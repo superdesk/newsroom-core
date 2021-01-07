@@ -19,18 +19,6 @@ requirements = (
     'superdesk-planning@https://github.com/superdesk/superdesk-planning/archive/release/2.0.1.zip'
 )
 
-dev_requirements = (
-    'flake8',
-    'sphinx',
-    'sphinx-autobuild',
-    'pytest==3.10.0',
-    'pytest-cov==2.6.1',
-    'pytest-mock==1.10.1',
-    'responses>=0.10.6,<0.11',
-    'httmock',
-    'wooper'
-)
-
 setup(
     name='Newsroom-Core',
     version='1.0',
@@ -42,9 +30,6 @@ setup(
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
     install_requires=requirements,
-    extras_require={
-        'dev': dev_requirements
-    },
     scripts=['manage.py'],
     classifiers=[
         'Development Status :: 4 - Beta',
