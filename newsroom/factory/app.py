@@ -28,16 +28,8 @@ from newsroom.gettext import setup_babel
 NEWSROOM_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 
-class NewsroomApp(eve.Eve):
-    """The base Newsroom object.
-
-    Usage::
-
-        from newsroom.web import NewsroomWebApp
-
-        app = NewsroomWebApp(__name__)
-        app.run()
-    """
+class BaseNewsroomApp(eve.Eve):
+    """The base Newsroom app class"""
 
     DATALAYER = SuperdeskDataLayer
     AUTH_SERVICE = SessionAuth
@@ -55,7 +47,7 @@ class NewsroomApp(eve.Eve):
         self.mail = None
         self.cache = None
 
-        super(NewsroomApp, self).__init__(
+        super(BaseNewsroomApp, self).__init__(
             import_name,
             data=self.DATALAYER,
             auth=self.AUTH_SERVICE,
@@ -104,7 +96,7 @@ class NewsroomApp(eve.Eve):
         if not getattr(self, 'settings'):
             self.settings = flask.Config('.')
 
-        super(NewsroomApp, self).load_config()
+        super(BaseNewsroomApp, self).load_config()
         self.config.setdefault('DOMAIN', {})
         self.config.setdefault('SOURCES', {})
         self.load_app_config()
