@@ -2,7 +2,7 @@ import os
 import flask
 import jinja2
 
-from newsroom.factory import NewsroomApp
+from newsroom.factory import BaseNewsroomApp
 from newsroom.template_filters import (
     datetime_short, datetime_long, time_short, date_short,
     plain_text, word_count, char_count, newsroom_config, is_admin,
@@ -16,7 +16,17 @@ from newsroom.webpack import NewsroomWebpack
 from newsroom.settings import SettingsApp
 
 
-class NewsroomWebApp(NewsroomApp):
+class NewsroomWebApp(BaseNewsroomApp):
+    """Newsroom web app.
+
+        Usage::
+
+            from newsroom.web import NewsroomWebApp
+
+            app = NewsroomWebApp(__name__)
+            app.run()
+        """
+
     def __init__(self, import_name=__package__, config=None, **kwargs):
         self.download_formatters = {}
         self.sections = []
@@ -188,3 +198,7 @@ class NewsroomWebApp(NewsroomApp):
             'name': name,
             'cards': cards
         })
+
+
+def get_app(config=None):
+    return NewsroomWebApp(__name__, config=config)

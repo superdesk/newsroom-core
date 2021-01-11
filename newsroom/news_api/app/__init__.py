@@ -7,7 +7,7 @@ from elasticsearch.exceptions import RequestError as ElasticRequestError
 from werkzeug.exceptions import HTTPException
 from superdesk.errors import SuperdeskApiError
 
-from newsroom.factory import NewsroomApp
+from newsroom.factory import BaseNewsroomApp
 from newsroom.news_api.api_tokens import CompanyTokenAuth
 from superdesk.utc import utcnow
 from newsroom.template_filters import (
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 API_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
-class NewsroomNewsAPI(NewsroomApp):
+class NewsroomNewsAPI(BaseNewsroomApp):
     AUTH_SERVICE = CompanyTokenAuth
 
     def __init__(self, import_name=__package__, config=None, **kwargs):
@@ -45,7 +45,7 @@ class NewsroomNewsAPI(NewsroomApp):
 
     def load_app_config(self):
         super(NewsroomNewsAPI, self).load_app_config()
-        self.config.from_object('newsroom.news_api.settings')
+        self.config.from_object('newsroom.news_api.default_settings')
         self.config.from_envvar('NEWS_API_SETTINGS', silent=True)
 
     def run(self, host=None, port=None, debug=None, **options):
@@ -116,11 +116,3 @@ def get_app(config=None):
         return response
 
     return app
-
-
-app = get_app()
-
-if __name__ == '__main__':
-    host = '0.0.0.0'
-    port = int(os.environ.get('APIPORT', '5400'))
-    app.run(host=host, port=port, debug=True, use_reloader=True)
