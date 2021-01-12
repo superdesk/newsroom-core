@@ -13,6 +13,6 @@ def app():
     from newsroom.web import NewsroomWebApp
 
     cfg = Config(root)
-    cfg.from_object('newsroom.news_api.settings')
+    cfg.from_object('newsroom.news_api.default_settings')
     update_config(cfg)
     return NewsroomWebApp(config=cfg, testing=True)
