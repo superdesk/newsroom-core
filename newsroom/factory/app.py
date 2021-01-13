@@ -33,6 +33,7 @@ class BaseNewsroomApp(eve.Eve):
 
     DATALAYER = SuperdeskDataLayer
     AUTH_SERVICE = SessionAuth
+    INSTANCE_CONFIG = None
 
     def __init__(self, import_name=__package__, config=None, testing=False, **kwargs):
         """Override __init__ to do Newsroom specific config and still be able
@@ -81,12 +82,19 @@ class BaseNewsroomApp(eve.Eve):
 
         configure_logging(self.config.get('LOG_CONFIG_FILE'))
 
-    def load_app_config(self):
+    def load_app_default_config(self):
+        """
+        Loads default app configuration
+        """
         self.config.from_object('content_api.app.settings')
-        self.config.from_object('newsroom.default_settings')
-        if not self._testing:
+
+    def load_app_instance_config(self):
+        """
+        Loads instance configuration defined on the newsroom-app repo level
+        """
+        if not self._testing and self.INSTANCE_CONFIG:
             try:
-                self.config.from_pyfile(os.path.join(os.getcwd(), 'settings.py'))
+                self.config.from_pyfile(os.path.join(os.getcwd(), self.INSTANCE_CONFIG))
             except FileNotFoundError:
                 pass
 
@@ -99,7 +107,8 @@ class BaseNewsroomApp(eve.Eve):
         super(BaseNewsroomApp, self).load_config()
         self.config.setdefault('DOMAIN', {})
         self.config.setdefault('SOURCES', {})
-        self.load_app_config()
+        self.load_app_default_config()
+        self.load_app_instance_config()
 
     def setup_media_storage(self):
         if self.config.get('AMAZON_CONTAINER_NAME'):

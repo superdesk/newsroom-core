@@ -4,6 +4,8 @@ from superdesk.default_settings import env
 URL_PREFIX = os.environ.get('CONTENT_API_PREFIX', 'api/v1')
 QUERY_MAX_PAGE_SIZE = 100
 
+BLUEPRINTS = []
+
 CORE_APPS = [
     'newsroom.news_api',
     'newsroom.news_api.api_tokens',

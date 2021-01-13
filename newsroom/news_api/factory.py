@@ -15,6 +15,7 @@ from newsroom.template_filters import (
     plain_text, word_count, char_count, date_header
 )
 
+
 logger = logging.getLogger(__name__)
 
 API_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -22,6 +23,7 @@ API_DIR = os.path.abspath(os.path.dirname(__file__))
 
 class NewsroomNewsAPI(BaseNewsroomApp):
     AUTH_SERVICE = CompanyTokenAuth
+    INSTANCE_CONFIG = 'settings_newsapi.py'
 
     def __init__(self, import_name=__package__, config=None, **kwargs):
         if not getattr(self, 'settings'):
@@ -43,9 +45,22 @@ class NewsroomNewsAPI(BaseNewsroomApp):
             jinja2.FileSystemLoader(template_folder),
         ])
 
-    def load_app_config(self):
-        super(NewsroomNewsAPI, self).load_app_config()
+    def load_app_default_config(self):
+        """
+        Loads default app configuration
+        """
+        # default config from `content_api.app.settings`
+        super().load_app_default_config()
+        # default config from `newsroom.news_api.default_settings`
         self.config.from_object('newsroom.news_api.default_settings')
+
+    def load_app_instance_config(self):
+        """
+        Loads instance configuration defined on the newsroom-app repo level
+        """
+        # config from newsroom-app settings_newsapi.py file
+        super().load_app_instance_config()
+        # config from env var
         self.config.from_envvar('NEWS_API_SETTINGS', silent=True)
 
     def run(self, host=None, port=None, debug=None, **options):
