@@ -46,6 +46,15 @@ from superdesk.default_settings import (   # noqa
     LOG_CONFIG_FILE,
 )
 
+# newsroom default db and index names
+MONGO_DBNAME = env('MONGO_DBNAME', 'newsroom')
+# mongo
+MONGO_URI = env('MONGO_URI', f'mongodb://localhost/{MONGO_DBNAME}')
+CONTENTAPI_MONGO_URI = env('CONTENTAPI_MONGO_URI', f'mongodb://localhost/{MONGO_DBNAME}')
+# elastic
+ELASTICSEARCH_INDEX = env('ELASTICSEARCH_INDEX', MONGO_DBNAME)
+CONTENTAPI_ELASTICSEARCH_INDEX = env('CONTENTAPI_ELASTICSEARCH_INDEX', MONGO_DBNAME)
+
 XML = False
 IF_MATCH = True
 JSON_SORT_KEYS = False
