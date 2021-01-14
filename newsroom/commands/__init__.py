@@ -14,3 +14,4 @@ from .data_updates import (
     data_upgrade,
     data_downgrade
 )  # noqa
+from .initialize_data import initialize_data # noqa
