@@ -1,5 +1,10 @@
 import os
-from superdesk.default_settings import env
+
+from superdesk.default_settings import (
+    env,
+    ELASTICSEARCH_URL,
+    CONTENTAPI_ELASTICSEARCH_URL
+)
 
 URL_PREFIX = os.environ.get('CONTENT_API_PREFIX', 'api/v1')
 QUERY_MAX_PAGE_SIZE = 100
@@ -29,22 +34,15 @@ CORE_APPS = [
 
 INSTALLED_APPS = []
 
-#: mongo db name, only used when mongo_uri is not set
+# newsroom default db and index names
 MONGO_DBNAME = env('MONGO_DBNAME', 'newsroom')
+# mongo
+MONGO_URI = env('MONGO_URI', f'mongodb://localhost/{MONGO_DBNAME}')
+CONTENTAPI_MONGO_URI = env('CONTENTAPI_MONGO_URI', f'mongodb://localhost/{MONGO_DBNAME}')
+# elastic
+ELASTICSEARCH_INDEX = env('ELASTICSEARCH_INDEX', MONGO_DBNAME)
+CONTENTAPI_ELASTICSEARCH_INDEX = env('CONTENTAPI_ELASTICSEARCH_INDEX', MONGO_DBNAME)
 
-#: full mongodb connection uri, overrides ``MONGO_DBNAME`` if set
-MONGO_URI = env('MONGO_URI', 'mongodb://localhost/%s' % MONGO_DBNAME)
-
-CONTENTAPI_MONGO_DBNAME = 'newsroom'
-CONTENTAPI_MONGO_URI = env('CONTENTAPI_MONGO_URI', 'mongodb://localhost/%s' % CONTENTAPI_MONGO_DBNAME)
-
-#: elastic url
-ELASTICSEARCH_URL = env('ELASTICSEARCH_URL', 'http://localhost:9200')
-CONTENTAPI_ELASTICSEARCH_URL = env('CONTENTAPI_ELASTICSEARCH_URL', ELASTICSEARCH_URL)
-
-#: elastic index name
-ELASTICSEARCH_INDEX = env('ELASTICSEARCH_INDEX', 'superdesk')
-CONTENTAPI_ELASTICSEARCH_INDEX = env('CONTENTAPI_ELASTICSEARCH_INDEX', CONTENTAPI_MONGO_DBNAME)
 
 FILTER_AGGREGATIONS = False
 ELASTIC_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
