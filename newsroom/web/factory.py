@@ -87,7 +87,9 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_global(self.settings_apps, 'settings_apps')
         self.add_template_global(get_multi_line_message)
         self.jinja_loader = jinja2.ChoiceLoader([
-            jinja2.FileSystemLoader('theme'),
+            # newsroom-app/server/templates
+            jinja2.FileSystemLoader(self.config['ABS_PATH'] / 'templates'),
+            # newsroom-core/newsroom/templates
             jinja2.FileSystemLoader(self.template_folder),
         ])
 
