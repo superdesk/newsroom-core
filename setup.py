@@ -30,7 +30,7 @@ setup(
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
     install_requires=requirements,
-    scripts=['manage.py'],
+    scripts=[],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
