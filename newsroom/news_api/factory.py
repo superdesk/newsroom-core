@@ -116,8 +116,8 @@ class NewsroomNewsAPI(BaseNewsroomApp):
         self.register_error_handler(Exception, base_exception_error)
 
 
-def get_app(config=None):
-    app = NewsroomNewsAPI(__name__, config=config)
+def get_app(config=None, **kwargs):
+    app = NewsroomNewsAPI(__name__, config=config, **kwargs)
 
     @app.after_request
     def after_request(response):

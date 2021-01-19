@@ -1,4 +1,4 @@
-from newsroom.default_settings import BLUEPRINTS, CLIENT_CONFIG
+from newsroom.web.default_settings import BLUEPRINTS, CLIENT_CONFIG
 
 BLUEPRINTS.append('newsroom.am_news')
 BLUEPRINTS.append('newsroom.market_place')
