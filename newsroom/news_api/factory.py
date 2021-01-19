@@ -31,7 +31,7 @@ class NewsroomNewsAPI(BaseNewsroomApp):
 
         super(NewsroomNewsAPI, self).__init__(import_name=import_name, config=config, **kwargs)
 
-        template_folder = os.path.abspath(os.path.join(API_DIR, '../../templates'))
+        template_folder = os.path.abspath(os.path.join(API_DIR, '../templates'))
 
         self.add_template_filter(datetime_short)
         self.add_template_filter(datetime_long)
