@@ -1,6 +1,6 @@
 from newsroom.data_updates import GenerateUpdate, Upgrade, get_data_updates_files, Downgrade
 
-from .manager import app, manager
+from .manager import manager
 
 
 @manager.option('-r', '--resource', dest='resource', required=True)

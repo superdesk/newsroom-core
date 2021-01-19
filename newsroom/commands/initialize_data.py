@@ -1,5 +1,4 @@
 import logging
-from pathlib import Path
 from collections import OrderedDict
 
 from apps.prepopulate.app_initialize import AppInitializeWithDataCommand as _AppInitializeWithDataCommand
