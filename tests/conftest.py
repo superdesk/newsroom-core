@@ -1,7 +1,12 @@
 import os
 import sys
 from pathlib import Path
+
+from flask import Config
 from pytest import fixture
+
+from newsroom.web.factory import get_app
+
 
 root = (Path(__file__).parent / '..').resolve()
 sys.path.insert(0, str(root))
@@ -45,13 +50,10 @@ def clean_databases(app):
 
 @fixture
 def app():
-    from flask import Config
-    from newsroom.web import NewsroomWebApp
-
     cfg = Config(root)
-    cfg.from_object('newsroom.default_settings')
+    # cfg.from_object('newsroom.web.default_settings')
     update_config(cfg)
-    return NewsroomWebApp(config=cfg, testing=True)
+    return get_app(config=cfg, testing=True)
 
 
 @fixture

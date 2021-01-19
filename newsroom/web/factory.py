@@ -83,12 +83,19 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_global(get_date, 'get_date')
         self.add_template_global(self.settings_apps, 'settings_apps')
         self.add_template_global(get_multi_line_message)
-        self.jinja_loader = jinja2.ChoiceLoader([
-            # newsroom-app/server/templates
-            jinja2.FileSystemLoader(self.config['ABS_PATH'] / 'templates'),
+
+        jinja2_loaders = []
+        # ABS_PATH is set only for the instance settings and not set for a test app instance
+        if 'ABS_PATH' in self.config:
+            jinja2_loaders.append(
+                # newsroom-app/server/templates
+                jinja2.FileSystemLoader(self.config['ABS_PATH'] / 'templates')
+            )
+        jinja2_loaders.append(
             # newsroom-core/newsroom/templates
-            jinja2.FileSystemLoader(self.template_folder),
-        ])
+            jinja2.FileSystemLoader(self.template_folder)
+        )
+        self.jinja_loader = jinja2.ChoiceLoader(jinja2_loaders)
 
     def _setup_limiter(self):
         limiter.init_app(self)
@@ -218,5 +225,5 @@ class NewsroomWebApp(BaseNewsroomApp):
         })
 
 
-def get_app(config=None):
-    return NewsroomWebApp(__name__, config=config)
+def get_app(config=None, **kwargs):
+    return NewsroomWebApp(__name__, config=config, **kwargs)
