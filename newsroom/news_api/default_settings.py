@@ -1,6 +1,6 @@
 import os
 
-from superdesk.default_settings import (
+from superdesk.default_settings import ( # noqa
     env,
     ELASTICSEARCH_URL,
     CONTENTAPI_ELASTICSEARCH_URL

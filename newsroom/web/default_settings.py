@@ -6,7 +6,7 @@ from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
 from datetime import timedelta
 
-from superdesk.default_settings import (   # noqa
+from superdesk.default_settings import ( # noqa
     DEBUG,
     VERSION,
     MONGO_URI,
@@ -50,11 +50,11 @@ from superdesk.default_settings import (   # noqa
 # newsroom default db and index names
 MONGO_DBNAME = env('MONGO_DBNAME', 'newsroom')
 # mongo
-MONGO_URI = env('MONGO_URI', f'mongodb://localhost/{MONGO_DBNAME}')
-CONTENTAPI_MONGO_URI = env('CONTENTAPI_MONGO_URI', f'mongodb://localhost/{MONGO_DBNAME}')
+MONGO_URI = env('MONGO_URI', f'mongodb://localhost/{MONGO_DBNAME}') # noqa
+CONTENTAPI_MONGO_URI = env('CONTENTAPI_MONGO_URI', f'mongodb://localhost/{MONGO_DBNAME}') # noqa
 # elastic
-ELASTICSEARCH_INDEX = env('ELASTICSEARCH_INDEX', MONGO_DBNAME)
-CONTENTAPI_ELASTICSEARCH_INDEX = env('CONTENTAPI_ELASTICSEARCH_INDEX', MONGO_DBNAME)
+ELASTICSEARCH_INDEX = env('ELASTICSEARCH_INDEX', MONGO_DBNAME) # noqa
+CONTENTAPI_ELASTICSEARCH_INDEX = env('CONTENTAPI_ELASTICSEARCH_INDEX', MONGO_DBNAME) # noqa
 
 XML = False
 IF_MATCH = True

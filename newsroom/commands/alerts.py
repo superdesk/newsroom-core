@@ -1,7 +1,7 @@
 from newsroom.company_expiry_alerts import CompanyExpiryAlerts
 from newsroom.monitoring.email_alerts import MonitoringEmailAlerts
 
-from .manager import app, manager
+from .manager import manager
 
 
 @manager.command

@@ -1,6 +1,6 @@
 import content_api
 
-from .manager import app, manager
+from .manager import manager
 
 
 @manager.option('-m', '--expiry', dest='expiry_days', required=False)
