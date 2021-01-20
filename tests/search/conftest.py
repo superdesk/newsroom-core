@@ -5,7 +5,7 @@ from flask import Config
 from pytest import fixture
 
 from newsroom.web.factory import get_app
-from tests.conftest import update_config, client, setup  # noqa
+from newsroom.tests.conftest import update_config, client, setup  # noqa
 
 
 root = (Path(__file__).parent / '..').resolve()
