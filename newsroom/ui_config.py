@@ -35,6 +35,9 @@ class UIConfigResource(newsroom.Resource):
         'multi_select_topics': {
             'type': 'boolean',
             'default': False
+        },
+        'init_version': {
+            'type': 'integer'
         }
     }
     datasource = {
