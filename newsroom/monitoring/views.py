@@ -1,28 +1,31 @@
-import flask
+import base64
 from bson import ObjectId
+
+import flask
 from flask import jsonify, current_app as app, send_file
 from flask_babel import gettext
-from superdesk import get_resource_service
 from werkzeug.exceptions import NotFound
 from eve.methods.get import get_internal
 from eve.render import send_response
 from newsroom.decorator import admin_only, login_required, account_manager_only
+from superdesk import get_resource_service
+from superdesk.logging import logger
+
+from newsroom.email import send_email
 from newsroom.companies import section
-from newsroom.monitoring import blueprint
-from .forms import MonitoringForm, alert_types
-from newsroom.utils import query_resource, find_one, get_items_by_id, get_entity_or_404, get_json_or_400, \
-    set_original_creator, set_version_creator, is_json_request, get_items_for_user_action
 from newsroom.template_filters import is_admin
 from newsroom.auth import get_user, get_user_id
 from newsroom.wire.utils import update_action_list
 from newsroom.wire.views import item as wire_print
 from newsroom.notifications import push_user_notification
 from newsroom.wire.search import get_bookmarks_count
-from newsroom.monitoring.utils import get_date_items_dict, get_monitoring_file, \
-    get_items_for_monitoring_report
-from superdesk.logging import logger
-from newsroom.email import send_email
-import base64
+from newsroom.monitoring import blueprint
+from newsroom.monitoring.utils import (get_date_items_dict, get_monitoring_file,
+                                       get_items_for_monitoring_report)
+from newsroom.utils import (query_resource, find_one, get_items_by_id, get_entity_or_404, get_json_or_400,
+                            set_original_creator, set_version_creator, is_json_request, get_items_for_user_action)
+
+from .forms import MonitoringForm, alert_types
 
 
 def get_view_data():
