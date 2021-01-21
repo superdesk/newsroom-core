@@ -8,7 +8,7 @@ from .manager import app, manager
 
 logger = logging.getLogger(__name__)
 DATA_PATH = app.config['ABS_PATH'] / 'data'
-__entities__ = OrderedDict([
+__entities__: OrderedDict = OrderedDict([
     ('users', ('users.json', [], False)),
     ('ui_config', ('ui_config.json', [], True)),
 ])
