@@ -1,23 +1,12 @@
+from pathlib import Path
+
 from setuptools import setup, find_packages
 
 
-requirements = (
-    'Babel>=2.5.3,<3.0',
-    'WTForms==2.2.1',
-    'flask-webpack>=0.1.0,<0.2',
-    'Flask-WTF>=0.14.2,<0.15',
-    'flask-limiter>=0.9.5.1,<0.9.6',
-    'Flask-Caching>=1.9.0',
-    'flask_pymongo>=0.5.2,<1.0',
-    'honcho>=1.0.1',
-    'gunicorn>=19.7.1',
-    'icalendar>=4.0.3,<4.1',
-    'PyRTF3>=0.47.5',
-    'xhtml2pdf>=0.2.4',
-    'superdesk-core==2.0.10',
-    # dependency_links was deprecated
-    'superdesk-planning@https://github.com/superdesk/superdesk-planning/archive/release/2.0.1.zip'
-)
+requirements_txt_path = Path(__file__).parent.absolute() / 'requirements.txt'
+
+with open(requirements_txt_path, 'r') as r:
+    requirements = [line.rsplit('\n', 1)[0] for line in r.readlines()]
 
 setup(
     name='Newsroom-Core',
