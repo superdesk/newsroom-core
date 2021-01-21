@@ -83,7 +83,7 @@ def handle_exception(exc):
     logger.exception(exc)
 
 
-class AppContextTask(TaskBase):
+class AppContextTask(TaskBase):  # type: ignore
     abstract = True
     serializer = 'newsroom/json'
     app_errors = (
