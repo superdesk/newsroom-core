@@ -1,12 +1,13 @@
 from flask import Blueprint
+
 from .reports import get_company_saved_searches, get_subscriber_activity_report, \
     get_user_saved_searches, get_company_products, get_product_stories, get_company_report, \
     get_content_activity_report, get_company_api_usage, get_product_company, get_expired_companies
 import superdesk
 from newsroom.wire.search import WireSearchService, WireSearchResource
 
-blueprint = Blueprint('reports', __name__)
 
+blueprint = Blueprint('reports', __name__)
 
 reports = {
     'company-saved-searches': get_company_saved_searches,

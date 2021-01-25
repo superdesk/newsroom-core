@@ -1,5 +1,5 @@
-from .ninjs import NINJSFormatter
 from newsroom.news_api.utils import remove_internal_renditions, check_association_permission
+from .ninjs import NINJSFormatter
 
 
 class NINJSFormatter2(NINJSFormatter):

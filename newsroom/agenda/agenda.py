@@ -1,6 +1,7 @@
 import logging
-
 from copy import deepcopy
+
+from bson import ObjectId
 from content_api.items.resource import code_mapping
 from eve.utils import ParsedRequest, config
 from flask import json, abort, current_app as app
@@ -24,7 +25,6 @@ from datetime import datetime
 from newsroom.wire import url_for_wire
 from newsroom.search import BaseSearchService, SearchQuery, query_string
 from .utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD
-from bson import ObjectId
 
 
 logger = logging.getLogger(__name__)

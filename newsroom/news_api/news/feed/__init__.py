@@ -1,4 +1,5 @@
 import superdesk
+
 from .resource import NewsAPIFeedResource
 from .service import NewsAPIFeedService
 

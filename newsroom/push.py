@@ -1,15 +1,16 @@
 import hmac
 import flask
 import logging
-import superdesk
+from copy import copy, deepcopy
 from datetime import datetime
 
-from copy import copy, deepcopy
 from flask import current_app as app
 from flask_babel import gettext
+import superdesk
 from superdesk.text_utils import get_word_count, get_char_count
-
 from superdesk.utc import utcnow
+from planning.common import WORKFLOW_STATE
+
 from newsroom.notifications import push_notification
 from newsroom.topics.topics import get_wire_notification_topics, get_agenda_notification_topics
 from newsroom.utils import parse_dates, get_user_dict, get_company_dict, parse_date_str
@@ -22,7 +23,6 @@ from newsroom.upload import ASSETS_RESOURCE
 from newsroom.signals import publish_item as publish_item_signal
 from newsroom.agenda.utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD
 
-from planning.common import WORKFLOW_STATE
 
 logger = logging.getLogger(__name__)
 blueprint = flask.Blueprint('push', __name__)

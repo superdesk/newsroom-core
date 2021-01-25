@@ -1,12 +1,13 @@
 import superdesk
-
 from flask import Blueprint
 from flask_babel import lazy_gettext
+
+from newsroom.utils import url_for_agenda
 from .agenda import AgendaResource, AgendaService
 from .featured import FeaturedResource, FeaturedService
 from . import formatters
 from .utils import get_coverage_email_text
-from newsroom.utils import url_for_agenda
+
 
 blueprint = Blueprint('agenda', __name__)
 

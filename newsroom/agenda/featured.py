@@ -1,7 +1,8 @@
 
+from datetime import datetime
+
 from superdesk.utc import local_to_utc
 from newsroom import Resource, Service
-from datetime import datetime
 
 
 class FeaturedResource(Resource):

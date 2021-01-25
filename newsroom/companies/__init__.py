@@ -1,6 +1,6 @@
-import superdesk
 from functools import wraps
 
+import superdesk
 from flask import Blueprint, abort, current_app as newsroom_app, g
 from flask_babel import lazy_gettext
 from newsroom.auth import get_user

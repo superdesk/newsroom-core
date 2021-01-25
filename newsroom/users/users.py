@@ -1,9 +1,10 @@
 import bcrypt
 from flask import current_app as app, session
 
-import newsroom
 from content_api import MONGO_PREFIX
 from superdesk.utils import is_hashed, get_hash
+
+import newsroom
 from newsroom.auth import get_user_id
 from newsroom.utils import set_original_creator, set_version_creator
 

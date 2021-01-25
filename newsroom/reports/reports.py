@@ -1,21 +1,24 @@
-from collections import defaultdict
-
-import superdesk
-from bson import ObjectId
-from flask_babel import gettext
-from flask import request, send_file, current_app as newsroom_app, json
 import io
 import csv
-from superdesk.utc import utcnow
-from werkzeug.utils import secure_filename
+from collections import defaultdict
 from copy import deepcopy
-from newsroom.agenda.agenda import get_date_filters
+
+from bson import ObjectId
 from flask import abort
-from newsroom.utils import query_resource, get_entity_dict, get_items_by_id
-from .content_activity import get_content_activity_report  # noqa
+from flask_babel import gettext
+from flask import request, send_file, current_app as newsroom_app, json
 from eve.utils import ParsedRequest
+from werkzeug.utils import secure_filename
+import superdesk
+from superdesk.utc import utcnow
+
+
+from newsroom.utils import query_resource, get_entity_dict, get_items_by_id
+from newsroom.agenda.agenda import get_date_filters
 from newsroom.news_api.api_tokens import API_TOKENS
 from newsroom.news_api.utils import format_report_results
+
+from .content_activity import get_content_activity_report  # noqa
 
 
 def get_company_saved_searches():

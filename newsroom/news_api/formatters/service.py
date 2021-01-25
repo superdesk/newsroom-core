@@ -1,11 +1,13 @@
-from newsroom.wire.formatters import get_all_formatters
-from superdesk.utils import ListCursor
+from datetime import timedelta
+
 from flask import abort
-from superdesk import get_resource_service
 from flask import current_app as app
 from eve.versioning import versioned_id_field
-from datetime import timedelta
+from superdesk.utils import ListCursor
+from superdesk import get_resource_service
 from superdesk.utc import utcnow
+
+from newsroom.wire.formatters import get_all_formatters
 from newsroom.settings import get_setting
 from newsroom import Service
 

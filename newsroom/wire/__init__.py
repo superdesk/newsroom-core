@@ -2,9 +2,11 @@ import superdesk
 
 from flask import Blueprint, url_for
 from flask_babel import lazy_gettext
+from superdesk.metadata.item import not_analyzed
+
 from newsroom.wire.search import WireSearchResource, WireSearchService
 from . import utils
-from superdesk.metadata.item import not_analyzed
+
 
 blueprint = Blueprint('wire', __name__)
 

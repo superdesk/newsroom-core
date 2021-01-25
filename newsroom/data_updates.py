@@ -9,14 +9,15 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 
-from string import Template
-from types import ModuleType
-from flask import current_app
-import superdesk
 import getpass
 import os
 import re
 import time
+from string import Template
+from types import ModuleType
+
+from flask import current_app
+import superdesk
 from eve.utils import ParsedRequest
 
 

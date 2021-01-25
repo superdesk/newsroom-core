@@ -1,21 +1,21 @@
-
-import tempfile
 import os
-from werkzeug.utils import secure_filename
-from newsroom.wire.formatters.base import BaseFormatter
-from superdesk.utc import utcnow, utc_to_local
-from newsroom.monitoring.utils import get_keywords_in_text
-from flask import current_app as app
-from newsroom.wire import url_for_wire
+import logging
+import tempfile
+from binascii import hexlify
 
 from PyRTF.Elements import Document, Section, LINE
 from PyRTF.document.paragraph import Paragraph
 from PyRTF.document.character import TEXT
 from PyRTF.object.picture import Image
-from binascii import hexlify
 from PyRTF.document.base import RawCode
+from werkzeug.utils import secure_filename
+from superdesk.utc import utcnow, utc_to_local
+from flask import current_app as app
+
+from newsroom.wire import url_for_wire
+from newsroom.monitoring.utils import get_keywords_in_text
+from newsroom.wire.formatters.base import BaseFormatter
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
-import logging
 
 logger = logging.getLogger(__name__)
 

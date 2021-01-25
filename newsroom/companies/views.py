@@ -1,4 +1,5 @@
 import re
+import ipaddress
 from datetime import datetime
 
 import flask
@@ -12,7 +13,6 @@ from newsroom.decorator import admin_only, account_manager_only, login_required
 from newsroom.companies import blueprint
 from newsroom.utils import query_resource, find_one, get_entity_or_404, get_json_or_400, set_original_creator, \
     set_version_creator
-import ipaddress
 
 
 def get_company_types_options(company_types):
