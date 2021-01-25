@@ -32,6 +32,9 @@ CORE_APPS = [
 
 INSTALLED_APPS = []
 
+LANGUAGES = ['en', 'fi', 'cs', 'fr_CA']
+DEFAULT_LANGUAGE = 'en'
+
 # newsroom default db and index names
 MONGO_DBNAME = env('MONGO_DBNAME', 'newsroom')
 # mongo
