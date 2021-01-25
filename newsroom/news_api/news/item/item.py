@@ -1,10 +1,12 @@
-import superdesk
 import flask
-from superdesk import get_resource_service
 from flask import current_app as app, abort
 from flask_babel import gettext
+import superdesk
+from superdesk import get_resource_service
+
 from newsroom.news_api.utils import post_api_audit
 from newsroom.news_api.api_tokens import CompanyTokenAuth
+
 
 blueprint = superdesk.Blueprint('news/item', __name__)
 

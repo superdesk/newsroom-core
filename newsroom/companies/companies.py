@@ -1,6 +1,7 @@
 
-import newsroom
 from content_api import MONGO_PREFIX
+
+import newsroom
 
 
 class CompaniesResource(newsroom.Resource):

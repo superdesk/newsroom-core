@@ -1,6 +1,8 @@
 from superdesk import register_resource
-from newsroom import Resource, Service
 from superdesk.resource import not_analyzed
+
+from newsroom import Resource, Service
+
 
 not_analayzed_mapping = {
     'type': 'string',

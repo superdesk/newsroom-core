@@ -1,7 +1,10 @@
+import logging
+
 import superdesk
+
 from .resource import APIFormattersResource
 from .service import APIFormattersService
-import logging
+
 
 logger = logging.getLogger(__name__)
 

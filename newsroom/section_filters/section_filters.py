@@ -1,5 +1,6 @@
-import newsroom
 import superdesk
+
+import newsroom
 from newsroom.search import query_string
 
 

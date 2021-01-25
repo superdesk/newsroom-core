@@ -1,5 +1,6 @@
-from content_api.tokens import CompanyTokenResource
 from copy import deepcopy
+
+from content_api.tokens import CompanyTokenResource
 
 
 class NewsApiTokensResource(CompanyTokenResource):

@@ -1,17 +1,16 @@
-from datetime import datetime
-from werkzeug.datastructures import MultiDict
 import json
 import functools
 import re
 from dateutil import parser
 import pytz
-from bson import ObjectId
-from flask import current_app as app, g
+from datetime import datetime
 
+from bson import ObjectId
+from werkzeug.datastructures import MultiDict
+from flask import current_app as app, g
 from superdesk import get_resource_service
 from superdesk.utc import utcnow, local_to_utc
 from superdesk.errors import SuperdeskApiError
-
 from content_api.items.resource import ItemsResource
 from content_api.errors import BadParameterValueError, UnexpectedParameterError
 

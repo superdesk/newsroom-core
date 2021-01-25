@@ -1,12 +1,14 @@
-import superdesk
-import flask
-from newsroom.news_api.api_tokens import CompanyTokenAuth
-from flask import abort
-from newsroom.upload import ASSETS_RESOURCE
-from flask_babel import gettext
 import bson.errors
 from werkzeug.wsgi import wrap_file
+import flask
+from flask import abort
+from flask_babel import gettext
+import superdesk
+
+from newsroom.upload import ASSETS_RESOURCE
+from newsroom.news_api.api_tokens import CompanyTokenAuth
 from newsroom.news_api.utils import post_api_audit
+
 
 blueprint = superdesk.Blueprint('assets', __name__)
 

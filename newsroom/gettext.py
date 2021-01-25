@@ -2,6 +2,7 @@
 from babel import core
 from flask import request, current_app, session
 from flask_babel import Babel, get_translations
+
 from newsroom.auth import get_user
 
 
