@@ -1,4 +1,11 @@
 {
+  "name": "newsroom-core",
+  "version": "1.0.0",
+  "license": "GPLv3",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/superdesk/newsroom-core.git"
+  },
   "scripts": {
     "start": "webpack-dev-server --progress --colors --content-base dist --host 0.0.0.0",
     "build": "webpack --config webpack.config.js --progress --profile --colors",
