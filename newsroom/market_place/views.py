@@ -1,5 +1,4 @@
 import flask
-
 from flask import current_app as app
 from eve.render import send_response
 from eve.methods.get import get_internal

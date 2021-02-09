@@ -1,14 +1,14 @@
-from newsroom.agenda import blueprint
+import json
 
 import flask
-
 from flask import current_app as app, request
 from flask_babel import gettext
 from eve.methods.get import get_internal
 from eve.render import send_response
-from superdesk import get_resource_service
 from eve.utils import ParsedRequest
+from superdesk import get_resource_service
 
+from newsroom.agenda import blueprint
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.topics import get_user_topics
 from newsroom.navigations.navigations import get_navigations_by_company
@@ -22,7 +22,6 @@ from newsroom.agenda.email import send_coverage_request_email
 from newsroom.agenda.utils import remove_fields_for_public_user
 from newsroom.companies import section, get_user_company
 from newsroom.notifications import push_user_notification
-import json
 
 
 @blueprint.route('/agenda')

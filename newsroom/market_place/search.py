@@ -1,4 +1,5 @@
 import logging
+
 from newsroom.wire.search import WireSearchResource, WireSearchService
 from newsroom.market_place import SECTION_ID
 

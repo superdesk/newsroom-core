@@ -6,7 +6,7 @@ from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
 from datetime import timedelta
 
-from superdesk.default_settings import (   # noqa
+from superdesk.default_settings import ( # noqa
     DEBUG,
     VERSION,
     MONGO_URI,
@@ -14,6 +14,7 @@ from superdesk.default_settings import (   # noqa
     CONTENTAPI_MONGO_URI,
     CONTENTAPI_ELASTICSEARCH_URL,
     CONTENTAPI_ELASTICSEARCH_INDEX,
+    CONTENTAPI_ELASTICSEARCH_SETTINGS,
     ELASTICSEARCH_URL,
     ELASTICSEARCH_SETTINGS,
     ELASTIC_DATE_FORMAT,
@@ -45,6 +46,15 @@ from superdesk.default_settings import (   # noqa
     CELERY_BEAT_SCHEDULE_FILENAME,
     LOG_CONFIG_FILE,
 )
+
+# newsroom default db and index names
+MONGO_DBNAME = env('MONGO_DBNAME', 'newsroom')
+# mongo
+MONGO_URI = env('MONGO_URI', f'mongodb://localhost/{MONGO_DBNAME}') # noqa
+CONTENTAPI_MONGO_URI = env('CONTENTAPI_MONGO_URI', f'mongodb://localhost/{MONGO_DBNAME}') # noqa
+# elastic
+ELASTICSEARCH_INDEX = env('ELASTICSEARCH_INDEX', MONGO_DBNAME) # noqa
+CONTENTAPI_ELASTICSEARCH_INDEX = env('CONTENTAPI_ELASTICSEARCH_INDEX', MONGO_DBNAME) # noqa
 
 XML = False
 IF_MATCH = True
@@ -231,8 +241,7 @@ SERVICES = [
 # Hides or displays abstract on preview panel and details modal
 DISPLAY_ABSTRACT = False
 
-
-WATERMARK_IMAGE = os.path.join(os.path.dirname(__file__), 'static', 'watermark.png')
+WATERMARK_IMAGE = os.path.join(os.path.dirname(__file__), '../static', 'watermark.png')
 
 GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY')
 GOOGLE_ANALYTICS = os.environ.get('GOOGLE_ANALYTICS')

@@ -8,26 +8,26 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+import base64
+import datetime
+import logging
+from bson import ObjectId
+from urllib.parse import urlparse
+
+from flask import render_template, current_app as app
+from flask_babel import gettext
+from eve.utils import ParsedRequest
 from superdesk import get_resource_service, Command
 from superdesk.utc import utcnow, utc_to_local, local_to_utc
 from superdesk.celery_task_utils import get_lock_id
 from superdesk.lock import lock, unlock, remove_locks
-from flask import render_template, current_app as app
-from flask_babel import gettext
+
 from newsroom.celery_app import celery
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
 from newsroom.utils import parse_date_str, get_items_by_id, get_entity_or_404
-import datetime
-import logging
-from bson import ObjectId
-from eve.utils import ParsedRequest
-from .utils import get_monitoring_file, truncate_article_body
-import base64
 
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
+from .utils import get_monitoring_file, truncate_article_body
+
 
 logger = logging.getLogger(__name__)
 

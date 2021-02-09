@@ -1,8 +1,10 @@
-from flask import g
-from newsroom.products import ProductsService, ProductsResource
-from bson import ObjectId
 import json
+
+from flask import g
+from bson import ObjectId
 from eve.utils import ParsedRequest
+
+from newsroom.products import ProductsService, ProductsResource
 from newsroom.news_api.utils import post_api_audit
 
 

@@ -6,7 +6,6 @@ from flask import url_for
 from superdesk.utc import utcnow
 
 from newsroom.agenda.contacts import get_contact_name, get_contact_email
-
 from newsroom.formatter import BaseFormatter
 
 

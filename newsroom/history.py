@@ -1,5 +1,3 @@
-
-import newsroom
 import pymongo.errors
 import werkzeug.exceptions
 
@@ -9,6 +7,8 @@ from superdesk.utc import utcnow
 from flask import json, abort, Blueprint, jsonify
 from flask_babel import gettext
 from eve.utils import ParsedRequest
+
+import newsroom
 from newsroom.utils import get_json_or_400
 from newsroom.auth import get_user
 

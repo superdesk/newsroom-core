@@ -6,7 +6,7 @@ from .cards import CardsResource, CardsService
 
 blueprint = Blueprint('cards', __name__)
 
-from . import views   # noqa
+from . import views # noqa
 
 
 def init_app(app):

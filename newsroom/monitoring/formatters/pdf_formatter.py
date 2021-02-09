@@ -1,9 +1,9 @@
-
+from xhtml2pdf import pisa
 from werkzeug.utils import secure_filename
 from flask import render_template, current_app as app
-from newsroom.wire.formatters.base import BaseFormatter
 from superdesk.utc import utcnow, utc_to_local
-from xhtml2pdf import pisa
+
+from newsroom.wire.formatters.base import BaseFormatter
 
 
 class MonitoringPDFFormatter(BaseFormatter):

@@ -1,14 +1,17 @@
-import superdesk
+import ipaddress
+from datetime import timedelta
+
 from flask import Blueprint
 from flask_babel import gettext
-from .resource import NewsApiTokensResource
-from .service import NewsApiTokensService
-from eve.auth import TokenAuth
-import ipaddress
 from flask import g, current_app as app, abort, request
+from eve.auth import TokenAuth
+import superdesk
 from superdesk.utc import utcnow
 from superdesk import get_resource_service
-from datetime import timedelta
+
+from .resource import NewsApiTokensResource
+from .service import NewsApiTokensService
+
 
 API_TOKENS = 'news_api_tokens'
 
