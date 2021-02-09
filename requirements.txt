@@ -11,4 +11,4 @@ icalendar>=4.0.3,<4.1
 PyRTF3>=0.47.5
 xhtml2pdf>=0.2.4
 superdesk-core==2.0.10
-superdesk-planning@https://github.com/superdesk/superdesk-planning/archive/v2.0.1.zip
+superdesk-planning==2.0.2
