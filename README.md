@@ -20,43 +20,10 @@ Newshub is fully responsive from desktop, to tablet, to mobile.
 
 Sourcefabric is happy to provide demonstrations of Newshub and other newsroom tools from the Superdesk stable.
 
-## Install
+## Install && Run
 
-```
-pip install -r requirements.txt
-```
+See https://github.com/superdesk/newsroom-core
 
-And if you want to run tests also:
-
-```
-pip install -r dev-requirements.txt
-```
-
-### UI Development install
-
-Use npm (or yarn) to install packages:
-
-```
-npm install
-```
-
-## Run application
-
-```
-honcho start -p 5050
-```
-
-Will make it available on `http://localhost:5050` by default.
-
-### UI Dev Server
-
-Sources are located in `assets`, in order to use them run:
-
-```
-npm run start
-```
-
-It will start webpack dev server, python app is configured to make use of it.
 
 ## Test Python app
 
@@ -70,6 +37,12 @@ And tests:
 
 ```
 pytest
+```
+
+and
+
+```
+behave
 ```
 
 ## Test Javascript code

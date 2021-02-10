@@ -1,5 +1,6 @@
 import os
 import tzlocal
+import logging
 
 from kombu import Queue, Exchange
 from celery.schedules import crontab
@@ -47,6 +48,8 @@ from superdesk.default_settings import ( # noqa
     LOG_CONFIG_FILE,
 )
 
+logger = logging.getLogger()
+
 # newsroom default db and index names
 MONGO_DBNAME = env('MONGO_DBNAME', 'newsroom')
 # mongo
@@ -70,7 +73,11 @@ X_ALLOW_CREDENTIALS = True
 URL_PREFIX = 'api'
 
 # keys for signing, should be binary
-SECRET_KEY = os.environ.get('SECRET_KEY', '').encode() or os.urandom(32)
+SECRET_KEY = os.environ.get('SECRET_KEY', '').encode()
+if not SECRET_KEY:
+    SECRET_KEY = b'E`<+\xa6\x1e\x02\xc5\x87\xfc\xd6\x87\x1f|\xf6\xbd\x0cK\x1a6\xff!\x97M\xc0\xc4\x11Ppg\xf7\xaa'
+    logger.warning('SECRET_KEY is not set, hardcoded value is used instead. This should not be used on production!')
+
 PUSH_KEY = os.environ.get('PUSH_KEY', '').encode()
 
 #: Default TimeZone, will try to guess from server settings if not set
@@ -154,7 +161,7 @@ TEMPLATES_AUTO_RELOAD = True
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S+0000'
 
-WEBPACK_MANIFEST_PATH = os.path.join(os.path.dirname(__file__), 'static', 'dist', 'manifest.json')
+WEBPACK_MANIFEST_PATH = os.path.join(os.path.dirname(__file__), '..', 'static', 'dist', 'manifest.json')
 WEBPACK_ASSETS_URL = os.environ.get('ASSETS_URL', '/static/dist/')
 WEBPACK_SERVER_URL = os.environ.get('WEBPACK_SERVER_URL', 'http://localhost:8080/')
 
