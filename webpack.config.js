@@ -55,7 +55,6 @@ module.exports = {
             {
                 test: /\.jsx?$/,
                 loader: 'babel-loader',
-                exclude: /node_modules/,
                 options: {
                     presets: ['es2015', 'react'],
                     plugins: ['transform-object-rest-spread'],
