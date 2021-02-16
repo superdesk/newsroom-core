@@ -107,6 +107,7 @@
 </script>
 
 {{ javascript_tag('newsroom_js') | safe }}
+{{ javascript_tag('app') | safe }}
 
 {% if session.get('name') %}
     {{ javascript_tag('notifications_js') | safe }}
