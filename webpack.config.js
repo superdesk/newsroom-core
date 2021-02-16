@@ -79,7 +79,10 @@ module.exports = {
     },
     resolve: {
         extensions: ['.js', '.jsx'],
-        modules: [path.resolve(__dirname, 'assets'), NODE_MODULES],
+        modules: [
+            path.resolve(__dirname, 'assets'),
+            NODE_MODULES
+        ],
     },
     resolveLoader: {
         modules: [NODE_MODULES],
