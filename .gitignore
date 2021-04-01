@@ -115,7 +115,7 @@ package-lock.json
 .vagrant
 
 # newsroom
-# newsroom/static/
+newsroom/static/dist
 
 # pytest
 .pytest_cache

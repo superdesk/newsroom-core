@@ -54,7 +54,6 @@ module.exports = {
             {
                 test: /\.jsx?$/,
                 loader: 'babel-loader',
-                exclude: /node_modules/,
                 options: {
                     presets: ['es2015', 'react'],
                     plugins: ['transform-object-rest-spread'],
@@ -79,7 +78,10 @@ module.exports = {
     },
     resolve: {
         extensions: ['.js', '.jsx'],
-        modules: [path.resolve(__dirname, 'assets'), NODE_MODULES],
+        modules: [
+            path.resolve(__dirname, 'assets'),
+            NODE_MODULES
+        ],
     },
     resolveLoader: {
         modules: [NODE_MODULES],
