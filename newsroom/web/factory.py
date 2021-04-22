@@ -12,8 +12,8 @@ from newsroom.template_filters import (
 from newsroom.notifications.notifications import get_initial_notifications
 from newsroom.limiter import limiter
 from newsroom.celery_app import init_celery
-from newsroom.webpack import NewsroomWebpack
 from newsroom.settings import SettingsApp
+from newsroom.webpack import NewsroomWebpack
 
 
 class NewsroomWebApp(BaseNewsroomApp):
@@ -41,9 +41,9 @@ class NewsroomWebApp(BaseNewsroomApp):
 
         self._setup_jinja()
         self._setup_limiter()
-        init_celery(self)
-        self._setup_webpack()
+        self._setup_celery()
         self._setup_theme()
+        self._setup_assets()
 
     def load_app_default_config(self):
         """
@@ -100,7 +100,10 @@ class NewsroomWebApp(BaseNewsroomApp):
     def _setup_limiter(self):
         limiter.init_app(self)
 
-    def _setup_webpack(self):
+    def _setup_celery(self):
+        init_celery(self)
+
+    def _setup_assets(self):
         NewsroomWebpack(self)
 
     def _setup_theme(self):
