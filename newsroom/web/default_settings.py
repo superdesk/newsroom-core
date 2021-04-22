@@ -162,8 +162,8 @@ TEMPLATES_AUTO_RELOAD = True
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S+0000'
 
 WEBPACK_MANIFEST_PATH = os.path.join(os.path.dirname(__file__), '..', 'static', 'dist', 'manifest.json')
-WEBPACK_ASSETS_URL = os.environ.get('ASSETS_URL', '/static/dist/')
-WEBPACK_SERVER_URL = os.environ.get('WEBPACK_SERVER_URL', 'http://localhost:8080/')
+WEBPACK_ASSETS_URL = os.environ.get('ASSETS_URL')
+WEBPACK_SERVER_URL = os.environ.get('WEBPACK_SERVER_URL')
 
 # How many days a new account can stay active before it is approved by admin
 NEW_ACCOUNT_ACTIVE_DAYS = 14

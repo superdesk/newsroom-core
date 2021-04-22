@@ -47,6 +47,7 @@ class BaseNewsroomApp(eve.Eve):
         self.babel_translations = None
         self.mail = None
         self.cache = None
+        self.static_folder = None
 
         super(BaseNewsroomApp, self).__init__(
             import_name,
