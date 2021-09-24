@@ -21,7 +21,10 @@ class HistoryResource(newsroom.Resource):
 
     schema = {
         '_id': {'type': 'string', 'unique': True},
-        'action': {'type': 'string'},
+        'action': {
+            'type': 'string',
+            'mapping': not_analyzed
+        },
         'versioncreated': {'type': 'datetime'},
         'user': newsroom.Resource.rel('users'),
         'company': newsroom.Resource.rel('companies'),

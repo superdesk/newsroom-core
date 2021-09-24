@@ -17,6 +17,7 @@ from newsroom.auth import get_user_id
 
 
 DAY_IN_MINUTES = 24 * 60 - 1
+MAX_TERMS_SIZE = 1000
 
 
 def query_resource(resource, lookup=None, max_results=0, projection=None):

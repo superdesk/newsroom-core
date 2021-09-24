@@ -13,7 +13,7 @@ import superdesk
 from superdesk.utc import utcnow
 
 
-from newsroom.utils import query_resource, get_entity_dict, get_items_by_id
+from newsroom.utils import query_resource, get_entity_dict, get_items_by_id, MAX_TERMS_SIZE
 from newsroom.agenda.agenda import get_date_filters
 from newsroom.news_api.api_tokens import API_TOKENS
 from newsroom.news_api.utils import format_report_results
@@ -160,7 +160,7 @@ def get_subscriber_activity_report():
     args = deepcopy(request.args.to_dict())
 
     # Elastic query
-    aggregations = {'action': {'terms': {'field': 'action', 'size': 0}}}
+    aggregations = {'action': {'terms': {'field': 'action', 'size': MAX_TERMS_SIZE}}}
     must_terms = []
     source = {}
 
