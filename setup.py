@@ -3,10 +3,11 @@ from pathlib import Path
 from setuptools import setup, find_packages
 
 
-requirements_txt_path = Path(__file__).parent.absolute() / 'requirements.txt'
-
-with open(requirements_txt_path, 'r') as r:
-    requirements = [line.rsplit('\n', 1)[0] for line in r.readlines()]
+# Disable this for now, until the fix for `feedparser` in core is released
+# requirements_txt_path = Path(__file__).parent.absolute() / 'requirements.txt'
+#
+# with open(requirements_txt_path, 'r') as r:
+#     requirements = [line.rsplit('\n', 1)[0] for line in r.readlines()]
 
 setup(
     name='Newsroom-Core',
@@ -18,7 +19,7 @@ setup(
     platforms=['any'],
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
-    install_requires=requirements,
+    # install_requires=[],
     scripts=[],
     classifiers=[
         'Development Status :: 4 - Beta',
