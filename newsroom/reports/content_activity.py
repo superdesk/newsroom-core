@@ -8,7 +8,7 @@ from superdesk.utc import utc_to_local
 
 from newsroom.wire.search import items_query
 from newsroom.agenda.agenda import get_date_filters
-from newsroom.utils import query_resource
+from newsroom.utils import query_resource, MAX_TERMS_SIZE
 
 
 CHUNK_SIZE = 100
@@ -92,19 +92,19 @@ def get_aggregations(args, ids):
             'items': {
                 'terms': {
                     'field': 'item',
-                    'size': 0
+                    'size': MAX_TERMS_SIZE
                 },
                 'aggs': {
                     'actions': {
                         'terms': {
                             'field': 'action',
-                            'size': 0
+                            'size': MAX_TERMS_SIZE
                         }
                     },
                     'companies': {
                         'terms': {
                             'field': 'company',
-                            'size': 0
+                            'size': MAX_TERMS_SIZE
                         }
                     }
                 }
@@ -160,7 +160,7 @@ def get_facets(args):
                 'genres': {
                     'terms': {
                         'field': 'genre.code',
-                        'size': 0
+                        'size': MAX_TERMS_SIZE
                     }
                 }
             }
@@ -194,7 +194,7 @@ def get_facets(args):
                 'companies': {
                     'terms': {
                         'field': 'company',
-                        'size': 0
+                        'size': MAX_TERMS_SIZE
                     }
                 }
             }
