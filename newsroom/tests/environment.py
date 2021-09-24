@@ -12,7 +12,7 @@ def before_all(context):
         'ELASTICSEARCH_FORCE_REFRESH': True,
         'NEWS_API_ENABLED': True,
         'NEWS_API_IMAGE_PERMISSIONS_ENABLED': True,
-        'NEWS_API_TIME_LIMIT_DAYS': 100
+        'NEWS_API_TIME_LIMIT_DAYS': 100,
     }
     setup_before_all(context, config, app_factory=get_app)
 
@@ -25,7 +25,7 @@ def before_scenario(context, scenario):
         'ELASTICSEARCH_FORCE_REFRESH': True,
         'NEWS_API_ENABLED': True,
         'NEWS_API_IMAGE_PERMISSIONS_ENABLED': True,
-        'NEWS_API_TIME_LIMIT_DAYS': 100
+        'NEWS_API_TIME_LIMIT_DAYS': 100,
     }
 
     if 'rate_limit' in scenario.tags:

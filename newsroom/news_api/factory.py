@@ -29,6 +29,11 @@ class NewsroomNewsAPI(BaseNewsroomApp):
         if not getattr(self, 'settings'):
             self.settings = flask.Config('.')
 
+        if config and config.get('BEHAVE'):
+            # ``superdesk.tests.update_config`` adds ``planning`` to ``INSTALLED_APPS``
+            # So if we're running behave tests, reset this config here
+            config['INSTALLED_APPS'] = []
+
         super(NewsroomNewsAPI, self).__init__(import_name=import_name, config=config, **kwargs)
 
         template_folder = os.path.abspath(os.path.join(API_DIR, '../templates'))
