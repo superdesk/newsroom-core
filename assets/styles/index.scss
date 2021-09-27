@@ -1415,13 +1415,24 @@ article.list {
 
 // compact view
 .wire-articles--list-compact {
+    .wire-articles__item {
+        border: 3px solid transparent;
+        .no-touch & {
+            &:hover {
+                border: 3px solid #f5f5f5;
+            }
+        }
+    }
+    &.wire-articles--list {
+        flex-grow: 0;
+    }
     .wire-articles__item-wrap {
-        margin-bottom: 10px;
+        margin-bottom: 5px;
     }
     .wire-articles__item--list {
         padding: 10px;
         @include md {
-            padding: 4px 10px;
+            padding: 0 0 0 5px;
         }
     }
     .wire-articles__item-text {
@@ -1434,7 +1445,7 @@ article.list {
     }
     .wire-articles__item-headline {
         display: flex;
-        font-size: 0.875rem; // 14px
+        font-size: 0.8125rem; // 13px
         margin-right: 20px;
         margin-bottom: 6px;
         label {
@@ -1469,12 +1480,12 @@ article.list {
         @include md {
             margin-right: 6px;
         }
-        margin-bottom: 5px;
+        margin-bottom: 0px;
     }
     .wire-articles__item-select {
         margin-right: 6px;
         @include md {
-            margin-right: 10px;
+            margin-right: 0px;
         }
     }
     .wire-articles__item__meta {
@@ -1508,7 +1519,7 @@ article.list {
         background-size: 52px;
     }
     .wire-articles__item__meta-info {
-        margin-bottom: 5px;
+        margin-bottom: 0px;
     }
 }
 
@@ -1589,7 +1600,7 @@ article.list {
     // compact view
     .wire-articles--list-compact {
         .wire-articles__item--list {
-            padding: 4px 10px;
+            padding: 0 0 0 5px;
         }
         .wire-articles__item-actions {
             flex-direction: row;
@@ -1700,7 +1711,7 @@ article.list {
     // compact view
     .wire-articles--list-compact {
         .wire-articles__item--list {
-            padding: 4px 10px;
+            padding: 0 0 0 5px;
         }
         .wire-articles__item-actions {
             flex-direction: row;
@@ -1719,6 +1730,7 @@ article.list {
         }
         .wire-articles__item__versions-btn {
             margin-left: 0;
+            margin-top: 0;
             align-self: flex-start;
             @include xl {
                 margin-left: auto;
@@ -1855,7 +1867,7 @@ article.list {
 }
 
 .wire-articles__item__icon {
-    margin-right: 10px;
+    margin-right: 2px;
     display: flex;
     position: relative;
 
@@ -2040,7 +2052,7 @@ article.list {
 .wire-articles__item__versions-btn {
     font-size: 0.8125rem;
     color: $main-blue;
-    margin-top: 4px;
+    margin-top: 0px;
 }
 
 .wire-articles__item__versions-btn--open {
