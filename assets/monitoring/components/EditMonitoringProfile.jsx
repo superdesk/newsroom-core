@@ -12,7 +12,7 @@ import AuditInformation from 'components/AuditInformation';
 
 import MonitoringSchedule from './MonitoringSchedule';
 
-import {gettext} from 'utils';
+import { gettext } from 'utils';
 
 const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
 
@@ -120,6 +120,12 @@ class EditMonitoringProfile extends React.Component {
                                         value={item.subject}
                                         onChange={onChange}
                                         error={getError('subject')} />
+
+                                    <CheckboxInput
+                                        name='headline_subject'
+                                        label={gettext('Use Headline as Subject of emails containing a single item')}
+                                        value={item.headline_subject}
+                                        onChange={onChange}/>
 
                                     <TextInput
                                         name='description'

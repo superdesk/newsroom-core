@@ -25,7 +25,6 @@ def update_config(conf):
     conf['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Prague'
     conf['DEFAULT_TIMEZONE'] = 'Europe/Prague'
     conf['NEWS_API_ENABLED'] = True
-    conf['MAIL_DEFAULT_SENDER'] = 'newsroom@localhost'
     return conf
 
 
@@ -48,24 +47,14 @@ def clean_databases(app):
 
 
 @fixture
-def app(request):
+def app():
+    from flask import Config
+    from newsroom.web import NewsroomWebApp
+
     cfg = Config(root)
     cfg.from_object('newsroom.default_settings')
     update_config(cfg)
-    app = NewsroomWebApp(config=cfg, testing=True)
-    # init elastic
-    with app.app_context():
-        app.data.init_elastic(app)
-
-    def teardown():
-        # drop mongo db and es index
-        with app.app_context():
-            clean_databases(app)
-
-    request.addfinalizer(teardown)
-
-    with app.app_context():
-        yield app
+    return NewsroomWebApp(config=cfg, testing=True)
 
 
 @fixture

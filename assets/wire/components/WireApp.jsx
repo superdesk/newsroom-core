@@ -57,6 +57,12 @@ import {
     advancedSearchTabsConfigSelector,
 } from 'ui/selectors';
 
+import {
+    previewConfigSelector,
+    detailsConfigSelector,
+    advancedSearchTabsConfigSelector,
+} from 'ui/selectors';
+
 const modals = {
     shareItem: ShareItemModal,
     downloadItems: DownloadItemsModal,

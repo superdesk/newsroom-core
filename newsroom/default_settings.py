@@ -7,6 +7,7 @@ from superdesk.default_settings import strtobool, env, local_to_utc_hour
 from datetime import timedelta
 
 from superdesk.default_settings import (   # noqa
+    DEBUG,
     VERSION,
     MONGO_URI,
     REDIS_URL,
@@ -175,6 +176,7 @@ RATELIMIT_ENABLED = True
 RATELIMIT_STRATEGY = 'fixed-window'
 
 # Cache Settings
+# https://flask-caching.readthedocs.io/en/latest/#configuring-flask-caching
 CACHE_TYPE = os.environ.get('CACHE_TYPE', 'simple')  # in-memory cache
 # The default timeout that is used if no timeout is specified in sec
 CACHE_DEFAULT_TIMEOUT = 3600
@@ -265,8 +267,24 @@ CLIENT_LOCALE_FORMATS = {
     }
 }
 
+LANGUAGES = ['en', 'fi', 'cs', 'fr_CA']
+DEFAULT_LANGUAGE = 'en'
+
+CLIENT_LOCALE_FORMATS = {
+    "en": {  # defaults
+        "TIME_FORMAT": "HH:mm",
+        "DATE_FORMAT": "DD/MM/YYYY",
+        "COVERAGE_DATE_TIME_FORMAT": "HH:mm DD/MM",
+        "COVERAGE_DATE_FORMAT": "DD/MM",
+    },
+    "fr_CA": {  # example - you can overwrite any format above
+        "DATE_FORMAT": "DD/MM/YYYY",
+    }
+}
+
 # Client configuration
 CLIENT_CONFIG = {
+    'debug': DEBUG,
     'default_language': DEFAULT_LANGUAGE,
     'locale_formats': CLIENT_LOCALE_FORMATS,
     'coverage_types': COVERAGE_TYPES,
@@ -274,6 +292,7 @@ CLIENT_CONFIG = {
     'display_news_only': True,  # Displays news only switch in wire,
     'default_timezone': DEFAULT_TIMEZONE,
     'display_abstract': DISPLAY_ABSTRACT,
+    'display_credits': False,
 }
 
 # Enable iframely support for item body_html

@@ -118,8 +118,8 @@ class WireListItem extends React.Component {
             <article
                 key={item._id}
                 className={cardClassName}
-                tabIndex="0"
-                ref={(elem) => (this.dom.article = elem)}
+                tabIndex='0'
+                ref={(elem) => this.dom.article = elem}
                 onClick={() => onClick(item)}
                 onDoubleClick={() => onDoubleClick(item)}
                 onKeyDown={this.onKeyDown}

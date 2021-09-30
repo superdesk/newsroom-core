@@ -86,6 +86,12 @@ export function openItem(item) {
     };
 }
 
+export function selectCopy(item) {
+    return () => {
+        recordAction(item, 'clipboard');
+    };
+}
+
 export const QUERY_ITEMS = 'QUERY_ITEMS';
 export function queryItems() {
     return {type: QUERY_ITEMS};
@@ -565,8 +571,4 @@ export function initParams(params) {
                 });
         }
     };
-}
-
-export function itemStatistics(item) {
-    return (dispatch) => dispatch(renderModal('itemStatistics', {item}));
 }

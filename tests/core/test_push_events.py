@@ -174,6 +174,21 @@ test_planning = {
     "event_item": "foo",
 }
 
+text_item = {'byline': 'A Smith', 'copyrightholder': 'Australian Associated Press', 'pubstatus': 'usable',
+             'readtime': 0, 'description_text': 'Abstract', 'profile': 'ContentProfile',
+             'guid': 'urn:newsml:localhost:2020-08-06T15:59:39.183090:1f02e9bb-3007-48f3-bfad-ffa6107f87bd',
+             'type': 'text',
+             'place': [{'code': 'CIS', 'name': 'Commonwealth of Independent States'}],
+             'description_html': '<p>Abstract</p>',
+             'wordcount': 1, 'slugline': 'something', 'firstpublished': '2020-08-06T06:00:59+0000', 'language': 'en',
+             'priority': 6,
+             'version': '2', 'body_html': '<p>Body</p>', 'charcount': 4, 'versioncreated': '2020-08-06T06:00:24+0000',
+             'genre': [{'code': 'Backgrounder', 'name': 'Backgrounder'}], 'firstcreated': '2020-08-06T05:59:39+0000',
+             'service': [{'code': 'i', 'name': 'International News'}],
+             'headline': 'Headline', 'source': 'AAP',
+             'subject': [{'code': '01000000', 'name': 'arts, culture and entertainment'}], 'located': 'Wagga Wagga',
+             'urgency': 3}
+
 
 def test_push_parsed_event(client, app):
     event = deepcopy(test_event)
@@ -414,16 +429,15 @@ def test_notify_topic_matches_for_new_event_item(client, app, mocker):
             session['user'] = user
 
         topic = {'label': 'bar', 'query': 'foo', 'notifications': True, 'topic_type': 'agenda'}
-        resp = cli.post('api/users/%s/topics' % user, data=topic)
+        resp = cli.post('users/%s/topics' % user, json=topic)
         assert 201 == resp.status_code
 
     key = b'something random'
     app.config['PUSH_KEY'] = key
     event['dates']['start'] = '2018-05-29T04:00:00+0000'
-    data = json.dumps(event)
     push_mock = mocker.patch('newsroom.push.push_notification')
-    headers = get_signature_headers(data, key)
-    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+    headers = get_signature_headers(json.dumps(event), key)
+    resp = client.post('/push', json=event, headers=headers)
     assert 200 == resp.status_code
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['topics']) == 1
@@ -432,7 +446,7 @@ def test_notify_topic_matches_for_new_event_item(client, app, mocker):
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
     event = deepcopy(test_event)
-    client.post('/push', data=json.dumps(event), content_type='application/json')
+    client.post('/push', json=event)
 
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
@@ -448,7 +462,7 @@ def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
             session['user'] = user
 
         topic = {'label': 'bar', 'query': 'foo', 'notifications': True, 'topic_type': 'agenda'}
-        resp = cli.post('api/users/%s/topics' % user, data=topic)
+        resp = cli.post('users/%s/topics' % user, json=topic)
         assert 201 == resp.status_code
 
     key = b'something random'
@@ -460,7 +474,7 @@ def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
     data = json.dumps(planning)
     push_mock = mocker.patch('newsroom.push.push_notification')
     headers = get_signature_headers(data, key)
-    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+    resp = client.post('/push', json=planning, headers=headers)
     assert 200 == resp.status_code
     assert push_mock.call_args[1]['item']['_id'] == 'foo'
     assert len(push_mock.call_args[1]['topics']) == 1
@@ -472,7 +486,7 @@ def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker):
     planning = deepcopy(test_planning)
     planning['guid'] = 'bar3'
     planning['event_item'] = None
-    client.post('/push', data=json.dumps(planning), content_type='application/json')
+    client.post('/push', json=planning)
 
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
@@ -488,7 +502,7 @@ def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker):
             session['user'] = user
 
         topic = {'label': 'bar', 'query': 'bar3', 'notifications': True, 'topic_type': 'agenda'}
-        resp = cli.post('api/users/%s/topics' % user, data=topic)
+        resp = cli.post('users/%s/topics' % user, json=topic)
         assert 201 == resp.status_code
 
     key = b'something random'
@@ -498,7 +512,7 @@ def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker):
     data = json.dumps(planning)
     push_mock = mocker.patch('newsroom.push.push_notification')
     headers = get_signature_headers(data, key)
-    resp = client.post('/push', data=data, content_type='application/json', headers=headers)
+    resp = client.post('/push', json=planning, headers=headers)
     assert 200 == resp.status_code
     assert push_mock.call_args[1]['item']['_id'] == 'bar3'
     assert len(push_mock.call_args[1]['topics']) == 1
@@ -1174,3 +1188,30 @@ def test_coverages_delivery_sequence_has_default(client, app):
     assert parsed['coverages'][0]['delivery_id'] == 'item7'
     assert parsed['coverages'][0]['delivery_href'] == '/wire/item7'
     assert parsed['coverages'][0]['deliveries'][0]['sequence_no'] == 0
+
+
+def test_item_planning_reference_set_on_fulfill(client, app):
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar1'
+    planning['event_item'] = None
+    post_json(client, '/push', planning)
+
+    item = deepcopy(text_item)
+    post_json(client, '/push', item)
+
+    planning = deepcopy(test_planning)
+    planning['guid'] = 'bar1'
+    planning['event_item'] = None
+    planning['coverages'][0]['deliveries'] = [{
+        'item_id': 'urn:newsml:localhost:2020-08-06T15:59:39.183090:1f02e9bb-3007-48f3-bfad-ffa6107f87bd',
+        'item_state': 'published',
+    }]
+    planning['coverages'][0]['workflow_status'] = 'completed'
+
+    post_json(client, '/push', planning)
+
+    parsed = get_entity_or_404('urn:newsml:localhost:2020-08-06T15:59:39.183090:1f02e9bb-3007-48f3-bfad-ffa6107f87bd',
+                               'content_api')
+    assert parsed['planning_id'] == 'bar1'
+    assert parsed['coverage_id'] == 'urn:newsml:localhost:5000:2018-05-28T20:55:' \
+                                    '00.496765:197d3430-9cd1-4b93-822f-c3c050b5b6ab'

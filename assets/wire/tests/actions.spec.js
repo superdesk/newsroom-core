@@ -4,6 +4,8 @@ import {createStore, applyMiddleware} from 'redux';
 
 import server from 'server';
 
+import server from 'server';
+
 import wireApp from '../reducers';
 import * as actions from '../actions';
 import * as utils from 'utils';

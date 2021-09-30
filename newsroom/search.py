@@ -4,6 +4,7 @@ from eve.utils import ParsedRequest
 import logging
 
 from superdesk import get_resource_service
+from superdesk.metadata.utils import get_elastic_highlight_query
 from content_api.errors import BadParameterValueError
 
 from newsroom import Service
@@ -13,7 +14,6 @@ from newsroom.companies import get_user_company
 from newsroom.settings import get_setting
 from newsroom.template_filters import is_admin
 from newsroom.utils import get_local_date, get_end_date
-
 
 logger = logging.getLogger(__name__)
 
@@ -327,26 +327,18 @@ class BaseSearchService(Service):
         query_string = search.args.get('q')
         query_string_settings = app.config['ELASTICSEARCH_SETTINGS']['settings']['query_string']
         if app.data.elastic.should_highlight(req) and query_string:
-            field_settings = {
-                'highlight_query': {
-                    'query_string': {
-                        'query': query_string,
-                        'default_operator': "AND",
-                        'analyze_wildcard': query_string_settings['analyze_wildcard'],
-                        "lenient": False
-                    }
+            elastic_highlight_query = get_elastic_highlight_query(
+                query_string={
+                    "query": query_string,
+                    "default_operator": "AND",
+                    "analyze_wildcard": query_string_settings["analyze_wildcard"],
+                    "lenient": True,
                 },
-                'number_of_fragments': 0
+            )
+            elastic_highlight_query['fields'] = {
+                'body_html': elastic_highlight_query['fields']['body_html']
             }
 
-            elastic_highlight_query = {
-                'require_field_match': False,
-                'pre_tags': ['<span class=\"es-highlight\">'],
-                'post_tags': ['</span>'],
-                'fields': {
-                    'body_html': field_settings
-                }
-            }
             search.highlight = elastic_highlight_query
 
     def validate_request(self, search):

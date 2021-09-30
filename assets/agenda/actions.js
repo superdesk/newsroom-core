@@ -1,4 +1,4 @@
-import {get, isEmpty, includes} from 'lodash';
+import { get, isEmpty, includes } from 'lodash';
 import moment from 'moment';
 
 import server from 'server';
@@ -16,8 +16,8 @@ import {
 } from 'utils';
 import {noNavigationSelected, getNavigationUrlParam} from 'search/utils';
 
-import {markItemAsRead, toggleFeaturedOnlyParam} from 'local-store';
-import {renderModal, setSavedItemsCount} from 'actions';
+import { markItemAsRead, toggleFeaturedOnlyParam } from 'local-store';
+import { renderModal, setSavedItemsCount } from 'actions';
 import {
     getCalendars,
     getDateInputDate,

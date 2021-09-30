@@ -7,11 +7,11 @@ import {isEqual} from 'lodash';
 
 import {gettext, isDisplayed} from 'utils';
 import WireListItem from './WireListItem';
-import {setActive, previewItem, toggleSelected, openItem} from '../actions';
-import {EXTENDED_VIEW} from '../defaults';
-import {getIntVersion} from '../utils';
+import { setActive, previewItem, toggleSelected, openItem } from '../actions';
+import { EXTENDED_VIEW } from '../defaults';
+import { getIntVersion } from '../utils';
 import {searchNavigationSelector} from 'search/selectors';
-import {previewConfigSelector, listConfigSelector} from 'ui/selectors';
+import {previewConfigSelector} from 'ui/selectors';
 import {getContextName} from 'selectors';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb

@@ -13,23 +13,12 @@ sys.path.insert(0, str(root))
 
 
 @fixture
-def app(request):
+def app():
+    from flask import Config
+    from newsroom.web import NewsroomWebApp
+
     cfg = Config(root)
     cfg.from_object('newsroom.default_settings')
     cfg.from_object('tests.aap.settings')
     update_config(cfg)
-    app = NewsroomWebApp(config=cfg, testing=True)
-
-    # init elastic
-    with app.app_context():
-        app.data.init_elastic(app)
-
-    def teardown():
-        # drop mongo db and es index
-        with app.app_context():
-            clean_databases(app)
-
-    request.addfinalizer(teardown)
-
-    with app.app_context():
-        yield app
+    return NewsroomWebApp(config=cfg, testing=True)

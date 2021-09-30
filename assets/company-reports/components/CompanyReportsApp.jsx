@@ -8,8 +8,8 @@ import {
     printReport,
     toggleFilterAndQuery,
 } from '../actions';
-import {gettext} from 'utils';
-import {panels} from '../utils';
+import { gettext } from 'utils';
+import { panels } from '../utils';
 
 const options = [
     {value: '', text: ''},
