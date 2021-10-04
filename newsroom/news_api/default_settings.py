@@ -3,7 +3,8 @@ import os
 from superdesk.default_settings import ( # noqa
     env,
     ELASTICSEARCH_URL,
-    CONTENTAPI_ELASTICSEARCH_URL
+    CONTENTAPI_ELASTICSEARCH_URL,
+    CONTENTAPI_ELASTICSEARCH_SETTINGS,
 )
 
 URL_PREFIX = os.environ.get('CONTENT_API_PREFIX', 'api/v1')
