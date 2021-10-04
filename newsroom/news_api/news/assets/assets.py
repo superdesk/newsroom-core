@@ -6,7 +6,6 @@ from flask_babel import gettext
 import superdesk
 
 from newsroom.upload import ASSETS_RESOURCE
-from newsroom.news_api.api_tokens import CompanyTokenAuth
 from newsroom.news_api.utils import post_api_audit
 from flask import current_app as app
 
