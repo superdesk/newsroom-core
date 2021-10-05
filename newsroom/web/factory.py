@@ -36,9 +36,12 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.sidenavs = []
         self.settings_apps = []
         self.dashboards = []
-        self.theme_folder = 'theme'
-
         super(NewsroomWebApp, self).__init__(import_name=import_name, config=config, **kwargs)
+
+        self.theme_folder = self.config.get(
+            "THEME_PATH",
+            os.path.join(self.config["ABS_PATH"], 'theme') if self.config.get("ABS_PATH") else 'theme'
+        )
 
         self._setup_jinja()
         self._setup_limiter()
@@ -87,7 +90,10 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_global(self.settings_apps, 'settings_apps')
         self.add_template_global(get_multi_line_message)
 
-        jinja2_loaders = []
+        jinja2_loaders = [
+            jinja2.FileSystemLoader(self.theme_folder),
+        ]
+
         # ABS_PATH is set only for the instance settings and not set for a test app instance
         if 'ABS_PATH' in self.config:
             jinja2_loaders.append(
@@ -114,7 +120,7 @@ class NewsroomWebApp(BaseNewsroomApp):
             self.static_url_path.replace('static', 'theme') + '/<path:filename>',
             endpoint='theme',
             host=self.static_host,
-            view_func=self.send_theme_file
+            view_func=self.send_theme_file,
         )
 
     def download_formatter(self, _format, formatter, name, types, assets=None):

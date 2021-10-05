@@ -25,9 +25,22 @@ session = requests.Session()
 class NewsroomWebpack(Webpack):
 
     def init_app(self, app):
+        app.config.setdefault(
+            "WEBPACK_MANIFEST_PATH",
+            os.path.join(
+                app.config["ABS_PATH"].parent,
+                "client",
+                "dist",
+                "manifest.json",
+            ) if app.config.get("ABS_PATH") else None,
+        )
+
         super(NewsroomWebpack, self).init_app(app)
+
         if not app.config.get('DEBUG'):  # let us change debug flag later
             app.before_request(self._refresh_webpack_stats_if_debug)
+        app.add_url_rule('/static/dist/<path:filename>', 'asset', send_asset)
+
         app.add_url_rule('/static/dist/<path:filename>', 'asset', send_asset)
 
     def _refresh_webpack_stats_if_debug(self):

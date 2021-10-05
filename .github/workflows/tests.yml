@@ -30,8 +30,8 @@ jobs:
 
       - name: pip install
         run: |
-            python -m pip install --upgrade pip wheel setuptools
-            pip install -r dev-requirements.txt
+             python -m pip install --upgrade pip wheel setuptools
+             pip install -r dev-requirements.txt
 
       - name: pytest
         run: pytest --ignore=tests/aap/ --disable-pytest-warnings --cov=newsroom

@@ -10,6 +10,7 @@ from newsroom.news_api.utils import post_api_audit
 from flask import current_app as app
 
 
+
 blueprint = superdesk.Blueprint('assets', __name__)
 
 
