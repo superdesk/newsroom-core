@@ -13,6 +13,7 @@ def before_all(context):
         'NEWS_API_ENABLED': True,
         'NEWS_API_IMAGE_PERMISSIONS_ENABLED': True,
         'NEWS_API_TIME_LIMIT_DAYS': 100,
+        'SITE_NAME': 'Newsroom',
     }
     setup_before_all(context, config, app_factory=get_app)
 
@@ -26,6 +27,7 @@ def before_scenario(context, scenario):
         'NEWS_API_ENABLED': True,
         'NEWS_API_IMAGE_PERMISSIONS_ENABLED': True,
         'NEWS_API_TIME_LIMIT_DAYS': 100,
+        'SITE_NAME': 'Newsroom',
     }
 
     if 'rate_limit' in scenario.tags:
