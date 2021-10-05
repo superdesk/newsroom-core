@@ -9,7 +9,6 @@ from superdesk import get_resource_service
 from newsroom.news_api.utils import post_api_audit
 
 
-
 blueprint = superdesk.Blueprint('news/item', __name__)
 
 
