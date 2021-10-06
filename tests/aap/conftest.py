@@ -3,7 +3,6 @@ from pathlib import Path
 
 from flask import Config
 from pytest import fixture
-from flask import Config
 
 from newsroom.web.factory import get_app
 from newsroom.tests.conftest import update_config, client, setup  # noqa

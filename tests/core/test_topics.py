@@ -1,9 +1,8 @@
-from unittest import mock
 from flask import json
+from unittest import mock
 
 from newsroom.topics.views import get_topic_url
 from ..fixtures import PUBLIC_USER_NAME, init_company, PUBLIC_USER_ID, TEST_USER_ID  # noqa
-from unittest import mock
 from ..utils import mock_send_email
 
 topic = {
