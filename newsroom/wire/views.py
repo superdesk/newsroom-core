@@ -11,7 +11,6 @@ from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
 from flask_babel import gettext
 from superdesk.utc import utcnow
-
 from superdesk import get_resource_service
 
 from newsroom.navigations.navigations import get_navigations_by_company

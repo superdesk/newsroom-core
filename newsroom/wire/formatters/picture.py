@@ -1,4 +1,5 @@
 import mimetypes
+
 from newsroom.wire.formatters.base import BaseFormatter
 from newsroom.wire.utils import get_picture
 

@@ -8,16 +8,19 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+import datetime
+import logging
+
+from flask import render_template
+from superdesk import config
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
 from superdesk.celery_task_utils import get_lock_id
 from superdesk.lock import lock, unlock, remove_locks
-from flask import render_template
+
 from newsroom.celery_app import celery
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
-from superdesk import config
-import datetime
-import logging
+
 
 logger = logging.getLogger(__name__)
 

@@ -1,12 +1,13 @@
 
 import flask
-import newsroom
 import bson.errors
 
 from werkzeug.wsgi import wrap_file
 from werkzeug.utils import secure_filename
 from flask import request, url_for, current_app as newsroom_app
 from superdesk.upload import upload_url as _upload_url
+
+import newsroom
 from newsroom.decorator import login_required
 
 

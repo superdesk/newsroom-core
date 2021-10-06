@@ -1,9 +1,9 @@
-import superdesk
+import pytz
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from uuid import uuid4
-import pytz
 
+import superdesk
 from superdesk.utc import utcnow
 from superdesk.json_utils import try_cast
 from bson import ObjectId
@@ -11,11 +11,13 @@ from eve.utils import config, parse_request
 from eve_elastic.elastic import parse_date
 from flask import current_app as app, json, abort, request, g, flash, session, url_for
 from flask_babel import gettext
+
 from newsroom.template_filters import time_short, parse_date as parse_short_date, format_datetime, is_admin
 from newsroom.auth import get_user_id
 
 
 DAY_IN_MINUTES = 24 * 60 - 1
+MAX_TERMS_SIZE = 1000
 
 
 def query_resource(resource, lookup=None, max_results=0, projection=None):

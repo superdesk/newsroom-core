@@ -1,21 +1,19 @@
-from datetime import datetime
-from werkzeug.datastructures import MultiDict
 import json
 import functools
 import re
 from dateutil import parser
 import pytz
-from bson import ObjectId
-from flask import current_app as app, g
+from datetime import datetime
 
+from bson import ObjectId
+from werkzeug.datastructures import MultiDict
+from flask import current_app as app, g
 from superdesk import get_resource_service
 from superdesk.utc import utcnow, local_to_utc
 from superdesk.errors import SuperdeskApiError
-
 from content_api.items.resource import ItemsResource
 from content_api.errors import BadParameterValueError, UnexpectedParameterError
 
-from newsroom.news_api.settings import ELASTIC_DATETIME_FORMAT
 from newsroom.news_api.utils import post_api_audit, remove_internal_renditions
 from newsroom.search import BaseSearchService, query_string
 from newsroom.products.products import get_products_by_company
@@ -645,7 +643,7 @@ class NewsAPINewsService(BaseSearchService):
 
     @staticmethod
     def _format_date(date):
-        return datetime.strftime(date, ELASTIC_DATETIME_FORMAT)
+        return datetime.strftime(date, app.config['ELASTIC_DATETIME_FORMAT'])
 
     def on_fetched(self, doc):
         post_api_audit(doc)

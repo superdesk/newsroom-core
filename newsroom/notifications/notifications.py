@@ -71,11 +71,11 @@ def get_initial_notifications():
     items = []
     try:
         items.extend(superdesk.get_resource_service('wire_search').get_items(item_ids))
-    except KeyError:  # wire disabled
+    except (KeyError, TypeError):  # wire disabled
         pass
     try:
         items.extend(superdesk.get_resource_service('agenda').get_items(item_ids))
-    except KeyError:  # agenda disabled
+    except (KeyError, TypeError):  # agenda disabled
         pass
     return {
         'user': str(session['user']) if session['user'] else None,

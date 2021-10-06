@@ -1,15 +1,15 @@
+import base64
 from superdesk.emails import SuperdeskMessage  # it handles some encoding issues
 from flask import current_app, render_template, url_for
 from flask_babel import gettext
-from newsroom.celery_app import celery
 from flask_mail import Attachment
 
+from newsroom.celery_app import celery
 from newsroom.utils import get_agenda_dates, get_location_string, get_links, \
     get_public_contacts
 from newsroom.template_filters import is_admin_or_internal
 from newsroom.utils import url_for_agenda
 from superdesk.logging import logger
-import base64
 
 
 @celery.task(bind=True, soft_time_limit=120)

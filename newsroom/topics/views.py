@@ -1,15 +1,17 @@
 from urllib import parse
+
 from bson import ObjectId
 from superdesk import get_resource_service
+from flask import json, jsonify, abort, session, render_template, current_app as app
+from flask_babel import gettext
+
 from newsroom.topics import blueprint
 from newsroom.utils import find_one
 from newsroom.auth import get_user
 from newsroom.decorator import login_required
-from flask import json, jsonify, abort, session, render_template, current_app as app
 from newsroom.utils import get_json_or_400, get_entity_or_404
 from newsroom.email import send_email
 from newsroom.notifications import push_user_notification
-from flask_babel import gettext
 
 
 @blueprint.route('/topics/<id>', methods=['POST'])

@@ -1,8 +1,9 @@
+import logging
+from typing import Union
+
 from flask import current_app as app, json, abort
 from flask_babel import gettext
 from eve.utils import ParsedRequest
-import logging
-
 from superdesk import get_resource_service
 from superdesk.metadata.utils import get_elastic_highlight_query
 from content_api.errors import BadParameterValueError
@@ -62,7 +63,7 @@ class SearchQuery(object):
 
 class BaseSearchService(Service):
     section = 'wire'
-    limit_days_setting = 'wire_time_limit_days'
+    limit_days_setting: Union[None, str] = 'wire_time_limit_days'
     default_sort = [{'versioncreated': 'desc'}]
     default_page_size = 25
 

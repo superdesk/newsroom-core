@@ -14,6 +14,8 @@ Created on May 29, 2014
 @author: ioan
 """
 
+import logging
+
 import arrow
 import werkzeug
 from bson import ObjectId
@@ -23,8 +25,6 @@ from eve.io.mongo import MongoJSONEncoder
 from eve.utils import str_to_date
 from flask import json
 from superdesk.errors import SuperdeskError
-import newsroom
-import logging
 from superdesk.celery_app import (  # noqa
     finish_subtask_from_progress,
     finish_task_for_progress,
@@ -32,6 +32,9 @@ from superdesk.celery_app import (  # noqa
     update_key,
     _update_subtask_progress
 )
+
+import newsroom
+
 
 logger = logging.getLogger(__name__)
 celery = Celery(__name__)
@@ -83,7 +86,7 @@ def handle_exception(exc):
     logger.exception(exc)
 
 
-class AppContextTask(TaskBase):
+class AppContextTask(TaskBase):  # type: ignore
     abstract = True
     serializer = 'newsroom/json'
     app_errors = (

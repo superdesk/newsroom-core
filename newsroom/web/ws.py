@@ -1,13 +1,12 @@
-
 import os
 import logging
 
 from superdesk.ws import create_server
-from newsroom.web import NewsroomWebApp
+
+from .app import app
 
 
 if __name__ == '__main__':
-    app = NewsroomWebApp('newsroom')
     host = '0.0.0.0'
     port = int(os.environ.get('PORT', '5100'))
     logging.info('listening on %s:%d', host, port)

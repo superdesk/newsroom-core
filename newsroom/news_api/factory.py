@@ -7,7 +7,7 @@ from elasticsearch.exceptions import RequestError as ElasticRequestError
 from werkzeug.exceptions import HTTPException
 from superdesk.errors import SuperdeskApiError
 
-from newsroom.factory import NewsroomApp
+from newsroom.factory import BaseNewsroomApp
 from newsroom.news_api.api_tokens import CompanyTokenAuth
 from superdesk.utc import utcnow
 from newsroom.template_filters import (
@@ -15,21 +15,28 @@ from newsroom.template_filters import (
     plain_text, word_count, char_count, date_header
 )
 
+
 logger = logging.getLogger(__name__)
 
 API_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
-class NewsroomNewsAPI(NewsroomApp):
+class NewsroomNewsAPI(BaseNewsroomApp):
     AUTH_SERVICE = CompanyTokenAuth
+    INSTANCE_CONFIG = 'settings_newsapi.py'
 
     def __init__(self, import_name=__package__, config=None, **kwargs):
         if not getattr(self, 'settings'):
             self.settings = flask.Config('.')
 
+        if config and config.get('NEWS_API_BEHAVE_TESTS'):
+            # ``superdesk.tests.update_config`` adds ``planning`` to ``INSTALLED_APPS``
+            # So if we're running behave tests, reset this config here
+            config['INSTALLED_APPS'] = []
+
         super(NewsroomNewsAPI, self).__init__(import_name=import_name, config=config, **kwargs)
 
-        template_folder = os.path.abspath(os.path.join(API_DIR, '../../templates'))
+        template_folder = os.path.abspath(os.path.join(API_DIR, '../templates'))
 
         self.add_template_filter(datetime_short)
         self.add_template_filter(datetime_long)
@@ -43,9 +50,22 @@ class NewsroomNewsAPI(NewsroomApp):
             jinja2.FileSystemLoader(template_folder),
         ])
 
-    def load_app_config(self):
-        super(NewsroomNewsAPI, self).load_app_config()
-        self.config.from_object('newsroom.news_api.settings')
+    def load_app_default_config(self):
+        """
+        Loads default app configuration
+        """
+        # default config from `content_api.app.settings`
+        super().load_app_default_config()
+        # default config from `newsroom.news_api.default_settings`
+        self.config.from_object('newsroom.news_api.default_settings')
+
+    def load_app_instance_config(self):
+        """
+        Loads instance configuration defined on the newsroom-app repo level
+        """
+        # config from newsroom-app settings_newsapi.py file
+        super().load_app_instance_config()
+        # config from env var
         self.config.from_envvar('NEWS_API_SETTINGS', silent=True)
 
     def run(self, host=None, port=None, debug=None, **options):
@@ -101,8 +121,8 @@ class NewsroomNewsAPI(NewsroomApp):
         self.register_error_handler(Exception, base_exception_error)
 
 
-def get_app(config=None):
-    app = NewsroomNewsAPI(__name__, config=config)
+def get_app(config=None, **kwargs):
+    app = NewsroomNewsAPI(__name__, config=config, **kwargs)
 
     @app.after_request
     def after_request(response):
@@ -116,11 +136,3 @@ def get_app(config=None):
         return response
 
     return app
-
-
-app = get_app()
-
-if __name__ == '__main__':
-    host = '0.0.0.0'
-    port = int(os.environ.get('APIPORT', '5400'))
-    app.run(host=host, port=port, debug=True, use_reloader=True)

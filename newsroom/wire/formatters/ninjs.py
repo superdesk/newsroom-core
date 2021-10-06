@@ -1,6 +1,8 @@
 import json
-from .base import BaseFormatter
+
 from superdesk.utils import json_serialize_datetime_objectId
+
+from .base import BaseFormatter
 
 
 class NINJSFormatter(BaseFormatter):

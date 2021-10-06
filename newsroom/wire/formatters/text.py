@@ -1,5 +1,6 @@
 
 import flask
+
 from .base import BaseFormatter
 
 
