@@ -10,15 +10,16 @@ import importlib
 
 import eve
 import flask
+import newsroom
+
 from flask_mail import Mail
 from flask_caching import Cache
-from superdesk.validator import SuperdeskValidator
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
 from superdesk.json_utils import SuperdeskJSONEncoder
+from superdesk.validator import SuperdeskValidator
 from superdesk.logging import configure_logging
 
-import newsroom
 from newsroom.auth import SessionAuth
 from newsroom.utils import is_json_request
 from newsroom.gettext import setup_babel
@@ -73,7 +74,9 @@ class BaseNewsroomApp(eve.Eve):
         self.setup_babel()
         self.setup_blueprints(self.config['BLUEPRINTS'])
         self.setup_apps(self.config['CORE_APPS'])
-        self.setup_apps(self.config.get('INSTALLED_APPS', []))
+        if not self.config.get("BEHAVE"):
+            # workaround for core 2.3 adding planning to installed apps
+            self.setup_apps(self.config.get('INSTALLED_APPS', []))
         self.setup_email()
         self.setup_cache()
         self.setup_error_handlers()

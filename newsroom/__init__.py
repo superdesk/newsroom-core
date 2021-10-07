@@ -5,12 +5,15 @@ Superdesk Newsroom
 :license: GPLv3
 """
 
+import logging
 import superdesk
 from superdesk import register_resource  # noqa
 
 # reuse content api dbs
 MONGO_PREFIX = 'CONTENTAPI_MONGO'
 ELASTIC_PREFIX = 'CONTENTAPI_ELASTICSEARCH'
+
+logging.basicConfig()
 
 
 class Resource(superdesk.Resource):

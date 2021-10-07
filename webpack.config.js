@@ -28,6 +28,7 @@ module.exports = {
         market_place_js: './assets/market-place/index.js',
         media_releases_js: './assets/media-releases/index.js',
         monitoring_js: './assets/monitoring/index.js',
+        factcheck_js: './assets/factcheck/index.js',
         common: [
             'alertifyjs',
             'bootstrap',
@@ -53,6 +54,7 @@ module.exports = {
         rules: [
             {
                 test: /\.jsx?$/,
+                exclude: /node_modules/,
                 loader: 'babel-loader',
                 options: {
                     presets: ['es2015', 'react'],
