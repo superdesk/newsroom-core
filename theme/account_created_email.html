@@ -1,7 +1,0 @@
-{% extends "email_layout.html" %}
-
-{% block content %}
-<p>Sinulle on luotu käyttäjätunnus STT:n {{app_name}}-palveluun. Ole hyvä ja klikkaa linkkiä aktivoidaksesi tunnuksesi: {{url}}</p>
-<p>Linkki vanhenee {{(expires/24)|int}} päivän kuluttua.</p>
-<p>Jos luulet, että {{app_name}}-tunnus on luotu erheellisesti, jätä tämä viesti huomiotta.</p>
-{% endblock %}
