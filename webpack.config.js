@@ -98,5 +98,3 @@ module.exports = {
         }),
     ]
 };
-
-console.log("resolve", module.exports.resolve);

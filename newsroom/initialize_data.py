@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 from collections import OrderedDict
+from typing import Dict, Tuple, List
 
 from apps.prepopulate.app_initialize import AppInitializeWithDataCommand as _AppInitializeWithDataCommand
 from newsroom.web import NewsroomWebApp
@@ -9,7 +10,7 @@ from newsroom.web import NewsroomWebApp
 logger = logging.getLogger(__name__)
 app = NewsroomWebApp()
 DATA_PATH = Path(__file__).parent.parent / 'data'
-__entities__ = OrderedDict([
+__entities__: Dict[str, Tuple[str, List, bool]] = OrderedDict([
     ('users', ('users.json', [], False)),
     ('ui_config', ('ui_config.json', [], True)),
 ])
