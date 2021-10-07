@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
-import { formatHTML } from 'utils';
+import {get} from 'lodash';
+import {formatHTML} from 'utils';
 import {connect} from 'react-redux';
-import { selectCopy } from '../../wire/actions';
+import {selectCopy} from '../../wire/actions';
 
 /**
  * using component to fix iframely loading

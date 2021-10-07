@@ -5,7 +5,7 @@ import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
 import AuditInformation from 'components/AuditInformation';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 import {isUserAdmin, getUserTypes, getUserLabel, userTypeReadOnly} from '../utils';
 
 const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));

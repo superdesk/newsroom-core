@@ -1,17 +1,17 @@
 import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { createSelector } from 'reselect';
+import {connect} from 'react-redux';
+import {createSelector} from 'reselect';
 import {get, isEqual, cloneDeep} from 'lodash';
 import classNames from 'classnames';
 import moment from 'moment';
 
 import {gettext, DATE_FORMAT, isDisplayed} from 'utils';
 import AgendaListItem from './AgendaListItem';
-import { setActive, previewItem, toggleSelected, openItem } from '../actions';
-import { EXTENDED_VIEW } from 'wire/defaults';
-import { getIntVersion } from 'wire/utils';
-import { groupItems, getPlanningItemsByGroup, getListItems } from 'agenda/utils';
+import {setActive, previewItem, toggleSelected, openItem} from '../actions';
+import {EXTENDED_VIEW} from 'wire/defaults';
+import {getIntVersion} from 'wire/utils';
+import {groupItems, getPlanningItemsByGroup, getListItems} from 'agenda/utils';
 import {searchNavigationSelector} from 'search/selectors';
 import {previewConfigSelector} from 'ui/selectors';
 
