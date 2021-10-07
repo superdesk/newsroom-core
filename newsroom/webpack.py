@@ -39,6 +39,7 @@ class NewsroomWebpack(Webpack):
 
         if not app.config.get('DEBUG'):  # let us change debug flag later
             app.before_request(self._refresh_webpack_stats_if_debug)
+        app.add_url_rule('/static/dist/<path:filename>', 'asset', send_asset)
 
         app.add_url_rule('/static/dist/<path:filename>', 'asset', send_asset)
 
