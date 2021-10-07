@@ -439,7 +439,7 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         assert push_mock.call_args_list[1][0][0] == 'history_matches'
         assert push_mock.call_args[1]['item']['_id']
         notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
-        assert notification['item'] == 'bar:1'
+        assert notification['item'] == 'bar'
 
     assert len(outbox) == 1
     assert 'http://localhost:5050/wire?item=bar' in outbox[0].body
