@@ -1,4 +1,6 @@
 import logging
+import elasticsearch.exceptions
+
 from collections import OrderedDict
 
 from apps.prepopulate.app_initialize import AppInitializeWithDataCommand as _AppInitializeWithDataCommand
@@ -22,7 +24,10 @@ class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
         # create indexes in mongo
         app.init_indexes()
         # put mapping to elastic
-        app.data.init_elastic(app)
+        try:
+            app.data.init_elastic(app)
+        except elasticsearch.exceptions.TransportError as err:
+            logger.error("Error when initializing elastic %s", err)
 
         if init_index_only:
             logger.info('Only indexes initialized.')
