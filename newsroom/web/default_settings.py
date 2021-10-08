@@ -1,4 +1,5 @@
 import os
+import pathlib
 import tzlocal
 import logging
 
@@ -8,7 +9,6 @@ from superdesk.default_settings import strtobool, env, local_to_utc_hour
 from datetime import timedelta
 
 from superdesk.default_settings import ( # noqa
-    DEBUG,
     VERSION,
     MONGO_URI,
     REDIS_URL,
@@ -49,6 +49,8 @@ from superdesk.default_settings import ( # noqa
 )
 
 logger = logging.getLogger()
+
+DEBUG = strtobool(os.environ.get('NEWSROOM_DEBUG'))
 
 # newsroom default db and index names
 MONGO_DBNAME = env('MONGO_DBNAME', 'newsroom')
@@ -357,3 +359,11 @@ ELASTICSEARCH_SETTINGS.setdefault("settings", {})["query_string"] = {
     # https://discuss.elastic.co/t/configuring-the-standard-tokenizer/8691/5
     'analyze_wildcard': False
 }
+
+#: server working directory
+#: should be set in settings.py
+SERVER_PATH = pathlib.Path(__file__).resolve().parent.parent
+
+#: client working directory
+#: used to locate client/dist/manifest.json file
+CLIENT_PATH = SERVER_PATH

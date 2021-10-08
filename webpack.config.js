@@ -44,7 +44,7 @@ module.exports = {
         ],
     },
     output: {
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(process.cwd(), 'dist'),
         publicPath: 'http://localhost:8080/',
         filename: '[name].[chunkhash].js',
         chunkFilename: '[id].[chunkhash].js'

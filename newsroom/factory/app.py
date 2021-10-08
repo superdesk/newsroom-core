@@ -6,6 +6,7 @@ This module implements WSGI application extending eve.Eve
 """
 
 import os
+import pathlib
 import importlib
 
 import eve
@@ -25,7 +26,7 @@ from newsroom.utils import is_json_request
 from newsroom.gettext import setup_babel
 
 
-NEWSROOM_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+NEWSROOM_DIR = pathlib.Path(__file__).resolve().parent.parent
 
 
 class BaseNewsroomApp(eve.Eve):
