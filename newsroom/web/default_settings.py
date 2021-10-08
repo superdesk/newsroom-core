@@ -50,7 +50,7 @@ from superdesk.default_settings import ( # noqa
 
 logger = logging.getLogger()
 
-DEBUG = strtobool(os.environ.get('NEWSROOM_DEBUG'))
+DEBUG = strtobool(os.environ.get('NEWSROOM_DEBUG', 'false'))
 
 # newsroom default db and index names
 MONGO_DBNAME = env('MONGO_DBNAME', 'newsroom')
