@@ -1,3 +1,4 @@
+import pathlib
 import logging
 import elasticsearch.exceptions
 
@@ -9,7 +10,7 @@ from .manager import app, manager
 
 
 logger = logging.getLogger(__name__)
-DATA_PATH = app.config['ABS_PATH'] / 'data'
+
 __entities__: OrderedDict = OrderedDict([
     ('users', ('users.json', [], False)),
     ('ui_config', ('ui_config.json', [], True)),
@@ -20,6 +21,11 @@ class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
 
     def run(self, entity_name=None, force=False, init_index_only=False):
         logger.info('Starting data initialization')
+
+        data_paths = [path for path in [
+            pathlib.Path(app.config["ABS_PATH"]).resolve().joinpath("data"),
+            pathlib.Path(__file__).resolve().parent.parent.joinpath("init_data"),
+        ] if path.exists()]
 
         # create indexes in mongo
         app.init_indexes()
@@ -33,22 +39,23 @@ class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
             logger.info('Only indexes initialized.')
             return 0
 
-        if entity_name:
-            if isinstance(entity_name, str):
-                entity_name = [entity_name]
-            for name in entity_name:
-                (file_name, index_params, do_patch) = __entities__[name]
-                self.import_file(name, DATA_PATH, file_name, index_params, do_patch, force)
-            return 0
+        if entity_name is None:
+            entity_name = list(__entities__.keys())
+        elif isinstance(entity_name, str):
+            entity_name = [entity_name]
 
-        for name, (file_name, index_params, do_patch) in __entities__.items():
+        for name in entity_name:
             try:
-                self.import_file(name, DATA_PATH, file_name, index_params, do_patch, force)
+                (file_name, index_params, do_patch) = __entities__[name]
+                for path in data_paths:
+                    if path.joinpath(file_name).exists():
+                        self.import_file(name, path, file_name, index_params, do_patch, force)
+                        break
             except KeyError:
                 continue
             except Exception as ex:
                 logger.exception(ex)
-                logger.info('Exception loading entity {} from {}'.format(name, file_name))
+                logger.info('Exception loading entity %s', name)
 
         logger.info('Data import finished')
         return 0

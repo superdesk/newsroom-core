@@ -1,0 +1,71 @@
+[
+    {
+        "_id": "wire",
+        "init_version": 1,
+        "preview": {
+            "slugline": {
+                "displayed": true
+            },
+            "metadata_fields": [
+              "urgency",
+              "source",
+              "wordcount",
+              "previous_versions",
+              "embargo"
+            ]
+        },
+        "details": {
+            "slugline": {
+                "displayed": false
+            },
+            "metadata_fields": [
+              "urgency",
+              "source",
+              "wordcount",
+              "previous_versions",
+              "embargo"
+            ]
+        },
+        "list": {
+            "highlights": {
+                "urgency": ["#C20000", "#BE8502"]
+            },
+            "metadata_fields": [
+              "embargo",
+              "source",
+              "//",
+              "wordcount",
+              "//",
+              "versioncreated"
+            ]
+        },
+        "advanced_search_tabs": {},
+        "multi_select_topics": false
+    },
+    {
+        "_id": "home",
+        "init_version": 1,
+        "list": {
+            "wordcount": {
+                "displayed": true
+            },
+            "charcount": {
+                "displayed": false
+            },
+            "slugline": {
+                "displayed": true
+            }
+        },
+        "details": {
+            "wordcount": {
+                "displayed": true
+            },
+            "charcount": {
+                "displayed": false
+            },
+            "slugline": {
+                "displayed": true
+            }
+        }
+    }
+]
