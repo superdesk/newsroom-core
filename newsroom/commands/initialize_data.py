@@ -23,7 +23,7 @@ class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
         logger.info('Starting data initialization')
 
         data_paths = [path for path in [
-            pathlib.Path(app.config["ABS_PATH"]).resolve().joinpath("data"),
+            pathlib.Path(app.config["SERVER_PATH"]).resolve().joinpath("data"),
             pathlib.Path(__file__).resolve().parent.parent.joinpath("init_data"),
         ] if path.exists()]
 
