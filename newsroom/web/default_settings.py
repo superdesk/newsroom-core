@@ -367,3 +367,11 @@ SERVER_PATH = pathlib.Path(__file__).resolve().parent.parent
 #: client working directory
 #: used to locate client/dist/manifest.json file
 CLIENT_PATH = SERVER_PATH
+
+#: server date/time formats
+#: defined using babel syntax http://babel.pocoo.org/en/latest/dates.html#date-and-time
+TIME_FORMAT_SHORT = "HH:mm"
+DATE_FORMAT_SHORT = "short"
+DATE_FORMAT_HEADER = "EEEE, dd.MM.yyyy"
+DATETIME_FORMAT_SHORT = "short"
+DATETIME_FORMAT_LONG = "dd/MM/yyyy HH:mm"

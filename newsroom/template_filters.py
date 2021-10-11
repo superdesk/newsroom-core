@@ -29,26 +29,26 @@ def parse_date(datetime):
 
 def datetime_short(datetime):
     if datetime:
-        return format_datetime(parse_date(datetime), 'short')
+        return format_datetime(parse_date(datetime), app.config["DATETIME_FORMAT_SHORT"])
 
 
 def datetime_long(datetime):
     if datetime:
-        return format_datetime(parse_date(datetime), "dd/MM/yyyy HH:mm")
+        return format_datetime(parse_date(datetime), app.config["DATETIME_FORMAT_LONG"])
 
 
 def date_header(datetime):
-    return format_datetime(parse_date(datetime if datetime else utcnow()), 'EEEE, dd.MM.yyyy')
+    return format_datetime(parse_date(datetime if datetime else utcnow()), app.config["DATE_FORMAT_HEADER"])
 
 
 def time_short(datetime):
     if datetime:
-        return format_time(parse_date(datetime), 'HH:mm')
+        return format_time(parse_date(datetime), app.config["TIME_FORMAT_SHORT"])
 
 
 def date_short(datetime):
     if datetime:
-        return format_date(parse_date(datetime), 'short')
+        return format_date(parse_date(datetime), app.config["DATE_FORMAT_SHORT"])
 
 
 def plain_text(html):
