@@ -43,7 +43,7 @@ ListViewControls.propTypes = {
     toggleNews: PropTypes.func,
     activeNavigation: PropTypes.arrayOf(PropTypes.string),
     hideNewsOnly: PropTypes.bool,
-
+    hideSearchAllVersions: PropTypes.bool,
     searchAllVersions: PropTypes.bool,
     toggleSearchAllVersions: PropTypes.func,
 };
