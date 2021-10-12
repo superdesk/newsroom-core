@@ -30,6 +30,7 @@ class WireSearchResource(newsroom.Resource):
         'search_backend': 'elastic',
         'source': 'items',
         'projection': {
+            'original_id': 1,
             'slugline': 1,
             'headline': 1,
             'body_html': 1,
