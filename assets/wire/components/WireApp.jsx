@@ -12,6 +12,7 @@ import {
     fetchMoreItems,
     previewItem,
     toggleNews,
+    toggleSearchAllVersions,
     downloadVideo,
 } from 'wire/actions';
 
@@ -175,6 +176,9 @@ class WireApp extends BaseApp {
                             newsOnly={this.props.newsOnly}
                             toggleNews={this.props.toggleNews}
                             hideNewsOnly={!(this.props.context === 'wire' && DISPLAY_NEWS_ONLY)}
+                            hideSearchAllVersions={false}
+                            searchAllVersions={this.props.searchAllVersions}
+                            toggleSearchAllVersions={this.props.toggleSearchAllVersions}
                         />
                     </nav>
                 </section>,
@@ -274,6 +278,8 @@ WireApp.propTypes = {
     activeNavigation: PropTypes.arrayOf(PropTypes.string),
     toggleNews: PropTypes.func,
     newsOnly: PropTypes.bool,
+    toggleSearchAllVersions: PropTypes.func,
+    searchAllVersions: PropTypes.bool,
     activeTopic: PropTypes.object,
     activeProduct: PropTypes.object,
     activeFilter: PropTypes.object,
@@ -306,6 +312,7 @@ const mapStateToProps = (state) => ({
     navigations: navigationsSelector(state),
     activeNavigation: searchNavigationSelector(state),
     newsOnly: !!get(state, 'wire.newsOnly'),
+    searchAllVersions: !!get(state, 'wire.searchAllVersions'),
     bookmarks: state.bookmarks,
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,
@@ -328,6 +335,7 @@ const mapDispatchToProps = (dispatch) => ({
         dispatch(toggleNews());
         dispatch(fetchItems());
     },
+    toggleSearchAllVersions: () => dispatch(toggleSearchAllVersions()),
     setQuery: (query) => dispatch(setQuery(query)),
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),

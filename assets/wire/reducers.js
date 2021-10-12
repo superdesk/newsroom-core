@@ -2,6 +2,7 @@ import {
     RECIEVE_ITEMS,
     INIT_DATA,
     TOGGLE_NEWS,
+    TOGGLE_SEARCH_ALL_VERSIONS,
     WIRE_ITEM_REMOVED,
 } from './actions';
 
@@ -100,6 +101,13 @@ function _wireReducer(state, action) {
         };
     }
 
+    case TOGGLE_SEARCH_ALL_VERSIONS: {
+        return {
+            ...state,
+            searchAllVersions: !state.searchAllVersions,
+        };
+    }
+
     default:
         return state;
     }
@@ -125,7 +133,10 @@ export default function wireReducer(state = initialState, action) {
             bookmarks: action.wireData.bookmarks || false,
             formats: action.wireData.formats || [],
             secondaryFormats: get(action, 'wireData.secondary_formats') || [],
-            wire: Object.assign({}, state.wire, {newsOnly: action.newsOnly}),
+            wire: Object.assign({}, state.wire, {
+                newsOnly: action.newsOnly,
+                searchAllVersions: action.searchAllVersions,
+            }),
             search: Object.assign({}, state.search, {
                 navigations,
                 products,
@@ -139,6 +150,7 @@ export default function wireReducer(state = initialState, action) {
     }
 
     case TOGGLE_NEWS:
+    case TOGGLE_SEARCH_ALL_VERSIONS:
         return {...state, wire: _wireReducer(state.wire, action)};
 
     case WIRE_ITEM_REMOVED:

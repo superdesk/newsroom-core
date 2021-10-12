@@ -2,11 +2,29 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import NewsOnlyControl from './NewsOnlyControl';
+import SearchAllVersionsControl from './SearchAllVersionsControl';
 import ListViewOptions from '../../components/ListViewOptions';
 
-function ListViewControls({activeView, setView, newsOnly, toggleNews, activeNavigation, hideNewsOnly}) {
+function ListViewControls({
+    activeView,
+    setView,
+    newsOnly,
+    toggleNews,
+    activeNavigation,
+    hideNewsOnly,
+    hideSearchAllVersions,
+    searchAllVersions,
+    toggleSearchAllVersions,
+}) {
     return(
         <div className='content-bar__right'>
+            {hideSearchAllVersions ? null : (
+                <SearchAllVersionsControl
+                    activeNavigation={activeNavigation}
+                    searchAllVersions={searchAllVersions}
+                    toggleSearchAllVersions={toggleSearchAllVersions}
+                />
+            )}
             {!hideNewsOnly && <NewsOnlyControl
                 activeNavigation={activeNavigation}
                 newsOnly={newsOnly}
@@ -25,6 +43,9 @@ ListViewControls.propTypes = {
     toggleNews: PropTypes.func,
     activeNavigation: PropTypes.arrayOf(PropTypes.string),
     hideNewsOnly: PropTypes.bool,
+
+    searchAllVersions: PropTypes.bool,
+    toggleSearchAllVersions: PropTypes.func,
 };
 
 export default ListViewControls;
