@@ -1,44 +1,50 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext, wordCount, isDisplayed, characterCount} from 'utils';
-import { getPicture } from 'wire/utils';
+import {getPicture} from 'wire/utils';
+import {FieldComponents} from './fields';
 
-const DEFAULT_URGENCY = 4;
+const DEFAULT_META_FIELDS = [
+    'urgency',
+    'source',
+    ['charcount', 'wordcount'],
+    'previous_versions',
+];
 
-
-
-function PreviewMeta({item, isItemDetail, inputRef, displayConfig}) {
+function PreviewMeta({
+    item,
+    isItemDetail,
+    inputRef,
+    displayConfig,
+    listConfig,
+}) {
     const picture = getPicture(item);
-    const onClick = () => {
-        const previousVersions = document.getElementById(inputRef);
-        previousVersions && previousVersions.scrollIntoView();
-    };
+    const fields = displayConfig.metadata_fields || DEFAULT_META_FIELDS;
 
     return (
-        <div className='wire-articles__item__meta'>
-            <div className='wire-articles__item__icons'>
-                {item.type === 'text' &&
-                    <span className='wire-articles__item__icon'>
-                        <i className='icon--text icon--gray-light'></i>
+        <div className="wire-articles__item__meta">
+            <div className="wire-articles__item__icons">
+                {item.type === 'text' && (
+                    <span className="wire-articles__item__icon">
+                        <i className="icon--text icon--gray-light"></i>
                     </span>
-                }
+                )}
                 {picture && (
-                    <span className='wire-articles__item__icon'>
-                        <i className='icon--photo icon--gray-light'></i>
+                    <span className="wire-articles__item__icon">
+                        <i className="icon--photo icon--gray-light"></i>
                     </span>
                 )}
             </div>
-            <div className='wire-articles__item__meta-info'>
-                {isDisplayed('urgency', displayConfig) &&
-                <span>{gettext('News Value: {{ value }}', {value: item.urgency || DEFAULT_URGENCY})}</span>}
-                {isDisplayed('wordcount', displayConfig) && <span>{gettext('Words:')}<span> {wordCount(item)}</span></span>}
-                {isDisplayed('charcount', displayConfig) && <span>{gettext('Characters:')}<span> {characterCount(item)}</span></span>}
-                <span>{isDisplayed('source', displayConfig) && gettext('Source: {{ source }}', {source: item.source})}
-                    {!isItemDetail && ' // '}
-                    {!isItemDetail && <span className="blue-text" onClick={onClick}>
-                        {gettext('{{ count }} previous versions', {count: item.ancestors ? item.ancestors.length : '0'})}
-                    </span>}
-                </span>
+            <div className="wire-articles__item__meta-info">
+                <FieldComponents
+                    config={fields}
+                    item={item}
+                    fieldProps={{
+                        listConfig,
+                        isItemDetail,
+                        inputRef,
+                        alwaysShow: true,
+                    }}
+                />
             </div>
         </div>
     );
@@ -49,6 +55,7 @@ PreviewMeta.propTypes = {
     isItemDetail: PropTypes.bool,
     inputRef: PropTypes.string,
     displayConfig: PropTypes.object,
+    listConfig: PropTypes.object,
 };
 
 export default PreviewMeta;

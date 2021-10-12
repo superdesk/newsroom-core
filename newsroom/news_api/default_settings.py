@@ -1,8 +1,9 @@
 import os
 
-from superdesk.default_settings import ( # noqa
+from newsroom.web.default_settings import ( # noqa
     env,
     ELASTICSEARCH_URL,
+    ELASTICSEARCH_SETTINGS,
     CONTENTAPI_ELASTICSEARCH_URL,
     CONTENTAPI_ELASTICSEARCH_SETTINGS,
 )

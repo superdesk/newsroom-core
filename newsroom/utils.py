@@ -81,7 +81,10 @@ def loads(s):
 
 
 def get_entity_or_404(_id, resource):
-    item = superdesk.get_resource_service(resource).find_one(req=None, _id=_id)
+    try:
+        item = superdesk.get_resource_service(resource).find_one(req=None, _id=_id)
+    except KeyError:
+        item = None
     if not item:
         abort(404)
     return item
@@ -309,9 +312,11 @@ def get_cached_resource_by_id(resource, _id, black_list_keys=None):
     item = app.cache.get(str(_id))
     if item:
         return loads(item)
-
-    # item is not stored in cache
-    item = superdesk.get_resource_service(resource).find_one(req=None, _id=_id)
+    try:
+        # item is not stored in cache
+        item = superdesk.get_resource_service(resource).find_one(req=None, _id=_id)
+    except KeyError:
+        item = None
     if item:
         if not black_list_keys:
             black_list_keys = {'password', 'token', 'token_expiry', '_id', '_updated', '_etag'}

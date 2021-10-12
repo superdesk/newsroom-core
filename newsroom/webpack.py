@@ -1,6 +1,7 @@
 
 import os
 import json
+import pathlib
 import requests
 
 from urllib.parse import urljoin
@@ -28,11 +29,10 @@ class NewsroomWebpack(Webpack):
         app.config.setdefault(
             "WEBPACK_MANIFEST_PATH",
             os.path.join(
-                app.config["ABS_PATH"].parent,
-                "client",
+                pathlib.Path(app.config["CLIENT_PATH"]).resolve(),
                 "dist",
                 "manifest.json",
-            ) if app.config.get("ABS_PATH") else None,
+            ),
         )
 
         super(NewsroomWebpack, self).init_app(app)

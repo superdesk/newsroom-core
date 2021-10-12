@@ -118,3 +118,6 @@ newsroom/static/dist
 
 # pytest
 .pytest_cache
+
+# data dumps
+dump

@@ -20,10 +20,12 @@ logger = logging.getLogger(__name__)
 
 
 def query_string(query, default_operator='AND'):
+    query_string_settings = app.config['ELASTICSEARCH_SETTINGS']['settings']['query_string']
     return {
         'query_string': {
             'query': query,
             'default_operator': default_operator,
+            'analyze_wildcard': query_string_settings['analyze_wildcard'],
             'lenient': True,
         }
     }
@@ -324,10 +326,15 @@ class BaseSearchService(Service):
 
     def prefill_search_highlights(self, search, req):
         query_string = search.args.get('q')
-
+        query_string_settings = app.config['ELASTICSEARCH_SETTINGS']['settings']['query_string']
         if app.data.elastic.should_highlight(req) and query_string:
             elastic_highlight_query = get_elastic_highlight_query(
-                query_string={"query": query_string, "default_operator": "AND", "lenient": True}
+                query_string={
+                    "query": query_string,
+                    "default_operator": "AND",
+                    "analyze_wildcard": query_string_settings["analyze_wildcard"],
+                    "lenient": True,
+                },
             )
             elastic_highlight_query['fields'] = {
                 'body_html': elastic_highlight_query['fields']['body_html']

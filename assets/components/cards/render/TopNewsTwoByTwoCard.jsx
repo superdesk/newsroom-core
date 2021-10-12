@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {wordCount, getSlugline} from 'utils';
-import { getPicture, getThumbnailRendition, getCaption } from 'wire/utils';
+import {getPicture, getThumbnailRendition, getCaption, shortText} from 'wire/utils';
 import CardRow from './CardRow';
 import CardFooter from './CardFooter';
 import CardMeta from './CardMeta';
 import CardBody from './CardBody';
+import {Embargo} from '../../../wire/components/fields/Embargo';
 
 const getTopNewsLeftPanel = (item, picture, openItem, cardId) => {
 
@@ -20,6 +21,7 @@ const getTopNewsLeftPanel = (item, picture, openItem, cardId) => {
             </div>}
             <div className='card-body'>
                 <h2 className='card-title'>{item.headline}</h2>
+                <Embargo item={item} isCard={true} />
                 <CardMeta
                     pictureAvailable={!!picture}
                     wordCount={wordCount(item)}
@@ -29,7 +31,7 @@ const getTopNewsLeftPanel = (item, picture, openItem, cardId) => {
                     slugline={getSlugline(item, true)}
                 />
                 <div className='wire-articles__item__text'>
-                    <p className='card-text'>{item.description_text}</p>
+                    <p className='card-text'>{shortText(item, 40, true)}</p>
                 </div>
             </div>
         </div>

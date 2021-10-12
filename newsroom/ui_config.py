@@ -38,7 +38,7 @@ class UIConfigResource(newsroom.Resource):
         },
         'init_version': {
             'type': 'integer'
-        }
+        },
     }
     datasource = {
         'source': 'ui_config'

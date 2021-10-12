@@ -61,7 +61,6 @@ class NewsAPINewsService(BaseSearchService):
         exclude_fields = self.mandatory_exclude_fields.union(
             set(orig_request_params.get('exclude_fields').split(','))) if orig_request_params.get(
             'exclude_fields') else self.mandatory_exclude_fields
-
         for doc in resp.docs:
             for field in exclude_fields:
                 doc.pop(field, None)

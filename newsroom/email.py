@@ -41,7 +41,7 @@ def _send_email(self, to, subject, text_body, html_body=None, sender=None, attac
         return app.mail.send(msg)
 
 
-def send_email(to, subject, text_body, html_body=None, sender=None, attachments_info=[]):
+def send_email(to, subject, text_body, html_body=None, sender=None, attachments_info=None):
     """
     Sends the email
     :param to: List of recipients
@@ -88,7 +88,7 @@ def send_validate_account_email(user_name, user_email, token):
     url = url_for('auth.validate_account', token=token, _external=True)
     hours = current_app.config['VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE'] * 24
 
-    subject = gettext('{} account created'.format(app_name))
+    subject = gettext('{} account created').format(app_name)
     text_body = render_template('validate_account_email.txt',
                                 app_name=app_name, name=user_name, expires=hours, url=url)
     html_body = render_template('validate_account_email.html',
@@ -109,7 +109,7 @@ def send_new_account_email(user_name, user_email, token):
     url = url_for('auth.reset_password', token=token, _external=True)
     hours = current_app.config['VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE'] * 24
 
-    subject = gettext('{} account created'.format(app_name))
+    subject = gettext('{} account created').format(app_name)
     text_body = render_template('account_created_email.txt', app_name=app_name, name=user_name, expires=hours, url=url)
     html_body = render_template('account_created_email.html', app_name=app_name, name=user_name, expires=hours, url=url)
 
@@ -128,7 +128,7 @@ def send_reset_password_email(user_name, user_email, token):
     url = url_for('auth.reset_password', token=token, _external=True)
     hours = current_app.config['RESET_PASSWORD_TOKEN_TIME_TO_LIVE'] * 24
 
-    subject = gettext('{} password reset'.format(app_name))
+    subject = gettext('{} password reset').format(app_name)
     text_body = render_template('reset_password_email.txt', app_name=app_name, name=user_name,
                                 email=user_email, expires=hours, url=url)
     html_body = render_template('reset_password_email.html', app_name=app_name, name=user_name,
@@ -147,7 +147,7 @@ def send_new_item_notification_email(user, topic_name, item, section='wire'):
 def _send_new_wire_notification_email(user, topic_name, item, section):
     url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
-    subject = gettext('New story for followed topic: {}'.format(topic_name))
+    subject = gettext('New story for followed topic: {}').format(topic_name)
     kwargs = dict(
         app_name=current_app.config['SITE_NAME'],
         is_topic=True,
@@ -166,7 +166,7 @@ def _send_new_wire_notification_email(user, topic_name, item, section):
 def _send_new_agenda_notification_email(user, topic_name, item):
     url = url_for_agenda(item, _external=True)
     recipients = [user['email']]
-    subject = gettext('New update for followed agenda: {}'.format(topic_name))
+    subject = gettext('New update for followed agenda: {}').format(topic_name)
     kwargs = dict(
         app_name=current_app.config['SITE_NAME'],
         is_topic=True,
@@ -198,7 +198,7 @@ def _send_history_match_wire_notification_email(user, item, section):
     app_name = current_app.config['SITE_NAME']
     url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
-    subject = gettext('New update for your previously accessed story: {}'.format(item['headline']))
+    subject = gettext('New update for your previously accessed story: {}').format(item['headline'])
     text_body = render_template(
         'new_item_notification.txt',
         app_name=app_name,
@@ -217,7 +217,7 @@ def _send_history_match_agenda_notification_email(user, item):
     app_name = current_app.config['SITE_NAME']
     url = url_for_agenda(item, _external=True)
     recipients = [user['email']]
-    subject = gettext('New update for your previously accessed agenda: {}'.format(item['name']))
+    subject = gettext('New update for your previously accessed agenda: {}').format(item['name'])
     text_body = render_template(
         'new_item_notification.txt',
         app_name=app_name,

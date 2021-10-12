@@ -38,10 +38,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.dashboards = []
         super(NewsroomWebApp, self).__init__(import_name=import_name, config=config, **kwargs)
 
-        self.theme_folder = self.config.get(
-            "THEME_PATH",
-            os.path.join(self.config["ABS_PATH"], 'theme') if self.config.get("ABS_PATH") else 'theme'
-        )
+        self.theme_folder = os.path.join(self.config["SERVER_PATH"], "theme")
 
         self._setup_jinja()
         self._setup_limiter()
@@ -94,16 +91,15 @@ class NewsroomWebApp(BaseNewsroomApp):
             jinja2.FileSystemLoader(self.theme_folder),
         ]
 
-        # ABS_PATH is set only for the instance settings and not set for a test app instance
-        if 'ABS_PATH' in self.config:
-            jinja2_loaders.append(
-                # newsroom-app/server/templates
-                jinja2.FileSystemLoader(self.config['ABS_PATH'] / 'templates')
-            )
+        jinja2_loaders.append(
+            jinja2.FileSystemLoader(os.path.join(self.config["SERVER_PATH"], "templates"))
+        )
+
         jinja2_loaders.append(
             # newsroom-core/newsroom/templates
             jinja2.FileSystemLoader(self.template_folder)
         )
+
         self.jinja_loader = jinja2.ChoiceLoader(jinja2_loaders)
 
     def _setup_limiter(self):

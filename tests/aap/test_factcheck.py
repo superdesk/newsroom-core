@@ -1,8 +1,8 @@
 from tests.fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from tests.utils import json, get_json, get_admin_user_id, mock_send_email
-from tests.test_download import wire_formats, download_zip_file, items_ids, setup_image
-from tests.test_push import get_signature_headers
-from tests.test_users import ADMIN_USER_ID
+from tests.core.test_download import wire_formats, download_zip_file, items_ids, setup_image
+from tests.core.test_push import get_signature_headers
+from tests.core.test_users import ADMIN_USER_ID
 
 from superdesk import get_resource_service
 from superdesk.utc import utcnow

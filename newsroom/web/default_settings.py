@@ -1,4 +1,5 @@
 import os
+import pathlib
 import tzlocal
 import logging
 
@@ -8,7 +9,6 @@ from superdesk.default_settings import strtobool, env, local_to_utc_hour
 from datetime import timedelta
 
 from superdesk.default_settings import ( # noqa
-    DEBUG,
     VERSION,
     MONGO_URI,
     REDIS_URL,
@@ -49,6 +49,8 @@ from superdesk.default_settings import ( # noqa
 )
 
 logger = logging.getLogger()
+
+DEBUG = strtobool(os.environ.get('NEWSROOM_DEBUG', 'false'))
 
 # newsroom default db and index names
 MONGO_DBNAME = env('MONGO_DBNAME', 'newsroom')
@@ -266,6 +268,20 @@ COVERAGE_TYPES = {
     'video_explainer': {'name': 'Video Explainer', 'icon': 'explainer'}
 }
 
+LANGUAGES = ['en', 'fi', 'cs']
+DEFAULT_LANGUAGE = 'en'
+
+CLIENT_LOCALE_FORMATS = {
+    "en": {  # defaults
+        "TIME_FORMAT": "HH:mm",
+        "DATE_FORMAT": "DD/MM/YYYY",
+        "COVERAGE_DATE_TIME_FORMAT": "HH:mm DD/MM",
+        "COVERAGE_DATE_FORMAT": "DD/MM",
+    },
+    "fr_CA": {  # example - you can overwrite any format above
+        "DATE_FORMAT": "DD/MM/YYYY",
+    }
+}
 
 LANGUAGES = ['en', 'fi', 'cs', 'fr_CA']
 DEFAULT_LANGUAGE = 'en'
@@ -288,13 +304,12 @@ CLIENT_CONFIG = {
     'default_language': DEFAULT_LANGUAGE,
     'locale_formats': CLIENT_LOCALE_FORMATS,
     'coverage_types': COVERAGE_TYPES,
-    'display_abstract': DISPLAY_ABSTRACT,
-    'display_credits': False,
     'list_animations': True,  # Enables or disables the animations for list item select boxes,
     'display_news_only': True,  # Displays news only switch in wire,
-    'default_timezone': DEFAULT_TIMEZONE
+    'default_timezone': DEFAULT_TIMEZONE,
+    'display_abstract': DISPLAY_ABSTRACT,
+    'display_credits': False,
 }
-
 
 # Enable iframely support for item body_html
 IFRAMELY = True
@@ -339,3 +354,24 @@ NEWS_API_ENABLED = strtobool(env('NEWS_API_ENABLED', 'false'))
 
 # Enables the application of product filtering to image references in the API and ATOM responses
 NEWS_API_IMAGE_PERMISSIONS_ENABLED = strtobool(env('NEWS_API_IMAGE_PERMISSIONS_ENABLED', 'false'))
+
+ELASTICSEARCH_SETTINGS.setdefault("settings", {})["query_string"] = {
+    # https://discuss.elastic.co/t/configuring-the-standard-tokenizer/8691/5
+    'analyze_wildcard': False
+}
+
+#: server working directory
+#: should be set in settings.py
+SERVER_PATH = pathlib.Path(__file__).resolve().parent.parent
+
+#: client working directory
+#: used to locate client/dist/manifest.json file
+CLIENT_PATH = SERVER_PATH
+
+#: server date/time formats
+#: defined using babel syntax http://babel.pocoo.org/en/latest/dates.html#date-and-time
+TIME_FORMAT_SHORT = "HH:mm"
+DATE_FORMAT_SHORT = "short"
+DATE_FORMAT_HEADER = "EEEE, dd.MM.yyyy"
+DATETIME_FORMAT_SHORT = "short"
+DATETIME_FORMAT_LONG = "dd/MM/yyyy HH:mm"

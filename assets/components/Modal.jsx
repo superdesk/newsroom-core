@@ -1,12 +1,13 @@
 import 'bootstrap';
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
-import { gettext } from 'utils';
-import { connect } from 'react-redux';
-import { closeModal } from 'actions';
+import {get} from 'lodash';
+import {gettext} from 'utils';
+import {connect} from 'react-redux';
+import {closeModal} from 'actions';
 
 import CloseButton from './CloseButton';
+import classNames from 'classnames';
 
 /**
  * Primary modal button for actions like save/send/etc
@@ -75,7 +76,7 @@ class Modal extends React.Component {
     constructor(props) {
         super(props);
         this.onSubmit = this.onSubmit.bind(this);
-        this.state = { submitting: false };
+        this.state = {submitting: false};
     }
 
     componentDidMount() {
@@ -97,7 +98,7 @@ class Modal extends React.Component {
 
     onSubmit(e) {
         if (this.props.disableButtonOnSubmit) {
-            this.setState({ submitting: true });
+            this.setState({submitting: true});
             this.props.onSubmit(e);
             return;
         }
@@ -107,8 +108,10 @@ class Modal extends React.Component {
 
     render() {
         return (
-            <div className="modal mt-xl-5"
-                ref={(elem) => this.elem = elem}>
+            <div className={classNames('modal mt-xl-5', {
+                'modal--full-width': this.props.width === 'full',
+            })}
+            ref={(elem) => this.elem = elem}>
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">
@@ -142,13 +145,14 @@ class Modal extends React.Component {
 Modal.propTypes = {
     title: PropTypes.string.isRequired,
     children: PropTypes.node.isRequired,
-    onSubmit: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func,
     onSubmitLabel: PropTypes.string,
     onCancelLabel: PropTypes.string,
     closeModal: PropTypes.func.isRequired,
     disableButtonOnSubmit: PropTypes.bool,
     formValid: PropTypes.bool,
     clickOutsideToClose: PropTypes.bool,
+    width: PropTypes.string,
 };
 
 Modal.defaultProps = {
@@ -157,6 +161,6 @@ Modal.defaultProps = {
     clickOutsideToClose: false,
 };
 
-const mapStateToProps = (state) => ({ formValid: get(state, 'modal.formValid') });
+const mapStateToProps = (state) => ({formValid: get(state, 'modal.formValid')});
 
 export default connect(mapStateToProps, {closeModal})(Modal);

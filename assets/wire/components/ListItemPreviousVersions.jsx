@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 
-import { gettext } from 'utils';
-import { fetchVersions, openItem } from '../actions';
+import {gettext} from 'utils';
+import {fetchVersions, openItem} from '../actions';
 
 import ItemVersion from './ItemVersion';
+
 
 class ListItemPreviousVersions extends React.Component {
     constructor(props) {
@@ -49,6 +50,7 @@ class ListItemPreviousVersions extends React.Component {
                 baseClass={this.baseClass}
                 withDivider={this.props.isPreview}
                 onClick={this.open}
+                displayConfig={this.props.displayConfig}
             />
         ));
 
@@ -72,6 +74,7 @@ ListItemPreviousVersions.propTypes = {
     isPreview: PropTypes.bool.isRequired,
     dispatch: PropTypes.func,
     inputId: PropTypes.string,
+    displayConfig: PropTypes.object
 };
 
 export default connect()(ListItemPreviousVersions);
