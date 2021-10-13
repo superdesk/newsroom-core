@@ -107,7 +107,6 @@ ENV/
 
 # js
 node_modules
-package-lock.json
 
 # editor
 .idea
@@ -119,3 +118,6 @@ newsroom/static/dist
 
 # pytest
 .pytest_cache
+
+# data dumps
+dump

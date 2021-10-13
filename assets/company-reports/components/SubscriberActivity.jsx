@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { connect } from 'react-redux';
-import { gettext, fullDate, upperCaseFirstCharacter } from 'utils';
-import { get } from 'lodash';
+import {connect} from 'react-redux';
+import {gettext, fullDate, upperCaseFirstCharacter} from 'utils';
+import {get} from 'lodash';
 import ReportsTable from './ReportsTable';
 import DropdownFilter from '../../components/DropdownFilter';
 import CalendarButton from '../../components/CalendarButton';
@@ -14,7 +14,7 @@ class SubscriberActivity extends React.Component {
         super(props, context);
 
         this.companies = [...this.props.companies.map((c) => ({...c, 'label': c.name}))];
-        this.state = { company: this.props.companies[0] };
+        this.state = {company: this.props.companies[0]};
 
         this.filters = [{
             label: gettext('All Companies'),
@@ -48,7 +48,7 @@ class SubscriberActivity extends React.Component {
     }
 
     getDropdownItems(filter) {
-        const { toggleFilterAndQuery, sections } = this.props;
+        const {toggleFilterAndQuery, sections, apiEnabled} = this.props;
         let getName = (text) => (text);
         let itemsArray = [];
         // Company is not filtered, always show full list
@@ -59,26 +59,33 @@ class SubscriberActivity extends React.Component {
 
         case 'action':
             itemsArray = [{
-                'name': 'download'
+                name: 'download'
             },
             {
-                'name': 'copy'
+                name: 'copy'
             },
             {
-                'name': 'share'
+                name: 'share'
             },
             {
-                'name': 'print'
+                name: 'print'
             },
             {
-                'name': 'open'
+                name: 'open'
             },
             {
-                'name': 'preview'
+                name: 'preview'
             },
             {
-                'name': 'clipboard'
+                name: 'clipboard'
             }];
+
+            if (apiEnabled) {
+                itemsArray.push({
+                    name: 'api retrieval',
+                    value: 'api'
+                });}
+
             getName = upperCaseFirstCharacter;
             break;
 
@@ -91,12 +98,14 @@ class SubscriberActivity extends React.Component {
         return itemsArray.map((item, i) => (<button
             key={i}
             className='dropdown-item'
-            onClick={() => toggleFilterAndQuery(filter.field, item.name)}
+            onClick={() => toggleFilterAndQuery(filter.field, item.value || item.name)}
         >{getName(item.name)}</button>));
     }
 
     getFilterLabel(filter, activeFilter) {
         if (activeFilter[filter.field]) {
+            if (activeFilter.action === 'api' && filter.field === 'action')
+                return 'api retrieval';
             return activeFilter[filter.field];
         } else {
             return filter.label;
@@ -201,6 +210,7 @@ SubscriberActivity.propTypes = {
     fetchReport: PropTypes.func,
     reportParams: PropTypes.object,
     sections: PropTypes.array,
+    apiEnabled: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -210,6 +220,6 @@ const mapStateToProps = (state) => ({
     sections: state.sections,
 });
 
-const mapDispatchToProps = { toggleFilterAndQuery, fetchReport, runReport };
+const mapDispatchToProps = {toggleFilterAndQuery, fetchReport, runReport};
 
 export default connect(mapStateToProps, mapDispatchToProps)(SubscriberActivity);

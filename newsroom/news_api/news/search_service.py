@@ -14,7 +14,7 @@ from superdesk.errors import SuperdeskApiError
 from content_api.items.resource import ItemsResource
 from content_api.errors import BadParameterValueError, UnexpectedParameterError
 
-from newsroom.news_api.utils import post_api_audit, remove_internal_renditions
+from newsroom.news_api.utils import post_api_audit, remove_internal_renditions, check_association_permission
 from newsroom.search import BaseSearchService, query_string
 from newsroom.products.products import get_products_by_company
 
@@ -61,13 +61,15 @@ class NewsAPINewsService(BaseSearchService):
         exclude_fields = self.mandatory_exclude_fields.union(
             set(orig_request_params.get('exclude_fields').split(','))) if orig_request_params.get(
             'exclude_fields') else self.mandatory_exclude_fields
-
         for doc in resp.docs:
             for field in exclude_fields:
                 doc.pop(field, None)
 
             if 'associations' in orig_request_params.get('include_fields', ''):
-                remove_internal_renditions(doc)
+                if not check_association_permission(doc):
+                    doc.pop('associations', None)
+                else:
+                    remove_internal_renditions(doc)
 
         return resp
 

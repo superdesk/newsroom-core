@@ -1,8 +1,8 @@
 from tests.fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from tests.utils import json, get_json, get_admin_user_id, mock_send_email
-from tests.test_download import wire_formats, download_zip_file, items_ids, setup_image
-from tests.test_push import get_signature_headers
-from tests.test_users import ADMIN_USER_ID
+from tests.core.test_download import wire_formats, download_zip_file, items_ids, setup_image
+from tests.core.test_push import get_signature_headers
+from tests.core.test_users import ADMIN_USER_ID
 
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
@@ -303,17 +303,17 @@ def test_time_limited_access(client, app):
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
 
-    g.settings['wire_time_limit_days']['value'] = 1
+    g.settings['media_releases_time_limit_days']['value'] = 1
     resp = client.get('/media_releases/search')
     data = json.loads(resp.get_data())
     assert 0 == len(data['_items'])
 
-    g.settings['wire_time_limit_days']['value'] = 100
+    g.settings['media_releases_time_limit_days']['value'] = 100
     resp = client.get('/media_releases/search')
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
 
-    g.settings['wire_time_limit_days']['value'] = 1
+    g.settings['media_releases_time_limit_days']['value'] = 1
     company = app.data.find_one('companies', req=None, _id=1)
     app.data.update('companies', 1, {'archive_access': True}, company)
     resp = client.get('/media_releases/search')
@@ -382,7 +382,7 @@ def test_share_items(client, app):
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'From AAP Newsroom: %s' % items[0]['headline']
         assert 'Hi Foo Bar' in outbox[0].body
-        assert 'admin admin (admin@sourcefabric.org) shared ' in outbox[0].body
+        assert 'admin admin' in outbox[0].body
         assert items[0]['headline'] in outbox[0].body
         assert items[1]['headline'] in outbox[0].body
         assert 'http://localhost:5050/media_releases?item=%s' % parse.quote(items[0]['_id']) in outbox[0].body

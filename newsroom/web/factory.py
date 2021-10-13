@@ -7,7 +7,8 @@ from newsroom.template_filters import (
     datetime_short, datetime_long, time_short, date_short,
     plain_text, word_count, char_count, newsroom_config, is_admin,
     hash_string, date_header, get_date, get_multi_line_message,
-    sidenavs_by_names, sidenavs_by_group, get_company_sidenavs, is_admin_or_account_manager
+    sidenavs_by_names, sidenavs_by_group, get_company_sidenavs, is_admin_or_account_manager,
+    to_json, authorized_settings_apps,
 )
 from newsroom.notifications.notifications import get_initial_notifications
 from newsroom.limiter import limiter
@@ -37,10 +38,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.dashboards = []
         super(NewsroomWebApp, self).__init__(import_name=import_name, config=config, **kwargs)
 
-        self.theme_folder = self.config.get(
-            "THEME_PATH",
-            os.path.join(self.config["ABS_PATH"], 'theme') if self.config.get("ABS_PATH") else 'theme'
-        )
+        self.theme_folder = os.path.join(self.config["SERVER_PATH"], "theme")
 
         self._setup_jinja()
         self._setup_limiter()
@@ -67,6 +65,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.config.from_envvar('NEWSROOM_SETTINGS', silent=True)
 
     def _setup_jinja(self):
+        self.add_template_filter(to_json, name='tojson')
         self.add_template_filter(datetime_short)
         self.add_template_filter(datetime_long)
         self.add_template_filter(date_header)
@@ -79,6 +78,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_global(sidenavs_by_names)
         self.add_template_global(sidenavs_by_group)
         self.add_template_global(is_admin_or_account_manager)
+        self.add_template_global(authorized_settings_apps)
         self.add_template_global(newsroom_config)
         self.add_template_global(is_admin)
         self.add_template_global(get_initial_notifications)
@@ -91,16 +91,15 @@ class NewsroomWebApp(BaseNewsroomApp):
             jinja2.FileSystemLoader(self.theme_folder),
         ]
 
-        # ABS_PATH is set only for the instance settings and not set for a test app instance
-        if 'ABS_PATH' in self.config:
-            jinja2_loaders.append(
-                # newsroom-app/server/templates
-                jinja2.FileSystemLoader(self.config['ABS_PATH'] / 'templates')
-            )
+        jinja2_loaders.append(
+            jinja2.FileSystemLoader(os.path.join(self.config["SERVER_PATH"], "templates"))
+        )
+
         jinja2_loaders.append(
             # newsroom-core/newsroom/templates
             jinja2.FileSystemLoader(self.template_folder)
         )
+
         self.jinja_loader = jinja2.ChoiceLoader(jinja2_loaders)
 
     def _setup_limiter(self):
@@ -211,12 +210,13 @@ class NewsroomWebApp(BaseNewsroomApp):
             'secondary_endpoints': secondary_endpoints
         })
 
-    def settings_app(self, app, name, weight=1000, data=None):
+    def settings_app(self, app, name, weight=1000, data=None, allow_account_mgr=False):
         self.settings_apps.append(SettingsApp(
             _id=app,
             name=name,
             data=data,
-            weight=weight
+            weight=weight,
+            allow_account_mgr=allow_account_mgr,
         ))
 
     def dashboard(self, _id, name, cards=[]):

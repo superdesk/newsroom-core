@@ -1,14 +1,14 @@
 import datetime
 from flask import url_for
 from bson import ObjectId
-from pytest import fixture
+from pytest import fixture, mark
 from superdesk import get_resource_service
 from superdesk.utils import get_hash
 
 from newsroom.auth.token import verify_auth_token
 from newsroom.auth.views import _is_password_valid
-from tests.test_users import init as users_init, ADMIN_USER_ID  # noqa
-from .utils import mock_send_email
+from tests.core.test_users import init as users_init, ADMIN_USER_ID  # noqa
+from tests.utils import mock_send_email
 from unittest import mock
 
 disabled_company = ObjectId()
@@ -61,6 +61,7 @@ def test_new_user_signup_sends_email(app, client):
         assert 'Press co.' in outbox[0].body
 
 
+@mark.skip(reason="STT doesn't have sign up")
 def test_new_user_signup_fails_if_fields_not_provided(client):
     # Register a new account
     response = client.post(url_for('auth.signup'), data={

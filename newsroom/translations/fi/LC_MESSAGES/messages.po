@@ -1,94 +1,112 @@
 # Translations template for Newsroom.
-# Copyright (C) 2019 ORGANIZATION
+# Copyright (C) 2020 ORGANIZATION
 # This file is distributed under the same license as the Newsroom project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
-# 
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
 # Translators:
 # Tomi Toivio <tomi.toivio@ukuli.fi>, 2019
-# Olli Vesala <olli.vesala@stt.fi>, 2019
-# Srdjan Karalic <srdjan.karalic@sourcefabric.org>, 2019
-# 
+# Andrey Podshivalov, 2020
+# Srdjan Karalic <srdjan.karalic@sourcefabric.org>, 2020
+# Oleg Pshenichniy <olegpshenichniy@gmail.com>, 2020
+# Olli Vesala <olli.vesala@stt.fi>, 2020
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom 1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-11-28 11:25+0100\n"
+"POT-Creation-Date: 2020-12-07 14:56+0100\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
-"Last-Translator: Srdjan Karalic <srdjan.karalic@sourcefabric.org>, 2019\n"
+"Last-Translator: Olli Vesala <olli.vesala@stt.fi>, 2020\n"
 "Language-Team: Finnish (https://www.transifex.com/sourcefabric/teams/6584/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.7.0\n"
+"Generated-By: Babel 2.9.0\n"
 "Language: fi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: newsroom/email.py:45
+#: newsroom/email.py:66
 msgid "A new newsroom signup request"
 msgstr "Uusi rekisteröitymispyyntö Mediapankkiin"
 
-#: newsroom/email.py:67 newsroom/email.py:88
+#: newsroom/email.py:88 newsroom/email.py:109
 msgid "{} account created"
-msgstr "{} tili luotu"
+msgstr "{}-tili luotu"
 
-#: newsroom/email.py:107
+#: newsroom/email.py:128
 msgid "{} password reset"
-msgstr "{} salasanan uusiminen"
+msgstr "{}-salasanan uusiminen"
 
-#: newsroom/email.py:126
+#: newsroom/email.py:147
 msgid "New story for followed topic: {}"
-msgstr "Uusi juttu seuratusta aiheesta: {}"
+msgstr "Uusi juttu seuraamastasi aiheesta: {}"
 
-#: newsroom/email.py:145
+#: newsroom/email.py:166
 msgid "New update for followed agenda: {}"
 msgstr "Uusi päivitys seurattuun tapahtumaan {}"
 
-#: newsroom/email.py:177
+#: newsroom/email.py:198
 msgid "New update for your previously accessed story: {}"
 msgstr "Aiemmin avaamasi juttu on päivitetty: {}"
 
-#: newsroom/email.py:196
+#: newsroom/email.py:217
 msgid "New update for your previously accessed agenda: {}"
 msgstr "Aiemmin avaamasi tapahtuma on päivitetty: {}"
 
-#: newsroom/email.py:226
+#: newsroom/email.py:247
 msgid "Kill/Takedown notice"
 msgstr "Ilmoitus poistosta"
 
-#: newsroom/email.py:235
+#: newsroom/email.py:256
 msgid "Agenda cancelled notice"
 msgstr "Agenda peruttu -ilmoitus"
 
 #: newsroom/history.py:134
 msgid "Activity History: Inavlid request"
-msgstr ""
+msgstr "Historia: Virheellinen pyyntö"
 
 #: newsroom/push.py:89
 msgid "Unknown type {}"
 msgstr "Tuntematon tyyppi {}"
 
-#: newsroom/settings.py:73 newsroom/settings.py:88
+#: newsroom/search.py:126
+msgid "Page limit exceeded"
+msgstr "Sivumäärä ylitetty"
+
+#: newsroom/search.py:349
+msgid "User does not belong to a company."
+msgstr "Käyttäjä ei kuulu yhteenkään yhtiöön"
+
+#: newsroom/search.py:351
+msgid "Your company doesn't have any products defined."
+msgstr "Yhtiölläsi ei ole yhtään määriteltyä tuotetta."
+
+#: newsroom/monitoring/search.py:66 newsroom/search.py:356
+msgid "Invalid product parameter"
+msgstr "Väärä tuoteparametri"
+
+#: newsroom/settings.py:88 newsroom/settings.py:103
 msgid "Company expiry alert recipients"
 msgstr "Yhtiön sopimuksen vanhentumisilmoitusten vastaanottajat"
 
-#: newsroom/settings.py:74 newsroom/settings.py:90
+#: newsroom/settings.py:89 newsroom/settings.py:105
 msgid "Coverage request recipients"
-msgstr ""
+msgstr "Uutisointipyynnöt"
 
-#: newsroom/settings.py:78
+#: newsroom/settings.py:93
 msgid "{}: Email IDs not in proper format"
-msgstr ""
+msgstr "{}: sähköpostit eivät ole oikeassa formaatissa"
 
-#: newsroom/settings.py:82
+#: newsroom/settings.py:97
 msgid "General Settings"
 msgstr "Yleiset asetukset"
 
-#: newsroom/settings.py:87
+#: newsroom/settings.py:102
 msgid "Google Analytics ID"
 msgstr "Google Analytics ID"
 
-#: newsroom/settings.py:89
+#: newsroom/settings.py:104
 msgid ""
 "Comma separated list of email addresses to which the expiration alerts of "
 "companies will be sent to."
@@ -96,29 +114,42 @@ msgstr ""
 "Pilkulla erotettu luettelo sähköpostiosoitteista, joihin lähetetään ilmoitus"
 " siitä, että yhtiön sopimus on päättymässä"
 
-#: newsroom/settings.py:91
+#: newsroom/settings.py:106
 msgid ""
 "Comma separated list of email addresses who will receive the coverage "
 "request emails."
 msgstr ""
+"Pilkuilla erotettu lista osoitteista, joihin tulee ilmoitus "
+"uutisointitoiveista"
 
-#: newsroom/agenda/utils.py:31 newsroom/utils.py:161
+#: newsroom/settings.py:108
+msgid "System alerts recipients"
+msgstr "Järjestelmähälytysten vastaanottaja"
+
+#: newsroom/settings.py:109
+msgid ""
+"Comma separated list of email addresses who will receive system alerts."
+msgstr ""
+"Pilkulla erotettu lista sähköpostiosoitteista, joihin lähetetään hälytyksiä"
+
+#: assets/missing-translations.js:3 newsroom/agenda/utils.py:31
+#: newsroom/utils.py:181
 msgid "ALL DAY"
 msgstr "KOKO PÄIVÄ"
 
-#: newsroom/utils.py:237 newsroom/utils.py:306
+#: newsroom/utils.py:257 newsroom/utils.py:326
 msgid "Account is disabled"
 msgstr "Tili on suljettu."
 
-#: newsroom/utils.py:244
+#: newsroom/utils.py:264
 msgid "Account has not been approved"
 msgstr "Tiliä ei ole hyväksytty"
 
-#: newsroom/auth/views.py:41 newsroom/auth/views.py:147 newsroom/utils.py:311
+#: newsroom/auth/views.py:41 newsroom/auth/views.py:147 newsroom/utils.py:331
 msgid "Company account has been disabled."
 msgstr "Yhtiön tili on suljettu."
 
-#: assets/wire/components/AgendaLinks.jsx:46 newsroom/agenda/__init__.py:21
+#: assets/wire/components/AgendaLinks.jsx:82 newsroom/agenda/__init__.py:21
 #: newsroom/templates/agenda_index.html:3
 #: newsroom/templates/agenda_index.html:6
 msgid "Agenda"
@@ -126,15 +157,15 @@ msgstr "Agenda"
 
 #: newsroom/agenda/__init__.py:22 newsroom/am_news/__init__.py:17
 #: newsroom/market_place/__init__.py:27 newsroom/media_releases/__init__.py:22
+#: newsroom/monitoring/__init__.py:22
 #: newsroom/templates/bookmark_layout.html:3
-#: newsroom/templates/bookmark_layout.html:6
-#: newsroom/watch_lists/__init__.py:18 newsroom/wire/__init__.py:65
+#: newsroom/templates/bookmark_layout.html:6 newsroom/wire/__init__.py:61
 msgid "Saved/Watched Items"
 msgstr "Tallennetut jutut"
 
 #: newsroom/agenda/__init__.py:30
 msgid "Google Maps Styles"
-msgstr ""
+msgstr "Google Maps -tyylit"
 
 #: newsroom/agenda/__init__.py:32
 msgid ""
@@ -188,17 +219,33 @@ msgstr "Seuraamassasi tapahtumassa on uutta sisältöä"
 msgid "Coverage added"
 msgstr "Seuranta lisätty"
 
-#: newsroom/agenda/email.py:19
+#: newsroom/agenda/email.py:20
 msgid "New coverage"
 msgstr "Uusi seuranta"
 
-#: newsroom/agenda/email.py:70
-msgid "A new coverage request"
-msgstr "Uusi seurantapyyntö"
+#: newsroom/agenda/email.py:72
+msgid "Coverage inquiry: {}"
+msgstr "Seurantapyyntö: {}"
+
+#: newsroom/agenda/views.py:180
+msgid "Cannot edit coverage watch when watching a parent item."
+msgstr "Ei voi muokata seurantaa, kun tapahtuma on auki"
+
+#: newsroom/agenda/views.py:185
+msgid "Coverage not found."
+msgstr "Ei seurantaa"
+
+#: newsroom/agenda/views.py:195
+msgid "Error removing watch."
+msgstr "Virhe"
+
+#: newsroom/agenda/views.py:224
+msgid "Agenda item not found"
+msgstr "Agenda-tapahtumaa ei löytynyt"
 
 #: newsroom/auth/forms.py:9
 msgid "Editor"
-msgstr "Leikkaaja"
+msgstr "Päätoimittaja"
 
 #: newsroom/auth/forms.py:10
 msgid "Journalist"
@@ -216,7 +263,7 @@ msgstr "Teknologiajohtaja"
 msgid "CEO"
 msgstr "Toimitusjohtaja"
 
-#: newsroom/auth/forms.py:14
+#: assets/companies/utils.js:7 newsroom/auth/forms.py:14
 msgid "Other"
 msgstr "Muu"
 
@@ -252,34 +299,38 @@ msgstr "Rooli"
 msgid "Size of your company"
 msgstr "Yhtiön koko"
 
+#: newsroom/auth/forms.py:24
+msgid "I agree to"
+msgstr "Hyväksyn"
+
 #: assets/user-profile/components/profile/UserProfile.jsx:83
-#: assets/users/components/EditUser.jsx:46
-#: assets/users/components/UsersList.jsx:24 newsroom/auth/forms.py:28
-#: newsroom/auth/forms.py:34 newsroom/users/forms.py:22
+#: assets/users/components/EditUser.jsx:47
+#: assets/users/components/UsersList.jsx:24 newsroom/auth/forms.py:29
+#: newsroom/auth/forms.py:35 newsroom/users/forms.py:22
 msgid "Email"
 msgstr "Sähköposti"
 
-#: newsroom/auth/forms.py:29
+#: newsroom/auth/forms.py:30
 msgid "Password"
 msgstr "Salasana"
 
-#: newsroom/auth/forms.py:30
+#: newsroom/auth/forms.py:31
 msgid "Remember Me"
 msgstr "Muista minut"
 
-#: newsroom/auth/forms.py:41
+#: newsroom/auth/forms.py:42
 msgid "Passwords must match."
 msgstr "Salasanojen on oltava yhteneväiset."
 
-#: newsroom/auth/forms.py:42
+#: newsroom/auth/forms.py:43
 msgid "Old password"
 msgstr "Vanha salasana"
 
-#: newsroom/auth/forms.py:43
+#: newsroom/auth/forms.py:44
 msgid "New password"
 msgstr "Uusi salasana"
 
-#: newsroom/auth/forms.py:44
+#: newsroom/auth/forms.py:45
 msgid "Confirm new password"
 msgstr "Vahvista salasana"
 
@@ -296,26 +347,27 @@ msgid "Exceeded number of allowed login attempts"
 msgstr "Kirjautumiskertojen määrä on ylitetty."
 
 #: newsroom/auth/views.py:161 newsroom/auth/views.py:165
+#: newsroom/news_api/news/item/item.py:25
 msgid "Invalid token"
-msgstr "Väärä suojaustunnus"
+msgstr "Virheellinen linkki"
 
 #: newsroom/auth/views.py:192
 msgid "Account already exists."
-msgstr ""
+msgstr "Tili on jo olemassa"
 
-#: newsroom/auth/views.py:212
+#: newsroom/auth/views.py:215
 msgid "Your account has been validated."
 msgstr "Tilisi on vahvistettu"
 
-#: newsroom/auth/views.py:215
+#: newsroom/auth/views.py:218
 msgid "Token has expired. Please create a new token"
 msgstr "Linkki on vanhentunut. Ole hyvä ja luo uusi."
 
-#: newsroom/auth/views.py:229
+#: newsroom/auth/views.py:232
 msgid "Your password has been changed. Please login again."
 msgstr "Salasanasi on vaihdettu. Ole hyvä ja kirjaudu sisään uudelleen."
 
-#: newsroom/auth/views.py:245
+#: newsroom/auth/views.py:248
 msgid "A reset password token has been sent to your email address."
 msgstr "Salasanan uusimislinkki on lähetetty sähköpostiisi."
 
@@ -323,15 +375,15 @@ msgstr "Salasanan uusimislinkki on lähetetty sähköpostiisi."
 msgid "Dashboards"
 msgstr "Etusivun näkymät"
 
-#: newsroom/cards/views.py:55
+#: newsroom/cards/views.py:56
 msgid "Label not found"
 msgstr "Nimeä ei löytynyt"
 
-#: newsroom/cards/views.py:58
+#: newsroom/cards/views.py:59
 msgid "Type not found"
 msgstr "Tyyppiä ei löytynyt"
 
-#: newsroom/cards/views.py:61
+#: newsroom/cards/views.py:62
 msgid "Dashboard type not found"
 msgstr "Näkymätyyppiä ei löytynyt"
 
@@ -339,94 +391,332 @@ msgstr "Näkymätyyppiä ei löytynyt"
 msgid "Company Management"
 msgstr "Yhtiöiden hallinta"
 
-#: newsroom/companies/views.py:57 newsroom/navigations/views.py:52
-#: newsroom/products/views.py:47 newsroom/section_filters/views.py:50
+#: newsroom/companies/views.py:64 newsroom/navigations/views.py:53
+#: newsroom/products/views.py:46 newsroom/section_filters/views.py:50
 msgid "Name not found"
 msgstr "Nimeä ei löytynyt"
 
-#: newsroom/companies/views.py:63
-msgid "Wrong date format"
-msgstr "Väärä formaatti"
+#: newsroom/companies/views.py:72
+msgid "{0}: {1}"
+msgstr "{0}: {1}"
 
-#: newsroom/companies/views.py:95
+#: newsroom/companies/views.py:108
 msgid "Company not found"
 msgstr "Yhtiötä ei löytynyt"
 
 #: newsroom/market_place/__init__.py:6
 msgid "aapX"
-msgstr ""
+msgstr "aapX"
 
 #: newsroom/market_place/__init__.py:32
 msgid "Time limit for aapX items (in days)"
-msgstr ""
+msgstr "Aikarajaus aapX (päiviä)"
 
-#: newsroom/market_place/__init__.py:36 newsroom/news_api/__init__.py:16
-#: newsroom/wire/__init__.py:91
+#: newsroom/market_place/__init__.py:36 newsroom/news_api/__init__.py:17
+#: newsroom/wire/__init__.py:88
 msgid ""
 "You can create an additional filter on top of the product definition. The "
 "time limit can be enabled for each company in the Permissions."
 msgstr ""
+"Tällä säädetään sitä, kuinka pitkältä ajalta ei-arkistoasiakkaat näkevät "
+"juttuja. Pääsy arkistoon avataan Yhtiöiden hallinta -> Käyttöoikeudet"
 
-#: assets/navigations/components/EditNavigation.jsx:21
+#: newsroom/monitoring/__init__.py:20
+#: newsroom/templates/monitoring_index.html:3
+#: newsroom/templates/monitoring_index.html:6
+msgid "Monitoring"
+msgstr "Seuranta"
+
+#: newsroom/monitoring/__init__.py:25 newsroom/monitoring/forms.py:8
+msgid "PDF"
+msgstr "PDF"
+
+#: newsroom/monitoring/__init__.py:26 newsroom/monitoring/forms.py:8
+msgid "RTF"
+msgstr "RTF"
+
+#: newsroom/monitoring/email_alerts.py:239
+msgid "Error sending alerts for monitoring: {0}"
+msgstr "Virhehälytykset seurantaan: {0}"
+
+#: newsroom/monitoring/forms.py:7
+msgid "Full text"
+msgstr "Koko teksti"
+
+#: newsroom/monitoring/forms.py:7
+msgid "Linked extract(s)"
+msgstr "Linkitetyt"
+
+#: assets/companies/components/CompanyList.jsx:25
+#: assets/companies/components/EditCompany.jsx:104
+#: assets/monitoring/components/EditMonitoringProfile.jsx:112
+#: assets/monitoring/components/MonitoringList.jsx:23
+#: assets/navigations/components/EditNavigation.jsx:84
+#: assets/navigations/components/NavigationList.jsx:22
+#: assets/products/components/EditProduct.jsx:107
+#: assets/products/components/ProductList.jsx:22
+#: assets/search/components/TopicForm.jsx:15
+#: assets/section-filters/components/EditSectionFilter.jsx:36
+#: assets/section-filters/components/SectionFilterList.jsx:22
+#: assets/users/components/UsersList.jsx:23 newsroom/monitoring/forms.py:18
+msgid "Name"
+msgstr "Nimi"
+
+#: assets/agenda/components/AgendaApp.jsx:107
+#: assets/company-reports/components/ContentActivity.jsx:108
+#: assets/monitoring/components/MonitoringList.jsx:24
+#: assets/search/components/TopicParameters.jsx:69
+#: newsroom/monitoring/forms.py:19 newsroom/reports/content_activity.py:229
+#: newsroom/wire/__init__.py:107
+msgid "Subject"
+msgstr "Aihe"
+
+#: assets/monitoring/components/EditMonitoringProfile.jsx:126
+#: assets/monitoring/components/MonitoringList.jsx:25
+#: assets/navigations/components/EditNavigation.jsx:91
+#: assets/navigations/components/NavigationList.jsx:23
+#: assets/products/components/EditProduct.jsx:114
+#: assets/search/components/MonitoringEditor.jsx:172
+#: assets/section-filters/components/EditSectionFilter.jsx:43
+#: newsroom/monitoring/forms.py:20
+msgid "Description"
+msgstr "Kuvaus"
+
+#: newsroom/monitoring/forms.py:21
+msgid "Alert Type"
+msgstr "Hälytyksen tyyppi"
+
+#: newsroom/monitoring/forms.py:22
+msgid "Format Type"
+msgstr "Formaatti"
+
+#: assets/companies/components/CompaniesApp.jsx:25
+#: assets/companies/components/EditCompany.jsx:24
+#: assets/company-reports/components/ComapnyNewsApiUsage.jsx:77
+#: assets/company-reports/components/Company.jsx:86
+#: assets/company-reports/components/CompanyProducts.jsx:32
+#: assets/company-reports/components/CompanyReportsApp.jsx:20
+#: assets/company-reports/components/CompanySavedSearches.jsx:17
+#: assets/company-reports/components/ExpiredCompanies.jsx:17
+#: assets/company-reports/components/SubscriberActivity.jsx:129
+#: assets/company-reports/components/UserSavedSearches.jsx:21
+#: assets/monitoring/components/EditMonitoringProfile.jsx:133
+#: assets/monitoring/components/MonitoringList.jsx:27
+#: assets/users/components/EditUser.jsx:83
+#: assets/users/components/UsersList.jsx:29 newsroom/monitoring/forms.py:23
+#: newsroom/reports/reports.py:153 newsroom/users/forms.py:27
+msgid "Company"
+msgstr "Yhtiö"
+
+#: assets/companies/components/CompanyListItem.jsx:17
+#: assets/companies/components/EditCompany.jsx:188
+#: assets/monitoring/components/EditMonitoringProfile.jsx:183
+#: assets/monitoring/components/MonitoringItem.jsx:18
+#: assets/navigations/components/EditNavigation.jsx:98
+#: assets/navigations/components/NavigationListItem.jsx:13
+#: assets/news-api/components/EditAPIToken.jsx:228
+#: assets/products/components/EditProduct.jsx:163
+#: assets/products/components/ProductListItem.jsx:12
+#: assets/search/components/MonitoringEditor.jsx:194
+#: assets/section-filters/components/EditSectionFilter.jsx:78
+#: assets/section-filters/components/SectionFilterListItem.jsx:12
+#: assets/users/components/EditUser.jsx:98
+#: assets/users/components/UserListItem.jsx:23 newsroom/monitoring/forms.py:24
+msgid "Enabled"
+msgstr "Aktiivinen"
+
+#: assets/monitoring/components/EditMonitoringProfile.jsx:190
+#: newsroom/monitoring/forms.py:25
+msgid "Always Send"
+msgstr "Lähetä aina"
+
+#: assets/company-reports/components/CompanyProducts.jsx:12
+#: assets/monitoring/components/EditMonitoringProfile.jsx:142
+#: assets/monitoring/components/MonitoringList.jsx:26
+#: assets/products/components/EditProduct.jsx:134
+#: assets/products/components/ProductList.jsx:25
+#: assets/section-filters/components/EditSectionFilter.jsx:63
+#: assets/section-filters/components/SectionFilterList.jsx:25
+#: newsroom/monitoring/forms.py:26
+msgid "Query"
+msgstr "Hakulauseke"
+
+#: newsroom/monitoring/search.py:83
+msgid "No monitoring profile requested."
+msgstr "Ei pyydettyjä profiileita"
+
+#: newsroom/monitoring/views.py:155
+msgid "monitoring Profile not found"
+msgstr "profliia ei löytynyt"
+
+#: newsroom/monitoring/views.py:254 newsroom/topics/views.py:114
+#: newsroom/wire/views.py:275
+#, python-format
+msgid "From %s: %s"
+msgstr "From 1%s: 1%s"
+
+#: assets/navigations/components/EditNavigation.jsx:22
 #: assets/navigations/components/NavigationsApp.jsx:29
-#: assets/products/components/EditProduct.jsx:27
+#: assets/products/components/EditProduct.jsx:28
 #: newsroom/navigations/__init__.py:14
 msgid "Navigation"
 msgstr "Navigaatio"
 
-#: newsroom/news_api/__init__.py:12
+#: newsroom/news_api/__init__.py:13
 msgid "Time limit for News API products (in days)"
-msgstr ""
+msgstr "Aikarajaus uutisrajapinnan tuotteille (päiviä)"
+
+#: newsroom/news_api/api_tokens/__init__.py:63
+msgid "Rate limit exceeded"
+msgstr "Ylitetty"
 
 #: assets/companies/components/CompanyPermissions.jsx:100
 #: assets/company-reports/components/Company.jsx:24
-#: assets/navigations/components/EditNavigation.jsx:22
+#: assets/navigations/components/EditNavigation.jsx:23
 #: newsroom/products/__init__.py:14
 msgid "Products"
 msgstr "Tuotteet"
 
-#: assets/company-reports/components/CompanyReportsApp.jsx:13
-#: newsroom/reports/reports.py:39
+#: newsroom/reports/content_activity.py:25
+#: newsroom/reports/content_activity.py:74
+msgid "Must provide a section for this report"
+msgstr "Raporttiin tarvitaan osasto"
+
+#: assets/company-reports/components/ContentActivity.jsx:103
+#: assets/ui/components/Preview.jsx:10
+#: assets/wire/components/ItemDetails.jsx:63
+#: assets/wire/components/filters/NavCreatedPicker.jsx:27
+#: newsroom/reports/content_activity.py:224
+msgid "Published"
+msgstr "Julkaistu"
+
+#: assets/company-reports/components/ContentActivity.jsx:104
+#: assets/components/cards/edit/ConfigEvent.jsx:26
+#: newsroom/reports/content_activity.py:225
+msgid "Headline"
+msgstr "Otsikko"
+
+#: assets/company-reports/components/ContentActivity.jsx:105
+#: newsroom/reports/content_activity.py:226
+msgid "Take Key"
+msgstr "Ota avain"
+
+#: assets/agenda/components/AgendaApp.jsx:115
+#: assets/company-reports/components/ContentActivity.jsx:106
+#: assets/search/components/TopicParameters.jsx:60
+#: newsroom/reports/content_activity.py:227 newsroom/wire/__init__.py:119
+msgid "Place"
+msgstr "Paikka"
+
+#: assets/agenda/components/AgendaApp.jsx:103
+#: assets/agenda/components/AgendaTags.jsx:25
+#: assets/company-reports/components/ContentActivity.jsx:107
+#: assets/search/components/TopicParameters.jsx:68
+#: assets/wire/components/PreviewTags.jsx:32
+#: newsroom/reports/content_activity.py:228
+#: newsroom/templates/wire_item.html:76
+#: newsroom/templates/wire_item_print.html:24 newsroom/wire/__init__.py:103
+msgid "Category"
+msgstr "Kategoria"
+
+#: assets/company-reports/components/ContentActivity.jsx:50
+#: assets/company-reports/components/ContentActivity.jsx:109
+#: assets/products/components/EditProduct.jsx:27
+#: newsroom/reports/content_activity.py:230
+msgid "Companies"
+msgstr "Yhtiöt"
+
+#: assets/company-reports/components/ContentActivity.jsx:59
+#: assets/company-reports/components/ContentActivity.jsx:110
+#: newsroom/reports/content_activity.py:231
+msgid "Actions"
+msgstr "Toiminnot"
+
+#: assets/company-reports/components/ContentActivity.jsx:61
+#: assets/company-reports/components/ContentActivity.jsx:114
+#: assets/item-actions.js:51 assets/ui/components/ArticleVideo.jsx:16
+#: assets/wire/components/DownloadItemsModal.jsx:53
+#: newsroom/reports/content_activity.py:237
+msgid "Download"
+msgstr "Lataa"
+
+#: assets/company-reports/components/ContentActivity.jsx:62
+#: assets/company-reports/components/ContentActivity.jsx:115
+#: assets/item-actions.js:44 newsroom/reports/content_activity.py:240
+msgid "Copy"
+msgstr "Kopioi"
+
+#: assets/company-reports/components/ContentActivity.jsx:63
+#: assets/company-reports/components/ContentActivity.jsx:116
+#: assets/components/ShareItemModal.jsx:95 assets/item-actions.js:27
+#: assets/search/components/FollowedTopics.jsx:45
+#: newsroom/reports/content_activity.py:243
+msgid "Share"
+msgstr "Jaa"
+
+#: assets/company-reports/components/ContentActivity.jsx:64
+#: assets/company-reports/components/ContentActivity.jsx:117
+#: assets/item-actions.js:37 newsroom/reports/content_activity.py:246
+msgid "Print"
+msgstr "Tulosta"
+
+#: assets/company-reports/components/ContentActivity.jsx:65
+#: assets/company-reports/components/ContentActivity.jsx:118
+#: assets/item-actions.js:20 newsroom/reports/content_activity.py:249
+msgid "Open"
+msgstr "Avaa"
+
+#: assets/company-reports/components/ContentActivity.jsx:66
+#: assets/company-reports/components/ContentActivity.jsx:119
+#: newsroom/reports/content_activity.py:252
+msgid "Preview"
+msgstr "Esikatselu"
+
+#: assets/company-reports/components/CompanyReportsApp.jsx:22
+#: newsroom/reports/content_activity.py:317
+msgid "Content activity"
+msgstr "Sisältöjen käyttötilasto"
+
+#: assets/company-reports/components/CompanyReportsApp.jsx:16
+#: newsroom/reports/reports.py:43
 msgid "Saved searches per company"
 msgstr "Tallennettuja hakuja yhtiötä kohden"
 
-#: assets/company-reports/components/CompanyReportsApp.jsx:14
-#: newsroom/reports/reports.py:65
+#: assets/company-reports/components/CompanyReportsApp.jsx:17
+#: newsroom/reports/reports.py:69
 msgid "Saved searches per user"
-msgstr "Käyttäjän tallentamat haut"
+msgstr "Käyttäjien tallentamat haut"
 
-#: assets/company-reports/components/CompanyReportsApp.jsx:15
-#: newsroom/reports/reports.py:93
+#: assets/company-reports/components/CompanyReportsApp.jsx:18
+#: newsroom/reports/reports.py:97
 msgid "Products per company"
 msgstr "Tuotteiden määrä yhtiötä kohden"
 
-#: assets/company-reports/components/CompanyReportsApp.jsx:16
-#: newsroom/reports/reports.py:116
+#: assets/company-reports/components/CompanyReportsApp.jsx:19
+#: newsroom/reports/reports.py:120
 msgid "Stories per product"
-msgstr "Tuotteen jutut"
+msgstr "Versioita tuotetta kohden"
 
-#: assets/companies/components/CompaniesApp.jsx:25
-#: assets/companies/components/EditCompany.jsx:23
-#: assets/company-reports/components/Company.jsx:78
-#: assets/company-reports/components/CompanyProducts.jsx:32
-#: assets/company-reports/components/CompanyReportsApp.jsx:17
-#: assets/company-reports/components/CompanySavedSearches.jsx:17
-#: assets/company-reports/components/SubscriberActivity.jsx:129
-#: assets/company-reports/components/UserSavedSearches.jsx:21
-#: assets/users/components/EditUser.jsx:82
-#: assets/users/components/UsersList.jsx:29
-#: assets/watch-lists/components/EditWatchList.jsx:132
-#: assets/watch-lists/components/WatchList.jsx:27
-#: newsroom/reports/reports.py:147 newsroom/users/forms.py:27
-#: newsroom/watch_lists/forms.py:22
-msgid "Company"
-msgstr "Yhtiö"
-
-#: newsroom/reports/reports.py:237
+#: newsroom/reports/reports.py:243
 msgid "SubscriberActivity"
-msgstr ""
+msgstr "Yhtiöiden toimintatilasto"
 
-#: newsroom/reports/views.py:16 newsroom/reports/views.py:42
+#: assets/company-reports/components/CompanyReportsApp.jsx:44
+#: newsroom/reports/reports.py:319
+msgid "Company News API Usage"
+msgstr "Yhtiön uutis-APIn käyttö"
+
+#: newsroom/reports/reports.py:352
+msgid "Companies permissioned per product"
+msgstr "Yhtiöiden pääsy tuotteisiin"
+
+#: assets/company-reports/components/CompanyReportsApp.jsx:24
+#: newsroom/reports/reports.py:363
+msgid "Expired companies"
+msgstr "Vanhentuneet yhtiöt"
+
+#: newsroom/reports/views.py:19 newsroom/reports/views.py:46
+#: newsroom/reports/views.py:58
 msgid "Unknown report {}"
 msgstr "Tuntematon raportti {}"
 
@@ -473,9 +763,9 @@ msgstr "Etusivu"
 
 #: newsroom/templates/agenda_item_print.html:18
 msgid "Where"
-msgstr ""
+msgstr "Missä"
 
-#: assets/companies/components/CompanyList.jsx:29
+#: assets/companies/components/CompanyList.jsx:30
 #: assets/company-reports/components/Company.jsx:37
 #: newsroom/templates/agenda_item_print.html:30
 msgid "Contact"
@@ -483,7 +773,7 @@ msgstr "Yhteyshenkilö"
 
 #: newsroom/templates/agenda_item_print.html:44
 msgid "Web"
-msgstr ""
+msgstr "Verkko"
 
 #: assets/agenda/components/AgendaEdNote.jsx:15
 #: newsroom/templates/agenda_item_print.html:59
@@ -498,7 +788,7 @@ msgstr "Uutisointi:"
 #: newsroom/templates/am_news_index.html:3
 #: newsroom/templates/am_news_index.html:10
 msgid "AM"
-msgstr ""
+msgstr "AM"
 
 #: newsroom/templates/base_layout.html:43 newsroom/templates/login.html:13
 #: newsroom/templates/login.html:36
@@ -506,6 +796,7 @@ msgid "Login"
 msgstr "Kirjaudu sisään"
 
 #: newsroom/templates/base_layout.html:46 newsroom/templates/footer.html:4
+#: theme/footer.html:7
 msgid "Contact Us"
 msgstr "Ota yhteyttä"
 
@@ -524,11 +815,11 @@ msgstr "Tilastot"
 msgid "Copyright"
 msgstr "Tekijänoikeudet"
 
-#: newsroom/templates/footer.html:2
+#: newsroom/templates/footer.html:2 theme/footer.html:5
 msgid "Privacy Policy"
-msgstr "Tietosuojakäytännöt"
+msgstr "Tietosuojalauseke"
 
-#: newsroom/templates/footer.html:3
+#: newsroom/templates/footer.html:3 theme/footer.html:6
 msgid "Terms and Conditions"
 msgstr "Käyttöehdot"
 
@@ -538,15 +829,15 @@ msgstr "Unohditko salasanasi?"
 
 #: newsroom/templates/login.html:41
 msgid "Click here to reset."
-msgstr "Paina tästä uusiaksesi salasanasi."
+msgstr "Klikkaa tästä uusiaksesi salasanasi."
 
 #: newsroom/templates/login.html:42
 msgid "Or you can"
-msgstr ""
+msgstr "Tai voit"
 
 #: newsroom/templates/login.html:42
 msgid "click here to register."
-msgstr ""
+msgstr "klikkaa rekisteröityäksesi"
 
 #: assets/user-profile/components/profile/UserProfile.jsx:127
 #: newsroom/templates/login.html:50
@@ -556,7 +847,24 @@ msgstr "Kieli"
 #: newsroom/templates/media_releases_index.html:3
 #: newsroom/templates/media_releases_index.html:6
 msgid "Media Releases"
+msgstr "Tiedotteet"
+
+#: newsroom/templates/monitoring_error.html:1
+msgid "The following monitoring profile has errored while sending alerts:"
 msgstr ""
+"Seuraavista profiileista tuli virheilmoitus, kun hälytystä lähetettiin:"
+
+#: newsroom/templates/monitoring_error.html:2
+msgid "Name:"
+msgstr "Nimi:"
+
+#: newsroom/templates/monitoring_error.html:3
+msgid "Company:"
+msgstr "Yhtiö:"
+
+#: newsroom/templates/monitoring_error.html:4
+msgid "Run time:"
+msgstr "Kesto:"
 
 #: newsroom/templates/request_token.html:12
 msgid "Password Reset"
@@ -566,7 +874,7 @@ msgstr "Salasanan uusiminen"
 msgid "Validate"
 msgstr "Vahvista"
 
-#: assets/users/components/EditUser.jsx:114
+#: assets/users/components/EditUser.jsx:115
 #: newsroom/templates/request_token.html:29
 msgid "Reset Password"
 msgstr "Uusi salasanasi"
@@ -577,26 +885,30 @@ msgstr "Uusi salasanasi"
 
 #: newsroom/templates/reset_password.html:30
 msgid "Please use 8 or more characters."
-msgstr "Käytä vähintään 8 merkkiä"
+msgstr "Käytä vähintään 8:aa merkkiä"
 
 #: newsroom/templates/reset_password.html:37
 msgid "Change Password"
 msgstr "Vaihda salasana"
 
 #: assets/agenda/components/AgendaCoverageRequest.jsx:56
-#: assets/components/EditPanel.jsx:99 assets/components/Modal.jsx:156
-#: assets/news-api/components/EditAPIToken.jsx:197
+#: assets/components/CardEditor.jsx:72 assets/components/EditPanel.jsx:99
+#: assets/components/Modal.jsx:156
+#: assets/search/components/MonitoringEditor.jsx:202
 #: assets/search/components/TopicEditor.jsx:186
-#: assets/search/components/WatchListEditor.jsx:202
 #: assets/user-profile/components/profile/UserProfile.jsx:143
 #: assets/wire/components/SelectedItemsBar.jsx:41
 #: newsroom/templates/reset_password.html:38
 msgid "Cancel"
 msgstr "Peruuta"
 
-#: newsroom/templates/signup.html:13 newsroom/templates/signup.html:60
+#: newsroom/templates/signup.html:13 newsroom/templates/signup.html:68
 msgid "Sign up"
 msgstr "Rekisteröidy"
+
+#: newsroom/templates/signup.html:61
+msgid "terms and conditions"
+msgstr "Käyttöehdot"
 
 #: newsroom/templates/signup_success.html:12
 msgid "Newsroom sign up"
@@ -618,14 +930,6 @@ msgstr "Tiimistämme ollaan yhteydessä sinuun"
 msgid "User Profile"
 msgstr "Oma profiili"
 
-#: assets/watch-lists/components/WatchListApp.jsx:28
-#: assets/wire/components/WireApp.jsx:69
-#: newsroom/templates/watch_lists_index.html:3
-#: newsroom/templates/watch_lists_index.html:6
-#: newsroom/watch_lists/__init__.py:16
-msgid "Watch Lists"
-msgstr ""
-
 #: newsroom/templates/wire_index.html:3 newsroom/templates/wire_index.html:6
 msgid "Wire"
 msgstr "Uusimmat uutiset"
@@ -635,22 +939,26 @@ msgstr "Uusimmat uutiset"
 msgid "By:"
 msgstr "Kirjoittaja"
 
-#: assets/components/cards/render/CardMeta.jsx:20
-#: assets/wire/components/ItemVersion.jsx:17
-#: assets/wire/components/WireListItem.jsx:102
-#: assets/wire/components/WireListItem.jsx:117
+#: assets/components/cards/render/CardMeta.jsx:22
+#: assets/wire/components/ItemVersion.jsx:20
+#: assets/wire/components/PreviewMeta.jsx:79
+#: assets/wire/components/WireListItem.jsx:181
+#: assets/wire/components/WireListItem.jsx:231
 #: newsroom/templates/wire_item.html:62 newsroom/templates/wire_item.html:108
 msgid "words"
 msgstr "sanoja"
 
-#: assets/wire/components/ItemVersion.jsx:21
+#: assets/components/cards/render/CardMeta.jsx:24
+#: assets/wire/components/ItemVersion.jsx:25
+#: assets/wire/components/PreviewMeta.jsx:71
+#: assets/wire/components/WireListItem.jsx:193
 #: newsroom/templates/wire_item.html:64 newsroom/templates/wire_item.html:110
 msgid "characters"
-msgstr "merkkejä"
+msgstr "merkkiä"
 
 #: newsroom/templates/wire_item.html:66
 msgid "Source:"
-msgstr "Lähde"
+msgstr "Lähde: "
 
 #: assets/agenda/components/AgendaTags.jsx:24
 #: assets/wire/components/PreviewTags.jsx:25
@@ -659,26 +967,17 @@ msgstr "Lähde"
 msgid "Metadata"
 msgstr "Metadata"
 
-#: assets/agenda/components/AgendaApp.jsx:104
-#: assets/agenda/components/AgendaTags.jsx:25
-#: assets/search/components/TopicParameters.jsx:68
-#: assets/wire/components/PreviewTags.jsx:32
-#: newsroom/templates/wire_item.html:76
-#: newsroom/templates/wire_item_print.html:24 newsroom/wire/__init__.py:106
-msgid "Category"
-msgstr "Kategoria"
-
 #: assets/search/components/TopicParameters.jsx:70
 #: assets/wire/components/PreviewTags.jsx:38
 #: newsroom/templates/wire_item.html:86
-#: newsroom/templates/wire_item_print.html:28 newsroom/wire/__init__.py:114
+#: newsroom/templates/wire_item_print.html:28 newsroom/wire/__init__.py:111
 msgid "Content Type"
 msgstr "Sisältötyyppi"
 
-#: assets/wire/components/ListItemPreviousVersions.jsx:59
+#: assets/wire/components/ListItemPreviousVersions.jsx:60
 #: newsroom/templates/wire_item.html:98
 msgid "Previous versions"
-msgstr "Aiemmat versiot"
+msgstr "Korvatut versiot"
 
 #: newsroom/templates/wire_item_print.html:10
 msgid "On:"
@@ -689,62 +988,61 @@ msgid ""
 "Please enable 'Receive notifications via email' option in your profile to "
 "receive topic notifications"
 msgstr ""
-"Ota aiheesi ilmoitukset käyttöön ottamalla profiiliisi vastaan ​​\"Ilmoita "
-"sähköpostitse\" -vaihtoehto"
-
-#: newsroom/topics/views.py:114 newsroom/wire/views.py:234
-#, python-format
-msgid "From %s: %s"
-msgstr ""
+"Ota ilmoitukset käyttöön profiiliasetuksista. Aktivoi valinta: \"Ota vastaan"
+" ilmoituksia sähköpostilla\"."
 
 #: newsroom/users/__init__.py:14
 msgid "User Management"
 msgstr "Käyttäjähallinta"
 
+#: assets/monitoring/utils.js:4 assets/users/utils.js:4
 #: newsroom/users/forms.py:14
 msgid "Administrator"
 msgstr "Ylläpitäjä"
 
+#: assets/monitoring/utils.js:6 assets/users/utils.js:6
 #: newsroom/users/forms.py:15
 msgid "Public"
 msgstr "STT:n asiakkaan käyttäjä"
 
+#: assets/monitoring/utils.js:5 assets/users/utils.js:5
 #: newsroom/users/forms.py:16
 msgid "Internal"
 msgstr "Sisäinen"
 
+#: assets/monitoring/utils.js:7 assets/users/utils.js:7
 #: newsroom/users/forms.py:17
 msgid "Account Management"
 msgstr "Tilin hallinta"
 
 #: assets/user-profile/components/profile/UserProfile.jsx:65
-#: assets/users/components/EditUser.jsx:32 newsroom/users/forms.py:20
+#: assets/users/components/EditUser.jsx:33 newsroom/users/forms.py:20
 msgid "First Name"
 msgstr "Etunimi"
 
 #: assets/user-profile/components/profile/UserProfile.jsx:74
-#: assets/users/components/EditUser.jsx:39 newsroom/users/forms.py:21
+#: assets/users/components/EditUser.jsx:40 newsroom/users/forms.py:21
 msgid "Last Name"
 msgstr "Sukunimi"
 
-#: assets/companies/components/CompanyList.jsx:30
-#: assets/companies/components/EditCompany.jsx:140 newsroom/users/forms.py:23
+#: assets/companies/components/CompanyList.jsx:31
+#: assets/companies/components/EditCompany.jsx:141 newsroom/users/forms.py:23
 msgid "Telephone"
 msgstr "Puhelin"
 
 #: assets/user-profile/components/profile/UserProfile.jsx:101
-#: assets/users/components/EditUser.jsx:60
+#: assets/users/components/EditUser.jsx:61
 #: assets/users/components/UsersList.jsx:26 newsroom/users/forms.py:24
 msgid "Mobile"
 msgstr "Matkapuhelin"
 
 #: assets/user-profile/components/profile/UserProfile.jsx:110
-#: assets/users/components/EditUser.jsx:67
+#: assets/users/components/EditUser.jsx:68
 #: assets/users/components/UsersList.jsx:27 newsroom/users/forms.py:25
 msgid "Role"
 msgstr "Rooli"
 
-#: assets/users/components/EditUser.jsx:74
+#: assets/users/components/EditUser.jsx:75
 #: assets/users/components/UsersList.jsx:28 newsroom/users/forms.py:26
 msgid "User Type"
 msgstr "Käyttäjätyyppi"
@@ -765,7 +1063,7 @@ msgstr "Tili käytössä"
 msgid "Account Approved"
 msgstr "Tili hyväksytty"
 
-#: assets/users/components/EditUser.jsx:103 newsroom/users/forms.py:32
+#: assets/users/components/EditUser.jsx:104 newsroom/users/forms.py:32
 msgid "Company Expiry Alert"
 msgstr "Varoitus sopimuksen päättymisestä"
 
@@ -778,153 +1076,300 @@ msgstr "Ota vastaan ilmoituksia sähköpostitse"
 msgid "Locale"
 msgstr "Kieli"
 
-#: newsroom/users/views.py:102 newsroom/users/views.py:147
+#: newsroom/users/views.py:106 newsroom/users/views.py:151
 msgid "User not found"
 msgstr "Käyttäjää ei löytynyt"
 
-#: newsroom/users/views.py:142
+#: newsroom/users/views.py:146
 msgid "User id not provided"
 msgstr "Käyttäjä-id:tä ei löytynyt"
 
-#: newsroom/watch_lists/__init__.py:21
-msgid "Watch List Format"
-msgstr ""
-
-#: newsroom/watch_lists/forms.py:14
-msgid "Linked extract(s)"
-msgstr ""
-
-#: newsroom/watch_lists/forms.py:15
-msgid "Full text"
-msgstr ""
-
-#: assets/companies/components/CompanyList.jsx:24
-#: assets/companies/components/EditCompany.jsx:103
-#: assets/navigations/components/EditNavigation.jsx:82
-#: assets/navigations/components/NavigationList.jsx:22
-#: assets/products/components/EditProduct.jsx:106
-#: assets/products/components/ProductList.jsx:22
-#: assets/search/components/TopicForm.jsx:15
-#: assets/section-filters/components/EditSectionFilter.jsx:34
-#: assets/section-filters/components/SectionFilterList.jsx:22
-#: assets/users/components/UsersList.jsx:23
-#: assets/watch-lists/components/EditWatchList.jsx:111
-#: assets/watch-lists/components/WatchList.jsx:23
-#: newsroom/watch_lists/forms.py:18
-msgid "Name"
-msgstr "Nimi"
-
-#: assets/agenda/components/AgendaApp.jsx:108
-#: assets/search/components/TopicParameters.jsx:69
-#: assets/watch-lists/components/WatchList.jsx:24
-#: newsroom/watch_lists/forms.py:19 newsroom/wire/__init__.py:110
-msgid "Subject"
-msgstr "Aihe"
-
-#: assets/navigations/components/EditNavigation.jsx:89
-#: assets/navigations/components/NavigationList.jsx:23
-#: assets/products/components/EditProduct.jsx:113
-#: assets/search/components/WatchListEditor.jsx:172
-#: assets/section-filters/components/EditSectionFilter.jsx:41
-#: assets/watch-lists/components/EditWatchList.jsx:125
-#: assets/watch-lists/components/WatchList.jsx:25
-#: newsroom/watch_lists/forms.py:20
-msgid "Description"
-msgstr "Kuvaus"
-
-#: newsroom/watch_lists/forms.py:21
-msgid "Alert Type"
-msgstr ""
-
-#: assets/companies/components/CompanyListItem.jsx:17
-#: assets/companies/components/EditCompany.jsx:187
-#: assets/navigations/components/EditNavigation.jsx:96
-#: assets/navigations/components/NavigationListItem.jsx:13
-#: assets/news-api/components/EditAPIToken.jsx:179
-#: assets/products/components/EditProduct.jsx:162
-#: assets/products/components/ProductListItem.jsx:12
-#: assets/search/components/WatchListEditor.jsx:194
-#: assets/section-filters/components/EditSectionFilter.jsx:76
-#: assets/section-filters/components/SectionFilterListItem.jsx:12
-#: assets/users/components/EditUser.jsx:97
-#: assets/users/components/UserListItem.jsx:23
-#: assets/watch-lists/components/EditWatchList.jsx:170
-#: assets/watch-lists/components/WatchListItem.jsx:18
-#: newsroom/watch_lists/forms.py:23
-msgid "Enabled"
-msgstr "Aktiivinen"
-
-#: assets/company-reports/components/CompanyProducts.jsx:12
-#: assets/products/components/EditProduct.jsx:133
-#: assets/products/components/ProductList.jsx:25
-#: assets/section-filters/components/EditSectionFilter.jsx:61
-#: assets/section-filters/components/SectionFilterList.jsx:25
-#: assets/watch-lists/components/EditWatchList.jsx:141
-#: assets/watch-lists/components/WatchList.jsx:26
-#: newsroom/watch_lists/forms.py:24
-msgid "Query"
-msgstr "Hakulauseke"
-
-#: newsroom/watch_lists/views.py:132
-msgid "Watch List not found"
-msgstr ""
-
-#: newsroom/wire/__init__.py:48
+#: newsroom/wire/__init__.py:44
 msgid "Newsroom"
 msgstr "Mediapankki"
 
-#: newsroom/wire/__init__.py:69
+#: newsroom/wire/__init__.py:65
 msgid "Plain Text"
 msgstr "TXT-formaatti"
 
-#: newsroom/wire/__init__.py:80
+#: newsroom/wire/__init__.py:69
+msgid "Story Image"
+msgstr "Kuva"
+
+#: assets/missing-translations.js:11 newsroom/wire/__init__.py:77
 msgid "News only filter"
 msgstr "Vain uutiset -suodatin"
 
-#: newsroom/wire/__init__.py:82
+#: newsroom/wire/__init__.py:79
 msgid ""
 "This query defines what is NOT considered 'news' content. It is used by the "
 "News only switch to filter the view. When switched on, stories matching this"
 " filter will not be displayed."
 msgstr ""
+"Hakulauseke määrittelee, mitä EI lasketa mukaan uutissisältöihin. Sitä "
+"käytetään Vain uutiset -kytkimen taustalla. Kun kytkin on päällä, tähän "
+"hakuun osuvat jutut piilotetaan."
 
-#: newsroom/wire/__init__.py:87
+#: assets/missing-translations.js:12 newsroom/wire/__init__.py:84
 msgid "Time limit for Wire products (in days)"
 msgstr "Uutistuotteiden aikarajoitus (päiviä)"
 
-#: assets/agenda/components/AgendaApp.jsx:112 newsroom/wire/__init__.py:118
+#: assets/agenda/components/AgendaApp.jsx:111 newsroom/wire/__init__.py:115
 msgid "News Value"
-msgstr "Uutisarvo"
+msgstr "Prio"
 
-#: assets/agenda/components/AgendaApp.jsx:116
-#: assets/search/components/TopicParameters.jsx:60
-#: newsroom/wire/__init__.py:122
-msgid "Place"
-msgstr "Paikka"
+#: newsroom/wire/views.py:300
+msgid "Not found"
+msgstr "Ei löytynyt"
 
-#: newsroom/wire/search.py:84
-msgid "User does not belong to a company."
-msgstr "Käyttäjä ei kuulu yhteenkään yhtiöön"
+#: assets/cards/components/EditCard.jsx:89
+#: assets/companies/components/CompanyPermissions.jsx:121
+#: assets/companies/components/EditCompany.jsx:197
+#: assets/companies/components/EditCompanyAPI.jsx:85
+#: assets/components/EditPanel.jsx:107 assets/components/Modal.jsx:155
+#: assets/general-settings/components/GeneralSettingsApp.jsx:83
+#: assets/item-actions.js:60
+#: assets/monitoring/components/EditMonitoringProfile.jsx:199
+#: assets/monitoring/components/MonitoringSchedule.jsx:197
+#: assets/navigations/components/EditNavigation.jsx:120
+#: assets/products/components/EditProduct.jsx:173
+#: assets/search/components/MonitoringEditor.jsx:209
+#: assets/search/components/TopicEditor.jsx:193
+#: assets/section-filters/components/EditSectionFilter.jsx:87
+#: assets/users/components/EditUser.jsx:122
+msgid "Save"
+msgstr "Tallenna"
 
-#: newsroom/wire/search.py:152
-msgid "Your company doesn't have any products defined."
-msgstr "Yhtiölläsi ei ole yhtään määriteltyä tuotetta."
+#: assets/item-actions.js:69
+msgid "Unsave"
+msgstr "Poista kirjanmerkeistä"
 
-#: assets/agenda/components/AgendaApp.jsx:143
-#: assets/layout/components/BaseApp.jsx:53
-#: assets/wire/components/WireApp.jsx:103
+#: assets/item-actions.js:78
+msgid "Remove"
+msgstr "Poista"
+
+#: assets/agenda/components/AgendaCoverageRequest.jsx:39
+#: assets/missing-translations.js:4
+msgid "Coverage inquiries"
+msgstr "Kyselyt"
+
+#: assets/missing-translations.js:5
+msgid "Department"
+msgstr "Osastokoodi"
+
+#: assets/missing-translations.js:6
+msgid "Genre"
+msgstr "Juttutyyppi"
+
+#: assets/missing-translations.js:7
+msgid "Version"
+msgstr "Versiotyyppi"
+
+#: assets/missing-translations.js:8
+msgid "Premium"
+msgstr "Media: Täysi uutispalvelu"
+
+#: assets/missing-translations.js:9
+msgid "Non-premium"
+msgstr "Media: Rajoitettu uutispalvelu"
+
+#: assets/missing-translations.js:10
+msgid "Non-media"
+msgstr "Yritysasiakas"
+
+#: assets/missing-translations.js:13
+msgid "New company"
+msgstr "Uusi yhtiö"
+
+#: assets/missing-translations.js:14
+msgid "New user"
+msgstr "Uusi käyttäjä"
+
+#: assets/missing-translations.js:15
+msgid "New navigation"
+msgstr "Uusi navigaatio"
+
+#: assets/missing-translations.js:16
+msgid "New section filter"
+msgstr "Uusi lisäsuodatin"
+
+#: assets/missing-translations.js:17
+msgid "New card"
+msgstr "Uusi näkymä"
+
+#: assets/agenda/actions.js:117
+msgid "Your inquiry has been sent successfully"
+msgstr "Hakusi on lähetetty"
+
+#: assets/agenda/actions.js:190
+msgid "Dates: {{ dates }}"
+msgstr "Päivämäärä: {{ dates }}"
+
+#: assets/agenda/actions.js:191
+msgid "Location: {{ location }}"
+msgstr "Sijainti: {{ location }}"
+
+#: assets/agenda/actions.js:192
+msgid "Ednote: {{ ednote }}"
+msgstr "Huomautus: {{ ednote }}"
+
+#: assets/agenda/actions.js:195 assets/agenda/actions.js:220
+#: assets/agenda/actions.js:225
+msgid "Description: {{ description }}"
+msgstr "Kuvaus: {{ description }}"
+
+#: assets/agenda/actions.js:201
+msgid "Contacts"
+msgstr "Yhteyshenkilöt"
+
+#: assets/agenda/actions.js:203
+msgid "Name: {{ contact }}"
+msgstr "Nimi: {{ contact }}"
+
+#: assets/agenda/actions.js:204
+msgid "Organisation: {{ organisation }}"
+msgstr "Organisaatio: {{ organisation }}"
+
+#: assets/agenda/actions.js:205
+msgid "Email: {{ email }}"
+msgstr "Sähköposti: {{ email }}"
+
+#: assets/agenda/actions.js:206
+msgid "Phone: {{ phone }}"
+msgstr "Puhelin: {{ phone }}"
+
+#: assets/agenda/actions.js:207
+msgid "Mobile: {{ mobile }}"
+msgstr "Matkapuhelin: {{ mobile }}"
+
+#: assets/agenda/actions.js:213
+msgid "Calendars: {{ calendars }}"
+msgstr "Kalenterit: {{ calendars }}"
+
+#: assets/agenda/actions.js:219
+msgid "Planning item"
+msgstr "Tapahtuma"
+
+#: assets/agenda/actions.js:222
+msgid "Coverage type: {{ type }}"
+msgstr "Uutisoinnin tyyppi: {{ type }}"
+
+#: assets/agenda/actions.js:223
+msgid "Scheduled: {{ schedule }}"
+msgstr "Suunniteltu: {{ schedule }}"
+
+#: assets/agenda/actions.js:224
+msgid "Status: {{ status }}"
+msgstr "Tila: {{ status }}"
+
+#: assets/agenda/actions.js:235 assets/wire/actions.js:177
+msgid "Item copied successfully."
+msgstr "Kohde kopioitu leikepöydälle"
+
+#: assets/agenda/actions.js:238 assets/wire/actions.js:180
+msgid "Sorry, Copy is not supported."
+msgstr "Pahoittelut, kopiointi ei ole mahdollista"
+
+#: assets/agenda/actions.js:343
+msgid "Started watching items successfully."
+msgstr "Ryhdyit seuraamaan kohdetta"
+
+#: assets/agenda/actions.js:354
+msgid "Stopped watching items successfully."
+msgstr "Lopetit kohteen seuraamisen"
+
+#: assets/agenda/actions.js:399 assets/wire/actions.js:344
+msgid "Items were bookmarked successfully."
+msgstr "Kohteet lisätty kirjanmerkkeihin"
+
+#: assets/agenda/actions.js:401 assets/wire/actions.js:346
+msgid "Item was bookmarked successfully."
+msgstr "Kohde lisätty kirjanmerkkeihin"
+
+#: assets/agenda/actions.js:416 assets/wire/actions.js:361
+msgid "Items were removed from bookmarks successfully."
+msgstr "Kohteet poistettu kirjanmerkeistä"
+
+#: assets/agenda/actions.js:418 assets/wire/actions.js:363
+msgid "Item was removed from bookmarks successfully."
+msgstr "Kohde poistettu kirjanmerkeistä"
+
+#: assets/agenda/actions.js:671
+msgid "Started watching coverage successfully."
+msgstr "Seuranta aloitettu"
+
+#: assets/agenda/actions.js:684
+msgid "Stopped watching coverage successfully."
+msgstr "Uutisointia ei seurata enää"
+
+#: assets/agenda/item-actions.js:21 assets/agenda/item-actions.js:41
+msgid "Watch"
+msgstr "Seuraa"
+
+#: assets/agenda/item-actions.js:28 assets/agenda/item-actions.js:48
+msgid "Stop watching"
+msgstr "Lopeta seuraaminen"
+
+#: assets/agenda/item-actions.js:45
+msgid "Watch this coverage"
+msgstr "Seuraa"
+
+#: assets/agenda/utils.js:53
+msgid "updated {{ at }}"
+msgstr "päivitetty {{ at }}"
+
+#: assets/agenda/utils.js:63
+msgid "Time to be confirmed"
+msgstr "Aika vahvistamatta"
+
+#: assets/agenda/utils.js:73 assets/agenda/utils.js:74
+msgid "not planned"
+msgstr "ei suunniteltu"
+
+#: assets/agenda/utils.js:75 assets/agenda/utils.js:82
+msgid "planned"
+msgstr "suunniteltu"
+
+#: assets/agenda/utils.js:76 assets/agenda/utils.js:77
+msgid "on merit"
+msgstr "taitojen perusteella"
+
+#: assets/agenda/utils.js:78
+msgid "on request"
+msgstr "pyynnöstä"
+
+#: assets/agenda/utils.js:83
+msgid "in progress"
+msgstr "kesken"
+
+#: assets/agenda/utils.js:84
+msgid "available"
+msgstr "saatavilla"
+
+#: assets/agenda/components/AgendaListItemLabels.jsx:19
+#: assets/agenda/utils.js:85
+msgid "cancelled"
+msgstr "peruttu"
+
+#: assets/agenda/utils.js:475
+msgid "Update expected @ ${dateString}"
+msgstr "Päivitys odotettavissa @ ${dateString}"
+
+#: assets/agenda/components/AgendaApp.jsx:142
+#: assets/layout/components/BaseApp.jsx:76
+#: assets/wire/components/WireApp.jsx:114
 msgid "Custom View"
-msgstr ""
+msgstr "Muokattu näkymä"
 
 #: assets/agenda/components/AgendaApp.jsx:173
 #: assets/am-news/components/AmNewsApp.jsx:122
-#: assets/wire/components/WireApp.jsx:139
+#: assets/wire/components/WireApp.jsx:151
 msgid "Close filter panel"
 msgstr "Sulje suodatinnäkymä"
 
 #: assets/agenda/components/AgendaApp.jsx:183
 #: assets/am-news/components/AmNewsApp.jsx:129
-#: assets/wire/components/WireApp.jsx:151
+#: assets/wire/components/WireApp.jsx:163
 msgid "Open filter panel"
 msgstr "Avaa suodattimet"
 
@@ -938,7 +1383,7 @@ msgstr "MIME-tyyppi"
 
 #: assets/agenda/components/AgendaCalendarButton.jsx:33
 #: assets/agenda/components/AgendaDateButtons.jsx:15
-#: assets/agenda/components/AgendaList.jsx:208
+#: assets/agenda/components/AgendaList.jsx:209
 #: assets/company-reports/components/ProductStories.jsx:26
 #: assets/components/CalendarButton.jsx:33
 #: assets/components/ExpiryDateInput.jsx:90
@@ -959,10 +1404,6 @@ msgstr "Kattavuus on suunniteltu"
 msgid "Coverage not planned"
 msgstr "Kattavuus ei ole suunniteltu"
 
-#: assets/agenda/components/AgendaCoverageRequest.jsx:39
-msgid "Coverage inquiries"
-msgstr "Kyselyt"
-
 #: assets/agenda/components/AgendaCoverageRequest.jsx:46
 msgid "your inquiry"
 msgstr "Sinun kyselysi"
@@ -971,11 +1412,16 @@ msgstr "Sinun kyselysi"
 msgid "Submit inquiry"
 msgstr "Lähetä kyselysi"
 
-#: assets/agenda/components/AgendaCoverages.jsx:31
+#: assets/agenda/components/AgendaCoverages.jsx:32
+#: assets/agenda/components/AgendaEventInfo.jsx:19
+msgid "Open Agenda in new tab"
+msgstr "Avaa agenda välilehdellä"
+
+#: assets/agenda/components/AgendaCoverages.jsx:40
 msgid "expected"
 msgstr "odotettu"
 
-#: assets/agenda/components/AgendaCoverages.jsx:36
+#: assets/agenda/components/AgendaCoverages.jsx:45
 msgid "Source"
 msgstr "Lähde"
 
@@ -992,7 +1438,7 @@ msgid "M"
 msgstr "KK"
 
 #: assets/agenda/components/AgendaDetailCoverages.jsx:14
-#: assets/agenda/components/AgendaPreviewCoverages.jsx:15
+#: assets/agenda/components/AgendaPreviewCoverages.jsx:22
 msgid "Coverages"
 msgstr "Uutisointi"
 
@@ -1002,19 +1448,19 @@ msgstr "syy"
 
 #: assets/agenda/components/AgendaEventsOnlyFilter.jsx:7
 msgid "Show Events Only"
-msgstr ""
+msgstr "Näytä vain tapahtumat"
 
 #: assets/agenda/components/AgendaEventsOnlyFilter.jsx:9
 msgid "Events & Coverages"
-msgstr ""
+msgstr "Tapahtumat ja uutisointi"
 
 #: assets/agenda/components/AgendaFeaturedStoriesToogle.jsx:10
 msgid "Top/Featured Stories"
-msgstr "Suosituimmat tarinat"
+msgstr "Suosituimmat jutut"
 
 #: assets/agenda/components/AgendaFeaturedStoriesToogle.jsx:11
 msgid "Top Stories"
-msgstr ""
+msgstr "Pääuutiset"
 
 #: assets/agenda/components/AgendaFilters.jsx:21
 msgid "Any calendar"
@@ -1036,7 +1482,7 @@ msgstr "Kaikki uutisointityypit"
 msgid "Internal Note"
 msgstr "Sisäinen huomautus"
 
-#: assets/agenda/components/AgendaItemDetails.jsx:91
+#: assets/agenda/components/AgendaItemDetails.jsx:94
 #: assets/agenda/components/AgendaPreviewAttachments.jsx:16
 msgid "Attachments"
 msgstr "Liitteet"
@@ -1049,59 +1495,59 @@ msgstr "Lähettäjä"
 msgid "Updated"
 msgstr "Päivitetty"
 
-#: assets/agenda/components/AgendaList.jsx:212
+#: assets/agenda/components/AgendaList.jsx:213
 msgid "Tomorrow"
-msgstr ""
+msgstr "Huomenna"
 
-#: assets/agenda/components/AgendaList.jsx:305
-#: assets/am-news/components/AmNewsList.jsx:190
-#: assets/wire/components/ItemsList.jsx:168
+#: assets/agenda/components/AgendaList.jsx:314
+#: assets/am-news/components/AmNewsList.jsx:192
+#: assets/wire/components/ItemsList.jsx:171
 msgid "No items found."
 msgstr "Kohteita ei löytynyt"
 
-#: assets/agenda/components/AgendaListItemIcons.jsx:31
+#: assets/agenda/components/AgendaListCoverageItem.jsx:21
 msgid " '${slugline}'"
-msgstr ""
+msgstr " '${slugline}'"
 
-#: assets/agenda/components/AgendaListItemIcons.jsx:37
+#: assets/agenda/components/AgendaListCoverageItem.jsx:27
 msgid "{{ type }}{{ slugline }} {{ status_text }}"
-msgstr ""
+msgstr "{{ type }}{{ slugline }} {{ status_text }}"
 
-#: assets/agenda/components/AgendaListItemIcons.jsx:46
+#: assets/agenda/components/AgendaListCoverageItem.jsx:36
 msgid "Planned {{ type }} {{ slugline }}, expected {{date}} at {{time}}"
-msgstr ""
+msgstr "Suunniteltu {{ type }} {{ slugline }}, odotettu {{date}} {{time}}"
 
-#: assets/agenda/components/AgendaListItemIcons.jsx:55
+#: assets/agenda/components/AgendaListCoverageItem.jsx:45
 msgid "{{ type }} {{ slugline }} in progress, expected {{date}} at {{time}}"
-msgstr ""
+msgstr "{{ type }} {{ slugline }} kesken, valmis arviolta {{date}} {{time}}"
 
-#: assets/agenda/components/AgendaListItemIcons.jsx:61
+#: assets/agenda/components/AgendaListCoverageItem.jsx:51
 msgid "{{ type }} {{slugline}} cancelled"
-msgstr ""
+msgstr "{{ type }} {{slugline}} peruttu"
 
-#: assets/agenda/components/AgendaListItemIcons.jsx:69
+#: assets/agenda/components/AgendaListCoverageItem.jsx:59
 msgid " (update to come)"
-msgstr ""
+msgstr "(päivitys tulossa)"
 
-#: assets/agenda/components/AgendaListItemIcons.jsx:69
+#: assets/agenda/components/AgendaListCoverageItem.jsx:59
 msgid " (updated)"
-msgstr ""
+msgstr "(päivitetty)"
 
-#: assets/agenda/components/AgendaListItemIcons.jsx:73
+#: assets/agenda/components/AgendaListCoverageItem.jsx:63
 msgid "{{ type }} {{ slugline }} available{{deliveryState}}"
-msgstr ""
+msgstr "{{ type }} {{ slugline }} saatavilla {{deliveryState}}"
 
-#: assets/agenda/components/AgendaListItemIcons.jsx:126
+#: assets/agenda/components/AgendaListCoverageItem.jsx:96
+msgid "(Watching)"
+msgstr "(Seurataan)"
+
+#: assets/agenda/components/AgendaListItemIcons.jsx:91
 msgid "{{ attachments }} file(s) attached"
-msgstr ""
+msgstr "{{ attachments }} tiedostoa liitetty"
 
 #: assets/agenda/components/AgendaListItemLabels.jsx:15
 msgid "postponed"
 msgstr "lykkääntynyt"
-
-#: assets/agenda/components/AgendaListItemLabels.jsx:19
-msgid "cancelled"
-msgstr "peruttu"
 
 #: assets/agenda/components/AgendaListItemLabels.jsx:23
 msgid "rescheduled"
@@ -1109,85 +1555,143 @@ msgstr "siirretty"
 
 #: assets/agenda/components/AgendaListItemLabels.jsx:27
 msgid "event completed"
-msgstr ""
+msgstr "tapahtuma suoritettu"
 
-#: assets/agenda/components/AgendaMetaTime.jsx:65
-#: assets/agenda/components/AgendaMetaTime.jsx:70
+#: assets/agenda/components/AgendaMetaTime.jsx:66
+#: assets/agenda/components/AgendaMetaTime.jsx:71
 #: assets/components/cards/render/EventsTwoByTwoCard.jsx:33
 msgid "to"
 msgstr "päättyen"
 
-#: assets/agenda/components/AgendaPreviewCoverages.jsx:19
+#: assets/agenda/components/AgendaPreviewCoverages.jsx:27
 msgid "Previous Coverages"
 msgstr "Edellinen uutisointi"
 
 #: assets/agenda/components/AgendaPreviewImage.jsx:24
 msgid "Show Map"
-msgstr ""
+msgstr "Näytä kartta"
 
 #: assets/agenda/components/AgendaPreviewImage.jsx:25
 msgid "Hide Map"
-msgstr ""
+msgstr "Piilota kartta"
 
 #: assets/agenda/components/AgendaTypeAheadFilter.jsx:80
 msgid "Choose a location..."
 msgstr "Valitse sijainti..."
 
-#: assets/agenda/components/CoverageItemStatus.jsx:61
-#: assets/companies/components/CompanyList.jsx:28
+#: assets/agenda/components/CoverageItemStatus.jsx:79
+#: assets/companies/components/CompanyList.jsx:29
+#: assets/monitoring/components/MonitoringList.jsx:28
 #: assets/navigations/components/NavigationList.jsx:24
 #: assets/products/components/ProductList.jsx:23
 #: assets/section-filters/components/SectionFilterList.jsx:23
 #: assets/users/components/UsersList.jsx:30
-#: assets/watch-lists/components/WatchList.jsx:28
 msgid "Status"
 msgstr "Tila"
 
-#: assets/agenda/components/CoverageItemStatus.jsx:63
+#: assets/agenda/components/CoverageItemStatus.jsx:81
 msgid "coverage {{ state }} "
 msgstr "uutisointi {{ state }}"
 
-#: assets/agenda/components/CoverageItemStatus.jsx:74
-#: assets/agenda/components/CoverageItemStatus.jsx:89
+#: assets/agenda/components/CoverageItemStatus.jsx:94
+#: assets/agenda/components/CoverageItemStatus.jsx:111
 msgid "Open in new tab"
 msgstr "Avaa välilehdellä"
 
-#: assets/agenda/components/CoverageItemStatus.jsx:75
-#: assets/agenda/components/CoverageItemStatus.jsx:90
 #: assets/agenda/components/CoverageItemStatus.jsx:95
+#: assets/agenda/components/CoverageItemStatus.jsx:112
+#: assets/agenda/components/CoverageItemStatus.jsx:118
 msgid "View Content"
 msgstr "Katso sisältö"
 
-#: assets/agenda/components/CoverageItemStatus.jsx:125
+#: assets/agenda/components/CoverageItemStatus.jsx:147
 msgid "Update coming"
-msgstr ""
+msgstr "Päivitys tulossa"
+
+#: assets/am-news/utils.js:37
+msgid "Text"
+msgstr "Teksti"
+
+#: assets/am-news/utils.js:41
+msgid "Fuel"
+msgstr "Polttoaine"
+
+#: assets/am-news/utils.js:43
+msgid "Weather"
+msgstr "Sää"
+
+#: assets/am-news/utils.js:48
+msgid "Alert"
+msgstr "Hälytys"
+
+#: assets/am-news/utils.js:50
+msgid "Headlines"
+msgstr "Otsikot"
+
+#: assets/am-news/utils.js:52
+msgid "Quote"
+msgstr "Sitaatti"
+
+#: assets/cards/actions.js:89
+msgid "Invalid Url."
+msgstr "Virheellinen url"
+
+#: assets/cards/actions.js:94
+msgid "Invalid count of media."
+msgstr "Virheellinen määrä mediaa"
+
+#: assets/cards/actions.js:101
+msgid "Count of media should be greater than zero."
+msgstr "Median määrän on oltava enemmän kuin nolla"
+
+#: assets/cards/actions.js:107
+#: assets/components/cards/edit/ConfigExternalMedia.jsx:28
+msgid "Total media count across all media config should be between 1 and 4."
+msgstr "Median määrän on oltava väillä 1-4"
+
+#: assets/cards/actions.js:112
+msgid "Failed to update Card."
+msgstr "Näkymän päivittäminen epäonnistui"
+
+#: assets/cards/actions.js:132
+msgid "Card updated successfully"
+msgstr "Näkymä päivitetty"
+
+#: assets/cards/actions.js:134
+msgid "Card created successfully"
+msgstr "Näkymä luotu"
+
+#: assets/cards/actions.js:156
+msgid "Card deleted successfully"
+msgstr "Näkymä poistettu"
 
 #: assets/cards/components/CardList.jsx:23
-#: assets/cards/components/EditCard.jsx:61
+#: assets/cards/components/EditCard.jsx:62
 msgid "Label"
 msgstr "Nimi"
 
 #: assets/cards/components/CardList.jsx:24
-#: assets/cards/components/EditCard.jsx:68
-#: assets/companies/components/CompanyList.jsx:25
+#: assets/cards/components/EditCard.jsx:69
+#: assets/companies/components/CompanyList.jsx:26
 msgid "Type"
 msgstr "Tyyppi"
 
 #: assets/cards/components/CardList.jsx:25
+#: assets/company-reports/components/ProductCompanies.jsx:53
 #: assets/company-reports/components/ProductStories.jsx:24
 #: assets/components/cards/edit/ConfigProduct.jsx:28
-#: assets/products/components/EditProduct.jsx:25
+#: assets/products/components/EditProduct.jsx:26
 #: assets/products/components/ProductsApp.jsx:31
 msgid "Product"
 msgstr "Tuote"
 
 #: assets/cards/components/CardList.jsx:26
-#: assets/cards/components/EditCard.jsx:77
+#: assets/cards/components/EditCard.jsx:78
 msgid "Order"
 msgstr "Sijainti etusivulla"
 
 #: assets/cards/components/CardList.jsx:27
-#: assets/companies/components/CompanyList.jsx:32
+#: assets/companies/components/CompanyList.jsx:33
 #: assets/navigations/components/NavigationList.jsx:25
 #: assets/products/components/ProductList.jsx:27
 #: assets/section-filters/components/SectionFilterList.jsx:26
@@ -1211,64 +1715,73 @@ msgstr "Haluatko varmasti poistaa näkymän: {{label}}"
 msgid "Card"
 msgstr "Näkymä"
 
-#: assets/cards/components/EditCard.jsx:88
-#: assets/companies/components/CompanyPermissions.jsx:121
-#: assets/companies/components/EditCompany.jsx:196
-#: assets/components/EditPanel.jsx:107 assets/components/Modal.jsx:155
-#: assets/general-settings/components/GeneralSettingsApp.jsx:65
-#: assets/navigations/components/EditNavigation.jsx:118
-#: assets/news-api/components/EditAPIToken.jsx:190
-#: assets/products/components/EditProduct.jsx:172
-#: assets/search/components/TopicEditor.jsx:193
-#: assets/search/components/WatchListEditor.jsx:209
-#: assets/section-filters/components/EditSectionFilter.jsx:85
-#: assets/users/components/EditUser.jsx:121
-#: assets/watch-lists/components/EditWatchList.jsx:179
-#: assets/watch-lists/components/WatchListSchedule.jsx:129
-msgid "Save"
-msgstr "Tallenna"
-
-#: assets/cards/components/EditCard.jsx:93
-#: assets/companies/components/EditCompany.jsx:201
-#: assets/navigations/components/EditNavigation.jsx:123
-#: assets/products/components/EditProduct.jsx:177
+#: assets/cards/components/EditCard.jsx:94
+#: assets/companies/components/EditCompany.jsx:202
+#: assets/monitoring/components/EditMonitoringProfile.jsx:205
+#: assets/navigations/components/EditNavigation.jsx:125
+#: assets/products/components/EditProduct.jsx:178
 #: assets/search/components/FollowedTopics.jsx:49
-#: assets/section-filters/components/EditSectionFilter.jsx:90
-#: assets/users/components/EditUser.jsx:127
-#: assets/watch-lists/components/EditWatchList.jsx:185
+#: assets/section-filters/components/EditSectionFilter.jsx:92
+#: assets/users/components/EditUser.jsx:128
 msgid "Delete"
 msgstr "Poista"
 
-#: assets/companies/components/Companies.jsx:55
+#: assets/companies/actions.js:109 assets/companies/actions.js:144
+msgid "Company updated successfully"
+msgstr "Yhtiö päivitetty"
+
+#: assets/companies/actions.js:111
+msgid "Company created successfully"
+msgstr "Yhtiö luotu"
+
+#: assets/companies/actions.js:165
+msgid "Company deleted successfully"
+msgstr "Yhtiö poistettu"
+
+#: assets/companies/utils.js:4
+msgid "Australia"
+msgstr "Australia"
+
+#: assets/companies/utils.js:5
+msgid "New Zealand"
+msgstr "Uusi-Seelanti"
+
+#: assets/companies/utils.js:6
+msgid "Finland"
+msgstr "Suomi"
+
+#: assets/companies/components/Companies.jsx:60
 msgid "Would you like to delete company: {{name}}"
 msgstr "Haluatko varmasti poistaa yhtiön: {{name}}"
 
-#: assets/companies/components/CompanyList.jsx:26
-#: assets/companies/components/EditCompany.jsx:126
+#: assets/companies/components/CompanyList.jsx:27
+#: assets/companies/components/EditCompany.jsx:127
 msgid "Superdesk Subscriber Id"
 msgstr "Superdesk-asiakastunnus"
 
-#: assets/companies/components/CompanyList.jsx:27
-#: assets/companies/components/EditCompany.jsx:133
+#: assets/companies/components/CompanyList.jsx:28
+#: assets/companies/components/EditCompany.jsx:134
+#: assets/company-reports/components/Company.jsx:69
 msgid "Account Manager"
-msgstr ""
+msgstr "Asiakaspäällikkö"
 
-#: assets/companies/components/CompanyList.jsx:31
-#: assets/companies/components/EditCompany.jsx:161
+#: assets/companies/components/CompanyList.jsx:32
+#: assets/companies/components/EditCompany.jsx:162
 msgid "Country"
 msgstr "Maa"
 
-#: assets/companies/components/CompanyList.jsx:33
+#: assets/companies/components/CompanyList.jsx:34
 msgid "Expires On"
 msgstr "Vanhenee"
 
 #: assets/companies/components/CompanyListItem.jsx:17
 #: assets/company-reports/components/Company.jsx:57
+#: assets/company-reports/components/ExpiredCompanies.jsx:12
+#: assets/monitoring/components/MonitoringItem.jsx:18
 #: assets/navigations/components/NavigationListItem.jsx:13
 #: assets/products/components/ProductListItem.jsx:12
 #: assets/section-filters/components/SectionFilterListItem.jsx:12
 #: assets/users/components/UserListItem.jsx:23
-#: assets/watch-lists/components/WatchListItem.jsx:18
 msgid "Disabled"
 msgstr "Passivoitu"
 
@@ -1278,82 +1791,115 @@ msgstr "Yleinen"
 
 #: assets/companies/components/CompanyPermissions.jsx:67
 msgid "Grant Access To Archived Wire"
-msgstr ""
+msgstr "Anna pääsy arkistoon"
 
 #: assets/companies/components/CompanyPermissions.jsx:75
 msgid "Events Only Access"
-msgstr "Vain tapahtumia"
+msgstr "*Ei käytössä*"
 
 #: assets/companies/components/CompanyPermissions.jsx:84
 msgid "Sections"
-msgstr "Osastot"
+msgstr "Osiot"
 
-#: assets/companies/components/EditCompany.jsx:24
-#: assets/search/components/WatchListEditor.jsx:31
-#: assets/watch-lists/components/EditWatchList.jsx:26
+#: assets/companies/components/EditCompany.jsx:25
+#: assets/monitoring/components/EditMonitoringProfile.jsx:27
+#: assets/search/components/MonitoringEditor.jsx:31
 msgid "Users"
 msgstr "Käyttäjät"
 
-#: assets/companies/components/EditCompany.jsx:25
+#: assets/companies/components/EditCompany.jsx:26
 msgid "Permissions"
 msgstr "Käyttöoikeudet"
 
-#: assets/companies/components/EditCompany.jsx:29
+#: assets/companies/components/EditCompany.jsx:30
 msgid "API"
-msgstr ""
+msgstr "API"
 
-#: assets/companies/components/EditCompany.jsx:44
+#: assets/companies/components/EditCompany.jsx:45
 msgid "There are no users in the company."
 msgstr "Yhtiöllä ei ole käyttäjiä"
 
-#: assets/companies/components/EditCompany.jsx:110
+#: assets/companies/components/EditCompany.jsx:111
 msgid "Company Type"
 msgstr "Yhtiötyyppi"
 
-#: assets/companies/components/EditCompany.jsx:119
+#: assets/companies/components/EditCompany.jsx:120
 msgid "Company Url"
 msgstr "Yhtiön verkkosivu"
 
-#: assets/companies/components/EditCompany.jsx:147
+#: assets/companies/components/EditCompany.jsx:148
 msgid "Contact Name"
 msgstr "Yhteyshenkilö"
 
-#: assets/companies/components/EditCompany.jsx:154
+#: assets/companies/components/EditCompany.jsx:155
 msgid "Contact Email"
 msgstr "Sähköposti"
 
-#: assets/companies/components/EditCompany.jsx:169
-#: assets/company-reports/components/Company.jsx:78
+#: assets/companies/components/EditCompany.jsx:170
+#: assets/company-reports/components/Company.jsx:86
+#: assets/company-reports/components/ExpiredCompanies.jsx:17
 msgid "Expiry Date"
 msgstr "Vanhenee"
 
-#: assets/companies/components/EditCompany.jsx:176
-msgid "Watch List Administrator"
-msgstr ""
+#: assets/companies/components/EditCompany.jsx:177
+msgid "Monitoring Administrator"
+msgstr "Seuranta-admin"
+
+#: assets/companies/components/EditCompanyAPI.jsx:76
+msgid "Allowed IP Addresses"
+msgstr "Sallitut IP-osoitteet"
+
+#: assets/company-reports/actions.js:40
+msgid "To date is after From date"
+msgstr "Alku- ja loppuajat ovat väärässä järjestyksessä"
+
+#: assets/company-reports/actions.js:151
+msgid "No data to export."
+msgstr "Ei dataa vietäväksi"
+
+#: assets/company-reports/components/ComapnyNewsApiUsage.jsx:72
+#: assets/company-reports/components/ContentActivity.jsx:243
+#: assets/company-reports/components/SubscriberActivity.jsx:146
+msgid "No Data"
+msgstr "Ei tietoja"
+
+#: assets/company-reports/components/ComapnyNewsApiUsage.jsx:82
+#: assets/company-reports/components/SubscriberActivity.jsx:167
+msgid "FROM:"
+msgstr "Alkaen:"
+
+#: assets/company-reports/components/ComapnyNewsApiUsage.jsx:88
+#: assets/company-reports/components/SubscriberActivity.jsx:173
+msgid "TO:"
+msgstr "Päättyen:"
 
 #: assets/company-reports/components/Company.jsx:38
 msgid "Tel"
-msgstr ""
+msgstr "Puh"
 
 #: assets/company-reports/components/Company.jsx:48
 msgid "User Accounts"
 msgstr "Käyttäjätilit"
 
 #: assets/company-reports/components/Company.jsx:57
+#: assets/company-reports/components/ExpiredCompanies.jsx:12
 msgid "Active"
-msgstr ""
+msgstr "Aktiivinen"
 
 #: assets/company-reports/components/Company.jsx:59
+#: assets/company-reports/components/ExpiredCompanies.jsx:14
 msgid "Unspecified"
-msgstr ""
+msgstr "Määrittelemätön"
 
-#: assets/company-reports/components/Company.jsx:78
+#: assets/company-reports/components/Company.jsx:86
+#: assets/company-reports/components/ExpiredCompanies.jsx:17
 msgid "Is Active"
-msgstr ""
+msgstr "Onko aktiivinen"
 
-#: assets/company-reports/components/Company.jsx:78
+#: assets/company-reports/components/Company.jsx:86
+#: assets/company-reports/components/ExpiredCompanies.jsx:17
 msgid "Created"
-msgstr ""
+msgstr "Yhtiö luotu"
 
 #: assets/company-reports/components/CompanyProducts.jsx:10
 msgid "Product name"
@@ -1378,15 +1924,19 @@ msgstr "Käytössä"
 msgid "Number Of Products"
 msgstr "Tuotteiden määrä"
 
-#: assets/company-reports/components/CompanyReportsApp.jsx:18
+#: assets/company-reports/components/CompanyReportsApp.jsx:21
 msgid "Subscriber activity"
-msgstr ""
+msgstr "Yhtiöiden toimintatilastot"
 
-#: assets/company-reports/components/CompanyReportsApp.jsx:54
+#: assets/company-reports/components/CompanyReportsApp.jsx:23
+msgid "Companies per Product"
+msgstr "Tuotteita käyttävät yhtiöt"
+
+#: assets/company-reports/components/CompanyReportsApp.jsx:66
 msgid "Run report"
 msgstr "Aja raportti"
 
-#: assets/company-reports/components/CompanyReportsApp.jsx:61
+#: assets/company-reports/components/CompanyReportsApp.jsx:72
 msgid "Print report"
 msgstr "Tulosta raportti"
 
@@ -1394,6 +1944,31 @@ msgstr "Tulosta raportti"
 #: assets/company-reports/components/UserSavedSearches.jsx:22
 msgid "Number Of Saved Searches"
 msgstr "Tallennettujen hakujen määrä"
+
+#: assets/company-reports/components/ContentActivity.jsx:27
+#: assets/company-reports/components/SubscriberActivity.jsx:129
+msgid "Section"
+msgstr "Osio"
+
+#: assets/company-reports/components/ContentActivity.jsx:41
+msgid "Genres"
+msgstr "Genret"
+
+#: assets/company-reports/components/ContentActivity.jsx:280
+msgid "Export to CSV"
+msgstr "Vie CSV:hen"
+
+#: assets/company-reports/components/ProductCompanies.jsx:19
+msgid "All Products"
+msgstr "Kaikki tuotteet"
+
+#: assets/company-reports/components/ProductCompanies.jsx:53
+msgid "Active Companies"
+msgstr "Aktiiviset yhtiöt"
+
+#: assets/company-reports/components/ProductCompanies.jsx:53
+msgid "Disabled Companies"
+msgstr "Passivoidut yhtiöt"
 
 #: assets/company-reports/components/ProductStories.jsx:27
 msgid "Last 24 hours"
@@ -1424,31 +1999,27 @@ msgid "Last 6 months"
 msgstr "Edelliset 6 kuukautta"
 
 #: assets/company-reports/components/SubscriberActivity.jsx:20
+#: assets/monitoring/components/MonitoringApp.jsx:34
+#: assets/monitoring/components/MonitoringApp.jsx:50
 #: assets/users/components/UsersApp.jsx:31
-#: assets/watch-lists/components/WatchListApp.jsx:35
-#: assets/watch-lists/components/WatchListApp.jsx:51
 msgid "All Companies"
-msgstr ""
+msgstr "Kaikki yhtiöt"
 
 #: assets/company-reports/components/SubscriberActivity.jsx:24
 msgid "All Actions"
-msgstr ""
+msgstr "Kaikki toiminnot"
 
 #: assets/company-reports/components/SubscriberActivity.jsx:28
 msgid "All Sections"
-msgstr ""
-
-#: assets/company-reports/components/SubscriberActivity.jsx:129
-msgid "Section"
-msgstr ""
+msgstr "Kaikki osiot"
 
 #: assets/company-reports/components/SubscriberActivity.jsx:129
 msgid "Item"
-msgstr ""
+msgstr "Versio"
 
 #: assets/company-reports/components/SubscriberActivity.jsx:129
 msgid "Action"
-msgstr ""
+msgstr "Toiminta"
 
 #: assets/company-reports/components/SubscriberActivity.jsx:129
 #: assets/company-reports/components/UserSavedSearches.jsx:19
@@ -1457,58 +2028,54 @@ msgid "User"
 msgstr "Käyttäjä"
 
 #: assets/company-reports/components/SubscriberActivity.jsx:129
-#: assets/watch-lists/components/WatchListSchedule.jsx:104
+#: assets/monitoring/components/MonitoringSchedule.jsx:172
 msgid "Time"
-msgstr ""
+msgstr "Aika"
 
-#: assets/company-reports/components/SubscriberActivity.jsx:146
-msgid "No Data"
-msgstr ""
+#: assets/components/AuditInformation.jsx:32
+msgid "Created {{creator}}at {{created}}"
+msgstr "Luotu {{creator}}{{created}}"
 
-#: assets/company-reports/components/SubscriberActivity.jsx:167
-msgid "FROM:"
-msgstr ""
-
-#: assets/company-reports/components/SubscriberActivity.jsx:173
-msgid "TO:"
-msgstr ""
+#: assets/components/AuditInformation.jsx:46
+msgid "Updated {{updator}}at {{updated}}"
+msgstr "Päivitetty {{updator}} {{updated}}"
 
 #: assets/components/ExpiryDateInput.jsx:19
 msgid "on"
-msgstr ""
+msgstr "klo"
 
 #: assets/components/ExpiryDateInput.jsx:20
 msgid "in 1 week"
-msgstr ""
+msgstr "1 viikossa"
 
 #: assets/components/ExpiryDateInput.jsx:21
 msgid "in 2 weeks"
-msgstr ""
+msgstr "2 viikossa"
 
 #: assets/components/ExpiryDateInput.jsx:22
 msgid "in 1 month"
-msgstr ""
+msgstr "1 kuukauden kuluessa"
 
 #: assets/components/ExpiryDateInput.jsx:23
 msgid "in 6 months"
-msgstr ""
+msgstr "6 kuukaudessa"
 
 #: assets/components/ExpiryDateInput.jsx:24
 msgid "in 1 year"
-msgstr ""
+msgstr "1 vuodessa"
 
 #: assets/components/ExpiryDateInput.jsx:25
-#: assets/news-api/components/EditAPIToken.jsx:211
+#: assets/news-api/components/EditAPIToken.jsx:194
 msgid "Never"
-msgstr ""
-
-#: assets/components/KeywordInput.jsx:72
-msgid "Keywords (Type and press ENTER to add a keyword)"
-msgstr ""
+msgstr "Ei koskaan"
 
 #: assets/components/ListBar.jsx:22
 msgid "New {{ buttonName }}"
 msgstr "Uusi {{ buttonName }}"
+
+#: assets/components/ListItemEmbargoed.jsx:36
+msgid "embargo"
+msgstr "embargo"
 
 #: assets/components/ListViewOptions.jsx:14
 msgid "Large list"
@@ -1547,7 +2114,7 @@ msgstr "Luontiaika"
 
 #: assets/components/ShareItemModal.jsx:76
 msgid "Deselect All"
-msgstr ""
+msgstr "Poista kaikki valinnat"
 
 #: assets/components/ShareItemModal.jsx:77
 #: assets/wire/components/SelectedItemsBar.jsx:44
@@ -1558,22 +2125,57 @@ msgstr "Valitse kaikki"
 msgid "Share Item"
 msgstr "Jaa kohde"
 
-#: assets/components/ShareItemModal.jsx:95
-#: assets/search/components/FollowedTopics.jsx:45
-msgid "Share"
-msgstr "Jaa"
-
 #: assets/components/ShareItemModal.jsx:103
 msgid "People"
-msgstr "Ihmiset"
+msgstr "Käyttäjät"
 
 #: assets/components/ShareItemModal.jsx:124
 msgid "Message"
 msgstr "Viesti"
 
-#: assets/components/cards/edit/ConfigEvent.jsx:26
-msgid "Headline"
-msgstr "Otsikko"
+#: assets/components/cards/utils.js:23
+msgid "6-text-only"
+msgstr "6-palstainen, vain teksti"
+
+#: assets/components/cards/utils.js:30
+msgid "4-picture-text"
+msgstr "4-palstainen, kuva ja teksti"
+
+#: assets/components/cards/utils.js:37
+msgid "4-media-gallery"
+msgstr "4-palstainen mediagalleria"
+
+#: assets/components/cards/utils.js:44
+msgid "4-photo-gallery"
+msgstr "4-palstainen kuvagalleria"
+
+#: assets/components/cards/utils.js:51
+msgid "1x1-top-news"
+msgstr "1x1 pääuutiset"
+
+#: assets/components/cards/utils.js:58
+msgid "2x2-top-news"
+msgstr "2x2 pääuutiset"
+
+#: assets/components/cards/utils.js:65
+msgid "3-text-only"
+msgstr "3-palstainen, vain teksti"
+
+#: assets/components/cards/utils.js:72
+msgid "3-picture-text"
+msgstr "3-palstainen, kuva ja teksti"
+
+#: assets/components/cards/utils.js:79
+msgid "4-text-only"
+msgstr "4-palstainen, vain teksti"
+
+#: assets/components/cards/utils.js:86
+msgid "2x2-events"
+msgstr "2x2, tapahtumat"
+
+#: assets/components/cards/utils.js:93
+msgid "6 Navigation Tiles Per Row"
+msgstr "6 navigaatiolohkoa rivillä"
 
 #: assets/components/cards/edit/ConfigEvent.jsx:33
 msgid "Abstract"
@@ -1598,11 +2200,7 @@ msgstr "Lisää"
 
 #: assets/components/cards/edit/ConfigExternalMedia.jsx:23
 msgid "More button url"
-msgstr ""
-
-#: assets/components/cards/edit/ConfigExternalMedia.jsx:28
-msgid "Total media count across all media config should be between 1 and 4."
-msgstr "Median määrän on oltava väillä 1-4"
+msgstr "Lisää"
 
 #: assets/components/cards/edit/ConfigExternalMedia.jsx:40
 msgid "External url to fetch media"
@@ -1640,31 +2238,191 @@ msgstr "Lisää uutisia"
 msgid "Stories"
 msgstr "Jutut"
 
-#: assets/home/components/HomeApp.jsx:120
+#: assets/general-settings/actions.js:14
+msgid "Settings were updated successfully."
+msgstr "Asetukset päivitetty"
+
+#: assets/home/components/HomeApp.jsx:123
 #: assets/market-place/components/MarketPlaceApp.jsx:34
 msgid "Warning"
 msgstr "Varoitus"
 
-#: assets/home/components/HomeApp.jsx:120
+#: assets/home/components/HomeApp.jsx:123
 msgid "There's no card defined for home page!"
 msgstr "Etusivulle ei ole määritelty yhtään näkymää!"
 
-#: assets/layout/components/BaseApp.jsx:26
+#: assets/layout/components/BaseApp.jsx:36
 #: assets/search/components/TopicParameters.jsx:67
 msgid "Topics"
 msgstr "Aiheet"
 
-#: assets/layout/components/BaseApp.jsx:27
+#: assets/layout/components/BaseApp.jsx:37
 msgid "My Topics"
-msgstr "Omat aiheeni"
+msgstr "Tallennetut haut"
 
-#: assets/layout/components/BaseApp.jsx:28
+#: assets/layout/components/BaseApp.jsx:38
 msgid "Filters"
 msgstr "Suodattimet"
 
 #: assets/market-place/components/MarketPlaceApp.jsx:34
 msgid "There's no navigations defined!"
 msgstr "Et ole määritellyt yhtään navigaatiota"
+
+#: assets/monitoring/actions.js:92
+msgid "Monitoring Profile updated successfully"
+msgstr "Seurantaprofiili päivitetty"
+
+#: assets/monitoring/actions.js:94
+msgid "Monitoring Profile created successfully"
+msgstr "Seurantaprofiili luotu"
+
+#: assets/monitoring/actions.js:160
+msgid "Monitoring Profile users updated successfully"
+msgstr "Seurantaprofiilin käyttäjät päivitetty"
+
+#: assets/monitoring/actions.js:172
+msgid "Please create the monitoring profile first."
+msgstr "Luo ensin seurantaprofiili"
+
+#: assets/monitoring/actions.js:177
+msgid "Monitoring Profile schedule updated successfully"
+msgstr "Seurantaprofiili päivitetty"
+
+#: assets/monitoring/actions.js:193
+msgid "Monitoring Profile deleted successfully"
+msgstr "Seurantaprofiili poistettu onnistuneesti"
+
+#: assets/monitoring/components/EditMonitoringProfile.jsx:26
+msgid "Profile"
+msgstr "Profiili"
+
+#: assets/monitoring/components/EditMonitoringProfile.jsx:28
+msgid "Schedule"
+msgstr "Aikataulu"
+
+#: assets/monitoring/components/EditMonitoringProfile.jsx:43
+msgid "There are no users for this monitoring profile."
+msgstr "Seurantaprofiililla ei ole käyttäjiä"
+
+#: assets/monitoring/components/EditMonitoringProfile.jsx:80
+msgid "Add/Edit Monitoring Profile"
+msgstr "Lisää/muokkaa seurantaprofiili"
+
+#: assets/monitoring/components/EditMonitoringProfile.jsx:119
+#: assets/search/components/MonitoringEditor.jsx:166
+msgid "Subject line"
+msgstr "Otsikko"
+
+#: assets/monitoring/components/EditMonitoringProfile.jsx:148
+msgid "Test Monitoring Profile query"
+msgstr "Testaa hakulauseketta"
+
+#: assets/monitoring/components/EditMonitoringProfile.jsx:153
+msgid "Keywords"
+msgstr "Avainsanat"
+
+#: assets/monitoring/components/EditMonitoringProfile.jsx:161
+#: assets/search/components/MonitoringEditor.jsx:178
+msgid "Alert type"
+msgstr "Hälytystyyppi"
+
+#: assets/monitoring/components/EditMonitoringProfile.jsx:172
+msgid "Format type"
+msgstr "Formaatti"
+
+#: assets/monitoring/components/MonitoringApp.jsx:27
+#: assets/wire/components/WireApp.jsx:73
+msgid "Monitoring Profiles"
+msgstr "Seurantaprofiili"
+
+#: assets/monitoring/components/MonitoringApp.jsx:28
+msgid "Schedules"
+msgstr "Aikataulut"
+
+#: assets/monitoring/components/MonitoringApp.jsx:49
+msgid "Companies with schedules"
+msgstr "Yhtiöt ja aikataulut"
+
+#: assets/monitoring/components/MonitoringApp.jsx:82
+#: assets/search/components/MonitoringEditor.jsx:27
+msgid "Monitoring Profile"
+msgstr "Seurantaprofiili"
+
+#: assets/monitoring/components/MonitoringPanel.jsx:36
+msgid "Please provide a name"
+msgstr "Anna nimi"
+
+#: assets/monitoring/components/MonitoringPanel.jsx:41
+msgid "Please provide a company"
+msgstr "Anna yhtiön nimi"
+
+#: assets/monitoring/components/MonitoringPanel.jsx:46
+msgid "Please provide a query"
+msgstr "Anna hakulauseke"
+
+#: assets/monitoring/components/MonitoringPanel.jsx:67
+msgid "Would you like to delete the Monitoring Profile: {{name}}?"
+msgstr "Haluatko poistaa: {{name}}?"
+
+#: assets/monitoring/components/MonitoringSchedule.jsx:19
+msgid "Immediate"
+msgstr "Heti"
+
+#: assets/monitoring/components/MonitoringSchedule.jsx:23
+msgid "Hourly"
+msgstr "Tunneittain"
+
+#: assets/monitoring/components/MonitoringSchedule.jsx:27
+msgid "Every Two Hours"
+msgstr "Kahden tunnin välein"
+
+#: assets/monitoring/components/MonitoringSchedule.jsx:31
+msgid "Every Four Hours"
+msgstr "Neljän tunnin välein"
+
+#: assets/monitoring/components/MonitoringSchedule.jsx:35
+msgid "Every day at"
+msgstr "Joka päivä klo"
+
+#: assets/monitoring/components/MonitoringSchedule.jsx:39
+msgid "Every week at"
+msgstr "Joka viikko"
+
+#: assets/monitoring/components/MonitoringSchedule.jsx:46
+msgid "Monday"
+msgstr "Maanantai"
+
+#: assets/monitoring/components/MonitoringSchedule.jsx:50
+msgid "Tuesday"
+msgstr "Tiistai"
+
+#: assets/monitoring/components/MonitoringSchedule.jsx:54
+msgid "Wednesday"
+msgstr "Keskiviikko"
+
+#: assets/monitoring/components/MonitoringSchedule.jsx:58
+msgid "Thursday"
+msgstr "Torstai"
+
+#: assets/monitoring/components/MonitoringSchedule.jsx:62
+msgid "Friday"
+msgstr "Perjantai"
+
+#: assets/monitoring/components/MonitoringSchedule.jsx:66
+msgid "Saturday"
+msgstr "Lauantai"
+
+#: assets/monitoring/components/MonitoringSchedule.jsx:70
+msgid "Sunday"
+msgstr "Sunnuntai"
+
+#: assets/monitoring/components/MonitoringSchedule.jsx:157
+msgid "Schedule type"
+msgstr "Ohjelmatyyppi"
+
+#: assets/monitoring/components/MonitoringSchedule.jsx:165
+msgid "Day of week"
+msgstr "Viikonpäivä"
 
 #: assets/navigations/actions.jsx:94 assets/navigations/actions.jsx:150
 msgid "Navigation updated successfully"
@@ -1678,7 +2436,7 @@ msgstr "Navigaatio on luotu"
 msgid "Navigation deleted successfully"
 msgstr "Navigaatio on poistettu"
 
-#: assets/navigations/components/EditNavigation.jsx:101
+#: assets/navigations/components/EditNavigation.jsx:103
 msgid "Tile Images"
 msgstr "Otsikkokuvat"
 
@@ -1686,86 +2444,127 @@ msgstr "Otsikkokuvat"
 msgid "Would you like to delete navigation: {{name}}"
 msgstr "Haluatko varmasti poistaa navigaation: {{name}}"
 
-#: assets/news-api/components/EditAPIToken.jsx:93
+#: assets/news-api/actions.js:17
+msgid "API Token generated successfully"
+msgstr "API-avain luotu"
+
+#: assets/news-api/actions.js:25
+msgid "API Token deleted successfully"
+msgstr "API-avain poistettu"
+
+#: assets/news-api/actions.js:37
+msgid "API Token updated successfully"
+msgstr "API-avain päivitetty"
+
+#: assets/news-api/components/EditAPIToken.jsx:100
 msgid "Cannot be in the past"
-msgstr ""
+msgstr "Ei voi olla menneisyydessä"
 
-#: assets/news-api/components/EditAPIToken.jsx:131
+#: assets/news-api/components/EditAPIToken.jsx:161
 msgid "Are you sure you want to delete this Company's API Token?"
-msgstr ""
+msgstr "Haluatko varmasti poistaa yhtiön API-avaimen?"
 
-#: assets/news-api/components/EditAPIToken.jsx:159
-msgid "Edit API Token"
-msgstr ""
-
-#: assets/news-api/components/EditAPIToken.jsx:160
-msgid "Create New API Token"
-msgstr ""
-
-#: assets/news-api/components/EditAPIToken.jsx:171
-msgid "Expires:"
-msgstr ""
-
-#: assets/news-api/components/EditAPIToken.jsx:190
-msgid "Generate Token"
-msgstr ""
-
-#: assets/news-api/components/EditAPIToken.jsx:215
+#: assets/news-api/components/EditAPIToken.jsx:197
 msgid "Expired On:"
-msgstr ""
+msgstr "Vanheni:"
 
-#: assets/news-api/components/EditAPIToken.jsx:216
+#: assets/news-api/components/EditAPIToken.jsx:198
 msgid "Expires On:"
-msgstr ""
+msgstr "Vanhenee:"
 
-#: assets/news-api/components/EditAPIToken.jsx:225
-msgid "API Token - Disabled"
-msgstr ""
+#: assets/news-api/components/EditAPIToken.jsx:209
+msgid "Token:"
+msgstr "API:"
 
-#: assets/news-api/components/EditAPIToken.jsx:227
-msgid "API Token"
-msgstr ""
+#: assets/news-api/components/EditAPIToken.jsx:221
+msgid "Expires:"
+msgstr "Vanhenee"
+
+#: assets/news-api/components/EditAPIToken.jsx:243
+msgid "Edit API Token"
+msgstr "Muokkaa API-avainta"
+
+#: assets/news-api/components/EditAPIToken.jsx:244
+msgid "Create New API Token"
+msgstr "Luo uusi APi-avain"
 
 #: assets/news-api/components/EditAPIToken.jsx:245
-msgid "Token:"
-msgstr ""
+msgid "API Token - Disabled"
+msgstr "API-avain - pois päältä"
 
-#: assets/products/components/EditProduct.jsx:26
-msgid "Companies"
-msgstr "Yritykset"
+#: assets/news-api/components/EditAPIToken.jsx:246
+msgid "API Token"
+msgstr "API-avain"
 
-#: assets/products/components/EditProduct.jsx:57
+#: assets/news-api/components/EditAPIToken.jsx:247
+msgid "Save Token"
+msgstr "Tallenna API-avain"
+
+#: assets/news-api/components/EditAPIToken.jsx:247
+msgid "Generate Token"
+msgstr "Luo avain"
+
+#: assets/notifications/actions.js:40
+msgid "Notification cleared successfully"
+msgstr "Ilmoitus poistettu"
+
+#: assets/notifications/actions.js:58
+msgid "Notifications cleared successfully"
+msgstr "Kaikki ilmoitukset poistettu"
+
+#: assets/products/actions.js:92 assets/products/actions.js:147
+#: assets/products/actions.js:177
+msgid "Product updated successfully"
+msgstr "Tuote on päivitetty"
+
+#: assets/products/actions.js:94
+msgid "Product created successfully"
+msgstr "Tuote on luotu"
+
+#: assets/products/actions.js:116
+msgid "Product deleted successfully"
+msgstr "Tuote on poistettu"
+
+#: assets/products/components/EditProduct.jsx:58
 msgid "Test product"
 msgstr "Testaa tuotetta"
 
-#: assets/products/components/EditProduct.jsx:119
+#: assets/products/components/EditProduct.jsx:120
 #: assets/products/components/ProductList.jsx:24
-#: assets/section-filters/components/EditSectionFilter.jsx:47
+#: assets/section-filters/components/EditSectionFilter.jsx:49
 #: assets/section-filters/components/SectionFilterList.jsx:24
 msgid "Superdesk Product Id"
 msgstr "Superdesk-tuotteen id"
 
-#: assets/products/components/EditProduct.jsx:128
+#: assets/products/components/EditProduct.jsx:129
 msgid "Test product id"
 msgstr "Testaa tuotteen id:tä"
 
-#: assets/products/components/EditProduct.jsx:142
-#: assets/section-filters/components/EditSectionFilter.jsx:70
+#: assets/products/components/EditProduct.jsx:143
+#: assets/section-filters/components/EditSectionFilter.jsx:72
 msgid "Test query"
 msgstr "Testaa hakulauseketta"
 
-#: assets/products/components/EditProduct.jsx:147
+#: assets/products/components/EditProduct.jsx:148
 #: assets/products/components/ProductList.jsx:26
 msgid "Planning Item Query"
 msgstr "Suunnitteluyksikkö kysely"
 
-#: assets/products/components/EditProduct.jsx:156
+#: assets/products/components/EditProduct.jsx:157
 msgid "Test Planning Item query"
-msgstr ""
+msgstr "Testaa hakua"
 
 #: assets/products/components/Products.jsx:66
 msgid "Would you like to delete product: {{name}}"
 msgstr "Haluatko varmasti poistaa tuotteen: {{name}}"
+
+#: assets/search/actions.js:279
+msgid "Items were shared successfully."
+msgstr "Jaoit kohteet onnistuneesti"
+
+#: assets/search/actions.js:281
+msgid "Item was shared successfully."
+msgstr "Jaoit kohteen onnistuneesti"
 
 #: assets/search/components/FollowedTopics.jsx:36
 msgid "Edit"
@@ -1773,7 +2572,27 @@ msgstr "Muokkaa"
 
 #: assets/search/components/FollowedTopics.jsx:77
 msgid "Would you like to delete topic {{name}}?"
-msgstr "Haluatko varmasti poistaa aiheen {{name}}?"
+msgstr "Haluatko varmasti poistaa haun {{name}}?"
+
+#: assets/search/components/MonitoringEditor.jsx:78
+msgid "Unsubscribed"
+msgstr "Peruttu"
+
+#: assets/search/components/MonitoringEditor.jsx:81
+msgid "Subscribed"
+msgstr "Tilattu"
+
+#: assets/search/components/MonitoringEditor.jsx:96
+msgid "{{ msg }} successfully"
+msgstr "{{ msg }} onnistuneesti"
+
+#: assets/search/components/MonitoringEditor.jsx:159
+msgid "Unsubscribe"
+msgstr "Peru tilaus"
+
+#: assets/search/components/MonitoringEditor.jsx:159
+msgid "Subscribe"
+msgstr "Tilaa"
 
 #: assets/search/components/NewItemsIcon.jsx:41
 msgid "New events to load"
@@ -1796,51 +2615,51 @@ msgstr "Hae"
 
 #: assets/search/components/SearchResults.jsx:32
 msgid "search results found"
-msgstr ""
+msgstr "hakutulosta löytyi"
 
 #: assets/search/components/SearchResults.jsx:35
 msgid "search results for:"
 msgstr "hakutulokset:"
 
-#: assets/search/components/SearchResultsInfo.jsx:34
-msgid "Update my topic"
-msgstr ""
-
 #: assets/search/components/SearchResultsInfo.jsx:35
+msgid "Update my topic"
+msgstr "Päivitä haku"
+
+#: assets/search/components/SearchResultsInfo.jsx:36
 msgid "Create my topic"
-msgstr ""
+msgstr "Tallenna haku"
 
 #: assets/search/components/TopicEditor.jsx:103
 msgid "Agenda Topic updated successfully"
-msgstr ""
+msgstr "Aihe päivitetty"
 
 #: assets/search/components/TopicEditor.jsx:104
 msgid "Wire Topic updated successfully"
-msgstr ""
+msgstr "Päivitetty onnistuneesti"
 
 #: assets/search/components/TopicEditor.jsx:108
 msgid "Agenda Topic created successfully"
-msgstr ""
+msgstr "Aihe luotu"
 
 #: assets/search/components/TopicEditor.jsx:109
 msgid "Wire Topic created successfully"
-msgstr ""
+msgstr "Haku tallennettu onnistuneesti"
 
 #: assets/search/components/TopicEditor.jsx:133
 msgid "Create new Agenda Topic"
-msgstr ""
+msgstr "Luo uusi agenda-aihe"
 
 #: assets/search/components/TopicEditor.jsx:134
 msgid "Create new Wire Topic"
-msgstr ""
+msgstr "Tallenna uusi haku"
 
 #: assets/search/components/TopicEditor.jsx:137
 msgid "Save Agenda Topic"
-msgstr ""
+msgstr "Tallenna agenda-aihe"
 
 #: assets/search/components/TopicEditor.jsx:138
 msgid "Save Wire Topic"
-msgstr ""
+msgstr "Tallenna haku"
 
 #: assets/search/components/TopicForm.jsx:23
 msgid "Send me notifications"
@@ -1848,23 +2667,23 @@ msgstr "Lähetä minulle ilmoituksia"
 
 #: assets/search/components/TopicParameters.jsx:19
 msgid "From: {{date}}"
-msgstr ""
+msgstr "Lähtien: {{date}}"
 
 #: assets/search/components/TopicParameters.jsx:20
 msgid "To: {{date}}"
-msgstr ""
+msgstr "To: {{date}}"
 
 #: assets/search/components/TopicParameters.jsx:66
 msgid "Date Created"
-msgstr ""
+msgstr "Luontiaika"
 
 #: assets/search/components/TopicParameters.jsx:71
 msgid "Urgency"
-msgstr ""
+msgstr "Prio"
 
 #: assets/search/components/TopicParameters.jsx:73
 msgid "Calendar"
-msgstr ""
+msgstr "Kalenteri"
 
 #: assets/search/components/TopicParameters.jsx:74
 msgid "Coverage Type"
@@ -1876,53 +2695,29 @@ msgstr "Seurannan tila"
 
 #: assets/search/components/TopicsTab.jsx:36
 msgid "No {{name}} created."
-msgstr "Nimeä ei annettu."
+msgstr "Ei tallennettuja hakuja"
 
 #: assets/search/components/TopicsTab.jsx:58
 msgid "Manage my {{name}}"
-msgstr "Hallinnoi omia aiheitani"
+msgstr "Hallinnoi omia hakujani"
 
-#: assets/search/components/WatchListEditor.jsx:27
-#: assets/watch-lists/components/EditWatchList.jsx:25
-#: assets/watch-lists/components/WatchListApp.jsx:83
-msgid "Watch List"
-msgstr ""
+#: assets/section-filters/actions.js:72
+msgid "Section Filter updated successfully"
+msgstr "Lisäsuodattimen asetukset päivitetty"
 
-#: assets/search/components/WatchListEditor.jsx:78
-msgid "Unsubscribed"
-msgstr ""
+#: assets/section-filters/actions.js:74
+msgid "Section Filter created successfully"
+msgstr "Lisäsuodatin luotu"
 
-#: assets/search/components/WatchListEditor.jsx:81
-msgid "Subscribed"
-msgstr ""
+#: assets/section-filters/actions.js:96
+msgid "Section Filter deleted successfully"
+msgstr "Lisäsuodatin poistettu"
 
-#: assets/search/components/WatchListEditor.jsx:96
-msgid "{{ msg }} successfully"
-msgstr ""
-
-#: assets/search/components/WatchListEditor.jsx:159
-msgid "Unsubscribe"
-msgstr ""
-
-#: assets/search/components/WatchListEditor.jsx:159
-msgid "Subscribe"
-msgstr ""
-
-#: assets/search/components/WatchListEditor.jsx:166
-#: assets/watch-lists/components/EditWatchList.jsx:118
-msgid "Subject line"
-msgstr ""
-
-#: assets/search/components/WatchListEditor.jsx:178
-#: assets/watch-lists/components/EditWatchList.jsx:159
-msgid "Alert type"
-msgstr ""
-
-#: assets/section-filters/components/EditSectionFilter.jsx:19
+#: assets/section-filters/components/EditSectionFilter.jsx:20
 msgid "New Filter"
 msgstr "Uusi suodatin"
 
-#: assets/section-filters/components/EditSectionFilter.jsx:56
+#: assets/section-filters/components/EditSectionFilter.jsx:58
 msgid "Test Superdesk Product id"
 msgstr "Testaa Superdesk-tuotteen id:tä"
 
@@ -1934,9 +2729,17 @@ msgstr "Haluatko poistaa lisäsuodattimen: {{name}}"
 msgid "Section Filter"
 msgstr "Lisäsuodatin"
 
+#: assets/tests/utils.spec.js:5
+msgid "foo"
+msgstr "foo"
+
+#: assets/tests/utils.spec.js:9
+msgid "hello {{ name }}"
+msgstr "Hei {{ name }}"
+
 #: assets/ui/components/ArticleAuthor.jsx:6
 msgid "in "
-msgstr ""
+msgstr "in"
 
 #: assets/ui/components/ArticleAuthor.jsx:11
 msgid "By "
@@ -1944,26 +2747,31 @@ msgstr "Tekijä:"
 
 #: assets/ui/components/ArticleAuthor.jsx:16
 msgid "{{inStr}}{{ located}}"
-msgstr ""
+msgstr "{{inStr}}{{ located}}"
 
 #: assets/ui/components/ArticleEmbargoed.jsx:14
 msgid "Embargo: {{ date }}"
-msgstr ""
+msgstr "Embargo: {{ date }}"
 
 #: assets/ui/components/ArticleVideo.jsx:12
 msgid "Your browser does not support HTML5 video"
 msgstr "Selaimesi ei tue HTML5-videota"
 
-#: assets/ui/components/ArticleVideo.jsx:16
-#: assets/wire/components/DownloadItemsModal.jsx:44
-msgid "Download"
-msgstr "Lataa"
+#: assets/user-profile/actions.js:97 assets/users/actions.js:99
+msgid "User updated successfully"
+msgstr "Käyttäjän tiedot päivitetty"
 
-#: assets/ui/components/Preview.jsx:10
-#: assets/wire/components/ItemDetails.jsx:63
-#: assets/wire/components/filters/NavCreatedPicker.jsx:27
-msgid "Published"
-msgstr "Julkaistu"
+#: assets/user-profile/actions.js:100
+msgid "Please reload the page in order to change language."
+msgstr "Päivitä sivu vaihtaaksesi kieltä"
+
+#: assets/user-profile/actions.js:131
+msgid "Topic deleted successfully"
+msgstr "Haku on poistettu"
+
+#: assets/user-profile/actions.js:163
+msgid "Topic was shared successfully."
+msgstr "Haku on jaettu onnistuneesti"
 
 #: assets/user-profile/components/UserProfileApp.jsx:38
 msgid "My Profile"
@@ -1971,15 +2779,15 @@ msgstr "Profiilini"
 
 #: assets/user-profile/components/UserProfileApp.jsx:46
 msgid "My Wire Topics"
-msgstr ""
+msgstr "Tallennetut hakuni"
 
 #: assets/user-profile/components/UserProfileApp.jsx:55
 msgid "My Agenda Topics"
-msgstr ""
+msgstr "Omat aiheet"
 
 #: assets/user-profile/components/UserProfileApp.jsx:64
-msgid "My Watch Lists"
-msgstr ""
+msgid "My Monitoring"
+msgstr "Omat seurannat"
 
 #: assets/user-profile/components/UserProfileApp.jsx:164
 msgid "Logout"
@@ -1994,7 +2802,7 @@ msgid "Please provide last name"
 msgstr "Anna sukunimi"
 
 #: assets/user-profile/components/profile/UserProfile.jsx:92
-#: assets/users/components/EditUser.jsx:53
+#: assets/users/components/EditUser.jsx:54
 #: assets/users/components/UsersList.jsx:25
 msgid "Phone"
 msgstr "Puhelin"
@@ -2003,11 +2811,23 @@ msgstr "Puhelin"
 msgid "Save Changes"
 msgstr "Tallenna muutokset"
 
-#: assets/users/components/EditUser.jsx:16
-msgid "Add/Edit User"
-msgstr ""
+#: assets/users/actions.js:101
+msgid "User created successfully"
+msgstr "Käyttäjä on luotu"
 
-#: assets/users/components/EditUser.jsx:91
+#: assets/users/actions.js:118
+msgid "Reset password token is sent successfully"
+msgstr "Ohjeet salasanan vaihtamiseen on lähetetty"
+
+#: assets/users/actions.js:136
+msgid "User deleted successfully"
+msgstr "Käyttäjä on poistettu"
+
+#: assets/users/components/EditUser.jsx:17
+msgid "Add/Edit User"
+msgstr "Uusi käyttäjä / muokkaa"
+
+#: assets/users/components/EditUser.jsx:92
 #: assets/users/components/UserListItem.jsx:22
 msgid "Approved"
 msgstr "Hyväksytty"
@@ -2022,87 +2842,56 @@ msgstr "Haluatko varmasti poistaa käyttäjän: {{name}}?"
 
 #: assets/users/components/UsersApp.jsx:35
 msgid "Sort By"
-msgstr ""
+msgstr "Järjestä"
 
 #: assets/users/components/UsersList.jsx:32
 msgid "Last Active"
-msgstr ""
+msgstr "Viimeksi aktiivinen"
 
-#: assets/watch-lists/components/EditWatchList.jsx:27
-msgid "Schedule"
-msgstr ""
+#: assets/wire/actions.js:116
+msgid "Are you sure you want to permanently remove these item(s)?"
+msgstr "Haluatko varmasti poistaa nämä pysyvästi?"
 
-#: assets/watch-lists/components/EditWatchList.jsx:42
-msgid "There are no users for this watch list."
-msgstr ""
+#: assets/wire/actions.js:120
+msgid "Items were removed successfully"
+msgstr "Poistettu"
 
-#: assets/watch-lists/components/EditWatchList.jsx:79
-msgid "Add/Edit Watch List"
-msgstr ""
+#: assets/wire/actions.js:122
+msgid "Item wes removed successfully"
+msgstr "Poistettu"
 
-#: assets/watch-lists/components/EditWatchList.jsx:147
-msgid "Test Watch List query"
-msgstr ""
+#: assets/wire/actions.js:153
+msgid "By: {{ byline }}"
+msgstr "Kirjoittaja: {{ byline }}"
 
-#: assets/watch-lists/components/WatchListApp.jsx:29
-msgid "Schedules"
-msgstr ""
+#: assets/wire/actions.js:154
+msgid "Location: {{ located }}"
+msgstr "Sijainti: {{ located }}"
 
-#: assets/watch-lists/components/WatchListApp.jsx:50
-msgid "Companies with schedules"
-msgstr ""
+#: assets/wire/actions.js:155
+msgid "Source: {{ source }}"
+msgstr "Lähde: {{ source }}"
 
-#: assets/watch-lists/components/WatchListSchedule.jsx:19
-msgid "Immediate"
-msgstr ""
+#: assets/wire/components/AgendaLinks.jsx:84
+msgid "Related Event"
+msgstr "Yhdistetty tapahtuma"
 
-#: assets/watch-lists/components/WatchListSchedule.jsx:23
-msgid "Every Two Hours"
-msgstr ""
+#: assets/wire/components/AgendaLinks.jsx:90
+msgid "Related Coverage"
+msgstr "Yhdistetyt seurannat"
 
-#: assets/watch-lists/components/WatchListSchedule.jsx:27
-msgid "Every Four Hours"
-msgstr ""
-
-#: assets/watch-lists/components/WatchListSchedule.jsx:31
-msgid "Every day at"
-msgstr ""
-
-#: assets/watch-lists/components/WatchListSchedule.jsx:35
-msgid "Every week at"
-msgstr ""
-
-#: assets/watch-lists/components/WatchListSchedule.jsx:96
-msgid "Schedule type"
-msgstr ""
-
-#: assets/watch-lists/components/WatchListsPanel.jsx:36
-msgid "Please provide a name"
-msgstr ""
-
-#: assets/watch-lists/components/WatchListsPanel.jsx:41
-msgid "Please provide a company"
-msgstr ""
-
-#: assets/watch-lists/components/WatchListsPanel.jsx:46
-msgid "Please provide a query"
-msgstr ""
-
-#: assets/watch-lists/components/WatchListsPanel.jsx:67
-msgid "Would you like to delete the watch list: {{name}}?"
-msgstr ""
-
-#: assets/wire/components/AgendaLinks.jsx:49
-msgid "Open agenda item \"{{ name }}\""
-msgstr "Avaa agenda \"{{ name }}\""
-
-#: assets/wire/components/DownloadItemsModal.jsx:43
+#: assets/wire/components/DownloadItemsModal.jsx:52
 msgid "Download Items"
 msgstr "Lataa kohteet"
 
-#: assets/wire/components/DownloadItemsModal.jsx:49
+#: assets/wire/components/DownloadItemsModal.jsx:58
+#: assets/wire/components/DownloadItemsModal.jsx:66
 msgid "Format"
 msgstr "Tiedostomuoto"
+
+#: assets/wire/components/InfoBox.jsx:17
+msgid "{{name}}"
+msgstr "{{name}}"
 
 #: assets/wire/components/ListItemNextVersion.jsx:44
 msgid "Next version"
@@ -2118,43 +2907,43 @@ msgstr "Vain uutiset"
 
 #: assets/wire/components/PreviewEdnote.jsx:9
 msgid "Note"
-msgstr ""
+msgstr "Huom"
 
-#: assets/wire/components/PreviewMeta.jsx:33
-msgid "News Value: {{ value }}"
-msgstr "Prioriteetti: {{ value }}"
+#: assets/wire/components/PreviewMeta.jsx:47
+msgid "{{ source }}"
+msgstr "{{ source }}"
 
-#: assets/wire/components/PreviewMeta.jsx:34
-msgid "Words:"
-msgstr "Sanoja:"
+#: assets/wire/components/PreviewMeta.jsx:63
+msgid "Version type: {{ version }}"
+msgstr "Versiotyyppi: {{ version }}"
 
-#: assets/wire/components/PreviewMeta.jsx:35
-msgid "Characters:"
-msgstr "Merkkejä:"
-
-#: assets/wire/components/PreviewMeta.jsx:36
-msgid "Source: {{ source }}"
-msgstr "Lähde: {{ source }}"
-
-#: assets/wire/components/PreviewMeta.jsx:39
+#: assets/wire/components/PreviewMeta.jsx:86
 msgid "{{ count }} previous versions"
-msgstr "{{ count }} aiempaa versiota"
+msgstr "Korvatut versiot {{ count }}"
 
 #: assets/wire/components/PreviewTags.jsx:27
 msgid "Slugline"
-msgstr ""
+msgstr "Slugline"
 
 #: assets/wire/components/SelectedItemsBar.jsx:47
 msgid "{{ count }} item(s) selected"
 msgstr "{{ count }} kohde(tta) valittu"
 
-#: assets/wire/components/WireListItem.jsx:137
-msgid "Show previous versions ({{ count }})"
-msgstr "Näytä aiemmat ({{ count }}) versiota"
+#: assets/wire/components/UrgencyLabel.jsx:45
+msgid "News Value: {{ value }}"
+msgstr "Prio: {{ value }}"
 
-#: assets/wire/components/WireListItemEmbargoed.jsx:32
-msgid "embargo"
-msgstr "kauppasaarto"
+#: assets/wire/components/UrgencyLabel.jsx:61
+msgid "urgency"
+msgstr "prio"
+
+#: assets/wire/components/WireListItem.jsx:259
+msgid "Show previous versions ({{ count }})"
+msgstr "Korvatut versiot ({{ count }})"
+
+#: assets/wire/components/WireListItemDeleted.jsx:30
+msgid "This item has been removed from {{ context_name }}"
+msgstr "Artikkeli on poistettu {{ context_name }}"
 
 #: assets/wire/components/WirePreview.jsx:64
 msgid "Follow story"
@@ -2183,3 +2972,7 @@ msgstr "Päättyen"
 #: assets/wire/components/filters/NavigationTab.jsx:39
 msgid "All"
 msgstr "Kaikki"
+
+#: theme/footer.html:3
+msgid "Support"
+msgstr "Tukisivusto"

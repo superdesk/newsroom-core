@@ -7,11 +7,11 @@ from flask_babel import gettext
 from werkzeug.exceptions import NotFound
 from eve.methods.get import get_internal
 from eve.render import send_response
+from newsroom.decorator import admin_only, login_required, account_manager_only
 from superdesk import get_resource_service
 from superdesk.logging import logger
 
 from newsroom.email import send_email
-from newsroom.decorator import admin_only, login_required
 from newsroom.companies import section
 from newsroom.template_filters import is_admin
 from newsroom.auth import get_user, get_user_id
@@ -70,7 +70,7 @@ def get_monitoring_for_company(user):
 
 
 @blueprint.route('/monitoring/<id>/users', methods=['POST'])
-@admin_only
+@account_manager_only
 def update_users(id):
     updates = flask.request.get_json()
     if 'users' in updates:
@@ -80,7 +80,7 @@ def update_users(id):
 
 
 @blueprint.route('/monitoring/schedule_companies', methods=['GET'])
-@admin_only
+@account_manager_only
 def monitoring_companies():
     monitoring_list = list(query_resource('monitoring', lookup={'schedule.interval': {'$ne': None}}))
     companies = get_items_by_id([ObjectId(m['company']) for m in monitoring_list], 'companies')
@@ -88,7 +88,7 @@ def monitoring_companies():
 
 
 @blueprint.route('/monitoring/<id>/schedule', methods=['POST'])
-@admin_only
+@account_manager_only
 def update_schedule(id):
     updates = flask.request.get_json()
     get_resource_service('monitoring').patch(id=ObjectId(id), updates=updates)
@@ -108,7 +108,7 @@ def search():
 
 
 @blueprint.route('/monitoring/new', methods=['POST'])
-@admin_only
+@account_manager_only
 def create():
     form = MonitoringForm()
     if form.validate():

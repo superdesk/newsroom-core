@@ -1,9 +1,11 @@
 import os
 
-from superdesk.default_settings import ( # noqa
+from newsroom.web.default_settings import ( # noqa
     env,
     ELASTICSEARCH_URL,
-    CONTENTAPI_ELASTICSEARCH_URL
+    ELASTICSEARCH_SETTINGS,
+    CONTENTAPI_ELASTICSEARCH_URL,
+    CONTENTAPI_ELASTICSEARCH_SETTINGS,
 )
 
 URL_PREFIX = os.environ.get('CONTENT_API_PREFIX', 'api/v1')
@@ -28,6 +30,8 @@ CORE_APPS = [
     'newsroom.news_api.api_audit',
     'newsroom.news_api.news.assets.assets',
     'newsroom.upload',
+    'newsroom.news_api.news.atom.atom',
+    'newsroom.history'
 ]
 
 INSTALLED_APPS = []

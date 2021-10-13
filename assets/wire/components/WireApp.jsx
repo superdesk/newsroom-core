@@ -49,16 +49,19 @@ import ItemDetails from './ItemDetails';
 import ShareItemModal from 'components/ShareItemModal';
 import getItemActions from '../item-actions';
 import BookmarkTabs from 'components/BookmarkTabs';
+import ItemStatisticsModal from './ItemStatisticsModal';
 
 import {
     previewConfigSelector,
     detailsConfigSelector,
+    listConfigSelector,
     advancedSearchTabsConfigSelector,
 } from 'ui/selectors';
 
 const modals = {
     shareItem: ShareItemModal,
     downloadItems: DownloadItemsModal,
+    itemStatistics: ItemStatisticsModal,
 };
 
 class WireApp extends BaseApp {
@@ -136,6 +139,7 @@ class WireApp extends BaseApp {
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
                 detailsConfig={this.props.detailsConfig}
+                listConfig={this.props.listConfig}
                 downloadVideo={this.props.downloadVideo}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
             />] : [
@@ -228,6 +232,7 @@ class WireApp extends BaseApp {
                                 closePreview={this.props.closePreview}
                                 previewConfig={this.props.previewConfig}
                                 downloadVideo={this.props.downloadVideo}
+                                listConfig={this.props.listConfig}
                             />
                             }
 
@@ -288,6 +293,7 @@ WireApp.propTypes = {
     context: PropTypes.string.isRequired,
     previewConfig: PropTypes.object,
     detailsConfig: PropTypes.object,
+    listConfig: PropTypes.object,
     groups: PropTypes.array,
     downloadVideo: PropTypes.func,
     advancedSearchTabConfig: PropTypes.object,
@@ -322,6 +328,7 @@ const mapStateToProps = (state) => ({
     context: state.context,
     previewConfig: previewConfigSelector(state),
     detailsConfig: detailsConfigSelector(state),
+    listConfig: listConfigSelector(state),
     advancedSearchTabConfig: advancedSearchTabsConfigSelector(state),
     groups: get(state, 'groups', []),
     searchParams: searchParamsSelector(state),
