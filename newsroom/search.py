@@ -103,12 +103,7 @@ class BaseSearchService(Service):
 
         # Now run a query only using the IDs from the above search
         # This final search makes sure pagination still works
-        search.query['bool']['must_not'] = []
-        search.query['bool']['should'] = []
-        search.query['bool'].pop('minimum_should_match', None)
-        search.query['bool']['must'] = [
-            {'terms': {'_id': next_item_ids}}
-        ]
+        search.query['bool'] = {'must': {'terms': {'_id': next_item_ids}}}
         self.gen_source_from_search(search)
         internal_req = self.get_internal_request(search)
         return self.internal_get(internal_req, search.lookup)
