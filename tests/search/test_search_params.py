@@ -27,6 +27,21 @@ def init(app):
     app.data.insert('products', PRODUCTS)
 
 
+def get_search_instance(args=None, lookup=None):
+    search = SearchQuery()
+
+    if not args:
+        service.prefill_search_args(search, req=None)
+        service.prefill_search_query(search, req=None, lookup=lookup)
+    else:
+        req = ParsedRequest()
+        req.args = args
+        service.prefill_search_args(search, req)
+        service.prefill_search_query(search, req, lookup)
+
+    return search
+
+
 def test_prefill_search_args(client, app):
     with app.test_request_context():
         search = SearchQuery()
@@ -62,37 +77,30 @@ def test_prefill_search_args(client, app):
 
 def test_prefill_search_lookup(client, app):
     with app.test_request_context():
-        search = SearchQuery()
-        service.prefill_search_query(search)
+        search = get_search_instance()
         assert search.lookup == {}
 
-        search = SearchQuery()
-        service.prefill_search_query(search, lookup={})
+        search = get_search_instance(lookup={})
         assert search.lookup == {}
 
-        search = SearchQuery()
-        service.prefill_search_query(search, lookup={'foo': 'bar'})
+        search = get_search_instance(lookup={'foo': 'bar'})
         assert search.lookup == {'foo': 'bar'}
 
 
 def test_prefill_search_page(client, app):
     with app.test_request_context():
-        search = SearchQuery()
-        service.prefill_search_query(search)
+        search = get_search_instance()
         assert search.args == {
             'sort': service.default_sort,
             'size': service.default_page_size,
             'from': 0
         }
 
-        search = SearchQuery()
-        req = ParsedRequest()
-        req.args = {
+        search = get_search_instance(args={
             'sort': [{'versioncreated': 'asc'}],
             'size': '50',
             'from': '50',
-        }
-        service.prefill_search_query(search, req)
+        })
         assert search.args == {
             'sort': [{'versioncreated': 'asc'}],
             'size': 50,
@@ -103,27 +111,21 @@ def test_prefill_search_page(client, app):
 def test_prefill_search_user(client, app):
     with app.test_request_context():
         session['user'] = None
-        search = SearchQuery()
-        service.prefill_search_query(search)
+        search = get_search_instance()
         assert search.user is None
 
         session['user'] = ADMIN_USER_ID
-        search = SearchQuery()
-        service.prefill_search_query(search)
+        search = get_search_instance()
         assert search.user.get('_id') == ADMIN_USER_ID
         assert search.is_admin is True
 
         session['user'] = PUBLIC_USER_ID
-        search = SearchQuery()
-        service.prefill_search_query(search)
+        search = get_search_instance()
         assert search.user.get('_id') == PUBLIC_USER_ID
         assert search.is_admin is False
 
         session['user'] = ADMIN_USER_ID
-        search = SearchQuery()
-        req = ParsedRequest()
-        req.args = {'user': TEST_USER_ID}
-        service.prefill_search_query(search, req)
+        search = get_search_instance(args={'user': TEST_USER_ID})
         assert search.user.get('_id') == TEST_USER_ID
         assert search.is_admin is False
 
@@ -131,113 +133,78 @@ def test_prefill_search_user(client, app):
 def test_prefill_search_company(client, app):
     with app.test_request_context():
         session['user'] = None
-        search = SearchQuery()
-        service.prefill_search_query(search)
+        search = get_search_instance()
         assert search.user is None
         assert search.company is None
 
         session['user'] = ADMIN_USER_ID
-        search = SearchQuery()
-        service.prefill_search_query(search)
+        search = get_search_instance()
         assert search.company.get('_id') == COMPANY_1
 
         session['user'] = PUBLIC_USER_ID
-        search = SearchQuery()
-        service.prefill_search_query(search)
+        search = get_search_instance()
         assert search.company.get('_id') == COMPANY_2
 
         session['user'] = ADMIN_USER_ID
-        search = SearchQuery()
-        req = ParsedRequest()
-        req.args = {'user': TEST_USER_ID}
-        service.prefill_search_query(search, req)
+        search = get_search_instance(args={'user': TEST_USER_ID})
         assert search.company.get('_id') == COMPANY_3
 
 
 def test_prefill_search_section(client, app):
     with app.test_request_context():
-        search = SearchQuery()
-        service.prefill_search_section(search)
+        search = get_search_instance()
         assert search.section == service.section
 
-        search = SearchQuery()
         service.section = 'test'
-        service.prefill_search_section(search)
+        search = get_search_instance()
         assert search.section == 'test'
 
 
 def test_prefill_search_navigation(client, app):
     with app.test_request_context():
-        search = SearchQuery()
-        service.prefill_search_query(search)
+        search = get_search_instance()
         assert search.navigation_ids == []
 
-        search = SearchQuery()
-        req = ParsedRequest()
-        req.args = {'navigation': ''}
-        service.prefill_search_query(search, req)
+        search = get_search_instance(args={'navigation': ''})
         assert search.navigation_ids == []
 
-        search = SearchQuery()
-        req = ParsedRequest()
-        req.args = {'navigation': '{},{},{}'.format(NAV_1, NAV_2, NAV_3)}
-        service.prefill_search_query(search, req)
+        search = get_search_instance(args={'navigation': '{},{},{}'.format(NAV_1, NAV_2, NAV_3)})
         assert search.navigation_ids == [str(NAV_1), str(NAV_2), str(NAV_3)]
 
-        search = SearchQuery()
-        req = ParsedRequest()
-        req.args = {'navigation': [str(NAV_1), str(NAV_2), str(NAV_3)]}
-        service.prefill_search_query(search, req)
+        search = get_search_instance(args={'navigation': [str(NAV_1), str(NAV_2), str(NAV_3)]})
         assert search.navigation_ids == [str(NAV_1), str(NAV_2), str(NAV_3)]
 
-        search = SearchQuery()
-        req = ParsedRequest()
-        req.args = {'navigation': {'test': NAV_1}}
         with raises(BadParameterValueError):
-            service.prefill_search_query(search, req)
+            get_search_instance(args={'navigation': {'test': NAV_1}})
 
 
 def test_prefill_search_products__requested_products(client, app):
     with app.test_request_context():
-        search = SearchQuery()
-        service.prefill_search_query(search)
+        search = get_search_instance()
         assert search.requested_products == []
 
-        search = SearchQuery()
-        req = ParsedRequest()
-        req.args = {'requested_products': '{},{},{}'.format(PROD_1, PROD_2, PROD_3)}
-        service.prefill_search_query(search, req)
+        search = get_search_instance(args={'requested_products': '{},{},{}'.format(PROD_1, PROD_2, PROD_3)})
         assert search.requested_products == [str(PROD_1), str(PROD_2), str(PROD_3)]
 
-        search = SearchQuery()
-        req = ParsedRequest()
-        req.args = {'requested_products': [str(PROD_1), str(PROD_2), str(PROD_3)]}
-        service.prefill_search_query(search, req)
+        search = get_search_instance(args={'requested_products': [str(PROD_1), str(PROD_2), str(PROD_3)]})
         assert search.requested_products == [str(PROD_1), str(PROD_2), str(PROD_3)]
 
-        search = SearchQuery()
-        req = ParsedRequest()
-        req.args = {'requested_products': {'test': PROD_3}}
         with raises(BadParameterValueError):
-            service.prefill_search_query(search, req)
+            get_search_instance(args={'requested_products': {'test': PROD_3}})
 
 
 def test_prefill_search_products__admin_products(client, app):
     with app.test_request_context():
         session['user'] = ADMIN_USER_ID
-        search = SearchQuery()
-        service.prefill_search_query(search)
+        search = get_search_instance()
         assert search.products == []
 
-        search = SearchQuery()
-        req = ParsedRequest()
-        req.args = {'navigation': [
+        search = get_search_instance(args={'navigation': [
             NAV_1,  # PROD_1: enabled for Admin/Company
             NAV_3,  # PROD_2: not enabled for Admin/Company
             NAV_4,  # PROD_3: is_enabled=False
             NAV_5,  # PROD_4: product_type=agenda
-        ]}
-        service.prefill_search_query(search, req)
+        ]})
         assert len(search.products) == 2
         assert search.products[0]['_id'] in [PROD_1, PROD_2]
         assert search.products[1]['_id'] in [PROD_1, PROD_2]
@@ -246,23 +213,19 @@ def test_prefill_search_products__admin_products(client, app):
 def test_prefill_search_products__public_products(client, app):
     with app.test_request_context():
         session['user'] = PUBLIC_USER_ID
-        search = SearchQuery()
-        service.prefill_search_query(search)
+        search = get_search_instance()
         assert len(search.products) == 2
         assert search.products[0]['_id'] in [PROD_1, PROD_2]
         assert search.products[1]['_id'] in [PROD_1, PROD_2]
 
-        search = SearchQuery()
-        req = ParsedRequest()
-        req.args = {'navigation': [
+        search = get_search_instance(args={'navigation': [
             NAV_1,  # PROD_1: enabled for Public/Company
             NAV_2,  # PROD_1: enabled for Public/Company
             NAV_3,  # PROD_2: enabled for Public/Company
             NAV_4,  # PROD_3: is_enabled=False
             NAV_5,  # PROD_4: product_type=agenda
             NAV_6,  # PROD_4: disabled for Public/Company
-        ]}
-        service.prefill_search_query(search)
+        ]})
         assert len(search.products) == 2
         assert search.products[0]['_id'] in [PROD_1, PROD_2]
         assert search.products[1]['_id'] in [PROD_1, PROD_2]
@@ -270,18 +233,14 @@ def test_prefill_search_products__public_products(client, app):
 
 def test_prefill_search_items(client, app):
     with app.test_request_context():
-        search = SearchQuery()
-        service.prefill_search_query(search)
+        search = get_search_instance()
         assert {'term': {'_type': 'items'}} in search.query['bool']['must']
         assert {'term': {'type': 'composite'}} in search.query['bool']['must_not']
         assert {'constant_score': {
             'filter': {'exists': {'field': 'nextversion'}}
         }} in search.query['bool']['must_not']
 
-        search = SearchQuery()
-        req = ParsedRequest()
-        req.args = {'ignore_latest': True}
-        service.prefill_search_query(search, req)
+        search = get_search_instance(args={'ignore_latest': True})
         assert {'constant_score': {
             'filter': {'exists': {'field': 'nextversion'}}
         }} not in search.query['bool']['must_not']

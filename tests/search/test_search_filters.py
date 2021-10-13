@@ -111,10 +111,12 @@ def test_apply_products_filter(client, app):
             search = SearchQuery()
 
             if args is None:
+                service.prefill_search_args(search)
                 service.prefill_search_query(search)
             else:
                 req = ParsedRequest()
                 req.args = args
+                service.prefill_search_args(search, req)
                 service.prefill_search_query(search, req)
 
             service.apply_products_filter(search)
