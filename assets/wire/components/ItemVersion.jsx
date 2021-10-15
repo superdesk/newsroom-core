@@ -48,3 +48,7 @@ ItemVersion.propTypes = {
     displayConfig: PropTypes.object,
     matchedIds: PropTypes.array,
 };
+
+ItemVersion.defaultProps = {
+    matchedIds: [],
+};

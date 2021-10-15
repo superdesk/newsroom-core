@@ -79,4 +79,8 @@ ListItemPreviousVersions.propTypes = {
     matchedIds: PropTypes.array,
 };
 
+ListItemPreviousVersions.defaultProps = {
+    matchedIds: [],
+};
+
 export default connect()(ListItemPreviousVersions);

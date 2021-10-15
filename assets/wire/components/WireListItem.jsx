@@ -328,4 +328,8 @@ WireListItem.propTypes = {
     matchedIds: PropTypes.array,
 };
 
+WireListItem.defaultProps = {
+    matchedIds: [],
+};
+
 export default WireListItem;
