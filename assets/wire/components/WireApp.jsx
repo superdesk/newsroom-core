@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {get, isEqual} from 'lodash';
 
-import {gettext, getItemFromArray, DISPLAY_NEWS_ONLY} from 'utils';
+import {gettext, getItemFromArray, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE} from 'utils';
 import {getSingleFilterValue} from 'search/utils';
 
 import {
@@ -180,7 +180,7 @@ class WireApp extends BaseApp {
                             newsOnly={this.props.newsOnly}
                             toggleNews={this.props.toggleNews}
                             hideNewsOnly={!(this.props.context === 'wire' && DISPLAY_NEWS_ONLY)}
-                            hideSearchAllVersions={false}
+                            hideSearchAllVersions={!(this.props.context === 'wire' && DISPLAY_ALL_VERSIONS_TOGGLE)}
                             searchAllVersions={this.props.searchAllVersions}
                             toggleSearchAllVersions={this.props.toggleSearchAllVersions}
                         />
