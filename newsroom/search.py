@@ -66,7 +66,7 @@ class BaseSearchService(Service):
     limit_days_setting: Union[None, str] = 'wire_time_limit_days'
     default_sort = [{'versioncreated': 'desc'}]
     default_page_size = 25
-    _matched_ids = [] # array of IDs matched on the request, used when searching all versions
+    _matched_ids = []  # array of IDs matched on the request, used when searching all versions
 
     def get(self, req, lookup):
         search = SearchQuery()
