@@ -14,6 +14,7 @@ import {searchReducer} from 'search/reducers';
 const initialState = {
     items: [],
     itemsById: {},
+    matchedIds: [],
     aggregations: null,
     activeItem: null,
     previewItem: null,
@@ -49,10 +50,15 @@ function recieveItems(state, data) {
         return item._id;
     });
 
+    const matchedIds = get(data, '_links.matched_ids.length') ?
+        data._links.matched_ids :
+        [];
+
     return {
         ...state,
         items,
         itemsById,
+        matchedIds,
         isLoading: false,
         totalItems: data._meta.total,
         aggregations: data._aggregations || null,

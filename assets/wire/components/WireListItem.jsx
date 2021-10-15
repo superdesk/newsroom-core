@@ -29,6 +29,7 @@ import ActionMenu from '../../components/ActionMenu';
 import WireListItemDeleted from './WireListItemDeleted';
 import {Embargo} from './fields/Embargo';
 import {UrgencyItemBorder, UrgencyLabel} from './fields/UrgencyLabel';
+import {MatchLabel} from './fields/MatchLabel';
 import {FieldComponents} from './fields';
 
 export const DISPLAY_WORD_COUNT = getConfig('display_word_count');
@@ -83,6 +84,7 @@ class WireListItem extends React.Component {
             onDoubleClick,
             isExtended,
             listConfig,
+            matchedIds,
         } = this.props;
 
         if (get(this.props, 'item.deleted')) {
@@ -142,6 +144,9 @@ class WireListItem extends React.Component {
                                     <i></i>
                                 </label>
                             </div>
+                            {!matchedIds.includes(item._id) ? null : (
+                                <MatchLabel />
+                            )}
                             {!isExtended && (
                                 <WireListItemIcons
                                     item={item}
@@ -291,6 +296,7 @@ class WireListItem extends React.Component {
                         item={this.props.item}
                         isPreview={false}
                         displayConfig={this.props.listConfig}
+                        matchedIds={matchedIds}
                     />
                 )}
             </article>
@@ -319,6 +325,7 @@ WireListItem.propTypes = {
     context: PropTypes.string,
     contextName: PropTypes.string,
     listConfig: PropTypes.object,
+    matchedIds: PropTypes.array,
 };
 
 export default WireListItem;

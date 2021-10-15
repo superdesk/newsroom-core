@@ -135,7 +135,7 @@ class ItemsList extends React.Component {
     }
 
     render() {
-        const {items, itemsById, activeItem, activeView, selectedItems, readItems} = this.props;
+        const {items, itemsById, activeItem, activeView, selectedItems, readItems, matchedIds} = this.props;
         const isExtended = activeView === EXTENDED_VIEW;
 
         const articles = items.map((_id) =>
@@ -156,6 +156,7 @@ class ItemsList extends React.Component {
                 context={this.props.context}
                 contextName={this.props.contextName}
                 listConfig={this.props.listConfig}
+                matchedIds={matchedIds || []}
             />
         );
 
@@ -179,6 +180,7 @@ class ItemsList extends React.Component {
 ItemsList.propTypes = {
     items: PropTypes.array.isRequired,
     itemsById: PropTypes.object,
+    matchedIds: PropTypes.array,
     activeItem: PropTypes.string,
     previewItem: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
@@ -206,6 +208,7 @@ ItemsList.propTypes = {
 const mapStateToProps = (state) => ({
     items: state.items,
     itemsById: state.itemsById,
+    matchedIds: state.matchedIds,
     activeItem: state.activeItem,
     previewItem: state.previewItem,
     selectedItems: state.selectedItems,
