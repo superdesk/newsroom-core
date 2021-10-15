@@ -66,6 +66,7 @@ class BaseSearchService(Service):
     limit_days_setting: Union[None, str] = 'wire_time_limit_days'
     default_sort = [{'versioncreated': 'desc'}]
     default_page_size = 25
+    _matched_ids = [] # array of IDs matched on the request, used when searching all versions
 
     def get(self, req, lookup):
         search = SearchQuery()
@@ -82,6 +83,18 @@ class BaseSearchService(Service):
             internal_req = self.get_internal_request(search)
             return self.internal_get(internal_req, search.lookup)
 
+    def on_fetched(self, docs):
+        """Add IDs of the versions that matched the search to the HATEOAS response
+
+        The list of IDs are not guaranteed to be in the ``_items`` response.
+        This is used in the front-end to highlight which version matched the search query,
+        which may not be the last version in the content chain.
+        """
+
+        if self._matched_ids:
+            docs['_links']['matched_ids'] = self._matched_ids
+            self._matched_ids = []
+
     def _search_all_versions(self, search: SearchQuery, req, lookup):
         """Search across all versions of items, but return last versions only"""
 
@@ -91,17 +104,21 @@ class BaseSearchService(Service):
         self.apply_filters(search)
         self.gen_source_from_search(search)
 
-        # Search up to 1,000 items, and store original params
-        # for use in the final search query
+        # Search up to 1,000 items to make sure pagination works
+        # as we're getting all versions here
+        # where as the final response will only include the last version
+        # of each content chain
         search.source['size'] = 1000
         search.source['from'] = 0
 
         internal_req = self.get_internal_request(search)
-        earlier_versions = self.internal_get(internal_req, search.lookup)
-        next_item_ids = [
-            str(self.get_last_version(doc)['_id'])
-            for doc in earlier_versions.docs
-        ]
+        search_results = self.internal_get(internal_req, search.lookup)
+        next_item_ids = []
+        self._matched_ids = []
+
+        for doc in search_results.docs:
+            self._matched_ids.append(doc['_id'])
+            next_item_ids.append(str(self.get_last_version(doc)['_id']))
 
         # Now run a query only using the IDs from the above search
         # This final search makes sure pagination still works
