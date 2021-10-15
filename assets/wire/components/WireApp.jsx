@@ -342,7 +342,10 @@ const mapDispatchToProps = (dispatch) => ({
         dispatch(toggleNews());
         dispatch(fetchItems());
     },
-    toggleSearchAllVersions: () => dispatch(toggleSearchAllVersions()),
+    toggleSearchAllVersions: () => {
+        dispatch(toggleSearchAllVersions());
+        dispatch(fetchItems());
+    },
     setQuery: (query) => dispatch(setQuery(query)),
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
