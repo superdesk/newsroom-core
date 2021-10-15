@@ -1,9 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {noNavigationSelected} from 'search/utils';
+
 import NewsOnlyControl from './NewsOnlyControl';
 import SearchAllVersionsControl from './SearchAllVersionsControl';
 import ListViewOptions from '../../components/ListViewOptions';
+import {ListSearchOptions} from './ListSearchOptions';
 
 function ListViewControls({
     activeView,
@@ -17,21 +20,35 @@ function ListViewControls({
     toggleSearchAllVersions,
 }) {
     return(
-        <div className='content-bar__right'>
-            {hideSearchAllVersions ? null : (
-                <SearchAllVersionsControl
+        <React.Fragment>
+            <div className='content-bar__right'>
+                {hideSearchAllVersions ? null : (
+                    <SearchAllVersionsControl
+                        activeNavigation={activeNavigation}
+                        searchAllVersions={searchAllVersions}
+                        toggleSearchAllVersions={toggleSearchAllVersions}
+                    />
+                )}
+                {!hideNewsOnly && <NewsOnlyControl
                     activeNavigation={activeNavigation}
-                    searchAllVersions={searchAllVersions}
-                    toggleSearchAllVersions={toggleSearchAllVersions}
-                />
+                    newsOnly={newsOnly}
+                    toggleNews={toggleNews}
+                />}
+                <ListViewOptions setView={setView} activeView={activeView} />
+            </div>
+            {(!noNavigationSelected(activeNavigation) || (hideSearchAllVersions && hideNewsOnly)) ? null : (
+                <div className="content-bar__right--mobile">
+                    <ListSearchOptions
+                        hideSearchAllVersions={hideSearchAllVersions}
+                        searchAllVersions={searchAllVersions}
+                        toggleSearchAllVersions={toggleSearchAllVersions}
+                        hideNewsOnly={hideNewsOnly}
+                        newsOnly={newsOnly}
+                        toggleNews={toggleNews}
+                    />
+                </div>
             )}
-            {!hideNewsOnly && <NewsOnlyControl
-                activeNavigation={activeNavigation}
-                newsOnly={newsOnly}
-                toggleNews={toggleNews}
-            />}
-            <ListViewOptions setView={setView} activeView={activeView} />
-        </div>
+        </React.Fragment>
     );
 }
 

@@ -721,6 +721,18 @@ article.list {
 .content-bar__right {
     display: flex;
     border-left: 1px solid #ebebeb;
+
+    @include phone {
+        display: none;
+    }
+}
+
+.content-bar__right--mobile {
+    display: none;
+
+    @include phone {
+        display: flex;
+    }
 }
 
 .content-bar__sort {

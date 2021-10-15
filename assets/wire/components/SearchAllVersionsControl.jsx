@@ -7,7 +7,7 @@ import {noNavigationSelected} from 'search/utils';
 function SearchAllVersionsControl({searchAllVersions, toggleSearchAllVersions, activeNavigation}) {
     return !noNavigationSelected(activeNavigation) ? null : (
         <div className="d-flex align-items-center px-2 px-sm-3">
-            <div className="d-flex align-items-center flex-column-reverse flex-md-row">
+            <div className="d-flex align-items-center">
                 <label htmlFor='all-versions' className="mr-2">{gettext('All Versions')}</label>
                 <Toggle
                     id="all-versions"
