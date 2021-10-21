@@ -143,7 +143,7 @@ class BaseSearchService(Service):
                                 {'term': {'original_id': original_id}},
                             ],
                             'must_not': [
-                                {'constant_score': {'filter': {'exists': {'field': 'nextversion'}}}}
+                                {'exists': {'field': 'nextversion'}}
                             ]
                         }
                     }
