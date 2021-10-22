@@ -66,16 +66,111 @@ class BaseSearchService(Service):
     limit_days_setting: Union[None, str] = 'wire_time_limit_days'
     default_sort = [{'versioncreated': 'desc'}]
     default_page_size = 25
+    _matched_ids = []  # array of IDs matched on the request, used when searching all versions
 
     def get(self, req, lookup):
         search = SearchQuery()
+        self.prefill_search_args(search, req)
+
+        if search.args.get('all_versions'):
+            return self._search_all_versions(search, req, lookup)
+        else:
+            self.prefill_search_query(search, req, lookup)
+            self.validate_request(search)
+            self.apply_filters(search)
+            self.gen_source_from_search(search)
+
+            internal_req = self.get_internal_request(search)
+            return self.internal_get(internal_req, search.lookup)
+
+    def on_fetched(self, docs):
+        """Add IDs of the versions that matched the search to the HATEOAS response
+
+        The list of IDs are not guaranteed to be in the ``_items`` response.
+        This is used in the front-end to highlight which version matched the search query,
+        which may not be the last version in the content chain.
+        """
+
+        if self._matched_ids:
+            docs['_links']['matched_ids'] = self._matched_ids
+            self._matched_ids = []
+
+    def _search_all_versions(self, search: SearchQuery, req, lookup):
+        """Search across all versions of items, but return last versions only"""
+
+        search.args['ignore_latest'] = True
         self.prefill_search_query(search, req, lookup)
         self.validate_request(search)
         self.apply_filters(search)
         self.gen_source_from_search(search)
 
+        # Search up to 1,000 items to make sure pagination works
+        # as we're getting all versions here
+        # where as the final response will only include the last version
+        # of each content chain
+        search.source['size'] = 1000
+        search.source['from'] = 0
+
+        internal_req = self.get_internal_request(search)
+        search_results = self.internal_get(internal_req, search.lookup)
+        next_item_ids = []
+        self._matched_ids = []
+
+        for doc in search_results.docs:
+            self._matched_ids.append(doc['_id'])
+            next_item_ids.append(str(self.get_last_version(doc)['_id']))
+
+        # Now run a query only using the IDs from the above search
+        # This final search makes sure pagination still works
+        search.query['bool'] = {'must': {'terms': {'_id': next_item_ids}}}
+        self.gen_source_from_search(search)
         internal_req = self.get_internal_request(search)
         return self.internal_get(internal_req, search.lookup)
+
+    def get_last_version(self, doc):
+        if not doc.get('nextversion'):
+            # This is already the latest version
+            return doc
+        elif doc.get('original_id'):
+            # Attempt to get the last version in the series using Elastic
+            original_id = doc['original_id']
+            req = ParsedRequest()
+            req.args = {
+                'source': json.dumps({
+                    'query': {
+                        'bool': {
+                            'must': [
+                                {'term': {'original_id': original_id}},
+                            ],
+                            'must_not': [
+                                {'exists': {'field': 'nextversion'}}
+                            ]
+                        }
+                    }
+                }),
+                'size': 1,
+            }
+            result = self.internal_get(req=req, lookup=None)
+
+            if result.count():
+                return result[0]
+            else:
+                logger.warning(f'Failed to find the latest version using `original_id="{original_id}"`')
+
+        # Either the item doesn't have ``original_id`` set, or the elastic query didn't find a match
+        # So we resort to a slower method
+        # This can happen for item's that were published prior to this new feature
+        nextversion_id = doc['nextversion']
+        next_doc = self.find_one(req=None, _id=nextversion_id)
+        if next_doc:
+            return self.get_last_version(next_doc)
+        else:
+            # If, for whatever reason, we can't get the next version return the current one.
+            # That way the request will still be fulfilled,
+            # albeit with this content group cut short in versions
+            item_id = doc['_id']
+            logger.warning(f'Failed to find the next doc "{nextversion_id}" for "{item_id}"')
+            return doc
 
     def internal_get(self, req, lookup):
         return super().get(req, lookup)
@@ -89,7 +184,6 @@ class BaseSearchService(Service):
         :param dict lookup: The parsed in lookup dictionary from the endpoint
         """
 
-        self.prefill_search_args(search, req)
         self.prefill_search_lookup(search, lookup)
         self.prefill_search_page(search)
         self.prefill_search_user(search)
@@ -122,7 +216,7 @@ class BaseSearchService(Service):
 
         search.source['query'] = search.query
         search.source['sort'] = search.args.get('sort') or [{'versioncreated': 'desc'}]
-        search.source['size'] = search.args.get('size') or 25
+        search.source['size'] = search.args.get('size') or self.default_page_size
         search.source['from'] = int(search.args.get('from') or 0)
 
         if search.source['from'] >= 1000:

@@ -14,7 +14,7 @@ class NINJSFormatter(BaseFormatter):
                               'body_text', 'body_html', 'slugline', 'keywords',
                               'firstcreated', 'firstpublished', 'source', 'extra', 'annotations', 'located', 'byline',
                               'description_html', 'place', 'embargoed', 'priority', 'genre', 'service', 'subject',
-                              'evolvedfrom', 'decsription_text')
+                              'evolvedfrom', 'original_id', 'decsription_text')
 
     def format_item(self, item, item_type='items'):
         item = item.copy()

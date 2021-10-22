@@ -108,12 +108,16 @@ def publish_item(doc, original):
     doc['publish_schedule'] = parse_date_str(doc.get('publish_schedule'))
     doc.setdefault('wordcount', get_word_count(doc.get('body_html', '')))
     doc.setdefault('charcount', get_char_count(doc.get('body_html', '')))
+    doc['original_id'] = doc['guid']
+
     service = superdesk.get_resource_service('content_api')
     service.datasource = 'items'
 
-    if 'evolvedfrom' in doc:
+    if doc.get('evolvedfrom'):
         parent_item = service.find_one(req=None, _id=doc['evolvedfrom'])
         if parent_item:
+            if parent_item.get("original_id"):
+                doc["original_id"] = parent_item["original_id"]
             doc['ancestors'] = copy(parent_item.get('ancestors', []))
             doc['ancestors'].append(doc['evolvedfrom'])
             doc['bookmarks'] = parent_item.get('bookmarks', [])
@@ -121,6 +125,7 @@ def publish_item(doc, original):
             doc['coverage_id'] = parent_item.get('coverage_id')
         else:
             logger.warning("Failed to find evolvedfrom item %s for %s", doc['evolvedfrom'], doc['guid'])
+
     fix_hrefs(doc)
     logger.debug('publishing %s', doc['guid'])
     for assoc in doc.get('associations', {}).values():

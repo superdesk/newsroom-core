@@ -8,6 +8,7 @@ import {get} from 'lodash';
 
 const READ_ITEMS_STORE = 'read_items';
 const NEWS_ONLY_STORE = 'news_only';
+const SEARCH_ALL_VERSIONS_STORE = 'search_all_versions';
 const FEATURED_ONLY_STORE = 'featured-only';
 const FILTER_TAB = 'filter_tab';
 const ACTIVE_DATE = 'active_date';
@@ -54,6 +55,23 @@ export function getNewsOnlyParam() {
  */
 export function toggleNewsOnlyParam() {
     store.assign(NEWS_ONLY_STORE, {value: !getNewsOnlyParam()});
+}
+
+/**
+ * Get search all versions  value
+ *
+ * @returns {boolean}
+ */
+export function getSearchAllVersionsParam() {
+    return !!((store.get(SEARCH_ALL_VERSIONS_STORE) || {}).value);
+}
+
+/**
+ * Toggles search all versions value
+ *
+ */
+export function toggleSearchAllVersionsParam() {
+    store.assign(SEARCH_ALL_VERSIONS_STORE, {value: !getSearchAllVersionsParam()});
 }
 
 /**

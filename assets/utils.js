@@ -54,6 +54,7 @@ export const SERVER_DATETIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss+0000';
 export const DAY_IN_MINUTES = 24 * 60 - 1;
 export const LIST_ANIMATIONS = getConfig('list_animations', true);
 export const DISPLAY_NEWS_ONLY = getConfig('display_news_only', true);
+export const DISPLAY_ALL_VERSIONS_TOGGLE = getConfig('display_all_versions_toggle', true);
 export const DEFAULT_TIMEZONE = getConfig('default_timezone', 'Australia/Sydney');
 export const KEYCODES = {
     ENTER: 13,

@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {get, isEqual} from 'lodash';
 
-import {gettext, getItemFromArray, DISPLAY_NEWS_ONLY} from 'utils';
+import {gettext, getItemFromArray, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE} from 'utils';
 import {getSingleFilterValue} from 'search/utils';
 
 import {
@@ -12,6 +12,7 @@ import {
     fetchMoreItems,
     previewItem,
     toggleNews,
+    toggleSearchAllVersions,
     downloadVideo,
 } from 'wire/actions';
 
@@ -179,6 +180,9 @@ class WireApp extends BaseApp {
                             newsOnly={this.props.newsOnly}
                             toggleNews={this.props.toggleNews}
                             hideNewsOnly={!(this.props.context === 'wire' && DISPLAY_NEWS_ONLY)}
+                            hideSearchAllVersions={!(this.props.context === 'wire' && DISPLAY_ALL_VERSIONS_TOGGLE)}
+                            searchAllVersions={this.props.searchAllVersions}
+                            toggleSearchAllVersions={this.props.toggleSearchAllVersions}
                         />
                     </nav>
                 </section>,
@@ -279,6 +283,8 @@ WireApp.propTypes = {
     activeNavigation: PropTypes.arrayOf(PropTypes.string),
     toggleNews: PropTypes.func,
     newsOnly: PropTypes.bool,
+    toggleSearchAllVersions: PropTypes.func,
+    searchAllVersions: PropTypes.bool,
     activeTopic: PropTypes.object,
     activeProduct: PropTypes.object,
     activeFilter: PropTypes.object,
@@ -312,6 +318,7 @@ const mapStateToProps = (state) => ({
     navigations: navigationsSelector(state),
     activeNavigation: searchNavigationSelector(state),
     newsOnly: !!get(state, 'wire.newsOnly'),
+    searchAllVersions: !!get(state, 'wire.searchAllVersions'),
     bookmarks: state.bookmarks,
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,
@@ -333,6 +340,10 @@ const mapDispatchToProps = (dispatch) => ({
     fetchItems: () => dispatch(fetchItems()),
     toggleNews: () => {
         dispatch(toggleNews());
+        dispatch(fetchItems());
+    },
+    toggleSearchAllVersions: () => {
+        dispatch(toggleSearchAllVersions());
         dispatch(fetchItems());
     },
     setQuery: (query) => dispatch(setQuery(query)),

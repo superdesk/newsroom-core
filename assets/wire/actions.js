@@ -20,7 +20,7 @@ import {getNavigationUrlParam} from 'search/utils';
 import {searchParamsSelector} from 'search/selectors';
 import {context} from 'selectors';
 
-import {markItemAsRead, toggleNewsOnlyParam} from 'local-store';
+import {markItemAsRead, toggleNewsOnlyParam, toggleSearchAllVersionsParam} from 'local-store';
 import {renderModal, closeModal, setSavedItemsCount} from 'actions';
 
 import {
@@ -108,14 +108,20 @@ export function recieveItem(data) {
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(wireData, readData, newsOnly) {
-    return {type: INIT_DATA, wireData, readData, newsOnly};
+export function initData(wireData, readData, newsOnly, searchAllVersions) {
+    return {type: INIT_DATA, wireData, readData, newsOnly, searchAllVersions};
 }
 
 export const TOGGLE_NEWS = 'TOGGLE_NEWS';
 export function toggleNews() {
     toggleNewsOnlyParam();
     return {type: TOGGLE_NEWS};
+}
+
+export const TOGGLE_SEARCH_ALL_VERSIONS = 'TOGGLE_SEARCH_ALL_VERSIONS';
+export function toggleSearchAllVersions() {
+    toggleSearchAllVersionsParam();
+    return {type: TOGGLE_SEARCH_ALL_VERSIONS};
 }
 
 export function removeItems(items) {
@@ -227,6 +233,7 @@ export function search(state, next) {
     }
 
     const newsOnly = !!get(state, 'wire.newsOnly');
+    const searchAllVersions = !!get(state, 'wire.searchAllVersions');
     const context = get(state, 'context', 'wire');
 
     const params = {
@@ -241,6 +248,7 @@ export function search(state, next) {
         newsOnly,
         product: searchParams.product,
         es_highlight: !searchParams.query ? null : 1,
+        all_versions: !searchAllVersions ? null : 1,
     };
 
     const queryString = Object.keys(params)

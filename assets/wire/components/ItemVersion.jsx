@@ -1,12 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {MatchLabel} from './fields/MatchLabel';
 
 import {formatTime, formatDate, wordCount, characterCount, gettext, isDisplayed, getSlugline} from 'utils';
 
-export default function ItemVersion({version, baseClass, showDivider, onClick, displayConfig}) {
+export default function ItemVersion({version, baseClass, showDivider, onClick, displayConfig, matchedIds}) {
     return (
         <div className={`${baseClass}__versions__item`} onClick={(event) => onClick(version, event)}>
             <div className={`${baseClass}__versions__wrap`}>
+                {!matchedIds.includes(version._id) ? null : (
+                    <MatchLabel />
+                )}
                 <div className={`${baseClass}__versions__time`}>
                     <span>{formatTime(version.versioncreated)}</span>
                 </div>
@@ -42,4 +46,9 @@ ItemVersion.propTypes = {
     showDivider: PropTypes.bool,
     onClick: PropTypes.func.isRequired,
     displayConfig: PropTypes.object,
+    matchedIds: PropTypes.array,
+};
+
+ItemVersion.defaultProps = {
+    matchedIds: [],
 };

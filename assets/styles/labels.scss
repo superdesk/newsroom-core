@@ -68,3 +68,10 @@ $labels-palette: (
     font-weight: 500;
     width: fit-content;
 }
+
+// Generate label modifiers for each theme colour defined
+@each $color, $value in $theme-colors {
+    .label--#{$color} {
+        @include alert-variant(theme-color-level($color, $alert-bg-level), theme-color-level($color, $alert-border-level), theme-color-level($color, $alert-color-level));
+    }
+}
