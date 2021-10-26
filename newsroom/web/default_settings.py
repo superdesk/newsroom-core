@@ -163,7 +163,7 @@ TEMPLATES_AUTO_RELOAD = True
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S+0000'
 
-WEBPACK_ASSETS_URL = os.environ.get('ASSETS_URL')
+WEBPACK_ASSETS_URL = os.environ.get('WEBPACK_ASSETS_URL')
 WEBPACK_SERVER_URL = os.environ.get('WEBPACK_SERVER_URL')
 
 # How many days a new account can stay active before it is approved by admin
