@@ -9,7 +9,7 @@ from newsroom.web.default_settings import ( # noqa
 
 NEWSAPI_URL = env('NEWSAPI_URL', 'http://localhost:5400')
 server_url = urlparse(NEWSAPI_URL)
-URL_PREFIX = env("NEWSAPI_URL_PREFIX", server_url.path.strip("/")) or ""
+URL_PREFIX = env("NEWSAPI_URL_PREFIX", server_url.path.strip("/")) or "api/v1"
 
 QUERY_MAX_PAGE_SIZE = 100
 
