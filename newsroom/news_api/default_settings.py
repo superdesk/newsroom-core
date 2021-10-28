@@ -1,5 +1,3 @@
-import os
-
 from superdesk.default_settings import urlparse
 from newsroom.web.default_settings import ( # noqa
     env,
