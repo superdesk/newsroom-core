@@ -1,5 +1,6 @@
 import os
 
+from superdesk.default_settings import urlparse
 from newsroom.web.default_settings import ( # noqa
     env,
     ELASTICSEARCH_URL,
@@ -8,7 +9,10 @@ from newsroom.web.default_settings import ( # noqa
     CONTENTAPI_ELASTICSEARCH_SETTINGS,
 )
 
-URL_PREFIX = os.environ.get('CONTENT_API_PREFIX', 'api/v1')
+NEWSAPI_URL = env('NEWSAPI_URL', 'http://localhost:5400')
+server_url = urlparse(NEWSAPI_URL)
+URL_PREFIX = env("NEWSAPI_URL_PREFIX", server_url.path.strip("/")) or ""
+
 QUERY_MAX_PAGE_SIZE = 100
 
 BLUEPRINTS = []
