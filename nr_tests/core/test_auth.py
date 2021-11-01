@@ -7,8 +7,8 @@ from superdesk.utils import get_hash
 
 from newsroom.auth.token import verify_auth_token
 from newsroom.auth.views import _is_password_valid
-from tests.core.test_users import init as users_init, ADMIN_USER_ID  # noqa
-from tests.utils import mock_send_email
+from nr_tests.core.test_users import init as users_init, ADMIN_USER_ID  # noqa
+from nr_tests.utils import mock_send_email
 from unittest import mock
 
 disabled_company = ObjectId()

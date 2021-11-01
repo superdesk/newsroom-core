@@ -13,8 +13,8 @@ from newsroom.utils import get_entity_or_404
 from newsroom.notifications import get_user_notifications
 
 from .test_push import get_signature_headers
-from tests.utils import post_json, get_json, mock_send_email
-from tests.fixtures import init_auth  # noqa
+from nr_tests.utils import post_json, get_json, mock_send_email
+from nr_tests.fixtures import init_auth  # noqa
 
 
 test_event: Dict[str, Any] = {

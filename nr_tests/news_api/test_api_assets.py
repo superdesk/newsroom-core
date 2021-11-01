@@ -1,6 +1,6 @@
 import os
 from superdesk.storage.desk_media_storage import SuperdeskGridFSMediaStorage
-from tests.news_api.test_api_audit import audit_check
+from nr_tests.news_api.test_api_audit import audit_check
 
 
 def get_fixture_path(fixture):

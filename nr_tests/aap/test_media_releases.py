@@ -1,8 +1,8 @@
-from tests.fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
-from tests.utils import json, get_json, get_admin_user_id, mock_send_email
-from tests.core.test_download import wire_formats, download_zip_file, items_ids, setup_image
-from tests.core.test_push import get_signature_headers
-from tests.core.test_users import ADMIN_USER_ID
+from nr_tests.fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
+from nr_tests.utils import json, get_json, get_admin_user_id, mock_send_email
+from nr_tests.core.test_download import wire_formats, download_zip_file, items_ids, setup_image
+from nr_tests.core.test_push import get_signature_headers
+from nr_tests.core.test_users import ADMIN_USER_ID
 
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
@@ -15,12 +15,12 @@ import zipfile
 
 
 def test_blueprint_registration(client):
-    resp = client.get('/factcheck')
+    resp = client.get('/media_releases')
     assert resp.status_code == 200
 
 
 def test_item_detail(client):
-    resp = client.get('/factcheck/tag:foo')
+    resp = client.get('/media_releases/tag:foo')
     assert resp.status_code == 200
 
     html = resp.get_data().decode('utf-8')
@@ -28,7 +28,7 @@ def test_item_detail(client):
 
 
 def test_item_json(client):
-    resp = client.get('/factcheck/tag:foo?format=json')
+    resp = client.get('/media_releases/tag:foo?format=json')
     assert resp.status_code == 200
 
     data = json.loads(resp.get_data())
@@ -37,7 +37,7 @@ def test_item_json(client):
 
 
 def get_bookmarks_count(client, user):
-    resp = client.get('/api/factcheck_search?bookmarks=%s' % str(user))
+    resp = client.get('/api/media_releases_search?bookmarks=%s' % str(user))
     assert resp.status_code == 200
     data = json.loads(resp.get_data())
     return data['_meta']['total']
@@ -49,14 +49,14 @@ def test_bookmarks(client, app):
 
     assert 0 == get_bookmarks_count(client, user_id)
 
-    resp = client.post('/factcheck_bookmark', data=json.dumps({
+    resp = client.post('/media_releases_bookmark', data=json.dumps({
         'items': [items[0]['_id']],
     }), content_type='application/json')
     assert resp.status_code == 200
 
     assert 1 == get_bookmarks_count(client, user_id)
 
-    client.delete('/factcheck_bookmark', data=json.dumps({
+    client.delete('/media_releases_bookmark', data=json.dumps({
         'items': [items[0]['_id']],
     }), content_type='application/json')
     assert resp.status_code == 200
@@ -74,7 +74,7 @@ def test_bookmarks_by_section(client, app):
             "description": "Service A",
             "companies": ['1'],
             "sd_product_id": None,
-            "product_type": "factcheck"
+            "product_type": "media_releases"
         }
     ]
 
@@ -89,14 +89,14 @@ def test_bookmarks_by_section(client, app):
 
     assert 0 == get_bookmarks_count(client, PUBLIC_USER_ID)
 
-    resp = client.post('/factcheck_bookmark', data=json.dumps({
+    resp = client.post('/media_releases_bookmark', data=json.dumps({
         'items': [items[0]['_id']],
     }), content_type='application/json')
     assert resp.status_code == 200
 
     assert 1 == get_bookmarks_count(client, PUBLIC_USER_ID)
 
-    client.delete('/factcheck_bookmark', data=json.dumps({
+    client.delete('/media_releases_bookmark', data=json.dumps({
         'items': [items[0]['_id']],
     }), content_type='application/json')
     assert resp.status_code == 200
@@ -106,12 +106,12 @@ def test_bookmarks_by_section(client, app):
 
 def test_item_copy(client, app):
     resp = client.post(
-        '/factcheck/{}/copy'.format(items[0]['_id']),
+        '/media_releases/{}/copy'.format(items[0]['_id']),
         content_type='application/json'
     )
     assert resp.status_code == 200
 
-    resp = client.get('/factcheck/tag:foo?format=json')
+    resp = client.get('/media_releases/tag:foo?format=json')
     data = json.loads(resp.get_data())
     assert 'copies' in data
 
@@ -120,12 +120,12 @@ def test_item_copy(client, app):
 
 
 def test_versions(client):
-    resp = client.get('/factcheck/%s/versions' % items[0]['_id'])
+    resp = client.get('/media_releases/%s/versions' % items[0]['_id'])
     assert 200 == resp.status_code
     data = json.loads(resp.get_data())
     assert len(data.get('_items')) == 0
 
-    resp = client.get('/factcheck/%s/versions' % items[1]['_id'])
+    resp = client.get('/media_releases/%s/versions' % items[1]['_id'])
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
     assert 'tag:weather' == data['_items'][0]['_id']
@@ -137,13 +137,13 @@ def test_search_by_products_id(client, app):
     app.data.insert('items', [
         {'_id': 'foo', 'headline': 'product test', 'products': [{'code': '12345'}]}
     ])
-    resp = client.get('/factcheck/search?q=products.code:12345')
+    resp = client.get('/media_releases/search?q=products.code:12345')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
 
 
 def test_filter_by_product_anonymous_user_gets_all(client):
-    resp = client.get('/factcheck/search?products=%s' % json.dumps({'10': True}))
+    resp = client.get('/media_releases/search?products=%s' % json.dumps({'10': True}))
     data = json.loads(resp.get_data())
     assert 3 == len(data['_items'])
     assert '_aggregations' in data
@@ -153,7 +153,7 @@ def test_logged_in_user_no_product_gets_no_results(client):
     with client.session_transaction() as session:
         session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
-    resp = client.get('/factcheck/search')
+    resp = client.get('/media_releases/search')
     assert 403 == resp.status_code
 
 
@@ -162,7 +162,7 @@ def test_logged_in_user_no_company_gets_no_results(client):
         session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
-    resp = client.get('/factcheck/search')
+    resp = client.get('/media_releases/search')
     assert resp.status_code == 403
 
 
@@ -171,7 +171,7 @@ def test_administrator_gets_all_results(client):
         session['user'] = ADMIN_USER_ID
         session['user_type'] = 'administrator'
 
-    resp = client.get('/factcheck/search')
+    resp = client.get('/media_releases/search')
     data = json.loads(resp.get_data())
     assert 3 == len(data['_items'])
 
@@ -183,51 +183,51 @@ def test_search_filtered_by_users_products(client, app):
         'sd_product_id': 1,
         'companies': ['1'],
         'is_enabled': True,
-        'product_type': 'factcheck'
+        'product_type': 'media_releases'
     }])
 
     with client.session_transaction() as session:
         session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
-    resp = client.get('/factcheck/search')
+    resp = client.get('/media_releases/search')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
 
 
 def test_search_pagination(client):
-    resp = client.get('/factcheck/search?from=25')
+    resp = client.get('/media_releases/search?from=25')
     assert 200 == resp.status_code
     data = json.loads(resp.get_data())
     assert 0 == len(data['_items'])
     assert '_aggregations' not in data
 
-    resp = client.get('/factcheck/search?from=2000')
+    resp = client.get('/media_releases/search?from=2000')
     assert 400 == resp.status_code
 
 
 def test_search_created_from(client):
-    resp = client.get('/factcheck/search?created_from=now/d')
+    resp = client.get('/media_releases/search?created_from=now/d')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
 
-    resp = client.get('/factcheck/search?created_from=now/w')
+    resp = client.get('/media_releases/search?created_from=now/w')
     data = json.loads(resp.get_data())
     assert 1 <= len(data['_items'])
 
-    resp = client.get('/factcheck/search?created_from=now/M')
+    resp = client.get('/media_releases/search?created_from=now/M')
     data = json.loads(resp.get_data())
 
     assert 1 <= len(data['_items'])
 
 
 def test_search_created_to(client):
-    resp = client.get('/factcheck/search?created_to=%s' % datetime.now().strftime('%Y-%m-%d'))
+    resp = client.get('/media_releases/search?created_to=%s' % datetime.now().strftime('%Y-%m-%d'))
     data = json.loads(resp.get_data())
     assert 3 == len(data['_items'])
 
-    resp = client.get('/factcheck/search?created_to=%s&timezone_offset=%s' % (
+    resp = client.get('/media_releases/search?created_to=%s&timezone_offset=%s' % (
         (datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d'),
         -120
     ))
@@ -236,7 +236,7 @@ def test_search_created_to(client):
 
 
 def test_item_detail_access(client, app):
-    item_url = '/factcheck/%s' % items[0]['_id']
+    item_url = '/media_releases/%s' % items[0]['_id']
     data = get_json(client, item_url)
     assert data['_access']
     assert data['body_html']
@@ -257,7 +257,7 @@ def test_item_detail_access(client, app):
         'name': 'matching product',
         'companies': ['1'],
         'is_enabled': True,
-        'product_type': 'factcheck',
+        'product_type': 'media_releases',
         'query': 'slugline:%s' % items[0]['slugline']
     }])
 
@@ -277,10 +277,10 @@ def test_administrator_gets_results_based_on_section_filter(client, app):
         'name': 'product test 2',
         'query': 'headline:Weather',
         'is_enabled': True,
-        'filter_type': 'factcheck'
+        'filter_type': 'media_releases'
     }])
 
-    resp = client.get('/factcheck/search')
+    resp = client.get('/media_releases/search')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
 
@@ -292,31 +292,31 @@ def test_time_limited_access(client, app):
         'query': 'versioncreated:<=now-2d',
         'companies': ['1'],
         'is_enabled': True,
-        'product_type': 'factcheck'
+        'product_type': 'media_releases'
     }])
 
     with client.session_transaction() as session:
         session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
-    resp = client.get('/factcheck/search')
+    resp = client.get('/media_releases/search')
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
 
-    g.settings['wire_time_limit_days']['value'] = 1
-    resp = client.get('/factcheck/search')
+    g.settings['media_releases_time_limit_days']['value'] = 1
+    resp = client.get('/media_releases/search')
     data = json.loads(resp.get_data())
     assert 0 == len(data['_items'])
 
-    g.settings['wire_time_limit_days']['value'] = 100
-    resp = client.get('/factcheck/search')
+    g.settings['media_releases_time_limit_days']['value'] = 100
+    resp = client.get('/media_releases/search')
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
 
-    g.settings['wire_time_limit_days']['value'] = 1
+    g.settings['media_releases_time_limit_days']['value'] = 1
     company = app.data.find_one('companies', req=None, _id=1)
     app.data.update('companies', 1, {'archive_access': True}, company)
-    resp = client.get('/factcheck/search')
+    resp = client.get('/media_releases/search')
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
 
@@ -328,14 +328,14 @@ def test_company_type_filter(client, app):
         'query': 'versioncreated:<=now-2d',
         'companies': ['1'],
         'is_enabled': True,
-        'product_type': 'factcheck'
+        'product_type': 'media_releases'
     }])
 
     with client.session_transaction() as session:
         session['user'] = str(PUBLIC_USER_ID)
         session['user_type'] = 'public'
 
-    resp = client.get('/factcheck/search')
+    resp = client.get('/media_releases/search')
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
 
@@ -346,7 +346,7 @@ def test_company_type_filter(client, app):
     company = app.data.find_one('companies', req=None, _id=1)
     app.data.update('companies', 1, {'company_type': 'test'}, company)
 
-    resp = client.get('/factcheck/search')
+    resp = client.get('/media_releases/search')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert 'WEATHER' == data['_items'][0]['slugline']
@@ -355,7 +355,7 @@ def test_company_type_filter(client, app):
         dict(id='test', wire_must_not={'term': {'service.code': 'b'}}),
     ]
 
-    resp = client.get('/factcheck/search')
+    resp = client.get('/media_releases/search')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert 'WEATHER' != data['_items'][0]['slugline']
@@ -370,7 +370,7 @@ def test_share_items(client, app):
     }])
 
     with app.mail.record_messages() as outbox:
-        resp = client.post('/wire_share?type=factcheck', data=json.dumps({
+        resp = client.post('/wire_share?type=media_releases', data=json.dumps({
             'items': [item['_id'] for item in items],
             'users': [str(user_ids[0])],
             'message': 'Some info message',
@@ -382,14 +382,14 @@ def test_share_items(client, app):
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'From AAP Newsroom: %s' % items[0]['headline']
         assert 'Hi Foo Bar' in outbox[0].body
-        assert 'admin admin (admin@sourcefabric.org) shared ' in outbox[0].body
+        assert 'admin admin' in outbox[0].body
         assert items[0]['headline'] in outbox[0].body
         assert items[1]['headline'] in outbox[0].body
-        assert 'http://localhost:5050/factcheck?item=%s' % parse.quote(items[0]['_id']) in outbox[0].body
-        assert 'http://localhost:5050/factcheck?item=%s' % parse.quote(items[1]['_id']) in outbox[0].body
+        assert 'http://localhost:5050/media_releases?item=%s' % parse.quote(items[0]['_id']) in outbox[0].body
+        assert 'http://localhost:5050/media_releases?item=%s' % parse.quote(items[1]['_id']) in outbox[0].body
         assert 'Some info message' in outbox[0].body
 
-    resp = client.get('/factcheck/{}?format=json'.format(items[0]['_id']))
+    resp = client.get('/media_releases/{}?format=json'.format(items[0]['_id']))
     data = json.loads(resp.get_data())
     assert 'shares' in data
 
@@ -400,21 +400,21 @@ def test_share_items(client, app):
 def test_download(client, app):
     setup_image(client, app)
     for _format in wire_formats:
-        _file = download_zip_file(client, _format['format'], 'factcheck')
+        _file = download_zip_file(client, _format['format'], 'media_releases')
         with zipfile.ZipFile(_file) as zf:
             assert _format['filename'] in zf.namelist()
             content = zf.open(_format['filename']).read()
             if _format.get('test_content'):
                 _format['test_content'](content)
-    history = app.data.find('history', None, None)
-    assert (len(wire_formats) * len(items_ids)) == history.count()
+    history, count = app.data.find('history', None, None)
+    assert (len(wire_formats) * len(items_ids)) == count
     assert 'download' == history[0]['action']
     assert history[0].get('user')
     assert history[0].get('versioncreated') + timedelta(seconds=2) >= utcnow()
     assert history[0].get('item') in items_ids
     assert history[0].get('version')
     assert history[0].get('company') is None
-    assert history[0].get('section') == 'factcheck'
+    assert history[0].get('section') == 'media_releases'
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -439,7 +439,7 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     app.data.insert('history', docs=[{
         'version': '1',
         '_id': 'bar',
-    }], action='download', user=user, section='factcheck')
+    }], action='download', user=user, section='media_releases')
 
     with app.mail.record_messages() as outbox:
         key = b'something random'
@@ -456,7 +456,7 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
         assert notification['item'] == 'bar'
 
     assert len(outbox) == 1
-    assert 'http://localhost:5050/factcheck?item=bar' in outbox[0].body
+    assert 'http://localhost:5050/media_releases?item=bar' in outbox[0].body
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -478,19 +478,13 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         'name': 'product test 2',
         'query': 'service.code:a',
         'is_enabled': True,
-        'filter_type': 'factcheck'
+        'filter_type': 'media_releases'
     }, {
         '_id': 'f-3',
         'name': 'product test 3',
         'query': 'NOT service.code:a',
         'is_enabled': True,
         'filter_type': 'aapX'
-    }, {
-        '_id': 'f-5',
-        'name': 'product test 5',
-        'query': 'NOT service.code:a',
-        'is_enabled': True,
-        'filter_type': 'media_releases'
     }])
 
     app.data.insert('companies', [{
@@ -502,8 +496,7 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
             'agenda': True,
             'wire': True,
             'am_news': True,
-            'media_releases': False,
-            'factcheck': True,
+            'media_releases': True,
         }
     }])
 
@@ -527,7 +520,7 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         "description": "Service A",
         "companies": ['2'],
         "sd_product_id": None,
-        "product_type": "factcheck",
+        "product_type": "media_releases",
     }])
 
     app.data.insert('items', [{
@@ -542,7 +535,7 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         session['user_type'] = 'public'
         session['name'] = 'public'
 
-    resp = client.post('/factcheck_bookmark', data=json.dumps({
+    resp = client.post('/media_releases_bookmark', data=json.dumps({
         'items': ['bar'],
     }), content_type='application/json')
     assert resp.status_code == 200
@@ -562,4 +555,4 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         assert notification['item'] == 'bar'
 
     assert len(outbox) == 1
-    assert 'http://localhost:5050/factcheck?item=bar' in outbox[0].body
+    assert 'http://localhost:5050/media_releases?item=bar' in outbox[0].body
