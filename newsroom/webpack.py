@@ -58,7 +58,6 @@ class NewsroomWebpack(Webpack):
         if app.config.get('WEBPACK_SERVER_URL'):
             try:
                 self.assets = session.get(urljoin(app.config['WEBPACK_SERVER_URL'], 'manifest.json'), timeout=5).json()
-                self.assets_url = app.config['WEBPACK_SERVER_URL']
                 return
             except requests.exceptions.ConnectionError:
                 raise RuntimeError(
