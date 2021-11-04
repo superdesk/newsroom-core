@@ -13,6 +13,7 @@ from werkzeug.datastructures import ImmutableMultiDict
 from flask_babel import gettext
 from superdesk.utc import utcnow
 from superdesk import get_resource_service
+from superdesk.default_settings import strtobool
 
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.products.products import get_products_by_company
@@ -174,9 +175,16 @@ def bookmarks():
 
 @blueprint.route('/wire/search')
 def search():
-    if app.config['PREPEND_EMBARGOED_TO_WIRE_SEARCH']:
+    if 'prepend_embargoed' in request.args or app.config['PREPEND_EMBARGOED_TO_WIRE_SEARCH']:
         args = request.args.to_dict()
-        args['prepend_embargoed'] = True
+        args['prepend_embargoed'] = strtobool(
+            str(
+                request.args.get(
+                    'prepend_embargoed',
+                    app.config['PREPEND_EMBARGOED_TO_WIRE_SEARCH']
+                )
+            )
+        )
         request.args = ImmutableMultiDict(args)
     response = get_internal('wire_search')
     return send_response('wire_search', response)

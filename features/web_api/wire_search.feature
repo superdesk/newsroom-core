@@ -62,6 +62,11 @@ Feature: Wire Search
         """
         ["published-1", "embargo-2", "embargo-3", "published-2", "embargo-1", "published-3", "embargo-4"]
         """
+        When we get "/wire/search?prepend_embargoed=0"
+        Then we get the following order
+        """
+        ["published-1", "embargo-2", "embargo-3", "published-2", "embargo-1", "published-3", "embargo-4"]
+        """
         When we get "/wire/search?prepend_embargoed=1"
         Then we get the following order
         """
@@ -72,6 +77,16 @@ Feature: Wire Search
         {"PREPEND_EMBARGOED_TO_WIRE_SEARCH": true}
         """
         When we get "/wire/search"
+        Then we get the following order
+        """
+        ["embargo-2", "embargo-1", "published-1", "embargo-3", "published-2", "published-3", "embargo-4"]
+        """
+        When we get "/wire/search?prepend_embargoed=0"
+        Then we get the following order
+        """
+        ["published-1", "embargo-2", "embargo-3", "published-2", "embargo-1", "published-3", "embargo-4"]
+        """
+        When we get "/wire/search?prepend_embargoed=1"
         Then we get the following order
         """
         ["embargo-2", "embargo-1", "published-1", "embargo-3", "published-2", "published-3", "embargo-4"]
