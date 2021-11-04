@@ -6,7 +6,7 @@ from superdesk import get_resource_service
 
 from newsroom.auth import get_user_by_email
 from newsroom.utils import get_user_dict, get_company_dict, is_valid_login
-from newsroom.tests.users import test_login_succeeds_for_admin
+from newsroom.tests.users import test_login_succeeds_for_admin, init as user_init  # noqa
 from unittest import mock
 
 from tests.utils import mock_send_email
