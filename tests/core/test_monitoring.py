@@ -1,7 +1,7 @@
 from flask import json
 from pytest import fixture
 from bson import ObjectId
-from newsroom.tests.users import init as test_login_succeeds_for_admin, init as user_init  # noqa
+from newsroom.tests.users import test_login_succeeds_for_admin, init as user_init  # noqa
 from ..fixtures import PUBLIC_USER_ID
 from newsroom.monitoring.email_alerts import MonitoringEmailAlerts
 from unittest import mock
