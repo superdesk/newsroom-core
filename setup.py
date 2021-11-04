@@ -12,7 +12,7 @@ with open(requirements_txt_path, 'r') as r:
     requirements = [
         line.rsplit('\n', 1)[0]
         for line in r.readlines()
-        if line.rsplit('\n', 1)[0] and not line.startswith('#') and not 'superdesk-core.git' in line
+        if line.rsplit('\n', 1)[0] and not line.startswith('#') and 'superdesk-core.git' not in line
     ] + ['superdesk-core @ https://github.com/superdesk/superdesk-core/tarball/develop#egg=Superdesk-Core']
 
 setup(
