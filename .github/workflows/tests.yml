@@ -14,7 +14,7 @@ jobs:
       - name: setup python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.6
+          python-version: 3.8
 
       - name: docker-compose
         run: docker-compose -f .actions-docker-compose.yml up -d
@@ -30,7 +30,7 @@ jobs:
 
       - name: pip install
         run: |
-             python -m pip install --upgrade 'pip<21.3' wheel setuptools
+             python -m pip install --upgrade pip wheel setuptools
              pip install -r dev-requirements.txt
 
       - name: pytest
@@ -48,7 +48,7 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v1
         with:
-          node-version: 12.x
+          node-version: 14.x
 
       - name: cache npm
         uses: actions/cache@v2
