@@ -4,18 +4,62 @@ services:
         image: redis:alpine
         ports:
             - "6379:6379"
+        networks:
+            - newsroom
 
     mongo:
         image: mongo:3.6
         ports:
             - "27017:27017"
-        tmpfs:
-            - /data/db
+        networks:
+            - newsroom
 
     elastic:
         image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
         ports:
             - "9200:9200"
+        networks:
+            - newsroom
         environment:
             - discovery.type=single-node
+    
+    server:
+        build: ./docker/server
+        ports:
+            - "5050:5050"
+            - "5150:5150"
+        networks:
+            - newsroom
+        volumes:
+            - ./dump:/opt/newsroom/dump
+        depends_on:
+            - elastic
+            - redis
+            - mongo
+            - client
+        environment:
+            - WEB_CONCURRENCY=2
+            - WEBPACK_SERVER_URL=http://client:8080
+            - WEBPACK_ASSETS_URL=http://localhost:8080
+            - MONGO_URI=mongodb://mongo/newsroom
+            - CONTENTAPI_MONGO_URI=mongodb://mongo/newsroom
+            - ELASTICSEARCH_URL=http://elastic:9200
+            - ELASTICSEARCH_INDEX=newsroom
+            - CELERY_BROKER_URL=redis://redis:6379/1
+            - REDIS_URL=redis://redis:6379/1
+            - DEFAULT_TIMEZONE=Europe/Prague
+            - SECRET_KEY=newsroom
+            - NEWSROOM_DEBUG=true
 
+    client:
+        build: ./docker/client
+        ports:
+            - "8080:8080"
+        networks:
+            - newsroom
+        volumes:
+            - .:/opt/client/node_modules/newsroom-core
+
+networks:
+    newsroom:
+        driver: bridge
