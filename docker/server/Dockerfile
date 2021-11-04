@@ -37,5 +37,5 @@ COPY . .
 # fix line endings when running docker on windows
 RUN dos2unix scripts/start.sh
 
-ENTRYPOINT ["sh", "/opt/newsroom/scripts/start.sh"]
+ENTRYPOINT ["bash", "/opt/newsroom/scripts/start.sh"]
 CMD ["honcho", "start", "-p 5050"]
