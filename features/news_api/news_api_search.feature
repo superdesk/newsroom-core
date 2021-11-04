@@ -455,7 +455,6 @@ Feature: News API News Search
      """
 
   @rate_limit
-  @notification
   Scenario: X-RateLimit-Remaining header is set in response
     Given "items"
         """
@@ -480,7 +479,6 @@ Feature: News API News Search
       """
 
   @rate_limit
-  @notification
   Scenario: X-RateLimit-Reset header is set in response
     Given "items"
         """
