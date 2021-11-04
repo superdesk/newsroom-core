@@ -35,15 +35,6 @@ def test_return_search_for_users(client):
     assert 'John' in response.get_data(as_text=True)
 
 
-def test_login_succeeds_for_admin(client):
-    response = client.post(
-        url_for('auth.login'),
-        data={'email': 'admin@sourcefabric.org', 'password': 'admin'},
-        follow_redirects=True
-    )
-    assert response.status_code == 200
-
-
 def test_reset_password_token_sent_for_user_succeeds(app, client):
     test_login_succeeds_for_admin(client)
     # Insert a new user
