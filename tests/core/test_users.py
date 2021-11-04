@@ -1,33 +1,15 @@
 from bson import ObjectId
 from flask import json
 from flask import url_for
-from pytest import fixture
 from datetime import datetime, timedelta
 from superdesk import get_resource_service
 
 from newsroom.auth import get_user_by_email
 from newsroom.utils import get_user_dict, get_company_dict, is_valid_login
+from newsroom.tests.users import test_login_succeeds_for_admin, init as user_init  # noqa
 from unittest import mock
 
 from tests.utils import mock_send_email
-
-ADMIN_USER_ID = '5cc94b99bc4316684dc7dc07'
-
-
-@fixture(autouse=True)
-def init(app):
-    app.data.insert('users', [{
-        '_id': ObjectId(ADMIN_USER_ID),
-        'first_name': 'admin',
-        'last_name': 'admin',
-        'email': 'admin@sourcefabric.org',
-        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
-        'user_type': 'administrator',
-        'is_validated': True,
-        'is_enabled': True,
-        'is_approved': True,
-        'receive_email': True,
-    }])
 
 
 def test_user_list_fails_for_anonymous_user(client):
@@ -51,15 +33,6 @@ def test_return_search_for_users(client):
 
     response = client.get('/users/search?q=jo')
     assert 'John' in response.get_data(as_text=True)
-
-
-def test_login_succeeds_for_admin(client):
-    response = client.post(
-        url_for('auth.login'),
-        data={'email': 'admin@sourcefabric.org', 'password': 'admin'},
-        follow_redirects=True
-    )
-    assert response.status_code == 200
 
 
 def test_reset_password_token_sent_for_user_succeeds(app, client):

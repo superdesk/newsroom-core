@@ -2,7 +2,7 @@ from tests.fixtures import items, init_items, init_auth, init_company, PUBLIC_US
 from tests.utils import json, get_json, get_admin_user_id, mock_send_email
 from tests.core.test_download import wire_formats, download_zip_file, items_ids, setup_image
 from tests.core.test_push import get_signature_headers
-from tests.core.test_users import ADMIN_USER_ID
+from newsroom.tests.users import ADMIN_USER_ID
 
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
