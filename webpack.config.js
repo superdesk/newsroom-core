@@ -96,5 +96,9 @@ module.exports = {
             name: 'common',
             minChunks: Infinity,
         }),
-    ]
+    ],
+    devServer: {
+        compress: true,
+        disableHostCheck: true,
+    },
 };
