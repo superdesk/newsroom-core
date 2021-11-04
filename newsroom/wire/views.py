@@ -9,6 +9,7 @@ from flask import current_app as app, request, jsonify, url_for
 from eve.render import send_response
 from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
+from werkzeug.datastructures import ImmutableMultiDict
 from flask_babel import gettext
 from superdesk.utc import utcnow
 from superdesk import get_resource_service
@@ -173,6 +174,10 @@ def bookmarks():
 
 @blueprint.route('/wire/search')
 def search():
+    if app.config['PREPEND_EMBARGOED_TO_WIRE_SEARCH']:
+        args = request.args.to_dict()
+        args['prepend_embargoed'] = True
+        request.args = ImmutableMultiDict(args)
     response = get_internal('wire_search')
     return send_response('wire_search', response)
 
