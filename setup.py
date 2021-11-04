@@ -6,7 +6,14 @@ from setuptools import setup, find_packages
 requirements_txt_path = Path(__file__).parent.absolute() / 'requirements.txt'
 
 with open(requirements_txt_path, 'r') as r:
-    requirements = [line.rsplit('\n', 1)[0] for line in r.readlines()]
+    # Continue to use requirements.txt
+    # but replace superdesk-core with setuptools equivalent syntax
+    # This is so we don't have to update customer repos
+    requirements = [
+        line.rsplit('\n', 1)[0]
+        for line in r.readlines()
+        if line.rsplit('\n', 1)[0] and not line.startswith('#') and not 'superdesk-core.git' in line
+    ] + ['superdesk-core @ https://github.com/superdesk/superdesk-core/tarball/develop#egg=Superdesk-Core']
 
 setup(
     name='Newsroom-Core',
