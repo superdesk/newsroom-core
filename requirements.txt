@@ -9,5 +9,6 @@ gunicorn>=20.0.4,<20.1
 PyRTF3>=0.47.5
 xhtml2pdf>=0.2.4
 
-superdesk-core==2.3.4
+# Use develop branch for now (until 2.4 is released, to fix inclusion of `tests` from Superdesk)
+git+https://github.com/superdesk/superdesk-core.git@develop#egg=superdesk-core
 superdesk-planning==2.3.1

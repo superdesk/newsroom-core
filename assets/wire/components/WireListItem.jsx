@@ -5,12 +5,12 @@ import {get} from 'lodash';
 
 import {
     gettext,
-    fullDate,
     wordCount,
     characterCount,
     LIST_ANIMATIONS,
     getSlugline,
     getConfig,
+    isMobilePhone,
 } from 'utils';
 import {
     getPicture,
@@ -36,6 +36,12 @@ export const DISPLAY_WORD_COUNT = getConfig('display_word_count');
 export const DISPLAY_CHAR_COUNT = getConfig('display_char_count');
 
 const DEFAULT_META_FIELDS = ['source', 'charcount', 'versioncreated'];
+const DEFAULT_COMPACT_META_FIELDS = ['versioncreated'];
+const DEFAULT_SHOW_ACTION_ICONS = {
+    large: true,
+    compact: true,
+    mobile: false,
+};
 
 class WireListItem extends React.Component {
     constructor(props) {
@@ -115,6 +121,14 @@ class WireListItem extends React.Component {
         const videos = getVideos(item);
         const isMarketPlace = this.props.context === 'aapX';
         const fields = listConfig.metadata_fields || DEFAULT_META_FIELDS;
+        const compactFields = listConfig.compact_metadata_fields || DEFAULT_COMPACT_META_FIELDS;
+        const showActionIconsConfig = listConfig.show_list_action_icons || DEFAULT_SHOW_ACTION_ICONS;
+        const showListActionIcons = isMobilePhone() ?
+            showActionIconsConfig.mobile : (
+                isExtended ?
+                    showActionIconsConfig.large :
+                    showActionIconsConfig.compact
+            );
 
         return (
             <article
@@ -216,11 +230,16 @@ class WireListItem extends React.Component {
                         {!isExtended && (
                             <div className="wire-articles__item__meta">
                                 <div className="wire-articles__item__meta-info">
-                                    <time
-                                        dateTime={fullDate(item.versioncreated)}
-                                    >
-                                        {fullDate(item.versioncreated)}
-                                    </time>
+                                    <span>
+                                        <FieldComponents
+                                            config={compactFields}
+                                            item={item}
+                                            fieldProps={{
+                                                listConfig,
+                                                isItemDetail: false,
+                                            }}
+                                        />
+                                    </span>
                                 </div>
                             </div>
                         )}
@@ -270,8 +289,8 @@ class WireListItem extends React.Component {
                             showActions={this.props.showActions}
                         />
 
-                        {this.props.actions.map(
-                            (action) =>
+                        {!showListActionIcons ? null : this.props.actions.map(
+                            (action) => (
                                 action.shortcut && (
                                     <ActionButton
                                         key={action.name}
@@ -287,6 +306,7 @@ class WireListItem extends React.Component {
                                         item={this.props.item}
                                     />
                                 )
+                            )
                         )}
                     </div>
                 </div>
