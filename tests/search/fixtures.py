@@ -9,13 +9,29 @@ COMPANY_2 = ObjectId('5e659f3ff5db68883df561b1')
 COMPANY_3 = ObjectId('5e659f3ff5db68883df561b2')
 
 USERS = [
-    {'_id': ADMIN_USER_ID, 'company': COMPANY_1, 'user_type': 'administrator'},
-    {'_id': PUBLIC_USER_ID, 'company': COMPANY_2},
-    {'_id': TEST_USER_ID, 'company': COMPANY_3}
+    {
+        '_id': ADMIN_USER_ID, 'company': COMPANY_1, 'user_type': 'administrator',
+        'first_name': 'admin', 'last_name': 'admin',
+        'email': 'admin@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'is_validated': True, 'is_enabled': True, 'is_approved': True
+    },
+    {
+        '_id': PUBLIC_USER_ID, 'company': COMPANY_2,
+        'email': 'public@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'is_validated': True, 'is_enabled': True, 'is_approved': True
+    },
+    {
+        '_id': TEST_USER_ID, 'company': COMPANY_3,
+        'email': 'test@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'is_validated': True, 'is_enabled': True, 'is_approved': True
+    }
 ]
 
 COMPANIES = [
-    {'_id': COMPANY_1, 'name': 'Press co.', 'is_enabled': False, 'company_type': 'internal'},
+    {'_id': COMPANY_1, 'name': 'Press co.', 'is_enabled': True, 'company_type': 'internal'},
     {'_id': COMPANY_2, 'name': 'Company co.', 'is_enabled': True, 'company_type': 'public', 'archive_access': False},
     {'_id': COMPANY_3, 'name': 'Foo bar co.', 'is_enabled': True, 'company_type': 'test', 'archive_access': True}
 ]

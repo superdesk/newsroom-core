@@ -73,7 +73,7 @@ class BaseSearchService(Service):
         self.prefill_search_args(search, req)
 
         if search.args.get('all_versions'):
-            return self._search_all_versions(search, req, lookup)
+            response = self._search_all_versions(search, req, lookup)
         else:
             self.prefill_search_query(search, req, lookup)
             self.validate_request(search)
@@ -81,7 +81,12 @@ class BaseSearchService(Service):
             self.gen_source_from_search(search)
 
             internal_req = self.get_internal_request(search)
-            return self.internal_get(internal_req, search.lookup)
+            response = self.internal_get(internal_req, search.lookup)
+
+        if search.args.get('prepend_embargoed'):
+            self.prepend_embargoed_items_to_response(response, req, lookup)
+
+        return response
 
     def on_fetched(self, docs):
         """Add IDs of the versions that matched the search to the HATEOAS response
@@ -194,16 +199,20 @@ class BaseSearchService(Service):
         self.prefill_search_items(search)
         self.prefill_search_highlights(search, req)
 
-    def apply_filters(self, search):
+    def apply_filters(self, search, include_request_filters=True):
         """ Generate and apply the different search filters
 
         :param SearchQuery search: the search query instance
+        :param bool include_request_filters: appends filters from the request arguments
         """
         self.apply_section_filter(search)
         self.apply_company_filter(search)
         self.apply_time_limit_filter(search)
         self.apply_products_filter(search)
-        self.apply_request_filter(search)
+
+        if include_request_filters:
+            self.apply_request_filter(search)
+            self.apply_embargoed_filter(search)
 
         if len(search.query['bool'].get('should', [])):
             search.query['bool']['minimum_should_match'] = 1
@@ -215,7 +224,7 @@ class BaseSearchService(Service):
         """
 
         search.source['query'] = search.query
-        search.source['sort'] = search.args.get('sort') or [{'versioncreated': 'desc'}]
+        search.source['sort'] = search.args.get('sort') or self.default_sort
         search.source['size'] = search.args.get('size') or self.default_page_size
         search.source['from'] = int(search.args.get('from') or 0)
 
@@ -582,3 +591,36 @@ class BaseSearchService(Service):
                 search.source['post_filter']['bool']['must'].append(
                     self.versioncreated_range(search.args)
                 )
+
+    def apply_embargoed_filter(self, search):
+        """Ignore embargoed items in initial search if we're prepending them anyway"""
+
+        if search.args.get('prepend_embargoed'):
+            search.query['bool']['must_not'].append({
+                'range': {
+                    'embargoed': {
+                        'gt': 'now'
+                    }
+                }
+            })
+
+    def prepend_embargoed_items_to_response(self, response, req, lookup):
+        search = SearchQuery()
+        self.prefill_search_args(search, req)
+        self.prefill_search_query(search, req, lookup)
+        self.apply_filters(search, include_request_filters=False)
+
+        search.query['bool']['must'].append({
+            'range': {
+                'embargoed': {
+                    'gt': 'now'
+                }
+            }
+        })
+
+        self.gen_source_from_search(search)
+        internal_req = self.get_internal_request(search)
+        embargoed_response = self.internal_get(internal_req, search.lookup)
+
+        if embargoed_response.count():
+            response.docs = embargoed_response.docs + response.docs
