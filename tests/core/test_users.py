@@ -1,33 +1,15 @@
 from bson import ObjectId
 from flask import json
 from flask import url_for
-from pytest import fixture
 from datetime import datetime, timedelta
 from superdesk import get_resource_service
 
 from newsroom.auth import get_user_by_email
 from newsroom.utils import get_user_dict, get_company_dict, is_valid_login
+from newsroom.tests.users import test_login_succeeds_for_admin
 from unittest import mock
 
 from tests.utils import mock_send_email
-
-ADMIN_USER_ID = '5cc94b99bc4316684dc7dc07'
-
-
-@fixture(autouse=True)
-def init(app):
-    app.data.insert('users', [{
-        '_id': ObjectId(ADMIN_USER_ID),
-        'first_name': 'admin',
-        'last_name': 'admin',
-        'email': 'admin@sourcefabric.org',
-        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
-        'user_type': 'administrator',
-        'is_validated': True,
-        'is_enabled': True,
-        'is_approved': True,
-        'receive_email': True,
-    }])
 
 
 def test_user_list_fails_for_anonymous_user(client):

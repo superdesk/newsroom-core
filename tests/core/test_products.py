@@ -2,7 +2,7 @@ from bson import ObjectId
 from flask import json
 from pytest import fixture
 
-from .test_users import test_login_succeeds_for_admin, init as user_init  # noqa
+from newsroom.tests.users import test_login_succeeds_for_admin, init as user_init  # noqa
 
 
 @fixture(autouse=True)

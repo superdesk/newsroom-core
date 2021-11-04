@@ -1,6 +1,6 @@
 from flask import json, url_for
 from bson import ObjectId
-from .test_users import test_login_succeeds_for_admin, init as user_init  # noqa
+from newsroom.tests.users import test_login_succeeds_for_admin, init as user_init  # noqa
 from superdesk import get_resource_service
 
 
