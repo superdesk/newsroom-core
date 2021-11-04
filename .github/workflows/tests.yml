@@ -36,8 +36,10 @@ jobs:
       - name: pytest
         run: pytest --ignore=tests/aap/ --disable-pytest-warnings --cov=newsroom
 
-      - name: behave
-        run: behave --format progress2 --logging-level=ERROR
+      - name: behave (API)
+        run: behave --format progress2 --logging-level=ERROR features/news_api
+      - name: behave (Web)
+        run: behave --format progress2 --logging-level=ERROR features/web_api
 
   client:
     runs-on: ubuntu-latest
