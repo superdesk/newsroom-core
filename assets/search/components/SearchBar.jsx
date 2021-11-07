@@ -62,7 +62,12 @@ class SearchBar extends React.Component {
                             onChange={this.onChange}
                         />
                         <div className='search__form__buttons'>
-                            <button className='btn search__clear' aria-label={gettext('Search clear')} onClick={this.onClear}>
+                            <button
+                                className='btn search__clear'
+                                aria-label={gettext('Search clear')}
+                                onClick={this.onClear}
+                                type="reset"
+                            >
                                 <img src='/static/search_clear.png' width='16' height='16'/>
                             </button>
                             <button className='btn btn-outline-secondary' type='submit'>
