@@ -2,7 +2,7 @@ from urllib import parse
 
 from bson import ObjectId
 from superdesk import get_resource_service
-from flask import json, jsonify, abort, session, render_template, current_app as app
+from flask import json, jsonify, abort, session, current_app as app
 from flask_babel import gettext
 
 from newsroom.topics import blueprint

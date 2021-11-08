@@ -105,7 +105,7 @@ def test_delete_topic(client):
         assert 0 == len(data['_items'])
 
 
-@mock.patch('newsroom.topics.views.send_email', mock_send_email)
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_share_wire_topics(client, app):
     topic_ids = app.data.insert('topics', [topic])
     topic['_id'] = topic_ids[0]
@@ -132,7 +132,7 @@ def test_share_wire_topics(client, app):
         assert '/wire' in outbox[0].body
 
 
-@mock.patch('newsroom.topics.views.send_email', mock_send_email)
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_share_agenda_topics(client, app):
     topic_ids = app.data.insert('topics', [agenda_topic])
     agenda_topic['_id'] = topic_ids[0]
