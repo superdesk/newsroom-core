@@ -1,4 +1,5 @@
 import base64
+from typing import List
 from superdesk.emails import SuperdeskMessage  # it handles some encoding issues
 from flask import current_app, render_template, url_for
 from flask_babel import gettext
@@ -63,17 +64,19 @@ def send_email(to, subject, text_body, html_body=None, sender=None, attachments_
 
 
 def send_new_signup_email(user):
-    app_name = current_app.config['SITE_NAME']
-    url = url_for('settings.app', app_id='users', _external=True)
-    recipients = current_app.config['SIGNUP_EMAIL_RECIPIENTS'].split(',')
-    subject = gettext('A new newsroom signup request')
-    text_body = render_template(
-        'signup_request_email.txt',
-        app_name=app_name,
+    send_template_email(
+        to=current_app.config['SIGNUP_EMAIL_RECIPIENTS'].split(','),
+        subject=gettext('A new newsroom signup request'),
+        template="signup_request_email",
+        url=url_for('settings.app', app_id='users', _external=True),
         user=user,
-        url=url)
+    )
 
-    send_email(to=recipients, subject=subject, text_body=text_body)
+
+def send_template_email(to: List[str], subject: str, template: str, **kwargs):
+    text_body = render_template(f'{template}.txt', **kwargs)
+    html_body = render_template(f'{template}.html', **kwargs)
+    send_email(to=to, subject=subject, text_body=text_body, html_body=html_body)
 
 
 def send_validate_account_email(user_name, user_email, token):

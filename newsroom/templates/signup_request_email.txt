@@ -17,5 +17,4 @@ Please go to {{url}} to create a new user.
 
 
 Regards,
-{{app_name}}
-
+{{config.SITE_NAME}}

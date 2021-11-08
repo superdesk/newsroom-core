@@ -1,0 +1,29 @@
+<p>Hi {{app_name}} Administrator,</p>
+
+<p>There's a new sign up request with the following details:</p>
+
+<dl>
+    <dt>First Name:</dt>
+    <dd>{{user.first_name}}</dd>
+    <dt>Last Name:</dt>
+    <dd>{{user.last_name}}</dd>
+    <dt>Email:</dt>
+    <dd>{{user.email}}</dd>
+    <dt>Telephone:</dt>
+    <dd>{{user.phone}}</dd>
+    <dt>Country:</dt>
+    <dd>{{user.country}}</dd>
+    <dt>Company:</dt>
+    <dd>{{user.company}}</dd>
+    <dt>Occupation:</dt>
+    <dd>{{user.occupation}}</dd>
+    <dt>Company Size:</dt>
+    <dd>{{user.company_size}}</dd>
+</dl>
+
+<p>Please go to <a href="{{url}}" title="User settings">User settings</a> to create a new user.</p>
+
+<p>
+Regards,
+{{config.SITE_NAME}}
+</p>
