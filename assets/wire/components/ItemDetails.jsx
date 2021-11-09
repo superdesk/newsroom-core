@@ -34,6 +34,7 @@ import ArticleBody from 'ui/components/ArticleBody';
 import ArticleAuthor from 'ui/components/ArticleAuthor';
 import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 import PreviewEdnote from './PreviewEdnote';
+import {Authors} from './fields/Authors';
 
 
 function ItemDetails({
@@ -91,6 +92,10 @@ function ItemDetails({
                         <ArticleContentInfoWrapper>
                             {isDisplayed('tags_section', detailsConfig) &&
                                 <PreviewTags item={item} isItemDetail={true} displayConfig={detailsConfig}/>}
+
+                            {!isDisplayed('authors', detailsConfig) ? null : (
+                                <Authors item={item} />
+                            )}
 
                             {isDisplayed('ednotes_section', detailsConfig) &&
                                 <PreviewEdnote item={item} />}
