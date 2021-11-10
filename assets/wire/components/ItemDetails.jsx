@@ -93,7 +93,7 @@ function ItemDetails({
                             {isDisplayed('tags_section', detailsConfig) &&
                                 <PreviewTags item={item} isItemDetail={true} displayConfig={detailsConfig}/>}
 
-                            {!isDisplayed('authors', detailsConfig) ? null : (
+                            {isDisplayed('authors', detailsConfig) && (
                                 <Authors item={item} />
                             )}
 

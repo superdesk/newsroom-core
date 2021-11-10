@@ -97,7 +97,7 @@ class WirePreview extends React.PureComponent {
                     {isDisplayed('tags_section', previewConfig) &&
                         <PreviewTags item={item} isItemDetail={false} displayConfig={previewConfig}/>}
 
-                    {!isDisplayed('authors', previewConfig) ? null : (
+                    {isDisplayed('authors', previewConfig) && (
                         <Authors item={item} />
                     )}
 
