@@ -48,7 +48,11 @@ export default function ArticlePicture({isKilled, picture, isItemDetails, isCust
         <img src={renditions.href} className={classes}/>}
         <figcaption className='wire-column__preview__caption'>
             {caption}
-            {bylineHref && <a href={bylineHref} target='_blank'> {byline}</a>}
+            {bylineHref ? (
+                <a href={bylineHref} target='_blank'> {byline}</a>
+            ) : (
+                <span> {byline}</span>
+            )}
             {credits && <p>{`${gettext('Credits ')} `}{credits}</p>}
         </figcaption>
     </figure>);
