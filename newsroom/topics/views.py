@@ -10,7 +10,7 @@ from newsroom.topics.topics import get_user_topics as _get_user_topics
 from newsroom.utils import find_one
 from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required
-from newsroom.utils import get_json_or_400, get_entity_or_404, query_resource
+from newsroom.utils import get_json_or_400, get_entity_or_404
 from newsroom.email import send_template_email
 from newsroom.notifications import push_user_notification, push_company_notification
 
