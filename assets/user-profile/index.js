@@ -1,8 +1,7 @@
 import {render, isWireContext, initWebSocket} from 'utils';
 import UserProfileApp from './components/UserProfileApp';
-import {initData, selectMenu} from './actions';
+import {initData, selectMenu, pushNotification} from './actions';
 import {store} from './store';
-import {pushNotification} from "wire/actions";
 
 if (window.profileData) {
     store.dispatch(initData(window.profileData));
@@ -19,5 +18,3 @@ document.addEventListener('manage_topics', function () {
 }, false);
 
 initWebSocket(store, pushNotification);
-
-console.log('Testing:user-profile');

@@ -49,11 +49,6 @@ export function setNewItemsByTopic(data) {
     return {type: SET_NEW_ITEMS_BY_TOPIC, data};
 }
 
-export function loadTopics(user) {
-    return loadMyTopics();
-    // return server.get(`/users/${user}/topics`);
-}
-
 export function loadMyTopics() {
     return server.get('/topics/my_topics');
 }
@@ -245,7 +240,6 @@ export function toggleNavigationByIds(navigationIds) {
 export function submitFollowTopic(data) {
     return (dispatch, getState) => {
         const user = getState().user;
-        const company = getState().company;
         const userId = get(user, '_id') || user;
 
         const url = `/users/${userId}/topics`;

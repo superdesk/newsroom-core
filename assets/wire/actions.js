@@ -26,7 +26,6 @@ import {renderModal, closeModal, setSavedItemsCount} from 'actions';
 import {
     initParams as initSearchParams,
     setNewItemsByTopic,
-    loadTopics,
     loadMyTopics,
     setTopics,
     loadMyTopic,
@@ -472,7 +471,10 @@ export function pushNotification(push) {
             return dispatch(reloadMyTopics());
 
         case `topic_created:${user}`:
-            return dispatch(reloadTopics(user, true));
+            return dispatch(reloadMyTopics(true));
+
+        case `topic_created:company-${company}`:
+            return dispatch(reloadMyTopics(push.extra && push.extra.user_id === user));
 
         case `saved_items:${user}`:
             return dispatch(setSavedItemsCount(push.extra.count));
@@ -483,26 +485,7 @@ export function pushNotification(push) {
     };
 }
 
-function reloadTopics(user, reloadTopic = false) {
-    return reloadMyTopics(reloadTopic);
-    // return function (dispatch) {
-    //     return loadTopics(user)
-    //         .then((data) => {
-    //             const wireTopics = data._items.filter((topic) => !topic.topic_type || topic.topic_type === 'wire');
-    //             dispatch(setTopics(wireTopics));
-    //
-    //             if (reloadTopic) {
-    //                 const params = new URLSearchParams(window.location.search);
-    //                 if (params.get('topic')) {
-    //                     dispatch(loadMyWireTopic(params.get('topic')));
-    //                 }
-    //             }
-    //         })
-    //         .catch(errorHandler);
-    // };
-}
-
-function reloadMyTopics(reloadTopic = false) {
+export function reloadMyTopics(reloadTopic = false) {
     return function(dispatch) {
         return loadMyTopics()
             .then((data) => {
@@ -517,7 +500,7 @@ function reloadMyTopics(reloadTopic = false) {
                 }
             })
             .catch(errorHandler);
-    }
+    };
 }
 
 export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';

@@ -31,15 +31,14 @@ import {
     toggleFilter,
     initParams as initSearchParams,
     setNewItemsByTopic,
-    loadTopics,
+    loadMyTopics,
     setTopics,
-    loadMyTopic, loadMyTopics,
+    loadMyTopic,
 } from 'search/actions';
 import {searchParamsSelector} from 'search/selectors';
 
 import {clearAgendaDropdownFilters} from '../local-store';
 import {getLocations, getMapSource} from '../maps/utils';
-import {loadMyWireTopic} from "../wire/actions";
 
 const WATCH_URL = '/agenda_watch';
 const WATCH_COVERAGE_URL = '/agenda_coverage_watch';
@@ -472,6 +471,8 @@ export function removeNewItems(data) {
 export function pushNotification(push) {
     return (dispatch, getState) => {
         const user = getState().user;
+        const company = getState().company;
+
         switch (push.event) {
         case 'topic_matches':
             return dispatch(setNewItemsByTopic(push.extra));
@@ -480,10 +481,16 @@ export function pushNotification(push) {
             return dispatch(setAndUpdateNewItems(push.extra));
 
         case `topics:${user}`:
-            return dispatch(reloadTopics(user));
+            return dispatch(reloadMyTopics());
+
+        case `topics:company-${company}`:
+            return dispatch(reloadMyTopics());
 
         case `topic_created:${user}`:
-            return dispatch(reloadTopics(user, true));
+            return dispatch(reloadMyTopics(true));
+
+        case `topic_created:company-${company}`:
+            return dispatch(reloadMyTopics(push.extra && push.extra.user_id === user));
 
         case `saved_items:${user}`:
             return dispatch(setSavedItemsCount(push.extra.count));
@@ -491,41 +498,22 @@ export function pushNotification(push) {
     };
 }
 
-function reloadTopics(user, reloadTopic = false) {
-    return reloadMyTopics(reloadTopic);
-    // return function (dispatch) {
-    //     return loadTopics(user)
-    //         .then((data) => {
-    //             const agendaTopics = data._items.filter((topic) => topic.topic_type === 'agenda');
-    //             dispatch(setTopics(agendaTopics));
-    //
-    //             if (reloadTopic) {
-    //                 const params = new URLSearchParams(window.location.search);
-    //                 if (params.get('topic')) {
-    //                     dispatch(loadMyAgendaTopic(params.get('topic')));
-    //                 }
-    //             }
-    //         })
-    //         .catch(errorHandler);
-    // };
-}
-
-function reloadMyTopics(reloadTopic = false) {
+export function reloadMyTopics(reloadTopic = false) {
     return function(dispatch) {
         return loadMyTopics()
             .then((data) => {
-                const wireTopics = data.filter((topic) => topic.topic_type === 'agenda');
-                dispatch(setTopics(wireTopics));
+                const agendaTopics = data.filter((topic) => topic.topic_type === 'agenda');
+                dispatch(setTopics(agendaTopics));
 
                 if (reloadTopic) {
                     const params = new URLSearchParams(window.location.search);
                     if (params.get('topic')) {
-                        dispatch(loadMyWireTopic(params.get('topic')));
+                        dispatch(loadMyAgendaTopic(params.get('topic')));
                     }
                 }
             })
             .catch(errorHandler);
-    }
+    };
 }
 
 export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
