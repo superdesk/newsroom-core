@@ -226,7 +226,9 @@ def test_send_immediate_alerts(client, app):
     with app.mail.record_messages() as outbox:
         MonitoringEmailAlerts().run(immediate=True)
         assert len(outbox) == 1
-        assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
+        assert len(outbox[0].recipients) == 2
+        assert 'foo_user2@bar.com' in outbox[0].recipients
+        assert 'foo_user@bar.com' in outbox[0].recipients
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Monitoring Subject'
         assert 'Newsroom Monitoring: W1' in outbox[0].body
@@ -255,7 +257,9 @@ def test_send_one_hour_alerts(client, app):
     with app.mail.record_messages() as outbox:
         MonitoringEmailAlerts().scheduled_worker(even_now)
         assert len(outbox) == 1
-        assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
+        assert len(outbox[0].recipients) == 2
+        assert 'foo_user2@bar.com' in outbox[0].recipients
+        assert 'foo_user@bar.com' in outbox[0].recipients
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Monitoring Subject'
         assert 'Newsroom Monitoring: W1' in outbox[0].body
@@ -284,7 +288,9 @@ def test_send_two_hour_alerts(client, app):
     with app.mail.record_messages() as outbox:
         MonitoringEmailAlerts().scheduled_worker(even_now)
         assert len(outbox) == 1
-        assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
+        assert len(outbox[0].recipients) == 2
+        assert 'foo_user2@bar.com' in outbox[0].recipients
+        assert 'foo_user@bar.com' in outbox[0].recipients
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Monitoring Subject'
         assert 'Newsroom Monitoring: W1' in outbox[0].body
@@ -313,7 +319,9 @@ def test_send_four_hour_alerts(client, app):
     with app.mail.record_messages() as outbox:
         MonitoringEmailAlerts().scheduled_worker(even_now)
         assert len(outbox) == 1
-        assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
+        assert len(outbox[0].recipients) == 2
+        assert 'foo_user2@bar.com' in outbox[0].recipients
+        assert 'foo_user@bar.com' in outbox[0].recipients
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Monitoring Subject'
         assert 'Newsroom Monitoring: W1' in outbox[0].body
@@ -355,7 +363,9 @@ def test_send_daily_alerts(client, app):
     with app.mail.record_messages() as outbox:
         MonitoringEmailAlerts().run()
         assert len(outbox) == 1
-        assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
+        assert len(outbox[0].recipients) == 2
+        assert 'foo_user2@bar.com' in outbox[0].recipients
+        assert 'foo_user@bar.com' in outbox[0].recipients
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Monitoring Subject'
         assert 'Newsroom Monitoring: W1' in outbox[0].body
@@ -398,7 +408,9 @@ def test_send_weekly_alerts(client, app):
     with app.mail.record_messages() as outbox:
         MonitoringEmailAlerts().run()
         assert len(outbox) == 1
-        assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
+        assert len(outbox[0].recipients) == 2
+        assert 'foo_user2@bar.com' in outbox[0].recipients
+        assert 'foo_user@bar.com' in outbox[0].recipients
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Monitoring Subject'
         assert 'Newsroom Monitoring: W1' in outbox[0].body
@@ -427,7 +439,9 @@ def test_send_alerts_respects_last_run_time(client, app):
     with app.mail.record_messages() as outbox:
         MonitoringEmailAlerts().scheduled_worker(even_now)
         assert len(outbox) == 1
-        assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
+        assert len(outbox[0].recipients) == 2
+        assert 'foo_user2@bar.com' in outbox[0].recipients
+        assert 'foo_user@bar.com' in outbox[0].recipients
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Monitoring Subject'
         assert 'Newsroom Monitoring: W1' in outbox[0].body
@@ -563,7 +577,9 @@ def test_last_run_time_always_updated_with_matching_content_immediate(client, ap
     with app.mail.record_messages() as outbox:
         MonitoringEmailAlerts().run(immediate=True)
         assert len(outbox) == 1
-        assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
+        assert len(outbox[0].recipients) == 2
+        assert 'foo_user2@bar.com' in outbox[0].recipients
+        assert 'foo_user@bar.com' in outbox[0].recipients
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Monitoring Subject'
         assert 'Newsroom Monitoring: W1' in outbox[0].body
@@ -596,7 +612,9 @@ def test_last_run_time_always_updated_with_matching_content_scheduled(client, ap
     with app.mail.record_messages() as outbox:
         MonitoringEmailAlerts().scheduled_worker(even_now)
         assert len(outbox) == 1
-        assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
+        assert len(outbox[0].recipients) == 2
+        assert 'foo_user2@bar.com' in outbox[0].recipients
+        assert 'foo_user@bar.com' in outbox[0].recipients
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Monitoring Subject'
         assert 'Newsroom Monitoring: W1' in outbox[0].body
@@ -792,7 +810,9 @@ def test_send_immediate_rtf_attachment_alerts(client, app):
     with app.mail.record_messages() as outbox:
         MonitoringEmailAlerts().run(immediate=True)
         assert len(outbox) == 1
-        assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
+        assert len(outbox[0].recipients) == 2
+        assert 'foo_user2@bar.com' in outbox[0].recipients
+        assert 'foo_user@bar.com' in outbox[0].recipients
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Monitoring Subject'
         assert 'Newsroom Monitoring: W1' in outbox[0].body
@@ -816,7 +836,9 @@ def test_send_immediate_headline_subject_alerts(client, app):
     with app.mail.record_messages() as outbox:
         MonitoringEmailAlerts().run(immediate=True)
         assert len(outbox) == 1
-        assert outbox[0].recipients == ['foo_user@bar.com', 'foo_user2@bar.com']
+        assert len(outbox[0].recipients) == 2
+        assert 'foo_user2@bar.com' in outbox[0].recipients
+        assert 'foo_user@bar.com' in outbox[0].recipients
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'Article headline about product'
         assert 'Newsroom Monitoring: W1' in outbox[0].body
