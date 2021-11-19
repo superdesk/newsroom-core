@@ -17,6 +17,7 @@ import {SET_USER_COMPANY_MONITORING_LIST} from 'monitoring/actions';
 
 import {modalReducer} from 'reducers';
 import {GET_NAVIGATIONS} from 'navigations/actions';
+import {SET_TOPICS} from "../search/actions";
 
 const initialState = {
     user: null,
@@ -54,6 +55,9 @@ export default function itemReducer(state = initialState, action) {
             isLoading: false
         };
     }
+
+    case SET_TOPICS:
+        return {...state, topics: action.topics};
 
     case GET_USER: {
         return {
@@ -159,7 +163,7 @@ export default function itemReducer(state = initialState, action) {
             newState.selectedItem = newSelected;
         }
 
-        return newState;        
+        return newState;
 
     default:
         return state;

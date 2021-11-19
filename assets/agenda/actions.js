@@ -33,12 +33,13 @@ import {
     setNewItemsByTopic,
     loadTopics,
     setTopics,
-    loadMyTopic,
+    loadMyTopic, loadMyTopics,
 } from 'search/actions';
 import {searchParamsSelector} from 'search/selectors';
 
 import {clearAgendaDropdownFilters} from '../local-store';
 import {getLocations, getMapSource} from '../maps/utils';
+import {loadMyWireTopic} from "../wire/actions";
 
 const WATCH_URL = '/agenda_watch';
 const WATCH_COVERAGE_URL = '/agenda_coverage_watch';
@@ -491,21 +492,40 @@ export function pushNotification(push) {
 }
 
 function reloadTopics(user, reloadTopic = false) {
-    return function (dispatch) {
-        return loadTopics(user)
+    return reloadMyTopics(reloadTopic);
+    // return function (dispatch) {
+    //     return loadTopics(user)
+    //         .then((data) => {
+    //             const agendaTopics = data._items.filter((topic) => topic.topic_type === 'agenda');
+    //             dispatch(setTopics(agendaTopics));
+    //
+    //             if (reloadTopic) {
+    //                 const params = new URLSearchParams(window.location.search);
+    //                 if (params.get('topic')) {
+    //                     dispatch(loadMyAgendaTopic(params.get('topic')));
+    //                 }
+    //             }
+    //         })
+    //         .catch(errorHandler);
+    // };
+}
+
+function reloadMyTopics(reloadTopic = false) {
+    return function(dispatch) {
+        return loadMyTopics()
             .then((data) => {
-                const agendaTopics = data._items.filter((topic) => topic.topic_type === 'agenda');
-                dispatch(setTopics(agendaTopics));
+                const wireTopics = data.filter((topic) => topic.topic_type === 'agenda');
+                dispatch(setTopics(wireTopics));
 
                 if (reloadTopic) {
                     const params = new URLSearchParams(window.location.search);
                     if (params.get('topic')) {
-                        dispatch(loadMyAgendaTopic(params.get('topic')));
+                        dispatch(loadMyWireTopic(params.get('topic')));
                     }
                 }
             })
             .catch(errorHandler);
-    };
+    }
 }
 
 export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';

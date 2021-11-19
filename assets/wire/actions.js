@@ -27,6 +27,7 @@ import {
     initParams as initSearchParams,
     setNewItemsByTopic,
     loadTopics,
+    loadMyTopics,
     setTopics,
     loadMyTopic,
 } from 'search/actions';
@@ -455,6 +456,8 @@ export function removeNewItems(data) {
 export function pushNotification(push) {
     return (dispatch, getState) => {
         const user = getState().user;
+        const company = getState().company;
+
         switch (push.event) {
         case 'topic_matches':
             return dispatch(setNewItemsByTopic(push.extra));
@@ -463,7 +466,10 @@ export function pushNotification(push) {
             return dispatch(setNewItems(push.extra));
 
         case `topics:${user}`:
-            return dispatch(reloadTopics(user));
+            return dispatch(reloadMyTopics());
+
+        case `topics:company-${company}`:
+            return dispatch(reloadMyTopics());
 
         case `topic_created:${user}`:
             return dispatch(reloadTopics(user, true));
@@ -478,10 +484,29 @@ export function pushNotification(push) {
 }
 
 function reloadTopics(user, reloadTopic = false) {
-    return function (dispatch) {
-        return loadTopics(user)
+    return reloadMyTopics(reloadTopic);
+    // return function (dispatch) {
+    //     return loadTopics(user)
+    //         .then((data) => {
+    //             const wireTopics = data._items.filter((topic) => !topic.topic_type || topic.topic_type === 'wire');
+    //             dispatch(setTopics(wireTopics));
+    //
+    //             if (reloadTopic) {
+    //                 const params = new URLSearchParams(window.location.search);
+    //                 if (params.get('topic')) {
+    //                     dispatch(loadMyWireTopic(params.get('topic')));
+    //                 }
+    //             }
+    //         })
+    //         .catch(errorHandler);
+    // };
+}
+
+function reloadMyTopics(reloadTopic = false) {
+    return function(dispatch) {
+        return loadMyTopics()
             .then((data) => {
-                const wireTopics = data._items.filter((topic) => !topic.topic_type || topic.topic_type === 'wire');
+                const wireTopics = data.filter((topic) => !topic.topic_type || topic.topic_type === 'wire');
                 dispatch(setTopics(wireTopics));
 
                 if (reloadTopic) {
@@ -492,7 +517,7 @@ function reloadTopics(user, reloadTopic = false) {
                 }
             })
             .catch(errorHandler);
-    };
+    }
 }
 
 export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';

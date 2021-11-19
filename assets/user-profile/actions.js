@@ -173,7 +173,10 @@ export function submitShareTopic(data) {
  *
  */
 export function submitFollowTopic(topic) {
-    return (dispatch) => {
+    return (dispatch, getState) => {
+        topic.company = getState().company;
+
+
         const url = `/topics/${topic._id}`;
         return server.post(url, topic)
             .then(() => dispatch(fetchTopics()))

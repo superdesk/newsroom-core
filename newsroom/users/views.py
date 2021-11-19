@@ -13,7 +13,7 @@ from newsroom.auth.views import send_token, add_token_data, \
 from newsroom.decorator import admin_only, login_required, account_manager_only
 from newsroom.companies import get_user_company_name, get_company_sections_monitoring_data
 from newsroom.notifications.notifications import get_user_notifications
-from newsroom.notifications import push_user_notification
+from newsroom.notifications import push_user_notification, push_company_notification
 from newsroom.topics import get_user_topics
 from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
@@ -180,14 +180,19 @@ def get_topics(_id):
 @login_required
 def post_topic(_id):
     """Creates a user topic"""
-    if flask.session['user'] != str(_id):
+    user = get_user()
+    if str(user['_id']) != str(_id):
         flask.abort(403)
 
     topic = get_json_or_400()
-    topic['user'] = ObjectId(_id)
+    topic['user'] = user['_id']
+    topic['company'] = user.get('company')
 
     ids = get_resource_service('topics').post([topic])
-    push_user_notification('topic_created')
+    if topic.get('is_global'):
+        push_company_notification('topic_created', user_id=str(user['_id']))
+    else:
+        push_user_notification('topic_created')
     return jsonify({'success': True, '_id': ids[0]}), 201
 
 

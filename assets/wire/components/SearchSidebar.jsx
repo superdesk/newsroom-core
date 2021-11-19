@@ -30,7 +30,7 @@ class SearchSidebar extends React.Component {
                 </ul>
                 {this.props.tabs.map((tab) => (
                     <div className='tab-content' key={tab.id}>
-                        <div className={classNames('tab-pane', 'fade', {'show active': this.state.active === tab.id})} role='tabpanel'>
+                        <div className={classNames('tab-pane tab-pane--no-padding', 'fade', {'show active': this.state.active === tab.id})} role='tabpanel'>
                             <tab.component {...this.props.props} />
                         </div>
                     </div>

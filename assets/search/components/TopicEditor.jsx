@@ -55,11 +55,14 @@ class TopicEditor extends React.Component {
 
     updateFormValidity(topic) {
         const original = get(this.props, 'topic') || {};
+        const isDirty = ['label', 'notifications', 'is_global'].some(
+            (field) => get(original, field) !== get(topic, field)
+        );
 
         if (!topic.label) {
             // The topic must have a label so disable the save button
             this.setState({valid: false});
-        } else if (original.label !== topic.label || original.notifications !== topic.notifications) {
+        } else if (isDirty) {
             // If the label or notification have changed, then enable the save button
             this.setState({valid: true});
         } else if (original._id) {
@@ -72,8 +75,8 @@ class TopicEditor extends React.Component {
     onChangeHandler(field) {
         return (event) => {
             const topic = cloneDeep(this.state.topic);
-            const value = field === 'notifications' ?
-                !get(this.state, 'topic.notifications') :
+            const value = ['notifications', 'is_global'].includes(field) ?
+                !get(topic, field) :
                 event.target.value;
 
             set(topic, field, value);

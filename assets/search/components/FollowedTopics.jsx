@@ -31,6 +31,9 @@ class FollowedTopics extends React.Component {
         this.closeEditor = this.closeEditor.bind(this);
         this.getFilteredTopics = this.getFilteredTopics.bind(this);
         this.onTopicChanged = this.onTopicChanged.bind(this);
+        this.toggleGlobal = this.toggleGlobal.bind(this);
+
+        this.state = {showGlobal: false};
 
         this.actions = [{
             name: gettext('Edit'),
@@ -90,7 +93,7 @@ class FollowedTopics extends React.Component {
         }
 
         return this.props.topics.filter(
-            (topic) => topic.topic_type === this.props.topicType
+            (topic) => topic.topic_type === this.props.topicType && topic.is_global === this.state.showGlobal
         );
     }
 
@@ -100,6 +103,10 @@ class FollowedTopics extends React.Component {
 
     isMonitoringAdmin() {
         return this.props.monitoringAdministrator === get(this.props, 'user._id');
+    }
+
+    toggleGlobal() {
+        this.setState((previousState) => ({showGlobal: !previousState.showGlobal}));
     }
 
     render() {
@@ -113,11 +120,29 @@ class FollowedTopics extends React.Component {
         return (
             <div className={containerClasses}>
                 {!editorOpenInFullscreen && (
-                    <div className="row pt-xl-4 pt-3 px-xl-4 flex-grow-1 mr-0">
-                        <TopicList
-                            topics={this.getFilteredTopics()}
-                            actions={this.actions}
-                        />
+                    <div style={{display: 'flex', flexDirection: 'column'}} className="flex-grow-1">
+                        <div className="pt-xl-4 pt-3 px-xl-4 mr-0">
+                            <div className="btn-group btn-group--navbar ml-0 mr-3">
+                                <button
+                                    className={'btn btn-outline-primary' + (!this.state.showGlobal ? ' active' : '')}
+                                    onClick={this.toggleGlobal}
+                                >
+                                    {gettext('Personal')}
+                                </button>
+                                <button
+                                    className={'btn btn-outline-primary' + (this.state.showGlobal ? ' active' : '')}
+                                    onClick={this.toggleGlobal}
+                                >
+                                    {gettext('Global')}
+                                </button>
+                            </div>
+                        </div>
+                        <div className="row pt-xl-4 pt-3 px-xl-4 flex-grow-1 mr-0">
+                            <TopicList
+                                topics={this.getFilteredTopics()}
+                                actions={this.actions}
+                            />
+                        </div>
                     </div>
                 )}
                 {this.props.selectedItem && (this.props.topicType === 'monitoring' ?

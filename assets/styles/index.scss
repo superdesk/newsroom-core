@@ -1040,6 +1040,10 @@ article.list {
         .tab-pane {
             padding: 20px;
 
+            &--no-padding {
+                padding: 0;
+            }
+
             #reset-filter-buffer {
                 height: 80px;
             }

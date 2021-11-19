@@ -50,7 +50,12 @@ export function setNewItemsByTopic(data) {
 }
 
 export function loadTopics(user) {
-    return server.get(`/users/${user}/topics`);
+    return loadMyTopics();
+    // return server.get(`/users/${user}/topics`);
+}
+
+export function loadMyTopics() {
+    return server.get('/topics/my_topics');
 }
 
 export const SET_TOPICS = 'SET_TOPICS';
@@ -240,6 +245,7 @@ export function toggleNavigationByIds(navigationIds) {
 export function submitFollowTopic(data) {
     return (dispatch, getState) => {
         const user = getState().user;
+        const company = getState().company;
         const userId = get(user, '_id') || user;
 
         const url = `/users/${userId}/topics`;
@@ -271,7 +277,7 @@ export function submitShareItem(data) {
             url = 'monitoring/share';
             data.monitoring_profile = get(getState(), 'search.activeNavigation[0]');
         }
-        
+
         if (type === 'agenda') {
             data.items.map((_id) => data.maps.push(getMapSource(getLocations(getState().itemsById[_id]), 2)));
         }

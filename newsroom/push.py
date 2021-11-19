@@ -725,14 +725,19 @@ def notify_agenda_topic_matches(item, users_dict):
 
 def send_topic_notification_emails(item, topics, topic_matches, users):
     for topic in topics:
-        user = users.get(str(topic['user']))
-        if topic['_id'] in topic_matches and user and user.get('receive_email'):
-            send_new_item_notification_email(
-                user,
-                topic['label'],
-                item=item,
-                section=topic.get('topic_type') or 'wire'
-            )
+        if topic['_id'] not in topic_matches:
+            continue
+
+        for user_id in topic.get('subscribers') or []:
+            user = users.get(str(user_id))
+
+            if user and user.get('receive_email'):
+                send_new_item_notification_email(
+                    user,
+                    topic['label'],
+                    item=item,
+                    section=topic.get('topic_type') or 'wire'
+                )
 
 
 # keeping this for testing
