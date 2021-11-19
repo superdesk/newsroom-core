@@ -277,8 +277,16 @@ def test_notify_topic_matches_for_new_item(client, app, mocker):
             user = str(user_ids[0])
             session['user'] = user
 
-        resp = cli.post('users/%s/topics' % user,
-                        json={'label': 'bar', 'query': 'test', 'notifications': True, 'topic_type': 'wire'})
+        resp = cli.post(
+            f'users/{user}/topics',
+            json={
+                'label': 'bar',
+                'query': 'test',
+                'subscribers': [user],
+                'is_global': False,
+                'topic_type': 'wire'
+            }
+        )
         assert 201 == resp.status_code
 
     key = b'something random'
@@ -539,8 +547,22 @@ def test_send_notification_emails(client, app):
     }])
 
     app.data.insert('topics', [
-        {'label': 'topic-1', 'query': 'test', 'user': user_ids[0], 'notifications': True, 'topic_type': 'wire'},
-        {'label': 'topic-2', 'query': 'mock', 'user': user_ids[0], 'notifications': True, 'topic_type': 'wire'}])
+        {
+            'label': 'topic-1',
+            'query': 'test',
+            'user': user_ids[0],
+            'subscribers': [user_ids[0]],
+            'is_global': False,
+            'topic_type': 'wire'
+        }, {
+            'label': 'topic-2',
+            'query': 'mock',
+            'user': user_ids[0],
+            'subscribers': [user_ids[0]],
+            'is_global': False,
+            'topic_type': 'wire'
+        }
+    ])
 
     with client.session_transaction() as session:
         user = str(user_ids[0])

@@ -431,7 +431,13 @@ def test_notify_topic_matches_for_new_event_item(client, app, mocker):
             user = str(user_ids[0])
             session['user'] = user
 
-        topic = {'label': 'bar', 'query': 'foo', 'notifications': True, 'topic_type': 'agenda'}
+        topic = {
+            'label': 'bar',
+            'query': 'foo',
+            'subscribers': [user],
+            'is_global': False,
+            'topic_type': 'agenda'
+        }
         resp = cli.post('users/%s/topics' % user, json=topic)
         assert 201 == resp.status_code
 
@@ -464,7 +470,13 @@ def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
             user = str(user_ids[0])
             session['user'] = user
 
-        topic = {'label': 'bar', 'query': 'foo', 'notifications': True, 'topic_type': 'agenda'}
+        topic = {
+            'label': 'bar',
+            'query': 'foo',
+            'subscribers': [user],
+            'is_global': False,
+            'topic_type': 'agenda'
+        }
         resp = cli.post('users/%s/topics' % user, json=topic)
         assert 201 == resp.status_code
 
@@ -504,7 +516,13 @@ def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker):
             user = str(user_ids[0])
             session['user'] = user
 
-        topic = {'label': 'bar', 'query': 'bar3', 'notifications': True, 'topic_type': 'agenda'}
+        topic = {
+            'label': 'bar',
+            'query': 'bar3',
+            'subscribers': [user],
+            'is_global': False,
+            'topic_type': 'agenda'
+        }
         resp = cli.post('users/%s/topics' % user, json=topic)
         assert 201 == resp.status_code
 
