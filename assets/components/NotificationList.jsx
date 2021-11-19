@@ -16,12 +16,12 @@ class NotificationList extends React.Component {
 
     componentDidMount() {
         if ( !isTouchDevice() ) {
-            this.elem && $(this.elem).tooltip();
+            this.elem && $(this.elem).tooltip && $(this.elem).tooltip();
         }
     }
 
     componentWillUnmount() {
-        this.elem && $(this.elem).tooltip('dispose'); // make sure it's gone
+        this.elem && $(this.elem).tooltip && $(this.elem).tooltip('dispose'); // make sure it's gone
     }
 
     toggleDisplay() {
