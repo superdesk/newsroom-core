@@ -120,24 +120,30 @@ class FollowedTopics extends React.Component {
         return (
             <div className={containerClasses}>
                 {!editorOpenInFullscreen && (
-                    <div style={{display: 'flex', flexDirection: 'column'}} className="flex-grow-1">
+                    <div className="d-flex flex-column flex-grow-1">
                         <div className="pt-xl-4 pt-3 px-xl-4 mr-0">
                             <div className="btn-group btn-group--navbar ml-0 mr-3">
                                 <button
-                                    className={'btn btn-outline-primary' + (!this.state.showGlobal ? ' active' : '')}
+                                    className={classNames(
+                                        'btn btn-outline-primary',
+                                        {active: !this.state.showGlobal}
+                                    )}
                                     onClick={this.toggleGlobal}
                                 >
-                                    {gettext('Personal')}
+                                    {gettext('My Topics')}
                                 </button>
                                 <button
-                                    className={'btn btn-outline-primary' + (this.state.showGlobal ? ' active' : '')}
+                                    className={classNames(
+                                        'btn btn-outline-primary',
+                                        {active: this.state.showGlobal}
+                                    )}
                                     onClick={this.toggleGlobal}
                                 >
-                                    {gettext('Global')}
+                                    {gettext('Company Topics')}
                                 </button>
                             </div>
                         </div>
-                        <div className="row pt-xl-4 pt-3 px-xl-4 flex-grow-1 mr-0">
+                        <div className="row pt-xl-4 pt-3 px-xl-4 mr-0">
                             <TopicList
                                 topics={this.getFilteredTopics()}
                                 actions={this.actions}

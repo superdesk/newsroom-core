@@ -25,7 +25,7 @@ const TopicForm = ({topic, save, onChange}) => (
                 onChange={onChange('notifications')}
             />
             <CheckboxInput
-                label={gettext('Is Global')}
+                label={gettext('Share with my Company')}
                 value={topic.is_global || false}
                 onChange={onChange('is_global')}
             />

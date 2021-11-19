@@ -8,29 +8,11 @@ import {removeNewItems} from 'wire/actions';
 import FilterButton from 'wire/components/filters/FilterButton';
 import {loadMyWireTopic} from 'wire/actions';
 import {loadMyAgendaTopic} from 'agenda/actions';
-import {Accordion} from 'ui/components/Accordion';
+import {CollapseBoxWithButton} from '../../ui/components/Collapse';
+import {TopicItem} from './TopicItem';
 
 const tabName = isWireContext() ? 'Wire Topics' : 'Agenda Topics';
 const manageTopics = () => document.dispatchEvent(window.manageTopics);
-
-function TopicItem({topic, newItemsByTopic, onClick, className}) {
-    return (
-        <a
-            href="#"
-            key={topic._id}
-            className={className}
-            onClick={(e) => onClick(e, topic)}
-        >
-            <span>{topic.company} // {topic.user} // </span>
-            {topic.label}
-            {newItemsByTopic && newItemsByTopic[topic._id] && (
-                <span className="wire-button__notif">
-                    {newItemsByTopic[topic._id].length}
-                </span>
-            )}
-        </a>
-    )
-}
 
 function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNewItems}) {
     const clickTopic = (event, topic) => {
@@ -58,48 +40,52 @@ function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNew
 
     return (
         <React.Fragment>
-            <Accordion
-                id="my-topics-accordion"
-                items={[{
-                    id: 'my-topics--personal',
-                    label: gettext('Personal'),
-                    body: () => !personalTopics.length ? (
-                        <div className='wire-column__info'>
-                            {gettext('No {{name}} created.', {name: tabName})}
-                        </div>
-                    ) : (
-                        <div>
-                            {personalTopics.map((topic) => (
-                                <TopicItem
-                                    topic={topic}
-                                    newItemsByTopic={newItemsByTopic}
-                                    onClick={clickTopic}
-                                    className={topicClass(topic)}
-                                />
-                            ))}
-                        </div>
-                    )
-                }, {
-                    id: 'my-topics--company',
-                    label: gettext('Global'),
-                    body: () => !globalTopics.length ? (
-                        <div className='wire-column__info'>
-                            {gettext('No {{name}} created.', {name: tabName})}
-                        </div>
-                    ) : (
-                        <div>
-                            {globalTopics.map((topic) => (
-                                <TopicItem
-                                    topic={topic}
-                                    newItemsByTopic={newItemsByTopic}
-                                    onClick={clickTopic}
-                                    className={topicClass(topic)}
-                                />
-                            ))}
-                        </div>
-                    )
-                }]}
-            />,
+            <CollapseBoxWithButton
+                id="my-topics"
+                buttonText={gettext('My Topics')}
+                initiallyOpen={true}
+            >
+                {!personalTopics.length ? (
+                    <div className='wire-column__info m-3'>
+                        {gettext('No {{name}} created.', {name: tabName})}
+                    </div>
+                ) : (
+                    <div className="m-3">
+                        {personalTopics.map((topic) => (
+                            <TopicItem
+                                key={topic._id}
+                                topic={topic}
+                                newItemsByTopic={newItemsByTopic}
+                                onClick={clickTopic}
+                                className={topicClass(topic)}
+                            />
+                        ))}
+                    </div>
+                )}
+            </CollapseBoxWithButton>
+            <CollapseBoxWithButton
+                id="company-topics"
+                buttonText={gettext('Company Topics')}
+                initiallyOpen={true}
+            >
+                {!globalTopics.length ? (
+                    <div className='wire-column__info m-3'>
+                        {gettext('No {{name}} created.', {name: tabName})}
+                    </div>
+                ) : (
+                    <div className="m-3">
+                        {globalTopics.map((topic) => (
+                            <TopicItem
+                                key={topic._id}
+                                topic={topic}
+                                newItemsByTopic={newItemsByTopic}
+                                onClick={clickTopic}
+                                className={topicClass(topic)}
+                            />
+                        ))}
+                    </div>
+                )}
+            </CollapseBoxWithButton>
             <FilterButton
                 label={gettext('Manage my {{name}}', {name: tabName})}
                 onClick={clickManage}
