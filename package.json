@@ -27,7 +27,7 @@
     "css-loader": "^0.28.5",
     "enzyme-adapter-react-16": "1.7.1",
     "extract-text-webpack-plugin": "3.0.2",
-    "fetch-mock": "^5.12.2",
+    "fetch-mock": "^9.11.0",
     "isomorphic-fetch": "^2.2.1",
     "jasmine-core": "3.3.0",
     "jquery": "3.3.1",
