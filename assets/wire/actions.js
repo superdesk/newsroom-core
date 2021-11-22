@@ -249,10 +249,11 @@ export function search(state, next) {
         product: searchParams.product,
         es_highlight: !searchParams.query ? null : 1,
         all_versions: !searchAllVersions ? null : 1,
+        prepend_embargoed: !state.bookmarks ? null : 0,
     };
 
     const queryString = Object.keys(params)
-        .filter((key) => params[key])
+        .filter((key) => params[key] != null && (params[key].length == null || params[key].length > 0))
         .map((key) => [key, params[key]].join('='))
         .join('&');
 
