@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import ActionButton from './ActionButton';
 
 
-function ActionList({item, group, plan, user, actions, onMouseLeave}) {
+function ActionList({item, group, plan, user, actions, onMouseLeave, showShortcutActions}) {
     return (
         <div onMouseLeave={onMouseLeave}>
-            {actions.map((action) => !action.shortcut &&
+            {actions.map((action) => (showShortcutActions || !action.shortcut) &&
                 <ActionButton
                     key={action.name}
                     action={action}
@@ -33,6 +33,7 @@ ActionList.propTypes = {
         action: PropTypes.func.isRequired,
     })),
     onMouseLeave: PropTypes.func,
+    showShortcutActions: PropTypes.bool,
 };
 
 export default ActionList;

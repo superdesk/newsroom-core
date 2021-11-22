@@ -18,7 +18,7 @@ class ActionMenu extends React.Component {
     }
 
     render() {
-        const {item, plan, user, actions, group, onActionList, showActions} = this.props;
+        const {item, plan, user, actions, group, onActionList, showActions, showShortcutActions} = this.props;
         return (
             <div className='btn-group'>
                 <button
@@ -38,6 +38,7 @@ class ActionMenu extends React.Component {
                           user={user}
                           actions={actions}
                           onMouseLeave={this.onMouseLeave}
+                          showShortcutActions={showShortcutActions}
                       />
                   </PopoverBody>
               </Popover>}
@@ -58,6 +59,7 @@ ActionMenu.propTypes = {
     group: PropTypes.string,
     onActionList: PropTypes.func.isRequired,
     showActions: PropTypes.bool.isRequired,
+    showShortcutActions: PropTypes.bool,
 };
 
 export default ActionMenu;

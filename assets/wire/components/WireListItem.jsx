@@ -287,6 +287,7 @@ class WireListItem extends React.Component {
                             actions={this.props.actions}
                             onActionList={this.props.onActionList}
                             showActions={this.props.showActions}
+                            showShortcutActions={!showListActionIcons}
                         />
 
                         {!showListActionIcons ? null : this.props.actions.map(
