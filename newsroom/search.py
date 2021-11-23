@@ -304,7 +304,6 @@ class BaseSearchService(Service):
             search.args['exclude_embargoed'] = strtobool(str(search.args.get('exclude_embargoed', False)))
             search.args['embargoed_only'] = strtobool(str(search.args.get('embargoed_only', False)))
 
-        search.args['bookmarks'] = strtobool(str(search.args.get('bookmarks', False)))
         search.args['newsOnly'] = strtobool(str(search.args.get('newsOnly', False)))
 
     def prefill_search_lookup(self, search, lookup=None):

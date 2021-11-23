@@ -49,6 +49,7 @@ def test_prefill_search_args(client, app):
         assert search.args == {
             'embargoed_only': False,
             'exclude_embargoed': False,
+            'newsOnly': False,
         }
         assert search.projections == {}
         assert search.req is None
@@ -61,6 +62,7 @@ def test_prefill_search_args(client, app):
             'test': 'one',
             'embargoed_only': False,
             'exclude_embargoed': False,
+            'newsOnly': False,
         }
         assert search.projections == {}
         assert search.req == req
@@ -74,6 +76,7 @@ def test_prefill_search_args(client, app):
             'name': 'test',
             'embargoed_only': False,
             'exclude_embargoed': False,
+            'newsOnly': False,
         }
         assert search.projections == {}
         assert search.req == req
@@ -85,6 +88,7 @@ def test_prefill_search_args(client, app):
         assert search.args == {
             'embargoed_only': False,
             'exclude_embargoed': False,
+            'newsOnly': False,
         }
         assert search.projections == {'service': 1}
         assert search.req == req
@@ -111,6 +115,7 @@ def test_prefill_search_page(client, app):
             'from': 0,
             'embargoed_only': False,
             'exclude_embargoed': False,
+            'newsOnly': False,
         }
 
         search = get_search_instance(args={
@@ -124,6 +129,7 @@ def test_prefill_search_page(client, app):
             'from': 50,
             'embargoed_only': False,
             'exclude_embargoed': False,
+            'newsOnly': False,
         }
 
 
