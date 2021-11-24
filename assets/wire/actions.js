@@ -238,9 +238,9 @@ export function search(state, next) {
 
     const params = {
         q: !searchParams.query ? null : encodeURIComponent(searchParams.query),
-        bookmarks: state.bookmarks && state.user,
+        bookmarks: state.bookmarks ? state.user : null,
         navigation: getNavigationUrlParam(searchParams.navigation, true, false),
-        filter: !isEmpty(searchParams.filter) && encodeURIComponent(JSON.stringify(searchParams.filter)),
+        filter: !isEmpty(searchParams.filter) ? encodeURIComponent(JSON.stringify(searchParams.filter)) : null,
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,
         created_to,

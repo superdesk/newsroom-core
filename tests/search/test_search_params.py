@@ -46,7 +46,11 @@ def test_prefill_search_args(client, app):
     with app.test_request_context():
         search = SearchQuery()
         service.prefill_search_args(search)
-        assert search.args == {}
+        assert search.args == {
+            'embargoed_only': False,
+            'exclude_embargoed': False,
+            'newsOnly': False,
+        }
         assert search.projections == {}
         assert search.req is None
 
@@ -54,7 +58,12 @@ def test_prefill_search_args(client, app):
         req = ParsedRequest()
         req.args = {'test': 'one'}
         service.prefill_search_args(search, req)
-        assert search.args == {'test': 'one'}
+        assert search.args == {
+            'test': 'one',
+            'embargoed_only': False,
+            'exclude_embargoed': False,
+            'newsOnly': False,
+        }
         assert search.projections == {}
         assert search.req == req
 
@@ -62,7 +71,13 @@ def test_prefill_search_args(client, app):
         req = ParsedRequest()
         req.args = ImmutableMultiDict([('foo', 'bar'), ('name', 'test')])
         service.prefill_search_args(search, req)
-        assert search.args == {'foo': 'bar', 'name': 'test'}
+        assert search.args == {
+            'foo': 'bar',
+            'name': 'test',
+            'embargoed_only': False,
+            'exclude_embargoed': False,
+            'newsOnly': False,
+        }
         assert search.projections == {}
         assert search.req == req
 
@@ -70,7 +85,11 @@ def test_prefill_search_args(client, app):
         req = ParsedRequest()
         req.projection = {'service': 1}
         service.prefill_search_args(search, req)
-        assert search.args == {}
+        assert search.args == {
+            'embargoed_only': False,
+            'exclude_embargoed': False,
+            'newsOnly': False,
+        }
         assert search.projections == {'service': 1}
         assert search.req == req
 
@@ -93,7 +112,10 @@ def test_prefill_search_page(client, app):
         assert search.args == {
             'sort': service.default_sort,
             'size': service.default_page_size,
-            'from': 0
+            'from': 0,
+            'embargoed_only': False,
+            'exclude_embargoed': False,
+            'newsOnly': False,
         }
 
         search = get_search_instance(args={
@@ -104,7 +126,10 @@ def test_prefill_search_page(client, app):
         assert search.args == {
             'sort': [{'versioncreated': 'asc'}],
             'size': 50,
-            'from': 50
+            'from': 50,
+            'embargoed_only': False,
+            'exclude_embargoed': False,
+            'newsOnly': False,
         }
 
 

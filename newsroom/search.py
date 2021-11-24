@@ -1,11 +1,13 @@
 import logging
 from typing import Union
+from copy import deepcopy
 
 from flask import current_app as app, json, abort
 from flask_babel import gettext
 from eve.utils import ParsedRequest
 from superdesk import get_resource_service
 from superdesk.metadata.utils import get_elastic_highlight_query
+from superdesk.default_settings import strtobool
 from content_api.errors import BadParameterValueError
 
 from newsroom import Service
@@ -199,20 +201,17 @@ class BaseSearchService(Service):
         self.prefill_search_items(search)
         self.prefill_search_highlights(search, req)
 
-    def apply_filters(self, search, include_request_filters=True):
+    def apply_filters(self, search):
         """ Generate and apply the different search filters
 
         :param SearchQuery search: the search query instance
-        :param bool include_request_filters: appends filters from the request arguments
         """
         self.apply_section_filter(search)
         self.apply_company_filter(search)
         self.apply_time_limit_filter(search)
         self.apply_products_filter(search)
-
-        if include_request_filters:
-            self.apply_request_filter(search)
-            self.apply_embargoed_filter(search)
+        self.apply_request_filter(search)
+        self.apply_embargoed_filters(search)
 
         if len(search.query['bool'].get('should', [])):
             search.query['bool']['minimum_should_match'] = 1
@@ -286,14 +285,26 @@ class BaseSearchService(Service):
         if req is None:
             search.args = {}
         elif getattr(req.args, 'to_dict', None):
-            search.args = req.args.to_dict()
+            search.args = deepcopy(req.args.to_dict())
         elif isinstance(req.args, dict):
-            search.args = req.args
+            search.args = deepcopy(req.args)
         else:
             search.args = {}
 
         search.projections = {} if req is None or not req.projection else req.projection
         search.req = req
+
+        if search.args.get('prepend_embargoed'):
+            # Exclude embargoed items if we're prepending them anyway
+            search.args.update({
+                'exclude_embargoed': True,
+                'embargoed_only': False,
+            })
+        else:
+            search.args['exclude_embargoed'] = strtobool(str(search.args.get('exclude_embargoed', False)))
+            search.args['embargoed_only'] = strtobool(str(search.args.get('embargoed_only', False)))
+
+        search.args['newsOnly'] = strtobool(str(search.args.get('newsOnly', False)))
 
     def prefill_search_lookup(self, search, lookup=None):
         """ Prefill the search lookup
@@ -592,11 +603,19 @@ class BaseSearchService(Service):
                     self.versioncreated_range(search.args)
                 )
 
-    def apply_embargoed_filter(self, search):
-        """Ignore embargoed items in initial search if we're prepending them anyway"""
+    def apply_embargoed_filters(self, search):
+        """Generate filters for embargoed params"""
 
-        if search.args.get('prepend_embargoed'):
+        if search.args.get('exclude_embargoed'):
             search.query['bool']['must_not'].append({
+                'range': {
+                    'embargoed': {
+                        'gt': 'now'
+                    }
+                }
+            })
+        elif search.args.get('embargoed_only'):
+            search.query['bool']['must'].append({
                 'range': {
                     'embargoed': {
                         'gt': 'now'
@@ -607,17 +626,13 @@ class BaseSearchService(Service):
     def prepend_embargoed_items_to_response(self, response, req, lookup):
         search = SearchQuery()
         self.prefill_search_args(search, req)
-        self.prefill_search_query(search, req, lookup)
-        self.apply_filters(search, include_request_filters=False)
-
-        search.query['bool']['must'].append({
-            'range': {
-                'embargoed': {
-                    'gt': 'now'
-                }
-            }
+        search.args.update({
+            'exclude_embargoed': False,
+            'embargoed_only': True,
         })
 
+        self.prefill_search_query(search, req, lookup)
+        self.apply_filters(search)
         self.gen_source_from_search(search)
         internal_req = self.get_internal_request(search)
         embargoed_response = self.internal_get(internal_req, search.lookup)

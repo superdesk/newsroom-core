@@ -91,3 +91,42 @@ Feature: Wire Search
         """
         ["embargo-2", "embargo-1", "published-1", "embargo-3", "published-2", "published-3", "embargo-4"]
         """
+
+    @auth @admin
+    Scenario: Embargo based filters
+        Given "items"
+        """
+        [{
+            "_id": "embargo-2", "type": "text", "version": 1,
+            "headline": "Weather", "slugline": "WEATHER", "body_html": "<p>Weather report</p>",
+            "versioncreated": "#DATE-4#", "embargoed": "#DATE-1#"
+        }, {
+            "_id": "embargo-1", "type": "text", "version": 1,
+            "headline": "Weather", "slugline": "WEATHER", "body_html": "<p>Weather report</p>",
+            "versioncreated": "#DATE-3#", "embargoed": "#DATE+1#"
+        }, {
+            "_id": "published-1", "type": "text", "version": 1,
+            "headline": "Weather", "slugline": "WEATHER", "body_html": "<p>Weather report</p>",
+            "versioncreated": "#DATE-3#"
+        }]
+        """
+        When we get "/wire/search?exclude_embargoed=0"
+        Then we get the following order
+        """
+        ["embargo-1", "published-1", "embargo-2"]
+        """
+        When we get "/wire/search?exclude_embargoed=1"
+        Then we get the following order
+        """
+        ["published-1", "embargo-2"]
+        """
+        When we get "/wire/search?embargoed_only=0"
+        Then we get the following order
+        """
+        ["embargo-1", "published-1", "embargo-2"]
+        """
+        When we get "/wire/search?embargoed_only=1"
+        Then we get the following order
+        """
+        ["embargo-1"]
+        """
