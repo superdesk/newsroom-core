@@ -65,8 +65,11 @@ def process_form_request(updates, request_updates, form):
 
 
 def get_monitoring_for_company(user):
-    company = user['company'] if user and user.get('company') else None
-    return list(query_resource('monitoring', lookup={'company': company}))
+    try:
+        company = user['company'] if user and user.get('company') else None
+        return list(query_resource('monitoring', lookup={'company': company}))
+    except KeyError:
+        return []
 
 
 @blueprint.route('/monitoring/<id>/users', methods=['POST'])
