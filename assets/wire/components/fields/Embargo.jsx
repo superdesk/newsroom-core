@@ -12,6 +12,7 @@ export class Embargo extends React.Component {
             embargo: getEmbargo(props.item),
             forceRender: false,
         };
+        this.timeout = null;
     }
 
     componentDidMount() {
@@ -29,7 +30,8 @@ export class Embargo extends React.Component {
 
             // Make sure we aren't setting a timeout that is too big
             if (embargoLiftsIn.asHours() < 48) {
-                setTimeout(() => {
+                this.timeout = setTimeout(() => {
+                    this.timeout = null;
                     this.setState({
                         embargo: getEmbargo(this.props.item),
                         forceRender: true,
@@ -42,6 +44,10 @@ export class Embargo extends React.Component {
     componentWillUnmount() {
         if (this.elem) {
             $(this.elem).tooltip('dispose');
+        }
+
+        if (this.timeout != null) {
+            clearTimeout(this.timeout);
         }
     }
 
