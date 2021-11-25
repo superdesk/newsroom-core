@@ -29,7 +29,6 @@ import ActionMenu from '../../components/ActionMenu';
 import WireListItemDeleted from './WireListItemDeleted';
 import {Embargo} from './fields/Embargo';
 import {UrgencyItemBorder, UrgencyLabel} from './fields/UrgencyLabel';
-import {MatchLabel} from './fields/MatchLabel';
 import {FieldComponents} from './fields';
 
 export const DISPLAY_WORD_COUNT = getConfig('display_word_count');
@@ -42,6 +41,36 @@ const DEFAULT_SHOW_ACTION_ICONS = {
     compact: true,
     mobile: false,
 };
+
+function getShowVersionText(isExpanded, itemCount, matchCount) {
+    if (isExpanded) {
+        return matchCount ?
+            gettext(
+                'Hide previous versions ({{ matches }} / {{ count }} matches)',
+                {
+                    matches: matchCount,
+                    count: itemCount,
+                }
+            ) :
+            gettext(
+                'Hide previous versions ({{ count }})',
+                {count: itemCount}
+            );
+    } else {
+        return matchCount ?
+            gettext(
+                'Show previous versions ({{ matches }} / {{ count }} matches)',
+                {
+                    matches: matchCount,
+                    count: itemCount,
+                }
+            ) :
+            gettext(
+                'Show previous versions ({{ count }})',
+                {count: itemCount}
+            );
+    }
+}
 
 class WireListItem extends React.Component {
     constructor(props) {
@@ -90,7 +119,6 @@ class WireListItem extends React.Component {
             onDoubleClick,
             isExtended,
             listConfig,
-            matchedIds,
         } = this.props;
 
         if (get(this.props, 'item.deleted')) {
@@ -129,6 +157,7 @@ class WireListItem extends React.Component {
                     showActionIconsConfig.large :
                     showActionIconsConfig.compact
             );
+        const matchedIds = this.props.isSearchFiltered ? this.props.matchedIds : [];
 
         return (
             <article
@@ -158,9 +187,6 @@ class WireListItem extends React.Component {
                                     <i></i>
                                 </label>
                             </div>
-                            {!matchedIds.includes(item._id) ? null : (
-                                <MatchLabel />
-                            )}
                             {!isExtended && (
                                 <WireListItemIcons
                                     item={item}
@@ -255,10 +281,19 @@ class WireListItem extends React.Component {
                                 className="no-bindable wire-articles__item__versions-btn"
                                 onClick={this.togglePreviousVersions}
                             >
-                                {gettext(
-                                    'Show previous versions ({{ count }})',
-                                    {count: item.ancestors.length}
-                                )}
+                                <button className={classNames(
+                                    'label label-rounded label--success mt-1 mt-md-2',
+                                    {
+                                        'bg-transparent': !matchedIds.length,
+                                        'text-primary': !matchedIds.length,
+                                    }
+                                )}>
+                                    {getShowVersionText(
+                                        this.state.previousVersions,
+                                        item.ancestors.length,
+                                        matchedIds.length
+                                    )}
+                                </button>
                             </div>
                         )}
                     </div>
@@ -347,6 +382,7 @@ WireListItem.propTypes = {
     contextName: PropTypes.string,
     listConfig: PropTypes.object,
     matchedIds: PropTypes.array,
+    isSearchFiltered: PropTypes.bool,
 };
 
 WireListItem.defaultProps = {
