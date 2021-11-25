@@ -10,6 +10,10 @@ from superdesk import get_resource_service
 from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
 from newsroom.auth import get_user
+from datetime import datetime
+
+
+_hash_cache = {}
 
 
 def to_json(value):
@@ -143,3 +147,28 @@ def authorized_settings_apps(user=None):
 def get_multi_line_message(message):
     new_message = message.replace('\r', '')
     return new_message.replace('\n', '\r\n')
+
+
+def get_theme_file(filename):
+    for folder in app._theme_folders:
+        file = os.path.realpath(os.path.join(folder, filename))
+        if os.path.exists(file):
+            return file
+
+
+def theme_url(filename):
+    """Get url for theme file.
+    
+    There will be a hash of the file added to it
+    in order to force refresh on changes.
+    """
+    file = get_theme_file(filename)
+    assert file
+    if not file:  # this should not really happen
+        return flask.url_for('theme', filename=filename)
+    if _hash_cache.get(file) == None or app.debug:
+        hash = hashlib.md5()
+        with open(file, 'rb') as f:
+            hash.update(f.read())
+        _hash_cache[file] = hash.hexdigest()
+    return flask.url_for('theme', filename=filename, h=_hash_cache.get(file, int(datetime.now().timestamp())))

@@ -1,4 +1,6 @@
 
+import flask
+
 from datetime import datetime
 from newsroom.template_filters import datetime_long, parse_date
 
@@ -10,3 +12,7 @@ def test_parse_date():
 
 def test_datetime_long_str(app):
     assert isinstance(datetime_long('2017-11-03T13:49:48+0000'), str)
+
+
+def test_to_json():
+    assert '"foo"' == flask.render_template_string("{{ 'foo' | tojson }}")

@@ -8,7 +8,7 @@ from newsroom.template_filters import (
     plain_text, word_count, char_count, newsroom_config, is_admin,
     hash_string, date_header, get_date, get_multi_line_message,
     sidenavs_by_names, sidenavs_by_group, get_company_sidenavs, is_admin_or_account_manager,
-    to_json, authorized_settings_apps,
+    to_json, authorized_settings_apps, theme_url,
 )
 from newsroom.notifications.notifications import get_initial_notifications
 from newsroom.limiter import limiter
@@ -36,9 +36,16 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.sidenavs = []
         self.settings_apps = []
         self.dashboards = []
+        self._theme_folders = []
         super(NewsroomWebApp, self).__init__(import_name=import_name, config=config, **kwargs)
 
         self.theme_folder = os.path.join(self.config["SERVER_PATH"], "theme")
+        self._theme_folders = [folder for folder in [
+            self.theme_folder,
+            os.path.join(self.config["SERVER_PATH"], "templates"),
+            self.template_folder,
+            self.static_folder,
+        ] if os.path.exists(folder)]
 
         self._setup_jinja()
         self._setup_limiter()
@@ -86,19 +93,12 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_global(get_date, 'get_date')
         self.add_template_global(self.settings_apps, 'settings_apps')
         self.add_template_global(get_multi_line_message)
+        self.add_template_global(theme_url)
 
         jinja2_loaders = [
-            jinja2.FileSystemLoader(self.theme_folder),
+            jinja2.FileSystemLoader(folder)
+            for folder in self._theme_folders
         ]
-
-        jinja2_loaders.append(
-            jinja2.FileSystemLoader(os.path.join(self.config["SERVER_PATH"], "templates"))
-        )
-
-        jinja2_loaders.append(
-            # newsroom-core/newsroom/templates
-            jinja2.FileSystemLoader(self.template_folder)
-        )
 
         self.jinja_loader = jinja2.ChoiceLoader(jinja2_loaders)
 
