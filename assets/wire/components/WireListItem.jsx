@@ -42,9 +42,9 @@ const DEFAULT_SHOW_ACTION_ICONS = {
     mobile: false,
 };
 
-function getShowVersionText(isExpanded, itemCount, matchCount) {
+function getShowVersionText(isExpanded, itemCount, matchCount, isExtended) {
     if (isExpanded) {
-        return matchCount ?
+        return (isExtended && matchCount) ?
             gettext(
                 'Hide previous versions ({{ matches }} / {{ count }} matches)',
                 {
@@ -57,7 +57,7 @@ function getShowVersionText(isExpanded, itemCount, matchCount) {
                 {count: itemCount}
             );
     } else {
-        return matchCount ?
+        return (isExtended && matchCount) ?
             gettext(
                 'Show previous versions ({{ matches }} / {{ count }} matches)',
                 {
@@ -291,7 +291,8 @@ class WireListItem extends React.Component {
                                     {getShowVersionText(
                                         this.state.previousVersions,
                                         item.ancestors.length,
-                                        matchedIds.length
+                                        matchedIds.length,
+                                        isExtended
                                     )}
                                 </button>
                             </div>
