@@ -10,7 +10,7 @@ import WireListItem from './WireListItem';
 import {setActive, previewItem, toggleSelected, openItem} from '../actions';
 import {EXTENDED_VIEW} from '../defaults';
 import {getIntVersion} from '../utils';
-import {searchNavigationSelector} from 'search/selectors';
+import {searchNavigationSelector, isSearchFiltered} from 'search/selectors';
 import {previewConfigSelector, listConfigSelector} from 'ui/selectors';
 import {getContextName} from 'selectors';
 
@@ -157,6 +157,7 @@ class ItemsList extends React.Component {
                 contextName={this.props.contextName}
                 listConfig={this.props.listConfig}
                 matchedIds={matchedIds || []}
+                isSearchFiltered={this.props.isSearchFiltered}
             />
         );
 
@@ -203,6 +204,7 @@ ItemsList.propTypes = {
     previewConfig: PropTypes.object,
     listConfig: PropTypes.object,
     contextName: PropTypes.string,
+    isSearchFiltered: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -225,6 +227,7 @@ const mapStateToProps = (state) => ({
     previewConfig: previewConfigSelector(state),
     listConfig: listConfigSelector(state),
     contextName: getContextName(state),
+    isSearchFiltered: isSearchFiltered(state),
 });
 
 export default connect(mapStateToProps)(ItemsList);

@@ -105,3 +105,12 @@ export const showSaveTopicSelector = createSelector(
         );
     }
 );
+
+export const isSearchFiltered = createSelector(
+    [searchParamsSelector],
+    (params) => {
+        return get(params, 'query', '').length > 0 ||
+            Object.keys(get(params, 'created', {})).filter((key) => get(params.created, key)).length > 0 ||
+            Object.keys(get(params, 'filter', {})).filter((key) => get(params.filter, key)).length > 0;
+    }
+);

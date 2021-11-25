@@ -2124,10 +2124,8 @@ article.list {
     }
 }
 
-.wire-articles__item__versions-btn {
-    font-size: 0.8125rem;
-    color: $main-blue;
-    margin-top: 0px;
+.wire-articles__item__versions-btn button {
+    cursor: pointer;
 }
 
 .wire-articles__item__versions-btn--open {
