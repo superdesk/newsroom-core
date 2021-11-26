@@ -8,7 +8,7 @@ from newsroom.template_filters import (
     plain_text, word_count, char_count, newsroom_config, is_admin,
     hash_string, date_header, get_date, get_multi_line_message,
     sidenavs_by_names, sidenavs_by_group, get_company_sidenavs, is_admin_or_account_manager,
-    to_json, authorized_settings_apps, theme_url,
+    authorized_settings_apps, theme_url, to_json,
 )
 from newsroom.notifications.notifications import get_initial_notifications
 from newsroom.limiter import limiter
@@ -37,6 +37,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.settings_apps = []
         self.dashboards = []
         self._theme_folders = []
+
         super(NewsroomWebApp, self).__init__(import_name=import_name, config=config, **kwargs)
 
         self.theme_folder = os.path.join(self.config["SERVER_PATH"], "theme")
