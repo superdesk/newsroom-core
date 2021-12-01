@@ -331,6 +331,8 @@ def is_valid_login(user_id):
     :param str user_id: id of the user
     """
     user = get_cached_resource_by_id('users', user_id)
+    if not user:
+        return False
     if not (is_account_enabled(user)):
         session.pop('_flashes', None)  # remove old messages and just show one message
         flash(gettext('Account is disabled'), 'danger')
