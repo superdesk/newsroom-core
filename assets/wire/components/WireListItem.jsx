@@ -143,7 +143,7 @@ class WireListItem extends React.Component {
         );
         const selectClassName = classNames('no-bindable-select', {
             'wire-articles__item-select-visible': !LIST_ANIMATIONS,
-            'wire-articles__item-select float-left float-sm-none': LIST_ANIMATIONS,
+            'wire-articles__item-select': LIST_ANIMATIONS,
         });
         const picture = getPicture(item);
         const videos = getVideos(item);
@@ -188,17 +188,19 @@ class WireListItem extends React.Component {
                                     <i></i>
                                 </label>
                             </div>
-                            {!isExtended && (
-                                <WireListItemIcons
-                                    item={item}
-                                    picture={picture}
-                                    videos={videos}
-                                    divider={false}
-                                />
-                            )}
-                            <Embargo item={item} />
-                            <UrgencyLabel item={item} listConfig={listConfig} />
-                            {item.headline}
+                            <div className="wire-articles__item-headline-inner">
+                                {!isExtended && (
+                                    <WireListItemIcons
+                                        item={item}
+                                        picture={picture}
+                                        videos={videos}
+                                        divider={false}
+                                    />
+                                )}
+                                <Embargo item={item} />
+                                <UrgencyLabel item={item} listConfig={listConfig} />
+                                {item.headline}
+                            </div>
                         </h4>
 
                         {isExtended && !isMarketPlace && (
