@@ -46,7 +46,7 @@ function getShowVersionText(isExpanded, itemCount, matchCount, isExtended) {
     if (isExpanded) {
         return (isExtended && matchCount) ?
             gettext(
-                'Hide previous versions ({{ matches }} / {{ count }} matches)',
+                'Hide previous versions ({{ count }}) - {{ matches }} matches',
                 {
                     matches: matchCount,
                     count: itemCount,
@@ -59,7 +59,7 @@ function getShowVersionText(isExpanded, itemCount, matchCount, isExtended) {
     } else {
         return (isExtended && matchCount) ?
             gettext(
-                'Show previous versions ({{ matches }} / {{ count }} matches)',
+                'Show previous versions ({{ count }}) - {{ matches }} matches',
                 {
                     matches: matchCount,
                     count: itemCount,
@@ -158,6 +158,7 @@ class WireListItem extends React.Component {
                     showActionIconsConfig.compact
             );
         const matchedIds = this.props.isSearchFiltered ? this.props.matchedIds : [];
+        const matchedAncestors = matchedIds.filter((id) => (item.ancestors || []).includes(id));
 
         return (
             <article
@@ -195,6 +196,7 @@ class WireListItem extends React.Component {
                                     divider={false}
                                 />
                             )}
+                            <Embargo item={item} />
                             <UrgencyLabel item={item} listConfig={listConfig} />
                             {item.headline}
                         </h4>
@@ -219,9 +221,6 @@ class WireListItem extends React.Component {
                                                 isItemDetail: false,
                                             }}
                                         />
-                                    </span>
-                                    <span>
-                                        <Embargo item={item} />
                                     </span>
                                 </div>
                             </div>
@@ -279,19 +278,21 @@ class WireListItem extends React.Component {
                         {showItemVersions(item) && (
                             <div
                                 className="no-bindable wire-articles__item__versions-btn"
-                                onClick={this.togglePreviousVersions}
                             >
-                                <button className={classNames(
-                                    'label label-rounded label--success mt-1 mt-md-2',
-                                    {
-                                        'bg-transparent': !matchedIds.length,
-                                        'text-primary': !matchedIds.length,
-                                    }
-                                )}>
+                                <button
+                                    className={classNames(
+                                        'label label-rounded label--success mt-1 mt-md-2',
+                                        {
+                                            'bg-transparent': !matchedIds.length,
+                                            'text-primary': !matchedIds.length,
+                                        }
+                                    )}
+                                    onClick={this.togglePreviousVersions}
+                                >
                                     {getShowVersionText(
                                         this.state.previousVersions,
                                         item.ancestors.length,
-                                        matchedIds.length,
+                                        matchedAncestors.length,
                                         isExtended
                                     )}
                                 </button>
