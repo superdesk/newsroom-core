@@ -132,7 +132,10 @@ class BaseSearchService(Service):
         search.query['bool'] = {'must': {'terms': {'_id': next_item_ids}}}
         self.gen_source_from_search(search)
         internal_req = self.get_internal_request(search)
-        return self.internal_get(internal_req, search.lookup)
+        res = self.internal_get(internal_req, search.lookup)
+        # count including previous versions
+        res.hits["hits"]["total"] = res.count() + len(self._matched_ids)
+        return res
 
     def get_last_version(self, doc):
         if not doc.get('nextversion'):
