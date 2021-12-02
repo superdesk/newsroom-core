@@ -1833,7 +1833,9 @@ article.list {
     margin-bottom: 4px;
     @include sm {    
         display: flex;
+        align-items: flex-start;
         margin-bottom: 0;
+        margin-top: 3px;
     }
 }
 .wire-articles__item-headline--indent {
