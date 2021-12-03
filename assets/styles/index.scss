@@ -1504,6 +1504,9 @@ article.list {
             margin-bottom: 0;
         }
     }
+    .wire-articles__item-headline-inner {
+        align-items: center;
+    }
     .wire-articles__item__versions-btn {
         @include md {
             margin-left: auto;
@@ -1819,6 +1822,7 @@ article.list {
     font-weight: 700;
     margin-bottom: 0;
     line-height: 1.3;
+    display: flex;
 
     @include sm {
         font-size: 1rem;
@@ -1827,6 +1831,15 @@ article.list {
     }
     i {
         margin: 0 4px 0 2px;
+    }
+}
+.wire-articles__item-headline-inner {
+    margin-bottom: 4px;
+    @include sm {    
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 0;
+        margin-top: 3px;
     }
 }
 .wire-articles__item-headline--indent {
@@ -1891,10 +1904,12 @@ article.list {
     flex-wrap: nowrap;
     margin-bottom: 0;
     margin-top: 0;
+    margin-left: 32px;
 
     @include sm {
         flex-wrap: wrap;
         margin-top: 10px;
+        margin-left: 0;
     }
     @include lg {
         margin-top: 0;
@@ -2127,11 +2142,14 @@ article.list {
         font-size: 1rem !important;
     }
 }
-
 .wire-articles__item__versions-btn {
-    font-size: 0.8125rem;
-    color: $main-blue;
-    margin-top: 0px;
+    margin-left: 24px;
+    @include sm {
+        margin-left: 0;
+    }
+    button {
+        cursor: pointer;
+    }
 }
 
 .wire-articles__item__versions-btn--open {

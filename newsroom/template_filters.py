@@ -1,20 +1,38 @@
 import os
 import arrow
+from bson.objectid import ObjectId
 import flask
 import hashlib
 
 from flask import current_app as app
 from eve.utils import str_to_date
 from flask_babel import format_time, format_date, format_datetime
+from flask_babel.speaklater import LazyString
+from jinja2.utils import htmlsafe_json_dumps  # type: ignore
 from superdesk import get_resource_service
 from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
 from newsroom.auth import get_user
+from datetime import datetime
+
+
+_hash_cache = {}
 
 
 def to_json(value):
-    """Jinja filter to address the encoding of special values to json"""
-    return app.json_encoder().dumps(value)
+    """Jinja filter to address the encoding of special values to json.
+
+    Make it consistent to return strings without surrounding ""
+    so for string values it should be used with '' in the template::
+
+        const user_id = '{{ user["_id"] | tojson }}';
+
+    """
+    if isinstance(value, LazyString):
+        value = str(value)
+    if isinstance(value, ObjectId):
+        value = str(value)
+    return htmlsafe_json_dumps(obj=value, dumper=app.json_encoder().dumps)
 
 
 def parse_date(datetime):
@@ -143,3 +161,28 @@ def authorized_settings_apps(user=None):
 def get_multi_line_message(message):
     new_message = message.replace('\r', '')
     return new_message.replace('\n', '\r\n')
+
+
+def get_theme_file(filename):
+    for folder in app._theme_folders:
+        file = os.path.realpath(os.path.join(folder, filename))
+        if os.path.exists(file):
+            return file
+
+
+def theme_url(filename):
+    """Get url for theme file.
+
+    There will be a hash of the file added to it
+    in order to force refresh on changes.
+    """
+    file = get_theme_file(filename)
+    assert file
+    if not file:  # this should not really happen
+        return flask.url_for('theme', filename=filename)
+    if _hash_cache.get(file) is None or app.debug:
+        hash = hashlib.md5()
+        with open(file, 'rb') as f:
+            hash.update(f.read())
+        _hash_cache[file] = hash.hexdigest()
+    return flask.url_for('theme', filename=filename, h=_hash_cache.get(file, int(datetime.now().timestamp())))

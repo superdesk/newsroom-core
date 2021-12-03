@@ -12,11 +12,11 @@
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/css/themes/bootstrap.min.css"/>
 
     <link rel="icon" type="image/x-icon"
-        href="{{ url_for('theme', filename='favicon.ico') }}">
+        href="{{ theme_url('favicon.ico') }}">
 
 {{ javascript_tag('common') | safe }}
 {{ javascript_tag('newsroom_css') | safe }}
-<link rel="stylesheet" href="{{ url_for('theme', filename='theme.css') }}"/>
+<link rel="stylesheet" href="{{ theme_url('theme.css') }}"/>
 {% block sectioncss %}{% endblock %}
 </head>
 <body>
@@ -125,7 +125,7 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', {{ get_setting('google_analytics') | tojson | safe }}, {
+  gtag('config', '{{ get_setting('google_analytics') | tojson }}', {
       custom_map: {
           dimension1: 'company',
           dimension2: 'user',
@@ -133,7 +133,7 @@
   });
 
   {% if session.get('user') %}
-  gtag('set', {'user_id': {{ hash(session['user']) | tojson | safe }} });
+  gtag('set', {'user_id': '{{ hash(session['user']) | tojson }}' });
   {% endif %}
 
   {% with messages = get_flashed_messages(category_filter=['analytics']) %}

@@ -238,9 +238,9 @@ export function search(state, next) {
 
     const params = {
         q: !searchParams.query ? null : encodeURIComponent(searchParams.query),
-        bookmarks: state.bookmarks && state.user,
+        bookmarks: state.bookmarks ? state.user : null,
         navigation: getNavigationUrlParam(searchParams.navigation, true, false),
-        filter: !isEmpty(searchParams.filter) && encodeURIComponent(JSON.stringify(searchParams.filter)),
+        filter: !isEmpty(searchParams.filter) ? encodeURIComponent(JSON.stringify(searchParams.filter)) : null,
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,
         created_to,
@@ -249,10 +249,11 @@ export function search(state, next) {
         product: searchParams.product,
         es_highlight: !searchParams.query ? null : 1,
         all_versions: !searchAllVersions ? null : 1,
+        prepend_embargoed: !state.bookmarks ? null : 0,
     };
 
     const queryString = Object.keys(params)
-        .filter((key) => params[key])
+        .filter((key) => params[key] != null && (params[key].length == null || params[key].length > 0))
         .map((key) => [key, params[key]].join('='))
         .join('&');
 

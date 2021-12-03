@@ -29,7 +29,6 @@ import ActionMenu from '../../components/ActionMenu';
 import WireListItemDeleted from './WireListItemDeleted';
 import {Embargo} from './fields/Embargo';
 import {UrgencyItemBorder, UrgencyLabel} from './fields/UrgencyLabel';
-import {MatchLabel} from './fields/MatchLabel';
 import {FieldComponents} from './fields';
 
 export const DISPLAY_WORD_COUNT = getConfig('display_word_count');
@@ -42,6 +41,36 @@ const DEFAULT_SHOW_ACTION_ICONS = {
     compact: true,
     mobile: false,
 };
+
+function getShowVersionText(isExpanded, itemCount, matchCount, isExtended) {
+    if (isExpanded) {
+        return (isExtended && matchCount) ?
+            gettext(
+                'Hide previous versions ({{ count }}) - {{ matches }} matches',
+                {
+                    matches: matchCount,
+                    count: itemCount,
+                }
+            ) :
+            gettext(
+                'Hide previous versions ({{ count }})',
+                {count: itemCount}
+            );
+    } else {
+        return (isExtended && matchCount) ?
+            gettext(
+                'Show previous versions ({{ count }}) - {{ matches }} matches',
+                {
+                    matches: matchCount,
+                    count: itemCount,
+                }
+            ) :
+            gettext(
+                'Show previous versions ({{ count }})',
+                {count: itemCount}
+            );
+    }
+}
 
 class WireListItem extends React.Component {
     constructor(props) {
@@ -90,7 +119,6 @@ class WireListItem extends React.Component {
             onDoubleClick,
             isExtended,
             listConfig,
-            matchedIds,
         } = this.props;
 
         if (get(this.props, 'item.deleted')) {
@@ -115,7 +143,7 @@ class WireListItem extends React.Component {
         );
         const selectClassName = classNames('no-bindable-select', {
             'wire-articles__item-select-visible': !LIST_ANIMATIONS,
-            'wire-articles__item-select float-left float-sm-none': LIST_ANIMATIONS,
+            'wire-articles__item-select': LIST_ANIMATIONS,
         });
         const picture = getPicture(item);
         const videos = getVideos(item);
@@ -129,6 +157,8 @@ class WireListItem extends React.Component {
                     showActionIconsConfig.large :
                     showActionIconsConfig.compact
             );
+        const matchedIds = this.props.isSearchFiltered ? this.props.matchedIds : [];
+        const matchedAncestors = matchedIds.filter((id) => (item.ancestors || []).includes(id));
 
         return (
             <article
@@ -158,19 +188,19 @@ class WireListItem extends React.Component {
                                     <i></i>
                                 </label>
                             </div>
-                            {!matchedIds.includes(item._id) ? null : (
-                                <MatchLabel />
-                            )}
-                            {!isExtended && (
-                                <WireListItemIcons
-                                    item={item}
-                                    picture={picture}
-                                    videos={videos}
-                                    divider={false}
-                                />
-                            )}
-                            <UrgencyLabel item={item} listConfig={listConfig} />
-                            {item.headline}
+                            <div className="wire-articles__item-headline-inner">
+                                {!isExtended && (
+                                    <WireListItemIcons
+                                        item={item}
+                                        picture={picture}
+                                        videos={videos}
+                                        divider={false}
+                                    />
+                                )}
+                                <Embargo item={item} />
+                                <UrgencyLabel item={item} listConfig={listConfig} />
+                                {item.headline}
+                            </div>
                         </h4>
 
                         {isExtended && !isMarketPlace && (
@@ -193,9 +223,6 @@ class WireListItem extends React.Component {
                                                 isItemDetail: false,
                                             }}
                                         />
-                                    </span>
-                                    <span>
-                                        <Embargo item={item} />
                                     </span>
                                 </div>
                             </div>
@@ -253,12 +280,24 @@ class WireListItem extends React.Component {
                         {showItemVersions(item) && (
                             <div
                                 className="no-bindable wire-articles__item__versions-btn"
-                                onClick={this.togglePreviousVersions}
                             >
-                                {gettext(
-                                    'Show previous versions ({{ count }})',
-                                    {count: item.ancestors.length}
-                                )}
+                                <button
+                                    className={classNames(
+                                        'label label-rounded label--success mt-1 mt-md-2',
+                                        {
+                                            'bg-transparent': !matchedIds.length,
+                                            'text-primary': !matchedIds.length,
+                                        }
+                                    )}
+                                    onClick={this.togglePreviousVersions}
+                                >
+                                    {getShowVersionText(
+                                        this.state.previousVersions,
+                                        item.ancestors.length,
+                                        matchedAncestors.length,
+                                        isExtended
+                                    )}
+                                </button>
                             </div>
                         )}
                     </div>
@@ -287,6 +326,7 @@ class WireListItem extends React.Component {
                             actions={this.props.actions}
                             onActionList={this.props.onActionList}
                             showActions={this.props.showActions}
+                            showShortcutActions={!showListActionIcons}
                         />
 
                         {!showListActionIcons ? null : this.props.actions.map(
@@ -346,6 +386,7 @@ WireListItem.propTypes = {
     contextName: PropTypes.string,
     listConfig: PropTypes.object,
     matchedIds: PropTypes.array,
+    isSearchFiltered: PropTypes.bool,
 };
 
 WireListItem.defaultProps = {

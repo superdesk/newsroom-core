@@ -331,6 +331,8 @@ def is_valid_login(user_id):
     :param str user_id: id of the user
     """
     user = get_cached_resource_by_id('users', user_id)
+    if not user:
+        return False
     if not (is_account_enabled(user)):
         session.pop('_flashes', None)  # remove old messages and just show one message
         flash(gettext('Account is disabled'), 'danger')
@@ -359,7 +361,7 @@ def get_items_by_id(ids, resource):
 
 def get_vocabulary(id):
     vocabularies = app.data.pymongo('items').db.vocabularies
-    if vocabularies and vocabularies.count_documents({}) > 0 and id:
+    if vocabularies is not None and vocabularies.count_documents({}) > 0 and id:
         return vocabularies.find_one({'_id': id})
 
     return None
