@@ -134,7 +134,7 @@ class BaseSearchService(Service):
         internal_req = self.get_internal_request(search)
         res = self.internal_get(internal_req, search.lookup)
         # count including previous versions
-        res.hits["hits"]["total"] = res.count() + len(self._matched_ids)
+        res.hits["hits"]["total"] = search_results.count()
         return res
 
     def get_last_version(self, doc):
