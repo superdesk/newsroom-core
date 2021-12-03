@@ -32,13 +32,13 @@ class TopicsResource(newsroom.Resource):
 
 
 class TopicsService(newsroom.Service):
-    def update(self, topic_id, updates, original):
+    def update(self, id, updates, original):
         # If ``is_global`` has been turned off, then remove all subscribers
         # except for the owner of the Topic
         if original.get('is_global') and not updates.get('is_global'):
             updates['subscribers'] = [original['user']]
 
-        return super().update(topic_id, updates, original)
+        return super().update(id, updates, original)
 
 
 def get_user_topics(user_id):
