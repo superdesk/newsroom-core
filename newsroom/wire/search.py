@@ -141,21 +141,25 @@ class WireSearchService(BaseSearchService):
         search = SearchQuery()
         self.prefill_search_args(search)
         self.prefill_search_items(search)
+        self.prefill_search_user(search)
+        self.prefill_search_company(search)
+        self.apply_company_filter(search)
         search.args['size'] = size
 
         product = get_resource_service('products').find_one(req=None, _id=product_id)
 
         if not product:
-            return
+            return []
 
-        search.query['bool']['must'].append({
-            "bool": {
-                "should": [
-                    {"range": {"embargoed": {"lt": "now"}}},
-                    {"bool": {"must_not": {"exists": {"field": "embargoed"}}}}
-                ]
-            }
-        })
+        if not app.config['DASHBOARD_EMBARGOED']:
+            search.query['bool']['must'].append({
+                "bool": {
+                    "should": [
+                        {"range": {"embargoed": {"lt": "now"}}},
+                        {"bool": {"must_not": {"exists": {"field": "embargoed"}}}}
+                    ]
+                }
+            })
 
         get_resource_service('section_filters').apply_section_filter(
             search.query,
