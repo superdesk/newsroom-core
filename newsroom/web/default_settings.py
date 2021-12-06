@@ -377,3 +377,6 @@ DATETIME_FORMAT_SHORT = "short"
 DATETIME_FORMAT_LONG = "dd/MM/yyyy HH:mm"
 
 PREPEND_EMBARGOED_TO_WIRE_SEARCH = False
+
+#: allow embargoed items on dashboard
+DASHBOARD_EMBARGOED = True
