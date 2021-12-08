@@ -642,3 +642,4 @@ class BaseSearchService(Service):
 
         if embargoed_response.count():
             response.docs = embargoed_response.docs + response.docs
+            response.hits["hits"]["total"] = response.count() + embargoed_response.count()
