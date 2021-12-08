@@ -6,7 +6,7 @@ import hashlib
 
 from flask import current_app as app
 from eve.utils import str_to_date
-from flask_babel import format_time, format_date, format_datetime
+from flask_babel import format_time, format_date, format_datetime, get_locale
 from flask_babel.speaklater import LazyString
 from jinja2.utils import htmlsafe_json_dumps  # type: ignore
 from superdesk import get_resource_service
@@ -115,7 +115,14 @@ def sidenavs(blueprint=None):
     def blueprint_matches(nav, blueprint):
         return not nav.get('blueprint') or not blueprint or nav['blueprint'] == blueprint
 
-    return [nav for nav in app.sidenavs if blueprint_matches(nav, blueprint)]
+    locale = str(get_locale())
+
+    return [
+        nav for nav in app.sidenavs
+        if blueprint_matches(nav, blueprint) and (
+            nav.get('locale') is None or nav['locale'] == locale
+        )
+    ]
 
 
 def section_allowed(nav, sections):
