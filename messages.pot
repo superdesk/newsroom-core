@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-12-06 12:11+0100\n"
+"POT-Creation-Date: 2021-12-09 11:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -126,7 +126,8 @@ msgstr ""
 msgid "Monitoring report logo image (jpg or png) for RTF reports."
 msgstr ""
 
-#: newsroom/agenda/utils.py:33 newsroom/utils.py:188
+#: assets/missing-translations.js:3 newsroom/agenda/utils.py:33
+#: newsroom/utils.py:188
 msgid "ALL DAY"
 msgstr ""
 
@@ -252,7 +253,7 @@ msgstr ""
 msgid "CEO"
 msgstr ""
 
-#: newsroom/auth/forms.py:14
+#: assets/companies/utils.js:7 newsroom/auth/forms.py:14
 msgid "Other"
 msgstr ""
 
@@ -462,8 +463,8 @@ msgstr ""
 #: assets/company-reports/components/ContentActivity.jsx:111
 #: assets/monitoring/components/MonitoringList.jsx:24
 #: assets/search/components/TopicParameters.jsx:69
-#: newsroom/monitoring/forms.py:19 newsroom/reports/content_activity.py:229
-#: newsroom/wire/__init__.py:110
+#: assets/wire/components/PreviewTags.jsx:39 newsroom/monitoring/forms.py:19
+#: newsroom/reports/content_activity.py:229 newsroom/wire/__init__.py:110
 msgid "Subject"
 msgstr ""
 
@@ -613,7 +614,7 @@ msgstr ""
 #: assets/agenda/components/AgendaTags.jsx:25
 #: assets/company-reports/components/ContentActivity.jsx:110
 #: assets/search/components/TopicParameters.jsx:68
-#: assets/wire/components/PreviewTags.jsx:32
+#: assets/wire/components/PreviewTags.jsx:33
 #: newsroom/reports/content_activity.py:228
 #: newsroom/templates/wire_item.html:76
 #: newsroom/templates/wire_item_print.html:24 newsroom/wire/__init__.py:106
@@ -636,7 +637,7 @@ msgstr ""
 #: assets/agenda/components/AgendaAttachments.jsx:42
 #: assets/company-reports/components/ContentActivity.jsx:62
 #: assets/company-reports/components/ContentActivity.jsx:117
-#: assets/ui/components/ArticleVideo.jsx:16
+#: assets/item-actions.js:51 assets/ui/components/ArticleVideo.jsx:16
 #: assets/wire/components/DownloadItemsModal.jsx:53
 #: newsroom/reports/content_activity.py:237
 msgid "Download"
@@ -644,13 +645,13 @@ msgstr ""
 
 #: assets/company-reports/components/ContentActivity.jsx:63
 #: assets/company-reports/components/ContentActivity.jsx:118
-#: newsroom/reports/content_activity.py:240
+#: assets/item-actions.js:44 newsroom/reports/content_activity.py:240
 msgid "Copy"
 msgstr ""
 
 #: assets/company-reports/components/ContentActivity.jsx:64
 #: assets/company-reports/components/ContentActivity.jsx:119
-#: assets/components/ShareItemModal.jsx:95
+#: assets/components/ShareItemModal.jsx:95 assets/item-actions.js:27
 #: assets/search/components/FollowedTopics.jsx:48
 #: newsroom/reports/content_activity.py:243
 msgid "Share"
@@ -658,13 +659,13 @@ msgstr ""
 
 #: assets/company-reports/components/ContentActivity.jsx:65
 #: assets/company-reports/components/ContentActivity.jsx:120
-#: newsroom/reports/content_activity.py:246
+#: assets/item-actions.js:37 newsroom/reports/content_activity.py:246
 msgid "Print"
 msgstr ""
 
 #: assets/company-reports/components/ContentActivity.jsx:66
 #: assets/company-reports/components/ContentActivity.jsx:121
-#: newsroom/reports/content_activity.py:249
+#: assets/item-actions.js:20 newsroom/reports/content_activity.py:249
 msgid "Open"
 msgstr ""
 
@@ -975,14 +976,14 @@ msgid "Source:"
 msgstr ""
 
 #: assets/agenda/components/AgendaTags.jsx:24
-#: assets/wire/components/PreviewTags.jsx:25
+#: assets/wire/components/PreviewTags.jsx:26
 #: newsroom/templates/wire_item.html:73
 #: newsroom/templates/wire_item_print.html:21
 msgid "Metadata"
 msgstr ""
 
 #: assets/search/components/TopicParameters.jsx:70
-#: assets/wire/components/PreviewTags.jsx:38
+#: assets/wire/components/PreviewTags.jsx:45
 #: newsroom/templates/wire_item.html:86
 #: newsroom/templates/wire_item_print.html:28 newsroom/wire/__init__.py:114
 msgid "Content Type"
@@ -1007,18 +1008,22 @@ msgstr ""
 msgid "User Management"
 msgstr ""
 
+#: assets/monitoring/utils.js:4 assets/users/utils.js:5
 #: newsroom/users/forms.py:14
 msgid "Administrator"
 msgstr ""
 
+#: assets/monitoring/utils.js:6 assets/users/utils.js:7
 #: newsroom/users/forms.py:15
 msgid "Public"
 msgstr ""
 
+#: assets/monitoring/utils.js:5 assets/users/utils.js:6
 #: newsroom/users/forms.py:16
 msgid "Internal"
 msgstr ""
 
+#: assets/monitoring/utils.js:7 assets/users/utils.js:8
 #: newsroom/users/forms.py:17
 msgid "Account Management"
 msgstr ""
@@ -1104,7 +1109,7 @@ msgstr ""
 msgid "Story Image"
 msgstr ""
 
-#: newsroom/wire/__init__.py:80
+#: assets/missing-translations.js:11 newsroom/wire/__init__.py:80
 msgid "News only filter"
 msgstr ""
 
@@ -1115,7 +1120,7 @@ msgid ""
 "matching this filter will not be displayed."
 msgstr ""
 
-#: newsroom/wire/__init__.py:87
+#: assets/missing-translations.js:12 newsroom/wire/__init__.py:87
 msgid "Time limit for Wire products (in days)"
 msgstr ""
 
@@ -1125,6 +1130,241 @@ msgstr ""
 
 #: newsroom/wire/views.py:312
 msgid "Not found"
+msgstr ""
+
+#: assets/cards/components/EditCard.jsx:89
+#: assets/companies/components/CompanyPermissions.jsx:121
+#: assets/companies/components/EditCompany.jsx:197
+#: assets/companies/components/EditCompanyAPI.jsx:85
+#: assets/components/CardEditor.jsx:64 assets/components/EditPanel.jsx:107
+#: assets/components/Modal.jsx:159
+#: assets/general-settings/components/GeneralSettingsApp.jsx:83
+#: assets/item-actions.js:60
+#: assets/monitoring/components/EditMonitoringProfile.jsx:205
+#: assets/monitoring/components/MonitoringSchedule.jsx:197
+#: assets/navigations/components/EditNavigation.jsx:120
+#: assets/products/components/EditProduct.jsx:173
+#: assets/search/components/MonitoringEditor.jsx:210
+#: assets/search/components/TopicEditor.jsx:212
+#: assets/search/components/TopicEditor.jsx:215
+#: assets/section-filters/components/EditSectionFilter.jsx:87
+#: assets/users/components/EditUser.jsx:122
+msgid "Save"
+msgstr ""
+
+#: assets/item-actions.js:69
+msgid "Unsave"
+msgstr ""
+
+#: assets/item-actions.js:78
+msgid "Remove"
+msgstr ""
+
+#: assets/agenda/components/AgendaCoverageRequest.jsx:39
+#: assets/missing-translations.js:4
+msgid "Coverage inquiries"
+msgstr ""
+
+#: assets/missing-translations.js:5
+msgid "Department"
+msgstr ""
+
+#: assets/missing-translations.js:6
+msgid "Genre"
+msgstr ""
+
+#: assets/missing-translations.js:7
+msgid "Version"
+msgstr ""
+
+#: assets/missing-translations.js:8
+msgid "Premium"
+msgstr ""
+
+#: assets/missing-translations.js:9
+msgid "Non-premium"
+msgstr ""
+
+#: assets/missing-translations.js:10
+msgid "Non-media"
+msgstr ""
+
+#: assets/missing-translations.js:13
+msgid "New company"
+msgstr ""
+
+#: assets/missing-translations.js:14
+msgid "New user"
+msgstr ""
+
+#: assets/missing-translations.js:15
+msgid "New navigation"
+msgstr ""
+
+#: assets/missing-translations.js:16
+msgid "New section filter"
+msgstr ""
+
+#: assets/missing-translations.js:17
+msgid "New card"
+msgstr ""
+
+#: assets/agenda/actions.js:117
+msgid "Your inquiry has been sent successfully"
+msgstr ""
+
+#: assets/agenda/actions.js:190
+msgid "Dates: {{ dates }}"
+msgstr ""
+
+#: assets/agenda/actions.js:191
+msgid "Location: {{ location }}"
+msgstr ""
+
+#: assets/agenda/actions.js:192
+msgid "Ednote: {{ ednote }}"
+msgstr ""
+
+#: assets/agenda/actions.js:195 assets/agenda/actions.js:220
+#: assets/agenda/actions.js:225
+msgid "Description: {{ description }}"
+msgstr ""
+
+#: assets/agenda/actions.js:201
+msgid "Contacts"
+msgstr ""
+
+#: assets/agenda/actions.js:203
+msgid "Name: {{ contact }}"
+msgstr ""
+
+#: assets/agenda/actions.js:204
+msgid "Organisation: {{ organisation }}"
+msgstr ""
+
+#: assets/agenda/actions.js:205
+msgid "Email: {{ email }}"
+msgstr ""
+
+#: assets/agenda/actions.js:206
+msgid "Phone: {{ phone }}"
+msgstr ""
+
+#: assets/agenda/actions.js:207
+msgid "Mobile: {{ mobile }}"
+msgstr ""
+
+#: assets/agenda/actions.js:213
+msgid "Calendars: {{ calendars }}"
+msgstr ""
+
+#: assets/agenda/actions.js:219
+msgid "Planning item"
+msgstr ""
+
+#: assets/agenda/actions.js:222
+msgid "Coverage type: {{ type }}"
+msgstr ""
+
+#: assets/agenda/actions.js:223
+msgid "Scheduled: {{ schedule }}"
+msgstr ""
+
+#: assets/agenda/actions.js:224
+msgid "Status: {{ status }}"
+msgstr ""
+
+#: assets/agenda/actions.js:235 assets/wire/actions.js:189
+msgid "Item copied successfully."
+msgstr ""
+
+#: assets/agenda/actions.js:238 assets/wire/actions.js:192
+msgid "Sorry, Copy is not supported."
+msgstr ""
+
+#: assets/agenda/actions.js:343
+msgid "Started watching items successfully."
+msgstr ""
+
+#: assets/agenda/actions.js:354
+msgid "Stopped watching items successfully."
+msgstr ""
+
+#: assets/agenda/actions.js:399 assets/wire/actions.js:359
+msgid "Items were bookmarked successfully."
+msgstr ""
+
+#: assets/agenda/actions.js:401 assets/wire/actions.js:361
+msgid "Item was bookmarked successfully."
+msgstr ""
+
+#: assets/agenda/actions.js:416 assets/wire/actions.js:376
+msgid "Items were removed from bookmarks successfully."
+msgstr ""
+
+#: assets/agenda/actions.js:418 assets/wire/actions.js:378
+msgid "Item was removed from bookmarks successfully."
+msgstr ""
+
+#: assets/agenda/actions.js:679
+msgid "Started watching coverage successfully."
+msgstr ""
+
+#: assets/agenda/actions.js:692
+msgid "Stopped watching coverage successfully."
+msgstr ""
+
+#: assets/agenda/item-actions.js:21 assets/agenda/item-actions.js:41
+msgid "Watch"
+msgstr ""
+
+#: assets/agenda/item-actions.js:28 assets/agenda/item-actions.js:48
+msgid "Stop watching"
+msgstr ""
+
+#: assets/agenda/item-actions.js:45
+msgid "Watch this coverage"
+msgstr ""
+
+#: assets/agenda/utils.js:53
+msgid "updated {{ at }}"
+msgstr ""
+
+#: assets/agenda/utils.js:63
+msgid "Time to be confirmed"
+msgstr ""
+
+#: assets/agenda/utils.js:73 assets/agenda/utils.js:74
+msgid "not planned"
+msgstr ""
+
+#: assets/agenda/utils.js:75 assets/agenda/utils.js:82
+msgid "planned"
+msgstr ""
+
+#: assets/agenda/utils.js:76 assets/agenda/utils.js:77
+msgid "on merit"
+msgstr ""
+
+#: assets/agenda/utils.js:78
+msgid "on request"
+msgstr ""
+
+#: assets/agenda/utils.js:83
+msgid "in progress"
+msgstr ""
+
+#: assets/agenda/utils.js:84
+msgid "available"
+msgstr ""
+
+#: assets/agenda/components/AgendaListItemLabels.jsx:19
+#: assets/agenda/utils.js:85
+msgid "cancelled"
+msgstr ""
+
+#: assets/agenda/utils.js:475
+msgid "Update expected @ ${dateString}"
 msgstr ""
 
 #: assets/agenda/components/AgendaApp.jsx:142
@@ -1176,10 +1416,6 @@ msgstr ""
 
 #: assets/agenda/components/AgendaCoverageExistsFilter.jsx:36
 msgid "Coverage not planned"
-msgstr ""
-
-#: assets/agenda/components/AgendaCoverageRequest.jsx:39
-msgid "Coverage inquiries"
 msgstr ""
 
 #: assets/agenda/components/AgendaCoverageRequest.jsx:46
@@ -1335,10 +1571,6 @@ msgstr ""
 msgid "postponed"
 msgstr ""
 
-#: assets/agenda/components/AgendaListItemLabels.jsx:19
-msgid "cancelled"
-msgstr ""
-
 #: assets/agenda/components/AgendaListItemLabels.jsx:23
 msgid "rescheduled"
 msgstr ""
@@ -1396,6 +1628,63 @@ msgstr ""
 
 #: assets/agenda/components/CoverageItemStatus.jsx:147
 msgid "Update coming"
+msgstr ""
+
+#: assets/am-news/utils.js:37
+msgid "Text"
+msgstr ""
+
+#: assets/am-news/utils.js:41
+msgid "Fuel"
+msgstr ""
+
+#: assets/am-news/utils.js:43
+msgid "Weather"
+msgstr ""
+
+#: assets/am-news/utils.js:48
+msgid "Alert"
+msgstr ""
+
+#: assets/am-news/utils.js:50
+msgid "Headlines"
+msgstr ""
+
+#: assets/am-news/utils.js:52
+msgid "Quote"
+msgstr ""
+
+#: assets/cards/actions.js:89
+msgid "Invalid Url."
+msgstr ""
+
+#: assets/cards/actions.js:94
+msgid "Invalid count of media."
+msgstr ""
+
+#: assets/cards/actions.js:101
+msgid "Count of media should be greater than zero."
+msgstr ""
+
+#: assets/cards/actions.js:107
+#: assets/components/cards/edit/ConfigExternalMedia.jsx:28
+msgid "Total media count across all media config should be between 1 and 4."
+msgstr ""
+
+#: assets/cards/actions.js:112
+msgid "Failed to update Card."
+msgstr ""
+
+#: assets/cards/actions.js:132
+msgid "Card updated successfully"
+msgstr ""
+
+#: assets/cards/actions.js:134
+msgid "Card created successfully"
+msgstr ""
+
+#: assets/cards/actions.js:156
+msgid "Card deleted successfully"
 msgstr ""
 
 #: assets/cards/components/CardList.jsx:23
@@ -1463,25 +1752,6 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: assets/cards/components/EditCard.jsx:89
-#: assets/companies/components/CompanyPermissions.jsx:121
-#: assets/companies/components/EditCompany.jsx:197
-#: assets/companies/components/EditCompanyAPI.jsx:85
-#: assets/components/CardEditor.jsx:64 assets/components/EditPanel.jsx:107
-#: assets/components/Modal.jsx:159
-#: assets/general-settings/components/GeneralSettingsApp.jsx:83
-#: assets/monitoring/components/EditMonitoringProfile.jsx:205
-#: assets/monitoring/components/MonitoringSchedule.jsx:197
-#: assets/navigations/components/EditNavigation.jsx:120
-#: assets/products/components/EditProduct.jsx:173
-#: assets/search/components/MonitoringEditor.jsx:210
-#: assets/search/components/TopicEditor.jsx:212
-#: assets/search/components/TopicEditor.jsx:215
-#: assets/section-filters/components/EditSectionFilter.jsx:87
-#: assets/users/components/EditUser.jsx:122
-msgid "Save"
-msgstr ""
-
 #: assets/cards/components/EditCard.jsx:94
 #: assets/companies/components/EditCompany.jsx:202
 #: assets/components/CardEditor.jsx:105
@@ -1492,6 +1762,30 @@ msgstr ""
 #: assets/section-filters/components/EditSectionFilter.jsx:92
 #: assets/users/components/EditUser.jsx:128
 msgid "Delete"
+msgstr ""
+
+#: assets/companies/actions.js:109 assets/companies/actions.js:144
+msgid "Company updated successfully"
+msgstr ""
+
+#: assets/companies/actions.js:111
+msgid "Company created successfully"
+msgstr ""
+
+#: assets/companies/actions.js:165
+msgid "Company deleted successfully"
+msgstr ""
+
+#: assets/companies/utils.js:4
+msgid "Australia"
+msgstr ""
+
+#: assets/companies/utils.js:5
+msgid "New Zealand"
+msgstr ""
+
+#: assets/companies/utils.js:6
+msgid "Finland"
 msgstr ""
 
 #: assets/companies/components/Companies.jsx:60
@@ -1591,6 +1885,14 @@ msgstr ""
 
 #: assets/companies/components/EditCompanyAPI.jsx:76
 msgid "Allowed IP Addresses"
+msgstr ""
+
+#: assets/company-reports/actions.js:40
+msgid "To date is after From date"
+msgstr ""
+
+#: assets/company-reports/actions.js:151
+msgid "No data to export."
 msgstr ""
 
 #: assets/company-reports/components/ComapnyNewsApiUsage.jsx:72
@@ -1875,6 +2177,50 @@ msgstr ""
 msgid "Message"
 msgstr ""
 
+#: assets/components/cards/utils.js:23
+msgid "6-text-only"
+msgstr ""
+
+#: assets/components/cards/utils.js:30
+msgid "4-picture-text"
+msgstr ""
+
+#: assets/components/cards/utils.js:37
+msgid "4-media-gallery"
+msgstr ""
+
+#: assets/components/cards/utils.js:44
+msgid "4-photo-gallery"
+msgstr ""
+
+#: assets/components/cards/utils.js:51
+msgid "1x1-top-news"
+msgstr ""
+
+#: assets/components/cards/utils.js:58
+msgid "2x2-top-news"
+msgstr ""
+
+#: assets/components/cards/utils.js:65
+msgid "3-text-only"
+msgstr ""
+
+#: assets/components/cards/utils.js:72
+msgid "3-picture-text"
+msgstr ""
+
+#: assets/components/cards/utils.js:79
+msgid "4-text-only"
+msgstr ""
+
+#: assets/components/cards/utils.js:86
+msgid "2x2-events"
+msgstr ""
+
+#: assets/components/cards/utils.js:93
+msgid "6 Navigation Tiles Per Row"
+msgstr ""
+
 #: assets/components/cards/edit/ConfigEvent.jsx:33
 msgid "Abstract"
 msgstr ""
@@ -1898,10 +2244,6 @@ msgstr ""
 
 #: assets/components/cards/edit/ConfigExternalMedia.jsx:23
 msgid "More button url"
-msgstr ""
-
-#: assets/components/cards/edit/ConfigExternalMedia.jsx:28
-msgid "Total media count across all media config should be between 1 and 4."
 msgstr ""
 
 #: assets/components/cards/edit/ConfigExternalMedia.jsx:40
@@ -1940,6 +2282,10 @@ msgstr ""
 msgid "Stories"
 msgstr ""
 
+#: assets/general-settings/actions.js:14
+msgid "Settings were updated successfully."
+msgstr ""
+
 #: assets/home/components/HomeApp.jsx:123
 #: assets/market-place/components/MarketPlaceApp.jsx:34
 msgid "Warning"
@@ -1966,6 +2312,30 @@ msgstr ""
 
 #: assets/market-place/components/MarketPlaceApp.jsx:34
 msgid "There's no navigations defined!"
+msgstr ""
+
+#: assets/monitoring/actions.js:92
+msgid "Monitoring Profile updated successfully"
+msgstr ""
+
+#: assets/monitoring/actions.js:94
+msgid "Monitoring Profile created successfully"
+msgstr ""
+
+#: assets/monitoring/actions.js:160
+msgid "Monitoring Profile users updated successfully"
+msgstr ""
+
+#: assets/monitoring/actions.js:172
+msgid "Please create the monitoring profile first."
+msgstr ""
+
+#: assets/monitoring/actions.js:177
+msgid "Monitoring Profile schedule updated successfully"
+msgstr ""
+
+#: assets/monitoring/actions.js:193
+msgid "Monitoring Profile deleted successfully"
 msgstr ""
 
 #: assets/monitoring/components/EditMonitoringProfile.jsx:26
@@ -2120,6 +2490,18 @@ msgstr ""
 msgid "Would you like to delete navigation: {{name}}"
 msgstr ""
 
+#: assets/news-api/actions.js:17
+msgid "API Token generated successfully"
+msgstr ""
+
+#: assets/news-api/actions.js:25
+msgid "API Token deleted successfully"
+msgstr ""
+
+#: assets/news-api/actions.js:37
+msgid "API Token updated successfully"
+msgstr ""
+
 #: assets/news-api/components/EditAPIToken.jsx:100
 msgid "Cannot be in the past"
 msgstr ""
@@ -2168,6 +2550,27 @@ msgstr ""
 msgid "Generate Token"
 msgstr ""
 
+#: assets/notifications/actions.js:40
+msgid "Notification cleared successfully"
+msgstr ""
+
+#: assets/notifications/actions.js:58
+msgid "Notifications cleared successfully"
+msgstr ""
+
+#: assets/products/actions.js:92 assets/products/actions.js:147
+#: assets/products/actions.js:177
+msgid "Product updated successfully"
+msgstr ""
+
+#: assets/products/actions.js:94
+msgid "Product created successfully"
+msgstr ""
+
+#: assets/products/actions.js:116
+msgid "Product deleted successfully"
+msgstr ""
+
 #: assets/products/components/EditProduct.jsx:58
 msgid "Test product"
 msgstr ""
@@ -2199,6 +2602,14 @@ msgstr ""
 
 #: assets/products/components/Products.jsx:66
 msgid "Would you like to delete product: {{name}}"
+msgstr ""
+
+#: assets/search/actions.js:283
+msgid "Items were shared successfully."
+msgstr ""
+
+#: assets/search/actions.js:285
+msgid "Item was shared successfully."
 msgstr ""
 
 #: assets/search/components/FollowedTopics.jsx:80
@@ -2346,6 +2757,18 @@ msgstr ""
 msgid "Manage my {{name}}"
 msgstr ""
 
+#: assets/section-filters/actions.js:72
+msgid "Section Filter updated successfully"
+msgstr ""
+
+#: assets/section-filters/actions.js:74
+msgid "Section Filter created successfully"
+msgstr ""
+
+#: assets/section-filters/actions.js:96
+msgid "Section Filter deleted successfully"
+msgstr ""
+
 #: assets/section-filters/components/EditSectionFilter.jsx:20
 msgid "New Filter"
 msgstr ""
@@ -2360,6 +2783,14 @@ msgstr ""
 
 #: assets/section-filters/components/SectionFiltersApp.jsx:31
 msgid "Section Filter"
+msgstr ""
+
+#: assets/tests/utils.spec.js:5
+msgid "foo"
+msgstr ""
+
+#: assets/tests/utils.spec.js:9
+msgid "hello {{ name }}"
 msgstr ""
 
 #: assets/ui/components/ArticleAuthor.jsx:6
@@ -2384,6 +2815,22 @@ msgstr ""
 
 #: assets/ui/components/Preview.jsx:9
 msgid "Article preview panel"
+msgstr ""
+
+#: assets/user-profile/actions.js:102 assets/users/actions.js:105
+msgid "User updated successfully"
+msgstr ""
+
+#: assets/user-profile/actions.js:105
+msgid "Please reload the page in order to change language."
+msgstr ""
+
+#: assets/user-profile/actions.js:136
+msgid "Topic deleted successfully"
+msgstr ""
+
+#: assets/user-profile/actions.js:168
+msgid "Topic was shared successfully."
 msgstr ""
 
 #: assets/user-profile/components/UserProfileApp.jsx:38
@@ -2424,6 +2871,18 @@ msgstr ""
 msgid "Save Changes"
 msgstr ""
 
+#: assets/users/actions.js:107
+msgid "User created successfully"
+msgstr ""
+
+#: assets/users/actions.js:124
+msgid "Reset password token is sent successfully"
+msgstr ""
+
+#: assets/users/actions.js:142
+msgid "User deleted successfully"
+msgstr ""
+
 #: assets/users/components/EditUser.jsx:17
 msgid "Add/Edit User"
 msgstr ""
@@ -2447,6 +2906,30 @@ msgstr ""
 
 #: assets/users/components/UsersList.jsx:32
 msgid "Last Active"
+msgstr ""
+
+#: assets/wire/actions.js:128
+msgid "Are you sure you want to permanently remove these item(s)?"
+msgstr ""
+
+#: assets/wire/actions.js:132
+msgid "Items were removed successfully"
+msgstr ""
+
+#: assets/wire/actions.js:134
+msgid "Item was removed successfully"
+msgstr ""
+
+#: assets/wire/actions.js:165
+msgid "By: {{ byline }}"
+msgstr ""
+
+#: assets/wire/actions.js:166
+msgid "Location: {{ located }}"
+msgstr ""
+
+#: assets/wire/actions.js:167
+msgid "Source: {{ source }}"
 msgstr ""
 
 #: assets/wire/components/AgendaLinks.jsx:84
@@ -2507,7 +2990,7 @@ msgstr ""
 msgid "Note"
 msgstr ""
 
-#: assets/wire/components/PreviewTags.jsx:27
+#: assets/wire/components/PreviewTags.jsx:28
 msgid "Slugline"
 msgstr ""
 
