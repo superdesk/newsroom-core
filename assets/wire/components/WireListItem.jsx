@@ -19,6 +19,7 @@ import {
     shortText,
     isKilled,
     getVideos,
+    getCaption,
 } from 'wire/utils';
 
 import ActionButton from 'components/ActionButton';
@@ -236,6 +237,7 @@ class WireListItem extends React.Component {
                             >
                                 <img
                                     src={`/theme/logo/${item.source}.png`}
+                                    alt={item.source}
                                 />
                             </div>,
                             <div
@@ -311,6 +313,7 @@ class WireListItem extends React.Component {
                                     src={
                                         getThumbnailRendition(picture).href
                                     }
+                                    alt={getCaption(picture)}
                                 />
                             </figure>
                         </div>

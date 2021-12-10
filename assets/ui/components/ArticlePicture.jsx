@@ -44,8 +44,8 @@ export default function ArticlePicture({isKilled, picture, isItemDetails, isCust
 
     return (<figure className='wire-column__preview__image'>
         {isItemDetails &&
-        <span><img src={renditions.href} className={classes} /></span> ||
-        <img src={renditions.href} className={classes}/>}
+        <span><img src={renditions.href} className={classes} alt={caption} /></span> ||
+        <img src={renditions.href} className={classes} alt={caption} />}
         <figcaption className='wire-column__preview__caption'>
             {caption}
             {bylineHref ? (
