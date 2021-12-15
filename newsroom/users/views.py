@@ -39,7 +39,7 @@ def get_view_data():
         'locators': get_vocabulary('locators')
     }
 
-    if app.config.get('ENABLE_WATCH_LISTS'):
+    if app.config.get('ENABLE_MONITORING'):
         rv['monitoring_list'] = get_monitoring_for_company(user)
 
     rv.update(get_company_sections_monitoring_data(company))
