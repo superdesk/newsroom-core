@@ -37,7 +37,7 @@ import {
 import {getMaxVersion} from 'local-store';
 import {REMOVE_NEW_ITEMS} from './agenda/actions';
 import {toggleValue} from 'utils';
-import { topicsReducer } from './topics/reducer';
+import {topicsReducer} from './topics/reducer';
 
 export function modalReducer(state, action) {
     switch (action.type) {

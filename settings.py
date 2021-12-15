@@ -1,4 +1,4 @@
-from newsroom.default_settings import CELERY_BEAT_SCHEDULE as CELERY_BEAT_SCHEDULE_DEFAULT
+from newsroom.web.default_settings import CELERY_BEAT_SCHEDULE as CELERY_BEAT_SCHEDULE_DEFAULT
 
 SITE_NAME = 'News Centre'
 SHOW_USER_REGISTER = True
