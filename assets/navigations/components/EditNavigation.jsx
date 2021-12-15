@@ -4,10 +4,10 @@ import TextInput from 'components/TextInput';
 import CheckboxInput from 'components/CheckboxInput';
 import EditPanel from 'components/EditPanel';
 import FileInput from 'components/FileInput';
-import { get } from 'lodash';
+import {get} from 'lodash';
 
-import { gettext } from 'utils';
-import { sectionsPropType } from 'features/sections/types';
+import {gettext} from 'utils';
+import {sectionsPropType} from 'features/sections/types';
 import {MAX_TILE_IMAGES} from '../actions';
 import AuditInformation from 'components/AuditInformation';
 
@@ -54,7 +54,7 @@ class EditNavigation extends React.Component {
                         type='button'
                         className='icon-button'
                         data-dismiss='modal'
-                        aria-label='Close'
+                        aria-label={gettext('Close')}
                         onClick={this.props.onClose}>
                         <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
                     </button>

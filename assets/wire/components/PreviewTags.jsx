@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { uniqBy } from 'lodash';
-import { gettext, isDisplayed } from 'utils';
+import {uniqBy} from 'lodash';
+import {gettext, isDisplayed} from 'utils';
 import InfoBox from './InfoBox';
 import PreviewTagsBlock from './PreviewTagsBlock';
 import PreviewTagsLink from './PreviewTagsLink';
@@ -19,6 +19,7 @@ function formatCV(items, field) {
 
 function PreviewTags({item, isItemDetail, displayConfig}) {
     const genres = item.genre && formatCV(item.genre, 'genre');
+    const services = item.service && formatCV(item.service, 'service');
     const subjects = item.subject && formatCV(item.subject, 'subject');
 
     return (
@@ -28,8 +29,14 @@ function PreviewTags({item, isItemDetail, displayConfig}) {
                     <ArticleSlugline item={item}/>
                 </PreviewTagsBlock>)}
 
-            {subjects && isDisplayed('subjects', displayConfig) &&
+            {services && isDisplayed('services', displayConfig) &&
                 <PreviewTagsBlock label={gettext('Category')}>
+                    {services}
+                </PreviewTagsBlock>
+            }
+
+            {subjects && isDisplayed('subjects', displayConfig) &&
+                <PreviewTagsBlock label={gettext('Subject')}>
                     {subjects}
                 </PreviewTagsBlock>
             }

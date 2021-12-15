@@ -8,7 +8,7 @@ import {
 import {BOOKMARK_ITEMS, REMOVE_BOOKMARK} from '../wire/actions';
 import {CLOSE_MODAL, MODAL_FORM_VALID, RENDER_MODAL} from '../actions';
 import {modalReducer} from '../reducers';
-import { topicsReducer } from '../topics/reducer';
+import {topicsReducer} from '../topics/reducer';
 
 const initialState = {
     cards: [],
@@ -16,6 +16,7 @@ const initialState = {
     products: [],
     itemsByCard: {},
     activeCard: null,
+    uiConfig: {},
 };
 
 export default function homeReducer(state=initialState, action) {

@@ -9,14 +9,14 @@ import AgendaFilterButton from './AgendaFilterButton';
 
 
 const getActiveTypeahead = (filter, activeFilter) => {
-    return activeFilter[filter.field] ? activeFilter[filter.field][0] : [];
+    return activeFilter[filter.field] ? activeFilter[filter.field] : [];
 };
 const processBuckets = (buckets) => buckets.map((bucket) => bucket.key).sort();
 
 class AgendaTypeAheadFilter extends React.PureComponent {
     constructor(props) {
         super(props);
-        this.state = { dropdownOpen: false };
+        this.state = {dropdownOpen: false};
 
         this.dom = {};
         this.toggleDropdown = this.toggleDropdown.bind(this);
@@ -33,7 +33,7 @@ class AgendaTypeAheadFilter extends React.PureComponent {
             document.addEventListener('click', this.handleClickOutside);
         }
 
-        this.setState({ dropdownOpen: !this.state.dropdownOpen });
+        this.setState({dropdownOpen: !this.state.dropdownOpen});
     }
 
     handleClickOutside(e) {

@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import {get} from 'lodash';
 
 import TextInput from 'components/TextInput';
 import CheckboxInput from 'components/CheckboxInput';
 
-import { gettext, getProductQuery } from 'utils';
+import {gettext, getProductQuery} from 'utils';
 import EditPanel from '../../components/EditPanel';
 import AuditInformation from 'components/AuditInformation';
 import {sectionsPropType} from '../../features/sections/types';
@@ -78,7 +78,7 @@ class EditProduct extends React.Component {
                         type='button'
                         className='icon-button'
                         data-dismiss='modal'
-                        aria-label='Close'
+                        aria-label={gettext('Close')}
                         onClick={this.props.onClose}>
                         <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
                     </button>

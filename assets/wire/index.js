@@ -1,7 +1,7 @@
-import { createStore, render, initWebSocket, getInitData, closeItemOnMobile, isMobilePhone } from 'utils';
+import {createStore, render, initWebSocket, getInitData, closeItemOnMobile, isMobilePhone} from 'utils';
 
 import wireReducer from './reducers';
-import {getNewsOnlyParam, getReadItems} from 'local-store';
+import {getNewsOnlyParam, getSearchAllVersionsParam, getReadItems} from 'local-store';
 import WireApp from './components/WireApp';
 import {
     fetchItems,
@@ -12,12 +12,12 @@ import {
     openItemDetails,
     previewItem,
 } from './actions';
-import { setView } from 'search/actions';
+import {setView} from 'search/actions';
 
 const store = createStore(wireReducer, 'Wire');
 
 // init data
-store.dispatch(initData(getInitData(window.wireData), getReadItems(), getNewsOnlyParam()));
+store.dispatch(initData(getInitData(window.wireData), getReadItems(), getNewsOnlyParam(), getSearchAllVersionsParam()));
 
 // init view
 if (localStorage.getItem('view')) {

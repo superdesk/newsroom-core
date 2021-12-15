@@ -9,10 +9,11 @@ from flask import current_app as app, request, jsonify, url_for
 from eve.render import send_response
 from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
+from werkzeug.datastructures import ImmutableMultiDict
 from flask_babel import gettext
 from superdesk.utc import utcnow
-
 from superdesk import get_resource_service
+from superdesk.default_settings import strtobool
 
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.products.products import get_products_by_company
@@ -86,9 +87,10 @@ def get_view_data():
     }
 
 
-def get_items_by_card(cards):
-    if app.cache.get(HOME_ITEMS_CACHE_KEY):
-        return app.cache.get(HOME_ITEMS_CACHE_KEY)
+def get_items_by_card(cards, company_id):
+    cache_key = '{}{}'.format(HOME_ITEMS_CACHE_KEY, company_id or '')
+    if app.cache.get(cache_key):
+        return app.cache.get(cache_key)
 
     items_by_card = {}
     for card in cards:
@@ -100,7 +102,7 @@ def get_items_by_card(cards):
             # using '/media_card_external' endpoint
             items_by_card[card['label']] = None
 
-    app.cache.set(HOME_ITEMS_CACHE_KEY, items_by_card, timeout=300)
+    app.cache.set(cache_key, items_by_card, timeout=300)
     return items_by_card
 
 
@@ -108,8 +110,8 @@ def get_home_data():
     user = get_user()
     cards = list(query_resource('cards', lookup={'dashboard': 'newsroom'}))
     company_id = str(user['company']) if user and user.get('company') else None
-    items_by_card = get_items_by_card(cards)
     topics = get_user_topics(user['_id']) if user else []
+    items_by_card = get_items_by_card(cards, company_id)
 
     return {
         'cards': cards,
@@ -121,8 +123,8 @@ def get_home_data():
         'formats': [{'format': f['format'], 'name': f['name'], 'types': f['types'], 'assets': f['assets']}
                     for f in app.download_formatters.values()],
         'context': 'wire',
-        'ui_config': get_resource_service('ui_config').getSectionConfig('wire'),
         'topics': topics,
+        'ui_config': get_resource_service('ui_config').getSectionConfig('home'),
     }
 
 
@@ -175,6 +177,17 @@ def bookmarks():
 
 @blueprint.route('/wire/search')
 def search():
+    if 'prepend_embargoed' in request.args or app.config['PREPEND_EMBARGOED_TO_WIRE_SEARCH']:
+        args = request.args.to_dict()
+        args['prepend_embargoed'] = strtobool(
+            str(
+                request.args.get(
+                    'prepend_embargoed',
+                    app.config['PREPEND_EMBARGOED_TO_WIRE_SEARCH']
+                )
+            )
+        )
+        request.args = ImmutableMultiDict(args)
     response = get_internal('wire_search')
     return send_response('wire_search', response)
 

@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { isTouchDevice } from 'utils';
+import {isTouchDevice} from 'utils';
 
 
 class ActionButton extends React.Component {
     componentDidMount() {
         if ( !isTouchDevice() ) {
-            this.elem && $(this.elem).tooltip({ trigger: 'hover' });
+            this.elem && $(this.elem).tooltip({trigger: 'hover'});
         }
     }
 
@@ -36,7 +36,8 @@ class ActionButton extends React.Component {
                     }
                 }
                 ref={(elem) => this.elem = elem}
-                title={!this.props.displayName ? this.props.action.tooltip || this.props.action.name : ''}>
+                title={!this.props.displayName ? this.props.action.tooltip || this.props.action.name : ''}
+                aria-label={!this.props.displayName ? this.props.action.tooltip || this.props.action.name : this.props.action.name }>
                 <i className={classes}></i>
                 {this.props.displayName && this.props.action.name}</button>
         );
@@ -46,7 +47,10 @@ class ActionButton extends React.Component {
 ActionButton.propTypes = {
     item: PropTypes.object,
     group: PropTypes.string,
-    plan: PropTypes.object,
+    plan: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.object
+    ]),
     className: PropTypes.string,
     displayName: PropTypes.bool,
     isVisited: PropTypes.bool,

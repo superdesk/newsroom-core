@@ -30,6 +30,7 @@ class WireSearchResource(newsroom.Resource):
         'search_backend': 'elastic',
         'source': 'items',
         'projection': {
+            'original_id': 1,
             'slugline': 1,
             'headline': 1,
             'body_html': 1,
@@ -39,6 +40,7 @@ class WireSearchResource(newsroom.Resource):
             'ancestors': 1,
             'wordcount': 1,
             'charcount': 1,
+            'version': 1,
         },
         'elastic_filter': {'bool': {'must': [{'term': {'_type': 'items'}}]}},
     }
@@ -139,21 +141,25 @@ class WireSearchService(BaseSearchService):
         search = SearchQuery()
         self.prefill_search_args(search)
         self.prefill_search_items(search)
+        self.prefill_search_user(search)
+        self.prefill_search_company(search)
+        self.apply_company_filter(search)
         search.args['size'] = size
 
         product = get_resource_service('products').find_one(req=None, _id=product_id)
 
         if not product:
-            return
+            return []
 
-        search.query['bool']['must'].append({
-            "bool": {
-                "should": [
-                    {"range": {"embargoed": {"lt": "now"}}},
-                    {"bool": {"must_not": {"exists": {"field": "embargoed"}}}}
-                ]
-            }
-        })
+        if not app.config['DASHBOARD_EMBARGOED']:
+            search.query['bool']['must'].append({
+                "bool": {
+                    "should": [
+                        {"range": {"embargoed": {"lt": "now"}}},
+                        {"bool": {"must_not": {"exists": {"field": "embargoed"}}}}
+                    ]
+                }
+            })
 
         get_resource_service('section_filters').apply_section_filter(
             search.query,
@@ -191,13 +197,7 @@ class WireSearchService(BaseSearchService):
         search.company = company
         self.apply_section_filter(search)
 
-        aggs = {
-            'navigations': {
-                'filters': {
-                    'filters': {}
-                }
-            }
-        }
+        aggs = {}
 
         for navigation in navigations:
             navigation_id = navigation.get('_id')
@@ -210,7 +210,9 @@ class WireSearchService(BaseSearchService):
                     )
 
             if navigation_filter['bool']['should']:
-                aggs['navigations']['filters']['filters'][str(navigation_id)] = navigation_filter
+                aggs.setdefault('navigations', {}) \
+                    .setdefault('filters', {}) \
+                    .setdefault('filters', {})[str(navigation_id)] = navigation_filter
 
         source = {
             'query': search.query,
@@ -282,20 +284,17 @@ class WireSearchService(BaseSearchService):
             search.company = companies.get(str(user.get('company', '')))
 
             search.query = deepcopy(query)
-            search.query['bool']['must'] = [{'term': {'_id': item_id}}]
             search.section = topic.get('topic_type')
 
             self.prefill_search_products(search)
 
-            topic_filter = {'bool': {'must': []}}
-
             if topic.get('query'):
-                topic_filter['bool']['must'].append(
+                search.query['bool']['must'].append(
                     query_string(topic['query'])
                 )
 
             if topic.get('created'):
-                topic_filter['bool']['must'].append(
+                search.query['bool']['must'].append(
                     self.versioncreated_range(dict(
                         created_from=topic['created'].get('from'),
                         created_to=topic['created'].get('to'),
@@ -304,7 +303,7 @@ class WireSearchService(BaseSearchService):
                 )
 
             if topic.get('filter'):
-                topic_filter['bool']['must'] += self._filter_terms(topic['filter'])
+                search.query['bool']['must'] += self._filter_terms(topic['filter'])
 
             # for now even if there's no active company matching for the user
             # continuing with the search
@@ -323,12 +322,15 @@ class WireSearchService(BaseSearchService):
                 )
                 continue
 
-            aggs['topics']['filters']['filters'][str(topic['_id'])] = topic_filter
+            aggs['topics']['filters']['filters'][str(topic['_id'])] = search.query
+
             queried_topics.append(topic)
 
         source = {'query': query}
-        source['aggs'] = aggs
+        source['aggs'] = aggs if aggs["topics"]["filters"]["filters"] else {}
         source['size'] = 0
+
+        print("source", json.dumps(source, indent=2))
 
         req = ParsedRequest()
         req.args = {'source': json.dumps(source)}
@@ -342,6 +344,7 @@ class WireSearchService(BaseSearchService):
                     topic_matches.append(topic['_id'])
 
         except Exception as exc:
+            raise
             logger.error('Error in get_matching_topics for query: {}'.format(json.dumps(source)),
                          exc, exc_info=True)
 

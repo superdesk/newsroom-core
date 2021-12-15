@@ -1,8 +1,8 @@
 from tests.fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from tests.utils import json, get_json, get_admin_user_id, mock_send_email
-from tests.test_download import wire_formats, download_zip_file, items_ids, setup_image
-from tests.test_push import get_signature_headers
-from tests.test_users import ADMIN_USER_ID
+from tests.core.test_download import wire_formats, download_zip_file, items_ids, setup_image
+from tests.core.test_push import get_signature_headers
+from newsroom.tests.users import ADMIN_USER_ID
 
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
@@ -382,7 +382,7 @@ def test_share_items(client, app):
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'From AAP Newsroom: %s' % items[0]['headline']
         assert 'Hi Foo Bar' in outbox[0].body
-        assert 'admin admin (admin@sourcefabric.org) shared ' in outbox[0].body
+        assert 'admin admin' in outbox[0].body
         assert items[0]['headline'] in outbox[0].body
         assert items[1]['headline'] in outbox[0].body
         assert 'http://localhost:5050/am_news?item=%s' % parse.quote(items[0]['_id']) in outbox[0].body
@@ -406,8 +406,8 @@ def test_download(client, app):
             content = zf.open(_format['filename']).read()
             if _format.get('test_content'):
                 _format['test_content'](content)
-    history = app.data.find('history', None, None)
-    assert (len(wire_formats) * len(items_ids)) == history.count()
+    history, count = app.data.find('history', None, None)
+    assert (len(wire_formats) * len(items_ids)) == count
     assert 'download' == history[0]['action']
     assert history[0].get('user')
     assert history[0].get('versioncreated') + timedelta(seconds=2) >= utcnow()

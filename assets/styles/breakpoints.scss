@@ -50,25 +50,25 @@
 }
 
 @mixin small_phone {
-    @media only screen and (orientation: portrait) and (max-width: 375px), (orientation: landscape) and (max-width: 576px) {
+    @media only screen and (orientation: portrait) and (max-width: 374px), (orientation: landscape) and (max-width: 575px) {
         @content;
     }
 }
 
 @mixin phone {
-    @media only screen and (orientation: portrait) and (max-width: 576px), (orientation: landscape) and (max-width: 992px) {
+    @media only screen and (orientation: portrait) and (max-width: 575px), (orientation: landscape) and (max-width: 991px) {
         @content;
     }
 }
 
 @mixin tablet {
-    @media only screen and (orientation: portrait) and (min-width: 577px) and (max-width: 1440px), (orientation: landscape) and (min-width: 993px) and (max-width: 1440px) {
+    @media only screen and (orientation: portrait) and (min-width: 576px) and (max-width: 1439px), (orientation: landscape) and (min-width: 992px) and (max-width: 1439px) {
         @content;
     }
 }
 
 @mixin pc {
-    @media only screen and (orientation: landscape) and (min-width: 1441px) {
+    @media only screen and (orientation: landscape) and (min-width: 1440px) {
         @content;
     }
 }

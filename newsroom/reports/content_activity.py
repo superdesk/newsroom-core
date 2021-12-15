@@ -8,7 +8,7 @@ from superdesk.utc import utc_to_local
 
 from newsroom.wire.search import items_query
 from newsroom.agenda.agenda import get_date_filters
-from newsroom.utils import query_resource
+from newsroom.utils import query_resource, MAX_TERMS_SIZE
 
 
 CHUNK_SIZE = 100
@@ -92,19 +92,19 @@ def get_aggregations(args, ids):
             'items': {
                 'terms': {
                     'field': 'item',
-                    'size': 0
+                    'size': MAX_TERMS_SIZE
                 },
                 'aggs': {
                     'actions': {
                         'terms': {
                             'field': 'action',
-                            'size': 0
+                            'size': MAX_TERMS_SIZE
                         }
                     },
                     'companies': {
                         'terms': {
                             'field': 'company',
-                            'size': 0
+                            'size': MAX_TERMS_SIZE
                         }
                     }
                 }
@@ -160,7 +160,7 @@ def get_facets(args):
                 'genres': {
                     'terms': {
                         'field': 'genre.code',
-                        'size': 0
+                        'size': MAX_TERMS_SIZE
                     }
                 }
             }
@@ -194,7 +194,7 @@ def get_facets(args):
                 'companies': {
                     'terms': {
                         'field': 'company',
-                        'size': 0
+                        'size': MAX_TERMS_SIZE
                     }
                 }
             }
@@ -231,7 +231,7 @@ def export_csv(args, results):
         gettext('Actions'),
     ]]
 
-    actions = args.get('action') or ['download', 'copy', 'share', 'print', 'open', 'preview']
+    actions = args.get('action') or ['download', 'copy', 'share', 'print', 'open', 'preview', 'clipboard', 'api']
 
     if 'download' in actions:
         rows[0].append(gettext('Download'))
@@ -250,6 +250,12 @@ def export_csv(args, results):
 
     if 'preview' in actions:
         rows[0].append(gettext('Preview'))
+
+    if 'clipboard' in actions:
+        rows[0].append(gettext('Clipboard'))
+
+    if 'api' in actions:
+        rows[0].append(gettext('API retrieval'))
 
     for item in results:
         aggs = item.get('aggs') or {}
@@ -287,6 +293,12 @@ def export_csv(args, results):
 
         if 'preview' in actions:
             row.append((aggs.get('actions') or {}).get('preview') or 0)
+
+        if 'clipboard' in actions:
+            row.append((aggs.get('actions') or {}).get('clipboard') or 0)
+
+        if 'api' in actions:
+            row.append((aggs.get('actions') or {}).get('api') or 0)
 
         rows.append(row)
 

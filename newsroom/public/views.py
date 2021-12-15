@@ -1,22 +1,9 @@
 import flask
+
+from werkzeug.utils import secure_filename
 from newsroom.public import blueprint
 
 
-@blueprint.route('/privacy')
-def privacy():
-    return flask.render_template('privacy.html')
-
-
-@blueprint.route('/terms')
-def terms():
-    return flask.render_template('terms.html')
-
-
-@blueprint.route('/contact')
-def contact():
-    return flask.render_template('contact.html')
-
-
-@blueprint.route('/support')
-def support():
-    return flask.render_template('support.html')
+@blueprint.route('/page/<path:template>')
+def page(template):
+    return flask.render_template('page-{template}.html'.format(template=secure_filename(template)))

@@ -1,8 +1,9 @@
 import logging
+
 from flask import abort
 from flask_babel import gettext
-
 from superdesk import get_resource_service
+
 from newsroom.search import query_string
 from newsroom.wire.search import WireSearchResource, WireSearchService
 from newsroom.utils import query_resource
@@ -102,7 +103,7 @@ class MonitoringSearchService(WireSearchService):
                         "query_string": {
                             "query": ' '.join(monitoring_list[0]['keywords']),
                             "default_operator": "AND",
-                            "lenient": False
+                            "lenient": True
                         }
                     }
                 }

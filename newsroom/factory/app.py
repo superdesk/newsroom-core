@@ -6,41 +6,35 @@ This module implements WSGI application extending eve.Eve
 """
 
 import os
+import pathlib
+import importlib
 
 import eve
 import flask
-import importlib
+import newsroom
 
-from eve.io.mongo import MongoJSONEncoder
-
+from flask_mail import Mail
+from flask_caching import Cache
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
-from newsroom.auth import SessionAuth
-from flask_mail import Mail
-from flask_cache import Cache
-
-from newsroom.utils import is_json_request
-from newsroom.gettext import setup_babel
-import newsroom
+from superdesk.json_utils import SuperdeskJSONEncoder
+from superdesk.validator import SuperdeskValidator
 from superdesk.logging import configure_logging
 
+from newsroom.auth import SessionAuth
+from newsroom.utils import is_json_request
+from newsroom.gettext import setup_babel
 
-NEWSROOM_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+NEWSROOM_DIR = pathlib.Path(__file__).resolve().parent.parent
 
 
-class NewsroomApp(eve.Eve):
-    """The base Newsroom object.
-
-    Usage::
-
-        from newsroom.web import NewsroomWebApp
-
-        app = NewsroomWebApp(__name__)
-        app.run()
-    """
+class BaseNewsroomApp(eve.Eve):
+    """The base Newsroom app class"""
 
     DATALAYER = SuperdeskDataLayer
     AUTH_SERVICE = SessionAuth
+    INSTANCE_CONFIG = None
 
     def __init__(self, import_name=__package__, config=None, testing=False, **kwargs):
         """Override __init__ to do Newsroom specific config and still be able
@@ -54,17 +48,19 @@ class NewsroomApp(eve.Eve):
         self.babel_translations = None
         self.mail = None
         self.cache = None
+        self.static_folder = None
 
-        super(NewsroomApp, self).__init__(
+        super(BaseNewsroomApp, self).__init__(
             import_name,
             data=self.DATALAYER,
             auth=self.AUTH_SERVICE,
             template_folder=os.path.join(NEWSROOM_DIR, 'templates'),
             static_folder=os.path.join(NEWSROOM_DIR, 'static'),
-            json_encoder=MongoJSONEncoder,
+            validator=SuperdeskValidator,
             **kwargs
         )
-        self.json_encoder = MongoJSONEncoder
+        self.json_encoder = SuperdeskJSONEncoder
+        self.data.json_encoder_class = SuperdeskJSONEncoder
 
         if config:
             try:
@@ -79,19 +75,28 @@ class NewsroomApp(eve.Eve):
         self.setup_babel()
         self.setup_blueprints(self.config['BLUEPRINTS'])
         self.setup_apps(self.config['CORE_APPS'])
-        self.setup_apps(self.config.get('INSTALLED_APPS', []))
+        if not self.config.get("BEHAVE"):
+            # workaround for core 2.3 adding planning to installed apps
+            self.setup_apps(self.config.get('INSTALLED_APPS', []))
         self.setup_email()
         self.setup_cache()
         self.setup_error_handlers()
 
         configure_logging(self.config.get('LOG_CONFIG_FILE'))
 
-    def load_app_config(self):
+    def load_app_default_config(self):
+        """
+        Loads default app configuration
+        """
         self.config.from_object('content_api.app.settings')
-        self.config.from_object('newsroom.default_settings')
-        if not self._testing:
+
+    def load_app_instance_config(self):
+        """
+        Loads instance configuration defined on the newsroom-app repo level
+        """
+        if not self._testing and self.INSTANCE_CONFIG:
             try:
-                self.config.from_pyfile(os.path.join(os.getcwd(), 'settings.py'))
+                self.config.from_pyfile(os.path.join(os.getcwd(), self.INSTANCE_CONFIG))
             except FileNotFoundError:
                 pass
 
@@ -101,10 +106,11 @@ class NewsroomApp(eve.Eve):
         if not getattr(self, 'settings'):
             self.settings = flask.Config('.')
 
-        super(NewsroomApp, self).load_config()
+        super(BaseNewsroomApp, self).load_config()
         self.config.setdefault('DOMAIN', {})
         self.config.setdefault('SOURCES', {})
-        self.load_app_config()
+        self.load_app_default_config()
+        self.load_app_instance_config()
 
     def setup_media_storage(self):
         if self.config.get('AMAZON_CONTAINER_NAME'):
@@ -142,7 +148,6 @@ class NewsroomApp(eve.Eve):
         self.mail = Mail(self)
 
     def setup_cache(self):
-        # configuring for in-memory cache for now
         self.cache = Cache(self)
 
     def setup_error_handlers(self):

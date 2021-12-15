@@ -1,6 +1,6 @@
 import thunk from 'redux-thunk';
 import fetchMock from 'fetch-mock';
-import { createStore, applyMiddleware } from 'redux';
+import {createStore, applyMiddleware} from 'redux';
 
 import server from 'server';
 
@@ -25,8 +25,10 @@ describe('wire actions', () => {
 
     beforeEach(() => {
         spyOn(utils.now, 'utcOffset').and.returnValue('');
-        fetchMock.get('begin:/wire/search?&tick=', response);
-        fetchMock.get('begin:/wire/search?q=foo&tick=', response);
+        fetchMock.get('/wire/search', response, {
+            name: 'wire_search:from_0',
+            query: {from: 0}
+        });
         store = createStore(wireApp, applyMiddleware(thunk));
     });
 
@@ -73,13 +75,13 @@ describe('wire actions', () => {
 
     it('can bookmark items', () => {
         store.dispatch(actions.initData({context: 'wire'}));
-        fetchMock.post('/wire_bookmark', {});
-        fetchMock.delete('/wire_bookmark', {});
 
+        fetchMock.post('/wire_bookmark', {});
         store.dispatch(actions.bookmarkItems(['foo', 'bar']));
         expect(fetchMock.called('/wire_bookmark')).toBeTruthy();
         fetchMock.reset();
 
+        fetchMock.delete('/wire_bookmark', {});
         store.dispatch(actions.removeBookmarks('foo'));
         expect(fetchMock.called('/wire_bookmark')).toBeTruthy();
     });
@@ -93,7 +95,7 @@ describe('wire actions', () => {
 
     it('can populate new items on update', () => {
         expect(store.getState().newItems).toEqual([]);
-        return store.dispatch(actions.pushNotification({event: 'new_item', extra: { _items: [ {'_id': 'foo', 'type': 'text'} ]}}))
+        return store.dispatch(actions.pushNotification({event: 'new_item', extra: {_items: [ {'_id': 'foo', 'type': 'text'} ]}}))
             .then(() => {
                 expect(store.getState().newItems).toEqual(['foo']);
             });
@@ -172,7 +174,12 @@ describe('wire actions', () => {
     });
 
     it('can fetch more items', (done) => {
-        fetchMock.get('begin:/wire/search?from=1&tick=', {_items: [{_id: 'bar'}]});
+        fetchMock.get('/wire/search', {_items: [{_id: 'bar'}]}, {
+            name: 'wire_search:from_1',
+            query: {
+                from: 1,
+            }
+        });
         return store.dispatch(actions.fetchItems())
             .then(() => {
                 expect(store.getState().totalItems).toBe(2);

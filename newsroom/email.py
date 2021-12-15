@@ -1,19 +1,23 @@
+import base64
+from typing import List
 from superdesk.emails import SuperdeskMessage  # it handles some encoding issues
 from flask import current_app, render_template, url_for
 from flask_babel import gettext
-from newsroom.celery_app import celery
 from flask_mail import Attachment
 
+from newsroom.celery_app import celery
 from newsroom.utils import get_agenda_dates, get_location_string, get_links, \
     get_public_contacts
 from newsroom.template_filters import is_admin_or_internal
 from newsroom.utils import url_for_agenda
 from superdesk.logging import logger
-import base64
 
 
 @celery.task(bind=True, soft_time_limit=120)
-def _send_email(self, to, subject, text_body, html_body=None, sender=None, attachments_info=[]):
+def _send_email(self, to, subject, text_body, html_body=None, sender=None, attachments_info=None):
+    if attachments_info is None:
+        attachments_info = []
+
     if sender is None:
         sender = current_app.config['MAIL_DEFAULT_SENDER']
 
@@ -38,7 +42,7 @@ def _send_email(self, to, subject, text_body, html_body=None, sender=None, attac
         return app.mail.send(msg)
 
 
-def send_email(to, subject, text_body, html_body=None, sender=None, attachments_info=[]):
+def send_email(to, subject, text_body, html_body=None, sender=None, attachments_info=None):
     """
     Sends the email
     :param to: List of recipients
@@ -60,17 +64,19 @@ def send_email(to, subject, text_body, html_body=None, sender=None, attachments_
 
 
 def send_new_signup_email(user):
-    app_name = current_app.config['SITE_NAME']
-    url = url_for('settings.app', app_id='users', _external=True)
-    recipients = current_app.config['SIGNUP_EMAIL_RECIPIENTS'].split(',')
-    subject = gettext('A new newsroom signup request')
-    text_body = render_template(
-        'signup_request_email.txt',
-        app_name=app_name,
+    send_template_email(
+        to=current_app.config['SIGNUP_EMAIL_RECIPIENTS'].split(','),
+        subject=gettext('A new newsroom signup request'),
+        template="signup_request_email",
+        url=url_for('settings.app', app_id='users', _external=True),
         user=user,
-        url=url)
+    )
 
-    send_email(to=recipients, subject=subject, text_body=text_body)
+
+def send_template_email(to: List[str], subject: str, template: str, **kwargs):
+    text_body = render_template(f'{template}.txt', **kwargs)
+    html_body = render_template(f'{template}.html', **kwargs)
+    send_email(to=to, subject=subject, text_body=text_body, html_body=html_body)
 
 
 def send_validate_account_email(user_name, user_email, token):
@@ -125,7 +131,7 @@ def send_reset_password_email(user_name, user_email, token):
     url = url_for('auth.reset_password', token=token, _external=True)
     hours = current_app.config['RESET_PASSWORD_TOKEN_TIME_TO_LIVE'] * 24
 
-    subject = gettext('{} password reset'.format(app_name))
+    subject = gettext('{} password reset').format(app_name)
     text_body = render_template('reset_password_email.txt', app_name=app_name, name=user_name,
                                 email=user_email, expires=hours, url=url)
     html_body = render_template('reset_password_email.html', app_name=app_name, name=user_name,
@@ -144,7 +150,7 @@ def send_new_item_notification_email(user, topic_name, item, section='wire'):
 def _send_new_wire_notification_email(user, topic_name, item, section):
     url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
-    subject = gettext('New story for followed topic: {}'.format(topic_name))
+    subject = gettext('New story for followed topic: {}').format(topic_name)
     kwargs = dict(
         app_name=current_app.config['SITE_NAME'],
         is_topic=True,
@@ -163,7 +169,7 @@ def _send_new_wire_notification_email(user, topic_name, item, section):
 def _send_new_agenda_notification_email(user, topic_name, item):
     url = url_for_agenda(item, _external=True)
     recipients = [user['email']]
-    subject = gettext('New update for followed agenda: {}'.format(topic_name))
+    subject = gettext('New update for followed agenda: {}').format(topic_name)
     kwargs = dict(
         app_name=current_app.config['SITE_NAME'],
         is_topic=True,
@@ -195,7 +201,7 @@ def _send_history_match_wire_notification_email(user, item, section):
     app_name = current_app.config['SITE_NAME']
     url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
-    subject = gettext('New update for your previously accessed story: {}'.format(item['headline']))
+    subject = gettext('New update for your previously accessed story: {}').format(item['headline'])
     text_body = render_template(
         'new_item_notification.txt',
         app_name=app_name,
@@ -214,7 +220,7 @@ def _send_history_match_agenda_notification_email(user, item):
     app_name = current_app.config['SITE_NAME']
     url = url_for_agenda(item, _external=True)
     recipients = [user['email']]
-    subject = gettext('New update for your previously accessed agenda: {}'.format(item['name']))
+    subject = gettext('New update for your previously accessed agenda: {}').format(item['name'])
     text_body = render_template(
         'new_item_notification.txt',
         app_name=app_name,

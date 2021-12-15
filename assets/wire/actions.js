@@ -20,13 +20,13 @@ import {getNavigationUrlParam} from 'search/utils';
 import {searchParamsSelector} from 'search/selectors';
 import {context} from 'selectors';
 
-import {markItemAsRead, toggleNewsOnlyParam} from 'local-store';
+import {markItemAsRead, toggleNewsOnlyParam, toggleSearchAllVersionsParam} from 'local-store';
 import {renderModal, closeModal, setSavedItemsCount} from 'actions';
 
 import {
     initParams as initSearchParams,
     setNewItemsByTopic,
-    loadTopics,
+    loadMyTopics,
     setTopics,
     loadMyTopic,
 } from 'search/actions';
@@ -86,6 +86,12 @@ export function openItem(item) {
     };
 }
 
+export function selectCopy(item) {
+    return () => {
+        recordAction(item, 'clipboard');
+    };
+}
+
 export const QUERY_ITEMS = 'QUERY_ITEMS';
 export function queryItems() {
     return {type: QUERY_ITEMS};
@@ -102,14 +108,20 @@ export function recieveItem(data) {
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(wireData, readData, newsOnly) {
-    return {type: INIT_DATA, wireData, readData, newsOnly};
+export function initData(wireData, readData, newsOnly, searchAllVersions) {
+    return {type: INIT_DATA, wireData, readData, newsOnly, searchAllVersions};
 }
 
 export const TOGGLE_NEWS = 'TOGGLE_NEWS';
 export function toggleNews() {
     toggleNewsOnlyParam();
     return {type: TOGGLE_NEWS};
+}
+
+export const TOGGLE_SEARCH_ALL_VERSIONS = 'TOGGLE_SEARCH_ALL_VERSIONS';
+export function toggleSearchAllVersions() {
+    toggleSearchAllVersionsParam();
+    return {type: TOGGLE_SEARCH_ALL_VERSIONS};
 }
 
 export function removeItems(items) {
@@ -119,7 +131,7 @@ export function removeItems(items) {
                 if (items.length > 1) {
                     notify.success(gettext('Items were removed successfully'));
                 } else {
-                    notify.success(gettext('Item wes removed successfully'));
+                    notify.success(gettext('Item was removed successfully'));
                 }
             })
             .catch(notifyErrors);
@@ -213,23 +225,27 @@ export function search(state, next) {
     }
 
     const newsOnly = !!get(state, 'wire.newsOnly');
+    const searchAllVersions = !!get(state, 'wire.searchAllVersions');
     const context = get(state, 'context', 'wire');
 
     const params = {
         q: !searchParams.query ? null : encodeURIComponent(searchParams.query),
-        bookmarks: state.bookmarks && state.user,
+        bookmarks: state.bookmarks ? state.user : null,
         navigation: getNavigationUrlParam(searchParams.navigation, true, false),
-        filter: !isEmpty(searchParams.filter) && encodeURIComponent(JSON.stringify(searchParams.filter)),
+        filter: !isEmpty(searchParams.filter) ? encodeURIComponent(JSON.stringify(searchParams.filter)) : null,
         from: next ? state.items.length : 0,
         created_from: createdFilter.from,
         created_to,
         timezone_offset: getTimezoneOffset(),
         newsOnly,
-        product: searchParams.product
+        product: searchParams.product,
+        es_highlight: !searchParams.query ? null : 1,
+        all_versions: !searchAllVersions ? null : 1,
+        prepend_embargoed: !state.bookmarks ? null : 0,
     };
 
     const queryString = Object.keys(params)
-        .filter((key) => params[key])
+        .filter((key) => params[key] != null && (params[key].length == null || params[key].length > 0))
         .map((key) => [key, params[key]].join('='))
         .join('&');
 
@@ -432,6 +448,8 @@ export function removeNewItems(data) {
 export function pushNotification(push) {
     return (dispatch, getState) => {
         const user = getState().user;
+        const company = getState().company;
+
         switch (push.event) {
         case 'topic_matches':
             return dispatch(setNewItemsByTopic(push.extra));
@@ -440,10 +458,16 @@ export function pushNotification(push) {
             return dispatch(setNewItems(push.extra));
 
         case `topics:${user}`:
-            return dispatch(reloadTopics(user));
+            return dispatch(reloadMyTopics());
+
+        case `topics:company-${company}`:
+            return dispatch(reloadMyTopics());
 
         case `topic_created:${user}`:
-            return dispatch(reloadTopics(user, true));
+            return dispatch(reloadMyTopics(true));
+
+        case `topic_created:company-${company}`:
+            return dispatch(reloadMyTopics(push.extra && push.extra.user_id === user));
 
         case `saved_items:${user}`:
             return dispatch(setSavedItemsCount(push.extra.count));
@@ -454,11 +478,11 @@ export function pushNotification(push) {
     };
 }
 
-function reloadTopics(user, reloadTopic = false) {
-    return function (dispatch) {
-        return loadTopics(user)
+export function reloadMyTopics(reloadTopic = false) {
+    return function(dispatch) {
+        return loadMyTopics()
             .then((data) => {
-                const wireTopics = data._items.filter((topic) => !topic.topic_type || topic.topic_type === 'wire');
+                const wireTopics = data.filter((topic) => !topic.topic_type || topic.topic_type === 'wire');
                 dispatch(setTopics(wireTopics));
 
                 if (reloadTopic) {

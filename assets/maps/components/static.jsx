@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { getMapSource } from '../utils';
+import {getMapSource} from '../utils';
+import {gettext} from '../../utils';
 
 
 class StaticMap extends React.Component{
@@ -32,6 +33,7 @@ class StaticMap extends React.Component{
                 height="640"
                 onLoad={this.handleMapLoaded}
                 onError={this.handleMapError}
+                alt={gettext('Map')}
             />
         );
     }

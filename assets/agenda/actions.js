@@ -1,4 +1,4 @@
-import { get, isEmpty, includes } from 'lodash';
+import {get, isEmpty, includes} from 'lodash';
 import moment from 'moment';
 
 import server from 'server';
@@ -16,8 +16,8 @@ import {
 } from 'utils';
 import {noNavigationSelected, getNavigationUrlParam} from 'search/utils';
 
-import { markItemAsRead, toggleFeaturedOnlyParam } from 'local-store';
-import { renderModal, setSavedItemsCount } from 'actions';
+import {markItemAsRead, toggleFeaturedOnlyParam} from 'local-store';
+import {renderModal, setSavedItemsCount} from 'actions';
 import {
     getCalendars,
     getDateInputDate,
@@ -31,7 +31,7 @@ import {
     toggleFilter,
     initParams as initSearchParams,
     setNewItemsByTopic,
-    loadTopics,
+    loadMyTopics,
     setTopics,
     loadMyTopic,
 } from 'search/actions';
@@ -112,7 +112,7 @@ export function openItemDetails(item, group, plan) {
 export function requestCoverage(item, message) {
     return () => {
         const url = '/agenda/request_coverage';
-        const data = { item: item._id, message };
+        const data = {item: item._id, message};
         return server.post(url, data)
             .then(() => notify.success(gettext('Your inquiry has been sent successfully')))
             .catch(errorHandler);
@@ -471,6 +471,8 @@ export function removeNewItems(data) {
 export function pushNotification(push) {
     return (dispatch, getState) => {
         const user = getState().user;
+        const company = getState().company;
+
         switch (push.event) {
         case 'topic_matches':
             return dispatch(setNewItemsByTopic(push.extra));
@@ -479,10 +481,16 @@ export function pushNotification(push) {
             return dispatch(setAndUpdateNewItems(push.extra));
 
         case `topics:${user}`:
-            return dispatch(reloadTopics(user));
+            return dispatch(reloadMyTopics());
+
+        case `topics:company-${company}`:
+            return dispatch(reloadMyTopics());
 
         case `topic_created:${user}`:
-            return dispatch(reloadTopics(user, true));
+            return dispatch(reloadMyTopics(true));
+
+        case `topic_created:company-${company}`:
+            return dispatch(reloadMyTopics(push.extra && push.extra.user_id === user));
 
         case `saved_items:${user}`:
             return dispatch(setSavedItemsCount(push.extra.count));
@@ -490,11 +498,11 @@ export function pushNotification(push) {
     };
 }
 
-function reloadTopics(user, reloadTopic = false) {
-    return function (dispatch) {
-        return loadTopics(user)
+export function reloadMyTopics(reloadTopic = false) {
+    return function(dispatch) {
+        return loadMyTopics()
             .then((data) => {
-                const agendaTopics = data._items.filter((topic) => topic.topic_type === 'agenda');
+                const agendaTopics = data.filter((topic) => topic.topic_type === 'agenda');
                 dispatch(setTopics(agendaTopics));
 
                 if (reloadTopic) {
@@ -539,7 +547,7 @@ export function setAndUpdateNewItems(data) {
         dispatch(updateItems(data));
 
         // Do not use 'killed' items for new-item notifications
-        let newItemsData = { ...data };
+        let newItemsData = {...data};
         if (get(newItemsData, '_items.length', 0) > 0) {
             newItemsData._items = newItemsData._items.filter((item) => item.state !== 'killed');
         }

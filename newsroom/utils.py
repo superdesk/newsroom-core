@@ -1,9 +1,9 @@
-import superdesk
+import pytz
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from uuid import uuid4
-import pytz
 
+import superdesk
 from superdesk.utc import utcnow
 from superdesk.json_utils import try_cast
 from bson import ObjectId
@@ -11,18 +11,21 @@ from eve.utils import config, parse_request
 from eve_elastic.elastic import parse_date
 from flask import current_app as app, json, abort, request, g, flash, session, url_for
 from flask_babel import gettext
+
 from newsroom.template_filters import time_short, parse_date as parse_short_date, format_datetime, is_admin
 from newsroom.auth import get_user_id
 
 
 DAY_IN_MINUTES = 24 * 60 - 1
+MAX_TERMS_SIZE = 1000
 
 
 def query_resource(resource, lookup=None, max_results=0, projection=None):
     req = parse_request(resource)
     req.max_results = max_results
     req.projection = json.dumps(projection) if projection else None
-    return app.data.find(resource, req, lookup)
+    cursor, count = app.data.find(resource, req, lookup)
+    return cursor
 
 
 def find_one(resource, **lookup):
@@ -78,7 +81,10 @@ def loads(s):
 
 
 def get_entity_or_404(_id, resource):
-    item = superdesk.get_resource_service(resource).find_one(req=None, _id=_id)
+    try:
+        item = superdesk.get_resource_service(resource).find_one(req=None, _id=_id)
+    except KeyError:
+        item = None
     if not item:
         abort(404)
     return item
@@ -117,6 +123,7 @@ def get_type():
         'aapX': 'items',
         'media_releases': 'items',
         'monitoring': 'items',
+        'factcheck': 'items',
     }
     return types[item_type]
 
@@ -265,7 +272,8 @@ def is_account_enabled(user):
     if not user.get('is_approved'):
         account_created = user.get('_created')
 
-        if account_created < utcnow() + timedelta(days=-app.config.get('NEW_ACCOUNT_ACTIVE_DAYS', 14)):
+        approve_expiration = utcnow() + timedelta(days=-app.config.get('NEW_ACCOUNT_ACTIVE_DAYS', 14))
+        if not account_created or account_created < approve_expiration:
             flash(gettext('Account has not been approved'), 'danger')
             return False
 
@@ -309,13 +317,15 @@ def get_cached_resource_by_id(resource, _id, black_list_keys=None):
     item = app.cache.get(str(_id))
     if item:
         return loads(item)
-
-    # item is not stored in cache
-    item = superdesk.get_resource_service(resource).find_one(req=None, _id=_id)
+    try:
+        # item is not stored in cache
+        item = superdesk.get_resource_service(resource).find_one(req=None, _id=_id)
+    except KeyError:
+        item = None
     if item:
         if not black_list_keys:
-            black_list_keys = {'password', 'token', 'token_expiry'}
-        item = {key: item[key] for key in item.keys() if key not in black_list_keys and not key.startswith('_')}
+            black_list_keys = {'password', 'token', 'token_expiry', '_id', '_updated', '_etag'}
+        item = {key: item[key] for key in item.keys() if key not in black_list_keys}
         app.cache.set(str(_id), json.dumps(item, default=json_serialize_datetime_objectId))
         return item
     return None
@@ -326,6 +336,8 @@ def is_valid_login(user_id):
     :param str user_id: id of the user
     """
     user = get_cached_resource_by_id('users', user_id)
+    if not user:
+        return False
     if not (is_account_enabled(user)):
         session.pop('_flashes', None)  # remove old messages and just show one message
         flash(gettext('Account is disabled'), 'danger')
@@ -354,7 +366,7 @@ def get_items_by_id(ids, resource):
 
 def get_vocabulary(id):
     vocabularies = app.data.pymongo('items').db.vocabularies
-    if vocabularies and vocabularies.count() > 0 and id:
+    if vocabularies is not None and vocabularies.count_documents({}) > 0 and id:
         return vocabularies.find_one({'_id': id})
 
     return None

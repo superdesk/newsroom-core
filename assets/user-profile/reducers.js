@@ -1,4 +1,3 @@
-
 import {
     GET_TOPICS,
     INIT_DATA,
@@ -11,12 +10,13 @@ import {
     SET_TOPIC_EDITOR_FULLSCREEN,
 } from './actions';
 
-import { RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID } from 'actions';
+import {RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID} from 'actions';
 import {GET_COMPANY_USERS} from 'companies/actions';
 import {SET_USER_COMPANY_MONITORING_LIST} from 'monitoring/actions';
 
 import {modalReducer} from 'reducers';
-import {GET_NAVIGATIONS} from 'navigations/actions';
+import {GET_NAVIGATIONS, QUERY_NAVIGATIONS} from 'navigations/actions';
+import {SET_TOPICS} from '../search/actions';
 
 const initialState = {
     user: null,
@@ -55,6 +55,12 @@ export default function itemReducer(state = initialState, action) {
         };
     }
 
+    case SET_TOPICS:
+        return {
+            ...state,
+            topics: action.topics,
+        };
+
     case GET_USER: {
         return {
             ...state,
@@ -63,8 +69,19 @@ export default function itemReducer(state = initialState, action) {
         };
     }
 
+    case QUERY_NAVIGATIONS: {
+        return {
+            ...state,
+            isLoading: true,
+        };
+    }
+
     case GET_NAVIGATIONS: {
-        return {...state, navigations: action.data};
+        return {
+            ...state,
+            navigations: action.data,
+            isLoading: false,
+        };
     }
 
     case EDIT_USER: {
@@ -159,7 +176,7 @@ export default function itemReducer(state = initialState, action) {
             newState.selectedItem = newSelected;
         }
 
-        return newState;        
+        return newState;
 
     default:
         return state;

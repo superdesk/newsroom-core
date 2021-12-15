@@ -20,7 +20,7 @@ class MonitoringResource(newsroom.Resource):
             'type': 'string'
         },
         'company': {
-            'type': 'ObjectId'
+            'type': 'objectid'
         },
         'query': {
             'type': 'string'
@@ -33,7 +33,7 @@ class MonitoringResource(newsroom.Resource):
         },
         'users': {
             'type': 'list',
-            'mapping': {'type': 'ObjectId'}
+            'mapping': {'type': 'objectid'}
         },
         'schedule': {
             'type': 'dict',
@@ -54,6 +54,10 @@ class MonitoringResource(newsroom.Resource):
         'always_send': {
             'type': 'boolean',
         },
+        'headline_subject': {
+            'type': 'boolean',
+            'default': False
+        }
     }
     datasource = {
         'source': 'monitoring',

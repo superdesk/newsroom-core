@@ -1,5 +1,3 @@
-
-import newsroom
 import pymongo.errors
 import werkzeug.exceptions
 
@@ -9,6 +7,8 @@ from superdesk.utc import utcnow
 from flask import json, abort, Blueprint, jsonify
 from flask_babel import gettext
 from eve.utils import ParsedRequest
+
+import newsroom
 from newsroom.utils import get_json_or_400
 from newsroom.auth import get_user
 
@@ -21,7 +21,10 @@ class HistoryResource(newsroom.Resource):
 
     schema = {
         '_id': {'type': 'string', 'unique': True},
-        'action': {'type': 'string'},
+        'action': {
+            'type': 'string',
+            'mapping': not_analyzed
+        },
         'versioncreated': {'type': 'datetime'},
         'user': newsroom.Resource.rel('users'),
         'company': newsroom.Resource.rel('companies'),
@@ -88,7 +91,7 @@ class HistoryService(newsroom.Service):
         results = self.query_items(query)
         docs = results.docs
         if all:
-            while results.hits['hits']['total'] > len(docs):
+            while results.hits['hits']['total']['value'] > len(docs):
                 query['from'] = len(docs)
                 results = self.query_items(query)
                 docs.extend(results.docs)

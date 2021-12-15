@@ -6,7 +6,7 @@ import {gettext} from 'utils';
 export default class CardEditor extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { open: this.props.forceEditor };
+        this.state = {open: this.props.forceEditor};
 
         this.onEditClick = this.onEditClick.bind(this);
         this.onCancelClick = this.onCancelClick.bind(this);
@@ -15,19 +15,19 @@ export default class CardEditor extends React.Component {
 
     componentWillReceiveProps(nextProps, nextState) {
         if (!nextState.open && nextProps.forceEditor) {
-            this.setState({ open: true });
+            this.setState({open: true});
         }
     }
 
     onEditClick() {
-        this.setState({ open: true });
+        this.setState({open: true});
         if (this.props.onEdit) {
             this.props.onEdit();
         }
     }
 
     onCancelClick() {
-        this.setState({ open: false });
+        this.setState({open: false});
         if (this.props.onCancel) {
             this.props.onCancel();
         }
@@ -35,7 +35,7 @@ export default class CardEditor extends React.Component {
 
     onSave(event) {
         this.props.onSave(event);
-        this.setState({ open: false });
+        this.setState({open: false});
     }
 
     renderEditor() {
@@ -61,6 +61,7 @@ export default class CardEditor extends React.Component {
                                     className="btn btn-outline-primary ml-auto"
                                     onClick={this.onSave}
                                     disabled={Object.keys(errors || {}).length > 0}
+                                    aria-label={gettext('Save')}
                                 >
                                     {saveText}
                                 </button>
@@ -68,6 +69,7 @@ export default class CardEditor extends React.Component {
                                     <button
                                         className='btn btn-outline-secondary ml-3'
                                         onClick={this.onCancelClick}
+                                        aria-label={gettext('Cancel')}
                                     >
                                         {gettext('Cancel')}
                                     </button>
@@ -97,10 +99,10 @@ export default class CardEditor extends React.Component {
                         <div className="card mt-3 d-block">
                             <div className="card-header d-flex justify-content-start align-items-center">
                                 <span className={titleClassNames}>{previewTitle || label}</span>
-                                <button className="icon-button ml-auto" onClick={this.onEditClick}>
+                                <button className="icon-button ml-auto" aria-label={gettext('Edit')} onClick={this.onEditClick}>
                                     <i className="icon--edit" />
                                 </button>
-                                {!this.props.noDelete && <button className="icon-button" onClick={onDelete}>
+                                {!this.props.noDelete && <button className="icon-button" aria-label={gettext('Delete')} onClick={onDelete}>
                                     <i className="icon--trash" />
                                 </button>}
                             </div>

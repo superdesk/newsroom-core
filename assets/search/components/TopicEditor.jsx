@@ -44,6 +44,8 @@ class TopicEditor extends React.Component {
     }
 
     changeTopic(topic) {
+        topic.notifications = (topic.subscribers || []).includes(this.props.userId);
+
         this.setState({
             topic: topic,
             saving: false,
@@ -55,11 +57,14 @@ class TopicEditor extends React.Component {
 
     updateFormValidity(topic) {
         const original = get(this.props, 'topic') || {};
+        const isDirty = ['label', 'notifications', 'is_global'].some(
+            (field) => get(original, field) !== get(topic, field)
+        );
 
         if (!topic.label) {
             // The topic must have a label so disable the save button
             this.setState({valid: false});
-        } else if (original.label !== topic.label || original.notifications !== topic.notifications) {
+        } else if (isDirty) {
             // If the label or notification have changed, then enable the save button
             this.setState({valid: true});
         } else if (original._id) {
@@ -72,8 +77,8 @@ class TopicEditor extends React.Component {
     onChangeHandler(field) {
         return (event) => {
             const topic = cloneDeep(this.state.topic);
-            const value = field === 'notifications' ?
-                !get(this.state, 'topic.notifications') :
+            const value = ['notifications', 'is_global'].includes(field) ?
+                !get(topic, field) :
                 event.target.value;
 
             set(topic, field, value);
@@ -86,6 +91,18 @@ class TopicEditor extends React.Component {
         const topic = cloneDeep(this.state.topic);
         const isExisting = !this.isNewTopic();
         const isAgendaTopic = this.isAgendaTopic();
+
+        // Construct new list of subscribers
+        const currentSubscribers = topic.subscribers || [];
+        const alreadySubscribed = currentSubscribers.includes(this.props.userId);
+        if (topic.notifications && !alreadySubscribed) {
+            topic.subscribers.push(this.props.userId);
+        } else if (!topic.notifications && alreadySubscribed) {
+            topic.subscribers = currentSubscribers.filter(
+                (userId) => userId !== this.props.userId
+            );
+        }
+        delete topic.notifications;
 
         event.preventDefault();
         this.setState({saving: true});
@@ -141,7 +158,7 @@ class TopicEditor extends React.Component {
 
     render() {
         // Wait for navigations to be loaded
-        if (get(this.props, 'navigations.length', 0) < 1) {
+        if (this.props.isLoading) {
             return null;
         }
 
@@ -160,6 +177,7 @@ class TopicEditor extends React.Component {
                         className="icon-button"
                         onClick={this.props.closeEditor}
                         disabled={this.state.saving}
+                        aria-label={gettext('Close')}
                     >
                         <i className="icon--close-thin icon--gray" />
                     </button>
@@ -186,6 +204,7 @@ class TopicEditor extends React.Component {
                         value={gettext('Cancel')}
                         onClick={this.props.closeEditor}
                         disabled={this.state.saving}
+                        aria-label={gettext('Cancel')}
                     />
                     <input
                         type="button"
@@ -193,6 +212,7 @@ class TopicEditor extends React.Component {
                         value={gettext('Save')}
                         onClick={this.saveTopic}
                         disabled={this.state.saving || !this.state.valid}
+                        aria-label={gettext('Save')}
                     />
                 </div>
             </div>
@@ -202,6 +222,8 @@ class TopicEditor extends React.Component {
 
 TopicEditor.propTypes = {
     topic: PropTypes.object,
+    userId: PropTypes.string,
+    isLoading: PropTypes.bool,
     navigations: PropTypes.arrayOf(PropTypes.object),
     fetchNavigations: PropTypes.func,
     closeEditor: PropTypes.func,
@@ -214,6 +236,8 @@ TopicEditor.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
+    userId: get(state, 'editedUser._id'),
+    isLoading: state.isLoading,
     navigations: state.navigations || [],
     editorFullscreen: topicEditorFullscreenSelector(state),
 });

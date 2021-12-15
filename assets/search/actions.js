@@ -49,8 +49,8 @@ export function setNewItemsByTopic(data) {
     return {type: SET_NEW_ITEMS_BY_TOPIC, data};
 }
 
-export function loadTopics(user) {
-    return server.get(`/users/${user}/topics`);
+export function loadMyTopics() {
+    return server.get('/topics/my_topics');
 }
 
 export const SET_TOPICS = 'SET_TOPICS';
@@ -109,18 +109,22 @@ export function toggleNavigation(navigation, disableSameNavigationDeselect) {
 
 export const TOGGLE_FILTER = 'TOGGLE_FILTER';
 export function toggleFilter(key, value, single) {
-    return function(dispatch, getState) {
+    return function (dispatch, getState) {
         const state = getState();
         const currentFilters = cloneDeep(searchFilterSelector(state));
 
-        currentFilters[key] = toggleValue(currentFilters[key], value);
+        // the `value` can be an Array
+        let values = Array.isArray(value) ? value : [value];
 
-        if (!value || !currentFilters[key] || currentFilters[key].length === 0) {
-            delete currentFilters[key];
-        } else if (single) {
-            currentFilters[key] = currentFilters[key].filter(
-                (val) => val === value
-            );
+        for (let _value of values) {
+            currentFilters[key] = toggleValue(currentFilters[key], _value);
+            if (!_value || !currentFilters[key] || currentFilters[key].length === 0) {
+                delete currentFilters[key];
+            } else if (single) {
+                currentFilters[key] = currentFilters[key].filter(
+                    (val) => val === _value
+                );
+            }
         }
 
         dispatch(setSearchFilters(currentFilters));
@@ -267,7 +271,7 @@ export function submitShareItem(data) {
             url = 'monitoring/share';
             data.monitoring_profile = get(getState(), 'search.activeNavigation[0]');
         }
-        
+
         if (type === 'agenda') {
             data.items.map((_id) => data.maps.push(getMapSource(getLocations(getState().itemsById[_id]), 2)));
         }

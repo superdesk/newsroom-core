@@ -3,8 +3,8 @@ import logging
 from flask import current_app as app
 from eve.render import send_response
 from eve.methods.get import get_internal
-
 from superdesk import get_resource_service
+
 from newsroom.media_releases import blueprint
 from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required

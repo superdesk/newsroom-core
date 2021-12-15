@@ -1,8 +1,10 @@
 from datetime import timedelta
-from newsroom.template_filters import time_short, parse_date, format_datetime
+
 from flask_babel import gettext
 from planning.common import WORKFLOW_STATE, ASSIGNMENT_WORKFLOW_STATE
 from superdesk.metadata.item import CONTENT_STATE
+
+from newsroom.template_filters import time_short, parse_date, format_datetime
 
 DAY_IN_MINUTES = 24 * 60 - 1
 TO_BE_CONFIRMED_FIELD = '_time_to_be_confirmed'

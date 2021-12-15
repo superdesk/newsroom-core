@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import {get} from 'lodash';
 
 import TextInput from 'components/TextInput';
 import AuditInformation from 'components/AuditInformation';
 import SelectInput from 'components/SelectInput';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 import {
     CARD_TYPES,
     getCardEditComponent,
@@ -49,7 +49,7 @@ class EditCard extends React.Component {
                         type='button'
                         className='icon-button'
                         data-dismiss='modal'
-                        aria-label='Close'
+                        aria-label={gettext('Close')}
                         onClick={this.props.onClose}>
                         <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
                     </button>

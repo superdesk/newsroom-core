@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { isEmpty } from 'lodash';
+import {isEmpty} from 'lodash';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import AgendaLinks from './AgendaLinks';
-import { isDisplayed, fullDate, gettext } from 'utils';
+import {isDisplayed, fullDate, gettext} from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import {
@@ -35,14 +35,24 @@ import ArticleAuthor from 'ui/components/ArticleAuthor';
 import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
+import {Authors} from './fields/Authors';
 
-
-function ItemDetails({item, user, actions, topics, onClose, detailsConfig, downloadVideo, followStory}) {
+function ItemDetails({
+    item,
+    user,
+    actions,
+    topics,
+    onClose,
+    detailsConfig,
+    downloadVideo,
+    followStory,
+    listConfig,
+}) {
     const picture = getPicture(item);
     const videos = getVideos(item);
     const isCustom = isCustomRendition(picture);
-
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
+
     return (
         <Content type="item-detail">
             <ContentHeader>
@@ -86,10 +96,14 @@ function ItemDetails({item, user, actions, topics, onClose, detailsConfig, downl
 
 
                         {isDisplayed('metadata_section', detailsConfig) &&
-                            <PreviewMeta item={item} isItemDetail={true} displayConfig={detailsConfig}/>}
+                            <PreviewMeta item={item} isItemDetail={true} displayConfig={detailsConfig} listConfig={listConfig}/>}
                         <ArticleContentInfoWrapper>
                             {isDisplayed('tags_section', detailsConfig) &&
                                 <PreviewTags item={item} isItemDetail={true} displayConfig={detailsConfig}/>}
+
+                            {isDisplayed('authors', detailsConfig) && (
+                                <Authors item={item} />
+                            )}
 
                             {isDisplayed('ednotes_section', detailsConfig) &&
                                 <PreviewEdnote item={item} />}
@@ -98,7 +112,7 @@ function ItemDetails({item, user, actions, topics, onClose, detailsConfig, downl
                                 <ListItemNextVersion item={item} displayConfig={detailsConfig}  />
                             }
                             {isDisplayed('item_versions', detailsConfig) && showItemVersions(item) &&
-                                <ListItemPreviousVersions item={item} isPreview={true}/>
+                                <ListItemPreviousVersions item={item} displayConfig={detailsConfig} isPreview={true}/>
                             }
 
                             {isDisplayed('agenda_links', detailsConfig) && <AgendaLinks item={item} />}
@@ -115,6 +129,7 @@ ItemDetails.propTypes = {
     user: types.user.isRequired,
     topics: types.topics.isRequired,
     actions: types.actions,
+    listConfig: PropTypes.object,
     detailsConfig: PropTypes.object,
 
     onClose: PropTypes.func,

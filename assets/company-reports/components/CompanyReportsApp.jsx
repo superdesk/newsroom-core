@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import {
     setActiveReport,
     runReport,
@@ -8,8 +8,8 @@ import {
     printReport,
     toggleFilterAndQuery,
 } from '../actions';
-import { gettext } from 'utils';
-import { panels } from '../utils';
+import {gettext} from 'utils';
+import {panels} from '../utils';
 
 const options = [
     {value: '', text: ''},
@@ -21,7 +21,7 @@ const options = [
     {value: REPORTS_NAMES.SUBSCRIBER_ACTIVITY, text: gettext('Subscriber activity')},
     {value: REPORTS_NAMES.CONTENT_ACTIVITY, text: gettext('Content activity')},
     {value: REPORTS_NAMES.PRODUCT_COMPANIES, text: gettext('Companies per Product')},
-
+    {value: REPORTS_NAMES.EXPIRED_COMPANIES, text: gettext('Expired companies')},
 ];
 
 

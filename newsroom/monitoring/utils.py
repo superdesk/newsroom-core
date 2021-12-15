@@ -1,6 +1,8 @@
-from flask import current_app as app
 import collections
+
+from flask import current_app as app
 from superdesk.text_utils import get_text
+
 from newsroom.utils import get_items_by_id
 
 

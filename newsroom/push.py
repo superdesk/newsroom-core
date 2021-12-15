@@ -1,15 +1,16 @@
 import hmac
 import flask
 import logging
-import superdesk
+from copy import copy, deepcopy
 from datetime import datetime
 
-from copy import copy, deepcopy
 from flask import current_app as app
 from flask_babel import gettext
+import superdesk
 from superdesk.text_utils import get_word_count, get_char_count
-
 from superdesk.utc import utcnow
+from planning.common import WORKFLOW_STATE
+
 from newsroom.notifications import push_notification
 from newsroom.topics.topics import get_wire_notification_topics, get_agenda_notification_topics
 from newsroom.utils import parse_dates, get_user_dict, get_company_dict, parse_date_str
@@ -22,7 +23,6 @@ from newsroom.upload import ASSETS_RESOURCE
 from newsroom.signals import publish_item as publish_item_signal
 from newsroom.agenda.utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD
 
-from planning.common import WORKFLOW_STATE
 
 logger = logging.getLogger(__name__)
 blueprint = flask.Blueprint('push', __name__)
@@ -108,10 +108,16 @@ def publish_item(doc, original):
     doc['publish_schedule'] = parse_date_str(doc.get('publish_schedule'))
     doc.setdefault('wordcount', get_word_count(doc.get('body_html', '')))
     doc.setdefault('charcount', get_char_count(doc.get('body_html', '')))
+    doc['original_id'] = doc['guid']
+
     service = superdesk.get_resource_service('content_api')
-    if 'evolvedfrom' in doc:
+    service.datasource = 'items'
+
+    if doc.get('evolvedfrom'):
         parent_item = service.find_one(req=None, _id=doc['evolvedfrom'])
         if parent_item:
+            if parent_item.get("original_id"):
+                doc["original_id"] = parent_item["original_id"]
             doc['ancestors'] = copy(parent_item.get('ancestors', []))
             doc['ancestors'].append(doc['evolvedfrom'])
             doc['bookmarks'] = parent_item.get('bookmarks', [])
@@ -119,6 +125,7 @@ def publish_item(doc, original):
             doc['coverage_id'] = parent_item.get('coverage_id')
         else:
             logger.warning("Failed to find evolvedfrom item %s for %s", doc['evolvedfrom'], doc['guid'])
+
     fix_hrefs(doc)
     logger.debug('publishing %s', doc['guid'])
     for assoc in doc.get('associations', {}).values():
@@ -126,6 +133,11 @@ def publish_item(doc, original):
             assoc.setdefault('subscribers', [])
     if doc.get('associations', {}).get('featuremedia'):
         app.generate_renditions(doc)
+
+    # If there is a function defined that generates renditions for embedded images call it.
+    if app.generate_embed_renditions:
+        app.generate_embed_renditions(doc)
+
     if doc.get('coverage_id'):
         agenda_items = superdesk.get_resource_service('agenda').set_delivery(doc)
         if agenda_items:
@@ -542,6 +554,7 @@ def get_coverages(planning_items, original_coverages, new_plan):
 
                         if new_coverage.get('workflow_status') == 'completed':
                             coverage_changes['coverage_modified'] = True
+                            set_item_reference(new_coverage)
 
                     if existing_coverage.get('scheduled') != new_coverage.get('scheduled') and \
                             existing_coverage.get('workflow_status') != 'completed':
@@ -551,6 +564,26 @@ def get_coverages(planning_items, original_coverages, new_plan):
         coverage_changes['coverage_cancelled'] = True
 
     return coverages, coverage_changes
+
+
+def set_item_reference(coverage):
+    """
+    Check if the delivery in the passed coverage refers back to the agenda item and coverage.
+    If the item is fulfilled after the item is published it will not have this reference
+    :param coverage:
+    :return:
+    """
+    if coverage.get('delivery_id') is None:
+        return
+    item = superdesk.get_resource_service('items').find_one(req=None, _id=coverage.get('delivery_id'))
+    if item:
+        if 'planning_id' not in item and 'coverage_id' not in item:
+            service = superdesk.get_resource_service('content_api')
+            service.patch(item.get('_id'), updates={'planning_id': coverage.get('planning_id'),
+                                                    'coverage_id': coverage.get('coverage_id')})
+            item['planning_id'] = coverage.get('planning_id')
+            item['coverage_id'] = coverage.get('coverage_id')
+            notify_new_item(item, check_topics=False)
 
 
 def notify_new_item(item, check_topics=True):
@@ -692,14 +725,19 @@ def notify_agenda_topic_matches(item, users_dict):
 
 def send_topic_notification_emails(item, topics, topic_matches, users):
     for topic in topics:
-        user = users.get(str(topic['user']))
-        if topic['_id'] in topic_matches and user and user.get('receive_email'):
-            send_new_item_notification_email(
-                user,
-                topic['label'],
-                item=item,
-                section=topic.get('topic_type') or 'wire'
-            )
+        if topic['_id'] not in topic_matches:
+            continue
+
+        for user_id in topic.get('subscribers') or []:
+            user = users.get(str(user_id))
+
+            if user and user.get('receive_email'):
+                send_new_item_notification_email(
+                    user,
+                    topic['label'],
+                    item=item,
+                    section=topic.get('topic_type') or 'wire'
+                )
 
 
 # keeping this for testing
@@ -729,11 +767,12 @@ def push_binary_get(media_id):
 
 def publish_planning_featured(item):
     assert item.get('_id'), {'_id': 1}
-    assert item.get('tz'), {'tz': 1}
-    assert item.get('items'), {'items': 1}
     service = superdesk.get_resource_service('agenda_featured')
     orig = service.find_one(req=None, _id=item['_id'])
     if orig:
-        service.update(orig['_id'], {'items': item['items']}, orig)
+        service.update(orig['_id'], {'items': item.get('items') or []}, orig)
     else:
+        # Assert `tz` and `items` in initial push only
+        assert item.get('tz'), {'tz': 1}
+        assert item.get('items'), {'items': 1}
         service.create([item])

@@ -2,7 +2,9 @@ import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
 import {renderModal, closeModal} from 'actions';
 import {store as userProfileStore} from './store';
-import { getLocale } from '../utils';
+import {getLocale} from '../utils';
+import {reloadMyTopics as reloadMyAgendaTopics} from '../agenda/actions';
+import {reloadMyTopics as reloadMyWireTopics} from '../wire/actions';
 
 export const GET_TOPICS = 'GET_TOPICS';
 export function getTopics(topics) {
@@ -31,7 +33,10 @@ export function setError(errors) {
 
 export const SELECT_MENU = 'SELECT_MENU';
 export function selectMenu(data) {
-    return {type: SELECT_MENU, data};
+    return function(dispatch) {
+        dispatch({type: SELECT_MENU, data});
+        dispatch(reloadMyTopics());
+    };
 }
 
 export const SET_TOPIC_EDITOR_FULLSCREEN = 'SET_TOPIC_EDITOR_FULLSCREEN';
@@ -184,5 +189,30 @@ export function submitFollowTopic(topic) {
             .then(() => dispatch(fetchTopics()))
             .then(() => dispatch(closeModal()))
             .catch(errorHandler);
+    };
+}
+
+function reloadMyTopics() {
+    return function(dispatch, getState) {
+        const reloadMyTopicsFunction = getState().selectedMenu === 'events' ? reloadMyAgendaTopics : reloadMyWireTopics;
+
+        return dispatch(reloadMyTopicsFunction());
+    };
+}
+
+export function pushNotification(push) {
+    return (dispatch, getState) => {
+        const user = getState().user;
+        const company = getState().company;
+        const shouldReloadTopics = [
+            `topics:${user}`,
+            `topics:company-${company}`,
+            `topic_created:${user}`,
+            `topic_created:company-${company}`,
+        ].includes(push.event);
+
+        if (shouldReloadTopics) {
+            return dispatch(reloadMyTopics());
+        }
     };
 }

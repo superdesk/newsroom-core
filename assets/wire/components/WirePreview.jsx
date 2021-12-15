@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { isEmpty } from 'lodash';
-import { isDisplayed } from 'utils';
+import {isEmpty} from 'lodash';
+
+import {isDisplayed} from 'utils';
 import {
     getPicture,
     getVideos,
@@ -31,6 +32,7 @@ import PreviewMeta from './PreviewMeta';
 import AgendaLinks from './AgendaLinks';
 import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
+import {Authors} from './fields/Authors';
 
 
 class WirePreview extends React.PureComponent {
@@ -45,7 +47,7 @@ class WirePreview extends React.PureComponent {
     }
 
     render() {
-        const {item, user, actions, followStory, topics, previewConfig, downloadVideo} = this.props;
+        const {item, user, actions, followStory, topics, previewConfig, downloadVideo, listConfig} = this.props;
         const picture = getPicture(item);
         const videos = getVideos(item);
         const isCustom = isCustomRendition(picture);
@@ -63,7 +65,7 @@ class WirePreview extends React.PureComponent {
                         previewConfig={previewConfig}
                     />
                 </div>
-                <div id='preview-article' className='wire-column__preview__content noselect' ref={(preview) => this.preview = preview}>
+                <div id='preview-article' className='wire-column__preview__content' ref={(preview) => this.preview = preview}>
                     <ArticleEmbargoed item={item} />
                     {isDisplayed('slugline', previewConfig) && <ArticleSlugline item={item}/>}
                     {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item}/>}
@@ -75,7 +77,7 @@ class WirePreview extends React.PureComponent {
                         isCustomRendition={isCustom} />}
 
                     {isDisplayed('metadata_section', previewConfig) &&
-                    <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions} displayConfig={previewConfig}/>}
+                    <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions} displayConfig={previewConfig} listConfig={listConfig} />}
                     {isDisplayed('abstract', previewConfig) &&
                     <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                     {isDisplayed('body_html', previewConfig) && <ArticleBodyHtml item={item}/>}
@@ -91,6 +93,10 @@ class WirePreview extends React.PureComponent {
                     {isDisplayed('tags_section', previewConfig) &&
                         <PreviewTags item={item} isItemDetail={false} displayConfig={previewConfig}/>}
 
+                    {isDisplayed('authors', previewConfig) && (
+                        <Authors item={item} />
+                    )}
+
                     {isDisplayed('ednotes_section', previewConfig) &&
                                 <PreviewEdnote item={item} />}
 
@@ -99,6 +105,7 @@ class WirePreview extends React.PureComponent {
                             item={item}
                             isPreview={true}
                             inputId={previousVersions}
+                            displayConfig={previewConfig}
                         />
                     }
                     {isDisplayed('agenda_links', previewConfig) &&
@@ -119,6 +126,7 @@ WirePreview.propTypes = {
     followStory: PropTypes.func,
     closePreview: PropTypes.func,
     downloadVideo: PropTypes.func,
+    listConfig: PropTypes.object,
 };
 
 export default WirePreview;

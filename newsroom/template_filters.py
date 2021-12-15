@@ -1,15 +1,52 @@
 import os
+from typing import Optional
 import arrow
+from bson.objectid import ObjectId
 import flask
 import hashlib
 
 from flask import current_app as app
 from eve.utils import str_to_date
-from flask_babel import format_time, format_date, format_datetime
+from flask_babel import format_time, format_date, format_datetime, get_locale
+from flask_babel.speaklater import LazyString
+from jinja2.utils import htmlsafe_json_dumps  # type: ignore
 from superdesk import get_resource_service
 from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
 from newsroom.auth import get_user
+from datetime import datetime
+
+
+_hash_cache = {}
+
+
+def get_client_format(key) -> Optional[str]:
+    locale = str(get_locale())
+    try:
+        return app.config["CLIENT_LOCALE_FORMATS"][locale][key]
+    except KeyError:
+        pass
+    try:
+        return app.config["CLIENT_LOCALE_FORMATS"][app.config["DEFAULT_LANGUAGE"]][key]
+    except KeyError:
+        pass
+    return None
+
+
+def to_json(value):
+    """Jinja filter to address the encoding of special values to json.
+
+    Make it consistent to return strings without surrounding ""
+    so for string values it should be used with '' in the template::
+
+        const user_id = '{{ user["_id"] | tojson }}';
+
+    """
+    if isinstance(value, LazyString):
+        value = str(value)
+    if isinstance(value, ObjectId):
+        value = str(value)
+    return htmlsafe_json_dumps(obj=value, dumper=app.json_encoder().dumps)
 
 
 def parse_date(datetime):
@@ -24,31 +61,27 @@ def parse_date(datetime):
 
 def datetime_short(datetime):
     if datetime:
-        return format_datetime(parse_date(datetime), 'short')
+        return format_datetime(parse_date(datetime), app.config["DATETIME_FORMAT_SHORT"])
 
 
 def datetime_long(datetime):
     if datetime:
-        return format_datetime(parse_date(datetime), "dd/MM/yyyy HH:mm")
+        return format_datetime(parse_date(datetime), app.config["DATETIME_FORMAT_LONG"])
 
 
 def date_header(datetime):
-    date_format_str = "EEEE, MMMM d, yyyy"
-
-    if flask.session.get('locale', '').startswith('fr'):
-        date_format_str = "EEEE, 'le' d MMMM yyyy"  # French format
-
-    return format_datetime(parse_date(datetime if datetime else utcnow()), date_format_str).capitalize()
+    _format = get_client_format("DATE_FORMAT_HEADER")
+    return format_datetime(parse_date(datetime if datetime else utcnow()), _format)
 
 
 def time_short(datetime):
     if datetime:
-        return format_time(parse_date(datetime), 'HH:mm')
+        return format_time(parse_date(datetime), app.config["TIME_FORMAT_SHORT"])
 
 
 def date_short(datetime):
     if datetime:
-        return format_date(parse_date(datetime), 'short')
+        return format_date(parse_date(datetime), app.config["DATE_FORMAT_SHORT"])
 
 
 def plain_text(html):
@@ -97,7 +130,14 @@ def sidenavs(blueprint=None):
     def blueprint_matches(nav, blueprint):
         return not nav.get('blueprint') or not blueprint or nav['blueprint'] == blueprint
 
-    return [nav for nav in app.sidenavs if blueprint_matches(nav, blueprint)]
+    locale = str(get_locale())
+
+    return [
+        nav for nav in app.sidenavs
+        if blueprint_matches(nav, blueprint) and (
+            nav.get('locale') is None or nav['locale'] == locale
+        )
+    ]
 
 
 def section_allowed(nav, sections):
@@ -132,6 +172,39 @@ def is_admin_or_account_manager(user=None):
     return flask.session.get('user_type') in allowed_user_types
 
 
+def authorized_settings_apps(user=None):
+    if is_admin(user):
+        return app.settings_apps
+    if is_admin_or_account_manager(user):
+        return [app for app in app.settings_apps if app.allow_account_mgr]
+    return []
+
+
 def get_multi_line_message(message):
     new_message = message.replace('\r', '')
     return new_message.replace('\n', '\r\n')
+
+
+def get_theme_file(filename):
+    for folder in app._theme_folders:
+        file = os.path.realpath(os.path.join(folder, filename))
+        if os.path.exists(file):
+            return file
+
+
+def theme_url(filename):
+    """Get url for theme file.
+
+    There will be a hash of the file added to it
+    in order to force refresh on changes.
+    """
+    file = get_theme_file(filename)
+    assert file
+    if not file:  # this should not really happen
+        return flask.url_for('theme', filename=filename)
+    if _hash_cache.get(file) is None or app.debug:
+        hash = hashlib.md5()
+        with open(file, 'rb') as f:
+            hash.update(f.read())
+        _hash_cache[file] = hash.hexdigest()
+    return flask.url_for('theme', filename=filename, h=_hash_cache.get(file, int(datetime.now().timestamp())))

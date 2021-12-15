@@ -1,1 +1,1 @@
-from .app import NewsroomWebApp  # noqa
+from .factory import NewsroomWebApp, get_app  # noqa

@@ -1,21 +1,24 @@
-from collections import defaultdict
-
-import superdesk
-from bson import ObjectId
-from flask_babel import gettext
-from flask import request, send_file, current_app as newsroom_app, json
 import io
 import csv
-from superdesk.utc import utcnow
-from werkzeug.utils import secure_filename
+from collections import defaultdict
 from copy import deepcopy
-from newsroom.agenda.agenda import get_date_filters
+
+from bson import ObjectId
 from flask import abort
-from newsroom.utils import query_resource, get_entity_dict, get_items_by_id
-from .content_activity import get_content_activity_report  # noqa
+from flask_babel import gettext
+from flask import request, send_file, current_app as newsroom_app, json
 from eve.utils import ParsedRequest
+from werkzeug.utils import secure_filename
+import superdesk
+from superdesk.utc import utcnow
+
+
+from newsroom.utils import query_resource, get_entity_dict, get_items_by_id, MAX_TERMS_SIZE
+from newsroom.agenda.agenda import get_date_filters
 from newsroom.news_api.api_tokens import API_TOKENS
 from newsroom.news_api.utils import format_report_results
+
+from .content_activity import get_content_activity_report  # noqa
 
 
 def get_company_saved_searches():
@@ -157,7 +160,7 @@ def get_subscriber_activity_report():
     args = deepcopy(request.args.to_dict())
 
     # Elastic query
-    aggregations = {'action': {'terms': {'field': 'action', 'size': 0}}}
+    aggregations = {'action': {'terms': {'field': 'action', 'size': MAX_TERMS_SIZE}}}
     must_terms = []
     source = {}
 
@@ -205,7 +208,6 @@ def get_subscriber_activity_report():
         if doc.get('company'):
             company_ids.append(ObjectId(doc.get('company')))
         user_ids.append(ObjectId(doc.get('user')))
-
     agenda_items = get_entity_dict(get_items_by_id(agenda_ids, 'agenda'))
     wire_items = get_entity_dict(get_items_by_id(wire_ids, 'items'))
     company_items = get_entity_dict(get_items_by_id(company_ids, 'companies'), True)
@@ -219,7 +221,8 @@ def get_subscriber_activity_report():
             doc['item'] = {
                 'item_text': wire_items[doc['item']].get('headline'),
                 '_id': wire_items[doc['item']]['_id'],
-                'item_href': '/{}?item={}'.format(doc['section'], doc['item'])
+                'item_href': '/{}?item={}'.format(doc['section'] if doc['section'] != 'news_api' else 'wire',
+                                                  doc['item'])
             }
         elif doc.get('item') in agenda_items:
             doc['item'] = {
@@ -236,7 +239,7 @@ def get_subscriber_activity_report():
             doc['user'] = "{0} {1}".format(user.get('first_name'), user.get('last_name'))
 
         doc['section'] = get_section_name(doc['section'])
-        doc['action'] = doc['action'].capitalize()
+        doc['action'] = doc['action'].capitalize() if doc['action'].lower() != 'api' else 'API retrieval'
 
     if not request.args.get('export'):
         results = {
@@ -351,5 +354,16 @@ def get_product_company():
     results = {
         'results': res,
         'name': gettext('Companies permissioned per product')
+    }
+    return results
+
+
+def get_expired_companies():
+    expired = list(superdesk.get_resource_service('companies').find(
+        {'expiry_date': {'$lte': utcnow().replace(hour=0, minute=0, second=0)}}))
+
+    results = {
+        'results': expired,
+        'name': gettext('Expired companies')
     }
     return results

@@ -15,6 +15,7 @@ from newsroom.email import send_validate_account_email, \
     send_reset_password_email, send_new_signup_email, send_new_account_email
 from newsroom.limiter import limiter
 from newsroom.template_filters import is_admin
+
 from .token import generate_auth_token, verify_auth_token
 
 
@@ -117,6 +118,10 @@ def _is_password_valid(password, user):
 
 def is_current_user_admin():
     return flask.session['user_type'] == 'administrator'
+
+
+def is_current_user_account_mgr():
+    return flask.session['user_type'] == 'account_management'
 
 
 def is_current_user(user_id):

@@ -1,8 +1,15 @@
-httmock
-wooper
-PyRTF3
-xhtml2pdf
-werkzeug>=0.9.4,<=0.11.15
--e .
-git+git://github.com/superdesk/superdesk-planning.git@1.10#egg=superdesk-planning
-git+git://github.com/superdesk/superdesk-core.git@master#egg=superdesk-core
+WTForms==2.2.1
+flask>=1.1.4,<2.0
+flask-webpack>=0.1.0,<0.2
+Flask-WTF>=0.14.2,<0.15
+flask-limiter>=0.9.5.1,<0.9.6
+Flask-Caching>=1.9.0
+flask_pymongo>=0.5.2,<1.0
+honcho>=1.0.1
+gunicorn>=20.0.4,<20.1
+PyRTF3>=0.47.5
+xhtml2pdf>=0.2.4
+
+# Use develop branch for now (until 2.4 is released, to fix inclusion of `tests` from Superdesk)
+git+https://github.com/superdesk/superdesk-core.git@develop#egg=superdesk-core
+superdesk-planning==2.3.1

@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {get, isEqual} from 'lodash';
 
-import {gettext, getItemFromArray, DISPLAY_NEWS_ONLY} from 'utils';
+import {gettext, getItemFromArray, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE} from 'utils';
 import {getSingleFilterValue} from 'search/utils';
 
 import {
@@ -12,6 +12,7 @@ import {
     fetchMoreItems,
     previewItem,
     toggleNews,
+    toggleSearchAllVersions,
     downloadVideo,
 } from 'wire/actions';
 
@@ -48,16 +49,19 @@ import ItemDetails from './ItemDetails';
 import ShareItemModal from 'components/ShareItemModal';
 import getItemActions from '../item-actions';
 import BookmarkTabs from 'components/BookmarkTabs';
+import ItemStatisticsModal from './ItemStatisticsModal';
 
 import {
     previewConfigSelector,
     detailsConfigSelector,
+    listConfigSelector,
     advancedSearchTabsConfigSelector,
 } from 'ui/selectors';
 
 const modals = {
     shareItem: ShareItemModal,
     downloadItems: DownloadItemsModal,
+    itemStatistics: ItemStatisticsModal,
 };
 
 class WireApp extends BaseApp {
@@ -134,6 +138,7 @@ class WireApp extends BaseApp {
                 topics={this.props.topics}
                 actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
                 detailsConfig={this.props.detailsConfig}
+                listConfig={this.props.listConfig}
                 downloadVideo={this.props.downloadVideo}
                 followStory={this.props.followStory}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
@@ -143,25 +148,27 @@ class WireApp extends BaseApp {
                         actions={this.props.actions}
                     />
                     <nav className="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
-                        {this.state.withSidebar && <span
+                        {this.state.withSidebar && <button
                             className='content-bar__menu content-bar__menu--nav--open'
                             ref={this.setOpenRef}
                             title={gettext('Close filter panel')}
+                            aria-label={gettext('Close filter panel')}
                             onClick={this.toggleSidebar}>
                             <i className="icon--close-thin icon--white" />
-                        </span>}
+                        </button>}
 
                         {this.props.bookmarks &&
                             <BookmarkTabs active={this.props.context} sections={this.props.userSections}/>
                         }
 
-                        {!this.state.withSidebar && !this.props.bookmarks && <span
+                        {!this.state.withSidebar && !this.props.bookmarks && <button
                             className="content-bar__menu content-bar__menu--nav"
                             ref={this.setCloseRef}
                             title={gettext('Open filter panel')}
+                            aria-label={gettext('Open filter panel')}
                             onClick={this.toggleSidebar}>
                             <i className="icon--hamburger" />
-                        </span>}
+                        </button>}
 
                         <SearchBar
                             fetchItems={this.props.fetchItems}
@@ -175,12 +182,16 @@ class WireApp extends BaseApp {
                             newsOnly={this.props.newsOnly}
                             toggleNews={this.props.toggleNews}
                             hideNewsOnly={!(this.props.context === 'wire' && DISPLAY_NEWS_ONLY)}
+                            hideSearchAllVersions={!(this.props.context === 'wire' && DISPLAY_ALL_VERSIONS_TOGGLE)}
+                            searchAllVersions={this.props.searchAllVersions}
+                            toggleSearchAllVersions={this.props.toggleSearchAllVersions}
                         />
                     </nav>
                 </section>,
                 <section key="contentMain" className='content-main'>
                     <div className='wire-column--3'>
                         <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
+                            <h3 className="a11y-only">{gettext('Side filter panel')}</h3>
                             {this.state.withSidebar &&
                                 <SearchSidebar tabs={this.tabs} props={{...this.props}} />
                             }
@@ -224,6 +235,7 @@ class WireApp extends BaseApp {
                                 closePreview={this.props.closePreview}
                                 previewConfig={this.props.previewConfig}
                                 downloadVideo={this.props.downloadVideo}
+                                listConfig={this.props.listConfig}
                             />
                             }
 
@@ -274,6 +286,8 @@ WireApp.propTypes = {
     activeNavigation: PropTypes.arrayOf(PropTypes.string),
     toggleNews: PropTypes.func,
     newsOnly: PropTypes.bool,
+    toggleSearchAllVersions: PropTypes.func,
+    searchAllVersions: PropTypes.bool,
     activeTopic: PropTypes.object,
     activeProduct: PropTypes.object,
     activeFilter: PropTypes.object,
@@ -282,6 +296,7 @@ WireApp.propTypes = {
     context: PropTypes.string.isRequired,
     previewConfig: PropTypes.object,
     detailsConfig: PropTypes.object,
+    listConfig: PropTypes.object,
     groups: PropTypes.array,
     downloadVideo: PropTypes.func,
     advancedSearchTabConfig: PropTypes.object,
@@ -306,6 +321,7 @@ const mapStateToProps = (state) => ({
     navigations: navigationsSelector(state),
     activeNavigation: searchNavigationSelector(state),
     newsOnly: !!get(state, 'wire.newsOnly'),
+    searchAllVersions: !!get(state, 'wire.searchAllVersions'),
     bookmarks: state.bookmarks,
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,
@@ -315,6 +331,7 @@ const mapStateToProps = (state) => ({
     context: state.context,
     previewConfig: previewConfigSelector(state),
     detailsConfig: detailsConfigSelector(state),
+    listConfig: listConfigSelector(state),
     advancedSearchTabConfig: advancedSearchTabsConfigSelector(state),
     groups: get(state, 'groups', []),
     searchParams: searchParamsSelector(state),
@@ -326,6 +343,10 @@ const mapDispatchToProps = (dispatch) => ({
     fetchItems: () => dispatch(fetchItems()),
     toggleNews: () => {
         dispatch(toggleNews());
+        dispatch(fetchItems());
+    },
+    toggleSearchAllVersions: () => {
+        dispatch(toggleSearchAllVersions());
         dispatch(fetchItems());
     },
     setQuery: (query) => dispatch(setQuery(query)),

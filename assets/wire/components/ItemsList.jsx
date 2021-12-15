@@ -1,17 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import classNames from 'classnames';
 import {isEqual} from 'lodash';
 
 
 import {gettext, isDisplayed} from 'utils';
 import WireListItem from './WireListItem';
-import { setActive, previewItem, toggleSelected, openItem } from '../actions';
-import { EXTENDED_VIEW } from '../defaults';
-import { getIntVersion } from '../utils';
-import {searchNavigationSelector} from 'search/selectors';
-import {previewConfigSelector} from 'ui/selectors';
+import {setActive, previewItem, toggleSelected, openItem} from '../actions';
+import {EXTENDED_VIEW} from '../defaults';
+import {getIntVersion} from '../utils';
+import {searchNavigationSelector, isSearchFiltered} from 'search/selectors';
+import {previewConfigSelector, listConfigSelector} from 'ui/selectors';
 import {getContextName} from 'selectors';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
@@ -135,7 +135,7 @@ class ItemsList extends React.Component {
     }
 
     render() {
-        const {items, itemsById, activeItem, activeView, selectedItems, readItems} = this.props;
+        const {items, itemsById, activeItem, activeView, selectedItems, readItems, matchedIds} = this.props;
         const isExtended = activeView === EXTENDED_VIEW;
 
         const articles = items.map((_id) =>
@@ -155,6 +155,9 @@ class ItemsList extends React.Component {
                 user={this.props.user}
                 context={this.props.context}
                 contextName={this.props.contextName}
+                listConfig={this.props.listConfig}
+                matchedIds={matchedIds || []}
+                isSearchFiltered={this.props.isSearchFiltered}
             />
         );
 
@@ -178,6 +181,7 @@ class ItemsList extends React.Component {
 ItemsList.propTypes = {
     items: PropTypes.array.isRequired,
     itemsById: PropTypes.object,
+    matchedIds: PropTypes.array,
     activeItem: PropTypes.string,
     previewItem: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
@@ -198,12 +202,15 @@ ItemsList.propTypes = {
     resultsFiltered: PropTypes.bool,
     isLoading: PropTypes.bool,
     previewConfig: PropTypes.object,
+    listConfig: PropTypes.object,
     contextName: PropTypes.string,
+    isSearchFiltered: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
     items: state.items,
     itemsById: state.itemsById,
+    matchedIds: state.matchedIds,
     activeItem: state.activeItem,
     previewItem: state.previewItem,
     selectedItems: state.selectedItems,
@@ -218,7 +225,9 @@ const mapStateToProps = (state) => ({
     resultsFiltered: state.resultsFiltered,
     isLoading: state.isLoading,
     previewConfig: previewConfigSelector(state),
+    listConfig: listConfigSelector(state),
     contextName: getContextName(state),
+    isSearchFiltered: isSearchFiltered(state),
 });
 
 export default connect(mapStateToProps)(ItemsList);

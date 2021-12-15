@@ -2,6 +2,7 @@ import {
     RECIEVE_ITEMS,
     INIT_DATA,
     TOGGLE_NEWS,
+    TOGGLE_SEARCH_ALL_VERSIONS,
     WIRE_ITEM_REMOVED,
 } from './actions';
 
@@ -13,6 +14,7 @@ import {searchReducer} from 'search/reducers';
 const initialState = {
     items: [],
     itemsById: {},
+    matchedIds: [],
     aggregations: null,
     activeItem: null,
     previewItem: null,
@@ -48,10 +50,15 @@ function recieveItems(state, data) {
         return item._id;
     });
 
+    const matchedIds = get(data, '_links.matched_ids.length') ?
+        data._links.matched_ids :
+        [];
+
     return {
         ...state,
         items,
         itemsById,
+        matchedIds,
         isLoading: false,
         totalItems: data._meta.total,
         aggregations: data._aggregations || null,
@@ -100,6 +107,13 @@ function _wireReducer(state, action) {
         };
     }
 
+    case TOGGLE_SEARCH_ALL_VERSIONS: {
+        return {
+            ...state,
+            searchAllVersions: !state.searchAllVersions,
+        };
+    }
+
     default:
         return state;
     }
@@ -125,7 +139,10 @@ export default function wireReducer(state = initialState, action) {
             bookmarks: action.wireData.bookmarks || false,
             formats: action.wireData.formats || [],
             secondaryFormats: get(action, 'wireData.secondary_formats') || [],
-            wire: Object.assign({}, state.wire, {newsOnly: action.newsOnly}),
+            wire: Object.assign({}, state.wire, {
+                newsOnly: action.newsOnly,
+                searchAllVersions: action.searchAllVersions,
+            }),
             search: Object.assign({}, state.search, {
                 navigations,
                 products,
@@ -139,6 +156,7 @@ export default function wireReducer(state = initialState, action) {
     }
 
     case TOGGLE_NEWS:
+    case TOGGLE_SEARCH_ALL_VERSIONS:
         return {...state, wire: _wireReducer(state.wire, action)};
 
     case WIRE_ITEM_REMOVED:

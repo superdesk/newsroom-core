@@ -12,11 +12,11 @@
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/css/themes/bootstrap.min.css"/>
 
     <link rel="icon" type="image/x-icon"
-        href="{{ url_for('theme', filename='favicon.ico') }}">
+        href="{{ theme_url('favicon.ico') }}">
 
 {{ javascript_tag('common') | safe }}
 {{ javascript_tag('newsroom_css') | safe }}
-<link rel="stylesheet" href="{{ url_for('theme', filename='theme.css') }}"/>
+<link rel="stylesheet" href="{{ theme_url('theme.css') }}"/>
 {% block sectioncss %}{% endblock %}
 </head>
 <body>
@@ -53,20 +53,6 @@
         {% if session.get('name') %}
         <nav class="sidenav">
             <ul class="sidenav-icons">
-                {% for app in settings_apps|sort(attribute='weight') %}{% if loop.first and is_admin()%}
-                <li class="sidenav-icons__item sidenav-icons__item--admin d-none d-md-p-block d-lg-l-block {% if request.blueprint == 'settings' %}active{% endif %}">
-                  <a href="{{ url_for('settings.app', app_id=app._id) }}" title="{{ gettext('Settings') }}" data-toggle="tooltip" data-placement="right">
-                      <i class="icon--cog icon--mid-blue"></i>
-                  </a>
-                </li>
-                {% endif %}{% endfor %}
-                {% if is_admin_or_account_manager() %}
-                <li class="sidenav-icons__item sidenav-icons__item--report d-none d-md-p-block d-lg-l-block {% if request.endpoint == 'reports.company_reports' %}active{% endif %}">
-                  <a href="{{ url_for('reports.company_reports') }}" title="{{ gettext('Reports') }}" data-toggle="tooltip" data-placement="right">
-                      <i class="icon--report icon--mid-blue"></i>
-                  </a>
-                </li>
-                {% endif %}
 
                 {% block default_navs %}
                     {% for group in range(0, 10) %}
@@ -78,7 +64,22 @@
                         {% include "sidenav_icon.html" %}
                         {% endfor %}
                     {% endfor %}
-            {%  endblock %}
+                {%  endblock %}
+
+                {% if is_admin_or_account_manager() %}
+                <li class="sidenav-icons__item sidenav-icons__item--report d-none d-md-p-block d-lg-l-block {% if request.endpoint == 'reports.company_reports' %}active{% endif %}">
+                  <a href="{{ url_for('reports.company_reports') }}" title="{{ gettext('Reports') }}" data-toggle="tooltip" data-placement="right">
+                      <i class="icon--report icon--mid-blue"></i>
+                  </a>
+                </li>
+                {% endif %}
+                {% for app in settings_apps|sort(attribute='weight') %}{% if loop.first and is_admin()%}
+                <li class="sidenav-icons__item sidenav-icons__item--admin d-none d-md-p-block d-lg-l-block {% if request.blueprint == 'settings' %}active{% endif %}">
+                  <a href="{{ url_for('settings.app', app_id=app._id) }}" title="{{ gettext('Settings') }}" data-toggle="tooltip" data-placement="right">
+                      <i class="icon--cog icon--mid-blue"></i>
+                  </a>
+                </li>
+                {% endif %}{% endfor %}
             </ul>
 
             {% block sidenav %}
@@ -103,10 +104,11 @@
     window.profileData = {{ get_user_profile_data() | tojson | safe }};
     window.translations = {{ get_client_translations() | tojson | safe }};
     window.locales = {{ get_client_locales() | tojson | safe }};
-    window.locale = {{ get_locale() | tojson | safe }};
+    window.locale = '{{ get_locale() | tojson | safe }}';
 </script>
 
 {{ javascript_tag('newsroom_js') | safe }}
+{{ javascript_tag('app') | safe }}
 
 {% if session.get('name') %}
     {{ javascript_tag('notifications_js') | safe }}
@@ -123,7 +125,7 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', {{ get_setting('google_analytics') | tojson | safe }}, {
+  gtag('config', '{{ get_setting('google_analytics') | tojson }}', {
       custom_map: {
           dimension1: 'company',
           dimension2: 'user',
@@ -131,7 +133,7 @@
   });
 
   {% if session.get('user') %}
-  gtag('set', {'user_id': {{ hash(session['user']) | tojson | safe }} });
+  gtag('set', {'user_id': '{{ hash(session['user']) | tojson }}' });
   {% endif %}
 
   {% with messages = get_flashed_messages(category_filter=['analytics']) %}
@@ -145,7 +147,7 @@
 {% if config.GOOGLE_MAPS_KEY %}
 <script>
     window.mapsProvider = 'google';
-    window.googleMapsKey = {{ config.GOOGLE_MAPS_KEY | tojson }};
+    window.googleMapsKey = '{{ config.GOOGLE_MAPS_KEY | tojson }}';
     function setMapsLoaded() {
         window.mapsLoaded = true;
     }

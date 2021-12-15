@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { setActiveFilterTab, getActiveFilterTab } from 'local-store';
+import {setActiveFilterTab, getActiveFilterTab} from 'local-store';
 
 class SearchSidebar extends React.Component {
     constructor(props) {
@@ -17,6 +17,8 @@ class SearchSidebar extends React.Component {
                         <li className='wire-column__nav__tab nav-item' key={tab.id}>
                             <a className={`nav-link ${this.state.active === tab.id && 'active'}`}
                                 role='tab'
+                                aria-selected={`${this.state.active === tab.id ? 'true' : 'false'}`}
+                                aria-label={tab.label}
                                 href=''
                                 onClick={(event) => {
                                     event.preventDefault();
@@ -28,7 +30,7 @@ class SearchSidebar extends React.Component {
                 </ul>
                 {this.props.tabs.map((tab) => (
                     <div className='tab-content' key={tab.id}>
-                        <div className={classNames('tab-pane', 'fade', {'show active': this.state.active === tab.id})} role='tabpanel'>
+                        <div className={classNames('tab-pane tab-pane--no-padding', 'fade', {'show active': this.state.active === tab.id})} role='tabpanel'>
                             <tab.component {...this.props.props} />
                         </div>
                     </div>

@@ -1,7 +1,8 @@
 
 from babel import core
 from flask import request, current_app, session
-from flask_babel import Babel, get_translations
+from flask_babel import Babel, get_translations, format_datetime
+
 from newsroom.auth import get_user
 
 
@@ -50,3 +51,4 @@ def setup_babel(app):
     app.add_template_global(get_client_translations)
     app.add_template_global(get_client_locales)
     app.add_template_global(_get_locale, 'get_locale')
+    app.add_template_global(format_datetime)

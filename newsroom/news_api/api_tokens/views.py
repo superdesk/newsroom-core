@@ -1,13 +1,16 @@
 import logging
+import json
+
 import flask
 from flask import jsonify
-from newsroom.news_api.api_tokens import blueprint
 from superdesk import get_resource_service
-from newsroom.utils import get_json_or_400
-from content_api.errors import BadParameterValueError
 from superdesk.json_utils import loads
-import json
+from content_api.errors import BadParameterValueError
+
+from newsroom.utils import get_json_or_400
+from newsroom.news_api.api_tokens import blueprint
 from . import API_TOKENS
+
 
 logger = logging.getLogger(__name__)
 

@@ -1,15 +1,30 @@
 from urllib import parse
+
 from bson import ObjectId
 from superdesk import get_resource_service
-from newsroom.topics import blueprint
-from newsroom.utils import find_one
-from newsroom.auth import get_user
-from newsroom.decorator import login_required
-from flask import json, jsonify, abort, session, render_template, current_app as app
-from newsroom.utils import get_json_or_400, get_entity_or_404
-from newsroom.email import send_email
-from newsroom.notifications import push_user_notification
+from flask import json, jsonify, abort, session, current_app as app
 from flask_babel import gettext
+
+from newsroom.topics import blueprint
+from newsroom.topics.topics import get_user_topics as _get_user_topics
+from newsroom.utils import find_one
+from newsroom.auth import get_user, get_user_id
+from newsroom.decorator import login_required
+from newsroom.utils import get_json_or_400, get_entity_or_404
+from newsroom.email import send_template_email
+from newsroom.notifications import push_user_notification, push_company_notification
+
+
+@blueprint.route('/users/<user_id>/topics', methods=['GET'])
+@login_required
+def get_user_topics(user_id):
+    return jsonify(_get_user_topics(user_id)), 200
+
+
+@blueprint.route('/topics/my_topics', methods=['GET'])
+@login_required
+def get_list_my_topics():
+    return jsonify(_get_user_topics(get_user_id())), 200
 
 
 @blueprint.route('/topics/<id>', methods=['POST'])
@@ -17,28 +32,38 @@ from flask_babel import gettext
 def update_topic(id):
     """ Updates a followed topic """
     data = get_json_or_400()
-    user_id = session['user']
+    current_user = get_user(required=True)
 
-    if not is_user_topic(id, user_id):
+    if not is_user_topic(id, str(current_user['_id'])):
         abort(403)
 
     # If notifications are enabled, check to see if user is configured to receive emails
-    if data.get('notifications'):
-        user = get_resource_service('users').find_one(req=None, _id=user_id)
+    data.setdefault('subscribers', [])
+    if str(current_user['_id']) in data['subscribers']:
+        user = get_resource_service('users').find_one(req=None, _id=current_user['_id'])
         if not user.get('receive_email'):
             return "", gettext('Please enable \'Receive notifications via email\' option in your profile to receive topic notifications')  # noqa
 
     updates = {
         'label': data.get('label'),
-        'notifications': data.get('notifications', False),
         'query': data.get('query'),
         'created': data.get('created'),
         'filter': data.get('filter'),
         'navigation': data.get('navigation'),
+        'company': current_user.get('company'),
+        'subscribers': [
+            ObjectId(uid)
+            for uid in data['subscribers']
+        ],
+        'is_global': data.get('is_global', False),
     }
 
-    get_resource_service('topics').patch(id=ObjectId(id), updates=updates)
-    push_user_notification('topics')
+    original = get_resource_service('topics').find_one(req=None, _id=ObjectId(id))
+    response = get_resource_service('topics').patch(id=ObjectId(id), updates=updates)
+    if response.get('is_global') or updates.get('is_global', False) != original.get('is_global', False):
+        push_company_notification('topics')
+    else:
+        push_user_notification('topics')
     return jsonify({'success': True}), 200
 
 
@@ -59,7 +84,8 @@ def is_user_topic(topic_id, user_id):
     Checks if the topic with topic_id belongs to user with user_id
     """
     topic = find_one('topics', _id=ObjectId(topic_id))
-    if topic and str(topic.get('user')) == user_id:
+    user_ids = [user.get('id') for user in topic.get('users') or []]
+    if topic and (str(topic.get('user')) == user_id or user_id in user_ids):
         return True
     return False
 
@@ -109,9 +135,10 @@ def share():
             'message': data.get('message'),
             'app_name': app.config['SITE_NAME'],
         }
-        send_email(
+        send_template_email(
             [user['email']],
             gettext('From %s: %s' % (app.config['SITE_NAME'], topic['label'])),
-            render_template('share_topic.txt', **template_kwargs),
+            'share_topic',
+            **template_kwargs
         )
     return jsonify(), 201

@@ -1,10 +1,11 @@
 import logging
-
 from copy import deepcopy
+
+from bson import ObjectId
 from content_api.items.resource import code_mapping
 from eve.utils import ParsedRequest, config
 from flask import json, abort, current_app as app
-from flask_babel import gettext
+from flask_babel import lazy_gettext
 from planning.common import WORKFLOW_STATE_SCHEMA, ASSIGNMENT_WORKFLOW_STATE, WORKFLOW_STATE
 from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
@@ -24,7 +25,6 @@ from datetime import datetime
 from newsroom.wire import url_for_wire
 from newsroom.search import BaseSearchService, SearchQuery, query_string
 from .utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD
-from bson import ObjectId
 
 
 logger = logging.getLogger(__name__)
@@ -42,24 +42,24 @@ PLANNING_ITEMS_FIELDS = [
 
 agenda_notifications = {
     'event_updated': {
-        'message': gettext('An event you have been watching has been updated'),
-        'subject': gettext('Event updated')
+        'message': lazy_gettext('An event you have been watching has been updated'),
+        'subject': lazy_gettext('Event updated')
     },
     'event_unposted': {
-        'message': gettext('An event you have been watching has been cancelled'),
-        'subject': gettext('Event cancelled')
+        'message': lazy_gettext('An event you have been watching has been cancelled'),
+        'subject': lazy_gettext('Event cancelled')
     },
     'planning_added': {
-        'message': gettext('An event you have been watching has a new planning'),
-        'subject': gettext('Planning added')
+        'message': lazy_gettext('An event you have been watching has a new planning'),
+        'subject': lazy_gettext('Planning added')
     },
     'planning_cancelled': {
-        'message': gettext('An event you have been watching has a planning cancelled'),
-        'subject': gettext('Planning cancelled')
+        'message': lazy_gettext('An event you have been watching has a planning cancelled'),
+        'subject': lazy_gettext('Planning cancelled')
     },
     'coverage_added': {
-        'message': gettext('An event you have been watching has a new coverage added'),
-        'subject': gettext('Coverage added')
+        'message': lazy_gettext('An event you have been watching has a new coverage added'),
+        'subject': lazy_gettext('Coverage added')
     },
 }
 
@@ -126,7 +126,10 @@ class AgendaResource(newsroom.Resource):
     schema['subject'] = planning_schema['subject']
     schema['urgency'] = planning_schema['urgency']
     schema['place'] = planning_schema['place']
-    schema['service'] = code_mapping
+    schema['service'] = {
+        'type': 'dict',
+        'mapping': code_mapping,
+    }
     schema['state_reason'] = {'type': 'string'}
 
     # dates
@@ -153,7 +156,7 @@ class AgendaResource(newsroom.Resource):
 
     # coverages
     schema['coverages'] = {
-        'type': 'object',
+        'type': 'list',
         'mapping': {
             'type': 'nested',
             'properties': {
@@ -203,7 +206,7 @@ class AgendaResource(newsroom.Resource):
 
     # event details
     schema['event'] = {
-        'type': 'object',
+        'type': 'dict',
         'mapping': not_enabled,
     }
 
@@ -282,8 +285,7 @@ def _agenda_query():
         'bool': {
             'must': [{'term': {'_type': 'agenda'}}],
             'should': [],
-            'must_not': [{'term': {'state': 'killed'}}],
-            'minimum_should_match': 1,
+            'must_not': [{'term': {'state': 'killed'}}]
         }
     }
 
@@ -378,8 +380,8 @@ def _set_event_date_range(search):
 
 
 aggregations = {
-    'calendar': {'terms': {'field': 'calendars.name', 'size': 0}},
-    'location': {'terms': {'field': 'location.name', 'size': 0}},
+    'calendar': {'terms': {'field': 'calendars.name', 'size': 100}},
+    'location': {'terms': {'field': 'location.name', 'size': 10000}},
     'service': {'terms': {'field': 'service.name', 'size': 50}},
     'subject': {'terms': {'field': 'subject.name', 'size': 20}},
     'urgency': {'terms': {'field': 'urgency'}},
@@ -674,8 +676,7 @@ class AgendaService(BaseSearchService):
                     name='products'
                 )
             )
-
-        search.query['bool']['minimum_should_match'] = 1
+            search.query['bool']['minimum_should_match'] = 1
 
         # Append the product query to the agenda query
         agenda_query = _agenda_query()
@@ -1163,7 +1164,7 @@ class AgendaService(BaseSearchService):
         set_saved_items_query(search.query, str(search.user['_id']))
 
         cursor = self.get_items_by_query(search.query, size=0)
-        return cursor.count()
+        return cursor.count() if cursor else 0
 
     def get_featured_stories(self, req, lookup):
         for_date = datetime.strptime(req.args.get('date_from'), '%d/%m/%Y %H:%M')

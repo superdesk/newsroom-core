@@ -26,7 +26,8 @@ class ContentActivity extends React.Component {
                 field: 'section',
                 label: gettext('Section'),
                 options: this.props.sections
-                    .filter((section) => section.group === 'wire')
+                    .filter((section) => section.group === 'wire' || (section.group === 'api' && this.props.apiEnabled)
+                    || section.group === 'monitoring')
                     .map((section) => ({
                         label: section.name,
                         value: section.name,
@@ -64,6 +65,8 @@ class ContentActivity extends React.Component {
                     {label: gettext('Print'), value: 'print'},
                     {label: gettext('Open'), value: 'open'},
                     {label: gettext('Preview'), value: 'preview'},
+                    {label: gettext('Clipboard'), value: 'clipboard'},
+                    {label: gettext('API retrieval'), value: 'api'},
                 ],
                 onChange: this.props.toggleFilter,
                 showAllButton: true,
@@ -92,7 +95,7 @@ class ContentActivity extends React.Component {
         let actions = get(this.props, 'reportParams.action');
 
         if (!get(actions, 'length', 0)) {
-            actions = ['download', 'copy', 'share', 'print', 'open', 'preview'];
+            actions = ['download', 'copy', 'share', 'print', 'open', 'preview', 'clipboard', 'api'];
         }
 
         return actions;
@@ -117,6 +120,8 @@ class ContentActivity extends React.Component {
         actions.includes('print') && headers.push(gettext('Print'));
         actions.includes('open') && headers.push(gettext('Open'));
         actions.includes('preview') && headers.push(gettext('Preview'));
+        actions.includes('clipboard') && headers.push(gettext('Clipboard'));
+        actions.includes('api') && headers.push(gettext('API retrieval'));
 
         return headers;
     }
@@ -173,6 +178,8 @@ class ContentActivity extends React.Component {
                     print: get(item, 'aggs.actions.print') || 0,
                     open: get(item, 'aggs.actions.open') || 0,
                     preview: get(item, 'aggs.actions.preview') || 0,
+                    clipboard: get(item, 'aggs.actions.clipboard') || 0,
+                    api: get(item, 'aggs.actions.api') || 0,
                 }
             })
         );
@@ -234,6 +241,8 @@ class ContentActivity extends React.Component {
                     {actions.includes('print') && <td>{item.actions.print}</td>}
                     {actions.includes('open') && <td>{item.actions.open}</td>}
                     {actions.includes('preview') && <td>{item.actions.preview}</td>}
+                    {actions.includes('clipboard') && <td>{item.actions.clipboard}</td>}
+                    {actions.includes('api') && <td>{item.actions.api}</td>}
                 </tr>
             );
         }
@@ -303,6 +312,7 @@ ContentActivity.propTypes = {
     sections: PropTypes.array,
     fetchAggregations: PropTypes.func,
     aggregations: PropTypes.object,
+    apiEnabled: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({

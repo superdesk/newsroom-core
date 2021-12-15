@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import {get} from 'lodash';
 
 import EditCompany from './EditCompany';
@@ -137,7 +137,7 @@ Companies.propTypes = {
     companyTypes: PropTypes.array,
     apiEnabled: PropTypes.bool,
     showSubscriberId: PropTypes.bool,
-    companiesById: PropTypes.array,
+    companiesById: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({

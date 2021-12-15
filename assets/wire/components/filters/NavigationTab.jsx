@@ -40,7 +40,11 @@ function NavigationTab({
         />
     );
 
-    return navLinks.length > 1 && addAllOption ? [all].concat(navLinks) : navLinks;
+    return (
+        <div className="m-3">
+            {navLinks.length > 1 && addAllOption ? [all].concat(navLinks) : navLinks}
+        </div>
+    );
 }
 
 NavigationTab.propTypes = {
@@ -49,9 +53,10 @@ NavigationTab.propTypes = {
     toggleNavigation: PropTypes.func.isRequired,
     fetchItems: PropTypes.func.isRequired,
     addAllOption: PropTypes.bool,
+    disableSameNavigationDeselect: PropTypes.bool,
 };
 
-NavigationTab.defaultProps = { addAllOption: true };
+NavigationTab.defaultProps = {addAllOption: true};
 
 const mapDispatchToProps = {
     toggleNavigation,

@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { gettext } from 'utils';
+import {gettext} from 'utils';
 
-import { EXTENDED_VIEW, COMPACT_VIEW } from 'wire/defaults';
+import {EXTENDED_VIEW, COMPACT_VIEW} from 'wire/defaults';
 import {isTouchDevice} from 'utils';
 
 class ListViewOptions extends React.PureComponent {
@@ -50,13 +50,14 @@ class ListViewOptions extends React.PureComponent {
     render() {
         return(
             <div className='btn-group list-view__options' ref={(elem) => this.elem = elem}>
-                <span
+                <button
                     className='content-bar__menu'
                     onClick={this.toggleOpen}
                     ref={(elem) => this.elem = elem}
-                    title={gettext('Change view')}>
+                    title={gettext('Change view')}
+                    aria-label={gettext('Change view')}>
                     <i className={`icon--${this.props.activeView}`}></i>
-                </span>
+                </button>
                 {this.state.isOpen && (
                     <div className='dropdown-menu dropdown-menu-right show'>
                         <h6 className='dropdown-header'>{gettext('Change view')}</h6>

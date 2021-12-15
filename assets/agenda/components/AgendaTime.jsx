@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
-import { get } from 'lodash';
+import {get} from 'lodash';
 import classNames from 'classnames';
 
 import {SCHEDULE_TYPE, isItemTBC, TO_BE_CONFIRMED_TEXT} from '../utils';
@@ -53,7 +53,7 @@ export default function AgendaTime({item, group, suppliedNodes, withGroupDate}) 
             const dateGroup = group && moment(group, DATE_FORMAT);
             let element = [<div key='time' className={getClassNames(!isAllDay ? 'dashed-border' : 'event')}>{dates[0]}</div>];
             if (dateGroup && withGroupDate && !isAllDay) {
-                element.push((<div className= {classNames(getClassNames(), 'p-0')}>
+                element.push((<div key='time-groupdate' className={classNames(getClassNames(), 'p-0')}>
                     {formatDate(dateGroup)}</div>));
             }
 

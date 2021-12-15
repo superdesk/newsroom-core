@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 
-import { isEmpty } from 'lodash';
-import { gettext } from 'utils';
-import { getActiveDate } from 'local-store';
+import {isEmpty} from 'lodash';
+import {gettext} from 'utils';
+import {getActiveDate} from 'local-store';
 
 import NavCreatedPicker from './NavCreatedPicker';
 import FilterGroup from './FilterGroup';
@@ -24,7 +24,7 @@ import {
     selectDate
 } from '../../../agenda/actions';
 
-import { resultsFilteredSelector } from 'search/selectors';
+import {resultsFilteredSelector} from 'search/selectors';
 
 class FiltersTab extends React.Component {
     constructor(props) {
@@ -82,33 +82,37 @@ class FiltersTab extends React.Component {
         const isResetActive = Object.keys(activeFilter).find((key) => !isEmpty(activeFilter[key]))
             || Object.keys(createdFilter).find((key) => !isEmpty(createdFilter[key]));
 
-        return this.getFilterGroups().filter((group) => !!group).concat([
-            (<NavCreatedPicker
-                key="created"
-                createdFilter={createdFilter}
-                setCreatedFilter={this.setCreatedFilterAndSearch}
-            />),
-            !isResetActive && !this.props.resultsFiltered ? null : ([
-                <div key="reset-buffer" id="reset-filter-buffer" />,
-                <FilterButton
-                    key='search'
-                    label={gettext('Search')}
-                    onClick={(e) => {
-                        e.preventDefault();
-                        this.props.fetchItems();
-                    }}
-                    className='search filter-button--border'
-                    primary={true}
-                />,
-                <FilterButton
-                    key='reset'
-                    label={gettext('Clear filters')}
-                    onClick={this.reset}
-                    className='reset'
-                    primary={false}
-                />,
-            ]),
-        ]);
+        return (
+            <div className="m-3">
+                {this.getFilterGroups().filter((group) => !!group).concat([
+                    (<NavCreatedPicker
+                        key="created"
+                        createdFilter={createdFilter}
+                        setCreatedFilter={this.setCreatedFilterAndSearch}
+                    />),
+                    !isResetActive && !this.props.resultsFiltered ? null : ([
+                        <div key="reset-buffer" id="reset-filter-buffer" />,
+                        <FilterButton
+                            key='search'
+                            label={gettext('Search')}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                this.props.fetchItems();
+                            }}
+                            className='search filter-button--border'
+                            primary={true}
+                        />,
+                        <FilterButton
+                            key='reset'
+                            label={gettext('Clear filters')}
+                            onClick={this.reset}
+                            className='reset'
+                            primary={false}
+                        />,
+                    ]),
+                ])}
+            </div>
+        );
     }
 }
 

@@ -1,6 +1,7 @@
 
-import newsroom
 from content_api import MONGO_PREFIX
+
+import newsroom
 
 
 class CompaniesResource(newsroom.Resource):
@@ -42,7 +43,7 @@ class CompaniesResource(newsroom.Resource):
             'required': False,
         },
         'sections': {
-            'type': 'object',
+            'type': 'objectid',
         },
         'archive_access': {
             'type': 'boolean',
@@ -59,7 +60,7 @@ class CompaniesResource(newsroom.Resource):
             'type': 'string'
         },
         'monitoring_administrator': {
-            'type': 'ObjectId'
+            'type': 'objectid'
         },
         'allowed_ip_list': {
             'type': 'list',

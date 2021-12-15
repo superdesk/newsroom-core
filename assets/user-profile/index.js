@@ -1,6 +1,6 @@
-import {render, isWireContext} from 'utils';
+import {render, isWireContext, initWebSocket} from 'utils';
 import UserProfileApp from './components/UserProfileApp';
-import {initData, selectMenu} from './actions';
+import {initData, selectMenu, pushNotification} from './actions';
 import {store} from './store';
 
 if (window.profileData) {
@@ -16,3 +16,5 @@ render(
 document.addEventListener('manage_topics', function () {
     isWireContext() ? store.dispatch(selectMenu('topics')) : store.dispatch(selectMenu('events'));
 }, false);
+
+initWebSocket(store, pushNotification);
