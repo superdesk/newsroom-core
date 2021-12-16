@@ -26,6 +26,7 @@ services:
             - newsroom
         volumes:
             - ./dump:/opt/newsroom/dump
+            - ./newsroom/templates:/opt/newsroom/templates
         depends_on:
             - elastic
             - redis
