@@ -52,7 +52,7 @@ services:
         networks:
             - newsroom
         volumes:
-            - .:/opt/client/node_modules/newsroom-core
+            - ./assets:/opt/client/node_modules/newsroom-core/assets
 
 networks:
     newsroom:
