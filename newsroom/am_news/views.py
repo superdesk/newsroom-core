@@ -32,7 +32,7 @@ def get_view_data():
                     if 'wire' in f['types']],
         'saved_items': get_bookmarks_count(user['_id'], 'am_news'),
         'context': 'am_news',
-        'ui_config': get_resource_service('ui_config').getSectionConfig('am_news')
+        'ui_config': get_resource_service('ui_config').get_section_config('am_news')
     }
 
 
@@ -96,7 +96,7 @@ def versions(_id):
 def item(_id):
     item = get_entity_or_404(_id, 'items')
     set_permissions(item, 'am_news')
-    display_char_count = get_resource_service('ui_config').getSectionConfig('am_news').get('char_count', False)
+    display_char_count = get_resource_service('ui_config').get_section_config('am_news').get('char_count', False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get('_access'):

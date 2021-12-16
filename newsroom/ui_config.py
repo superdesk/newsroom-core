@@ -36,6 +36,9 @@ class UIConfigResource(newsroom.Resource):
             'type': 'boolean',
             'default': False
         },
+        'search': {
+            'type': 'boolean',
+        },
         'init_version': {
             'type': 'integer'
         },
@@ -49,7 +52,7 @@ class UIConfigResource(newsroom.Resource):
 
 class UIConfigService(newsroom.Service):
 
-    def getSectionConfig(self, section_name):
+    def get_section_config(self, section_name):
         """Get the section config"""
         config = self.find_one(req=None, _id=section_name)
         if not config:
