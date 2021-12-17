@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {get} from 'lodash';
+import {get, memoize} from 'lodash';
 import {formatHTML} from 'utils';
 import {connect} from 'react-redux';
 import {selectCopy} from '../../wire/actions';
@@ -14,6 +14,9 @@ class ArticleBodyHtml extends React.PureComponent {
         super(props);
         this.copyClicked = this.copyClicked.bind(this);
         this.clickClicked = this.clickClicked.bind(this);
+
+        // use memoize so this function is only called when `body_html` changes
+        this.getBodyHTML = memoize(this._getBodyHTML.bind(this));
     }
 
     componentDidMount() {
@@ -72,19 +75,75 @@ class ArticleBodyHtml extends React.PureComponent {
         document.removeEventListener('click', this.clickClicked);
     }
 
-    render() {
+    _getBodyHTML(bodyHtml) {
+        return !bodyHtml ?
+            null :
+            this._updateImageEmbedSources(formatHTML(bodyHtml));
+    }
+
+    /**
+     * Update Image Embeds to use the Web APIs Assets endpoint
+     *
+     * @param html - The `body_html` value (could also be the ES Highlight version)
+     * @returns {string}
+     * @private
+     */
+    _updateImageEmbedSources(html) {
         const item = this.props.item;
 
-        if (!item.body_html) {
-            return null;
+        // Get the list of Original Rendition IDs for all Image Associations
+        const imageEmbedOriginalIds = Object
+            .keys(item.associations || {})
+            .filter((key) => key.startsWith('editor_'))
+            .map((key) => get(item.associations[key], 'renditions.original.media'))
+            .filter((value) => value);
+
+        if (!imageEmbedOriginalIds.length) {
+            // This item has no Image Embeds
+            // return the supplied html as-is
+            return html;
         }
 
-        const esHighlightedItem = get(item, 'es_highlight.body_html.length', 0) > 0 ? 
-            {
-                ...item,
-                body_html: item.es_highlight.body_html[0]
-            } : item;
-        const html = formatHTML(esHighlightedItem.body_html);
+        // Create a DOM node tree from the supplied html
+        // We can then efficiently find and update the image sources
+        const container = document.createElement('div');
+        let imageSourcesUpdated = false;
+
+        container.innerHTML = html;
+        container
+            .querySelectorAll('img')
+            .forEach((imageTag) => {
+                // Using the tag's `src` attribute, find the Original Rendition's ID
+                const originalMediaId = imageEmbedOriginalIds.find((mediaId) => (
+                    !imageTag.src.startsWith('/assets/') &&
+                    imageTag.src.includes(mediaId))
+                );
+
+                if (originalMediaId) {
+                    // We now have the Original Rendition's ID
+                    // Use that to update the `src` attribute to use Newshub's Web API
+                    // imageSourcesUpdated = true;
+                    imageTag.src = `/assets/${originalMediaId}`;
+                }
+            });
+
+        // If Image tags were not updated, then return the supplied html as-is
+        return imageSourcesUpdated ?
+            container.innerHTML :
+            html;
+    }
+
+    render() {
+        const item = this.props.item;
+        const html = this.getBodyHTML(
+            get(item, 'es_highlight.body_html.length', 0) > 0 ?
+                item.es_highlight.body_html[0] :
+                item.body_html
+        );
+
+        if (!html) {
+            return null;
+        }
 
         return (
             <div
@@ -99,7 +158,8 @@ class ArticleBodyHtml extends React.PureComponent {
 ArticleBodyHtml.propTypes = {
     item: PropTypes.shape({
         body_html: PropTypes.string,
-        es_highlight: PropTypes.Object
+        es_highlight: PropTypes.Object,
+        associations: PropTypes.Object,
     }).isRequired,
     reportCopy: PropTypes.func,
 };
