@@ -122,7 +122,7 @@ class ArticleBodyHtml extends React.PureComponent {
                 if (originalMediaId) {
                     // We now have the Original Rendition's ID
                     // Use that to update the `src` attribute to use Newshub's Web API
-                    // imageSourcesUpdated = true;
+                    imageSourcesUpdated = true;
                     imageTag.src = `/assets/${originalMediaId}`;
                 }
             });
