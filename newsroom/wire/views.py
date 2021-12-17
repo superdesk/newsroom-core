@@ -82,7 +82,7 @@ def get_view_data():
         'products': get_products_by_company(company_id),
         'saved_items': get_bookmarks_count(user['_id'], 'wire'),
         'context': 'wire',
-        'ui_config': get_resource_service('ui_config').getSectionConfig('wire'),
+        'ui_config': get_resource_service('ui_config').get_section_config('wire'),
         'groups': app.config.get('WIRE_GROUPS', []),
     }
 
@@ -124,7 +124,7 @@ def get_home_data():
                     for f in app.download_formatters.values()],
         'context': 'wire',
         'topics': topics,
-        'ui_config': get_resource_service('ui_config').getSectionConfig('home'),
+        'ui_config': get_resource_service('ui_config').get_section_config('home'),
     }
 
 
@@ -372,7 +372,7 @@ def item(_id):
 
     item = items[0]
     set_permissions(item, 'wire', False if flask.request.args.get('ignoreLatest') == 'false' else True)
-    display_char_count = get_resource_service('ui_config').getSectionConfig('wire').get('char_count', False)
+    display_char_count = get_resource_service('ui_config').get_section_config('wire').get('char_count', False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get('_access'):

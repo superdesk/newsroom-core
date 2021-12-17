@@ -36,7 +36,7 @@ def get_view_data():
                     if 'wire' in f['types']],
         'saved_items': get_bookmarks_count(user['_id'], SECTION_ID),
         'context': SECTION_ID,
-        'ui_config': get_resource_service('ui_config').getSectionConfig(SECTION_ID),
+        'ui_config': get_resource_service('ui_config').get_section_config(SECTION_ID),
         'home_page': False,
         'title': SECTION_NAME
     }
@@ -134,7 +134,7 @@ def versions(_id):
 def item(_id):
     item = get_entity_or_404(_id, 'items')
     set_permissions(item, 'aapX')
-    display_char_count = get_resource_service('ui_config').getSectionConfig(SECTION_ID).get('char_count', False)
+    display_char_count = get_resource_service('ui_config').get_section_config(SECTION_ID).get('char_count', False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get('_access'):
