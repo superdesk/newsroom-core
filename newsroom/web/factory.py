@@ -38,6 +38,10 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.dashboards = []
         self._theme_folders = []
 
+        # avoid event sockets on these
+        self.generate_renditions = None
+        self.generate_embed_renditions = None
+
         super(NewsroomWebApp, self).__init__(import_name=import_name, config=config, **kwargs)
 
         self.theme_folder = os.path.join(self.config["SERVER_PATH"], "theme")

@@ -249,7 +249,7 @@ SERVICES = [
 # Hides or displays abstract on preview panel and details modal
 DISPLAY_ABSTRACT = False
 
-WATERMARK_IMAGE = os.path.join(os.path.dirname(__file__), '../static', 'watermark.png')
+WATERMARK_IMAGE = None  # os.path.join(os.path.dirname(__file__), '../static', 'watermark.png')
 
 GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY')
 GOOGLE_ANALYTICS = os.environ.get('GOOGLE_ANALYTICS')

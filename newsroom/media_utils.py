@@ -1,10 +1,14 @@
 import io
+import logging
+
 from PIL import Image, ImageEnhance
 from flask import current_app as app
 from newsroom.upload import ASSETS_RESOURCE
 
 THUMBNAIL_SIZE = (640, 640)
 THUMBNAIL_QUALITY = 80
+
+logger = logging.getLogger(__name__)
 
 
 def store_image(image, filename=None, _id=None):
@@ -77,14 +81,13 @@ def generate_preview_details_renditions(picture):
             })
 
 
-def generate_renditions(item):
-    picture = item.get('associations', {}).get('featuremedia', {})
-    if not picture:
+def generate_renditions(picture):
+    if not picture or picture.get("type") != "picture":
         return
 
     # use 4-3 rendition for generated thumbs
     renditions = picture.get('renditions', {})
-    rendition = renditions.get('4-3', renditions.get('viewImage'))
+    rendition = renditions.get('4-3', renditions.get('baseImage'))
     if not rendition:
         return
 

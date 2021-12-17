@@ -131,8 +131,7 @@ def publish_item(doc, original):
     for assoc in doc.get('associations', {}).values():
         if assoc:
             assoc.setdefault('subscribers', [])
-    if doc.get('associations', {}).get('featuremedia'):
-        app.generate_renditions(doc)
+            app.generate_renditions(assoc)
 
     # If there is a function defined that generates renditions for embedded images call it.
     if app.generate_embed_renditions:
