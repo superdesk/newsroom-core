@@ -1,8 +1,6 @@
-
 from lxml import etree
-from superdesk.publish.formatters.nitf_formatter import NITFFormatter as SuperdeskNITFFormatter
 
-from .base import BaseFormatter
+from .base import BaseFormatter, NewsroomNITFFormatter
 
 
 class NITFFormatter(BaseFormatter):
@@ -11,7 +9,7 @@ class NITFFormatter(BaseFormatter):
     FILE_EXTENSION = 'xml'
 
     encoding = 'utf-8'
-    formatter = SuperdeskNITFFormatter()
+    formatter = NewsroomNITFFormatter()
 
     def format_item(self, item, item_type='items'):
         dest = {}
