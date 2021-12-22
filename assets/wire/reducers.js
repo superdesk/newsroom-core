@@ -71,6 +71,7 @@ function markItemsRemoved(state, ids) {
     const itemsById = cloneDeep(state.itemsById || {});
     let activeItem = state.activeItem;
     let previewItem = state.previewItem;
+    let openItem = state.openItem;
 
     (ids || []).forEach(
         (itemId) => {
@@ -85,6 +86,10 @@ function markItemsRemoved(state, ids) {
             if (previewItem === itemId) {
                 previewItem = null;
             }
+
+            if (get(openItem, '_id') === itemId) {
+                openItem = null;
+            }
         }
     );
 
@@ -93,6 +98,7 @@ function markItemsRemoved(state, ids) {
         itemsById,
         activeItem,
         previewItem,
+        openItem,
     };
 }
 
