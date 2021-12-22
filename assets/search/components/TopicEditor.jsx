@@ -93,16 +93,17 @@ class TopicEditor extends React.Component {
         const isAgendaTopic = this.isAgendaTopic();
 
         // Construct new list of subscribers
-        const currentSubscribers = topic.subscribers || [];
-        const alreadySubscribed = currentSubscribers.includes(this.props.userId);
+        let subscribers = topic.subscribers || [];
+        const alreadySubscribed = subscribers.includes(this.props.userId);
         if (topic.notifications && !alreadySubscribed) {
-            topic.subscribers.push(this.props.userId);
+            subscribers.push(this.props.userId);
         } else if (!topic.notifications && alreadySubscribed) {
-            topic.subscribers = currentSubscribers.filter(
+            subscribers = subscribers.filter(
                 (userId) => userId !== this.props.userId
             );
         }
         delete topic.notifications;
+        topic.subscribers = subscribers;
 
         event.preventDefault();
         this.setState({saving: true});
