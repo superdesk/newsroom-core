@@ -67,7 +67,7 @@ class EditCompany extends React.Component {
             <div className={classNames(
                 'list-item__preview',
                 {'list-item__preview--large': this.props.apiEnabled}
-            )}>
+            )} role={gettext('dialog')} aria-label={gettext('Edit Company')}>
                 <div className='list-item__preview-header'>
                     <h3>{this.props.company.name}</h3>
                     <button

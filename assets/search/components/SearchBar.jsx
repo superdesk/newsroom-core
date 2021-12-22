@@ -52,7 +52,7 @@ class SearchBar extends React.Component {
                 <div className={classNames('search__form input-group', {
                     'searchForm--active': !!this.state.query,
                 })}>
-                    <form className='form-inline' onSubmit={this.onSubmit}>
+                    <form className='form-inline' role="search" aria-label={gettext('search')} onSubmit={this.onSubmit}>
                         <input type='text'
                             name='q'
                             className='search__input form-control'

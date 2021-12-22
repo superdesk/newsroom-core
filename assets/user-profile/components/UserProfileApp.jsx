@@ -116,7 +116,7 @@ class UserProfileApp extends React.Component {
                                     {links.find((link) => link.active).label}
                                 </h5>
                                 <div className="content-bar__right">
-                                    <button className="content-bar__menu" aria-label="Close" onClick={this.props.hideModal}>
+                                    <button className="content-bar__menu" aria-label={gettext('Close')} role="button" onClick={this.props.hideModal}>
                                         <i className="icon--close-thin" />
                                     </button>
                                 </div>

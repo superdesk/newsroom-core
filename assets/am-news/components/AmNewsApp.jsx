@@ -120,6 +120,7 @@ class AmNewsApp extends BaseApp {
                             className='content-bar__menu content-bar__menu--nav--open'
                             ref={this.setOpenRef}
                             title={gettext('Close filter panel')}
+                            aria-label={gettext('Close filter panel')}
                             onClick={this.toggleSidebar}>
                             <i className="icon--close-thin icon--white"></i>
                         </span>}
@@ -127,6 +128,7 @@ class AmNewsApp extends BaseApp {
                             className='content-bar__menu content-bar__menu--nav'
                             ref={this.setCloseRef}
                             title={gettext('Open filter panel')}
+                            aria-label={gettext('Open filter panel')}
                             onClick={this.toggleSidebar}>
                             <i className="icon--hamburger"></i>
                         </span>}

@@ -11,7 +11,7 @@ export class SearchBar extends React.PureComponent {
                             <i className="icon--search icon--gray-light" />
                         </span>
                         <div className="search__form input-group searchForm--active">
-                            <form className="form-inline" action="/wire">
+                            <form className="form-inline" action="/wire" role="search" aria-label={gettext('search')}>
                                 <input type="text" name="q" className="search__input form-control"
                                     placeholder={gettext('Search for...')}
                                     aria-label={gettext('Search for...')} />
