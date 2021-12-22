@@ -12,7 +12,7 @@ const getCompanyOptions = (companies) => companies.map(company => ({value: compa
 
 function EditUser({user, onChange, errors, companies, onSave, onResetPassword, onClose, onDelete, currentUser}) {
     return (
-        <div className='list-item__preview'>
+        <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit User')}>
             <div className='list-item__preview-header'>
                 <h3>{ gettext('Add/Edit User') }</h3>
                 <button

@@ -55,7 +55,8 @@ class ListViewOptions extends React.PureComponent {
                     onClick={this.toggleOpen}
                     ref={(elem) => this.elem = elem}
                     title={gettext('Change view')}
-                    aria-label={gettext('Change view')}>
+                    aria-label={gettext('Change view')}
+                    role="button">
                     <i className={`icon--${this.props.activeView}`}></i>
                 </button>
                 {this.state.isOpen && (
@@ -65,6 +66,7 @@ class ListViewOptions extends React.PureComponent {
                             <button key={view.type}
                                 className='dropdown-item'
                                 onClick={() => this.setView(view)}
+                                aria-label={view.label}
                                 type='button'>
                                 <i className={`icon--${view.type}`} />
                                 {' '}{view.label}

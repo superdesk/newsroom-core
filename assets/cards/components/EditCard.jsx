@@ -41,7 +41,7 @@ class EditCard extends React.Component {
         }
 
         return (
-            <div className='list-item__preview'>
+            <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit Cards')}>
                 <div className='list-item__preview-header'>
                     <h3>{this.props.card.label}</h3>
                     <button

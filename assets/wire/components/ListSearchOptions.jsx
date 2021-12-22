@@ -27,17 +27,18 @@ export class ListSearchOptions extends React.PureComponent {
                 className="btn-group"
                 ref={(elem) => this.btnGroup = elem}
             >
-                <span
+                <button
                     id="listSearchOptionsButton"
                     className="content-bar__menu"
                     onClick={this.toggleOpen}
                     data-toggle="dropdown"
                     aria-haspopup="menu"
                     aria-expanded={this.state.isOpen}
+                    aria-label={gettext('Search Options')}
                     role="button"
                 >
                     <i className="icon--settings" />
-                </span>
+                </button>
                 <div
                     className='dropdown-menu dropdown-menu-right'
                     aria-labelledby="listSearchOptionsButton"
