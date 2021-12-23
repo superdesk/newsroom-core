@@ -698,7 +698,7 @@ export function postHistoryAction(item, action, section='wire') {
 export function recordAction(item, action = 'open', section = 'wire', state = null) {
     if (item) {
         analytics.itemEvent(action, item);
-        analytics.itemView(item);
+        analytics.itemView(item, section);
         postHistoryAction(item, action, section);
 
         if (action === 'preview') {

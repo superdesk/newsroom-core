@@ -356,7 +356,10 @@ def is_valid_login(user_id):
 
 
 def get_items_by_id(ids, resource):
-    return list(superdesk.get_resource_service(resource).find(where={'_id': {'$in': ids}}))
+    try:
+        return list(superdesk.get_resource_service(resource).find(where={'_id': {'$in': ids}}))
+    except KeyError:
+        return []
 
 
 def get_vocabulary(id):

@@ -30,17 +30,15 @@ class Analytics {
     }
 
     pageview(title, path) {
-        if (window.gtag) {
-            window.gtag('config', get(window, 'newsroom.analytics'), {
-                page_title: title,
-                page_path: path,
-            });
-        }
+        this._event('page_view', {
+            page_title: title,
+            page_path: path,
+        });
     }
 
     itemView(item) {
         if (item) {
-            this.pageview(item.headline || item.slugline, `/wire?item=${item._id}`);
+            this.pageview(item.headline || item.slugline, `/${item._type}/${item._id}`);
         } else {
             this.pageview();
         }
