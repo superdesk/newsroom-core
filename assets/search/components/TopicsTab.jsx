@@ -130,7 +130,7 @@ TopicsTab.propTypes = {
 
     removeNewItems: PropTypes.func.isRequired,
     loadMyTopic: PropTypes.func.isRequired,
-    globalTopicsEnabled: PropTypes.object,
+    globalTopicsEnabled: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
