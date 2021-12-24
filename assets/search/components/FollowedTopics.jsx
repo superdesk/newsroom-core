@@ -163,6 +163,7 @@ class FollowedTopics extends React.Component {
                     /> :
                     <TopicEditor
                         topic={this.props.selectedItem}
+                        globalTopicsEnabled={this.props.globalTopicsEnabled}
                         closeEditor={this.closeEditor}
                         onTopicChanged={this.onTopicChanged}
                     />)}
