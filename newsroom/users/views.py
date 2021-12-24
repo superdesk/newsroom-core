@@ -38,6 +38,10 @@ def get_view_data():
         'companyName': get_user_company_name(user),
         'locators': get_vocabulary('locators'),
         'monitoring_list': get_monitoring_for_company(user),
+        'ui_configs': {
+            config['_id']: config
+            for config in query_resource('ui_config')
+        },
     }
 
     rv.update(get_company_sections_monitoring_data(company))

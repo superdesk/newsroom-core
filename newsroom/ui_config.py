@@ -36,6 +36,10 @@ class UIConfigResource(newsroom.Resource):
             'type': 'boolean',
             'default': False
         },
+        'enable_global_topics': {
+            'type': 'boolean',
+            'default': False
+        },
         'init_version': {
             'type': 'integer'
         },

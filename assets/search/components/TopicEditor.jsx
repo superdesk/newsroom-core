@@ -188,6 +188,7 @@ class TopicEditor extends React.Component {
                         <TopicForm
                             key="form"
                             topic={this.state.topic}
+                            globalTopicsEnabled={this.props.globalTopicsEnabled}
                             save={this.saveTopic}
                             onChange={this.onChangeHandler}
                         />,
@@ -234,6 +235,7 @@ TopicEditor.propTypes = {
     loadMyTopic: PropTypes.func,
     editorFullscreen: PropTypes.bool,
     setTopicEditorFullscreen: PropTypes.func,
+    globalTopicsEnabled: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({

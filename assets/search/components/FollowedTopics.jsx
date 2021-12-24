@@ -16,6 +16,7 @@ import {
     selectedItemSelector,
     selectedMenuSelector,
     topicEditorFullscreenSelector,
+    globalTopicsEnabledSelector,
 } from 'user-profile/selectors';
 
 import MonitoringEditor from 'search/components/MonitoringEditor';
@@ -121,28 +122,30 @@ class FollowedTopics extends React.Component {
             <div className={containerClasses}>
                 {!editorOpenInFullscreen && (
                     <div className="d-flex flex-column flex-grow-1">
-                        <div className="pt-xl-4 pt-3 px-xl-4 mr-0">
-                            <div className="btn-group btn-group--navbar ml-0 mr-3">
-                                <button
-                                    className={classNames(
-                                        'btn btn-outline-primary',
-                                        {active: !this.state.showGlobal}
-                                    )}
-                                    onClick={this.toggleGlobal}
-                                >
-                                    {gettext('My Topics')}
-                                </button>
-                                <button
-                                    className={classNames(
-                                        'btn btn-outline-primary',
-                                        {active: this.state.showGlobal}
-                                    )}
-                                    onClick={this.toggleGlobal}
-                                >
-                                    {gettext('Company Topics')}
-                                </button>
+                        {!this.props.globalTopicsEnabled ? null : (
+                            <div className="pt-xl-4 pt-3 px-xl-4 mr-0">
+                                <div className="btn-group btn-group--navbar ml-0 mr-3">
+                                    <button
+                                        className={classNames(
+                                            'btn btn-outline-primary',
+                                            {active: !this.state.showGlobal}
+                                        )}
+                                        onClick={this.toggleGlobal}
+                                    >
+                                        {gettext('My Topics')}
+                                    </button>
+                                    <button
+                                        className={classNames(
+                                            'btn btn-outline-primary',
+                                            {active: this.state.showGlobal}
+                                        )}
+                                        onClick={this.toggleGlobal}
+                                    >
+                                        {gettext('Company Topics')}
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        )}
                         <div className="row pt-xl-4 pt-3 px-xl-4 mr-0">
                             <TopicList
                                 topics={this.getFilteredTopics()}
@@ -160,6 +163,7 @@ class FollowedTopics extends React.Component {
                     /> :
                     <TopicEditor
                         topic={this.props.selectedItem}
+                        globalTopicsEnabled={this.props.globalTopicsEnabled}
                         closeEditor={this.closeEditor}
                         onTopicChanged={this.onTopicChanged}
                     />)}
@@ -185,9 +189,10 @@ FollowedTopics.propTypes = {
     editorFullscreen: PropTypes.bool,
     monitoringList: PropTypes.array,
     monitoringAdministrator: PropTypes.string,
+    globalTopicsEnabled: PropTypes.bool,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, ownProps) => ({
     topics: state.topics,
     monitoringList: state.monitoringList,
     monitoringAdministrator: state.monitoringAdministrator,
@@ -195,6 +200,7 @@ const mapStateToProps = (state) => ({
     selectedItem: selectedItemSelector(state),
     selectedMenu: selectedMenuSelector(state),
     editorFullscreen: topicEditorFullscreenSelector(state),
+    globalTopicsEnabled: globalTopicsEnabledSelector(state, ownProps.topicType),
 });
 
 const mapDispatchToProps = (dispatch) => ({
