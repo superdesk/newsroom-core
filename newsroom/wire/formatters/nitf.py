@@ -1,8 +1,6 @@
-
 from lxml import etree
-from superdesk.publish.formatters.nitf_formatter import NITFFormatter as SuperdeskNITFFormatter
 
-from .base import BaseFormatter
+from .base import BaseFormatter, NewsroomNITFFormatter
 
 
 class NITFFormatter(BaseFormatter):
@@ -11,7 +9,7 @@ class NITFFormatter(BaseFormatter):
     FILE_EXTENSION = 'xml'
 
     encoding = 'utf-8'
-    formatter = SuperdeskNITFFormatter()
+    formatter = NewsroomNITFFormatter()
 
     def _format_docdata_doc_id_source(self, article, docdata):
         elem = docdata.find('.//head/docdata/doc-id')

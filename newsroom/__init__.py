@@ -16,6 +16,7 @@ MONGO_PREFIX = 'CONTENTAPI_MONGO'
 ELASTIC_PREFIX = 'CONTENTAPI_ELASTICSEARCH'
 
 logging.basicConfig()
+logging.getLogger(__name__).setLevel(logging.INFO)
 
 
 class Resource(superdesk.Resource):

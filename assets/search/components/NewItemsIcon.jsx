@@ -48,6 +48,7 @@ class NewItemsIcon extends React.Component {
                 title={newItemsTooltip}
                 className="button__reset-styles d-flex align-items-center ml-3"
                 onClick={this.props.refresh}
+                aria-label={gettext('Refresh')}
             >
                 <i className="icon--refresh icon--pink"/>
                 <span className="badge badge-pill badge-info badge-secondary ml-2">

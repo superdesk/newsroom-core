@@ -10,11 +10,12 @@ import {loadMyWireTopic} from 'wire/actions';
 import {loadMyAgendaTopic} from 'agenda/actions';
 import {CollapseBoxWithButton} from '../../ui/components/Collapse';
 import {TopicItem} from './TopicItem';
+import {globalTopicsEnabledSelector} from 'ui/selectors';
 
 const tabName = isWireContext() ? 'Wire Topics' : 'Agenda Topics';
 const manageTopics = () => document.dispatchEvent(window.manageTopics);
 
-function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNewItems}) {
+function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNewItems, globalTopicsEnabled}) {
     const clickTopic = (event, topic) => {
         event.preventDefault();
         removeNewItems(topic._id);
@@ -38,7 +39,33 @@ function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNew
         (topic) => topic.is_global
     );
 
-    return (
+    return !globalTopicsEnabled ? (
+        <React.Fragment>
+            {!personalTopics.length ? (
+                <div className='wire-column__info m-3'>
+                    {gettext('No {{name}} created.', {name: tabName})}
+                </div>
+            ) : (
+                <div className="m-3">
+                    {personalTopics.map((topic) => (
+                        <TopicItem
+                            key={topic._id}
+                            topic={topic}
+                            newItemsByTopic={newItemsByTopic}
+                            onClick={clickTopic}
+                            className={topicClass(topic)}
+                        />
+                    ))}
+                </div>
+            )}
+            <FilterButton
+                label={gettext('Manage my {{name}}', {name: tabName})}
+                onClick={clickManage}
+                className='reset filter-button--border'
+                primary={true}
+            />
+        </React.Fragment>
+    ) : (
         <React.Fragment>
             <CollapseBoxWithButton
                 id="my-topics"
@@ -103,11 +130,13 @@ TopicsTab.propTypes = {
 
     removeNewItems: PropTypes.func.isRequired,
     loadMyTopic: PropTypes.func.isRequired,
+    globalTopicsEnabled: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
     topics: state.topics || [],
     newItemsByTopic: state.newItemsByTopic,
+    globalTopicsEnabled: globalTopicsEnabledSelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({

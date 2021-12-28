@@ -36,7 +36,12 @@ def get_view_data():
         'company': str(company),
         'topics': get_user_topics(user['_id']) if user else [],
         'companyName': get_user_company_name(user),
-        'locators': get_vocabulary('locators')
+        'locators': get_vocabulary('locators'),
+        'monitoring_list': get_monitoring_for_company(user),
+        'ui_configs': {
+            config['_id']: config
+            for config in query_resource('ui_config')
+        },
     }
 
     if app.config.get('ENABLE_MONITORING'):

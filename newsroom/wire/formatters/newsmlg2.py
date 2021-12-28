@@ -1,11 +1,9 @@
-
 from lxml import etree
 from flask import current_app as app
 
-from superdesk.publish.formatters.nitf_formatter import NITFFormatter
 from superdesk.publish.formatters.newsml_g2_formatter import NewsMLG2Formatter as SuperdeskFormatter
 
-from .base import BaseFormatter
+from .base import BaseFormatter, NewsroomNITFFormatter
 
 
 class NewsroomFormatter(SuperdeskFormatter):
@@ -31,7 +29,7 @@ class NewsMLG2Formatter(BaseFormatter):
 
     encoding = 'utf-8'
     formatter = NewsroomFormatter()
-    nitf_formatter = NITFFormatter()
+    nitf_formatter = NewsroomNITFFormatter()
 
     def format_item(self, item, item_type='items'):
         item = item.copy()
