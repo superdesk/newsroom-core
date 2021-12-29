@@ -1,8 +1,0 @@
-<!doctype html>
-<title>Authorized</title>
-
-<script>
-opener.postMessage({type: 'oauth', data: {{ data|tojson }}}, '*');
-opener.focus();
-window.close();
-</script>

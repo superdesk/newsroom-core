@@ -13,37 +13,7 @@
                     <h5 class="mb-0">{{ gettext("Login") }}</h5>
                 </div>
                 <div class="card-body pt-1">
-                    <form class="form" role="form" id="formLogin" method="post">
-
-                        {{ form.csrf_token }}
-
-                        {% include "form_alerts.html" %}
-
-                        {% if config.GOOGLE_LOGIN %}
-                        <div id="oauth_error" class="alert alert-danger" role="alert" style="display: none">
-                            <ul></ul>
-                        </div>
-                        {% endif %}
-
-                        <div class="form-group">
-                            <label for="email">{{ form.email.label.text }}</label>
-                            {{ form.email(class="form-control", id="email", required="true") }}
-                        </div>
-                        <div class="form-group">
-                            <label for="password">{{ form.password.label.text }}</label>
-                            {{ form.password(class="form-control", id="password", required="true") }}
-                        </div>
-                        <div class="form-check mb-4 p-0">
-                            <div class="custom-control custom-checkbox">
-                                {{ form.remember_me(class="custom-control-input", id="remember_me") }}
-                                <label class="custom-control-label" for="remember_me">{{ form.remember_me.label.text }}</label>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block">{{ gettext("Login") }}</button>
-                        {% if config.GOOGLE_LOGIN %}
-                        <button type="button" class="btn btn-secondary btn-block">{{ gettext('Log In with Google') }}</button>
-                        {% endif %}
-                    </form>
+                    {% include "login_form.html" %}
                 </div>
 
                 <div class="card-footer bg-white border-0 text-muted small">
@@ -73,8 +43,4 @@
     </div>
     {% include "login_messages.html" %}
 </div>
-{% endblock %}
-
-{% block script %}
-{% include "oauth_login_js.html" %}
 {% endblock %}

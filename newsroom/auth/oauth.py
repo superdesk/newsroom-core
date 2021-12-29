@@ -1,11 +1,10 @@
 import flask
-from flask import Blueprint, url_for, render_template
+from flask import Blueprint, url_for
 from flask_babel import gettext
 from authlib.integrations.flask_client import OAuth
 
 import superdesk
 from superdesk.utc import utcnow
-from superdesk.utils import get_random_string
 
 from newsroom.template_filters import is_admin
 from newsroom.utils import is_company_enabled, is_account_enabled
@@ -13,7 +12,6 @@ from newsroom.limiter import limiter
 
 blueprint = Blueprint("oauth", __name__)
 oauth = None
-AUTHORIZED_TEMPLATE = "oauth_authorized.html"
 
 
 def init_app(app):
@@ -36,6 +34,7 @@ def init_app(app):
 def google_login():
     global oauth
     redirect_uri = url_for(".google_authorized", _external=True)
+    flask.session["next_page"] = flask.request.args.get("next") or flask.url_for("wire.index")
     return oauth.google.authorize_redirect(redirect_uri)
 
 
@@ -43,49 +42,37 @@ def google_login():
 @limiter.limit("60/hour")
 def google_authorized():
     global oauth
+    next_page = flask.session.pop("next_page", flask.url_for("wire.index"))
     token = oauth.google.authorize_access_token()
+
+    def redirect_with_error(error_str):
+        flask.session.pop('_flashes', None)  # remove old messages and just show one message
+        flask.flash(error_str, "danger")
+        return flask.redirect(url_for("auth.login", next=next_page))
+
     if not token:
-        return render_template(AUTHORIZED_TEMPLATE, data={
-            "error": 404,
-            "error_str": gettext("Invalid token"),
-        })
+        return redirect_with_error(gettext("Invalid token"))
 
     user_data = oauth.google.parse_id_token(token)
     email = user_data["email"]
     if not email:
-        return render_template(AUTHORIZED_TEMPLATE, data={
-            "error": 404,
-            "error_str": gettext("Email not found"),
-        })
+        return redirect_with_error(gettext("Email not found"))
 
     # get user by email
     users_service = superdesk.get_resource_service("users")
     user = users_service.find_one(req=None, email=email.lower())
     if not user:
-        return render_template(AUTHORIZED_TEMPLATE, data={
-            "error": 404,
-            "error_str": gettext("User not found"),
-        })
+        return redirect_with_error(gettext("User not found"))
 
     # Check user & company validation
     if not is_admin(user) and not user.get("company"):
-        flask.session["oauth_error"] = gettext("No Company assigned")
-        return render_template(AUTHORIZED_TEMPLATE, data={
-            "error": 404,
-            "error_str": gettext("No Company assigned"),
-        })
+        return redirect_with_error(gettext("No Company assigned"))
 
     if not is_company_enabled(user):
-        return render_template(AUTHORIZED_TEMPLATE, data={
-            "error": 404,
-            "error_str": gettext("Company is disabled"),
-        })
+        return redirect_with_error(gettext("Company is disabled"))
 
     if not is_account_enabled(user):
-        return render_template(AUTHORIZED_TEMPLATE, data={
-            "error": 404,
-            "error_str": gettext("User account is disabled"),
-        })
+        return redirect_with_error(gettext("Account is disabled"))
 
     # If the user is not yet validated, then validate it now
     if not user.get("is_validated", False):
@@ -99,12 +86,4 @@ def google_authorized():
     flask.session["name"] = "{} {}".format(user.get("first_name"), user.get("last_name"))
     flask.session["user_type"] = user["user_type"]
 
-    return render_template(
-        AUTHORIZED_TEMPLATE,
-        data={
-            "email": email,
-            "_id": str(user["_id"]),
-            "user": str(user["_id"]),
-            "token": get_random_string(40),
-        }
-    )
+    return flask.redirect(next_page)
