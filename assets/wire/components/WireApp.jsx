@@ -144,6 +144,7 @@ class WireApp extends BaseApp {
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
             />] : [
                 <section key="contentHeader" className='content-header'>
+                    <h3 className="a11y-only">{gettext('Wire Content')}</h3>
                     <SelectedItemsBar
                         actions={this.props.actions}
                     />

@@ -24,6 +24,7 @@
 <div class="newsroomWrap">
     {% block topnav %}
         <nav class="main navbar justify-content-start align-items-stretch flex-nowrap">
+            <h3 class="a11y-only">{{ gettext('Main Navigation Bar') }}</h3>
             {% include 'logo.html' %}
             <div class="navbar-brand d-flex align-items-center ml-0 ml-sm-1 ml-md-2 mr-0 mr-sm-4">
                 <nav>
@@ -52,6 +53,7 @@
     <div class="contentWrap flex-column flex-md-p-row flex-lg-l-row {% block custom_content_style %}{% endblock %}">
         {% if session.get('name') %}
         <nav class="sidenav">
+            <h3 class="a11y-only">{{ gettext('Side Navigation') }}</h3>
             <ul class="sidenav-icons">
 
                 {% block default_navs %}

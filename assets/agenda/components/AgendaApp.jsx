@@ -162,6 +162,7 @@ class AgendaApp extends BaseApp {
                 coverageActions={this.props.coverageActions}
             />] : [
                 <section key="contentHeader" className='content-header'>
+                    <h3 className="a11y-only">{gettext('Agenda Content')}</h3>
                     <SelectedItemsBar
                         actions={this.props.actions}
                     />
@@ -219,6 +220,7 @@ class AgendaApp extends BaseApp {
                 <section key="contentMain" className='content-main'>
                     <div className={`wire-column--3 ${this.state.withSidebar?'nav--open':''}`}>
                         <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
+                            <h3 className="a11y-only">{gettext('Side filter panel')}</h3>
                             {this.state.withSidebar && (
                                 <SearchSidebar
                                     tabs={this.getTabs()}
