@@ -111,7 +111,8 @@ class Modal extends React.Component {
             <div className={classNames('modal mt-xl-5', {
                 'modal--full-width': this.props.width === 'full',
             })}
-            ref={(elem) => this.elem = elem}>
+            ref={(elem) => this.elem = elem} role={gettext('dialog')} aria-label={this.props.title}>
+                <h3 className="a11y-only">{this.props.title}</h3>
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">

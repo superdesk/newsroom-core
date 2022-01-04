@@ -146,6 +146,7 @@ class AmNewsApp extends BaseApp {
                         <div className={mainClassName}>
                             {this.state.isMobile && <div
                                 className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
+                                <h3 className="a11y-only">{gettext('Side filter panel')}</h3>
                                 {this.state.withSidebar &&
                                     <SearchSidebar
                                         tabs={this.tabs}

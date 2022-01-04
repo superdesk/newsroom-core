@@ -14,6 +14,7 @@
 <div class="settingsWrap">
     <div class="settings-inner">
         <div class='side-navigation' id='settings-menu'>
+            <h3 class="a11y-only">{{ gettext('Settings Menu') }}</h3>
             <ul>
                 {% for app in authorized_settings_apps()|sort(attribute='weight') %}
                     <li>

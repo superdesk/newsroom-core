@@ -23,6 +23,7 @@ from .token import generate_auth_token, verify_auth_token
 @limiter.limit('60/hour')
 def login():
     form = LoginForm()
+    next_page = flask.request.args.get('next') or flask.url_for('wire.index')
     if form.validate_on_submit():
 
         if not is_valid_login_attempt(form.email.data):
@@ -51,10 +52,11 @@ def login():
                 if flask.session.get('locale') and flask.session['locale'] != user.get('locale'):
                     get_resource_service('users').system_update(user['_id'], {'locale': flask.session['locale']}, user)
 
-                return flask.redirect(flask.request.args.get('next') or flask.url_for('wire.index'))
+                return flask.redirect(next_page)
         else:
             flask.flash(gettext('Invalid username or password.'), 'danger')
-    return flask.render_template('login.html', form=form)
+
+    return flask.render_template('login.html', form=form, next_page=next_page)
 
 
 def is_valid_login_attempt(email):
