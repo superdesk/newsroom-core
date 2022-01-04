@@ -31,7 +31,7 @@
         border-color: $main-blue;
     }
     &:focus {
-        outline: 0;       
+        outline: 0;
     }
     &:focus-visible {
         box-shadow: 0 0 0 1px rgba(0, 172, 236, .6), 0 0 3px 4px rgba(0, 172, 236, .4);
@@ -54,7 +54,7 @@
 }
 
 .icon-button[disabled] {
-    cursor: default;
+    cursor: not-allowed;
     &:hover  {
         border-color: transparent;
     }
@@ -63,7 +63,7 @@
 .icon-button--small {
     height: 29px;
     width: 28px;
-    
+
     @include xl {
         width: 34px;
     }
