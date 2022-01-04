@@ -83,6 +83,10 @@ class UsersResource(newsroom.Resource):
         'locale': {
             'type': 'string',
         },
+        'manage_company_topics': {
+            'type': 'boolean',
+            'default': False
+        },
         'last_active': {
             'type': 'datetime',
             'required': False,
