@@ -34,17 +34,14 @@ const TopicList = ({topics, selectedTopicId, actions, users}) => {
                     {'simple-card--selected': selectedTopicId === topic._id}
                 )}>
                     <div className="simple-card__header simple-card__header-with-icons">
-                        <ToolTip
-                            render={(ref) => (
-                                <h6
-                                    ref={ref}
-                                    className="simple-card__headline"
-                                    title={topic.label || topic.name}
-                                >
-                                    {topic.label || topic.name}
-                                </h6>
-                            )}
-                        />
+                        <ToolTip>
+                            <h6
+                                className="simple-card__headline"
+                                title={topic.label || topic.name}
+                            >
+                                {topic.label || topic.name}
+                            </h6>
+                        </ToolTip>
                         <div className='simple-card__icons'>
                             {getActionButtons(topic)}
                         </div>
