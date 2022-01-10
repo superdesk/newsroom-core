@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 const user = PropTypes.string;
 
 const item = PropTypes.shape({
-    'slugline': PropTypes.string,
+    slugline: PropTypes.string,
 });
 
 const actions = PropTypes.arrayOf(PropTypes.shape({
@@ -12,9 +12,19 @@ const actions = PropTypes.arrayOf(PropTypes.shape({
     url: PropTypes.func,
 }));
 
-const topics = PropTypes.arrayOf(PropTypes.shape({
+const topic = PropTypes.shape({
+    _id: PropTypes.string,
+    _created: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    is_global: PropTypes.bool,
+    user: PropTypes.string,
+    company: PropTypes.string,
     query: PropTypes.string,
-}));
+});
+
+const topics = PropTypes.arrayOf(topic);
 
 const previewConfig = PropTypes.shape({
 
@@ -23,6 +33,7 @@ const previewConfig = PropTypes.shape({
 const types = {
     user,
     item,
+    topic,
     topics,
     actions,
     previewConfig,

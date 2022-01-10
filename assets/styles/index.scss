@@ -615,6 +615,10 @@ article.list {
     &--no-scroll {
         overflow: visible !important;
     }
+
+    &--no-padding {
+        padding: 0;
+    }
 }
 .list-item__preview-footer {
     display: flex;
@@ -1846,7 +1850,7 @@ article.list {
 }
 .wire-articles__item-headline-inner {
     margin-bottom: 4px;
-    @include sm {    
+    @include sm {
         display: flex;
         align-items: flex-start;
         margin-bottom: 0;
@@ -3216,6 +3220,11 @@ a.wire-articles__versions {
     @include md {
         padding: 10px 25px 16px 25px;
     }
+}
+
+.simple-card--selected {
+    border: 3px solid rgba(0, 172, 236, .4) !important;
+    outline: 1px solid $main-blue !important;
 }
 
 .pull-right {
