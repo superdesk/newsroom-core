@@ -114,6 +114,7 @@ BLUEPRINTS = [
     'newsroom.settings',
     'newsroom.news_api.api_tokens',
     'newsroom.monitoring',
+    'newsroom.clients',
 ]
 
 CORE_APPS = [
@@ -147,6 +148,7 @@ CORE_APPS = [
     'newsroom.news_api.api_audit',
     'newsroom.monitoring',
     'newsroom.company_expiry_alerts',
+    'newsroom.clients',
 ]
 
 SITE_NAME = 'AAP Newsroom'
