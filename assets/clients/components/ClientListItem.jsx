@@ -5,9 +5,9 @@ import {shortDate} from 'utils';
 
 function ClientListItem({client, onClick}) {
     return (
-        <tr key={client}
+        <tr key={client._id}
             className={classNames({'table-secondary': false})}
-            onClick={() => onClick(client)}
+            onClick={() => onClick(client._id)}
         >
             <td className="name">{client.name}</td>
             <td>{shortDate(client._created)}</td>

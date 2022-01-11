@@ -33,7 +33,6 @@ function ClientList({clients, onClick}) {
 ClientList.propTypes = {
     clients: PropTypes.array.isRequired,
     onClick: PropTypes.func.isRequired,
-    showSubscriberId: PropTypes.bool,
 };
 
 export default ClientList;

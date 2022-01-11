@@ -38,8 +38,6 @@ export default function clientReducer(state = initialState, action) {
 
     case SELECT_CLIENT: {
         const defaultClient = {
-            is_enabled: true,
-            _id: null,
             name: '',
         };
 
@@ -61,7 +59,6 @@ export default function clientReducer(state = initialState, action) {
 
     case NEW_CLIENT: {
         const newClient =  {
-            _id: null,
             name: '',
             secret_key: '',
         };
@@ -75,12 +72,10 @@ export default function clientReducer(state = initialState, action) {
 
     case QUERY_CLIENTS:
         return {...state,
-            isLoading: true,
-            totalClients: null,
             activeQuery: state.query};
 
     case GET_CLIENTS:
-        return setupClients(action.data.clients, state);
+        return setupClients(action.data, state);
 
     case INIT_VIEW_DATA: {
         const nextState = {

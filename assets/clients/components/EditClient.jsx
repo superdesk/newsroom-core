@@ -14,7 +14,7 @@ class EditClient extends React.Component {
     render() {
         return (
             <div className={classNames('list-item__preview')}
-                role={gettext('dialog')} 
+                role={gettext('dialog')}
                 aria-label={gettext('Edit Client')}>
                 <div className='list-item__preview-header'>
                     <h3>{ gettext('Add/Edit Client') }</h3>

@@ -32,7 +32,7 @@ class Clients extends React.Component {
         let errors = {};
 
         if (!this.props.clientToEdit.name) {
-            errors.name = ['Please provide client name'];
+            errors.name = [gettext('Please provide client name')];
             valid = false;
         }
 
