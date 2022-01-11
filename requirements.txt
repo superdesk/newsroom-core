@@ -11,5 +11,5 @@ PyRTF3>=0.47.5
 xhtml2pdf>=0.2.4
 
 # Use develop branch for now (until 2.4 is released, to fix inclusion of `tests` from Superdesk)
-git+https://github.com/superdesk/superdesk-core.git@develop#egg=superdesk-core
+git+https://github.com/superdesk/superdesk-core.git@46d5140#egg=superdesk-core
 superdesk-planning==2.3.1

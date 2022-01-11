@@ -125,6 +125,7 @@ CORE_APPS = [
     'content_api.auth',
     'content_api.publish',
     'newsroom.users',
+    'newsroom.auth.oauth',
     'newsroom.companies',
     'newsroom.wire',
     'newsroom.topics',
@@ -249,7 +250,7 @@ SERVICES = [
 # Hides or displays abstract on preview panel and details modal
 DISPLAY_ABSTRACT = False
 
-WATERMARK_IMAGE = os.path.join(os.path.dirname(__file__), '../static', 'watermark.png')
+WATERMARK_IMAGE = None  # os.path.join(os.path.dirname(__file__), '../static', 'watermark.png')
 
 GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY')
 GOOGLE_ANALYTICS = os.environ.get('GOOGLE_ANALYTICS')
@@ -383,3 +384,11 @@ PREPEND_EMBARGOED_TO_WIRE_SEARCH = False
 
 #: allow embargoed items on dashboard
 DASHBOARD_EMBARGOED = True
+
+#: Google OAuth Settings
+#:
+#: .. versionadded:: 2.1
+#:
+GOOGLE_CLIENT_ID = env("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = env("GOOGLE_CLIENT_SECRET")
+GOOGLE_LOGIN = True

@@ -36,7 +36,7 @@ def get_view_data():
         'navigations': get_monitoring_for_company(user),
         'context': 'monitoring',
         'groups': app.config.get('MONITORING_GROUPS') or app.config.get('WIRE_GROUPS', []),
-        'ui_config': get_resource_service('ui_config').getSectionConfig('monitoring'),
+        'ui_config': get_resource_service('ui_config').get_section_config('monitoring'),
         'saved_items': get_bookmarks_count(user['_id'], 'monitoring'),
         'formats': [{'format': f['format'], 'name': f['name']} for f in app.download_formatters.values()
                     if 'monitoring' in f['types']],

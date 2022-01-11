@@ -17,7 +17,7 @@ import WirePreview from 'wire/components/WirePreview';
 import {followStory} from 'search/actions';
 import {downloadVideo} from 'wire/actions';
 import {SearchBar} from './search-bar';
-import {previewConfigSelector, listConfigSelector, detailsConfigSelector} from 'ui/selectors';
+import {previewConfigSelector, listConfigSelector, detailsConfigSelector, isSearchEnabled} from 'ui/selectors';
 
 const modals = {
     shareItem: ShareItemModal,
@@ -113,7 +113,9 @@ class HomeApp extends React.Component {
     renderContent(children) {
         return (
             <React.Fragment>
-                <SearchBar />
+                {this.props.isSearchEnabled && (
+                    <SearchBar />
+                )}
 
                 <section className="content-main d-block py-4 px-2 p-md-3 p-lg-4"
                     onScroll={this.onHomeScroll}
@@ -208,6 +210,7 @@ HomeApp.propTypes = {
     downloadVideo: PropTypes.func,
     topics: PropTypes.array,
     isFollowing: PropTypes.bool,
+    isSearchEnabled: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -225,6 +228,7 @@ const mapStateToProps = (state) => ({
     listConfig: listConfigSelector(state),
     detailsConfig: detailsConfigSelector(state),
     topics: state.topics || [],
+    isSearchEnabled: isSearchEnabled(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({

@@ -1,7 +1,7 @@
-
 from bson import ObjectId
-import newsroom
 import superdesk
+import newsroom
+from newsroom.utils import set_original_creator, set_version_creator
 
 
 class TopicsResource(newsroom.Resource):
@@ -27,18 +27,27 @@ class TopicsResource(newsroom.Resource):
             'type': 'list',
             'nullable': True,
             'schema': {'type': 'string'},
-        }
+        },
+        'original_creator': newsroom.Resource.rel('users'),
+        'version_creator': newsroom.Resource.rel('users'),
     }
 
 
 class TopicsService(newsroom.Service):
-    def update(self, id, updates, original):
+    def on_create(self, docs):
+        super().on_create(docs)
+        for doc in docs:
+            set_original_creator(doc)
+            set_version_creator(doc)
+
+    def on_update(self, updates, original):
+        super().on_update(updates, original)
+        set_version_creator(updates)
+
         # If ``is_global`` has been turned off, then remove all subscribers
         # except for the owner of the Topic
-        if original.get('is_global') and not updates.get('is_global'):
-            updates['subscribers'] = [original['user']]
-
-        return super().update(id, updates, original)
+        if original.get('is_global') and 'is_global' in updates and not updates.get('is_global'):
+            updates['subscribers'] = [original['user']] if original['user'] in original['subscribers'] else []
 
 
 def get_user_topics(user_id):

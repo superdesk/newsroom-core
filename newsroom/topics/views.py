@@ -2,7 +2,7 @@ from urllib import parse
 
 from bson import ObjectId
 from superdesk import get_resource_service
-from flask import json, jsonify, abort, session, current_app as app
+from flask import json, jsonify, abort, current_app as app, request
 from flask_babel import gettext
 
 from newsroom.topics import blueprint
@@ -27,14 +27,15 @@ def get_list_my_topics():
     return jsonify(_get_user_topics(get_user_id())), 200
 
 
-@blueprint.route('/topics/<id>', methods=['POST'])
+@blueprint.route('/topics/<topic_id>', methods=['POST'])
 @login_required
-def update_topic(id):
+def update_topic(topic_id):
     """ Updates a followed topic """
     data = get_json_or_400()
     current_user = get_user(required=True)
+    original = get_resource_service('topics').find_one(req=None, _id=ObjectId(topic_id))
 
-    if not is_user_topic(id, str(current_user['_id'])):
+    if not can_edit_topic(original, current_user):
         abort(403)
 
     # If notifications are enabled, check to see if user is configured to receive emails
@@ -58,8 +59,7 @@ def update_topic(id):
         'is_global': data.get('is_global', False),
     }
 
-    original = get_resource_service('topics').find_one(req=None, _id=ObjectId(id))
-    response = get_resource_service('topics').patch(id=ObjectId(id), updates=updates)
+    response = get_resource_service('topics').patch(id=ObjectId(topic_id), updates=updates)
     if response.get('is_global') or updates.get('is_global', False) != original.get('is_global', False):
         push_company_notification('topics')
     else:
@@ -67,26 +67,87 @@ def update_topic(id):
     return jsonify({'success': True}), 200
 
 
-@blueprint.route('/topics/<id>', methods=['DELETE'])
+@blueprint.route('/topics/<topic_id>', methods=['DELETE'])
 @login_required
-def delete(id):
+def delete(topic_id):
     """ Deletes a followed topic by given id """
-    if not is_user_topic(id, session['user']):
+    current_user = get_user(required=True)
+    original = get_resource_service('topics').find_one(req=None, _id=ObjectId(topic_id))
+
+    if not can_edit_topic(original, current_user):
         abort(403)
 
-    get_resource_service('topics').delete_action({'_id': ObjectId(id)})
-    push_user_notification('topics')
+    get_resource_service('topics').delete_action({'_id': ObjectId(topic_id)})
+    if original.get('is_global'):
+        push_company_notification('topics')
+    else:
+        push_user_notification('topics')
     return jsonify({'success': True}), 200
 
 
-def is_user_topic(topic_id, user_id):
-    """
-    Checks if the topic with topic_id belongs to user with user_id
-    """
+@blueprint.route('/topics/<topic_id>/subscribe', methods=['POST', 'DELETE'])
+@login_required
+def subscribe_to_topic(topic_id):
+    current_user = get_user(required=True)
     topic = find_one('topics', _id=ObjectId(topic_id))
-    user_ids = [user.get('id') for user in topic.get('users') or []]
-    if topic and (str(topic.get('user')) == user_id or user_id in user_ids):
+
+    if not is_user_or_company_topic(topic, current_user):
+        abort(403)
+
+    subscribers = topic.get('subscribers') or []
+    currently_subscribed = current_user['_id'] in subscribers
+    topic_updated = False
+    if request.method == 'POST' and not currently_subscribed:
+        subscribers.append(current_user['_id'])
+        topic_updated = True
+    elif request.method == 'DELETE' and currently_subscribed:
+        subscribers = [subscriber for subscriber in subscribers if subscriber != current_user['_id']]
+        topic_updated = True
+
+    if topic_updated:
+        # Use the ``update`` method, so we don't update the ``version_creator`` field unnecessarily
+        get_resource_service('topics').update(
+            id=topic['_id'],
+            updates={'subscribers': subscribers},
+            original=topic
+        )
+
+        push_company_notification('topics')
+
+    return jsonify({'success': True}), 200
+
+
+def can_user_manage_topic(topic, user):
+    """
+    Checks if the topic can be managed by the provided user
+    """
+    return (
+        topic.get("is_global") and
+        str(topic.get("company")) == str(user.get("company")) and
+        (
+            user.get("user_type") == "administrator" or
+            user.get("manage_company_topics")
+        )
+    )
+
+
+def can_edit_topic(topic, user):
+    """
+    Checks if the topic can be edited by the user
+    """
+    user_ids = [user.get("id") for user in topic.get("users") or []]
+    if topic and (str(topic.get("user")) == str(user["_id"]) or str(user["_id"]) in user_ids):
         return True
+    return can_user_manage_topic(topic, user)
+
+
+def is_user_or_company_topic(topic, user):
+    """Checks if the topic is owned by the user or global to the users company"""
+
+    if topic.get('user') == user.get('_id'):
+        return True
+    elif topic.get('company') and topic.get('is_global', False):
+        return user.get('company') == topic.get('company')
     return False
 
 

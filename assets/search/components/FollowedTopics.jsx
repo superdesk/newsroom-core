@@ -4,7 +4,11 @@ import {connect} from 'react-redux';
 import {get} from 'lodash';
 import classNames from 'classnames';
 
+import types from 'wire/types';
 import {gettext, isActionEnabled} from 'utils';
+import {canUserManageTopics} from 'users/utils';
+import {canUserEditTopic} from 'topics/utils';
+import {fetchCompanyUsers} from 'companies/actions';
 
 import {
     fetchTopics,
@@ -16,6 +20,7 @@ import {
     selectedItemSelector,
     selectedMenuSelector,
     topicEditorFullscreenSelector,
+    globalTopicsEnabledSelector,
 } from 'user-profile/selectors';
 
 import MonitoringEditor from 'search/components/MonitoringEditor';
@@ -55,6 +60,7 @@ class FollowedTopics extends React.Component {
                     name: gettext('Delete'),
                     icon: 'trash',
                     action: this.deleteTopic,
+                    when: (topic) => canUserEditTopic(topic, this.props.user),
                 }
             ].filter(isActionEnabled('topic_actions'));
         }
@@ -62,6 +68,7 @@ class FollowedTopics extends React.Component {
 
     componentDidMount() {
         this.onTopicChanged();
+        this.props.fetchCompanyUsers(this.props.user.company);
     }
 
     componentDidUpdate(prevProps) {
@@ -124,32 +131,36 @@ class FollowedTopics extends React.Component {
             <div className={containerClasses}>
                 {!editorOpenInFullscreen && (
                     <div className="d-flex flex-column flex-grow-1">
-                        <div className="pt-xl-4 pt-3 px-xl-4 mr-0">
-                            <div className="btn-group btn-group--navbar ml-0 mr-3">
-                                <button
-                                    className={classNames(
-                                        'btn btn-outline-primary',
-                                        {active: !this.state.showGlobal}
-                                    )}
-                                    onClick={this.toggleGlobal}
-                                >
-                                    {gettext('My Topics')}
-                                </button>
-                                <button
-                                    className={classNames(
-                                        'btn btn-outline-primary',
-                                        {active: this.state.showGlobal}
-                                    )}
-                                    onClick={this.toggleGlobal}
-                                >
-                                    {gettext('Company Topics')}
-                                </button>
+                        {!this.props.globalTopicsEnabled ? null : (
+                            <div className="pt-xl-4 pt-3 px-xl-4 mr-0">
+                                <div className="btn-group btn-group--navbar ml-0 mr-3">
+                                    <button
+                                        className={classNames(
+                                            'btn btn-outline-primary',
+                                            {active: !this.state.showGlobal}
+                                        )}
+                                        onClick={this.toggleGlobal}
+                                    >
+                                        {gettext('My Topics')}
+                                    </button>
+                                    <button
+                                        className={classNames(
+                                            'btn btn-outline-primary',
+                                            {active: this.state.showGlobal}
+                                        )}
+                                        onClick={this.toggleGlobal}
+                                    >
+                                        {gettext('Company Topics')}
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        )}
                         <div className="row pt-xl-4 pt-3 px-xl-4 mr-0">
                             <TopicList
                                 topics={this.getFilteredTopics()}
+                                selectedTopicId={get(this.props.selectedItem, '_id')}
                                 actions={this.actions}
+                                users={this.props.companyUsers}
                             />
                         </div>
                     </div>
@@ -163,8 +174,12 @@ class FollowedTopics extends React.Component {
                     /> :
                     <TopicEditor
                         topic={this.props.selectedItem}
+                        globalTopicsEnabled={this.props.globalTopicsEnabled}
                         closeEditor={this.closeEditor}
                         onTopicChanged={this.onTopicChanged}
+                        isAdmin={canUserManageTopics(this.props.user)}
+                        user={this.props.user}
+                        companyUsers={this.props.companyUsers}
                     />)}
             </div>
         );
@@ -173,24 +188,23 @@ class FollowedTopics extends React.Component {
 
 FollowedTopics.propTypes = {
     fetchTopics: PropTypes.func.isRequired,
-    topics: PropTypes.arrayOf(PropTypes.shape({
-        _id: PropTypes.string.isRequired,
-        _created: PropTypes.string.isRequired,
-        label: PropTypes.string.isRequired,
-        description: PropTypes.string,
-    })),
+    topics: types.topics,
     topicType: PropTypes.string.isRequired,
     shareTopic: PropTypes.func,
     deleteTopic: PropTypes.func,
     selectMenuItem: PropTypes.func,
-    selectedItem: PropTypes.object,
+    selectedItem: types.topic,
     selectedMenu: PropTypes.string,
     editorFullscreen: PropTypes.bool,
     monitoringList: PropTypes.array,
     monitoringAdministrator: PropTypes.string,
+    globalTopicsEnabled: PropTypes.bool,
+    user: PropTypes.object,
+    fetchCompanyUsers: PropTypes.func,
+    companyUsers: PropTypes.array,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, ownProps) => ({
     topics: state.topics,
     monitoringList: state.monitoringList,
     monitoringAdministrator: state.monitoringAdministrator,
@@ -198,6 +212,8 @@ const mapStateToProps = (state) => ({
     selectedItem: selectedItemSelector(state),
     selectedMenu: selectedMenuSelector(state),
     editorFullscreen: topicEditorFullscreenSelector(state),
+    globalTopicsEnabled: globalTopicsEnabledSelector(state, ownProps.topicType),
+    companyUsers: state.monitoringProfileUsers || [],
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -205,6 +221,7 @@ const mapDispatchToProps = (dispatch) => ({
     shareTopic: (topic) => dispatch(shareTopic(topic)),
     deleteTopic: (topic) => dispatch(deleteTopic(topic)),
     selectMenuItem: (item) => dispatch(selectMenuItem(item)),
+    fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId, true)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(FollowedTopics);

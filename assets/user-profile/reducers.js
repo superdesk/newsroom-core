@@ -10,7 +10,7 @@ import {
     SET_TOPIC_EDITOR_FULLSCREEN,
 } from './actions';
 
-import {RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID} from 'actions';
+import {RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID, ADD_EDIT_USERS} from 'actions';
 import {GET_COMPANY_USERS} from 'companies/actions';
 import {SET_USER_COMPANY_MONITORING_LIST} from 'monitoring/actions';
 
@@ -104,6 +104,7 @@ export default function itemReducer(state = initialState, action) {
             locators: action.data.locators || null,
             monitoringList: action.data.monitoring_list || [],
             monitoringAdministrator: action.data.monitoring_administrator,
+            uiConfigs: action.data.ui_configs,
         };
     }
 
@@ -177,6 +178,16 @@ export default function itemReducer(state = initialState, action) {
         }
 
         return newState;
+
+    case ADD_EDIT_USERS: {
+        return {
+            ...state,
+            editUsers: [
+                ...(state.editUsers || []),
+                ...action.data,
+            ]
+        };
+    }
 
     default:
         return state;

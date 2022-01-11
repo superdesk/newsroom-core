@@ -5,7 +5,7 @@ import superdesk
 
 from bson import ObjectId
 from operator import itemgetter
-from flask import current_app as app, request, jsonify, url_for
+from flask import current_app as app, request, jsonify
 from eve.render import send_response
 from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
@@ -31,7 +31,7 @@ from newsroom.companies import section
 from newsroom.template_filters import is_admin_or_internal
 
 from .search import get_bookmarks_count
-from ..upload import ASSETS_RESOURCE
+from ..upload import ASSETS_RESOURCE, get_upload
 
 HOME_ITEMS_CACHE_KEY = 'home_items'
 HOME_EXTERNAL_ITEMS_CACHE_KEY = 'home_external_items'
@@ -82,7 +82,7 @@ def get_view_data():
         'products': get_products_by_company(company_id),
         'saved_items': get_bookmarks_count(user['_id'], 'wire'),
         'context': 'wire',
-        'ui_config': get_resource_service('ui_config').getSectionConfig('wire'),
+        'ui_config': get_resource_service('ui_config').get_section_config('wire'),
         'groups': app.config.get('WIRE_GROUPS', []),
     }
 
@@ -124,7 +124,7 @@ def get_home_data():
                     for f in app.download_formatters.values()],
         'context': 'wire',
         'topics': topics,
-        'ui_config': get_resource_service('ui_config').getSectionConfig('home'),
+        'ui_config': get_resource_service('ui_config').get_section_config('home'),
     }
 
 
@@ -208,10 +208,7 @@ def download(_ids):
         if len(items) == 1:
             try:
                 picture = formatter.format_item(items[0], item_type=item_type)
-                return flask.redirect(
-                    url_for('upload.get_upload',
-                            media_id=picture['media'],
-                            filename='baseimage%s' % picture['file_extension']))
+                return get_upload(picture['media'], filename='baseimage%s' % picture['file_extension'])
             except ValueError:
                 return flask.abort(404)
         else:
@@ -372,7 +369,7 @@ def item(_id):
 
     item = items[0]
     set_permissions(item, 'wire', False if flask.request.args.get('ignoreLatest') == 'false' else True)
-    display_char_count = get_resource_service('ui_config').getSectionConfig('wire').get('char_count', False)
+    display_char_count = get_resource_service('ui_config').get_section_config('wire').get('char_count', False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get('_access'):
