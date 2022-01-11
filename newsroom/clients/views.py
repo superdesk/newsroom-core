@@ -2,6 +2,7 @@ import re
 
 import flask
 from bson import ObjectId
+import bcrypt
 from flask import jsonify, current_app as app
 from flask_babel import gettext
 from superdesk import get_resource_service
@@ -10,6 +11,7 @@ from werkzeug.exceptions import NotFound
 from newsroom.decorator import admin_only, account_manager_only
 from newsroom.clients import blueprint
 from newsroom.utils import query_resource, find_one, get_json_or_400
+from superdesk.utils import gen_password
 
 
 def get_settings_data():
@@ -37,9 +39,9 @@ def create():
     """
     client = get_json_or_400()
 
-    new_company = get_client_updates(client)
+    new_company, password = get_client_updates(client)
     ids = get_resource_service('clients').post([new_company])
-    return jsonify({'success': True, '_id': ids[0]}), 201
+    return jsonify({'success': True, '_id': ids[0], 'password': password}), 201
 
 
 @blueprint.route('/clients/<_id>', methods=['GET', 'POST'])
@@ -48,19 +50,19 @@ def edit(_id):
     """
     Edits the client with given client id
     """
-    company = find_one('clients', _id=ObjectId(_id))
+    client = find_one('clients', _id=ObjectId(_id))
 
-    if not company:
+    if not client:
         return NotFound(gettext('Client not found'))
 
     if flask.request.method == 'POST':
-        company = get_json_or_400()
-
-        updates = get_client_updates(company)
+        client = get_json_or_400()
+        updates = {}
+        updates['name'] = client.get('name')
         get_resource_service('clients').patch(ObjectId(_id), updates=updates)
         app.cache.delete(_id)
         return jsonify({'success': True}), 200
-    return jsonify(company), 200
+    return jsonify(client), 200
 
 
 @blueprint.route('/clients/<_id>', methods=['DELETE'])
@@ -76,9 +78,10 @@ def delete(_id):
 
 
 def get_client_updates(client):
+    password = gen_password()
     updates = {
         'name': client.get('name'),
-        'secret_key': ''
+        'password': bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
     }
 
-    return updates
+    return updates, password
