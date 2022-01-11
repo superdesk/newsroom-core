@@ -39,6 +39,13 @@ class EditClient extends React.Component {
                                     value={this.props.client.name}
                                     onChange={this.props.onChange}
                                 />
+                                {this.props.client.secret_key &&
+                                    <TextInput
+                                        name='secret_key'
+                                        label={gettext('Secret Key')}
+                                        value={this.props.client.secret_key}
+                                    />
+                                }
                             </div>
                             <div className='list-item__preview-footer'>
                                 <input

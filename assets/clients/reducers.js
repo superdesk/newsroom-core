@@ -1,5 +1,6 @@
 import {
     EDIT_CLIENT,
+    GET_CLIENT_PASSWORD,
     GET_CLIENTS,
     NEW_CLIENT,
     QUERY_CLIENTS,
@@ -76,6 +77,12 @@ export default function clientReducer(state = initialState, action) {
 
     case GET_CLIENTS:
         return setupClients(action.data, state);
+
+    case GET_CLIENT_PASSWORD:{
+        let newClient = state.clientToEdit;
+        newClient['secret_key'] = action.data.password;
+        return {...state, clientToEdit: newClient, errors: null};
+    }
 
     case INIT_VIEW_DATA: {
         const nextState = {

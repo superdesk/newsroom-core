@@ -45,6 +45,12 @@ export function setError(errors) {
 }
 
 
+export const GET_CLIENT_PASSWORD = 'GET_CLIENT_PASSWORD';
+export function getClientPassword(data) {
+    return {type: GET_CLIENT_PASSWORD, data};
+}
+
+
 /**
  * Fetches clients
  *
@@ -73,10 +79,11 @@ export function postClient() {
         const url = `/clients/${client._id ? client._id : 'new'}`;
 
         return server.post(url, client)
-            .then(function() {
+            .then((data) => {
                 if (client._id) {
                     notify.success(gettext('Client updated successfully'));
                 } else {
+                    dispatch(getClientPassword(data));
                     notify.success(gettext('Client created successfully'));
                 }
                 dispatch(fetchClients());
