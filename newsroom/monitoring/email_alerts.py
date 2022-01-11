@@ -14,7 +14,7 @@ import logging
 from bson import ObjectId
 from urllib.parse import urlparse
 
-from flask import render_template, current_app as app
+from flask import current_app as app
 from flask_babel import gettext
 from eve.utils import ParsedRequest
 from superdesk import get_resource_service, Command
@@ -187,7 +187,7 @@ class MonitoringEmailAlerts(Command):
         if general_settings and general_settings['values'].get('system_alerts_recipients'):
             error_recipients = general_settings['values']['system_alerts_recipients'].split(',')
 
-        from newsroom.email import send_email
+        from newsroom.email import send_template_email
         for m in monitoring_list:
             if m.get('users'):
                 internal_req = ParsedRequest()
@@ -217,18 +217,18 @@ class MonitoringEmailAlerts(Command):
                         else:
                             subject = m.get('subject') or m['name']
 
-                        send_email(
-                            [u['email'] for u in get_items_by_id([ObjectId(u) for u in m['users']], 'users')],
-                            subject,
-                            text_body=render_template('monitoring_email.txt', **template_kwargs),
-                            html_body=render_template('monitoring_email.html', **template_kwargs),
+                        send_template_email(
+                            to=[u["email"] for u in get_items_by_id([ObjectId(u) for u in m["users"]], "users")],
+                            subject=subject,
+                            template="monitoring_email",
+                            template_kwargs=template_kwargs,
                             attachments_info=[{
-                                'file': attachment,
-                                'file_name': formatter.format_filename(None),
-                                'content_type': 'application/{}'.format(formatter.FILE_EXTENSION),
-                                'file_desc': 'Monitoring Report for Celery monitoring alerts for profile: {}'.format(
-                                        m['name'])
-                            }]
+                                "file": attachment,
+                                "file_name": formatter.format_filename(None),
+                                "content_type": "application/{}".format(formatter.FILE_EXTENSION),
+                                "file_desc": "Monitoring Report for Celery monitoring alerts for profile: {}".format(
+                                    m['name'])
+                            }],
                         )
                     except Exception:
                         logger.exception('{0} Error processing monitoring profile {1} for company {2}.'.format(
@@ -240,18 +240,18 @@ class MonitoringEmailAlerts(Command):
                                 'company': company['name'],
                                 'run_time': now,
                             }
-                            send_email(
-                                error_recipients,
-                                gettext('Error sending alerts for monitoring: {0}'.format(m['name'])),
-                                text_body=render_template('monitoring_error.txt', **template_kwargs),
-                                html_body=render_template('monitoring_error.html', **template_kwargs),
+                            send_template_email(
+                                to=error_recipients,
+                                subject=gettext("Error sending alerts for monitoring: {0}".format(m["name"])),
+                                template="monitoring_error",
+                                template_kwargs=template_kwargs,
                             )
                 elif m['schedule'].get('interval') != 'immediate' and m.get('always_send'):
-                    send_email(
-                        [u['email'] for u in get_items_by_id([ObjectId(u) for u in m['users']], 'users')],
-                        m.get('subject') or m['name'],
-                        text_body=render_template('monitoring_email_no_updates.txt', **template_kwargs),
-                        html_body=render_template('monitoring_email_no_updates.html', **template_kwargs),
+                    send_template_email(
+                        to=[u["email"] for u in get_items_by_id([ObjectId(u) for u in m["users"]], "users")],
+                        subject=m.get("subject") or m["name"],
+                        template="monitoring_email_no_updates",
+                        template_kwargs=template_kwargs,
                     )
 
             get_resource_service('monitoring').patch(m['_id'], {

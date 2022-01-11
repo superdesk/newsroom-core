@@ -11,7 +11,7 @@ from newsroom.decorator import admin_only, login_required, account_manager_only
 from superdesk import get_resource_service
 from superdesk.logging import logger
 
-from newsroom.email import send_email
+from newsroom.email import send_template_email
 from newsroom.companies import section
 from newsroom.template_filters import is_admin
 from newsroom.auth import get_user, get_user_id
@@ -254,18 +254,18 @@ def share():
         monitoring_profile['format_type'] = 'monitoring_pdf'
         _file = get_monitoring_file(monitoring_profile, items)
         attachment = base64.b64encode(_file.read())
+        profile_name = monitoring_profile.get("subject", monitoring_profile["name"])
 
-        send_email(
-            [user['email']],
-            gettext('From %s: %s' % (app.config['SITE_NAME'], monitoring_profile.get('subject',
-                                                                                     monitoring_profile['name']))),
-            text_body=flask.render_template('share_items.txt', **template_kwargs),
-            html_body=flask.render_template('share_items.html', **template_kwargs),
+        send_template_email(
+            to=[user["email"]],
+            subject=gettext("From %s: %s" % (app.config["SITE_NAME"], profile_name)),
+            template="share_items",
+            template_kwargs=template_kwargs,
             attachments_info=[{
-                'file': attachment,
-                'file_name': formatter.format_filename(None),
-                'content_type': 'application/{}'.format(formatter.FILE_EXTENSION),
-                'file_desc': 'Monitoring Report'
+                "file": attachment,
+                "file_name": formatter.format_filename(None),
+                "content_type": "application/{}".format(formatter.FILE_EXTENSION),
+                "file_desc": "Monitoring Report"
             }],
         )
 

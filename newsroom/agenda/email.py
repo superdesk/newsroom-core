@@ -1,7 +1,6 @@
-from flask import render_template
 from flask_babel import gettext
 
-from newsroom.email import send_email
+from newsroom.email import send_template_email
 from newsroom.utils import get_agenda_dates, get_location_string, get_links, get_public_contacts, url_for_agenda
 from newsroom.template_filters import is_admin_or_internal
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
@@ -10,23 +9,23 @@ from newsroom.companies import get_user_company
 
 def send_coverage_notification_email(user, agenda, wire_item):
     if user.get('receive_email'):
-        kwargs = dict(
+        template_kwargs = dict(
             agenda=agenda,
             item=wire_item,
             section='agenda',
         )
-        send_email(
-            to=[user['email']],
-            subject=gettext('New coverage'),
-            text_body=render_template('agenda_new_coverage_email.txt', **kwargs),
-            html_body=render_template('agenda_new_coverage_email.html', **kwargs)
+        send_template_email(
+            to=[user["email"]],
+            subject=gettext("New coverage"),
+            template="agenda_new_coverage_email",
+            template_kwargs=template_kwargs,
         )
 
 
 def send_agenda_notification_email(user, agenda, message, subject, original_agenda, coverage_updates,
                                    related_planning_removed, coverage_updated, time_updated):
     if agenda and user.get('receive_email'):
-        kwargs = dict(
+        template_kwargs = dict(
             message=message,
             agenda=agenda,
             dateString=get_agenda_dates(agenda if agenda.get('dates') else original_agenda, date_paranthesis=True),
@@ -40,11 +39,11 @@ def send_agenda_notification_email(user, agenda, message, subject, original_agen
             coverage_updated=coverage_updated,
             time_updated=time_updated,
         )
-        send_email(
-            to=[user['email']],
+        send_template_email(
+            to=[user["email"]],
             subject=subject,
-            text_body=render_template('agenda_updated_email.txt', **kwargs),
-            html_body=render_template('agenda_updated_email.html', **kwargs)
+            template="agenda_updated_email",
+            template_kwargs=template_kwargs,
         )
 
 
@@ -74,9 +73,20 @@ def send_coverage_request_email(user, message, item):
     if user_company:
         user_company = user_company.get('name')
 
-    text_body = render_template('coverage_request_email.txt', name=name, email=email, message=message, url=url,
-                                company=user_company, recipients=recipients, subject=subject, item_name=item_name)
-    html_body = render_template('coverage_request_email.html', name=name, email=email, message=message, url=url,
-                                company=user_company, recipients=recipients, subject=subject, item_name=item_name)
+    template_kwargs = dict(
+        name=name,
+        email=email,
+        message=message,
+        url=url,
+        company=user_company,
+        recipients=recipients,
+        subject=subject,
+        item_name=item_name
+    )
 
-    send_email(to=recipients, subject=subject, text_body=text_body, html_body=html_body)
+    send_template_email(
+        to=recipients,
+        subject=subject,
+        template="coverage_request_email",
+        template_kwargs=template_kwargs,
+    )

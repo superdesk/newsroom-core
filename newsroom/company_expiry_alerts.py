@@ -11,7 +11,8 @@
 import datetime
 import logging
 
-from flask import render_template
+from flask_babel import gettext
+
 from superdesk import config
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
@@ -46,7 +47,7 @@ class CompanyExpiryAlerts():
         logger.info('{} Completed sending alerts.'.format(self.log_msg))
 
     def worker(self):
-        from newsroom.email import send_email
+        from newsroom.email import send_template_email
 
         # Check if there are any recipients
         general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
@@ -71,13 +72,12 @@ class CompanyExpiryAlerts():
                     template_kwargs = {'expiry_date': company.get('expiry_date')}
                     logger.info('{} Sending to following users of company {}: {}'
                                 .format(self.log_msg, company.get('name'), recipients))
-                    send_email(
-                        [u['email'] for u in users],
-                        'Your Company\'s account is expiring on {}'.format(
-                            company.get('expiry_date').strftime('%d-%m-%Y')
-                        ),
-                        text_body=render_template('company_expiry_alert_user.txt', **template_kwargs),
-                        html_body=render_template('company_expiry_alert_user.html', **template_kwargs),
+                    expiry_str = company.get('expiry_date').strftime('%d-%m-%Y')
+                    send_template_email(
+                        to=[u["email"] for u in users],
+                        subject=gettext(f"Your Company's account is expiring on {expiry_str}"),
+                        template="company_expiry_alert_user",
+                        template_kwargs=template_kwargs,
                     )
 
             if not (general_settings.get('values') or {}).get('company_expiry_alert_recipients'):
@@ -88,13 +88,12 @@ class CompanyExpiryAlerts():
                 'expiry_date': expiry_time
             }
             logger.info('{} Sending to following expiry administrators: {}'.format(self.log_msg, recipients))
-            send_email(
-                recipients,
-                'Companies expired or due to expire within the next 7 days ({})'.format(
-                    expiry_time.strftime('%d-%m-%Y')
-                ),
-                text_body=render_template('company_expiry_email.txt', **template_kwargs),
-                html_body=render_template('company_expiry_email.html', **template_kwargs),
+            expiry_str = expiry_time.strftime("%d-%m-%Y")
+            send_template_email(
+                to=recipients,
+                subject=gettext(f"Companies expired or due to expire within the next 7 days ({expiry_str})"),
+                template="company_expiry_email",
+                template_kwargs=template_kwargs,
             )
 
 

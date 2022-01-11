@@ -1,16 +1,25 @@
 import base64
-from typing import List
+from typing import List, Optional, Dict, Any
+from typing_extensions import TypedDict
+
 from superdesk.emails import SuperdeskMessage  # it handles some encoding issues
 from flask import current_app, render_template, url_for
 from flask_babel import gettext
 from flask_mail import Attachment
+from jinja2 import TemplateNotFound
 
 from newsroom.celery_app import celery
 from newsroom.utils import get_agenda_dates, get_location_string, get_links, \
     get_public_contacts
 from newsroom.template_filters import is_admin_or_internal
-from newsroom.utils import url_for_agenda
+from newsroom.utils import url_for_agenda, query_resource
 from superdesk.logging import logger
+
+
+class EmailGroup(TypedDict):
+    html_template: str
+    text_template: str
+    emails: List[str]
 
 
 @celery.task(bind=True, soft_time_limit=120)
@@ -65,18 +74,75 @@ def send_email(to, subject, text_body, html_body=None, sender=None, attachments_
 
 def send_new_signup_email(user):
     send_template_email(
-        to=current_app.config['SIGNUP_EMAIL_RECIPIENTS'].split(','),
-        subject=gettext('A new newsroom signup request'),
+        to=current_app.config["SIGNUP_EMAIL_RECIPIENTS"].split(","),
+        subject=gettext("A new newsroom signup request"),
         template="signup_request_email",
-        url=url_for('settings.app', app_id='users', _external=True),
-        user=user,
+        template_kwargs=dict(
+            url=url_for("settings.app", app_id="users", _external=True),
+            user=user,
+        ),
     )
 
 
-def send_template_email(to: List[str], subject: str, template: str, **kwargs):
-    text_body = render_template(f'{template}.txt', **kwargs)
-    html_body = render_template(f'{template}.html', **kwargs)
-    send_email(to=to, subject=subject, text_body=text_body, html_body=html_body)
+def map_email_recipients_by_language(emails: List[str], template_name: str) -> Dict[str, EmailGroup]:
+    users = {
+        user["email"]: user
+        for user in query_resource("users", lookup={"email": {"$in": emails}}) or []
+    }
+    default_language = current_app.config["DEFAULT_LANGUAGE"]
+    groups: Dict[str, EmailGroup] = {}
+    default_html_template = get_language_template_name(template_name, default_language, "html")
+    default_txt_template = get_language_template_name(template_name, default_language, "txt")
+
+    for email in emails:
+        email_language = ((users.get(email) or {}).get("locale") or default_language).lower().replace("-", "_")
+        html_template_name = get_language_template_name(template_name, email_language, "html")
+        text_template = get_language_template_name(template_name, email_language, "txt")
+
+        if html_template_name == default_html_template and text_template == default_txt_template:
+            email_language = default_language
+
+        if not groups.get(email_language):
+            groups[email_language] = EmailGroup(
+                html_template=html_template_name,
+                text_template=text_template,
+                emails=[]
+            )
+
+        groups[email_language]["emails"].append(email)
+
+    return groups
+
+
+def get_language_template_name(template_name: str, language: str, extension: str) -> str:
+    language_template_name = f"{template_name}.{language}.{extension}"
+    fallback_template_name = f"{template_name}.{extension}"
+
+    try:
+        current_app.jinja_env.get_or_select_template(language_template_name)
+        return language_template_name
+    except TemplateNotFound:
+        pass
+
+    return fallback_template_name
+
+
+def send_template_email(
+    to: List[str],
+    subject: str,
+    template: str,
+    template_kwargs: Optional[Dict[str, Any]] = None,
+    **kwargs
+):
+    template_kwargs = {} if not template_kwargs else template_kwargs
+    for language, group in map_email_recipients_by_language(to, template).items():
+        send_email(
+            to=group["emails"],
+            subject=subject,
+            text_body=render_template(group["text_template"], **template_kwargs),
+            html_body=render_template(group["html_template"], **template_kwargs),
+            **kwargs
+        )
 
 
 def send_validate_account_email(user_name, user_email, token):
@@ -92,12 +158,17 @@ def send_validate_account_email(user_name, user_email, token):
     hours = current_app.config['VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE'] * 24
 
     subject = current_app.config.get('ACCOUNT_CREATED_EMAIL_SUBJECT', gettext('{} account created'.format(app_name)))
-    text_body = render_template('validate_account_email.txt',
-                                app_name=app_name, name=user_name, expires=hours, url=url)
-    html_body = render_template('validate_account_email.html',
-                                app_name=app_name, name=user_name, expires=hours, url=url)
-
-    send_email(to=[user_email], subject=subject, text_body=text_body, html_body=html_body)
+    send_template_email(
+        to=[user_email],
+        subject=subject,
+        template="validate_account_email",
+        template_kwargs=dict(
+            app_name=app_name,
+            name=user_name,
+            expires=hours,
+            url=url,
+        ),
+    )
 
 
 def send_new_account_email(user_name, user_email, token):
@@ -113,10 +184,17 @@ def send_new_account_email(user_name, user_email, token):
     hours = current_app.config['VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE'] * 24
 
     subject = current_app.config.get('ACCOUNT_CREATED_EMAIL_SUBJECT', gettext('{} account created'.format(app_name)))
-    text_body = render_template('account_created_email.txt', app_name=app_name, name=user_name, expires=hours, url=url)
-    html_body = render_template('account_created_email.html', app_name=app_name, name=user_name, expires=hours, url=url)
-
-    send_email(to=[user_email], subject=subject, text_body=text_body, html_body=html_body)
+    send_template_email(
+        to=[user_email],
+        subject=subject,
+        template="account_created_email",
+        template_kwargs=dict(
+            app_name=app_name,
+            name=user_name,
+            expires=hours,
+            url=url,
+        )
+    )
 
 
 def send_reset_password_email(user_name, user_email, token):
@@ -132,12 +210,18 @@ def send_reset_password_email(user_name, user_email, token):
     hours = current_app.config['RESET_PASSWORD_TOKEN_TIME_TO_LIVE'] * 24
 
     subject = gettext('{} password reset').format(app_name)
-    text_body = render_template('reset_password_email.txt', app_name=app_name, name=user_name,
-                                email=user_email, expires=hours, url=url)
-    html_body = render_template('reset_password_email.html', app_name=app_name, name=user_name,
-                                email=user_email, expires=hours, url=url)
-
-    send_email(to=[user_email], subject=subject, text_body=text_body, html_body=html_body)
+    send_template_email(
+        to=[user_email],
+        subject=subject,
+        template="reset_password_email",
+        template_kwargs=dict(
+            app_name=app_name,
+            name=user_name,
+            email=user_email,
+            expires=hours,
+            url=url,
+        ),
+    )
 
 
 def send_new_item_notification_email(user, topic_name, item, section='wire'):
@@ -151,43 +235,49 @@ def _send_new_wire_notification_email(user, topic_name, item, section):
     url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
     subject = gettext('New story for followed topic: {}').format(topic_name)
-    kwargs = dict(
-        app_name=current_app.config['SITE_NAME'],
+    template_kwargs = dict(
+        app_name=current_app.config["SITE_NAME"],
         is_topic=True,
         topic_name=topic_name,
-        name=user.get('first_name'),
+        name=user.get("first_name"),
         item=item,
         url=url,
-        type='wire',
-        section=section
+        type="wire",
+        section=section,
     )
-    text_body = render_template('new_item_notification.txt', **kwargs)
-    html_body = render_template('new_item_notification.html', **kwargs)
-    send_email(to=recipients, subject=subject, text_body=text_body, html_body=html_body)
+    send_template_email(
+        to=recipients,
+        subject=subject,
+        template="new_item_notification",
+        template_kwargs=template_kwargs,
+    )
 
 
 def _send_new_agenda_notification_email(user, topic_name, item):
     url = url_for_agenda(item, _external=True)
     recipients = [user['email']]
     subject = gettext('New update for followed agenda: {}').format(topic_name)
-    kwargs = dict(
-        app_name=current_app.config['SITE_NAME'],
+    template_kwargs = dict(
+        app_name=current_app.config["SITE_NAME"],
         is_topic=True,
         topic_name=topic_name,
-        name=user.get('first_name'),
+        name=user.get("first_name"),
         item=item,
         url=url,
-        type='agenda',
+        type="agenda",
         dateString=get_agenda_dates(item),
         location=get_location_string(item),
         contacts=get_public_contacts(item),
         links=get_links(item),
         is_admin=is_admin_or_internal(user),
-        section='agenda'
+        section="agenda",
     )
-    text_body = render_template('new_item_notification.txt', **kwargs)
-    html_body = render_template('new_item_notification.html', **kwargs)
-    send_email(to=recipients, subject=subject, text_body=text_body, html_body=html_body)
+    send_template_email(
+        to=recipients,
+        subject=subject,
+        template="new_item_notification",
+        template_kwargs=template_kwargs,
+    )
 
 
 def send_history_match_notification_email(user, item, section):
@@ -202,18 +292,21 @@ def _send_history_match_wire_notification_email(user, item, section):
     url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
     subject = gettext('New update for your previously accessed story: {}').format(item['headline'])
-    text_body = render_template(
-        'new_item_notification.txt',
+    template_kwargs = dict(
         app_name=app_name,
         is_topic=False,
-        name=user.get('first_name'),
+        name=user.get("first_name"),
         item=item,
         url=url,
-        type='wire',
-        section=section
+        type="wire",
+        section=section,
     )
-
-    send_email(to=recipients, subject=subject, text_body=text_body)
+    send_template_email(
+        to=recipients,
+        subject=subject,
+        template="new_item_notification",
+        template_kwargs=template_kwargs,
+    )
 
 
 def _send_history_match_agenda_notification_email(user, item):
@@ -221,8 +314,7 @@ def _send_history_match_agenda_notification_email(user, item):
     url = url_for_agenda(item, _external=True)
     recipients = [user['email']]
     subject = gettext('New update for your previously accessed agenda: {}').format(item['name'])
-    text_body = render_template(
-        'new_item_notification.txt',
+    template_kwargs = dict(
         app_name=app_name,
         is_topic=False,
         name=user.get('first_name'),
@@ -236,8 +328,12 @@ def _send_history_match_agenda_notification_email(user, item):
         is_admin=is_admin_or_internal(user),
         section='agenda'
     )
-
-    send_email(to=recipients, subject=subject, text_body=text_body)
+    send_template_email(
+        to=recipients,
+        subject=subject,
+        template="new_item_notification",
+        template_kwargs=template_kwargs,
+    )
 
 
 def send_item_killed_notification_email(user, item):

@@ -136,9 +136,9 @@ def share():
             'app_name': app.config['SITE_NAME'],
         }
         send_template_email(
-            [user['email']],
-            gettext('From %s: %s' % (app.config['SITE_NAME'], topic['label'])),
-            'share_topic',
-            **template_kwargs
+            to=[user["email"]],
+            subject=gettext("From %s: %s" % (app.config["SITE_NAME"], topic["label"])),
+            template="share_topic",
+            template_kwargs=template_kwargs,
         )
     return jsonify(), 201
