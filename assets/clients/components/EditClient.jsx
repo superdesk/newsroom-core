@@ -39,11 +39,17 @@ class EditClient extends React.Component {
                                     value={this.props.client.name}
                                     onChange={this.props.onChange}
                                 />
+                                <TextInput
+                                    name='client id'
+                                    label={gettext('Client Id')}
+                                    value={this.props.client._id}
+                                />
                                 {this.props.client.secret_key &&
                                     <TextInput
-                                        name='secret_key'
-                                        label={gettext('Secret Key')}
+                                        name='client secret'
+                                        label={gettext('Client Secret')}
                                         value={this.props.client.secret_key}
+                                        description={gettext('Make sure to copy your new client secret now. You won`t be able to see it again.')}
                                     />
                                 }
                             </div>

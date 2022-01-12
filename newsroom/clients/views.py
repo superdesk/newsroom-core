@@ -39,7 +39,12 @@ def create():
     """
     client = get_json_or_400()
 
-    new_company, password = get_client_updates(client)
+    password = gen_password()
+    new_company = {
+        'name': client.get('name'),
+        'password': bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    }
+
     ids = get_resource_service('clients').post([new_company])
     return jsonify({'success': True, '_id': ids[0], 'password': password}), 201
 
@@ -75,13 +80,3 @@ def delete(_id):
 
     app.cache.delete(_id)
     return jsonify({'success': True}), 200
-
-
-def get_client_updates(client):
-    password = gen_password()
-    updates = {
-        'name': client.get('name'),
-        'password': bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
-    }
-
-    return updates, password
