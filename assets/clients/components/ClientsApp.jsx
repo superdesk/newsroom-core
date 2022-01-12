@@ -44,7 +44,6 @@ ClientsApp.propTypes = {
     totalClients: PropTypes.number,
     clientsById: PropTypes.object,
     fetchClients: PropTypes.func,
-    fetchClientUsers: PropTypes.func,
     setQuery: PropTypes.func,
     errors: PropTypes.object,
     dispatch: PropTypes.func,

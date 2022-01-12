@@ -112,16 +112,11 @@ Clients.propTypes = {
     editClient: PropTypes.func,
     saveClient: PropTypes.func,
     deleteClient: PropTypes.func,
-    newClient: PropTypes.func,
     cancelEdit: PropTypes.func,
     isLoading: PropTypes.bool,
     activeQuery: PropTypes.string,
     totalClients: PropTypes.number,
-    errors: PropTypes.object,
     dispatch: PropTypes.func,
-    products: PropTypes.array,
-    apiEnabled: PropTypes.bool,
-    showSubscriberId: PropTypes.bool,
     clientsById: PropTypes.object,
 };
 
