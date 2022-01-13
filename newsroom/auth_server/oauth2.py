@@ -62,4 +62,10 @@ def config_oauth(app):
     app.config["OAUTH2_ACCESS_TOKEN_GENERATOR"] = generate_jwt_token
     app.config["OAUTH2_TOKEN_EXPIRES_IN"] = {"client_credentials": expiration_delay}
     authorization.init_app(app)
-    authorization.register_grant(grants.ClientCredentialsGrant)
+    authorization.register_grant(ClientCredentialsGrant)
+
+
+class ClientCredentialsGrant(grants.ClientCredentialsGrant):
+    TOKEN_ENDPOINT_AUTH_METHODS = [
+        'client_secret_basic', 'client_secret_post'
+    ]
