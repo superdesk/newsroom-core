@@ -96,6 +96,7 @@ export function postNavigation() {
                     notify.success(gettext('Navigation created successfully'));
                 }
                 dispatch(fetchNavigations());
+                dispatch(fetchProducts());
             })
             .catch((error) => errorHandler(error, dispatch, setError));
 
@@ -136,24 +137,6 @@ export function fetchProducts() {
             .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
-
-
-/**
- * Saves products for a navigation
- *
- */
-export function saveProducts(products) {
-    return function (dispatch, getState) {
-        const navigation = getState().navigationToEdit;
-        return server.post(`/navigations/${navigation._id}/products`, {products})
-            .then(() => {
-                notify.success(gettext('Navigation updated successfully'));
-                dispatch(fetchProducts());
-            })
-            .catch((error) => errorHandler(error, dispatch, setError));
-    };
-}
-
 
 export function initViewData(data) {
     return function (dispatch) {
