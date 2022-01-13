@@ -17,7 +17,7 @@ function MonitoringList({list, onClick, activeMonitoringProfileId, companiesById
     return (
         <section className="content-main">
             <div className="list-items-container">
-                <table className="table table-hover">
+                <table className="table table-hover" tabIndex='-1'>
                     <thead>
                         <tr>
                             <th>{ gettext('Name') }</th>

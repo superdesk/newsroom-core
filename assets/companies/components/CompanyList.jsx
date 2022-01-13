@@ -19,7 +19,7 @@ function CompanyList({companies, onClick, activeCompanyId, companyTypes, showSub
     return (
         <section className="content-main">
             <div className="list-items-container">
-                <table className="table table-hover">
+                <table className="table table-hover" tabIndex='-1'>
                     <thead>
                         <tr>
                             <th>{ gettext('Name') }</th>
