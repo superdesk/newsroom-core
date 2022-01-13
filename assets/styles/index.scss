@@ -90,6 +90,10 @@ label {
     tr {
         outline: 1px solid transparent;
         border-bottom: 1px solid #e9ecef;
+
+        &:focus-visible {
+            box-shadow: 0 0 0 1px rgb(0 172 236 / 60%), 0 0 3px 4px rgb(0 172 236 / 40%);
+        }
     }
     td {
         padding: 1rem .75rem;
@@ -1210,7 +1214,7 @@ article.list {
     margin-bottom: 10px;
     padding: 0 15px;
     font-size: 1.25rem;
-    font-weight: 300;
+    font-weight: 400;
     color: $gray-dark;
 }
 .wire-articles__group {
@@ -1989,8 +1993,8 @@ article.list {
 }
 
 .wire-articles__item__meta-info {
-    font-size: 0.8125rem;
-    color: $gray-dark;
+    font-size: 0.875rem;
+    color: $body-text;
     line-height: 1.2;
     display: flex;
     flex-direction: column;
@@ -2360,8 +2364,7 @@ a.wire-articles__versions {
         }
     }
 
-    &--remote {
-        color: #b2acac;
+    &--remote {        
         font-size: 0.95rem !important;
     }
 
@@ -2428,8 +2431,7 @@ a.wire-articles__versions {
 
 .wire-column__preview__author {
     color: #626262;
-    font-size: 0.9375rem;
-    font-weight: 300;
+    font-size: 0.9375rem;    
     .bold {
         color: #222222;
         font-weight: 500;
@@ -2646,8 +2648,6 @@ a.wire-articles__versions {
 }
 .coverage-item__text-label {
     color: #333;
-    opacity: 0.8;
-    font-weight: 300;
 }
 .coverage-item--element-grow {
     flex-grow: 1;

@@ -8,7 +8,7 @@ function CompanyListItem({company, type, isActive, onClick, showSubscriberId}) {
     return (
         <tr key={company._id}
             className={classNames({'table--selected': isActive, 'table-secondary': !company.is_enabled})}
-            onClick={() => onClick(company._id)}>
+            onClick={() => onClick(company._id)} tabIndex='0'>
             <td className="name">{company.name}</td>
             <td className="type">{type ? gettext(type.name) : ''}</td>
             {showSubscriberId && <td>{company.sd_subscriber_id}</td>}

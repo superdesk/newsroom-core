@@ -9,7 +9,7 @@ function MonitoringItem({item, isActive, onClick, companiesById}) {
         <tr key={item._id}
             className={`${isActive?'table--selected':''}
             ${(item.company && companiesById[item.company] && !get(companiesById[item.company],'is_enabled')) || !item.is_enabled?'table-secondary':null}`}
-            onClick={() => onClick(item._id)}>
+            onClick={() => onClick(item._id)} tabIndex='0'>
             <td className="name">{item.name}</td>
             <td>{item.subject}</td>
             <td>{item.description}</td>

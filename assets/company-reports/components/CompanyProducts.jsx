@@ -17,7 +17,7 @@ function getProductDetails(products) {
 function CompanyProducts({results, print}) {
 
     const list = results && results.map((item) =>
-        [<tr key={item._id} className="table-secondary">
+        [<tr key={item._id} className="table-secondary" tabIndex='0'>
             <td>{item.name}</td>
             <td>{item.is_enabled.toString()}</td>
             <td>{item.products.length}</td>
