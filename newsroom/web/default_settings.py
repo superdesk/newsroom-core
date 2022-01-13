@@ -115,6 +115,7 @@ BLUEPRINTS = [
     'newsroom.news_api.api_tokens',
     'newsroom.monitoring',
     'newsroom.clients',
+    'newsroom.auth_server.oauth2',
 ]
 
 CORE_APPS = [
@@ -149,6 +150,7 @@ CORE_APPS = [
     'newsroom.monitoring',
     'newsroom.company_expiry_alerts',
     'newsroom.clients',
+    'newsroom.auth_server.client',
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -385,3 +387,5 @@ PREPEND_EMBARGOED_TO_WIRE_SEARCH = False
 
 #: allow embargoed items on dashboard
 DASHBOARD_EMBARGOED = True
+AUTH_SERVER_EXPIRATION_DELAY = env("AUTH_SERVER_EXPIRATION_TIME", 60 * 60 * 24)  # 1 day by default
+AUTH_SERVER_SHARED_SECRET = env("AUTH_SERVER_SHARED_SECRET", "")
