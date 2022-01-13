@@ -27,7 +27,7 @@ class OAuth2Client(ClientMixin):
         return str(self._id)
 
     def check_token_endpoint_auth_method(self, method):
-        return method == "client_secret_basic"
+        return method in ["client_secret_basic", "client_secret_post"]
 
     def check_client_secret(self, client_secret):
         return bcrypt.checkpw(client_secret.encode(), self.pwd_hash.encode())
