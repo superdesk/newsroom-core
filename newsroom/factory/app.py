@@ -20,6 +20,7 @@ from superdesk.datalayer import SuperdeskDataLayer
 from superdesk.json_utils import SuperdeskJSONEncoder
 from superdesk.validator import SuperdeskValidator
 from superdesk.logging import configure_logging
+from elasticapm.contrib.flask import ElasticAPM
 
 from newsroom.auth import SessionAuth
 from newsroom.utils import is_json_request
@@ -49,6 +50,9 @@ class BaseNewsroomApp(eve.Eve):
         self.mail = None
         self.cache = None
         self.static_folder = None
+        self.apm = None
+        self.__self__ = self
+        self.__func__ = None
 
         super(BaseNewsroomApp, self).__init__(
             import_name,
@@ -71,6 +75,7 @@ class BaseNewsroomApp(eve.Eve):
         newsroom.flask_app = self
         self.settings = self.config
 
+        self.setup_apm()
         self.setup_media_storage()
         self.setup_babel()
         self.setup_blueprints(self.config['BLUEPRINTS'])
@@ -182,3 +187,15 @@ class BaseNewsroomApp(eve.Eve):
 
         if flask.g:  # reset settings cache
             flask.g.settings = None
+
+    def setup_apm(self):
+        if self.config.get("APM_SERVER_URL") and self.config.get("APM_SECRET_TOKEN"):
+            self.config["ELASTIC_APM"] = {
+                "DEBUG": self.debug,
+                "SERVICE_NAME": self.config.get("APM_SERVICE_NAME") or self.config["SITE_NAME"],
+                "SERVER_URL": self.config["APM_SERVER_URL"],
+                "SECRET_TOKEN": self.config["APM_SECRET_TOKEN"],
+                "TRANSACTIONS_IGNORE_PATTERNS": ["^OPTIONS "],
+            }
+
+            self.apm = ElasticAPM(self)
