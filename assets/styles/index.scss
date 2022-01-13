@@ -92,7 +92,7 @@ label {
         border-bottom: 1px solid #e9ecef;
 
         &:focus-visible {
-            box-shadow: 0 0 0 1px rgb(0 172 236 / 60%), 0 0 3px 4px rgb(0 172 236 / 40%);
+            box-shadow: 0 0 0 1px rgba(0, 172, 236, .6), 0 0 3px 4px rgba(0, 172, 236, .4);
         }
     }
     td {
