@@ -52,10 +52,10 @@ export function UrgencyLabel ({item, listConfig, alwaysShow = false}) {
 
     return (
         <span
-            className={'label label-rounded label-rounded--urgency mr-2'}
+            className={'label label-rounded label--warning mr-2'}
             style={{
                 color: urgencyHighlightColor,
-                backgroundColor: urgencyHighlightColor + '20', // color + alpha channel
+                backgroundColor: urgencyHighlightColor + '15', // color + alpha channel
             }}
         >
             {/*{gettext('urgency')} {item.urgency}*/}

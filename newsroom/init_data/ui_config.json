@@ -28,7 +28,7 @@
         },
         "list": {
             "highlights": {
-                "urgency": ["#C20000", "#BE8502"]
+                "urgency": ["#C20000", "#AF821A"]
             },
             "metadata_fields": [
               "embargo",

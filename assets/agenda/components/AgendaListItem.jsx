@@ -129,14 +129,13 @@ class AgendaListItem extends React.Component {
         return (
             <article key={item._id}
                 className={classes.card}
-                tabIndex='0'
                 ref={this.setArticleRef}
                 onClick={this.onArticleClick}
                 onDoubleClick={this.onArticleDoubleClick}
                 onMouseEnter={this.onMouseEnter}
                 onKeyDown={this.onKeyDown}
             >
-                <div className={classes.wrap}>
+                <div className={classes.wrap} tabIndex='0'>
                     <div className={classes.article} key="article">
                         <h4 className='wire-articles__item-headline'>
                             <div className={classes.select} onClick={this.stopPropagation}>

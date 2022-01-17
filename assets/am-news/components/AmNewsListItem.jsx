@@ -93,13 +93,12 @@ class AmNewsListItem extends React.Component {
         return (
             <article key={item._id}
                 className={cardClassName}
-                tabIndex='0'
                 ref={(elem) => this.articleElem = elem}
                 onClick={() => onClick(item)}
                 onDoubleClick={() => onDoubleClick(item)}
                 onKeyDown={this.onKeyDown}
             >
-                <div className={wrapClassName}>
+                <div className={wrapClassName} tabIndex='0'>
                     <div className='wire-articles__item-text'>
                         <h4 className='wire-articles__item-headline'>
                             <div className={selectClassName} onClick={this.stopPropagation}>

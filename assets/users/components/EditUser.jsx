@@ -105,6 +105,13 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                         value={user.expiry_alert}
                         onChange={onChange} />
 
+                    <CheckboxInput
+                        name='manage_company_topics'
+                        label={gettext('Manage Company Topics')}
+                        value={user.manage_company_topics}
+                        onChange={onChange}
+                    />
+
                 </div>
 
                 <div className='list-item__preview-footer'>

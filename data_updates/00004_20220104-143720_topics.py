@@ -5,33 +5,26 @@
 # at https://www.sourcefabric.org/superdesk/license
 #
 # Author  : Mark Pittaway
-# Creation: 2021-11-18 18:11
+# Creation: 2022-01-04 14:37
 
 from eve.utils import config
 from superdesk.commands.data_updates import DataUpdate as _DataUpdate
-from superdesk import get_resource_service
 
 
 class DataUpdate(_DataUpdate):
     resource = 'topics'
 
     def forwards(self, mongodb_collection, mongodb_database):
-        users = {
-            user['_id']: user
-            for user in get_resource_service('users').get(req=None, lookup={})
-        }
-
         for topic in mongodb_collection.find({}):
+            if not topic.get('user'):
+                pass
+
             print(mongodb_collection.update(
                 {config.ID_FIELD: topic.get(config.ID_FIELD)},
                 {
                     '$set': {
-                        'subscribers': [topic['user']] if topic.get('notifications', False) else [],
-                        'company': users[topic['user']].get('company'),
-                        'is_global': topic.get('is_global', False),
-                    },
-                    '$unset': {
-                        'notifications': ''
+                        'original_creator': topic['user'],
+                        'version_creator': topic['user'],
                     }
                 }
             ))
@@ -41,13 +34,9 @@ class DataUpdate(_DataUpdate):
             print(mongodb_collection.update(
                 {config.ID_FIELD: topic.get(config.ID_FIELD)},
                 {
-                    '$set': {
-                        'notifications': topic['user'] in (topic.get('subscribers') or [])
-                    },
                     '$unset': {
-                        'subscribers': '',
-                        'company': '',
-                        'is_global': ''
+                        'original_creator': '',
+                        'version_creator': '',
                     }
                 }
             ))

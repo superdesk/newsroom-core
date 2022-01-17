@@ -127,6 +127,7 @@ CORE_APPS = [
     'content_api.auth',
     'content_api.publish',
     'newsroom.users',
+    'newsroom.auth.oauth',
     'newsroom.companies',
     'newsroom.wire',
     'newsroom.topics',
@@ -387,5 +388,21 @@ PREPEND_EMBARGOED_TO_WIRE_SEARCH = False
 
 #: allow embargoed items on dashboard
 DASHBOARD_EMBARGOED = True
+
+#: OAuth settings
 AUTH_SERVER_EXPIRATION_DELAY = env("AUTH_SERVER_EXPIRATION_TIME", 60 * 60 * 4)  # 4 hours by default
 AUTH_SERVER_SHARED_SECRET = env("AUTH_SERVER_SHARED_SECRET", "")
+
+#: Google OAuth Settings
+#:
+#: .. versionadded:: 2.1
+#:
+GOOGLE_CLIENT_ID = env("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = env("GOOGLE_CLIENT_SECRET")
+GOOGLE_LOGIN = True
+
+
+#: Elastic APM
+APM_SERVER_URL = env("APM_SERVER_URL")
+APM_SECRET_TOKEN = env("APM_SECRET_TOKEN")
+APM_SERVICE_NAME = env("APM_SERVICE_NAME") or SITE_NAME

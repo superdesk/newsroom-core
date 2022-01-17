@@ -59,7 +59,7 @@ class Server {
         return fetch(url, options({
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(data),
+            body: data ? JSON.stringify(data) : null,
         })).then(checkStatus);
     }
 

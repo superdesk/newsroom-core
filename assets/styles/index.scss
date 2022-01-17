@@ -90,6 +90,10 @@ label {
     tr {
         outline: 1px solid transparent;
         border-bottom: 1px solid #e9ecef;
+
+        &:focus-visible {
+            box-shadow: 0 0 0 1px rgba(0, 172, 236, .6), 0 0 3px 4px rgba(0, 172, 236, .4);
+        }
     }
     td {
         padding: 1rem .75rem;
@@ -614,6 +618,10 @@ article.list {
 
     &--no-scroll {
         overflow: visible !important;
+    }
+
+    &--no-padding {
+        padding: 0;
     }
 }
 .list-item__preview-footer {
@@ -1206,7 +1214,7 @@ article.list {
     margin-bottom: 10px;
     padding: 0 15px;
     font-size: 1.25rem;
-    font-weight: 300;
+    font-weight: 400;
     color: $gray-dark;
 }
 .wire-articles__group {
@@ -1846,7 +1854,7 @@ article.list {
 }
 .wire-articles__item-headline-inner {
     margin-bottom: 4px;
-    @include sm {    
+    @include sm {
         display: flex;
         align-items: flex-start;
         margin-bottom: 0;
@@ -1985,8 +1993,8 @@ article.list {
 }
 
 .wire-articles__item__meta-info {
-    font-size: 0.8125rem;
-    color: $gray-dark;
+    font-size: 0.875rem;
+    color: $body-text;
     line-height: 1.2;
     display: flex;
     flex-direction: column;
@@ -2356,8 +2364,7 @@ a.wire-articles__versions {
         }
     }
 
-    &--remote {
-        color: #b2acac;
+    &--remote {        
         font-size: 0.95rem !important;
     }
 
@@ -2424,8 +2431,7 @@ a.wire-articles__versions {
 
 .wire-column__preview__author {
     color: #626262;
-    font-size: 0.9375rem;
-    font-weight: 300;
+    font-size: 0.9375rem;    
     .bold {
         color: #222222;
         font-weight: 500;
@@ -2642,8 +2648,6 @@ a.wire-articles__versions {
 }
 .coverage-item__text-label {
     color: #333;
-    opacity: 0.8;
-    font-weight: 300;
 }
 .coverage-item--element-grow {
     flex-grow: 1;
@@ -3216,6 +3220,11 @@ a.wire-articles__versions {
     @include md {
         padding: 10px 25px 16px 25px;
     }
+}
+
+.simple-card--selected {
+    border: 3px solid rgba(0, 172, 236, .4) !important;
+    outline: 1px solid $main-blue !important;
 }
 
 .pull-right {

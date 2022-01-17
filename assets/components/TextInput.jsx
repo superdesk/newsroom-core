@@ -41,7 +41,7 @@ function TextInput({
                     {...props}
                 />
                 {error && <div className="alert alert-danger">{error}</div>}
-                {description && <small className="form-text text-muted">{description}</small>}
+                {description && <small className="form-text">{description}</small>}
             </div>
         </InputWrapper>
     );
