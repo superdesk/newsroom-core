@@ -12,7 +12,7 @@ def test_oauth_clients(client):
 
     assert response.status_code == 201
     company = get_resource_service('clients').find_one(req=None, name='client1')
-    
+
     # Update an existing company
     response = client.post('/clients/{}'.format(str(company['_id'])), data=json.dumps({
         'name': 'client2'
