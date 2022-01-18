@@ -9,7 +9,7 @@ from superdesk import get_resource_service
 from werkzeug.exceptions import NotFound
 
 from newsroom.decorator import admin_only, account_manager_only
-from newsroom.clients import blueprint
+from newsroom.oauth_clients import blueprint
 from newsroom.utils import query_resource, find_one, get_json_or_400
 from superdesk.utils import gen_password
 

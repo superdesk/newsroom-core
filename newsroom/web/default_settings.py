@@ -114,7 +114,7 @@ BLUEPRINTS = [
     'newsroom.settings',
     'newsroom.news_api.api_tokens',
     'newsroom.monitoring',
-    'newsroom.clients',
+    'newsroom.oauth_clients',
     'newsroom.auth_server.oauth2',
 ]
 
@@ -150,7 +150,7 @@ CORE_APPS = [
     'newsroom.news_api.api_audit',
     'newsroom.monitoring',
     'newsroom.company_expiry_alerts',
-    'newsroom.clients',
+    'newsroom.oauth_clients',
     'newsroom.auth_server.client',
 ]
 
@@ -391,7 +391,7 @@ DASHBOARD_EMBARGOED = True
 
 #: OAuth settings
 AUTH_SERVER_EXPIRATION_DELAY = env("AUTH_SERVER_EXPIRATION_TIME", 60 * 60 * 4)  # 4 hours by default
-AUTH_SERVER_SHARED_SECRET = env("AUTH_SERVER_SHARED_SECRET", "")
+AUTH_SERVER_SHARED_SECRET = env("AUTH_SERVER_SHARED_SECRET", "a")
 
 #: Google OAuth Settings
 #:
