@@ -3,6 +3,9 @@ from authlib.jose import jwt
 from authlib.jose.errors import BadSignatureError, ExpiredTokenError, DecodeError
 from flask import current_app as app
 from eve.auth import TokenAuth
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class JWTAuth(TokenAuth):
@@ -20,6 +23,7 @@ class JWTAuth(TokenAuth):
         :param method: HTTP method being executed (POST, GET, etc.)
         """
         if not app.config.get("AUTH_SERVER_SHARED_SECRET"):
+            logger.warning('AUTH_SERVER_SHARED_SECRET is not configured in default settings')
             return False
 
         # decode jwt

@@ -60,7 +60,7 @@ export function fetchClients() {
         dispatch(queryClients());
         const query = searchQuerySelector(getState()) || '';
 
-        return server.get(`/clients/search?q=${query}`)
+        return server.get(`/oauth_clients/search?q=${query}`)
             .then((data) => {
                 dispatch(getClients(data));
             })
@@ -76,7 +76,7 @@ export function fetchClients() {
 export function postClient() {
     return function (dispatch, getState) {
         const client = getState().clientToEdit;
-        const url = `/clients/${client._id ? client._id : 'new'}`;
+        const url = `/oauth_clients/${client._id ? client._id : 'new'}`;
 
         return server.post(url, client)
             .then((data) => {
@@ -102,7 +102,7 @@ export function deleteClient() {
     return function (dispatch, getState) {
 
         const client = getState().clientToEdit;
-        const url = `/clients/${client._id}`;
+        const url = `/oauth_clients/${client._id}`;
 
         return server.del(url)
             .then(() => {

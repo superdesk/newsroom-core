@@ -18,7 +18,7 @@ class ClientResource(newsroom.Resource):
     }
 
     datasource = {
-        'source': 'clients',
+        'source': 'oauth_clients',
         'default_sort': [('name', 1)]
     }
     item_methods = ['GET', 'PATCH', 'DELETE']
