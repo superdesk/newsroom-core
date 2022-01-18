@@ -137,7 +137,6 @@ def share():
         }
         send_template_email(
             to=[user["email"]],
-            subject=gettext("From %s: %s" % (app.config["SITE_NAME"], topic["label"])),
             template="share_topic",
             template_kwargs=template_kwargs,
         )

@@ -1,5 +1,3 @@
-from flask_babel import gettext
-
 from newsroom.email import send_template_email
 from newsroom.utils import get_agenda_dates, get_location_string, get_links, get_public_contacts, url_for_agenda
 from newsroom.template_filters import is_admin_or_internal
@@ -16,14 +14,17 @@ def send_coverage_notification_email(user, agenda, wire_item):
         )
         send_template_email(
             to=[user["email"]],
-            subject=gettext("New coverage"),
             template="agenda_new_coverage_email",
             template_kwargs=template_kwargs,
         )
 
 
-def send_agenda_notification_email(user, agenda, message, subject, original_agenda, coverage_updates,
-                                   related_planning_removed, coverage_updated, time_updated):
+def send_agenda_notification_email(
+    user, agenda, message,
+    original_agenda, coverage_updates,
+    related_planning_removed, coverage_updated, time_updated,
+    coverage_modified
+):
     if agenda and user.get('receive_email'):
         template_kwargs = dict(
             message=message,
@@ -38,10 +39,10 @@ def send_agenda_notification_email(user, agenda, message, subject, original_agen
             related_planning_removed=related_planning_removed,
             coverage_updated=coverage_updated,
             time_updated=time_updated,
+            coverage_modified=coverage_modified,
         )
         send_template_email(
             to=[user["email"]],
-            subject=subject,
             template="agenda_updated_email",
             template_kwargs=template_kwargs,
         )
@@ -68,7 +69,6 @@ def send_coverage_request_email(user, message, item):
     email = user.get('email')
 
     item_name = item.get('name') or item.get('slugline')
-    subject = gettext('Coverage inquiry: {}'.format(item_name))
     user_company = get_user_company(user)
     if user_company:
         user_company = user_company.get('name')
@@ -80,13 +80,12 @@ def send_coverage_request_email(user, message, item):
         url=url,
         company=user_company,
         recipients=recipients,
-        subject=subject,
-        item_name=item_name
+        item_name=item_name,
+        item=item,
     )
 
     send_template_email(
         to=recipients,
-        subject=subject,
         template="coverage_request_email",
         template_kwargs=template_kwargs,
     )

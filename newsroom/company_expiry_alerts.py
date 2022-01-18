@@ -11,8 +11,6 @@
 import datetime
 import logging
 
-from flask_babel import gettext
-
 from superdesk import config
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
@@ -69,13 +67,14 @@ class CompanyExpiryAlerts():
                 users = get_resource_service('users').find({'company': company.get(config.ID_FIELD),
                                                             'expiry_alert': True})
                 if users.count() > 0:
-                    template_kwargs = {'expiry_date': company.get('expiry_date')}
+                    template_kwargs = {
+                        "expiry_date": company.get("expiry_date"),
+                        "expires_on": company.get("expiry_date").strftime("%d-%m-%Y"),
+                    }
                     logger.info('{} Sending to following users of company {}: {}'
                                 .format(self.log_msg, company.get('name'), recipients))
-                    expiry_str = company.get('expiry_date').strftime('%d-%m-%Y')
                     send_template_email(
                         to=[u["email"] for u in users],
-                        subject=gettext(f"Your Company's account is expiring on {expiry_str}"),
                         template="company_expiry_alert_user",
                         template_kwargs=template_kwargs,
                     )
@@ -84,14 +83,13 @@ class CompanyExpiryAlerts():
                 return  # No one else to send
 
             template_kwargs = {
-                'companies': sorted(companies, key=lambda k: k['expiry_date']),
-                'expiry_date': expiry_time
+                "companies": sorted(companies, key=lambda k: k["expiry_date"]),
+                "expiry_date": expiry_time,
+                "expires_on": expiry_time.strftime("%d-%m-%Y")
             }
             logger.info('{} Sending to following expiry administrators: {}'.format(self.log_msg, recipients))
-            expiry_str = expiry_time.strftime("%d-%m-%Y")
             send_template_email(
                 to=recipients,
-                subject=gettext(f"Companies expired or due to expire within the next 7 days ({expiry_str})"),
                 template="company_expiry_email",
                 template_kwargs=template_kwargs,
             )

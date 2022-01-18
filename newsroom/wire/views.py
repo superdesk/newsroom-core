@@ -258,20 +258,22 @@ def share():
     items = get_items_for_user_action(data.get('items'), item_type)
     for user_id in data['users']:
         user = superdesk.get_resource_service('users').find_one(req=None, _id=user_id)
-        subject = items[0].get('headline')
+        subject_name = items[0].get('headline')
 
-        # If it's an event, 'name' is the subject
+        # If it's an event, 'name' is the subject_name
         if items[0].get('event'):
-            subject = items[0]['name']
+            subject_name = items[0]['name']
 
         if not user or not user.get('email'):
             continue
         template_kwargs = {
-            'recipient': user,
-            'sender': current_user,
-            'items': items,
-            'message': data.get('message'),
-            'section': request.args.get('type', 'wire')
+            "app_name": app.config["SITE_NAME"],
+            "recipient": user,
+            "sender": current_user,
+            "items": items,
+            "message": data.get("message"),
+            "section": request.args.get("type", "wire"),
+            "subject_name": subject_name
         }
         if item_type == 'agenda':
             template_kwargs['maps'] = data.get('maps')
@@ -283,7 +285,6 @@ def share():
 
         send_template_email(
             to=[user["email"]],
-            subject=gettext("From %s: %s" % (app.config["SITE_NAME"], subject)),
             template=f"share_{item_type}",
             template_kwargs=template_kwargs,
         )

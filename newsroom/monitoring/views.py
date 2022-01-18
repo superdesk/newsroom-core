@@ -245,20 +245,20 @@ def share():
     for user_id in data['users']:
         user = get_resource_service('users').find_one(req=None, _id=user_id)
         template_kwargs = {
-            'recipient': user,
-            'sender': current_user,
-            'message': data.get('message'),
-            'item_name': 'Monitoring Report',
+            "app_name": app.config["SITE_NAME"],
+            "profile": monitoring_profile,
+            "recipient": user,
+            "sender": current_user,
+            "message": data.get("message"),
+            "item_name": "Monitoring Report",
         }
         formatter = app.download_formatters['monitoring_pdf']['formatter']
         monitoring_profile['format_type'] = 'monitoring_pdf'
         _file = get_monitoring_file(monitoring_profile, items)
         attachment = base64.b64encode(_file.read())
-        profile_name = monitoring_profile.get("subject", monitoring_profile["name"])
 
         send_template_email(
             to=[user["email"]],
-            subject=gettext("From %s: %s" % (app.config["SITE_NAME"], profile_name)),
             template="share_items",
             template_kwargs=template_kwargs,
             attachments_info=[{

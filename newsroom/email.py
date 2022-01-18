@@ -2,6 +2,7 @@ import base64
 from typing import List, Optional, Dict, Any
 from typing_extensions import TypedDict
 
+from superdesk import get_resource_service
 from superdesk.emails import SuperdeskMessage  # it handles some encoding issues
 from flask import current_app, render_template, url_for
 from flask_babel import gettext
@@ -75,7 +76,6 @@ def send_email(to, subject, text_body, html_body=None, sender=None, attachments_
 def send_new_signup_email(user):
     send_template_email(
         to=current_app.config["SIGNUP_EMAIL_RECIPIENTS"].split(","),
-        subject=gettext("A new newsroom signup request"),
         template="signup_request_email",
         template_kwargs=dict(
             url=url_for("settings.app", app_id="users", _external=True),
@@ -129,13 +129,18 @@ def get_language_template_name(template_name: str, language: str, extension: str
 
 def send_template_email(
     to: List[str],
-    subject: str,
     template: str,
     template_kwargs: Optional[Dict[str, Any]] = None,
     **kwargs
 ):
     template_kwargs = {} if not template_kwargs else template_kwargs
+    email_templates = get_resource_service("email_templates")
     for language, group in map_email_recipients_by_language(to, template).items():
+        # ``coverage_request_email`` requires ``subject`` variable for the body template
+        # so add the generated/rendered subject to kwargs (if subject is not already defined)
+        subject = email_templates.get_translated_subject(template, language, **template_kwargs)
+        template_kwargs.setdefault("subject", subject)
+
         send_email(
             to=group["emails"],
             subject=subject,
@@ -157,10 +162,8 @@ def send_validate_account_email(user_name, user_email, token):
     url = url_for('auth.validate_account', token=token, _external=True)
     hours = current_app.config['VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE'] * 24
 
-    subject = current_app.config.get('ACCOUNT_CREATED_EMAIL_SUBJECT', gettext('{} account created'.format(app_name)))
     send_template_email(
         to=[user_email],
-        subject=subject,
         template="validate_account_email",
         template_kwargs=dict(
             app_name=app_name,
@@ -183,10 +186,8 @@ def send_new_account_email(user_name, user_email, token):
     url = url_for('auth.reset_password', token=token, _external=True)
     hours = current_app.config['VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE'] * 24
 
-    subject = current_app.config.get('ACCOUNT_CREATED_EMAIL_SUBJECT', gettext('{} account created'.format(app_name)))
     send_template_email(
         to=[user_email],
-        subject=subject,
         template="account_created_email",
         template_kwargs=dict(
             app_name=app_name,
@@ -209,10 +210,8 @@ def send_reset_password_email(user_name, user_email, token):
     url = url_for('auth.reset_password', token=token, _external=True)
     hours = current_app.config['RESET_PASSWORD_TOKEN_TIME_TO_LIVE'] * 24
 
-    subject = gettext('{} password reset').format(app_name)
     send_template_email(
         to=[user_email],
-        subject=subject,
         template="reset_password_email",
         template_kwargs=dict(
             app_name=app_name,
@@ -234,7 +233,6 @@ def send_new_item_notification_email(user, topic_name, item, section='wire'):
 def _send_new_wire_notification_email(user, topic_name, item, section):
     url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
-    subject = gettext('New story for followed topic: {}').format(topic_name)
     template_kwargs = dict(
         app_name=current_app.config["SITE_NAME"],
         is_topic=True,
@@ -247,8 +245,7 @@ def _send_new_wire_notification_email(user, topic_name, item, section):
     )
     send_template_email(
         to=recipients,
-        subject=subject,
-        template="new_item_notification",
+        template="new_wire_notification_email",
         template_kwargs=template_kwargs,
     )
 
@@ -256,7 +253,6 @@ def _send_new_wire_notification_email(user, topic_name, item, section):
 def _send_new_agenda_notification_email(user, topic_name, item):
     url = url_for_agenda(item, _external=True)
     recipients = [user['email']]
-    subject = gettext('New update for followed agenda: {}').format(topic_name)
     template_kwargs = dict(
         app_name=current_app.config["SITE_NAME"],
         is_topic=True,
@@ -274,8 +270,7 @@ def _send_new_agenda_notification_email(user, topic_name, item):
     )
     send_template_email(
         to=recipients,
-        subject=subject,
-        template="new_item_notification",
+        template="new_agenda_notification_email",
         template_kwargs=template_kwargs,
     )
 
@@ -291,7 +286,6 @@ def _send_history_match_wire_notification_email(user, item, section):
     app_name = current_app.config['SITE_NAME']
     url = url_for('wire.item', _id=item['guid'], _external=True)
     recipients = [user['email']]
-    subject = gettext('New update for your previously accessed story: {}').format(item['headline'])
     template_kwargs = dict(
         app_name=app_name,
         is_topic=False,
@@ -303,8 +297,7 @@ def _send_history_match_wire_notification_email(user, item, section):
     )
     send_template_email(
         to=recipients,
-        subject=subject,
-        template="new_item_notification",
+        template="updated_wire_notification_email",
         template_kwargs=template_kwargs,
     )
 
@@ -313,7 +306,6 @@ def _send_history_match_agenda_notification_email(user, item):
     app_name = current_app.config['SITE_NAME']
     url = url_for_agenda(item, _external=True)
     recipients = [user['email']]
-    subject = gettext('New update for your previously accessed agenda: {}').format(item['name'])
     template_kwargs = dict(
         app_name=app_name,
         is_topic=False,
@@ -330,8 +322,7 @@ def _send_history_match_agenda_notification_email(user, item):
     )
     send_template_email(
         to=recipients,
-        subject=subject,
-        template="new_item_notification",
+        template="updated_agenda_notification_email",
         template_kwargs=template_kwargs,
     )
 

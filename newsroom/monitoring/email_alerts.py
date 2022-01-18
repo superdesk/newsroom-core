@@ -15,7 +15,6 @@ from bson import ObjectId
 from urllib.parse import urlparse
 
 from flask import current_app as app
-from flask_babel import gettext
 from eve.utils import ParsedRequest
 from superdesk import get_resource_service, Command
 from superdesk.utc import utcnow, utc_to_local, local_to_utc
@@ -211,15 +210,8 @@ class MonitoringEmailAlerts(Command):
                         attachment = base64.b64encode(_file.read())
                         formatter = app.download_formatters[m['format_type']]['formatter']
 
-                        # If there is only one story to send and the headline is to be used as the subject
-                        if m.get('headline_subject', False) and len(items) == 1:
-                            subject = items[0].get('headline', m.get('subject') or m['name'])
-                        else:
-                            subject = m.get('subject') or m['name']
-
                         send_template_email(
                             to=[u["email"] for u in get_items_by_id([ObjectId(u) for u in m["users"]], "users")],
-                            subject=subject,
                             template="monitoring_email",
                             template_kwargs=template_kwargs,
                             attachments_info=[{
@@ -236,20 +228,19 @@ class MonitoringEmailAlerts(Command):
                         if error_recipients:
                             # Send an email to admin
                             template_kwargs = {
-                                'name': m['name'],
-                                'company': company['name'],
-                                'run_time': now,
+                                "profile": m,
+                                "name": m["name"],
+                                "company": company["name"],
+                                "run_time": now,
                             }
                             send_template_email(
                                 to=error_recipients,
-                                subject=gettext("Error sending alerts for monitoring: {0}".format(m["name"])),
                                 template="monitoring_error",
                                 template_kwargs=template_kwargs,
                             )
                 elif m['schedule'].get('interval') != 'immediate' and m.get('always_send'):
                     send_template_email(
                         to=[u["email"] for u in get_items_by_id([ObjectId(u) for u in m["users"]], "users")],
-                        subject=m.get("subject") or m["name"],
                         template="monitoring_email_no_updates",
                         template_kwargs=template_kwargs,
                     )
