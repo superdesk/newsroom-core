@@ -1,5 +1,12 @@
 # Newshub Changelog
 
+## [2.0.1] 2022-01-18
+### Fixes
+- [NHUB-51] fix: Duplicate image descriptions in xml based downloads (#52)
+- [NHUB-73] add elastic apm setup (#54)
+- [NHUB-56] fix: Add/remove navigations from products on nav post/patch (#53)
+- [NHUB-79] fix(push): Convert str to datetime for agenda notification (#56)
+
 ## [2.0.0] 2022-01-07
 ### Breaking Changes
 - Moved core and app features into separate repositories (newsroom-core & newsroom-app)
