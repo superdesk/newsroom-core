@@ -6,10 +6,13 @@ from newsroom.tests.users import test_login_succeeds_for_admin, init as user_ini
 from newsroom.navigations.navigations import get_navigations_by_company
 
 
+NAV_ID = ObjectId('59b4c5c61d41c8d736852fbf')
+
+
 @fixture(autouse=True)
 def init(app):
     app.data.insert('navigations', [{
-        '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
+        '_id': NAV_ID,
         'name': 'Sport',
         'product_type': 'wire',
         'description': 'Top level sport navigation',
@@ -72,36 +75,71 @@ def test_delete_navigation_removes_references(client):
     assert data[0]['navigations'] == []
 
 
-def test_save_navigation_products(client, app):
-    app.data.insert('navigations', [{
-        '_id': 'n-1',
-        'name': 'Navigation 1',
-        'is_enabled': True,
-        'product_type': 'wire'
-    }])
-
+def test_create_navigation_with_products(client, app):
     app.data.insert('products', [{
         '_id': 'p-1',
         'name': 'Sport',
         'description': 'sport product',
-        'navigations': ['n-1'],
+        'navigations': [],
         'is_enabled': True,
         'product_type': 'wire'
     }, {
         '_id': 'p-2',
         'name': 'News',
         'description': 'news product',
+        'navigations': [],
         'is_enabled': True,
         'product_type': 'wire'
     }])
 
     test_login_succeeds_for_admin(client)
-    client.post('navigations/n-1/products', data=json.dumps({'products': ['p-2']}), content_type='application/json')
+    response = client.post('/navigations/new', data={'navigation': json.dumps({
+        'name': 'Breaking',
+        'description': 'Breaking news',
+        'product_type': 'wire',
+        'is_enabled': True,
+        'products': ['p-2']
+    })})
+    assert response.status_code == 201
+    nav_id = json.loads(response.get_data()).get('_id')
+    assert nav_id
+
+    response = client.get('/navigations')
+    assert 'Breaking news' in response.get_data(as_text=True)
 
     response = client.get('/products')
     data = json.loads(response.get_data())
     assert [p for p in data if p['_id'] == 'p-1'][0]['navigations'] == []
-    assert [p for p in data if p['_id'] == 'p-2'][0]['navigations'] == ['n-1']
+    assert [p for p in data if p['_id'] == 'p-2'][0]['navigations'] == [nav_id]
+
+
+def test_update_navigation_with_products(client, app):
+    app.data.insert('products', [{
+        '_id': 'p-1',
+        'name': 'Sport',
+        'description': 'sport product',
+        'navigations': [],
+        'is_enabled': True,
+        'product_type': 'wire'
+    }, {
+        '_id': 'p-2',
+        'name': 'News',
+        'description': 'news product',
+        'navigations': [str(NAV_ID)],
+        'is_enabled': True,
+        'product_type': 'wire'
+    }])
+
+    test_login_succeeds_for_admin(client)
+    client.post(f'navigations/{NAV_ID}', data={'navigation': json.dumps({
+        'name': 'Sports 2',
+        'products': ['p-1']
+    })})
+
+    response = client.get('/products')
+    data = json.loads(response.get_data())
+    assert [p for p in data if p['_id'] == 'p-1'][0]['navigations'] == [str(NAV_ID)]
+    assert [p for p in data if p['_id'] == 'p-2'][0]['navigations'] == []
 
 
 def test_get_agenda_navigations_by_company_returns_ordered(client, app):

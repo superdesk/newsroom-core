@@ -41,11 +41,18 @@ export default function navigationReducer(state = initialState, action) {
             name: '',
             description: '',
         };
+        const navigationToEdit = action.id ? Object.assign(defaultNavigation, state.navigationsById[action.id]) : null;
+
+        if (navigationToEdit != null) {
+            navigationToEdit.products = state.products
+                .filter((product) => (product.navigations && product.navigations.includes(action.id)))
+                .map((product) => product._id);
+        }
 
         return {
             ...state,
             activeNavigationId: action.id || null,
-            navigationToEdit: action.id ? Object.assign(defaultNavigation, state.navigationsById[action.id]) : null,
+            navigationToEdit: navigationToEdit,
             errors: null,
         };
     }
