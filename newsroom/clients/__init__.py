@@ -10,5 +10,5 @@ from . import views   # noqa
 
 def init_app(app):
     superdesk.register_resource('clients', ClientResource, ClientService, _app=app)
-    app.settings_app('clients', lazy_gettext('Client Management'), weight=100, data=views.get_settings_data,
+    app.settings_app('clients', lazy_gettext('OAuth Clients'), weight=100, data=views.get_settings_data,
                      allow_account_mgr=True)
