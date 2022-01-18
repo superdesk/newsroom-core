@@ -48,7 +48,7 @@ class NewsroomNITFFormatter(SuperdeskNITFFormatter):
 
         for p in root.xpath("//p|figure"):
             if p.tag == 'figure':
-                captions = p.xpath("//figcaption")
+                captions = p.xpath(".//figcaption")
                 if len(captions):
                     para = etree.SubElement(element, "p")
                     para.text = etree.tostring(captions[0], encoding="unicode", method="text")

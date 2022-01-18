@@ -31,14 +31,6 @@ class EditNavigation extends React.Component {
         }
     }
 
-    getNavigationProducts() {
-        const products = this.props.products.filter((product) =>
-            product.navigations && product.navigations.includes(this.props.navigation._id)
-        ).map(p => p._id);
-
-        return {_id: this.props.navigation._id, products};
-    }
-
     render() {
         const tile_images = get(this.props, 'navigation.tile_images') || [];
         const getActiveSection = () => this.props.sections.filter(
@@ -130,13 +122,14 @@ class EditNavigation extends React.Component {
                     }
                     {this.state.activeTab === 'products' &&
                         <EditPanel
-                            parent={this.getNavigationProducts()}
+                            parent={{_id: this.props.navigation._id, products: this.props.navigation.products}}
                             items={this.props.products}
                             field="products"
-                            onSave={this.props.saveProducts}
+                            onSave={this.props.onSave}
                             groups={getActiveSection()}
                             groupField={'product_type'}
                             groupDefaultValue={'wire'}
+                            onChange={this.props.onChange}
                         />
                     }
                 </div>
@@ -153,7 +146,6 @@ EditNavigation.propTypes = {
     onSave: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
-    saveProducts: PropTypes.func.isRequired,
     fetchProducts: PropTypes.func.isRequired,
     sections: sectionsPropType,
 };
