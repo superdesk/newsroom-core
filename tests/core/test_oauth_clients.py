@@ -10,11 +10,11 @@ def test_oauth_clients(client):
         'name': 'client1',
     }), content_type='application/json')
     password = response.json.get('password')
-    
+
     # Check for the client secret
     if not password:
         assert False
-    
+
     assert response.status_code == 201
     oauth_client = get_resource_service('oauth_clients').find_one(req=None, name='client1')
 
