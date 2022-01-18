@@ -1,6 +1,7 @@
 import re
 import flask
 import json
+from typing import List
 
 from bson import ObjectId
 from flask import jsonify, current_app as app
@@ -10,7 +11,7 @@ from superdesk import get_resource_service
 from newsroom.decorator import admin_only
 from newsroom.navigations import blueprint
 from newsroom.products.products import get_products_by_navigation
-from newsroom.utils import get_json_or_400, get_entity_or_404, query_resource, set_original_creator, set_version_creator
+from newsroom.utils import get_entity_or_404, query_resource, set_original_creator, set_version_creator
 from newsroom.upload import get_file
 
 
@@ -43,9 +44,14 @@ def search():
 def create():
     data = json.loads(flask.request.form['navigation'])
     nav_data = _get_navigation_data(data)
+    product_ids = nav_data.pop('products', None)
 
     set_original_creator(nav_data)
     ids = get_resource_service('navigations').post([nav_data])
+
+    if product_ids is not None:
+        add_remove_products_for_navigation(ids[0], product_ids)
+
     return jsonify({'success': True, '_id': ids[0]}), 201
 
 
@@ -58,7 +64,8 @@ def _get_navigation_data(data):
         'description': data.get('description'),
         'is_enabled': data.get('is_enabled'),
         'product_type': data.get('product_type'),
-        'tile_images': data.get('tile_images')
+        'tile_images': data.get('tile_images'),
+        'products': data.get('products'),
     }
 
     for index, tile in enumerate(navigation_data['tile_images'] or []):
@@ -76,9 +83,14 @@ def edit(_id):
 
     data = json.loads(flask.request.form['navigation'])
     nav_data = _get_navigation_data(data)
+    product_ids = nav_data.pop('products', None)
 
     set_version_creator(nav_data)
     get_resource_service('navigations').patch(id=ObjectId(_id), updates=nav_data)
+
+    if product_ids is not None:
+        add_remove_products_for_navigation(_id, product_ids)
+
     return jsonify({'success': True}), 200
 
 
@@ -98,18 +110,12 @@ def delete(_id):
     return jsonify({'success': True}), 200
 
 
-@blueprint.route('/navigations/<_id>/products', methods=['POST'])
-@admin_only
-def save_navigation_products(_id):
-    get_entity_or_404(_id, 'navigations')
-    data = get_json_or_400()
-    products = list(query_resource('products'))
-
+def add_remove_products_for_navigation(nav_id: str, product_ids: List[str]):
+    get_entity_or_404(nav_id, 'navigations')
+    products = query_resource('products')
     db = app.data.get_mongo_collection('products')
     for product in products:
-        if str(product['_id']) in data.get('products', []):
-            db.update_one({'_id': product['_id']}, {'$addToSet': {'navigations': _id}})
+        if str(product['_id']) in product_ids:
+            db.update_one({'_id': product['_id']}, {'$addToSet': {'navigations': nav_id}})
         else:
-            db.update_one({'_id': product['_id']}, {'$pull': {'navigations': _id}})
-
-    return jsonify(), 200
+            db.update_one({'_id': product['_id']}, {'$pull': {'navigations': nav_id}})
