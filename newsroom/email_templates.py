@@ -99,10 +99,7 @@ class EmailTemplatesService(Service):
 
     def get_translated_subject(self, email_id: str, language_code: Optional[str] = None, **kwargs) -> str:
         language_code = language_code or current_app.config["DEFAULT_LANGUAGE"]
-
         email = self.find_one(req=None, _id=email_id)
-        # if not email:
-        #     raise NotFound(gettext("Email template '%(name)s' not found", name=email_id))
 
         try:
             subject = email["subject"]["translations"][language_code.lower()]
