@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 __entities__: OrderedDict = OrderedDict([
     ('users', ('users.json', [], False)),
     ('ui_config', ('ui_config.json', [], True)),
+    ('email_templates', ('email_templates.json', [], True))
 ])
 
 
@@ -76,13 +77,13 @@ class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
 def initialize_data(entity_name=None, path=None, force=False, init_index_only=False):
     """Initialize application with predefined data for various entities.
 
-    Loads predefined data (users, ui_config, etc..) for instance.
+    Loads predefined data (users, ui_config, email_templates, etc..) for instance.
     Mostly used for to load initial data for production instances,
 
     Supported entities:
     ::
 
-        users, ui_config
+        users, ui_config, email_templates
 
     If no --entity-name parameter is supplied, all the entities are inserted.
 
