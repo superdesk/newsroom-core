@@ -8,7 +8,7 @@ module.exports = {
     entry: {
         newsroom_js: path.resolve(__dirname, 'assets/index.js'),
         companies_js: path.resolve(__dirname, 'assets/companies/index.js'),
-        clients_js: path.resolve(__dirname, 'assets/clients/index.js'),
+        oauth_clients_js: path.resolve(__dirname, 'assets/oauth_clients/index.js'),
         users_js: path.resolve(__dirname, 'assets/users/index.js'),
         products_js: path.resolve(__dirname, 'assets/products/index.js'),
         'section-filters_js': path.resolve(__dirname, 'assets/section-filters/index.js'),
