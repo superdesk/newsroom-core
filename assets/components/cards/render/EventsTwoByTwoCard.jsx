@@ -57,7 +57,7 @@ const getEventPanel = (event, index) => {
                     <div className='wire-articles__item__meta'>
                         <div className="wire-articles__item__icons">
                             <span className="wire-articles__item__icon">
-                                <i className="icon--calendar icon--gray-light"></i>
+                                <i className="icon--calendar icon--gray-dark"></i>
                             </span>
                         </div>
                         <div className='wire-articles__item__meta-info'>

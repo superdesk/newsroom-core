@@ -25,7 +25,7 @@ class EditSectionFilter extends React.Component {
                         data-dismiss='modal'
                         aria-label={gettext('Close')}
                         onClick={this.props.onClose}>
-                        <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
+                        <i className="icon--close-thin icon--gray-dark" aria-hidden='true'></i>
                     </button>
                 </div>
                 <AuditInformation item={this.props.sectionFilter} />

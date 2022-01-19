@@ -11,27 +11,32 @@ import {gettext} from '../../utils';
 function AgendaListItemLabels({item, withDate, group, right}) {
     const getLabel = () => {
         let labelText;
+        let labelColor;
         if (isPostponed(item)) {
             labelText = gettext('postponed');
+            labelColor = 'label--blue';
         }
 
         if (isCanceled(item)) {
             labelText = gettext('cancelled');
+            labelColor = 'label--red';
         }
 
         if (isRescheduled(item)) {
             labelText = gettext('rescheduled');
+            labelColor = 'label--orange';
         }
 
         if (get(item, 'event.completed')) {
             labelText = gettext('event completed');
+            labelColor = 'label--green';
         }
 
         if (!labelText) {
             return null;
         }
 
-        return (<div><span className={classNames('label label--orange ml-2', {'pull-right': right})}>{labelText}</span></div>);
+        return (<div><span className={classNames('label ml-2', labelColor, {'pull-right': right})}>{labelText}</span></div>);
         
     };
 

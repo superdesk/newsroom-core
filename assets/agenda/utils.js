@@ -86,9 +86,9 @@ export const WORKFLOW_STATUS_TEXTS = {
 };
 
 export const WORKFLOW_COLORS = {
-    [WORKFLOW_STATUS.DRAFT]: 'icon--gray-light',
-    [WORKFLOW_STATUS.ASSIGNED]: 'icon--mid-blue',
-    [WORKFLOW_STATUS.ACTIVE]: 'icon--cyan',
+    [WORKFLOW_STATUS.DRAFT]: 'icon--gray-dark',
+    [WORKFLOW_STATUS.ASSIGNED]: 'icon--main-blue',
+    [WORKFLOW_STATUS.ACTIVE]: 'icon--purple',
     [WORKFLOW_STATUS.COMPLETED]: 'icon--green',
     [WORKFLOW_STATUS.CANCELLED]: 'icon--red',
 };

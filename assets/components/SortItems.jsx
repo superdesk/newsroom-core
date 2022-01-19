@@ -48,7 +48,7 @@ class SortItems extends React.Component {
                         e.preventDefault();
                         e.stopPropagation();
                         this.onRemove(item);
-                    }}><i className="icon--close-thin icon--gray"></i>
+                    }}><i className="icon--close-thin icon--gray-dark"></i>
                 </button>
             </li>
         );

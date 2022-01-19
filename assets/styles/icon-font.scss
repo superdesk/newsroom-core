@@ -46,11 +46,17 @@
     &.icon--gray-light {
         color: $gray-light;
     }
+    &.icon--gray-dark {
+        color: $gray-dark;
+    }
     &.icon--gray {
         color: $gray-mid;
     }
     &.icon--mid-blue {
         color: $mid-blue;
+    }
+    &.icon--main-blue {
+        color: $main-blue;
     }
     &.icon--mid-blue-light {
         color: $mid-blue-light;
@@ -72,6 +78,9 @@
     }
     &.icon--cyan {
         color: $cyan;
+    }
+    &.icon--purple {
+        color: $purple;
     }
 }
 

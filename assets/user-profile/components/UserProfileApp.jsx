@@ -97,7 +97,7 @@ class UserProfileApp extends React.Component {
                 <div className="profileWrap">
                     <div className="profile__mobile-close d-md-none">
                         <button className="icon-button" aria-label={gettext('Close')} onClick={this.props.hideModal}>
-                            <i className="icon--close-thin icon--gray-light" />
+                            <i className="icon--close-thin icon--gray-dark" />
                         </button>
                     </div>
                     <nav className='profile-side-navigation' id='profile-menu'>

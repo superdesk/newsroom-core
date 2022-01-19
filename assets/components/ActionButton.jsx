@@ -17,7 +17,7 @@ class ActionButton extends React.Component {
 
     render() {
         const classes = classNames(`icon--${this.props.action.icon}`, {
-            'icon--gray': this.props.isVisited || this.props.disabled,
+            'icon--gray-dark': this.props.isVisited || this.props.disabled,
         });
         const {item, group, plan, action, disabled} = this.props;
 
