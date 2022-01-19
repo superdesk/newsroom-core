@@ -26,7 +26,7 @@ def test_item_json(client):
     assert 'headline' in data
 
 
-@mock.patch('newsroom.wire.views.send_email', mock_send_email)
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_share_items(client, app):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',

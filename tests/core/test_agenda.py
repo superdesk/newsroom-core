@@ -149,7 +149,7 @@ def test_item_copy(client, app):
     assert str(user_id) in data['copies']
 
 
-@mock.patch('newsroom.wire.views.send_email', mock_send_email)
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_share_items(client, app, mocker):
     user_ids = app.data.insert('users', [{
         'email': 'foo@bar.com',
@@ -232,7 +232,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
     assert '_aggregations' in data
 
 
-@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_coverage_request(client, app):
     post_json(client, '/settings/general_settings', {'coverage_request_recipients': 'admin@bar.com'})
     with app.mail.record_messages() as outbox:

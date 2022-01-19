@@ -148,6 +148,7 @@ CORE_APPS = [
     'newsroom.news_api.api_audit',
     'newsroom.monitoring',
     'newsroom.company_expiry_alerts',
+    'newsroom.email_templates'
 ]
 
 SITE_NAME = 'AAP Newsroom'

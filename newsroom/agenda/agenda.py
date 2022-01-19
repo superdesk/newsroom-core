@@ -1110,8 +1110,6 @@ class AgendaService(BaseSearchService):
                 agenda['definition_short'] = agenda.get('definition_short', original_agenda.get('definition_short'))
                 agenda['ednote'] = agenda.get('ednote', original_agenda.get('ednote'))
                 agenda['state_reason'] = agenda.get('state_reason', original_agenda.get('state_reason'))
-                subject = '{} -{} updated'.format(agenda['name'] or agenda['headline'] or agenda['slugline'],
-                                                  ' Coverage' if coverage_modified else '')
                 action = 'been updated.'
                 if state_changed:
                     action = 'been {}.'.format(agenda.get('state') if agenda.get('state') != WORKFLOW_STATE.KILLED else
@@ -1147,12 +1145,12 @@ class AgendaService(BaseSearchService):
                         user,
                         agenda,
                         message,
-                        subject,
                         original_agenda,
                         coverage_updates,
                         related_planning_removed,
                         coverage_updated,
                         time_updated,
+                        coverage_modified,
                     )
 
     def get_saved_items_count(self):

@@ -2,6 +2,7 @@ import pytz
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from uuid import uuid4
+from typing import List
 
 import superdesk
 from superdesk.utc import utcnow
@@ -285,6 +286,10 @@ def get_user_dict():
                      if is_company_enabled(user, companies.get(user.get('company')))}
         g.user_dict = user_dict
     return g.user_dict
+
+
+def get_users_by_email(emails: List[str]):
+    return query_resource("users", lookup={"email": {"$in": emails}})
 
 
 def get_company_dict():
