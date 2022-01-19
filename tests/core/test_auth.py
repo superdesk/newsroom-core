@@ -53,7 +53,7 @@ def test_new_user_signup_sends_email(app, client):
 
         assert len(outbox) == 1
         assert outbox[0].recipients == ['admin@bar.com']
-        assert outbox[0].subject == 'A new newsroom signup request'
+        assert outbox[0].subject == 'A new Newshub signup request'
         assert 'newuser@abc.org' in outbox[0].body
         assert 'John' in outbox[0].body
         assert 'Doe' in outbox[0].body

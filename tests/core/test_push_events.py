@@ -736,7 +736,7 @@ def test_push_event_with_files(client, app):
     assert 'foo' == resp.get_data().decode('utf-8')
 
 
-@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_push_story_wont_notify_for_first_publish(client, app, mocker):
     test_item = {
         'type': 'text',
@@ -776,7 +776,7 @@ def assign_active_company(app):
     return current_user['_id']
 
 
-@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     event = deepcopy(test_event)
     post_json(client, '/push', event)
@@ -806,7 +806,7 @@ def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     assert notifications[0]['_id'] == '{}_foo'.format(user_id)
 
 
-@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)
@@ -834,7 +834,7 @@ def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     assert notifications[0]['_id'] == '{}_foo'.format(user_id)
 
 
-@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_added_planning(client, app, mocker):
     event = deepcopy(test_event)
     post_json(client, '/push', event)
@@ -862,7 +862,7 @@ def test_watched_event_sends_notification_for_added_planning(client, app, mocker
     assert notifications[0]['_id'] == '{}_foo'.format(user_id)
 
 
-@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_cancelled_planning(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)
@@ -891,7 +891,7 @@ def test_watched_event_sends_notification_for_cancelled_planning(client, app, mo
     assert notifications[0]['_id'] == '{}_foo'.format(user_id)
 
 
-@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_added_coverage(client, app, mocker):
     event = deepcopy(test_event)
     planning = deepcopy(test_planning)

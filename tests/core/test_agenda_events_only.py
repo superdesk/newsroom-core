@@ -114,7 +114,8 @@ def set_watch_products(app):
     }])
 
 
-@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
+# @mock.patch('newsroom.agenda.email.send_email', mock_send_email)
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     event = deepcopy(test_event)
     post_json(client, '/push', event)
@@ -148,7 +149,8 @@ def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     assert notifications[0]['_id'] == '{}_foo'.format(PUBLIC_USER_ID)
 
 
-@mock.patch('newsroom.agenda.email.send_email', mock_send_email)
+# @mock.patch('newsroom.agenda.email.send_email', mock_send_email)
+@mock.patch('newsroom.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     event = deepcopy(test_event)
     set_watch_products(app)
