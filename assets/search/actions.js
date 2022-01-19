@@ -318,6 +318,19 @@ export function updateSearchParams() {
     };
 }
 
+export function updateFilterStateAndURL(activeFilter, createdFilter) {
+    return function(dispatch, getState) {
+        const state = getState();
+        dispatch(setSearchFilters(activeFilter));
+        dispatch(setSearchCreated(createdFilter));
+        updateRouteParams(
+            {filter: activeFilter, created: createdFilter},
+            state,
+            false
+        );
+    };
+}
+
 export const SET_SEARCH_TOPIC_ID = 'SET_SEARCH_TOPIC_ID';
 export function setSearchTopicId(topicId) {
     return {type: SET_SEARCH_TOPIC_ID, payload: topicId};
