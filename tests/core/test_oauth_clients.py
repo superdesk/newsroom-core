@@ -33,7 +33,7 @@ def test_oauth_clients(client):
     )
     token = token_auth_response.json["access_token"]
 
-    assert JWTAuth.check_auth(token)
+    assert JWTAuth.check_auth(self=None, token=token, allowed_roles=None, resource=None, method=None)
 
     oauth_client = get_resource_service("oauth_clients").find_one(
         req=None, name="client11"
