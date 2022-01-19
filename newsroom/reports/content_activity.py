@@ -29,7 +29,7 @@ def get_items(args):
         'size': CHUNK_SIZE,
         'from': 0,
         'sort': [{'versioncreated': 'asc'}],
-        '_source': ['headline', 'place', 'subject', 'service', 'versioncreated', 'anpa_take_key']
+        '_source': ['_resource', 'headline', 'place', 'subject', 'service', 'versioncreated', 'anpa_take_key']
     }
 
     must_terms = []
@@ -46,7 +46,7 @@ def get_items(args):
         must_terms.append({'range': {'versioncreated': date_range}})
 
     if len(must_terms) > 0:
-        source['query']['bool']['must'].append(must_terms)
+        source['query']['bool']['must'] += must_terms
 
     # Apply the section filters
     section = args['section']
@@ -151,7 +151,7 @@ def get_facets(args):
             must_terms.append({'range': {'versioncreated': date_range}})
 
         if len(must_terms) > 0:
-            query['bool']['must'].append(must_terms)
+            query['bool']['must'] += must_terms
 
         source.update({
             'query': query,
