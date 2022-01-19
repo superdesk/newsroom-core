@@ -1353,7 +1353,7 @@ article.list {
 .wire-articles__item--postponed {
     &:before {
         width: 4px;
-        background-color: $orange;
+        background-color: $main-blue;
     }
     .date-round__number {
         color: $orange;
