@@ -35,7 +35,7 @@ def search():
 @account_manager_only
 def create():
     """
-    Creates the client with given client
+    Creates the client with given client id
     """
     client = get_json_or_400()
 

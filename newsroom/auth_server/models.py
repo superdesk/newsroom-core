@@ -40,7 +40,7 @@ class OAuth2Client(ClientMixin):
 
 
 def query_client(client_id):
-    clients_service = superdesk.get_resource_service("clients")
+    clients_service = superdesk.get_resource_service("oauth_clients")
     try:
         client_data = clients_service.find_one(req=None, _id=ObjectId(client_id))
     except InvalidId as e:
