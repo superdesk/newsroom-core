@@ -218,7 +218,7 @@ def test_send_immediate_alerts(client, app):
         'products': [{'code': '12345'}],
         "versioncreated": utcnow(),
     }])
-    with app.mail.record_messages() as outbox:
+    with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().run(immediate=True)
         assert len(outbox) == 1
         assert len(outbox[0].recipients) == 2
@@ -249,7 +249,7 @@ def test_send_one_hour_alerts(client, app):
         'products': [{'code': '12345'}],
         "versioncreated": even_now - timedelta(minutes=30)
     }])
-    with app.mail.record_messages() as outbox:
+    with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().scheduled_worker(even_now)
         assert len(outbox) == 1
         assert len(outbox[0].recipients) == 2
@@ -280,7 +280,7 @@ def test_send_two_hour_alerts(client, app):
         'products': [{'code': '12345'}],
         "versioncreated": even_now - timedelta(minutes=90)
     }])
-    with app.mail.record_messages() as outbox:
+    with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().scheduled_worker(even_now)
         assert len(outbox) == 1
         assert len(outbox[0].recipients) == 2
@@ -311,7 +311,7 @@ def test_send_four_hour_alerts(client, app):
         'products': [{'code': '12345'}],
         "versioncreated": even_now - timedelta(hours=3)
     }])
-    with app.mail.record_messages() as outbox:
+    with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().scheduled_worker(even_now)
         assert len(outbox) == 1
         assert len(outbox[0].recipients) == 2
@@ -355,7 +355,7 @@ def test_send_daily_alerts(client, app):
         'products': [{'code': '12345'}],
         "versioncreated": now - timedelta(days=4)
     }])
-    with app.mail.record_messages() as outbox:
+    with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().run()
         assert len(outbox) == 1
         assert len(outbox[0].recipients) == 2
@@ -400,7 +400,7 @@ def test_send_weekly_alerts(client, app):
         'products': [{'code': '12345'}],
         "versioncreated": now - timedelta(days=4)
     }])
-    with app.mail.record_messages() as outbox:
+    with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().run()
         assert len(outbox) == 1
         assert len(outbox[0].recipients) == 2
@@ -431,7 +431,7 @@ def test_send_alerts_respects_last_run_time(client, app):
         'products': [{'code': '12345'}],
         "versioncreated": even_now - timedelta(minutes=90)
     }])
-    with app.mail.record_messages() as outbox:
+    with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().scheduled_worker(even_now)
         assert len(outbox) == 1
         assert len(outbox[0].recipients) == 2
@@ -442,7 +442,7 @@ def test_send_alerts_respects_last_run_time(client, app):
         assert 'Newsroom Monitoring: W1' in outbox[0].body
         assert 'monitoring-export.pdf' in outbox[0].attachments[0]
 
-    with app.mail.record_messages() as newoutbox:
+    with app.mail.record_messages() as newoutbox, app.test_request_context():
         w = app.data.find_one('monitoring', None, _id='5db11ec55f627d8aa0b545fb')
         assert w is not None
         assert w.get('last_run_time') is not None
@@ -520,7 +520,7 @@ def test_always_send_schedule_alerts(client, app):
         'products': [{'code': '12345'}],
         "versioncreated": even_now - timedelta(days=31),
     }])
-    with app.mail.record_messages() as outbox:
+    with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().scheduled_worker(even_now)
         assert len(outbox) == 1
         assert 'No content has matched the monitoring profile for this schedule.' in outbox[0].body
@@ -569,7 +569,7 @@ def test_last_run_time_always_updated_with_matching_content_immediate(client, ap
         'products': [{'code': '12345'}],
         "versioncreated": utcnow(),
     }])
-    with app.mail.record_messages() as outbox:
+    with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().run(immediate=True)
         assert len(outbox) == 1
         assert len(outbox[0].recipients) == 2
@@ -604,7 +604,7 @@ def test_last_run_time_always_updated_with_matching_content_scheduled(client, ap
         'products': [{'code': '12345'}],
         "versioncreated": even_now - timedelta(minutes=90)
     }])
-    with app.mail.record_messages() as outbox:
+    with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().scheduled_worker(even_now)
         assert len(outbox) == 1
         assert len(outbox[0].recipients) == 2
@@ -727,7 +727,7 @@ def test_will_send_one_hour_alerts_on_odd_hours(client, app):
         'products': [{'code': '12345'}],
         "versioncreated": even_now - timedelta(minutes=90)
     }])
-    with app.mail.record_messages() as outbox:
+    with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().scheduled_worker(now)
         assert len(outbox) == 1
 

@@ -14,7 +14,6 @@ import {
     selectNavigation,
     setError,
     fetchProducts,
-    saveProducts,
 } from '../actions';
 import {sectionsPropType} from 'features/sections/types';
 import {uiSectionsSelector} from 'features/sections/selectors';
@@ -48,7 +47,7 @@ class Navigations extends React.Component {
     }
 
     save(event) {
-        event.preventDefault();
+        event.preventDefault && event.preventDefault();
 
         if (!this.isFormValid()) {
             return;
@@ -103,7 +102,6 @@ class Navigations extends React.Component {
                         onClose={this.props.cancelEdit}
                         onDelete={this.deleteNavigation}
                         products={this.props.products}
-                        saveProducts={this.props.saveProducts}
                         fetchProducts={this.props.fetchProducts}
                         sections={this.props.sections}
                     />
@@ -131,7 +129,6 @@ Navigations.propTypes = {
     dispatch: PropTypes.func,
     products: PropTypes.arrayOf(PropTypes.object),
     sections: sectionsPropType,
-    saveProducts: PropTypes.func.isRequired,
     fetchProducts: PropTypes.func.isRequired,
 };
 
@@ -154,7 +151,6 @@ const mapDispatchToProps = (dispatch) => ({
     deleteNavigation: (type) => dispatch(deleteNavigation(type)),
     newNavigation: () => dispatch(newNavigation()),
     cancelEdit: (event) => dispatch(cancelEdit(event)),
-    saveProducts: (products) => dispatch(saveProducts(products)),
     fetchProducts: () => dispatch(fetchProducts()),
     dispatch: dispatch,
 });

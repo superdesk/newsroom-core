@@ -290,7 +290,8 @@ class AgendaApp extends BaseApp {
                     this.props.navigations,
                     this.props.activeNavigation,
                     this.props.activeTopic
-                )
+                ),
+                this.renderSavedItemsCount(),
             ])
         );
     }

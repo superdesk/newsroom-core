@@ -22,7 +22,7 @@ from newsroom.wire.utils import update_action_list
 from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required, admin_only
 from newsroom.topics import get_user_topics
-from newsroom.email import send_email
+from newsroom.email import send_template_email
 from newsroom.companies import get_user_company
 from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request, query_resource, \
     get_agenda_dates, get_location_string, get_public_contacts, get_links, get_items_for_user_action
@@ -258,20 +258,22 @@ def share():
     items = get_items_for_user_action(data.get('items'), item_type)
     for user_id in data['users']:
         user = superdesk.get_resource_service('users').find_one(req=None, _id=user_id)
-        subject = items[0].get('headline')
+        subject_name = items[0].get('headline')
 
-        # If it's an event, 'name' is the subject
+        # If it's an event, 'name' is the subject_name
         if items[0].get('event'):
-            subject = items[0]['name']
+            subject_name = items[0]['name']
 
         if not user or not user.get('email'):
             continue
         template_kwargs = {
-            'recipient': user,
-            'sender': current_user,
-            'items': items,
-            'message': data.get('message'),
-            'section': request.args.get('type', 'wire')
+            "app_name": app.config["SITE_NAME"],
+            "recipient": user,
+            "sender": current_user,
+            "items": items,
+            "message": data.get("message"),
+            "section": request.args.get("type", "wire"),
+            "subject_name": subject_name
         }
         if item_type == 'agenda':
             template_kwargs['maps'] = data.get('maps')
@@ -281,11 +283,10 @@ def share():
             template_kwargs['linkList'] = [get_links(item) for item in items]
             template_kwargs['is_admin'] = is_admin_or_internal(user)
 
-        send_email(
-            [user['email']],
-            gettext('From %s: %s' % (app.config['SITE_NAME'], subject)),
-            text_body=flask.render_template('share_{}.txt'.format(item_type), **template_kwargs),
-            html_body=flask.render_template('share_{}.html'.format(item_type), **template_kwargs),
+        send_template_email(
+            to=[user["email"]],
+            template=f"share_{item_type}",
+            template_kwargs=template_kwargs,
         )
     update_action_list(data.get('items'), 'shares', item_type=item_type)
     get_resource_service('history').create_history_record(items, 'share', current_user,

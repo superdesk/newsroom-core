@@ -1,5 +1,8 @@
-from newsroom.email import send_new_item_notification_email
 from flask import render_template_string, json, url_for
+from jinja2 import TemplateNotFound
+
+from newsroom.email import send_new_item_notification_email, map_email_recipients_by_language, EmailGroup
+from unittest import mock
 
 
 def test_item_notification_template(client, app, mocker):
@@ -21,7 +24,7 @@ def test_item_notification_template(client, app, mocker):
 
     sub = mocker.patch('newsroom.email.send_email')
 
-    with app.app_context():
+    with app.app_context(), app.test_request_context():
         send_new_item_notification_email(user, 'Topic', item)
 
     sub.assert_called_with(
@@ -58,3 +61,81 @@ Link: {{ item_url }}
 
 {% endblock %}
 """, app_name=app.config['SITE_NAME'], item_url=item_url))
+
+
+EMAILS = ['default@test.com', 'ca_french@test.com', 'fi@test.com']
+MOCK_USERS = [{
+    'email': EMAILS[0],
+    'first_name': 'Default',
+    'last_name': 'Test',
+}, {
+    'email': EMAILS[1],
+    'first_name': 'CA',
+    'last_name': 'French',
+    'locale': 'fr_CA',
+}, {
+    'email': EMAILS[2],
+    'first_name': 'Finnish',
+    'last_name': 'Test',
+    'locale': 'fi',
+}]
+
+
+def mock_get_template_always_pass(_template_name_or_list):
+    pass
+
+
+def mock_get_template_include_fr_ca(template_name_or_list):
+    if '.fr_ca.' not in template_name_or_list:
+        raise TemplateNotFound(template_name_or_list)
+
+
+@mock.patch('flask.current_app.jinja_env.get_or_select_template', mock_get_template_always_pass)
+def test_map_email_recipients_by_language(client, app):
+    app.data.insert('users', MOCK_USERS)
+
+    with app.test_request_context():
+        email_groups = map_email_recipients_by_language(EMAILS, 'test_template')
+
+        assert 'en' in email_groups
+        assert email_groups['en'] == EmailGroup(
+            html_template='test_template.en.html',
+            text_template='test_template.en.txt',
+            emails=[EMAILS[0]]
+        )
+
+        assert 'fr_ca' in email_groups
+        assert email_groups['fr_ca'] == EmailGroup(
+            html_template='test_template.fr_ca.html',
+            text_template='test_template.fr_ca.txt',
+            emails=[EMAILS[1]]
+        )
+
+        assert 'fi' in email_groups
+        assert email_groups['fi'] == EmailGroup(
+            html_template='test_template.fi.html',
+            text_template='test_template.fi.txt',
+            emails=[EMAILS[2]]
+        )
+
+
+@mock.patch('flask.current_app.jinja_env.get_or_select_template', mock_get_template_include_fr_ca)
+def test_map_email_recipients_by_language_fallback(client, app):
+    app.data.insert('users', MOCK_USERS)
+
+    with app.test_request_context():
+        email_groups = map_email_recipients_by_language(EMAILS, 'test_template')
+
+        assert 'en' in email_groups
+        assert email_groups['en'] == EmailGroup(
+            html_template='test_template.html',
+            text_template='test_template.txt',
+            emails=[EMAILS[0], EMAILS[2]]
+        )
+
+        assert 'fr_ca' in email_groups
+        assert email_groups['fr_ca'] == EmailGroup(
+            html_template='test_template.fr_ca.html',
+            text_template='test_template.fr_ca.txt',
+            emails=[EMAILS[1]]
+        )

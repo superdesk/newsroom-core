@@ -152,6 +152,7 @@ CORE_APPS = [
     'newsroom.company_expiry_alerts',
     'newsroom.oauth_clients',
     'newsroom.auth_server.client',
+    'newsroom.email_templates'
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -403,6 +404,9 @@ GOOGLE_LOGIN = True
 
 
 #: Elastic APM
+#:
+#: .. versionadded:: 2.0.1
+#:
 APM_SERVER_URL = env("APM_SERVER_URL")
 APM_SECRET_TOKEN = env("APM_SECRET_TOKEN")
 APM_SERVICE_NAME = env("APM_SERVICE_NAME") or SITE_NAME

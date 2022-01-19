@@ -35,7 +35,7 @@ def test_company_expiry_alerts(client, app):
     expiry_time = (now + datetime.timedelta(days=7)).replace(hour=0, minute=0, second=0)
     assert companies.count() == 2
 
-    with app.mail.record_messages() as outbox:
+    with app.mail.record_messages() as outbox, app.test_request_context():
         CompanyExpiryAlerts().send_alerts()
         assert len(outbox) == 1
         assert outbox[0].recipients == ['admin@localhost.com', ' notanadmin@localhost.com']
