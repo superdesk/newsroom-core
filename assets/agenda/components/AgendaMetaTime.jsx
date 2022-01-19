@@ -94,7 +94,7 @@ function getCalendarClass(item) {
     if (hasCoverages(item)) {
         return 'icon--green';
     } else {
-        return 'icon--gray';
+        return 'icon--gray-dark';
     }
 }
 

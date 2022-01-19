@@ -36,7 +36,7 @@ export default function AgendaCoverages({item, coverages, wireItems, actions, us
                     <span>{`${getCoverageDisplayName(coverage.coverage_type)}${getSlugline(coverage)}`}</span>
                 </span>
                 {coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED && <span className='d-flex text-nowrap'>
-                    <i className='icon-small--clock icon--gray mr-1'></i>
+                    <i className='icon-small--clock icon--gray-dark mr-1'></i>
                     <span className='coverage-item__text-label mr-1'>{gettext('expected')}:</span>
                     <span>{formatCoverageDate(coverage)}</span>
                 </span>}

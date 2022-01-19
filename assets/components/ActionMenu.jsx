@@ -26,7 +26,7 @@ class ActionMenu extends React.Component {
                     onClick={(event) => onActionList(event, item, group, plan)}
                     className="icon-button"
                     aria-label={gettext('More Actions')}>
-                    <i className='icon--more icon--gray-light'></i>
+                    <i className='icon--more icon--gray-dark'></i>
                 </button>
                 {this.referenceElem &&
               <Popover placement="left" isOpen={showActions} target={this.referenceElem} className="action-popover">

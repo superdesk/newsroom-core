@@ -7,10 +7,10 @@ function CardMeta({wordCount, charCount, pictureAvailable, source, versioncreate
     return (<div className="wire-articles__item__meta">
         <div className="wire-articles__item__icons">
             <span className="wire-articles__item__icon">
-                <i className="icon--text icon--gray-light"></i>
+                <i className="icon--text icon--gray-dark"></i>
             </span>
             {pictureAvailable && <span className="wire-articles__item__icon">
-                <i className="icon--photo icon--gray-light"></i>
+                <i className="icon--photo icon--gray-dark"></i>
             </span>}
             {displayDivider && <span className='wire-articles__item__divider'></span>}
         </div>

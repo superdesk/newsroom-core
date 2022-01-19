@@ -47,7 +47,7 @@ class SearchBar extends React.Component {
         return (
             <div className="search form-inline">
                 <span className="search__icon">
-                    <i className="icon--search icon--gray-light" />
+                    <i className="icon--search icon--gray" />
                 </span>
                 <div className={classNames('search__form input-group', {
                     'searchForm--active': !!this.state.query,

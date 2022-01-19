@@ -12,7 +12,7 @@ export default function AgendaLocation({item, isMobilePhone, border}) {
     return (
         <Fragment>
             <span className='mr-2'>
-                <i className='icon-small--location icon--gray' />
+                <i className='icon-small--location icon--gray-dark' />
             </span>
 
             {isMobilePhone ? (

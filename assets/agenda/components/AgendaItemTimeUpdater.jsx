@@ -99,7 +99,7 @@ class AgendaItemTimeUpdater extends React.Component {
 
         return(
             <div className={className}>
-                <div className="label label--yellow2">{this.state.timeText}</div>
+                <div className="label label--blue">{this.state.timeText}</div>
             </div>
         );
     }

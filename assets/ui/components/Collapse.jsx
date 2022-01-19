@@ -48,7 +48,7 @@ export class CollapseBoxWithButton extends React.Component {
                 >
                     <span>{this.props.buttonText}</span>
                     <i className={classNames(
-                        'icon-small--arrow-down icon--gray-light ml-auto',
+                        'icon-small--arrow-down icon--gray-dark ml-auto',
                         {'icon--rotate-180': this.state.open}
                     )} />
                 </button>
