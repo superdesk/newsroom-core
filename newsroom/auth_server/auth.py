@@ -13,7 +13,7 @@ class JWTAuth(TokenAuth):
     Implements JWT auth logic.
     """
 
-    def check_auth(self, token, allowed_roles, resource, method):
+    def check_auth(token):
         """
         This function is called to check if a token is valid. Must be
         overridden with custom logic.

@@ -3,10 +3,10 @@ import clientReducer from './reducers';
 import ClientsApp from './components/ClientsApp';
 import {initViewData} from './actions';
 
-const store = createStore(clientReducer, 'Client');
+const store = createStore(clientReducer, 'oauth_clients');
 
 
-if (window.viewData && window.viewData.clients) {
+if (window.viewData && window.viewData.oauth_clients) {
     store.dispatch(initViewData(window.viewData));
 }
 

@@ -95,7 +95,7 @@ export default function clientReducer(state = initialState, action) {
             ui_config: action.data.ui_config,
         };
 
-        return setupClients(action.data.clients, nextState);
+        return setupClients(action.data.oauth_clients, nextState);
     }
 
     default: {

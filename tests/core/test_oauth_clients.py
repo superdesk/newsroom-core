@@ -1,6 +1,7 @@
 from flask import json
 from newsroom.tests.users import (test_login_succeeds_for_admin, init as user_init)  # noqa
 from superdesk import get_resource_service
+from newsroom.auth_server.auth import JWTAuth
 import base64
 
 
@@ -9,14 +10,10 @@ def test_oauth_clients(client):
     # Register a new client
     response = client.post(
         "/oauth_clients/new",
-        data=json.dumps({"name": "client1"}),
+        data=json.dumps({"name": "client11"}),
         content_type="application/json",
     )
     assert response.status_code == 201
-
-    oauth_client = get_resource_service("oauth_clients").find_one(
-        req=None, name="client1"
-    )
 
     # Check for the client secret
     password = response.json.get("password", None)
@@ -34,15 +31,13 @@ def test_oauth_clients(client):
         headers={"Authorization": "Basic %s" % encoded_u},
         data=payload,
     )
+    token = token_auth_response.json["access_token"]
 
-    # Now use oauth token to access API
-    api_data_response = client.get(
-        "api",
-        headers={
-            "Authorization": "Bearer %s" % token_auth_response.json["access_token"]
-        },
+    assert JWTAuth.check_auth(token)
+
+    oauth_client = get_resource_service("oauth_clients").find_one(
+        req=None, name="client11"
     )
-    assert api_data_response.status_code == 200
 
     # Update an existing client
     response = client.post(
