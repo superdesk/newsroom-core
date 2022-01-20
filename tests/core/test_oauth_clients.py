@@ -31,8 +31,9 @@ def test_oauth_clients(client):
         headers={"Authorization": "Basic %s" % encoded_u},
         data=payload,
     )
-    token = token_auth_response.json["access_token"]
+    assert token_auth_response.status_code == 200
 
+    token = token_auth_response.json["access_token"]
     assert JWTAuth.check_auth(self=None, token=token, allowed_roles=None, resource=None, method=None)
 
     oauth_client = get_resource_service("oauth_clients").find_one(

@@ -26,6 +26,7 @@ def update_config(conf):
     conf['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Prague'
     conf['DEFAULT_TIMEZONE'] = 'Europe/Prague'
     conf['NEWS_API_ENABLED'] = True
+    conf['AUTH_SERVER_SHARED_SECRET'] = "secret123"
     return conf
 
 
