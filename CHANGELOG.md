@@ -1,9 +1,18 @@
 # Newshub Changelog
 
+## [2.0.2] 2022-01-20
+### Features
+- [NHUB-84] setup sentry in app factory (#60)
+
+### Fixes
+- [NHUB-77] fix(reports): Incorrectly adding terms and missing _resource field (#59)
+
 ## [2.0.1] 2022-01-18
+### Features
+- [NHUB-73] add elastic apm setup (#54)
+
 ### Fixes
 - [NHUB-51] fix: Duplicate image descriptions in xml based downloads (#52)
-- [NHUB-73] add elastic apm setup (#54)
 - [NHUB-56] fix: Add/remove navigations from products on nav post/patch (#53)
 - [NHUB-79] fix(push): Convert str to datetime for agenda notification (#56)
 
