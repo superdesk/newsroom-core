@@ -107,7 +107,8 @@ def get_view_data():
         'saved_items': get_resource_service('agenda').get_saved_items_count(),
         'events_only': company.get('events_only', False),
         'locators': get_vocabulary('locators'),
-        'ui_config': get_resource_service('ui_config').get_section_config('agenda')
+        'ui_config': get_resource_service('ui_config').get_section_config('agenda'),
+        "groups": app.config.get("AGENDA_GROUPS", []),
     }
 
 

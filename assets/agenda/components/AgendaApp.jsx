@@ -96,25 +96,6 @@ class AgendaApp extends BaseApp {
 
         const onDetailClose = this.props.detail ? null :
             () => this.props.actions.filter(a => a.id === 'open')[0].action(null, this.props.previewGroup, this.props.previewPlan);
-
-        const groups = [
-            {
-                field: 'service',
-                label: gettext('Category'),
-            },
-            {
-                field: 'subject',
-                label: gettext('Subject'),
-            },
-            {
-                field: 'urgency',
-                label: gettext('News Value'),
-            },
-            {
-                field: 'place',
-                label: gettext('Place'),
-            },
-        ];
         const eventsOnly = this.props.eventsOnlyView || this.props.eventsOnlyAccess;
         const hideFeaturedToggle = !noNavigationSelected(this.props.activeNavigation) ||
             this.props.bookmarks ||
@@ -226,7 +207,6 @@ class AgendaApp extends BaseApp {
                                     tabs={this.getTabs()}
                                     props={{
                                         ...this.props,
-                                        groups,
                                         fetchItems: this.fetchItemsOnNavigation}}
                                 />
                             )}
@@ -345,6 +325,7 @@ AgendaApp.propTypes = {
     searchParams: PropTypes.object,
     showSaveTopic: PropTypes.bool,
     previewConfig: PropTypes.object,
+    groups: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
@@ -385,6 +366,7 @@ const mapStateToProps = (state) => ({
     searchParams: searchParamsSelector(state),
     showSaveTopic: showSaveTopicSelector(state),
     previewConfig: previewConfigSelector(state),
+    groups: get(state, 'groups', []),
 });
 
 const mapDispatchToProps = (dispatch) => ({
