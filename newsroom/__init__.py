@@ -9,7 +9,7 @@ import logging
 import superdesk
 from superdesk import register_resource  # noqa
 
-__version__ = '2.0.1'
+__version__ = '2.0.2'
 
 # reuse content api dbs
 MONGO_PREFIX = 'CONTENTAPI_MONGO'
