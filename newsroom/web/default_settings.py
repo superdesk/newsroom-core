@@ -46,6 +46,7 @@ from superdesk.default_settings import ( # noqa
     CELERY_WORKER_CONCURRENCY,
     CELERY_BEAT_SCHEDULE_FILENAME,
     LOG_CONFIG_FILE,
+    SENTRY_DSN,
 )
 
 logger = logging.getLogger()

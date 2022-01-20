@@ -21,6 +21,7 @@ from superdesk.json_utils import SuperdeskJSONEncoder
 from superdesk.validator import SuperdeskValidator
 from superdesk.logging import configure_logging
 from elasticapm.contrib.flask import ElasticAPM
+from superdesk.factory.sentry import SuperdeskSentry
 
 from newsroom.auth import SessionAuth
 from newsroom.utils import is_json_request
@@ -75,6 +76,7 @@ class BaseNewsroomApp(eve.Eve):
         newsroom.flask_app = self
         self.settings = self.config
 
+        self.setup_error_handlers()
         self.setup_apm()
         self.setup_media_storage()
         self.setup_babel()
@@ -85,7 +87,6 @@ class BaseNewsroomApp(eve.Eve):
             self.setup_apps(self.config.get('INSTALLED_APPS', []))
         self.setup_email()
         self.setup_cache()
-        self.setup_error_handlers()
 
         configure_logging(self.config.get('LOG_CONFIG_FILE'))
 
@@ -172,6 +173,7 @@ class BaseNewsroomApp(eve.Eve):
         self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(404, render_404)
         self.register_error_handler(403, render_403)
+        self.sentry = SuperdeskSentry(self)
 
     def general_setting(self, _id, label, type='text', default=None,
                         weight=0, description=None, min=None, client_setting=False):
