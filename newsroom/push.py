@@ -146,6 +146,12 @@ def publish_item(doc, original):
         logger.info('Failed to notify new wire item for Agenda watches')
         logger.exception(ex)
 
+    if app.config.get("WIRE_SUBJECT_SCHEME_WHITELIST") and doc.get("subject"):
+        doc["subject"] = [
+            subject for subject in doc["subject"]
+            if subject.get("scheme") in app.config["WIRE_SUBJECT_SCHEME_WHITELIST"]
+        ]
+
     publish_item_signal.send(app._get_current_object(), item=doc, is_new=original is None)
     _id = service.create([doc])[0]
     if 'associations' not in doc and original is not None and bool(original.get('associations', {})):
