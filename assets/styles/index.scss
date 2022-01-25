@@ -2364,7 +2364,7 @@ a.wire-articles__versions {
         }
     }
 
-    &--remote {        
+    &--remote {
         font-size: 0.95rem !important;
     }
 
@@ -2431,7 +2431,7 @@ a.wire-articles__versions {
 
 .wire-column__preview__author {
     color: #626262;
-    font-size: 0.9375rem;    
+    font-size: 0.9375rem;
     .bold {
         color: #222222;
         font-weight: 500;
@@ -2973,6 +2973,22 @@ a.wire-articles__versions {
     @include lg {
         flex: 1 0 320px;
     }
+}
+
+.wire-column__preview__content table {
+    width: 100%;
+    border-collapse: collapse;
+    resize: both;
+    table-layout: auto;
+    border: 1px solid #dadada;
+    margin: 16px 0;
+}
+
+.wire-column__preview__content td {
+    border: 1px solid #dadada;
+    padding: 5px 8px;
+    font-size: 14px;
+    font-weight: 300;
 }
 
 .content--item-detail .wire-column__preview__tags {

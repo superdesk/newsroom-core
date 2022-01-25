@@ -1,7 +1,7 @@
 import React from 'react';
 import server from 'server';
 import analytics from 'analytics';
-import {get, isInteger, keyBy, isEmpty, cloneDeep, throttle} from 'lodash';
+import {get, isInteger, keyBy, isEmpty, cloneDeep, throttle, memoize} from 'lodash';
 import {Provider} from 'react-redux';
 import {createStore as _createStore, applyMiddleware, compose} from 'redux';
 import {createLogger} from 'redux-logger';
@@ -753,3 +753,19 @@ export function isActionEnabled(configKey) {
     const config = getConfig(configKey, {});
     return (action) => config[action.id] == null || config[action.id];
 }
+
+function convertHtmlToPlainText(html) {
+    if (html == null || html.length === 0) {
+        return '';
+    } else if (html[0] !== '<') {
+        // No need to convert if the string doesn't start with a tag
+        return html;
+    }
+
+    const node = document.createElement('div');
+
+    node.innerHTML = html;
+    return node.textContent;
+}
+
+export const getPlainTextMemoized = memoize((html) => convertHtmlToPlainText(html));

@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext} from 'utils';
 import classNames from 'classnames';
+import {gettext, getPlainTextMemoized} from 'utils';
 
 export default function AgendaInternalNote({internalNote, onlyIcon, noMargin, mt2, alignCenter, marginRightAuto, borderRight, noPaddingRight}) {
-    if (!internalNote) {
+    const note = getPlainTextMemoized(internalNote);
+
+    if (!note) {
         return null;
     }
 
@@ -23,7 +25,7 @@ export default function AgendaInternalNote({internalNote, onlyIcon, noMargin, mt
         );
 
         return (
-            <div title={`${labelText}:\n${internalNote}`}
+            <div title={`${labelText}:\n${note}`}
                 data-toggle="tooltip"
                 data-placement="right"
                 className={className}
@@ -35,8 +37,16 @@ export default function AgendaInternalNote({internalNote, onlyIcon, noMargin, mt
         return (
             <div className={classNames('wire-column__preview_article-note', {'m-0': noMargin}, {'mt-2': mt2})}>
                 <i className="icon--info icon--red icon--info--smaller" title={labelText}/>
-                <span className='ml-1'>{internalNote.split('\n').map((item, key) =>
-                    <span key={key}>{item}<br/></span>)}</span>
+                <span className='ml-1'>
+                    {internalNote[0] !== '<' ?
+                        internalNote.split('\n').map((item, key) => (
+                            <span key={key}>{item}<br/></span>
+                        ))
+                        : (
+                            <div dangerouslySetInnerHTML={{__html: internalNote}} />
+                        )
+                    }
+                </span>
             </div>
         );
     }
