@@ -40,7 +40,7 @@ export default function AgendaInternalNote({internalNote, onlyIcon, noMargin, mt
                 <span className='ml-1'>
                     {internalNote[0] !== '<' ?
                         internalNote.split('\n').map((item, key) => (
-                            <span key={key}>{item}<br/></span>
+                            <p key={key}>{item}</p>
                         ))
                         : (
                             <div dangerouslySetInnerHTML={{__html: internalNote}} />
