@@ -456,6 +456,13 @@ export const notify = {
  * @return {string}
  */
 export function getTextFromHtml(html) {
+    if (html == null || html.length === 0) {
+        return '';
+    } else if (html[0] !== '<') {
+        // No need to convert if the string doesn't start with a tag
+        return html;
+    }
+
     const div = document.createElement('div');
     div.innerHTML = formatHTML(html);
     const tree = document.createTreeWalker(div, NodeFilter.SHOW_TEXT, null, false); // ie requires all params
@@ -754,18 +761,4 @@ export function isActionEnabled(configKey) {
     return (action) => config[action.id] == null || config[action.id];
 }
 
-function convertHtmlToPlainText(html) {
-    if (html == null || html.length === 0) {
-        return '';
-    } else if (html[0] !== '<') {
-        // No need to convert if the string doesn't start with a tag
-        return html;
-    }
-
-    const node = document.createElement('div');
-
-    node.innerHTML = html;
-    return node.textContent;
-}
-
-export const getPlainTextMemoized = memoize((html) => convertHtmlToPlainText(html));
+export const getPlainTextMemoized = memoize((html) => getTextFromHtml(html));
