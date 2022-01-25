@@ -230,7 +230,7 @@ def validate_account(token):
 def reset_password(token):
     user = get_resource_service('users').find_one(req=None, token=token)
     if not user:
-        flask.abort(404)
+        return flask.render_template('password_reset_link_expiry.html')
 
     form = ResetPasswordForm()
     if form.validate_on_submit():
