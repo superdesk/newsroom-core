@@ -8,6 +8,7 @@ import ActionButton from 'components/ActionButton';
 import AgendaListItemIcons from './AgendaListItemIcons';
 import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
 import AgendaInternalNote from './AgendaInternalNote';
+import {PlainText} from 'ui/components/PlainText';
 
 import {
     hasCoverages,
@@ -163,7 +164,7 @@ class AgendaListItem extends React.Component {
 
                         {(isMobile || isExtended) && description && (
                             <p className="wire-articles__item__text">
-                                {description}
+                                <PlainText text={description} />
                             </p>
                         )}
                     </div>
