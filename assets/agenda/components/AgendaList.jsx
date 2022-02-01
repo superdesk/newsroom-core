@@ -6,14 +6,14 @@ import {get, isEqual, cloneDeep} from 'lodash';
 import classNames from 'classnames';
 import moment from 'moment';
 
-import {gettext, DATE_FORMAT, isDisplayed} from 'utils';
+import {gettext, DATE_FORMAT, isDisplayed, shouldShowListShortcutActionIcons} from 'utils';
 import AgendaListItem from './AgendaListItem';
 import {setActive, previewItem, toggleSelected, openItem} from '../actions';
 import {EXTENDED_VIEW} from 'wire/defaults';
 import {getIntVersion} from 'wire/utils';
 import {groupItems, getPlanningItemsByGroup, getListItems} from 'agenda/utils';
 import {searchNavigationSelector} from 'search/selectors';
-import {previewConfigSelector} from 'ui/selectors';
+import {previewConfigSelector, listConfigSelector} from 'ui/selectors';
 
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
@@ -228,6 +228,7 @@ class AgendaList extends React.Component {
             onScroll,
         } = this.props;
         const isExtended = activeView === EXTENDED_VIEW;
+        const showShortcutActionIcons = shouldShowListShortcutActionIcons(this.props.listConfig, isExtended);
         const articleGroups = groupedItems.map((group) =>
             [
                 <div className='wire-articles__header' key={`${group.date}header`}>
@@ -263,7 +264,9 @@ class AgendaList extends React.Component {
                                             user={this.props.user}
                                             actioningItem={this.state.actioningItem}
                                             planningId={plan.guid}
-                                            resetActioningItem={this.resetActioningItem}/>
+                                            resetActioningItem={this.resetActioningItem}
+                                            showShortcutActionIcons={showShortcutActionIcons}
+                                        />
                                     )
                                 }
                             </Fragment>);
@@ -286,6 +289,7 @@ class AgendaList extends React.Component {
                                 user={this.props.user}
                                 actioningItem={this.state.actioningItem}
                                 resetActioningItem={this.resetActioningItem}
+                                showShortcutActionIcons={showShortcutActionIcons}
                             />);
                         }
                     })}
@@ -347,6 +351,7 @@ AgendaList.propTypes = {
     refNode: PropTypes.func,
     previewConfig: PropTypes.object,
     featuredOnly: PropTypes.bool,
+    listConfig: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -369,6 +374,7 @@ const mapStateToProps = (state) => ({
     isLoading: state.isLoading,
     previewConfig: previewConfigSelector(state),
     featuredOnly: get(state, 'agenda.featuredOnly'),
+    listConfig: listConfigSelector(state),
 });
 
 export default connect(mapStateToProps)(AgendaList);

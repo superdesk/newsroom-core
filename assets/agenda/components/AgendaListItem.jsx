@@ -188,9 +188,10 @@ class AgendaListItem extends React.Component {
                     actions={this.props.actions}
                     onActionList={this.props.onActionList}
                     showActions={this.props.showActions}
+                    showShortcutActions={!this.props.showShortcutActionIcons}
                 />
 
-                {this.props.actions.map((action) => action.shortcut && (
+                {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action) => action.shortcut && (
                     <ActionButton
                         key={action.name}
                         className="icon-button"
@@ -206,7 +207,6 @@ class AgendaListItem extends React.Component {
     renderMobile() {
         const {item, planningId} = this.props;
         const planningItem = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
-
         const internalNote = getInternalNote(item, planningItem);
 
         return this.renderListItem(true, (
@@ -226,7 +226,7 @@ class AgendaListItem extends React.Component {
                     noPaddingRight={true}
                 />
 
-                {this.props.actions.map((action) => action.shortcut && (
+                {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action) => action.shortcut && (
                     <ActionButton
                         key={action.name}
                         className="icon-button"
@@ -244,6 +244,7 @@ class AgendaListItem extends React.Component {
                         actions={this.props.actions}
                         onActionList={this.props.onActionList}
                         showActions={this.props.showActions}
+                        showShortcutActions={!this.props.showShortcutActionIcons}
                     />
                 )}
             </div>
@@ -277,6 +278,7 @@ AgendaListItem.propTypes = {
     actioningItem: PropTypes.object,
     resetActioningItem: PropTypes.func,
     planningId: PropTypes.string,
+    showShortcutActionIcons: PropTypes.bool,
 };
 
 export default AgendaListItem;
