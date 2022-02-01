@@ -419,3 +419,9 @@ APM_SERVICE_NAME = env("APM_SERVICE_NAME") or SITE_NAME
 #: .. versionadded:: 2.1
 #:
 WIRE_SUBJECT_SCHEME_WHITELIST = []
+
+#: Agenda Filter groups (defaults set in ``newsroom.agenda.init_app``)
+#:
+#: .. versionadded:: 2.1.0
+#:
+AGENDA_GROUPS = None

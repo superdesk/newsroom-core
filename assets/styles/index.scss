@@ -179,65 +179,98 @@ body.print {
     display: block;
     margin: 0;
     overflow: visible;
-
+    
     @include phone {
         display: flex;
         margin: 0 0 0 6px;
         overflow: auto;
     }
+    @include md {
+        padding-top: 10px;
+    }
 
-  li {
-      a, span {
-          display: block;
-          height: 40px;
-          padding: 0 8px;
-          line-height: 40px;
-          text-align: center;
+    
+    .sidenav-icons__item {
+        margin: 4px 0;
+    
+        a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            &:hover {
+                text-decoration: none;
+            }
 
-          @include phone {
-              height: 45px;
-              line-height: 45px;
-          }
 
-          i {
-              vertical-align: middle;
-          }
-          @include sm {
+        }
+        span {
+            display: block;
+        }
+        a, span {
+            height: 40px;
+            padding: 0 8px;
+            line-height: 40px;
+            text-align: center;
+
+            @include phone {
+                height: 40px;
+                line-height: 40px;
+            }
+
+            i {
+                vertical-align: middle;
+            }
+            @include sm {
             padding: 0 10px;
-          }
-        &:focus {
-            outline: none;
+            }
+            &:focus {
+                outline: none;
+            }
+            &:focus-visible {
+                box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 3px 4px rgba(255, 255, 255, .7);
+            }
         }
-        &:focus-visible {
-            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 3px 4px rgba(255, 255, 255, .7);
+        &.active {
+            display: flex !important;
+            justify-content: center;
+
+            a {
+                background-color: white;
+                border-radius: 50%;
+                width: 40px; 
+            }
+            i {
+                color: $main-blue;
+            }
         }
-      }
-  }
-  .active i {
-    color: #fff;
-  }
-}
-
-.sidenav-icons__item--admin {
-  position: absolute;
-  bottom: 0;
-  left: auto;
-  right: 0;
-  @include sm {
-      left: 0;
-  }
-}
-
-.sidenav-icons__item--report {
-  position: absolute;
-  bottom: 0;
-  left: auto;
-  right: 38px;
-  @include sm {
-      left: 0;
-      right: 0;
-      bottom: 40px;
-  }
+        .badge--icon {
+            top: 2px;
+            right: 7px;
+        }
+        [class^="icon--"], [class*=" icon--"] {
+            color: white;
+        }
+        &--report {
+            position: absolute;
+            bottom: 0;
+            left: auto;
+            right: 38px;
+            @include sm {
+                left: 0;
+                right: 0;
+                bottom: 48px;
+            }
+        }
+        &--admin {
+            position: absolute;
+            bottom: 0;
+            left: auto;
+            right: 0;
+            @include sm {
+                left: 0;
+            }
+        }
+    }
 }
 
 .content-header {
@@ -1084,7 +1117,7 @@ article.list {
 
 .wire-column__nav__tab {
     a {
-        color: #8b8f9a;
+        color: #B3B5BD;
         &.active {
             color: #fff;
             border-bottom: 3px solid $main-blue;
@@ -1189,7 +1222,7 @@ article.list {
 }
 
 .wire-column__info {
-    color:#8b8f9a;
+    color: #B3B5BD;
 }
 
 .wire-button__notif {
@@ -2364,7 +2397,7 @@ a.wire-articles__versions {
         }
     }
 
-    &--remote {        
+    &--remote {
         font-size: 0.95rem !important;
     }
 
@@ -2431,7 +2464,7 @@ a.wire-articles__versions {
 
 .wire-column__preview__author {
     color: #626262;
-    font-size: 0.9375rem;    
+    font-size: 0.9375rem;
     .bold {
         color: #222222;
         font-weight: 500;
@@ -2973,6 +3006,22 @@ a.wire-articles__versions {
     @include lg {
         flex: 1 0 320px;
     }
+}
+
+.wire-column__preview__content table {
+    width: 100%;
+    border-collapse: collapse;
+    resize: both;
+    table-layout: auto;
+    border: 1px solid #dadada;
+    margin: 16px 0;
+}
+
+.wire-column__preview__content td {
+    border: 1px solid #dadada;
+    padding: 5px 8px;
+    font-size: 14px;
+    font-weight: 300;
 }
 
 .content--item-detail .wire-column__preview__tags {
