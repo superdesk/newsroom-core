@@ -46,6 +46,10 @@ item = {
     },
     'event_id': 'urn:event/1',
     'coverage_id': 'urn:coverage/1',
+    'subject': [
+        {"name": "a", "code": "a", "scheme": "a"},
+        {"name": "b", "code": "b", "scheme": "b"}
+    ],
 }
 
 
@@ -683,3 +687,11 @@ def test_push_event_coverage_info(client, app):
     parsed = get_entity_or_404(item['guid'], 'items')
     assert parsed['event_id'] == 'urn:event/1'
     assert parsed['coverage_id'] == 'urn:coverage/1'
+
+
+def test_push_wire_subject_whitelist(client, app):
+    app.config["WIRE_SUBJECT_SCHEME_WHITELIST"] = ['b']
+    client.post('/push', data=json.dumps(item), content_type='application/json')
+    parsed = get_entity_or_404(item['guid'], 'items')
+    assert 1 == len(parsed['subject'])
+    assert 'b' == parsed['subject'][0]['name']

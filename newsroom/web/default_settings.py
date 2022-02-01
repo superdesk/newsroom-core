@@ -412,6 +412,14 @@ APM_SERVER_URL = env("APM_SERVER_URL")
 APM_SECRET_TOKEN = env("APM_SECRET_TOKEN")
 APM_SERVICE_NAME = env("APM_SERVICE_NAME") or SITE_NAME
 
+#: Filter out subjects with schema which is not in the whitelist
+#: before storing the item to avoid those being displayed in filter,
+#: preview and outputs.
+#:
+#: .. versionadded:: 2.1
+#:
+WIRE_SUBJECT_SCHEME_WHITELIST = []
+
 #: Agenda Filter groups (defaults set in ``newsroom.agenda.init_app``)
 #:
 #: .. versionadded:: 2.1.0
