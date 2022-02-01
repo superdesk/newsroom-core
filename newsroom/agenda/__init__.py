@@ -33,3 +33,22 @@ def init_app(app):
         description=lazy_gettext('Provide styles delimited by &(ampersand). For example, feature:poi|element:labels|visibility:off&transit|visibility:off. Refer to https://developers.google.com/maps/documentation/maps-static/styling for more details'),  # noqa
         client_setting=True
     )
+
+    app.config.setdefault("AGENDA_GROUPS", [
+        {
+            "field": "service",
+            "label": lazy_gettext("Category"),
+        },
+        {
+            "field": "subject",
+            "label": lazy_gettext("Subject"),
+        },
+        {
+            "field": "urgency",
+            "label": lazy_gettext("News Value"),
+        },
+        {
+            "field": "place",
+            "label": lazy_gettext("Place"),
+        },
+    ])
