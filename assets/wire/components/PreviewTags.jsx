@@ -63,7 +63,7 @@ PreviewTagsComponent.propTypes = {
 
 const mapStateToProps = (state) => ({
     filterGroupLabels: filterGroupsToLabelMap(state),
-})
+});
 
 const PreviewTags = connect(mapStateToProps)(PreviewTagsComponent);
 
