@@ -762,3 +762,18 @@ export function isActionEnabled(configKey) {
 }
 
 export const getPlainTextMemoized = memoize((html) => getTextFromHtml(html));
+
+export function shouldShowListShortcutActionIcons(listConfig, isExtended) {
+    const showActionIconsConfig = listConfig.show_list_action_icons || {
+        large: true,
+        compact: true,
+        mobile: false,
+    };
+
+    return isMobilePhone() ?
+        showActionIconsConfig.mobile : (
+            isExtended ?
+                showActionIconsConfig.large :
+                showActionIconsConfig.compact
+        );
+}

@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import {isEqual} from 'lodash';
 
 
-import {gettext, isDisplayed} from 'utils';
+import {gettext, isDisplayed, shouldShowListShortcutActionIcons} from 'utils';
 import WireListItem from './WireListItem';
 import {setActive, previewItem, toggleSelected, openItem} from '../actions';
 import {EXTENDED_VIEW} from '../defaults';
@@ -137,6 +137,7 @@ class ItemsList extends React.Component {
     render() {
         const {items, itemsById, activeItem, activeView, selectedItems, readItems, matchedIds} = this.props;
         const isExtended = activeView === EXTENDED_VIEW;
+        const showShortcutActionIcons = shouldShowListShortcutActionIcons(this.props.listConfig, isExtended);
 
         const articles = items.map((_id) =>
             <WireListItem
@@ -158,6 +159,7 @@ class ItemsList extends React.Component {
                 listConfig={this.props.listConfig}
                 matchedIds={matchedIds || []}
                 isSearchFiltered={this.props.isSearchFiltered}
+                showShortcutActionIcons={showShortcutActionIcons}
             />
         );
 
