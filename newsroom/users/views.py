@@ -42,6 +42,7 @@ def get_view_data():
             config['_id']: config
             for config in query_resource('ui_config')
         },
+        'groups': app.config.get('WIRE_GROUPS', []),
     }
 
     if app.config.get('ENABLE_MONITORING'):

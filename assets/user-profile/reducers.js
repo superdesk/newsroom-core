@@ -105,6 +105,7 @@ export default function itemReducer(state = initialState, action) {
             monitoringList: action.data.monitoring_list || [],
             monitoringAdministrator: action.data.monitoring_administrator,
             uiConfigs: action.data.ui_configs,
+            groups: action.data.groups || [],
         };
     }
 

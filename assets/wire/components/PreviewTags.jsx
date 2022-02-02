@@ -1,7 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {uniqBy} from 'lodash';
+import {connect} from 'react-redux';
+import {uniqBy, get} from 'lodash';
+
 import {gettext, isDisplayed} from 'utils';
+import {filterGroupsToLabelMap} from 'search/selectors';
+
 import InfoBox from './InfoBox';
 import PreviewTagsBlock from './PreviewTagsBlock';
 import PreviewTagsLink from './PreviewTagsLink';
@@ -17,7 +21,7 @@ function formatCV(items, field) {
     ));
 }
 
-function PreviewTags({item, isItemDetail, displayConfig}) {
+function PreviewTagsComponent({item, isItemDetail, displayConfig, filterGroupLabels}) {
     const genres = item.genre && formatCV(item.genre, 'genre');
     const services = item.service && formatCV(item.service, 'service');
     const subjects = item.subject && formatCV(item.subject, 'subject');
@@ -30,19 +34,19 @@ function PreviewTags({item, isItemDetail, displayConfig}) {
                 </PreviewTagsBlock>)}
 
             {services && isDisplayed('services', displayConfig) &&
-                <PreviewTagsBlock label={gettext('Category')}>
+                <PreviewTagsBlock label={get(filterGroupLabels, 'service', gettext('Category'))}>
                     {services}
                 </PreviewTagsBlock>
             }
 
             {subjects && isDisplayed('subjects', displayConfig) &&
-                <PreviewTagsBlock label={gettext('Subject')}>
+                <PreviewTagsBlock label={get(filterGroupLabels, 'subject', gettext('Subject'))}>
                     {subjects}
                 </PreviewTagsBlock>
             }
 
             {genres && isDisplayed('genre', displayConfig) &&
-                <PreviewTagsBlock label={gettext('Content Type')}>
+                <PreviewTagsBlock label={get(filterGroupLabels, 'genre', gettext('Content Type'))}>
                     {genres}
                 </PreviewTagsBlock>
             }
@@ -50,10 +54,17 @@ function PreviewTags({item, isItemDetail, displayConfig}) {
     );
 }
 
-PreviewTags.propTypes = {
+PreviewTagsComponent.propTypes = {
     item: PropTypes.object,
     isItemDetail: PropTypes.bool,
     displayConfig: PropTypes.object,
+    filterGroupLabels: PropTypes.object,
 };
+
+const mapStateToProps = (state) => ({
+    filterGroupLabels: filterGroupsToLabelMap(state),
+});
+
+const PreviewTags = connect(mapStateToProps)(PreviewTagsComponent);
 
 export default PreviewTags;
