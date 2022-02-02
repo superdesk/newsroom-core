@@ -18,6 +18,7 @@ import {followStory} from 'search/actions';
 import {downloadVideo} from 'wire/actions';
 import {SearchBar} from './search-bar';
 import {previewConfigSelector, listConfigSelector, detailsConfigSelector, isSearchEnabled} from 'ui/selectors';
+import {filterGroupsToLabelMap} from 'search/selectors';
 
 const modals = {
     shareItem: ShareItemModal,
@@ -148,6 +149,7 @@ class HomeApp extends React.Component {
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
                 followStory={this.props.followStory}
                 detailsConfig={this.props.detailsConfig}
+                filterGroupLabels={this.props.filterGroupLabels}
             />, modal] :
                 this.renderContent()
             )
@@ -172,6 +174,7 @@ class HomeApp extends React.Component {
                         previewConfig={this.props.previewConfig}
                         downloadVideo={this.props.downloadVideo}
                         listConfig={this.props.listConfig}
+                        filterGroupLabels={this.props.filterGroupLabels}
                     />
                 )}
             </div>,
@@ -211,6 +214,7 @@ HomeApp.propTypes = {
     topics: PropTypes.array,
     isFollowing: PropTypes.bool,
     isSearchEnabled: PropTypes.bool,
+    filterGroupLabels: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -229,6 +233,7 @@ const mapStateToProps = (state) => ({
     detailsConfig: detailsConfigSelector(state),
     topics: state.topics || [],
     isSearchEnabled: isSearchEnabled(state),
+    filterGroupLabels: filterGroupsToLabelMap(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({

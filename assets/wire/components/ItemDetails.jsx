@@ -47,6 +47,7 @@ function ItemDetails({
     downloadVideo,
     followStory,
     listConfig,
+    filterGroupLabels,
 }) {
     const picture = getPicture(item);
     const videos = getVideos(item);
@@ -95,8 +96,12 @@ function ItemDetails({
 
 
 
-                        {isDisplayed('metadata_section', detailsConfig) &&
-                            <PreviewMeta item={item} isItemDetail={true} displayConfig={detailsConfig} listConfig={listConfig}/>}
+                        {isDisplayed('metadata_section', detailsConfig) && (
+                            <PreviewMeta item={item} isItemDetail={true} displayConfig={detailsConfig}
+                                listConfig={listConfig}
+                                filterGroupLabels={filterGroupLabels}
+                            />
+                        )}
                         <ArticleContentInfoWrapper>
                             {isDisplayed('tags_section', detailsConfig) &&
                                 <PreviewTags item={item} isItemDetail={true} displayConfig={detailsConfig}/>}
@@ -131,6 +136,7 @@ ItemDetails.propTypes = {
     actions: types.actions,
     listConfig: PropTypes.object,
     detailsConfig: PropTypes.object,
+    filterGroupLabels: PropTypes.object,
 
     onClose: PropTypes.func,
     downloadVideo: PropTypes.func,

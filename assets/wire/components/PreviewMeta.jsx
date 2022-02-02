@@ -16,6 +16,7 @@ function PreviewMeta({
     inputRef,
     displayConfig,
     listConfig,
+    filterGroupLabels,
 }) {
     const picture = getPicture(item);
     const fields = displayConfig.metadata_fields || DEFAULT_META_FIELDS;
@@ -42,6 +43,7 @@ function PreviewMeta({
                         listConfig,
                         isItemDetail,
                         inputRef,
+                        filterGroupLabels,
                         alwaysShow: true,
                     }}
                 />
@@ -56,6 +58,7 @@ PreviewMeta.propTypes = {
     inputRef: PropTypes.string,
     displayConfig: PropTypes.object,
     listConfig: PropTypes.object,
+    filterGroupLabels: PropTypes.object,
 };
 
 export default PreviewMeta;

@@ -125,6 +125,7 @@ def get_home_data():
         'context': 'wire',
         'topics': topics,
         'ui_config': get_resource_service('ui_config').get_section_config('home'),
+        'groups': app.config.get('WIRE_GROUPS', []),
     }
 
 
