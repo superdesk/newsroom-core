@@ -103,7 +103,10 @@ class FollowedTopics extends React.Component {
         }
 
         return this.props.topics.filter(
-            (topic) => topic.topic_type === this.props.topicType && topic.is_global === this.state.showGlobal
+            (topic) => (
+                topic.topic_type === this.props.topicType &&
+                (topic.is_global || false) === this.state.showGlobal
+            )
         );
     }
 
