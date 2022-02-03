@@ -50,7 +50,7 @@ def create():
     ids = get_resource_service('navigations').post([nav_data])
 
     if product_ids is not None:
-        add_remove_products_for_navigation(ids[0], product_ids)
+        add_remove_products_for_navigation(str(ids[0]), product_ids)
 
     return jsonify({'success': True, '_id': ids[0]}), 201
 
