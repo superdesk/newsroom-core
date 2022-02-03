@@ -2,6 +2,11 @@ import React from 'react';
 import {gettext} from 'utils';
 
 export class SearchBar extends React.PureComponent {
+    constructor(props) {
+        super(props);
+        this.state = {value: ''};
+    }
+
     render() {
         return (
             <section className="content-header">
@@ -14,13 +19,17 @@ export class SearchBar extends React.PureComponent {
                             <form className="form-inline" action="/wire" role="search" aria-label={gettext('search')}>
                                 <input type="text" name="q" className="search__input form-control"
                                     placeholder={gettext('Search for...')}
-                                    aria-label={gettext('Search for...')} />
+                                    aria-label={gettext('Search for...')}
+                                    onChange={(event) => this.setState({value: event.target.value})}
+                                />
                                 <div className="search__form__buttons">
-                                    <button type="reset" className="icon-button search__clear" title={gettext('Clear')}>
-                                        <span className="search__clear">
-                                            <img src="/static/search_clear.png" width="16" height="16"/>
-                                        </span>
-                                    </button>
+                                    {this.state.value && (
+                                        <button type="reset" className="icon-button search__clear" title={gettext('Clear')}>
+                                            <span className="search__clear">
+                                                <img src="/static/search_clear.png" width="16" height="16"/>
+                                            </span>
+                                        </button>
+                                    )}
                                     <button className="btn btn-outline-secondary" type="submit" title={gettext('Search')}>
                                         {gettext('Search')}
                                     </button>
