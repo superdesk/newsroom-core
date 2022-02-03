@@ -36,7 +36,8 @@ export default function homeReducer(state=initialState, action) {
             userSections: action.data.userSections,
             uiConfig: action.data.ui_config || {},
             topics: action.data.topics || [],
-            context: 'wire'
+            context: 'wire',
+            groups: action.data.groups || [],
         };
 
     case OPEN_ITEM:{

@@ -47,7 +47,7 @@ class WirePreview extends React.PureComponent {
     }
 
     render() {
-        const {item, user, actions, followStory, topics, previewConfig, downloadVideo, listConfig} = this.props;
+        const {item, user, actions, followStory, topics, previewConfig, downloadVideo, listConfig, filterGroupLabels} = this.props;
         const picture = getPicture(item);
         const videos = getVideos(item);
         const isCustom = isCustomRendition(picture);
@@ -77,7 +77,8 @@ class WirePreview extends React.PureComponent {
                         isCustomRendition={isCustom} />}
 
                     {isDisplayed('metadata_section', previewConfig) &&
-                    <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions} displayConfig={previewConfig} listConfig={listConfig} />}
+                    <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions} displayConfig={previewConfig} listConfig={listConfig}
+                        filterGroupLabels={filterGroupLabels} />}
                     {isDisplayed('abstract', previewConfig) &&
                     <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                     {isDisplayed('body_html', previewConfig) && <ArticleBodyHtml item={item}/>}
@@ -127,6 +128,7 @@ WirePreview.propTypes = {
     closePreview: PropTypes.func,
     downloadVideo: PropTypes.func,
     listConfig: PropTypes.object,
+    filterGroupLabels: PropTypes.object,
 };
 
 export default WirePreview;

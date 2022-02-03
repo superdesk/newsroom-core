@@ -185,7 +185,7 @@ class WireListItem extends React.Component {
                                     />
                                 )}
                                 <Embargo item={item} />
-                                <UrgencyLabel item={item} listConfig={listConfig} />
+                                <UrgencyLabel item={item} listConfig={listConfig} filterGroupLabels={this.props.filterGroupLabels} />
                                 {item.headline}
                             </div>
                         </h4>
@@ -377,6 +377,7 @@ WireListItem.propTypes = {
     matchedIds: PropTypes.array,
     isSearchFiltered: PropTypes.bool,
     showShortcutActionIcons: PropTypes.bool,
+    filterGroupLabels: PropTypes.object,
 };
 
 WireListItem.defaultProps = {
