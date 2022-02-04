@@ -1,8 +1,6 @@
-from urllib import parse
-
 from bson import ObjectId
 from superdesk import get_resource_service
-from flask import json, jsonify, abort, current_app as app, request
+from flask import json, jsonify, abort, current_app as app, request, url_for
 from flask_babel import gettext
 
 from newsroom.topics import blueprint
@@ -152,27 +150,22 @@ def is_user_or_company_topic(topic, user):
 
 
 def get_topic_url(topic):
-    query_strings = []
+    url_params = {}
     if topic.get('query'):
-        query_strings.append('q={}'.format(parse.quote(topic.get('query'))))
+        url_params["q"] = topic.get('query')
     if topic.get('filter'):
-        query_strings.append('filter={}'.format(parse.quote(json.dumps(topic.get('filter')))))
+        url_params["filter"] = json.dumps(topic.get('filter'))
     if topic.get('navigation'):
-        query_strings.append(
-            'navigation={}'.format(
-                parse.quote(json.dumps(topic.get('navigation')))
-            )
-        )
+        url_params["navigation"] = json.dumps(topic.get('navigation'))
     if topic.get('created'):
-        query_strings.append('created={}'.format(parse.quote(json.dumps(topic.get('created')))))
+        url_params["created"] = json.dumps(topic.get('created'))
 
-    url = '{}/{}?{}'.format(
-        app.config['CLIENT_URL'],
-        topic.get('topic_type'),
-        '&'.join(query_strings)
+    section = topic.get("topic_type")
+    return url_for(
+        "wire.wire" if section == "wire" else f"{section}.index",
+        _external=True,
+        **url_params
     )
-
-    return url
 
 
 @blueprint.route('/topic_share', methods=['POST'])
