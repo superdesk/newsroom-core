@@ -106,7 +106,7 @@ export default class CoverageItemStatus extends React.Component {
                         <a className="wire-column__preview__coverage__available-story"
                             key="value"
                             href={'/wire?item='+ get(coverage, 'delivery_id')}
-                            target="_blank"
+                            target={this.props.contentLinkTarget}
                             onClick={this.onAnchorClick}
                             title={gettext('Open in new tab')}>
                             {gettext('View Content')}
@@ -145,7 +145,7 @@ export default class CoverageItemStatus extends React.Component {
                 {isCoverageBeingUpdated(coverage) && (
                     <div className='coverage-item__row'>
                         <span className='label label--blue'>{gettext('Update coming')}</span>
-                    </div>                
+                    </div>
                 )}
                 <div className='coverage-item__row'>{this.getStatusContent(coverage)}</div>
 
@@ -179,6 +179,7 @@ CoverageItemStatus.propTypes = {
     ednotes: PropTypes.object,
     workflowStatusReasons: PropTypes.object,
     hideViewContentItems: PropTypes.array,
+    contentLinkTarget: PropTypes.string,
 };
 
 CoverageItemStatus.defaultProps = {actions: []};
