@@ -43,6 +43,10 @@ class UIConfigResource(newsroom.Resource):
             'type': 'boolean',
             'default': False
         },
+        'open_coverage_content_in_same_page': {
+            'type': 'boolean',
+            'default': False
+        },
         'init_version': {
             'type': 'integer'
         },

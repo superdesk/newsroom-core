@@ -1,4 +1,5 @@
 import React from 'react';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
@@ -13,9 +14,10 @@ import {
     WORKFLOW_STATUS,
     formatCoverageDate
 } from '../utils';
+import {agendaContentLinkTarget} from 'ui/selectors';
 
 
-export default function AgendaCoverages({item, coverages, wireItems, actions, user, onClick, hideViewContentItems}) {
+function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, onClick, hideViewContentItems, contentLinkTarget}) {
     if (isEmpty(coverages)) {
         return null;
     }
@@ -52,13 +54,24 @@ export default function AgendaCoverages({item, coverages, wireItems, actions, us
                 actions={actions}
                 user={user}
                 coverageData={getDataFromCoverages(item)}
-                hideViewContentItems={hideViewContentItems} />
+                hideViewContentItems={hideViewContentItems}
+                contentLinkTarget={contentLinkTarget}
+            />
         </div>
     ));
 }
 
-AgendaCoverages.propTypes = {
+AgendaCoveragesComponent.propTypes = {
     item: PropTypes.object,
     coverages: PropTypes.arrayOf(PropTypes.object),
     wireItems: PropTypes.array,
+    contentLinkTarget: PropTypes.string,
 };
+
+const mapStateToProps = (state) => ({
+    contentLinkTarget: agendaContentLinkTarget(state),
+});
+
+const AgendaCoverages = connect(mapStateToProps)(AgendaCoveragesComponent);
+
+export default AgendaCoverages;
