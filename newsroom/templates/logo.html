@@ -1,5 +1,6 @@
 <div class="navbar__logo flex-shrink-0 flex-grow-0">
     <a href="{{ url_for('wire.index') }}">
-        <img src="{{ theme_url('logo.svg') }}" alt="{{ config.SITE_NAME }}"/>
+        <h1 class="a11y-only">{{ config.SITE_NAME }}</h1>
+        <img src="{{ theme_url('logo.svg') }}" alt="{{ config.SITE_NAME }}" aria-hidden="true" />
     </a>
 </div>

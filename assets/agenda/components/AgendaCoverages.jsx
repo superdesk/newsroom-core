@@ -33,8 +33,8 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
             {'coverage-item--clickable': onClick})} key={coverage.coverage_id} onClick={onClick}
         title={onClick ? gettext('Open Agenda in new tab') : onClick} >
             <div className='coverage-item__row'>
-                <span className='d-flex coverage-item--element-grow'>
-                    <i className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} ${WORKFLOW_COLORS[coverage.workflow_status]} mr-2`}></i>
+                <span className={classNames('coverage-item__coverage-icon', WORKFLOW_COLORS[coverage.workflow_status])}>                    
+                    <i className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} mr-2`}></i>
                     <span>{`${getCoverageDisplayName(coverage.coverage_type)}${getSlugline(coverage)}`}</span>
                 </span>
                 {coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED && <span className='d-flex text-nowrap'>

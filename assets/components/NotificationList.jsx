@@ -41,6 +41,7 @@ class NotificationList extends React.Component {
     render() {
         return (
             <div className="badge--top-right">
+                <h3 className="a11y-only">Notification Bell</h3>
                 {this.props.notifications && this.props.notifications.length > 0 &&
                     <div className="badge badge-pill badge-info badge-secondary">
                         {this.props.notifications && this.props.notifications.length}
@@ -51,6 +52,7 @@ class NotificationList extends React.Component {
                     className="notif__circle"
                     ref={(elem) => this.elem = elem}
                     title={gettext('Notifications')}>
+                    <h3 className="a11y-only">Notification bell</h3>    
                     <i className='icon--alert icon--white' onClick={this.toggleDisplay} />
                 </span>
 
