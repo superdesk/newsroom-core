@@ -23,9 +23,12 @@ import {
  *
  * 'en' comes by default
  */
+// TODO: Improve how we load Moment locales, based on server config
 import 'moment/locale/fr-ca';
-moment.locale('fr_CA');
-moment.locale('en');
+import 'moment/locale/fi';
+import 'moment/locale/cs';
+
+moment.locale(getLocale());
 
 export const now = moment(); // to enable mocking in tests
 const NEWSROOM = 'newsroom';
