@@ -10,8 +10,6 @@ import {
     getTimezoneOffset,
     errorHandler,
     getLocaleDate,
-    DATE_FORMAT,
-    TIME_FORMAT,
     recordAction
 } from 'utils';
 import {noNavigationSelected, getNavigationUrlParam} from 'search/utils';
