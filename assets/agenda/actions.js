@@ -272,7 +272,7 @@ function search(state, next) {
         fromDateFilter = getMomentDate(get(state, 'agenda.activeDate')).set({
             hour: currentMoment.hour(),
             minute: currentMoment.minute()
-        }).format(`${DATE_FORMAT} ${TIME_FORMAT}`);
+        }).format('DD/MM/YYYY HH:mm'); // Server expects specific date/time format for FeaturedStories param
     } else {
         const agendaDate = getDateInputDate(get(state, 'agenda.activeDate'));
         fromDateFilter = (
