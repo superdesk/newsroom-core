@@ -5,6 +5,8 @@ from copy import deepcopy
 from flask import current_app as app, json, abort
 from flask_babel import gettext
 from eve.utils import ParsedRequest
+from werkzeug.exceptions import Forbidden
+
 from superdesk import get_resource_service
 from superdesk.metadata.utils import get_elastic_highlight_query
 from superdesk.default_settings import strtobool
@@ -643,3 +645,92 @@ class BaseSearchService(Service):
         if embargoed_response.count():
             response.docs = embargoed_response.docs + response.docs
             response.hits["hits"]["total"] = response.count() + embargoed_response.count()
+
+    def get_matching_topics_for_item(self, item_id, topics, users, companies, query):
+        aggs = {
+            'topics': {
+                'filters': {
+                    'filters': {}
+                }
+            }
+        }
+
+        queried_topics = []
+        # get all section filters
+        section_filters = get_resource_service('section_filters').get_section_filters_dict()
+
+        for topic in topics:
+            search = SearchQuery()
+
+            user = users.get(str(topic['user']))
+            if not user:
+                continue
+
+            search.user = user
+            search.is_admin = is_admin(user)
+            search.company = companies.get(str(user.get('company', '')))
+
+            search.query = deepcopy(query)
+            search.section = topic.get('topic_type')
+
+            self.prefill_search_products(search)
+
+            if topic.get('query'):
+                search.query['bool']['must'].append(
+                    query_string(topic['query'])
+                )
+
+            if topic.get('created'):
+                search.query['bool']['must'].append(
+                    self.versioncreated_range(dict(
+                        created_from=topic['created'].get('from'),
+                        created_to=topic['created'].get('to'),
+                        timezone_offset=topic.get('timezone_offset', '0')
+                    ))
+                )
+
+            if topic.get('filter'):
+                search.query['bool']['must'] += self._filter_terms(topic['filter'])
+
+            # for now even if there's no active company matching for the user
+            # continuing with the search
+            try:
+                self.validate_request(search)
+                self.apply_section_filter(search, section_filters)
+                self.apply_company_filter(search)
+                self.apply_time_limit_filter(search)
+                self.apply_products_filter(search)
+            except Forbidden:
+                logger.info(
+                    'Notification for user:{} and topic:{} is skipped'.format(
+                        user.get('_id'),
+                        topic.get('_id')
+                    )
+                )
+                continue
+
+            aggs['topics']['filters']['filters'][str(topic['_id'])] = search.query
+
+            queried_topics.append(topic)
+
+        source = {'query': query}
+        source['aggs'] = aggs if aggs["topics"]["filters"]["filters"] else {}
+        source['size'] = 0
+
+        req = ParsedRequest()
+        req.args = {'source': json.dumps(source)}
+        topic_matches = []
+
+        try:
+            search_results = self.internal_get(req, None)
+
+            for topic in queried_topics:
+                if search_results.hits['aggregations']['topics']['buckets'][str(topic['_id'])]['doc_count'] > 0:
+                    topic_matches.append(topic['_id'])
+
+        except Exception as exc:
+            logger.error('Error in get_matching_topics for query: {}'.format(json.dumps(source)),
+                         exc, exc_info=True)
+            raise
+
+        return topic_matches

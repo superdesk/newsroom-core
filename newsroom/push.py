@@ -12,7 +12,7 @@ from superdesk.utc import utcnow
 from planning.common import WORKFLOW_STATE
 
 from newsroom.notifications import push_notification
-from newsroom.topics.topics import get_wire_notification_topics, get_agenda_notification_topics
+from newsroom.topics.topics import get_agenda_notification_topics_for_query_by_id, get_topics_with_subscribers
 from newsroom.utils import parse_dates, get_user_dict, get_company_dict, parse_date_str
 from newsroom.email import send_new_item_notification_email, \
     send_history_match_notification_email, send_item_killed_notification_email
@@ -597,24 +597,29 @@ def set_item_reference(coverage):
 
 
 def notify_new_item(item, check_topics=True):
-    if not item or item.get('type') == 'composite':
+    if not item or item.get("type") == 'composite':
         return
 
-    user_dict = get_user_dict()
-    user_ids = [u['_id'] for u in user_dict.values()]
+    item_type = item.get("type")
+    try:
+        user_dict = get_user_dict()
+        user_ids = [u['_id'] for u in user_dict.values()]
 
-    company_dict = get_company_dict()
-    company_ids = [c['_id'] for c in company_dict.values()]
+        company_dict = get_company_dict()
+        company_ids = [c['_id'] for c in company_dict.values()]
 
-    push_notification('new_item', _items=[item])
+        push_notification('new_item', _items=[item])
 
-    if check_topics:
-        if item.get('type') == 'text':
-            notify_wire_topic_matches(item, user_dict, company_dict)
-        else:
-            notify_agenda_topic_matches(item, user_dict)
+        if check_topics:
+            if item_type == 'text':
+                notify_wire_topic_matches(item, user_dict, company_dict)
+            else:
+                notify_agenda_topic_matches(item, user_dict, company_dict)
 
-    notify_user_matches(item, user_dict, company_dict, user_ids, company_ids)
+        notify_user_matches(item, user_dict, company_dict, user_ids, company_ids)
+    except Exception as e:
+        logger.exception(e)
+        logger.error(f"Failed to notify users for new {item_type} item {item['_id']}")
 
 
 def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids):
@@ -709,8 +714,7 @@ def send_user_notification_emails(item, user_matches, users, section):
 
 
 def notify_wire_topic_matches(item, users_dict, companies_dict):
-    topics = get_wire_notification_topics()
-
+    topics = get_topics_with_subscribers("wire")
     topic_matches = superdesk.get_resource_service('wire_search'). \
         get_matching_topics(item['_id'], topics, users_dict, companies_dict)
 
@@ -721,10 +725,18 @@ def notify_wire_topic_matches(item, users_dict, companies_dict):
         send_topic_notification_emails(item, topics, topic_matches, users_dict)
 
 
-def notify_agenda_topic_matches(item, users_dict):
-    topics = get_agenda_notification_topics(item, users_dict)
+def notify_agenda_topic_matches(item, users_dict, companies_dict):
+    topics = get_topics_with_subscribers("agenda")
+    topic_matches = superdesk.get_resource_service("agenda"). \
+        get_matching_topics(item['_id'], topics, users_dict, companies_dict)
 
-    topic_matches = [t['_id'] for t in topics]
+    # Include topics where the ``query`` is ``item["_id"]``
+    topic_match_ids = [topic.get("_id") for topic in topic_matches]
+    topic_matches.extend([
+        topic
+        for topic in get_agenda_notification_topics_for_query_by_id(item, users_dict)
+        if topic.get("_id") not in topic_match_ids
+    ])
 
     if topic_matches:
         push_notification('topic_matches',
