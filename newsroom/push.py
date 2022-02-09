@@ -731,11 +731,10 @@ def notify_agenda_topic_matches(item, users_dict, companies_dict):
         get_matching_topics(item['_id'], topics, users_dict, companies_dict)
 
     # Include topics where the ``query`` is ``item["_id"]``
-    topic_match_ids = [topic.get("_id") for topic in topic_matches]
     topic_matches.extend([
         topic
         for topic in get_agenda_notification_topics_for_query_by_id(item, users_dict)
-        if topic.get("_id") not in topic_match_ids
+        if topic.get("_id") not in topic_matches
     ])
 
     if topic_matches:
