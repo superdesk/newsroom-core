@@ -619,7 +619,7 @@ export function errorHandler(error, dispatch, setError) {
     console.error('error', error);
 
     if (error.response.status !== 400) {
-        notify.error(error.response.statusText);
+        notify.error(error.response.statusText || gettext('Failed to process request!'));
         return;
     }
     if (setError) {
