@@ -288,7 +288,10 @@ def get_user_dict():
         user_dict = {
             str(user['_id']): user
             for user in all_users
-            if is_company_enabled(user, companies.get(user.get('company'))) and not is_company_expired(companies.get(user.get('company')))
+            if (
+                is_company_enabled(user, companies.get(user.get('company')))
+                and not is_company_expired(companies.get(user.get('company')))
+            )
         }
         g.user_dict = user_dict
     return g.user_dict
