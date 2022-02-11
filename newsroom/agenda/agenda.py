@@ -6,6 +6,7 @@ from content_api.items.resource import code_mapping
 from eve.utils import ParsedRequest, config
 from flask import json, abort, current_app as app
 from flask_babel import lazy_gettext
+
 from planning.common import WORKFLOW_STATE_SCHEMA, ASSIGNMENT_WORKFLOW_STATE, WORKFLOW_STATE
 from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
@@ -964,6 +965,28 @@ class AgendaService(BaseSearchService):
                         self.notify_agenda_update(updated_agenda, updated_agenda, None, True, None, coverage)
                     break
         return agenda_items
+
+    def get_matching_topics(self, item_id, topics, users, companies):
+        """ Returns a list of topic ids matching to the given item_id
+
+        :param item_id: item id to be tested against all topics
+        :param topics: list of topics
+        :param users: user_id, user dictionary
+        :param companies: company_id, company dictionary
+        :return:
+        """
+
+        return self.get_matching_topics_for_item(item_id, topics, users, companies, {
+            "bool": {
+                "must_not": [
+                    {"term": {"state": "killed"}},
+                ],
+                "must": [
+                    {"term": {'_id': item_id}},
+                ],
+                "should": []
+            }
+        })
 
     def enhance_coverage_watches(self, item):
         for c in (item.get('coverages') or []):

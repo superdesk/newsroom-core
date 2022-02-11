@@ -65,17 +65,16 @@ def get_user_topics(user_id):
     }))
 
 
-def get_wire_notification_topics():
-    lookup = {
-        '$and': [
-            {'subscribers': {'$exists': True, '$ne': []}},
-            {'topic_type': 'wire'},
+def get_topics_with_subscribers(topic_type: str):
+    return list(superdesk.get_resource_service('topics').get(req=None, lookup={
+        "$and": [
+            {"subscribers": {"$exists": True, "$ne": []}},
+            {"topic_type": topic_type},
         ]
-    }
-    return list(superdesk.get_resource_service('topics').get(req=None, lookup=lookup))
+    }))
 
 
-def get_agenda_notification_topics(item, users):
+def get_agenda_notification_topics_for_query_by_id(item, users):
     """
     Returns active topics for a given agenda item
     :param item: agenda item

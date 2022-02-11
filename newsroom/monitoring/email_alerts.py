@@ -34,6 +34,13 @@ logger = logging.getLogger(__name__)
 class MonitoringEmailAlerts(Command):
     def run(self, immediate=False):
         self.log_msg = 'Monitoring Scheduled Alerts: {}'.format(utcnow())
+
+        try:
+            get_resource_service('monitoring')
+        except KeyError:
+            logger.info('{} Monitoring app is not enabled! Not sending email alerts'.format(self.log_msg))
+            return
+
         logger.info('{} Starting to send alerts.'.format(self.log_msg))
 
         lock_name = get_lock_id('newsroom', 'monitoring_{0}'.format('scheduled' if not immediate else 'immediate'))
