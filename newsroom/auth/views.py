@@ -10,7 +10,8 @@ from superdesk.utc import utcnow
 
 from newsroom.auth import blueprint, get_auth_user_by_email, get_user_by_email
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
-from newsroom.utils import get_random_string, is_company_enabled, is_account_enabled
+from newsroom.utils import get_random_string, is_company_enabled, is_account_enabled, is_company_expired, \
+    get_cached_resource_by_id
 from newsroom.email import send_validate_account_email, \
     send_reset_password_email, send_new_signup_email, send_new_account_email
 from newsroom.limiter import limiter
@@ -39,8 +40,14 @@ def login():
                 flask.flash(gettext('Insufficient Permissions. Access denied.'), 'danger')
                 return flask.render_template('login.html', form=form)
 
-            if not is_company_enabled(user):
+            company = get_cached_resource_by_id("companies", user.get("company"))
+
+            if not is_company_enabled(user, company):
                 flask.flash(gettext('Company account has been disabled.'), 'danger')
+                return flask.render_template('login.html', form=form)
+
+            if is_company_expired(company):
+                flask.flash(gettext("Company account has expired."), "danger")
                 return flask.render_template('login.html', form=form)
 
             if is_account_enabled(user):
@@ -149,9 +156,13 @@ def get_login_token():
 
     if user is not None and _is_password_valid(password.encode('UTF-8'), user):
         user = get_resource_service('users').find_one(req=None, _id=user['_id'])
+        company = get_cached_resource_by_id("companies", user.get("company"))
 
-        if not is_company_enabled(user):
+        if not is_company_enabled(user, company):
             abort(401, gettext('Company account has been disabled.'))
+
+        if is_company_expired(company):
+            abort(401, gettext("Company account has expired."))
 
         if is_account_enabled(user):
             return generate_auth_token(

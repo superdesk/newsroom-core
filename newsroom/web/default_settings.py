@@ -425,3 +425,9 @@ WIRE_SUBJECT_SCHEME_WHITELIST = []
 #: .. versionadded:: 2.1.0
 #:
 AGENDA_GROUPS = None
+
+#: If True, allows Users to log in after their associated Company has expired
+#:
+#: .. versionadded:: 2.1.0
+#:
+ALLOW_EXPIRED_COMPANY_LOGINS = False

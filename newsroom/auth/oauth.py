@@ -7,7 +7,7 @@ import superdesk
 from superdesk.utc import utcnow
 
 from newsroom.template_filters import is_admin
-from newsroom.utils import is_company_enabled, is_account_enabled
+from newsroom.utils import is_company_enabled, is_account_enabled, is_company_expired, get_cached_resource_by_id
 from newsroom.limiter import limiter
 
 blueprint = Blueprint("oauth", __name__)
@@ -68,8 +68,13 @@ def google_authorized():
     if not is_admin(user) and not user.get("company"):
         return redirect_with_error(gettext("No Company assigned"))
 
-    if not is_company_enabled(user):
+    company = get_cached_resource_by_id("companies", user.get("company"))
+
+    if not is_company_enabled(user, company):
         return redirect_with_error(gettext("Company is disabled"))
+
+    if is_company_expired(company):
+        return redirect_with_error(gettext("Company has expired"))
 
     if not is_account_enabled(user):
         return redirect_with_error(gettext("Account is disabled"))

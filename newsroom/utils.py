@@ -251,6 +251,9 @@ def is_company_enabled(user, company=None):
 
 
 def is_company_expired(company):
+    if app.config.get('ALLOW_EXPIRED_COMPANY_LOGINS'):
+        return False
+
     expiry_date = company.get('expiry_date')
     if not expiry_date:
         return False
@@ -282,8 +285,11 @@ def get_user_dict():
         lookup = {'is_enabled': True}
         all_users = query_resource('users', lookup=lookup)
         companies = get_company_dict()
-        user_dict = {str(user['_id']): user for user in all_users
-                     if is_company_enabled(user, companies.get(user.get('company')))}
+        user_dict = {
+            str(user['_id']): user
+            for user in all_users
+            if is_company_enabled(user, companies.get(user.get('company'))) and not is_company_expired(companies.get(user.get('company')))
+        }
         g.user_dict = user_dict
     return g.user_dict
 
@@ -300,8 +306,11 @@ def get_company_dict():
     if 'company_dict' not in g or app.testing:
         lookup = {'is_enabled': True}
         all_companies = list(query_resource('companies', lookup=lookup))
-        g.company_dict = {str(company['_id']): company for company in all_companies
-                          if is_company_enabled({'company': company['_id']}, company)}
+        g.company_dict = {
+            str(company['_id']): company
+            for company in all_companies
+            if is_company_enabled({'company': company['_id']}, company) and not is_company_expired(company)
+        }
     return g.company_dict
 
 
@@ -346,6 +355,11 @@ def is_valid_login(user_id):
     if not is_company_enabled(user, company):
         session.pop('_flashes', None)  # remove old messages and just show one message
         flash(gettext('Company account has been disabled.'), 'danger')
+        return False
+
+    if is_company_expired(company):
+        session.pop("_flashes", None)  # remove old messages and just show one message
+        flash(gettext("Company account has expired."), "danger")
         return False
 
     # Updated the active time for the user if required
