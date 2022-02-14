@@ -71,8 +71,7 @@ def get_view_data():
     company_id = str(user['company']) if user and user.get('company') else None
 
     return {
-        'user': str(user['_id']) if user else None,
-        'user_type': (user or {}).get('user_type') or 'public',
+        'user': user,
         'company': company_id,
         'topics': [t for t in topics if t.get('topic_type') == 'wire'],
         'formats': [{'format': f['format'], 'name': f['name'], 'assets': f['assets']}

@@ -31,16 +31,24 @@ class SearchResultsInfo extends React.Component {
     }
 
     render() {
-        const saveButtonText = get(this.props, 'activeTopic._id') ?
+        const activeTopic = get(this.props, 'activeTopic', {});
+        const user = get(this.props, 'user', {});
+        const saveButtonText = activeTopic._id != null ?
             gettext('Update my topic') :
             gettext('Create my topic');
+        const canSaveTopic = !activeTopic._id ||
+            !activeTopic.is_global ||
+            (
+                activeTopic.is_global &&
+                user.manage_company_topics === true
+            );
 
         return (
             <SearchResults
                 scrollClass={this.props.scrollClass}
                 showTotalItems={this.props.showTotalItems}
                 showTotalLabel={this.props.showTotalLabel}
-                showSaveTopic={this.props.showSaveTopic}
+                showSaveTopic={this.props.showSaveTopic && canSaveTopic}
                 totalItems={this.props.totalItems}
                 totalItemsLabel={this.props.totalItemsLabel}
                 saveMyTopic={this.saveMyTopic}
@@ -58,6 +66,7 @@ class SearchResultsInfo extends React.Component {
 }
 
 SearchResultsInfo.propTypes = {
+    user: PropTypes.object,
     scrollClass: PropTypes.string,
 
     showTotalItems: PropTypes.bool,
@@ -83,6 +92,7 @@ SearchResultsInfo.defaultProps = {
 };
 
 const mapStateToProps = (state) => ({
+    user: state.userObject,
     searchParams: searchParamsSelector(state),
 });
 
