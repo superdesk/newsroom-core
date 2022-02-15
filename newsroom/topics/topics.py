@@ -49,6 +49,9 @@ class TopicsService(newsroom.Service):
         if original.get('is_global') and 'is_global' in updates and not updates.get('is_global'):
             updates['subscribers'] = [original['user']] if original['user'] in original['subscribers'] else []
 
+    def get_items(self, item_ids):
+        return self.get(req=None, lookup={"_id": {"$in": item_ids}})
+
 
 def get_user_topics(user_id):
     user = superdesk.get_resource_service('users').find_one(req=None, _id=ObjectId(user_id))

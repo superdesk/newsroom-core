@@ -18,7 +18,7 @@ import newsroom
 from newsroom.agenda.email import send_coverage_notification_email, send_agenda_notification_email
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
-from newsroom.notifications import push_notification
+from newsroom.notifications import push_notification, save_user_notifications, UserNotification
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.utils import get_user_dict, get_company_dict, get_entity_or_404, parse_date_str
 from newsroom.utils import get_local_date, get_end_date
@@ -1019,10 +1019,6 @@ class AgendaService(BaseSearchService):
                                                   events_only)
 
             users = [user_dict[str(user_id)] for user_id in notify_user_ids]
-            # Only one push-notification
-            push_notification('agenda_update',
-                              item=agenda,
-                              users=notify_user_ids)
 
             if len(notify_user_ids) == 0 and not coverage_watched:
                 return
@@ -1158,12 +1154,18 @@ class AgendaService(BaseSearchService):
                         users = users + [user_dict[str(user_id)] for user_id in notify_user_ids]
 
                 # Send notifications to users
-                for user in users:
-                    app.data.insert('notifications', [{
-                        'item': agenda.get('_id'),
-                        'user': user['_id']
-                    }])
+                save_user_notifications([
+                    UserNotification(
+                        user=user["_id"],
+                        item=agenda.get("_id"),
+                        resource="agenda",
+                        action="watched_agenda_updated",
+                        data=None,
+                    )
+                    for user in users
+                ])
 
+                for user in users:
                     send_agenda_notification_email(
                         user,
                         agenda,
