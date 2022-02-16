@@ -6,11 +6,13 @@ import CheckboxInput from 'components/CheckboxInput';
 import AuditInformation from 'components/AuditInformation';
 
 import {gettext} from 'utils';
-import {isUserAdmin, getUserTypes, getUserLabel, userTypeReadOnly} from '../utils';
+import {isUserAdmin, getUserTypes, getUserLabel, userTypeReadOnly, getLocaleInputOptions, getDefaultLocale} from '../utils';
 
 const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
 
 function EditUser({user, onChange, errors, companies, onSave, onResetPassword, onClose, onDelete, currentUser}) {
+    const localeOptions = getLocaleInputOptions();
+
     return (
         <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit User')}>
             <div className='list-item__preview-header'>
@@ -86,6 +88,18 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                         options={getCompanyOptions(companies)}
                         onChange={onChange}
                         error={errors ? errors.company : null} />
+
+                    {!localeOptions.length ? null : (
+                        <SelectInput
+                            name={'locale'}
+                            label={gettext('Language')}
+                            value={user.locale}
+                            onChange={onChange}
+                            options={localeOptions}
+                            defaultOption={getDefaultLocale()}
+                            error={errors ? errors.locale : null}
+                        />
+                    )}
 
                     <CheckboxInput
                         name='is_approved'
