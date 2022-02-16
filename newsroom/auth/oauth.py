@@ -73,7 +73,7 @@ def google_authorized():
     if not is_company_enabled(user, company):
         return redirect_with_error(gettext("Company is disabled"))
 
-    if is_company_expired(company):
+    if is_company_expired(user, company):
         return redirect_with_error(gettext("Company has expired"))
 
     if not is_account_enabled(user):

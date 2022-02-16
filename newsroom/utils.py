@@ -250,11 +250,15 @@ def is_company_enabled(user, company=None):
     return user_company.get('is_enabled', False)
 
 
-def is_company_expired(company):
-    if app.config.get('ALLOW_EXPIRED_COMPANY_LOGINS'):
+def is_company_expired(user=None, company=None):
+    if app.config.get("ALLOW_EXPIRED_COMPANY_LOGINS"):
         return False
+    elif user and not user.get("company"):
+        return False if is_admin(user) else True
+    elif user and not company:
+        company = get_cached_resource_by_id("companies", user.get("company"))
 
-    expiry_date = company.get('expiry_date')
+    expiry_date = (company or {}).get("expiry_date")
     if not expiry_date:
         return False
     return expiry_date.replace(tzinfo=None) <= datetime.utcnow().replace(tzinfo=None)
@@ -289,8 +293,8 @@ def get_user_dict():
             str(user['_id']): user
             for user in all_users
             if (
-                is_company_enabled(user, companies.get(user.get('company')))
-                and not is_company_expired(companies.get(user.get('company')))
+                is_company_enabled(user, companies.get(str(user.get("company"))))
+                and not is_company_expired(user, companies.get(str(user.get("company"))))
             )
         }
         g.user_dict = user_dict
@@ -312,7 +316,7 @@ def get_company_dict():
         g.company_dict = {
             str(company['_id']): company
             for company in all_companies
-            if is_company_enabled({'company': company['_id']}, company) and not is_company_expired(company)
+            if is_company_enabled({"company": company["_id"]}, company) and not is_company_expired(company=company)
         }
     return g.company_dict
 
@@ -360,7 +364,7 @@ def is_valid_login(user_id):
         flash(gettext('Company account has been disabled.'), 'danger')
         return False
 
-    if is_company_expired(company):
+    if is_company_expired(user, company):
         session.pop("_flashes", None)  # remove old messages and just show one message
         flash(gettext("Company account has expired."), "danger")
         return False

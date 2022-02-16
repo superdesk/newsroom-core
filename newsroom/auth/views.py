@@ -46,7 +46,7 @@ def login():
                 flask.flash(gettext('Company account has been disabled.'), 'danger')
                 return flask.render_template('login.html', form=form)
 
-            if is_company_expired(company):
+            if is_company_expired(user, company):
                 flask.flash(gettext("Company account has expired."), "danger")
                 return flask.render_template('login.html', form=form)
 
@@ -161,7 +161,7 @@ def get_login_token():
         if not is_company_enabled(user, company):
             abort(401, gettext('Company account has been disabled.'))
 
-        if is_company_expired(company):
+        if is_company_expired(user, company):
             abort(401, gettext("Company account has expired."))
 
         if is_account_enabled(user):

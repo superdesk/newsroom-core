@@ -327,9 +327,16 @@ def test_expired_company_does_not_restrict_activity(client, app):
     with app.test_request_context():
         companies = get_company_dict()
 
-        assert '1' in companies
-        assert '2' not in companies
-        assert '3' in companies
+        assert "1" in companies
+        assert "2" not in companies
+        assert "3" not in companies
+
+        app.config["ALLOW_EXPIRED_COMPANY_LOGINS"] = True
+        companies = get_company_dict()
+
+        assert "1" in companies
+        assert "2" not in companies
+        assert "3" in companies
 
 
 def test_is_valid_login(client, app):
