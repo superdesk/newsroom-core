@@ -51,6 +51,7 @@ class EditClient extends React.Component {
                                         name='client secret'
                                         label={gettext('Client Secret')}
                                         value={this.props.client.secret_key}
+                                        iconName='icon--copy'
                                         description={gettext('Make sure to copy your new client secret now. You won`t be able to see it again.')}
                                     />
                                 }

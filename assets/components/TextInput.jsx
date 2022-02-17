@@ -17,6 +17,7 @@ function TextInput({
     description,
     min,
     autoFocus,
+    iconName,
     ...props
 }) {
     return (
@@ -24,6 +25,16 @@ function TextInput({
             {label && (
                 <label htmlFor={name}>{label}</label>
             )}
+            {iconName && iconName==='icon--copy' &&
+                <button  
+                    className='icon-button' 
+                    onClick={(e) => {e.preventDefault();navigator.clipboard.writeText(value);}}
+                    title='Copy'
+                >
+                    <i className={iconName}></i>
+                </button>
+            }    
+            
             <div className="field">
                 <input
                     type={type || 'text'}
@@ -52,6 +63,7 @@ TextInput.propTypes = {
     label: PropTypes.string,
     name: PropTypes.string,
     value: PropTypes.string,
+    iconName: PropTypes.string,
     error: PropTypes.arrayOf(PropTypes.string),
     onChange: PropTypes.func,
     required: PropTypes.bool,
