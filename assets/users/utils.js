@@ -27,7 +27,7 @@ export function getUserTypes(user) {
 }
 
 export function isUserAdmin(user) {
-    return get(user, 'user_type') === 'Administrator';
+    return get(user, 'user_type') === 'administrator';
 }
 
 export function canUserManageTopics(user) {
