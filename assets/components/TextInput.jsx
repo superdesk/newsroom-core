@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext} from 'utils';
+
 import InputWrapper from './InputWrapper';
+
+import {gettext} from 'utils';
 
 function TextInput({
     type,
