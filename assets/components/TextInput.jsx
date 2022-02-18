@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import {gettext} from 'utils'
 import InputWrapper from './InputWrapper';
 
 function TextInput({
@@ -29,7 +29,7 @@ function TextInput({
                 <button  
                     className='icon-button' 
                     onClick={(e) => {e.preventDefault();navigator.clipboard.writeText(value);}}
-                    title='Copy'
+                    title={gettext('Copy')}
                 >
                     <i className='icon--copy'></i>
                 </button>
