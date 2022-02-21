@@ -46,8 +46,8 @@ function getNotificationUrl(notification, item) {
     }
 
     return notification.resource === 'agenda' ?
-        `/wire?item=${item._id}` :
-        `/agenda?item=${item._id}`;
+        `/agenda?item=${item._id}` :
+        `/wire?item=${item._id}`;
 }
 
 function getNotificationName(item) {
