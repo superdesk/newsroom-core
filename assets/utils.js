@@ -459,15 +459,17 @@ export const notify = {
  * @return {string}
  */
 export function getTextFromHtml(html) {
-    if (html == null || html.length === 0) {
+    let raw_html = (html || '').trim();
+
+    if (raw_html.length === 0) {
         return '';
-    } else if (html[0] !== '<') {
+    } else if (raw_html[0] !== '<') {
         // No need to convert if the string doesn't start with a tag
-        return html;
+        return raw_html;
     }
 
     const div = document.createElement('div');
-    div.innerHTML = formatHTML(html);
+    div.innerHTML = formatHTML(raw_html);
     const tree = document.createTreeWalker(div, NodeFilter.SHOW_TEXT, null, false); // ie requires all params
     const text = [];
     while (tree.nextNode()) {
