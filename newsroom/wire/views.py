@@ -26,7 +26,7 @@ from newsroom.email import send_template_email
 from newsroom.companies import get_user_company
 from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request, query_resource, \
     get_agenda_dates, get_location_string, get_public_contacts, get_links, get_items_for_user_action
-from newsroom.notifications import push_user_notification, push_notification
+from newsroom.notifications import push_user_notification, push_notification, save_user_notifications, UserNotification
 from newsroom.companies import section
 from newsroom.template_filters import is_admin_or_internal
 
@@ -282,6 +282,21 @@ def share():
             template_kwargs['contactList'] = [get_public_contacts(item) for item in items]
             template_kwargs['linkList'] = [get_links(item) for item in items]
             template_kwargs['is_admin'] = is_admin_or_internal(user)
+
+        save_user_notifications([UserNotification(
+            resource=item_type,
+            action="share",
+            user=user["_id"],
+            item=items[0]["_id"],
+            data=dict(
+                shared_by=dict(
+                    _id=current_user["_id"],
+                    first_name=current_user["first_name"],
+                    last_name=current_user["last_name"],
+                ),
+                items=[i["_id"] for i in items]
+            ),
+        )])
 
         send_template_email(
             to=[user["email"]],

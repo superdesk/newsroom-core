@@ -12,7 +12,7 @@ from newsroom.auth.views import send_token, add_token_data, \
     is_current_user_admin, is_current_user, is_current_user_account_mgr
 from newsroom.decorator import admin_only, login_required, account_manager_only
 from newsroom.companies import get_user_company_name, get_company_sections_monitoring_data
-from newsroom.notifications.notifications import get_user_notifications
+from newsroom.notifications.notifications import get_notifications_with_items
 from newsroom.notifications import push_user_notification, push_company_notification
 from newsroom.topics import get_user_topics
 from newsroom.users import blueprint
@@ -209,7 +209,8 @@ def post_topic(_id):
 def get_notifications(user_id):
     if flask.session['user'] != str(user_id):
         flask.abort(403)
-    return jsonify({'_items': get_user_notifications(user_id)}), 200
+
+    return jsonify(get_notifications_with_items()), 200
 
 
 @blueprint.route('/users/<user_id>/notifications', methods=['DELETE'])
