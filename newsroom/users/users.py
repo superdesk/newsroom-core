@@ -149,3 +149,8 @@ class UsersService(newsroom.Service):
 
     def on_deleted(self, doc):
         app.cache.delete(str(doc.get('_id')))
+
+    def on_delete(self, doc):
+        if doc.get('_id') == get_user_id():
+            raise Exception
+        app.cache.delete(str(doc.get('_id')))

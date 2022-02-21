@@ -165,7 +165,14 @@ export function deleteCompany() {
                 notify.success(gettext('Company deleted successfully'));
                 dispatch(fetchCompanies());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error) => {
+                if (error.response.status == 403) {
+                    error.response.json().then(function(data) {
+                        notify.error(data['company']);
+                    });
+                }
+                errorHandler(error, dispatch, setError);
+            });
     };
 }
 

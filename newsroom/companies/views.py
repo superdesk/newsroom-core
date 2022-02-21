@@ -127,7 +127,10 @@ def delete(_id):
     """
     Deletes the company and users of the company with given company id
     """
-    get_resource_service('users').delete_action(lookup={'company': ObjectId(_id)})
+    try:
+        get_resource_service('users').delete_action(lookup={'company': ObjectId(_id)})
+    except Exception:
+        return jsonify({'company': gettext('Can not delete current user.')}), 403
     get_resource_service('companies').delete_action(lookup={'_id': ObjectId(_id)})
 
     app.cache.delete(_id)
