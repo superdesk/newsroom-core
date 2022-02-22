@@ -50,7 +50,7 @@ export function getItemActions(dispatch, actions) {
             icon: 'download',
             multi: true,
             visited: (user, item) => user && item && item.downloads &&  item.downloads.includes(user),
-            when: (state) => state.user && state.company,
+            when: (state) => state.user && (state.company || state.userType === 'administrator'),
             action: (items) => dispatch(downloadItems(items)),
         },
         {
