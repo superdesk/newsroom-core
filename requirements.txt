@@ -11,6 +11,8 @@ PyRTF3>=0.47.5
 xhtml2pdf>=0.2.4
 elastic-apm[flask]>=6.7,<6.8
 
+reportlab==3.6.6
+MarkupSafe<2.1
 
 # Use develop branch for now (until 2.4 is released, to fix inclusion of `tests` from Superdesk)
 git+https://github.com/superdesk/superdesk-core.git@46d5140#egg=superdesk-core
