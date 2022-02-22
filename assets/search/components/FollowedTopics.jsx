@@ -68,7 +68,9 @@ class FollowedTopics extends React.Component {
 
     componentDidMount() {
         this.onTopicChanged();
-        this.props.fetchCompanyUsers(this.props.user.company);
+        if (this.props.user && this.props.user.company && this.props.user.company.length) {
+            this.props.fetchCompanyUsers(this.props.user.company);
+        }
     }
 
     componentDidUpdate(prevProps) {
