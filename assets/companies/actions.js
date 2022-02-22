@@ -168,7 +168,7 @@ export function deleteCompany() {
             .catch((error) => {
                 if (error.response.status == 403) {
                     error.response.json().then(function(data) {
-                        notify.error(data['company']);
+                        notify.error(data['error']);
                     });
                 }
                 errorHandler(error, dispatch, setError);

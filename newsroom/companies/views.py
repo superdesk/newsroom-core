@@ -7,7 +7,7 @@ from bson import ObjectId
 from flask import jsonify, current_app as app
 from flask_babel import gettext
 from superdesk import get_resource_service
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, BadRequest
 
 from newsroom.decorator import admin_only, account_manager_only, login_required
 from newsroom.companies import blueprint
@@ -129,8 +129,8 @@ def delete(_id):
     """
     try:
         get_resource_service('users').delete_action(lookup={'company': ObjectId(_id)})
-    except Exception:
-        return jsonify({'company': gettext('Can not delete current user.')}), 403
+    except BadRequest as er:
+        return jsonify({'error': gettext(er.description)}), 403
     get_resource_service('companies').delete_action(lookup={'_id': ObjectId(_id)})
 
     app.cache.delete(_id)

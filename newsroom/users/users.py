@@ -7,6 +7,7 @@ from superdesk.utils import is_hashed, get_hash
 import newsroom
 from newsroom.auth import get_user_id
 from newsroom.utils import set_original_creator, set_version_creator
+from werkzeug.exceptions import BadRequest
 
 
 class UsersResource(newsroom.Resource):
@@ -152,5 +153,4 @@ class UsersService(newsroom.Service):
 
     def on_delete(self, doc):
         if doc.get('_id') == get_user_id():
-            raise Exception
-        app.cache.delete(str(doc.get('_id')))
+            raise BadRequest("Can not delete current user")
