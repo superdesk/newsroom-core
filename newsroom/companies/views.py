@@ -130,7 +130,7 @@ def delete(_id):
     try:
         get_resource_service('users').delete_action(lookup={'company': ObjectId(_id)})
     except BadRequest as er:
-        return jsonify({'error': gettext(er.description)}), 403
+        return jsonify({'error': er.description}), 403
     get_resource_service('companies').delete_action(lookup={'_id': ObjectId(_id)})
 
     app.cache.delete(_id)
