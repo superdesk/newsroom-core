@@ -331,15 +331,19 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
         key = b'something random'
         app.config['PUSH_KEY'] = key
         data = json.dumps({'guid': 'bar', 'type': 'text', 'headline': 'this is a test'})
-        push_mock = mocker.patch('newsroom.push.push_notification')
+        push_mock = mocker.patch('newsroom.notifications.push_notification')
         headers = get_signature_headers(data, key)
         resp = client.post('/push', data=data, content_type='application/json', headers=headers)
         assert 200 == resp.status_code
-        assert push_mock.call_args[1]['item']['_id'] == 'bar'
-        assert len(push_mock.call_args[1]['users']) == 1
+
+        assert push_mock.call_args[0][0] == "new_notifications"
+        assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
 
         notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
-        assert notification['item'] == 'bar'
+        assert notification["action"] == "history_match"
+        assert notification["item"] == "bar"
+        assert notification["resource"] == "text"
+        assert notification["user"] == user_ids[0]
 
     assert len(outbox) == 1
     assert 'http://localhost:5050/wire?item=bar' in outbox[0].body
@@ -378,17 +382,20 @@ def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
         'description_html': 'This story is killed',
         'body_html': 'Killed story',
         'pubstatus': 'canceled'})
-    push_mock = mocker.patch('newsroom.push.push_notification')
+    push_mock = mocker.patch('newsroom.notifications.push_notification')
     headers = get_signature_headers(data, key)
 
     with app.mail.record_messages() as outbox:
         resp = client.post('/push', data=data, content_type='application/json', headers=headers)
         assert 200 == resp.status_code
-        assert push_mock.call_args[1]['item']['_id'] == 'bar'
-        assert len(push_mock.call_args[1]['users']) == 1
+        assert push_mock.call_args[0][0] == "new_notifications"
+        assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
     assert len(outbox) == 1
     notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
-    assert notification['item'] == 'bar'
+    assert notification["action"] == "history_match"
+    assert notification["item"] == "bar"
+    assert notification["resource"] == "text"
+    assert notification["user"] == user_ids[0]
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -443,15 +450,19 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         key = b'something random'
         app.config['PUSH_KEY'] = key
         data = json.dumps({'guid': 'bar', 'type': 'text', 'headline': 'this is a test'})
-        push_mock = mocker.patch('newsroom.push.push_notification')
+        push_mock = mocker.patch('newsroom.notifications.push_notification')
         headers = get_signature_headers(data, key)
         resp = client.post('/push', data=data, content_type='application/json', headers=headers)
         assert 200 == resp.status_code
-        assert push_mock.call_args_list[0][0][0] == 'new_item'
-        assert push_mock.call_args_list[1][0][0] == 'history_matches'
-        assert push_mock.call_args[1]['item']['_id']
+
+        assert push_mock.call_args[0][0] == "new_notifications"
+        assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
+
         notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
-        assert notification['item'] == 'bar'
+        assert notification["action"] == "history_match"
+        assert notification["item"] == "bar"
+        assert notification["resource"] == "text"
+        assert notification["user"] == user_ids[0]
 
     assert len(outbox) == 1
     assert 'http://localhost:5050/wire?item=bar' in outbox[0].body

@@ -114,7 +114,6 @@ def set_watch_products(app):
     }])
 
 
-# @mock.patch('newsroom.agenda.email.send_email', mock_send_email)
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     event = deepcopy(test_event)
@@ -135,18 +134,23 @@ def test_watched_event_sends_notification_for_event_update(client, app, mocker):
         'tz': 'Australia/Sydney'
     }
 
-    push_mock = mocker.patch('newsroom.agenda.agenda.push_notification')
+    push_mock = mocker.patch('newsroom.notifications.push_notification')
     with app.mail.record_messages() as outbox:
         post_json(client, '/push', event)
     notifications = get_user_notifications(PUBLIC_USER_ID)
 
     assert len(outbox) == 1
     assert 'Subject: Prime minister press conference - updated' in str(outbox[0])
-    assert push_mock.call_args[0][0] == 'agenda_update'
-    assert push_mock.call_args[1]['item']['_id'] == 'foo'
-    assert len(push_mock.call_args[1]['users']) == 1
+
+    assert push_mock.call_args[0][0] == "new_notifications"
+    assert str(PUBLIC_USER_ID) in push_mock.call_args[1]["counts"].keys()
+
     assert len(notifications) == 1
     assert notifications[0]['_id'] == '{}_foo'.format(PUBLIC_USER_ID)
+    assert notifications[0]["action"] == "watched_agenda_updated"
+    assert notifications[0]["item"] == "foo"
+    assert notifications[0]["resource"] == "agenda"
+    assert notifications[0]["user"] == PUBLIC_USER_ID
 
 
 # @mock.patch('newsroom.agenda.email.send_email', mock_send_email)
@@ -166,18 +170,23 @@ def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     event['pubstatus'] = 'cancelled'
     event['state'] = 'cancelled'
 
-    push_mock = mocker.patch('newsroom.agenda.agenda.push_notification')
+    push_mock = mocker.patch('newsroom.notifications.push_notification')
     with app.mail.record_messages() as outbox:
         post_json(client, '/push', event)
     notifications = get_user_notifications(PUBLIC_USER_ID)
 
     assert len(outbox) == 1
     assert 'Subject: Prime minister press conference - updated' in str(outbox[0])
-    assert push_mock.call_args[0][0] == 'agenda_update'
-    assert push_mock.call_args[1]['item']['_id'] == 'foo'
-    assert len(push_mock.call_args[1]['users']) == 1
+
+    assert push_mock.call_args[0][0] == "new_notifications"
+    assert str(PUBLIC_USER_ID) in push_mock.call_args[1]["counts"].keys()
+
     assert len(notifications) == 1
     assert notifications[0]['_id'] == '{}_foo'.format(PUBLIC_USER_ID)
+    assert notifications[0]["action"] == "watched_agenda_updated"
+    assert notifications[0]["item"] == "foo"
+    assert notifications[0]["resource"] == "agenda"
+    assert notifications[0]["user"] == PUBLIC_USER_ID
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -195,16 +204,14 @@ def test_watched_event_sends_notification_for_added_planning(client, app, mocker
     # planning comes in
     planning = deepcopy(test_planning)
 
-    push_mock = mocker.patch('newsroom.agenda.agenda.push_notification')
+    push_mock = mocker.patch('newsroom.notifications.push_notification')
     with app.mail.record_messages() as outbox:
         post_json(client, '/push', planning)
     notifications = get_user_notifications(PUBLIC_USER_ID)
 
     assert len(outbox) == 0
     assert len(notifications) == 0
-    assert push_mock.call_args[0][0] == 'agenda_update'
-    assert push_mock.call_args[1]['item']['_id'] == 'foo'
-    assert len(push_mock.call_args[1]['users']) == 0
+    push_mock.assert_not_called()
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -225,16 +232,14 @@ def test_watched_event_sends_notification_for_cancelled_planning(client, app, mo
     planning['pubstatus'] = 'cancelled'
     planning['state'] = 'cancelled'
 
-    push_mock = mocker.patch('newsroom.agenda.agenda.push_notification')
+    push_mock = mocker.patch('newsroom.notifications.push_notification')
     with app.mail.record_messages() as outbox:
         post_json(client, '/push', planning)
     notifications = get_user_notifications(PUBLIC_USER_ID)
 
     assert len(outbox) == 0
     assert len(notifications) == 0
-    assert push_mock.call_args[0][0] == 'agenda_update'
-    assert push_mock.call_args[1]['item']['_id'] == 'foo'
-    assert len(push_mock.call_args[1]['users']) == 0
+    push_mock.assert_not_called()
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -276,13 +281,11 @@ def test_watched_event_sends_notification_for_added_coverage(client, app, mocker
         "coverage_id": "coverage-3"
     })
 
-    push_mock = mocker.patch('newsroom.agenda.agenda.push_notification')
+    push_mock = mocker.patch('newsroom.notifications.push_notification')
     with app.mail.record_messages() as outbox:
         post_json(client, '/push', planning)
     notifications = get_user_notifications(PUBLIC_USER_ID)
 
     assert len(outbox) == 0
-    assert push_mock.call_args[0][0] == 'agenda_update'
-    assert push_mock.call_args[1]['item']['_id'] == 'foo'
-    assert len(push_mock.call_args[1]['users']) == 0
     assert len(notifications) == 0
+    push_mock.assert_not_called()

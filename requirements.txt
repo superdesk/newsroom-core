@@ -9,7 +9,13 @@ honcho>=1.0.1
 gunicorn>=20.0.4,<20.1
 PyRTF3>=0.47.5
 xhtml2pdf>=0.2.4
+
+# Fix an issue between xhtml2pdf v0.2.4 and reportlab v3.6.7
+# https://github.com/xhtml2pdf/xhtml2pdf/issues/589
+reportlab==3.6.6
+
 elastic-apm[flask]>=6.7,<6.8
+MarkupSafe<2.1
 
 
 # Use develop branch for now (until 2.4 is released, to fix inclusion of `tests` from Superdesk)

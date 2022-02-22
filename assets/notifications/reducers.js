@@ -1,6 +1,7 @@
-
 import {
-    NEW_NOTIFICATION,
+    UPDATE_NOTIFICATION_COUNT,
+    SET_NOTIFICATIONS,
+    SET_NOTIFICATIONS_LOADING,
     INIT_DATA,
     CLEAR_NOTIFICATION,
     CLEAR_ALL_NOTIFICATIONS,
@@ -8,18 +9,36 @@ import {
 
 const initialState = {
     user: null,
+    items: {},
     notifications: [],
+    notificationCount: 0,
+    loading: false,
 };
 
 export default function notificationReducer(state = initialState, action) {
     switch (action.type) {
-
-    case NEW_NOTIFICATION: {
-        const notifications = state.notifications.concat([action.notification.item]);
-
+    case SET_NOTIFICATIONS:
         return {
             ...state,
-            notifications,
+            notifications: action.notifications,
+            notificationCount: action.notifications.length,
+            items: action.items.reduce((itemMap, item) => {
+                itemMap[item._id] = item;
+
+                return itemMap;
+            }, {}),
+        };
+
+    case SET_NOTIFICATIONS_LOADING:
+        return {
+            ...state,
+            loading: action.loading,
+        };
+
+    case UPDATE_NOTIFICATION_COUNT: {
+        return {
+            ...state,
+            notificationCount: state.notificationCount + action.count,
         };
     }
 
@@ -27,14 +46,16 @@ export default function notificationReducer(state = initialState, action) {
         return {
             ...state,
             notifications: [],
+            notificationCount: 0,
         };
 
 
     case CLEAR_NOTIFICATION:{
-        const notifications = state.notifications.filter((n) => n._id !== action.id);
+        const notifications = state.notifications.filter((n) => n.item !== action.id);
         return {
             ...state,
-            notifications,
+            notifications: notifications,
+            notificationCount: notifications.length,
         };
     }
 
@@ -42,7 +63,10 @@ export default function notificationReducer(state = initialState, action) {
         return {
             ...state,
             user: action.data.user || null,
-            notifications: action.data.notifications || [],
+            items: {},
+            notifications: [],
+            notificationCount: action.data.notificationCount,
+            loading: false,
         };
     }
 

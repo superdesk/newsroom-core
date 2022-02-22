@@ -10,7 +10,8 @@ from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required
 from newsroom.utils import get_json_or_400, get_entity_or_404
 from newsroom.email import send_template_email
-from newsroom.notifications import push_user_notification, push_company_notification
+from newsroom.notifications import push_user_notification, push_company_notification, \
+    save_user_notifications, UserNotification
 
 
 @blueprint.route('/users/<user_id>/topics', methods=['GET'])
@@ -181,11 +182,26 @@ def share():
         if not user or not user.get('email'):
             continue
 
+        topic_url = get_topic_url(topic)
+        save_user_notifications([UserNotification(
+            user=user["_id"],
+            action="share",
+            resource="topic",
+            item=topic["_id"],
+            data=dict(
+                shared_by=dict(
+                    _id=current_user["_id"],
+                    first_name=current_user["first_name"],
+                    last_name=current_user["last_name"],
+                ),
+                url=topic_url,
+            ),
+        )])
         template_kwargs = {
             'recipient': user,
             'sender': current_user,
             'topic': topic,
-            'url': get_topic_url(topic),
+            'url': topic_url,
             'message': data.get('message'),
             'app_name': app.config['SITE_NAME'],
         }

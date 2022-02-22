@@ -571,15 +571,18 @@ def test_notify_user_matches_for_ad_hoc_agenda_in_history(client, app, mocker):
     app.config['PUSH_KEY'] = key
 
     data = json.dumps(planning)
-    push_mock = mocker.patch('newsroom.push.push_notification')
+    push_mock = mocker.patch('newsroom.notifications.push_notification')
     headers = get_signature_headers(data, key)
     resp = client.post('/push', data=data, content_type='application/json', headers=headers)
     assert 200 == resp.status_code
-    assert push_mock.call_args[1]['item']['_id'] == 'bar3'
-    assert len(push_mock.call_args[1]['users']) == 1
+    assert push_mock.call_args[0][0] == "new_notifications"
+    assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
 
     notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
-    assert notification['item'] == 'bar3'
+    assert notification["action"] == "history_match"
+    assert notification["item"] == "bar3"
+    assert notification["resource"] == "agenda"
+    assert notification["user"] == user_ids[0]
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -609,15 +612,18 @@ def test_notify_user_matches_for_new_agenda_in_history(client, app, mocker):
     app.config['PUSH_KEY'] = key
     event = deepcopy(test_event)
     data = json.dumps(event)
-    push_mock = mocker.patch('newsroom.push.push_notification')
+    push_mock = mocker.patch('newsroom.notifications.push_notification')
     headers = get_signature_headers(data, key)
     resp = client.post('/push', data=data, content_type='application/json', headers=headers)
     assert 200 == resp.status_code
-    assert push_mock.call_args[1]['item']['_id'] == 'foo'
-    assert len(push_mock.call_args[1]['users']) == 1
+    assert push_mock.call_args[0][0] == "new_notifications"
+    assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
 
     notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
-    assert notification['item'] == 'foo'
+    assert notification["action"] == "history_match"
+    assert notification["item"] == "foo"
+    assert notification["resource"] == "agenda"
+    assert notification["user"] == user_ids[0]
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -653,16 +659,19 @@ def test_notify_user_matches_for_new_planning_in_history(client, app, mocker):
     planning['guid'] = 'bar2'
     planning['event_item'] = 'foo'
     data = json.dumps(planning)
-    push_mock = mocker.patch('newsroom.push.push_notification')
+    push_mock = mocker.patch('newsroom.notifications.push_notification')
     headers = get_signature_headers(data, key)
     resp = client.post('/push', data=data, content_type='application/json', headers=headers)
     assert 200 == resp.status_code
 
-    assert push_mock.call_args[1]['item']['_id'] == 'foo'
-    assert len(push_mock.call_args[1]['users']) == 1
+    assert push_mock.call_args[0][0] == "new_notifications"
+    assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
 
     notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
-    assert notification['item'] == 'foo'
+    assert notification["action"] == "history_match"
+    assert notification["item"] == "foo"
+    assert notification["resource"] == "agenda"
+    assert notification["user"] == user_ids[0]
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -696,17 +705,20 @@ def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
     event['pubstatus'] = 'cancelled'
     event['state'] = 'cancelled'
     data = json.dumps(event)
-    push_mock = mocker.patch('newsroom.push.push_notification')
+    push_mock = mocker.patch('newsroom.notifications.push_notification')
     headers = get_signature_headers(data, key)
 
     with app.mail.record_messages() as outbox:
         resp = client.post('/push', data=data, content_type='application/json', headers=headers)
         assert 200 == resp.status_code
-        assert push_mock.call_args[1]['item']['_id'] == 'foo'
-        assert len(push_mock.call_args[1]['users']) == 1
+        assert push_mock.call_args[0][0] == "new_notifications"
+        assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
     assert len(outbox) == 1
     notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
-    assert notification['item'] == 'foo'
+    assert notification["action"] == "history_match"
+    assert notification["item"] == "foo"
+    assert notification["resource"] == "agenda"
+    assert notification["user"] == user_ids[0]
 
 
 def test_push_event_with_files(client, app):
@@ -791,7 +803,7 @@ def test_watched_event_sends_notification_for_event_update(client, app, mocker):
         'tz': 'Australia/Sydney'
     }
 
-    push_mock = mocker.patch('newsroom.agenda.agenda.push_notification')
+    push_mock = mocker.patch('newsroom.notifications.push_notification')
     with app.mail.record_messages() as outbox:
         post_json(client, '/push', event)
     notifications = get_user_notifications(user_id)
@@ -799,11 +811,16 @@ def test_watched_event_sends_notification_for_event_update(client, app, mocker):
     assert len(outbox) == 1
     assert 'Subject: Prime minister press conference - updated' in str(outbox[0])
     assert 'The event you have been following has been rescheduled' in str(outbox[0])
-    assert push_mock.call_args[0][0] == 'agenda_update'
-    assert push_mock.call_args[1]['item']['_id'] == 'foo'
-    assert len(push_mock.call_args[1]['users']) == 1
+
+    assert push_mock.call_args[0][0] == "new_notifications"
+    assert str(user_id) in push_mock.call_args[1]["counts"].keys()
+
     assert len(notifications) == 1
     assert notifications[0]['_id'] == '{}_foo'.format(user_id)
+    assert notifications[0]["action"] == "watched_agenda_updated"
+    assert notifications[0]["item"] == "foo"
+    assert notifications[0]["resource"] == "agenda"
+    assert notifications[0]["user"] == user_id
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -819,7 +836,7 @@ def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     event['pubstatus'] = 'cancelled'
     event['state'] = 'cancelled'
 
-    push_mock = mocker.patch('newsroom.agenda.agenda.push_notification')
+    push_mock = mocker.patch('newsroom.notifications.push_notification')
     with app.mail.record_messages() as outbox:
         post_json(client, '/push', event)
     notifications = get_user_notifications(user_id)
@@ -827,11 +844,16 @@ def test_watched_event_sends_notification_for_unpost_event(client, app, mocker):
     assert len(outbox) == 1
     assert 'Subject: Prime minister press conference - Coverage updated' in str(outbox[0])
     assert 'The event you have been following has been cancelled' in str(outbox[0])
-    assert push_mock.call_args[0][0] == 'agenda_update'
-    assert push_mock.call_args[1]['item']['_id'] == 'foo'
-    assert len(push_mock.call_args[1]['users']) == 1
+
+    assert push_mock.call_args[0][0] == "new_notifications"
+    assert str(user_id) in push_mock.call_args[1]["counts"].keys()
+
     assert len(notifications) == 1
     assert notifications[0]['_id'] == '{}_foo'.format(user_id)
+    assert notifications[0]["action"] == "watched_agenda_updated"
+    assert notifications[0]["item"] == "foo"
+    assert notifications[0]["resource"] == "agenda"
+    assert notifications[0]["user"] == user_id
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -844,7 +866,7 @@ def test_watched_event_sends_notification_for_added_planning(client, app, mocker
     # planning comes in
     planning = deepcopy(test_planning)
 
-    push_mock = mocker.patch('newsroom.agenda.agenda.push_notification')
+    push_mock = mocker.patch('newsroom.notifications.push_notification')
     with app.mail.record_messages() as outbox:
         post_json(client, '/push', planning)
     notifications = get_user_notifications(user_id)
@@ -855,11 +877,15 @@ def test_watched_event_sends_notification_for_added_planning(client, app, mocker
     assert '! Text coverage \'Vivid Text Explainer\' due' in str(outbox[0])
     assert '! Picture coverage \'Vivid Photos\' due' in str(outbox[0])
 
-    assert push_mock.call_args[0][0] == 'agenda_update'
-    assert push_mock.call_args[1]['item']['_id'] == 'foo'
-    assert len(push_mock.call_args[1]['users']) == 1
+    assert push_mock.call_args[0][0] == "new_notifications"
+    assert str(user_id) in push_mock.call_args[1]["counts"].keys()
+
     assert len(notifications) == 1
     assert notifications[0]['_id'] == '{}_foo'.format(user_id)
+    assert notifications[0]["action"] == "watched_agenda_updated"
+    assert notifications[0]["item"] == "foo"
+    assert notifications[0]["resource"] == "agenda"
+    assert notifications[0]["user"] == user_id
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -875,7 +901,7 @@ def test_watched_event_sends_notification_for_cancelled_planning(client, app, mo
     planning['pubstatus'] = 'cancelled'
     planning['state'] = 'cancelled'
 
-    push_mock = mocker.patch('newsroom.agenda.agenda.push_notification')
+    push_mock = mocker.patch('newsroom.notifications.push_notification')
     with app.mail.record_messages() as outbox:
         post_json(client, '/push', planning)
     notifications = get_user_notifications(user_id)
@@ -884,11 +910,16 @@ def test_watched_event_sends_notification_for_cancelled_planning(client, app, mo
     assert 'Subject: Prime minister press conference - Coverage updated' in str(outbox[0])
     assert '! Text coverage \'Vivid Text Explainer\' has been cancelled.\r\nNote: ed note here' in str(outbox[0])
     assert '! Picture coverage \'Vivid Photos\' has been cancelled.\r\nNote: ed note here' in str(outbox[0])
-    assert push_mock.call_args[0][0] == 'agenda_update'
-    assert push_mock.call_args[1]['item']['_id'] == 'foo'
-    assert len(push_mock.call_args[1]['users']) == 1
+
+    assert push_mock.call_args[0][0] == "new_notifications"
+    assert str(user_id) in push_mock.call_args[1]["counts"].keys()
+
     assert len(notifications) == 1
     assert notifications[0]['_id'] == '{}_foo'.format(user_id)
+    assert notifications[0]["action"] == "watched_agenda_updated"
+    assert notifications[0]["item"] == "foo"
+    assert notifications[0]["resource"] == "agenda"
+    assert notifications[0]["user"] == user_id
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
@@ -925,7 +956,7 @@ def test_watched_event_sends_notification_for_added_coverage(client, app, mocker
         "coverage_id": "coverage-3"
     })
 
-    push_mock = mocker.patch('newsroom.agenda.agenda.push_notification')
+    push_mock = mocker.patch('newsroom.notifications.push_notification')
     with app.mail.record_messages() as outbox:
         post_json(client, '/push', planning)
     notifications = get_user_notifications(user_id)
@@ -933,11 +964,16 @@ def test_watched_event_sends_notification_for_added_coverage(client, app, mocker
     assert len(outbox) == 1
     assert 'Subject: Prime minister press conference - Coverage updated' in str(outbox[0])
     assert '! Video coverage \'Vivid planning item\' due' in str(outbox[0])
-    assert push_mock.call_args[0][0] == 'agenda_update'
-    assert push_mock.call_args[1]['item']['_id'] == 'foo'
-    assert len(push_mock.call_args[1]['users']) == 1
+
+    assert push_mock.call_args[0][0] == "new_notifications"
+    assert str(user_id) in push_mock.call_args[1]["counts"].keys()
+
     assert len(notifications) == 1
     assert notifications[0]['_id'] == '{}_foo'.format(user_id)
+    assert notifications[0]["action"] == "watched_agenda_updated"
+    assert notifications[0]["item"] == "foo"
+    assert notifications[0]["resource"] == "agenda"
+    assert notifications[0]["user"] == user_id
 
 
 def test_filter_killed_events(client, app):
