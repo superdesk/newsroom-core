@@ -2,8 +2,6 @@
 import datetime
 import newsroom
 import superdesk
-import pymongo.errors
-import werkzeug.exceptions
 
 from bson import ObjectId
 from superdesk.utc import utcnow
@@ -38,14 +36,15 @@ class NotificationsService(newsroom.Service):
 
         for doc in docs:
             id = '_'.join(map(str, [doc['user'], doc['item']]))
-            try:
+            original = self.find_one(req=None, _id=id)
+
+            if original:
+                self.update(id=id, updates={'created': now}, original=original)
+            else:
                 super().create([{
                     '_id': id,
                     'created': now, 'user': ObjectId(doc['user']), 'item': doc['item']
                 }])
-            except (werkzeug.exceptions.Conflict, pymongo.errors.BulkWriteError):
-                original = super().find_one(req=None, _id=id)
-                super().update(id=id, updates={'created': now}, original=original)
 
 
 def get_user_notifications(user_id):
