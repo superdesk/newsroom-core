@@ -28,27 +28,28 @@ def get_client_locales():
     return client_locales
 
 
+def get_session_locale():
+    try:
+        if session.get('locale'):
+            return session['locale']
+        user = get_user()
+        if user and user.get('locale'):
+            return user['locale']
+    except RuntimeError:
+        pass
+    if request:
+        if request.args.get('language') and request.args.get('language') in current_app.config['LANGUAGES']:
+            return request.args['language']
+        else:
+            return request.accept_languages.best_match(current_app.config['LANGUAGES'])
+    return current_app.config['DEFAULT_LANGUAGE']
+
+
 def setup_babel(app):
     babel = Babel(app)
 
-    @babel.localeselector
-    def _get_locale():
-        try:
-            if session.get('locale'):
-                return session['locale']
-            user = get_user()
-            if user and user.get('locale'):
-                return user['locale']
-        except RuntimeError:
-            pass
-        if request:
-            if request.args.get('language') and request.args.get('language') in app.config['LANGUAGES']:
-                return request.args['language']
-            else:
-                return request.accept_languages.best_match(app.config['LANGUAGES'])
-        return app.config['DEFAULT_LANGUAGE']
-
+    babel.localeselector(get_session_locale)
     app.add_template_global(get_client_translations)
     app.add_template_global(get_client_locales)
-    app.add_template_global(_get_locale, 'get_locale')
+    app.add_template_global(get_session_locale, 'get_locale')
     app.add_template_global(format_datetime)

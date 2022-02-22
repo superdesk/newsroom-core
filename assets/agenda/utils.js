@@ -166,7 +166,10 @@ export function getCoverageIcon(coverageType) {
  */
 export function getCoverageDisplayName(coverageType) {
     const coverageTypes = getConfig('coverage_types', {});
-    return get(coverageTypes, `${coverageType}.name`, coverageType);
+    const locale = (window.locale || 'en').toLowerCase();
+
+    return get(coverageTypes, `${coverageType}.translations.${locale}`) ||
+        get(coverageTypes, `${coverageType}.name`, coverageType);
 }
 
 /**
