@@ -275,23 +275,6 @@ COVERAGE_TYPES = {
     'video_explainer': {'name': 'Video Explainer', 'icon': 'explainer'}
 }
 
-LANGUAGES = ['en', 'fi', 'cs']
-DEFAULT_LANGUAGE = 'en'
-
-CLIENT_LOCALE_FORMATS = {
-    "en": {  # defaults
-        "TIME_FORMAT": "HH:mm",
-        "DATE_FORMAT": "DD/MM/YYYY",
-        "COVERAGE_DATE_TIME_FORMAT": "HH:mm DD/MM",
-        "COVERAGE_DATE_FORMAT": "DD/MM",
-        "DATE_FORMAT_HEADER": "EEEE, dd.MM.yyyy"
-    },
-    "fr_CA": {  # example - you can overwrite any format above
-        "DATE_FORMAT": "DD/MM/YYYY",
-        "DATE_FORMAT_HEADER": "EEEE, 'le' d MMMM yyyy",
-    }
-}
-
 LANGUAGES = ['en', 'fi', 'cs', 'fr_CA']
 DEFAULT_LANGUAGE = 'en'
 
@@ -301,9 +284,11 @@ CLIENT_LOCALE_FORMATS = {
         "DATE_FORMAT": "DD/MM/YYYY",
         "COVERAGE_DATE_TIME_FORMAT": "HH:mm DD/MM",
         "COVERAGE_DATE_FORMAT": "DD/MM",
+        "DATE_FORMAT_HEADER": "EEEE, dd/MM/yyyy"
     },
     "fr_CA": {  # example - you can overwrite any format above
         "DATE_FORMAT": "DD/MM/YYYY",
+        "DATE_FORMAT_HEADER": "EEEE, 'le' d MMMM yyyy",
     }
 }
 
@@ -382,9 +367,10 @@ CLIENT_PATH = SERVER_PATH
 #: defined using babel syntax http://babel.pocoo.org/en/latest/dates.html#date-and-time
 TIME_FORMAT_SHORT = "HH:mm"
 DATE_FORMAT_SHORT = "short"
-DATE_FORMAT_HEADER = "EEEE, dd.MM.yyyy"
+DATE_FORMAT_HEADER = "EEEE, dd/MM/yyyy"
 DATETIME_FORMAT_SHORT = "short"
 DATETIME_FORMAT_LONG = "dd/MM/yyyy HH:mm"
+AGENDA_EMAIL_LIST_DATE_FORMAT = "HH:mm (dd/MM/yyyy)"
 
 PREPEND_EMBARGOED_TO_WIRE_SEARCH = False
 
