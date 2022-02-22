@@ -13,4 +13,4 @@ export const globalTopicsEnabledSelector = (state, context) => context === 'moni
     state,
     `uiConfigs.${context}.enable_global_topics`,
     DEFAULT_ENABLE_GLOBAL_TOPICS
-) === true;
+) === true && get(state, 'user.company.length');
