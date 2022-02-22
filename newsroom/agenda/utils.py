@@ -100,7 +100,7 @@ def get_coverage_content_type_name(coverage, language):
 
 
 def get_display_date_from_string(datetime_str):
-    return format_datetime(parse_date(datetime_str), 'HH:mm (dd/MM/yyyy)')
+    return format_datetime(parse_date(datetime_str), app.config["AGENDA_EMAIL_LIST_DATE_FORMAT"])
 
 
 def get_coverage_publish_time(coverage):
