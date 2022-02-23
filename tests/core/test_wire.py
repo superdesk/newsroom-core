@@ -1,5 +1,4 @@
 import pytz
-import pytest
 from flask import json, g, session as server_session
 from datetime import datetime, timedelta
 from urllib import parse

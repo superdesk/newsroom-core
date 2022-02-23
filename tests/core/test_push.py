@@ -662,7 +662,10 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
     client.post('/push', json=item)
     search = get_resource_service('wire_search')
 
-    users = {'foo': {'company': COMPANY_1_ID, 'user_type': 'public'}, 'bar': {'company': COMPANY_2_ID, 'user_type': 'public'}}
+    users = {
+        'foo': {'company': COMPANY_1_ID, 'user_type': 'public'},
+        'bar': {'company': COMPANY_2_ID, 'user_type': 'public'},
+    }
     companies = {COMPANY_1_ID: {'_id': COMPANY_1_ID, 'name': 'test-comp'}}
     topics = [
         {'_id': 'created_to_old', 'created': {'to': '2017-01-01'}, 'user': 'bar'},
