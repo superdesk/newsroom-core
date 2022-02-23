@@ -3,6 +3,7 @@ from flask import json
 from pytest import fixture
 
 from newsroom.tests.users import test_login_succeeds_for_admin, init as user_init  # noqa
+from newsroom.tests.fixtures import COMPANY_1_ID
 from newsroom.navigations.navigations import get_navigations_by_company
 
 
@@ -151,7 +152,7 @@ def test_get_agenda_navigations_by_company_returns_ordered(client, app):
     }])
 
     app.data.insert('companies', [{
-        '_id': 'c-1',
+        '_id': COMPANY_1_ID,
         'phone': '2132132134',
         'sd_subscriber_id': '12345',
         'name': 'Press Co.',
@@ -163,7 +164,7 @@ def test_get_agenda_navigations_by_company_returns_ordered(client, app):
         '_id': 'p-1',
         'name': 'Top Things',
         'navigations': ['n-1'],
-        'companies': ['c-1'],
+        'companies': [COMPANY_1_ID],
         'is_enabled': True,
         'query': '_featured',
         'product_type': 'agenda'
@@ -171,7 +172,7 @@ def test_get_agenda_navigations_by_company_returns_ordered(client, app):
         '_id': 'p-2',
         'name': 'A News',
         'navigations': ['59b4c5c61d41c8d736852fbf'],
-        'companies': ['c-1'],
+        'companies': [COMPANY_1_ID],
         'description': 'news product',
         'is_enabled': True,
         'product_type': 'wire',
@@ -179,7 +180,7 @@ def test_get_agenda_navigations_by_company_returns_ordered(client, app):
     }])
 
     test_login_succeeds_for_admin(client)
-    navigations = get_navigations_by_company('c-1', 'agenda')
+    navigations = get_navigations_by_company(COMPANY_1_ID, 'agenda')
     assert navigations[0].get('name') == 'Uber'
-    navigations = get_navigations_by_company('c-1', 'wire')
+    navigations = get_navigations_by_company(COMPANY_1_ID, 'wire')
     assert navigations[0].get('name') == 'Sport'

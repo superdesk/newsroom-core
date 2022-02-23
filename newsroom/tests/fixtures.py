@@ -10,6 +10,8 @@ PUBLIC_USER_FIRSTNAME = 'Foo'
 PUBLIC_USER_LASTNAME = 'Bar'
 PUBLIC_USER_NAME = '{} {}'.format(PUBLIC_USER_FIRSTNAME, PUBLIC_USER_LASTNAME)
 TEST_USER_ID = ObjectId('5cc94454bc43165c045ffec9')
+COMPANY_1_ID = ObjectId("6215cbf55fc14ebe18e175a5")
+COMPANY_2_ID = ObjectId("6215ce6ed2943dec3725afde")
 
 items = [
     {
@@ -190,7 +192,7 @@ def init_auth(app, client):
 
 def setup_user_company(app):
     app.data.insert('companies', [{
-        '_id': 1,
+        '_id': COMPANY_1_ID,
         'name': 'Grain Corp',
         'is_enabled': True
     }])
@@ -200,7 +202,7 @@ def setup_user_company(app):
         'email': 'foo@bar.com',
         'first_name': PUBLIC_USER_FIRSTNAME,
         'last_name': PUBLIC_USER_LASTNAME,
-        'company': 1,
+        'company': COMPANY_1_ID,
         'is_enabled': True,
         'is_approved': True,
         '_created': utcnow()
@@ -209,7 +211,7 @@ def setup_user_company(app):
         'email': 'test@bar.com',
         'first_name': 'Test',
         'last_name': 'Bar',
-        'company': 1,
+        'company': COMPANY_1_ID,
         'is_enabled': True,
         'is_approved': True,
         '_created': utcnow()

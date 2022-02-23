@@ -4,6 +4,8 @@ from newsroom.tests.fixtures import (  # noqa
     PUBLIC_USER_LASTNAME,
     PUBLIC_USER_NAME,
     TEST_USER_ID,
+    COMPANY_1_ID,
+    COMPANY_2_ID,
     items,
     agenda_items,
     init_items,

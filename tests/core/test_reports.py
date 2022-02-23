@@ -3,16 +3,17 @@ from pytest import fixture
 from bson import ObjectId
 from datetime import datetime, timedelta
 from newsroom.tests.users import test_login_succeeds_for_admin, init as user_init  # noqa
+from newsroom.tests.fixtures import COMPANY_1_ID, COMPANY_2_ID
 
 
 @fixture(autouse=True)
 def init(app):
     app.data.insert('companies', [{
-        '_id': ObjectId('59bc460f1d41c8fa815cc2c2'),
+        '_id': COMPANY_1_ID,
         'name': 'Press Co.',
         'is_enabled': True,
     }, {
-        '_id': ObjectId('59c38b965057fb87d7eda9ab'),
+        '_id': COMPANY_2_ID,
         'name': 'Paper Co.',
         'is_enabled': True,
     }])
@@ -22,7 +23,7 @@ def init(app):
         'first_name': 'Foo',
         'last_name': 'Smith',
         'is_enabled': True,
-        'company': ObjectId('59bc460f1d41c8fa815cc2c2'),
+        'company': COMPANY_1_ID,
     }, {
         '_id': 'u-2',
         'email': 'bar@bar.com',
@@ -35,7 +36,7 @@ def init(app):
         'first_name': 'Bar',
         'last_name': 'Brown',
         'is_enabled': True,
-        'company': ObjectId('59bc460f1d41c8fa815cc2c2'),
+        'company': COMPANY_1_ID,
     }])
 
 
@@ -100,13 +101,13 @@ def test_company_products(client, app):
         '_id': 'p-1',
         'name': 'Sport',
         'description': 'sport product',
-        'companies': ['59bc460f1d41c8fa815cc2c2'],
+        'companies': [COMPANY_1_ID],
         'is_enabled': True,
     }, {
         '_id': 'p-2',
         'name': 'News',
         'description': 'news product',
-        'companies': ['59bc460f1d41c8fa815cc2c2', '59c38b965057fb87d7eda9ab'],
+        'companies': [COMPANY_1_ID, COMPANY_2_ID],
         'is_enabled': True,
     }])
 
@@ -126,13 +127,13 @@ def test_product_companies(client, app):
         '_id': 'p-1',
         'name': 'Sport',
         'description': 'sport product',
-        'companies': ['59bc460f1d41c8fa815cc2c2'],
+        'companies': [COMPANY_1_ID],
         'is_enabled': True,
     }, {
         '_id': 'p-2',
         'name': 'News',
         'description': 'news product',
-        'companies': ['59bc460f1d41c8fa815cc2c2', '59c38b965057fb87d7eda9ab'],
+        'companies': [COMPANY_1_ID, COMPANY_2_ID],
         'is_enabled': True,
     }])
 

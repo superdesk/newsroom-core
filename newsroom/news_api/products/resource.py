@@ -24,7 +24,7 @@ class NewsAPIProductsService(ProductsService):
         req.projection = self.allowed_fields
         if '_id' in lookup and isinstance(lookup['_id'], str):
             lookup['_id'] = ObjectId(lookup.get('_id'))
-        lookup['companies'] = str(g.user)
+        lookup['companies'] = ObjectId(g.user)
         item = super().find_one(req, **lookup)
         return item
 
@@ -34,7 +34,7 @@ class NewsAPIProductsService(ProductsService):
         if not req:
             req = ParsedRequest()
         req.projection = self.allowed_fields
-        lookup['companies'] = str(company_id)
+        lookup['companies'] = ObjectId(company_id)
         lookup['product_type'] = 'news_api'
         return super().get(req=req, lookup=lookup)
 

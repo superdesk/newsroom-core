@@ -73,29 +73,29 @@ PRODUCTS = [{
     '_id': PROD_1, 'name': 'Sport1', 'description': 'sport product 1',
     'is_enabled': True, 'product_type': 'wire',
     'navigations': [str(NAV_1), str(NAV_2)],
-    'companies': [str(COMPANY_1), str(COMPANY_2)],
+    'companies': [COMPANY_1, COMPANY_2],
     'query': 'service.code:a'
 }, {
     '_id': PROD_2, 'name': 'Sport2', 'description': 'sport product 2',
     'is_enabled': True, 'product_type': 'wire',
     'navigations': [str(NAV_3)],
-    'companies': [str(COMPANY_2), str(COMPANY_3)],
+    'companies': [COMPANY_2, COMPANY_3],
     'query': 'service.code:b', 'sd_product_id': 'sd_product_1'
 }, {
     '_id': PROD_3, 'name': 'Sport3', 'description': 'sport product 3',
     'is_enabled': False, 'product_type': 'wire',
     'navigations': [str(NAV_4)],
-    'companies': [str(COMPANY_1)]
+    'companies': [COMPANY_1]
 }, {
     '_id': PROD_4, 'name': 'Sport4', 'description': 'sport product 4',
     'is_enabled': True, 'product_type': 'agenda',
     'navigations': [str(NAV_5)],
-    'companies': [str(COMPANY_1), str(COMPANY_2)]
+    'companies': [COMPANY_1, COMPANY_2]
 }, {
     '_id': PROD_5, 'name': 'Sport4', 'description': 'sport product 4',
     'is_enabled': True, 'product_type': 'wire',
     'navigations': [str(NAV_6)],
-    'companies': [str(COMPANY_1), str(COMPANY_3)]
+    'companies': [COMPANY_1, COMPANY_3]
 }]
 
 SECTION_FILTERS = [{

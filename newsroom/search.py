@@ -668,7 +668,7 @@ class BaseSearchService(Service):
 
             search.user = user
             search.is_admin = is_admin(user)
-            search.company = companies.get(str(user.get('company', '')))
+            search.company = companies.get(user.get('company', ''))
 
             search.query = deepcopy(query)
             search.section = topic.get('topic_type')

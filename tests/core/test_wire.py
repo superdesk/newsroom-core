@@ -1,12 +1,11 @@
 import pytz
-import pytest
-from flask import json, g
+from flask import json, g, session as server_session
 from datetime import datetime, timedelta
 from urllib import parse
 from bson import ObjectId
 from copy import deepcopy
 
-from ..fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
+from ..fixtures import items, init_items, init_auth, init_company, PUBLIC_USER_ID, COMPANY_1_ID  # noqa
 from ..utils import get_json, get_admin_user_id, mock_send_email
 from unittest import mock
 from newsroom.tests.users import ADMIN_USER_ID
@@ -98,7 +97,7 @@ def test_bookmarks_by_section(client, app):
             "query": "service.code: a",
             "is_enabled": True,
             "description": "Service A",
-            "companies": ['1'],
+            "companies": [COMPANY_1_ID],
             "sd_product_id": None,
             "product_type": "wire"
         }
@@ -221,7 +220,7 @@ def test_search_filtered_by_users_products(client, app):
         '_id': 10,
         'name': 'product test',
         'sd_product_id': 1,
-        'companies': ['1'],
+        'companies': [COMPANY_1_ID],
         'is_enabled': True,
         'product_type': 'wire'
     }])
@@ -253,7 +252,7 @@ def test_search_filter_by_individual_navigation(client, app):
         '_id': 10,
         'name': 'product test',
         'sd_product_id': 1,
-        'companies': ['1'],
+        'companies': [COMPANY_1_ID],
         'navigations': ['51'],
         'product_type': 'wire',
         'is_enabled': True
@@ -261,7 +260,7 @@ def test_search_filter_by_individual_navigation(client, app):
         '_id': 11,
         'name': 'product test 2',
         'sd_product_id': 2,
-        'companies': ['1'],
+        'companies': [COMPANY_1_ID],
         'navigations': ['52'],
         'product_type': 'wire',
         'is_enabled': True
@@ -310,7 +309,7 @@ def test_search_filtered_by_query_product(client, app):
         '_id': 12,
         'name': 'product test',
         'query': 'headline:more',
-        'companies': ['1'],
+        'companies': [COMPANY_1_ID],
         'navigations': ['51'],
         'product_type': 'wire',
         'is_enabled': True
@@ -318,7 +317,7 @@ def test_search_filtered_by_query_product(client, app):
         '_id': 13,
         'name': 'product test 2',
         'query': 'headline:Weather',
-        'companies': ['1'],
+        'companies': [COMPANY_1_ID],
         'navigations': ['52'],
         'product_type': 'wire',
         'is_enabled': True
@@ -397,7 +396,7 @@ def test_item_detail_access(client, app):
     app.data.insert('products', [{
         '_id': 10,
         'name': 'matching product',
-        'companies': ['1'],
+        'companies': [COMPANY_1_ID],
         'is_enabled': True,
         'product_type': 'wire',
         'query': 'slugline:%s' % items[0]['slugline']
@@ -426,7 +425,7 @@ def test_search_using_section_filter_for_public_user(client, app):
         '_id': 12,
         'name': 'product test',
         'query': 'headline:more',
-        'companies': ['1'],
+        'companies': [COMPANY_1_ID],
         'navigations': ['51'],
         'is_enabled': True,
         'product_type': 'wire'
@@ -434,7 +433,7 @@ def test_search_using_section_filter_for_public_user(client, app):
         '_id': 13,
         'name': 'product test 2',
         'query': 'headline:Weather',
-        'companies': ['1'],
+        'companies': [COMPANY_1_ID],
         'navigations': ['52'],
         'is_enabled': True,
         'product_type': 'wire'
@@ -497,7 +496,7 @@ def test_time_limited_access(client, app):
         '_id': 10,
         'name': 'product test',
         'query': 'versioncreated:<=now-2d',
-        'companies': ['1'],
+        'companies': [COMPANY_1_ID],
         'is_enabled': True,
         'product_type': 'wire'
     }])
@@ -522,8 +521,8 @@ def test_time_limited_access(client, app):
     assert 2 == len(data['_items'])
 
     g.settings['wire_time_limit_days']['value'] = 1
-    company = app.data.find_one('companies', req=None, _id=1)
-    app.data.update('companies', 1, {'archive_access': True}, company)
+    company = app.data.find_one('companies', req=None, _id=COMPANY_1_ID)
+    app.data.update('companies', COMPANY_1_ID, {'archive_access': True}, company)
     resp = client.get('/wire/search')
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
@@ -534,7 +533,7 @@ def test_company_type_filter(client, app):
         '_id': 10,
         'name': 'product test',
         'query': 'versioncreated:<=now-2d',
-        'companies': ['1'],
+        'companies': [COMPANY_1_ID],
         'is_enabled': True,
         'product_type': 'wire'
     }])
@@ -551,8 +550,8 @@ def test_company_type_filter(client, app):
         dict(id='test', wire_must={'term': {'service.code': 'b'}}),
     ]
 
-    company = app.data.find_one('companies', req=None, _id=1)
-    app.data.update('companies', 1, {'company_type': 'test'}, company)
+    company = app.data.find_one('companies', req=None, _id=COMPANY_1_ID)
+    app.data.update('companies', COMPANY_1_ID, {'company_type': 'test'}, company)
 
     resp = client.get('/wire/search')
     data = json.loads(resp.get_data())
@@ -569,47 +568,51 @@ def test_company_type_filter(client, app):
     assert 'WEATHER' != data['_items'][0]['slugline']
 
 
-@pytest.mark.skip(reason="Issue with app context, skipping for now")
 def test_search_by_products_and_filtered_by_embargoe(client, app):
-    app.data.insert('products', [{
-        '_id': 10,
-        'name': 'product test',
-        'query': 'headline:china',
-        'companies': ['1'],
-        'is_enabled': True,
-        'product_type': 'wire'
-    }])
+    with app.test_request_context():
+        server_session['user'] = str(PUBLIC_USER_ID)
+        server_session['user_type'] = 'public'
+        app.data.insert('products', [{
+            '_id': 10,
+            'name': 'product test',
+            'query': 'headline:china',
+            'companies': [COMPANY_1_ID],
+            'is_enabled': True,
+            'product_type': 'wire'
+        }])
 
-    # embargoed item is not fetched
-    app.data.insert('items', [{
-        '_id': 'foo',
-        'headline': 'china',
-        'embargoed': (datetime.now() + timedelta(days=10)).replace(tzinfo=pytz.UTC),
-        'products': [{'code': '10'}]
-    }])
+        # embargoed item is not fetched
+        app.data.insert('items', [{
+            '_id': 'foo',
+            'headline': 'china',
+            'embargoed': (datetime.now() + timedelta(days=10)).replace(tzinfo=pytz.UTC),
+            'products': [{'code': '10'}]
+        }])
 
-    items = get_resource_service('wire_search').get_product_items(10, 20)
-    assert 1 == len(items)
+        items = get_resource_service('wire_search').get_product_items(10, 20)
+        assert 1 == len(items)
 
-    app.config['COMPANY_TYPES'] = [
-        dict(id='test', wire_must_not={'range': {'embargoed': {'gte': 'now'}}}),
-    ]
+        app.config['COMPANY_TYPES'] = [
+            dict(id='test', wire_must_not={'range': {'embargoed': {'gte': 'now'}}}),
+        ]
 
-    company = app.data.find_one('companies', req=None, _id=1)
-    app.data.update('companies', 1, {'company_type': 'test'}, company)
-    items = get_resource_service('wire_search').get_product_items(10, 20)
-    assert 0 == len(items)
+        company = app.data.find_one('companies', req=None, _id=COMPANY_1_ID)
+        app.data.update('companies', COMPANY_1_ID, {'company_type': 'test'}, company)
 
-    # ex-embargoed item is fetched
-    app.data.insert('items', [{
-        '_id': 'bar',
-        'headline': 'china story',
-        'embargoed': (datetime.now() - timedelta(days=10)).replace(tzinfo=pytz.UTC),
-        'products': [{'code': '10'}]
-    }])
-    items = get_resource_service('wire_search').get_product_items(10, 20)
-    assert 1 == len(items)
-    assert items[0]['headline'] == 'china story'
+        items = get_resource_service('wire_search').get_product_items(10, 20)
+        assert 0 == len(items)
+
+        # ex-embargoed item is fetched
+        app.data.insert('items', [{
+            '_id': 'bar',
+            'headline': 'china story',
+            'embargoed': (datetime.now() - timedelta(days=10)).replace(tzinfo=pytz.UTC),
+            'products': [{'code': '10'}]
+        }])
+
+        items = get_resource_service('wire_search').get_product_items(10, 20)
+        assert 1 == len(items)
+        assert items[0]['headline'] == 'china story'
 
 
 def test_wire_delete(client, app):

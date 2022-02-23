@@ -92,6 +92,11 @@ def edit(id):
 @account_manager_only
 def update_companies(id):
     updates = flask.request.get_json()
+    if updates.get("companies"):
+        updates["companies"] = [
+            ObjectId(company_id)
+            for company_id in updates["companies"]
+        ]
     get_resource_service('products').patch(id=ObjectId(id), updates=updates)
     return jsonify({'success': True}), 200
 
