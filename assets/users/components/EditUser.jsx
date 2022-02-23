@@ -143,7 +143,7 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                         value={gettext('Save')}
                         onClick={onSave} />
 
-                    {user._id && isUserAdmin(currentUser) && <input
+                    {user._id && isUserAdmin(currentUser) && (user._id !== currentUser._id) && <input
                         type='button'
                         className='btn btn-outline-primary'
                         value={gettext('Delete')}
