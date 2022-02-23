@@ -147,9 +147,9 @@ def update_products(updates, company_id):
     db = app.data.get_mongo_collection('products')
     for product in products:
         if updates.get(str(product['_id'])):
-            db.update_one({'_id': product['_id']}, {'$addToSet': {'companies': company_id}})
+            db.update_one({'_id': product['_id']}, {'$addToSet': {'companies': ObjectId(company_id)}})
         else:
-            db.update_one({'_id': product['_id']}, {'$pull': {'companies': company_id}})
+            db.update_one({'_id': product['_id']}, {'$pull': {'companies': ObjectId(company_id)}})
 
 
 def update_company(data, _id):
