@@ -63,6 +63,9 @@ def get_errors_company(company):
     if not company.get('name'):
         return jsonify({'name': gettext('Name not found')}), 400
 
+    if get_resource_service('companies').find_one(req=None, name=company['name']):
+        return jsonify({'name': gettext('Company already exists')}), 400
+
     if company.get('allowed_ip_list'):
         errors = []
         for ip in company['allowed_ip_list']:
