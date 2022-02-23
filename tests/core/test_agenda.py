@@ -7,7 +7,8 @@ from unittest import mock
 import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_location_string, get_agenda_dates, get_public_contacts, get_entity_or_404, \
     get_local_date, get_end_date
-from tests.fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
+from tests.fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company, \
+    PUBLIC_USER_ID, COMPANY_1_ID  # noqa
 from tests.utils import post_json, delete_json, get_json, get_admin_user_id, mock_send_email
 from copy import deepcopy
 from bson import ObjectId
@@ -199,7 +200,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
         '_id': 12,
         'name': 'product test',
         'query': 'headline:test',
-        'companies': ['1'],
+        'companies': [COMPANY_1_ID],
         'navigations': ['51'],
         'is_enabled': True,
         'product_type': 'agenda'
@@ -207,7 +208,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
         '_id': 13,
         'name': 'product test 2',
         'query': 'slugline:prime',
-        'companies': ['1'],
+        'companies': [COMPANY_1_ID],
         'navigations': ['52'],
         'is_enabled': True,
         'product_type': 'agenda'

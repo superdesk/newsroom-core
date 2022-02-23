@@ -10,7 +10,7 @@ import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from superdesk import get_resource_service
 import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_entity_or_404
-from ..fixtures import init_auth  # noqa
+from ..fixtures import init_auth, COMPANY_1_ID, COMPANY_2_ID  # noqa
 from ..utils import mock_send_email
 from unittest import mock
 
@@ -401,7 +401,7 @@ def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
     app.data.insert('companies', [{
-        '_id': '2',
+        '_id': COMPANY_1_ID,
         'name': 'Press co.',
         'is_enabled': True,
     }])
@@ -412,7 +412,7 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         'is_enabled': True,
         'is_approved': True,
         'receive_email': True,
-        'company': '2',
+        'company': COMPANY_1_ID,
     }
 
     user_ids = app.data.insert('users', [user])
@@ -424,7 +424,7 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         "query": "service.code: a",
         "is_enabled": True,
         "description": "Service A",
-        "companies": ['2'],
+        "companies": [COMPANY_1_ID],
         "sd_product_id": None,
         "product_type": "wire",
     }])
@@ -626,7 +626,7 @@ def test_matching_topics_for_public_user(client, app):
         'description': 'Top level sport product',
         'sd_product_id': 'p-1',
         'is_enabled': True,
-        'companies': ['1'],
+        'companies': [COMPANY_1_ID],
         'product_type': 'wire'
     }])
 
@@ -634,8 +634,8 @@ def test_matching_topics_for_public_user(client, app):
     client.post('/push', json=item)
     search = get_resource_service('wire_search')
 
-    users = {'foo': {'company': '1', 'user_type': 'public'}}
-    companies = {'1': {'_id': '1', 'name': 'test-comp'}}
+    users = {'foo': {'company': COMPANY_1_ID, 'user_type': 'public'}}
+    companies = {COMPANY_1_ID: {'_id': COMPANY_1_ID, 'name': 'test-comp'}}
     topics = [
         {'_id': 'created_to_old', 'created': {'to': '2017-01-01'}, 'user': 'foo'},
         {'_id': 'created_from_future', 'created': {'from': 'now/d'}, 'user': 'foo', 'timezone_offset': 60 * 28},
@@ -654,7 +654,7 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
         'description': 'Top level sport product',
         'sd_product_id': 'p-1',
         'is_enabled': True,
-        'companies': ['1'],
+        'companies': [COMPANY_1_ID],
         'product_type': 'wire'
     }])
 
@@ -662,8 +662,8 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
     client.post('/push', json=item)
     search = get_resource_service('wire_search')
 
-    users = {'foo': {'company': '1', 'user_type': 'public'}, 'bar': {'company': '2', 'user_type': 'public'}}
-    companies = {'1': {'_id': '1', 'name': 'test-comp'}}
+    users = {'foo': {'company': COMPANY_1_ID, 'user_type': 'public'}, 'bar': {'company': COMPANY_2_ID, 'user_type': 'public'}}
+    companies = {COMPANY_1_ID: {'_id': COMPANY_1_ID, 'name': 'test-comp'}}
     topics = [
         {'_id': 'created_to_old', 'created': {'to': '2017-01-01'}, 'user': 'bar'},
         {'_id': 'created_from_future', 'created': {'from': 'now/d'}, 'user': 'foo', 'timezone_offset': 60 * 28},

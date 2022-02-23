@@ -3,6 +3,7 @@ from eve.methods.get import get_internal, getitem_internal
 from superdesk import get_resource_service
 from flask import g
 from bson import ObjectId
+from newsroom.tests.fixtures import COMPANY_1_ID, COMPANY_2_ID
 
 company_id = "5c3eb6975f627db90c84093c"
 
@@ -21,9 +22,9 @@ def init(app):
         "name": "Sample Product X",
         "decsription": "a description",
         "companies": [
-            "5aa5e9fbbdd7810885f0dac1",
-            "company_123"
-            ],
+            COMPANY_1_ID,
+            COMPANY_2_ID,
+        ],
         "navigations": [
             "5aa5e94ebdd7810884f66ed3"
         ],
@@ -49,7 +50,7 @@ def test_get_item_audit_creation(client, app):
 
 def test_get_all_company_products_audit_creation(client, app):
     with app.test_request_context(path='/account/products/'):
-        g.user = 'company_123'
+        g.user = COMPANY_2_ID
         response = get_internal('account/products')
         assert len(response[0]['_items']) == 1
         audit_check('5ab03a87bdd78169bb6d0783')
@@ -57,7 +58,7 @@ def test_get_all_company_products_audit_creation(client, app):
 
 def test_get_single_product_audit_creation(client, app):
     with app.test_request_context(path='/account/products/'):
-        g.user = 'company_123'
+        g.user = COMPANY_2_ID
         response = getitem_internal('account/products', _id='5ab03a87bdd78169bb6d0783')
         assert str(response[0]['_id']) == '5ab03a87bdd78169bb6d0783'
         audit_check('5ab03a87bdd78169bb6d0783')

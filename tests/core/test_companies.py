@@ -1,6 +1,7 @@
 from flask import json, url_for
 from bson import ObjectId
 from newsroom.tests.users import test_login_succeeds_for_admin, init as user_init  # noqa
+from newsroom.tests.fixtures import COMPANY_1_ID
 from superdesk import get_resource_service
 
 
@@ -62,7 +63,7 @@ def test_get_company_users(client):
 
 def test_save_company_permissions(client, app):
     app.data.insert('companies', [{
-        '_id': 'c-1',
+        '_id': COMPANY_1_ID,
         'phone': '2132132134',
         'sd_subscriber_id': '12345',
         'name': 'Press Co.',
@@ -74,7 +75,7 @@ def test_save_company_permissions(client, app):
         '_id': 'p-1',
         'name': 'Sport',
         'description': 'sport product',
-        'companies': ['c-1'],
+        'companies': [COMPANY_1_ID],
         'is_enabled': True,
     }, {
         '_id': 'p-2',
@@ -85,14 +86,14 @@ def test_save_company_permissions(client, app):
 
     test_login_succeeds_for_admin(client)
     data = json.dumps({'products': {'p-2': True}, 'sections': {'wire': True}, 'archive_access': True})
-    client.post('companies/c-1/permissions', data=data, content_type='application/json')
+    client.post(f"companies/{COMPANY_1_ID}/permissions", data=data, content_type='application/json')
 
     response = client.get('/products')
     data = json.loads(response.get_data())
     assert [p for p in data if p['_id'] == 'p-1'][0]['companies'] == []
-    assert [p for p in data if p['_id'] == 'p-2'][0]['companies'] == ['c-1']
+    assert [p for p in data if p['_id'] == 'p-2'][0]['companies'] == [str(COMPANY_1_ID)]
 
-    updated = app.data.find_one('companies', req=None, _id='c-1')
+    updated = app.data.find_one('companies', req=None, _id=COMPANY_1_ID)
     assert updated['sections']['wire']
     assert not updated['sections'].get('agenda')
     assert updated['archive_access']
@@ -104,7 +105,7 @@ def test_save_company_permissions(client, app):
     # set company with wire only
     user = app.data.find_one('users', req=None, first_name='admin')
     assert user
-    app.data.update('users', user['_id'], {'company': 'c-1'}, user)
+    app.data.update('users', user['_id'], {'company': COMPANY_1_ID}, user)
 
     # test section protection
     resp = client.get(url_for('agenda.index'))
