@@ -258,11 +258,6 @@ def share():
     items = get_items_for_user_action(data.get('items'), item_type)
     for user_id in data['users']:
         user = superdesk.get_resource_service('users').find_one(req=None, _id=user_id)
-        subject_name = items[0].get('headline')
-
-        # If it's an event, 'name' is the subject_name
-        if items[0].get('event'):
-            subject_name = items[0]['name']
 
         if not user or not user.get('email'):
             continue
@@ -273,7 +268,7 @@ def share():
             "items": items,
             "message": data.get("message"),
             "section": request.args.get("type", "wire"),
-            "subject_name": subject_name
+            "subject_name": items[0].get('headline') or items[0].get('name')
         }
         if item_type == 'agenda':
             template_kwargs['maps'] = data.get('maps')
