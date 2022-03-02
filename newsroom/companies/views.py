@@ -4,7 +4,8 @@ from datetime import datetime
 
 import flask
 from bson import ObjectId
-from flask import jsonify, current_app as app
+from eve.utils import ParsedRequest
+from flask import json, jsonify, current_app as app
 from flask_babel import gettext
 from superdesk import get_resource_service
 from werkzeug.exceptions import NotFound, BadRequest
@@ -63,7 +64,7 @@ def get_errors_company(company):
     if not company.get('name'):
         return jsonify({'name': gettext('Name not found')}), 400
 
-    if get_resource_service('companies').find_one(req=None, name=company['name']):
+    if company_exists(company['name']):
         return jsonify({'name': gettext('Company already exists')}), 400
 
     if company.get('allowed_ip_list'):
@@ -76,6 +77,14 @@ def get_errors_company(company):
 
         if errors:
             return jsonify({'allowed_ip_list': errors}), 400
+
+
+def company_exists(name: str) -> bool:
+    service = get_resource_service('companies')
+    req = ParsedRequest()
+    req.args = {"collation": json.dumps({"locale": "en", "strength": 1})}
+    req.where = json.dumps({"name": name})
+    return service.get_from_mongo(req=req, lookup={}).count() > 0
 
 
 def get_company_updates(company):

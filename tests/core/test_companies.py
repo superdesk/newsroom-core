@@ -56,7 +56,7 @@ def test_company_name_is_unique(client):
     assert company_id
 
     duplicate_response = client.post('/companies/new', data=json.dumps({
-        'name': 'Press Co.',
+        'name': 'PRESS Co.',
     }), content_type='application/json')
 
     assert duplicate_response.status_code == 400
