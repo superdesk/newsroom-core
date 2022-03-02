@@ -29,7 +29,7 @@ class NotificationsResource(newsroom.Resource):
     }
 
     mongo_indexes = {
-        'user_created': ([('user', 1), ('created', -1)],),
+        'user_created': ([('user', 1), ('created', -1)], {}),
     }
 
 

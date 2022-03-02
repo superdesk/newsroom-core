@@ -1,11 +1,12 @@
 import re
 import ipaddress
-from datetime import datetime
 
 import flask
+import werkzeug.exceptions
+
 from bson import ObjectId
-from eve.utils import ParsedRequest
-from flask import json, jsonify, current_app as app
+from datetime import datetime
+from flask import jsonify, current_app as app
 from flask_babel import gettext
 from superdesk import get_resource_service
 from werkzeug.exceptions import NotFound, BadRequest
@@ -56,16 +57,17 @@ def create():
 
     new_company = get_company_updates(company)
     set_original_creator(new_company)
-    ids = get_resource_service('companies').post([new_company])
+    try:
+        ids = get_resource_service('companies').post([new_company])
+    except werkzeug.exceptions.Conflict:
+        return jsonify({'name': gettext('Company already exists')}), 400
+
     return jsonify({'success': True, '_id': ids[0]}), 201
 
 
 def get_errors_company(company):
     if not company.get('name'):
         return jsonify({'name': gettext('Name not found')}), 400
-
-    if company_exists(company['name']):
-        return jsonify({'name': gettext('Company already exists')}), 400
 
     if company.get('allowed_ip_list'):
         errors = []
@@ -77,14 +79,6 @@ def get_errors_company(company):
 
         if errors:
             return jsonify({'allowed_ip_list': errors}), 400
-
-
-def company_exists(name: str) -> bool:
-    service = get_resource_service('companies')
-    req = ParsedRequest()
-    req.args = {"collation": json.dumps({"locale": "en", "strength": 1})}
-    req.where = json.dumps({"name": name})
-    return service.get_from_mongo(req=req, lookup={}).count() > 0
 
 
 def get_company_updates(company):
