@@ -28,7 +28,7 @@ def test_item_json(client):
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_share_items(client, app):
     user_ids = app.data.insert('users', [{
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'last_name': 'Bar',
     }])
@@ -42,7 +42,7 @@ def test_share_items(client, app):
 
         assert resp.status_code == 201, resp.get_data().decode('utf-8')
         assert len(outbox) == 1
-        assert outbox[0].recipients == ['foo@bar.com']
+        assert outbox[0].recipients == ['foo2@bar.com']
         assert outbox[0].sender == 'newsroom@localhost'
         assert outbox[0].subject == 'From AAP Newsroom: %s' % items[0]['headline']
         assert 'Hi Foo Bar' in outbox[0].body

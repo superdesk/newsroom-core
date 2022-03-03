@@ -12,7 +12,7 @@ USERS = [
     {
         '_id': ADMIN_USER_ID, 'company': COMPANY_1, 'user_type': 'administrator',
         'first_name': 'admin', 'last_name': 'admin',
-        'email': 'admin@sourcefabric.org',
+        'email': 'admin2@sourcefabric.org',
         'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
         'is_validated': True, 'is_enabled': True, 'is_approved': True
     },

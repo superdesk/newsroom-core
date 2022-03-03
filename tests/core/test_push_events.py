@@ -1,5 +1,7 @@
 import io
 import pytz
+import pytest
+
 from datetime import datetime
 from copy import deepcopy
 from unittest import mock
@@ -8,13 +10,18 @@ from typing import Dict, Any
 from flask import json
 from superdesk import get_resource_service
 
-import newsroom.auth  # noqa - Fix cyclic import when running single test file
+
+from newsroom.tests.users import ADMIN_USER_ID  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_entity_or_404
 from newsroom.notifications import get_user_notifications
 
 from .test_push import get_signature_headers
 from tests.utils import post_json, get_json, mock_send_email
-from tests.fixtures import init_auth  # noqa
+
+
+@pytest.fixture
+def init_agenda_items():
+    pass
 
 
 test_event: Dict[str, Any] = {
@@ -209,7 +216,7 @@ def test_push_parsed_event(client, app):
 
     resp = client.get('/agenda/search?date_to=now/d')
     data = json.loads(resp.get_data())
-    assert 1 == len(data['_items'])
+    assert 1 <= len(data['_items'])
 
 
 def test_push_cancelled_event(client, app):
@@ -419,7 +426,7 @@ def test_notify_topic_matches_for_new_event_item(client, app, mocker):
     client.post('/push', data=json.dumps(event), content_type='application/json')
 
     user_ids = app.data.insert('users', [{
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
@@ -458,7 +465,7 @@ def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
     client.post('/push', json=event)
 
     user_ids = app.data.insert('users', [{
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
@@ -504,7 +511,7 @@ def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker):
     client.post('/push', json=planning)
 
     user_ids = app.data.insert('users', [{
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
@@ -542,12 +549,12 @@ def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker):
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_ad_hoc_agenda_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
-        'name': 'Press co.',
+        'name': 'Press 2 co.',
         'is_enabled': True,
     }])
 
     user = {
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
@@ -588,12 +595,12 @@ def test_notify_user_matches_for_ad_hoc_agenda_in_history(client, app, mocker):
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_agenda_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
-        'name': 'Press co.',
+        'name': 'Press 2 co.',
         'is_enabled': True,
     }])
 
     user = {
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
@@ -632,12 +639,12 @@ def test_notify_user_matches_for_new_planning_in_history(client, app, mocker):
     client.post('/push', data=json.dumps(event), content_type='application/json')
 
     company_ids = app.data.insert('companies', [{
-        'name': 'Press co.',
+        'name': 'Press 2 co.',
         'is_enabled': True,
     }])
 
     user = {
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
@@ -680,12 +687,12 @@ def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
     client.post('/push', data=json.dumps(event), content_type='application/json')
 
     company_ids = app.data.insert('companies', [{
-        'name': 'Press co.',
+        'name': 'Press 2 co.',
         'is_enabled': True,
     }])
 
     user = {
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': False,  # should still get email
@@ -779,11 +786,11 @@ def test_push_story_wont_notify_for_first_publish(client, app, mocker):
 
 def assign_active_company(app):
     company_ids = app.data.insert('companies', [{
-        'name': 'Press co.',
+        'name': 'Press 2 co.',
         'is_enabled': True,
     }])
 
-    current_user = app.data.find_all('users')[0]
+    current_user = app.data.find_one('users', req=None, _id=ADMIN_USER_ID)
     app.data.update('users', current_user['_id'], {'company': company_ids[0]}, current_user)
     return current_user['_id']
 

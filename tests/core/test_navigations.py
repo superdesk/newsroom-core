@@ -2,7 +2,7 @@ from bson import ObjectId
 from flask import json
 from pytest import fixture
 
-from newsroom.tests.users import test_login_succeeds_for_admin, init as user_init  # noqa
+from newsroom.tests.users import test_login_succeeds_for_admin  # noqa
 from newsroom.tests.fixtures import COMPANY_1_ID
 from newsroom.navigations.navigations import get_navigations_by_company
 
@@ -149,15 +149,6 @@ def test_get_agenda_navigations_by_company_returns_ordered(client, app):
         'name': 'Uber',
         'is_enabled': True,
         'product_type': 'agenda',
-    }])
-
-    app.data.insert('companies', [{
-        '_id': COMPANY_1_ID,
-        'phone': '2132132134',
-        'sd_subscriber_id': '12345',
-        'name': 'Press Co.',
-        'is_enabled': True,
-        'contact_name': 'Tom'
     }])
 
     app.data.insert('products', [{

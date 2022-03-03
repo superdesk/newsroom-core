@@ -37,6 +37,7 @@ def update_action_list(items, action_list, force_insert=False, item_type='items'
         else:
             updates = {'$pull': {action_list: user_id}}
         for item_id in items:
+            print("item", item_id)
             result = db.update_one({'_id': item_id}, updates)
             if result.modified_count:
                 modified = db.find_one({'_id': item_id})

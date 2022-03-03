@@ -7,7 +7,7 @@ from superdesk.utils import get_hash
 
 from newsroom.auth.token import verify_auth_token
 from newsroom.auth.views import _is_password_valid
-from newsroom.tests.users import init as user_init, ADMIN_USER_ID  # noqa
+from newsroom.tests.users import ADMIN_USER_ID  # noqa
 from tests.utils import mock_send_email
 from unittest import mock
 
@@ -20,7 +20,7 @@ company = ObjectId()
 def init(app):
     app.data.insert('companies', [{
         '_id': disabled_company,
-        'name': 'Press co.',
+        'name': 'Press 2 co.',
         'is_enabled': False,
     }, {
         '_id': expired_company,
@@ -45,7 +45,7 @@ def test_new_user_signup_sends_email(app, client):
             'last_name': 'Doe',
             'country': 'Australia',
             'phone': '1234567',
-            'company': 'Press co.',
+            'company': 'Press 2 co.',
             'company_size': '0-10',
             'occupation': 'Other'
         })
@@ -58,7 +58,7 @@ def test_new_user_signup_sends_email(app, client):
         assert 'John' in outbox[0].body
         assert 'Doe' in outbox[0].body
         assert '1234567' in outbox[0].body
-        assert 'Press co.' in outbox[0].body
+        assert 'Press 2 co.' in outbox[0].body
 
 
 def test_new_user_signup_fails_if_fields_not_provided(client):
@@ -205,18 +205,17 @@ def test_login_fails_for_not_approved_user(app, client):
     assert 'Account has not been approved' in response.get_data(as_text=True)
 
 
-def test_login_fails_for_many_times_gets_limited(client):
+def test_login_fails_for_many_times_gets_limited(client, app):
     for i in range(1, 100):
         response = client.post(
             url_for('auth.login'),
             data={'email': 'xyz{}@abc.org'.format(i), 'password': 'abc'},
             follow_redirects=True
         )
-        if i <= 60:
-            assert 'Invalid username or password' in response.get_data(as_text=True)
-        else:
-            assert response.status_code == 429
+        if response.status_code == 429:
             break
+    else:
+        assert False, "Ratelimit not set"
 
 
 def test_account_is_locked_after_5_wrong_passwords(app, client):
@@ -531,18 +530,19 @@ def test_access_for_disabled_company(app, client):
 
 def test_access_for_not_approved_user(client, app):
     user_ids = app.data.insert('users', [{
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
-        'user_type': 'administrator'
+        'user_type': 'administrator',
+        '_created': datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
     }])
 
     with client as cli:
         with client.session_transaction() as session:
             user = str(user_ids[0])
             session['user'] = user
-
+            session['user_type'] = 'administrator'
         resp = cli.post('/users/%s/topics' % user,
-                        data={'label': 'bar', 'query': 'test', 'notifications': True, 'topic_type': 'wire'})
-        assert 302 == resp.status_code
+                        json={'label': 'bar', 'query': 'test', 'notifications': True, 'topic_type': 'wire'})
+        assert 302 == resp.status_code, resp.get_data()

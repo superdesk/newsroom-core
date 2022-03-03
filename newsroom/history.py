@@ -43,7 +43,7 @@ class HistoryResource(newsroom.Resource):
         }
     }
 
-    mongo_indexes = {
+    mongo_indexes: newsroom.MongoIndexes = {
         'item': ([('item', 1)], {}),
         'company_user': ([('company', 1), ('user', 1)], {}),
     }

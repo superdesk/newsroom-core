@@ -28,7 +28,7 @@ class NotificationsResource(newsroom.Resource):
         'default_sort': [('created', -1)]
     }
 
-    mongo_indexes = {
+    mongo_indexes: newsroom.MongoIndexes = {
         'user_created': ([('user', 1), ('created', -1)], {}),
     }
 

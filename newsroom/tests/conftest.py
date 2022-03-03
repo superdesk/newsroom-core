@@ -2,8 +2,8 @@ import os
 import sys
 import pymongo
 
-from pathlib import Path
 from flask import Config
+from pathlib import Path
 from pytest import fixture
 
 from newsroom.web.factory import get_app
@@ -27,6 +27,7 @@ def update_config(conf):
     conf['DEFAULT_TIMEZONE'] = 'Europe/Prague'
     conf['NEWS_API_ENABLED'] = True
     conf['AUTH_SERVER_SHARED_SECRET'] = "secret123"
+    conf['SECRET_KEY'] = "foo"
     return conf
 
 
@@ -49,26 +50,25 @@ def reset_elastic(app):
         app.data.init_elastic(app)
 
 
+def drop_mongo(config: Config):
+    client = pymongo.MongoClient(config['CONTENTAPI_MONGO_URI'])
+    client.drop_database(config['CONTENTAPI_MONGO_DBNAME'])
+
+
 @fixture
 def app():
     cfg = Config(root)
     update_config(cfg)
 
-    # drop mongodb now, indexes will be created in when app is created
-    client = pymongo.MongoClient(cfg['CONTENTAPI_MONGO_URI'])
-    client.drop_database(cfg['CONTENTAPI_MONGO_DBNAME'])
+    # drop mongodb now, indexes will be created during app init
+    drop_mongo(cfg)
 
     app = get_app(config=cfg, testing=True)
-    return app
+    with app.app_context():
+        reset_elastic(app)
+        yield app
 
 
 @fixture
 def client(app):
     return app.test_client()
-
-
-@fixture(autouse=True)
-def setup(app):
-    with app.app_context():
-        reset_elastic(app)
-        yield

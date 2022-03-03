@@ -1,6 +1,6 @@
 from flask import json, url_for
 from bson import ObjectId
-from newsroom.tests.users import test_login_succeeds_for_admin, init as user_init  # noqa
+from newsroom.tests.users import test_login_succeeds_for_admin
 from newsroom.tests.fixtures import COMPANY_1_ID
 from superdesk import get_resource_service
 
@@ -11,13 +11,13 @@ def test_delete_company_deletes_company_and_users(client):
     response = client.post('/companies/new', data=json.dumps({
         'phone': '2132132134',
         'sd_subscriber_id': '12345',
-        'name': 'Press Co.',
+        'name': 'Press 2 Co.',
         'is_enabled': True,
         'contact_name': 'Tom'
     }), content_type='application/json')
 
     assert response.status_code == 201
-    company = get_resource_service('companies').find_one(req=None, name='Press Co.')
+    company = get_resource_service('companies').find_one(req=None, name='Press 2 Co.')
 
     # Register a user for the company
     response = client.post('/users/new', data={
@@ -46,7 +46,7 @@ def test_company_name_is_unique(client):
     response = client.post('/companies/new', data=json.dumps({
         'phone': '2132132134',
         'sd_subscriber_id': '12345',
-        'name': 'Press Co.',
+        'name': 'Press 2 Co.',
         'is_enabled': True,
         'contact_name': 'Tom'
     }), content_type='application/json')
@@ -56,7 +56,7 @@ def test_company_name_is_unique(client):
     assert company_id
 
     duplicate_response = client.post('/companies/new', data=json.dumps({
-        'name': 'PRESS Co.',
+        'name': 'PRESS 2 Co.',
     }), content_type='application/json')
 
     assert duplicate_response.status_code == 400
@@ -73,7 +73,7 @@ def test_get_company_users(client):
         'first_name': 'foo',
         'last_name': 'bar',
         'phone': '123456789',
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'user_type': 'public',
     })
     assert resp.status_code == 201, resp.get_data().decode('utf-8')
@@ -85,15 +85,6 @@ def test_get_company_users(client):
 
 
 def test_save_company_permissions(client, app):
-    app.data.insert('companies', [{
-        '_id': COMPANY_1_ID,
-        'phone': '2132132134',
-        'sd_subscriber_id': '12345',
-        'name': 'Press Co.',
-        'is_enabled': True,
-        'contact_name': 'Tom'
-    }])
-
     app.data.insert('products', [{
         '_id': 'p-1',
         'name': 'Sport',

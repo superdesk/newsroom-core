@@ -6,11 +6,10 @@ import bson
 from bson import ObjectId
 from flask import json
 from datetime import datetime
-import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from superdesk import get_resource_service
 import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_entity_or_404
-from ..fixtures import init_auth, COMPANY_1_ID, COMPANY_2_ID  # noqa
+from ..fixtures import COMPANY_1_ID, COMPANY_2_ID
 from ..utils import mock_send_email
 from unittest import mock
 
@@ -269,7 +268,7 @@ def test_push_binary_invalid_signature(client, app):
 
 def test_notify_topic_matches_for_new_item(client, app, mocker):
     user_ids = app.data.insert('users', [{
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
@@ -307,12 +306,12 @@ def test_notify_topic_matches_for_new_item(client, app, mocker):
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
-        'name': 'Press co.',
+        'name': 'Press 2 co.',
         'is_enabled': True,
     }])
 
     user = {
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
@@ -352,12 +351,12 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
-        'name': 'Press co.',
+        'name': 'Press 2 co.',
         'is_enabled': True,
     }])
 
     user = {
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': False,  # should still get email
@@ -400,14 +399,8 @@ def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
-    app.data.insert('companies', [{
-        '_id': COMPANY_1_ID,
-        'name': 'Press co.',
-        'is_enabled': True,
-    }])
-
     user = {
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'is_approved': True,
@@ -471,12 +464,12 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
 def test_do_not_notify_disabled_user(client, app, mocker):
     app.data.insert('companies', [{
         '_id': 1,
-        'name': 'Press co.',
+        'name': 'Press 2 co.',
         'is_enabled': True,
     }])
 
     user_ids = app.data.insert('users', [{
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
@@ -510,12 +503,12 @@ def test_do_not_notify_disabled_user(client, app, mocker):
 def test_notify_checks_service_subscriptions(client, app, mocker):
     app.data.insert('companies', [{
         '_id': 1,
-        'name': 'Press co.',
+        'name': 'Press 2 co.',
         'is_enabled': True,
     }])
 
     user_ids = app.data.insert('users', [{
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
@@ -554,7 +547,7 @@ def test_notify_checks_service_subscriptions(client, app, mocker):
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_send_notification_emails(client, app):
     user_ids = app.data.insert('users', [{
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,

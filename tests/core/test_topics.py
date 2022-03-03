@@ -26,7 +26,7 @@ test_user_id = str(TEST_USER_ID)
 topics_url = 'users/%s/topics' % user_id
 
 
-def test_topics_no_session(client):
+def test_topics_no_session(client, anonymous_user):
     resp = client.get(topics_url)
     assert 302 == resp.status_code
     resp = client.post(topics_url, data=topic)
