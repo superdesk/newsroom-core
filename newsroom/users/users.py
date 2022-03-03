@@ -2,7 +2,6 @@ import bcrypt
 from flask import current_app as app, session
 from flask_babel import gettext
 
-from content_api import MONGO_PREFIX
 from superdesk.utils import is_hashed, get_hash
 
 import newsroom
@@ -100,14 +99,13 @@ class UsersResource(newsroom.Resource):
 
     item_methods = ['GET', 'PATCH', 'PUT']
     resource_methods = ['GET', 'POST']
-    mongo_prefix = MONGO_PREFIX
     datasource = {
         'source': 'users',
         'projection': {'password': 0},
         'default_sort': [('last_name', 1)]
     }
     mongo_indexes = {
-        'email': ([('email', 1)], {'unique': True})
+        'email': ([('email', 1)], {'unique': True, 'collation': {'locale': 'en', 'strength': 2}})
     }
 
 

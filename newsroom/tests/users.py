@@ -2,11 +2,12 @@ from flask import url_for
 from pytest import fixture
 from bson import ObjectId
 
+
 ADMIN_USER_ID = '5cc94b99bc4316684dc7dc07'
 
 
 @fixture(autouse=True)
-def init(app):
+def init(app, setup):
     app.data.insert('users', [{
         '_id': ObjectId(ADMIN_USER_ID),
         'first_name': 'admin',

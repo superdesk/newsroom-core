@@ -62,19 +62,13 @@ class BaseNewsroomApp(eve.Eve):
             template_folder=os.path.join(NEWSROOM_DIR, 'templates'),
             static_folder=os.path.join(NEWSROOM_DIR, 'static'),
             validator=SuperdeskValidator,
+            settings=config,
             **kwargs
         )
         self.json_encoder = SuperdeskJSONEncoder
         self.data.json_encoder_class = SuperdeskJSONEncoder
 
-        if config:
-            try:
-                self.config.update(config or {})
-            except TypeError:
-                self.config.from_object(config)
-
         newsroom.flask_app = self
-        self.settings = self.config
 
         self.setup_error_handlers()
         self.setup_apm()
@@ -108,15 +102,15 @@ class BaseNewsroomApp(eve.Eve):
 
     def load_config(self):
         # Override Eve.load_config in order to get default_settings
-
-        if not getattr(self, 'settings'):
-            self.settings = flask.Config('.')
-
         super(BaseNewsroomApp, self).load_config()
+
         self.config.setdefault('DOMAIN', {})
         self.config.setdefault('SOURCES', {})
         self.load_app_default_config()
         self.load_app_instance_config()
+
+        # now we have to do this again to override newsrom default and instance config
+        self.config.update(self.settings or {})
 
     def setup_media_storage(self):
         if self.config.get('AMAZON_CONTAINER_NAME'):
@@ -201,3 +195,9 @@ class BaseNewsroomApp(eve.Eve):
             }
 
             self.apm = ElasticAPM(self)
+
+    def register_resource(self, resource, settings):
+        """In superdesk we have a workaround for mongo indexes, so now we need a workaround here."""
+        if settings.get("mongo_indexes__init") and not settings.get("mongo_indexes"):
+            settings["mongo_indexes"] = settings["mongo_indexes__init"]
+        super().register_resource(resource, settings)
