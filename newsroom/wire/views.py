@@ -177,7 +177,6 @@ def bookmarks():
 
 @blueprint.route('/wire/search')
 def search():
-    print("IN SEARCH")
     if 'prepend_embargoed' in request.args or app.config['PREPEND_EMBARGOED_TO_WIRE_SEARCH']:
         args = request.args.to_dict()
         args['prepend_embargoed'] = strtobool(
@@ -190,7 +189,6 @@ def search():
         )
         request.args = ImmutableMultiDict(args)
     response = get_internal('wire_search')
-    print("RESP", response)
     return send_response('wire_search', response)
 
 

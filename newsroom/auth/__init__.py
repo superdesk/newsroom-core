@@ -20,7 +20,6 @@ def get_user(required=False):
 
     :param required: Is user required.
     """
-    print("GET USER")
     user_id = get_user_id()
     if user_id:
         user = superdesk.get_resource_service('users').find_one(req=None, _id=user_id)
@@ -28,7 +27,6 @@ def get_user(required=False):
         user = None
     if not user and required:
         abort(401)
-    print("USER", user, session.get("user"))
     return user
 
 
