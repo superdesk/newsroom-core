@@ -11,7 +11,7 @@ from eve.utils import ParsedRequest
 import newsroom
 from newsroom.utils import get_json_or_400
 from newsroom.auth import get_user
-
+from superdesk.resource import MongoIndexes
 blueprint = Blueprint('history', __name__)
 
 
@@ -43,7 +43,7 @@ class HistoryResource(newsroom.Resource):
         }
     }
 
-    mongo_indexes = {
+    mongo_indexes: MongoIndexes = {
         'item': ([('item', 1)], {}),
         'company_user': ([('company', 1), ('user', 1)], {}),
     }

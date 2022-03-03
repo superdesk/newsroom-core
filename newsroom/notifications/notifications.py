@@ -6,7 +6,7 @@ import superdesk
 from bson import ObjectId
 from superdesk.utc import utcnow
 from flask import current_app as app, session
-
+from superdesk.resource import MongoIndexes
 
 class NotificationsResource(newsroom.Resource):
     url = 'users/<regex("[a-f0-9]{24}"):user>/notifications'
@@ -28,7 +28,7 @@ class NotificationsResource(newsroom.Resource):
         'default_sort': [('created', -1)]
     }
 
-    mongo_indexes = {
+    mongo_indexes: MongoIndexes = {
         'user_created': ([('user', 1), ('created', -1)], {}),
     }
 
