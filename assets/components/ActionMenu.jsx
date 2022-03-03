@@ -29,7 +29,7 @@ class ActionMenu extends React.Component {
                     <i className='icon--more icon--gray-dark'></i>
                 </button>
                 {this.referenceElem &&
-              <Popover placement="left" isOpen={showActions} target={this.referenceElem} className="action-popover">
+              <Popover placement="left-end" isOpen={showActions} target={this.referenceElem} className="action-popover">
                   <PopoverBody>
                       <ActionList
                           item={item}
