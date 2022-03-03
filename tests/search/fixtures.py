@@ -31,7 +31,7 @@ USERS = [
 ]
 
 COMPANIES = [
-    {'_id': COMPANY_1, 'name': 'Press co.', 'is_enabled': True, 'company_type': 'internal'},
+    {'_id': COMPANY_1, 'name': 'Press 2 co.', 'is_enabled': True, 'company_type': 'internal'},
     {'_id': COMPANY_2, 'name': 'Company co.', 'is_enabled': True, 'company_type': 'public', 'archive_access': False},
     {'_id': COMPANY_3, 'name': 'Foo bar co.', 'is_enabled': True, 'company_type': 'test', 'archive_access': True}
 ]
