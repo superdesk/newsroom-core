@@ -7,7 +7,7 @@ ADMIN_USER_ID = '5cc94b99bc4316684dc7dc07'
 
 
 @fixture(autouse=True)
-def init(app, setup):
+def init(app):
     app.data.insert('users', [{
         '_id': ObjectId(ADMIN_USER_ID),
         'first_name': 'admin',
