@@ -1,5 +1,4 @@
 import os
-import sys
 import pymongo
 
 from flask import Config
@@ -10,7 +9,6 @@ from newsroom.web.factory import get_app
 
 
 root = (Path(__file__).parent / '..').resolve()
-sys.path.insert(0, str(root))
 
 
 def update_config(conf):
