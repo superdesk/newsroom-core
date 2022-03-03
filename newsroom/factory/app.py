@@ -55,6 +55,9 @@ class BaseNewsroomApp(eve.Eve):
         self.__self__ = self
         self.__func__ = None
 
+        if config is None:
+            config = {}
+
         super(BaseNewsroomApp, self).__init__(
             import_name,
             data=self.DATALAYER,
