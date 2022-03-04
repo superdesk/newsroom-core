@@ -1,4 +1,3 @@
-@wip
 Feature: Wire Search
     @auth @admin
     Scenario: Sort items by descending publish date
