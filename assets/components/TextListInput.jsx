@@ -76,6 +76,7 @@ class TextListInput extends React.Component {
                     icon={readOnly ? null : 'icon--close-thin'}
                     onClick={this.removeKeyword} />
                 {!readOnly && <TextInput
+                    name={name}
                     onChange={this.inputChange}
                     onKeyDown={(event) => {
                         if (event.keyCode === KEYCODES.ENTER ||
