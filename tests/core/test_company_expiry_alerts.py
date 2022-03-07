@@ -3,7 +3,6 @@ import datetime
 from newsroom.company_expiry_alerts import CompanyExpiryAlerts
 from ..utils import post_json, mock_send_email
 from superdesk import get_resource_service
-from ..fixtures import items, init_items, init_auth # noqa
 from unittest import mock
 
 
@@ -33,7 +32,7 @@ def test_company_expiry_alerts(client, app):
 
     companies = get_resource_service('companies').find({})
     expiry_time = (now + datetime.timedelta(days=7)).replace(hour=0, minute=0, second=0)
-    assert companies.count() == 2
+    assert companies.count() >= 2
 
     with app.mail.record_messages() as outbox, app.test_request_context():
         CompanyExpiryAlerts().send_alerts()

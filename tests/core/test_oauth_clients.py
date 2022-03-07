@@ -1,5 +1,5 @@
 from flask import json
-from newsroom.tests.users import (test_login_succeeds_for_admin, init as user_init)  # noqa
+from newsroom.tests.users import test_login_succeeds_for_admin
 from superdesk import get_resource_service
 from newsroom.auth_server.auth import JWTAuth
 import base64

@@ -2,8 +2,6 @@ from bson import ObjectId
 from flask import json
 from pytest import fixture
 
-from newsroom.tests.users import test_login_succeeds_for_admin, init as user_init  # noqa
-
 
 @fixture(autouse=True)
 def init(app):
@@ -20,12 +18,13 @@ def init(app):
 
 
 def test_card_list_fails_for_anonymous_user(client):
+    with client.session_transaction() as session:
+        session['user'] = None
     response = client.get('/cards')
     assert response.status_code == 302
 
 
 def test_save_and_return_cards(client):
-    test_login_succeeds_for_admin(client)
     # Save a new card
     client.post('/cards/new', data={'card': json.dumps({
         '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
@@ -42,8 +41,6 @@ def test_save_and_return_cards(client):
 
 
 def test_update_card(client):
-    test_login_succeeds_for_admin(client)
-
     client.post('/cards/59b4c5c61d41c8d736852fbf/',
                 data={'card': json.dumps({'label': 'Sport',
                                           'dashboard': 'newsroom',
@@ -54,8 +51,6 @@ def test_update_card(client):
 
 
 def test_delete_card_succeeds(client):
-    test_login_succeeds_for_admin(client)
-
     client.delete('/cards/59b4c5c61d41c8d736852fbf')
 
     response = client.get('/cards')
