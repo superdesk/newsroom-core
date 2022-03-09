@@ -39,13 +39,16 @@ const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubs
                     readOnly={readOnly}
                 />
             )}
-            {!globalTopicsEnabled ? null : (
+            {!(globalTopicsEnabled && original.user) ? null : (
                 <CheckboxInput
                     label={gettext('Share with my Company')}
                     value={topic.is_global || false}
                     onChange={onChange('is_global')}
                     readOnly={readOnly}
                 />
+            )}
+            {!(original._id != null && original.user == null ) ? null : (
+                <label htmlFor={original._id}>{gettext('Created Externally')}</label>
             )}
         </form>
     </div>
