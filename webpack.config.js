@@ -3,8 +3,9 @@
 const path = require('path');
 const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
+const TerserPlugin = require('terser-webpack-plugin-legacy');
 
-module.exports = {
+config = {
     entry: {
         newsroom_js: path.resolve(__dirname, 'assets/index.js'),
         companies_js: path.resolve(__dirname, 'assets/companies/index.js'),
@@ -90,3 +91,18 @@ module.exports = {
         disableHostCheck: true,
     },
 };
+
+if (process.env.NODE_ENV === 'production') {
+    console.log('PRODUCTION MODE');
+    config.plugins.push(new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+    }));
+    config.plugins.push(new TerserPlugin({
+        cache: true,
+        parallel: true,
+    }));
+} else {
+    console.log('DEVELOPMENT MODE');
+}
+
+module.exports = config;
