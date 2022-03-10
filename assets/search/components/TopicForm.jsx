@@ -39,7 +39,7 @@ const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubs
                     readOnly={readOnly}
                 />
             )}
-            {!(globalTopicsEnabled && original.user) ? null : (
+            {!(globalTopicsEnabled && (original._id == null || original.user)) ? null : (
                 <CheckboxInput
                     label={gettext('Share with my Company')}
                     value={topic.is_global || false}
