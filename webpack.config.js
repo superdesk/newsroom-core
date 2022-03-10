@@ -93,7 +93,6 @@ const config = {
 };
 
 if (process.env.NODE_ENV === 'production') {
-    console.log('PRODUCTION MODE');
     config.plugins.push(new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
     }));
@@ -101,8 +100,6 @@ if (process.env.NODE_ENV === 'production') {
         cache: true,
         parallel: true,
     }));
-} else {
-    console.log('DEVELOPMENT MODE');
 }
 
 module.exports = config;
