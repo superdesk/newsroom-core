@@ -5,7 +5,7 @@ const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const TerserPlugin = require('terser-webpack-plugin-legacy');
 
-config = {
+const config = {
     entry: {
         newsroom_js: path.resolve(__dirname, 'assets/index.js'),
         companies_js: path.resolve(__dirname, 'assets/companies/index.js'),
