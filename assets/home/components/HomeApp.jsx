@@ -53,7 +53,7 @@ class HomeApp extends React.Component {
         ])
             .then(() => {
                 this.setState({loadingItems: false});
-            })
+            });
     }
 
     renderModal(specs) {
