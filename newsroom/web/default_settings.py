@@ -417,3 +417,15 @@ AGENDA_GROUPS = None
 #: .. versionadded:: 2.1.0
 #:
 ALLOW_EXPIRED_COMPANY_LOGINS = False
+
+#: The timeout used on the cache for the dashboard items
+#:
+#: .. versionadded:: 2.1.0
+#:
+DASHBOARD_CACHE_TIMEOUT = 300
+
+#: If True, deletes all Dashboard item caches when new items are pushed
+#:
+#: .. versionadded:: 2.1.0
+#:
+DELETE_DASHBOARD_CACHE_ON_PUSH = True
