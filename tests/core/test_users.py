@@ -6,6 +6,7 @@ from superdesk import get_resource_service
 
 from newsroom.auth import get_user_by_email
 from newsroom.utils import get_user_dict, get_company_dict, is_valid_login
+from newsroom.tests.fixtures import COMPANY_1_ID
 from unittest import mock
 
 from tests.utils import mock_send_email
@@ -83,7 +84,7 @@ def test_new_user_has_correct_flags(client):
         'last_name': 'Doe',
         'password': 'abc',
         'phone': '1234567',
-        'company': '',
+        'company': COMPANY_1_ID,
         'user_type': 'public'
     })
 
@@ -103,7 +104,7 @@ def test_new_user_fails_if_email_is_used_before_case_insensitive(client):
         'last_name': 'Doe',
         'password': 'abc',
         'phone': '1234567',
-        'company': '',
+        'company': COMPANY_1_ID,
         'user_type': 'public'
     })
 
@@ -113,7 +114,7 @@ def test_new_user_fails_if_email_is_used_before_case_insensitive(client):
         'last_name': 'Smith',
         'password': 'abc',
         'phone': '1234567',
-        'company': '',
+        'company': COMPANY_1_ID,
         'user_type': 'public'
     })
 
@@ -201,7 +202,7 @@ def test_new_user_can_be_deleted(client):
         'last_name': 'Doe',
         'password': 'abc',
         'phone': '1234567',
-        'company': '',
+        'company': COMPANY_1_ID,
         'user_type': 'public'
     })
 
