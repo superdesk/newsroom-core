@@ -363,6 +363,9 @@ SERVER_PATH = pathlib.Path(__file__).resolve().parent.parent
 #: used to locate client/dist/manifest.json file
 CLIENT_PATH = SERVER_PATH
 
+#: path to app specific translations
+TRANSLATIONS_PATH = None
+
 #: server date/time formats
 #: defined using babel syntax http://babel.pocoo.org/en/latest/dates.html#date-and-time
 TIME_FORMAT_SHORT = "HH:mm"

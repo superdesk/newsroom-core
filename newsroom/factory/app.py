@@ -126,6 +126,13 @@ class BaseNewsroomApp(eve.Eve):
             'BABEL_TRANSLATION_DIRECTORIES',
             os.path.join(NEWSROOM_DIR, 'translations')
         )
+
+        if self.config.get('TRANSLATIONS_PATH'):
+            self.config['BABEL_TRANSLATION_DIRECTORIES'] = ';'.join([
+                str(self.config['BABEL_TRANSLATION_DIRECTORIES']),
+                str(self.config['TRANSLATIONS_PATH']),
+            ])
+
         # avoid events on this
         self.babel_tzinfo = None
         self.babel_locale = None
