@@ -3,8 +3,9 @@
 const path = require('path');
 const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
+const TerserPlugin = require('terser-webpack-plugin-legacy');
 
-module.exports = {
+const config = {
     entry: {
         newsroom_js: path.resolve(__dirname, 'assets/index.js'),
         companies_js: path.resolve(__dirname, 'assets/companies/index.js'),
@@ -29,20 +30,7 @@ module.exports = {
         media_releases_js: path.resolve(__dirname, 'assets/media-releases/index.js'),
         monitoring_js: path.resolve(__dirname, 'assets/monitoring/index.js'),
         factcheck_js: path.resolve(__dirname, 'assets/factcheck/index.js'),
-        common: [
-            'alertifyjs',
-            'bootstrap',
-            'classnames',
-            'lodash',
-            'moment',
-            'prop-types',
-            'react',
-            'react-dom',
-            'react-redux',
-            'redux',
-            'redux-thunk',
-            'redux-logger',
-        ],
+        common: path.resolve(__dirname, 'assets/common.js'),
     },
     output: {
         path: path.resolve(process.cwd(), 'dist'),
@@ -103,3 +91,15 @@ module.exports = {
         disableHostCheck: true,
     },
 };
+
+if (process.env.NODE_ENV === 'production') {
+    config.plugins.push(new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+    }));
+    config.plugins.push(new TerserPlugin({
+        cache: true,
+        parallel: true,
+    }));
+}
+
+module.exports = config;

@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "webpack-dev-server --progress --colors --content-base dist --host 0.0.0.0",
-    "build": "webpack --config webpack.config.js --progress --profile --colors",
+    "build": "export NODE_ENV=production && webpack --config webpack.config.js --progress --profile --colors",
     "lint": "eslint *.js assets --ext .js --ext .jsx",
     "fix": "eslint *.js assets --ext .js --ext .jsx --fix",
     "test": "karma start --single-run",
@@ -51,6 +51,7 @@
     "sass-loader": "^6.0.6",
     "store": "2.0.12",
     "style-loader": "^0.19.0",
+    "terser-webpack-plugin-legacy": "^1.2.5",
     "url-search-params-polyfill": "2.0.3",
     "webpack": "3.11.0",
     "webpack-dev-server": "2.11.1",
