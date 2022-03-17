@@ -34,7 +34,7 @@ class AuditInformation extends React.Component {
                 <div className='wire-column__preview__date'>
                     {gettext('Created {{creator}}at {{created}}',
                         {
-                            creator: creator ? gettext(`by ${creator.first_name} ${creator.last_name} `) : gettext('by System '),
+                            creator: creator ? gettext(`by ${creator.first_name} ${creator.last_name} `) : gettext('by System') + ' ',
                             created: fullDate(item._created),
                         }
                     )}
