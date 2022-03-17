@@ -48,7 +48,7 @@ class AuditInformation extends React.Component {
                 <div className='wire-column__preview__date'>
                     {gettext('Updated {{updator}}at {{updated}}',
                         {
-                            updator: updator ? gettext(`by ${updator.first_name} ${updator.last_name} `) : gettext('by System '),
+                            updator: updator ? gettext(`by ${updator.first_name} ${updator.last_name} `) : gettext('by System') + ' ',
                             updated: fullDate(item._updated),
                         }
                     )}
