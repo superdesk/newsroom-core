@@ -17,7 +17,7 @@ from newsroom.utils import parse_dates, get_user_dict, get_company_dict, parse_d
 from newsroom.email import send_new_item_notification_email, \
     send_history_match_notification_email, send_item_killed_notification_email
 from newsroom.history import get_history_users
-from newsroom.wire.views import HOME_ITEMS_CACHE_KEY
+from newsroom.wire.views import delete_dashboard_caches
 from newsroom.wire import url_for_wire
 from newsroom.upload import ASSETS_RESOURCE
 from newsroom.signals import publish_item as publish_item_signal
@@ -88,7 +88,8 @@ def push():
     else:
         flask.abort(400, gettext('Unknown type {}'.format(item.get('type'))))
 
-    app.cache.delete(HOME_ITEMS_CACHE_KEY)
+    if app.config.get("DELETE_DASHBOARD_CACHE_ON_PUSH", True):
+        delete_dashboard_caches()
     return flask.jsonify({})
 
 

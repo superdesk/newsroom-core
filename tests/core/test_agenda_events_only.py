@@ -2,7 +2,7 @@ from flask import json
 from pytest import fixture
 from copy import deepcopy
 from newsroom.notifications import get_user_notifications
-from tests.fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, setup_user_company, \
+from tests.fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, \
     PUBLIC_USER_ID, COMPANY_1_ID  # noqa
 from tests.utils import post_json, mock_send_email
 from .test_push_events import test_event, test_planning
@@ -11,7 +11,6 @@ from unittest import mock
 
 @fixture(autouse=True)
 def set_events_only_company(app):
-    setup_user_company(app)
     company = app.data.find_one('companies', None, _id=COMPANY_1_ID)
     assert company is not None
     updates = {'events_only': True, 'section': {'wire': True, 'agenda': True}, 'is_enabled': True}

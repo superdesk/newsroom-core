@@ -77,6 +77,9 @@ class CompaniesResource(newsroom.Resource):
     resource_methods = ['GET', 'POST']
     mongo_prefix = MONGO_PREFIX
     internal_resource = True
+    mongo_indexes = {
+        'name_1': ([('name', 1)], {'unique': True, 'collation': {'locale': 'en', 'strength': 2}}),
+    }
 
 
 class CompaniesService(newsroom.Service):

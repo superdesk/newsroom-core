@@ -12,7 +12,7 @@ USERS = [
     {
         '_id': ADMIN_USER_ID, 'company': COMPANY_1, 'user_type': 'administrator',
         'first_name': 'admin', 'last_name': 'admin',
-        'email': 'admin@sourcefabric.org',
+        'email': 'admin2@sourcefabric.org',
         'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
         'is_validated': True, 'is_enabled': True, 'is_approved': True
     },
@@ -31,7 +31,7 @@ USERS = [
 ]
 
 COMPANIES = [
-    {'_id': COMPANY_1, 'name': 'Press co.', 'is_enabled': True, 'company_type': 'internal'},
+    {'_id': COMPANY_1, 'name': 'Press 2 co.', 'is_enabled': True, 'company_type': 'internal'},
     {'_id': COMPANY_2, 'name': 'Company co.', 'is_enabled': True, 'company_type': 'public', 'archive_access': False},
     {'_id': COMPANY_3, 'name': 'Foo bar co.', 'is_enabled': True, 'company_type': 'test', 'archive_access': True}
 ]

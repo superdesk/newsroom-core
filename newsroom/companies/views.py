@@ -1,9 +1,11 @@
 import re
 import ipaddress
-from datetime import datetime
 
 import flask
+import werkzeug.exceptions
+
 from bson import ObjectId
+from datetime import datetime
 from flask import jsonify, current_app as app
 from flask_babel import gettext
 from superdesk import get_resource_service
@@ -55,7 +57,11 @@ def create():
 
     new_company = get_company_updates(company)
     set_original_creator(new_company)
-    ids = get_resource_service('companies').post([new_company])
+    try:
+        ids = get_resource_service('companies').post([new_company])
+    except werkzeug.exceptions.Conflict:
+        return jsonify({'name': gettext('Company already exists')}), 400
+
     return jsonify({'success': True, '_id': ids[0]}), 201
 
 

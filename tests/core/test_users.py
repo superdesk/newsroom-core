@@ -6,20 +6,19 @@ from superdesk import get_resource_service
 
 from newsroom.auth import get_user_by_email
 from newsroom.utils import get_user_dict, get_company_dict, is_valid_login
-from newsroom.tests.users import test_login_succeeds_for_admin, init as user_init  # noqa
+from newsroom.tests.fixtures import COMPANY_1_ID
 from unittest import mock
 
 from tests.utils import mock_send_email
 
 
-def test_user_list_fails_for_anonymous_user(client):
+def test_user_list_fails_for_anonymous_user(client, anonymous_user):
     response = client.get('/users/search')
     assert response.status_code == 403
     assert b'Forbidden' in response.data
 
 
 def test_return_search_for_users(client):
-    test_login_succeeds_for_admin(client)
     # Register a new account
     response = client.post('/users/new', data={
         'email': 'newuser@abc.org',
@@ -36,10 +35,9 @@ def test_return_search_for_users(client):
 
 
 def test_reset_password_token_sent_for_user_succeeds(app, client):
-    test_login_succeeds_for_admin(client)
     # Insert a new user
     app.data.insert('users', [{
-        '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
+        '_id': ObjectId('59b4c5c61d41c8d736852000'),
         'first_name': 'John',
         'last_name': 'Smith',
         'email': 'test@sourcefabric.org',
@@ -50,7 +48,7 @@ def test_reset_password_token_sent_for_user_succeeds(app, client):
         'is_approved': False
     }])
     # Resend the reset password token
-    response = client.post('/users/59b4c5c61d41c8d736852fbf/reset_password')
+    response = client.post('/users/59b4c5c61d41c8d736852000/reset_password')
     assert response.status_code == 200
     assert '"success": true' in response.get_data(as_text=True)
     user = get_resource_service('users').find_one(req=None, email='test@sourcefabric.org')
@@ -58,10 +56,9 @@ def test_reset_password_token_sent_for_user_succeeds(app, client):
 
 
 def test_reset_password_token_sent_for_user_fails_for_disabled_user(app, client):
-    test_login_succeeds_for_admin(client)
     # Insert a new user
     app.data.insert('users', [{
-        '_id': ObjectId('59b4c5c61d41c8d736852fbf'),
+        '_id': ObjectId('59b4c5c61d41c8d736852000'),
         'first_name': 'John',
         'last_name': 'Smith',
         'email': 'test@sourcefabric.org',
@@ -72,7 +69,7 @@ def test_reset_password_token_sent_for_user_fails_for_disabled_user(app, client)
         'is_approved': False
     }])
     # Resend the reset password token
-    response = client.post('/users/59b4c5c61d41c8d736852fbf/reset_password')
+    response = client.post('/users/59b4c5c61d41c8d736852000/reset_password')
     assert response.status_code == 400
     assert '"message": "Token could not be sent"' in response.get_data(as_text=True)
     user = get_resource_service('users').find_one(req=None, email='test@sourcefabric.org')
@@ -80,7 +77,6 @@ def test_reset_password_token_sent_for_user_fails_for_disabled_user(app, client)
 
 
 def test_new_user_has_correct_flags(client):
-    test_login_succeeds_for_admin(client)
     # Register a new account
     response = client.post('/users/new', data={
         'email': 'newuser@abc.org',
@@ -88,7 +84,7 @@ def test_new_user_has_correct_flags(client):
         'last_name': 'Doe',
         'password': 'abc',
         'phone': '1234567',
-        'company': '',
+        'company': COMPANY_1_ID,
         'user_type': 'public'
     })
 
@@ -101,7 +97,6 @@ def test_new_user_has_correct_flags(client):
 
 
 def test_new_user_fails_if_email_is_used_before_case_insensitive(client):
-    test_login_succeeds_for_admin(client)
     # Register a new account
     response = client.post('/users/new', data={
         'email': 'newuser@abc.org',
@@ -109,7 +104,7 @@ def test_new_user_fails_if_email_is_used_before_case_insensitive(client):
         'last_name': 'Doe',
         'password': 'abc',
         'phone': '1234567',
-        'company': '',
+        'company': COMPANY_1_ID,
         'user_type': 'public'
     })
 
@@ -119,7 +114,7 @@ def test_new_user_fails_if_email_is_used_before_case_insensitive(client):
         'last_name': 'Smith',
         'password': 'abc',
         'phone': '1234567',
-        'company': '',
+        'company': COMPANY_1_ID,
         'user_type': 'public'
     })
 
@@ -131,11 +126,10 @@ def test_new_user_fails_if_email_is_used_before_case_insensitive(client):
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_create_new_user_succeeds(app, client):
-    test_login_succeeds_for_admin(client)
     company_ids = app.data.insert('companies', [{
         'phone': '2132132134',
         'sd_subscriber_id': '12345',
-        'name': 'Press Co.',
+        'name': 'Press 2 Co.',
         'is_enabled': True,
         'contact_name': 'Tom'
     }])
@@ -186,7 +180,6 @@ def test_create_new_user_succeeds(app, client):
 
 
 def test_new_user_fails_if_fields_not_provided(client):
-    test_login_succeeds_for_admin(client)
     # Register a new account
     response = client.post(url_for('users.create'), data={
         'phone': '1234567',
@@ -202,7 +195,6 @@ def test_new_user_fails_if_fields_not_provided(client):
 
 
 def test_new_user_can_be_deleted(client):
-    test_login_succeeds_for_admin(client)
     # Register a new account
     response = client.post('/users/new', data={
         'email': 'newuser@abc.org',
@@ -210,7 +202,7 @@ def test_new_user_can_be_deleted(client):
         'last_name': 'Doe',
         'password': 'abc',
         'phone': '1234567',
-        'company': '',
+        'company': COMPANY_1_ID,
         'user_type': 'public'
     })
 
@@ -227,8 +219,6 @@ def test_new_user_can_be_deleted(client):
 
 
 def test_return_search_for_all_users(client, app):
-    test_login_succeeds_for_admin(client)
-
     for i in range(250):
         app.data.insert('users', [{
             'email': 'foo%s@bar.com' % i,
@@ -240,12 +230,10 @@ def test_return_search_for_all_users(client, app):
 
     resp = client.get('/users/search?q=fo')
     data = json.loads(resp.get_data())
-    assert 250 == len(data)
+    assert 250 <= len(data)
 
 
 def test_active_user(client, app):
-    test_login_succeeds_for_admin(client)
-
     resp = client.get('/users/search?q=admin')
     data = json.loads(resp.get_data())
     assert data[0].get('last_active')
@@ -340,9 +328,8 @@ def test_expired_company_does_not_restrict_activity(client, app):
 
 
 def test_is_valid_login(client, app):
-    app.data.insert('users', [
+    user_ids = app.data.insert('users', [
         {
-            '_id': '5cc94b99bc4316684dc7dc07',
             'email': 'foo1@bar.com',
             'last_name': 'bar1',
             'first_name': 'foo1',
@@ -350,10 +337,9 @@ def test_is_valid_login(client, app):
             'is_approved': True,
             'is_enabled': True,
             'is_validated': True,
-            'company': '1'
+            'company': '1',
         },
         {
-            '_id': '2',
             'email': 'foo2@bar.com',
             'last_name': 'bar2',
             'first_name': 'foo2',
@@ -364,7 +350,6 @@ def test_is_valid_login(client, app):
             'company': '1'
         },
         {
-            '_id': '3',
             'email': 'foo3@bar.com',
             'last_name': 'bar3',
             'first_name': 'foo3',
@@ -375,7 +360,6 @@ def test_is_valid_login(client, app):
             'company': '2'
         },
         {
-            '_id': '4',
             'email': 'foo4@bar.com',
             'last_name': 'bar4',
             'first_name': 'foo4',
@@ -394,17 +378,16 @@ def test_is_valid_login(client, app):
     ])
 
     with app.test_request_context():
-
-        assert is_valid_login('5cc94b99bc4316684dc7dc07') is True
-        assert is_valid_login('2') is False
-        assert is_valid_login('3') is False
+        assert is_valid_login(user_ids[0]) is True
+        assert is_valid_login(user_ids[1]) is False
+        assert is_valid_login(user_ids[2]) is False
 
 
 def test_account_manager_can_update_user(app, client):
     company_ids = app.data.insert('companies', [{
         'phone': '2132132134',
         'sd_subscriber_id': '12345',
-        'name': 'Press Co.',
+        'name': 'Press 2 Co.',
         'is_enabled': True,
         'contact_name': 'Tom'
     }])

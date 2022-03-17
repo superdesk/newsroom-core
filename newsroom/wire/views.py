@@ -101,8 +101,14 @@ def get_items_by_card(cards, company_id):
             # using '/media_card_external' endpoint
             items_by_card[card['label']] = None
 
-    app.cache.set(cache_key, items_by_card, timeout=300)
+    app.cache.set(cache_key, items_by_card, timeout=app.config.get("DASHBOARD_CACHE_TIMEOUT", 300))
     return items_by_card
+
+
+def delete_dashboard_caches():
+    app.cache.delete(HOME_ITEMS_CACHE_KEY)
+    for company in query_resource("companies"):
+        app.cache.delete(f"{HOME_ITEMS_CACHE_KEY}{company['_id']}")
 
 
 def get_home_data():
@@ -110,11 +116,9 @@ def get_home_data():
     cards = list(query_resource('cards', lookup={'dashboard': 'newsroom'}))
     company_id = str(user['company']) if user and user.get('company') else None
     topics = get_user_topics(user['_id']) if user else []
-    items_by_card = get_items_by_card(cards, company_id)
 
     return {
         'cards': cards,
-        'itemsByCard': items_by_card,
         'products': get_products_by_company(company_id),
         'user': str(user['_id']) if user else None,
         'userType': user.get('user_type'),
@@ -155,9 +159,19 @@ def get_media_card_external(card_id):
     else:
         card = get_entity_or_404(card_id, 'cards')
         card_items = app.get_media_cards_external(card)
-        app.cache.set(cache_id, card_items, timeout=300)
+        app.cache.set(cache_id, card_items, timeout=app.config.get("DASHBOARD_CACHE_TIMEOUT", 300))
 
     return flask.jsonify({'_items': card_items})
+
+
+@blueprint.route('/card_items')
+@login_required
+def get_card_items():
+    user = get_user()
+    cards = list(query_resource('cards', lookup={'dashboard': 'newsroom'}))
+    company_id = str(user['company']) if user and user.get('company') else None
+    items_by_card = get_items_by_card(cards, company_id)
+    return flask.jsonify({"_items": items_by_card})
 
 
 @blueprint.route('/wire')

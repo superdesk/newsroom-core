@@ -80,12 +80,14 @@ def create():
     form = UserForm()
     if form.validate():
         if not _is_email_address_valid(form.email.data):
-            return jsonify({'email': ['Email address is already in use']}), 400
+            return jsonify({'email': [gettext('Email address is already in use')]}), 400
 
         new_user = form.data
         add_token_data(new_user)
         if form.company.data:
             new_user['company'] = ObjectId(form.company.data)
+        elif new_user["user_type"] != "administrator":
+            return jsonify({"company": [gettext("Company is required for non administrators")]}), 400
 
         # Flask form won't accept default value if any form data was passed in the request.
         # So, we need to set this explicitly here.
@@ -117,7 +119,9 @@ def edit(_id):
         form = UserForm(user=user)
         if form.validate_on_submit():
             if form.email.data != user['email'] and not _is_email_address_valid(form.email.data):
-                return jsonify({'email': ['Email address is already in use']}), 400
+                return jsonify({'email': [gettext("Email address is already in use")]}), 400
+            elif not form.company.data and form.user_type.data != "administrator":
+                return jsonify({"company": [gettext("Company is required for non administrators")]}), 400
 
             updates = form.data
             if form.company.data:
