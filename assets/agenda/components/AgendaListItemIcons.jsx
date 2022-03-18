@@ -71,7 +71,7 @@ class AgendaListItemIcons extends React.Component {
                 />
 
                 {state.coveragesToDisplay.length > 0 && (
-                    <div className='wire-articles__item__icons wire-articles__item__icons--dashed-border align-self-start'>
+                    <div className='wire-articles__item__icons wire-articles__item__icons--dashed-border'>
                         {state.coveragesToDisplay.map((coverage, index) => (
                             <AgendaListCoverageItem
                                 key={index}
@@ -86,14 +86,14 @@ class AgendaListItemIcons extends React.Component {
                 )}
 
                 {state.attachments > 0 && (
-                    <div className='wire-articles__item__icons--dashed-border align-self-start'>
+                    <div className='d-flex align-items-center wire-articles__item__icons--dashed-border'>
                         <i className='icon-small--attachment'
                             title={gettext('{{ attachments }} file(s) attached', {attachments: state.attachments})}
                         />
                     </div>
                 )}
 
-                <div className='wire-articles__item__meta-info flex-row align-items-start'>
+                <div className='wire-articles__item__meta-info align-items-center'>
                     <AgendaLocation item={props.item} isMobilePhone={props.isMobilePhone} border={state.internalNote} />
 
                     {!props.isMobilePhone && (

@@ -36,7 +36,7 @@ function AgendaListItemLabels({item, withDate, group, right}) {
             return null;
         }
 
-        return (<div><span className={classNames('label ml-2', labelColor, {'pull-right': right})}>{labelText}</span></div>);
+        return (<div><span className={classNames('label', labelColor, {'pull-right': right})}>{labelText}</span></div>);
         
     };
 
