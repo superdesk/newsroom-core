@@ -34,14 +34,18 @@ expiration_delay = 0
 @blueprint.route(TOKEN_ENDPOINT, methods=["POST"])
 def issue_token():
     current_time = utcnow()
-
-    client_id = request.authorization.get("username")
-    if client_id:
-        client = get_cached_resource_by_id("oauth_clients", client_id)
-        superdesk.get_resource_service("oauth_clients").system_update(
-            ObjectId(client_id), {"last_active": current_time}, client
-        )
-    return authorization.create_token_response()
+    try:
+        token_response = authorization.create_token_response()
+    except Exception:
+        pass
+    else:
+        client_id = request.authorization.get("username")
+        if client_id:
+            client = get_cached_resource_by_id("oauth_clients", client_id)
+            superdesk.get_resource_service("oauth_clients").system_update(
+                ObjectId(client_id), {"last_active": current_time}, client
+            )
+        return token_response
 
 
 def generate_jwt_token(client, grant_type, user, scope):
