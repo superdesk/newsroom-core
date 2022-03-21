@@ -11,16 +11,17 @@ import logging
 from authlib.integrations.flask_oauth2 import AuthorizationServer
 from authlib.oauth2.rfc6749 import grants
 from authlib.jose import jwt
+from bson import ObjectId
 import flask
+from flask import request
 from .models import query_client, save_token
-
+from newsroom.utils import get_cached_resource_by_id
+import superdesk
+from superdesk.utc import utcnow
 
 logger = logging.getLogger(__name__)
 
-authorization = AuthorizationServer(
-    query_client=query_client,
-    save_token=save_token,
-)
+authorization = AuthorizationServer(query_client=query_client, save_token=save_token)
 
 
 blueprint = flask.Blueprint("auth_server", __name__)
@@ -32,6 +33,14 @@ expiration_delay = 0
 
 @blueprint.route(TOKEN_ENDPOINT, methods=["POST"])
 def issue_token():
+    current_time = utcnow()
+
+    client_id = request.authorization.get("username")
+    if client_id:
+        client = get_cached_resource_by_id("oauth_clients", client_id)
+        superdesk.get_resource_service("oauth_clients").system_update(
+            ObjectId(client_id), {"last_active": current_time}, client
+        )
     return authorization.create_token_response()
 
 
