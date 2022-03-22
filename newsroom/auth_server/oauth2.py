@@ -37,7 +37,7 @@ def issue_token():
     try:
         token_response = authorization.create_token_response()
     except Exception:
-        pass
+        raise
     else:
         client_id = request.authorization.get("username")
         if client_id:
