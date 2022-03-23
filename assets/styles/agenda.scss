@@ -50,6 +50,12 @@
             padding: 0 0 0 5px;
         }
     }
+    .wire-articles__item-text {
+        padding-right: 58px;
+        @include sm {
+            padding-right: 0;
+        }
+    }
     .wire-articles__item__meta {
         align-items: stretch;
         flex-wrap: wrap;
