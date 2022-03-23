@@ -1,23 +1,23 @@
 # Translations template for Newsroom-Core.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the Newsroom-Core
 # project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 # 
 # Translators:
 # Srdjan Karalic <srdjan.karalic@sourcefabric.org>, 2020
-# Gideon Lehmann <gideon.lehmann@sourcefabric.org>, 2021
-# Evzen Deulin <evgeny.deulin@sourcefabric.org>, 2021
-# Simon Peacock <simon.peacock@gmail.com>, 2021
-# Marie-Eve Ouellette <marie-eve.ouellette@lapressecanadienne.com>, 2021
+# Evzen Deulin <evgeny.deulin@sourcefabric.org>, 2022
+# Gideon Lehmann <gideon.lehmann@sourcefabric.org>, 2022
+# Simon Peacock <simon.peacock@gmail.com>, 2022
+# Marie-Eve Ouellette <marie-eve.ouellette@lapressecanadienne.com>, 2022
 # Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2022
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Newsroom-Core 1.0\n"
+"Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-12-09 11:52+0100\n"
+"POT-Creation-Date: 2022-03-15 13:38+0100\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
 "Last-Translator: Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2022\n"
 "Language-Team: French (Canada) (https://www.transifex.com/sourcefabric/teams/6584/fr_CA/)\n"
@@ -28,42 +28,22 @@ msgstr ""
 "Language: fr_CA\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: newsroom/email.py:69
-msgid "A new newsroom signup request"
-msgstr "Nouvelle demande d'inscription à NouvellesPro"
-
-#: newsroom/email.py:94 newsroom/email.py:115
-msgid "{} account created"
-msgstr "{} Compte créé"
-
-#: newsroom/email.py:134
-msgid "{} password reset"
-msgstr "{} réinitialisation du mot de passe"
-
-#: newsroom/email.py:153
-msgid "New story for followed topic: {}"
-msgstr "Nouvel article pour le sujet suivi: {}"
-
-#: newsroom/email.py:172
-msgid "New update for followed agenda: {}"
-msgstr "Nouvelle mise à jour pour le calendrier suivi: {}"
-
-#: newsroom/email.py:204
-msgid "New update for your previously accessed story: {}"
-msgstr "Nouvelle mise à jour pour l'article précédemment consulté: {}"
-
-#: newsroom/email.py:223
-msgid "New update for your previously accessed agenda: {}"
-msgstr ""
-"Nouvelle mise à jour pour le calendrier que vous avez déjà consulté: {}"
-
-#: newsroom/email.py:253
+#: newsroom/email.py:340
 msgid "Kill/Takedown notice"
 msgstr "Avis de supression"
 
-#: newsroom/email.py:262
+#: newsroom/email.py:349
 msgid "Agenda cancelled notice"
 msgstr "Avis de calendrier annulé"
+
+#: newsroom/email_templates.py:78
+msgid "Email template name not supplied"
+msgstr "Un nom de gabarit de courriel n'a pas été fourni"
+
+#: newsroom/email_templates.py:80
+#, python-format
+msgid "Email template '%(name)s' not found"
+msgstr "Le gabarit de courriel '%(name)s' n'a pas été trouvé"
 
 #: newsroom/history.py:137
 msgid "Activity History: Inavlid request"
@@ -73,19 +53,19 @@ msgstr "Historique d'activité: demande invalide"
 msgid "Unknown type {}"
 msgstr "Type inconnu {}"
 
-#: newsroom/search.py:235
+#: newsroom/search.py:237
 msgid "Page limit exceeded"
 msgstr "Limite du nombre de pages excédée"
 
-#: newsroom/search.py:470
+#: newsroom/search.py:472
 msgid "User does not belong to a company."
 msgstr "L'utilisateur n'appartient pas à une entreprise."
 
-#: newsroom/search.py:472
+#: newsroom/search.py:474
 msgid "Your company doesn't have any products defined."
 msgstr "Votre entreprise n'a pas de produits définis."
 
-#: newsroom/monitoring/search.py:67 newsroom/search.py:477
+#: newsroom/monitoring/search.py:67 newsroom/search.py:479
 msgid "Invalid product parameter"
 msgstr "Paramètre de produit invalide"
 
@@ -144,30 +124,34 @@ msgstr "Image du logo de rapport de supervision"
 msgid "Monitoring report logo image (jpg or png) for RTF reports."
 msgstr ""
 
-#: assets/missing-translations.js:3 newsroom/agenda/utils.py:33
-#: newsroom/utils.py:188
+#: assets/missing-translations.js:3 newsroom/agenda/utils.py:35
+#: newsroom/utils.py:189
 msgid "ALL DAY"
 msgstr "TOUTE LA JOURNÉE"
 
-#: newsroom/utils.py:264 newsroom/utils.py:338
+#: newsroom/auth/oauth.py:80 newsroom/utils.py:272 newsroom/utils.py:359
 msgid "Account is disabled"
 msgstr "Compte désactivé"
 
-#: newsroom/utils.py:272
+#: newsroom/utils.py:280
 msgid "Account has not been approved"
 msgstr "Le compte n'a pas été approuvé"
 
-#: newsroom/auth/views.py:42 newsroom/auth/views.py:152 newsroom/utils.py:343
+#: newsroom/auth/views.py:46 newsroom/auth/views.py:162 newsroom/utils.py:364
 msgid "Company account has been disabled."
 msgstr "Le compte de l'entreprise a été désactivé."
 
-#: assets/wire/components/AgendaLinks.jsx:82 newsroom/agenda/__init__.py:22
+#: newsroom/auth/views.py:50 newsroom/auth/views.py:165 newsroom/utils.py:369
+msgid "Company account has expired."
+msgstr "Le compte de l'entreprise a expiré."
+
+#: assets/wire/components/AgendaLinks.jsx:82 newsroom/agenda/__init__.py:23
 #: newsroom/templates/agenda_index.html:3
 #: newsroom/templates/agenda_index.html:6
 msgid "Agenda"
 msgstr "Calendrier"
 
-#: newsroom/agenda/__init__.py:23 newsroom/am_news/__init__.py:17
+#: newsroom/agenda/__init__.py:24 newsroom/am_news/__init__.py:17
 #: newsroom/factcheck/__init__.py:22 newsroom/market_place/__init__.py:27
 #: newsroom/media_releases/__init__.py:22 newsroom/monitoring/__init__.py:25
 #: newsroom/templates/bookmark_layout.html:3
@@ -175,11 +159,11 @@ msgstr "Calendrier"
 msgid "Saved/Watched Items"
 msgstr "Éléments enregistrés ou surveillés"
 
-#: newsroom/agenda/__init__.py:31
+#: newsroom/agenda/__init__.py:35
 msgid "Google Maps Styles"
 msgstr "Styles de Google Maps"
 
-#: newsroom/agenda/__init__.py:33
+#: newsroom/agenda/__init__.py:37
 msgid ""
 "Provide styles delimited by &(ampersand). For example, "
 "feature:poi|element:labels|visibility:off&transit|visibility:off. Refer to "
@@ -191,75 +175,98 @@ msgstr ""
 "la page https://developers.google.com/maps/documentation/maps-static/styling"
 " pour plus de détails."
 
-#: newsroom/agenda/agenda.py:45
+#: assets/agenda/components/AgendaTags.jsx:25
+#: assets/company-reports/components/ContentActivity.jsx:110
+#: assets/search/components/TopicParameters.jsx:69
+#: assets/wire/components/PreviewTags.jsx:37 newsroom/agenda/__init__.py:44
+#: newsroom/reports/content_activity.py:228
+#: newsroom/templates/wire_item.html:76
+#: newsroom/templates/wire_item_print.html:24 newsroom/wire/__init__.py:106
+msgid "Category"
+msgstr "Fil"
+
+#: assets/company-reports/components/ContentActivity.jsx:111
+#: assets/monitoring/components/MonitoringList.jsx:24
+#: assets/search/components/TopicParameters.jsx:70
+#: assets/wire/components/PreviewTags.jsx:43 newsroom/agenda/__init__.py:48
+#: newsroom/monitoring/forms.py:19 newsroom/reports/content_activity.py:229
+#: newsroom/wire/__init__.py:110
+msgid "Subject"
+msgstr "Sujet"
+
+#: assets/wire/components/fields/UrgencyLabel.jsx:43
+#: newsroom/agenda/__init__.py:52 newsroom/wire/__init__.py:118
+msgid "News Value"
+msgstr "Priorité de la nouvelle"
+
+#: assets/company-reports/components/ContentActivity.jsx:109
+#: assets/search/components/TopicParameters.jsx:61
+#: newsroom/agenda/__init__.py:56 newsroom/reports/content_activity.py:227
+#: newsroom/wire/__init__.py:122
+msgid "Place"
+msgstr "Endroit"
+
+#: newsroom/agenda/agenda.py:46
 msgid "An event you have been watching has been updated"
 msgstr "Un événement que vous avez regardé a été mis à jour"
 
-#: newsroom/agenda/agenda.py:46
+#: newsroom/agenda/agenda.py:47
 msgid "Event updated"
 msgstr "Événement mis à jour"
 
-#: newsroom/agenda/agenda.py:49
+#: newsroom/agenda/agenda.py:50
 msgid "An event you have been watching has been cancelled"
 msgstr "Un événement que vous avez regardé a été annulé"
 
-#: newsroom/agenda/agenda.py:50
+#: newsroom/agenda/agenda.py:51
 msgid "Event cancelled"
 msgstr "Événement annulé"
 
-#: newsroom/agenda/agenda.py:53
+#: newsroom/agenda/agenda.py:54
 msgid "An event you have been watching has a new planning"
 msgstr "Un événement que vous avez regardé a une nouvelle planification"
 
-#: newsroom/agenda/agenda.py:54
+#: newsroom/agenda/agenda.py:55
 msgid "Planning added"
 msgstr "Planification ajoutée"
 
-#: newsroom/agenda/agenda.py:57
+#: newsroom/agenda/agenda.py:58
 msgid "An event you have been watching has a planning cancelled"
 msgstr "La planification d'un événement que vous avez regardé a été annulée"
 
-#: newsroom/agenda/agenda.py:58
+#: newsroom/agenda/agenda.py:59
 msgid "Planning cancelled"
 msgstr "Planification annulée"
 
-#: newsroom/agenda/agenda.py:61
+#: newsroom/agenda/agenda.py:62
 msgid "An event you have been watching has a new coverage added"
 msgstr "Une couverture a été ajoutée pour un événement que vous avez regardé"
 
-#: newsroom/agenda/agenda.py:62
+#: newsroom/agenda/agenda.py:63
 msgid "Coverage added"
 msgstr "Couverture ajoutée"
 
-#: newsroom/agenda/email.py:20
-msgid "New coverage"
-msgstr "Nouvelle couverture"
-
-#: newsroom/agenda/email.py:72
-msgid "Coverage inquiry: {}"
-msgstr "Demande de couverture: {}"
-
-#: newsroom/agenda/views.py:179
+#: newsroom/agenda/views.py:180
 msgid "Cannot edit coverage watch when watching a parent item."
 msgstr ""
 "Il n'est pas possible de modifier le suivi de la couverture d'un élément "
 "lorsqu'un élément plus large est aussi suivi."
 
-#: newsroom/agenda/views.py:184
+#: newsroom/agenda/views.py:185
 msgid "Coverage not found."
 msgstr "Couverture non trouvée."
 
-#: newsroom/agenda/views.py:194
+#: newsroom/agenda/views.py:195
 msgid "Error removing watch."
 msgstr "Erreur survenue lors du retrait de la surveillance. "
 
-#: newsroom/agenda/views.py:223
+#: newsroom/agenda/views.py:224
 msgid "Agenda item not found"
 msgstr "Entrée de calendrier non trouvée"
 
 #: newsroom/auth/forms.py:9
 msgid "Editor"
-msgstr "Rédacteur/trice en chef"
+msgstr ""
 
 #: newsroom/auth/forms.py:10
 msgid "Journalist"
@@ -271,7 +278,7 @@ msgstr "Ventes"
 
 #: newsroom/auth/forms.py:12
 msgid "CTO"
-msgstr "DT"
+msgstr ""
 
 #: newsroom/auth/forms.py:13
 msgid "CEO"
@@ -317,8 +324,8 @@ msgstr "Taille de l'entreprise"
 msgid "I agree to"
 msgstr "J'accepte"
 
-#: assets/user-profile/components/profile/UserProfile.jsx:83
-#: assets/users/components/EditUser.jsx:47
+#: assets/user-profile/components/profile/UserProfile.jsx:82
+#: assets/users/components/EditUser.jsx:49
 #: assets/users/components/UsersList.jsx:24 newsroom/auth/forms.py:29
 #: newsroom/auth/forms.py:35 newsroom/users/forms.py:22
 msgid "Email"
@@ -348,41 +355,62 @@ msgstr "Nouveau mot de passe"
 msgid "Confirm new password"
 msgstr "Confirmer le nouveau mot de passe"
 
-#: newsroom/auth/views.py:38
-msgid "Insufficient Permissions. Access denied."
-msgstr "Autorisations insuffisantes. Accès refusé."
-
-#: newsroom/auth/views.py:56 newsroom/auth/views.py:160
-msgid "Invalid username or password."
-msgstr "Nom d'utilisateur ou mot de passe invalide."
-
-#: newsroom/auth/views.py:144
-msgid "Exceeded number of allowed login attempts"
-msgstr "Nombre de tentatives de connexion autorisées dépassé"
-
-#: newsroom/auth/views.py:166 newsroom/auth/views.py:170
-#: newsroom/news_api/news/assets/assets.py:24
+#: newsroom/auth/oauth.py:54 newsroom/auth/views.py:179
+#: newsroom/auth/views.py:183 newsroom/news_api/news/assets/assets.py:24
 #: newsroom/news_api/news/item/item.py:23
 msgid "Invalid token"
 msgstr "Jeton invalide"
 
-#: newsroom/auth/views.py:197
+#: newsroom/auth/oauth.py:59
+msgid "Email not found"
+msgstr "Courriel non trouvé"
+
+#: newsroom/auth/oauth.py:65 newsroom/users/views.py:116
+#: newsroom/users/views.py:166
+msgid "User not found"
+msgstr "Utilisateur non trouvé"
+
+#: newsroom/auth/oauth.py:69
+msgid "No Company assigned"
+msgstr "Aucune entreprise assignée"
+
+#: newsroom/auth/oauth.py:74
+msgid "Company is disabled"
+msgstr "L'entreprise est désactivée"
+
+#: newsroom/auth/oauth.py:77
+msgid "Company has expired"
+msgstr "L'entreprise a expiré"
+
+#: newsroom/auth/views.py:40
+msgid "Insufficient Permissions. Access denied."
+msgstr "Autorisations insuffisantes. Accès refusé."
+
+#: newsroom/auth/views.py:64 newsroom/auth/views.py:173
+msgid "Invalid username or password."
+msgstr "Nom d'utilisateur ou mot de passe invalide."
+
+#: newsroom/auth/views.py:153
+msgid "Exceeded number of allowed login attempts"
+msgstr "Nombre de tentatives de connexion autorisées dépassé"
+
+#: newsroom/auth/views.py:210
 msgid "Account already exists."
 msgstr "Ce compte existe déjà."
 
-#: newsroom/auth/views.py:220
+#: newsroom/auth/views.py:233
 msgid "Your account has been validated."
 msgstr "Votre compte a été validé."
 
-#: newsroom/auth/views.py:223
+#: newsroom/auth/views.py:236
 msgid "Token has expired. Please create a new token"
 msgstr "Le jeton a expiré. S'il vous plaît créez un nouveau jeton."
 
-#: newsroom/auth/views.py:237
+#: newsroom/auth/views.py:250
 msgid "Your password has been changed. Please login again."
 msgstr "Votre mot de passe a été changé. Veuillez vous reconnecter."
 
-#: newsroom/auth/views.py:253
+#: newsroom/auth/views.py:266
 msgid "A reset password token has been sent to your email address."
 msgstr ""
 "Un jeton de réinitialisation du mot de passe a été envoyé à votre adresse de"
@@ -408,26 +436,30 @@ msgstr "Type de tableau de bord non trouvé"
 msgid "Company Management"
 msgstr "Direction de l'entreprise"
 
-#: newsroom/companies/views.py:64 newsroom/navigations/views.py:54
+#: newsroom/companies/views.py:63
+msgid "Company already exists"
+msgstr "L'entreprise existe déjà"
+
+#: newsroom/companies/views.py:70 newsroom/navigations/views.py:60
 #: newsroom/products/views.py:46 newsroom/section_filters/views.py:50
 msgid "Name not found"
 msgstr "Nom non trouvé"
 
-#: newsroom/companies/views.py:72
+#: newsroom/companies/views.py:78
 msgid "{0}: {1}"
 msgstr "{0}: {1}"
 
-#: newsroom/companies/views.py:108
+#: newsroom/companies/views.py:114
 msgid "Company not found"
 msgstr "Entreprise non trouvée"
 
 #: newsroom/market_place/__init__.py:6
 msgid "aapX"
-msgstr "aapX"
+msgstr ""
 
 #: newsroom/market_place/__init__.py:32
 msgid "Time limit for aapX items (in days)"
-msgstr "Délai pour les articles aapX (en jours)"
+msgstr ""
 
 #: newsroom/market_place/__init__.py:36 newsroom/news_api/__init__.py:17
 #: newsroom/wire/__init__.py:91
@@ -461,11 +493,6 @@ msgstr "PDF"
 msgid "RTF"
 msgstr ""
 
-#: newsroom/monitoring/email_alerts.py:245
-msgid "Error sending alerts for monitoring: {0}"
-msgstr ""
-"Erreur survenue lors de la transmission d'alertes pour la supervision: {0}"
-
 #: newsroom/monitoring/forms.py:7
 msgid "Full text"
 msgstr "Texte intégral"
@@ -478,29 +505,22 @@ msgstr "Extrait(s) lié(s)"
 #: assets/companies/components/EditCompany.jsx:104
 #: assets/monitoring/components/EditMonitoringProfile.jsx:112
 #: assets/monitoring/components/MonitoringList.jsx:23
-#: assets/navigations/components/EditNavigation.jsx:84
+#: assets/navigations/components/EditNavigation.jsx:76
 #: assets/navigations/components/NavigationList.jsx:22
+#: assets/oauth_clients/components/ClientList.jsx:22
+#: assets/oauth_clients/components/EditClient.jsx:38
 #: assets/products/components/EditProduct.jsx:107
 #: assets/products/components/ProductList.jsx:22
-#: assets/search/components/TopicForm.jsx:15
+#: assets/search/components/TopicForm.jsx:26
 #: assets/section-filters/components/EditSectionFilter.jsx:36
 #: assets/section-filters/components/SectionFilterList.jsx:22
 #: assets/users/components/UsersList.jsx:23 newsroom/monitoring/forms.py:18
 msgid "Name"
 msgstr "Nom"
 
-#: assets/agenda/components/AgendaApp.jsx:107
-#: assets/company-reports/components/ContentActivity.jsx:111
-#: assets/monitoring/components/MonitoringList.jsx:24
-#: assets/search/components/TopicParameters.jsx:69
-#: assets/wire/components/PreviewTags.jsx:39 newsroom/monitoring/forms.py:19
-#: newsroom/reports/content_activity.py:229 newsroom/wire/__init__.py:110
-msgid "Subject"
-msgstr "Sujet"
-
 #: assets/monitoring/components/EditMonitoringProfile.jsx:132
 #: assets/monitoring/components/MonitoringList.jsx:25
-#: assets/navigations/components/EditNavigation.jsx:91
+#: assets/navigations/components/EditNavigation.jsx:83
 #: assets/navigations/components/NavigationList.jsx:23
 #: assets/products/components/EditProduct.jsx:114
 #: assets/search/components/MonitoringEditor.jsx:173
@@ -517,7 +537,6 @@ msgstr "Type d'alerte"
 msgid "Format Type"
 msgstr "Type de format"
 
-#: assets/companies/components/CompaniesApp.jsx:25
 #: assets/companies/components/EditCompany.jsx:24
 #: assets/company-reports/components/ComapnyNewsApiUsage.jsx:77
 #: assets/company-reports/components/Company.jsx:86
@@ -529,7 +548,7 @@ msgstr "Type de format"
 #: assets/company-reports/components/UserSavedSearches.jsx:21
 #: assets/monitoring/components/EditMonitoringProfile.jsx:139
 #: assets/monitoring/components/MonitoringList.jsx:27
-#: assets/users/components/EditUser.jsx:83
+#: assets/users/components/EditUser.jsx:85
 #: assets/users/components/UsersList.jsx:29 newsroom/monitoring/forms.py:23
 #: newsroom/reports/reports.py:156 newsroom/users/forms.py:27
 msgid "Company"
@@ -539,7 +558,7 @@ msgstr "Entreprise"
 #: assets/companies/components/EditCompany.jsx:188
 #: assets/monitoring/components/EditMonitoringProfile.jsx:189
 #: assets/monitoring/components/MonitoringItem.jsx:18
-#: assets/navigations/components/EditNavigation.jsx:98
+#: assets/navigations/components/EditNavigation.jsx:90
 #: assets/navigations/components/NavigationListItem.jsx:13
 #: assets/news-api/components/EditAPIToken.jsx:228
 #: assets/products/components/EditProduct.jsx:163
@@ -547,7 +566,7 @@ msgstr "Entreprise"
 #: assets/search/components/MonitoringEditor.jsx:195
 #: assets/section-filters/components/EditSectionFilter.jsx:78
 #: assets/section-filters/components/SectionFilterListItem.jsx:12
-#: assets/users/components/EditUser.jsx:98
+#: assets/users/components/EditUser.jsx:112
 #: assets/users/components/UserListItem.jsx:23 newsroom/monitoring/forms.py:24
 msgid "Enabled"
 msgstr "Activé"
@@ -583,14 +602,7 @@ msgstr "Aucun profil de supervision demandé."
 msgid "monitoring Profile not found"
 msgstr "Profil de supervision non trouvé"
 
-#: newsroom/monitoring/views.py:260 newsroom/topics/views.py:140
-#: newsroom/wire/views.py:287
-#, python-format
-msgid "From %s: %s"
-msgstr "De %s: %s"
-
 #: assets/navigations/components/EditNavigation.jsx:22
-#: assets/navigations/components/NavigationsApp.jsx:29
 #: assets/products/components/EditProduct.jsx:28
 #: newsroom/navigations/__init__.py:14
 msgid "Navigation"
@@ -598,11 +610,19 @@ msgstr "Navigation"
 
 #: newsroom/news_api/__init__.py:13
 msgid "Time limit for News API products (in days)"
-msgstr "Délai pour les produits de l'API News (en jours)"
+msgstr ""
 
 #: newsroom/news_api/api_tokens/__init__.py:66
 msgid "Rate limit exceeded"
 msgstr "Limite de taux excédée"
+
+#: newsroom/oauth_clients/__init__.py:13
+msgid "OAuth Clients"
+msgstr ""
+
+#: newsroom/oauth_clients/views.py:61
+msgid "Client not found"
+msgstr "Client non trouvé"
 
 #: assets/companies/components/CompanyPermissions.jsx:100
 #: assets/company-reports/components/Company.jsx:24
@@ -618,7 +638,7 @@ msgstr "Une section doit être fournie pour ce rapport"
 
 #: assets/company-reports/components/ContentActivity.jsx:106
 #: assets/ui/components/Preview.jsx:11
-#: assets/wire/components/ItemDetails.jsx:72
+#: assets/wire/components/ItemDetails.jsx:81
 #: assets/wire/components/filters/NavCreatedPicker.jsx:27
 #: newsroom/reports/content_activity.py:224
 msgid "Published"
@@ -634,24 +654,6 @@ msgstr "Titre"
 #: newsroom/reports/content_activity.py:226
 msgid "Take Key"
 msgstr "Lead"
-
-#: assets/agenda/components/AgendaApp.jsx:115
-#: assets/company-reports/components/ContentActivity.jsx:109
-#: assets/search/components/TopicParameters.jsx:60
-#: newsroom/reports/content_activity.py:227 newsroom/wire/__init__.py:122
-msgid "Place"
-msgstr "Endroit"
-
-#: assets/agenda/components/AgendaApp.jsx:103
-#: assets/agenda/components/AgendaTags.jsx:25
-#: assets/company-reports/components/ContentActivity.jsx:110
-#: assets/search/components/TopicParameters.jsx:68
-#: assets/wire/components/PreviewTags.jsx:33
-#: newsroom/reports/content_activity.py:228
-#: newsroom/templates/wire_item.html:76
-#: newsroom/templates/wire_item_print.html:24 newsroom/wire/__init__.py:106
-msgid "Category"
-msgstr "Fil"
 
 #: assets/company-reports/components/ContentActivity.jsx:51
 #: assets/company-reports/components/ContentActivity.jsx:112
@@ -669,7 +671,7 @@ msgstr "Actions"
 #: assets/agenda/components/AgendaAttachments.jsx:42
 #: assets/company-reports/components/ContentActivity.jsx:62
 #: assets/company-reports/components/ContentActivity.jsx:117
-#: assets/item-actions.js:51 assets/ui/components/ArticleVideo.jsx:16
+#: assets/item-actions.js:49 assets/ui/components/ArticleVideo.jsx:16
 #: assets/wire/components/DownloadItemsModal.jsx:53
 #: newsroom/reports/content_activity.py:237
 msgid "Download"
@@ -677,27 +679,28 @@ msgstr "Télécharger"
 
 #: assets/company-reports/components/ContentActivity.jsx:63
 #: assets/company-reports/components/ContentActivity.jsx:118
-#: assets/item-actions.js:44 newsroom/reports/content_activity.py:240
+#: assets/components/TextInput.jsx:34 assets/item-actions.js:42
+#: newsroom/reports/content_activity.py:240
 msgid "Copy"
 msgstr "Copier"
 
 #: assets/company-reports/components/ContentActivity.jsx:64
 #: assets/company-reports/components/ContentActivity.jsx:119
-#: assets/components/ShareItemModal.jsx:95 assets/item-actions.js:27
-#: assets/search/components/FollowedTopics.jsx:48
+#: assets/components/ShareItemModal.jsx:95 assets/item-actions.js:25
+#: assets/search/components/FollowedTopics.jsx:55
 #: newsroom/reports/content_activity.py:243
 msgid "Share"
 msgstr "Partager"
 
 #: assets/company-reports/components/ContentActivity.jsx:65
 #: assets/company-reports/components/ContentActivity.jsx:120
-#: assets/item-actions.js:37 newsroom/reports/content_activity.py:246
+#: assets/item-actions.js:35 newsroom/reports/content_activity.py:246
 msgid "Print"
 msgstr "Imprimer"
 
 #: assets/company-reports/components/ContentActivity.jsx:66
 #: assets/company-reports/components/ContentActivity.jsx:121
-#: assets/item-actions.js:20 newsroom/reports/content_activity.py:249
+#: assets/item-actions.js:18 newsroom/reports/content_activity.py:249
 msgid "Open"
 msgstr "Ouvrir"
 
@@ -744,21 +747,21 @@ msgstr "Produits par entreprise"
 msgid "Stories per product"
 msgstr "Articles par produit"
 
-#: newsroom/reports/reports.py:246
+#: newsroom/reports/reports.py:247
 msgid "SubscriberActivity"
 msgstr "Activité d'abonné"
 
 #: assets/company-reports/components/CompanyReportsApp.jsx:44
-#: newsroom/reports/reports.py:322
+#: newsroom/reports/reports.py:323
 msgid "Company News API Usage"
 msgstr ""
 
-#: newsroom/reports/reports.py:355
+#: newsroom/reports/reports.py:362
 msgid "Companies permissioned per product"
 msgstr "Entreprises autorisées par produit"
 
 #: assets/company-reports/components/CompanyReportsApp.jsx:24
-#: newsroom/reports/reports.py:366
+#: newsroom/reports/reports.py:373
 msgid "Expired companies"
 msgstr "Entreprises expirées"
 
@@ -842,22 +845,30 @@ msgstr "Couvertures:"
 msgid "AM"
 msgstr ""
 
-#: newsroom/templates/base_layout.html:43 newsroom/templates/login.html:13
-#: newsroom/templates/login.html:36
+#: newsroom/templates/base_layout.html:27
+msgid "Main Navigation Bar"
+msgstr "Barre de navigation principale"
+
+#: newsroom/templates/base_layout.html:44 newsroom/templates/login.html:13
+#: newsroom/templates/login_form.html:20
 msgid "Login"
 msgstr "Ouvrir une session"
 
-#: newsroom/templates/base_layout.html:46 newsroom/templates/footer.html:4
+#: newsroom/templates/base_layout.html:47 newsroom/templates/footer.html:4
 msgid "Contact Us"
 msgstr "Contactez-nous"
 
-#: newsroom/templates/base_layout.html:71
+#: newsroom/templates/base_layout.html:56
+msgid "Side Navigation"
+msgstr "Navigation latérale"
+
+#: newsroom/templates/base_layout.html:73
 #: newsroom/templates/company_reports.html:3
 #: newsroom/templates/company_reports.html:6
 msgid "Reports"
 msgstr "Rapports"
 
-#: newsroom/templates/base_layout.html:78 newsroom/templates/settings.html:3
+#: newsroom/templates/base_layout.html:80 newsroom/templates/settings.html:3
 #: newsroom/templates/settings.html:6
 msgid "Settings"
 msgstr "Paramètres"
@@ -879,26 +890,31 @@ msgstr "Conditions du contrat"
 msgid "Copyright"
 msgstr "Droits d'auteur"
 
-#: newsroom/templates/login.html:41
+#: newsroom/templates/login.html:20
 msgid "Forgot your password?"
 msgstr "Mot de passe oublié?"
 
-#: newsroom/templates/login.html:41
+#: newsroom/templates/login.html:20
+#: newsroom/templates/password_reset_link_expiry.html:8
 msgid "Click here to reset."
 msgstr "Cliquez ici pour réinitialiser."
 
-#: newsroom/templates/login.html:42
+#: newsroom/templates/login.html:21
 msgid "Or you can"
-msgstr "Ou tu peux"
+msgstr ""
 
-#: newsroom/templates/login.html:42
+#: newsroom/templates/login.html:21
 msgid "click here to register."
 msgstr "cliquez ici pour vous inscrire."
 
-#: assets/user-profile/components/profile/UserProfile.jsx:127
-#: newsroom/templates/login.html:50
+#: assets/user-profile/components/profile/UserProfile.jsx:126
+#: assets/users/components/EditUser.jsx:95 newsroom/templates/login.html:29
 msgid "Language"
 msgstr "Langue"
+
+#: newsroom/templates/login_form.html:26
+msgid "Log In with Google"
+msgstr "Se connecter avec Google"
 
 #: newsroom/templates/media_releases_index.html:3
 #: newsroom/templates/media_releases_index.html:6
@@ -923,6 +939,18 @@ msgstr "Entreprise:"
 msgid "Run time:"
 msgstr "Durée: "
 
+#: newsroom/templates/password_reset_link_expiry.html:6
+msgid "That's an error."
+msgstr "Cela est une erreur. "
+
+#: newsroom/templates/password_reset_link_expiry.html:7
+msgid ""
+"The link in the email has already expired. Please request to reset your "
+"password again."
+msgstr ""
+"Le lien dans le courriel a déjà expiré. Veuillez s'il vous plaît demander de"
+" nouveau de réinitialiser votre mot de passe. "
+
 #: newsroom/templates/request_token.html:12
 msgid "Password Reset"
 msgstr "Réinitialisation du mot de passe"
@@ -931,7 +959,7 @@ msgstr "Réinitialisation du mot de passe"
 msgid "Validate"
 msgstr "Valider"
 
-#: assets/users/components/EditUser.jsx:115
+#: assets/users/components/EditUser.jsx:136
 #: newsroom/templates/request_token.html:29
 msgid "Reset Password"
 msgstr "Réinitialiser le mot de passe"
@@ -950,23 +978,27 @@ msgstr "Changer le mot de passe"
 
 #: assets/agenda/components/AgendaCoverageRequest.jsx:56
 #: assets/components/CardEditor.jsx:72 assets/components/CardEditor.jsx:74
-#: assets/components/EditPanel.jsx:99 assets/components/Modal.jsx:160
+#: assets/components/EditPanel.jsx:99 assets/components/Modal.jsx:161
 #: assets/search/components/MonitoringEditor.jsx:203
-#: assets/search/components/TopicEditor.jsx:204
-#: assets/search/components/TopicEditor.jsx:207
-#: assets/user-profile/components/profile/UserProfile.jsx:143
-#: assets/wire/components/SelectedItemsBar.jsx:42
+#: assets/search/components/TopicEditor.jsx:302
+#: assets/search/components/TopicEditor.jsx:305
+#: assets/user-profile/components/profile/UserProfile.jsx:142
+#: assets/wire/components/SelectedItemsBar.jsx:43
 #: newsroom/templates/reset_password.html:38
 msgid "Cancel"
 msgstr "Annuler"
+
+#: newsroom/templates/settings.html:17
+msgid "Settings Menu"
+msgstr "Menu des paramètres"
 
 #: newsroom/templates/signup.html:13 newsroom/templates/signup.html:68
 msgid "Sign up"
 msgstr "S'inscrire"
 
 #: newsroom/templates/signup.html:61
-msgid "terms and conditions"
-msgstr "conditions du contrat"
+msgid "the terms and conditions"
+msgstr "les conditions du contrat"
 
 #: newsroom/templates/signup_success.html:12
 msgid "Newsroom sign up"
@@ -992,6 +1024,25 @@ msgstr "Profil de l'utilisateur"
 msgid "Wire"
 msgstr "Fil de presse"
 
+#: assets/agenda/components/AgendaApp.jsx:156
+#: assets/cards/components/EditCard.jsx:52
+#: assets/companies/components/EditCompany.jsx:78
+#: assets/components/CloseButton.jsx:9 assets/components/SortItems.jsx:46
+#: assets/monitoring/components/EditMonitoringProfile.jsx:86
+#: assets/navigations/components/EditNavigation.jsx:49
+#: assets/oauth_clients/components/EditClient.jsx:26
+#: assets/products/components/EditProduct.jsx:81
+#: assets/search/components/MonitoringEditor.jsx:131
+#: assets/search/components/TopicEditor.jsx:234
+#: assets/section-filters/components/EditSectionFilter.jsx:26
+#: assets/ui/components/ContentBar.jsx:8 assets/ui/components/Preview.jsx:13
+#: assets/user-profile/components/UserProfileApp.jsx:99
+#: assets/user-profile/components/UserProfileApp.jsx:119
+#: assets/users/components/EditUser.jsx:25
+#: newsroom/templates/wire_item.html:11
+msgid "Close"
+msgstr "Fermer"
+
 #: newsroom/templates/wire_item.html:40
 #: newsroom/templates/wire_item_print.html:10
 msgid "By:"
@@ -999,7 +1050,7 @@ msgstr "Par:"
 
 #: assets/components/cards/render/CardMeta.jsx:22
 #: assets/wire/components/ItemVersion.jsx:24
-#: assets/wire/components/WireListItem.jsx:252
+#: assets/wire/components/WireListItem.jsx:240
 #: assets/wire/components/fields/WordCount.jsx:6
 #: newsroom/templates/wire_item.html:62 newsroom/templates/wire_item.html:108
 msgid "words"
@@ -1017,14 +1068,14 @@ msgid "Source:"
 msgstr "Source:"
 
 #: assets/agenda/components/AgendaTags.jsx:24
-#: assets/wire/components/PreviewTags.jsx:26
+#: assets/wire/components/PreviewTags.jsx:30
 #: newsroom/templates/wire_item.html:73
 #: newsroom/templates/wire_item_print.html:21
 msgid "Metadata"
 msgstr "Métadonnées"
 
-#: assets/search/components/TopicParameters.jsx:70
-#: assets/wire/components/PreviewTags.jsx:45
+#: assets/search/components/TopicParameters.jsx:71
+#: assets/wire/components/PreviewTags.jsx:49
 #: newsroom/templates/wire_item.html:86
 #: newsroom/templates/wire_item_print.html:28 newsroom/wire/__init__.py:114
 msgid "Content Type"
@@ -1037,7 +1088,7 @@ msgstr "Versions précédentes"
 
 #: newsroom/templates/wire_item_print.html:10
 msgid "On:"
-msgstr "Sur:"
+msgstr ""
 
 #: newsroom/topics/views.py:45
 msgid ""
@@ -1071,13 +1122,13 @@ msgstr "Interne"
 msgid "Account Management"
 msgstr "Gestion de compte"
 
-#: assets/user-profile/components/profile/UserProfile.jsx:65
-#: assets/users/components/EditUser.jsx:33 newsroom/users/forms.py:20
+#: assets/user-profile/components/profile/UserProfile.jsx:64
+#: assets/users/components/EditUser.jsx:35 newsroom/users/forms.py:20
 msgid "First Name"
 msgstr "Prénom"
 
-#: assets/user-profile/components/profile/UserProfile.jsx:74
-#: assets/users/components/EditUser.jsx:40 newsroom/users/forms.py:21
+#: assets/user-profile/components/profile/UserProfile.jsx:73
+#: assets/users/components/EditUser.jsx:42 newsroom/users/forms.py:21
 msgid "Last Name"
 msgstr "Nom de famille"
 
@@ -1086,19 +1137,19 @@ msgstr "Nom de famille"
 msgid "Telephone"
 msgstr "Téléphone"
 
-#: assets/user-profile/components/profile/UserProfile.jsx:101
-#: assets/users/components/EditUser.jsx:61
+#: assets/user-profile/components/profile/UserProfile.jsx:100
+#: assets/users/components/EditUser.jsx:63
 #: assets/users/components/UsersList.jsx:26 newsroom/users/forms.py:24
 msgid "Mobile"
 msgstr "Mobile"
 
-#: assets/user-profile/components/profile/UserProfile.jsx:110
-#: assets/users/components/EditUser.jsx:68
+#: assets/user-profile/components/profile/UserProfile.jsx:109
+#: assets/users/components/EditUser.jsx:70
 #: assets/users/components/UsersList.jsx:27 newsroom/users/forms.py:25
 msgid "Role"
 msgstr "Poste"
 
-#: assets/users/components/EditUser.jsx:74
+#: assets/users/components/EditUser.jsx:76
 #: assets/users/components/UsersList.jsx:28 newsroom/users/forms.py:26
 msgid "User Type"
 msgstr "Type d'utilisateur"
@@ -1119,24 +1170,36 @@ msgstr "Compte activé"
 msgid "Account Approved"
 msgstr "Compte approuvé"
 
-#: assets/users/components/EditUser.jsx:104 newsroom/users/forms.py:32
+#: assets/users/components/EditUser.jsx:118 newsroom/users/forms.py:32
 msgid "Company Expiry Alert"
 msgstr "Alerte d'expiration de l'entreprise"
 
-#: assets/user-profile/components/profile/UserProfile.jsx:119
+#: assets/user-profile/components/profile/UserProfile.jsx:118
 #: newsroom/users/forms.py:33
 msgid "Receive notifications via email"
 msgstr "Recevoir les notifications par courriel"
 
 #: newsroom/users/forms.py:34
 msgid "Locale"
-msgstr "Lieu"
+msgstr ""
 
-#: newsroom/users/views.py:106 newsroom/users/views.py:154
-msgid "User not found"
-msgstr "Utilisateur non trouvé"
+#: assets/users/components/EditUser.jsx:124 newsroom/users/forms.py:35
+msgid "Manage Company Topics"
+msgstr "Gérer les sujets partagés"
 
-#: newsroom/users/views.py:149
+#: newsroom/users/users.py:155
+msgid "Can not delete current user"
+msgstr "Impossible de supprimer l'utilisateur actuel"
+
+#: newsroom/users/views.py:83 newsroom/users/views.py:122
+msgid "Email address is already in use"
+msgstr "Cette adresse de courriel est déjà utilisée"
+
+#: newsroom/users/views.py:90 newsroom/users/views.py:124
+msgid "Company is required for non administrators"
+msgstr "Une entreprise est requise pour les non-administrateurs"
+
+#: newsroom/users/views.py:161
 msgid "User id not provided"
 msgstr "Identifiant d'utilisateur non fourni"
 
@@ -1154,7 +1217,7 @@ msgstr "Photo de l'article"
 
 #: assets/missing-translations.js:11 newsroom/wire/__init__.py:80
 msgid "News only filter"
-msgstr "Filtrer uniquement les nouvelles"
+msgstr ""
 
 #: newsroom/wire/__init__.py:82
 msgid ""
@@ -1162,20 +1225,12 @@ msgid ""
 "News only switch to filter the view. When switched on, stories matching this"
 " filter will not be displayed."
 msgstr ""
-"Cette requête définit ce qui n'est PAS considéré comme un contenu "
-"\"d'actualité\". Il est utilisé par le commutateur News uniquement pour "
-"filtrer la vue. Lorsqu'il est activé, les récits correspondant à ce filtre "
-"ne seront pas affichés."
 
 #: assets/missing-translations.js:12 newsroom/wire/__init__.py:87
 msgid "Time limit for Wire products (in days)"
 msgstr "Expiration des produits du fil (en jours)"
 
-#: assets/agenda/components/AgendaApp.jsx:111 newsroom/wire/__init__.py:118
-msgid "News Value"
-msgstr "Priorité de la nouvelle"
-
-#: newsroom/wire/views.py:312
+#: newsroom/wire/views.py:336
 msgid "Not found"
 msgstr "Non trouvé"
 
@@ -1184,26 +1239,27 @@ msgstr "Non trouvé"
 #: assets/companies/components/EditCompany.jsx:197
 #: assets/companies/components/EditCompanyAPI.jsx:85
 #: assets/components/CardEditor.jsx:64 assets/components/EditPanel.jsx:107
-#: assets/components/Modal.jsx:159
+#: assets/components/Modal.jsx:160
 #: assets/general-settings/components/GeneralSettingsApp.jsx:83
-#: assets/item-actions.js:60
+#: assets/item-actions.js:58
 #: assets/monitoring/components/EditMonitoringProfile.jsx:205
 #: assets/monitoring/components/MonitoringSchedule.jsx:197
-#: assets/navigations/components/EditNavigation.jsx:120
+#: assets/navigations/components/EditNavigation.jsx:112
+#: assets/oauth_clients/components/EditClient.jsx:63
 #: assets/products/components/EditProduct.jsx:173
 #: assets/search/components/MonitoringEditor.jsx:210
-#: assets/search/components/TopicEditor.jsx:212
-#: assets/search/components/TopicEditor.jsx:215
+#: assets/search/components/TopicEditor.jsx:310
+#: assets/search/components/TopicEditor.jsx:313
 #: assets/section-filters/components/EditSectionFilter.jsx:87
-#: assets/users/components/EditUser.jsx:122
+#: assets/users/components/EditUser.jsx:143
 msgid "Save"
 msgstr "Enregistrer"
 
-#: assets/item-actions.js:69
+#: assets/item-actions.js:67
 msgid "Unsave"
 msgstr "Libérer"
 
-#: assets/item-actions.js:78
+#: assets/item-actions.js:76
 msgid "Remove"
 msgstr "Retirer"
 
@@ -1256,108 +1312,112 @@ msgstr "Nouveau filtre de section"
 msgid "New card"
 msgstr "Nouvelle fiche"
 
-#: assets/agenda/actions.js:117
+#: assets/utils.js:624
+msgid "Failed to process request!"
+msgstr "La requête n'a pas pu être traitée!"
+
+#: assets/agenda/actions.js:115
 msgid "Your inquiry has been sent successfully"
 msgstr "Votre demande a été envoyée avec succès"
 
-#: assets/agenda/actions.js:190
+#: assets/agenda/actions.js:188
 msgid "Dates: {{ dates }}"
 msgstr "Dates: {{ dates }}"
 
-#: assets/agenda/actions.js:191
+#: assets/agenda/actions.js:189
 msgid "Location: {{ location }}"
 msgstr "Endroit: {{ location }}"
 
-#: assets/agenda/actions.js:192
+#: assets/agenda/actions.js:190
 msgid "Ednote: {{ ednote }}"
 msgstr "Note de la rédaction: {{ ednote }}"
 
-#: assets/agenda/actions.js:195 assets/agenda/actions.js:220
-#: assets/agenda/actions.js:225
+#: assets/agenda/actions.js:193 assets/agenda/actions.js:218
+#: assets/agenda/actions.js:223
 msgid "Description: {{ description }}"
 msgstr "Description: {{ description }}"
 
-#: assets/agenda/actions.js:201
+#: assets/agenda/actions.js:199
 msgid "Contacts"
 msgstr "Contacts"
 
-#: assets/agenda/actions.js:203
+#: assets/agenda/actions.js:201
 msgid "Name: {{ contact }}"
 msgstr "Nom: {{ contact }}"
 
-#: assets/agenda/actions.js:204
+#: assets/agenda/actions.js:202
 msgid "Organisation: {{ organisation }}"
 msgstr "Organisation: {{ organisation }}"
 
-#: assets/agenda/actions.js:205
+#: assets/agenda/actions.js:203
 msgid "Email: {{ email }}"
 msgstr "Courriel: {{ email }}"
 
-#: assets/agenda/actions.js:206
+#: assets/agenda/actions.js:204
 msgid "Phone: {{ phone }}"
 msgstr "Téléphone: {{ phone }}"
 
-#: assets/agenda/actions.js:207
+#: assets/agenda/actions.js:205
 msgid "Mobile: {{ mobile }}"
 msgstr "Mobile: {{ mobile }}"
 
-#: assets/agenda/actions.js:213
+#: assets/agenda/actions.js:211
 msgid "Calendars: {{ calendars }}"
 msgstr "Calendriers: {{ calendars }}"
 
-#: assets/agenda/actions.js:219
+#: assets/agenda/actions.js:217
 msgid "Planning item"
 msgstr "Élément de couverture"
 
-#: assets/agenda/actions.js:222
+#: assets/agenda/actions.js:220
 msgid "Coverage type: {{ type }}"
 msgstr "Type de couverture: {{ type }}"
 
-#: assets/agenda/actions.js:223
+#: assets/agenda/actions.js:221
 msgid "Scheduled: {{ schedule }}"
 msgstr "Programmé: {{ schedule }}"
 
-#: assets/agenda/actions.js:224
+#: assets/agenda/actions.js:222
 msgid "Status: {{ status }}"
 msgstr "Statut: {{ status }}"
 
-#: assets/agenda/actions.js:235 assets/wire/actions.js:189
+#: assets/agenda/actions.js:233 assets/wire/actions.js:181
 msgid "Item copied successfully."
 msgstr "Élément copié avec succès."
 
-#: assets/agenda/actions.js:238 assets/wire/actions.js:192
+#: assets/agenda/actions.js:236 assets/wire/actions.js:184
 msgid "Sorry, Copy is not supported."
 msgstr "Désolé, la copie n'est pas prise en charge."
 
-#: assets/agenda/actions.js:343
+#: assets/agenda/actions.js:341
 msgid "Started watching items successfully."
 msgstr "Ces éléments sont maintenant surveillés."
 
-#: assets/agenda/actions.js:354
+#: assets/agenda/actions.js:352
 msgid "Stopped watching items successfully."
 msgstr "Ces éléments ne sont plus surveillés."
 
-#: assets/agenda/actions.js:399 assets/wire/actions.js:359
+#: assets/agenda/actions.js:397 assets/wire/actions.js:351
 msgid "Items were bookmarked successfully."
 msgstr "Les éléments ont été ajoutés aux signets avec succès."
 
-#: assets/agenda/actions.js:401 assets/wire/actions.js:361
+#: assets/agenda/actions.js:399 assets/wire/actions.js:353
 msgid "Item was bookmarked successfully."
 msgstr "L’élément a été ajouté aux signets."
 
-#: assets/agenda/actions.js:416 assets/wire/actions.js:376
+#: assets/agenda/actions.js:414 assets/wire/actions.js:368
 msgid "Items were removed from bookmarks successfully."
 msgstr "Les éléments ont été retirés des signets avec succès."
 
-#: assets/agenda/actions.js:418 assets/wire/actions.js:378
+#: assets/agenda/actions.js:416 assets/wire/actions.js:370
 msgid "Item was removed from bookmarks successfully."
 msgstr "L'élément a été retiré des signets."
 
-#: assets/agenda/actions.js:679
+#: assets/agenda/actions.js:677
 msgid "Started watching coverage successfully."
 msgstr "Cette couverture est maintenant surveillée."
 
-#: assets/agenda/actions.js:692
+#: assets/agenda/actions.js:690
 msgid "Stopped watching coverage successfully."
 msgstr "Cette couverture n'est plus surveillée."
 
@@ -1405,34 +1465,47 @@ msgstr "en cours"
 msgid "available"
 msgstr "disponible"
 
-#: assets/agenda/components/AgendaListItemLabels.jsx:19
+#: assets/agenda/components/AgendaListItemLabels.jsx:21
 #: assets/agenda/utils.js:85
 msgid "cancelled"
 msgstr "annulé"
 
-#: assets/agenda/utils.js:475
+#: assets/agenda/utils.js:478
 msgid "Update expected @ ${dateString}"
 msgstr "Mise à jour attendue @ ${dateString}"
 
-#: assets/agenda/components/AgendaApp.jsx:142
+#: assets/agenda/components/AgendaApp.jsx:123
 #: assets/layout/components/BaseApp.jsx:76
-#: assets/wire/components/WireApp.jsx:117
+#: assets/wire/components/WireApp.jsx:116
 msgid "Custom View"
 msgstr "Vue personnalisée"
 
-#: assets/agenda/components/AgendaApp.jsx:173
+#: assets/agenda/components/AgendaApp.jsx:146
+msgid "Agenda Content"
+msgstr "Contenu du calendrier"
+
+#: assets/agenda/components/AgendaApp.jsx:155
 #: assets/am-news/components/AmNewsApp.jsx:122
-#: assets/wire/components/WireApp.jsx:154
-#: assets/wire/components/WireApp.jsx:155
+#: assets/am-news/components/AmNewsApp.jsx:123
+#: assets/wire/components/WireApp.jsx:157
+#: assets/wire/components/WireApp.jsx:158
 msgid "Close filter panel"
 msgstr "Fermer le panneau de filtre"
 
-#: assets/agenda/components/AgendaApp.jsx:183
-#: assets/am-news/components/AmNewsApp.jsx:129
-#: assets/wire/components/WireApp.jsx:167
-#: assets/wire/components/WireApp.jsx:168
+#: assets/agenda/components/AgendaApp.jsx:166
+#: assets/agenda/components/AgendaApp.jsx:167
+#: assets/am-news/components/AmNewsApp.jsx:130
+#: assets/am-news/components/AmNewsApp.jsx:131
+#: assets/wire/components/WireApp.jsx:170
+#: assets/wire/components/WireApp.jsx:171
 msgid "Open filter panel"
 msgstr "Ouvrir le panneau de filtre"
+
+#: assets/agenda/components/AgendaApp.jsx:204
+#: assets/am-news/components/AmNewsApp.jsx:149
+#: assets/wire/components/WireApp.jsx:197
+msgid "Side filter panel"
+msgstr "Panneau de filtre latéral"
 
 #: assets/agenda/components/AgendaAttachments.jsx:35
 msgid "Size:"
@@ -1448,7 +1521,7 @@ msgstr "Type Mime:"
 #: assets/company-reports/components/ProductStories.jsx:26
 #: assets/components/CalendarButton.jsx:33
 #: assets/components/ExpiryDateInput.jsx:90
-#: assets/search/components/TopicParameters.jsx:24
+#: assets/search/components/TopicParameters.jsx:25
 #: assets/wire/components/filters/NavCreatedPicker.jsx:9
 msgid "Today"
 msgstr "Aujourd'hui"
@@ -1473,16 +1546,16 @@ msgstr "votre demande"
 msgid "Submit inquiry"
 msgstr "Soumettre une demande"
 
-#: assets/agenda/components/AgendaCoverages.jsx:32
+#: assets/agenda/components/AgendaCoverages.jsx:34
 #: assets/agenda/components/AgendaEventInfo.jsx:19
 msgid "Open Agenda in new tab"
 msgstr "Ouvrir le calendrier dans un nouvel onglet"
 
-#: assets/agenda/components/AgendaCoverages.jsx:40
+#: assets/agenda/components/AgendaCoverages.jsx:42
 msgid "expected"
 msgstr "attendue"
 
-#: assets/agenda/components/AgendaCoverages.jsx:45
+#: assets/agenda/components/AgendaCoverages.jsx:47
 msgid "Source"
 msgstr "Source"
 
@@ -1547,7 +1620,7 @@ msgstr "Toute région"
 msgid "Any coverage type"
 msgstr "Textes et photos"
 
-#: assets/agenda/components/AgendaInternalNote.jsx:11
+#: assets/agenda/components/AgendaInternalNote.jsx:13
 msgid "Internal Note"
 msgstr "Note interne"
 
@@ -1568,9 +1641,9 @@ msgstr "Mis à jour"
 msgid "Tomorrow"
 msgstr "Demain"
 
-#: assets/agenda/components/AgendaList.jsx:314
+#: assets/agenda/components/AgendaList.jsx:318
 #: assets/am-news/components/AmNewsList.jsx:192
-#: assets/wire/components/ItemsList.jsx:173
+#: assets/wire/components/ItemsList.jsx:176
 msgid "No items found."
 msgstr "Aucun élément trouvé."
 
@@ -1614,15 +1687,15 @@ msgstr "(En surveillance)"
 msgid "{{ attachments }} file(s) attached"
 msgstr "{{ attachments }} fichier(s) joint(s)"
 
-#: assets/agenda/components/AgendaListItemLabels.jsx:15
+#: assets/agenda/components/AgendaListItemLabels.jsx:16
 msgid "postponed"
 msgstr "reporté"
 
-#: assets/agenda/components/AgendaListItemLabels.jsx:23
+#: assets/agenda/components/AgendaListItemLabels.jsx:26
 msgid "rescheduled"
 msgstr "reporté"
 
-#: assets/agenda/components/AgendaListItemLabels.jsx:27
+#: assets/agenda/components/AgendaListItemLabels.jsx:31
 msgid "event completed"
 msgstr "événement terminé"
 
@@ -1707,18 +1780,16 @@ msgstr "URL invalide."
 
 #: assets/cards/actions.js:94
 msgid "Invalid count of media."
-msgstr "Nombre de médias non valide."
+msgstr ""
 
 #: assets/cards/actions.js:101
 msgid "Count of media should be greater than zero."
-msgstr "Le nombre de médias doit être supérieur à zéro."
+msgstr ""
 
 #: assets/cards/actions.js:107
 #: assets/components/cards/edit/ConfigExternalMedia.jsx:28
 msgid "Total media count across all media config should be between 1 and 4."
 msgstr ""
-"Le nombre total de médias dans toutes les configurations de médias doit être"
-" compris entre 1 et 4."
 
 #: assets/cards/actions.js:112
 msgid "Failed to update Card."
@@ -1752,7 +1823,6 @@ msgstr "Type"
 #: assets/company-reports/components/ProductStories.jsx:24
 #: assets/components/cards/edit/ConfigProduct.jsx:28
 #: assets/products/components/EditProduct.jsx:26
-#: assets/products/components/ProductsApp.jsx:31
 msgid "Product"
 msgstr "Produit"
 
@@ -1764,52 +1834,58 @@ msgstr "Ordre"
 #: assets/cards/components/CardList.jsx:27
 #: assets/companies/components/CompanyList.jsx:33
 #: assets/navigations/components/NavigationList.jsx:25
+#: assets/oauth_clients/components/ClientList.jsx:23
 #: assets/products/components/ProductList.jsx:27
 #: assets/section-filters/components/SectionFilterList.jsx:26
 #: assets/users/components/UsersList.jsx:31
 msgid "Created On"
 msgstr "Créé le"
 
-#: assets/cards/components/Cards.jsx:39
+#: assets/cards/components/Cards.jsx:37
 msgid "Please provide card label"
 msgstr "Veuillez fournir une étiquette pour la fiche"
 
-#: assets/cards/components/Cards.jsx:45
+#: assets/cards/components/Cards.jsx:43
 msgid "Please provide start date"
 msgstr "Veuillez indiquer la date de début"
 
-#: assets/cards/components/Cards.jsx:66
+#: assets/cards/components/Cards.jsx:64
 msgid "Would you like to delete card: {{label}}"
 msgstr "Voulez-vous supprimer la fiche: {{label}}"
 
 #: assets/cards/components/CardsApp.jsx:28
-msgid "Card"
-msgstr "Fiche"
+msgid "New Card"
+msgstr "Nouvelle fiche"
 
-#: assets/cards/components/EditCard.jsx:52
-#: assets/companies/components/EditCompany.jsx:78
-#: assets/components/SortItems.jsx:46
-#: assets/monitoring/components/EditMonitoringProfile.jsx:86
-#: assets/navigations/components/EditNavigation.jsx:57
-#: assets/products/components/EditProduct.jsx:81
-#: assets/search/components/MonitoringEditor.jsx:131
-#: assets/search/components/TopicEditor.jsx:180
-#: assets/section-filters/components/EditSectionFilter.jsx:26
-#: assets/ui/components/Preview.jsx:13
-#: assets/user-profile/components/UserProfileApp.jsx:99
-#: assets/users/components/EditUser.jsx:23
-msgid "Close"
-msgstr "Fermer"
+#: assets/cards/components/EditCard.jsx:44
+#: assets/companies/components/EditCompany.jsx:70
+#: assets/components/Modal.jsx:114
+#: assets/monitoring/components/EditMonitoringProfile.jsx:78
+#: assets/navigations/components/EditNavigation.jsx:41
+#: assets/oauth_clients/components/EditClient.jsx:17
+#: assets/products/components/EditProduct.jsx:73
+#: assets/search/components/MonitoringEditor.jsx:122
+#: assets/section-filters/components/EditSectionFilter.jsx:18
+#: assets/ui/components/Content.jsx:7 assets/ui/components/Preview.jsx:8
+#: assets/user-profile/components/UserProfileApp.jsx:96
+#: assets/users/components/EditUser.jsx:17
+msgid "dialog"
+msgstr "dialogue"
+
+#: assets/cards/components/EditCard.jsx:44
+msgid "Edit Cards"
+msgstr "Modifier les fiches"
 
 #: assets/cards/components/EditCard.jsx:94
 #: assets/companies/components/EditCompany.jsx:202
 #: assets/components/CardEditor.jsx:105
 #: assets/monitoring/components/EditMonitoringProfile.jsx:211
-#: assets/navigations/components/EditNavigation.jsx:125
+#: assets/navigations/components/EditNavigation.jsx:117
+#: assets/oauth_clients/components/EditClient.jsx:68
 #: assets/products/components/EditProduct.jsx:178
-#: assets/search/components/FollowedTopics.jsx:52
+#: assets/search/components/FollowedTopics.jsx:60
 #: assets/section-filters/components/EditSectionFilter.jsx:92
-#: assets/users/components/EditUser.jsx:128
+#: assets/users/components/EditUser.jsx:149
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -1840,6 +1916,10 @@ msgstr "Finlande"
 #: assets/companies/components/Companies.jsx:60
 msgid "Would you like to delete company: {{name}}"
 msgstr "Voulez-vous supprimer l'entreprise: {{name}}"
+
+#: assets/companies/components/CompaniesApp.jsx:25
+msgid "New Company"
+msgstr "Nouvelle entreprise"
 
 #: assets/companies/components/CompanyList.jsx:27
 #: assets/companies/components/EditCompany.jsx:127
@@ -1905,6 +1985,10 @@ msgstr "API"
 #: assets/companies/components/EditCompany.jsx:45
 msgid "There are no users in the company."
 msgstr "Il n'y a pas d'utilisateurs dans l'entreprise."
+
+#: assets/companies/components/EditCompany.jsx:70
+msgid "Edit Company"
+msgstr "Modifier l'entreprise"
 
 #: assets/companies/components/EditCompany.jsx:111
 msgid "Company Type"
@@ -2062,7 +2146,7 @@ msgid "Last 24 hours"
 msgstr "Dernières 24 heures"
 
 #: assets/company-reports/components/ProductStories.jsx:28
-#: assets/search/components/TopicParameters.jsx:26
+#: assets/search/components/TopicParameters.jsx:27
 #: assets/wire/components/filters/NavCreatedPicker.jsx:10
 msgid "This week"
 msgstr "Cette semaine"
@@ -2072,7 +2156,7 @@ msgid "Last 7 days"
 msgstr "Les 7 derniers jours"
 
 #: assets/company-reports/components/ProductStories.jsx:30
-#: assets/search/components/TopicParameters.jsx:28
+#: assets/search/components/TopicParameters.jsx:29
 #: assets/wire/components/filters/NavCreatedPicker.jsx:11
 msgid "This month"
 msgstr "Ce mois-ci"
@@ -2110,7 +2194,6 @@ msgstr "Action"
 
 #: assets/company-reports/components/SubscriberActivity.jsx:141
 #: assets/company-reports/components/UserSavedSearches.jsx:19
-#: assets/users/components/UsersApp.jsx:77
 msgid "User"
 msgstr "Utilisateur"
 
@@ -2123,16 +2206,16 @@ msgstr "Heure"
 msgid "More Actions"
 msgstr "Plus d'actions"
 
-#: assets/components/AuditInformation.jsx:32
+#: assets/components/AuditInformation.jsx:38
 msgid "Created {{creator}}at {{created}}"
 msgstr "{{creator}} créé à {{created}}"
 
-#: assets/components/AuditInformation.jsx:46
+#: assets/components/AuditInformation.jsx:52
 msgid "Updated {{updator}}at {{updated}}"
 msgstr "Mis à jour par {{updator}} à {{updated}}"
 
 #: assets/components/CardEditor.jsx:102
-#: assets/search/components/FollowedTopics.jsx:39
+#: assets/search/components/FollowedTopics.jsx:45
 msgid "Edit"
 msgstr "Modifier"
 
@@ -2165,10 +2248,6 @@ msgstr "dans 1 an"
 msgid "Never"
 msgstr "Jamais"
 
-#: assets/components/ListBar.jsx:22
-msgid "New {{ buttonName }}"
-msgstr "Nouveau {{ buttonName }}"
-
 #: assets/components/ListViewOptions.jsx:14
 msgid "Large list"
 msgstr "Liste détaillée"
@@ -2179,38 +2258,34 @@ msgstr "Liste compacte"
 
 #: assets/components/ListViewOptions.jsx:57
 #: assets/components/ListViewOptions.jsx:58
-#: assets/components/ListViewOptions.jsx:63
+#: assets/components/ListViewOptions.jsx:64
 msgid "Change view"
 msgstr "Changer la visualisation"
 
-#: assets/components/NotificationList.jsx:53
-#: assets/components/NotificationList.jsx:60
+#: assets/components/NotificationList.jsx:56
+#: assets/components/NotificationList.jsx:64
+#: assets/components/NotificationList.jsx:73
 msgid "Notifications"
 msgstr "Notifications"
 
-#: assets/components/NotificationList.jsx:63
+#: assets/components/NotificationList.jsx:67
+msgid "No new notifications!"
+msgstr "Pas de nouvelles notifications!"
+
+#: assets/components/NotificationList.jsx:77
 msgid "Clear All"
 msgstr "Tout effacer"
 
-#: assets/components/NotificationListItem.jsx:9
-msgid "An event you are watching has been updated"
-msgstr "Un événement que vous surveillez a été mis à jour"
-
-#: assets/components/NotificationListItem.jsx:15
-msgid "A story you downloaded has been updated"
-msgstr "Un article que vous avez téléchargé a été mis à jour"
-
-#: assets/components/NotificationListItem.jsx:27
-#: assets/search/components/TopicList.jsx:37
-msgid "Created on"
-msgstr "Créé le"
+#: assets/components/NotificationList.jsx:82
+msgid "Loading..."
+msgstr "Chargement..."
 
 #: assets/components/ShareItemModal.jsx:76
 msgid "Deselect All"
 msgstr "Tout désélectionner"
 
 #: assets/components/ShareItemModal.jsx:77
-#: assets/wire/components/SelectedItemsBar.jsx:45
+#: assets/wire/components/SelectedItemsBar.jsx:46
 msgid "Select All"
 msgstr "Tout sélectionner"
 
@@ -2228,43 +2303,43 @@ msgstr "Message"
 
 #: assets/components/cards/utils.js:23
 msgid "6-text-only"
-msgstr "6 texte seulement"
+msgstr ""
 
 #: assets/components/cards/utils.js:30
 msgid "4-picture-text"
-msgstr "4 texte de l'image"
+msgstr ""
 
 #: assets/components/cards/utils.js:37
 msgid "4-media-gallery"
-msgstr "4 médiathèque"
+msgstr ""
 
 #: assets/components/cards/utils.js:44
 msgid "4-photo-gallery"
-msgstr "4 galerie photo"
+msgstr ""
 
 #: assets/components/cards/utils.js:51
 msgid "1x1-top-news"
-msgstr "1x1 top news"
+msgstr ""
 
 #: assets/components/cards/utils.js:58
 msgid "2x2-top-news"
-msgstr "2x2 top news"
+msgstr ""
 
 #: assets/components/cards/utils.js:65
 msgid "3-text-only"
-msgstr "3 texte seulement"
+msgstr ""
 
 #: assets/components/cards/utils.js:72
 msgid "3-picture-text"
-msgstr "3 texte de l'image"
+msgstr ""
 
 #: assets/components/cards/utils.js:79
 msgid "4-text-only"
-msgstr "4 texte seulement"
+msgstr ""
 
 #: assets/components/cards/utils.js:86
 msgid "2x2-events"
-msgstr "2x2 événements"
+msgstr ""
 
 #: assets/components/cards/utils.js:93
 msgid "6 Navigation Tiles Per Row"
@@ -2283,21 +2358,21 @@ msgid "End Date"
 msgstr "Date de fin"
 
 #: assets/components/cards/edit/ConfigEvent.jsx:56
-#: assets/search/components/TopicParameters.jsx:76
+#: assets/search/components/TopicParameters.jsx:77
 msgid "Location"
 msgstr "Endroit"
 
 #: assets/components/cards/edit/ConfigExternalMedia.jsx:16
 msgid "More button label"
-msgstr "Plus d'étiquette de bouton"
+msgstr ""
 
 #: assets/components/cards/edit/ConfigExternalMedia.jsx:23
 msgid "More button url"
-msgstr "Plus d'URL de bouton"
+msgstr ""
 
 #: assets/components/cards/edit/ConfigExternalMedia.jsx:40
 msgid "External url to fetch media"
-msgstr "URL externe pour récupérer le média"
+msgstr ""
 
 #: assets/components/cards/edit/ConfigExternalMedia.jsx:48
 msgid "Media Count"
@@ -2335,29 +2410,61 @@ msgstr "Articles"
 msgid "Settings were updated successfully."
 msgstr "Les paramètres ont été mis à jour avec succès."
 
-#: assets/home/components/HomeApp.jsx:123
+#: assets/home/components/HomeApp.jsx:88
+msgid "Loading Card Items"
+msgstr "Téléchargement des éléments de fiche"
+
+#: assets/home/components/HomeApp.jsx:150
 #: assets/market-place/components/MarketPlaceApp.jsx:34
 msgid "Warning"
 msgstr "Avertissement"
 
-#: assets/home/components/HomeApp.jsx:123
+#: assets/home/components/HomeApp.jsx:150
 msgid "There's no card defined for home page!"
 msgstr "Aucune fiche n'a été définie pour la page d'accueil!"
 
+#: assets/home/components/search-bar.jsx:19
+#: assets/search/components/SearchBar.jsx:55
+msgid "search"
+msgstr "rechercher"
+
+#: assets/home/components/search-bar.jsx:21
+#: assets/home/components/search-bar.jsx:22
+#: assets/search/components/SearchBar.jsx:59
+#: assets/search/components/SearchBar.jsx:60
+msgid "Search for..."
+msgstr "Rechercher..."
+
+#: assets/home/components/search-bar.jsx:27
+msgid "Clear"
+msgstr "Effacer"
+
+#: assets/home/components/search-bar.jsx:33
+#: assets/home/components/search-bar.jsx:34
+#: assets/search/components/SearchBar.jsx:74
+#: assets/search/components/TopicParameters.jsx:66
+#: assets/wire/components/filters/FiltersTab.jsx:127
+msgid "Search"
+msgstr "Rechercher"
+
 #: assets/layout/components/BaseApp.jsx:36
-#: assets/search/components/TopicParameters.jsx:67
+#: assets/search/components/TopicParameters.jsx:68
 msgid "Topics"
 msgstr "Sujets"
 
 #: assets/layout/components/BaseApp.jsx:37
-#: assets/search/components/FollowedTopics.jsx:133
-#: assets/search/components/TopicsTab.jsx:45
+#: assets/search/components/FollowedTopics.jsx:149
+#: assets/search/components/TopicsTab.jsx:72
 msgid "My Topics"
 msgstr "Mes sujets"
 
 #: assets/layout/components/BaseApp.jsx:38
 msgid "Filters"
 msgstr "Filtres"
+
+#: assets/maps/components/static.jsx:36
+msgid "Map"
+msgstr "Carte"
 
 #: assets/market-place/components/MarketPlaceApp.jsx:34
 msgid "There's no navigations defined!"
@@ -2399,6 +2506,11 @@ msgstr "Horaire"
 msgid "There are no users for this monitoring profile."
 msgstr "Il n'y a aucun utilisateur pour ce profil de supervision."
 
+#: assets/monitoring/components/EditMonitoringProfile.jsx:78
+#: assets/search/components/MonitoringEditor.jsx:122
+msgid "Edit Monitoring"
+msgstr "Modifier la supervision"
+
 #: assets/monitoring/components/EditMonitoringProfile.jsx:80
 msgid "Add/Edit Monitoring Profile"
 msgstr "Ajouter / Modifier le profil de supervision"
@@ -2426,7 +2538,7 @@ msgid "Format type"
 msgstr "Type de format"
 
 #: assets/monitoring/components/MonitoringApp.jsx:27
-#: assets/wire/components/WireApp.jsx:76
+#: assets/wire/components/WireApp.jsx:77
 msgid "Monitoring Profiles"
 msgstr "Profils de supervision"
 
@@ -2519,7 +2631,7 @@ msgstr "Type d'horaire"
 msgid "Day of week"
 msgstr "Jour de la semaine"
 
-#: assets/navigations/actions.jsx:94 assets/navigations/actions.jsx:150
+#: assets/navigations/actions.jsx:94
 msgid "Navigation updated successfully"
 msgstr "Navigation mise à jour avec succès"
 
@@ -2527,17 +2639,25 @@ msgstr "Navigation mise à jour avec succès"
 msgid "Navigation created successfully"
 msgstr "Navigation créée avec succès"
 
-#: assets/navigations/actions.jsx:118
+#: assets/navigations/actions.jsx:119
 msgid "Navigation deleted successfully"
 msgstr "Navigation supprimée avec succès"
 
-#: assets/navigations/components/EditNavigation.jsx:103
+#: assets/navigations/components/EditNavigation.jsx:41
+msgid "Edit Navigation"
+msgstr "Modifier la navigation"
+
+#: assets/navigations/components/EditNavigation.jsx:95
 msgid "Tile Images"
 msgstr "Images de la tuile"
 
-#: assets/navigations/components/Navigations.jsx:63
+#: assets/navigations/components/Navigations.jsx:62
 msgid "Would you like to delete navigation: {{name}}"
 msgstr "Voulez-vous supprimer la navigation: {{name}}"
+
+#: assets/navigations/components/NavigationsApp.jsx:29
+msgid "New Navigation"
+msgstr "Nouvelle navigation"
 
 #: assets/news-api/actions.js:17
 msgid "API Token generated successfully"
@@ -2600,13 +2720,105 @@ msgstr "Enregistrer le jeton"
 msgid "Generate Token"
 msgstr "Générer un jeton"
 
-#: assets/notifications/actions.js:40
+#: assets/notifications/actions.js:68
 msgid "Notification cleared successfully"
 msgstr "Notification effacée avec succès"
 
-#: assets/notifications/actions.js:58
+#: assets/notifications/actions.js:86
 msgid "Notifications cleared successfully"
 msgstr "Notifications effacées avec succès"
+
+#: assets/notifications/components/notificationItems.jsx:33
+msgid "Shared by {{ first_name }} {{ last_name }} on {{ datetime }}"
+msgstr "Partagé par {{ first_name }} {{ last_name }} à {{ datetime }}"
+
+#: assets/notifications/components/notificationItems.jsx:36
+msgid "Created on {{ datetime }}"
+msgstr "Créé à {{ datetime }}"
+
+#: assets/notifications/components/notificationItems.jsx:39
+msgid "Updated on {{ datetime }}"
+msgstr "Mis à jour à {{ datetime }}"
+
+#: assets/notifications/components/notificationItems.jsx:66
+msgid "A story you downloaded has been updated"
+msgstr "Un article que vous avez téléchargé a été mis à jour"
+
+#: assets/notifications/components/notificationItems.jsx:84
+msgid "An event you are watching has been updated"
+msgstr "Un événement que vous surveillez a été mis à jour"
+
+#: assets/notifications/components/notificationItems.jsx:101
+msgid "An Agenda item has arrived that matches a subscribed topic"
+msgstr ""
+"Un élément du calendrier à propos d'un sujet auquel vous êtes abonné a été "
+"publié"
+
+#: assets/notifications/components/notificationItems.jsx:102
+msgid "A story has arrived that matches a subscribed topic"
+msgstr "Un article à propos d'un sujet auquel vous êtes abonné a été publié"
+
+#: assets/notifications/components/notificationItems.jsx:121
+msgid "An Agenda Topic has been shared with you"
+msgstr "Un sujet de calendrier a été partagé avec vous"
+
+#: assets/notifications/components/notificationItems.jsx:122
+msgid "A Wire Topic has been shared with you"
+msgstr "Un sujet du fil a été partagé avec vous"
+
+#: assets/notifications/components/notificationItems.jsx:140
+msgid "An Agenda item was shared with you"
+msgstr "Un élément de calendrier a été partagé avec vous"
+
+#: assets/notifications/components/notificationItems.jsx:141
+msgid "A Wire item was shared with you"
+msgstr "Un élément du fil a été partagé avec vous"
+
+#: assets/oauth_clients/actions.js:84
+msgid "Client updated successfully"
+msgstr "Client mis à jour avec succès"
+
+#: assets/oauth_clients/actions.js:87
+msgid "Client created successfully"
+msgstr "Client créé avec succès"
+
+#: assets/oauth_clients/actions.js:109
+msgid "Client deleted successfully"
+msgstr "Client supprimé avec succès"
+
+#: assets/oauth_clients/components/Clients.jsx:35
+msgid "Please provide client name"
+msgstr "Veuillez fournir le nom du client"
+
+#: assets/oauth_clients/components/Clients.jsx:58
+msgid "Would you like to delete client: {{name}}"
+msgstr "Voulez-vous supprimer le client: {{name}}"
+
+#: assets/oauth_clients/components/ClientsApp.jsx:25
+msgid "New Client"
+msgstr "Nouveau client"
+
+#: assets/oauth_clients/components/EditClient.jsx:18
+msgid "Edit Client"
+msgstr "Modifier le client"
+
+#: assets/oauth_clients/components/EditClient.jsx:20
+msgid "Add/Edit Client"
+msgstr "Ajouter/Modifier un client"
+
+#: assets/oauth_clients/components/EditClient.jsx:45
+msgid "Client Id"
+msgstr "Identifiant du client"
+
+#: assets/oauth_clients/components/EditClient.jsx:52
+msgid "Client Secret"
+msgstr ""
+
+#: assets/oauth_clients/components/EditClient.jsx:55
+msgid ""
+"Make sure to copy your new client secret now. You won`t be able to see it "
+"again."
+msgstr ""
 
 #: assets/products/actions.js:92 assets/products/actions.js:147
 #: assets/products/actions.js:177
@@ -2624,6 +2836,10 @@ msgstr "Produit supprimé avec succès"
 #: assets/products/components/EditProduct.jsx:58
 msgid "Test product"
 msgstr "Tester le produit"
+
+#: assets/products/components/EditProduct.jsx:73
+msgid "Edit Product"
+msgstr "Modifier le produit"
 
 #: assets/products/components/EditProduct.jsx:120
 #: assets/products/components/ProductList.jsx:24
@@ -2654,6 +2870,10 @@ msgstr "Tester la requête d'élément de couverture"
 msgid "Would you like to delete product: {{name}}"
 msgstr "Voulez-vous supprimer le produit: {{name}}"
 
+#: assets/products/components/ProductsApp.jsx:31
+msgid "New Product"
+msgstr "Nouveau produit"
+
 #: assets/search/actions.js:283
 msgid "Items were shared successfully."
 msgstr "Les éléments ont été partagés avec succès."
@@ -2662,12 +2882,20 @@ msgstr "Les éléments ont été partagés avec succès."
 msgid "Item was shared successfully."
 msgstr "L'élément a été partagé avec succès."
 
-#: assets/search/components/FollowedTopics.jsx:80
+#: assets/search/actions.js:429
+msgid "Topic subscribed successfully"
+msgstr ""
+
+#: assets/search/actions.js:437
+msgid "Topic unsubscribed successfully"
+msgstr ""
+
+#: assets/search/components/FollowedTopics.jsx:92
 msgid "Would you like to delete topic {{name}}?"
 msgstr "Voulez-vous supprimer le sujet {{name}}?"
 
-#: assets/search/components/FollowedTopics.jsx:142
-#: assets/search/components/TopicsTab.jsx:68
+#: assets/search/components/FollowedTopics.jsx:158
+#: assets/search/components/TopicsTab.jsx:95
 msgid "Company Topics"
 msgstr "Sujets partagés"
 
@@ -2684,10 +2912,12 @@ msgid "{{ msg }} successfully"
 msgstr "{{ msg }} avec succès"
 
 #: assets/search/components/MonitoringEditor.jsx:160
+#: assets/search/components/TopicForm.jsx:20
 msgid "Unsubscribe"
 msgstr "Se désabonner"
 
 #: assets/search/components/MonitoringEditor.jsx:160
+#: assets/search/components/TopicForm.jsx:20
 msgid "Subscribe"
 msgstr "S'abonner"
 
@@ -2699,20 +2929,13 @@ msgstr "Nouveaux événements à charger"
 msgid "New stories available to load"
 msgstr "Nouveaux articles disponibles pour chargement"
 
-#: assets/search/components/SearchBar.jsx:59
-#: assets/search/components/SearchBar.jsx:60
-msgid "Search for..."
-msgstr "Rechercher..."
+#: assets/search/components/NewItemsIcon.jsx:51
+msgid "Refresh"
+msgstr "Rafraîchir"
 
 #: assets/search/components/SearchBar.jsx:67
 msgid "Search clear"
 msgstr "Effacer la recherche"
-
-#: assets/search/components/SearchBar.jsx:74
-#: assets/search/components/TopicParameters.jsx:65
-#: assets/wire/components/filters/FiltersTab.jsx:97
-msgid "Search"
-msgstr "Rechercher"
 
 #: assets/search/components/SearchResults.jsx:32
 msgid "search results found"
@@ -2722,88 +2945,106 @@ msgstr "résultats de recherche trouvés"
 msgid "search results for:"
 msgstr "Résultats de recherche pour:"
 
-#: assets/search/components/SearchResultsInfo.jsx:35
+#: assets/search/components/SearchResultsInfo.jsx:37
 msgid "Update my topic"
 msgstr "Mettre à jour mon sujet"
 
-#: assets/search/components/SearchResultsInfo.jsx:36
+#: assets/search/components/SearchResultsInfo.jsx:38
 msgid "Create my topic"
 msgstr "Créer mon sujet"
 
-#: assets/search/components/TopicEditor.jsx:120
+#: assets/search/components/TopicEditor.jsx:76
+msgid "Company Topic"
+msgstr "Sujet partagé"
+
+#: assets/search/components/TopicEditor.jsx:77
+msgid "Subscribers"
+msgstr "Abonnés"
+
+#: assets/search/components/TopicEditor.jsx:163
 msgid "Agenda Topic updated successfully"
 msgstr "Sujet de calendrier mis à jour"
 
-#: assets/search/components/TopicEditor.jsx:121
+#: assets/search/components/TopicEditor.jsx:164
 msgid "Wire Topic updated successfully"
 msgstr "Sujet du fil mis à jour avec succès"
 
-#: assets/search/components/TopicEditor.jsx:125
+#: assets/search/components/TopicEditor.jsx:168
 msgid "Agenda Topic created successfully"
 msgstr "Sujet de calendrier créé"
 
-#: assets/search/components/TopicEditor.jsx:126
+#: assets/search/components/TopicEditor.jsx:169
 msgid "Wire Topic created successfully"
 msgstr "Sujet du fil créé avec succès"
 
-#: assets/search/components/TopicEditor.jsx:150
+#: assets/search/components/TopicEditor.jsx:193
 msgid "Create new Agenda Topic"
 msgstr "Créer un nouveau sujet de calendrier"
 
-#: assets/search/components/TopicEditor.jsx:151
+#: assets/search/components/TopicEditor.jsx:194
 msgid "Create new Wire Topic"
 msgstr "Créer un nouveau sujet du fil"
 
-#: assets/search/components/TopicEditor.jsx:154
+#: assets/search/components/TopicEditor.jsx:197
 msgid "Save Agenda Topic"
 msgstr "Enregistrer le sujet de calendrier"
 
-#: assets/search/components/TopicEditor.jsx:155
+#: assets/search/components/TopicEditor.jsx:198
 msgid "Save Wire Topic"
 msgstr "Enregistrer le sujet du fil"
 
-#: assets/search/components/TopicForm.jsx:23
+#: assets/search/components/TopicForm.jsx:36
 msgid "Send me notifications"
 msgstr "M'envoyer des notifications"
 
-#: assets/search/components/TopicForm.jsx:28
+#: assets/search/components/TopicForm.jsx:44
 msgid "Share with my Company"
 msgstr "Partager avec mes collègues"
 
-#: assets/search/components/TopicParameters.jsx:19
+#: assets/search/components/TopicForm.jsx:51
+msgid "Created Externally"
+msgstr ""
+
+#: assets/search/components/TopicList.jsx:61
+msgid "Created on"
+msgstr "Créé le"
+
+#: assets/search/components/TopicParameters.jsx:20
 msgid "From: {{date}}"
 msgstr "À partir du: {{date}}"
 
-#: assets/search/components/TopicParameters.jsx:20
+#: assets/search/components/TopicParameters.jsx:21
 msgid "To: {{date}}"
 msgstr "Au: {{date}}"
 
-#: assets/search/components/TopicParameters.jsx:66
+#: assets/search/components/TopicParameters.jsx:67
 msgid "Date Created"
 msgstr "Date de création"
 
-#: assets/search/components/TopicParameters.jsx:71
+#: assets/search/components/TopicParameters.jsx:72
 msgid "Urgency"
 msgstr "Priorité"
 
-#: assets/search/components/TopicParameters.jsx:73
+#: assets/search/components/TopicParameters.jsx:74
 msgid "Calendar"
 msgstr "Calendrier"
 
-#: assets/search/components/TopicParameters.jsx:74
+#: assets/search/components/TopicParameters.jsx:75
 msgid "Coverage Type"
 msgstr "Type de couverture"
 
-#: assets/search/components/TopicParameters.jsx:75
+#: assets/search/components/TopicParameters.jsx:76
 msgid "Coverage Status"
 msgstr "Statut de couverture"
 
-#: assets/search/components/TopicsTab.jsx:50
-#: assets/search/components/TopicsTab.jsx:73
+#: assets/search/components/TopicsTab.jsx:46
+#: assets/search/components/TopicsTab.jsx:77
+#: assets/search/components/TopicsTab.jsx:100
 msgid "No {{name}} created."
 msgstr "Aucun {{name}} créé."
 
-#: assets/search/components/TopicsTab.jsx:90
+#: assets/search/components/TopicsTab.jsx:62
+#: assets/search/components/TopicsTab.jsx:117
 msgid "Manage my {{name}}"
 msgstr "Gérer mon {{name}}"
 
@@ -2819,6 +3060,10 @@ msgstr "Filtre de section créé avec succès"
 msgid "Section Filter deleted successfully"
 msgstr "Filtre de section supprimé avec succès"
 
+#: assets/section-filters/components/EditSectionFilter.jsx:18
+msgid "Edit Section Filters"
+msgstr "Modifier les filtres de section"
+
 #: assets/section-filters/components/EditSectionFilter.jsx:20
 msgid "New Filter"
 msgstr "Nouveau filtre"
@@ -2832,12 +3077,12 @@ msgid "Would you like to delete Section Filter: {{name}}"
 msgstr "Voulez-vous supprimer le filtre de section: {{name}}"
 
 #: assets/section-filters/components/SectionFiltersApp.jsx:31
-msgid "Section Filter"
-msgstr "Filtre de section"
+msgid "New Section Filter"
+msgstr "Nouveau filtre de section"
 
 #: assets/tests/utils.spec.js:5
 msgid "foo"
-msgstr "foo"
+msgstr ""
 
 #: assets/tests/utils.spec.js:9
 msgid "hello {{ name }}"
@@ -2863,23 +3108,31 @@ msgstr "Embargo: {{ date }}"
 msgid "Your browser does not support HTML5 video"
 msgstr "Votre navigateur est incapable de lire la vidéo HTML5"
 
-#: assets/ui/components/Preview.jsx:9
-msgid "Article preview panel"
-msgstr "Panneau de prévisualisation d'article"
+#: assets/ui/components/Content.jsx:7 assets/ui/components/Content.jsx:8
+msgid "Item Detail"
+msgstr "Détails de l'élément"
 
-#: assets/user-profile/actions.js:102 assets/users/actions.js:105
+#: assets/ui/components/Preview.jsx:8
+msgid "Article Preview"
+msgstr "Aperçu de l'article"
+
+#: assets/ui/components/Preview.jsx:9
+msgid "Article preview"
+msgstr "Aperçu de l'article"
+
+#: assets/user-profile/actions.js:103 assets/users/actions.js:105
 msgid "User updated successfully"
 msgstr "Utilisateur mis à jour avec succès"
 
-#: assets/user-profile/actions.js:105
+#: assets/user-profile/actions.js:107
 msgid "Please reload the page in order to change language."
 msgstr "Veuillez recharger la page pour changer la langue."
 
-#: assets/user-profile/actions.js:136
+#: assets/user-profile/actions.js:141
 msgid "Topic deleted successfully"
 msgstr "Sujet supprimé avec succès"
 
-#: assets/user-profile/actions.js:168
+#: assets/user-profile/actions.js:173
 msgid "Topic was shared successfully."
 msgstr "Sujet partagé avec succès."
 
@@ -2903,21 +3156,21 @@ msgstr "Ma supervision"
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: assets/user-profile/components/profile/UserProfile.jsx:28
+#: assets/user-profile/components/profile/UserProfile.jsx:29
 msgid "Please provide first name"
 msgstr "Veuillez écrire un prénom"
 
-#: assets/user-profile/components/profile/UserProfile.jsx:33
+#: assets/user-profile/components/profile/UserProfile.jsx:34
 msgid "Please provide last name"
 msgstr "Veuillez écrire un nom de famille"
 
-#: assets/user-profile/components/profile/UserProfile.jsx:92
-#: assets/users/components/EditUser.jsx:54
+#: assets/user-profile/components/profile/UserProfile.jsx:91
+#: assets/users/components/EditUser.jsx:56
 #: assets/users/components/UsersList.jsx:25
 msgid "Phone"
 msgstr "Téléphone"
 
-#: assets/user-profile/components/profile/UserProfile.jsx:149
+#: assets/user-profile/components/profile/UserProfile.jsx:148
 msgid "Save Changes"
 msgstr "Enregistrer les modifications"
 
@@ -2934,10 +3187,14 @@ msgid "User deleted successfully"
 msgstr "Utilisateur supprimé avec succès"
 
 #: assets/users/components/EditUser.jsx:17
+msgid "Edit User"
+msgstr "Modifier l'utilisateur"
+
+#: assets/users/components/EditUser.jsx:19
 msgid "Add/Edit User"
 msgstr "Ajouter / Modifier un utilisateur"
 
-#: assets/users/components/EditUser.jsx:92
+#: assets/users/components/EditUser.jsx:106
 #: assets/users/components/UserListItem.jsx:22
 msgid "Approved"
 msgstr "Approuvé"
@@ -2953,6 +3210,10 @@ msgstr "Voulez-vous supprimer l'utilisateur: {{name}}?"
 #: assets/users/components/UsersApp.jsx:35
 msgid "Sort By"
 msgstr "Trier par"
+
+#: assets/users/components/UsersApp.jsx:77
+msgid "New User"
+msgstr "Nouvel utilisateur"
 
 #: assets/users/components/UsersList.jsx:32
 msgid "Last Active"
@@ -3000,6 +3261,10 @@ msgstr "Télécharger les éléments"
 msgid "Format"
 msgstr "Format"
 
+#: assets/wire/components/FollowStory.jsx:22
+msgid "Follow story"
+msgstr "Suivre l'article"
+
 #: assets/wire/components/InfoBox.jsx:17
 msgid "{{name}}"
 msgstr "{{name}} "
@@ -3020,16 +3285,17 @@ msgstr "Version suivante"
 msgid "Loading"
 msgstr "Chargement"
 
-#: assets/wire/components/ListSearchOptions.jsx:45
+#: assets/wire/components/ListSearchOptions.jsx:37
+#: assets/wire/components/ListSearchOptions.jsx:46
 msgid "Search Options"
 msgstr "Options de recherche"
 
-#: assets/wire/components/ListSearchOptions.jsx:60
+#: assets/wire/components/ListSearchOptions.jsx:61
 #: assets/wire/components/SearchAllVersionsControl.jsx:11
 msgid "All Versions"
 msgstr "Toutes les versions"
 
-#: assets/wire/components/ListSearchOptions.jsx:78
+#: assets/wire/components/ListSearchOptions.jsx:79
 msgid "News Only"
 msgstr "Nouvelles seulement"
 
@@ -3041,41 +3307,37 @@ msgstr "Nouvelles seulement"
 msgid "Note"
 msgstr "Remarque"
 
-#: assets/wire/components/PreviewTags.jsx:28
+#: assets/wire/components/PreviewTags.jsx:32
 msgid "Slugline"
 msgstr "Titre de rappel"
 
-#: assets/wire/components/SelectedItemsBar.jsx:48
+#: assets/wire/components/SelectedItemsBar.jsx:49
 msgid "{{ count }} item(s) selected"
 msgstr "{{ count }} élément(s) sélectionné(s)"
 
-#: assets/wire/components/WireApp.jsx:194
-msgid "Side filter panel"
-msgstr "Panneau de filtre latéral"
+#: assets/wire/components/WireApp.jsx:149
+msgid "Wire Content"
+msgstr "Contenu du fil"
 
-#: assets/wire/components/WireListItem.jsx:48
+#: assets/wire/components/WireListItem.jsx:43
 msgid "Hide previous versions ({{ count }}) - {{ matches }} matches"
 msgstr ""
 
-#: assets/wire/components/WireListItem.jsx:55
+#: assets/wire/components/WireListItem.jsx:50
 msgid "Hide previous versions ({{ count }})"
 msgstr "Masquer versions précédentes ({{ count }})"
 
-#: assets/wire/components/WireListItem.jsx:61
+#: assets/wire/components/WireListItem.jsx:56
 msgid "Show previous versions ({{ count }}) - {{ matches }} matches"
 msgstr ""
 
-#: assets/wire/components/WireListItem.jsx:68
+#: assets/wire/components/WireListItem.jsx:63
 msgid "Show previous versions ({{ count }})"
 msgstr "Afficher les ({{ count }}) versions précédentes"
 
 #: assets/wire/components/WireListItemDeleted.jsx:30
 msgid "This item has been removed from {{ context_name }}"
 msgstr "Cet élément a été retiré de {{ context_name }}"
-
-#: assets/wire/components/WirePreview.jsx:65
-msgid "Follow story"
-msgstr "Suivre l'article"
 
 #: assets/wire/components/fields/Authors.jsx:14
 msgid "Authors"
@@ -3093,11 +3355,6 @@ msgstr ""
 msgid "{{ count }} previous versions"
 msgstr "{{ count }} versions précédentes"
 
-#: assets/wire/components/fields/UrgencyLabel.jsx:45
-#: assets/wire/components/fields/UrgencyLabel.jsx:62
-msgid "News Value: {{ value }}"
-msgstr "Priorité de la nouvelle: {{ value }}"
-
 #: assets/wire/components/fields/VersionType.jsx:7
 msgid "Version type: {{version}}"
 msgstr "Type de version: {{version}}"
@@ -3110,7 +3367,7 @@ msgstr "En montrer plus"
 msgid "Show less"
 msgstr "En montrer moins"
 
-#: assets/wire/components/filters/FiltersTab.jsx:107
+#: assets/wire/components/filters/FiltersTab.jsx:134
 msgid "Clear filters"
 msgstr "Effacer les filtres"
 
