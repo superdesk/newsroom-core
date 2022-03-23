@@ -12,6 +12,7 @@ import importlib
 import eve
 import flask
 import newsroom
+import sentry_sdk
 
 from flask_mail import Mail
 from flask_caching import Cache
@@ -21,7 +22,7 @@ from superdesk.json_utils import SuperdeskJSONEncoder
 from superdesk.validator import SuperdeskValidator
 from superdesk.logging import configure_logging
 from elasticapm.contrib.flask import ElasticAPM
-from superdesk.factory.sentry import SuperdeskSentry
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 from newsroom.auth import SessionAuth
 from newsroom.utils import is_json_request
@@ -74,6 +75,7 @@ class BaseNewsroomApp(eve.Eve):
         newsroom.flask_app = self
 
         self.setup_error_handlers()
+        self.setup_sentry()
         self.setup_apm()
         self.setup_media_storage()
         self.setup_babel()
@@ -126,6 +128,13 @@ class BaseNewsroomApp(eve.Eve):
             'BABEL_TRANSLATION_DIRECTORIES',
             os.path.join(NEWSROOM_DIR, 'translations')
         )
+
+        if self.config.get('TRANSLATIONS_PATH'):
+            self.config['BABEL_TRANSLATION_DIRECTORIES'] = ';'.join([
+                str(self.config['BABEL_TRANSLATION_DIRECTORIES']),
+                str(self.config['TRANSLATIONS_PATH']),
+            ])
+
         # avoid events on this
         self.babel_tzinfo = None
         self.babel_locale = None
@@ -170,7 +179,6 @@ class BaseNewsroomApp(eve.Eve):
         self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(404, render_404)
         self.register_error_handler(403, render_403)
-        self.sentry = SuperdeskSentry(self)
 
     def general_setting(self, _id, label, type='text', default=None,
                         weight=0, description=None, min=None, client_setting=False):
@@ -204,3 +212,10 @@ class BaseNewsroomApp(eve.Eve):
         if settings.get("mongo_indexes__init") and not settings.get("mongo_indexes"):
             settings["mongo_indexes"] = settings["mongo_indexes__init"]
         super().register_resource(resource, settings)
+
+    def setup_sentry(self):
+        if self.config.get("SENTRY_DSN"):
+            sentry_sdk.init(
+                dsn=self.config["SENTRY_DSN"],
+                integrations=[FlaskIntegration()],
+            )

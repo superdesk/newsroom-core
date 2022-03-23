@@ -11,6 +11,9 @@ function ClientListItem({client, onClick}) {
         >
             <td className="name">{client.name}</td>
             <td>{shortDate(client._created)}</td>
+            {(!client.last_active) ? (<td></td>) : (
+                <td>{shortDate(client.last_active)}</td>
+            )}
         </tr>
     );
 }

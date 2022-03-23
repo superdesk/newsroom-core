@@ -21,6 +21,7 @@ function ClientList({clients, onClick}) {
                         <tr>
                             <th>{ gettext('Name') }</th>
                             <th>{ gettext('Created On') }</th>
+                            <th>{ gettext('Last Login') }</th>
                         </tr>
                     </thead>
                     <tbody>{list}</tbody>

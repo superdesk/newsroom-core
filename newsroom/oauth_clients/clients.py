@@ -15,6 +15,11 @@ class ClientResource(newsroom.Resource):
             "unique": True,
         },
         "password": {"type": "string", "required": True},
+        "last_active": {
+            "type": "datetime",
+            "required": False,
+            "nullable": True
+        },
     }
 
     datasource = {
