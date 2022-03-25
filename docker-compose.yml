@@ -48,13 +48,15 @@ services:
             - NEWSROOM_DEBUG=true
 
     client:
-        build: ./docker/client
+        build:
+            context: .
+            dockerfile: Dockerfile-client
         ports:
             - "8080:8080"
         networks:
             - newsroom
         volumes:
-            - ./assets:/opt/client/node_modules/newsroom-core/assets
+            - ./assets:/opt/client/assets
 
 networks:
     newsroom:
