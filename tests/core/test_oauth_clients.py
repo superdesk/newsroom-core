@@ -20,7 +20,7 @@ def test_oauth_clients(client):
     if not password:
         assert False
 
-    # OAuth Token Generation
+    # OAuth Token Generation using Basic Auth header
     username = response.json["_id"]
     userpass = username + ":" + password
     encoded_u = base64.b64encode(userpass.encode()).decode()
@@ -29,6 +29,24 @@ def test_oauth_clients(client):
     token_auth_response = client.post(
         "api/auth_server/token",
         headers={"Authorization": "Basic %s" % encoded_u},
+        data=payload,
+    )
+    assert token_auth_response.status_code == 200
+
+    token = token_auth_response.json["access_token"]
+    assert JWTAuth.check_auth(self=None, token=token, allowed_roles=None, resource=None, method=None)
+
+    oauth_client = get_resource_service("oauth_clients").find_one(
+        req=None, name="client11"
+    )
+
+    # OAuth Token Generation using client credentials in body.
+    username = response.json["_id"]
+    userpass = password
+
+    payload = {"grant_type": "client_credentials", "client_id": username, "client_secret": userpass}
+    token_auth_response = client.post(
+        "api/auth_server/token",
         data=payload,
     )
     assert token_auth_response.status_code == 200

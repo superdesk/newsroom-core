@@ -36,10 +36,13 @@ def issue_token():
     current_time = utcnow()
     try:
         token_response = authorization.create_token_response()
+        if request.authorization:
+            client_id = request.authorization.get("username")
+        else:
+            client_id = request.form.get("client_id")
     except Exception:
         raise
     else:
-        client_id = request.authorization.get("username")
         if client_id:
             client = get_cached_resource_by_id("oauth_clients", client_id)
             superdesk.get_resource_service("oauth_clients").system_update(
