@@ -13,7 +13,6 @@ from jinja2.utils import htmlsafe_json_dumps  # type: ignore
 from superdesk import get_resource_service
 from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
-from newsroom.auth import get_user
 from datetime import datetime
 
 
@@ -145,6 +144,8 @@ def section_allowed(nav, sections):
 
 
 def get_company_sidenavs(blueprint=None):
+    from newsroom.auth import get_user
+
     user = get_user()
     company = None
     if user and user.get('company'):
