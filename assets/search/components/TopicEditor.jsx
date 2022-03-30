@@ -220,12 +220,9 @@ class TopicEditor extends React.Component {
             'list-item__preview',
             {'list-item__preview--new': this.props.editorFullscreen}
         );
-        const Container = (props) => showTabs ?
-            <div className="list-item__preview">{props.children}</div> :
-            <div className={containerClasses}>{props.children}</div>;
 
         return (
-            <Container>
+            <div className={showTabs ? 'list-item__preview' : containerClasses}>
                 <div className="list-item__preview-header">
                     <h3>{this.getTitle()}</h3>
                     <button
@@ -324,7 +321,7 @@ class TopicEditor extends React.Component {
                         />
                     </div>
                 )}
-            </Container>
+            </div>
         );
     }
 }
