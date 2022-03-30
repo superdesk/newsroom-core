@@ -1,25 +1,40 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 
 import TextInput from 'components/TextInput';
 import CheckboxInput from 'components/CheckboxInput';
+import {ToolTip} from 'ui/components/ToolTip';
 
 import {gettext} from 'utils';
 
 const TOPIC_NAME_MAXLENGTH = 30;
 
-const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubscribeChanged, readOnly, showSubscribeButton}) => (
+const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubscribeChanged, readOnly}) => (
     <div>
         <form onSubmit={save}>
-            {showSubscribeButton && (
+            {original._id == null ? null : (
                 <div className="form-group">
-                    <input
-                        name="notifications"
-                        type="button"
-                        className="btn btn-outline-primary"
-                        value={(topic.notifications || false) ? gettext('Unsubscribe') : gettext('Subscribe')}
-                        onClick={onSubscribeChanged}
-                    />
+                    <label htmlFor="notifications">{gettext('Email Notifications:')}</label>
+                    <div className="field">
+                        <ToolTip>
+                            <button
+                                type="button"
+                                className={classNames(
+                                    'btn',
+                                    {
+                                        'btn-primary': topic.notifications,
+                                        'btn-outline-primary': !topic.notifications
+                                    }
+                                )}
+                                title={gettext('Toggle email notifications')}
+                                name="notifications"
+                                onClick={onSubscribeChanged}
+                            >
+                                {(topic.notifications || false) ? gettext('Unsubscribe') : gettext('Subscribe')}
+                            </button>
+                        </ToolTip>
+                    </div>
                 </div>
             )}
             <TextInput
@@ -31,7 +46,7 @@ const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubs
                 autoFocus={true}
                 readOnly={readOnly}
             />
-            {!(original._id == null || !original.is_global) ? null : (
+            {original._id != null ? null : (
                 <CheckboxInput
                     label={gettext('Send me notifications')}
                     value={topic.notifications || false}
@@ -62,7 +77,6 @@ TopicForm.propTypes = {
     onSubscribeChanged: PropTypes.func.isRequired,
     save: PropTypes.func.isRequired,
     readOnly: PropTypes.bool,
-    showSubscribeButton: PropTypes.bool,
 };
 
 export default TopicForm;

@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {gettext} from '../utils';
-import {isEmpty, get, pickBy, isEqual} from 'lodash';
+import {isEmpty, get, pickBy, isEqual, every} from 'lodash';
 import CheckboxInput from 'components/CheckboxInput';
 
 class EditPanel extends React.Component {
     constructor(props) {
         super(props);
         this.onItemChange = this.onItemChange.bind(this);
+        this.toggleSelectAll = this.toggleSelectAll.bind(this);
         this.saveItems = this.saveItems.bind(this);
         this.initItems = this.initItems.bind(this);
 
@@ -18,6 +19,22 @@ class EditPanel extends React.Component {
         const item = event.target.name;
         const items = Object.assign({}, this.state.items);
         items[item] = !items[item];
+        this.updateItems(items);
+    }
+
+    toggleSelectAll(availableItems, allActive) {
+        let items = {};
+
+        if (!allActive) {
+            availableItems.forEach((item) => {
+                items[item._id] = true;
+            });
+        }
+
+        this.updateItems(items);
+    }
+
+    updateItems(items) {
         this.setState({items});
         if (this.props.onChange) {
             this.props.onChange({
@@ -63,8 +80,22 @@ class EditPanel extends React.Component {
     }
 
     renderList(items) {
+        const allActive = every(items, (item) => {
+            return !!this.state.items[item._id];
+        });
+
         return (
             <ul className="list-unstyled">
+                {!this.props.includeSelectAll ? null : (
+                    <li style={{borderBottom: '1px dotted #cacaca'}}>
+                        <CheckboxInput
+                            name="select_all"
+                            label={allActive ? gettext('Deselect All') : gettext('Select All')}
+                            onChange={() => this.toggleSelectAll(items, allActive)}
+                            value={allActive}
+                        />
+                    </li>
+                )}
                 {items.map((item) => (
                     <li key={item._id}>
                         <CheckboxInput
@@ -83,6 +114,9 @@ class EditPanel extends React.Component {
             <div className='tab-pane active' id='navigations'>
                 <form onSubmit={this.saveItems}>
                     <div className="list-item__preview-form">
+                        {!this.props.title ? null : (
+                            <div>{this.props.title}</div>
+                        )}
                         {!isEmpty(this.props.groups) && this.props.groups.map((group) => (
                             <div className="form-group" key={group._id}>
                                 <label>{group.name}</label>
@@ -130,6 +164,8 @@ EditPanel.propTypes = {
     cancelDisabled: PropTypes.bool,
     saveDisabled: PropTypes.bool,
     onCancel: PropTypes.func,
+    includeSelectAll: PropTypes.bool,
+    title: PropTypes.string,
 };
 
 export default EditPanel;
