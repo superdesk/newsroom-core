@@ -11,7 +11,7 @@ def test_email_template_find_one(app):
     template = service.find_one(req=None, _id="share_wire")
     assert template
     assert template["_id"] == "share_wire"
-    assert template["subject"]["default"] == "From {{ app_name }}: {{ subject_name }}"
+    assert template["subject"]["default"] == "From {{ app_name }}: {{ subject_name | safe }}"
 
     with pytest.raises(BadRequest):
         service.find_one(req=None, name="my_custom_template")
