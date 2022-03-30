@@ -108,8 +108,8 @@ export function recieveItem(data) {
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(wireData, readData, newsOnly, searchAllVersions) {
-    return {type: INIT_DATA, wireData, readData, newsOnly, searchAllVersions};
+export function initData(wireData, newsOnlyFilterText,readData, newsOnly, searchAllVersions) {
+    return {type: INIT_DATA, wireData, newsOnlyFilterText, readData, newsOnly, searchAllVersions};
 }
 
 export const TOGGLE_NEWS = 'TOGGLE_NEWS';
