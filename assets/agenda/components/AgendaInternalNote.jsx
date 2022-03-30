@@ -26,8 +26,8 @@ export default function AgendaInternalNote({internalNote, onlyIcon, noMargin, mt
 
         return (
             <div title={`${labelText}:\n${note}`}
-                data-toggle="tooltip"
-                data-placement="right"
+                data-bs-toggle="tooltip"
+                data-bs-placement="right"
                 className={className}
             >
                 <i className="icon--info icon--red icon--info--smaller"/>

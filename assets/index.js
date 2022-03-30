@@ -27,7 +27,7 @@ $(document).ready(function() {
 
     if ( !isTouchDevice() ) {
         $('html').addClass('no-touch');
-        $('[data-toggle="tooltip"]').tooltip();
+        $('[data-bs-toggle="tooltip"]').tooltip();
     }
 
     // collapsible group
