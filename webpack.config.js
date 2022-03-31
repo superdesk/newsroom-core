@@ -42,7 +42,10 @@ const config = {
         rules: [
             {
                 test: /\.jsx?$/,
-                include: path.resolve(__dirname, 'assets'),
+                include: [
+                    path.resolve(__dirname, 'assets'),
+                    path.resolve(__dirname, 'node_modules/bootstrap')
+                ],
                 loader: 'babel-loader',
                 options: {
                     presets: ['es2015', 'react'],
