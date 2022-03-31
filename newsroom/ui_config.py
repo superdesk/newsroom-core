@@ -41,7 +41,7 @@ class UIConfigResource(newsroom.Resource):
         },
         'enable_global_topics': {
             'type': 'boolean',
-            'default': False
+            'default': True
         },
         'open_coverage_content_in_same_page': {
             'type': 'boolean',
