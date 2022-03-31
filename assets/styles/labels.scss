@@ -72,6 +72,7 @@ $labels-palette: (
 // Generate label modifiers for each theme colour defined
 @each $color, $value in $theme-colors {
     .label--#{$color} {
-        @include alert-variant(theme-color-level($color, $alert-bg-level), theme-color-level($color, $alert-border-level), theme-color-level($color, $alert-color-level));
+        // TODO: Migrate this to a Bootstrap v5 variant
+        //@include alert-variant(theme-color-level($color, $alert-bg-level), theme-color-level($color, $alert-border-level), theme-color-level($color, $alert-color-level));
     }
 }
