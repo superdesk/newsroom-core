@@ -78,12 +78,6 @@ const config = {
     },
     plugins: [
         new ManifestPlugin(),
-        new webpack.ProvidePlugin({
-            $: 'jquery',
-            // bootstrap depenendecies
-            'window.jQuery': 'jquery',
-            'window.Popper': 'popper.js',
-        }),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'common',
             minChunks: Infinity,

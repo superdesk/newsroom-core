@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
+import {Tooltip} from 'bootstrap';
 
 import {gettext} from 'utils';
 import {isTouchDevice} from '../utils';
@@ -10,18 +11,21 @@ class NotificationList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {displayItems: false};
+        this.tooltip = null;
 
         this.toggleDisplay = this.toggleDisplay.bind(this);
     }
 
     componentDidMount() {
-        if ( !isTouchDevice() ) {
-            this.elem && $(this.elem).tooltip && $(this.elem).tooltip();
+        if (!isTouchDevice() && this.elem) {
+            this.tooltip = new Tooltip(this.elem);
         }
     }
 
     componentWillUnmount() {
-        this.elem && $(this.elem).tooltip && $(this.elem).tooltip('dispose'); // make sure it's gone
+        if (this.elem && this.tooltip) {
+            this.tooltip.dispose();
+        }
     }
 
     componentDidUpdate(prevProps) {

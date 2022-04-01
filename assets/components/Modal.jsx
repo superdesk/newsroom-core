@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
-import {gettext} from 'utils';
 import {connect} from 'react-redux';
+import {Modal as BSModal} from 'bootstrap';
+
+import {gettext} from 'utils';
 import {closeModal} from 'actions';
 
 import CloseButton from './CloseButton';
@@ -76,6 +78,7 @@ class Modal extends React.Component {
         super(props);
         this.onSubmit = this.onSubmit.bind(this);
         this.state = {submitting: false};
+        this.modal = null;
     }
 
     componentDidMount() {
@@ -85,14 +88,18 @@ class Modal extends React.Component {
             options.backdrop = 'static';
         }
 
-        $(this.elem).modal(options);
-        $(this.elem).on('hidden.bs.modal', () => {
-            this.props.closeModal();
-        });
+        if (this.elem) {
+            this.modal = new BSModal(this.elem);
+            this.elem.addEventListener('hidden.bd.modal', () => {
+                this.props.closeModal();
+            });
+        }
     }
 
     componentWillUnmount() {
-        $(this.elem).modal('hide'); // make sure it's gone
+        if (this.elem && this.modal) {
+            this.modal.hide();
+        }
     }
 
     onSubmit(e) {

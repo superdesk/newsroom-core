@@ -1,86 +1,113 @@
 import 'babel-polyfill';
 import 'url-search-params-polyfill';
 import 'whatwg-fetch';
+import {Tooltip, Dropdown} from 'bootstrap';
 import {isTouchDevice} from 'utils';
+import {setElementStyle, elementHasClass, replaceElementClasses, onElementClicked, removeElementClass} from 'domUtils';
 
-$(document).ready(function() {
+if (!isTouchDevice()) {
+    document.documentElement.classList.add('no-touch');
+}
+
+window.manageTopics = new Event('manage_topics');
+
+let filterOpen = false;
+let previewOpen = false;
+
+function isGrid() {
+    return elementHasClass('.wire-articles__item', 'wire-articles__item--grid');
+}
+
+// Function for responsive wire item
+function responsiveWireItem() {
+    if (filterOpen && !previewOpen) {
+        document.getElementsByClassName('wire-column__main')[0].classList.add('wire-articles__one-side-pane');
+        document.getElementsByClassName('wire-column__main')[0].classList.remove('wire-articles__two-side-panes');
+        if (isGrid()) {
+            replaceElementClasses('.wire-articles__item-wrap', [
+                'wire-articles__item-wrap',
+                'col-sm-12',
+                'col-md-6',
+                'col-xl-4',
+                'col-xxl-3'
+            ]);
+        }
+    } else if (filterOpen && previewOpen) {
+        document.getElementsByClassName('wire-column__main')[0].classList.remove('wire-articles__one-side-pane');
+        document.getElementsByClassName('wire-column__main')[0].classList.add('wire-articles__two-side-panes');
+        if (isGrid()) {
+            replaceElementClasses('.wire-articles__item-wrap', [
+                'wire-articles__item-wrap',
+                'col-sm-12',
+                'col-md-12',
+                'col-xl-6',
+                'col-xxl-4',
+            ]);
+        }
+    } else if (!filterOpen && previewOpen) {
+        document.getElementsByClassName('wire-column__main')[0].classList.remove('wire-articles__two-side-panes');
+        document.getElementsByClassName('wire-column__main')[0].classList.add('wire-articles__one-side-pane');
+        if (isGrid()) {
+            replaceElementClasses('.wire-articles__item-wrap', [
+                'wire-articles__item-wrap',
+                'col-sm-12',
+                'col-md-6',
+                'col-xl-4',
+                'col-xxl-3',
+            ]);
+        }
+    } else {
+        document.getElementsByClassName('wire-column__main')[0].classList.remove('wire-articles__one-side-pane');
+        document.getElementsByClassName('wire-column__main')[0].classList.remove('wire-articles__two-side-panes');
+        if (isGrid()) {
+            replaceElementClasses('.wire-articles__item-wrap', [
+                'wire-articles__item-wrap',
+                'col-sm-6',
+                'col-md-4',
+                'col-xl-3',
+                'col-xxl-2',
+            ])
+        }
+    }
+}
+
+function setupCarouselCaptionParallax() {
     // Carousel caption parallax
-    $('.content-main').scroll(function() {
-        var scrollTop = $('.content-main').scrollTop();
-        var imgPos = scrollTop / 2 + 'px';
-        $('.carousel-item').css('background-position', '50% ' + imgPos);
-        $('.carousel-caption').css('opacity', 1 - scrollTop / 400);
+    const contentMain = document.querySelector('.content-main');
 
-    });
+    if (contentMain) {
+        contentMain.addEventListener('scroll', () => {
+            const scrollTop = contentMain.scrollTop;
+            const imgPos = (scrollTop / 2) + 'px';
 
+            console.log(scrollTop);
+            setElementStyle('.carousel-item', 'backgroundPosition', '50% ' + imgPos);
+            setElementStyle('.carousel-caption', 'opacity', 1 - scrollTop / 400);
+        });
+    }
+}
+
+function setupContentNavbarScroll() {
     // Content navbar scroll
-    $('.wire-articles--list').scroll(function() {
-        var articles_scrollTop = $('.wire-articles--list').scrollTop();
-        if( articles_scrollTop>10 ) {
-            $('.wire-column__main-header').addClass('wire-column__main-header--small');
-        }
-        else {
-            $('.wire-column__main-header').removeClass('wire-column__main-header--small');
-        }
-    });
+    const wireArticlesList = document.querySelector('.wire-articles--list');
 
+    if (wireArticlesList) {
+        wireArticlesList.addEventListener('scroll', () => {
+            const scrollTop = wireArticlesList.scrollTop;
+            const mainHeader = document.querySelector('.wire-column__main-header');
 
-    if ( !isTouchDevice() ) {
-        $('html').addClass('no-touch');
-        $('[data-bs-toggle="tooltip"]').tooltip();
+            if (mainHeader) {
+                if (scrollTop > 10) {
+                    mainHeader.classList.add('wire-column__main-header--small');
+                } else {
+                    mainHeader.classList.remove('wire-column__main-header--small')
+                }
+            }
+        });
     }
+}
 
-    // collapsible group
-    $('.collapsible__link').click(function() {
-        $('.collapsible__link i').toggleClass('rotate-90-ccw');
-        $('.collapsible__form').toggle();
-    });
-
-    // Function for responsive wire item
-
-    var filterOpen = false;
-    var previewOpen = false;
-
-    window.manageTopics = new Event('manage_topics');
-
-    function isGrid() {
-        if ( $('.wire-articles__item').hasClass('wire-articles__item--grid')) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    function responsiveWireItem() {
-
-        if (filterOpen && !previewOpen) {
-            document.getElementsByClassName('wire-column__main')[0].classList.add('wire-articles__one-side-pane');
-            document.getElementsByClassName('wire-column__main')[0].classList.remove('wire-articles__two-side-panes');
-            if ( isGrid() ) {
-                $('.wire-articles__item-wrap').removeClass().addClass('wire-articles__item-wrap col-sm-12 col-md-6 col-xl-4 col-xxl-3');
-            }
-        } else if (filterOpen && previewOpen) {
-            document.getElementsByClassName('wire-column__main')[0].classList.remove('wire-articles__one-side-pane');
-            document.getElementsByClassName('wire-column__main')[0].classList.add('wire-articles__two-side-panes');
-            if ( isGrid() ) {
-                $('.wire-articles__item-wrap').removeClass().addClass('wire-articles__item-wrap col-sm-12 col-md-12 col-xl-6 col-xxl-4');
-            }
-        } else if (!filterOpen && previewOpen) {
-            document.getElementsByClassName('wire-column__main')[0].classList.remove('wire-articles__two-side-panes');
-            document.getElementsByClassName('wire-column__main')[0].classList.add('wire-articles__one-side-pane');
-            if ( isGrid() ) {
-                $('.wire-articles__item-wrap').removeClass().addClass('wire-articles__item-wrap col-sm-12 col-md-6 col-xl-4 col-xxl-3');
-            }
-        } else {
-            document.getElementsByClassName('wire-column__main')[0].classList.remove('wire-articles__one-side-pane');
-            document.getElementsByClassName('wire-column__main')[0].classList.remove('wire-articles__two-side-panes');
-            if ( isGrid() ) {
-                $('.wire-articles__item-wrap').removeClass().addClass('wire-articles__item-wrap col-sm-6 col-md-4 col-xl-3 col-xxl-2');
-            }
-        }
-    }
-
+function setupTogglingLeftBarNavigation() {
     // Toggle left bar navigation
     if (document.getElementsByClassName('content-bar__menu--nav')[0]) {
         document.getElementsByClassName('content-bar__menu--nav')[0].onclick = function(){
@@ -92,10 +119,10 @@ $(document).ready(function() {
             responsiveWireItem();
         };
     }
+}
 
-
+function setupOpenArticleFromWireList() {
     // Open article from wire list
-
     var listItem = document.getElementsByClassName('wire-articles__item');
 
     var currentItem;
@@ -121,43 +148,53 @@ $(document).ready(function() {
             }
         };
     }
+}
 
-    // Show and hide multi action bar
-
-    $('.wire-articles__item-select input').click(function(){
-        $('.multi-action-bar').toggleClass('multi-action-bar--open');
-    });
-
-    $('.multi-action-bar .btn').click(function(){
-        $('.multi-action-bar').removeClass('multi-action-bar--open');
-    });
-
+function setupTopBarSearchFocus() {
     // Top bar search items
-
+    // TODO: Use CSS to achieve the same goal here
     var searchForm = document.getElementsByClassName('search__form')[0];
     var searchInput = document.getElementsByClassName('search__input')[0];
-    var searchClear = document.getElementsByClassName('search__clear')[0];
-
     if (searchInput) {
         searchInput.onfocus = function() {
             searchForm.classList.add('searchForm--active');
         };
     }
+}
 
-    if (searchClear) {
-        searchClear.onclick = function() {
-            searchInput.value = '';
-        };
+function setupClosePreviewOnMobile() {
+    // close preview on mobile
+    if (isTouchDevice()) {
+        onElementClicked('.wire-column__preview__mobile-bar button', () => {
+            removeElementClass('.wire-column__preview', 'wire-column__preview--open');
+
+            previewOpen = !previewOpen;
+            responsiveWireItem();
+        });
+    }
+}
+
+function setupBootstrapElementsFromServerTemplates() {
+    if (!isTouchDevice()) {
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((ele) => {
+            new Tooltip(ele);
+        });
     }
 
-    // close preview on mobile
-    $('.wire-column__preview__mobile-bar button').click(function(){
-        $('.wire-column__preview').removeClass('wire-column__preview--open');
-
-        previewOpen = !previewOpen;
-        responsiveWireItem();
-    });
-
     // design view dropdown fix
-    $('[data-toggle="dropdown"]').dropdown();
+    document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach((ele) => {
+        new Dropdown(ele);
+    });
+}
+
+document.addEventListener('newshub-core--app-rendered', function() {
+    setupBootstrapElementsFromServerTemplates();
+
+    // TODO: Replace these remaining functions with React style implementations
+    setupCarouselCaptionParallax();
+    setupContentNavbarScroll();
+    setupTogglingLeftBarNavigation();
+    setupOpenArticleFromWireList();
+    setupTopBarSearchFocus();
+    setupClosePreviewOnMobile();
 });

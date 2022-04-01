@@ -295,6 +295,7 @@ export function shareItems(items) {
 
 export const TOGGLE_SELECTED = 'TOGGLE_SELECTED';
 export function toggleSelected(item) {
+    document.dispatchEvent(new Event('newshub-core--toggle-'))
     return {type: TOGGLE_SELECTED, item};
 }
 

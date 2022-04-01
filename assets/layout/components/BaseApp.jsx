@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
 import {createPortal} from 'react-dom';
+import {Tooltip} from 'bootstrap';
 import {isTouchDevice, gettext, isDisplayed} from 'utils';
 import {getSingleFilterValue} from 'search/utils';
 
@@ -23,6 +24,10 @@ export default class BaseApp extends React.Component {
             open: null,
             close: null,
             list: null,
+        };
+        this.tooltips = {
+            open: null,
+            close: null,
         };
 
         this.toggleSidebar = this.toggleSidebar.bind(this);
@@ -130,18 +135,28 @@ export default class BaseApp extends React.Component {
 
     componentDidMount() {
         this.initTooltips();
+
+        document.dispatchEvent(new Event('newshub-core--app-rendered'));
     }
 
     initTooltips() {
-        if ( !isTouchDevice() ) {
-            this.dom.open && $(this.dom.open).tooltip();
-            this.dom.close && $(this.dom.close).tooltip();
+        if (!isTouchDevice()) {
+            if (this.dom.open) {
+                this.tooltips.open = new Tooltip(this.dom.open);
+            }
+            if (this.dom.close) {
+                this.tooltips.close = new Tooltip(this.dom.close);
+            }
         }
     }
 
     disposeTooltips() {
-        this.dom.open && $(this.dom.open).tooltip('dispose');
-        this.dom.close && $(this.dom.close).tooltip('dispose');
+        if (this.dom.open && this.tooltips.open) {
+            this.tooltips.open.dispose();
+        }
+        if (this.dom.close && this.tooltips.close) {
+            this.tooltips.close.dispose();
+        }
     }
 
     componentWillUnmount() {

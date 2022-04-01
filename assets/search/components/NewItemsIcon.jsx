@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import 'react-toggle/style.css';
 import {get} from 'lodash';
+import {Tooltip} from 'bootstrap';
 
 import {gettext, isTouchDevice, isWireContext} from 'utils';
 
@@ -10,17 +11,18 @@ class NewItemsIcon extends React.Component {
         super(props);
 
         this.dom = {tooltip: null};
+        this.tooltip = null;
     }
 
     componentDidMount() {
         if (!isTouchDevice() && this.dom.tooltip) {
-            $(this.dom.tooltip).tooltip();
+            this.tooltip = new Tooltip(this.dom.tooltip);
         }
     }
 
     componentWillUnmount() {
-        if (this.dom.tooltip) {
-            $(this.dom.tooltip).tooltip('dispose'); // make sure it's gone
+        if (this.dom.tooltip && this.tooltip) {
+            this.tooltip.dispose();
         }
     }
 
