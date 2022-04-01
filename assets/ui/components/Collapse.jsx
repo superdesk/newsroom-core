@@ -28,7 +28,6 @@ export class CollapseBoxWithButton extends React.Component {
         if (this.dom.content && this.collapse) {
             this.collapse.dispose();
         }
-        // $(this.dom.content).collapse('dispose');
     }
 
     render() {

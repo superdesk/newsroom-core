@@ -66,7 +66,7 @@ function responsiveWireItem() {
                 'col-md-4',
                 'col-xl-3',
                 'col-xxl-2',
-            ])
+            ]);
         }
     }
 }
@@ -80,7 +80,6 @@ function setupCarouselCaptionParallax() {
             const scrollTop = contentMain.scrollTop;
             const imgPos = (scrollTop / 2) + 'px';
 
-            console.log(scrollTop);
             setElementStyle('.carousel-item', 'backgroundPosition', '50% ' + imgPos);
             setElementStyle('.carousel-caption', 'opacity', 1 - scrollTop / 400);
         });
@@ -100,7 +99,7 @@ function setupContentNavbarScroll() {
                 if (scrollTop > 10) {
                     mainHeader.classList.add('wire-column__main-header--small');
                 } else {
-                    mainHeader.classList.remove('wire-column__main-header--small')
+                    mainHeader.classList.remove('wire-column__main-header--small');
                 }
             }
         });
