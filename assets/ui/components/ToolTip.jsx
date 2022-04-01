@@ -12,27 +12,30 @@ export class ToolTip extends React.PureComponent {
     }
 
     getFirstChild() {
-        return !isTouchDevice() && this.elem && this.elem.firstChild && this.elem.firstChild ?
+        return this.elem && this.elem.firstChild ?
             this.elem.firstChild :
             null;
     }
 
     componentDidMount() {
-        const child = this.getFirstChild();
+        if (!isTouchDevice()) {
+            const child = this.getFirstChild();
 
-        if (!child) {
-            console.error('No child supplied to <ToolTip>!');
-        } else if (!child.getAttribute('title')) {
-            console.error('Child of <ToolTip> must have a "title" attribute!');
-        } else {
-            this.tooltip = new Tooltip(child, {trigger: 'hover'});
+            if (!child) {
+                console.error('No child supplied to <ToolTip>!');
+            } else if (!child.getAttribute('title')) {
+                console.error('Child of <ToolTip> must have a "title" attribute!');
+            } else {
+                this.tooltip = new Tooltip(child, {
+                    trigger: 'hover',
+                    placement: this.props.placement || 'top'
+                });
+            }
         }
     }
 
     componentWillUnmount() {
-        const child = this.getFirstChild();
-
-        if (child && this.tooltip) {
+        if (this.tooltip) {
             this.tooltip.dispose();
         }
     }
@@ -51,4 +54,5 @@ export class ToolTip extends React.PureComponent {
 
 ToolTip.propTypes = {
     children: PropTypes.node.isRequired,
+    placement: PropTypes.string,
 };

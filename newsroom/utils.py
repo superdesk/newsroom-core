@@ -14,11 +14,15 @@ from flask import current_app as app, json, abort, request, g, flash, session, u
 from flask_babel import gettext
 
 from newsroom.template_filters import time_short, parse_date as parse_short_date, format_datetime, is_admin
-from newsroom.auth import get_user_id
 
 
 DAY_IN_MINUTES = 24 * 60 - 1
 MAX_TERMS_SIZE = 1000
+
+
+def get_user_id():
+    from newsroom.auth import get_user_id as _get_user_id
+    return _get_user_id()
 
 
 def query_resource(resource, lookup=None, max_results=0, projection=None):
