@@ -199,6 +199,10 @@ def post_topic(_id):
     topic = get_json_or_400()
     topic['user'] = user['_id']
     topic['company'] = user.get('company')
+    topic['subscribers'] = [
+        ObjectId(uid)
+        for uid in topic.get('subscribers') or []
+    ]
 
     ids = get_resource_service('topics').post([topic])
     if topic.get('is_global'):
