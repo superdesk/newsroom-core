@@ -73,6 +73,7 @@ class AgendaTypeAheadFilter extends React.PureComponent {
                 >{gettext(filter.label)}</button>
                 <div className='dropdown-divider'></div>
                 <Typeahead
+                    id="agenda-typeahead-filter"
                     labelKey={filter.label}
                     onChange={this.onChange}
                     options={getDropdownItems(filter, aggregations, toggleFilter, processBuckets)}
