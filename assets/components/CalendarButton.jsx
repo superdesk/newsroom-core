@@ -12,7 +12,7 @@ class CalendarButton extends React.Component {
     constructor (props) {
         super(props);
 
-        this.state = {startDate: moment(this.props.activeDate)};
+        this.state = {startDate: moment(this.props.activeDate).toDate()};
         this.handleChange = this.handleChange.bind(this);
     }
 
@@ -29,11 +29,11 @@ class CalendarButton extends React.Component {
         const isStartDateToday = moment.isMoment(this.state.startDate) && !this.state.startDate.isSame(moment(), 'day');
         const datePicker = (<DatePicker
             customInput={<CalendarButtonWrapper active={isStartDateToday}/>}
-            dateFormat='dddd, MMMM D'
+            dateFormat="EEEE, MMMM d" // TODO: Make this configurable (DatePicker now uses date-fns: https://date-fns.org/v2.16.1/docs/format)
             todayButton={gettext('Today')}
             selected={this.state.startDate}
             onChange={this.handleChange}
-            highlightDates={[moment()]}
+            highlightDates={[moment().toDate()]}
             locale={window.locale || 'en'}
             popperModifiers={{
                 offset: {
