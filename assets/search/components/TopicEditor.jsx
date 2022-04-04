@@ -125,6 +125,7 @@ class TopicEditor extends React.Component {
         }
 
         this.setState({topic});
+        this.props.onTopicChanged();
     }
 
     saveTopic(event) {
