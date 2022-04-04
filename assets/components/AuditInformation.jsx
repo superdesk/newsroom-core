@@ -28,7 +28,7 @@ class AuditInformation extends React.Component {
         const users = get(this.props, 'users.length') ? this.props.users : this.props.editUsers;
 
         if (field === '_created' && item._created) {
-            const creator = getItemFromArray(item.original_creator,
+            const creator = getItemFromArray(item.users,
                 users || []);
             return (
                 <div className='wire-column__preview__date'>

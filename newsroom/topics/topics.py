@@ -19,7 +19,8 @@ class TopicsResource(newsroom.Resource):
         'is_global': {'type': 'boolean', 'default': False},
         'subscribers': {
             'type': 'list',
-            'schema': newsroom.Resource.rel('users', required=True)
+            'schema': newsroom.Resource.rel('users'),
+            'required': True
         },
         'timezone_offset': {'type': 'integer', 'nullable': True},
         'topic_type': {'type': 'string', 'nullable': True},
