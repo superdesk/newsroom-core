@@ -19,7 +19,7 @@ class TopicsResource(newsroom.Resource):
         'is_global': {'type': 'boolean', 'default': False},
         'subscribers': {
             'type': 'list',
-            'schema': newsroom.Resource.rel('users', required=True)
+            'schema': newsroom.Resource.rel('users', required=True),
         },
         'timezone_offset': {'type': 'integer', 'nullable': True},
         'topic_type': {'type': 'string', 'nullable': True},
@@ -47,7 +47,7 @@ class TopicsService(newsroom.Service):
         # If ``is_global`` has been turned off, then remove all subscribers
         # except for the owner of the Topic
         if original.get('is_global') and 'is_global' in updates and not updates.get('is_global'):
-            updates['subscribers'] = [original['user']] if original['user'] in original['subscribers'] else []
+            updates['subscribers'] = [original['user']] if original['user'] in original.get('subscribers', []) else []
 
     def get_items(self, item_ids):
         return self.get(req=None, lookup={"_id": {"$in": item_ids}})
