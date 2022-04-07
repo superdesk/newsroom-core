@@ -11,6 +11,7 @@ import {
     AGENDA_WIRE_ITEMS,
     WATCH_COVERAGE,
     STOP_WATCHING_COVERAGE,
+    RECIEVE_FEATURED_ITEMS_COUNT,
 } from './actions';
 
 import {get, isEmpty, uniqBy, uniq} from 'lodash';
@@ -59,6 +60,7 @@ const initialState = {
     searchInitiated: false,
     uiConfig: {},
     groups: [],
+    featuredItemsCount: null,
 };
 
 function processAggregations(aggregations) {
@@ -291,6 +293,12 @@ export default function agendaReducer(state = initialState, action) {
                 ...state.agenda,
                 agendaWireItems: action.items
             }
+        };
+
+    case RECIEVE_FEATURED_ITEMS_COUNT:
+        return {
+            ...state,
+            featuredItemsCount: action.data,
         };
 
     default:

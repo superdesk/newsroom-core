@@ -4,10 +4,10 @@ import AgendaFeaturedStoriesToogle from './AgendaFeaturedStoriesToogle.jsx';
 
 import ListViewOptions from 'components/ListViewOptions';
 
-function AgendaListViewControls({activeView, setView, hideFeaturedToggle, toggleFeaturedFilter, featuredFilter}) {
+function AgendaListViewControls({activeView, setView, hideFeaturedToggle, toggleFeaturedFilter, featuredFilter, featuredItemsCount}) {
     return(
         <div className='content-bar__right'>
-            {!hideFeaturedToggle && <AgendaFeaturedStoriesToogle onChange={toggleFeaturedFilter} featuredFilter={featuredFilter}/>}
+            {!hideFeaturedToggle && (featuredItemsCount > 0) && <AgendaFeaturedStoriesToogle onChange={toggleFeaturedFilter} featuredFilter={featuredFilter}/>}
             <ListViewOptions setView={setView} activeView={activeView} />
         </div>
     );
@@ -20,6 +20,7 @@ AgendaListViewControls.propTypes = {
     toggleFeaturedFilter: PropTypes.func.isRequired,
     hideFeaturedToggle: PropTypes.bool,
     featuredFilter: PropTypes.bool,
+    featuredItemsCount: PropTypes.number,
 };
 
 export default AgendaListViewControls;

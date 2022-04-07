@@ -91,6 +91,13 @@ def search():
     return send_response('agenda', response)
 
 
+@blueprint.route('/agenda/count')
+@login_required
+def get_agenda_featured_item_count():
+    items = get_resource_service('agenda_featured').get_all()
+    return flask.jsonify({'count': items.count()}, 200)
+
+
 def get_view_data():
     user = get_user()
     topics = get_user_topics(user['_id']) if user else []
