@@ -1,16 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {Tooltip} from 'bootstrap';
+
 import {isTouchDevice} from '../../utils';
 
 class ProfileToggle extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.tooltip = null;
+    }
+
     componentDidMount() {
-        if ( !isTouchDevice() ) {
-            this.elem && $(this.elem).tooltip();
+        if (!isTouchDevice() && this.elem) {
+            this.tooltip = new Tooltip(this.elem);
         }
     }
 
     componentWillUnmount() {
-        this.elem && $(this.elem).tooltip('dispose'); // make sure it's gone
+        if (this.elem && this.tooltip) {
+            this.tooltip.dispose();
+        }
     }
 
     render() {

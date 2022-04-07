@@ -13,6 +13,7 @@ class SearchBar extends React.Component {
         this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.onClear = this.onClear.bind(this);
+        this.onFocus = this.onFocus.bind(this);
         this.state = {query: props.query || ''};
     }
 
@@ -28,6 +29,10 @@ class SearchBar extends React.Component {
     onClear(){
         this.setAndFetch();
         this.setState({query: ''});
+    }
+
+    onFocus() {
+
     }
 
     setAndFetch(q = '') {
@@ -53,13 +58,15 @@ class SearchBar extends React.Component {
                     'searchForm--active': !!this.state.query,
                 })}>
                     <form className='form-inline' role="search" aria-label={gettext('search')} onSubmit={this.onSubmit}>
-                        <input type='text'
+                        <input
+                            type='text'
                             name='q'
                             className='search__input form-control'
                             placeholder={gettext('Search for...')}
                             aria-label={gettext('Search for...')}
                             value={this.state.query || ''}
                             onChange={this.onChange}
+                            onFocus={this.onFocus}
                         />
                         <div className='search__form__buttons'>
                             <button

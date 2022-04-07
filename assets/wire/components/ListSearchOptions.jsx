@@ -13,12 +13,14 @@ export class ListSearchOptions extends React.PureComponent {
     }
 
     componentDidMount() {
-        $(this.btnGroup).on('shown.bs.dropdown', () => {
-            this.setState({isOpen: true});
-        });
-        $(this.btnGroup).on('hidden.bs.dropdown', () => {
-            this.setState({isOpen: false});
-        });
+        if (this.btnGroup) {
+            this.btnGroup.addEventListener('shown.bs.dropdown', () => {
+                this.setState({isOpen: true});
+            });
+            this.btnGroup.addEventListener('hidden.bs.dropdown', () => {
+                this.setState({isOpen: false});
+            });
+        }
     }
 
     render() {

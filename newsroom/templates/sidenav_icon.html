@@ -1,7 +1,7 @@
 <li class="sidenav-icons__item {% if request.endpoint == nav.endpoint or request.endpoint in nav.secondary_endpoints %}active{% endif %} {% if nav.badge or nav.url %}badge--top-right{% endif %}">
     <a href="{{ url_for(nav.endpoint) if nav.endpoint else nav.url }}" title="{{  gettext(nav.name) }}"
-        data-toggle="tooltip"
-        data-placement="right"
+        data-bs-toggle="tooltip"
+        data-bs-placement="right"
         aria-label="{{  gettext(nav.name) }}"
         role="button"
         {% if nav.url %}target="_blank"{% endif %}

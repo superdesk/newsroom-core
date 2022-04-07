@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {Tooltip} from 'bootstrap';
 
 import {gettext} from 'utils';
 
@@ -18,6 +19,7 @@ class ListViewOptions extends React.PureComponent {
 
         this.toggleOpen = this.toggleOpen.bind(this);
         this.handleClickOutside = this.handleClickOutside.bind(this);
+        this.tooltip = null;
     }
 
     toggleOpen() {
@@ -31,13 +33,17 @@ class ListViewOptions extends React.PureComponent {
 
     componentDidMount() {
         if ( !isTouchDevice() ) {
-            this.elem && $(this.elem).tooltip();
+            if (this.elem) {
+                this.tooltip = new Tooltip(this.elem);
+            }
             document.addEventListener('mousedown', this.handleClickOutside);
         }
     }
 
     componentWillUnmount() {
-        this.elem && $(this.elem).tooltip('dispose'); // make sure it's gone
+        if (this.elem && this.tooltip) {
+            this.tooltip.dispose();
+        }
         document.removeEventListener('mousedown', this.handleClickOutside);
     }
 

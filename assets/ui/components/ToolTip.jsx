@@ -1,10 +1,18 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import {Tooltip} from 'bootstrap';
+
 import {isTouchDevice} from 'utils';
 
 export class ToolTip extends React.PureComponent {
+    constructor(props) {
+        super(props);
+
+        this.tooltip = null;
+    }
+
     getFirstChild() {
-        return this.elem && this.elem.firstChild && this.elem.firstChild ?
+        return this.elem && this.elem.firstChild ?
             this.elem.firstChild :
             null;
     }
@@ -18,19 +26,17 @@ export class ToolTip extends React.PureComponent {
             } else if (!child.getAttribute('title')) {
                 console.error('Child of <ToolTip> must have a "title" attribute!');
             } else {
-                $(child).tooltip({trigger: 'hover', placement: this.props.placement || 'top'});
+                this.tooltip = new Tooltip(child, {
+                    trigger: 'hover',
+                    placement: this.props.placement || 'top'
+                });
             }
         }
-
     }
 
     componentWillUnmount() {
-        if (!isTouchDevice()) {
-            const child = this.getFirstChild();
-
-            if (child) {
-                $(child).tooltip('dispose'); // make sure it's gone
-            }
+        if (this.tooltip) {
+            this.tooltip.dispose();
         }
     }
 

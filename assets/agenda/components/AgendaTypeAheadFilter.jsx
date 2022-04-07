@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
-import 'react-bootstrap-typeahead/css/Typeahead-bs4.css';
 import classNames from 'classnames';
 import AgendaFilterButton from './AgendaFilterButton';
 
@@ -49,7 +48,7 @@ class AgendaTypeAheadFilter extends React.PureComponent {
 
         this.toggleDropdown();
     }
-   
+
     onChange(selected) {
         this.toggleDropdown();
         this.props.toggleFilter(this.props.filter.field, selected.length ? selected : null);
@@ -74,6 +73,7 @@ class AgendaTypeAheadFilter extends React.PureComponent {
                 >{gettext(filter.label)}</button>
                 <div className='dropdown-divider'></div>
                 <Typeahead
+                    id="agenda-typeahead-filter"
                     labelKey={filter.label}
                     onChange={this.onChange}
                     options={getDropdownItems(filter, aggregations, toggleFilter, processBuckets)}
