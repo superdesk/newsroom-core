@@ -20,7 +20,7 @@ from .token import generate_auth_token, verify_auth_token
 
 
 @blueprint.route('/login', methods=['GET', 'POST'])
-@limiter.limit('60/hour')
+@limiter.limit('60/minute')
 def login():
     form = LoginForm()
     if form.validate_on_submit():
