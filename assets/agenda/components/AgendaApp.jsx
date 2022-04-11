@@ -282,7 +282,7 @@ AgendaApp.propTypes = {
     state: PropTypes.object,
     isLoading: PropTypes.bool,
     totalItems: PropTypes.number,
-    featuredItemsCount: PropTypes.number,
+    featuredItemsCount: PropTypes.bool,
     activeQuery: PropTypes.string,
     activeFilter: PropTypes.object,
     createdFilter: PropTypes.object,

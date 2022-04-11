@@ -8,7 +8,7 @@ import ListViewOptions from 'components/ListViewOptions';
 function AgendaListViewControls({activeView, setView, hideFeaturedToggle, toggleFeaturedFilter, featuredFilter, featuredItemsCount}) {
     return(
         <div className='content-bar__right'>
-            {!hideFeaturedToggle && (featuredItemsCount > 0) && DISPLAY_AGENDA_FEATURED_STORIES_ONLY && 
+            {!hideFeaturedToggle && featuredItemsCount  && DISPLAY_AGENDA_FEATURED_STORIES_ONLY && 
                 <AgendaFeaturedStoriesToogle onChange={toggleFeaturedFilter} featuredFilter={featuredFilter}/>
             }
             <ListViewOptions setView={setView} activeView={activeView} />
@@ -23,7 +23,7 @@ AgendaListViewControls.propTypes = {
     toggleFeaturedFilter: PropTypes.func.isRequired,
     hideFeaturedToggle: PropTypes.bool,
     featuredFilter: PropTypes.bool,
-    featuredItemsCount: PropTypes.number,
+    featuredItemsCount: PropTypes.bool,
 };
 
 export default AgendaListViewControls;

@@ -60,7 +60,7 @@ const initialState = {
     searchInitiated: false,
     uiConfig: {},
     groups: [],
-    featuredItemsCount: null,
+    featuredItemsCount: false,
 };
 
 function processAggregations(aggregations) {

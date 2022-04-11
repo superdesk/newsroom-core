@@ -332,7 +332,7 @@ export function fetchItems() {
 export function fetchFeaturedItemsCount() {
     return (dispatch) => {
         return server.get('/agenda_featured/count')
-            .then((data) => dispatch(recieveFeaturedItemsCount(data[0]['count'])))
+            .then((data) => dispatch(recieveFeaturedItemsCount(data[0]['has_agenda_featured_items'])))
             .catch(errorHandler);
     };
 }

@@ -94,8 +94,15 @@ def search():
 @blueprint.route('/agenda_featured/count')
 @login_required
 def get_agenda_featured_item_count():
-    items = get_resource_service('agenda_featured').get_all()
-    return flask.jsonify({'count': items.count()}, 200)
+    return flask.jsonify(
+        {
+            "has_agenda_featured_items": get_resource_service(
+                "agenda_featured"
+            ).find_one(req=None)
+            is not None
+        },
+        200,
+    )
 
 
 def get_view_data():
