@@ -300,6 +300,7 @@ CLIENT_CONFIG = {
     'coverage_types': COVERAGE_TYPES,
     'list_animations': True,  # Enables or disables the animations for list item select boxes,
     'display_news_only': True,  # Displays news only switch in wire,
+    'display_agenda_featured_stories_only': True,   # Displays top/featured stories switch in agenda,
     'default_timezone': DEFAULT_TIMEZONE,
     'item_actions': {},
     'display_abstract': DISPLAY_ABSTRACT,
