@@ -59,6 +59,7 @@ const initialState = {
     searchInitiated: false,
     uiConfig: {},
     groups: [],
+    hasAgendaFeaturedItems: false,
 };
 
 function processAggregations(aggregations) {
@@ -256,6 +257,7 @@ export default function agendaReducer(state = initialState, action) {
             locators: action.agendaData.locators || null,
             uiConfig: action.agendaData.ui_config || {},
             groups: action.agendaData.groups || [],
+            hasAgendaFeaturedItems: action.agendaData.has_agenda_featured_items || false,
         };
     }
 

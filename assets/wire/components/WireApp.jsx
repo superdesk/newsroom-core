@@ -79,6 +79,7 @@ class WireApp extends BaseApp {
     }
 
     render() {
+        const newsOnlyFilterText = this.props.newsOnlyFilterText;
         const modal = this.renderModal(this.props.modal);
 
         const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x) => x).length;
@@ -184,7 +185,7 @@ class WireApp extends BaseApp {
                             activeNavigation={this.props.activeNavigation}
                             newsOnly={this.props.newsOnly}
                             toggleNews={this.props.toggleNews}
-                            hideNewsOnly={!(this.props.context === 'wire' && DISPLAY_NEWS_ONLY)}
+                            hideNewsOnly={!(this.props.context === 'wire' && DISPLAY_NEWS_ONLY && newsOnlyFilterText)}
                             hideSearchAllVersions={!(this.props.context === 'wire' && DISPLAY_ALL_VERSIONS_TOGGLE)}
                             searchAllVersions={this.props.searchAllVersions}
                             toggleSearchAllVersions={this.props.toggleSearchAllVersions}
@@ -273,6 +274,7 @@ WireApp.propTypes = {
     user: PropTypes.string,
     company: PropTypes.string,
     topics: PropTypes.array,
+    newsOnlyFilterText: PropTypes.string,
     fetchItems: PropTypes.func,
     actions: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string,
@@ -312,6 +314,7 @@ WireApp.propTypes = {
 const mapStateToProps = (state) => ({
     state: state,
     isLoading: state.isLoading,
+    newsOnlyFilterText: state.newsOnlyFilterText,
     totalItems: state.totalItems,
     activeQuery: searchQuerySelector(state),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,

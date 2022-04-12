@@ -195,6 +195,7 @@ class AgendaApp extends BaseApp {
                             hideFeaturedToggle={!!hideFeaturedToggle}
                             toggleFeaturedFilter={this.props.toggleFeaturedFilter}
                             featuredFilter={this.props.featuredOnly}
+                            hasAgendaFeaturedItems={this.props.hasAgendaFeaturedItems}
                         />
                     </nav>
                 </section>,
@@ -281,6 +282,7 @@ AgendaApp.propTypes = {
     state: PropTypes.object,
     isLoading: PropTypes.bool,
     totalItems: PropTypes.number,
+    hasAgendaFeaturedItems: PropTypes.bool,
     activeQuery: PropTypes.string,
     activeFilter: PropTypes.object,
     createdFilter: PropTypes.object,
@@ -367,6 +369,7 @@ const mapStateToProps = (state) => ({
     showSaveTopic: showSaveTopicSelector(state),
     previewConfig: previewConfigSelector(state),
     groups: get(state, 'groups', []),
+    hasAgendaFeaturedItems: state.hasAgendaFeaturedItems,
 });
 
 const mapDispatchToProps = (dispatch) => ({

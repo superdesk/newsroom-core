@@ -323,7 +323,6 @@ export function fetchItems() {
     };
 }
 
-
 export function fetchItem(id) {
     return (dispatch) => {
         return server.get(`/agenda/${id}?format=json`)

@@ -109,6 +109,7 @@ def get_view_data():
         'locators': get_vocabulary('locators'),
         'ui_config': get_resource_service('ui_config').get_section_config('agenda'),
         "groups": app.config.get("AGENDA_GROUPS", []),
+        'has_agenda_featured_items': get_resource_service('agenda_featured').find_one(req=None) is not None,
     }
 
 
