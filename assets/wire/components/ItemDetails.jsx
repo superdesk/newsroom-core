@@ -4,7 +4,7 @@ import {isEmpty} from 'lodash';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import AgendaLinks from './AgendaLinks';
-import {isDisplayed, fullDate, gettext} from 'utils';
+import {isDisplayed, gettext, formatDate, formatTime} from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import {
@@ -78,7 +78,10 @@ function ItemDetails({
                         <ArticleBody itemType={itemType}>
                             <ArticleEmbargoed item={item} />
                             <div className='wire-column__preview__date pb-2'>
-                                {gettext('Published')}{' '}{fullDate(item.versioncreated)}
+                                {gettext('Published on {{ date }} at {{ time }}', {
+                                    date: formatDate(item.versioncreated),
+                                    time: formatTime(item.versioncreated),
+                                })}
                             </div>
                             {isDisplayed('headline', detailsConfig) && <ArticleHeadline item={item}/>}
                             <ArticleAuthor item={item} displayConfig={detailsConfig} />
