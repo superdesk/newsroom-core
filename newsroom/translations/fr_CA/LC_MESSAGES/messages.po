@@ -266,7 +266,7 @@ msgstr "Entrée de calendrier non trouvée"
 
 #: newsroom/auth/forms.py:9
 msgid "Editor"
-msgstr ""
+msgstr "Rédacteur en chef"
 
 #: newsroom/auth/forms.py:10
 msgid "Journalist"
@@ -618,7 +618,7 @@ msgstr "Limite de taux excédée"
 
 #: newsroom/oauth_clients/__init__.py:13
 msgid "OAuth Clients"
-msgstr ""
+msgstr "Clients OAuth"
 
 #: newsroom/oauth_clients/views.py:61
 msgid "Client not found"
@@ -1217,7 +1217,7 @@ msgstr "Photo de l'article"
 
 #: assets/missing-translations.js:11 newsroom/wire/__init__.py:80
 msgid "News only filter"
-msgstr ""
+msgstr "Filtre Nouvelles seulement"
 
 #: newsroom/wire/__init__.py:82
 msgid ""
@@ -1780,16 +1780,18 @@ msgstr "URL invalide."
 
 #: assets/cards/actions.js:94
 msgid "Invalid count of media."
-msgstr ""
+msgstr "Nombre de médias non valide."
 
 #: assets/cards/actions.js:101
 msgid "Count of media should be greater than zero."
-msgstr ""
+msgstr "Le nombre de médias doit être supérieur à zéro."
 
 #: assets/cards/actions.js:107
 #: assets/components/cards/edit/ConfigExternalMedia.jsx:28
 msgid "Total media count across all media config should be between 1 and 4."
 msgstr ""
+"Le nombre total de médias dans toutes les configurations de médias doit être"
+" compris entre 1 et 4."
 
 #: assets/cards/actions.js:112
 msgid "Failed to update Card."
@@ -2303,43 +2305,43 @@ msgstr "Message"
 
 #: assets/components/cards/utils.js:23
 msgid "6-text-only"
-msgstr ""
+msgstr "6 tuiles texte"
 
 #: assets/components/cards/utils.js:30
 msgid "4-picture-text"
-msgstr ""
+msgstr "4 tuiles texte et photo"
 
 #: assets/components/cards/utils.js:37
 msgid "4-media-gallery"
-msgstr ""
+msgstr "4 tuiles média"
 
 #: assets/components/cards/utils.js:44
 msgid "4-photo-gallery"
-msgstr ""
+msgstr "4 tuiles photo"
 
 #: assets/components/cards/utils.js:51
 msgid "1x1-top-news"
-msgstr ""
+msgstr "1x1 tuile principaux articles"
 
 #: assets/components/cards/utils.js:58
 msgid "2x2-top-news"
-msgstr ""
+msgstr "2x2 tuiles principaux articles"
 
 #: assets/components/cards/utils.js:65
 msgid "3-text-only"
-msgstr ""
+msgstr "3 tuiles texte"
 
 #: assets/components/cards/utils.js:72
 msgid "3-picture-text"
-msgstr ""
+msgstr "3 tuiles texte et photo"
 
 #: assets/components/cards/utils.js:79
 msgid "4-text-only"
-msgstr ""
+msgstr "4 tuiles texte"
 
 #: assets/components/cards/utils.js:86
 msgid "2x2-events"
-msgstr ""
+msgstr "2x2 tuiles événements"
 
 #: assets/components/cards/utils.js:93
 msgid "6 Navigation Tiles Per Row"
@@ -2372,7 +2374,7 @@ msgstr ""
 
 #: assets/components/cards/edit/ConfigExternalMedia.jsx:40
 msgid "External url to fetch media"
-msgstr ""
+msgstr "URL externe pour récupérer le média"
 
 #: assets/components/cards/edit/ConfigExternalMedia.jsx:48
 msgid "Media Count"
@@ -2884,11 +2886,11 @@ msgstr "L'élément a été partagé avec succès."
 
 #: assets/search/actions.js:429
 msgid "Topic subscribed successfully"
-msgstr ""
+msgstr "Abonné au sujet"
 
 #: assets/search/actions.js:437
 msgid "Topic unsubscribed successfully"
-msgstr ""
+msgstr "Désabonné au sujet"
 
 #: assets/search/components/FollowedTopics.jsx:92
 msgid "Would you like to delete topic {{name}}?"
