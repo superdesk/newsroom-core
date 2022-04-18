@@ -1,7 +1,7 @@
 from bson import ObjectId
-import superdesk
 import newsroom
 from newsroom.utils import set_original_creator, set_version_creator
+import superdesk
 
 
 class TopicsResource(newsroom.Resource):

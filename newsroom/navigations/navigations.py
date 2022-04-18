@@ -1,7 +1,6 @@
 import newsroom
-import superdesk
-
 from newsroom.products.products import get_products_by_company
+import superdesk
 
 
 class NavigationsResource(newsroom.Resource):
