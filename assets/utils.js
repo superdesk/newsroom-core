@@ -34,7 +34,7 @@ export const now = moment(); // to enable mocking in tests
 const NEWSROOM = 'newsroom';
 const CLIENT_CONFIG = 'client_config';
 
-function getLocaleFormat(formatType) {
+function getLocaleFormat(formatType, defaultFormat) {
     const formats = getConfig('locale_formats', {});
     const locale = getLocale();
 
@@ -48,7 +48,7 @@ function getLocaleFormat(formatType) {
         return formats[defaultLanguage][formatType];
     }
 
-    return 'DD-MM-YYYY';
+    return defaultFormat || 'DD-MM-YYYY';
 }
 
 const getTimeFormat = () => getLocaleFormat('TIME_FORMAT');
@@ -61,7 +61,7 @@ export const TIME_FORMAT = getTimeFormat();
 export const DATE_FORMAT = getDateFormat();
 export const COVERAGE_DATE_TIME_FORMAT = getCoverageDateTimeFormat();
 export const COVERAGE_DATE_FORMAT = getCoverageDateFormat();
-const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
+export const DATETIME_FORMAT = getLocaleFormat('DATETIME_FORMAT', `${TIME_FORMAT} ${DATE_FORMAT}`);
 
 export const SERVER_DATETIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss+0000';
 export const DAY_IN_MINUTES = 24 * 60 - 1;
