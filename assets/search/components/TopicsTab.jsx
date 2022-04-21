@@ -12,7 +12,6 @@ import {CollapseBoxWithButton} from '../../ui/components/Collapse';
 import {TopicItem} from './TopicItem';
 import {globalTopicsEnabledSelector} from 'ui/selectors';
 
-const tabName = isWireContext() ? 'Wire Topics' : 'Agenda Topics';
 const manageTopics = () => document.dispatchEvent(window.manageTopics);
 
 function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNewItems, globalTopicsEnabled}) {
@@ -38,6 +37,8 @@ function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNew
     const globalTopics = (topics || []).filter(
         (topic) => topic.is_global
     );
+
+    const tabName = isWireContext() ? gettext('Wire Topics') : gettext('Agenda Topics');
 
     return !globalTopicsEnabled ? (
         <React.Fragment>
