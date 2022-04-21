@@ -56,9 +56,8 @@ def create():
         return validation
 
     if product.get('navigations'):
-        product['navigations'] = [str(get_entity_or_404(_id, 'navigations')['_id'])
-                                  for _id in product.get('navigations').split(',')]
-
+        product['navigations'] = [ObjectId(get_entity_or_404(_id, 'navigations')['_id'])
+                                  for _id in product.get('navigations')]
     set_original_creator(product)
     ids = get_resource_service('products').post([product])
     return jsonify({'success': True, '_id': ids[0]}), 201
