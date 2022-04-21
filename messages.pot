@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-04-14 15:20+0200\n"
+"POT-Creation-Date: 2022-04-21 13:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -59,51 +59,51 @@ msgstr ""
 msgid "Invalid product parameter"
 msgstr ""
 
-#: newsroom/settings.py:90 newsroom/settings.py:105
+#: newsroom/settings.py:89 newsroom/settings.py:104
 msgid "Company expiry alert recipients"
 msgstr ""
 
-#: newsroom/settings.py:91 newsroom/settings.py:107
+#: newsroom/settings.py:90 newsroom/settings.py:106
 msgid "Coverage request recipients"
 msgstr ""
 
-#: newsroom/settings.py:95
+#: newsroom/settings.py:94
 msgid "{}: Email IDs not in proper format"
 msgstr ""
 
-#: newsroom/settings.py:99
+#: newsroom/settings.py:98
 msgid "General Settings"
 msgstr ""
 
-#: newsroom/settings.py:104
+#: newsroom/settings.py:103
 msgid "Google Analytics ID"
 msgstr ""
 
-#: newsroom/settings.py:106
+#: newsroom/settings.py:105
 msgid ""
 "Comma separated list of email addresses to which the expiration alerts of"
 " companies will be sent to."
 msgstr ""
 
-#: newsroom/settings.py:108
+#: newsroom/settings.py:107
 msgid ""
 "Comma separated list of email addresses who will receive the coverage "
 "request emails."
 msgstr ""
 
-#: newsroom/settings.py:110
+#: newsroom/settings.py:109
 msgid "System alerts recipients"
 msgstr ""
 
-#: newsroom/settings.py:111
+#: newsroom/settings.py:110
 msgid "Comma separated list of email addresses who will receive system alerts."
 msgstr ""
 
-#: newsroom/settings.py:113
+#: newsroom/settings.py:112
 msgid "Monitoring report logo image"
 msgstr ""
 
-#: newsroom/settings.py:114
+#: newsroom/settings.py:113
 msgid "Monitoring report logo image (jpg or png) for RTF reports."
 msgstr ""
 
@@ -225,19 +225,19 @@ msgstr ""
 msgid "Coverage added"
 msgstr ""
 
-#: newsroom/agenda/views.py:180
+#: newsroom/agenda/views.py:181
 msgid "Cannot edit coverage watch when watching a parent item."
 msgstr ""
 
-#: newsroom/agenda/views.py:185
+#: newsroom/agenda/views.py:186
 msgid "Coverage not found."
 msgstr ""
 
-#: newsroom/agenda/views.py:195
+#: newsroom/agenda/views.py:196
 msgid "Error removing watch."
 msgstr ""
 
-#: newsroom/agenda/views.py:224
+#: newsroom/agenda/views.py:225
 msgid "Agenda item not found"
 msgstr ""
 
@@ -1266,7 +1266,7 @@ msgstr ""
 msgid "New card"
 msgstr ""
 
-#: assets/utils.js:624
+#: assets/utils.js:625
 msgid "Failed to process request!"
 msgstr ""
 
@@ -1343,35 +1343,35 @@ msgstr ""
 msgid "Sorry, Copy is not supported."
 msgstr ""
 
-#: assets/agenda/actions.js:341
+#: assets/agenda/actions.js:340
 msgid "Started watching items successfully."
 msgstr ""
 
-#: assets/agenda/actions.js:352
+#: assets/agenda/actions.js:351
 msgid "Stopped watching items successfully."
 msgstr ""
 
-#: assets/agenda/actions.js:397 assets/wire/actions.js:351
+#: assets/agenda/actions.js:396 assets/wire/actions.js:351
 msgid "Items were bookmarked successfully."
 msgstr ""
 
-#: assets/agenda/actions.js:399 assets/wire/actions.js:353
+#: assets/agenda/actions.js:398 assets/wire/actions.js:353
 msgid "Item was bookmarked successfully."
 msgstr ""
 
-#: assets/agenda/actions.js:414 assets/wire/actions.js:368
+#: assets/agenda/actions.js:413 assets/wire/actions.js:368
 msgid "Items were removed from bookmarks successfully."
 msgstr ""
 
-#: assets/agenda/actions.js:416 assets/wire/actions.js:370
+#: assets/agenda/actions.js:415 assets/wire/actions.js:370
 msgid "Item was removed from bookmarks successfully."
 msgstr ""
 
-#: assets/agenda/actions.js:677
+#: assets/agenda/actions.js:676
 msgid "Started watching coverage successfully."
 msgstr ""
 
-#: assets/agenda/actions.js:690
+#: assets/agenda/actions.js:689
 msgid "Stopped watching coverage successfully."
 msgstr ""
 
@@ -1430,7 +1430,7 @@ msgstr ""
 
 #: assets/agenda/components/AgendaApp.jsx:123
 #: assets/layout/components/BaseApp.jsx:76
-#: assets/wire/components/WireApp.jsx:116
+#: assets/wire/components/WireApp.jsx:117
 msgid "Custom View"
 msgstr ""
 
@@ -1441,8 +1441,8 @@ msgstr ""
 #: assets/agenda/components/AgendaApp.jsx:155
 #: assets/am-news/components/AmNewsApp.jsx:122
 #: assets/am-news/components/AmNewsApp.jsx:123
-#: assets/wire/components/WireApp.jsx:157
 #: assets/wire/components/WireApp.jsx:158
+#: assets/wire/components/WireApp.jsx:159
 msgid "Close filter panel"
 msgstr ""
 
@@ -1450,14 +1450,14 @@ msgstr ""
 #: assets/agenda/components/AgendaApp.jsx:167
 #: assets/am-news/components/AmNewsApp.jsx:130
 #: assets/am-news/components/AmNewsApp.jsx:131
-#: assets/wire/components/WireApp.jsx:170
 #: assets/wire/components/WireApp.jsx:171
+#: assets/wire/components/WireApp.jsx:172
 msgid "Open filter panel"
 msgstr ""
 
-#: assets/agenda/components/AgendaApp.jsx:204
+#: assets/agenda/components/AgendaApp.jsx:205
 #: assets/am-news/components/AmNewsApp.jsx:149
-#: assets/wire/components/WireApp.jsx:197
+#: assets/wire/components/WireApp.jsx:198
 msgid "Side filter panel"
 msgstr ""
 
@@ -1589,6 +1589,14 @@ msgstr ""
 
 #: assets/agenda/components/AgendaItemTimeUpdater.jsx:79
 msgid "Updated"
+msgstr ""
+
+#: assets/agenda/components/AgendaItemTimeUpdater.jsx:84
+msgid "just now"
+msgstr ""
+
+#: assets/agenda/components/AgendaItemTimeUpdater.jsx:86
+msgid "minute(s) ago"
 msgstr ""
 
 #: assets/agenda/components/AgendaList.jsx:213
@@ -2416,7 +2424,7 @@ msgstr ""
 
 #: assets/layout/components/BaseApp.jsx:37
 #: assets/search/components/FollowedTopics.jsx:149
-#: assets/search/components/TopicsTab.jsx:72
+#: assets/search/components/TopicsTab.jsx:73
 msgid "My Topics"
 msgstr ""
 
@@ -2858,7 +2866,7 @@ msgid "Would you like to delete topic {{name}}?"
 msgstr ""
 
 #: assets/search/components/FollowedTopics.jsx:158
-#: assets/search/components/TopicsTab.jsx:95
+#: assets/search/components/TopicsTab.jsx:96
 msgid "Company Topics"
 msgstr ""
 
@@ -3020,14 +3028,22 @@ msgstr ""
 msgid "Coverage Status"
 msgstr ""
 
-#: assets/search/components/TopicsTab.jsx:46
-#: assets/search/components/TopicsTab.jsx:77
-#: assets/search/components/TopicsTab.jsx:100
+#: assets/search/components/TopicsTab.jsx:41
+msgid "Wire Topics"
+msgstr ""
+
+#: assets/search/components/TopicsTab.jsx:41
+msgid "Agenda Topics"
+msgstr ""
+
+#: assets/search/components/TopicsTab.jsx:47
+#: assets/search/components/TopicsTab.jsx:78
+#: assets/search/components/TopicsTab.jsx:101
 msgid "No {{name}} created."
 msgstr ""
 
-#: assets/search/components/TopicsTab.jsx:62
-#: assets/search/components/TopicsTab.jsx:117
+#: assets/search/components/TopicsTab.jsx:63
+#: assets/search/components/TopicsTab.jsx:118
 msgid "Manage my {{name}}"
 msgstr ""
 
@@ -3071,16 +3087,12 @@ msgstr ""
 msgid "hello {{ name }}"
 msgstr ""
 
-#: assets/ui/components/ArticleAuthor.jsx:6
-msgid "in "
+#: assets/ui/components/ArticleAuthor.jsx:10
+msgid "By"
 msgstr ""
 
-#: assets/ui/components/ArticleAuthor.jsx:11
-msgid "By "
-msgstr ""
-
-#: assets/ui/components/ArticleAuthor.jsx:16
-msgid "{{inStr}}{{ located}}"
+#: assets/ui/components/ArticleAuthor.jsx:15
+msgid "in {{located}}"
 msgstr ""
 
 #: assets/ui/components/ArticleEmbargoed.jsx:14
@@ -3302,7 +3314,7 @@ msgstr ""
 msgid "{{ count }} item(s) selected"
 msgstr ""
 
-#: assets/wire/components/WireApp.jsx:149
+#: assets/wire/components/WireApp.jsx:150
 msgid "Wire Content"
 msgstr ""
 
