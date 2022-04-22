@@ -72,29 +72,29 @@ PROD_5 = ObjectId('5e65964bf5db68883df561d4')
 PRODUCTS = [{
     '_id': PROD_1, 'name': 'Sport1', 'description': 'sport product 1',
     'is_enabled': True, 'product_type': 'wire',
-    'navigations': [str(NAV_1), str(NAV_2)],
+    'navigations': [NAV_1, NAV_2],
     'companies': [COMPANY_1, COMPANY_2],
     'query': 'service.code:a'
 }, {
     '_id': PROD_2, 'name': 'Sport2', 'description': 'sport product 2',
     'is_enabled': True, 'product_type': 'wire',
-    'navigations': [str(NAV_3)],
+    'navigations': [NAV_3],
     'companies': [COMPANY_2, COMPANY_3],
     'query': 'service.code:b', 'sd_product_id': 'sd_product_1'
 }, {
     '_id': PROD_3, 'name': 'Sport3', 'description': 'sport product 3',
     'is_enabled': False, 'product_type': 'wire',
-    'navigations': [str(NAV_4)],
+    'navigations': [NAV_4],
     'companies': [COMPANY_1]
 }, {
     '_id': PROD_4, 'name': 'Sport4', 'description': 'sport product 4',
     'is_enabled': True, 'product_type': 'agenda',
-    'navigations': [str(NAV_5)],
+    'navigations': [NAV_5],
     'companies': [COMPANY_1, COMPANY_2]
 }, {
     '_id': PROD_5, 'name': 'Sport4', 'description': 'sport product 4',
     'is_enabled': True, 'product_type': 'wire',
-    'navigations': [str(NAV_6)],
+    'navigations': [NAV_6],
     'companies': [COMPANY_1, COMPANY_3]
 }]
 
