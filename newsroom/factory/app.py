@@ -199,7 +199,7 @@ class BaseNewsroomApp(eve.Eve):
         if self.config.get("APM_SERVER_URL") and self.config.get("APM_SECRET_TOKEN"):
             self.config["ELASTIC_APM"] = {
                 "DEBUG": self.debug,
-                "SERVICE_NAME": self.config.get("APM_SERVICE_NAME") or self.config["SITE_NAME"],
+                "SERVICE_NAME": self.config.get("APM_SERVICE_NAME") or self.config.get("SITE_NAME") or "Newsroom",
                 "SERVER_URL": self.config["APM_SERVER_URL"],
                 "SECRET_TOKEN": self.config["APM_SECRET_TOKEN"],
                 "TRANSACTIONS_IGNORE_PATTERNS": ["^OPTIONS "],

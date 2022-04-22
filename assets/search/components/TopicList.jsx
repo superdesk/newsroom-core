@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {get} from 'lodash';
 import classNames from 'classnames';
 
-import {getLocaleDate, gettext} from 'utils';
+import {gettext, formatDate, formatTime} from 'utils';
 import ActionButton from 'components/ActionButton';
 import {ToolTip} from '../../ui/components/ToolTip';
 import AuditInformation from 'components/AuditInformation';
@@ -58,7 +58,10 @@ const TopicList = ({topics, selectedTopicId, actions, users}) => {
                         </span>
                     ) : (
                         <span className="simple-card__date">
-                            {gettext('Created on')} {getLocaleDate(topic._created)}
+                            {gettext('Created on {{ date }} at {{ time }}', {
+                                date: formatDate(topic._created),
+                                time: formatTime(topic._created),
+                            })}
                         </span>
                     )}
                 </div>

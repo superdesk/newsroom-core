@@ -21,7 +21,7 @@ from .token import generate_auth_token, verify_auth_token
 
 
 @blueprint.route('/login', methods=['GET', 'POST'])
-@limiter.limit('60/hour')
+@limiter.limit('60/minute')
 def login():
     form = LoginForm()
     next_page = flask.request.args.get('next') or flask.url_for('wire.index')
