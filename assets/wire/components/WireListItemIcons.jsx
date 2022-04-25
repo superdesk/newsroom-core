@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {isEmpty} from 'lodash';
+import {hasAudio} from 'wire/utils';
 
 function WireListItemIcons({item, picture, videos, divider}) {
     return (
@@ -18,6 +19,11 @@ function WireListItemIcons({item, picture, videos, divider}) {
             {!isEmpty(videos) &&
                 <span className='wire-articles__item__icon'>
                     <i className='icon--video icon--gray'></i>
+                </span>
+            }
+            {hasAudio(item) &&
+                <span className='wire-articles__item__icon'>
+                    <i className='icon--audio icon--gray'></i>
                 </span>
             }
             {divider &&

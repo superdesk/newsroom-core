@@ -5,8 +5,7 @@ import {isEmpty} from 'lodash';
 import {isDisplayed} from 'utils';
 import {
     getPicture,
-    getVideos,
-    getOriginalVideo,
+    getItemMedia,
     showItemVersions,
     isEqualItem,
     isKilled,
@@ -19,7 +18,7 @@ import Preview from 'ui/components/Preview';
 import ArticleSlugline from 'ui/components/ArticleSlugline';
 import ArticleAuthor from  'ui/components/ArticleAuthor';
 import ArticlePicture from  'ui/components/ArticlePicture';
-import ArticleVideo from  'ui/components/ArticleVideo';
+import ArticleMedia from  'ui/components/ArticleMedia';
 import ArticleHeadline from 'ui/components/ArticleHeadline';
 import ArticleAbstract from 'ui/components/ArticleAbstract';
 import ArticleBodyHtml from 'ui/components/ArticleBodyHtml';
@@ -47,9 +46,9 @@ class WirePreview extends React.PureComponent {
     }
 
     render() {
-        const {item, user, actions, followStory, topics, previewConfig, downloadVideo, listConfig, filterGroupLabels} = this.props;
+        const {item, user, actions, followStory, topics, previewConfig, downloadMedia, listConfig, filterGroupLabels} = this.props;
         const picture = getPicture(item);
-        const videos = getVideos(item);
+        const media = getItemMedia(item);
         const isCustom = isCustomRendition(picture);
 
         const previousVersions = 'preview_versions';
@@ -83,12 +82,11 @@ class WirePreview extends React.PureComponent {
                     <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                     {isDisplayed('body_html', previewConfig) && <ArticleBodyHtml item={item}/>}
 
-                    {!isEmpty(videos) && videos.map((video) => <ArticleVideo
-                        key={video.guid}
-                        video={getOriginalVideo(video)}
+                    {!isEmpty(media) && media.map((media) => <ArticleMedia
+                        key={media.guid}
+                        media={media}
                         isKilled={isKilled(item)}
-                        headline={video.headline}
-                        downloadVideo={downloadVideo}
+                        download={downloadMedia}
                     />)}
 
                     {isDisplayed('tags_section', previewConfig) &&
@@ -126,7 +124,7 @@ WirePreview.propTypes = {
 
     followStory: PropTypes.func,
     closePreview: PropTypes.func,
-    downloadVideo: PropTypes.func,
+    downloadMedia: PropTypes.func,
     listConfig: PropTypes.object,
     filterGroupLabels: PropTypes.object,
 };

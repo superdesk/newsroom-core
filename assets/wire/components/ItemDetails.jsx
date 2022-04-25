@@ -9,8 +9,7 @@ import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import {
     getPicture,
-    getVideos,
-    getOriginalVideo,
+    getItemMedia,
     showItemVersions,
     isKilled,
     DISPLAY_ABSTRACT,
@@ -24,7 +23,7 @@ import ContentBar from 'ui/components/ContentBar';
 import ArticleItemDetails from 'ui/components/ArticleItemDetails';
 import ArticleContent from 'ui/components/ArticleContent';
 import ArticlePicture from 'ui/components/ArticlePicture';
-import ArticleVideo from  'ui/components/ArticleVideo';
+import ArticleMedia from  'ui/components/ArticleMedia';
 import ArticleContentWrapper from 'ui/components/ArticleContentWrapper';
 import ArticleContentInfoWrapper from 'ui/components/ArticleContentInfoWrapper';
 import ArticleHeadline from 'ui/components/ArticleHeadline';
@@ -44,13 +43,13 @@ function ItemDetails({
     topics,
     onClose,
     detailsConfig,
-    downloadVideo,
+    downloadMedia,
     followStory,
     listConfig,
     filterGroupLabels,
 }) {
     const picture = getPicture(item);
-    const videos = getVideos(item);
+    const media = getItemMedia(item);
     const isCustom = isCustomRendition(picture);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
 
@@ -88,16 +87,13 @@ function ItemDetails({
                             {isDisplayed('abstract', detailsConfig) &&
                             <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                             {isDisplayed('body_html', detailsConfig) && <ArticleBodyHtml item={item}/>}
-                            {!isEmpty(videos) && videos.map((video) => <ArticleVideo
-                                key={video.guid}
-                                video={getOriginalVideo(video)}
+                            {!isEmpty(media) && media.map((media) => <ArticleMedia
+                                key={media.guid}
+                                media={media}
                                 isKilled={isKilled(item)}
-                                headline={video.headline}
-                                downloadVideo={downloadVideo}
+                                download={downloadMedia}
                             />)}
                         </ArticleBody>
-
-
 
                         {isDisplayed('metadata_section', detailsConfig) && (
                             <PreviewMeta item={item} isItemDetail={true} displayConfig={detailsConfig}
@@ -142,7 +138,7 @@ ItemDetails.propTypes = {
     filterGroupLabels: PropTypes.object,
 
     onClose: PropTypes.func,
-    downloadVideo: PropTypes.func,
+    downloadMedia: PropTypes.func,
     followStory: PropTypes.func,
 };
 

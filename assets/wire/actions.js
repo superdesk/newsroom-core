@@ -393,13 +393,15 @@ export function fetchVersions(item) {
 }
 
 /**
- * Download video file
+ * Download media file
  *
  * @param {string} id
  */
-export function downloadVideo(href, id, mimeType) {
-    window.open(`${href}?filename=${id}.${mime.extension(mimeType)}`, '_blank');
-    analytics.event('download-video', id);
+export function downloadMedia(href, id, mimeType) {
+    return () => {
+        window.open(`${href}?filename=${id}.${mime.extension(mimeType)}`, '_blank');
+        analytics.event('download-media', id);
+    };
 }
 
 /**

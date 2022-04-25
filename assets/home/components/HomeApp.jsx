@@ -15,7 +15,7 @@ import ShareItemModal from 'components/ShareItemModal';
 import DownloadItemsModal from 'wire/components/DownloadItemsModal';
 import WirePreview from 'wire/components/WirePreview';
 import {followStory} from 'search/actions';
-import {downloadVideo} from 'wire/actions';
+import {downloadMedia} from 'wire/actions';
 import {SearchBar} from './search-bar';
 import {previewConfigSelector, listConfigSelector, detailsConfigSelector, isSearchEnabled} from 'ui/selectors';
 import {filterGroupsToLabelMap} from 'search/selectors';
@@ -192,7 +192,7 @@ class HomeApp extends React.Component {
                         isFollowing={!!isFollowing}
                         closePreview={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
                         previewConfig={this.props.previewConfig}
-                        downloadVideo={this.props.downloadVideo}
+                        downloadMedia={this.props.downloadMedia}
                         listConfig={this.props.listConfig}
                         filterGroupLabels={this.props.filterGroupLabels}
                     />
@@ -231,7 +231,7 @@ HomeApp.propTypes = {
     previewConfig: PropTypes.object,
     listConfig: PropTypes.object,
     detailsConfig: PropTypes.object,
-    downloadVideo: PropTypes.func,
+    downloadMedia: PropTypes.func,
     topics: PropTypes.array,
     isFollowing: PropTypes.bool,
     isSearchEnabled: PropTypes.bool,
@@ -266,7 +266,7 @@ const mapDispatchToProps = (dispatch) => ({
     fetchCardExternalItems: (cardId, cardLabel) => dispatch(fetchCardExternalItems(cardId, cardLabel)),
     fetchCompanyCardItems: () => dispatch(fetchCompanyCardItems()),
     followStory: (item) => followStory(item, 'wire'),
-    downloadVideo: (href, id, mimeType) => dispatch(downloadVideo(href, id, mimeType)),
+    downloadMedia: (href, id, mimeType) => dispatch(downloadMedia(href, id, mimeType)),
 });
 
 
