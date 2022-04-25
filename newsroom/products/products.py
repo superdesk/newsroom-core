@@ -32,7 +32,7 @@ class ProductsResource(newsroom.Resource):
         },
         'navigations': {
             'type': 'list',
-            'nullable': True,
+            'schema': newsroom.Resource.rel('navigations', nullable=True),
         },
         'companies': {
             'type': 'list',

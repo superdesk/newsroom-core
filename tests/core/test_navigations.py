@@ -61,7 +61,7 @@ def test_delete_navigation_removes_references(client):
     client.post('/products/new', data=json.dumps({
         'name': 'Breaking',
         'description': 'Breaking news',
-        'navigations': '59b4c5c61d41c8d736852fbf',
+        'navigations': [('59b4c5c61d41c8d736852fbf')],
         'is_enabled': True,
         'product_type': 'wire',
         'query': 'foo'

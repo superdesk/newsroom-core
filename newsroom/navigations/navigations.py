@@ -1,7 +1,6 @@
 import newsroom
-import superdesk
-
 from newsroom.products.products import get_products_by_company
+import superdesk
 
 
 class NavigationsResource(newsroom.Resource):
@@ -47,7 +46,13 @@ class NavigationsResource(newsroom.Resource):
 
 
 class NavigationsService(newsroom.Service):
-    pass
+    def on_delete(self, doc):
+        super().on_delete(doc)
+        navigation = doc.get('_id')
+        products = superdesk.get_resource_service('products').find(where={'navigations': navigation})
+        for product in products:
+            product['navigations'].remove(navigation)
+            superdesk.get_resource_service('products').patch(product['_id'], product)
 
 
 def get_navigations_by_company(company_id, product_type='wire', events_only=False):

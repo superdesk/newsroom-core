@@ -73,7 +73,7 @@ def get_errors_company(company):
         errors = []
         for ip in company['allowed_ip_list']:
             try:
-                ipaddress.ip_network(ip, strict=False)
+                ipaddress.ip_network(ip, strict=True)
             except ValueError as e:
                 errors.append(gettext('{0}: {1}'.format(ip, e)))
 

@@ -128,6 +128,8 @@ class UsersService(newsroom.Service):
         set_version_creator(updates)
         if 'password' in updates:
             updates['password'] = self._get_password_hash(updates['password'])
+        app.cache.delete(str(original.get('_id')))
+        app.cache.delete(original.get('email'))
 
     def on_updated(self, updates, original):
         # set session locale if updating locale for current user
