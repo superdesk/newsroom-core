@@ -38,7 +38,7 @@ class Navigations extends React.Component {
         let errors = {};
 
         if (!this.props.navigationToEdit.name) {
-            errors.name = ['Please provide navigation name'];
+            errors.name = [gettext('Please provide navigation name')];
             valid = false;
         }
 

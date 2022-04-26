@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-04-21 13:31+0200\n"
+"POT-Creation-Date: 2022-04-25 14:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1141,7 +1141,7 @@ msgstr ""
 msgid "Manage Company Topics"
 msgstr ""
 
-#: newsroom/users/users.py:155
+#: newsroom/users/users.py:157
 msgid "Can not delete current user"
 msgstr ""
 
@@ -1883,6 +1883,10 @@ msgstr ""
 msgid "Finland"
 msgstr ""
 
+#: assets/companies/components/Companies.jsx:37
+msgid "Please provide company name"
+msgstr ""
+
 #: assets/companies/components/Companies.jsx:60
 msgid "Would you like to delete company: {{name}}"
 msgstr ""
@@ -2621,6 +2625,10 @@ msgstr ""
 msgid "Tile Images"
 msgstr ""
 
+#: assets/navigations/components/Navigations.jsx:41
+msgid "Please provide navigation name"
+msgstr ""
+
 #: assets/navigations/components/Navigations.jsx:62
 msgid "Would you like to delete navigation: {{name}}"
 msgstr ""
@@ -2835,6 +2843,10 @@ msgstr ""
 
 #: assets/products/components/EditProduct.jsx:157
 msgid "Test Planning Item query"
+msgstr ""
+
+#: assets/products/components/Products.jsx:45
+msgid "Please provide product name"
 msgstr ""
 
 #: assets/products/components/Products.jsx:66
@@ -3071,6 +3083,10 @@ msgstr ""
 msgid "Test Superdesk Product id"
 msgstr ""
 
+#: assets/section-filters/components/SectionFilters.jsx:40
+msgid "Please provide Section Filter name"
+msgstr ""
+
 #: assets/section-filters/components/SectionFilters.jsx:61
 msgid "Would you like to delete Section Filter: {{name}}"
 msgstr ""
@@ -3201,6 +3217,10 @@ msgstr ""
 
 #: assets/users/components/UserListItem.jsx:22
 msgid "Needs Approval"
+msgstr ""
+
+#: assets/users/components/Users.jsx:39
+msgid "Please provide email"
 msgstr ""
 
 #: assets/users/components/Users.jsx:60
