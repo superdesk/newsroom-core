@@ -34,7 +34,7 @@ class Companies extends React.Component {
         let errors = {};
 
         if (!this.props.companyToEdit.name) {
-            errors.name = ['Please provide company name'];
+            errors.name = [gettext('Please provide company name')];
             valid = false;
         }
 
