@@ -275,7 +275,7 @@ COVERAGE_TYPES = {
     'video_explainer': {'name': 'Video Explainer', 'icon': 'explainer'}
 }
 
-LANGUAGES = ['en', 'fi', 'cs', 'fr_CA']
+LANGUAGES = ['en', 'fi', 'fr_CA']
 DEFAULT_LANGUAGE = 'en'
 
 CLIENT_LOCALE_FORMATS = {
