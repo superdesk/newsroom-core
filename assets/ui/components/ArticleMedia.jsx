@@ -5,6 +5,7 @@ import {getOriginalRendition} from 'wire/utils';
 
 export default function ArticleMedia({isKilled, media, download}) {
     const rendition = getOriginalRendition(media);
+    const filename = media.slugline || rendition.media;
 
     return (
         (rendition && !isKilled) && (
@@ -23,7 +24,7 @@ export default function ArticleMedia({isKilled, media, download}) {
                     </audio>
                 )}
                 <button className="btn btn-outline-primary btn-with-icon btn-sm mt-3 mb-4"
-                    onClick={() => download(rendition.href, rendition.media, rendition.mimetype)}>
+                    onClick={() => download(rendition.href, filename, rendition.mimetype)}>
                     <i className="icon--download"></i>{gettext('Download')}
                 </button>
             </div>
