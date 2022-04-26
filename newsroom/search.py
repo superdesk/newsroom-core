@@ -668,7 +668,7 @@ class BaseSearchService(Service):
 
             search.user = user
             search.is_admin = is_admin(user)
-            search.company = companies.get(user.get('company', ''))
+            search.company = companies.get(str(user.get('company', '')))
 
             search.query = deepcopy(query)
             search.section = topic.get('topic_type')
@@ -700,12 +700,13 @@ class BaseSearchService(Service):
                 self.apply_company_filter(search)
                 self.apply_time_limit_filter(search)
                 self.apply_products_filter(search)
-            except Forbidden:
+            except Forbidden as exc:
                 logger.info(
                     'Notification for user:{} and topic:{} is skipped'.format(
                         user.get('_id'),
                         topic.get('_id')
-                    )
+                    ),
+                    exc_info=exc
                 )
                 continue
 

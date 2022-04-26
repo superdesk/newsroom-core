@@ -628,7 +628,7 @@ def test_matching_topics_for_public_user(client, app):
     search = get_resource_service('wire_search')
 
     users = {'foo': {'company': COMPANY_1_ID, 'user_type': 'public'}}
-    companies = {COMPANY_1_ID: {'_id': COMPANY_1_ID, 'name': 'test-comp'}}
+    companies = {str(COMPANY_1_ID): {'_id': COMPANY_1_ID, 'name': 'test-comp'}}
     topics = [
         {'_id': 'created_to_old', 'created': {'to': '2017-01-01'}, 'user': 'foo'},
         {'_id': 'created_from_future', 'created': {'from': 'now/d'}, 'user': 'foo', 'timezone_offset': 60 * 28},
@@ -659,7 +659,7 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
         'foo': {'company': COMPANY_1_ID, 'user_type': 'public'},
         'bar': {'company': COMPANY_2_ID, 'user_type': 'public'},
     }
-    companies = {COMPANY_1_ID: {'_id': COMPANY_1_ID, 'name': 'test-comp'}}
+    companies = {str(COMPANY_1_ID): {'_id': COMPANY_1_ID, 'name': 'test-comp'}}
     topics = [
         {'_id': 'created_to_old', 'created': {'to': '2017-01-01'}, 'user': 'bar'},
         {'_id': 'created_from_future', 'created': {'from': 'now/d'}, 'user': 'foo', 'timezone_offset': 60 * 28},
