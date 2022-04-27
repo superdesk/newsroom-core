@@ -13,7 +13,7 @@ import {
     previewItem,
     toggleNews,
     toggleSearchAllVersions,
-    downloadVideo,
+    downloadMedia,
 } from 'wire/actions';
 
 import {
@@ -141,7 +141,7 @@ class WireApp extends BaseApp {
                 actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
                 detailsConfig={this.props.detailsConfig}
                 listConfig={this.props.listConfig}
-                downloadVideo={this.props.downloadVideo}
+                downloadMedia={this.props.downloadMedia}
                 followStory={this.props.followStory}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
                 filterGroupLabels={this.props.filterGroupLabels}
@@ -238,7 +238,7 @@ class WireApp extends BaseApp {
                                 followStory={this.props.followStory}
                                 closePreview={this.props.closePreview}
                                 previewConfig={this.props.previewConfig}
-                                downloadVideo={this.props.downloadVideo}
+                                downloadMedia={this.props.downloadMedia}
                                 listConfig={this.props.listConfig}
                                 filterGroupLabels={this.props.filterGroupLabels}
                             />
@@ -304,7 +304,7 @@ WireApp.propTypes = {
     detailsConfig: PropTypes.object,
     listConfig: PropTypes.object,
     groups: PropTypes.array,
-    downloadVideo: PropTypes.func,
+    downloadMedia: PropTypes.func,
     advancedSearchTabConfig: PropTypes.object,
     searchParams: PropTypes.object,
     showSaveTopic: PropTypes.bool,
@@ -363,7 +363,7 @@ const mapDispatchToProps = (dispatch) => ({
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view) => dispatch(setView(view)),
     closePreview: () => dispatch(previewItem(null)),
-    downloadVideo: (href, id, mimeType) => dispatch(downloadVideo(href, id, mimeType)),
+    downloadMedia: (href, id, mimeType) => dispatch(downloadMedia(href, id, mimeType)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);
