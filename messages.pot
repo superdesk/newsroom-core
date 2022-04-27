@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-04-25 14:10+0200\n"
+"POT-Creation-Date: 2022-04-27 08:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1266,7 +1266,15 @@ msgstr ""
 msgid "New card"
 msgstr ""
 
-#: assets/utils.js:625
+#: assets/utils.js:400
+msgid "{{startDate}} to {{endDate}}"
+msgstr ""
+
+#: assets/utils.js:407
+msgid "{{startTime}} {{startDate}} to {{endTime}} {{endDate}}"
+msgstr ""
+
+#: assets/utils.js:633
 msgid "Failed to process request!"
 msgstr ""
 

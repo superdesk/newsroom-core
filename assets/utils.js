@@ -394,9 +394,17 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
         switch(scheduleType) {
         case SCHEDULE_TYPE.MULTI_DAY:
             if (isTBCItem) {
-                dateTimeString.push(`${formatDate(start)} to ${formatDate(end)}`);
+                dateTimeString.push(gettext('{{startDate}} to {{endDate}}', {
+                    startDate: formatDate(start),
+                    endDate: formatDate(end),
+                }));
             } else {
-                dateTimeString.push(`${formatTime(start)} ${formatDate(start)} to ${formatTime(end)} ${formatDate(end)}`);
+                dateTimeString.push(gettext('{{startTime}} {{startDate}} to {{endTime}} {{endDate}}', {
+                    startTime: formatTime(start),
+                    startDate: formatDate(start),
+                    endTime: formatTime(end),
+                    endDate: formatDate(end),
+                }));
             }
             break;
 
