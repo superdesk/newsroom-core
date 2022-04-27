@@ -26,7 +26,6 @@ import {
 // TODO: Improve how we load Moment locales, based on server config
 import 'moment/locale/fr-ca';
 import 'moment/locale/fi';
-import 'moment/locale/cs';
 
 moment.locale(getLocale());
 
