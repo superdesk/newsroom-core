@@ -26,13 +26,13 @@ function AgendaCoverageExistsFilter ({toggleFilter, activeFilter}) {
             <button
                 key='coverage-planned'
                 className='dropdown-item'
-                onClick={() => toggleFilter(filter.field, 'planned')}
+                onClick={() => toggleFilter(filter.field, gettext('planned'))}
             >{gettext('Coverage is planned')}
             </button>
             <button
                 key='coverage-not-planned'
                 className='dropdown-item'
-                onClick={() => toggleFilter(filter.field, 'not planned')}
+                onClick={() => toggleFilter(filter.field, gettext('not planned'))}
             >{gettext('Coverage not planned')}
             </button>
         </div>
