@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-04-27 08:27+0200\n"
+"POT-Creation-Date: 2022-04-27 16:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -639,7 +639,7 @@ msgstr ""
 #: assets/agenda/components/AgendaAttachments.jsx:42
 #: assets/company-reports/components/ContentActivity.jsx:62
 #: assets/company-reports/components/ContentActivity.jsx:117
-#: assets/item-actions.js:49 assets/ui/components/ArticleVideo.jsx:16
+#: assets/item-actions.js:49 assets/ui/components/ArticleMedia.jsx:28
 #: assets/wire/components/DownloadItemsModal.jsx:53
 #: newsroom/reports/content_activity.py:237
 msgid "Download"
@@ -1266,15 +1266,17 @@ msgstr ""
 msgid "New card"
 msgstr ""
 
-#: assets/utils.js:400
+#: assets/utils.js:404
+msgid "{{startTime}} - {{endTime}}"
+msgstr ""
+
+#: assets/agenda/components/AgendaMetaTime.jsx:68
+#: assets/agenda/components/AgendaMetaTime.jsx:76 assets/utils.js:417
+#: assets/utils.js:422
 msgid "{{startDate}} to {{endDate}}"
 msgstr ""
 
-#: assets/utils.js:407
-msgid "{{startTime}} {{startDate}} to {{endTime}} {{endDate}}"
-msgstr ""
-
-#: assets/utils.js:633
+#: assets/utils.js:648
 msgid "Failed to process request!"
 msgstr ""
 
@@ -1667,12 +1669,6 @@ msgstr ""
 
 #: assets/agenda/components/AgendaListItemLabels.jsx:31
 msgid "event completed"
-msgstr ""
-
-#: assets/agenda/components/AgendaMetaTime.jsx:66
-#: assets/agenda/components/AgendaMetaTime.jsx:71
-#: assets/components/cards/render/EventsTwoByTwoCard.jsx:33
-msgid "to"
 msgstr ""
 
 #: assets/agenda/components/AgendaPreviewCoverages.jsx:27
@@ -2378,6 +2374,10 @@ msgstr ""
 
 #: assets/components/cards/render/EventsTwoByTwoCard.jsx:26
 msgid "all"
+msgstr ""
+
+#: assets/components/cards/render/EventsTwoByTwoCard.jsx:33
+msgid "to"
 msgstr ""
 
 #: assets/components/cards/render/MoreNewsButton.jsx:12
@@ -3123,8 +3123,12 @@ msgstr ""
 msgid "Embargo: {{ date }}"
 msgstr ""
 
-#: assets/ui/components/ArticleVideo.jsx:12
-msgid "Your browser does not support HTML5 video"
+#: assets/ui/components/ArticleMedia.jsx:17
+msgid "Your browser does not support playing video"
+msgstr ""
+
+#: assets/ui/components/ArticleMedia.jsx:23
+msgid "Your browser does not support playing audio"
 msgstr ""
 
 #: assets/ui/components/Content.jsx:7 assets/ui/components/Content.jsx:8
@@ -3140,7 +3144,7 @@ msgid "Article preview"
 msgstr ""
 
 #: assets/ui/components/Preview.jsx:13
-#: assets/wire/components/ItemDetails.jsx:83
+#: assets/wire/components/ItemDetails.jsx:82
 msgid "Published on {{ date }} at {{ time }}"
 msgstr ""
 
