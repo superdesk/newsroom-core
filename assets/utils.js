@@ -29,6 +29,10 @@ import 'moment/locale/fi';
 import 'moment/locale/cs';
 
 moment.locale(getLocale());
+window.moment = moment;
+
+// CP don't want 2e 3e etc., only 1er
+moment.updateLocale('fr-ca', {ordinal: (number) => number + (number === 1 ? 'er' : '')});
 
 export const now = moment(); // to enable mocking in tests
 const NEWSROOM = 'newsroom';
@@ -288,6 +292,16 @@ export function formatDate(dateString) {
 }
 
 /**
+ * Format date with time
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function formatDatetime(dateString) {
+    return fullDate(dateString);
+}
+
+/**
  * Parse the given date string, setting the time to 23:59:59 (i.e. end of the day).
  * Ensures that the datetime is for the end of the day in the provided timezone
  * If no timezone is provided, then it will default to the browser's timezone
@@ -384,7 +398,10 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
     }
 
     const scheduleType = getScheduleType(item);
-    let regulartTimeStr = `${formatTime(start)} - ${formatTime(end)} `;
+    let regulartTimeStr = gettext('{{startTime}} - {{endTime}}', {
+        startTime: formatTime(start),
+        endTime: formatTime(end),
+    });
     if (isTBCItem) {
         regulartTimeStr = localTimeZone ? `${TO_BE_CONFIRMED_TEXT} ` : '';
     }
@@ -399,11 +416,9 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
                     endDate: formatDate(end),
                 }));
             } else {
-                dateTimeString.push(gettext('{{startTime}} {{startDate}} to {{endTime}} {{endDate}}', {
-                    startTime: formatTime(start),
-                    startDate: formatDate(start),
-                    endTime: formatTime(end),
-                    endDate: formatDate(end),
+                dateTimeString.push(gettext('{{startDate}} to {{endDate}}', {
+                    startDate: formatDatetime(start),
+                    endDate: formatDatetime(end),
                 }));
             }
             break;
