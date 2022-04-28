@@ -217,6 +217,9 @@ export function isEqualItem(a, b) {
     return a && b && a._id === b._id && a.version === b.version;
 }
 
-export function hasAudio(item) {
-    return getItemMedia(item).some((_item) => _item.type === 'audio');
+function hasMedia(item, type) {
+    return item != null && getItemMedia(item).some((_item) => _item.type === type);
 }
+
+export const hasAudio = (item) => hasMedia(item, 'audio');
+export const hasVideo = (item) => hasMedia(item, 'video');

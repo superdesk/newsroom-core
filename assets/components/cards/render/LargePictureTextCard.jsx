@@ -20,6 +20,7 @@ const getPictureTextPanel = (item, picture, openItem, cardId, listConfig) => {
             }
             <CardBody item={item} displaySource={false} />
             <CardFooter
+                item={item}
                 wordCount={wordCount(item)}
                 charCount={characterCount(item)}
                 pictureAvailable={!!picture}

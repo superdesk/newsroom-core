@@ -1,19 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {gettext, shortDate, fullDate, isDisplayed} from 'utils';
+import WireListItemIcons from 'wire/components/WireListItemIcons';
 
-
-function CardMeta({wordCount, charCount, pictureAvailable, source, versioncreated, displayDivider, slugline, listConfig}) {
+function CardMeta({wordCount, charCount, pictureAvailable, source, versioncreated, displayDivider, slugline, listConfig, item}) {
     return (<div className="wire-articles__item__meta">
-        <div className="wire-articles__item__icons">
-            <span className="wire-articles__item__icon">
-                <i className="icon--text icon--gray-dark"></i>
-            </span>
-            {pictureAvailable && <span className="wire-articles__item__icon">
-                <i className="icon--photo icon--gray-dark"></i>
-            </span>}
-            {displayDivider && <span className='wire-articles__item__divider'></span>}
-        </div>
+        <WireListItemIcons item={item} picture={pictureAvailable ? {} : null} divider={displayDivider} />
         <div className="wire-articles__item__meta-info">
             {slugline && <span className='bold'>{slugline}</span>}
             <span>
@@ -32,6 +24,7 @@ function CardMeta({wordCount, charCount, pictureAvailable, source, versioncreate
 }
 
 CardMeta.propTypes = {
+    item: PropTypes.object.isRequired,
     wordCount: PropTypes.number,
     charCount: PropTypes.number,
     pictureAvailable: PropTypes.bool,

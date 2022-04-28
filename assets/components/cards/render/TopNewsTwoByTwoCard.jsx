@@ -23,6 +23,7 @@ const getTopNewsLeftPanel = (item, picture, openItem, cardId) => {
                 <h2 className='card-title'>{item.headline}</h2>
                 <Embargo item={item} isCard={true} />
                 <CardMeta
+                    item={item}
                     pictureAvailable={!!picture}
                     wordCount={wordCount(item)}
                     source={item.source}

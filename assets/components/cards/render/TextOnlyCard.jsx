@@ -17,6 +17,7 @@ const getTextOnlyPanel = (item, openItem, picture, cardId, listConfig) => (
                 </div>
             </div>
             <CardFooter
+                item={item}
                 wordCount={wordCount(item)}
                 charCount={characterCount(item)}
                 pictureAvailable={!!picture}

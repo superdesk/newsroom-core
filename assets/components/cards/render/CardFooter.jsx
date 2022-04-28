@@ -2,9 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import CardMeta from './CardMeta';
 
-function CardFooter({wordCount, charCount, pictureAvailable, source, versioncreated, listConfig}) {
+function CardFooter({wordCount, charCount, pictureAvailable, source, versioncreated, listConfig, item}) {
     return (<div className="card-footer">
         <CardMeta
+            item={item}
             pictureAvailable={pictureAvailable}
             wordCount={wordCount}
             charCount={charCount}
@@ -16,6 +17,7 @@ function CardFooter({wordCount, charCount, pictureAvailable, source, versioncrea
 }
 
 CardFooter.propTypes = {
+    item: PropTypes.object.isRequired,
     wordCount: PropTypes.number,
     charCount: PropTypes.number,
     pictureAvailable: PropTypes.bool,
