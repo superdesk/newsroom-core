@@ -82,7 +82,7 @@ class HomeApp extends React.Component {
     getPanels(card) {
         if (this.state.loadingItems) {
             return (
-                <CardRow title={card.label} product={this.getProduct(card)} isActive={this.props.activeCard === card._id}>
+                <CardRow key={card.label} title={card.label} product={this.getProduct(card)} isActive={this.props.activeCard === card._id}>
                     <div className='col-sm-6 col-md-4 col-lg-3 col-xxl-2 d-flex mb-4'>
                         <div className="spinner-border text-success" />
                         <span className="a11y-only">{gettext('Loading Card Items')}</span>
@@ -170,6 +170,7 @@ class HomeApp extends React.Component {
                 followStory={this.props.followStory}
                 detailsConfig={this.props.detailsConfig}
                 filterGroupLabels={this.props.filterGroupLabels}
+                downloadMedia={this.props.downloadMedia}
             />, modal] :
                 this.renderContent()
             )
