@@ -5,7 +5,7 @@ import classNames from 'classnames';
 
 const getActiveFilterLabel = (filter, activeFilter, isActive) => {
     if (isActive) {
-        return filter.transform ? gettext(filter.transform(activeFilter[filter.field][0])) : gettext(activeFilter[filter.field][0]);
+        return filter.transform ? filter.transform(activeFilter[filter.field][0]) : gettext(activeFilter[filter.field][0]);
     }
     else {
         return gettext(filter.label);
