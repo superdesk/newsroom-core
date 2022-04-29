@@ -4,7 +4,14 @@ import {gettext} from 'utils';
 import classNames from 'classnames';
 
 const getActiveFilterLabel = (filter, activeFilter, isActive) => {
-    return isActive ? activeFilter[filter.field][0] : gettext(filter.label);
+    let filterLabel = '';
+    if (isActive) {
+        filterLabel = filter.transform  ? gettext(filter.transform(activeFilter[filter.field][0])) : gettext(activeFilter[filter.field][0]);
+    }
+    else {
+        filterLabel = gettext(filter.label);
+    }
+    return filterLabel;
 };
 
 function DropdownFilterButton({filter, activeFilter, autoToggle, onClick, getFilterLabel, ...props}) {
