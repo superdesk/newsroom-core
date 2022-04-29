@@ -1445,12 +1445,10 @@ msgid "Time to be confirmed"
 msgstr "Heure à confirmer"
 
 #: assets/agenda/utils.js:73 assets/agenda/utils.js:74
-#: assets/agenda/components/AgendaCoverageExistsFilter.jsx:29
 msgid "not planned"
 msgstr "non planifié"
 
 #: assets/agenda/utils.js:75 assets/agenda/utils.js:82
-#: assets/agenda/components/AgendaCoverageExistsFilter.jsx:35
 msgid "planned"
 msgstr "planifié"
 
