@@ -61,9 +61,9 @@ class ProductsService(newsroom.Service):
 
 
 def _get_navigation_query(ids):
-    return {'$in': [str(oid) for oid in ids]} \
+    return {'$in': [ObjectId(oid) for oid in ids]} \
         if type(ids) is list \
-        else str(ids)
+        else ObjectId(ids)
 
 
 def get_products_by_navigation(navigation_id, product_type=None):

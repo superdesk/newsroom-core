@@ -105,6 +105,11 @@ def update_companies(id):
 @admin_only
 def update_navigations(id):
     updates = flask.request.get_json()
+    if updates.get("navigations"):
+        updates["navigations"] = [
+            ObjectId(nav_id)
+            for nav_id in updates["navigations"]
+        ]
     get_resource_service('products').patch(id=ObjectId(id), updates=updates)
     return jsonify({'success': True}), 200
 

@@ -184,13 +184,16 @@ def test_share_items(client, app, mocker):
 
 
 def test_agenda_search_filtered_by_query_product(client, app):
+    NAV_1 = ObjectId('5e65964bf5db68883df561c0')
+    NAV_2 = ObjectId('5e65964bf5db68883df561c1')
+
     app.data.insert('navigations', [{
-        '_id': 51,
+        '_id': NAV_1,
         'name': 'navigation-1',
         'is_enabled': True,
         'product_type': 'agenda'
     }, {
-        '_id': 52,
+        '_id': NAV_2,
         'name': 'navigation-2',
         'is_enabled': True,
         'product_type': 'agenda'
@@ -201,7 +204,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
         'name': 'product test',
         'query': 'headline:test',
         'companies': [COMPANY_1_ID],
-        'navigations': ['51'],
+        'navigations': [NAV_1],
         'is_enabled': True,
         'product_type': 'agenda'
     }, {
@@ -209,7 +212,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
         'name': 'product test 2',
         'query': 'slugline:prime',
         'companies': [COMPANY_1_ID],
-        'navigations': ['52'],
+        'navigations': [NAV_2],
         'is_enabled': True,
         'product_type': 'agenda'
     }])
@@ -227,7 +230,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
     assert 'internal_note' not in data['_items'][0]['planning_items'][0]
     assert 'internal_note' not in data['_items'][0]['planning_items'][0]['coverages'][0]['planning']
     assert 'internal_note' not in data['_items'][0]['coverages'][0]['planning']
-    resp = client.get('/agenda/search?navigation=51')
+    resp = client.get(f'/agenda/search?navigation={NAV_1}')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data

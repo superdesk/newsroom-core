@@ -126,7 +126,7 @@ def test_update_navigation_with_products(client, app):
         '_id': 'p-2',
         'name': 'News',
         'description': 'news product',
-        'navigations': [str(NAV_ID)],
+        'navigations': [NAV_ID],
         'is_enabled': True,
         'product_type': 'wire'
     }])
