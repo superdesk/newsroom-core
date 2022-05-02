@@ -10,7 +10,6 @@ from superdesk import get_resource_service
 
 from newsroom.decorator import admin_only
 from newsroom.navigations import blueprint
-from newsroom.products.products import get_products_by_navigation
 from newsroom.utils import get_entity_or_404, query_resource, set_original_creator, set_version_creator
 from newsroom.upload import get_file
 
@@ -50,7 +49,7 @@ def create():
     ids = get_resource_service('navigations').post([nav_data])
 
     if product_ids is not None:
-        add_remove_products_for_navigation(str(ids[0]), product_ids)
+        add_remove_products_for_navigation(ObjectId(ids[0]), product_ids)
 
     return jsonify({'success': True, '_id': ids[0]}), 201
 
@@ -89,7 +88,7 @@ def edit(_id):
     get_resource_service('navigations').patch(id=ObjectId(_id), updates=nav_data)
 
     if product_ids is not None:
-        add_remove_products_for_navigation(_id, product_ids)
+        add_remove_products_for_navigation(ObjectId(_id), product_ids)
 
     return jsonify({'success': True}), 200
 
@@ -99,18 +98,11 @@ def edit(_id):
 def delete(_id):
     """ Deletes the navigations by given id """
     get_entity_or_404(_id, 'navigations')
-
-    # remove all references from products
-    db = app.data.get_mongo_collection('products')
-    products = get_products_by_navigation(_id)
-    for product in products:
-        db.update_one({'_id': product['_id']}, {'$pull': {'navigations': _id}})
-
     get_resource_service('navigations').delete_action({'_id': ObjectId(_id)})
     return jsonify({'success': True}), 200
 
 
-def add_remove_products_for_navigation(nav_id: str, product_ids: List[str]):
+def add_remove_products_for_navigation(nav_id: ObjectId, product_ids: List[str]):
     get_entity_or_404(nav_id, 'navigations')
     products = query_resource('products')
     db = app.data.get_mongo_collection('products')

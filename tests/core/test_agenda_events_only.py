@@ -1,3 +1,4 @@
+from bson import ObjectId
 from flask import json
 from pytest import fixture
 from copy import deepcopy
@@ -7,6 +8,9 @@ from tests.fixtures import items, init_items, agenda_items, init_agenda_items, i
 from tests.utils import post_json, mock_send_email
 from .test_push_events import test_event, test_planning
 from unittest import mock
+
+NAV_1 = ObjectId('5e65964bf5db68883df561c0')
+NAV_2 = ObjectId('5e65964bf5db68883df561c1')
 
 
 @fixture(autouse=True)
@@ -24,12 +28,12 @@ def set_events_only_company(app):
 
 def set_products(app):
     app.data.insert('navigations', [{
-        '_id': 51,
+        '_id': NAV_1,
         'name': 'navigation-1',
         'is_enabled': True,
         'product_type': 'agenda'
     }, {
-        '_id': 52,
+        '_id': NAV_2,
         'name': 'navigation-2',
         'is_enabled': True,
         'product_type': 'agenda'
@@ -40,7 +44,7 @@ def set_products(app):
         'name': 'product test',
         'query': 'headline:test',
         'companies': [COMPANY_1_ID],
-        'navigations': ['51'],
+        'navigations': [NAV_1],
         'is_enabled': True,
         'product_type': 'agenda'
     }, {
@@ -48,7 +52,7 @@ def set_products(app):
         'name': 'product test 2',
         'query': 'slugline:prime',
         'companies': [COMPANY_1_ID],
-        'navigations': ['52'],
+        'navigations': [NAV_2],
         'is_enabled': True,
         'product_type': 'agenda'
     }])
@@ -84,7 +88,7 @@ def test_search(client, app):
     assert 'planning_items' not in data['_items'][0]
     assert 'coverages' not in data['_items'][0]
 
-    resp = client.get('/agenda/search?navigation=51')
+    resp = client.get(f'/agenda/search?navigation={NAV_1}')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
@@ -97,7 +101,7 @@ def test_search(client, app):
 
 def set_watch_products(app):
     app.data.insert('navigations', [{
-        '_id': 51,
+        '_id': NAV_1,
         'name': 'navigation-1',
         'is_enabled': True,
         'product_type': 'agenda'
@@ -108,7 +112,7 @@ def set_watch_products(app):
         'name': 'product test',
         'query': 'press',
         'companies': [COMPANY_1_ID],
-        'navigations': ['51'],
+        'navigations': [NAV_1],
         'is_enabled': True,
         'product_type': 'agenda'
     }])

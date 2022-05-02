@@ -12,6 +12,10 @@ from newsroom.tests.users import ADMIN_USER_ID
 from superdesk import get_resource_service
 
 
+NAV_1 = ObjectId('5e65964bf5db68883df561c0')
+NAV_2 = ObjectId('5e65964bf5db68883df561c1')
+
+
 def test_item_detail(client):
     resp = client.get('/wire/tag:foo')
     assert resp.status_code == 200
@@ -237,12 +241,12 @@ def test_search_filtered_by_users_products(client, app):
 
 def test_search_filter_by_individual_navigation(client, app):
     app.data.insert('navigations', [{
-        '_id': 51,
+        '_id': NAV_1,
         'name': 'navigation-1',
         'is_enabled': True,
         'product_type': 'wire'
     }, {
-        '_id': 52,
+        '_id': NAV_2,
         'name': 'navigation-2',
         'is_enabled': True,
         'product_type': 'wire'
@@ -253,7 +257,7 @@ def test_search_filter_by_individual_navigation(client, app):
         'name': 'product test',
         'sd_product_id': 1,
         'companies': [COMPANY_1_ID],
-        'navigations': ['51'],
+        'navigations': [NAV_1],
         'product_type': 'wire',
         'is_enabled': True
     }, {
@@ -261,7 +265,7 @@ def test_search_filter_by_individual_navigation(client, app):
         'name': 'product test 2',
         'sd_product_id': 2,
         'companies': [COMPANY_1_ID],
-        'navigations': ['52'],
+        'navigations': [NAV_2],
         'product_type': 'wire',
         'is_enabled': True
     }])
@@ -273,7 +277,7 @@ def test_search_filter_by_individual_navigation(client, app):
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
     assert '_aggregations' in data
-    resp = client.get('/wire/search?navigation=51')
+    resp = client.get(f'/wire/search?navigation={NAV_1}')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
@@ -287,19 +291,19 @@ def test_search_filter_by_individual_navigation(client, app):
     data = json.loads(resp.get_data())
     assert 3 == len(data['_items'])  # gets all by default
 
-    resp = client.get('/wire/search?navigation=51')
+    resp = client.get(f'/wire/search?navigation={NAV_1}')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
 
 
 def test_search_filtered_by_query_product(client, app):
     app.data.insert('navigations', [{
-        '_id': 51,
+        '_id': NAV_1,
         'name': 'navigation-1',
         'is_enabled': True,
         'product_type': 'wire',
     }, {
-        '_id': 52,
+        '_id': NAV_2,
         'name': 'navigation-2',
         'is_enabled': True,
         'product_type': 'wire'
@@ -310,7 +314,7 @@ def test_search_filtered_by_query_product(client, app):
         'name': 'product test',
         'query': 'headline:more',
         'companies': [COMPANY_1_ID],
-        'navigations': ['51'],
+        'navigations': [NAV_1],
         'product_type': 'wire',
         'is_enabled': True
     }, {
@@ -318,7 +322,7 @@ def test_search_filtered_by_query_product(client, app):
         'name': 'product test 2',
         'query': 'headline:Weather',
         'companies': [COMPANY_1_ID],
-        'navigations': ['52'],
+        'navigations': [NAV_2],
         'product_type': 'wire',
         'is_enabled': True
     }])
@@ -331,7 +335,7 @@ def test_search_filtered_by_query_product(client, app):
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
     assert '_aggregations' in data
-    resp = client.get('/wire/search?navigation=52')
+    resp = client.get(f'/wire/search?navigation={NAV_2}')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
@@ -410,12 +414,12 @@ def test_item_detail_access(client, app):
 
 def test_search_using_section_filter_for_public_user(client, app):
     app.data.insert('navigations', [{
-        '_id': 51,
+        '_id': NAV_1,
         'name': 'navigation-1',
         'is_enabled': True,
         'product_type': 'wire'
     }, {
-        '_id': 52,
+        '_id': NAV_2,
         'name': 'navigation-2',
         'is_enabled': True,
         'product_type': 'wire'
@@ -426,7 +430,7 @@ def test_search_using_section_filter_for_public_user(client, app):
         'name': 'product test',
         'query': 'headline:more',
         'companies': [COMPANY_1_ID],
-        'navigations': ['51'],
+        'navigations': [NAV_1],
         'is_enabled': True,
         'product_type': 'wire'
     }, {
@@ -434,7 +438,7 @@ def test_search_using_section_filter_for_public_user(client, app):
         'name': 'product test 2',
         'query': 'headline:Weather',
         'companies': [COMPANY_1_ID],
-        'navigations': ['52'],
+        'navigations': [NAV_2],
         'is_enabled': True,
         'product_type': 'wire'
     }])
@@ -447,7 +451,7 @@ def test_search_using_section_filter_for_public_user(client, app):
     data = json.loads(resp.get_data())
     assert 2 == len(data['_items'])
     assert '_aggregations' in data
-    resp = client.get('/wire/search?navigation=52')
+    resp = client.get(f'/wire/search?navigation={NAV_2}')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data
@@ -464,11 +468,11 @@ def test_search_using_section_filter_for_public_user(client, app):
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
 
-    resp = client.get('/wire/search?navigation=52')
+    resp = client.get(f'/wire/search?navigation={NAV_2}')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
 
-    resp = client.get('/wire/search?navigation=51')
+    resp = client.get(f'/wire/search?navigation={NAV_1}')
     data = json.loads(resp.get_data())
     assert 0 == len(data['_items'])
 
