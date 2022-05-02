@@ -117,11 +117,14 @@ class TopicEditor extends React.Component {
         if (this.state.topic.notifications) {
             unsubscribeToTopic(this.state.topic);
             topic.notifications = false;
-            topic.subscribers = topic.subscribers.filter((userId) => userId !== this.props.userId);
+            topic.subscribers = (topic.subscribers || []).filter((userId) => userId !== this.props.userId);
         } else {
             subscribeToTopic(this.state.topic);
             topic.notifications = true;
-            topic.subscribers.push(this.props.userId);
+            topic.subscribers = [
+                ...(topic.subscribers || []),
+                this.props.userId
+            ];
         }
 
         this.setState({topic});
@@ -148,7 +151,7 @@ class TopicEditor extends React.Component {
             }
 
             delete topic.notifications;
-            topic.subscribers = subscribers;
+            topic.subscribers = subscribers || [];
         }
 
         event.preventDefault && event.preventDefault();
