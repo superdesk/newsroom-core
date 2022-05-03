@@ -32,7 +32,9 @@ moment.locale(getLocale());
 window.moment = moment;
 
 // CP don't want 2e 3e etc., only 1er
-moment.updateLocale('fr-ca', {ordinal: (number) => number + (number === 1 ? 'er' : '')});
+if (getLocale() === 'fr_CA') {
+    moment.updateLocale('fr-ca', {ordinal: (number) => number + (number === 1 ? 'er' : '')});
+}
 
 export const now = moment(); // to enable mocking in tests
 const NEWSROOM = 'newsroom';
