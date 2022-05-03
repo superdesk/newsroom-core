@@ -16,6 +16,7 @@ import {
     isItemTBC,
     TO_BE_CONFIRMED_TEXT
 } from './agenda/utils';
+export {initWebSocket} from './websocket';
 
 /*
  * Import and load all locales that will be used in moment.js
@@ -618,22 +619,6 @@ const SHIFT_OUT_REGEXP = new RegExp(String.fromCharCode(14), 'g');
  */
 export function formatHTML(html) {
     return html.replace(SHIFT_OUT_REGEXP, html.indexOf('<pre>') === -1 ? '<br>' : '\n');
-}
-
-/**
- * Initializes the web socket listener
- * @param store
- */
-export function initWebSocket(store, action) {
-    if (window.newsroom) {
-        const ws = new WebSocket(window.newsroom.websocket);
-        ws.onmessage = (message) => {
-            const data = JSON.parse(message.data);
-            if (data.event) {
-                store.dispatch(action(data));
-            }
-        };
-    }
 }
 
 /**

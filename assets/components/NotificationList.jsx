@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import {get} from 'lodash';
 
 import {gettext} from 'utils';
@@ -9,19 +10,38 @@ import NotificationListItem from './NotificationListItem';
 class NotificationList extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {displayItems: false};
+        this.state = {
+            displayItems: false,
+            connected: false,
+        };
 
+        this.websocketConnected = this.websocketConnected.bind(this);
+        this.websocketDisconnected = this.websocketDisconnected.bind(this);
         this.toggleDisplay = this.toggleDisplay.bind(this);
     }
 
     componentDidMount() {
-        if ( !isTouchDevice() ) {
+        if (!isTouchDevice()) {
             this.elem && $(this.elem).tooltip && $(this.elem).tooltip();
         }
+
+        window.addEventListener('websocket:connected', this.websocketConnected);
+        window.addEventListener('websocket:disconnected', this.websocketDisconnected);
     }
 
     componentWillUnmount() {
         this.elem && $(this.elem).tooltip && $(this.elem).tooltip('dispose'); // make sure it's gone
+
+        window.removeEventListener('websocket:connected', this.websocketConnected);
+        window.removeEventListener('websocket:disconnected', this.websocketDisconnected);
+    }
+
+    websocketConnected() {
+        this.setState({connected: true});
+    }
+
+    websocketDisconnected() {
+        this.setState({connected: false});
     }
 
     componentDidUpdate(prevProps) {
@@ -51,7 +71,10 @@ class NotificationList extends React.Component {
                 }
 
                 <span
-                    className="notif__circle"
+                    className={classNames(
+                        'notif__circle',
+                        {'notif__circle--disconnected': !this.state.connected}
+                    )}
                     ref={(elem) => this.elem = elem}
                     title={gettext('Notifications')}>
                     <h3 className="a11y-only">Notification bell</h3>
