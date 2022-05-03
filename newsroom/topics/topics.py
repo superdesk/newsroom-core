@@ -22,7 +22,11 @@ class TopicsResource(newsroom.Resource):
             'schema': newsroom.Resource.rel('users', required=True),
         },
         'timezone_offset': {'type': 'integer', 'nullable': True},
-        'topic_type': {'type': 'string', 'nullable': True},
+        'topic_type': {
+            'type': 'string',
+            'required': True,
+            'allowed': ['wire', 'agenda']
+        },
         'navigation': {
             'type': 'list',
             'nullable': True,
