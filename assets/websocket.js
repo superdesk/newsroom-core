@@ -68,7 +68,7 @@ function onWebsocketMessage(message) {
 
     const data = JSON.parse(message.data);
 
-    if (!data || !data.event) {
+    if ((!data || !data.event) && !data.ping) {
         console.error('Invalid websocket message data', message.data);
         return;
     }
