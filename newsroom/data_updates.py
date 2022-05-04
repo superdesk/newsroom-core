@@ -140,6 +140,13 @@ class DataUpdateCommand(superdesk.Command):
     def in_db(self, update):
         return update in map(lambda _: _['name'], self.get_applied_updates())
 
+    def resource_registered(self, module_scope):
+        try:
+            current_app.data.get_mongo_collection(module_scope.DataUpdate.resource)
+            return True
+        except KeyError:
+            return False
+
 
 class Upgrade(DataUpdateCommand):
     """Runs all the new data updates available.
@@ -169,7 +176,9 @@ class Upgrade(DataUpdateCommand):
             print('data update %s running forward...' % (data_update_name))
             module_scope = self.compile_update_in_module(data_update_name)
             # run the data update forward
-            if not fake:
+            if not self.resource_registered(module_scope):
+                print(f"skipping data update {data_update_name}, resource not registered")
+            elif not fake:
                 module_scope.DataUpdate().apply('forwards')
             if not dry:
                 # store the applied data update in the database
@@ -216,7 +225,9 @@ class Downgrade(DataUpdateCommand):
             print('data update %s running backward...' % (data_update_name))
             module_scope = self.compile_update_in_module(data_update_name)
             # run the data update backward
-            if not fake:
+            if not self.resource_registered(module_scope):
+                print(f"Skipping data update {data_update_name}, resource not registered")
+            elif not fake:
                 module_scope.DataUpdate().apply('backwards')
             if not dry:
                 # remove the applied data update from the database
