@@ -22,8 +22,15 @@ class DataUpdate(_DataUpdate):
         }
 
         for topic in mongodb_collection.find({}):
+            topic_id = topic.get(config.ID_FIELD)
+            user_id = topic.get('user')
+
+            if not users.get(str(user_id)):
+                print(f"Skipping Topic '{topic_id}', user '{user_id}' no longer exists in DB")
+                continue
+
             print(mongodb_collection.update(
-                {config.ID_FIELD: topic.get(config.ID_FIELD)},
+                {config.ID_FIELD: topic_id},
                 {
                     '$set': {
                         'subscribers': [topic['user']] if topic.get('notifications', False) else [],
