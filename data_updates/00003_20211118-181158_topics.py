@@ -22,19 +22,26 @@ class DataUpdate(_DataUpdate):
         }
 
         for topic in mongodb_collection.find({}):
-            print(mongodb_collection.update(
-                {config.ID_FIELD: topic.get(config.ID_FIELD)},
-                {
-                    '$set': {
-                        'subscribers': [topic['user']] if topic.get('notifications', False) else [],
-                        'company': users[topic['user']].get('company'),
-                        'is_global': topic.get('is_global', False),
-                    },
-                    '$unset': {
-                        'notifications': ''
+            if not topic.get("user"):  # this could happen on new cp instances with the mgmt api
+                continue
+            if users.get(topic["user"]) is None:
+                print("Deleting topic of missing user", topic["_id"], topic.get("label"))
+                print(mongodb_collection.delete_one({"_id": topic["_id"]}))
+            else:
+                print("Updating topic of existing user", topic["_id"], topic.get("label"))
+                print(mongodb_collection.update(
+                    {config.ID_FIELD: topic.get(config.ID_FIELD)},
+                    {
+                        '$set': {
+                            'subscribers': [topic['user']] if topic.get('notifications', False) else [],
+                            'company': users[topic['user']].get('company'),
+                            'is_global': topic.get('is_global', False),
+                        },
+                        '$unset': {
+                            'notifications': ''
+                        }
                     }
-                }
-            ))
+                ))
 
     def backwards(self, mongodb_collection, mongodb_database):
         for topic in mongodb_collection.find({}):

@@ -17,7 +17,7 @@ class DataUpdate(_DataUpdate):
     def forwards(self, mongodb_collection, mongodb_database):
         for topic in mongodb_collection.find({}):
             if not topic.get('user'):
-                pass
+                continue
 
             print(mongodb_collection.update(
                 {config.ID_FIELD: topic.get(config.ID_FIELD)},
