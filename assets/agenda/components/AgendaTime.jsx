@@ -4,12 +4,12 @@ import moment from 'moment-timezone';
 import {get} from 'lodash';
 import classNames from 'classnames';
 
-import {SCHEDULE_TYPE, isItemTBC, TO_BE_CONFIRMED_TEXT} from '../utils';
 import {bem} from 'ui/utils';
-import {formatAgendaDate, formatDate, DATE_FORMAT, getScheduleType} from 'utils';
+import {SCHEDULE_TYPE, isItemTBC, TO_BE_CONFIRMED_TEXT} from '../utils';
+import {formatAgendaDate, getScheduleType} from 'utils';
 import {shouldRenderLocation} from'maps/utils';
 
-export default function AgendaTime({item, group, suppliedNodes, withGroupDate}) {
+export default function AgendaTime({item, children}) {
     const tbcItem = isItemTBC(item);
     const getClassNames = (modifier = 'event') => {
         return bem('wire-column__preview', 'date', modifier);
@@ -18,7 +18,6 @@ export default function AgendaTime({item, group, suppliedNodes, withGroupDate}) 
     const isRemoteTimezone = get(item, 'dates.tz') &&
         moment.tz(moment.tz.guess()).format('Z') !== startDateInRemoteTZ.format('Z');
     const getDates = (remoteTz = false) => {
-        const isAllDay = getScheduleType(item) === SCHEDULE_TYPE.ALL_DAY;
         let dates;
 
         if (remoteTz) {
@@ -34,7 +33,7 @@ export default function AgendaTime({item, group, suppliedNodes, withGroupDate}) 
                     tz: item.dates.tz,
                 }
             };
-            dates = formatAgendaDate(new_dates, group, false);
+            dates = formatAgendaDate(new_dates, null, false);
             return (<div key='remote-time' className={classNames(
                 getClassNames(),
                 getClassNames('remote'),
@@ -42,31 +41,23 @@ export default function AgendaTime({item, group, suppliedNodes, withGroupDate}) 
                 {dates[0]} {dates[1]}
             </div>);
         } else {
-            dates = formatAgendaDate(item, group);
+            dates = formatAgendaDate(item, null);
         }
 
-        if (suppliedNodes) {
-            // Used in full-view mode where we supply a item label as suppliedNode
-            return [(<div key='time' className={getClassNames(!isAllDay ? 'dashed-border' : 'event')}>
-                {dates[1]} {dates[0]}</div>)];
-        } else {
-            const dateGroup = group && moment(group, DATE_FORMAT);
-            let element = [<div key='time' className={getClassNames(!isAllDay ? 'dashed-border' : 'event')}>{dates[0]}</div>];
-            if (dateGroup && withGroupDate && !isAllDay) {
-                element.push((<div key='time-groupdate' className={classNames(getClassNames(), 'p-0')}>
-                    {formatDate(dateGroup)}</div>));
-            }
-
-            return element;
-        }
+        return [(
+            <div key='time' className={getClassNames('event')}>
+                {dates[1]} {dates[0]}
+            </div>
+        )];
     };
 
     const margin = !isRemoteTimezone && !shouldRenderLocation(item) && !tbcItem;
 
-    let retElement = [(<div key='local-time' className={classNames('wire-column__preview__content-header', {'mb-0': !margin}, {'mb-2': margin})}>
-        <div className={classNames(getClassNames(),
-            {'p-0': isRemoteTimezone || tbcItem})}>{getDates()}</div>
-        {suppliedNodes}
+    let retElement = [(<div key='local-time' className={classNames('wire-column__preview__content-header', {'mb-0': !margin, 'mb-2': margin})}>
+        <div className={classNames(getClassNames(), {'p-0': isRemoteTimezone || tbcItem})}>
+            {getDates()}
+        </div>
+        {children}
     </div>),
     getDates(true)];
 
@@ -80,11 +71,5 @@ export default function AgendaTime({item, group, suppliedNodes, withGroupDate}) 
 
 AgendaTime.propTypes = {
     item: PropTypes.object.isRequired,
-    group: PropTypes.string,
-    suppliedNodes: PropTypes.node,
-    withGroupDate: PropTypes.bool,
-};
-
-AgendaTime.defaultProps = {
-    withGroupDate: true
+    children: PropTypes.node,
 };
