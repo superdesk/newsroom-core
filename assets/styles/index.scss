@@ -2428,13 +2428,19 @@ a.wire-articles__versions {
     font-size: .8125rem;
 
     &.wire-column__preview__date--event {
-        padding: 0 10px 10px 0px;
+        padding: 0 0 10px 0px;
         display: flex;
+        flex-wrap: wrap;
+        column-gap: 10px;
 
         @include xl {
-            padding: 0 10px 20px 0px;
+            padding: 0 0 20px 0px;
             font-size: 1rem;
             line-height: 1.5rem;
+        }
+
+        .wire-column__preview__date--event {
+            padding: 0;
         }
     }
 
@@ -2444,6 +2450,7 @@ a.wire-articles__versions {
 
     &.wire-column__preview__date--dashed-border {
         border-right: 1px dotted #c4c4c4;
+        padding-right: 10px;
 
         @include xl {
             font-size: 1rem;
@@ -2475,6 +2482,8 @@ a.wire-articles__versions {
 .wire-column__preview__content-header {
     display: flex;
     align-items: baseline;
+    flex-wrap: nowrap;
+    gap: 10px;
     margin: 20px 0;
 
     &--block {

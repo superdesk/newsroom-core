@@ -78,7 +78,11 @@ class AgendaPreview extends React.PureComponent {
 
                         <div id='preview-article' className='wire-column__preview__content pt-0 noselect' ref={(preview) => this.preview = preview}>
                             <AgendaName item={item} />
-                            <AgendaTime item={item} group={previewGroup} />
+                            <AgendaTime item={item} group={previewGroup}>
+                                <AgendaListItemLabels
+                                    item={item}
+                                />
+                            </AgendaTime>
                             <AgendaPreviewImage item={item} onClick={openItemDetails} />
                             <AgendaMeta item={item} />
                             <AgendaLongDescription item={item} plan={plan}/>

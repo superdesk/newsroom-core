@@ -431,11 +431,7 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
             break;
 
         case SCHEDULE_TYPE.REGULAR:
-            if (localTimeZone) {
-                dateTimeString.push(regulartTimeStr);
-            } else {
-                dateTimeString.push(`${regulartTimeStr}${formatDate(start)}`);
-            }
+            dateTimeString.push(`${regulartTimeStr} ${formatDate(start)}`);
             break;
         }
     }
