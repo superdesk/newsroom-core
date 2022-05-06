@@ -54,14 +54,14 @@ export function fetchCardExternalItems(cardId, cardLabel) {
 }
 
 export function pushNotification(push) {
-    return () => {
+    return (dispatch) => {
         if (push.event === 'items_deleted') {
             setTimeout(
                 () => window.location.reload(),
                 1000
             );
         } else {
-            return wirePushNotification(push);
+            return dispatch(wirePushNotification(push));
         }
     };
 }
