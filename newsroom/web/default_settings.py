@@ -304,6 +304,16 @@ CLIENT_CONFIG = {
     'item_actions': {},
     'display_abstract': DISPLAY_ABSTRACT,
     'display_credits': False,
+    'filter_panel_defaults': {
+        'tab': {
+            'wire': 'nav',  # Options are 'nav', 'topics', 'filters'
+            'agenda': 'nav',
+        },
+        'open': {
+            'wire': False,
+            'agenda': False,
+        },
+    },
 }
 
 # Enable iframely support for item body_html
