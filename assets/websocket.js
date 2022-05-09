@@ -22,6 +22,10 @@ function connectToNotificationServer() {
     }
 }
 
+window.addEventListener('beforeunload', () => {
+    wsConnection = null;
+});
+
 export function initWebSocket(store, action) {
     connectToNotificationServer();
     listeners.push({store, action});
@@ -45,7 +49,7 @@ function onWebsocketOpen() {
 }
 
 function onWebsocketClose() {
-    if (connectInterval != null) {
+    if (connectInterval != null || wsConnection == null) {
         // Already attempting to reconnect to the Notification Server
         // No need to add another interval
         return;
