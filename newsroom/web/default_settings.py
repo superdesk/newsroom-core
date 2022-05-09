@@ -366,6 +366,9 @@ ELASTICSEARCH_SETTINGS.setdefault("settings", {})["query_string"] = {
     'analyze_wildcard': False
 }
 
+# count above 10k
+ELASTICSEARCH_TRACK_TOTAL_HITS = True
+
 #: server working directory
 #: should be set in settings.py
 SERVER_PATH = pathlib.Path(__file__).resolve().parent.parent
