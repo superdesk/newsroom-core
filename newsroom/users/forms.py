@@ -30,6 +30,6 @@ class UserForm(FlaskForm):
     is_enabled = BooleanField(gettext('Account Enabled'), default=True, validators=[])
     is_approved = BooleanField(gettext('Account Approved'), validators=[])
     expiry_alert = BooleanField(gettext('Company Expiry Alert'), validators=[])
-    receive_email = BooleanField(gettext('Receive notifications via email'), default=True, validators=[])
+    receive_email = BooleanField(gettext('Receive notifications'), default=True, validators=[])
     locale = StringField(gettext('Locale'))
     manage_company_topics = BooleanField(gettext('Manage Company Topics'), validators=[])
