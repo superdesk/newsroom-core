@@ -2077,6 +2077,7 @@ article.list {
     flex-direction: column;
     overflow-y: visible;
     margin-bottom: 0px;
+    gap: 2px;
 
     @include xxsm {
         margin-bottom: 0;
@@ -2557,7 +2558,7 @@ a.wire-articles__versions {
 
 .wire-column__preview__caption {
     font-size: 0.8125rem; // 13px
-    color: #7c7c7c;
+    color: $body-text;
     margin: 10px 20px;
 }
 
@@ -2746,6 +2747,7 @@ a.wire-articles__versions {
     flex-grow: 1;
     position: relative;
     padding-left: 16px;
+    line-height: 120%;
 
     &[class*=" coverage--"] {
         &::before {
