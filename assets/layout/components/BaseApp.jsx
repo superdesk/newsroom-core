@@ -117,7 +117,7 @@ export default class BaseApp extends React.Component {
                 .catch(() => null); // ignore
         }
 
-        if(container.scrollTop > BUFFER) {
+        if (container.scrollTop > BUFFER) {
             this.setState({scrollClass: 'wire-column__main-header--small'});
         }
         else {
@@ -156,7 +156,7 @@ export default class BaseApp extends React.Component {
     }
 
     componentDidUpdate(nextProps) {
-        if ((nextProps.activeQuery || this.props.activeQuery) && (nextProps.activeQuery !== this.props.activeQuery)) {
+        if ((nextProps.activeQuery || this.props.activeQuery) && (nextProps.activeQuery !== this.props.activeQuery) && this.dom.list != null) {
             this.dom.list.scrollTop = 0;
         }
         this.initTooltips();
