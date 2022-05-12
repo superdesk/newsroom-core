@@ -86,11 +86,11 @@ export const WORKFLOW_STATUS_TEXTS = {
 };
 
 export const WORKFLOW_COLORS = {
-    [WORKFLOW_STATUS.DRAFT]: 'icon--gray-dark',
-    [WORKFLOW_STATUS.ASSIGNED]: 'icon--main-blue',
-    [WORKFLOW_STATUS.ACTIVE]: 'icon--purple',
-    [WORKFLOW_STATUS.COMPLETED]: 'icon--green',
-    [WORKFLOW_STATUS.CANCELLED]: 'icon--red',
+    [WORKFLOW_STATUS.DRAFT]: 'coverage--draft',
+    [WORKFLOW_STATUS.ASSIGNED]: 'coverage--assigned',
+    [WORKFLOW_STATUS.ACTIVE]: 'coverage--active',
+    [WORKFLOW_STATUS.COMPLETED]: 'coverage--completed',
+    [WORKFLOW_STATUS.CANCELLED]: 'coverage--cancelled',
 };
 
 export const SCHEDULE_TYPE = {
@@ -166,7 +166,10 @@ export function getCoverageIcon(coverageType) {
  */
 export function getCoverageDisplayName(coverageType) {
     const coverageTypes = getConfig('coverage_types', {});
-    return get(coverageTypes, `${coverageType}.name`, coverageType);
+    const locale = (window.locale || 'en').toLowerCase();
+
+    return get(coverageTypes, `${coverageType}.translations.${locale}`) ||
+        get(coverageTypes, `${coverageType}.name`, coverageType);
 }
 
 /**

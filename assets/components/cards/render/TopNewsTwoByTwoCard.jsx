@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {wordCount, getSlugline} from 'utils';
+import {getSlugline} from 'utils';
 import {getPicture, getThumbnailRendition, getCaption, shortText} from 'wire/utils';
 import CardRow from './CardRow';
 import CardFooter from './CardFooter';
@@ -23,10 +23,8 @@ const getTopNewsLeftPanel = (item, picture, openItem, cardId) => {
                 <h2 className='card-title'>{item.headline}</h2>
                 <Embargo item={item} isCard={true} />
                 <CardMeta
-                    pictureAvailable={!!picture}
-                    wordCount={wordCount(item)}
-                    source={item.source}
-                    versioncreated={item.versioncreated}
+                    item={item}
+                    picture={picture}
                     displayDivider={false}
                     slugline={getSlugline(item, true)}
                 />
@@ -50,10 +48,8 @@ const getTopNewsRightPanel = (item, picture, openItem, cardId) => {
             <img className='card-img-top' src={imageUrl} alt={caption} />
             <CardBody item={item} displayDescription={false} displaySource={false}/>
             <CardFooter
-                wordCount={wordCount(item)}
-                pictureAvailable={!!picture}
-                source={item.source}
-                versioncreated={item.versioncreated}
+                item={item}
+                picture={picture}
             />
         </div>
     </div>);

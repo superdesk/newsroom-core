@@ -77,8 +77,7 @@ def get_client_config():
     for key, setting in (get_setting() or {}).items():
         if key not in ['_updated', 'version_creator']:
             value = setting.get('value', setting.get('default'))
-            if value:
-                config['client_config'][key] = value
+            config['client_config'][key] = value
     return config
 
 

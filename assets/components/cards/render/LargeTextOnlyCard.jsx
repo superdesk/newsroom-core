@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {characterCount, wordCount} from 'utils';
 import CardFooter from './CardFooter';
 import CardBody from './CardBody';
 import CardRow from './CardRow';
@@ -11,11 +10,8 @@ const getTextOnlyPanel = (item, openItem, cardId, listConfig) => (
         <div className='card card--home' onClick={() => openItem(item, cardId)}>
             <CardBody item={item} displaySource={false} />
             <CardFooter
-                wordCount={wordCount(item)}
-                charCount={characterCount(item)}
-                pictureAvailable={!!getPicture(item)}
-                source={item.source}
-                versioncreated={item.versioncreated}
+                item={item}
+                picture={getPicture(item)}
                 listConfig={listConfig}
             />
         </div>

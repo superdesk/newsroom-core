@@ -26,7 +26,7 @@ test_user_id = str(TEST_USER_ID)
 topics_url = 'users/%s/topics' % user_id
 
 
-def test_topics_no_session(client):
+def test_topics_no_session(client, anonymous_user):
     resp = client.get(topics_url)
     assert 302 == resp.status_code
     resp = client.post(topics_url, data=topic)
@@ -160,22 +160,20 @@ def test_share_agenda_topics(client, app):
 
 
 def test_get_topic_share_url(app):
-    app.config['CLIENT_URL'] = 'http://newsroom.com'
-
     topic = {'topic_type': 'wire', 'query': 'art exhibition'}
-    assert get_topic_url(topic) == 'http://newsroom.com/wire?q=art%20exhibition'
+    assert get_topic_url(topic) == 'http://localhost:5050/wire?q=art+exhibition'
 
     topic = {'topic_type': 'wire', 'filter': {"location": [["Sydney"]]}}
-    assert get_topic_url(topic) == 'http://newsroom.com/wire?filter=%7B%22location%22%3A%20%5B%5B%22Sydney%22%5D%5D%7D'
+    assert get_topic_url(topic) == 'http://localhost:5050/wire?filter=%7B%22location%22%3A+%5B%5B%22Sydney%22%5D%5D%7D'
 
     topic = {'topic_type': 'wire', 'navigation': ['123']}
-    assert get_topic_url(topic) == 'http://newsroom.com/wire?navigation=%5B%22123%22%5D'
+    assert get_topic_url(topic) == 'http://localhost:5050/wire?navigation=%5B%22123%22%5D'
 
     topic = {'topic_type': 'wire', 'navigation': ['123', '456']}
-    assert get_topic_url(topic) == 'http://newsroom.com/wire?navigation=%5B%22123%22%2C%20%22456%22%5D'
+    assert get_topic_url(topic) == 'http://localhost:5050/wire?navigation=%5B%22123%22%2C+%22456%22%5D'
 
     topic = {'topic_type': 'wire', 'created': {'from': '2018-06-01'}}
-    assert get_topic_url(topic) == 'http://newsroom.com/wire?created=%7B%22from%22%3A%20%222018-06-01%22%7D'
+    assert get_topic_url(topic) == 'http://localhost:5050/wire?created=%7B%22from%22%3A+%222018-06-01%22%7D'
 
     topic = {
         'topic_type': 'wire',
@@ -184,8 +182,8 @@ def test_get_topic_share_url(app):
         'navigation': ['123'],
         'created': {'from': '2018-06-01'},
     }
-    assert get_topic_url(topic) == 'http://newsroom.com/wire?' \
-                                   'q=art%20exhibition' \
-                                   '&filter=%7B%22urgency%22%3A%20%5B3%5D%7D' \
+    assert get_topic_url(topic) == 'http://localhost:5050/wire?' \
+                                   'q=art+exhibition' \
+                                   '&filter=%7B%22urgency%22%3A+%5B3%5D%7D' \
                                    '&navigation=%5B%22123%22%5D' \
-                                   '&created=%7B%22from%22%3A%20%222018-06-01%22%7D'
+                                   '&created=%7B%22from%22%3A+%222018-06-01%22%7D'

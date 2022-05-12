@@ -67,14 +67,14 @@ def test_delete_notification(client):
 
     resp = client.get(notifications_url)
     data = json.loads(resp.get_data())
-    id = data['_items'][0]['_id']
+    notify_id = data['notifications'][0]['_id']
 
-    resp = client.delete('/users/{}/notifications/{}'.format(user, id))
+    resp = client.delete('/users/{}/notifications/{}'.format(user, notify_id))
     assert 200 == resp.status_code
 
     resp = client.get(notifications_url)
     data = json.loads(resp.get_data())
-    assert 0 == len(data['_items'])
+    assert 0 == len(data['notifications'])
 
 
 def test_delete_all_notifications(client):
@@ -92,11 +92,11 @@ def test_delete_all_notifications(client):
 
     resp = client.get(notifications_url)
     data = json.loads(resp.get_data())
-    assert 2 == len(data['_items'])
+    assert 2 == len(data['notifications'])
 
     resp = client.delete('/users/{}/notifications'.format(user))
     assert 200 == resp.status_code
 
     resp = client.get(notifications_url)
     data = json.loads(resp.get_data())
-    assert 0 == len(data['_items'])
+    assert 0 == len(data['notifications'])

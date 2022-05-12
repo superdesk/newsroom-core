@@ -96,25 +96,6 @@ class AgendaApp extends BaseApp {
 
         const onDetailClose = this.props.detail ? null :
             () => this.props.actions.filter(a => a.id === 'open')[0].action(null, this.props.previewGroup, this.props.previewPlan);
-
-        const groups = [
-            {
-                field: 'service',
-                label: gettext('Category'),
-            },
-            {
-                field: 'subject',
-                label: gettext('Subject'),
-            },
-            {
-                field: 'urgency',
-                label: gettext('News Value'),
-            },
-            {
-                field: 'place',
-                label: gettext('Place'),
-            },
-        ];
         const eventsOnly = this.props.eventsOnlyView || this.props.eventsOnlyAccess;
         const hideFeaturedToggle = !noNavigationSelected(this.props.activeNavigation) ||
             this.props.bookmarks ||
@@ -214,6 +195,7 @@ class AgendaApp extends BaseApp {
                             hideFeaturedToggle={!!hideFeaturedToggle}
                             toggleFeaturedFilter={this.props.toggleFeaturedFilter}
                             featuredFilter={this.props.featuredOnly}
+                            hasAgendaFeaturedItems={this.props.hasAgendaFeaturedItems}
                         />
                     </nav>
                 </section>,
@@ -226,7 +208,6 @@ class AgendaApp extends BaseApp {
                                     tabs={this.getTabs()}
                                     props={{
                                         ...this.props,
-                                        groups,
                                         fetchItems: this.fetchItemsOnNavigation}}
                                 />
                             )}
@@ -301,6 +282,7 @@ AgendaApp.propTypes = {
     state: PropTypes.object,
     isLoading: PropTypes.bool,
     totalItems: PropTypes.number,
+    hasAgendaFeaturedItems: PropTypes.bool,
     activeQuery: PropTypes.string,
     activeFilter: PropTypes.object,
     createdFilter: PropTypes.object,
@@ -345,6 +327,7 @@ AgendaApp.propTypes = {
     searchParams: PropTypes.object,
     showSaveTopic: PropTypes.bool,
     previewConfig: PropTypes.object,
+    groups: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
@@ -385,6 +368,8 @@ const mapStateToProps = (state) => ({
     searchParams: searchParamsSelector(state),
     showSaveTopic: showSaveTopicSelector(state),
     previewConfig: previewConfigSelector(state),
+    groups: get(state, 'groups', []),
+    hasAgendaFeaturedItems: state.hasAgendaFeaturedItems,
 });
 
 const mapDispatchToProps = (dispatch) => ({

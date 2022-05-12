@@ -8,6 +8,7 @@ import ActionButton from 'components/ActionButton';
 import AgendaListItemIcons from './AgendaListItemIcons';
 import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
 import AgendaInternalNote from './AgendaInternalNote';
+import {PlainText} from 'ui/components/PlainText';
 
 import {
     hasCoverages,
@@ -146,7 +147,7 @@ class AgendaListItem extends React.Component {
                             </div>
 
                             <span className={
-                                classNames({'wire-articles__item__meta-time wire-articles__item__meta-time--border-right': showHeadline})}>
+                                classNames({'wire-articles__item__meta-time': showHeadline})}>
                                 {getName(item)}</span>
                             {showHeadline && <span
                                 className='wire-articles__item__text wire-articles__item__text--large'>
@@ -163,7 +164,7 @@ class AgendaListItem extends React.Component {
 
                         {(isMobile || isExtended) && description && (
                             <p className="wire-articles__item__text">
-                                {description}
+                                <PlainText text={description} />
                             </p>
                         )}
                     </div>
@@ -187,9 +188,10 @@ class AgendaListItem extends React.Component {
                     actions={this.props.actions}
                     onActionList={this.props.onActionList}
                     showActions={this.props.showActions}
+                    showShortcutActions={!this.props.showShortcutActionIcons}
                 />
 
-                {this.props.actions.map((action) => action.shortcut && (
+                {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action) => action.shortcut && (
                     <ActionButton
                         key={action.name}
                         className="icon-button"
@@ -205,7 +207,6 @@ class AgendaListItem extends React.Component {
     renderMobile() {
         const {item, planningId} = this.props;
         const planningItem = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
-
         const internalNote = getInternalNote(item, planningItem);
 
         return this.renderListItem(true, (
@@ -225,7 +226,7 @@ class AgendaListItem extends React.Component {
                     noPaddingRight={true}
                 />
 
-                {this.props.actions.map((action) => action.shortcut && (
+                {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action) => action.shortcut && (
                     <ActionButton
                         key={action.name}
                         className="icon-button"
@@ -243,6 +244,7 @@ class AgendaListItem extends React.Component {
                         actions={this.props.actions}
                         onActionList={this.props.onActionList}
                         showActions={this.props.showActions}
+                        showShortcutActions={!this.props.showShortcutActionIcons}
                     />
                 )}
             </div>
@@ -276,6 +278,7 @@ AgendaListItem.propTypes = {
     actioningItem: PropTypes.object,
     resetActioningItem: PropTypes.func,
     planningId: PropTypes.string,
+    showShortcutActionIcons: PropTypes.bool,
 };
 
 export default AgendaListItem;

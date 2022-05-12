@@ -1,10 +1,12 @@
 from datetime import timedelta
 
+from flask import current_app as app
 from flask_babel import gettext
 from planning.common import WORKFLOW_STATE, ASSIGNMENT_WORKFLOW_STATE
 from superdesk.metadata.item import CONTENT_STATE
 
 from newsroom.template_filters import time_short, parse_date, format_datetime
+from newsroom.gettext import get_session_locale
 
 DAY_IN_MINUTES = 24 * 60 - 1
 TO_BE_CONFIRMED_FIELD = '_time_to_be_confirmed'
@@ -87,30 +89,48 @@ def get_coverage_scheduled(coverage):
     return coverage.get('scheduled') or (coverage.get('planning') or {}).get('scheduled')
 
 
-def get_coverage_status_text(coverage):
-    def get_date(datetime_str):
-        return format_datetime(parse_date(datetime_str), 'HH:mm (dd/MM/yyyy)')
+def get_coverage_content_type_name(coverage, language):
+    coverage_types = app.config['COVERAGE_TYPES']
+    content_type = (coverage.get('coverage_type') or
+                    coverage.get('planning', {}).get('g2_content_type', ''))
+    coverage_type = coverage_types.get(content_type, {})
+    locale = (language or get_session_locale() or 'en').lower()
 
+    return coverage_type.get("translations", {}).get(locale) or coverage_type.get("name")
+
+
+def get_display_date_from_string(datetime_str):
+    return format_datetime(parse_date(datetime_str), app.config["AGENDA_EMAIL_LIST_DATE_FORMAT"])
+
+
+def get_coverage_publish_time(coverage):
+    return get_display_date_from_string(coverage.get('publish_time')) if coverage.get('publish_time') else ''
+
+
+def get_coverage_scheduled_date(coverage):
+    return get_display_date_from_string(get_coverage_scheduled(coverage))
+
+
+def get_coverage_status_text(coverage):
     if coverage.get('workflow_status') == WORKFLOW_STATE.CANCELLED:
         return 'has been cancelled.'
 
     if coverage.get('workflow_status') == WORKFLOW_STATE.DRAFT:
-        return 'due at {}.'.format(get_date(get_coverage_scheduled(coverage)))
+        return 'due at {}.'.format(get_coverage_scheduled_date(coverage))
 
     if coverage.get('workflow_status') == ASSIGNMENT_WORKFLOW_STATE.ASSIGNED:
-        return 'expected at {}.'.format(get_date(get_coverage_scheduled(coverage)))
+        return 'expected at {}.'.format(get_coverage_scheduled_date(coverage))
 
     if coverage.get('workflow_status') == WORKFLOW_STATE.ACTIVE:
-        return 'in progress at {}.'.format(get_date(get_coverage_scheduled(coverage)))
+        return 'in progress at {}.'.format(get_coverage_scheduled_date(coverage))
 
     if coverage.get('workflow_status') == ASSIGNMENT_WORKFLOW_STATE.COMPLETED:
         return '{}{}.'.format('updated' if len(coverage.get('deliveries') or []) > 1 else 'available',
-                              ' at ' + get_date(coverage.get('publish_time')) if coverage.get('publish_time') else '')
+                              ' at ' + get_coverage_publish_time(coverage))
 
 
-def get_coverage_email_text(coverage, default_state=''):
-    content_type = (coverage.get('coverage_type') or
-                    coverage.get('planning', {}).get('g2_content_type', '')).capitalize()
+def get_coverage_email_text(coverage, default_state='', language=None):
+    content_type = get_coverage_content_type_name(coverage, language)
     status = default_state or get_coverage_status_text(coverage)
     slugline = (coverage.get('slugline') or coverage.get('planning', {}).get('slugline', ''))
 

@@ -6,11 +6,10 @@ import bson
 from bson import ObjectId
 from flask import json
 from datetime import datetime
-import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from superdesk import get_resource_service
 import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_entity_or_404
-from ..fixtures import init_auth  # noqa
+from ..fixtures import COMPANY_1_ID, COMPANY_2_ID
 from ..utils import mock_send_email
 from unittest import mock
 
@@ -46,6 +45,10 @@ item = {
     },
     'event_id': 'urn:event/1',
     'coverage_id': 'urn:coverage/1',
+    'subject': [
+        {"name": "a", "code": "a", "scheme": "a"},
+        {"name": "b", "code": "b", "scheme": "b"}
+    ],
 }
 
 
@@ -265,7 +268,7 @@ def test_push_binary_invalid_signature(client, app):
 
 def test_notify_topic_matches_for_new_item(client, app, mocker):
     user_ids = app.data.insert('users', [{
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
@@ -303,12 +306,12 @@ def test_notify_topic_matches_for_new_item(client, app, mocker):
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
-        'name': 'Press co.',
+        'name': 'Press 2 co.',
         'is_enabled': True,
     }])
 
     user = {
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
@@ -327,15 +330,19 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
         key = b'something random'
         app.config['PUSH_KEY'] = key
         data = json.dumps({'guid': 'bar', 'type': 'text', 'headline': 'this is a test'})
-        push_mock = mocker.patch('newsroom.push.push_notification')
+        push_mock = mocker.patch('newsroom.notifications.push_notification')
         headers = get_signature_headers(data, key)
         resp = client.post('/push', data=data, content_type='application/json', headers=headers)
         assert 200 == resp.status_code
-        assert push_mock.call_args[1]['item']['_id'] == 'bar'
-        assert len(push_mock.call_args[1]['users']) == 1
+
+        assert push_mock.call_args[0][0] == "new_notifications"
+        assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
 
         notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
-        assert notification['item'] == 'bar'
+        assert notification["action"] == "history_match"
+        assert notification["item"] == "bar"
+        assert notification["resource"] == "text"
+        assert notification["user"] == user_ids[0]
 
     assert len(outbox) == 1
     assert 'http://localhost:5050/wire?item=bar' in outbox[0].body
@@ -344,12 +351,12 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
     company_ids = app.data.insert('companies', [{
-        'name': 'Press co.',
+        'name': 'Press 2 co.',
         'is_enabled': True,
     }])
 
     user = {
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': False,  # should still get email
@@ -374,34 +381,31 @@ def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
         'description_html': 'This story is killed',
         'body_html': 'Killed story',
         'pubstatus': 'canceled'})
-    push_mock = mocker.patch('newsroom.push.push_notification')
+    push_mock = mocker.patch('newsroom.notifications.push_notification')
     headers = get_signature_headers(data, key)
 
     with app.mail.record_messages() as outbox:
         resp = client.post('/push', data=data, content_type='application/json', headers=headers)
         assert 200 == resp.status_code
-        assert push_mock.call_args[1]['item']['_id'] == 'bar'
-        assert len(push_mock.call_args[1]['users']) == 1
+        assert push_mock.call_args[0][0] == "new_notifications"
+        assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
     assert len(outbox) == 1
     notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
-    assert notification['item'] == 'bar'
+    assert notification["action"] == "history_match"
+    assert notification["item"] == "bar"
+    assert notification["resource"] == "text"
+    assert notification["user"] == user_ids[0]
 
 
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
-    app.data.insert('companies', [{
-        '_id': '2',
-        'name': 'Press co.',
-        'is_enabled': True,
-    }])
-
     user = {
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'is_approved': True,
         'receive_email': True,
-        'company': '2',
+        'company': COMPANY_1_ID,
     }
 
     user_ids = app.data.insert('users', [user])
@@ -413,7 +417,7 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         "query": "service.code: a",
         "is_enabled": True,
         "description": "Service A",
-        "companies": ['2'],
+        "companies": [COMPANY_1_ID],
         "sd_product_id": None,
         "product_type": "wire",
     }])
@@ -439,15 +443,19 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         key = b'something random'
         app.config['PUSH_KEY'] = key
         data = json.dumps({'guid': 'bar', 'type': 'text', 'headline': 'this is a test'})
-        push_mock = mocker.patch('newsroom.push.push_notification')
+        push_mock = mocker.patch('newsroom.notifications.push_notification')
         headers = get_signature_headers(data, key)
         resp = client.post('/push', data=data, content_type='application/json', headers=headers)
         assert 200 == resp.status_code
-        assert push_mock.call_args_list[0][0][0] == 'new_item'
-        assert push_mock.call_args_list[1][0][0] == 'history_matches'
-        assert push_mock.call_args[1]['item']['_id']
+
+        assert push_mock.call_args[0][0] == "new_notifications"
+        assert str(user_ids[0]) in push_mock.call_args[1]["counts"].keys()
+
         notification = get_resource_service('notifications').find_one(req=None, user=user_ids[0])
-        assert notification['item'] == 'bar'
+        assert notification["action"] == "history_match"
+        assert notification["item"] == "bar"
+        assert notification["resource"] == "text"
+        assert notification["user"] == user_ids[0]
 
     assert len(outbox) == 1
     assert 'http://localhost:5050/wire?item=bar' in outbox[0].body
@@ -456,12 +464,12 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
 def test_do_not_notify_disabled_user(client, app, mocker):
     app.data.insert('companies', [{
         '_id': 1,
-        'name': 'Press co.',
+        'name': 'Press 2 co.',
         'is_enabled': True,
     }])
 
     user_ids = app.data.insert('users', [{
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
@@ -495,12 +503,12 @@ def test_do_not_notify_disabled_user(client, app, mocker):
 def test_notify_checks_service_subscriptions(client, app, mocker):
     app.data.insert('companies', [{
         '_id': 1,
-        'name': 'Press co.',
+        'name': 'Press 2 co.',
         'is_enabled': True,
     }])
 
     user_ids = app.data.insert('users', [{
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
@@ -539,7 +547,7 @@ def test_notify_checks_service_subscriptions(client, app, mocker):
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_send_notification_emails(client, app):
     user_ids = app.data.insert('users', [{
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
@@ -611,7 +619,7 @@ def test_matching_topics_for_public_user(client, app):
         'description': 'Top level sport product',
         'sd_product_id': 'p-1',
         'is_enabled': True,
-        'companies': ['1'],
+        'companies': [COMPANY_1_ID],
         'product_type': 'wire'
     }])
 
@@ -619,8 +627,8 @@ def test_matching_topics_for_public_user(client, app):
     client.post('/push', json=item)
     search = get_resource_service('wire_search')
 
-    users = {'foo': {'company': '1', 'user_type': 'public'}}
-    companies = {'1': {'_id': '1', 'name': 'test-comp'}}
+    users = {'foo': {'company': COMPANY_1_ID, 'user_type': 'public'}}
+    companies = {str(COMPANY_1_ID): {'_id': COMPANY_1_ID, 'name': 'test-comp'}}
     topics = [
         {'_id': 'created_to_old', 'created': {'to': '2017-01-01'}, 'user': 'foo'},
         {'_id': 'created_from_future', 'created': {'from': 'now/d'}, 'user': 'foo', 'timezone_offset': 60 * 28},
@@ -639,7 +647,7 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
         'description': 'Top level sport product',
         'sd_product_id': 'p-1',
         'is_enabled': True,
-        'companies': ['1'],
+        'companies': [COMPANY_1_ID],
         'product_type': 'wire'
     }])
 
@@ -647,8 +655,11 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
     client.post('/push', json=item)
     search = get_resource_service('wire_search')
 
-    users = {'foo': {'company': '1', 'user_type': 'public'}, 'bar': {'company': '2', 'user_type': 'public'}}
-    companies = {'1': {'_id': '1', 'name': 'test-comp'}}
+    users = {
+        'foo': {'company': COMPANY_1_ID, 'user_type': 'public'},
+        'bar': {'company': COMPANY_2_ID, 'user_type': 'public'},
+    }
+    companies = {str(COMPANY_1_ID): {'_id': COMPANY_1_ID, 'name': 'test-comp'}}
     topics = [
         {'_id': 'created_to_old', 'created': {'to': '2017-01-01'}, 'user': 'bar'},
         {'_id': 'created_from_future', 'created': {'from': 'now/d'}, 'user': 'foo', 'timezone_offset': 60 * 28},
@@ -683,3 +694,11 @@ def test_push_event_coverage_info(client, app):
     parsed = get_entity_or_404(item['guid'], 'items')
     assert parsed['event_id'] == 'urn:event/1'
     assert parsed['coverage_id'] == 'urn:coverage/1'
+
+
+def test_push_wire_subject_whitelist(client, app):
+    app.config["WIRE_SUBJECT_SCHEME_WHITELIST"] = ['b']
+    client.post('/push', data=json.dumps(item), content_type='application/json')
+    parsed = get_entity_or_404(item['guid'], 'items')
+    assert 1 == len(parsed['subject'])
+    assert 'b' == parsed['subject'][0]['name']

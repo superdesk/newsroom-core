@@ -23,7 +23,7 @@
     </p>
 {% endif %}
 
-{% if contacts | length is gt 1 %}
+{% if links | length is gt 1 %}
     <p><b>Web: </b>
     {% for link in links %}
         <div><a href={{ link | safe }}>{{ link }}</a></div>

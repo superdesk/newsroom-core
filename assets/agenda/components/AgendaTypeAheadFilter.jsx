@@ -80,6 +80,8 @@ class AgendaTypeAheadFilter extends React.PureComponent {
                     placeholder={gettext('Choose a location...')}
                     selected={getActiveTypeahead(filter, activeFilter)}
                     className='p-2'
+                    emptyLabel={gettext('No matches found.')}
+                    paginationText={gettext('Display additional results...')}
                 />
             </div>
         </div>);

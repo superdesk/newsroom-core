@@ -3,13 +3,16 @@ from bson import ObjectId
 from pytest import fixture
 from datetime import datetime, timedelta
 from superdesk.utc import utcnow
-from .users import test_login_succeeds_for_admin, init as users_init
+from newsroom.tests.users import ADMIN_USER_ID, test_login_succeeds_for_admin
+
 
 PUBLIC_USER_ID = ObjectId('59b4c5c61d41c8d736852fbf')
 PUBLIC_USER_FIRSTNAME = 'Foo'
 PUBLIC_USER_LASTNAME = 'Bar'
 PUBLIC_USER_NAME = '{} {}'.format(PUBLIC_USER_FIRSTNAME, PUBLIC_USER_LASTNAME)
 TEST_USER_ID = ObjectId('5cc94454bc43165c045ffec9')
+COMPANY_1_ID = ObjectId("6215cbf55fc14ebe18e175a5")
+COMPANY_2_ID = ObjectId("6215ce6ed2943dec3725afde")
 
 items = [
     {
@@ -182,25 +185,54 @@ def init_agenda_items(app):
     app.data.insert('agenda', agenda_items)
 
 
-@fixture(autouse=True)
-def init_auth(app, client):
-    users_init(app)
+@fixture()
+def user(app):
+    app.data.insert('users', [{
+        '_id': ObjectId(ADMIN_USER_ID),
+        'first_name': 'admin',
+        'last_name': 'admin',
+        'email': 'admin@sourcefabric.org',
+        'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
+        'user_type': 'administrator',
+        'is_validated': True,
+        'is_enabled': True,
+        'is_approved': True,
+        'receive_email': True,
+    }])
+
+
+@fixture()
+def auth_users(client, user):
     test_login_succeeds_for_admin(client)
 
 
+@fixture(autouse=True)
+def init_auth(app, auth_users):
+    return
+
+
 def setup_user_company(app):
-    app.data.insert('companies', [{
-        '_id': 1,
-        'name': 'Grain Corp',
-        'is_enabled': True
-    }])
+    app.data.insert('companies', [
+        {
+            '_id': COMPANY_1_ID,
+            'sd_subscriber_id': '12345',
+            'name': 'Press Co.',
+            'is_enabled': True,
+            'contact_name': 'Tom'
+        },
+        {
+            '_id': COMPANY_2_ID,
+            'name': 'Paper Co.',
+            'is_enabled': True,
+        },
+    ])
 
     app.data.insert('users', [{
         '_id': PUBLIC_USER_ID,
         'email': 'foo@bar.com',
         'first_name': PUBLIC_USER_FIRSTNAME,
         'last_name': PUBLIC_USER_LASTNAME,
-        'company': 1,
+        'company': COMPANY_1_ID,
         'is_enabled': True,
         'is_approved': True,
         '_created': utcnow()
@@ -209,7 +241,7 @@ def setup_user_company(app):
         'email': 'test@bar.com',
         'first_name': 'Test',
         'last_name': 'Bar',
-        'company': 1,
+        'company': COMPANY_1_ID,
         'is_enabled': True,
         'is_approved': True,
         '_created': utcnow()
@@ -219,3 +251,9 @@ def setup_user_company(app):
 @fixture(autouse=True)
 def init_company(app):
     setup_user_company(app)
+
+
+@fixture
+def anonymous_user(client):
+    with client.session_transaction() as session:
+        session.clear()

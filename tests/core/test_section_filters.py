@@ -2,7 +2,7 @@ from bson import ObjectId
 from flask import json
 from pytest import fixture
 
-from newsroom.tests.users import test_login_succeeds_for_admin, init as user_init  # noqa
+from newsroom.tests.users import test_login_succeeds_for_admin
 
 
 @fixture(autouse=True)
@@ -15,7 +15,7 @@ def init(app):
     }])
 
 
-def test_filter_list_fails_for_anonymous_user(client):
+def test_filter_list_fails_for_anonymous_user(client, anonymous_user):
     response = client.get('/section_filters/search')
     assert response.status_code == 403
     assert b'Forbidden' in response.data

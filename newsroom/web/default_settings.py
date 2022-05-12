@@ -275,7 +275,7 @@ COVERAGE_TYPES = {
     'video_explainer': {'name': 'Video Explainer', 'icon': 'explainer'}
 }
 
-LANGUAGES = ['en', 'fi', 'cs']
+LANGUAGES = ['en', 'fi', 'fr_CA']
 DEFAULT_LANGUAGE = 'en'
 
 CLIENT_LOCALE_FORMATS = {
@@ -284,26 +284,11 @@ CLIENT_LOCALE_FORMATS = {
         "DATE_FORMAT": "DD/MM/YYYY",
         "COVERAGE_DATE_TIME_FORMAT": "HH:mm DD/MM",
         "COVERAGE_DATE_FORMAT": "DD/MM",
-        "DATE_FORMAT_HEADER": "EEEE, dd.MM.yyyy"
+        "DATE_FORMAT_HEADER": "EEEE, dd/MM/yyyy"
     },
     "fr_CA": {  # example - you can overwrite any format above
         "DATE_FORMAT": "DD/MM/YYYY",
         "DATE_FORMAT_HEADER": "EEEE, 'le' d MMMM yyyy",
-    }
-}
-
-LANGUAGES = ['en', 'fi', 'cs', 'fr_CA']
-DEFAULT_LANGUAGE = 'en'
-
-CLIENT_LOCALE_FORMATS = {
-    "en": {  # defaults
-        "TIME_FORMAT": "HH:mm",
-        "DATE_FORMAT": "DD/MM/YYYY",
-        "COVERAGE_DATE_TIME_FORMAT": "HH:mm DD/MM",
-        "COVERAGE_DATE_FORMAT": "DD/MM",
-    },
-    "fr_CA": {  # example - you can overwrite any format above
-        "DATE_FORMAT": "DD/MM/YYYY",
     }
 }
 
@@ -315,10 +300,21 @@ CLIENT_CONFIG = {
     'coverage_types': COVERAGE_TYPES,
     'list_animations': True,  # Enables or disables the animations for list item select boxes,
     'display_news_only': True,  # Displays news only switch in wire,
+    'display_agenda_featured_stories_only': True,   # Displays top/featured stories switch in agenda,
     'default_timezone': DEFAULT_TIMEZONE,
     'item_actions': {},
     'display_abstract': DISPLAY_ABSTRACT,
     'display_credits': False,
+    'filter_panel_defaults': {
+        'tab': {
+            'wire': 'nav',  # Options are 'nav', 'topics', 'filters'
+            'agenda': 'nav',
+        },
+        'open': {
+            'wire': False,
+            'agenda': False,
+        },
+    },
 }
 
 # Enable iframely support for item body_html
@@ -370,6 +366,9 @@ ELASTICSEARCH_SETTINGS.setdefault("settings", {})["query_string"] = {
     'analyze_wildcard': False
 }
 
+# count above 10k
+ELASTICSEARCH_TRACK_TOTAL_HITS = True
+
 #: server working directory
 #: should be set in settings.py
 SERVER_PATH = pathlib.Path(__file__).resolve().parent.parent
@@ -378,13 +377,17 @@ SERVER_PATH = pathlib.Path(__file__).resolve().parent.parent
 #: used to locate client/dist/manifest.json file
 CLIENT_PATH = SERVER_PATH
 
+#: path to app specific translations
+TRANSLATIONS_PATH = None
+
 #: server date/time formats
 #: defined using babel syntax http://babel.pocoo.org/en/latest/dates.html#date-and-time
 TIME_FORMAT_SHORT = "HH:mm"
 DATE_FORMAT_SHORT = "short"
-DATE_FORMAT_HEADER = "EEEE, dd.MM.yyyy"
+DATE_FORMAT_HEADER = "EEEE, dd/MM/yyyy"
 DATETIME_FORMAT_SHORT = "short"
 DATETIME_FORMAT_LONG = "dd/MM/yyyy HH:mm"
+AGENDA_EMAIL_LIST_DATE_FORMAT = "HH:mm (dd/MM/yyyy)"
 
 PREPEND_EMBARGOED_TO_WIRE_SEARCH = False
 
@@ -411,3 +414,35 @@ GOOGLE_LOGIN = True
 APM_SERVER_URL = env("APM_SERVER_URL")
 APM_SECRET_TOKEN = env("APM_SECRET_TOKEN")
 APM_SERVICE_NAME = env("APM_SERVICE_NAME") or SITE_NAME
+
+#: Filter out subjects with schema which is not in the whitelist
+#: before storing the item to avoid those being displayed in filter,
+#: preview and outputs.
+#:
+#: .. versionadded:: 2.1
+#:
+WIRE_SUBJECT_SCHEME_WHITELIST = []
+
+#: Agenda Filter groups (defaults set in ``newsroom.agenda.init_app``)
+#:
+#: .. versionadded:: 2.1.0
+#:
+AGENDA_GROUPS = None
+
+#: If True, allows Users to log in after their associated Company has expired
+#:
+#: .. versionadded:: 2.1.0
+#:
+ALLOW_EXPIRED_COMPANY_LOGINS = False
+
+#: The timeout used on the cache for the dashboard items
+#:
+#: .. versionadded:: 2.1.0
+#:
+DASHBOARD_CACHE_TIMEOUT = 300
+
+#: If True, deletes all Dashboard item caches when new items are pushed
+#:
+#: .. versionadded:: 2.1.0
+#:
+DELETE_DASHBOARD_CACHE_ON_PUSH = True

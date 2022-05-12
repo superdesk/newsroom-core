@@ -4,6 +4,7 @@ import {
     OPEN_ITEM,
     SET_ACTIVE,
     SET_CARD_ITEMS,
+    SET_MULTIPLE_CARD_ITEMS,
 } from './actions';
 import {BOOKMARK_ITEMS, REMOVE_BOOKMARK} from '../wire/actions';
 import {CLOSE_MODAL, MODAL_FORM_VALID, RENDER_MODAL} from '../actions';
@@ -27,7 +28,7 @@ export default function homeReducer(state=initialState, action) {
         return {
             ...state,
             cards: action.data.cards,
-            itemsByCard: action.data.itemsByCard,
+            itemsByCard: {},
             products: action.data.products,
             user: action.data.user,
             userType: action.data.userType,
@@ -36,7 +37,8 @@ export default function homeReducer(state=initialState, action) {
             userSections: action.data.userSections,
             uiConfig: action.data.ui_config || {},
             topics: action.data.topics || [],
-            context: 'wire'
+            context: 'wire',
+            groups: action.data.groups || [],
         };
 
     case OPEN_ITEM:{
@@ -78,6 +80,16 @@ export default function homeReducer(state=initialState, action) {
             itemsByCard: {
                 ...state.itemsByCard,
                 [action.payload.card]: action.payload.items,
+            },
+        };
+    }
+
+    case SET_MULTIPLE_CARD_ITEMS: {
+        return {
+            ...state,
+            itemsByCard: {
+                ...state.itemsByCard,
+                ...action.payload,
             },
         };
     }

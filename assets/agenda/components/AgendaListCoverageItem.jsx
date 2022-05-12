@@ -110,13 +110,13 @@ class AgendaListCoverageItem extends React.Component {
             (state.isCoverageForExtraDay && props.coverage.planning_id === get(props, 'planningItem.guid'))
         ) && (
             <span
-                className={classNames('wire-articles__item__icon', {'dashed-border': props.showBorder})}
+                className={classNames('wire-articles__item__icon', WORKFLOW_COLORS[props.coverage.workflow_status], {'dashed-border': props.showBorder})}
                 title={state.tooltip}
             >
-                <i className={`${state.coverageClass} ${WORKFLOW_COLORS[props.coverage.workflow_status]}`}>
+                <i className={`${state.coverageClass}`}>
                     {state.beingUpdated && <i className="blue-circle" />}
                     {state.isWatched &&
-                      <i className="blue-circle blue-circle--pale blue-circle--right" />}
+                      <i className="blue-circle blue-circle--pale blue-circle--left" />}
                 </i>
             </span>
         );

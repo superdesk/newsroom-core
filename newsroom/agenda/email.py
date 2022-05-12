@@ -27,6 +27,7 @@ def send_agenda_notification_email(
 ):
     if agenda and user.get('receive_email'):
         template_kwargs = dict(
+            name=user.get('first_name'),
             message=message,
             agenda=agenda,
             dateString=get_agenda_dates(agenda if agenda.get('dates') else original_agenda, date_paranthesis=True),

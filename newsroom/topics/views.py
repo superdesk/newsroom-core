@@ -1,8 +1,6 @@
-from urllib import parse
-
 from bson import ObjectId
 from superdesk import get_resource_service
-from flask import json, jsonify, abort, current_app as app, request
+from flask import json, jsonify, abort, current_app as app, request, url_for
 from flask_babel import gettext
 
 from newsroom.topics import blueprint
@@ -12,7 +10,8 @@ from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required
 from newsroom.utils import get_json_or_400, get_entity_or_404
 from newsroom.email import send_template_email
-from newsroom.notifications import push_user_notification, push_company_notification
+from newsroom.notifications import push_user_notification, push_company_notification, \
+    save_user_notifications, UserNotification
 
 
 @blueprint.route('/users/<user_id>/topics', methods=['GET'])
@@ -43,7 +42,7 @@ def update_topic(topic_id):
     if str(current_user['_id']) in data['subscribers']:
         user = get_resource_service('users').find_one(req=None, _id=current_user['_id'])
         if not user.get('receive_email'):
-            return "", gettext('Please enable \'Receive notifications via email\' option in your profile to receive topic notifications')  # noqa
+            return "", gettext('Please enable \'Receive notifications\' option in your profile to receive topic notifications')  # noqa
 
     updates = {
         'label': data.get('label'),
@@ -152,27 +151,22 @@ def is_user_or_company_topic(topic, user):
 
 
 def get_topic_url(topic):
-    query_strings = []
+    url_params = {}
     if topic.get('query'):
-        query_strings.append('q={}'.format(parse.quote(topic.get('query'))))
+        url_params["q"] = topic.get('query')
     if topic.get('filter'):
-        query_strings.append('filter={}'.format(parse.quote(json.dumps(topic.get('filter')))))
+        url_params["filter"] = json.dumps(topic.get('filter'))
     if topic.get('navigation'):
-        query_strings.append(
-            'navigation={}'.format(
-                parse.quote(json.dumps(topic.get('navigation')))
-            )
-        )
+        url_params["navigation"] = json.dumps(topic.get('navigation'))
     if topic.get('created'):
-        query_strings.append('created={}'.format(parse.quote(json.dumps(topic.get('created')))))
+        url_params["created"] = json.dumps(topic.get('created'))
 
-    url = '{}/{}?{}'.format(
-        app.config['CLIENT_URL'],
-        topic.get('topic_type'),
-        '&'.join(query_strings)
+    section = topic.get("topic_type")
+    return url_for(
+        "wire.wire" if section == "wire" else f"{section}.index",
+        _external=True,
+        **url_params
     )
-
-    return url
 
 
 @blueprint.route('/topic_share', methods=['POST'])
@@ -188,11 +182,26 @@ def share():
         if not user or not user.get('email'):
             continue
 
+        topic_url = get_topic_url(topic)
+        save_user_notifications([UserNotification(
+            user=user["_id"],
+            action="share",
+            resource="topic",
+            item=topic["_id"],
+            data=dict(
+                shared_by=dict(
+                    _id=current_user["_id"],
+                    first_name=current_user["first_name"],
+                    last_name=current_user["last_name"],
+                ),
+                url=topic_url,
+            ),
+        )])
         template_kwargs = {
             'recipient': user,
             'sender': current_user,
             'topic': topic,
-            'url': get_topic_url(topic),
+            'url': topic_url,
             'message': data.get('message'),
             'app_name': app.config['SITE_NAME'],
         }

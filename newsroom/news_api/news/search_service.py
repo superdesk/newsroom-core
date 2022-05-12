@@ -122,7 +122,7 @@ class NewsAPINewsService(BaseSearchService):
         if search.args.get('products'):
             search.products = list(get_resource_service('products').get(req=None, lookup={
                 'is_enabled': True,
-                'companies': str(search.company['_id']),
+                'companies': ObjectId(search.company['_id']),
                 '_id': {
                     '$in': [
                         ObjectId(pid)

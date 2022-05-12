@@ -18,6 +18,7 @@ import {loadMyWireTopic} from 'wire/actions';
 import {loadMyAgendaTopic} from 'agenda/actions';
 import EditPanel from 'components/EditPanel';
 import AuditInformation from 'components/AuditInformation';
+import {ToolTip} from 'ui/components/ToolTip';
 
 class TopicEditor extends React.Component {
     constructor(props) {
@@ -73,8 +74,8 @@ class TopicEditor extends React.Component {
         return (!topic._id || !topic.is_global || !this.props.isAdmin) ?
             [] :
             [
-                {label: gettext('Company Topic'), name: 'topic'},
-                {label: gettext('Subscribers'), name: 'subscribers'},
+                {label: gettext('Company Topic'), name: 'topic', tooltip: gettext('Edit Metadata')},
+                {label: gettext('Subscribers'), name: 'subscribers', tooltip: gettext('Email Notifications')},
             ];
     }
 
@@ -116,12 +117,18 @@ class TopicEditor extends React.Component {
         if (this.state.topic.notifications) {
             unsubscribeToTopic(this.state.topic);
             topic.notifications = false;
+            topic.subscribers = (topic.subscribers || []).filter((userId) => userId !== this.props.userId);
         } else {
             subscribeToTopic(this.state.topic);
             topic.notifications = true;
+            topic.subscribers = [
+                ...(topic.subscribers || []),
+                this.props.userId
+            ];
         }
 
         this.setState({topic});
+        this.props.onTopicChanged();
     }
 
     saveTopic(event) {
@@ -144,7 +151,7 @@ class TopicEditor extends React.Component {
             }
 
             delete topic.notifications;
-            topic.subscribers = subscribers;
+            topic.subscribers = subscribers || [];
         }
 
         event.preventDefault && event.preventDefault();
@@ -217,12 +224,9 @@ class TopicEditor extends React.Component {
             'list-item__preview',
             {'list-item__preview--new': this.props.editorFullscreen}
         );
-        const Container = (props) => showTabs ?
-            <div className="list-item__preview">{props.children}</div> :
-            <div className={containerClasses}>{props.children}</div>;
 
         return (
-            <Container>
+            <div className={showTabs ? 'list-item__preview' : containerClasses}>
                 <div className="list-item__preview-header">
                     <h3>{this.getTitle()}</h3>
                     <button
@@ -245,13 +249,19 @@ class TopicEditor extends React.Component {
                 {!showTabs ? null : (
                     <ul className='nav nav-tabs'>
                         {this.state.tabs.map((tab) => (
-                            <li key={tab.name} className='nav-item'>
-                                <a
-                                    name={tab.name}
-                                    className={`nav-link ${this.state.activeTab === tab.name && 'active'}`}
-                                    href='#'
-                                    onClick={this.handleTabClick}>{tab.label}
-                                </a>
+                            <li
+                                key={tab.name}
+                                className='nav-item'
+                            >
+                                <ToolTip placement="bottom">
+                                    <a
+                                        name={tab.name}
+                                        className={`nav-link ${this.state.activeTab === tab.name && 'active'}`}
+                                        href='#'
+                                        title={tab.tooltip}
+                                        onClick={this.handleTabClick}>{tab.label}
+                                    </a>
+                                </ToolTip>
                             </li>
                         ))}
                     </ul>
@@ -268,7 +278,6 @@ class TopicEditor extends React.Component {
                                 topic={updatedTopic}
                                 save={this.saveTopic}
                                 onChange={this.onChangeHandler}
-                                showSubscribeButton={!showTabs && originalTopic.is_global}
                                 onSubscribeChanged={this.onSubscribeChanged}
                                 readOnly={isReadOnly}
                             />
@@ -291,6 +300,8 @@ class TopicEditor extends React.Component {
                             onCancel={this.props.closeEditor}
                             saveDisabled={this.state.saving || !this.state.valid}
                             cancelDisabled={this.state.saving}
+                            includeSelectAll={true}
+                            title={gettext('Send notifications to:')}
                         />
                     )}
                 </div>
@@ -314,7 +325,7 @@ class TopicEditor extends React.Component {
                         />
                     </div>
                 )}
-            </Container>
+            </div>
         );
     }
 }

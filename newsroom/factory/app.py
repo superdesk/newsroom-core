@@ -12,6 +12,7 @@ import importlib
 import eve
 import flask
 import newsroom
+import sentry_sdk
 
 from flask_mail import Mail
 from flask_caching import Cache
@@ -21,7 +22,7 @@ from superdesk.json_utils import SuperdeskJSONEncoder
 from superdesk.validator import SuperdeskValidator
 from superdesk.logging import configure_logging
 from elasticapm.contrib.flask import ElasticAPM
-from superdesk.factory.sentry import SuperdeskSentry
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 from newsroom.auth import SessionAuth
 from newsroom.utils import is_json_request
@@ -55,6 +56,9 @@ class BaseNewsroomApp(eve.Eve):
         self.__self__ = self
         self.__func__ = None
 
+        if config is None:
+            config = {}
+
         super(BaseNewsroomApp, self).__init__(
             import_name,
             data=self.DATALAYER,
@@ -62,21 +66,16 @@ class BaseNewsroomApp(eve.Eve):
             template_folder=os.path.join(NEWSROOM_DIR, 'templates'),
             static_folder=os.path.join(NEWSROOM_DIR, 'static'),
             validator=SuperdeskValidator,
+            settings=config,
             **kwargs
         )
         self.json_encoder = SuperdeskJSONEncoder
         self.data.json_encoder_class = SuperdeskJSONEncoder
 
-        if config:
-            try:
-                self.config.update(config or {})
-            except TypeError:
-                self.config.from_object(config)
-
         newsroom.flask_app = self
-        self.settings = self.config
 
         self.setup_error_handlers()
+        self.setup_sentry()
         self.setup_apm()
         self.setup_media_storage()
         self.setup_babel()
@@ -108,15 +107,15 @@ class BaseNewsroomApp(eve.Eve):
 
     def load_config(self):
         # Override Eve.load_config in order to get default_settings
-
-        if not getattr(self, 'settings'):
-            self.settings = flask.Config('.')
-
         super(BaseNewsroomApp, self).load_config()
+
         self.config.setdefault('DOMAIN', {})
         self.config.setdefault('SOURCES', {})
         self.load_app_default_config()
         self.load_app_instance_config()
+
+        # now we have to do this again to override newsrom default and instance config
+        self.config.update(self.settings or {})
 
     def setup_media_storage(self):
         if self.config.get('AMAZON_CONTAINER_NAME'):
@@ -129,6 +128,13 @@ class BaseNewsroomApp(eve.Eve):
             'BABEL_TRANSLATION_DIRECTORIES',
             os.path.join(NEWSROOM_DIR, 'translations')
         )
+
+        if self.config.get('TRANSLATIONS_PATH'):
+            self.config['BABEL_TRANSLATION_DIRECTORIES'] = ';'.join([
+                str(self.config['BABEL_TRANSLATION_DIRECTORIES']),
+                str(self.config['TRANSLATIONS_PATH']),
+            ])
+
         # avoid events on this
         self.babel_tzinfo = None
         self.babel_locale = None
@@ -173,7 +179,6 @@ class BaseNewsroomApp(eve.Eve):
         self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(404, render_404)
         self.register_error_handler(403, render_403)
-        self.sentry = SuperdeskSentry(self)
 
     def general_setting(self, _id, label, type='text', default=None,
                         weight=0, description=None, min=None, client_setting=False):
@@ -194,10 +199,23 @@ class BaseNewsroomApp(eve.Eve):
         if self.config.get("APM_SERVER_URL") and self.config.get("APM_SECRET_TOKEN"):
             self.config["ELASTIC_APM"] = {
                 "DEBUG": self.debug,
-                "SERVICE_NAME": self.config.get("APM_SERVICE_NAME") or self.config["SITE_NAME"],
+                "SERVICE_NAME": self.config.get("APM_SERVICE_NAME") or self.config.get("SITE_NAME") or "Newsroom",
                 "SERVER_URL": self.config["APM_SERVER_URL"],
                 "SECRET_TOKEN": self.config["APM_SECRET_TOKEN"],
                 "TRANSACTIONS_IGNORE_PATTERNS": ["^OPTIONS "],
             }
 
             self.apm = ElasticAPM(self)
+
+    def register_resource(self, resource, settings):
+        """In superdesk we have a workaround for mongo indexes, so now we need a workaround here."""
+        if settings.get("mongo_indexes__init") and not settings.get("mongo_indexes"):
+            settings["mongo_indexes"] = settings["mongo_indexes__init"]
+        super().register_resource(resource, settings)
+
+    def setup_sentry(self):
+        if self.config.get("SENTRY_DSN"):
+            sentry_sdk.init(
+                dsn=self.config["SENTRY_DSN"],
+                integrations=[FlaskIntegration()],
+            )

@@ -12,7 +12,7 @@ USERS = [
     {
         '_id': ADMIN_USER_ID, 'company': COMPANY_1, 'user_type': 'administrator',
         'first_name': 'admin', 'last_name': 'admin',
-        'email': 'admin@sourcefabric.org',
+        'email': 'admin2@sourcefabric.org',
         'password': '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
         'is_validated': True, 'is_enabled': True, 'is_approved': True
     },
@@ -31,7 +31,7 @@ USERS = [
 ]
 
 COMPANIES = [
-    {'_id': COMPANY_1, 'name': 'Press co.', 'is_enabled': True, 'company_type': 'internal'},
+    {'_id': COMPANY_1, 'name': 'Press 2 co.', 'is_enabled': True, 'company_type': 'internal'},
     {'_id': COMPANY_2, 'name': 'Company co.', 'is_enabled': True, 'company_type': 'public', 'archive_access': False},
     {'_id': COMPANY_3, 'name': 'Foo bar co.', 'is_enabled': True, 'company_type': 'test', 'archive_access': True}
 ]
@@ -72,30 +72,30 @@ PROD_5 = ObjectId('5e65964bf5db68883df561d4')
 PRODUCTS = [{
     '_id': PROD_1, 'name': 'Sport1', 'description': 'sport product 1',
     'is_enabled': True, 'product_type': 'wire',
-    'navigations': [str(NAV_1), str(NAV_2)],
-    'companies': [str(COMPANY_1), str(COMPANY_2)],
+    'navigations': [NAV_1, NAV_2],
+    'companies': [COMPANY_1, COMPANY_2],
     'query': 'service.code:a'
 }, {
     '_id': PROD_2, 'name': 'Sport2', 'description': 'sport product 2',
     'is_enabled': True, 'product_type': 'wire',
-    'navigations': [str(NAV_3)],
-    'companies': [str(COMPANY_2), str(COMPANY_3)],
+    'navigations': [NAV_3],
+    'companies': [COMPANY_2, COMPANY_3],
     'query': 'service.code:b', 'sd_product_id': 'sd_product_1'
 }, {
     '_id': PROD_3, 'name': 'Sport3', 'description': 'sport product 3',
     'is_enabled': False, 'product_type': 'wire',
-    'navigations': [str(NAV_4)],
-    'companies': [str(COMPANY_1)]
+    'navigations': [NAV_4],
+    'companies': [COMPANY_1]
 }, {
     '_id': PROD_4, 'name': 'Sport4', 'description': 'sport product 4',
     'is_enabled': True, 'product_type': 'agenda',
-    'navigations': [str(NAV_5)],
-    'companies': [str(COMPANY_1), str(COMPANY_2)]
+    'navigations': [NAV_5],
+    'companies': [COMPANY_1, COMPANY_2]
 }, {
     '_id': PROD_5, 'name': 'Sport4', 'description': 'sport product 4',
     'is_enabled': True, 'product_type': 'wire',
-    'navigations': [str(NAV_6)],
-    'companies': [str(COMPANY_1), str(COMPANY_3)]
+    'navigations': [NAV_6],
+    'companies': [COMPANY_1, COMPANY_3]
 }]
 
 SECTION_FILTERS = [{

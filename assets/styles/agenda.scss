@@ -37,16 +37,43 @@
     @include md {
         margin-top: 10px;
     }
-}
 
-.agenda-item {
-    .wire-articles__item__meta-info {
-        margin-top: 10px;
+    .wire-articles__item--list {
+        padding: 4px 8px;
+
+        @include md {
+            padding: 12px 20px;
+        }
+    }
+    .wire-articles--list-compact & {
+        .wire-articles__item--list {
+            padding: 0 0 0 5px;
+        }
+    }
+    .wire-articles__item-text {
+        padding-right: 58px;
+        @include sm {
+            padding-right: 0;
+        }
+    }
+    .wire-articles__item__meta {
+        align-items: stretch;
+        flex-wrap: wrap;
+        margin-left: 0;
+        padding: 5px 0;
+    }
+
+    .wire-articles__item__meta-info {        
         margin-bottom: 0;
+        flex-direction: row;
+        gap: 6px;
 
         @include md {
             margin-top: 0;
-            margin-bottom: 10px;
+        }
+        & > span {
+            display: flex;
+            align-items: center;
         }
     }
 }

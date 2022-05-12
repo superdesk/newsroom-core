@@ -1,12 +1,13 @@
 import bcrypt
 from flask import current_app as app, session
+from flask_babel import gettext
 
-from content_api import MONGO_PREFIX
 from superdesk.utils import is_hashed, get_hash
 
 import newsroom
 from newsroom.auth import get_user_id
 from newsroom.utils import set_original_creator, set_version_creator
+from werkzeug.exceptions import BadRequest
 
 
 class UsersResource(newsroom.Resource):
@@ -98,14 +99,13 @@ class UsersResource(newsroom.Resource):
 
     item_methods = ['GET', 'PATCH', 'PUT']
     resource_methods = ['GET', 'POST']
-    mongo_prefix = MONGO_PREFIX
     datasource = {
         'source': 'users',
         'projection': {'password': 0},
         'default_sort': [('last_name', 1)]
     }
     mongo_indexes = {
-        'email': ([('email', 1)], {'unique': True})
+        'email': ([('email', 1)], {'unique': True, 'collation': {'locale': 'en', 'strength': 2}})
     }
 
 
@@ -128,6 +128,8 @@ class UsersService(newsroom.Service):
         set_version_creator(updates)
         if 'password' in updates:
             updates['password'] = self._get_password_hash(updates['password'])
+        app.cache.delete(str(original.get('_id')))
+        app.cache.delete(original.get('email'))
 
     def on_updated(self, updates, original):
         # set session locale if updating locale for current user
@@ -149,3 +151,7 @@ class UsersService(newsroom.Service):
 
     def on_deleted(self, doc):
         app.cache.delete(str(doc.get('_id')))
+
+    def on_delete(self, doc):
+        if doc.get('_id') == get_user_id():
+            raise BadRequest(gettext("Can not delete current user"))

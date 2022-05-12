@@ -4,7 +4,7 @@ import {gettext} from 'utils';
 import classNames from 'classnames';
 
 const getActiveFilterLabel = (filter, activeFilter, isActive) => {
-    return isActive ? activeFilter[filter.field][0] : gettext(filter.label);
+    return isActive ? gettext(activeFilter[filter.field][0]) : gettext(filter.label);
 };
 
 function AgendaFilterButton({filter, activeFilter, autoToggle, onClick}) {

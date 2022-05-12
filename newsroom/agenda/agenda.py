@@ -6,6 +6,7 @@ from content_api.items.resource import code_mapping
 from eve.utils import ParsedRequest, config
 from flask import json, abort, current_app as app
 from flask_babel import lazy_gettext
+
 from planning.common import WORKFLOW_STATE_SCHEMA, ASSIGNMENT_WORKFLOW_STATE, WORKFLOW_STATE
 from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
@@ -17,7 +18,7 @@ import newsroom
 from newsroom.agenda.email import send_coverage_notification_email, send_agenda_notification_email
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
-from newsroom.notifications import push_notification
+from newsroom.notifications import push_notification, save_user_notifications, UserNotification
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.utils import get_user_dict, get_company_dict, get_entity_or_404, parse_date_str
 from newsroom.utils import get_local_date, get_end_date
@@ -965,6 +966,28 @@ class AgendaService(BaseSearchService):
                     break
         return agenda_items
 
+    def get_matching_topics(self, item_id, topics, users, companies):
+        """ Returns a list of topic ids matching to the given item_id
+
+        :param item_id: item id to be tested against all topics
+        :param topics: list of topics
+        :param users: user_id, user dictionary
+        :param companies: company_id, company dictionary
+        :return:
+        """
+
+        return self.get_matching_topics_for_item(item_id, topics, users, companies, {
+            "bool": {
+                "must_not": [
+                    {"term": {"state": "killed"}},
+                ],
+                "must": [
+                    {"term": {'_id': item_id}},
+                ],
+                "should": []
+            }
+        })
+
     def enhance_coverage_watches(self, item):
         for c in (item.get('coverages') or []):
             if c.get('watches'):
@@ -996,10 +1019,6 @@ class AgendaService(BaseSearchService):
                                                   events_only)
 
             users = [user_dict[str(user_id)] for user_id in notify_user_ids]
-            # Only one push-notification
-            push_notification('agenda_update',
-                              item=agenda,
-                              users=notify_user_ids)
 
             if len(notify_user_ids) == 0 and not coverage_watched:
                 return
@@ -1135,12 +1154,18 @@ class AgendaService(BaseSearchService):
                         users = users + [user_dict[str(user_id)] for user_id in notify_user_ids]
 
                 # Send notifications to users
-                for user in users:
-                    app.data.insert('notifications', [{
-                        'item': agenda.get('_id'),
-                        'user': user['_id']
-                    }])
+                save_user_notifications([
+                    UserNotification(
+                        user=user["_id"],
+                        item=agenda.get("_id"),
+                        resource="agenda",
+                        action="watched_agenda_updated",
+                        data=None,
+                    )
+                    for user in users
+                ])
 
+                for user in users:
                     send_agenda_notification_email(
                         user,
                         agenda,

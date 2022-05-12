@@ -30,6 +30,19 @@ export function setCardItems(cardLabel, items) {
     return {type: SET_CARD_ITEMS, payload: {card: cardLabel, items: items}};
 }
 
+export const SET_MULTIPLE_CARD_ITEMS = 'SET_MULTIPLE_CARD_ITEMS';
+export function getMultipleCardItems(itemsByCard) {
+    return {type: SET_MULTIPLE_CARD_ITEMS, payload: itemsByCard};
+}
+
+export function fetchCompanyCardItems() {
+    return (dispatch) => {
+        return server.get('/card_items')
+            .then((data) => dispatch(getMultipleCardItems(data._items)))
+            .catch(errorHandler);
+    };
+}
+
 export function fetchCardExternalItems(cardId, cardLabel) {
     return (dispatch) => {
         return server.get(`/media_card_external/${cardId}`)
@@ -41,14 +54,14 @@ export function fetchCardExternalItems(cardId, cardLabel) {
 }
 
 export function pushNotification(push) {
-    return () => {
+    return (dispatch) => {
         if (push.event === 'items_deleted') {
             setTimeout(
                 () => window.location.reload(),
                 1000
             );
         } else {
-            return wirePushNotification(push);
+            return dispatch(wirePushNotification(push));
         }
     };
 }

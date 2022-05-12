@@ -68,7 +68,9 @@ class FollowedTopics extends React.Component {
 
     componentDidMount() {
         this.onTopicChanged();
-        this.props.fetchCompanyUsers(this.props.user.company);
+        if (this.props.user && this.props.user.company && this.props.user.company.length) {
+            this.props.fetchCompanyUsers(this.props.user.company);
+        }
     }
 
     componentDidUpdate(prevProps) {
@@ -103,7 +105,10 @@ class FollowedTopics extends React.Component {
         }
 
         return this.props.topics.filter(
-            (topic) => topic.topic_type === this.props.topicType && topic.is_global === this.state.showGlobal
+            (topic) => (
+                topic.topic_type === this.props.topicType &&
+                (topic.is_global || false) === this.state.showGlobal
+            )
         );
     }
 

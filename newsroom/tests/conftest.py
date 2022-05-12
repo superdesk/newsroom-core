@@ -1,23 +1,21 @@
 import os
-import sys
-from pathlib import Path
+import pymongo
 
 from flask import Config
+from pathlib import Path
 from pytest import fixture
 
 from newsroom.web.factory import get_app
 
 
 root = (Path(__file__).parent / '..').resolve()
-sys.path.insert(0, str(root))
 
 
 def update_config(conf):
     conf['CONTENTAPI_URL'] = 'http://localhost:5400'
-    conf['MONGO_DBNAME'] = conf['CONTENTAPI_MONGO_DBNAME'] = 'newsroom_test'
     conf['ELASTICSEARCH_INDEX'] = conf['CONTENTAPI_ELASTICSEARCH_INDEX'] = 'newsroom_test'
-    conf['MONGO_URI'] = get_mongo_uri('MONGO_URI', conf['MONGO_DBNAME'])
-    conf['CONTENTAPI_MONGO_URI'] = get_mongo_uri('CONTENTAPI_MONGO_URI', conf['MONGO_DBNAME'])
+    conf['MONGO_DBNAME'] = conf['CONTENTAPI_MONGO_DBNAME'] = 'newsroom_test'
+    conf['MONGO_URI'] = conf['CONTENTAPI_MONGO_URI'] = 'mongodb://localhost/newsroom_test'
     conf['SERVER_NAME'] = 'localhost:5050'
     conf['WTF_CSRF_ENABLED'] = False
     conf['DEBUG'] = True
@@ -27,6 +25,7 @@ def update_config(conf):
     conf['DEFAULT_TIMEZONE'] = 'Europe/Prague'
     conf['NEWS_API_ENABLED'] = True
     conf['AUTH_SERVER_SHARED_SECRET'] = "secret123"
+    conf['SECRET_KEY'] = "foo"
     return conf
 
 
@@ -41,8 +40,7 @@ def get_mongo_uri(key, dbname):
     return '/'.join([env_host, dbname])
 
 
-def clean_databases(app):
-    app.data.mongo.pymongo().cx.drop_database(app.config['CONTENTAPI_MONGO_DBNAME'])
+def reset_elastic(app):
     indices = '%s*' % app.config['CONTENTAPI_ELASTICSEARCH_INDEX']
     es = app.data.elastic.es
     es.indices.delete(indices, ignore=[404])
@@ -50,24 +48,25 @@ def clean_databases(app):
         app.data.init_elastic(app)
 
 
+def drop_mongo(config: Config):
+    client = pymongo.MongoClient(config['CONTENTAPI_MONGO_URI'])
+    client.drop_database(config['CONTENTAPI_MONGO_DBNAME'])
+
+
 @fixture
 def app():
     cfg = Config(root)
-    # cfg.from_object('newsroom.web.default_settings')
     update_config(cfg)
-    app = get_app(config=cfg, testing=True)
 
-    return app
+    # drop mongodb now, indexes will be created during app init
+    drop_mongo(cfg)
+
+    app = get_app(config=cfg, testing=True)
+    with app.app_context():
+        reset_elastic(app)
+        yield app
 
 
 @fixture
 def client(app):
     return app.test_client()
-
-
-@fixture(autouse=True)
-def setup(app):
-    with app.app_context():
-        app.data.init_elastic(app)
-        clean_databases(app)
-        yield

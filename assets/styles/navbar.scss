@@ -18,6 +18,9 @@
         box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);
         z-index: 1007;
         flex: 0 0 auto;
+
+        // [SDCP-609]: Commenting the next line until a better fix is implemented
+        //overflow: hidden;
     }
     .notif {
         width: 56px;
@@ -53,6 +56,10 @@
         display: flex;
         justify-content: center;
         align-items: center;
+
+        &--disconnected {
+            background: #cc0000;
+        }
     }
     .notif__list {
         position: absolute;
@@ -77,6 +84,10 @@
         font-size: 1rem;
         color: $body-text;
         font-weight: 700;
+    }
+    .notif__list__message {
+        padding: 10px 12px;
+        margin: 10px;
     }
     .notif__list__item {
         background: #fff;
@@ -112,8 +123,9 @@
     }
     .notif__list__info {
         font-size: 0.75rem;
-        color: $gray-mid;
+        color: $body-text;
         margin-bottom: 6px;
+        font-weight: 700;
     }
 }
 

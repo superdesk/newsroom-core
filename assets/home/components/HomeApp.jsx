@@ -10,14 +10,16 @@ import {
 
 import getItemActions from 'wire/item-actions';
 import ItemDetails from 'wire/components/ItemDetails';
-import {openItemDetails, setActive, fetchCardExternalItems} from '../actions';
+import {openItemDetails, setActive, fetchCardExternalItems, fetchCompanyCardItems} from '../actions';
 import ShareItemModal from 'components/ShareItemModal';
 import DownloadItemsModal from 'wire/components/DownloadItemsModal';
 import WirePreview from 'wire/components/WirePreview';
 import {followStory} from 'search/actions';
-import {downloadVideo} from 'wire/actions';
+import {downloadMedia} from 'wire/actions';
 import {SearchBar} from './search-bar';
 import {previewConfigSelector, listConfigSelector, detailsConfigSelector, isSearchEnabled} from 'ui/selectors';
+import {filterGroupsToLabelMap} from 'search/selectors';
+import CardRow from 'components/cards/render/CardRow';
 
 const modals = {
     shareItem: ShareItemModal,
@@ -32,17 +34,25 @@ class HomeApp extends React.Component {
         this.renderModal = this.renderModal.bind(this);
         this.onHomeScroll = this.onHomeScroll.bind(this);
         this.height = 0;
+
+        this.state = {loadingItems: true};
     }
 
     componentDidMount() {
         document.getElementById('footer').className = 'footer footer--home';
         this.height = this.elem.offsetHeight;
 
-        // Load any external media items for cards
-        this.props.cards
-            .filter((card) => card.dashboard === 'newsroom' && card.type === '4-photo-gallery')
-            .forEach((card) => {
-                this.props.fetchCardExternalItems(get(card, '_id'), get(card, 'label'));
+        // Load items for cards
+        Promise.all([
+            this.props.fetchCompanyCardItems(),
+            ...this.props.cards
+                .filter((card) => card.dashboard === 'newsroom' && card.type === '4-photo-gallery')
+                .map((card) => (
+                    this.props.fetchCardExternalItems(get(card, '_id'), get(card, 'label'))
+                )),
+        ])
+            .then(() => {
+                this.setState({loadingItems: false});
             });
     }
 
@@ -70,6 +80,17 @@ class HomeApp extends React.Component {
     }
 
     getPanels(card) {
+        if (this.state.loadingItems) {
+            return (
+                <CardRow key={card.label} title={card.label} product={this.getProduct(card)} isActive={this.props.activeCard === card._id}>
+                    <div className='col-sm-6 col-md-4 col-lg-3 col-xxl-2 d-flex mb-4'>
+                        <div className="spinner-border text-success" />
+                        <span className="a11y-only">{gettext('Loading Card Items')}</span>
+                    </div>
+                </CardRow>
+            );
+        }
+
         const Panel = getCardDashboardComponent(card.type);
         const items = this.props.itemsByCard[card.label] || [];
 
@@ -148,6 +169,8 @@ class HomeApp extends React.Component {
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
                 followStory={this.props.followStory}
                 detailsConfig={this.props.detailsConfig}
+                filterGroupLabels={this.props.filterGroupLabels}
+                downloadMedia={this.props.downloadMedia}
             />, modal] :
                 this.renderContent()
             )
@@ -170,8 +193,9 @@ class HomeApp extends React.Component {
                         isFollowing={!!isFollowing}
                         closePreview={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
                         previewConfig={this.props.previewConfig}
-                        downloadVideo={this.props.downloadVideo}
+                        downloadMedia={this.props.downloadMedia}
                         listConfig={this.props.listConfig}
+                        filterGroupLabels={this.props.filterGroupLabels}
                     />
                 )}
             </div>,
@@ -203,14 +227,16 @@ HomeApp.propTypes = {
         action: PropTypes.func,
     })),
     fetchCardExternalItems: PropTypes.func,
+    fetchCompanyCardItems: PropTypes.func,
     followStory: PropTypes.func,
     previewConfig: PropTypes.object,
     listConfig: PropTypes.object,
     detailsConfig: PropTypes.object,
-    downloadVideo: PropTypes.func,
+    downloadMedia: PropTypes.func,
     topics: PropTypes.array,
     isFollowing: PropTypes.bool,
     isSearchEnabled: PropTypes.bool,
+    filterGroupLabels: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -229,6 +255,7 @@ const mapStateToProps = (state) => ({
     detailsConfig: detailsConfigSelector(state),
     topics: state.topics || [],
     isSearchEnabled: isSearchEnabled(state),
+    filterGroupLabels: filterGroupsToLabelMap(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -238,8 +265,9 @@ const mapDispatchToProps = (dispatch) => ({
     },
     actions: getItemActions(dispatch),
     fetchCardExternalItems: (cardId, cardLabel) => dispatch(fetchCardExternalItems(cardId, cardLabel)),
+    fetchCompanyCardItems: () => dispatch(fetchCompanyCardItems()),
     followStory: (item) => followStory(item, 'wire'),
-    downloadVideo: (href, id, mimeType) => dispatch(downloadVideo(href, id, mimeType)),
+    downloadMedia: (href, id, mimeType) => dispatch(downloadMedia(href, id, mimeType)),
 });
 
 

@@ -56,9 +56,8 @@ def create():
         return validation
 
     if product.get('navigations'):
-        product['navigations'] = [str(get_entity_or_404(_id, 'navigations')['_id'])
-                                  for _id in product.get('navigations').split(',')]
-
+        product['navigations'] = [ObjectId(get_entity_or_404(_id, 'navigations')['_id'])
+                                  for _id in product.get('navigations')]
     set_original_creator(product)
     ids = get_resource_service('products').post([product])
     return jsonify({'success': True, '_id': ids[0]}), 201
@@ -92,6 +91,11 @@ def edit(id):
 @account_manager_only
 def update_companies(id):
     updates = flask.request.get_json()
+    if updates.get("companies"):
+        updates["companies"] = [
+            ObjectId(company_id)
+            for company_id in updates["companies"]
+        ]
     get_resource_service('products').patch(id=ObjectId(id), updates=updates)
     return jsonify({'success': True}), 200
 
@@ -100,6 +104,11 @@ def update_companies(id):
 @admin_only
 def update_navigations(id):
     updates = flask.request.get_json()
+    if updates.get("navigations"):
+        updates["navigations"] = [
+            ObjectId(nav_id)
+            for nav_id in updates["navigations"]
+        ]
     get_resource_service('products').patch(id=ObjectId(id), updates=updates)
     return jsonify({'success': True}), 200
 

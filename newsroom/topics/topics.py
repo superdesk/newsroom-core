@@ -1,7 +1,7 @@
 from bson import ObjectId
-import superdesk
 import newsroom
 from newsroom.utils import set_original_creator, set_version_creator
+import superdesk
 
 
 class TopicsResource(newsroom.Resource):
@@ -19,10 +19,14 @@ class TopicsResource(newsroom.Resource):
         'is_global': {'type': 'boolean', 'default': False},
         'subscribers': {
             'type': 'list',
-            'schema': newsroom.Resource.rel('users', required=True)
+            'schema': newsroom.Resource.rel('users', required=True),
         },
         'timezone_offset': {'type': 'integer', 'nullable': True},
-        'topic_type': {'type': 'string', 'nullable': True},
+        'topic_type': {
+            'type': 'string',
+            'required': True,
+            'allowed': ['wire', 'agenda']
+        },
         'navigation': {
             'type': 'list',
             'nullable': True,
@@ -47,7 +51,10 @@ class TopicsService(newsroom.Service):
         # If ``is_global`` has been turned off, then remove all subscribers
         # except for the owner of the Topic
         if original.get('is_global') and 'is_global' in updates and not updates.get('is_global'):
-            updates['subscribers'] = [original['user']] if original['user'] in original['subscribers'] else []
+            updates['subscribers'] = [original['user']] if original['user'] in original.get('subscribers', []) else []
+
+    def get_items(self, item_ids):
+        return self.get(req=None, lookup={"_id": {"$in": item_ids}})
 
 
 def get_user_topics(user_id):
@@ -65,17 +72,16 @@ def get_user_topics(user_id):
     }))
 
 
-def get_wire_notification_topics():
-    lookup = {
-        '$and': [
-            {'subscribers': {'$exists': True, '$ne': []}},
-            {'topic_type': 'wire'},
+def get_topics_with_subscribers(topic_type: str):
+    return list(superdesk.get_resource_service('topics').get(req=None, lookup={
+        "$and": [
+            {"subscribers": {"$exists": True, "$ne": []}},
+            {"topic_type": topic_type},
         ]
-    }
-    return list(superdesk.get_resource_service('topics').get(req=None, lookup=lookup))
+    }))
 
 
-def get_agenda_notification_topics(item, users):
+def get_agenda_notification_topics_for_query_by_id(item, users):
     """
     Returns active topics for a given agenda item
     :param item: agenda item

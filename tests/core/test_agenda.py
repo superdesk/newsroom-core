@@ -7,8 +7,9 @@ from unittest import mock
 import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_location_string, get_agenda_dates, get_public_contacts, get_entity_or_404, \
     get_local_date, get_end_date
-from tests.fixtures import items, init_items, agenda_items, init_agenda_items, init_auth, init_company, PUBLIC_USER_ID  # noqa
 from tests.utils import post_json, delete_json, get_json, get_admin_user_id, mock_send_email
+from tests.fixtures import PUBLIC_USER_ID, COMPANY_1_ID
+
 from copy import deepcopy
 from bson import ObjectId
 
@@ -152,7 +153,7 @@ def test_item_copy(client, app):
 @mock.patch('newsroom.email.send_email', mock_send_email)
 def test_share_items(client, app, mocker):
     user_ids = app.data.insert('users', [{
-        'email': 'foo@bar.com',
+        'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'last_name': 'Bar',
     }])
@@ -166,8 +167,8 @@ def test_share_items(client, app, mocker):
 
         assert resp.status_code == 201, resp.get_data().decode('utf-8')
         assert len(outbox) == 1
-        assert outbox[0].recipients == ['foo@bar.com']
-        assert outbox[0].subject == 'From AAP Newsroom: Conference Planning'
+        assert outbox[0].recipients == ['foo2@bar.com']
+        assert outbox[0].subject == 'From AAP Newsroom: test headline'
         assert 'Hi Foo Bar' in outbox[0].body
         assert 'admin admin (admin@sourcefabric.org) shared ' in outbox[0].body
         assert 'Conference Planning' in outbox[0].body
@@ -183,13 +184,16 @@ def test_share_items(client, app, mocker):
 
 
 def test_agenda_search_filtered_by_query_product(client, app):
+    NAV_1 = ObjectId('5e65964bf5db68883df561c0')
+    NAV_2 = ObjectId('5e65964bf5db68883df561c1')
+
     app.data.insert('navigations', [{
-        '_id': 51,
+        '_id': NAV_1,
         'name': 'navigation-1',
         'is_enabled': True,
         'product_type': 'agenda'
     }, {
-        '_id': 52,
+        '_id': NAV_2,
         'name': 'navigation-2',
         'is_enabled': True,
         'product_type': 'agenda'
@@ -199,16 +203,16 @@ def test_agenda_search_filtered_by_query_product(client, app):
         '_id': 12,
         'name': 'product test',
         'query': 'headline:test',
-        'companies': ['1'],
-        'navigations': ['51'],
+        'companies': [COMPANY_1_ID],
+        'navigations': [NAV_1],
         'is_enabled': True,
         'product_type': 'agenda'
     }, {
         '_id': 13,
         'name': 'product test 2',
         'query': 'slugline:prime',
-        'companies': ['1'],
-        'navigations': ['52'],
+        'companies': [COMPANY_1_ID],
+        'navigations': [NAV_2],
         'is_enabled': True,
         'product_type': 'agenda'
     }])
@@ -226,7 +230,7 @@ def test_agenda_search_filtered_by_query_product(client, app):
     assert 'internal_note' not in data['_items'][0]['planning_items'][0]
     assert 'internal_note' not in data['_items'][0]['planning_items'][0]['coverages'][0]['planning']
     assert 'internal_note' not in data['_items'][0]['coverages'][0]['planning']
-    resp = client.get('/agenda/search?navigation=51')
+    resp = client.get(f'/agenda/search?navigation={NAV_1}')
     data = json.loads(resp.get_data())
     assert 1 == len(data['_items'])
     assert '_aggregations' in data

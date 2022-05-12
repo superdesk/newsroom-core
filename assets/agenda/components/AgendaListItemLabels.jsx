@@ -1,14 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 import classNames from 'classnames';
 import {get} from 'lodash';
 
 import {isPostponed, isRescheduled, isCanceled} from '../utils';
-import {DATE_FORMAT, formatDate} from 'utils';
-import {gettext} from '../../utils';
+import {gettext} from 'utils';
 
-function AgendaListItemLabels({item, withDate, group, right}) {
+function AgendaListItemLabels({item, right}) {
     const getLabel = () => {
         let labelText;
         let labelColor;
@@ -36,25 +34,15 @@ function AgendaListItemLabels({item, withDate, group, right}) {
             return null;
         }
 
-        return (<div><span className={classNames('label ml-2', labelColor, {'pull-right': right})}>{labelText}</span></div>);
+        return (<div><span className={classNames('label', labelColor, {'pull-right': right})}>{labelText}</span></div>);
         
     };
 
-    if (!withDate) {
-        return getLabel();
-    }
-
-    const dateGroup = group ? moment(group, DATE_FORMAT) : moment(get(item, 'dates.start'));
-   
-    return (<div className='wire-column__preview__date wire-column__preview__date--event p-0'>
-        {formatDate(dateGroup)}{getLabel()}
-    </div>);
+    return getLabel();
 }
 
 AgendaListItemLabels.propTypes = {
     item: PropTypes.object,
-    withDate: PropTypes.bool,
-    group: PropTypes.string,
     right: PropTypes.bool,
 };
 

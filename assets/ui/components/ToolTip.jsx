@@ -4,28 +4,33 @@ import {isTouchDevice} from 'utils';
 
 export class ToolTip extends React.PureComponent {
     getFirstChild() {
-        return !isTouchDevice() && this.elem && this.elem.firstChild && this.elem.firstChild ?
+        return this.elem && this.elem.firstChild && this.elem.firstChild ?
             this.elem.firstChild :
             null;
     }
 
     componentDidMount() {
-        const child = this.getFirstChild();
+        if (!isTouchDevice()) {
+            const child = this.getFirstChild();
 
-        if (!child) {
-            console.error('No child supplied to <ToolTip>!');
-        } else if (!child.getAttribute('title')) {
-            console.error('Child of <ToolTip> must have a "title" attribute!');
-        } else {
-            $(child).tooltip({trigger: 'hover'});
+            if (!child) {
+                console.error('No child supplied to <ToolTip>!');
+            } else if (!child.getAttribute('title')) {
+                console.error('Child of <ToolTip> must have a "title" attribute!');
+            } else {
+                $(child).tooltip({trigger: 'hover', placement: this.props.placement || 'top'});
+            }
         }
+
     }
 
     componentWillUnmount() {
-        const child = this.getFirstChild();
+        if (!isTouchDevice()) {
+            const child = this.getFirstChild();
 
-        if (child) {
-            $(child).tooltip('dispose'); // make sure it's gone
+            if (child) {
+                $(child).tooltip('dispose'); // make sure it's gone
+            }
         }
     }
 
@@ -43,4 +48,5 @@ export class ToolTip extends React.PureComponent {
 
 ToolTip.propTypes = {
     children: PropTypes.node.isRequired,
+    placement: PropTypes.string,
 };

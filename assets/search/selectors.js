@@ -14,6 +14,8 @@ export const navigationsSelector = (state) => get(state, 'search.navigations') |
 export const topicsSelector = (state) => get(state, 'topics') || [];
 export const productsSelector = (state) => get(state, 'search.products') || [];
 
+export const filterGroups = (state) => get(state, 'groups') || [];
+
 export const activeTopicSelector = createSelector(
     [searchTopicIdSelector, topicsSelector],
     (topicId, topics) => find(topics, {'_id': topicId})
@@ -113,4 +115,18 @@ export const isSearchFiltered = createSelector(
             Object.keys(get(params, 'created', {})).filter((key) => get(params.created, key)).length > 0 ||
             Object.keys(get(params, 'filter', {})).filter((key) => get(params.filter, key)).length > 0;
     }
+);
+
+export const filterGroupsToLabelMap = createSelector(
+    [filterGroups],
+    (groups) => (
+        groups.reduce(
+            (groupMap, group) => {
+                groupMap[group.field] = group.label;
+
+                return groupMap;
+            },
+            {}
+        )
+    )
 );

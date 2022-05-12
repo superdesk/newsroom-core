@@ -161,7 +161,7 @@ ArticleBodyHtml.propTypes = {
         es_highlight: PropTypes.shape({
             body_html: PropTypes.arrayOf(PropTypes.string),
         }),
-        associations: PropTypes.Object,
+        associations: PropTypes.object,
     }).isRequired,
     reportCopy: PropTypes.func,
 };

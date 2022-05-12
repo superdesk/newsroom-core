@@ -108,8 +108,8 @@ export function recieveItem(data) {
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(wireData, readData, newsOnly, searchAllVersions) {
-    return {type: INIT_DATA, wireData, readData, newsOnly, searchAllVersions};
+export function initData(wireData, newsOnlyFilterText,readData, newsOnly, searchAllVersions) {
+    return {type: INIT_DATA, wireData, newsOnlyFilterText, readData, newsOnly, searchAllVersions};
 }
 
 export const TOGGLE_NEWS = 'TOGGLE_NEWS';
@@ -393,13 +393,15 @@ export function fetchVersions(item) {
 }
 
 /**
- * Download video file
+ * Download media file
  *
  * @param {string} id
  */
-export function downloadVideo(href, id, mimeType) {
-    window.open(`${href}?filename=${id}.${mime.extension(mimeType)}`, '_blank');
-    analytics.event('download-video', id);
+export function downloadMedia(href, id, mimeType) {
+    return () => {
+        window.open(`${href}?filename=${id}.${mime.extension(mimeType)}`, '_blank');
+        analytics.event('download-media', id);
+    };
 }
 
 /**
