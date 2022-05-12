@@ -95,7 +95,7 @@ class EditNavigation extends React.Component {
 
                                     {this.sectionIds.includes('aapX') && (
                                         <div className="card mt-3 d-block">
-                                            <div className="card-header">{gettext('Tile Images')}{' (Marketplace)'}</div>
+                                            <div className="card-header">{'Tile Images (Marketplace)'}</div>
                                             <div className="card-body">
                                                 {[...Array(MAX_TILE_IMAGES)].map((_, index) => (
                                                     <FileInput key={index}
