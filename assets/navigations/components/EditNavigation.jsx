@@ -22,6 +22,8 @@ class EditNavigation extends React.Component {
             {label: gettext('Navigation'), name: 'navigation-details'},
             {label: gettext('Products'), name: 'products'}
         ];
+
+        this.sectionIds = this.props.sections.map((section) => section._id);
     }
 
     handleTabClick(event) {
@@ -91,19 +93,21 @@ class EditNavigation extends React.Component {
                                         value={this.props.navigation.is_enabled}
                                         onChange={this.props.onChange}/>
 
-                                    <div className="card mt-3 d-block">
-                                        <div className="card-header">{gettext('Tile Images')}</div>
-                                        <div className="card-body">
-                                            {[...Array(MAX_TILE_IMAGES)].map((_, index) => (
-                                                <FileInput key={index}
-                                                    name={`tile_images_file_${index}`}
-                                                    label={get(tile_images, `[${index}.file]`) ||
-                                                    `${gettext('Upload Image')} ${index + 1}`}
-                                                    onChange={this.props.onChange}
-                                                    error={this.props.errors ? this.props.errors.tile_images : null}/>
-                                            ))}
+                                    {this.sectionIds.includes('aapX') && (
+                                        <div className="card mt-3 d-block">
+                                            <div className="card-header">{gettext('Tile Images')}{' (Marketplace)'}</div>
+                                            <div className="card-body">
+                                                {[...Array(MAX_TILE_IMAGES)].map((_, index) => (
+                                                    <FileInput key={index}
+                                                        name={`tile_images_file_${index}`}
+                                                        label={get(tile_images, `[${index}.file]`) ||
+                                                        `${gettext('Upload Image')} ${index + 1}`}
+                                                        onChange={this.props.onChange}
+                                                        error={this.props.errors ? this.props.errors.tile_images : null}/>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                                 <div className='list-item__preview-footer'>
                                     <input
