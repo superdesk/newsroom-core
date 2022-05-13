@@ -22,6 +22,7 @@ API_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
 class NewsroomNewsAPI(BaseNewsroomApp):
+    SERVICE_NAME = "Newsroom News API"
     AUTH_SERVICE = CompanyTokenAuth
     INSTANCE_CONFIG = 'settings_newsapi.py'
 

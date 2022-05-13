@@ -6,6 +6,7 @@ This module implements WSGI application extending eve.Eve
 """
 
 import os
+import re
 import pathlib
 import importlib
 
@@ -35,6 +36,7 @@ NEWSROOM_DIR = pathlib.Path(__file__).resolve().parent.parent
 class BaseNewsroomApp(eve.Eve):
     """The base Newsroom app class"""
 
+    SERVICE_NAME = "Newsroom"
     DATALAYER = SuperdeskDataLayer
     AUTH_SERVICE = SessionAuth
     INSTANCE_CONFIG = None
@@ -199,10 +201,13 @@ class BaseNewsroomApp(eve.Eve):
         if self.config.get("APM_SERVER_URL") and self.config.get("APM_SECRET_TOKEN"):
             self.config["ELASTIC_APM"] = {
                 "DEBUG": self.debug,
-                "SERVICE_NAME": self.config.get("APM_SERVICE_NAME") or self.config.get("SITE_NAME") or "Newsroom",
+                "ENVIRONMENT": self._get_apm_environment(),
+                "SERVICE_NAME": self.config.get("APM_SERVICE_NAME")
+                or self.config.get("SITE_NAME")
+                or self.SERVICE_NAME,
                 "SERVER_URL": self.config["APM_SERVER_URL"],
                 "SECRET_TOKEN": self.config["APM_SECRET_TOKEN"],
-                "TRANSACTIONS_IGNORE_PATTERNS": ["^OPTIONS "],
+                "TRANSACTIONS_IGNORE_PATTERNS": ["^OPTIONS"],
             }
 
             self.apm = ElasticAPM(self)
@@ -219,3 +224,12 @@ class BaseNewsroomApp(eve.Eve):
                 dsn=self.config["SENTRY_DSN"],
                 integrations=[FlaskIntegration()],
             )
+
+    def _get_apm_environment(self):
+        if self.config.get("CLIENT_URL"):
+            print("URL", self.config["CLIENT_URL"])
+            if re.search(r'-(dev|demo|test|staging)', self.config["CLIENT_URL"]):
+                return "staging"
+            if "localhost" in self.config["CLIENT_URL"] or self.debug:
+                return "testing"
+        return "production"
