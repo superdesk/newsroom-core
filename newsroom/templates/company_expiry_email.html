@@ -1,5 +1,5 @@
-<h3>The following company accounts have expired or are due to expire within the next 7 days (before {{expiry_date.strftime('%d-%m-%Y')}}):</h3>
+<h3>The following company accounts have expired or are due to expire within the next 7 days (before {{expiry_date | datetime_short}}):</h3>
 
 {% for company in companies %}
-    <h3><pre>{{ company.get('name') }} (Email: {{ company.contact_email if company.contact_email else '-'}}), (Account Manager: {{ company.account_manager if company.account_manager else '-' }}) expiring on {{ company.expiry_date.strftime('%d-%m-%Y')}}</pre></h3>
+    <h3><pre>{{ company.get('name') }} (Email: {{ company.contact_email if company.contact_email else '-'}}), (Account Manager: {{ company.account_manager if company.account_manager else '-' }}) expiring on {{ company.expiry_date | datetime_short}}</pre></h3>
 {% endfor %}
