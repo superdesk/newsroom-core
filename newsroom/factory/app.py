@@ -227,7 +227,6 @@ class BaseNewsroomApp(eve.Eve):
 
     def _get_apm_environment(self):
         if self.config.get("CLIENT_URL"):
-            print("URL", self.config["CLIENT_URL"])
             if re.search(r'-(dev|demo|test|staging)', self.config["CLIENT_URL"]):
                 return "staging"
             if "localhost" in self.config["CLIENT_URL"] or self.debug:
