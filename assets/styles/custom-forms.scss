@@ -43,7 +43,7 @@ $enable-shadows:true;
   &.ui-dark {
     .custom-control-label {
       color: $gray-500;
-      font-weight: 300;
+      font-weight: 400;
       font-size: 0.8rem;
     }
     .custom-control-input:checked ~ .custom-control-label {
