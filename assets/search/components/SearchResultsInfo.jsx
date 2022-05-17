@@ -10,7 +10,6 @@ import {
     searchParamsSelector,
 } from 'search/selectors';
 
-import SearchResults from './SearchResults';
 import NewItemsIcon from './NewItemsIcon';
 import {ContentSearchResults} from './ContentSearchResults';
 

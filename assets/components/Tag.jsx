@@ -35,7 +35,7 @@ export function Tag({text, keyValue, shade, readOnly, onClick, label}) {
                 </span>
             }
         </React.Fragment>
-    )
+    );
 }
 
 Tag.propTypes = {
@@ -53,4 +53,4 @@ Tag.propTypes = {
     ]),
     readOnly: PropTypes.bool,
     onClick: PropTypes.func.isRequired,
-}
+};

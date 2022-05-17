@@ -42,7 +42,7 @@ class FiltersTab extends React.Component {
         };
     }
 
-    componentDidUpdate(prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS) {
+    componentDidUpdate(prevProps) {
         const newState = {};
         if (!isEqual(this.props.activeFilter, prevProps.activeFilter)) {
             newState.activeFilter = cloneDeep(this.props.activeFilter);

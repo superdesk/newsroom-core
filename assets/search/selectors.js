@@ -32,7 +32,7 @@ export const filterGroupsByIdSelector = createSelector(
 
         return groups;
     }, {})
-)
+);
 
 export const activeTopicSelector = createSelector(
     [searchTopicIdSelector, topicsSelector],
@@ -156,7 +156,7 @@ export const searchParamTagSelector = createSelector(
 
         if (params.filter) {
             Object.keys(params.filter).forEach((field) => {
-                const group = groups[field]
+                const group = groups[field];
                 params.filter[field].forEach((filterValue) => {
                     paramTags.push({
                         key: `${field}.${filterValue}`,

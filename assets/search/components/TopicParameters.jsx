@@ -12,7 +12,7 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels}) => {
     const navs = (get(topic, 'navigation') || [])
         .map((navId) => get(navsById, `[${navId}].name`));
 
-    const created = getCreatedSearchParamLabel(get(topic, 'created') || {})
+    const created = getCreatedSearchParamLabel(get(topic, 'created') || {});
     const dateLabels = [];
 
     if (created.relative) {

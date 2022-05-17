@@ -24,7 +24,7 @@ class ContentSearchResultsComponent extends React.Component {
         this.toggleExpanded = this.toggleExpanded.bind(this);
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
+    componentDidUpdate(prevProps) {
         if (prevProps.minimizeSearchResults && !this.props.minimizeSearchResults) {
             this.setState({expanded: false});
         }
@@ -78,19 +78,19 @@ class ContentSearchResultsComponent extends React.Component {
                         const params = {...tag.params};
 
                         switch (tag.key) {
-                            case 'published_relative':
-                                // Remove `from` and `to`
-                                params.from = null;
-                                params.to = null;
-                                break;
-                            case 'published_from':
-                                // Remove `from`
-                                params.from = null;
-                                break;
-                            case 'published_to':
-                                // Remove 'to`
-                                params.to = null;
-                                break;
+                        case 'published_relative':
+                            // Remove `from` and `to`
+                            params.from = null;
+                            params.to = null;
+                            break;
+                        case 'published_from':
+                            // Remove `from`
+                            params.from = null;
+                            break;
+                        case 'published_to':
+                            // Remove 'to`
+                            params.to = null;
+                            break;
                         }
 
                         this.props.setCreatedFilter(params);
@@ -129,8 +129,8 @@ class ContentSearchResultsComponent extends React.Component {
                                     </span>
                                     {!(this.props.minimizeSearchResults && !this.state.expanded) ? null : (
                                         <span className="search-results__tags">
-                                        {this.renderTags()}
-                                    </span>
+                                            {this.renderTags()}
+                                        </span>
                                     )}
                                 </React.Fragment>
                             )}
@@ -193,6 +193,7 @@ ContentSearchResultsComponent.propTypes = {
     saveButtonText: PropTypes.string,
     disableSameNavigationDeselect: PropTypes.bool,
     fetchItems: PropTypes.func.isRequired,
+    children: PropTypes.node,
 
     // Redux Props
     searchParams: PropTypes.object,
@@ -205,7 +206,7 @@ ContentSearchResultsComponent.propTypes = {
     removeNewItems: PropTypes.func,
     loadMyWireTopic: PropTypes.func,
     loadMyAgendaTopic: PropTypes.func,
-}
+};
 
 const mapStateToProps = (state) => ({
     navigations: navigationsByIdSelector(state),
@@ -225,5 +226,5 @@ const mapDispatchToProps = {
 
 export const ContentSearchResults = connect(
     mapStateToProps,
-    mapDispatchToProps,
+    mapDispatchToProps
 )(ContentSearchResultsComponent);
