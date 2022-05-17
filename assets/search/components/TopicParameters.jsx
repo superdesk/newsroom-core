@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get, keyBy} from 'lodash';
 
-import {gettext, formatDate} from 'utils';
+import {gettext, getCreatedSearchParamLabel} from 'utils';
 import {filterGroupsToLabelMap} from 'search/selectors';
 
 const TopicParameters = ({topic, navigations, locators, filterGroupLabels}) => {
@@ -12,24 +12,18 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels}) => {
     const navs = (get(topic, 'navigation') || [])
         .map((navId) => get(navsById, `[${navId}].name`));
 
-    const created = get(topic, 'created') || {};
-    let dateLabels;
+    const created = getCreatedSearchParamLabel(get(topic, 'created') || {})
+    const dateLabels = [];
 
-    if (created.to) {
-        dateLabels = [
-            gettext('From: {{date}}', {date: formatDate(created.from)}),
-            gettext('To: {{date}}', {date: formatDate(created.to)}),
-        ];
-    } else if (created.from) {
-        if (created.from === 'now/d') {
-            dateLabels = [gettext('Today')];
-        } else if (created.from === 'now/w') {
-            dateLabels = [gettext('This week')];
-        } else if (created.from === 'now/M') {
-            dateLabels = [gettext('This month')];
-        }
+    if (created.relative) {
+        dateLabels.push(created.relative);
     } else {
-        dateLabels = [];
+        if (created.from) {
+            dateLabels.push(gettext('From: {{date}}', {date: created.from}));
+        }
+        if (created.to) {
+            dateLabels.push(gettext('To: {{date}}', {date: created.to}));
+        }
     }
 
     const renderParam = (name, items) => get(items, 'length', 0) < 1 ? null : (

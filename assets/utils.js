@@ -666,7 +666,7 @@ export function getTimezoneOffset() {
 
 export function isTouchDevice() {
     return 'ontouchstart' in window        // works on most browsers
-    || navigator.maxTouchPoints;       // works on IE10/11 and Surface
+    || navigator.maxTouchPoints > 0;       // works on IE10/11 and Surface
 }
 
 export function isMobilePhone() {
@@ -791,4 +791,31 @@ export function shouldShowListShortcutActionIcons(listConfig, isExtended) {
                 showActionIconsConfig.large :
                 showActionIconsConfig.compact
         );
+}
+
+export function getCreatedSearchParamLabel(created) {
+    if (created.to) {
+        if (created.from) {
+            return {
+                from: formatDate(created.from),
+                to: formatDate(created.to),
+            };
+        } else {
+            return {
+                to: formatDate(created.to),
+            };
+        }
+    } else if (created.from) {
+        if (created.from === 'now/d') {
+            return {relative: gettext('Today')};
+        } else if (created.from === 'now/w') {
+            return {relative: gettext('This week')};
+        } else if (created.from === 'now/M') {
+            return {relative: gettext('This month')};
+        } else {
+            return {from: formatDate(created.from)};
+        }
+    }
+
+    return {};
 }
