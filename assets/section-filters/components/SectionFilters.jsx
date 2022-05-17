@@ -80,9 +80,6 @@ class SectionFilters extends React.Component {
                     <div className="flex-col flex-column">
                         {this.props.activeQuery && (
                             <SearchResults
-                                showTotalItems={true}
-                                showTotalLabel={true}
-                                showSaveTopic={false}
                                 totalItems={this.props.totalSectionFilters}
                                 totalItemsLabel={this.props.activeQuery}
                             />

@@ -76,9 +76,6 @@ class Users extends React.Component {
                     <div className="flex-col flex-column">
                         {this.props.activeQuery && (
                             <SearchResults
-                                showTotalItems={true}
-                                showTotalLabel={true}
-                                showSaveTopic={false}
                                 totalItems={this.props.totalUsers}
                                 totalItemsLabel={this.props.activeQuery}
                             />

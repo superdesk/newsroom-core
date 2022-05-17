@@ -76,9 +76,6 @@ class Clients extends React.Component {
                     <div className="flex-col flex-column">
                         {this.props.activeQuery && (
                             <SearchResults
-                                showTotalItems={true}
-                                showTotalLabel={true}
-                                showSaveTopic={false}
                                 totalItems={this.props.totalClients}
                                 totalItemsLabel={this.props.activeQuery}
                             />
