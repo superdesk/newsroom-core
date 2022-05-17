@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
 import {createPortal} from 'react-dom';
-import {isTouchDevice, gettext, isDisplayed} from 'utils';
+import {isTouchDevice, gettext, isDisplayed, isMobilePhone} from 'utils';
 import {getSingleFilterValue} from 'search/utils';
 
 // tabs
@@ -16,7 +16,7 @@ export default class BaseApp extends React.Component {
 
         this.state = {
             withSidebar: false,
-            scrollClass: '',
+            minimizeSearchResults: isMobilePhone(),
         };
 
         this.dom = {
@@ -116,10 +116,14 @@ export default class BaseApp extends React.Component {
         }
 
         if(container.scrollTop > BUFFER) {
-            this.setState({scrollClass: 'wire-column__main-header--small'});
+            this.setState({
+                minimizeSearchResults: true,
+            });
         }
         else {
-            this.setState({scrollClass: ''});
+            this.setState({
+                minimizeSearchResults: isMobilePhone(),
+            });
         }
     }
 

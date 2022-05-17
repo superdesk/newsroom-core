@@ -165,6 +165,7 @@ class AmNewsApp extends BaseApp {
 
                             {(this.props.activeQuery || get(this.props, 'newItems.length', 0) > 0) && (
                                 <SearchResultsInfo
+                                    minimizeSearchResults={this.state.minimizeSearchResults}
                                     user={this.props.user}
                                     query={this.props.activeQuery}
                                     bookmarks={this.props.bookmarks}
@@ -172,7 +173,6 @@ class AmNewsApp extends BaseApp {
                                     newItems={this.props.newItems}
                                     refresh={this.props.fetchItems}
                                     activeNavigation={this.props.activeNavigation}
-                                    scrollClass={this.state.scrollClass}
                                     displayTotalItems={this.props.activeQuery}
                                     resultsLabel={searchResultsLabel}
                                 />
