@@ -4,7 +4,11 @@ import {connect} from 'react-redux';
 import {get} from 'lodash';
 import classNames from 'classnames';
 
-import {gettext} from 'utils';
+import types from 'wire/types';
+import {gettext, isActionEnabled} from 'utils';
+import {canUserManageTopics} from 'users/utils';
+import {canUserEditTopic} from 'topics/utils';
+import {fetchCompanyUsers} from 'companies/actions';
 
 import {
     fetchTopics,
@@ -37,6 +41,7 @@ class FollowedTopics extends React.Component {
         this.state = {showGlobal: false};
 
         this.actions = [{
+            id: 'edit',
             name: gettext('Edit'),
             icon: 'edit',
             action: this.editTopic,
@@ -46,20 +51,26 @@ class FollowedTopics extends React.Component {
             this.actions = [
                 ...this.actions,
                 {
+                    id: 'share',
                     name: gettext('Share'),
                     icon: 'share',
                     action: this.props.shareTopic,
                 }, {
+                    id: 'delete',
                     name: gettext('Delete'),
                     icon: 'trash',
                     action: this.deleteTopic,
+                    when: (topic) => canUserEditTopic(topic, this.props.user),
                 }
-            ];
+            ].filter(isActionEnabled('topic_actions'));
         }
     }
 
     componentDidMount() {
         this.onTopicChanged();
+        if (this.props.user && this.props.user.company && this.props.user.company.length) {
+            this.props.fetchCompanyUsers(this.props.user.company);
+        }
     }
 
     componentDidUpdate(prevProps) {
@@ -94,7 +105,10 @@ class FollowedTopics extends React.Component {
         }
 
         return this.props.topics.filter(
-            (topic) => topic.topic_type === this.props.topicType && topic.is_global === this.state.showGlobal
+            (topic) => (
+                topic.topic_type === this.props.topicType &&
+                (topic.is_global || false) === this.state.showGlobal
+            )
         );
     }
 
@@ -149,7 +163,9 @@ class FollowedTopics extends React.Component {
                         <div className="row pt-xl-4 pt-3 px-xl-4 mr-0">
                             <TopicList
                                 topics={this.getFilteredTopics()}
+                                selectedTopicId={get(this.props.selectedItem, '_id')}
                                 actions={this.actions}
+                                users={this.props.companyUsers}
                             />
                         </div>
                     </div>
@@ -166,6 +182,9 @@ class FollowedTopics extends React.Component {
                         globalTopicsEnabled={this.props.globalTopicsEnabled}
                         closeEditor={this.closeEditor}
                         onTopicChanged={this.onTopicChanged}
+                        isAdmin={canUserManageTopics(this.props.user)}
+                        user={this.props.user}
+                        companyUsers={this.props.companyUsers}
                     />)}
             </div>
         );
@@ -174,22 +193,20 @@ class FollowedTopics extends React.Component {
 
 FollowedTopics.propTypes = {
     fetchTopics: PropTypes.func.isRequired,
-    topics: PropTypes.arrayOf(PropTypes.shape({
-        _id: PropTypes.string.isRequired,
-        _created: PropTypes.string.isRequired,
-        label: PropTypes.string.isRequired,
-        description: PropTypes.string,
-    })),
+    topics: types.topics,
     topicType: PropTypes.string.isRequired,
     shareTopic: PropTypes.func,
     deleteTopic: PropTypes.func,
     selectMenuItem: PropTypes.func,
-    selectedItem: PropTypes.object,
+    selectedItem: types.topic,
     selectedMenu: PropTypes.string,
     editorFullscreen: PropTypes.bool,
     monitoringList: PropTypes.array,
     monitoringAdministrator: PropTypes.string,
     globalTopicsEnabled: PropTypes.bool,
+    user: PropTypes.object,
+    fetchCompanyUsers: PropTypes.func,
+    companyUsers: PropTypes.array,
 };
 
 const mapStateToProps = (state, ownProps) => ({
@@ -201,6 +218,7 @@ const mapStateToProps = (state, ownProps) => ({
     selectedMenu: selectedMenuSelector(state),
     editorFullscreen: topicEditorFullscreenSelector(state),
     globalTopicsEnabled: globalTopicsEnabledSelector(state, ownProps.topicType),
+    companyUsers: state.monitoringProfileUsers || [],
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -208,6 +226,7 @@ const mapDispatchToProps = (dispatch) => ({
     shareTopic: (topic) => dispatch(shareTopic(topic)),
     deleteTopic: (topic) => dispatch(deleteTopic(topic)),
     selectMenuItem: (item) => dispatch(selectMenuItem(item)),
+    fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId, true)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(FollowedTopics);

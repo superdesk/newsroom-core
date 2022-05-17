@@ -2,27 +2,18 @@ from flask import json
 from pytest import fixture
 from bson import ObjectId
 from datetime import datetime, timedelta
-from newsroom.tests.users import test_login_succeeds_for_admin, init as user_init  # noqa
+from newsroom.tests.fixtures import COMPANY_1_ID, COMPANY_2_ID
 
 
 @fixture(autouse=True)
 def init(app):
-    app.data.insert('companies', [{
-        '_id': ObjectId('59bc460f1d41c8fa815cc2c2'),
-        'name': 'Press Co.',
-        'is_enabled': True,
-    }, {
-        '_id': ObjectId('59c38b965057fb87d7eda9ab'),
-        'name': 'Paper Co.',
-        'is_enabled': True,
-    }])
     app.data.insert('users', [{
         '_id': 'u-1',
         'email': 'foo@foo.com',
         'first_name': 'Foo',
         'last_name': 'Smith',
         'is_enabled': True,
-        'company': ObjectId('59bc460f1d41c8fa815cc2c2'),
+        'company': COMPANY_1_ID,
     }, {
         '_id': 'u-2',
         'email': 'bar@bar.com',
@@ -31,16 +22,15 @@ def init(app):
         'is_enabled': True,
     }, {
         '_id': 'u-3',
-        'email': 'bar@bar.com',
+        'email': 'baz@bar.com',
         'first_name': 'Bar',
         'last_name': 'Brown',
         'is_enabled': True,
-        'company': ObjectId('59bc460f1d41c8fa815cc2c2'),
+        'company': COMPANY_1_ID,
     }])
 
 
 def test_company_saved_searches(client, app):
-
     app.data.insert('topics', [{
         'label': 'Foo',
         'query': 'foo',
@@ -58,7 +48,6 @@ def test_company_saved_searches(client, app):
         'user': 'u-3'
     }])
 
-    test_login_succeeds_for_admin(client)
     resp = client.get('reports/company-saved-searches')
     report = json.loads(resp.get_data())
     assert report['name'] == 'Saved searches per company'
@@ -68,7 +57,6 @@ def test_company_saved_searches(client, app):
 
 
 def test_user_saved_searches(client, app):
-
     app.data.insert('topics', [{
         'label': 'Foo',
         'query': 'foo',
@@ -86,7 +74,6 @@ def test_user_saved_searches(client, app):
         'user': 'u-1'
     }])
 
-    test_login_succeeds_for_admin(client)
     resp = client.get('reports/user-saved-searches')
     report = json.loads(resp.get_data())
     assert report['name'] == 'Saved searches per user'
@@ -100,17 +87,16 @@ def test_company_products(client, app):
         '_id': 'p-1',
         'name': 'Sport',
         'description': 'sport product',
-        'companies': ['59bc460f1d41c8fa815cc2c2'],
+        'companies': [COMPANY_1_ID],
         'is_enabled': True,
     }, {
         '_id': 'p-2',
         'name': 'News',
         'description': 'news product',
-        'companies': ['59bc460f1d41c8fa815cc2c2', '59c38b965057fb87d7eda9ab'],
+        'companies': [COMPANY_1_ID, COMPANY_2_ID],
         'is_enabled': True,
     }])
 
-    test_login_succeeds_for_admin(client)
     resp = client.get('reports/company-products')
     report = json.loads(resp.get_data())
     assert report['name'] == 'Products per company'
@@ -126,17 +112,16 @@ def test_product_companies(client, app):
         '_id': 'p-1',
         'name': 'Sport',
         'description': 'sport product',
-        'companies': ['59bc460f1d41c8fa815cc2c2'],
+        'companies': [COMPANY_1_ID],
         'is_enabled': True,
     }, {
         '_id': 'p-2',
         'name': 'News',
         'description': 'news product',
-        'companies': ['59bc460f1d41c8fa815cc2c2', '59c38b965057fb87d7eda9ab'],
+        'companies': [COMPANY_1_ID, COMPANY_2_ID],
         'is_enabled': True,
     }])
 
-    test_login_succeeds_for_admin(client)
     resp = client.get('reports/product-companies')
     report = json.loads(resp.get_data())
     assert report['name'] == 'Companies permissioned per product'
@@ -159,7 +144,6 @@ def test_expired_companies(client, app):
         'expiry_date': datetime.utcnow() - timedelta(days=10),
         'is_enabled': False,
     }])
-    test_login_succeeds_for_admin(client)
     resp = client.get('reports/expired-companies')
     report = json.loads(resp.get_data())
     assert report['name'] == 'Expired companies'

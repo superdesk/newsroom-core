@@ -44,14 +44,13 @@ export default function ArticlePicture({isKilled, picture, isItemDetails, isCust
 
     return (<figure className='wire-column__preview__image'>
         {isItemDetails &&
-        <span><img src={renditions.href} className={classes} /></span> ||
-        <img src={renditions.href} className={classes}/>}
+        <span><img src={renditions.href} className={classes} alt={caption} /></span> ||
+        <img src={renditions.href} className={classes} alt={caption} />}
         <figcaption className='wire-column__preview__caption'>
             {caption}
-            {bylineHref ? (
-                <a href={bylineHref} target='_blank'> {byline}</a>
-            ) : (
-                <span> {byline}</span>
+            {bylineHref && <a href={bylineHref} target='_blank'> {byline}</a>}
+            {!bylineHref && picture.byline && (
+                <div>{picture.byline}</div>
             )}
             {credits && <p>{`${gettext('Credits ')} `}{credits}</p>}
         </figcaption>

@@ -11,7 +11,7 @@ function UserListItem({user, isActive, onClick, companiesById}) {
             className={`${isActive?'table--selected':''}
             ${(user.company && companiesById[user.company] && !get(companiesById[user.company],'is_enabled')) ||
             !user.is_enabled?'table-secondary':null}`}
-            onClick={() => onClick(user._id)}>
+            onClick={() => onClick(user._id)} tabIndex='0'>
             <td className="name">{user.first_name} {user.last_name}</td>
             <td>{user.email}</td>
             <td>{user.phone}</td>

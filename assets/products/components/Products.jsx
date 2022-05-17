@@ -42,7 +42,7 @@ class Products extends React.Component {
         let errors = {};
 
         if (!this.props.productToEdit.name) {
-            errors.name = ['Please provide product name'];
+            errors.name = [gettext('Please provide product name')];
             valid = false;
         }
 

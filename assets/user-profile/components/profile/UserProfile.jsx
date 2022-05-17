@@ -6,6 +6,7 @@ import {gettext} from 'utils';
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
+import {getLocaleInputOptions, getDefaultLocale} from 'users/utils';
 
 import {
     fetchUser,
@@ -51,9 +52,7 @@ class UserProfile extends React.Component {
     render() {
         const {user, onChange, errors} = this.props;
         const onCancel = () => this.props.fetchUser(this.props.user._id);
-        const localeOptions = (window.locales || [])
-            .filter((locale) => locale.locale !== window.locale) // this will be default value
-            .map((locale) => ({value: locale.locale, text: locale.name}));
+        const localeOptions = getLocaleInputOptions();
         return (
             <form className="profile-content container-fluid">
                 <div className="row">
@@ -128,7 +127,7 @@ class UserProfile extends React.Component {
                                         value={user.locale}
                                         onChange={onChange}
                                         options={localeOptions}
-                                        defaultOption={window.locales.find((locale) => locale.locale === window.locale).name}
+                                        defaultOption={getDefaultLocale()}
                                     />
                                 </div>
                             }

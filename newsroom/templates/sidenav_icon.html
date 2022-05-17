@@ -3,6 +3,7 @@
         data-toggle="tooltip"
         data-placement="right"
         aria-label="{{  gettext(nav.name) }}"
+        role="button"
         {% if nav.url %}target="_blank"{% endif %}
     >
         {% if nav.badge %}
@@ -11,10 +12,10 @@
         {% block navurl %}
         {% if nav.url %}
         <div class="badge badge-pill badge-light badge--icon">
-            <i class="icon-small--external icon--mid-blue"></i>
+            <i class="icon-small--external"></i>
         </div>
         {% endif %}
         {% endblock %}
-        <i class="icon--{{ nav.icon }} icon--mid-blue"></i>
+        <i class="icon--{{ nav.icon }}"></i>
     </a>
 </li>

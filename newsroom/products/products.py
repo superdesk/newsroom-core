@@ -36,6 +36,7 @@ class ProductsResource(newsroom.Resource):
         },
         'companies': {
             'type': 'list',
+            "schema": newsroom.Resource.rel("companies"),
             'nullable': True,
         },
         'product_type': {
@@ -60,9 +61,9 @@ class ProductsService(newsroom.Service):
 
 
 def _get_navigation_query(ids):
-    return {'$in': [str(oid) for oid in ids]} \
+    return {'$in': [ObjectId(oid) for oid in ids]} \
         if type(ids) is list \
-        else str(ids)
+        else ObjectId(ids)
 
 
 def get_products_by_navigation(navigation_id, product_type=None):
@@ -84,7 +85,7 @@ def get_product_by_id(product_id, product_type=None, company_id=None):
     }
 
     if company_id is not None:
-        lookup['companies'] = str(company_id)
+        lookup['companies'] = ObjectId(company_id)
 
     if product_type is not None:
         lookup['product_type'] = product_type
@@ -99,7 +100,7 @@ def get_products_by_company(company_id, navigation_id=None, product_type=None):
     :param navigation_id: Navigation Id
     :param product_type: Type of the product
     """
-    lookup = {'is_enabled': True, 'companies': str(company_id)}
+    lookup = {'is_enabled': True, 'companies': ObjectId(company_id)}
     if navigation_id:
         lookup['navigations'] = _get_navigation_query(navigation_id)
     if product_type:
@@ -110,5 +111,5 @@ def get_products_by_company(company_id, navigation_id=None, product_type=None):
 
 
 def get_products_dict_by_company(company_id):
-    lookup = {'is_enabled': True, 'companies': str(company_id)}
+    lookup = {'is_enabled': True, 'companies': ObjectId(company_id)}
     return list(superdesk.get_resource_service('products').get(req=None, lookup=lookup))

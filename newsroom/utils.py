@@ -2,6 +2,7 @@ import pytz
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from uuid import uuid4
+from typing import List
 
 import superdesk
 from superdesk.utc import utcnow
@@ -13,11 +14,15 @@ from flask import current_app as app, json, abort, request, g, flash, session, u
 from flask_babel import gettext
 
 from newsroom.template_filters import time_short, parse_date as parse_short_date, format_datetime, is_admin
-from newsroom.auth import get_user_id
 
 
 DAY_IN_MINUTES = 24 * 60 - 1
 MAX_TERMS_SIZE = 1000
+
+
+def get_user_id():
+    from newsroom.auth import get_user_id as _get_user_id
+    return _get_user_id()
 
 
 def query_resource(resource, lookup=None, max_results=0, projection=None):
@@ -249,8 +254,15 @@ def is_company_enabled(user, company=None):
     return user_company.get('is_enabled', False)
 
 
-def is_company_expired(company):
-    expiry_date = company.get('expiry_date')
+def is_company_expired(user=None, company=None):
+    if app.config.get("ALLOW_EXPIRED_COMPANY_LOGINS"):
+        return False
+    elif user and not user.get("company"):
+        return False if is_admin(user) else True
+    elif user and not company:
+        company = get_cached_resource_by_id("companies", user.get("company"))
+
+    expiry_date = (company or {}).get("expiry_date")
     if not expiry_date:
         return False
     return expiry_date.replace(tzinfo=None) <= datetime.utcnow().replace(tzinfo=None)
@@ -281,10 +293,20 @@ def get_user_dict():
         lookup = {'is_enabled': True}
         all_users = query_resource('users', lookup=lookup)
         companies = get_company_dict()
-        user_dict = {str(user['_id']): user for user in all_users
-                     if is_company_enabled(user, companies.get(user.get('company')))}
+        user_dict = {
+            str(user['_id']): user
+            for user in all_users
+            if (
+                is_company_enabled(user, companies.get(str(user.get("company"))))
+                and not is_company_expired(user, companies.get(str(user.get("company"))))
+            )
+        }
         g.user_dict = user_dict
     return g.user_dict
+
+
+def get_users_by_email(emails: List[str]):
+    return query_resource("users", lookup={"email": {"$in": emails}})
 
 
 def get_company_dict():
@@ -295,8 +317,11 @@ def get_company_dict():
     if 'company_dict' not in g or app.testing:
         lookup = {'is_enabled': True}
         all_companies = list(query_resource('companies', lookup=lookup))
-        g.company_dict = {str(company['_id']): company for company in all_companies
-                          if is_company_enabled({'company': company['_id']}, company)}
+        g.company_dict = {
+            str(company['_id']): company
+            for company in all_companies
+            if is_company_enabled({"company": company["_id"]}, company) and not is_company_expired(company=company)
+        }
     return g.company_dict
 
 
@@ -341,6 +366,11 @@ def is_valid_login(user_id):
     if not is_company_enabled(user, company):
         session.pop('_flashes', None)  # remove old messages and just show one message
         flash(gettext('Company account has been disabled.'), 'danger')
+        return False
+
+    if is_company_expired(user, company):
+        session.pop("_flashes", None)  # remove old messages and just show one message
+        flash(gettext("Company account has expired."), "danger")
         return False
 
     # Updated the active time for the user if required

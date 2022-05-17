@@ -11,13 +11,13 @@ from superdesk.text_utils import get_word_count, get_char_count
 from superdesk.utc import utcnow
 from planning.common import WORKFLOW_STATE
 
-from newsroom.notifications import push_notification
-from newsroom.topics.topics import get_wire_notification_topics, get_agenda_notification_topics
+from newsroom.notifications import push_notification, save_user_notifications, UserNotification
+from newsroom.topics.topics import get_agenda_notification_topics_for_query_by_id, get_topics_with_subscribers
 from newsroom.utils import parse_dates, get_user_dict, get_company_dict, parse_date_str
 from newsroom.email import send_new_item_notification_email, \
     send_history_match_notification_email, send_item_killed_notification_email
 from newsroom.history import get_history_users
-from newsroom.wire.views import HOME_ITEMS_CACHE_KEY
+from newsroom.wire.views import delete_dashboard_caches
 from newsroom.wire import url_for_wire
 from newsroom.upload import ASSETS_RESOURCE
 from newsroom.signals import publish_item as publish_item_signal
@@ -88,7 +88,8 @@ def push():
     else:
         flask.abort(400, gettext('Unknown type {}'.format(item.get('type'))))
 
-    app.cache.delete(HOME_ITEMS_CACHE_KEY)
+    if app.config.get("DELETE_DASHBOARD_CACHE_ON_PUSH", True):
+        delete_dashboard_caches()
     return flask.jsonify({})
 
 
@@ -131,8 +132,7 @@ def publish_item(doc, original):
     for assoc in doc.get('associations', {}).values():
         if assoc:
             assoc.setdefault('subscribers', [])
-    if doc.get('associations', {}).get('featuremedia'):
-        app.generate_renditions(doc)
+            app.generate_renditions(assoc)
 
     # If there is a function defined that generates renditions for embedded images call it.
     if app.generate_embed_renditions:
@@ -146,6 +146,12 @@ def publish_item(doc, original):
     except Exception as ex:
         logger.info('Failed to notify new wire item for Agenda watches')
         logger.exception(ex)
+
+    if app.config.get("WIRE_SUBJECT_SCHEME_WHITELIST") and doc.get("subject"):
+        doc["subject"] = [
+            subject for subject in doc["subject"]
+            if subject.get("scheme") in app.config["WIRE_SUBJECT_SCHEME_WHITELIST"]
+        ]
 
     publish_item_signal.send(app._get_current_object(), item=doc, is_new=original is None)
     _id = service.create([doc])[0]
@@ -592,24 +598,29 @@ def set_item_reference(coverage):
 
 
 def notify_new_item(item, check_topics=True):
-    if not item or item.get('type') == 'composite':
+    if not item or item.get("type") == 'composite':
         return
 
-    user_dict = get_user_dict()
-    user_ids = [u['_id'] for u in user_dict.values()]
+    item_type = item.get("type")
+    try:
+        user_dict = get_user_dict()
+        user_ids = [u['_id'] for u in user_dict.values()]
 
-    company_dict = get_company_dict()
-    company_ids = [c['_id'] for c in company_dict.values()]
+        company_dict = get_company_dict()
+        company_ids = [c['_id'] for c in company_dict.values()]
 
-    push_notification('new_item', _items=[item])
+        push_notification('new_item', _items=[item])
 
-    if check_topics:
-        if item.get('type') == 'text':
-            notify_wire_topic_matches(item, user_dict, company_dict)
-        else:
-            notify_agenda_topic_matches(item, user_dict)
+        if check_topics:
+            if item_type == 'text':
+                notify_wire_topic_matches(item, user_dict, company_dict)
+            else:
+                notify_agenda_topic_matches(item, user_dict, company_dict)
 
-    notify_user_matches(item, user_dict, company_dict, user_ids, company_ids)
+        notify_user_matches(item, user_dict, company_dict, user_ids, company_ids)
+    except Exception as e:
+        logger.exception(e)
+        logger.error(f"Failed to notify users for new {item_type} item {item['_id']}")
 
 
 def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids):
@@ -660,17 +671,17 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids)
         if not users_ids:
             return
 
-        app.data.insert('notifications', [
-            {'item': item['_id'], 'user': user}
+        save_user_notifications([
+            UserNotification(
+                user=user,
+                item=item["_id"],
+                resource=item.get("type"),
+                action="history_match",
+                data=None,
+            )
             for user in users_ids
         ])
 
-        push_notification(
-            'history_matches',
-            item=item,
-            users=users_ids,
-            section=section
-        )
         send_user_notification_emails(
             item,
             users_ids,
@@ -704,8 +715,7 @@ def send_user_notification_emails(item, user_matches, users, section):
 
 
 def notify_wire_topic_matches(item, users_dict, companies_dict):
-    topics = get_wire_notification_topics()
-
+    topics = get_topics_with_subscribers("wire")
     topic_matches = superdesk.get_resource_service('wire_search'). \
         get_matching_topics(item['_id'], topics, users_dict, companies_dict)
 
@@ -716,10 +726,17 @@ def notify_wire_topic_matches(item, users_dict, companies_dict):
         send_topic_notification_emails(item, topics, topic_matches, users_dict)
 
 
-def notify_agenda_topic_matches(item, users_dict):
-    topics = get_agenda_notification_topics(item, users_dict)
+def notify_agenda_topic_matches(item, users_dict, companies_dict):
+    topics = get_topics_with_subscribers("agenda")
+    topic_matches = superdesk.get_resource_service("agenda"). \
+        get_matching_topics(item['_id'], topics, users_dict, companies_dict)
 
-    topic_matches = [t['_id'] for t in topics]
+    # Include topics where the ``query`` is ``item["_id"]``
+    topic_matches.extend([
+        topic
+        for topic in get_agenda_notification_topics_for_query_by_id(item, users_dict)
+        if topic.get("_id") not in topic_matches
+    ])
 
     if topic_matches:
         push_notification('topic_matches',
@@ -737,11 +754,19 @@ def send_topic_notification_emails(item, topics, topic_matches, users):
             user = users.get(str(user_id))
 
             if user and user.get('receive_email'):
+                section = topic.get("topic_type") or "wire"
+                save_user_notifications([UserNotification(
+                    user=user["_id"],
+                    item=item["_id"],
+                    resource=section,
+                    action="topic_matches",
+                    data=None,
+                )])
                 send_new_item_notification_email(
                     user,
                     topic['label'],
                     item=item,
-                    section=topic.get('topic_type') or 'wire'
+                    section=section,
                 )
 
 

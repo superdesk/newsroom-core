@@ -36,7 +36,7 @@ class Users extends React.Component {
         let errors = {};
 
         if (!this.props.userToEdit.email) {
-            errors.email = ['Please provide email'];
+            errors.email = [gettext('Please provide email')];
             valid = false;
         }
 

@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
-import {isEmpty} from 'lodash';
-import {gettext} from 'utils';
+import {isEmpty, cloneDeep, pickBy, assign} from 'lodash';
+import {gettext, toggleValue} from 'utils';
 import {getActiveDate} from 'local-store';
 
 import NavCreatedPicker from './NavCreatedPicker';
@@ -12,8 +12,7 @@ import FilterButton from './FilterButton';
 
 import {
     resetFilter,
-    toggleFilter,
-    setCreatedFilter,
+    updateFilterStateAndURL,
 } from 'search/actions';
 import {
     searchFilterSelector,
@@ -32,11 +31,14 @@ class FiltersTab extends React.Component {
 
         this.toggleGroup = this.toggleGroup.bind(this);
         this.getFilterGroups = this.getFilterGroups.bind(this);
-        this.toggleFilterAndSearch = this.toggleFilterAndSearch.bind(this);
+        this.updateFilter = this.updateFilter.bind(this);
         this.setCreatedFilterAndSearch = this.setCreatedFilterAndSearch.bind(this);
+        this.search = this.search.bind(this);
         this.reset = this.reset.bind(this);
         this.state = {
-            groups: this.props.groups
+            groups: this.props.groups,
+            activeFilter: cloneDeep(this.props.activeFilter),
+            createdFilter: cloneDeep(this.props.createdFilter),
         };
     }
 
@@ -47,29 +49,57 @@ class FiltersTab extends React.Component {
         )});
     }
 
-    toggleFilterAndSearch(field, key, single, wasActive) {
-        this.props.toggleFilter(field, key, single);
-        wasActive && this.props.resultsFiltered && this.props.fetchItems();
+    updateFilter(field, key, single) {
+        // The `value` can be an Array
+        let values = Array.isArray(key) ? key : [key];
+        const currentFilters = cloneDeep(this.state.activeFilter);
+
+        for (let _value of values) {
+            currentFilters[field] = toggleValue(currentFilters[field], _value);
+
+            if (!_value || !currentFilters[field] || currentFilters[field].length === 0) {
+                delete currentFilters[field];
+            } else if (single) {
+                currentFilters[field] = currentFilters[field].filter(
+                    (val) => val === _value
+                );
+            }
+        }
+
+        this.setState({activeFilter: currentFilters});
     }
 
     setCreatedFilterAndSearch(createdFilter) {
-        this.props.setCreatedFilter(createdFilter);
-        this.props.resultsFiltered && this.props.fetchItems();
+        const created = pickBy(
+            assign(
+                cloneDeep(this.state.createdFilter),
+                createdFilter
+            )
+        );
+
+        this.setState({createdFilter: created});
     }
 
     getFilterGroups() {
         return this.state.groups.map((group) => <FilterGroup
             key={group.label}
             group={group}
-            activeFilter={this.props.activeFilter}
+            activeFilter={this.state.activeFilter}
             aggregations={this.props.aggregations}
             toggleGroup={this.toggleGroup}
-            toggleFilter={this.toggleFilterAndSearch}
+            toggleFilter={this.updateFilter}
         />);
+    }
+
+    search(event) {
+        event.preventDefault();
+        this.props.updateFilterStateAndURL(this.state.activeFilter, this.state.createdFilter);
+        this.props.fetchItems();
     }
 
     reset(event) {
         event.preventDefault();
+        this.setState({activeFilter: {}, createdFilter: {}});
         this.props.resetFilter();
         this.props.fetchItems();
         if ('function' === typeof this.props.selectDate) {
@@ -78,7 +108,7 @@ class FiltersTab extends React.Component {
     }
 
     render() {
-        const {activeFilter, createdFilter} = this.props;
+        const {activeFilter, createdFilter} = this.state;
         const isResetActive = Object.keys(activeFilter).find((key) => !isEmpty(activeFilter[key]))
             || Object.keys(createdFilter).find((key) => !isEmpty(createdFilter[key]));
 
@@ -95,10 +125,7 @@ class FiltersTab extends React.Component {
                         <FilterButton
                             key='search'
                             label={gettext('Search')}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                this.props.fetchItems();
-                            }}
+                            onClick={this.search}
                             className='search filter-button--border'
                             primary={true}
                         />,
@@ -123,8 +150,7 @@ FiltersTab.propTypes = {
     resultsFiltered: PropTypes.bool.isRequired,
 
     resetFilter: PropTypes.func.isRequired,
-    toggleFilter: PropTypes.func.isRequired,
-    setCreatedFilter: PropTypes.func.isRequired,
+    updateFilterStateAndURL: PropTypes.func.isRequired,
     fetchItems: PropTypes.func.isRequired,
     groups: PropTypes.array,
     selectDate: PropTypes.func,
@@ -139,8 +165,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
     resetFilter,
-    toggleFilter,
-    setCreatedFilter,
+    updateFilterStateAndURL,
     selectDate,
 };
 

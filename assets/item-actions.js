@@ -1,5 +1,4 @@
-import {gettext} from './utils';
-
+import {gettext, isActionEnabled} from './utils';
 
 export function getItemActions(dispatch, actions) {
     const {
@@ -12,7 +11,6 @@ export function getItemActions(dispatch, actions) {
         removeBookmarks,
         removeItems,
     } = actions;
-
 
     return [
         {
@@ -52,7 +50,7 @@ export function getItemActions(dispatch, actions) {
             icon: 'download',
             multi: true,
             visited: (user, item) => user && item && item.downloads &&  item.downloads.includes(user),
-            when: (state) => state.user && state.company,
+            when: (state) => state.user && (state.company || state.userType === 'administrator'),
             action: (items) => dispatch(downloadItems(items)),
         },
         {
@@ -81,5 +79,5 @@ export function getItemActions(dispatch, actions) {
             when: (state) => state.user && state.userType === 'administrator',
             action: (items) => removeItems(items),
         }
-    ];
+    ].filter(isActionEnabled('item_actions'));
 }

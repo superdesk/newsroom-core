@@ -66,6 +66,10 @@
     }
 }
 
+[class^="icon-small--coverage-"], [class*=" icon-small--coverage-"] {
+    color: $gray-dark;
+}
+
 .icon-small--arrow-down:before {
     content: "\e600";
 }

@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 import arrow
 from bson.objectid import ObjectId
 import flask
@@ -12,11 +13,23 @@ from jinja2.utils import htmlsafe_json_dumps  # type: ignore
 from superdesk import get_resource_service
 from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
-from newsroom.auth import get_user
 from datetime import datetime
 
 
 _hash_cache = {}
+
+
+def get_client_format(key) -> Optional[str]:
+    locale = str(get_locale())
+    try:
+        return app.config["CLIENT_LOCALE_FORMATS"][locale][key]
+    except KeyError:
+        pass
+    try:
+        return app.config["CLIENT_LOCALE_FORMATS"][app.config["DEFAULT_LANGUAGE"]][key]
+    except KeyError:
+        pass
+    return None
 
 
 def to_json(value):
@@ -56,7 +69,8 @@ def datetime_long(datetime):
 
 
 def date_header(datetime):
-    return format_datetime(parse_date(datetime if datetime else utcnow()), app.config["DATE_FORMAT_HEADER"])
+    _format = get_client_format("DATE_FORMAT_HEADER")
+    return format_datetime(parse_date(datetime if datetime else utcnow()), _format)
 
 
 def time_short(datetime):
@@ -130,6 +144,8 @@ def section_allowed(nav, sections):
 
 
 def get_company_sidenavs(blueprint=None):
+    from newsroom.auth import get_user
+
     user = get_user()
     company = None
     if user and user.get('company'):

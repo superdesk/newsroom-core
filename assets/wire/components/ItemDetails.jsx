@@ -4,10 +4,9 @@ import {isEmpty} from 'lodash';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import AgendaLinks from './AgendaLinks';
-import {isDisplayed, fullDate, gettext} from 'utils';
+import {isDisplayed, gettext, formatDate, formatTime} from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
-import PreviewActionButtons from 'components/PreviewActionButtons';
 import {
     getPicture,
     getVideos,
@@ -18,6 +17,7 @@ import {
     isPreformatted,
     isCustomRendition,
 } from 'wire/utils';
+import types from 'wire/types';
 import Content from 'ui/components/Content';
 import ContentHeader from 'ui/components/ContentHeader';
 import ContentBar from 'ui/components/ContentBar';
@@ -34,17 +34,20 @@ import ArticleBody from 'ui/components/ArticleBody';
 import ArticleAuthor from 'ui/components/ArticleAuthor';
 import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 import PreviewEdnote from './PreviewEdnote';
+import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
-
 
 function ItemDetails({
     item,
     user,
     actions,
+    topics,
     onClose,
     detailsConfig,
     downloadVideo,
+    followStory,
     listConfig,
+    filterGroupLabels,
 }) {
     const picture = getPicture(item);
     const videos = getVideos(item);
@@ -55,7 +58,13 @@ function ItemDetails({
         <Content type="item-detail">
             <ContentHeader>
                 <ContentBar onClose={onClose}>
-                    <PreviewActionButtons item={item} user={user} actions={actions}/>
+                    <WireActionButtons
+                        item={item}
+                        user={user}
+                        topics={topics}
+                        actions={actions}
+                        followStory={followStory}
+                    />
                 </ContentBar>
             </ContentHeader>
             <ArticleItemDetails>
@@ -69,7 +78,10 @@ function ItemDetails({
                         <ArticleBody itemType={itemType}>
                             <ArticleEmbargoed item={item} />
                             <div className='wire-column__preview__date pb-2'>
-                                {gettext('Published')}{' '}{fullDate(item.versioncreated)}
+                                {gettext('Published on {{ date }} at {{ time }}', {
+                                    date: formatDate(item.versioncreated),
+                                    time: formatTime(item.versioncreated),
+                                })}
                             </div>
                             {isDisplayed('headline', detailsConfig) && <ArticleHeadline item={item}/>}
                             <ArticleAuthor item={item} displayConfig={detailsConfig} />
@@ -87,8 +99,12 @@ function ItemDetails({
 
 
 
-                        {isDisplayed('metadata_section', detailsConfig) &&
-                            <PreviewMeta item={item} isItemDetail={true} displayConfig={detailsConfig} listConfig={listConfig}/>}
+                        {isDisplayed('metadata_section', detailsConfig) && (
+                            <PreviewMeta item={item} isItemDetail={true} displayConfig={detailsConfig}
+                                listConfig={listConfig}
+                                filterGroupLabels={filterGroupLabels}
+                            />
+                        )}
                         <ArticleContentInfoWrapper>
                             {isDisplayed('tags_section', detailsConfig) &&
                                 <PreviewTags item={item} isItemDetail={true} displayConfig={detailsConfig}/>}
@@ -117,17 +133,17 @@ function ItemDetails({
 }
 
 ItemDetails.propTypes = {
-    item: PropTypes.object.isRequired,
-    user: PropTypes.string.isRequired,
-    actions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        action: PropTypes.func,
-        url: PropTypes.func,
-    })),
-    onClose: PropTypes.func,
-    detailsConfig: PropTypes.object,
+    item: types.item.isRequired,
+    user: types.user.isRequired,
+    topics: types.topics.isRequired,
+    actions: types.actions,
     listConfig: PropTypes.object,
+    detailsConfig: PropTypes.object,
+    filterGroupLabels: PropTypes.object,
+
+    onClose: PropTypes.func,
     downloadVideo: PropTypes.func,
+    followStory: PropTypes.func,
 };
 
 export default ItemDetails;

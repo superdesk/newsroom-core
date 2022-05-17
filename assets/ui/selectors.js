@@ -8,6 +8,11 @@ export const listConfigSelector = (state) => uiConfigSelector(state).list || {};
 export const advancedSearchTabsConfigSelector = (state) => uiConfigSelector(state).advanced_search_tabs || {};
 export const multiSelectTopicsConfigSelector = (state) => uiConfigSelector(state).multi_select_topics || false;
 export const companiesSubscriberIdEnabled = (state) => get(state, 'ui_config.list.sd_subscriber_id.enabled', false);
+export const isSearchEnabled = (state) => uiConfigSelector(state).search || false;
+export const agendaContentLinkTarget = (state) => uiConfigSelector(state).open_coverage_content_in_same_page === true ?
+    '_self' :
+    '_blank';
+
 export const globalTopicsEnabledSelector = (state) => get(
     uiConfigSelector(state),
     'enable_global_topics',

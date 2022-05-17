@@ -10,7 +10,8 @@ from superdesk.utc import utcnow
 
 from newsroom.auth import blueprint, get_auth_user_by_email, get_user_by_email
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
-from newsroom.utils import get_random_string, is_company_enabled, is_account_enabled
+from newsroom.utils import get_random_string, is_company_enabled, is_account_enabled, is_company_expired, \
+    get_cached_resource_by_id
 from newsroom.email import send_validate_account_email, \
     send_reset_password_email, send_new_signup_email, send_new_account_email
 from newsroom.limiter import limiter
@@ -20,9 +21,10 @@ from .token import generate_auth_token, verify_auth_token
 
 
 @blueprint.route('/login', methods=['GET', 'POST'])
-@limiter.limit('60/hour')
+@limiter.limit('60/minute')
 def login():
     form = LoginForm()
+    next_page = flask.request.args.get('next') or flask.url_for('wire.index')
     if form.validate_on_submit():
 
         if not is_valid_login_attempt(form.email.data):
@@ -38,8 +40,14 @@ def login():
                 flask.flash(gettext('Insufficient Permissions. Access denied.'), 'danger')
                 return flask.render_template('login.html', form=form)
 
-            if not is_company_enabled(user):
+            company = get_cached_resource_by_id("companies", user.get("company"))
+
+            if not is_company_enabled(user, company):
                 flask.flash(gettext('Company account has been disabled.'), 'danger')
+                return flask.render_template('login.html', form=form)
+
+            if is_company_expired(user, company):
+                flask.flash(gettext("Company account has expired."), "danger")
                 return flask.render_template('login.html', form=form)
 
             if is_account_enabled(user):
@@ -51,10 +59,11 @@ def login():
                 if flask.session.get('locale') and flask.session['locale'] != user.get('locale'):
                     get_resource_service('users').system_update(user['_id'], {'locale': flask.session['locale']}, user)
 
-                return flask.redirect(flask.request.args.get('next') or flask.url_for('wire.index'))
+                return flask.redirect(next_page)
         else:
             flask.flash(gettext('Invalid username or password.'), 'danger')
-    return flask.render_template('login.html', form=form)
+
+    return flask.render_template('login.html', form=form, next_page=next_page)
 
 
 def is_valid_login_attempt(email):
@@ -147,9 +156,13 @@ def get_login_token():
 
     if user is not None and _is_password_valid(password.encode('UTF-8'), user):
         user = get_resource_service('users').find_one(req=None, _id=user['_id'])
+        company = get_cached_resource_by_id("companies", user.get("company"))
 
-        if not is_company_enabled(user):
+        if not is_company_enabled(user, company):
             abort(401, gettext('Company account has been disabled.'))
+
+        if is_company_expired(user, company):
+            abort(401, gettext("Company account has expired."))
 
         if is_account_enabled(user):
             return generate_auth_token(
@@ -228,7 +241,7 @@ def validate_account(token):
 def reset_password(token):
     user = get_resource_service('users').find_one(req=None, token=token)
     if not user:
-        flask.abort(404)
+        return flask.render_template('password_reset_link_expiry.html')
 
     form = ResetPasswordForm()
     if form.validate_on_submit():

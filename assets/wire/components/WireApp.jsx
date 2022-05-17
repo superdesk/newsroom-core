@@ -33,6 +33,7 @@ import {
     searchFilterSelector,
     searchParamsSelector,
     showSaveTopicSelector,
+    filterGroupsToLabelMap,
 } from 'search/selectors';
 
 import BaseApp from 'layout/components/BaseApp';
@@ -80,8 +81,6 @@ class WireApp extends BaseApp {
     render() {
         const modal = this.renderModal(this.props.modal);
 
-        const isFollowing = get(this.props, 'itemToPreview.slugline') && this.props.topics &&
-            this.props.topics.find((topic) => topic.query === `slugline:"${this.props.itemToPreview.slugline}"`);
         const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x) => x).length;
         const mainClassName = classNames('wire-column__main', {
             'wire-articles__one-side-pane': panesCount === 1,
@@ -137,13 +136,17 @@ class WireApp extends BaseApp {
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
                 user={this.props.user}
+                topics={this.props.topics}
                 actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
                 detailsConfig={this.props.detailsConfig}
                 listConfig={this.props.listConfig}
                 downloadVideo={this.props.downloadVideo}
+                followStory={this.props.followStory}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
+                filterGroupLabels={this.props.filterGroupLabels}
             />] : [
                 <section key="contentHeader" className='content-header'>
+                    <h3 className="a11y-only">{gettext('Wire Content')}</h3>
                     <SelectedItemsBar
                         actions={this.props.actions}
                     />
@@ -229,13 +232,14 @@ class WireApp extends BaseApp {
                             <WirePreview
                                 item={this.props.itemToPreview}
                                 user={this.props.user}
+                                topics={this.props.topics}
                                 actions={this.filterActions(this.props.itemToPreview, this.props.previewConfig)}
                                 followStory={this.props.followStory}
-                                isFollowing={!!isFollowing}
                                 closePreview={this.props.closePreview}
                                 previewConfig={this.props.previewConfig}
                                 downloadVideo={this.props.downloadVideo}
                                 listConfig={this.props.listConfig}
+                                filterGroupLabels={this.props.filterGroupLabels}
                             />
                             }
 
@@ -302,6 +306,7 @@ WireApp.propTypes = {
     advancedSearchTabConfig: PropTypes.object,
     searchParams: PropTypes.object,
     showSaveTopic: PropTypes.bool,
+    filterGroupLabels: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -336,6 +341,7 @@ const mapStateToProps = (state) => ({
     groups: get(state, 'groups', []),
     searchParams: searchParamsSelector(state),
     showSaveTopic: showSaveTopicSelector(state),
+    filterGroupLabels: filterGroupsToLabelMap(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({

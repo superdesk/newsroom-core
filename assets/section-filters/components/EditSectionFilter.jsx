@@ -15,7 +15,7 @@ class EditSectionFilter extends React.Component {
 
     render() {
         return (
-            <div className='list-item__preview'>
+            <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit Section Filters')}>
                 <div className='list-item__preview-header'>
                     <h3>{get(this.props.sectionFilter, '_id') && this.props.sectionFilter.name || gettext('New Filter')}</h3>
                     <button
@@ -25,7 +25,7 @@ class EditSectionFilter extends React.Component {
                         data-dismiss='modal'
                         aria-label={gettext('Close')}
                         onClick={this.props.onClose}>
-                        <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
+                        <i className="icon--close-thin icon--gray-dark" aria-hidden='true'></i>
                     </button>
                 </div>
                 <AuditInformation item={this.props.sectionFilter} />

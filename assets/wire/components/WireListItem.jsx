@@ -10,7 +10,6 @@ import {
     LIST_ANIMATIONS,
     getSlugline,
     getConfig,
-    isMobilePhone,
 } from 'utils';
 import {
     getPicture,
@@ -19,6 +18,7 @@ import {
     shortText,
     isKilled,
     getVideos,
+    getCaption,
 } from 'wire/utils';
 
 import ActionButton from 'components/ActionButton';
@@ -36,11 +36,6 @@ export const DISPLAY_CHAR_COUNT = getConfig('display_char_count');
 
 const DEFAULT_META_FIELDS = ['source', 'charcount', 'versioncreated'];
 const DEFAULT_COMPACT_META_FIELDS = ['versioncreated'];
-const DEFAULT_SHOW_ACTION_ICONS = {
-    large: true,
-    compact: true,
-    mobile: false,
-};
 
 function getShowVersionText(isExpanded, itemCount, matchCount, isExtended) {
     if (isExpanded) {
@@ -150,13 +145,6 @@ class WireListItem extends React.Component {
         const isMarketPlace = this.props.context === 'aapX';
         const fields = listConfig.metadata_fields || DEFAULT_META_FIELDS;
         const compactFields = listConfig.compact_metadata_fields || DEFAULT_COMPACT_META_FIELDS;
-        const showActionIconsConfig = listConfig.show_list_action_icons || DEFAULT_SHOW_ACTION_ICONS;
-        const showListActionIcons = isMobilePhone() ?
-            showActionIconsConfig.mobile : (
-                isExtended ?
-                    showActionIconsConfig.large :
-                    showActionIconsConfig.compact
-            );
         const matchedIds = this.props.isSearchFiltered ? this.props.matchedIds : [];
         const matchedAncestors = matchedIds.filter((id) => (item.ancestors || []).includes(id));
 
@@ -164,14 +152,13 @@ class WireListItem extends React.Component {
             <article
                 key={item._id}
                 className={cardClassName}
-                tabIndex='0'
                 ref={(elem) => this.dom.article = elem}
                 onClick={() => onClick(item)}
                 onDoubleClick={() => onDoubleClick(item)}
                 onKeyDown={this.onKeyDown}
             >
                 <UrgencyItemBorder item={item} listConfig={listConfig} />
-                <div className={wrapClassName}>
+                <div className={wrapClassName} tabIndex='0'>
                     <div className="wire-articles__item-text">
                         <h4 className="wire-articles__item-headline">
                             <div
@@ -198,7 +185,7 @@ class WireListItem extends React.Component {
                                     />
                                 )}
                                 <Embargo item={item} />
-                                <UrgencyLabel item={item} listConfig={listConfig} />
+                                <UrgencyLabel item={item} listConfig={listConfig} filterGroupLabels={this.props.filterGroupLabels} />
                                 {item.headline}
                             </div>
                         </h4>
@@ -236,6 +223,7 @@ class WireListItem extends React.Component {
                             >
                                 <img
                                     src={`/theme/logo/${item.source}.png`}
+                                    alt={item.source}
                                 />
                             </div>,
                             <div
@@ -311,6 +299,7 @@ class WireListItem extends React.Component {
                                     src={
                                         getThumbnailRendition(picture).href
                                     }
+                                    alt={getCaption(picture)}
                                 />
                             </figure>
                         </div>
@@ -326,10 +315,10 @@ class WireListItem extends React.Component {
                             actions={this.props.actions}
                             onActionList={this.props.onActionList}
                             showActions={this.props.showActions}
-                            showShortcutActions={!showListActionIcons}
+                            showShortcutActions={!this.props.showShortcutActionIcons}
                         />
 
-                        {!showListActionIcons ? null : this.props.actions.map(
+                        {!this.props.showShortcutActionIcons ? null : this.props.actions.map(
                             (action) => (
                                 action.shortcut && (
                                     <ActionButton
@@ -387,6 +376,8 @@ WireListItem.propTypes = {
     listConfig: PropTypes.object,
     matchedIds: PropTypes.array,
     isSearchFiltered: PropTypes.bool,
+    showShortcutActionIcons: PropTypes.bool,
+    filterGroupLabels: PropTypes.object,
 };
 
 WireListItem.defaultProps = {

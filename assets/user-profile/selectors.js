@@ -9,8 +9,8 @@ export const userSectionsSelector = (state) => get(state, 'userSections');
 export const topicEditorFullscreenSelector = (state) => get(state, 'editorFullscreen') || false;
 
 export const uiContextConfigSelector = (state, context) => get(state, `uiConfigs.${context}`) || {};
-export const globalTopicsEnabledSelector = (state, context) => get(
+export const globalTopicsEnabledSelector = (state, context) => context === 'monitoring' ? false : get(
     state,
     `uiConfigs.${context}.enable_global_topics`,
     DEFAULT_ENABLE_GLOBAL_TOPICS
-) === true;
+) === true && get(state, 'user.company.length') > 0;

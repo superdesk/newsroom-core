@@ -5,23 +5,24 @@ $gray-light: #c9c9c9;
 $gray-mid: #9a9a9a;
 $gray-dark: #747474;
 $background-color: #f8f8f8;
-$main-blue: #00acec;
-$mid-blue: #006f98;
-$mid-blue-light: #6b8d9a;
+$main-blue: #007EAD;
+$mid-blue: #00658A;
+$mid-blue-light: #427A8F;
 $pink: #d50089;
 $red: #cb0002;
-$green: #7ed321;
-$green-dark: #64a51c;
-$orange: #f7941d;
-$cyan: #0ce7e7;
-$yellow2: #d2a800;
+$green: #51831B;
+$green-dark: #3D7204;
+$orange: #B36100;
+$cyan: #108484;
+$purple: #B637DE;
+$yellow: #8F7200;
 
 // Custom bootstrap variables
 
 $info: $pink;
-$gray-600: #868e96;
+$gray-600: #6D757E;
 
-$blue: #00acec;
+$blue: #007EAD;
 $line-height-sm: 1.25;
 $border-radius: .1875rem;
 $btn-border-radius-sm: .125rem;
@@ -52,6 +53,7 @@ $btn-block-spacing-y: .625rem;
 $input-focus-border-color: $blue;
 $input-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .15);
 $input-bg: $background-color;
+$input-placeholder-color: $gray-dark;
 $custom-checkbox-indicator-border-radius: 2px;
 $custom-control-indicator-bg: transparent;
 
@@ -67,7 +69,7 @@ $dropdown-min-width: 12rem;
 // Modals
 
 $modal-backdrop-bg: #fff;
-$modal-backdrop-opacity: .95;
+$modal-backdrop-opacity: 1;
 $modal-content-border-width: 0px;
 $modal-content-bg: transparent;
 

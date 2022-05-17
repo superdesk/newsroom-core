@@ -1,19 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {get, set, cloneDeep} from 'lodash';
+import {get, set, cloneDeep, isEqual} from 'lodash';
 import classNames from 'classnames';
 
 import {gettext, notify} from 'utils';
+import {canUserEditTopic} from 'topics/utils';
+import types from 'wire/types';
 
 import TopicForm from './TopicForm';
 import TopicParameters from './TopicParameters';
 import {fetchNavigations} from 'navigations/actions';
-import {submitFollowTopic as submitWireFollowTopic} from 'search/actions';
+import {submitFollowTopic as submitWireFollowTopic, subscribeToTopic, unsubscribeToTopic} from 'search/actions';
 import {submitFollowTopic as submitProfileFollowTopic, hideModal, setTopicEditorFullscreen} from 'user-profile/actions';
 import {topicEditorFullscreenSelector} from 'user-profile/selectors';
 import {loadMyWireTopic} from 'wire/actions';
 import {loadMyAgendaTopic} from 'agenda/actions';
+import EditPanel from 'components/EditPanel';
+import AuditInformation from 'components/AuditInformation';
+import {ToolTip} from 'ui/components/ToolTip';
 
 class TopicEditor extends React.Component {
     constructor(props) {
@@ -23,10 +28,14 @@ class TopicEditor extends React.Component {
             topic: null,
             saving: false,
             valid: false,
+            tabs: [],
+            activeTab: 'topic',
         };
 
         this.onChangeHandler = this.onChangeHandler.bind(this);
+        this.onSubscribeChanged = this.onSubscribeChanged.bind(this);
         this.saveTopic = this.saveTopic.bind(this);
+        this.handleTabClick = this.handleTabClick.bind(this);
     }
 
     componentDidMount() {
@@ -43,6 +52,10 @@ class TopicEditor extends React.Component {
         }
     }
 
+    handleTabClick(event) {
+        this.setState({activeTab: event.target.name});
+    }
+
     changeTopic(topic) {
         topic.notifications = (topic.subscribers || []).includes(this.props.userId);
 
@@ -50,16 +63,27 @@ class TopicEditor extends React.Component {
             topic: topic,
             saving: false,
             valid: !get(topic, '_id'),
+            tabs:  this.getTabsForTopic(topic),
+            activeTab: 'topic',
         }, () => {
             this.updateFormValidity(topic);
         });
+    }
+
+    getTabsForTopic(topic) {
+        return (!topic._id || !topic.is_global || !this.props.isAdmin) ?
+            [] :
+            [
+                {label: gettext('Company Topic'), name: 'topic', tooltip: gettext('Edit Metadata')},
+                {label: gettext('Subscribers'), name: 'subscribers', tooltip: gettext('Email Notifications')},
+            ];
     }
 
     updateFormValidity(topic) {
         const original = get(this.props, 'topic') || {};
         const isDirty = ['label', 'notifications', 'is_global'].some(
             (field) => get(original, field) !== get(topic, field)
-        );
+        ) || !isEqual(original.subscribers, topic.subscribers);
 
         if (!topic.label) {
             // The topic must have a label so disable the save button
@@ -87,25 +111,50 @@ class TopicEditor extends React.Component {
         };
     }
 
+    onSubscribeChanged() {
+        const topic = cloneDeep(this.state.topic);
+
+        if (this.state.topic.notifications) {
+            unsubscribeToTopic(this.state.topic);
+            topic.notifications = false;
+            topic.subscribers = (topic.subscribers || []).filter((userId) => userId !== this.props.userId);
+        } else {
+            subscribeToTopic(this.state.topic);
+            topic.notifications = true;
+            topic.subscribers = [
+                ...(topic.subscribers || []),
+                this.props.userId
+            ];
+        }
+
+        this.setState({topic});
+        this.props.onTopicChanged();
+    }
+
     saveTopic(event) {
+        const original = this.props.topic;
         const topic = cloneDeep(this.state.topic);
         const isExisting = !this.isNewTopic();
         const isAgendaTopic = this.isAgendaTopic();
 
         // Construct new list of subscribers
-        let subscribers = topic.subscribers || [];
-        const alreadySubscribed = subscribers.includes(this.props.userId);
-        if (topic.notifications && !alreadySubscribed) {
-            subscribers.push(this.props.userId);
-        } else if (!topic.notifications && alreadySubscribed) {
-            subscribers = subscribers.filter(
-                (userId) => userId !== this.props.userId
-            );
-        }
-        delete topic.notifications;
-        topic.subscribers = subscribers;
+        if (!isExisting || !original.is_global) {
+            let subscribers = topic.subscribers || [];
+            const alreadySubscribed = subscribers.includes(this.props.userId);
 
-        event.preventDefault();
+            if (topic.notifications && !alreadySubscribed) {
+                subscribers.push(this.props.userId);
+            } else if (!topic.notifications && alreadySubscribed) {
+                subscribers = subscribers.filter(
+                    (userId) => userId !== this.props.userId
+                );
+            }
+
+            delete topic.notifications;
+            topic.subscribers = subscribers || [];
+        }
+
+        event.preventDefault && event.preventDefault();
         this.setState({saving: true});
         this.props.saveTopic(
             isExisting,
@@ -163,13 +212,21 @@ class TopicEditor extends React.Component {
             return null;
         }
 
+        const originalTopic = this.props.topic || {};
+        const updatedTopic = this.state.topic || {};
+        const currentUser = this.props.user || {};
+
+        const isCompanyTopic = originalTopic.is_global;
+        const isReadOnly = !canUserEditTopic(originalTopic, currentUser);
+        const showTabs = this.state.tabs.length > 0;
+
         const containerClasses = classNames(
             'list-item__preview',
             {'list-item__preview--new': this.props.editorFullscreen}
         );
 
         return (
-            <div className={containerClasses}>
+            <div className={showTabs ? 'list-item__preview' : containerClasses}>
                 <div className="list-item__preview-header">
                     <h3>{this.getTitle()}</h3>
                     <button
@@ -180,50 +237,101 @@ class TopicEditor extends React.Component {
                         disabled={this.state.saving}
                         aria-label={gettext('Close')}
                     >
-                        <i className="icon--close-thin icon--gray" />
+                        <i className="icon--close-thin icon--gray-dark" />
                     </button>
                 </div>
-                <div className="list-item__preview-form">
-                    {this.state.topic && ([
-                        <TopicForm
-                            key="form"
-                            topic={this.state.topic}
-                            globalTopicsEnabled={this.props.globalTopicsEnabled}
-                            save={this.saveTopic}
-                            onChange={this.onChangeHandler}
-                        />,
-                        <TopicParameters
-                            key="params"
-                            topic={this.state.topic}
-                            navigations={this.props.navigations}
+                {!isCompanyTopic ? null : (
+                    <AuditInformation
+                        item={originalTopic}
+                        users={this.props.companyUsers}
+                    />
+                )}
+                {!showTabs ? null : (
+                    <ul className='nav nav-tabs'>
+                        {this.state.tabs.map((tab) => (
+                            <li
+                                key={tab.name}
+                                className='nav-item'
+                            >
+                                <ToolTip placement="bottom">
+                                    <a
+                                        name={tab.name}
+                                        className={`nav-link ${this.state.activeTab === tab.name && 'active'}`}
+                                        href='#'
+                                        title={tab.tooltip}
+                                        onClick={this.handleTabClick}>{tab.label}
+                                    </a>
+                                </ToolTip>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+                <div className={classNames(
+                    'list-item__preview-form',
+                    {'list-item__preview-form--no-padding': this.state.activeTab === 'subscribers'}
+                )}>
+                    {this.state.activeTab === 'topic' && updatedTopic && (
+                        <React.Fragment>
+                            <TopicForm
+                                original={originalTopic}
+                                globalTopicsEnabled={this.props.globalTopicsEnabled}
+                                topic={updatedTopic}
+                                save={this.saveTopic}
+                                onChange={this.onChangeHandler}
+                                onSubscribeChanged={this.onSubscribeChanged}
+                                readOnly={isReadOnly}
+                            />
+                            <TopicParameters
+                                topic={updatedTopic}
+                                navigations={this.props.navigations}
+                            />
+                        </React.Fragment>
+                    )}
+                    {this.state.activeTab === 'subscribers' && updatedTopic && (
+                        <EditPanel
+                            parent={updatedTopic}
+                            items={this.props.companyUsers.map((user) => ({
+                                ...user,
+                                name: `${user.first_name} ${user.last_name}`,
+                            }))}
+                            field="subscribers"
+                            onChange={this.onChangeHandler('subscribers')}
+                            onSave={this.saveTopic}
+                            onCancel={this.props.closeEditor}
+                            saveDisabled={this.state.saving || !this.state.valid}
+                            cancelDisabled={this.state.saving}
+                            includeSelectAll={true}
+                            title={gettext('Send notifications to:')}
                         />
-                    ])}
+                    )}
                 </div>
-                <div className="list-item__preview-footer">
-                    <input
-                        type="button"
-                        className="btn btn-outline-secondary"
-                        value={gettext('Cancel')}
-                        onClick={this.props.closeEditor}
-                        disabled={this.state.saving}
-                        aria-label={gettext('Cancel')}
-                    />
-                    <input
-                        type="button"
-                        className="btn btn-outline-primary"
-                        value={gettext('Save')}
-                        onClick={this.saveTopic}
-                        disabled={this.state.saving || !this.state.valid}
-                        aria-label={gettext('Save')}
-                    />
-                </div>
+                {(this.state.activeTab === 'subscribers' || isReadOnly) ? null : (
+                    <div className="list-item__preview-footer">
+                        <input
+                            type="button"
+                            className="btn btn-outline-secondary"
+                            value={gettext('Cancel')}
+                            onClick={this.props.closeEditor}
+                            disabled={this.state.saving}
+                            aria-label={gettext('Cancel')}
+                        />
+                        <input
+                            type="button"
+                            className="btn btn-outline-primary"
+                            value={gettext('Save')}
+                            onClick={this.saveTopic}
+                            disabled={this.state.saving || !this.state.valid}
+                            aria-label={gettext('Save')}
+                        />
+                    </div>
+                )}
             </div>
         );
     }
 }
 
 TopicEditor.propTypes = {
-    topic: PropTypes.object,
+    topic: types.topic,
     userId: PropTypes.string,
     isLoading: PropTypes.bool,
     navigations: PropTypes.arrayOf(PropTypes.object),
@@ -236,6 +344,9 @@ TopicEditor.propTypes = {
     editorFullscreen: PropTypes.bool,
     setTopicEditorFullscreen: PropTypes.func,
     globalTopicsEnabled: PropTypes.bool,
+    isAdmin: PropTypes.bool,
+    companyUsers: PropTypes.array,
+    user: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -243,6 +354,7 @@ const mapStateToProps = (state) => ({
     isLoading: state.isLoading,
     navigations: state.navigations || [],
     editorFullscreen: topicEditorFullscreenSelector(state),
+    companyUsers: state.monitoringProfileUsers || [],
 });
 
 const mapDispatchToProps = (dispatch) => ({

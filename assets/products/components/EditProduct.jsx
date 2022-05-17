@@ -70,7 +70,7 @@ class EditProduct extends React.Component {
 
     render() {
         return (
-            <div className='list-item__preview'>
+            <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit Product')}>
                 <div className='list-item__preview-header'>
                     <h3>{this.props.product.name}</h3>
                     <button
@@ -80,7 +80,7 @@ class EditProduct extends React.Component {
                         data-dismiss='modal'
                         aria-label={gettext('Close')}
                         onClick={this.props.onClose}>
-                        <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
+                        <i className="icon--close-thin icon--gray-dark" aria-hidden='true'></i>
                     </button>
                 </div>
                 <AuditInformation item={this.props.product} />

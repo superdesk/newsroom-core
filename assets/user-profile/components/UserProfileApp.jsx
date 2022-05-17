@@ -93,11 +93,11 @@ class UserProfileApp extends React.Component {
         const topicType = links.find((link) => link.active).type;
 
         return (
-            <div className="profile-container">
+            <div className="profile-container" role={gettext('dialog')} aria-label={links.find((link) => link.active).label}>
                 <div className="profileWrap">
                     <div className="profile__mobile-close d-md-none">
                         <button className="icon-button" aria-label={gettext('Close')} onClick={this.props.hideModal}>
-                            <i className="icon--close-thin icon--gray-light" />
+                            <i className="icon--close-thin icon--gray-dark" />
                         </button>
                     </div>
                     <nav className='profile-side-navigation' id='profile-menu'>
@@ -116,7 +116,7 @@ class UserProfileApp extends React.Component {
                                     {links.find((link) => link.active).label}
                                 </h5>
                                 <div className="content-bar__right">
-                                    <button className="content-bar__menu" aria-label="Close" onClick={this.props.hideModal}>
+                                    <button className="content-bar__menu" aria-label={gettext('Close')} role="button" onClick={this.props.hideModal}>
                                         <i className="icon--close-thin" />
                                     </button>
                                 </div>

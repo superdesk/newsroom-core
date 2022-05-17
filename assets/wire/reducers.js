@@ -71,6 +71,7 @@ function markItemsRemoved(state, ids) {
     const itemsById = cloneDeep(state.itemsById || {});
     let activeItem = state.activeItem;
     let previewItem = state.previewItem;
+    let openItem = state.openItem;
 
     (ids || []).forEach(
         (itemId) => {
@@ -85,6 +86,10 @@ function markItemsRemoved(state, ids) {
             if (previewItem === itemId) {
                 previewItem = null;
             }
+
+            if (get(openItem, '_id') === itemId) {
+                openItem = null;
+            }
         }
     );
 
@@ -93,6 +98,7 @@ function markItemsRemoved(state, ids) {
         itemsById,
         activeItem,
         previewItem,
+        openItem,
     };
 }
 
@@ -128,12 +134,14 @@ export default function wireReducer(state = initialState, action) {
     case INIT_DATA: {
         const navigations = get(action, 'wireData.navigations', []);
         const products = get(action, 'wireData.products', []);
+        const user = get(action, 'wireData.user', {});
 
         return {
             ...state,
             readItems: action.readData || {},
-            user: action.wireData.user || null,
-            userType: action.wireData.user_type || null,
+            user: user._id,
+            userType: user.user_type,
+            userObject: user,
             topics: action.wireData.topics || [],
             company: action.wireData.company || null,
             bookmarks: action.wireData.bookmarks || false,

@@ -1,13 +1,15 @@
 import re
 import ipaddress
-from datetime import datetime
 
 import flask
+import werkzeug.exceptions
+
 from bson import ObjectId
+from datetime import datetime
 from flask import jsonify, current_app as app
 from flask_babel import gettext
 from superdesk import get_resource_service
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, BadRequest
 
 from newsroom.decorator import admin_only, account_manager_only, login_required
 from newsroom.companies import blueprint
@@ -30,7 +32,7 @@ def get_settings_data():
         'sections': app.sections,
         'company_types': get_company_types_options(app.config.get('COMPANY_TYPES', [])),
         'api_enabled': app.config.get('NEWS_API_ENABLED', False),
-        'ui_config': get_resource_service('ui_config').getSectionConfig('companies'),
+        'ui_config': get_resource_service('ui_config').get_section_config('companies'),
     }
 
 
@@ -55,7 +57,11 @@ def create():
 
     new_company = get_company_updates(company)
     set_original_creator(new_company)
-    ids = get_resource_service('companies').post([new_company])
+    try:
+        ids = get_resource_service('companies').post([new_company])
+    except werkzeug.exceptions.Conflict:
+        return jsonify({'name': gettext('Company already exists')}), 400
+
     return jsonify({'success': True, '_id': ids[0]}), 201
 
 
@@ -127,7 +133,10 @@ def delete(_id):
     """
     Deletes the company and users of the company with given company id
     """
-    get_resource_service('users').delete_action(lookup={'company': ObjectId(_id)})
+    try:
+        get_resource_service('users').delete_action(lookup={'company': ObjectId(_id)})
+    except BadRequest as er:
+        return jsonify({'error': er.description}), 403
     get_resource_service('companies').delete_action(lookup={'_id': ObjectId(_id)})
 
     app.cache.delete(_id)
@@ -147,9 +156,9 @@ def update_products(updates, company_id):
     db = app.data.get_mongo_collection('products')
     for product in products:
         if updates.get(str(product['_id'])):
-            db.update_one({'_id': product['_id']}, {'$addToSet': {'companies': company_id}})
+            db.update_one({'_id': product['_id']}, {'$addToSet': {'companies': ObjectId(company_id)}})
         else:
-            db.update_one({'_id': product['_id']}, {'$pull': {'companies': company_id}})
+            db.update_one({'_id': product['_id']}, {'$pull': {'companies': ObjectId(company_id)}})
 
 
 def update_company(data, _id):

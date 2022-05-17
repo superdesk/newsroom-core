@@ -16,6 +16,7 @@ function PreviewMeta({
     inputRef,
     displayConfig,
     listConfig,
+    filterGroupLabels,
 }) {
     const picture = getPicture(item);
     const fields = displayConfig.metadata_fields || DEFAULT_META_FIELDS;
@@ -25,12 +26,12 @@ function PreviewMeta({
             <div className="wire-articles__item__icons">
                 {item.type === 'text' && (
                     <span className="wire-articles__item__icon">
-                        <i className="icon--text icon--gray-light"></i>
+                        <i className="icon--text icon--gray-dark"></i>
                     </span>
                 )}
                 {picture && (
                     <span className="wire-articles__item__icon">
-                        <i className="icon--photo icon--gray-light"></i>
+                        <i className="icon--photo icon--gray-dark"></i>
                     </span>
                 )}
             </div>
@@ -42,6 +43,7 @@ function PreviewMeta({
                         listConfig,
                         isItemDetail,
                         inputRef,
+                        filterGroupLabels,
                         alwaysShow: true,
                     }}
                 />
@@ -56,6 +58,7 @@ PreviewMeta.propTypes = {
     inputRef: PropTypes.string,
     displayConfig: PropTypes.object,
     listConfig: PropTypes.object,
+    filterGroupLabels: PropTypes.object,
 };
 
 export default PreviewMeta;

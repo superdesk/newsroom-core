@@ -29,3 +29,17 @@ export function getUserTypes(user) {
 export function isUserAdmin(user) {
     return get(user, 'user_type') === 'administrator';
 }
+
+export function canUserManageTopics(user) {
+    return isUserAdmin(user) || get(user, 'manage_company_topics') === true;
+}
+
+export function getLocaleInputOptions() {
+    return (window.locales || [])
+        .filter((locale) => locale.locale !== window.locale) // this will be default value
+        .map((locale) => ({value: locale.locale, text: locale.name}));
+}
+
+export function getDefaultLocale() {
+    return window.locales.find((locale) => locale.locale === window.locale).name;
+}

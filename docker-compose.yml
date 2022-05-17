@@ -26,6 +26,8 @@ services:
             - newsroom
         volumes:
             - ./dump:/opt/newsroom/dump
+            - ./newsroom/templates:/opt/newsroom/templates
+            - ./newsroom/static:/opt/newsroom/static
         depends_on:
             - elastic
             - redis
@@ -46,13 +48,15 @@ services:
             - NEWSROOM_DEBUG=true
 
     client:
-        build: ./docker/client
+        build:
+            context: .
+            dockerfile: Dockerfile-client
         ports:
             - "8080:8080"
         networks:
             - newsroom
         volumes:
-            - .:/opt/client/node_modules/newsroom-core
+            - ./assets:/opt/client/assets
 
 networks:
     newsroom:

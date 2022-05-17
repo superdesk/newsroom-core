@@ -115,6 +115,8 @@ BLUEPRINTS = [
     'newsroom.settings',
     'newsroom.news_api.api_tokens',
     'newsroom.monitoring',
+    'newsroom.oauth_clients',
+    'newsroom.auth_server.oauth2',
 ]
 
 CORE_APPS = [
@@ -126,6 +128,7 @@ CORE_APPS = [
     'content_api.auth',
     'content_api.publish',
     'newsroom.users',
+    'newsroom.auth.oauth',
     'newsroom.companies',
     'newsroom.wire',
     'newsroom.topics',
@@ -148,6 +151,9 @@ CORE_APPS = [
     'newsroom.news_api.api_audit',
     'newsroom.monitoring',
     'newsroom.company_expiry_alerts',
+    'newsroom.oauth_clients',
+    'newsroom.auth_server.client',
+    'newsroom.email_templates'
 ]
 
 SITE_NAME = 'AAP Newsroom'
@@ -250,7 +256,7 @@ SERVICES = [
 # Hides or displays abstract on preview panel and details modal
 DISPLAY_ABSTRACT = False
 
-WATERMARK_IMAGE = os.path.join(os.path.dirname(__file__), '../static', 'watermark.png')
+WATERMARK_IMAGE = None  # os.path.join(os.path.dirname(__file__), '../static', 'watermark.png')
 
 GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY')
 GOOGLE_ANALYTICS = os.environ.get('GOOGLE_ANALYTICS')
@@ -269,21 +275,6 @@ COVERAGE_TYPES = {
     'video_explainer': {'name': 'Video Explainer', 'icon': 'explainer'}
 }
 
-LANGUAGES = ['en', 'fi', 'cs']
-DEFAULT_LANGUAGE = 'en'
-
-CLIENT_LOCALE_FORMATS = {
-    "en": {  # defaults
-        "TIME_FORMAT": "HH:mm",
-        "DATE_FORMAT": "DD/MM/YYYY",
-        "COVERAGE_DATE_TIME_FORMAT": "HH:mm DD/MM",
-        "COVERAGE_DATE_FORMAT": "DD/MM",
-    },
-    "fr_CA": {  # example - you can overwrite any format above
-        "DATE_FORMAT": "DD/MM/YYYY",
-    }
-}
-
 LANGUAGES = ['en', 'fi', 'cs', 'fr_CA']
 DEFAULT_LANGUAGE = 'en'
 
@@ -293,9 +284,11 @@ CLIENT_LOCALE_FORMATS = {
         "DATE_FORMAT": "DD/MM/YYYY",
         "COVERAGE_DATE_TIME_FORMAT": "HH:mm DD/MM",
         "COVERAGE_DATE_FORMAT": "DD/MM",
+        "DATE_FORMAT_HEADER": "EEEE, dd/MM/yyyy"
     },
     "fr_CA": {  # example - you can overwrite any format above
         "DATE_FORMAT": "DD/MM/YYYY",
+        "DATE_FORMAT_HEADER": "EEEE, 'le' d MMMM yyyy",
     }
 }
 
@@ -308,8 +301,19 @@ CLIENT_CONFIG = {
     'list_animations': True,  # Enables or disables the animations for list item select boxes,
     'display_news_only': True,  # Displays news only switch in wire,
     'default_timezone': DEFAULT_TIMEZONE,
+    'item_actions': {},
     'display_abstract': DISPLAY_ABSTRACT,
     'display_credits': False,
+    'filter_panel_defaults': {
+        'tab': {
+            'wire': 'nav',  # Options are 'nav', 'topics', 'filters'
+            'agenda': 'nav',
+        },
+        'open': {
+            'wire': False,
+            'agenda': False,
+        },
+    },
 }
 
 # Enable iframely support for item body_html
@@ -361,6 +365,9 @@ ELASTICSEARCH_SETTINGS.setdefault("settings", {})["query_string"] = {
     'analyze_wildcard': False
 }
 
+# count above 10k
+ELASTICSEARCH_TRACK_TOTAL_HITS = True
+
 #: server working directory
 #: should be set in settings.py
 SERVER_PATH = pathlib.Path(__file__).resolve().parent.parent
@@ -369,20 +376,72 @@ SERVER_PATH = pathlib.Path(__file__).resolve().parent.parent
 #: used to locate client/dist/manifest.json file
 CLIENT_PATH = SERVER_PATH
 
+#: path to app specific translations
+TRANSLATIONS_PATH = None
+
 #: server date/time formats
 #: defined using babel syntax http://babel.pocoo.org/en/latest/dates.html#date-and-time
 TIME_FORMAT_SHORT = "HH:mm"
 DATE_FORMAT_SHORT = "short"
-DATE_FORMAT_HEADER = "EEEE, dd.MM.yyyy"
+DATE_FORMAT_HEADER = "EEEE, dd/MM/yyyy"
 DATETIME_FORMAT_SHORT = "short"
 DATETIME_FORMAT_LONG = "dd/MM/yyyy HH:mm"
+AGENDA_EMAIL_LIST_DATE_FORMAT = "HH:mm (dd/MM/yyyy)"
 
 PREPEND_EMBARGOED_TO_WIRE_SEARCH = False
 
 #: allow embargoed items on dashboard
 DASHBOARD_EMBARGOED = True
 
+#: OAuth settings
+AUTH_SERVER_EXPIRATION_DELAY = env("AUTH_SERVER_EXPIRATION_TIME", 60 * 60 * 4)  # 4 hours by default
+AUTH_SERVER_SHARED_SECRET = env("AUTH_SERVER_SHARED_SECRET", "")
+
+#: Google OAuth Settings
+#:
+#: .. versionadded:: 2.1
+#:
+GOOGLE_CLIENT_ID = env("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = env("GOOGLE_CLIENT_SECRET")
+GOOGLE_LOGIN = True
+
+
 #: Elastic APM
+#:
+#: .. versionadded:: 2.0.1
+#:
 APM_SERVER_URL = env("APM_SERVER_URL")
 APM_SECRET_TOKEN = env("APM_SECRET_TOKEN")
 APM_SERVICE_NAME = env("APM_SERVICE_NAME") or SITE_NAME
+
+#: Filter out subjects with schema which is not in the whitelist
+#: before storing the item to avoid those being displayed in filter,
+#: preview and outputs.
+#:
+#: .. versionadded:: 2.1
+#:
+WIRE_SUBJECT_SCHEME_WHITELIST = []
+
+#: Agenda Filter groups (defaults set in ``newsroom.agenda.init_app``)
+#:
+#: .. versionadded:: 2.1.0
+#:
+AGENDA_GROUPS = None
+
+#: If True, allows Users to log in after their associated Company has expired
+#:
+#: .. versionadded:: 2.1.0
+#:
+ALLOW_EXPIRED_COMPANY_LOGINS = False
+
+#: The timeout used on the cache for the dashboard items
+#:
+#: .. versionadded:: 2.1.0
+#:
+DASHBOARD_CACHE_TIMEOUT = 300
+
+#: If True, deletes all Dashboard item caches when new items are pushed
+#:
+#: .. versionadded:: 2.1.0
+#:
+DELETE_DASHBOARD_CACHE_ON_PUSH = True

@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 
 import InputWrapper from './InputWrapper';
 
+import {gettext} from 'utils';
+
 function TextInput({
     type,
     name,
@@ -17,6 +19,7 @@ function TextInput({
     description,
     min,
     autoFocus,
+    copyAction,
     ...props
 }) {
     return (
@@ -24,6 +27,16 @@ function TextInput({
             {label && (
                 <label htmlFor={name}>{label}</label>
             )}
+            {copyAction &&
+                <button  
+                    className='icon-button' 
+                    onClick={(e) => {e.preventDefault();navigator.clipboard.writeText(value);}}
+                    title={gettext('Copy')}
+                >
+                    <i className='icon--copy'></i>
+                </button>
+            }    
+            
             <div className="field">
                 <input
                     type={type || 'text'}
@@ -41,7 +54,7 @@ function TextInput({
                     {...props}
                 />
                 {error && <div className="alert alert-danger">{error}</div>}
-                {description && <small className="form-text text-muted">{description}</small>}
+                {description && <small className="form-text">{description}</small>}
             </div>
         </InputWrapper>
     );
@@ -52,6 +65,7 @@ TextInput.propTypes = {
     label: PropTypes.string,
     name: PropTypes.string,
     value: PropTypes.string,
+    copyAction: PropTypes.bool,
     error: PropTypes.arrayOf(PropTypes.string),
     onChange: PropTypes.func,
     required: PropTypes.bool,

@@ -34,6 +34,9 @@ $enable-shadows:true;
 .custom-control-input:checked ~ .custom-control-label::before {
   border-color: $blue;
 }
+.custom-control-input:focus-visible ~ .custom-control-label::before {
+  box-shadow: 0 0 0 1px rgba(0, 172, 236, .6), 0 0 3px 4px rgba(0, 172, 236, .4);
+}
 
 // UI dark
 .custom-control {

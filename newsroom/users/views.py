@@ -12,7 +12,7 @@ from newsroom.auth.views import send_token, add_token_data, \
     is_current_user_admin, is_current_user, is_current_user_account_mgr
 from newsroom.decorator import admin_only, login_required, account_manager_only
 from newsroom.companies import get_user_company_name, get_company_sections_monitoring_data
-from newsroom.notifications.notifications import get_user_notifications
+from newsroom.notifications.notifications import get_notifications_with_items
 from newsroom.notifications import push_user_notification, push_company_notification
 from newsroom.topics import get_user_topics
 from newsroom.users import blueprint
@@ -42,7 +42,11 @@ def get_view_data():
             config['_id']: config
             for config in query_resource('ui_config')
         },
+        'groups': app.config.get('WIRE_GROUPS', []),
     }
+
+    if app.config.get('ENABLE_MONITORING'):
+        rv['monitoring_list'] = get_monitoring_for_company(user)
 
     rv.update(get_company_sections_monitoring_data(company))
 
@@ -76,12 +80,14 @@ def create():
     form = UserForm()
     if form.validate():
         if not _is_email_address_valid(form.email.data):
-            return jsonify({'email': ['Email address is already in use']}), 400
+            return jsonify({'email': [gettext('Email address is already in use')]}), 400
 
         new_user = form.data
         add_token_data(new_user)
         if form.company.data:
             new_user['company'] = ObjectId(form.company.data)
+        elif new_user["user_type"] != "administrator":
+            return jsonify({"company": [gettext("Company is required for non administrators")]}), 400
 
         # Flask form won't accept default value if any form data was passed in the request.
         # So, we need to set this explicitly here.
@@ -113,7 +119,9 @@ def edit(_id):
         form = UserForm(user=user)
         if form.validate_on_submit():
             if form.email.data != user['email'] and not _is_email_address_valid(form.email.data):
-                return jsonify({'email': ['Email address is already in use']}), 400
+                return jsonify({'email': [gettext("Email address is already in use")]}), 400
+            elif not form.company.data and form.user_type.data != "administrator":
+                return jsonify({"company": [gettext("Company is required for non administrators")]}), 400
 
             updates = form.data
             if form.company.data:
@@ -191,6 +199,10 @@ def post_topic(_id):
     topic = get_json_or_400()
     topic['user'] = user['_id']
     topic['company'] = user.get('company')
+    topic['subscribers'] = [
+        ObjectId(uid)
+        for uid in topic.get('subscribers') or []
+    ]
 
     ids = get_resource_service('topics').post([topic])
     if topic.get('is_global'):
@@ -205,7 +217,8 @@ def post_topic(_id):
 def get_notifications(user_id):
     if flask.session['user'] != str(user_id):
         flask.abort(403)
-    return jsonify({'_items': get_user_notifications(user_id)}), 200
+
+    return jsonify(get_notifications_with_items()), 200
 
 
 @blueprint.route('/users/<user_id>/notifications', methods=['DELETE'])

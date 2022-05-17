@@ -119,7 +119,7 @@ class MonitoringEditor extends React.Component {
         const subscribed = (get(this.state, 'profile.users') || []).includes(user);
 
         return (
-            <div className='list-item__preview'>
+            <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit Monitoring')}>
                 <div className="list-item__preview-header">
                     <h3>{get(item, 'name')}</h3>
                     <button
@@ -130,7 +130,7 @@ class MonitoringEditor extends React.Component {
                         disabled={this.state.saving}
                         aria-label={gettext('Close')}
                     >
-                        <i className="icon--close-thin icon--gray" />
+                        <i className="icon--close-thin icon--gray-dark" />
                     </button>
                 </div>
                 <ul className='nav nav-tabs'>

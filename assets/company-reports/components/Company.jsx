@@ -52,7 +52,7 @@ function getUsers(users = []) {
 function Company({results, print}) {
 
     const list = results && results.map((item) =>
-        [<tr key={item._id} className="table-secondary">
+        [<tr key={item._id} className="table-secondary" tabIndex='0'>
             <td>{item.name}</td>
             <td className='font-weight-bold'>{item.is_enabled ? gettext('Active') : gettext('Disabled')}</td>
             <td>{formatDate(get(item, 'company._created'))}</td>

@@ -1,7 +1,7 @@
 import React from 'react';
 import server from 'server';
 import analytics from 'analytics';
-import {get, isInteger, keyBy, isEmpty, cloneDeep, throttle} from 'lodash';
+import {get, isInteger, keyBy, isEmpty, cloneDeep, throttle, memoize} from 'lodash';
 import {Provider} from 'react-redux';
 import {createStore as _createStore, applyMiddleware, compose} from 'redux';
 import {createLogger} from 'redux-logger';
@@ -16,12 +16,32 @@ import {
     isItemTBC,
     TO_BE_CONFIRMED_TEXT
 } from './agenda/utils';
+export {initWebSocket} from './websocket';
+
+/*
+ * Import and load all locales that will be used in moment.js
+ * This should match the LANGUAGES defined in settings.py
+ *
+ * 'en' comes by default
+ */
+// TODO: Improve how we load Moment locales, based on server config
+import 'moment/locale/fr-ca';
+import 'moment/locale/fi';
+import 'moment/locale/cs';
+
+moment.locale(getLocale());
+window.moment = moment;
+
+// CP don't want 2e 3e etc., only 1er
+if (getLocale() === 'fr_CA') {
+    moment.updateLocale('fr-ca', {ordinal: (number) => number + (number === 1 ? 'er' : '')});
+}
 
 export const now = moment(); // to enable mocking in tests
 const NEWSROOM = 'newsroom';
 const CLIENT_CONFIG = 'client_config';
 
-function getLocaleFormat(formatType) {
+function getLocaleFormat(formatType, defaultFormat) {
     const formats = getConfig('locale_formats', {});
     const locale = getLocale();
 
@@ -35,7 +55,7 @@ function getLocaleFormat(formatType) {
         return formats[defaultLanguage][formatType];
     }
 
-    return 'DD-MM-YYYY';
+    return defaultFormat || 'DD-MM-YYYY';
 }
 
 const getTimeFormat = () => getLocaleFormat('TIME_FORMAT');
@@ -48,7 +68,7 @@ export const TIME_FORMAT = getTimeFormat();
 export const DATE_FORMAT = getDateFormat();
 export const COVERAGE_DATE_TIME_FORMAT = getCoverageDateTimeFormat();
 export const COVERAGE_DATE_FORMAT = getCoverageDateFormat();
-const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
+export const DATETIME_FORMAT = getLocaleFormat('DATETIME_FORMAT', `${TIME_FORMAT} ${DATE_FORMAT}`);
 
 export const SERVER_DATETIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss+0000';
 export const DAY_IN_MINUTES = 24 * 60 - 1;
@@ -60,8 +80,6 @@ export const KEYCODES = {
     ENTER: 13,
     DOWN: 40,
 };
-
-
 
 /**
  * Create redux store with default middleware
@@ -165,7 +183,7 @@ export function getProductQuery(product) {
  * @return {Date}
  */
 export function parseDate(dateString) {
-    return moment(dateString);
+    return moment(dateString).locale(getLocale());
 }
 
 /**
@@ -277,6 +295,16 @@ export function formatDate(dateString) {
 }
 
 /**
+ * Format date with time
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function formatDatetime(dateString) {
+    return fullDate(dateString);
+}
+
+/**
  * Parse the given date string, setting the time to 23:59:59 (i.e. end of the day).
  * Ensures that the datetime is for the end of the day in the provided timezone
  * If no timezone is provided, then it will default to the browser's timezone
@@ -373,7 +401,10 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
     }
 
     const scheduleType = getScheduleType(item);
-    let regulartTimeStr = `${formatTime(start)} - ${formatTime(end)} `;
+    let regulartTimeStr = gettext('{{startTime}} - {{endTime}}', {
+        startTime: formatTime(start),
+        endTime: formatTime(end),
+    });
     if (isTBCItem) {
         regulartTimeStr = localTimeZone ? `${TO_BE_CONFIRMED_TEXT} ` : '';
     }
@@ -383,9 +414,15 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
         switch(scheduleType) {
         case SCHEDULE_TYPE.MULTI_DAY:
             if (isTBCItem) {
-                dateTimeString.push(`${formatDate(start)} to ${formatDate(end)}`);
+                dateTimeString.push(gettext('{{startDate}} to {{endDate}}', {
+                    startDate: formatDate(start),
+                    endDate: formatDate(end),
+                }));
             } else {
-                dateTimeString.push(`${formatTime(start)} ${formatDate(start)} to ${formatTime(end)} ${formatDate(end)}`);
+                dateTimeString.push(gettext('{{startDate}} to {{endDate}}', {
+                    startDate: formatDatetime(start),
+                    endDate: formatDatetime(end),
+                }));
             }
             break;
 
@@ -394,11 +431,7 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
             break;
 
         case SCHEDULE_TYPE.REGULAR:
-            if (localTimeZone) {
-                dateTimeString.push(regulartTimeStr);
-            } else {
-                dateTimeString.push(`${regulartTimeStr}${formatDate(start)}`);
-            }
+            dateTimeString.push(`${regulartTimeStr} ${formatDate(start)}`);
             break;
         }
     }
@@ -448,8 +481,17 @@ export const notify = {
  * @return {string}
  */
 export function getTextFromHtml(html) {
+    let raw_html = (html || '').trim();
+
+    if (raw_html.length === 0) {
+        return '';
+    } else if (raw_html[0] !== '<') {
+        // No need to convert if the string doesn't start with a tag
+        return raw_html;
+    }
+
     const div = document.createElement('div');
-    div.innerHTML = formatHTML(html);
+    div.innerHTML = formatHTML(raw_html);
     const tree = document.createTreeWalker(div, NodeFilter.SHOW_TEXT, null, false); // ie requires all params
     const text = [];
     while (tree.nextNode()) {
@@ -576,22 +618,6 @@ export function formatHTML(html) {
 }
 
 /**
- * Initializes the web socket listener
- * @param store
- */
-export function initWebSocket(store, action) {
-    if (window.newsroom) {
-        const ws = new WebSocket(window.newsroom.websocket);
-        ws.onmessage = (message) => {
-            const data = JSON.parse(message.data);
-            if (data.event) {
-                store.dispatch(action(data));
-            }
-        };
-    }
-}
-
-/**
  * Generic error handler for http requests
  * @param error
  * @param dispatch
@@ -601,7 +627,7 @@ export function errorHandler(error, dispatch, setError) {
     console.error('error', error);
 
     if (error.response.status !== 400) {
-        notify.error(error.response.statusText);
+        notify.error(error.response.statusText || gettext('Failed to process request!'));
         return;
     }
     if (setError) {
@@ -624,7 +650,7 @@ export function getConfig(key, defaultValue) {
 }
 
 export function getLocale() {
-    const defaultLanguage = getConfig('default_language');
+    const defaultLanguage = getConfig('default_language', 'en');
     const locale = get(window, 'locale', defaultLanguage);
 
     return locale;
@@ -736,4 +762,29 @@ export function getSlugline(item, withTakeKey = false) {
     }
 
     return slugline;
+}
+
+/**
+ * Factory for filter function to check if action is enabled
+ */
+export function isActionEnabled(configKey) {
+    const config = getConfig(configKey, {});
+    return (action) => config[action.id] == null || config[action.id];
+}
+
+export const getPlainTextMemoized = memoize((html) => getTextFromHtml(html));
+
+export function shouldShowListShortcutActionIcons(listConfig, isExtended) {
+    const showActionIconsConfig = listConfig.show_list_action_icons || {
+        large: true,
+        compact: true,
+        mobile: false,
+    };
+
+    return isMobilePhone() ?
+        showActionIconsConfig.mobile : (
+            isExtended ?
+                showActionIconsConfig.large :
+                showActionIconsConfig.compact
+        );
 }

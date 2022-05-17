@@ -80,19 +80,19 @@ def get_company_products():
     products = query_resource('products')
 
     for product in products:
-        for company in product.get('companies', []):
-            company_product = company_products.get(company, {})
+        for company_id in product.get('companies', []):
+            company_product = company_products.get(company_id, {})
             products = company_product.get('products', [])
             products.append(product)
             company_product['products'] = products
-            company_products[company] = company_product
+            company_products[company_id] = company_product
 
     for _id, details in company_products.items():
-        if companies.get(ObjectId(_id)):
+        if companies.get(_id):
             results.append({
-                '_id': _id,
-                'name': companies[ObjectId(_id)]['name'],
-                'is_enabled': companies[ObjectId(_id)]['is_enabled'],
+                '_id': str(_id),
+                'name': companies[_id]['name'],
+                'is_enabled': companies[_id]['is_enabled'],
                 'products': details.get('products', [])
             })
 
@@ -131,19 +131,19 @@ def get_company_report():
     products = query_resource('products')
 
     for product in products:
-        for company in product.get('companies', []):
-            company_product = company_products.get(company, {})
+        for company_id in product.get('companies', []):
+            company_product = company_products.get(company_id, {})
             products = company_product.get('products', [])
             products.append(product)
             company_product['products'] = products
-            company_products[company] = company_product
+            company_products[company_id] = company_product
 
     for _id, details in company_products.items():
-        users = list(query_resource('users', lookup={'company': ObjectId(_id)}))
-        if companies.get(ObjectId(_id)):
-            company = companies[ObjectId(_id)]
+        users = list(query_resource('users', lookup={'company': _id}))
+        if companies.get(_id):
+            company = companies[_id]
             results.append({
-                '_id': _id,
+                '_id': str(_id),
                 'name': company['name'],
                 'is_enabled': company['is_enabled'],
                 'products': details.get('products', []),
@@ -205,7 +205,8 @@ def get_subscriber_activity_report():
         else:
             wire_ids.append(doc.get('item'))
 
-        company_ids.append(ObjectId(doc.get('company')))
+        if doc.get('company'):
+            company_ids.append(ObjectId(doc.get('company')))
         user_ids.append(ObjectId(doc.get('user')))
     agenda_items = get_entity_dict(get_items_by_id(agenda_ids, 'agenda'))
     wire_items = get_entity_dict(get_items_by_id(wire_ids, 'items'))
@@ -325,12 +326,12 @@ def get_company_api_usage():
     return results
 
 
-def get_company_names(companies):
+def get_company_names(company_ids):
     service = superdesk.get_resource_service('companies')
     enabled_companies = []
     disabled_companies = []
-    for company in companies:
-        company = service.find_one(req=None, _id=company)
+    for company_id in company_ids:
+        company = service.find_one(req=None, _id=company_id)
         if company:
             if not company.get('is_enabled'):
                 disabled_companies.append(company.get('name'))
@@ -344,8 +345,14 @@ def get_product_company():
     lookup = {'_id': ObjectId(args.get('product'))} if args.get('product') else None
     products = query_resource('products', lookup=lookup)
 
-    res = [{'_id': product.get('_id'), 'product': product.get('name'), 'companies': product.get('companies', [])} for
-           product in products]
+    res = [
+        {
+            '_id': product.get('_id'),
+            'product': product.get('name'),
+            'companies': product.get('companies', [])
+        }
+        for product in products
+    ]
 
     for r in res:
         r.update(get_company_names(r.get('companies', [])))

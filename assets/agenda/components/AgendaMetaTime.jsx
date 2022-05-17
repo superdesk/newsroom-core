@@ -5,7 +5,7 @@ import classNames from 'classnames';
 
 import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
 import {bem} from 'ui/utils';
-import {formatTime, formatDate, DATE_FORMAT, gettext, getScheduleType} from 'utils';
+import {formatTime, formatDate, DATE_FORMAT, gettext, getScheduleType, formatDatetime} from 'utils';
 import {hasCoverages, isCoverageForExtraDay, SCHEDULE_TYPE, isItemTBC, TO_BE_CONFIRMED_TEXT} from '../utils';
 
 function format(item, group, onlyDates) {
@@ -62,14 +62,20 @@ function format(item, group, onlyDates) {
         switch(scheduleType) {
         case SCHEDULE_TYPE.MULTI_DAY:
             return isTBCItem ? ([
-                <span key="start">{dateElement(start)}{tbcStr}</span>,
-                <span key="dash" className='ml-2 mr-2'>{(gettext('to'))}</span>,
-                <span key="end">{dateElement(end)}{tbcStr}</span>
+                <span key="date">
+                    {gettext('{{startDate}} to {{endDate}}', {
+                        startDate: formatDate(start) + tbcStr,
+                        endDate: formatDate(end) + tbcStr,
+                    })}
+                </span>,
             ]) :
                 ([
-                    <span key="start">{timeElement(start)}{dateElement(start)}</span>,
-                    <span key="dash" className='ml-2 mr-2'>{(gettext('to'))}</span>,
-                    <span key="end">{timeElement(end)}{dateElement(end)}</span>
+                    <span key="date">
+                        {gettext('{{startDate}} to {{endDate}}', {
+                            startDate: formatDatetime(start),
+                            endDate: formatDatetime(end),
+                        })}
+                    </span>,
                 ]);
 
         case SCHEDULE_TYPE.ALL_DAY:
@@ -94,7 +100,7 @@ function getCalendarClass(item) {
     if (hasCoverages(item)) {
         return 'icon--green';
     } else {
-        return 'icon--gray';
+        return 'icon--gray-dark';
     }
 }
 

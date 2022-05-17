@@ -7,17 +7,17 @@ function WireListItemIcons({item, picture, videos, divider}) {
         <div className='wire-articles__item__icons'>
             {item.type === 'text' &&
                 <span className='wire-articles__item__icon'>
-                    <i className='icon--text icon--gray-light'></i>
+                    <i className='icon--text icon--gray'></i>
                 </span>
             }
             {picture &&
                 <span className='wire-articles__item__icon'>
-                    <i className='icon--photo icon--gray-light'></i>
+                    <i className='icon--photo icon--gray'></i>
                 </span>
             }
             {!isEmpty(videos) &&
                 <span className='wire-articles__item__icon'>
-                    <i className='icon--video icon--gray-light'></i>
+                    <i className='icon--video icon--gray'></i>
                 </span>
             }
             {divider &&

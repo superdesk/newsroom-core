@@ -18,7 +18,7 @@
     width: $width;
     height: $height;
     line-height: $line-height;
-    font-family: 'aap_newsroom_icons';
+    font-family: 'aap_newsroom_icons' !important;
     font-size: $font-size;
     color: $main_blue;
     speak: none;
@@ -30,14 +30,6 @@
 
 [class^="icon--"], [class*=" icon--"] {
     @include icon-base;
-    /* use !important to prevent issues with browser extensions that change fonts */
-    font-family: 'aap_newsroom_icons' !important;
-    speak: none;
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
-    line-height: 1;
 
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
@@ -46,11 +38,17 @@
     &.icon--gray-light {
         color: $gray-light;
     }
+    &.icon--gray-dark {
+        color: $gray-dark;
+    }
     &.icon--gray {
         color: $gray-mid;
     }
     &.icon--mid-blue {
         color: $mid-blue;
+    }
+    &.icon--main-blue {
+        color: $main-blue;
     }
     &.icon--mid-blue-light {
         color: $mid-blue-light;
@@ -73,6 +71,12 @@
     &.icon--cyan {
         color: $cyan;
     }
+    &.icon--purple {
+        color: $purple;
+    }
+}
+[class^="icon--coverage-"], [class*=" icon--coverage-"] {
+    color: $gray-dark;
 }
 
 .icon--rotate-90 {

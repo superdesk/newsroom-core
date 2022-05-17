@@ -74,7 +74,6 @@ Feature: News API News Feed
         {"_items": [{"_id": "urn:test2"}, {"_id": "urn:test4"}]}
         """
 
-  @wip
   Scenario: Response provides a link to the next page
     Given "items"
         """

@@ -6,13 +6,15 @@ import CheckboxInput from 'components/CheckboxInput';
 import AuditInformation from 'components/AuditInformation';
 
 import {gettext} from 'utils';
-import {isUserAdmin, getUserTypes, getUserLabel, userTypeReadOnly} from '../utils';
+import {isUserAdmin, getUserTypes, getUserLabel, userTypeReadOnly, getLocaleInputOptions, getDefaultLocale} from '../utils';
 
 const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
 
 function EditUser({user, onChange, errors, companies, onSave, onResetPassword, onClose, onDelete, currentUser}) {
+    const localeOptions = getLocaleInputOptions();
+
     return (
-        <div className='list-item__preview'>
+        <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit User')}>
             <div className='list-item__preview-header'>
                 <h3>{ gettext('Add/Edit User') }</h3>
                 <button
@@ -87,6 +89,18 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                         onChange={onChange}
                         error={errors ? errors.company : null} />
 
+                    {!localeOptions.length ? null : (
+                        <SelectInput
+                            name={'locale'}
+                            label={gettext('Language')}
+                            value={user.locale}
+                            onChange={onChange}
+                            options={localeOptions}
+                            defaultOption={getDefaultLocale()}
+                            error={errors ? errors.locale : null}
+                        />
+                    )}
+
                     <CheckboxInput
                         name='is_approved'
                         label={gettext('Approved')}
@@ -105,6 +119,13 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                         value={user.expiry_alert}
                         onChange={onChange} />
 
+                    <CheckboxInput
+                        name='manage_company_topics'
+                        label={gettext('Manage Company Topics')}
+                        value={user.manage_company_topics}
+                        onChange={onChange}
+                    />
+
                 </div>
 
                 <div className='list-item__preview-footer'>
@@ -122,7 +143,7 @@ function EditUser({user, onChange, errors, companies, onSave, onResetPassword, o
                         value={gettext('Save')}
                         onClick={onSave} />
 
-                    {user._id && isUserAdmin(currentUser) && <input
+                    {user._id && isUserAdmin(currentUser) && (user._id !== currentUser._id) && <input
                         type='button'
                         className='btn btn-outline-primary'
                         value={gettext('Delete')}

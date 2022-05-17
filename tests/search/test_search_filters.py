@@ -145,7 +145,7 @@ def test_apply_products_filter(client, app):
         # Filter results by navigation
         assert_products_query(ADMIN_USER_ID, {'navigation': str(NAV_3)}, [PRODUCTS[1]])
 
-        # Public user has access only to their allwed products
+        # Public user has access only to their allowed products
         assert_products_query(PUBLIC_USER_ID, None, [PRODUCTS[0], PRODUCTS[1]])
         # Filter results by navigation
         assert_products_query(PUBLIC_USER_ID, {'navigation': str(NAV_1)}, [PRODUCTS[0]])

@@ -11,7 +11,6 @@
 import datetime
 import logging
 
-from flask import render_template
 from superdesk import config
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
@@ -46,7 +45,7 @@ class CompanyExpiryAlerts():
         logger.info('{} Completed sending alerts.'.format(self.log_msg))
 
     def worker(self):
-        from newsroom.email import send_email
+        from newsroom.email import send_template_email
 
         # Check if there are any recipients
         general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
@@ -68,33 +67,31 @@ class CompanyExpiryAlerts():
                 users = get_resource_service('users').find({'company': company.get(config.ID_FIELD),
                                                             'expiry_alert': True})
                 if users.count() > 0:
-                    template_kwargs = {'expiry_date': company.get('expiry_date')}
+                    template_kwargs = {
+                        "expiry_date": company.get("expiry_date"),
+                        "expires_on": company.get("expiry_date").strftime("%d-%m-%Y"),
+                    }
                     logger.info('{} Sending to following users of company {}: {}'
                                 .format(self.log_msg, company.get('name'), recipients))
-                    send_email(
-                        [u['email'] for u in users],
-                        'Your Company\'s account is expiring on {}'.format(
-                            company.get('expiry_date').strftime('%d-%m-%Y')
-                        ),
-                        text_body=render_template('company_expiry_alert_user.txt', **template_kwargs),
-                        html_body=render_template('company_expiry_alert_user.html', **template_kwargs),
+                    send_template_email(
+                        to=[u["email"] for u in users],
+                        template="company_expiry_alert_user",
+                        template_kwargs=template_kwargs,
                     )
 
             if not (general_settings.get('values') or {}).get('company_expiry_alert_recipients'):
                 return  # No one else to send
 
             template_kwargs = {
-                'companies': sorted(companies, key=lambda k: k['expiry_date']),
-                'expiry_date': expiry_time
+                "companies": sorted(companies, key=lambda k: k["expiry_date"]),
+                "expiry_date": expiry_time,
+                "expires_on": expiry_time.strftime("%d-%m-%Y")
             }
             logger.info('{} Sending to following expiry administrators: {}'.format(self.log_msg, recipients))
-            send_email(
-                recipients,
-                'Companies expired or due to expire within the next 7 days ({})'.format(
-                    expiry_time.strftime('%d-%m-%Y')
-                ),
-                text_body=render_template('company_expiry_email.txt', **template_kwargs),
-                html_body=render_template('company_expiry_email.html', **template_kwargs),
+            send_template_email(
+                to=recipients,
+                template="company_expiry_email",
+                template_kwargs=template_kwargs,
             )
 
 

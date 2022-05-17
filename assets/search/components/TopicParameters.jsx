@@ -4,8 +4,9 @@ import {connect} from 'react-redux';
 import {get, keyBy} from 'lodash';
 
 import {gettext, formatDate} from 'utils';
+import {filterGroupsToLabelMap} from 'search/selectors';
 
-const TopicParameters = ({topic, navigations, locators}) => {
+const TopicParameters = ({topic, navigations, locators, filterGroupLabels}) => {
     const filters = get(topic, 'filter') || {};
     const navsById = keyBy(navigations, '_id');
     const navs = (get(topic, 'navigation') || [])
@@ -65,10 +66,10 @@ const TopicParameters = ({topic, navigations, locators}) => {
             {renderParam(gettext('Search'), get(topic, 'query') ? [topic.query] : [])}
             {renderParam(gettext('Date Created'), dateLabels)}
             {renderParam(gettext('Topics'), navs)}
-            {renderParam(gettext('Category'), filters.service)}
-            {renderParam(gettext('Subject'), filters.subject)}
-            {renderParam(gettext('Content Type'), filters.genre)}
-            {renderParam(gettext('Urgency'), filters.urgency)}
+            {renderParam(get(filterGroupLabels, 'service', gettext('Category')), filters.service)}
+            {renderParam(get(filterGroupLabels, 'subject', gettext('Subject')), filters.subject)}
+            {renderParam(get(filterGroupLabels, 'genre', gettext('Content Type')), filters.genre)}
+            {renderParam(get(filterGroupLabels, 'urgency', gettext('Urgency')), filters.urgency)}
             {renderPlace()}
             {renderParam(gettext('Calendar'), filters.calendar)}
             {renderParam(gettext('Coverage Type'), filters.coverage)}
@@ -82,10 +83,12 @@ TopicParameters.propTypes = {
     topic: PropTypes.object,
     navigations: PropTypes.arrayOf(PropTypes.object),
     locators: PropTypes.array,
+    filterGroupLabels: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
     locators: get(state, 'locators.items', []),
+    filterGroupLabels: filterGroupsToLabelMap(state),
 });
 
 export default connect(mapStateToProps, null)(TopicParameters);

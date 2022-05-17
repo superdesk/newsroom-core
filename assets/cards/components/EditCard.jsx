@@ -41,7 +41,7 @@ class EditCard extends React.Component {
         }
 
         return (
-            <div className='list-item__preview'>
+            <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit Cards')}>
                 <div className='list-item__preview-header'>
                     <h3>{this.props.card.label}</h3>
                     <button
@@ -51,7 +51,7 @@ class EditCard extends React.Component {
                         data-dismiss='modal'
                         aria-label={gettext('Close')}
                         onClick={this.props.onClose}>
-                        <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
+                        <i className="icon--close-thin icon--gray-dark" aria-hidden='true'></i>
                     </button>
                 </div>
                 <AuditInformation item={this.props.card} />

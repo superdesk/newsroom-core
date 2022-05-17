@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {get, isEmpty} from 'lodash';
+import {isEmpty} from 'lodash';
 
-import {gettext, isDisplayed} from 'utils';
+import {isDisplayed} from 'utils';
 import {
     getPicture,
     getVideos,
@@ -13,6 +13,7 @@ import {
     DISPLAY_ABSTRACT,
     isCustomRendition,
 } from 'wire/utils';
+import types from 'wire/types';
 
 import Preview from 'ui/components/Preview';
 import ArticleSlugline from 'ui/components/ArticleSlugline';
@@ -26,11 +27,11 @@ import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 
 
 import ListItemPreviousVersions from './ListItemPreviousVersions';
-import PreviewActionButtons from 'components/PreviewActionButtons';
 import PreviewTags from './PreviewTags';
 import PreviewMeta from './PreviewMeta';
 import AgendaLinks from './AgendaLinks';
 import PreviewEdnote from './PreviewEdnote';
+import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
 
 
@@ -46,28 +47,23 @@ class WirePreview extends React.PureComponent {
     }
 
     render() {
-        const {item, user, actions, followStory, isFollowing, previewConfig, downloadVideo, listConfig} = this.props;
+        const {item, user, actions, followStory, topics, previewConfig, downloadVideo, listConfig, filterGroupLabels} = this.props;
         const picture = getPicture(item);
         const videos = getVideos(item);
         const isCustom = isCustomRendition(picture);
 
         const previousVersions = 'preview_versions';
-        const canFollowStory = followStory && user && (get(item, 'slugline') || '').trim();
         return (
             <Preview onCloseClick={this.props.closePreview} published={item.versioncreated}>
                 <div className='wire-column__preview__top-bar'>
-                    <div>
-                        {isDisplayed('follow_story', previewConfig) && canFollowStory &&
-                            <button type="button"
-                                disabled={isFollowing}
-                                className="btn btn-outline-primary btn-responsive"
-                                onClick={() => followStory(item)}>
-                                {gettext('Follow story')}
-                            </button>
-                        }
-                    </div>
-
-                    <PreviewActionButtons item={item} user={user} actions={actions} />
+                    <WireActionButtons
+                        user={user}
+                        item={item}
+                        topics={topics}
+                        actions={actions}
+                        followStory={followStory}
+                        previewConfig={previewConfig}
+                    />
                 </div>
                 <div id='preview-article' className='wire-column__preview__content' ref={(preview) => this.preview = preview}>
                     <ArticleEmbargoed item={item} />
@@ -81,7 +77,8 @@ class WirePreview extends React.PureComponent {
                         isCustomRendition={isCustom} />}
 
                     {isDisplayed('metadata_section', previewConfig) &&
-                    <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions} displayConfig={previewConfig} listConfig={listConfig} />}
+                    <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions} displayConfig={previewConfig} listConfig={listConfig}
+                        filterGroupLabels={filterGroupLabels} />}
                     {isDisplayed('abstract', previewConfig) &&
                     <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                     {isDisplayed('body_html', previewConfig) && <ArticleBodyHtml item={item}/>}
@@ -121,19 +118,17 @@ class WirePreview extends React.PureComponent {
 }
 
 WirePreview.propTypes = {
-    user: PropTypes.string,
-    item: PropTypes.object.isRequired,
-    actions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        action: PropTypes.func,
-        url: PropTypes.func,
-    })),
+    user: types.user,
+    item: types.item.isRequired,
+    topics: types.topics,
+    actions: types.actions,
+    previewConfig: types.previewConfig,
+
     followStory: PropTypes.func,
-    isFollowing: PropTypes.bool,
     closePreview: PropTypes.func,
-    previewConfig: PropTypes.object,
     downloadVideo: PropTypes.func,
     listConfig: PropTypes.object,
+    filterGroupLabels: PropTypes.object,
 };
 
 export default WirePreview;

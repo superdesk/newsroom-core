@@ -11,14 +11,14 @@ export default function AgendaLocation({item, isMobilePhone, border}) {
 
     return (
         <Fragment>
-            <span className='mr-2'>
-                <i className='icon-small--location icon--gray' />
+            <span>
+                <i className='icon-small--location icon--gray-dark' />
             </span>
 
             {isMobilePhone ? (
                 <span>{getLocationString(item)}</span>
             ) : (
-                <span className={classNames('mr-2',
+                <span className={classNames('mr-2 align-self-stretch',
                     {'wire-articles__item__icons--dashed-border': border})}>
                     {getLocationString(item)}
                 </span>

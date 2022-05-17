@@ -63,7 +63,7 @@ class MonitoringApp extends React.Component {
             key={i}
             className='dropdown-item'
             onClick={() => {this.onChange(filter.field, item._id);}}
-        >{item.name}</button>));        
+        >{item.name}</button>));
     }
 
     getActiveQuery() {
@@ -102,7 +102,7 @@ class MonitoringApp extends React.Component {
                 </div>
                 <MonitoringPanel />
             </Fragment>
-            
+
         );
     }
 

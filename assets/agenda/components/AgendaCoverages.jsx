@@ -1,4 +1,5 @@
 import React from 'react';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
@@ -13,9 +14,10 @@ import {
     WORKFLOW_STATUS,
     formatCoverageDate
 } from '../utils';
+import {agendaContentLinkTarget} from 'ui/selectors';
 
 
-export default function AgendaCoverages({item, coverages, wireItems, actions, user, onClick, hideViewContentItems}) {
+function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, onClick, hideViewContentItems, contentLinkTarget}) {
     if (isEmpty(coverages)) {
         return null;
     }
@@ -31,12 +33,12 @@ export default function AgendaCoverages({item, coverages, wireItems, actions, us
             {'coverage-item--clickable': onClick})} key={coverage.coverage_id} onClick={onClick}
         title={onClick ? gettext('Open Agenda in new tab') : onClick} >
             <div className='coverage-item__row'>
-                <span className='d-flex coverage-item--element-grow'>
-                    <i className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} ${WORKFLOW_COLORS[coverage.workflow_status]} mr-2`}></i>
+                <span className={classNames('coverage-item__coverage-icon', WORKFLOW_COLORS[coverage.workflow_status])}>                    
+                    <i className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} mr-2`}></i>
                     <span>{`${getCoverageDisplayName(coverage.coverage_type)}${getSlugline(coverage)}`}</span>
                 </span>
                 {coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED && <span className='d-flex text-nowrap'>
-                    <i className='icon-small--clock icon--gray mr-1'></i>
+                    <i className='icon-small--clock icon--gray-dark mr-1'></i>
                     <span className='coverage-item__text-label mr-1'>{gettext('expected')}:</span>
                     <span>{formatCoverageDate(coverage)}</span>
                 </span>}
@@ -52,13 +54,24 @@ export default function AgendaCoverages({item, coverages, wireItems, actions, us
                 actions={actions}
                 user={user}
                 coverageData={getDataFromCoverages(item)}
-                hideViewContentItems={hideViewContentItems} />
+                hideViewContentItems={hideViewContentItems}
+                contentLinkTarget={contentLinkTarget}
+            />
         </div>
     ));
 }
 
-AgendaCoverages.propTypes = {
+AgendaCoveragesComponent.propTypes = {
     item: PropTypes.object,
     coverages: PropTypes.arrayOf(PropTypes.object),
     wireItems: PropTypes.array,
+    contentLinkTarget: PropTypes.string,
 };
+
+const mapStateToProps = (state) => ({
+    contentLinkTarget: agendaContentLinkTarget(state),
+});
+
+const AgendaCoverages = connect(mapStateToProps)(AgendaCoveragesComponent);
+
+export default AgendaCoverages;

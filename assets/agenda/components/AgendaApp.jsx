@@ -96,25 +96,6 @@ class AgendaApp extends BaseApp {
 
         const onDetailClose = this.props.detail ? null :
             () => this.props.actions.filter(a => a.id === 'open')[0].action(null, this.props.previewGroup, this.props.previewPlan);
-
-        const groups = [
-            {
-                field: 'service',
-                label: gettext('Category'),
-            },
-            {
-                field: 'subject',
-                label: gettext('Subject'),
-            },
-            {
-                field: 'urgency',
-                label: gettext('News Value'),
-            },
-            {
-                field: 'place',
-                label: gettext('Place'),
-            },
-        ];
         const eventsOnly = this.props.eventsOnlyView || this.props.eventsOnlyAccess;
         const hideFeaturedToggle = !noNavigationSelected(this.props.activeNavigation) ||
             this.props.bookmarks ||
@@ -162,6 +143,7 @@ class AgendaApp extends BaseApp {
                 coverageActions={this.props.coverageActions}
             />] : [
                 <section key="contentHeader" className='content-header'>
+                    <h3 className="a11y-only">{gettext('Agenda Content')}</h3>
                     <SelectedItemsBar
                         actions={this.props.actions}
                     />
@@ -171,6 +153,7 @@ class AgendaApp extends BaseApp {
                                 className='content-bar__menu content-bar__menu--nav--open'
                                 ref={this.setOpenRef}
                                 title={gettext('Close filter panel')}
+                                aria-label={gettext('Close')}
                                 onClick={this.toggleSidebar}>
                                 <i className='icon--close-thin icon--white' />
                             </span>
@@ -181,6 +164,7 @@ class AgendaApp extends BaseApp {
                                 className='content-bar__menu content-bar__menu--nav'
                                 ref={this.setCloseRef}
                                 title={gettext('Open filter panel')}
+                                aria-label={gettext('Open filter panel')}
                                 onClick={this.toggleSidebar}>
                                 <i className='icon--hamburger' />
                             </span>
@@ -217,12 +201,12 @@ class AgendaApp extends BaseApp {
                 <section key="contentMain" className='content-main'>
                     <div className={`wire-column--3 ${this.state.withSidebar?'nav--open':''}`}>
                         <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
+                            <h3 className="a11y-only">{gettext('Side filter panel')}</h3>
                             {this.state.withSidebar && (
                                 <SearchSidebar
                                     tabs={this.getTabs()}
                                     props={{
                                         ...this.props,
-                                        groups,
                                         fetchItems: this.fetchItemsOnNavigation}}
                                 />
                             )}
@@ -286,7 +270,8 @@ class AgendaApp extends BaseApp {
                     this.props.navigations,
                     this.props.activeNavigation,
                     this.props.activeTopic
-                )
+                ),
+                this.renderSavedItemsCount(),
             ])
         );
     }
@@ -340,6 +325,7 @@ AgendaApp.propTypes = {
     searchParams: PropTypes.object,
     showSaveTopic: PropTypes.bool,
     previewConfig: PropTypes.object,
+    groups: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
@@ -380,6 +366,7 @@ const mapStateToProps = (state) => ({
     searchParams: searchParamsSelector(state),
     showSaveTopic: showSaveTopicSelector(state),
     previewConfig: previewConfigSelector(state),
+    groups: get(state, 'groups', []),
 });
 
 const mapDispatchToProps = (dispatch) => ({

@@ -1,12 +1,13 @@
 import bcrypt
 from flask import current_app as app, session
+from flask_babel import gettext
 
-from content_api import MONGO_PREFIX
 from superdesk.utils import is_hashed, get_hash
 
 import newsroom
 from newsroom.auth import get_user_id
 from newsroom.utils import set_original_creator, set_version_creator
+from werkzeug.exceptions import BadRequest
 
 
 class UsersResource(newsroom.Resource):
@@ -83,6 +84,10 @@ class UsersResource(newsroom.Resource):
         'locale': {
             'type': 'string',
         },
+        'manage_company_topics': {
+            'type': 'boolean',
+            'default': False
+        },
         'last_active': {
             'type': 'datetime',
             'required': False,
@@ -94,14 +99,13 @@ class UsersResource(newsroom.Resource):
 
     item_methods = ['GET', 'PATCH', 'PUT']
     resource_methods = ['GET', 'POST']
-    mongo_prefix = MONGO_PREFIX
     datasource = {
         'source': 'users',
         'projection': {'password': 0},
         'default_sort': [('last_name', 1)]
     }
     mongo_indexes = {
-        'email': ([('email', 1)], {'unique': True})
+        'email': ([('email', 1)], {'unique': True, 'collation': {'locale': 'en', 'strength': 2}})
     }
 
 
@@ -145,3 +149,7 @@ class UsersService(newsroom.Service):
 
     def on_deleted(self, doc):
         app.cache.delete(str(doc.get('_id')))
+
+    def on_delete(self, doc):
+        if doc.get('_id') == get_user_id():
+            raise BadRequest(gettext("Can not delete current user"))

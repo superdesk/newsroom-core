@@ -22,11 +22,11 @@ from newsroom.wire.utils import update_action_list
 from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required, admin_only
 from newsroom.topics import get_user_topics
-from newsroom.email import send_email
+from newsroom.email import send_template_email
 from newsroom.companies import get_user_company
 from newsroom.utils import get_entity_or_404, get_json_or_400, parse_dates, get_type, is_json_request, query_resource, \
     get_agenda_dates, get_location_string, get_public_contacts, get_links, get_items_for_user_action
-from newsroom.notifications import push_user_notification, push_notification
+from newsroom.notifications import push_user_notification, push_notification, save_user_notifications, UserNotification
 from newsroom.companies import section
 from newsroom.template_filters import is_admin_or_internal
 
@@ -71,8 +71,7 @@ def get_view_data():
     company_id = str(user['company']) if user and user.get('company') else None
 
     return {
-        'user': str(user['_id']) if user else None,
-        'user_type': (user or {}).get('user_type') or 'public',
+        'user': user,
         'company': company_id,
         'topics': [t for t in topics if t.get('topic_type') == 'wire'],
         'formats': [{'format': f['format'], 'name': f['name'], 'assets': f['assets']}
@@ -82,7 +81,7 @@ def get_view_data():
         'products': get_products_by_company(company_id),
         'saved_items': get_bookmarks_count(user['_id'], 'wire'),
         'context': 'wire',
-        'ui_config': get_resource_service('ui_config').getSectionConfig('wire'),
+        'ui_config': get_resource_service('ui_config').get_section_config('wire'),
         'groups': app.config.get('WIRE_GROUPS', []),
     }
 
@@ -102,19 +101,24 @@ def get_items_by_card(cards, company_id):
             # using '/media_card_external' endpoint
             items_by_card[card['label']] = None
 
-    app.cache.set(cache_key, items_by_card, timeout=300)
+    app.cache.set(cache_key, items_by_card, timeout=app.config.get("DASHBOARD_CACHE_TIMEOUT", 300))
     return items_by_card
+
+
+def delete_dashboard_caches():
+    app.cache.delete(HOME_ITEMS_CACHE_KEY)
+    for company in query_resource("companies"):
+        app.cache.delete(f"{HOME_ITEMS_CACHE_KEY}{company['_id']}")
 
 
 def get_home_data():
     user = get_user()
     cards = list(query_resource('cards', lookup={'dashboard': 'newsroom'}))
     company_id = str(user['company']) if user and user.get('company') else None
-    items_by_card = get_items_by_card(cards, company_id)
+    topics = get_user_topics(user['_id']) if user else []
 
     return {
         'cards': cards,
-        'itemsByCard': items_by_card,
         'products': get_products_by_company(company_id),
         'user': str(user['_id']) if user else None,
         'userType': user.get('user_type'),
@@ -122,7 +126,9 @@ def get_home_data():
         'formats': [{'format': f['format'], 'name': f['name'], 'types': f['types'], 'assets': f['assets']}
                     for f in app.download_formatters.values()],
         'context': 'wire',
-        'ui_config': get_resource_service('ui_config').getSectionConfig('home'),
+        'topics': topics,
+        'ui_config': get_resource_service('ui_config').get_section_config('home'),
+        'groups': app.config.get('WIRE_GROUPS', []),
     }
 
 
@@ -153,9 +159,19 @@ def get_media_card_external(card_id):
     else:
         card = get_entity_or_404(card_id, 'cards')
         card_items = app.get_media_cards_external(card)
-        app.cache.set(cache_id, card_items, timeout=300)
+        app.cache.set(cache_id, card_items, timeout=app.config.get("DASHBOARD_CACHE_TIMEOUT", 300))
 
     return flask.jsonify({'_items': card_items})
+
+
+@blueprint.route('/card_items')
+@login_required
+def get_card_items():
+    user = get_user()
+    cards = list(query_resource('cards', lookup={'dashboard': 'newsroom'}))
+    company_id = str(user['company']) if user and user.get('company') else None
+    items_by_card = get_items_by_card(cards, company_id)
+    return flask.jsonify({"_items": items_by_card})
 
 
 @blueprint.route('/wire')
@@ -256,20 +272,17 @@ def share():
     items = get_items_for_user_action(data.get('items'), item_type)
     for user_id in data['users']:
         user = superdesk.get_resource_service('users').find_one(req=None, _id=user_id)
-        subject = items[0].get('headline')
-
-        # If it's an event, 'name' is the subject
-        if items[0].get('event'):
-            subject = items[0]['name']
 
         if not user or not user.get('email'):
             continue
         template_kwargs = {
-            'recipient': user,
-            'sender': current_user,
-            'items': items,
-            'message': data.get('message'),
-            'section': request.args.get('type', 'wire')
+            "app_name": app.config["SITE_NAME"],
+            "recipient": user,
+            "sender": current_user,
+            "items": items,
+            "message": data.get("message"),
+            "section": request.args.get("type", "wire"),
+            "subject_name": items[0].get('headline') or items[0].get('name')
         }
         if item_type == 'agenda':
             template_kwargs['maps'] = data.get('maps')
@@ -279,11 +292,25 @@ def share():
             template_kwargs['linkList'] = [get_links(item) for item in items]
             template_kwargs['is_admin'] = is_admin_or_internal(user)
 
-        send_email(
-            [user['email']],
-            gettext('From %s: %s' % (app.config['SITE_NAME'], subject)),
-            text_body=flask.render_template('share_{}.txt'.format(item_type), **template_kwargs),
-            html_body=flask.render_template('share_{}.html'.format(item_type), **template_kwargs),
+        save_user_notifications([UserNotification(
+            resource=item_type,
+            action="share",
+            user=user["_id"],
+            item=items[0]["_id"],
+            data=dict(
+                shared_by=dict(
+                    _id=current_user["_id"],
+                    first_name=current_user["first_name"],
+                    last_name=current_user["last_name"],
+                ),
+                items=[i["_id"] for i in items]
+            ),
+        )])
+
+        send_template_email(
+            to=[user["email"]],
+            template=f"share_{item_type}",
+            template_kwargs=template_kwargs,
         )
     update_action_list(data.get('items'), 'shares', item_type=item_type)
     get_resource_service('history').create_history_record(items, 'share', current_user,
@@ -367,7 +394,7 @@ def item(_id):
 
     item = items[0]
     set_permissions(item, 'wire', False if flask.request.args.get('ignoreLatest') == 'false' else True)
-    display_char_count = get_resource_service('ui_config').getSectionConfig('wire').get('char_count', False)
+    display_char_count = get_resource_service('ui_config').get_section_config('wire').get('char_count', False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get('_access'):
