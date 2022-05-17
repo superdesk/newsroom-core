@@ -73,8 +73,9 @@ class TextListInput extends React.Component {
                 </label></div>}
                 <TagList
                     tags={value}
-                    icon={readOnly ? null : 'icon--close-thin'}
-                    onClick={this.removeKeyword} />
+                    onClick={this.removeKeyword}
+                    readOnly={readOnly}
+                />
                 {!readOnly && <TextInput
                     name={name}
                     onChange={this.inputChange}
