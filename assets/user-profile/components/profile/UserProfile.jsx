@@ -115,7 +115,7 @@ class UserProfile extends React.Component {
                             <div className="col-lg-12">
                                 <CheckboxInput
                                     name='receive_email'
-                                    label={gettext('Receive notifications via email')}
+                                    label={gettext('Receive notifications')}
                                     value={!!user.receive_email}
                                     onChange={onChange} />
                             </div>

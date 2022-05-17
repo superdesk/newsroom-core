@@ -6,7 +6,13 @@ import {setActiveFilterTab, getActiveFilterTab} from 'local-store';
 class SearchSidebar extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {active: getActiveFilterTab(props.props.context) || props.tabs[0].id};
+        const activeTabId = getActiveFilterTab(props.props.context);
+
+        this.state = {
+            active: props.tabs.findIndex((tab) => tab.id === activeTabId) >= 0 ?
+                activeTabId :
+                props.tabs[0].id
+        };
     }
 
     render() {

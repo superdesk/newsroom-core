@@ -4,6 +4,7 @@ import {get} from 'lodash';
 import {createPortal} from 'react-dom';
 import {isTouchDevice, gettext, isDisplayed, isMobilePhone} from 'utils';
 import {getSingleFilterValue} from 'search/utils';
+import {getFilterPanelOpenState, setFilterPanelOpenState} from 'local-store';
 
 // tabs
 import TopicsTab from 'search/components/TopicsTab';
@@ -15,7 +16,7 @@ export default class BaseApp extends React.Component {
         super(props);
 
         this.state = {
-            withSidebar: false,
+            withSidebar: getFilterPanelOpenState(props.context),
             minimizeSearchResults: isMobilePhone(),
         };
 
@@ -99,6 +100,7 @@ export default class BaseApp extends React.Component {
     toggleSidebar(event) {
         event.preventDefault();
         this.setState({withSidebar: !this.state.withSidebar});
+        setFilterPanelOpenState(!this.state.withSidebar, this.props.context);
     }
 
     onListScroll(event) {
@@ -158,7 +160,7 @@ export default class BaseApp extends React.Component {
     }
 
     componentDidUpdate(nextProps) {
-        if ((nextProps.activeQuery || this.props.activeQuery) && (nextProps.activeQuery !== this.props.activeQuery)) {
+        if ((nextProps.activeQuery || this.props.activeQuery) && (nextProps.activeQuery !== this.props.activeQuery) && this.dom.list != null) {
             this.dom.list.scrollTop = 0;
         }
         this.initTooltips();
@@ -167,6 +169,7 @@ export default class BaseApp extends React.Component {
 
 BaseApp.propTypes = {
     state: PropTypes.object.isRequired,
+    context: PropTypes.string.isRequired,
     actions: PropTypes.arrayOf(PropTypes.object).isRequired,
     activeQuery: PropTypes.string,
     fetchMoreItems: PropTypes.func.isRequired,

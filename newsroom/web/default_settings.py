@@ -305,6 +305,16 @@ CLIENT_CONFIG = {
     'item_actions': {},
     'display_abstract': DISPLAY_ABSTRACT,
     'display_credits': False,
+    'filter_panel_defaults': {
+        'tab': {
+            'wire': 'nav',  # Options are 'nav', 'topics', 'filters'
+            'agenda': 'nav',
+        },
+        'open': {
+            'wire': False,
+            'agenda': False,
+        },
+    },
 }
 
 # Enable iframely support for item body_html
@@ -355,6 +365,9 @@ ELASTICSEARCH_SETTINGS.setdefault("settings", {})["query_string"] = {
     # https://discuss.elastic.co/t/configuring-the-standard-tokenizer/8691/5
     'analyze_wildcard': False
 }
+
+# count above 10k
+ELASTICSEARCH_TRACK_TOTAL_HITS = True
 
 #: server working directory
 #: should be set in settings.py
