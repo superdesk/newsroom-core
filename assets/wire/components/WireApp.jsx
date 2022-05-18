@@ -205,7 +205,7 @@ class WireApp extends BaseApp {
                             ref={this.setListRef}
                         >
                             <SearchResultsInfo
-                                scrollClass={this.state.scrollClass}
+                                minimizeSearchResults={this.state.minimizeSearchResults}
 
                                 showTotalItems={showTotalItems}
                                 showTotalLabel={showTotalLabel}

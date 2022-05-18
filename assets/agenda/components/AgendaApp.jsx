@@ -225,8 +225,7 @@ class AgendaApp extends BaseApp {
                             )}
 
                             <SearchResultsInfo
-                                scrollClass={this.state.scrollClass}
-
+                                minimizeSearchResults={this.state.minimizeSearchResults}
                                 showTotalItems={showTotalItems}
                                 showTotalLabel={showTotalLabel}
                                 showSaveTopic={showSaveTopic}

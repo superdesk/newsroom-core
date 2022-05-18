@@ -179,7 +179,7 @@ body.print {
     display: block;
     margin: 0;
     overflow: visible;
-    
+
     @include phone {
         display: flex;
         margin: 0 0 0 6px;
@@ -189,10 +189,10 @@ body.print {
         padding-top: 10px;
     }
 
-    
+
     .sidenav-icons__item {
         margin: 4px 0;
-    
+
         a {
             display: flex;
             align-items: center;
@@ -237,7 +237,7 @@ body.print {
             a {
                 background-color: white;
                 border-radius: 50%;
-                width: 40px; 
+                width: 40px;
             }
             i {
                 color: $main-blue;
@@ -908,10 +908,9 @@ article.list {
     min-height: 28px;
     padding-bottom: 0;
     padding-top: 0;
+    align-items: center;
     @include md {
         margin-right: 40px;
-        padding-top: 0.3rem;
-        min-height: 48px;
     }
 }
 
@@ -921,7 +920,7 @@ article.list {
 
     @include md {
         font-size: 2rem; // 32px
-        font-weight: 300;
+        font-weight: 500;
         line-height: 1.4;
         margin-right: 10px;
     }
@@ -934,6 +933,7 @@ article.list {
 .search-results-info__text {
     color: #6e6e6e;
     display: flex;
+    margin-top: 0;
 
     .text-break {
         max-height: 32px;
@@ -941,7 +941,6 @@ article.list {
     }
 
     @include md {
-        margin-top: 6px;
         flex-direction: column;
     }
 
@@ -1178,7 +1177,7 @@ article.list {
 .wire-column__main--left-margin {
     margin-left: 260px;
 }
-.wire-column__main-header {
+.search-results__main-header {
     flex-shrink: 0;
     min-height: 40px;
     padding-top: 4px;
@@ -1190,10 +1189,29 @@ article.list {
         padding-top: 7px;
         padding-bottom: 7px;
     }
+}
+
+.wire-column__main-header {
+    flex-shrink: 0;
+    min-height: 40px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    transition: all .2s ease;
+    z-index: 9;
+
+    @include lg {
+        padding-top: 7px;
+        padding-bottom: 14px;
+    }
 
     &--small {
         background: white;
         box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+
+        @include lg {
+            min-height: 50px;
+            max-height: 50px;
+        }
 
         padding-top: 0;
 
@@ -1221,8 +1239,26 @@ article.list {
                 transition: all .2s ease;
             }
         }
-        .search-results-info__text {
-            margin-top: 0;
+    }
+
+    &--expanded {
+        @include lg {
+            min-height: 150px;
+            max-height: unset;
+
+            .search-results__tags {
+                margin-left: 2.5rem;
+                margin-bottom: 1rem;
+            }
+        }
+
+        .search-results__tags {
+            margin-left: 0.5rem;
+        }
+
+        .search-results-info {
+            margin-top: 0.5rem;
+            margin-left: 0.5rem;
         }
     }
 
@@ -2015,7 +2051,7 @@ article.list {
         gap: 5px;
     }
 
-    &--dashed-border {        
+    &--dashed-border {
         padding-right: 5px;
         border-right: 1px dotted #c4c4c4;
 
@@ -2103,7 +2139,7 @@ article.list {
     font-size: 0.875rem;
     color: $body-text;
     line-height: 1.2;
-    display: flex;    
+    display: flex;
     flex-direction: column;
     overflow-y: visible;
     margin-bottom: 0px;
@@ -2147,7 +2183,7 @@ article.list {
     position: relative;
     display: flex;
     align-items: center;
-    font-size: 0.8125rem;    
+    font-size: 0.8125rem;
 
     @include lg {
         font-size: 0.97rem;
@@ -2791,7 +2827,7 @@ a.wire-articles__versions {
             width: 12px;
             position: absolute;
             top: 2px;
-            left: 0px;           
+            left: 0px;
             background-repeat: no-repeat;
             background-size: 100%;
         }

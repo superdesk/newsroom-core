@@ -1,5 +1,6 @@
 import {createSelector} from 'reselect';
 import {get, find, filter as removeNulls, isEqual, isEmpty} from 'lodash';
+import {getCreatedSearchParamLabel, gettext} from 'utils';
 
 export const searchQuerySelector = (state) => get(state, 'search.activeQuery') || null;
 export const searchFilterSelector = (state) => get(state, 'search.activeFilter');
@@ -11,10 +12,27 @@ export const searchProductSelector = (state) => get(state, 'search.productId') |
 export const activeViewSelector = (state) => get(state, 'search.activeView');
 export const navigationsSelector = (state) => get(state, 'search.navigations') || [];
 
+export const navigationsByIdSelector = createSelector(
+    [navigationsSelector],
+    (navigations) => navigations.reduce((navs, nav) => {
+        navs[nav._id] = nav;
+
+        return navs;
+    }, {})
+);
+
 export const topicsSelector = (state) => get(state, 'topics') || [];
 export const productsSelector = (state) => get(state, 'search.products') || [];
 
 export const filterGroups = (state) => get(state, 'groups') || [];
+export const filterGroupsByIdSelector = createSelector(
+    [filterGroups],
+    (listOfGroups) => listOfGroups.reduce((groups, group) => {
+        groups[group.field] = group;
+
+        return groups;
+    }, {})
+);
 
 export const activeTopicSelector = createSelector(
     [searchTopicIdSelector, topicsSelector],
@@ -65,6 +83,97 @@ export const searchParamsSelector = createSelector(
         }
 
         return params;
+    }
+);
+
+export const searchParamTagSelector = createSelector(
+    [searchParamsSelector, navigationsByIdSelector, filterGroupsByIdSelector, activeTopicSelector],
+    (params, navs, groups, activeTopic) => {
+        const paramTags = [];
+
+        if (params.navigation) {
+            params.navigation.forEach((navId) => {
+                if (activeTopic != null && navId === activeTopic._id) {
+                    return;
+                }
+
+                const nav = navs[navId];
+
+                if (nav && nav._id) {
+                    paramTags.push({
+                        key: nav._id,
+                        label: gettext('Topic'),
+                        text: nav.name,
+                        shade: 'highlight1',
+                        type: 'navigation',
+                        params: nav,
+                    });
+                }
+            });
+        }
+        if (activeTopic) {
+            paramTags.push({
+                key: activeTopic._id,
+                label: gettext('Topic'),
+                text: activeTopic.label,
+                shade: 'highlight1',
+                type: 'topic',
+                params: activeTopic,
+            });
+        }
+        if (params.created) {
+            const created = getCreatedSearchParamLabel(params.created);
+
+            if (created.relative) {
+                paramTags.push({
+                    key: 'published_relative',
+                    label: gettext('Published'),
+                    text: created.relative,
+                    type: 'created',
+                    params: params.created,
+                });
+            } else {
+                if (created.from) {
+                    paramTags.push({
+                        key: 'published_from',
+                        label: gettext('Published From'),
+                        text: created.from,
+                        type: 'created',
+                        params: params.created,
+                    });
+                }
+                if (created.to) {
+                    paramTags.push({
+                        key: 'published_to',
+                        label: gettext('Published To'),
+                        text: created.to,
+                        type: 'created',
+                        params: params.created,
+                    });
+                }
+            }
+        }
+
+        if (params.filter) {
+            Object.keys(params.filter).forEach((field) => {
+                const group = groups[field];
+                params.filter[field].forEach((filterValue) => {
+                    paramTags.push({
+                        key: `${field}.${filterValue}`,
+                        label: group.label,
+                        text: filterValue,
+                        type: 'filter',
+                        params: {
+                            group: group,
+                            field: field,
+                            value: filterValue,
+                        },
+                    });
+                });
+            });
+        }
+
+        return paramTags;
     }
 );
 

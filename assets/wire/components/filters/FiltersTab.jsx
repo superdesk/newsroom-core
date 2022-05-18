@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
-import {isEmpty, cloneDeep, pickBy, assign} from 'lodash';
+import {isEmpty, cloneDeep, pickBy, assign, isEqual} from 'lodash';
 import {gettext, toggleValue} from 'utils';
 import {getActiveDate} from 'local-store';
 
@@ -40,6 +40,20 @@ class FiltersTab extends React.Component {
             activeFilter: cloneDeep(this.props.activeFilter),
             createdFilter: cloneDeep(this.props.createdFilter),
         };
+    }
+
+    componentDidUpdate(prevProps) {
+        const newState = {};
+        if (!isEqual(this.props.activeFilter, prevProps.activeFilter)) {
+            newState.activeFilter = cloneDeep(this.props.activeFilter);
+        }
+        if (!isEqual(this.props.createdFilter, prevProps.createdFilter)) {
+            newState.createdFilter = cloneDeep(this.props.createdFilter);
+        }
+
+        if (Object.keys(newState).length > 0) {
+            this.setState(newState);
+        }
     }
 
     toggleGroup(event, group) {
