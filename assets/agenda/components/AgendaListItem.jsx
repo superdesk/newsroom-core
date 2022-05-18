@@ -154,6 +154,14 @@ class AgendaListItem extends React.Component {
                                 {item.headline}</span>}
                         </h4>
 
+                        {!isMobile ? null : (
+                            <AgendaItemTimeUpdater
+                                item={item}
+                                borderRight={false}
+                                alignCenter={false}
+                            />
+                        )}
+
                         <AgendaListItemIcons
                             item={item}
                             group={group}
@@ -211,11 +219,6 @@ class AgendaListItem extends React.Component {
 
         return this.renderListItem(true, (
             <div className='wire-articles__item-actions ml-0' onClick={this.stopPropagation}>
-                <AgendaItemTimeUpdater
-                    item={item}
-                    borderRight={true}
-                    alignCenter={true}
-                />
                 <AgendaInternalNote
                     internalNote={internalNote}
                     onlyIcon={true}
