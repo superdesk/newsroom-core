@@ -14,6 +14,7 @@ import {getIntVersion} from 'wire/utils';
 import {groupItems, getPlanningItemsByGroup, getListItems} from 'agenda/utils';
 import {searchNavigationSelector} from 'search/selectors';
 import {previewConfigSelector, listConfigSelector} from 'ui/selectors';
+import {AGENDA_DATE_FORMAT_LONG, AGENDA_DATE_FORMAT_SHORT} from '../../utils';
 
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
@@ -213,7 +214,7 @@ class AgendaList extends React.Component {
                 return gettext('Tomorrow');
             }
 
-            return groupDate.format(groupDate.year() === today.year() ? 'dddd, MMMM D' : 'dddd, MMMM D, YYYY');
+            return groupDate.format(groupDate.year() === today.year() ? AGENDA_DATE_FORMAT_SHORT : AGENDA_DATE_FORMAT_LONG);
         }
     }
 

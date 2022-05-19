@@ -6,7 +6,7 @@ import moment from 'moment';
 import CalendarButtonWrapper from './CalendarButtonWrapper';
 
 import 'react-datepicker/dist/react-datepicker.css';
-import {EARLIEST_DATE} from '../utils';
+import {AGENDA_DATE_FORMAT_SHORT, EARLIEST_DATE} from '../utils';
 
 class CalendarButton extends React.Component {
     constructor (props) {
@@ -29,7 +29,7 @@ class CalendarButton extends React.Component {
         const isStartDateToday = moment.isMoment(this.state.startDate) && !this.state.startDate.isSame(moment(), 'day');
         const datePicker = (<DatePicker
             customInput={<CalendarButtonWrapper active={isStartDateToday}/>}
-            dateFormat='dddd, MMMM D'
+            dateFormat={AGENDA_DATE_FORMAT_SHORT}
             todayButton={gettext('Today')}
             selected={this.state.startDate}
             onChange={this.handleChange}

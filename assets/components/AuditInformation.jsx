@@ -32,9 +32,9 @@ class AuditInformation extends React.Component {
                 users || []);
             return (
                 <div className='wire-column__preview__date'>
-                    {gettext('Created {{creator}}at {{created}}',
+                    {gettext('Created by {{author}} at {{date}}',
                         {
-                            creator: creator ? gettext(`by ${creator.first_name} ${creator.last_name} `) : gettext('by System') + ' ',
+                            creator: creator ? `${creator.first_name} ${creator.last_name}` : gettext('System'),
                             created: fullDate(item._created),
                         }
                     )}
@@ -46,9 +46,9 @@ class AuditInformation extends React.Component {
             const updator = getItemFromArray(item.version_creator, (users || []));
             return (
                 <div className='wire-column__preview__date'>
-                    {gettext('Updated {{updator}}at {{updated}}',
+                    {gettext('Updated by {{author}} at {{date}}',
                         {
-                            updator: updator ? gettext(`by ${updator.first_name} ${updator.last_name} `) : gettext('by System') + ' ',
+                            updator: updator ? `${updator.first_name} ${updator.last_name}` : gettext('System'),
                             updated: fullDate(item._updated),
                         }
                     )}
