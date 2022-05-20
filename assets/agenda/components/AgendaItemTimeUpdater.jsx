@@ -81,9 +81,12 @@ class AgendaItemTimeUpdater extends React.Component {
         }
 
         if (timeDiff === 0) {
-            this.setState({timeText: itemState + ' ' + gettext('just now')});
+            this.setState({timeText: gettext('{{ action }} just now', {action: itemState})});
         } else {
-            this.setState({timeText: itemState + ' ' + timeDiff + ' ' + gettext('minute(s) ago')});
+            this.setState({timeText: gettext('{{ action }} {{ minutes }} minute(s) ago', {
+                action: itemState,
+                minutes: timeDiff,
+            })});
         }
     }
 

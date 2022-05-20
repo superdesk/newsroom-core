@@ -33,7 +33,10 @@ window.moment = moment;
 
 // CP don't want 2e 3e etc., only 1er
 if (getLocale() === 'fr_CA') {
-    moment.updateLocale('fr-ca', {ordinal: (number) => number + (number === 1 ? 'er' : '')});
+    moment.updateLocale('fr-ca', {
+        ordinal: (number) => number + (number === 1 ? 'er' : ''),
+        weekdays: 'Dimanche_Lundi_Mardi_Mercredi_Jeudi_Vendredi_Samedi'.split('_'),
+    });
 }
 
 export const now = moment(); // to enable mocking in tests
@@ -68,6 +71,8 @@ export const DATE_FORMAT = getDateFormat();
 export const COVERAGE_DATE_TIME_FORMAT = getCoverageDateTimeFormat();
 export const COVERAGE_DATE_FORMAT = getCoverageDateFormat();
 export const DATETIME_FORMAT = getLocaleFormat('DATETIME_FORMAT', `${TIME_FORMAT} ${DATE_FORMAT}`);
+export const AGENDA_DATE_FORMAT_SHORT = getLocaleFormat('AGENDA_DATE_FORMAT_SHORT', 'dddd, MMMM D');
+export const AGENDA_DATE_FORMAT_LONG = getLocaleFormat('AGENDA_DATE_FORMAT_LONG', 'dddd, MMMM D, YYYY');
 
 export const SERVER_DATETIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss+0000';
 export const DAY_IN_MINUTES = 24 * 60 - 1;

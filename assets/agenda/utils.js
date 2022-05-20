@@ -9,7 +9,8 @@ import {
     DATE_FORMAT,
     COVERAGE_DATE_TIME_FORMAT,
     COVERAGE_DATE_FORMAT,
-    parseDate
+    parseDate,
+    AGENDA_DATE_FORMAT_SHORT
 } from '../utils';
 
 const STATUS_KILLED = 'killed';
@@ -21,7 +22,7 @@ const navigationFunctions = {
     'day': {
         'next': getNextDay,
         'previous': getPreviousDay,
-        'format': (dateString) => moment(dateString).format('dddd, D MMMM'),
+        'format': (dateString) => moment(dateString).format(AGENDA_DATE_FORMAT_SHORT),
     },
     'week': {
         'next': getNextWeek,
