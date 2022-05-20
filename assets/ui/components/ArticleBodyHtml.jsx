@@ -84,6 +84,16 @@ class ArticleBodyHtml extends React.PureComponent {
 
                 loaded.push(url);
 
+                if (url.includes('platform.twitter.com/widgets.js') && window.twttr != null) {
+                    window.twttr.widgets.load();
+                    return;
+                } 
+
+                if (url.includes('instagram.com/embed.js') && window.instgrm != null) {
+                    window.instgrm.Embeds.process();
+                    return;
+                }
+
                 if (url.startsWith('http')) {
                     // change https?:// to // so it uses schema of the client
                     url = url.substring(url.indexOf(':') + 1);
