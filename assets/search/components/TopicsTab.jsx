@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
-import {gettext, isWireContext} from 'utils';
+import {gettext, isWireContext, HIDE_COMPANY_TOPICS_FEATURE} from 'utils';
 
 import {removeNewItems} from 'wire/actions';
 import FilterButton from 'wire/components/filters/FilterButton';
@@ -91,29 +91,31 @@ function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNew
                     </div>
                 )}
             </CollapseBoxWithButton>
-            <CollapseBoxWithButton
-                id="company-topics"
-                buttonText={gettext('Company Topics')}
-                initiallyOpen={true}
-            >
-                {!globalTopics.length ? (
-                    <div className='wire-column__info m-3'>
-                        {gettext('No {{name}} created.', {name: tabName})}
-                    </div>
-                ) : (
-                    <div className="m-3">
-                        {globalTopics.map((topic) => (
-                            <TopicItem
-                                key={topic._id}
-                                topic={topic}
-                                newItemsByTopic={newItemsByTopic}
-                                onClick={clickTopic}
-                                className={topicClass(topic)}
-                            />
-                        ))}
-                    </div>
-                )}
-            </CollapseBoxWithButton>
+            {HIDE_COMPANY_TOPICS_FEATURE && (
+                <CollapseBoxWithButton
+                    id="company-topics"
+                    buttonText={gettext('Company Topics')}
+                    initiallyOpen={true}
+                >
+                    {!globalTopics.length ? (
+                        <div className='wire-column__info m-3'>
+                            {gettext('No {{name}} created.', {name: tabName})}
+                        </div>
+                    ) : (
+                        <div className="m-3">
+                            {globalTopics.map((topic) => (
+                                <TopicItem
+                                    key={topic._id}
+                                    topic={topic}
+                                    newItemsByTopic={newItemsByTopic}
+                                    onClick={clickTopic}
+                                    className={topicClass(topic)}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </CollapseBoxWithButton>
+            )}
             <FilterButton
                 label={gettext('Manage my {{name}}', {name: tabName})}
                 onClick={clickManage}

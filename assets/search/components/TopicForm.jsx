@@ -6,7 +6,7 @@ import TextInput from 'components/TextInput';
 import CheckboxInput from 'components/CheckboxInput';
 import {ToolTip} from 'ui/components/ToolTip';
 
-import {gettext} from 'utils';
+import {gettext, HIDE_COMPANY_TOPICS_FEATURE} from 'utils';
 
 const TOPIC_NAME_MAXLENGTH = 30;
 
@@ -54,7 +54,7 @@ const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubs
                     readOnly={readOnly}
                 />
             )}
-            {!(globalTopicsEnabled && (original._id == null || original.user)) ? null : (
+            {!(globalTopicsEnabled && HIDE_COMPANY_TOPICS_FEATURE && (original._id == null || original.user)) ? null : (
                 <CheckboxInput
                     label={gettext('Share with my Company')}
                     value={topic.is_global || false}

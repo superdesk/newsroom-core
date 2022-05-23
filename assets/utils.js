@@ -80,6 +80,7 @@ export const LIST_ANIMATIONS = getConfig('list_animations', true);
 export const DISPLAY_NEWS_ONLY = getConfig('display_news_only', true);
 export const DISPLAY_AGENDA_FEATURED_STORIES_ONLY = getConfig('display_agenda_featured_stories_only', true);
 export const DISPLAY_ALL_VERSIONS_TOGGLE = getConfig('display_all_versions_toggle', true);
+export const HIDE_COMPANY_TOPICS_FEATURE = getConfig('hide_company_topics_feature', false);
 export const DEFAULT_TIMEZONE = getConfig('default_timezone', 'Australia/Sydney');
 export const KEYCODES = {
     ENTER: 13,
