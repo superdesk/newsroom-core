@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-05-12 15:51+0200\n"
+"POT-Creation-Date: 2022-05-24 10:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -156,7 +156,7 @@ msgstr ""
 
 #: assets/agenda/components/AgendaTags.jsx:25
 #: assets/company-reports/components/ContentActivity.jsx:110
-#: assets/search/components/TopicParameters.jsx:69
+#: assets/search/components/TopicParameters.jsx:63
 #: assets/wire/components/PreviewTags.jsx:37 newsroom/agenda/__init__.py:44
 #: newsroom/reports/content_activity.py:228
 #: newsroom/templates/wire_item.html:76
@@ -166,7 +166,7 @@ msgstr ""
 
 #: assets/company-reports/components/ContentActivity.jsx:111
 #: assets/monitoring/components/MonitoringList.jsx:24
-#: assets/search/components/TopicParameters.jsx:70
+#: assets/search/components/TopicParameters.jsx:64
 #: assets/wire/components/PreviewTags.jsx:43 newsroom/agenda/__init__.py:48
 #: newsroom/monitoring/forms.py:19 newsroom/reports/content_activity.py:229
 #: newsroom/wire/__init__.py:110
@@ -179,7 +179,7 @@ msgid "News Value"
 msgstr ""
 
 #: assets/company-reports/components/ContentActivity.jsx:109
-#: assets/search/components/TopicParameters.jsx:61
+#: assets/search/components/TopicParameters.jsx:55
 #: newsroom/agenda/__init__.py:56 newsroom/reports/content_activity.py:227
 #: newsroom/wire/__init__.py:122
 msgid "Place"
@@ -607,6 +607,7 @@ msgid "Must provide a section for this report"
 msgstr ""
 
 #: assets/company-reports/components/ContentActivity.jsx:106
+#: assets/search/selectors.js:130
 #: assets/wire/components/filters/NavCreatedPicker.jsx:27
 #: newsroom/reports/content_activity.py:224
 msgid "Published"
@@ -1030,7 +1031,7 @@ msgstr ""
 msgid "Metadata"
 msgstr ""
 
-#: assets/search/components/TopicParameters.jsx:71
+#: assets/search/components/TopicParameters.jsx:65
 #: assets/wire/components/PreviewTags.jsx:49
 #: newsroom/templates/wire_item.html:86
 #: newsroom/templates/wire_item_print.html:28 newsroom/wire/__init__.py:114
@@ -1266,18 +1267,38 @@ msgstr ""
 msgid "New card"
 msgstr ""
 
-#: assets/utils.js:406
+#: assets/utils.js:411
 msgid "{{startTime}} - {{endTime}}"
 msgstr ""
 
 #: assets/agenda/components/AgendaMetaTime.jsx:68
-#: assets/agenda/components/AgendaMetaTime.jsx:76 assets/utils.js:419
-#: assets/utils.js:424
+#: assets/agenda/components/AgendaMetaTime.jsx:76 assets/utils.js:424
+#: assets/utils.js:429
 msgid "{{startDate}} to {{endDate}}"
 msgstr ""
 
-#: assets/utils.js:630
+#: assets/utils.js:635
 msgid "Failed to process request!"
+msgstr ""
+
+#: assets/agenda/components/AgendaCalendarButton.jsx:33
+#: assets/agenda/components/AgendaDateButtons.jsx:15
+#: assets/agenda/components/AgendaList.jsx:210
+#: assets/company-reports/components/ProductStories.jsx:26
+#: assets/components/CalendarButton.jsx:33
+#: assets/components/ExpiryDateInput.jsx:90 assets/utils.js:811
+#: assets/wire/components/filters/NavCreatedPicker.jsx:9
+msgid "Today"
+msgstr ""
+
+#: assets/company-reports/components/ProductStories.jsx:28 assets/utils.js:813
+#: assets/wire/components/filters/NavCreatedPicker.jsx:10
+msgid "This week"
+msgstr ""
+
+#: assets/company-reports/components/ProductStories.jsx:30 assets/utils.js:815
+#: assets/wire/components/filters/NavCreatedPicker.jsx:11
+msgid "This month"
 msgstr ""
 
 #: assets/websocket.js:42
@@ -1405,44 +1426,44 @@ msgstr ""
 msgid "Watch this coverage"
 msgstr ""
 
-#: assets/agenda/utils.js:53
+#: assets/agenda/utils.js:54
 msgid "updated {{ at }}"
 msgstr ""
 
-#: assets/agenda/utils.js:63
+#: assets/agenda/utils.js:64
 msgid "Time to be confirmed"
 msgstr ""
 
-#: assets/agenda/utils.js:73 assets/agenda/utils.js:74
+#: assets/agenda/utils.js:74 assets/agenda/utils.js:75
 msgid "not planned"
 msgstr ""
 
-#: assets/agenda/utils.js:75 assets/agenda/utils.js:82
+#: assets/agenda/utils.js:76 assets/agenda/utils.js:83
 msgid "planned"
 msgstr ""
 
-#: assets/agenda/utils.js:76 assets/agenda/utils.js:77
+#: assets/agenda/utils.js:77 assets/agenda/utils.js:78
 msgid "on merit"
 msgstr ""
 
-#: assets/agenda/utils.js:78
+#: assets/agenda/utils.js:79
 msgid "on request"
 msgstr ""
 
-#: assets/agenda/utils.js:83
+#: assets/agenda/utils.js:84
 msgid "in progress"
 msgstr ""
 
-#: assets/agenda/utils.js:84
+#: assets/agenda/utils.js:85
 msgid "available"
 msgstr ""
 
 #: assets/agenda/components/AgendaListItemLabels.jsx:19
-#: assets/agenda/utils.js:85
+#: assets/agenda/utils.js:86
 msgid "cancelled"
 msgstr ""
 
-#: assets/agenda/utils.js:478
+#: assets/agenda/utils.js:479
 msgid "Update expected @ ${dateString}"
 msgstr ""
 
@@ -1485,17 +1506,6 @@ msgstr ""
 
 #: assets/agenda/components/AgendaAttachments.jsx:37
 msgid "MIME type:"
-msgstr ""
-
-#: assets/agenda/components/AgendaCalendarButton.jsx:33
-#: assets/agenda/components/AgendaDateButtons.jsx:15
-#: assets/agenda/components/AgendaList.jsx:209
-#: assets/company-reports/components/ProductStories.jsx:26
-#: assets/components/CalendarButton.jsx:33
-#: assets/components/ExpiryDateInput.jsx:90
-#: assets/search/components/TopicParameters.jsx:25
-#: assets/wire/components/filters/NavCreatedPicker.jsx:9
-msgid "Today"
 msgstr ""
 
 #: assets/agenda/components/AgendaCoverageExistsFilter.jsx:7
@@ -1610,18 +1620,18 @@ msgid "Updated"
 msgstr ""
 
 #: assets/agenda/components/AgendaItemTimeUpdater.jsx:84
-msgid "just now"
+msgid "{{ action }} just now"
 msgstr ""
 
 #: assets/agenda/components/AgendaItemTimeUpdater.jsx:86
-msgid "minute(s) ago"
+msgid "{{ action }} {{ minutes }} minute(s) ago"
 msgstr ""
 
-#: assets/agenda/components/AgendaList.jsx:213
+#: assets/agenda/components/AgendaList.jsx:214
 msgid "Tomorrow"
 msgstr ""
 
-#: assets/agenda/components/AgendaList.jsx:318
+#: assets/agenda/components/AgendaList.jsx:319
 #: assets/am-news/components/AmNewsList.jsx:192
 #: assets/wire/components/ItemsList.jsx:176
 msgid "No items found."
@@ -2131,20 +2141,8 @@ msgstr ""
 msgid "Last 24 hours"
 msgstr ""
 
-#: assets/company-reports/components/ProductStories.jsx:28
-#: assets/search/components/TopicParameters.jsx:27
-#: assets/wire/components/filters/NavCreatedPicker.jsx:10
-msgid "This week"
-msgstr ""
-
 #: assets/company-reports/components/ProductStories.jsx:29
 msgid "Last 7 days"
-msgstr ""
-
-#: assets/company-reports/components/ProductStories.jsx:30
-#: assets/search/components/TopicParameters.jsx:29
-#: assets/wire/components/filters/NavCreatedPicker.jsx:11
-msgid "This month"
 msgstr ""
 
 #: assets/company-reports/components/ProductStories.jsx:31
@@ -2192,12 +2190,17 @@ msgstr ""
 msgid "More Actions"
 msgstr ""
 
-#: assets/components/AuditInformation.jsx:38
-msgid "Created {{creator}}at {{created}}"
+#: assets/components/AuditInformation.jsx:37
+msgid "${creator.first_name} ${creator.last_name}"
 msgstr ""
 
-#: assets/components/AuditInformation.jsx:52
-msgid "Updated {{updator}}at {{updated}}"
+#: assets/components/AuditInformation.jsx:37
+#: assets/components/AuditInformation.jsx:51
+msgid "System"
+msgstr ""
+
+#: assets/components/AuditInformation.jsx:51
+msgid "${updater.first_name} ${updater.last_name}"
 msgstr ""
 
 #: assets/components/CardEditor.jsx:102
@@ -2344,7 +2347,7 @@ msgid "End Date"
 msgstr ""
 
 #: assets/components/cards/edit/ConfigEvent.jsx:56
-#: assets/search/components/TopicParameters.jsx:77
+#: assets/search/components/TopicParameters.jsx:71
 msgid "Location"
 msgstr ""
 
@@ -2432,13 +2435,13 @@ msgstr ""
 #: assets/home/components/search-bar.jsx:33
 #: assets/home/components/search-bar.jsx:34
 #: assets/search/components/SearchBar.jsx:74
-#: assets/search/components/TopicParameters.jsx:66
-#: assets/wire/components/filters/FiltersTab.jsx:127
+#: assets/search/components/TopicParameters.jsx:60
+#: assets/wire/components/filters/FiltersTab.jsx:141
 msgid "Search"
 msgstr ""
 
 #: assets/layout/components/BaseApp.jsx:37
-#: assets/search/components/TopicParameters.jsx:68
+#: assets/search/components/TopicParameters.jsx:62
 msgid "Topics"
 msgstr ""
 
@@ -2885,6 +2888,23 @@ msgstr ""
 msgid "Topic unsubscribed successfully"
 msgstr ""
 
+#: assets/search/selectors.js:105 assets/search/selectors.js:117
+msgid "Topic"
+msgstr ""
+
+#: assets/search/selectors.js:139
+msgid "Published From"
+msgstr ""
+
+#: assets/search/selectors.js:148
+msgid "Published To"
+msgstr ""
+
+#: assets/search/components/ContentSearchResults.jsx:128
+#: assets/search/components/SearchResults.jsx:18
+msgid "search results for:"
+msgstr ""
+
 #: assets/search/components/FollowedTopics.jsx:92
 msgid "Would you like to delete topic {{name}}?"
 msgstr ""
@@ -2932,12 +2952,8 @@ msgstr ""
 msgid "Search clear"
 msgstr ""
 
-#: assets/search/components/SearchResults.jsx:32
+#: assets/search/components/SearchResults.jsx:15
 msgid "search results found"
-msgstr ""
-
-#: assets/search/components/SearchResults.jsx:35
-msgid "search results for:"
 msgstr ""
 
 #: assets/search/components/SearchResultsInfo.jsx:37
@@ -3024,31 +3040,31 @@ msgstr ""
 msgid "Created on {{ date }} at {{ time }}"
 msgstr ""
 
-#: assets/search/components/TopicParameters.jsx:20
+#: assets/search/components/TopicParameters.jsx:22
 msgid "From: {{date}}"
 msgstr ""
 
-#: assets/search/components/TopicParameters.jsx:21
+#: assets/search/components/TopicParameters.jsx:25
 msgid "To: {{date}}"
 msgstr ""
 
-#: assets/search/components/TopicParameters.jsx:67
+#: assets/search/components/TopicParameters.jsx:61
 msgid "Date Created"
 msgstr ""
 
-#: assets/search/components/TopicParameters.jsx:72
+#: assets/search/components/TopicParameters.jsx:66
 msgid "Urgency"
 msgstr ""
 
-#: assets/search/components/TopicParameters.jsx:74
+#: assets/search/components/TopicParameters.jsx:68
 msgid "Calendar"
 msgstr ""
 
-#: assets/search/components/TopicParameters.jsx:75
+#: assets/search/components/TopicParameters.jsx:69
 msgid "Coverage Type"
 msgstr ""
 
-#: assets/search/components/TopicParameters.jsx:76
+#: assets/search/components/TopicParameters.jsx:70
 msgid "Coverage Status"
 msgstr ""
 
@@ -3402,7 +3418,7 @@ msgstr ""
 msgid "Show less"
 msgstr ""
 
-#: assets/wire/components/filters/FiltersTab.jsx:134
+#: assets/wire/components/filters/FiltersTab.jsx:148
 msgid "Clear filters"
 msgstr ""
 
