@@ -41,7 +41,9 @@ def get_session_locale():
         if request.args.get('language') and request.args.get('language') in current_app.config['LANGUAGES']:
             return request.args['language']
         else:
-            return request.accept_languages.best_match(current_app.config['LANGUAGES'])
+            return request.accept_languages.best_match(
+                current_app.config['LANGUAGES'], current_app.config['DEFAULT_LANGUAGE']
+            )
     return current_app.config['DEFAULT_LANGUAGE']
 
 
