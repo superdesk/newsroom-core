@@ -157,6 +157,14 @@ export const searchParamTagSelector = createSelector(
         if (params.filter) {
             Object.keys(params.filter).forEach((field) => {
                 const group = groups[field];
+
+                if (!group) {
+                    // If no group is defined, then this filter is not from
+                    // the filters tab in the side-panel
+                    // So we exclude it from the list of tags
+                    return;
+                }
+
                 params.filter[field].forEach((filterValue) => {
                     paramTags.push({
                         key: `${field}.${filterValue}`,
