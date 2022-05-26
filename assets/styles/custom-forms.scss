@@ -13,12 +13,17 @@ $enable-shadows:true;
 // Custom checkbox style
 .custom-control {
   &.custom-checkbox {
-    margin-bottom: 0.3rem;
+    margin-block-end: 0.3rem;
+  }
+  .custom-control-input {
+    margin-inline-end: .5rem;
+    margin-block-end: 0;
   }
 }
 
 .custom-control-label {
   color: $body-text;
+  line-height: 1.2;
 
   &:hover {
     color: $gray-600;
@@ -42,9 +47,8 @@ $enable-shadows:true;
 .custom-control {
   &.ui-dark {
     .custom-control-label {
-      color: $gray-500;
-      font-weight: 300;
-      font-size: 0.8rem;
+      color: $gray-300;      
+      font-size: 0.9rem;
     }
     .custom-control-input:checked ~ .custom-control-label {
       color: $gray-200;
@@ -58,6 +62,9 @@ $enable-shadows:true;
     height: 300px;
     width: 100%;
   }
+}
+.form-group {
+  margin-block-end: 1rem;
 }
 
 .expiry-date {
@@ -75,7 +82,7 @@ $enable-shadows:true;
 
   .react-datepicker-wrapper {
     width: 50%;
-    margin-left: auto;
+    margin-inline-start: auto;
   }
   .react-datepicker__input-container {
     width: 100%;

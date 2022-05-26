@@ -50,7 +50,7 @@ const SearchResults = ({
         </div>
 
         {(showSaveTopic || children) && (
-            <div className="d-flex ml-auto align-items-end align-items-md-center h-100 flex-column flex-md-row flex-shrink-0">
+            <div className="d-flex ms-auto align-items-end align-items-md-center h-100 flex-column flex-md-row flex-shrink-0">
                 <button
                     className="btn btn-outline-primary btn-sm d-block d-sm-none mb-1 mt-1"
                     onClick={saveMyTopic}

@@ -39,7 +39,7 @@ export class CollapseBoxWithButton extends React.Component {
                 className="d-flex flex-column collapse__container"
             >
                 <button
-                    className="btn d-flex align-items-center btn-outline-light mb-0"
+                    className="btn d-flex align-items-center btn-outline-light mb-0 mx-3"
                     type="button"
                     data-toggle="collapse"
                     data-target={`#${contentId}`}
@@ -53,7 +53,7 @@ export class CollapseBoxWithButton extends React.Component {
                 >
                     <span>{this.props.buttonText}</span>
                     <i className={classNames(
-                        'icon-small--arrow-down icon--gray-dark ml-auto',
+                        'icon-small--arrow-down icon--gray-dark ms-auto',
                         {'icon--rotate-180': this.state.open}
                     )} />
                 </button>

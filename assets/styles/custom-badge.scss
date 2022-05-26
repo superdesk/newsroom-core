@@ -6,8 +6,8 @@
     font-size: 0.6875rem; // 11px    
     line-height: 1.2;
     position: absolute;
-    top: 5px;
-    right: 7px;
+    inset-block-start: 5px;
+    inset-inline-end: 7px;
   }
 }
 
@@ -16,10 +16,10 @@
 }
 .badge--icon {
   padding: 0;
-  top: 10px !important;
-  right: 2px !important;
+  inset-block-start: 10px !important;
+  inset-inline-end: 2px !important;
 
   @include sm {
-    right: 11px !important;
+    inset-inline-end: 11px !important;
   }
 }

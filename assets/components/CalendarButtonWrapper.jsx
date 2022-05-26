@@ -6,10 +6,10 @@ class CalendarButtonWrapper extends React.Component {
     render() {
         return (
             <button className={
-                classNames('btn btn-outline-primary btn-sm mr-3 align-items-center px-2 btn-with-icon', {'active': this.props.active})}
+                classNames('btn btn-outline-primary btn-sm me-3 align-items-center px-2 btn-with-icon', {'active': this.props.active})}
             onClick={this.props.onClick}>
                 {this.props.value}
-                <i className={classNames('icon-small--arrow-down ml-1', {'icon--white': this.props.active})}></i>
+                <i className={classNames('icon-small--arrow-down ms-1', {'icon--white': this.props.active})}></i>
             </button>
         );
     }

@@ -21,10 +21,10 @@ function format(item, group, onlyDates) {
     function timeElement(start, end, key) {
         let value = end ? `${formatTime(start)} - ${formatTime(end)}` : formatTime(start);
         if (onlyDates) {
-            return (<span className="mr-2 border-right pr-2" key={key}>{value}</span>);
+            return (<span className="me-2 border-right pe-2" key={key}>{value}</span>);
         }
 
-        return (<span className="time-text mr-2" key={key}>{value}</span>);
+        return (<span className="time-text me-2" key={key}>{value}</span>);
     }
 
     function dateElement(date) {
@@ -63,12 +63,12 @@ function format(item, group, onlyDates) {
         case SCHEDULE_TYPE.MULTI_DAY:
             return isTBCItem ? ([
                 <span key="start">{dateElement(start)}{tbcStr}</span>,
-                <span key="dash" className='ml-2 mr-2'>{(gettext('to'))}</span>,
+                <span key="dash" className='ms-2 me-2'>{(gettext('to'))}</span>,
                 <span key="end">{dateElement(end)}{tbcStr}</span>
             ]) :
                 ([
                     <span key="start">{timeElement(start)}{dateElement(start)}</span>,
-                    <span key="dash" className='ml-2 mr-2'>{(gettext('to'))}</span>,
+                    <span key="dash" className='ms-2 me-2'>{(gettext('to'))}</span>,
                     <span key="end">{timeElement(end)}{dateElement(end)}</span>
                 ]);
 

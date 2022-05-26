@@ -9,7 +9,7 @@
         min-width: 16rem;
     
         .card-footer {
-            border-top: none;
+            border-inline-start: none;
         }
     }
 
@@ -65,7 +65,7 @@
                 }
             }
             &.card-body--green-border {
-                border-left: 4px solid #7ed321;
+                border-inline-start: 4px solid #7ed321;
             }
             .card-body__sidebar {
                 flex: 0 0 45%;
@@ -92,9 +92,9 @@
 
         .card-footer {
             .wire-articles__item__icon {
-                margin-right: 5px;
+                margin-inline-end: 5px;
                 @include xxl {
-                    margin-right: 7px;
+                    margin-inline-end: 7px;
                 }
             }
         }
@@ -121,22 +121,22 @@
             height: 0;
 
             &--aspect-16-9 {
-                padding-bottom: 56.25%; /* outer div has 16:9 aspect ratio */
+                padding-block-end: 56.25%; /* outer div has 16:9 aspect ratio */
             }
             &--aspect-4-3 {
-                padding-bottom: 75%; /* outer div has 4:3 aspect ratio */
+                padding-block-end: 75%; /* outer div has 4:3 aspect ratio */
             }
             &--aspect-3-2 {
-                padding-bottom: 66.67%; /* outer div has 3:2 aspect ratio */
+                padding-block-end: 66.67%; /* outer div has 3:2 aspect ratio */
             }
             &--aspect-1-1 {
-                padding-bottom: 100%; /* outer div has 1:1 aspect ratio */
+                padding-block-end: 100%; /* outer div has 1:1 aspect ratio */
             }
 
             .card-img-top {
                 position: absolute;
-                top: 0;
-                left: 0;
+                inset-block-start: 0;
+                inset-inline-start: 0;
                 height: 100%;
                 object-fit: contain;
             }              
@@ -184,9 +184,9 @@
 
         .card-body {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            inset-block-end: 0;
+            inset-inline-start: 0;
+            inset-inline-end: 0;
             color: white;           
             background: -moz-linear-gradient(top,  rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%); 
             background: -webkit-linear-gradient(top,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); 
@@ -237,7 +237,7 @@
             }
         }
         &.card-body--green-border {
-            border-left: 4px solid #7ed321;
+            border-inline-start: 4px solid #7ed321;
         }
         .card-body__sidebar {
             flex: 0 0 20%;

@@ -62,7 +62,7 @@ export class Embargo extends React.Component {
             <span
                 ref={(elem) => this.elem = elem}
                 className={classNames('label', {
-                    'mr-2': !this.props.isCard,
+                    'me-2': !this.props.isCard,
                     'label--red': !this.state.forceRender,
                     'label--available': this.state.forceRender,
                 })}

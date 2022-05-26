@@ -3,6 +3,7 @@
 .btn {
     position: relative;
     text-transform: uppercase;
+    text-decoration: none;
     letter-spacing: 0.04rem;
     white-space: normal;
     @include button-size($input-btn-padding-y, $input-btn-padding-x, $font-size-button, $btn-border-radius);
@@ -13,6 +14,9 @@
     &:disabled {
       opacity: .4;
       cursor: not-allowed;
+    }
+    &:hover {
+      text-decoration: none;
     }
 }
 
@@ -38,7 +42,7 @@
   align-items: center;
 
   [class^="icon--"], [class*=" icon--"] {
-    margin-right: 8px;
+    margin-inline-end: 8px;
   }
   &:hover {
     [class^="icon--"], [class*=" icon--"], [class^="icon-"] {

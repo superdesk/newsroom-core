@@ -66,7 +66,7 @@ class AuditInformation extends React.Component {
                 'wire-column__preview__top-bar pt-0 audit-information',
                 {
                     'pt-2': !noPadding,
-                    'pl-0': noPadding,
+                    'ps-0': noPadding,
                     [this.props.className]: this.props.className != null,
                 }
             )}>

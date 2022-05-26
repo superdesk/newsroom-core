@@ -65,7 +65,7 @@ class NotificationList extends React.Component {
                 {!this.state.displayItems ? null : this.props.count === 0 ? (
                     <div className="notif__list">
                         <div className='notif__list__header d-flex'>
-                            <span className='notif__list__header-headline ml-3'>{gettext('Notifications')}</span>
+                            <span className='notif__list__header-headline ms-3'>{gettext('Notifications')}</span>
                         </div>
                         <div className='notif__list__message'>
                             {gettext('No new notifications!')}
@@ -74,10 +74,10 @@ class NotificationList extends React.Component {
                 ) : (
                     <div className="notif__list">
                         <div className='notif__list__header d-flex'>
-                            <span className='notif__list__header-headline ml-3'>{gettext('Notifications')}</span>
+                            <span className='notif__list__header-headline ms-3'>{gettext('Notifications')}</span>
                             <button
                                 type="button"
-                                className="button-pill ml-auto mr-3"
+                                className="button-pill ms-auto me-3"
                                 onClick={this.props.clearAll}>{gettext('Clear All')}
                             </button>
                         </div>

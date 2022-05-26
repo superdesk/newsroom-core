@@ -175,7 +175,7 @@ class SubscriberActivity extends React.Component {
             ...filterNodes,
             (<CalendarButton
                 key='subscriver_activity_from'
-                labelClass='ml-3 mt-1'
+                labelClass='ms-3 mt-1'
                 label={gettext('FROM:')}
                 selectDate={this.onFromDateChange}
                 activeDate={get(reportParams, 'date_from') || moment()} />),

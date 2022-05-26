@@ -58,7 +58,7 @@ export default class CardEditor extends React.Component {
                             <div className="card-body">{editorCardBody}</div>
                             <div className="card-footer d-flex">
                                 <button
-                                    className="btn btn-outline-primary ml-auto"
+                                    className="btn btn-outline-primary ms-auto"
                                     onClick={this.onSave}
                                     disabled={Object.keys(errors || {}).length > 0}
                                     aria-label={gettext('Save')}
@@ -67,7 +67,7 @@ export default class CardEditor extends React.Component {
                                 </button>
                                 {!hideCancel && (
                                     <button
-                                        className='btn btn-outline-secondary ml-3'
+                                        className='btn btn-outline-secondary ms-3'
                                         onClick={this.onCancelClick}
                                         aria-label={gettext('Cancel')}
                                     >
@@ -99,7 +99,7 @@ export default class CardEditor extends React.Component {
                         <div className="card mt-3 d-block">
                             <div className="card-header d-flex justify-content-start align-items-center">
                                 <span className={titleClassNames}>{previewTitle || label}</span>
-                                <button className="icon-button ml-auto" aria-label={gettext('Edit')} onClick={this.onEditClick}>
+                                <button className="icon-button ms-auto" aria-label={gettext('Edit')} onClick={this.onEditClick}>
                                     <i className="icon--edit" />
                                 </button>
                                 {!this.props.noDelete && <button className="icon-button" aria-label={gettext('Delete')} onClick={onDelete}>

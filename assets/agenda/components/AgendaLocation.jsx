@@ -18,7 +18,7 @@ export default function AgendaLocation({item, isMobilePhone, border}) {
             {isMobilePhone ? (
                 <span>{getLocationString(item)}</span>
             ) : (
-                <span className={classNames('mr-2 align-self-stretch',
+                <span className={classNames('me-2 align-self-stretch',
                     {'wire-articles__item__icons--dashed-border': border})}>
                     {getLocationString(item)}
                 </span>
