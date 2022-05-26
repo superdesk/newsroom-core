@@ -17,7 +17,7 @@ const getPictureTextPanel = (item, picture, openItem, cardId, listConfig) => {
                     <img className="card-img-top" src={imageUrl} alt={caption} />
                 </div>
             }
-            <CardBody item={item} displaySource={false} />
+            <CardBody item={item} displaySource={false} listConfig={listConfig} />
             <CardFooter
                 item={item}
                 picture={picture}

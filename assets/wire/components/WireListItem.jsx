@@ -261,7 +261,7 @@ class WireListItem extends React.Component {
 
                         {isExtended && (
                             <div className="wire-articles__item__text">
-                                <p>{shortText(item, 40, true)}</p>
+                                <p>{shortText(item, 40, listConfig)}</p>
                             </div>
                         )}
 

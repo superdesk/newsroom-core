@@ -5,14 +5,14 @@ import {shortText} from 'wire/utils';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 
 
-function CardBody({item, displayMeta, displayDescription, displaySource}) {
+function CardBody({item, displayMeta, displayDescription, displaySource, listConfig}) {
     return (<div className="card-body">
         <h4 className="card-title">{item.headline}</h4>
 
         <Embargo item={item} isCard={true} />
 
         {displayDescription && <div className="wire-articles__item__text">
-            <p className='card-text small'>{shortText(item, 40, true)}</p>
+            <p className='card-text small'>{shortText(item, 40, listConfig)}</p>
         </div>}
 
         {displayMeta && (
@@ -33,6 +33,7 @@ CardBody.propTypes = {
     displayMeta: PropTypes.bool,
     displayDescription: PropTypes.bool,
     displaySource: PropTypes.bool,
+    listConfig: PropTypes.object,
 };
 
 CardBody.defaultProps = {
