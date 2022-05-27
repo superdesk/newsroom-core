@@ -84,12 +84,12 @@ class ArticleBodyHtml extends React.PureComponent {
 
                 loaded.push(url);
 
-                if (url.includes('platform.twitter.com/widgets.js') && window.twttr != null) {
+                if (url.includes('twitter.com/') && window.twttr != null) {
                     window.twttr.widgets.load();
                     return;
                 } 
 
-                if (url.includes('instagram.com/embed.js') && window.instgrm != null) {
+                if (url.includes('instagram.com/') && window.instgrm != null) {
                     window.instgrm.Embeds.process();
                     return;
                 }
