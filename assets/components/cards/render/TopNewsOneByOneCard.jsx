@@ -28,7 +28,7 @@ const getTopNewsPanel = (item, picture, openItem, cardId, listConfig) => {
                     listConfig={listConfig}
                 />
                 <div className='wire-articles__item__text'>
-                    <p className='card-text small'>{shortText(item, 40, true)}</p>
+                    <p className='card-text small'>{shortText(item, 40, listConfig)}</p>
                 </div>
             </div>
         </div>

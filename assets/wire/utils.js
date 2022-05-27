@@ -1,5 +1,5 @@
 import {get, isEmpty, isEqual, pickBy} from 'lodash';
-import {getTextFromHtml, getConfig} from 'utils';
+import {getTextFromHtml, getConfig, isDisplayed} from 'utils';
 
 export const DISPLAY_ABSTRACT = getConfig('display_abstract');
 
@@ -149,7 +149,8 @@ export function showItemVersions(item, next) {
  * @param {Item} item
  * @return {Node}
  */
-export function shortText(item, length=40, useBody=false) {
+export function shortText(item, length=40, config) {
+    const useBody = (config === true || config === false) ? config : isDisplayed('abstract', config) === false;
     const html = (useBody ? item.body_html : item.description_html || item.body_html) || '<p></p>';
     const text = useBody ?  getTextFromHtml(html) : item.description_text || getTextFromHtml(html);
     const words = text.split(/\s/).filter((w) => w);

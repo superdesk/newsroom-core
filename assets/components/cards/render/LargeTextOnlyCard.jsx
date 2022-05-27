@@ -9,7 +9,7 @@ import {getPicture} from 'wire/utils';
 const getTextOnlyPanel = (item, openItem, cardId, listConfig) => (
     <div key={item._id} className='col-sm-6 col-lg-4 d-flex mb-4'>
         <div className='card card--home' onClick={() => openItem(item, cardId)}>
-            <CardBody item={item} displaySource={false} />
+            <CardBody item={item} displaySource={false} listConfig={listConfig} />
             <CardFooter
                 wordCount={wordCount(item)}
                 charCount={characterCount(item)}
