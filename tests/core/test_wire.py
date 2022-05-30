@@ -35,6 +35,8 @@ def test_share_items(client, app):
         'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'last_name': 'Bar',
+        'receive_email': True,
+        'receive_app_notifications': True,
     }])
 
     with app.mail.record_messages() as outbox:

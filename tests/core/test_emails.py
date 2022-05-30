@@ -68,16 +68,22 @@ MOCK_USERS = [{
     'email': EMAILS[0],
     'first_name': 'Default',
     'last_name': 'Test',
+    'receive_email': True,
+    'receive_app_notifications': True,
 }, {
     'email': EMAILS[1],
     'first_name': 'CA',
     'last_name': 'French',
     'locale': 'fr_CA',
+    'receive_email': True,
+    'receive_app_notifications': True,
 }, {
     'email': EMAILS[2],
     'first_name': 'Finnish',
     'last_name': 'Test',
     'locale': 'fi',
+    'receive_email': True,
+    'receive_app_notifications': True,
 }]
 
 

@@ -198,6 +198,7 @@ def user(app):
         'is_enabled': True,
         'is_approved': True,
         'receive_email': True,
+        'receive_app_notifications': True,
     }])
 
 
@@ -235,7 +236,9 @@ def setup_user_company(app):
         'company': COMPANY_1_ID,
         'is_enabled': True,
         'is_approved': True,
-        '_created': utcnow()
+        '_created': utcnow(),
+        'receive_email': True,
+        'receive_app_notifications': True,
     }, {
         '_id': TEST_USER_ID,
         'email': 'test@bar.com',
@@ -244,7 +247,9 @@ def setup_user_company(app):
         'company': COMPANY_1_ID,
         'is_enabled': True,
         'is_approved': True,
-        '_created': utcnow()
+        '_created': utcnow(),
+        'receive_email': True,
+        'receive_app_notifications': True,
     }])
 
 
