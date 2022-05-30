@@ -156,6 +156,7 @@ def test_share_items(client, app, mocker):
         'email': 'foo2@bar.com',
         'first_name': 'Foo',
         'last_name': 'Bar',
+        'receive_email': True
     }])
 
     with app.mail.record_messages() as outbox:

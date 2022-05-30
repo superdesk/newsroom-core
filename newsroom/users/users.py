@@ -81,6 +81,10 @@ class UsersResource(newsroom.Resource):
             'type': 'boolean',
             'default': True
         },
+        'receive_app_notifications': {
+            'type': 'boolean',
+            'default': True
+        },
         'locale': {
             'type': 'string',
         },

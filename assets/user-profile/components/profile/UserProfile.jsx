@@ -114,10 +114,20 @@ class UserProfile extends React.Component {
 
                             <div className="col-lg-12">
                                 <CheckboxInput
+                                    name='receive_app_notifications'
+                                    label={gettext('Receive inApp notifications')}
+                                    value={!!user.receive_app_notifications}
+                                    onChange={onChange}
+                                />
+                            </div>
+
+                            <div className="col-lg-12">
+                                <CheckboxInput
                                     name='receive_email'
-                                    label={gettext('Receive notifications')}
+                                    label={gettext('Receive email notifications')}
                                     value={!!user.receive_email}
-                                    onChange={onChange} />
+                                    onChange={onChange}
+                                />
                             </div>
                             {!!localeOptions.length &&
                                 <div className="col-lg-6">

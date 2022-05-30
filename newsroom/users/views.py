@@ -92,6 +92,7 @@ def create():
         # Flask form won't accept default value if any form data was passed in the request.
         # So, we need to set this explicitly here.
         new_user['receive_email'] = True
+        new_user['receive_app_notifications'] = True
 
         get_resource_service('users').post([new_user])
         send_token(new_user, token_type='new_account')

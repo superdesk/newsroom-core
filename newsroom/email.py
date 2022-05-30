@@ -95,7 +95,13 @@ def map_email_recipients_by_language(emails: List[str], template_name: str) -> D
     default_txt_template = get_language_template_name(template_name, default_language, "txt")
 
     for email in emails:
-        email_language = ((users.get(email) or {}).get("locale") or default_language).lower().replace("-", "_")
+        user = users.get(email)
+        if user and not user.get("receive_email"):
+            # If this is a user in the system, and has emails disabled
+            # then skip this recipient
+            continue
+
+        email_language = ((user or {}).get("locale") or default_language).lower().replace("-", "_")
         html_template_name = get_language_template_name(template_name, email_language, "html")
         text_template = get_language_template_name(template_name, email_language, "txt")
 

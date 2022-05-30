@@ -315,6 +315,7 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': True,
+        'receive_app_notifications': True,
         'company': company_ids[0],
     }
 
@@ -360,6 +361,7 @@ def test_notify_user_matches_for_killed_item_in_history(client, app, mocker):
         'first_name': 'Foo',
         'is_enabled': True,
         'receive_email': False,  # should still get email
+        'receive_app_notifications': True,
         'company': company_ids[0],
     }
 
@@ -405,6 +407,7 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
         'is_enabled': True,
         'is_approved': True,
         'receive_email': True,
+        'receive_app_notifications': True,
         'company': COMPANY_1_ID,
     }
 
