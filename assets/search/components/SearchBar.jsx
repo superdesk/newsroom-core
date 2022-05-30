@@ -50,14 +50,14 @@ class SearchBar extends React.Component {
 
     render() {
         return (
-            <div className="search form-inline">
+            <div className="search d-flex align-items-center">
                 <span className="search__icon">
                     <i className="icon--search icon--gray" />
                 </span>
                 <div className={classNames('search__form input-group', {
                     'searchForm--active': !!this.state.query,
                 })}>
-                    <form className='form-inline' role="search" aria-label={gettext('search')} onSubmit={this.onSubmit}>
+                    <form className='d-flex align-items-center' role="search" aria-label={gettext('search')} onSubmit={this.onSubmit}>
                         <input
                             type='text'
                             name='q'

@@ -58,7 +58,7 @@ export class ListSearchOptions extends React.PureComponent {
                                 />
                                 <label
                                     htmlFor="all-versions"
-                                    className="mb-0 ml-2"
+                                    className="mb-0 ms-2"
                                 >
                                     {gettext('All Versions')}
                                 </label>
@@ -76,7 +76,7 @@ export class ListSearchOptions extends React.PureComponent {
                                 />
                                 <label
                                     htmlFor="news-only"
-                                    className="mb-0 ml-2"
+                                    className="mb-0 ms-2"
                                 >
                                     {gettext('News Only')}
                                 </label>

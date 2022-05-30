@@ -78,7 +78,7 @@ class ComapnyNewsApiUsage extends React.Component {
         const filterNodes = [
             (<CalendarButton
                 key='news_api_from'
-                labelClass='ml-3 mt-1'
+                labelClass='ms-3 mt-1'
                 label={gettext('FROM:')}
                 selectDate={this.onFromDateChange}
                 activeDate={get(reportParams, 'date_from') || moment()} />),

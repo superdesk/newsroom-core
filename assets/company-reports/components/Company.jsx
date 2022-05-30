@@ -23,8 +23,8 @@ function getProductDetails(products = []) {
         <div className="m-2">
             <div><span className="font-italic">{gettext('Products')}: </span></div>
             {Object.keys(productsByGroup).map((productType) =>
-                <div className='pl-3' key={productType}>{getProductSectionName(productType)}
-                    <div className='pl-3'>{productsByGroup[productType].map((p) => <div key={p._id}>{p.name}</div>)}</div>
+                <div className='ps-3' key={productType}>{getProductSectionName(productType)}
+                    <div className='ps-3'>{productsByGroup[productType].map((p) => <div key={p._id}>{p.name}</div>)}</div>
                 </div>
             )}
         </div>);
@@ -35,7 +35,7 @@ function getContactDetails(company) {
     return (
         <div className="d-flex align-items-center m-2">
             <div><span className="font-italic">{gettext('Contact')}: </span>{contactInfo}</div>
-            <div className="ml-3"><span className="font-italic">{gettext('Tel')}: </span>{company.phone || '-'}</div>
+            <div className="ms-3"><span className="font-italic">{gettext('Tel')}: </span>{company.phone || '-'}</div>
         </div>);
 }
 
@@ -54,7 +54,7 @@ function Company({results, print}) {
     const list = results && results.map((item) =>
         [<tr key={item._id} className="table-secondary" tabIndex='0'>
             <td>{item.name}</td>
-            <td className='font-weight-bold'>{item.is_enabled ? gettext('Active') : gettext('Disabled')}</td>
+            <td className='fw-bold'>{item.is_enabled ? gettext('Active') : gettext('Disabled')}</td>
             <td>{formatDate(get(item, 'company._created'))}</td>
             <td>{get(item, 'company.expiry_date') ? formatDate(item.company.expiry_date) : gettext('Unspecified')}</td>
         </tr>,

@@ -111,8 +111,8 @@ class UserProfileApp extends React.Component {
                     </nav>
                     <div className="content">
                         <section className="content-header">
-                            <nav className="profile-nav content-bar navbar content-bar--side-padding pr-0 d-none d-md-flex">
-                                <h5 className="pl-xl-4 mb-0">
+                            <nav className="profile-nav content-bar navbar content-bar--side-padding pe-0 d-none d-md-flex">
+                                <h5 className="ps-xl-4 mb-0">
                                     {links.find((link) => link.active).label}
                                 </h5>
                                 <div className="content-bar__right">

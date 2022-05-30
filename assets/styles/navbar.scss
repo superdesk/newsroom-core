@@ -35,8 +35,8 @@
         }
 
         .badge {
-            top: -7px;
-            right: -7px;
+            inset-block-start: -7px;
+            inset-inline-end: -7px;
         }
         &:hover .notif__circle {
             background: #4a4a4a;
@@ -59,8 +59,8 @@
     }
     .notif__list {
         position: absolute;
-        top: 44px;
-        right: 0px;
+        inset-block-start: 44px;
+        inset-block-end: 0px;
         background: $background-color;
         box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
         min-width: 300px;
@@ -73,7 +73,7 @@
     }
     .notif__list__header {
         background: #fff;
-        border-bottom: 1px solid #e7e7e7;
+        border-inline-end: 1px solid #e7e7e7;
         padding: 1rem 0;
     }
     .notif__list__header-headline {
@@ -103,7 +103,7 @@
             font-size: 1.1rem;
             font-weight: 400;
             text-shadow: none;
-            padding-left: 1px;
+            padding-inline-start: 1px;
 
             &:focus {
                 outline: 0;
@@ -115,17 +115,17 @@
         color: $body-text;
         font-weight: 700;
         line-height: 1.4;
-        margin-bottom: 6px;
+        margin-block-end: 6px;
     }
     .notif__list__info {
         font-size: 0.75rem;
         color: $gray-mid;
-        margin-bottom: 6px;
+        margin-block-end: 6px;
     }
 }
 
 .navbar-header {
-    top: 0px;
+    inset-block-start: 0px;
     z-index: 1007;
     width: 100vw;
     background-color: #2d2d2d;
@@ -157,7 +157,7 @@
         display: flex;
         height: 30px;
         justify-content: center;
-        padding-top: 5px;
+        padding-block-start: 5px;
 
         a {
             color: #969696;
@@ -171,7 +171,7 @@
     &_tagline {
         width: 50%;
         text-align: center;
-        left: 25%;
+        inset-inline-start: 25%;
         position: absolute;
     }
 }
@@ -196,7 +196,7 @@
     }
 
     @include md {
-        padding-bottom: 0;
+        padding-block-end: 0;
     }
 
     img {
@@ -219,8 +219,8 @@
     }
 }
 .navbar-brand {
-    margin-top: 3.5px;
-    margin-left: 2rem;
+    margin-block-start: 3.5px;
+    margin-inline-start: 2rem;
     opacity: 1;
     line-height: 1.2rem;
     font-size: 1.125rem;
@@ -230,7 +230,7 @@
         font-size: 1.75rem;
     }
     @include md {
-        margin-top: 0;
+        margin-block-start: 0;
     }
     nav {
         display: flex;
@@ -271,7 +271,7 @@
     }
 
     @include sm {
-        margin-left: 4px;
+        margin-inline-start: 4px;
     }
 }
 

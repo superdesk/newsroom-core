@@ -29,8 +29,8 @@
 // Footer (for actions)
 .modal-footer {
   // Easily place margin between footer elements
-  > :not(:first-child) { margin-left: 10px; }
-  > :not(:last-child) { margin-right: 10px; }
+  > :not(:first-child) { margin-inline-start: 10px; }
+  > :not(:last-child) { margin-inline-end: 10px; }
 
   @include phone {
     padding: 0.5rem 1rem;
@@ -51,6 +51,6 @@
   }
   .modal-content {
     height: 100%;
-    padding-bottom: 2rem;
+    padding-block-end: 2rem;
   }
 }

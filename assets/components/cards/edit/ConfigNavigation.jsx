@@ -92,7 +92,7 @@ class ConfigNavigation extends React.Component {
                         options={this.getNavigations()}
                         onChange={this.onSelect}
                         error={this.props.errors ? this.props.errors.navigations : null} />
-                    <div className="form-group align-self-sm-end ml-3">
+                    <div className="form-group align-self-sm-end ms-3">
                         <button
                             type="button"
                             onClick={() => this.onAdd(this.state.selected)}

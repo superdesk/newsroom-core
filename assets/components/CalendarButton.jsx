@@ -52,7 +52,7 @@ class CalendarButton extends React.Component {
             return datePicker;
         } else {
             return (<div className={this.props.labelClass}>
-                <label className='pr-1'>{this.props.label}</label>
+                <label className='pe-1'>{this.props.label}</label>
                 {datePicker}
             </div>);
 

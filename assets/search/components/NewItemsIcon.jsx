@@ -48,12 +48,12 @@ class NewItemsIcon extends React.Component {
                 type="button"
                 ref={(elem) => this.dom.tooltip = elem}
                 title={newItemsTooltip}
-                className="button__reset-styles d-flex align-items-center ml-3"
+                className="button__reset-styles d-flex align-items-center ms-3"
                 onClick={this.props.refresh}
                 aria-label={gettext('Refresh')}
             >
                 <i className="icon--refresh icon--pink"/>
-                <span className="badge badge-pill badge-info badge-secondary ml-2">
+                <span className="badge badge-pill badge-info badge-secondary ms-2">
                     {newItemsLength}
                 </span>
             </button>

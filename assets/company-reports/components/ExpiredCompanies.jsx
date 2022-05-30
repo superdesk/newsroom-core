@@ -9,7 +9,7 @@ function ExpiredCompanies({results, print}) {
     const list = results && results.map((item) =>
         <tr key={item._id}>
             <td>{get(item, 'name')}</td>
-            <td className='font-weight-bold'>{item.is_enabled ? gettext('Active') : gettext('Disabled')}</td>
+            <td className='fw-bold'>{item.is_enabled ? gettext('Active') : gettext('Disabled')}</td>
             <td>{formatDate(get(item, '_created'))}</td>
             <td>{get(item, 'expiry_date') ? formatDate(item.expiry_date) : gettext('Unspecified')}</td>
         </tr>

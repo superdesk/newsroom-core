@@ -8,9 +8,9 @@ import {gettext} from 'utils';
 function getProductDetails(products) {
     return (products.map((product) => (<div key={product._id} className="d-flex align-items-center m-2">
         <div><span className="font-italic">{gettext('Product name')}:</span> {product.name}</div>
-        <div className="ml-3"><span className="font-italic">{gettext('Is enabled')}:</span>{product.is_enabled.toString()}</div>
-        {product.query && <div className="ml-3"><span className="font-italic">{gettext('Query')}:</span>{product.query}</div>}
-        {product.sd_product_id && <div className="ml-3"><span className="font-italic">{gettext('sd_product_id')}:</span>{product.sd_product_id}</div>}
+        <div className="ms-3"><span className="font-italic">{gettext('Is enabled')}:</span>{product.is_enabled.toString()}</div>
+        {product.query && <div className="ms-3"><span className="font-italic">{gettext('Query')}:</span>{product.query}</div>}
+        {product.sd_product_id && <div className="ms-3"><span className="font-italic">{gettext('sd_product_id')}:</span>{product.sd_product_id}</div>}
     </div>)));
 }
 

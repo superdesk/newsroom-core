@@ -81,7 +81,7 @@ class MonitoringApp extends React.Component {
                     onNewItem={this.isScheduleMode() ? null : this.props.newMonitoringProfile}
                     buttonName={gettext('Monitoring Profile')}
                     noSearch>
-                    <div className="btn-group btn-group--navbar ml-0 mr-3">
+                    <div className="btn-group btn-group--navbar ms-0 me-3">
                         {this.sections.map((section) => (
                             <button key={section.name}
                                 className={'btn btn-outline-primary' + (section.name === this.state.activeSection ? ' active' :
@@ -91,13 +91,13 @@ class MonitoringApp extends React.Component {
                         ))}
                     </div>
                 </ListBar>
-                <div className='align-items-center d-flex flex-sm-nowrap flex-wrap m-0 px-3 wire-column__main-header-agenda pl-3'>
+                <div className='align-items-center d-flex flex-sm-nowrap flex-wrap m-0 px-3 wire-column__main-header-agenda ps-3'>
                     <DropdownFilter
                         filter={this.state.filter}
                         getDropdownItems={this.getDropdownItems}
                         activeFilter={activeQuery}
                         toggleFilter={this.onChange}
-                        className='pl-3'
+                        className='ps-3'
                     />
                 </div>
                 <MonitoringPanel />

@@ -11,12 +11,12 @@ export class SearchBar extends React.PureComponent {
         return (
             <section className="content-header">
                 <nav className="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
-                    <div className="search form-inline">
+                    <div className="search d-flex align-items-center">
                         <span className="search__icon d-none d-sm-block">
                             <i className="icon--search icon--gray" />
                         </span>
                         <div className="search__form input-group searchForm--active">
-                            <form className="form-inline" action="/wire" role="search" aria-label={gettext('search')}>
+                            <form className="d-flex align-items-center" action="/wire" role="search" aria-label={gettext('search')}>
                                 <input type="text" name="q" className="search__input form-control"
                                     placeholder={gettext('Search for...')}
                                     aria-label={gettext('Search for...')}

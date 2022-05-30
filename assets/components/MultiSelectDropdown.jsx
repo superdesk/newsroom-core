@@ -29,7 +29,7 @@ function MultiSelectDropdown({values, label, field, options, onChange, showAllBu
                 id={field}
                 type='button'
                 className={classNames(
-                    'btn btn-outline-primary btn-sm d-flex align-items-center px-2 ml-2',
+                    'btn btn-outline-primary btn-sm d-flex align-items-center px-2 ms-2',
                     {'active': isActive}
                 )}
                 aria-haspopup='true'
@@ -47,7 +47,7 @@ function MultiSelectDropdown({values, label, field, options, onChange, showAllBu
                 {(!multi && values) && (
                     <span className='d-block'>{values}</span>
                 )}
-                <i className={classNames('icon-small--arrow-down ml-1', {'icon--white': isActive})}  />
+                <i className={classNames('icon-small--arrow-down ms-1', {'icon--white': isActive})}  />
             </button>
             <div className='dropdown-menu' aria-labelledby={field}>
                 {showAllButton && (
@@ -57,7 +57,7 @@ function MultiSelectDropdown({values, label, field, options, onChange, showAllBu
                             onClick={onChanged.bind(null, 'all')}
                         >
                             <i className={classNames(
-                                'mr-2',
+                                'me-2',
                                 {
                                     'icon--': isActive,
                                     'icon--check': !isActive,
@@ -76,7 +76,7 @@ function MultiSelectDropdown({values, label, field, options, onChange, showAllBu
                             onClick={onChanged.bind(null, option.value)}
                         >
                             <i className={classNames(
-                                'mr-2',
+                                'me-2',
                                 {
                                     'icon--': (multi && !values.includes(option.value)) ||
                                         (!multi && values !== option.value),
