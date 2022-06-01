@@ -44,7 +44,8 @@ const config = {
                 test: /\.jsx?$/,
                 include: [
                     path.resolve(__dirname, 'assets'),
-                    path.resolve(__dirname, 'node_modules/bootstrap')
+                    path.resolve(__dirname, 'node_modules/bootstrap'),
+                    path.resolve(process.cwd(), 'node_modules/bootstrap'),
                 ],
                 loader: 'babel-loader',
                 options: {
