@@ -19,7 +19,7 @@ class EditNavigation extends React.Component {
         this.state = {activeTab: 'navigation-details'};
 
         this.tabs = [
-            {label: gettext('Navigation'), name: 'navigation-details'},
+            {label: gettext('Global Topic'), name: 'navigation-details'},
             {label: gettext('Products'), name: 'products'}
         ];
 
