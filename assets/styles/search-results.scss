@@ -3,10 +3,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-
-    @include md {
-        margin-left: 1rem;
-    }
+    margin-inline-start: 0;
 }
 
 .search-results__toggle {
@@ -17,6 +14,8 @@
 }
 
 .search-results__toggle-button {
+    position: absolute;
+    inset-block-start: 11px;
     cursor: pointer;
     width: 37px;
     height: 25px;
@@ -29,6 +28,9 @@
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
     transition: all ease-in 0.12s;
     outline: none;
+    @include md {
+        inset-block-start: 6px;
+    }
 }
 
 .search-results__toggle-button:hover {

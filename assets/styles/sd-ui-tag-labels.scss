@@ -78,7 +78,7 @@ $tag-text-palette: $tag-text-colors !default;
         border-radius: 9999px;
         border: 0;
         background-color: var(--badge-remove-bg);
-        opacity: 0.35;
+        opacity: 0.65;
         color: var(--badge-txt-default);
         cursor: pointer;
         transition: background-color .2s ease-out, color .1s ease-out, opacity .1s ease-out;
@@ -90,14 +90,14 @@ $tag-text-palette: $tag-text-colors !default;
             flex-grow: 0;
             flex-shrink: 0;
             margin-left: 1px;
-            opacity: 0.4;
+            opacity: 0.8;
             transition: color .1s ease-out, opacity .1s ease-out;
         }
         &:hover {
             text-decoration: none;
             opacity: 0.85;
             [class^="icon-"], [class*=" icon-"] {
-                opacity: 0.85;
+                opacity: 1;
             }
         }
         &:active {
@@ -117,7 +117,10 @@ $tag-text-palette: $tag-text-colors !default;
         justify-content: center;
         gap: 4px;
     }
+    .tag-label--text {
+        font-weight: 700;
+    }
     .tag-label--text-label {
-        opacity: 0.7;
+        opacity: 0.9;
     }
 }

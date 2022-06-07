@@ -1193,30 +1193,27 @@ article.list {
 
 .wire-column__main-header {
     flex-shrink: 0;
-    min-height: 40px;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    min-height: 50px;
+    padding-block-start: 4px;
+    padding-block-end: 4px;
     transition: all .2s ease;
     z-index: 9;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 
     @include lg {
-        padding-top: 7px;
-        padding-bottom: 14px;
+        padding-block-start: 7px;
+        padding-block-end: 14px;
+        margin-block-end: 5px;
     }
 
     &--small {
         background: white;
         box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
 
-        @include lg {
-            min-height: 50px;
-            max-height: 50px;
-        }
-
-        padding-top: 0;
-
         @include md {
-            padding-bottom: 0;
+            padding-block-end: 6px;
         }
 
         .btn-sm {
@@ -1229,7 +1226,7 @@ article.list {
             @include sm {
                 font-size: 1.625rem;
                 transition: all .2s ease;
-                margin-top: 0;
+                margin-block-start: 0;
             }
         }
         .search-results-info {
@@ -1239,31 +1236,34 @@ article.list {
                 transition: all .2s ease;
             }
         }
+        .search-results__tags {
+            margin-inline-start: 0.5rem;
+            @include md {
+                margin-inline-start: 1rem;
+            }
+        }
     }
 
     &--expanded {
         @include lg {
-            min-height: 150px;
-            max-height: unset;
-
-            .search-results__tags {
-                margin-left: 2.5rem;
-                margin-bottom: 1rem;
-            }
+            min-height: 50px;           
+            padding-block-end: 14px;
         }
 
         .search-results__tags {
-            margin-left: 0.5rem;
+            margin-inline-start: 0;
         }
 
-        .search-results-info {
-            margin-top: 0.5rem;
-            margin-left: 0.5rem;
+        .search-results__toggle-button {
+            inset-block-start: 4px;
+            @include md {
+                inset-block-start: 14px;
+            }
         }
     }
 
     + .wire-articles--list {
-        padding-top: 4px;
+        padding-block-start: 4px;
     }
 }
 
