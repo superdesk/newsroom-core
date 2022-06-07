@@ -44,6 +44,7 @@ from superdesk.default_settings import ( # noqa
     CELERY_WORKER_LOG_FORMAT,
     CELERY_WORKER_TASK_LOG_FORMAT,
     CELERY_WORKER_CONCURRENCY,
+    CELERY_WORKER_PREFETCH_MULTIPLIER,
     CELERY_BEAT_SCHEDULE_FILENAME,
     LOG_CONFIG_FILE,
     SENTRY_DSN,
@@ -323,6 +324,8 @@ IFRAMELY = True
 COMPANY_TYPES = []
 
 #: celery config
+CELERY_WORKER_TASK_TIME_LIMIT = 600
+
 WEBSOCKET_EXCHANGE = celery_queue('newsroom_notification')
 
 CELERY_TASK_DEFAULT_QUEUE = celery_queue('newsroom')
@@ -336,6 +339,7 @@ CELERY_TASK_ROUTES = {
         'routing_key': 'newsroom.task',
     }
 }
+
 
 #: celery beat config
 CELERY_BEAT_SCHEDULE = {
