@@ -114,8 +114,8 @@ class ContentSearchResultsComponent extends React.Component {
                     'wire-column__main-header--small': this.props.minimizeSearchResults,
                 }
             )}>
-                <div className="d-flex flex-column flex-md-row h-100">
-                    <div className="d-flex flex-column h-100 w-100">
+                <div className="d-flex flex-column flex-md-row">
+                    <div className="d-flex flex-column justify-content-center w-100">
                         <div className="navbar-text search-results-info">
                             {!this.props.showTotalItems ? null : (
                                 <span className="search-results-info__num">
@@ -137,7 +137,7 @@ class ContentSearchResultsComponent extends React.Component {
                             {!this.props.showSaveTopic && !this.props.children ? null : (
                                 <div className="d-flex ml-auto align-items-center">
                                     {this.props.showSaveTopic && (
-                                        <div className="d-none d-md-flex h-100 align-items-center flex-shrink-0 ml-auto">
+                                        <div className="d-none d-md-flex align-items-center flex-shrink-0 ml-auto">
                                             <button
                                                 className="btn btn-outline-primary btn-sm d-none d-sm-block mb-1 mt-1"
                                                 onClick={this.props.saveMyTopic}
@@ -145,7 +145,7 @@ class ContentSearchResultsComponent extends React.Component {
                                         </div>
                                     )}
                                     {(this.props.showSaveTopic || this.props.children) && (
-                                        <div className="d-flex ml-auto align-items-end align-items-md-center h-100 flex-column flex-md-row flex-shrink-0">
+                                        <div className="d-flex ml-auto align-items-end align-items-md-center flex-column flex-md-row flex-shrink-0">
                                             <button
                                                 className="btn btn-outline-primary btn-sm d-block d-sm-none mb-1 mt-1"
                                                 onClick={this.props.saveMyTopic}
