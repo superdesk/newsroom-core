@@ -64,6 +64,7 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels}) => {
             {renderParam(get(filterGroupLabels, 'subject', gettext('Subject')), filters.subject)}
             {renderParam(get(filterGroupLabels, 'genre', gettext('Content Type')), filters.genre)}
             {renderParam(get(filterGroupLabels, 'urgency', gettext('Urgency')), filters.urgency)}
+            {renderParam(get(filterGroupLabels, 'source', gettext('Source')), filters.source)}
             {renderPlace()}
             {renderParam(gettext('Calendar'), filters.calendar)}
             {renderParam(gettext('Coverage Type'), filters.coverage)}
