@@ -3,10 +3,9 @@ from typing import List, Optional, Dict, Any
 from typing_extensions import TypedDict
 
 from superdesk import get_resource_service
-from superdesk.emails import SuperdeskMessage  # it handles some encoding issues
 from flask import current_app, render_template, url_for
 from flask_babel import gettext
-from flask_mail import Attachment
+from flask_mail import Attachment, Message
 from jinja2 import TemplateNotFound
 
 from newsroom.celery_app import celery
@@ -41,7 +40,7 @@ def _send_email(self, to, subject, text_body, html_body=None, sender=None, attac
             logger.error('Error attaching {} file to mail. Receipient(s): {}. Error: {}'.format(
                 a['file_desc'], to, e))
 
-    msg = SuperdeskMessage(subject=subject, sender=sender, recipients=to, attachments=decoded_attachments)
+    msg = Message(subject=subject, sender=sender, recipients=to, attachments=decoded_attachments)
     msg.body = text_body
     msg.html = html_body
     app = current_app._get_current_object()
