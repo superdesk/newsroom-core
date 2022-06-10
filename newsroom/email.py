@@ -1,4 +1,6 @@
 import base64
+import email.policy as email_policy
+
 from typing import List, Optional, Dict, Any
 from typing_extensions import TypedDict
 
@@ -14,6 +16,13 @@ from newsroom.utils import get_agenda_dates, get_location_string, get_links, \
 from newsroom.template_filters import is_admin_or_internal
 from newsroom.utils import url_for_agenda, query_resource
 from superdesk.logging import logger
+
+
+class NewsroomMessage(Message):
+    def _message(self):
+        msg = super()._message()
+        msg.policy = email_policy.SMTPUTF8
+        return msg
 
 
 class EmailGroup(TypedDict):
