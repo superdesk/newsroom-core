@@ -120,11 +120,11 @@ class AppContextTask(TaskBase):  # type: ignore
             try:
                 return super().__call__(*args, **kwargs)
             except Exception as e:
-                logger.warning('Error when calling task %s', self.task.name)
+                logger.warning('Error when calling task %s', self.name)
                 handle_exception(e)
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
-        logger.warning('Failure detected for task %s', self.task.name)
+        logger.warning('Failure detected for task %s', self.name)
         handle_exception(exc)
 
 
