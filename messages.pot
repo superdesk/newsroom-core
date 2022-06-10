@@ -2644,6 +2644,10 @@ msgstr ""
 msgid "Please provide navigation name"
 msgstr ""
 
+#: assets/navigations/components/Navigations.jsx:41
+msgid "Please provide navigation name"
+msgstr ""
+
 #: assets/navigations/components/Navigations.jsx:62
 msgid "Would you like to delete navigation: {{name}}"
 msgstr ""
