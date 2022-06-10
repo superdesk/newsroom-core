@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-05-24 10:16+0200\n"
+"POT-Creation-Date: 2022-06-10 10:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,11 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
 
-#: newsroom/email.py:340
+#: newsroom/email.py:354
 msgid "Kill/Takedown notice"
 msgstr ""
 
-#: newsroom/email.py:349
+#: newsroom/email.py:363
 msgid "Agenda cancelled notice"
 msgstr ""
 
@@ -342,8 +342,8 @@ msgstr ""
 msgid "Email not found"
 msgstr ""
 
-#: newsroom/auth/oauth.py:65 newsroom/users/views.py:116
-#: newsroom/users/views.py:166
+#: newsroom/auth/oauth.py:65 newsroom/users/views.py:117
+#: newsroom/users/views.py:167
 msgid "User not found"
 msgstr ""
 
@@ -572,10 +572,9 @@ msgstr ""
 msgid "monitoring Profile not found"
 msgstr ""
 
-#: assets/navigations/components/EditNavigation.jsx:22
 #: assets/products/components/EditProduct.jsx:28
 #: newsroom/navigations/__init__.py:14
-msgid "Navigation"
+msgid "Global Topics"
 msgstr ""
 
 #: newsroom/news_api/__init__.py:13
@@ -869,7 +868,7 @@ msgstr ""
 msgid "click here to register."
 msgstr ""
 
-#: assets/user-profile/components/profile/UserProfile.jsx:126
+#: assets/user-profile/components/profile/UserProfile.jsx:136
 #: assets/users/components/EditUser.jsx:95 newsroom/templates/login.html:29
 msgid "Language"
 msgstr ""
@@ -940,7 +939,7 @@ msgstr ""
 #: assets/search/components/MonitoringEditor.jsx:203
 #: assets/search/components/TopicEditor.jsx:313
 #: assets/search/components/TopicEditor.jsx:316
-#: assets/user-profile/components/profile/UserProfile.jsx:142
+#: assets/user-profile/components/profile/UserProfile.jsx:152
 #: assets/wire/components/SelectedItemsBar.jsx:43
 #: newsroom/templates/reset_password.html:38
 msgid "Cancel"
@@ -1129,32 +1128,35 @@ msgstr ""
 msgid "Company Expiry Alert"
 msgstr ""
 
-#: assets/user-profile/components/profile/UserProfile.jsx:118
 #: newsroom/users/forms.py:33
-msgid "Receive notifications"
+msgid "Receive Email Notifications"
 msgstr ""
 
 #: newsroom/users/forms.py:34
+msgid "Receive App Notifications"
+msgstr ""
+
+#: newsroom/users/forms.py:35
 msgid "Locale"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:124 newsroom/users/forms.py:35
+#: assets/users/components/EditUser.jsx:124 newsroom/users/forms.py:36
 msgid "Manage Company Topics"
 msgstr ""
 
-#: newsroom/users/users.py:157
+#: newsroom/users/users.py:161
 msgid "Can not delete current user"
 msgstr ""
 
-#: newsroom/users/views.py:83 newsroom/users/views.py:122
+#: newsroom/users/views.py:83 newsroom/users/views.py:123
 msgid "Email address is already in use"
 msgstr ""
 
-#: newsroom/users/views.py:90 newsroom/users/views.py:124
+#: newsroom/users/views.py:90 newsroom/users/views.py:125
 msgid "Company is required for non administrators"
 msgstr ""
 
-#: newsroom/users/views.py:161
+#: newsroom/users/views.py:162
 msgid "User id not provided"
 msgstr ""
 
@@ -2636,12 +2638,12 @@ msgstr ""
 msgid "Navigation deleted successfully"
 msgstr ""
 
-#: assets/navigations/components/EditNavigation.jsx:43
-msgid "Edit Navigation"
+#: assets/navigations/components/EditNavigation.jsx:22
+msgid "Global Topic"
 msgstr ""
 
-#: assets/navigations/components/Navigations.jsx:41
-msgid "Please provide navigation name"
+#: assets/navigations/components/EditNavigation.jsx:43
+msgid "Edit Navigation"
 msgstr ""
 
 #: assets/navigations/components/Navigations.jsx:41
@@ -2653,7 +2655,7 @@ msgid "Would you like to delete navigation: {{name}}"
 msgstr ""
 
 #: assets/navigations/components/NavigationsApp.jsx:29
-msgid "New Navigation"
+msgid "New Global Topic"
 msgstr ""
 
 #: assets/news-api/actions.js:17
@@ -3222,7 +3224,15 @@ msgstr ""
 msgid "Phone"
 msgstr ""
 
-#: assets/user-profile/components/profile/UserProfile.jsx:148
+#: assets/user-profile/components/profile/UserProfile.jsx:118
+msgid "Receive inApp notifications"
+msgstr ""
+
+#: assets/user-profile/components/profile/UserProfile.jsx:127
+msgid "Receive email notifications"
+msgstr ""
+
+#: assets/user-profile/components/profile/UserProfile.jsx:158
 msgid "Save Changes"
 msgstr ""
 
