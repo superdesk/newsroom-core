@@ -49,7 +49,7 @@ def _send_email(self, to, subject, text_body, html_body=None, sender=None, attac
             logger.error('Error attaching {} file to mail. Receipient(s): {}. Error: {}'.format(
                 a['file_desc'], to, e))
 
-    msg = Message(subject=subject, sender=sender, recipients=to, attachments=decoded_attachments)
+    msg = NewsroomMessage(subject=subject, sender=sender, recipients=to, attachments=decoded_attachments)
     msg.body = text_body
     msg.html = html_body
     app = current_app._get_current_object()
