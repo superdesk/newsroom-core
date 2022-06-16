@@ -3,11 +3,12 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get, keyBy} from 'lodash';
 
-import {gettext, getCreatedSearchParamLabel} from 'utils';
+import {gettext, getCreatedSearchParamLabel, getConfig} from 'utils';
 import {filterGroupsToLabelMap} from 'search/selectors';
 
 const TopicParameters = ({topic, navigations, locators, filterGroupLabels}) => {
     const filters = get(topic, 'filter') || {};
+    const wireAggskeys = Object.keys(getConfig('wire_aggs'));
     const navsById = keyBy(navigations, '_id');
     const navs = (get(topic, 'navigation') || [])
         .map((navId) => get(navsById, `[${navId}].name`));
@@ -60,11 +61,12 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels}) => {
             {renderParam(gettext('Search'), get(topic, 'query') ? [topic.query] : [])}
             {renderParam(gettext('Date Created'), dateLabels)}
             {renderParam(gettext('Topics'), navs)}
-            {renderParam(get(filterGroupLabels, 'service', gettext('Category')), filters.service)}
-            {renderParam(get(filterGroupLabels, 'subject', gettext('Subject')), filters.subject)}
-            {renderParam(get(filterGroupLabels, 'genre', gettext('Content Type')), filters.genre)}
-            {renderParam(get(filterGroupLabels, 'urgency', gettext('Urgency')), filters.urgency)}
-            {renderParam(get(filterGroupLabels, 'source', gettext('Source')), filters.source)}
+            {renderParam(get(filterGroupLabels, 'service', gettext('Category')),  wireAggskeys.includes('service') ? filters.service : [])}
+            {renderParam(get(filterGroupLabels, 'subject', gettext('Subject')),  wireAggskeys.includes('subject') ? filters.subject : [])}
+            {renderParam(get(filterGroupLabels, 'genre', gettext('Content Type')),  wireAggskeys.includes('genre') ? filters.genre : [])}
+            {renderParam(get(filterGroupLabels, 'urgency', gettext('Urgency')),  wireAggskeys.includes('urgency') ? filters.urgency : [])}
+            {renderParam(get(filterGroupLabels, 'language', gettext('Language')), wireAggskeys.includes('language') ? filters.language : [])}
+            {renderParam(get(filterGroupLabels, 'source', gettext('Source')), wireAggskeys.includes('source') ? filters.source : [])}
             {renderPlace()}
             {renderParam(gettext('Calendar'), filters.calendar)}
             {renderParam(gettext('Coverage Type'), filters.coverage)}
