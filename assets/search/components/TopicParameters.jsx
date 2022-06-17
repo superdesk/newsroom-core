@@ -3,12 +3,11 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get, keyBy} from 'lodash';
 
-import {gettext, getCreatedSearchParamLabel, getConfig} from 'utils';
-import {filterGroupsToLabelMap} from 'search/selectors';
+import {gettext, getCreatedSearchParamLabel} from 'utils';
+import {filterGroupsToLabelMap, filterGroups} from 'search/selectors';
 
-const TopicParameters = ({topic, navigations, locators, filterGroupLabels}) => {
+const TopicParameters = ({topic, navigations, locators, filterGroupLabels, filterGroupsMain}) => {
     const filters = get(topic, 'filter') || {};
-    const wireAggskeys = Object.keys(getConfig('wire_aggs'));
     const navsById = keyBy(navigations, '_id');
     const navs = (get(topic, 'navigation') || [])
         .map((navId) => get(navsById, `[${navId}].name`));
@@ -40,6 +39,14 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels}) => {
         </div>
     );
 
+    const filterGroups = () => {
+        return (
+            <div>
+                {filterGroupsMain.map((element) => renderParam(get(filterGroupLabels, element.field, element.label), filters[element.field]))}
+            </div>
+        );
+    };
+
     const renderPlace = () => {
         if (get(filters, 'place.length', 0) < 1) {
             return null;
@@ -61,12 +68,7 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels}) => {
             {renderParam(gettext('Search'), get(topic, 'query') ? [topic.query] : [])}
             {renderParam(gettext('Date Created'), dateLabels)}
             {renderParam(gettext('Topics'), navs)}
-            {renderParam(get(filterGroupLabels, 'service', gettext('Category')),  wireAggskeys.includes('service') ? filters.service : [])}
-            {renderParam(get(filterGroupLabels, 'subject', gettext('Subject')),  wireAggskeys.includes('subject') ? filters.subject : [])}
-            {renderParam(get(filterGroupLabels, 'genre', gettext('Content Type')),  wireAggskeys.includes('genre') ? filters.genre : [])}
-            {renderParam(get(filterGroupLabels, 'urgency', gettext('Urgency')),  wireAggskeys.includes('urgency') ? filters.urgency : [])}
-            {renderParam(get(filterGroupLabels, 'language', gettext('Language')), wireAggskeys.includes('language') ? filters.language : [])}
-            {renderParam(get(filterGroupLabels, 'source', gettext('Source')), wireAggskeys.includes('source') ? filters.source : [])}
+            {filterGroups()}
             {renderPlace()}
             {renderParam(gettext('Calendar'), filters.calendar)}
             {renderParam(gettext('Coverage Type'), filters.coverage)}
@@ -81,11 +83,13 @@ TopicParameters.propTypes = {
     navigations: PropTypes.arrayOf(PropTypes.object),
     locators: PropTypes.array,
     filterGroupLabels: PropTypes.object,
+    filterGroupsMain: PropTypes.array
 };
 
 const mapStateToProps = (state) => ({
     locators: get(state, 'locators.items', []),
     filterGroupLabels: filterGroupsToLabelMap(state),
+    filterGroupsMain: filterGroups(state),
 });
 
 export default connect(mapStateToProps, null)(TopicParameters);
