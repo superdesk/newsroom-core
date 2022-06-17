@@ -31,6 +31,12 @@
     </p>
 {% endif %}
 
+{% if item.definition_long or item.definition_short %}
+    <p>
+        {{ item.definition_long or item.definition_short }}
+    </p>
+{% endif %}
+
 {%  for planning_item in item.get('planning_items', []) or [] %}
     <div>
         <div >
