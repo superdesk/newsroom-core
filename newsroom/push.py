@@ -3,6 +3,7 @@ import flask
 import logging
 from copy import copy, deepcopy
 from datetime import datetime
+from typing import Optional
 
 from flask import current_app as app
 from flask_babel import gettext
@@ -74,10 +75,15 @@ def push():
             superdesk.get_resource_service('agenda').enhance_items([agenda])
         notify_new_item(agenda, check_topics=True)
     elif item.get('type') == 'planning':
-        published = publish_planning(item)
-        agenda = app.data.find_one('agenda', req=None, _id=published['_id'])
+        orig = app.data.find_one("agenda", req=None, guid=item["guid"]) or {}
+        item["planning_date"] = parse_date_str(item["planning_date"])
+        plan_id = publish_planning_item(item, orig)
+        event_id = publish_planning_into_event(item)
+        # Prefer parent Event when sending notificaitons
+        _id = event_id or plan_id
+        agenda = app.data.find_one("agenda", req=None, _id=_id)
         if agenda:
-            superdesk.get_resource_service('agenda').enhance_items([agenda])
+            superdesk.get_resource_service("agenda").enhance_items([agenda])
         notify_new_item(agenda, check_topics=True)
     elif item.get('type') == 'text':
         orig = superdesk.get_resource_service('items').find_one(req=None, _id=item['guid'])
@@ -175,7 +181,7 @@ def publish_event(event, orig):
     service = superdesk.get_resource_service('agenda')
 
     if event.get('plans') and not orig:
-        # event is created planning item
+        # event is created from a planning item
         orig = superdesk.get_resource_service('agenda').find_one(req=None, guid=event.get('plans')[0])
 
     event.pop('plans', None)
@@ -251,60 +257,69 @@ def get_event_dates(event):
     return dates
 
 
-def publish_planning(planning):
-    logger.debug('publishing planning %s', planning)
-    service = superdesk.get_resource_service('agenda')
-    agenda = None
+def publish_planning_item(planning, orig):
+    service = superdesk.get_resource_service("agenda")
+    agenda = deepcopy(orig)
 
-    # update dates
-    planning['planning_date'] = parse_date_str(planning['planning_date'])
+    init_adhoc_agenda(planning, agenda)
 
-    if planning.get('event_item'):
-        # this is a planning for an event item
-        # if there's an event then _id field will have the same value as event_id
-        orig_agenda = None
-        orig_agendas = superdesk.get_resource_service('agenda').find(where={'_id': {'$in': [planning['event_item'],
-                                                                                            planning['guid']]}})
-        if orig_agendas.count() > 0:
-            orig_agenda = orig_agendas[0]
+    # Update agenda metadata
+    new_plan = set_agenda_metadata_from_planning(agenda, planning, force_adhoc=True)
 
-        agenda = deepcopy(orig_agenda)
-        if not agenda:
-            # event id exists in planning item but event is not in the system
-            logger.warning('Event {} for planning {} couldn\'t be found'.format(planning['event_item'], planning))
-            # create new agenda
-            agenda = {}
-            init_adhoc_agenda(planning, agenda)
-        else:
-            if planning.get('state') in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED] or \
-                    planning.get('pubstatus') == 'cancelled':
-                # remove the planning item from the list
-                set_agenda_planning_items(agenda, orig_agenda, planning, action='remove')
+    # Add the planning item to the list
+    set_agenda_planning_items(agenda, orig, planning, action="add" if new_plan else "update")
 
-                service.patch(agenda['_id'], agenda)
-                return agenda
-
+    if not agenda.get("_id"):
+        # Setting ``_id`` of Agenda to be equal to the Planning item if there's no Event ID
+        agenda.setdefault("_id", planning["guid"])
+        agenda.setdefault("guid", planning["guid"])
+        return service.post([agenda])[0]
     else:
-        # there's no event item (ad-hoc planning item)
-        orig_agenda = app.data.find_one('agenda', req=None, _id=planning['guid']) or {}
-        agenda = deepcopy(orig_agenda)
-        init_adhoc_agenda(planning, agenda)
+        # Replace the original
+        service.patch(agenda["_id"], agenda)
+        return agenda["_id"]
 
-    # update agenda metadata
+
+def publish_planning_into_event(planning) -> Optional[str]:
+    if not planning.get("event_item"):
+        return None
+
+    service = superdesk.get_resource_service('agenda')
+
+    # this is a planning for an event item
+    # if there's an event then _id field will have the same value as event_id
+    orig_agendas = service.find(where={"_id": {"$in": [planning["event_item"], planning["guid"]]}})
+
+    if not orig_agendas.count():
+        # event id exists in planning item but event is not in the system
+        logger.warning('Event {} for planning {} couldn\'t be found'.format(planning['event_item'], planning))
+        return None
+
+    orig_agenda = orig_agendas[0]
+    agenda = deepcopy(orig_agendas[0])
+
+    if planning.get("state") in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED] or \
+            planning.get("pubstatus") == "cancelled":
+        # Remove the Planning item from the list
+        set_agenda_planning_items(agenda, orig_agenda, planning, action="remove")
+        service.patch(agenda["_id"], agenda)
+        return None
+
+    # Update agenda metadata
     new_plan = set_agenda_metadata_from_planning(agenda, planning)
 
-    # add the planning item to the list
-    set_agenda_planning_items(agenda, orig_agenda, planning, action='add' if new_plan else 'update')
+    # Add the Planning item to the list
+    set_agenda_planning_items(agenda, orig_agenda, planning, action="add" if new_plan else "update")
 
-    if not agenda.get('_id'):
+    if not agenda.get("_id"):
         # setting _id of agenda to be equal to planning if there's no event id
-        agenda.setdefault('_id', planning.get('event_item', planning['guid']) or planning['guid'])
-        agenda.setdefault('guid', planning.get('event_item', planning['guid']) or planning['guid'])
-        service.post([agenda])[0]
+        agenda.setdefault("_id", planning.get("event_item", planning["guid"]) or planning["guid"])
+        agenda.setdefault("guid", planning.get("event_item", planning["guid"]) or planning["guid"])
+        return service.post([agenda])[0]
     else:
-        # replace the original document
-        service.patch(agenda['_id'], agenda)
-    return agenda
+        # Replace the original document
+        service.patch(agenda["_id"], agenda)
+        return agenda["_id"]
 
 
 def init_adhoc_agenda(planning, agenda):
@@ -313,6 +328,8 @@ def init_adhoc_agenda(planning, agenda):
     """
 
     # check if there's an existing ad-hoc
+
+    agenda["item_type"] = "planning"
 
     # planning dates is saved as the dates of the new agenda
     agenda['dates'] = {
@@ -337,6 +354,7 @@ def set_agenda_metadata_from_event(agenda, event, set_doc_id=True):
     if set_doc_id:
         agenda.setdefault('_id', event['guid'])
 
+    agenda["item_type"] = "event"
     agenda['guid'] = event['guid']
     agenda['event_id'] = event['guid']
     agenda['recurrence_id'] = event.get('recurrence_id')
@@ -366,13 +384,13 @@ def format_qcode_items(items=None):
         return []
 
 
-def set_agenda_metadata_from_planning(agenda, planning_item):
+def set_agenda_metadata_from_planning(agenda, planning_item, force_adhoc=False):
     """Sets agenda metadata from a given planning"""
 
     parse_dates(planning_item)
     set_dates(agenda)
 
-    if not planning_item.get('event_item'):
+    if not planning_item.get("event_item") or force_adhoc:
         # adhoc planning item
         agenda['name'] = planning_item.get('name')
         agenda['headline'] = planning_item.get('headline')
@@ -387,6 +405,9 @@ def set_agenda_metadata_from_planning(agenda, planning_item):
         agenda['service'] = format_qcode_items(planning_item.get('anpa_category'))
         agenda['state'] = planning_item.get('state')
         agenda['state_reason'] = planning_item.get('state_reason')
+
+    if planning_item.get("event_item") and force_adhoc:
+        agenda["event_id"] = planning_item["event_item"]
 
     if not agenda.get('planning_items'):
         agenda['planning_items'] = []
