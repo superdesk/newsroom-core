@@ -405,6 +405,7 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
         }
     }
 
+
     const scheduleType = getScheduleType(item);
     let regulartTimeStr = gettext('{{startTime}} - {{endTime}}', {
         startTime: formatTime(start),
@@ -414,7 +415,8 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
         regulartTimeStr = localTimeZone ? `${TO_BE_CONFIRMED_TEXT} ` : '';
     }
     if (duration === 0 || scheduleType === SCHEDULE_TYPE.NO_DURATION) {
-        dateTimeString.push(isTBCItem ? `${regulartTimeStr}` : `${formatTime(start)}`);
+        dateTimeString.push(formatDate(start));
+        dateTimeString.push(isTBCItem ? regulartTimeStr : formatTime(start));
     } else {
         switch(scheduleType) {
         case SCHEDULE_TYPE.MULTI_DAY:
