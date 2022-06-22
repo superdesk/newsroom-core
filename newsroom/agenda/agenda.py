@@ -106,6 +106,12 @@ class AgendaResource(newsroom.Resource):
         'default': 'agenda',
     }
     schema['event_id'] = events_schema['guid']
+    schema["item_type"] = {
+        "type": "string",
+        "mapping": not_analyzed,
+        "nullable": False,
+        "allowed": ["event", "planning"]
+    }
     schema['recurrence_id'] = {
         'type': 'string',
         'mapping': not_analyzed,
@@ -693,8 +699,39 @@ class AgendaService(BaseSearchService):
 
         if search.is_events_only:
             # no adhoc planning items and remove planning items and coverages fields
-            search.query['bool']['must'].append({'exists': {'field': 'event_id'}})
+            search.query["bool"]["must"].append({
+                "bool": {
+                    "should": [
+                        {"term": {"item_type": "event"}},
+                        {
+                            # Match Events before ``item_type`` field was added
+                            "bool": {
+                                "must_not": {"exists": {"field": "item_type"}},
+                                "must": {"exists": {"field": "event_id"}},
+                            },
+                        }
+                    ],
+                    "minimum_should_match": 1,
+                },
+            })
             _remove_fields(search.source, PLANNING_ITEMS_FIELDS)
+        else:
+            # Don't include Planning items that are associated with an Event
+            search.query["bool"]["must"].append({
+                "bool": {
+                    "should": [
+                        {"bool": {"must_not": {"exists": {"field": "item_type"}}}},
+                        {"term": {"item_type": "event"}},
+                        {
+                            "bool": {
+                                "must": {"term": {"item_type": "planning"}},
+                                "must_not": {"exists": {"field": "event_id"}},
+                            },
+                        },
+                    ],
+                    "minimum_should_match": 1,
+                },
+            })
 
     def apply_product_filter(self, search, product):
         """ Generate the filter for a single product

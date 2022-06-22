@@ -175,27 +175,58 @@ def watch_coverage():
     data = get_json_or_400()
     assert data.get('item_id')
     assert data.get('coverage_id')
-    item = get_entity_or_404(data['item_id'], 'agenda')
+    return update_coverage_watch(data["item_id"], data["coverage_id"], user_id, add=request.method == "POST")
 
-    if item.get('watches') and user_id in item['watches']:
-        return flask.jsonify({'error': gettext('Cannot edit coverage watch when watching a parent item.')}), 403
+
+def update_coverage_watch(item_id, coverage_id, user_id, add, skip_associated=False):
+    item = get_entity_or_404(item_id, "agenda")
+
+    if user_id in item.get("watches", []):
+        return flask.jsonify({"error": gettext("Cannot edit coverage watch when watching parnet item")}), 403
 
     try:
-        coverage_index = [c['coverage_id'] for c in (item.get('coverages') or [])].index(data['coverage_id'])
+        coverage_index = [
+            c["coverage_id"]
+            for c in (item.get("coverages") or [])
+        ].index(coverage_id)
     except ValueError:
-        return flask.jsonify({'error': gettext('Coverage not found.')}), 404
+        return flask.jsonify({"error": gettext("Coverage not found")}), 404
 
-    updates = {'coverages': item['coverages']}
-    if request.method == 'POST':
-        updates['coverages'][coverage_index]['watches'] = list(set((updates['coverages'][coverage_index].get('watches')
-                                                                    or []) + [user_id]))
+    updates = {"coverages": item["coverages"]}
+
+    if add:
+        updates["coverages"][coverage_index]["watches"] = list(
+            set((updates["coverages"][coverage_index].get("watches") or []) + [user_id])
+        )
     else:
         try:
-            updates['coverages'][coverage_index]['watches'].remove(user_id)
+            updates["coverages"][coverage_index]["watches"].remove(user_id)
         except Exception:
-            return flask.jsonify({'error': gettext('Error removing watch.')}), 404
+            return flask.jsonify({"error": gettext("Error removing watch.")}), 404
 
-    get_resource_service('agenda').patch(data['item_id'], updates)
+    get_resource_service("agenda").patch(item_id, updates)
+
+    if skip_associated:
+        return flask.jsonify(), 200
+    elif item.get("item_type") == "planning" and item.get("event_id"):
+        # Need to also update the parent Event's list of coverage watches
+        return update_coverage_watch(
+            item["event_id"],
+            coverage_id,
+            user_id,
+            add,
+            skip_associated=True
+        )
+    elif item.get("item_type") == "event":
+        # Need to also update the Planning item's list of coverage watches
+        return update_coverage_watch(
+            item["coverages"][coverage_index]["planning_id"],
+            coverage_id,
+            user_id,
+            add,
+            skip_associated=True
+        )
+
     return flask.jsonify(), 200
 
 
