@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-06-10 10:37+0200\n"
+"POT-Creation-Date: 2022-06-20 14:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -156,7 +156,6 @@ msgstr ""
 
 #: assets/agenda/components/AgendaTags.jsx:25
 #: assets/company-reports/components/ContentActivity.jsx:110
-#: assets/search/components/TopicParameters.jsx:63
 #: assets/wire/components/PreviewTags.jsx:37 newsroom/agenda/__init__.py:44
 #: newsroom/reports/content_activity.py:228
 #: newsroom/templates/wire_item.html:76
@@ -166,7 +165,6 @@ msgstr ""
 
 #: assets/company-reports/components/ContentActivity.jsx:111
 #: assets/monitoring/components/MonitoringList.jsx:24
-#: assets/search/components/TopicParameters.jsx:64
 #: assets/wire/components/PreviewTags.jsx:43 newsroom/agenda/__init__.py:48
 #: newsroom/monitoring/forms.py:19 newsroom/reports/content_activity.py:229
 #: newsroom/wire/__init__.py:110
@@ -179,7 +177,7 @@ msgid "News Value"
 msgstr ""
 
 #: assets/company-reports/components/ContentActivity.jsx:109
-#: assets/search/components/TopicParameters.jsx:55
+#: assets/search/components/TopicParameters.jsx:63
 #: newsroom/agenda/__init__.py:56 newsroom/reports/content_activity.py:227
 #: newsroom/wire/__init__.py:122
 msgid "Place"
@@ -1030,7 +1028,6 @@ msgstr ""
 msgid "Metadata"
 msgstr ""
 
-#: assets/search/components/TopicParameters.jsx:65
 #: assets/wire/components/PreviewTags.jsx:49
 #: newsroom/templates/wire_item.html:86
 #: newsroom/templates/wire_item_print.html:28 newsroom/wire/__init__.py:114
@@ -2192,17 +2189,16 @@ msgstr ""
 msgid "More Actions"
 msgstr ""
 
-#: assets/components/AuditInformation.jsx:37
-msgid "${creator.first_name} ${creator.last_name}"
-msgstr ""
-
-#: assets/components/AuditInformation.jsx:37
-#: assets/components/AuditInformation.jsx:51
+#: assets/components/AuditInformation.jsx:29
 msgid "System"
 msgstr ""
 
-#: assets/components/AuditInformation.jsx:51
-msgid "${updater.first_name} ${updater.last_name}"
+#: assets/components/AuditInformation.jsx:39
+msgid "Created by {{author}} at {{date}}"
+msgstr ""
+
+#: assets/components/AuditInformation.jsx:53
+msgid "Updated by {{author}} at {{date}}"
 msgstr ""
 
 #: assets/components/CardEditor.jsx:102
@@ -2349,7 +2345,7 @@ msgid "End Date"
 msgstr ""
 
 #: assets/components/cards/edit/ConfigEvent.jsx:56
-#: assets/search/components/TopicParameters.jsx:71
+#: assets/search/components/TopicParameters.jsx:76
 msgid "Location"
 msgstr ""
 
@@ -2437,13 +2433,13 @@ msgstr ""
 #: assets/home/components/search-bar.jsx:33
 #: assets/home/components/search-bar.jsx:34
 #: assets/search/components/SearchBar.jsx:74
-#: assets/search/components/TopicParameters.jsx:60
+#: assets/search/components/TopicParameters.jsx:68
 #: assets/wire/components/filters/FiltersTab.jsx:141
 msgid "Search"
 msgstr ""
 
 #: assets/layout/components/BaseApp.jsx:37
-#: assets/search/components/TopicParameters.jsx:62
+#: assets/search/components/TopicParameters.jsx:70
 msgid "Topics"
 msgstr ""
 
@@ -3054,23 +3050,19 @@ msgstr ""
 msgid "To: {{date}}"
 msgstr ""
 
-#: assets/search/components/TopicParameters.jsx:61
+#: assets/search/components/TopicParameters.jsx:69
 msgid "Date Created"
 msgstr ""
 
-#: assets/search/components/TopicParameters.jsx:66
-msgid "Urgency"
-msgstr ""
-
-#: assets/search/components/TopicParameters.jsx:68
+#: assets/search/components/TopicParameters.jsx:73
 msgid "Calendar"
 msgstr ""
 
-#: assets/search/components/TopicParameters.jsx:69
+#: assets/search/components/TopicParameters.jsx:74
 msgid "Coverage Type"
 msgstr ""
 
-#: assets/search/components/TopicParameters.jsx:70
+#: assets/search/components/TopicParameters.jsx:75
 msgid "Coverage Status"
 msgstr ""
 

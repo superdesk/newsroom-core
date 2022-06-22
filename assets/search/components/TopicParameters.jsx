@@ -4,9 +4,9 @@ import {connect} from 'react-redux';
 import {get, keyBy} from 'lodash';
 
 import {gettext, getCreatedSearchParamLabel} from 'utils';
-import {filterGroupsToLabelMap} from 'search/selectors';
+import {filterGroupsToLabelMap, filterGroups} from 'search/selectors';
 
-const TopicParameters = ({topic, navigations, locators, filterGroupLabels}) => {
+const TopicParameters = ({topic, navigations, locators, filterGroupLabels, filterGroupsMain}) => {
     const filters = get(topic, 'filter') || {};
     const navsById = keyBy(navigations, '_id');
     const navs = (get(topic, 'navigation') || [])
@@ -39,6 +39,14 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels}) => {
         </div>
     );
 
+    const filterGroups = () => {
+        return (
+            <div>
+                {filterGroupsMain.map((element) => renderParam(get(filterGroupLabels, element.field, element.label), filters[element.field]))}
+            </div>
+        );
+    };
+
     const renderPlace = () => {
         if (get(filters, 'place.length', 0) < 1) {
             return null;
@@ -60,10 +68,7 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels}) => {
             {renderParam(gettext('Search'), get(topic, 'query') ? [topic.query] : [])}
             {renderParam(gettext('Date Created'), dateLabels)}
             {renderParam(gettext('Topics'), navs)}
-            {renderParam(get(filterGroupLabels, 'service', gettext('Category')), filters.service)}
-            {renderParam(get(filterGroupLabels, 'subject', gettext('Subject')), filters.subject)}
-            {renderParam(get(filterGroupLabels, 'genre', gettext('Content Type')), filters.genre)}
-            {renderParam(get(filterGroupLabels, 'urgency', gettext('Urgency')), filters.urgency)}
+            {filterGroups()}
             {renderPlace()}
             {renderParam(gettext('Calendar'), filters.calendar)}
             {renderParam(gettext('Coverage Type'), filters.coverage)}
@@ -78,11 +83,13 @@ TopicParameters.propTypes = {
     navigations: PropTypes.arrayOf(PropTypes.object),
     locators: PropTypes.array,
     filterGroupLabels: PropTypes.object,
+    filterGroupsMain: PropTypes.array
 };
 
 const mapStateToProps = (state) => ({
     locators: get(state, 'locators.items', []),
     filterGroupLabels: filterGroupsToLabelMap(state),
+    filterGroupsMain: filterGroups(state),
 });
 
 export default connect(mapStateToProps, null)(TopicParameters);

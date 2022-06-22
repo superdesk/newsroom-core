@@ -753,7 +753,7 @@ def send_topic_notification_emails(item, topics, topic_matches, users):
         for user_id in topic.get('subscribers') or []:
             user = users.get(str(user_id))
 
-            if user and user.get('receive_email'):
+            if user:
                 section = topic.get("topic_type") or "wire"
                 save_user_notifications([UserNotification(
                     user=user["_id"],
@@ -762,12 +762,14 @@ def send_topic_notification_emails(item, topics, topic_matches, users):
                     action="topic_matches",
                     data=None,
                 )])
-                send_new_item_notification_email(
-                    user,
-                    topic['label'],
-                    item=item,
-                    section=section,
-                )
+
+                if user.get("receive_email"):
+                    send_new_item_notification_email(
+                        user,
+                        topic['label'],
+                        item=item,
+                        section=section,
+                    )
 
 
 # keeping this for testing
