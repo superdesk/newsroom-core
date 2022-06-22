@@ -9,18 +9,18 @@
 # Gideon Lehmann <gideon.lehmann@sourcefabric.org>, 2022
 # Evzen Deulin <evgeny.deulin@sourcefabric.org>, 2022
 # Simon Peacock <simon.peacock@gmail.com>, 2022
-# Petr Jašek <petr.jasek@sourcefabric.org>, 2022
 # Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2022
 # Marie-Eve Ouellette <marie-eve.ouellette@lapressecanadienne.com>, 2022
+# Petr Jašek <petr.jasek@sourcefabric.org>, 2022
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-06-10 10:37+0200\n"
+"POT-Creation-Date: 2022-06-20 14:54+0200\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
-"Last-Translator: Marie-Eve Ouellette <marie-eve.ouellette@lapressecanadienne.com>, 2022\n"
+"Last-Translator: Petr Jašek <petr.jasek@sourcefabric.org>, 2022\n"
 "Language-Team: French (Canada) (https://www.transifex.com/sourcefabric/teams/6584/fr_CA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -178,7 +178,6 @@ msgstr ""
 
 #: assets/agenda/components/AgendaTags.jsx:25
 #: assets/company-reports/components/ContentActivity.jsx:110
-#: assets/search/components/TopicParameters.jsx:63
 #: assets/wire/components/PreviewTags.jsx:37 newsroom/agenda/__init__.py:44
 #: newsroom/reports/content_activity.py:228
 #: newsroom/templates/wire_item.html:76
@@ -188,7 +187,6 @@ msgstr "Fil"
 
 #: assets/company-reports/components/ContentActivity.jsx:111
 #: assets/monitoring/components/MonitoringList.jsx:24
-#: assets/search/components/TopicParameters.jsx:64
 #: assets/wire/components/PreviewTags.jsx:43 newsroom/agenda/__init__.py:48
 #: newsroom/monitoring/forms.py:19 newsroom/reports/content_activity.py:229
 #: newsroom/wire/__init__.py:110
@@ -201,7 +199,7 @@ msgid "News Value"
 msgstr "Priorité de la nouvelle"
 
 #: assets/company-reports/components/ContentActivity.jsx:109
-#: assets/search/components/TopicParameters.jsx:55
+#: assets/search/components/TopicParameters.jsx:63
 #: newsroom/agenda/__init__.py:56 newsroom/reports/content_activity.py:227
 #: newsroom/wire/__init__.py:122
 msgid "Place"
@@ -1073,7 +1071,6 @@ msgstr "Source:"
 msgid "Metadata"
 msgstr "Métadonnées"
 
-#: assets/search/components/TopicParameters.jsx:65
 #: assets/wire/components/PreviewTags.jsx:49
 #: newsroom/templates/wire_item.html:86
 #: newsroom/templates/wire_item_print.html:28 newsroom/wire/__init__.py:114
@@ -2243,18 +2240,17 @@ msgstr "Heure"
 msgid "More Actions"
 msgstr "Plus d'actions"
 
-#: assets/components/AuditInformation.jsx:37
-msgid "${creator.first_name} ${creator.last_name}"
-msgstr "${creator.first_name} ${creator.last_name}"
-
-#: assets/components/AuditInformation.jsx:37
-#: assets/components/AuditInformation.jsx:51
+#: assets/components/AuditInformation.jsx:29
 msgid "System"
 msgstr "Système"
 
-#: assets/components/AuditInformation.jsx:51
-msgid "${updater.first_name} ${updater.last_name}"
-msgstr "${updater.first_name} ${updater.last_name}"
+#: assets/components/AuditInformation.jsx:39
+msgid "Created by {{author}} at {{date}}"
+msgstr "Par {{author}} créé à {{date}}"
+
+#: assets/components/AuditInformation.jsx:53
+msgid "Updated by {{author}} at {{date}}"
+msgstr "Mis à jour par {{author}} à {{date}}"
 
 #: assets/components/CardEditor.jsx:102
 #: assets/search/components/FollowedTopics.jsx:45
@@ -2400,7 +2396,7 @@ msgid "End Date"
 msgstr "Date de fin"
 
 #: assets/components/cards/edit/ConfigEvent.jsx:56
-#: assets/search/components/TopicParameters.jsx:71
+#: assets/search/components/TopicParameters.jsx:76
 msgid "Location"
 msgstr "Endroit"
 
@@ -2488,13 +2484,13 @@ msgstr "Effacer"
 #: assets/home/components/search-bar.jsx:33
 #: assets/home/components/search-bar.jsx:34
 #: assets/search/components/SearchBar.jsx:74
-#: assets/search/components/TopicParameters.jsx:60
+#: assets/search/components/TopicParameters.jsx:68
 #: assets/wire/components/filters/FiltersTab.jsx:141
 msgid "Search"
 msgstr "Rechercher"
 
 #: assets/layout/components/BaseApp.jsx:37
-#: assets/search/components/TopicParameters.jsx:62
+#: assets/search/components/TopicParameters.jsx:70
 msgid "Topics"
 msgstr "Sujets"
 
@@ -3110,23 +3106,19 @@ msgstr "À partir du: {{date}}"
 msgid "To: {{date}}"
 msgstr "Au: {{date}}"
 
-#: assets/search/components/TopicParameters.jsx:61
+#: assets/search/components/TopicParameters.jsx:69
 msgid "Date Created"
 msgstr "Date de création"
 
-#: assets/search/components/TopicParameters.jsx:66
-msgid "Urgency"
-msgstr "Priorité"
-
-#: assets/search/components/TopicParameters.jsx:68
+#: assets/search/components/TopicParameters.jsx:73
 msgid "Calendar"
 msgstr "Calendrier"
 
-#: assets/search/components/TopicParameters.jsx:69
+#: assets/search/components/TopicParameters.jsx:74
 msgid "Coverage Type"
 msgstr "Type de couverture"
 
-#: assets/search/components/TopicParameters.jsx:70
+#: assets/search/components/TopicParameters.jsx:75
 msgid "Coverage Status"
 msgstr "Statut de couverture"
 
