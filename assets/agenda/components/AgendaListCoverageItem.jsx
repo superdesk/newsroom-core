@@ -3,71 +3,15 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get, isEqual} from 'lodash';
 
-import {formatDate, formatTime, gettext} from '../../utils';
+import {gettext} from '../../utils';
 import {
-    getCoverageDisplayName,
     getCoverageIcon,
-    getCoverageStatusText,
+    getCoverageTooltip,
     isCoverageBeingUpdated,
     isCoverageForExtraDay,
     isWatched,
     WORKFLOW_COLORS,
-    WORKFLOW_STATUS,
 } from '../utils';
-
-const getCoverageTootip = (coverage, beingUpdated) => {
-    let slugline = coverage.item_slugline || coverage.slugline;
-
-    slugline =  gettext(' coverage{{slugline}}', {slugline: slugline ? ` '${slugline}'` : ''}) ;
-
-    if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
-        return gettext('{{ type }}{{ slugline }} {{ status_text }}', {
-            type: getCoverageDisplayName(coverage.coverage_type),
-            slugline: slugline,
-            status_text: getCoverageStatusText(coverage)
-        });
-    }
-
-    if (['assigned'].includes(coverage.workflow_status)) {
-        return gettext('Planned {{ type }} {{ slugline }}, expected {{date}} at {{time}}', {
-            type: getCoverageDisplayName(coverage.coverage_type),
-            slugline: slugline,
-            date: formatDate(coverage.scheduled),
-            time: formatTime(coverage.scheduled)
-        });
-    }
-
-    if (['active'].includes(coverage.workflow_status)) {
-        return gettext('{{ type }} {{ slugline }} in progress, expected {{date}} at {{time}}', {
-            type: getCoverageDisplayName(coverage.coverage_type),
-            slugline: slugline,
-            date: formatDate(coverage.scheduled),
-            time: formatTime(coverage.scheduled)
-        });
-    }
-
-    if (coverage.workflow_status === WORKFLOW_STATUS.CANCELLED) {
-        return gettext('{{ type }} {{slugline}} cancelled', {
-            type: getCoverageDisplayName(coverage.coverage_type),
-            slugline: slugline,
-        });
-    }
-
-    if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
-        let deliveryState;
-        if (get(coverage, 'deliveries.length', 0) > 1) {
-            deliveryState = beingUpdated ? gettext(' (update to come)') : gettext(' (updated)');
-        }
-
-        return gettext('{{ type }} {{ slugline }} available{{deliveryState}}', {
-            type: getCoverageDisplayName(coverage.coverage_type),
-            slugline: slugline,
-            deliveryState: deliveryState
-        });
-    }
-
-    return '';
-};
 
 class AgendaListCoverageItem extends React.Component {
     constructor(props) {
@@ -97,7 +41,7 @@ class AgendaListCoverageItem extends React.Component {
             isCoverageForExtraDay: isCoverageForExtraDay(props.coverage, props.group),
         };
 
-        state.tooltip = `${state.watchText} ${getCoverageTootip(props.coverage, state.beingUpdated)}`;
+        state.tooltip = `${state.watchText} ${getCoverageTooltip(props.coverage, state.beingUpdated)}`;
 
         return state;
     }
