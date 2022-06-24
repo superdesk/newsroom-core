@@ -7,7 +7,7 @@ from .agenda import AgendaResource, AgendaService
 from .featured import FeaturedResource, FeaturedService
 from . import formatters
 from .utils import get_coverage_email_text, get_coverage_content_type_name, get_coverage_publish_time, \
-    get_coverage_scheduled_date
+    get_coverage_scheduled_date, get_planning_coverages
 
 
 blueprint = Blueprint('agenda', __name__)
@@ -30,6 +30,7 @@ def init_app(app):
     app.add_template_global(get_coverage_content_type_name, 'get_coverage_content_type')
     app.add_template_global(get_coverage_scheduled_date, 'get_coverage_date')
     app.add_template_global(get_coverage_publish_time, 'get_coverage_publish_time')
+    app.add_template_global(get_planning_coverages)
     app.general_setting(
         'google_maps_styles',
         lazy_gettext('Google Maps Styles'),
