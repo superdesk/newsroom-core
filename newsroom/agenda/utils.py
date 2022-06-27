@@ -125,8 +125,10 @@ def get_coverage_status_text(coverage):
         return 'in progress at {}.'.format(get_coverage_scheduled_date(coverage))
 
     if coverage.get('workflow_status') == ASSIGNMENT_WORKFLOW_STATE.COMPLETED:
-        return '{}{}.'.format('updated' if len(coverage.get('deliveries') or []) > 1 else 'available',
-                              ' at ' + get_coverage_publish_time(coverage))
+        return '{}{}.'.format(
+            'updated' if len(coverage.get('deliveries') or []) > 1 else 'available',
+            ' at ' + get_coverage_publish_time(coverage)
+        )
 
 
 def get_coverage_email_text(coverage, default_state='', language=None):
@@ -152,3 +154,10 @@ def remove_fields_for_public_user(item):
         clean_coverages(p.get('coverages', []))
 
     clean_coverages(item.get('coverages', []))
+
+
+def get_planning_coverages(item, plan_id):
+    return [
+        coverage for coverage in item.get("coverages", [])
+        if coverage.get("planning_id") == plan_id
+    ]

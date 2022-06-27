@@ -285,7 +285,7 @@ def share():
             "subject_name": items[0].get('headline') or items[0].get('name')
         }
         if item_type == 'agenda':
-            template_kwargs['maps'] = data.get('maps')
+            template_kwargs['maps'] = data.get('maps') if app.config.get("GOOGLE_MAPS_KEY") else []
             template_kwargs['dateStrings'] = [get_agenda_dates(item) for item in items]
             template_kwargs['locations'] = [get_location_string(item) for item in items]
             template_kwargs['contactList'] = [get_public_contacts(item) for item in items]

@@ -154,6 +154,7 @@ def send_template_email(
         # so add the generated/rendered subject to kwargs (if subject is not already defined)
         subject = email_templates.get_translated_subject(template, language, **template_kwargs)
         template_kwargs.setdefault("subject", subject)
+        template_kwargs.setdefault("recipient_language", language)
 
         send_email(
             to=group["emails"],
