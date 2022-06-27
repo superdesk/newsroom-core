@@ -10,7 +10,8 @@ import {
     COVERAGE_DATE_TIME_FORMAT,
     COVERAGE_DATE_FORMAT,
     parseDate,
-    AGENDA_DATE_FORMAT_SHORT
+    AGENDA_DATE_FORMAT_SHORT,
+    formatTime,
 } from '../utils';
 
 const STATUS_KILLED = 'killed';
@@ -768,3 +769,56 @@ export function formatCoverageDate(coverage) {
         parseDate(coverage.scheduled).format(COVERAGE_DATE_TIME_FORMAT);
 }
 
+export const getCoverageTooltip = (coverage, beingUpdated) => {
+    let slugline = coverage.item_slugline || coverage.slugline;
+
+    slugline =  gettext(' coverage{{slugline}}', {slugline: slugline ? ` '${slugline}'` : ''}) ;
+
+    if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
+        return gettext('{{ type }}{{ slugline }} {{ status_text }}', {
+            type: getCoverageDisplayName(coverage.coverage_type),
+            slugline: slugline,
+            status_text: getCoverageStatusText(coverage)
+        });
+    }
+
+    if (['assigned'].includes(coverage.workflow_status)) {
+        return gettext('Planned {{ type }} {{ slugline }}, expected {{date}} at {{time}}', {
+            type: getCoverageDisplayName(coverage.coverage_type),
+            slugline: slugline,
+            date: formatDate(coverage.scheduled),
+            time: formatTime(coverage.scheduled)
+        });
+    }
+
+    if (['active'].includes(coverage.workflow_status)) {
+        return gettext('{{ type }} {{ slugline }} in progress, expected {{date}} at {{time}}', {
+            type: getCoverageDisplayName(coverage.coverage_type),
+            slugline: slugline,
+            date: formatDate(coverage.scheduled),
+            time: formatTime(coverage.scheduled)
+        });
+    }
+
+    if (coverage.workflow_status === WORKFLOW_STATUS.CANCELLED) {
+        return gettext('{{ type }} {{slugline}} cancelled', {
+            type: getCoverageDisplayName(coverage.coverage_type),
+            slugline: slugline,
+        });
+    }
+
+    if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
+        let deliveryState;
+        if (get(coverage, 'deliveries.length', 0) > 1) {
+            deliveryState = beingUpdated ? gettext(' (update to come)') : gettext(' (updated)');
+        }
+
+        return gettext('{{ type }} {{ slugline }} available{{deliveryState}}', {
+            type: getCoverageDisplayName(coverage.coverage_type),
+            slugline: slugline,
+            deliveryState: deliveryState
+        });
+    }
+
+    return '';
+};

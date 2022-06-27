@@ -10,6 +10,7 @@ import {
     getDataFromCoverages,
     getCoverageDisplayName,
     getCoverageIcon,
+    getCoverageTooltip,
     WORKFLOW_COLORS,
     WORKFLOW_STATUS,
     formatCoverageDate
@@ -32,7 +33,9 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
         <div className={classNames('coverage-item',
             {'coverage-item--clickable': onClick})} key={coverage.coverage_id} onClick={onClick}
         title={onClick ? gettext('Open Agenda in new tab') : onClick} >
-            <div className='coverage-item__row flex-column align-items-start'>
+            <div className='coverage-item__row flex-column align-items-start'
+                title={getCoverageTooltip(coverage)}
+            >
                 <span className={classNames('coverage-item__coverage-icon', WORKFLOW_COLORS[coverage.workflow_status])}>                    
                     <i className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} mr-2`}></i>
                     <span>{`${getCoverageDisplayName(coverage.coverage_type)}${getSlugline(coverage)}`}</span>
