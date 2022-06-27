@@ -11,6 +11,6 @@
     </div>
 {% endif %}
 <br>
-{% for cov in coverage_updates.cancelled_coverages %}<div><span style="color:red">!</span> {{ get_coverage_email_text(cov, 'has been cancelled') }}</div>{% if cov.get('planning', {}).get('ednote') %}{{ "\r\n" }}<div><i> Note: {{ cov['planning']['ednote'] }}</i>{% endif %}</div><br>{% endfor %}
-{% for cov in coverage_updates.modified_coverages %}<div><span style="color:red">!</span> {{ get_coverage_email_text(cov) }}</div>{% if cov.get('planning', {}).get('ednote') %}{{ "\r\n" }}<div><i> Note: {{ cov['planning']['ednote'] }}</i>{% endif %}</div><br>{% endfor %}
-{% for cov in coverage_updates.unaltered_coverages %}<div>{{ get_coverage_email_text(cov) }}</div>{% if cov.get('planning', {}).get('ednote') %}{{ "\r\n" }}<div><i> Note: {{ cov['planning']['ednote'] }}</i>{% endif %}</div><br>{% endfor %}
+{% for cov in coverage_updates.cancelled_coverages %}<div><span style="color:red">!</span> {{ get_coverage_email_text(cov, 'has been cancelled', recipient_language) }}</div>{% if cov.get('planning', {}).get('ednote') %}{{ "\r\n" }}<div><i> Note: {{ cov['planning']['ednote'] }}</i>{% endif %}</div><br>{% endfor %}
+{% for cov in coverage_updates.modified_coverages %}<div><span style="color:red">!</span> {{ get_coverage_email_text(cov, '', recipient_language) }}</div>{% if cov.get('planning', {}).get('ednote') %}{{ "\r\n" }}<div><i> Note: {{ cov['planning']['ednote'] }}</i>{% endif %}</div><br>{% endfor %}
+{% for cov in coverage_updates.unaltered_coverages %}<div>{{ get_coverage_email_text(cov, '', recipient_language) }}</div>{% if cov.get('planning', {}).get('ednote') %}{{ "\r\n" }}<div><i> Note: {{ cov['planning']['ednote'] }}</i>{% endif %}</div><br>{% endfor %}

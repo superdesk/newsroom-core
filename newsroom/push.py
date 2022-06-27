@@ -378,10 +378,13 @@ def set_agenda_metadata_from_event(agenda, event, set_doc_id=True):
 
 
 def format_qcode_items(items=None):
-    try:
-        return [{'code': item.get('qcode'), 'name': item.get('name')} for item in items]
-    except (TypeError, AttributeError):
+    if not items:
         return []
+
+    for item in items:
+        item["code"] = item.get("qcode")
+
+    return items
 
 
 def set_agenda_metadata_from_planning(agenda, planning_item, force_adhoc=False):
