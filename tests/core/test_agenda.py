@@ -568,7 +568,7 @@ def test_filter_events_only(client):
     assert 'foo' == data['_items'][0]['_id']
     assert 1 == len(data['_items'][1]['planning_items'])
     assert 1 == len(data['_items'][1]['coverages'])
-    data = get_json(client, '/agenda/search?eventsOnlyView=true')
+    data = get_json(client, '/agenda/search?itemType=events')
 
     assert 1 == data['_meta']['total']
     assert 'urn:conference' == data['_items'][0]['_id']
