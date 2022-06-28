@@ -373,7 +373,7 @@ def _set_event_date_range(search):
             }
         }]
 
-    if search.is_events_only:
+    if search.item_type == "events":
         # Get events for extra dates for coverages and planning.
         should.append({'range': {'display_dates': date_range}})
 
@@ -638,7 +638,7 @@ class AgendaService(BaseSearchService):
                 })
         return cursor
 
-    def prefill_search_query(self, search, req=None, lookup=None):
+    def prefill_search_query(self, search: SearchQuery, req=None, lookup=None):
         """ Generate the search query instance
 
         :param newsroom.search.SearchQuery search: The search query instance
@@ -647,8 +647,8 @@ class AgendaService(BaseSearchService):
         """
 
         super().prefill_search_query(search, req, lookup)
-        search.is_events_only = is_events_only_access(search.user, search.company) or \
-            search.args.get('eventsOnlyView')
+        search.item_type = "events" if is_events_only_access(search.user, search.company) else \
+            search.args.get("itemType")
 
     def prefill_search_items(self, search):
         """ Prefill the item filters
@@ -697,7 +697,7 @@ class AgendaService(BaseSearchService):
         if not is_admin_or_internal(search.user):
             _remove_fields(search.source, PRIVATE_FIELDS)
 
-        if search.is_events_only:
+        if search.item_type == "events":
             # no adhoc planning items and remove planning items and coverages fields
             search.query["bool"]["must"].append({
                 "bool": {
@@ -715,6 +715,24 @@ class AgendaService(BaseSearchService):
                 },
             })
             _remove_fields(search.source, PLANNING_ITEMS_FIELDS)
+        elif search.item_type == "planning":
+            search.query["bool"]["must"].append({
+                "bool": {
+                    "should": [
+                        {"term": {"item_type": "planning"}},
+                        {
+                            # Match Planning before ``item_type`` field was added
+                            "bool": {
+                                "must_not": [
+                                    {"exists": {"field": "item_type"}},
+                                    {"exists": {"field": "event_id"}},
+                                ],
+                            },
+                        },
+                    ],
+                    "minimum_should_match": 1,
+                }
+            })
         else:
             # Don't include Planning items that are associated with an Event
             search.query["bool"]["must"].append({
@@ -748,7 +766,7 @@ class AgendaService(BaseSearchService):
                 query_string(product['query'])
             )
 
-            if product.get('planning_item_query') and not search.is_events_only:
+            if product.get('planning_item_query') and search.item_type != "events":
                 search.planning_items_should.append(
                     planning_items_query_string(
                         product.get('planning_item_query')
@@ -788,7 +806,7 @@ class AgendaService(BaseSearchService):
                 search.query['bool']['must'].append(
                     get_agenda_query(
                         search.args['q'],
-                        search.is_events_only
+                        search.item_type == "events"
                     )
                 )
 
@@ -814,11 +832,11 @@ class AgendaService(BaseSearchService):
 
         super().gen_source_from_search(search)
 
-        set_post_filter(search.source, search, search.is_events_only)
+        set_post_filter(search.source, search, search.item_type == "events")
 
         if not search.source['from'] and not search.args.get('bookmarks'):
             # avoid aggregations when handling pagination
-            search.source['aggs'] = get_agenda_aggregations(search.is_events_only)
+            search.source['aggs'] = get_agenda_aggregations(search.item_type == "events")
         else:
             search.source.pop('aggs', None)
 
