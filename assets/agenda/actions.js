@@ -255,9 +255,8 @@ function search(state, next) {
     const currentMoment = moment();
     const searchParams = searchParamsSelector(state);
     const createdFilter = get(searchParams, 'created') || {};
-
-    const eventsOnlyFilter = !state.bookmarks &&
-        get(state, 'agenda.eventsOnlyView', false);
+    const itemTypeFilter = get(state, 'agenda.itemType');
+    const eventsOnlyFilter = !state.bookmarks && itemTypeFilter === 'events';
 
     const featuredFilter = noNavigationSelected(searchParams.navigation) &&
         !state.bookmarks &&
@@ -296,7 +295,7 @@ function search(state, next) {
         date_to: dateTo,
         timezone_offset: getTimezoneOffset(),
         featured: featuredFilter,
-        eventsOnlyView: eventsOnlyFilter,
+        itemType: itemTypeFilter,
     };
 
     const queryString = Object.keys(params)
@@ -563,7 +562,7 @@ export function toggleDropdownFilter(key, val) {
     return (dispatch) => {
         dispatch(setActive(null));
         dispatch(preview(null));
-        key === 'eventsOnly' ? dispatch(toggleEventsOnlyFilter(val)) : dispatch(toggleFilter(key, val, true));
+        key === 'itemType' ? dispatch(setItemTypeFilter(val)) : dispatch(toggleFilter(key, val, true));
         dispatch(fetchItems());
     };
 }
@@ -611,7 +610,7 @@ export function initParams(params) {
             dispatch(toggleFeaturedFilter(false));
         }
 
-        dispatch(toggleEventsOnlyFilter(params.get('eventsOnlyView') ? true : false));
+        dispatch(setItemTypeFilter(params.get('itemType', null)));
         dispatch(initSearchParams(params));
         if (params.get('item')) {
             dispatch(fetchItem(params.get('item')))
@@ -655,9 +654,9 @@ export function toggleFeaturedFilter(fetch = true) {
     };
 }
 
-export const TOGGLE_EVENTS_ONLY_FILTER = 'TOGGLE_EVENTS_ONLY_FILTER';
-export function toggleEventsOnlyFilter(value) {
-    return {type: TOGGLE_EVENTS_ONLY_FILTER, value};
+export const SET_ITEM_TYPE_FILTER = 'SET_ITEM_TYPE_FILTER';
+export function setItemTypeFilter(value) {
+    return {type: SET_ITEM_TYPE_FILTER, value};
 }
 
 export const WATCH_COVERAGE = 'WATCH_COVERAGE';

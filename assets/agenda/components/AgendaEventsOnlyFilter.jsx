@@ -3,39 +3,57 @@ import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 import AgendaFilterButton from './AgendaFilterButton';
 
-function AgendaEventsOnlyFilter ({toggleFilter, eventsOnlyView}) {
-    const eventOnlyLabel = gettext('Show Events Only');
+function AgendaEventsOnlyFilter ({toggleFilter, itemTypeFilter}) {
+    const activeFilter = itemTypeFilter == null ? {} : {
+        itemType: [
+            itemTypeFilter === 'events' ?
+                gettext('Events Only') :
+                gettext('Planning Only')
+        ]
+    };
     const filter = {
         label: gettext('Events & Coverages'),
-        field: 'eventsOnly',
+        field: 'itemType',
         icon: 'icon-small--coverage-infographics'
     };
 
-    return (<div className="btn-group" key={filter.field}>
-        <AgendaFilterButton
-            filter={filter}
-            activeFilter={eventsOnlyView ? {[filter.field]: [eventOnlyLabel]} : {}}
-        />
-        <div className='dropdown-menu' aria-labelledby={filter.field}>
-            <button
-                type='button'
-                className='dropdown-item'
-                onClick={() => toggleFilter(filter.field, false)}
-            >{gettext(filter.label)}</button>
-            <div className='dropdown-divider'></div>
-            <button
-                key='coverage-planned'
-                className='dropdown-item'
-                onClick={() => toggleFilter(filter.field, true)}
-            >{eventOnlyLabel}
-            </button>
+    return (
+        <div className="btn-group" key={filter.field}>
+            <AgendaFilterButton
+                filter={filter}
+                activeFilter={activeFilter}
+            />
+            <div className="dropdown-menu" aria-labelledby={filter.field}>
+                <button
+                    type="button"
+                    className="dropdown-item"
+                    onClick={() => toggleFilter(filter.field, null)}
+                >
+                    {gettext(filter.label)}
+                </button>
+                <div className="dropdown-divider"></div>
+                <button
+                    key="events_only"
+                    className="dropdown-item"
+                    onClick={() => toggleFilter(filter.field, 'events')}
+                >
+                    {gettext('Events Only')}
+                </button>
+                <button
+                    key="planning_only"
+                    className="dropdown-item"
+                    onClick={() => toggleFilter(filter.field, 'planning')}
+                >
+                    {gettext('Planning Only')}
+                </button>
+            </div>
         </div>
-    </div>);
+    );
 }
 
 AgendaEventsOnlyFilter.propTypes = {
     toggleFilter: PropTypes.func,
-    eventsOnlyView: PropTypes.bool,
+    itemTypeFilter: PropTypes.string,
 };
 
 

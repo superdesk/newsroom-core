@@ -21,18 +21,18 @@ const filters = [{
     label: gettext('Any calendar'),
     field: 'calendar',
     icon: 'icon-small--calendar',
-    eventsOnly: true,
+    itemTypes: ['events', 'combined'],
 }, {
     label: gettext('Any location'),
     field: 'location',
     typeAhead: true,
     icon: 'icon-small--location',
-    eventsOnly: true,
+    itemTypes: ['events', 'combined'],
 }, {
     label: gettext('Any region'),
     field: 'place',
     icon: 'icon-small--region',
-    eventsOnly: true,
+    itemTypes: ['events', 'combined'],
     transformBuckets: groupRegions,
     notSorted: true,
     transform: getRegionName,
@@ -54,7 +54,7 @@ const filters = [{
     nestedField: 'coverage_type',
     icon: 'icon-small--coverage-text',
     transform: getCoverageDisplayName,
-    eventsOnly: false,
+    itemTypes: ['planning', 'combined'],
 }];
 
 
@@ -70,8 +70,10 @@ const getDropdownItems = (filter, aggregations, toggleFilter, processBuckets, pr
     return [];
 };
 
-function AgendaFilters({aggregations, toggleFilter, activeFilter, eventsOnlyAccess, eventsOnlyView, locators}) {
-    const displayFilters = eventsOnlyAccess || eventsOnlyView ? filters.filter((f) => f.eventsOnly) : filters;
+function AgendaFilters({aggregations, toggleFilter, activeFilter, eventsOnlyAccess, itemTypeFilter, locators}) {
+    const displayFilters = filters.filter(
+        (filter) => filter.itemTypes.includes(itemTypeFilter || 'combined')
+    );
 
     return (<div className='wire-column__main-header-agenda d-flex m-0 px-3 align-items-center flex-wrap flex-sm-nowrap'>
         {displayFilters.map((filter) => (
@@ -93,10 +95,19 @@ function AgendaFilters({aggregations, toggleFilter, activeFilter, eventsOnlyAcce
                 getFilterLabel={filter.getFilterLabel}
             />
         ))}
-        {!eventsOnlyAccess && !eventsOnlyView &&
-         <AgendaCoverageExistsFilter activeFilter={activeFilter} toggleFilter={toggleFilter}/>}
-        {!eventsOnlyAccess &&
-         <AgendaEventsOnlyFilter eventsOnlyView={eventsOnlyView} toggleFilter={toggleFilter}/>}
+        {!eventsOnlyAccess && itemTypeFilter !== 'events' && (
+            <AgendaCoverageExistsFilter
+                activeFilter={activeFilter}
+                toggleFilter={toggleFilter}
+            />
+        )}
+        {!eventsOnlyAccess && (
+            <AgendaEventsOnlyFilter
+                activeFilter={activeFilter}
+                itemTypeFilter={itemTypeFilter}
+                toggleFilter={toggleFilter}
+            />
+        )}
     </div>);
 }
 
@@ -105,7 +116,7 @@ AgendaFilters.propTypes = {
     toggleFilter: PropTypes.func,
     activeFilter: PropTypes.object,
     eventsOnlyAccess: PropTypes.bool,
-    eventsOnlyView: PropTypes.bool,
+    itemTypeFilter: PropTypes.string,
     locators: PropTypes.arrayOf(PropTypes.object),
 };
 

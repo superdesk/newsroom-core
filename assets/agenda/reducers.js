@@ -7,7 +7,7 @@ import {
     STOP_WATCHING_EVENTS,
     UPDATE_ITEMS,
     TOGGLE_FEATURED_FILTER,
-    TOGGLE_EVENTS_ONLY_FILTER,
+    SET_ITEM_TYPE_FILTER,
     AGENDA_WIRE_ITEMS,
     WATCH_COVERAGE,
     STOP_WATCHING_COVERAGE,
@@ -49,7 +49,7 @@ const initialState = {
         activeDate: Date.now(),
         activeGrouping: 'day',
         eventsOnlyAccess: false,
-        eventsOnlyView: false,
+        itemType: null,
         featuredOnly: false,
         agendaWireItems: [],
     },
@@ -277,13 +277,13 @@ export default function agendaReducer(state = initialState, action) {
                 featuredOnly: !state.agenda.featuredOnly,
             }
         };
-    case TOGGLE_EVENTS_ONLY_FILTER:
+    case SET_ITEM_TYPE_FILTER:
         return {
             ...state,
             agenda: {
                 ...state.agenda,
-                eventsOnlyView: action.value,
-            }
+                itemType: action.value,
+            },
         };
 
     case AGENDA_WIRE_ITEMS:
