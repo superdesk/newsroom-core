@@ -96,7 +96,7 @@ class AgendaApp extends BaseApp {
 
         const onDetailClose = this.props.detail ? null :
             () => this.props.actions.filter(a => a.id === 'open')[0].action(null, this.props.previewGroup, this.props.previewPlan);
-        const eventsOnly = this.props.eventsOnlyView || this.props.eventsOnlyAccess;
+        const eventsOnly = this.props.itemTypeFilter === 'events' || this.props.eventsOnlyAccess;
         const hideFeaturedToggle = !noNavigationSelected(this.props.activeNavigation) ||
             this.props.bookmarks ||
             this.props.activeTopic ||
@@ -219,7 +219,7 @@ class AgendaApp extends BaseApp {
                                     toggleFilter={this.props.toggleDropdownFilter}
                                     activeFilter={this.props.activeFilter}
                                     eventsOnlyAccess={this.props.eventsOnlyAccess}
-                                    eventsOnlyView={this.props.eventsOnlyView}
+                                    itemTypeFilter={this.props.itemTypeFilter}
                                     locators={this.props.locators}
                                 />
                             )}
@@ -320,7 +320,7 @@ AgendaApp.propTypes = {
     userSections: PropTypes.object,
     context: PropTypes.string,
     eventsOnlyAccess: PropTypes.bool,
-    eventsOnlyView: PropTypes.bool,
+    itemTypeFilter: PropTypes.string,
     locators: PropTypes.array,
     wireItems: PropTypes.array,
     searchParams: PropTypes.object,
@@ -355,7 +355,7 @@ const mapStateToProps = (state) => ({
     activeDate: get(state, 'agenda.activeDate'),
     activeGrouping: get(state, 'agenda.activeGrouping'),
     eventsOnlyAccess: get(state, 'agenda.eventsOnlyAccess', false),
-    eventsOnlyView: get(state, 'agenda.eventsOnlyView', false),
+    itemTypeFilter: get(state, 'agenda.itemType'),
     detail: get(state, 'detail', false),
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,

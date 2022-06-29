@@ -63,6 +63,7 @@ class SearchQuery(object):
             }
         }
         self.highlight = None
+        self.item_type = None
 
 
 class BaseSearchService(Service):
