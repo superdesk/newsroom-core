@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 import AgendaFilterButton from './AgendaFilterButton';
 
-function AgendaEventsOnlyFilter ({toggleFilter, itemTypeFilter}) {
+function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter}) {
     const activeFilter = itemTypeFilter == null ? {} : {
         itemType: [
             itemTypeFilter === 'events' ?
@@ -51,10 +51,10 @@ function AgendaEventsOnlyFilter ({toggleFilter, itemTypeFilter}) {
     );
 }
 
-AgendaEventsOnlyFilter.propTypes = {
+AgendaItemTypeFilter.propTypes = {
     toggleFilter: PropTypes.func,
     itemTypeFilter: PropTypes.string,
 };
 
 
-export default AgendaEventsOnlyFilter;
+export default AgendaItemTypeFilter;

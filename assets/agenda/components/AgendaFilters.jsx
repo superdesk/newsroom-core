@@ -6,7 +6,7 @@ import AgendaTypeAheadFilter from './AgendaTypeAheadFilter';
 import DropdownFilter from '../../components/DropdownFilter';
 import {getCoverageDisplayName, groupRegions, getRegionName} from '../utils';
 import AgendaCoverageExistsFilter from './AgendaCoverageExistsFilter';
-import AgendaEventsOnlyFilter from './AgendaEventsOnlyFilter';
+import AgendaItemTypeFilter from './AgendaItemTypeFilter';
 
 
 const transformFilterBuckets = (filter, aggregations, props) => {
@@ -102,7 +102,7 @@ function AgendaFilters({aggregations, toggleFilter, activeFilter, eventsOnlyAcce
             />
         )}
         {!eventsOnlyAccess && (
-            <AgendaEventsOnlyFilter
+            <AgendaItemTypeFilter
                 activeFilter={activeFilter}
                 itemTypeFilter={itemTypeFilter}
                 toggleFilter={toggleFilter}
