@@ -281,7 +281,7 @@ export function getPublicContacts(item) {
  * @return {String}
  */
 export function getCalendars(item) {
-    return get(item, 'calendars', []).map(cal => cal.name).join(', ');
+    return (get(item, 'calendars') || []).map(cal => cal.name).join(', ');
 }
 
 
@@ -510,7 +510,7 @@ const getNextPendingScheduledUpdate = (coverage) => {
     if (lastPublishedShceduledUpdateIndex === coverage.scheduled_updates.length - 1) {
         // Last scheduled_update was published, nothing pending
         return;
-    } 
+    }
 
     if (lastPublishedShceduledUpdateIndex < coverage.scheduled_updates.length - 1){
         // There is a pending scheduled_update
