@@ -51,7 +51,7 @@ export function getCoverageStatusText(coverage) {
     if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && coverage.publish_time) {
         if ((get(coverage, 'deliveries.length', 0) === 2 && coverage.deliveries[0].publish_time) ||
             get(coverage, 'deliveries.length', 0) > 2) {
-            return gettext('updated {{ at }}', {at: moment(coverage.publish_time).format(COVERAGE_DATE_TIME_FORMAT)});
+            return gettext('coverage updated {{ at }}', {at: moment(coverage.publish_time).format(COVERAGE_DATE_TIME_FORMAT)});
         }
 
         return `${get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '')} ${moment(coverage.publish_time).format(COVERAGE_DATE_TIME_FORMAT)}`;
@@ -70,20 +70,20 @@ export const WORKFLOW_STATUS = {
     CANCELLED: 'cancelled',
 };
 
-export const DRAFT_STATUS_TEXTS = {
-    'coverage not planned': gettext('not planned'),
-    'coverage not intended': gettext('not planned'),
-    'coverage intended': gettext('planned'),
-    'coverage not decided': gettext('on merit'),
-    'coverage not decided yet': gettext('on merit'),
-    'coverage upon request': gettext('on request'),
+const DRAFT_STATUS_TEXTS = {
+    'coverage not planned': gettext('coverage not planned'),
+    'coverage not intended': gettext('coverage not planned'),
+    'coverage intended': gettext('coverage planned'),
+    'coverage not decided': gettext('coverage on merit'),
+    'coverage not decided yet': gettext('coverage on merit'),
+    'coverage upon request': gettext('coverage on request'),
 };
 
-export const WORKFLOW_STATUS_TEXTS = {
-    [WORKFLOW_STATUS.ASSIGNED]: gettext('planned'),
-    [WORKFLOW_STATUS.ACTIVE]: gettext('in progress'),
-    [WORKFLOW_STATUS.COMPLETED]: gettext('available'),
-    [WORKFLOW_STATUS.CANCELLED]: gettext('cancelled'),
+const WORKFLOW_STATUS_TEXTS = {
+    [WORKFLOW_STATUS.ASSIGNED]: gettext('coverage planned'),
+    [WORKFLOW_STATUS.ACTIVE]: gettext('coverage in progress'),
+    [WORKFLOW_STATUS.COMPLETED]: gettext('coverage available'),
+    [WORKFLOW_STATUS.CANCELLED]: gettext('coverage cancelled'),
 };
 
 export const WORKFLOW_COLORS = {
