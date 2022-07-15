@@ -1065,7 +1065,7 @@ article.list {
             color: white;
             border-color: $main-blue;
             background-color: $main-blue;
-        
+
             &:hover {
                 color: white;
                 border-color: $mid-blue;
@@ -1075,7 +1075,7 @@ article.list {
         .btn-outline-secondary {
             color: $gray-light;
             border-color: $gray-light;
-            
+
             &:hover {
                 color: white;
                 border-color: #6D757E;
@@ -1246,7 +1246,7 @@ article.list {
 
     &--expanded {
         @include lg {
-            min-height: 50px;           
+            min-height: 50px;
             padding-block-end: 14px;
         }
 
@@ -2742,7 +2742,83 @@ a.wire-articles__versions {
     }
 }
 
+.agenda-planning__container {
+    margin: 0 0 10px !important;
+
+    .info-box__content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-box__label {
+        text-transform: uppercase;
+        font-size: 11px;
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
+}
+
+.agenda-planning__preview {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.8125rem;
+    margin-bottom: 12px;
+    padding: 6px;
+    background-color: var(--background-color);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.1);
+
+    @include xl {
+        padding: 12px;
+    }
+
+    h3 {
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    p {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+    }
+
+    &--expanded {
+        p {
+            margin-top: 5px !important;
+            margin-bottom: 5px !important;
+        }
+    }
+
+    .agenda-planning__preview-metadata {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px !important;
+
+        .agenda-planning__preview-agendas {
+            display: flex;
+            flex-direction: row;
+            margin-bottom: 6px;
+            align-items: center;
+
+            .icon-small--calendar {
+                margin-right: 6px;
+            }
+        }
+    }
+}
+
+.agenda-planning__preview-header {
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+
+    .icon-small--arrow-down {
+        color: var(--body-text);
+        transition: transform 0.2s ease;
+    }
+}
+
 .coverage-item {
+    background-color: #FCFCFC;
     display: flex;
     flex-direction: column;
     font-size: 0.8125rem;
@@ -3241,7 +3317,7 @@ a.wire-articles__versions {
         color: white;
         border-color: $main-blue;
         background-color: $main-blue;
-    
+
         &:hover {
             color: white;
             border-color: $mid-blue;
@@ -3251,7 +3327,7 @@ a.wire-articles__versions {
     .btn-outline-secondary {
         color: $gray-light;
         border-color: $gray-light;
-        
+
         &:hover {
             color: white;
             border-color: #6D757E;

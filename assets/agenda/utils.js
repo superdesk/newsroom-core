@@ -285,7 +285,18 @@ export function getCalendars(item) {
     return get(item, 'calendars', []).map(cal => cal.name).join(', ');
 }
 
+export function getAgendaNames(item) {
+    return (get(item, 'agendas') || [])
+        .map((agenda) => agenda.name)
+        .join(', ');
+}
 
+export function isPlanningItem(item) {
+    return item.item_type === 'planning' || (
+        item.item_type == null &&
+        item.event_id == null
+    );
+}
 
 /**
  * Returns item event link
@@ -511,7 +522,7 @@ const getNextPendingScheduledUpdate = (coverage) => {
     if (lastPublishedShceduledUpdateIndex === coverage.scheduled_updates.length - 1) {
         // Last scheduled_update was published, nothing pending
         return;
-    } 
+    }
 
     if (lastPublishedShceduledUpdateIndex < coverage.scheduled_updates.length - 1){
         // There is a pending scheduled_update

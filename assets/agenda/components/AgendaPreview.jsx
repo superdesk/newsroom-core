@@ -4,17 +4,10 @@ import classNames from 'classnames';
 import {get} from 'lodash';
 
 import {isEqualItem} from 'wire/utils';
+import {hasCoverages, isPostponed, isRescheduled, getInternalNote} from '../utils';
+
 import PreviewActionButtons from 'components/PreviewActionButtons';
-
 import Preview from 'ui/components/Preview';
-
-import {
-    hasCoverages,
-    isPostponed,
-    isRescheduled,
-    getInternalNote,
-    getCoveragesForDisplay,
-} from '../utils';
 import AgendaName from './AgendaName';
 import AgendaTime from './AgendaTime';
 import AgendaMeta from './AgendaMeta';
@@ -27,6 +20,7 @@ import AgendaPreviewAttachments from './AgendaPreviewAttachments';
 import AgendaCoverageRequest from './AgendaCoverageRequest';
 import AgendaTags from './AgendaTags';
 import AgendaListItemLabels from './AgendaListItemLabels';
+import {AgendaPreviewPlanning} from './AgendaPreviewPlanning';
 
 class AgendaPreview extends React.PureComponent {
     constructor(props) {
@@ -40,6 +34,12 @@ class AgendaPreview extends React.PureComponent {
     }
 
     render() {
+        if (!this.props.item) {
+            return (
+                <div className="wire-column__preview" />
+            );
+        }
+
         const {
             item,
             user,
@@ -64,44 +64,44 @@ class AgendaPreview extends React.PureComponent {
             'wire-column__preview--watched': isWatching,
         });
 
-        const plan = (get(item, 'planning_items') || []).find((p) => p.guid === previewPlan) || {};
-        const displayCoverages = getCoveragesForDisplay(item, plan, previewGroup);
+        const plan = (get(item, 'planning_items') || []).find((p) => p.guid === previewPlan);
         const previewInnerElement = (<AgendaListItemLabels item={item} />);
 
         return (
             <div className={previewClassName}>
-                {item &&
-                    <Preview onCloseClick={this.props.closePreview} published={item.versioncreated} innerElements={previewInnerElement}>
-                        <div className='wire-column__preview__top-bar'>
-                            <PreviewActionButtons item={item} user={user} actions={actions} plan={previewPlan} group={previewGroup} />
-                        </div>
+                <Preview onCloseClick={this.props.closePreview} published={item.versioncreated} innerElements={previewInnerElement}>
+                    <div className='wire-column__preview__top-bar'>
+                        <PreviewActionButtons item={item} user={user} actions={actions} plan={previewPlan} group={previewGroup} />
+                    </div>
 
-                        <div id='preview-article' className='wire-column__preview__content pt-0 noselect' ref={(preview) => this.preview = preview}>
-                            <AgendaName item={item} />
-                            <AgendaTime item={item} group={previewGroup}>
-                                <AgendaListItemLabels
-                                    item={item}
-                                />
-                            </AgendaTime>
-                            <AgendaPreviewImage item={item} onClick={openItemDetails} />
-                            <AgendaMeta item={item} />
-                            <AgendaLongDescription item={item} plan={plan}/>
-                            <AgendaPreviewCoverages item={item}
-                                currentCoverage={displayCoverages.current}
-                                previousCoverage={displayCoverages.previous}
-                                wireItems={wireItems}
-                                actions={coverageActions}
-                                user={user}
+                    <div id='preview-article' className='wire-column__preview__content pt-0 noselect' ref={(preview) => this.preview = preview}>
+                        <AgendaName item={item} />
+                        <AgendaTime item={item} group={previewGroup}>
+                            <AgendaListItemLabels
+                                item={item}
                             />
-                            <AgendaPreviewAttachments item={item} />
-                            <AgendaTags item={item} plan={plan} isItemDetail={false} />
-                            <AgendaEdNote item={item} plan={plan} secondaryNoteField='state_reason' />
-                            <AgendaInternalNote internalNote={getInternalNote(item, plan)}
-                                mt2={!!(item.ednote || plan.ednote || item.state_reason)} />
-                            {!eventsOnly && <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>}
-                        </div>
-                    </Preview>
-                }
+                        </AgendaTime>
+                        <AgendaPreviewImage item={item} onClick={openItemDetails} />
+                        <AgendaMeta item={item} />
+                        <AgendaLongDescription item={item} plan={plan}/>
+
+                        <AgendaPreviewPlanning
+                            user={user}
+                            item={item}
+                            planningId={previewPlan}
+                            wireItems={wireItems}
+                            coverageActions={coverageActions}
+                            previewGroup={previewGroup}
+                        />
+
+                        <AgendaPreviewAttachments item={item} />
+                        <AgendaTags item={item} plan={plan} isItemDetail={false} />
+                        <AgendaEdNote item={item} plan={{}} secondaryNoteField='state_reason' />
+                        <AgendaInternalNote internalNote={getInternalNote(item, {})}
+                            mt2={!!(item.ednote || plan.ednote || item.state_reason)} />
+                        {!eventsOnly && <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>}
+                    </div>
+                </Preview>
             </div>
         );
     }
