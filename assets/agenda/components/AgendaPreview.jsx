@@ -13,7 +13,6 @@ import AgendaTime from './AgendaTime';
 import AgendaMeta from './AgendaMeta';
 import AgendaEdNote from './AgendaEdNote';
 import AgendaInternalNote from './AgendaInternalNote';
-import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 import AgendaPreviewImage from './AgendaPreviewImage';
 import AgendaLongDescription from './AgendaLongDescription';
 import AgendaPreviewAttachments from './AgendaPreviewAttachments';

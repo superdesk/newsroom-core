@@ -82,4 +82,4 @@ AgendaPreviewPlanning.propTypes = {
     wireItems: PropTypes.array,
     coverageActions: PropTypes.array,
     previewGroup: PropTypes.string,
-}
+};

@@ -23,7 +23,6 @@ import AgendaLongDescription from './AgendaLongDescription';
 import AgendaMeta from './AgendaMeta';
 import AgendaEdNote from './AgendaEdNote';
 import AgendaInternalNote from './AgendaInternalNote';
-import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 import AgendaAttachments from './AgendaAttachments';
 import AgendaCoverageRequest from './AgendaCoverageRequest';
 import AgendaTags from './AgendaTags';
