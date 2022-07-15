@@ -9,18 +9,18 @@
 # Gideon Lehmann <gideon.lehmann@sourcefabric.org>, 2022
 # Evzen Deulin <evgeny.deulin@sourcefabric.org>, 2022
 # Simon Peacock <simon.peacock@gmail.com>, 2022
+# Petr Jašek <petr.jasek@sourcefabric.org>, 2022
 # Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2022
 # Marie-Eve Ouellette <marie-eve.ouellette@lapressecanadienne.com>, 2022
-# Petr Jašek <petr.jasek@sourcefabric.org>, 2022
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-06-20 14:54+0200\n"
+"POT-Creation-Date: 2022-07-07 14:48+0200\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
-"Last-Translator: Petr Jašek <petr.jasek@sourcefabric.org>, 2022\n"
+"Last-Translator: Marie-Eve Ouellette <marie-eve.ouellette@lapressecanadienne.com>, 2022\n"
 "Language-Team: French (Canada) (https://www.transifex.com/sourcefabric/teams/6584/fr_CA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,13 +29,13 @@ msgstr ""
 "Language: fr_CA\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
-#: newsroom/email.py:354
+#: newsroom/email.py:355
 msgid "Kill/Takedown notice"
 msgstr "Avis de supression"
 
-#: newsroom/email.py:363
+#: newsroom/email.py:364
 msgid "Agenda cancelled notice"
-msgstr "Avis de calendrier annulé"
+msgstr "Avis d'annulation d'événement"
 
 #: newsroom/email_templates.py:78
 msgid "Email template name not supplied"
@@ -160,11 +160,11 @@ msgstr "Calendrier"
 msgid "Saved/Watched Items"
 msgstr "Éléments enregistrés ou surveillés"
 
-#: newsroom/agenda/__init__.py:35
+#: newsroom/agenda/__init__.py:36
 msgid "Google Maps Styles"
 msgstr "Styles de Google Maps"
 
-#: newsroom/agenda/__init__.py:37
+#: newsroom/agenda/__init__.py:38
 msgid ""
 "Provide styles delimited by &(ampersand). For example, "
 "feature:poi|element:labels|visibility:off&transit|visibility:off. Refer to "
@@ -178,7 +178,7 @@ msgstr ""
 
 #: assets/agenda/components/AgendaTags.jsx:25
 #: assets/company-reports/components/ContentActivity.jsx:110
-#: assets/wire/components/PreviewTags.jsx:37 newsroom/agenda/__init__.py:44
+#: assets/wire/components/PreviewTags.jsx:37 newsroom/agenda/__init__.py:45
 #: newsroom/reports/content_activity.py:228
 #: newsroom/templates/wire_item.html:76
 #: newsroom/templates/wire_item_print.html:24 newsroom/wire/__init__.py:106
@@ -187,27 +187,27 @@ msgstr "Fil"
 
 #: assets/company-reports/components/ContentActivity.jsx:111
 #: assets/monitoring/components/MonitoringList.jsx:24
-#: assets/wire/components/PreviewTags.jsx:43 newsroom/agenda/__init__.py:48
+#: assets/wire/components/PreviewTags.jsx:43 newsroom/agenda/__init__.py:49
 #: newsroom/monitoring/forms.py:19 newsroom/reports/content_activity.py:229
 #: newsroom/wire/__init__.py:110
 msgid "Subject"
 msgstr "Sujet"
 
 #: assets/wire/components/fields/UrgencyLabel.jsx:43
-#: newsroom/agenda/__init__.py:52 newsroom/wire/__init__.py:118
+#: newsroom/agenda/__init__.py:53 newsroom/wire/__init__.py:118
 msgid "News Value"
 msgstr "Priorité de la nouvelle"
 
 #: assets/company-reports/components/ContentActivity.jsx:109
 #: assets/search/components/TopicParameters.jsx:63
-#: newsroom/agenda/__init__.py:56 newsroom/reports/content_activity.py:227
+#: newsroom/agenda/__init__.py:57 newsroom/reports/content_activity.py:227
 #: newsroom/wire/__init__.py:122
 msgid "Place"
 msgstr "Endroit"
 
 #: newsroom/agenda/agenda.py:46
 msgid "An event you have been watching has been updated"
-msgstr "Un événement que vous avez regardé a été mis à jour"
+msgstr "Un événement que vous avez surveillé a été mis à jour"
 
 #: newsroom/agenda/agenda.py:47
 msgid "Event updated"
@@ -215,7 +215,7 @@ msgstr "Événement mis à jour"
 
 #: newsroom/agenda/agenda.py:50
 msgid "An event you have been watching has been cancelled"
-msgstr "Un événement que vous avez regardé a été annulé"
+msgstr "Un événement que vous avez surveillé a été annulé"
 
 #: newsroom/agenda/agenda.py:51
 msgid "Event cancelled"
@@ -223,23 +223,23 @@ msgstr "Événement annulé"
 
 #: newsroom/agenda/agenda.py:54
 msgid "An event you have been watching has a new planning"
-msgstr "Un événement que vous avez regardé a une nouvelle planification"
+msgstr "Un événement que vous avez surveillé a une nouvelle couverture"
 
 #: newsroom/agenda/agenda.py:55
 msgid "Planning added"
-msgstr "Planification ajoutée"
+msgstr "Couverture ajoutée"
 
 #: newsroom/agenda/agenda.py:58
 msgid "An event you have been watching has a planning cancelled"
-msgstr "La planification d'un événement que vous avez regardé a été annulée"
+msgstr "La couverture d'un événement que vous avez surveillé a été annulée"
 
 #: newsroom/agenda/agenda.py:59
 msgid "Planning cancelled"
-msgstr "Planification annulée"
+msgstr "Couverture annulée"
 
 #: newsroom/agenda/agenda.py:62
 msgid "An event you have been watching has a new coverage added"
-msgstr "Une couverture a été ajoutée pour un événement que vous avez regardé"
+msgstr "Une couverture a été ajoutée à un événement que vous avez surveillé"
 
 #: newsroom/agenda/agenda.py:63
 msgid "Coverage added"
@@ -482,7 +482,7 @@ msgstr "Délai pour accéder aux communiqués de presse"
 #: newsroom/templates/monitoring_index.html:3
 #: newsroom/templates/monitoring_index.html:6
 msgid "Monitoring"
-msgstr "Supervision"
+msgstr "Suivi"
 
 #: newsroom/monitoring/__init__.py:28 newsroom/monitoring/forms.py:8
 msgid "PDF"
@@ -595,11 +595,11 @@ msgstr "Requête"
 
 #: newsroom/monitoring/search.py:84
 msgid "No monitoring profile requested."
-msgstr "Aucun profil de supervision demandé."
+msgstr "Aucun profil de suivi demandé."
 
 #: newsroom/monitoring/views.py:161
 msgid "monitoring Profile not found"
-msgstr "Profil de supervision non trouvé"
+msgstr "Profil de suivi non trouvé"
 
 #: assets/products/components/EditProduct.jsx:28
 #: newsroom/navigations/__init__.py:14
@@ -1315,17 +1315,17 @@ msgstr "Nouveau filtre de section"
 msgid "New card"
 msgstr "Nouvelle fiche"
 
-#: assets/utils.js:411
+#: assets/utils.js:412
 msgid "{{startTime}} - {{endTime}}"
 msgstr "{{startTime}} - {{endTime}}"
 
 #: assets/agenda/components/AgendaMetaTime.jsx:68
-#: assets/agenda/components/AgendaMetaTime.jsx:76 assets/utils.js:424
-#: assets/utils.js:429
+#: assets/agenda/components/AgendaMetaTime.jsx:76 assets/utils.js:426
+#: assets/utils.js:431
 msgid "{{startDate}} to {{endDate}}"
 msgstr "{{startDate}} à {{endDate}}"
 
-#: assets/utils.js:635
+#: assets/utils.js:637
 msgid "Failed to process request!"
 msgstr "La requête n'a pas pu être exécutée!"
 
@@ -1334,17 +1334,17 @@ msgstr "La requête n'a pas pu être exécutée!"
 #: assets/agenda/components/AgendaList.jsx:210
 #: assets/company-reports/components/ProductStories.jsx:26
 #: assets/components/CalendarButton.jsx:33
-#: assets/components/ExpiryDateInput.jsx:90 assets/utils.js:811
+#: assets/components/ExpiryDateInput.jsx:90 assets/utils.js:813
 #: assets/wire/components/filters/NavCreatedPicker.jsx:9
 msgid "Today"
 msgstr "Aujourd'hui"
 
-#: assets/company-reports/components/ProductStories.jsx:28 assets/utils.js:813
+#: assets/company-reports/components/ProductStories.jsx:28 assets/utils.js:815
 #: assets/wire/components/filters/NavCreatedPicker.jsx:10
 msgid "This week"
 msgstr "Cette semaine"
 
-#: assets/company-reports/components/ProductStories.jsx:30 assets/utils.js:815
+#: assets/company-reports/components/ProductStories.jsx:30 assets/utils.js:817
 #: assets/wire/components/filters/NavCreatedPicker.jsx:11
 msgid "This month"
 msgstr "Ce mois-ci"
@@ -1475,41 +1475,40 @@ msgid "Watch this coverage"
 msgstr "Surveiller cette couverture"
 
 #: assets/agenda/utils.js:54
-msgid "updated {{ at }}"
-msgstr "mis à jour {{ at }}"
+msgid "coverage updated {{ at }}"
+msgstr "couverture mise à jour {{ at }}"
 
 #: assets/agenda/utils.js:64
 msgid "Time to be confirmed"
 msgstr "Heure à confirmer"
 
 #: assets/agenda/utils.js:74 assets/agenda/utils.js:75
-msgid "not planned"
-msgstr "non planifié"
+msgid "coverage not planned"
+msgstr "couverture non planifiée"
 
 #: assets/agenda/utils.js:76 assets/agenda/utils.js:83
-msgid "planned"
-msgstr "planifié"
+msgid "coverage planned"
+msgstr "couverture planifiée"
 
 #: assets/agenda/utils.js:77 assets/agenda/utils.js:78
-msgid "on merit"
-msgstr "au mérite"
+msgid "coverage on merit"
+msgstr "couverture au mérite"
 
 #: assets/agenda/utils.js:79
-msgid "on request"
-msgstr "sur demande"
+msgid "coverage on request"
+msgstr "couverture sur demande"
 
 #: assets/agenda/utils.js:84
-msgid "in progress"
-msgstr "en cours"
+msgid "coverage in progress"
+msgstr "couverture en cours"
 
 #: assets/agenda/utils.js:85
-msgid "available"
-msgstr "disponible"
+msgid "coverage available"
+msgstr "couverture disponible"
 
-#: assets/agenda/components/AgendaListItemLabels.jsx:19
 #: assets/agenda/utils.js:86
-msgid "cancelled"
-msgstr "annulé"
+msgid "coverage cancelled"
+msgstr "couverture annulée"
 
 #: assets/agenda/utils.js:479
 msgid "Update expected @ ${dateString}"
@@ -1695,15 +1694,16 @@ msgstr "{{ type }}{{ slugline }} {{ status_text }}"
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:36
 msgid "Planned {{ type }} {{ slugline }}, expected {{date}} at {{time}}"
-msgstr "{{ type }} {{ slugline }} planifié, attendu le {{ date }} à {{time}}"
+msgstr ""
+"{{ type }} {{ slugline }} planifiée, attendue le {{ date }} à {{time}}"
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:45
 msgid "{{ type }} {{ slugline }} in progress, expected {{date}} at {{time}}"
-msgstr "{{ type }} {{ slugline }} en cours, attendu le {{ date }} à {{time}}"
+msgstr "{{ type }} {{ slugline }} en cours, attendue le {{ date }} à {{time}}"
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:51
 msgid "{{ type }} {{slugline}} cancelled"
-msgstr "{{ type }} {{slugline}} annulé"
+msgstr "{{ type }} {{slugline}} annulée"
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:59
 msgid " (update to come)"
@@ -1711,7 +1711,7 @@ msgstr "(mise à jour à venir)"
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:59
 msgid " (updated)"
-msgstr "(mis à jour)"
+msgstr "(mise à jour)"
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:63
 msgid "{{ type }} {{ slugline }} available{{deliveryState}}"
@@ -1728,6 +1728,10 @@ msgstr "{{ attachments }} fichier(s) joint(s)"
 #: assets/agenda/components/AgendaListItemLabels.jsx:14
 msgid "postponed"
 msgstr "reporté"
+
+#: assets/agenda/components/AgendaListItemLabels.jsx:19
+msgid "cancelled"
+msgstr "annulé"
 
 #: assets/agenda/components/AgendaListItemLabels.jsx:24
 msgid "rescheduled"
@@ -1771,22 +1775,18 @@ msgstr "Afficher plus de résultats..."
 msgid "Status"
 msgstr "Statut"
 
-#: assets/agenda/components/CoverageItemStatus.jsx:81
-msgid "coverage {{ state }} "
-msgstr "{{ state }}"
-
-#: assets/agenda/components/CoverageItemStatus.jsx:94
-#: assets/agenda/components/CoverageItemStatus.jsx:111
+#: assets/agenda/components/CoverageItemStatus.jsx:93
+#: assets/agenda/components/CoverageItemStatus.jsx:110
 msgid "Open in new tab"
 msgstr "Ouvrir dans un nouvel onglet"
 
-#: assets/agenda/components/CoverageItemStatus.jsx:95
-#: assets/agenda/components/CoverageItemStatus.jsx:112
-#: assets/agenda/components/CoverageItemStatus.jsx:118
+#: assets/agenda/components/CoverageItemStatus.jsx:94
+#: assets/agenda/components/CoverageItemStatus.jsx:111
+#: assets/agenda/components/CoverageItemStatus.jsx:117
 msgid "View Content"
 msgstr "Voir le contenu"
 
-#: assets/agenda/components/CoverageItemStatus.jsx:147
+#: assets/agenda/components/CoverageItemStatus.jsx:146
 msgid "Update coming"
 msgstr "Mise à jour à venir"
 
@@ -2246,11 +2246,11 @@ msgstr "Système"
 
 #: assets/components/AuditInformation.jsx:39
 msgid "Created by {{author}} at {{date}}"
-msgstr "Par {{author}} créé à {{date}}"
+msgstr "Créé par {{author}} le {{date}}"
 
 #: assets/components/AuditInformation.jsx:53
 msgid "Updated by {{author}} at {{date}}"
-msgstr "Mis à jour par {{author}} à {{date}}"
+msgstr "Mis à jour par {{author}} le {{date}}"
 
 #: assets/components/CardEditor.jsx:102
 #: assets/search/components/FollowedTopics.jsx:45
@@ -2402,11 +2402,11 @@ msgstr "Endroit"
 
 #: assets/components/cards/edit/ConfigExternalMedia.jsx:16
 msgid "More button label"
-msgstr "Plus d'étiquette de bouton"
+msgstr "Plus de boutons"
 
 #: assets/components/cards/edit/ConfigExternalMedia.jsx:23
 msgid "More button url"
-msgstr "Plus d'URL de bouton"
+msgstr "Plus de boutons"
 
 #: assets/components/cards/edit/ConfigExternalMedia.jsx:40
 msgid "External url to fetch media"
@@ -2514,27 +2514,27 @@ msgstr "Aucune navigation définie!"
 
 #: assets/monitoring/actions.js:92
 msgid "Monitoring Profile updated successfully"
-msgstr "Profil de supervision mis à jour avec succès"
+msgstr "Profil de suivi mis à jour avec succès"
 
 #: assets/monitoring/actions.js:94
 msgid "Monitoring Profile created successfully"
-msgstr "Profil de supervision créé avec succès"
+msgstr "Profil de suivi créé avec succès"
 
 #: assets/monitoring/actions.js:160
 msgid "Monitoring Profile users updated successfully"
-msgstr "Utilisateurs du profil de supervision mis à jour avec succès"
+msgstr "Utilisateurs du profil de suivi mis à jour avec succès"
 
 #: assets/monitoring/actions.js:172
 msgid "Please create the monitoring profile first."
-msgstr "Veuillez d'abord créer le profil de supervision."
+msgstr "Veuillez d'abord créer le profil de suivi."
 
 #: assets/monitoring/actions.js:177
 msgid "Monitoring Profile schedule updated successfully"
-msgstr "Horaire du profil de supervision mis à jour avec succès"
+msgstr "Horaire du profil de suivi mis à jour avec succès"
 
 #: assets/monitoring/actions.js:193
 msgid "Monitoring Profile deleted successfully"
-msgstr "Profil de supervision supprimé avec succès"
+msgstr "Profil de suivi supprimé avec succès"
 
 #: assets/monitoring/components/EditMonitoringProfile.jsx:26
 msgid "Profile"
@@ -2546,16 +2546,16 @@ msgstr "Horaire"
 
 #: assets/monitoring/components/EditMonitoringProfile.jsx:43
 msgid "There are no users for this monitoring profile."
-msgstr "Il n'y a aucun utilisateur pour ce profil de supervision."
+msgstr "Il n'y a aucun utilisateur pour ce profil de suivi."
 
 #: assets/monitoring/components/EditMonitoringProfile.jsx:78
 #: assets/search/components/MonitoringEditor.jsx:122
 msgid "Edit Monitoring"
-msgstr "Modifier la supervision"
+msgstr "Modifier le suivi"
 
 #: assets/monitoring/components/EditMonitoringProfile.jsx:80
 msgid "Add/Edit Monitoring Profile"
-msgstr "Ajouter/Modifier le profil de supervision"
+msgstr "Ajouter/Modifier le profil de suivi"
 
 #: assets/monitoring/components/EditMonitoringProfile.jsx:119
 #: assets/search/components/MonitoringEditor.jsx:167
@@ -2564,7 +2564,7 @@ msgstr "Ligne d'objet"
 
 #: assets/monitoring/components/EditMonitoringProfile.jsx:154
 msgid "Test Monitoring Profile query"
-msgstr "Tester la requête de profil de supervision"
+msgstr "Tester la requête de profil de suivi"
 
 #: assets/monitoring/components/EditMonitoringProfile.jsx:159
 msgid "Keywords"
@@ -2582,7 +2582,7 @@ msgstr "Type de format"
 #: assets/monitoring/components/MonitoringApp.jsx:27
 #: assets/wire/components/WireApp.jsx:77
 msgid "Monitoring Profiles"
-msgstr "Profils de supervision"
+msgstr "Profils de suivi"
 
 #: assets/monitoring/components/MonitoringApp.jsx:28
 msgid "Schedules"
@@ -2595,7 +2595,7 @@ msgstr "Entreprises avec horaires"
 #: assets/monitoring/components/MonitoringApp.jsx:82
 #: assets/search/components/MonitoringEditor.jsx:27
 msgid "Monitoring Profile"
-msgstr "Profil de supervision"
+msgstr "Profil de suivi"
 
 #: assets/monitoring/components/MonitoringPanel.jsx:36
 msgid "Please provide a name"
@@ -2611,7 +2611,7 @@ msgstr "Veuillez fournir une requête"
 
 #: assets/monitoring/components/MonitoringPanel.jsx:67
 msgid "Would you like to delete the Monitoring Profile: {{name}}?"
-msgstr "Voulez-vous supprimer le profil de supervision: {{name}}?"
+msgstr "Voulez-vous supprimer le profil de suivi: {{name}}?"
 
 #: assets/monitoring/components/MonitoringSchedule.jsx:19
 msgid "Immediate"
@@ -2776,7 +2776,7 @@ msgstr "Notifications effacées avec succès"
 
 #: assets/notifications/components/notificationItems.jsx:33
 msgid "Shared by {{ first_name }} {{ last_name }} on {{ datetime }}"
-msgstr "Partagé par {{ first_name }} {{ last_name }} à {{ datetime }}"
+msgstr "Partagé par {{ first_name }} {{ last_name }} le {{ datetime }}"
 
 #: assets/notifications/components/notificationItems.jsx:36
 msgid "Created on {{ datetime }}"
@@ -2797,12 +2797,11 @@ msgstr "Un événement que vous surveillez a été mis à jour"
 #: assets/notifications/components/notificationItems.jsx:101
 msgid "An Agenda item has arrived that matches a subscribed topic"
 msgstr ""
-"Un élément du calendrier à propos d'un sujet auquel vous êtes abonné a été "
-"publié"
+"Un élément du calendrier sur un sujet auquel vous êtes abonné a été publié"
 
 #: assets/notifications/components/notificationItems.jsx:102
 msgid "A story has arrived that matches a subscribed topic"
-msgstr "Un article à propos d'un sujet auquel vous êtes abonné a été publié"
+msgstr "Un article sur un sujet auquel vous êtes abonné a été publié"
 
 #: assets/notifications/components/notificationItems.jsx:121
 msgid "An Agenda Topic has been shared with you"
@@ -3100,7 +3099,7 @@ msgstr "Créé le {{ date }} à {{ time }}"
 
 #: assets/search/components/TopicParameters.jsx:22
 msgid "From: {{date}}"
-msgstr "À partir du: {{date}}"
+msgstr "Du: {{date}}"
 
 #: assets/search/components/TopicParameters.jsx:25
 msgid "To: {{date}}"
@@ -3179,7 +3178,7 @@ msgstr "Nouveau filtre de section"
 
 #: assets/tests/utils.spec.js:5
 msgid "foo"
-msgstr "foo"
+msgstr ""
 
 #: assets/tests/utils.spec.js:9
 msgid "hello {{ name }}"
@@ -3252,7 +3251,7 @@ msgstr "Mes sujets de calendrier"
 
 #: assets/user-profile/components/UserProfileApp.jsx:64
 msgid "My Monitoring"
-msgstr "Ma supervision"
+msgstr "Mon suivi"
 
 #: assets/user-profile/components/UserProfileApp.jsx:164
 msgid "Logout"
