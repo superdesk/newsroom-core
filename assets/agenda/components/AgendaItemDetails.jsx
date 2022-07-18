@@ -41,6 +41,7 @@ export default function AgendaItemDetails(
         eventsOnly,
         wireItems,
         coverageActions,
+        detailsConfig,
     })
 {
     const locations = getLocations(item);
@@ -85,7 +86,12 @@ export default function AgendaItemDetails(
                             <AgendaAttachments item={item} />
                         </ArticleSidebarBox>
                     )}
-                    <AgendaTags item={item} plan={plan} isItemDetail={true} />
+                    <AgendaTags
+                        item={item}
+                        plan={plan}
+                        isItemDetail={true}
+                        displayConfig={detailsConfig}
+                    />
                     <AgendaEdNote item={item} plan={plan} secondaryNoteField='state_reason'/>
                     <AgendaInternalNote internalNote={internalNotes}
                         mt2={!!(item.ednote || plan.ednote || item.state_reason)}/>
@@ -111,4 +117,5 @@ AgendaItemDetails.propTypes = {
     eventsOnly: PropTypes.bool,
     wireItems: PropTypes.array,
     coverageActions: PropTypes.array,
+    detailsConfig: PropTypes.object,
 };

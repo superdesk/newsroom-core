@@ -54,7 +54,7 @@ import AgendaFilters from './AgendaFilters';
 import AgendaDateNavigation from './AgendaDateNavigation';
 import BookmarkTabs from 'components/BookmarkTabs';
 import {setActiveDate, setAgendaDropdownFilter} from 'local-store';
-import {previewConfigSelector} from 'ui/selectors';
+import {previewConfigSelector, detailsConfigSelector} from 'ui/selectors';
 
 const modals = {
     shareItem: ShareItemModal,
@@ -141,6 +141,7 @@ class AgendaApp extends BaseApp {
                 eventsOnly={eventsOnly}
                 wireItems={this.props.wireItems}
                 coverageActions={this.props.coverageActions}
+                detailsConfig={this.props.detailsConfig}
             />] : [
                 <section key="contentHeader" className='content-header'>
                     <h3 className="a11y-only">{gettext('Agenda Content')}</h3>
@@ -261,6 +262,7 @@ class AgendaApp extends BaseApp {
                             previewPlan={this.props.previewPlan}
                             eventsOnly={eventsOnly}
                             wireItems={this.props.wireItems}
+                            previewConfig={this.props.previewConfig}
                         />
                     </div>
                 </section>
@@ -326,6 +328,7 @@ AgendaApp.propTypes = {
     searchParams: PropTypes.object,
     showSaveTopic: PropTypes.bool,
     previewConfig: PropTypes.object,
+    detailsConfig: PropTypes.object,
     groups: PropTypes.array,
 };
 
@@ -367,6 +370,7 @@ const mapStateToProps = (state) => ({
     searchParams: searchParamsSelector(state),
     showSaveTopic: showSaveTopicSelector(state),
     previewConfig: previewConfigSelector(state),
+    detailsConfig: detailsConfigSelector(state),
     groups: get(state, 'groups', []),
     hasAgendaFeaturedItems: state.hasAgendaFeaturedItems,
 });
