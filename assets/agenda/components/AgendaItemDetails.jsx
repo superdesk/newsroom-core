@@ -94,7 +94,7 @@ export default function AgendaItemDetails(
                     />
                     <AgendaEdNote item={item} plan={plan} secondaryNoteField='state_reason'/>
                     <AgendaInternalNote internalNote={internalNotes}
-                        mt2={!!(item.ednote || plan.ednote || item.state_reason)}/>
+                        mt2={!!(item.ednote || get(plan, 'ednote') || item.state_reason)}/>
                     {!eventsOnly && <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>}
                 </ArticleSidebar>
             </Article>
