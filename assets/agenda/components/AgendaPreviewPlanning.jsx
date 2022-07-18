@@ -2,6 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
 
+import {gettext} from 'utils';
 import {isPlanningItem} from '../utils';
 import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 
@@ -39,7 +40,9 @@ export class AgendaPreviewPlanning extends React.Component {
                 {!plan ? null : (
                     <div className="agenda-planning__container info-box">
                         <div className="info-box__content">
-                            <span className="info-box__label">Planning Item</span>
+                            <span className="info-box__label">
+                                {gettext('Planning Item')}
+                            </span>
                             <AgendaPreviewCoverages
                                 key={plan.guid}
                                 item={item}
@@ -55,7 +58,9 @@ export class AgendaPreviewPlanning extends React.Component {
                 {!otherPlanningItems.length ? null : (
                     <div className="agenda-planning__container info-box">
                         <div className="info-box__content">
-                            <span className="info-box__label">Other Planning Items</span>
+                            <span className="info-box__label">
+                                {gettext('Other Planning Items')}
+                            </span>
                             {otherPlanningItems.map((planningItem) => (
                                 <AgendaPreviewCoverages
                                     key={planningItem.guid}
