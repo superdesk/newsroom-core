@@ -5,8 +5,9 @@ import {isEmpty, get} from 'lodash';
 import {gettext} from 'utils';
 
 import {getLocations, mapsKey} from 'maps/utils';
-import StaticMap from 'maps/components/static';
+import {hasAttachments, getInternalNote} from '../utils';
 
+import StaticMap from 'maps/components/static';
 import PreviewActionButtons from 'components/PreviewActionButtons';
 
 import Content from 'ui/components/Content';
@@ -18,21 +19,14 @@ import ArticleBody from 'ui/components/ArticleBody';
 import ArticleSidebar from 'ui/components/ArticleSidebar';
 import ArticleSidebarBox from 'ui/components/ArticleSidebarBox';
 
-import {
-    hasCoverages,
-    hasAttachments,
-    getInternalNote,
-    getCoveragesForDisplay,
-} from '../utils';
-
 import AgendaLongDescription from './AgendaLongDescription';
 import AgendaMeta from './AgendaMeta';
 import AgendaEdNote from './AgendaEdNote';
 import AgendaInternalNote from './AgendaInternalNote';
-import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 import AgendaAttachments from './AgendaAttachments';
 import AgendaCoverageRequest from './AgendaCoverageRequest';
 import AgendaTags from './AgendaTags';
+import {AgendaPreviewPlanning} from './AgendaPreviewPlanning';
 
 
 export default function AgendaItemDetails(
@@ -57,13 +51,12 @@ export default function AgendaItemDetails(
     // if (mapsLoaded() && !isEmpty(geoLocations)) {
     //     map = <Map locations={geoLocations} />;
     // }
-    const plan = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
 
     if (!map && mapsKey() && !isEmpty(locations)) {
         map = <StaticMap locations={locations} scale={2} />;
     }
 
-    const displayCoverages = getCoveragesForDisplay(item, plan, group);
+    const plan = (get(item, 'planning_items') || []).find((p) => p.guid === planningId);
     const internalNotes = getInternalNote(item, plan);
 
     return (
@@ -80,16 +73,13 @@ export default function AgendaItemDetails(
                     <AgendaLongDescription item={item} plan={plan}/>
                 </ArticleBody>
                 <ArticleSidebar>
-                    <div>
-                        {hasCoverages(item) &&
-                        <AgendaPreviewCoverages
-                            item={item}
-                            currentCoverage={displayCoverages.current}
-                            previousCoverage={displayCoverages.previous}
-                            wireItems={wireItems}
-                            actions={coverageActions}
-                            user={user} />}
-                    </div>
+                    <AgendaPreviewPlanning
+                        user={user}
+                        item={item}
+                        planningId={planningId}
+                        wireItems={wireItems}
+                        coverageActions={coverageActions}
+                    />
                     {hasAttachments(item) && (
                         <ArticleSidebarBox label={gettext('Attachments')}>
                             <AgendaAttachments item={item} />

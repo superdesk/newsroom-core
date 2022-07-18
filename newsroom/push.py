@@ -428,6 +428,7 @@ def set_agenda_metadata_from_planning(agenda, planning_item, force_adhoc=False):
     plan['slugline'] = planning_item.get('slugline')
     plan['description_text'] = planning_item.get('description_text')
     plan['headline'] = planning_item.get('headline')
+    plan['name'] = planning_item.get('name')
     plan['abstract'] = planning_item.get('abstract')
     plan['place'] = planning_item.get('place')
     plan['subject'] = format_qcode_items(planning_item.get('subject'))
