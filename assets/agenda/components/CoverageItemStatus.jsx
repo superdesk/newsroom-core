@@ -77,8 +77,7 @@ export default class CoverageItemStatus extends React.Component {
         let content = [
             (<span key="topRow" className={get(actions, 'length', 0) === 0 ? 'coverage-item--element-grow' : ''} >
                 <span key="label" className='coverage-item__text-label mr-1'>{gettext('Status')}:</span>
-                <span key="value">{gettext('coverage {{ state }} ',
-                    {state: getCoverageStatusText(coverage)})}</span>
+                <span key="value">{getCoverageStatusText(coverage)}</span>
             </span>),
             actions
         ];
