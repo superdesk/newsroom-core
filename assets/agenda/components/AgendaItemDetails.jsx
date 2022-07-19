@@ -5,7 +5,7 @@ import {isEmpty, get} from 'lodash';
 import {gettext} from 'utils';
 
 import {getLocations, mapsKey} from 'maps/utils';
-import {hasAttachments, getInternalNote} from '../utils';
+import {hasAttachments, getInternalNote, planHasEvent} from '../utils';
 
 import StaticMap from 'maps/components/static';
 import PreviewActionButtons from 'components/PreviewActionButtons';
@@ -27,6 +27,7 @@ import AgendaAttachments from './AgendaAttachments';
 import AgendaCoverageRequest from './AgendaCoverageRequest';
 import AgendaTags from './AgendaTags';
 import {AgendaPreviewPlanning} from './AgendaPreviewPlanning';
+import {AgendaPreviewEvent} from './AgendaPreviewEvent';
 
 
 export default function AgendaItemDetails(
@@ -81,6 +82,9 @@ export default function AgendaItemDetails(
                         wireItems={wireItems}
                         coverageActions={coverageActions}
                     />
+                    {!planHasEvent(item) ? null : (
+                        <AgendaPreviewEvent item={item} />
+                    )}
                     {hasAttachments(item) && (
                         <ArticleSidebarBox label={gettext('Attachments')}>
                             <AgendaAttachments item={item} />

@@ -298,6 +298,10 @@ export function isPlanningItem(item) {
     );
 }
 
+export function planHasEvent(item) {
+    return isPlanningItem(item) && item.event_id != null;
+}
+
 /**
  * Returns item event link
  *
