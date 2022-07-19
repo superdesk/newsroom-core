@@ -94,10 +94,15 @@ class AgendaPreview extends React.PureComponent {
                         />
 
                         <AgendaPreviewAttachments item={item} />
-                        <AgendaTags item={item} plan={plan} isItemDetail={false} />
+                        <AgendaTags
+                            item={item}
+                            plan={plan}
+                            isItemDetail={false}
+                            displayConfig={this.props.previewConfig}
+                        />
                         <AgendaEdNote item={item} plan={{}} secondaryNoteField='state_reason' />
                         <AgendaInternalNote internalNote={getInternalNote(item, {})}
-                            mt2={!!(item.ednote || plan.ednote || item.state_reason)} />
+                            mt2={!!(item.ednote || get(plan, 'ednote') || item.state_reason)} />
                         {!eventsOnly && <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>}
                     </div>
                 </Preview>
@@ -123,6 +128,7 @@ AgendaPreview.propTypes = {
     eventsOnly: PropTypes.bool,
     wireItems: PropTypes.array,
     coverageActions: PropTypes.array,
+    previewConfig: PropTypes.object,
 };
 
 AgendaPreview.defaultProps = {eventsOnly: false};
