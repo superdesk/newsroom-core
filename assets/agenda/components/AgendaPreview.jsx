@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import {get} from 'lodash';
 
 import {isEqualItem} from 'wire/utils';
-import {hasCoverages, isPostponed, isRescheduled, getInternalNote} from '../utils';
+import {hasCoverages, isPostponed, isRescheduled, getInternalNote, planHasEvent} from '../utils';
 
 import PreviewActionButtons from 'components/PreviewActionButtons';
 import Preview from 'ui/components/Preview';
@@ -20,6 +20,7 @@ import AgendaCoverageRequest from './AgendaCoverageRequest';
 import AgendaTags from './AgendaTags';
 import AgendaListItemLabels from './AgendaListItemLabels';
 import {AgendaPreviewPlanning} from './AgendaPreviewPlanning';
+import {AgendaPreviewEvent} from './AgendaPreviewEvent';
 
 class AgendaPreview extends React.PureComponent {
     constructor(props) {
@@ -92,7 +93,9 @@ class AgendaPreview extends React.PureComponent {
                             coverageActions={coverageActions}
                             previewGroup={previewGroup}
                         />
-
+                        {!planHasEvent(item) ? null : (
+                            <AgendaPreviewEvent item={item} />
+                        )}
                         <AgendaPreviewAttachments item={item} />
                         <AgendaTags
                             item={item}

@@ -2781,10 +2781,23 @@ a.wire-articles__versions {
         margin-bottom: 0 !important;
     }
 
+    .wire-column__preview__content-header {
+        margin-bottom: 0 !important;
+        margin-top: 0 !important;
+    }
+
+    .wire-column__preview__date--event {
+        padding: 0;
+    }
+
     &--expanded {
         p {
             margin-top: 5px !important;
             margin-bottom: 5px !important;
+        }
+
+        .wire-column__preview__date--event {
+            padding-bottom: 1rem;
         }
     }
 
