@@ -6,15 +6,28 @@ import DropdownFilterButton from './DropdownFilterButton';
 
 const compareFunction = (a, b) => String(a.key).localeCompare(String(b.key));
 
-const processBuckets = (buckets, filter, toggleFilter) => (filter.notSorted ? buckets : buckets.sort(compareFunction)).map(
+export const processBuckets = (buckets, filter, toggleFilter) => (filter.notSorted ? buckets : buckets.sort(compareFunction)).map(
     (bucket, index) =>
         bucket.key === 'divider' ?
             <div className="dropdown-divider" key={index}/> :
             <button
                 key={bucket.key}
-                className='dropdown-item'
+                className={classNames(
+                    'dropdown-item',
+                    {'dropdown-item--active': filter.isItemActive && filter.isItemActive(bucket.key)}
+                )}
                 onClick={() => toggleFilter(filter.field, bucket.key)}
             >{filter.transform ? filter.transform(bucket.key, bucket) : bucket.key}</button>);
+
+
+function getActiveFilterLabel(filter, activeFilter, isActive) {
+    if (isActive) {
+        return filter.transform ? filter.transform(activeFilter[filter.field][0]) : gettext(activeFilter[filter.field][0]);
+    }
+    else {
+        return gettext(filter.label);
+    }
+}
 
 function DropdownFilter({
     aggregations,
@@ -25,15 +38,20 @@ function DropdownFilter({
     getFilterLabel,
     className,
     ...props}) {
+    const isActive = !!(activeFilter[filter.field]);
+    const filterLabel = getFilterLabel ? getFilterLabel : getActiveFilterLabel;
+
     return (<div className={classNames(
         'btn-group',
         {[className]: className}
     )} key={filter.field}>
         <DropdownFilterButton
-            filter={filter}
-            activeFilter={activeFilter}
-            getFilterLabel={getFilterLabel}
-            {...props}
+            id={filter.field}
+            isActive={isActive}
+            autoToggle={props.autoToggle}
+            onClick={props.onClick}
+            icon={filter.icon}
+            label={filterLabel(filter, activeFilter, isActive, {...props})}
         />
         <div className='dropdown-menu' aria-labelledby={filter.field}>
             <button
@@ -55,6 +73,8 @@ DropdownFilter.propTypes = {
     getDropdownItems: PropTypes.func,
     getFilterLabel: PropTypes.func,
     className: PropTypes.string,
+    autoToggle: PropTypes.bool,
+    onClick: PropTypes.func,
 };
 
 export default DropdownFilter;

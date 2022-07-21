@@ -1,0 +1,91 @@
+import * as React from 'react';
+import PropTypes from 'prop-types';
+
+import {gettext} from '../../utils';
+import {processBuckets} from '../../components/DropdownFilter';
+import DropdownFilterButton from '../../components/DropdownFilterButton';
+
+import {getDropdownItems} from './AgendaFilters';
+
+export class AgendaCalendarAgendaFilter extends React.PureComponent {
+    render() {
+        const isActive = !!(this.props.activeFilter.calendar) || !!(this.props.activeFilter.agendas);
+        const calendarFilter = {
+            label: gettext('Any calendar'),
+            field: 'calendar',
+            icon: 'icon-small--calendar',
+            itemTypes: ['events', 'combined'],
+            isItemActive: (key) => (
+                (this.props.activeFilter.calendar || []).includes(key)
+            ),
+        };
+        const agendaFilter = {
+            label: gettext('Any agenda'),
+            field: 'agendas',
+            nestedField: 'agenda',
+            icon: 'icon-small--calendar',
+            itemTypes: ['planning', 'combined'],
+            isItemActive: (key) => (
+                (this.props.activeFilter.agendas || []).includes(key)
+            ),
+        };
+        const calendarItems = getDropdownItems(
+            calendarFilter,
+            this.props.aggregations,
+            this.props.toggleFilter,
+            processBuckets,
+            {}
+        );
+        const agendaItems = getDropdownItems(
+            agendaFilter,
+            this.props.aggregations,
+            this.props.toggleFilter,
+            processBuckets,
+            {}
+        );
+
+        return (
+            <div className="btn-group">
+                <DropdownFilterButton
+                    id="calendar_agenda"
+                    isActive={isActive}
+                    icon="icon-small--calendar"
+                    label="Calendars"
+                />
+                <div className="dropdown-menu" aria-labelledby="calendar_agenda">
+                    <button
+                        type="button"
+                        className="dropdown-item"
+                        onClick={() => {
+                            this.props.toggleFilter('calendar', null);
+                            this.props.toggleFilter('agendas', null);
+                        }}
+                    >
+                        {gettext('All Calendars')}
+                    </button>
+                    <div className="dropdown-divider" />
+                    {!calendarItems.length ? null : (
+                        <React.Fragment>
+                            <h6 className="dropdown-header">{gettext('Events')}</h6>
+                            {calendarItems}
+                            <div className="dropdown-divider" />
+                        </React.Fragment>
+                    )}
+                    {!agendaItems.length ? null : (
+                        <React.Fragment>
+                            <h6 className="dropdown-header">{gettext('Planning')}</h6>
+                            {agendaItems}
+                        </React.Fragment>
+                    )}
+                </div>
+            </div>
+        );
+    }
+}
+
+AgendaCalendarAgendaFilter.propTypes = {
+    aggregations: PropTypes.object,
+    activeFilter: PropTypes.object,
+    toggleFilter: PropTypes.func,
+    itemTypeFilter: PropTypes.string,
+};
