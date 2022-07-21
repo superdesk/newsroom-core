@@ -406,6 +406,12 @@ aggregations = {
             'urgency': {'terms': {'field': 'planning_items.urgency'}},
             'place': {'terms': {'field': 'planning_items.place.name', 'size': 50}}
         },
+    },
+    'agendas': {
+        'nested': {'path': 'planning_items'},
+        'aggs': {
+            'agenda': {'terms': {'field': 'planning_items.agendas.name', 'size': 100}},
+        },
     }
 }
 
@@ -416,12 +422,15 @@ def get_agenda_aggregations(events_only=False):
         aggs.pop('coverage', None)
         aggs.pop('planning_items', None)
         aggs.pop('urgency', None)
+        aggs.pop('agendas', None)
     return aggs
 
 
 def get_aggregation_field(key):
     if key == 'coverage':
         return aggregations[key]['aggs']['coverage_type']['terms']['field']
+    elif key == 'agendas':
+        return aggregations[key]['aggs']['agenda']['terms']['field']
     return aggregations[key]['terms']['field']
 
 
@@ -442,7 +451,51 @@ def _filter_terms(filters, events_only=False):
     must_term_filters = []
     must_not_term_filters = []
     for key, val in filters.items():
-        if val and key != 'coverage' and key != 'coverage_status':
+        if not val:
+            continue
+        elif key == 'coverage':
+            if events_only:
+                continue
+            must_term_filters.append(
+                {"nested": {
+                    "path": "coverages",
+                    "query": {"bool": {"must": [{'terms': {get_aggregation_field(key): val}}]}}
+                }})
+        elif key == 'coverage_status':
+            if events_only:
+                continue
+            if val == ['planned']:
+                must_term_filters.append(
+                    {"nested": {
+                        "path": "coverages",
+                        "query": {"bool": {"must": [{'terms': {'coverages.coverage_status': ['coverage intended']}}]}}
+                    }})
+            else:
+                must_not_term_filters.append(
+                    {"nested": {
+                        "path": "coverages",
+                        "query": {"bool": {
+                            "should": [
+                                {'terms': {'coverages.coverage_status': ['coverage intended']}}
+                            ]}}
+                    }})
+        elif key == 'agendas':
+            if events_only:
+                continue
+
+            must_term_filters.append({
+                "nested": {
+                    "path": "planning_items",
+                    "query": {
+                        "bool": {
+                            "must": [{
+                                "terms": {get_aggregation_field(key): val}
+                            }]
+                        }
+                    }
+                }
+            })
+        else:
             if key in {'service', 'urgency', 'subject', 'place'} and not events_only:
                 must_term_filters.append({
                     'or': [
@@ -462,28 +515,6 @@ def _filter_terms(filters, events_only=False):
                 })
             else:
                 must_term_filters.append({'terms': {get_aggregation_field(key): val}})
-        if val and key == 'coverage' and not events_only:
-            must_term_filters.append(
-                {"nested": {
-                    "path": "coverages",
-                    "query": {"bool": {"must": [{'terms': {get_aggregation_field(key): val}}]}}
-                }})
-        if val and key == 'coverage_status' and not events_only:
-            if val == ['planned']:
-                must_term_filters.append(
-                    {"nested": {
-                        "path": "coverages",
-                        "query": {"bool": {"must": [{'terms': {'coverages.coverage_status': ['coverage intended']}}]}}
-                    }})
-            else:
-                must_not_term_filters.append(
-                    {"nested": {
-                        "path": "coverages",
-                        "query": {"bool": {
-                            "should": [
-                                {'terms': {'coverages.coverage_status': ['coverage intended']}}
-                            ]}}
-                    }})
 
     return {"must_term_filters": must_term_filters, "must_not_term_filters": must_not_term_filters}
 
