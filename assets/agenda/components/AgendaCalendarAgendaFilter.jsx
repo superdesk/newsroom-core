@@ -50,7 +50,7 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent {
                     id="calendar_agenda"
                     isActive={isActive}
                     icon="icon-small--calendar"
-                    label="Calendars"
+                    label={gettext('Calendars')}
                 />
                 <div className="dropdown-menu" aria-labelledby="calendar_agenda">
                     <button
