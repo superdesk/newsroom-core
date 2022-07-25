@@ -9,14 +9,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-07-07 14:48+0200\n"
+"POT-Creation-Date: 2022-07-21 14:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.10.3\n"
 
 #: newsroom/email.py:355
 msgid "Kill/Takedown notice"
@@ -1636,11 +1636,11 @@ msgid "No items found."
 msgstr ""
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:21
-msgid " '${slugline}'"
+msgid "coverage {{slugline}}"
 msgstr ""
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:27
-msgid "{{ type }}{{ slugline }} {{ status_text }}"
+msgid "{{ type }} {{ slugline }} {{ status_text }}"
 msgstr ""
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:36
@@ -1656,15 +1656,15 @@ msgid "{{ type }} {{slugline}} cancelled"
 msgstr ""
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:59
-msgid " (update to come)"
+msgid "(update to come)"
 msgstr ""
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:59
-msgid " (updated)"
+msgid "(updated)"
 msgstr ""
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:63
-msgid "{{ type }} {{ slugline }} available{{deliveryState}}"
+msgid "{{ type }} {{ slugline }} available {{deliveryState}}"
 msgstr ""
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:96

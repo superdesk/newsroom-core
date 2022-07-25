@@ -18,10 +18,10 @@ import {
 const getCoverageTootip = (coverage, beingUpdated) => {
     let slugline = coverage.item_slugline || coverage.slugline;
 
-    slugline =  gettext(' coverage{{slugline}}', {slugline: slugline ? ` '${slugline}'` : ''}) ;
+    slugline =  gettext('coverage {{slugline}}', {slugline: slugline || ''}) ;
 
     if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
-        return gettext('{{ type }}{{ slugline }} {{ status_text }}', {
+        return gettext('{{ type }} {{ slugline }} {{ status_text }}', {
             type: getCoverageDisplayName(coverage.coverage_type),
             slugline: slugline,
             status_text: getCoverageStatusText(coverage)
@@ -56,10 +56,10 @@ const getCoverageTootip = (coverage, beingUpdated) => {
     if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
         let deliveryState;
         if (get(coverage, 'deliveries.length', 0) > 1) {
-            deliveryState = beingUpdated ? gettext(' (update to come)') : gettext(' (updated)');
+            deliveryState = beingUpdated ? gettext('(update to come)') : gettext('(updated)');
         }
 
-        return gettext('{{ type }} {{ slugline }} available{{deliveryState}}', {
+        return gettext('{{ type }} {{ slugline }} available {{deliveryState}}', {
             type: getCoverageDisplayName(coverage.coverage_type),
             slugline: slugline,
             deliveryState: deliveryState
