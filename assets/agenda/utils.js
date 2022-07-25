@@ -784,7 +784,7 @@ export function formatCoverageDate(coverage) {
         parseDate(coverage.scheduled).format(COVERAGE_DATE_TIME_FORMAT);
 }
 
-export const getCoverageTootip = (coverage, beingUpdated) => {
+export const getCoverageTooltip = (coverage, beingUpdated) => {
     let slugline = coverage.item_slugline || coverage.slugline;
 
     slugline =  gettext('coverage {{slugline}}', {slugline: slugline || ''}) ;
