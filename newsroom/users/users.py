@@ -1,13 +1,24 @@
 import bcrypt
+import newsroom
+
+from typing import TypedDict
 from flask import current_app as app, session
 from flask_babel import gettext
+from werkzeug.exceptions import BadRequest
 
-from superdesk.utils import is_hashed, get_hash
-
-import newsroom
 from newsroom.auth import get_user_id
 from newsroom.utils import set_original_creator, set_version_creator
-from werkzeug.exceptions import BadRequest
+from superdesk.utils import is_hashed, get_hash
+
+
+class UserData(TypedDict, total=False):
+    _id: str
+    email: str
+    first_name: str
+    last_name: str
+    user_type: str
+    company: str
+    is_enabled: bool
 
 
 class UsersResource(newsroom.Resource):

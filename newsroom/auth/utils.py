@@ -2,19 +2,10 @@ import flask
 import werkzeug
 import superdesk
 
-from typing import Optional, TypedDict
+from typing import Optional
 from flask_babel import _
 from superdesk.utc import utcnow
-
-
-class UserData(TypedDict, total=False):
-    _id: str
-    email: str
-    first_name: str
-    last_name: str
-    user_type: str
-    company: str
-    is_enabled: bool
+from newsroom.users import UserData
 
 
 def sign_user_by_email(
