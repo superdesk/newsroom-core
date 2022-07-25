@@ -836,4 +836,4 @@ export const getCoverageTooltip = (coverage, beingUpdated) => {
     }
 
     return '';
-}
+};
