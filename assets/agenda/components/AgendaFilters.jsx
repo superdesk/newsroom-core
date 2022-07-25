@@ -8,8 +8,10 @@ import {getCoverageDisplayName, groupRegions, getRegionName} from '../utils';
 import AgendaCoverageExistsFilter from './AgendaCoverageExistsFilter';
 import AgendaItemTypeFilter from './AgendaItemTypeFilter';
 
+import {AgendaCalendarAgendaFilter} from './AgendaCalendarAgendaFilter';
 
-const transformFilterBuckets = (filter, aggregations, props) => {
+
+export const transformFilterBuckets = (filter, aggregations, props) => {
     if (!filter.transformBuckets) {
         return aggregations[filter.field].buckets;
     }
@@ -18,11 +20,6 @@ const transformFilterBuckets = (filter, aggregations, props) => {
 };
 
 const filters = [{
-    label: gettext('Any calendar'),
-    field: 'calendar',
-    icon: 'icon-small--calendar',
-    itemTypes: ['events', 'combined'],
-}, {
     label: gettext('Any location'),
     field: 'location',
     typeAhead: true,
@@ -58,7 +55,7 @@ const filters = [{
 }];
 
 
-const getDropdownItems = (filter, aggregations, toggleFilter, processBuckets, props) => {
+export const getDropdownItems = (filter, aggregations, toggleFilter, processBuckets, props) => {
     if (!filter.nestedField && aggregations && aggregations[filter.field]) {
         return processBuckets(transformFilterBuckets(filter, aggregations, props), filter, toggleFilter);
     }
@@ -76,6 +73,13 @@ function AgendaFilters({aggregations, toggleFilter, activeFilter, eventsOnlyAcce
     );
 
     return (<div className='wire-column__main-header-agenda d-flex m-0 px-3 align-items-center flex-wrap flex-sm-nowrap'>
+        <AgendaCalendarAgendaFilter
+            aggregations={aggregations}
+            activeFilter={activeFilter}
+            toggleFilter={toggleFilter}
+            itemTypeFilter={itemTypeFilter}
+        />
+
         {displayFilters.map((filter) => (
             filter.typeAhead ? <AgendaTypeAheadFilter
                 key={filter.label}

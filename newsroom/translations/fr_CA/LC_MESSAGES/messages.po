@@ -1706,15 +1706,15 @@ msgid "{{ type }} {{slugline}} cancelled"
 msgstr "{{ type }} {{slugline}} annulée"
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:59
-msgid " (update to come)"
+msgid "(update to come)"
 msgstr "(mise à jour à venir)"
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:59
-msgid " (updated)"
+msgid "(updated)"
 msgstr "(mise à jour)"
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:63
-msgid "{{ type }} {{ slugline }} available{{deliveryState}}"
+msgid "{{ type }} {{ slugline }} available {{deliveryState}}"
 msgstr "{{ type }} {{ slugline }} disponible {{deliveryState}}"
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:96
@@ -3497,3 +3497,6 @@ msgstr "À"
 #: assets/wire/components/filters/NavigationTab.jsx:39
 msgid "All"
 msgstr "Tout"
+
+msgid "coverage {{slugline}}"
+msgstr "couverture {{slugline}}"

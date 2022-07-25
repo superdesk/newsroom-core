@@ -26,6 +26,15 @@
   [class^="icon--"], [class*=" icon--"] {
     margin-right: 1rem;
   }
+
+  &--active {
+    color: #fff !important;
+    background-color: $main-blue !important;
+    [class^="icon--"], [class*=" icon--"] {
+      color: white !important;
+    }
+  }
+
   &:focus {
     color: #16181b;
     background-color: #eff4f6 !important;
