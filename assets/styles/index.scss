@@ -2301,6 +2301,10 @@ article.list {
     &--large {
         font-size: 1rem !important;
     }
+    &--headline {
+        margin-top: 1px;
+        margin-left: 1rem;
+    }
 }
 .wire-articles__item__versions-btn {
     margin-left: 24px;
