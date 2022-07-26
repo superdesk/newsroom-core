@@ -2,7 +2,7 @@ from flask import Blueprint
 from flask_babel import lazy_gettext
 import superdesk
 
-from .users import UsersResource, UsersService
+from .users import UsersResource, UsersService, UserData  # noqa: F401
 
 blueprint = Blueprint('users', __name__)
 

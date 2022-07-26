@@ -81,11 +81,12 @@ class BaseNewsroomApp(eve.Eve):
         self.setup_apm()
         self.setup_media_storage()
         self.setup_babel()
-        self.setup_blueprints(self.config['BLUEPRINTS'])
         self.setup_apps(self.config['CORE_APPS'])
         if not self.config.get("BEHAVE"):
             # workaround for core 2.3 adding planning to installed apps
             self.setup_apps(self.config.get('INSTALLED_APPS', []))
+        # load blueprints after apps just in case some views are added by apps
+        self.setup_blueprints(self.config['BLUEPRINTS'])
         self.setup_email()
         self.setup_cache()
 

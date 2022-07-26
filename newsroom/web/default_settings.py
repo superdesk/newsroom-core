@@ -450,3 +450,21 @@ DASHBOARD_CACHE_TIMEOUT = 300
 #: .. versionadded:: 2.1.0
 #:
 DELETE_DASHBOARD_CACHE_ON_PUSH = True
+
+#: Path to SAML config
+#:
+#: .. versionadded:: 2.3
+#:
+SAML_PATH = ""
+
+#: Company name which will be assigned to newsly created users
+#:
+#: .. versionadded:: 2.3
+#:
+SAML_COMPANY = ""
+
+#: Button label displayed on the login page
+#:
+#: .. versionadded:: 2.3
+#:
+SAML_LABEL = "SSO"
