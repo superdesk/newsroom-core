@@ -107,7 +107,7 @@ def saml():
         else:
             logger.error("SAML %s reason=%s", errors, auth.get_last_error_reason())
             flash(_("There was an error when using SSO"), "danger")
-            return redirect(url_for("auth.index", user_error=1))
+            return redirect(url_for("auth.login", user_error=1))
     elif "sls" in request.args:
 
         def dscb():
