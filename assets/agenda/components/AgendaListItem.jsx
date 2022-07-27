@@ -150,7 +150,7 @@ class AgendaListItem extends React.Component {
                                 classNames({'wire-articles__item__meta-time': showHeadline})}>
                                 {getName(item)}</span>
                             {showHeadline && <span
-                                className='wire-articles__item__text wire-articles__item__text--large'>
+                                className='wire-articles__item__text wire-articles__item__text--large wire-articles__item__text--headline'>
                                 {item.headline}</span>}
                         </h4>
 
