@@ -1,3 +1,4 @@
+from typing import Dict, Any
 import logging
 from copy import deepcopy
 
@@ -25,6 +26,7 @@ from newsroom.utils import get_local_date, get_end_date
 from datetime import datetime
 from newsroom.wire import url_for_wire
 from newsroom.search import BaseSearchService, SearchQuery, query_string
+from newsroom.search_config import is_search_field_nested
 from .utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD
 
 
@@ -96,6 +98,9 @@ class AgendaResource(newsroom.Resource):
     """
     Agenda schema
     """
+
+    SUPPORTED_NESTED_SEARCH_FIELDS = ["subject", "service"]
+
     schema = {}
 
     # identifiers
@@ -386,7 +391,7 @@ def _set_event_date_range(search):
         })
 
 
-aggregations = {
+aggregations: Dict[str, Dict[str, Any]] = {
     'calendar': {'terms': {'field': 'calendars.name', 'size': 100}},
     'location': {'terms': {'field': 'location.name', 'size': 10000}},
     'service': {'terms': {'field': 'service.name', 'size': 50}},
@@ -426,11 +431,13 @@ def get_agenda_aggregations(events_only=False):
     return aggs
 
 
-def get_aggregation_field(key):
+def get_aggregation_field(key: str):
     if key == 'coverage':
         return aggregations[key]['aggs']['coverage_type']['terms']['field']
     elif key == 'agendas':
         return aggregations[key]['aggs']['agenda']['terms']['field']
+    elif is_search_field_nested("agenda", key):
+        return aggregations[key]["aggs"][f"{key}_filtered"]["aggs"][key]["terms"]["field"]
     return aggregations[key]['terms']['field']
 
 
