@@ -182,5 +182,5 @@ def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
     # Search using the new search group, ``event_type==Sporting Event``
     resp = client.get("/agenda/search?filter=%7B%22event_type%22%3A%5B%22Sporting%20Event%22%5D%7D")
     data = json.loads(resp.get_data())
-    assert len(data["_items"]) == 2
+    assert len(data["_items"]) == 1
     assert data["_items"][0]["_id"] == "event2"
