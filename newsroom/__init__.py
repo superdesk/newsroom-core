@@ -27,6 +27,7 @@ class Resource(superdesk.Resource):
     mongo_prefix = MONGO_PREFIX
     elastic_prefix = ELASTIC_PREFIX
     mongo_indexes: MongoIndexes = {}
+    SUPPORTED_NESTED_SEARCH_FIELDS: List[str] = []
 
 
 class Service(superdesk.Service):
