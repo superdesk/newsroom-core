@@ -1,7 +1,6 @@
 from flask import json
 from flask.testing import FlaskClient
 
-from superdesk.resource import not_analyzed
 from newsroom.factory.app import BaseNewsroomApp
 from newsroom.agenda.agenda import AgendaResource, aggregations
 from newsroom.search_config import init_nested_aggregation
@@ -52,7 +51,6 @@ test_event_2 = {
 def test_default_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
     """Tests the default config (disabled nested search groups)"""
 
-    assert app.config["DOMAIN"]["agenda"]["schema"]["subject"]["mapping"]["type"] == "object"
     assert len(app.config["AGENDA_GROUPS"]) == 4
 
     group_fields = [
@@ -64,14 +62,6 @@ def test_default_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient)
     assert "urgency" in group_fields
     assert "place" in group_fields
 
-    assert app.config["DOMAIN"]["agenda"]["schema"]["subject"]["mapping"] == {
-        "type": "object",
-        "dynamic": False,
-        "properties": {
-            "qcode": not_analyzed,
-            "name": not_analyzed,
-        },
-    }
     assert aggregations["subject"] == {"terms": {"field": "subject.name", "size": 20}}
 
     # Test search aggregations
@@ -91,8 +81,6 @@ def test_default_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient)
 def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
     """Tests custom config, enabling nested search groups"""
 
-    print('Testing before/after stuff')
-
     app.config["AGENDA_GROUPS"].append({
         "field": "event_type",
         "label": "Event Type",
@@ -103,7 +91,6 @@ def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
         },
     })
     init_nested_aggregation(
-        app,
         AgendaResource,
         app.config["AGENDA_GROUPS"],
         aggregations
@@ -111,16 +98,6 @@ def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
     reset_elastic(app)
 
     # Test if the Eve & aggregations config has been updated
-    # Test modified Eve elastic config
-    assert app.config["DOMAIN"]["agenda"]["schema"]["subject"]["mapping"] == {
-        "type": "nested",
-        "include_in_parent": True,
-        "properties": {
-            "qcode": not_analyzed,
-            "name": not_analyzed,
-            "scheme": not_analyzed,
-        }
-    }
 
     # Test generated/modified aggregation configs
     # Parent field
