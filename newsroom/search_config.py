@@ -1,9 +1,7 @@
-from typing import List, Dict, Any, KeysView, Type
+from typing import List, Dict, Any, Type
 import logging
 from copy import deepcopy
 
-from superdesk.resource import not_analyzed
-from newsroom.factory.app import BaseNewsroomApp
 from newsroom import Resource
 
 
@@ -18,7 +16,6 @@ def is_search_field_nested(resource_type: str, field: str):
 
 
 def init_nested_aggregation(
-    current_app: BaseNewsroomApp,
     resource: Type[Resource],
     groups: List[Dict[str, Any]],
     aggregations: Dict[str, Any]
@@ -59,40 +56,8 @@ def init_nested_aggregation(
         group["agg_path"] = f"{field}.{field}_filtered.{field}.buckets"
 
     for parent, fields in agg_groups.items():
-        _adjust_es_mapping(current_app, resource_type, parent, fields.keys())
         for field, values in fields.items():
             _update_agg_to_nested(parent, field, values, aggregations)
-
-
-def _adjust_es_mapping(current_app: BaseNewsroomApp, resource_type: str, parent: str, fields: KeysView[str]):
-    """Updates the ES mapping for ``parent``"""
-
-    try:
-        original = deepcopy(current_app.config["DOMAIN"][resource_type]["schema"])
-    except KeyError:
-        logger.warning(f"Resource {resource_type}: original schema not found")
-        original = {}
-
-    new_schema: Dict[str, Any] = {
-        "type": "nested",
-        # Flatten the field in the parent object too
-        # This is so non-nested queries/aggregations still work
-        # (such as in existing Topics)
-        "include_in_parent": True,
-        "properties": (original.get("mapping") or {}).get("properties") or {
-            "qcode": not_analyzed,
-            "name": not_analyzed,
-            "scheme": not_analyzed,
-        }
-    }
-
-    # Make sure all required fields have `not_analyzed`
-    # so filtering etc works
-    for field in fields:
-        if field not in new_schema["properties"].keys():
-            new_schema["properties"][field] = not_analyzed
-
-    current_app.config["DOMAIN"][resource_type]["schema"][parent]["mapping"] = new_schema
 
 
 def _update_agg_to_nested(parent: str, field: str, groups: List[str], aggregations: Dict[str, Any]):
