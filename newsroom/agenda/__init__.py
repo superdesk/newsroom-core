@@ -61,4 +61,4 @@ def init_app(app):
             },
         ]
 
-    init_nested_aggregation(app, AgendaResource, app.config.get("AGENDA_GROUPS", []), aggregations)
+    init_nested_aggregation(AgendaResource, app.config.get("AGENDA_GROUPS", []), aggregations)

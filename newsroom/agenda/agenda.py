@@ -66,6 +66,15 @@ agenda_notifications = {
     },
 }
 
+nested_code_mapping = {
+    "type": "list",
+    "mapping": {
+        "type": "nested",
+        "include_in_parent": True,
+        "properties": code_mapping["properties"],
+    },
+}
+
 
 def set_saved_items_query(query, user_id):
     query['bool']['must'].append({
@@ -135,14 +144,13 @@ class AgendaResource(newsroom.Resource):
     schema['ednote'] = events_schema['ednote']
 
     # aggregated fields
-    schema['subject'] = planning_schema['subject']
     schema['urgency'] = planning_schema['urgency']
     schema['place'] = planning_schema['place']
-    schema['service'] = {
-        'type': 'dict',
-        'mapping': code_mapping,
-    }
     schema['state_reason'] = {'type': 'string'}
+
+    # Fields supporting Nested Aggregation / Filtering
+    schema["subject"] = nested_code_mapping
+    schema["service"] = nested_code_mapping
 
     # dates
     schema['dates'] = {
