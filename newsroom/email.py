@@ -1,6 +1,7 @@
 import base64
 import email.policy as email_policy
 
+from lxml import etree
 from typing import List, Optional, Dict, Any
 from typing_extensions import TypedDict
 
@@ -31,8 +32,42 @@ class EmailGroup(TypedDict):
     emails: List[str]
 
 
-@celery.task(bind=True, soft_time_limit=120)
-def _send_email(self, to, subject, text_body, html_body=None, sender=None, attachments_info=None):
+MAX_LINE_LENGTH = 998  # RFC 5322
+
+
+def handle_long_lines_text(text):
+    if not text:
+        return text
+    output = []
+    lines = text.splitlines()
+    for line in lines:
+        if len(line) < MAX_LINE_LENGTH:
+            output.append(line)
+        else:
+            next_line = ''
+            words = line.split()
+            for word in words:
+                if len(next_line) + len(word) + 1 > MAX_LINE_LENGTH:
+                    output.append(next_line)
+                    next_line = word
+                else:
+                    next_line += (' ' if len(next_line) else '') + word
+
+            if next_line:
+                output.append(next_line)
+    return "\n".join(output)
+
+
+def handle_long_lines_html(html):
+    lines = html.splitlines()
+    if not any([len(line) > MAX_LINE_LENGTH for line in lines]):
+        return html
+    parsed = etree.fromstring(html, parser=etree.HTMLParser())
+    return etree.tounicode(parsed, method="html", pretty_print=True)
+
+
+@celery.task(soft_time_limit=120)
+def _send_email(to, subject, text_body, html_body=None, sender=None, attachments_info=None):
     if attachments_info is None:
         attachments_info = []
 
@@ -70,11 +105,12 @@ def send_email(to, subject, text_body, html_body=None, sender=None, attachments_
     :param sender: Sender
     :return:
     """
+
     kwargs = {
         'to': to,
         'subject': subject,
-        'text_body': text_body,
-        'html_body': html_body,
+        'text_body': handle_long_lines_text(text_body),
+        'html_body': handle_long_lines_html(html_body),
         'sender': sender,
         'attachments_info': attachments_info,
     }
