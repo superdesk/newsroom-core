@@ -1,7 +1,7 @@
 from flask import render_template_string, json, url_for
 from jinja2 import TemplateNotFound
 
-from newsroom.email import send_new_item_notification_email, map_email_recipients_by_language, EmailGroup
+from newsroom.email import send_new_item_notification_email, map_email_recipients_by_language, EmailGroup, send_email
 from unittest import mock
 
 
@@ -145,3 +145,26 @@ def test_map_email_recipients_by_language_fallback(client, app):
             text_template='test_template.fr_ca.txt',
             emails=[EMAILS[1]]
         )
+
+
+def test_email_avoid_long_lines(client, app, mocker):
+    sub = mocker.patch('newsroom.email._send_email.apply_async')
+    with app.test_request_context():
+        html = "<p>foo</p>" * 10000
+        text = "a" * 500 + " " + "b" * 500 + " " + "c" * 500 + "d"
+        send_email(html_body=html, text_body=text, to="to", subject="subject")
+    assert len(sub.mock_calls)
+    call = sub.mock_calls[0]
+    check_lines_length(call.kwargs["kwargs"]["html_body"])
+    check_lines_length(call.kwargs["kwargs"]["text_body"])
+    lines = call.kwargs["kwargs"]["text_body"].splitlines()
+    assert 3 == len(lines)
+    assert 500 == len(lines[0])
+    assert 500 == len(lines[1])
+    assert 501 == len(lines[2])
+
+
+def check_lines_length(text, length=998):
+    lines = text.splitlines()
+    for line in lines:
+        assert len(line) < length
