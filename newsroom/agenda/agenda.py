@@ -1,3 +1,4 @@
+from typing import Dict, Any
 import logging
 from copy import deepcopy
 
@@ -25,6 +26,7 @@ from newsroom.utils import get_local_date, get_end_date
 from datetime import datetime
 from newsroom.wire import url_for_wire
 from newsroom.search import BaseSearchService, SearchQuery, query_string
+from newsroom.search_config import is_search_field_nested
 from .utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD
 
 
@@ -64,6 +66,15 @@ agenda_notifications = {
     },
 }
 
+nested_code_mapping = {
+    "type": "list",
+    "mapping": {
+        "type": "nested",
+        "include_in_parent": True,
+        "properties": code_mapping["properties"],
+    },
+}
+
 
 def set_saved_items_query(query, user_id):
     query['bool']['must'].append({
@@ -96,6 +107,9 @@ class AgendaResource(newsroom.Resource):
     """
     Agenda schema
     """
+
+    SUPPORTED_NESTED_SEARCH_FIELDS = ["subject", "service"]
+
     schema = {}
 
     # identifiers
@@ -130,14 +144,13 @@ class AgendaResource(newsroom.Resource):
     schema['ednote'] = events_schema['ednote']
 
     # aggregated fields
-    schema['subject'] = planning_schema['subject']
     schema['urgency'] = planning_schema['urgency']
     schema['place'] = planning_schema['place']
-    schema['service'] = {
-        'type': 'dict',
-        'mapping': code_mapping,
-    }
     schema['state_reason'] = {'type': 'string'}
+
+    # Fields supporting Nested Aggregation / Filtering
+    schema["subject"] = nested_code_mapping
+    schema["service"] = nested_code_mapping
 
     # dates
     schema['dates'] = {
@@ -386,7 +399,7 @@ def _set_event_date_range(search):
         })
 
 
-aggregations = {
+aggregations: Dict[str, Dict[str, Any]] = {
     'calendar': {'terms': {'field': 'calendars.name', 'size': 100}},
     'location': {'terms': {'field': 'location.name', 'size': 10000}},
     'service': {'terms': {'field': 'service.name', 'size': 50}},
@@ -426,11 +439,13 @@ def get_agenda_aggregations(events_only=False):
     return aggs
 
 
-def get_aggregation_field(key):
+def get_aggregation_field(key: str):
     if key == 'coverage':
         return aggregations[key]['aggs']['coverage_type']['terms']['field']
     elif key == 'agendas':
         return aggregations[key]['aggs']['agenda']['terms']['field']
+    elif is_search_field_nested("agenda", key):
+        return aggregations[key]["aggs"][f"{key}_filtered"]["aggs"][key]["terms"]["field"]
     return aggregations[key]['terms']['field']
 
 

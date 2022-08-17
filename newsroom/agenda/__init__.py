@@ -3,7 +3,8 @@ from flask import Blueprint
 from flask_babel import lazy_gettext
 
 from newsroom.utils import url_for_agenda
-from .agenda import AgendaResource, AgendaService
+from .agenda import AgendaResource, AgendaService, aggregations
+from newsroom.search_config import init_nested_aggregation
 from .featured import FeaturedResource, FeaturedService
 from . import formatters
 from .utils import get_coverage_email_text, get_coverage_content_type_name, get_coverage_publish_time, \
@@ -39,21 +40,25 @@ def init_app(app):
         client_setting=True
     )
 
-    app.config.setdefault("AGENDA_GROUPS", [
-        {
-            "field": "service",
-            "label": lazy_gettext("Category"),
-        },
-        {
-            "field": "subject",
-            "label": lazy_gettext("Subject"),
-        },
-        {
-            "field": "urgency",
-            "label": lazy_gettext("News Value"),
-        },
-        {
-            "field": "place",
-            "label": lazy_gettext("Place"),
-        },
-    ])
+    if app.config.get("AGENDA_GROUPS") is None:
+        # Default values are applied if ``AGENDA_GROUPS`` is not defined or None
+        app.config["AGENDA_GROUPS"] = [
+            {
+                "field": "service",
+                "label": lazy_gettext("Category"),
+            },
+            {
+                "field": "subject",
+                "label": lazy_gettext("Subject"),
+            },
+            {
+                "field": "urgency",
+                "label": lazy_gettext("News Value"),
+            },
+            {
+                "field": "place",
+                "label": lazy_gettext("Place"),
+            },
+        ]
+
+    init_nested_aggregation(AgendaResource, app.config.get("AGENDA_GROUPS", []), aggregations)

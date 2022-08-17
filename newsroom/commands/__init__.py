@@ -15,3 +15,4 @@ from .data_updates import ( # noqa
     data_downgrade
 )
 from .initialize_data import initialize_data # noqa
+from .schema_migrate import schema_migrate  # noqa
