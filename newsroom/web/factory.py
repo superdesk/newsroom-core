@@ -30,13 +30,14 @@ class NewsroomWebApp(BaseNewsroomApp):
 
     INSTANCE_CONFIG = 'settings.py'
 
-    def __init__(self, import_name=__package__, config=None, **kwargs):
+    def __init__(self, import_name=__package__, config=None, is_manage_command=False, **kwargs):
         self.download_formatters = {}
         self.sections = []
         self.sidenavs = []
         self.settings_apps = []
         self.dashboards = []
         self._theme_folders = []
+        self.is_manage_command = is_manage_command
 
         # avoid event sockets on these
         self.generate_renditions = None
@@ -114,6 +115,11 @@ class NewsroomWebApp(BaseNewsroomApp):
         init_celery(self)
 
     def _setup_assets(self):
+        if self.is_manage_command:
+            # Don't attempt to connect to Webpack service
+            # Otherwise manage.py command will fail without it running
+            return
+
         NewsroomWebpack(self)
 
     def _setup_theme(self):
