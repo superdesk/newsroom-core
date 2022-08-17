@@ -31,7 +31,7 @@ def index_elastic_from_mongo(hours=None, collection=None):
 
             for i in range(1, 4):
                 try:
-                    success, failed = superdesk.app.data._search_backend(resource).bulk_insert(resource, items)
+                    success, failed = app.data._search_backend(resource).bulk_insert(resource, items)
                 except Exception as ex:
                     print('Exception thrown on insert to elastic {}', ex)
                     time.sleep(10)
@@ -78,7 +78,7 @@ def index_elastic_from_mongo_from_timestamp(collection, timestamp_str, direction
 
         for i in range(1, 4):
             try:
-                success, failed = superdesk.app.data._search_backend(collection).bulk_insert(collection, items)
+                success, failed = app.data._search_backend(collection).bulk_insert(collection, items)
             except Exception as ex:
                 print('Exception thrown on insert to elastic {}', ex)
                 time.sleep(10)
