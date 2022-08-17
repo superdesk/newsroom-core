@@ -55,7 +55,7 @@ DEFAULT_DATA_UPDATE_BW_IMPLEMENTATION = 'raise NotImplementedError()'
 def get_dirs(only_relative_folder=False):
     dirs = []
     try:
-        with superdesk.app.app_context():
+        with current_app.app_context():
             dirs.append(current_app.config.get('DATA_UPDATES_PATH', DEFAULT_DATA_UPDATE_DIR_NAME))
     except RuntimeError:
         # working outside of application context
