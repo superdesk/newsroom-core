@@ -1,7 +1,6 @@
 
 import time
 import pymongo
-import superdesk
 from datetime import timedelta, datetime
 
 from flask import current_app as app
