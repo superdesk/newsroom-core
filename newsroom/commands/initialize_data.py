@@ -7,6 +7,7 @@ from collections import OrderedDict
 from apps.prepopulate.app_initialize import AppInitializeWithDataCommand as _AppInitializeWithDataCommand
 
 from .manager import app, manager
+from .elastic_rebuild import elastic_rebuild
 
 
 logger = logging.getLogger(__name__)
@@ -35,6 +36,12 @@ class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
             app.data.init_elastic(app)
         except elasticsearch.exceptions.TransportError as err:
             logger.error("Error when initializing elastic %s", err)
+
+            if app.config.get("REBUILD_ELASTIC_ON_INIT_DATA_ERROR"):
+                logger.warning("Can't update the mapping, running elastic_rebuild command now.")
+                elastic_rebuild()
+            else:
+                logger.warning("Can't update the mapping, please run elastic_rebuild command.")
 
         if init_index_only:
             logger.info('Only indexes initialized.')
