@@ -468,3 +468,5 @@ SAML_COMPANY = ""
 #: .. versionadded:: 2.3
 #:
 SAML_LABEL = "SSO"
+
+REBUILD_ELASTIC_ON_INIT_DATA_ERROR = strtobool(env("REBUILD_ELASTIC_ON_INIT_DATA_ERROR", "true"))
