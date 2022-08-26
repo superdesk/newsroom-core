@@ -52,7 +52,8 @@ def we_get_text_in_atom_xml_response(context, get, text):
         assert (isinstance(get_body(context.response), str))
         tree = lxml.etree.fromstring(get_body(context.response).encode('utf-8'))
         assert '{http://www.w3.org/2005/Atom}feed' == tree.tag
+        body = get_body(context.response)
         if get == 'get':
-            assert (text in get_body(context.response))
+            assert (text in body), f"{text} not in {body}"
         else:
-            assert (text not in get_body(context.response))
+            assert (text not in body), f"{text} found in {body}"
