@@ -1,31 +1,35 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {uniqBy, get} from 'lodash';
+import {get} from 'lodash';
 
 import {gettext, isDisplayed} from 'utils';
 import {filterGroupsToLabelMap} from 'search/selectors';
 
 import InfoBox from 'wire/components/InfoBox';
 import PreviewTagsBlock from 'wire/components/PreviewTagsBlock';
-import PreviewTagsLink from 'wire/components/PreviewTagsLink';
+import {PreviewTagsLinkList} from 'wire/components/PreviewTagsLinkList';
+import {PreviewTagsSubjects} from 'wire/components/PreviewTagsSubjects';
 import {getSubjects} from '../utils';
 
-function formatCV(items, field) {
-    return items && uniqBy(items, 'code').map((item) => (
-        <PreviewTagsLink
-            key={item.code}
-            href={'/agenda?filter=' + encodeURIComponent(JSON.stringify({[field]: [item.name]}))}
-            text={item.name}
-        />
-    ));
-}
 
 function AgendaTagsComponent({item, plan, isItemDetail, displayConfig, filterGroupLabels}) {
-    const services = isDisplayed('services', displayConfig) &&
-        formatCV([...(get(item, 'service') || []), ...(get(plan, 'service') || [])], 'service');
-    const subjects = isDisplayed('subjects', displayConfig) &&
-        formatCV([...getSubjects(item), ...getSubjects(plan)], 'subject');
+    const services = !isDisplayed('services', displayConfig) ? null : (
+        <PreviewTagsLinkList
+            urlPrefix="/agenda?filter="
+            items={[...(get(item, 'service') || []), ...(get(plan, 'service') || [])]}
+            field="service"
+        />
+    );
+
+    const subjects = (
+        <PreviewTagsSubjects
+            subjects={[...getSubjects(item), ...getSubjects(plan)]}
+            displayConfig={displayConfig}
+            urlPrefix="/agenda?filter="
+            filterGroupLabels={filterGroupLabels}
+        />
+    );
 
     if (!subjects && !services) {
         return null;
@@ -41,11 +45,7 @@ function AgendaTagsComponent({item, plan, isItemDetail, displayConfig, filterGro
                     {services}
                 </PreviewTagsBlock>
             )}
-            {!subjects ? null : (
-                <PreviewTagsBlock label={get(filterGroupLabels, 'subject', gettext('Subject'))}>
-                    {subjects}
-                </PreviewTagsBlock>
-            )}
+            {subjects}
         </InfoBox>
     );
 }
