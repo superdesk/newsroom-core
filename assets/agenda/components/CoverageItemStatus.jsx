@@ -126,13 +126,30 @@ export default class CoverageItemStatus extends React.Component {
             action.when(this.props.coverage, this.props.user, this.props.item));
     }
 
+    getWorkflowStatusReason() {
+        const {coverage, coverageData} = this.props;
+        const COVERAGE_CANCELLED_PREFIX = 'All coverages cancelled: ';
+        const PLANNING_CANCELLED_PREFIX = 'Planning cancelled: ';
+        let reason = get(coverageData, `workflow_status_reason[${coverage.coverage_id}]`);
+
+        if (reason.startsWith(COVERAGE_CANCELLED_PREFIX)) {
+            reason = reason.substring(COVERAGE_CANCELLED_PREFIX.length);
+            reason = gettext('All coverages cancelled: {{ reason }}', {reason: reason});
+        } else if (reason.startsWith(PLANNING_CANCELLED_PREFIX)) {
+            reason = reason.substring(PLANNING_CANCELLED_PREFIX.length);
+            reason = gettext('Planning cancelled: {{ reason }}', {reason: reason});
+        }
+
+        return reason;
+    }
+
     render() {
         const coverage = this.props.coverage;
         const wireText = this.getItemText(coverage);
         const internalNote = get(this.props, 'coverageData.internal_note', {})[coverage.coverage_id];
         const edNote = this.state.wireItem ? this.state.wireItem.ednote :
             get(this.props, 'coverageData.ednote', {})[coverage.coverage_id];
-        const reason = get(this.props, 'coverageData.workflow_status_reason', {})[coverage.coverage_id];
+        const reason = this.getWorkflowStatusReason();
         const scheduledStatus = get(this.props, 'coverageData.scheduled_update_status', {})[coverage.coverage_id];
 
 
@@ -171,6 +188,7 @@ export default class CoverageItemStatus extends React.Component {
 CoverageItemStatus.propTypes = {
     item: PropTypes.object,
     coverage: PropTypes.object,
+    coverageData: PropTypes.object,
     wireItems: PropTypes.array,
     actions: PropTypes.array,
     user: PropTypes.string,
