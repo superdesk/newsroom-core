@@ -1220,7 +1220,7 @@ def test_push_event_from_planning(client, app):
     event['guid'] = 'retrospective_event'
     event['plans'] = ['adhoc_plan']
     post_json(client, '/push', event)
-    parsed = get_entity_or_404(plan['guid'], 'agenda')
+    parsed = get_entity_or_404(event['guid'], 'agenda')
 
     assert parsed['slugline'] == test_event['slugline']
     assert parsed['definition_short'] == test_event['definition_short']
