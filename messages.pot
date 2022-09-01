@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-07-21 14:46+0200\n"
+"POT-Creation-Date: 2022-09-01 16:29+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,11 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.3\n"
 
-#: newsroom/email.py:355
+#: newsroom/email.py:391
 msgid "Kill/Takedown notice"
 msgstr ""
 
-#: newsroom/email.py:364
+#: newsroom/email.py:400
 msgid "Agenda cancelled notice"
 msgstr ""
 
@@ -1736,7 +1736,15 @@ msgstr ""
 msgid "View Content"
 msgstr ""
 
-#: assets/agenda/components/CoverageItemStatus.jsx:146
+#: assets/agenda/components/CoverageItemStatus.jsx:139
+msgid "All coverages cancelled: {{ reason }}"
+msgstr ""
+
+#: assets/agenda/components/CoverageItemStatus.jsx:142
+msgid "Planning cancelled: {{ reason }}"
+msgstr ""
+
+#: assets/agenda/components/CoverageItemStatus.jsx:165
 msgid "Update coming"
 msgstr ""
 
