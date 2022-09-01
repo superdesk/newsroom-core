@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-09-01 16:29+1000\n"
+"POT-Creation-Date: 2022-09-01 10:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1635,39 +1635,37 @@ msgstr ""
 msgid "No items found."
 msgstr ""
 
-#: assets/agenda/components/AgendaListCoverageItem.jsx:21
-msgid "coverage {{slugline}}"
+#: assets/agenda/components/AgendaListCoverageItem.jsx:25
+msgid "{{ type }} coverage {{ slugline }} {{ status_text }}"
 msgstr ""
 
-#: assets/agenda/components/AgendaListCoverageItem.jsx:27
-msgid "{{ type }} {{ slugline }} {{ status_text }}"
+#: assets/agenda/components/AgendaListCoverageItem.jsx:34
+msgid "Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}}"
 msgstr ""
 
-#: assets/agenda/components/AgendaListCoverageItem.jsx:36
-msgid "Planned {{ type }} {{ slugline }}, expected {{date}} at {{time}}"
+#: assets/agenda/components/AgendaListCoverageItem.jsx:43
+msgid ""
+"{{ type }} coverage {{ slugline }} in progress, expected {{date}} at "
+"{{time}}"
 msgstr ""
 
-#: assets/agenda/components/AgendaListCoverageItem.jsx:45
-msgid "{{ type }} {{ slugline }} in progress, expected {{date}} at {{time}}"
+#: assets/agenda/components/AgendaListCoverageItem.jsx:49
+msgid "{{ type }} coverage {{slugline}} cancelled"
 msgstr ""
 
-#: assets/agenda/components/AgendaListCoverageItem.jsx:51
-msgid "{{ type }} {{slugline}} cancelled"
-msgstr ""
-
-#: assets/agenda/components/AgendaListCoverageItem.jsx:59
+#: assets/agenda/components/AgendaListCoverageItem.jsx:57
 msgid "(update to come)"
 msgstr ""
 
-#: assets/agenda/components/AgendaListCoverageItem.jsx:59
+#: assets/agenda/components/AgendaListCoverageItem.jsx:57
 msgid "(updated)"
 msgstr ""
 
-#: assets/agenda/components/AgendaListCoverageItem.jsx:63
-msgid "{{ type }} {{ slugline }} available {{deliveryState}}"
+#: assets/agenda/components/AgendaListCoverageItem.jsx:61
+msgid "{{ type }} coverage {{ slugline }} available {{deliveryState}}"
 msgstr ""
 
-#: assets/agenda/components/AgendaListCoverageItem.jsx:96
+#: assets/agenda/components/AgendaListCoverageItem.jsx:94
 msgid "(Watching)"
 msgstr ""
 
