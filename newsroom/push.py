@@ -180,17 +180,25 @@ def publish_event(event, orig):
     _id = event['guid']
     service = superdesk.get_resource_service('agenda')
 
-    if event.get('plans') and not orig:
-        # event is created from a planning item
-        orig = superdesk.get_resource_service('agenda').find_one(req=None, guid=event.get('plans')[0])
-
-    event.pop('plans', None)
+    plan_ids = event.pop("plans", [])
 
     if not orig:
         # new event
         agenda = {}
         set_agenda_metadata_from_event(agenda, event)
         agenda['dates'] = get_event_dates(event)
+
+        # Retrieve all current Planning items and add them into this Event
+        agenda.setdefault("planning_items", [])
+        for plan in service.find(where={"_id": {"$in": plan_ids}}):
+            planning_item = plan["planning_items"][0]
+            agenda["planning_items"].append(planning_item)
+            set_agenda_planning_items(agenda, orig, planning_item, action="add", send_notification=False)
+
+            if not plan.get("event_id"):
+                # Make sure the Planning item has an ``event_id`` defined
+                # This can happen when pushing a Planning item before linking to an Event
+                service.system_update(plan["_id"], {"event_id": _id}, plan)
         _id = service.post([agenda])[0]
     else:
         # replace the original document
@@ -423,7 +431,7 @@ def set_agenda_metadata_from_planning(agenda, planning_item, force_adhoc=False):
     if not plan:
         new_plan = True
 
-    plan['_id'] = planning_item.get('_id')
+    plan['_id'] = planning_item.get('_id') or planning_item.get('guid')
     plan['guid'] = planning_item.get('guid')
     plan['slugline'] = planning_item.get('slugline')
     plan['description_text'] = planning_item.get('description_text')
@@ -452,7 +460,7 @@ def set_agenda_metadata_from_planning(agenda, planning_item, force_adhoc=False):
     return new_plan
 
 
-def set_agenda_planning_items(agenda, orig_agenda, planning_item, action='add'):
+def set_agenda_planning_items(agenda, orig_agenda, planning_item, action='add', send_notification=True):
     """
     Updates the list of planning items of agenda. If action is 'add' then adds the new one.
     And updates the list of coverages
@@ -471,8 +479,11 @@ def set_agenda_planning_items(agenda, orig_agenda, planning_item, action='add'):
                                                           (orig_agenda or {}).get('coverages') or [],
                                                           planning_item if action == 'add' else None)
 
-    if action != 'remove' and (coverage_changes.get('coverage_added') or coverage_changes.get('coverage_cancelled') or
-                               coverage_changes.get('coverage_modified')):
+    if send_notification and action != 'remove' and (
+        coverage_changes.get('coverage_added') or
+        coverage_changes.get('coverage_cancelled') or
+        coverage_changes.get('coverage_modified')
+    ):
         superdesk.get_resource_service('agenda').notify_agenda_update(agenda, orig_agenda, planning_item, True)
 
     agenda['display_dates'] = get_display_dates(agenda['dates'], agenda['planning_items'])
