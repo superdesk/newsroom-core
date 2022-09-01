@@ -132,7 +132,9 @@ export default class CoverageItemStatus extends React.Component {
         const PLANNING_CANCELLED_PREFIX = 'Planning cancelled: ';
         let reason = get(coverageData, `workflow_status_reason[${coverage.coverage_id}]`);
 
-        if (reason.startsWith(COVERAGE_CANCELLED_PREFIX)) {
+        if (!get(reason, 'length', 0)) {
+            return '';
+        } else if (reason.startsWith(COVERAGE_CANCELLED_PREFIX)) {
             reason = reason.substring(COVERAGE_CANCELLED_PREFIX.length);
             reason = gettext('All coverages cancelled: {{ reason }}', {reason: reason});
         } else if (reason.startsWith(PLANNING_CANCELLED_PREFIX)) {
