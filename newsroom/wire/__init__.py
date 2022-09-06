@@ -2,9 +2,11 @@ import superdesk
 
 from flask import Blueprint, url_for
 from flask_babel import lazy_gettext
-from superdesk.metadata.item import not_analyzed
+from content_api.items.resource import code_mapping
 
+from newsroom.factory.app import BaseNewsroomApp
 from newsroom.wire.search import WireSearchResource, WireSearchService
+from newsroom.search_config import init_nested_aggregation
 from . import utils
 
 
@@ -25,20 +27,8 @@ def url_for_wire(item, _external=True, section='wire', **kwargs):
     )
 
 
-def init_app(app):
-    app.config['DOMAIN']['items']['schema'].update({
-        'products': {
-            'type': 'list',
-            'mapping': {
-                'type': 'object',
-                'properties': {
-                    'code': not_analyzed,
-                    'name': not_analyzed
-                }
-            }
-        },
-    })
-
+def init_app(app: BaseNewsroomApp):
+    _update_items_schema(app)
     superdesk.register_resource('wire_search', WireSearchResource, WireSearchService, _app=app)
 
     app.section('wire', 'Wire', 'wire')
@@ -122,3 +112,30 @@ def init_app(app):
             'label': lazy_gettext('Place'),
         },
     ])
+
+    init_nested_aggregation(WireSearchResource, app.config.get("WIRE_GROUPS", []), app.config["WIRE_AGGS"])
+
+
+def _update_items_schema(app: BaseNewsroomApp):
+    app.config["DOMAIN"]["items"]["schema"].update({
+        "products": {
+            "type": "list",
+            "mapping": code_mapping
+        },
+        "subject": {
+            "type": "list",
+            "mapping": {
+                "type": "nested",
+                "include_in_parent": True,
+                "properties": code_mapping["properties"],
+            },
+        },
+        "service": {
+            "type": "list",
+            "mapping": {
+                "type": "nested",
+                "include_in_parent": True,
+                "properties": code_mapping["properties"],
+            },
+        },
+    })

@@ -7,12 +7,13 @@ from newsroom import Resource
 
 logger = logging.getLogger(__name__)
 nested_agg_groups = {}
+nested_agg_fields = set()
 
 
 def is_search_field_nested(resource_type: str, field: str):
     """Returns ``True`` if the ``resource_type`` is configured for nested search group"""
 
-    return field in (nested_agg_groups.get(resource_type) or {})
+    return field in (nested_agg_groups.get(resource_type) or {}) or field in nested_agg_fields
 
 
 def init_nested_aggregation(
@@ -56,6 +57,7 @@ def init_nested_aggregation(
         group["agg_path"] = f"{field}.{field}_filtered.{field}.buckets"
 
     for parent, fields in agg_groups.items():
+        nested_agg_fields.add(parent)
         for field, values in fields.items():
             _update_agg_to_nested(parent, field, values, aggregations)
 
