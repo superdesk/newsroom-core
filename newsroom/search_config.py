@@ -1,12 +1,25 @@
-from typing import List, Dict, Any, Type
+from typing import List, Dict, Any, Type, TypedDict
 import logging
 from copy import deepcopy
 
 from newsroom import Resource
 
 
+class SearchGroupNestedConfig(TypedDict):
+    parent: str
+    field: str
+    value: str
+
+
+class SearchGroupConfig(TypedDict, total=False):
+    field: str
+    label: str
+    nested: SearchGroupNestedConfig
+    agg_path: str  # Generated on startup, used to retrieve agg value from buckets
+
+
 logger = logging.getLogger(__name__)
-nested_agg_groups = {}
+nested_agg_groups: Dict[str, Dict[str, SearchGroupConfig]] = {}
 nested_agg_fields = set()
 
 
@@ -18,7 +31,7 @@ def is_search_field_nested(resource_type: str, field: str):
 
 def init_nested_aggregation(
     resource: Type[Resource],
-    groups: List[Dict[str, Any]],
+    groups: List[SearchGroupConfig],
     aggregations: Dict[str, Any]
 ):
     """Applies aggregation & mapping changes for nested search groups"""
@@ -34,14 +47,13 @@ def init_nested_aggregation(
 
     agg_groups: Dict[str, Dict[str, Any]] = {}
 
-    if nested_agg_groups.get(resource_type) is None:
-        nested_agg_groups[resource_type] = {}
+    nested_agg_groups[resource_type] = {}
 
     for group in groups:
         field = group.get("field")
         nested = group.get("nested")
-        if nested is None:
-            # No nesting is not enabled on this group
+        if field is None or nested is None:
+            # Invalid group config or no nesting is enabled on this group
             continue
         elif not nested.get("field") or not nested.get("parent") or not nested.get("value"):
             logger.warning(f"Resource '{resource_type}' search group '{field}': incorrectly configured")
