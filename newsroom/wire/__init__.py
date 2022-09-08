@@ -130,12 +130,4 @@ def _update_items_schema(app: BaseNewsroomApp):
                 "properties": code_mapping["properties"],
             },
         },
-        "service": {
-            "type": "list",
-            "mapping": {
-                "type": "nested",
-                "include_in_parent": True,
-                "properties": code_mapping["properties"],
-            },
-        },
     })
