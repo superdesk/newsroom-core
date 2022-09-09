@@ -13,6 +13,7 @@ from superdesk.default_settings import strtobool
 from content_api.errors import BadParameterValueError
 
 from newsroom import Service
+from newsroom.search_config import is_search_field_nested
 from newsroom.products.products import get_products_by_navigation, get_products_by_company, get_product_by_id
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
@@ -268,7 +269,11 @@ class BaseSearchService(Service):
         return app.config.get('WIRE_AGGS') or {}
 
     def get_aggregation_field(self, key):
-        return self.get_aggregations()[key]['terms']['field']
+        aggregations = self.get_aggregations()
+        if is_search_field_nested("items", key):
+            return aggregations[key]["aggs"][f"{key}_filtered"]["aggs"][key]["terms"]["field"]
+        else:
+            return aggregations[key]['terms']['field']
 
     def versioncreated_range(self, created):
         _range = {}

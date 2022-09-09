@@ -16,3 +16,4 @@ from .data_updates import ( # noqa
 )
 from .initialize_data import initialize_data # noqa
 from .schema_migrate import schema_migrate  # noqa
+from .fix_topic_nested_filters import fix_topic_nested_filters  # noqa

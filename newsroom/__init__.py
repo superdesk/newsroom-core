@@ -17,7 +17,7 @@ MONGO_PREFIX = 'CONTENTAPI_MONGO'
 ELASTIC_PREFIX = 'CONTENTAPI_ELASTICSEARCH'
 
 SCHEMA_VERSIONS = {
-    "wire": 0,
+    "wire": 1,
     "agenda": 1,
 }
 
