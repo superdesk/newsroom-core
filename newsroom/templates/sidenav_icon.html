@@ -7,11 +7,11 @@
         {% if nav.url %}target="_blank"{% endif %}
     >
         {% if nav.badge %}
-        <div id="{{ nav.badge }}" class="badge badge-pill badge-info badge-secondary"></div>
+        <div id="{{ nav.badge }}" class="badge rounded-pill bg-danger"></div>
         {% endif %}
         {% block navurl %}
         {% if nav.url %}
-        <div class="badge badge-pill badge-light badge--icon">
+        <div class="badge rounded-pill bg-danger">
             <i class="icon-small--external"></i>
         </div>
         {% endif %}

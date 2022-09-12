@@ -12,6 +12,9 @@
   [class^="icon--"], [class*=" icon--"] {
       vertical-align: middle;
   }
+  .card-header, .card-footer {
+    padding: 0.75rem 1.25rem;
+  }
 }
 
 .dropdown-menu-typeahead {

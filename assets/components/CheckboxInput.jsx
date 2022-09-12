@@ -10,16 +10,16 @@ function CheckboxInput({name, label, onChange, value, labelClass, readOnly}) {
 
     return (
         <div className='form-check p-0'>                
-            <div className='custom-control custom-checkbox' tabIndex='-1'>
+            <div className='form-check' tabIndex='-1'>
                 <input type="checkbox"
                     name={name}
-                    className="custom-control-input"
+                    className="form-check-input"
                     checked={value}
                     id={name}
                     onChange={onChange}
                     disabled={readOnly}
                     tabIndex='0' />
-                <label className={classNames('custom-control-label', labelClass)} htmlFor={name}>{label}</label>
+                <label className={classNames('form-check-label', labelClass)} htmlFor={name}>{label}</label>
             </div>
         </div>
     );

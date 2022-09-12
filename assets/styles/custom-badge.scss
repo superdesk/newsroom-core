@@ -6,8 +6,9 @@
     font-size: 0.6875rem; // 11px    
     line-height: 1.2;
     position: absolute;
-    inset-block-start: 5px;
-    inset-inline-end: 7px;
+    inset-block-start: -4px !important;
+    inset-inline-end: 3px !important;
+    padding: 0.35em 0.7em;
   }
 }
 
