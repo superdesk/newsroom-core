@@ -1,3 +1,4 @@
+from typing import Dict, NamedTuple, Any, Literal
 from datetime import timedelta
 
 from flask import current_app as app
@@ -10,6 +11,14 @@ from newsroom.gettext import get_session_locale
 
 DAY_IN_MINUTES = 24 * 60 - 1
 TO_BE_CONFIRMED_FIELD = '_time_to_be_confirmed'
+
+
+class AgendaItemTypes(NamedTuple):
+    EVENT: str
+    PLANNING: str
+
+
+AGENDA_ITEM_TYPE: AgendaItemTypes = AgendaItemTypes("event", "planning")
 
 
 def date_short(datetime):
@@ -161,3 +170,12 @@ def get_planning_coverages(item, plan_id):
         coverage for coverage in item.get("coverages", [])
         if coverage.get("planning_id") == plan_id
     ]
+
+
+def get_item_type(item: Dict[str, Any]) -> Literal["event", "planning"]:
+    if item.get("item_type") is not None:
+        return item["item_type"]
+    elif item.get("event"):
+        return "event"
+    else:
+        return "planning"
