@@ -81,7 +81,6 @@ def _get_expired_items(expiry_datetime: datetime) -> Generator[List[Dict[str, An
 
     agenda_service = get_resource_service("agenda")
     max_loops = app.config.get("MAX_EXPIRY_LOOPS", 50)
-    ids_processed: Set[str] = set()
     for i in range(max_loops):  # avoid blocking forever just in case
         req = ParsedRequest()
         expiry_datetime_str = date_to_str(expiry_datetime)
@@ -132,9 +131,6 @@ def _get_expired_items(expiry_datetime: datetime) -> Generator[List[Dict[str, An
 
         if not len(items):
             break
-
-        for item in items:
-            ids_processed.add(item[config.ID_FIELD])
 
         yield items
     else:
