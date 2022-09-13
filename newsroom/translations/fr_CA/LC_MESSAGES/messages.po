@@ -9,8 +9,8 @@
 # Gideon Lehmann <gideon.lehmann@sourcefabric.org>, 2022
 # Evzen Deulin <evgeny.deulin@sourcefabric.org>, 2022
 # Simon Peacock <simon.peacock@gmail.com>, 2022
-# Petr Jašek <petr.jasek@sourcefabric.org>, 2022
 # Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2022
+# Petr Jašek <petr.jasek@sourcefabric.org>, 2022
 # Marie-Eve Ouellette <marie-eve.ouellette@lapressecanadienne.com>, 2022
 # 
 #, fuzzy
@@ -18,22 +18,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-07-07 14:48+0200\n"
+"POT-Creation-Date: 2022-09-01 10:11+0200\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
 "Last-Translator: Marie-Eve Ouellette <marie-eve.ouellette@lapressecanadienne.com>, 2022\n"
 "Language-Team: French (Canada) (https://www.transifex.com/sourcefabric/teams/6584/fr_CA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.10.3\n"
 "Language: fr_CA\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
-#: newsroom/email.py:355
+#: newsroom/email.py:391
 msgid "Kill/Takedown notice"
 msgstr "Avis de supression"
 
-#: newsroom/email.py:364
+#: newsroom/email.py:400
 msgid "Agenda cancelled notice"
 msgstr "Avis d'annulation d'événement"
 
@@ -1684,40 +1684,42 @@ msgstr "Demain"
 msgid "No items found."
 msgstr "Aucun élément trouvé."
 
-#: assets/agenda/components/AgendaListCoverageItem.jsx:21
-msgid " '${slugline}'"
-msgstr "'${slugline}'"
+#: assets/agenda/components/AgendaListCoverageItem.jsx:25
+msgid "{{ type }} coverage {{ slugline }} {{ status_text }}"
+msgstr "Couverture {{ type }} {{ slugline }} {{ status_text }}"
 
-#: assets/agenda/components/AgendaListCoverageItem.jsx:27
-msgid "{{ type }}{{ slugline }} {{ status_text }}"
-msgstr "{{ type }}{{ slugline }} {{ status_text }}"
-
-#: assets/agenda/components/AgendaListCoverageItem.jsx:36
-msgid "Planned {{ type }} {{ slugline }}, expected {{date}} at {{time}}"
+#: assets/agenda/components/AgendaListCoverageItem.jsx:34
+msgid ""
+"Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}}"
 msgstr ""
-"{{ type }} {{ slugline }} planifiée, attendue le {{ date }} à {{time}}"
+"Couverture {{ type }} planifiée {{ slugline }}, attendue le {{date}} à "
+"{{time}}"
 
-#: assets/agenda/components/AgendaListCoverageItem.jsx:45
-msgid "{{ type }} {{ slugline }} in progress, expected {{date}} at {{time}}"
-msgstr "{{ type }} {{ slugline }} en cours, attendue le {{ date }} à {{time}}"
+#: assets/agenda/components/AgendaListCoverageItem.jsx:43
+msgid ""
+"{{ type }} coverage {{ slugline }} in progress, expected {{date}} at "
+"{{time}}"
+msgstr ""
+"Couverture {{ type }} {{ slugline }} en cours, attendue le {{date}} à "
+"{{time}}"
 
-#: assets/agenda/components/AgendaListCoverageItem.jsx:51
-msgid "{{ type }} {{slugline}} cancelled"
-msgstr "{{ type }} {{slugline}} annulée"
+#: assets/agenda/components/AgendaListCoverageItem.jsx:49
+msgid "{{ type }} coverage {{slugline}} cancelled"
+msgstr "Couverture {{ type }} {{slugline}} annulée"
 
-#: assets/agenda/components/AgendaListCoverageItem.jsx:59
+#: assets/agenda/components/AgendaListCoverageItem.jsx:57
 msgid "(update to come)"
 msgstr "(mise à jour à venir)"
 
-#: assets/agenda/components/AgendaListCoverageItem.jsx:59
+#: assets/agenda/components/AgendaListCoverageItem.jsx:57
 msgid "(updated)"
 msgstr "(mise à jour)"
 
-#: assets/agenda/components/AgendaListCoverageItem.jsx:63
-msgid "{{ type }} {{ slugline }} available {{deliveryState}}"
-msgstr "{{ type }} {{ slugline }} disponible {{deliveryState}}"
+#: assets/agenda/components/AgendaListCoverageItem.jsx:61
+msgid "{{ type }} coverage {{ slugline }} available {{deliveryState}}"
+msgstr "Couverture {{ type }} {{ slugline }} disponible {{deliveryState}}"
 
-#: assets/agenda/components/AgendaListCoverageItem.jsx:96
+#: assets/agenda/components/AgendaListCoverageItem.jsx:94
 msgid "(Watching)"
 msgstr "(En surveillance)"
 
@@ -1786,7 +1788,15 @@ msgstr "Ouvrir dans un nouvel onglet"
 msgid "View Content"
 msgstr "Voir le contenu"
 
-#: assets/agenda/components/CoverageItemStatus.jsx:146
+#: assets/agenda/components/CoverageItemStatus.jsx:139
+msgid "All coverages cancelled: {{ reason }}"
+msgstr "Toutes les couvertures ont été annulées: {{ reason }}"
+
+#: assets/agenda/components/CoverageItemStatus.jsx:142
+msgid "Planning cancelled: {{ reason }}"
+msgstr "Couverture annulée: {{ reason }}"
+
+#: assets/agenda/components/CoverageItemStatus.jsx:165
 msgid "Update coming"
 msgstr "Mise à jour à venir"
 
@@ -3497,6 +3507,3 @@ msgstr "À"
 #: assets/wire/components/filters/NavigationTab.jsx:39
 msgid "All"
 msgstr "Tout"
-
-msgid "coverage {{slugline}}"
-msgstr "couverture {{slugline}}"
