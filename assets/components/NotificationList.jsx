@@ -49,7 +49,7 @@ class NotificationList extends React.Component {
             <div className="badge--top-right">
                 <h3 className="a11y-only">Notification Bell</h3>
                 {this.props.count > 0 &&
-                    <div className="badge badge-pill badge-info badge-secondary">
+                    <div className="badge rounded-pill bg-danger">
                         {this.props.count}
                     </div>
                 }
