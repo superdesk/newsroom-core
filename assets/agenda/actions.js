@@ -529,7 +529,7 @@ export function setAndUpdateNewItems(data) {
                 return Promise.resolve();
             }
 
-            const coveragesToCheck = agendaItem.coverages.map((c) => c.coverage_id);
+            const coveragesToCheck = (agendaItem.coverages || []).map((c) => c.coverage_id);
             for(let i of data._items) {
                 if (coveragesToCheck.includes(i.coverage_id)) {
                     dispatch(fetchWireItemsForAgenda(agendaItem));

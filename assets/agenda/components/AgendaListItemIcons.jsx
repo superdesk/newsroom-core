@@ -47,7 +47,7 @@ class AgendaListItemIcons extends React.Component {
             internalNote: getInternalNote(props.item, props.planningItem),
             coveragesToDisplay: !hasCoverages(props.item) || props.hideCoverages ?
                 [] :
-                props.item.coverages.filter(
+                (props.item.coverages || []).filter(
                     (c) => !props.group || (isCoverageForExtraDay(c, props.group) && c.planning_id === get(props, 'planningItem.guid'))
                 ),
             attachments: (getAttachments(props.item)).length,
