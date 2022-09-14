@@ -54,7 +54,6 @@ def handle_long_lines_text(text):
                     next_line += (' ' if len(next_line) else '') + word
 
             if next_line:
-                print("IN", next_line)
                 output.append(next_line)
     return "\n".join(output)
 
