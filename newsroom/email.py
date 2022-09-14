@@ -32,7 +32,7 @@ class EmailGroup(TypedDict):
     emails: List[str]
 
 
-MAX_LINE_LENGTH = 998  # RFC 5322
+MAX_LINE_LENGTH = 998 - 50  # RFC 5322 - buffer for html indentiation
 
 
 def handle_long_lines_text(text):
@@ -47,13 +47,14 @@ def handle_long_lines_text(text):
             next_line = ''
             words = line.split()
             for word in words:
-                if len(next_line) + len(word) + 1 > MAX_LINE_LENGTH:
+                if len(next_line) + len(word) > MAX_LINE_LENGTH:
                     output.append(next_line)
                     next_line = word
                 else:
                     next_line += (' ' if len(next_line) else '') + word
 
             if next_line:
+                print("IN", next_line)
                 output.append(next_line)
     return "\n".join(output)
 
@@ -63,7 +64,13 @@ def handle_long_lines_html(html):
     if not any([len(line) > MAX_LINE_LENGTH for line in lines]):
         return html
     parsed = etree.fromstring(html, parser=etree.HTMLParser())
-    return etree.tounicode(parsed, method="html", pretty_print=True)
+    etree.indent(parsed, space=" ")  # like pretty print but upfront
+    for elem in parsed.iter():
+        if elem.text is not None and len(elem.text) > MAX_LINE_LENGTH:
+            elem.text = handle_long_lines_text(elem.text) + "\n"
+        if elem.tail is not None and len(elem.tail) > MAX_LINE_LENGTH:
+            elem.tail = handle_long_lines_text(elem.tail) + "\n"
+    return etree.tostring(parsed, method="html", encoding="unicode")
 
 
 @celery.task(soft_time_limit=120)
