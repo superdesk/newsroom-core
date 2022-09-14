@@ -32,7 +32,7 @@ class EmailGroup(TypedDict):
     emails: List[str]
 
 
-MAX_LINE_LENGTH = 998 - 50  # RFC 5322 - buffer for html indentiation
+MAX_LINE_LENGTH = 998 - 50  # RFC 5322 - buffer for html indentation
 
 
 def handle_long_lines_text(text):
