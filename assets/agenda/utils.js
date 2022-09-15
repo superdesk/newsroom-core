@@ -682,7 +682,7 @@ export function getPlanningItemsByGroup(item, group) {
     const processed = {};
 
     // get unique plans for that group based on the coverage.
-    const plansWithCoverages = item.coverages
+    const plansWithCoverages = (item.coverages || [])
         .map((coverage) => {
             if (isCoverageForExtraDay(coverage, group)) {
                 if (!processed[coverage.planning_id]) {

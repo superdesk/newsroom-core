@@ -33,7 +33,7 @@ function format(item, group, onlyDates) {
 
     if (!isGroupBetweenEventDates && hasCoverages(item)) {
         // we rendering for extra days
-        const scheduleDates = item.coverages
+        const scheduleDates = (item.coverages || [])
             .map((coverage) => {
                 if (isCoverageForExtraDay(coverage, group)) {
                     return coverage.scheduled;
