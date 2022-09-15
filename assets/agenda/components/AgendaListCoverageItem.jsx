@@ -13,6 +13,58 @@ import {
     WORKFLOW_COLORS,
 } from '../utils';
 
+const getCoverageTootip = (coverage, beingUpdated) => {
+    const slugline = coverage.item_slugline || coverage.slugline;
+
+    if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
+        return gettext('{{ type }} coverage {{ slugline }} {{ status_text }}', {
+            type: getCoverageDisplayName(coverage.coverage_type),
+            slugline: slugline,
+            status_text: getCoverageStatusText(coverage)
+        });
+    }
+
+    if (['assigned'].includes(coverage.workflow_status)) {
+        return gettext('Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}}', {
+            type: getCoverageDisplayName(coverage.coverage_type),
+            slugline: slugline,
+            date: formatDate(coverage.scheduled),
+            time: formatTime(coverage.scheduled)
+        });
+    }
+
+    if (['active'].includes(coverage.workflow_status)) {
+        return gettext('{{ type }} coverage {{ slugline }} in progress, expected {{date}} at {{time}}', {
+            type: getCoverageDisplayName(coverage.coverage_type),
+            slugline: slugline,
+            date: formatDate(coverage.scheduled),
+            time: formatTime(coverage.scheduled)
+        });
+    }
+
+    if (coverage.workflow_status === WORKFLOW_STATUS.CANCELLED) {
+        return gettext('{{ type }} coverage {{slugline}} cancelled', {
+            type: getCoverageDisplayName(coverage.coverage_type),
+            slugline: slugline,
+        });
+    }
+
+    if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
+        let deliveryState;
+        if (get(coverage, 'deliveries.length', 0) > 1) {
+            deliveryState = beingUpdated ? gettext('(update to come)') : gettext('(updated)');
+        }
+
+        return gettext('{{ type }} coverage {{ slugline }} available {{deliveryState}}', {
+            type: getCoverageDisplayName(coverage.coverage_type),
+            slugline: slugline,
+            deliveryState: deliveryState
+        });
+    }
+
+    return '';
+};
+
 class AgendaListCoverageItem extends React.Component {
     constructor(props) {
         super(props);
