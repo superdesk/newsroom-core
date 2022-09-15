@@ -12,6 +12,7 @@
 
 import logging
 from newsroom.web import NewsroomWebApp
+import newsroom.commands  # noqa
 
 
 logger = logging.getLogger(__name__)

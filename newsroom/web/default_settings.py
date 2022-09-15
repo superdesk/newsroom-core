@@ -354,7 +354,15 @@ CELERY_BEAT_SCHEDULE = {
     'newsroom:monitoring_immediate_alerts': {
         'task': 'newsroom.monitoring.email_alerts.monitoring_immediate_alerts',
         'schedule': timedelta(seconds=60),
-    }
+    },
+    "newsroom:remove_expired_content_api": {
+        "task": "content_api.commands.item_expiry",
+        "schedule": crontab(hour=local_to_utc_hour(2), minute=0)  # Runs every day at 2am
+    },
+    "newsroom:remove_expired_agenda": {
+        "task": "newsroom.commands.async_remove_expired_agenda",
+        "schedule": crontab(hour=local_to_utc_hour(3), minute=0),  # Runs every day at 3am
+    },
 }
 
 MAX_EXPIRY_QUERY_LIMIT = os.environ.get('MAX_EXPIRY_QUERY_LIMIT', 100)
@@ -469,4 +477,14 @@ SAML_COMPANY = ""
 #:
 SAML_LABEL = "SSO"
 
+#: Rebuild elastic mapping on ``initialize_data`` mapping error
+#:
+#: .. versionadded:: 2.3
+#:
 REBUILD_ELASTIC_ON_INIT_DATA_ERROR = strtobool(env("REBUILD_ELASTIC_ON_INIT_DATA_ERROR", "true"))
+
+#: The number of days before Agenda items are removed. Defaults to 0 which means no purging occurs
+#:
+#: .. versionadded:: 2.3
+#:
+AGENDA_EXPIRY_DAYS = int(env("AGENDA_EXPIRY_DAYS", 0))

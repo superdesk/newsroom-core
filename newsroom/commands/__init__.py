@@ -17,3 +17,11 @@ from .data_updates import ( # noqa
 from .initialize_data import initialize_data # noqa
 from .schema_migrate import schema_migrate  # noqa
 from .fix_topic_nested_filters import fix_topic_nested_filters  # noqa
+from .remove_expired_agenda import remove_expired_agenda  # noqa
+
+from newsroom.celery_app import celery
+
+
+@celery.task(soft_time_limit=600)
+def async_remove_expired_agenda():
+    remove_expired_agenda()
