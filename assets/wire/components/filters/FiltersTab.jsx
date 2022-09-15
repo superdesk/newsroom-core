@@ -4,7 +4,6 @@ import {connect} from 'react-redux';
 
 import {isEmpty, cloneDeep, pickBy, assign, isEqual} from 'lodash';
 import {gettext, toggleValue} from 'utils';
-import {getActiveDate} from 'local-store';
 
 import NavCreatedPicker from './NavCreatedPicker';
 import FilterGroup from './FilterGroup';
@@ -116,9 +115,6 @@ class FiltersTab extends React.Component {
         this.setState({activeFilter: {}, createdFilter: {}});
         this.props.resetFilter();
         this.props.fetchItems();
-        if ('function' === typeof this.props.selectDate) {
-            this.props.selectDate(getActiveDate() || Date.now().valueOf(), 'day');
-        }
     }
 
     render() {
