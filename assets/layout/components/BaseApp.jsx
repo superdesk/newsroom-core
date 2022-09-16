@@ -16,7 +16,7 @@ export default class BaseApp extends React.Component {
         super(props);
 
         this.state = {
-            withSidebar: getFilterPanelOpenState(props.context),
+            withSidebar: props.bookmarks !== true && getFilterPanelOpenState(props.context),
             minimizeSearchResults: isMobilePhone(),
         };
 
@@ -174,4 +174,5 @@ BaseApp.propTypes = {
     activeQuery: PropTypes.string,
     fetchMoreItems: PropTypes.func.isRequired,
     savedItemsCount: PropTypes.number,
+    bookmarks: PropTypes.bool,
 };
