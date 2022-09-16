@@ -670,15 +670,18 @@ export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
  */
 export function getPlanningItemsByGroup(item, group) {
     // Event item
-    if (get(item, 'planning_items.length', 0) === 0) {
+    const planningIds = get(item, '_links.matched_planning_items') || [];
+    const planningItems = (get(item, 'planning_items') || []).filter((plan) => planningIds.includes(plan._id));
+
+    if (planningItems.length === 0) {
         return [];
     }
 
     // Planning item without coverages
-    const plansWithoutCoverages = get(item, 'planning_items', []).filter((p) =>
+    const plansWithoutCoverages = planningItems.filter((p) =>
         formatDate(p.planning_date) === group && get(p, 'coverages.length', 0) === 0);
 
-    const allPlans = keyBy(get(item, 'planning_items'), '_id');
+    const allPlans = keyBy(planningItems, '_id');
     const processed = {};
 
     // get unique plans for that group based on the coverage.
