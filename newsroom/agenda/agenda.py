@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Set, Any
 import logging
 from copy import deepcopy
 
@@ -462,71 +462,61 @@ def nested_query(path, query, inner_hits=True, name=None):
     return {'nested': nested}
 
 
-def _filter_terms(filters, events_only=False):
+planning_filters = ["coverage", "coverage_status", "agendas"]
+
+
+def _filter_terms(filters, item_type):
     must_term_filters = []
     must_not_term_filters = []
     for key, val in filters.items():
         if not val:
             continue
+        elif item_type == "events" and key in planning_filters:
+            continue
         elif key == 'coverage':
-            if events_only:
-                continue
             must_term_filters.append(
-                {"nested": {
-                    "path": "coverages",
-                    "query": {"bool": {"must": [{'terms': {get_aggregation_field(key): val}}]}}
-                }})
+                nested_query(
+                    path="coverages",
+                    query={"bool": {"must": [{'terms': {get_aggregation_field(key): val}}]}},
+                    name="coverage_type"
+                )
+            )
         elif key == 'coverage_status':
-            if events_only:
-                continue
-            if val == ['planned']:
-                must_term_filters.append(
-                    {"nested": {
-                        "path": "coverages",
-                        "query": {"bool": {"must": [{'terms': {'coverages.coverage_status': ['coverage intended']}}]}}
-                    }})
+            if val == ["planned"]:
+                query = {"bool": {"must": [{'terms': {'coverages.coverage_status': ['coverage intended']}}]}}
             else:
-                must_not_term_filters.append(
-                    {"nested": {
-                        "path": "coverages",
-                        "query": {"bool": {
-                            "should": [
-                                {'terms': {'coverages.coverage_status': ['coverage intended']}}
-                            ]}}
-                    }})
-        elif key == 'agendas':
-            if events_only:
-                continue
+                query = {"bool": {"should": [{'terms': {'coverages.coverage_status': ['coverage intended']}}]}}
 
-            must_term_filters.append({
-                "nested": {
-                    "path": "planning_items",
-                    "query": {
-                        "bool": {
-                            "must": [{
-                                "terms": {get_aggregation_field(key): val}
-                            }]
-                        }
-                    }
-                }
-            })
+            must_term_filters.append(
+                nested_query(
+                    path="coverages",
+                    query=query,
+                    name="coverage_status"
+                )
+            )
+        elif key == 'agendas':
+            must_term_filters.append(
+                nested_query(
+                    path="planning_items",
+                    query={"bool": {"must": [{"terms": {get_aggregation_field(key): val}}]}},
+                    name="agendas"
+                )
+            )
         else:
-            if key in {'service', 'urgency', 'subject', 'place'} and not events_only:
+            if item_type != "events":
+                agg_field = get_aggregation_field(key)
                 must_term_filters.append({
-                    'or': [
-                        {'terms': {get_aggregation_field(key): val}},
-                        nested_query(
-                            'planning_items',
-                            {
-                                'bool': {
-                                    'must': [
-                                        {'terms': {'planning_items.{}'.format(get_aggregation_field(key)): val}}
-                                    ]
-                                }
-                            },
-                            name=key
-                        )
-                    ]
+                    "bool": {
+                        "minimum_should_match": 1,
+                        "should": [
+                            {"terms": {agg_field: val}},
+                            nested_query(
+                                path="planning_items",
+                                query={"bool": {"must": [{"terms": {f"planning_items.{agg_field}": val}}]}},
+                                name=key,
+                            ),
+                        ],
+                    },
                 })
             else:
                 must_term_filters.append({'terms': {get_aggregation_field(key): val}})
@@ -549,19 +539,19 @@ def _remove_fields(source, fields):
     source['_source']['exclude'].extend(fields)
 
 
-def set_post_filter(source, req, events_only=False):
+def set_post_filter(source, req, item_type):
     filters = None
     if req.args.get('filter'):
         filters = json.loads(req.args['filter'])
     if filters:
         if app.config.get('FILTER_BY_POST_FILTER', False):
             source['post_filter'] = {'bool': {
-                'must': [_filter_terms(filters, events_only)['must_term_filters']],
-                'must_not': [_filter_terms(filters, events_only)['must_not_term_filters']],
+                'must': [_filter_terms(filters, item_type)['must_term_filters']],
+                'must_not': [_filter_terms(filters, item_type)['must_not_term_filters']],
             }}
         else:
-            source['query']['bool']['must'] += _filter_terms(filters, events_only)['must_term_filters']
-            source['query']['bool']['must_not'] += _filter_terms(filters, events_only)['must_not_term_filters']
+            source['query']['bool']['must'] += _filter_terms(filters, item_type)['must_term_filters']
+            source['query']['bool']['must_not'] += _filter_terms(filters, item_type)['must_not_term_filters']
 
 
 def planning_items_query_string(query, fields=None):
@@ -624,17 +614,29 @@ class AgendaService(BaseSearchService):
     def enhance_items(self, docs):
         for doc in docs:
             self.enhance_coverages(doc.get('coverages') or [])
+            doc["_links"]["matched_planning_items"] = [
+                plan["_id"]
+                for plan in doc.get("planning_items") or []
+            ]
 
             # Filter based on _inner_hits
             inner_hits = doc.pop('_inner_hits', None)
             if not inner_hits or not doc.get('planning_items'):
                 continue
 
-            items_by_key = {item.get('guid') for key, items in inner_hits.items() for item in items}
-            if not items_by_key:
-                continue
-            doc['planning_items'] = [p for p in doc['planning_items'] or [] if p.get('guid') in items_by_key]
-            doc['coverages'] = [c for c in (doc.get('coverages') or []) if c.get('planning_id') in items_by_key]
+            # Store matched Planning IDs into matched_planning_items
+            # The Planning IDs must be in all supplied ``_inner_hits``
+            # In order to be included (i.e. match all nested planning queries)
+            items_by_filter = {
+                key: [item.get("guid") or item.get("planning_id") for item in items]
+                for key, items in inner_hits.items()
+            }
+            unique_ids = set([item_id for items in items_by_filter.values() for item_id in items])
+            doc["_links"]["matched_planning_items"] = [
+                item_id
+                for item_id in unique_ids
+                if all([item_id in items for items in items_by_filter.values()])
+            ]
 
     def enhance_coverages(self, coverages):
         completed_coverages = [c for c in coverages if c['workflow_status'] == ASSIGNMENT_WORKFLOW_STATE.COMPLETED
@@ -668,10 +670,28 @@ class AgendaService(BaseSearchService):
         coverage['publish_time'] = wire_item.get('publish_schedule') or wire_item.get('firstpublished')
 
     def get(self, req, lookup):
+        self._matched_ids = []
         if req.args.get('featured'):
             return self.get_featured_stories(req, lookup)
 
         cursor = super().get(req, lookup)
+
+        args = req.args
+        if args.get("itemType") is None or (args.get("date_from") and args.get("date_to")):
+            matching_event_ids: Set[str] = set() if args.get("itemType") is not None \
+                else self._get_event_ids_matching_query(req, lookup)
+            date_range = {} if not (args.get("date_from") and args.get("date_to")) else get_date_filters(args)
+
+            for doc in cursor.docs:
+                if doc["_id"] in matching_event_ids:
+                    doc.pop("_inner_hits", None)
+                if date_range:
+                    # make the items display on the featured day,
+                    # it's used in ui instead of dates.start and dates.end
+                    doc.update({
+                        '_display_from': date_range.get('gt'),
+                        '_display_to': date_range.get('lt'),
+                    })
 
         if req.args.get('date_from') and req.args.get('date_to'):
             date_range = get_date_filters(req.args)
@@ -683,6 +703,25 @@ class AgendaService(BaseSearchService):
                     '_display_to': date_range.get('lt'),
                 })
         return cursor
+
+    def _get_event_ids_matching_query(self, req, lookup) -> Set[str]:
+        """Re-run the query to retrieve the list of Event IDs matching the query
+
+        This is used to show ALL Planning Items for the Event if the search query matched the parent Event
+        """
+
+        if any([key in planning_filters for key in (json.loads(req.args.get("filter") or "{}")).keys()]):
+            return set()
+
+        orig_args = req.args
+        req.args = dict(req.args)
+        req.args["itemType"] = "events"
+        item_ids = set([
+            item["_id"]
+            for item in super().get(req, lookup)
+        ])
+        req.args = orig_args
+        return item_ids
 
     def prefill_search_query(self, search: SearchQuery, req=None, lookup=None):
         """ Generate the search query instance
@@ -878,7 +917,7 @@ class AgendaService(BaseSearchService):
 
         super().gen_source_from_search(search)
 
-        set_post_filter(search.source, search, search.item_type == "events")
+        set_post_filter(search.source, search, search.item_type)
 
         if not search.source['from'] and not search.args.get('bookmarks'):
             # avoid aggregations when handling pagination
@@ -918,7 +957,7 @@ class AgendaService(BaseSearchService):
         query['bool']['must'].append(planning_items_query)
 
         source = {'query': query}
-        set_post_filter(source, req)
+        set_post_filter(source, req, None)
         source['size'] = len(featured['items'])
         source['from'] = req.args.get('from', 0, type=int)
         if not source['from']:
