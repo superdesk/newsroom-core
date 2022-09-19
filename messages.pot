@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-09-01 10:11+0200\n"
+"POT-Creation-Date: 2022-09-20 10:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,11 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.3\n"
 
-#: newsroom/email.py:391
+#: newsroom/email.py:397
 msgid "Kill/Takedown notice"
 msgstr ""
 
-#: newsroom/email.py:400
+#: newsroom/email.py:406
 msgid "Agenda cancelled notice"
 msgstr ""
 
@@ -789,7 +789,7 @@ msgstr ""
 msgid "Web"
 msgstr ""
 
-#: assets/agenda/components/AgendaEdNote.jsx:15
+#: assets/agenda/components/AgendaEdNote.jsx:16
 #: newsroom/templates/agenda_item_print.html:59
 msgid "Editorial Note"
 msgstr ""
@@ -1564,8 +1564,16 @@ msgstr ""
 msgid "Coverages"
 msgstr ""
 
-#: assets/agenda/components/AgendaEdNote.jsx:15
+#: assets/agenda/components/AgendaEdNote.jsx:16
 msgid "Reason"
+msgstr ""
+
+#: assets/agenda/components/AgendaEdNote.jsx:33
+msgid "Event Postponed: {{reason}}"
+msgstr ""
+
+#: assets/agenda/components/AgendaEdNote.jsx:35
+msgid "Event Rescheduled: {{reason}}"
 msgstr ""
 
 #: assets/agenda/components/AgendaEventsOnlyFilter.jsx:7
