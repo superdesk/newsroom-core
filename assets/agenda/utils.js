@@ -612,7 +612,8 @@ export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
     items
         // Filter out items that didn't match any Planning items
         .filter((item) => (
-            get(item, 'planning_items.length', 0) > 0 &&
+            get(item, 'planning_items.length', 0) === 0 ||
+            get(item, '_links.matched_planning_items') == null ||
             get(item, '_links.matched_planning_items.length', 0) > 0)
         )
         .forEach((item) => {
