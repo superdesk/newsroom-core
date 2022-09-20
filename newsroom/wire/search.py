@@ -24,7 +24,7 @@ def get_aggregations():
 
 
 class WireSearchResource(newsroom.Resource):
-    SUPPORTED_NESTED_SEARCH_FIELDS = ["subject", "service"]
+    SUPPORTED_NESTED_SEARCH_FIELDS = ["subject"]
 
     datasource = {
         'search_backend': 'elastic',

@@ -108,7 +108,7 @@ class AgendaResource(newsroom.Resource):
     Agenda schema
     """
 
-    SUPPORTED_NESTED_SEARCH_FIELDS = ["subject", "service"]
+    SUPPORTED_NESTED_SEARCH_FIELDS = ["subject"]
 
     schema = {}
 
@@ -146,11 +146,11 @@ class AgendaResource(newsroom.Resource):
     # aggregated fields
     schema['urgency'] = planning_schema['urgency']
     schema['place'] = planning_schema['place']
+    schema["service"] = planning_schema["anpa_category"]
     schema['state_reason'] = {'type': 'string'}
 
     # Fields supporting Nested Aggregation / Filtering
     schema["subject"] = nested_code_mapping
-    schema["service"] = nested_code_mapping
 
     # dates
     schema['dates'] = {
