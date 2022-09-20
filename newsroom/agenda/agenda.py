@@ -478,22 +478,26 @@ def _filter_terms(filters, item_type):
                 nested_query(
                     path="coverages",
                     query={"bool": {"must": [{'terms': {get_aggregation_field(key): val}}]}},
-                    name="coverage_type"
+                    name="coverage"
                 )
             )
         elif key == 'coverage_status':
             if val == ["planned"]:
-                query = {"bool": {"must": [{'terms': {'coverages.coverage_status': ['coverage intended']}}]}}
-            else:
-                query = {"bool": {"should": [{'terms': {'coverages.coverage_status': ['coverage intended']}}]}}
-
-            must_term_filters.append(
-                nested_query(
-                    path="coverages",
-                    query=query,
-                    name="coverage_status"
+                must_term_filters.append(
+                    nested_query(
+                        path="coverages",
+                        query={"bool": {"must": [{'terms': {'coverages.coverage_status': ['coverage intended']}}]}},
+                        name="coverage_status"
+                    )
                 )
-            )
+            else:
+                must_not_term_filters.append(
+                    nested_query(
+                        path="coverages",
+                        query={"bool": {"must": [{'terms': {'coverages.coverage_status': ['coverage intended']}}]}},
+                        name="coverage_status"
+                    )
+                )
         elif key == 'agendas':
             must_term_filters.append(
                 nested_query(
@@ -614,13 +618,29 @@ class AgendaService(BaseSearchService):
     def enhance_items(self, docs):
         for doc in docs:
             self.enhance_coverages(doc.get('coverages') or [])
+            doc.setdefault("_links", {})
+            doc["_links"]["matched_event"] = doc.pop("_search_matched_event", False)
+
+            if not doc.get("planning_items"):
+                continue
+
             doc["_links"]["matched_planning_items"] = [
                 plan["_id"]
                 for plan in doc.get("planning_items") or []
             ]
 
             # Filter based on _inner_hits
-            inner_hits = doc.pop('_inner_hits', None)
+            inner_hits = doc.pop('_inner_hits', {})
+
+            # If the search matched the Event
+            # then only count Planning based filters when checking ``_inner_hits``
+            if doc["_links"]["matched_event"]:
+                inner_hits = {
+                    key: val
+                    for key, val in inner_hits.items()
+                    if key in planning_filters
+                }
+
             if not inner_hits or not doc.get('planning_items'):
                 continue
 
@@ -670,7 +690,6 @@ class AgendaService(BaseSearchService):
         coverage['publish_time'] = wire_item.get('publish_schedule') or wire_item.get('firstpublished')
 
     def get(self, req, lookup):
-        self._matched_ids = []
         if req.args.get('featured'):
             return self.get_featured_stories(req, lookup)
 
@@ -684,7 +703,7 @@ class AgendaService(BaseSearchService):
 
             for doc in cursor.docs:
                 if doc["_id"] in matching_event_ids:
-                    doc.pop("_inner_hits", None)
+                    doc["_search_matched_event"] = True
                 if date_range:
                     # make the items display on the featured day,
                     # it's used in ui instead of dates.start and dates.end
@@ -693,15 +712,6 @@ class AgendaService(BaseSearchService):
                         '_display_to': date_range.get('lt'),
                     })
 
-        if req.args.get('date_from') and req.args.get('date_to'):
-            date_range = get_date_filters(req.args)
-            for doc in cursor.docs:
-                # make the items display on the featured day,
-                # it's used in ui instead of dates.start and dates.end
-                doc.update({
-                    '_display_from': date_range.get('gt'),
-                    '_display_to': date_range.get('lt'),
-                })
         return cursor
 
     def _get_event_ids_matching_query(self, req, lookup) -> Set[str]:
@@ -710,12 +720,11 @@ class AgendaService(BaseSearchService):
         This is used to show ALL Planning Items for the Event if the search query matched the parent Event
         """
 
-        if any([key in planning_filters for key in (json.loads(req.args.get("filter") or "{}")).keys()]):
-            return set()
-
         orig_args = req.args
-        req.args = dict(req.args)
+        req.args = {key: val for key, val in dict(req.args).items() if key not in planning_filters}
         req.args["itemType"] = "events"
+        req.args["noAggregations"] = 1
+        req.projection = json.dumps({'_id': 1})
         item_ids = set([
             item["_id"]
             for item in super().get(req, lookup)
@@ -919,7 +928,7 @@ class AgendaService(BaseSearchService):
 
         set_post_filter(search.source, search, search.item_type)
 
-        if not search.source['from'] and not search.args.get('bookmarks'):
+        if not search.source['from'] and not search.args.get('bookmarks') and not search.args.get("noAggregations"):
             # avoid aggregations when handling pagination
             search.source['aggs'] = get_agenda_aggregations(search.item_type == "events")
         else:

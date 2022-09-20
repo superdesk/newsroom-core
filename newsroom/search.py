@@ -255,6 +255,7 @@ class BaseSearchService(Service):
 
         if search.projections:
             internal_req.args['projections'] = search.projections
+            internal_req.projection = search.projections
 
         return internal_req
 
