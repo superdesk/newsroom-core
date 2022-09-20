@@ -609,37 +609,43 @@ export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
     const groupedItems = {};
     const grouper = Groupers[activeGrouping];
 
-    items.forEach((item) => {
-        const itemExtraDates = getExtraDates(item);
-        const itemStartDate = moment(item.dates.start);
-        const start = item._display_from ? moment(item._display_from) :
-            moment.max(maxStart, moment.min(itemExtraDates.concat([itemStartDate])));
-        const itemEndDate = moment(get(item, 'dates.end', start));
+    items
+        // Filter out items that didn't match any Planning items
+        .filter((item) => (
+            get(item, 'planning_items.length', 0) > 0 &&
+            get(item, '_links.matched_planning_items.length', 0) > 0)
+        )
+        .forEach((item) => {
+            const itemExtraDates = getExtraDates(item);
+            const itemStartDate = moment(item.dates.start);
+            const start = item._display_from ? moment(item._display_from) :
+                moment.max(maxStart, moment.min(itemExtraDates.concat([itemStartDate])));
+            const itemEndDate = moment(get(item, 'dates.end', start));
 
-        // If item is an event and was actioned (postponed, rescheduled, cancelled only incase of multi-day event)
-        // actioned_date is set. In this case, use that as the cut off date.
-        let end = get(item, 'event.actioned_date') ? moment(item.event.actioned_date) : null;
-        if (!end || !moment.isMoment(end)) {
-            end = item._display_to ? moment(item._display_to) :
-                moment.max(itemExtraDates.concat([maxStart]).concat([itemEndDate]));
-        }
-        let key = null;
-
-        // use clone otherwise it would modify start and potentially also maxStart, moments are mutable
-        for (const day = start.clone(); day.isSameOrBefore(end, 'day'); day.add(1, 'd')) {
-
-            const isBetween = day.isBetween(itemStartDate, itemEndDate, 'day', '[]');
-            const containsExtra = containsExtraDate(item, day);
-            const addGroupItem = (item.event && (isBetween || containsExtra)) || containsExtra;
-
-            if (grouper(day) !== key && addGroupItem) {
-                key = grouper(day);
-                const groupList = groupedItems[key] || [];
-                groupList.push(item);
-                groupedItems[key] = groupList;
+            // If item is an event and was actioned (postponed, rescheduled, cancelled only incase of multi-day event)
+            // actioned_date is set. In this case, use that as the cut off date.
+            let end = get(item, 'event.actioned_date') ? moment(item.event.actioned_date) : null;
+            if (!end || !moment.isMoment(end)) {
+                end = item._display_to ? moment(item._display_to) :
+                    moment.max(itemExtraDates.concat([maxStart]).concat([itemEndDate]));
             }
-        }
-    });
+            let key = null;
+
+            // use clone otherwise it would modify start and potentially also maxStart, moments are mutable
+            for (const day = start.clone(); day.isSameOrBefore(end, 'day'); day.add(1, 'd')) {
+
+                const isBetween = day.isBetween(itemStartDate, itemEndDate, 'day', '[]');
+                const containsExtra = containsExtraDate(item, day);
+                const addGroupItem = (item.event && (isBetween || containsExtra)) || containsExtra;
+
+                if (grouper(day) !== key && addGroupItem) {
+                    key = grouper(day);
+                    const groupList = groupedItems[key] || [];
+                    groupList.push(item);
+                    groupedItems[key] = groupList;
+                }
+            }
+        });
 
     Object.keys(groupedItems).forEach((k) => {
         if (featuredOnly) {
@@ -670,7 +676,10 @@ export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
  */
 export function getPlanningItemsByGroup(item, group) {
     // Event item
-    const planningIds = get(item, '_links.matched_planning_items') || [];
+    // Filter Planning items from `item._links.matched_planning_items`, if defined
+    const planningIds = get(item, '_links.matched_planning_items') != null ?
+        item._links.matched_planning_items :
+        (get(item, 'planning_items') || []).map((plan) => plan._id);
     const planningItems = (get(item, 'planning_items') || []).filter((plan) => planningIds.includes(plan._id));
 
     if (planningItems.length === 0) {
