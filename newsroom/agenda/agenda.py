@@ -243,7 +243,7 @@ class AgendaResource(newsroom.Resource):
                 'description_text': {'type': 'string'},
                 'headline': {'type': 'string'},
                 'abstract': {'type': 'string'},
-                'subject': code_mapping,
+                "subject": nested_code_mapping["mapping"],
                 'urgency': {'type': 'integer'},
                 'service': code_mapping,
                 'planning_date': {'type': 'date'},
