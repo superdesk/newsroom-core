@@ -13,7 +13,7 @@ import {
     STOP_WATCHING_COVERAGE,
 } from './actions';
 
-import {get, isEmpty, uniqBy, uniq} from 'lodash';
+import {get, isEmpty, uniq} from 'lodash';
 import {getActiveDate} from 'local-store';
 import {EXTENDED_VIEW} from 'wire/defaults';
 import {searchReducer} from 'search/reducers';
@@ -62,27 +62,6 @@ const initialState = {
     hasAgendaFeaturedItems: false,
 };
 
-function processAggregations(aggregations) {
-    if (!get(aggregations, 'planning_items.doc_count', false)) {
-        return aggregations;
-    }
-
-    const planningItems = get(aggregations, 'planning_items', {});
-
-    Object.keys(planningItems).forEach((key) => {
-        if (key !== 'doc_count' && planningItems[key].buckets) {
-            if (!get(aggregations, `${key}.buckets`)) {
-                aggregations[key] = {'buckets': planningItems[key].buckets};
-            } else {
-                aggregations[key] = {
-                    'buckets': uniqBy([...planningItems[key].buckets, ...get(aggregations, `${key}.buckets`)], 'key')
-                };
-            }
-        }
-    });
-    return aggregations;
-}
-
 function recieveItems(state, data) {
     const itemsById = Object.assign({}, state.itemsById);
     const items = data._items.map((item) => {
@@ -123,7 +102,7 @@ function recieveItems(state, data) {
         itemsById,
         isLoading: false,
         totalItems: data._meta.total,
-        aggregations: processAggregations(data._aggregations) || null,
+        aggregations: data._aggregations || null,
         newItems: [],
         agenda,
         searchInitiated: false,

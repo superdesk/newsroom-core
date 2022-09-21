@@ -22,7 +22,7 @@ from newsroom.agenda.email import send_coverage_request_email
 from newsroom.agenda.utils import remove_fields_for_public_user
 from newsroom.companies import section, get_user_company
 from newsroom.notifications import push_user_notification
-from newsroom.search_config import merge_planning_nested_aggs
+from newsroom.search_config import merge_planning_aggs
 
 
 @blueprint.route('/agenda')
@@ -90,7 +90,7 @@ def item(_id):
 def search():
     response = get_internal('agenda')
     if len(response) and response[0].get("_aggregations"):
-        merge_planning_nested_aggs(response[0]["_aggregations"])
+        merge_planning_aggs(response[0]["_aggregations"])
     return send_response('agenda', response)
 
 

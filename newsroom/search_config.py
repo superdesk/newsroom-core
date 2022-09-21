@@ -102,6 +102,20 @@ def merge_planning_nested_aggs(aggs: Dict[str, Any]):
             logger.warning(f"Failed to process Planning nested aggs for {field}: key {e} not found")
 
 
+def merge_planning_aggs(aggs: Dict[str, Any]):
+    merge_planning_nested_aggs(aggs)
+    for field, planning_aggs in (aggs.get("planning_items") or {}).items():
+        field_buckets = (aggs.get(field) or {}).get("buckets")
+
+        if field_buckets is None:
+            continue
+
+        field_aggs = [bucket["key"] for bucket in field_buckets]
+        for bucket in planning_aggs.get("buckets") or []:
+            if bucket["key"] not in field_aggs:
+                field_buckets.append(bucket)
+
+
 def _update_agg_to_nested(parent: str, field: str, configs: List[SearchGroupNestedConfig], aggs: Dict[str, Any]):
     """Updates/Adds aggregations config for ``parent`` and associated ``groups``"""
 
