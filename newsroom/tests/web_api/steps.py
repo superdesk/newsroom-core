@@ -3,6 +3,7 @@ from flask import json
 from wooper.expect import expect_status_in
 
 from superdesk.tests.steps import assert_200, get_json_data, apply_placeholders, get_prefixed_url, set_placeholder
+from newsroom.utils import deep_get
 
 
 def assert_ok(response):
@@ -56,3 +57,17 @@ def step_impl_when_post_json_to_url(context, url):
 def step_impl_store_response_item_id(context, tag):
     data = get_json_data(context.response)
     set_placeholder(context, tag, data.get('_id'))
+
+
+@then("we get aggregations")
+def step_impl_get_aggregations(context):
+    assert_200(context.response)
+    response_aggs = (get_json_data(context.response) or {}).get("_aggregations")
+    expected_aggs = json.loads(context.text)
+
+    for key, val in expected_aggs.items():
+        agg_values = [
+            bucket.get("key")
+            for bucket in deep_get(response_aggs, key, {}).get("buckets") or {}
+        ]
+        assert sorted(val) == sorted(agg_values), f"_aggregations['{key}']: {agg_values} != {val},\n{response_aggs}"

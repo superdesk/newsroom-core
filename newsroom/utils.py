@@ -1,8 +1,9 @@
+from functools import reduce
 import pytz
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from uuid import uuid4
-from typing import List
+from typing import List, Dict, Any, Optional
 
 import superdesk
 from superdesk.utc import utcnow
@@ -466,3 +467,16 @@ def get_end_date(date_range, start_date):
     if date_range == 'now/M':
         return start_date + relativedelta(months=+1) - timedelta(days=1)
     return start_date
+
+
+def deep_get(val: Dict[str, Any], keys: str, default: Optional[Any] = None) -> Any:
+    """Helper function to get nested value from a dictionary using dot notation
+
+    i.e.
+    account = {"details": {"name": {"first": "John"}}}
+    deep_get(account, "details.name.first")  # "John"
+    deep_get(account, "details.name.last")  # None
+    deep_get(account, "details.name.last", "Not Defined")  # "Not Defined"
+    """
+
+    return reduce(lambda d, key: d.get(key, default) if isinstance(d, dict) else default or {}, keys.split("."), val)
