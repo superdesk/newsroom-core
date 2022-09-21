@@ -10,6 +10,7 @@
 # Evzen Deulin <evgeny.deulin@sourcefabric.org>, 2022
 # Simon Peacock <simon.peacock@gmail.com>, 2022
 # Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2022
+# Petr Jašek <petr.jasek@sourcefabric.org>, 2022
 # Marie-Eve Ouellette <marie-eve.ouellette@lapressecanadienne.com>, 2022
 # Petr Jašek <petr.jasek@sourcefabric.org>, 2022
 # 
@@ -1692,16 +1693,20 @@ msgstr "Couverture {{ type }} {{ slugline }} {{ status_text }}"
 msgid ""
 "Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}}"
 msgstr ""
+"Couverture {{ type }} planifiée {{ slugline }}, attendue le {{date}} à "
+"{{time}}"
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:43
 msgid ""
 "{{ type }} coverage {{ slugline }} in progress, expected {{date}} at "
 "{{time}}"
 msgstr ""
+"Couverture {{ type }} {{ slugline }} en cours, attendue le {{date}} à "
+"{{time}}"
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:49
 msgid "{{ type }} coverage {{slugline}} cancelled"
-msgstr ""
+msgstr "Couverture {{ type }} {{slugline}} annulée"
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:57
 msgid "(update to come)"
@@ -1713,7 +1718,7 @@ msgstr ""
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:61
 msgid "{{ type }} coverage {{ slugline }} available {{deliveryState}}"
-msgstr ""
+msgstr "Couverture {{ type }} {{ slugline }} disponible {{deliveryState}}"
 
 #: assets/agenda/components/AgendaListCoverageItem.jsx:94
 msgid "(Watching)"
@@ -1786,11 +1791,11 @@ msgstr "Voir le contenu"
 
 #: assets/agenda/components/CoverageItemStatus.jsx:139
 msgid "All coverages cancelled: {{ reason }}"
-msgstr ""
+msgstr "Toutes les couvertures ont été annulées: {{ reason }}"
 
 #: assets/agenda/components/CoverageItemStatus.jsx:142
 msgid "Planning cancelled: {{ reason }}"
-msgstr ""
+msgstr "Couverture annulée: {{ reason }}"
 
 #: assets/agenda/components/CoverageItemStatus.jsx:165
 msgid "Update coming"

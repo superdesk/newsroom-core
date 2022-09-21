@@ -798,12 +798,10 @@ export function formatCoverageDate(coverage) {
 }
 
 export const getCoverageTooltip = (coverage, beingUpdated) => {
-    let slugline = coverage.item_slugline || coverage.slugline;
-
-    slugline =  gettext('coverage {{slugline}}', {slugline: slugline || ''}) ;
+    const slugline = coverage.item_slugline || coverage.slugline;
 
     if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
-        return gettext('{{ type }} {{ slugline }} {{ status_text }}', {
+        return gettext('{{ type }} coverage {{ slugline }} {{ status_text }}', {
             type: getCoverageDisplayName(coverage.coverage_type),
             slugline: slugline,
             status_text: getCoverageStatusText(coverage)
@@ -811,7 +809,7 @@ export const getCoverageTooltip = (coverage, beingUpdated) => {
     }
 
     if (['assigned'].includes(coverage.workflow_status)) {
-        return gettext('Planned {{ type }} {{ slugline }}, expected {{date}} at {{time}}', {
+        return gettext('Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}}', {
             type: getCoverageDisplayName(coverage.coverage_type),
             slugline: slugline,
             date: formatDate(coverage.scheduled),
@@ -820,7 +818,7 @@ export const getCoverageTooltip = (coverage, beingUpdated) => {
     }
 
     if (['active'].includes(coverage.workflow_status)) {
-        return gettext('{{ type }} {{ slugline }} in progress, expected {{date}} at {{time}}', {
+        return gettext('{{ type }} coverage {{ slugline }} in progress, expected {{date}} at {{time}}', {
             type: getCoverageDisplayName(coverage.coverage_type),
             slugline: slugline,
             date: formatDate(coverage.scheduled),
@@ -829,7 +827,7 @@ export const getCoverageTooltip = (coverage, beingUpdated) => {
     }
 
     if (coverage.workflow_status === WORKFLOW_STATUS.CANCELLED) {
-        return gettext('{{ type }} {{slugline}} cancelled', {
+        return gettext('{{ type }} coverage {{slugline}} cancelled', {
             type: getCoverageDisplayName(coverage.coverage_type),
             slugline: slugline,
         });
@@ -841,7 +839,7 @@ export const getCoverageTooltip = (coverage, beingUpdated) => {
             deliveryState = beingUpdated ? gettext('(update to come)') : gettext('(updated)');
         }
 
-        return gettext('{{ type }} {{ slugline }} available {{deliveryState}}', {
+        return gettext('{{ type }} coverage {{ slugline }} available {{deliveryState}}', {
             type: getCoverageDisplayName(coverage.coverage_type),
             slugline: slugline,
             deliveryState: deliveryState

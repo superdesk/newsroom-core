@@ -13,13 +13,11 @@ import {
     STOP_WATCHING_COVERAGE,
 } from './actions';
 
-import {get, isEmpty, uniq} from 'lodash';
-import {getActiveDate} from 'local-store';
+import {get, uniq} from 'lodash';
 import {EXTENDED_VIEW} from 'wire/defaults';
 import {searchReducer} from 'search/reducers';
 import {defaultReducer} from '../reducers';
 import {EARLIEST_DATE} from './utils';
-import moment from 'moment';
 
 const initialState = {
     items: [],
@@ -68,33 +66,6 @@ function recieveItems(state, data) {
         itemsById[item._id] = item;
         return item._id;
     });
-    const createdFilter = get(state, 'search.createdFilter', {});
-
-    let activeDate = state.agenda.activeDate || Date.now();
-    if (state.bookmarks) {
-        activeDate = EARLIEST_DATE;
-    }
-    if (!isEmpty(createdFilter.from) || !isEmpty(createdFilter.to)) {
-        activeDate = moment().valueOf(); // default for 'now/d'
-        if (createdFilter.from === 'now/d') {
-            activeDate = moment().valueOf();
-        } else if (createdFilter.from === 'now/w') {
-            activeDate =  moment(activeDate).isoWeekday(1).valueOf();
-        } else if (createdFilter.from === 'now/M') {
-            activeDate =  moment(activeDate).startOf('month').valueOf();
-        } else if (!isEmpty(createdFilter.from)) {
-            activeDate = moment(createdFilter.from).valueOf();
-        } else {
-            activeDate = EARLIEST_DATE;
-        }
-    } else if (!state.bookmarks && activeDate === EARLIEST_DATE) {
-        activeDate = getActiveDate() || moment().valueOf();
-    }
-
-    const agenda = {
-        ...state.agenda,
-        activeDate,
-    };
 
     return {
         ...state,
@@ -104,11 +75,9 @@ function recieveItems(state, data) {
         totalItems: data._meta.total,
         aggregations: data._aggregations || null,
         newItems: [],
-        agenda,
         searchInitiated: false,
     };
 }
-
 
 function _agendaReducer(state, action) {
     switch (action.type) {
