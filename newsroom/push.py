@@ -34,7 +34,8 @@ KEY = 'PUSH_KEY'
 def test_signature(request):
     """Test if request is signed using app PUSH_KEY."""
     if not app.config.get(KEY):
-        logger.warning('PUSH_KEY is not configured, can not verify incoming data.')
+        if not app.config.get("TESTING"):
+            logger.warning('PUSH_KEY is not configured, can not verify incoming data.')
         return True
     payload = request.get_data()
     key = app.config[KEY]
