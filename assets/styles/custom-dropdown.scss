@@ -25,6 +25,8 @@
 .dropdown-item {
   padding: 0.7rem 1rem;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 
   [class^="icon--"], [class*=" icon--"] {
     margin-inline-end: 1rem;

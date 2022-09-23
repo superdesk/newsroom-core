@@ -608,6 +608,7 @@ article.list {
                 &:hover {
                     border-color: transparent;
                     color: $body-text;
+                    text-decoration: none;
                 }
             }
             &:first-child {

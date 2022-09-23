@@ -151,7 +151,7 @@ class EditMonitoringProfile extends React.Component {
                                         error={getError('query')}>
                                         {item.query &&
                                                 <a target="_blank" href={`/${'wire'}?q=${item.query}`}
-                                                    className='btn btn-outline-secondary float-right mt-3'>{gettext('Test Monitoring Profile query')}
+                                                    className='btn btn-outline-secondary float-end mt-3'>{gettext('Test Monitoring Profile query')}
                                                 </a>}
                                     </TextAreaInput>
 
