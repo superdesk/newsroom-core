@@ -618,13 +618,13 @@ class AgendaService(BaseSearchService):
     def enhance_items(self, docs):
         for doc in docs:
             self.enhance_coverages(doc.get('coverages') or [])
-            doc.setdefault("_links", {})
-            doc["_links"]["matched_event"] = doc.pop("_search_matched_event", False)
+            doc.setdefault("_hits", {})
+            doc["_hits"]["matched_event"] = doc.pop("_search_matched_event", False)
 
             if not doc.get("planning_items"):
                 continue
 
-            doc["_links"]["matched_planning_items"] = [
+            doc["_hits"]["matched_planning_items"] = [
                 plan["_id"]
                 for plan in doc.get("planning_items") or []
             ]
@@ -634,7 +634,7 @@ class AgendaService(BaseSearchService):
 
             # If the search matched the Event
             # then only count Planning based filters when checking ``_inner_hits``
-            if doc["_links"]["matched_event"]:
+            if doc["_hits"]["matched_event"]:
                 inner_hits = {
                     key: val
                     for key, val in inner_hits.items()
@@ -652,7 +652,7 @@ class AgendaService(BaseSearchService):
                 for key, items in inner_hits.items()
             }
             unique_ids = set([item_id for items in items_by_filter.values() for item_id in items])
-            doc["_links"]["matched_planning_items"] = [
+            doc["_hits"]["matched_planning_items"] = [
                 item_id
                 for item_id in unique_ids
                 if all([item_id in items for items in items_by_filter.values()])

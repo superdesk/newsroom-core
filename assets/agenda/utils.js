@@ -613,8 +613,8 @@ export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
         // Filter out items that didn't match any Planning items
         .filter((item) => (
             get(item, 'planning_items.length', 0) === 0 ||
-            get(item, '_links.matched_planning_items') == null ||
-            get(item, '_links.matched_planning_items.length', 0) > 0)
+            get(item, '_hits.matched_planning_items') == null ||
+            get(item, '_hits.matched_planning_items.length', 0) > 0)
         )
         .forEach((item) => {
             const itemExtraDates = getExtraDates(item);
@@ -677,9 +677,9 @@ export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
  */
 export function getPlanningItemsByGroup(item, group) {
     // Event item
-    // Filter Planning items from `item._links.matched_planning_items`, if defined
-    const planningIds = get(item, '_links.matched_planning_items') != null ?
-        item._links.matched_planning_items :
+    // Filter Planning items from `item._hits.matched_planning_items`, if defined
+    const planningIds = get(item, '_hits.matched_planning_items') != null ?
+        item._hits.matched_planning_items :
         (get(item, 'planning_items') || []).map((plan) => plan._id);
     const planningItems = (get(item, 'planning_items') || []).filter((plan) => planningIds.includes(plan._id));
 

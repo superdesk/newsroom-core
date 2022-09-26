@@ -181,7 +181,7 @@ Feature: Agenda Search
         """
         {"_items": [{
             "_id": "event1",
-            "_links": {
+            "_hits": {
                 "matched_event": true,
                 "matched_planning_items": ["plan1", "plan2"]
             }
@@ -192,7 +192,7 @@ Feature: Agenda Search
         """
         {"_items": [{
             "_id": "event1",
-            "_links": {
+            "_hits": {
                 "matched_event": false,
                 "matched_planning_items": ["plan1"]
             }
@@ -203,7 +203,7 @@ Feature: Agenda Search
         """
         {"_items": [{
             "_id": "event1",
-            "_links": {
+            "_hits": {
                 "matched_event": true,
                 "matched_planning_items": ["plan2"]
             }
