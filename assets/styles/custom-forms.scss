@@ -24,6 +24,8 @@ $enable-shadows:true;
 .custom-control-label {
   color: $body-text;
   line-height: 1.2;
+  display: flex;
+  align-items: center;
 
   &:hover {
     color: $gray-600;

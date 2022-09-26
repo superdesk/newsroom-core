@@ -29,6 +29,10 @@
     @include icon-button-base();
     &:hover {
         border-color: $main-blue;
+        text-decoration: none;
+        [class^="icon--"], [class*=" icon--"] {
+            color: $main-blue;
+        }
     }
     &:focus {
         outline: 0;

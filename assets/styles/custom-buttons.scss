@@ -7,7 +7,7 @@
     letter-spacing: 0.04rem;
     white-space: normal;
     @include button-size($input-btn-padding-y, $input-btn-padding-x, $font-size-button, $btn-border-radius);
-    line-height: 1.2rem;
+    line-height: 1.2;
     transition: padding .2s ease-out;
     
     &.disabled,
@@ -34,7 +34,7 @@
   
   @include xxl {
     @include button-size($input-btn-padding-y, $input-btn-padding-x, $font-size-button, $btn-border-radius);
-    line-height: 1.2rem;
+    line-height: 1.2;
   }
 }
 .btn-with-icon {

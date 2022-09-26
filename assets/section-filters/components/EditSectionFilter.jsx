@@ -55,7 +55,7 @@ class EditSectionFilter extends React.Component {
                             />
                             {this.props.sectionFilter.sd_product_id &&
                             <a href={`/${this.props.sectionFilter.filter_type || 'wire'}?q=products.code:${this.props.sectionFilter.sd_product_id}`} target="_blank"
-                                className='btn btn-outline-secondary float-right mt-2'>{gettext('Test Superdesk Product id')}
+                                className='btn btn-outline-secondary float-end mt-2'>{gettext('Test Superdesk Product id')}
                             </a>}
                         </div>
 
@@ -69,7 +69,7 @@ class EditSectionFilter extends React.Component {
                             />
                             {this.props.sectionFilter.query &&
                             <a href={`/${this.props.sectionFilter.search_type || this.props.sectionFilter.filter_type || 'wire'}?q=${this.props.sectionFilter.query}`} target="_blank"
-                                className='btn btn-outline-secondary float-right mt-3'>{gettext('Test query')}
+                                className='btn btn-outline-secondary float-end mt-3'>{gettext('Test query')}
                             </a>}
                         </div>
 
