@@ -119,7 +119,10 @@ def merge_planning_aggs(aggs: Dict[str, Any]):
 def _update_agg_to_nested(parent: str, field: str, configs: List[SearchGroupNestedConfig], aggs: Dict[str, Any]):
     """Updates/Adds aggregations config for ``parent`` and associated ``groups``"""
 
-    original_aggs = deepcopy(aggs[parent])
+    if not aggs.get(f"_{parent}"):
+        aggs[f"_{parent}"] = deepcopy(aggs.get(parent))
+
+    original_aggs = deepcopy(aggs[f"_{parent}"])
 
     def set_agg_config(key: str, agg_filter: Dict[str, Any]):
         aggs[key] = {
