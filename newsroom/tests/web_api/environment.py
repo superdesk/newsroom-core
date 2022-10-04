@@ -1,3 +1,4 @@
+from copy import deepcopy
 from flask import json, Config
 
 from superdesk.tests.steps import get_prefixed_url
@@ -5,7 +6,11 @@ from newsroom.tests.conftest import drop_mongo, reset_elastic, root
 
 from newsroom.web.factory import get_app
 from newsroom.web.default_settings import CORE_APPS, BLUEPRINTS
+from newsroom.agenda.agenda import aggregations as agenda_aggs
 from tests.search.fixtures import USERS, COMPANIES
+
+
+orig_agenda_aggs = deepcopy(agenda_aggs)
 
 
 def before_all(context):
@@ -13,6 +18,10 @@ def before_all(context):
 
 
 def before_scenario(context, scenario):
+    for key in list(agenda_aggs.keys()):
+        agenda_aggs.pop(key)
+    agenda_aggs.update(orig_agenda_aggs)
+
     config = Config(root, {
         'BEHAVE': True,
         'TESTING': True,
@@ -27,6 +36,38 @@ def before_scenario(context, scenario):
         'CONTENTAPI_MONGO_URI': 'mongodb://localhost/newsroom_behave',
         'MONGO_DBNAME': 'newsroom_behave',
         'CONTENTAPI_MONGO_DBNAME': 'newsroom_behave',
+        "AUTH_SERVER_SHARED_SECRET": "2kZOf0VI9T70vU9uMlKLyc5GlabxVgl6",
+        "AGENDA_GROUPS": [
+            {
+                "field": "sttdepartment",
+                "label": "Department",
+                "nested": {
+                    "parent": "subject",
+                    "field": "scheme",
+                    "value": "sttdepartment",
+                    "include_planning": True
+                }
+            },
+            {
+                "field": "sttsubj",
+                "label": "Subject",
+                "nested": {
+                    "parent": "subject",
+                    "field": "scheme",
+                    "value": "sttsubj",
+                    "include_planning": True
+                }
+            },
+            {
+                "field": "event_type",
+                "label": "Event Type",
+                "nested": {
+                    "parent": "subject",
+                    "field": "scheme",
+                    "value": "event_type"
+                }
+            }
+        ]
     })
 
     drop_mongo(config)

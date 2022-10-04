@@ -1,3 +1,4 @@
+from typing import Dict, Any, List
 from flask import json
 from flask.testing import FlaskClient
 
@@ -5,6 +6,7 @@ from newsroom.factory.app import BaseNewsroomApp
 from newsroom.agenda.agenda import AgendaResource, aggregations as agenda_aggregations
 from newsroom.wire.search import WireSearchResource, get_aggregations as get_wire_aggregations
 from newsroom.search_config import init_nested_aggregation
+from newsroom.utils import deep_get
 from newsroom.tests.conftest import reset_elastic
 
 
@@ -38,8 +40,8 @@ test_event_2 = {
         "name": "Test Subject",
     }, {
         "qcode": "abcd",
-        "name": "Sporting Event",
-        "scheme": "event_type"
+        "name": "Sports",
+        "scheme": "sttdepartment"
     }],
     "dates": {
         "start": "2038-05-28T04:00:00+0000",
@@ -79,6 +81,13 @@ test_wire_item_2 = {
 }
 
 
+def get_agg_keys(data: Dict[str, Any], path: str) -> List[str]:
+    return [
+        bucket.get("key")
+        for bucket in deep_get(data, f"_aggregations.{path}.buckets", [])
+    ]
+
+
 def test_default_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
     """Tests the default config (disabled nested search groups)"""
 
@@ -99,26 +108,20 @@ def test_default_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient)
     client.post("/push", data=json.dumps(test_event_1), content_type="application/json")
     resp = client.get("/agenda/search")
     data = json.loads(resp.get_data())
-    assert data["_aggregations"]["subject"] == {
-        "doc_count_error_upper_bound": 0,
-        "sum_other_doc_count": 0,
-        "buckets": [{
-            "doc_count": 1,
-            "key": "Test Subject",
-        }]
-    }
+    assert get_agg_keys(data, "subject") == ["Test Subject"]
 
 
 def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
     """Tests custom config, enabling nested search groups"""
 
     app.config["AGENDA_GROUPS"].append({
-        "field": "event_type",
-        "label": "Event Type",
+        "field": "sttdepartment",
+        "label": "Department",
         "nested": {
             "parent": "subject",
             "field": "scheme",
-            "value": "event_type",
+            "value": "sttdepartment",
+            "include_planning": True
         },
     })
     init_nested_aggregation(
@@ -136,21 +139,35 @@ def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
         "nested": {"path": "subject"},
         "aggs": {
             "subject_filtered": {
-                "filter": {"bool": {"must_not": [{"terms": {"subject.scheme": ["event_type"]}}]}},
+                "filter": {"bool": {"must_not": [{"terms": {"subject.scheme": ["sttdepartment"]}}]}},
                 "aggs": {"subject": {"terms": {"field": "subject.name", "size": 20}}},
             },
         },
     }
 
     # Nested Field
-    assert agenda_aggregations["event_type"] == {
+    assert agenda_aggregations["sttdepartment"] == {
         "nested": {"path": "subject"},
         "aggs": {
-            "event_type_filtered": {
-                "filter": {"bool": {"must": [{"term": {"subject.scheme": "event_type"}}]}},
-                "aggs": {"event_type": {"terms": {"field": "subject.name", "size": 20}}},
+            "sttdepartment_filtered": {
+                "filter": {"bool": {"must": [{"term": {"subject.scheme": "sttdepartment"}}]}},
+                "aggs": {"sttdepartment": {"terms": {"field": "subject.name", "size": 20}}},
             },
         },
+    }
+    assert agenda_aggregations["sttdepartment_planning"] == {
+        "nested": {"path": "planning_items"},
+        "aggs": {
+            "sttdepartment": {
+                "nested": {"path": "planning_items.subject"},
+                "aggs": {
+                    "sttdepartment_filtered": {
+                        "filter": {"bool": {"must": [{"term": {"planning_items.subject.scheme": "sttdepartment"}}]}},
+                        "aggs": {"sttdepartment": {"terms": {"field": "planning_items.subject.name", "size": 20}}}
+                    }
+                }
+            }
+        }
     }
 
     # Test search agenda_aggregations
@@ -158,37 +175,11 @@ def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
     client.post("/push", data=json.dumps(test_event_2), content_type="application/json")
     resp = client.get("/agenda/search")
     data = json.loads(resp.get_data())
-    assert data["_aggregations"]["subject"] == {
-        "doc_count": 3,
-        "subject_filtered": {
-            "doc_count": 2,
-            "subject": {
-                "doc_count_error_upper_bound": 0,
-                "sum_other_doc_count": 0,
-                "buckets": [{
-                    "doc_count": 2,
-                    "key": "Test Subject",
-                }],
-            },
-        },
-    }
-    assert data["_aggregations"]["event_type"] == {
-        "doc_count": 3,
-        "event_type_filtered": {
-            "doc_count": 1,
-            "event_type": {
-                "doc_count_error_upper_bound": 0,
-                "sum_other_doc_count": 0,
-                "buckets": [{
-                    "doc_count": 1,
-                    "key": "Sporting Event",
-                }],
-            },
-        },
-    }
+    assert get_agg_keys(data, "subject.subject_filtered.subject") == ["Test Subject"]
+    assert get_agg_keys(data, "sttdepartment.sttdepartment_filtered.sttdepartment") == ["Sports"]
 
-    # Search using the new search group, ``event_type==Sporting Event``
-    resp = client.get("/agenda/search?filter=%7B%22event_type%22%3A%5B%22Sporting%20Event%22%5D%7D")
+    # Search using the new search group, ``sttdepartment==Sporting Event``
+    resp = client.get("/agenda/search?filter=%7B%22sttdepartment%22%3A%5B%22Sports%22%5D%7D")
     data = json.loads(resp.get_data())
     assert len(data["_items"]) == 1
     assert data["_items"][0]["_id"] == "event2"
@@ -215,14 +206,7 @@ def test_default_wire_groups_config(app: BaseNewsroomApp, client: FlaskClient):
     client.post("/push", data=json.dumps(test_wire_item_1), content_type="application/json")
     res = client.get("/wire/search")
     data = json.loads(res.get_data())
-    assert data["_aggregations"]["subject"] == {
-        "doc_count_error_upper_bound": 0,
-        "sum_other_doc_count": 0,
-        "buckets": [{
-            "doc_count": 1,
-            "key": "Test Subject",
-        }]
-    }
+    assert get_agg_keys(data, "subject") == ["Test Subject"]
 
 
 def test_custom_wire_groups_config(app: BaseNewsroomApp, client: FlaskClient):
@@ -273,34 +257,9 @@ def test_custom_wire_groups_config(app: BaseNewsroomApp, client: FlaskClient):
     client.post("/push", data=json.dumps(test_wire_item_2), content_type="application/json")
     resp = client.get("/wire/search")
     data = json.loads(resp.get_data())
-    assert data["_aggregations"]["subject"] == {
-        "doc_count": 3,
-        "subject_filtered": {
-            "doc_count": 2,
-            "subject": {
-                "doc_count_error_upper_bound": 0,
-                "sum_other_doc_count": 0,
-                "buckets": [{
-                    "doc_count": 2,
-                    "key": "Test Subject",
-                }],
-            },
-        },
-    }
-    assert data["_aggregations"]["distribution"] == {
-        "doc_count": 3,
-        "distribution_filtered": {
-            "doc_count": 1,
-            "distribution": {
-                "doc_count_error_upper_bound": 0,
-                "sum_other_doc_count": 0,
-                "buckets": [{
-                    "doc_count": 1,
-                    "key": "Sporting Event",
-                }],
-            },
-        },
-    }
+
+    assert get_agg_keys(data, "subject.subject_filtered.subject") == ["Test Subject"]
+    assert get_agg_keys(data, "distribution.distribution_filtered.distribution") == ["Sporting Event"]
 
     # Search using the new search group, ``distribution==Sporting Event``
     resp = client.get("/wire/search?filter=%7B%22distribution%22%3A%5B%22Sporting%20Event%22%5D%7D")

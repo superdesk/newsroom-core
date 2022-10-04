@@ -90,7 +90,8 @@ class BaseNewsroomApp(eve.Eve):
         self.setup_email()
         self.setup_cache()
 
-        configure_logging(self.config.get('LOG_CONFIG_FILE'))
+        if not self.config.get("TESTING"):
+            configure_logging(self.config.get('LOG_CONFIG_FILE'))
 
     def load_app_default_config(self):
         """

@@ -383,6 +383,7 @@ class NewsAPINewsService(BaseSearchService):
         """
 
         internal_req = super().get_internal_request(search)
+        del internal_req.projection
 
         if search.args.get('df'):
             internal_req['df'] = search.args['df']

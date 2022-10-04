@@ -5,10 +5,11 @@ from copy import deepcopy
 from newsroom import Resource
 
 
-class SearchGroupNestedConfig(TypedDict):
+class SearchGroupNestedConfig(TypedDict, total=False):
     parent: str
     field: str
     value: str
+    include_planning: bool
 
 
 class SearchGroupConfig(TypedDict, total=False):
@@ -32,7 +33,7 @@ def is_search_field_nested(resource_type: str, field: str):
 def init_nested_aggregation(
     resource: Type[Resource],
     groups: List[SearchGroupConfig],
-    aggregations: Dict[str, Any]
+    aggs: Dict[str, Any]
 ):
     """Applies aggregation & mapping changes for nested search groups"""
 
@@ -45,7 +46,7 @@ def init_nested_aggregation(
         logger.warning(f"Resource '{resource_type}': no nested search fields supported")
         return
 
-    agg_groups: Dict[str, Dict[str, Any]] = {}
+    agg_groups: Dict[str, Dict[str, List[SearchGroupNestedConfig]]] = {}
 
     nested_agg_groups[resource_type] = {}
 
@@ -63,34 +64,108 @@ def init_nested_aggregation(
             continue
 
         agg_groups.setdefault(nested["parent"], {})
-        agg_groups[nested["parent"]].setdefault(nested["field"], []).append(nested["value"])
+        agg_groups[nested["parent"]].setdefault(nested["field"], []).append(nested)
 
         nested_agg_groups[resource_type][field] = group
         group["agg_path"] = f"{field}.{field}_filtered.{field}.buckets"
 
     for parent, fields in agg_groups.items():
         nested_agg_fields.add(parent)
-        for field, values in fields.items():
-            _update_agg_to_nested(parent, field, values, aggregations)
+        for field, configs in fields.items():
+            _update_agg_to_nested(parent, field, configs, aggs)
 
 
-def _update_agg_to_nested(parent: str, field: str, groups: List[str], aggregations: Dict[str, Any]):
+def merge_planning_nested_aggs(aggs: Dict[str, Any]):
+    """Merge nested Planning agg buckets to parent agg bucket"""
+
+    def get_buckets(field_aggs: Dict[str, Any], field: str) -> List[Dict[str, Any]]:
+        return field_aggs[field][f"{field}_filtered"][field]["buckets"]
+
+    planning_fields = [
+        field
+        for field, config in nested_agg_groups["agenda"].items()
+        if (config.get("nested") or {}).get("include_planning")
+    ]
+
+    for field in planning_fields:
+        planning_aggs = aggs.pop(f"{field}_planning", None)
+        if planning_aggs is None:
+            continue
+
+        try:
+            field_buckets = get_buckets(aggs, field)
+            field_aggs = [bucket["key"] for bucket in field_buckets]
+            for bucket in get_buckets(planning_aggs, field):
+                if bucket["key"] not in field_aggs:
+                    field_buckets.append(bucket)
+        except KeyError as e:
+            logger.warning(f"Failed to process Planning nested aggs for {field}: key {e} not found")
+
+
+def merge_planning_aggs(aggs: Dict[str, Any]):
+    merge_planning_nested_aggs(aggs)
+    for field, planning_aggs in (aggs.get("planning_items") or {}).items():
+        field_buckets = (aggs.get(field) or {}).get("buckets")
+
+        if field_buckets is None:
+            continue
+
+        field_aggs = [bucket["key"] for bucket in field_buckets]
+        for bucket in planning_aggs.get("buckets") or []:
+            if bucket["key"] not in field_aggs:
+                field_buckets.append(bucket)
+
+
+def _update_agg_to_nested(parent: str, field: str, configs: List[SearchGroupNestedConfig], aggs: Dict[str, Any]):
     """Updates/Adds aggregations config for ``parent`` and associated ``groups``"""
 
-    original_aggs = deepcopy(aggregations[parent])
+    if not aggs.get(f"_{parent}"):
+        aggs[f"_{parent}"] = deepcopy(aggs.get(parent))
 
-    def set_agg_config(key: str, filter: Dict[str, Any]):
-        aggregations[key] = {
+    original_aggs = deepcopy(aggs[f"_{parent}"])
+
+    def set_agg_config(key: str, agg_filter: Dict[str, Any]):
+        aggs[key] = {
             "nested": {"path": parent},
             "aggs": {
                 f"{key}_filtered": {
-                    "filter": filter,
+                    "filter": agg_filter,
                     "aggs": {key: original_aggs}
                 },
             },
         }
 
-    for group in groups:
-        set_agg_config(group, {"bool": {"must": [{"term": {f"{parent}.{field}": group}}]}})
+    def set_planning_agg_config(key: str, agg_filter: Dict[str, Any]):
+        planning_aggs = deepcopy(original_aggs)
+        planning_aggs["terms"]["field"] = "planning_items." + planning_aggs["terms"]["field"]
 
-    set_agg_config(parent, {"bool": {"must_not": [{"terms": {f"{parent}.{field}": groups}}]}})
+        aggs[f"{key}_planning"] = {
+            "nested": {"path": "planning_items"},
+            "aggs": {
+                key: {
+                    "nested": {"path": f"planning_items.{parent}"},
+                    "aggs": {
+                        f"{key}_filtered": {
+                            "filter": agg_filter,
+                            "aggs": {key: planning_aggs},
+                        },
+                    },
+                },
+            },
+        }
+
+    for config in configs:
+        set_agg_config(
+            config["value"],
+            {"bool": {"must": [{"term": {f"{parent}.{field}": config["value"]}}]}}
+        )
+        if config.get("include_planning"):
+            set_planning_agg_config(
+                config["value"],
+                {"bool": {"must": [{"term": {f"planning_items.{parent}.{field}": config["value"]}}]}}
+            )
+
+    set_agg_config(
+        parent,
+        {"bool": {"must_not": [{"terms": {f"{parent}.{field}": [config["value"] for config in configs]}}]}}
+    )
