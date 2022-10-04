@@ -21,6 +21,7 @@ import AgendaTags from './AgendaTags';
 import AgendaListItemLabels from './AgendaListItemLabels';
 import {AgendaPreviewPlanning} from './AgendaPreviewPlanning';
 import {AgendaPreviewEvent} from './AgendaPreviewEvent';
+import {AgendaRegistrationInvitationDetails} from './AgendaRegistrationInvitationDetails';
 
 class AgendaPreview extends React.PureComponent {
     constructor(props) {
@@ -84,6 +85,7 @@ class AgendaPreview extends React.PureComponent {
                         <AgendaPreviewImage item={item} onClick={openItemDetails} />
                         <AgendaMeta item={item} />
                         <AgendaLongDescription item={item} plan={plan}/>
+                        <AgendaRegistrationInvitationDetails item={item} />
 
                         <AgendaPreviewPlanning
                             user={user}

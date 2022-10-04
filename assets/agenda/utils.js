@@ -258,6 +258,10 @@ export function hasLocation(item) {
     return !!getLocationString(item);
 }
 
+export function hasLocationNotes(item) {
+    return get(item, 'location[0].details[0].length', 0) > 0;
+}
+
 /**
  * Returns public contacts
  *

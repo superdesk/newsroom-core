@@ -1371,7 +1371,7 @@ article.list {
     }
     .wire-articles__wire-articles__item__metaitem__meta-info .bold {
         font-weight: 500;
-    }    
+    }
     .icon--gray-light {
         color: #999 !important;
     }
@@ -2175,6 +2175,12 @@ article.list {
         overflow-wrap: break-word;
         word-break: break-word;
         word-wrap: break-word;
+    }
+
+    &--info {
+        margin-left: 1rem;
+        color: $gray-dark;
+        font-weight: 400;
     }
 }
 

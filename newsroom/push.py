@@ -382,6 +382,8 @@ def set_agenda_metadata_from_event(agenda, event, set_doc_id=True):
     agenda['products'] = event.get('products')
     agenda['service'] = format_qcode_items(event.get('anpa_category'))
     agenda['event'] = event
+    agenda["registration_details"] = event.get("registration_details")
+    agenda["invitation_details"] = event.get("invitation_details")
 
     set_dates(agenda)
 

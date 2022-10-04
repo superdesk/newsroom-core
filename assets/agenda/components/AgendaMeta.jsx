@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {hasLocation, getEventLinks, getLocationString, getPublicContacts, getCalendars} from 'agenda/utils';
+import {hasLocation, hasLocationNotes, getEventLinks, getLocationString, getPublicContacts,
+    getCalendars} from 'agenda/utils';
 
 
 function AgendaPreviewMeta({item}) {
@@ -11,6 +12,12 @@ function AgendaPreviewMeta({item}) {
                     <i className='icon-small--location icon--gray-dark'></i>
                     <span>{getLocationString(item)}</span>
                 </div>}
+                {!hasLocationNotes(item) ? null : (
+                    <div className='wire-articles__item__meta-row wire-articles__item__meta-row--info'>
+                        <i className='icon-small--info icon--gray-dark'></i>
+                        <span>{item.location[0].details[0]}</span>
+                    </div>
+                )}
                 {getPublicContacts(item).map((contact, index) => <div
                     className='wire-articles__item__meta-row'
                     key={`${contact.name}-${index}`}>
