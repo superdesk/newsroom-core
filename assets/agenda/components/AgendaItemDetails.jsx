@@ -28,6 +28,7 @@ import AgendaCoverageRequest from './AgendaCoverageRequest';
 import AgendaTags from './AgendaTags';
 import {AgendaPreviewPlanning} from './AgendaPreviewPlanning';
 import {AgendaPreviewEvent} from './AgendaPreviewEvent';
+import {AgendaRegistrationInvitationDetails} from './AgendaRegistrationInvitationDetails';
 
 
 export default function AgendaItemDetails(
@@ -73,6 +74,7 @@ export default function AgendaItemDetails(
                 <ArticleBody>
                     <AgendaMeta item={item} />
                     <AgendaLongDescription item={item} plan={plan}/>
+                    <AgendaRegistrationInvitationDetails item={item} />
                 </ArticleBody>
                 <ArticleSidebar>
                     <AgendaPreviewPlanning
