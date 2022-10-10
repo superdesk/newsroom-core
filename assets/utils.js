@@ -206,11 +206,12 @@ export function parseDateInTimezone(dateString, timezone = null) {
  * Return date formatted for lists
  *
  * @param {String} dateString
+ * @param {String} timeForToday - if true show only time if date is today
  * @return {String}
  */
-export function shortDate(dateString) {
+export function shortDate(dateString, timeForToday = true) {
     const parsed = parseDate(dateString);
-    return parsed.format(isToday(parsed) ? TIME_FORMAT : DATE_FORMAT);
+    return parsed.format(timeForToday === true && isToday(parsed) ? TIME_FORMAT : DATE_FORMAT);
 }
 
 /**
@@ -221,7 +222,7 @@ export function shortDate(dateString) {
  */
 export function getDateInputDate(dateString) {
     if (dateString) {
-        const parsed = parseDate(dateString);
+        const parsed = parseDate(dateString.substring(0, 10));
         return parsed.format('YYYY-MM-DD');
     }
 
