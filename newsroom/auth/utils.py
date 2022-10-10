@@ -23,11 +23,11 @@ def sign_user_by_email(
         user["is_enabled"] = True
         users.create([user])
 
-    assert "_id" in user
-
     if user is None:
         flask.flash(_("User not found"), "danger")
         return flask.redirect(flask.url_for(redirect_on_error, user_error=1))
+
+    assert "_id" in user
 
     users.system_update(
         user["_id"],
