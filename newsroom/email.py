@@ -35,19 +35,19 @@ class EmailGroup(TypedDict):
 MAX_LINE_LENGTH = 998 - 50  # RFC 5322 - buffer for html indentation
 
 
-def handle_long_lines_text(text):
+def handle_long_lines_text(text, limit=MAX_LINE_LENGTH):
     if not text:
         return text
     output = []
     lines = text.splitlines()
     for line in lines:
-        if len(line) < MAX_LINE_LENGTH:
+        if len(line) < limit:
             output.append(line)
         else:
             next_line = ''
             words = line.split()
             for word in words:
-                if len(next_line) + len(word) > MAX_LINE_LENGTH:
+                if len(next_line) + len(word) > limit:
                     output.append(next_line)
                     next_line = word
                 else:
@@ -64,11 +64,11 @@ def handle_long_lines_html(html):
         return html
     parsed = etree.fromstring(html, parser=etree.HTMLParser())
     etree.indent(parsed, space=" ")  # like pretty print but upfront
-    for elem in parsed.iter():
-        if elem.text is not None and len(elem.text) > MAX_LINE_LENGTH:
-            elem.text = handle_long_lines_text(elem.text) + "\n"
-        if elem.tail is not None and len(elem.tail) > MAX_LINE_LENGTH:
-            elem.tail = handle_long_lines_text(elem.tail) + "\n"
+    for elem in parsed.iter("*"):
+        if elem.text is not None and len(elem.text) > 100:
+            elem.text = handle_long_lines_text(elem.text, 100) + "\n"
+        if elem.tail is not None and len(elem.tail) > 100:
+            elem.tail = handle_long_lines_text(elem.tail, 100) + "\n"
     return etree.tostring(parsed, method="html", encoding="unicode")
 
 
