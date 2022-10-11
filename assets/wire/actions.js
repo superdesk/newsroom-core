@@ -1,5 +1,4 @@
 import {get, isEmpty} from 'lodash';
-import mime from 'mime-types';
 
 import server from 'server';
 import analytics from 'analytics';
@@ -396,11 +395,12 @@ export function fetchVersions(item) {
  * Download media file
  *
  * @param {string} id
+ * @param {string} filename
  */
-export function downloadMedia(href, id, mimeType) {
+export function downloadMedia(id, filename) {
     return () => {
-        window.open(`${href}?filename=${id}.${mime.extension(mimeType)}`, '_blank');
-        analytics.event('download-media', id);
+        window.open(`/assets/${id}?filename=${filename}`, '_blank');
+        analytics.event('download-media', filename || id);
     };
 }
 
