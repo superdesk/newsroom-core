@@ -1,3 +1,5 @@
+import pathlib
+
 from flask import render_template_string, json, url_for
 from jinja2 import TemplateNotFound
 
@@ -172,6 +174,15 @@ def test_email_avoid_long_lines(client, app, mocker):
 
 def test_handle_long_lines_html():
     html = "<div><p>{}</p></div>".format("foo bar <a href=\"test\">{}</a>baz".format("loong link" * 1000) * 50)
+    formatted = handle_long_lines_html(html)
+    for line in formatted.splitlines():
+        assert len(line) < 998, line
+
+
+def test_long_lines_html_links():
+    with open(pathlib.Path(__file__).parent.parent.joinpath("fixtures", "item_fixture.json")) as f:
+        item = json.load(f)
+    html = "<div>{}</div>".format(item["body_html"])
     formatted = handle_long_lines_html(html)
     for line in formatted.splitlines():
         assert len(line) < 998, line
