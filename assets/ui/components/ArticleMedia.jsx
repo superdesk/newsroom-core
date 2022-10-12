@@ -23,10 +23,12 @@ export default function ArticleMedia({isKilled, media, download}) {
                         {gettext('Your browser does not support playing audio')}
                     </audio>
                 )}
-                <button className="btn btn-outline-primary btn-with-icon btn-sm mt-3 mb-4"
-                    onClick={() => download(rendition.href, filename, rendition.mimetype)}>
-                    <i className="icon--download"></i>{gettext('Download')}
-                </button>
+                {rendition.media && (
+                    <button className="btn btn-outline-primary btn-with-icon btn-sm mt-3 mb-4"
+                        onClick={() => download(rendition.media, filename)}>
+                        <i className="icon--download"></i>{gettext('Download')}
+                    </button>
+                )}
             </div>
         ) || null
     );
