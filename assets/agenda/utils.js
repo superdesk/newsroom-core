@@ -587,7 +587,51 @@ export function getDescription(item, plan) {
  * @return {Array} list of dates
  */
 export function getExtraDates(item) {
-    return get(item, 'display_dates', []).map(ed => moment(ed.date));
+    return getDisplayDates(item).map((ed) => moment(ed.date));
+}
+
+/**
+ * Get the display dates, filtering out those that didn't match Planning/Coverage search
+ * @param item: Event or Planning item
+ * @returns {Array.<{date: moment.Moment}>}
+ */
+export function getDisplayDates(item) {
+    const matchedPlanning = get(item, '_hits.matched_planning_items');
+
+    if (matchedPlanning == null) {
+        return get(item, 'display_dates') || [];
+    }
+
+    const dates = [];
+    const planningItems = get(item, 'planning_items') || [];
+    const planningIds = item._hits.matched_planning_items;
+    const coverageIds = get(item, '_hits.matched_coverages') != null ?
+        item._hits.matched_coverages :
+        (get(item, 'coverages') || []).map((coverage) => coverage.coverage_id);
+
+    planningItems
+        .forEach((plan) => {
+            if (!planningIds.includes(plan._id)) {
+                return;
+            }
+
+            const coverages = get(plan, 'coverages') || [];
+
+            if (!coverages.length) {
+                dates.push({date: plan.planning_date});
+                return;
+            }
+
+            coverages.forEach((coverage) => {
+                if (!coverageIds.includes(coverage.coverage_id)) {
+                    return;
+                }
+
+                dates.push({date: coverage.planning.scheduled});
+            });
+        });
+
+    return dates;
 }
 
 /**
@@ -598,7 +642,7 @@ export function getExtraDates(item) {
  * @return {Boolean}
  */
 export function containsExtraDate(item, dateToCheck) {
-    return get(item, 'display_dates', []).map(ed => moment(ed.date).format('YYYY-MM-DD')).includes(dateToCheck.format('YYYY-MM-DD'));
+    return getDisplayDates(item).map(ed => moment(ed.date).format('YYYY-MM-DD')).includes(dateToCheck.format('YYYY-MM-DD'));
 }
 
 
@@ -638,10 +682,11 @@ export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
 
             // use clone otherwise it would modify start and potentially also maxStart, moments are mutable
             for (const day = start.clone(); day.isSameOrBefore(end, 'day'); day.add(1, 'd')) {
-
                 const isBetween = day.isBetween(itemStartDate, itemEndDate, 'day', '[]');
                 const containsExtra = containsExtraDate(item, day);
-                const addGroupItem = (item.event && (isBetween || containsExtra)) || containsExtra;
+                const addGroupItem = (item.event == null || get(item, '_hits.matched_planning_items') != null) ?
+                    containsExtra :
+                    isBetween || containsExtra;
 
                 if (grouper(day) !== key && addGroupItem) {
                     key = grouper(day);
@@ -680,12 +725,7 @@ export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
  * @param group: Group Date
  */
 export function getPlanningItemsByGroup(item, group) {
-    // Event item
-    // Filter Planning items from `item._hits.matched_planning_items`, if defined
-    const planningIds = get(item, '_hits.matched_planning_items') != null ?
-        item._hits.matched_planning_items :
-        (get(item, 'planning_items') || []).map((plan) => plan._id);
-    const planningItems = (get(item, 'planning_items') || []).filter((plan) => planningIds.includes(plan._id));
+    const planningItems = get(item, 'planning_items') || [];
 
     if (planningItems.length === 0) {
         return [];

@@ -159,7 +159,7 @@ Feature: Agenda Search
         ["plan1", "plan2", "plan3"]
         """
 
-    @auth @admin @wip
+    @auth @admin
     Scenario: Search Planning with Events
         When we get "/agenda/search"
         Then we get aggregations
@@ -183,7 +183,8 @@ Feature: Agenda Search
             "_id": "event1",
             "_hits": {
                 "matched_event": true,
-                "matched_planning_items": ["plan1", "plan2"]
+                "matched_planning_items": ["plan1", "plan2"],
+                "matched_coverages": "__none__"
             }
         }]}
         """
@@ -194,7 +195,8 @@ Feature: Agenda Search
             "_id": "event1",
             "_hits": {
                 "matched_event": false,
-                "matched_planning_items": ["plan1"]
+                "matched_planning_items": ["plan1"],
+                "matched_coverages": "__none__"
             }
         }]}
         """
@@ -205,7 +207,8 @@ Feature: Agenda Search
             "_id": "event1",
             "_hits": {
                 "matched_event": true,
-                "matched_planning_items": ["plan2"]
+                "matched_planning_items": ["plan2"],
+                "matched_coverages": ["plan2_cov1"]
             }
         }]}
         """

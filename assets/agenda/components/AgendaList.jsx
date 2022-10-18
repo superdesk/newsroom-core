@@ -101,7 +101,7 @@ class AgendaList extends React.Component {
         }
 
         this.previewTimeout = setTimeout(() => this.props.dispatch(
-            previewItem(nextItem, nextItemInList.group, nextItemInList.plan)
+            previewItem(nextItem, nextItemInList.group, get(nextItemInList, 'plan.guid'))
         ), PREVIEW_TIMEOUT);
 
         const activeElements = document.getElementsByClassName('wire-articles__item--open');
