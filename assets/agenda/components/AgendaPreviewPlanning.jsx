@@ -24,7 +24,7 @@ export class AgendaPreviewPlanning extends React.Component {
         if (isPlanningItem(item)) {
             return (
                 <AgendaPreviewCoverages
-                    key={plan.guid}
+                    key={item.guid}
                     item={item}
                     plan={plan}
                     wireItems={wireItems}

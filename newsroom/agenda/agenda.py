@@ -464,7 +464,8 @@ def nested_query(path, query, inner_hits=True, name=None):
     return {'nested': nested}
 
 
-planning_filters = ["coverage", "coverage_status", "agendas"]
+coverage_filters = ["coverage", "coverage_status"]
+planning_filters = coverage_filters + ["agendas"]
 
 
 def _filter_terms(filters, item_type):
@@ -646,19 +647,37 @@ class AgendaService(BaseSearchService):
             if not inner_hits or not doc.get('planning_items'):
                 continue
 
-            # Store matched Planning IDs into matched_planning_items
-            # The Planning IDs must be in all supplied ``_inner_hits``
-            # In order to be included (i.e. match all nested planning queries)
-            items_by_filter = {
-                key: [item.get("guid") or item.get("planning_id") for item in items]
-                for key, items in inner_hits.items()
-            }
-            unique_ids = set([item_id for items in items_by_filter.values() for item_id in items])
-            doc["_hits"]["matched_planning_items"] = [
-                item_id
-                for item_id in unique_ids
-                if all([item_id in items for items in items_by_filter.values()])
-            ]
+            if len([f for f in inner_hits.keys() if f in coverage_filters]) > 0:
+                # Collect hits for 'coverage' and 'coverage_status' separately to other inner_hits
+                coverages_by_filter = {
+                    key: [item.get("coverage_id") for item in items]
+                    for key, items in inner_hits.items()
+                    if key in ["coverage", "coverage_status"]
+                }
+                unique_coverage_ids = set([
+                    coverage_id
+                    for items in coverages_by_filter.values() for coverage_id in items
+                ])
+                doc["_hits"]["matched_coverages"] = [
+                    coverage_id
+                    for coverage_id in unique_coverage_ids
+                    if all([coverage_id in items for items in coverages_by_filter.values()])
+                ]
+
+            if len(inner_hits.keys()) > 0:
+                # Store matched Planning IDs into matched_planning_items
+                # The Planning IDs must be in all supplied ``_inner_hits``
+                # In order to be included (i.e. match all nested planning queries)
+                items_by_filter = {
+                    key: [item.get("guid") or item.get("planning_id") for item in items]
+                    for key, items in inner_hits.items()
+                }
+                unique_ids = set([item_id for items in items_by_filter.values() for item_id in items])
+                doc["_hits"]["matched_planning_items"] = [
+                    item_id
+                    for item_id in unique_ids
+                    if all([item_id in items for items in items_by_filter.values()])
+                ]
 
     def enhance_coverages(self, coverages):
         completed_coverages = [c for c in coverages if c['workflow_status'] == ASSIGNMENT_WORKFLOW_STATE.COMPLETED
