@@ -1,4 +1,3 @@
-
 from newsroom.gettext import get_session_locale
 
 

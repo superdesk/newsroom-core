@@ -64,9 +64,7 @@ def fix_topic_nested_filters():
                         if search_value not in topic_filters[nested_group]:
                             topic_filters[nested_group].append(search_value)
                         topic_filters[parent_field] = [
-                            value
-                            for value in topic_filters[parent_field]
-                            if value != search_value
+                            value for value in topic_filters[parent_field] if value != search_value
                         ]
 
                 if update_filters:
@@ -119,16 +117,8 @@ def _get_attribute_value_from_name(search_config: SearchGroupNestedConfig, searc
     def _search_items(resource: str):
         req = ParsedRequest()
         req.args = {
-            "source": json.dumps({
-                "query": {
-                    "bool": {
-                        "must": [
-                            {"term": {f"{parent_field}.name": search_value}}
-                        ]
-                    }
-                }
-            }),
-            "size": 1
+            "source": json.dumps({"query": {"bool": {"must": [{"term": {f"{parent_field}.name": search_value}}]}}}),
+            "size": 1,
         }
         response = get_resource_service(resource).internal_get(req=req, lookup={})
 

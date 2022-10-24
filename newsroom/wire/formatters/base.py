@@ -1,7 +1,9 @@
 from lxml import etree
 
 from superdesk.utc import utcnow
-from superdesk.publish.formatters.nitf_formatter import NITFFormatter as SuperdeskNITFFormatter
+from superdesk.publish.formatters.nitf_formatter import (
+    NITFFormatter as SuperdeskNITFFormatter,
+)
 from superdesk.etree import parse_html
 
 from . import FormatterRegistry
@@ -11,16 +13,17 @@ class BaseFormatter(metaclass=FormatterRegistry):
 
     MIMETYPE = None
     FILE_EXTENSION = None
-    MEDIATYPE = 'text'
+    MEDIATYPE = "text"
 
     def format_filename(self, item):
         assert self.FILE_EXTENSION
-        _id = (item.get('slugline', item['_id']) or item['_id']).replace(' ', '-').lower()
-        timestamp = item.get('versioncreated', item.get('_updated', utcnow()))
-        return '{timestamp}-{_id}.{ext}'.format(
-            timestamp=timestamp.strftime('%Y%m%d%H%M'),
+        _id = (item.get("slugline", item["_id"]) or item["_id"]).replace(" ", "-").lower()
+        timestamp = item.get("versioncreated", item.get("_updated", utcnow()))
+        return "{timestamp}-{_id}.{ext}".format(
+            timestamp=timestamp.strftime("%Y%m%d%H%M"),
             _id=_id.lower(),
-            ext=self.FILE_EXTENSION)
+            ext=self.FILE_EXTENSION,
+        )
 
     def get_mimetype(self, item):
         return self.MIMETYPE
@@ -47,7 +50,7 @@ class NewsroomNITFFormatter(SuperdeskNITFFormatter):
                 etree.SubElement(para, "br").text = br.text
 
         for p in root.xpath("//p|figure"):
-            if p.tag == 'figure':
+            if p.tag == "figure":
                 captions = p.xpath(".//figcaption")
                 if len(captions):
                     para = etree.SubElement(element, "p")

@@ -16,9 +16,7 @@ class EmailTemplatesResource(Resource):
     endpoint_name = RESOURCE
     item_methods = ["GET"]
     resource_methods = ["GET"]
-    datasource = {
-        "source": RESOURCE
-    }
+    datasource = {"source": RESOURCE}
     schema = {
         # Identifies the email template these translations are used for
         "_id": {
@@ -26,14 +24,11 @@ class EmailTemplatesResource(Resource):
             "unique": True,
             "required": True,
             "nullable": False,
-            "empty": False
+            "empty": False,
         },
         "subject": {
             "type": "dict",
-            "schema": {
-                "default": {"type": "string"},
-                "translations": {"type": "dict"}
-            }
+            "schema": {"default": {"type": "string"}, "translations": {"type": "dict"}},
         },
     }
 
@@ -41,7 +36,7 @@ class EmailTemplatesResource(Resource):
 DEFAULT_SUBJECTS = {
     "agenda_new_coverage_email": "New coverage",
     "agenda_updated_email": "{{ agenda.name or agenda.headline or agenda.slugline | safe }}"
-                            " -{{ ' Coverage' if coverage_modified else '' }} updated",
+    " -{{ ' Coverage' if coverage_modified else '' }} updated",
     "coverage_request_email": "Coverage inquiry: {{ item.name or item.slugline | safe }}",
     "company_expiry_alert_user": "Your Company's account is expiring on {{ expires_on }}",
     "company_expiry_email": "Companies expired or due to expire within the next 7 days ({{ expires_on }})",
@@ -54,10 +49,10 @@ DEFAULT_SUBJECTS = {
     "updated_wire_notification_email": "New update for your previously accessed story {{ item.headline | safe }}",
     "updated_agenda_notification_email": "New update for your previously accessed agenda {{ item.name | safe }}",
     "monitoring_email": "{% if profile.headline_subject and items | length == 1 %}"
-                        "{{ items[0].headline or profile.subject or profile.name | safe }}"
-                        "{% else %}"
-                        "{{ profile.subject or profile.name | safe }}"
-                        "{% endif %}",
+    "{{ items[0].headline or profile.subject or profile.name | safe }}"
+    "{% else %}"
+    "{{ profile.subject or profile.name | safe }}"
+    "{% endif %}",
     "monitoring_error": "Error sending alerts for monitoring: {{ profile.name | safe }}",
     "monitoring_email_no_updates": "{{ profile.subject or profile.name | safe }}",
     "share_items": "From {{ app_name }}: {{ subject_name | safe }}",

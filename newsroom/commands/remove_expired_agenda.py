@@ -15,7 +15,7 @@ from .manager import manager
 logger = logging.getLogger(__name__)
 
 
-@manager.option('-m', '--expiry', dest='expiry_days', required=False)
+@manager.option("-m", "--expiry", dest="expiry_days", required=False)
 def remove_expired_agenda(expiry_days=None):
     """Remove expired Agenda items
 
@@ -76,7 +76,9 @@ def _remove_expired_items(now: datetime, expiry_days: int):
     return num_items_removed
 
 
-def _get_expired_items(expiry_datetime: datetime) -> Generator[List[Dict[str, Any]], datetime, None]:
+def _get_expired_items(
+    expiry_datetime: datetime,
+) -> Generator[List[Dict[str, Any]], datetime, None]:
     """Get the expired items, based on ``expiry_datetime``"""
 
     agenda_service = get_resource_service("agenda")
@@ -93,38 +95,42 @@ def _get_expired_items(expiry_datetime: datetime) -> Generator[List[Dict[str, An
             },
         }
         req.args = {
-            "source": json.dumps({
-                "query": {
-                    "bool": {
-                        "must": [{"range": {"dates.end": {"lte": expiry_datetime_str}}}],
-                        "should": [
-                            # Match Events directly (stored from v2.3+)
-                            # No more filters required, as we'll query & check planning items separately
-                            {"term": {"item_type": "event"}},
-
-                            # Match Planning directly with no associated Event (stored from v2.3+)
-                            {"bool": {
-                                "must": [{"term": {"item_type": "planning"}}],
-                                "must_not": [
-                                    {"exists": {"field": "event_id"}},
-                                    coverage_scheduled_query,
-                                ],
-                            }},
-
-                            # Match Event and/or Planning items (stored before v2.3 changes to storage)
-                            {"bool": {
-                                "must_not": [
-                                    {"exists": {"field": "item_type"}},
-                                    coverage_scheduled_query,
-                                ],
-                            }},
-                        ],
-                        "minimum_should_match": 1,
+            "source": json.dumps(
+                {
+                    "query": {
+                        "bool": {
+                            "must": [{"range": {"dates.end": {"lte": expiry_datetime_str}}}],
+                            "should": [
+                                # Match Events directly (stored from v2.3+)
+                                # No more filters required, as we'll query & check planning items separately
+                                {"term": {"item_type": "event"}},
+                                # Match Planning directly with no associated Event (stored from v2.3+)
+                                {
+                                    "bool": {
+                                        "must": [{"term": {"item_type": "planning"}}],
+                                        "must_not": [
+                                            {"exists": {"field": "event_id"}},
+                                            coverage_scheduled_query,
+                                        ],
+                                    }
+                                },
+                                # Match Event and/or Planning items (stored before v2.3 changes to storage)
+                                {
+                                    "bool": {
+                                        "must_not": [
+                                            {"exists": {"field": "item_type"}},
+                                            coverage_scheduled_query,
+                                        ],
+                                    }
+                                },
+                            ],
+                            "minimum_should_match": 1,
+                        },
                     },
-                },
-                "sort": [{"dates.start": "asc"}],
-                "size": app.config.get("MAX_EXPIRY_QUERY_LIMIT", 100),
-            }),
+                    "sort": [{"dates.start": "asc"}],
+                    "size": app.config.get("MAX_EXPIRY_QUERY_LIMIT", 100),
+                }
+            ),
         }
 
         items = list(agenda_service.internal_get(req=req, lookup=None))
@@ -141,8 +147,8 @@ def has_plan_expired(item: Dict[str, Any], expiry_datetime: datetime) -> bool:
     """Returns ``True`` if the maximum planning/coverage time is before or equal to ``expiry_datetime``"""
 
     max_schedule_datetime = max(
-        [parse_date_str(coverage["scheduled"]) for coverage in (item.get("coverages") or [])] +
-        [parse_date_str(item["dates"]["end"])]
+        [parse_date_str(coverage["scheduled"]) for coverage in (item.get("coverages") or [])]
+        + [parse_date_str(item["dates"]["end"])]
     )
     return max_schedule_datetime <= expiry_datetime
 
@@ -155,10 +161,7 @@ def _get_expired_chain_ids(parent: Dict[str, Any], expiry_datetime: datetime) ->
     """
 
     item_type = get_item_type(parent)
-    plan_ids = [
-        plan.get(config.ID_FIELD)
-        for plan in (parent.get("planning_items") or [])
-    ]
+    plan_ids = [plan.get(config.ID_FIELD) for plan in (parent.get("planning_items") or [])]
 
     if item_type == AGENDA_ITEM_TYPE.PLANNING:
         return [] if not has_plan_expired(parent, expiry_datetime) else [parent[config.ID_FIELD]]

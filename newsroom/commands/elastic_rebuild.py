@@ -43,9 +43,7 @@ def delete_elastic(index_prefix: str):
                 except es_exceptions.NotFoundError:
                     print('\t- "{}" elastic index was not found. Continue without deleting.'.format(index))
                 except es_exceptions.TransportError as e:
-                    raise SystemExit(
-                        '\t- "{}" elastic index was not deleted. Exception: "{}"'.format(index, e.error)
-                    )
+                    raise SystemExit('\t- "{}" elastic index was not deleted. Exception: "{}"'.format(index, e.error))
                 else:
                     print('\t- "{}" elastic index was deleted.'.format(index))
                     break

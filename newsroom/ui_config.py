@@ -18,48 +18,27 @@ class UIConfigResource(newsroom.Resource):
         }
     }
     """
+
     schema = {
-        '_id': {'type': 'string', 'required': True, 'unique': True},
-        'preview': {
-            'type': 'dict'
+        "_id": {"type": "string", "required": True, "unique": True},
+        "preview": {"type": "dict"},
+        "details": {"type": "dict"},
+        "list": {"type": "dict"},
+        "advanced_search_tabs": {"type": "dict"},
+        "multi_select_topics": {"type": "boolean", "default": False},
+        "search": {
+            "type": "boolean",
         },
-        'details': {
-            'type': 'dict'
-        },
-        'list': {
-            'type': 'dict'
-        },
-        'advanced_search_tabs': {
-            'type': 'dict'
-        },
-        'multi_select_topics': {
-            'type': 'boolean',
-            'default': False
-        },
-        'search': {
-            'type': 'boolean',
-        },
-        'enable_global_topics': {
-            'type': 'boolean',
-            'default': True
-        },
-        'open_coverage_content_in_same_page': {
-            'type': 'boolean',
-            'default': False
-        },
-        'init_version': {
-            'type': 'integer'
-        },
+        "enable_global_topics": {"type": "boolean", "default": True},
+        "open_coverage_content_in_same_page": {"type": "boolean", "default": False},
+        "init_version": {"type": "integer"},
     }
-    datasource = {
-        'source': 'ui_config'
-    }
-    item_methods = ['GET']
-    resource_methods = ['GET']
+    datasource = {"source": "ui_config"}
+    item_methods = ["GET"]
+    resource_methods = ["GET"]
 
 
 class UIConfigService(newsroom.Service):
-
     def get_section_config(self, section_name):
         """Get the section config"""
         config = self.find_one(req=None, _id=section_name)
@@ -69,4 +48,4 @@ class UIConfigService(newsroom.Service):
 
 
 def init_app(app):
-    superdesk.register_resource('ui_config', UIConfigResource, UIConfigService, _app=app)
+    superdesk.register_resource("ui_config", UIConfigResource, UIConfigService, _app=app)

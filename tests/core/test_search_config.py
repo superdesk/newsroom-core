@@ -4,7 +4,10 @@ from flask.testing import FlaskClient
 
 from newsroom.factory.app import BaseNewsroomApp
 from newsroom.agenda.agenda import AgendaResource, aggregations as agenda_aggregations
-from newsroom.wire.search import WireSearchResource, get_aggregations as get_wire_aggregations
+from newsroom.wire.search import (
+    WireSearchResource,
+    get_aggregations as get_wire_aggregations,
+)
 from newsroom.search_config import init_nested_aggregation
 from newsroom.utils import deep_get
 from newsroom.tests.conftest import reset_elastic
@@ -17,15 +20,17 @@ test_event_1 = {
     "pubstatus": "usable",
     "slugline": "New Press Conference",
     "name": "Prime minister press conference",
-    "subject": [{
-        "qcode": "1523",
-        "name": "Test Subject",
-    }],
+    "subject": [
+        {
+            "qcode": "1523",
+            "name": "Test Subject",
+        }
+    ],
     "dates": {
         "start": "2038-05-28T04:00:00+0000",
         "end": "2038-05-28T05:00:00+0000",
-        "tz": "Australia/Sydney"
-    }
+        "tz": "Australia/Sydney",
+    },
 }
 
 test_event_2 = {
@@ -35,19 +40,18 @@ test_event_2 = {
     "pubstatus": "usable",
     "slugline": "New Press Conference",
     "name": "Prime minister press conference",
-    "subject": [{
-        "qcode": "1523",
-        "name": "Test Subject",
-    }, {
-        "qcode": "abcd",
-        "name": "Sports",
-        "scheme": "sttdepartment"
-    }],
+    "subject": [
+        {
+            "qcode": "1523",
+            "name": "Test Subject",
+        },
+        {"qcode": "abcd", "name": "Sports", "scheme": "sttdepartment"},
+    ],
     "dates": {
         "start": "2038-05-28T04:00:00+0000",
         "end": "2038-05-28T05:00:00+0000",
-        "tz": "Australia/Sydney"
-    }
+        "tz": "Australia/Sydney",
+    },
 }
 
 test_wire_item_1 = {
@@ -57,10 +61,12 @@ test_wire_item_1 = {
     "firstcreated": "2017-11-27T08:00:57+0000",
     "body_html": "<p>foo bar</p>",
     "genre": [{"name": "News", "code": "news"}],
-    "subject": [{
-        "qcode": "1523",
-        "name": "Test Subject",
-    }],
+    "subject": [
+        {
+            "qcode": "1523",
+            "name": "Test Subject",
+        }
+    ],
 }
 
 test_wire_item_2 = {
@@ -70,22 +76,18 @@ test_wire_item_2 = {
     "firstcreated": "2017-11-27T08:00:57+0000",
     "body_html": "<p>foo bar</p>",
     "genre": [{"name": "News", "code": "news"}],
-    "subject": [{
-        "qcode": "1523",
-        "name": "Test Subject",
-    }, {
-        "qcode": "abcd",
-        "name": "Sporting Event",
-        "scheme": "distribution"
-    }],
+    "subject": [
+        {
+            "qcode": "1523",
+            "name": "Test Subject",
+        },
+        {"qcode": "abcd", "name": "Sporting Event", "scheme": "distribution"},
+    ],
 }
 
 
 def get_agg_keys(data: Dict[str, Any], path: str) -> List[str]:
-    return [
-        bucket.get("key")
-        for bucket in deep_get(data, f"_aggregations.{path}.buckets", [])
-    ]
+    return [bucket.get("key") for bucket in deep_get(data, f"_aggregations.{path}.buckets", [])]
 
 
 def test_default_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
@@ -93,10 +95,7 @@ def test_default_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient)
 
     assert len(app.config["AGENDA_GROUPS"]) == 4
 
-    group_fields = [
-        group.get("field")
-        for group in app.config["AGENDA_GROUPS"]
-    ]
+    group_fields = [group.get("field") for group in app.config["AGENDA_GROUPS"]]
     assert "service" in group_fields
     assert "subject" in group_fields
     assert "urgency" in group_fields
@@ -114,21 +113,19 @@ def test_default_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient)
 def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
     """Tests custom config, enabling nested search groups"""
 
-    app.config["AGENDA_GROUPS"].append({
-        "field": "sttdepartment",
-        "label": "Department",
-        "nested": {
-            "parent": "subject",
-            "field": "scheme",
-            "value": "sttdepartment",
-            "include_planning": True
-        },
-    })
-    init_nested_aggregation(
-        AgendaResource,
-        app.config["AGENDA_GROUPS"],
-        agenda_aggregations
+    app.config["AGENDA_GROUPS"].append(
+        {
+            "field": "sttdepartment",
+            "label": "Department",
+            "nested": {
+                "parent": "subject",
+                "field": "scheme",
+                "value": "sttdepartment",
+                "include_planning": True,
+            },
+        }
     )
+    init_nested_aggregation(AgendaResource, app.config["AGENDA_GROUPS"], agenda_aggregations)
     reset_elastic(app)
 
     # Test if the Eve & agenda_aggregations config has been updated
@@ -163,11 +160,18 @@ def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
                 "aggs": {
                     "sttdepartment_filtered": {
                         "filter": {"bool": {"must": [{"term": {"planning_items.subject.scheme": "sttdepartment"}}]}},
-                        "aggs": {"sttdepartment": {"terms": {"field": "planning_items.subject.name", "size": 20}}}
+                        "aggs": {
+                            "sttdepartment": {
+                                "terms": {
+                                    "field": "planning_items.subject.name",
+                                    "size": 20,
+                                }
+                            }
+                        },
                     }
-                }
+                },
             }
-        }
+        },
     }
 
     # Test search agenda_aggregations
@@ -190,10 +194,7 @@ def test_default_wire_groups_config(app: BaseNewsroomApp, client: FlaskClient):
 
     assert len(app.config["WIRE_GROUPS"]) == 5
 
-    group_fields = [
-        group.get("field")
-        for group in app.config["WIRE_GROUPS"]
-    ]
+    group_fields = [group.get("field") for group in app.config["WIRE_GROUPS"]]
     assert "service" in group_fields
     assert "subject" in group_fields
     assert "genre" in group_fields
@@ -212,21 +213,15 @@ def test_default_wire_groups_config(app: BaseNewsroomApp, client: FlaskClient):
 def test_custom_wire_groups_config(app: BaseNewsroomApp, client: FlaskClient):
     """Tests custom wire config, enabling nested search groups"""
 
-    app.config["WIRE_GROUPS"].append({
-        "field": "distribution",
-        "label": "Distribution",
-        "nested": {
-            "parent": "subject",
-            "field": "scheme",
-            "value": "distribution"
-        },
-    })
-    wire_aggregations = get_wire_aggregations()
-    init_nested_aggregation(
-        WireSearchResource,
-        app.config["WIRE_GROUPS"],
-        wire_aggregations
+    app.config["WIRE_GROUPS"].append(
+        {
+            "field": "distribution",
+            "label": "Distribution",
+            "nested": {"parent": "subject", "field": "scheme", "value": "distribution"},
+        }
     )
+    wire_aggregations = get_wire_aggregations()
+    init_nested_aggregation(WireSearchResource, app.config["WIRE_GROUPS"], wire_aggregations)
     reset_elastic(app)
 
     # Test generated/modified aggregation configs

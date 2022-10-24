@@ -7,7 +7,12 @@ import superdesk
 from superdesk.utc import utcnow
 
 from newsroom.template_filters import is_admin
-from newsroom.utils import is_company_enabled, is_account_enabled, is_company_expired, get_cached_resource_by_id
+from newsroom.utils import (
+    is_company_enabled,
+    is_account_enabled,
+    is_company_expired,
+    get_cached_resource_by_id,
+)
 from newsroom.limiter import limiter
 
 blueprint = Blueprint("oauth", __name__)
@@ -46,7 +51,7 @@ def google_authorized():
     token = oauth.google.authorize_access_token()
 
     def redirect_with_error(error_str):
-        flask.session.pop('_flashes', None)  # remove old messages and just show one message
+        flask.session.pop("_flashes", None)  # remove old messages and just show one message
         flask.flash(error_str, "danger")
         return flask.redirect(url_for("auth.login", next=next_page))
 
@@ -81,10 +86,14 @@ def google_authorized():
 
     # If the user is not yet validated, then validate it now
     if not user.get("is_validated", False):
-        users_service.system_update(user["_id"], {
-            "is_validated": True,
-            "last_active": utcnow(),
-        }, user)
+        users_service.system_update(
+            user["_id"],
+            {
+                "is_validated": True,
+                "last_active": utcnow(),
+            },
+            user,
+        )
 
     # Set flask session information
     flask.session["user"] = str(user["_id"])

@@ -57,7 +57,7 @@ def generate_jwt_token(client, grant_type, user, scope):
         "iss": "Superdesk Auth Server",
         "iat": int(time.time()),
         "exp": int(time.time() + expiration_delay),
-        "client_id": client.client_id
+        "client_id": client.client_id,
     }
     return jwt.encode(header, payload, shared_secret)
 
@@ -82,6 +82,4 @@ def config_oauth(app):
 
 
 class ClientCredentialsGrant(grants.ClientCredentialsGrant):
-    TOKEN_ENDPOINT_AUTH_METHODS = [
-        'client_secret_basic', 'client_secret_post'
-    ]
+    TOKEN_ENDPOINT_AUTH_METHODS = ["client_secret_basic", "client_secret_post"]

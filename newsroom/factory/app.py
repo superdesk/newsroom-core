@@ -65,11 +65,11 @@ class BaseNewsroomApp(eve.Eve):
             import_name,
             data=self.DATALAYER,
             auth=self.AUTH_SERVICE,
-            template_folder=os.path.join(NEWSROOM_DIR, 'templates'),
-            static_folder=os.path.join(NEWSROOM_DIR, 'static'),
+            template_folder=os.path.join(NEWSROOM_DIR, "templates"),
+            static_folder=os.path.join(NEWSROOM_DIR, "static"),
             validator=SuperdeskValidator,
             settings=config,
-            **kwargs
+            **kwargs,
         )
         self.json_encoder = SuperdeskJSONEncoder
         self.data.json_encoder_class = SuperdeskJSONEncoder
@@ -81,23 +81,23 @@ class BaseNewsroomApp(eve.Eve):
         self.setup_apm()
         self.setup_media_storage()
         self.setup_babel()
-        self.setup_apps(self.config['CORE_APPS'])
+        self.setup_apps(self.config["CORE_APPS"])
         if not self.config.get("BEHAVE"):
             # workaround for core 2.3 adding planning to installed apps
-            self.setup_apps(self.config.get('INSTALLED_APPS', []))
+            self.setup_apps(self.config.get("INSTALLED_APPS", []))
         # load blueprints after apps just in case some views are added by apps
-        self.setup_blueprints(self.config['BLUEPRINTS'])
+        self.setup_blueprints(self.config["BLUEPRINTS"])
         self.setup_email()
         self.setup_cache()
 
         if not self.config.get("TESTING"):
-            configure_logging(self.config.get('LOG_CONFIG_FILE'))
+            configure_logging(self.config.get("LOG_CONFIG_FILE"))
 
     def load_app_default_config(self):
         """
         Loads default app configuration
         """
-        self.config.from_object('content_api.app.settings')
+        self.config.from_object("content_api.app.settings")
 
     def load_app_instance_config(self):
         """
@@ -113,8 +113,8 @@ class BaseNewsroomApp(eve.Eve):
         # Override Eve.load_config in order to get default_settings
         super(BaseNewsroomApp, self).load_config()
 
-        self.config.setdefault('DOMAIN', {})
-        self.config.setdefault('SOURCES', {})
+        self.config.setdefault("DOMAIN", {})
+        self.config.setdefault("SOURCES", {})
         self.load_app_default_config()
         self.load_app_instance_config()
 
@@ -122,22 +122,21 @@ class BaseNewsroomApp(eve.Eve):
         self.config.update(self.settings or {})
 
     def setup_media_storage(self):
-        if self.config.get('AMAZON_CONTAINER_NAME'):
+        if self.config.get("AMAZON_CONTAINER_NAME"):
             self.media = AmazonMediaStorage(self)
         else:
             self.media = SuperdeskGridFSMediaStorage(self)
 
     def setup_babel(self):
-        self.config.setdefault(
-            'BABEL_TRANSLATION_DIRECTORIES',
-            os.path.join(NEWSROOM_DIR, 'translations')
-        )
+        self.config.setdefault("BABEL_TRANSLATION_DIRECTORIES", os.path.join(NEWSROOM_DIR, "translations"))
 
-        if self.config.get('TRANSLATIONS_PATH'):
-            self.config['BABEL_TRANSLATION_DIRECTORIES'] = ';'.join([
-                str(self.config['BABEL_TRANSLATION_DIRECTORIES']),
-                str(self.config['TRANSLATIONS_PATH']),
-            ])
+        if self.config.get("TRANSLATIONS_PATH"):
+            self.config["BABEL_TRANSLATION_DIRECTORIES"] = ";".join(
+                [
+                    str(self.config["BABEL_TRANSLATION_DIRECTORIES"]),
+                    str(self.config["TRANSLATIONS_PATH"]),
+                ]
+            )
 
         # avoid events on this
         self.babel_tzinfo = None
@@ -150,14 +149,14 @@ class BaseNewsroomApp(eve.Eve):
         for name in modules:
             mod = importlib.import_module(name)
 
-            if getattr(mod, 'blueprint'):
+            if getattr(mod, "blueprint"):
                 self.register_blueprint(mod.blueprint)
 
     def setup_apps(self, apps):
         """Setup configured apps."""
         for name in apps:
             mod = importlib.import_module(name)
-            if hasattr(mod, 'init_app'):
+            if hasattr(mod, "init_app"):
                 mod.init_app(self)
 
     def setup_email(self):
@@ -168,32 +167,50 @@ class BaseNewsroomApp(eve.Eve):
 
     def setup_error_handlers(self):
         def assertion_error(err):
-            return flask.jsonify({'error': err.args[0] if err.args else 1}), 400
+            return flask.jsonify({"error": err.args[0] if err.args else 1}), 400
 
         def render_404(err):
             if flask.request and is_json_request(flask.request):
-                return flask.jsonify({'code': 404}), 404
-            return flask.render_template('404.html'), 404
+                return flask.jsonify({"code": 404}), 404
+            return flask.render_template("404.html"), 404
 
         def render_403(err):
             if flask.request and is_json_request(flask.request):
-                return flask.jsonify({'code': 403, 'error': str(err), 'info': getattr(err, 'description', None)}), 403
-            return flask.render_template('403.html'), 403
+                return (
+                    flask.jsonify(
+                        {
+                            "code": 403,
+                            "error": str(err),
+                            "info": getattr(err, "description", None),
+                        }
+                    ),
+                    403,
+                )
+            return flask.render_template("403.html"), 403
 
         self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(404, render_404)
         self.register_error_handler(403, render_403)
 
-    def general_setting(self, _id, label, type='text', default=None,
-                        weight=0, description=None, min=None, client_setting=False):
+    def general_setting(
+        self,
+        _id,
+        label,
+        type="text",
+        default=None,
+        weight=0,
+        description=None,
+        min=None,
+        client_setting=False,
+    ):
         self._general_settings[_id] = {
-            'type': type,
-            'label': label,
-            'weight': weight,
-            'default': default,
-            'description': description,
-            'min': min,
-            'client_setting': client_setting
+            "type": type,
+            "label": label,
+            "weight": weight,
+            "default": default,
+            "description": description,
+            "min": min,
+            "client_setting": client_setting,
         }
 
         if flask.g:  # reset settings cache
@@ -229,7 +246,7 @@ class BaseNewsroomApp(eve.Eve):
 
     def _get_apm_environment(self):
         if self.config.get("CLIENT_URL"):
-            if re.search(r'-(dev|demo|test|staging)', self.config["CLIENT_URL"]):
+            if re.search(r"-(dev|demo|test|staging)", self.config["CLIENT_URL"]):
                 return "staging"
             if "localhost" in self.config["CLIENT_URL"] or self.debug:
                 return "testing"

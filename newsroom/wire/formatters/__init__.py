@@ -1,4 +1,3 @@
-
 formatters = []
 
 
@@ -13,7 +12,7 @@ class FormatterRegistry(type):
     def __init__(cls, name, bases, attrs):
         """Register sub-classes of Formatter class when defined."""
         super(FormatterRegistry, cls).__init__(name, bases, attrs)
-        if name != 'BaseFormatter':
+        if name != "BaseFormatter":
             formatters.append(cls)
 
 

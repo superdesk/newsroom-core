@@ -14,24 +14,19 @@ from superdesk.commands.data_updates import DataUpdate as _DataUpdate
 
 class DataUpdate(_DataUpdate):
 
-    resource = 'products'
+    resource = "products"
 
     def forwards(self, mongodb_collection, mongodb_database):
         for product in mongodb_collection.find({}):
             if not product.get("companies"):
                 continue
 
-            print(mongodb_collection.update(
-                {config.ID_FIELD: product.get(config.ID_FIELD)},
-                {
-                    "$set": {
-                        "companies": [
-                            ObjectId(company_id)
-                            for company_id in product.get("companies")
-                        ]
-                    }
-                }
-            ))
+            print(
+                mongodb_collection.update(
+                    {config.ID_FIELD: product.get(config.ID_FIELD)},
+                    {"$set": {"companies": [ObjectId(company_id) for company_id in product.get("companies")]}},
+                )
+            )
 
     def backwards(self, mongodb_collection, mongodb_database):
         raise NotImplementedError()
