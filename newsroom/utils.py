@@ -262,11 +262,10 @@ def is_company_enabled(user, company=None):
         # there's no company assigned return true for admin user else false
         return True if is_admin(user) else False
 
-    user_company = get_cached_resource_by_id("companies", user.get("company")) if not company else company
-    if not user_company:
+    if not company:
         return False
 
-    return user_company.get("is_enabled", False)
+    return company.get("is_enabled", False)
 
 
 def is_company_expired(user=None, company=None):
@@ -274,9 +273,6 @@ def is_company_expired(user=None, company=None):
         return False
     elif user and not user.get("company"):
         return False if is_admin(user) else True
-    elif user and not company:
-        company = get_cached_resource_by_id("companies", user.get("company"))
-
     expiry_date = (company or {}).get("expiry_date")
     if not expiry_date:
         return False
@@ -373,38 +369,43 @@ def get_cached_resource_by_id(resource, _id, black_list_keys=None):
     return None
 
 
-def is_valid_login(user_id):
-    """Validates if the login for user.
-    :param str user_id: id of the user
-    """
-    user = get_cached_resource_by_id("users", user_id)
+def is_valid_user(user, company) -> bool:
+    """Validate if user is valid and should be able to login to the system."""
     if not user:
         return False
-    if not (is_account_enabled(user)):
-        session.pop("_flashes", None)  # remove old messages and just show one message
+
+    session.pop("_flashes", None)  # remove old messages and just show one message
+
+    if not is_admin(user) and not company:
+        flash(gettext("Insufficient Permissions. Access denied."), "danger")
+        return False
+
+    if not is_account_enabled(user):
         flash(gettext("Account is disabled"), "danger")
         return False
-    company = get_cached_resource_by_id("companies", user.get("company")) if user.get("company") else None
+
     if not is_company_enabled(user, company):
-        session.pop("_flashes", None)  # remove old messages and just show one message
         flash(gettext("Company account has been disabled."), "danger")
         return False
 
     if is_company_expired(user, company):
-        session.pop("_flashes", None)  # remove old messages and just show one message
         flash(gettext("Company account has expired."), "danger")
         return False
 
+    return True
+
+
+def update_user_last_active(user):
     # Updated the active time for the user if required
     if not user.get("last_active") or user.get("last_active") < utcnow() + timedelta(minutes=-10):
         current_time = utcnow()
         # Set the cached version of the user
         user["last_active"] = current_time
-        app.cache.set(str(user_id), json.dumps(user, default=json_serialize_datetime_objectId))
+        app.cache.set(str(user["_id"]), json.dumps(user, default=json_serialize_datetime_objectId))
         # Set the db version of the user
-        superdesk.get_resource_service("users").system_update(ObjectId(user_id), {"last_active": current_time}, user)
-
-    return True
+        superdesk.get_resource_service("users").system_update(
+            ObjectId(user["_id"]), {"last_active": current_time}, user
+        )
 
 
 def get_items_by_id(ids, resource):

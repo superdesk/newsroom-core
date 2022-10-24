@@ -138,8 +138,9 @@ def test_login_fails_for_user_with_disabled_company(app, client):
                 "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
                 "user_type": "public",
                 "company": disabled_company,
-                "is_validated": True,
                 "is_enabled": True,
+                "is_approved": True,
+                "is_validated": True,
                 "_created": datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),
             }
         ],
@@ -422,7 +423,10 @@ def test_login_token_succeeds_for_correct_username_or_password(client):
     )
     token = response.get_data(as_text=True)
     data = verify_auth_token(token)
-    assert data["name"] == "admin admin"
+    assert data is not None
+    assert data["first_name"] == "admin"
+    assert data["last_name"] == "admin"
+    assert data["user_type"] == "administrator"
 
 
 def test_login_with_token_fails_for_wrong_token(client):
@@ -536,6 +540,7 @@ def test_access_for_disabled_user(app, client):
         session["user"] = str(user_id)
         session["user_type"] = "administrator"
         session["name"] = "public"
+        session["auth_ttl"] = None
     resp = client.get("/bookmarks_wire")
     assert 200 == resp.status_code
 
@@ -543,6 +548,7 @@ def test_access_for_disabled_user(app, client):
         session["user"] = ADMIN_USER_ID
         session["user_type"] = "administrator"
         session["name"] = "Admin"
+        session["auth_ttl"] = None
     resp = client.post(
         "/users/{}".format(user_id),
         data={
@@ -565,6 +571,7 @@ def test_access_for_disabled_user(app, client):
         session["user"] = str(user_id)
         session["user_type"] = "administrator"
         session["name"] = "public"
+        session["auth_ttl"] = None
     resp = client.get("/users/search")
     assert 403 == resp.status_code
 
@@ -599,6 +606,7 @@ def test_access_for_disabled_company(app, client):
         session["user"] = str(user_id)
         session["user_type"] = "administrator"
         session["name"] = "public"
+        session["auth_ttl"] = None
     resp = client.get("/bookmarks_wire")
     assert 302 == resp.status_code
 
@@ -623,13 +631,9 @@ def test_access_for_not_approved_user(client, app):
             user = str(user_ids[0])
             session["user"] = user
             session["user_type"] = "administrator"
+            session["auth_ttl"] = None
         resp = cli.post(
             "/users/%s/topics" % user,
-            json={
-                "label": "bar",
-                "query": "test",
-                "notifications": True,
-                "topic_type": "wire",
-            },
+            json={"label": "bar", "query": "test", "notifications": True, "topic_type": "wire"},
         )
         assert 302 == resp.status_code, resp.get_data()

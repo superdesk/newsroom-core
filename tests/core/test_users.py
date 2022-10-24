@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from superdesk import get_resource_service
 
 from newsroom.auth import get_user_by_email
-from newsroom.utils import get_user_dict, get_company_dict, is_valid_login
+from newsroom.utils import get_user_dict, get_company_dict, is_valid_user
 from newsroom.tests.fixtures import COMPANY_1_ID
 from unittest import mock
 
@@ -390,71 +390,61 @@ def test_expired_company_does_not_restrict_activity(client, app):
         assert "3" in companies
 
 
-def test_is_valid_login(client, app):
-    user_ids = app.data.insert(
-        "users",
-        [
-            {
-                "email": "foo1@bar.com",
-                "last_name": "bar1",
-                "first_name": "foo1",
-                "user_type": "public",
-                "is_approved": True,
-                "is_enabled": True,
-                "is_validated": True,
-                "company": "1",
-            },
-            {
-                "email": "foo2@bar.com",
-                "last_name": "bar2",
-                "first_name": "foo2",
-                "user_type": "public",
-                "is_approved": True,
-                "is_enabled": False,
-                "is_validated": True,
-                "company": "1",
-            },
-            {
-                "email": "foo3@bar.com",
-                "last_name": "bar3",
-                "first_name": "foo3",
-                "user_type": "administrator",
-                "is_approved": True,
-                "is_enabled": True,
-                "is_validated": True,
-                "company": "2",
-            },
-            {
-                "email": "foo4@bar.com",
-                "last_name": "bar4",
-                "first_name": "foo4",
-                "user_type": "administrator",
-                "is_approved": True,
-                "is_enabled": True,
-                "is_validated": True,
-                "company": "3",
-            },
-        ],
-    )
+def test_is_valid_user(client, app):
+    users = [
+        {
+            "email": "foo1@bar.com",
+            "last_name": "bar1",
+            "first_name": "foo1",
+            "user_type": "public",
+            "is_approved": True,
+            "is_enabled": True,
+            "is_validated": True,
+            "company": "1",
+        },
+        {
+            "email": "foo2@bar.com",
+            "last_name": "bar2",
+            "first_name": "foo2",
+            "user_type": "public",
+            "is_approved": True,
+            "is_enabled": False,
+            "is_validated": True,
+            "company": "1",
+        },
+        {
+            "email": "foo3@bar.com",
+            "last_name": "bar3",
+            "first_name": "foo3",
+            "user_type": "administrator",
+            "is_approved": True,
+            "is_enabled": True,
+            "is_validated": True,
+            "company": "2",
+        },
+        {
+            "email": "foo4@bar.com",
+            "last_name": "bar4",
+            "first_name": "foo4",
+            "user_type": "administrator",
+            "is_approved": True,
+            "is_enabled": True,
+            "is_validated": True,
+            "company": "3",
+        },
+    ]
 
-    app.data.insert(
-        "companies",
-        [
-            {"_id": "1", "name": "Company1", "is_enabled": True},
-            {"_id": "2", "name": "Company2", "is_enabled": False},
-            {
-                "_id": "3",
-                "name": "Company3",
-                "is_enabled": True,
-                "expiry_date": datetime.utcnow() - timedelta(days=1),
-            },
-        ],
-    )
+    companies = [
+        {"_id": "1", "name": "Enabled", "is_enabled": True},
+        {"_id": "2", "name": "Not Enabled", "is_enabled": False},
+        {"_id": "3", "name": "Expired", "is_enabled": True, "expiry_date": datetime.utcnow() - timedelta(days=1)},
+    ]
 
     with app.test_request_context():
-        assert is_valid_login(user_ids[0]) is True
-        assert is_valid_login(user_ids[1]) is False
-        assert is_valid_login(user_ids[2]) is False
+        assert is_valid_user(users[0], companies[0]) is True
+        assert is_valid_user(users[1], companies[0]) is False
+        assert is_valid_user(users[2], companies[1]) is False
+        assert is_valid_user(users[3], companies[2]) is False
 
 
 def test_account_manager_can_update_user(app, client):

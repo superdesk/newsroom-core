@@ -42,8 +42,13 @@ class UsersResource(newsroom.Resource):
             "allowed": ["administrator", "internal", "public", "account_management"],
             "default": "public",
         },
+        # user must have his auth method validated in order to login
         "is_validated": {"type": "boolean", "default": False},
+        # user must be enabled in order to login
         "is_enabled": {"type": "boolean", "default": True},
+        # flag if user was approved, applies to users who registers themselves,
+        # they must be approved within predefined time otherwise they won't be
+        # able to login
         "is_approved": {"type": "boolean", "default": False},
         "expiry_alert": {"type": "boolean", "default": False},
         "token": {
