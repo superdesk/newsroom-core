@@ -10,11 +10,11 @@ import superdesk
 from superdesk import register_resource  # noqa
 from typing import Dict, List, Tuple
 
-__version__ = '2.1.0-dev'
+__version__ = "2.1.0-dev"
 
 # reuse content api dbs
-MONGO_PREFIX = 'CONTENTAPI_MONGO'
-ELASTIC_PREFIX = 'CONTENTAPI_ELASTICSEARCH'
+MONGO_PREFIX = "CONTENTAPI_MONGO"
+ELASTIC_PREFIX = "CONTENTAPI_ELASTICSEARCH"
 
 SCHEMA_VERSIONS = {
     "wire": 1,

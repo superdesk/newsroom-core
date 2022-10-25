@@ -17,25 +17,30 @@ class DataUpdate(_DataUpdate):
     Refer to https://dev.sourcefabric.org/browse/SDAN-581 for more information
 
     """
-    resource = 'topics'
+
+    resource = "topics"
 
     def forwards(self, mongodb_collection, mongodb_database):
         for topic in mongodb_collection.find({}):
-            navigation = topic.get('navigation', None)
+            navigation = topic.get("navigation", None)
 
             if type(navigation) is list:
                 continue
 
-            print(mongodb_collection.update(
-                {config.ID_FIELD: topic.get(config.ID_FIELD)},
-                {'$set': {'navigation': [] if navigation is None else [navigation]}}
-            ))
+            print(
+                mongodb_collection.update(
+                    {config.ID_FIELD: topic.get(config.ID_FIELD)},
+                    {"$set": {"navigation": [] if navigation is None else [navigation]}},
+                )
+            )
 
     def backwards(self, mongodb_collection, mongodb_database):
         for topic in mongodb_collection.find({}):
-            navigation = next((iter(topic.get('navigation') or [])), None)
+            navigation = next((iter(topic.get("navigation") or [])), None)
 
-            print(mongodb_collection.update(
-                {config.ID_FIELD: topic.get(config.ID_FIELD)},
-                {'$set': {'navigation': navigation}}
-            ))
+            print(
+                mongodb_collection.update(
+                    {config.ID_FIELD: topic.get(config.ID_FIELD)},
+                    {"$set": {"navigation": navigation}},
+                )
+            )

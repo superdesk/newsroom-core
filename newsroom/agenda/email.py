@@ -1,16 +1,22 @@
 from newsroom.email import send_template_email
-from newsroom.utils import get_agenda_dates, get_location_string, get_links, get_public_contacts, url_for_agenda
+from newsroom.utils import (
+    get_agenda_dates,
+    get_location_string,
+    get_links,
+    get_public_contacts,
+    url_for_agenda,
+)
 from newsroom.template_filters import is_admin_or_internal
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
 from newsroom.companies import get_user_company
 
 
 def send_coverage_notification_email(user, agenda, wire_item):
-    if user.get('receive_email'):
+    if user.get("receive_email"):
         template_kwargs = dict(
             agenda=agenda,
             item=wire_item,
-            section='agenda',
+            section="agenda",
         )
         send_template_email(
             to=[user["email"]],
@@ -20,17 +26,25 @@ def send_coverage_notification_email(user, agenda, wire_item):
 
 
 def send_agenda_notification_email(
-    user, agenda, message,
-    original_agenda, coverage_updates,
-    related_planning_removed, coverage_updated, time_updated,
-    coverage_modified
+    user,
+    agenda,
+    message,
+    original_agenda,
+    coverage_updates,
+    related_planning_removed,
+    coverage_updated,
+    time_updated,
+    coverage_modified,
 ):
-    if agenda and user.get('receive_email'):
+    if agenda and user.get("receive_email"):
         template_kwargs = dict(
-            name=user.get('first_name'),
+            name=user.get("first_name"),
             message=message,
             agenda=agenda,
-            dateString=get_agenda_dates(agenda if agenda.get('dates') else original_agenda, date_paranthesis=True),
+            dateString=get_agenda_dates(
+                agenda if agenda.get("dates") else original_agenda,
+                date_paranthesis=True,
+            ),
             location=get_location_string(agenda),
             contacts=get_public_contacts(agenda),
             links=get_links(agenda),
@@ -62,17 +76,17 @@ def send_coverage_request_email(user, message, item):
     if not general_settings:
         return
 
-    recipients = general_settings.get('values').get('coverage_request_recipients').split(',')
+    recipients = general_settings.get("values").get("coverage_request_recipients").split(",")
     assert recipients
     assert isinstance(recipients, list)
-    url = url_for_agenda({'_id': item['_id']}, _external=True)
-    name = '{} {}'.format(user.get('first_name'), user.get('last_name'))
-    email = user.get('email')
+    url = url_for_agenda({"_id": item["_id"]}, _external=True)
+    name = "{} {}".format(user.get("first_name"), user.get("last_name"))
+    email = user.get("email")
 
-    item_name = item.get('name') or item.get('slugline')
+    item_name = item.get("name") or item.get("slugline")
     user_company = get_user_company(user)
     if user_company:
-        user_company = user_company.get('name')
+        user_company = user_company.get("name")
 
     template_kwargs = dict(
         name=name,

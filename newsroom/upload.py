@@ -21,9 +21,7 @@ def get_file(key):
     file = request.files.get(key)
     if file:
         filename = secure_filename(file.filename)
-        newsroom_app.media.put(
-            file, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type
-        )
+        newsroom_app.media.put(file, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type)
         return url_for("upload.get_upload", media_id=filename)
 
 
@@ -38,9 +36,7 @@ def get_upload(media_id, filename=None):
         flask.abort(404)
 
     data = wrap_file(flask.request.environ, media_file, buffer_size=1024 * 256)
-    response = flask.current_app.response_class(
-        data, mimetype=media_file.content_type, direct_passthrough=True
-    )
+    response = flask.current_app.response_class(data, mimetype=media_file.content_type, direct_passthrough=True)
     response.content_length = media_file.length
     response.last_modified = media_file.upload_date
     response.set_etag(media_file.md5)
@@ -58,9 +54,7 @@ def get_upload(media_id, filename=None):
             ext = guess_media_extension(media_file.content_type)
         filename = secure_filename(f"{_filename}{ext}")
         response.headers["Content-Type"] = media_file.content_type
-        response.headers["Content-Disposition"] = 'attachment; filename="{}"'.format(
-            filename
-        )
+        response.headers["Content-Disposition"] = 'attachment; filename="{}"'.format(filename)
     else:
         response.headers["Content-Disposition"] = "inline"
 

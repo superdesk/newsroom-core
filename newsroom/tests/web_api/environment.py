@@ -22,53 +22,56 @@ def before_scenario(context, scenario):
         agenda_aggs.pop(key)
     agenda_aggs.update(orig_agenda_aggs)
 
-    config = Config(root, {
-        'BEHAVE': True,
-        'TESTING': True,
-        'CORE_APPS': CORE_APPS,
-        'BLUEPRINTS': BLUEPRINTS,
-        'INSTALLED_APPS': [],
-        'WTF_CSRF_ENABLED': False,
-        'URL_PREFIX': '',
-        'ELASTICSEARCH_FORCE_REFRESH': True,
-        'SITE_NAME': 'Newsroom',
-        'MONGO_URI': 'mongodb://localhost/newsroom_behave',
-        'CONTENTAPI_MONGO_URI': 'mongodb://localhost/newsroom_behave',
-        'MONGO_DBNAME': 'newsroom_behave',
-        'CONTENTAPI_MONGO_DBNAME': 'newsroom_behave',
-        "AUTH_SERVER_SHARED_SECRET": "2kZOf0VI9T70vU9uMlKLyc5GlabxVgl6",
-        "AGENDA_GROUPS": [
-            {
-                "field": "sttdepartment",
-                "label": "Department",
-                "nested": {
-                    "parent": "subject",
-                    "field": "scheme",
-                    "value": "sttdepartment",
-                    "include_planning": True
-                }
-            },
-            {
-                "field": "sttsubj",
-                "label": "Subject",
-                "nested": {
-                    "parent": "subject",
-                    "field": "scheme",
-                    "value": "sttsubj",
-                    "include_planning": True
-                }
-            },
-            {
-                "field": "event_type",
-                "label": "Event Type",
-                "nested": {
-                    "parent": "subject",
-                    "field": "scheme",
-                    "value": "event_type"
-                }
-            }
-        ]
-    })
+    config = Config(
+        root,
+        {
+            "BEHAVE": True,
+            "TESTING": True,
+            "CORE_APPS": CORE_APPS,
+            "BLUEPRINTS": BLUEPRINTS,
+            "INSTALLED_APPS": [],
+            "WTF_CSRF_ENABLED": False,
+            "URL_PREFIX": "",
+            "ELASTICSEARCH_FORCE_REFRESH": True,
+            "SITE_NAME": "Newsroom",
+            "MONGO_URI": "mongodb://localhost/newsroom_behave",
+            "CONTENTAPI_MONGO_URI": "mongodb://localhost/newsroom_behave",
+            "MONGO_DBNAME": "newsroom_behave",
+            "CONTENTAPI_MONGO_DBNAME": "newsroom_behave",
+            "AUTH_SERVER_SHARED_SECRET": "2kZOf0VI9T70vU9uMlKLyc5GlabxVgl6",
+            "AGENDA_GROUPS": [
+                {
+                    "field": "sttdepartment",
+                    "label": "Department",
+                    "nested": {
+                        "parent": "subject",
+                        "field": "scheme",
+                        "value": "sttdepartment",
+                        "include_planning": True,
+                    },
+                },
+                {
+                    "field": "sttsubj",
+                    "label": "Subject",
+                    "nested": {
+                        "parent": "subject",
+                        "field": "scheme",
+                        "value": "sttsubj",
+                        "include_planning": True,
+                    },
+                },
+                {
+                    "field": "event_type",
+                    "label": "Event Type",
+                    "nested": {
+                        "parent": "subject",
+                        "field": "scheme",
+                        "value": "event_type",
+                    },
+                },
+            ],
+        },
+    )
 
     drop_mongo(config)
 
@@ -87,8 +90,8 @@ def before_scenario(context, scenario):
 
 def setup_users(context):
     with context.app.test_request_context():
-        context.app.data.insert('companies', COMPANIES)
-        context.app.data.insert('users', USERS)
+        context.app.data.insert("companies", COMPANIES)
+        context.app.data.insert("users", USERS)
 
 
 def login_user(context, scenario):
@@ -96,8 +99,8 @@ def login_user(context, scenario):
 
     if "admin" in scenario.tags:
         data = {
-            'email': 'admin2@sourcefabric.org',
-            'password': 'admin',
+            "email": "admin2@sourcefabric.org",
+            "password": "admin",
         }
 
     if data:

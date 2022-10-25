@@ -3,44 +3,42 @@ from pathlib import Path
 from setuptools import setup, find_packages
 
 
-requirements_txt_path = Path(__file__).parent.absolute() / 'requirements.txt'
+requirements_txt_path = Path(__file__).parent.absolute() / "requirements.txt"
 
-with open(requirements_txt_path, 'r') as r:
+with open(requirements_txt_path, "r") as r:
     # Continue to use requirements.txt
     # but replace superdesk-core with setuptools equivalent syntax
     # This is so we don't have to update customer repos
     requirements = [
-        line.rsplit('\n', 1)[0]
+        line.rsplit("\n", 1)[0]
         for line in r.readlines()
-        if line.rsplit('\n', 1)[0] and (
-           not line.startswith('#') and
-           'superdesk-core.git' not in line and
-           'superdesk-planning.git' not in line
-        )] + [
-        'superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@develop#egg=superdesk-core',
-        'superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@develop#egg=superdesk-planning'
+        if line.rsplit("\n", 1)[0]
+        and (not line.startswith("#") and "superdesk-core.git" not in line and "superdesk-planning.git" not in line)
+    ] + [
+        "superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@develop#egg=superdesk-core",
+        "superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@develop#egg=superdesk-planning",
     ]
 
 setup(
-    name='Newsroom-Core',
-    version='2.1.0-dev',
-    description='Newsroom Core library',
-    author='Sourcefabric',
-    url='https://github.com/superdesk/newsroom-core',
-    license='GPLv3',
-    platforms=['any'],
-    packages=find_packages(exclude=['tests']),
+    name="Newsroom-Core",
+    version="2.1.0-dev",
+    description="Newsroom Core library",
+    author="Sourcefabric",
+    url="https://github.com/superdesk/newsroom-core",
+    license="GPLv3",
+    platforms=["any"],
+    packages=find_packages(exclude=["tests"]),
     include_package_data=True,
     install_requires=requirements,
     scripts=[],
     classifiers=[
-        'Development Status :: 4 - Beta',
-        'Environment :: Web Environment',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3',
-        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+        "Development Status :: 4 - Beta",
+        "Environment :: Web Environment",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
     ],
 )

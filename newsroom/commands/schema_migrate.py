@@ -39,10 +39,7 @@ def schema_migrate(resource_name=None):
 
 def _resource_schema_migrate(resource: str):
     resource_schema_version = get_schema_version(resource)
-    newsroom_schema_version = app.config.get(
-        f"{resource.upper()}_SCHEMA_VERSION",
-        SCHEMA_VERSIONS.get(resource)
-    )
+    newsroom_schema_version = app.config.get(f"{resource.upper()}_SCHEMA_VERSION", SCHEMA_VERSIONS.get(resource))
 
     if resource_schema_version < newsroom_schema_version:
         print(f"Update {resource} schema from version {resource_schema_version} to {newsroom_schema_version}")

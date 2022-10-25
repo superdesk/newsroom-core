@@ -5,7 +5,7 @@ from bson import ObjectId
 from eve.auth import BasicAuth
 from flask import Blueprint, session, abort
 
-blueprint = Blueprint('auth', __name__)
+blueprint = Blueprint("auth", __name__)
 
 
 class SessionAuth(BasicAuth):
@@ -22,7 +22,7 @@ def get_user(required=False):
     """
     user_id = get_user_id()
     if user_id:
-        user = superdesk.get_resource_service('users').find_one(req=None, _id=user_id)
+        user = superdesk.get_resource_service("users").find_one(req=None, _id=user_id)
     else:
         user = None
     if not user and required:
@@ -35,23 +35,23 @@ def get_user_id():
 
     Make sure it's an ObjectId.
     """
-    return ObjectId(session.get('user')) if session.get('user') else None
+    return ObjectId(session.get("user")) if session.get("user") else None
 
 
 def get_auth_user_by_email(email):
-    """ Returns the user from auth by the email case insensitive """
-    return _get_user_by_email(email, 'auth_user')
+    """Returns the user from auth by the email case insensitive"""
+    return _get_user_by_email(email, "auth_user")
 
 
 def get_user_by_email(email):
-    """ Returns the user from users by the email case insensitive """
-    return _get_user_by_email(email, 'users')
+    """Returns the user from users by the email case insensitive"""
+    return _get_user_by_email(email, "users")
 
 
 def _get_user_by_email(email, repo):
-    lookup = {'email': {'$regex': re.compile('^{}$'.format(re.escape(email)), re.IGNORECASE)}}
+    lookup = {"email": {"$regex": re.compile("^{}$".format(re.escape(email)), re.IGNORECASE)}}
     users = list(superdesk.get_resource_service(repo).get(req=None, lookup=lookup))
     return users[0] if users else None
 
 
-from . import views   # noqa
+from . import views  # noqa

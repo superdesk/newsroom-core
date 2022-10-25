@@ -4,7 +4,9 @@ import elasticsearch.exceptions
 
 from collections import OrderedDict
 
-from apps.prepopulate.app_initialize import AppInitializeWithDataCommand as _AppInitializeWithDataCommand
+from apps.prepopulate.app_initialize import (
+    AppInitializeWithDataCommand as _AppInitializeWithDataCommand,
+)
 
 from .manager import app, manager
 from .elastic_rebuild import elastic_rebuild
@@ -12,22 +14,27 @@ from .elastic_rebuild import elastic_rebuild
 
 logger = logging.getLogger(__name__)
 
-__entities__: OrderedDict = OrderedDict([
-    ('users', ('users.json', [], False)),
-    ('ui_config', ('ui_config.json', [], True)),
-    ('email_templates', ('email_templates.json', [], True))
-])
+__entities__: OrderedDict = OrderedDict(
+    [
+        ("users", ("users.json", [], False)),
+        ("ui_config", ("ui_config.json", [], True)),
+        ("email_templates", ("email_templates.json", [], True)),
+    ]
+)
 
 
 class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
-
     def run(self, entity_name=None, force=False, init_index_only=False):
-        logger.info('Starting data initialization')
+        logger.info("Starting data initialization")
 
-        data_paths = [path for path in [
-            pathlib.Path(app.config["SERVER_PATH"]).resolve().joinpath("data"),
-            pathlib.Path(__file__).resolve().parent.parent.joinpath("init_data"),
-        ] if path.exists()]
+        data_paths = [
+            path
+            for path in [
+                pathlib.Path(app.config["SERVER_PATH"]).resolve().joinpath("data"),
+                pathlib.Path(__file__).resolve().parent.parent.joinpath("init_data"),
+            ]
+            if path.exists()
+        ]
 
         # create indexes in mongo
         app.init_indexes()
@@ -44,7 +51,7 @@ class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
                 logger.warning("Can't update the mapping, please run elastic_rebuild command.")
 
         if init_index_only:
-            logger.info('Only indexes initialized.')
+            logger.info("Only indexes initialized.")
             return 0
 
         if entity_name is None:
@@ -63,23 +70,35 @@ class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
                 continue
             except Exception as ex:
                 logger.exception(ex)
-                logger.info('Exception loading entity %s', name)
+                logger.info("Exception loading entity %s", name)
 
-        logger.info('Data import finished')
+        logger.info("Data import finished")
         return 0
 
 
 @manager.option(
-    '-n', '--entity_name', dest='entity_name', action='append', required=False,
-    help='entity(ies) to initialize'
+    "-n",
+    "--entity_name",
+    dest="entity_name",
+    action="append",
+    required=False,
+    help="entity(ies) to initialize",
 )
 @manager.option(
-    '-f', '--force', dest='force', action='store_true', required=False,
-    help='if True, update item even if it has been modified by user'
+    "-f",
+    "--force",
+    dest="force",
+    action="store_true",
+    required=False,
+    help="if True, update item even if it has been modified by user",
 )
 @manager.option(
-    '-i', '--init-index-only', dest='init_index_only', action='store_true', required=False,
-    help='if True, it only initializes index only'
+    "-i",
+    "--init-index-only",
+    dest="init_index_only",
+    action="store_true",
+    required=False,
+    help="if True, it only initializes index only",
 )
 def initialize_data(entity_name=None, path=None, force=False, init_index_only=False):
     """Initialize application with predefined data for various entities.

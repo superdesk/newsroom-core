@@ -13,24 +13,19 @@ from superdesk.commands.data_updates import DataUpdate as _DataUpdate
 
 class DataUpdate(_DataUpdate):
 
-    resource = 'products'
+    resource = "products"
 
     def forwards(self, mongodb_collection, mongodb_database):
         for product in mongodb_collection.find({}):
             if not product.get("navigations"):
                 continue
 
-            print(mongodb_collection.update(
-                {config.ID_FIELD: product.get(config.ID_FIELD)},
-                {
-                    "$set": {
-                        "navigations": [
-                            str(nav_id)
-                            for nav_id in product.get("navigations")
-                        ]
-                    }
-                }
-            ))
+            print(
+                mongodb_collection.update(
+                    {config.ID_FIELD: product.get(config.ID_FIELD)},
+                    {"$set": {"navigations": [str(nav_id) for nav_id in product.get("navigations")]}},
+                )
+            )
 
     def backwards(self, mongodb_collection, mongodb_database):
         pass

@@ -13,22 +13,19 @@ from bson import ObjectId
 
 class DataUpdate(_DataUpdate):
 
-    resource = 'agenda'
+    resource = "agenda"
 
     def forwards(self, mongodb_collection, mongodb_database):
-        for agenda in mongodb_collection.find({'coverages.watches': {'$exists': True}}):
-            coverages = agenda.get('coverages', [])
+        for agenda in mongodb_collection.find({"coverages.watches": {"$exists": True}}):
+            coverages = agenda.get("coverages", [])
             updated = False
             for coverage in coverages:
-                if len(coverage.get('watches') or []) > 0:
-                    coverage['watches'] = [ObjectId(w) for w in coverage['watches']]
+                if len(coverage.get("watches") or []) > 0:
+                    coverage["watches"] = [ObjectId(w) for w in coverage["watches"]]
                     updated = True
 
             if updated:
-                print(mongodb_collection.update(
-                    {'_id': agenda['_id']},
-                    {'$set': {'coverages': coverages}}
-                ))
+                print(mongodb_collection.update({"_id": agenda["_id"]}, {"$set": {"coverages": coverages}}))
 
     def backwards(self, mongodb_collection, mongodb_database):
         pass

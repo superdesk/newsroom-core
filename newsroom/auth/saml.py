@@ -72,9 +72,7 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
     )
 
     if app.config.get("SAML_COMPANY"):
-        company = superdesk.get_resource_service("companies").find_one(
-            req=None, name=app.config["SAML_COMPANY"]
-        )
+        company = superdesk.get_resource_service("companies").find_one(req=None, name=app.config["SAML_COMPANY"])
         if company is not None:
             userdata["company"] = company["_id"]
         else:
@@ -123,9 +121,7 @@ def saml():
         return sign_user_by_email(
             session[SESSION_NAME_ID],
             create_missing=True,
-            userdata=get_userdata(
-                session[SESSION_NAME_ID], session[SESSION_USERDATA_KEY]
-            ),
+            userdata=get_userdata(session[SESSION_NAME_ID], session[SESSION_USERDATA_KEY]),
         )
 
     return redirect(auth.login())
