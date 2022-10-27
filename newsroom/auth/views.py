@@ -1,7 +1,6 @@
-from datetime import timedelta
-
-import bcrypt
 import flask
+import bcrypt
+
 from bson import ObjectId
 from flask import current_app as app, abort
 from flask_babel import gettext
@@ -10,21 +9,16 @@ from superdesk.utc import utcnow
 
 from newsroom.auth import blueprint, get_auth_user_by_email, get_user_by_email
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
+from newsroom.auth.utils import clear_user_session, start_user_session, send_token
 from newsroom.utils import (
-    get_random_string,
     is_company_enabled,
     is_account_enabled,
     is_company_expired,
-    get_cached_resource_by_id,
+    is_valid_user,
+    update_user_last_active,
 )
-from newsroom.email import (
-    send_validate_account_email,
-    send_reset_password_email,
-    send_new_signup_email,
-    send_new_account_email,
-)
+from newsroom.email import send_new_signup_email
 from newsroom.limiter import limiter
-from newsroom.template_filters import is_admin
 
 from .token import generate_auth_token, verify_auth_token
 
@@ -35,43 +29,25 @@ def login():
     form = LoginForm()
     next_page = flask.request.args.get("next") or flask.url_for("wire.index")
     if form.validate_on_submit():
-
         if not is_valid_login_attempt(form.email.data):
             return flask.render_template("account_locked.html", form=form)
 
         user = get_auth_user_by_email(form.email.data)
-
         if user is not None and _is_password_valid(form.password.data.encode("UTF-8"), user):
-
             user = get_resource_service("users").find_one(req=None, _id=user["_id"])
-
-            if not is_admin(user) and not user.get("company"):
-                flask.flash(gettext("Insufficient Permissions. Access denied."), "danger")
-                return flask.render_template("login.html", form=form)
-
-            company = get_cached_resource_by_id("companies", user.get("company"))
-
-            if not is_company_enabled(user, company):
-                flask.flash(gettext("Company account has been disabled."), "danger")
-                return flask.render_template("login.html", form=form)
-
-            if is_company_expired(user, company):
-                flask.flash(gettext("Company account has expired."), "danger")
-                return flask.render_template("login.html", form=form)
-
-            if is_account_enabled(user):
-                flask.session["user"] = str(user["_id"])  # str to avoid serialization issues
-                flask.session["name"] = "{} {}".format(user.get("first_name"), user.get("last_name"))
-                flask.session["user_type"] = user["user_type"]
-                flask.session.permanent = form.remember_me.data
-
-                if flask.session.get("locale") and flask.session["locale"] != user.get("locale"):
-                    get_resource_service("users").system_update(user["_id"], {"locale": flask.session["locale"]}, user)
-
+            company = None
+            if user:
+                company = (
+                    get_resource_service("companies").find_one(req=None, _id=user["company"])
+                    if user.get("company")
+                    else None
+                )
+            if is_valid_user(user, company):
+                start_user_session(user, permanent=form.remember_me.data)
+                update_user_last_active(user)
                 return flask.redirect(next_page)
         else:
             flask.flash(gettext("Invalid username or password."), "danger")
-
     return flask.render_template("login.html", form=form, next_page=next_page)
 
 
@@ -132,21 +108,6 @@ def _is_password_valid(password, user):
     return True
 
 
-def is_current_user_admin():
-    return flask.session["user_type"] == "administrator"
-
-
-def is_current_user_account_mgr():
-    return flask.session["user_type"] == "account_management"
-
-
-def is_current_user(user_id):
-    """
-    Checks if the current session user is the same as given user id
-    """
-    return flask.session["user"] == str(user_id)
-
-
 # this could be rate limited to a specific ip address
 @blueprint.route("/login/token/", methods=["POST"])
 def get_login_token():
@@ -163,7 +124,9 @@ def get_login_token():
 
     if user is not None and _is_password_valid(password.encode("UTF-8"), user):
         user = get_resource_service("users").find_one(req=None, _id=user["_id"])
-        company = get_cached_resource_by_id("companies", user.get("company"))
+        company = (
+            get_resource_service("companies").find_one(req=None, _id=user["company"]) if user.get("company") else None
+        )
 
         if not is_company_enabled(user, company):
             abort(401, gettext("Company account has been disabled."))
@@ -172,11 +135,7 @@ def get_login_token():
             abort(401, gettext("Company account has expired."))
 
         if is_account_enabled(user):
-            return generate_auth_token(
-                str(user["_id"]),
-                "{} {}".format(user.get("first_name"), user.get("last_name")),
-                user["user_type"],
-            )
+            return generate_auth_token(user)
     else:
         abort(401, gettext("Invalid username or password."))
 
@@ -190,18 +149,21 @@ def login_with_token(token):
     if not data:
         abort(401, gettext("Invalid token"))
 
-    flask.session["user"] = data["id"]
-    flask.session["name"] = data["name"]
-    flask.session["user_type"] = data["user_type"]
+    user_data = {
+        "_id": data["id"],
+        "first_name": data["first_name"],
+        "last_name": data["last_name"],
+        "user_type": data["user_type"],
+    }
+
+    start_user_session(user_data)
     flask.flash("login", "analytics")
     return flask.redirect(flask.url_for("wire.index"))
 
 
 @blueprint.route("/logout")
 def logout():
-    flask.session["user"] = None
-    flask.session["name"] = None
-    flask.session["user_type"] = None
+    clear_user_session()
     return flask.redirect(flask.url_for("wire.index"))
 
 
@@ -299,27 +261,3 @@ def set_locale():
     if locale and locale in app.config["LANGUAGES"]:
         flask.session["locale"] = locale
     return flask.redirect(flask.url_for("auth.login"))
-
-
-def send_token(user, token_type="validate"):
-    if user is not None and user.get("is_enabled", False):
-
-        if token_type == "validate" and user.get("is_validated", False):
-            return False
-
-        updates = {}
-        add_token_data(updates)
-        get_resource_service("users").patch(id=ObjectId(user["_id"]), updates=updates)
-        if token_type == "validate":
-            send_validate_account_email(user["first_name"], user["email"], updates["token"])
-        if token_type == "new_account":
-            send_new_account_email(user["first_name"], user["email"], updates["token"])
-        elif token_type == "reset_password":
-            send_reset_password_email(user["first_name"], user["email"], updates["token"])
-        return True
-    return False
-
-
-def add_token_data(user):
-    user["token"] = get_random_string()
-    user["token_expiry_date"] = utcnow() + timedelta(days=app.config["VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE"])

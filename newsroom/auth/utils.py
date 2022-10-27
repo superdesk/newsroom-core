@@ -1,11 +1,25 @@
+import bson
 import flask
 import werkzeug
 import superdesk
 
+from datetime import timedelta
 from typing import Optional
+from flask import current_app as app
 from flask_babel import _
 from superdesk.utc import utcnow
-from newsroom.users import UserData
+from newsroom.types import UserData
+from newsroom.utils import get_random_string, is_valid_user
+from newsroom.email import (
+    send_validate_account_email,
+    send_reset_password_email,
+    send_new_account_email,
+)
+
+
+# how often we should check in db if session
+# user is still valid
+SESSION_AUTH_TTL = timedelta(minutes=15)
 
 
 def sign_user_by_email(
@@ -38,9 +52,85 @@ def sign_user_by_email(
         user,
     )
 
-    # Set flask session information
-    flask.session["user"] = str(user["_id"])
-    flask.session["name"] = "{} {}".format(user.get("first_name"), user.get("last_name"))
-    flask.session["user_type"] = user["user_type"]
+    start_user_session(user)
 
     return flask.redirect(flask.url_for(redirect_on_success))
+
+
+def start_user_session(user: UserData, permanent=False):
+    flask.session["user"] = str(user["_id"])  # str to avoid serialization issues
+    flask.session["name"] = "{} {}".format(user.get("first_name"), user.get("last_name"))
+    flask.session["user_type"] = user["user_type"]
+    flask.session["auth_ttl"] = utcnow() + SESSION_AUTH_TTL
+    flask.session.permanent = permanent
+
+
+def clear_user_session():
+    flask.session["user"] = None
+    flask.session["name"] = None
+    flask.session["user_type"] = None
+    flask.session["auth_ttl"] = None
+
+
+def is_current_user_admin():
+    return flask.session.get("user_type") and flask.session["user_type"] == "administrator"
+
+
+def is_current_user_account_mgr():
+    return flask.session.get("user_type") and flask.session["user_type"] == "account_management"
+
+
+def is_current_user(user_id):
+    """
+    Checks if the current session user is the same as given user id
+    """
+    return flask.session["user"] == str(user_id)
+
+
+def send_token(user, token_type="validate"):
+    if user is not None and user.get("is_enabled", False):
+
+        if token_type == "validate" and user.get("is_validated", False):
+            return False
+
+        updates = {}
+        add_token_data(updates)
+        superdesk.get_resource_service("users").patch(id=bson.ObjectId(user["_id"]), updates=updates)
+        if token_type == "validate":
+            send_validate_account_email(user["first_name"], user["email"], updates["token"])
+        if token_type == "new_account":
+            send_new_account_email(user["first_name"], user["email"], updates["token"])
+        elif token_type == "reset_password":
+            send_reset_password_email(user["first_name"], user["email"], updates["token"])
+        return True
+    return False
+
+
+def add_token_data(user):
+    user["token"] = get_random_string()
+    user["token_expiry_date"] = utcnow() + timedelta(days=app.config["VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE"])
+
+
+def is_valid_session():
+    now = utcnow().replace(tzinfo=None)
+    return (
+        flask.session.get("user")
+        and flask.session.get("user_type")
+        and (flask.session.get("auth_ttl") and flask.session.get("auth_ttl") > now or revalidate_session_user())
+    )
+
+
+def revalidate_session_user():
+    user = superdesk.get_resource_service("users").find_one(req=None, _id=flask.session.get("user"))
+    if not user:
+        clear_user_session()
+        return False
+    company = (
+        superdesk.get_resource_service("companies").find_one(req=None, _id=user["company"])
+        if user.get("company")
+        else None
+    )
+    is_valid = is_valid_user(user, company)
+    if is_valid:
+        flask.session["auth_ttl"] = utcnow() + SESSION_AUTH_TTL
+    return is_valid

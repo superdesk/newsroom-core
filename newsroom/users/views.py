@@ -8,7 +8,7 @@ from superdesk import get_resource_service
 from werkzeug.exceptions import BadRequest, NotFound
 
 from newsroom.auth import get_user, get_user_by_email
-from newsroom.auth.views import (
+from newsroom.auth.utils import (
     send_token,
     add_token_data,
     is_current_user_admin,
