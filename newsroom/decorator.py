@@ -32,7 +32,7 @@ def admin_only(f):
 def account_manager_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not is_current_user_admin() and not is_current_user_account_mgr() or not is_valid_session():
+        if (not is_current_user_admin() and not is_current_user_account_mgr()) or not is_valid_session():
             return abort(403)
         return f(*args, **kwargs)
 
