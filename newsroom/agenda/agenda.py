@@ -224,12 +224,7 @@ class AgendaResource(newsroom.Resource):
     schema["location"] = events_schema["location"]
 
     # update location name to allow exact search and term based searching
-    schema['location']['mapping']['properties']['name'] = {
-        "type": "text",
-        "fields": {
-            "keyword": {"type": "keyword"}
-        }
-    }
+    schema["location"]["mapping"]["properties"]["name"] = {"type": "text", "fields": {"keyword": {"type": "keyword"}}}
 
     # event details
     schema["event"] = {
