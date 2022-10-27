@@ -22,7 +22,20 @@ Feature: Agenda Search
             ],
             "anpa_category": [
                 {"qcode": "a", "name": "Australian General News"}
-            ]
+            ],
+            "location": [{
+                "name": "Sydney Harbour Bridge",
+                "address": {
+                    "city": "Sydney",
+                    "state": "New South Wales",
+                    "country": "Australia",
+                    "line": ["Hickson Road"],
+                    "postal_code": "2000",
+                    "type": "attraction",
+                    "title": "Sydney Harbour Bridge",
+                    "area": "Council of the City of Sydney"
+                }
+            }]
         }
         """
         And we post json to "/push"
@@ -211,4 +224,143 @@ Feature: Agenda Search
                 "matched_coverages": ["plan2_cov1"]
             }
         }]}
+        """
+
+    @auth @admin
+    Scenario: Search by location
+        When we post json to "/push"
+        """
+        {
+            "guid": "helsinki_event1", "type": "event", "state": "scheduled", "pubstatus": "usable",
+            "name": "Helsingin Kirjamessut",
+            "dates": {
+                "start": "2018-05-28T04:00:00+0000",
+                "end": "2018-05-28T05:00:00+0000",
+                "tz": "Australia/Sydney"
+            },
+            "location": [{
+                "name": "Helsingin Uusimaa Messukeskus",
+                "address": {
+                    "title": "Helsingin Uusimaa Messukeskus",
+                    "line": ["Messuaukio 1"],
+                    "city": "Helsinki", "state": "Uusimaa", "country": "Suomi",
+                    "extra": {
+                        "iso3166": "iso3166-1a2:FI",
+                        "sttcity": "35",
+                        "sttcountry": "1",
+                        "sttlocationalias": "16179",
+                        "sttstate": "31"
+                    }
+                }
+            }]
+        }
+        """
+        And we post json to "/push"
+        """
+        {
+            "guid": "tuusula_event1", "type": "event", "state": "scheduled", "pubstatus": "usable",
+            "name": "Tuusulan työpaikkamurhasta syytetty oli mielentilatutkimuksen mukaan syyntakeeton",
+            "dates": {
+                "start": "2018-06-28T04:00:00+0000",
+                "end": "2018-06-28T05:00:00+0000",
+                "tz": "Australia/Sydney"
+            },
+            "location": [{
+                "name": "Itä-Uudenmaan käräjäoikeus",
+                "address": {
+                    "title": "Itä-Uudenmaan käräjäoikeus",
+                    "city": "Tuusula", "state": "Uusimaa", "country": "Suomi",
+                    "extra": {
+                        "iso3166": "iso3166-1a2:FI",
+                        "sttcity": "307",
+                        "sttcountry": "1",
+                        "sttlocationalias": "19558",
+                        "sttstate": "31"
+                    }
+                }
+            }]
+        }
+        """
+        And we post json to "/push"
+        """
+        {
+            "guid": "vaasa_event1", "type": "event", "state": "scheduled", "pubstatus": "usable",
+            "name": "Pesäpallo: Miesten Superpesis, 1/3 pronssiottelu, klo 15 Hyvinkää-Joensuu",
+            "dates": {
+                "start": "2018-07-28T04:00:00+0000",
+                "end": "2018-07-28T05:00:00+0000",
+                "tz": "Australia/Sydney"
+            },
+            "location": [{
+                "name": "Nightwishin stadionkonsertti Vaasassa",
+                "address": {
+                    "title": "Nightwishin stadionkonsertti Vaasassa",
+                    "line": ["Rantamaantie"],
+                    "city": "Vaasa", "state": "Pohjanmaa", "country": "Suomi",
+                    "extra": {
+                        "iso3166": "iso3166-1a2:FI",
+                        "sttcity": "317",
+                        "sttcountry": "1",
+                        "sttlocationalias": "22376",
+                        "sttstate": "40"
+                    }
+                }
+            }]
+        }
+        """
+        When we get "/agenda/search_locations"
+        Then we get existing resource
+        """
+        {
+            "regions": [
+                {"type": "city", "country": "Australia", "state": "New South Wales", "name": "Sydney"},
+                {"type": "state", "country": "Australia", "name": "New South Wales"},
+                {"type": "country", "name": "Australia"},
+                {"type": "city", "country": "Suomi", "state": "Uusimaa", "name": "Helsinki"},
+                {"type": "city", "country": "Suomi", "state": "Uusimaa", "name": "Tuusula"},
+                {"type": "state", "country": "Suomi", "name": "Uusimaa"},
+                {"type": "city", "country": "Suomi", "state": "Pohjanmaa", "name": "Vaasa"},
+                {"type": "state", "country": "Suomi", "name": "Pohjanmaa"},
+                {"type": "country", "name": "Suomi"}
+            ],
+            "places": [
+                "Sydney Harbour Bridge",
+                "Helsingin Uusimaa Messukeskus",
+                "It\u00e4-Uudenmaan k\u00e4r\u00e4j\u00e4oikeus",
+                "Nightwishin stadionkonsertti Vaasassa"
+            ]
+        }
+        """
+        When we get "/agenda/search_locations?q=uus"
+        Then we get existing resource
+        """
+        {
+            "regions": [
+                {"type": "city", "country": "Suomi", "state": "Uusimaa", "name": "Tuusula"},
+                {"type": "state", "country": "Suomi", "name": "Uusimaa"}
+            ],
+            "places": [
+                "Helsingin Uusimaa Messukeskus"
+            ]
+        }
+        """
+        When we get "/agenda/search?filter={\"location\":{\"type\":\"city\",\"name\":\"Helsinki\"}}"
+        Then we get the following order
+        """
+        ["helsinki_event1"]
+        """
+        When we get "/agenda/search?filter={\"location\":{\"type\":\"state\",\"name\":\"Uusimaa\"}}"
+        Then we get the following order
+        """
+        ["helsinki_event1", "tuusula_event1"]
+        """
+        When we get "/agenda/search?filter={\"location\":{\"type\":\"country\",\"name\":\"Suomi\"}}"
+        Then we get the following order
+        """
+        ["helsinki_event1", "tuusula_event1", "vaasa_event1"]
+        """
+        When we get "/agenda/search?filter={\"location\":{\"name\":\"Helsingin Uusimaa Messukeskus\"}}"
+        Then we get the following order
+        """
+        ["helsinki_event1"]
         """
