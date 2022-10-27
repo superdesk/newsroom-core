@@ -7,11 +7,11 @@ import {gettext} from 'utils';
 import {getCoverageDisplayName, groupRegions, getRegionName} from '../utils';
 import {agendaFiltersConfigSelector} from '../selectors';
 
-import AgendaTypeAheadFilter from './AgendaTypeAheadFilter';
 import DropdownFilter from '../../components/DropdownFilter';
 import AgendaCoverageExistsFilter from './AgendaCoverageExistsFilter';
 import AgendaItemTypeFilter from './AgendaItemTypeFilter';
 import {AgendaCalendarAgendaFilter} from './AgendaCalendarAgendaFilter';
+import {LocationFilter} from './LocationFilter';
 
 export const transformFilterBuckets = (filter, aggregations, props) => {
     if (!filter.transformBuckets) {
@@ -43,18 +43,10 @@ const renderFilter = {
     ),
     location: (props) => (
         !['events', 'combined'].includes(props.itemTypeFilter || 'combined') ? null : (
-            <AgendaTypeAheadFilter
+            <LocationFilter
                 key="location"
-                aggregations={props.aggregations}
                 activeFilter={props.activeFilter}
                 toggleFilter={props.toggleFilter}
-                getDropdownItems={getDropdownItems}
-                filter={{
-                    label: gettext('Any location'),
-                    field: 'location',
-                    typeAhead: true,
-                    icon: 'icon-small--location',
-                }}
             />
         )
     ),

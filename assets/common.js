@@ -19,3 +19,10 @@ import 'reselect';
 import 'store';
 import 'url-search-params-polyfill';
 import 'whatwg-fetch';
+
+export const KEYS = {
+    ESCAPE: 'Escape',
+    ENTER: 'Enter',
+    UP: 'ArrowUp',
+    DOWN: 'ArrowDown',
+};

@@ -70,6 +70,11 @@ export const searchParamsSelector = createSelector(
         if (filter && Object.keys(filter).length > 0) {
             params.filter = {};
             Object.keys(filter).forEach((key) => {
+                if (key === 'location') {
+                    params.filter[key] = filter[key];
+                    return;
+                }
+
                 const value = removeNulls(filter[key]);
 
                 if (value && value.length > 0) {
