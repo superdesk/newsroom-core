@@ -18,24 +18,24 @@ def create_user(email, password, first_name, last_name, is_admin):
     """
 
     new_user = {
-        'email': email,
-        'password': password,
-        'first_name': first_name,
-        'last_name': last_name,
-        'user_type': 'administrator' if is_admin else 'public',
-        'is_enabled': True,
-        'is_approved': True
+        "email": email,
+        "password": password,
+        "first_name": first_name,
+        "last_name": last_name,
+        "user_type": "administrator" if is_admin else "public",
+        "is_enabled": True,
+        "is_approved": True,
     }
 
-    with app.test_request_context('/users', method='POST'):
+    with app.test_request_context("/users", method="POST"):
 
         user = get_user_by_email(email)
 
         if user:
-            print('user already exists %s' % str(new_user))
+            print("user already exists %s" % str(new_user))
         else:
-            print('creating user %s' % str(new_user))
-            get_resource_service('users').post([new_user])
-            print('user saved %s' % (new_user))
+            print("creating user %s" % str(new_user))
+            get_resource_service("users").post([new_user])
+            print("user saved %s" % (new_user))
 
         return new_user

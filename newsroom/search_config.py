@@ -30,11 +30,7 @@ def is_search_field_nested(resource_type: str, field: str):
     return field in (nested_agg_groups.get(resource_type) or {}) or field in nested_agg_fields
 
 
-def init_nested_aggregation(
-    resource: Type[Resource],
-    groups: List[SearchGroupConfig],
-    aggs: Dict[str, Any]
-):
+def init_nested_aggregation(resource: Type[Resource], groups: List[SearchGroupConfig], aggs: Dict[str, Any]):
     """Applies aggregation & mapping changes for nested search groups"""
 
     resource_type = resource.datasource["source"]
@@ -116,7 +112,12 @@ def merge_planning_aggs(aggs: Dict[str, Any]):
                 field_buckets.append(bucket)
 
 
-def _update_agg_to_nested(parent: str, field: str, configs: List[SearchGroupNestedConfig], aggs: Dict[str, Any]):
+def _update_agg_to_nested(
+    parent: str,
+    field: str,
+    configs: List[SearchGroupNestedConfig],
+    aggs: Dict[str, Any],
+):
     """Updates/Adds aggregations config for ``parent`` and associated ``groups``"""
 
     if not aggs.get(f"_{parent}"):
@@ -128,10 +129,7 @@ def _update_agg_to_nested(parent: str, field: str, configs: List[SearchGroupNest
         aggs[key] = {
             "nested": {"path": parent},
             "aggs": {
-                f"{key}_filtered": {
-                    "filter": agg_filter,
-                    "aggs": {key: original_aggs}
-                },
+                f"{key}_filtered": {"filter": agg_filter, "aggs": {key: original_aggs}},
             },
         }
 
@@ -157,15 +155,15 @@ def _update_agg_to_nested(parent: str, field: str, configs: List[SearchGroupNest
     for config in configs:
         set_agg_config(
             config["value"],
-            {"bool": {"must": [{"term": {f"{parent}.{field}": config["value"]}}]}}
+            {"bool": {"must": [{"term": {f"{parent}.{field}": config["value"]}}]}},
         )
         if config.get("include_planning"):
             set_planning_agg_config(
                 config["value"],
-                {"bool": {"must": [{"term": {f"planning_items.{parent}.{field}": config["value"]}}]}}
+                {"bool": {"must": [{"term": {f"planning_items.{parent}.{field}": config["value"]}}]}},
             )
 
     set_agg_config(
         parent,
-        {"bool": {"must_not": [{"terms": {f"{parent}.{field}": [config["value"] for config in configs]}}]}}
+        {"bool": {"must_not": [{"terms": {f"{parent}.{field}": [config["value"] for config in configs]}}]}},
     )

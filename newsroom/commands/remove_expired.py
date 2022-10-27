@@ -3,7 +3,7 @@ import content_api
 from .manager import manager
 
 
-@manager.option('-m', '--expiry', dest='expiry_days', required=False)
+@manager.option("-m", "--expiry", dest="expiry_days", required=False)
 def remove_expired(expiry_days):
     """Remove expired items from the content_api items collection.
 

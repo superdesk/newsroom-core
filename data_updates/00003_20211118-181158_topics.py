@@ -13,13 +13,10 @@ from superdesk import get_resource_service
 
 
 class DataUpdate(_DataUpdate):
-    resource = 'topics'
+    resource = "topics"
 
     def forwards(self, mongodb_collection, mongodb_database):
-        users = {
-            user['_id']: user
-            for user in get_resource_service('users').get(req=None, lookup={})
-        }
+        users = {user["_id"]: user for user in get_resource_service("users").get(req=None, lookup={})}
 
         for topic in mongodb_collection.find({}):
             if not topic.get("user"):  # this could happen on new cp instances with the mgmt api
@@ -29,32 +26,28 @@ class DataUpdate(_DataUpdate):
                 print(mongodb_collection.delete_one({"_id": topic["_id"]}))
             else:
                 print("Updating topic of existing user", topic["_id"], topic.get("label"))
-                print(mongodb_collection.update(
-                    {config.ID_FIELD: topic.get(config.ID_FIELD)},
-                    {
-                        '$set': {
-                            'subscribers': [topic['user']] if topic.get('notifications', False) else [],
-                            'company': users[topic['user']].get('company'),
-                            'is_global': topic.get('is_global', False),
+                print(
+                    mongodb_collection.update(
+                        {config.ID_FIELD: topic.get(config.ID_FIELD)},
+                        {
+                            "$set": {
+                                "subscribers": [topic["user"]] if topic.get("notifications", False) else [],
+                                "company": users[topic["user"]].get("company"),
+                                "is_global": topic.get("is_global", False),
+                            },
+                            "$unset": {"notifications": ""},
                         },
-                        '$unset': {
-                            'notifications': ''
-                        }
-                    }
-                ))
+                    )
+                )
 
     def backwards(self, mongodb_collection, mongodb_database):
         for topic in mongodb_collection.find({}):
-            print(mongodb_collection.update(
-                {config.ID_FIELD: topic.get(config.ID_FIELD)},
-                {
-                    '$set': {
-                        'notifications': topic['user'] in (topic.get('subscribers') or [])
+            print(
+                mongodb_collection.update(
+                    {config.ID_FIELD: topic.get(config.ID_FIELD)},
+                    {
+                        "$set": {"notifications": topic["user"] in (topic.get("subscribers") or [])},
+                        "$unset": {"subscribers": "", "company": "", "is_global": ""},
                     },
-                    '$unset': {
-                        'subscribers': '',
-                        'company': '',
-                        'is_global': ''
-                    }
-                }
-            ))
+                )
+            )

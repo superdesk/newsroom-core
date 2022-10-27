@@ -28,7 +28,7 @@ let store;
 if (get(window.viewData, 'context', '') === 'monitoring') {
     store = createStore(wireReducer, 'Monitoring');
     // init data
-    store.dispatch(initData(getInitData(window.viewData), getReadItems(), false));
+    store.dispatch(initData(getInitData(window.viewData), null, getReadItems(), false));
 
     // init query
     const params = new URLSearchParams(window.location.search);

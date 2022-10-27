@@ -7,55 +7,35 @@ class NavigationsResource(newsroom.Resource):
     """
     Navigations schema
     """
+
     schema = {
-        'name': {
-            'type': 'string',
-            'unique': True,
-            'required': True
-        },
-        'description': {
-            'type': 'string'
-        },
-        'is_enabled': {
-            'type': 'boolean',
-            'default': True
-        },
-        'order': {
-            'type': 'integer',
-            'nullable': True
-        },
-        'product_type': {
-            'type': 'string',
-            'default': 'wire'
-        },
+        "name": {"type": "string", "unique": True, "required": True},
+        "description": {"type": "string"},
+        "is_enabled": {"type": "boolean", "default": True},
+        "order": {"type": "integer", "nullable": True},
+        "product_type": {"type": "string", "default": "wire"},
         # list of images for tile based navigation
-        'tile_images': {
-            'type': 'list',
-            'nullable': True
-        },
-        'original_creator': newsroom.Resource.rel('users'),
-        'version_creator': newsroom.Resource.rel('users'),
+        "tile_images": {"type": "list", "nullable": True},
+        "original_creator": newsroom.Resource.rel("users"),
+        "version_creator": newsroom.Resource.rel("users"),
     }
 
-    datasource = {
-        'source': 'navigations',
-        'default_sort': [('order', 1), ('name', 1)]
-    }
-    item_methods = ['GET', 'PATCH', 'DELETE']
-    resource_methods = ['GET', 'POST']
+    datasource = {"source": "navigations", "default_sort": [("order", 1), ("name", 1)]}
+    item_methods = ["GET", "PATCH", "DELETE"]
+    resource_methods = ["GET", "POST"]
 
 
 class NavigationsService(newsroom.Service):
     def on_delete(self, doc):
         super().on_delete(doc)
-        navigation = doc.get('_id')
-        products = superdesk.get_resource_service('products').find(where={'navigations': navigation})
+        navigation = doc.get("_id")
+        products = superdesk.get_resource_service("products").find(where={"navigations": navigation})
         for product in products:
-            product['navigations'].remove(navigation)
-            superdesk.get_resource_service('products').patch(product['_id'], product)
+            product["navigations"].remove(navigation)
+            superdesk.get_resource_service("products").patch(product["_id"], product)
 
 
-def get_navigations_by_company(company_id, product_type='wire', events_only=False):
+def get_navigations_by_company(company_id, product_type="wire", events_only=False):
     """
     Returns list of navigations for given company id
     Navigations will contain the list of product ids
@@ -64,7 +44,7 @@ def get_navigations_by_company(company_id, product_type='wire', events_only=Fals
 
     # Get the navigation ids used across products
     navigation_ids = []
-    [navigation_ids.extend(p.get('navigations', [])) for p in products]
+    [navigation_ids.extend(p.get("navigations", [])) for p in products]
     return get_navigations_by_ids(navigation_ids)
 
 
@@ -75,5 +55,8 @@ def get_navigations_by_ids(navigation_ids):
     if not navigation_ids:
         return []
 
-    return list(superdesk.get_resource_service('navigations')
-                .get(req=None, lookup={'_id': {'$in': navigation_ids}, 'is_enabled': True}))
+    return list(
+        superdesk.get_resource_service("navigations").get(
+            req=None, lookup={"_id": {"$in": navigation_ids}, "is_enabled": True}
+        )
+    )

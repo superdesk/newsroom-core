@@ -19,7 +19,7 @@ class APIFormattersService(Service):
 
     def get(self, req, lookup):
         formatters = get_all_formatters()
-        return ListCursor([{'name': type(f).__name__} for f in formatters])
+        return ListCursor([{"name": type(f).__name__} for f in formatters])
 
     def _get_formatter(self, name):
         formatters = get_all_formatters()
@@ -30,19 +30,24 @@ class APIFormattersService(Service):
         if not formatter:
             abort(404)
         if version:
-            item = get_resource_service('items_versions').find_one(req=None, _id_document=id, version=version)
+            item = get_resource_service("items_versions").find_one(req=None, _id_document=id, version=version)
             if not item:
                 abort(404)
-            resource_def = app.config['DOMAIN']['items']
+            resource_def = app.config["DOMAIN"]["items"]
             id_field = versioned_id_field(resource_def)
-            item['_id'] = item[id_field]
+            item["_id"] = item[id_field]
         else:
-            item = get_resource_service('items').find_one(req=None, _id=id)
+            item = get_resource_service("items").find_one(req=None, _id=id)
             if not item:
                 abort(404)
         # Ensure that the item has not expired
-        if utcnow() - timedelta(days=int(get_setting('news_api_time_limit_days'))) > item.get('versioncreated',
-                                                                                              utcnow()):
+        if utcnow() - timedelta(days=int(get_setting("news_api_time_limit_days"))) > item.get(
+            "versioncreated", utcnow()
+        ):
             abort(404)
         ret = formatter.format_item(item)
-        return {'formatted_item': ret, 'mimetype': formatter.MIMETYPE, 'version': item.get('version')}
+        return {
+            "formatted_item": ret,
+            "mimetype": formatter.MIMETYPE,
+            "version": item.get("version"),
+        }

@@ -1,1 +1,1 @@
-from newsroom.tests.news_api.steps import * # noqa
+from newsroom.tests.news_api.steps import *  # noqa

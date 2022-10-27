@@ -40,9 +40,7 @@ def sign_user_by_email(
 
     # Set flask session information
     flask.session["user"] = str(user["_id"])
-    flask.session["name"] = "{} {}".format(
-        user.get("first_name"), user.get("last_name")
-    )
+    flask.session["name"] = "{} {}".format(user.get("first_name"), user.get("last_name"))
     flask.session["user_type"] = user["user_type"]
 
     return flask.redirect(flask.url_for(redirect_on_success))
