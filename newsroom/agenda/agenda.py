@@ -223,8 +223,13 @@ class AgendaResource(newsroom.Resource):
     schema['calendars'] = events_schema['calendars']
     schema['location'] = events_schema['location']
 
-    # update location name to be not_analyzed
-    schema['location']['mapping']['properties']['name'] = not_analyzed
+    # # update location name to be not_analyzed
+    schema['location']['mapping']['properties']['name'] = {
+        "type": "text",
+        "fields": {
+            "keyword": {"type": "keyword"}
+        }
+    }
 
     # event details
     schema['event'] = {
@@ -403,7 +408,6 @@ def _set_event_date_range(search):
 
 aggregations: Dict[str, Dict[str, Any]] = {
     'calendar': {'terms': {'field': 'calendars.name', 'size': 100}},
-    'location': {'terms': {'field': 'location.name', 'size': 10000}},
     'service': {'terms': {'field': 'service.name', 'size': 50}},
     'subject': {'terms': {'field': 'subject.name', 'size': 20}},
     'urgency': {'terms': {'field': 'urgency'}},
@@ -476,6 +480,19 @@ def _filter_terms(filters, item_type):
             continue
         elif item_type == "events" and key in planning_filters:
             continue
+        elif key == "location":
+            search_type = val.get("type", "location")
+
+            if search_type == "city":
+                field = "location.address.city.keyword"
+            elif search_type == "state":
+                field = "location.address.state.keyword"
+            elif search_type == "country":
+                field = "location.address.country.keyword"
+            else:
+                field = "location.name.keyword"
+
+            must_term_filters.append({"term": {field: val.get("name")}})
         elif key == 'coverage':
             must_term_filters.append(
                 nested_query(
