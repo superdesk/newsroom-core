@@ -287,3 +287,143 @@ def related_wire_items(wire_id):
         ),
         200,
     )
+
+
+@blueprint.route("/agenda/search_locations")
+@login_required
+def search_locations():
+    query = request.args.get("q") or ""
+    apply_filters = len(query) > 0
+
+    if apply_filters and not query.startswith("*") and not query.endswith("*"):
+        query = f"*{query}*"
+
+    def gen_agg_filter(field: str):
+        return {
+            "bool": {
+                "must": [
+                    {
+                        "query_string": {
+                            "fields": [f"location.{field}"],
+                            "query": query,
+                        },
+                    }
+                ],
+            },
+        }
+
+    def gen_agg_terms(field: str):
+        return {
+            "field": f"location.{field}.keyword",
+            "size": 1000,
+        }
+
+    es_query = {
+        "size": 0,
+        "aggs": {
+            "city_search_country": {
+                "terms": gen_agg_terms("address.country"),
+                "aggs": {
+                    "city_search_state": {
+                        "terms": gen_agg_terms("address.state"),
+                        "aggs": {
+                            "cities": {
+                                "terms": gen_agg_terms("address.city"),
+                            },
+                        },
+                    },
+                },
+            },
+            "state_search_country": {
+                "terms": gen_agg_terms("address.country"),
+                "aggs": {
+                    "states": {
+                        "terms": gen_agg_terms("address.state"),
+                    },
+                },
+            },
+            "countries": {
+                "terms": gen_agg_terms("address.country"),
+            },
+            "places": {"terms": gen_agg_terms("name")},
+        },
+    }
+
+    if apply_filters:
+        es_query["query"] = {
+            "bool": {
+                "must": [
+                    {
+                        "query_string": {
+                            "fields": [
+                                "location.address.city",
+                                "location.address.state",
+                                "location.address.country",
+                                "location.name",
+                            ],
+                            "query": query,
+                        },
+                    }
+                ],
+            },
+        }
+
+        es_query["aggs"]["city_search"] = {
+            "filter": gen_agg_filter("address.city"),
+            "aggs": {"city_search_country": es_query["aggs"].pop("city_search_country")},
+        }
+        es_query["aggs"]["state_search"] = {
+            "filter": gen_agg_filter("address.state"),
+            "aggs": {"state_search_country": es_query["aggs"].pop("state_search_country")},
+        }
+        es_query["aggs"]["country_search"] = {
+            "filter": gen_agg_filter("address.country"),
+            "aggs": {"countries": es_query["aggs"].pop("countries")},
+        }
+        es_query["aggs"]["place_search"] = {
+            "filter": gen_agg_filter("name"),
+            "aggs": {"places": es_query["aggs"].pop("places")},
+        }
+
+    req = ParsedRequest()
+    req.args = {"source": json.dumps(es_query)}
+    service = get_resource_service("agenda")
+    cursor = service.internal_get(req, {})
+    aggs = cursor.hits.get("aggregations") or {}
+
+    regions = []
+    for country_bucket in (aggs.get("city_search_country") or aggs["city_search"]["city_search_country"])["buckets"]:
+        country_name = country_bucket["key"]
+        for state_bucket in country_bucket["city_search_state"]["buckets"]:
+            state_name = state_bucket["key"]
+            for city_bucket in state_bucket["cities"]["buckets"]:
+                regions.append(
+                    {"name": city_bucket["key"], "country": country_name, "state": state_name, "type": "city"}
+                )
+
+    for country_bucket in (aggs.get("state_search_country") or aggs["state_search"]["state_search_country"])["buckets"]:
+        country_name = country_bucket["key"]
+        for state_bucket in country_bucket["states"]["buckets"]:
+            regions.append(
+                {
+                    "name": state_bucket["key"],
+                    "country": country_name,
+                    "type": "state",
+                }
+            )
+
+    for country_bucket in (aggs.get("countries") or aggs["country_search"]["countries"])["buckets"]:
+        regions.append(
+            {
+                "name": country_bucket["key"],
+                "type": "country",
+            }
+        )
+
+    return (
+        {
+            "regions": regions,
+            "places": [bucket["key"] for bucket in (aggs.get("places") or aggs["place_search"]["places"])["buckets"]],
+        },
+        200,
+    )

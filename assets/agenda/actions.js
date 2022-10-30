@@ -1,4 +1,4 @@
-import {get, isEmpty, includes} from 'lodash';
+import {get, isEmpty, includes, cloneDeep} from 'lodash';
 import moment from 'moment';
 
 import server from 'server';
@@ -32,8 +32,9 @@ import {
     loadMyTopics,
     setTopics,
     loadMyTopic,
+    setSearchFilters,
 } from 'search/actions';
-import {searchParamsSelector} from 'search/selectors';
+import {searchParamsSelector, searchFilterSelector} from 'search/selectors';
 
 import {clearAgendaDropdownFilters} from '../local-store';
 import {getLocations, getMapSource} from '../maps/utils';
@@ -562,8 +563,37 @@ export function toggleDropdownFilter(key, val) {
     return (dispatch) => {
         dispatch(setActive(null));
         dispatch(preview(null));
-        key === 'itemType' ? dispatch(setItemTypeFilter(val)) : dispatch(toggleFilter(key, val, true));
+
+        if (key === 'itemType') {
+            dispatch(setItemTypeFilter(val));
+        } else if (key === 'location') {
+            dispatch(setLocationFilter(val));
+        } else {
+            dispatch(toggleFilter(key, val, true));
+        }
+
         dispatch(fetchItems());
+    };
+}
+
+function setLocationFilter(location) {
+    return (dispatch, getState) => {
+        const state = getState();
+        const currentFilters = cloneDeep(searchFilterSelector(state));
+        const currentLocation = get(currentFilters, 'location') || {};
+
+        if (location == null || (currentLocation.type === location.type && currentLocation.name === location.name)) {
+            delete currentFilters.location;
+        } else {
+            currentFilters.location = location;
+        }
+
+        dispatch(setSearchFilters(currentFilters));
+        updateRouteParams(
+            {filter: currentFilters},
+            state,
+            false
+        );
     };
 }
 
