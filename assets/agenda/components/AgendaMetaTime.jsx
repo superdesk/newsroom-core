@@ -55,13 +55,13 @@ function format(item, group, onlyDates) {
 
     const scheduleType = getScheduleType(item);
 
-    if (duration === 0 || scheduleType === SCHEDULE_TYPE.NO_DURATION) {
+    if ((duration === 0 || scheduleType === SCHEDULE_TYPE.NO_DURATION) && !item.dates.all_day) {
         return isTBCItem ? ([dateElement(start), tbcStr]) :
             ([timeElement(start, null, 'start'), dateElement(start)]);
     } else {
         switch(scheduleType) {
         case SCHEDULE_TYPE.MULTI_DAY:
-            return isTBCItem ? ([
+            return isTBCItem || item.dates.all_day ? ([
                 <span key="date">
                     {gettext('{{startDate}} to {{endDate}}', {
                         startDate: formatDate(start) + tbcStr,
@@ -73,7 +73,7 @@ function format(item, group, onlyDates) {
                     <span key="date">
                         {gettext('{{startDate}} to {{endDate}}', {
                             startDate: formatDatetime(start),
-                            endDate: formatDatetime(end),
+                            endDate: item.dates.no_end_time ? formatDate(end) : formatDatetime(end),
                         })}
                     </span>,
                 ]);
@@ -82,8 +82,8 @@ function format(item, group, onlyDates) {
             return dateElement(start);
 
         case SCHEDULE_TYPE.REGULAR:
-            return isTBCItem ?  ([dateElement(start), tbcStr])
-                : ([timeElement(start, end, 'times'), dateElement(start)]);
+            return isTBCItem ? ([dateElement(start), tbcStr])
+                : ([timeElement(start, item.dates.no_end_time ? null : end, 'times'), dateElement(start)]);
         }
     }
 }

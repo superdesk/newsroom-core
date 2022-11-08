@@ -338,6 +338,11 @@ export function getScheduleType(item) {
     const start = moment(item.dates.start);
     const end = moment(item.dates.end);
     const duration = end.diff(start, 'minutes');
+
+    if (item.dates.all_day) {
+        return duration === 0 ? SCHEDULE_TYPE.ALL_DAY : SCHEDULE_TYPE.MULTI_DAY;
+    }
+
     if (duration > DAY_IN_MINUTES || !start.isSame(end, 'day')) {
         return SCHEDULE_TYPE.MULTI_DAY;
     }
@@ -408,20 +413,26 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
 
 
     const scheduleType = getScheduleType(item);
-    let regulartTimeStr = gettext('{{startTime}} - {{endTime}}', {
+    let regularTimeStr = gettext('{{startTime}} - {{endTime}}', {
         startTime: formatTime(start),
         endTime: formatTime(end),
     });
     if (isTBCItem) {
-        regulartTimeStr = localTimeZone ? `${TO_BE_CONFIRMED_TEXT} ` : '';
+        regularTimeStr = localTimeZone ? `${TO_BE_CONFIRMED_TEXT} ` : '';
     }
-    if (duration === 0 || scheduleType === SCHEDULE_TYPE.NO_DURATION) {
+    if (item.dates.all_day) {
+        regularTimeStr = '';
+    } else if (item.dates.no_end_time) {
+        regularTimeStr = formatTime(start);
+    }
+    if ((duration === 0 || scheduleType === SCHEDULE_TYPE.NO_DURATION) && !item.dates.all_day) {
         dateTimeString.push(formatDate(start));
-        dateTimeString.push(isTBCItem ? regulartTimeStr : formatTime(start));
+        dateTimeString.push(isTBCItem ? regularTimeStr : formatTime(start));
+        console.info("IN 0")
     } else {
         switch(scheduleType) {
         case SCHEDULE_TYPE.MULTI_DAY:
-            if (isTBCItem) {
+            if (isTBCItem || item.dates.all_day) {
                 dateTimeString.push(gettext('{{startDate}} to {{endDate}}', {
                     startDate: formatDate(start),
                     endDate: formatDate(end),
@@ -432,14 +443,17 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
                     endDate: formatDatetime(end),
                 }));
             }
+            console.info("IN multi");
             break;
 
         case SCHEDULE_TYPE.ALL_DAY:
             dateTimeString.push(formatDate(start));
+            console.info("IN all day");
             break;
 
         case SCHEDULE_TYPE.REGULAR:
-            dateTimeString.push(`${regulartTimeStr} ${formatDate(start)}`);
+            dateTimeString.push(`${regularTimeStr} ${formatDate(start)}`);
+            console.info("In regular")
             break;
         }
     }

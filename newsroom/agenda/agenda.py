@@ -333,14 +333,38 @@ def _set_event_date_range(search):
     if date_from and not date_to:
         # Filter from a particular date onwards
         should = [
-            {"range": {"dates.start": {"gte": date_from}}},
-            {"range": {"dates.end": {"gte": date_from}}},
+            {
+                "bool": {
+                    "must": {"range": {"dates.start": {"gte": date_from}}},
+                    "must_not": {"term": {"dates.all_day": True}},
+                },
+            },
+            {
+                "bool": {
+                    "must": [
+                        {"term": {"dates.all_day": True}},
+                        {"range": {"dates.start": {"gte": search.args["date_from"]}}},
+                    ],
+                },
+            },
         ]
     elif not date_from and date_to:
         # Filter up to a particular date
         should = [
-            {"range": {"dates.start": {"lte": date_to}}},
-            {"range": {"dates.end": {"lte": date_to}}},
+            {
+                "bool": {
+                    "must": {"range": {"dates.end": {"lte": date_to}}},
+                    "must_not": {"term": {"dates.all_day": True}},
+                },
+            },
+            {
+                "bool": {
+                    "must": [
+                        {"range": {"dates.end": {"lte": search.args["date_to"]}}},
+                        {"term": {"dates.all_day": True}},
+                    ],
+                },
+            },
         ]
     elif date_from and date_to:
         # Filter based on the date range provided
@@ -351,8 +375,19 @@ def _set_event_date_range(search):
                     "must": [
                         {"range": {"dates.start": {"gte": date_from}}},
                         {"range": {"dates.end": {"lte": date_to}}},
-                    ]
-                }
+                    ],
+                    "must_not": {"term": {"dates.all_day": True}},
+                },
+            },
+            {
+                # Both start/end dates are inside the range, all day version
+                "bool": {
+                    "must": [
+                        {"range": {"dates.start": {"gte": search.args["date_from"]}}},
+                        {"range": {"dates.end": {"lte": search.args["date_to"]}}},
+                        {"term": {"dates.all_day": True}},
+                    ],
+                },
             },
             {
                 # Starts before date_from and finishes after date_to
@@ -360,8 +395,19 @@ def _set_event_date_range(search):
                     "must": [
                         {"range": {"dates.start": {"lt": date_from}}},
                         {"range": {"dates.end": {"gt": date_to}}},
-                    ]
-                }
+                    ],
+                    "must_not": {"term": {"dates.all_day": True}},
+                },
+            },
+            {
+                # Starts before date_from and finishes after date_to, all day version
+                "bool": {
+                    "must": [
+                        {"range": {"dates.start": {"lt": search.args["date_from"]}}},
+                        {"range": {"dates.end": {"gt": search.args["date_to"]}}},
+                        {"term": {"dates.all_day": True}},
+                    ],
+                },
             },
             {
                 # Start date is within range OR End date is within range
@@ -370,8 +416,20 @@ def _set_event_date_range(search):
                         {"range": {"dates.start": {"gte": date_from, "lte": date_to}}},
                         {"range": {"dates.end": {"gte": date_from, "lte": date_to}}},
                     ],
+                    "must_not": {"term": {"dates.all_day": True}},
                     "minimum_should_match": 1,
-                }
+                },
+            },
+            {
+                # Start date is within range OR End date is within range, all day version
+                "bool": {
+                    "should": [
+                        {"range": {"dates.start": {"gte": search.args["date_from"], "lte": search.args["date_to"]}}},
+                        {"range": {"dates.end": {"gte": search.args["date_from"], "lte": search.args["date_to"]}}},
+                    ],
+                    "must": {"term": {"dates.all_day": True}},
+                    "minimum_should_match": 1,
+                },
             },
         ]
 

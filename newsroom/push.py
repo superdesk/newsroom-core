@@ -273,14 +273,7 @@ def publish_event(event, orig):
 def get_event_dates(event):
     event["dates"]["start"] = datetime.strptime(event["dates"]["start"], "%Y-%m-%dT%H:%M:%S+0000")
     event["dates"]["end"] = datetime.strptime(event["dates"]["end"], "%Y-%m-%dT%H:%M:%S+0000")
-
-    dates = {
-        "start": event["dates"]["start"],
-        "end": event["dates"]["end"],
-        "tz": event["dates"]["tz"],
-    }
-
-    return dates
+    return event["dates"]
 
 
 def publish_planning_item(planning, orig):
