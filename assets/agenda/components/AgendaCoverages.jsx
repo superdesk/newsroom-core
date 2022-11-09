@@ -40,11 +40,13 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                     <i className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} mr-2`}></i>
                     <span>{`${getCoverageDisplayName(coverage.coverage_type)}${getSlugline(coverage)}`}</span>
                 </span>
-                {coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED && <span className='d-flex text-nowrap'>
-                    <i className='icon-small--clock icon--gray-dark mr-1'></i>
-                    <span className='coverage-item__text-label mr-1'>{gettext('expected')}:</span>
-                    <span>{formatCoverageDate(coverage)}</span>
-                </span>}
+                {coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED && coverage.scheduled != null && (
+                    <span className='d-flex text-nowrap'>
+                        <i className='icon-small--clock icon--gray-dark mr-1'></i>
+                        <span className='coverage-item__text-label mr-1'>{gettext('expected')}:</span>
+                        <span>{formatCoverageDate(coverage)}</span>
+                    </span>
+                )}
             </div>
             {coverage.coverage_provider && <div className='coverage-item__row'>
                 <span className='coverage-item__text-label mr-1'>{gettext('Source')}:</span>

@@ -219,8 +219,14 @@ export function copyPreviewContents(item) {
                 contents.push(gettext('Description: {{ description }}', {description: pi.description_text}));
                 pi.coverages &&  pi.coverages.map(coverage => {
                     contents.push(gettext('Coverage type: {{ type }}', {type: coverage.planning.g2_content_type}));
-                    contents.push(gettext('Scheduled: {{ schedule }}', {schedule: getLocaleDate(coverage.planning.scheduled)}));
-                    contents.push(gettext('Status: {{ status }}', {status: coverage.workflow_status}));
+
+                    if (coverage.planning.scheduled != null) {
+                        contents.push(gettext('Scheduled: {{ schedule }}', {schedule: getLocaleDate(coverage.planning.scheduled)}));
+                    }
+                    if (coverage.workflow_status != null) {
+                        contents.push(gettext('Status: {{ status }}', {status: coverage.workflow_status}));
+                    }
+
                     coverage.planning.description_text && contents.push(gettext('Description: {{ description }}', {description: coverage.planning.description_text}));
                     contents.push('');
                 });
