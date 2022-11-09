@@ -428,7 +428,6 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
     if ((duration === 0 || scheduleType === SCHEDULE_TYPE.NO_DURATION) && !item.dates.all_day) {
         dateTimeString.push(formatDate(start));
         dateTimeString.push(isTBCItem ? regularTimeStr : formatTime(start));
-        console.info("IN 0")
     } else {
         switch(scheduleType) {
         case SCHEDULE_TYPE.MULTI_DAY:
@@ -443,17 +442,14 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
                     endDate: formatDatetime(end),
                 }));
             }
-            console.info("IN multi");
             break;
 
         case SCHEDULE_TYPE.ALL_DAY:
             dateTimeString.push(formatDate(start));
-            console.info("IN all day");
             break;
 
         case SCHEDULE_TYPE.REGULAR:
             dateTimeString.push(`${regularTimeStr} ${formatDate(start)}`);
-            console.info("In regular")
             break;
         }
     }
