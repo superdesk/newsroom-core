@@ -184,6 +184,7 @@ export default function agendaReducer(state = initialState, action) {
             ...state.agenda,
             activeDate: action.agendaData.bookmarks ? EARLIEST_DATE : action.activeDate || state.agenda.activeDate,
             eventsOnlyAccess: action.agendaData.events_only,
+            restrictCoverageInfo: action.agendaData.restrict_coverage_info,
             featuredOnly: action.featuredOnly,
         };
 

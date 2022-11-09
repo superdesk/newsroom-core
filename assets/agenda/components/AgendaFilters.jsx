@@ -23,14 +23,14 @@ export const transformFilterBuckets = (filter, aggregations, props) => {
 
 const renderFilter = {
     item_type: (props) => (
-        props.eventsOnlyAccess ? null : (
-            <AgendaItemTypeFilter
-                key="item_type"
-                activeFilter={props.activeFilter}
-                itemTypeFilter={props.itemTypeFilter}
-                toggleFilter={props.toggleFilter}
-            />
-        )
+        <AgendaItemTypeFilter
+            key="item_type"
+            activeFilter={props.activeFilter}
+            itemTypeFilter={props.itemTypeFilter}
+            toggleFilter={props.toggleFilter}
+            eventsOnlyAccess={props.eventsOnlyAccess}
+            restrictCoverageInfo={props.restrictCoverageInfo}
+        />
     ),
     calendar: (props) => (
         <AgendaCalendarAgendaFilter
@@ -139,6 +139,7 @@ AgendaFiltersComponent.propTypes = {
     toggleFilter: PropTypes.func,
     activeFilter: PropTypes.object,
     eventsOnlyAccess: PropTypes.bool,
+    restrictCoverageInfo: PropTypes.bool,
     itemTypeFilter: PropTypes.string,
     locators: PropTypes.arrayOf(PropTypes.object),
     filtersConfig: PropTypes.arrayOf(PropTypes.string),

@@ -220,6 +220,7 @@ class AgendaApp extends BaseApp {
                                     toggleFilter={this.props.toggleDropdownFilter}
                                     activeFilter={this.props.activeFilter}
                                     eventsOnlyAccess={this.props.eventsOnlyAccess}
+                                    restrictCoverageInfo={this.props.restrictCoverageInfo}
                                     itemTypeFilter={this.props.itemTypeFilter}
                                     locators={this.props.locators}
                                 />
@@ -322,6 +323,7 @@ AgendaApp.propTypes = {
     userSections: PropTypes.object,
     context: PropTypes.string,
     eventsOnlyAccess: PropTypes.bool,
+    restrictCoverageInfo: PropTypes.bool,
     itemTypeFilter: PropTypes.string,
     locators: PropTypes.array,
     wireItems: PropTypes.array,
@@ -358,6 +360,7 @@ const mapStateToProps = (state) => ({
     activeDate: get(state, 'agenda.activeDate'),
     activeGrouping: get(state, 'agenda.activeGrouping'),
     eventsOnlyAccess: get(state, 'agenda.eventsOnlyAccess', false),
+    restrictCoverageInfo: get(state, 'agenda.restrictCoverageInfo', false),
     itemTypeFilter: get(state, 'agenda.itemType'),
     detail: get(state, 'detail', false),
     savedItemsCount: state.savedItemsCount,

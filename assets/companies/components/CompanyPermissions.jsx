@@ -34,8 +34,9 @@ class CompanyPermissions extends React.Component {
 
         const archive_access = !!this.props.company.archive_access;
         const events_only = !!this.props.company.events_only;
+        const restrict_coverage_info = !!this.props.company.restrict_coverage_info;
 
-        return {sections, products, archive_access, events_only};
+        return {sections, products, archive_access, events_only, restrict_coverage_info};
     }
 
     componentDidUpdate(prevProps) {
@@ -75,6 +76,12 @@ class CompanyPermissions extends React.Component {
                                         label={gettext('Events Only Access')}
                                         value={!!this.state.events_only}
                                         onChange={() => this.setState({events_only: !this.state.events_only})}
+                                    />
+                                    <CheckboxInput
+                                        name="restrict_coverage_info"
+                                        label={gettext('Restrict Coverage Info')}
+                                        value={!!this.state.restrict_coverage_info}
+                                        onChange={() => this.setState({restrict_coverage_info: !this.state.restrict_coverage_info})}
                                     />
                                 </li>
                             </ul>
@@ -133,6 +140,7 @@ CompanyPermissions.propTypes = {
         sections: PropTypes.object,
         archive_access: PropTypes.bool,
         events_only: PropTypes.bool,
+        restrict_coverage_info: PropTypes.bool,
     }).isRequired,
 
     sections: PropTypes.arrayOf(PropTypes.shape({
