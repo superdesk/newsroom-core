@@ -1,3 +1,4 @@
+import {get} from 'lodash';
 import {notify, gettext} from './utils';
 
 const DEFAULT_WS_URL = 'ws://localhost:5150';
@@ -10,11 +11,19 @@ const listeners = [];
 
 function connectToNotificationServer() {
     if (wsConnection == null || wsConnection.readyState === WebSocket.CLOSED) {
-        wsConnection = new WebSocket(
-            window.newsroom && window.newsroom.websocket ?
-                window.newsroom.websocket :
-                DEFAULT_WS_URL
-        );
+        const baseURL = window.newsroom && window.newsroom.websocket ?
+            window.newsroom.websocket :
+            DEFAULT_WS_URL;
+        const wsURL = new URL(`${baseURL}/subscribe`);
+
+        if (get(window, 'profileData.user._id')) {
+            wsURL.searchParams.append('user', window.profileData.user._id);
+        }
+        if (get(window, 'profileData.company') && window.profileData.company !== 'None') {
+            wsURL.searchParams.append('company', window.profileData.company);
+        }
+
+        wsConnection = new WebSocket(wsURL.href);
         wsConnection.onerror = onWebsocketError;
         wsConnection.onopen = onWebsocketOpen;
         wsConnection.onclose = onWebsocketClose;

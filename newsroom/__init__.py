@@ -34,6 +34,10 @@ class Resource(superdesk.Resource):
     mongo_indexes: MongoIndexes = {}
     SUPPORTED_NESTED_SEARCH_FIELDS: List[str] = []
 
+    # Disable resource websocket notifications
+    # as we aren't using them in Newshub
+    notifications = False
+
 
 class Service(superdesk.Service):
     pass
