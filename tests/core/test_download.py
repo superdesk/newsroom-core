@@ -61,7 +61,7 @@ def newsmlg2_content_test(content):
 def text_agenda_content_test(content):
     content = content.decode("utf-8").split("\n")
     assert "Conference Planning" in content[0]
-    assert "Slugline:Prime Conference" in content[1]
+    assert "Slugline: Prime Conference" in content[1]
     assert "<p>" not in content
 
 
