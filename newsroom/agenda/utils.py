@@ -1,4 +1,4 @@
-from typing import Dict, NamedTuple, Any, Literal
+from typing import Dict, NamedTuple, Any, Literal, Tuple, Set
 from datetime import timedelta
 
 from flask import current_app as app
@@ -8,6 +8,8 @@ from superdesk.metadata.item import CONTENT_STATE
 
 from newsroom.template_filters import time_short, parse_date, format_datetime
 from newsroom.gettext import get_session_locale
+from newsroom.utils import query_resource
+from newsroom.notifications import push_notification
 
 DAY_IN_MINUTES = 24 * 60 - 1
 TO_BE_CONFIRMED_FIELD = "_time_to_be_confirmed"
@@ -154,7 +156,7 @@ def get_coverage_email_text(coverage, default_state="", language=None):
     status = default_state or get_coverage_status_text(coverage)
     slugline = coverage.get("slugline") or coverage.get("planning", {}).get("slugline", "")
 
-    return "{} coverage '{}' {}".format(content_type, slugline, status)
+    return content_type if status is None else "{} coverage '{}' {}".format(content_type, slugline, status)
 
 
 def remove_fields_for_public_user(item):
@@ -185,3 +187,97 @@ def get_item_type(item: Dict[str, Any]) -> Literal["event", "planning"]:
         return "event"
     else:
         return "planning"
+
+
+def coverage_is_completed(coverage: Dict[str, Any]) -> bool:
+    return coverage.get("workflow_status") == ASSIGNMENT_WORKFLOW_STATE.COMPLETED
+
+
+def remove_restricted_coverage_info(items):
+    keys_to_copy = (
+        "coverage_id",
+        "coverage_type",
+        "planning_id",
+        "watches",
+        "planning",
+        "delivery_id",
+        "delivery_href",
+        "deliveries",
+    )
+
+    for item in items:
+        item["coverages"] = [
+            coverage
+            if coverage_is_completed(coverage)
+            else {key: val for key, val in coverage.items() if key in keys_to_copy}
+            for coverage in item.get("coverages") or []
+        ]
+
+        for plan in item.get("planning_items") or []:
+            plan["coverages"] = [
+                coverage
+                if coverage_is_completed(coverage)
+                else {key: val for key, val in coverage.items() if key in keys_to_copy}
+                for coverage in plan.get("coverages") or []
+            ]
+            for coverage in plan["coverages"]:
+                if not coverage_is_completed(coverage):
+                    coverage["planning"] = {"g2_content_type": coverage["planning"]["g2_content_type"]}
+
+    return items
+
+
+def get_restricted_companies_tuple() -> Tuple[Set[str], Set[str]]:
+    restricted_companies = set()
+    unrestricted_companies = set()
+    for company in query_resource("companies"):
+        if company.get("restrict_coverage_info"):
+            restricted_companies.add(company.get("_id"))
+        else:
+            unrestricted_companies.add(company.get("_id"))
+
+    # Make sure to send notifications for admins without a company
+    unrestricted_companies.add("None")
+
+    return restricted_companies, unrestricted_companies
+
+
+def push_agenda_items_notification(name, items, **kwargs):
+    restricted_companies, unrestricted_companies = get_restricted_companies_tuple()
+
+    if not len(restricted_companies):
+        push_notification(name, _items=items, **kwargs)
+    else:
+        push_notification(
+            name,
+            {"exclude": {"company": list(restricted_companies)}},
+            _items=items,
+            **kwargs,
+        )
+        push_notification(
+            name,
+            filters={"include": {"company": list(restricted_companies)}},
+            _items=remove_restricted_coverage_info(items),
+            **kwargs,
+        )
+
+
+def push_agenda_item_notification(name, item, **kwargs):
+    restricted_companies, unrestricted_companies = get_restricted_companies_tuple()
+
+    if not len(restricted_companies):
+        push_notification(name, item=item, **kwargs)
+    else:
+        push_notification(
+            name,
+            filters={"exclude": {"company": list(restricted_companies)}},
+            item=item,
+            **kwargs,
+        )
+        remove_restricted_coverage_info([item])
+        push_notification(
+            name,
+            filters={"include": {"company": list(restricted_companies)}},
+            item=item,
+            **kwargs,
+        )
