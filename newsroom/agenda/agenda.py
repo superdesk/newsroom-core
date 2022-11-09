@@ -1088,41 +1088,68 @@ class AgendaService(BaseSearchService):
         }
 
         agenda_items = self.get_items_by_query(query)
+        agenda_updated_notification_sent = False
+
+        def update_coverage_details(coverage):
+            coverage["delivery_id"] = wire_item["guid"]
+            coverage["delivery_href"] = url_for_wire(
+                None,
+                _external=False,
+                section="wire.item",
+                _id=wire_item["guid"],
+            )
+            coverage["workflow_status"] = ASSIGNMENT_WORKFLOW_STATE.COMPLETED
+            deliveries = coverage.get("deliveries") or []
+            d = next(
+                (d for d in deliveries if d.get("delivery_id") == wire_item["guid"]),
+                None,
+            )
+            if d and d.get("delivery_state") != "published":
+                d["delivery_state"] = "published"
+                d["publish_time"] = parse_date_str(wire_item.get("publish_schedule") or wire_item.get("firstpublished"))
+            return d
+
         for item in agenda_items:
             self.enhance_coverage_watches(item)
-            coverages = item["coverages"]
-            for coverage in coverages:
-                if coverage["coverage_id"] == wire_item["coverage_id"] and is_delivery_validated(coverage, item):
-                    coverage["delivery_id"] = wire_item["guid"]
-                    coverage["delivery_href"] = url_for_wire(
-                        None,
-                        _external=False,
-                        section="wire.item",
-                        _id=wire_item["guid"],
-                    )
-                    coverage["workflow_status"] = ASSIGNMENT_WORKFLOW_STATE.COMPLETED
-                    deliveries = coverage["deliveries"]
-                    d = next(
-                        (d for d in deliveries if d.get("delivery_id") == wire_item["guid"]),
-                        None,
-                    )
-                    if d and d.get("delivery_state") != "published":
-                        d["delivery_state"] = "published"
-                        d["publish_time"] = parse_date_str(
-                            wire_item.get("publish_schedule") or wire_item.get("firstpublished")
-                        )
 
-                    self.system_update(item["_id"], {"coverages": coverages}, item)
-                    updated_agenda = get_entity_or_404(item.get("_id"), "agenda")
+            parent_coverage = next(
+                (c for c in item.get("coverages") or [] if c["coverage_id"] == wire_item["coverage_id"]), None
+            )
+            if not parent_coverage or not is_delivery_validated(parent_coverage, item):
+                continue
 
-                    # Notify agenda to update itself with new details of coverage
-                    self.enhance_coverage_with_wire_details(coverage, wire_item)
-                    push_notification("new_item", _items=[item])
+            delivery = update_coverage_details(parent_coverage)
+            planning_item = next(
+                (p for p in item.get("planning_items") or [] if p["_id"] == parent_coverage["planning_id"]), None
+            )
+            planning_updated = False
+            if planning_item:
+                coverage = next(
+                    (c for c in planning_item.get("coverages") or [] if c["coverage_id"] == wire_item["coverage_id"]),
+                    None,
+                )
+                if coverage:
+                    planning_updated = True
+                    update_coverage_details(coverage)
 
-                    # If published first time, coverage completion will trigger email - not needed now
-                    if (d or {}).get("sequence_no", 0) > 0:
-                        self.notify_agenda_update(updated_agenda, updated_agenda, None, True, None, coverage)
-                    break
+            if not planning_updated:
+                self.system_update(item["_id"], {"coverages": item["coverages"]}, item)
+            else:
+                updates = {
+                    "coverages": item["coverages"],
+                    "planning_items": item["planning_items"],
+                }
+                self.system_update(item["_id"], updates, item)
+
+            updated_agenda = get_entity_or_404(item.get("_id"), "agenda")
+            # Notify agenda to update itself with new details of coverage
+            self.enhance_coverage_with_wire_details(parent_coverage, wire_item)
+            push_notification("new_item", _items=[item])
+
+            # If published first time, coverage completion will trigger email - not needed now
+            if (delivery or {}).get("sequence_no", 0) > 0 and not agenda_updated_notification_sent:
+                agenda_updated_notification_sent = True
+                self.notify_agenda_update(updated_agenda, updated_agenda, None, True, None, parent_coverage)
         return agenda_items
 
     def get_matching_topics(self, item_id, topics, users, companies):
