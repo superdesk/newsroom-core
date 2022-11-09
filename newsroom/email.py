@@ -304,7 +304,17 @@ def _send_new_wire_notification_email(user, topic_name, item, section):
     )
 
 
+def _remove_restricted_coverage_info(user, item):
+    # Import here to prevent circular imports
+    from newsroom.companies.utils import get_user_company, restrict_coverage_info
+    from newsroom.agenda.utils import remove_restricted_coverage_info
+
+    if restrict_coverage_info(get_user_company(user)):
+        remove_restricted_coverage_info([item])
+
+
 def _send_new_agenda_notification_email(user, topic_name, item):
+    _remove_restricted_coverage_info(user, item)
     url = url_for_agenda(item, _external=True)
     recipients = [user["email"]]
     template_kwargs = dict(
@@ -357,6 +367,7 @@ def _send_history_match_wire_notification_email(user, item, section):
 
 
 def _send_history_match_agenda_notification_email(user, item):
+    _remove_restricted_coverage_info(user, item)
     app_name = current_app.config["SITE_NAME"]
     url = url_for_agenda(item, _external=True)
     recipients = [user["email"]]

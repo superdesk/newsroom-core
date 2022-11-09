@@ -441,12 +441,19 @@ def get_items_for_user_action(_ids, item_type):
     # even those which are not a part of ItemsResource(content_api) schema.
     items = get_entities_elastic_or_mongo_or_404(_ids, item_type)
 
-    if not items or items[0].get("type") != "text":
+    if not items:
         return items
+    elif items[0].get("type") == "text":
+        for item in items:
+            if item.get("slugline") and item.get("anpa_take_key"):
+                item["slugline"] = "{0} | {1}".format(item["slugline"], item["anpa_take_key"])
+    elif items[0].get("type") == "agenda":
+        # Import here to prevent circular imports
+        from newsroom.companies.utils import restrict_coverage_info
+        from newsroom.agenda.utils import remove_restricted_coverage_info
 
-    for item in items:
-        if item.get("slugline") and item.get("anpa_take_key"):
-            item["slugline"] = "{0} | {1}".format(item["slugline"], item["anpa_take_key"])
+        if restrict_coverage_info():
+            remove_restricted_coverage_info(items)
 
     return items
 

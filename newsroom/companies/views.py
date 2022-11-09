@@ -168,7 +168,9 @@ def update_products(updates, company_id):
 
 
 def update_company(data, _id):
-    updates = {k: v for k, v in data.items() if k in ("sections", "archive_access", "events_only")}
+    updates = {
+        k: v for k, v in data.items() if k in ("sections", "archive_access", "events_only", "restrict_coverage_info")
+    }
     get_resource_service("companies").patch(_id, updates=updates)
 
 

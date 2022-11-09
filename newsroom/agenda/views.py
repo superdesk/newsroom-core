@@ -28,8 +28,9 @@ from newsroom.utils import (
 from newsroom.wire.utils import update_action_list
 from newsroom.wire.views import set_item_permission
 from newsroom.agenda.email import send_coverage_request_email
-from newsroom.agenda.utils import remove_fields_for_public_user
+from newsroom.agenda.utils import remove_fields_for_public_user, remove_restricted_coverage_info
 from newsroom.companies import section, get_user_company
+from newsroom.companies.utils import restrict_coverage_info
 from newsroom.notifications import push_user_notification
 from newsroom.search_config import merge_planning_aggs
 
@@ -69,6 +70,9 @@ def item(_id):
         item.pop("planning_items", None)
         item.pop("coverages", None)
 
+    if restrict_coverage_info():
+        remove_restricted_coverage_info([item])
+
     if is_json_request(flask.request):
         return flask.jsonify(item)
 
@@ -99,8 +103,11 @@ def item(_id):
 @login_required
 def search():
     response = get_internal("agenda")
-    if len(response) and response[0].get("_aggregations"):
-        merge_planning_aggs(response[0]["_aggregations"])
+    if len(response):
+        if restrict_coverage_info():
+            remove_restricted_coverage_info(response[0].get("_items") or [])
+        if response[0].get("_aggregations"):
+            merge_planning_aggs(response[0]["_aggregations"])
     return send_response("agenda", response)
 
 
@@ -124,6 +131,7 @@ def get_view_data():
         ),
         "saved_items": get_resource_service("agenda").get_saved_items_count(),
         "events_only": company.get("events_only", False),
+        "restrict_coverage_info": company.get("restrict_coverage_info", False),
         "locators": get_vocabulary("locators"),
         "ui_config": get_resource_service("ui_config").get_section_config("agenda"),
         "groups": app.config.get("AGENDA_GROUPS", []),

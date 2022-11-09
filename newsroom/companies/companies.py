@@ -32,6 +32,10 @@ class CompaniesResource(newsroom.Resource):
             "type": "boolean",
             "default": False,
         },
+        "restrict_coverage_info": {
+            "type": "boolean",
+            "default": False,
+        },
         "company_type": {
             "type": "string",
             "nullable": True,
