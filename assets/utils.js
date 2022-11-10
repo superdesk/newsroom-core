@@ -14,7 +14,6 @@ import {
     isCoverageForExtraDay,
     SCHEDULE_TYPE,
     isItemTBC,
-    TO_BE_CONFIRMED_TEXT
 } from './agenda/utils';
 export {initWebSocket} from './websocket';
 
@@ -424,7 +423,6 @@ export function formatAgendaDate(item, group, {localTimeZone = true, onlyDates =
         return gettext('{{startDate}} to {{endDate}} (Time to be confirmed)', {
             startDate,
             endDate,
-            timeToBeConfirmed: TO_BE_CONFIRMED_TEXT,
         });
 
     case isTBCItem:
