@@ -19,7 +19,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-09-01 10:11+0200\n"
+"POT-Creation-Date: 2022-09-20 10:56+0200\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
 "Last-Translator: Petr Jašek <petr.jasek@sourcefabric.org>, 2022\n"
 "Language-Team: French (Canada) (https://www.transifex.com/sourcefabric/teams/6584/fr_CA/)\n"
@@ -30,11 +30,11 @@ msgstr ""
 "Language: fr_CA\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
-#: newsroom/email.py:391
+#: newsroom/email.py:397
 msgid "Kill/Takedown notice"
 msgstr "Avis de supression"
 
-#: newsroom/email.py:400
+#: newsroom/email.py:406
 msgid "Agenda cancelled notice"
 msgstr "Avis d'annulation d'événement"
 
@@ -828,7 +828,7 @@ msgstr "Contacter"
 msgid "Web"
 msgstr "Web"
 
-#: assets/agenda/components/AgendaEdNote.jsx:15
+#: assets/agenda/components/AgendaEdNote.jsx:16
 #: newsroom/templates/agenda_item_print.html:59
 msgid "Editorial Note"
 msgstr "Note de la rédaction"
@@ -1614,9 +1614,17 @@ msgstr "M"
 msgid "Coverages"
 msgstr "Couvertures"
 
-#: assets/agenda/components/AgendaEdNote.jsx:15
+#: assets/agenda/components/AgendaEdNote.jsx:16
 msgid "Reason"
 msgstr "Raison"
+
+#: assets/agenda/components/AgendaEdNote.jsx:33
+msgid "Event Postponed: {{reason}}"
+msgstr "Événement reporté: {{reason}}"
+
+#: assets/agenda/components/AgendaEdNote.jsx:35
+msgid "Event Rescheduled: {{reason}}"
+msgstr "Événement reprogrammé: {{reason}}"
 
 #: assets/agenda/components/AgendaEventsOnlyFilter.jsx:7
 msgid "Show Events Only"
@@ -2257,11 +2265,11 @@ msgstr "Système"
 
 #: assets/components/AuditInformation.jsx:39
 msgid "Created by {{author}} at {{date}}"
-msgstr "Créé par {{author}} le {{date}}"
+msgstr "Créé par {{author}} à {{date}}"
 
 #: assets/components/AuditInformation.jsx:53
 msgid "Updated by {{author}} at {{date}}"
-msgstr "Mis à jour par {{author}} le {{date}}"
+msgstr "Mis à jour par {{author}} à {{date}}"
 
 #: assets/components/CardEditor.jsx:102
 #: assets/search/components/FollowedTopics.jsx:45
@@ -3479,7 +3487,7 @@ msgstr ""
 
 #: assets/wire/components/fields/PreviousVersions.jsx:18
 msgid "{{ count }} previous versions"
-msgstr "{{ count }} versions précédentes"
+msgstr "{{ count }} version(s) précédente(s)"
 
 #: assets/wire/components/fields/VersionType.jsx:7
 msgid "Version type: {{version}}"
