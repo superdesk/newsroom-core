@@ -61,8 +61,8 @@ export function getCoverageStatusText(coverage) {
     return get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '');
 }
 
-export const TO_BE_CONFIRMED_FIELD = '_time_to_be_confirmed';
-export const TO_BE_CONFIRMED_TEXT = gettext('Time to be confirmed');
+const TO_BE_CONFIRMED_FIELD = '_time_to_be_confirmed';
+const TO_BE_CONFIRMED_TEXT = gettext('Time to be confirmed');
 export const WORKFLOW_STATUS = {
     DRAFT: 'draft',
     ASSIGNED: 'assigned',

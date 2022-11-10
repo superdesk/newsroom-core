@@ -1,91 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 import classNames from 'classnames';
 
-import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
 import {bem} from 'ui/utils';
-import {formatTime, formatDate, DATE_FORMAT, gettext, getScheduleType, formatDatetime} from 'utils';
-import {hasCoverages, isCoverageForExtraDay, SCHEDULE_TYPE, isItemTBC, TO_BE_CONFIRMED_TEXT} from '../utils';
+import {hasCoverages} from '../utils';
+import {formatAgendaDate} from 'utils';
+
+import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
 
 function format(item, group, onlyDates) {
-    let start = moment(item.dates.start);
-    let end = moment(item.dates.end);
-    let duration = end.diff(start, 'minutes');
-    let groupDate = moment(group, DATE_FORMAT);
-
-    const isGroupBetweenEventDates = start.isSameOrBefore(groupDate, 'day') && end.isSameOrAfter(groupDate, 'day');
-    const isTBCItem = isItemTBC(item);
-    const tbcStr = ` (${TO_BE_CONFIRMED_TEXT})`;
-
-    function timeElement(start, end, key) {
-        let value = end ? `${formatTime(start)} - ${formatTime(end)}` : formatTime(start);
-        if (onlyDates) {
-            return (<span className="mr-2 border-right pr-2" key={key}>{value}</span>);
-        }
-
-        return (<span className="time-text mr-2" key={key}>{value}</span>);
-    }
-
-    function dateElement(date) {
-        return (<span key='date'>{formatDate(date)}</span>);
-    }
-
-    if (!isGroupBetweenEventDates && hasCoverages(item)) {
-        // we rendering for extra days
-        const scheduleDates = (item.coverages || [])
-            .map((coverage) => {
-                if (isCoverageForExtraDay(coverage, group)) {
-                    return coverage.scheduled;
-                }
-                return null;
-            })
-            .filter((d) => d)
-            .sort((a, b) => {
-                if (a < b) return -1;
-                if (a > b) return 1;
-                return 0;
-            })
-        ;
-        if (scheduleDates.length > 0) {
-            duration = 0;
-            start = moment(scheduleDates[0]);
-        }
-    }
-
-    const scheduleType = getScheduleType(item);
-
-    if (duration === 0 || scheduleType === SCHEDULE_TYPE.NO_DURATION) {
-        return isTBCItem ? ([dateElement(start), tbcStr]) :
-            ([timeElement(start, null, 'start'), dateElement(start)]);
-    } else {
-        switch(scheduleType) {
-        case SCHEDULE_TYPE.MULTI_DAY:
-            return isTBCItem ? ([
-                <span key="date">
-                    {gettext('{{startDate}} to {{endDate}}', {
-                        startDate: formatDate(start) + tbcStr,
-                        endDate: formatDate(end) + tbcStr,
-                    })}
-                </span>,
-            ]) :
-                ([
-                    <span key="date">
-                        {gettext('{{startDate}} to {{endDate}}', {
-                            startDate: formatDatetime(start),
-                            endDate: formatDatetime(end),
-                        })}
-                    </span>,
-                ]);
-
-        case SCHEDULE_TYPE.ALL_DAY:
-            return dateElement(start);
-
-        case SCHEDULE_TYPE.REGULAR:
-            return isTBCItem ?  ([dateElement(start), tbcStr])
-                : ([timeElement(start, end, 'times'), dateElement(start)]);
-        }
-    }
+    return (
+        <span key="date">
+            {formatAgendaDate(item, group, {onlyDates})}
+        </span>
+    );
 }
 
 function getCalendarClass(item) {
