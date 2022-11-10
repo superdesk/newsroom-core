@@ -21,10 +21,12 @@ export default function AgendaEdNote({item, plan, secondaryNoteField, noMargin})
         // which are always in english
         const POSTPONED = 0;
         const RESCHEDULED = 1;
+        const CANCELLED = 2;
         const prefixes = [];
 
         prefixes[POSTPONED] = 'Event Postponed: ';
         prefixes[RESCHEDULED] = 'Event Rescheduled: ';
+        prefixes[CANCELLED] = 'Event Cancelled: ';
 
         return prefixes.reduce((_text, prefix, index) => {
             if (_text.startsWith(prefix)) {
@@ -35,6 +37,8 @@ export default function AgendaEdNote({item, plan, secondaryNoteField, noMargin})
                     return gettext('Event Postponed: {{reason}}', {reason});
                 case RESCHEDULED:
                     return gettext('Event Rescheduled: {{reason}}', {reason});
+                case CANCELLED:
+                    return gettext('Event Cancelled: {{reason}}', {reason});
                 }
             }
 
