@@ -35,7 +35,6 @@ from newsroom.signals import publish_item as publish_item_signal
 from newsroom.agenda.utils import (
     get_latest_available_delivery,
     TO_BE_CONFIRMED_FIELD,
-    push_agenda_items_notification,
     push_agenda_item_notification,
 )
 
@@ -700,9 +699,9 @@ def notify_new_item(item, check_topics=True):
         company_ids = [c["_id"] for c in company_dict.values()]
 
         if item_type == "agenda":
-            push_agenda_items_notification("new_item", [item])
+            push_agenda_item_notification("new_item", item=item)
         else:
-            push_notification("new_item", _items=[item])
+            push_notification("new_item", item=item)
 
         if check_topics:
             if item_type == "text":

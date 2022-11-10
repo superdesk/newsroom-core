@@ -27,7 +27,6 @@ from newsroom.agenda.email import (
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
 from newsroom.notifications import (
-    push_notification,
     save_user_notifications,
     UserNotification,
 )
@@ -43,7 +42,7 @@ from datetime import datetime
 from newsroom.wire import url_for_wire
 from newsroom.search import BaseSearchService, SearchQuery, query_string
 from newsroom.search_config import is_search_field_nested
-from .utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD
+from .utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD, push_agenda_item_notification
 
 
 logger = logging.getLogger(__name__)
@@ -1144,7 +1143,7 @@ class AgendaService(BaseSearchService):
             updated_agenda = get_entity_or_404(item.get("_id"), "agenda")
             # Notify agenda to update itself with new details of coverage
             self.enhance_coverage_with_wire_details(parent_coverage, wire_item)
-            push_notification("new_item", _items=[item])
+            push_agenda_item_notification("new_item", item=item)
 
             # If published first time, coverage completion will trigger email - not needed now
             if (delivery or {}).get("sequence_no", 0) > 0 and not agenda_updated_notification_sent:

@@ -31,7 +31,7 @@ import {
 import {
     SET_QUERY,
     ADD_TOPIC,
-    SET_NEW_ITEMS_BY_TOPIC,
+    SET_NEW_ITEM_BY_TOPIC,
 } from 'search/actions';
 
 import {getMaxVersion} from 'local-store';
@@ -303,7 +303,7 @@ export function defaultReducer(state={}, action) {
         };
     }
 
-    case SET_NEW_ITEMS_BY_TOPIC: {
+    case SET_NEW_ITEM_BY_TOPIC: {
         const newItemsByTopic = Object.assign({}, state.newItemsByTopic);
         action.data.topics.map((topic) => {
             const previous = newItemsByTopic[topic] || [];

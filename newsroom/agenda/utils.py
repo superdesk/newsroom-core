@@ -1,4 +1,4 @@
-from typing import Dict, NamedTuple, Any, Literal, Tuple, Set
+from typing import Dict, NamedTuple, Any, Literal
 from datetime import timedelta
 
 from flask import current_app as app
@@ -227,57 +227,24 @@ def remove_restricted_coverage_info(items):
     return items
 
 
-def get_restricted_companies_tuple() -> Tuple[Set[str], Set[str]]:
-    restricted_companies = set()
-    unrestricted_companies = set()
-    for company in query_resource("companies"):
-        if company.get("restrict_coverage_info"):
-            restricted_companies.add(company.get("_id"))
-        else:
-            unrestricted_companies.add(company.get("_id"))
-
-    # Make sure to send notifications for admins without a company
-    unrestricted_companies.add("None")
-
-    return restricted_companies, unrestricted_companies
-
-
-def push_agenda_items_notification(name, items, **kwargs):
-    restricted_companies, unrestricted_companies = get_restricted_companies_tuple()
-
-    if not len(restricted_companies):
-        push_notification(name, _items=items, **kwargs)
-    else:
-        push_notification(
-            name,
-            {"exclude": {"company": list(restricted_companies)}},
-            _items=items,
-            **kwargs,
-        )
-        push_notification(
-            name,
-            filters={"include": {"company": list(restricted_companies)}},
-            _items=remove_restricted_coverage_info(items),
-            **kwargs,
-        )
-
-
 def push_agenda_item_notification(name, item, **kwargs):
-    restricted_companies, unrestricted_companies = get_restricted_companies_tuple()
+    restricted_companies = [
+        item["_id"] for item in query_resource("companies", lookup={"restrict_coverage_info": True})
+    ]
 
     if not len(restricted_companies):
         push_notification(name, item=item, **kwargs)
     else:
         push_notification(
             name,
-            filters={"exclude": {"company": list(restricted_companies)}},
+            filters={"exclude": {"company": restricted_companies}},
             item=item,
             **kwargs,
         )
         remove_restricted_coverage_info([item])
         push_notification(
             name,
-            filters={"include": {"company": list(restricted_companies)}},
+            filters={"include": {"company": restricted_companies}},
             item=item,
             **kwargs,
         )

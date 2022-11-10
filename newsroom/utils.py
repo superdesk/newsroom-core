@@ -3,14 +3,15 @@ import pytz
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from uuid import uuid4
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
+from pymongo.cursor import Cursor as MongoCursor
 
 import superdesk
 from superdesk.utc import utcnow
 from superdesk.json_utils import try_cast
 from bson import ObjectId
 from eve.utils import config, parse_request
-from eve_elastic.elastic import parse_date
+from eve_elastic.elastic import parse_date, ElasticCursor
 from flask import current_app as app, json, abort, request, g, flash, session, url_for
 from flask_babel import gettext
 
@@ -32,7 +33,7 @@ def get_user_id():
     return _get_user_id()
 
 
-def query_resource(resource, lookup=None, max_results=0, projection=None):
+def query_resource(resource, lookup=None, max_results=0, projection=None) -> Union[ElasticCursor, MongoCursor]:
     req = parse_request(resource)
     req.max_results = max_results
     req.projection = json.dumps(projection) if projection else None

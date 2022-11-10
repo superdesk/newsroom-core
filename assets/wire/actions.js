@@ -24,7 +24,7 @@ import {renderModal, closeModal, setSavedItemsCount} from 'actions';
 
 import {
     initParams as initSearchParams,
-    setNewItemsByTopic,
+    setNewItemByTopic,
     loadMyTopics,
     setTopics,
     loadMyTopic,
@@ -460,7 +460,7 @@ export function pushNotification(push) {
 
         switch (push.event) {
         case 'topic_matches':
-            return dispatch(setNewItemsByTopic(push.extra));
+            return dispatch(setNewItemByTopic(push.extra));
 
         case 'new_item':
             return dispatch(setNewItems(push.extra));
