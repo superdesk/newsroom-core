@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {hasLocation, hasLocationNotes, getEventLinks, getLocationString, getPublicContacts,
     getCalendars} from 'agenda/utils';
 
+const url = (link) => link.startsWith('http') ? link : 'https://' + link;
 
 function AgendaPreviewMeta({item}) {
     return (
@@ -28,7 +29,7 @@ function AgendaPreviewMeta({item}) {
                 </div>)}
                 {getEventLinks(item).map((link) => <div className='wire-articles__item__meta-row' key={link}>
                     <i className='icon-small--globe icon--gray-dark'></i>
-                    <span><a href={link} target="_blank">{link}</a></span>
+                    <span><a href={url(link)} target="_blank">{link}</a></span>
                 </div>)}
                 {getCalendars(item) && <div className='wire-articles__item__meta-row'>
                     <i className='icon-small--calendar icon--gray-dark'></i>
