@@ -50,7 +50,9 @@ class AgendaListCoverageItem extends React.Component {
         const props = this.props;
         const state = this.state;
 
-        return (!props.group ||
+        return (
+            !props.group ||
+            props.coverage.scheduled == null ||
             (state.isCoverageForExtraDay && props.coverage.planning_id === get(props, 'planningItem.guid'))
         ) && (
             <span

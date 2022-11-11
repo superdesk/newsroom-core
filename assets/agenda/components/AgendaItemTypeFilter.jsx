@@ -3,7 +3,11 @@ import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 import AgendaFilterButton from './AgendaFilterButton';
 
-function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter}) {
+function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter, eventsOnlyAccess, restrictCoverageInfo}) {
+    if (eventsOnlyAccess) {
+        return null;
+    }
+
     const activeFilter = itemTypeFilter == null ? {} : {
         itemType: [
             itemTypeFilter === 'events' ?
@@ -39,13 +43,15 @@ function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter}) {
                 >
                     {gettext('Events Only')}
                 </button>
-                <button
-                    key="planning_only"
-                    className="dropdown-item"
-                    onClick={() => toggleFilter(filter.field, 'planning')}
-                >
-                    {gettext('Planning Only')}
-                </button>
+                {restrictCoverageInfo ? null : (
+                    <button
+                        key="planning_only"
+                        className="dropdown-item"
+                        onClick={() => toggleFilter(filter.field, 'planning')}
+                    >
+                        {gettext('Planning Only')}
+                    </button>
+                )}
             </div>
         </div>
     );
@@ -54,6 +60,8 @@ function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter}) {
 AgendaItemTypeFilter.propTypes = {
     toggleFilter: PropTypes.func,
     itemTypeFilter: PropTypes.string,
+    eventsOnlyAccess: PropTypes.bool,
+    restrictCoverageInfo: PropTypes.bool,
 };
 
 

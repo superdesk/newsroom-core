@@ -3,14 +3,15 @@ import pytz
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from uuid import uuid4
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
+from pymongo.cursor import Cursor as MongoCursor
 
 import superdesk
 from superdesk.utc import utcnow
 from superdesk.json_utils import try_cast
 from bson import ObjectId
 from eve.utils import config, parse_request
-from eve_elastic.elastic import parse_date
+from eve_elastic.elastic import parse_date, ElasticCursor
 from flask import current_app as app, json, abort, request, g, flash, session, url_for
 from flask_babel import gettext
 
@@ -32,7 +33,7 @@ def get_user_id():
     return _get_user_id()
 
 
-def query_resource(resource, lookup=None, max_results=0, projection=None):
+def query_resource(resource, lookup=None, max_results=0, projection=None) -> Union[ElasticCursor, MongoCursor]:
     req = parse_request(resource)
     req.max_results = max_results
     req.projection = json.dumps(projection) if projection else None
@@ -441,12 +442,19 @@ def get_items_for_user_action(_ids, item_type):
     # even those which are not a part of ItemsResource(content_api) schema.
     items = get_entities_elastic_or_mongo_or_404(_ids, item_type)
 
-    if not items or items[0].get("type") != "text":
+    if not items:
         return items
+    elif items[0].get("type") == "text":
+        for item in items:
+            if item.get("slugline") and item.get("anpa_take_key"):
+                item["slugline"] = "{0} | {1}".format(item["slugline"], item["anpa_take_key"])
+    elif items[0].get("type") == "agenda":
+        # Import here to prevent circular imports
+        from newsroom.companies.utils import restrict_coverage_info
+        from newsroom.agenda.utils import remove_restricted_coverage_info
 
-    for item in items:
-        if item.get("slugline") and item.get("anpa_take_key"):
-            item["slugline"] = "{0} | {1}".format(item["slugline"], item["anpa_take_key"])
+        if restrict_coverage_info():
+            remove_restricted_coverage_info(items)
 
     return items
 

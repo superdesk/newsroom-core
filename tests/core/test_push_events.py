@@ -433,7 +433,7 @@ def test_notify_topic_matches_for_new_event_item(client, app, mocker):
     key = b"something random"
     app.config["PUSH_KEY"] = key
     event["dates"]["start"] = "2018-05-29T04:00:00+0000"
-    push_mock = mocker.patch("newsroom.push.push_notification")
+    push_mock = mocker.patch("newsroom.push.push_agenda_item_notification")
     headers = get_signature_headers(json.dumps(event), key)
     resp = client.post("/push", json=event, headers=headers)
     assert 200 == resp.status_code
@@ -481,7 +481,7 @@ def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
     planning["guid"] = "bar2"
     planning["event_item"] = "foo"
     data = json.dumps(planning)
-    push_mock = mocker.patch("newsroom.push.push_notification")
+    push_mock = mocker.patch("newsroom.push.push_agenda_item_notification")
     headers = get_signature_headers(data, key)
     resp = client.post("/push", json=planning, headers=headers)
     assert 200 == resp.status_code
@@ -530,7 +530,7 @@ def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker):
 
     # resend the planning item
     data = json.dumps(planning)
-    push_mock = mocker.patch("newsroom.push.push_notification")
+    push_mock = mocker.patch("newsroom.push.push_agenda_item_notification")
     headers = get_signature_headers(data, key)
     resp = client.post("/push", json=planning, headers=headers)
     assert 200 == resp.status_code

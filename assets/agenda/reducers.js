@@ -5,7 +5,7 @@ import {
     SELECT_DATE,
     WATCH_EVENTS,
     STOP_WATCHING_EVENTS,
-    UPDATE_ITEMS,
+    UPDATE_ITEM,
     TOGGLE_FEATURED_FILTER,
     SET_ITEM_TYPE_FILTER,
     AGENDA_WIRE_ITEMS,
@@ -154,21 +154,19 @@ export default function agendaReducer(state = initialState, action) {
         return {...state, itemsById};
     }
 
-    case UPDATE_ITEMS: {
+    case UPDATE_ITEM: {
         // Update existing items, remove killed items
-
         let itemsById = Object.assign({}, state.itemsById);
         let updatedItems = [ ...state.items ];
-        get(action.data, '_items', []).forEach(item => {
-            if(itemsById[item._id]) {
-                if (get(item, 'state') === 'killed') {
-                    delete itemsById[item._id];
-                    updatedItems = updatedItems.filter((i) => i !== item._id);
-                } else {
-                    itemsById[item._id] = item;
-                }
+        const item = action.item;
+        if(itemsById[item._id]) {
+            if (get(item, 'state') === 'killed') {
+                delete itemsById[item._id];
+                updatedItems = updatedItems.filter((i) => i !== item._id);
+            } else {
+                itemsById[item._id] = item;
             }
-        });
+        }
 
         return {
             ...state,
@@ -184,6 +182,7 @@ export default function agendaReducer(state = initialState, action) {
             ...state.agenda,
             activeDate: action.agendaData.bookmarks ? EARLIEST_DATE : action.activeDate || state.agenda.activeDate,
             eventsOnlyAccess: action.agendaData.events_only,
+            restrictCoverageInfo: action.agendaData.restrict_coverage_info,
             featuredOnly: action.featuredOnly,
         };
 

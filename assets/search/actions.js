@@ -44,9 +44,9 @@ export function addTopic(topic) {
     return {type: ADD_TOPIC, topic};
 }
 
-export const SET_NEW_ITEMS_BY_TOPIC = 'SET_NEW_ITEMS_BY_TOPIC';
-export function setNewItemsByTopic(data) {
-    return {type: SET_NEW_ITEMS_BY_TOPIC, data};
+export const SET_NEW_ITEM_BY_TOPIC = 'SET_NEW_ITEM_BY_TOPIC';
+export function setNewItemByTopic(data) {
+    return {type: SET_NEW_ITEM_BY_TOPIC, data};
 }
 
 export function loadMyTopics() {

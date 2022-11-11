@@ -32,7 +32,11 @@ from newsroom.wire.views import delete_dashboard_caches
 from newsroom.wire import url_for_wire
 from newsroom.upload import ASSETS_RESOURCE
 from newsroom.signals import publish_item as publish_item_signal
-from newsroom.agenda.utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD
+from newsroom.agenda.utils import (
+    get_latest_available_delivery,
+    TO_BE_CONFIRMED_FIELD,
+    push_agenda_item_notification,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -687,7 +691,10 @@ def notify_new_item(item, check_topics=True):
         company_dict = get_company_dict()
         company_ids = [c["_id"] for c in company_dict.values()]
 
-        push_notification("new_item", _items=[item])
+        if item_type == "agenda":
+            push_agenda_item_notification("new_item", item=item)
+        else:
+            push_notification("new_item", item=item)
 
         if check_topics:
             if item_type == "text":
@@ -802,7 +809,7 @@ def notify_agenda_topic_matches(item, users_dict, companies_dict):
     )
 
     if topic_matches:
-        push_notification("topic_matches", item=item, topics=topic_matches)
+        push_agenda_item_notification("topic_matches", item=item, topics=topic_matches)
         send_topic_notification_emails(item, topics, topic_matches, users_dict)
 
 

@@ -63,3 +63,20 @@ def step_impl_get_aggregations(context):
     for key, val in expected_aggs.items():
         agg_values = [bucket.get("key") for bucket in deep_get(response_aggs, key, {}).get("buckets") or {}]
         assert sorted(val) == sorted(agg_values), f"_aggregations['{key}']: {agg_values} != {val},\n{response_aggs}"
+
+
+@when('we login with email "{email}" and password "{password}"')
+def when_we_login_as_user(context, email, password):
+    url = "/login"
+    with context.app.test_request_context():
+        response = context.client.post(
+            get_prefixed_url(context.app, url),
+            data=json.dumps(
+                dict(
+                    email=email,
+                    password=password,
+                )
+            ),
+            headers=context.headers,
+        )
+        assert response.status_code == 302, response.status_code

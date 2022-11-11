@@ -185,21 +185,6 @@ export function isWatched(item, userId) {
     return userId && includes(get(item, 'watches', []), userId);
 }
 
-
-/**
- * Test if a coverage is in boundary of event start and end dates
- *
- * @param {Object} item
- * @param {Object} coverage
- * @return {Boolean}
- */
-export function isCoverageBetweenEventDates(item, coverage) {
-    const coverageDate = moment(coverage.scheduled);
-    const eventStartDate = moment(item.dates.start);
-    const eventEndDate = moment(get(item, 'dates.end', eventStartDate));
-    return coverageDate.isBetween(eventStartDate, eventEndDate, null, '[]');
-}
-
 /**
  * Test if a coverage is for given date string
  *
@@ -208,7 +193,7 @@ export function isCoverageBetweenEventDates(item, coverage) {
  * @return {Boolean}
  */
 export function isCoverageForExtraDay(coverage, dateString) {
-    return formatDate(moment(coverage.scheduled)) === dateString;
+    return coverage.scheduled != null && formatDate(moment(coverage.scheduled)) === dateString;
 }
 
 /**
@@ -506,17 +491,19 @@ export function getDataFromCoverages(item) {
 }
 
 const getNextPendingScheduledUpdate = (coverage) => {
-    // No scheduled_updates or deliveries
-    if (get(coverage, 'scheduled_updates.length', 0) === 0 ||
-            get(coverage, 'deliveries.length', 0) === 0) {
+    if (coverage.scheduled == null) {
+        // Not privileged to see coverage details
         return null;
-    }
-
-    // Only one delivery: no scheduled_update was published
-    if (get(coverage, 'deliveries.length', 0) === 1) {
+    } else if (
+        get(coverage, 'scheduled_updates.length', 0) === 0 ||
+        get(coverage, 'deliveries.length', 0) === 0
+    ) {
+        // No scheduled_updates or deliveries
+        return null;
+    } else if (get(coverage, 'deliveries.length', 0) === 1) {
+        // Only one delivery: no scheduled_update was published
         return coverage.scheduled_updates[0];
     }
-
 
     const lastScheduledDelivery = (coverage.deliveries.reverse()).find((d) => d.scheduled_update_id);
     // More deliveries, but no scheduled_update was published
@@ -615,7 +602,7 @@ export function getDisplayDates(item) {
                 return;
             }
 
-            const coverages = get(plan, 'coverages') || [];
+            const coverages = (get(plan, 'coverages') || []).filter((coverage) => coverage.scheduled);
 
             if (!coverages.length) {
                 dates.push({date: plan.planning_date});
@@ -756,7 +743,10 @@ export function getPlanningItemsByGroup(item, group) {
 }
 
 export function isCoverageOnPreviousDay(coverage, group) {
-    return moment(coverage.scheduled).isBefore(moment(group, DATE_FORMAT), 'day');
+    return (
+        coverage.scheduled != null &&
+        moment(coverage.scheduled).isBefore(moment(group, DATE_FORMAT), 'day')
+    );
 }
 
 
@@ -850,34 +840,26 @@ export const getCoverageTooltip = (coverage, beingUpdated) => {
             slugline: slugline,
             status_text: getCoverageStatusText(coverage)
         });
-    }
-
-    if (['assigned'].includes(coverage.workflow_status)) {
+    } else if (coverage.workflow_status === WORKFLOW_STATUS.ASSIGNED) {
         return gettext('Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}}', {
             type: getCoverageDisplayName(coverage.coverage_type),
             slugline: slugline,
             date: formatDate(coverage.scheduled),
             time: formatTime(coverage.scheduled)
         });
-    }
-
-    if (['active'].includes(coverage.workflow_status)) {
+    } else if (coverage.workflow_status === WORKFLOW_STATUS.ACTIVE) {
         return gettext('{{ type }} coverage {{ slugline }} in progress, expected {{date}} at {{time}}', {
             type: getCoverageDisplayName(coverage.coverage_type),
             slugline: slugline,
             date: formatDate(coverage.scheduled),
             time: formatTime(coverage.scheduled)
         });
-    }
-
-    if (coverage.workflow_status === WORKFLOW_STATUS.CANCELLED) {
+    } else if (coverage.workflow_status === WORKFLOW_STATUS.CANCELLED) {
         return gettext('{{ type }} coverage {{slugline}} cancelled', {
             type: getCoverageDisplayName(coverage.coverage_type),
             slugline: slugline,
         });
-    }
-
-    if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
+    } else if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
         let deliveryState;
         if (get(coverage, 'deliveries.length', 0) > 1) {
             deliveryState = beingUpdated ? gettext('(update to come)') : gettext('(updated)');

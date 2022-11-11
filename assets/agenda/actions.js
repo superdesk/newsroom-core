@@ -28,7 +28,7 @@ import {
 import {
     toggleFilter,
     initParams as initSearchParams,
-    setNewItemsByTopic,
+    setNewItemByTopic,
     loadMyTopics,
     setTopics,
     loadMyTopic,
@@ -219,8 +219,14 @@ export function copyPreviewContents(item) {
                 contents.push(gettext('Description: {{ description }}', {description: pi.description_text}));
                 pi.coverages &&  pi.coverages.map(coverage => {
                     contents.push(gettext('Coverage type: {{ type }}', {type: coverage.planning.g2_content_type}));
-                    contents.push(gettext('Scheduled: {{ schedule }}', {schedule: getLocaleDate(coverage.planning.scheduled)}));
-                    contents.push(gettext('Status: {{ status }}', {status: coverage.workflow_status}));
+
+                    if (coverage.planning.scheduled != null) {
+                        contents.push(gettext('Scheduled: {{ schedule }}', {schedule: getLocaleDate(coverage.planning.scheduled)}));
+                    }
+                    if (coverage.workflow_status != null) {
+                        contents.push(gettext('Status: {{ status }}', {status: coverage.workflow_status}));
+                    }
+
                     coverage.planning.description_text && contents.push(gettext('Description: {{ description }}', {description: coverage.planning.description_text}));
                     contents.push('');
                 });
@@ -472,7 +478,7 @@ export function pushNotification(push) {
 
         switch (push.event) {
         case 'topic_matches':
-            return dispatch(setNewItemsByTopic(push.extra));
+            return dispatch(setNewItemByTopic(push.extra));
 
         case 'new_item':
             return dispatch(setAndUpdateNewItems(push.extra));
@@ -513,15 +519,17 @@ export function reloadMyTopics(reloadTopic = false) {
     };
 }
 
-export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
+export const SET_NEW_ITEM = 'SET_NEW_ITEM';
 export function setAndUpdateNewItems(data) {
     return function(dispatch, getState) {
-        if (get(data, '_items.length') <= 0 || get(data, '_items[0].type') !== 'agenda') {
+        const item = data.item || {};
+
+        if (item.type !== 'agenda') {
             const state = getState();
 
             // Check if the item is used in the preview or opened agenda item
             // If yes, make it available to the preview
-            if (get(data, '_items[0].type') !== 'text' || (!state.previewItem && !state.openItem)) {
+            if (item !== 'text' || (!state.previewItem && !state.openItem)) {
                 return Promise.resolve();
             }
 
@@ -531,32 +539,29 @@ export function setAndUpdateNewItems(data) {
             }
 
             const coveragesToCheck = (agendaItem.coverages || []).map((c) => c.coverage_id);
-            for(let i of data._items) {
-                if (coveragesToCheck.includes(i.coverage_id)) {
-                    dispatch(fetchWireItemsForAgenda(agendaItem));
-                    break;
-                }
+
+            if (coveragesToCheck.includes(item.coverage_id)) {
+                dispatch(fetchWireItemsForAgenda(agendaItem));
             }
 
             return Promise.resolve();
         }
 
-        dispatch(updateItems(data));
+        dispatch(updateItem(item));
 
         // Do not use 'killed' items for new-item notifications
-        let newItemsData = {...data};
-        if (get(newItemsData, '_items.length', 0) > 0) {
-            newItemsData._items = newItemsData._items.filter((item) => item.state !== 'killed');
+        if (item.state === 'killed') {
+            return Promise.resolve();
         }
 
-        dispatch({type: SET_NEW_ITEMS, data: newItemsData});
+        dispatch({type: SET_NEW_ITEM, data: item});
         return Promise.resolve();
     };
 }
 
-export const UPDATE_ITEMS = 'UPDATE_ITEMS';
-export function updateItems(data) {
-    return {type: UPDATE_ITEMS, data};
+export const UPDATE_ITEM = 'UPDATE_ITEM';
+export function updateItem(item) {
+    return {type: UPDATE_ITEM, item: item};
 }
 
 export function toggleDropdownFilter(key, val) {
