@@ -30,7 +30,9 @@ export default function AgendaTime({item, children}) {
                     start: startDateInRemoteTZ,
                     end: moment.tz(moment(item.dates.end).utc(), item.dates.tz),
                     tz: item.dates.tz,
-                }
+                    all_day: item.dates.all_day,
+                    no_end_time: item.dates.no_end_time,
+                },
             };
 
             return (
