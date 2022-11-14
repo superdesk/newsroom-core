@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {get} from 'lodash';
 
-import {gettext, shortDate} from 'utils';
+import {gettext, formatTime, formatDate, isToday} from 'utils';
 import {BasicNotificationItem} from './BasicNotificationItem';
 
 export const registeredNotifications = [];
@@ -27,16 +27,32 @@ export function renderNotificationComponent(notification, item) {
 function getNotificationFooterText(notification) {
     switch (notification.action) {
     case 'share':
-        return gettext('Shared by {{ first_name }} {{ last_name }} on {{ datetime }}', {
-            first_name: get(notification, 'data.shared_by.first_name'),
-            last_name: get(notification, 'data.shared_by.last_name'),
-            datetime: shortDate(notification.created),
-        });
+        return (
+            isToday(notification.created) ?
+                gettext('Shared by {{ first_name }} {{ last_name }} at {{ time }}', {
+                    first_name: get(notification, 'data.shared_by.first_name'),
+                    last_name: get(notification, 'data.shared_by.last_name'),
+                    time: formatTime(notification.created),
+                }) :
+                gettext('Shared by {{ first_name }} {{ last_name }} on {{ date }}', {
+                    first_name: get(notification, 'data.shared_by.first_name'),
+                    last_name: get(notification, 'data.shared_by.last_name'),
+                    date: formatDate(notification.created),
+                })
+        );
     case 'topic_matches':
-        return gettext('Created on {{ datetime }}', {datetime: shortDate(notification.created)});
+        return (
+            isToday(notification.created) ?
+                gettext('Created at {{ time }}', {time: formatTime(notification.created)}) :
+                gettext('Created on {{ date }}', {date: formatDate(notification.created)})
+        );
     case 'history_match':
     default:
-        return gettext('Updated on {{ datetime }}', {datetime: shortDate(notification.created)});
+        return (
+            isToday(notification.created) ?
+                gettext('Updated at {{ time }}', {time: formatTime(notification.created)}) :
+                gettext('Updated on {{ date }}', {date: formatDate(notification.created)})
+        );
     }
 }
 
