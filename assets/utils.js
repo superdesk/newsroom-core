@@ -184,10 +184,15 @@ export function getProductQuery(product) {
  * Parse given date string and return Date instance
  *
  * @param {String} dateString
+ * @param {String} ignoreTimezone - avoid converting time to different timezone, will output the date as it is
  * @return {Date}
  */
-export function parseDate(dateString) {
-    return moment(dateString).locale(getLocale());
+export function parseDate(dateString, ignoreTimezone = false) {
+    const parsed = ignoreTimezone ? moment.utc(dateString) : moment(dateString);
+
+    parsed.locale(getLocale());
+
+    return parsed;
 }
 
 /**
@@ -384,8 +389,8 @@ export function formatAgendaDate(item, group, {localTimeZone = true, onlyDates =
     };
 
     const isTBCItem = isItemTBC(item);
-    let start = parseDate(item.dates.start);
-    let end = parseDate(item.dates.end);
+    let start = parseDate(item.dates.start, item.dates.all_day);
+    let end = parseDate(item.dates.end, item.dates.all_day || item.dates.no_end_time);
     let dateGroup = group ? moment(group, DATE_FORMAT) : null;
 
     let isGroupBetweenEventDates = dateGroup ?
