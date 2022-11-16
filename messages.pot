@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-11-11 11:09+0100\n"
+"POT-Creation-Date: 2022-11-16 09:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1276,39 +1276,35 @@ msgstr ""
 msgid "New card"
 msgstr ""
 
-#: assets/utils.js:423
+#: assets/utils.js:428
 msgid "{{startDate}} to {{endDate}} (Time to be confirmed)"
 msgstr ""
 
-#: assets/utils.js:429
+#: assets/utils.js:434
 msgid "{{startDate}} (Time to be confirmed)"
 msgstr ""
 
-#: assets/utils.js:434
+#: assets/utils.js:439
 msgid "{{startDate}} to {{endDate}}"
 msgstr ""
 
-#: assets/utils.js:443
+#: assets/utils.js:448
 msgid "{{startTime}} {{startDate}} - {{endDate}} {{timezone}}"
 msgstr ""
 
-#: assets/utils.js:451
+#: assets/utils.js:456
 msgid "{{startTime}} {{startDate}} {{timezone}}"
 msgstr ""
 
-#: assets/utils.js:458
+#: assets/utils.js:463
 msgid "{{startTime}} - {{endTime}} {{startDate}} {{timezone}}"
 msgstr ""
 
-#: assets/utils.js:466
+#: assets/utils.js:471 assets/utils.js:481
 msgid "{{startTime}} {{startDate}} to {{endTime}} {{endDate}} {{timezone}}"
 msgstr ""
 
-#: assets/utils.js:476
-msgid "{{starTime}} {{startDate}} to {{endTime}} {{endDate}} {{timezone}}"
-msgstr ""
-
-#: assets/utils.js:670
+#: assets/utils.js:675
 msgid "Failed to process request!"
 msgstr ""
 
@@ -1317,17 +1313,17 @@ msgstr ""
 #: assets/agenda/components/AgendaList.jsx:210
 #: assets/company-reports/components/ProductStories.jsx:26
 #: assets/components/CalendarButton.jsx:33
-#: assets/components/ExpiryDateInput.jsx:90 assets/utils.js:846
+#: assets/components/ExpiryDateInput.jsx:90 assets/utils.js:851
 #: assets/wire/components/filters/NavCreatedPicker.jsx:9
 msgid "Today"
 msgstr ""
 
-#: assets/company-reports/components/ProductStories.jsx:28 assets/utils.js:848
+#: assets/company-reports/components/ProductStories.jsx:28 assets/utils.js:853
 #: assets/wire/components/filters/NavCreatedPicker.jsx:10
 msgid "This week"
 msgstr ""
 
-#: assets/company-reports/components/ProductStories.jsx:30 assets/utils.js:850
+#: assets/company-reports/components/ProductStories.jsx:30 assets/utils.js:855
 #: assets/wire/components/filters/NavCreatedPicker.jsx:11
 msgid "This month"
 msgstr ""

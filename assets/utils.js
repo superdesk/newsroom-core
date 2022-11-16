@@ -478,7 +478,7 @@ export function formatAgendaDate(item, group, {localTimeZone = true, onlyDates =
 
     default:
         console.warn('not sure about the datetime format', item, scheduleType);
-        return gettext('{{starTime}} {{startDate}} to {{endTime}} {{endDate}} {{timezone}}', {
+        return gettext('{{startTime}} {{startDate}} to {{endTime}} {{endDate}} {{timezone}}', {
             startTime,
             startDate,
             endTime,
