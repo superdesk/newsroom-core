@@ -1,4 +1,4 @@
-from typing import Dict, Set, Any
+from typing import Dict, Set, Any, Optional
 import logging
 from copy import deepcopy
 
@@ -600,23 +600,6 @@ def _remove_fields(source, fields):
     source["_source"]["exclude"].extend(fields)
 
 
-def set_post_filter(source, req, item_type):
-    filters = None
-    if req.args.get("filter"):
-        filters = json.loads(req.args["filter"])
-    if filters:
-        if app.config.get("FILTER_BY_POST_FILTER", False):
-            source["post_filter"] = {
-                "bool": {
-                    "must": [_filter_terms(filters, item_type)["must_term_filters"]],
-                    "must_not": [_filter_terms(filters, item_type)["must_not_term_filters"]],
-                }
-            }
-        else:
-            source["query"]["bool"]["must"] += _filter_terms(filters, item_type)["must_term_filters"]
-            source["query"]["bool"]["must_not"] += _filter_terms(filters, item_type)["must_not_term_filters"]
-
-
 def planning_items_query_string(query, fields=None):
     plan_query_string = query_string(query)
 
@@ -977,6 +960,17 @@ class AgendaService(BaseSearchService):
         if search.args.get("date_from") or search.args.get("date_to"):
             _set_event_date_range(search)
 
+    def set_post_filter(self, source: Dict[str, Any], req: ParsedRequest, item_type: Optional[str] = None):
+        filters = json.loads(req.args.get("filter") or "{}")
+        if not filters:
+            return
+
+        if app.config.get("FILTER_BY_POST_FILTER", False):
+            source["post_filter"] = {"bool": {}}
+            self.set_bool_query_from_filters(source["post_filter"]["bool"], filters, item_type)
+        else:
+            self.set_bool_query_from_filters(source["query"]["bool"], filters, item_type)
+
     def gen_source_from_search(self, search):
         """Generate the eve source object from the search query instance
 
@@ -985,7 +979,7 @@ class AgendaService(BaseSearchService):
 
         super().gen_source_from_search(search)
 
-        set_post_filter(search.source, search, search.item_type)
+        self.set_post_filter(search.source, search, search.item_type)
 
         if not search.source["from"] and not search.args.get("bookmarks") and not search.args.get("noAggregations"):
             # avoid aggregations when handling pagination
@@ -1023,7 +1017,7 @@ class AgendaService(BaseSearchService):
         query["bool"]["must"].append(planning_items_query)
 
         source = {"query": query}
-        set_post_filter(source, req, None)
+        self.set_post_filter(source, req)
         source["size"] = len(featured["items"])
         source["from"] = req.args.get("from", 0, type=int)
         if not source["from"]:
@@ -1209,6 +1203,16 @@ class AgendaService(BaseSearchService):
                 self.notify_agenda_update(updated_agenda, updated_agenda, None, True, None, parent_coverage)
         return agenda_items
 
+    def set_bool_query_from_filters(
+        self, bool_query: Dict[str, Any], filters: Dict[str, Any], item_type: Optional[str] = None
+    ):
+        filter_terms = _filter_terms(filters, item_type)
+        bool_query.setdefault("must", [])
+        bool_query["must"] += filter_terms["must_term_filters"]
+
+        bool_query.setdefault("must_not", [])
+        bool_query["must_not"] += filter_terms["must_not_term_filters"]
+
     def get_matching_topics(self, item_id, topics, users, companies):
         """Returns a list of topic ids matching to the given item_id
 
@@ -1220,7 +1224,6 @@ class AgendaService(BaseSearchService):
         """
 
         return self.get_matching_topics_for_item(
-            item_id,
             topics,
             users,
             companies,

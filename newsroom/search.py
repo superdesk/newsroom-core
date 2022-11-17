@@ -1,5 +1,5 @@
 import logging
-from typing import Union
+from typing import Union, Dict, Any
 from copy import deepcopy
 
 from flask import current_app as app, json, abort
@@ -257,8 +257,8 @@ class BaseSearchService(Service):
 
         return internal_req
 
-    def _filter_terms(self, filters):
-        return [{"terms": {self.get_aggregation_field(key): val}} for key, val in filters.items() if val]
+    def set_bool_query_from_filters(self, bool_query: Dict[str, Any], filters: Dict[str, Any]):
+        bool_query["must"] += [{"terms": {self.get_aggregation_field(key): val}} for key, val in filters.items() if val]
 
     def get_aggregations(self):
         return app.config.get("WIRE_AGGS") or {}
@@ -572,7 +572,7 @@ class BaseSearchService(Service):
         if not app.config.get("FILTER_BY_POST_FILTER", False):
             if filters:
                 if app.config.get("FILTER_AGGREGATIONS", True):
-                    search.query["bool"]["must"] += self._filter_terms(filters)
+                    self.set_bool_query_from_filters(search.query["bool"], filters)
                 else:
                     search.query["bool"]["must"].append(filters)
 
@@ -583,7 +583,7 @@ class BaseSearchService(Service):
 
             if filters:
                 if app.config.get("FILTER_AGGREGATIONS", True):
-                    search.source["post_filter"]["bool"]["must"] += self._filter_terms(filters)
+                    self.set_bool_query_from_filters(search.source["post_filter"]["bool"], filters)
                 else:
                     search.source["post_filter"]["bool"]["must"].append(filters)
 
@@ -618,7 +618,7 @@ class BaseSearchService(Service):
             response.docs = embargoed_response.docs + response.docs
             response.hits["hits"]["total"] = response.count() + embargoed_response.count()
 
-    def get_matching_topics_for_item(self, item_id, topics, users, companies, query):
+    def get_matching_topics_for_item(self, topics, users, companies, query):
         aggs = {"topics": {"filters": {"filters": {}}}}
 
         queried_topics = []
@@ -656,7 +656,7 @@ class BaseSearchService(Service):
                 )
 
             if topic.get("filter"):
-                search.query["bool"]["must"] += self._filter_terms(topic["filter"])
+                self.set_bool_query_from_filters(search.query["bool"], topic["filter"])
 
             # for now even if there's no active company matching for the user
             # continuing with the search

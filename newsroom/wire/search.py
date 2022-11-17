@@ -240,7 +240,6 @@ class WireSearchService(BaseSearchService):
         """
 
         return self.get_matching_topics_for_item(
-            item_id,
             topics,
             users,
             companies,
