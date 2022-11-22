@@ -434,7 +434,7 @@ export class LocationFilter extends React.Component {
                     )}
                     aria-labelledby="subnav_location"
                 >
-                    <div className="p-2">
+                    <div className="d-flex flex-column h-100 d-md-block p-md-2">
                         <div>
                             <input
                                 type="text"
