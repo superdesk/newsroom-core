@@ -45,7 +45,7 @@ export class ListSearchOptions extends React.PureComponent {
                 >
                     <h6 className='dropdown-header'>{gettext('Search Options')}</h6>
                     <form className="px-3 pt-3">
-                        {this.props.hideNewsOnly ? null : (
+                        {this.props.hideSearchAllVersions ? null : (
                             <div className="form-group d-flex align-items-center">
                                 <Toggle
                                     id="all-versions"
@@ -63,7 +63,7 @@ export class ListSearchOptions extends React.PureComponent {
                             </div>
                         )}
 
-                        {this.props.hideSearchAllVersions ? null : (
+                        {this.props.hideNewsOnly ? null : (
                             <div className="form-group d-flex align-items-center">
                                 <Toggle
                                     id="news-only"
