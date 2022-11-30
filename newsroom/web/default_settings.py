@@ -7,6 +7,7 @@ from kombu import Queue, Exchange
 from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
 from datetime import timedelta
+from flask_babel import lazy_gettext
 
 from superdesk.default_settings import (  # noqa
     VERSION,
@@ -268,17 +269,17 @@ GOOGLE_MAPS_KEY = os.environ.get("GOOGLE_MAPS_KEY")
 GOOGLE_ANALYTICS = os.environ.get("GOOGLE_ANALYTICS")
 
 COVERAGE_TYPES = {
-    "text": {"name": "Text", "icon": "text"},
-    "photo": {"name": "Photo", "icon": "photo"},
-    "picture": {"name": "Picture", "icon": "photo"},
-    "audio": {"name": "Audio", "icon": "audio"},
-    "video": {"name": "Video", "icon": "video"},
-    "explainer": {"name": "Explainer", "icon": "explainer"},
-    "infographics": {"name": "Infographics", "icon": "infographics"},
-    "graphic": {"name": "Graphic", "icon": "infographics"},
-    "live_video": {"name": "Live Video", "icon": "live-video"},
-    "live_blog": {"name": "Live Blog", "icon": "live-blog"},
-    "video_explainer": {"name": "Video Explainer", "icon": "explainer"},
+    "text": {"name": lazy_gettext("Text"), "icon": "text"},
+    "photo": {"name": lazy_gettext("Photo"), "icon": "photo"},
+    "picture": {"name": lazy_gettext("Picture"), "icon": "photo"},
+    "audio": {"name": lazy_gettext("Audio"), "icon": "audio"},
+    "video": {"name": lazy_gettext("Video"), "icon": "video"},
+    "explainer": {"name": lazy_gettext("Explainer"), "icon": "explainer"},
+    "infographics": {"name": lazy_gettext("Infographics"), "icon": "infographics"},
+    "graphic": {"name": lazy_gettext("Graphic"), "icon": "infographics"},
+    "live_video": {"name": lazy_gettext("Live Video"), "icon": "live-video"},
+    "live_blog": {"name": lazy_gettext("Live Blog"), "icon": "live-blog"},
+    "video_explainer": {"name": lazy_gettext("Video Explainer"), "icon": "explainer"},
 }
 
 LANGUAGES = ["en", "fi", "fr_CA"]
