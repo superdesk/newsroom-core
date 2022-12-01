@@ -35,7 +35,7 @@ import {
 } from 'search/actions';
 
 import {getMaxVersion} from 'local-store';
-import {REMOVE_NEW_ITEMS} from './agenda/actions';
+import {REMOVE_NEW_ITEMS, SET_NEW_ITEM} from './agenda/actions';
 import {toggleValue} from 'utils';
 import {topicsReducer} from './topics/reducer';
 
@@ -340,6 +340,22 @@ export function defaultReducer(state={}, action) {
                 ...(action.data._items.filter((item) => !item.nextversion && !state.itemsById[item._id]).map((item) => item._id))
             ]),
         };
+    }
+
+    case SET_NEW_ITEM: {
+        const item = state.data || {};
+
+        if (!item.nextversion && !state.itemsById[item._id]) {
+            return {
+                ...state,
+                newItems: [
+                    ...state.newItems,
+                    item._id,
+                ],
+            };
+        }
+
+        return state;
     }
 
     case START_LOADING:

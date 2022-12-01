@@ -103,16 +103,16 @@ def test_index_from_mongo_from_timestamp(app, client):
     remove_elastic_index(app)
     app.data.init_elastic(app)
     sleep(1)
-    assert 0 == app.data.elastic.find("items", ParsedRequest(), {}).count()
+    assert 0 == app.data.elastic.find("items", ParsedRequest(), {})[1]
 
     timestamp = (datetime.now() - timedelta(hours=3)).strftime("%Y-%m-%dT%H:%M")
     index_elastic_from_mongo_from_timestamp("items", timestamp, "older")
     sleep(1)
-    assert 4 == app.data.elastic.find("items", ParsedRequest(), {}).count()
+    assert 4 == app.data.elastic.find("items", ParsedRequest(), {})[1]
 
     index_elastic_from_mongo_from_timestamp("items", timestamp, "newer")
     sleep(1)
-    assert 6 == app.data.elastic.find("items", ParsedRequest(), {}).count()
+    assert 6 == app.data.elastic.find("items", ParsedRequest(), {})[1]
 
 
 def test_fix_topic_nested_filters(app, client):
