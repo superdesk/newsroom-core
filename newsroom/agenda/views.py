@@ -263,7 +263,7 @@ def related_wire_items(wire_id):
     source.update({"query": {"nested": {"path": "coverages", "query": query}}})
     internal_req = ParsedRequest()
     internal_req.args = {"source": json.dumps(source)}
-    agenda_result = elastic.find("agenda", internal_req, None)
+    agenda_result, _ = elastic.find("agenda", internal_req, None)
 
     if len(agenda_result.docs) == 0:
         return flask.jsonify({"error": gettext("Agenda item not found")}), 404
