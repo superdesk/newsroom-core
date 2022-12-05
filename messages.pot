@@ -9,14 +9,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.1.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-11-29 14:18+0100\n"
+"POT-Creation-Date: 2022-12-05 19:48+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.11.0\n"
 
 #: newsroom/email.py:405
 msgid "Kill/Takedown notice"
@@ -228,7 +228,7 @@ msgid "Coverage added"
 msgstr ""
 
 #: newsroom/agenda/views.py:212
-msgid "Cannot edit coverage watch when watching parnet item"
+msgid "Cannot edit coverage watch when watching parent item"
 msgstr ""
 
 #: newsroom/agenda/views.py:219
@@ -1537,15 +1537,15 @@ msgstr ""
 msgid "Update expected @ ${dateString}"
 msgstr ""
 
-#: assets/agenda/utils.js:841
+#: assets/agenda/utils.js:842
 msgid "{{ type }} coverage {{ slugline }} {{ status_text }}"
 msgstr ""
 
-#: assets/agenda/utils.js:848
+#: assets/agenda/utils.js:849
 msgid "Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}}"
 msgstr ""
 
-#: assets/agenda/utils.js:855
+#: assets/agenda/utils.js:856
 msgid ""
 "{{ type }} coverage {{ slugline }} in progress, expected {{date}} at "
 "{{time}}"
@@ -1555,16 +1555,20 @@ msgstr ""
 msgid "{{ type }} coverage {{slugline}} cancelled"
 msgstr ""
 
-#: assets/agenda/utils.js:865
+#: assets/agenda/utils.js:866
 msgid "(update to come)"
 msgstr ""
 
-#: assets/agenda/utils.js:865
+#: assets/agenda/utils.js:866
 msgid "(updated)"
 msgstr ""
 
 #: assets/agenda/utils.js:869
 msgid "{{ type }} coverage {{ slugline }} available {{deliveryState}}"
+msgstr ""
+
+#: assets/agenda/utils.js:876
+msgid "{{ type }} coverage"
 msgstr ""
 
 #: assets/agenda/components/AgendaApp.jsx:123
@@ -1652,16 +1656,16 @@ msgstr ""
 msgid "Submit inquiry"
 msgstr ""
 
-#: assets/agenda/components/AgendaCoverages.jsx:35
+#: assets/agenda/components/AgendaCoverages.jsx:56
 #: assets/agenda/components/AgendaEventInfo.jsx:19
 msgid "Open Agenda in new tab"
 msgstr ""
 
-#: assets/agenda/components/AgendaCoverages.jsx:46
+#: assets/agenda/components/AgendaCoverages.jsx:69
 msgid "expected"
 msgstr ""
 
-#: assets/agenda/components/AgendaCoverages.jsx:52
+#: assets/agenda/components/AgendaCoverages.jsx:76
 msgid "Source"
 msgstr ""
 
