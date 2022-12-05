@@ -268,6 +268,9 @@ def related_wire_items(wire_id):
     if len(agenda_result.docs) == 0:
         return flask.jsonify({"error": gettext("Agenda item not found")}), 404
 
+    if restrict_coverage_info():
+        remove_restricted_coverage_info([agenda_result.docs[0]])
+
     wire_ids = []
     for cov in agenda_result.docs[0].get("coverages") or []:
         if cov.get("coverage_type") == "text" and cov.get("delivery_id"):

@@ -833,30 +833,31 @@ export function formatCoverageDate(coverage) {
 
 export const getCoverageTooltip = (coverage, beingUpdated) => {
     const slugline = coverage.item_slugline || coverage.slugline;
+    const coverageType = getCoverageDisplayName(coverage.coverage_type);
 
     if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
         return gettext('{{ type }} coverage {{ slugline }} {{ status_text }}', {
-            type: getCoverageDisplayName(coverage.coverage_type),
+            type: coverageType,
             slugline: slugline,
             status_text: getCoverageStatusText(coverage)
         });
     } else if (coverage.workflow_status === WORKFLOW_STATUS.ASSIGNED) {
         return gettext('Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}}', {
-            type: getCoverageDisplayName(coverage.coverage_type),
+            type: coverageType,
             slugline: slugline,
             date: formatDate(coverage.scheduled),
             time: formatTime(coverage.scheduled)
         });
     } else if (coverage.workflow_status === WORKFLOW_STATUS.ACTIVE) {
         return gettext('{{ type }} coverage {{ slugline }} in progress, expected {{date}} at {{time}}', {
-            type: getCoverageDisplayName(coverage.coverage_type),
+            type: coverageType,
             slugline: slugline,
             date: formatDate(coverage.scheduled),
             time: formatTime(coverage.scheduled)
         });
     } else if (coverage.workflow_status === WORKFLOW_STATUS.CANCELLED) {
         return gettext('{{ type }} coverage {{slugline}} cancelled', {
-            type: getCoverageDisplayName(coverage.coverage_type),
+            type: coverageType,
             slugline: slugline,
         });
     } else if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
@@ -866,11 +867,11 @@ export const getCoverageTooltip = (coverage, beingUpdated) => {
         }
 
         return gettext('{{ type }} coverage {{ slugline }} available {{deliveryState}}', {
-            type: getCoverageDisplayName(coverage.coverage_type),
+            type: coverageType,
             slugline: slugline,
             deliveryState: deliveryState
         });
     }
 
-    return '';
+    return gettext('{{ type }} coverage', {type: coverageType});
 };
