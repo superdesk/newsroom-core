@@ -209,7 +209,7 @@ def update_coverage_watch(item_id, coverage_id, user_id, add, skip_associated=Fa
 
     if user_id in item.get("watches", []):
         return (
-            flask.jsonify({"error": gettext("Cannot edit coverage watch when watching parnet item")}),
+            flask.jsonify({"error": gettext("Cannot edit coverage watch when watching parent item")}),
             403,
         )
 
