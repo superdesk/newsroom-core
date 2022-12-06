@@ -28,7 +28,7 @@ class CompanyPermissions extends React.Component {
             Object.assign(sections, this.props.company.sections);
         } else {
             this.props.sections.forEach((section) => {
-                sections[section._id] = true;
+                sections[section._id] = false;
             });
         }
 
