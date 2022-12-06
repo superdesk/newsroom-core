@@ -632,6 +632,13 @@ export function containsExtraDate(item, dateToCheck) {
     return getDisplayDates(item).map(ed => moment(ed.date).format('YYYY-MM-DD')).includes(dateToCheck.format('YYYY-MM-DD'));
 }
 
+// get start date in utc mode if there is no time info
+const getStartDate = (item) => item.dates.all_day ? moment.utc(item.dates.start) : moment(item.dates.start);
+
+// get end date in utc mode if there is no end time info
+const getEndDate = (item) => item.dates.no_end_time || item.dates.all_day ?
+    moment.utc(item.dates.end || item.dates.start) :
+    moment(item.dates.end || item.dates.start);
 
 /**
  * Groups given agenda items per given grouping
@@ -653,10 +660,10 @@ export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
         )
         .forEach((item) => {
             const itemExtraDates = getExtraDates(item);
-            const itemStartDate = moment(item.dates.start);
+            const itemStartDate = getStartDate(item);
             const start = item._display_from ? moment(item._display_from) :
                 moment.max(maxStart, moment.min(itemExtraDates.concat([itemStartDate])));
-            const itemEndDate = moment(get(item, 'dates.end', start));
+            const itemEndDate = getEndDate(item);
 
             // If item is an event and was actioned (postponed, rescheduled, cancelled only incase of multi-day event)
             // actioned_date is set. In this case, use that as the cut off date.
