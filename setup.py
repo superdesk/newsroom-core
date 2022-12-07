@@ -15,7 +15,7 @@ with open(requirements_txt_path, "r") as r:
         if line.rsplit("\n", 1)[0]
         and (not line.startswith("#") and "superdesk-core.git" not in line and "superdesk-planning.git" not in line)
     ] + [
-        "superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@develop#egg=superdesk-core",
+        "superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@v2.6-rc1#egg=superdesk-core",
         "superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@develop#egg=superdesk-planning",
     ]
 
