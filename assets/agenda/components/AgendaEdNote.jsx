@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {get} from 'lodash';
 import classNames from 'classnames';
+import {get} from 'lodash';
 
 import {gettext} from 'utils';
+import {STATUS_CANCELED, STATUS_POSTPONED, STATUS_RESCHEDULED} from '../utils';
 
 export default function AgendaEdNote({item, plan, secondaryNoteField, noMargin}) {
     const planEdnote = get(plan, 'ednote');
@@ -15,7 +16,7 @@ export default function AgendaEdNote({item, plan, secondaryNoteField, noMargin})
         return null;
     }
 
-    const tooltip = !item.ednote && !plan.ednote ? gettext('Reason') : gettext('Editorial Note');
+    const tooltip = !item.ednote && !planEdnote ? gettext('Reason') : gettext('Editorial Note');
     const fixText = (text) => {
         // remove prefixes added by planning
         // which are always in english
@@ -28,22 +29,33 @@ export default function AgendaEdNote({item, plan, secondaryNoteField, noMargin})
         prefixes[RESCHEDULED] = 'Event Rescheduled: ';
         prefixes[CANCELLED] = 'Event Cancelled: ';
 
-        return prefixes.reduce((_text, prefix, index) => {
-            if (_text.startsWith(prefix)) {
-                let reason = _text.substr(prefix.length);
+        const index = prefixes.findIndex((_prefix) => text.startsWith(_prefix));
 
-                switch (index) {
-                case POSTPONED:
-                    return gettext('Event Postponed: {{reason}}', {reason});
-                case RESCHEDULED:
-                    return gettext('Event Rescheduled: {{reason}}', {reason});
-                case CANCELLED:
-                    return gettext('Event Cancelled: {{reason}}', {reason});
-                }
+        if (index !== -1) {
+            const reason = text.substr(prefixes[index].length);
+
+            switch (index) {
+            case POSTPONED:
+                return gettext('Event Postponed: {{reason}}', {reason});
+            case RESCHEDULED:
+                return gettext('Event Rescheduled: {{reason}}', {reason});
+            case CANCELLED:
+                return gettext('Event Cancelled: {{reason}}', {reason});
             }
+        }
 
-            return _text;
-        }, text.trim());
+        const reason = text;
+
+        switch (item.state) {
+        case STATUS_POSTPONED:
+            return gettext('Event Postponed: {{reason}}', {reason});
+        case STATUS_RESCHEDULED:
+            return gettext('Event Rescheduled: {{reason}}', {reason});
+        case STATUS_CANCELED:
+            return gettext('Event Cancelled: {{reason}}', {reason});
+        }
+
+        return text;
     };
 
     const getMultiLineNote = (note) => (note && fixText(note).split('\n').map((t, key) =>

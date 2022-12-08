@@ -14,10 +14,10 @@ import {
     formatTime,
 } from '../utils';
 
-const STATUS_KILLED = 'killed';
-const STATUS_CANCELED = 'cancelled';
-const STATUS_POSTPONED = 'postponed';
-const STATUS_RESCHEDULED = 'rescheduled';
+export const STATUS_KILLED = 'killed';
+export const STATUS_CANCELED = 'cancelled';
+export const STATUS_POSTPONED = 'postponed';
+export const STATUS_RESCHEDULED = 'rescheduled';
 
 const navigationFunctions = {
     'day': {
