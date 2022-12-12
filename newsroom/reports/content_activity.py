@@ -57,7 +57,7 @@ def get_items(args):
     get_resource_service("section_filters").apply_section_filter(source["query"], section)
 
     while True:
-        results = get_resource_service("{}_search".format(section)).search(source)
+        results = get_resource_service(section if section == "agenda" else f"{section}_search").search(source)
         items = list(results)
 
         if not len(items):
@@ -147,7 +147,7 @@ def get_facets(args):
         section = args["section"]
         get_resource_service("section_filters").apply_section_filter(source["query"], section)
 
-        results = get_resource_service("{}_search".format(section)).search(source)
+        results = get_resource_service(section if section == "agenda" else f"{section}_search").search(source)
 
         buckets = ((results.hits.get("aggregations") or {}).get("genres") or {}).get("buckets") or []
 
