@@ -640,6 +640,15 @@ const getEndDate = (item) => item.dates.no_end_time || item.dates.all_day ?
     moment.utc(item.dates.end || item.dates.start) :
     moment(item.dates.end || item.dates.start);
 
+// compare days without being affected by timezone
+const isBetweenDay = (day, start, end) => {
+    const dayDate = day.format('YYYY-MM-DD');
+    const startDate = start.format('YYYY-MM-DD');
+    const endDate = end.format('YYYY-MM-DD');
+
+    return (startDate <= dayDate && endDate >= dayDate);
+};
+
 /**
  * Groups given agenda items per given grouping
  * @param items: list of agenda items
@@ -676,7 +685,7 @@ export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
 
             // use clone otherwise it would modify start and potentially also maxStart, moments are mutable
             for (const day = start.clone(); day.isSameOrBefore(end, 'day'); day.add(1, 'd')) {
-                const isBetween = day.isBetween(itemStartDate, itemEndDate, 'day', '[]');
+                const isBetween = isBetweenDay(day, itemStartDate, itemEndDate);
                 const containsExtra = containsExtraDate(item, day);
                 const addGroupItem = (item.event == null || get(item, '_hits.matched_planning_items') != null) ?
                     containsExtra :
