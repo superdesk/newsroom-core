@@ -41,11 +41,11 @@ function getReportQueryString(currentState, next, exportReport, notify) {
         }
 
         if (params.date_from) {
-            params.date_from = getDateInputDate(params.date_from);
+            params.date_from = getDateInputDate((new Date(params.date_from)).toISOString());
         }
 
         if (params.date_to) {
-            params.date_to = getDateInputDate(params.date_to);
+            params.date_to = getDateInputDate((new Date(params.date_to)).toISOString());
         }
 
         if (params.section) {
