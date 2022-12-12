@@ -252,6 +252,8 @@ msgstr "Couverture ajoutée"
 #: newsroom/agenda/views.py:212
 msgid "Cannot edit coverage watch when watching parent item"
 msgstr ""
+"Il n'est pas possible de modifier la surveillance d'une couverture lorsqu'un"
+" élément qui y est associé est surveillé "
 
 #: newsroom/agenda/views.py:219
 msgid "Coverage not found"
@@ -1621,7 +1623,7 @@ msgstr "Couverture {{ type }} {{ slugline }} disponible {{deliveryState}}"
 
 #: assets/agenda/utils.js:876
 msgid "{{ type }} coverage"
-msgstr ""
+msgstr "Couverture {{ type }}"
 
 #: assets/agenda/components/AgendaApp.jsx:123
 #: assets/layout/components/BaseApp.jsx:77
@@ -2922,7 +2924,7 @@ msgstr "Expire le:"
 
 #: assets/news-api/components/EditAPIToken.jsx:243
 msgid "Edit API Token"
-msgstr "Modifier le jeton de l'API"
+msgstr "Modifier le jeton d'API"
 
 #: assets/news-api/components/EditAPIToken.jsx:244
 msgid "Create New API Token"

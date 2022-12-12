@@ -34,7 +34,7 @@ msgstr "Ilmoitus poistosta"
 
 #: newsroom/email.py:414
 msgid "Agenda cancelled notice"
-msgstr "Agenda peruttu -ilmoitus"
+msgstr "Tapahtuma tai suunnittelutieto peruttu -ilmoitus"
 
 #: newsroom/email_templates.py:73
 msgid "Email template name not supplied"
@@ -152,7 +152,7 @@ msgstr "Yhtiön tili on vanhentunut."
 #: newsroom/templates/agenda_index.html:3
 #: newsroom/templates/agenda_index.html:6
 msgid "Agenda"
-msgstr "Agenda"
+msgstr "Luotsi"
 
 #: newsroom/agenda/__init__.py:31 newsroom/am_news/__init__.py:18
 #: newsroom/factcheck/__init__.py:18 newsroom/market_place/__init__.py:35
@@ -160,7 +160,7 @@ msgstr "Agenda"
 #: newsroom/templates/bookmark_layout.html:3
 #: newsroom/templates/bookmark_layout.html:6 newsroom/wire/__init__.py:56
 msgid "Saved/Watched Items"
-msgstr "Tallennetut jutut"
+msgstr "Suosikit"
 
 #: newsroom/agenda/__init__.py:48
 msgid "Google Maps Styles"
@@ -262,7 +262,7 @@ msgstr "Virhe"
 
 #: newsroom/agenda/views.py:269
 msgid "Agenda item not found"
-msgstr "Agenda-tapahtumaa ei löytynyt"
+msgstr "Hakuun ei löytynyt osumia"
 
 #: newsroom/auth/forms.py:10
 msgid "Editor"
@@ -1297,11 +1297,11 @@ msgstr "Ei löytynyt"
 #: assets/section-filters/components/EditSectionFilter.jsx:87
 #: assets/users/components/EditUser.jsx:143
 msgid "Save"
-msgstr "Tallenna"
+msgstr "Tallenna suosikkeihin"
 
 #: assets/item-actions.js:67
 msgid "Unsave"
-msgstr "Poista kirjanmerkeistä"
+msgstr "Poista suosikeista"
 
 #: assets/item-actions.js:76
 msgid "Remove"
@@ -1620,7 +1620,7 @@ msgstr "Muokattu näkymä"
 
 #: assets/agenda/components/AgendaApp.jsx:147
 msgid "Agenda Content"
-msgstr "Agendan sisältö"
+msgstr "Sisältö"
 
 #: assets/agenda/components/AgendaApp.jsx:156
 #: assets/am-news/components/AmNewsApp.jsx:122
@@ -1700,7 +1700,7 @@ msgstr "Lähetä kyselysi"
 #: assets/agenda/components/AgendaCoverages.jsx:56
 #: assets/agenda/components/AgendaEventInfo.jsx:19
 msgid "Open Agenda in new tab"
-msgstr "Avaa agenda välilehdellä"
+msgstr "Avaa välilehdellä"
 
 #: assets/agenda/components/AgendaCoverages.jsx:69
 msgid "expected"
@@ -3234,7 +3234,7 @@ msgstr "Haku tallennettu onnistuneesti"
 
 #: assets/search/components/TopicEditor.jsx:200
 msgid "Create new Agenda Topic"
-msgstr "Luo uusi agenda-aihe"
+msgstr "Luo uusi aihe"
 
 #: assets/search/components/TopicEditor.jsx:201
 msgid "Create new Wire Topic"
@@ -3242,7 +3242,7 @@ msgstr "Tallenna uusi haku"
 
 #: assets/search/components/TopicEditor.jsx:204
 msgid "Save Agenda Topic"
-msgstr "Tallenna agenda-aihe"
+msgstr "Tallenna aihe"
 
 #: assets/search/components/TopicEditor.jsx:205
 msgid "Save Wire Topic"
@@ -3258,7 +3258,7 @@ msgstr "Sähköposti-ilmoitukset:"
 
 #: assets/search/components/TopicForm.jsx:30
 msgid "Toggle email notifications"
-msgstr ""
+msgstr "Peru sähköpostinotifikaatiot"
 
 #: assets/search/components/TopicForm.jsx:51
 msgid "Send me notifications"
@@ -3306,7 +3306,7 @@ msgstr "Uutisvirran aiheet"
 
 #: assets/search/components/TopicsTab.jsx:41
 msgid "Agenda Topics"
-msgstr "Agendan aiheet"
+msgstr "Aiheet"
 
 #: assets/search/components/TopicsTab.jsx:47
 #: assets/search/components/TopicsTab.jsx:78
@@ -3426,7 +3426,7 @@ msgstr "Tallennetut hakuni"
 
 #: assets/user-profile/components/UserProfileApp.jsx:55
 msgid "My Agenda Topics"
-msgstr "Omat aiheet"
+msgstr "Omat aiheeni"
 
 #: assets/user-profile/components/UserProfileApp.jsx:64
 msgid "My Monitoring"
