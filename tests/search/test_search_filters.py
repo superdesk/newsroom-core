@@ -231,6 +231,40 @@ def test_apply_request_filter__filters(client, app):
         assert {"term": {"service": "a"}} in search.source["post_filter"]["bool"]["must"]
 
 
+def test_apply_request_filter__filters_using_groups_config(client, app):
+    with app.test_request_context():
+        app.config["FILTER_BY_POST_FILTER"] = False
+        app.config["FILTER_AGGREGATIONS"] = True
+        app.config["WIRE_GROUPS"] = [
+            {
+                "field": "testfield",
+                "label": "Test Field",
+                "nested": {
+                    "parent": "subject",
+                    "field": "scheme",
+                    "value": "testfieldscheme",
+                },
+            },
+        ]
+
+        search = SearchQuery()
+        search.args = {"filter": json.dumps({"testfield": ["valuea", "valueb"]})}
+        service.apply_request_filter(search)
+        assert {
+            "nested": {
+                "path": "subject",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {"term": {"subject.scheme": "testfieldscheme"}},
+                            {"terms": {"subject.name": ["valuea", "valueb"]}},
+                        ],
+                    },
+                },
+            },
+        } in search.query["bool"]["must"]
+
+
 def test_apply_request_filter__versioncreated(client, app):
     with app.test_request_context():
         app.config["FILTER_BY_POST_FILTER"] = False

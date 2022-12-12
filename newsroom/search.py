@@ -259,7 +259,43 @@ class BaseSearchService(Service):
         return internal_req
 
     def set_bool_query_from_filters(self, bool_query: Dict[str, Any], filters: Dict[str, Any]):
-        bool_query["must"] += [{"terms": {self.get_aggregation_field(key): val}} for key, val in filters.items() if val]
+        for key, val in filters.items():
+            if not val:
+                continue
+            nested_config = self.get_nested_config(key)
+            if nested_config:
+                query = {
+                    "nested": {
+                        "path": nested_config["parent"],
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "term": {
+                                            f"{nested_config['parent']}.{nested_config['field']}": nested_config[
+                                                "value"
+                                            ]
+                                        }
+                                    },
+                                    {"terms": {f"{nested_config['parent']}.{nested_config['searchfield']}": val}},
+                                ],
+                            },
+                        },
+                    },
+                }
+            else:
+                query = {"terms": {self.get_aggregation_field(key): val}}
+            bool_query["must"].append(query)
+
+    def get_nested_config(self, field):
+        groups = self.get_groups()
+        for group in groups:
+            if group.get("field") == field and group.get("nested"):
+                group["nested"].setdefault("searchfield", "name")
+                return group["nested"]
+
+    def get_groups(self):
+        return app.config.get("WIRE_GROUPS") or []
 
     def get_aggregations(self):
         return app.config.get("WIRE_AGGS") or {}
