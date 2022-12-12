@@ -63,6 +63,7 @@ class SearchQuery(object):
         self.query = {"bool": {"must": [], "must_not": [], "should": []}}
         self.highlight = None
         self.item_type = None
+        self.planning_items_should = []
 
 
 class BaseSearchService(Service):
