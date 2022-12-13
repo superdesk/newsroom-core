@@ -258,7 +258,7 @@ def test_apply_request_filter__filters_using_groups_config(client, app):
                 "path": "subject",
                 "query": {
                     "bool": {
-                        "must": [
+                        "filter": [
                             {"term": {"subject.scheme": "testfieldscheme"}},
                             {"terms": {"subject.name": ["valuea", "valueb"]}},
                         ],
