@@ -24,7 +24,12 @@ test_event_1 = {
         {
             "qcode": "1523",
             "name": "Test Subject",
-        }
+        },
+        {
+            "qcode": "abcd",
+            "name": "Sports",
+            "scheme": "something completely different",
+        },
     ],
     "dates": {
         "start": "2038-05-28T04:00:00+0000",
@@ -107,7 +112,7 @@ def test_default_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient)
     client.post("/push", data=json.dumps(test_event_1), content_type="application/json")
     resp = client.get("/agenda/search")
     data = json.loads(resp.get_data())
-    assert get_agg_keys(data, "subject") == ["Test Subject"]
+    assert get_agg_keys(data, "subject") == ["Sports", "Test Subject"]
 
 
 def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
@@ -179,13 +184,14 @@ def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
     client.post("/push", data=json.dumps(test_event_2), content_type="application/json")
     resp = client.get("/agenda/search")
     data = json.loads(resp.get_data())
-    assert get_agg_keys(data, "subject.subject_filtered.subject") == ["Test Subject"]
+    assert get_agg_keys(data, "subject.subject_filtered.subject") == ["Test Subject", "Sports"]
     assert get_agg_keys(data, "sttdepartment.sttdepartment_filtered.sttdepartment") == ["Sports"]
 
-    # Search using the new search group, ``sttdepartment==Sporting Event``
+    print("NOW")
+    # Search using the new search group, ``sttdepartment==Sports``
     resp = client.get("/agenda/search?filter=%7B%22sttdepartment%22%3A%5B%22Sports%22%5D%7D")
     data = json.loads(resp.get_data())
-    assert len(data["_items"]) == 1
+    assert len(data["_items"]) == 1, [item["_id"] for item in data["_items"]]
     assert data["_items"][0]["_id"] == "event2"
 
 

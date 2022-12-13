@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Type, TypedDict
+from typing import List, Dict, Any, Optional, Type, TypedDict
 import logging
 from copy import deepcopy
 
@@ -10,6 +10,7 @@ class SearchGroupNestedConfig(TypedDict, total=False):
     field: str
     value: str
     include_planning: bool
+    searchfield: str
 
 
 class SearchGroupConfig(TypedDict, total=False):
@@ -28,6 +29,13 @@ def is_search_field_nested(resource_type: str, field: str):
     """Returns ``True`` if the ``resource_type`` is configured for nested search group"""
 
     return field in (nested_agg_groups.get(resource_type) or {}) or field in nested_agg_fields
+
+
+def get_nested_config(resource_type: str, field: str) -> Optional[SearchGroupNestedConfig]:
+    config = (nested_agg_groups.get(resource_type) or {}).get(field)
+    if config is not None:
+        return config.get("nested")
+    return None
 
 
 def init_nested_aggregation(resource: Type[Resource], groups: List[SearchGroupConfig], aggs: Dict[str, Any]):
@@ -61,6 +69,7 @@ def init_nested_aggregation(resource: Type[Resource], groups: List[SearchGroupCo
 
         agg_groups.setdefault(nested["parent"], {})
         agg_groups[nested["parent"]].setdefault(nested["field"], []).append(nested)
+        nested.setdefault("searchfield", "name")
 
         nested_agg_groups[resource_type][field] = group
         group["agg_path"] = f"{field}.{field}_filtered.{field}.buckets"

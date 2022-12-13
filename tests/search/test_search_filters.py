@@ -6,7 +6,9 @@ from content_api.errors import BadParameterValueError
 
 from newsroom import auth  # noqa
 from newsroom.search import SearchQuery, BaseSearchService
+from newsroom.search_config import init_nested_aggregation
 from newsroom.utils import get_local_date
+from newsroom.wire.search import WireSearchResource
 
 from .fixtures import (
     PUBLIC_USER_ID,
@@ -229,6 +231,41 @@ def test_apply_request_filter__filters(client, app):
         search.args = {"filter": {"term": {"service": "a"}}}
         service.apply_request_filter(search)
         assert {"term": {"service": "a"}} in search.source["post_filter"]["bool"]["must"]
+
+
+def test_apply_request_filter__filters_using_groups_config(client, app):
+    with app.test_request_context():
+        app.config["FILTER_BY_POST_FILTER"] = False
+        app.config["FILTER_AGGREGATIONS"] = True
+        app.config["WIRE_GROUPS"] = [
+            {
+                "field": "testfield",
+                "label": "Test Field",
+                "nested": {
+                    "parent": "subject",
+                    "field": "scheme",
+                    "value": "testfieldscheme",
+                },
+            },
+        ]
+        init_nested_aggregation(WireSearchResource, app.config["WIRE_GROUPS"], {})
+
+        search = SearchQuery()
+        search.args = {"filter": json.dumps({"testfield": ["valuea", "valueb"]})}
+        service.apply_request_filter(search)
+        assert {
+            "nested": {
+                "path": "subject",
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {"term": {"subject.scheme": "testfieldscheme"}},
+                            {"terms": {"subject.name": ["valuea", "valueb"]}},
+                        ],
+                    },
+                },
+            },
+        } in search.query["bool"]["must"]
 
 
 def test_apply_request_filter__versioncreated(client, app):
