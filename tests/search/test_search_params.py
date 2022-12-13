@@ -286,7 +286,6 @@ def test_prefill_search_products__public_products(client, app):
 def test_prefill_search_items(client, app):
     with app.test_request_context():
         search = get_search_instance()
-        assert {"term": {"_type": "items"}} in search.query["bool"]["must"]
         assert {"term": {"type": "composite"}} in search.query["bool"]["must_not"]
         assert {"constant_score": {"filter": {"exists": {"field": "nextversion"}}}} in search.query["bool"]["must_not"]
 
