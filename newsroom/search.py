@@ -437,7 +437,6 @@ class BaseSearchService(Service):
         """
 
         search.query["bool"]["must_not"].append({"term": {"type": "composite"}})
-        search.query["bool"]["must"].append({"term": {"_type": "items"}})
         if not search.args.get("ignore_latest", False):
             search.query["bool"]["must_not"].append(
                 {"constant_score": {"filter": {"exists": {"field": "nextversion"}}}}

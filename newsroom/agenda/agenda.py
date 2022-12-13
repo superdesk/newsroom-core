@@ -298,7 +298,7 @@ class AgendaResource(newsroom.Resource):
 def _agenda_query():
     return {
         "bool": {
-            "must": [{"term": {"_type": "agenda"}}],
+            "must": [],
             "should": [],
             "must_not": [{"term": {"state": "killed"}}],
         }
