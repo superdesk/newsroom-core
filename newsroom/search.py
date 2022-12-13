@@ -1,5 +1,5 @@
 import logging
-from typing import Union, Dict, Any
+from typing import List, Optional, Union, Dict, Any
 from copy import deepcopy
 
 from flask import current_app as app, json, abort
@@ -13,7 +13,7 @@ from superdesk.default_settings import strtobool
 from content_api.errors import BadParameterValueError
 
 from newsroom import Service
-from newsroom.search_config import is_search_field_nested
+from newsroom.search_config import SearchGroupNestedConfig, get_nested_config, is_search_field_nested
 from newsroom.products.products import (
     get_products_by_navigation,
     get_products_by_company,
@@ -38,6 +38,26 @@ def query_string(query, default_operator="AND"):
             "lenient": True,
         }
     }
+
+
+def get_filter_query(
+    key: str, val: List[str], aggregation_field: str, nested_config: Optional[SearchGroupNestedConfig]
+):
+    if nested_config:
+        return {
+            "nested": {
+                "path": nested_config["parent"],
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {"term": {f"{nested_config['parent']}.{nested_config['field']}": nested_config["value"]}},
+                            {"terms": {f"{nested_config['parent']}.{nested_config['searchfield']}": val}},
+                        ],
+                    },
+                },
+            },
+        }
+    return {"terms": {aggregation_field: val}}
 
 
 class SearchQuery(object):
@@ -262,46 +282,17 @@ class BaseSearchService(Service):
         for key, val in filters.items():
             if not val:
                 continue
-            nested_config = self.get_nested_config(key)
-            if nested_config:
-                query = {
-                    "nested": {
-                        "path": nested_config["parent"],
-                        "query": {
-                            "bool": {
-                                "must": [
-                                    {
-                                        "term": {
-                                            f"{nested_config['parent']}.{nested_config['field']}": nested_config[
-                                                "value"
-                                            ]
-                                        }
-                                    },
-                                    {"terms": {f"{nested_config['parent']}.{nested_config['searchfield']}": val}},
-                                ],
-                            },
-                        },
-                    },
-                }
-            else:
-                query = {"terms": {self.get_aggregation_field(key): val}}
-            bool_query["must"].append(query)
-
-    def get_nested_config(self, field):
-        groups = self.get_groups()
-        for group in groups:
-            if group.get("field") == field and group.get("nested"):
-                group["nested"].setdefault("searchfield", "name")
-                return group["nested"]
-
-    def get_groups(self):
-        return app.config.get("WIRE_GROUPS") or []
+            bool_query["must"].append(
+                get_filter_query(key, val, self.get_aggregation_field(key), get_nested_config("items", key))
+            )
 
     def get_aggregations(self):
         return app.config.get("WIRE_AGGS") or {}
 
     def get_aggregation_field(self, key):
         aggregations = self.get_aggregations()
+        if key not in aggregations:
+            return key
         if is_search_field_nested("items", key):
             return aggregations[key]["aggs"][f"{key}_filtered"]["aggs"][key]["terms"]["field"]
         else:

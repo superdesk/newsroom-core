@@ -6,7 +6,9 @@ from content_api.errors import BadParameterValueError
 
 from newsroom import auth  # noqa
 from newsroom.search import SearchQuery, BaseSearchService
+from newsroom.search_config import init_nested_aggregation
 from newsroom.utils import get_local_date
+from newsroom.wire.search import WireSearchResource
 
 from .fixtures import (
     PUBLIC_USER_ID,
@@ -246,6 +248,7 @@ def test_apply_request_filter__filters_using_groups_config(client, app):
                 },
             },
         ]
+        init_nested_aggregation(WireSearchResource, app.config["WIRE_GROUPS"], {})
 
         search = SearchQuery()
         search.args = {"filter": json.dumps({"testfield": ["valuea", "valueb"]})}

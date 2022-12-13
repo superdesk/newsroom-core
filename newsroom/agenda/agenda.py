@@ -40,8 +40,8 @@ from newsroom.utils import (
 from newsroom.utils import get_local_date, get_end_date
 from datetime import datetime
 from newsroom.wire import url_for_wire
-from newsroom.search import BaseSearchService, SearchQuery, query_string
-from newsroom.search_config import is_search_field_nested
+from newsroom.search import BaseSearchService, SearchQuery, query_string, get_filter_query
+from newsroom.search_config import is_search_field_nested, get_nested_config
 from .utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD, push_agenda_item_notification
 
 
@@ -566,7 +566,7 @@ def _filter_terms(filters, item_type):
                         "bool": {
                             "minimum_should_match": 1,
                             "should": [
-                                {"terms": {agg_field: val}},
+                                get_filter_query(key, val, agg_field, get_nested_config("agenda", key)),
                                 nested_query(
                                     path="planning_items",
                                     query={"bool": {"must": [{"terms": {f"planning_items.{agg_field}": val}}]}},
@@ -577,7 +577,9 @@ def _filter_terms(filters, item_type):
                     }
                 )
             else:
-                must_term_filters.append({"terms": {get_aggregation_field(key): val}})
+                must_term_filters.append(
+                    get_filter_query(key, val, get_aggregation_field(key), get_nested_config("agenda", key))
+                )
 
     return {
         "must_term_filters": must_term_filters,
