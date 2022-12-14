@@ -42,7 +42,6 @@ class WireSearchResource(newsroom.Resource):
             "charcount": 1,
             "version": 1,
         },
-        "elastic_filter": {"bool": {"must": [{"term": {"_type": "items"}}]}},
     }
 
     item_methods = ["GET"]
@@ -78,7 +77,7 @@ def items_query(ignore_latest=False):
     query = {
         "bool": {
             "must_not": [{"term": {"type": "composite"}}],
-            "must": [{"term": {"_type": "items"}}],
+            "must": [],
         }
     }
 

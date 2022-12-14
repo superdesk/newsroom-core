@@ -667,6 +667,7 @@ def set_item_reference(coverage):
     if item:
         if "planning_id" not in item and "coverage_id" not in item:
             service = superdesk.get_resource_service("content_api")
+            service.datasource = "items"
             service.patch(
                 item.get("_id"),
                 updates={
