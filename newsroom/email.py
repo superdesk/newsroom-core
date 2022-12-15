@@ -26,7 +26,7 @@ from superdesk.logging import logger
 class NewsroomMessage(Message):
     def _message(self):
         msg = super()._message()
-        msg.policy = email_policy.SMTPUTF8
+        msg.policy = email_policy.SMTP
         return msg
 
 
