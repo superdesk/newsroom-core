@@ -695,7 +695,7 @@ def notify_new_item(item, check_topics=True):
         if item_type == "agenda":
             push_agenda_item_notification("new_item", item=item)
         else:
-            push_notification("new_item", item=item)
+            push_notification("new_item", _items=[item])
 
         if check_topics:
             if item_type == "text":
