@@ -400,6 +400,8 @@ def set_agenda_metadata_from_event(agenda, event, set_doc_id=True):
     agenda["event"] = event
     agenda["registration_details"] = event.get("registration_details")
     agenda["invitation_details"] = event.get("invitation_details")
+    agenda["language"] = event.get("language")
+    agenda["source"] = event.get("source")
 
     set_dates(agenda)
 
