@@ -161,6 +161,8 @@ def get_coverage_email_text(coverage, default_state="", language=None):
 
 def remove_fields_for_public_user(item):
     def clean_coverages(coverages):
+        if not coverages:
+            return
         for c in coverages:
             c.pop("internal_note", None)
             c.get("planning", {}).pop("internal_note", None)
@@ -171,9 +173,9 @@ def remove_fields_for_public_user(item):
     planning_items = item.get("planning_items", [])
     for p in planning_items:
         p.pop("internal_note", None)
-        clean_coverages(p.get("coverages", []))
+        clean_coverages(p.get("coverages"))
 
-    clean_coverages(item.get("coverages", []))
+    clean_coverages(item.get("coverages"))
 
 
 def get_planning_coverages(item, plan_id):
