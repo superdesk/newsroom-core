@@ -15,6 +15,7 @@ from newsroom.utils import (
     set_version_creator,
 )
 from newsroom.upload import get_file
+from newsroom.wire.views import delete_dashboard_caches
 
 
 def get_settings_data():
@@ -51,6 +52,7 @@ def create():
     card_data = _get_card_data(data)
     set_original_creator(card_data)
     ids = get_resource_service("cards").post([card_data])
+    delete_dashboard_caches()
     return jsonify({"success": True, "_id": ids[0]}), 201
 
 
@@ -101,6 +103,7 @@ def edit(id):
     card_data = _get_card_data(data)
     set_version_creator(card_data)
     get_resource_service("cards").patch(id=ObjectId(id), updates=card_data)
+    delete_dashboard_caches()
     return jsonify({"success": True}), 200
 
 
@@ -110,4 +113,5 @@ def delete(id):
     """Deletes the cards by given id"""
     get_entity_or_404(id, "cards")
     get_resource_service("cards").delete({"_id": ObjectId(id)})
+    delete_dashboard_caches()
     return jsonify({"success": True}), 200
