@@ -81,6 +81,8 @@ test_event: Dict[str, Any] = {
         "qcode": "eocstat:eos5",
         "label": "Planned, occurs certainly",
     },
+    "source": "Test",
+    "language": "en-CA",
 }
 
 test_planning = {
@@ -188,6 +190,8 @@ def test_push_parsed_event(client, app):
     assert 1 == len(parsed["service"])
     assert 1 == len(parsed["subject"])
     assert "a" == parsed["service"][0]["code"]
+    assert "en-CA" == parsed["language"]
+    assert "Test" == parsed["source"]
 
     resp = client.get("/agenda/search?date_to=now/d")
     data = json.loads(resp.get_data())

@@ -143,6 +143,8 @@ class AgendaResource(newsroom.Resource):
     schema["ednote"] = events_schema["ednote"]
     schema["registration_details"] = {"type": "string"}
     schema["invitation_details"] = {"type": "string"}
+    schema["language"] = not_analyzed
+    schema["source"] = not_analyzed
 
     # aggregated fields
     schema["urgency"] = planning_schema["urgency"]
