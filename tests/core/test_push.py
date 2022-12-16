@@ -569,7 +569,7 @@ def test_do_not_notify_disabled_user(client, app, mocker):
     headers = get_signature_headers(data, key)
     resp = client.post("/push", data=data, content_type="application/json", headers=headers)
     assert 200 == resp.status_code
-    assert push_mock.call_args[1]["item"]["_id"] == "foo"
+    assert push_mock.call_args[1]["_items"][0]["_id"] == "foo"
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
