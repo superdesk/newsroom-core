@@ -143,8 +143,8 @@ class AgendaResource(newsroom.Resource):
     schema["ednote"] = events_schema["ednote"]
     schema["registration_details"] = {"type": "string"}
     schema["invitation_details"] = {"type": "string"}
-    schema["language"] = not_analyzed
-    schema["source"] = not_analyzed
+    schema["language"] = {"type": "string", "mapping": {"type": "keyword"}}
+    schema["source"] = {"type": "string", "mapping": {"type": "keyword"}}
 
     # aggregated fields
     schema["urgency"] = planning_schema["urgency"]
@@ -443,6 +443,7 @@ def _set_event_date_range(search):
 
 
 aggregations: Dict[str, Dict[str, Any]] = {
+    "language": {"terms": {"field": "language"}},
     "calendar": {"terms": {"field": "calendars.name", "size": 100}},
     "service": {"terms": {"field": "service.name", "size": 50}},
     "subject": {"terms": {"field": "subject.name", "size": 20}},
