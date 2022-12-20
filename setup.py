@@ -15,13 +15,13 @@ with open(requirements_txt_path, "r") as r:
         if line.rsplit("\n", 1)[0]
         and (not line.startswith("#") and "superdesk-core.git" not in line and "superdesk-planning.git" not in line)
     ] + [
-        "superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@v2.6-rc1#egg=superdesk-core",
-        "superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@develop#egg=superdesk-planning",
+        "superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@v2.6.0rc3#egg=superdesk-core",
+        "superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@v2.6.0-rc2#egg=superdesk-planning",
     ]
 
 setup(
     name="Newsroom-Core",
-    version="2.1.0-dev",
+    version="2.3.0-rc2",
     description="Newsroom Core library",
     author="Sourcefabric",
     url="https://github.com/superdesk/newsroom-core",
