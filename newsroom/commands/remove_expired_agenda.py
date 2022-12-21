@@ -99,7 +99,7 @@ def _get_expired_items(
                 {
                     "query": {
                         "bool": {
-                            "must": [{"range": {"dates.end": {"lte": expiry_datetime_str}}}],
+                            "filter": [{"range": {"dates.end": {"lte": expiry_datetime_str}}}],
                             "should": [
                                 # Match Events directly (stored from v2.3+)
                                 # No more filters required, as we'll query & check planning items separately
@@ -107,7 +107,7 @@ def _get_expired_items(
                                 # Match Planning directly with no associated Event (stored from v2.3+)
                                 {
                                     "bool": {
-                                        "must": [{"term": {"item_type": "planning"}}],
+                                        "filter": [{"term": {"item_type": "planning"}}],
                                         "must_not": [
                                             {"exists": {"field": "event_id"}},
                                             coverage_scheduled_query,

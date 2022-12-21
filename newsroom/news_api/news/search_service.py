@@ -321,7 +321,7 @@ class NewsAPINewsService(BaseSearchService):
         """
 
         if search.args.get("q"):
-            search.query["bool"]["must"].append(
+            search.query["bool"]["filter"].append(
                 query_string(search.args["q"], search.args.get("default_operator") or "AND")
             )
 
@@ -334,7 +334,7 @@ class NewsAPINewsService(BaseSearchService):
         start_date, end_date = self._get_date_range(search.args)
         date_filter = self._create_date_range_filter(start_date, end_date)
         if date_filter:
-            search.query["bool"]["must"].append(date_filter)
+            search.query["bool"]["filter"].append(date_filter)
 
     def apply_fields_filter(self, search):
         """Generate the field filters
@@ -380,7 +380,7 @@ class NewsAPINewsService(BaseSearchService):
             filters.append({"terms": {field_name: filter_value}})
 
         if filters:
-            search.query["bool"]["must"].extend(filters)
+            search.query["bool"]["filter"].extend(filters)
 
     def apply_projections(self, search):
         """Generate and apply projections

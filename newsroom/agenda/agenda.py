@@ -84,7 +84,7 @@ nested_code_mapping = {
 
 
 def set_saved_items_query(query, user_id):
-    query["bool"]["must"].append(
+    query["bool"]["filter"].append(
         {
             "bool": {
                 "should": [
@@ -300,7 +300,7 @@ class AgendaResource(newsroom.Resource):
 def _agenda_query():
     return {
         "bool": {
-            "must": [],
+            "filter": [],
             "should": [],
             "must_not": [{"term": {"state": "killed"}}],
         }
@@ -336,13 +336,13 @@ def _set_event_date_range(search):
         should = [
             {
                 "bool": {
-                    "must": {"range": {"dates.start": {"gte": date_from}}},
+                    "filter": {"range": {"dates.start": {"gte": date_from}}},
                     "must_not": {"term": {"dates.all_day": True}},
                 },
             },
             {
                 "bool": {
-                    "must": [
+                    "filter": [
                         {"term": {"dates.all_day": True}},
                         {"range": {"dates.start": {"gte": search.args["date_from"]}}},
                     ],
@@ -354,13 +354,13 @@ def _set_event_date_range(search):
         should = [
             {
                 "bool": {
-                    "must": {"range": {"dates.end": {"lte": date_to}}},
+                    "filter": {"range": {"dates.end": {"lte": date_to}}},
                     "must_not": {"term": {"dates.all_day": True}},
                 },
             },
             {
                 "bool": {
-                    "must": [
+                    "filter": [
                         {"range": {"dates.end": {"lte": search.args["date_to"]}}},
                         {"term": {"dates.all_day": True}},
                     ],
@@ -373,7 +373,7 @@ def _set_event_date_range(search):
             {
                 # Both start/end dates are inside the range
                 "bool": {
-                    "must": [
+                    "filter": [
                         {"range": {"dates.start": {"gte": date_from}}},
                         {"range": {"dates.end": {"lte": date_to}}},
                     ],
@@ -383,7 +383,7 @@ def _set_event_date_range(search):
             {
                 # Both start/end dates are inside the range, all day version
                 "bool": {
-                    "must": [
+                    "filter": [
                         {"range": {"dates.start": {"gte": search.args["date_from"]}}},
                         {"range": {"dates.end": {"lte": search.args["date_to"]}}},
                         {"term": {"dates.all_day": True}},
@@ -393,7 +393,7 @@ def _set_event_date_range(search):
             {
                 # Starts before date_from and finishes after date_to
                 "bool": {
-                    "must": [
+                    "filter": [
                         {"range": {"dates.start": {"lt": date_from}}},
                         {"range": {"dates.end": {"gt": date_to}}},
                     ],
@@ -403,7 +403,7 @@ def _set_event_date_range(search):
             {
                 # Starts before date_from and finishes after date_to, all day version
                 "bool": {
-                    "must": [
+                    "filter": [
                         {"range": {"dates.start": {"lt": search.args["date_from"]}}},
                         {"range": {"dates.end": {"gt": search.args["date_to"]}}},
                         {"term": {"dates.all_day": True}},
@@ -428,7 +428,7 @@ def _set_event_date_range(search):
                         {"range": {"dates.start": {"gte": search.args["date_from"], "lte": search.args["date_to"]}}},
                         {"range": {"dates.end": {"gte": search.args["date_from"], "lte": search.args["date_to"]}}},
                     ],
-                    "must": {"term": {"dates.all_day": True}},
+                    "filter": {"term": {"dates.all_day": True}},
                     "minimum_should_match": 1,
                 },
             },
@@ -439,7 +439,7 @@ def _set_event_date_range(search):
         should.append({"range": {"display_dates": date_range}})
 
     if len(should):
-        search.query["bool"]["must"].append({"bool": {"should": should, "minimum_should_match": 1}})
+        search.query["bool"]["filter"].append({"bool": {"should": should, "minimum_should_match": 1}})
 
 
 aggregations: Dict[str, Dict[str, Any]] = {
@@ -532,7 +532,7 @@ def _filter_terms(filters, item_type):
             must_term_filters.append(
                 nested_query(
                     path="coverages",
-                    query={"bool": {"must": [{"terms": {get_aggregation_field(key): val}}]}},
+                    query={"bool": {"filter": [{"terms": {get_aggregation_field(key): val}}]}},
                     name="coverage",
                 )
             )
@@ -541,7 +541,7 @@ def _filter_terms(filters, item_type):
                 must_term_filters.append(
                     nested_query(
                         path="coverages",
-                        query={"bool": {"must": [{"terms": {"coverages.coverage_status": ["coverage intended"]}}]}},
+                        query={"bool": {"filter": [{"terms": {"coverages.coverage_status": ["coverage intended"]}}]}},
                         name="coverage_status",
                     )
                 )
@@ -549,7 +549,7 @@ def _filter_terms(filters, item_type):
                 must_not_term_filters.append(
                     nested_query(
                         path="coverages",
-                        query={"bool": {"must": [{"terms": {"coverages.coverage_status": ["coverage intended"]}}]}},
+                        query={"bool": {"filter": [{"terms": {"coverages.coverage_status": ["coverage intended"]}}]}},
                         name="coverage_status",
                     )
                 )
@@ -557,7 +557,7 @@ def _filter_terms(filters, item_type):
             must_term_filters.append(
                 nested_query(
                     path="planning_items",
-                    query={"bool": {"must": [{"terms": {get_aggregation_field(key): val}}]}},
+                    query={"bool": {"filter": [{"terms": {get_aggregation_field(key): val}}]}},
                     name="agendas",
                 )
             )
@@ -572,7 +572,7 @@ def _filter_terms(filters, item_type):
                                 get_filter_query(key, val, agg_field, get_nested_config("agenda", key)),
                                 nested_query(
                                     path="planning_items",
-                                    query={"bool": {"must": [{"terms": {f"planning_items.{agg_field}": val}}]}},
+                                    query={"bool": {"filter": [{"terms": {f"planning_items.{agg_field}": val}}]}},
                                     name=key,
                                 ),
                             ],
@@ -838,7 +838,7 @@ class AgendaService(BaseSearchService):
 
         # Append the product query to the agenda query
         agenda_query = _agenda_query()
-        agenda_query["bool"]["must"].append(search.query)
+        agenda_query["bool"]["filter"].append(search.query)
         search.query = agenda_query
 
         # Apply agenda based filters
@@ -850,7 +850,7 @@ class AgendaService(BaseSearchService):
 
         if search.item_type == "events":
             # no adhoc planning items and remove planning items and coverages fields
-            search.query["bool"]["must"].append(
+            search.query["bool"]["filter"].append(
                 {
                     "bool": {
                         "should": [
@@ -859,7 +859,7 @@ class AgendaService(BaseSearchService):
                                 # Match Events before ``item_type`` field was added
                                 "bool": {
                                     "must_not": {"exists": {"field": "item_type"}},
-                                    "must": {"exists": {"field": "event_id"}},
+                                    "filter": {"exists": {"field": "event_id"}},
                                 },
                             },
                         ],
@@ -869,7 +869,7 @@ class AgendaService(BaseSearchService):
             )
             _remove_fields(search.source, PLANNING_ITEMS_FIELDS)
         elif search.item_type == "planning":
-            search.query["bool"]["must"].append(
+            search.query["bool"]["filter"].append(
                 {
                     "bool": {
                         "should": [
@@ -890,7 +890,7 @@ class AgendaService(BaseSearchService):
             )
         else:
             # Don't include Planning items that are associated with an Event
-            search.query["bool"]["must"].append(
+            search.query["bool"]["filter"].append(
                 {
                     "bool": {
                         "should": [
@@ -898,7 +898,7 @@ class AgendaService(BaseSearchService):
                             {"term": {"item_type": "event"}},
                             {
                                 "bool": {
-                                    "must": {"term": {"item_type": "planning"}},
+                                    "filter": {"term": {"item_type": "planning"}},
                                     "must_not": {"exists": {"field": "event_id"}},
                                 },
                             },
@@ -949,15 +949,15 @@ class AgendaService(BaseSearchService):
                         )
 
                     if test_query["or"]:
-                        search.query["bool"]["must"].append(test_query)
+                        search.query["bool"]["filter"].append(test_query)
             except Exception:
                 pass
 
             if not test_query.get("or"):
-                search.query["bool"]["must"].append(get_agenda_query(search.args["q"], search.item_type == "events"))
+                search.query["bool"]["filter"].append(get_agenda_query(search.args["q"], search.item_type == "events"))
 
         if search.args.get("id"):
-            search.query["bool"]["must"].append({"term": {"_id": search.args["id"]}})
+            search.query["bool"]["filter"].append({"term": {"_id": search.args["id"]}})
 
         if search.args.get("bookmarks"):
             set_saved_items_query(search.query, search.args["bookmarks"])
@@ -1012,14 +1012,14 @@ class AgendaService(BaseSearchService):
         get_resource_service("section_filters").apply_section_filter(query, self.section)
         planning_items_query = nested_query(
             "planning_items",
-            {"bool": {"must": [{"terms": {"planning_items.guid": featured["items"]}}]}},
+            {"bool": {"filter": [{"terms": {"planning_items.guid": featured["items"]}}]}},
             name="featured",
         )
         if req.args.get("q"):
-            query["bool"]["must"].append(query_string(req.args["q"]))
-            planning_items_query["nested"]["query"]["bool"]["must"].append(planning_items_query_string(req.args["q"]))
+            query["bool"]["filter"].append(query_string(req.args["q"]))
+            planning_items_query["nested"]["query"]["bool"]["filter"].append(planning_items_query_string(req.args["q"]))
 
-        query["bool"]["must"].append(planning_items_query)
+        query["bool"]["filter"].append(planning_items_query)
 
         source = {"query": query}
         self.set_post_filter(source, req)
@@ -1030,7 +1030,7 @@ class AgendaService(BaseSearchService):
 
         if company and not is_admin(user) and company.get("events_only", False):
             # no adhoc planning items and remove planning items and coverages fields
-            query["bool"]["must"].append({"exists": {"field": "event"}})
+            query["bool"]["filter"].append({"exists": {"field": "event"}})
             _remove_fields(source, PLANNING_ITEMS_FIELDS)
 
         internal_req = ParsedRequest()
@@ -1064,7 +1064,7 @@ class AgendaService(BaseSearchService):
     def get_items(self, item_ids):
         query = {
             "bool": {
-                "must": [{"terms": {"_id": item_ids}}],
+                "filter": [{"terms": {"_id": item_ids}}],
             }
         }
         get_resource_service("section_filters").apply_section_filter(query, self.section)
@@ -1130,12 +1130,12 @@ class AgendaService(BaseSearchService):
 
         query = {
             "bool": {
-                "must": [
+                "filter": [
                     {
                         "nested": {
                             "path": "coverages",
                             "query": {
-                                "bool": {"must": [{"term": {"coverages.coverage_id": wire_item["coverage_id"]}}]}
+                                "bool": {"filter": [{"term": {"coverages.coverage_id": wire_item["coverage_id"]}}]}
                             },
                         }
                     }
@@ -1212,8 +1212,8 @@ class AgendaService(BaseSearchService):
         self, bool_query: Dict[str, Any], filters: Dict[str, Any], item_type: Optional[str] = None
     ):
         filter_terms = _filter_terms(filters, item_type)
-        bool_query.setdefault("must", [])
-        bool_query["must"] += filter_terms["must_term_filters"]
+        bool_query.setdefault("filter", [])
+        bool_query["filter"] += filter_terms["must_term_filters"]
 
         bool_query.setdefault("must_not", [])
         bool_query["must_not"] += filter_terms["must_not_term_filters"]
@@ -1237,7 +1237,7 @@ class AgendaService(BaseSearchService):
                     "must_not": [
                         {"term": {"state": "killed"}},
                     ],
-                    "must": [
+                    "filter": [
                         {"term": {"_id": item_id}},
                     ],
                     "should": [],

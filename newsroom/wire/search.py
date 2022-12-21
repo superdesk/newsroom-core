@@ -66,7 +66,7 @@ def versioncreated_range(created):
 
 
 def set_bookmarks_query(query, user_id):
-    query["bool"]["must"].append(
+    query["bool"]["filter"].append(
         {
             "term": {"bookmarks": str(user_id)},
         }
@@ -77,7 +77,7 @@ def items_query(ignore_latest=False):
     query = {
         "bool": {
             "must_not": [{"term": {"type": "composite"}}],
-            "must": [],
+            "filter": [],
         }
     }
 
@@ -108,7 +108,7 @@ class WireSearchService(BaseSearchService):
                     "must_not": [
                         {"term": {"type": "composite"}},
                     ],
-                    "must": [{"terms": {"_id": item_ids}}],
+                    "filter": [{"terms": {"_id": item_ids}}],
                     "should": [],
                 }
             }
@@ -153,7 +153,7 @@ class WireSearchService(BaseSearchService):
             return []
 
         if not app.config["DASHBOARD_EMBARGOED"]:
-            search.query["bool"]["must"].append(
+            search.query["bool"]["filter"].append(
                 {
                     "bool": {
                         "should": [
@@ -177,7 +177,7 @@ class WireSearchService(BaseSearchService):
         search.query["bool"]["minimum_should_match"] = 1
 
         self.gen_source_from_search(search)
-        search.source["post_filter"] = {"bool": {"must": []}}
+        search.source["post_filter"] = {"bool": {"filter": []}}
         internal_req = self.get_internal_request(search)
 
         return list(self.internal_get(internal_req, None))
@@ -248,7 +248,7 @@ class WireSearchService(BaseSearchService):
                         {"term": {"type": "composite"}},
                         {"constant_score": {"filter": {"exists": {"field": "nextversion"}}}},
                     ],
-                    "must": [{"term": {"_id": item_id}}],
+                    "filter": [{"term": {"_id": item_id}}],
                     "should": [],
                 }
             },
@@ -375,7 +375,7 @@ class WireSearchService(BaseSearchService):
                 "must_not": [
                     {"term": {"type": "composite"}},
                 ],
-                "must": [{"terms": {"_id": item_ids}}],
+                "filter": [{"terms": {"_id": item_ids}}],
             }
         }
         get_resource_service("section_filters").apply_section_filter(query, self.section)

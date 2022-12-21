@@ -257,7 +257,7 @@ def related_wire_items(wire_id):
     source = {}
     must_terms = [{"term": {"coverages.delivery_id": {"value": wire_id}}}]
     query = {
-        "bool": {"must": must_terms},
+        "bool": {"filter": must_terms},
     }
 
     source.update({"query": {"nested": {"path": "coverages", "query": query}}})
@@ -312,7 +312,7 @@ def search_locations():
     def gen_agg_filter(field: str):
         return {
             "bool": {
-                "must": [
+                "filter": [
                     {
                         "query_string": {
                             "fields": [f"location.{field}"],
@@ -363,7 +363,7 @@ def search_locations():
     if apply_filters:
         es_query["query"] = {
             "bool": {
-                "must": [
+                "filter": [
                     {
                         "query_string": {
                             "fields": [

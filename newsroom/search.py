@@ -80,7 +80,7 @@ class SearchQuery(object):
 
         self.aggs = None
         self.source = {}
-        self.query = {"bool": {"must": [], "must_not": [], "should": []}}
+        self.query = {"bool": {"filter": [], "must_not": [], "should": []}}
         self.highlight = None
         self.item_type = None
         self.planning_items_should = []
@@ -152,7 +152,7 @@ class BaseSearchService(Service):
 
         # Now run a query only using the IDs from the above search
         # This final search makes sure pagination still works
-        search.query["bool"] = {"must": {"terms": {"_id": next_item_ids}}}
+        search.query["bool"] = {"filter": {"terms": {"_id": next_item_ids}}}
         self.gen_source_from_search(search)
         internal_req = self.get_internal_request(search)
         res = self.internal_get(internal_req, search.lookup)
@@ -173,7 +173,7 @@ class BaseSearchService(Service):
                     {
                         "query": {
                             "bool": {
-                                "must": [
+                                "filter": [
                                     {"term": {"original_id": original_id}},
                                 ],
                                 "must_not": [{"exists": {"field": "nextversion"}}],
@@ -282,7 +282,7 @@ class BaseSearchService(Service):
         for key, val in filters.items():
             if not val:
                 continue
-            bool_query["must"].append(
+            bool_query["filter"].append(
                 get_filter_query(key, val, self.get_aggregation_field(key), get_nested_config("items", key))
             )
 
@@ -522,7 +522,7 @@ class BaseSearchService(Service):
         for company_type in app.config.get("COMPANY_TYPES", []):
             if company_type["id"] == search.company["company_type"]:
                 if company_type.get("wire_must"):
-                    search.query["bool"]["must"].append(company_type["wire_must"])
+                    search.query["bool"]["filter"].append(company_type["wire_must"])
                 if company_type.get("wire_must_not"):
                     search.query["bool"]["must_not"].append(company_type["wire_must_not"])
 
@@ -538,7 +538,7 @@ class BaseSearchService(Service):
         limit_days = get_setting(self.limit_days_setting) if self.limit_days_setting is not None else None
 
         if limit_days and search.company and not search.company.get("archive_access", False):
-            search.query["bool"]["must"].append(
+            search.query["bool"]["filter"].append(
                 {
                     "range": {
                         "versioncreated": {
@@ -582,7 +582,7 @@ class BaseSearchService(Service):
 
     def apply_request_filter(self, search):
         if search.args.get("q"):
-            search.query["bool"]["must"].append(
+            search.query["bool"]["filter"].append(
                 query_string(search.args["q"], search.args.get("default_operator") or "AND")
             )
 
@@ -601,21 +601,21 @@ class BaseSearchService(Service):
                 if app.config.get("FILTER_AGGREGATIONS", True):
                     self.set_bool_query_from_filters(search.query["bool"], filters)
                 else:
-                    search.query["bool"]["must"].append(filters)
+                    search.query["bool"]["filter"].append(filters)
 
             if search.args.get("created_from") or search.args.get("created_to"):
-                search.query["bool"]["must"].append(self.versioncreated_range(search.args))
+                search.query["bool"]["filter"].append(self.versioncreated_range(search.args))
         elif filters or search.args.get("created_from") or search.args.get("created_to"):
-            search.source["post_filter"] = {"bool": {"must": []}}
+            search.source["post_filter"] = {"bool": {"filter": []}}
 
             if filters:
                 if app.config.get("FILTER_AGGREGATIONS", True):
                     self.set_bool_query_from_filters(search.source["post_filter"]["bool"], filters)
                 else:
-                    search.source["post_filter"]["bool"]["must"].append(filters)
+                    search.source["post_filter"]["bool"]["filter"].append(filters)
 
             if search.args.get("created_from") or search.args.get("created_to"):
-                search.source["post_filter"]["bool"]["must"].append(self.versioncreated_range(search.args))
+                search.source["post_filter"]["bool"]["filter"].append(self.versioncreated_range(search.args))
 
     def apply_embargoed_filters(self, search):
         """Generate filters for embargoed params"""
@@ -623,7 +623,7 @@ class BaseSearchService(Service):
         if search.args.get("exclude_embargoed"):
             search.query["bool"]["must_not"].append({"range": {"embargoed": {"gt": "now"}}})
         elif search.args.get("embargoed_only"):
-            search.query["bool"]["must"].append({"range": {"embargoed": {"gt": "now"}}})
+            search.query["bool"]["filter"].append({"range": {"embargoed": {"gt": "now"}}})
 
     def prepend_embargoed_items_to_response(self, response, req, lookup):
         search = SearchQuery()
@@ -669,10 +669,10 @@ class BaseSearchService(Service):
             self.prefill_search_products(search)
 
             if topic.get("query"):
-                search.query["bool"]["must"].append(query_string(topic["query"]))
+                search.query["bool"]["filter"].append(query_string(topic["query"]))
 
             if topic.get("created"):
-                search.query["bool"]["must"].append(
+                search.query["bool"]["filter"].append(
                     self.versioncreated_range(
                         dict(
                             created_from=topic["created"].get("from"),

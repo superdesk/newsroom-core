@@ -164,12 +164,12 @@ def _update_agg_to_nested(
     for config in configs:
         set_agg_config(
             config["value"],
-            {"bool": {"must": [{"term": {f"{parent}.{field}": config["value"]}}]}},
+            {"bool": {"filter": [{"term": {f"{parent}.{field}": config["value"]}}]}},
         )
         if config.get("include_planning"):
             set_planning_agg_config(
                 config["value"],
-                {"bool": {"must": [{"term": {f"planning_items.{parent}.{field}": config["value"]}}]}},
+                {"bool": {"filter": [{"term": {f"planning_items.{parent}.{field}": config["value"]}}]}},
             )
 
     set_agg_config(
