@@ -65,4 +65,4 @@ class SectionFiltersService(newsroom.Service):
 
         for f in section_filters:
             if f.get("query"):
-                query["bool"]["must"].append(query_string(f.get("query")))
+                query["bool"]["filter"].append(query_string(f.get("query")))

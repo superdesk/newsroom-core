@@ -195,7 +195,7 @@ def get_subscriber_activity_report():
 
     source["sort"] = [{"versioncreated": "desc"}]
     if len(must_terms) > 0:
-        source["query"] = {"bool": {"must": must_terms}}
+        source["query"] = {"bool": {"filter": must_terms}}
 
     source["size"] = 25
     source["from"] = int(args.get("from", 0))
@@ -309,7 +309,7 @@ def get_company_api_usage():
 
     source = {}
     must_terms = [{"range": {"created": date_range}}]
-    source["query"] = {"bool": {"must": must_terms}}
+    source["query"] = {"bool": {"filter": must_terms}}
     source["sort"] = [{"created": "desc"}]
     source["size"] = 200
     source["from"] = int(args.get("from", 0))
@@ -320,7 +320,7 @@ def get_company_api_usage():
         }
     }
     company_ids = [t["company"] for t in query_resource(API_TOKENS)]
-    source["query"]["bool"]["must"].append({"terms": {"subscriber": company_ids}})
+    source["query"]["bool"]["filter"].append({"terms": {"subscriber": company_ids}})
     companies = get_entity_dict(query_resource("companies", lookup={"_id": {"$in": company_ids}}), str_id=True)
     req = ParsedRequest()
     req.args = {"source": json.dumps(source)}

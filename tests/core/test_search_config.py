@@ -152,7 +152,7 @@ def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
         "nested": {"path": "subject"},
         "aggs": {
             "sttdepartment_filtered": {
-                "filter": {"bool": {"must": [{"term": {"subject.scheme": "sttdepartment"}}]}},
+                "filter": {"bool": {"filter": [{"term": {"subject.scheme": "sttdepartment"}}]}},
                 "aggs": {"sttdepartment": {"terms": {"field": "subject.name", "size": 20}}},
             },
         },
@@ -164,7 +164,7 @@ def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
                 "nested": {"path": "planning_items.subject"},
                 "aggs": {
                     "sttdepartment_filtered": {
-                        "filter": {"bool": {"must": [{"term": {"planning_items.subject.scheme": "sttdepartment"}}]}},
+                        "filter": {"bool": {"filter": [{"term": {"planning_items.subject.scheme": "sttdepartment"}}]}},
                         "aggs": {
                             "sttdepartment": {
                                 "terms": {
@@ -247,7 +247,7 @@ def test_custom_wire_groups_config(app: BaseNewsroomApp, client: FlaskClient):
         "nested": {"path": "subject"},
         "aggs": {
             "distribution_filtered": {
-                "filter": {"bool": {"must": [{"term": {"subject.scheme": "distribution"}}]}},
+                "filter": {"bool": {"filter": [{"term": {"subject.scheme": "distribution"}}]}},
                 "aggs": {"distribution": {"terms": {"field": "subject.name", "size": 20}}},
             },
         },

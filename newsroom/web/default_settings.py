@@ -391,6 +391,8 @@ ELASTICSEARCH_SETTINGS.setdefault("settings", {})["query_string"] = {
 # count above 10k
 ELASTICSEARCH_TRACK_TOTAL_HITS = True
 
+ELASTICSEARCH_FIX_QUERY = False
+
 #: server working directory
 #: should be set in settings.py
 SERVER_PATH = pathlib.Path(__file__).resolve().parent.parent

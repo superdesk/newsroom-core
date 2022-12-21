@@ -117,7 +117,7 @@ def _get_attribute_value_from_name(search_config: SearchGroupNestedConfig, searc
     def _search_items(resource: str):
         req = ParsedRequest()
         req.args = {
-            "source": json.dumps({"query": {"bool": {"must": [{"term": {f"{parent_field}.name": search_value}}]}}}),
+            "source": json.dumps({"query": {"bool": {"filter": [{"term": {f"{parent_field}.name": search_value}}]}}}),
             "size": 1,
         }
         response = get_resource_service(resource).internal_get(req=req, lookup={})

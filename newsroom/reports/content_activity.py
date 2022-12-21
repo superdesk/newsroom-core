@@ -50,7 +50,7 @@ def get_items(args):
         must_terms.append({"range": {"versioncreated": date_range}})
 
     if len(must_terms) > 0:
-        source["query"]["bool"]["must"] += must_terms
+        source["query"]["bool"]["filter"] += must_terms
 
     # Apply the section filters
     section = args["section"]
@@ -83,7 +83,7 @@ def get_aggregations(args, ids):
         must_terms.append({"terms": {"action": args["action"]}})
 
     source = {
-        "query": {"bool": {"must": must_terms}},
+        "query": {"bool": {"filter": must_terms}},
         "size": 0,
         "from": 0,
         "aggs": {
@@ -133,7 +133,7 @@ def get_facets(args):
             must_terms.append({"range": {"versioncreated": date_range}})
 
         if len(must_terms) > 0:
-            query["bool"]["must"] += must_terms
+            query["bool"]["filter"] += must_terms
 
         source.update(
             {
@@ -161,7 +161,7 @@ def get_facets(args):
             must_terms.append({"range": {"_created": date_range}})
 
         source = {
-            "query": {"bool": {"must": must_terms}},
+            "query": {"bool": {"filter": must_terms}},
             "size": 0,
             "from": 0,
             "aggs": {"companies": {"terms": {"field": "company", "size": MAX_TERMS_SIZE}}},

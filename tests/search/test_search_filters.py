@@ -54,7 +54,7 @@ def test_apply_section_filter(client, app):
                 "analyze_wildcard": query_string_settings["analyze_wildcard"],
                 "lenient": True,
             }
-        } in search.query["bool"]["must"]
+        } in search.query["bool"]["filter"]
 
         service.section = "agenda"
         service.prefill_search_query(search)
@@ -66,7 +66,7 @@ def test_apply_section_filter(client, app):
                 "analyze_wildcard": query_string_settings["analyze_wildcard"],
                 "lenient": True,
             }
-        } in search.query["bool"]["must"]
+        } in search.query["bool"]["filter"]
 
 
 def test_apply_company_filter(client, app):
@@ -86,15 +86,15 @@ def test_apply_company_filter(client, app):
             return search.query
 
     query = _set_search_query(ADMIN_USER_ID)
-    assert {"term": {"service.code": "a"}} not in query["bool"]["must"]
+    assert {"term": {"service.code": "a"}} not in query["bool"]["filter"]
     assert query["bool"]["must_not"] == []
 
     query = _set_search_query(PUBLIC_USER_ID)
     assert query["bool"]["must_not"] == []
-    assert {"term": {"service.code": "b"}} in query["bool"]["must"]
+    assert {"term": {"service.code": "b"}} in query["bool"]["filter"]
 
     query = _set_search_query(TEST_USER_ID)
-    assert query["bool"]["must"] == []
+    assert query["bool"]["filter"] == []
     assert {"term": {"service.code": "b"}} in query["bool"]["must_not"]
 
 
@@ -108,7 +108,7 @@ def test_apply_time_limit_filter(client, app):
             service.prefill_search_user(search)
             service.prefill_search_company(search)
             service.apply_time_limit_filter(search)
-            return search.query["bool"]["must"]
+            return search.query["bool"]["filter"]
 
     assert {"range": {"versioncreated": {"gte": "now-25d/d"}}} not in _set_search_query(ADMIN_USER_ID)
     assert {"range": {"versioncreated": {"gte": "now-25d/d"}}} not in _set_search_query(TEST_USER_ID)
@@ -178,7 +178,7 @@ def test_apply_request_filter__query_string(client, app):
                 "analyze_wildcard": query_string_settings["analyze_wildcard"],
                 "lenient": True,
             }
-        } in search.query["bool"]["must"]
+        } in search.query["bool"]["filter"]
 
         search.args = {"q": "Sport AND Tennis", "default_operator": "OR"}
         service.apply_request_filter(search)
@@ -189,7 +189,7 @@ def test_apply_request_filter__query_string(client, app):
                 "analyze_wildcard": query_string_settings["analyze_wildcard"],
                 "lenient": True,
             }
-        } in search.query["bool"]["must"]
+        } in search.query["bool"]["filter"]
 
 
 def test_apply_request_filter__filters(client, app):
@@ -200,12 +200,12 @@ def test_apply_request_filter__filters(client, app):
         search = SearchQuery()
         search.args = {"filter": json.dumps({"service": ["a"]})}
         service.apply_request_filter(search)
-        assert {"terms": {"service.name": ["a"]}} in search.query["bool"]["must"]
+        assert {"terms": {"service.name": ["a"]}} in search.query["bool"]["filter"]
 
         search = SearchQuery()
         search.args = {"filter": {"service": ["a"]}}
         service.apply_request_filter(search)
-        assert {"terms": {"service.name": ["a"]}} in search.query["bool"]["must"]
+        assert {"terms": {"service.name": ["a"]}} in search.query["bool"]["filter"]
 
         with raises(BadParameterValueError):
             search.args = {"filter": ["test"]}
@@ -216,21 +216,21 @@ def test_apply_request_filter__filters(client, app):
         search = SearchQuery()
         search.args = {"filter": {"term": {"service": "a"}}}
         service.apply_request_filter(search)
-        assert {"term": {"service": "a"}} in search.query["bool"]["must"]
+        assert {"term": {"service": "a"}} in search.query["bool"]["filter"]
 
         app.config["FILTER_BY_POST_FILTER"] = True
         app.config["FILTER_AGGREGATIONS"] = True
         search = SearchQuery()
         search.args = {"filter": {"service": ["a"]}}
         service.apply_request_filter(search)
-        assert {"terms": {"service.name": ["a"]}} in search.source["post_filter"]["bool"]["must"]
+        assert {"terms": {"service.name": ["a"]}} in search.source["post_filter"]["bool"]["filter"]
 
         app.config["FILTER_BY_POST_FILTER"] = True
         app.config["FILTER_AGGREGATIONS"] = False
         search = SearchQuery()
         search.args = {"filter": {"term": {"service": "a"}}}
         service.apply_request_filter(search)
-        assert {"term": {"service": "a"}} in search.source["post_filter"]["bool"]["must"]
+        assert {"term": {"service": "a"}} in search.source["post_filter"]["bool"]["filter"]
 
 
 def test_apply_request_filter__filters_using_groups_config(client, app):
@@ -265,7 +265,7 @@ def test_apply_request_filter__filters_using_groups_config(client, app):
                     },
                 },
             },
-        } in search.query["bool"]["must"]
+        } in search.query["bool"]["filter"]
 
 
 def test_apply_request_filter__versioncreated(client, app):
@@ -277,14 +277,14 @@ def test_apply_request_filter__versioncreated(client, app):
         service.apply_request_filter(search)
         assert {"range": {"versioncreated": {"gte": get_local_date("2020-03-27", "00:00:00", 0)}}} in search.query[
             "bool"
-        ]["must"]
+        ]["filter"]
 
         search = SearchQuery()
         search.args = {"created_to": "2020-03-27"}
         service.apply_request_filter(search)
         assert {"range": {"versioncreated": {"lte": get_local_date("2020-03-27", "23:59:59", 0)}}} in search.query[
             "bool"
-        ]["must"]
+        ]["filter"]
 
         search = SearchQuery()
         search.args = {
@@ -300,7 +300,7 @@ def test_apply_request_filter__versioncreated(client, app):
                     "lte": get_local_date("2020-03-27", "23:59:59", 0),
                 }
             }
-        } in search.query["bool"]["must"]
+        } in search.query["bool"]["filter"]
 
         app.config["FILTER_BY_POST_FILTER"] = True
 
@@ -309,14 +309,14 @@ def test_apply_request_filter__versioncreated(client, app):
         service.apply_request_filter(search)
         assert {"range": {"versioncreated": {"gte": get_local_date("2020-03-27", "00:00:00", 0)}}} in search.source[
             "post_filter"
-        ]["bool"]["must"]
+        ]["bool"]["filter"]
 
         search = SearchQuery()
         search.args = {"created_to": "2020-03-27"}
         service.apply_request_filter(search)
         assert {"range": {"versioncreated": {"lte": get_local_date("2020-03-27", "23:59:59", 0)}}} in search.source[
             "post_filter"
-        ]["bool"]["must"]
+        ]["bool"]["filter"]
 
         search = SearchQuery()
         search.args = {
@@ -332,4 +332,4 @@ def test_apply_request_filter__versioncreated(client, app):
                     "lte": get_local_date("2020-03-27", "23:59:59", 0),
                 }
             }
-        } in search.source["post_filter"]["bool"]["must"]
+        } in search.source["post_filter"]["bool"]["filter"]

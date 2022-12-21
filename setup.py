@@ -10,13 +10,7 @@ with open(requirements_txt_path, "r") as r:
     # but replace superdesk-core with setuptools equivalent syntax
     # This is so we don't have to update customer repos
     requirements = [
-        line.rsplit("\n", 1)[0]
-        for line in r.readlines()
-        if line.rsplit("\n", 1)[0]
-        and (not line.startswith("#") and "superdesk-core.git" not in line and "superdesk-planning.git" not in line)
-    ] + [
-        "superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@v2.6.0rc3#egg=superdesk-core",
-        "superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@v2.6.0-rc2#egg=superdesk-planning",
+        line.rsplit("\n", 1)[0] for line in r.readlines() if line.rsplit("\n", 1)[0] and not line.startswith("#")
     ]
 
 setup(

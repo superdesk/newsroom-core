@@ -88,7 +88,7 @@ def get_history_users(item_ids, active_user_ids, active_company_ids, section, ac
     source = {
         "query": {
             "bool": {
-                "must": [
+                "filter": [
                     {"terms": {"company": [str(a) for a in active_company_ids]}},
                     {"terms": {"item": [str(i) for i in item_ids]}},
                     {"term": {"section": section}},
