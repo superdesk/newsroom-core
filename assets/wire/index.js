@@ -39,11 +39,11 @@ window.onpopstate = function(event) {
 const params = new URLSearchParams(window.location.search);
 store.dispatch(initParams(params));
 
+// start fetching items, must be before rendering WireApp to show loader
+store.dispatch(fetchItems());
 
-// fetch items & render
-store.dispatch(fetchItems()).then(() =>
-    render(store, WireApp, document.getElementById('wire-app'))
-);
+// render app
+render(store, WireApp, document.getElementById('wire-app'));
 
 // initialize web socket listener
 initWebSocket(store, pushNotification);
