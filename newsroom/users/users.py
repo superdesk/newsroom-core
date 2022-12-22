@@ -66,6 +66,13 @@ class UsersResource(newsroom.Resource):
         "last_active": {"type": "datetime", "required": False, "nullable": True},
         "original_creator": newsroom.Resource.rel("users"),
         "version_creator": newsroom.Resource.rel("users"),
+        "products": {
+            "type": "list",
+            "schema": {
+                "section": {"type": "string", "default": "wire"},
+                "product": newsroom.Resource.rel("products"),
+            },
+        },
     }
 
     item_methods = ["GET", "PATCH", "PUT"]
