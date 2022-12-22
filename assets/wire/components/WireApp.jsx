@@ -80,21 +80,9 @@ class WireApp extends BaseApp {
         this.state.initialLoad = this.props.isLoading;
     }
 
-    static getDerivedStateFromProps(props) {
-        if (props.isLoading === false) {
-            return {initialLoad: false};
-        }
-
-        return null;
-    }
-
     render() {
         if (this.state.initialLoad) {
-            return (
-                <div className="d-flex justify-content-center h-50">
-                    <div className="spinner-border text-muted m-5 align-self-center" />
-                </div>
-            );
+            return this.renderLoader();
         }
 
         const newsOnlyFilterText = this.props.newsOnlyFilterText;
