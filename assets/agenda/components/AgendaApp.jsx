@@ -85,6 +85,10 @@ class AgendaApp extends BaseApp {
     }
 
     render() {
+        if (this.state.initialLoad) {
+            return this.renderLoader();
+        }
+
         const modal = this.renderModal(this.props.modal);
         const showDatePicker = isEmpty(this.props.createdFilter.from) && isEmpty(this.props.createdFilter.to) && !this.props.bookmarks;
 

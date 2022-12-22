@@ -32,11 +32,11 @@ window.onpopstate = function(event) {
     }
 };
 
+// start fetching items before rendering
+store.dispatch(fetchItems());
 
-// fetch items & render
-store.dispatch(fetchItems()).then(() =>
-    render(store, AgendaApp, document.getElementById('agenda-app'))
-);
+// render app
+render(store, AgendaApp, document.getElementById('agenda-app'));
 
 // initialize web socket listener
 initWebSocket(store, pushNotification);
