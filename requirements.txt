@@ -21,5 +21,5 @@ MarkupSafe<2.1
 reportlab==3.6.6
 MarkupSafe<2.1
 
-superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@release/2.6
+superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@v2.6.0-rc4
 superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@v2.6.0-rc2
