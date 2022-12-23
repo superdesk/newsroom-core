@@ -1,15 +1,16 @@
-from flask import url_for
-from pytest import fixture
+import pytest
+import tests.utils as utils
+
+from newsroom.users.users import UserRole
 
 from .fixtures import (
-    TEST_USER_ID,
     USERS,
     COMPANIES,
     PRODUCTS,
 )
 
 
-@fixture(autouse=True)
+@pytest.fixture(autouse=True)
 def init(app):
     app.data.insert("users", USERS)
     app.data.insert("companies", COMPANIES)
@@ -17,29 +18,41 @@ def init(app):
 
 
 def test_user_products(app, client):
-    product = {"name": "test", "query": "headline:BAR", "is_enabled": True}
+    product = {"name": "test", "query": "headline:somethingthatdoesnotexist", "is_enabled": True}
     app.data.insert("products", [product])
 
-    user = app.data.find_one("users", req=None, _id=TEST_USER_ID)
-    updates = {"products": [{"section": "wire", "_id": product["_id"]}]}
-    app.data.update("users", user["_id"], updates, user)
+    manager = USERS[-1].copy()
+    manager["email"] = "manager@example.com"
+    manager["user_type"] = UserRole.ACCOUNT_MANAGEMENT.value
+    manager.pop("_id")
 
-    client.post(
-        url_for("auth.login"),
-        data={
-            "email": user["email"],
-            "password": "admin",
+    app.data.insert("users", [manager])
+
+    utils.login(client, manager)
+
+    data = utils.get_json(client, "/wire/search")
+    assert 1 >= len(data["_items"])
+
+    utils.patch_json(
+        client,
+        f"/api/users/{manager['_id']}",
+        {
+            "products": [{"section": "wire", "_id": product["_id"]}],
         },
     )
 
-    resp = client.get("/wire/search")
-    assert resp.status_code == 200
-    data = resp.json
+    data = utils.get_json(client, "/wire/search")
     assert 0 == len(data["_items"])
 
     app.data.update("products", product["_id"], {"query": "headline:WEATHER"}, product)
 
-    resp = client.get("/wire/search")
-    assert resp.status_code == 200
-    data = resp.json
-    assert 1 == len(data["_items"])
+    data = utils.get_json(client, "/wire/search")
+    assert 1 >= len(data["_items"])
+
+    with pytest.raises(AssertionError) as err:
+        utils.patch_json(client, f"/api/users/{USERS[0]['_id']}", {"products": []})
+    assert "403" in str(err)
+
+    with pytest.raises(AssertionError) as err:
+        utils.delete_json(client, f"/api/users/{USERS[0]['_id']}", {})
+    assert "403" in str(err)

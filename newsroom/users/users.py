@@ -1,14 +1,16 @@
+import enum
 import bcrypt
 import newsroom
 
 from typing import TypedDict
-from flask import current_app as app, session
+from flask import current_app as app, session, abort
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest
 
-from newsroom.auth import get_user_id
+from newsroom.auth import get_user_id, get_user
 from newsroom.utils import set_original_creator, set_version_creator
 from superdesk.utils import is_hashed, get_hash
+from newsroom.auth.utils import is_current_user_admin, is_current_user_account_mgr
 
 
 class UserData(TypedDict, total=False):
@@ -19,6 +21,13 @@ class UserData(TypedDict, total=False):
     user_type: str
     company: str
     is_enabled: bool
+
+
+class UserRole(enum.Enum):
+    ADMINISTRATOR = "administrator"
+    INTERNAL = "internal"
+    PUBLIC = "public"
+    ACCOUNT_MANAGEMENT = "account_management"
 
 
 class UsersResource(newsroom.Resource):
@@ -39,7 +48,7 @@ class UsersResource(newsroom.Resource):
         "company": newsroom.Resource.rel("companies", embeddable=True, required=False),
         "user_type": {
             "type": "string",
-            "allowed": ["administrator", "internal", "public", "account_management"],
+            "allowed": [role.value for role in UserRole],
             "default": "public",
         },
         # user must have his auth method validated in order to login
@@ -69,13 +78,16 @@ class UsersResource(newsroom.Resource):
         "products": {
             "type": "list",
             "schema": {
-                "section": {"type": "string", "default": "wire"},
-                "product": newsroom.Resource.rel("products"),
+                "type": "dict",
+                "schema": {
+                    "_id": newsroom.Resource.rel("products"),
+                    "section": {"type": "string", "default": "wire"},
+                },
             },
         },
     }
 
-    item_methods = ["GET", "PATCH", "PUT"]
+    item_methods = ["GET", "PATCH", "PUT", "DELETE"]
     resource_methods = ["GET", "POST"]
     datasource = {
         "source": "users",
@@ -101,11 +113,15 @@ class UsersService(newsroom.Service):
     def on_create(self, docs):
         super().on_create(docs)
         for doc in docs:
+            self.check_permissions(doc)
             set_original_creator(doc)
             if doc.get("password", None) and not is_hashed(doc.get("password")):
                 doc["password"] = self._get_password_hash(doc["password"])
 
     def on_update(self, updates, original):
+        updated = original.copy()
+        updated.update(updates)
+        self.check_permissions(updated, updates)
         set_version_creator(updates)
         if "password" in updates:
             updates["password"] = self._get_password_hash(updates["password"])
@@ -136,3 +152,15 @@ class UsersService(newsroom.Service):
     def on_delete(self, doc):
         if doc.get("_id") == get_user_id():
             raise BadRequest(gettext("Can not delete current user"))
+        user = self.find_one(req=None, _id=doc["_id"])
+        self.check_permissions(user)
+        super().on_delete(doc)
+
+    def check_permissions(self, doc, updates=None):
+        if is_current_user_admin():
+            return
+        if is_current_user_account_mgr():
+            manager = get_user()
+            if doc.get("company") and doc["company"] == manager.get("company"):
+                return
+        abort(403)

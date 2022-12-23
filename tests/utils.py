@@ -1,11 +1,11 @@
-from flask import json, current_app as app
+from flask import json, current_app as app, url_for
 from superdesk import get_resource_service
 from superdesk.emails import SuperdeskMessage
 
 
 def post_json(client, url, data):
     """Post json data to client."""
-    resp = client.post(url, data=json.dumps(data, indent=2), content_type="application/json")
+    resp = client.post(url, json=data)
     assert resp.status_code in [200, 201], "error %d on post to %s:\n%s" % (
         resp.status_code,
         url,
@@ -14,13 +14,33 @@ def post_json(client, url, data):
     return resp
 
 
+def patch_json(client, url, data):
+    headers = get_etag_header(client, url)
+    resp = client.patch(url, json=data, headers=headers)
+    assert resp.status_code in (200, 201), "error {}: {} on patch to {}".format(
+        resp.status_code,
+        resp.data,
+        url,
+    )
+    return resp.json
+
+
 def delete_json(client, url, data):
-    resp = client.delete(url, data=json.dumps(data, indent=2), content_type="application/json")
-    assert resp.status_code in [200], "error %d on delete to %s" % (
+    headers = get_etag_header(client, url)
+    resp = client.delete(url, json=data, headers=headers)
+    assert resp.status_code in [200, 204], "error %d on delete to %s" % (
         resp.status_code,
         url,
     )
     return resp
+
+
+def get_etag_header(client, url):
+    headers = {}
+    orig = client.get(url).json
+    if orig.get("_etag"):
+        headers["IF-Match"] = orig["_etag"]
+    return headers
 
 
 def get_json(client, url):
@@ -55,3 +75,15 @@ def mock_send_email(to, subject, text_body, html_body=None, sender=None, attachm
             return connection.send(msg)
 
         return _app.mail.send(msg)
+
+
+def login(client, user):
+    resp = client.post(
+        url_for("auth.login"),
+        data={
+            "email": user["email"],
+            "password": "admin",
+        },
+        follow_redirects=True,
+    )
+    assert resp.status_code == 200, f"Login failed for user {user['email']}"
