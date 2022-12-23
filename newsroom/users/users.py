@@ -3,7 +3,7 @@ import bcrypt
 import newsroom
 
 from typing import TypedDict
-from flask import current_app as app, session, abort
+from flask import current_app as app, session, abort, request
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest
 
@@ -157,6 +157,8 @@ class UsersService(newsroom.Service):
         super().on_delete(doc)
 
     def check_permissions(self, doc, updates=None):
+        if not request or request.method == "GET":  # in behave there is test request context
+            return
         if is_current_user_admin():
             return
         if is_current_user_account_mgr():
