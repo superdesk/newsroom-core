@@ -1,6 +1,8 @@
+import superdesk
+
 from flask import Blueprint
 from flask_babel import lazy_gettext
-import superdesk
+
 
 from .users import UsersResource, UsersService, UserData  # noqa: F401
 

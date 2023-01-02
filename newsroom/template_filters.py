@@ -10,7 +10,6 @@ from eve.utils import str_to_date
 from flask_babel import format_time, format_date, format_datetime, get_locale
 from flask_babel.speaklater import LazyString
 from jinja2.utils import htmlsafe_json_dumps  # type: ignore
-from superdesk import get_resource_service
 from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
 from datetime import datetime
@@ -143,15 +142,12 @@ def section_allowed(nav, sections):
 
 
 def get_company_sidenavs(blueprint=None):
-    from newsroom.auth import get_user
+    from newsroom.auth.utils import get_user_sections
 
-    user = get_user()
-    company = None
-    if user and user.get("company"):
-        company = get_resource_service("companies").find_one(req=None, _id=user["company"])
+    sections = get_user_sections()
     navs = sidenavs(blueprint)
-    if company and company.get("sections"):
-        return [nav for nav in navs if section_allowed(nav, company["sections"])]
+    if sections:
+        return [nav for nav in navs if section_allowed(nav, sections)]
     return navs
 
 

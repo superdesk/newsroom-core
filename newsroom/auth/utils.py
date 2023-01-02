@@ -4,10 +4,12 @@ import werkzeug
 import superdesk
 
 from datetime import timedelta
-from typing import Optional
+from typing import Dict, Optional
 from flask import current_app as app
 from flask_babel import _
+from newsroom.user_roles import UserRole
 from superdesk.utc import utcnow
+from newsroom.auth import get_user
 from newsroom.types import UserData
 from newsroom.utils import get_random_string, is_valid_user
 from newsroom.email import (
@@ -72,12 +74,16 @@ def clear_user_session():
     flask.session["auth_ttl"] = None
 
 
-def is_current_user_admin():
-    return flask.session.get("user_type") and flask.session["user_type"] == "administrator"
+def is_current_user_admin() -> bool:
+    return flask.session.get("user_type") == UserRole.ADMINISTRATOR.value
 
 
-def is_current_user_account_mgr():
-    return flask.session.get("user_type") and flask.session["user_type"] == "account_management"
+def is_current_user_account_mgr() -> bool:
+    return flask.session.get("user_type") == UserRole.ACCOUNT_MANAGEMENT.value
+
+
+def is_current_user_company_admin() -> bool:
+    return flask.session.get("user_type") == UserRole.COMPANY_ADMIN.value
 
 
 def is_current_user(user_id):
@@ -120,17 +126,49 @@ def is_valid_session():
     )
 
 
+def get_user_company(user) -> Optional[Dict]:
+    return (
+        superdesk.get_resource_service("companies").find_one(req=None, _id=user["company"])
+        if user.get("company")
+        else None
+    )
+
+
 def revalidate_session_user():
     user = superdesk.get_resource_service("users").find_one(req=None, _id=flask.session.get("user"))
     if not user:
         clear_user_session()
         return False
-    company = (
-        superdesk.get_resource_service("companies").find_one(req=None, _id=user["company"])
-        if user.get("company")
-        else None
-    )
+    company = get_user_company(user)
     is_valid = is_valid_user(user, company)
     if is_valid:
         flask.session["auth_ttl"] = utcnow() + SESSION_AUTH_TTL
     return is_valid
+
+
+def get_user_sections() -> Dict:
+    user = get_user()
+    if not user:
+        return {}
+    if user.get("sections"):
+        return user["sections"]
+    company = get_user_company(user)
+    if company and company.get("sections"):
+        return company["sections"]
+    return {}
+
+
+def user_has_section_allowed(section) -> bool:
+    sections = get_user_sections()
+    if sections:
+        return sections.get(section, False)
+    return True  # might be False eventually, atm allow access if sections are not set explicitly
+
+
+def user_can_manage_company(company_id) -> bool:
+    if is_current_user_admin() or is_current_user_account_mgr():
+        return True
+    if is_current_user_company_admin():
+        user = get_user()
+        return str(user.get("company")) == str(company_id) and company_id
+    return False

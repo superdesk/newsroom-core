@@ -38,15 +38,16 @@ def delete_json(client, url, data):
 def get_etag_header(client, url):
     headers = {}
     orig = client.get(url).json
+    assert orig, "Could not fetch {}".format(url)
     if orig.get("_etag"):
         headers["IF-Match"] = orig["_etag"]
     return headers
 
 
-def get_json(client, url):
+def get_json(client, url, expected_code=200):
     """Get json from client."""
     resp = client.get(url, headers={"Accept": "application/json"})
-    assert resp.status_code == 200, "error %d on get to %s:\n%s" % (
+    assert resp.status_code == expected_code, "error %d on get to %s:\n%s" % (
         resp.status_code,
         url,
         resp.get_data().decode("utf-8"),
