@@ -187,7 +187,6 @@ def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
     assert get_agg_keys(data, "subject.subject_filtered.subject") == ["Test Subject", "Sports"]
     assert get_agg_keys(data, "sttdepartment.sttdepartment_filtered.sttdepartment") == ["Sports"]
 
-    print("NOW")
     # Search using the new search group, ``sttdepartment==Sports``
     resp = client.get("/agenda/search?filter=%7B%22sttdepartment%22%3A%5B%22Sports%22%5D%7D")
     data = json.loads(resp.get_data())
