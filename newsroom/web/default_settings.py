@@ -199,7 +199,7 @@ MAIL_DEFAULT_SENDER = _MAIL_FROM or "newsroom@localhost"
 SIGNUP_EMAIL_RECIPIENTS = os.environ.get("SIGNUP_EMAIL_RECIPIENTS")
 
 #: public client url - used to create links within emails etc
-CLIENT_URL = "http://localhost:5050"
+CLIENT_URL = os.environ.get("CLIENT_URL", "http://localhost:5050")
 
 MEDIA_PREFIX = os.environ.get("MEDIA_PREFIX", "/assets")
 
