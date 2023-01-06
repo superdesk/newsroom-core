@@ -621,10 +621,12 @@ def get_agenda_query(query, events_only=False):
         return query_string(query)
     else:
         return {
-            "or": [
-                query_string(query),
-                nested_query("planning_items", planning_items_query_string(query), name="query"),
-            ]
+            "bool": {
+                "should": [
+                    query_string(query),
+                    nested_query("planning_items", planning_items_query_string(query), name="query"),
+                ]
+            },
         }
 
 
@@ -931,16 +933,16 @@ class AgendaService(BaseSearchService):
         """
 
         if search.args.get("q"):
-            test_query = {"or": []}
+            test_query = {"bool": {"should": []}}
             try:
                 q = json.loads(search.args.get("q"))
                 if isinstance(q, dict):
                     # used for product testing
                     if q.get("query"):
-                        test_query["or"].append(query_string(q.get("query")))
+                        test_query["bool"]["should"].append(query_string(q.get("query")))
 
                     if q.get("planning_item_query"):
-                        test_query["or"].append(
+                        test_query["bool"]["should"].append(
                             nested_query(
                                 "planning_items",
                                 planning_items_query_string(q.get("planning_item_query")),
@@ -948,12 +950,12 @@ class AgendaService(BaseSearchService):
                             )
                         )
 
-                    if test_query["or"]:
+                    if test_query["bool"]["should"]:
                         search.query["bool"]["filter"].append(test_query)
             except Exception:
                 pass
 
-            if not test_query.get("or"):
+            if not test_query["bool"]["should"]:
                 search.query["bool"]["filter"].append(get_agenda_query(search.args["q"], search.item_type == "events"))
 
         if search.args.get("id"):
