@@ -194,6 +194,11 @@ body.print {
     
     .sidenav-icons__item {
         margin: 4px 0;
+        // display: none;
+        
+        // @include sm {
+        //     display: block;
+        // }
     
         a {
             display: flex;
@@ -354,6 +359,7 @@ article.list {
     display: flex;
     flex-grow: 1;
     overflow-y: auto;
+    flex-direction: column;
 }
 .settings-inner {
     flex-direction: column;

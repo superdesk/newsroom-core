@@ -9,6 +9,9 @@
     @include button-size($input-btn-padding-y, $input-btn-padding-x, $font-size-button, $btn-border-radius);
     line-height: 1.2;
     transition: padding .2s ease-out;
+    @include xxl {
+      line-height: 1.7;
+    }
     
     &.disabled,
     &:disabled {
@@ -34,7 +37,6 @@
   
   @include xxl {
     @include button-size($input-btn-padding-y, $input-btn-padding-x, $font-size-button, $btn-border-radius);
-    line-height: 1.2;
   }
 }
 .btn-with-icon {
