@@ -33,6 +33,7 @@ USERS = [
     {
         "_id": TEST_USER_ID,
         "company": COMPANY_3,
+        "user_type": "public",
         "email": "test@sourcefabric.org",
         "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
         "is_validated": True,

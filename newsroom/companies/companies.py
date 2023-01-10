@@ -23,7 +23,8 @@ class CompaniesResource(newsroom.Resource):
             "required": False,
         },
         "sections": {
-            "type": "objectid",
+            "type": "dict",
+            "nullable": True,
         },
         "archive_access": {
             "type": "boolean",

@@ -13,7 +13,7 @@ from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.topics import get_user_topics
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.auth import get_user, get_user_id
-from newsroom.decorator import login_required
+from newsroom.decorator import login_required, section_required
 from newsroom.utils import (
     get_entity_or_404,
     is_json_request,
@@ -100,6 +100,7 @@ def item(_id):
 
 
 @blueprint.route("/agenda/search")
+@section_required("agenda")
 @login_required
 def search():
     response = get_internal("agenda")

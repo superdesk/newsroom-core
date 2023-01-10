@@ -20,7 +20,7 @@ from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
 from newsroom.wire.utils import update_action_list
 from newsroom.auth import get_user, get_user_id
-from newsroom.decorator import login_required, admin_only
+from newsroom.decorator import login_required, admin_only, section_required
 from newsroom.topics import get_user_topics
 from newsroom.email import send_template_email
 from newsroom.companies import get_user_company
@@ -212,6 +212,8 @@ def bookmarks():
 
 
 @blueprint.route("/wire/search")
+@section_required("wire")
+@login_required
 def search():
     if "prepend_embargoed" in request.args or app.config["PREPEND_EMBARGOED_TO_WIRE_SEARCH"]:
         args = request.args.to_dict()

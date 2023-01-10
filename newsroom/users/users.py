@@ -2,13 +2,15 @@ import bcrypt
 import newsroom
 
 from typing import TypedDict
-from flask import current_app as app, session
+from flask import current_app as app, session, abort, request
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest
 
-from newsroom.auth import get_user_id
+from newsroom.auth import get_user_id, get_user
 from newsroom.utils import set_original_creator, set_version_creator
 from superdesk.utils import is_hashed, get_hash
+from newsroom.auth.utils import is_current_user_admin, is_current_user_account_mgr, is_current_user_company_admin
+from newsroom.user_roles import UserRole
 
 
 class UserData(TypedDict, total=False):
@@ -39,7 +41,7 @@ class UsersResource(newsroom.Resource):
         "company": newsroom.Resource.rel("companies", embeddable=True, required=False),
         "user_type": {
             "type": "string",
-            "allowed": ["administrator", "internal", "public", "account_management"],
+            "allowed": [role.value for role in UserRole],
             "default": "public",
         },
         # user must have his auth method validated in order to login
@@ -66,9 +68,23 @@ class UsersResource(newsroom.Resource):
         "last_active": {"type": "datetime", "required": False, "nullable": True},
         "original_creator": newsroom.Resource.rel("users"),
         "version_creator": newsroom.Resource.rel("users"),
+        "products": {
+            "type": "list",
+            "schema": {
+                "type": "dict",
+                "schema": {
+                    "_id": newsroom.Resource.rel("products"),
+                    "section": {"type": "string", "default": "wire"},
+                },
+            },
+        },
+        "sections": {
+            "type": "dict",
+            "nullable": True,
+        },
     }
 
-    item_methods = ["GET", "PATCH", "PUT"]
+    item_methods = ["GET", "PATCH", "PUT", "DELETE"]
     resource_methods = ["GET", "POST"]
     datasource = {
         "source": "users",
@@ -83,6 +99,26 @@ class UsersResource(newsroom.Resource):
     }
 
 
+COMPANY_ADMIN_ALLOWED_UPDATES = {
+    "products",
+    "sections",
+    "locale",
+    "first_name",
+    "last_name",
+    "email",
+    "phone",
+    "mobile",
+    "country",
+    # populated by system
+    "_created",
+    "_updated",
+    "expiry_alert",
+    "receive_email",
+    "receive_app_notifications",
+    "manage_company_topics",
+}
+
+
 class UsersService(newsroom.Service):
     """
     A service that knows how to perform CRUD operations on the `users`
@@ -94,11 +130,13 @@ class UsersService(newsroom.Service):
     def on_create(self, docs):
         super().on_create(docs)
         for doc in docs:
+            self.check_permissions(doc)
             set_original_creator(doc)
             if doc.get("password", None) and not is_hashed(doc.get("password")):
                 doc["password"] = self._get_password_hash(doc["password"])
 
     def on_update(self, updates, original):
+        self.check_permissions(original, updates)
         set_version_creator(updates)
         if "password" in updates:
             updates["password"] = self._get_password_hash(updates["password"])
@@ -129,3 +167,19 @@ class UsersService(newsroom.Service):
     def on_delete(self, doc):
         if doc.get("_id") == get_user_id():
             raise BadRequest(gettext("Can not delete current user"))
+        user = self.find_one(req=None, _id=doc["_id"])
+        self.check_permissions(user)
+        super().on_delete(doc)
+
+    def check_permissions(self, doc, updates=None):
+        """Check if current user has permissions to edit user."""
+        if not request or request.method == "GET":  # in behave there is test request context
+            return
+        if is_current_user_admin() or is_current_user_account_mgr():
+            return
+        if is_current_user_company_admin():
+            manager = get_user()
+            if doc.get("company") and doc["company"] == manager.get("company"):
+                if not updates or all([key in COMPANY_ADMIN_ALLOWED_UPDATES for key in updates.keys()]):
+                    return
+        abort(403)

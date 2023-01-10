@@ -16,7 +16,8 @@ def test_api_home(client, anonymous_user):
 
 def test_news_search_fails_for_anonymous_user(client, anonymous_user):
     response = client.get("/wire/search")
-    assert 403 == response.status_code
+    assert 302 == response.status_code
+    assert b"login" in response.data
 
 
 def test_agenda_search_fails_for_anonymous_user(client, anonymous_user):

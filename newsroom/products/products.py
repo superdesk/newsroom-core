@@ -85,3 +85,12 @@ def get_products_by_company(company_id, navigation_id=None, product_type=None):
 def get_products_dict_by_company(company_id):
     lookup = {"is_enabled": True, "companies": ObjectId(company_id)}
     return list(superdesk.get_resource_service("products").get(req=None, lookup=lookup))
+
+
+def get_products_by_user(user, section):
+    if user.get("products"):
+        ids = [p["_id"] for p in user["products"] if p["section"] == section]
+        if ids:
+            lookup = {"is_enabled": True, "_id": {"$in": ids}}
+            return list(superdesk.get_resource_service("products").get(req=None, lookup=lookup))
+    return []

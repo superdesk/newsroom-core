@@ -5,6 +5,7 @@ from newsroom.auth.utils import (
     is_current_user_account_mgr,
     is_current_user_admin,
     is_valid_session,
+    user_has_section_allowed,
 )
 
 
@@ -37,3 +38,16 @@ def account_manager_only(f):
         return f(*args, **kwargs)
 
     return decorated_function
+
+
+def section_required(section):
+    def _section_required(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            if not is_current_user_admin() and not user_has_section_allowed(section):
+                return abort(403)
+            return f(*args, **kwargs)
+
+        return wrapper
+
+    return _section_required

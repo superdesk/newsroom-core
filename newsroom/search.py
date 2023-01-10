@@ -18,6 +18,7 @@ from newsroom.products.products import (
     get_products_by_navigation,
     get_products_by_company,
     get_product_by_id,
+    get_products_by_user,
 )
 from newsroom.auth import get_user
 from newsroom.companies import get_user_company
@@ -449,11 +450,21 @@ class BaseSearchService(Service):
                     company_id=search.company.get("_id"),
                 )
             else:
-                search.products = get_products_by_company(
-                    search.company.get("_id"),
-                    search.navigation_ids,
-                    product_type=search.section,
-                )
+                user_products = []
+                if search.user and search.user.get("products"):
+                    user_products = get_products_by_user(
+                        search.user,
+                        search.section,
+                    )
+
+                if user_products:
+                    search.products = user_products
+                else:
+                    search.products = get_products_by_company(
+                        search.company.get("_id"),
+                        search.navigation_ids,
+                        product_type=search.section,
+                    )
         else:
             search.products = []
 
