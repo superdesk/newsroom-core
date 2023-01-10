@@ -309,17 +309,21 @@ def publish_planning_into_event(planning) -> Optional[str]:
 
     service = superdesk.get_resource_service("agenda")
 
-    # this is a planning for an event item
-    # if there's an event then _id field will have the same value as event_id
-    orig_agendas = service.find(where={"_id": {"$in": [planning["event_item"], planning["guid"]]}})
+    event_id = planning["event_item"]
+    plan_id = planning["guid"]
+    orig_agenda = service.find_one(req=None, _id=event_id)
 
-    if not orig_agendas.count():
+    if not orig_agenda:
+        # Item not found using ``event_item`` attribute
+        # Try again using ``guid`` attribute
+        orig_agenda = service.find_one(req=None, _id=plan_id)
+
+    if (orig_agenda or {}).get("item_type") != "event":
         # event id exists in planning item but event is not in the system
-        logger.warning("Event {} for planning {} couldn't be found".format(planning["event_item"], planning))
+        logger.warning(f"Event '{event_id}' for Planning '{plan_id}' not found")
         return None
 
-    orig_agenda = orig_agendas[0]
-    agenda = deepcopy(orig_agendas[0])
+    agenda = deepcopy(orig_agenda)
 
     if (
         planning.get("state") in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED]

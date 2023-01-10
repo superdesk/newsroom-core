@@ -1348,3 +1348,24 @@ def test_item_planning_reference_set_on_fulfill(client, app):
         parsed["coverage_id"] == "urn:newsml:localhost:5000:2018-05-28T20:55:"
         "00.496765:197d3430-9cd1-4b93-822f-c3c050b5b6ab"
     )
+
+
+def test_push_plan_with_date_before_event_start(client, app):
+    event = deepcopy(test_event)
+    planning = deepcopy(test_planning)
+
+    event["plans"] = [planning["guid"]]
+    client.post("/push", data=json.dumps(event), content_type="application/json")
+    parsed = get_entity_or_404(event["guid"], "agenda")
+    assert 0 == len(parsed["planning_items"])
+
+    # Change the Planning Date to before the Event's start date
+    planning["planning_date"] = "2018-05-28T04:00:00+0000"
+    client.post("/push", data=json.dumps(planning), content_type="application/json")
+    parsed = get_entity_or_404(event["guid"], "agenda")
+    assert 1 == len(parsed["planning_items"])
+    assert 2 == len(parsed["coverages"])
+
+    parsed = get_entity_or_404(planning["guid"], "agenda")
+    assert 1 == len(parsed["planning_items"])
+    assert 2 == len(parsed["coverages"])
