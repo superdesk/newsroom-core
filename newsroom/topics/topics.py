@@ -14,7 +14,7 @@ class TopicsResource(newsroom.Resource):
         "query": {"type": "string", "nullable": True},
         "filter": {"type": "dict", "nullable": True},
         "created": {"type": "dict", "nullable": True},
-        "user": newsroom.Resource.rel("users"),  # This is the owner of the "My Topic"
+        "user": newsroom.Resource.rel("users", required=True),  # This is the owner of the "My Topic"
         "company": newsroom.Resource.rel("companies", required=True),
         "is_global": {"type": "boolean", "default": False},
         "subscribers": {
