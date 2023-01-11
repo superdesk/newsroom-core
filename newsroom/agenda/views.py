@@ -12,8 +12,8 @@ from newsroom.agenda import blueprint
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.topics import get_user_topics
 from newsroom.navigations.navigations import get_navigations_by_company
-from newsroom.auth import get_user, get_user_id
-from newsroom.decorator import login_required, section_required
+from newsroom.auth import get_company, get_user, get_user_id
+from newsroom.decorator import login_required, section
 from newsroom.utils import (
     get_entity_or_404,
     is_json_request,
@@ -29,7 +29,6 @@ from newsroom.wire.utils import update_action_list
 from newsroom.wire.views import set_item_permission
 from newsroom.agenda.email import send_coverage_request_email
 from newsroom.agenda.utils import remove_fields_for_public_user, remove_restricted_coverage_info
-from newsroom.companies import section, get_user_company
 from newsroom.companies.utils import restrict_coverage_info
 from newsroom.notifications import push_user_notification
 from newsroom.search_config import merge_planning_aggs
@@ -56,7 +55,7 @@ def item(_id):
     item = get_entity_or_404(_id, "agenda")
 
     user = get_user()
-    company = get_user_company(user)
+    company = get_company(user)
     if not is_admin_or_internal(user):
         remove_fields_for_public_user(item)
 
@@ -70,7 +69,7 @@ def item(_id):
         item.pop("planning_items", None)
         item.pop("coverages", None)
 
-    if restrict_coverage_info():
+    if restrict_coverage_info(company):
         remove_restricted_coverage_info([item])
 
     if is_json_request(flask.request):
@@ -100,12 +99,12 @@ def item(_id):
 
 
 @blueprint.route("/agenda/search")
-@section_required("agenda")
 @login_required
+@section("agenda")
 def search():
     response = get_internal("agenda")
     if len(response):
-        if restrict_coverage_info():
+        if restrict_coverage_info(get_company()):
             remove_restricted_coverage_info(response[0].get("_items") or [])
         if response[0].get("_aggregations"):
             merge_planning_aggs(response[0]["_aggregations"])
@@ -115,7 +114,7 @@ def search():
 def get_view_data():
     user = get_user()
     topics = get_user_topics(user["_id"]) if user else []
-    company = get_user_company(user) or {}
+    company = get_company(user) or {}
     return {
         "user": str(user["_id"]) if user else None,
         "company": str(user["company"]) if user and user.get("company") else None,
@@ -126,10 +125,12 @@ def get_view_data():
             if "agenda" in f["types"]
         ],
         "navigations": get_navigations_by_company(
-            str(user["company"]) if user and user.get("company") else None,
+            company,
             product_type="agenda",
             events_only=company.get("events_only", False),
-        ),
+        )
+        if company
+        else [],
         "saved_items": get_resource_service("agenda").get_saved_items_count(),
         "events_only": company.get("events_only", False),
         "restrict_coverage_info": company.get("restrict_coverage_info", False),
@@ -269,7 +270,7 @@ def related_wire_items(wire_id):
     if len(agenda_result.docs) == 0:
         return flask.jsonify({"error": gettext("Agenda item not found")}), 404
 
-    if restrict_coverage_info():
+    if restrict_coverage_info(get_company()):
         remove_restricted_coverage_info([agenda_result.docs[0]])
 
     wire_ids = []

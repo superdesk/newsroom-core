@@ -24,8 +24,7 @@ from newsroom.agenda.email import (
     send_coverage_notification_email,
     send_agenda_notification_email,
 )
-from newsroom.auth import get_user
-from newsroom.companies import get_user_company
+from newsroom.auth import get_company, get_user
 from newsroom.notifications import (
     save_user_notifications,
     UserNotification,
@@ -999,9 +998,8 @@ class AgendaService(BaseSearchService):
         :param dict lookup: The parsed in lookup dictionary from the endpoint
         :param dict featured: list featured items
         """
-
         user = get_user()
-        company = get_user_company(user)
+        company = get_company(user)
         if is_events_only_access(user, company):
             abort(403)
 

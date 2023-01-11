@@ -7,12 +7,13 @@ from datetime import datetime
 
 from bson import ObjectId
 from werkzeug.datastructures import MultiDict
-from flask import current_app as app, g
+from flask import current_app as app
 from superdesk import get_resource_service
 from superdesk.utc import utcnow, local_to_utc
 from superdesk.errors import SuperdeskApiError
 from content_api.items.resource import ItemsResource
 from content_api.errors import BadParameterValueError, UnexpectedParameterError
+from newsroom.auth import get_company
 
 from newsroom.news_api.utils import (
     post_api_audit,
@@ -115,12 +116,16 @@ class NewsAPINewsService(BaseSearchService):
             if orig_request_params.get("exclude_fields")
             else self.mandatory_exclude_fields
         )
+
+        company = get_company()
+        products = get_products_by_company(company, product_type="news_api")
+
         for doc in resp.docs:
             for field in exclude_fields:
                 doc.pop(field, None)
 
             if "associations" in orig_request_params.get("include_fields", ""):
-                if not check_association_permission(doc):
+                if not check_association_permission(doc, products):
                     doc.pop("associations", None)
                 else:
                     remove_internal_renditions(doc)
@@ -161,8 +166,7 @@ class NewsAPINewsService(BaseSearchService):
             search.query["bool"]["minimum_should_match"] = 1
 
     def prefill_search_company(self, search):
-        if hasattr(g, "user"):
-            search.company = get_resource_service("companies").find_one(req=None, _id=g.user)
+        search.company = get_company()
 
     def prefill_search_products(self, search):
         """Prefill the search products
@@ -182,7 +186,7 @@ class NewsAPINewsService(BaseSearchService):
                 )
             )
         else:
-            search.products = get_products_by_company(search.company.get("_id"), product_type=search.section)
+            search.products = get_products_by_company(search.company, product_type=search.section)
 
     def prefill_search_args(self, search, req=None):
         """Prefill the search request args

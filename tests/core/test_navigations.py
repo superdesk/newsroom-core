@@ -226,7 +226,7 @@ def test_get_agenda_navigations_by_company_returns_ordered(client, app):
     )
 
     test_login_succeeds_for_admin(client)
-    navigations = get_navigations_by_company(COMPANY_1_ID, "agenda")
+    navigations = get_navigations_by_company({"_id": COMPANY_1_ID}, "agenda")
     assert navigations[0].get("name") == "Uber"
-    navigations = get_navigations_by_company(COMPANY_1_ID, "wire")
+    navigations = get_navigations_by_company({"_id": COMPANY_1_ID}, "wire")
     assert navigations[0].get("name") == "Sport"

@@ -1,7 +1,10 @@
+from typing import Any, Dict, List, Optional
 from bson import ObjectId
 
 import newsroom
 import superdesk
+
+from newsroom.types import Company, Product
 
 
 class ProductsResource(newsroom.Resource):
@@ -20,7 +23,7 @@ class ProductsResource(newsroom.Resource):
             "type": "list",
             "schema": newsroom.Resource.rel("navigations", nullable=True),
         },
-        "companies": {
+        "companies": {  # obsolete
             "type": "list",
             "schema": newsroom.Resource.rel("companies"),
             "nullable": True,
@@ -65,14 +68,24 @@ def get_product_by_id(product_id, product_type=None, company_id=None):
     return list(superdesk.get_resource_service("products").get(req=None, lookup=lookup))
 
 
-def get_products_by_company(company_id, navigation_id=None, product_type=None):
+def get_products_by_company(company: Optional[Company], navigation_id=None, product_type=None) -> List[Product]:
     """Get the list of products for a company
 
     :param company_id: Company Id
     :param navigation_id: Navigation Id
     :param product_type: Type of the product
     """
-    lookup = {"is_enabled": True, "companies": ObjectId(company_id)}
+    if company is None:
+        return []
+    lookup: Dict[str, Any] = {"is_enabled": True}
+    if "products" in company:
+        product_ids = []
+        if company.get("products"):
+            product_ids = [ObjectId(p["_id"]) for p in company["products"] if p["section"] == product_type]
+        if product_ids:
+            lookup["_id"] = {"$in": product_ids}
+    else:
+        lookup["companies"] = ObjectId(company["_id"])
     if navigation_id:
         lookup["navigations"] = _get_navigation_query(navigation_id)
     if product_type:

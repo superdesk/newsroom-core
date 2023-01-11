@@ -40,7 +40,7 @@ def account_manager_only(f):
     return decorated_function
 
 
-def section_required(section):
+def section(section):
     def _section_required(f):
         @wraps(f)
         def wrapper(*args, **kwargs):

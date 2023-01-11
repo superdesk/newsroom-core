@@ -1,9 +1,13 @@
 import re
+import flask
 
 import superdesk
+
+from typing import Optional
 from bson import ObjectId
 from eve.auth import BasicAuth
 from flask import Blueprint, session, abort
+from newsroom.types import Company, User
 
 blueprint = Blueprint("auth", __name__)
 
@@ -13,7 +17,7 @@ class SessionAuth(BasicAuth):
         return get_user_id()
 
 
-def get_user(required=False):
+def get_user(required=False) -> Optional[User]:
     """Get current user.
 
     If user is required but not set abort.
@@ -30,12 +34,24 @@ def get_user(required=False):
     return user
 
 
+def get_company(user=None, required=False) -> Optional[Company]:
+    if user is None:
+        user = get_user(required=required)
+    if user and user.get("company"):
+        return superdesk.get_resource_service("companies").find_one(req=None, _id=user["company"])
+    if hasattr(flask.g, "company_id"):  # if there is no user this might be company session (in news api)
+        return superdesk.get_resource_service("companies").find_one(req=None, _id=flask.g.company_id)
+    return None
+
+
 def get_user_id():
     """Get user for current user.
 
     Make sure it's an ObjectId.
     """
-    return ObjectId(session.get("user")) if session.get("user") else None
+    if flask.request and session.get("user"):
+        return ObjectId(session.get("user"))
+    return None
 
 
 def get_auth_user_by_email(email):

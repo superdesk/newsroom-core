@@ -47,7 +47,7 @@ class MonitoringSearchService(WireSearchService):
 
         if search.company:
             search.products = get_products_by_company(
-                search.company.get("_id"),
+                search.company,
                 search.navigation_ids,
                 product_type=search.section,
             )

@@ -7,12 +7,11 @@ from flask_babel import gettext
 from werkzeug.exceptions import NotFound
 from eve.methods.get import get_internal
 from eve.render import send_response
-from newsroom.decorator import admin_only, login_required, account_manager_only
+from newsroom.decorator import admin_only, login_required, account_manager_only, section
 from superdesk import get_resource_service
 from superdesk.logging import logger
 
 from newsroom.email import send_template_email
-from newsroom.companies import section
 from newsroom.template_filters import is_admin
 from newsroom.auth import get_user, get_user_id
 from newsroom.wire.utils import update_action_list

@@ -8,7 +8,7 @@ from newsroom.utils import (
 )
 from newsroom.template_filters import is_admin_or_internal
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
-from newsroom.companies import get_user_company
+from newsroom.auth import get_company
 
 
 def send_coverage_notification_email(user, agenda, wire_item):
@@ -84,7 +84,7 @@ def send_coverage_request_email(user, message, item):
     email = user.get("email")
 
     item_name = item.get("name") or item.get("slugline")
-    user_company = get_user_company(user)
+    user_company = get_company(user)
     if user_company:
         user_company = user_company.get("name")
 

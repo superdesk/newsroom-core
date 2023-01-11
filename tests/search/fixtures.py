@@ -8,6 +8,20 @@ COMPANY_1 = ObjectId("5e65964bf5db68883df561b0")
 COMPANY_2 = ObjectId("5e659f3ff5db68883df561b1")
 COMPANY_3 = ObjectId("5e659f3ff5db68883df561b2")
 
+NAV_1 = ObjectId("5e65964bf5db68883df561c0")
+NAV_2 = ObjectId("5e65964bf5db68883df561c1")
+NAV_3 = ObjectId("5e65964bf5db68883df561c2")
+NAV_4 = ObjectId("5e65964bf5db68883df561c3")
+NAV_5 = ObjectId("5e65964bf5db68883df561c4")
+NAV_6 = ObjectId("5e65964bf5db68883df561c5")
+
+PROD_1 = ObjectId("5e65964bf5db68883df561d0")
+PROD_2 = ObjectId("5e65964bf5db68883df561d1")
+PROD_3 = ObjectId("5e65964bf5db68883df561d2")
+PROD_4 = ObjectId("5e65964bf5db68883df561d3")
+PROD_5 = ObjectId("5e65964bf5db68883df561d4")
+
+
 USERS = [
     {
         "_id": ADMIN_USER_ID,
@@ -48,6 +62,12 @@ COMPANIES = [
         "name": "Press 2 co.",
         "is_enabled": True,
         "company_type": "internal",
+        "products": [
+            {"_id": PROD_1, "section": "wire"},
+            {"_id": PROD_3, "section": "wire"},
+            {"_id": PROD_4, "section": "agenda"},
+            {"_id": PROD_5, "section": "wire"},
+        ],
     },
     {
         "_id": COMPANY_2,
@@ -55,6 +75,11 @@ COMPANIES = [
         "is_enabled": True,
         "company_type": "public",
         "archive_access": False,
+        "products": [
+            {"_id": PROD_1, "section": "wire"},
+            {"_id": PROD_2, "section": "wire"},
+            {"_id": PROD_4, "section": "agenda"},
+        ],
     },
     {
         "_id": COMPANY_3,
@@ -62,6 +87,10 @@ COMPANIES = [
         "is_enabled": True,
         "company_type": "test",
         "archive_access": True,
+        "products": [
+            {"_id": PROD_2, "section": "wire"},
+            {"_id": PROD_5, "section": "wire"},
+        ],
     },
 ]
 
@@ -76,13 +105,6 @@ Admin:
     )
 """
 
-NAV_1 = ObjectId("5e65964bf5db68883df561c0")
-NAV_2 = ObjectId("5e65964bf5db68883df561c1")
-NAV_3 = ObjectId("5e65964bf5db68883df561c2")
-NAV_4 = ObjectId("5e65964bf5db68883df561c3")
-NAV_5 = ObjectId("5e65964bf5db68883df561c4")
-NAV_6 = ObjectId("5e65964bf5db68883df561c5")
-
 NAVIGATIONS = [
     {"_id": NAV_1, "name": "Sport1", "product_type": "wire", "is_enabled": True},
     {"_id": NAV_2, "name": "Sport2", "product_type": "wire", "is_enabled": True},
@@ -92,12 +114,6 @@ NAVIGATIONS = [
     {"_id": NAV_6, "name": "Sport6", "product_type": "wire", "is_enabled": True},
 ]
 
-PROD_1 = ObjectId("5e65964bf5db68883df561d0")
-PROD_2 = ObjectId("5e65964bf5db68883df561d1")
-PROD_3 = ObjectId("5e65964bf5db68883df561d2")
-PROD_4 = ObjectId("5e65964bf5db68883df561d3")
-PROD_5 = ObjectId("5e65964bf5db68883df561d4")
-
 PRODUCTS = [
     {
         "_id": PROD_1,
@@ -106,7 +122,6 @@ PRODUCTS = [
         "is_enabled": True,
         "product_type": "wire",
         "navigations": [NAV_1, NAV_2],
-        "companies": [COMPANY_1, COMPANY_2],
         "query": "service.code:a",
     },
     {
@@ -116,7 +131,6 @@ PRODUCTS = [
         "is_enabled": True,
         "product_type": "wire",
         "navigations": [NAV_3],
-        "companies": [COMPANY_2, COMPANY_3],
         "query": "service.code:b",
         "sd_product_id": "sd_product_1",
     },
@@ -127,7 +141,6 @@ PRODUCTS = [
         "is_enabled": False,
         "product_type": "wire",
         "navigations": [NAV_4],
-        "companies": [COMPANY_1],
     },
     {
         "_id": PROD_4,
@@ -136,7 +149,6 @@ PRODUCTS = [
         "is_enabled": True,
         "product_type": "agenda",
         "navigations": [NAV_5],
-        "companies": [COMPANY_1, COMPANY_2],
     },
     {
         "_id": PROD_5,
@@ -145,7 +157,6 @@ PRODUCTS = [
         "is_enabled": True,
         "product_type": "wire",
         "navigations": [NAV_6],
-        "companies": [COMPANY_1, COMPANY_3],
     },
 ]
 

@@ -34,7 +34,7 @@ def get_item(item_id):
     get_resource_service("history").create_history_record(
         [{"_id": item_id, "version": formatted.get("version")}],
         "api",
-        {"_id": None, "company": ObjectId(g.user)},
+        {"_id": None, "company": ObjectId(g.company_id)},
         "news_api",
     )
     return response

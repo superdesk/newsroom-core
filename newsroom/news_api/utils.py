@@ -1,7 +1,6 @@
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
 from flask import request, g, current_app as app
-from newsroom.products.products import get_products_by_company
 
 
 def post_api_audit(doc):
@@ -13,9 +12,9 @@ def post_api_audit(doc):
         "endpoint": (request.endpoint or "").replace("|resource", ""),
     }
 
-    # g.user contains comapny._id from CompanyTokenAuth.check_auth]
-    if "user" in g:
-        audit_doc["subscriber"] = g.user
+    # g.company_id is set via CompanyTokenAuth.check_auth]
+    if "company_id" in g:
+        audit_doc["subscriber"] = g.company_id
 
     get_resource_service("api_audit").post([audit_doc])
 
@@ -55,7 +54,7 @@ def remove_internal_renditions(item):
     return item
 
 
-def check_association_permission(item):
+def check_association_permission(item, products):
     """
     Check if any of the products that the passed image item matches are permissioned superdesk products for the
      company
@@ -73,9 +72,7 @@ def check_association_permission(item):
 
         # Check if the one of the companies products that has a superdesk product id matches one of the
         # image product id's
-        sd_products = [
-            p.get("sd_product_id") for p in get_products_by_company(g.user, None, "news_api") if p.get("sd_product_id")
-        ]
+        sd_products = [p.get("sd_product_id") for p in products if p.get("sd_product_id")]
 
         return True if len(set(im_products) & set(sd_products)) else False
     else:
