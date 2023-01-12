@@ -47,24 +47,6 @@ def get_agenda_dates(agenda):
     return "{} - {}, {}".format(time_short(start), time_short(end), date_short(start))
 
 
-def get_location_string(agenda):
-    location = agenda.get("location", [])
-
-    if not location:
-        return ""
-
-    location_items = [
-        location[0].get("name"),
-        location[0].get("address", {}).get("line", [""])[0],
-        location[0].get("address", {}).get("city") or location[0].get("address", {}).get("area"),
-        location[0].get("address", {}).get("state") or location[0].get("address", {}).get("locality"),
-        location[0].get("address", {}).get("postal_code"),
-        location[0].get("address", {}).get("country"),
-    ]
-
-    return ", ".join([location_part for location_part in location_items if location_part])
-
-
 def get_public_contacts(agenda):
     contacts = agenda.get("event", {}).get("event_contact_info", [])
     public_contacts = []
