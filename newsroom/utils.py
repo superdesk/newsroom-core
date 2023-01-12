@@ -216,8 +216,8 @@ def get_location_string(agenda):
     location_items = [
         location[0].get("name"),
         location[0].get("address", {}).get("line", [""])[0],
-        location[0].get("address", {}).get("area"),
-        location[0].get("address", {}).get("locality"),
+        location[0].get("address", {}).get("city") or location[0].get("address", {}).get("area"),
+        location[0].get("address", {}).get("state") or location[0].get("address", {}).get("locality"),
         location[0].get("address", {}).get("postal_code"),
         location[0].get("address", {}).get("country"),
     ]

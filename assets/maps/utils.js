@@ -54,7 +54,7 @@ export function getAddressLine(location) {
  * @param {Object} location
  */
 export function getAddressState(location) {
-    return get(location, 'address.locality');
+    return get(location, 'address.state') || get(location, 'address.locality');
 }
 
 /**
