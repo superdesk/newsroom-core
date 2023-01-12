@@ -226,8 +226,8 @@ export function getLocationString(item) {
     return [
         get(item, 'location.0.name', get(item, 'location.0.address.title')),
         get(item, 'location.0.address.line.0'),
-        get(item, 'location.0.address.area'),
-        get(item, 'location.0.address.locality'),
+        get(item, 'location.0.address.city') || get(item, 'location.0.address.area'),
+        get(item, 'location.0.address.state') || get(item, 'location.0.address.locality'),
         get(item, 'location.0.address.postal_code'),
         get(item, 'location.0.address.country'),
     ].filter((d) => d).join(', ');
