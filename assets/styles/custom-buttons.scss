@@ -9,7 +9,8 @@
     @include button-size($input-btn-padding-y, $input-btn-padding-x, $font-size-button, $btn-border-radius);
     line-height: 1.2;
     transition: padding .2s ease-out;
-    @include xxl {
+
+    @include lg {
       line-height: 1.7;
     }
     
@@ -36,7 +37,7 @@
   @include button-size($input-btn-padding-y-sm, $input-btn-padding-x-sm, $font-size-sm, $btn-border-radius-sm);
   
   @include xxl {
-    @include button-size($input-btn-padding-y, $input-btn-padding-x, $font-size-button, $btn-border-radius);
+    @include button-size($input-btn-padding-y, $input-btn-padding-x, $font-size-button, $btn-border-radius);    
   }
 }
 .btn-with-icon {
@@ -111,4 +112,28 @@
       }
     }
   }
-  
+
+.btn-text-only {
+  text-transform: initial;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.5rem;
+  &:hover {
+    border: 1px solid #999;
+  }
+  &:focus {
+    box-shadow: 0 0 0 0.25rem rgba(109, 117, 126, .5);
+  }
+  span {
+    font-weight: 400;
+    color: #676C7B;
+    margin: 0 3px;
+  }
+}
+.btn-group--navbar {
+  margin: 0 12px;
+}
