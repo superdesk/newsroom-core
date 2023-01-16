@@ -1,4 +1,5 @@
 import re
+from typing import List
 
 import flask
 from bson import ObjectId
@@ -8,6 +9,8 @@ from superdesk import get_resource_service
 
 from newsroom.decorator import admin_only, account_manager_only
 from newsroom.products import blueprint
+from newsroom.products.products import get_products_by_company
+from newsroom.types import Product, ProductRef
 from newsroom.utils import (
     get_json_or_400,
     get_entity_or_404,
@@ -23,6 +26,14 @@ def get_settings_data():
         "navigations": list(query_resource("navigations")),
         "companies": list(query_resource("companies")),
         "sections": [s for s in current_app.sections if s.get("_id") != "monitoring"],  # monitoring has no products
+    }
+
+
+def get_product_ref(product: Product) -> ProductRef:
+    assert "_id" in product
+    return {
+        "_id": product["_id"],
+        "section": product.get("product_type") or "wire",
     }
 
 
@@ -98,9 +109,29 @@ def edit(id):
 @account_manager_only
 def update_companies(id):
     updates = flask.request.get_json()
-    if updates.get("companies"):
-        updates["companies"] = [ObjectId(company_id) for company_id in updates["companies"]]
-    get_resource_service("products").patch(id=ObjectId(id), updates=updates)
+    product = get_entity_or_404(id, "products")
+    selected_companies = updates.get("companies") or []
+    for company in get_resource_service("companies").get_all():
+        update_company = False
+        if "products" in company:
+            company_products: List[ProductRef] = company["products"].copy()
+        else:
+            company_products = [get_product_ref(p) for p in get_products_by_company(company)]
+            update_company = True
+        if str(company["_id"]) in selected_companies:
+            for ref in company_products:
+                if str(ref["_id"]) == id:
+                    break
+            else:
+                company_products.append(get_product_ref(product))
+                update_company = True
+        else:
+            for ref in company_products:
+                if str(ref["_id"]) == id:
+                    company_products = [p for p in company_products if str(p["_id"]) != id]
+                    update_company = True
+        if update_company:
+            get_resource_service("companies").patch(company["_id"], updates={"products": company_products})
     return jsonify({"success": True}), 200
 
 

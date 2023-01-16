@@ -19,7 +19,9 @@ class User(UserData):
 
 
 class Product(TypedDict, total=False):
+    _id: str
     name: str
+    product_type: str
     navigations: List[str]
 
 
