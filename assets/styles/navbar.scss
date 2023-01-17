@@ -18,6 +18,9 @@
         box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);
         z-index: 1007;
         flex: 0 0 auto;
+        align-items: stretch;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
 
         // [SDCP-609]: Commenting the next line until a better fix is implemented
         //overflow: hidden;
@@ -46,6 +49,14 @@
         &--small {
             height: 40px;
             width: 40px;
+        }
+    }
+    .navbar__date {
+        margin-inline-end: 0.5rem;
+        display: none;
+    
+        @include md {
+            display: block;
         }
     }
     .notif__circle {
@@ -187,6 +198,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    flex-grow: 0;
     padding: 0 0.5rem 0 0.5rem;
     max-width: 160px;
 
@@ -219,8 +232,11 @@
     }
 }
 .navbar-brand {
+    display: flex;
+    align-items: center;
     margin-block-start: 3.5px;
-    margin-inline-start: 2rem;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
     opacity: 1;
     line-height: 1.2rem;
     font-size: 1.125rem;
@@ -228,9 +244,12 @@
     @include sm {
         line-height: inherit;
         font-size: 1.75rem;
+        margin-inline-start: 0.25rem;
+        margin-inline-end: 1.5rem;
     }
     @include md {
         margin-block-start: 0;
+        margin-inline-start: 0.5rem;
     }
     nav {
         display: flex;
@@ -239,6 +258,21 @@
         @include sm {
             flex-direction: row;
             align-items: center;
+        }
+    }
+}
+.navbar__right {
+    display: flex;
+    align-items: center;
+    margin-inline-start: auto;
+    flex-shrink: 0;
+    flex-grow: 0;
+    
+    &--login {
+        padding-inline-end: 0.5rem;
+       
+        @include sm {
+            padding-inline-end: 1rem;
         }
     }
 }

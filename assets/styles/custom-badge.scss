@@ -1,5 +1,13 @@
 // Custom badges
 
+.badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+
+  &--disabled {
+    opacity: .35;
+  }
+}
 .badge--top-right {
   position: relative;
   .badge {
@@ -23,4 +31,7 @@
   @include sm {
     inset-inline-end: 11px !important;
   }
+}
+.badge.bg-secondary {
+  background-color: rgba($gray-300, var(--bs-bg-opacity)) !important;;
 }
