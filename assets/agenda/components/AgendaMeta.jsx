@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {hasLocation, getEventLinks, getLocationString, getPublicContacts, getCalendars} from 'agenda/utils';
+import {hasLocation, hasLocationNotes, getEventLinks, getLocationString, getPublicContacts,
+    getCalendars} from 'agenda/utils';
 
+const url = (link) => link.startsWith('http') ? link : 'https://' + link;
 
 function AgendaPreviewMeta({item}) {
     return (
@@ -11,6 +13,12 @@ function AgendaPreviewMeta({item}) {
                     <i className='icon-small--location icon--gray-dark'></i>
                     <span>{getLocationString(item)}</span>
                 </div>}
+                {!hasLocationNotes(item) ? null : (
+                    <div className='wire-articles__item__meta-row wire-articles__item__meta-row--info'>
+                        <i className='icon-small--info icon--gray-dark'></i>
+                        <span>{item.location[0].details[0]}</span>
+                    </div>
+                )}
                 {getPublicContacts(item).map((contact, index) => <div
                     className='wire-articles__item__meta-row'
                     key={`${contact.name}-${index}`}>
@@ -21,7 +29,7 @@ function AgendaPreviewMeta({item}) {
                 </div>)}
                 {getEventLinks(item).map((link) => <div className='wire-articles__item__meta-row' key={link}>
                     <i className='icon-small--globe icon--gray-dark'></i>
-                    <span><a href={link} target="_blank">{link}</a></span>
+                    <span><a href={url(link)} target="_blank">{link}</a></span>
                 </div>)}
                 {getCalendars(item) && <div className='wire-articles__item__meta-row'>
                     <i className='icon-small--calendar icon--gray-dark'></i>

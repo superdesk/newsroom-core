@@ -16,78 +16,83 @@ logger = logging.getLogger(__name__)
 
 
 def get_bookmarks_count(user_id, product_type):
-    return get_resource_service('{}_search'.format(product_type)).get_bookmarks_count(user_id)
+    return get_resource_service("{}_search".format(product_type)).get_bookmarks_count(user_id)
 
 
 def get_aggregations():
-    return app.config.get('WIRE_AGGS', {})
+    return app.config.get("WIRE_AGGS", {})
 
 
 class WireSearchResource(newsroom.Resource):
+    SUPPORTED_NESTED_SEARCH_FIELDS = ["subject"]
+
     datasource = {
-        'search_backend': 'elastic',
-        'source': 'items',
-        'projection': {
-            'original_id': 1,
-            'slugline': 1,
-            'headline': 1,
-            'body_html': 1,
-            'firstcreated': 1,
-            'versioncreated': 1,
-            'nextversion': 1,
-            'ancestors': 1,
-            'wordcount': 1,
-            'charcount': 1,
-            'version': 1,
+        "search_backend": "elastic",
+        "source": "items",
+        "projection": {
+            "original_id": 1,
+            "slugline": 1,
+            "headline": 1,
+            "body_html": 1,
+            "firstcreated": 1,
+            "versioncreated": 1,
+            "nextversion": 1,
+            "ancestors": 1,
+            "wordcount": 1,
+            "charcount": 1,
+            "version": 1,
         },
-        'elastic_filter': {'bool': {'must': [{'term': {'_type': 'items'}}]}},
     }
 
-    item_methods = ['GET']
-    resource_methods = ['GET']
+    item_methods = ["GET"]
+    resource_methods = ["GET"]
 
 
 def versioncreated_range(created):
     _range = {}
-    offset = int(created.get('timezone_offset', '0'))
-    if created.get('created_from'):
-        _range['gte'] = get_local_date(created['created_from'], created.get('created_from_time', '00:00:00'), offset)
-    if created.get('created_to'):
-        _range['lte'] = get_end_date(created['created_to'], get_local_date(created['created_to'], '23:59:59', offset))
-    return {'range': {'versioncreated': _range}}
+    offset = int(created.get("timezone_offset", "0"))
+    if created.get("created_from"):
+        _range["gte"] = get_local_date(
+            created["created_from"],
+            created.get("created_from_time", "00:00:00"),
+            offset,
+        )
+    if created.get("created_to"):
+        _range["lte"] = get_end_date(
+            created["created_to"],
+            get_local_date(created["created_to"], "23:59:59", offset),
+        )
+    return {"range": {"versioncreated": _range}}
 
 
 def set_bookmarks_query(query, user_id):
-    query['bool']['must'].append({
-        'term': {'bookmarks': str(user_id)},
-    })
+    query["bool"]["filter"].append(
+        {
+            "term": {"bookmarks": str(user_id)},
+        }
+    )
 
 
 def items_query(ignore_latest=False):
     query = {
-        'bool': {
-            'must_not': [
-                {'term': {'type': 'composite'}}
-            ],
-            'must': [{'term': {'_type': 'items'}}],
+        "bool": {
+            "must_not": [{"term": {"type": "composite"}}],
+            "filter": [],
         }
     }
 
     if not ignore_latest:
-        query['bool']['must_not'].append({'constant_score': {'filter': {'exists': {'field': 'nextversion'}}}})
+        query["bool"]["must_not"].append({"constant_score": {"filter": {"exists": {"field": "nextversion"}}}})
 
     return query
 
 
 class WireSearchService(BaseSearchService):
-    section = 'wire'
+    section = "wire"
 
     def get_bookmarks_count(self, user_id):
         req = ParsedRequest()
-        req.args = {
-            'bookmarks': user_id,
-            'size': 0
-        }
+        req.args = {"bookmarks": user_id, "size": 0}
 
         try:
             return super().get(req, None).count()
@@ -99,14 +104,12 @@ class WireSearchService(BaseSearchService):
 
         try:
             search.query = {
-                'bool': {
-                    'must_not': [
-                        {'term': {'type': 'composite'}},
+                "bool": {
+                    "must_not": [
+                        {"term": {"type": "composite"}},
                     ],
-                    'must': [
-                        {'terms': {'_id': item_ids}}
-                    ],
-                    'should': [],
+                    "filter": [{"terms": {"_id": item_ids}}],
+                    "should": [],
                 }
             }
 
@@ -116,23 +119,23 @@ class WireSearchService(BaseSearchService):
                 self.apply_filters(search)
 
             search.source = {
-                'query': search.query,
-                'size': len(item_ids) if size is None else size,
+                "query": search.query,
+                "size": len(item_ids) if size is None else size,
             }
 
             if aggregations is not None:
-                search.source['aggs'] = aggregations
+                search.source["aggs"] = aggregations
 
             req = ParsedRequest()
-            req.args = {'source': json.dumps(search.source)}
+            req.args = {"source": json.dumps(search.source)}
 
             return self.internal_get(req, None)
 
         except Exception as exc:
             logger.error(
-                'Error in get_items for query: {}'.format(json.dumps(search.source)),
+                "Error in get_items for query: {}".format(json.dumps(search.source)),
                 exc,
-                exc_info=True
+                exc_info=True,
             )
 
     def get_product_items(self, product_id, size):
@@ -142,44 +145,39 @@ class WireSearchService(BaseSearchService):
         self.prefill_search_user(search)
         self.prefill_search_company(search)
         self.apply_company_filter(search)
-        search.args['size'] = size
+        search.args["size"] = size
 
-        product = get_resource_service('products').find_one(req=None, _id=product_id)
+        product = get_resource_service("products").find_one(req=None, _id=product_id)
 
         if not product:
             return []
 
-        if not app.config['DASHBOARD_EMBARGOED']:
-            search.query['bool']['must'].append({
-                "bool": {
-                    "should": [
-                        {"range": {"embargoed": {"lt": "now"}}},
-                        {"bool": {"must_not": {"exists": {"field": "embargoed"}}}}
-                    ]
+        if not app.config["DASHBOARD_EMBARGOED"]:
+            search.query["bool"]["filter"].append(
+                {
+                    "bool": {
+                        "should": [
+                            {"range": {"embargoed": {"lt": "now"}}},
+                            {"bool": {"must_not": {"exists": {"field": "embargoed"}}}},
+                        ]
+                    }
                 }
-            })
-
-        get_resource_service('section_filters').apply_section_filter(
-            search.query,
-            product.get('product_type')
-        )
-
-        search.query['bool']['should'] = []
-
-        if product.get('sd_product_id'):
-            search.query['bool']['should'].append(
-                {'term': {'products.code': product['sd_product_id']}}
             )
 
-        if product.get('query'):
-            search.query['bool']['should'].append(
-                query_string(product['query'])
-            )
+        get_resource_service("section_filters").apply_section_filter(search.query, product.get("product_type"))
 
-        search.query['bool']['minimum_should_match'] = 1
+        search.query["bool"]["should"] = []
+
+        if product.get("sd_product_id"):
+            search.query["bool"]["should"].append({"term": {"products.code": product["sd_product_id"]}})
+
+        if product.get("query"):
+            search.query["bool"]["should"].append(query_string(product["query"]))
+
+        search.query["bool"]["minimum_should_match"] = 1
 
         self.gen_source_from_search(search)
-        search.source['post_filter'] = {'bool': {'must': []}}
+        search.source["post_filter"] = {"bool": {"filter": []}}
         internal_req = self.get_internal_request(search)
 
         return list(self.internal_get(internal_req, None))
@@ -198,46 +196,40 @@ class WireSearchService(BaseSearchService):
         aggs = {}
 
         for navigation in navigations:
-            navigation_id = navigation.get('_id')
+            navigation_id = navigation.get("_id")
             products = get_products_by_navigation(navigation_id) or []
-            navigation_filter = {'bool': {'should': [], 'minimum_should_match': 1}}
+            navigation_filter = {"bool": {"should": [], "minimum_should_match": 1}}
             for product in products:
-                if product.get('query'):
-                    navigation_filter['bool']['should'].append(
-                        query_string(product.get('query'))
-                    )
+                if product.get("query"):
+                    navigation_filter["bool"]["should"].append(query_string(product.get("query")))
 
-            if navigation_filter['bool']['should']:
-                aggs.setdefault('navigations', {}) \
-                    .setdefault('filters', {}) \
-                    .setdefault('filters', {})[str(navigation_id)] = navigation_filter
+            if navigation_filter["bool"]["should"]:
+                aggs.setdefault("navigations", {}).setdefault("filters", {}).setdefault("filters", {})[
+                    str(navigation_id)
+                ] = navigation_filter
 
-        source = {
-            'query': search.query,
-            'aggs': aggs,
-            'size': 0
-        }
+        source = {"query": search.query, "aggs": aggs, "size": 0}
         req = ParsedRequest()
-        req.args = {'source': json.dumps(source)}
+        req.args = {"source": json.dumps(source)}
 
         try:
             results = self.internal_get(req, None)
-            buckets = results.hits['aggregations']['navigations']['buckets']
+            buckets = results.hits["aggregations"]["navigations"]["buckets"]
             for navigation in navigations:
-                navigation_id = navigation.get('_id')
-                doc_count = buckets.get(str(navigation_id), {}).get('doc_count', 0)
+                navigation_id = navigation.get("_id")
+                doc_count = buckets.get(str(navigation_id), {}).get("doc_count", 0)
                 if doc_count > 0:
-                    navigation['story_count'] = doc_count
+                    navigation["story_count"] = doc_count
 
         except Exception as exc:
             logger.error(
-                'Error in get_navigation_story_count for query: {}'.format(json.dumps(source)),
+                "Error in get_navigation_story_count for query: {}".format(json.dumps(source)),
                 exc,
-                exc_info=True
+                exc_info=True,
             )
 
     def get_matching_topics(self, item_id, topics, users, companies):
-        """ Returns a list of topic ids matching to the given item_id
+        """Returns a list of topic ids matching to the given item_id
 
         :param item_id: item id to be tested against all topics
         :param topics: list of topics
@@ -246,51 +238,50 @@ class WireSearchService(BaseSearchService):
         :return:
         """
 
-        return self.get_matching_topics_for_item(item_id, topics, users, companies, {
-            "bool": {
-                "must_not": [
-                    {"term": {"type": "composite"}},
-                    {"constant_score": {"filter": {"exists": {"field": "nextversion"}}}},
-                ],
-                "must": [
-                    {"term": {"_id": item_id}}
-                ],
-                "should": []
-            }
-        })
+        return self.get_matching_topics_for_item(
+            topics,
+            users,
+            companies,
+            {
+                "bool": {
+                    "must_not": [
+                        {"term": {"type": "composite"}},
+                        {"constant_score": {"filter": {"exists": {"field": "nextversion"}}}},
+                    ],
+                    "filter": [{"term": {"_id": item_id}}],
+                    "should": [],
+                }
+            },
+        )
 
     def has_permissions(self, item, ignore_latest=False):
         """Test if current user has permissions to view given item."""
         req = ParsedRequest()
-        req.args = {
-            'size': 0,
-            'aggs': False,
-            'ignore_latest': ignore_latest
-        }
+        req.args = {"size": 0, "aggs": False, "ignore_latest": ignore_latest}
         try:
-            results = self.get(req, {'_id': item['_id']})
+            results = self.get(req, {"_id": item["_id"]})
             return results.count() > 0
         except Forbidden:
             return False
 
     def apply_request_filter(self, search):
-        """ Generate the filters from request args
+        """Generate the filters from request args
 
         :param newsroom.search.SearchQuery search: The search query instance
         """
 
         super().apply_request_filter(search)
 
-        if search.args.get('bookmarks'):
-            set_bookmarks_query(search.query, search.args['bookmarks'])
+        if search.args.get("bookmarks"):
+            set_bookmarks_query(search.query, search.args["bookmarks"])
 
-        if search.args.get('newsOnly') and not (search.args.get('navigation') or search.args.get('product_type')):
-            news_only_filter = get_setting('news_only_filter')
+        if search.args.get("newsOnly") and not (search.args.get("navigation") or search.args.get("product_type")):
+            news_only_filter = get_setting("news_only_filter")
             if news_only_filter:
-                search.query['bool']['must_not'].append(query_string(news_only_filter))
-            elif app.config.get('NEWS_ONLY_FILTERS'):
-                for f in app.config.get('NEWS_ONLY_FILTERS', []):
-                    search.query['bool']['must_not'].append(f)
+                search.query["bool"]["must_not"].append(query_string(news_only_filter))
+            elif app.config.get("NEWS_ONLY_FILTERS"):
+                for f in app.config.get("NEWS_ONLY_FILTERS", []):
+                    search.query["bool"]["must_not"].append(f)
 
     def get_product_item_report(self, product, section_filters=None):
         query = items_query()
@@ -298,75 +289,53 @@ class WireSearchService(BaseSearchService):
         if not product:
             return
 
-        query['bool']['should'] = []
-        get_resource_service('section_filters').apply_section_filter(
-            query,
-            product.get('product_type'),
-            section_filters
+        query["bool"]["should"] = []
+        get_resource_service("section_filters").apply_section_filter(
+            query, product.get("product_type"), section_filters
         )
 
-        if product.get('sd_product_id'):
-            query['bool']['should'].append({'term': {'products.code': product['sd_product_id']}})
+        if product.get("sd_product_id"):
+            query["bool"]["should"].append({"term": {"products.code": product["sd_product_id"]}})
 
-        if product.get('query'):
-            query['bool']['should'].append(query_string(product['query']))
+        if product.get("query"):
+            query["bool"]["should"].append(query_string(product["query"]))
 
-        query['bool']['minimum_should_match'] = 1
-        query['bool']['must_not'].append({'term': {'pubstatus': 'canceled'}})
+        query["bool"]["minimum_should_match"] = 1
+        query["bool"]["must_not"].append({"term": {"pubstatus": "canceled"}})
 
         now = datetime.utcnow()
 
-        source = {'query': query}
-        source['size'] = 0
-        source['aggs'] = {
+        source = {"query": query}
+        source["size"] = 0
+        source["aggs"] = {
             "today": {
                 "date_range": {
                     "field": "versioncreated",
-                    "ranges": [
-                        {
-                            "from": now.strftime('%Y-%m-%d')
-                        }
-                    ]
+                    "ranges": [{"from": now.strftime("%Y-%m-%d")}],
                 }
             },
             "last_24_hours": {
                 "date_range": {
                     "field": "versioncreated",
-                    "ranges": [
-                        {
-                            "from": "now-1d/d"
-                        }
-                    ]
+                    "ranges": [{"from": "now-1d/d"}],
                 }
             },
             "this_week": {
                 "date_range": {
                     "field": "versioncreated",
-                    "ranges": [
-                        {
-                            "from": (now - timedelta(days=now.weekday())).strftime('%Y-%m-%d')
-                        }
-                    ]
+                    "ranges": [{"from": (now - timedelta(days=now.weekday())).strftime("%Y-%m-%d")}],
                 }
             },
             "last_7_days": {
                 "date_range": {
                     "field": "versioncreated",
-                    "ranges": [
-                        {
-                            "from": (now - timedelta(days=7)).strftime('%Y-%m-%d')
-                        }
-                    ]
+                    "ranges": [{"from": (now - timedelta(days=7)).strftime("%Y-%m-%d")}],
                 }
             },
             "this_month": {
                 "date_range": {
                     "field": "versioncreated",
-                    "ranges": [
-                        {
-                            "from": (now.replace(day=1)).strftime('%Y-%m-%d')
-                        }
-                    ]
+                    "ranges": [{"from": (now.replace(day=1)).strftime("%Y-%m-%d")}],
                 }
             },
             "previous_month": {
@@ -374,30 +343,26 @@ class WireSearchService(BaseSearchService):
                     "field": "versioncreated",
                     "ranges": [
                         {
-                            "from": (((now.replace(day=1)) - timedelta(days=1)).replace(day=1)).strftime('%Y-%m-%d'),
-                            "to": (now.replace(day=1)).strftime('%Y-%m-%d'),
+                            "from": (((now.replace(day=1)) - timedelta(days=1)).replace(day=1)).strftime("%Y-%m-%d"),
+                            "to": (now.replace(day=1)).strftime("%Y-%m-%d"),
                         }
-                    ]
+                    ],
                 }
             },
             "last_6_months": {
                 "date_range": {
                     "field": "versioncreated",
-                    "ranges": [
-                        {
-                            "from": (now - timedelta(days=180)).strftime('%Y-%m-%d')
-                        }
-                    ]
+                    "ranges": [{"from": (now - timedelta(days=180)).strftime("%Y-%m-%d")}],
                 }
             },
         }
 
         internal_req = ParsedRequest()
-        internal_req.args = {'source': json.dumps(source)}
+        internal_req.args = {"source": json.dumps(source)}
         return self.internal_get(internal_req, None)
 
     def get_matching_bookmarks(self, item_ids, active_users, active_companies):
-        """ Returns a list of user ids bookmarked any of the given items
+        """Returns a list of user ids bookmarked any of the given items
 
         :param item_ids: list of ids of items to be searched
         :param active_users: user_id, user dictionary
@@ -406,30 +371,28 @@ class WireSearchService(BaseSearchService):
         bookmark_users = []
 
         query = {
-            'bool': {
-                'must_not': [
-                    {'term': {'type': 'composite'}},
+            "bool": {
+                "must_not": [
+                    {"term": {"type": "composite"}},
                 ],
-                'must': [
-                    {'terms': {'_id': item_ids}}
-                ],
+                "filter": [{"terms": {"_id": item_ids}}],
             }
         }
-        get_resource_service('section_filters').apply_section_filter(query, self.section)
+        get_resource_service("section_filters").apply_section_filter(query, self.section)
 
-        source = {'query': query}
+        source = {"query": query}
         internal_req = ParsedRequest()
-        internal_req.args = {'source': json.dumps(source)}
+        internal_req.args = {"source": json.dumps(source)}
         search_results = self.internal_get(internal_req, None)
 
         if not search_results:
             return bookmark_users
 
-        for result in search_results.hits['hits']['hits']:
-            bookmarks = result['_source'].get('bookmarks', [])
+        for result in search_results.hits["hits"]["hits"]:
+            bookmarks = result["_source"].get("bookmarks", [])
             for bookmark in bookmarks:
                 user = active_users.get(bookmark)
-                if user and str(user.get('company', '')) in active_companies:
+                if user and str(user.get("company", "")) in active_companies:
                     bookmark_users.append(bookmark)
 
         return bookmark_users

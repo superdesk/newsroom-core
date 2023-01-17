@@ -1,5 +1,5 @@
 import {get, isEmpty, isEqual, pickBy} from 'lodash';
-import {getTextFromHtml, getConfig} from 'utils';
+import {getTextFromHtml, getConfig, isDisplayed} from 'utils';
 
 export const DISPLAY_ABSTRACT = getConfig('display_abstract');
 
@@ -28,9 +28,26 @@ export function getIntVersion(item) {
  * @return {Array}
  */
 export function getVideos(item) {
-    return item.type === 'video' ? [item] : Object.values(get(item, 'associations', {}) || {}).filter((assoc) => get(assoc, 'type') === 'video');
+    return getRelatedItemsByType(item, 'video');
 }
 
+const isMedia = (item) => item.type === 'audio' || item.type === 'video';
+
+/**
+ * 
+ * @param {*} item 
+ */
+export function getItemMedia(item) {
+    if (isMedia(item)) {
+        return [item];
+    }
+
+    return Object.values(get(item, 'associations', {}) || {}).filter((assoc) => assoc != null && isMedia(assoc));
+}
+
+function getRelatedItemsByType(item, type) {
+    return item.type === type ? [item] : Object.values(get(item, 'associations', {}) || {}).filter((assoc) => get(assoc, 'type') === type);
+}
 
 /**
  * Get picture for an item
@@ -41,9 +58,17 @@ export function getVideos(item) {
  * @return {Object}
  */
 export function getPicture(item) {
-    return item.type === 'picture' ? item : (
-        get(item, 'associations.featuremedia') || getBodyPicture(item)
-    );
+    if (item.type === 'picture') {
+        return item;
+    }
+
+    const featured = get(item, 'associations.featuremedia');
+
+    if (featured != null && featured.type === 'picture') {
+        return featured;
+    }
+
+    return getBodyPicture(item);
 }
 
 function getBodyPicture(item) {
@@ -108,7 +133,7 @@ export function isCustomRendition(picture) {
  * @param {Object} video
  * @return {Object}
  */
-export function getOriginalVideo(video) {
+export function getOriginalRendition(video) {
     return get(video, 'renditions.original');
 }
 
@@ -149,7 +174,8 @@ export function showItemVersions(item, next) {
  * @param {Item} item
  * @return {Node}
  */
-export function shortText(item, length=40, useBody=false) {
+export function shortText(item, length=40, config) {
+    const useBody = (config === true || config === false) ? config : isDisplayed('abstract', config) === false;
     const html = (useBody ? item.body_html : item.description_html || item.body_html) || '<p></p>';
     const text = useBody ?  getTextFromHtml(html) : item.description_text || getTextFromHtml(html);
     const words = text.split(/\s/).filter((w) => w);
@@ -191,3 +217,10 @@ export function isTopicActive(topic, activeQuery) {
 export function isEqualItem(a, b) {
     return a && b && a._id === b._id && a.version === b.version;
 }
+
+function hasMedia(item, type) {
+    return item != null && getItemMedia(item).some((_item) => _item.type === type);
+}
+
+export const hasAudio = (item) => hasMedia(item, 'audio');
+export const hasVideo = (item) => hasMedia(item, 'video');

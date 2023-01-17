@@ -13,7 +13,7 @@ import {
     previewItem,
     toggleNews,
     toggleSearchAllVersions,
-    downloadVideo,
+    downloadMedia,
 } from 'wire/actions';
 
 import {
@@ -79,6 +79,7 @@ class WireApp extends BaseApp {
     }
 
     render() {
+        const newsOnlyFilterText = this.props.newsOnlyFilterText;
         const modal = this.renderModal(this.props.modal);
 
         const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x) => x).length;
@@ -140,7 +141,7 @@ class WireApp extends BaseApp {
                 actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
                 detailsConfig={this.props.detailsConfig}
                 listConfig={this.props.listConfig}
-                downloadVideo={this.props.downloadVideo}
+                downloadMedia={this.props.downloadMedia}
                 followStory={this.props.followStory}
                 onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
                 filterGroupLabels={this.props.filterGroupLabels}
@@ -184,7 +185,7 @@ class WireApp extends BaseApp {
                             activeNavigation={this.props.activeNavigation}
                             newsOnly={this.props.newsOnly}
                             toggleNews={this.props.toggleNews}
-                            hideNewsOnly={!(this.props.context === 'wire' && DISPLAY_NEWS_ONLY)}
+                            hideNewsOnly={!(this.props.context === 'wire' && DISPLAY_NEWS_ONLY && newsOnlyFilterText)}
                             hideSearchAllVersions={!(this.props.context === 'wire' && DISPLAY_ALL_VERSIONS_TOGGLE)}
                             searchAllVersions={this.props.searchAllVersions}
                             toggleSearchAllVersions={this.props.toggleSearchAllVersions}
@@ -204,7 +205,7 @@ class WireApp extends BaseApp {
                             ref={this.setListRef}
                         >
                             <SearchResultsInfo
-                                scrollClass={this.state.scrollClass}
+                                minimizeSearchResults={this.state.minimizeSearchResults}
 
                                 showTotalItems={showTotalItems}
                                 showTotalLabel={showTotalLabel}
@@ -237,7 +238,7 @@ class WireApp extends BaseApp {
                                 followStory={this.props.followStory}
                                 closePreview={this.props.closePreview}
                                 previewConfig={this.props.previewConfig}
-                                downloadVideo={this.props.downloadVideo}
+                                downloadMedia={this.props.downloadMedia}
                                 listConfig={this.props.listConfig}
                                 filterGroupLabels={this.props.filterGroupLabels}
                             />
@@ -273,6 +274,7 @@ WireApp.propTypes = {
     user: PropTypes.string,
     company: PropTypes.string,
     topics: PropTypes.array,
+    newsOnlyFilterText: PropTypes.string,
     fetchItems: PropTypes.func,
     actions: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string,
@@ -302,7 +304,7 @@ WireApp.propTypes = {
     detailsConfig: PropTypes.object,
     listConfig: PropTypes.object,
     groups: PropTypes.array,
-    downloadVideo: PropTypes.func,
+    downloadMedia: PropTypes.func,
     advancedSearchTabConfig: PropTypes.object,
     searchParams: PropTypes.object,
     showSaveTopic: PropTypes.bool,
@@ -312,6 +314,7 @@ WireApp.propTypes = {
 const mapStateToProps = (state) => ({
     state: state,
     isLoading: state.isLoading,
+    newsOnlyFilterText: state.newsOnlyFilterText,
     totalItems: state.totalItems,
     activeQuery: searchQuerySelector(state),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
@@ -360,7 +363,7 @@ const mapDispatchToProps = (dispatch) => ({
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view) => dispatch(setView(view)),
     closePreview: () => dispatch(previewItem(null)),
-    downloadVideo: (href, id, mimeType) => dispatch(downloadVideo(href, id, mimeType)),
+    downloadMedia: (href, id, mimeType) => dispatch(downloadMedia(href, id, mimeType)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);

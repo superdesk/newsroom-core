@@ -1,4 +1,3 @@
-
 {{ item.headline or item.name }}
 {{ url_for_agenda(item) }}
 {%  if item.event %}{{ dateString }}{% endif %}
@@ -8,13 +7,19 @@
 {% endif %}{% if links | length is gt 1 %}Web: {% for link in links %}{{ link }}
 {% endfor %}
 {% endif %}
+{% if item.definition_long or item.definition_short %}{{ item.definition_long or item.definition_short }}
+{% endif %}
 {%  for planning_item in item.get('planning_items', []) or [] %}
+Planning Item:
+{%- if (planning_item.get('description_text') or planning_item.get('name') or '') != (item.definition_long or item.definition_short) %}
 {{ planning_item.get('description_text') or planning_item.get('name') or '' }}
-{% if planning_item.get('ednote') %}Editorial Note: {{ planning_item.get('ednote') }}{% endif %}
+{% endif -%}
+{% if planning_item.get('ednote') %}Editorial Note: {{ planning_item.get('ednote') }}
+{% endif -%}
 {% if planning_item.get('coverages', []) | length is gt 0 %}
 Coverages:
-{% for cov in planning_item.get('coverages', []) or [] %}
-{{ get_coverage_email_text(cov) }}{% if cov.get('planning', {}).get('ednote') %}
+{% for cov in get_planning_coverages(item, planning_item._id) %}
+{{ get_coverage_email_text(cov, '', recipient_language) }}{% if cov.get('planning', {}).get('ednote') %}
 Note: {{ cov['planning']['ednote'] }} {% endif %}{% if is_admin and cov.get('planning', {}).get('internal_note') %}Internal Note: {{ cov['planning']['internal_note'] }}{% endif %}
 {% endfor %}
 {% endif %}

@@ -36,7 +36,7 @@ class Users extends React.Component {
         let errors = {};
 
         if (!this.props.userToEdit.email) {
-            errors.email = ['Please provide email'];
+            errors.email = [gettext('Please provide email')];
             valid = false;
         }
 
@@ -76,9 +76,6 @@ class Users extends React.Component {
                     <div className="flex-col flex-column">
                         {this.props.activeQuery && (
                             <SearchResults
-                                showTotalItems={true}
-                                showTotalLabel={true}
-                                showSaveTopic={false}
                                 totalItems={this.props.totalUsers}
                                 totalItemsLabel={this.props.activeQuery}
                             />

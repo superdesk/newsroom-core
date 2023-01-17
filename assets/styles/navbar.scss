@@ -67,6 +67,10 @@
         display: flex;
         justify-content: center;
         align-items: center;
+
+        &--disconnected {
+            background: #cc0000;
+        }
     }
     .notif__list {
         position: absolute;

@@ -77,8 +77,7 @@ export default class CoverageItemStatus extends React.Component {
         let content = [
             (<span key="topRow" className={get(actions, 'length', 0) === 0 ? 'coverage-item--element-grow' : ''} >
                 <span key="label" className='coverage-item__text-label me-1'>{gettext('Status')}:</span>
-                <span key="value">{gettext('coverage {{ state }} ',
-                    {state: getCoverageStatusText(coverage)})}</span>
+                <span key="value">{getCoverageStatusText(coverage)}</span>
             </span>),
             actions
         ];
@@ -127,13 +126,32 @@ export default class CoverageItemStatus extends React.Component {
             action.when(this.props.coverage, this.props.user, this.props.item));
     }
 
+    getWorkflowStatusReason() {
+        const {coverage, coverageData} = this.props;
+        const COVERAGE_CANCELLED_PREFIX = 'All coverages cancelled: ';
+        const PLANNING_CANCELLED_PREFIX = 'Planning cancelled: ';
+        let reason = get(coverageData, `workflow_status_reason[${coverage.coverage_id}]`);
+
+        if (!get(reason, 'length', 0)) {
+            return '';
+        } else if (reason.startsWith(COVERAGE_CANCELLED_PREFIX)) {
+            reason = reason.substring(COVERAGE_CANCELLED_PREFIX.length);
+            reason = gettext('All coverages cancelled: {{ reason }}', {reason: reason});
+        } else if (reason.startsWith(PLANNING_CANCELLED_PREFIX)) {
+            reason = reason.substring(PLANNING_CANCELLED_PREFIX.length);
+            reason = gettext('Planning cancelled: {{ reason }}', {reason: reason});
+        }
+
+        return reason;
+    }
+
     render() {
         const coverage = this.props.coverage;
         const wireText = this.getItemText(coverage);
         const internalNote = get(this.props, 'coverageData.internal_note', {})[coverage.coverage_id];
         const edNote = this.state.wireItem ? this.state.wireItem.ednote :
             get(this.props, 'coverageData.ednote', {})[coverage.coverage_id];
-        const reason = get(this.props, 'coverageData.workflow_status_reason', {})[coverage.coverage_id];
+        const reason = this.getWorkflowStatusReason();
         const scheduledStatus = get(this.props, 'coverageData.scheduled_update_status', {})[coverage.coverage_id];
 
 
@@ -172,6 +190,7 @@ export default class CoverageItemStatus extends React.Component {
 CoverageItemStatus.propTypes = {
     item: PropTypes.object,
     coverage: PropTypes.object,
+    coverageData: PropTypes.object,
     wireItems: PropTypes.array,
     actions: PropTypes.array,
     user: PropTypes.string,

@@ -1,3 +1,6 @@
 .git
+.env
 env
+dump
+dist
 node_modules

@@ -4,13 +4,12 @@ import {isEmpty} from 'lodash';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import AgendaLinks from './AgendaLinks';
-import {isDisplayed, fullDate, gettext} from 'utils';
+import {isDisplayed, gettext, formatDate, formatTime} from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import {
     getPicture,
-    getVideos,
-    getOriginalVideo,
+    getItemMedia,
     showItemVersions,
     isKilled,
     DISPLAY_ABSTRACT,
@@ -24,7 +23,7 @@ import ContentBar from 'ui/components/ContentBar';
 import ArticleItemDetails from 'ui/components/ArticleItemDetails';
 import ArticleContent from 'ui/components/ArticleContent';
 import ArticlePicture from 'ui/components/ArticlePicture';
-import ArticleVideo from  'ui/components/ArticleVideo';
+import ArticleMedia from  'ui/components/ArticleMedia';
 import ArticleContentWrapper from 'ui/components/ArticleContentWrapper';
 import ArticleContentInfoWrapper from 'ui/components/ArticleContentInfoWrapper';
 import ArticleHeadline from 'ui/components/ArticleHeadline';
@@ -44,13 +43,13 @@ function ItemDetails({
     topics,
     onClose,
     detailsConfig,
-    downloadVideo,
+    downloadMedia,
     followStory,
     listConfig,
     filterGroupLabels,
 }) {
     const picture = getPicture(item);
-    const videos = getVideos(item);
+    const media = getItemMedia(item);
     const isCustom = isCustomRendition(picture);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
 
@@ -78,23 +77,23 @@ function ItemDetails({
                         <ArticleBody itemType={itemType}>
                             <ArticleEmbargoed item={item} />
                             <div className='wire-column__preview__date pb-2'>
-                                {gettext('Published')}{' '}{fullDate(item.versioncreated)}
+                                {gettext('Published on {{ date }} at {{ time }}', {
+                                    date: formatDate(item.versioncreated),
+                                    time: formatTime(item.versioncreated),
+                                })}
                             </div>
                             {isDisplayed('headline', detailsConfig) && <ArticleHeadline item={item}/>}
                             <ArticleAuthor item={item} displayConfig={detailsConfig} />
                             {isDisplayed('abstract', detailsConfig) &&
                             <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                             {isDisplayed('body_html', detailsConfig) && <ArticleBodyHtml item={item}/>}
-                            {!isEmpty(videos) && videos.map((video) => <ArticleVideo
-                                key={video.guid}
-                                video={getOriginalVideo(video)}
+                            {!isEmpty(media) && media.map((media) => <ArticleMedia
+                                key={media.guid}
+                                media={media}
                                 isKilled={isKilled(item)}
-                                headline={video.headline}
-                                downloadVideo={downloadVideo}
+                                download={downloadMedia}
                             />)}
                         </ArticleBody>
-
-
 
                         {isDisplayed('metadata_section', detailsConfig) && (
                             <PreviewMeta item={item} isItemDetail={true} displayConfig={detailsConfig}
@@ -139,7 +138,7 @@ ItemDetails.propTypes = {
     filterGroupLabels: PropTypes.object,
 
     onClose: PropTypes.func,
-    downloadVideo: PropTypes.func,
+    downloadMedia: PropTypes.func,
     followStory: PropTypes.func,
 };
 

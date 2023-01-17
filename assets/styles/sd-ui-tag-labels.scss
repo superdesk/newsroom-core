@@ -1,0 +1,126 @@
+:root {
+    --badge-bg-default: var(--gray-light);
+    --badge-txt-default: var(--body-text);
+    --badge-remove-bg: var(--gray-lighter);
+    --badge-icon-color: var(--gray-dark);
+
+    --badge-bg-darker: var(--gray-mid);
+    --badge-txt-darker: var(--body-text);
+
+    --badge-bg-highlight1: var(--main-blue);
+    --badge-txt-highlight1: var(--background-color);
+
+    --badge-bg-highlight2: var(--mid-blue-light);
+    --badge-txt-highlight2: var(--background-color);
+}
+
+$tag-bg-colors: (
+    default: var(--badge-bg-default),
+    darker: var(--badge-bg-darker),
+    highlight1: var(--badge-bg-highlight1),
+    highlight2: var(--badge-bg-highlight2),
+);
+$tag-text-colors: (
+    default: var(--badge-txt-default),
+    darker: var(--badge-txt-darker),
+    highlight1: var(--badge-txt-highlight1),
+    highlight2: var(--badge-txt-highlight2),
+);
+/// Coloring classes. A map of classes to output in the CSS.
+$tag-bg-palette: $tag-bg-colors !default;
+$tag-text-palette: $tag-text-colors !default;
+
+
+/// Generates the base styles for a badge.
+@mixin tag-label {
+    display: inline-flex;
+    align-items: center;
+    min-width: 1.8em;
+    padding: 0;
+    padding-inline: 1em 1em;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    position: relative;
+    text-align: center;
+    font-weight: 400;
+    transition: background-color .2s ease-out, opacity .1s ease-out;
+    margin: 0.125rem 0.1875rem 0.125rem 0;
+    height: 1.5rem;
+    color: var(--badge-txt-default);
+    background-color: var(--badge-bg-default);
+}
+
+.tag-label {
+    @include tag-label;
+
+    @each $name, $color in $tag-bg-palette {
+        &.tag-label--#{$name} {
+            background-color: $color;
+        }
+    }
+    @each $name, $color in $tag-text-palette {
+        &.tag-label--#{$name} {
+            color: $color;
+        }
+    }
+    .tag-label__remove {
+        height: 1.125rem;
+        width: 1.125rem;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: inherit;
+        line-height: 1;
+        text-decoration: none;
+        text-align: center;
+        vertical-align: middle;
+        border-radius: 9999px;
+        border: 0;
+        background-color: var(--badge-remove-bg);
+        opacity: 0.65;
+        color: var(--badge-txt-default);
+        cursor: pointer;
+        transition: background-color .2s ease-out, color .1s ease-out, opacity .1s ease-out;
+        margin-inline-start: 0.5rem;
+        margin-inline-end: -0.625rem;
+        [class^="icon-"], [class*=" icon-"] {
+            color: var(--badge-icon-color);
+            font-size: 0.875rem;
+            flex-grow: 0;
+            flex-shrink: 0;
+            margin-left: 1px;
+            opacity: 0.8;
+            transition: color .1s ease-out, opacity .1s ease-out;
+        }
+        &:hover {
+            text-decoration: none;
+            opacity: 0.85;
+            [class^="icon-"], [class*=" icon-"] {
+                opacity: 1;
+            }
+        }
+        &:active {
+            opacity: 1;
+            [class^="icon-"], [class*=" icon-"] {
+                color: var(--badge-txt-default);
+                opacity: 1;
+            }
+        }
+        &:focus {
+            outline: none;
+        }
+    }
+    .tag-label--text-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+    }
+    .tag-label--text {
+        font-weight: 700;
+    }
+    .tag-label--text-label {
+        opacity: 0.9;
+    }
+}

@@ -1,4 +1,4 @@
-import {get, isEmpty, includes} from 'lodash';
+import {get, isEmpty, includes, cloneDeep} from 'lodash';
 import moment from 'moment';
 
 import server from 'server';
@@ -28,12 +28,13 @@ import {
 import {
     toggleFilter,
     initParams as initSearchParams,
-    setNewItemsByTopic,
+    setNewItemByTopic,
     loadMyTopics,
     setTopics,
     loadMyTopic,
+    setSearchFilters,
 } from 'search/actions';
-import {searchParamsSelector} from 'search/selectors';
+import {searchParamsSelector, searchFilterSelector} from 'search/selectors';
 
 import {clearAgendaDropdownFilters} from '../local-store';
 import {getLocations, getMapSource} from '../maps/utils';
@@ -218,8 +219,14 @@ export function copyPreviewContents(item) {
                 contents.push(gettext('Description: {{ description }}', {description: pi.description_text}));
                 pi.coverages &&  pi.coverages.map(coverage => {
                     contents.push(gettext('Coverage type: {{ type }}', {type: coverage.planning.g2_content_type}));
-                    contents.push(gettext('Scheduled: {{ schedule }}', {schedule: getLocaleDate(coverage.planning.scheduled)}));
-                    contents.push(gettext('Status: {{ status }}', {status: coverage.workflow_status}));
+
+                    if (coverage.planning.scheduled != null) {
+                        contents.push(gettext('Scheduled: {{ schedule }}', {schedule: getLocaleDate(coverage.planning.scheduled)}));
+                    }
+                    if (coverage.workflow_status != null) {
+                        contents.push(gettext('Status: {{ status }}', {status: coverage.workflow_status}));
+                    }
+
                     coverage.planning.description_text && contents.push(gettext('Description: {{ description }}', {description: coverage.planning.description_text}));
                     contents.push('');
                 });
@@ -255,9 +262,8 @@ function search(state, next) {
     const currentMoment = moment();
     const searchParams = searchParamsSelector(state);
     const createdFilter = get(searchParams, 'created') || {};
-
-    const eventsOnlyFilter = !state.bookmarks &&
-        get(state, 'agenda.eventsOnlyView', false);
+    const itemTypeFilter = get(state, 'agenda.itemType');
+    const eventsOnlyFilter = !state.bookmarks && itemTypeFilter === 'events';
 
     const featuredFilter = noNavigationSelected(searchParams.navigation) &&
         !state.bookmarks &&
@@ -296,7 +302,7 @@ function search(state, next) {
         date_to: dateTo,
         timezone_offset: getTimezoneOffset(),
         featured: featuredFilter,
-        eventsOnlyView: eventsOnlyFilter,
+        itemType: itemTypeFilter,
     };
 
     const queryString = Object.keys(params)
@@ -322,7 +328,6 @@ export function fetchItems() {
             .catch(errorHandler);
     };
 }
-
 
 export function fetchItem(id) {
     return (dispatch) => {
@@ -473,7 +478,7 @@ export function pushNotification(push) {
 
         switch (push.event) {
         case 'topic_matches':
-            return dispatch(setNewItemsByTopic(push.extra));
+            return dispatch(setNewItemByTopic(push.extra));
 
         case 'new_item':
             return dispatch(setAndUpdateNewItems(push.extra));
@@ -514,15 +519,17 @@ export function reloadMyTopics(reloadTopic = false) {
     };
 }
 
-export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
+export const SET_NEW_ITEM = 'SET_NEW_ITEM';
 export function setAndUpdateNewItems(data) {
     return function(dispatch, getState) {
-        if (get(data, '_items.length') <= 0 || get(data, '_items[0].type') !== 'agenda') {
+        const item = data.item || {};
+
+        if (item.type !== 'agenda') {
             const state = getState();
 
             // Check if the item is used in the preview or opened agenda item
             // If yes, make it available to the preview
-            if (get(data, '_items[0].type') !== 'text' || (!state.previewItem && !state.openItem)) {
+            if (item !== 'text' || (!state.previewItem && !state.openItem)) {
                 return Promise.resolve();
             }
 
@@ -531,41 +538,67 @@ export function setAndUpdateNewItems(data) {
                 return Promise.resolve();
             }
 
-            const coveragesToCheck = agendaItem.coverages.map((c) => c.coverage_id);
-            for(let i of data._items) {
-                if (coveragesToCheck.includes(i.coverage_id)) {
-                    dispatch(fetchWireItemsForAgenda(agendaItem));
-                    break;
-                }
+            const coveragesToCheck = (agendaItem.coverages || []).map((c) => c.coverage_id);
+
+            if (coveragesToCheck.includes(item.coverage_id)) {
+                dispatch(fetchWireItemsForAgenda(agendaItem));
             }
 
             return Promise.resolve();
         }
 
-        dispatch(updateItems(data));
+        dispatch(updateItem(item));
 
         // Do not use 'killed' items for new-item notifications
-        let newItemsData = {...data};
-        if (get(newItemsData, '_items.length', 0) > 0) {
-            newItemsData._items = newItemsData._items.filter((item) => item.state !== 'killed');
+        if (item.state === 'killed') {
+            return Promise.resolve();
         }
 
-        dispatch({type: SET_NEW_ITEMS, data: newItemsData});
+        dispatch({type: SET_NEW_ITEM, data: item});
         return Promise.resolve();
     };
 }
 
-export const UPDATE_ITEMS = 'UPDATE_ITEMS';
-export function updateItems(data) {
-    return {type: UPDATE_ITEMS, data};
+export const UPDATE_ITEM = 'UPDATE_ITEM';
+export function updateItem(item) {
+    return {type: UPDATE_ITEM, item: item};
 }
 
 export function toggleDropdownFilter(key, val) {
     return (dispatch) => {
         dispatch(setActive(null));
         dispatch(preview(null));
-        key === 'eventsOnly' ? dispatch(toggleEventsOnlyFilter(val)) : dispatch(toggleFilter(key, val, true));
+
+        if (key === 'itemType') {
+            dispatch(setItemTypeFilter(val));
+        } else if (key === 'location') {
+            dispatch(setLocationFilter(val));
+        } else {
+            dispatch(toggleFilter(key, val, true));
+        }
+
         dispatch(fetchItems());
+    };
+}
+
+function setLocationFilter(location) {
+    return (dispatch, getState) => {
+        const state = getState();
+        const currentFilters = cloneDeep(searchFilterSelector(state));
+        const currentLocation = get(currentFilters, 'location') || {};
+
+        if (location == null || (currentLocation.type === location.type && currentLocation.name === location.name)) {
+            delete currentFilters.location;
+        } else {
+            currentFilters.location = location;
+        }
+
+        dispatch(setSearchFilters(currentFilters));
+        updateRouteParams(
+            {filter: currentFilters},
+            state,
+            false
+        );
     };
 }
 
@@ -612,7 +645,7 @@ export function initParams(params) {
             dispatch(toggleFeaturedFilter(false));
         }
 
-        dispatch(toggleEventsOnlyFilter(params.get('eventsOnlyView') ? true : false));
+        dispatch(setItemTypeFilter(params.get('itemType', null)));
         dispatch(initSearchParams(params));
         if (params.get('item')) {
             dispatch(fetchItem(params.get('item')))
@@ -656,9 +689,9 @@ export function toggleFeaturedFilter(fetch = true) {
     };
 }
 
-export const TOGGLE_EVENTS_ONLY_FILTER = 'TOGGLE_EVENTS_ONLY_FILTER';
-export function toggleEventsOnlyFilter(value) {
-    return {type: TOGGLE_EVENTS_ONLY_FILTER, value};
+export const SET_ITEM_TYPE_FILTER = 'SET_ITEM_TYPE_FILTER';
+export function setItemTypeFilter(value) {
+    return {type: SET_ITEM_TYPE_FILTER, value};
 }
 
 export const WATCH_COVERAGE = 'WATCH_COVERAGE';

@@ -35,7 +35,7 @@ class AgendaCoverageRequest extends React.Component {
     render() {
         return (<div className='collapsible'>
             <a href='#' className='collapsible__link' onClick={this.onRequestClick}>
-                <i className={classNames('icon-small--arrow-down rotate-90-ccw me-1', {'rotate-90-ccw': this.state.opened})}></i>
+                <i className={classNames('icon-small--arrow-down me-1', {'rotate-90-ccw': this.state.opened})}></i>
                 {gettext('Coverage inquiries')}
             </a>
             <div className={classNames({'collapsible__form': !this.state.opened})}>

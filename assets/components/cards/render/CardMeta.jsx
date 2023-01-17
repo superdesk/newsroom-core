@@ -1,30 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {gettext, shortDate, fullDate, isDisplayed} from 'utils';
+import {characterCount, wordCount} from 'utils';
+import WireListItemIcons from 'wire/components/WireListItemIcons';
 
-
-function CardMeta({wordCount, charCount, pictureAvailable, source, versioncreated, displayDivider, slugline, listConfig}) {
+function CardMeta({item, picture, displayDivider, slugline, listConfig}) {
     return (<div className="wire-articles__item__meta">
-        <div className="wire-articles__item__icons">
-            <span className="wire-articles__item__icon">
-                <i className="icon--text icon--gray-dark"></i>
-            </span>
-            {pictureAvailable && <span className="wire-articles__item__icon">
-                <i className="icon--photo icon--gray-dark"></i>
-            </span>}
-            {displayDivider && <span className='wire-articles__item__divider'></span>}
-        </div>
+        <WireListItemIcons item={item} picture={picture} divider={displayDivider} />
         <div className="wire-articles__item__meta-info">
             {slugline && <span className='bold'>{slugline}</span>}
             <span>
-                {source && source}
+                {item.source && item.source}
                 {isDisplayed('wordcount', listConfig) &&
-                <span>{'  //  '}<span>{wordCount}</span> {gettext('words')}</span>}
+                <span>{'  //  '}<span>{wordCount(item)}</span> {gettext('words')}</span>}
                 {isDisplayed('charcount', listConfig) &&
-                <span>{'  //  '}<span>{charCount}</span> {gettext('characters')}</span>}
-                {versioncreated && ' // '}
-                {versioncreated &&
-                    <time dateTime={fullDate(versioncreated)}>{shortDate(versioncreated)}</time>
+                <span>{'  //  '}<span>{characterCount(item)}</span> {gettext('characters')}</span>}
+                {item.versioncreated && ' // '}
+                {item.versioncreated &&
+                    <time dateTime={fullDate(item.versioncreated)}>{shortDate(item.versioncreated)}</time>
                 }
             </span>
         </div>
@@ -32,11 +25,8 @@ function CardMeta({wordCount, charCount, pictureAvailable, source, versioncreate
 }
 
 CardMeta.propTypes = {
-    wordCount: PropTypes.number,
-    charCount: PropTypes.number,
-    pictureAvailable: PropTypes.bool,
-    source: PropTypes.string,
-    versioncreated: PropTypes.string,
+    item: PropTypes.object.isRequired,
+    picture: PropTypes.object,
     displayDivider: PropTypes.bool,
     slugline: PropTypes.string,
     listConfig: PropTypes.object,

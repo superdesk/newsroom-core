@@ -33,7 +33,7 @@ class ListBar extends React.Component {
 ListBar.propTypes = {
     setQuery: PropTypes.func,
     fetch: PropTypes.func,
-    buttonText: PropTypes.string,
+    buttonText: PropTypes.string.isRequired,
     onNewItem: PropTypes.func,
     children: PropTypes.node,
     noSearch: PropTypes.bool,

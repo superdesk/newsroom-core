@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {characterCount, wordCount} from 'utils';
 import {getPicture, getThumbnailRendition, getCaption, shortText} from 'wire/utils';
 import CardRow from './CardRow';
 import CardMeta from './CardMeta';
@@ -19,16 +18,13 @@ const getTopNewsPanel = (item, picture, openItem, cardId, listConfig) => {
                 <h4 className='card-title'>{item.headline}</h4>
                 <Embargo item={item} isCard={true} />
                 <CardMeta
-                    pictureAvailable={!!picture}
-                    wordCount={wordCount(item)}
-                    source={item.source}
-                    versioncreated={item.versioncreated}
-                    displayDivider={false}
-                    charCount={characterCount(item)}
+                    item={item}
+                    picture={picture}
                     listConfig={listConfig}
+                    displayDivider={false}
                 />
                 <div className='wire-articles__item__text'>
-                    <p className='card-text small'>{shortText(item, 40, true)}</p>
+                    <p className='card-text small'>{shortText(item, 40, listConfig)}</p>
                 </div>
             </div>
         </div>

@@ -16,6 +16,12 @@
                     {% include "login_form.html" %}
                 </div>
 
+                {% if config.SAML_PATH %}
+                <div class="card-body pt-1 pb-2">
+                    <a href="{{ url_for('auth.saml') }}" title="{{ gettext('Login using Single Sign On') }}" class="btn btn-primary btn-block">{{ config.SAML_LABEL }}</a>
+                </div>
+                {% endif %}
+
                 <div class="card-footer bg-white border-0 text-muted small">
                     <p>{{ gettext('Forgot your password?') }} <a href="{{ url_for('auth.token', token_type='reset_password') }}">{{ gettext('Click here to reset.') }}</a>
                         {% if config.SHOW_USER_REGISTER %}{{ gettext("Or you can") }} <a href="{{ url_for('auth.signup') }}">{{ gettext('click here to register.') }}</a>{% endif %}

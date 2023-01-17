@@ -1,4 +1,3 @@
-
 from datetime import datetime
 
 from superdesk.utc import local_to_utc
@@ -7,16 +6,15 @@ from newsroom import Resource, Service
 
 class FeaturedResource(Resource):
     schema = {
-        '_id': {'type': 'string', 'unique': True},
-        'tz': {'type': 'string'},
-        'items': {'type': 'list'},
-        'display_from': {'type': 'datetime'},
-        'display_to': {'type': 'datetime'},
+        "_id": {"type": "string", "unique": True},
+        "tz": {"type": "string"},
+        "items": {"type": "list"},
+        "display_from": {"type": "datetime"},
+        "display_to": {"type": "datetime"},
     }
 
 
 class FeaturedService(Service):
-
     def create(self, docs):
         """Add UTC from/to datetimes on save.
 
@@ -25,10 +23,10 @@ class FeaturedService(Service):
         display_from and display_to.
         """
         for item in docs:
-            date = datetime.strptime(item['_id'], '%Y%m%d')
-            item['display_from'] = local_to_utc(item['tz'], date.replace(hour=0, minute=0, second=0))
-            item['display_to'] = local_to_utc(item['tz'], date.replace(hour=23, minute=59, second=59))
+            date = datetime.strptime(item["_id"], "%Y%m%d")
+            item["display_from"] = local_to_utc(item["tz"], date.replace(hour=0, minute=0, second=0))
+            item["display_to"] = local_to_utc(item["tz"], date.replace(hour=23, minute=59, second=59))
         super().create(docs)
 
     def find_one_for_date(self, for_date):
-        return self.find_one(req=None, display_from={'$lte': for_date}, display_to={'$gte': for_date})
+        return self.find_one(req=None, display_from={"$lte": for_date}, display_to={"$gte": for_date})

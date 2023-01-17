@@ -4,11 +4,26 @@ import jinja2
 
 from newsroom.factory import BaseNewsroomApp
 from newsroom.template_filters import (
-    datetime_short, datetime_long, time_short, date_short,
-    plain_text, word_count, char_count, newsroom_config, is_admin,
-    hash_string, date_header, get_date, get_multi_line_message,
-    sidenavs_by_names, sidenavs_by_group, get_company_sidenavs, is_admin_or_account_manager,
-    authorized_settings_apps, theme_url, to_json,
+    datetime_short,
+    datetime_long,
+    time_short,
+    date_short,
+    plain_text,
+    word_count,
+    char_count,
+    newsroom_config,
+    is_admin,
+    hash_string,
+    date_header,
+    get_date,
+    get_multi_line_message,
+    sidenavs_by_names,
+    sidenavs_by_group,
+    get_company_sidenavs,
+    is_admin_or_account_manager,
+    authorized_settings_apps,
+    theme_url,
+    to_json,
 )
 from newsroom.notifications.notifications import get_initial_notifications
 from newsroom.limiter import limiter
@@ -20,15 +35,15 @@ from newsroom.webpack import NewsroomWebpack
 class NewsroomWebApp(BaseNewsroomApp):
     """Newsroom web app.
 
-        Usage::
+    Usage::
 
-            from newsroom.web import NewsroomWebApp
+        from newsroom.web import NewsroomWebApp
 
-            app = NewsroomWebApp(__name__)
-            app.run()
-        """
+        app = NewsroomWebApp(__name__)
+        app.run()
+    """
 
-    INSTANCE_CONFIG = 'settings.py'
+    INSTANCE_CONFIG = "settings.py"
 
     def __init__(self, import_name=__package__, config=None, **kwargs):
         self.download_formatters = {}
@@ -45,12 +60,16 @@ class NewsroomWebApp(BaseNewsroomApp):
         super(NewsroomWebApp, self).__init__(import_name=import_name, config=config, **kwargs)
 
         self.theme_folder = os.path.join(self.config["SERVER_PATH"], "theme")
-        self._theme_folders = [folder for folder in [
-            self.theme_folder,
-            os.path.join(self.config["SERVER_PATH"], "templates"),
-            self.template_folder,
-            self.static_folder,
-        ] if os.path.exists(folder)]
+        self._theme_folders = [
+            folder
+            for folder in [
+                self.theme_folder,
+                os.path.join(self.config["SERVER_PATH"], "templates"),
+                self.template_folder,
+                self.static_folder,
+            ]
+            if os.path.exists(folder)
+        ]
 
         self._setup_jinja()
         self._setup_limiter()
@@ -65,7 +84,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         # default config from `content_api.app.settings`
         super().load_app_default_config()
         # default config from `newsroom.web.default_settings`
-        self.config.from_object('newsroom.web.default_settings')
+        self.config.from_object("newsroom.web.default_settings")
 
     def load_app_instance_config(self):
         """
@@ -74,10 +93,10 @@ class NewsroomWebApp(BaseNewsroomApp):
         # config from newsroom-app settings.py file
         super().load_app_instance_config()
         # config from env var
-        self.config.from_envvar('NEWSROOM_SETTINGS', silent=True)
+        self.config.from_envvar("NEWSROOM_SETTINGS", silent=True)
 
     def _setup_jinja(self):
-        self.add_template_filter(to_json, name='tojson')
+        self.add_template_filter(to_json, name="tojson")
         self.add_template_filter(datetime_short)
         self.add_template_filter(datetime_long)
         self.add_template_filter(date_header)
@@ -86,7 +105,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_filter(date_short)
         self.add_template_filter(word_count)
         self.add_template_filter(char_count)
-        self.add_template_global(get_company_sidenavs, 'sidenavs')
+        self.add_template_global(get_company_sidenavs, "sidenavs")
         self.add_template_global(sidenavs_by_names)
         self.add_template_global(sidenavs_by_group)
         self.add_template_global(is_admin_or_account_manager)
@@ -94,16 +113,13 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_global(newsroom_config)
         self.add_template_global(is_admin)
         self.add_template_global(get_initial_notifications)
-        self.add_template_global(hash_string, 'hash')
-        self.add_template_global(get_date, 'get_date')
-        self.add_template_global(self.settings_apps, 'settings_apps')
+        self.add_template_global(hash_string, "hash")
+        self.add_template_global(get_date, "get_date")
+        self.add_template_global(self.settings_apps, "settings_apps")
         self.add_template_global(get_multi_line_message)
         self.add_template_global(theme_url)
 
-        jinja2_loaders = [
-            jinja2.FileSystemLoader(folder)
-            for folder in self._theme_folders
-        ]
+        jinja2_loaders = [jinja2.FileSystemLoader(folder) for folder in self._theme_folders]
 
         self.jinja_loader = jinja2.ChoiceLoader(jinja2_loaders)
 
@@ -118,8 +134,8 @@ class NewsroomWebApp(BaseNewsroomApp):
 
     def _setup_theme(self):
         self.add_url_rule(
-            self.static_url_path.replace('static', 'theme') + '/<path:filename>',
-            endpoint='theme',
+            self.static_url_path.replace("static", "theme") + "/<path:filename>",
+            endpoint="theme",
             host=self.static_host,
             view_func=self.send_theme_file,
         )
@@ -134,11 +150,11 @@ class NewsroomWebApp(BaseNewsroomApp):
         :param types: list of supported assets, eg. ``['picture']``
         """
         self.download_formatters[_format] = {
-            'format': _format,
-            'formatter': formatter,
-            'name': name,
-            'types': types,
-            'assets': assets
+            "format": _format,
+            "formatter": formatter,
+            "name": name,
+            "types": types,
+            "assets": assets,
         }
 
     def send_theme_file(self, filename):
@@ -174,15 +190,21 @@ class NewsroomWebApp(BaseNewsroomApp):
         :param _id: section _id
         :param name: section name
         """
-        self.sections.append({
-            '_id': _id,
-            'name': name,
-            'group': group,
-            'search_type': search_type
-        })
+        self.sections.append({"_id": _id, "name": name, "group": group, "search_type": search_type})
 
-    def sidenav(self, name, endpoint=None, icon=None, group=0, section=None, blueprint=None, badge=None, url=None,
-                secondary_endpoints=[], locale=None):
+    def sidenav(
+        self,
+        name,
+        endpoint=None,
+        icon=None,
+        group=0,
+        section=None,
+        blueprint=None,
+        badge=None,
+        url=None,
+        secondary_endpoints=[],
+        locale=None,
+    ):
         """Register an item in sidebar menu.
 
         Use in module :meth:`init_app` method::
@@ -202,29 +224,33 @@ class NewsroomWebApp(BaseNewsroomApp):
         :param locale: set locale if link is language specific, null will be displayed for all locales
         """
         if endpoint is None and url is None:
-            raise ValueError('please specify endpoint or url')
+            raise ValueError("please specify endpoint or url")
 
-        self.sidenavs.append({
-            'name': name,
-            'endpoint': endpoint,
-            'icon': icon,
-            'group': group,
-            'section': section,
-            'blueprint': blueprint,
-            'badge': badge,
-            'url': url,
-            'secondary_endpoints': secondary_endpoints,
-            'locale': locale,
-        })
+        self.sidenavs.append(
+            {
+                "name": name,
+                "endpoint": endpoint,
+                "icon": icon,
+                "group": group,
+                "section": section,
+                "blueprint": blueprint,
+                "badge": badge,
+                "url": url,
+                "secondary_endpoints": secondary_endpoints,
+                "locale": locale,
+            }
+        )
 
     def settings_app(self, app, name, weight=1000, data=None, allow_account_mgr=False):
-        self.settings_apps.append(SettingsApp(
-            _id=app,
-            name=name,
-            data=data,
-            weight=weight,
-            allow_account_mgr=allow_account_mgr,
-        ))
+        self.settings_apps.append(
+            SettingsApp(
+                _id=app,
+                name=name,
+                data=data,
+                weight=weight,
+                allow_account_mgr=allow_account_mgr,
+            )
+        )
 
     def dashboard(self, _id, name, cards=[]):
         """Define new dashboard
@@ -234,11 +260,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         :param cards: list of cards id related to the dashboard to
         populate the drop down in dashboard config.
         """
-        self.dashboards.append({
-            '_id': _id,
-            'name': name,
-            'cards': cards
-        })
+        self.dashboards.append({"_id": _id, "name": name, "cards": cards})
 
 
 def get_app(config=None, **kwargs):

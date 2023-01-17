@@ -1,4 +1,4 @@
-from newsroom.commands import * # noqa
+from newsroom.commands import *  # noqa
 from newsroom.commands.manager import manager
 
 

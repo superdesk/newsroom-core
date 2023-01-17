@@ -1,4 +1,4 @@
-
+import os
 import flask
 import bson.errors
 
@@ -6,13 +6,14 @@ from werkzeug.wsgi import wrap_file
 from werkzeug.utils import secure_filename
 from flask import request, url_for, current_app as newsroom_app
 from superdesk.upload import upload_url as _upload_url
+from superdesk.media.media_operations import guess_media_extension
 
 import newsroom
 from newsroom.decorator import login_required
 
 
 cache_for = 3600 * 24 * 7  # 7 days cache
-ASSETS_RESOURCE = 'upload'
+ASSETS_RESOURCE = "upload"
 blueprint = flask.Blueprint(ASSETS_RESOURCE, __name__)
 
 
@@ -21,10 +22,10 @@ def get_file(key):
     if file:
         filename = secure_filename(file.filename)
         newsroom_app.media.put(file, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type)
-        return url_for('upload.get_upload', media_id=filename)
+        return url_for("upload.get_upload", media_id=filename)
 
 
-@blueprint.route('/assets/<path:media_id>', methods=['GET'])
+@blueprint.route("/assets/<path:media_id>", methods=["GET"])
 @login_required
 def get_upload(media_id, filename=None):
     try:
@@ -35,10 +36,7 @@ def get_upload(media_id, filename=None):
         flask.abort(404)
 
     data = wrap_file(flask.request.environ, media_file, buffer_size=1024 * 256)
-    response = flask.current_app.response_class(
-        data,
-        mimetype=media_file.content_type,
-        direct_passthrough=True)
+    response = flask.current_app.response_class(data, mimetype=media_file.content_type, direct_passthrough=True)
     response.content_length = media_file.length
     response.last_modified = media_file.upload_date
     response.set_etag(media_file.md5)
@@ -47,25 +45,33 @@ def get_upload(media_id, filename=None):
     response.cache_control.public = True
     response.make_conditional(flask.request)
 
-    if flask.request.args.get('filename') or filename:
-        response.headers['Content-Type'] = media_file.content_type
-        response.headers['Content-Disposition'] = 'attachment; filename="%s"' % (
-            filename if filename else flask.request.args['filename']
-        )
+    if filename is None and flask.request.args.get("filename"):
+        filename = flask.request.args.get("filename")
+
+    if filename:
+        _filename, ext = os.path.splitext(filename)
+        if not ext:
+            ext = guess_media_extension(media_file.content_type)
+        filename = secure_filename(f"{_filename}{ext}")
+        response.headers["Content-Type"] = media_file.content_type
+        response.headers["Content-Disposition"] = 'attachment; filename="{}"'.format(filename)
     else:
-        response.headers['Content-Disposition'] = 'inline'
+        response.headers["Content-Disposition"] = "inline"
 
     return response
 
 
 def upload_url(media_id):
-    return _upload_url(media_id, view='assets.get_media_streamed')
+    return _upload_url(media_id, view="assets.get_media_streamed")
 
 
 def init_app(app):
     app.upload_url = upload_url
-    app.config['DOMAIN'].setdefault('upload', {
-        'authentication': None,
-        'mongo_prefix': newsroom.MONGO_PREFIX,
-        'internal_resource': True
-    })
+    app.config["DOMAIN"].setdefault(
+        "upload",
+        {
+            "authentication": None,
+            "mongo_prefix": newsroom.MONGO_PREFIX,
+            "internal_resource": True,
+        },
+    )

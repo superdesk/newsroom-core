@@ -17,10 +17,13 @@ class ArticleBodyHtml extends React.PureComponent {
 
         // use memoize so this function is only called when `body_html` changes
         this.getBodyHTML = memoize(this._getBodyHTML.bind(this));
+
+        this.bodyRef = React.createRef();
     }
 
     componentDidMount() {
         this.loadIframely();
+        this.executeScripts();
         document.addEventListener('copy', this.copyClicked);
         document.addEventListener('click', this.clickClicked);
     }
@@ -56,6 +59,7 @@ class ArticleBodyHtml extends React.PureComponent {
 
     componentDidUpdate() {
         this.loadIframely();
+        this.executeScripts();
     }
 
     loadIframely() {
@@ -64,6 +68,53 @@ class ArticleBodyHtml extends React.PureComponent {
         if (window.iframely && html && html.includes('iframely')) {
             window.iframely.load();
         }
+    }
+
+    executeScripts() {
+        const tree = this.bodyRef.current;
+        const loaded = [];
+
+        if (tree == null) {
+            return;
+        }
+
+        tree.querySelectorAll('script').forEach((s) => {
+            if (s.hasAttribute('src') && !loaded.includes(s.getAttribute('src'))) {
+                let url = s.getAttribute('src');
+
+                loaded.push(url);
+
+                if (url.includes('twitter.com/') && window.twttr != null) {
+                    window.twttr.widgets.load();
+                    return;
+                } 
+
+                if (url.includes('instagram.com/') && window.instgrm != null) {
+                    window.instgrm.Embeds.process();
+                    return;
+                }
+
+                if (url.startsWith('http')) {
+                    // change https?:// to // so it uses schema of the client
+                    url = url.substring(url.indexOf(':') + 1);
+                }
+
+                const script = document.createElement('script');
+
+                script.src = url;
+                script.async = true;
+
+                script.onload = () => {
+                    document.body.removeChild(script);
+                };
+
+                script.onerrror = (error) => {
+                    throw new URIError('The script ' + error.target.src + 'didn\'t load.');
+                };
+
+                document.body.appendChild(script);
+            }
+        });
     }
 
     copyClicked() {
@@ -147,6 +198,7 @@ class ArticleBodyHtml extends React.PureComponent {
 
         return (
             <div
+                ref={this.bodyRef}
                 className='wire-column__preview__text wire-column__preview__text--pre'
                 id='preview-body'
                 dangerouslySetInnerHTML={({__html: html})}
@@ -161,7 +213,7 @@ ArticleBodyHtml.propTypes = {
         es_highlight: PropTypes.shape({
             body_html: PropTypes.arrayOf(PropTypes.string),
         }),
-        associations: PropTypes.Object,
+        associations: PropTypes.object,
     }).isRequired,
     reportCopy: PropTypes.func,
 };

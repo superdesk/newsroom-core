@@ -1,6 +1,6 @@
 {
   "name": "newsroom-core",
-  "version": "2.1.0-dev",
+  "version": "2.4.0-dev",
   "license": "GPLv3",
   "repository": {
     "type": "git",
@@ -36,7 +36,6 @@
     "moment-timezone": "0.5.23",
     "node-sass": "^4.5.3",
     "react": "16.14.0",
-    "react-bootstrap-typeahead": "5.2.2",
     "react-datepicker": "4.7.0",
     "react-dom": "16.14.0",
     "react-redux": "5.0.7",

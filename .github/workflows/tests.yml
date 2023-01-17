@@ -8,25 +8,20 @@ jobs:
   server:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.10']
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: setup python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.8
+          python-version: ${{ matrix.python-version }}
 
       - name: docker-compose
         run: docker-compose -f .actions-docker-compose.yml up -d
-
-      - name: cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('dev-requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip
-            ${{ runner.os }}-
 
       - name: pip install
         run: |

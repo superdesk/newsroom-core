@@ -5,21 +5,19 @@ import {
     SELECT_DATE,
     WATCH_EVENTS,
     STOP_WATCHING_EVENTS,
-    UPDATE_ITEMS,
+    UPDATE_ITEM,
     TOGGLE_FEATURED_FILTER,
-    TOGGLE_EVENTS_ONLY_FILTER,
+    SET_ITEM_TYPE_FILTER,
     AGENDA_WIRE_ITEMS,
     WATCH_COVERAGE,
     STOP_WATCHING_COVERAGE,
 } from './actions';
 
-import {get, isEmpty, uniqBy, uniq} from 'lodash';
-import {getActiveDate} from 'local-store';
+import {get, uniq} from 'lodash';
 import {EXTENDED_VIEW} from 'wire/defaults';
 import {searchReducer} from 'search/reducers';
 import {defaultReducer} from '../reducers';
 import {EARLIEST_DATE} from './utils';
-import moment from 'moment';
 
 const initialState = {
     items: [],
@@ -49,7 +47,7 @@ const initialState = {
         activeDate: Date.now(),
         activeGrouping: 'day',
         eventsOnlyAccess: false,
-        eventsOnlyView: false,
+        itemType: null,
         featuredOnly: false,
         agendaWireItems: [],
     },
@@ -59,28 +57,8 @@ const initialState = {
     searchInitiated: false,
     uiConfig: {},
     groups: [],
+    hasAgendaFeaturedItems: false,
 };
-
-function processAggregations(aggregations) {
-    if (!get(aggregations, 'planning_items.doc_count', false)) {
-        return aggregations;
-    }
-
-    const planningItems = get(aggregations, 'planning_items', {});
-
-    Object.keys(planningItems).forEach((key) => {
-        if (key !== 'doc_count' && planningItems[key].buckets) {
-            if (!get(aggregations, `${key}.buckets`)) {
-                aggregations[key] = {'buckets': planningItems[key].buckets};
-            } else {
-                aggregations[key] = {
-                    'buckets': uniqBy([...planningItems[key].buckets, ...get(aggregations, `${key}.buckets`)], 'key')
-                };
-            }
-        }
-    });
-    return aggregations;
-}
 
 function recieveItems(state, data) {
     const itemsById = Object.assign({}, state.itemsById);
@@ -88,33 +66,6 @@ function recieveItems(state, data) {
         itemsById[item._id] = item;
         return item._id;
     });
-    const createdFilter = get(state, 'search.createdFilter', {});
-
-    let activeDate = state.agenda.activeDate || Date.now();
-    if (state.bookmarks) {
-        activeDate = EARLIEST_DATE;
-    }
-    if (!isEmpty(createdFilter.from) || !isEmpty(createdFilter.to)) {
-        activeDate = moment().valueOf(); // default for 'now/d'
-        if (createdFilter.from === 'now/d') {
-            activeDate = moment().valueOf();
-        } else if (createdFilter.from === 'now/w') {
-            activeDate =  moment(activeDate).isoWeekday(1).valueOf();
-        } else if (createdFilter.from === 'now/M') {
-            activeDate =  moment(activeDate).startOf('month').valueOf();
-        } else if (!isEmpty(createdFilter.from)) {
-            activeDate = moment(createdFilter.from).valueOf();
-        } else {
-            activeDate = EARLIEST_DATE;
-        }
-    } else if (!state.bookmarks && activeDate === EARLIEST_DATE) {
-        activeDate = getActiveDate() || moment().valueOf();
-    }
-
-    const agenda = {
-        ...state.agenda,
-        activeDate,
-    };
 
     return {
         ...state,
@@ -122,13 +73,11 @@ function recieveItems(state, data) {
         itemsById,
         isLoading: false,
         totalItems: data._meta.total,
-        aggregations: processAggregations(data._aggregations) || null,
+        aggregations: data._aggregations || null,
         newItems: [],
-        agenda,
         searchInitiated: false,
     };
 }
-
 
 function _agendaReducer(state, action) {
     switch (action.type) {
@@ -205,21 +154,19 @@ export default function agendaReducer(state = initialState, action) {
         return {...state, itemsById};
     }
 
-    case UPDATE_ITEMS: {
+    case UPDATE_ITEM: {
         // Update existing items, remove killed items
-
         let itemsById = Object.assign({}, state.itemsById);
         let updatedItems = [ ...state.items ];
-        get(action.data, '_items', []).forEach(item => {
-            if(itemsById[item._id]) {
-                if (get(item, 'state') === 'killed') {
-                    delete itemsById[item._id];
-                    updatedItems = updatedItems.filter((i) => i !== item._id);
-                } else {
-                    itemsById[item._id] = item;
-                }
+        const item = action.item;
+        if(itemsById[item._id]) {
+            if (get(item, 'state') === 'killed') {
+                delete itemsById[item._id];
+                updatedItems = updatedItems.filter((i) => i !== item._id);
+            } else {
+                itemsById[item._id] = item;
             }
-        });
+        }
 
         return {
             ...state,
@@ -235,6 +182,7 @@ export default function agendaReducer(state = initialState, action) {
             ...state.agenda,
             activeDate: action.agendaData.bookmarks ? EARLIEST_DATE : action.activeDate || state.agenda.activeDate,
             eventsOnlyAccess: action.agendaData.events_only,
+            restrictCoverageInfo: action.agendaData.restrict_coverage_info,
             featuredOnly: action.featuredOnly,
         };
 
@@ -256,6 +204,7 @@ export default function agendaReducer(state = initialState, action) {
             locators: action.agendaData.locators || null,
             uiConfig: action.agendaData.ui_config || {},
             groups: action.agendaData.groups || [],
+            hasAgendaFeaturedItems: action.agendaData.has_agenda_featured_items || false,
         };
     }
 
@@ -275,13 +224,13 @@ export default function agendaReducer(state = initialState, action) {
                 featuredOnly: !state.agenda.featuredOnly,
             }
         };
-    case TOGGLE_EVENTS_ONLY_FILTER:
+    case SET_ITEM_TYPE_FILTER:
         return {
             ...state,
             agenda: {
                 ...state.agenda,
-                eventsOnlyView: action.value,
-            }
+                itemType: action.value,
+            },
         };
 
     case AGENDA_WIRE_ITEMS:

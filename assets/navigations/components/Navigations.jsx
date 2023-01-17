@@ -38,7 +38,7 @@ class Navigations extends React.Component {
         let errors = {};
 
         if (!this.props.navigationToEdit.name) {
-            errors.name = ['Please provide navigation name'];
+            errors.name = [gettext('Please provide navigation name')];
             valid = false;
         }
 
@@ -80,9 +80,6 @@ class Navigations extends React.Component {
                     <div className="flex-col flex-column">
                         {this.props.activeQuery && (
                             <SearchResults
-                                showTotalItems={true}
-                                showTotalLabel={true}
-                                showSaveTopic={false}
                                 totalItems={this.props.navigations.length}
                                 totalItemsLabel={this.props.activeQuery}
                             />

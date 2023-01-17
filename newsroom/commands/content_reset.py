@@ -11,5 +11,5 @@ def content_reset():
         $ python manage.py content_reset
 
     """
-    app.data.remove('items')
-    app.data.remove('items_versions')
+    app.data.remove("items")
+    app.data.remove("items_versions")

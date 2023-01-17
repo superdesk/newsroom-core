@@ -15,19 +15,12 @@ class ClientResource(newsroom.Resource):
             "unique": True,
         },
         "password": {"type": "string", "required": True},
-        "last_active": {
-            "type": "datetime",
-            "required": False,
-            "nullable": True
-        },
+        "last_active": {"type": "datetime", "required": False, "nullable": True},
     }
 
-    datasource = {
-        'source': 'oauth_clients',
-        'default_sort': [('name', 1)]
-    }
-    item_methods = ['GET', 'PATCH', 'DELETE']
-    resource_methods = ['GET', 'POST']
+    datasource = {"source": "oauth_clients", "default_sort": [("name", 1)]}
+    item_methods = ["GET", "PATCH", "DELETE"]
+    resource_methods = ["GET", "POST"]
     mongo_prefix = MONGO_PREFIX
     internal_resource = True
 

@@ -24,14 +24,14 @@ from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
 logger = logging.getLogger(__name__)
 
 
-class CompanyExpiryAlerts():
+class CompanyExpiryAlerts:
     def send_alerts(self):
-        self.log_msg = 'Company Expiry Alerts: {}'.format(utcnow())
-        logger.info('{} Starting to send alerts.'.format(self.log_msg))
+        self.log_msg = "Company Expiry Alerts: {}".format(utcnow())
+        logger.info("{} Starting to send alerts.".format(self.log_msg))
 
-        lock_name = get_lock_id('newsroom', 'company_expiry')
+        lock_name = get_lock_id("newsroom", "company_expiry")
         if not lock(lock_name, expire=610):
-            logger.error('{} Job already running'.format(self.log_msg))
+            logger.error("{} Job already running".format(self.log_msg))
             return
 
         try:
@@ -42,7 +42,7 @@ class CompanyExpiryAlerts():
         unlock(lock_name)
         remove_locks()
 
-        logger.info('{} Completed sending alerts.'.format(self.log_msg))
+        logger.info("{} Completed sending alerts.".format(self.log_msg))
 
     def worker(self):
         from newsroom.email import send_template_email
@@ -50,44 +50,45 @@ class CompanyExpiryAlerts():
         # Check if there are any recipients
         general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
         try:
-            recipients = general_settings['values']['company_expiry_alert_recipients'].split(',')
-        except KeyError:
-            logger.warning('there are no alert expiry recipients')
+            recipients = general_settings["values"]["company_expiry_alert_recipients"].split(",")
+        except (KeyError, TypeError):
+            logger.warning("there are no alert expiry recipients")
             return
         expiry_time = (utcnow() + datetime.timedelta(days=7)).replace(hour=0, minute=0, second=0)
-        companies_service = get_resource_service('companies')
-        companies = list(companies_service.find({
-                'expiry_date': {'$lte': expiry_time},
-                'is_enabled': True
-                }))
+        companies_service = get_resource_service("companies")
+        companies = list(companies_service.find({"expiry_date": {"$lte": expiry_time}, "is_enabled": True}))
 
         if len(companies) > 0:
             # Send notifications to users who are nominated to receive expiry alerts
             for company in companies:
-                users = get_resource_service('users').find({'company': company.get(config.ID_FIELD),
-                                                            'expiry_alert': True})
+                users = get_resource_service("users").find(
+                    {"company": company.get(config.ID_FIELD), "expiry_alert": True}
+                )
                 if users.count() > 0:
                     template_kwargs = {
                         "expiry_date": company.get("expiry_date"),
                         "expires_on": company.get("expiry_date").strftime("%d-%m-%Y"),
                     }
-                    logger.info('{} Sending to following users of company {}: {}'
-                                .format(self.log_msg, company.get('name'), recipients))
+                    logger.info(
+                        "{} Sending to following users of company {}: {}".format(
+                            self.log_msg, company.get("name"), recipients
+                        )
+                    )
                     send_template_email(
                         to=[u["email"] for u in users],
                         template="company_expiry_alert_user",
                         template_kwargs=template_kwargs,
                     )
 
-            if not (general_settings.get('values') or {}).get('company_expiry_alert_recipients'):
+            if not (general_settings.get("values") or {}).get("company_expiry_alert_recipients"):
                 return  # No one else to send
 
             template_kwargs = {
                 "companies": sorted(companies, key=lambda k: k["expiry_date"]),
                 "expiry_date": expiry_time,
-                "expires_on": expiry_time.strftime("%d-%m-%Y")
+                "expires_on": expiry_time.strftime("%d-%m-%Y"),
             }
-            logger.info('{} Sending to following expiry administrators: {}'.format(self.log_msg, recipients))
+            logger.info("{} Sending to following expiry administrators: {}".format(self.log_msg, recipients))
             send_template_email(
                 to=recipients,
                 template="company_expiry_email",

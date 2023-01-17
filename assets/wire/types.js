@@ -14,7 +14,7 @@ const actions = PropTypes.arrayOf(PropTypes.shape({
 
 const topic = PropTypes.shape({
     _id: PropTypes.string,
-    _created: PropTypes.string.isRequired,
+    _created: PropTypes.string,
     name: PropTypes.string,
     label: PropTypes.string.isRequired,
     description: PropTypes.string,

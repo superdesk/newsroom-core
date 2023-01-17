@@ -5,12 +5,14 @@ import operationsPlugin from 'store/plugins/operations';
 import expirePlugin from 'store/plugins/expire';
 
 import {get} from 'lodash';
+import {getConfig} from './utils';
 
 const READ_ITEMS_STORE = 'read_items';
 const NEWS_ONLY_STORE = 'news_only';
 const SEARCH_ALL_VERSIONS_STORE = 'search_all_versions';
 const FEATURED_ONLY_STORE = 'featured-only';
 const FILTER_TAB = 'filter_tab';
+const FILTER_PANEL_OPEN = 'filter_open';
 const ACTIVE_DATE = 'active_date';
 const DROPDOWN_FILTERS = 'dropdown_filters';
 
@@ -32,10 +34,10 @@ export function getReadItems() {
  * @param {Object} state
  */
 export function markItemAsRead(item, state) {
-    if (item && item._id && item.version) {
+    if (item && item._id) {
         const readItems = get(state, 'readItems', getReadItems()) || {};
 
-        store.assign(READ_ITEMS_STORE, {[item._id]: getMaxVersion(readItems[item._id], item.version)});
+        store.assign(READ_ITEMS_STORE, {[item._id]: getMaxVersion(readItems[item._id], item.version || 0)});
     }
 }
 
@@ -92,13 +94,28 @@ export function toggleFeaturedOnlyParam() {
     store.assign(FEATURED_ONLY_STORE, {value: !getFeaturedOnlyParam()});
 }
 
+export function getFilterPanelOpenState(context) {
+    const defaultValue = get(getConfig('filter_panel_defaults') || {}, `open.${context}`, false);
+
+    return get(store.get(FILTER_PANEL_OPEN), context, defaultValue);
+}
+
+export function setFilterPanelOpenState(open, context) {
+    const filterTabs = {...store.get(FILTER_PANEL_OPEN) || {}};
+
+    filterTabs[context] = open;
+    store.assign(FILTER_PANEL_OPEN, filterTabs);
+}
+
 /**
  * Get active filter tab
  *
  * @returns {boolean}
  */
 export function getActiveFilterTab(context) {
-    return get(store.get(FILTER_TAB), context, '');
+    const defaultValue = get(getConfig('filter_panel_defaults') || {}, `tab.${context}`, 'nav');
+
+    return get(store.get(FILTER_TAB), context, defaultValue);
 }
 
 /**

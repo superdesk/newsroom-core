@@ -40,8 +40,9 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
     const groupFilter = get(activeFilter, group.field, []);
     const activeBuckets = (get(activeFilter, group.field) || [])
         .map((filter) => ({key: filter}));
+    const bucketPath = get(group, 'agg_path') || `${group.field}.buckets`;
     const buckets = uniqBy(
-        cloneDeep(get(aggregations, `${group.field}.buckets`) || group.buckets || [])
+        cloneDeep(get(aggregations, bucketPath) || group.buckets || [])
             .concat(activeBuckets),
         'key'
     )

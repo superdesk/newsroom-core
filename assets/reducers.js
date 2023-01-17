@@ -31,11 +31,11 @@ import {
 import {
     SET_QUERY,
     ADD_TOPIC,
-    SET_NEW_ITEMS_BY_TOPIC,
+    SET_NEW_ITEM_BY_TOPIC,
 } from 'search/actions';
 
 import {getMaxVersion} from 'local-store';
-import {REMOVE_NEW_ITEMS} from './agenda/actions';
+import {REMOVE_NEW_ITEMS, SET_NEW_ITEM} from './agenda/actions';
 import {toggleValue} from 'utils';
 import {topicsReducer} from './topics/reducer';
 
@@ -303,7 +303,7 @@ export function defaultReducer(state={}, action) {
         };
     }
 
-    case SET_NEW_ITEMS_BY_TOPIC: {
+    case SET_NEW_ITEM_BY_TOPIC: {
         const newItemsByTopic = Object.assign({}, state.newItemsByTopic);
         action.data.topics.map((topic) => {
             const previous = newItemsByTopic[topic] || [];
@@ -340,6 +340,22 @@ export function defaultReducer(state={}, action) {
                 ...(action.data._items.filter((item) => !item.nextversion && !state.itemsById[item._id]).map((item) => item._id))
             ]),
         };
+    }
+
+    case SET_NEW_ITEM: {
+        const item = state.data || {};
+
+        if (!item.nextversion && !state.itemsById[item._id]) {
+            return {
+                ...state,
+                newItems: [
+                    ...state.newItems,
+                    item._id,
+                ],
+            };
+        }
+
+        return state;
     }
 
     case START_LOADING:

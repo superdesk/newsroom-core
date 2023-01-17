@@ -26,16 +26,17 @@ class AuditInformation extends React.Component {
     getElement(field) {
         const {item} = this.props;
         const users = get(this.props, 'users.length') ? this.props.users : this.props.editUsers;
+        const system = gettext('System');
 
         if (field === '_created' && item._created) {
             const creator = getItemFromArray(item.original_creator,
                 users || []);
             return (
                 <div className='wire-column__preview__date'>
-                    {gettext('Created {{creator}}at {{created}}',
+                    {gettext('Created by {{author}} at {{date}}',
                         {
-                            creator: creator ? gettext(`by ${creator.first_name} ${creator.last_name} `) : gettext('by System') + ' ',
-                            created: fullDate(item._created),
+                            author: creator ? creator.first_name + ' ' + creator.last_name : system,
+                            date: fullDate(item._created),
                         }
                     )}
                 </div>
@@ -43,13 +44,13 @@ class AuditInformation extends React.Component {
         }
 
         if (field === '_updated' && item.version_creator) {
-            const updator = getItemFromArray(item.version_creator, (users || []));
+            const updater = getItemFromArray(item.version_creator, (users || []));
             return (
                 <div className='wire-column__preview__date'>
-                    {gettext('Updated {{updator}}at {{updated}}',
+                    {gettext('Updated by {{author}} at {{date}}',
                         {
-                            updator: updator ? gettext(`by ${updator.first_name} ${updator.last_name} `) : gettext('by System') + ' ',
-                            updated: fullDate(item._updated),
+                            author: updater ? updater.first_name + ' ' + updater.last_name : system,
+                            date: fullDate(item._updated),
                         }
                     )}
                 </div>

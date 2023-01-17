@@ -1,5 +1,4 @@
 import {get, isEmpty} from 'lodash';
-import mime from 'mime-types';
 
 import server from 'server';
 import analytics from 'analytics';
@@ -25,7 +24,7 @@ import {renderModal, closeModal, setSavedItemsCount} from 'actions';
 
 import {
     initParams as initSearchParams,
-    setNewItemsByTopic,
+    setNewItemByTopic,
     loadMyTopics,
     setTopics,
     loadMyTopic,
@@ -108,8 +107,8 @@ export function recieveItem(data) {
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(wireData, readData, newsOnly, searchAllVersions) {
-    return {type: INIT_DATA, wireData, readData, newsOnly, searchAllVersions};
+export function initData(wireData, newsOnlyFilterText,readData, newsOnly, searchAllVersions) {
+    return {type: INIT_DATA, wireData, newsOnlyFilterText, readData, newsOnly, searchAllVersions};
 }
 
 export const TOGGLE_NEWS = 'TOGGLE_NEWS';
@@ -393,13 +392,16 @@ export function fetchVersions(item) {
 }
 
 /**
- * Download video file
+ * Download media file
  *
  * @param {string} id
+ * @param {string} filename
  */
-export function downloadVideo(href, id, mimeType) {
-    window.open(`${href}?filename=${id}.${mime.extension(mimeType)}`, '_blank');
-    analytics.event('download-video', id);
+export function downloadMedia(id, filename) {
+    return () => {
+        window.open(`/assets/${id}?filename=${filename}`, '_blank');
+        analytics.event('download-media', filename || id);
+    };
 }
 
 /**
@@ -458,7 +460,7 @@ export function pushNotification(push) {
 
         switch (push.event) {
         case 'topic_matches':
-            return dispatch(setNewItemsByTopic(push.extra));
+            return dispatch(setNewItemByTopic(push.extra));
 
         case 'new_item':
             return dispatch(setNewItems(push.extra));

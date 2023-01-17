@@ -1,38 +1,67 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext} from 'utils';
-import {isEmpty, uniqBy} from 'lodash';
+import {connect} from 'react-redux';
+import {get} from 'lodash';
+
+import {gettext, isDisplayed} from 'utils';
+import {filterGroupsToLabelMap} from 'search/selectors';
+
 import InfoBox from 'wire/components/InfoBox';
 import PreviewTagsBlock from 'wire/components/PreviewTagsBlock';
-import PreviewTagsLink from 'wire/components/PreviewTagsLink';
+import {PreviewTagsLinkList} from 'wire/components/PreviewTagsLinkList';
+import {PreviewTagsSubjects} from 'wire/components/PreviewTagsSubjects';
 import {getSubjects} from '../utils';
 
-function formatCV(items, field) {
-    return items && items.map((item) => (
-        <PreviewTagsLink key={item.code}
-            href={`/agenda?q=${field}:"${item.name}"`}
-            text={item.name}
-        />
-    ));
-}
 
-function AgendaTags({item, plan, isItemDetail}) {
-    const subjects = uniqBy([...getSubjects(item), ...getSubjects(plan)], 'code');
-    const formattedSubjects = !isEmpty(subjects) && formatCV(subjects, 'subject.name');
+function AgendaTagsComponent({item, plan, isItemDetail, displayConfig, filterGroupLabels}) {
+    const services = !isDisplayed('services', displayConfig) ? null : (
+        <PreviewTagsLinkList
+            urlPrefix="/agenda?filter="
+            items={[...(get(item, 'service') || []), ...(get(plan, 'service') || [])]}
+            field="service"
+        />
+    );
+
+    const subjects = (
+        <PreviewTagsSubjects
+            subjects={[...getSubjects(item), ...getSubjects(plan)]}
+            displayConfig={displayConfig}
+            urlPrefix="/agenda?filter="
+            filterGroupLabels={filterGroupLabels}
+        />
+    );
+
+    if (!subjects && !services) {
+        return null;
+    }
 
     return (
-        formattedSubjects && <InfoBox label={isItemDetail ? gettext('Metadata') : null} top={!isItemDetail}>
-            <PreviewTagsBlock label={gettext('Category')}>
-                {formattedSubjects}
-            </PreviewTagsBlock>
+        <InfoBox
+            label={isItemDetail ? gettext('Metadata') : null}
+            top={!isItemDetail}
+        >
+            {!services ? null : (
+                <PreviewTagsBlock label={get(filterGroupLabels, 'service', gettext('Category'))}>
+                    {services}
+                </PreviewTagsBlock>
+            )}
+            {subjects}
         </InfoBox>
     );
 }
 
-AgendaTags.propTypes = {
+AgendaTagsComponent.propTypes = {
     item: PropTypes.object,
     plan: PropTypes.object,
     isItemDetail: PropTypes.bool,
+    displayConfig: PropTypes.object,
+    filterGroupLabels: PropTypes.object,
 };
+
+const mapStateToProps = (state) => ({
+    filterGroupLabels: filterGroupsToLabelMap(state),
+});
+
+const AgendaTags = connect(mapStateToProps)(AgendaTagsComponent);
 
 export default AgendaTags;

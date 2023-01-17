@@ -9,19 +9,21 @@ import {
     DATE_FORMAT,
     COVERAGE_DATE_TIME_FORMAT,
     COVERAGE_DATE_FORMAT,
-    parseDate
+    parseDate,
+    AGENDA_DATE_FORMAT_SHORT,
+    formatTime,
 } from '../utils';
 
-const STATUS_KILLED = 'killed';
-const STATUS_CANCELED = 'cancelled';
-const STATUS_POSTPONED = 'postponed';
-const STATUS_RESCHEDULED = 'rescheduled';
+export const STATUS_KILLED = 'killed';
+export const STATUS_CANCELED = 'cancelled';
+export const STATUS_POSTPONED = 'postponed';
+export const STATUS_RESCHEDULED = 'rescheduled';
 
 const navigationFunctions = {
     'day': {
         'next': getNextDay,
         'previous': getPreviousDay,
-        'format': (dateString) => moment(dateString).format('dddd, D MMMM'),
+        'format': (dateString) => moment(dateString).format(AGENDA_DATE_FORMAT_SHORT),
     },
     'week': {
         'next': getNextWeek,
@@ -50,7 +52,7 @@ export function getCoverageStatusText(coverage) {
     if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && coverage.publish_time) {
         if ((get(coverage, 'deliveries.length', 0) === 2 && coverage.deliveries[0].publish_time) ||
             get(coverage, 'deliveries.length', 0) > 2) {
-            return gettext('updated {{ at }}', {at: moment(coverage.publish_time).format(COVERAGE_DATE_TIME_FORMAT)});
+            return gettext('coverage updated {{ at }}', {at: moment(coverage.publish_time).format(COVERAGE_DATE_TIME_FORMAT)});
         }
 
         return `${get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '')} ${moment(coverage.publish_time).format(COVERAGE_DATE_TIME_FORMAT)}`;
@@ -59,8 +61,8 @@ export function getCoverageStatusText(coverage) {
     return get(WORKFLOW_STATUS_TEXTS, coverage.workflow_status, '');
 }
 
-export const TO_BE_CONFIRMED_FIELD = '_time_to_be_confirmed';
-export const TO_BE_CONFIRMED_TEXT = gettext('Time to be confirmed');
+const TO_BE_CONFIRMED_FIELD = '_time_to_be_confirmed';
+const TO_BE_CONFIRMED_TEXT = gettext('Time to be confirmed');
 export const WORKFLOW_STATUS = {
     DRAFT: 'draft',
     ASSIGNED: 'assigned',
@@ -69,20 +71,20 @@ export const WORKFLOW_STATUS = {
     CANCELLED: 'cancelled',
 };
 
-export const DRAFT_STATUS_TEXTS = {
-    'coverage not planned': gettext('not planned'),
-    'coverage not intended': gettext('not planned'),
-    'coverage intended': gettext('planned'),
-    'coverage not decided': gettext('on merit'),
-    'coverage not decided yet': gettext('on merit'),
-    'coverage upon request': gettext('on request'),
+const DRAFT_STATUS_TEXTS = {
+    'coverage not planned': gettext('coverage not planned'),
+    'coverage not intended': gettext('coverage not planned'),
+    'coverage intended': gettext('coverage planned'),
+    'coverage not decided': gettext('coverage on merit'),
+    'coverage not decided yet': gettext('coverage on merit'),
+    'coverage upon request': gettext('coverage on request'),
 };
 
-export const WORKFLOW_STATUS_TEXTS = {
-    [WORKFLOW_STATUS.ASSIGNED]: gettext('planned'),
-    [WORKFLOW_STATUS.ACTIVE]: gettext('in progress'),
-    [WORKFLOW_STATUS.COMPLETED]: gettext('available'),
-    [WORKFLOW_STATUS.CANCELLED]: gettext('cancelled'),
+const WORKFLOW_STATUS_TEXTS = {
+    [WORKFLOW_STATUS.ASSIGNED]: gettext('coverage planned'),
+    [WORKFLOW_STATUS.ACTIVE]: gettext('coverage in progress'),
+    [WORKFLOW_STATUS.COMPLETED]: gettext('coverage available'),
+    [WORKFLOW_STATUS.CANCELLED]: gettext('coverage cancelled'),
 };
 
 export const WORKFLOW_COLORS = {
@@ -183,21 +185,6 @@ export function isWatched(item, userId) {
     return userId && includes(get(item, 'watches', []), userId);
 }
 
-
-/**
- * Test if a coverage is in boundary of event start and end dates
- *
- * @param {Object} item
- * @param {Object} coverage
- * @return {Boolean}
- */
-export function isCoverageBetweenEventDates(item, coverage) {
-    const coverageDate = moment(coverage.scheduled);
-    const eventStartDate = moment(item.dates.start);
-    const eventEndDate = moment(get(item, 'dates.end', eventStartDate));
-    return coverageDate.isBetween(eventStartDate, eventEndDate, null, '[]');
-}
-
 /**
  * Test if a coverage is for given date string
  *
@@ -206,7 +193,7 @@ export function isCoverageBetweenEventDates(item, coverage) {
  * @return {Boolean}
  */
 export function isCoverageForExtraDay(coverage, dateString) {
-    return formatDate(moment(coverage.scheduled)) === dateString;
+    return coverage.scheduled != null && formatDate(moment(coverage.scheduled)) === dateString;
 }
 
 /**
@@ -256,6 +243,10 @@ export function hasLocation(item) {
     return !!getLocationString(item);
 }
 
+export function hasLocationNotes(item) {
+    return get(item, 'location[0].details[0].length', 0) > 0;
+}
+
 /**
  * Returns public contacts
  *
@@ -280,10 +271,25 @@ export function getPublicContacts(item) {
  * @return {String}
  */
 export function getCalendars(item) {
-    return get(item, 'calendars', []).map(cal => cal.name).join(', ');
+    return (get(item, 'calendars') || []).map(cal => cal.name).join(', ');
 }
 
+export function getAgendaNames(item) {
+    return (get(item, 'agendas') || [])
+        .map((agenda) => agenda.name)
+        .join(', ');
+}
 
+export function isPlanningItem(item) {
+    return item.item_type === 'planning' || (
+        item.item_type == null &&
+        item.event_id == null
+    );
+}
+
+export function planHasEvent(item) {
+    return isPlanningItem(item) && item.event_id != null;
+}
 
 /**
  * Returns item event link
@@ -485,17 +491,19 @@ export function getDataFromCoverages(item) {
 }
 
 const getNextPendingScheduledUpdate = (coverage) => {
-    // No scheduled_updates or deliveries
-    if (get(coverage, 'scheduled_updates.length', 0) === 0 ||
-            get(coverage, 'deliveries.length', 0) === 0) {
+    if (coverage.scheduled == null) {
+        // Not privileged to see coverage details
         return null;
-    }
-
-    // Only one delivery: no scheduled_update was published
-    if (get(coverage, 'deliveries.length', 0) === 1) {
+    } else if (
+        get(coverage, 'scheduled_updates.length', 0) === 0 ||
+        get(coverage, 'deliveries.length', 0) === 0
+    ) {
+        // No scheduled_updates or deliveries
+        return null;
+    } else if (get(coverage, 'deliveries.length', 0) === 1) {
+        // Only one delivery: no scheduled_update was published
         return coverage.scheduled_updates[0];
     }
-
 
     const lastScheduledDelivery = (coverage.deliveries.reverse()).find((d) => d.scheduled_update_id);
     // More deliveries, but no scheduled_update was published
@@ -509,7 +517,7 @@ const getNextPendingScheduledUpdate = (coverage) => {
     if (lastPublishedShceduledUpdateIndex === coverage.scheduled_updates.length - 1) {
         // Last scheduled_update was published, nothing pending
         return;
-    } 
+    }
 
     if (lastPublishedShceduledUpdateIndex < coverage.scheduled_updates.length - 1){
         // There is a pending scheduled_update
@@ -566,7 +574,51 @@ export function getDescription(item, plan) {
  * @return {Array} list of dates
  */
 export function getExtraDates(item) {
-    return get(item, 'display_dates', []).map(ed => moment(ed.date));
+    return getDisplayDates(item).map((ed) => moment(ed.date));
+}
+
+/**
+ * Get the display dates, filtering out those that didn't match Planning/Coverage search
+ * @param item: Event or Planning item
+ * @returns {Array.<{date: moment.Moment}>}
+ */
+export function getDisplayDates(item) {
+    const matchedPlanning = get(item, '_hits.matched_planning_items');
+
+    if (matchedPlanning == null) {
+        return get(item, 'display_dates') || [];
+    }
+
+    const dates = [];
+    const planningItems = get(item, 'planning_items') || [];
+    const planningIds = item._hits.matched_planning_items;
+    const coverageIds = get(item, '_hits.matched_coverages') != null ?
+        item._hits.matched_coverages :
+        (get(item, 'coverages') || []).map((coverage) => coverage.coverage_id);
+
+    planningItems
+        .forEach((plan) => {
+            if (!planningIds.includes(plan._id)) {
+                return;
+            }
+
+            const coverages = (get(plan, 'coverages') || []).filter((coverage) => coverage.scheduled);
+
+            if (!coverages.length) {
+                dates.push({date: plan.planning_date});
+                return;
+            }
+
+            coverages.forEach((coverage) => {
+                if (!coverageIds.includes(coverage.coverage_id)) {
+                    return;
+                }
+
+                dates.push({date: coverage.planning.scheduled});
+            });
+        });
+
+    return dates;
 }
 
 /**
@@ -577,9 +629,25 @@ export function getExtraDates(item) {
  * @return {Boolean}
  */
 export function containsExtraDate(item, dateToCheck) {
-    return get(item, 'display_dates', []).map(ed => moment(ed.date).format('YYYY-MM-DD')).includes(dateToCheck.format('YYYY-MM-DD'));
+    return getDisplayDates(item).map(ed => moment(ed.date).format('YYYY-MM-DD')).includes(dateToCheck.format('YYYY-MM-DD'));
 }
 
+// get start date in utc mode if there is no time info
+const getStartDate = (item) => item.dates.all_day ? moment.utc(item.dates.start) : moment(item.dates.start);
+
+// get end date in utc mode if there is no end time info
+const getEndDate = (item) => item.dates.no_end_time || item.dates.all_day ?
+    moment.utc(item.dates.end || item.dates.start) :
+    moment(item.dates.end || item.dates.start);
+
+// compare days without being affected by timezone
+const isBetweenDay = (day, start, end) => {
+    const dayDate = day.format('YYYY-MM-DD');
+    const startDate = start.format('YYYY-MM-DD');
+    const endDate = end.format('YYYY-MM-DD');
+
+    return (startDate <= dayDate && endDate >= dayDate);
+};
 
 /**
  * Groups given agenda items per given grouping
@@ -592,37 +660,45 @@ export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
     const groupedItems = {};
     const grouper = Groupers[activeGrouping];
 
-    items.forEach((item) => {
-        const itemExtraDates = getExtraDates(item);
-        const itemStartDate = moment(item.dates.start);
-        const start = item._display_from ? moment(item._display_from) :
-            moment.max(maxStart, moment.min(itemExtraDates.concat([itemStartDate])));
-        const itemEndDate = moment(get(item, 'dates.end', start));
+    items
+        // Filter out items that didn't match any Planning items
+        .filter((item) => (
+            get(item, 'planning_items.length', 0) === 0 ||
+            get(item, '_hits.matched_planning_items') == null ||
+            get(item, '_hits.matched_planning_items.length', 0) > 0)
+        )
+        .forEach((item) => {
+            const itemExtraDates = getExtraDates(item);
+            const itemStartDate = getStartDate(item);
+            const start = item._display_from ? moment(item._display_from) :
+                moment.max(maxStart, moment.min(itemExtraDates.concat([itemStartDate])));
+            const itemEndDate = getEndDate(item);
 
-        // If item is an event and was actioned (postponed, rescheduled, cancelled only incase of multi-day event)
-        // actioned_date is set. In this case, use that as the cut off date.
-        let end = get(item, 'event.actioned_date') ? moment(item.event.actioned_date) : null;
-        if (!end || !moment.isMoment(end)) {
-            end = item._display_to ? moment(item._display_to) :
-                moment.max(itemExtraDates.concat([maxStart]).concat([itemEndDate]));
-        }
-        let key = null;
-
-        // use clone otherwise it would modify start and potentially also maxStart, moments are mutable
-        for (const day = start.clone(); day.isSameOrBefore(end, 'day'); day.add(1, 'd')) {
-
-            const isBetween = day.isBetween(itemStartDate, itemEndDate, 'day', '[]');
-            const containsExtra = containsExtraDate(item, day);
-            const addGroupItem = (item.event && (isBetween || containsExtra)) || containsExtra;
-
-            if (grouper(day) !== key && addGroupItem) {
-                key = grouper(day);
-                const groupList = groupedItems[key] || [];
-                groupList.push(item);
-                groupedItems[key] = groupList;
+            // If item is an event and was actioned (postponed, rescheduled, cancelled only incase of multi-day event)
+            // actioned_date is set. In this case, use that as the cut off date.
+            let end = get(item, 'event.actioned_date') ? moment(item.event.actioned_date) : null;
+            if (!end || !moment.isMoment(end)) {
+                end = item._display_to ? moment(item._display_to) :
+                    moment.max(itemExtraDates.concat([maxStart]).concat([itemEndDate]));
             }
-        }
-    });
+            let key = null;
+
+            // use clone otherwise it would modify start and potentially also maxStart, moments are mutable
+            for (const day = start.clone(); day.isSameOrBefore(end, 'day'); day.add(1, 'd')) {
+                const isBetween = isBetweenDay(day, itemStartDate, itemEndDate);
+                const containsExtra = containsExtraDate(item, day);
+                const addGroupItem = (item.event == null || get(item, '_hits.matched_planning_items') != null) ?
+                    containsExtra :
+                    isBetween || containsExtra;
+
+                if (grouper(day) !== key && addGroupItem) {
+                    key = grouper(day);
+                    const groupList = groupedItems[key] || [];
+                    groupList.push(item);
+                    groupedItems[key] = groupList;
+                }
+            }
+        });
 
     Object.keys(groupedItems).forEach((k) => {
         if (featuredOnly) {
@@ -652,20 +728,21 @@ export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
  * @param group: Group Date
  */
 export function getPlanningItemsByGroup(item, group) {
-    // Event item
-    if (get(item, 'planning_items.length', 0) === 0) {
+    const planningItems = get(item, 'planning_items') || [];
+
+    if (planningItems.length === 0) {
         return [];
     }
 
     // Planning item without coverages
-    const plansWithoutCoverages = get(item, 'planning_items', []).filter((p) =>
+    const plansWithoutCoverages = planningItems.filter((p) =>
         formatDate(p.planning_date) === group && get(p, 'coverages.length', 0) === 0);
 
-    const allPlans = keyBy(get(item, 'planning_items'), '_id');
+    const allPlans = keyBy(planningItems, '_id');
     const processed = {};
 
     // get unique plans for that group based on the coverage.
-    const plansWithCoverages = item.coverages
+    const plansWithCoverages = (item.coverages || [])
         .map((coverage) => {
             if (isCoverageForExtraDay(coverage, group)) {
                 if (!processed[coverage.planning_id]) {
@@ -682,7 +759,10 @@ export function getPlanningItemsByGroup(item, group) {
 }
 
 export function isCoverageOnPreviousDay(coverage, group) {
-    return moment(coverage.scheduled).isBefore(moment(group, DATE_FORMAT), 'day');
+    return (
+        coverage.scheduled != null &&
+        moment(coverage.scheduled).isBefore(moment(group, DATE_FORMAT), 'day')
+    );
 }
 
 
@@ -767,3 +847,47 @@ export function formatCoverageDate(coverage) {
         parseDate(coverage.scheduled).format(COVERAGE_DATE_TIME_FORMAT);
 }
 
+export const getCoverageTooltip = (coverage, beingUpdated) => {
+    const slugline = coverage.item_slugline || coverage.slugline;
+    const coverageType = getCoverageDisplayName(coverage.coverage_type);
+
+    if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
+        return gettext('{{ type }} coverage {{ slugline }} {{ status_text }}', {
+            type: coverageType,
+            slugline: slugline,
+            status_text: getCoverageStatusText(coverage)
+        });
+    } else if (coverage.workflow_status === WORKFLOW_STATUS.ASSIGNED) {
+        return gettext('Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}}', {
+            type: coverageType,
+            slugline: slugline,
+            date: formatDate(coverage.scheduled),
+            time: formatTime(coverage.scheduled)
+        });
+    } else if (coverage.workflow_status === WORKFLOW_STATUS.ACTIVE) {
+        return gettext('{{ type }} coverage {{ slugline }} in progress, expected {{date}} at {{time}}', {
+            type: coverageType,
+            slugline: slugline,
+            date: formatDate(coverage.scheduled),
+            time: formatTime(coverage.scheduled)
+        });
+    } else if (coverage.workflow_status === WORKFLOW_STATUS.CANCELLED) {
+        return gettext('{{ type }} coverage {{slugline}} cancelled', {
+            type: coverageType,
+            slugline: slugline,
+        });
+    } else if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
+        let deliveryState;
+        if (get(coverage, 'deliveries.length', 0) > 1) {
+            deliveryState = beingUpdated ? gettext('(update to come)') : gettext('(updated)');
+        }
+
+        return gettext('{{ type }} coverage {{ slugline }} available {{deliveryState}}', {
+            type: coverageType,
+            slugline: slugline,
+            deliveryState: deliveryState
+        });
+    }
+
+    return gettext('{{ type }} coverage', {type: coverageType});
+};

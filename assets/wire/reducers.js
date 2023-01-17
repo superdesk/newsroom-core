@@ -26,6 +26,7 @@ const initialState = {
     userType: null,
     company: null,
     topics: [],
+    newsOnlyFilterText: null,
     selectedItems: [],
     bookmarks: false,
     formats: [],
@@ -160,6 +161,7 @@ export default function wireReducer(state = initialState, action) {
             userSections: action.wireData.userSections || {},
             uiConfig: action.wireData.ui_config || {},
             groups: action.wireData.groups || [],
+            newsOnlyFilterText: action.newsOnlyFilterText,
         };
     }
 

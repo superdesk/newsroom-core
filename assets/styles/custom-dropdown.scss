@@ -5,7 +5,7 @@
   margin-block-start: 0px;
   border-radius: 0px;
   box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
-  max-height: 495px;
+  max-height: 60vh;
   overflow-y: auto;
   overflow-x: hidden;
 
@@ -19,7 +19,28 @@
 
 .dropdown-menu-typeahead {
   overflow: visible;
-  width: 300px;
+  width: 400px;
+
+  @include phone {
+    position: fixed;
+    top: 180.5px;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--footer-height) + 10px);
+    width: unset;
+    max-height: unset;
+    background-color: transparent;
+  }
+}
+
+.dropdown-menu-typeahead .dropdown-menu-typeahead {
+  @include phone {
+    width: 100%;
+    position: relative;
+    top: 0;
+    max-height: unset;
+    background-color: white;
+  }
 }
 
 .dropdown-item {
@@ -31,6 +52,15 @@
   [class^="icon--"], [class*=" icon--"] {
     margin-inline-end: 1rem;
   }
+
+  &--active {
+    color: #fff !important;
+    background-color: $main-blue !important;
+    [class^="icon--"], [class*=" icon--"] {
+      color: white !important;
+    }
+  }
+
   &:focus {
     color: #16181b;
     background-color: #eff4f6 !important;

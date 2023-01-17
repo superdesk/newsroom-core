@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {wordCount, characterCount} from 'utils';
 import CardRow from './CardRow';
 import CardFooter from './CardFooter';
 import {getPicture, shortText} from 'wire/utils';
@@ -13,15 +12,12 @@ const getTextOnlyPanel = (item, openItem, picture, cardId, listConfig) => (
                 <h4 className='card-title'>{item.headline}</h4>
                 <Embargo item={item} isCard={true} />
                 <div className='wire-articles__item__text'>
-                    <p className='card-text small'>{shortText(item, 40, true)}</p>
+                    <p className='card-text small'>{shortText(item, 40, listConfig)}</p>
                 </div>
             </div>
             <CardFooter
-                wordCount={wordCount(item)}
-                charCount={characterCount(item)}
-                pictureAvailable={!!picture}
-                source={item.source}
-                versioncreated={item.versioncreated}
+                item={item}
+                picture={picture}
                 listConfig={listConfig}
             />
         </div>

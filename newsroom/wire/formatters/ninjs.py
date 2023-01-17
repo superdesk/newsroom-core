@@ -6,17 +6,44 @@ from .base import BaseFormatter
 
 
 class NINJSFormatter(BaseFormatter):
-    MIMETYPE = 'application/json'
-    FILE_EXTENSION = 'json'
+    MIMETYPE = "application/json"
+    FILE_EXTENSION = "json"
 
-    direct_copy_properties = ('versioncreated', 'usageterms', 'language', 'headline', 'copyrightnotice',
-                              'urgency', 'pubstatus', 'mimetype', 'copyrightholder', 'ednote',
-                              'body_text', 'body_html', 'slugline', 'keywords',
-                              'firstcreated', 'firstpublished', 'source', 'extra', 'annotations', 'located', 'byline',
-                              'description_html', 'place', 'embargoed', 'priority', 'genre', 'service', 'subject',
-                              'evolvedfrom', 'original_id', 'decsription_text')
+    direct_copy_properties = (
+        "versioncreated",
+        "usageterms",
+        "language",
+        "headline",
+        "copyrightnotice",
+        "urgency",
+        "pubstatus",
+        "mimetype",
+        "copyrightholder",
+        "ednote",
+        "body_text",
+        "body_html",
+        "slugline",
+        "keywords",
+        "firstcreated",
+        "firstpublished",
+        "source",
+        "extra",
+        "annotations",
+        "located",
+        "byline",
+        "description_html",
+        "place",
+        "embargoed",
+        "priority",
+        "genre",
+        "service",
+        "subject",
+        "evolvedfrom",
+        "original_id",
+        "decsription_text",
+    )
 
-    def format_item(self, item, item_type='items'):
+    def format_item(self, item, item_type="items"):
         item = item.copy()
         ninjs = self._transform_to_ninjs(item)
 
@@ -24,9 +51,9 @@ class NINJSFormatter(BaseFormatter):
 
     def _transform_to_ninjs(self, item):
         ninjs = {
-            'guid': item.get('_id'),
-            'version': str(item.get('version', 1)),
-            'type': 'text'
+            "guid": item.get("_id"),
+            "version": str(item.get("version", 1)),
+            "type": "text",
         }
 
         for copy_property in self.direct_copy_properties:

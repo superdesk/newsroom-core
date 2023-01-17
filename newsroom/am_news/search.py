@@ -6,4 +6,4 @@ class AmNewsSearchResource(WireSearchResource):
 
 
 class AmNewsSearchService(WireSearchService):
-    section = 'am_news'
+    section = "am_news"

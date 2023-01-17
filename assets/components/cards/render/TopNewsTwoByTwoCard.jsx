@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {wordCount, getSlugline} from 'utils';
+import {getSlugline} from 'utils';
 import {getPicture, getThumbnailRendition, getCaption, shortText} from 'wire/utils';
 import CardRow from './CardRow';
 import CardFooter from './CardFooter';
@@ -8,7 +8,7 @@ import CardMeta from './CardMeta';
 import CardBody from './CardBody';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 
-const getTopNewsLeftPanel = (item, picture, openItem, cardId) => {
+const getTopNewsLeftPanel = (item, picture, openItem, cardId, listConfig) => {
 
     const rendition = getThumbnailRendition(picture, true);
     const imageUrl = rendition && rendition.href;
@@ -23,15 +23,13 @@ const getTopNewsLeftPanel = (item, picture, openItem, cardId) => {
                 <h2 className='card-title'>{item.headline}</h2>
                 <Embargo item={item} isCard={true} />
                 <CardMeta
-                    pictureAvailable={!!picture}
-                    wordCount={wordCount(item)}
-                    source={item.source}
-                    versioncreated={item.versioncreated}
+                    item={item}
+                    picture={picture}
                     displayDivider={false}
                     slugline={getSlugline(item, true)}
                 />
                 <div className='wire-articles__item__text'>
-                    <p className='card-text'>{shortText(item, 40, true)}</p>
+                    <p className='card-text'>{shortText(item, 40, listConfig)}</p>
                 </div>
             </div>
         </div>
@@ -39,7 +37,7 @@ const getTopNewsLeftPanel = (item, picture, openItem, cardId) => {
     );
 };
 
-const getTopNewsRightPanel = (item, picture, openItem, cardId) => {
+const getTopNewsRightPanel = (item, picture, openItem, cardId, listConfig) => {
 
     const rendition = getThumbnailRendition(picture);
     const imageUrl = rendition && rendition.href;
@@ -48,21 +46,19 @@ const getTopNewsRightPanel = (item, picture, openItem, cardId) => {
     return (<div key={item._id} className='col-sm-6 col-md-3 d-flex mb-4'>
         <div className='card card--home' onClick={() => openItem(item, cardId)}>
             <img className='card-img-top' src={imageUrl} alt={caption} />
-            <CardBody item={item} displayDescription={false} displaySource={false}/>
+            <CardBody item={item} displayDescription={false} displaySource={false} listConfig={listConfig}/>
             <CardFooter
-                wordCount={wordCount(item)}
-                pictureAvailable={!!picture}
-                source={item.source}
-                versioncreated={item.versioncreated}
+                item={item}
+                picture={picture}
             />
         </div>
     </div>);
 };
 
-const getTopNews = (items, openItem, cardId) => {
+const getTopNews = (items, openItem, cardId, listConfig) => {
     const topNews = [];
     for(var i=0; i<items.length; i+=2) {
-        topNews.push(getTopNewsLeftPanel(items[i], getPicture(items[i]), openItem, cardId));
+        topNews.push(getTopNewsLeftPanel(items[i], getPicture(items[i]), openItem, cardId, listConfig));
         if (i+1 < items.length) {
             topNews.push(getTopNewsRightPanel(items[i+1], getPicture(items[i+1]), openItem, cardId));
         }
@@ -70,10 +66,10 @@ const getTopNews = (items, openItem, cardId) => {
     return topNews;
 };
 
-function TopNewsTwoByTwoCard ({items, title, product, openItem, isActive, cardId}) {
+function TopNewsTwoByTwoCard ({items, title, product, openItem, isActive, cardId, listConfig}) {
     return (
         <CardRow title={title} product={product} isActive={isActive}>
-            {getTopNews(items, openItem, cardId)}
+            {getTopNews(items, openItem, cardId, listConfig)}
         </CardRow>
     );
 }
@@ -85,6 +81,7 @@ TopNewsTwoByTwoCard.propTypes = {
     openItem: PropTypes.func,
     isActive: PropTypes.bool,
     cardId: PropTypes.string,
+    listConfig: PropTypes.object,
 };
 
 export default TopNewsTwoByTwoCard;

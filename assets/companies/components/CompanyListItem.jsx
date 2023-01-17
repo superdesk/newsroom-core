@@ -20,7 +20,7 @@ function CompanyListItem({company, type, isActive, onClick, showSubscriberId}) {
             <td>{company.phone}</td>
             <td>{getCountryLabel(company.country)}</td>
             <td>{shortDate(company._created)}</td>
-            <td>{company.expiry_date && shortDate(company.expiry_date)}</td>
+            <td>{company.expiry_date && shortDate(company.expiry_date.substring(0, 10), false)}</td>
         </tr>
     );
 }

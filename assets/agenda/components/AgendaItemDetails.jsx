@@ -5,8 +5,9 @@ import {isEmpty, get} from 'lodash';
 import {gettext} from 'utils';
 
 import {getLocations, mapsKey} from 'maps/utils';
-import StaticMap from 'maps/components/static';
+import {hasAttachments, getInternalNote, planHasEvent} from '../utils';
 
+import StaticMap from 'maps/components/static';
 import PreviewActionButtons from 'components/PreviewActionButtons';
 
 import Content from 'ui/components/Content';
@@ -18,21 +19,16 @@ import ArticleBody from 'ui/components/ArticleBody';
 import ArticleSidebar from 'ui/components/ArticleSidebar';
 import ArticleSidebarBox from 'ui/components/ArticleSidebarBox';
 
-import {
-    hasCoverages,
-    hasAttachments,
-    getInternalNote,
-    getCoveragesForDisplay,
-} from '../utils';
-
 import AgendaLongDescription from './AgendaLongDescription';
 import AgendaMeta from './AgendaMeta';
 import AgendaEdNote from './AgendaEdNote';
 import AgendaInternalNote from './AgendaInternalNote';
-import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 import AgendaAttachments from './AgendaAttachments';
 import AgendaCoverageRequest from './AgendaCoverageRequest';
 import AgendaTags from './AgendaTags';
+import {AgendaPreviewPlanning} from './AgendaPreviewPlanning';
+import {AgendaPreviewEvent} from './AgendaPreviewEvent';
+import {AgendaRegistrationInvitationDetails} from './AgendaRegistrationInvitationDetails';
 
 
 export default function AgendaItemDetails(
@@ -47,6 +43,7 @@ export default function AgendaItemDetails(
         eventsOnly,
         wireItems,
         coverageActions,
+        detailsConfig,
     })
 {
     const locations = getLocations(item);
@@ -57,13 +54,12 @@ export default function AgendaItemDetails(
     // if (mapsLoaded() && !isEmpty(geoLocations)) {
     //     map = <Map locations={geoLocations} />;
     // }
-    const plan = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
 
     if (!map && mapsKey() && !isEmpty(locations)) {
         map = <StaticMap locations={locations} scale={2} />;
     }
 
-    const displayCoverages = getCoveragesForDisplay(item, plan, group);
+    const plan = (get(item, 'planning_items') || []).find((p) => p.guid === planningId);
     const internalNotes = getInternalNote(item, plan);
 
     return (
@@ -78,27 +74,33 @@ export default function AgendaItemDetails(
                 <ArticleBody>
                     <AgendaMeta item={item} />
                     <AgendaLongDescription item={item} plan={plan}/>
+                    <AgendaRegistrationInvitationDetails item={item} />
                 </ArticleBody>
                 <ArticleSidebar>
-                    <div>
-                        {hasCoverages(item) &&
-                        <AgendaPreviewCoverages
-                            item={item}
-                            currentCoverage={displayCoverages.current}
-                            previousCoverage={displayCoverages.previous}
-                            wireItems={wireItems}
-                            actions={coverageActions}
-                            user={user} />}
-                    </div>
+                    <AgendaPreviewPlanning
+                        user={user}
+                        item={item}
+                        planningId={planningId}
+                        wireItems={wireItems}
+                        coverageActions={coverageActions}
+                    />
+                    {!planHasEvent(item) ? null : (
+                        <AgendaPreviewEvent item={item} />
+                    )}
                     {hasAttachments(item) && (
                         <ArticleSidebarBox label={gettext('Attachments')}>
                             <AgendaAttachments item={item} />
                         </ArticleSidebarBox>
                     )}
-                    <AgendaTags item={item} plan={plan} isItemDetail={true} />
+                    <AgendaTags
+                        item={item}
+                        plan={plan}
+                        isItemDetail={true}
+                        displayConfig={detailsConfig}
+                    />
                     <AgendaEdNote item={item} plan={plan} secondaryNoteField='state_reason'/>
                     <AgendaInternalNote internalNote={internalNotes}
-                        mt2={!!(item.ednote || plan.ednote || item.state_reason)}/>
+                        mt2={!!(item.ednote || get(plan, 'ednote') || item.state_reason)}/>
                     {!eventsOnly && <AgendaCoverageRequest item={item} requestCoverage={requestCoverage}/>}
                 </ArticleSidebar>
             </Article>
@@ -121,4 +123,5 @@ AgendaItemDetails.propTypes = {
     eventsOnly: PropTypes.bool,
     wireItems: PropTypes.array,
     coverageActions: PropTypes.array,
+    detailsConfig: PropTypes.object,
 };

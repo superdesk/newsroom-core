@@ -79,7 +79,7 @@ class MonitoringApp extends React.Component {
             <Fragment>
                 <ListBar
                     onNewItem={this.isScheduleMode() ? null : this.props.newMonitoringProfile}
-                    buttonName={gettext('Monitoring Profile')}
+                    buttonText={gettext('New Monitoring Profile')}
                     noSearch>
                     <div className="btn-group btn-group--navbar ms-0 me-3">
                         {this.sections.map((section) => (

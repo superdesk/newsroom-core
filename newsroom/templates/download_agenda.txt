@@ -1,17 +1,26 @@
-{{ item.name }}
-{% if item.slugline %}Slugline:{{ item.slugline }}{% endif %}
-{% if item.headline %}Headline:{{ item.headline }}{% endif %}
-{% if item.definition_long %}Definition:{{ item.definition_long }}{% endif %}
+{% if item.name %}{{ item.name }}
+{% endif %}
+{%- if item.slugline %}Slugline: {{ item.slugline }}
+{% endif %}
+{%- if item.headline %}Headline: {{ item.headline }}
+{% endif %}
+{%- if item.definition_long %}Definition: {{ item.definition_long }}
+{% endif -%}
 On: {{ item.dates.start | datetime_long }}
 
-{% if item.subject %}Category: {{ item.subject|join(', ', attribute='name')}}{% endif %}
-{% if item.genre %}Content Type: {{ item.genre|join(', ', attribute='name')}}{% endif %}
-{% if item.place %}Place: {{ item.place|join(', ', attribute='name')}}{% endif %}
+{%- if item.subject %}Category: {{ item.subject|join(', ', attribute='name')}}
+{% endif %}
+{%- if item.genre %}Content Type: {{ item.genre|join(', ', attribute='name')}}
+{% endif %}
+{%- if item.place %}Place: {{ item.place|join(', ', attribute='name')}}
+{% endif %}
 
 {% if item.coverages %}Coverages:
-{% for coverage in item.coverages %}
-  On: {{ coverage.scheduled | datetime_long }}
+{%- for coverage in item.coverages %}
+{%- if coverage.scheduled %}  On: {{ coverage.scheduled | datetime_long }}
+{% endif %}
   Coverage Type: {{ coverage.coverage_type }}
-  Workflow Status: {{ coverage.workflow_status }}
+{% if coverage.workflow_status %}  Workflow Status: {{ coverage.workflow_status }}
+{% endif -%}
   Coverage Status: {{ coverage.coverage_status }}
-{% endfor %}{% endif %}
+{%- endfor %}{% endif %}

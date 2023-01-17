@@ -6,4 +6,4 @@ class FactCheckSearchResource(WireSearchResource):
 
 
 class FactCheckSearchService(WireSearchService):
-    section = 'factcheck'
+    section = "factcheck"

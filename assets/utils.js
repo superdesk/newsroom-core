@@ -14,8 +14,8 @@ import {
     isCoverageForExtraDay,
     SCHEDULE_TYPE,
     isItemTBC,
-    TO_BE_CONFIRMED_TEXT
 } from './agenda/utils';
+export {initWebSocket} from './websocket';
 
 /*
  * Import and load all locales that will be used in moment.js
@@ -26,15 +26,23 @@ import {
 // TODO: Improve how we load Moment locales, based on server config
 import 'moment/locale/fr-ca';
 import 'moment/locale/fi';
-import 'moment/locale/cs';
 
 moment.locale(getLocale());
+window.moment = moment;
+
+// CP don't want 2e 3e etc., only 1er
+if (getLocale() === 'fr_CA') {
+    moment.updateLocale('fr-ca', {
+        ordinal: (number) => number + (number === 1 ? 'er' : ''),
+        weekdays: 'Dimanche_Lundi_Mardi_Mercredi_Jeudi_Vendredi_Samedi'.split('_'),
+    });
+}
 
 export const now = moment(); // to enable mocking in tests
 const NEWSROOM = 'newsroom';
 const CLIENT_CONFIG = 'client_config';
 
-function getLocaleFormat(formatType) {
+function getLocaleFormat(formatType, defaultFormat) {
     const formats = getConfig('locale_formats', {});
     const locale = getLocale();
 
@@ -48,7 +56,7 @@ function getLocaleFormat(formatType) {
         return formats[defaultLanguage][formatType];
     }
 
-    return 'DD-MM-YYYY';
+    return defaultFormat || 'DD-MM-YYYY';
 }
 
 const getTimeFormat = () => getLocaleFormat('TIME_FORMAT');
@@ -61,12 +69,15 @@ export const TIME_FORMAT = getTimeFormat();
 export const DATE_FORMAT = getDateFormat();
 export const COVERAGE_DATE_TIME_FORMAT = getCoverageDateTimeFormat();
 export const COVERAGE_DATE_FORMAT = getCoverageDateFormat();
-const DATETIME_FORMAT = `${TIME_FORMAT} ${DATE_FORMAT}`;
+export const DATETIME_FORMAT = getLocaleFormat('DATETIME_FORMAT', `${TIME_FORMAT} ${DATE_FORMAT}`);
+export const AGENDA_DATE_FORMAT_SHORT = getLocaleFormat('AGENDA_DATE_FORMAT_SHORT', 'dddd, MMMM D');
+export const AGENDA_DATE_FORMAT_LONG = getLocaleFormat('AGENDA_DATE_FORMAT_LONG', 'dddd, MMMM D, YYYY');
 
 export const SERVER_DATETIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss+0000';
 export const DAY_IN_MINUTES = 24 * 60 - 1;
 export const LIST_ANIMATIONS = getConfig('list_animations', true);
 export const DISPLAY_NEWS_ONLY = getConfig('display_news_only', true);
+export const DISPLAY_AGENDA_FEATURED_STORIES_ONLY = getConfig('display_agenda_featured_stories_only', true);
 export const DISPLAY_ALL_VERSIONS_TOGGLE = getConfig('display_all_versions_toggle', true);
 export const DEFAULT_TIMEZONE = getConfig('default_timezone', 'Australia/Sydney');
 export const KEYCODES = {
@@ -173,10 +184,15 @@ export function getProductQuery(product) {
  * Parse given date string and return Date instance
  *
  * @param {String} dateString
+ * @param {String} ignoreTimezone - avoid converting time to different timezone, will output the date as it is
  * @return {Date}
  */
-export function parseDate(dateString) {
-    return moment(dateString).locale(getLocale());
+export function parseDate(dateString, ignoreTimezone = false) {
+    const parsed = ignoreTimezone ? moment.utc(dateString) : moment(dateString);
+
+    parsed.locale(getLocale());
+
+    return parsed;
 }
 
 /**
@@ -194,11 +210,12 @@ export function parseDateInTimezone(dateString, timezone = null) {
  * Return date formatted for lists
  *
  * @param {String} dateString
+ * @param {String} timeForToday - if true show only time if date is today
  * @return {String}
  */
-export function shortDate(dateString) {
+export function shortDate(dateString, timeForToday = true) {
     const parsed = parseDate(dateString);
-    return parsed.format(isToday(parsed) ? TIME_FORMAT : DATE_FORMAT);
+    return parsed.format(timeForToday === true && isToday(parsed) ? TIME_FORMAT : DATE_FORMAT);
 }
 
 /**
@@ -209,7 +226,7 @@ export function shortDate(dateString) {
  */
 export function getDateInputDate(dateString) {
     if (dateString) {
-        const parsed = parseDate(dateString);
+        const parsed = parseDate(dateString.substring(0, 10));
         return parsed.format('YYYY-MM-DD');
     }
 
@@ -288,6 +305,16 @@ export function formatDate(dateString) {
 }
 
 /**
+ * Format date with time
+ *
+ * @param {String} dateString
+ * @return {String}
+ */
+export function formatDatetime(dateString) {
+    return fullDate(dateString);
+}
+
+/**
  * Parse the given date string, setting the time to 23:59:59 (i.e. end of the day).
  * Ensures that the datetime is for the end of the day in the provided timezone
  * If no timezone is provided, then it will default to the browser's timezone
@@ -311,10 +338,19 @@ export function convertUtcToTimezone(datetime, timezone) {
         .tz(timezone);
 }
 
-export function getScheduleType(item) {
+function getScheduleType(item) {
     const start = moment(item.dates.start);
     const end = moment(item.dates.end);
     const duration = end.diff(start, 'minutes');
+
+    if (item.dates.all_day) {
+        return duration === 0 ? SCHEDULE_TYPE.ALL_DAY : SCHEDULE_TYPE.MULTI_DAY;
+    }
+
+    if (item.dates.no_end_time) {
+        return SCHEDULE_TYPE.NO_DURATION;
+    }
+
     if (duration > DAY_IN_MINUTES || !start.isSame(end, 'day')) {
         return SCHEDULE_TYPE.MULTI_DAY;
     }
@@ -335,10 +371,10 @@ export function getScheduleType(item) {
  *
  * @param {String} dateString
  * @param {String} group: date of the selected event group
+ * @param {Object} options
  * @return {Array} [time string, date string]
  */
-export function formatAgendaDate(item, group, localTimeZone = true) {
-
+export function formatAgendaDate(item, group, {localTimeZone = true, onlyDates = false} = {}) {
     const getFormattedTimezone = (date) => {
         let tzStr = date.format('z');
         if (tzStr.indexOf('+0') >= 0) {
@@ -353,11 +389,9 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
     };
 
     const isTBCItem = isItemTBC(item);
-    let start = parseDate(item.dates.start);
-    let end = parseDate(item.dates.end);
-    let duration = end.diff(start, 'minutes');
+    let start = parseDate(item.dates.start, item.dates.all_day);
+    let end = parseDate(item.dates.end, item.dates.all_day || item.dates.no_end_time);
     let dateGroup = group ? moment(group, DATE_FORMAT) : null;
-    let dateTimeString = localTimeZone ? [] : [`(${getFormattedTimezone(start)} `];
 
     let isGroupBetweenEventDates = dateGroup ?
         start.isSameOrBefore(dateGroup, 'day') && end.isSameOrAfter(dateGroup, 'day') : true;
@@ -378,47 +412,80 @@ export function formatAgendaDate(item, group, localTimeZone = true) {
                 return 0;
             });
         if (scheduleDates.length > 0) {
-            duration = 0;
             start = moment(scheduleDates[0]);
         }
     }
 
     const scheduleType = getScheduleType(item);
-    let regulartTimeStr = `${formatTime(start)} - ${formatTime(end)} `;
-    if (isTBCItem) {
-        regulartTimeStr = localTimeZone ? `${TO_BE_CONFIRMED_TEXT} ` : '';
+    const startDate = formatDate(start);
+    const startTime = formatTime(start);
+    const endDate = formatDate(end);
+    const endTime = formatTime(end);
+    const timezone = localTimeZone ? '' : getFormattedTimezone(start);
+
+    switch (true) {
+    case isTBCItem && startDate !== endDate:
+        return gettext('{{startDate}} to {{endDate}} (Time to be confirmed)', {
+            startDate,
+            endDate,
+        });
+
+    case isTBCItem:
+        return gettext('{{startDate}} (Time to be confirmed)', {
+            startDate,
+        });
+
+    case startDate !== endDate && (item.dates.all_day || onlyDates):
+        return gettext('{{startDate}} to {{endDate}}', {
+            startDate,
+            endDate,
+        });
+
+    case startDate === endDate && (item.dates.all_day || onlyDates || scheduleType === SCHEDULE_TYPE.ALL_DAY):
+        return startDate;
+
+    case item.dates.no_end_time && startDate !== endDate:
+        return gettext('{{startTime}} {{startDate}} - {{endDate}} {{timezone}}', {
+            startTime,
+            startDate,
+            endDate,
+            timezone,
+        });
+
+    case item.dates.no_end_time:
+        return gettext('{{startTime}} {{startDate}} {{timezone}}', {
+            startTime,
+            startDate,
+            timezone,
+        });
+
+    case scheduleType === SCHEDULE_TYPE.REGULAR:
+        return gettext('{{startTime}} - {{endTime}} {{startDate}} {{timezone}}', {
+            startTime,
+            startDate,
+            endTime,
+            timezone,
+        });
+
+    case scheduleType === SCHEDULE_TYPE.MULTI_DAY:
+        return gettext('{{startTime}} {{startDate}} to {{endTime}} {{endDate}} {{timezone}}', {
+            startTime,
+            startDate,
+            endTime,
+            endDate,
+            timezone,
+        });
+
+    default:
+        console.warn('not sure about the datetime format', item, scheduleType);
+        return gettext('{{startTime}} {{startDate}} to {{endTime}} {{endDate}} {{timezone}}', {
+            startTime,
+            startDate,
+            endTime,
+            endDate,
+            timezone
+        });
     }
-    if (duration === 0 || scheduleType === SCHEDULE_TYPE.NO_DURATION) {
-        dateTimeString.push(isTBCItem ? `${regulartTimeStr}` : `${formatTime(start)}`);
-    } else {
-        switch(scheduleType) {
-        case SCHEDULE_TYPE.MULTI_DAY:
-            if (isTBCItem) {
-                dateTimeString.push(`${formatDate(start)} to ${formatDate(end)}`);
-            } else {
-                dateTimeString.push(`${formatTime(start)} ${formatDate(start)} to ${formatTime(end)} ${formatDate(end)}`);
-            }
-            break;
-
-        case SCHEDULE_TYPE.ALL_DAY:
-            dateTimeString.push(formatDate(start));
-            break;
-
-        case SCHEDULE_TYPE.REGULAR:
-            if (localTimeZone) {
-                dateTimeString.push(regulartTimeStr);
-            } else {
-                dateTimeString.push(`${regulartTimeStr}${formatDate(start)}`);
-            }
-            break;
-        }
-    }
-
-    if (!localTimeZone) {
-        dateTimeString[dateTimeString.length - 1] = dateTimeString[dateTimeString.length - 1] + ')';
-    }
-
-    return dateTimeString;
 }
 
 /**
@@ -596,22 +663,6 @@ export function formatHTML(html) {
 }
 
 /**
- * Initializes the web socket listener
- * @param store
- */
-export function initWebSocket(store, action) {
-    if (window.newsroom) {
-        const ws = new WebSocket(window.newsroom.websocket);
-        ws.onmessage = (message) => {
-            const data = JSON.parse(message.data);
-            if (data.event) {
-                store.dispatch(action(data));
-            }
-        };
-    }
-}
-
-/**
  * Generic error handler for http requests
  * @param error
  * @param dispatch
@@ -656,7 +707,7 @@ export function getTimezoneOffset() {
 
 export function isTouchDevice() {
     return 'ontouchstart' in window        // works on most browsers
-    || navigator.maxTouchPoints;       // works on IE10/11 and Surface
+    || navigator.maxTouchPoints > 0;       // works on IE10/11 and Surface
 }
 
 export function isMobilePhone() {
@@ -781,4 +832,31 @@ export function shouldShowListShortcutActionIcons(listConfig, isExtended) {
                 showActionIconsConfig.large :
                 showActionIconsConfig.compact
         );
+}
+
+export function getCreatedSearchParamLabel(created) {
+    if (created.to) {
+        if (created.from) {
+            return {
+                from: formatDate(created.from),
+                to: formatDate(created.to),
+            };
+        } else {
+            return {
+                to: formatDate(created.to),
+            };
+        }
+    } else if (created.from) {
+        if (created.from === 'now/d') {
+            return {relative: gettext('Today')};
+        } else if (created.from === 'now/w') {
+            return {relative: gettext('This week')};
+        } else if (created.from === 'now/M') {
+            return {relative: gettext('This month')};
+        } else {
+            return {from: formatDate(created.from)};
+        }
+    }
+
+    return {};
 }

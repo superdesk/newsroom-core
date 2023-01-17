@@ -54,7 +54,7 @@ import AgendaFilters from './AgendaFilters';
 import AgendaDateNavigation from './AgendaDateNavigation';
 import BookmarkTabs from 'components/BookmarkTabs';
 import {setActiveDate, setAgendaDropdownFilter} from 'local-store';
-import {previewConfigSelector} from 'ui/selectors';
+import {previewConfigSelector, detailsConfigSelector} from 'ui/selectors';
 
 const modals = {
     shareItem: ShareItemModal,
@@ -96,7 +96,7 @@ class AgendaApp extends BaseApp {
 
         const onDetailClose = this.props.detail ? null :
             () => this.props.actions.filter(a => a.id === 'open')[0].action(null, this.props.previewGroup, this.props.previewPlan);
-        const eventsOnly = this.props.eventsOnlyView || this.props.eventsOnlyAccess;
+        const eventsOnly = this.props.itemTypeFilter === 'events' || this.props.eventsOnlyAccess;
         const hideFeaturedToggle = !noNavigationSelected(this.props.activeNavigation) ||
             this.props.bookmarks ||
             this.props.activeTopic ||
@@ -141,6 +141,7 @@ class AgendaApp extends BaseApp {
                 eventsOnly={eventsOnly}
                 wireItems={this.props.wireItems}
                 coverageActions={this.props.coverageActions}
+                detailsConfig={this.props.detailsConfig}
             />] : [
                 <section key="contentHeader" className='content-header'>
                     <h3 className="a11y-only">{gettext('Agenda Content')}</h3>
@@ -195,6 +196,7 @@ class AgendaApp extends BaseApp {
                             hideFeaturedToggle={!!hideFeaturedToggle}
                             toggleFeaturedFilter={this.props.toggleFeaturedFilter}
                             featuredFilter={this.props.featuredOnly}
+                            hasAgendaFeaturedItems={this.props.hasAgendaFeaturedItems}
                         />
                     </nav>
                 </section>,
@@ -218,14 +220,14 @@ class AgendaApp extends BaseApp {
                                     toggleFilter={this.props.toggleDropdownFilter}
                                     activeFilter={this.props.activeFilter}
                                     eventsOnlyAccess={this.props.eventsOnlyAccess}
-                                    eventsOnlyView={this.props.eventsOnlyView}
+                                    restrictCoverageInfo={this.props.restrictCoverageInfo}
+                                    itemTypeFilter={this.props.itemTypeFilter}
                                     locators={this.props.locators}
                                 />
                             )}
 
                             <SearchResultsInfo
-                                scrollClass={this.state.scrollClass}
-
+                                minimizeSearchResults={this.state.minimizeSearchResults}
                                 showTotalItems={showTotalItems}
                                 showTotalLabel={showTotalLabel}
                                 showSaveTopic={showSaveTopic}
@@ -261,6 +263,7 @@ class AgendaApp extends BaseApp {
                             previewPlan={this.props.previewPlan}
                             eventsOnly={eventsOnly}
                             wireItems={this.props.wireItems}
+                            previewConfig={this.props.previewConfig}
                         />
                     </div>
                 </section>
@@ -281,6 +284,7 @@ AgendaApp.propTypes = {
     state: PropTypes.object,
     isLoading: PropTypes.bool,
     totalItems: PropTypes.number,
+    hasAgendaFeaturedItems: PropTypes.bool,
     activeQuery: PropTypes.string,
     activeFilter: PropTypes.object,
     createdFilter: PropTypes.object,
@@ -319,12 +323,14 @@ AgendaApp.propTypes = {
     userSections: PropTypes.object,
     context: PropTypes.string,
     eventsOnlyAccess: PropTypes.bool,
-    eventsOnlyView: PropTypes.bool,
+    restrictCoverageInfo: PropTypes.bool,
+    itemTypeFilter: PropTypes.string,
     locators: PropTypes.array,
     wireItems: PropTypes.array,
     searchParams: PropTypes.object,
     showSaveTopic: PropTypes.bool,
     previewConfig: PropTypes.object,
+    detailsConfig: PropTypes.object,
     groups: PropTypes.array,
 };
 
@@ -354,7 +360,8 @@ const mapStateToProps = (state) => ({
     activeDate: get(state, 'agenda.activeDate'),
     activeGrouping: get(state, 'agenda.activeGrouping'),
     eventsOnlyAccess: get(state, 'agenda.eventsOnlyAccess', false),
-    eventsOnlyView: get(state, 'agenda.eventsOnlyView', false),
+    restrictCoverageInfo: get(state, 'agenda.restrictCoverageInfo', false),
+    itemTypeFilter: get(state, 'agenda.itemType'),
     detail: get(state, 'detail', false),
     savedItemsCount: state.savedItemsCount,
     userSections: state.userSections,
@@ -366,7 +373,9 @@ const mapStateToProps = (state) => ({
     searchParams: searchParamsSelector(state),
     showSaveTopic: showSaveTopicSelector(state),
     previewConfig: previewConfigSelector(state),
+    detailsConfig: detailsConfigSelector(state),
     groups: get(state, 'groups', []),
+    hasAgendaFeaturedItems: state.hasAgendaFeaturedItems,
 });
 
 const mapDispatchToProps = (dispatch) => ({

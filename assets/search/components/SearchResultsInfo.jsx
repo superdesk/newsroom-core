@@ -10,8 +10,8 @@ import {
     searchParamsSelector,
 } from 'search/selectors';
 
-import SearchResults from './SearchResults';
 import NewItemsIcon from './NewItemsIcon';
+import {ContentSearchResults} from './ContentSearchResults';
 
 class SearchResultsInfo extends React.Component {
     constructor(props) {
@@ -44,8 +44,8 @@ class SearchResultsInfo extends React.Component {
             );
 
         return (
-            <SearchResults
-                scrollClass={this.props.scrollClass}
+            <ContentSearchResults
+                minimizeSearchResults={this.props.minimizeSearchResults}
                 showTotalItems={this.props.showTotalItems}
                 showTotalLabel={this.props.showTotalLabel}
                 showSaveTopic={this.props.showSaveTopic && canSaveTopic}
@@ -53,6 +53,7 @@ class SearchResultsInfo extends React.Component {
                 totalItemsLabel={this.props.totalItemsLabel}
                 saveMyTopic={this.saveMyTopic}
                 saveButtonText={saveButtonText}
+                fetchItems={this.props.refresh}
             >
                 {isEmpty(this.props.newItems) ? null : (
                     <NewItemsIcon
@@ -60,15 +61,15 @@ class SearchResultsInfo extends React.Component {
                         refresh={this.props.refresh}
                     />
                 )}
-            </SearchResults>
+            </ContentSearchResults>
         );
     }
 }
 
 SearchResultsInfo.propTypes = {
     user: PropTypes.object,
-    scrollClass: PropTypes.string,
 
+    minimizeSearchResults: PropTypes.bool,
     showTotalItems: PropTypes.bool,
     showTotalLabel: PropTypes.bool,
     showSaveTopic: PropTypes.bool,
@@ -86,6 +87,7 @@ SearchResultsInfo.propTypes = {
 };
 
 SearchResultsInfo.defaultProps = {
+    minimizeSearchResults: false,
     showTotalItems: true,
     showTotalLabel: true,
     showSaveTopic: false,

@@ -7,8 +7,9 @@ from kombu import Queue, Exchange
 from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
 from datetime import timedelta
+from flask_babel import lazy_gettext
 
-from superdesk.default_settings import ( # noqa
+from superdesk.default_settings import (  # noqa
     VERSION,
     MONGO_URI,
     REDIS_URL,
@@ -44,6 +45,7 @@ from superdesk.default_settings import ( # noqa
     CELERY_WORKER_LOG_FORMAT,
     CELERY_WORKER_TASK_LOG_FORMAT,
     CELERY_WORKER_CONCURRENCY,
+    CELERY_WORKER_PREFETCH_MULTIPLIER,
     CELERY_BEAT_SCHEDULE_FILENAME,
     LOG_CONFIG_FILE,
     SENTRY_DSN,
@@ -51,40 +53,46 @@ from superdesk.default_settings import ( # noqa
 
 logger = logging.getLogger()
 
-DEBUG = strtobool(os.environ.get('NEWSROOM_DEBUG', 'false'))
+DEBUG = strtobool(os.environ.get("NEWSROOM_DEBUG", "false"))
 
 # newsroom default db and index names
-MONGO_DBNAME = env('MONGO_DBNAME', 'newsroom')
+MONGO_DBNAME = env("MONGO_DBNAME", "newsroom")
 # mongo
-MONGO_URI = env('MONGO_URI', f'mongodb://localhost/{MONGO_DBNAME}') # noqa
-CONTENTAPI_MONGO_URI = env('CONTENTAPI_MONGO_URI', f'mongodb://localhost/{MONGO_DBNAME}') # noqa
+MONGO_URI = env("MONGO_URI", f"mongodb://localhost/{MONGO_DBNAME}")  # noqa
+CONTENTAPI_MONGO_URI = env("CONTENTAPI_MONGO_URI", f"mongodb://localhost/{MONGO_DBNAME}")  # noqa
 # elastic
-ELASTICSEARCH_INDEX = env('ELASTICSEARCH_INDEX', MONGO_DBNAME) # noqa
-CONTENTAPI_ELASTICSEARCH_INDEX = env('CONTENTAPI_ELASTICSEARCH_INDEX', MONGO_DBNAME) # noqa
+ELASTICSEARCH_INDEX = env("ELASTICSEARCH_INDEX", MONGO_DBNAME)  # noqa
+CONTENTAPI_ELASTICSEARCH_INDEX = env("CONTENTAPI_ELASTICSEARCH_INDEX", MONGO_DBNAME)  # noqa
 
 XML = False
 IF_MATCH = True
 JSON_SORT_KEYS = False
 DOMAIN = {}
 
-X_DOMAINS = '*'
+X_DOMAINS = "*"
 X_MAX_AGE = 24 * 3600
-X_HEADERS = ['Content-Type', 'Accept', 'If-Match', 'Access-Control-Allow-Origin', 'Authorization']
-X_EXPOSE_HEADERS = ['Access-Control-Allow-Origin']
+X_HEADERS = [
+    "Content-Type",
+    "Accept",
+    "If-Match",
+    "Access-Control-Allow-Origin",
+    "Authorization",
+]
+X_EXPOSE_HEADERS = ["Access-Control-Allow-Origin"]
 X_ALLOW_CREDENTIALS = True
 
-URL_PREFIX = 'api'
+URL_PREFIX = "api"
 
 # keys for signing, should be binary
-SECRET_KEY = os.environ.get('SECRET_KEY', '').encode()
+SECRET_KEY = os.environ.get("SECRET_KEY", "").encode()
 if not SECRET_KEY:
-    SECRET_KEY = b'E`<+\xa6\x1e\x02\xc5\x87\xfc\xd6\x87\x1f|\xf6\xbd\x0cK\x1a6\xff!\x97M\xc0\xc4\x11Ppg\xf7\xaa'
-    logger.warning('SECRET_KEY is not set, hardcoded value is used instead. This should not be used on production!')
+    SECRET_KEY = b"E`<+\xa6\x1e\x02\xc5\x87\xfc\xd6\x87\x1f|\xf6\xbd\x0cK\x1a6\xff!\x97M\xc0\xc4\x11Ppg\xf7\xaa"
+    logger.warning("SECRET_KEY is not set, hardcoded value is used instead. This should not be used on production!")
 
-PUSH_KEY = os.environ.get('PUSH_KEY', '').encode()
+PUSH_KEY = os.environ.get("PUSH_KEY", "").encode()
 
 #: Default TimeZone, will try to guess from server settings if not set
-DEFAULT_TIMEZONE = os.environ.get('DEFAULT_TIMEZONE')
+DEFAULT_TIMEZONE = os.environ.get("DEFAULT_TIMEZONE")
 
 if DEFAULT_TIMEZONE is None:
     DEFAULT_TIMEZONE = tzlocal.get_localzone().zone
@@ -95,83 +103,83 @@ if not DEFAULT_TIMEZONE:
 BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
 BLUEPRINTS = [
-    'newsroom.wire',
-    'newsroom.auth',
-    'newsroom.users',
-    'newsroom.companies',
-    'newsroom.design',
-    'newsroom.history',
-    'newsroom.push',
-    'newsroom.topics',
-    'newsroom.upload',
-    'newsroom.notifications',
-    'newsroom.products',
-    'newsroom.section_filters',
-    'newsroom.navigations',
-    'newsroom.cards',
-    'newsroom.reports',
-    'newsroom.public',
-    'newsroom.agenda',
-    'newsroom.settings',
-    'newsroom.news_api.api_tokens',
-    'newsroom.monitoring',
-    'newsroom.oauth_clients',
-    'newsroom.auth_server.oauth2',
+    "newsroom.wire",
+    "newsroom.auth",
+    "newsroom.users",
+    "newsroom.companies",
+    "newsroom.design",
+    "newsroom.history",
+    "newsroom.push",
+    "newsroom.topics",
+    "newsroom.upload",
+    "newsroom.notifications",
+    "newsroom.products",
+    "newsroom.section_filters",
+    "newsroom.navigations",
+    "newsroom.cards",
+    "newsroom.reports",
+    "newsroom.public",
+    "newsroom.agenda",
+    "newsroom.settings",
+    "newsroom.news_api.api_tokens",
+    "newsroom.monitoring",
+    "newsroom.oauth_clients",
+    "newsroom.auth_server.oauth2",
 ]
 
 CORE_APPS = [
-    'superdesk.notification',
-    'superdesk.data_updates',
-    'content_api.items',
-    'content_api.items_versions',
-    'content_api.search',
-    'content_api.auth',
-    'content_api.publish',
-    'newsroom.users',
-    'newsroom.auth.oauth',
-    'newsroom.companies',
-    'newsroom.wire',
-    'newsroom.topics',
-    'newsroom.upload',
-    'newsroom.history',
-    'newsroom.ui_config',
-    'newsroom.notifications',
-    'newsroom.products',
-    'newsroom.section_filters',
-    'newsroom.navigations',
-    'newsroom.cards',
-    'newsroom.reports',
-    'newsroom.public',
-    'newsroom.agenda',
-    'newsroom.settings',
-    'newsroom.photos',
-    'newsroom.media_utils',
-    'newsroom.news_api',
-    'newsroom.news_api.api_tokens',
-    'newsroom.news_api.api_audit',
-    'newsroom.monitoring',
-    'newsroom.company_expiry_alerts',
-    'newsroom.oauth_clients',
-    'newsroom.auth_server.client',
-    'newsroom.email_templates'
+    "superdesk.notification",
+    "superdesk.data_updates",
+    "content_api.items",
+    "content_api.items_versions",
+    "content_api.search",
+    "content_api.auth",
+    "content_api.publish",
+    "newsroom.users",
+    "newsroom.auth.oauth",
+    "newsroom.companies",
+    "newsroom.wire",
+    "newsroom.topics",
+    "newsroom.upload",
+    "newsroom.history",
+    "newsroom.ui_config",
+    "newsroom.notifications",
+    "newsroom.products",
+    "newsroom.section_filters",
+    "newsroom.navigations",
+    "newsroom.cards",
+    "newsroom.reports",
+    "newsroom.public",
+    "newsroom.agenda",
+    "newsroom.settings",
+    "newsroom.photos",
+    "newsroom.media_utils",
+    "newsroom.news_api",
+    "newsroom.news_api.api_tokens",
+    "newsroom.news_api.api_audit",
+    "newsroom.monitoring",
+    "newsroom.company_expiry_alerts",
+    "newsroom.oauth_clients",
+    "newsroom.auth_server.client",
+    "newsroom.email_templates",
 ]
 
-SITE_NAME = 'AAP Newsroom'
-COPYRIGHT_HOLDER = 'AAP'
-COPYRIGHT_NOTICE = ''
-USAGE_TERMS = ''
-CONTACT_ADDRESS = 'https://www.aap.com.au/contact/sales-inquiries/'
-PRIVACY_POLICY = 'https://www.aap.com.au/legal/'
-TERMS_AND_CONDITIONS = 'https://www.aap.com.au/legal/'
+SITE_NAME = "AAP Newsroom"
+COPYRIGHT_HOLDER = "AAP"
+COPYRIGHT_NOTICE = ""
+USAGE_TERMS = ""
+CONTACT_ADDRESS = "https://www.aap.com.au/contact/sales-inquiries/"
+PRIVACY_POLICY = "https://www.aap.com.au/legal/"
+TERMS_AND_CONDITIONS = "https://www.aap.com.au/legal/"
 SHOW_COPYRIGHT = True
 SHOW_USER_REGISTER = False
 
 TEMPLATES_AUTO_RELOAD = True
 
-DATE_FORMAT = '%Y-%m-%dT%H:%M:%S+0000'
+DATE_FORMAT = "%Y-%m-%dT%H:%M:%S+0000"
 
-WEBPACK_ASSETS_URL = os.environ.get('WEBPACK_ASSETS_URL')
-WEBPACK_SERVER_URL = os.environ.get('WEBPACK_SERVER_URL')
+WEBPACK_ASSETS_URL = os.environ.get("WEBPACK_ASSETS_URL")
+WEBPACK_SERVER_URL = os.environ.get("WEBPACK_SERVER_URL")
 
 # How many days a new account can stay active before it is approved by admin
 NEW_ACCOUNT_ACTIVE_DAYS = 14
@@ -186,30 +194,30 @@ VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE = 7
 #: The number login attempts allowed before account is locked
 MAXIMUM_FAILED_LOGIN_ATTEMPTS = 5
 #: default sender for superdesk emails
-MAIL_DEFAULT_SENDER = _MAIL_FROM or 'newsroom@localhost'
+MAIL_DEFAULT_SENDER = _MAIL_FROM or "newsroom@localhost"
 # Recipients for the sign up form filled by new users (single or comma separated)
-SIGNUP_EMAIL_RECIPIENTS = os.environ.get('SIGNUP_EMAIL_RECIPIENTS')
+SIGNUP_EMAIL_RECIPIENTS = os.environ.get("SIGNUP_EMAIL_RECIPIENTS")
 
 #: public client url - used to create links within emails etc
-CLIENT_URL = 'http://localhost:5050'
+CLIENT_URL = "http://localhost:5050"
 
-MEDIA_PREFIX = os.environ.get('MEDIA_PREFIX', '/assets')
+MEDIA_PREFIX = os.environ.get("MEDIA_PREFIX", "/assets")
 
 # Flask Limiter Settings
 RATELIMIT_ENABLED = True
-RATELIMIT_STRATEGY = 'fixed-window'
+RATELIMIT_STRATEGY = "fixed-window"
 
 # Cache Settings
 # https://flask-caching.readthedocs.io/en/latest/#configuring-flask-caching
-CACHE_TYPE = os.environ.get('CACHE_TYPE', 'simple')  # in-memory cache
+CACHE_TYPE = os.environ.get("CACHE_TYPE", "simple")  # in-memory cache
 # The default timeout that is used if no timeout is specified in sec
 CACHE_DEFAULT_TIMEOUT = 3600
 # Redis host (used only if CACHE_TYPE is redis)
-CACHE_REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
+CACHE_REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
 
 # Recaptcha Settings
-RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
-RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
+RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_PUBLIC_KEY")
+RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_PRIVATE_KEY")
 
 # Filter tab behaviour
 # If true, aggregations will be against all content all the time
@@ -220,8 +228,8 @@ FILTER_AGGREGATIONS = True
 
 # List of filters to remove matching stories when news only switch is turned on
 NEWS_ONLY_FILTERS = [
-   {'match': {'genre.code': 'Results (sport)'}},
-   {'match': {'source': 'PMF'}},
+    {"match": {"genre.code": "Results (sport)"}},
+    {"match": {"source": "PMF"}},
 ]
 
 # the lifetime of a permanent session in seconds
@@ -236,7 +244,6 @@ SERVICES = [
     {"name": "Finance", "code": "f"},
     {"name": "International News", "code": "i"},
     {"name": "Entertainment", "code": "e"},
-
     # {"name": "Australian General News", "code": "a"},
     # {"name": "Australian Weather", "code": "b"},
     # {"name": "General Features", "code": "c"},
@@ -258,25 +265,25 @@ DISPLAY_ABSTRACT = False
 
 WATERMARK_IMAGE = None  # os.path.join(os.path.dirname(__file__), '../static', 'watermark.png')
 
-GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY')
-GOOGLE_ANALYTICS = os.environ.get('GOOGLE_ANALYTICS')
+GOOGLE_MAPS_KEY = os.environ.get("GOOGLE_MAPS_KEY")
+GOOGLE_ANALYTICS = os.environ.get("GOOGLE_ANALYTICS")
 
 COVERAGE_TYPES = {
-    'text': {'name': 'Text', 'icon': 'text'},
-    'photo': {'name': 'Photo', 'icon': 'photo'},
-    'picture': {'name': 'Picture', 'icon': 'photo'},
-    'audio': {'name': 'Audio', 'icon': 'audio'},
-    'video': {'name': 'Video', 'icon': 'video'},
-    'explainer': {'name': 'Explainer', 'icon': 'explainer'},
-    'infographics': {'name': 'Infographics', 'icon': 'infographics'},
-    'graphic': {'name': 'Graphic', 'icon': 'infographics'},
-    'live_video': {'name': 'Live Video', 'icon': 'live-video'},
-    'live_blog': {'name': 'Live Blog', 'icon': 'live-blog'},
-    'video_explainer': {'name': 'Video Explainer', 'icon': 'explainer'}
+    "text": {"name": lazy_gettext("Text"), "icon": "text"},
+    "photo": {"name": lazy_gettext("Photo"), "icon": "photo"},
+    "picture": {"name": lazy_gettext("Picture"), "icon": "photo"},
+    "audio": {"name": lazy_gettext("Audio"), "icon": "audio"},
+    "video": {"name": lazy_gettext("Video"), "icon": "video"},
+    "explainer": {"name": lazy_gettext("Explainer"), "icon": "explainer"},
+    "infographics": {"name": lazy_gettext("Infographics"), "icon": "infographics"},
+    "graphic": {"name": lazy_gettext("Graphic"), "icon": "infographics"},
+    "live_video": {"name": lazy_gettext("Live Video"), "icon": "live-video"},
+    "live_blog": {"name": lazy_gettext("Live Blog"), "icon": "live-blog"},
+    "video_explainer": {"name": lazy_gettext("Video Explainer"), "icon": "explainer"},
 }
 
-LANGUAGES = ['en', 'fi', 'cs', 'fr_CA']
-DEFAULT_LANGUAGE = 'en'
+LANGUAGES = ["en", "fi", "fr_CA"]
+DEFAULT_LANGUAGE = "en"
 
 CLIENT_LOCALE_FORMATS = {
     "en": {  # defaults
@@ -284,26 +291,37 @@ CLIENT_LOCALE_FORMATS = {
         "DATE_FORMAT": "DD/MM/YYYY",
         "COVERAGE_DATE_TIME_FORMAT": "HH:mm DD/MM",
         "COVERAGE_DATE_FORMAT": "DD/MM",
-        "DATE_FORMAT_HEADER": "EEEE, dd/MM/yyyy"
+        "DATE_FORMAT_HEADER": "EEEE, dd/MM/yyyy",
     },
     "fr_CA": {  # example - you can overwrite any format above
         "DATE_FORMAT": "DD/MM/YYYY",
         "DATE_FORMAT_HEADER": "EEEE, 'le' d MMMM yyyy",
-    }
+    },
 }
 
 # Client configuration
 CLIENT_CONFIG = {
-    'debug': DEBUG,
-    'default_language': DEFAULT_LANGUAGE,
-    'locale_formats': CLIENT_LOCALE_FORMATS,
-    'coverage_types': COVERAGE_TYPES,
-    'list_animations': True,  # Enables or disables the animations for list item select boxes,
-    'display_news_only': True,  # Displays news only switch in wire,
-    'default_timezone': DEFAULT_TIMEZONE,
-    'item_actions': {},
-    'display_abstract': DISPLAY_ABSTRACT,
-    'display_credits': False,
+    "debug": DEBUG,
+    "default_language": DEFAULT_LANGUAGE,
+    "locale_formats": CLIENT_LOCALE_FORMATS,
+    "coverage_types": COVERAGE_TYPES,
+    "list_animations": True,  # Enables or disables the animations for list item select boxes,
+    "display_news_only": True,  # Displays news only switch in wire,
+    "display_agenda_featured_stories_only": True,  # Displays top/featured stories switch in agenda,
+    "default_timezone": DEFAULT_TIMEZONE,
+    "item_actions": {},
+    "display_abstract": DISPLAY_ABSTRACT,
+    "display_credits": False,
+    "filter_panel_defaults": {
+        "tab": {
+            "wire": "nav",  # Options are 'nav', 'topics', 'filters'
+            "agenda": "nav",
+        },
+        "open": {
+            "wire": False,
+            "agenda": False,
+        },
+    },
 }
 
 # Enable iframely support for item body_html
@@ -312,48 +330,68 @@ IFRAMELY = True
 COMPANY_TYPES = []
 
 #: celery config
-WEBSOCKET_EXCHANGE = celery_queue('newsroom_notification')
+CELERY_WORKER_TASK_TIME_LIMIT = 600
 
-CELERY_TASK_DEFAULT_QUEUE = celery_queue('newsroom')
+WEBSOCKET_EXCHANGE = celery_queue("newsroom_notification")
+
+CELERY_TASK_DEFAULT_QUEUE = celery_queue("newsroom")
 CELERY_TASK_QUEUES = (
-    Queue(celery_queue('newsroom'), Exchange(celery_queue('newsroom'), type='topic'), routing_key='newsroom.#'),
+    Queue(
+        celery_queue("newsroom"),
+        Exchange(celery_queue("newsroom"), type="topic"),
+        routing_key="newsroom.#",
+    ),
 )
 
 CELERY_TASK_ROUTES = {
-    'newsroom.*': {
-        'queue': celery_queue('newsroom'),
-        'routing_key': 'newsroom.task',
+    "newsroom.*": {
+        "queue": celery_queue("newsroom"),
+        "routing_key": "newsroom.task",
     }
 }
+
 
 #: celery beat config
 CELERY_BEAT_SCHEDULE = {
-    'newsroom:company_expiry': {
-        'task': 'newsroom.company_expiry_alerts.company_expiry',
-        'schedule': crontab(hour=local_to_utc_hour(0), minute=0),  # Runs every day at midnight
+    "newsroom:company_expiry": {
+        "task": "newsroom.company_expiry_alerts.company_expiry",
+        "schedule": crontab(hour=local_to_utc_hour(0), minute=0),  # Runs every day at midnight
     },
-    'newsroom:monitoring_schedule_alerts': {
-        'task': 'newsroom.monitoring.email_alerts.monitoring_schedule_alerts',
-        'schedule': timedelta(seconds=60),
+    "newsroom:monitoring_schedule_alerts": {
+        "task": "newsroom.monitoring.email_alerts.monitoring_schedule_alerts",
+        "schedule": timedelta(seconds=60),
     },
-    'newsroom:monitoring_immediate_alerts': {
-        'task': 'newsroom.monitoring.email_alerts.monitoring_immediate_alerts',
-        'schedule': timedelta(seconds=60),
-    }
+    "newsroom:monitoring_immediate_alerts": {
+        "task": "newsroom.monitoring.email_alerts.monitoring_immediate_alerts",
+        "schedule": timedelta(seconds=60),
+    },
+    "newsroom:remove_expired_content_api": {
+        "task": "content_api.commands.item_expiry",
+        "schedule": crontab(hour=local_to_utc_hour(2), minute=0),  # Runs every day at 2am
+    },
+    "newsroom:remove_expired_agenda": {
+        "task": "newsroom.commands.async_remove_expired_agenda",
+        "schedule": crontab(hour=local_to_utc_hour(3), minute=0),  # Runs every day at 3am
+    },
 }
 
-MAX_EXPIRY_QUERY_LIMIT = os.environ.get('MAX_EXPIRY_QUERY_LIMIT', 100)
-CONTENT_API_EXPIRY_DAYS = os.environ.get('CONTENT_API_EXPIRY_DAYS', 180)
+MAX_EXPIRY_QUERY_LIMIT = os.environ.get("MAX_EXPIRY_QUERY_LIMIT", 100)
+CONTENT_API_EXPIRY_DAYS = os.environ.get("CONTENT_API_EXPIRY_DAYS", 180)
 
-NEWS_API_ENABLED = strtobool(env('NEWS_API_ENABLED', 'false'))
+NEWS_API_ENABLED = strtobool(env("NEWS_API_ENABLED", "false"))
 
 # Enables the application of product filtering to image references in the API and ATOM responses
-NEWS_API_IMAGE_PERMISSIONS_ENABLED = strtobool(env('NEWS_API_IMAGE_PERMISSIONS_ENABLED', 'false'))
+NEWS_API_IMAGE_PERMISSIONS_ENABLED = strtobool(env("NEWS_API_IMAGE_PERMISSIONS_ENABLED", "false"))
 
 ELASTICSEARCH_SETTINGS.setdefault("settings", {})["query_string"] = {
     # https://discuss.elastic.co/t/configuring-the-standard-tokenizer/8691/5
-    'analyze_wildcard': False
+    "analyze_wildcard": False
 }
+
+# count above 10k
+ELASTICSEARCH_TRACK_TOTAL_HITS = True
+
+ELASTICSEARCH_FIX_QUERY = False
 
 #: server working directory
 #: should be set in settings.py
@@ -432,3 +470,33 @@ DASHBOARD_CACHE_TIMEOUT = 300
 #: .. versionadded:: 2.1.0
 #:
 DELETE_DASHBOARD_CACHE_ON_PUSH = True
+
+#: Path to SAML config
+#:
+#: .. versionadded:: 2.3
+#:
+SAML_PATH = ""
+
+#: Company name which will be assigned to newsly created users
+#:
+#: .. versionadded:: 2.3
+#:
+SAML_COMPANY = ""
+
+#: Button label displayed on the login page
+#:
+#: .. versionadded:: 2.3
+#:
+SAML_LABEL = "SSO"
+
+#: Rebuild elastic mapping on ``initialize_data`` mapping error
+#:
+#: .. versionadded:: 2.3
+#:
+REBUILD_ELASTIC_ON_INIT_DATA_ERROR = strtobool(env("REBUILD_ELASTIC_ON_INIT_DATA_ERROR", "true"))
+
+#: The number of days before Agenda items are removed. Defaults to 0 which means no purging occurs
+#:
+#: .. versionadded:: 2.3
+#:
+AGENDA_EXPIRY_DAYS = int(env("AGENDA_EXPIRY_DAYS", 0))

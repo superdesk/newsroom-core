@@ -17,7 +17,7 @@ import {setView} from 'search/actions';
 const store = createStore(wireReducer, 'Wire');
 
 // init data
-store.dispatch(initData(getInitData(window.wireData), getReadItems(), getNewsOnlyParam(), getSearchAllVersionsParam()));
+store.dispatch(initData(getInitData(window.wireData), window.newsroom.client_config.news_only_filter, getReadItems(), getNewsOnlyParam(), getSearchAllVersionsParam()));
 
 // init view
 if (localStorage.getItem('view')) {

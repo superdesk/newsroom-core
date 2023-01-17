@@ -1,6 +1,17 @@
 // Custom variables
+:root {
+    --body-text: #222;
+    --gray-light: #c9c9c9;
+    --gray-lighter: #e9e9e9;
+    --gray-mid: #9a9a9a;
+    --gray-dark: #747474;
+    --main-blue: #007ead;
+    --main-blue-light: #427a8f;
+    --background-color: #f8f8f8;
+    --footer-height: 30px;
+}
 
-$body-text: #444;
+$body-text: #222;
 $gray-light: #c9c9c9;
 $gray-mid: #9a9a9a;
 $gray-dark: #747474;

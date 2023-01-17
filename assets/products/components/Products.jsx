@@ -42,7 +42,7 @@ class Products extends React.Component {
         let errors = {};
 
         if (!this.props.productToEdit.name) {
-            errors.name = ['Please provide product name'];
+            errors.name = [gettext('Please provide product name')];
             valid = false;
         }
 
@@ -85,9 +85,6 @@ class Products extends React.Component {
                     <div className="flex-col flex-column">
                         {this.props.activeQuery && (
                             <SearchResults
-                                showTotalItems={true}
-                                showTotalLabel={true}
-                                showSaveTopic={false}
                                 totalItems={this.props.totalProducts}
                                 totalItemsLabel={this.props.activeQuery}
                             />

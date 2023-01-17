@@ -1,4 +1,3 @@
-
 import datetime
 import newsroom
 import superdesk
@@ -6,13 +5,14 @@ import superdesk
 from bson import ObjectId
 from superdesk.utc import utcnow
 from flask import current_app as app, session
+from newsroom.utils import get_cached_resource_by_id
 
 
 class NotificationsResource(newsroom.Resource):
     url = 'users/<regex("[a-f0-9]{24}"):user>/notifications'
 
-    resource_methods = ['GET']
-    item_methods = ['GET', 'PATCH', 'DELETE']
+    resource_methods = ["GET"]
+    item_methods = ["GET", "PATCH", "DELETE"]
 
     schema = {
         "_id": {"type": "string", "unique": True},
@@ -24,12 +24,10 @@ class NotificationsResource(newsroom.Resource):
         "data": {"type": "dict", "schema": {}, "allow_unknown": True},
     }
 
-    datasource = {
-        'default_sort': [('created', -1)]
-    }
+    datasource = {"default_sort": [("created", -1)]}
 
     mongo_indexes: newsroom.MongoIndexes = {
-        'user_created': ([('user', 1), ('created', -1)], {}),
+        "user_created": ([("user", 1), ("created", -1)], {}),
     }
 
 
@@ -39,7 +37,13 @@ class NotificationsService(newsroom.Service):
         ids = []
 
         for doc in docs:
-            notification_id = "_".join(map(str, [doc["user"], doc["item"]]))
+            user_id = str(doc["user"])
+            user = get_cached_resource_by_id("users", user_id)
+
+            if not user.get("receive_app_notifications"):
+                continue
+
+            notification_id = "_".join(map(str, [user_id, doc["item"]]))
             original = self.find_one(req=None, _id=notification_id)
 
             if original:
@@ -50,18 +54,22 @@ class NotificationsService(newsroom.Service):
                         "action": doc.get("action") or original.get("action"),
                         "data": doc.get("data") or original.get("data"),
                     },
-                    original=original
+                    original=original,
                 )
             else:
-                super().create([{
-                    "_id": notification_id,
-                    "created": now,
-                    "user": ObjectId(doc["user"]),
-                    "item": doc["item"],
-                    "resource": doc.get("resource"),
-                    "action": doc.get("action"),
-                    "data": doc.get("data"),
-                }])
+                super().create(
+                    [
+                        {
+                            "_id": notification_id,
+                            "created": now,
+                            "user": ObjectId(doc["user"]),
+                            "item": doc["item"],
+                            "resource": doc.get("resource"),
+                            "action": doc.get("action"),
+                            "data": doc.get("data"),
+                        }
+                    ]
+                )
 
             ids.append(notification_id)
 
@@ -72,13 +80,13 @@ class NotificationsService(newsroom.Service):
 
 
 def get_user_notifications(user_id):
-    ttl = app.config.get('NOTIFICATIONS_TTL', 1)
+    ttl = app.config.get("NOTIFICATIONS_TTL", 1)
     lookup = {
-        'user': user_id,
-        'created': {'$gte': utcnow() - datetime.timedelta(days=ttl)}
+        "user": user_id,
+        "created": {"$gte": utcnow() - datetime.timedelta(days=ttl)},
     }
 
-    return list(superdesk.get_resource_service('notifications').get(req=None, lookup=lookup))
+    return list(superdesk.get_resource_service("notifications").get(req=None, lookup=lookup))
 
 
 def get_initial_notifications():
@@ -93,7 +101,7 @@ def get_initial_notifications():
 
     return {
         "user": str(session["user"]) if session["user"] else None,
-        "notificationCount": len(list(saved_notifications))
+        "notificationCount": len(list(saved_notifications)),
     }
 
 

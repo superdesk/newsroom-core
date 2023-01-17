@@ -103,7 +103,7 @@ Feature: News API News Search
     Then we get OK response
     Then we "get" "<title><![CDATA[headline 1]]></title>" in atom xml response
     Then we "get" "5fc5dce16369ab07be3325fa" in atom xml response
-    Then we "get" "src="http://" in atom xml response
+    Then we "get" "src="https://" in atom xml response
 
   Scenario: Atom request response restricted by featured image product
     Given "items"

@@ -103,7 +103,7 @@ class AgendaListItem extends React.Component {
                 'wire-articles__item--not-covering': !hasCoverages(this.props.item),
                 'wire-articles__item--postponed': isPostponed(this.props.item),
                 'wire-articles__item--canceled': isCanceled(this.props.item),
-                'wire-articles__item--visited': isCanceled(this.props.item),
+                'wire-articles__item--visited': this.props.isRead,
                 'wire-articles__item--rescheduled': isRescheduled(this.props.item),
                 'wire-articles__item--selected': this.props.isSelected,
                 'wire-articles__item--open': this.props.isActive,
@@ -150,9 +150,17 @@ class AgendaListItem extends React.Component {
                                 classNames({'wire-articles__item__meta-time': showHeadline})}>
                                 {getName(item)}</span>
                             {showHeadline && <span
-                                className='wire-articles__item__text wire-articles__item__text--large'>
+                                className='wire-articles__item__text wire-articles__item__text--large wire-articles__item__text--headline'>
                                 {item.headline}</span>}
                         </h4>
+
+                        {!isMobile ? null : (
+                            <AgendaItemTimeUpdater
+                                item={item}
+                                borderRight={false}
+                                alignCenter={false}
+                            />
+                        )}
 
                         <AgendaListItemIcons
                             item={item}
@@ -211,11 +219,6 @@ class AgendaListItem extends React.Component {
 
         return this.renderListItem(true, (
             <div className='wire-articles__item-actions ms-0' onClick={this.stopPropagation}>
-                <AgendaItemTimeUpdater
-                    item={item}
-                    borderRight={true}
-                    alignCenter={true}
-                />
                 <AgendaInternalNote
                     internalNote={internalNote}
                     onlyIcon={true}
