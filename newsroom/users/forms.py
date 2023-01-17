@@ -16,6 +16,7 @@ class UserForm(FlaskForm):
         ("public", gettext("Public")),
         ("internal", gettext("Internal")),
         ("account_management", gettext("Account Management")),
+        ("company_admin", gettext("Company Admin")),
     ]
 
     id = HiddenField("Id")

@@ -44,8 +44,6 @@ export function getNavigations(data) {
     return {type: GET_NAVIGATIONS, data};
 }
 
-export const UPDATE_PRODUCT_COMPANIES = 'UPDATE_PRODUCT_COMPANIES';
-
 export const UPDATE_PRODUCT_NAVIGATIONS = 'UPDATE_PRODUCT_NAVIGATIONS';
 export function updateProductNavigations(product, navigations) {
     return {type: UPDATE_PRODUCT_NAVIGATIONS, product, navigations};
