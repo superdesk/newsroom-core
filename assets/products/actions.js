@@ -45,9 +45,6 @@ export function getNavigations(data) {
 }
 
 export const UPDATE_PRODUCT_COMPANIES = 'UPDATE_PRODUCT_COMPANIES';
-export function updateProductCompanies(product, companies) {
-    return {type: UPDATE_PRODUCT_COMPANIES, product, companies};
-}
 
 export const UPDATE_PRODUCT_NAVIGATIONS = 'UPDATE_PRODUCT_NAVIGATIONS';
 export function updateProductNavigations(product, navigations) {
@@ -145,7 +142,7 @@ export function saveCompanies(companies) {
         return server.post(`/products/${product._id}/companies`, {companies})
             .then(() => {
                 notify.success(gettext('Product updated successfully'));
-                dispatch(updateProductCompanies(product, companies));
+                dispatch(fetchCompanies());
             })
             .catch((error) => errorHandler(error, dispatch, setError));
     };

@@ -10,6 +10,13 @@ import EditPanel from '../../components/EditPanel';
 import AuditInformation from 'components/AuditInformation';
 import {sectionsPropType} from '../../features/sections/types';
 
+const getProductCompanies = (product, companies) => ({
+    companies: companies.filter((company) => {
+        const companyProducts = company.products || [];
+        return companyProducts.some((_product) => _product._id === product._id);
+    }).map((company) => company._id),
+});
+
 class EditProduct extends React.Component {
     constructor(props) {
         super(props);
@@ -183,7 +190,7 @@ class EditProduct extends React.Component {
                     }
                     {this.state.activeTab === 'companies' &&
                         <EditPanel
-                            parent={this.props.product}
+                            parent={getProductCompanies(this.props.product, this.props.companies)}
                             items={this.props.companies}
                             field="companies"
                             onSave={this.props.saveCompanies}

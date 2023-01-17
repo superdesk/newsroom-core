@@ -178,6 +178,5 @@ def save_company_permissions(_id):
     data = get_json_or_400()
     if data.get("products"):
         data["products"] = get_product_updates(data["products"])
-        print("DATA", data["products"])
     update_company(data, orig["_id"])
     return jsonify(), 200
