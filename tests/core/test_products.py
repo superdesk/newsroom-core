@@ -144,22 +144,30 @@ def test_gets_all_products(client, app):
 def test_assign_products_to_companies(client, app, product, companies):
     test_login_succeeds_for_admin(client)
 
-    resp = client.post("/products/{}/companies".format(product["_id"]), json={"companies": [
-        companies[0]["_id"],
-        companies[1]["_id"],
-    ]})
+    resp = client.post(
+        "/products/{}/companies".format(product["_id"]),
+        json={
+            "companies": [
+                companies[0]["_id"],
+                companies[1]["_id"],
+            ]
+        },
+    )
 
     assert 200 == resp.status_code
 
     company = app.data.find_one("companies", req=None, _id=companies[0]["_id"])
     assert "products" in company
-    assert company["products"] == [
-        {"section": "wire", "_id": product["_id"]}
-    ]
+    assert company["products"] == [{"section": "wire", "_id": product["_id"]}]
 
-    resp = client.post("/products/{}/companies".format(product["_id"]), json={"companies": [
-        companies[1]["_id"],
-    ]})
+    resp = client.post(
+        "/products/{}/companies".format(product["_id"]),
+        json={
+            "companies": [
+                companies[1]["_id"],
+            ]
+        },
+    )
 
     assert 200 == resp.status_code
 
@@ -168,9 +176,7 @@ def test_assign_products_to_companies(client, app, product, companies):
 
 
 def test_products_company_migration(app, companies):
-    app.data.insert("products", [
-        {"name": "test1", "companies": [companies[0]["_id"], str(companies[1]["_id"])]}
-    ])
+    app.data.insert("products", [{"name": "test1", "companies": [companies[0]["_id"], str(companies[1]["_id"])]}])
 
     update_module = importlib.import_module("data_updates.00009_20230116-145407_products")
     data_update = update_module.DataUpdate()

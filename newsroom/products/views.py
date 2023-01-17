@@ -34,6 +34,7 @@ def get_product_ref(product: Product) -> ProductRef:
     return {
         "_id": product["_id"],
         "section": product.get("product_type") or "wire",
+        "seats": None,
     }
 
 
