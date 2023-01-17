@@ -57,7 +57,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: npm ci
-        run: npm ci
+        run: npm ci || npm install
 
       - name: lint
         run: npm run lint
