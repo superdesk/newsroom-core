@@ -76,6 +76,7 @@ const config = {
             path.resolve(__dirname, 'assets'),
             'node_modules',
         ],
+        mainFields: ['browser', 'main'],
     },
     plugins: [
         new ManifestPlugin(),
