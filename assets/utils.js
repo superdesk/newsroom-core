@@ -71,6 +71,7 @@ export const COVERAGE_DATE_TIME_FORMAT = getCoverageDateTimeFormat();
 export const COVERAGE_DATE_FORMAT = getCoverageDateFormat();
 export const DATETIME_FORMAT = getLocaleFormat('DATETIME_FORMAT', `${TIME_FORMAT} ${DATE_FORMAT}`);
 export const AGENDA_DATE_FORMAT_SHORT = getLocaleFormat('AGENDA_DATE_FORMAT_SHORT', 'dddd, MMMM D');
+export const AGENDA_DATE_PICKER_FORMAT_SHORT = getLocaleFormat('AGENDA_DATE_FORMAT_SHORT', 'EEEE, MMMM d');
 export const AGENDA_DATE_FORMAT_LONG = getLocaleFormat('AGENDA_DATE_FORMAT_LONG', 'dddd, MMMM D, YYYY');
 
 export const SERVER_DATETIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss+0000';
@@ -452,7 +453,7 @@ export function formatAgendaDate(item, group, {localTimeZone = true, onlyDates =
             timezone,
         });
 
-    case item.dates.no_end_time:
+    case item.dates.no_end_time || scheduleType === SCHEDULE_TYPE.NO_DURATION:
         return gettext('{{startTime}} {{startDate}} {{timezone}}', {
             startTime,
             startDate,
