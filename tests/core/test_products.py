@@ -158,7 +158,7 @@ def test_assign_products_to_companies(client, app, product, companies):
 
     company = app.data.find_one("companies", req=None, _id=companies[0]["_id"])
     assert "products" in company
-    assert company["products"] == [{"section": "wire", "_id": product["_id"], "seats": None}]
+    assert company["products"] == [{"section": "wire", "_id": product["_id"], "seats": 0}]
 
     resp = client.post(
         "/products/{}/companies".format(product["_id"]),
