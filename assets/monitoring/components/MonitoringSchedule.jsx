@@ -5,14 +5,13 @@ import moment from 'moment';
 
 import {gettext} from 'utils';
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 
 import SelectInput from 'components/SelectInput';
 
 class MonitoringSchedule extends React.Component {
     constructor(props) {
         super(props);
-        
+
         this.options = [
             {
                 value: 'immediate',

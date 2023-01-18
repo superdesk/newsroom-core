@@ -1,12 +1,7 @@
 import 'alertifyjs';
 import 'babel-polyfill';
 
-// Only import the classes used
-import 'bootstrap/js/dist/tooltip';
-import 'bootstrap/js/dist/modal';
-import 'bootstrap/js/dist/collapse';
-import 'bootstrap/js/dist/dropdown';
-
+import 'bootstrap';
 import 'classnames';
 import 'lodash';
 import 'moment';
@@ -24,6 +19,8 @@ import 'reselect';
 import 'store';
 import 'url-search-params-polyfill';
 import 'whatwg-fetch';
+import 'react-datepicker';
+import './utils';
 
 export const KEYS = {
     ESCAPE: 'Escape',
