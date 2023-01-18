@@ -29,12 +29,12 @@ def get_settings_data():
     }
 
 
-def get_product_ref(product: Product) -> ProductRef:
+def get_product_ref(product: Product, seats=0) -> ProductRef:
     assert "_id" in product
     return {
         "_id": product["_id"],
         "section": product.get("product_type") or "wire",
-        "seats": None,
+        "seats": seats or 0,
     }
 
 
