@@ -92,13 +92,13 @@ export default class ExpiryDateInput extends React.Component {
                         highlightDates={[moment()]}
                         locale={window.locale || 'en'}
                         minDate={new Date()}
-                        popperModifiers={{
-                            preventOverflow: {
-                                enabled: true,
-                                escapeWithReference: false, // force popper to stay in viewport (even when input is scrolled out of view)
-                                boundariesElement: 'viewport'
-                            }
-                        }}
+                        // popperModifiers={{
+                        //     preventOverflow: {
+                        //         enabled: true,
+                        //         escapeWithReference: false, // force popper to stay in viewport (even when input is scrolled out of view)
+                        //         boundariesElement: 'viewport'
+                        //     }
+                        // }}
                     />
                 </div>
                 {this.props.error && (

@@ -34,7 +34,7 @@ function MultiSelectDropdown({values, label, field, options, onChange, showAllBu
                 )}
                 aria-haspopup='true'
                 aria-expanded='false'
-                data-toggle='dropdown'
+                data-bs-toggle='dropdown'
             >
                 {multi && (
                     <span className='d-block'>{label}</span>

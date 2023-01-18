@@ -41,7 +41,7 @@ export class CollapseBoxWithButton extends React.Component {
                 <button
                     className="btn d-flex align-items-center btn-outline-light mb-0 mx-3"
                     type="button"
-                    data-toggle="collapse"
+                    data-bs-toggle="collapse"
                     data-target={`#${contentId}`}
                     onClick={() => {
                         if (this.state.open) {

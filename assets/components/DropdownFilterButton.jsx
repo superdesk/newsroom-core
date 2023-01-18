@@ -11,7 +11,7 @@ function DropdownFilterButton({id, isActive, autoToggle, onClick, icon, label}) 
                 'btn btn-outline-primary btn-sm d-flex align-items-center px-2 ms-2',
                 {active: isActive}
             )}
-            data-toggle={autoToggle ? 'dropdown' : undefined}
+            data-bs-toggle={autoToggle ? 'dropdown' : undefined}
             aria-haspopup='true'
             aria-expanded='false'
             onClick={onClick}

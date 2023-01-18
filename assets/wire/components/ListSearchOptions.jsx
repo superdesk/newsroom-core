@@ -33,7 +33,7 @@ export class ListSearchOptions extends React.PureComponent {
                     id="listSearchOptionsButton"
                     className="content-bar__menu"
                     onClick={this.toggleOpen}
-                    data-toggle="dropdown"
+                    data-bs-toggle="dropdown"
                     aria-haspopup="menu"
                     aria-expanded={this.state.isOpen}
                     aria-label={gettext('Search Options')}
