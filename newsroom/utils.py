@@ -14,7 +14,6 @@ from eve.utils import config, parse_request
 from eve_elastic.elastic import parse_date, ElasticCursor
 from flask import current_app as app, json, abort, request, g, flash, session, url_for
 from flask_babel import gettext
-from newsroom.auth import get_company
 
 from newsroom.template_filters import (
     time_short,
@@ -451,6 +450,7 @@ def get_items_for_user_action(_ids, item_type):
                 item["slugline"] = "{0} | {1}".format(item["slugline"], item["anpa_take_key"])
     elif items[0].get("type") == "agenda":
         # Import here to prevent circular imports
+        from newsroom.auth import get_company
         from newsroom.companies.utils import restrict_coverage_info
         from newsroom.agenda.utils import remove_restricted_coverage_info
 
