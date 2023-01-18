@@ -31,6 +31,7 @@ const config = {
         monitoring_js: path.resolve(__dirname, 'assets/monitoring/index.js'),
         factcheck_js: path.resolve(__dirname, 'assets/factcheck/index.js'),
         common: path.resolve(__dirname, 'assets/common.js'),
+        design_js: path.resolve(__dirname, 'assets/design_pages.js'),
     },
     output: {
         path: path.resolve(process.cwd(), 'dist'),

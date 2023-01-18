@@ -12,7 +12,7 @@ import {CollapseBoxWithButton} from '../../ui/components/Collapse';
 import {TopicItem} from './TopicItem';
 import {globalTopicsEnabledSelector} from 'ui/selectors';
 
-const manageTopics = () => document.dispatchEvent(window.manageTopics);
+const manageTopics = () => document.dispatchEvent(new Event('manage_topics'));
 
 function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNewItems, globalTopicsEnabled}) {
     const clickTopic = (event, topic) => {
