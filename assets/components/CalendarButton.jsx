@@ -4,7 +4,6 @@ import {gettext} from 'utils';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import CalendarButtonWrapper from './CalendarButtonWrapper';
-import {StrictModifiers} from "@popperjs/core";
 
 import {AGENDA_DATE_PICKER_FORMAT_SHORT} from '../utils';
 import {EARLIEST_DATE} from '../agenda/utils';
@@ -36,20 +35,17 @@ class CalendarButton extends React.Component {
             onChange={this.handleChange}
             highlightDates={[moment().toDate()]}
             locale={window.locale || 'en'}
-            // popperModifiers={{
-            //     offset: '5px, 10px'
-            // }}
-            // popperModifiers={{
-            //     offset: {
-            //         enabled: true,
-            //         offset: '5px, 10px'
-            //     },
-            //     preventOverflow: {
-            //         enabled: true,
-            //         escapeWithReference: false, // force popper to stay in viewport (even when input is scrolled out of view)
-            //         boundariesElement: 'viewport'
-            //     }
-            // }}
+            popperModifiers={{
+                offset: {
+                    enabled: true,
+                    offset: '5px, 10px'
+                },
+                preventOverflow: {
+                    enabled: true,
+                    escapeWithReference: false, // force popper to stay in viewport (even when input is scrolled out of view)
+                    boundariesElement: 'viewport'
+                }
+            }}
         />);
 
         if (!this.props.label) {
