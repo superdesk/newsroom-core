@@ -35,17 +35,14 @@ class CalendarButton extends React.Component {
             onChange={this.handleChange}
             highlightDates={[moment().toDate()]}
             locale={window.locale || 'en'}
-            popperModifiers={{
-                offset: {
-                    enabled: true,
-                    offset: '5px, 10px'
+            popperModifiers={[
+                {
+                    name: 'offset',
+                    options: {
+                        offset: [5, 10],
+                    },
                 },
-                preventOverflow: {
-                    enabled: true,
-                    escapeWithReference: false, // force popper to stay in viewport (even when input is scrolled out of view)
-                    boundariesElement: 'viewport'
-                }
-            }}
+            ]}
         />);
 
         if (!this.props.label) {
