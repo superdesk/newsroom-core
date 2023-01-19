@@ -27,7 +27,7 @@ class Product(TypedDict, total=False):
 
 class ProductRef(TypedDict):
     _id: str
-    seats: Optional[int]
+    seats: int
     section: str
 
 

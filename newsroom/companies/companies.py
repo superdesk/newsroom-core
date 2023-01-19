@@ -52,7 +52,7 @@ class CompaniesResource(newsroom.Resource):
                 "type": "dict",
                 "schema": {
                     "_id": newsroom.Resource.rel("products"),
-                    "seats": {"type": "number"},
+                    "seats": {"type": "number", "default": 0},
                     "section": {"type": "string", "default": "wire"},
                 },
             },

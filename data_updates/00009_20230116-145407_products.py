@@ -8,6 +8,7 @@
 # Creation: 2023-01-16 14:54
 
 from superdesk.commands.data_updates import DataUpdate as _DataUpdate
+from newsroom.products.views import get_product_ref
 
 
 class DataUpdate(_DataUpdate):
@@ -19,11 +20,11 @@ class DataUpdate(_DataUpdate):
         products = list(db.products.find({}))
         for company in db.companies.find({}):
             company_products = [
-                {"_id": p["_id"], "section": p.get("product_type") or "wire"}
+                get_product_ref(p)
                 for p in products
                 if p.get("companies") and str(company["_id"]) in set(map(str, p["companies"]))
             ]
             db.companies.update_one({"_id": company["_id"]}, {"$set": {"products": company_products}})
 
     def backwards(self, mongodb_collection, mongodb_database):
-        raise NotImplementedError()
+        pass
