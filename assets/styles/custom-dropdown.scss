@@ -20,6 +20,8 @@
 .dropdown-menu-typeahead {
   overflow: visible;
   width: 400px;
+  top: 100%;
+  left: 0;
 
   @include phone {
     position: fixed;
