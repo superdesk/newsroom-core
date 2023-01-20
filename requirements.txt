@@ -19,8 +19,5 @@ reportlab==3.6.6
 elastic-apm[flask]>=6.7,<6.8
 MarkupSafe<2.1
 
-reportlab==3.6.6
-MarkupSafe<2.1
-
-superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@v2.6.0-rc4
-superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@v2.6.0-rc2
+superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@v2.6.0
+superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@v2.6.0
