@@ -18,7 +18,7 @@ class SignupForm(FlaskForm):
     email = StringField(lazy_gettext("Your email"), validators=[DataRequired(), Length(1, 128), Email()])
     first_name = StringField(lazy_gettext("Your First Name"), validators=[DataRequired(), Length(1, 128)])
     last_name = StringField(lazy_gettext("Your Last Name"), validators=[DataRequired(), Length(1, 128)])
-    phone = StringField(lazy_gettext("Your telephone number"), validators=[])
+    phone = StringField(lazy_gettext("Your telephone number"), validators=[DataRequired()])
     company = StringField(lazy_gettext("Your company"), validators=[DataRequired()])
     country = StringField(lazy_gettext("Your country"), validators=[DataRequired()])
     occupation = SelectField(lazy_gettext("Your position"), choices=occupations, validators=[DataRequired()])
