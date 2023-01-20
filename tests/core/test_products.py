@@ -1,3 +1,5 @@
+import importlib
+
 from bson import ObjectId
 from flask import json
 from pytest import fixture
@@ -6,18 +8,27 @@ from newsroom.tests.users import test_login_succeeds_for_admin
 
 
 @fixture(autouse=True)
-def products(app):
-    app.data.insert(
-        "products",
-        [
-            {
-                "_id": ObjectId("59b4c5c61d41c8d736852fbf"),
-                "name": "Sport",
-                "description": "Top level sport product",
-                "is_enabled": True,
-            }
-        ],
-    )
+def product(app):
+    _product = {
+        "_id": ObjectId("59b4c5c61d41c8d736852fbf"),
+        "name": "Sport",
+        "description": "Top level sport product",
+        "is_enabled": True,
+    }
+    app.data.insert("products", [_product])
+    return _product
+
+
+@fixture
+def companies(app):
+    _companies = [
+        {"name": "test1"},
+        {"name": "test2"},
+        {"name": "test3"},
+    ]
+
+    app.data.insert("companies", _companies)
+    return _companies
 
 
 def test_product_list_fails_for_anonymous_user(client, anonymous_user):
@@ -128,3 +139,50 @@ def test_gets_all_products(client, app):
     resp = client.get("/products")
     data = json.loads(resp.get_data())
     assert 251 == len(data)
+
+
+def test_assign_products_to_companies(client, app, product, companies):
+    test_login_succeeds_for_admin(client)
+
+    resp = client.post(
+        "/products/{}/companies".format(product["_id"]),
+        json={
+            "companies": [
+                companies[0]["_id"],
+                companies[1]["_id"],
+            ]
+        },
+    )
+
+    assert 200 == resp.status_code
+
+    company = app.data.find_one("companies", req=None, _id=companies[0]["_id"])
+    assert "products" in company
+    assert company["products"] == [{"section": "wire", "_id": product["_id"], "seats": 0}]
+
+    resp = client.post(
+        "/products/{}/companies".format(product["_id"]),
+        json={
+            "companies": [
+                companies[1]["_id"],
+            ]
+        },
+    )
+
+    assert 200 == resp.status_code
+
+    company = app.data.find_one("companies", req=None, _id=companies[0]["_id"])
+    assert company["products"] == []
+
+
+def test_products_company_migration(app, companies):
+    app.data.insert("products", [{"name": "test1", "companies": [companies[0]["_id"], str(companies[1]["_id"])]}])
+
+    update_module = importlib.import_module("data_updates.00009_20230116-145407_products")
+    data_update = update_module.DataUpdate()
+
+    db = app.data.pymongo("products").db
+    data_update.forwards(db[data_update.resource], db)
+
+    company = app.data.find_one("companies", req=None, _id=companies[0]["_id"])
+    assert 1 == len(company["products"])

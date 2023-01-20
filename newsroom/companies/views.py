@@ -154,22 +154,19 @@ def company_users(_id):
     return jsonify(users), 200
 
 
-def update_products(updates, company_id):
-    products = list(query_resource("products"))
-    db = app.data.get_mongo_collection("products")
-    for product in products:
-        if updates.get(str(product["_id"])):
-            db.update_one(
-                {"_id": product["_id"]},
-                {"$addToSet": {"companies": ObjectId(company_id)}},
-            )
-        else:
-            db.update_one({"_id": product["_id"]}, {"$pull": {"companies": ObjectId(company_id)}})
+def get_product_updates(updates):
+    product_ids = [product_id for product_id, selected in updates.items() if selected]
+    if not product_ids:
+        return []
+    products = list(query_resource("products", lookup={"_id": {"$in": product_ids}}))
+    return [{"_id": product["_id"], "section": product.get("product_type") or "wire"} for product in products]
 
 
 def update_company(data, _id):
     updates = {
-        k: v for k, v in data.items() if k in ("sections", "archive_access", "events_only", "restrict_coverage_info")
+        k: v
+        for k, v in data.items()
+        if k in ("sections", "archive_access", "events_only", "restrict_coverage_info", "products")
     }
     get_resource_service("companies").patch(_id, updates=updates)
 
@@ -180,6 +177,6 @@ def save_company_permissions(_id):
     orig = get_entity_or_404(_id, "companies")
     data = get_json_or_400()
     if data.get("products"):
-        update_products(data["products"], _id)
+        data["products"] = get_product_updates(data["products"])
     update_company(data, orig["_id"])
     return jsonify(), 200

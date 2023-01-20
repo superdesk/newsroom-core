@@ -9,7 +9,9 @@ from flask import current_app as app
 import datetime
 import logging
 import re
+from newsroom.auth import get_company
 from newsroom.news_api.utils import check_association_permission
+from newsroom.products.products import get_products_by_company
 
 blueprint = superdesk.Blueprint("atom", __name__)
 
@@ -63,13 +65,16 @@ def get_atom():
     #    req.args = {'include_fields': 'abstract'}
     #    response = superdesk.get_resource_service('news/search').get(req=req, lookup=None)
 
+    company = get_company()
+    products = get_products_by_company(company)
+
     for item in response[0].get("_items"):
         try:
             complete_item = superdesk.get_resource_service("items").find_one(req=None, _id=item.get("_id"))
 
             # If featuremedia is not allowed for the company don't add the item
             if ((complete_item.get("associations") or {}).get("featuremedia") or {}).get("renditions"):
-                if not check_association_permission(complete_item):
+                if not check_association_permission(complete_item, products):
                     continue
 
             entry = SubElement(feed, "entry")

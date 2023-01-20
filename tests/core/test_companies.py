@@ -4,6 +4,8 @@ from newsroom.tests.users import test_login_succeeds_for_admin
 from newsroom.tests.fixtures import COMPANY_1_ID
 from superdesk import get_resource_service
 
+from newsroom.user_roles import UserRole
+
 
 def test_delete_company_deletes_company_and_users(client):
     test_login_succeeds_for_admin(client)
@@ -140,15 +142,11 @@ def test_save_company_permissions(client, app):
         content_type="application/json",
     )
 
-    response = client.get("/products")
-    data = json.loads(response.get_data())
-    assert [p for p in data if p["_id"] == "p-1"][0]["companies"] == []
-    assert [p for p in data if p["_id"] == "p-2"][0]["companies"] == [str(COMPANY_1_ID)]
-
     updated = app.data.find_one("companies", req=None, _id=COMPANY_1_ID)
     assert updated["sections"]["wire"]
     assert not updated["sections"].get("agenda")
     assert updated["archive_access"]
+    assert updated["products"] == [{"section": "wire", "_id": "p-2"}]
 
     # available by default
     resp = client.get(url_for("agenda.index"))
@@ -157,7 +155,10 @@ def test_save_company_permissions(client, app):
     # set company with wire only
     user = app.data.find_one("users", req=None, first_name="admin")
     assert user
-    app.data.update("users", user["_id"], {"company": COMPANY_1_ID}, user)
+    app.data.update("users", user["_id"], {"company": COMPANY_1_ID, "user_type": UserRole.PUBLIC.value}, user)
+
+    # refresh session with new type
+    test_login_succeeds_for_admin(client)
 
     # test section protection
     resp = client.get(url_for("agenda.index"))

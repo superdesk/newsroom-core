@@ -176,7 +176,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         And then you can use it in views as decorator and it will check if user
         has section active::
 
-            from newsroom.companies import section
+            from newsroom.decorators import section
 
             @blueprint.route('/foo')
             @section('foo')

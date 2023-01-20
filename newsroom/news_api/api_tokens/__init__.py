@@ -22,7 +22,7 @@ from . import views  # noqa
 
 class CompanyTokenAuth(TokenAuth):
     def check_auth(self, token_id, allowed_roles, resource, method):
-        """Try to find auth token and if valid put subscriber id into ``g.user``."""
+        """Try to find auth token and if valid put subscriber id into ``g.company_id``."""
         token = app.data.mongo.find_one(API_TOKENS, req=None, _id=token_id)
         if not token:
             return False
@@ -78,8 +78,8 @@ class CompanyTokenAuth(TokenAuth):
             if updates.get("rate_limit_expiry"):
                 g.rate_limit_expiry = updates["rate_limit_expiry"]
 
-        g.user = str(token.get("company"))
-        return g.user
+        g.company_id = str(token.get("company"))
+        return g.company_id
 
 
 def init_app(app):

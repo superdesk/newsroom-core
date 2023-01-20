@@ -2,6 +2,8 @@ import newsroom
 from newsroom.products.products import get_products_by_company
 import superdesk
 
+from newsroom.types import Company
+
 
 class NavigationsResource(newsroom.Resource):
     """
@@ -35,16 +37,18 @@ class NavigationsService(newsroom.Service):
             superdesk.get_resource_service("products").patch(product["_id"], product)
 
 
-def get_navigations_by_company(company_id, product_type="wire", events_only=False):
+def get_navigations_by_company(company: Company, product_type="wire", events_only=False):
     """
     Returns list of navigations for given company id
     Navigations will contain the list of product ids
     """
-    products = get_products_by_company(company_id, None, product_type)
+    products = get_products_by_company(company, None, product_type)
 
     # Get the navigation ids used across products
     navigation_ids = []
-    [navigation_ids.extend(p.get("navigations", [])) for p in products]
+    for p in products:
+        if p.get("navigations"):
+            navigation_ids.extend(p["navigations"])
     return get_navigations_by_ids(navigation_ids)
 
 

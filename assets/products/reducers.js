@@ -8,7 +8,6 @@ import {
     SET_ERROR,
     GET_COMPANIES,
     GET_NAVIGATIONS,
-    UPDATE_PRODUCT_COMPANIES,
     UPDATE_PRODUCT_NAVIGATIONS,
 } from './actions';
 import {ADD_EDIT_USERS} from 'actions';
@@ -110,14 +109,6 @@ export default function productReducer(state = initialState, action) {
         action.data.map((navigation) => navigationsById[navigation._id] = navigation);
 
         return {...state, navigations: action.data, navigationsById};
-    }
-
-    case UPDATE_PRODUCT_COMPANIES: {
-        const product = Object.assign({}, action.product, {companies: action.companies});
-        const productsById = Object.assign({}, state.productsById);
-        productsById[action.product._id] = product;
-
-        return {...state, productsById, productToEdit: product};
     }
 
     case UPDATE_PRODUCT_NAVIGATIONS: {

@@ -19,7 +19,7 @@ class CompanyPermissions extends React.Component {
         const products = {};
 
         this.props.products.forEach((product) => {
-            products[product._id] = get(product, 'companies', []).includes(this.props.company._id);
+            products[product._id] = get(this.props.company, 'products', []).some((_product) => _product._id === product._id);
         });
 
         const sections = {};

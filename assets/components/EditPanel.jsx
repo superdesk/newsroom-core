@@ -11,7 +11,6 @@ class EditPanel extends React.Component {
         this.toggleSelectAll = this.toggleSelectAll.bind(this);
         this.saveItems = this.saveItems.bind(this);
         this.initItems = this.initItems.bind(this);
-
         this.state = {activeParent: props.parent._id, items: {}};
     }
 

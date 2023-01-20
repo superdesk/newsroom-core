@@ -19,11 +19,10 @@ from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
 from newsroom.wire.utils import update_action_list
-from newsroom.auth import get_user, get_user_id
-from newsroom.decorator import login_required, admin_only, section_required
+from newsroom.auth import get_company, get_user, get_user_id
+from newsroom.decorator import login_required, admin_only, section
 from newsroom.topics import get_user_topics
 from newsroom.email import send_template_email
-from newsroom.companies import get_user_company
 from newsroom.utils import (
     get_entity_or_404,
     get_json_or_400,
@@ -43,7 +42,6 @@ from newsroom.notifications import (
     save_user_notifications,
     UserNotification,
 )
-from newsroom.companies import section
 from newsroom.template_filters import is_admin_or_internal
 
 from .search import get_bookmarks_count
@@ -57,7 +55,7 @@ def get_services(user):
     services = app.config["SERVICES"]
     for service in services:
         service.setdefault("is_active", True)
-    company = get_user_company(user)
+    company = get_company(user)
     if company and company.get("services"):
         for service in services:
             service["is_active"] = bool(company["services"].get(service["code"]))
@@ -83,6 +81,7 @@ def set_item_permission(item, permitted=True):
 
 def get_view_data():
     user = get_user()
+    company = get_company(user)
     topics = get_user_topics(user["_id"]) if user else []
     company_id = str(user["company"]) if user and user.get("company") else None
 
@@ -95,8 +94,8 @@ def get_view_data():
             for f in app.download_formatters.values()
             if "wire" in f["types"]
         ],
-        "navigations": get_navigations_by_company(company_id, product_type="wire"),
-        "products": get_products_by_company(company_id),
+        "navigations": get_navigations_by_company(company, product_type="wire") if company else [],
+        "products": get_products_by_company(company, product_type="wire") if company else [],
         "saved_items": get_bookmarks_count(user["_id"], "wire"),
         "context": "wire",
         "ui_config": get_resource_service("ui_config").get_section_config("wire"),
@@ -132,13 +131,14 @@ def delete_dashboard_caches():
 
 def get_home_data():
     user = get_user()
+    company = get_company(user)
     cards = list(query_resource("cards", lookup={"dashboard": "newsroom"}))
     company_id = str(user["company"]) if user and user.get("company") else None
     topics = get_user_topics(user["_id"]) if user else []
 
     return {
         "cards": cards,
-        "products": get_products_by_company(company_id),
+        "products": get_products_by_company(company) if company else [],
         "user": str(user["_id"]) if user else None,
         "userType": user.get("user_type"),
         "company": company_id,
@@ -212,8 +212,8 @@ def bookmarks():
 
 
 @blueprint.route("/wire/search")
-@section_required("wire")
 @login_required
+@section("wire")
 def search():
     if "prepend_embargoed" in request.args or app.config["PREPEND_EMBARGOED_TO_WIRE_SEARCH"]:
         args = request.args.to_dict()

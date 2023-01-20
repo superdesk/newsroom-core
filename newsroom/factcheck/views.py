@@ -7,8 +7,7 @@ from eve.methods.get import get_internal
 from superdesk import get_resource_service
 from newsroom.factcheck import blueprint
 from newsroom.auth import get_user, get_user_id
-from newsroom.decorator import login_required
-from newsroom.companies import section
+from newsroom.decorator import login_required, section
 from newsroom.wire.search import get_bookmarks_count
 from newsroom.wire.views import (
     update_action_list,

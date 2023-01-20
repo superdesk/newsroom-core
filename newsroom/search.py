@@ -20,8 +20,7 @@ from newsroom.products.products import (
     get_product_by_id,
     get_products_by_user,
 )
-from newsroom.auth import get_user
-from newsroom.companies import get_user_company
+from newsroom.auth import get_company, get_user
 from newsroom.settings import get_setting
 from newsroom.template_filters import is_admin
 from newsroom.utils import get_local_date, get_end_date
@@ -378,7 +377,7 @@ class BaseSearchService(Service):
         :param SearchQuery search: The search query instance
         """
 
-        search.company = get_user_company(search.user)
+        search.company = get_company(search.user)
 
     def prefill_search_page(self, search):
         """Prefill the search page parameters
@@ -461,7 +460,7 @@ class BaseSearchService(Service):
                     search.products = user_products
                 else:
                     search.products = get_products_by_company(
-                        search.company.get("_id"),
+                        search.company,
                         search.navigation_ids,
                         product_type=search.section,
                     )

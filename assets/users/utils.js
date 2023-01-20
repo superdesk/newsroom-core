@@ -6,6 +6,7 @@ export const userTypes = [
     {value: 'internal', text: gettext('Internal'), show_acc_mgr: true},
     {value: 'public', text: gettext('Public'), show_acc_mgr: true},
     {value: 'account_management', text: gettext('Account Management'), show_acc_mgr: false},
+    {value: 'company_admin', text: gettext('Company Admin'), show_acc_mgr: false},
 ];
 
 export function getUserLabel(code) {

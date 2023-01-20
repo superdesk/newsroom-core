@@ -46,7 +46,19 @@ class CompaniesResource(newsroom.Resource):
         "allowed_ip_list": {"type": "list", "mapping": {"type": "string"}},
         "original_creator": newsroom.Resource.rel("users"),
         "version_creator": newsroom.Resource.rel("users"),
+        "products": {
+            "type": "list",
+            "schema": {
+                "type": "dict",
+                "schema": {
+                    "_id": newsroom.Resource.rel("products"),
+                    "seats": {"type": "number", "default": 0},
+                    "section": {"type": "string", "default": "wire"},
+                },
+            },
+        },
     }
+
     datasource = {"source": "companies", "default_sort": [("name", 1)]}
     item_methods = ["GET", "PATCH", "DELETE"]
     resource_methods = ["GET", "POST"]

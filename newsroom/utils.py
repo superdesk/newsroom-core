@@ -450,10 +450,11 @@ def get_items_for_user_action(_ids, item_type):
                 item["slugline"] = "{0} | {1}".format(item["slugline"], item["anpa_take_key"])
     elif items[0].get("type") == "agenda":
         # Import here to prevent circular imports
+        from newsroom.auth import get_company
         from newsroom.companies.utils import restrict_coverage_info
         from newsroom.agenda.utils import remove_restricted_coverage_info
 
-        if restrict_coverage_info():
+        if restrict_coverage_info(get_company()):
             remove_restricted_coverage_info(items)
 
     return items

@@ -58,7 +58,7 @@ def test_get_item_audit_creation(client, app):
 
 def test_get_all_company_products_audit_creation(client, app):
     with app.test_request_context(path="/account/products/"):
-        g.user = COMPANY_2_ID
+        g.company_id = COMPANY_2_ID
         response = get_internal("account/products")
         assert len(response[0]["_items"]) == 1
         audit_check("5ab03a87bdd78169bb6d0783")
@@ -66,7 +66,7 @@ def test_get_all_company_products_audit_creation(client, app):
 
 def test_get_single_product_audit_creation(client, app):
     with app.test_request_context(path="/account/products/"):
-        g.user = COMPANY_2_ID
+        g.company_id = COMPANY_2_ID
         response = getitem_internal("account/products", _id="5ab03a87bdd78169bb6d0783")
         assert str(response[0]["_id"]) == "5ab03a87bdd78169bb6d0783"
         audit_check("5ab03a87bdd78169bb6d0783")
@@ -84,7 +84,7 @@ def test_search_audit_creation(client, app):
         ],
     )
     with app.test_request_context(query_string="q=fish&include_fields=body_html", path="/news"):
-        g.user = company_id
+        g.company_id = company_id
         response = get_internal("news/search")
         assert len(response[0]["_items"]) == 1
         audit_check("5ab03a87bdd78169bb6d0785")

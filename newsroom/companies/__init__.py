@@ -1,23 +1,11 @@
-from functools import wraps
-
 import superdesk
-from flask import Blueprint, abort, current_app as newsroom_app, g
+
+from flask import Blueprint, current_app as newsroom_app
 from flask_babel import lazy_gettext
-from newsroom.auth import get_user
+from newsroom.auth import get_company
 from .companies import CompaniesResource, CompaniesService
 
 blueprint = Blueprint("companies", __name__)
-
-from . import views  # noqa
-
-
-def get_user_company(user):
-    if user and user.get("company"):
-        return superdesk.get_resource_service("companies").find_one(req=None, _id=user["company"])
-    else:  # if no user passed then try to see if the session belongs to the a company
-        return (
-            superdesk.get_resource_service("companies").find_one(req=None, _id=g.user) if hasattr(g, "user") else None
-        )
 
 
 def get_company_sections_monitoring_data(company_id):
@@ -37,28 +25,11 @@ def get_company_sections_monitoring_data(company_id):
     return rv
 
 
-def get_user_company_name(user=None):
-    if not user:
-        user = get_user()
-    company = get_user_company(user)
+def get_user_company_name(user) -> str:
+    company = get_company(user)
     if company:
-        return company["name"]
+        return company.get("name", "")
     return ""
-
-
-def section(_id):
-    def section_decorator(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            user = get_user()
-            company = get_user_company(user)
-            if company and company.get("sections") and not company["sections"].get(_id):
-                abort(403)
-            return f(*args, **kwargs)
-
-        return decorated_function
-
-    return section_decorator
 
 
 def init_app(app):
@@ -71,3 +42,6 @@ def init_app(app):
         data=views.get_settings_data,
         allow_account_mgr=True,
     )
+
+
+from . import views  # noqa

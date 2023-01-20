@@ -10,6 +10,7 @@ from flask import current_app, render_template, url_for
 from flask_babel import gettext
 from flask_mail import Attachment, Message
 from jinja2 import TemplateNotFound
+from newsroom.auth import get_company
 
 from newsroom.celery_app import celery
 from newsroom.utils import (
@@ -306,10 +307,10 @@ def _send_new_wire_notification_email(user, topic_name, item, section):
 
 def _remove_restricted_coverage_info(user, item):
     # Import here to prevent circular imports
-    from newsroom.companies.utils import get_user_company, restrict_coverage_info
+    from newsroom.companies.utils import restrict_coverage_info
     from newsroom.agenda.utils import remove_restricted_coverage_info
 
-    if restrict_coverage_info(get_user_company(user)):
+    if restrict_coverage_info(get_company()):
         remove_restricted_coverage_info([item])
 
 
