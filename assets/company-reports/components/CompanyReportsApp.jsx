@@ -49,7 +49,7 @@ class CompanyReportsApp extends React.Component {
                 <nav className="content-bar navbar content-bar--side-padding">
                     <div>
                         <select
-                            className="ml-3 form-control form-control-lg"
+                            className="ms-3 form-control form-control-lg"
                             id={'company-reports'}
                             name={'company-reports'}
                             value={this.props.activeReport || ''}
@@ -66,7 +66,7 @@ class CompanyReportsApp extends React.Component {
                             {gettext('Run report')}
                         </button>}
                         {this.props.activeReport && <button
-                            className='btn btn-outline-secondary ml-2'
+                            className='btn btn-outline-secondary ms-2'
                             type='button'
                             onClick={this.props.printReport} >
                             {gettext('Print report')}

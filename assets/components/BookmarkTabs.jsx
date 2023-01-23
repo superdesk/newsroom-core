@@ -17,7 +17,7 @@ export default function BookmarkTabs(props) {
     }
 
     return (
-        <div className="btn-group btn-group--navbar ml-3 mr-3">
+        <div className="btn-group btn-group--navbar ms-3 me-3">
             {sections}
         </div>
     );

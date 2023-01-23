@@ -62,7 +62,7 @@ class EditProduct extends React.Component {
         if (q) {
             return (
                 <a href={`/${product.product_type}?q=${q}`} target="_blank"
-                    className='btn btn-outline-secondary float-right'>{gettext('Test product')}
+                    className='btn btn-outline-secondary float-end'>{gettext('Test product')}
                 </a>
             );
         }
@@ -133,7 +133,7 @@ class EditProduct extends React.Component {
                                         />
                                         {this.props.product.sd_product_id &&
                                         <a href={`/${this.props.product.product_type || 'wire'}?q=products.code:${this.props.product.sd_product_id}`} target="_blank"
-                                            className='btn btn-outline-secondary float-right mt-2'>{gettext('Test product id')}
+                                            className='btn btn-outline-secondary float-end mt-2'>{gettext('Test product id')}
                                         </a>}
                                     </div>
 
@@ -147,7 +147,7 @@ class EditProduct extends React.Component {
                                         />
                                         {this.props.product.query &&
                                         <a href={`/${this.props.product.product_type || 'wire'}?q=${this.getQueryString(this.props.product, 'query')}`} target="_blank"
-                                            className='btn btn-outline-secondary float-right mt-3'>{gettext('Test query')}
+                                            className='btn btn-outline-secondary float-end mt-3'>{gettext('Test query')}
                                         </a>}
                                     </div>
 
@@ -161,7 +161,7 @@ class EditProduct extends React.Component {
                                         />
                                         {this.props.product.planning_item_query &&
                                         <a href={`/${this.props.product.product_type || 'wire'}?q=${this.getQueryString(this.props.product, 'planning_item_query')}`} target="_blank"
-                                            className='btn btn-outline-secondary float-right mt-3'>{gettext('Test Planning Item query')}
+                                            className='btn btn-outline-secondary float-end mt-3'>{gettext('Test Planning Item query')}
                                         </a>}
                                     </div>}
 

@@ -28,20 +28,28 @@ class ActionMenu extends React.Component {
                     aria-label={gettext('More Actions')}>
                     <i className='icon--more icon--gray-dark'></i>
                 </button>
-                {this.referenceElem &&
-              <Popover placement="left-end" isOpen={showActions} target={this.referenceElem} className="action-popover">
-                  <PopoverBody>
-                      <ActionList
-                          item={item}
-                          group={group}
-                          plan={plan}
-                          user={user}
-                          actions={actions}
-                          onMouseLeave={this.onMouseLeave}
-                          showShortcutActions={showShortcutActions}
-                      />
-                  </PopoverBody>
-              </Popover>}
+                {this.referenceElem && (
+                    <Popover
+                        placement="left-end"
+                        isOpen={showActions}
+                        target={this.referenceElem}
+                        className="action-popover"
+                        delay={0}
+                        fade={false}
+                    >
+                        <PopoverBody>
+                            <ActionList
+                                item={item}
+                                group={group}
+                                plan={plan}
+                                user={user}
+                                actions={actions}
+                                onMouseLeave={this.onMouseLeave}
+                                showShortcutActions={showShortcutActions}
+                            />
+                        </PopoverBody>
+                    </Popover>
+                )}
             </div>
         );
     }

@@ -65,12 +65,12 @@ export default function AgendaEdNote({item, plan, secondaryNoteField, noMargin})
     const getNoteFields = () => {
         if (!item.ednote && !planEdnote) {
             // Display only Secondary Note
-            return (<span className='ml-1'>{getMultiLineNote(item[secondaryNoteField])}</span>);
+            return (<span className='ms-1'>{getMultiLineNote(item[secondaryNoteField])}</span>);
         }
 
         // Display both Ed & Secondary Note
         return (
-            <span className='ml-1'>{getMultiLineNote(planEdnote || item.ednote)}
+            <span className='ms-1'>{getMultiLineNote(planEdnote || item.ednote)}
                 <span className="secondary-note">
                     {getMultiLineNote(item[secondaryNoteField])}
                 </span>

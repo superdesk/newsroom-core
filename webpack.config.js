@@ -31,6 +31,7 @@ const config = {
         monitoring_js: path.resolve(__dirname, 'assets/monitoring/index.js'),
         factcheck_js: path.resolve(__dirname, 'assets/factcheck/index.js'),
         common: path.resolve(__dirname, 'assets/common.js'),
+        design_js: path.resolve(__dirname, 'assets/design_pages.js'),
     },
     output: {
         path: path.resolve(process.cwd(), 'dist'),
@@ -42,7 +43,11 @@ const config = {
         rules: [
             {
                 test: /\.jsx?$/,
-                include: path.resolve(__dirname, 'assets'),
+                include: [
+                    path.resolve(__dirname, 'assets'),
+                    path.resolve(__dirname, 'node_modules/bootstrap'),
+                    path.resolve(process.cwd(), 'node_modules/bootstrap'),
+                ],
                 loader: 'babel-loader',
                 options: {
                     presets: ['es2015', 'react'],
@@ -72,15 +77,10 @@ const config = {
             path.resolve(__dirname, 'assets'),
             'node_modules',
         ],
+        mainFields: ['browser', 'main'],
     },
     plugins: [
         new ManifestPlugin(),
-        new webpack.ProvidePlugin({
-            $: 'jquery',
-            // bootstrap depenendecies
-            'window.jQuery': 'jquery',
-            'window.Popper': 'popper.js',
-        }),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'common',
             minChunks: Infinity,

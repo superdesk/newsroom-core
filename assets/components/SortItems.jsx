@@ -42,7 +42,7 @@ class SortItems extends React.Component {
             <li className="list-group-item">
                 <span>{item.text}</span>
                 <button type="button"
-                    className="icon-button icon-button--small float-right"
+                    className="icon-button icon-button--small float-end"
                     aria-label={gettext('Close')}
                     onClick={(e) => {
                         e.preventDefault();

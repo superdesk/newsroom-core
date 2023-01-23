@@ -12,15 +12,15 @@
         {{ form.password(class="form-control", id="password", required="true") }}
     </div>
     <div class="form-check mb-4 p-0">
-        <div class="custom-control custom-checkbox">
-            {{ form.remember_me(class="custom-control-input", id="remember_me") }}
-            <label class="custom-control-label" for="remember_me">{{ form.remember_me.label.text }}</label>
+        <div class="form-check">
+            {{ form.remember_me(class="form-check-input", id="remember_me") }}
+            <label class="form-check-label" for="remember_me">{{ form.remember_me.label.text }}</label>
         </div>
     </div>
-    <button type="submit" class="btn btn-primary btn-block">{{ gettext("Login") }}</button>
+    <button type="submit" class="btn btn-primary w-100">{{ gettext("Login") }}</button>
     {% if config.GOOGLE_LOGIN %}
     <a href="{{ url_for('oauth.google_login', next=next_page) }}"
-       class="btn btn-secondary btn-block text-white"
+       class="btn btn-secondary w-100 text-white"
        role="button"
     >
         {{ gettext('Log In with Google') }}

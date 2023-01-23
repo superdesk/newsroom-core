@@ -13,12 +13,14 @@ export class ListSearchOptions extends React.PureComponent {
     }
 
     componentDidMount() {
-        $(this.btnGroup).on('shown.bs.dropdown', () => {
-            this.setState({isOpen: true});
-        });
-        $(this.btnGroup).on('hidden.bs.dropdown', () => {
-            this.setState({isOpen: false});
-        });
+        if (this.btnGroup) {
+            this.btnGroup.addEventListener('shown.bs.dropdown', () => {
+                this.setState({isOpen: true});
+            });
+            this.btnGroup.addEventListener('hidden.bs.dropdown', () => {
+                this.setState({isOpen: false});
+            });
+        }
     }
 
     render() {
@@ -31,7 +33,7 @@ export class ListSearchOptions extends React.PureComponent {
                     id="listSearchOptionsButton"
                     className="content-bar__menu"
                     onClick={this.toggleOpen}
-                    data-toggle="dropdown"
+                    data-bs-toggle="dropdown"
                     aria-haspopup="menu"
                     aria-expanded={this.state.isOpen}
                     aria-label={gettext('Search Options')}
@@ -56,7 +58,7 @@ export class ListSearchOptions extends React.PureComponent {
                                 />
                                 <label
                                     htmlFor="all-versions"
-                                    className="mb-0 ml-2"
+                                    className="mb-0 ms-2"
                                 >
                                     {gettext('All Versions')}
                                 </label>
@@ -74,7 +76,7 @@ export class ListSearchOptions extends React.PureComponent {
                                 />
                                 <label
                                     htmlFor="news-only"
-                                    className="mb-0 ml-2"
+                                    className="mb-0 ms-2"
                                 >
                                     {gettext('News Only')}
                                 </label>

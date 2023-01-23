@@ -2,14 +2,14 @@
 
 .user-profile__app--overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    inset-block-end: 0;
     opacity: 0.15;
     background-color: black;
 }
 
 .my-topics__form-params {
-    margin-top: 1rem;
+    margin-block-start: 1rem;
 }

@@ -1,10 +1,18 @@
 // Custom list group
 
+.list-group {
+    &.list-group-flush {
+        & + .card-footer {
+            border-top: 1px solid rgba(0, 0, 0, 0.125);
+        }
+    }
+}
+
 .list-group-item--link {
     padding: 0;
     a {
         display: block;
-        padding: $list-group-item-padding-y $list-group-item-padding-x;
+        padding: $list-group-item-padding-x $list-group-item-padding-y;
         &:hover {
             text-decoration: none;
             background-color: #eff4f6;

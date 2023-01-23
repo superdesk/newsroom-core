@@ -24,6 +24,7 @@ $red: #cb0002;
 $green: #51831B;
 $green-dark: #3D7204;
 $orange: #B36100;
+$orange2: #CC7A00;
 $cyan: #108484;
 $purple: #B637DE;
 $yellow: #8F7200;
@@ -32,6 +33,7 @@ $yellow: #8F7200;
 
 $info: $pink;
 $gray-600: #6D757E;
+$light: $gray-dark;
 
 $blue: #007EAD;
 $line-height-sm: 1.25;
@@ -76,6 +78,8 @@ $dropdown-item-padding-x: 1rem;
 $dropdown-link-hover-bg: #eff4f6;
 $dropdown-border-width: 0;
 $dropdown-min-width: 12rem;
+$list-group-item-padding-x: 0.75rem;
+$list-group-item-padding-y: 1.25rem; 
 
 // Modals
 
@@ -88,6 +92,11 @@ $modal-content-bg: transparent;
 
 $badge-font-size: 0.8125rem;
 $badge-font-weight: 400;
+
+//Alerts
+$alert-bg-level: -10 !default;
+$alert-border-level: -9 !default;
+$alert-color-level: 6 !default;
 
 // Grid breakpoints
 $grid-breakpoints: (

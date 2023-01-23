@@ -5,17 +5,17 @@ export default function FilterItem({bucket, group, toggleFilter, groupFilter}) {
     const isActive = groupFilter.indexOf(bucket.key) !== -1;
 
     return (
-        <div className="custom-control custom-checkbox ui-dark">
+        <div className="form-check ui-dark">
             <input
                 type="checkbox"
-                className="custom-control-input"
+                className="form-check-input"
                 checked={isActive}
                 id={bucket.key}
                 onChange={() => {
                     toggleFilter(group.field, bucket.key, group.single, isActive);
                 }} />
             <label
-                className="custom-control-label"
+                className="form-check-label"
                 htmlFor={bucket.key}
             >
                 {bucket.label || '' + bucket.key}

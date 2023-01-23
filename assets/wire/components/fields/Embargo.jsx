@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
 import classNames from 'classnames';
+import {Tooltip} from 'bootstrap';
 
 import {gettext, fullDate, getEmbargo} from 'utils';
 
@@ -13,12 +14,13 @@ export class Embargo extends React.Component {
             forceRender: false,
         };
         this.timeout = null;
+        this.tooltip = null;
     }
 
     componentDidMount() {
         if (this.state.embargo) {
             if (this.elem) {
-                $(this.elem).tooltip({
+                this.tooltip = new Tooltip(this.elem, {
                     placement: 'bottom',
                     title: fullDate(this.state.embargo),
                 });
@@ -42,8 +44,8 @@ export class Embargo extends React.Component {
     }
 
     componentWillUnmount() {
-        if (this.elem) {
-            $(this.elem).tooltip('dispose');
+        if (this.elem && this.tooltip) {
+            this.tooltip.dispose();
         }
 
         if (this.timeout != null) {
@@ -60,7 +62,7 @@ export class Embargo extends React.Component {
             <span
                 ref={(elem) => this.elem = elem}
                 className={classNames('label', {
-                    'mr-2': !this.props.isCard,
+                    'me-2': !this.props.isCard,
                     'label--red': !this.state.forceRender,
                     'label--available': this.state.forceRender,
                 })}

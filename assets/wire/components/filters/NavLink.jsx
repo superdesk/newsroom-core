@@ -5,7 +5,7 @@ import classNames from 'classnames';
 function NavLink({isActive, onClick, label}) {
     return (
         <a href=''
-            className={classNames('btn btn-block', {
+            className={classNames('btn w-100', {
                 'btn-outline-primary': isActive,
                 'btn-outline-secondary': !isActive,
             })}

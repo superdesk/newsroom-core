@@ -261,7 +261,7 @@ class ContentActivity extends React.Component {
         return (
             <Fragment>
                 <div className="align-items-center d-flex flex-sm-nowrap flex-wrap m-0 px-3 wire-column__main-header-agenda">
-                    <div className='ml-3' style={{marginRight: '-1rem'}}>
+                    <div className='ms-3' style={{marginRight: '-1rem'}}>
                         <CalendarButton
                             key='content_activity_date'
                             selectDate={this.onDateChange}
@@ -283,7 +283,7 @@ class ContentActivity extends React.Component {
 
                     <button
                         key='content_activity_export'
-                        className="btn btn-outline-secondary ml-auto mr-3"
+                        className="btn btn-outline-secondary ms-auto me-3"
                         type="button"
                         onClick={this.exportToCSV}
                     >{gettext('Export to CSV')}</button>

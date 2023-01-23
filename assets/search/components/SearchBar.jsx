@@ -13,6 +13,7 @@ class SearchBar extends React.Component {
         this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.onClear = this.onClear.bind(this);
+        this.onFocus = this.onFocus.bind(this);
         this.state = {query: props.query || ''};
     }
 
@@ -30,6 +31,10 @@ class SearchBar extends React.Component {
         this.setState({query: ''});
     }
 
+    onFocus() {
+
+    }
+
     setAndFetch(q = '') {
         if (this.props.enableQueryAction) {
             this.props.setQuery(q);
@@ -45,21 +50,23 @@ class SearchBar extends React.Component {
 
     render() {
         return (
-            <div className="search form-inline">
+            <div className="search d-flex align-items-center">
                 <span className="search__icon">
                     <i className="icon--search icon--gray" />
                 </span>
                 <div className={classNames('search__form input-group', {
                     'searchForm--active': !!this.state.query,
                 })}>
-                    <form className='form-inline' role="search" aria-label={gettext('search')} onSubmit={this.onSubmit}>
-                        <input type='text'
+                    <form className='d-flex align-items-center' role="search" aria-label={gettext('search')} onSubmit={this.onSubmit}>
+                        <input
+                            type='text'
                             name='q'
                             className='search__input form-control'
                             placeholder={gettext('Search for...')}
                             aria-label={gettext('Search for...')}
                             value={this.state.query || ''}
                             onChange={this.onChange}
+                            onFocus={this.onFocus}
                         />
                         <div className='search__form__buttons'>
                             <button

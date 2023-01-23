@@ -5,14 +5,14 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import CalendarButtonWrapper from './CalendarButtonWrapper';
 
-import 'react-datepicker/dist/react-datepicker.css';
-import {AGENDA_DATE_FORMAT_SHORT, EARLIEST_DATE} from '../utils';
+import {AGENDA_DATE_PICKER_FORMAT_SHORT} from '../utils';
+import {EARLIEST_DATE} from '../agenda/utils';
 
 class CalendarButton extends React.Component {
     constructor (props) {
         super(props);
 
-        this.state = {startDate: moment(this.props.activeDate)};
+        this.state = {startDate: moment(this.props.activeDate).toDate()};
         this.handleChange = this.handleChange.bind(this);
     }
 
@@ -29,30 +29,27 @@ class CalendarButton extends React.Component {
         const isStartDateToday = moment.isMoment(this.state.startDate) && !this.state.startDate.isSame(moment(), 'day');
         const datePicker = (<DatePicker
             customInput={<CalendarButtonWrapper active={isStartDateToday}/>}
-            dateFormat={AGENDA_DATE_FORMAT_SHORT}
+            dateFormat={AGENDA_DATE_PICKER_FORMAT_SHORT}
             todayButton={gettext('Today')}
             selected={this.state.startDate}
             onChange={this.handleChange}
-            highlightDates={[moment()]}
+            highlightDates={[moment().toDate()]}
             locale={window.locale || 'en'}
-            popperModifiers={{
-                offset: {
-                    enabled: true,
-                    offset: '5px, 10px'
+            popperModifiers={[
+                {
+                    name: 'offset',
+                    options: {
+                        offset: [5, 10],
+                    },
                 },
-                preventOverflow: {
-                    enabled: true,
-                    escapeWithReference: false, // force popper to stay in viewport (even when input is scrolled out of view)
-                    boundariesElement: 'viewport'
-                }
-            }}
+            ]}
         />);
 
         if (!this.props.label) {
             return datePicker;
         } else {
             return (<div className={this.props.labelClass}>
-                <label className='pr-1'>{this.props.label}</label>
+                <label className='pe-1'>{this.props.label}</label>
                 {datePicker}
             </div>);
 

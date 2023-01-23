@@ -2,7 +2,7 @@
 
 .dropdown-menu {
   font-size: 0.875rem; // 14px
-  margin-top: 0px;
+  margin-block-start: 0px;
   border-radius: 0px;
   box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
   max-height: 60vh;
@@ -12,11 +12,16 @@
   [class^="icon--"], [class*=" icon--"] {
       vertical-align: middle;
   }
+  .card-header, .card-footer {
+    padding: 0.75rem 1.25rem;
+  }
 }
 
 .dropdown-menu-typeahead {
   overflow: visible;
   width: 400px;
+  top: 100%;
+  left: 0;
 
   @include phone {
     position: fixed;
@@ -43,9 +48,11 @@
 .dropdown-item {
   padding: 0.7rem 1rem;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 
   [class^="icon--"], [class*=" icon--"] {
-    margin-right: 1rem;
+    margin-inline-end: 1rem;
   }
 
   &--active {
@@ -86,10 +93,10 @@
 }
 
 .dropdown-menu-right {
-  right: 0;
-  left: auto !important;
+  inset-inline-end: 0;
+  inset-inline-start: auto !important;
   transform: initial !important;
-  top: 100% !important;
+  inset-block-start: 100% !important;
 }
 
 .dropdown-header {
@@ -97,7 +104,7 @@
   color: $body-text;
   font-weight: 500;
   padding: 1rem;
-  border-bottom: 1px solid #e7e7e7;
+  border-inline-end: 1px solid #e7e7e7;
 }
 
 .dropdown-divider {
@@ -105,7 +112,7 @@
 }
 
 .rbt-input-hint {
-  top: 3px !important;
+  inset-block-start: 3px !important;
   width: 100%;
 }
 

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import {Collapse} from 'bootstrap';
 
 export class CollapseBoxWithButton extends React.Component {
     constructor(props) {
@@ -8,21 +9,25 @@ export class CollapseBoxWithButton extends React.Component {
 
         this.state = {open: this.props.initiallyOpen};
         this.dom = {content: null};
+        this.collapse = null;
     }
 
     componentDidMount() {
-        $(this.dom.content).collapse({toggle: this.props.initiallyOpen});
-
-        $(this.dom.content).on('show.bs.collapse', () => {
-            this.setState({open: true});
-        });
-        $(this.dom.content).on('hide.bs.collapse', () => {
-            this.setState({open: false});
-        });
+        if (this.dom.content) {
+            this.collapse = new Collapse(this.dom.content, {toggle: this.props.initiallyOpen});
+            this.dom.content.addEventListener('show.bs.collapse', () => {
+                this.setState({open: true});
+            });
+            this.dom.content.addEventListener('hide.bs.collapse', () => {
+                this.setState({open: false});
+            });
+        }
     }
 
     componentWillUnmount() {
-        $(this.dom.content).collapse('dispose');
+        if (this.dom.content && this.collapse) {
+            this.collapse.dispose();
+        }
     }
 
     render() {
@@ -34,9 +39,9 @@ export class CollapseBoxWithButton extends React.Component {
                 className="d-flex flex-column collapse__container"
             >
                 <button
-                    className="btn d-flex align-items-center btn-outline-light mb-0"
+                    className="btn d-flex align-items-center btn-outline-light mb-0 mx-3"
                     type="button"
-                    data-toggle="collapse"
+                    data-bs-toggle="collapse"
                     data-target={`#${contentId}`}
                     onClick={() => {
                         if (this.state.open) {
@@ -48,7 +53,7 @@ export class CollapseBoxWithButton extends React.Component {
                 >
                     <span>{this.props.buttonText}</span>
                     <i className={classNames(
-                        'icon-small--arrow-down icon--gray-dark ml-auto',
+                        'icon-small--arrow-down icon--gray-dark ms-auto',
                         {'icon--rotate-180': this.state.open}
                     )} />
                 </button>

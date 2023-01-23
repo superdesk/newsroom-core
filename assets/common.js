@@ -1,8 +1,8 @@
 import 'alertifyjs';
 import 'babel-polyfill';
+
 import 'bootstrap';
 import 'classnames';
-import 'jquery';
 import 'lodash';
 import 'moment';
 import 'moment-timezone';
@@ -19,6 +19,8 @@ import 'reselect';
 import 'store';
 import 'url-search-params-polyfill';
 import 'whatwg-fetch';
+import 'react-datepicker';
+import './utils';
 
 export const KEYS = {
     ESCAPE: 'Escape',

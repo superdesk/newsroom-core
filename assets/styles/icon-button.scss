@@ -29,6 +29,10 @@
     @include icon-button-base();
     &:hover {
         border-color: $main-blue;
+        text-decoration: none;
+        [class^="icon--"], [class*=" icon--"] {
+            color: $main-blue;
+        }
     }
     &:focus {
         outline: 0;
@@ -50,6 +54,12 @@
         &:active {
             box-shadow: inset 0 1px 0 0 $gray-light;
         }
+    }
+    &--border-three-sides {
+        border-color: $gray-light;
+        border-width: 1px 1px 1px 0;
+        border-radius: 0 $border-radius $border-radius 0;
+        width: 38px;
     }
 }
 

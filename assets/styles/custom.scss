@@ -1,7 +1,9 @@
 // Bootstrap overrides - AAP Newsroom
 
 @import './custom-variables.scss'; // custom variables, Bootstrap overrides
+@import './custom-utilities.scss'; // custom utilities for RTL support
 @import '~bootstrap/scss/bootstrap'; // default Bootstrap from node modules
+@import './custom-mixins.scss'; // custom mixins, Bootstrap overrides
 @import './custom-buttons.scss'; // custom buttons
 @import './custom-forms.scss'; // custom forms
 @import './custom-modal.scss'; // custom modals
@@ -14,3 +16,4 @@
 @import './custom-popover.scss'; // custom popover
 @import './custom-display.scss'; // custom display properties
 @import './custom-collapse.scss'; // custom display properties
+@import '~react-datepicker/dist/react-datepicker.css';

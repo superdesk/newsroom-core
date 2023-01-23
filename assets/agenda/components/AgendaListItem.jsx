@@ -218,7 +218,7 @@ class AgendaListItem extends React.Component {
         const internalNote = getInternalNote(item, planningItem);
 
         return this.renderListItem(true, (
-            <div className='wire-articles__item-actions ml-0' onClick={this.stopPropagation}>
+            <div className='wire-articles__item-actions ms-0' onClick={this.stopPropagation}>
                 <AgendaInternalNote
                     internalNote={internalNote}
                     onlyIcon={true}

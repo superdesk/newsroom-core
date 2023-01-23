@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get} from 'lodash';
+import {Tooltip} from 'bootstrap';
 
 import {gettext} from 'utils';
 import {isTouchDevice} from '../utils';
@@ -14,6 +15,8 @@ class NotificationList extends React.Component {
             displayItems: false,
             connected: false,
         };
+        this.tooltip = null;
+        this.elem = null;
 
         this.websocketConnected = this.websocketConnected.bind(this);
         this.websocketDisconnected = this.websocketDisconnected.bind(this);
@@ -21,8 +24,8 @@ class NotificationList extends React.Component {
     }
 
     componentDidMount() {
-        if (!isTouchDevice()) {
-            this.elem && $(this.elem).tooltip && $(this.elem).tooltip();
+        if (!isTouchDevice() && this.elem) {
+            this.tooltip = new Tooltip(this.elem);
         }
 
         window.addEventListener('websocket:connected', this.websocketConnected);
@@ -30,7 +33,9 @@ class NotificationList extends React.Component {
     }
 
     componentWillUnmount() {
-        this.elem && $(this.elem).tooltip && $(this.elem).tooltip('dispose'); // make sure it's gone
+        if (this.elem && this.tooltip) {
+            this.tooltip.dispose();
+        }
 
         window.removeEventListener('websocket:connected', this.websocketConnected);
         window.removeEventListener('websocket:disconnected', this.websocketDisconnected);
@@ -65,7 +70,7 @@ class NotificationList extends React.Component {
             <div className="badge--top-right">
                 <h3 className="a11y-only">Notification Bell</h3>
                 {this.props.count > 0 &&
-                    <div className="badge badge-pill badge-info badge-secondary">
+                    <div className="badge rounded-pill bg-danger">
                         {this.props.count}
                     </div>
                 }
@@ -84,7 +89,7 @@ class NotificationList extends React.Component {
                 {!this.state.displayItems ? null : this.props.count === 0 ? (
                     <div className="notif__list">
                         <div className='notif__list__header d-flex'>
-                            <span className='notif__list__header-headline ml-3'>{gettext('Notifications')}</span>
+                            <span className='notif__list__header-headline ms-3'>{gettext('Notifications')}</span>
                         </div>
                         <div className='notif__list__message'>
                             {gettext('No new notifications!')}
@@ -93,10 +98,10 @@ class NotificationList extends React.Component {
                 ) : (
                     <div className="notif__list">
                         <div className='notif__list__header d-flex'>
-                            <span className='notif__list__header-headline ml-3'>{gettext('Notifications')}</span>
+                            <span className='notif__list__header-headline ms-3'>{gettext('Notifications')}</span>
                             <button
                                 type="button"
-                                className="button-pill ml-auto mr-3"
+                                className="button-pill ms-auto me-3"
                                 onClick={this.props.clearAll}>{gettext('Clear All')}
                             </button>
                         </div>

@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 
 import ExpiryButtonWrapper from './ExpiryButtonWrapper';
 
@@ -93,13 +92,14 @@ export default class ExpiryDateInput extends React.Component {
                         highlightDates={[moment()]}
                         locale={window.locale || 'en'}
                         minDate={new Date()}
-                        popperModifiers={{
-                            preventOverflow: {
-                                enabled: true,
-                                escapeWithReference: false, // force popper to stay in viewport (even when input is scrolled out of view)
-                                boundariesElement: 'viewport'
-                            }
-                        }}
+                        popperModifiers={[
+                            {
+                                name: 'offset',
+                                options: {
+                                    offset: [5, 10],
+                                },
+                            },
+                        ]}
                     />
                 </div>
                 {this.props.error && (

@@ -8,10 +8,10 @@ function DropdownFilterButton({id, isActive, autoToggle, onClick, icon, label}) 
             id={id}
             type="button"
             className={classNames(
-                'btn btn-outline-primary btn-sm d-flex align-items-center px-2 ml-2',
+                'btn btn-outline-primary btn-sm d-flex align-items-center px-2 ms-2',
                 {active: isActive}
             )}
-            data-toggle={autoToggle ? 'dropdown' : undefined}
+            data-bs-toggle={autoToggle ? 'dropdown' : undefined}
             aria-haspopup='true'
             aria-expanded='false'
             onClick={onClick}
@@ -21,7 +21,7 @@ function DropdownFilterButton({id, isActive, autoToggle, onClick, icon, label}) 
                 {label}
             </span>
             <i className={classNames(
-                'icon-small--arrow-down ml-1',
+                'icon-small--arrow-down ms-1',
                 {'icon--white': isActive}
             )} />
         </button>

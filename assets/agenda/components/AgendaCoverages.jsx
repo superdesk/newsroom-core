@@ -38,7 +38,7 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                 <div>
                     {coveragesWithoutState.map((coverage) => (
                         <i
-                            className={`icon--coverage-${getCoverageIcon(coverage.coverage_type)} mr-2`}
+                            className={`icon--coverage-${getCoverageIcon(coverage.coverage_type)} me-2`}
                             key={coverage.coverage_id}
                             title={getCoverageTooltip(coverage)}
                         />
@@ -60,21 +60,21 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                         title={getCoverageTooltip(coverage)}
                     >
                         <span className={classNames('coverage-item__coverage-icon', WORKFLOW_COLORS[coverage.workflow_status])}>
-                            <i className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} mr-2`}></i>
+                            <i className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} me-2`}></i>
                             <span>{`${getCoverageDisplayName(coverage.coverage_type)}${getSlugline(coverage)}`}</span>
                         </span>
                         {coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED && coverage.scheduled != null && (
                             <span className='d-flex text-nowrap'>
-                                <i className='icon-small--clock icon--gray-dark mr-1'></i>
-                                <span className='coverage-item__text-label mr-1'>{gettext('expected')}:</span>
+                                <i className='icon-small--clock icon--gray-dark me-1'></i>
+                                <span className='coverage-item__text-label me-1'>{gettext('expected')}:</span>
                                 <span>{formatCoverageDate(coverage)}</span>
                             </span>
                         )}
                     </div>
                     {coverage.coverage_provider && (
                         <div className='coverage-item__row'>
-                            <span className='coverage-item__text-label mr-1'>{gettext('Source')}:</span>
-                            <span className='mr-2'>{coverage.coverage_provider}</span>
+                            <span className='coverage-item__text-label me-1'>{gettext('Source')}:</span>
+                            <span className='me-2'>{coverage.coverage_provider}</span>
                         </div>
                     )}
                     <CoverageItemStatus

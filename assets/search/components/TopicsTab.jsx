@@ -12,7 +12,7 @@ import {CollapseBoxWithButton} from '../../ui/components/Collapse';
 import {TopicItem} from './TopicItem';
 import {globalTopicsEnabledSelector} from 'ui/selectors';
 
-const manageTopics = () => document.dispatchEvent(window.manageTopics);
+const manageTopics = () => document.dispatchEvent(new Event('manage_topics'));
 
 function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNewItems, globalTopicsEnabled}) {
     const clickTopic = (event, topic) => {
@@ -27,7 +27,7 @@ function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNew
     };
 
     const topicClass = (topic) => (
-        `btn btn-block btn-outline-${topic._id === activeTopicId ? 'primary' : 'secondary'}`
+        `btn w-100 btn-outline-${topic._id === activeTopicId ? 'primary' : 'secondary'}`
     );
 
     const activeTopicId = activeTopic ? activeTopic._id : null;

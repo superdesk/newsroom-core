@@ -18,6 +18,9 @@
         box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);
         z-index: 1007;
         flex: 0 0 auto;
+        align-items: stretch;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
 
         // [SDCP-609]: Commenting the next line until a better fix is implemented
         //overflow: hidden;
@@ -35,8 +38,8 @@
         }
 
         .badge {
-            top: -7px;
-            right: -7px;
+            inset-block-start: -7px;
+            inset-inline-end: -7px;
         }
         &:hover .notif__circle {
             background: #4a4a4a;
@@ -46,6 +49,14 @@
         &--small {
             height: 40px;
             width: 40px;
+        }
+    }
+    .navbar__date {
+        margin-inline-end: 0.5rem;
+        display: none;
+    
+        @include md {
+            display: block;
         }
     }
     .notif__circle {
@@ -63,8 +74,8 @@
     }
     .notif__list {
         position: absolute;
-        top: 44px;
-        right: 0px;
+        inset-block-start: 44px;
+        inset-block-end: 0px;
         background: $background-color;
         box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
         min-width: 300px;
@@ -77,7 +88,7 @@
     }
     .notif__list__header {
         background: #fff;
-        border-bottom: 1px solid #e7e7e7;
+        border-inline-end: 1px solid #e7e7e7;
         padding: 1rem 0;
     }
     .notif__list__header-headline {
@@ -107,7 +118,7 @@
             font-size: 1.1rem;
             font-weight: 400;
             text-shadow: none;
-            padding-left: 1px;
+            padding-inline-start: 1px;
 
             &:focus {
                 outline: 0;
@@ -119,18 +130,17 @@
         color: $body-text;
         font-weight: 700;
         line-height: 1.4;
-        margin-bottom: 6px;
+        margin-block-end: 6px;
     }
     .notif__list__info {
         font-size: 0.75rem;
-        color: $body-text;
-        margin-bottom: 6px;
-        font-weight: 700;
+        color: $gray-mid;
+        margin-block-end: 6px;
     }
 }
 
 .navbar-header {
-    top: 0px;
+    inset-block-start: 0px;
     z-index: 1007;
     width: 100vw;
     background-color: #2d2d2d;
@@ -162,7 +172,7 @@
         display: flex;
         height: 30px;
         justify-content: center;
-        padding-top: 5px;
+        padding-block-start: 5px;
 
         a {
             color: #969696;
@@ -176,7 +186,7 @@
     &_tagline {
         width: 50%;
         text-align: center;
-        left: 25%;
+        inset-inline-start: 25%;
         position: absolute;
     }
 }
@@ -192,6 +202,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    flex-grow: 0;
     padding: 0 0.5rem 0 0.5rem;
     max-width: 160px;
 
@@ -201,7 +213,7 @@
     }
 
     @include md {
-        padding-bottom: 0;
+        padding-block-end: 0;
     }
 
     img {
@@ -224,8 +236,11 @@
     }
 }
 .navbar-brand {
-    margin-top: 3.5px;
-    margin-left: 2rem;
+    display: flex;
+    align-items: center;
+    margin-block-start: 3.5px;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
     opacity: 1;
     line-height: 1.2rem;
     font-size: 1.125rem;
@@ -233,9 +248,12 @@
     @include sm {
         line-height: inherit;
         font-size: 1.75rem;
+        margin-inline-start: 0.25rem;
+        margin-inline-end: 1.5rem;
     }
     @include md {
-        margin-top: 0;
+        margin-block-start: 0;
+        margin-inline-start: 0.5rem;
     }
     nav {
         display: flex;
@@ -244,6 +262,21 @@
         @include sm {
             flex-direction: row;
             align-items: center;
+        }
+    }
+}
+.navbar__right {
+    display: flex;
+    align-items: center;
+    margin-inline-start: auto;
+    flex-shrink: 0;
+    flex-grow: 0;
+    
+    &--login {
+        padding-inline-end: 0.5rem;
+       
+        @include sm {
+            padding-inline-end: 1rem;
         }
     }
 }
@@ -276,7 +309,7 @@
     }
 
     @include sm {
-        margin-left: 4px;
+        margin-inline-start: 4px;
     }
 }
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {hasAttachments, getAttachments} from '../utils';
 
 import {gettext} from 'utils';
@@ -27,14 +28,14 @@ export default function AgendaAttachments({item}) {
             <div className={bem('coverage-item', 'column', 'grow')}>
                 <div className="coverage-item__row">
                     <span className="d-flex coverage-item--element-grow text-overflow-ellipsis">
-                        <i className="icon-small--attachment icon--green mr-2"></i>
+                        <i className="icon-small--attachment icon--green me-2"></i>
                         <span className="text-overflow-ellipsis">{attachment.name}</span>
                     </span>
                 </div>
                 <div className="coverage-item__row">
-                    <span className="coverage-item__text-label mr-1">{gettext('Size:')}</span>
-                    <span className="mr-2">{filesize(attachment.length)}</span>
-                    <span className="coverage-item__text-label mr-1">{gettext('MIME type:')}</span>
+                    <span className="coverage-item__text-label me-1">{gettext('Size:')}</span>
+                    <span className="me-2">{filesize(attachment.length)}</span>
+                    <span className="coverage-item__text-label me-1">{gettext('MIME type:')}</span>
                     <span>{attachment.mimetype}</span>
                 </div>
             </div>
@@ -46,3 +47,7 @@ export default function AgendaAttachments({item}) {
         </div>
     ));
 }
+
+AgendaAttachments.propTypes = {
+    item: PropTypes.object.isRequired,
+};

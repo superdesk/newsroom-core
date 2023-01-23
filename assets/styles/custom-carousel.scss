@@ -21,15 +21,15 @@
 
 .carousel-caption {
     text-align: left;
-    left: 10%;
-    right: 10%;
-    bottom: 0;
+    inset-inline-start: 10%;
+    inset-inline-end: 10%;
+    inset-block-end: 0;
     @include md {
-        bottom: 20px;
+        inset-block-end: 20px;
     }
     @include xl {
-        left: 5%;
-        right: 5%;
+        inset-inline-start: 5%;
+        inset-inline-end: 5%;
     }
 
     h3 {
@@ -44,10 +44,10 @@
 
 .carousel-overlay {
     position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
+    inset-block-start: 0;
+    inset-block-end: 0;
+    inset-inline-end: 0;
+    inset-inline-start: 0;
     background: -moz-linear-gradient(bottom,  rgba(0,0,0,.6) 0%, rgba(0,0,0,0) 50%);
     background: -webkit-linear-gradient(bottom,  rgba(0,0,0,.6) 0%,rgba(0,0,0,0) 50%);
     background: linear-gradient(to top,  rgba(0,0,0,.6) 0%,rgba(0,0,0,0) 50%);       
@@ -57,19 +57,19 @@
 .carousel-control-prev {
     width: 50px;
     height: 100px;
-    top: 50%;
-    margin-top: -50px;
+    inset-block-start: 50%;
+    margin-block-start: -50px;
     background-color: rgba(0,0,0,0.5);
 }
 .carousel-control-next {
     border-top-left-radius: 50px;
     border-bottom-left-radius: 50px;
-    padding-left: 10px;
+    padding-inline-start: 10px;
 }
 .carousel-control-prev {
     border-top-right-radius: 50px;
     border-bottom-right-radius: 50px;
-    padding-right: 10px;
+    padding-inline-end: 10px;
 }
 
 .carousel-control-next-icon,
