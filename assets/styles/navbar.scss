@@ -38,8 +38,8 @@
         }
 
         .badge {
-            inset-block-start: -7px;
-            inset-inline-end: -7px;
+            inset-block-start: -7px !important;
+            inset-inline-end: -7px !important;
         }
         &:hover .notif__circle {
             background: #4a4a4a;
