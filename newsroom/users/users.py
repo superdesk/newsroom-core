@@ -11,6 +11,7 @@ from newsroom.utils import set_original_creator, set_version_creator
 from superdesk.utils import is_hashed, get_hash
 from newsroom.auth.utils import is_current_user_admin, is_current_user_account_mgr, is_current_user_company_admin
 from newsroom.user_roles import UserRole
+from newsroom.signals import user_created, user_updated, user_deleted
 
 
 class UserData(TypedDict, total=False):
@@ -135,6 +136,11 @@ class UsersService(newsroom.Service):
             if doc.get("password", None) and not is_hashed(doc.get("password")):
                 doc["password"] = self._get_password_hash(doc["password"])
 
+    def on_created(self, docs):
+        super().on_created(docs)
+        for doc in docs:
+            user_created.send(self, user=doc)
+
     def on_update(self, updates, original):
         self.check_permissions(original, updates)
         set_version_creator(updates)
@@ -147,6 +153,9 @@ class UsersService(newsroom.Service):
         # set session locale if updating locale for current user
         if updates.get("locale") and original["_id"] == get_user_id() and updates["locale"] != original.get("locale"):
             session["locale"] = updates["locale"]
+        updated = original.copy()
+        updated.update(updates)
+        user_updated.send(self, user=updated, updates=updates)
 
     def _get_password_hash(self, password):
         return get_hash(password, app.config.get("BCRYPT_GENSALT_WORK_FACTOR", 12))
@@ -163,6 +172,7 @@ class UsersService(newsroom.Service):
 
     def on_deleted(self, doc):
         app.cache.delete(str(doc.get("_id")))
+        user_deleted.send(self, user=doc)
 
     def on_delete(self, doc):
         if doc.get("_id") == get_user_id():

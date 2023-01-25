@@ -7,6 +7,7 @@ from superdesk import get_resource_service
 from newsroom.auth import get_user_by_email
 from newsroom.utils import get_user_dict, get_company_dict, is_valid_user
 from newsroom.tests.fixtures import COMPANY_1_ID
+from newsroom.signals import user_created, user_updated, user_deleted
 from unittest import mock
 
 from tests.utils import mock_send_email
@@ -488,3 +489,76 @@ def test_account_manager_can_update_user(app, client):
     account_mgr["user_type"] = "administrator"
     response = client.post("users/5c5914275f627d5885fee6a8", data=account_mgr, follow_redirects=True)
     assert response.status_code == 401
+
+
+def test_signals(client, app):
+    created_listener = mock.Mock(return_value=None)
+    updated_listener = mock.Mock(return_value=None)
+    deleted_listener = mock.Mock(return_value=None)
+
+    # use weak to fix issue with weak ref and mock
+    user_created.connect(created_listener, weak=False)
+    user_updated.connect(updated_listener, weak=False)
+    user_deleted.connect(deleted_listener, weak=False)
+
+    user = {
+        "email": "foo1@bar.com",
+        "last_name": "bar1",
+        "first_name": "foo1",
+        "user_type": "public",
+        "company": ObjectId("59b4c5c61d41c8d736852fbf"),
+    }
+
+    resp = client.post(
+        "/users/new",
+        data=user,
+    )
+    assert resp.status_code == 201, resp.get_data(as_text=True)
+
+    created_listener.assert_called_once()
+    assert "_id" in created_listener.call_args.kwargs["user"]
+    assert user["email"] == created_listener.call_args.kwargs["user"]["email"]
+
+    user["email"] = "foo@example.com"
+    user["is_enabled"] = True
+    user_id = created_listener.call_args.kwargs["user"]["_id"]
+    resp = client.post(
+        f"/users/{user_id}",
+        data=user,
+    )
+    assert resp.status_code == 200, resp.get_data(as_text=True)
+
+    updated_listener.assert_called_once()
+    assert user_id == updated_listener.call_args.kwargs["user"]["_id"]
+    assert user["email"] == updated_listener.call_args.kwargs["user"]["email"]
+    updated_listener.reset_mock()
+
+    token = app.data.find_one("users", req=None, _id=user_id)["token"]
+
+    resp = client.get(f"/validate/{token}")
+    assert 302 == resp.status_code, resp.get_data(as_text=True)
+    updated_listener.assert_called_once()
+    updated_listener.reset_mock()
+
+    with mock.patch("newsroom.auth.utils.send_reset_password_email", autospec=True) as password_email:
+        resp = client.post(f"/users/{user_id}/reset_password")
+        assert 200 == resp.status_code, resp.get_data(as_text=True)
+        password_email.assert_called_once()
+        reset_token = password_email.call_args.args[2]
+        assert reset_token
+
+    updated_listener.reset_mock()
+    resp = client.post(
+        f"/reset_password/{reset_token}", data={"new_password": "newpassword123", "new_password2": "newpassword123"}
+    )
+    assert 302 == resp.status_code, resp.get_data(as_text=True)
+    updated_listener.assert_called_once()
+
+    resp = client.delete(
+        f"/users/{user_id}",
+    )
+    assert resp.status_code == 200, resp.get_data(as_text=True)
+
+    deleted_listener.assert_called_once()
+    assert user_id == deleted_listener.call_args.kwargs["user"]["_id"]
+    assert user["email"] == deleted_listener.call_args.kwargs["user"]["email"]
