@@ -27,34 +27,34 @@ const initialState = {
     sectionId: 'my_company',
     products: [],
     productId: null,
-}
+};
 
 export function companyAdminReducer(state = initialState, action) {
     switch (action.type) {
-        case INIT_VIEW_DATA:
-            return {
-                ...userReducer(state, action),
-                products: action.data.products,
-                company: action.data.companyId,
-            };
-        case SET_PRODUCT_FILTER:
-            return {
-                ...state,
-                productId: action.id,
-            };
-        case SET_SECTION:
-            return {
-                ...state,
-                sectionId: action.id,
-            };
+    case INIT_VIEW_DATA:
+        return {
+            ...userReducer(state, action),
+            products: action.data.products,
+            company: action.data.companyId,
+        };
+    case SET_PRODUCT_FILTER:
+        return {
+            ...state,
+            productId: action.id,
+        };
+    case SET_SECTION:
+        return {
+            ...state,
+            sectionId: action.id,
+        };
 
-        case RENDER_MODAL:
-        case CLOSE_MODAL:
-        case MODAL_FORM_VALID:
-        case MODAL_FORM_INVALID:
-            return {...state, modal: modalReducer(state.modal, action)};
+    case RENDER_MODAL:
+    case CLOSE_MODAL:
+    case MODAL_FORM_VALID:
+    case MODAL_FORM_INVALID:
+        return {...state, modal: modalReducer(state.modal, action)};
 
-        default:
-            return userReducer(state, action);
+    default:
+        return userReducer(state, action);
     }
 }

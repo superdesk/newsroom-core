@@ -16,7 +16,7 @@ import {FormToggle} from 'ui/components/FormToggle';
 import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserListItem';
 import {isProductEnabled} from 'companies/utils';
 
-import {companyProductSeatsSelector, sectionListSelector, currentCompanySelector, companySectionListSelector} from 'company-admin/selectors';
+import {companyProductSeatsSelector, currentCompanySelector, companySectionListSelector} from 'company-admin/selectors';
 
 const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
 

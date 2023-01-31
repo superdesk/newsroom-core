@@ -48,7 +48,7 @@ export class UserListSortFilter extends React.PureComponent {
         this.props.fetchUsers();
     }
 
-    getDropdownItems(filter, aggregations, toggleFilter, processBuckets, props) {
+    getDropdownItems(filter) {
         return this.sortFields.map((item, i) => (
             <button
                 key={i}
@@ -108,7 +108,7 @@ export class UserListSortFilter extends React.PureComponent {
                     </button>
                 </div>
             </React.Fragment>
-        )
+        );
     }
 }
 
@@ -118,4 +118,4 @@ UserListSortFilter.propTypes = {
     setSort: PropTypes.func,
     toggleSortDirection: PropTypes.func,
     fetchUsers: PropTypes.func,
-}
+};

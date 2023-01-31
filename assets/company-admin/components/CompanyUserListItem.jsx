@@ -2,7 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import {gettext, fullDate} from "utils";
+import {gettext, fullDate} from 'utils';
 
 export function getUserStateLabelDetails(user) {
     if (user.is_approved && user.is_enabled) {

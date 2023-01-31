@@ -18,14 +18,13 @@ function CompanyDetailsComponent({company, showSeatRequestModal, setSection, com
             <h3 className="home-section-heading">{company.name}</h3>
             <table className="table table--hollow">
                 <thead>
-                <tr>
-                    <th>{gettext('Products')}</th>
-                    <th>{gettext('Users')}</th>
-                    <th colSpan={numSections}>{gettext('Description')}</th>
-                </tr>
+                    <tr>
+                        <th>{gettext('Products')}</th>
+                        <th>{gettext('Users')}</th>
+                        <th colSpan={numSections}>{gettext('Description')}</th>
+                    </tr>
                 </thead>
                 <tbody>
-
                     {sections.map((section) => (
                         <React.Fragment key={section._id}>
                             <tr colSpan={2 + numSections} className="subheading">

@@ -36,7 +36,7 @@ export class FormToggle extends React.Component {
                     this.props.children
                 )}
             </React.Fragment>
-        )
+        );
     }
 }
 
@@ -47,4 +47,4 @@ FormToggle.propTypes = {
         PropTypes.arrayOf(PropTypes.node),
         PropTypes.node,
     ]).isRequired,
-}
+};

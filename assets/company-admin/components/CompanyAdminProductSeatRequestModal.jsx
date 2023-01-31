@@ -33,7 +33,7 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component {
             note: this.state.note,
         }).then(() => {
             this.props.closeModal();
-        })
+        });
     }
 
     toggleProduct(productId) {
@@ -146,7 +146,7 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component {
                     />
                 </form>
             </Modal>
-        )
+        );
     }
 }
 

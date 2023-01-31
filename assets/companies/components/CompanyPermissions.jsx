@@ -5,7 +5,6 @@ import {gettext} from 'utils';
 import {get} from 'lodash';
 
 import CheckboxInput from 'components/CheckboxInput';
-import TextInput from 'components/TextInput';
 
 import {savePermissions} from '../actions';
 
@@ -153,7 +152,7 @@ class CompanyPermissions extends React.Component {
                                                                     id={`${product._id}_seats`}
                                                                     name={`${product._id}_seats`}
                                                                     className="form-control"
-                                                                    style={{maxWidth: "100px"}}
+                                                                    style={{maxWidth: '100px'}}
                                                                     min="0"
                                                                     tabIndex="0"
                                                                     value={(this.state.seats[product._id] || 0).toString()}

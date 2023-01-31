@@ -24,7 +24,7 @@ export function CompanyDetailsProductRow({seat, onNameClicked, showSeatRequestMo
                 </button>
             </td>
         </tr>
-    )
+    );
 }
 
 CompanyDetailsProductRow.propTypes = {
@@ -39,4 +39,4 @@ CompanyDetailsProductRow.propTypes = {
     }),
     onNameClicked: PropTypes.func,
     showSeatRequestModal: PropTypes.func,
-}
+};

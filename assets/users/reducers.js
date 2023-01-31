@@ -43,7 +43,7 @@ export default function userReducer(state = initialState, action) {
             ...state,
             sections: action.data.sections,
             products: action.data.products,
-        }
+        };
     case SELECT_USER: {
         const defaultUser = {
             user_type: 'public',
@@ -104,7 +104,7 @@ export default function userReducer(state = initialState, action) {
                 user.products = user.products.filter((product) => product._id !== productId);
             }
         } else {
-            user[field] = value
+            user[field] = value;
         }
 
         return {...state, userToEdit: user, errors: null};

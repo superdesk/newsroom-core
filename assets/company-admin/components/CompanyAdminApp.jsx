@@ -67,7 +67,7 @@ class CompanyAdminAppComponent extends React.Component {
         event.preventDefault();
 
         confirm(gettext('Would you like to delete user: {{ name }}', {name: this.props.userToEdit.first_name})) &&
-            this.props.deleteUser()
+            this.props.deleteUser();
     }
 
     renderModal() {
@@ -83,7 +83,6 @@ class CompanyAdminAppComponent extends React.Component {
     }
 
     setProductFilterQuery(query) {
-        console.log(query);
         this.setState({productFilter: query});
     }
 

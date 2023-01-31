@@ -45,7 +45,7 @@ function UsersApp(props) {
             <div className="content-bar-divider" />
         </ListBar>,
         <Users key="Users" />
-    ])
+    ]);
 }
 
 const mapStateToProps = (state) => ({

@@ -52,7 +52,7 @@ export class UserListCompanyFilter extends React.PureComponent {
                     iconColour: 'gray-dark'
                 }}
             />
-        )
+        );
     }
 }
 
@@ -62,4 +62,4 @@ UserListCompanyFilter.propTypes = {
 
     setCompany: PropTypes.func,
     fetchUsers: PropTypes.func,
-}
+};

@@ -30,7 +30,7 @@ class CompanyDetailsProductFilterComponent extends React.PureComponent {
 
         return this.props.products
             .filter((product) => sectionIds.includes(product.product_type))
-            .map((product, i) => (
+            .map((product) => (
                 <button
                     key={product._id}
                     className="dropdown-item"
@@ -63,7 +63,7 @@ class CompanyDetailsProductFilterComponent extends React.PureComponent {
                     iconColour: 'gray-dark'
                 }}
             />
-        )
+        );
     }
 }
 

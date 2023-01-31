@@ -12,7 +12,7 @@ export const productIdMapSelector = createSelector(
             return products;
         }, {})
     )
-)
+);
 export const companyListSelector = (state) => state.companies;
 
 export const companySectionListSelector = createSelector(
@@ -94,9 +94,9 @@ export const companyProductSeatsSelector = createSelector(
                     return productSeats;
                 },
                 {}
-            )
+            );
 
             return companyProducts;
         }, {})
     )
-)
+);

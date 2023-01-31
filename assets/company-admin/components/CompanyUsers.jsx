@@ -43,7 +43,7 @@ function CompanyUsersComponent({users, usersById, selectUser, activeUserId, curr
                 ))}
             </tbody>
         </table>
-    )
+    );
 }
 
 CompanyUsersComponent.propTypes = {

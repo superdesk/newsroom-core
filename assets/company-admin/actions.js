@@ -28,5 +28,5 @@ export function sendProductSeatRequest(data) {
         return server.post('/company_admin/send_product_seat_request', data)
             .then(() => notify.success(gettext('Product Seat request sent')))
             .catch((error) => errorHandler(error, dispatch, setError));
-    }
+    };
 }
