@@ -42,9 +42,9 @@ describe('utils', () => {
                 },
             ];
 
-            const groupedItems = keyBy(utils.groupItems(items, '2018-10-16', 'day'), 'date');
+            const groupedItems = keyBy(utils.groupItems(items, '2018-10-21', 'day'), 'date');
 
-            expect(groupedItems.hasOwnProperty('15-10-2018')).toBe(false);
+            expect(groupedItems['15-10-2018']['items']).toEqual(['foo']);
             expect(groupedItems['16-10-2018']['items']).toEqual(['foo']);
             expect(groupedItems['17-10-2018']['items']).toEqual(['foo', 'bar']);
             expect(groupedItems['18-10-2018']['items']).toEqual(['bar']);
