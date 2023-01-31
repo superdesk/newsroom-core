@@ -38,7 +38,7 @@ $tag-text-palette: $tag-text-colors !default;
     min-width: 1.8em;
     padding: 0;
     padding-inline: 1em 1em;
-    border-radius: 9999px;
+    border-radius: 9999px !important;
     font-size: 0.875rem;
     position: relative;
     text-align: center;

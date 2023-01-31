@@ -40,6 +40,10 @@ import {toggleValue} from 'utils';
 import {topicsReducer} from './topics/reducer';
 
 export function modalReducer(state, action) {
+    if (!action) {
+        return state;
+    }
+
     switch (action.type) {
     case RENDER_MODAL:
         return {

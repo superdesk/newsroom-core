@@ -10,7 +10,7 @@ const AMNewsIcon = ({iconType, borderRight, toolTip}) => {
         bem('wire-articles__item', 'meta-time', {'border-right': borderRight})
     );
     return (
-        <div className={css} data-bs-toggle="tooltip" data-placement="left" title={toolTip}>
+        <div className={css} data-bs-toggle="tooltip" data-bs-placement="left" title={toolTip}>
             <i className={`icon--${iconType}`}></i>
         </div>
     );
