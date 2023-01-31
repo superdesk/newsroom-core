@@ -47,14 +47,16 @@ def company_admin_only(f):
         if not is_current_user_company_admin() or not is_valid_session():
             return abort(403)
         return f(*args, **kwargs)
-    
+
     return decorated_function
 
 
 def account_manager_or_company_admin_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if (not is_current_user_admin() and not is_current_user_account_mgr() and not is_current_user_company_admin()) or not is_valid_session():
+        if (
+            not is_current_user_admin() and not is_current_user_account_mgr() and not is_current_user_company_admin()
+        ) or not is_valid_session():
             return abort(403)
         return f(*args, **kwargs)
 

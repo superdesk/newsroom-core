@@ -57,9 +57,11 @@ def send_product_seat_request_email():
     if len(errors):
         return jsonify({"errors": errors}), 400
 
-    products = list(query_resource("products", lookup={"_id": {"$in": [
-        ObjectId(product_id) for product_id in data["product_ids"]
-    ]}}))
+    products = list(
+        query_resource(
+            "products", lookup={"_id": {"$in": [ObjectId(product_id) for product_id in data["product_ids"]]}}
+        )
+    )
 
     general_settings = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
     if not general_settings:

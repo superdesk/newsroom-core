@@ -160,11 +160,14 @@ def get_product_updates(updates: Dict[str, bool], seats: Dict[str, int]):
     if not product_ids:
         return []
     products = list(query_resource("products", lookup={"_id": {"$in": product_ids}}))
-    return [{
-        "_id": product["_id"],
-        "section": product.get("product_type") or "wire",
-        "seats": seats.get(str(product["_id"])) or 0,
-    } for product in products]
+    return [
+        {
+            "_id": product["_id"],
+            "section": product.get("product_type") or "wire",
+            "seats": seats.get(str(product["_id"])) or 0,
+        }
+        for product in products
+    ]
 
 
 def update_company(data, _id):
@@ -181,10 +184,7 @@ def update_company(data, _id):
 def save_company_permissions(_id):
     orig = get_entity_or_404(_id, "companies")
     data = get_json_or_400()
-    seats = {
-        product["_id"]: product.get("seats") or 0
-        for product in orig.get("products") or []
-    }
+    seats = {product["_id"]: product.get("seats") or 0 for product in orig.get("products") or []}
     if data.get("seats"):
         seats.update(data["seats"])
     if data.get("products"):

@@ -183,5 +183,5 @@ class UsersService(newsroom.Service):
             manager = get_user()
             if doc.get("company") and doc["company"] == manager.get("company"):
                 if not updates or all([key in COMPANY_ADMIN_ALLOWED_UPDATES for key in updates.keys()]):
-                    return        
+                    return
         abort(403)

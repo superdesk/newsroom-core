@@ -2,7 +2,7 @@ import re
 
 import flask
 from bson import ObjectId
-from flask import jsonify, current_app as app, request
+from flask import jsonify, current_app as app
 from flask_babel import gettext
 from superdesk import get_resource_service
 from werkzeug.exceptions import BadRequest, NotFound
@@ -37,7 +37,7 @@ def get_settings_data():
         "users": list(query_resource("users")),
         "companies": list(query_resource("companies")),
         "sections": app.sections,
-        "products": list(query_resource("products"))
+        "products": list(query_resource("products")),
     }
 
 
@@ -79,7 +79,7 @@ def search():
 
     if flask.request.args.get("ids"):
         lookup = {"_id": {"$in": (flask.request.args.get("ids") or "").split(",")}}
-    
+
     if is_current_user_company_admin():
         # Make sure this request only searches for the current users company
         company = get_company()
@@ -89,7 +89,7 @@ def search():
 
         if lookup is None:
             lookup = {}
-        
+
         lookup["company"] = company["_id"]
 
     users = list(query_resource("users", lookup=lookup))
@@ -111,7 +111,7 @@ def create():
             company = get_company()
             if company is None:
                 flask.abort(401)
-            
+
             # Make sure this new user is associated with ``company`` and as a ``PUBLIC`` user
             new_user["company"] = company["_id"]
             new_user["user_type"] = UserRole.PUBLIC.value
@@ -143,8 +143,10 @@ def _is_email_address_valid(email):
 @login_required
 def edit(_id):
     user_is_company_admin = is_current_user_company_admin()
-    
-    if not (is_current_user_admin() or is_current_user_account_mgr() or user_is_company_admin) and not is_current_user(_id):
+
+    if not (is_current_user_admin() or is_current_user_account_mgr() or user_is_company_admin) and not is_current_user(
+        _id
+    ):
         flask.abort(401)
 
     user = find_one("users", _id=ObjectId(_id))
@@ -176,8 +178,7 @@ def edit(_id):
 
             if "sections" in updates:
                 updates["sections"] = {
-                    section["_id"]: section["_id"] in (form.sections.data or [])
-                    for section in app.sections
+                    section["_id"]: section["_id"] in (form.sections.data or []) for section in app.sections
                 }
 
             if "products" in updates:
@@ -187,8 +188,7 @@ def edit(_id):
                     for product in query_resource("products", lookup={"_id": {"$in": product_ids}})
                 }
                 updates["products"] = [
-                    {"_id": product["_id"], "section": product["product_type"]}
-                    for product in products.values()
+                    {"_id": product["_id"], "section": product["product_type"]} for product in products.values()
                 ]
 
             if user_is_company_admin:
