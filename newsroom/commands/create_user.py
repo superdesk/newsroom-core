@@ -1,5 +1,7 @@
+from flask import session
 from superdesk import get_resource_service
 
+from newsroom.user_roles import UserRole
 from newsroom.auth import get_user_by_email
 from .manager import app, manager
 
@@ -28,7 +30,7 @@ def create_user(email, password, first_name, last_name, is_admin):
     }
 
     with app.test_request_context("/users", method="POST"):
-
+        session["user_type"] = UserRole.ADMINISTRATOR.value
         user = get_user_by_email(email)
 
         if user:
