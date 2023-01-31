@@ -9,18 +9,17 @@ function CheckboxInput({name, label, onChange, value, labelClass, readOnly}) {
     }
 
     return (
-        <div className='form-check p-0'>                
-            <div className='form-check' tabIndex='-1'>
-                <input type="checkbox"
-                    name={name}
-                    className="form-check-input"
-                    checked={value}
-                    id={name}
-                    onChange={onChange}
-                    disabled={readOnly}
-                    tabIndex='0' />
-                <label className={classNames('form-check-label', labelClass)} htmlFor={name}>{label}</label>
-            </div>
+        <div className='form-check' tabIndex='-1'>
+            <input type="checkbox"
+                name={name}
+                className="form-check-input"
+                checked={value}
+                id={name}
+                onChange={onChange}
+                disabled={readOnly}
+                tabIndex='0'
+            />
+            <label className={classNames('form-check-label', labelClass)} htmlFor={name}>{label}</label>
         </div>
     );
 }

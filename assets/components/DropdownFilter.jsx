@@ -37,6 +37,7 @@ function DropdownFilter({
     getDropdownItems,
     getFilterLabel,
     className,
+    buttonProps,
     ...props}) {
     const isActive = !!(activeFilter[filter.field]);
     const filterLabel = getFilterLabel ? getFilterLabel : getActiveFilterLabel;
@@ -52,6 +53,8 @@ function DropdownFilter({
             onClick={props.onClick}
             icon={filter.icon}
             label={filterLabel(filter, activeFilter, isActive, {...props})}
+            textOnly={(buttonProps || {}).textOnly}
+            iconColour={(buttonProps || {}).iconColour}
         />
         <div className='dropdown-menu' aria-labelledby={filter.field}>
             <button
@@ -75,6 +78,10 @@ DropdownFilter.propTypes = {
     className: PropTypes.string,
     autoToggle: PropTypes.bool,
     onClick: PropTypes.func,
+    buttonProps: PropTypes.shape({
+        textOnly: PropTypes.bool,
+        iconColour: PropTypes.string,
+    }),
 };
 
 export default DropdownFilter;

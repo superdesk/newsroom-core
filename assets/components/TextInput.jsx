@@ -9,6 +9,7 @@ function TextInput({
     type,
     name,
     label,
+    labelClasses,
     onChange,
     value,
     error,
@@ -25,18 +26,18 @@ function TextInput({
     return (
         <InputWrapper error={error} name={name}>
             {label && (
-                <label htmlFor={name}>{label}</label>
+                <label htmlFor={name} className={labelClasses}>{label}</label>
             )}
             {copyAction &&
-                <button  
-                    className='icon-button' 
+                <button
+                    className='icon-button'
                     onClick={(e) => {e.preventDefault();navigator.clipboard.writeText(value);}}
                     title={gettext('Copy')}
                 >
                     <i className='icon--copy'></i>
                 </button>
-            }    
-            
+            }
+
             <div className="field">
                 <input
                     type={type || 'text'}
@@ -63,6 +64,7 @@ function TextInput({
 TextInput.propTypes = {
     type: PropTypes.string,
     label: PropTypes.string,
+    labelClasses: PropTypes.string,
     name: PropTypes.string,
     value: PropTypes.string,
     copyAction: PropTypes.bool,
