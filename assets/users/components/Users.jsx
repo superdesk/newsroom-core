@@ -98,6 +98,7 @@ class Users extends React.Component {
                         onClose={this.props.cancelEdit}
                         onDelete={this.deleteUser}
                         currentUser={this.props.currentUser}
+                        products={this.props.products}
                     />
                 }
             </div>
@@ -124,6 +125,7 @@ Users.propTypes = {
     errors: PropTypes.object,
     dispatch: PropTypes.func,
     currentUser: PropTypes.object,
+    products: PropTypes.arrayOf(PropTypes.object),
 };
 
 const mapStateToProps = (state) => ({
@@ -137,6 +139,7 @@ const mapStateToProps = (state) => ({
     companiesById: state.companiesById,
     errors: state.errors,
     currentUser: userSelector(state),
+    products: state.products,
 });
 
 const mapDispatchToProps = (dispatch) => ({
