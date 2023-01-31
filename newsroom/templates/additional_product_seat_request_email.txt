@@ -1,0 +1,11 @@
+{% extends "email_layout.txt" %}
+{% block content %}
+A request from {{ user.email }} from {{ company.name }} has been received for additional Product Seats
+Additional Seats Requested: {{ number_of_seats }}
+
+Products:
+{% for product in products %}
+* {{ product.name }}
+{% endfor %}
+{% if note %}Note: {{ note }}{% endif %}
+{% endblock %}

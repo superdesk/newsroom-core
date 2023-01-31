@@ -88,6 +88,7 @@ def validate_general_settings(values):
         "company_expiry_alert_recipients",
         "coverage_request_recipients",
         "system_alerts_recipients",
+        "product_seat_request_recipients",
     ]
     for field in fields:
         field_txt = (
@@ -140,6 +141,11 @@ def init_app(app):
         "monitoring_report_logo_path",
         lazy_gettext("Monitoring report logo image"),
         description=lazy_gettext("Monitoring report logo image (jpg or png) for RTF reports."),
+    )
+    app.general_setting(
+        "product_seat_request_recipients",
+        lazy_gettext("Product Seat request recipients"),
+        description=lazy_gettext("Comma separated list of email addresses who will receive product seat requests."),
     )
 
 

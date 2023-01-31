@@ -1,0 +1,13 @@
+{% extends "email_layout.html" %}
+
+{% block content %}
+<p>A request from {{ user.email }} from {{ company.name }} has been received for additional Product Seats</p>
+<p>Additional Seats Requested: {{ number_of_seats }}</p>
+<p>Products:</p>
+<ul>
+    {% for product in products %}
+    <li>{{ product.name }}</li>
+    {% endfor %}
+</ul>
+{% if note %}<pre>Note: {{ note }}</pre>{% endif %}
+{% endblock %}
