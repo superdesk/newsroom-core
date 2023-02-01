@@ -101,6 +101,7 @@ class FiltersTab extends React.Component {
             aggregations={this.props.aggregations}
             toggleGroup={this.toggleGroup}
             toggleFilter={this.updateFilter}
+            isLoading={this.props.isLoading}
         />);
     }
 
@@ -158,6 +159,7 @@ FiltersTab.propTypes = {
     activeFilter: PropTypes.object,
     createdFilter: PropTypes.object.isRequired,
     resultsFiltered: PropTypes.bool.isRequired,
+    isLoading: PropTypes.bool,
 
     resetFilter: PropTypes.func.isRequired,
     updateFilterStateAndURL: PropTypes.func.isRequired,
@@ -171,6 +173,7 @@ const mapStateToProps = (state) => ({
     activeFilter: searchFilterSelector(state),
     createdFilter: searchCreatedSelector(state),
     resultsFiltered: resultsFilteredSelector(state),
+    isLoading: state.loadingAggregations,
 });
 
 const mapDispatchToProps = {

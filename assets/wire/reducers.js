@@ -4,6 +4,8 @@ import {
     TOGGLE_NEWS,
     TOGGLE_SEARCH_ALL_VERSIONS,
     WIRE_ITEM_REMOVED,
+    RECIEVE_AGGS,
+    LOADING_AGGREGATIONS,
 } from './actions';
 
 import {get, cloneDeep} from 'lodash';
@@ -41,6 +43,7 @@ const initialState = {
     uiConfig: {},
     groups: [],
     searchInitiated: false,
+    loadingAggregations: false,
 };
 
 function recieveItems(state, data) {
@@ -62,9 +65,16 @@ function recieveItems(state, data) {
         matchedIds,
         isLoading: false,
         totalItems: data._meta.total,
-        aggregations: data._aggregations || null,
         newItems: [],
         searchInitiated: false,
+    };
+}
+
+function recieveAggs(state, data) {
+    return {
+        ...state,
+        aggregations: data._aggregations || null,
+        loadingAggregations: false,
     };
 }
 
@@ -131,6 +141,12 @@ export default function wireReducer(state = initialState, action) {
 
     case RECIEVE_ITEMS:
         return recieveItems(state, action.data);
+
+    case RECIEVE_AGGS:
+        return recieveAggs(state, action.data);
+
+    case LOADING_AGGREGATIONS:
+        return {...state, loadingAggregations: true};
 
     case INIT_DATA: {
         const navigations = get(action, 'wireData.navigations', []);
