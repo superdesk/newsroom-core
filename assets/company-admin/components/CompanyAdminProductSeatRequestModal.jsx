@@ -6,6 +6,7 @@ import {get} from 'lodash';
 import {sendProductSeatRequest} from '../actions';
 import {closeModal} from 'actions';
 import {gettext} from 'utils';
+import {currentCompanySectionListSelector, productListSelector} from '../selectors';
 
 import Modal from 'components/Modal';
 import TextInput from 'components/TextInput';
@@ -63,10 +64,9 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component {
             products.push({
                 _id: section._id,
                 name: section.name,
-                products: this.props.products.filter((product) => (
-                    product.product_type === section._id &&
-                    !this.state.productIds.includes(product._id)
-                )),
+                products: this.props.products.filter(
+                    (product) => (product.product_type === section._id)
+                ),
             });
         });
 
@@ -109,6 +109,7 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component {
                                             <button
                                                 className="dropdown-item"
                                                 onClick={() => this.toggleProduct(product._id)}
+                                                disabled={this.state.productIds.includes(product._id)}
                                             >
                                                 {product.name}
                                             </button>
@@ -162,10 +163,9 @@ CompanyAdminProductSeatRequestModalComponent.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-    products: state.products,
+    products: productListSelector(state),
     productIds: get(state, 'modal.data.productIds') || [],
-
-    sections: state.sections,
+    sections: currentCompanySectionListSelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({
