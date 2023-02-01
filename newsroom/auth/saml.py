@@ -81,7 +81,7 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
     return userdata
 
 
-@blueprint.route("/api/login/saml", methods=["GET", "POST"])
+@blueprint.route("/login/saml", methods=["GET", "POST"])
 def saml():
     req = prepare_flask_request(request)
     auth = init_saml_auth(req)
@@ -127,7 +127,7 @@ def saml():
     return redirect(auth.login())
 
 
-@blueprint.route("/api/login/saml_metadata")
+@blueprint.route("/login/saml_metadata")
 def saml_metadata():
     req = prepare_flask_request(request)
     auth = init_saml_auth(req)

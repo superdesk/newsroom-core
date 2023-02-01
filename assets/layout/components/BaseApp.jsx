@@ -19,6 +19,7 @@ export default class BaseApp extends React.Component {
         this.state = {
             withSidebar: props.bookmarks !== true && getFilterPanelOpenState(props.context),
             minimizeSearchResults: isMobilePhone(),
+            initialLoad: props.isLoading,
         };
 
         this.dom = {
@@ -43,6 +44,14 @@ export default class BaseApp extends React.Component {
             {id: 'topics', label: gettext('My Topics'), component: TopicsTab},
             {id: 'filters', label: gettext('Filters'), component: FiltersTab},
         ];
+    }
+
+    static getDerivedStateFromProps(props) {
+        if (props.isLoading === false) {
+            return {initialLoad: false};
+        }
+
+        return null;
     }
 
     setOpenRef(elem) {
@@ -100,6 +109,14 @@ export default class BaseApp extends React.Component {
         }
 
         return createPortal(this.props.savedItemsCount, dest);
+    }
+
+    renderLoader() {
+        return (
+            <div className="d-flex justify-content-center h-50">
+                <div className="spinner-border text-muted m-5 align-self-center" />
+            </div>
+        );
     }
 
     toggleSidebar(event) {
@@ -190,4 +207,5 @@ BaseApp.propTypes = {
     fetchMoreItems: PropTypes.func.isRequired,
     savedItemsCount: PropTypes.number,
     bookmarks: PropTypes.bool,
+    isLoading: PropTypes.bool,
 };

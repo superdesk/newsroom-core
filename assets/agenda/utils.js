@@ -192,8 +192,8 @@ export function isWatched(item, userId) {
  * @param {String} dateString
  * @return {Boolean}
  */
-export function isCoverageForExtraDay(coverage, dateString) {
-    return coverage.scheduled != null && formatDate(moment(coverage.scheduled)) === dateString;
+export function isCoverageForExtraDay(coverage) {
+    return coverage.scheduled != null;
 }
 
 /**
@@ -226,8 +226,8 @@ export function getLocationString(item) {
     return [
         get(item, 'location.0.name', get(item, 'location.0.address.title')),
         get(item, 'location.0.address.line.0'),
-        get(item, 'location.0.address.area'),
-        get(item, 'location.0.address.locality'),
+        get(item, 'location.0.address.city') || get(item, 'location.0.address.area'),
+        get(item, 'location.0.address.state') || get(item, 'location.0.address.locality'),
         get(item, 'location.0.address.postal_code'),
         get(item, 'location.0.address.country'),
     ].filter((d) => d).join(', ');
@@ -850,6 +850,7 @@ export function formatCoverageDate(coverage) {
 export const getCoverageTooltip = (coverage, beingUpdated) => {
     const slugline = coverage.item_slugline || coverage.slugline;
     const coverageType = getCoverageDisplayName(coverage.coverage_type);
+    const coverageScheduled = moment(coverage.scheduled);
 
     if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
         return gettext('{{ type }} coverage {{ slugline }} {{ status_text }}', {
@@ -861,15 +862,15 @@ export const getCoverageTooltip = (coverage, beingUpdated) => {
         return gettext('Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}}', {
             type: coverageType,
             slugline: slugline,
-            date: formatDate(coverage.scheduled),
-            time: formatTime(coverage.scheduled)
+            date: formatDate(coverageScheduled),
+            time: formatTime(coverageScheduled),
         });
     } else if (coverage.workflow_status === WORKFLOW_STATUS.ACTIVE) {
         return gettext('{{ type }} coverage {{ slugline }} in progress, expected {{date}} at {{time}}', {
             type: coverageType,
             slugline: slugline,
-            date: formatDate(coverage.scheduled),
-            time: formatTime(coverage.scheduled)
+            date: formatDate(coverageScheduled),
+            time: formatTime(coverageScheduled),
         });
     } else if (coverage.workflow_status === WORKFLOW_STATUS.CANCELLED) {
         return gettext('{{ type }} coverage {{slugline}} cancelled', {

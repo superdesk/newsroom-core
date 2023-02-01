@@ -3,6 +3,7 @@ from flask import json
 from datetime import datetime
 from urllib import parse
 from unittest import mock
+from pytest import fixture
 
 import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import (
@@ -70,6 +71,37 @@ test_planning = {
 }
 
 
+@fixture
+def agenda_user(client, app):
+    app.data.insert(
+        "products",
+        [
+            {
+                "_id": 12,
+                "name": "product test",
+                "query": "headline:test",
+                "companies": [COMPANY_1_ID],
+                "is_enabled": True,
+                "product_type": "agenda",
+            },
+            {
+                "_id": 13,
+                "name": "product test 2",
+                "query": "slugline:prime",
+                "companies": [COMPANY_1_ID],
+                "is_enabled": True,
+                "product_type": "agenda",
+            },
+        ],
+    )
+
+    with client.session_transaction() as session:
+        session["user"] = PUBLIC_USER_ID
+        session["user_type"] = "public"
+
+    return PUBLIC_USER_ID
+
+
 def mock_utcnow():
     return datetime.strptime("2018-11-23T22:00:00", date_time_format)
 
@@ -110,6 +142,13 @@ def get_bookmarks_count(client, user):
     assert resp.status_code == 200
     data = json.loads(resp.get_data())
     return data["_meta"]["total"]
+
+
+def test_basic_search(client, agenda_user):
+    resp = client.get("/agenda/search?q=headline")
+    assert resp.status_code == 200
+    data = json.loads(resp.get_data())
+    assert data["_meta"]["total"]
 
 
 def test_bookmarks(client, app):

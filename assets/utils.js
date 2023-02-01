@@ -185,7 +185,7 @@ export function getProductQuery(product) {
  * Parse given date string and return Date instance
  *
  * @param {String} dateString
- * @param {String} ignoreTimezone - avoid converting time to different timezone, will output the date as it is
+ * @param {Boolean} ignoreTimezone - avoid converting time to different timezone, will output the date as it is
  * @return {Date}
  */
 export function parseDate(dateString, ignoreTimezone = false) {
@@ -436,7 +436,7 @@ export function formatAgendaDate(item, group, {localTimeZone = true, onlyDates =
             startDate,
         });
 
-    case startDate !== endDate && (item.dates.all_day || onlyDates):
+    case startDate !== endDate && (item.dates.all_day || onlyDates || (startTime === '00:00' && endTime === '23:59')):
         return gettext('{{startDate}} to {{endDate}}', {
             startDate,
             endDate,

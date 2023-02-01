@@ -76,9 +76,15 @@ class WireApp extends BaseApp {
             let navTab = this.tabs.find((t) => t.id === 'nav');
             navTab.label = gettext('Monitoring Profiles');
         }
+
+        this.state.initialLoad = this.props.isLoading;
     }
 
     render() {
+        if (this.state.initialLoad) {
+            return this.renderLoader();
+        }
+
         const newsOnlyFilterText = this.props.newsOnlyFilterText;
         const modal = this.renderModal(this.props.modal);
 

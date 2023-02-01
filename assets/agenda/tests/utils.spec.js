@@ -184,9 +184,9 @@ describe('utils', () => {
             expect(listItems.hasOwnProperty('15-10-2018')).toBe(true);
             expect(listItems.hasOwnProperty('16-10-2018')).toBe(true);
             expect(listItems['14-10-2018']['_id']).toBe('foo');
-            expect(listItems['14-10-2018']['plan']['guid']).toBe('plan1');
+            expect(listItems['14-10-2018']['plan']['guid']).toBe('plan2');
             expect(listItems['15-10-2018']['_id']).toBe('foo');
-            expect(listItems['15-10-2018']['plan']['guid']).toBe('plan1');
+            expect(listItems['15-10-2018']['plan']['guid']).toBe('plan2');
             expect(listItems['16-10-2018']['_id']).toBe('foo');
             expect(listItems['16-10-2018']['plan']['guid']).toBe('plan2');
         });
