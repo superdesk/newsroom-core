@@ -4,7 +4,6 @@ from .base import BaseFormatter, NewsroomNITFFormatter
 
 
 class NITFFormatter(BaseFormatter):
-
     MIMETYPE = "application/xml"
     FILE_EXTENSION = "xml"
 

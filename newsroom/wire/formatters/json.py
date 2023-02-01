@@ -22,7 +22,6 @@ agenda_json_fields = [
 
 
 class JsonFormatter(BaseFormatter):
-
     MIMETYPE = "application/json"
     FILE_EXTENSION = "json"
 

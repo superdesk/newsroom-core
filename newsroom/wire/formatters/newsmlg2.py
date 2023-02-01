@@ -24,7 +24,6 @@ class NewsroomFormatter(SuperdeskFormatter):
 
 
 class NewsMLG2Formatter(BaseFormatter):
-
     MIMETYPE = "application/vnd.iptc.g2.newsitem+xml"
     FILE_EXTENSION = "xml"
 

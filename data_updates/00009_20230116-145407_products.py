@@ -12,7 +12,6 @@ from newsroom.products.views import get_product_ref
 
 
 class DataUpdate(_DataUpdate):
-
     resource = "products"
 
     def forwards(self, mongodb_collection, mongodb_database):

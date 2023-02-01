@@ -12,7 +12,6 @@ from superdesk.commands.data_updates import DataUpdate as _DataUpdate
 
 
 class DataUpdate(_DataUpdate):
-
     resource = "users"
 
     def forwards(self, mongodb_collection, mongodb_database):

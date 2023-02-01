@@ -12,7 +12,6 @@ from bson import ObjectId
 
 
 class DataUpdate(_DataUpdate):
-
     resource = "agenda"
 
     def forwards(self, mongodb_collection, mongodb_database):
