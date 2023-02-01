@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 
 import {gettext} from 'utils';
 import {selectUser as _selectUser} from 'users/actions';
-import {currentCompanySelector, companySectionListSelector} from '../selectors';
+import {currentCompanySelector, companySectionListSelector, userIdSelector, userIdMapSelector} from '../selectors';
 
 import {CompanyUserListItem} from './CompanyUserListItem';
 
@@ -56,8 +56,8 @@ CompanyUsersComponent.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-    users: state.users,
-    usersById: state.usersById,
+    users: userIdSelector(state),
+    usersById: userIdMapSelector(state),
     activeUserId: state.activeUserId,
     currentCompany: currentCompanySelector(state),
     companySections: companySectionListSelector(state),

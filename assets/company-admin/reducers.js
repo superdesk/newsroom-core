@@ -25,6 +25,7 @@ const initialState = {
     errors: null,
 
     sectionId: 'my_company',
+    sections: [],
     products: [],
     productId: null,
 };

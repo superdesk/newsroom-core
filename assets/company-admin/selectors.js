@@ -1,8 +1,8 @@
 import {createSelector} from 'reselect';
 
-export const sectionListSelector = (state) => state.sections;
+export const sectionListSelector = (state) => state.sections || [];
 
-export const productListSelector = (state) => state.products;
+export const productListSelector = (state) => state.products || [];
 export const productIdMapSelector = createSelector(
     [productListSelector],
     (productList) => (
@@ -13,7 +13,7 @@ export const productIdMapSelector = createSelector(
         }, {})
     )
 );
-export const companyListSelector = (state) => state.companies;
+export const companyListSelector = (state) => state.companies || [];
 
 export const companySectionListSelector = createSelector(
     [sectionListSelector, companyListSelector],
@@ -21,7 +21,7 @@ export const companySectionListSelector = createSelector(
         companyList.reduce((companySections, company) => {
             companySections[company._id] = sectionList.filter(
                 (section) => (
-                    company.sections[section._id] === true
+                    (company.sections || {})[section._id] === true
                 )
             );
 
@@ -30,14 +30,21 @@ export const companySectionListSelector = createSelector(
     )
 );
 
-export const currentUserSelector = (state) => state.user;
-export const userIdSelector = (state) => state.users;
-export const userIdMapSelector = (state) => state.usersById;
+export const currentUserSelector = (state) => state.user || {};
+export const userIdSelector = (state) => state.users || [];
+export const userIdMapSelector = (state) => state.usersById || {};
 
 export const currentCompanySelector = createSelector(
     [currentUserSelector, companyListSelector],
     (user, companyList) => (
-        companyList.find((company) => company._id === user.company)
+        companyList.find((company) => company._id === user.company) || {}
+    )
+);
+
+export const currentCompanySectionListSelector = createSelector(
+    [currentCompanySelector, companySectionListSelector],
+    (currentCompany, companySectionMap) => (
+        companySectionMap[currentCompany._id] || []
     )
 );
 
@@ -58,7 +65,7 @@ export const companyProductsSelector = createSelector(
     [companyListSelector, productListSelector],
     (companyList, productList) => (
         companyList.reduce((companyProducts, company) => {
-            const companyProductIds = company.products.map(
+            const companyProductIds = (company.products || []).map(
                 (product) => product._id
             );
             companyProducts[company._id] = productList.filter(
@@ -74,10 +81,10 @@ export const companyProductSeatsSelector = createSelector(
     [companyListSelector, companyUserListSelector, productIdMapSelector],
     (companyList, companyUserList, productMap) => (
         companyList.reduce((companyProducts, company) => {
-            companyProducts[company._id] = company.products.reduce(
+            companyProducts[company._id] = (company.products || []).reduce(
                 (productSeats, companyProduct) => {
                     const userSeats = companyUserList[company._id].filter(
-                        (user) => user.products.some(
+                        (user) => (user.products || []).some(
                             (userProduct) => userProduct._id === companyProduct._id
                         )
                     );
