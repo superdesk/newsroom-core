@@ -29,11 +29,6 @@ def create_user(email, password, first_name, last_name, is_admin):
         "is_approved": True,
     }
 
-<<<<<<< HEAD
-    with app.test_request_context("/users", method="POST"):
-        session["user_type"] = UserRole.ADMINISTRATOR.value
-        user = get_user_by_email(email)
-=======
     user = get_user_by_email(email)
 
     if user:
@@ -42,6 +37,5 @@ def create_user(email, password, first_name, last_name, is_admin):
         print("creating user %s" % str(new_user))
         get_resource_service("users").post([new_user])
         print("user saved %s" % (new_user))
->>>>>>> develop
 
     return new_user
