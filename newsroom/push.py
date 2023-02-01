@@ -224,7 +224,6 @@ def publish_event(event, orig):
             event.get("state") in [WORKFLOW_STATE.CANCELLED, WORKFLOW_STATE.KILLED]
             or event.get("pubstatus") == "cancelled"
         ):
-
             # it has been cancelled so don't need to change the dates
             # update the event, the version and the state
             updates = {

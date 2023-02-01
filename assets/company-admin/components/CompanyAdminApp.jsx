@@ -8,6 +8,7 @@ import {gettext} from 'utils';
 import {setProductFilter, setSection} from '../actions';
 import {postUser, deleteUser, resetPassword, newUser, cancelEdit, editUser, setError, fetchUsers, setSort, toggleSortDirection} from 'users/actions';
 import {setSearchQuery} from 'search/actions';
+import {productListSelector, companyListSelector, currentUserSelector} from '../selectors';
 
 import {CompanyDetails} from './CompanyDetails';
 import {CompanyUsers} from './CompanyUsers';
@@ -172,7 +173,6 @@ class CompanyAdminAppComponent extends React.Component {
                                     onClose={this.props.closeUserEditor}
                                     onDelete={this.deleteUser}
                                     currentUser={this.props.user}
-                                    // sections={this.props.sections}
                                     products={this.props.products}
                                     hideFields={['user_type', 'company']}
                                 />
@@ -217,15 +217,15 @@ CompanyAdminAppComponent.propTypes = {
 
 const mapStateToProps = (state) => ({
     sectionId: state.sectionId,
-    user: state.user,
+    user: currentUserSelector(state),
     userToEdit: state.userToEdit,
     errors: state.errors,
-    products: state.products,
+    products: productListSelector(state),
     modal: state.modal,
     sort: state.sort,
     sortDirection: state.sortDirection,
     productId: state.productId,
-    companies: state.companies,
+    companies: companyListSelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({

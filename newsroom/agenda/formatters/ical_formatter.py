@@ -30,7 +30,6 @@ def guid(item):
 
 
 class iCalFormatter(BaseFormatter):
-
     VERSION = "2.0"
     PRODID = "Newshub"
     FILE_EXTENSION = "ical"

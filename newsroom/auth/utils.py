@@ -95,7 +95,6 @@ def is_current_user(user_id):
 
 def send_token(user, token_type="validate"):
     if user is not None and user.get("is_enabled", False):
-
         if token_type == "validate" and user.get("is_validated", False):
             return False
 

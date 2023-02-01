@@ -16,7 +16,6 @@ class NewsAPIProductsResource(ProductsResource):
 
 
 class NewsAPIProductsService(ProductsService):
-
     # The subset of fields that are returned by the API
     allowed_fields = json.dumps({"_id": 1, "name": 1, "description": 1})
 
