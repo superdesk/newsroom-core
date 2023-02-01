@@ -23,7 +23,6 @@ logger = logging.getLogger(__name__)
 # The Image class in the library does not work so is inherited here.
 class LogoImage(Image):
     def __init__(self, file_name, **kwargs):
-
         fin = open(file_name, "rb")
 
         if file_name[-3:].lower() not in ["png", "jpg"]:
@@ -58,7 +57,6 @@ class LogoImage(Image):
         RawCode.__init__(self, data)
 
     def _get_png_dimensions(self, data):
-
         _PNG_HEADER = b"\x89\x50\x4e"
 
         if data[0:3] != _PNG_HEADER:
@@ -157,7 +155,6 @@ class LogoImage(Image):
 
 
 class MonitoringRTFFormatter(BaseFormatter):
-
     FILE_EXTENSION = "rtf"
     MIMETYPE = "application/rtf"
 

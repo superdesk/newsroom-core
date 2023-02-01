@@ -28,7 +28,6 @@ def create_user(email, password, first_name, last_name, is_admin):
     }
 
     with app.test_request_context("/users", method="POST"):
-
         user = get_user_by_email(email)
 
         if user:

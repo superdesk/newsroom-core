@@ -10,7 +10,6 @@ from . import FormatterRegistry
 
 
 class BaseFormatter(metaclass=FormatterRegistry):
-
     MIMETYPE = None
     FILE_EXTENSION = None
     MEDIATYPE = "text"
