@@ -1,7 +1,5 @@
-from flask import session
 from superdesk import get_resource_service
 
-from newsroom.user_roles import UserRole
 from newsroom.auth import get_user_by_email
 from .manager import manager
 
