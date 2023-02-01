@@ -115,11 +115,11 @@ label {
     }
     &.table-hover > tbody > tr:hover {
         outline: 1px solid #999;
-    } 
+    }
     &.table-hover > tbody > tr:hover > * {
         --bs-table-accent-bg: white;
         background-color: white;
-    }    
+    }
     &--extended {
         border-collapse:separate;
         border-spacing:0 4px;
@@ -127,11 +127,11 @@ label {
         font-size: 14px;
 
         thead {
-            font-size: 13px;    
+            font-size: 13px;
             tr {
                 border-radius: 2px;
                 box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.2), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.1);
-                background-color: white;            
+                background-color: white;
             }
             th {
                 color: #676C7B;
@@ -148,7 +148,7 @@ label {
                 content: "_";
                 color: white;
                 display: block;
-            }            
+            }
             tr {
                 border-radius: 2px;
                 box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2), 0px 0px 0px 1px rgba(0, 0, 0, 0.08);
@@ -191,7 +191,7 @@ label {
                 border-top: 1px dashed #A1A6B6;
                 border-bottom: 1px dashed #A1A6B6;
             }
-            
+
             th {
                 font-size: 12px;
                 font-weight: 800;
@@ -237,7 +237,7 @@ label {
             outline: none;
         }
     }
-    
+
 }
 .table-hover tbody tr {
     &:hover {
@@ -248,7 +248,7 @@ label {
     &.table--selected {
         outline: 1px solid $main-blue;
         &:hover {
-            outline: 1px solid $main-blue;           
+            outline: 1px solid $main-blue;
         }
     }
 }
@@ -291,11 +291,11 @@ body.print {
     background-color: $main-blue;
     position: relative;
     box-shadow: inset -3px 0px 8px rgba(0, 0, 0, 0.1);
-    
+
     &:dir(rtl) {
         box-shadow: inset 3px 0px 8px rgba(0, 0, 0, 0.1);
     }
-    
+
     @include phone {
         flex: 0 0 45px;
     }
@@ -815,18 +815,18 @@ article.list {
 }
 .list-item__preview-collapsible {
     padding: 10px 0;
-    display: flex;    
+    display: flex;
     align-items: center;
     position: relative;
     &-header {
-        display: flex;    
+        display: flex;
         align-items: center;
         background-color: white;
-        z-index: 1;        
+        z-index: 1;
         &:hover {
             cursor: pointer;
             h3 {
-                color: $gray-dark;                
+                color: $gray-dark;
             }
         }
         .icon--arrow-right {
@@ -839,7 +839,7 @@ article.list {
     h3 {
         font-size: 18px;
         font-weight: 600;
-        margin: 0 10px;        
+        margin: 0 10px;
         line-height: 1.4;
     }
     &:after {
@@ -847,7 +847,7 @@ article.list {
         position: absolute;
         height: 1px;
         background-color: $gray-light;
-        right: 0px;        
+        right: 0px;
         width: calc(100% - 40px);
     }
 }
@@ -872,7 +872,7 @@ article.list {
     font-style: normal;
     font-weight: 700;
     font-size: 12px;
-    line-height: 14px;  
+    line-height: 14px;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: #676C7B;
@@ -1502,17 +1502,17 @@ article.list {
             @include lg {
                 min-height: 150px;
                 max-height: unset;
-    
+
                 .search-results__tags {
                     margin-inline-start: 2.5rem;
                     margin-block-end: 1rem;
                 }
             }
-    
+
             .search-results__tags {
                 margin-inline-start: 0.5rem;
             }
-    
+
             .search-results-info {
                 margin-block-start: 0.5rem;
                 margin-inline-start: 0.5rem;
@@ -3897,12 +3897,12 @@ a.wire-articles__versions {
     }
 }
 
-.modal, .modal-backdrop {
-    position: absolute;
-    position: fixed;
-    inset-block-start:0;
-    background: white;
-}
+//.modal, .modal-backdrop {
+//    position: absolute;
+//    position: fixed;
+//    inset-block-start:0;
+//    background: white;
+//}
 
 // home event
 .date-round {

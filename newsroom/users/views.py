@@ -7,15 +7,17 @@ from flask_babel import gettext
 from superdesk import get_resource_service
 from werkzeug.exceptions import BadRequest, NotFound
 
-from newsroom.auth import get_user, get_user_by_email
+from newsroom.user_roles import UserRole
+from newsroom.auth import get_user, get_user_by_email, get_company
 from newsroom.auth.utils import (
     send_token,
     add_token_data,
     is_current_user_admin,
     is_current_user,
     is_current_user_account_mgr,
+    is_current_user_company_admin,
 )
-from newsroom.decorator import admin_only, login_required, account_manager_only
+from newsroom.decorator import admin_only, login_required, account_manager_only, account_manager_or_company_admin_only
 from newsroom.companies import (
     get_user_company_name,
     get_company_sections_monitoring_data,
@@ -25,6 +27,7 @@ from newsroom.notifications import push_user_notification, push_company_notifica
 from newsroom.topics import get_user_topics
 from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
+from newsroom.users.users import COMPANY_ADMIN_ALLOWED_UPDATES
 from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary
 from newsroom.monitoring.views import get_monitoring_for_company
 
@@ -33,6 +36,8 @@ def get_settings_data():
     return {
         "users": list(query_resource("users")),
         "companies": list(query_resource("companies")),
+        "sections": app.sections,
+        "products": list(query_resource("products")),
     }
 
 
@@ -65,7 +70,7 @@ def user_profile():
 
 
 @blueprint.route("/users/search", methods=["GET"])
-@account_manager_only
+@account_manager_or_company_admin_only
 def search():
     lookup = None
     if flask.request.args.get("q"):
@@ -75,12 +80,24 @@ def search():
     if flask.request.args.get("ids"):
         lookup = {"_id": {"$in": (flask.request.args.get("ids") or "").split(",")}}
 
+    if is_current_user_company_admin():
+        # Make sure this request only searches for the current users company
+        company = get_company()
+
+        if company is None:
+            flask.abort(401)
+
+        if lookup is None:
+            lookup = {}
+
+        lookup["company"] = company["_id"]
+
     users = list(query_resource("users", lookup=lookup))
     return jsonify(users), 200
 
 
 @blueprint.route("/users/new", methods=["POST"])
-@account_manager_only
+@account_manager_or_company_admin_only
 def create():
     form = UserForm()
     if form.validate():
@@ -89,7 +106,16 @@ def create():
 
         new_user = form.data
         add_token_data(new_user)
-        if form.company.data:
+        user_is_company_admin = is_current_user_company_admin()
+        if user_is_company_admin:
+            company = get_company()
+            if company is None:
+                flask.abort(401)
+
+            # Make sure this new user is associated with ``company`` and as a ``PUBLIC`` user
+            new_user["company"] = company["_id"]
+            new_user["user_type"] = UserRole.PUBLIC.value
+        elif form.company.data:
             new_user["company"] = ObjectId(form.company.data)
         elif new_user["user_type"] != "administrator":
             return (
@@ -116,10 +142,18 @@ def _is_email_address_valid(email):
 @blueprint.route("/users/<_id>", methods=["GET", "POST"])
 @login_required
 def edit(_id):
-    if not (is_current_user_admin() or is_current_user_account_mgr()) and not is_current_user(_id):
+    user_is_company_admin = is_current_user_company_admin()
+
+    if not (is_current_user_admin() or is_current_user_account_mgr() or user_is_company_admin) and not is_current_user(
+        _id
+    ):
         flask.abort(401)
 
     user = find_one("users", _id=ObjectId(_id))
+    company = get_company()
+
+    if user_is_company_admin and (company is None or user["company"] != ObjectId(company["_id"])):
+        flask.abort(403)
 
     if not user:
         return NotFound(gettext("User not found"))
@@ -132,17 +166,36 @@ def edit(_id):
                     jsonify({"email": [gettext("Email address is already in use")]}),
                     400,
                 )
-            elif not form.company.data and form.user_type.data != "administrator":
+            elif not user_is_company_admin and not form.company.data and form.user_type.data != "administrator":
                 return (
                     jsonify({"company": [gettext("Company is required for non administrators")]}),
                     400,
                 )
 
             updates = form.data
-            if form.company.data:
+            if not user_is_company_admin and form.company.data:
                 updates["company"] = ObjectId(form.company.data)
 
-            if is_current_user_account_mgr() and updates.get("user_type", "") != user.get("user_type", ""):
+            if "sections" in updates:
+                updates["sections"] = {
+                    section["_id"]: section["_id"] in (form.sections.data or []) for section in app.sections
+                }
+
+            if "products" in updates:
+                product_ids = [ObjectId(productId) for productId in updates["products"]]
+                products = {
+                    product["_id"]: product
+                    for product in query_resource("products", lookup={"_id": {"$in": product_ids}})
+                }
+                updates["products"] = [
+                    {"_id": product["_id"], "section": product["product_type"]} for product in products.values()
+                ]
+
+            if user_is_company_admin:
+                for field in list(updates.keys()):
+                    if field not in COMPANY_ADMIN_ALLOWED_UPDATES:
+                        updates.pop(field, None)
+            elif is_current_user_account_mgr() and updates.get("user_type", "") != user.get("user_type", ""):
                 flask.abort(401)
 
             user = get_resource_service("users").patch(ObjectId(_id), updates=updates)

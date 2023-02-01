@@ -1,4 +1,5 @@
 import {
+    INIT_VIEW_DATA,
     GET_USERS,
     GET_USER,
     SELECT_USER,
@@ -31,11 +32,18 @@ const initialState = {
     sort: null,
     sortDirection: 1,
     search: searchReducer(),
+    sections: [],
+    products: [],
 };
 
 export default function userReducer(state = initialState, action) {
     switch (action.type) {
-
+    case INIT_VIEW_DATA:
+        return {
+            ...state,
+            sections: action.data.sections,
+            products: action.data.products,
+        };
     case SELECT_USER: {
         const defaultUser = {
             user_type: 'public',
@@ -48,7 +56,7 @@ export default function userReducer(state = initialState, action) {
             phone: '',
             mobile: '',
             role: '',
-            company: '',
+            company: state.company,
         };
 
         return {
@@ -69,8 +77,36 @@ export default function userReducer(state = initialState, action) {
     case EDIT_USER: {
         const target = action.event.target;
         const field = target.name;
-        let user = state.userToEdit;
-        user[field] = target.type === 'checkbox' ? target.checked : target.value;
+        let user = {...state.userToEdit};
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+
+        if (field.startsWith('sections.')) {
+            const sectionId = field.replace('sections.', '');
+
+            if (user.sections == null) {
+                user.sections = {};
+            }
+
+            user.sections[sectionId] = value;
+        } else if (field.startsWith('products.')) {
+            const [section, productId] = field.replace('products.', '').split('.');
+
+            if (user.products == null) {
+                user.products = [];
+            }
+
+            if (value) {
+                user.products.push({
+                    _id: productId,
+                    section: section,
+                });
+            } else {
+                user.products = user.products.filter((product) => product._id !== productId);
+            }
+        } else {
+            user[field] = value;
+        }
+
         return {...state, userToEdit: user, errors: null};
     }
 
@@ -83,7 +119,7 @@ export default function userReducer(state = initialState, action) {
             name: '',
             email: '',
             phone: '',
-            company: '',
+            company: state.company,
         };
 
         return {...state, userToEdit: newUser, errors: null};

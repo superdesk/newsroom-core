@@ -59,6 +59,7 @@ DEFAULT_SUBJECTS = {
     "share_topic": "From {{ app_name }}: {{ topic.label | safe }}",
     "share_wire": "From {{ app_name }}: {{ subject_name | safe }}",
     "share_agenda": "From {{ app_name }}: {{ subject_name | safe }}",
+    "additional_product_seat_request_email": "New Product Seat request",
 }
 
 

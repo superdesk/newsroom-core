@@ -146,7 +146,7 @@ def test_save_company_permissions(client, app):
     assert updated["sections"]["wire"]
     assert not updated["sections"].get("agenda")
     assert updated["archive_access"]
-    assert updated["products"] == [{"section": "wire", "_id": "p-2"}]
+    assert updated["products"] == [{"section": "wire", "seats": 0, "_id": "p-2"}]
 
     # available by default
     resp = client.get(url_for("agenda.index"))

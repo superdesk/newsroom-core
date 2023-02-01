@@ -14,6 +14,8 @@ from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
 from datetime import datetime
 
+from newsroom.user_roles import UserRole
+
 
 _hash_cache = {}
 
@@ -166,6 +168,10 @@ def is_admin_or_account_manager(user=None):
     if user:
         return user.get("user_type") in allowed_user_types
     return flask.session.get("user_type") in allowed_user_types
+
+
+def is_company_admin(user=None):
+    return (user.get("user_type") if user else flask.session.get("user_type")) == UserRole.COMPANY_ADMIN.value
 
 
 def authorized_settings_apps(user=None):

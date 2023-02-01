@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ gettext('Company Admin') }}{% endblock %}
+
+{% block breadcrumb %}
+    <span class="breadcrumb-item active">{{ gettext('Company Admin') }}</span>
+{% endblock %}
+
+{% block contentHeader %}
+
+{% endblock %}
+
+{% block content %}
+<div id="company-admin-app" class="settingsWrap">
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+var viewData = {{ data | tojson | safe }};
+</script>
+
+{{ javascript_tag('company_admin_js') | safe }}
+
+{% endblock %}

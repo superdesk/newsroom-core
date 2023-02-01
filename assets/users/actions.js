@@ -1,7 +1,7 @@
 import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
 import {searchQuerySelector} from 'search/selectors';
-import {get} from 'lodash';
+import {get, cloneDeep} from 'lodash';
 
 export const SELECT_USER = 'SELECT_USER';
 export function selectUser(id) {
@@ -76,11 +76,26 @@ export function toggleSortDirection() {
 export function fetchUsers() {
     return function (dispatch, getState) {
         dispatch(queryUsers());
-        const query = searchQuerySelector(getState()) || '';
-        const filter = getState().company &&
-            getState().company !== '' ? '&where={"company":"' + getState().company + '"}' : '';
-        const sort = !getState().sort ? '' :
-            `&sort=[("${getState().sort}", ${getState().sortDirection}), ("last_name", 1)]`;
+        const state = getState();
+        const query = searchQuerySelector(state) || '';
+        const filterQuery = {};
+
+        if (state.company && state.company !== '') {
+            filterQuery.company = state.company;
+        }
+        if (state.productId && state.productId !== '') {
+            filterQuery['products._id'] = state.productId;
+        }
+
+        let filter = '';
+        if (Object.keys(filterQuery).length) {
+            filter = '&where=' + encodeURIComponent(JSON.stringify(filterQuery));
+        }
+
+        const sortField = state.sort || 'last_name';
+        const sort = sortField === 'last_name' ?
+            `&sort=[("${sortField}", ${getState().sortDirection})]` :
+            `&sort=[("${sortField}", ${getState().sortDirection}), ("last_name", 1)]`;
 
         return server.get(`/users/search?q=${query}${filter}${sort}`)
             .then((data) => dispatch(getUsers(data)))
@@ -96,8 +111,19 @@ export function fetchUsers() {
 export function postUser() {
     return function (dispatch, getState) {
 
-        const user = getState().userToEdit;
+        const user = cloneDeep(getState().userToEdit);
         const url = `/users/${user._id ? user._id : 'new'}`;
+
+        if (user.sections != null) {
+            user.sections = Object.keys(user.sections)
+                .filter((sectionId) => user.sections[sectionId] === true)
+                .join(',');
+        }
+        if (user.products != null) {
+            user.products = user.products
+                .map((product) => product._id)
+                .join(',');
+        }
 
         return server.post(url, user)
             .then(function() {
@@ -146,12 +172,12 @@ export function deleteUser() {
     };
 }
 
+export const INIT_VIEW_DATA = 'INIT_VIEW_DATA';
 export function initViewData(data) {
     return function (dispatch) {
+        dispatch({type: INIT_VIEW_DATA, data});
         dispatch(getUsers(data.users));
         dispatch(getCompanies(data.companies));
         dispatch(getUser(get(window.profileData, 'user', {})));
-        //return {type: INIT_VIEW_DATA, data};
     };
 }
-

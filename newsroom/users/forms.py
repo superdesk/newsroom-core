@@ -1,8 +1,27 @@
 from flask_wtf import FlaskForm
 from flask_babel import gettext
-from wtforms import StringField, HiddenField, BooleanField, TextAreaField
+from wtforms import StringField, HiddenField, BooleanField, TextAreaField, Field
 from wtforms import SelectField
 from wtforms.validators import DataRequired, Email
+from wtforms.widgets import TextInput
+
+
+class CommaSeparatedListField(Field):
+    widget = TextInput()
+
+    def _value(self):
+        if self.data:
+            return ",".join(self.data)
+        else:
+            return ""
+
+    def process_formdata(self, valuelist):
+        if len(valuelist) == 1 and not len(valuelist[0]):
+            self.data = []
+        elif valuelist:
+            self.data = [x.strip() for x in valuelist[0].split(",")]
+        else:
+            self.data = []
 
 
 class UserForm(FlaskForm):
@@ -37,3 +56,6 @@ class UserForm(FlaskForm):
     receive_app_notifications = BooleanField(gettext("Receive App Notifications"), default=True, validators=[])
     locale = StringField(gettext("Locale"))
     manage_company_topics = BooleanField(gettext("Manage Company Topics"), validators=[])
+
+    sections = CommaSeparatedListField(gettext("Sections"), validators=[])
+    products = CommaSeparatedListField(gettext("Products"), validators=[])

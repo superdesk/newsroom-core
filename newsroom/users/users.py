@@ -110,6 +110,8 @@ COMPANY_ADMIN_ALLOWED_UPDATES = {
     "phone",
     "mobile",
     "country",
+    "is_approved",
+    "is_enabled",
     # populated by system
     "_created",
     "_updated",

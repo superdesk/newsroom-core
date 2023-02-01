@@ -17,9 +17,21 @@ class CompanyPermissions extends React.Component {
 
     setup() {
         const products = {};
+        const seats = {};
+        const companyProductsById = (get(this.props, 'company.products')|| []).reduce((productMap, product) => {
+            productMap[product._id] = product;
+
+            return productMap;
+        }, {});
 
         this.props.products.forEach((product) => {
-            products[product._id] = get(this.props.company, 'products', []).some((_product) => _product._id === product._id);
+            if (companyProductsById[product._id] != null) {
+                products[product._id] = true;
+                seats[product._id] = companyProductsById[product._id].seats || 0;
+            } else {
+                products[product._id] = false;
+                seats[product._id] = 0;
+            }
         });
 
         const sections = {};
@@ -36,7 +48,7 @@ class CompanyPermissions extends React.Component {
         const events_only = !!this.props.company.events_only;
         const restrict_coverage_info = !!this.props.company.restrict_coverage_info;
 
-        return {sections, products, archive_access, events_only, restrict_coverage_info};
+        return {sections, products, archive_access, events_only, restrict_coverage_info, seats};
     }
 
     componentDidUpdate(prevProps) {
@@ -49,6 +61,15 @@ class CompanyPermissions extends React.Component {
         const field = this.state[key];
         field[_id] = !field[_id];
         this.setState({[key]: field});
+    }
+
+    setSeats(productId, seats) {
+        this.setState((prevState) => ({
+            seats: {
+                ...prevState.seats,
+                [productId]: parseInt(seats),
+            },
+        }));
     }
 
     render() {
@@ -109,11 +130,37 @@ class CompanyPermissions extends React.Component {
                                         {this.props['products'].filter((p) => (p.product_type || 'wire').toLowerCase() === section._id.toLowerCase())
                                             .map((product) => (
                                                 <li key={product._id}>
-                                                    <CheckboxInput
-                                                        name={product._id}
-                                                        label={product.name}
-                                                        value={!!this.state['products'][product._id]}
-                                                        onChange={() => this.toggle('products', product._id)} />
+                                                    <div className="input-group">
+                                                        <div className="input-group-text border-0 bg-transparent">
+                                                            <CheckboxInput
+                                                                name={product._id}
+                                                                label={product.name}
+                                                                value={!!this.state.products[product._id]}
+                                                                onChange={() => this.toggle('products', product._id)}
+                                                            />
+                                                        </div>
+                                                        {!this.state['products'][product._id] ? null : (
+                                                            <React.Fragment>
+                                                                <label
+                                                                    className="input-group-text border-0 bg-transparent ms-auto"
+                                                                    htmlFor={`${product._id}_seats`}
+                                                                >
+                                                                    {gettext('Seats:')}
+                                                                </label>
+                                                                <input
+                                                                    type="number"
+                                                                    id={`${product._id}_seats`}
+                                                                    name={`${product._id}_seats`}
+                                                                    className="form-control"
+                                                                    style={{maxWidth: '100px'}}
+                                                                    min="0"
+                                                                    tabIndex="0"
+                                                                    value={(this.state.seats[product._id] || 0).toString()}
+                                                                    onChange={(event) => this.setSeats(product._id, event.target.value)}
+                                                                />
+                                                            </React.Fragment>
+                                                        )}
+                                                    </div>
                                                 </li>
                                             ))}
                                     </ul>]

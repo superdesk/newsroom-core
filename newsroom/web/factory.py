@@ -21,6 +21,7 @@ from newsroom.template_filters import (
     sidenavs_by_group,
     get_company_sidenavs,
     is_admin_or_account_manager,
+    is_company_admin,
     authorized_settings_apps,
     theme_url,
     to_json,
@@ -109,6 +110,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_global(sidenavs_by_names)
         self.add_template_global(sidenavs_by_group)
         self.add_template_global(is_admin_or_account_manager)
+        self.add_template_global(is_company_admin)
         self.add_template_global(authorized_settings_apps)
         self.add_template_global(newsroom_config)
         self.add_template_global(is_admin)
