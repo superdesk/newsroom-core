@@ -187,8 +187,6 @@ class UsersService(newsroom.Service):
         """Check if current user has permissions to edit user."""
         if not request or request.method == "GET":  # in behave there is test request context
             return
-        if not is_current_user_admin() and request.method == "POST":
-            return
         if is_current_user_admin() or is_current_user_account_mgr():
             return
         if is_current_user_company_admin():
@@ -196,4 +194,6 @@ class UsersService(newsroom.Service):
             if doc.get("company") and doc["company"] == manager.get("company"):
                 if not updates or all([key in COMPANY_ADMIN_ALLOWED_UPDATES for key in updates.keys()]):
                     return
+        if request and request.url_rule and request.url_rule.rule == "/reset_password/<token>":
+            return
         abort(403)
