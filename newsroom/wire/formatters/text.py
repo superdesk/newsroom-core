@@ -4,7 +4,6 @@ from .base import BaseFormatter
 
 
 class TextFormatter(BaseFormatter):
-
     FILE_EXTENSION = "txt"
     MIMETYPE = "text/plain"
 

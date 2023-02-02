@@ -2,7 +2,6 @@ import 'babel-polyfill';
 import 'url-search-params-polyfill';
 import 'whatwg-fetch';
 import {isTouchDevice} from 'utils';
-import 'primereact/resources/themes/lara-dark-indigo/theme.css';
 import 'primereact/resources/primereact.min.css';
 
 $(document).ready(function() {

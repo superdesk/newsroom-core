@@ -5,7 +5,6 @@ from newsroom.wire.utils import get_picture
 
 
 class PictureFormatter(BaseFormatter):
-
     MIMETYPE = "image/jpeg"
     MEDIATYPE = "picture"
 
