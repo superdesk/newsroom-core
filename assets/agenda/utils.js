@@ -671,7 +671,7 @@ export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
             const itemExtraDates = getExtraDates(item);
             const itemStartDate = getStartDate(item);
             const start = item._display_from ? moment(item._display_from) :
-                moment.max(maxStart, moment.min(itemExtraDates.concat([itemStartDate])));
+                moment.min(maxStart, moment.min(itemExtraDates.concat([itemStartDate])));
             const itemEndDate = getEndDate(item);
 
             // If item is an event and was actioned (postponed, rescheduled, cancelled only incase of multi-day event)

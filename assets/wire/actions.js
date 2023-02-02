@@ -96,9 +96,19 @@ export function queryItems() {
     return {type: QUERY_ITEMS};
 }
 
+export const LOADING_AGGREGATIONS = 'LOADING_AGGREGATIONS';
+function loadingAggregations() {
+    return {type: LOADING_AGGREGATIONS};
+}
+
 export const RECIEVE_ITEMS = 'RECIEVE_ITEMS';
 export function recieveItems(data) {
     return {type: RECIEVE_ITEMS, data};
+}
+
+export const RECIEVE_AGGS = 'RECIEVE_AGGS';
+function recieveAggs(data) {
+    return {type: RECIEVE_AGGS, data};
 }
 
 export const RECIEVE_ITEM = 'RECIEVE_ITEM';
@@ -212,9 +222,10 @@ export function printItem(item) {
  *
  * @param {Object} state
  * @param {bool} next
+ * @param {bool} aggs
  * @return {Promise}
  */
-export function search(state, next) {
+export function search(state, next, aggs) {
     const searchParams = searchParamsSelector(state);
     const createdFilter = get(searchParams, 'created') || {};
     let created_to = createdFilter.to;
@@ -241,14 +252,18 @@ export function search(state, next) {
         es_highlight: !searchParams.query ? null : 1,
         all_versions: !searchAllVersions ? null : 1,
         prepend_embargoed: !state.bookmarks ? null : 0,
+        aggs: aggs === false ? '0' : '1',
+        size: aggs === true ? 0 : null,
+        tick: Date.now().toString(),
     };
 
+
     const queryString = Object.keys(params)
-        .filter((key) => params[key] != null && (params[key].length == null || params[key].length > 0))
-        .map((key) => [key, params[key]].join('='))
+        .filter((key) => params[key] != null && params[key].toString() !== '')
+        .map((key) => `${key}=${params[key]}`)
         .join('&');
 
-    return server.get(`/${context}/search?${queryString}&tick=${Date.now().toString()}`);
+    return server.get(`/${context}/search?${queryString}`);
 }
 
 /**
@@ -258,12 +273,18 @@ export function fetchItems() {
     return (dispatch, getState) => {
         const start = Date.now();
         dispatch(queryItems());
-        return search(getState())
-            .then((data) => dispatch(recieveItems(data)))
-            .then(() => {
-                analytics.timingComplete('search', Date.now() - start);
-            })
-            .catch(errorHandler);
+        dispatch(loadingAggregations());
+        const state = getState();
+        return Promise.all([
+            search(state, false, false)
+                .then((data) => dispatch(recieveItems(data)))
+                .then(() => {
+                    analytics.timingComplete('search', Date.now() - start);
+                })
+                .catch(errorHandler),
+            search(state, false, true)
+                .then((data) => dispatch(recieveAggs(data))),
+        ]);
     };
 }
 

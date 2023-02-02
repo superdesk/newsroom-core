@@ -27,6 +27,7 @@ def create_user(email, password, first_name, last_name, is_admin):
         "is_approved": True,
     }
 
+<<<<<<< HEAD
     user = get_user_by_email(email)
 
     if user:
@@ -35,5 +36,9 @@ def create_user(email, password, first_name, last_name, is_admin):
         print("creating user %s" % str(new_user))
         get_resource_service("users").post([new_user])
         print("user saved %s" % (new_user))
+=======
+    with app.test_request_context("/users", method="POST"):
+        user = get_user_by_email(email)
+>>>>>>> hotfix/2.3.1
 
     return new_user

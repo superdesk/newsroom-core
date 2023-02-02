@@ -9,7 +9,7 @@ from werkzeug.exceptions import Forbidden
 
 from superdesk import get_resource_service
 from superdesk.metadata.utils import get_elastic_highlight_query
-from superdesk.default_settings import strtobool
+from superdesk.default_settings import strtobool as _strtobool
 from content_api.errors import BadParameterValueError
 
 from newsroom import Service
@@ -26,6 +26,12 @@ from newsroom.template_filters import is_admin
 from newsroom.utils import get_local_date, get_end_date
 
 logger = logging.getLogger(__name__)
+
+
+def strtobool(val):
+    if isinstance(val, bool):
+        return val
+    return _strtobool(val)
 
 
 def query_string(query, default_operator="AND"):
@@ -250,14 +256,14 @@ class BaseSearchService(Service):
 
         search.source["query"] = search.query
         search.source["sort"] = search.args.get("sort") or self.default_sort
-        search.source["size"] = search.args.get("size") or self.default_page_size
-        search.source["from"] = int(search.args.get("from") or 0)
+        search.source["size"] = int(search.args.get("size", self.default_page_size))
+        search.source["from"] = int(search.args.get("from", 0))
 
         if search.source["from"] >= 1000:
             # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
             return abort(400, gettext("Page limit exceeded"))
 
-        if not search.source["from"] and search.args.get("aggs", True):
+        if not search.source["from"] and strtobool(search.args.get("aggs", "true")):
             search.source["aggs"] = self.get_aggregations()
 
         if search.highlight:
