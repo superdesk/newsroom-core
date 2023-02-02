@@ -187,6 +187,8 @@ class UsersService(newsroom.Service):
         """Check if current user has permissions to edit user."""
         if not request or request.method == "GET":  # in behave there is test request context
             return
+        if not is_current_user_admin() and request.method == "POST":
+            return
         if is_current_user_admin() or is_current_user_account_mgr():
             return
         if is_current_user_company_admin():
