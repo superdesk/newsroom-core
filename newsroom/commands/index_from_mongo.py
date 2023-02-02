@@ -43,4 +43,4 @@ def index_from_mongo(collection_name, all_collections, page_size):
         $ python manage.py index_from_mongo --all
 
     """
-    IndexFromMongo().run(collection_name, all_collections, page_size, None)
+    IndexFromMongo().run(collection_name, all_collections, page_size, None, None)
