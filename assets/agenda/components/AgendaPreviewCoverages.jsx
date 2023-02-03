@@ -24,7 +24,7 @@ class AgendaPreviewCoverages extends React.Component {
     }
 
     render() {
-        const {item, wireItems, actions, user, plan, previewGroup} = this.props;
+        const {item, wireItems, actions, user, plan, previewGroup, restrictCoverageInfo} = this.props;
 
         const displayCoverages = getCoveragesForDisplay(item, plan, previewGroup);
 
@@ -34,7 +34,7 @@ class AgendaPreviewCoverages extends React.Component {
 
         const agendaNames = getAgendaNames(plan);
 
-        return item.item_type === 'planning' ? (
+        return (item.item_type === 'planning' || restrictCoverageInfo) ? (
             <React.Fragment>
                 {get(displayCoverages.current, 'length', 0) > 0 && (
                     <PreviewBox label={gettext('Coverages:')}>
@@ -151,4 +151,5 @@ AgendaPreviewCoverages.propTypes = {
     wireItems: PropTypes.array,
     actions: PropTypes.array,
     user: PropTypes.string,
+    restrictCoverageInfo: PropTypes.bool,
 };

@@ -178,7 +178,7 @@ def coverage_is_completed(coverage: Dict[str, Any]) -> bool:
 
 
 def remove_restricted_coverage_info(items):
-    keys_to_copy = (
+    coverage_keys_to_copy = (
         "coverage_id",
         "coverage_type",
         "planning_id",
@@ -189,19 +189,37 @@ def remove_restricted_coverage_info(items):
         "deliveries",
     )
 
+    planning_keys_to_copy = (
+        "guid",
+        "item_type",
+        "type",
+        "event_id",
+        "coverages",
+        "planning_items",
+    )
+
+    def remove_planning_info(plan_item):
+        for field in [key for key in plan_item.keys() if not key.startswith("_") and key not in planning_keys_to_copy]:
+            plan_item.pop(field, None)
+
     for item in items:
+        if item.get("item_type") == "planning":
+            remove_planning_info(item)
+
         item["coverages"] = [
             coverage
             if coverage_is_completed(coverage)
-            else {key: val for key, val in coverage.items() if key in keys_to_copy}
+            else {key: val for key, val in coverage.items() if key in coverage_keys_to_copy}
             for coverage in item.get("coverages") or []
         ]
 
         for plan in item.get("planning_items") or []:
+            remove_planning_info(plan)
+
             plan["coverages"] = [
                 coverage
                 if coverage_is_completed(coverage)
-                else {key: val for key, val in coverage.items() if key in keys_to_copy}
+                else {key: val for key, val in coverage.items() if key in coverage_keys_to_copy}
                 for coverage in plan.get("coverages") or []
             ]
             for coverage in plan["coverages"]:

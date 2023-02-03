@@ -99,8 +99,6 @@ Feature: Agenda Restricted Coverage Details
             }]
         }
         """
-
-    Scenario: Search Planning
         Given "companies"
         """
         [{
@@ -142,6 +140,8 @@ Feature: Agenda Restricted Coverage Details
             "is_approved": true
         }]
         """
+
+    Scenario: Search Planning
         When we login with email "admin2@sourcefabric.org" and password "admin"
         When we get "/agenda/search"
         Then we get list with 1 items
@@ -163,6 +163,10 @@ Feature: Agenda Restricted Coverage Details
                 "coverage_status": "coverage intended"
             }],
             "planning_items": [{
+                "guid": "plan1",
+                "slugline": "New Press Conference",
+                "name": "Prime minister press conference",
+                "planning_date": "2018-05-28T05:00:00+0000",
                 "coverages": [{
                     "coverage_id": "plan1_cov1",
                     "news_coverage_status": {
@@ -218,6 +222,10 @@ Feature: Agenda Restricted Coverage Details
                 "coverage_status": "__no_value__"
             }],
             "planning_items": [{
+                "guid": "plan1",
+                "slugline": "__no_value__",
+                "name": "__no_value__",
+                "planning_date": "__no_value__",
                 "coverages": [{
                     "coverage_id": "plan1_cov1",
                     "news_coverage_status": "__no_value__",
@@ -312,4 +320,63 @@ Feature: Agenda Restricted Coverage Details
                 }]
             }]
         }]}
+        """
+
+    Scenario: Get Planning item directly
+        When we login with email "admin2@sourcefabric.org" and password "admin"
+        When we get "/agenda/plan1?format=json"
+        Then we get existing resource
+        """
+        {
+            "_id": "plan1", "guid": "plan1",
+            "item_type": "planning",
+            "slugline": "New Press Conference",
+            "name": "Prime minister press conference",
+            "dates": {
+                "start": "2018-05-28T05:00:00+0000",
+                "end": "2018-05-28T05:00:00+0000"
+            },
+            "coverages": [{
+                "coverage_id": "plan1_cov1",
+                "coverage_type": "text",
+                "scheduled": "2018-05-28T10:51:52+0000",
+                "slugline": "Vivid planning item",
+                "workflow_status": "draft",
+                "coverage_status": "coverage intended"
+            }, {
+                "coverage_id": "plan1_cov2",
+                "coverage_type": "text",
+                "scheduled": "2018-05-28T10:51:52+0000",
+                "slugline": "Vivid planning item",
+                "workflow_status": "draft",
+                "coverage_status": "coverage intended"
+            }]
+        }
+        """
+        When we login with email "user1@restricted.org" and password "admin"
+        When we get "/agenda/plan1?format=json"
+        Then we get existing resource
+        """
+        {
+            "_id": "plan1", "guid": "plan1",
+            "item_type": "planning",
+            "slugline": "__no_value__",
+            "name": "__no_value__",
+            "planning_date": "__no_value__",
+            "coverages": [{
+                "coverage_id": "plan1_cov1",
+                "coverage_type": "text",
+                "scheduled": "__no_value__",
+                "slugline": "__no_value__",
+                "workflow_status": "__no_value__",
+                "coverage_status": "__no_value__"
+            }, {
+                "coverage_id": "plan1_cov2",
+                "coverage_type": "text",
+                "scheduled": "__no_value__",
+                "slugline": "__no_value__",
+                "workflow_status": "__no_value__",
+                "coverage_status": "__no_value__"
+            }]
+        }
         """
