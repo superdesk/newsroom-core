@@ -52,6 +52,7 @@ class AgendaPreview extends React.PureComponent {
             eventsOnly,
             wireItems,
             coverageActions,
+            restrictCoverageInfo,
         } = this.props;
 
         const isWatching = get(item, 'watches', []).includes(user);
@@ -94,6 +95,7 @@ class AgendaPreview extends React.PureComponent {
                             wireItems={wireItems}
                             coverageActions={coverageActions}
                             previewGroup={previewGroup}
+                            restrictCoverageInfo={restrictCoverageInfo}
                         />
                         {!planHasEvent(item) ? null : (
                             <AgendaPreviewEvent item={item} />
@@ -134,6 +136,7 @@ AgendaPreview.propTypes = {
     wireItems: PropTypes.array,
     coverageActions: PropTypes.array,
     previewConfig: PropTypes.object,
+    restrictCoverageInfo: PropTypes.bool,
 };
 
 AgendaPreview.defaultProps = {eventsOnly: false};
