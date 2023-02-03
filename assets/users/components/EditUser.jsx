@@ -16,7 +16,7 @@ import {FormToggle} from 'ui/components/FormToggle';
 import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserListItem';
 import {isProductEnabled} from 'companies/utils';
 
-import {companyProductSeatsSelector, currentCompanySelector, companySectionListSelector} from 'company-admin/selectors';
+import {companyProductSeatsSelector, companySectionListSelector} from 'company-admin/selectors';
 
 const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
 
@@ -35,12 +35,12 @@ function EditUserComponent({
     hideFields,
     companySections,
     seats,
-    company,
 }) {
+    const companyId = user.company;
     const localeOptions = getLocaleInputOptions();
     const stateLabelDetails = getUserStateLabelDetails(user);
-    const companyProductIds = Object.keys(seats[company._id]);
-    const sections = companySections[company._id];
+    const companyProductIds = Object.keys(seats[companyId] || {});
+    const sections = companySections[companyId] || [];
     const companySectionIds = sections.map((section) => section._id);
 
     return (
@@ -183,11 +183,11 @@ function EditUserComponent({
                                                     label={product.name}
                                                     value={isProductEnabled(user.products || [], product._id)}
                                                     onChange={onChange}
-                                                    readOnly={seats[company._id][product._id].max_reached === true}
+                                                    readOnly={seats[companyId][product._id].max_reached === true}
                                                 />
                                             </div>
-                                            <div className={classNames({'text-danger': seats[company._id][product._id].max_reached === true})}>
-                                                {seats[company._id][product._id].assigned_seats}/{seats[company._id][product._id].max_seats}
+                                            <div className={classNames({'text-danger': seats[companyId][product._id].max_reached === true})}>
+                                                {seats[companyId][product._id].assigned_seats}/{seats[companyId][product._id].max_seats}
                                             </div>
                                         </div>
                                     ))}
@@ -282,7 +282,6 @@ EditUserComponent.propTypes = {
 
     companySections: PropTypes.object,
     seats: PropTypes.object,
-    company: PropTypes.object,
 };
 
 EditUserComponent.defaultProps = {
@@ -292,7 +291,6 @@ EditUserComponent.defaultProps = {
 const mapStateToProps = (state) => ({
     companySections: companySectionListSelector(state),
     seats: companyProductSeatsSelector(state),
-    company: currentCompanySelector(state),
 });
 
 const EditUser = connect(mapStateToProps)(EditUserComponent);
