@@ -4,6 +4,7 @@ from werkzeug.exceptions import NotFound
 from flask import render_template, current_app as app, jsonify
 from flask_babel import gettext
 
+from superdesk.utc import utcnow, utc_to_local
 from newsroom.decorator import login_required, company_admin_only
 from newsroom.utils import query_resource, get_json_or_400
 from newsroom.auth import get_user, get_company
@@ -75,11 +76,14 @@ def send_product_seat_request_email():
         to=recipients,
         template="additional_product_seat_request_email",
         template_kwargs=dict(
+            app_name=app.config["SITE_NAME"],
             products=products,
             number_of_seats=data["number_of_seats"],
             note=data["note"],
             user=user,
             company=company,
+            now=utc_to_local(app.config["DEFAULT_TIMEZONE"], utcnow()),
+            all_products=len(products) == len(company.get("products") or [])
         ),
     )
 
