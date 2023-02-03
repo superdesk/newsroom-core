@@ -83,7 +83,7 @@ def send_product_seat_request_email():
             user=user,
             company=company,
             now=utc_to_local(app.config["DEFAULT_TIMEZONE"], utcnow()),
-            all_products=len(products) == len(company.get("products") or [])
+            all_products=len(products) == len(company.get("products") or []),
         ),
     )
 
