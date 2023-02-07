@@ -22,62 +22,92 @@
 </div>
 
 <nav class="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
-    <span class="content-bar__menu content-bar__menu--nav">
+    <button class="content-bar__menu content-bar__menu--nav" title="" aria-label="Open filter panel" data-bs-original-title="Open filter panel">
         <i class="icon--hamburger"></i>
-        <i class="icon--close-thin icon--white"></i>
-    </span>
-    <div class="search form-inline">
-        <span class="search__icon d-none d-sm-block">
-            <i class="icon--search icon--gray-dark"></i>
+    </button>
+    <div class="search d-flex align-items-center">
+        <span class="search__icon">
+            <i class="icon--search icon--gray"></i>
         </span>
         <div class="search__form input-group">
-            <form class="form-inline">
-
-                <input type="text" class="search__input form-control" placeholder="Search for..." aria-label="Search for...">
+            <form class="d-flex align-items-center" role="search" aria-label="search">
+                <input type="text" name="q" class="search__input form-control" placeholder="Search for..." aria-label="Search for..." value="">
                 <div class="search__form__buttons">
-                    <span class="search__clear">
-                        <img src="{{ url_for('static', filename = 'search_clear.png') }}" width="16" height="16"/>
-                    </span>
+                    <button class="btn search__clear" aria-label="Search clear" type="reset">
+                        <img src="/static/search_clear.png" width="16" height="16">
+                    </button>
                     <button class="btn btn-outline-secondary" type="submit">Search</button>
                 </div>
-
             </form>
         </div>
     </div>
-
     <div class="content-bar__right">
-        <div class="content-bar__sort btn-group d-none"><!-- sort bar hidden -->
-            <div class="form-control-plaintext">
-                Sort by:
-            </div>
-            <button type="button" class="content-bar__dropdown-btn btn dropdown-toggle" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false">
-                Date
-            </button>
-            <div class="dropdown-menu dropdown-menu-right">
-                <button class="dropdown-item" type="button">Date</button>
-                <button class="dropdown-item" type="button">Author</button>
-            </div>
-        </div>
-
         <div class="d-flex align-items-center px-2 px-sm-3">
-            <label for="news-only" class="me-2">News only</label>
-            <div class="react-toggle react-toggle--checked toggle-background"><div class="react-toggle-track"><div class="react-toggle-track-check"></div><div class="react-toggle-track-x"></div></div><div class="react-toggle-thumb"></div><input id="news-only" class="react-toggle-screenreader-only" type="checkbox" checked=""></div>
-        </div>
-
-        <div class="btn-group">
-            <span class="content-bar__menu" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false">
-                <i class="icon--list-view"></i>
-            </span>
-            <div class="dropdown-menu dropdown-menu-right">
-                <h6 class="dropdown-header">Change view</h6>
-                <button class="dropdown-item" type="button"><i class="icon--list-view icon--gray"></i> Large list</button>
-                <button class="dropdown-item" type="button"><i class="icon--list-view-compact icon--gray"></i> Compact list</button>
-                <button class="dropdown-item" type="button"><i class="icon--grid-view icon--gray"></i> Grid</button>
+            <div class="d-flex align-items-center">
+                <label for="all-versions" class="me-2">All Versions</label>
+                <div class="react-toggle toggle-background">
+                    <div class="react-toggle-track">
+                        <div class="react-toggle-track-check"></div>
+                        <div class="react-toggle-track-x"></div>
+                    </div>
+                    <div class="react-toggle-thumb"></div>
+                    <input id="all-versions" class="react-toggle-screenreader-only" type="checkbox">
+                </div>
             </div>
+        </div>
+        <div class="d-flex align-items-center px-2 px-sm-3">
+            <div class="d-flex align-items-center flex-column-reverse flex-md-row">
+                <label for="news-only" class="label__news-only me-2">News only</label>
+                <div class="react-toggle toggle-background">
+                    <div class="react-toggle-track">
+                        <div class="react-toggle-track-check"></div>
+                        <div class="react-toggle-track-x"></div>
+                    </div>
+                    <div class="react-toggle-thumb"></div>
+                    <input id="news-only" class="react-toggle-screenreader-only" type="checkbox">
+                </div>
+            </div>
+        </div>
+        <div class="btn-group list-view__options" data-bs-original-title="" title="">
+            <button class="content-bar__menu" title="Change view" aria-label="Change view" role="button">
+                <i class="icon--list-view"></i>
+            </button>
         </div>
     </div>
-
-</nav>
+    <div class="content-bar__right--mobile">
+        <div class="btn-group">
+            <button id="listSearchOptionsButton" class="content-bar__menu" data-bs-toggle="dropdown" aria-haspopup="menu" aria-expanded="false" aria-label="Search Options" role="button">
+                <i class="icon--settings"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="listSearchOptionsButton">
+                <h6 class="dropdown-header">Search Options</h6>
+                <form class="px-3 pt-3">
+                    <div class="form-group d-flex align-items-center">
+                        <div class="react-toggle toggle-background">
+                            <div class="react-toggle-track">
+                                <div class="react-toggle-track-check"></div>
+                                <div class="react-toggle-track-x"></div>
+                            </div>
+                            <div class="react-toggle-thumb"></div>
+                            <input class="react-toggle-screenreader-only" type="checkbox"></div>
+                            <label for="all-versions" class="mb-0 ms-2">All Versions</label>
+                        </div>
+                        <div class="form-group d-flex align-items-center">
+                            <div class="react-toggle toggle-background">
+                                <div class="react-toggle-track">
+                                    <div class="react-toggle-track-check"></div>
+                                    <div class="react-toggle-track-x"></div>
+                                </div>
+                                <div class="react-toggle-thumb"></div>
+                                <input class="react-toggle-screenreader-only" type="checkbox">
+                            </div>
+                            <label for="news-only" class="mb-0 ms-2">News Only</label>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
 
 {% endblock %}
 
@@ -145,20 +175,23 @@
     </div>
 
     <div class="wire-column__main">
-
-        <div class="wire-column__main-header d-flex m-0 px-3 align-items-center flex-wrap flex-sm-nowrap">
-            <div class="navbar-text search-results-info">
-                <span class="search-results-info__num">147</span>
-                <span class="search-results-info__text">search results for:<br><b>search</b></span>
-            </div>
-
-            <button class="btn btn-outline-primary btn-sm d-none d-sm-block">Save as topic</button>
-            <button class="btn btn-outline-primary btn-sm d-block d-sm-none">S</button>
-            <div class="d-flex align-items-center ms-auto">
-                    <button type="button" class="button__reset-styles d-flex align-items-center ms-3">
-                        <i class="icon--refresh icon--pink"></i>
-                        <span class="badge badge-pill badge-info badge-secondary ms-2">21</span>
-                    </button>
+        <div class="wire-column__main-header px-1 px-md-3">
+            <div class="d-flex flex-column flex-md-row">
+                <div class="d-flex flex-column justify-content-center w-100">
+                    <div class="navbar-text search-results-info">
+                        <span class="search-results-info__num">4336</span>
+                        <span class="search-results-info__text flex-column"><span>search results for:<br><b>search</b></span></span>
+                        <button class="btn btn-outline-primary btn-sm d-none d-sm-block my-1 ms-2">Create my topic</button>
+                        <div class="d-flex ml-auto align-items-center ms-auto">                            
+                            <div class="d-flex ml-auto align-items-end align-items-md-center flex-column flex-md-row flex-shrink-0">                                
+                                <button type="button" title="" class="button__reset-styles d-flex align-items-center ms-3" aria-label="Refresh" data-bs-original-title="New stories available to load"><i class="icon--refresh icon--pink rotating"></i>
+                                    <span class="badge rounded-pill bg-info ms-2">25</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="search-results__tags"></span>
+                </div>
             </div>
         </div>
 
