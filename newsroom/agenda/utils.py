@@ -196,11 +196,18 @@ def remove_restricted_coverage_info(items):
         "event_id",
         "coverages",
         "planning_items",
+        "dates",
     )
 
     def remove_planning_info(plan_item):
         for field in [key for key in plan_item.keys() if not key.startswith("_") and key not in planning_keys_to_copy]:
-            plan_item.pop(field, None)
+            if field == "display_dates":
+                try:
+                    plan_item["display_dates"] = plan_item["planning_items"][0]["planning_item"]
+                except (IndexError, KeyError):
+                    plan_item["display_dates"] = plan_item["dates"]["start"]
+            else:
+                plan_item.pop(field, None)
 
     for item in items:
         if item.get("item_type") == "planning":
