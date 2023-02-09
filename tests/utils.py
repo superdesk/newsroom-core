@@ -25,7 +25,7 @@ def patch_json(client, url, data):
     return resp.json
 
 
-def delete_json(client, url, data):
+def delete_json(client, url, data=None):
     headers = get_etag_header(client, url)
     resp = client.delete(url, json=data, headers=headers)
     assert resp.status_code in [200, 204], "error %d on delete to %s" % (
