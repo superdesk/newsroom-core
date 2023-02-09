@@ -87,7 +87,7 @@ class NotificationList extends React.Component {
                 </span>
 
                 {!this.state.displayItems ? null : this.props.count === 0 ? (
-                    <div className="notif__list">
+                    <div className="notif__list dropdown-menu dropdown-menu-right show">
                         <div className='notif__list__header d-flex'>
                             <span className='notif__list__header-headline ms-3'>{gettext('Notifications')}</span>
                         </div>
@@ -96,7 +96,7 @@ class NotificationList extends React.Component {
                         </div>
                     </div>
                 ) : (
-                    <div className="notif__list">
+                    <div className="notif__list dropdown-menu dropdown-menu-right show">
                         <div className='notif__list__header d-flex'>
                             <span className='notif__list__header-headline ms-3'>{gettext('Notifications')}</span>
                             <button
