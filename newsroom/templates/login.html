@@ -18,7 +18,7 @@
 
                 {% if config.SAML_PATH %}
                 <div class="card-body pt-1 pb-2">
-                    <a href="{{ url_for('auth.saml') }}" title="{{ gettext('Login using Single Sign On') }}" class="btn btn-primary btn-block">{{ config.SAML_LABEL }}</a>
+                    <a href="{{ url_for('auth.saml') }}" title="{{ gettext('Login using Single Sign On') }}" class="btn btn-primary w-100">{{ config.SAML_LABEL }}</a>
                 </div>
                 {% endif %}
 
