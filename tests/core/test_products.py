@@ -6,6 +6,8 @@ from pytest import fixture
 
 from newsroom.tests.users import test_login_succeeds_for_admin
 
+from .. import utils
+
 
 @fixture(autouse=True)
 def product(app):
@@ -143,18 +145,7 @@ def test_gets_all_products(client, app):
 
 def test_assign_products_to_companies(client, app, product, companies):
     test_login_succeeds_for_admin(client)
-
-    resp = client.post(
-        "/products/{}/companies".format(product["_id"]),
-        json={
-            "companies": [
-                companies[0]["_id"],
-                companies[1]["_id"],
-            ]
-        },
-    )
-
-    assert 200 == resp.status_code
+    assign_product_to_companies(client, product, companies)
 
     company = app.data.find_one("companies", req=None, _id=companies[0]["_id"])
     assert "products" in company
@@ -186,3 +177,48 @@ def test_products_company_migration(app, companies):
 
     company = app.data.find_one("companies", req=None, _id=companies[0]["_id"])
     assert 1 == len(company["products"])
+
+
+def test_delete_assigned_product(client, app, product, companies, user):
+    product2 = {
+        "name": "test",
+        "is_enabled": True,
+    }
+
+    app.data.insert("products", [product2])
+
+    assign_product_to_companies(client, product, companies)
+    assign_product_to_companies(client, product2, companies)
+    assign_product_to_user(client, product2, user)
+
+    company = app.data.find_one("companies", req=None, _id=companies[0]["_id"])
+    assert 2 == len(company["products"])
+
+    updated_user = app.data.find_one("users", req=None, _id=user["_id"])
+    assert 1 == len(updated_user["products"])
+
+    utils.delete_json(client, f"/products/{product2['_id']}")
+
+    company = app.data.find_one("companies", req=None, _id=companies[0]["_id"])
+    assert 1 == len(company["products"])
+    assert product2["_id"] not in [p["_id"] for p in company["products"]]
+
+    updated_user = app.data.find_one("users", req=None, _id=user["_id"])
+    assert 0 == len(updated_user["products"])
+
+
+def assign_product_to_companies(client, product, companies):
+    resp = client.post(
+        "/products/{}/companies".format(product["_id"]),
+        json={
+            "companies": [company["_id"] for company in companies],
+        },
+    )
+
+    assert resp.status_code == 200
+
+
+def assign_product_to_user(client, product, user):
+    products = user.get("products") or []
+    products.append({"_id": product["_id"]})
+    utils.patch_json(client, f"/api/users/{user['_id']}", {"products": products})

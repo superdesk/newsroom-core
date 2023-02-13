@@ -40,7 +40,13 @@ class ProductsResource(newsroom.Resource):
 
 
 class ProductsService(newsroom.Service):
-    pass
+    def on_deleted(self, doc):
+        lookup = {"products._id": doc["_id"]}
+        for resource in ("users", "companies"):
+            items = superdesk.get_resource_service(resource).get(req=None, lookup=lookup)
+            for item in items:
+                updates = {"products": [p for p in item["products"] if p["_id"] != doc["_id"]]}
+                superdesk.get_resource_service(resource).system_update(item["_id"], updates, item)
 
 
 def _get_navigation_query(ids):

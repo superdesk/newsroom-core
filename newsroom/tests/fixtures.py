@@ -172,24 +172,21 @@ def init_agenda_items(app):
 
 @fixture()
 def user(app):
-    app.data.insert(
-        "users",
-        [
-            {
-                "_id": ObjectId(ADMIN_USER_ID),
-                "first_name": "admin",
-                "last_name": "admin",
-                "email": "admin@sourcefabric.org",
-                "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
-                "user_type": "administrator",
-                "is_validated": True,
-                "is_enabled": True,
-                "is_approved": True,
-                "receive_email": True,
-                "receive_app_notifications": True,
-            }
-        ],
-    )
+    _user = {
+        "_id": ObjectId(ADMIN_USER_ID),
+        "first_name": "admin",
+        "last_name": "admin",
+        "email": "admin@sourcefabric.org",
+        "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
+        "user_type": "administrator",
+        "is_validated": True,
+        "is_enabled": True,
+        "is_approved": True,
+        "receive_email": True,
+        "receive_app_notifications": True,
+    }
+    app.data.insert("users", [_user])
+    return _user
 
 
 @fixture()
