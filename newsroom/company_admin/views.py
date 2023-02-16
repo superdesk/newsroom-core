@@ -69,8 +69,8 @@ def send_product_seat_request_email():
         return NotFound(gettext("Product Seat Request recipients not configured"))
 
     recipients = [
-        address for address in
-        (general_settings.get("values").get("product_seat_request_recipients") or "").split(",")
+        address
+        for address in (general_settings.get("values").get("product_seat_request_recipients") or "").split(",")
         if address
     ]
     if not len(recipients):
