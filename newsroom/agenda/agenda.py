@@ -701,9 +701,11 @@ class AgendaService(BaseSearchService):
                 ]
 
             if doc["item_type"] == "planning":
+                # If this is a Planning item, then ``inner_hits`` should only include the
+                # fields relevant to the Coverages (as this is the only nested field of a Planning item)
                 inner_hits = {key: val for key, val in inner_hits.items() if key in planning_filters}
 
-            if len(inner_hits.keys()) > 0 and doc["item_type"] != "planning":
+            if len(inner_hits.keys()) > 0:
                 # Store matched Planning IDs into matched_planning_items
                 # The Planning IDs must be in all supplied ``_inner_hits``
                 # In order to be included (i.e. match all nested planning queries)
