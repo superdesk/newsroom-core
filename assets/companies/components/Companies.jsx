@@ -59,6 +59,7 @@ class Companies extends React.Component {
 
         if (confirm(gettext('Would you like to delete company: {{name}}', {name: this.props.companyToEdit.name}))) {
             this.props.deleteCompany('companies');
+            this.props.cancelEdit();
         }
     }
 
