@@ -440,6 +440,8 @@ def set_agenda_metadata_from_planning(agenda, planning_item, force_adhoc=False):
         agenda["service"] = format_qcode_items(planning_item.get("anpa_category"))
         agenda["state"] = planning_item.get("state")
         agenda["state_reason"] = planning_item.get("state_reason")
+        agenda["language"] = planning_item.get("language")
+        agenda["source"] = planning_item.get("source")
 
     if planning_item.get("event_item") and force_adhoc:
         agenda["event_id"] = planning_item["event_item"]
@@ -478,6 +480,8 @@ def set_agenda_metadata_from_planning(agenda, planning_item, force_adhoc=False):
     plan["products"] = planning_item.get("products")
     plan["agendas"] = planning_item.get("agendas")
     plan[TO_BE_CONFIRMED_FIELD] = planning_item.get(TO_BE_CONFIRMED_FIELD)
+    plan["language"] = planning_item.get("language")
+    plan["source"] = planning_item.get("source")
 
     if new_plan:
         agenda["planning_items"].append(plan)

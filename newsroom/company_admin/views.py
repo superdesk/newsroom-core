@@ -68,9 +68,13 @@ def send_product_seat_request_email():
     if not general_settings:
         return NotFound(gettext("Product Seat Request recipients not configured"))
 
-    recipients = general_settings.get("values").get("product_seat_request_recipients").split(",")
-    assert recipients
-    assert isinstance(recipients, list)
+    recipients = [
+        address
+        for address in (general_settings.get("values").get("product_seat_request_recipients") or "").split(",")
+        if address
+    ]
+    if not len(recipients):
+        return NotFound(gettext("Product Seat Request recipients not configured"))
 
     send_template_email(
         to=recipients,

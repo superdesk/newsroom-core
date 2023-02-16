@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {get} from 'lodash';
 
 import {sendProductSeatRequest} from '../actions';
-import {closeModal} from 'actions';
+import {closeModal, modalFormValid, modalFormInvalid} from 'actions';
 import {gettext} from 'utils';
 import {currentCompanySectionListSelector, productListSelector} from '../selectors';
 
@@ -25,6 +25,11 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component {
         this.submit = this.submit.bind(this);
         this.updateNumberOfSeats = this.updateNumberOfSeats.bind(this);
         this.updateNote = this.updateNote.bind(this);
+        this.validateForm = this.validateForm.bind(this);
+    }
+
+    componentDidMount() {
+        this.validateForm();
     }
 
     submit() {
@@ -46,11 +51,11 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component {
             productIds.push(productId);
         }
 
-        this.setState({productIds: productIds});
+        this.setState({productIds: productIds}, this.validateForm);
     }
 
     updateNumberOfSeats(event) {
-        this.setState({numberOfSeats: parseInt(event.target.value, 10)});
+        this.setState({numberOfSeats: parseInt(event.target.value, 10)}, this.validateForm);
     }
 
     updateNote(event) {
@@ -73,6 +78,14 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component {
         return products;
     }
 
+    validateForm() {
+        if (!(this.state.productIds || []).length || this.state.numberOfSeats <= 0) {
+            this.props.modalFormInvalid();
+        } else {
+            this.props.modalFormValid();
+        }
+    }
+
     render() {
         const sectionProducts = this.getProductGroups();
         const selectedProducts = this.state.productIds.map((productId) => (
@@ -86,6 +99,7 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component {
                 disableButtonOnSubmit={true}
                 onSubmit={this.submit}
                 closeModal={this.props.closeModal}
+                clickOutsideToClose={true}
             >
                 <form>
                     <div className="input-group">
@@ -99,11 +113,12 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component {
                             +
                         </button>
                         <ul className="dropdown-menu">
-                            {sectionProducts.map((section) => (
+                            {sectionProducts.map((section, index) => (
                                 <React.Fragment key={section._id}>
                                     <h6 className="dropdown-header">
                                         {section.name}
                                     </h6>
+                                    <div className="dropdown-divider" />
                                     {section.products.map((product) => (
                                         <li key={product._id}>
                                             <button
@@ -115,6 +130,9 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component {
                                             </button>
                                         </li>
                                     ))}
+                                    {index >= (sectionProducts.length - 1) ? null : (
+                                        <div className="dropdown-divider" />
+                                    )}
                                 </React.Fragment>
                             ))}
                         </ul>
@@ -160,6 +178,8 @@ CompanyAdminProductSeatRequestModalComponent.propTypes = {
         _id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
     })),
+    modalFormInvalid: PropTypes.func,
+    modalFormValid: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -171,6 +191,8 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
     closeModal: () => dispatch(closeModal()),
     sendRequest: (data) => dispatch(sendProductSeatRequest(data)),
+    modalFormInvalid: () => dispatch(modalFormInvalid()),
+    modalFormValid: () => dispatch(modalFormValid()),
 });
 
 export const CompanyAdminProductSeatRequestModal = connect(
