@@ -700,7 +700,10 @@ class AgendaService(BaseSearchService):
                     if all([coverage_id in items for items in coverages_by_filter.values()])
                 ]
 
-            if len(inner_hits.keys()) > 0:
+            if doc["item_type"] == "planning":
+                inner_hits = {key: val for key, val in inner_hits.items() if key in planning_filters}
+
+            if len(inner_hits.keys()) > 0 and doc["item_type"] != "planning":
                 # Store matched Planning IDs into matched_planning_items
                 # The Planning IDs must be in all supplied ``_inner_hits``
                 # In order to be included (i.e. match all nested planning queries)
