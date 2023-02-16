@@ -91,7 +91,7 @@ class Modal extends React.Component {
         if (this.elem) {
             this.modal = new BSModal(this.elem);
             this.modal.show();
-            this.elem.addEventListener('hidden.bd.modal', () => {
+            this.elem.addEventListener('hidden.bs.modal', () => {
                 this.props.closeModal();
             });
         }
