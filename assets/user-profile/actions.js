@@ -95,8 +95,12 @@ export function fetchUser(id) {
 export function saveUser() {
     return function (dispatch, getState) {
 
-        const editedUser = getState().editedUser;
+        const editedUser = {...getState().editedUser};
         const url = `/users/${editedUser._id}`;
+
+        // Remove ``sections`` and ``products`` as these aren't managed in the ``UserProfile`` app
+        delete editedUser.sections;
+        delete editedUser.products;
 
         return server.post(url, editedUser)
             .then(function() {
