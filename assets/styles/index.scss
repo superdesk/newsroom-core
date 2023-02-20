@@ -916,7 +916,10 @@ article.list {
         }
     }
     .input-group {
-        width: auto;
+        width: 100%;
+        @include sm {
+            width: auto;
+        }
     }
 }
 
@@ -992,7 +995,7 @@ article.list {
 }
 
 .search__icon {
-    margin: 0 6px;
+    margin: 6px 6px 0 6px;
     order: 1;
     @include sm {
         margin: 6px 0 0 6px;
