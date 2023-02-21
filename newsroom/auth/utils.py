@@ -63,7 +63,7 @@ def start_user_session(user: UserData, permanent=False):
     flask.session["user"] = str(user["_id"])  # str to avoid serialization issues
     flask.session["name"] = "{} {}".format(user.get("first_name"), user.get("last_name"))
     flask.session["user_type"] = user["user_type"]
-    flask.session["auth_ttl"] = utcnow() + SESSION_AUTH_TTL
+    flask.session["auth_ttl"] = utcnow().replace(tzinfo=None) + SESSION_AUTH_TTL
     flask.session.permanent = permanent
 
 
@@ -133,7 +133,7 @@ def revalidate_session_user():
     company = get_company(user)
     is_valid = is_valid_user(user, company)
     if is_valid:
-        flask.session["auth_ttl"] = utcnow() + SESSION_AUTH_TTL
+        flask.session["auth_ttl"] = utcnow().replace(tzinfo=None) + SESSION_AUTH_TTL
     return is_valid
 
 
