@@ -39,8 +39,6 @@ if (getLocale() === 'fr_CA') {
 }
 
 export const now = moment(); // to enable mocking in tests
-const NEWSROOM = 'newsroom';
-const CLIENT_CONFIG = 'client_config';
 
 function getLocaleFormat(formatType, defaultFormat) {
     const formats = getConfig('locale_formats', {});
@@ -691,7 +689,12 @@ export function errorHandler(error, dispatch, setError) {
  * @return {Mixed}
  */
 export function getConfig(key, defaultValue) {
-    const clientConfig = get(window, `${NEWSROOM}.${CLIENT_CONFIG}`, {});
+    const clientConfig = window && window.newsroom && window.newsroom.client_config || {};
+
+    if (Object.keys(clientConfig).length === 0) {
+        console.warn('Client config is not yet available for key', key);
+    }
+
     return get(clientConfig, key, defaultValue);
 }
 

@@ -20,7 +20,6 @@ import 'store';
 import 'url-search-params-polyfill';
 import 'whatwg-fetch';
 import 'react-datepicker';
-import './utils';
 
 export const KEYS = {
     ESCAPE: 'Escape',
