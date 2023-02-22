@@ -119,6 +119,8 @@ COMPANY_ADMIN_ALLOWED_UPDATES = {
     "receive_email",
     "receive_app_notifications",
     "manage_company_topics",
+    "token",
+    "token_expiry_date",
 }
 
 
