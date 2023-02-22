@@ -207,7 +207,6 @@ class WireApp extends BaseApp {
                             }
                         </div>
                         <div className={mainClassName}
-                            onScroll={this.onListScroll}
                             ref={this.setListRef}
                         >
                             <SearchResultsInfo
@@ -231,6 +230,7 @@ class WireApp extends BaseApp {
                             <ItemsList
                                 actions={this.props.actions}
                                 activeView={this.props.activeView}
+                                onScroll={this.onListScroll}
                             />
                         </div>
 

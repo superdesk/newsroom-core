@@ -169,7 +169,7 @@ class ItemsList extends React.Component {
         });
 
         return (
-            <div className={listClassName} onKeyDown={this.onKeyDown} ref={(elem) => this.elem = elem}>
+            <div className={listClassName} onKeyDown={this.onKeyDown} onScroll={this.props.onScroll} ref={(elem) => this.elem = elem}>
                 {articles}
                 {!articles.length &&
                     <div className="wire-articles__item-wrap col-12">
@@ -209,6 +209,7 @@ ItemsList.propTypes = {
     contextName: PropTypes.string,
     isSearchFiltered: PropTypes.bool,
     filterGroupLabels: PropTypes.object,
+    onScroll: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
