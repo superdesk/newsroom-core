@@ -29,11 +29,12 @@ class EditProduct extends React.Component {
             activeProduct: props.product._id,
         };
 
-        this.tabs = [
-            {label: gettext('Product'), name: 'product-details'},
-            {label: gettext('Companies'), name: 'companies'},
-            {label: gettext('Global Topics'), name: 'navigations'}
-        ];
+        this.tabs = [{label: gettext('Product'), name: 'product-details'}];
+
+        if (this.props.product._id != null) {
+            this.tabs.push({label: gettext('Companies'), name: 'companies'});
+            this.tabs.push({label: gettext('Global Topics'), name: 'navigations'});
+        }
     }
 
     handleTabClick(event) {
