@@ -101,7 +101,7 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component {
                 closeModal={this.props.closeModal}
                 clickOutsideToClose={true}
             >
-                <form>
+                <form onSubmit={(event) => {event.preventDefault();}}>
                     <div className="input-group">
                         <button
                             className="btn btn-outline-secondary"
