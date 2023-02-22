@@ -700,7 +700,7 @@ class AgendaService(BaseSearchService):
                     if all([coverage_id in items for items in coverages_by_filter.values()])
                 ]
 
-            if doc["item_type"] == "planning":
+            if doc.get("item_type") == "planning":
                 # If this is a Planning item, then ``inner_hits`` should only include the
                 # fields relevant to the Coverages (as this is the only nested field of a Planning item)
                 inner_hits = {key: val for key, val in inner_hits.items() if key in planning_filters}
