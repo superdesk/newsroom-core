@@ -196,6 +196,6 @@ class UsersService(newsroom.Service):
             if doc.get("company") and doc["company"] == manager.get("company"):
                 if not updates or all([key in COMPANY_ADMIN_ALLOWED_UPDATES for key in updates.keys()]):
                     return
-        if request and request.url_rule and request.url_rule.rule == "/reset_password/<token>":
+        if request and request.url_rule and request.url_rule.rule in ["/reset_password/<token>", "/token/<token_type>"]:
             return
         abort(403)
