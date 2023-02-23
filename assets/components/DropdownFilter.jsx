@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {gettext} from 'utils';
-import DropdownFilterButton from './DropdownFilterButton';
+import {Dropdown} from 'bootstrap';
 
 const compareFunction = (a, b) => String(a.key).localeCompare(String(b.key));
 
@@ -41,21 +41,59 @@ function DropdownFilter({
     ...props}) {
     const isActive = !!(activeFilter[filter.field]);
     const filterLabel = getFilterLabel ? getFilterLabel : getActiveFilterLabel;
+    const dropdown = React.useRef();
+
+    React.useEffect(() => {
+        const dropdownInstance = Dropdown.getOrCreateInstance(dropdown.current, {autoClose: true});
+
+        return () => {
+            dropdownInstance.hide();
+        };
+    });
+
+    const icon= filter.icon;
+    const label = filterLabel(filter, activeFilter, isActive, {...props});
+    const textOnly = (buttonProps || {}).textOnly;
+    const iconColour= (buttonProps || {}).iconColour;
 
     return (<div className={classNames(
+        'dropdown',
         'btn-group',
         {[className]: className}
     )} key={filter.field}>
-        <DropdownFilterButton
+        <button
             id={filter.field}
-            isActive={isActive}
-            autoToggle={props.autoToggle}
+            type="button"
+            className={classNames(
+                'btn btn-sm d-flex align-items-center px-2 ms-2 dropdown-toggle',
+                {
+                    active: isActive,
+                    'btn-text-only': textOnly,
+                    'btn-outline-primary': !textOnly,
+                }
+            )}
+            data-bs-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
             onClick={props.onClick}
-            icon={filter.icon}
-            label={filterLabel(filter, activeFilter, isActive, {...props})}
-            textOnly={(buttonProps || {}).textOnly}
-            iconColour={(buttonProps || {}).iconColour}
-        />
+            ref={dropdown}
+        >
+            {!icon ? null : (
+                <i className={`${icon} d-md-none`} />
+            )}
+            {textOnly ? label : (
+                <span className="d-none d-md-block">
+                    {label}
+                </span>
+            )}
+            <i className={classNames(
+                'icon-small--arrow-down ms-1',
+                {
+                    'icon--white': isActive && !iconColour,
+                    [`icon--${iconColour}`]: iconColour
+                }
+            )} />
+        </button>
         <div className='dropdown-menu' aria-labelledby={filter.field}>
             <button
                 type='button'
