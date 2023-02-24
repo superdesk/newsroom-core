@@ -1,6 +1,8 @@
 import hmac
 import flask
 import logging
+
+import newsroom.signals as signals
 from copy import copy, deepcopy
 from datetime import datetime
 from typing import Optional
@@ -31,7 +33,6 @@ from newsroom.history import get_history_users
 from newsroom.wire.views import delete_dashboard_caches
 from newsroom.wire import url_for_wire
 from newsroom.upload import ASSETS_RESOURCE
-from newsroom.signals import publish_item as publish_item_signal
 from newsroom.agenda.utils import (
     get_latest_available_delivery,
     TO_BE_CONFIRMED_FIELD,
@@ -78,6 +79,8 @@ def push():
     item = flask.json.loads(flask.request.get_data())
     assert "guid" in item or "_id" in item, {"guid": 1}
     assert "type" in item, {"type": 1}
+
+    signals.push.send(app._get_current_object(), item=item)
 
     if item.get("type") == "event":
         orig = app.data.find_one("agenda", req=None, guid=item["guid"])
@@ -176,7 +179,7 @@ def publish_item(doc, original):
             if subject.get("scheme") in app.config["WIRE_SUBJECT_SCHEME_WHITELIST"]
         ]
 
-    publish_item_signal.send(app._get_current_object(), item=doc, is_new=original is None)
+    signals.publish_item.send(app._get_current_object(), item=doc, is_new=original is None)
     _id = service.create([doc])[0]
     if "associations" not in doc and original is not None and bool(original.get("associations", {})):
         service.patch(_id, updates={"associations": None})
@@ -216,6 +219,7 @@ def publish_event(event, orig):
                 # Make sure the Planning item has an ``event_id`` defined
                 # This can happen when pushing a Planning item before linking to an Event
                 service.system_update(plan["_id"], {"event_id": _id}, plan)
+
         _id = service.post([agenda])[0]
     else:
         # replace the original document
