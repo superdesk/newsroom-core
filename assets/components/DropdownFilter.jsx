@@ -16,7 +16,7 @@ export const processBuckets = (buckets, filter, toggleFilter) => (filter.notSort
                     'dropdown-item',
                     {'dropdown-item--active': filter.isItemActive && filter.isItemActive(bucket.key)}
                 )}
-                onClick={(event) => {
+                onClick={() => {
                     toggleFilter(filter.field, bucket.key);
                 }}
             >{filter.transform ? filter.transform(bucket.key, bucket) : bucket.key}</button>);

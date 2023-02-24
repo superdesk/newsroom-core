@@ -15,10 +15,10 @@ export function Dropdown({children, isActive, icon, label, className, buttonProp
             dropdownInstance.hide();
         }
 
-        document.addEventListener("click", clickOutside);
+        document.addEventListener('click', clickOutside);
 
         return () => {
-            document.removeEventListener("click", clickOutside);
+            document.removeEventListener('click', clickOutside);
         };
     });
 
@@ -29,7 +29,7 @@ export function Dropdown({children, isActive, icon, label, className, buttonProp
         className={classNames(
             'dropdown',
             'btn-group',
-            className ? className : '',
+            className ? className : ''
         )}
         onClick={(event) => {
             event.stopPropagation();
