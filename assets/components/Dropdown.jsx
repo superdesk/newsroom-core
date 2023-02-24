@@ -1,0 +1,75 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import classNames from 'classnames';
+import {Dropdown as BootstrapDropdown} from 'bootstrap';
+
+export function Dropdown({children, isActive, icon, label, className, buttonProps}) {
+
+    const dropdown = React.useRef();
+
+    React.useEffect(() => {
+        const dropdownInstance = BootstrapDropdown.getOrCreateInstance(dropdown.current, {autoClose: true});
+
+        return () => {
+            dropdownInstance.hide();
+        };
+    });
+
+    const textOnly = (buttonProps || {}).textOnly;
+    const iconColour= (buttonProps || {}).iconColour;
+
+    return (<div className={classNames(
+        'dropdown',
+        'btn-group',
+        {[className]: className}
+    )}>
+        <button
+            type="button"
+            className={classNames(
+                'btn btn-sm d-flex align-items-center px-2 ms-2 dropdown-toggle',
+                {
+                    active: isActive,
+                    'btn-text-only': textOnly,
+                    'btn-outline-primary': !textOnly,
+                }
+            )}
+            data-bs-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+            ref={dropdown}
+        >
+            {!icon ? null : (
+                <i className={`${icon} d-md-none`} />
+            )}
+            {textOnly ? label : (
+                <span className="d-none d-md-block">
+                    {label}
+                </span>
+            )}
+            <i className={classNames(
+                'icon-small--arrow-down ms-1',
+                {
+                    'icon--white': isActive && !iconColour,
+                    [`icon--${iconColour}`]: iconColour
+                }
+            )} />
+        </button>
+        <div className='dropdown-menu'>
+            {children}
+        </div>
+    </div>);
+}
+
+Dropdown.propTypes = {
+    children: PropTypes.node,
+    icon: PropTypes.string,
+    label: PropTypes.node,
+    isActive: PropTypes.bool,
+    className: PropTypes.string,
+    autoToggle: PropTypes.bool,
+    reset: PropTypes.func,
+    buttonProps: PropTypes.shape({
+        textOnly: PropTypes.bool,
+        iconColour: PropTypes.string,
+    }),
+};

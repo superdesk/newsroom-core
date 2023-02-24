@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {gettext} from 'utils';
-import {Dropdown} from 'bootstrap';
+import {Dropdown} from './Dropdown';
 
 const compareFunction = (a, b) => String(a.key).localeCompare(String(b.key));
 
@@ -41,60 +41,17 @@ function DropdownFilter({
     ...props}) {
     const isActive = !!(activeFilter[filter.field]);
     const filterLabel = getFilterLabel ? getFilterLabel : getActiveFilterLabel;
-    const dropdown = React.useRef();
-
-    React.useEffect(() => {
-        const dropdownInstance = Dropdown.getOrCreateInstance(dropdown.current, {autoClose: true});
-
-        return () => {
-            dropdownInstance.hide();
-        };
-    });
-
-    const icon= filter.icon;
     const label = filterLabel(filter, activeFilter, isActive, {...props});
-    const textOnly = (buttonProps || {}).textOnly;
-    const iconColour= (buttonProps || {}).iconColour;
 
-    return (<div className={classNames(
-        'dropdown',
-        'btn-group',
-        {[className]: className}
-    )} key={filter.field}>
-        <button
-            id={filter.field}
-            type="button"
-            className={classNames(
-                'btn btn-sm d-flex align-items-center px-2 ms-2 dropdown-toggle',
-                {
-                    active: isActive,
-                    'btn-text-only': textOnly,
-                    'btn-outline-primary': !textOnly,
-                }
-            )}
-            data-bs-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false"
-            onClick={props.onClick}
-            ref={dropdown}
+    return (
+        <Dropdown
+            key={filter.field}
+            icon={filter.icon}
+            label={label}
+            resetLabel={gettext(filter.label)}
+            className={className}
+            buttonProps={buttonProps}
         >
-            {!icon ? null : (
-                <i className={`${icon} d-md-none`} />
-            )}
-            {textOnly ? label : (
-                <span className="d-none d-md-block">
-                    {label}
-                </span>
-            )}
-            <i className={classNames(
-                'icon-small--arrow-down ms-1',
-                {
-                    'icon--white': isActive && !iconColour,
-                    [`icon--${iconColour}`]: iconColour
-                }
-            )} />
-        </button>
-        <div className='dropdown-menu' aria-labelledby={filter.field}>
             <button
                 type='button'
                 className='dropdown-item'
@@ -102,8 +59,8 @@ function DropdownFilter({
             >{gettext(filter.label)}</button>
             <div className='dropdown-divider'></div>
             {getDropdownItems(filter, aggregations, toggleFilter, processBuckets, {...props})}
-        </div>
-    </div>);
+        </Dropdown>
+    );
 }
 
 DropdownFilter.propTypes = {
