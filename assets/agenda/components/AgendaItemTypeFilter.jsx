@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {gettext} from 'utils';
-import AgendaFilterButton from './AgendaFilterButton';
+import {AgendaDropdown} from './AgendaDropdown';
 
 function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter, eventsOnlyAccess, restrictCoverageInfo}) {
     if (eventsOnlyAccess) {
@@ -15,6 +15,7 @@ function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter, eventsOnlyAccess, 
                 gettext('Planning Only')
         ]
     };
+
     const filter = {
         label: gettext('Events & Coverages'),
         field: 'itemType',
@@ -22,38 +23,28 @@ function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter, eventsOnlyAccess, 
     };
 
     return (
-        <div className="btn-group" key={filter.field}>
-            <AgendaFilterButton
-                filter={filter}
-                activeFilter={activeFilter}
-            />
-            <div className="dropdown-menu" aria-labelledby={filter.field}>
+        <AgendaDropdown key={filter.field}
+            filter={filter}
+            activeFilter={activeFilter}
+            toggleFilter={toggleFilter}
+        >
+            <button
+                key="events_only"
+                className="dropdown-item"
+                onClick={() => toggleFilter(filter.field, 'events')}
+            >
+                {gettext('Events Only')}
+            </button>
+            {restrictCoverageInfo ? null : (
                 <button
-                    type="button"
+                    key="planning_only"
                     className="dropdown-item"
-                    onClick={() => toggleFilter(filter.field, null)}
+                    onClick={() => toggleFilter(filter.field, 'planning')}
                 >
-                    {gettext(filter.label)}
+                    {gettext('Planning Only')}
                 </button>
-                <div className="dropdown-divider"></div>
-                <button
-                    key="events_only"
-                    className="dropdown-item"
-                    onClick={() => toggleFilter(filter.field, 'events')}
-                >
-                    {gettext('Events Only')}
-                </button>
-                {restrictCoverageInfo ? null : (
-                    <button
-                        key="planning_only"
-                        className="dropdown-item"
-                        onClick={() => toggleFilter(filter.field, 'planning')}
-                    >
-                        {gettext('Planning Only')}
-                    </button>
-                )}
-            </div>
-        </div>
+            )}
+        </AgendaDropdown>
     );
 }
 

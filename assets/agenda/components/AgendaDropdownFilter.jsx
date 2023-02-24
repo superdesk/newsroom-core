@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext} from 'utils';
-import AgendaFilterButton from './AgendaFilterButton';
+import {AgendaDropdown} from './AgendaDropdown';
 
 const compareFunction = (a, b) => String(a.key).localeCompare(String(b.key));
 
@@ -13,21 +12,15 @@ const processBuckets = (buckets, filter, toggleFilter) => buckets.sort(compareFu
     >{filter.transform ? filter.transform(bucket.key) : bucket.key}</button>);
 
 function AgendaDropdownFilter({aggregations, filter, toggleFilter, activeFilter, getDropdownItems}) {
-    return (<div className="btn-group" key={filter.field}>
-        <AgendaFilterButton
+    return (
+        <AgendaDropdown
             filter={filter}
             activeFilter={activeFilter}
-        />
-        <div className='dropdown-menu' aria-labelledby={filter.field}>
-            <button
-                type='button'
-                className='dropdown-item'
-                onClick={() => toggleFilter(filter.field, null)}
-            >{gettext(filter.label)}</button>
-            <div className='dropdown-divider'></div>
+            toggleFilter={toggleFilter}
+        >
             {getDropdownItems(filter, aggregations, toggleFilter, processBuckets)}
-        </div>
-    </div>);
+        </AgendaDropdown>
+    );
 }
 
 AgendaDropdownFilter.propTypes = {

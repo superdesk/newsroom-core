@@ -6,23 +6,36 @@ import {Dropdown as BootstrapDropdown} from 'bootstrap';
 export function Dropdown({children, isActive, icon, label, className, buttonProps}) {
 
     const dropdown = React.useRef();
+    let dropdownInstance = null;
 
     React.useEffect(() => {
-        const dropdownInstance = BootstrapDropdown.getOrCreateInstance(dropdown.current, {autoClose: true});
+        dropdownInstance = BootstrapDropdown.getOrCreateInstance(dropdown.current, {autoClose: true});
+
+        function clickOutside() {
+            dropdownInstance.hide();
+        }
+
+        document.addEventListener("click", clickOutside);
 
         return () => {
-            dropdownInstance.hide();
+            document.removeEventListener("click", clickOutside);
         };
     });
 
     const textOnly = (buttonProps || {}).textOnly;
     const iconColour= (buttonProps || {}).iconColour;
 
-    return (<div className={classNames(
-        'dropdown',
-        'btn-group',
-        {[className]: className}
-    )}>
+    return (<div
+        className={classNames(
+            'dropdown',
+            'btn-group',
+            className ? className : '',
+        )}
+        onClick={(event) => {
+            event.stopPropagation();
+            dropdownInstance.toggle();
+        }}
+    >
         <button
             type="button"
             className={classNames(
@@ -33,7 +46,6 @@ export function Dropdown({children, isActive, icon, label, className, buttonProp
                     'btn-outline-primary': !textOnly,
                 }
             )}
-            data-bs-toggle="dropdown"
             aria-haspopup="true"
             aria-expanded="false"
             ref={dropdown}

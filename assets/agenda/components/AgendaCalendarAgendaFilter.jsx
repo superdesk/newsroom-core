@@ -2,8 +2,8 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import {gettext} from '../../utils';
+import {Dropdown} from '../../components/Dropdown';
 import {processBuckets} from '../../components/DropdownFilter';
-import DropdownFilterButton from '../../components/DropdownFilterButton';
 
 import {getDropdownItems} from './AgendaFilters';
 
@@ -45,40 +45,36 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent {
         );
 
         return (
-            <div className="btn-group">
-                <DropdownFilterButton
-                    id="calendar_agenda"
-                    isActive={isActive}
-                    icon="icon-small--calendar"
-                    label={gettext('Calendars')}
-                />
-                <div className="dropdown-menu" aria-labelledby="calendar_agenda">
-                    <button
-                        type="button"
-                        className="dropdown-item"
-                        onClick={() => {
-                            this.props.toggleFilter('calendar', null);
-                            this.props.toggleFilter('agendas', null);
-                        }}
-                    >
-                        {gettext('All Calendars')}
-                    </button>
-                    <div className="dropdown-divider" />
-                    {!calendarItems.length ? null : (
-                        <React.Fragment>
-                            <h6 className="dropdown-header">{gettext('Events')}</h6>
-                            {calendarItems}
-                            <div className="dropdown-divider" />
-                        </React.Fragment>
-                    )}
-                    {!agendaItems.length ? null : (
-                        <React.Fragment>
-                            <h6 className="dropdown-header">{gettext('Planning')}</h6>
-                            {agendaItems}
-                        </React.Fragment>
-                    )}
-                </div>
-            </div>
+            <Dropdown
+                isActive={isActive}
+                icon="icon-small--calendar"
+                label={gettext('Calendars')}
+            >
+                <button
+                    type="button"
+                    className="dropdown-item"
+                    onClick={() => {
+                        this.props.toggleFilter('calendar', null);
+                        this.props.toggleFilter('agendas', null);
+                    }}
+                >
+                    {gettext('All Calendars')}
+                </button>
+                <div className="dropdown-divider" />
+                {!calendarItems.length ? null : (
+                    <React.Fragment>
+                        <h6 className="dropdown-header">{gettext('Events')}</h6>
+                        {calendarItems}
+                        <div className="dropdown-divider" />
+                    </React.Fragment>
+                )}
+                {!agendaItems.length ? null : (
+                    <React.Fragment>
+                        <h6 className="dropdown-header">{gettext('Planning')}</h6>
+                        {agendaItems}
+                    </React.Fragment>
+                )}
+            </Dropdown>
         );
     }
 }
