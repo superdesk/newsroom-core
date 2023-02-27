@@ -15,13 +15,14 @@ export class AgendaPreviewPlanning extends React.Component {
             coverageActions,
             user,
             previewGroup,
+            restrictCoverageInfo,
         } = this.props;
 
         const planningItems = get(item, 'planning_items') || [];
         const plan = planningItems.find((p) => p.guid === planningId);
         const otherPlanningItems = planningItems.filter((p) => p.guid !== planningId);
 
-        if (isPlanningItem(item)) {
+        if (isPlanningItem(item) || restrictCoverageInfo) {
             return (
                 <AgendaPreviewCoverages
                     key={item.guid}
@@ -31,6 +32,7 @@ export class AgendaPreviewPlanning extends React.Component {
                     actions={coverageActions}
                     user={user}
                     previewGroup={previewGroup}
+                    restrictCoverageInfo={restrictCoverageInfo}
                 />
             );
         }
@@ -87,4 +89,5 @@ AgendaPreviewPlanning.propTypes = {
     wireItems: PropTypes.array,
     coverageActions: PropTypes.array,
     previewGroup: PropTypes.string,
+    restrictCoverageInfo: PropTypes.bool,
 };

@@ -129,6 +129,7 @@ export default class BaseApp extends React.Component {
         const BUFFER = 10;
         const container = event.target;
 
+        // this probably won't happen with react 17 but keeping it for now
         if (container !== this.dom.list && !this.dom.list.contains(container)) {
             // Not scrolled on the actual list
             return;

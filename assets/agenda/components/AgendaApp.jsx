@@ -146,6 +146,7 @@ class AgendaApp extends BaseApp {
                 wireItems={this.props.wireItems}
                 coverageActions={this.props.coverageActions}
                 detailsConfig={this.props.detailsConfig}
+                restrictCoverageInfo={this.props.restrictCoverageInfo}
             />] : [
                 <section key="contentHeader" className='content-header'>
                     <h3 className="a11y-only">{gettext('Agenda Content')}</h3>
@@ -268,6 +269,7 @@ class AgendaApp extends BaseApp {
                             eventsOnly={eventsOnly}
                             wireItems={this.props.wireItems}
                             previewConfig={this.props.previewConfig}
+                            restrictCoverageInfo={this.props.restrictCoverageInfo}
                         />
                     </div>
                 </section>

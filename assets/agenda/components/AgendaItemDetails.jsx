@@ -44,6 +44,7 @@ export default function AgendaItemDetails(
         wireItems,
         coverageActions,
         detailsConfig,
+        restrictCoverageInfo,
     })
 {
     const locations = getLocations(item);
@@ -83,6 +84,7 @@ export default function AgendaItemDetails(
                         planningId={planningId}
                         wireItems={wireItems}
                         coverageActions={coverageActions}
+                        restrictCoverageInfo={restrictCoverageInfo}
                     />
                     {!planHasEvent(item) ? null : (
                         <AgendaPreviewEvent item={item} />
@@ -124,4 +126,5 @@ AgendaItemDetails.propTypes = {
     wireItems: PropTypes.array,
     coverageActions: PropTypes.array,
     detailsConfig: PropTypes.object,
+    restrictCoverageInfo: PropTypes.bool,
 };
