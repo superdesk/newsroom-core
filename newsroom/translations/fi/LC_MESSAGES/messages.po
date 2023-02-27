@@ -8,9 +8,9 @@
 # Tomi Toivio <tomi.toivio@ukuli.fi>, 2019
 # Srdjan Karalic <srdjan.karalic@sourcefabric.org>, 2021
 # Andrey Podshivalov, 2022
-# Maija Paikkala, 2022
 # Olli Vesala <olli.vesala@stt.fi>, 2023
 # Gideon Lehmann <gideon.lehmann@sourcefabric.org>, 2023
+# Maija Paikkala, 2023
 # 
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2023-02-01 14:26+0100\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
-"Last-Translator: Gideon Lehmann <gideon.lehmann@sourcefabric.org>, 2023\n"
+"Last-Translator: Maija Paikkala, 2023\n"
 "Language-Team: Finnish (https://www.transifex.com/sourcefabric/teams/6584/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -887,7 +887,7 @@ msgstr "Sivuvalikko"
 #: newsroom/templates/company_admin_index.html:3
 #: newsroom/templates/company_admin_index.html:6 newsroom/users/forms.py:38
 msgid "Company Admin"
-msgstr ""
+msgstr "Organisaation ylläpitäjä"
 
 #: newsroom/templates/base_layout.html:88
 #: newsroom/templates/company_reports.html:3
@@ -1223,7 +1223,7 @@ msgstr "Kieli"
 
 #: assets/users/components/EditUser.jsx:233 newsroom/users/forms.py:58
 msgid "Manage Company Topics"
-msgstr "Hallinnoi yrityksen aiheita"
+msgstr "Hallinnoi organisaation yhteisiä hakuja"
 
 #: assets/companies/components/CompanyPermissions.jsx:112
 #: assets/users/components/EditUser.jsx:154 newsroom/users/forms.py:60
@@ -2092,7 +2092,7 @@ msgstr "Sijainti etusivulla"
 #: assets/section-filters/components/SectionFilterList.jsx:26
 #: assets/users/components/UsersList.jsx:31
 msgid "Created On"
-msgstr "Luontiaika"
+msgstr "Luotu"
 
 #: assets/cards/components/Cards.jsx:37
 msgid "Please provide card label"
@@ -2308,7 +2308,7 @@ msgstr ""
 
 #: assets/company-admin/components/CompanyAdminApp.jsx:125
 msgid "My Company"
-msgstr ""
+msgstr "Minun organisaationi"
 
 #: assets/company-admin/components/CompanyAdminProductSeatRequestModal.jsx:84
 #: assets/company-admin/components/CompanyDetailsProductRow.jsx:23
@@ -2330,7 +2330,7 @@ msgstr "Huom"
 
 #: assets/company-admin/components/CompanyAdminSideNav.jsx:12
 msgid "Company User Management"
-msgstr ""
+msgstr "Organisaation käyttäjähallinta"
 
 #: assets/company-admin/components/CompanyDetailsProductFilter.jsx:16
 #: assets/company-reports/components/ProductCompanies.jsx:19
@@ -2339,20 +2339,20 @@ msgstr "Kaikki tuotteet"
 
 #: assets/company-admin/components/CompanyUserListItem.jsx:11
 msgid "active"
-msgstr ""
+msgstr "aktiivinen"
 
 #: assets/company-admin/components/CompanyUserListItem.jsx:16
 msgid "pending"
-msgstr ""
+msgstr "odottaa"
 
 #: assets/company-admin/components/CompanyUserListItem.jsx:21
 msgid "disabled"
-msgstr ""
+msgstr "passivoitu"
 
 #: assets/company-admin/components/CompanyUserListItem.jsx:47
 #: assets/users/components/EditUser.jsx:70
 msgid "admin"
-msgstr ""
+msgstr "ylläpitäjä"
 
 #: assets/company-admin/components/CompanyUsers.jsx:25
 msgid "{{ section }} Products"
@@ -2613,7 +2613,7 @@ msgstr "Ilmoitukset"
 
 #: assets/components/NotificationList.jsx:95
 msgid "No new notifications!"
-msgstr "Ei uusia ilmoituksia!"
+msgstr "Ei uusia ilmoituksia"
 
 #: assets/components/NotificationList.jsx:105
 msgid "Clear All"
@@ -3108,7 +3108,7 @@ msgstr ""
 
 #: assets/notifications/components/notificationItems.jsx:118
 msgid "A story has arrived that matches a subscribed topic"
-msgstr "Seuraamaasi aihetta vastaava juttu on tullut saataville"
+msgstr "Seurannassa olevaa hakua vastaava juttu on tullut julkaistu"
 
 #: assets/notifications/components/notificationItems.jsx:137
 msgid "An Agenda Topic has been shared with you"
@@ -3388,7 +3388,7 @@ msgstr "Sähköposti-ilmoitukset:"
 
 #: assets/search/components/TopicForm.jsx:30
 msgid "Toggle email notifications"
-msgstr "Peru sähköpostinotifikaatiot"
+msgstr "Tilaa sähköposti-ilmoitukset"
 
 #: assets/search/components/TopicForm.jsx:51
 msgid "Send me notifications"
@@ -3615,7 +3615,7 @@ msgstr "Uusi käyttäjä / muokkaa"
 
 #: assets/users/components/EditUser.jsx:198
 msgid "User Settings"
-msgstr ""
+msgstr "Käyttäjäasetukset"
 
 #: assets/users/components/EditUser.jsx:203
 #: assets/users/components/UserListItem.jsx:22
@@ -3641,15 +3641,15 @@ msgstr "Järjestä"
 
 #: assets/users/components/filters/UserListSortFilter.jsx:32
 msgid "User Status"
-msgstr ""
+msgstr "Käyttäjän tila"
 
 #: assets/users/components/filters/UserListSortFilter.jsx:77
 msgid "Sort by:"
-msgstr ""
+msgstr "Järjestä:"
 
 #: assets/users/components/filters/UserListSortFilter.jsx:101
 msgid "Sort"
-msgstr ""
+msgstr "Järjestä"
 
 #: assets/wire/actions.js:127
 msgid "Are you sure you want to permanently remove these item(s)?"
