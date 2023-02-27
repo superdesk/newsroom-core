@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {gettext} from 'utils';
-import DropdownFilterButton from './DropdownFilterButton';
+import {Dropdown} from './Dropdown';
 
 const compareFunction = (a, b) => String(a.key).localeCompare(String(b.key));
 
@@ -16,7 +16,9 @@ export const processBuckets = (buckets, filter, toggleFilter) => (filter.notSort
                     'dropdown-item',
                     {'dropdown-item--active': filter.isItemActive && filter.isItemActive(bucket.key)}
                 )}
-                onClick={() => toggleFilter(filter.field, bucket.key)}
+                onClick={() => {
+                    toggleFilter(filter.field, bucket.key);
+                }}
             >{filter.transform ? filter.transform(bucket.key, bucket) : bucket.key}</button>);
 
 
@@ -41,22 +43,17 @@ function DropdownFilter({
     ...props}) {
     const isActive = !!(activeFilter[filter.field]);
     const filterLabel = getFilterLabel ? getFilterLabel : getActiveFilterLabel;
+    const label = filterLabel(filter, activeFilter, isActive, {...props});
 
-    return (<div className={classNames(
-        'btn-group',
-        {[className]: className}
-    )} key={filter.field}>
-        <DropdownFilterButton
-            id={filter.field}
-            isActive={isActive}
-            autoToggle={props.autoToggle}
-            onClick={props.onClick}
+    return (
+        <Dropdown
+            key={filter.field}
             icon={filter.icon}
-            label={filterLabel(filter, activeFilter, isActive, {...props})}
-            textOnly={(buttonProps || {}).textOnly}
-            iconColour={(buttonProps || {}).iconColour}
-        />
-        <div className='dropdown-menu' aria-labelledby={filter.field}>
+            label={label}
+            resetLabel={gettext(filter.label)}
+            className={className}
+            buttonProps={buttonProps}
+        >
             <button
                 type='button'
                 className='dropdown-item'
@@ -64,8 +61,8 @@ function DropdownFilter({
             >{gettext(filter.label)}</button>
             <div className='dropdown-divider'></div>
             {getDropdownItems(filter, aggregations, toggleFilter, processBuckets, {...props})}
-        </div>
-    </div>);
+        </Dropdown>
+    );
 }
 
 DropdownFilter.propTypes = {

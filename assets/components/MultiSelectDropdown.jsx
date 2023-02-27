@@ -1,6 +1,8 @@
 import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import {gettext} from 'utils';
+import {Dropdown} from './Dropdown';
 
 function MultiSelectDropdown({values, label, field, options, onChange, showAllButton, multi}) {
     const onChanged = (option) => {
@@ -23,79 +25,68 @@ function MultiSelectDropdown({values, label, field, options, onChange, showAllBu
 
     const isActive = (multi && !!values.length) || (!multi && values !== null);
 
+    let buttonLabel = label;
+
+    if (!multi && !values) {
+        buttonLabel = gettext('All {{label}}', {label});
+    }
+
+    if (!multi && values) {
+        buttonLabel = values;
+    }
+
     return (
-        <div className='btn-group' key={field}>
-            <button
-                id={field}
-                type='button'
-                className={classNames(
-                    'btn btn-outline-primary btn-sm d-flex align-items-center px-2 ms-2',
-                    {'active': isActive}
-                )}
-                aria-haspopup='true'
-                aria-expanded='false'
-                data-bs-toggle='dropdown'
-            >
-                {multi && (
-                    <span className='d-block'>{label}</span>
-                )}
-
-                {(!multi && !values) && (
-                    <span className='d-block'>All {label}</span>
-                )}
-
-                {(!multi && values) && (
-                    <span className='d-block'>{values}</span>
-                )}
-                <i className={classNames('icon-small--arrow-down ms-1', {'icon--white': isActive})}  />
-            </button>
-            <div className='dropdown-menu' aria-labelledby={field}>
-                {showAllButton && (
-                    <Fragment>
-                        <button
-                            className='dropdown-item'
-                            onClick={onChanged.bind(null, 'all')}
-                        >
-                            <i className={classNames(
-                                'me-2',
-                                {
-                                    'icon--': isActive,
-                                    'icon--check': !isActive,
-                                }
-                            )}
-                            />
-                            <span>All {label}</span>
-                        </button>
-                        <div className='dropdown-divider' />
-                    </Fragment>
-                )}
-                {options.map((option) => (
-                    <Fragment key={option.value}>
-                        <button
-                            className='dropdown-item'
-                            onClick={onChanged.bind(null, option.value)}
-                        >
-                            <i className={classNames(
-                                'me-2',
-                                {
-                                    'icon--': (multi && !values.includes(option.value)) ||
-                                        (!multi && values !== option.value),
-                                    'icon--check': (multi && values.includes(option.value)) ||
-                                        (!multi && values === option.value),
-                                }
-                            )}
-                            />
-                            <span>{option.label}</span>
-                        </button>
-                    </Fragment>
-                ))}
-            </div>
-        </div>
+        <Dropdown
+            key={field}
+            label={buttonLabel}
+            icon={'icon-small--arrow-down'}
+            isActive={isActive}
+        >
+            {showAllButton && (
+                <Fragment>
+                    <button
+                        className='dropdown-item'
+                        onClick={onChanged.bind(null, 'all')}
+                    >
+                        <i className={classNames(
+                            'me-2',
+                            {
+                                'icon--': isActive,
+                                'icon--check': !isActive,
+                            }
+                        )}
+                        />
+                        <span>All {label}</span>
+                    </button>
+                    <div className='dropdown-divider' />
+                </Fragment>
+            )}
+            {options.map((option) => (
+                <Fragment key={option.value}>
+                    <button
+                        className='dropdown-item'
+                        onClick={onChanged.bind(null, option.value)}
+                    >
+                        <i className={classNames(
+                            'me-2',
+                            {
+                                'icon--': (multi && !values.includes(option.value)) ||
+                                    (!multi && values !== option.value),
+                                'icon--check': (multi && values.includes(option.value)) ||
+                                    (!multi && values === option.value),
+                            }
+                        )}
+                        />
+                        <span>{option.label}</span>
+                    </button>
+                </Fragment>
+            ))}
+        </Dropdown>
     );
 }
 
 MultiSelectDropdown.propTypes = {
-    values: PropTypes.oneOf([
+    values: PropTypes.oneOfType([
         PropTypes.arrayOf(PropTypes.string),
         PropTypes.string,
         PropTypes.shape({
@@ -103,7 +94,12 @@ MultiSelectDropdown.propTypes = {
             value: PropTypes.string,
         }),
     ]),
-    options: PropTypes.arrayOf(PropTypes.string),
+    options: PropTypes.arrayOf(
+        PropTypes.shape({
+            value: PropTypes.string,
+            label: PropTypes.string,
+        })
+    ),
     field: PropTypes.string,
     label: PropTypes.string,
     onChange: PropTypes.func,
