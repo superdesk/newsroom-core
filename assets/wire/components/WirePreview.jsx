@@ -70,11 +70,14 @@ class WirePreview extends React.PureComponent {
                     {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item}/>}
                     {(isDisplayed('byline', previewConfig) || isDisplayed('located', previewConfig)) &&
                         <ArticleAuthor item={item} displayConfig={previewConfig} />}
-                    {picture && <ArticlePicture
-                        picture={picture}
-                        isKilled={isKilled(item)}
-                        isCustomRendition={isCustom} />}
-
+                    {picture && picture.map((pic)=> (
+                        <ArticlePicture
+                            key={pic._id}
+                            picture={pic}
+                            isKilled={isKilled(item)}
+                            isCustomRendition={isCustom} 
+                        />
+                    ))}
                     {isDisplayed('metadata_section', previewConfig) &&
                     <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions} displayConfig={previewConfig} listConfig={listConfig}
                         filterGroupLabels={filterGroupLabels} />}

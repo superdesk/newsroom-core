@@ -68,11 +68,14 @@ function ItemDetails({
             </ContentHeader>
             <ArticleItemDetails>
                 <ArticleContent>
-                    {picture && <ArticlePicture
-                        picture={picture}
-                        isKilled={isKilled(item)}
-                        isCustomRendition={isCustom}
-                        isItemDetails />}
+                    {picture && picture.map((pic) => (
+                        <ArticlePicture
+                            key={pic._id}
+                            picture={pic}
+                            isKilled={isKilled(item)}
+                            isCustomRendition={isCustom}
+                        />
+                    ))}
                     <ArticleContentWrapper itemType={itemType}>
                         <ArticleBody itemType={itemType}>
                             <ArticleEmbargoed item={item} />

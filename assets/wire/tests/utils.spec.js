@@ -20,7 +20,6 @@ describe('utils', () => {
                 embed123: embed,
             },
         };
-
-        expect(utils.getPicture(item)).toBe(embed);
-    });
+        expect(utils.getPicture(item)).toEqual([embed]);
+    }); 
 });
