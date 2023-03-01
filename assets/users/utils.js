@@ -31,6 +31,10 @@ export function isUserAdmin(user) {
     return get(user, 'user_type') === 'administrator';
 }
 
+export function isUserCompanyAdmin(user) {
+    return get(user, 'user_type') === 'company_admin';
+}
+
 export function canUserManageTopics(user) {
     return isUserAdmin(user) || get(user, 'manage_company_topics') === true;
 }
