@@ -27,7 +27,7 @@ from newsroom.notifications import push_user_notification, push_company_notifica
 from newsroom.topics import get_user_topics
 from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
-from newsroom.users.users import COMPANY_ADMIN_ALLOWED_UPDATES
+from newsroom.users.users import COMPANY_ADMIN_ALLOWED_UPDATES, NON_ADMIN_ALLOWED_UPDATES
 from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary
 from newsroom.monitoring.views import get_monitoring_for_company
 
@@ -143,10 +143,11 @@ def _is_email_address_valid(email):
 @login_required
 def edit(_id):
     user_is_company_admin = is_current_user_company_admin()
+    user_is_admin = is_current_user_admin()
+    user_is_account_mgr = is_current_user_account_mgr()
+    user_is_non_admin = not (user_is_company_admin or user_is_admin or user_is_account_mgr)
 
-    if not (is_current_user_admin() or is_current_user_account_mgr() or user_is_company_admin) and not is_current_user(
-        _id
-    ):
+    if not (user_is_admin or user_is_account_mgr or user_is_company_admin) and not is_current_user(_id):
         flask.abort(401)
 
     user = find_one("users", _id=ObjectId(_id))
@@ -173,30 +174,33 @@ def edit(_id):
                 )
 
             updates = form.data
-            if not user_is_company_admin and form.company.data:
+            if not (user_is_company_admin or user_is_non_admin) and form.company.data:
                 updates["company"] = ObjectId(form.company.data)
 
-            if "sections" in updates:
-                updates["sections"] = {
-                    section["_id"]: section["_id"] in (form.sections.data or []) for section in app.sections
-                }
-
-            if "products" in updates:
-                product_ids = [ObjectId(productId) for productId in updates["products"]]
-                products = {
-                    product["_id"]: product
-                    for product in query_resource("products", lookup={"_id": {"$in": product_ids}})
-                }
-                updates["products"] = [
-                    {"_id": product["_id"], "section": product["product_type"]} for product in products.values()
-                ]
-
-            if user_is_company_admin:
-                for field in list(updates.keys()):
-                    if field not in COMPANY_ADMIN_ALLOWED_UPDATES:
-                        updates.pop(field, None)
-            elif is_current_user_account_mgr() and updates.get("user_type", "") != user.get("user_type", ""):
+            if not user_is_admin and updates.get("user_type", "") != user.get("user_type", ""):
                 flask.abort(401)
+
+            if user_is_non_admin or user_is_company_admin:
+                allowed_fields = NON_ADMIN_ALLOWED_UPDATES if user_is_non_admin else COMPANY_ADMIN_ALLOWED_UPDATES
+                for field in list(updates.keys()):
+                    if field not in allowed_fields:
+                        updates.pop(field, None)
+
+            if not user_is_non_admin:
+                if "sections" in updates:
+                    updates["sections"] = {
+                        section["_id"]: section["_id"] in (form.sections.data or []) for section in app.sections
+                    }
+
+                if "products" in updates:
+                    product_ids = [ObjectId(productId) for productId in updates["products"]]
+                    products = {
+                        product["_id"]: product
+                        for product in query_resource("products", lookup={"_id": {"$in": product_ids}})
+                    }
+                    updates["products"] = [
+                        {"_id": product["_id"], "section": product["product_type"]} for product in products.values()
+                    ]
 
             user = get_resource_service("users").patch(ObjectId(_id), updates=updates)
             app.cache.delete(user.get("email"))
