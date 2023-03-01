@@ -48,9 +48,8 @@ function ItemDetails({
     listConfig,
     filterGroupLabels,
 }) {
-    const picture = getPictureList(item);
+    const pictures = getPictureList(item);
     const media = getItemMedia(item);
-    const isCustom = isCustomRendition(picture);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
 
     return (
@@ -68,12 +67,12 @@ function ItemDetails({
             </ContentHeader>
             <ArticleItemDetails>
                 <ArticleContent>
-                    {picture && picture.map((pic) => (
+                    {pictures && pictures.map((pic) => (
                         <ArticlePicture
                             key={pic._id}
                             picture={pic}
                             isKilled={isKilled(item)}
-                            isCustomRendition={isCustom}
+                            isCustomRendition={isCustomRendition(pic)}
                         />
                     ))}
                     <ArticleContentWrapper itemType={itemType}>

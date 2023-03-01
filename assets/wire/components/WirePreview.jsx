@@ -47,9 +47,8 @@ class WirePreview extends React.PureComponent {
 
     render() {
         const {item, user, actions, followStory, topics, previewConfig, downloadMedia, listConfig, filterGroupLabels} = this.props;
-        const picture = getPictureList(item);
+        const pictures = getPictureList(item);
         const media = getItemMedia(item);
-        const isCustom = isCustomRendition(picture);
 
         const previousVersions = 'preview_versions';
         return (
@@ -70,12 +69,12 @@ class WirePreview extends React.PureComponent {
                     {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item}/>}
                     {(isDisplayed('byline', previewConfig) || isDisplayed('located', previewConfig)) &&
                         <ArticleAuthor item={item} displayConfig={previewConfig} />}
-                    {picture && picture.map((pic)=> (
+                    {pictures && pictures.map((pic)=> (
                         <ArticlePicture
                             key={pic._id}
                             picture={pic}
                             isKilled={isKilled(item)}
-                            isCustomRendition={isCustom} 
+                            isCustomRendition={isCustomRendition(pic)}
                         />
                     ))}
                     {isDisplayed('metadata_section', previewConfig) &&
