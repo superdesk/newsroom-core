@@ -100,28 +100,35 @@ class UsersResource(newsroom.Resource):
     }
 
 
-COMPANY_ADMIN_ALLOWED_UPDATES = {
-    "products",
-    "sections",
+NON_ADMIN_ALLOWED_UPDATES = {
     "locale",
     "first_name",
     "last_name",
-    "email",
     "phone",
     "mobile",
     "country",
-    "is_approved",
-    "is_enabled",
-    # populated by system
-    "_created",
-    "_updated",
-    "expiry_alert",
     "receive_email",
     "receive_app_notifications",
-    "manage_company_topics",
-    "token",
-    "token_expiry_date",
+    "role",
 }
+
+
+COMPANY_ADMIN_ALLOWED_UPDATES = NON_ADMIN_ALLOWED_UPDATES.union(
+    {
+        "email",
+        "products",
+        "sections",
+        "is_approved",
+        "is_enabled",
+        "expiry_alert",
+        "manage_company_topics",
+        "token",
+        "token_expiry_date",
+        # populated by system
+        "_created",
+        "_updated",
+    }
+)
 
 
 class UsersService(newsroom.Service):
@@ -191,11 +198,23 @@ class UsersService(newsroom.Service):
             return
         if is_current_user_admin() or is_current_user_account_mgr():
             return
+
+        # Only check against metadata that has changed from the original
+        updated_fields = (
+            []
+            if updates is None
+            else [field for field in updates.keys() if updates[field] != doc.get(field) and field != "id"]
+        )
+
         if is_current_user_company_admin():
             manager = get_user()
             if doc.get("company") and doc["company"] == manager.get("company"):
-                if not updates or all([key in COMPANY_ADMIN_ALLOWED_UPDATES for key in updates.keys()]):
+                if not updated_fields or all([key in COMPANY_ADMIN_ALLOWED_UPDATES for key in updated_fields]):
                     return
-        if request and request.url_rule and request.url_rule.rule in ["/reset_password/<token>", "/token/<token_type>"]:
-            return
+        if request and request.url_rule and request.url_rule.rule:
+            if request.url_rule.rule in ["/reset_password/<token>", "/token/<token_type>"]:
+                return
+            elif request.url_rule.rule == "/users/<_id>":
+                if not updated_fields or all([key in NON_ADMIN_ALLOWED_UPDATES for key in updated_fields]):
+                    return
         abort(403)
