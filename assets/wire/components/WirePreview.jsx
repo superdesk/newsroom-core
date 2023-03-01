@@ -4,13 +4,13 @@ import {isEmpty} from 'lodash';
 
 import {isDisplayed} from 'utils';
 import {
-    getPicture,
     getItemMedia,
     showItemVersions,
     isEqualItem,
     isKilled,
     DISPLAY_ABSTRACT,
     isCustomRendition,
+    getPictureList,
 } from 'wire/utils';
 import types from 'wire/types';
 
@@ -47,7 +47,7 @@ class WirePreview extends React.PureComponent {
 
     render() {
         const {item, user, actions, followStory, topics, previewConfig, downloadMedia, listConfig, filterGroupLabels} = this.props;
-        const picture = getPicture(item);
+        const picture = getPictureList(item);
         const media = getItemMedia(item);
         const isCustom = isCustomRendition(picture);
 

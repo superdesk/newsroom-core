@@ -8,13 +8,13 @@ import {isDisplayed, gettext, formatDate, formatTime} from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import {
-    getPicture,
     getItemMedia,
     showItemVersions,
     isKilled,
     DISPLAY_ABSTRACT,
     isPreformatted,
     isCustomRendition,
+    getPictureList,
 } from 'wire/utils';
 import types from 'wire/types';
 import Content from 'ui/components/Content';
@@ -48,7 +48,7 @@ function ItemDetails({
     listConfig,
     filterGroupLabels,
 }) {
-    const picture = getPicture(item);
+    const picture = getPictureList(item);
     const media = getItemMedia(item);
     const isCustom = isCustomRendition(picture);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
