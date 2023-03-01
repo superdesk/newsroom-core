@@ -10,7 +10,7 @@ import CheckboxInput from 'components/CheckboxInput';
 import AuditInformation from 'components/AuditInformation';
 
 import {gettext} from 'utils';
-import {isUserAdmin, getUserTypes, getUserLabel, userTypeReadOnly, getLocaleInputOptions, getDefaultLocale} from '../utils';
+import {isUserAdmin, getUserTypes, getUserLabel, userTypeReadOnly, getLocaleInputOptions, getDefaultLocale, isUserCompanyAdmin} from '../utils';
 import {FormToggle} from 'ui/components/FormToggle';
 
 import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserListItem';
@@ -42,6 +42,8 @@ function EditUserComponent({
     const companyProductIds = Object.keys(seats[companyId] || {});
     const sections = companySections[companyId] || [];
     const companySectionIds = sections.map((section) => section._id);
+    const isAdmin = isUserAdmin(currentUser);
+    const isCompanyAdmin = isUserCompanyAdmin(currentUser);
 
     return (
         <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit User')}>
@@ -254,7 +256,7 @@ function EditUserComponent({
                             value={gettext('Save')}
                             onClick={onSave} />
 
-                        {user._id && isUserAdmin(currentUser) && (user._id !== currentUser._id) && <input
+                        {user._id && (isAdmin||isCompanyAdmin) && user._id !== currentUser._id && <input
                             type='button'
                             className='btn btn-outline-primary'
                             value={gettext('Delete')}
