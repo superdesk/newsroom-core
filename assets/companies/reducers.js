@@ -77,7 +77,8 @@ export default function companyReducer(state = initialState, action) {
     case EDIT_COMPANY: {
         const target = action.event.target;
         const field = target.name;
-        let company = state.companyToEdit;
+        const company = {...state.companyToEdit};
+
         company[field] = target.type === 'checkbox' ? target.checked : target.value;
         return {...state, companyToEdit: company, errors: null};
     }

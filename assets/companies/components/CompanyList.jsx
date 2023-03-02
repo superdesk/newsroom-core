@@ -1,15 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import CompanyListItem from './CompanyListItem';
+import {connect} from 'react-redux';
+
 import {gettext} from 'utils';
+import {selectCompany} from '../actions';
+import {companiesSubscriberIdEnabled} from 'ui/selectors';
+
+import CompanyListItem from './CompanyListItem';
 
 
-function CompanyList({companies, onClick, activeCompanyId, companyTypes, showSubscriberId}) {
+function CompanyList({companies, selectCompany, activeCompanyId, companyTypes, showSubscriberId}) {
     const list = companies.map((company) =>
         <CompanyListItem
             key={company._id}
             company={company}
-            onClick={onClick}
+            onClick={selectCompany}
             isActive={activeCompanyId===company._id}
             type={companyTypes.find((ctype) => ctype.id === company.company_type)}
             showSubscriberId={showSubscriberId}
@@ -42,11 +47,22 @@ function CompanyList({companies, onClick, activeCompanyId, companyTypes, showSub
 }
 
 CompanyList.propTypes = {
-    companies: PropTypes.array.isRequired,
-    onClick: PropTypes.func.isRequired,
+    companies: PropTypes.arrayOf(PropTypes.object).isRequired,
     activeCompanyId: PropTypes.string,
     companyTypes: PropTypes.array,
     showSubscriberId: PropTypes.bool,
+    selectCompany: PropTypes.func.isRequired,
 };
 
-export default CompanyList;
+const mapStateToProps = (state) => ({
+    companies: state.companies.map((id) => state.companiesById[id]),
+    activeCompanyId: state.activeCompanyId,
+    companyTypes: state.companyTypes,
+    showSubscriberId: companiesSubscriberIdEnabled(state),
+});
+
+const mapDispatchToProps = {
+    selectCompany: selectCompany,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(CompanyList);

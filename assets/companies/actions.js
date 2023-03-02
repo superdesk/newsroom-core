@@ -97,23 +97,28 @@ export function fetchCompanyUsers(companyId, force = false) {
  * Creates new company
  *
  */
-export function postCompany() {
+export function postCompany(permissions = null) {
     return function (dispatch, getState) {
 
         const company = getState().companyToEdit;
         const url = `/companies/${company._id ? company._id : 'new'}`;
 
-        return server.post(url, company)
-            .then(function() {
-                if (company._id) {
-                    notify.success(gettext('Company updated successfully'));
-                } else {
-                    notify.success(gettext('Company created successfully'));
-                }
-                dispatch(fetchCompanies());
-            })
-            .catch((error) => errorHandler(error, dispatch, setError));
-
+        return (permissions == null ?
+            Promise.resolve() :
+            dispatch(savePermissions(company, permissions))
+        ).then(() => {
+            return server.post(url, company)
+                .then(function() {
+                    if (company._id) {
+                        notify.success(gettext('Company updated successfully'));
+                    } else {
+                        notify.success(gettext('Company created successfully'));
+                    }
+                    dispatch(fetchProducts());
+                    dispatch(fetchCompanies());
+                })
+                .catch((error) => errorHandler(error, dispatch, setError));
+        });
     };
 }
 
@@ -140,11 +145,6 @@ export function fetchProducts() {
 export function savePermissions(company, permissions) {
     return function (dispatch) {
         return server.post(`/companies/${company._id}/permissions`, permissions)
-            .then(() => {
-                notify.success(gettext('Company updated successfully'));
-                dispatch(fetchProducts());
-                dispatch(fetchCompanies());
-            })
             .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
