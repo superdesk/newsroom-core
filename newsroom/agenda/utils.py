@@ -161,7 +161,7 @@ def remove_fields_for_public_user(item):
 
 
 def get_planning_coverages(item, plan_id):
-    return [coverage for coverage in item.get("coverages", []) if coverage.get("planning_id") == plan_id]
+    return [coverage for coverage in item.get("coverages") or [] if coverage.get("planning_id") == plan_id]
 
 
 def get_item_type(item: Dict[str, Any]) -> Literal["event", "planning"]:
