@@ -1307,7 +1307,7 @@ class AgendaService(BaseSearchService):
                     return detail_cov
 
                 original_cov = next(
-                    (c for c in original_agenda.get("coverages") if c["coverage_id"] == cov["coverage_id"]),
+                    (c for c in original_agenda.get("coverages") or [] if c["coverage_id"] == cov["coverage_id"]),
                     cov,
                 )
                 cov["watches"] = original_cov.get("watches") or []

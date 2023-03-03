@@ -37,7 +37,7 @@ class JsonFormatter(BaseFormatter):
             "coverage_provider",
             "planning_id",
         ]
-        for coverage in item.get("coverages", []):
+        for coverage in item.get("coverages") or []:
             for field in fields:
                 coverage.pop(field, None)
 
