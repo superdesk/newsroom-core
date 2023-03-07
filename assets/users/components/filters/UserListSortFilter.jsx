@@ -16,6 +16,9 @@ export class UserListSortFilter extends React.PureComponent {
             label: gettext('Sort By'),
         };
         this.sortFields = [{
+            _id: 'first_name',
+            name: gettext('First Name'),
+        }, {
             _id: 'last_name',
             name: gettext('Last Name'),
         }, {
@@ -36,6 +39,10 @@ export class UserListSortFilter extends React.PureComponent {
         this.onSortChanged = this.onSortChanged.bind(this);
         this.getDropdownItems = this.getDropdownItems.bind(this);
         this.getFilterLabel = this.getFilterLabel.bind(this);
+    }
+
+    componentDidMount() {
+        this.props.fetchUsers();
     }
 
     onChange(field, value) {

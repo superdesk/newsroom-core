@@ -12,7 +12,7 @@ describe('fetch actions', () => {
     const response = [{_id: 'foo'}];
 
     beforeEach(() => {
-        fetchMock.get('/users/search?q=&sort=[(%22last_name%22,%201)]', response);
+        fetchMock.get('/users/search?q=&sort=[(%22first_name%22,%201)]', response);
         fetchMock.get('/users/search', response);
         store = createStore(wireApp, applyMiddleware(thunk));
     });

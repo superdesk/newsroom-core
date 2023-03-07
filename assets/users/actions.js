@@ -92,10 +92,10 @@ export function fetchUsers() {
             filter = '&where=' + encodeURIComponent(JSON.stringify(filterQuery));
         }
 
-        const sortField = state.sort || 'last_name';
-        const sort = sortField === 'last_name' ?
+        const sortField = state.sort || 'first_name';
+        const sort = sortField === 'first_name' ?
             `&sort=[("${sortField}", ${getState().sortDirection})]` :
-            `&sort=[("${sortField}", ${getState().sortDirection}), ("last_name", 1)]`;
+            `&sort=[("${sortField}", ${getState().sortDirection}), ("first_name", 1)]`;
 
         return server.get(`/users/search?q=${query}${filter}${sort}`)
             .then((data) => dispatch(getUsers(data)))
