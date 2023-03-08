@@ -202,9 +202,7 @@ def edit(_id):
                         {"_id": product["_id"], "section": product["product_type"]} for product in products.values()
                     ]
 
-            user = get_resource_service("users").patch(ObjectId(_id), updates=updates)
-            app.cache.delete(user.get("email"))
-            app.cache.delete(_id)
+            get_resource_service("users").patch(ObjectId(_id), updates=updates)
             return jsonify({"success": True}), 200
         return jsonify(form.errors), 400
     return jsonify(user), 200
