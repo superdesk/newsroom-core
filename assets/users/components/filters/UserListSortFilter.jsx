@@ -41,10 +41,6 @@ export class UserListSortFilter extends React.PureComponent {
         this.getFilterLabel = this.getFilterLabel.bind(this);
     }
 
-    componentDidMount() {
-        this.props.fetchUsers();
-    }
-
     onChange(field, value) {
         this.props.setSort(value);
         this.props.fetchUsers();
