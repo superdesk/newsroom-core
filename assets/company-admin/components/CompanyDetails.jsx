@@ -1,15 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-
 import {gettext} from 'utils';
 import {renderModal} from 'actions';
 import {setSection as _setSection, setProductFilter as _setProductFilter} from '../actions';
 import {CompanyDetailsProductRow} from './CompanyDetailsProductRow';
-
+import {searchQuerySelector} from 'search/selectors';
 import {companySectionListSelector, companyProductSeatsSelector, currentCompanySelector} from '../selectors';
 
-function CompanyDetailsComponent({ company, showSeatRequestModal, setSection, companySections, seats, query }) {
+function CompanyDetailsComponent({company, showSeatRequestModal, setSection, companySections, seats, query}) {
     const sections = companySections[company._id];
     const numSections = sections.length;
 
@@ -30,6 +29,7 @@ function CompanyDetailsComponent({ company, showSeatRequestModal, setSection, co
                             <tr colSpan={2 + numSections} className="subheading">
                                 <td>{section.name}</td>
                             </tr>
+
                             {
                                 (query === null ?
                                     Object.values(seats[company._id]).filter((seat) => seat.section === section._id) :
@@ -69,7 +69,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    showSeatRequestModal: (productIds) => dispatch(renderModal('productSeatRequest', { productIds })),
+    showSeatRequestModal: (productIds) => dispatch(renderModal('productSeatRequest', {productIds})),
     setSection: (sectionId, productId) => {
         dispatch(_setSection(sectionId));
         dispatch(_setProductFilter(productId));

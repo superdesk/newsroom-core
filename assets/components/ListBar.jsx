@@ -17,7 +17,6 @@ class ListBar extends React.Component {
                 )}>
                     {this.props.children}
                     {!this.props.noSearch &&
-                        this.props.enableQueryAction === false ? '':
                         (<SearchBar
                             setQuery={this.props.setQuery}
                             fetchItems={() => this.props.fetch()}
