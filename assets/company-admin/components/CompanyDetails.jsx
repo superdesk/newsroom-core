@@ -9,7 +9,7 @@ import {CompanyDetailsProductRow} from './CompanyDetailsProductRow';
 
 import {companySectionListSelector, companyProductSeatsSelector, currentCompanySelector} from '../selectors';
 
-function CompanyDetailsComponent({company, showSeatRequestModal, setSection, companySections, seats}) {
+function CompanyDetailsComponent({ company, showSeatRequestModal, setSection, companySections, seats, query }) {
     const sections = companySections[company._id];
     const numSections = sections.length;
 
@@ -30,14 +30,20 @@ function CompanyDetailsComponent({company, showSeatRequestModal, setSection, com
                             <tr colSpan={2 + numSections} className="subheading">
                                 <td>{section.name}</td>
                             </tr>
-                            {Object.values(seats[company._id]).filter((seat) => seat.section === section._id).map((seat) => (
-                                <CompanyDetailsProductRow
-                                    key={seat._id}
-                                    seat={seat}
-                                    showSeatRequestModal={showSeatRequestModal}
-                                    onNameClicked={() => setSection('users', seat._id)}
-                                />
-                            ))}
+                            {
+                                (query === null ?
+                                    Object.values(seats[company._id]).filter((seat) => seat.section === section._id) :
+                                    Object.values(seats[company._id]).filter((seat) => seat.section === section._id && seat.name.toString().includes(query))
+                                )
+                                    .map((seat) => (
+
+                                        <CompanyDetailsProductRow
+                                            key={seat._id}
+                                            seat={seat}
+                                            showSeatRequestModal={showSeatRequestModal}
+                                            onNameClicked={() => setSection('users', seat._id)}
+                                        />
+                                    ))}
                         </React.Fragment>
                     ))}
                 </tbody>
@@ -52,16 +58,18 @@ CompanyDetailsComponent.propTypes = {
     setSection: PropTypes.func,
     companySections: PropTypes.object,
     seats: PropTypes.object,
+    query: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
     company: currentCompanySelector(state),
     companySections: companySectionListSelector(state),
     seats: companyProductSeatsSelector(state),
+    query: searchQuerySelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    showSeatRequestModal: (productIds) => dispatch(renderModal('productSeatRequest', {productIds})),
+    showSeatRequestModal: (productIds) => dispatch(renderModal('productSeatRequest', { productIds })),
     setSection: (sectionId, productId) => {
         dispatch(_setSection(sectionId));
         dispatch(_setProductFilter(productId));

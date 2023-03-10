@@ -95,10 +95,10 @@ class CompanyAdminAppComponent extends React.Component {
                     <div className="content">
                         <ListBar
                             onNewItem={this.props.sectionId !== 'users' ? undefined : this.props.newUser}
-                            setQuery={this.props.sectionId === 'users' ? this.props.setQuery : undefined}
-                            fetch={this.props.sectionId === 'users' ? this.props.fetchUsers : this.setProductFilterQuery}
+                            setQuery={this.props.setQuery}
+                            fetch={this.props.sectionId === 'users' ?  this.props.fetchUsers : this.setProductFilterQuery }
                             buttonText={gettext('New User')}
-                            enableQueryAction={this.props.sectionId === 'users'}
+                            enableQueryAction={this.props.sectionId === 'users' || this.props.sectionId === 'my_company'}
                             noLeftPadding={true}
                         >
                             <button
