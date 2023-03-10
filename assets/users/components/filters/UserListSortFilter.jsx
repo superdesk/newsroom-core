@@ -16,6 +16,9 @@ export class UserListSortFilter extends React.PureComponent {
             label: gettext('Sort By'),
         };
         this.sortFields = [{
+            _id: 'first_name',
+            name: gettext('First Name'),
+        }, {
             _id: 'last_name',
             name: gettext('Last Name'),
         }, {
