@@ -98,7 +98,7 @@ class CompanyAdminAppComponent extends React.Component {
                             setQuery={this.props.setQuery}
                             fetch={this.props.sectionId === 'users' ?  this.props.fetchUsers : this.setProductFilterQuery }
                             buttonText={gettext('New User')}
-                            enableQueryAction={this.props.sectionId === 'users' || this.props.sectionId === 'my_company'}
+                            enableQueryAction={true}
                             noLeftPadding={true}
                         >
                             <button

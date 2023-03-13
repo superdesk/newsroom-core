@@ -8,7 +8,7 @@ import {CompanyDetailsProductRow} from './CompanyDetailsProductRow';
 import {searchQuerySelector} from 'search/selectors';
 import {companySectionListSelector, companyProductSeatsSelector, currentCompanySelector} from '../selectors';
 
-function CompanyDetailsComponent({company, showSeatRequestModal, setSection, companySections, seats, query}) {
+function CompanyDetailsComponent({company, showSeatRequestModal, setSection, companySections, products, query}) {
     const sections = companySections[company._id];
     const numSections = sections.length;
 
@@ -32,16 +32,16 @@ function CompanyDetailsComponent({company, showSeatRequestModal, setSection, com
 
                             {
                                 (query === null ?
-                                    Object.values(seats[company._id]).filter((seat) => seat.section === section._id) :
-                                    Object.values(seats[company._id]).filter((seat) => seat.section === section._id && seat.name.toString().includes(query))
+                                    Object.values(products[company._id]).filter((product) => product.section === section._id) : 
+                                    Object.values(products[company._id]).filter((product) => product.section === section._id && product.name.toString().includes(query)) 
                                 )
-                                    .map((seat) => (
+                                    .map((product) => (
 
                                         <CompanyDetailsProductRow
-                                            key={seat._id}
-                                            seat={seat}
+                                            key={product._id}
+                                            seat={product}
                                             showSeatRequestModal={showSeatRequestModal}
-                                            onNameClicked={() => setSection('users', seat._id)}
+                                            onNameClicked={() => setSection('users', product._id)}
                                         />
                                     ))}
                         </React.Fragment>
@@ -57,14 +57,14 @@ CompanyDetailsComponent.propTypes = {
     showSeatRequestModal: PropTypes.func,
     setSection: PropTypes.func,
     companySections: PropTypes.object,
-    seats: PropTypes.object,
+    products: PropTypes.object,
     query: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
     company: currentCompanySelector(state),
     companySections: companySectionListSelector(state),
-    seats: companyProductSeatsSelector(state),
+    products: companyProductSeatsSelector(state),
     query: searchQuerySelector(state),
 });
 
