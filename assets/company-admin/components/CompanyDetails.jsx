@@ -32,8 +32,11 @@ function CompanyDetailsComponent({company, showSeatRequestModal, setSection, com
 
                             {
                                 (query === null ?
-                                    Object.values(products[company._id]).filter((product) => product.section === section._id) : 
-                                    Object.values(products[company._id]).filter((product) => product.section === section._id && product.name.toString().includes(query)) 
+                                    Object.values(products[company._id]).filter((product) => product.section === section._id) :
+                                    Object.values(products[company._id]).filter((product) => 
+                                        product.section === section._id && 
+                                      product.name.toString().toLowerCase().includes(query.toLowerCase())
+                                    )
                                 )
                                     .map((product) => (
 
