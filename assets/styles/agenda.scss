@@ -29,10 +29,18 @@
             color: white;
         }
     }
-    .react-datepicker-wrapper {
-        width: auto;
-    }
 }
+.wire-column__main-header-container {
+    min-height: 56px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    box-shadow: 0 3px 6px hsla(0, 0%, 0%, 0.1), 0 1px 0 hsla(0, 0%, 0%, 0.06);
+    gap: 1px;
+    flex-shrink: 0;
+}
+
 
 .agenda-item {
     margin-block-start: 0;

@@ -11,7 +11,7 @@ body {
 }
 
 a {
-    color: $main-blue;
+    color: var(--primary-color);
     text-decoration: none;
     &:hover {
         color: $mid-blue;
@@ -246,14 +246,14 @@ label {
         cursor: pointer;
     }
     &.table--selected {
-        outline: 1px solid $main-blue;
+        outline: 1px solid var(--primary-color);
         &:hover {
-            outline: 1px solid $main-blue;
+            outline: 1px solid var(--primary-color);
         }
     }
 }
 tr.table--selected {
-    outline: 1px solid $main-blue;
+    outline: 1px solid var(--primary-color);
 }
 
 .report-thead {
@@ -287,17 +287,19 @@ body.print {
 }
 
 .sidenav {
-    flex: 0 0 56px;
-    background-color: $main-blue;
+    flex: 0 0 64px;
+    background-color: var(--sidenav-bg-color);
     position: relative;
     box-shadow: inset -3px 0px 8px rgba(0, 0, 0, 0.1);
+    padding: 0 4px;
 
     &:dir(rtl) {
         box-shadow: inset 3px 0px 8px rgba(0, 0, 0, 0.1);
     }
 
     @include phone {
-        flex: 0 0 45px;
+        padding: 0 2px;
+        flex: 0 0 48px;
     }
 }
 
@@ -307,13 +309,13 @@ body.print {
 
     // Default for tablet and pcs
     display: block;
-    margin: 0;
+    margin: 0 auto;
     overflow: visible;
 
     @include phone {
-        display: flex;
-        margin: 0 0 0 6px;
+        display: flex;        
         overflow: auto;
+        gap: 6px;
     }
     @include md {
         padding-block-start: 10px;
@@ -326,8 +328,13 @@ body.print {
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-direction: column;
+            gap: 2px;
             &:hover {
                 text-decoration: none;
+            }
+            @include sm {
+                gap: 4px;
             }
 
 
@@ -336,22 +343,21 @@ body.print {
             display: block;
         }
         a, span {
-            height: 40px;
-            padding: 0 8px;
-            line-height: 40px;
+            width: 56px;
+            min-height: 56px;
+            padding: 2px 0;
+            line-height: 56px;
             text-align: center;
 
             @include phone {
-                height: 40px;
-                line-height: 40px;
+                width: 44px;
+                height: 44px;
+                line-height: 44px;
             }
 
             i {
                 vertical-align: middle;
-            }
-            @include sm {
-            padding: 0 10px;
-            }
+            }           
             &:focus {
                 outline: none;
             }
@@ -359,18 +365,26 @@ body.print {
                 box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 3px 4px rgba(255, 255, 255, .7);
             }
         }
+        .sidenav-icons__item-title {
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 10px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            word-break: break-all;
+        }
         &.active {
             display: flex !important;
             justify-content: center;
 
             a {
                 background-color: white;
-                border-radius: 50%;
-                width: 40px;
+                border-radius: 4px;                
                 text-decoration: none;
             }
-            i {
-                color: $main-blue;
+            i, .sidenav-icons__item-title {
+                color: var(--primary-color);
             }
         }
         .badge--icon {
@@ -384,20 +398,21 @@ body.print {
             position: absolute;
             inset-block-end: 0;
             inset-inline-start: auto;
-            inset-inline-end: 38px;
+            inset-inline-end: 50px;
             @include sm {
-                inset-inline-start: 0;
-                inset-inline-end: 0;
-                inset-block-end: 48px;
+                inset-inline-start: auto;
+                inset-inline-end: auto;
+                inset-block-end: 56px;
             }
         }
         &--admin {
             position: absolute;
             inset-block-end: 0;
             inset-inline-start: auto;
-            inset-inline-end: 0;
+            inset-inline-end: 4px;
+
             @include sm {
-                inset-inline-start: 0;
+                inset-inline-end: auto;
             }
         }
     }
@@ -434,7 +449,7 @@ article.list {
 
 .footer {
     z-index: 10;
-    height: var(--footer-height, 30px);
+    height: 30px;
     color: #333;
     background-color: #e6e6e6;
     box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);
@@ -660,7 +675,7 @@ article.list {
     }
     &.active {
         background-color: #f1f1f1;
-        color: $main-blue;
+        color: var(--primary-color);
     }
     @include sm {
         padding: 20px;
@@ -1305,8 +1320,8 @@ article.list {
     .tab-pane {
         .btn-outline-primary {
             color: white;
-            border-color: $main-blue;
-            background-color: $main-blue;
+            border-color: var(--primary-color);
+            background-color: var(--primary-color);
             &:hover {
                 color: white;
                 border-color: $mid-blue;
@@ -1385,7 +1400,7 @@ article.list {
         color: #B3B5BD;
         &.active {
             color: #fff;
-            border-block-end: 3px solid $main-blue;
+            border-block-end: 3px solid var(--primary-color);
         }
         &:focus {
             outline: 0;
@@ -1717,7 +1732,7 @@ article.list {
 .wire-articles__item--postponed {
     &:before {
         width: 4px;
-        background-color: $main-blue;
+        background-color: var(--primary-color);
     }
     .date-round__number {
         color: $orange;
@@ -3596,8 +3611,8 @@ a.wire-articles__versions {
     }
     .btn-outline-primary {
         color: white;
-        border-color: $main-blue;
-        background-color: $main-blue;
+        border-color: var(--primary-color);
+        background-color: var(--primary-color);
         &:hover {
             color: white;
             border-color: $mid-blue;
@@ -3820,7 +3835,7 @@ a.wire-articles__versions {
 
 .simple-card--selected {
     border: 3px solid rgba(0, 172, 236, .4) !important;
-    outline: 1px solid $main-blue !important;
+    outline: 1px solid var(--primary-color) !important;
 }
 
 .pull-right {
@@ -4012,7 +4027,7 @@ a.wire-articles__versions {
 }
 
 .toggle-background.react-toggle--checked .react-toggle-track {
-  background-color: $main-blue !important;
+  background-color: var(--primary-color) !important;
 }
 .react-toggle-track {
     width: 42px !important;
@@ -4057,7 +4072,7 @@ a.wire-articles__versions {
 }
 
 .blue-circle {
-    background-color: $main-blue;
+    background-color: var(--primary-color);
     border: 1px solid #0600ec;
     box-shadow: 0px 0 0 2px #dedede;
     border-radius: 50%;
