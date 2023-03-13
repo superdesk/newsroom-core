@@ -402,10 +402,11 @@ def update_user_last_active(user):
         current_time = utcnow()
         # Set the cached version of the user
         user["last_active"] = current_time
+        user["is_validated"] = True
         app.cache.set(str(user["_id"]), json.dumps(user, default=json_serialize_datetime_objectId))
         # Set the db version of the user
         superdesk.get_resource_service("users").system_update(
-            ObjectId(user["_id"]), {"last_active": current_time}, user
+            ObjectId(user["_id"]), {"last_active": current_time, "is_validated": True}, user
         )
 
 
