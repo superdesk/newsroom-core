@@ -1,15 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-
 import {gettext} from 'utils';
 import {renderModal} from 'actions';
 import {setSection as _setSection, setProductFilter as _setProductFilter} from '../actions';
 import {CompanyDetailsProductRow} from './CompanyDetailsProductRow';
-
+import {searchQuerySelector} from 'search/selectors';
 import {companySectionListSelector, companyProductSeatsSelector, currentCompanySelector} from '../selectors';
 
-function CompanyDetailsComponent({company, showSeatRequestModal, setSection, companySections, seats}) {
+function CompanyDetailsComponent({company, showSeatRequestModal, setSection, companySections, products, query}) {
     const sections = companySections[company._id];
     const numSections = sections.length;
 
@@ -30,14 +29,24 @@ function CompanyDetailsComponent({company, showSeatRequestModal, setSection, com
                             <tr colSpan={2 + numSections} className="subheading">
                                 <td>{section.name}</td>
                             </tr>
-                            {Object.values(seats[company._id]).filter((seat) => seat.section === section._id).map((seat) => (
-                                <CompanyDetailsProductRow
-                                    key={seat._id}
-                                    seat={seat}
-                                    showSeatRequestModal={showSeatRequestModal}
-                                    onNameClicked={() => setSection('users', seat._id)}
-                                />
-                            ))}
+
+                            {
+                                (query === null ?
+                                    Object.values(products[company._id]).filter((product) => product.section === section._id) :
+                                    Object.values(products[company._id]).filter((product) => 
+                                        product.section === section._id && 
+                                      product.name.toString().toLowerCase().includes(query.toLowerCase())
+                                    )
+                                )
+                                    .map((product) => (
+
+                                        <CompanyDetailsProductRow
+                                            key={product._id}
+                                            seat={product}
+                                            showSeatRequestModal={showSeatRequestModal}
+                                            onNameClicked={() => setSection('users', product._id)}
+                                        />
+                                    ))}
                         </React.Fragment>
                     ))}
                 </tbody>
@@ -51,13 +60,15 @@ CompanyDetailsComponent.propTypes = {
     showSeatRequestModal: PropTypes.func,
     setSection: PropTypes.func,
     companySections: PropTypes.object,
-    seats: PropTypes.object,
+    products: PropTypes.object,
+    query: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
     company: currentCompanySelector(state),
     companySections: companySectionListSelector(state),
-    seats: companyProductSeatsSelector(state),
+    products: companyProductSeatsSelector(state),
+    query: searchQuerySelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({

@@ -16,13 +16,13 @@ class ListBar extends React.Component {
                     }
                 )}>
                     {this.props.children}
-                    {!this.props.noSearch && (
-                        <SearchBar
+                    {!this.props.noSearch &&
+                        (<SearchBar
                             setQuery={this.props.setQuery}
                             fetchItems={() => this.props.fetch()}
                             enableQueryAction={this.props.enableQueryAction}
                         />
-                    )}
+                        )}
                     <div className="content-bar__right">
                         {this.props.onNewItem && (
                             <button
