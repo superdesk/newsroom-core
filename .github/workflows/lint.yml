@@ -25,5 +25,5 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
-      - run: pip install black
+      - run: pip install black~=23.0
       - run: black --check .

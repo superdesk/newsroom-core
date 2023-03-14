@@ -5,12 +5,12 @@ import classNames from 'classnames';
 import {gettext, fullDate} from 'utils';
 
 export function getUserStateLabelDetails(user) {
-    if (user.is_approved && user.is_enabled) {
+    if (user.is_approved && user.is_enabled && user.is_validated) {
         return {
             colour: 'green',
             text: gettext('active'),
         };
-    } else if (!user.is_approved) {
+    } else if (!user.is_approved || !user.is_validated) {
         return {
             colour: 'orange2',
             text: gettext('pending'),
