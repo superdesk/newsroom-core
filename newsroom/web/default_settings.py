@@ -500,3 +500,9 @@ REBUILD_ELASTIC_ON_INIT_DATA_ERROR = strtobool(env("REBUILD_ELASTIC_ON_INIT_DATA
 #: .. versionadded:: 2.3
 #:
 AGENDA_EXPIRY_DAYS = int(env("AGENDA_EXPIRY_DAYS", 0))
+
+#: The maximum number of days allowed for an Event's duration
+#:
+#: .. versionadded:: 2.3.2
+#:
+MAX_MULTI_DAY_EVENT_DURATION = int(env("MAX_MULTI_DAY_EVENT_DURATION", 365))
