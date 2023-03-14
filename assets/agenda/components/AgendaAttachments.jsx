@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {hasAttachments, getAttachments} from '../utils';
 
 import {gettext} from 'utils';
@@ -46,3 +47,7 @@ export default function AgendaAttachments({item}) {
         </div>
     ));
 }
+
+AgendaAttachments.propTypes = {
+    item: PropTypes.object.isRequired,
+};
