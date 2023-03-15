@@ -135,8 +135,8 @@ class CompanyAdminAppComponent extends React.Component {
                                 </button>
                             </div>
 
-                            {this.props.sectionId === 'users' ? <label className='label label--big label--rounded'>USERS : {
-                                this.props.totalUsers}</label> : ''}
+                            {this.props.sectionId === 'users' ? <label className='label label--big label--rounded'>{
+                                gettext('Users : {{total}}', {total : this.props.totalUsers})}</label> : ''}
                             <div className="content-bar-divider" />
                             {this.props.sectionId !== 'users' ? null : (
                                 <React.Fragment>
