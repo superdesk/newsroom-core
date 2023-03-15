@@ -10,6 +10,7 @@ from flask_babel import gettext
 import superdesk
 from superdesk.text_utils import get_word_count, get_char_count
 from superdesk.utc import utcnow
+from superdesk.errors import SuperdeskApiError
 from planning.common import WORKFLOW_STATE
 
 from newsroom.notifications import (
@@ -187,6 +188,7 @@ def publish_item(doc, original):
 
 def publish_event(event, orig):
     logger.debug("publishing event %s", event)
+    validate_event_push(orig, event)
 
     # populate attachments href
     if event.get("files"):
@@ -274,9 +276,24 @@ def publish_event(event, orig):
 
 
 def get_event_dates(event):
-    event["dates"]["start"] = datetime.strptime(event["dates"]["start"], "%Y-%m-%dT%H:%M:%S+0000")
-    event["dates"]["end"] = datetime.strptime(event["dates"]["end"], "%Y-%m-%dT%H:%M:%S+0000")
+    if not isinstance(event["dates"]["start"], datetime):
+        event["dates"]["start"] = datetime.strptime(event["dates"]["start"], "%Y-%m-%dT%H:%M:%S+0000")
+    if not isinstance(event["dates"]["end"], datetime):
+        event["dates"]["end"] = datetime.strptime(event["dates"]["end"], "%Y-%m-%dT%H:%M:%S+0000")
     return event["dates"]
+
+
+def validate_event_push(orig, updates):
+    event = deepcopy(orig or {})
+    event.update(updates)
+    dates = get_event_dates(event)
+    event_id = event.get("guid")
+
+    max_duration = app.config["MAX_MULTI_DAY_EVENT_DURATION"] or 365
+    if (dates["end"] - dates["start"]).days > max_duration:
+        raise SuperdeskApiError.badRequestError(
+            f"Failed to ingest Event with id '{event_id}': duration exceeds maximum allowed"
+        )
 
 
 def publish_planning_item(planning, orig):

@@ -22,6 +22,7 @@ from superdesk.datalayer import SuperdeskDataLayer
 from superdesk.json_utils import SuperdeskJSONEncoder
 from superdesk.validator import SuperdeskValidator
 from superdesk.logging import configure_logging
+from superdesk.errors import SuperdeskApiError
 from elasticapm.contrib.flask import ElasticAPM
 from sentry_sdk.integrations.flask import FlaskIntegration
 
@@ -188,9 +189,14 @@ class BaseNewsroomApp(eve.Eve):
                 )
             return flask.render_template("403.html"), 403
 
+        def superdesk_api_error(err):
+            error_code = err.status_code or 500
+            return flask.jsonify({"error": err.message or "", "message": err.payload, "code": error_code}), error_code
+
         self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(404, render_404)
         self.register_error_handler(403, render_403)
+        self.register_error_handler(SuperdeskApiError, superdesk_api_error)
 
     def general_setting(
         self,
