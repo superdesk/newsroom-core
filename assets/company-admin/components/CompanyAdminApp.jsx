@@ -134,6 +134,9 @@ class CompanyAdminAppComponent extends React.Component {
                                     {gettext('Users')}
                                 </button>
                             </div>
+
+                            {this.props.sectionId === 'users' ? <label className='label label--big label--rounded'>{
+                                gettext('Users : {{total}}', {total : this.props.totalUsers})}</label> : ''}
                             <div className="content-bar-divider" />
                             {this.props.sectionId !== 'users' ? null : (
                                 <React.Fragment>
@@ -213,6 +216,7 @@ CompanyAdminAppComponent.propTypes = {
     productId: PropTypes.string,
     setProductFilter: PropTypes.func,
     companies: PropTypes.arrayOf(PropTypes.object),
+    totalUsers:PropTypes.number
 };
 
 const mapStateToProps = (state) => ({
@@ -226,6 +230,7 @@ const mapStateToProps = (state) => ({
     sortDirection: state.sortDirection,
     productId: state.productId,
     companies: companyListSelector(state),
+    totalUsers:state.totalUsers
 });
 
 const mapDispatchToProps = (dispatch) => ({
