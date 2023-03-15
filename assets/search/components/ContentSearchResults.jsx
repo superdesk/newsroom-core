@@ -128,9 +128,9 @@ class ContentSearchResultsComponent extends React.Component {
                                         <span>{gettext('search results for:')}</span>
                                     </span>
                                     {!(this.props.minimizeSearchResults && !this.state.expanded) ? null : (
-                                        <span className="search-results__tags">
+                                        <div className="tags-list">
                                             {this.renderTags()}
-                                        </span>
+                                        </div>
                                     )}
                                 </React.Fragment>
                             )}
@@ -157,9 +157,9 @@ class ContentSearchResultsComponent extends React.Component {
                             )}
                         </div>
                         {(this.props.minimizeSearchResults && !this.state.expanded) ? null : (
-                            <span className="search-results__tags">
+                            <div className="tags-list">
                                 {this.renderTags()}
-                            </span>
+                            </div>
                         )}
                     </div>
                 </div>

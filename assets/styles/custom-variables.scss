@@ -1,21 +1,19 @@
 // Custom variables
 :root {
-    --body-text: #222;
-    --gray-light: #c9c9c9;
-    --gray-lighter: #e9e9e9;
-    --gray-mid: #9a9a9a;
-    --gray-dark: #747474;
-    --main-blue: #007ead;
-    --main-blue-light: #427a8f;
+    --body-text: hsl(0, 0%, 14%);
     --background-color: #f8f8f8;
+    --primary-color: #007EAD;
+    --main-blue: #007EAD;
+    --top-bar-bg-color: #2D2D2D;
+    --sidenav-bg-color: var(--primary-color);
     --footer-height: 30px;
 }
 
-$body-text: #222;
+$body-text: var(--body-text);
 $gray-light: #c9c9c9;
 $gray-mid: #9a9a9a;
 $gray-dark: #747474;
-$background-color: #f8f8f8;
+$background-color: var(--background-color);
 $main-blue: #007EAD;
 $mid-blue: #00658A;
 $mid-blue-light: #427A8F;
@@ -79,7 +77,7 @@ $dropdown-link-hover-bg: #eff4f6;
 $dropdown-border-width: 0;
 $dropdown-min-width: 12rem;
 $list-group-item-padding-x: 0.75rem;
-$list-group-item-padding-y: 1.25rem;
+$list-group-item-padding-y: 1.25rem; 
 
 // Modals
 
@@ -107,17 +105,280 @@ $grid-breakpoints: (
     lg: 992px,
     xl: 1200px,
     xxl: 1440px
-  ) !default;
+) !default;
 
   // Grid containers
   //
   // Define the maximum width of `.container` for different screen sizes.
 
-  $container-max-widths: (
+$container-max-widths: (
     xsm: 300px,
     sm: 540px,
     md: 720px,
     lg: 960px,
     xl: 1140px,
     xxl: 1360px
-  ) !default;
+) !default;
+
+
+// NEW COLORS
+//--------------------------
+
+// return css color variable with different opacity value
+@function alpha($color, $opacity){
+    $color: str-replace($color, 'var(');
+    $color: str-replace($color, ')');
+    $color-h: var(#{$color+'-h'});
+    $color-s: var(#{$color+'-s'});
+    $color-l: var(#{$color+'-l'});
+    @return hsla($color-h, $color-s, $color-l, $opacity);
+}
+// return css color variable with different lightness value
+@function lightness($color, $lightnessMultiplier){
+    $color: str-replace($color, 'var(');
+    $color: str-replace($color, ')');
+    $color-h: var(#{$color+'-h'});
+    $color-s: var(#{$color+'-s'});
+    $color-l: var(#{$color+'-l'});
+    @return hsl($color-h, $color-s, calc(#{$color-l} * #{$lightnessMultiplier}));
+}
+  
+  // replace substring with another string
+  // credits: https://css-tricks.com/snippets/sass/str-replace-function/
+@function str-replace($string, $search, $replace: '') {
+    $index: str-index($string, $search);
+    @if $index {
+        @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+    }
+    @return $string;
+}
+
+@mixin defineColorHSL($color, $hue, $saturation, $lightness){
+    #{$color}: unquote("hsl(#{$hue}, #{$saturation}, #{$lightness})");#{$color}-h: #{$hue};#{$color}-s: #{$saturation};#{$color}-l: #{$lightness};
+}
+  
+:root {
+    --color-text:                 hsla(0, 0%, 14%, 1);
+    --color-text--light:          hsla(0, 0%, 40%, 1);
+    --color-text--inverse:        hsla(0, 0%, 96%, 1);
+    --color-dark:                 hsla(0, 3%, 15%, 1);
+    --color-light:                hsla(0, 0%, 84%, 1);
+
+    --line-shadow-end--light: 0 1px 0 var(--color-light);
+    --line-shadow-start--light: 0 -1px 0 var(--color-light);
+
+    //space
+    --space--0:     0;
+    --space--0-5:   4px;
+    --space--1:     8px;
+    --space--2:     16px;
+    --space--3:     24px;
+    --space--4:     32px;
+    --space--5:     40px;
+
+    @include defineColorHSL(--color-success, 95, 50%, 34%);
+    @include defineColorHSL(--color-warning, 36, 100%, 40%);
+    @include defineColorHSL(--color-alert, 356, 72%, 46%);
+    @include defineColorHSL(--color-info, 198, 45%, 50%);
+    @include defineColorHSL(--color-highlight, 356, 72%, 46%);
+    @include defineColorHSL(--color-highlight1, 268, 68%, 45%);
+    @include defineColorHSL(--color-highlight2, 310, 89%, 36%);
+}
+
+.line-shadow-end--light {
+    box-shadow: var(--line-shadow-end--light);
+}
+
+.btn {
+    height: 40px;
+    display: inline-flex;
+    [class^="icon--"],
+    [class*=" icon--"] {
+        color: inherit !important;
+    }
+}
+.btn--small {
+    height: 32px;
+    padding-block: 0 !important;
+}
+.btn--icon-only {
+    display: flex;
+    align-items: center;
+    padding: 0 8px !important;
+    line-height: 1;
+}
+
+.icon-button {
+    &.icon-button--bordered {
+        border: 1px solid var(--color-light);
+        height: 40px;
+        [class^="icon--"],
+        [class*=" icon--"] {
+            color: var(--color-text--light);
+        }
+    }
+}
+.icon--arrow-right {
+    &.icon--collapsible-closed {
+        transform: rotate(-90deg);
+
+    }
+}
+
+.search-result-count {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.navbar {
+    flex-shrink: 0;
+    flex-grow: 0;
+    &.navbar--flex {
+        display: flex;
+        align-items: center;
+        padding-inline: 16px;
+        padding-block: 0;
+    }
+    &.navbar--small {
+        height: 40px;
+    }
+    .navbar__inner {
+        display: flex;
+        align-items: center;
+        align-self: stretch;
+        &--end {
+            margin-inline-start: auto;
+        }
+        &--start {
+            margin-inline-end: auto;
+        }
+    }
+    &.navbar--auto-height {
+        min-height: 56px;
+        height: auto;
+        flex-shrink: 0;
+    }
+}
+.navbar__button-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space--1);
+}
+.navbar__divider {
+    display: inline-flex;
+    align-self: stretch;
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 1px;
+    border-inline-start: 1px solid var(--color-light);
+    opacity: 0.75;
+    margin-inline: var(--space--2);
+    margin-block: var(--space--1);
+}
+
+.react-toggle__wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space--1);
+    label {
+        margin: 0 !important;
+        color: var(--color-text);
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1;
+        &:hover {
+            cursor: pointer;
+        }
+    }
+}
+.icon-link--plain {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space--1);
+    color: var(--color-text);
+    text-decoration: none;
+    padding-inline: 4px;
+    transition: all 0.2s ease;
+    [class^="icon--"],
+    [class*=" icon--"] {
+        color: var(--color-text--light);
+        transition: all 0.2s ease;
+    }
+    .icon-link__text {
+        color: var(--color-text);
+        font-size: 14px;
+        font-weight: 500;
+        display: inline-flex;
+        line-height: 1;
+    }
+    &:hover {
+        text-decoration: none;
+        [class^="icon--"],
+        [class*=" icon--"] {
+            color: var(--color-text);
+        }
+    }
+}
+
+.search-result__tags-list {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    padding-inline: var(--space--1);
+    list-style-type: none;
+    width: 100%;
+    container-type: inline-size;
+    container-name: tags-list;
+}
+.search-result__tags-list-row {
+    display: flex;
+    flex-direction: row;
+    padding-block: 12px;
+    gap: var(--space--2);
+    min-height: 56px;
+    border-block-end: 1px dashed hsla(0, 0%, 20%, 0.2);
+    &:last-child {
+        border: none;
+    }
+    .tag-list {
+        flex-grow: 1;
+    }
+    .search-result__tags-list-row-label {
+        display: inline-flex;
+        min-height: 32px;
+        padding-block-start: var(--space--1);
+        text-align: end;
+        justify-content: flex-end;
+        color: var(--color-text);
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.2;
+        width: 100px;
+        word-wrap: normal;
+        flex-grow: 0;
+        flex-shrink: 0;
+    }
+
+}
+.tags-list-row__button-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space--1);
+    margin-inline-start: auto;
+}
+
+// Container Query test
+@container tags-list (max-width: 1200px) {
+    .search-result__tags-list-row {
+        flex-direction: column;
+        gap: var(--space--1);
+        .search-result__tags-list-row-label {
+            text-align: start;
+            justify-content: flex-start;
+            padding-block-start: 0;
+            width: auto;
+            min-height: auto;
+        }
+    }
+}
