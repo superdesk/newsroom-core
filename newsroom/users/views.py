@@ -242,7 +242,7 @@ def _resend_token(user_id, token_type):
 
 
 @blueprint.route("/users/<_id>", methods=["DELETE"])
-@admin_only
+@account_manager_or_company_admin_only
 def delete(_id):
     """Deletes the user by given id"""
     get_resource_service("users").delete_action({"_id": ObjectId(_id)})
