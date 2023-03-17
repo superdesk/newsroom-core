@@ -35,6 +35,7 @@ class CompanyAdminAppComponent extends React.Component {
         this.toggleSideNav = this.toggleSideNav.bind(this);
         this.saveUser = this.saveUser.bind(this);
         this.setProductFilterQuery = this.setProductFilterQuery.bind(this);
+        this.deleteUser = this.deleteUser.bind(this);
     }
 
     toggleSideNav() {
