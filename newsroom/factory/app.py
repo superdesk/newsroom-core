@@ -57,6 +57,7 @@ class BaseNewsroomApp(eve.Eve):
         self.apm = None
         self.__self__ = self
         self.__func__ = None
+        self._superdesk_cache = None
 
         if config is None:
             config = {}
