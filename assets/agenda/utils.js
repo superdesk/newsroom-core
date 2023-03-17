@@ -642,11 +642,13 @@ const getEndDate = (item) => item.dates.no_end_time || item.dates.all_day ?
 
 // compare days without being affected by timezone
 const isBetweenDay = (day, start, end) => {
-    const dayDate = day.format('YYYY-MM-DD');
-    const startDate = start.format('YYYY-MM-DD');
+    // it will be converted to local time
+    // if passed as string which we need
+    // for all day events which are in utc mode
+    const startDate = start.format('YYYY-MM-DD'); 
     const endDate = end.format('YYYY-MM-DD');
 
-    return (startDate <= dayDate && endDate >= dayDate);
+    return day.isBetween(startDate, endDate, 'day', '[]');
 };
 
 /**
@@ -655,7 +657,7 @@ const isBetweenDay = (day, start, end) => {
  * @param activeDate: date that the grouping will start from
  * @param activeGrouping: type of grouping i.e. day, week, month
  */
-export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
+export function groupItems(items, activeDate, activeGrouping, featuredOnly) {
     const maxStart = moment(activeDate).set({'h': 0, 'm': 0, 's': 0});
     const groupedItems = {};
     const grouper = Groupers[activeGrouping];
@@ -679,7 +681,15 @@ export function groupItems (items, activeDate, activeGrouping, featuredOnly) {
             let end = get(item, 'event.actioned_date') ? moment(item.event.actioned_date) : null;
             if (!end || !moment.isMoment(end)) {
                 end = item._display_to ? moment(item._display_to) :
-                    moment.max(itemExtraDates.concat([maxStart]).concat([itemEndDate]));
+                    moment.max(
+                        itemExtraDates
+                            .concat([maxStart])
+                            // If event is all day the end timestamp is the same as
+                            // start and depending on the local timezone offset it
+                            // might not give enough room for the event to show up,
+                            // so add an extra day for it.
+                            .concat([itemEndDate.clone().add(1, 'd')])
+                    );
             }
             let key = null;
 
