@@ -84,6 +84,9 @@ const config = {
             path.resolve(__dirname, 'assets'),
             'node_modules',
         ],
+        alias: {
+            'moment-timezone': 'moment-timezone/builds/moment-timezone-with-data-10-year-range',
+        },
         mainFields: ['browser', 'main'],
     },
     plugins: [
