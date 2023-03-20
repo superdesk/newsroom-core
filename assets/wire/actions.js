@@ -274,6 +274,7 @@ export function fetchItems() {
         const start = Date.now();
         dispatch(queryItems());
         dispatch(loadingAggregations());
+        dispatch(previewItem(null));
         const state = getState();
         return Promise.all([
             search(state, false, false)
