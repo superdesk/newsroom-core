@@ -31,11 +31,15 @@ def test_return_search_for_users(client):
             "phone": "1234567",
             "company": ObjectId("59b4c5c61d41c8d736852fbf"),
             "user_type": "public",
+            "sections": "wire,agenda",
         },
     )
 
     response = client.get("/users/search?q=jo")
     assert "John" in response.get_data(as_text=True)
+    user_data = response.get_json()[0]
+    assert user_data["sections"]["agenda"]
+    assert user_data["sections"]["wire"]
 
 
 def test_reset_password_token_sent_for_user_succeeds(app, client):
