@@ -104,7 +104,7 @@ def create():
         if not _is_email_address_valid(form.email.data):
             return jsonify({"email": [gettext("Email address is already in use")]}), 400
 
-        new_user = form.data
+        new_user = get_updates_from_form(form)
         add_token_data(new_user)
         user_is_company_admin = is_current_user_company_admin()
         if user_is_company_admin:
@@ -173,10 +173,7 @@ def edit(_id):
                     400,
                 )
 
-            updates = form.data
-            if not (user_is_company_admin or user_is_non_admin) and form.company.data:
-                updates["company"] = ObjectId(form.company.data)
-
+            updates = get_updates_from_form(form)
             if not user_is_admin and updates.get("user_type", "") != user.get("user_type", ""):
                 flask.abort(401)
 
@@ -186,26 +183,28 @@ def edit(_id):
                     if field not in allowed_fields:
                         updates.pop(field, None)
 
-            if not user_is_non_admin:
-                if "sections" in updates:
-                    updates["sections"] = {
-                        section["_id"]: section["_id"] in (form.sections.data or []) for section in app.sections
-                    }
-
-                if "products" in updates:
-                    product_ids = [ObjectId(productId) for productId in updates["products"]]
-                    products = {
-                        product["_id"]: product
-                        for product in query_resource("products", lookup={"_id": {"$in": product_ids}})
-                    }
-                    updates["products"] = [
-                        {"_id": product["_id"], "section": product["product_type"]} for product in products.values()
-                    ]
-
             get_resource_service("users").patch(ObjectId(_id), updates=updates)
             return jsonify({"success": True}), 200
         return jsonify(form.errors), 400
     return jsonify(user), 200
+
+
+def get_updates_from_form(form: UserForm):
+    updates = form.data
+    if form.company.data:
+        updates["company"] = ObjectId(form.company.data)
+    if "sections" in updates:
+        updates["sections"] = {section["_id"]: section["_id"] in (form.sections.data or []) for section in app.sections}
+
+    if "products" in updates:
+        product_ids = [ObjectId(productId) for productId in updates["products"]]
+        products = {
+            product["_id"]: product for product in query_resource("products", lookup={"_id": {"$in": product_ids}})
+        }
+        updates["products"] = [
+            {"_id": product["_id"], "section": product["product_type"]} for product in products.values()
+        ]
+    return updates
 
 
 @blueprint.route("/users/<_id>/validate", methods=["POST"])
