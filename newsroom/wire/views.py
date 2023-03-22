@@ -396,9 +396,22 @@ def bookmark():
 def copy(_id):
     item_type = get_type()
     item = get_entity_or_404(_id, item_type)
+
+    template_name = "copy_agenda_item.txt" if item_type == "agenda" else "copy_wire_item.txt"
+    template_kwargs = {"item": item}
+    if item_type == "agenda":
+        template_kwargs.update(
+            {
+                "location": "" if item_type != "agenda" else get_location_string(item),
+                "contacts": get_public_contacts(item),
+                "calendars": ", ".join([calendar.get("name") for calendar in item.get("calendars") or []]),
+            }
+        )
+    copy_data = flask.render_template(template_name, **template_kwargs).strip()
+
     update_action_list([_id], "copies", item_type=item_type)
     get_resource_service("history").create_history_record([item], "copy", get_user(), request.args.get("type", "wire"))
-    return flask.jsonify(), 200
+    return flask.jsonify({"data": copy_data}), 200
 
 
 @blueprint.route("/wire/<_id>/versions")
