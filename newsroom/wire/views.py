@@ -22,7 +22,7 @@ from newsroom.wire.utils import update_action_list
 from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required, admin_only
 from newsroom.topics import get_user_topics
-from newsroom.email import send_template_email
+from newsroom.email import send_template_email, get_language_template_name
 from newsroom.companies import get_user_company
 from newsroom.utils import (
     get_entity_or_404,
@@ -45,6 +45,7 @@ from newsroom.notifications import (
 )
 from newsroom.companies import section
 from newsroom.template_filters import is_admin_or_internal
+from newsroom.gettext import get_session_locale
 
 from .search import get_bookmarks_count
 from ..upload import ASSETS_RESOURCE, get_upload
@@ -397,7 +398,10 @@ def copy(_id):
     item_type = get_type()
     item = get_entity_or_404(_id, item_type)
 
-    template_name = "copy_agenda_item.txt" if item_type == "agenda" else "copy_wire_item.txt"
+    template_filename = "copy_agenda_item" if item_type == "agenda" else "copy_wire_item"
+    locale = (get_session_locale() or "en").lower()
+    template_name = get_language_template_name(template_filename, locale, "txt")
+
     template_kwargs = {"item": item}
     if item_type == "agenda":
         template_kwargs.update(
