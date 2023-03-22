@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import {isEmpty} from 'lodash';
 
 import {isDisplayed} from 'utils';
@@ -64,7 +65,14 @@ class WirePreview extends React.PureComponent {
                         previewConfig={previewConfig}
                     />
                 </div>
-                <div id='preview-article' className='wire-column__preview__content' ref={(preview) => this.preview = preview}>
+                <div
+                    id='preview-article'
+                    ref={(preview) => this.preview = preview}
+                    className={classNames(
+                        'wire-column__preview__content',
+                        {noselect: this.props.previewConfig.disable_text_selection}
+                    )}
+                >
                     <ArticleEmbargoed item={item} />
                     {isDisplayed('slugline', previewConfig) && <ArticleSlugline item={item}/>}
                     {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item}/>}

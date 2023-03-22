@@ -1,4 +1,7 @@
+from typing import Dict, Any
+from os import path
 from flask import json, current_app as app
+
 from superdesk import get_resource_service
 from superdesk.emails import SuperdeskMessage
 
@@ -55,3 +58,21 @@ def mock_send_email(to, subject, text_body, html_body=None, sender=None, attachm
             return connection.send(msg)
 
         return _app.mail.send(msg)
+
+
+def load_fixture(filename: str) -> str:
+    with open(path.join(path.dirname(__file__), "fixtures", filename), "r") as fixture:
+        return fixture.read()
+
+
+def load_json_fixture(filename: str) -> Dict[str, Any]:
+    return json.loads(load_fixture(filename))
+    # with open(path.join(path.dirname(__file__), "fixtures", filename), "r") as fixture:
+    #     return json.load(fixture)
+
+
+def add_fixture_to_db(resource: str, filename: str):
+    item = load_json_fixture(filename)
+    _app = app._get_current_object()
+    _app.data.insert(resource, [item])
+    return item

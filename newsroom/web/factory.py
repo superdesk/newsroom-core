@@ -24,6 +24,7 @@ from newsroom.template_filters import (
     authorized_settings_apps,
     theme_url,
     to_json,
+    get_slugline,
 )
 from newsroom.notifications.notifications import get_initial_notifications
 from newsroom.limiter import limiter
@@ -118,6 +119,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_global(self.settings_apps, "settings_apps")
         self.add_template_global(get_multi_line_message)
         self.add_template_global(theme_url)
+        self.add_template_global(get_slugline)
 
         jinja2_loaders = [jinja2.FileSystemLoader(folder) for folder in self._theme_folders]
 

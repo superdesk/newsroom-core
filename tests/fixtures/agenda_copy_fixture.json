@@ -1,0 +1,345 @@
+{
+	"item_type": "event",
+	"guid": "urn:newsml:localhost:5000:2023-03-22T13:58:43.041437:9a00a7db-306a-49aa-a745-e45d1e0d4112",
+	"event_id": "urn:newsml:localhost:5000:2023-03-22T13:58:43.041437:9a00a7db-306a-49aa-a745-e45d1e0d4112",
+	"recurrence_id": null,
+	"name": "Copy Test",
+	"slugline": "copy-test",
+	"definition_short": "<p>This is a test for copying <a href=\"https://www.abc.net\">Data</a> to/from the API and Browser clipboard.</p>",
+	"definition_long": "This is some looooon description you have there",
+	"version": null,
+	"calendars": [{
+		"is_active": true,
+		"name": "Sports",
+		"qcode": "sports"
+	}],
+	"location": [{
+		"formatted_address": "Hickson Road Sydney New South Wales 2000 Australia",
+		"address": {
+			"area": "Council of the City of Sydney",
+			"country": "Australia",
+			"city": "Sydney",
+			"line": ["Hickson Road"],
+			"locality": "Sydney",
+			"state": "New South Wales",
+			"postal_code": "2000",
+			"type": "attraction",
+			"title": "Sydney Harbour Bridge"
+		},
+		"name": "Sydney Harbour Bridge",
+		"qcode": "urn:newsml:localhost:5000:2022-06-30T15:34:06.051479:ec47fb30-0b0d-4fbf-a124-a6f3591d8f7f",
+		"details": ["Some notes\nabout the location"],
+		"location": {
+			"lon": 151.2107619962694,
+			"lat": -33.85214725
+		}
+	}],
+	"ednote": "Editorial note to make sure our partners are doing the right thing",
+	"state": "scheduled",
+	"state_reason": null,
+	"place": [],
+	"subject": [],
+	"service": [],
+	"event": {
+		"_id": "urn:newsml:localhost:5000:2023-03-22T13:58:43.041437:9a00a7db-306a-49aa-a745-e45d1e0d4112",
+		"type": "event",
+		"occur_status": {
+			"qcode": "eocstat:eos5",
+			"name": "Planned, occurs certainly",
+			"label": "Planned, occurs certainly"
+		},
+		"dates": {
+			"start": "2023-03-22T23:00:00+0000",
+			"end": "2023-03-23T00:00:00+0000",
+			"tz": "Australia/Sydney"
+		},
+		"calendars": [{
+			"is_active": true,
+			"name": "Sports",
+			"qcode": "sports"
+		}],
+		"state": "scheduled",
+		"language": "en",
+		"place": [],
+		"_time_to_be_confirmed": false,
+		"slugline": "copy-test",
+		"name": "Copy Test",
+		"definition_short": "<p>This is a test for copying <a href=\"https://www.abc.net\">Data</a> to/from the API and Browser clipboard.</p>",
+		"location": [{
+			"formatted_address": "Hickson Road Sydney New South Wales 2000 Australia",
+			"address": {
+				"area": "Council of the City of Sydney",
+				"country": "Australia",
+				"city": "Sydney",
+				"line": ["Hickson Road"],
+				"locality": "Sydney",
+				"state": "New South Wales",
+				"postal_code": "2000",
+				"type": "attraction",
+				"title": "Sydney Harbour Bridge"
+			},
+			"name": "Sydney Harbour Bridge",
+			"qcode": "urn:newsml:localhost:5000:2022-06-30T15:34:06.051479:ec47fb30-0b0d-4fbf-a124-a6f3591d8f7f",
+			"details": ["Some notes\nabout the location"],
+			"location": {
+				"lon": 151.2107619962694,
+				"lat": -33.85214725
+			}
+		}],
+		"event_contact_info": [{
+				"is_active": true,
+				"public": true,
+				"contact_phone": [{
+					"number": "12345678",
+					"public": true,
+					"usage": "Business"
+				}],
+				"_created": "2022-10-04T05:23:34+0000",
+				"mobile": [{
+					"number": "987654321",
+					"public": true,
+					"usage": "Business"
+				}],
+				"last_name": "Brown",
+				"_updated": "2023-03-22T04:01:32+0000",
+				"_id": "633bc356917c0aea91f9cd72",
+				"first_name": "Bob",
+				"contact_email": ["bob@brown.org"]
+			},
+			{
+				"is_active": true,
+				"public": true,
+				"contact_phone": [{
+					"number": "112233",
+					"public": true,
+					"usage": "Business"
+				}],
+				"_created": "2022-11-29T05:23:32+0000",
+				"mobile": [{
+					"number": "44556678",
+					"public": true,
+					"usage": "Business"
+				}],
+				"last_name": "Pittaway",
+				"_updated": "2023-03-22T04:01:47+0000",
+				"_id": "638597545fe3e9d094fc311c",
+				"first_name": "Mark",
+				"contact_email": ["bob@bob.com"]
+			}
+		],
+		"registration_details": "<h2>Rego details</h2>\n<p>Doing stuff <b>about</b> stuff</p>\n<blockquote>And this is the quote.</blockquote>",
+		"invitation_details": "<p>Doing stuff about stuff</p>",
+		"subject": [],
+		"anpa_category": [],
+		"definition_long": "This is some looooon description you have there",
+		"internal_note": "And an internal note to make sure you are doing the right thing",
+		"ednote": "Editorial note to make sure our partners are doing the right thing",
+		"links": ["www.abc.net"],
+		"_updated": "2023-03-22T04:01:59+0000",
+		"_created": "2023-03-22T02:58:43+0000",
+		"guid": "urn:newsml:localhost:5000:2023-03-22T13:58:43.041437:9a00a7db-306a-49aa-a745-e45d1e0d4112",
+		"firstcreated": "2023-03-22T02:58:43+0000",
+		"versioncreated": "2023-03-22T04:01:59+0000",
+		"pubstatus": "usable",
+		"state_reason": null,
+		"actioned_date": null,
+		"item_id": "urn:newsml:localhost:5000:2023-03-22T13:58:43.041437:9a00a7db-306a-49aa-a745-e45d1e0d4112",
+		"expired": false,
+		"version_creator": "619c8cba52dc63b51e53128a",
+		"files": []
+	},
+	"registration_details": "<h2>Rego details</h2>\n<p>Doing stuff <b>about</b> stuff</p>\n<blockquote>And this is the quote.</blockquote>",
+	"invitation_details": "<p>Doing stuff about stuff</p>",
+	"language": "en",
+	"source": null,
+	"firstcreated": "2023-03-22T04:02:06+0000",
+	"versioncreated": "2023-03-22T04:02:06+0000",
+	"_current_version": 1,
+	"dates": {
+		"start": "2023-03-22T23:00:00+0000",
+		"end": "2023-03-23T00:00:00+0000",
+		"tz": "Australia/Sydney"
+	},
+	"planning_items": [{
+			"state_reason": null,
+			"agendas": [{
+				"name": "Agenda 3.0",
+				"_id": "62cfbcc1deff52cb71d5a35b"
+			}],
+			"subject": [],
+			"firstcreated": "2023-03-22T03:06:08+0000",
+			"planning_date": "2023-03-22T23:00:00+0000",
+			"description_text": "This is a test for copying Data to/from the API and Browser clipboard.\n",
+			"internal_note": "And an internal note to make sure you are doing the right thing",
+			"abstract": null,
+			"coverages": [{
+				"coverage_id": "urn:newsml:localhost:5000:2023-03-22T14:06:26.296022:cdaca0cd-1ea4-44d9-af31-37607abc465d",
+				"workflow_status": "draft",
+				"planning": {
+					"slugline": "copy-test",
+					"scheduled": "2023-03-23T01:00:00+0000",
+					"genre": null,
+					"g2_content_type": "text",
+					"internal_note": "And an internal note to make sure you are doing the right thing",
+					"language": "en",
+					"ednote": "Editorial note to make sure our partners are doing the right thing"
+				},
+				"news_coverage_status": {
+					"name": "coverage intended",
+					"qcode": "ncostat:int",
+					"label": "Planned"
+				},
+				"firstcreated": "2023-03-22T03:06:26+0000",
+				"scheduled_updates": [],
+				"coverage_provider": null,
+				"versioncreated": "2023-03-22T04:02:00+0000",
+				"deliveries": []
+			}],
+			"versioncreated": "2023-03-22T04:02:00+0000",
+			"slugline": "copy-test",
+			"urgency": 3,
+			"service": [],
+			"_time_to_be_confirmed": null,
+			"name": "Copy Test",
+			"guid": "urn:newsml:localhost:5000:2023-03-22T14:06:08.278424:9ee9eabc-eb0a-4b8d-9b79-80d5bebcfc23",
+			"_id": "urn:newsml:localhost:5000:2023-03-22T14:06:08.278424:9ee9eabc-eb0a-4b8d-9b79-80d5bebcfc23",
+			"place": [],
+			"state": "scheduled",
+			"headline": null,
+			"ednote": "Editorial note to make sure our partners are doing the right thing"
+		},
+		{
+			"state_reason": null,
+			"agendas": [{
+				"name": "Agenda 3.0",
+				"_id": "62cfbcc1deff52cb71d5a35b"
+			}],
+			"subject": [],
+			"firstcreated": "2023-03-22T03:06:08+0000",
+			"planning_date": "2023-03-22T23:00:00+0000",
+			"description_text": "This is a test for copying Data to/from the API and Browser clipboard.\n",
+			"internal_note": "And an internal note to make sure you are doing the right thing",
+			"abstract": null,
+			"coverages": [{
+					"coverage_id": "urn:newsml:localhost:5000:2023-03-22T14:29:10.090647:4881fc85-8883-406e-93ba-33b38069cecb",
+					"workflow_status": "draft",
+					"planning": {
+						"slugline": "copy-test",
+						"scheduled": "2023-03-23T01:00:00+0000",
+						"genre": [{
+							"name": "Feature",
+							"qcode": "Feature"
+						}],
+						"g2_content_type": "picture",
+						"internal_note": "And an internal note to make sure you are doing the right thing",
+						"language": "en",
+						"ednote": "Editorial note to make sure our partners are doing the right thing"
+					},
+					"news_coverage_status": {
+						"name": "coverage intended",
+						"qcode": "ncostat:int",
+						"label": "Planned"
+					},
+					"firstcreated": "2023-03-22T03:29:10+0000",
+					"scheduled_updates": [],
+					"coverage_provider": null,
+					"deliveries": []
+				},
+				{
+					"coverage_id": "urn:newsml:localhost:5000:2023-03-22T14:29:10.197108:f3fedb78-aaf9-4779-8bd9-2e64a6d206db",
+					"workflow_status": "draft",
+					"planning": {
+						"slugline": "copy-test",
+						"scheduled": "2023-03-23T01:00:00+0000",
+						"genre": [{
+							"name": "Article (news)",
+							"qcode": "Article"
+						}],
+						"g2_content_type": "video",
+						"internal_note": "And an internal note to make sure you are doing the right thing",
+						"language": "en",
+						"ednote": "Editorial note to make sure our partners are doing the right thing"
+					},
+					"news_coverage_status": {
+						"name": "coverage intended",
+						"qcode": "ncostat:int",
+						"label": "Planned"
+					},
+					"firstcreated": "2023-03-22T03:29:10+0000",
+					"scheduled_updates": [],
+					"coverage_provider": null,
+					"deliveries": []
+				}
+			],
+			"versioncreated": "2023-03-22T04:02:00+0000",
+			"slugline": "copy-test",
+			"urgency": 3,
+			"service": [],
+			"_time_to_be_confirmed": null,
+			"name": "Copy Test",
+			"guid": "urn:newsml:localhost:5000:2023-03-22T14:28:49.898054:a17ac752-c337-48bc-a508-0e42f6d4fa2f",
+			"_id": "urn:newsml:localhost:5000:2023-03-22T14:28:49.898054:a17ac752-c337-48bc-a508-0e42f6d4fa2f",
+			"place": [],
+			"state": "scheduled",
+			"headline": null,
+			"ednote": "Editorial note to make sure our partners are doing the right thing"
+		}
+	],
+	"type": "agenda",
+	"_created": "2023-03-22T02:58:46+0000",
+	"_updated": "2023-03-22T04:02:07+0000",
+	"_etag": "82b1bae7447b1e44221875e9cb4d613dde964dbc",
+	"coverages": [{
+			"coverage_id": "urn:newsml:localhost:5000:2023-03-22T14:06:26.296022:cdaca0cd-1ea4-44d9-af31-37607abc465d",
+			"workflow_status": "draft",
+			"coverage_status": "coverage intended",
+			"watches": [],
+			"scheduled": "2023-03-23T01:00:00+0000",
+			"delivery_id": null,
+			"coverage_provider": null,
+			"planning_id": "urn:newsml:localhost:5000:2023-03-22T14:06:08.278424:9ee9eabc-eb0a-4b8d-9b79-80d5bebcfc23",
+			"deliveries": [],
+			"slugline": "copy-test",
+			"publish_time": null,
+			"delivery_href": null,
+			"coverage_type": "text"
+		},
+		{
+			"coverage_id": "urn:newsml:localhost:5000:2023-03-22T14:29:10.090647:4881fc85-8883-406e-93ba-33b38069cecb",
+			"workflow_status": "draft",
+			"coverage_status": "coverage intended",
+			"watches": [],
+			"scheduled": "2023-03-23T01:00:00+0000",
+			"delivery_id": null,
+			"coverage_provider": null,
+			"planning_id": "urn:newsml:localhost:5000:2023-03-22T14:28:49.898054:a17ac752-c337-48bc-a508-0e42f6d4fa2f",
+			"deliveries": [],
+			"slugline": "copy-test",
+			"publish_time": null,
+			"delivery_href": null,
+			"coverage_type": "picture"
+		},
+		{
+			"coverage_id": "urn:newsml:localhost:5000:2023-03-22T14:29:10.197108:f3fedb78-aaf9-4779-8bd9-2e64a6d206db",
+			"workflow_status": "draft",
+			"coverage_status": "coverage intended",
+			"watches": [],
+			"scheduled": "2023-03-23T01:00:00+0000",
+			"delivery_id": null,
+			"coverage_provider": null,
+			"planning_id": "urn:newsml:localhost:5000:2023-03-22T14:28:49.898054:a17ac752-c337-48bc-a508-0e42f6d4fa2f",
+			"deliveries": [],
+			"slugline": "copy-test",
+			"publish_time": null,
+			"delivery_href": null,
+			"coverage_type": "video"
+		}
+	],
+	"display_dates": [
+		{"date": "2023-03-23T01:00:00+0000"},
+		{"date": "2023-03-23T01:00:00+0000"},
+		{"date": "2023-03-23T01:00:00+0000"}
+	],
+	"_id": "urn:newsml:localhost:5000:2023-03-22T13:58:43.041437:9a00a7db-306a-49aa-a745-e45d1e0d4112",
+	"_type": "agenda"
+}

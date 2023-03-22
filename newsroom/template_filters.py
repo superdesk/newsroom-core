@@ -84,7 +84,11 @@ def date_short(datetime):
 
 
 def plain_text(html):
-    return get_text(html, content="html", lf_on_block=True) if html else ""
+    # Remove newlines, and strip whitespace, before converting tag blocks to newlines
+    text = "".join([line.strip() for line in html.split("\n")])
+
+    # Remove the final newline, as newlines are added after each block, and we don't need the last one
+    return (get_text(text, content="html", lf_on_block=True) if text else "")[:-1]
 
 
 def word_count(html):
@@ -212,3 +216,16 @@ def theme_url(filename):
         filename=filename,
         h=_hash_cache.get(file, int(datetime.now().timestamp())),
     )
+
+
+def get_slugline(item, with_take_key: bool = False):
+    if not item or not item.get("slugline"):
+        return ""
+
+    slugline = item["slugline"].strip()
+    take_key = item.get("anpa_take_key") or ""
+    take_key_suffix = f" | {take_key}"
+    if with_take_key and item.get("anpa_take_key") and not slugline.endswith(take_key_suffix):
+        slugline += take_key_suffix
+
+    return slugline

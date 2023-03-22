@@ -9,19 +9,15 @@ import {
     updateRouteParams,
     getTimezoneOffset,
     errorHandler,
-    getLocaleDate,
-    recordAction
+    recordAction,
+    copyTextToClipboard,
 } from 'utils';
 import {noNavigationSelected, getNavigationUrlParam} from 'search/utils';
 
 import {markItemAsRead, toggleFeaturedOnlyParam} from 'local-store';
 import {renderModal, setSavedItemsCount} from 'actions';
 import {
-    getCalendars,
     getDateInputDate,
-    getLocationString,
-    getPublicContacts,
-    hasLocation,
     getMomentDate,
 } from './utils';
 
@@ -182,72 +178,18 @@ export function printItem(item) {
  */
 export function copyPreviewContents(item) {
     return (dispatch, getState) => {
-        const textarea = document.getElementById('copy-area');
-        const contents = [];
+        const state = getState();
 
-        item.name && contents.push(item.name);
-        item.name && contents.push(gettext('Dates: {{ dates }}', {dates: `${getLocaleDate(item.dates.start)} - ${getLocaleDate(item.dates.end)}`}));
-        hasLocation(item) && contents.push(gettext('Location: {{ location }}', {location: getLocationString(item)}));
-        item.ednote && contents.push(gettext('Ednote: {{ ednote }}', {ednote: item.ednote}));
-
-        if (item.definition_short) {
-            contents.push(gettext('Description: {{ description }}', {description: item.definition_short}));
+        if (!state.user) {
+            return;
         }
 
-        const contacts = getPublicContacts(item);
-        if (!isEmpty(contacts)) {
-            contents.push(gettext(''));
-            contents.push(gettext('Contacts'));
-            contacts.map(contact => {
-                contents.push(gettext('Name: {{ contact }}', {contact: contact.name}));
-                contact.organisation && contents.push(gettext('Organisation: {{ organisation }}', {organisation: contact.organisation}));
-                contact.contact_email && contents.push(gettext('Email: {{ email }}', {email: contact.contact_email}));
-                contact.phone && contents.push(gettext('Phone: {{ phone }}', {phone: contact.phone}));
-                contact.mobile && contents.push(gettext('Mobile: {{ mobile }}', {mobile: contact.mobile}));
-                contents.push('');
-            });
-        }
-
-        const calendars = getCalendars(item);
-        calendars && contents.push(gettext('Calendars: {{ calendars }}', {calendars}));
-
-        contents.push('');
-
-        if (!isEmpty(item.planning_items)) {
-            item.planning_items.map(pi => {
-                contents.push(gettext('Planning item'));
-                contents.push(gettext('Description: {{ description }}', {description: pi.description_text}));
-                pi.coverages &&  pi.coverages.map(coverage => {
-                    contents.push(gettext('Coverage type: {{ type }}', {type: coverage.planning.g2_content_type}));
-
-                    if (coverage.planning.scheduled != null) {
-                        contents.push(gettext('Scheduled: {{ schedule }}', {schedule: getLocaleDate(coverage.planning.scheduled)}));
-                    }
-                    if (coverage.workflow_status != null) {
-                        contents.push(gettext('Status: {{ status }}', {status: coverage.workflow_status}));
-                    }
-
-                    coverage.planning.description_text && contents.push(gettext('Description: {{ description }}', {description: coverage.planning.description_text}));
-                    contents.push('');
-                });
-            });
-        }
-
-        textarea.value = contents.join('\n');
-        textarea.select();
-
-        if (document.execCommand('copy')) {
-            notify.success(gettext('Item copied successfully.'));
-            item && analytics.itemEvent('copy', item);
-        } else {
-            notify.error(gettext('Sorry, Copy is not supported.'));
-        }
-
-        if (getState().user) {
-            server.post(`/wire/${item._id}/copy?type=${getState().context}`)
-                .then(dispatch(setCopyItem(item._id)))
-                .catch(errorHandler);
-        }
+        server.post(`/wire/${item._id}/copy?type=${state.context}`)
+            .then((response) => {
+                dispatch(setCopyItem(item._id));
+                copyTextToClipboard(response.data, item);
+            })
+            .catch(errorHandler);
     };
 }
 

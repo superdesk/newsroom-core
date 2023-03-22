@@ -1,0 +1,52 @@
+{%- if item.name %}{{ item.name }}
+{% endif %}
+{%- if item.dates %}Dates: {{ item.dates.start | datetime_short }} - {{ item.dates.end | datetime_short }}
+{% endif %}
+{%- if location %}Location: {{ location }}
+{% endif %}
+{%- if item.ednote %}Ednote: {{ item.ednote }}
+{% endif %}
+{%- if item.definition_short %}Description: {{ item.definition_short | plain_text }}
+{% endif -%}
+{%- if item.invitation_details %}Invitation Details: {{ item.invitation_details | plain_text }}
+{% endif -%}
+{%- if item.registration_details %}Registration Details: {{ item.registration_details | plain_text }}
+{% endif -%}
+{%- if contacts | length is gt 0 %}
+
+Contacts
+{%- for contact in contacts %}
+Name: {{ contact.name }}
+{% if contact.organisation %}Organisation: {{ contact.organisation }}
+{% endif %}
+{%- if contact.email %}Email: {{ contact.email }}
+{% endif %}
+{%- if contact.phone %}Phone: {{ contact.phone }}
+{% endif %}
+{%- if contact.mobile %}Mobile: {{ contact.mobile }}
+{% endif %}
+{%- endfor %}
+{%- endif %}
+{%- if calendars %}
+
+Calendars: {{ calendars }}
+{% endif -%}
+{%- if item.planning_items | length is gt 0 -%}
+{%- for plan in item.planning_items %}
+
+Planning Item
+{%- if plan.description_text %}
+Description: {{ plan.description_text | plain_text }}
+{% endif -%}
+{%- for coverage in plan.coverages %}
+{% if coverage.planning.g2_content_type %}Coverage Type: {{ coverage.planning.g2_content_type }}
+{% endif %}
+{%- if coverage.planning.scheduled %}Scheduled: {{ coverage.planning.scheduled | datetime_short }}
+{% endif %}
+{%- if coverage.workflow_status %}Status: {{ coverage.workflow_status }}
+{% endif -%}
+{%- if coverage.planning.description_text %}Description: {{ coverage.planning.description_text }}
+{% endif -%}
+{%- endfor -%}
+{%- endfor -%}
+{%- endif -%}
