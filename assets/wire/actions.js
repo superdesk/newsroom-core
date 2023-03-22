@@ -8,11 +8,9 @@ import {
     notify,
     updateRouteParams,
     getTimezoneOffset,
-    getTextFromHtml,
-    fullDate,
     recordAction,
     errorHandler as notifyErrors,
-    getSlugline,
+    copyTextToClipboard,
 } from 'utils';
 import {getNavigationUrlParam} from 'search/utils';
 
@@ -165,39 +163,18 @@ export function onItemsDeleted(ids) {
  */
 export function copyPreviewContents(item) {
     return (dispatch, getState) => {
-        const textarea = document.getElementById('copy-area');
-        const contents = [];
+        const state = getState();
 
-        contents.push(fullDate(item.versioncreated));
-        item.slugline && contents.push(getSlugline(item, true));
-        item.headline && contents.push(item.headline);
-        item.byline && contents.push(gettext('By: {{ byline }}', {byline: item.byline}));
-        item.located && contents.push(gettext('Location: {{ located }}', {located: item.located}));
-        item.source && contents.push(gettext('Source: {{ source }}', {source: item.source}));
-
-        contents.push('');
-
-        if (item.body_text) {
-            contents.push(item.body_text);
-        } else if (item.body_html) {
-            contents.push(getTextFromHtml(item.body_html));
+        if (!state.user) {
+            return;
         }
 
-        textarea.value = contents.join('\n');
-        textarea.select();
-
-        if (document.execCommand('copy')) {
-            notify.success(gettext('Item copied successfully.'));
-            item && analytics.itemEvent('copy', item);
-        } else {
-            notify.error(gettext('Sorry, Copy is not supported.'));
-        }
-
-        if (getState().user) {
-            server.post(`/wire/${item._id}/copy?type=${getState().context}`)
-                .then(dispatch(setCopyItem(item._id)))
-                .catch(errorHandler);
-        }
+        server.post(`/wire/${item._id}/copy?type=${state.context}`)
+            .then((response) => {
+                dispatch(setCopyItem(item._id));
+                copyTextToClipboard(response.data, item);
+            })
+            .catch(errorHandler);
     };
 }
 

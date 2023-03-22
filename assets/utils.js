@@ -860,3 +860,15 @@ export function getCreatedSearchParamLabel(created) {
 
     return {};
 }
+
+export function copyTextToClipboard(text, item) {
+    navigator.clipboard.writeText(text).then(
+        () => {
+            notify.success(gettext('Item copied successfully.'));
+            item && analytics.itemEvent('copy', item);
+        },
+        () => {
+            notify.error(gettext('Sorry, Copy is not supported.'));
+        }
+    );
+}
