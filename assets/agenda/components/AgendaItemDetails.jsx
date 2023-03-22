@@ -71,7 +71,12 @@ export default function AgendaItemDetails(
                 </ContentBar>
             </ContentHeader>
 
-            <Article image={map} item={item} group={group}>
+            <Article
+                image={map}
+                item={item}
+                group={group}
+                disableTextSelection={detailsConfig.disable_text_selection}
+            >
                 <ArticleBody>
                     <AgendaMeta item={item} />
                     <AgendaLongDescription item={item} plan={plan}/>
