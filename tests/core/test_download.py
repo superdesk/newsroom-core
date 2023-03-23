@@ -41,7 +41,7 @@ def text_content_test(content):
     assert "AMAZON-BOOKSTORE-OPENING" in content[0]
     assert "Amazon Is Opening More Bookstores" in content[1]
     assert "<p>" not in content
-    assert "Next line" == content[-2]
+    assert "Next line" == content[-1]
 
 
 def nitf_content_test(content):

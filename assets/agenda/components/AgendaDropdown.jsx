@@ -3,13 +3,14 @@ import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 import {Dropdown} from '../../components/Dropdown';
 
-export function AgendaDropdown({filter, activeFilter, toggleFilter, children}) {
+export function AgendaDropdown({filter, activeFilter, toggleFilter, children, getFilterLabel}) {
 
     const isActive = activeFilter[filter.field];
-
-    const getActiveFilterLabel = (filter, activeFilter, isActive) => {
-        return isActive ? gettext(activeFilter[filter.field][0]) : gettext(filter.label);
-    };
+    const getActiveFilterLabel = getFilterLabel != null ?
+        getFilterLabel :
+        (filter, activeFilter, isActive) => {
+            return isActive ? gettext(activeFilter[filter.field][0]) : gettext(filter.label);
+        };
 
     return (
         <Dropdown
@@ -32,5 +33,6 @@ AgendaDropdown.propTypes = {
     filter: PropTypes.object,
     toggleFilter: PropTypes.func,
     activeFilter: PropTypes.object,
+    getFilterLabel: PropTypes.func,
 };
 
