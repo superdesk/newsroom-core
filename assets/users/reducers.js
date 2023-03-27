@@ -2,6 +2,7 @@ import {
     INIT_VIEW_DATA,
     GET_USERS,
     GET_USER,
+    REMOVE_USER,
     SELECT_USER,
     EDIT_USER,
     QUERY_USERS,
@@ -152,6 +153,24 @@ export default function userReducer(state = initialState, action) {
             usersById,
             isLoading: false,
             totalUsers: users.length,
+        };
+    }
+
+    case REMOVE_USER: {
+        const usersById = Object.assign({}, state.usersById);
+        const userToEdit = state.userToEdit && state.userToEdit._id === action.userId ?
+            null :
+            state.userToEdit;
+        const users = state.users.filter((userId) => userId !== action.userId);
+
+        delete usersById[action.userId];
+
+        return {
+            ...state,
+            usersById,
+            userToEdit,
+            users,
+            errors: null,
         };
     }
 
