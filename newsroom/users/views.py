@@ -134,6 +134,30 @@ def create():
     return jsonify(form.errors), 400
 
 
+@blueprint.route("/users/<_id>/resend_invite", methods=["POST"])
+@account_manager_or_company_admin_only
+def resent_invite(_id):
+    user = find_one("users", _id=ObjectId(_id))
+    company = get_company()
+    user_is_company_admin = is_current_user_company_admin()
+
+    if not user:
+        return NotFound(gettext("User not found"))
+    elif user.get("is_validated"):
+        return jsonify({"is_validated": gettext("User is already validated")}), 400
+    elif user_is_company_admin and (company is None or user["company"] != ObjectId(company["_id"])):
+        # Company admins can only resent invites for members of their company only
+        flask.abort(403)
+
+    updates = {}
+    add_token_data(updates)
+    get_resource_service("users").patch(ObjectId(_id), updates=updates)
+
+    user.update(updates)
+    send_token(user, token_type="new_account")
+    return jsonify({"success": True}), 200
+
+
 def _is_email_address_valid(email):
     existing_user = get_user_by_email(email)
     return not existing_user

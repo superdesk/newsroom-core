@@ -172,6 +172,17 @@ export function deleteUser() {
     };
 }
 
+export function resendUserInvite() {
+    return function(dispatch, getState) {
+        const user = getState().userToEdit;
+        const url = `/users/${user._id}/resend_invite`;
+
+        return server.post(url, {})
+            .then(() => notify.success(gettext('Invitation as been resent')))
+            .catch((error) => errorHandler(error, dispatch, setError));
+    };
+}
+
 export const INIT_VIEW_DATA = 'INIT_VIEW_DATA';
 export function initViewData(data) {
     return function (dispatch) {
