@@ -17,7 +17,7 @@ from newsroom.auth.utils import (
     is_current_user_account_mgr,
     is_current_user_company_admin,
 )
-from newsroom.decorator import admin_only, login_required, account_manager_only, account_manager_or_company_admin_only
+from newsroom.decorator import admin_only, login_required, account_manager_or_company_admin_only
 from newsroom.companies import (
     get_user_company_name,
     get_company_sections_monitoring_data,
@@ -214,7 +214,7 @@ def validate(_id):
 
 
 @blueprint.route("/users/<_id>/reset_password", methods=["POST"])
-@account_manager_only
+@account_manager_or_company_admin_only
 def resend_token(_id):
     return _resend_token(_id, token_type="reset_password")
 
