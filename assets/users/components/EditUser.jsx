@@ -35,6 +35,7 @@ function EditUserComponent({
     hideFields,
     companySections,
     seats,
+    resendUserInvite,
 }) {
     const companyId = user.company;
     const localeOptions = getLocaleInputOptions();
@@ -73,6 +74,22 @@ function EditUserComponent({
                                 </label>
                             )}
                         </div>
+                        {(user._id == null || user.is_validated === true) ? null : (
+                            <button
+                                type="button"
+                                className="btn btn-sm btn-outline-light"
+                                aria-label={gettext('Resend Invite')}
+                                onClick={(event) => {
+                                    event.preventDefault();
+
+                                    if (confirm(gettext('Would you like to resend the invitation for {{ email }}?', {email: user.email}))) {
+                                        resendUserInvite();
+                                    }
+                                }}
+                            >
+                                {gettext('Resend Invite')}
+                            </button>
+                        )}
                     </div>
                 )}
                 <form>
@@ -242,13 +259,14 @@ function EditUserComponent({
                     </div>
 
                     <div className='list-item__preview-footer'>
-                        {user._id ?
+                        {!user.is_validated ? null : (
                             <input
                                 type='button'
                                 className='btn btn-outline-secondary'
                                 value={gettext('Reset Password')}
                                 id='resetPassword'
-                                onClick={onResetPassword} /> : null}
+                                onClick={onResetPassword} />
+                        )}
 
                         <input
                             type='button'
@@ -277,6 +295,7 @@ EditUserComponent.propTypes = {
     onResetPassword: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
+    resendUserInvite: PropTypes.func.isRequired,
     currentUser: PropTypes.object,
     toolbar: PropTypes.node,
     products: PropTypes.arrayOf(PropTypes.object),
