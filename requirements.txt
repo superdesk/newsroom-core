@@ -16,7 +16,7 @@ eve-elastic==7.3.1
 # https://github.com/xhtml2pdf/xhtml2pdf/issues/589
 reportlab==3.6.6
 
-elastic-apm[flask]>=6.7,<6.8
+elastic-apm[flask]>=6.15.1,<7.0.0
 MarkupSafe<2.1
 
 superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@develop
