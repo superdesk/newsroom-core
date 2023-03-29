@@ -100,7 +100,7 @@ class UsersResource(newsroom.Resource):
     }
 
 
-NON_ADMIN_ALLOWED_UPDATES = {
+USER_PROFILE_UPDATES = {
     "locale",
     "first_name",
     "last_name",
@@ -113,7 +113,7 @@ NON_ADMIN_ALLOWED_UPDATES = {
 }
 
 
-COMPANY_ADMIN_ALLOWED_UPDATES = NON_ADMIN_ALLOWED_UPDATES.union(
+COMPANY_ADMIN_ALLOWED_UPDATES = USER_PROFILE_UPDATES.union(
     {
         "email",
         "products",
@@ -219,6 +219,6 @@ class UsersService(newsroom.Service):
             if request.url_rule.rule in ["/reset_password/<token>", "/token/<token_type>"]:
                 return
             elif request.url_rule.rule == "/users/<_id>":
-                if not updated_fields or all([key in NON_ADMIN_ALLOWED_UPDATES for key in updated_fields]):
+                if not updated_fields or all([key in USER_PROFILE_UPDATES for key in updated_fields]):
                     return
         abort(403)
