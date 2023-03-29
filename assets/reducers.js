@@ -342,7 +342,7 @@ export function defaultReducer(state={}, action) {
             newItems: uniq([
                 ...state.newItems,
                 ...(action.data._items.filter((item) => (!item.nextversion && !state.itemsById[item._id]
-                    ) || get(state.itemsById, `${item._id}.versioncreated`) !== item.versioncreated).map((item) => item._id))
+                ) || get(state.itemsById, `${item._id}.versioncreated`) !== item.versioncreated).map((item) => item._id))
             ]),
         };
     }
