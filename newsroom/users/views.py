@@ -27,7 +27,7 @@ from newsroom.notifications import push_user_notification, push_company_notifica
 from newsroom.topics import get_user_topics
 from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
-from newsroom.users.users import COMPANY_ADMIN_ALLOWED_UPDATES, NON_ADMIN_ALLOWED_UPDATES
+from newsroom.users.users import COMPANY_ADMIN_ALLOWED_UPDATES, USER_PROFILE_UPDATES
 from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary
 from newsroom.monitoring.views import get_monitoring_for_company
 
@@ -202,7 +202,7 @@ def edit(_id):
                 flask.abort(401)
 
             if user_is_non_admin or user_is_company_admin:
-                allowed_fields = NON_ADMIN_ALLOWED_UPDATES if user_is_non_admin else COMPANY_ADMIN_ALLOWED_UPDATES
+                allowed_fields = USER_PROFILE_UPDATES if user_is_non_admin else COMPANY_ADMIN_ALLOWED_UPDATES
                 for field in list(updates.keys()):
                     if field not in allowed_fields:
                         updates.pop(field, None)
@@ -229,6 +229,26 @@ def get_updates_from_form(form: UserForm):
             {"_id": product["_id"], "section": product["product_type"]} for product in products.values()
         ]
     return updates
+
+
+@blueprint.route("/users/<_id>/profile", methods=["POST"])
+@login_required
+def edit_user_profile(_id):
+    if not is_current_user(_id):
+        flask.abort(403)
+
+    user_id = ObjectId(_id)
+    user = find_one("users", _id=user_id)
+
+    if not user:
+        return NotFound(gettext("User not found"))
+
+    form = UserForm(user=user)
+    if form.validate_on_submit():
+        updates = {key: val for key, val in form.data.items() if key in USER_PROFILE_UPDATES}
+        get_resource_service("users").patch(user_id, updates=updates)
+        return jsonify({"success": True}), 200
+    return jsonify(form.errors), 400
 
 
 @blueprint.route("/users/<_id>/validate", methods=["POST"])
