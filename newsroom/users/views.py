@@ -235,7 +235,7 @@ def get_updates_from_form(form: UserForm):
 @login_required
 def edit_user_profile(_id):
     if not is_current_user(_id):
-        flask.abort(401)
+        flask.abort(403)
 
     user_id = ObjectId(_id)
     user = find_one("users", _id=user_id)
