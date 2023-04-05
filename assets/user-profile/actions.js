@@ -96,7 +96,7 @@ export function saveUser() {
     return function (dispatch, getState) {
 
         const editedUser = {...getState().editedUser};
-        const url = `/users/${editedUser._id}`;
+        const url = `/users/${editedUser._id}/profile`;
 
         // Remove ``sections`` and ``products`` as these aren't managed in the ``UserProfile`` app
         delete editedUser.sections;

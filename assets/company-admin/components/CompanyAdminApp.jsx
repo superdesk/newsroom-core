@@ -6,7 +6,19 @@ import classNames from 'classnames';
 import {gettext} from 'utils';
 
 import {setProductFilter, setSection} from '../actions';
-import {postUser, deleteUser, resetPassword, newUser, cancelEdit, editUser, setError, fetchUsers, setSort, toggleSortDirection} from 'users/actions';
+import {
+    postUser,
+    deleteUser,
+    resetPassword,
+    resendUserInvite,
+    newUser,
+    cancelEdit,
+    editUser,
+    setError,
+    fetchUsers,
+    setSort,
+    toggleSortDirection,
+} from 'users/actions';
 import {setSearchQuery} from 'search/actions';
 import {productListSelector, companyListSelector, currentUserSelector} from '../selectors';
 
@@ -176,6 +188,7 @@ class CompanyAdminAppComponent extends React.Component {
                                     onResetPassword={this.props.resetPassword}
                                     onClose={this.props.closeUserEditor}
                                     onDelete={this.deleteUser}
+                                    resendUserInvite={this.props.resendUserInvite}
                                     currentUser={this.props.user}
                                     products={this.props.products}
                                     hideFields={['user_type', 'company']}
@@ -199,6 +212,7 @@ CompanyAdminAppComponent.propTypes = {
     saveUser: PropTypes.func,
     deleteUser: PropTypes.func,
     resetPassword: PropTypes.func,
+    resendUserInvite: PropTypes.func,
     closeUserEditor: PropTypes.func,
     user: PropTypes.object,
     userToEdit: PropTypes.object,
@@ -243,6 +257,7 @@ const mapDispatchToProps = (dispatch) => ({
     closeUserEditor: () => dispatch(cancelEdit()),
     deleteUser: () => dispatch(deleteUser()),
     resetPassword: () => dispatch(resetPassword()),
+    resendUserInvite: () => dispatch(resendUserInvite()),
 
     setQuery: (query) => dispatch(setSearchQuery(query)),
     fetchUsers: () => dispatch(fetchUsers()),

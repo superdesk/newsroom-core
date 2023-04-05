@@ -6,6 +6,7 @@ import {gettext} from 'utils';
 
 import {
     deleteUser,
+    resendUserInvite,
     editUser,
     newUser,
     postUser,
@@ -97,6 +98,7 @@ class Users extends React.Component {
                         onResetPassword={this.props.resetPassword}
                         onClose={this.props.cancelEdit}
                         onDelete={this.deleteUser}
+                        resendUserInvite={this.props.resendUserInvite}
                         currentUser={this.props.currentUser}
                         products={this.props.products}
                     />
@@ -115,6 +117,7 @@ Users.propTypes = {
     saveUser: PropTypes.func,
     newUser: PropTypes.func,
     deleteUser: PropTypes.func,
+    resendUserInvite: PropTypes.func,
     resetPassword: PropTypes.func,
     cancelEdit: PropTypes.func,
     isLoading: PropTypes.bool,
@@ -147,6 +150,7 @@ const mapDispatchToProps = (dispatch) => ({
     editUser: (event) => dispatch(editUser(event)),
     saveUser: (type) => dispatch(postUser(type)),
     deleteUser: (type) => dispatch(deleteUser(type)),
+    resendUserInvite: () => dispatch(resendUserInvite()),
     newUser: (data) => dispatch(newUser(data)),
     resetPassword: () => dispatch(resetPassword()),
     cancelEdit: (event) => dispatch(cancelEdit(event)),
