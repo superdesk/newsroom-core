@@ -17,7 +17,7 @@ from newsroom.auth.utils import (
     is_current_user_account_mgr,
     is_current_user_company_admin,
 )
-from newsroom.decorator import admin_only, login_required, account_manager_only, account_manager_or_company_admin_only
+from newsroom.decorator import admin_only, login_required, account_manager_or_company_admin_only
 from newsroom.companies import (
     get_user_company_name,
     get_company_sections_monitoring_data,
@@ -27,7 +27,7 @@ from newsroom.notifications import push_user_notification, push_company_notifica
 from newsroom.topics import get_user_topics
 from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
-from newsroom.users.users import COMPANY_ADMIN_ALLOWED_UPDATES, NON_ADMIN_ALLOWED_UPDATES
+from newsroom.users.users import COMPANY_ADMIN_ALLOWED_UPDATES, USER_PROFILE_UPDATES
 from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary
 from newsroom.monitoring.views import get_monitoring_for_company
 
@@ -104,7 +104,7 @@ def create():
         if not _is_email_address_valid(form.email.data):
             return jsonify({"email": [gettext("Email address is already in use")]}), 400
 
-        new_user = form.data
+        new_user = get_updates_from_form(form)
         add_token_data(new_user)
         user_is_company_admin = is_current_user_company_admin()
         if user_is_company_admin:
@@ -132,6 +132,30 @@ def create():
         send_token(new_user, token_type="new_account")
         return jsonify({"success": True}), 201
     return jsonify(form.errors), 400
+
+
+@blueprint.route("/users/<_id>/resend_invite", methods=["POST"])
+@account_manager_or_company_admin_only
+def resent_invite(_id):
+    user = find_one("users", _id=ObjectId(_id))
+    company = get_company()
+    user_is_company_admin = is_current_user_company_admin()
+
+    if not user:
+        return NotFound(gettext("User not found"))
+    elif user.get("is_validated"):
+        return jsonify({"is_validated": gettext("User is already validated")}), 400
+    elif user_is_company_admin and (company is None or user["company"] != ObjectId(company["_id"])):
+        # Company admins can only resent invites for members of their company only
+        flask.abort(403)
+
+    updates = {}
+    add_token_data(updates)
+    get_resource_service("users").patch(ObjectId(_id), updates=updates)
+
+    user.update(updates)
+    send_token(user, token_type="new_account")
+    return jsonify({"success": True}), 200
 
 
 def _is_email_address_valid(email):
@@ -173,39 +197,58 @@ def edit(_id):
                     400,
                 )
 
-            updates = form.data
-            if not (user_is_company_admin or user_is_non_admin) and form.company.data:
-                updates["company"] = ObjectId(form.company.data)
-
+            updates = get_updates_from_form(form)
             if not user_is_admin and updates.get("user_type", "") != user.get("user_type", ""):
                 flask.abort(401)
 
             if user_is_non_admin or user_is_company_admin:
-                allowed_fields = NON_ADMIN_ALLOWED_UPDATES if user_is_non_admin else COMPANY_ADMIN_ALLOWED_UPDATES
+                allowed_fields = USER_PROFILE_UPDATES if user_is_non_admin else COMPANY_ADMIN_ALLOWED_UPDATES
                 for field in list(updates.keys()):
                     if field not in allowed_fields:
                         updates.pop(field, None)
-
-            if not user_is_non_admin:
-                if "sections" in updates:
-                    updates["sections"] = {
-                        section["_id"]: section["_id"] in (form.sections.data or []) for section in app.sections
-                    }
-
-                if "products" in updates:
-                    product_ids = [ObjectId(productId) for productId in updates["products"]]
-                    products = {
-                        product["_id"]: product
-                        for product in query_resource("products", lookup={"_id": {"$in": product_ids}})
-                    }
-                    updates["products"] = [
-                        {"_id": product["_id"], "section": product["product_type"]} for product in products.values()
-                    ]
 
             get_resource_service("users").patch(ObjectId(_id), updates=updates)
             return jsonify({"success": True}), 200
         return jsonify(form.errors), 400
     return jsonify(user), 200
+
+
+def get_updates_from_form(form: UserForm):
+    updates = form.data
+    if form.company.data:
+        updates["company"] = ObjectId(form.company.data)
+    if "sections" in updates:
+        updates["sections"] = {section["_id"]: section["_id"] in (form.sections.data or []) for section in app.sections}
+
+    if "products" in updates:
+        product_ids = [ObjectId(productId) for productId in updates["products"]]
+        products = {
+            product["_id"]: product for product in query_resource("products", lookup={"_id": {"$in": product_ids}})
+        }
+        updates["products"] = [
+            {"_id": product["_id"], "section": product["product_type"]} for product in products.values()
+        ]
+    return updates
+
+
+@blueprint.route("/users/<_id>/profile", methods=["POST"])
+@login_required
+def edit_user_profile(_id):
+    if not is_current_user(_id):
+        flask.abort(403)
+
+    user_id = ObjectId(_id)
+    user = find_one("users", _id=user_id)
+
+    if not user:
+        return NotFound(gettext("User not found"))
+
+    form = UserForm(user=user)
+    if form.validate_on_submit():
+        updates = {key: val for key, val in form.data.items() if key in USER_PROFILE_UPDATES}
+        get_resource_service("users").patch(user_id, updates=updates)
+        return jsonify({"success": True}), 200
+    return jsonify(form.errors), 400
 
 
 @blueprint.route("/users/<_id>/validate", methods=["POST"])
@@ -215,7 +258,7 @@ def validate(_id):
 
 
 @blueprint.route("/users/<_id>/reset_password", methods=["POST"])
-@account_manager_only
+@account_manager_or_company_admin_only
 def resend_token(_id):
     return _resend_token(_id, token_type="reset_password")
 
