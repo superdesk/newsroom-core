@@ -44,6 +44,11 @@ export function getUsers(data) {
     return {type: GET_USERS, data};
 }
 
+export const REMOVE_USER = 'REMOVE_USER';
+function removeUser(userId) {
+    return {type: REMOVE_USER, userId: userId};
+}
+
 export const GET_COMPANIES = 'GET_COMPANIES';
 export function getCompanies(data) {
     return {type: GET_COMPANIES, data};
@@ -161,13 +166,26 @@ export function deleteUser() {
     return function (dispatch, getState) {
 
         const user = getState().userToEdit;
-        const url = `/users/${user._id}`;
+        const userId = user._id;
+        const url = `/users/${userId}`;
 
         return server.del(url)
             .then(() => {
                 notify.success(gettext('User deleted successfully'));
+                dispatch(removeUser(userId));
                 dispatch(fetchUsers());
             })
+            .catch((error) => errorHandler(error, dispatch, setError));
+    };
+}
+
+export function resendUserInvite() {
+    return function(dispatch, getState) {
+        const user = getState().userToEdit;
+        const url = `/users/${user._id}/resend_invite`;
+
+        return server.post(url, {})
+            .then(() => notify.success(gettext('Invitation as been resent')))
             .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
