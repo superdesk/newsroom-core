@@ -1,12 +1,20 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import {gettext} from 'assets/utils';
 
-import {gettext} from 'utils';
+interface IProps {
+    item: any;
+    requestCoverage: any;
+}
 
+interface IState {
+    opened: boolean;
+    message: string;
+    status?: string | null;
+}
 
-class AgendaCoverageRequest extends React.Component {
-    constructor(props, context) {
+class AgendaCoverageRequest extends React.Component<IProps, IState> {
+    constructor(props: IProps, context: any) {
         super(props, context);
         this.onRequestClick = this.onRequestClick.bind(this);
         this.reset = this.reset.bind(this);
@@ -23,7 +31,7 @@ class AgendaCoverageRequest extends React.Component {
         this.setState({opened: false, message: '', status: null});
     }
 
-    onMessageChange(event) {
+    onMessageChange(event: any) {
         this.setState({message: event.target.value, status: null});
     }
 
@@ -69,10 +77,5 @@ class AgendaCoverageRequest extends React.Component {
     }
 
 }
-
-AgendaCoverageRequest.propTypes = {
-    item: PropTypes.object,
-    requestCoverage: PropTypes.func,
-};
 
 export default AgendaCoverageRequest;

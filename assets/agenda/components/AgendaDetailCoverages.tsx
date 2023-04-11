@@ -1,12 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-
-import {gettext} from 'utils';
-
 import {hasCoverages} from '../utils';
 import AgendaCoverages from './AgendaCoverages';
+import {gettext} from 'assets/utils';
 
-export default function AgendaDetailCoverages({item}) {
+interface IProps {
+    item: any;
+}
+
+export default function AgendaDetailCoverages({item}: IProps) {
     if (!hasCoverages(item)) {
         return null;
     }
@@ -18,7 +19,3 @@ export default function AgendaDetailCoverages({item}) {
         </div>,
     ];
 }
-
-AgendaDetailCoverages.propTypes = {
-    item: PropTypes.object,
-};

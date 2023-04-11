@@ -1,9 +1,15 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import {gettext} from 'utils';
 import {AgendaDropdown} from './AgendaDropdown';
+import {gettext} from 'assets/utils';
 
-function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter, eventsOnlyAccess, restrictCoverageInfo}) {
+interface IProps {
+    toggleFilter: any;
+    itemTypeFilter: string;
+    eventsOnlyAccess: boolean;
+    restrictCoverageInfo: boolean;
+}
+
+function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter, eventsOnlyAccess, restrictCoverageInfo}: IProps) {
     if (eventsOnlyAccess) {
         return null;
     }
@@ -47,13 +53,5 @@ function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter, eventsOnlyAccess, 
         </AgendaDropdown>
     );
 }
-
-AgendaItemTypeFilter.propTypes = {
-    toggleFilter: PropTypes.func,
-    itemTypeFilter: PropTypes.string,
-    eventsOnlyAccess: PropTypes.bool,
-    restrictCoverageInfo: PropTypes.bool,
-};
-
 
 export default AgendaItemTypeFilter;

@@ -22,7 +22,7 @@ export const transformFilterBuckets = (filter, aggregations, props) => {
 };
 
 const renderFilter = {
-    item_type: (props) => (
+    item_type: (props: any) => (
         <AgendaItemTypeFilter
             key="item_type"
             activeFilter={props.activeFilter}
@@ -32,7 +32,7 @@ const renderFilter = {
             restrictCoverageInfo={props.restrictCoverageInfo}
         />
     ),
-    calendar: (props) => (
+    calendar: (props: any) => (
         <AgendaCalendarAgendaFilter
             key="calendar"
             aggregations={props.aggregations}
@@ -41,7 +41,7 @@ const renderFilter = {
             itemTypeFilter={props.itemTypeFilter}
         />
     ),
-    location: (props) => (
+    location: (props: any) => (
         !['events', 'combined'].includes(props.itemTypeFilter || 'combined') ? null : (
             <LocationFilter
                 key="location"
@@ -50,7 +50,7 @@ const renderFilter = {
             />
         )
     ),
-    region: (props) => (
+    region: (props: any) => (
         !['events', 'combined'].includes(props.itemTypeFilter || 'combined') ? null : (
             <DropdownFilter
                 key="region"

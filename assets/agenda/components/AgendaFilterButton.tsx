@@ -1,13 +1,20 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import {gettext} from 'utils';
 import classNames from 'classnames';
+import {gettext} from 'assets/utils';
 
-const getActiveFilterLabel = (filter, activeFilter, isActive) => {
+const getActiveFilterLabel = (filter: any, activeFilter: any, isActive: boolean) => {
     return isActive ? gettext(activeFilter[filter.field][0]) : gettext(filter.label);
 };
 
-function AgendaFilterButton({filter, activeFilter, autoToggle, onClick, getFilterLabel}) {
+interface IProps {
+    filter: any;
+    activeFilter: any;
+    autoToggle: boolean;
+    onClick: any;
+    getFilterLabel: any;
+}
+
+function AgendaFilterButton({filter, activeFilter, autoToggle = true, onClick, getFilterLabel}: IProps) {
     const filterLabel = getFilterLabel ? getFilterLabel : getActiveFilterLabel;
     const isActive = activeFilter[filter.field];
     return (<button
@@ -24,15 +31,5 @@ function AgendaFilterButton({filter, activeFilter, autoToggle, onClick, getFilte
         <i className={classNames('icon-small--arrow-down ms-1', {'icon--white': isActive})}></i>
     </button>);
 }
-
-AgendaFilterButton.propTypes = {
-    filter: PropTypes.object,
-    activeFilter: PropTypes.object,
-    autoToggle: PropTypes.bool,
-    onClick: PropTypes.func,
-    getFilterLabel: PropTypes.func,
-};
-
-AgendaFilterButton.defaultProps = {autoToggle: true};
 
 export default AgendaFilterButton;

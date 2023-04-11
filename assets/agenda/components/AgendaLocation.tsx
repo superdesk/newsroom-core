@@ -1,10 +1,9 @@
 import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-
 import {hasLocation, getLocationString} from '../utils';
 
-export default function AgendaLocation({item, isMobilePhone, border}) {
+export default function AgendaLocation({item, isMobilePhone, border}: any) {
     if  (!hasLocation(item)) {
         return null;
     }

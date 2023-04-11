@@ -1,11 +1,15 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import {gettext} from 'utils';
 import {formatNavigationDate, getNext, getPrevious} from '../utils';
+import {gettext} from 'assets/utils';
 
+interface IProps {
+    selectDate: any;
+    activeDate: number;
+    activeGrouping: string;
+}
 
-function AgendaDateButtons({selectDate, activeDate, activeGrouping}) {
+function AgendaDateButtons({selectDate, activeDate, activeGrouping}: IProps) {
     return ([<span className='me-3' key='label'>{formatNavigationDate(activeDate, activeGrouping)}</span>,
         <button
             key='today'
@@ -52,11 +56,5 @@ function AgendaDateButtons({selectDate, activeDate, activeGrouping}) {
             {gettext('M')}
         </button>]);
 }
-
-AgendaDateButtons.propTypes = {
-    selectDate: PropTypes.func,
-    activeDate: PropTypes.number,
-    activeGrouping: PropTypes.string,
-};
 
 export default AgendaDateButtons;

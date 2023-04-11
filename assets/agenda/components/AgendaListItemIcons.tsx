@@ -1,7 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {get, isEqual} from 'lodash';
-import {bem} from 'ui/utils';
 import {
     hasCoverages,
     isCoverageForExtraDay,
@@ -15,39 +13,48 @@ import AgendaMetaTime from './AgendaMetaTime';
 import AgendaInternalNote from './AgendaInternalNote';
 import AgendaListCoverageItem from './AgendaListCoverageItem';
 import AgendaLocation from './AgendaLocation';
+import {bem} from 'assets/ui/utils';
+import {gettext} from 'assets/utils';
 
-import {gettext} from 'utils';
+interface IProps {
+    item: any;
+    planningItem: any;
+    group: string;
+    hideCoverages?: boolean;
+    row?: boolean;
+    isMobilePhone?: boolean;
+    user: string;
+}
 
-
-class AgendaListItemIcons extends React.Component {
-    constructor(props) {
+class AgendaListItemIcons extends React.Component<IProps, any> {
+    constructor(props: IProps) {
         super(props);
 
         this.state = this.getUpdatedState(props);
     }
 
-    itemChanged(nextProps) {
+    itemChanged(nextProps: IProps) {
         return get(this.props, 'item._id') !== get(nextProps, 'item._id') ||
             get(this.props, 'item._etag') !== get(nextProps, 'item._etag') ||
             !isEqual(get(this.props, 'item.coverages'), get(nextProps, 'item.coverages'));
     }
 
-    shouldComponentUpdate(nextProps) {
+    shouldComponentUpdate(nextProps: IProps) {
         return this.itemChanged(nextProps);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: IProps) {
         if (this.itemChanged(nextProps)) {
             this.setState(this.getUpdatedState(nextProps));
         }
     }
 
-    getUpdatedState(props) {
+    getUpdatedState(props: IProps) {
         return {
             internalNote: getInternalNote(props.item, props.planningItem),
             coveragesToDisplay: !hasCoverages(props.item) || props.hideCoverages ?
                 [] :
-                (props.item.coverages || []).filter((c) => (
+                (props.item.coverages || []).filter((c: any) => (
                     !props.group ||
                     c.scheduled == null ||
                     (isCoverageForExtraDay(c, props.group) && c.planning_id === get(props, 'planningItem.guid'))
@@ -74,13 +81,13 @@ class AgendaListItemIcons extends React.Component {
 
                 {state.coveragesToDisplay.length > 0 && (
                     <div className='wire-articles__item__icons wire-articles__item__icons--dashed-border'>
-                        {state.coveragesToDisplay.map((coverage, index) => (
+                        {(state.coveragesToDisplay as Array<any>).map((coverage: any, index) => (
                             <AgendaListCoverageItem
                                 key={index}
                                 planningItem={props.planningItem}
                                 user={props.user}
                                 coverage={coverage}
-                                showBorder={props.isMobilePhone && index === state.coveragesToDisplay.length - 1}
+                                showBorder={props.isMobilePhone == true && index === state.coveragesToDisplay.length - 1}
                                 group={props.group}
                             />
                         ))}
@@ -108,17 +115,5 @@ class AgendaListItemIcons extends React.Component {
         );
     }
 }
-
-AgendaListItemIcons.propTypes = {
-    item: PropTypes.object,
-    planningItem: PropTypes.object,
-    group: PropTypes.string,
-    hideCoverages: PropTypes.bool,
-    row: PropTypes.bool,
-    isMobilePhone: PropTypes.bool,
-    user: PropTypes.string,
-};
-
-AgendaListItemIcons.defaultProps = {isMobilePhone: false};
 
 export default AgendaListItemIcons;

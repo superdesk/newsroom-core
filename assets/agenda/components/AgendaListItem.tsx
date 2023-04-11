@@ -3,12 +3,9 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get, isEqual} from 'lodash';
 
-import ActionButton from 'components/ActionButton';
-
 import AgendaListItemIcons from './AgendaListItemIcons';
 import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
 import AgendaInternalNote from './AgendaInternalNote';
-import {PlainText} from 'ui/components/PlainText';
 
 import {
     hasCoverages,
@@ -21,10 +18,37 @@ import {
     getInternalNote,
 } from '../utils';
 import ActionMenu from '../../components/ActionMenu';
-import {LIST_ANIMATIONS, isMobilePhone} from 'utils';
+import {LIST_ANIMATIONS} from 'assets/utils';
+import {PlainText} from 'assets/ui/components/PlainText';
+import ActionButton from 'assets/components/ActionButton';
 
-class AgendaListItem extends React.Component {
-    constructor(props) {
+interface IProps {
+    item: any;
+    group: string;
+    isActive: boolean;
+    isSelected: boolean;
+    isRead: boolean;
+    onClick: any;
+    onDoubleClick: any;
+    onActionList: any;
+    showActions: boolean;
+    toggleSelected: any;
+    actions: Array<{name: string, action: any}>;
+    isExtended: boolean;
+    user: string;
+    actioningItem: any;
+    resetActioningItem: any;
+    planningId: string;
+    showShortcutActionIcons: boolean;
+}
+
+class AgendaListItem extends React.Component<IProps, any> {
+    slugline: any;
+    dom: {
+        article: any;
+    };
+
+    constructor(props: IProps) {
         super(props);
         this.slugline = props.item.slugline && props.item.slugline.trim();
 
@@ -38,7 +62,7 @@ class AgendaListItem extends React.Component {
         this.onMouseEnter = this.onMouseEnter.bind(this);
     }
 
-    onKeyDown(event) {
+    onKeyDown(event: any) {
         switch (event.key) {
         case ' ':  // on space toggle selected item
             this.props.toggleSelected();
@@ -51,7 +75,7 @@ class AgendaListItem extends React.Component {
         event.preventDefault();
     }
 
-    setArticleRef(elem) {
+    setArticleRef(elem: any) {
         this.dom.article = elem;
     }
 
@@ -69,7 +93,7 @@ class AgendaListItem extends React.Component {
         }
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
+    shouldComponentUpdate(nextProps: any, nextState: any) {
         const {props, state} = this;
 
         return props.item._etag !== nextProps.item._etag || state.hover !== nextState.hover ||
@@ -90,11 +114,11 @@ class AgendaListItem extends React.Component {
         }
     }
 
-    stopPropagation(event) {
+    stopPropagation(event: any) {
         event.stopPropagation();
     }
 
-    getClassNames(isExtended) {
+    getClassNames(isExtended: boolean) {
         return {
             card: classNames('wire-articles__item-wrap col-12 agenda-item'),
             wrap: classNames('wire-articles__item wire-articles__item--list', {
@@ -118,7 +142,7 @@ class AgendaListItem extends React.Component {
         };
     }
 
-    renderListItem(isMobile, children) {
+    renderListItem(isMobile: boolean, children: any) {
         const {item, isExtended, group, planningId} = this.props;
         const classes = this.getClassNames(isExtended);
         const planningItem = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
@@ -136,7 +160,7 @@ class AgendaListItem extends React.Component {
                 onMouseEnter={this.onMouseEnter}
                 onKeyDown={this.onKeyDown}
             >
-                <div className={classes.wrap} tabIndex='0'>
+                <div className={classes.wrap} tabIndex={0}>
                     <div className={classes.article} key="article">
                         <h4 className='wire-articles__item-headline'>
                             <div className={classes.select} onClick={this.stopPropagation}>
@@ -199,7 +223,7 @@ class AgendaListItem extends React.Component {
                     showShortcutActions={!this.props.showShortcutActionIcons}
                 />
 
-                {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action) => action.shortcut && (
+                {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action: any) => action.shortcut && (
                     <ActionButton
                         key={action.name}
                         className="icon-button"
@@ -229,13 +253,14 @@ class AgendaListItem extends React.Component {
                     noPaddingRight={true}
                 />
 
-                {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action) => action.shortcut && (
+                {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action: any) => action.shortcut && (
                     <ActionButton
                         key={action.name}
                         className="icon-button"
                         action={action}
                         isVisited={action.visited && action.visited(this.props.user, this.props.item)}
-                        item={this.props.item} />
+                        item={this.props.item}
+                    />
                 ))}
 
                 {this.props.actions.length && (
@@ -260,28 +285,5 @@ class AgendaListItem extends React.Component {
             this.renderNonMobile();
     }
 }
-
-AgendaListItem.propTypes = {
-    item: PropTypes.object.isRequired,
-    group: PropTypes.string,
-    isActive: PropTypes.bool.isRequired,
-    isSelected: PropTypes.bool.isRequired,
-    isRead: PropTypes.bool.isRequired,
-    onClick: PropTypes.func.isRequired,
-    onDoubleClick: PropTypes.func.isRequired,
-    onActionList: PropTypes.func.isRequired,
-    showActions: PropTypes.bool.isRequired,
-    toggleSelected: PropTypes.func.isRequired,
-    actions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string,
-        action: PropTypes.func,
-    })),
-    isExtended: PropTypes.bool.isRequired,
-    user: PropTypes.string,
-    actioningItem: PropTypes.object,
-    resetActioningItem: PropTypes.func,
-    planningId: PropTypes.string,
-    showShortcutActionIcons: PropTypes.bool,
-};
 
 export default AgendaListItem;

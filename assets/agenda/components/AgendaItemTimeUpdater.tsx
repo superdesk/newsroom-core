@@ -1,14 +1,21 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
 import {get} from 'lodash';
 import classNames from 'classnames';
+import {gettext} from 'assets/utils';
+import {bem} from 'assets/ui/utils';
 
-import {bem} from 'ui/utils';
-import {gettext} from 'utils';
+interface IProps {
+    item: any;
+    borderRight?: boolean;
+    alignCenter?: boolean;
+}
 
-class AgendaItemTimeUpdater extends React.Component {
-    constructor(props) {
+class AgendaItemTimeUpdater extends React.Component<IProps, any> {
+    interval: number;
+    timerIntervalId: any;
+
+    constructor(props: any) {
         super(props);
 
         this.state = {timeText: ''};
@@ -22,7 +29,7 @@ class AgendaItemTimeUpdater extends React.Component {
         this.activateTimer(this.props.item);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: IProps) {
         if (get(this.props, 'item._created') !== get(nextProps, 'item._created') ||
             get(this.props, 'item._updated') !== get(nextProps, 'item._updated')) {
             this.activateTimer(nextProps.item);
@@ -33,7 +40,7 @@ class AgendaItemTimeUpdater extends React.Component {
         this.deactivateTimer();
     }
 
-    activateTimer(item) {
+    activateTimer(item: any) {
         // Deactivate if a timer already exits
         this.deactivateTimer();
 
@@ -55,13 +62,13 @@ class AgendaItemTimeUpdater extends React.Component {
         }
     }
 
-    isItemPastTime(item) {
+    isItemPastTime(item: any) {
         // Check if the updated (and created) time is past the interval duration
         return item && (moment().diff(moment(item._created), 'minutes') >= this.interval &&
             moment().diff(moment(item._updated), 'minutes') >= this.interval);
     }
 
-    updateState(item, checkPastTime = true) {
+    updateState(item: any, checkPastTime: boolean = true) {
         if (checkPastTime && this.isItemPastTime(item)) {
             this.deactivateTimer();
             return;
@@ -107,16 +114,5 @@ class AgendaItemTimeUpdater extends React.Component {
         );
     }
 }
-
-AgendaItemTimeUpdater.propTypes = {
-    item: PropTypes.object,
-    borderRight: PropTypes.bool,
-    alignCenter: PropTypes.bool,
-};
-
-AgendaItemTimeUpdater.defaultProps = {
-    alignCenter: false,
-    borderRight: false,
-};
 
 export default AgendaItemTimeUpdater;

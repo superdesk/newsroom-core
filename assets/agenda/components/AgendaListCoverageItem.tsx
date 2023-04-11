@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get, isEqual} from 'lodash';
 
@@ -13,27 +12,35 @@ import {
     WORKFLOW_COLORS,
 } from '../utils';
 
-class AgendaListCoverageItem extends React.Component {
-    constructor(props) {
+interface IProps {
+    planningItem: any;
+    user: string;
+    coverage: any;
+    showBorder: boolean;
+    group: string;
+}
+
+class AgendaListCoverageItem extends React.Component<IProps, any> {
+    constructor(props: IProps) {
         super(props);
 
         this.state = this.getUpdatedState(props);
     }
 
-    shouldComponentUpdate(nextProps) {
+    shouldComponentUpdate(nextProps: IProps) {
         return !isEqual(this.props.coverage, nextProps.coverage);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: IProps) {
         if (!isEqual(this.props.coverage, nextProps.coverage)) {
             this.setState(this.getUpdatedState(nextProps));
         }
     }
 
-    getUpdatedState(props) {
+    getUpdatedState(props: IProps) {
         const watched = isWatched(props.coverage, props.user);
 
-        const state = {
+        const state: any = {
             coverageClass: `icon--coverage-${getCoverageIcon(props.coverage.coverage_type)}`,
             beingUpdated: isCoverageBeingUpdated(props.coverage),
             isWatched: watched,
@@ -68,13 +75,5 @@ class AgendaListCoverageItem extends React.Component {
         );
     }
 }
-
-AgendaListCoverageItem.propTypes = {
-    planningItem: PropTypes.object,
-    user: PropTypes.string,
-    coverage: PropTypes.object,
-    showBorder: PropTypes.bool,
-    group: PropTypes.string,
-};
 
 export default AgendaListCoverageItem;

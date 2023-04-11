@@ -1,12 +1,18 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get} from 'lodash';
 
-import {gettext} from 'utils';
 import {STATUS_CANCELED, STATUS_POSTPONED, STATUS_RESCHEDULED} from '../utils';
+import {gettext} from 'assets/utils';
 
-export default function AgendaEdNote({item, plan, secondaryNoteField, noMargin}) {
+interface IProps {
+    item: any;
+    plan: any;
+    secondaryNoteField: string;
+    noMargin?: boolean;
+}
+
+export default function AgendaEdNote({item, plan, secondaryNoteField, noMargin}: IProps) {
     const planEdnote = get(plan, 'ednote');
 
     // We display Secondary Note only from 'item' for now
@@ -58,7 +64,7 @@ export default function AgendaEdNote({item, plan, secondaryNoteField, noMargin})
         return text;
     };
 
-    const getMultiLineNote = (note) => (note && fixText(note).split('\n').map((t, key) =>
+    const getMultiLineNote = (note: any) => (note && fixText(note).split('\n').map((t: any, key: any) =>
         <span key={key}>{t}<br/></span>)
     );
 
@@ -85,10 +91,3 @@ export default function AgendaEdNote({item, plan, secondaryNoteField, noMargin})
         </div>
     );
 }
-
-AgendaEdNote.propTypes = {
-    item: PropTypes.object.isRequired,
-    plan: PropTypes.object,
-    secondaryNoteField: PropTypes.string,
-    noMargin: PropTypes.bool,
-};

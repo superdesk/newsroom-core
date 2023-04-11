@@ -1,33 +1,33 @@
 import {createSelector} from 'reselect';
 import {get, find, filter as removeNulls, isEqual, isEmpty} from 'lodash';
-import {getCreatedSearchParamLabel, gettext} from 'utils';
+import {gettext, getCreatedSearchParamLabel} from 'assets/utils';
 
-export const searchQuerySelector = (state) => get(state, 'search.activeQuery') || null;
-export const searchFilterSelector = (state) => get(state, 'search.activeFilter');
-export const searchCreatedSelector = (state) => get(state, 'search.createdFilter');
-export const searchNavigationSelector = (state) => get(state, 'search.activeNavigation') || [];
-export const searchTopicIdSelector = (state) => get(state, 'search.activeTopic') || null;
-export const searchProductSelector = (state) => get(state, 'search.productId') || null;
+export const searchQuerySelector = (state: any) => get(state, 'search.activeQuery') || null;
+export const searchFilterSelector = (state: any) => get(state, 'search.activeFilter');
+export const searchCreatedSelector = (state: any) => get(state, 'search.createdFilter');
+export const searchNavigationSelector = (state: any) => get(state, 'search.activeNavigation') || [];
+export const searchTopicIdSelector = (state: any) => get(state, 'search.activeTopic') || null;
+export const searchProductSelector = (state: any) => get(state, 'search.productId') || null;
 
-export const activeViewSelector = (state) => get(state, 'search.activeView');
-export const navigationsSelector = (state) => get(state, 'search.navigations') || [];
+export const activeViewSelector = (state: any) => get(state, 'search.activeView');
+export const navigationsSelector = (state: any) => get(state, 'search.navigations') || [];
 
 export const navigationsByIdSelector = createSelector(
     [navigationsSelector],
-    (navigations) => navigations.reduce((navs, nav) => {
+    (navigations) => navigations.reduce((navs: Array<any>, nav: any) => {
         navs[nav._id] = nav;
 
         return navs;
     }, {})
 );
 
-export const topicsSelector = (state) => get(state, 'topics') || [];
-export const productsSelector = (state) => get(state, 'search.products') || [];
+export const topicsSelector = (state: any) => get(state, 'topics') || [];
+export const productsSelector = (state: any) => get(state, 'search.products') || [];
 
-export const filterGroups = (state) => get(state, 'groups') || [];
+export const filterGroups = (state: any) => get(state, 'groups') || [];
 export const filterGroupsByIdSelector = createSelector(
     [filterGroups],
-    (listOfGroups) => listOfGroups.reduce((groups, group) => {
+    (listOfGroups) => listOfGroups.reduce((groups: Array<any>, group: any) => {
         groups[group.field] = group;
 
         return groups;
@@ -44,12 +44,12 @@ export const activeProductSelector = createSelector(
     (productId, products) => find(products, {'_id': productId})
 );
 
-export const resultsFilteredSelector = (state) => state.resultsFiltered;
+export const resultsFilteredSelector = (state: any) => state.resultsFiltered;
 
 export const searchParamsSelector = createSelector(
     [searchQuerySelector, searchCreatedSelector, searchNavigationSelector, searchFilterSelector, searchProductSelector],
     (query, created, navigation, filter, product) => {
-        const params = {};
+        const params: any = {};
 
         if (!isEmpty(query)) {
             params.query = query;
@@ -97,7 +97,7 @@ export const searchParamTagSelector = createSelector(
         const paramTags = [];
 
         if (params.navigation) {
-            params.navigation.forEach((navId) => {
+            params.navigation.forEach((navId: string) => {
                 if (activeTopic != null && navId === activeTopic._id) {
                     return;
                 }
@@ -170,7 +170,7 @@ export const searchParamTagSelector = createSelector(
                     return;
                 }
 
-                params.filter[field].forEach((filterValue) => {
+                params.filter[field].forEach((filterValue: string) => {
                     paramTags.push({
                         key: `${field}.${filterValue}`,
                         label: group.label,
@@ -193,7 +193,7 @@ export const searchParamTagSelector = createSelector(
 export const showSaveTopicSelector = createSelector(
     [searchParamsSelector, activeTopicSelector],
     (current, topic) => {
-        const areTopicFieldsSame = (field1, filed2) => {
+        const areTopicFieldsSame = (field1: any, filed2: any) => {
             if (field1 && filed2) {
                 return isEqual(field1, filed2);
             }
@@ -243,7 +243,7 @@ export const filterGroupsToLabelMap = createSelector(
     [filterGroups],
     (groups) => (
         groups.reduce(
-            (groupMap, group) => {
+            (groupMap: any, group: any) => {
                 groupMap[group.field] = group.label;
 
                 return groupMap;

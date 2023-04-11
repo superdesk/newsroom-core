@@ -31,10 +31,6 @@ class SearchBar extends React.Component {
         this.setState({query: ''});
     }
 
-    onFocus() {
-
-    }
-
     setAndFetch(q = '') {
         if (this.props.enableQueryAction) {
             this.props.setQuery(q);

@@ -2,9 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get} from 'lodash';
-
 import {isPostponed, isRescheduled, isCanceled} from '../utils';
-import {gettext} from 'utils';
 
 function AgendaListItemLabels({item, right}) {
     const getLabel = () => {
@@ -35,7 +33,7 @@ function AgendaListItemLabels({item, right}) {
         }
 
         return (<div><span className={classNames('label', labelColor, {'pull-right': right})}>{labelText}</span></div>);
-        
+
     };
 
     return getLabel();

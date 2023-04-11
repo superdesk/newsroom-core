@@ -1,9 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Toggle from 'react-toggle';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
-function AgendaFeaturedStoriesToogle ({featuredFilter, onChange}) {
+interface IProps {
+    onChange: any;
+    featuredFilter: boolean;
+}
+
+function AgendaFeaturedStoriesToggle ({featuredFilter, onChange}: IProps) {
     return (
         <div className="d-flex align-items-center px-2 px-sm-3">
             <div className={'d-flex align-items-center'}>
@@ -21,10 +25,4 @@ function AgendaFeaturedStoriesToogle ({featuredFilter, onChange}) {
     );
 }
 
-AgendaFeaturedStoriesToogle.propTypes = {
-    onChange: PropTypes.func,
-    featuredFilter: PropTypes.bool,
-};
-
-
-export default AgendaFeaturedStoriesToogle;
+export default AgendaFeaturedStoriesToggle;

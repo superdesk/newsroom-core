@@ -1,14 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {hasAttachments, getAttachments} from '../utils';
-
-import {gettext} from 'utils';
-import {bem} from 'ui/utils';
+import {bem} from 'assets/ui/utils';
+import {gettext} from 'assets/utils';
 
 const kB = 1024;
 const MB = kB * kB;
 
-function filesize (size) {
+function filesize(size: number) {
     if (size > MB) {
         return (size / MB).toFixed(1) + ' MB';
     } else if (size > kB) {
@@ -18,12 +16,12 @@ function filesize (size) {
     }
 }
 
-export default function AgendaAttachments({item}) {
+export default function AgendaAttachments({item}: any) {
     if (!hasAttachments(item)) {
         return null;
     }
 
-    return getAttachments(item).map((attachment) => (
+    return getAttachments(item).map((attachment: any) => (
         <div key={attachment.media} className="coverage-item flex-row">
             <div className={bem('coverage-item', 'column', 'grow')}>
                 <div className="coverage-item__row">
@@ -47,7 +45,3 @@ export default function AgendaAttachments({item}) {
         </div>
     ));
 }
-
-AgendaAttachments.propTypes = {
-    item: PropTypes.object.isRequired,
-};

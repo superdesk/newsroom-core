@@ -1,9 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {get} from 'lodash';
-
-import {gettext} from 'utils';
 import {AgendaDropdown} from './AgendaDropdown';
+import {gettext} from 'assets/utils';
 
 const filter = {
     label: gettext('Any coverage status'),
@@ -17,7 +15,7 @@ const FILTER_VALUES = {
     NOT_PLANNED: 'not planned',
 };
 
-function getActiveFilterLabel(filter, activeFilter) {
+function getActiveFilterLabel(filter: any, activeFilter: any) {
     const filterValue = get(activeFilter, `${filter.field}[0]`);
 
     switch (filterValue) {
@@ -30,7 +28,12 @@ function getActiveFilterLabel(filter, activeFilter) {
     return filter.label;
 }
 
-function AgendaCoverageExistsFilter ({toggleFilter, activeFilter}) {
+interface IProps {
+    toggleFilter: any;
+    activeFilter: any;
+}
+
+function AgendaCoverageExistsFilter ({toggleFilter, activeFilter}: IProps) {
     return (
         <AgendaDropdown
             filter={filter}
@@ -53,10 +56,5 @@ function AgendaCoverageExistsFilter ({toggleFilter, activeFilter}) {
         </AgendaDropdown>
     );
 }
-
-AgendaCoverageExistsFilter.propTypes = {
-    toggleFilter: PropTypes.func,
-    activeFilter: PropTypes.object,
-};
 
 export default AgendaCoverageExistsFilter;

@@ -23,18 +23,18 @@ const navigationFunctions = {
     'day': {
         'next': getNextDay,
         'previous': getPreviousDay,
-        'format': (dateString) => moment(dateString).format(AGENDA_DATE_FORMAT_SHORT),
+        'format': (dateString: string) => moment(dateString).format(AGENDA_DATE_FORMAT_SHORT),
     },
     'week': {
         'next': getNextWeek,
         'previous': getPreviousWeek,
-        'format': (dateString) => `${moment(dateString).format('D MMMM')} - 
+        'format': (dateString: string) => `${moment(dateString).format('D MMMM')} -
         ${moment(dateString).add(6, 'days').format('D MMMM')}`,
     },
     'month': {
         'next': getNextMonth,
         'previous': getPreviousMonth,
-        'format': (dateString) => moment(dateString).format('MMMM, YYYY'),
+        'format': (dateString: string) => moment(dateString).format('MMMM, YYYY'),
     }
 };
 
@@ -44,7 +44,7 @@ const Groupers = {
     'month': formatMonth,
 };
 
-export function getCoverageStatusText(coverage) {
+export function getCoverageStatusText(coverage: any) {
     if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
         return get(DRAFT_STATUS_TEXTS, coverage.coverage_status, '');
     }
@@ -115,7 +115,7 @@ export const EARLIEST_DATE = moment('20170101').valueOf();
  * @param {Object} item
  * @return {Boolean}
  */
-export function isCanceled(item) {
+export function isCanceled(item: any) {
     return item && (item.state === STATUS_CANCELED || item.state === STATUS_KILLED);
 }
 
@@ -125,7 +125,7 @@ export function isCanceled(item) {
  * @param {Object} item
  * @return {Boolean}
  */
-export function isPostponed(item) {
+export function isPostponed(item: any) {
     return item && item.state === STATUS_POSTPONED;
 }
 
@@ -135,7 +135,7 @@ export function isPostponed(item) {
  * @param {Object} item
  * @return {Boolean}
  */
-export function isRescheduled(item) {
+export function isRescheduled(item: any) {
     return item && item.state === STATUS_RESCHEDULED;
 }
 
@@ -145,7 +145,7 @@ export function isRescheduled(item) {
  * @param {Object} item
  * @return {Boolean}
  */
-export function hasCoverages(item) {
+export function hasCoverages(item: any) {
     return !isEmpty(get(item, 'coverages'));
 }
 
@@ -155,7 +155,7 @@ export function hasCoverages(item) {
  * @param coverageType
  * @returns {*}
  */
-export function getCoverageIcon(coverageType) {
+export function getCoverageIcon(coverageType: any) {
     const coverageTypes = getConfig('coverage_types', {});
     return get(coverageTypes, `${coverageType}.icon`, 'unrecognized');
 }
@@ -166,7 +166,7 @@ export function getCoverageIcon(coverageType) {
  * @param coverageType
  * @returns {*}
  */
-export function getCoverageDisplayName(coverageType) {
+export function getCoverageDisplayName(coverageType: any) {
     const coverageTypes = getConfig('coverage_types', {});
     const locale = (window.locale || 'en').toLowerCase();
 
@@ -181,7 +181,7 @@ export function getCoverageDisplayName(coverageType) {
  * @param {String} userId
  * @return {Boolean}
  */
-export function isWatched(item, userId) {
+export function isWatched(item: any, userId: string) {
     return userId && includes(get(item, 'watches', []), userId);
 }
 
@@ -192,7 +192,7 @@ export function isWatched(item, userId) {
  * @param {String} dateString
  * @return {Boolean}
  */
-export function isCoverageForExtraDay(coverage) {
+export function isCoverageForExtraDay(coverage: any) {
     return coverage.scheduled != null;
 }
 
@@ -202,7 +202,7 @@ export function isCoverageForExtraDay(coverage) {
  * @param {Object} item
  * @return {Boolean}
  */
-export function isRecurring(item) {
+export function isRecurring(item: any) {
     return item && !!item.recurrence_id;
 }
 
@@ -212,7 +212,7 @@ export function isRecurring(item) {
  * @param {Object} item
  * @return {String}
  */
-export function getGeoLocation(item) {
+export function getGeoLocation(item: any) {
     return get(item, 'location.location', null);
 }
 
@@ -222,7 +222,7 @@ export function getGeoLocation(item) {
  * @param {Object} item
  * @return {String}
  */
-export function getLocationString(item) {
+export function getLocationString(item: any) {
     return [
         get(item, 'location.0.name', get(item, 'location.0.address.title')),
         get(item, 'location.0.address.line.0'),
@@ -645,7 +645,7 @@ const isBetweenDay = (day, start, end) => {
     // it will be converted to local time
     // if passed as string which we need
     // for all day events which are in utc mode
-    const startDate = start.format('YYYY-MM-DD'); 
+    const startDate = start.format('YYYY-MM-DD');
     const endDate = end.format('YYYY-MM-DD');
 
     return day.isBetween(startDate, endDate, 'day', '[]');
@@ -838,9 +838,9 @@ export const groupRegions = (filter, aggregations, props) => {
     return aggregations[filter.field].buckets;
 };
 
-export const getRegionName = (key, locator) => locator.label || key;
+export const getRegionName = (key: any, locator: any) => locator.label || key;
 
-export const isItemTBC = (item) => (
+export const isItemTBC = (item: any) => (
     !get(item, 'event') ? get(item, `planning_items[0].${TO_BE_CONFIRMED_FIELD}`) : get(item, `event.${TO_BE_CONFIRMED_FIELD}`)
 );
 
@@ -851,13 +851,13 @@ export const isItemTBC = (item) => (
  * @param {String} dateString
  * @return {String}
  */
-export function formatCoverageDate(coverage) {
+export function formatCoverageDate(coverage: any) {
     return get(coverage, TO_BE_CONFIRMED_FIELD) ?
         `${parseDate(coverage.scheduled).format(COVERAGE_DATE_FORMAT)} ${TO_BE_CONFIRMED_TEXT}` :
         parseDate(coverage.scheduled).format(COVERAGE_DATE_TIME_FORMAT);
 }
 
-export const getCoverageTooltip = (coverage, beingUpdated) => {
+export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
     const slugline = coverage.item_slugline || coverage.slugline;
     const coverageType = getCoverageDisplayName(coverage.coverage_type);
     const coverageScheduled = moment(coverage.scheduled);

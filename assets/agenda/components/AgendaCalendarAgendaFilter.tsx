@@ -1,13 +1,17 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
-
 import {gettext} from '../../utils';
 import {Dropdown} from '../../components/Dropdown';
 import {processBuckets} from '../../components/DropdownFilter';
-
 import {getDropdownItems} from './AgendaFilters';
 
-export class AgendaCalendarAgendaFilter extends React.PureComponent {
+interface IProps {
+    aggregations: any;
+    activeFilter: any;
+    toggleFilter: any;
+    itemTypeFilter: any;
+}
+
+export class AgendaCalendarAgendaFilter extends React.PureComponent<IProps> {
     render() {
         const isActive = !!(this.props.activeFilter.calendar) || !!(this.props.activeFilter.agendas);
         const calendarFilter = {
@@ -15,7 +19,7 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent {
             field: 'calendar',
             icon: 'icon-small--calendar',
             itemTypes: ['events', 'combined'],
-            isItemActive: (key) => (
+            isItemActive: (key: any) => (
                 (this.props.activeFilter.calendar || []).includes(key)
             ),
         };
@@ -25,7 +29,7 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent {
             nestedField: 'agenda',
             icon: 'icon-small--calendar',
             itemTypes: ['planning', 'combined'],
-            isItemActive: (key) => (
+            isItemActive: (key: any) => (
                 (this.props.activeFilter.agendas || []).includes(key)
             ),
         };
@@ -78,10 +82,3 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent {
         );
     }
 }
-
-AgendaCalendarAgendaFilter.propTypes = {
-    aggregations: PropTypes.object,
-    activeFilter: PropTypes.object,
-    toggleFilter: PropTypes.func,
-    itemTypeFilter: PropTypes.string,
-};

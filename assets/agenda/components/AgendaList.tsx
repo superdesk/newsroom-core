@@ -1,31 +1,25 @@
 import React, {Fragment} from 'react';
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {createSelector} from 'reselect';
 import {get, isEqual, cloneDeep} from 'lodash';
 import classNames from 'classnames';
 import moment from 'moment';
-
-import {gettext, DATE_FORMAT, isDisplayed, shouldShowListShortcutActionIcons} from 'utils';
 import AgendaListItem from './AgendaListItem';
 import {setActive, previewItem, toggleSelected, openItem} from '../actions';
-import {EXTENDED_VIEW} from 'wire/defaults';
-import {getIntVersion} from 'wire/utils';
-import {groupItems, getPlanningItemsByGroup, getListItems} from 'agenda/utils';
-import {searchNavigationSelector} from 'search/selectors';
-import {previewConfigSelector, listConfigSelector} from 'ui/selectors';
-import {AGENDA_DATE_FORMAT_LONG, AGENDA_DATE_FORMAT_SHORT} from '../../utils';
-
+import {AGENDA_DATE_FORMAT_LONG, AGENDA_DATE_FORMAT_SHORT, DATE_FORMAT, gettext, isDisplayed, shouldShowListShortcutActionIcons} from '../../utils';
+import {getListItems, getPlanningItemsByGroup, groupItems} from '../utils';
+import {EXTENDED_VIEW} from 'assets/wire/defaults';
+import {getIntVersion} from 'assets/wire/utils';
+import {searchNavigationSelector} from 'assets/search/selectors';
+import {listConfigSelector, previewConfigSelector} from 'assets/ui/selectors';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
-
-
-const itemsSelector = (state) => state.items.map((_id) => state.itemsById[_id]);
-const activeDateSelector = (state) => get(state, 'agenda.activeDate');
-const activeGroupingSelector = (state) => get(state, 'agenda.activeGrouping');
-const itemsByIdSelector = (state) => get(state, 'itemsById', {});
-const featuredOnlySelector = (state) => get(state, 'agenda.featuredOnly', false);
+const itemsSelector = (state: any) => state.items.map((_id: string) => state.itemsById[_id]);
+const activeDateSelector = (state: any) => get(state, 'agenda.activeDate');
+const activeGroupingSelector = (state: any) => get(state, 'agenda.activeGrouping');
+const itemsByIdSelector = (state: any) => get(state, 'itemsById', {});
+const featuredOnlySelector = (state: any) => get(state, 'agenda.featuredOnly', false);
 
 const groupedItemsSelector = createSelector(
     [itemsSelector, activeDateSelector, activeGroupingSelector, featuredOnlySelector],
@@ -41,9 +35,45 @@ const listItemsSelector = createSelector(
     getListItems
 );
 
+interface IProps {
+    itemsById: any;
+    activeItem: any;
+    previewItem: string;
+    previewGroup: string;
+    previewPlan: string;
+    dispatch: any;
+    selectedItems: Array<any>;
+    readItems: any;
+    actions: Array<{name: string, action: any}>;
+    bookmarks: boolean;
+    user: string;
+    company: string;
+    activeView: string;
+    groupedItems: Array<any>;
+    activeDate: number;
+    searchInitiated: boolean;
+    activeNavigation: Array<string>;
+    resultsFiltered: boolean;
+    listItems: Array<any>;
+    isLoading: boolean;
+    onScroll: any;
+    refNode: any;
+    previewConfig: any;
+    featuredOnly: boolean;
+    listConfig: boolean;
+}
 
-class AgendaList extends React.Component {
-    constructor(props) {
+interface IState {
+    actioningItem: any;
+    activePlan?: any;
+    activeGroup?: any;
+}
+
+class AgendaList extends React.Component<IProps, IState> {
+    previewTimeout: any;
+    clickTimeout: any;
+    elem: any;
+    constructor(props: IProps) {
         super(props);
 
         this.state = {actioningItem: null};
@@ -57,7 +87,7 @@ class AgendaList extends React.Component {
         this.isActiveItem = this.isActiveItem.bind(this);
     }
 
-    onKeyDown(event) {
+    onKeyDown(event: any) {
         let diff = 0;
         switch (event.key) {
         case 'ArrowDown':
@@ -125,7 +155,7 @@ class AgendaList extends React.Component {
         }
     }
 
-    onItemClick(item, group, plan) {
+    onItemClick(item: any, group: any, plan: any) {
         const itemId = item._id;
         this.setState({actioningItem: null});
         this.cancelPreviewTimeout();
@@ -148,13 +178,13 @@ class AgendaList extends React.Component {
         this.setState({actioningItem: null});
     }
 
-    onItemDoubleClick(item, group, plan) {
+    onItemDoubleClick(item: any, group: any, plan: any) {
         this.cancelClickTimeout();
         this.props.dispatch(setActive({_id: item._id, group: group, plan: plan}));
         this.props.dispatch(openItem(item, group, plan));
     }
 
-    onActionList(event, item, group, plan) {
+    onActionList(event: any, item: any, group: any, plan: any) {
         event.stopPropagation();
         if (this.state.actioningItem && this.state.actioningItem._id === item._id &&
             (!this.state.activePlan || (this.state.activePlan && this.state.activePlan.guid === get(plan, 'guid')))) {
@@ -164,12 +194,12 @@ class AgendaList extends React.Component {
         }
     }
 
-    filterActions(item, config) {
-        return this.props.actions.filter((action) =>  (!config || isDisplayed(action.id, config)) &&
+    filterActions(item: any, config: any) {
+        return this.props.actions.filter((action: any) =>  (!config || isDisplayed(action.id, config)) &&
           (!action.when || action.when(this.props, item)));
     }
 
-    isActiveItem(_id, group, plan) {
+    isActiveItem(_id: string, group: any, plan: any) {
         const {activeItem} = this.props;
 
         if (!activeItem || (!_id && !group && !plan)) {
@@ -187,7 +217,7 @@ class AgendaList extends React.Component {
         return _id === activeItem._id;
     }
 
-    componentDidUpdate(nextProps) {
+    componentDidUpdate(nextProps: any) {
         if (!isEqual(nextProps.activeDate, this.props.activeDate) ||
           !isEqual(nextProps.activeNavigation, this.props.activeNavigation) ||
           (!nextProps.searchInitiated && this.props.searchInitiated)) {
@@ -195,13 +225,13 @@ class AgendaList extends React.Component {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (!nextProps.groupedItems) {
             return;
         }
     }
 
-    getListGroupDate(group) {
+    getListGroupDate(group: any) {
         if (get(group, 'date')) {
             const groupDate = moment(group.date, DATE_FORMAT);
             const today = moment();
@@ -237,8 +267,7 @@ class AgendaList extends React.Component {
                 </div>,
 
                 <div className = 'wire-articles__group' key={`${group.date}group`}>
-                    {group.items.map((_id, groupIndex) => {
-
+                    {(group.items as Array<any>).map((_id: string, groupIndex) => {
                         const plans = getPlanningItemsByGroup(itemsById[_id], group.date);
 
                         if (plans.length > 0) {
@@ -272,26 +301,28 @@ class AgendaList extends React.Component {
                                 }
                             </Fragment>);
                         } else {
-                            return (<AgendaListItem
-                                key={_id}
-                                group={group.date}
-                                item={itemsById[_id]}
-                                isActive={this.isActiveItem(_id, group.date, null)}
-                                isSelected={selectedItems.indexOf(_id) !== -1}
-                                isRead={readItems[_id] === getIntVersion(itemsById[_id])}
-                                onClick={this.onItemClick}
-                                onDoubleClick={this.onItemDoubleClick}
-                                onActionList={this.onActionList}
-                                showActions={!!this.state.actioningItem &&
-                                this.state.actioningItem._id === _id && group.date === this.state.activeGroup}
-                                toggleSelected={() => this.props.dispatch(toggleSelected(_id))}
-                                actions={this.filterActions(itemsById[_id], this.props.previewConfig)}
-                                isExtended={isExtended}
-                                user={this.props.user}
-                                actioningItem={this.state.actioningItem}
-                                resetActioningItem={this.resetActioningItem}
-                                showShortcutActionIcons={showShortcutActionIcons}
-                            />);
+                            return (
+                                <AgendaListItem
+                                    key={_id}
+                                    group={group.date}
+                                    item={itemsById[_id]}
+                                    isActive={this.isActiveItem(_id, group.date, null)}
+                                    isSelected={selectedItems.indexOf(_id) !== -1}
+                                    isRead={readItems[_id] === getIntVersion(itemsById[_id])}
+                                    onClick={this.onItemClick}
+                                    onDoubleClick={this.onItemDoubleClick}
+                                    onActionList={this.onActionList}
+                                    showActions={!!this.state.actioningItem &&
+                                    this.state.actioningItem._id === _id && group.date === this.state.activeGroup}
+                                    toggleSelected={() => this.props.dispatch(toggleSelected(_id))}
+                                    actions={this.filterActions(itemsById[_id], this.props.previewConfig)}
+                                    isExtended={isExtended}
+                                    user={this.props.user}
+                                    actioningItem={this.state.actioningItem}
+                                    resetActioningItem={this.resetActioningItem}
+                                    showShortcutActionIcons={showShortcutActionIcons}
+                                />
+                            );
                         }
                     })}
                 </div>
@@ -324,38 +355,7 @@ class AgendaList extends React.Component {
     }
 }
 
-AgendaList.propTypes = {
-    itemsById: PropTypes.object,
-    activeItem: PropTypes.object,
-    previewItem: PropTypes.string,
-    previewGroup: PropTypes.string,
-    previewPlan: PropTypes.string,
-    dispatch: PropTypes.func.isRequired,
-    selectedItems: PropTypes.array,
-    readItems: PropTypes.object,
-    actions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string,
-        action: PropTypes.func,
-    })),
-    bookmarks: PropTypes.bool,
-    user: PropTypes.string,
-    company: PropTypes.string,
-    activeView: PropTypes.string,
-    groupedItems: PropTypes.array,
-    activeDate: PropTypes.number,
-    searchInitiated: PropTypes.bool,
-    activeNavigation: PropTypes.arrayOf(PropTypes.string),
-    resultsFiltered: PropTypes.bool,
-    listItems: PropTypes.array,
-    isLoading: PropTypes.bool,
-    onScroll: PropTypes.func,
-    refNode: PropTypes.func,
-    previewConfig: PropTypes.object,
-    featuredOnly: PropTypes.bool,
-    listConfig: PropTypes.object,
-};
-
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     itemsById: state.itemsById,
     activeItem: state.activeItem,
     previewItem: state.previewItem,

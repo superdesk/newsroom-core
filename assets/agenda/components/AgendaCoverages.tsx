@@ -1,10 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
-
 import {isEmpty} from 'lodash';
-import {gettext} from 'utils';
 import CoverageItemStatus from './CoverageItemStatus';
 import {
     getDataFromCoverages,
@@ -15,15 +12,35 @@ import {
     WORKFLOW_STATUS,
     formatCoverageDate
 } from '../utils';
-import {agendaContentLinkTarget} from 'ui/selectors';
+import {agendaContentLinkTarget} from 'assets/ui/selectors';
+import {gettext} from 'assets/utils';
 
+interface IProps {
+    item: any;
+    coverages?: Array<any>;
+    wireItems?: Array<any>;
+    actions?: Array<any>;
+    user?: string;
+    onClick?: any;
+    hideViewContentItems?: boolean;
+    contentLinkTarget?: string;
+}
 
-function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, onClick, hideViewContentItems, contentLinkTarget}) {
+function AgendaCoveragesComponent({
+    item,
+    coverages,
+    wireItems,
+    actions,
+    user,
+    onClick,
+    hideViewContentItems,
+    contentLinkTarget,
+}: IProps) {
     if (isEmpty(coverages)) {
         return null;
     }
 
-    const getSlugline = (coverage) => {
+    const getSlugline = (coverage: any) => {
         const slugline = coverage.item_slugline || coverage.slugline;
 
         return slugline ? ` | ${slugline}` : '';
@@ -93,21 +110,8 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
     );
 }
 
-AgendaCoveragesComponent.propTypes = {
-    item: PropTypes.object,
-    coverages: PropTypes.arrayOf(PropTypes.object),
-    wireItems: PropTypes.array,
-    actions: PropTypes.array,
-    user: PropTypes.string,
-    onClick: PropTypes.func,
-    hideViewContentItems: PropTypes.bool,
-    contentLinkTarget: PropTypes.string,
-};
+const mapStateToProps = (state: any) => ({contentLinkTarget: agendaContentLinkTarget(state)});
 
-const mapStateToProps = (state) => ({
-    contentLinkTarget: agendaContentLinkTarget(state),
-});
-
-const AgendaCoverages = connect(mapStateToProps)(AgendaCoveragesComponent);
+const AgendaCoverages: React.ComponentType<IProps> = connect(mapStateToProps)(AgendaCoveragesComponent as any) as any;
 
 export default AgendaCoverages;

@@ -1,6 +1,4 @@
 import React from 'react';
-import server from 'server';
-import analytics from 'analytics';
 import {get, isInteger, keyBy, isEmpty, cloneDeep, throttle, memoize} from 'lodash';
 import {Provider} from 'react-redux';
 import {createStore as _createStore, applyMiddleware, compose} from 'redux';
@@ -26,6 +24,10 @@ export {initWebSocket} from './websocket';
 // TODO: Improve how we load Moment locales, based on server config
 import 'moment/locale/fr-ca';
 import 'moment/locale/fi';
+import server from './server';
+import analytics from './analytics';
+
+declare let window: Window & typeof globalThis & any;
 
 moment.locale(getLocale());
 window.moment = moment;
@@ -40,7 +42,7 @@ if (getLocale() === 'fr_CA') {
 
 export const now = moment(); // to enable mocking in tests
 
-function getLocaleFormat(formatType, defaultFormat) {
+function getLocaleFormat(formatType: any, defaultFormat?: any) {
     const formats = getConfig('locale_formats', {});
     const locale = getLocale();
 
@@ -154,7 +156,7 @@ export function render(store, App, element, props) {
  * @param {Object} params
  * @return {String}
  */
-export function gettext(text, params) {
+export function gettext(text: string, params?: any) {
     let translated = get(window.translations, text, text);
 
     if (params) {
@@ -373,8 +375,8 @@ function getScheduleType(item) {
  * @param {Object} options
  * @return {Array} [time string, date string]
  */
-export function formatAgendaDate(item, group, {localTimeZone = true, onlyDates = false} = {}) {
-    const getFormattedTimezone = (date) => {
+export function formatAgendaDate(item: any, group: any, {localTimeZone = true, onlyDates = false} = {}) {
+    const getFormattedTimezone = (date: any) => {
         let tzStr = date.format('z');
         if (tzStr.indexOf('+0') >= 0) {
             return tzStr.replace('+0', 'GMT+');
@@ -398,7 +400,7 @@ export function formatAgendaDate(item, group, {localTimeZone = true, onlyDates =
     if (!isGroupBetweenEventDates && hasCoverages(item)) {
         // we rendering for extra days
         const scheduleDates = item.coverages
-            .map((coverage) => {
+            .map((coverage: any) => {
                 if (isCoverageForExtraDay(coverage, group)) {
                     return coverage.scheduled;
                 }
@@ -493,7 +495,7 @@ export function formatAgendaDate(item, group, {localTimeZone = true, onlyDates =
  * @param {String} dateString
  * @return {String}
  */
-export function formatWeek(dateString) {
+export function formatWeek(dateString: string) {
     const startDate = parseDate(dateString).isoWeekday(1);
     const endDate = parseDate(dateString).isoWeekday(7);
     return `${startDate.format(DATE_FORMAT)} - ${endDate.format(DATE_FORMAT)}`;
@@ -505,7 +507,7 @@ export function formatWeek(dateString) {
  * @param {String} dateString
  * @return {String}
  */
-export function formatMonth(dateString) {
+export function formatMonth(dateString: string) {
     return parseDate(dateString).format('MMMM');
 }
 
@@ -513,9 +515,9 @@ export function formatMonth(dateString) {
  * Wrapper for alertifyjs
  */
 export const notify = {
-    success: (message) => alertify.success(message),
-    error: (message) => alertify.error(message),
-    warning: (message) => alertify.warning(message),
+    success: (message: any) => alertify.success(message),
+    error: (message: any) => alertify.error(message),
+    warning: (message: any) => alertify.warning(message),
 };
 
 /**
@@ -524,7 +526,7 @@ export const notify = {
  * @param {string} html
  * @return {string}
  */
-export function getTextFromHtml(html) {
+export function getTextFromHtml(html: string) {
     let raw_html = (html || '').trim();
 
     if (raw_html.length === 0) {
@@ -550,7 +552,7 @@ export function getTextFromHtml(html) {
             continue;
         }
 
-        switch (tree.currentNode.parentNode.nodeName) {
+        switch (tree.currentNode.parentNode?.nodeName) {
         case 'P':
         case 'LI':
         case 'H1':
@@ -574,7 +576,7 @@ export function getTextFromHtml(html) {
  * @param {Object} item
  * @return {number}
  */
-export function wordCount(item) {
+export function wordCount(item: any) {
     if (isInteger(item.wordcount)) {
         return item.wordcount;
     }
@@ -593,7 +595,7 @@ export function wordCount(item) {
  * @param {Object} item
  * @return {number}
  */
-export function characterCount(item) {
+export function characterCount(item: any) {
 
     if (isInteger(item.charcount)) {
         return item.charcount;
@@ -618,17 +620,17 @@ export function characterCount(item) {
  * @param {mixed} value
  * @return {Array}
  */
-export function toggleValue(items, value) {
+export function toggleValue(items: any, value: any) {
     if (!items) {
         return [value];
     }
 
-    const without = items.filter((x) => value !== x);
+    const without = items.filter((x: any) => value !== x);
     return without.length === items.length ? without.concat([value]) : without;
 }
 
 
-export function updateRouteParams(updates, state, deleteEmpty = true) {
+export function updateRouteParams(updates: any, state: any, deleteEmpty = true) {
     const params = new URLSearchParams(window.location.search);
 
     Object.keys(updates).forEach((key) => {
@@ -667,7 +669,7 @@ export function formatHTML(html) {
  * @param dispatch
  * @param setError
  */
-export function errorHandler(error, dispatch, setError) {
+export function errorHandler(error: any, dispatch?: any, setError?: any) {
     console.error('error', error);
 
     if (error.response.status !== 400) {
@@ -688,7 +690,7 @@ export function errorHandler(error, dispatch, setError) {
  * @param {Mixed} defaultValue
  * @return {Mixed}
  */
-export function getConfig(key, defaultValue) {
+export function getConfig(key: string, defaultValue?: any) {
     const clientConfig = window && window.newsroom && window.newsroom.client_config || {};
 
     if (Object.keys(clientConfig).length === 0) {
@@ -726,7 +728,7 @@ export function isWireContext() {
     return window.location.pathname.includes('/wire');
 }
 
-export const getInitData = (data) => {
+export const getInitData = (data: any) => {
     let initData = data || {};
     return {
         ...initData,
@@ -734,7 +736,7 @@ export const getInitData = (data) => {
     };
 };
 
-export const isDisplayed = (field, config) => get(config, `${field}.displayed`, true);
+export const isDisplayed = (field: any, config: any) => get(config, `${field}.displayed`, true);
 
 const getNow = throttle(moment, 500);
 
@@ -743,7 +745,7 @@ const getNow = throttle(moment, 500);
  * @param {String} embargoed
  * @return {Moment}
  */
-export function getEmbargo(item) {
+export function getEmbargo(item: any) {
     if (!item.embargoed) {
         return null;
     }
@@ -754,15 +756,15 @@ export function getEmbargo(item) {
     return parsed.isAfter(now) ? parsed : null;
 }
 
-export function getItemFromArray(value, items = [], field = '_id') {
+export function getItemFromArray(value: any, items = [], field = '_id') {
     return items.find((i) => i[field] === value);
 }
 
-export function upperCaseFirstCharacter(text) {
+export function upperCaseFirstCharacter(text: string) {
     return (text && text.toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase()));
 }
 
-export function postHistoryAction(item, action, section='wire') {
+export function postHistoryAction(item: any, action: any, section='wire') {
     server.post('/history/new', {
         item: item,
         action: action,
@@ -770,7 +772,7 @@ export function postHistoryAction(item, action, section='wire') {
     }).catch((error) => errorHandler(error));
 }
 
-export function recordAction(item, action = 'open', section = 'wire', state = null) {
+export function recordAction(item: any, action: string = 'open', section: string = 'wire', state: any = null) {
     if (item) {
         analytics.itemEvent(action, item);
         analytics.itemView(item, section);
@@ -785,7 +787,7 @@ export function recordAction(item, action = 'open', section = 'wire', state = nu
     }
 }
 
-export function closeItemOnMobile(dispatch, state, openItemDetails, previewItem) {
+export function closeItemOnMobile(dispatch: any, state: any, openItemDetails: any, previewItem: any) {
     if (isMobilePhone()) {
         dispatch(openItemDetails(null));
         dispatch(previewItem(null));
@@ -798,7 +800,7 @@ export function closeItemOnMobile(dispatch, state, openItemDetails, previewItem)
  * @param {boolean} withTakeKey - If true, appends the takekey to the response
  * @returns {String}
  */
-export function getSlugline(item, withTakeKey = false) {
+export function getSlugline(item: any, withTakeKey = false) {
     if (!item || !item.slugline) {
         return '';
     }
@@ -816,14 +818,14 @@ export function getSlugline(item, withTakeKey = false) {
 /**
  * Factory for filter function to check if action is enabled
  */
-export function isActionEnabled(configKey) {
+export function isActionEnabled(configKey: any) {
     const config = getConfig(configKey, {});
-    return (action) => config[action.id] == null || config[action.id];
+    return (action: any) => config[action.id] == null || config[action.id];
 }
 
 export const getPlainTextMemoized = memoize((html) => getTextFromHtml(html));
 
-export function shouldShowListShortcutActionIcons(listConfig, isExtended) {
+export function shouldShowListShortcutActionIcons(listConfig: any, isExtended: any) {
     const showActionIconsConfig = listConfig.show_list_action_icons || {
         large: true,
         compact: true,
@@ -838,7 +840,7 @@ export function shouldShowListShortcutActionIcons(listConfig, isExtended) {
         );
 }
 
-export function getCreatedSearchParamLabel(created) {
+export function getCreatedSearchParamLabel(created: any) {
     if (created.to) {
         if (created.from) {
             return {
@@ -865,7 +867,7 @@ export function getCreatedSearchParamLabel(created) {
     return {};
 }
 
-export function copyTextToClipboard(text, item) {
+export function copyTextToClipboard(text: string, item: any) {
     navigator.clipboard.writeText(text).then(
         () => {
             notify.success(gettext('Item copied successfully.'));

@@ -2,9 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
-
-import {gettext} from 'utils';
-
 import {
     setError,
     postSectionFilter,
@@ -14,16 +11,15 @@ import {
     newSectionFilter,
     cancelEdit
 } from '../actions';
-
-import {sectionsPropType} from 'features/sections/types';
-import {sectionsSelector} from 'features/sections/selectors';
-import {searchQuerySelector} from 'search/selectors';
-
 import EditSectionFilter from './EditSectionFilter';
 import SectionFilterList from './SectionFilterList';
-import SearchResults from 'search/components/SearchResults';
+import {sectionsSelector} from 'assets/features/sections/selectors';
+import {sectionsPropType} from 'assets/features/sections/types';
+import SearchResults from 'assets/search/components/SearchResults';
+import {searchQuerySelector} from 'assets/search/selectors';
+import {gettext} from 'assets/utils';
 
-class SectionFilters extends React.Component {
+class SectionFilters extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 
@@ -34,7 +30,9 @@ class SectionFilters extends React.Component {
 
     isFormValid() {
         let valid = true;
-        let errors = {};
+        const errors = {
+            name: ['']
+        };
 
         if (!this.props.sectionFilterToEdit.name) {
             errors.name = [gettext('Please provide Section Filter name')];

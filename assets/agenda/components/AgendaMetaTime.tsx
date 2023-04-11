@@ -1,14 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
-
-import {bem} from 'ui/utils';
 import {hasCoverages} from '../utils';
-import {formatAgendaDate} from 'utils';
-
 import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
+import {formatAgendaDate} from 'assets/utils';
+import {bem} from 'assets/ui/utils';
 
-function format(item, group, onlyDates) {
+function format(item: any, group: any, onlyDates: any) {
     return (
         <span key="date">
             {formatAgendaDate(item, group, {onlyDates})}
@@ -16,7 +13,7 @@ function format(item, group, onlyDates) {
     );
 }
 
-function getCalendarClass(item) {
+function getCalendarClass(item: any) {
     if (item.state === 'rescheduled') {
         return 'icon--orange';
     }
@@ -32,7 +29,17 @@ function getCalendarClass(item) {
     }
 }
 
-export default function AgendaMetaTime({item, borderRight, isRecurring, group, isMobilePhone, onlyDates}) {
+interface IProps {
+    item: any;
+    hasCoverage?: boolean;
+    borderRight?: boolean;
+    isRecurring?: boolean;
+    isMobilePhone?: boolean;
+    group: any;
+    onlyDates: any;
+}
+
+export default function AgendaMetaTime({item, borderRight, isRecurring, group, isMobilePhone, onlyDates}: IProps) {
     const times = (
         <div key="times" className={classNames(
             bem('wire-articles__item', 'meta-time', {'border-right': borderRight}),
@@ -62,19 +69,3 @@ export default function AgendaMetaTime({item, borderRight, isRecurring, group, i
         [times, icons] :
         [icons, times, <AgendaItemTimeUpdater key="timeUpdate" item={item} borderRight={borderRight} />];
 }
-
-AgendaMetaTime.propTypes = {
-    item: PropTypes.object,
-    borderRight: PropTypes.bool,
-    isRecurring: PropTypes.bool,
-    group: PropTypes.string,
-    isMobilePhone: PropTypes.bool,
-    onlyDates: PropTypes.bool,
-};
-
-AgendaMetaTime.defaultProps = {
-    isRecurring: false,
-    hasCoverage: false,
-    isMobilePhone: false,
-    borderRight: false,
-};

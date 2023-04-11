@@ -2,8 +2,14 @@ import 'babel-polyfill';
 import 'url-search-params-polyfill';
 import 'whatwg-fetch';
 import {Tooltip, Dropdown} from 'bootstrap';
-import {isTouchDevice} from 'utils';
-import {setElementStyle, elementHasClass, replaceElementClasses, onElementClicked, removeElementClass} from 'domUtils';
+import {isTouchDevice} from './utils';
+import {
+    elementHasClass,
+    replaceElementClasses,
+    setElementStyle,
+    onElementClicked,
+    removeElementClass
+} from './domUtils';
 
 if (!isTouchDevice()) {
     document.documentElement.classList.add('no-touch');
