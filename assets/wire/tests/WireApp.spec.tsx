@@ -8,10 +8,13 @@ import 'tests/setup';
 
 import WireApp from '../components/WireApp';
 
-
 function setup(state) {
     const store = createStore(() => state, applyMiddleware(thunk));
-    const enzymeWrapper = mount(<Provider store={store}><WireApp /></Provider>);
+    const enzymeWrapper = mount(
+        <Provider store={store}>
+            <WireApp />
+        </Provider>
+    );
     return enzymeWrapper;
 }
 

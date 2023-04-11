@@ -60,7 +60,7 @@ export default function navigationReducer(state = initialState, action) {
     case EDIT_NAVIGATION: {
         const target = action.event.target;
         const field = target.name;
-        let navigation = state.navigationToEdit;
+        const navigation = state.navigationToEdit;
         if (startsWith(field, 'tile_images_file')) {
             const fileData = field.split('_');
             const fileIndex = parseInt(fileData[3], 10);

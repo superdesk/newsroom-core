@@ -51,7 +51,7 @@ export default function productReducer(state = initialState, action) {
     case EDIT_PRODUCT: {
         const target = action.event.target;
         const field = target.name;
-        let product = state.productToEdit;
+        const product = state.productToEdit;
         product[field] = target.type === 'checkbox' ? target.checked : target.value;
         return {...state, productToEdit: product, errors: null};
     }

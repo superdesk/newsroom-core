@@ -377,7 +377,7 @@ function getScheduleType(item) {
  */
 export function formatAgendaDate(item: any, group: any, {localTimeZone = true, onlyDates = false} = {}) {
     const getFormattedTimezone = (date: any) => {
-        let tzStr = date.format('z');
+        const tzStr = date.format('z');
         if (tzStr.indexOf('+0') >= 0) {
             return tzStr.replace('+0', 'GMT+');
         }
@@ -391,10 +391,10 @@ export function formatAgendaDate(item: any, group: any, {localTimeZone = true, o
 
     const isTBCItem = isItemTBC(item);
     let start = parseDate(item.dates.start, item.dates.all_day);
-    let end = parseDate(item.dates.end, item.dates.all_day || item.dates.no_end_time);
-    let dateGroup = group ? moment(group, DATE_FORMAT) : null;
+    const end = parseDate(item.dates.end, item.dates.all_day || item.dates.no_end_time);
+    const dateGroup = group ? moment(group, DATE_FORMAT) : null;
 
-    let isGroupBetweenEventDates = dateGroup ?
+    const isGroupBetweenEventDates = dateGroup ?
         start.isSameOrBefore(dateGroup, 'day') && end.isSameOrAfter(dateGroup, 'day') : true;
 
     if (!isGroupBetweenEventDates && hasCoverages(item)) {
@@ -527,7 +527,7 @@ export const notify = {
  * @return {string}
  */
 export function getTextFromHtml(html: string) {
-    let raw_html = (html || '').trim();
+    const raw_html = (html || '').trim();
 
     if (raw_html.length === 0) {
         return '';
@@ -729,7 +729,7 @@ export function isWireContext() {
 }
 
 export const getInitData = (data: any) => {
-    let initData = data || {};
+    const initData = data || {};
     return {
         ...initData,
         userSections: keyBy(get(window.profileData, 'userSections', {}), '_id')
@@ -772,7 +772,7 @@ export function postHistoryAction(item: any, action: any, section='wire') {
     }).catch((error) => errorHandler(error));
 }
 
-export function recordAction(item: any, action: string = 'open', section: string = 'wire', state: any = null) {
+export function recordAction(item: any, action = 'open', section = 'wire', state: any = null) {
     if (item) {
         analytics.itemEvent(action, item);
         analytics.itemView(item, section);

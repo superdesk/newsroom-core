@@ -35,7 +35,7 @@ class Navigations extends React.Component {
 
     isFormValid() {
         let valid = true;
-        let errors = {};
+        const errors = {};
 
         if (!this.props.navigationToEdit.name) {
             errors.name = [gettext('Please provide navigation name')];

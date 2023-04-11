@@ -65,7 +65,7 @@ class MonitoringEditor extends React.Component {
     }
 
     onChange(event) {
-        let wl = cloneDeep(this.state.profile);
+        const wl = cloneDeep(this.state.profile);
         let field = event.target.name;
         let value = event.target.value;
         let autoSave, msg;

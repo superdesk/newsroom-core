@@ -11,7 +11,7 @@ export function registerNotification(condition, component) {
 }
 
 export function renderNotificationComponent(notification, item) {
-    let notificationEntry = registeredNotifications.find(
+    const notificationEntry = registeredNotifications.find(
         (entry) => entry.condition(notification, item)
     );
 

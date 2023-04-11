@@ -29,7 +29,7 @@ class Clients extends React.Component {
 
     isFormValid() {
         let valid = true;
-        let errors = {};
+        const errors = {};
 
         if (!this.props.clientToEdit.name) {
             errors.name = [gettext('Please provide client name')];

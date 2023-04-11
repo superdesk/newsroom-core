@@ -78,7 +78,7 @@ export default function userReducer(state = initialState, action) {
     case EDIT_USER: {
         const target = action.event.target;
         const field = target.name;
-        let user = {...state.userToEdit};
+        const user = {...state.userToEdit};
         const value = target.type === 'checkbox' ? target.checked : target.value;
 
         if (field.startsWith('sections.')) {

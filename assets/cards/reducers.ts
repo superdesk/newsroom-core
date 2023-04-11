@@ -53,8 +53,8 @@ export default function cardReducer(state = initialState, action) {
     case EDIT_CARD: {
         const target = action.event.target;
         const field = target.name;
-        let card = {...state.cardToEdit};
-        let size = get(getCard(card.type), 'size', 0);
+        const card = {...state.cardToEdit};
+        const size = get(getCard(card.type), 'size', 0);
 
         if (!card.dashboard) {
             card.dashboard = 'newsroom';

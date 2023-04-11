@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 export function Tag({text, keyValue, shade, readOnly, onClick, label}) {
-    let classes = classNames('tag-label', {
+    const classes = classNames('tag-label', {
         [`tag-label--${shade}`]: shade && shade !== 'light',
     });
 

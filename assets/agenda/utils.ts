@@ -455,7 +455,7 @@ export function getInternalNote(item, plan) {
  */
 export function getDataFromCoverages(item) {
     const planningItems = get(item, 'planning_items', []);
-    let data = {
+    const data = {
         'internal_note': {},
         'ednote': {},
         'workflow_status_reason': {},

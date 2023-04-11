@@ -68,7 +68,7 @@ class AgendaItemTimeUpdater extends React.Component<IProps, any> {
             moment().diff(moment(item._updated), 'minutes') >= this.interval);
     }
 
-    updateState(item: any, checkPastTime: boolean = true) {
+    updateState(item: any, checkPastTime = true) {
         if (checkPastTime && this.isItemPastTime(item)) {
             this.deactivateTimer();
             return;

@@ -30,7 +30,7 @@ export const REPORTS = {
 };
 
 function getReportQueryString(currentState, next, exportReport, notify) {
-    let params = cloneDeep(currentState.reportParams);
+    const params = cloneDeep(currentState.reportParams);
     if (params) {
         if (params.company) {
             params.company = get(getItemFromArray(params.company, currentState.companies, 'name'), '_id');
@@ -121,7 +121,7 @@ export function runReport() {
 
 export function fetchAggregations(url) {
     return function(dispatch, getState) {
-        let queryString = getReportQueryString(getState(), 0, false, notify);
+        const queryString = getReportQueryString(getState(), 0, false, notify);
 
         server.get(`${url}?${queryString}&aggregations=1`)
             .then((data) => {
@@ -143,7 +143,7 @@ export function fetchReport(url, next, exportReport) {
             dispatch(isLoading(next));
         }
 
-        let queryString = getReportQueryString(getState(), next, exportReport, notify);
+        const queryString = getReportQueryString(getState(), next, exportReport, notify);
         let apiRequest;
 
         if (exportReport) {

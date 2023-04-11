@@ -1,41 +1,41 @@
 /* eslint-env node */
 
-const path = require('path');
-const webpack = require('webpack');
-const ManifestPlugin = require('webpack-manifest-plugin');
-const TerserPlugin = require('terser-webpack-plugin-legacy');
+import {resolve as _resolve} from 'path';
+import {optimize, DefinePlugin} from 'webpack';
+import ManifestPlugin from 'webpack-manifest-plugin';
+import TerserPlugin from 'terser-webpack-plugin-legacy';
 
 const config = {
     entry: {
-        newsroom_ts: path.resolve(__dirname, 'assets/index.ts'),
-        companies_ts: path.resolve(__dirname, 'assets/companies/index.ts'),
-        oauth_clients_ts: path.resolve(__dirname, 'assets/oauth_clients/index.ts'),
-        users_ts: path.resolve(__dirname, 'assets/users/index.ts'),
-        products_ts: path.resolve(__dirname, 'assets/products/index.ts'),
-        'section-filters_ts': path.resolve(__dirname, 'assets/section-filters/index.ts'),
-        navigations_ts: path.resolve(__dirname, 'assets/navigations/index.ts'),
-        cards_ts: path.resolve(__dirname, 'assets/cards/index.ts'),
-        user_profile_ts: path.resolve(__dirname, 'assets/user-profile/index.ts'),
-        newsroom_css: path.resolve(__dirname, 'assets/style.ts'),
-        wire_ts: path.resolve(__dirname, 'assets/wire/index.ts'),
-        home_ts: path.resolve(__dirname, 'assets/home/index.ts'),
-        agenda_ts: path.resolve(__dirname, 'assets/agenda/index.ts'),
-        notifications_ts: path.resolve(__dirname, 'assets/notifications/index.ts'),
-        company_reports_ts: path.resolve(__dirname, 'assets/company-reports/index.ts'),
-        print_reports_ts: path.resolve(__dirname, 'assets/company-reports/components/index.ts'),
-        am_news_ts: path.resolve(__dirname, 'assets/am-news/index.ts'),
-        am_news_css: path.resolve(__dirname, 'assets/am-news/style.ts'),
-        'general-settings_ts': path.resolve(__dirname, 'assets/general-settings/index.ts'),
-        market_place_ts: path.resolve(__dirname, 'assets/market-place/index.ts'),
-        media_releases_ts: path.resolve(__dirname, 'assets/media-releases/index.ts'),
-        monitoring_ts: path.resolve(__dirname, 'assets/monitoring/index.ts'),
-        factcheck_ts: path.resolve(__dirname, 'assets/factcheck/index.ts'),
-        common: path.resolve(__dirname, 'assets/common.ts'),
-        design_ts: path.resolve(__dirname, 'assets/design_pages.ts'),
-        company_admin_ts: path.resolve(__dirname, 'assets/company-admin/index.ts'),
+        newsroom_ts: _resolve(__dirname, 'assets/index.ts'),
+        companies_ts: _resolve(__dirname, 'assets/companies/index.ts'),
+        oauth_clients_ts: _resolve(__dirname, 'assets/oauth_clients/index.ts'),
+        users_ts: _resolve(__dirname, 'assets/users/index.ts'),
+        products_ts: _resolve(__dirname, 'assets/products/index.ts'),
+        'section-filters_ts': _resolve(__dirname, 'assets/section-filters/index.ts'),
+        navigations_ts: _resolve(__dirname, 'assets/navigations/index.ts'),
+        cards_ts: _resolve(__dirname, 'assets/cards/index.ts'),
+        user_profile_ts: _resolve(__dirname, 'assets/user-profile/index.ts'),
+        newsroom_css: _resolve(__dirname, 'assets/style.ts'),
+        wire_ts: _resolve(__dirname, 'assets/wire/index.ts'),
+        home_ts: _resolve(__dirname, 'assets/home/index.ts'),
+        agenda_ts: _resolve(__dirname, 'assets/agenda/index.ts'),
+        notifications_ts: _resolve(__dirname, 'assets/notifications/index.ts'),
+        company_reports_ts: _resolve(__dirname, 'assets/company-reports/index.ts'),
+        print_reports_ts: _resolve(__dirname, 'assets/company-reports/components/index.ts'),
+        am_news_ts: _resolve(__dirname, 'assets/am-news/index.ts'),
+        am_news_css: _resolve(__dirname, 'assets/am-news/style.ts'),
+        'general-settings_ts': _resolve(__dirname, 'assets/general-settings/index.ts'),
+        market_place_ts: _resolve(__dirname, 'assets/market-place/index.ts'),
+        media_releases_ts: _resolve(__dirname, 'assets/media-releases/index.ts'),
+        monitoring_ts: _resolve(__dirname, 'assets/monitoring/index.ts'),
+        factcheck_ts: _resolve(__dirname, 'assets/factcheck/index.ts'),
+        common: _resolve(__dirname, 'assets/common.ts'),
+        design_ts: _resolve(__dirname, 'assets/design_pages.ts'),
+        company_admin_ts: _resolve(__dirname, 'assets/company-admin/index.ts'),
     },
     output: {
-        path: path.resolve(process.cwd(), 'dist'),
+        path: _resolve(process.cwd(), 'dist'),
         publicPath: 'http://localhost:8080/',
         filename: '[name].[chunkhash].js',
         chunkFilename: '[id].[chunkhash].js'
@@ -50,9 +50,9 @@ const config = {
             {
                 test: /\.tsx?$/,
                 include: [
-                    path.resolve(__dirname, 'assets'),
-                    path.resolve(__dirname, 'node_modules/bootstrap'),
-                    path.resolve(process.cwd(), 'node_modules/bootstrap'),
+                    _resolve(__dirname, 'assets'),
+                    _resolve(__dirname, 'node_modules/bootstrap'),
+                    _resolve(process.cwd(), 'node_modules/bootstrap'),
                 ],
                 loader: 'babel-loader',
                 options: {
@@ -86,7 +86,7 @@ const config = {
     resolve: {
         extensions: ['.ts', '.tsx'],
         modules: [
-            path.resolve(__dirname, 'assets'),
+            _resolve(__dirname, 'assets'),
             'node_modules',
         ],
         alias: {
@@ -96,7 +96,7 @@ const config = {
     },
     plugins: [
         new ManifestPlugin(),
-        new webpack.optimize.CommonsChunkPlugin({
+        new optimize.CommonsChunkPlugin({
             name: 'common',
             minChunks: Infinity,
         }),
@@ -108,7 +108,7 @@ const config = {
 };
 
 if (process.env.NODE_ENV === 'production') {
-    config.plugins.push(new webpack.DefinePlugin({
+    config.plugins.push(new DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
     }));
     config.plugins.push(new TerserPlugin({
@@ -117,4 +117,4 @@ if (process.env.NODE_ENV === 'production') {
     }));
 }
 
-module.exports = config;
+export default config;

@@ -123,7 +123,7 @@ export function getActiveFilterTab(context) {
  *
  */
 export function setActiveFilterTab(tab, context) {
-    let filterTabs = {...store.get(FILTER_TAB) || {}};
+    const filterTabs = {...store.get(FILTER_TAB) || {}};
     filterTabs[context] = tab;
     store.assign(FILTER_TAB, filterTabs);
 }

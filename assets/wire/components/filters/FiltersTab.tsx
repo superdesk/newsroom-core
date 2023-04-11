@@ -64,10 +64,10 @@ class FiltersTab extends React.Component {
 
     updateFilter(field, key, single) {
         // The `value` can be an Array
-        let values = Array.isArray(key) ? key : [key];
+        const values = Array.isArray(key) ? key : [key];
         const currentFilters = cloneDeep(this.state.activeFilter);
 
-        for (let _value of values) {
+        for (const _value of values) {
             currentFilters[field] = toggleValue(currentFilters[field], _value);
 
             if (!_value || !currentFilters[field] || currentFilters[field].length === 0) {

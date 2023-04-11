@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
 import InputWrapper from './InputWrapper';
-
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
 function TextInput({
     type,
@@ -22,7 +20,7 @@ function TextInput({
     autoFocus,
     copyAction,
     ...props
-}) {
+}): JSX.Element {
     return (
         <InputWrapper error={error} name={name}>
             {label && (

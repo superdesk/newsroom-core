@@ -57,7 +57,7 @@ const getTopNewsRightPanel = (item, picture, openItem, cardId, listConfig) => {
 
 const getTopNews = (items, openItem, cardId, listConfig) => {
     const topNews = [];
-    for(var i=0; i<items.length; i+=2) {
+    for(let i=0; i<items.length; i+=2) {
         topNews.push(getTopNewsLeftPanel(items[i], getPicture(items[i]), openItem, cardId, listConfig));
         if (i+1 < items.length) {
             topNews.push(getTopNewsRightPanel(items[i+1], getPicture(items[i+1]), openItem, cardId));

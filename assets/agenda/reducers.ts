@@ -156,7 +156,7 @@ export default function agendaReducer(state = initialState, action) {
 
     case UPDATE_ITEM: {
         // Update existing items, remove killed items
-        let itemsById = Object.assign({}, state.itemsById);
+        const itemsById = Object.assign({}, state.itemsById);
         let updatedItems = [ ...state.items ];
         const item = action.item;
         if(itemsById[item._id]) {

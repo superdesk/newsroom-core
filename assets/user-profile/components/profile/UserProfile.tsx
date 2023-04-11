@@ -23,7 +23,7 @@ class UserProfile extends React.Component {
 
     isFormValid() {
         let valid = true;
-        let errors = {};
+        const errors = {};
 
         if (!this.props.user.first_name) {
             errors.first_name = [gettext('Please provide first name')];

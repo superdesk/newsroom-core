@@ -5,6 +5,6 @@
 
 (window as any).newsroom = {client_config: {debug: true}};
 
-var testsContext = (require as any).context('.', true, /[Ss]pec.(js|jsx)$/);
+const testsContext = (require as any).context('.', true, /[Ss]pec.(js|jsx)$/);
 
 testsContext.keys().forEach(testsContext);

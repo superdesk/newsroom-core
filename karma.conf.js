@@ -1,9 +1,9 @@
 /* eslint-env node */
 
-const webpack = require('webpack');
-const webpackConfig = require('./webpack.config.js');
+import {ProvidePlugin} from 'webpack';
+import {module as _module, resolve as _resolve, plugins as _plugins} from './webpack.config.js';
 
-module.exports = function(config) {
+export default function(config) {
     config.set({
         files: [
             'assets/tests.js',
@@ -14,9 +14,9 @@ module.exports = function(config) {
         },
 
         webpack: {
-            module: webpackConfig.module,
-            resolve: webpackConfig.resolve,
-            plugins: webpackConfig.plugins.filter((plugin) => plugin instanceof webpack.ProvidePlugin),
+            module: _module,
+            resolve: _resolve,
+            plugins: _plugins.filter((plugin) => plugin instanceof ProvidePlugin),
             devtool: 'inline-source-map',
         },
 
@@ -28,4 +28,4 @@ module.exports = function(config) {
         frameworks: ['jasmine'],
         browsers: ['ChromeHeadless'],
     });
-};
+}

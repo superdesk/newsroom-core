@@ -22,7 +22,7 @@ class EditPanel extends React.Component {
     }
 
     toggleSelectAll(availableItems, allActive) {
-        let items = {};
+        const items = {};
 
         if (!allActive) {
             availableItems.forEach((item) => {
@@ -69,7 +69,7 @@ class EditPanel extends React.Component {
             return;
         }
 
-        let items = {};
+        const items = {};
         nextProps.items.map((item) =>
             items[item._id] = (nextProps.parent[nextProps.field] || []).includes(item._id));
         if (!isEqual(this.state.items, items)) {

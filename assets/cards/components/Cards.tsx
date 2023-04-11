@@ -31,7 +31,7 @@ class Cards extends React.Component {
 
     isFormValid() {
         let valid = true;
-        let errors = {};
+        const errors = {};
 
         if (!this.props.cardToEdit.label) {
             errors.label = [gettext('Please provide card label')];
