@@ -45,7 +45,6 @@ def test_item_notification_template(client, app, mocker):
 
 HTML Body
 
-
 Slugline: Albion Park Greys
 Headline: Albion Park Greyhound VIC TAB DIVS 1-2 Monday
 Category: Racing

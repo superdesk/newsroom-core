@@ -65,7 +65,7 @@ function ItemDetails({
                     />
                 </ContentBar>
             </ContentHeader>
-            <ArticleItemDetails>
+            <ArticleItemDetails disableTextSelection={detailsConfig.disable_text_selection}>
                 <ArticleContent>
                     {pictures && pictures.map((pic) => (
                         <ArticlePicture
