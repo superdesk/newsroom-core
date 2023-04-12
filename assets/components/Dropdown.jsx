@@ -39,7 +39,7 @@ export function Dropdown({children, isActive, icon, label, className, buttonProp
         <button
             type="button"
             className={classNames(
-                'btn btn-sm d-flex align-items-center px-2 ms-2 dropdown-toggle',
+                'btn btn-sm d-flex align-items-center px-2 ms-2',
                 {
                     active: isActive,
                     'btn-text-only': textOnly,
