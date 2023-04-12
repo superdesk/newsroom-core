@@ -2191,6 +2191,14 @@ article.list {
             }
         }
     }
+    .btn-group {
+        .btn {
+            line-height: 1;
+        }
+        .btn-sm {
+            padding: 0.375rem;
+        }
+    }
 }
 
 .wire-articles__item-text {
