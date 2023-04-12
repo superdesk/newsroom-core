@@ -137,7 +137,9 @@ def send_new_signup_email(user):
     )
 
 
-def map_email_recipients_by_language(emails: List[str], template_name: str) -> Dict[str, EmailGroup]:
+def map_email_recipients_by_language(
+    emails: List[str], template_name: str, ignore_preferences=False
+) -> Dict[str, EmailGroup]:
     users = {user["email"]: user for user in query_resource("users", lookup={"email": {"$in": emails}}) or []}
     default_language = current_app.config["DEFAULT_LANGUAGE"]
     groups: Dict[str, EmailGroup] = {}
@@ -146,7 +148,7 @@ def map_email_recipients_by_language(emails: List[str], template_name: str) -> D
 
     for email in emails:
         user = users.get(email)
-        if user and not user.get("receive_email"):
+        if user and not user.get("receive_email") and not ignore_preferences:
             # If this is a user in the system, and has emails disabled
             # then skip this recipient
             continue
@@ -185,11 +187,14 @@ def send_template_email(
     to: List[str],
     template: str,
     template_kwargs: Optional[Dict[str, Any]] = None,
+    ignore_preferences=False,  # ignore user email preferences
     **kwargs,
 ):
     template_kwargs = {} if not template_kwargs else template_kwargs
     email_templates = get_resource_service("email_templates")
-    for language, group in map_email_recipients_by_language(to, template).items():
+    for language, group in map_email_recipients_by_language(
+        to, template, ignore_preferences=ignore_preferences
+    ).items():
         # ``coverage_request_email`` requires ``subject`` variable for the body template
         # so add the generated/rendered subject to kwargs (if subject is not already defined)
         subject = email_templates.get_translated_subject(template, language, **template_kwargs)
@@ -226,6 +231,7 @@ def send_validate_account_email(user_name, user_email, token):
             expires=hours,
             url=url,
         ),
+        ignore_preferences=True,
     )
 
 
@@ -250,6 +256,7 @@ def send_new_account_email(user_name, user_email, token):
             expires=hours,
             url=url,
         ),
+        ignore_preferences=True,
     )
 
 
@@ -275,6 +282,7 @@ def send_reset_password_email(user_name, user_email, token):
             expires=hours,
             url=url,
         ),
+        ignore_preferences=True,
     )
 
 
