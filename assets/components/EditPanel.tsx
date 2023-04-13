@@ -5,7 +5,7 @@ import {isEmpty, get, pickBy, isEqual, every} from 'lodash';
 import CheckboxInput from 'components/CheckboxInput';
 
 class EditPanel extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.onItemChange = this.onItemChange.bind(this);
         this.toggleSelectAll = this.toggleSelectAll.bind(this);

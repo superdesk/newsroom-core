@@ -5,7 +5,7 @@ import {gettext} from 'utils';
 
 
 class SortItems extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {items: this.props.items};
         this.onSortEnd = this.onSortEnd.bind(this);

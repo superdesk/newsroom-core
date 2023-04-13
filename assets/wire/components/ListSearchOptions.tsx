@@ -4,8 +4,8 @@ import Toggle from 'react-toggle';
 
 import {gettext} from 'utils';
 
-export class ListSearchOptions extends React.PureComponent {
-    constructor(props) {
+export class ListSearchOptions extends React.PureComponent<any, any> {
+    constructor(props: any) {
         super(props);
 
         this.state = {isOpen: false};

@@ -9,7 +9,7 @@ import {REPORTS} from '../actions';
 
 
 class ComapnyNewsApiUsage extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.onFromDateChange = this.onFromDateChange.bind(this);
@@ -60,7 +60,7 @@ class ComapnyNewsApiUsage extends React.Component {
         Object.keys(results).forEach((company) => {
             const rowColums = [
                 (<td key={'name-' + company}>{company}</td>),
-                ...resultHeaders.map((headerName, index) => 
+                ...resultHeaders.map((headerName, index) =>
                     (<td key={index}>{get(results[company], headerName, 0)}</td>))
             ];
             list.push((<tr key={company}>{rowColums}</tr>));

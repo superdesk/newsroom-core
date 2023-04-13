@@ -9,7 +9,7 @@ import {gettext} from 'utils';
 import {sectionsPropType} from '../../features/sections/types';
 
 class EditSectionFilter extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
     }
 

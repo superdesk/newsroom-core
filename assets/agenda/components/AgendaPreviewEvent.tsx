@@ -18,7 +18,7 @@ import AgendaEdNote from './AgendaEdNote';
 import AgendaInternalNote from './AgendaInternalNote';
 
 class AgendaPreviewEventComponent extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {

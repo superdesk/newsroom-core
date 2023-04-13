@@ -8,7 +8,7 @@ import {gettext, notify} from 'utils';
 
 
 class ConfigNavigation extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.getNavigations = this.getNavigations.bind(this);

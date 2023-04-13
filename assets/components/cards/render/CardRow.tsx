@@ -4,7 +4,7 @@ import MoreNewsButton from './MoreNewsButton';
 
 
 class CardRow extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
     }
 

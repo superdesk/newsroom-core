@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 class BannerDrop extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {open: this.props.isOpen};
         this.toggleOpen = this.toggleOpen.bind(this);

@@ -21,7 +21,7 @@ import AuditInformation from 'components/AuditInformation';
 import {ToolTip} from 'ui/components/ToolTip';
 
 class TopicEditor extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {

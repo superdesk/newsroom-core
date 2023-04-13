@@ -13,7 +13,7 @@ import FiltersTab from 'wire/components/filters/FiltersTab';
 import NavigationTab from 'wire/components/filters/NavigationTab';
 
 export default class BaseApp extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {
@@ -192,7 +192,7 @@ export default class BaseApp extends React.Component {
         return null;
     }
 
-    componentDidUpdate(nextProps) {
+    componentDidUpdate(nextProps: any) {
         if ((nextProps.activeQuery || this.props.activeQuery) && (nextProps.activeQuery !== this.props.activeQuery) && this.dom.list != null) {
             this.dom.list.scrollTop = 0;
         }

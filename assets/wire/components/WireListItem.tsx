@@ -68,7 +68,7 @@ function getShowVersionText(isExpanded, itemCount, matchCount, isExtended) {
 }
 
 class WireListItem extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.wordCount = wordCount(props.item);
         this.characterCount = characterCount(props.item);

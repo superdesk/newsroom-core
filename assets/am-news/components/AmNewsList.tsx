@@ -31,7 +31,7 @@ const groupedItemsSelector = createSelector(
 
 
 class AmNewsList extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {actioningItem: null};

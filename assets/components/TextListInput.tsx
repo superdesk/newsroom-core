@@ -13,7 +13,7 @@ import {gettext, KEYCODES} from 'utils';
  * @description Component to select tags like Keyword of a news story
  */
 class TextListInput extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {inputText: ''};

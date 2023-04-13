@@ -12,7 +12,7 @@ import Modal from 'components/Modal';
 import SearchBar from 'search/components/SearchBar';
 
 class ShareItemModal extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {
             message: '',

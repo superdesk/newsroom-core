@@ -9,7 +9,7 @@ import {gettext} from '../utils';
 
 
 export default class ExpiryDateInput extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {value: !this.props.value ? 'never' : 'on'};

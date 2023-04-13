@@ -14,7 +14,7 @@ import {
 
 
 class EditCard extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
     }
 

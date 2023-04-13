@@ -12,7 +12,7 @@ import AgendaInternalNote from './AgendaInternalNote';
 import AgendaEdNote from './AgendaEdNote';
 
 class AgendaPreviewCoverages extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {expanded: true};

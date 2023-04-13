@@ -12,7 +12,7 @@ import MultiSelectDropdown from '../../components/MultiSelectDropdown';
 import ReportsTable from './ReportsTable';
 
 class ContentActivity extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.onDateChange = this.onDateChange.bind(this);

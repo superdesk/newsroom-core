@@ -1,8 +1,8 @@
 import React from 'react';
 import {gettext} from 'utils';
 
-export class SearchBar extends React.PureComponent {
-    constructor(props) {
+export class SearchBar extends React.PureComponent<any, any> {
+    constructor(props: any) {
         super(props);
         this.state = {value: ''};
     }

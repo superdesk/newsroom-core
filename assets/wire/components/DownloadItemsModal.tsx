@@ -11,7 +11,7 @@ import Modal from 'components/Modal';
 import SelectInput from 'components/SelectInput';
 
 class DownloadItemsModal extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {
             items: props.data.items,

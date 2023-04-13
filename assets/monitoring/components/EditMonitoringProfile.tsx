@@ -17,7 +17,7 @@ import {gettext} from 'utils';
 const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
 
 class EditMonitoringProfile extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
         this.getUsers = this.getUsers.bind(this);

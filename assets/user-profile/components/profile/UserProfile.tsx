@@ -16,7 +16,7 @@ import {
 } from '../../actions';
 
 class UserProfile extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.save = this.save.bind(this);
     }

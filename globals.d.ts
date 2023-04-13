@@ -3,4 +3,5 @@
 interface Window {
     gtag: any;
     analytics: any;
+    agendaData: any;
 }

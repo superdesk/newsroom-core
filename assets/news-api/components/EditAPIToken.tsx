@@ -20,7 +20,7 @@ import {
 import {getTokenForCompany, generateTokenForCompany, deleteTokenForCompany, updateTokenForCompany} from '../actions';
 
 export default class EditAPIToken extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {
@@ -145,7 +145,7 @@ export default class EditAPIToken extends React.Component {
         if (event) {
             event.preventDefault();
         }
-        
+
         this.setState({creating: false,});
 
         if (this.props.onCardEdit) {
@@ -178,7 +178,7 @@ export default class EditAPIToken extends React.Component {
         if (event) {
             event.preventDefault();
         }
-        
+
         this.setState({
             token: {
                 ...this.state.token,

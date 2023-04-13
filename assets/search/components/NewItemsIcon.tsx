@@ -7,7 +7,7 @@ import {Tooltip} from 'bootstrap';
 import {gettext, isTouchDevice, isWireContext} from 'utils';
 
 class NewItemsIcon extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.dom = {tooltip: null};

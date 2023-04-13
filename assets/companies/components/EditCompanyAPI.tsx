@@ -9,7 +9,7 @@ import CardEditor from 'components/CardEditor';
 
 
 export default class EditCompanyAPI extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.onIpWhitelistChange = this.onIpWhitelistChange.bind(this);
         this.onCardEdit = this.onCardEdit.bind(this);
@@ -25,7 +25,7 @@ export default class EditCompanyAPI extends React.Component {
         }
 
         if (get(nextProps, 'errors.allowed_ip_list')) {
-            this.setState({noListInput: false});   
+            this.setState({noListInput: false});
         }
     }
 
@@ -86,7 +86,7 @@ export default class EditCompanyAPI extends React.Component {
                 forceEditor={get(this.props, 'errors.allowed_ip_list')} />
         );
     }
-    
+
     render() {
         return (
             <Fragment>

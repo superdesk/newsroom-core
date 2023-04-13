@@ -22,7 +22,7 @@ function getDeliveryId(coverage) {
 }
 
 export default class CoverageItemStatus extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {wireItem: null};
         this.filterActions = this.filterActions.bind(this);

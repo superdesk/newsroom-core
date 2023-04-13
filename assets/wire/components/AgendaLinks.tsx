@@ -10,8 +10,8 @@ import PreviewBox from 'ui/components/PreviewBox';
 import AgendaCoverages from 'agenda/components/AgendaCoverages';
 import AgendaEventInfo from 'agenda/components/AgendaEventInfo';
 
-export default class AgendaLinks extends React.PureComponent {
-    constructor(props) {
+export default class AgendaLinks extends React.PureComponent<any, any> {
+    constructor(props: any) {
         super(props);
 
         this.openAgenda = this.openAgenda.bind(this);

@@ -13,7 +13,7 @@ import AuditInformation from 'components/AuditInformation';
 
 
 class EditNavigation extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
         this.state = {activeTab: 'navigation-details'};

@@ -9,7 +9,7 @@ import ItemVersion from './ItemVersion';
 
 
 class ListItemPreviousVersions extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {versions: [], loading: true, error: false};
         this.baseClass = this.props.isPreview ? 'wire-column__preview' : 'wire-articles';

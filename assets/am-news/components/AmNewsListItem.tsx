@@ -23,7 +23,7 @@ import {
 
 
 class AmNewsListItem extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.wordCount = wordCount(props.item);
         this.state = {previousVersions: false};

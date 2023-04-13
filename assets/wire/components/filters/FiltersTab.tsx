@@ -25,7 +25,7 @@ import {
 import {resultsFilteredSelector} from 'search/selectors';
 
 class FiltersTab extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.toggleGroup = this.toggleGroup.bind(this);

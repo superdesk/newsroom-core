@@ -35,12 +35,12 @@ import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
 
 
-class WirePreview extends React.PureComponent {
-    constructor(props) {
+class WirePreview extends React.PureComponent<any, any> {
+    constructor(props: any) {
         super(props);
     }
 
-    componentDidUpdate(nextProps) {
+    componentDidUpdate(nextProps: any) {
         if (!isEqualItem(nextProps.item, this.props.item)) {
             this.preview.scrollTop = 0; // reset scroll on change
         }

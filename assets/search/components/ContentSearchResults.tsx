@@ -17,7 +17,7 @@ import {
 import {Tag} from 'components/Tag';
 
 class ContentSearchResultsComponent extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {expanded: false};

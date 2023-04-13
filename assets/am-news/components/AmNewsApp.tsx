@@ -49,7 +49,7 @@ const modals = {
 };
 
 class AmNewsApp extends BaseApp {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.modals = modals;
         this.state = {isMobile: false};    // to cater for responsive behaviour during widnow resize

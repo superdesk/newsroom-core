@@ -5,8 +5,8 @@ import {get} from 'lodash';
 import {gettext} from 'utils';
 import DropdownFilter from 'components/DropdownFilter';
 
-export class UserListCompanyFilter extends React.PureComponent {
-    constructor(props) {
+export class UserListCompanyFilter extends React.PureComponent<any, any> {
+    constructor(props: any) {
         super(props);
 
         this.filter = {

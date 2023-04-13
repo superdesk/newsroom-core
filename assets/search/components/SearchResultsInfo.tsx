@@ -14,7 +14,7 @@ import NewItemsIcon from './NewItemsIcon';
 import {ContentSearchResults} from './ContentSearchResults';
 
 class SearchResultsInfo extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.saveMyTopic = this.saveMyTopic.bind(this);

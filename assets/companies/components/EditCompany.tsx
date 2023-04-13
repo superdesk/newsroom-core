@@ -58,7 +58,7 @@ function deriveInitialPermissionState(company, sectionList, productList) {
 }
 
 class EditCompany extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
         this.getUsers = this.getUsers.bind(this);

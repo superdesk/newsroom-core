@@ -23,12 +23,12 @@ import {AgendaPreviewPlanning} from './AgendaPreviewPlanning';
 import {AgendaPreviewEvent} from './AgendaPreviewEvent';
 import {AgendaRegistrationInvitationDetails} from './AgendaRegistrationInvitationDetails';
 
-class AgendaPreview extends React.PureComponent {
-    constructor(props) {
+class AgendaPreview extends React.PureComponent<any, any> {
+    constructor(props: any) {
         super(props);
     }
 
-    componentDidUpdate(nextProps) {
+    componentDidUpdate(nextProps: any) {
         if (!isEqualItem(nextProps.item, this.props.item) && this.props.item) {
             this.preview.scrollTop = 0; // reset scroll on change
         }

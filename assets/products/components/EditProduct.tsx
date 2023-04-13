@@ -18,7 +18,7 @@ const getProductCompanies = (product, companies) => ({
 });
 
 class EditProduct extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
         this.getPoductTestButton = this.getPoductTestButton.bind(this);

@@ -7,7 +7,7 @@ import ItemVersion from './ItemVersion';
 import {fetchNext, openItem} from '../actions';
 
 class ListItemNextVersion extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {next: null};
         this.open = this.open.bind(this);

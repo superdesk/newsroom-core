@@ -14,7 +14,7 @@ function isInput(field) {
 }
 
 class GeneralSettingsApp extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {
             values: {},
