@@ -191,7 +191,7 @@ class CompanyAdminAppComponent extends React.Component {
                                     resendUserInvite={this.props.resendUserInvite}
                                     currentUser={this.props.user}
                                     products={this.props.products}
-                                    hideFields={['user_type', 'company']}
+                                    hideFields={['company']}
                                 />
                             )}
                         </div>

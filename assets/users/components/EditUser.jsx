@@ -46,6 +46,8 @@ function EditUserComponent({
     const isAdmin = isUserAdmin(currentUser);
     const isCompanyAdmin = isUserCompanyAdmin(currentUser);
 
+    let company = companies.map((value)=> value.name);
+
     return (
         <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit User')}>
             <div className='list-item__preview-header'>
@@ -148,7 +150,12 @@ function EditUserComponent({
                                 readOnly={userTypeReadOnly(user, currentUser)}
                                 onChange={onChange}
                                 error={errors ? errors.user_type : null}/>)}
-                            {hideFields.includes('company') ? null : (<SelectInput
+                            {hideFields.includes('company') ? (<TextInput
+                                name='company'
+                                label={gettext('Company')}
+                                value={company[0]}
+                                onChange={onChange}
+                                error={errors ? errors.role : null} />) : (<SelectInput
                                 name='company'
                                 label={gettext('Company')}
                                 value={user.company}
