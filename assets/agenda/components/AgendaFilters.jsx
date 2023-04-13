@@ -51,7 +51,7 @@ const renderFilter = {
         )
     ),
     region: (props) => (
-        !['events', 'combined'].includes(props.itemTypeFilter || 'combined') ? null : (
+        !['events', 'planning', 'combined'].includes(props.itemTypeFilter || 'combined') ? null : (
             <DropdownFilter
                 key="region"
                 aggregations={props.aggregations}
