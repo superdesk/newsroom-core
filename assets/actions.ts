@@ -23,7 +23,7 @@ export function setUiConfig(config: any): any {
 
 export const MODAL_FORM_VALID = 'MODAL_FORM_VALID';
 export function modalFormValid(): any {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         if (!get(getState(), 'modal.formValid')) {
             dispatch({type: MODAL_FORM_VALID});
         }
@@ -34,7 +34,7 @@ export function modalFormValid(): any {
 
 export const MODAL_FORM_INVALID = 'MODAL_FORM_INVALID';
 export function modalFormInvalid(): any {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         if (get(getState(), 'modal.formValid')) {
             dispatch({type: MODAL_FORM_INVALID});
         }
@@ -50,7 +50,7 @@ export function userProfileClosed(): any {
 
 export const ADD_EDIT_USERS = 'ADD_EDIT_USERS';
 export function getEditUsers(item: any): any {
-    return function(dispatch, getState) {
+    return function(dispatch: any, getState: any) {
         let findUsers = [];
         const itemUsers = ([
             item.original_creator,

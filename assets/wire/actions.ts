@@ -56,7 +56,7 @@ export function previewAndCopy(item: any): any {
 }
 
 export function previewItem(item: any): any {
-    return (dispatch: any, getState: any) => {
+    return (dispatch: any,  getState: any) => {
         markItemAsRead(item, getState());
         dispatch(preview(item));
         recordAction(item, 'preview', getState().context, getState());
@@ -69,7 +69,7 @@ export function openItemDetails(item: any): any {
 }
 
 export function openItem(item: any): any {
-    return (dispatch: any, getState: any) => {
+    return (dispatch: any,  getState: any) => {
         const state = getState();
         markItemAsRead(item, state);
         dispatch(openItemDetails(item));
@@ -162,7 +162,7 @@ export function onItemsDeleted(ids: any): any {
  * This is an initial version, should be updated with preview markup changes.
  */
 export function copyPreviewContents(item: any): any {
-    return (dispatch: any, getState: any) => {
+    return (dispatch: any,  getState: any) => {
         const state = getState();
 
         if (!state.user) {
@@ -179,7 +179,7 @@ export function copyPreviewContents(item: any): any {
 }
 
 export function printItem(item: any): any {
-    return (dispatch: any, getState: any) => {
+    return (dispatch: any,  getState: any) => {
         const userContext = context(getState());
         let uri = `/${userContext}/${item._id}?print`;
         if (userContext === 'monitoring') {
@@ -247,7 +247,7 @@ export function search(state: any, next?: any, aggs?: any): any {
  * Fetch items for current query
  */
 export function fetchItems(): any {
-    return (dispatch: any, getState: any) => {
+    return (dispatch: any,  getState: any) => {
         const start = Date.now();
         dispatch(queryItems());
         dispatch(loadingAggregations());
@@ -268,7 +268,7 @@ export function fetchItems(): any {
 
 
 export function fetchItem(id: any): any {
-    return (dispatch: any, getState: any) => {
+    return (dispatch: any,  getState: any) => {
         return server.get(`/${context(getState())}/${id}?format=json&context=wire`)
             .then((data: any) => dispatch(recieveItem(data)))
             .catch(errorHandler);
@@ -281,7 +281,7 @@ export function fetchItem(id: any): any {
  * @return {function}
  */
 export function shareItems(items: any): any {
-    return (dispatch: any, getState: any) => {
+    return (dispatch: any,  getState: any) => {
         const user = getState().user;
         const company = getState().company;
         return server.get(`/companies/${company}/users`)
@@ -419,7 +419,7 @@ export function downloadItems(items: any): any {
  * @param {String} params
  */
 export function submitDownloadItems(items: any, params: any): any {
-    return (dispatch: any, getState: any) => {
+    return (dispatch: any,  getState: any) => {
         const {format, secondaryFormat} = params;
         const userContext = context(getState());
         let uri = `/download/${items.join(',')}?format=${format}&type=${userContext}`;
@@ -453,7 +453,7 @@ export function removeNewItems(data: any): any {
  * @param {Object} push
  */
 export function pushNotification(push: any): any {
-    return (dispatch: any, getState: any) => {
+    return (dispatch: any,  getState: any) => {
         const user = getState().user;
         const company = getState().company;
 
@@ -517,7 +517,7 @@ export function setNewItems(data: any): any {
 
 export function fetchNewItems(): any {
     return (dispatch: any, getState: any) => search(getState())
-        .then((response) => dispatch(setNewItems(response)));
+        .then((response: any) => dispatch(setNewItems(response)));
 }
 
 export function fetchNext(item: any): any {
@@ -532,7 +532,7 @@ export function fetchNext(item: any): any {
 
 export const TOGGLE_FILTER = 'TOGGLE_FILTER';
 export function toggleFilter(key: any, val: any, single: any): any {
-    return (dispatch) => {
+    return (dispatch: any) => {
         setTimeout(() => dispatch({type: TOGGLE_FILTER, key, val, single}));
     };
 }
@@ -549,7 +549,7 @@ export function recieveNextItems(data: any): any {
 
 const MAX_ITEMS = 1000; // server limit
 export function fetchMoreItems(): any {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const state = getState();
         const limit = Math.min(MAX_ITEMS, state.totalItems);
 
@@ -559,13 +559,13 @@ export function fetchMoreItems(): any {
 
         dispatch(startLoading());
         return search(getState(), true)
-            .then((data) => dispatch(recieveNextItems(data)))
+            .then((data: any) => dispatch(recieveNextItems(data)))
             .catch(errorHandler);
     };
 }
 
 export function loadMyWireTopic(topicId: any): any {
-    return (dispatch) => {
+    return (dispatch: any) => {
         dispatch(loadMyTopic(topicId));
         return dispatch(fetchItems());
     };
@@ -577,7 +577,7 @@ export function loadMyWireTopic(topicId: any): any {
  * @param {URLSearchParams} params
  */
 export function initParams(params: any): any {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         dispatch(initSearchParams(params));
         if (params.get('item')) {
             dispatch(fetchItem(params.get('item')))

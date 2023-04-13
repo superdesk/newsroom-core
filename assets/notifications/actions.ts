@@ -39,7 +39,7 @@ export function setNotificationsLoading(loading: any): any {
 }
 
 export function loadNotifications(): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         dispatch(setNotificationsLoading(true));
         const user = getState().user;
 
@@ -60,7 +60,7 @@ export function loadNotifications(): any {
  *
  */
 export function deleteNotification(id: any): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         const user = getState().user;
         const url = `/users/${user}/notifications/${user}_${id}`;
         return server.del(url)
@@ -78,7 +78,7 @@ export function deleteNotification(id: any): any {
  *
  */
 export function deleteAllNotifications(): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         const user = getState().user;
         const url = `/users/${user}/notifications`;
         return server.del(url)
@@ -97,7 +97,7 @@ export function deleteAllNotifications(): any {
  * @param {Object} push
  */
 export function pushNotification(push: any): any {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const user = getState().user;
         switch (push.event) {
         case 'new_notifications':

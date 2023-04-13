@@ -414,7 +414,7 @@ export function removeNewItems(data: any): any {
  * @param {Object} data
  */
 export function pushNotification(push: any): any {
-    return (dispatch: any, getState: any) => {
+    return (dispatch: any,  getState: any) => {
         const user = getState().user;
         const company = getState().company;
 
@@ -463,7 +463,7 @@ export function reloadMyTopics(reloadTopic = false): any {
 
 export const SET_NEW_ITEM = 'SET_NEW_ITEM';
 export function setAndUpdateNewItems(data: any): any {
-    return function(dispatch: any, getState: any) {
+    return function(dispatch: any,  getState: any) {
         const item = data.item || {};
 
         if (item.type !== 'agenda') {
@@ -620,7 +620,7 @@ export function loadMyAgendaTopic(topicId: any): any {
 
 export const TOGGLE_FEATURED_FILTER = 'TOGGLE_FEATURED_FILTER';
 export function toggleFeaturedFilter(fetch = true): any {
-    return (dispatch) => {
+    return (dispatch: any) => {
         toggleFeaturedOnlyParam();
         dispatch({type: TOGGLE_FEATURED_FILTER});
         if (!fetch) {
@@ -638,7 +638,7 @@ export function setItemTypeFilter(value: any): any {
 
 export const WATCH_COVERAGE = 'WATCH_COVERAGE';
 export function watchCoverage(coverage: any, item: any): any {
-    return (dispatch) => {
+    return (dispatch: any) => {
         server.post(WATCH_COVERAGE_URL, {
             coverage_id: coverage.coverage_id,
             item_id: item._id
@@ -656,7 +656,7 @@ export function watchCoverage(coverage: any, item: any): any {
 
 export const STOP_WATCHING_COVERAGE = 'STOP_WATCHING_COVERAGE';
 export function stopWatchingCoverage(coverage: any, item: any): any {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         server.del(WATCH_COVERAGE_URL, {
             coverage_id: coverage.coverage_id,
             item_id: item._id

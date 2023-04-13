@@ -8,7 +8,7 @@ function updateValues(data: any): any {
 }
 
 export function save(values: any): any {
-    return (dispatch) => {
+    return (dispatch: any) => {
         server.post('/settings/general_settings', values)
             .then((data) => {
                 notify.success(gettext('Settings were updated successfully.'));

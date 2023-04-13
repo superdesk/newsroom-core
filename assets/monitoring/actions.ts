@@ -15,7 +15,7 @@ export function setCompanies(data: any): any {
 }
 
 export function initViewData(data: any): any {
-    return function (dispatch) {
+    return function (dispatch: any) {
         dispatch(setCompanies(data.companies));
     };
 }
@@ -81,7 +81,7 @@ export function toggleScheduleMode(): any {
 }
 
 export function postMonitoringProfile(userProfile: any, notifyMsg: any): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const p = userProfile || monitoringProfileToEdit(getState());
         const url = `/monitoring/${p._id ? p._id : 'new'}`;
@@ -119,7 +119,7 @@ export function postMonitoringProfile(userProfile: any, notifyMsg: any): any {
 }
 
 export function fetchMonitoring(userCompany: any): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         dispatch(queryMonitoring());
         const companyFilter = userCompany || company(getState());
         const filter = get(companyFilter, 'length', 0) > 0 ? '&where={"company":"' + companyFilter + '"}' : '';
@@ -143,7 +143,7 @@ export function fetchMonitoring(userCompany: any): any {
 }
 
 export function fetchMonitoringCompanies(): any {
-    return function (dispatch) {
+    return function (dispatch: any) {
         return server.get('/monitoring/schedule_companies')
             .then((data) => {
                 dispatch(setMonitoringCompanies(data));
@@ -153,7 +153,7 @@ export function fetchMonitoringCompanies(): any {
 }
 
 export function saveMonitoringProfileUsers(users: any): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         const p = monitoringProfileToEdit(getState());
         return server.post(`/monitoring/${p._id}/users`, {users})
             .then(() => {
@@ -166,7 +166,7 @@ export function saveMonitoringProfileUsers(users: any): any {
 }
 
 export function saveMonitoringProfileSchedule(): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         const p = monitoringProfileToEdit(getState());
         if (!p._id) {
             notify.error(gettext('Please create the monitoring profile first.'));
@@ -183,7 +183,7 @@ export function saveMonitoringProfileSchedule(): any {
 }
 
 export function deleteMonitoringProfile(): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const p = monitoringProfileToEdit(getState());
         const url = `/monitoring/${p._id}`;

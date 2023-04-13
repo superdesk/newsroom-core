@@ -60,7 +60,7 @@ export function setError(errors: any): any {
  *
  */
 export function fetchProducts(): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         dispatch(queryProducts());
         const query = searchQuerySelector(getState()) || '';
 
@@ -76,7 +76,7 @@ export function fetchProducts(): any {
  *
  */
 export function postProduct(): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const product = getState().productToEdit;
         const url = `/products/${product._id ? product._id : 'new'}`;
@@ -101,7 +101,7 @@ export function postProduct(): any {
  *
  */
 export function deleteProduct(): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const product = getState().productToEdit;
         const url = `/products/${product._id}`;
@@ -121,7 +121,7 @@ export function deleteProduct(): any {
  *
  */
 export function fetchCompanies(): any {
-    return function (dispatch) {
+    return function (dispatch: any) {
         return server.get('/companies/search')
             .then((data) => {
                 dispatch(getCompanies(data));
@@ -135,7 +135,7 @@ export function fetchCompanies(): any {
  *
  */
 export function saveCompanies(companies: any): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         const product = getState().productToEdit;
         return server.post(`/products/${product._id}/companies`, {companies})
             .then(() => {
@@ -151,7 +151,7 @@ export function saveCompanies(companies: any): any {
  *
  */
 export function fetchNavigations(): any {
-    return function (dispatch) {
+    return function (dispatch: any) {
         return server.get('/navigations/search')
             .then((data) => {
                 dispatch(getNavigations(data));
@@ -165,7 +165,7 @@ export function fetchNavigations(): any {
  *
  */
 export function saveNavigations(navigations: any): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         const product = getState().productToEdit;
         return server.post(`/products/${product._id}/navigations`, {navigations})
             .then(() => {
@@ -177,7 +177,7 @@ export function saveNavigations(navigations: any): any {
 }
 
 export function initViewData(data: any): any {
-    return function (dispatch) {
+    return function (dispatch: any) {
         dispatch(getProducts(data.products));
         dispatch(getCompanies(data.companies));
         dispatch(getNavigations(data.navigations));

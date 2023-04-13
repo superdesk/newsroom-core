@@ -71,7 +71,7 @@ function getReportQueryString(currentState: any, next: any, exportReport: any, n
 
 export const INIT_DATA = 'INIT_DATA';
 export function initData(data: any): any {
-    return function (dispatch) {
+    return function (dispatch: any) {
         dispatch(fetchProducts());
         dispatch({type: INIT_DATA, data});
     };
@@ -113,14 +113,14 @@ export function getProducts(data: any): any {
 }
 
 export function runReport(): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         dispatch(queryReport());
         dispatch(fetchReport(REPORTS[getState().activeReport]));
     };
 }
 
 export function fetchAggregations(url: any): any {
-    return function(dispatch, getState) {
+    return function(dispatch: any, getState: any) {
         const queryString = getReportQueryString(getState(), 0, false, notify);
 
         server.get(`${url}?${queryString}&aggregations=1`)
@@ -137,8 +137,8 @@ export function fetchAggregations(url: any): any {
  * Fetches the report data
  *
  */
-export function fetchReport(url: any, next: any, exportReport: any): any {
-    return function (dispatch, getState) {
+export function fetchReport(url: any, next?: any, exportReport?: any): any {
+    return function (dispatch: any, getState: any) {
         if (next) {
             dispatch(isLoading(next));
         }
@@ -186,14 +186,14 @@ export function toggleFilter(filter: any, value: any): any {
 }
 
 export function toggleFilterAndQuery(filter: any, value: any): any {
-    return function (dispatch) {
+    return function (dispatch: any) {
         dispatch(toggleFilter(filter, value));
         return dispatch(runReport());
     };
 }
 
 export function printReport(): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         const state = getState();
         const activeReport = state.activeReport;
 
@@ -213,7 +213,7 @@ export function printReport(): any {
  *
  */
 export function fetchProducts(): any {
-    return function (dispatch) {
+    return function (dispatch: any) {
         return server.get('/products/search')
             .then((data) => {
                 dispatch(getProducts(data));

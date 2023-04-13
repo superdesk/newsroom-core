@@ -5,7 +5,7 @@ import {searchQuerySelector} from 'search/selectors';
 
 export const SELECT_COMPANY = 'SELECT_COMPANY';
 export function selectCompany(id: any): any {
-    return function (dispatch) {
+    return function (dispatch: any) {
         dispatch(select(id));
         dispatch(fetchCompanyUsers(id));
     };
@@ -61,7 +61,7 @@ export function setError(errors: any): any {
  *
  */
 export function fetchCompanies(): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         dispatch(queryCompanies());
         const query = searchQuerySelector(getState()) || '';
 
@@ -79,7 +79,7 @@ export function fetchCompanies(): any {
  * @param {String} companyId
  */
 export function fetchCompanyUsers(companyId: any,  force = false): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         if (!force && !getState().companiesById[companyId].name) {
             return;
         }
@@ -98,7 +98,7 @@ export function fetchCompanyUsers(companyId: any,  force = false): any {
  *
  */
 export function postCompany(permissions = null): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const company = getState().companyToEdit;
         const url = `/companies/${company._id ? company._id : 'new'}`;
@@ -128,7 +128,7 @@ export function postCompany(permissions = null): any {
  *
  */
 export function fetchProducts(): any {
-    return function (dispatch) {
+    return function (dispatch: any) {
         return server.get('/products/search')
             .then((data) => {
                 dispatch(getProducts(data));
@@ -143,7 +143,7 @@ export function fetchProducts(): any {
  *
  */
 export function savePermissions(company: any, permissions: any): any {
-    return function (dispatch) {
+    return function (dispatch: any) {
         return server.post(`/companies/${company._id}/permissions`, permissions)
             .catch((error) => errorHandler(error, dispatch, setError));
     };
@@ -155,7 +155,7 @@ export function savePermissions(company: any, permissions: any): any {
  *
  */
 export function deleteCompany(): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const company = getState().companyToEdit;
         const url = `/companies/${company._id}`;

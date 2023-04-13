@@ -54,7 +54,7 @@ export function getNavigations(data: any): any {
  *
  */
 export function fetchCards(): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         dispatch(queryCards());
         const query = searchQuerySelector(getState()) || '';
 
@@ -70,7 +70,7 @@ export function fetchCards(): any {
  *
  */
 export function postCard(): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const card = getState().cardToEdit;
         const data = new FormData();
@@ -146,7 +146,7 @@ export function postCard(): any {
  *
  */
 export function deleteCard(): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const card = getState().cardToEdit;
         const url = `/cards/${card._id}`;
@@ -166,7 +166,7 @@ export function deleteCard(): any {
  *
  */
 export function fetchProducts(): any {
-    return function (dispatch) {
+    return function (dispatch: any) {
         return server.get('/products/search')
             .then((data) => {
                 dispatch(getProducts(data));
@@ -177,7 +177,7 @@ export function fetchProducts(): any {
 
 
 export function initViewData(data: any): any {
-    return function (dispatch) {
+    return function (dispatch: any) {
         dispatch(getCards(data.cards));
         dispatch(getProducts(data.products));
         dispatch(getNavigations(data.navigations));

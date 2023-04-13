@@ -33,7 +33,7 @@ export function setError(errors: any): any {
 
 export const SELECT_MENU = 'SELECT_MENU';
 export function selectMenu(data: any): any {
-    return function(dispatch) {
+    return function(dispatch: any) {
         dispatch({type: SELECT_MENU, data});
         dispatch(reloadMyTopics());
     };
@@ -79,7 +79,7 @@ export function hideModal(): any {
  * Fetches user details
  */
 export function fetchUser(id: any): any {
-    return function (dispatch) {
+    return function (dispatch: any) {
         return server.get(`/users/${id}`)
             .then((data) => {
                 dispatch(getUser(data));
@@ -93,7 +93,7 @@ export function fetchUser(id: any): any {
  *
  */
 export function saveUser(): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const editedUser = {...getState().editedUser};
         const url = `/users/${editedUser._id}/profile`;
@@ -124,7 +124,7 @@ export function saveUser(): any {
  *
  */
 export function fetchTopics(): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         return server.get(`/users/${getState().user._id}/topics`)
             .then((data) => {
                 return dispatch(getTopics(data._items));
@@ -138,7 +138,7 @@ export function fetchTopics(): any {
  *
  */
 export function deleteTopic(topic: any): any {
-    return function (dispatch) {
+    return function (dispatch: any) {
         const url = `/topics/${topic._id}`;
         return server.del(url)
             .then(() => {
@@ -155,7 +155,7 @@ export function deleteTopic(topic: any): any {
  * @return {function}
  */
 export function shareTopic(items: any): any {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const user = getState().user;
         const company = getState().company;
         return server.get(`/companies/${company}/users`)
@@ -171,7 +171,7 @@ export function shareTopic(items: any): any {
  * @param {Object} data
  */
 export function submitShareTopic(data: any): any {
-    return (dispatch) => {
+    return (dispatch: any) => {
         return server.post('/topic_share', data)
             .then(() => {
                 notify.success(gettext('Topic was shared successfully.'));
@@ -187,7 +187,7 @@ export function submitShareTopic(data: any): any {
  *
  */
 export function submitFollowTopic(topic: any): any {
-    return (dispatch) => {
+    return (dispatch: any) => {
         const url = `/topics/${topic._id}`;
         return server.post(url, topic)
             .then(() => dispatch(fetchTopics()))
@@ -197,7 +197,7 @@ export function submitFollowTopic(topic: any): any {
 }
 
 function reloadMyTopics(): any {
-    return function(dispatch, getState) {
+    return function(dispatch: any, getState: any) {
         const reloadMyTopicsFunction = getState().selectedMenu === 'events' ? reloadMyAgendaTopics : reloadMyWireTopics;
 
         return dispatch(reloadMyTopicsFunction());
@@ -205,7 +205,7 @@ function reloadMyTopics(): any {
 }
 
 export function pushNotification(push: any): any {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const user = getState().user;
         const company = getState().company;
         const shouldReloadTopics = [

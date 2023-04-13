@@ -24,7 +24,7 @@ import {context} from 'selectors';
 
 export const SET_QUERY = 'SET_QUERY';
 export function setQuery(query: any): any {
-    return function(dispatch, getState) {
+    return function(dispatch: any, getState: any) {
         query && analytics.event('search', query);
         dispatch(setSearchQuery(query));
         updateRouteParams(
@@ -60,7 +60,7 @@ export function setTopics(topics: any): any {
 
 export const TOGGLE_NAVIGATION = 'TOGGLE_NAVIGATION';
 export function toggleNavigation(navigation: any, disableSameNavigationDeselect: any): any {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const state = getState();
         const currentNavigation = searchNavigationSelector(state);
         let newNavigation = [...currentNavigation];
@@ -109,7 +109,7 @@ export function toggleNavigation(navigation: any, disableSameNavigationDeselect:
 
 export const TOGGLE_FILTER = 'TOGGLE_FILTER';
 export function toggleFilter(key: any, value: any, single: any): any {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         const state = getState();
         const currentFilters = cloneDeep(searchFilterSelector(state));
 
@@ -138,7 +138,7 @@ export function toggleFilter(key: any, value: any, single: any): any {
 
 export const SET_CREATED_FILTER = 'SET_CREATED_FILTER';
 export function setCreatedFilter(filter: any): any {
-    return function(dispatch, getState) {
+    return function(dispatch: any, getState: any) {
         const state = getState();
 
         // Combine the current created filter with the one provided
@@ -161,7 +161,7 @@ export function setCreatedFilter(filter: any): any {
 
 export const RESET_FILTER = 'RESET_FILTER';
 export function resetFilter(filter: any): any {
-    return function(dispatch, getState) {
+    return function(dispatch: any, getState: any) {
         updateRouteParams({
             filter: null,
             created: null,
@@ -213,7 +213,7 @@ export function followStory(item: any, type: any): any {
  * @param {String} navigationId
  */
 export function toggleNavigationById(navigationId: any): any {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const navigation = (get(getState().search, 'navigations') || []).find((nav) => navigationId === nav._id);
         if (navigation) {
             dispatch(toggleNavigation(navigation));
@@ -227,7 +227,7 @@ export function toggleNavigationById(navigationId: any): any {
  * @param {Array<String>} navigationIds
  */
 export function toggleNavigationByIds(navigationIds: any): any {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const navigations = (get(getState().search, 'navigations') || []);
 
         toggleNavigation();
@@ -238,7 +238,7 @@ export function toggleNavigationByIds(navigationIds: any): any {
 }
 
 export function submitFollowTopic(data: any): any {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const user = getState().user;
         const userId = get(user, '_id') || user;
 
@@ -262,7 +262,7 @@ export function submitFollowTopic(data: any): any {
  * @param {Object} data
  */
 export function submitShareItem(data: any): any {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const userContext = context(getState());
         const type = userContext || data.items[0].topic_type;
         data.maps = [];
@@ -291,7 +291,7 @@ export function submitShareItem(data: any): any {
 }
 
 export function loadMyTopic(topicId: any): any {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const state = getState();
         const currentTopicId = searchTopicIdSelector(state);
         const nextTopicId = topicId === currentTopicId ? null : topicId;
@@ -311,7 +311,7 @@ export function loadMyTopic(topicId: any): any {
 }
 
 export function updateSearchParams(): any {
-    return function(dispatch, getState) {
+    return function(dispatch: any, getState: any) {
         dispatch(setParams(
             activeTopicSelector(getState())
         ));
@@ -319,7 +319,7 @@ export function updateSearchParams(): any {
 }
 
 export function updateFilterStateAndURL(activeFilter: any, createdFilter: any): any {
-    return function(dispatch, getState) {
+    return function(dispatch: any, getState: any) {
         const state = getState();
         dispatch(setSearchFilters(activeFilter));
         dispatch(setSearchCreated(createdFilter));
@@ -371,7 +371,7 @@ export function resetSearchParams(): any {
 }
 
 export function setParams(params: any): any {
-    return function(dispatch) {
+    return function(dispatch: any) {
         if (get(params, 'created')) {
             dispatch(setSearchCreated(params.created));
         }
@@ -400,7 +400,7 @@ export function setParams(params: any): any {
  * @param {URLSearchParams} params
  */
 export function initParams(params: any): any {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const custom = {
             query: params.get('q'),
             created: params.get('created') ? JSON.parse(params.get('created')) : null,
