@@ -8,7 +8,7 @@ import TextListInput from 'components/TextListInput';
 import CardEditor from 'components/CardEditor';
 
 
-export default class EditCompanyAPI extends React.Component {
+export default class EditCompanyAPI extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.onIpWhitelistChange = this.onIpWhitelistChange.bind(this);

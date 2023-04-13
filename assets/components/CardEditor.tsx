@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import {gettext} from 'utils';
 
-export default class CardEditor extends React.Component {
+export default class CardEditor extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.state = {open: this.props.forceEditor};

@@ -3,7 +3,7 @@ import Modal from 'components/Modal';
 import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 
-export default class ItemStatisticsModal extends React.Component {
+export default class ItemStatisticsModal extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
 
