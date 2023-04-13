@@ -42,11 +42,14 @@ export function CompanyUserListItem({user, onClick, selected, sections}) {
             <td>
                 <div className="name">
                     {user.first_name} {user.last_name}
-                    {user.user_type !== 'administrator' ? null : (
+                    {user.user_type === 'company_admin' ?
                         <label className="label label--green label--rounded label--fill">
-                            {gettext('admin')}
+                            {gettext('admin (C)')}
                         </label>
-                    )}
+                        : user.user_type === 'administrator' ?
+                            <label className="label label--green label--rounded label--fill">
+                                {gettext('admin')}
+                            </label> : null}
                 </div>
                 <div className="email">
                     {user.email}
