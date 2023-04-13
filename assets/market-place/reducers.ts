@@ -15,7 +15,7 @@ export default function marketPlaceHomeReducer(state = initialState, action: any
         const navigationById = keyBy(action.data.navigations|| [], '_id');
         (action.data.cards || []).forEach((card) => {
             card.config.navigations = (get(card, 'config.navigations') || [])
-                .map((nav) => {
+                .map((nav: any) => {
                     const navigation = get(navigationById, nav);
                     if (!navigation) {
                         // company does not have permission for navigation
@@ -27,7 +27,7 @@ export default function marketPlaceHomeReducer(state = initialState, action: any
                     navigation.href = `/${action.data.context}/?${params.toString()}`;
 
                     return navigation;
-                }).filter((nav) => nav);
+                }).filter((nav: any) => nav);
         });
         return {
             ...state,

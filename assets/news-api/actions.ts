@@ -13,7 +13,7 @@ export function generateTokenForCompany(token: any): any {
     newToken.expiry = !token.expiry ? null : token.expiry;
 
     return server.post('/news_api_tokens', newToken)
-        .then((data) => {
+        .then((data: any) => {
             notify.success(gettext('API Token generated successfully'));
             return data.token;
         });

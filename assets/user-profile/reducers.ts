@@ -41,7 +41,7 @@ export default function itemReducer(state = initialState, action: any): any {
 
     case GET_TOPICS: {
         const topicsById = Object.assign({}, state.topicsById);
-        const topics = action.topics.map((topic) => {
+        const topics = action.topics.map((topic: any) => {
             topicsById[topic._id] = topic;
             return topic;
         });

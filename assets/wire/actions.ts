@@ -115,7 +115,7 @@ export function recieveItem(data: any): any {
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(wireData: any, newsOnlyFilterText: any, readData: any, newsOnly: any, searchAllVersions: any): any {
+export function initData(wireData: any, newsOnlyFilterText?: any, readData?: any, newsOnly?: any, searchAllVersions?: any): any {
     return {type: INIT_DATA, wireData, newsOnlyFilterText, readData, newsOnly, searchAllVersions};
 }
 
@@ -236,8 +236,8 @@ export function search(state: any, next?: any, aggs?: any): any {
 
 
     const queryString = Object.keys(params)
-        .filter((key) => params[key] != null && params[key].toString() !== '')
-        .map((key) => `${key}=${params[key]}`)
+        .filter((key: any) => params[key] != null && params[key].toString() !== '')
+        .map((key: any) => `${key}=${params[key]}`)
         .join('&');
 
     return server.get(`/${context}/search?${queryString}`);

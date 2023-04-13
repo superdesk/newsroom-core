@@ -62,13 +62,13 @@ export function searchReducer(state=INITIAL_STATE, action: any): any {
     }
 
     case TOGGLE_FILTER: {
-        const activeFilter = Object.assign({}, state.activeFilter);
+        const activeFilter: any = Object.assign({}, state.activeFilter);
         activeFilter[action.key] = toggleValue(activeFilter[action.key], action.val);
         if (!action.val || !activeFilter[action.key] || activeFilter[action.key].length === 0) {
             delete activeFilter[action.key];
         }
         else if (action.single) {
-            activeFilter[action.key] = activeFilter[action.key].filter((val) => val === action.val);
+            activeFilter[action.key] = activeFilter[action.key].filter((val: any) => val === action.val);
         }
         return {
             ...state,

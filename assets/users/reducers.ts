@@ -37,7 +37,7 @@ const initialState = {
     products: [],
 };
 
-export default function userReducer(state = initialState, action: any): any {
+export default function userReducer(state: any = initialState, action: any): any {
     switch (action.type) {
     case INIT_VIEW_DATA:
         return {
@@ -102,7 +102,7 @@ export default function userReducer(state = initialState, action: any): any {
                     section: section,
                 });
             } else {
-                user.products = user.products.filter((product) => product._id !== productId);
+                user.products = user.products.filter((product: any) => product._id !== productId);
             }
         } else {
             user[field] = value;
@@ -141,8 +141,8 @@ export default function userReducer(state = initialState, action: any): any {
             activeQuery: state.query};
 
     case GET_USERS: {
-        const usersById = Object.assign({}, state.usersById);
-        const users = action.data.map((user) => {
+        const usersById: any = Object.assign({}, state.usersById);
+        const users = action.data.map((user: any) => {
             usersById[user._id] = user;
             return user._id;
         });
@@ -157,11 +157,11 @@ export default function userReducer(state = initialState, action: any): any {
     }
 
     case REMOVE_USER: {
-        const usersById = Object.assign({}, state.usersById);
+        const usersById: any = Object.assign({}, state.usersById);
         const userToEdit = state.userToEdit && state.userToEdit._id === action.userId ?
             null :
             state.userToEdit;
-        const users = state.users.filter((userId) => userId !== action.userId);
+        const users = state.users.filter((userId: any) => userId !== action.userId);
 
         delete usersById[action.userId];
 
@@ -175,8 +175,8 @@ export default function userReducer(state = initialState, action: any): any {
     }
 
     case GET_COMPANIES: {
-        const companiesById = {};
-        action.data.map((company) => companiesById[company._id] = company);
+        const companiesById: any = {};
+        action.data.map((company: any) => companiesById[company._id] = company);
 
         return {...state, companies: action.data, companiesById};
 

@@ -50,8 +50,8 @@ export function fetchSectionFilters(): any {
         const query = searchQuerySelector(getState()) || '';
 
         return server.get(`/section_filters/search?q=${query}`)
-            .then((data) => dispatch(getSectionFilters(data)))
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .then((data: any) => dispatch(getSectionFilters(data)))
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -75,7 +75,7 @@ export function postSectionFilter(): any {
                 }
                 dispatch(fetchSectionFilters());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
 
     };
 }
@@ -96,7 +96,7 @@ export function deleteSectionFilter(): any {
                 notify.success(gettext('Section Filter deleted successfully'));
                 dispatch(fetchSectionFilters());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 

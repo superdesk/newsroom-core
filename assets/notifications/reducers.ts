@@ -51,7 +51,7 @@ export default function notificationReducer(state = initialState, action: any): 
 
 
     case CLEAR_NOTIFICATION:{
-        const notifications = state.notifications.filter((n) => n.item !== action.id);
+        const notifications = state.notifications.filter((n: any) => n.item !== action.id);
         return {
             ...state,
             notifications: notifications,

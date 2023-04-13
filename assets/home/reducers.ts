@@ -11,7 +11,7 @@ import {CLOSE_MODAL, MODAL_FORM_VALID, RENDER_MODAL} from '../actions';
 import {modalReducer} from '../reducers';
 import {topicsReducer} from '../topics/reducer';
 
-const initialState = {
+const initialState: any = {
     cards: [],
     topics: [],
     products: [],
@@ -66,7 +66,7 @@ export default function homeReducer(state=initialState, action: any): any {
 
     case REMOVE_BOOKMARK: {
         const itemToOpen = Object.assign({}, state.itemToOpen);
-        itemToOpen.bookmarks = (itemToOpen.bookmarks || []).filter((val) => val !== state.user);
+        itemToOpen.bookmarks = (itemToOpen.bookmarks || []).filter((val: any) => val !== state.user);
 
         return {
             ...state,

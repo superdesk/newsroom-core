@@ -78,7 +78,7 @@ export default function sectionFiltersReducer(state = initialState, action: any)
 
     case GET_SECTION_FILTERS: {
         const sectionFiltersById = Object.assign({}, state.sectionFiltersById);
-        const sectionFilters = action.data.map((sectionFilter) => {
+        const sectionFilters = action.data.map((sectionFilter: any) => {
             sectionFiltersById[sectionFilter._id] = sectionFilter;
             return sectionFilter._id;
         });

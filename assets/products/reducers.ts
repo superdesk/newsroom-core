@@ -30,7 +30,7 @@ const initialState = {
     search: searchReducer(),
 };
 
-export default function productReducer(state = initialState, action: any): any {
+export default function productReducer(state: any = initialState, action: any): any {
     switch (action.type) {
 
     case SELECT_PRODUCT: {
@@ -82,8 +82,8 @@ export default function productReducer(state = initialState, action: any): any {
             activeQuery: state.query};
 
     case GET_PRODUCTS: {
-        const productsById = Object.assign({}, state.productsById);
-        const products = action.data.map((product) => {
+        const productsById: any = Object.assign({}, state.productsById);
+        const products = action.data.map((product: any) => {
             productsById[product._id] = product;
             return product._id;
         });
@@ -99,21 +99,21 @@ export default function productReducer(state = initialState, action: any): any {
 
     case GET_COMPANIES: {
         const companiesById = {};
-        action.data.map((company) => companiesById[company._id] = company);
+        action.data.map((company: any) => companiesById[company._id] = company);
 
         return {...state, companies: action.data, companiesById};
     }
 
     case GET_NAVIGATIONS: {
-        const navigationsById = {};
-        action.data.map((navigation) => navigationsById[navigation._id] = navigation);
+        const navigationsById: any = {};
+        action.data.map((navigation: any) => navigationsById[navigation._id] = navigation);
 
         return {...state, navigations: action.data, navigationsById};
     }
 
     case UPDATE_PRODUCT_NAVIGATIONS: {
         const product = Object.assign({}, action.product, {navigations: action.navigations});
-        const productsById = Object.assign({}, state.productsById);
+        const productsById: any = Object.assign({}, state.productsById);
         productsById[action.product._id] = product;
 
         return {...state, productsById, productToEdit: product};

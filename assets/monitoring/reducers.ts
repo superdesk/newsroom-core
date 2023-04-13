@@ -17,7 +17,7 @@ import {
 import {GET_COMPANY_USERS} from 'companies/actions';
 import {ADD_EDIT_USERS} from 'actions';
 
-const initialState = {
+const initialState: any = {
     companies: [],
     monitoringList: [],
     monitoringListById: null,
@@ -37,8 +37,8 @@ export default function monitoringReducer(state = initialState, action: any): an
         };
 
     case SET_COMPANIES: {
-        const companiesById = {};
-        action.data.map((company) => companiesById[company._id] = company);
+        const companiesById: any = {};
+        action.data.map((company: any) => companiesById[company._id] = company);
         return {...state, companies: action.data, companiesById};
 
     }
@@ -85,7 +85,7 @@ export default function monitoringReducer(state = initialState, action: any): an
 
     case SET_MONITORING_LIST: {
         const monitoringListById = Object.assign({}, state.monitoringListById);
-        const profiles = action.data.map((p) => {
+        const profiles = action.data.map((p: any) => {
             monitoringListById[p._id] = p;
             return p._id;
         });
@@ -123,8 +123,8 @@ export default function monitoringReducer(state = initialState, action: any): an
             scheduleMode: !state.scheduleMode,
         };
 
-    case SET_USER_COMPANY_MONITORING_LIST: 
-        return {...state, monitoringList: action.data};     
+    case SET_USER_COMPANY_MONITORING_LIST:
+        return {...state, monitoringList: action.data};
 
     case ADD_EDIT_USERS: {
         return {

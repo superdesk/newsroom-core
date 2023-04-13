@@ -24,7 +24,7 @@ export function getUserTypes(user: any): any {
     if (isUserAdmin(user)) {
         return userTypes;
     }
-    return userTypes.filter((opt) => (get(opt, 'show_acc_mgr') === true));
+    return userTypes.filter((opt: any) => (get(opt, 'show_acc_mgr') === true));
 }
 
 export function isUserAdmin(user: any): any {
@@ -41,8 +41,8 @@ export function canUserManageTopics(user: any): any {
 
 export function getLocaleInputOptions(): any {
     return (window.locales || [])
-        .filter((locale) => locale.locale !== window.locale) // this will be default value
-        .map((locale) => ({value: locale.locale, text: locale.name}));
+        .filter((locale: any) => locale.locale !== window.locale) // this will be default value
+        .map((locale: any) => ({value: locale.locale, text: locale.name}));
 }
 
 export function getDefaultLocale(): any {

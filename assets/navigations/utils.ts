@@ -9,8 +9,8 @@ export function getProductTypes(navigation: any, products: any): any {
         return '';
     }
 
-    const productTypes = {};
-    products.filter((product) => (product.navigations || []).includes(navigation._id)).forEach((p) =>
+    const productTypes: any = {};
+    products.filter((product: any) => (product.navigations || []).includes(navigation._id)).forEach((p) =>
         p.product_type ? productTypes[p.product_type] = 1 : productTypes['wire'] = 1
     );
 

@@ -59,8 +59,8 @@ export function fetchCards(): any {
         const query = searchQuerySelector(getState()) || '';
 
         return server.get(`/cards/search?q=${query}`)
-            .then((data) => dispatch(getCards(data)))
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .then((data: any) => dispatch(getCards(data)))
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -117,7 +117,7 @@ export function postCard(): any {
 
         if (card.type === '2x2-events') {
             [...Array(4)].forEach((_, i) => {
-                const input = document.getElementById(`config.events[${i}].file`);
+                const input: any = document.getElementById(`config.events[${i}].file`);
                 if (input && input.files.length > 0) {
                     data.append(`file${i}`, input.files[0]);
                 }
@@ -135,7 +135,7 @@ export function postCard(): any {
                 }
                 dispatch(fetchCards());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
 
     };
 }
@@ -156,7 +156,7 @@ export function deleteCard(): any {
                 notify.success(gettext('Card deleted successfully'));
                 dispatch(fetchCards());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -168,10 +168,10 @@ export function deleteCard(): any {
 export function fetchProducts(): any {
     return function (dispatch: any) {
         return server.get('/products/search')
-            .then((data) => {
+            .then((data: any) => {
                 dispatch(getProducts(data));
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 

@@ -62,8 +62,8 @@ function getReportQueryString(currentState: any, next: any, exportReport: any, n
 
         params['from'] = next ? get(currentState, 'results.length') : 0;
         const queryString = Object.keys(params)
-            .filter((key) => params[key])
-            .map((key) => [key, params[key]].join('='))
+            .filter((key: any) => params[key])
+            .map((key: any) => [key, params[key]].join('='))
             .join('&');
         return queryString;
     }
@@ -124,7 +124,7 @@ export function fetchAggregations(url: any): any {
         const queryString = getReportQueryString(getState(), 0, false, notify);
 
         server.get(`${url}?${queryString}&aggregations=1`)
-            .then((data) => {
+            .then((data: any) => {
                 dispatch({
                     type: 'RECEIVE_REPORT_AGGREGATIONS',
                     data: data,
@@ -162,7 +162,7 @@ export function fetchReport(url: any, next?: any, exportReport?: any): any {
             apiRequest = server.get(url);
         }
 
-        return apiRequest.then((data) => {
+        return apiRequest.then((data: any) => {
             if (!next) {
                 dispatch(receivedData(data));
             } else {
@@ -170,7 +170,7 @@ export function fetchReport(url: any, next?: any, exportReport?: any): any {
                 dispatch(addResults(get(data, 'results', [])));
             }
         })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -215,9 +215,9 @@ export function printReport(): any {
 export function fetchProducts(): any {
     return function (dispatch: any) {
         return server.get('/products/search')
-            .then((data) => {
+            .then((data: any) => {
                 dispatch(getProducts(data));
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }

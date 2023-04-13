@@ -17,7 +17,7 @@ import {
 import {initData} from '../actions';
 
 describe('wire actions', () => {
-    let store;
+    let store: any;
     const response = {
         _meta: {total: 2},
         _items: [{_id: 'foo'}],
@@ -148,7 +148,7 @@ describe('wire actions', () => {
         fetchMock.get(`/wire/${item._id}/versions`, {_items: [{_id: 'bar'}, {_id: 'baz'}]});
 
         return store.dispatch(actions.fetchVersions(item))
-            .then((versions) => {
+            .then((versions: any) => {
                 expect(versions.length).toBe(2);
                 expect(versions[0]._id).toBe('bar');
             });
@@ -160,7 +160,7 @@ describe('wire actions', () => {
         fetchMock.get('/wire/bar?format=json', next);
 
         return store.dispatch(actions.fetchNext(item))
-            .then((_next) => {
+            .then((_next: any) => {
                 expect(_next).toEqual(next);
             });
     });

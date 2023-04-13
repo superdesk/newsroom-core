@@ -27,6 +27,6 @@ export function sendProductSeatRequest(data: any): any {
     return function (dispatch: any) {
         return server.post('/company_admin/send_product_seat_request', data)
             .then(() => notify.success(gettext('Product Seat request sent')))
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }

@@ -59,7 +59,7 @@ export function setTopics(topics: any): any {
 }
 
 export const TOGGLE_NAVIGATION = 'TOGGLE_NAVIGATION';
-export function toggleNavigation(navigation: any, disableSameNavigationDeselect: any): any {
+export function toggleNavigation(navigation?: any, disableSameNavigationDeselect?: any): any {
     return (dispatch: any, getState: any) => {
         const state = getState();
         const currentNavigation = searchNavigationSelector(state);
@@ -232,8 +232,8 @@ export function toggleNavigationByIds(navigationIds: any): any {
 
         toggleNavigation();
         navigations
-            .filter((nav) => navigationIds.includes(nav._id))
-            .forEach((nav) => dispatch(toggleNavigation(nav)));
+            .filter((nav: any) => navigationIds.includes(nav._id))
+            .forEach((nav: any) => dispatch(toggleNavigation(nav)));
     };
 }
 
@@ -245,7 +245,7 @@ export function submitFollowTopic(data: any): any {
         const url = `/users/${userId}/topics`;
         data.timezone_offset = getTimezoneOffset();
         return server.post(url, data)
-            .then((updates) => {
+            .then((updates: any) => {
                 const topic = Object.assign(data, updates);
 
                 dispatch(addTopic(topic));
@@ -273,7 +273,7 @@ export function submitShareItem(data: any): any {
         }
 
         if (type === 'agenda') {
-            data.items.map((_id) => data.maps.push(getMapSource(getLocations(getState().itemsById[_id]), 2)));
+            data.items.map((_id: any) => data.maps.push(getMapSource(getLocations(getState().itemsById[_id]), 2)));
         }
         return server.post(`/${url}?type=${type}`, data)
             .then(() => {
@@ -285,7 +285,7 @@ export function submitShareItem(data: any): any {
                     notify.success(gettext('Item was shared successfully.'));
                 }
             })
-            .then(() => analytics.multiItemEvent('share', data.items.map((_id) => getState().itemsById[_id])))
+            .then(() => analytics.multiItemEvent('share', data.items.map((_id: any) => getState().itemsById[_id])))
             .catch(errorHandler);
     };
 }

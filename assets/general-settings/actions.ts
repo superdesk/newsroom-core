@@ -10,10 +10,10 @@ function updateValues(data: any): any {
 export function save(values: any): any {
     return (dispatch: any) => {
         server.post('/settings/general_settings', values)
-            .then((data) => {
+            .then((data: any) => {
                 notify.success(gettext('Settings were updated successfully.'));
                 dispatch(updateValues(data));
-            }, (reason) => errorHandler(reason));
+            }, (reason: any) => errorHandler(reason));
     };
 }
 

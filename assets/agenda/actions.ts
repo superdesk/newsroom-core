@@ -248,8 +248,8 @@ function search(state: any, next?: boolean): any {
     };
 
     const queryString = Object.keys(params)
-        .filter((key) => params[key])
-        .map((key) => [key, params[key]].join('='))
+        .filter((key: any) => params[key])
+        .map((key: any) => [key, params[key]].join('='))
         .join('&');
 
     return server.get(`/agenda/search?${queryString}&tick=${Date.now().toString()}`);
@@ -480,7 +480,7 @@ export function setAndUpdateNewItems(data: any): any {
                 return Promise.resolve();
             }
 
-            const coveragesToCheck = (agendaItem.coverages || []).map((c) => c.coverage_id);
+            const coveragesToCheck = (agendaItem.coverages || []).map((c: any) => c.coverage_id);
 
             if (coveragesToCheck.includes(item.coverage_id)) {
                 dispatch(fetchWireItemsForAgenda(agendaItem));

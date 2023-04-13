@@ -31,9 +31,9 @@ const initialState = {
 };
 
 function setupCompanies(companyList: any, state: any): any {
-    const companiesById = {};
-    const companyOptions = [];
-    const companies = companyList.map((company) => {
+    const companiesById: any = {};
+    const companyOptions: any = [];
+    const companies = companyList.map((company: any) => {
         companiesById[company._id] = company;
         companyOptions.push({value: company._id, text: company.name});
         return company._id;
