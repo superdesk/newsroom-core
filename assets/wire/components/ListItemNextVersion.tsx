@@ -14,7 +14,7 @@ class ListItemNextVersion extends React.Component {
         this.fetch(props);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (nextProps.item.nextversion !== this.props.item.nextversion) {
             this.fetch(nextProps);
         }

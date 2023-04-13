@@ -14,7 +14,7 @@ class AuditInformation extends React.Component {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (!get(this.props, 'users.length') && (
             get(this.props, 'item._created') !== get(nextProps, 'item._created') ||
             get(this.props, 'item._updated') !== get(nextProps, 'item._updated')

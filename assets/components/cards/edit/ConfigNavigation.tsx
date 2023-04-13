@@ -32,7 +32,7 @@ class ConfigNavigation extends React.Component {
         ) : [];
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (nextProps.card._id !== this.props.card._id) {
             this.setState({items: this.getCardNavigations(get(nextProps.card, 'config.navigations') || [])});
         }

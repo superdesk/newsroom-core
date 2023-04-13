@@ -3,58 +3,28 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {get, isEmpty} from 'lodash';
-
-import {getItemFromArray, gettext} from 'utils';
-import {noNavigationSelected} from 'search/utils';
-
-import {
-    fetchItems,
-    selectDate,
-    fetchMoreItems,
-    previewItem,
-    toggleDropdownFilter,
-    openItemDetails,
-    requestCoverage,
-    toggleFeaturedFilter,
-} from 'agenda/actions';
-
-import {
-    setView,
-    setQuery,
-    saveMyTopic,
-} from 'search/actions';
-
-import {
-    searchQuerySelector,
-    activeViewSelector,
-    searchFilterSelector,
-    searchCreatedSelector,
-    searchNavigationSelector,
-    navigationsSelector,
-    topicsSelector,
-    activeTopicSelector,
-    searchParamsSelector,
-    showSaveTopicSelector,
-} from 'search/selectors';
-
-import BaseApp from 'layout/components/BaseApp';
-import AgendaPreview from './AgendaPreview';
-import AgendaList from './AgendaList';
-import SearchBar from 'search/components/SearchBar';
-import SearchSidebar from 'wire/components/SearchSidebar';
-import SelectedItemsBar from 'wire/components/SelectedItemsBar';
-import AgendaListViewControls from './AgendaListViewControls';
-import DownloadItemsModal from 'wire/components/DownloadItemsModal';
-import AgendaItemDetails from 'agenda/components/AgendaItemDetails';
-import SearchResultsInfo from 'search/components/SearchResultsInfo';
-
-import ShareItemModal from 'components/ShareItemModal';
+import BookmarkTabs from 'assets/components/BookmarkTabs';
+import ShareItemModal from 'assets/components/ShareItemModal';
+import {SearchBar} from 'assets/home/components/search-bar';
+import BaseApp from 'assets/layout/components/BaseApp';
+import {setAgendaDropdownFilter, setActiveDate} from 'assets/local-store';
+import {saveMyTopic, setView, setQuery} from 'assets/search/actions';
+import SearchResultsInfo from 'assets/search/components/SearchResultsInfo';
+import {searchQuerySelector, searchFilterSelector, searchCreatedSelector, topicsSelector, activeViewSelector, navigationsSelector, activeTopicSelector, searchNavigationSelector, searchParamsSelector, showSaveTopicSelector} from 'assets/search/selectors';
+import {noNavigationSelected} from 'assets/search/utils';
+import {previewConfigSelector, detailsConfigSelector} from 'assets/ui/selectors';
+import {getItemFromArray, gettext} from 'assets/utils';
+import DownloadItemsModal from 'assets/wire/components/DownloadItemsModal';
+import SearchSidebar from 'assets/wire/components/SearchSidebar';
+import SelectedItemsBar from 'assets/wire/components/SelectedItemsBar';
+import {fetchItems, fetchMoreItems, previewItem, toggleDropdownFilter, selectDate, openItemDetails, requestCoverage, toggleFeaturedFilter} from '../actions';
 import {getAgendaItemActions, getCoverageItemActions} from '../item-actions';
-import AgendaFilters from './AgendaFilters';
 import AgendaDateNavigation from './AgendaDateNavigation';
-import BookmarkTabs from 'components/BookmarkTabs';
-import {setActiveDate, setAgendaDropdownFilter} from 'local-store';
-import {previewConfigSelector, detailsConfigSelector} from 'ui/selectors';
+import AgendaFilters from './AgendaFilters';
+import AgendaItemDetails from './AgendaItemDetails';
+import AgendaList from './AgendaList';
+import AgendaListViewControls from './AgendaListViewControls';
+import AgendaPreview from './AgendaPreview';
 
 const modals = {
     shareItem: ShareItemModal,
@@ -62,6 +32,9 @@ const modals = {
 };
 
 class AgendaApp extends BaseApp {
+    modals: any;
+    tabs: any;
+    static propTypes: any;
     constructor(props: any) {
         super(props);
         this.modals = modals;
@@ -70,7 +43,7 @@ class AgendaApp extends BaseApp {
     }
 
     getTabs() {
-        return this.props.featuredOnly ?  this.tabs.filter((t) => t.id !== 'filters') : this.tabs;
+        return this.props.featuredOnly ?  this.tabs.filter((t: any) => t.id !== 'filters') : this.tabs;
     }
 
 
@@ -99,7 +72,7 @@ class AgendaApp extends BaseApp {
         });
 
         const onDetailClose = this.props.detail ? null :
-            () => this.props.actions.filter(a => a.id === 'open')[0].action(null, this.props.previewGroup, this.props.previewPlan);
+            () => this.props.actions.filter((a: any) => a.id === 'open')[0].action(null, this.props.previewGroup, this.props.previewPlan);
         const eventsOnly = this.props.itemTypeFilter === 'events' || this.props.eventsOnlyAccess;
         const hideFeaturedToggle = !noNavigationSelected(this.props.activeNavigation) ||
             this.props.bookmarks ||

@@ -1,10 +1,9 @@
-import {gettext, notify, errorHandler} from 'utils';
-import server from 'server';
-import {renderModal, closeModal} from 'actions';
 import {store as userProfileStore} from './store';
-import {getLocale} from '../utils';
+import {errorHandler, getLocale, gettext, notify} from '../utils';
 import {reloadMyTopics as reloadMyAgendaTopics} from '../agenda/actions';
 import {reloadMyTopics as reloadMyWireTopics} from '../wire/actions';
+import {renderModal, closeModal} from 'assets/actions';
+import {server} from 'karma';
 
 export const GET_TOPICS = 'GET_TOPICS';
 export function getTopics(topics: any): any {
@@ -56,7 +55,7 @@ export function createOrUpdateTopic(menu: any, item: any, fullscreen: any): any 
 }
 
 export const SELECT_PROFILE_MENU = 'SELECT_PROFILE_MENU';
-export function selectProfileMenu({menu: any, item}: any): any {
+export function selectProfileMenu({menu, item}: any): any {
     userProfileStore.dispatch({
         type: SELECT_PROFILE_MENU,
         menu: menu,
@@ -80,7 +79,7 @@ export function hideModal(): any {
  */
 export function fetchUser(id: any): any {
     return function (dispatch: any) {
-        return server.get(`/users/${id}`)
+        return (server as any).get(`/users/${id}`)
             .then((data: any) => {
                 dispatch(getUser(data));
             })
@@ -102,7 +101,7 @@ export function saveUser(): any {
         delete editedUser.sections;
         delete editedUser.products;
 
-        return server.post(url, editedUser)
+        return (server as any).post(url, editedUser)
             .then(function() {
                 notify.success(gettext('User updated successfully'));
                 dispatch(fetchUser(editedUser._id));
@@ -125,7 +124,7 @@ export function saveUser(): any {
  */
 export function fetchTopics(): any {
     return function (dispatch: any, getState: any) {
-        return server.get(`/users/${getState().user._id}/topics`)
+        return (server as any).get(`/users/${getState().user._id}/topics`)
             .then((data: any) => {
                 return dispatch(getTopics(data._items));
             })
@@ -140,7 +139,7 @@ export function fetchTopics(): any {
 export function deleteTopic(topic: any): any {
     return function (dispatch: any) {
         const url = `/topics/${topic._id}`;
-        return server.del(url)
+        return (server as any).del(url)
             .then(() => {
                 notify.success(gettext('Topic deleted successfully'));
                 dispatch(fetchTopics());
@@ -158,7 +157,7 @@ export function shareTopic(items: any): any {
     return (dispatch: any, getState: any) => {
         const user = getState().user;
         const company = getState().company;
-        return server.get(`/companies/${company}/users`)
+        return (server as any).get(`/companies/${company}/users`)
             .then((users: any) => users.filter((u: any) => u._id !== user._id))
             .then((users: any) => dispatch(renderModal('shareItem', {items, users})))
             .catch(errorHandler);
@@ -172,7 +171,7 @@ export function shareTopic(items: any): any {
  */
 export function submitShareTopic(data: any): any {
     return (dispatch: any) => {
-        return server.post('/topic_share', data)
+        return (server as any).post('/topic_share', data)
             .then(() => {
                 notify.success(gettext('Topic was shared successfully.'));
                 dispatch(closeModal());
@@ -189,7 +188,7 @@ export function submitShareTopic(data: any): any {
 export function submitFollowTopic(topic: any): any {
     return (dispatch: any) => {
         const url = `/topics/${topic._id}`;
-        return server.post(url, topic)
+        return (server as any).post(url, topic)
             .then(() => dispatch(fetchTopics()))
             .then(() => dispatch(closeModal()))
             .catch(errorHandler);

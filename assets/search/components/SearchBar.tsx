@@ -40,7 +40,7 @@ class SearchBar extends React.Component {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         this.setState({query: nextProps.query});
     }
 

@@ -19,7 +19,7 @@ export default class EditCompanyAPI extends React.Component {
         this.state = {noListInput: true};
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (!isEqual(get(this.props, 'company.allowed_ip_list'), get(nextProps, 'company.allowed_ip_list'))) {
             this.setState({noListInput: true});
         }

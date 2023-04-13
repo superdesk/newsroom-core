@@ -27,7 +27,7 @@ class GeneralSettingsApp extends React.Component {
         this.onSubmit = this.onSubmit.bind(this);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (nextProps.updatedTime !== this.props.updatedTime) {
             this.setState({
                 _updated: nextProps.updatedTime

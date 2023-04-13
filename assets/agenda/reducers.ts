@@ -1,5 +1,4 @@
 import {
-    SET_EVENT_QUERY,
     RECIEVE_ITEMS,
     INIT_DATA,
     SELECT_DATE,
@@ -14,10 +13,10 @@ import {
 } from './actions';
 
 import {get, uniq} from 'lodash';
-import {EXTENDED_VIEW} from 'wire/defaults';
-import {searchReducer} from 'search/reducers';
 import {defaultReducer} from '../reducers';
 import {EARLIEST_DATE} from './utils';
+import {searchReducer} from 'assets/search/reducers';
+import {EXTENDED_VIEW} from 'assets/wire/defaults';
 
 const initialState = {
     items: [],
@@ -95,18 +94,15 @@ function _agendaReducer(state: any, action: any): any {
     }
 }
 
-export default function agendaReducer(state = initialState, action: any): any {
+export default function agendaReducer(state: any = initialState, action?: any): any {
     switch (action.type) {
 
     case RECIEVE_ITEMS:
         return recieveItems(state, action.data);
 
-    case SET_EVENT_QUERY:
-        return {...state, query: action.query, activeItem: null};
-
     case WATCH_EVENTS: {
         const itemsById: any = Object.assign({}, state.itemsById);
-        action.items.forEach((_id) => {
+        action.items.forEach((_id: any) => {
             const watches = get(itemsById[_id], 'watches', []).concat(state.user);
             itemsById[_id] = Object.assign({}, itemsById[_id], {watches});
             (get(itemsById[_id], 'coverages') || []).forEach((c: any) => {
@@ -136,7 +132,7 @@ export default function agendaReducer(state = initialState, action: any): any {
     case STOP_WATCHING_COVERAGE: {
         const itemsById: any = Object.assign({}, state.itemsById);
         const item = itemsById[get(action, 'item._id')];
-        const coverage = (get(item, 'coverages') || []).find((c) => c.coverage_id === action.coverage.coverage_id);
+        const coverage = (get(item, 'coverages') || []).find((c: any) => c.coverage_id === action.coverage.coverage_id);
         if (coverage) {
             coverage['watches'] = (get(coverage, 'watches') || []).filter((u: any) => u !== state.user);
         }

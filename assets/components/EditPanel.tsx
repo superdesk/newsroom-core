@@ -62,7 +62,7 @@ class EditPanel extends React.Component {
         this.initItems(this.props);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (this.state.activeParent !== nextProps.parent._id ||
             get(this.props, 'items.length', 0) !== get(nextProps, 'items.length', 0)) {
             this.initItems(nextProps);

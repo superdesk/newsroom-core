@@ -9,8 +9,8 @@
   "scripts": {
     "start": "webpack-dev-server --progress --colors --content-base dist --host 0.0.0.0",
     "build": "export NODE_ENV=production && webpack --config webpack.config.js --progress --profile --colors",
-    "lint": "eslint *.js assets --ext .js --ext .jsx",
-    "fix": "eslint *.js assets --ext .js --ext .jsx --fix",
+    "lint": "eslint *.ts assets --ext .ts --ext .tsx",
+    "fix": "eslint *.ts assets --ext .ts --ext .tsx --fix",
     "test": "karma start --single-run",
     "karma": "karma start"
   },

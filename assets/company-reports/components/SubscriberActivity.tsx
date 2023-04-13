@@ -40,7 +40,7 @@ class SubscriberActivity extends React.Component {
         this.props.runReport();
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (this.props.reportParams !== nextProps.reportParams) {
             // Filtering done
             this.previousScrollTop = 0;

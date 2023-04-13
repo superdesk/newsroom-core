@@ -81,7 +81,7 @@ class ContentActivity extends React.Component {
         this.props.fetchAggregations(REPORTS['content-activity']);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (this.props.results !== nextProps.results) {
             this.updateResults(nextProps);
         }

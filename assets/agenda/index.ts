@@ -1,10 +1,11 @@
-import {createStore, render, initWebSocket, getInitData, isMobilePhone, closeItemOnMobile} from 'utils';
-
 import agendaReducer from './reducers';
-import {getActiveDate, getReadItems, getFeaturedOnlyParam} from 'local-store';
 import AgendaApp from './components/AgendaApp';
 import {fetchItems, setState, initData, initParams, pushNotification, openItemDetails, previewItem} from './actions';
-import {setView} from 'search/actions';
+import {getReadItems, getActiveDate, getFeaturedOnlyParam} from 'assets/local-store';
+import {setView} from 'assets/search/actions';
+import {createStore, getInitData, closeItemOnMobile, isMobilePhone} from 'assets/utils';
+import {initWebSocket} from 'assets/websocket';
+import {render} from 'react-dom';
 
 const store = createStore(agendaReducer, 'Agenda');
 
@@ -27,7 +28,7 @@ window.onpopstate = function(event) {
         closeItemOnMobile(store.dispatch, event.state, openItemDetails, previewItem);
         if (!isMobilePhone()) {
             store.dispatch(setState(event.state));
-            store.dispatch(fetchItems(false));
+            store.dispatch(fetchItems());
         }
     }
 };
@@ -36,7 +37,7 @@ window.onpopstate = function(event) {
 store.dispatch(fetchItems());
 
 // render app
-render(store, AgendaApp, document.getElementById('agenda-app'));
+render(store as any, AgendaApp as any, document.getElementById('agenda-app') as any);
 
 // initialize web socket listener
 initWebSocket(store, pushNotification);

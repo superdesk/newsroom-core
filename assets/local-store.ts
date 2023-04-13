@@ -16,7 +16,7 @@ const FILTER_PANEL_OPEN = 'filter_open';
 const ACTIVE_DATE = 'active_date';
 const DROPDOWN_FILTERS = 'dropdown_filters';
 
-const store = Store.createStore([localStorage], [operationsPlugin, expirePlugin]);
+const store = Store.createStore([localStorage as any], [operationsPlugin, expirePlugin] as any);
 
 /**
  * Get read items

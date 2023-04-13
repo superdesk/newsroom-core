@@ -3,16 +3,19 @@ import PropTypes from 'prop-types';
 import {get} from 'lodash';
 import {createPortal} from 'react-dom';
 import {Tooltip} from 'bootstrap';
-import {isTouchDevice, gettext, isDisplayed, isMobilePhone} from 'utils';
-import {getSingleFilterValue} from 'search/utils';
-import {getFilterPanelOpenState, setFilterPanelOpenState} from 'local-store';
+import {getFilterPanelOpenState, setFilterPanelOpenState} from 'assets/local-store';
+import TopicsTab from 'assets/search/components/TopicsTab';
+import {getSingleFilterValue} from 'assets/search/utils';
+import {isMobilePhone, gettext, isDisplayed, isTouchDevice} from 'assets/utils';
+import FiltersTab from 'assets/wire/components/filters/FiltersTab';
+import NavigationTab from 'assets/wire/components/filters/NavigationTab';
 
-// tabs
-import TopicsTab from 'search/components/TopicsTab';
-import FiltersTab from 'wire/components/filters/FiltersTab';
-import NavigationTab from 'wire/components/filters/NavigationTab';
-
-export default class BaseApp extends React.Component {
+export default class BaseApp extends React.Component<any, any> {
+    dom: any;
+    tooltips: any;
+    tabs: any;
+    modals: any;
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 
@@ -46,7 +49,7 @@ export default class BaseApp extends React.Component {
         ];
     }
 
-    static getDerivedStateFromProps(props) {
+    static getDerivedStateFromProps(props: any) {
         if (props.isLoading === false) {
             return {initialLoad: false};
         }
@@ -54,19 +57,19 @@ export default class BaseApp extends React.Component {
         return null;
     }
 
-    setOpenRef(elem) {
+    setOpenRef(elem: any) {
         this.dom.open = elem;
     }
 
-    setCloseRef(elem) {
+    setCloseRef(elem: any) {
         this.dom.close = elem;
     }
 
-    setListRef(elem) {
+    setListRef(elem: any) {
         this.dom.list = elem;
     }
 
-    renderModal(specs) {
+    renderModal(specs: any) {
         if (specs) {
             const Modal = this.modals[specs.modal];
             return (
@@ -75,7 +78,7 @@ export default class BaseApp extends React.Component {
         }
     }
 
-    renderNavBreadcrumb(navigations, activeNavigation, activeTopic, activeProduct = null, activeFilter = null) {
+    renderNavBreadcrumb(navigations: any, activeNavigation: any, activeTopic: any, activeProduct: any = null, activeFilter = null) {
         const dest = document.getElementById('nav-breadcrumb');
         if (!dest) {
             return null;
@@ -90,7 +93,7 @@ export default class BaseApp extends React.Component {
         } else if (numNavigations > 1) {
             name = '/ ' + gettext('Custom View');
         } else if (numNavigations === 1) {
-            name = '/ ' + get(navigations.find((nav) => nav._id === activeNavigation[0]), 'name', '');
+            name = '/ ' + get(navigations.find((nav: any) => nav._id === activeNavigation[0]), 'name', '');
         } else if (activeProduct != null) {
             name = `/ ${activeProduct.name}`;
         } else if (filterValue !== null) {
@@ -119,18 +122,18 @@ export default class BaseApp extends React.Component {
         );
     }
 
-    toggleSidebar(event) {
+    toggleSidebar(event: any) {
         event.preventDefault();
         this.setState({withSidebar: !this.state.withSidebar});
         setFilterPanelOpenState(!this.state.withSidebar, this.props.context);
     }
 
-    onListScroll(event) {
+    onListScroll(event: any) {
         const BUFFER = 10;
         const container = event.target;
 
         // this probably won't happen with react 17 but keeping it for now
-        if (container !== this.dom.list && !this.dom.list.contains(container)) {
+        if (container !== this.dom.list && !this.dom.list?.contains(container)) {
             // Not scrolled on the actual list
             return;
         }
@@ -152,8 +155,8 @@ export default class BaseApp extends React.Component {
         }
     }
 
-    filterActions(item, config, includeCoverages=false) {
-        return this.props.actions.filter((action) => (!config || isDisplayed(action.id, config)) &&
+    filterActions(item: any, config: any, includeCoverages=false) {
+        return this.props.actions.filter((action: any) => (!config || isDisplayed(action.id, config)) &&
           (!action.when || action.when(this.props.state, item, includeCoverages)));
     }
 

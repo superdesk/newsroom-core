@@ -46,12 +46,12 @@ function AgendaCoveragesComponent({
         return slugline ? ` | ${slugline}` : '';
     };
 
-    const coveragesWithoutState = coverages.filter((coverage) => WORKFLOW_COLORS[coverage.workflow_status] == null);
-    const coveragesWithState = coverages.filter((coverage) => WORKFLOW_COLORS[coverage.workflow_status] != null);
+    const coveragesWithoutState = coverages?.filter((coverage) => WORKFLOW_COLORS[coverage.workflow_status] == null);
+    const coveragesWithState = coverages?.filter((coverage) => WORKFLOW_COLORS[coverage.workflow_status] != null);
 
     return (
         <React.Fragment>
-            {!coveragesWithoutState.length ? null : (
+            {!coveragesWithoutState?.length ? null : (
                 <div>
                     {coveragesWithoutState.map((coverage) => (
                         <i
@@ -62,7 +62,7 @@ function AgendaCoveragesComponent({
                     ))}
                 </div>
             )}
-            {coveragesWithState.map((coverage) => (
+            {coveragesWithState?.map((coverage) => (
                 <div
                     className={classNames(
                         'coverage-item',

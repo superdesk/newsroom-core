@@ -9,7 +9,7 @@ class BannerDrop extends React.Component {
         this.toggleOpen = this.toggleOpen.bind(this);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (this.props.id !== nextProps.id &&
                 this.state.open !== nextProps.isOpen) {
             this.setState({open: nextProps.isOpen});

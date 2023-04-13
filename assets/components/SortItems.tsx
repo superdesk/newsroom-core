@@ -13,7 +13,7 @@ class SortItems extends React.Component {
         this.onRemove = this.onRemove.bind(this);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         this.setState({items: nextProps.items});
     }
 

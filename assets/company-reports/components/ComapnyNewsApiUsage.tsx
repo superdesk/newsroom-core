@@ -19,7 +19,7 @@ class ComapnyNewsApiUsage extends React.Component {
         this.previousScrollTop = 0;
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (this.props.reportParams !== nextProps.reportParams) {
             // Filtering done
             this.previousScrollTop = 0;

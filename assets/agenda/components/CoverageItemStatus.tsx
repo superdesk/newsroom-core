@@ -1,27 +1,28 @@
 import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
-import {gettext} from 'utils';
 import {
     getCoverageStatusText,
     WORKFLOW_STATUS,
     isCoverageBeingUpdated,
     isWatched,
 } from '../utils';
-
 import AgendaInternalNote from './AgendaInternalNote';
 import AgendaEdNote from './AgendaEdNote';
-import ActionButton from 'components/ActionButton';
+import ActionButton from 'assets/components/ActionButton';
+import {gettext} from 'assets/utils';
 
-function getDeliveryHref(coverage) {
+function getDeliveryHref(coverage: any) {
     return get(coverage, 'delivery_href');
 }
 
-function getDeliveryId(coverage) {
+function getDeliveryId(coverage: any) {
     return get(coverage, 'delivery_id');
 }
 
-export default class CoverageItemStatus extends React.Component {
+export default class CoverageItemStatus extends React.Component<any, any> {
+    static propTypes: any;
+    static defaultProps: any;
     constructor(props: any) {
         super(props);
         this.state = {wireItem: null};
@@ -29,7 +30,7 @@ export default class CoverageItemStatus extends React.Component {
         this.onAnchorClick = this.onAnchorClick.bind(this);
     }
 
-    onAnchorClick(e) {
+    onAnchorClick(e: any) {
         e.stopPropagation();
     }
 
@@ -37,11 +38,11 @@ export default class CoverageItemStatus extends React.Component {
         this.setWireItem(this.props);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         this.setWireItem(nextProps);
     }
 
-    setWireItem(props) {
+    setWireItem(props: any) {
         const wireId = getDeliveryId(props.coverage);
         if (wireId && get(props, 'wireItems.length', 0) > 0) {
             this.setState({wireItem: props.wireItems.find((w) => w._id === wireId)});
@@ -58,10 +59,10 @@ export default class CoverageItemStatus extends React.Component {
         return '';
     }
 
-    getStatusContent(coverage) {
+    getStatusContent(coverage: any) {
         const actionsToShow = this.filterActions();
         const parentWatched = isWatched(this.props.item, this.props.user);
-        const actions = actionsToShow.map((action) =>
+        const actions = actionsToShow.map((action: any) =>
             <span className="coverage-item--element-grow" key="action-button">
                 <ActionButton
                     key={action.name}
@@ -122,7 +123,7 @@ export default class CoverageItemStatus extends React.Component {
     }
 
     filterActions() {
-        return this.props.actions.filter((action) => !action.when ||
+        return this.props.actions.filter((action: any) => !action.when ||
             action.when(this.props.coverage, this.props.user, this.props.item));
     }
 
