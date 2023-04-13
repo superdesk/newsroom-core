@@ -29,7 +29,7 @@ export const REPORTS = {
     [REPORTS_NAMES.EXPIRED_COMPANIES]: '/reports/expired-companies',
 };
 
-function getReportQueryString(currentState, next, exportReport, notify) {
+function getReportQueryString(currentState: any, next: any, exportReport: any, notify: any): any {
     const params = cloneDeep(currentState.reportParams);
     if (params) {
         if (params.company) {
@@ -70,7 +70,7 @@ function getReportQueryString(currentState, next, exportReport, notify) {
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(data) {
+export function initData(data: any): any {
     return function (dispatch) {
         dispatch(fetchProducts());
         dispatch({type: INIT_DATA, data});
@@ -78,48 +78,48 @@ export function initData(data) {
 }
 
 export const QUERY_REPORT = 'QUERY_REPORT';
-export function queryReport() {
+export function queryReport(): any {
     return {type: QUERY_REPORT};
 }
 
 export const SET_ACTIVE_REPORT = 'SET_ACTIVE_REPORT';
-export function setActiveReport(data) {
+export function setActiveReport(data: any): any {
     return {type: SET_ACTIVE_REPORT, data};
 }
 
 export const RECEIVED_DATA = 'RECEIVED_DATA';
-export function receivedData(data) {
+export function receivedData(data: any): any {
     return {type: RECEIVED_DATA, data};
 }
 
 export const ADD_RESULTS = 'ADD_RESULTS';
-export function addResults(results) {
+export function addResults(results: any): any {
     return {type: ADD_RESULTS, data: results};
 }
 
 export const SET_ERROR = 'SET_ERROR';
-export function setError(errors) {
+export function setError(errors: any): any {
     return {type: SET_ERROR, errors};
 }
 
 export const SET_IS_LOADING = 'SET_IS_LOADING';
-export function isLoading(data = false) {
+export function isLoading(data = false): any {
     return {type: SET_IS_LOADING, data};
 }
 
 export const GET_PRODUCTS = 'GET_PRODUCTS';
-export function getProducts(data) {
+export function getProducts(data: any): any {
     return {type: GET_PRODUCTS, data};
 }
 
-export function runReport() {
+export function runReport(): any {
     return function (dispatch, getState) {
         dispatch(queryReport());
         dispatch(fetchReport(REPORTS[getState().activeReport]));
     };
 }
 
-export function fetchAggregations(url) {
+export function fetchAggregations(url: any): any {
     return function(dispatch, getState) {
         const queryString = getReportQueryString(getState(), 0, false, notify);
 
@@ -137,7 +137,7 @@ export function fetchAggregations(url) {
  * Fetches the report data
  *
  */
-export function fetchReport(url, next, exportReport) {
+export function fetchReport(url: any, next: any, exportReport: any): any {
     return function (dispatch, getState) {
         if (next) {
             dispatch(isLoading(next));
@@ -175,7 +175,7 @@ export function fetchReport(url, next, exportReport) {
 }
 
 export const TOGGLE_REPORT_FILTER = 'TOGGLE_REPORT_FILTER';
-export function toggleFilter(filter, value) {
+export function toggleFilter(filter: any, value: any): any {
     return {
         type: TOGGLE_REPORT_FILTER,
         data: {
@@ -185,14 +185,14 @@ export function toggleFilter(filter, value) {
     };
 }
 
-export function toggleFilterAndQuery(filter, value) {
+export function toggleFilterAndQuery(filter: any, value: any): any {
     return function (dispatch) {
         dispatch(toggleFilter(filter, value));
         return dispatch(runReport());
     };
 }
 
-export function printReport() {
+export function printReport(): any {
     return function (dispatch, getState) {
         const state = getState();
         const activeReport = state.activeReport;
@@ -212,7 +212,7 @@ export function printReport() {
  * Fetches products
  *
  */
-export function fetchProducts() {
+export function fetchProducts(): any {
     return function (dispatch) {
         return server.get('/products/search')
             .then((data) => {

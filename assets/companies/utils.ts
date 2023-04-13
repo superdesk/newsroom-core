@@ -7,10 +7,10 @@ export const countries = [
     {value: 'other', text: gettext('Other')},
 ];
 
-export function getCountryLabel(code) {
+export function getCountryLabel(code: any): any {
     return (countries.find(c => c.value === code) || {}).text;
 }
 
-export function isProductEnabled(products, productId) {
+export function isProductEnabled(products: any, productId: any): any {
     return products.findIndex((product) => product._id === productId) !== -1;
 }

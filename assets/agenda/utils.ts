@@ -44,7 +44,7 @@ const Groupers = {
     'month': formatMonth,
 };
 
-export function getCoverageStatusText(coverage: any) {
+export function getCoverageStatusText(coverage: any: any): any {
     if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
         return get(DRAFT_STATUS_TEXTS, coverage.coverage_status, '');
     }
@@ -115,7 +115,7 @@ export const EARLIEST_DATE = moment('20170101').valueOf();
  * @param {Object} item
  * @return {Boolean}
  */
-export function isCanceled(item: any) {
+export function isCanceled(item: any: any): any {
     return item && (item.state === STATUS_CANCELED || item.state === STATUS_KILLED);
 }
 
@@ -125,7 +125,7 @@ export function isCanceled(item: any) {
  * @param {Object} item
  * @return {Boolean}
  */
-export function isPostponed(item: any) {
+export function isPostponed(item: any: any): any {
     return item && item.state === STATUS_POSTPONED;
 }
 
@@ -135,7 +135,7 @@ export function isPostponed(item: any) {
  * @param {Object} item
  * @return {Boolean}
  */
-export function isRescheduled(item: any) {
+export function isRescheduled(item: any: any): any {
     return item && item.state === STATUS_RESCHEDULED;
 }
 
@@ -145,7 +145,7 @@ export function isRescheduled(item: any) {
  * @param {Object} item
  * @return {Boolean}
  */
-export function hasCoverages(item: any) {
+export function hasCoverages(item: any: any): any {
     return !isEmpty(get(item, 'coverages'));
 }
 
@@ -155,7 +155,7 @@ export function hasCoverages(item: any) {
  * @param coverageType
  * @returns {*}
  */
-export function getCoverageIcon(coverageType: any) {
+export function getCoverageIcon(coverageType: any: any): any {
     const coverageTypes = getConfig('coverage_types', {});
     return get(coverageTypes, `${coverageType}.icon`, 'unrecognized');
 }
@@ -166,7 +166,7 @@ export function getCoverageIcon(coverageType: any) {
  * @param coverageType
  * @returns {*}
  */
-export function getCoverageDisplayName(coverageType: any) {
+export function getCoverageDisplayName(coverageType: any: any): any {
     const coverageTypes = getConfig('coverage_types', {});
     const locale = (window.locale || 'en').toLowerCase();
 
@@ -181,7 +181,7 @@ export function getCoverageDisplayName(coverageType: any) {
  * @param {String} userId
  * @return {Boolean}
  */
-export function isWatched(item: any, userId: string) {
+export function isWatched(item: any: any, userId: string: any): any {
     return userId && includes(get(item, 'watches', []), userId);
 }
 
@@ -192,7 +192,7 @@ export function isWatched(item: any, userId: string) {
  * @param {String} dateString
  * @return {Boolean}
  */
-export function isCoverageForExtraDay(coverage: any) {
+export function isCoverageForExtraDay(coverage: any: any): any {
     return coverage.scheduled != null;
 }
 
@@ -202,7 +202,7 @@ export function isCoverageForExtraDay(coverage: any) {
  * @param {Object} item
  * @return {Boolean}
  */
-export function isRecurring(item: any) {
+export function isRecurring(item: any: any): any {
     return item && !!item.recurrence_id;
 }
 
@@ -212,7 +212,7 @@ export function isRecurring(item: any) {
  * @param {Object} item
  * @return {String}
  */
-export function getGeoLocation(item: any) {
+export function getGeoLocation(item: any: any): any {
     return get(item, 'location.location', null);
 }
 
@@ -222,7 +222,7 @@ export function getGeoLocation(item: any) {
  * @param {Object} item
  * @return {String}
  */
-export function getLocationString(item: any) {
+export function getLocationString(item: any: any): any {
     return [
         get(item, 'location.0.name', get(item, 'location.0.address.title')),
         get(item, 'location.0.address.line.0'),
@@ -239,11 +239,11 @@ export function getLocationString(item: any) {
  * @param {Object} item
  * @return {Boolean}
  */
-export function hasLocation(item) {
+export function hasLocation(item: any): any {
     return !!getLocationString(item);
 }
 
-export function hasLocationNotes(item) {
+export function hasLocationNotes(item: any): any {
     return get(item, 'location[0].details[0].length', 0) > 0;
 }
 
@@ -253,7 +253,7 @@ export function hasLocationNotes(item) {
  * @param {Object} item
  * @return {String}
  */
-export function getPublicContacts(item) {
+export function getPublicContacts(item: any): any {
     const contacts = get(item, 'event.event_contact_info', []);
     return contacts.filter(c => c.public).map(c => ({
         name: [c.first_name, c.last_name].filter((x) => !!x).join(' '),
@@ -270,24 +270,24 @@ export function getPublicContacts(item) {
  * @param {Object} item
  * @return {String}
  */
-export function getCalendars(item) {
+export function getCalendars(item: any): any {
     return (get(item, 'calendars') || []).map(cal => cal.name).join(', ');
 }
 
-export function getAgendaNames(item) {
+export function getAgendaNames(item: any): any {
     return (get(item, 'agendas') || [])
         .map((agenda) => agenda.name)
         .join(', ');
 }
 
-export function isPlanningItem(item) {
+export function isPlanningItem(item: any): any {
     return item.item_type === 'planning' || (
         item.item_type == null &&
         item.event_id == null
     );
 }
 
-export function planHasEvent(item) {
+export function planHasEvent(item: any): any {
     return isPlanningItem(item) && item.event_id != null;
 }
 
@@ -297,7 +297,7 @@ export function planHasEvent(item) {
  * @param {Object} item
  * @return {String}
  */
-export function getEventLinks(item) {
+export function getEventLinks(item: any): any {
     return get(item, 'event.links') || [];
 }
 
@@ -308,7 +308,7 @@ export function getEventLinks(item) {
  * @param {String} dateString
  * @return {String}
  */
-export function formatNavigationDate(dateString, grouping) {
+export function formatNavigationDate(dateString: any, grouping: any): any {
     return navigationFunctions[grouping].format(dateString);
 }
 
@@ -319,7 +319,7 @@ export function formatNavigationDate(dateString, grouping) {
  * @param {String} dateString
  * @return {String}
  */
-export function getDateInputDate(dateString) {
+export function getDateInputDate(dateString: any): any {
     if (dateString) {
         const parsed = moment(parseInt(dateString));
         return parsed.format('YYYY-MM-DD');
@@ -334,7 +334,7 @@ export function getDateInputDate(dateString) {
  * @param {String} dateString
  * @return {String}
  */
-export function getMomentDate(dateString) {
+export function getMomentDate(dateString: any): any {
     if (dateString) {
         return moment(parseInt(dateString));
     }
@@ -348,7 +348,7 @@ export function getMomentDate(dateString) {
  * @param {String} dateString
  * @return {String} number of milliseconds since the Unix Epoch
  */
-function getNextDay(dateString) {
+function getNextDay(dateString: any): any {
     return moment(dateString).add(1, 'days').valueOf();
 }
 
@@ -359,7 +359,7 @@ function getNextDay(dateString) {
  * @param {String} dateString
  * @return {String} number of milliseconds since the Unix Epoch
  */
-function getPreviousDay(dateString) {
+function getPreviousDay(dateString: any): any {
     return moment(dateString).add(-1, 'days').valueOf();
 }
 
@@ -369,7 +369,7 @@ function getPreviousDay(dateString) {
  * @param {String} dateString
  * @return {String} number of milliseconds since the Unix Epoch
  */
-function getNextWeek(dateString) {
+function getNextWeek(dateString: any): any {
     return moment(dateString).add(7, 'days').isoWeekday(1).valueOf();
 }
 
@@ -380,7 +380,7 @@ function getNextWeek(dateString) {
  * @param {String} dateString
  * @return {String} number of milliseconds since the Unix Epoch
  */
-function getPreviousWeek(dateString) {
+function getPreviousWeek(dateString: any): any {
     return moment(dateString).add(-7, 'days').isoWeekday(1).valueOf();
 }
 
@@ -390,7 +390,7 @@ function getPreviousWeek(dateString) {
  * @param {String} dateString
  * @return {String} number of milliseconds since the Unix Epoch
  */
-function getNextMonth(dateString) {
+function getNextMonth(dateString: any): any {
     return moment(dateString).add(1, 'months').startOf('month').valueOf();
 }
 
@@ -401,7 +401,7 @@ function getNextMonth(dateString) {
  * @param {String} dateString
  * @return {String} number of milliseconds since the Unix Epoch
  */
-export function getPreviousMonth(dateString) {
+export function getPreviousMonth(dateString: any): any {
     return moment(dateString).add(-1, 'months').startOf('month').valueOf();
 }
 
@@ -412,7 +412,7 @@ export function getPreviousMonth(dateString) {
  * @param {String} grouping: day, week or month
  * @return {String} number of milliseconds since the Unix Epoch
  */
-export function getNext(dateString, grouping) {
+export function getNext(dateString: any, grouping: any): any {
     return navigationFunctions[grouping].next(dateString);
 }
 
@@ -423,7 +423,7 @@ export function getNext(dateString, grouping) {
  * @param {String} grouping: day, week or month
  * @return {String} number of milliseconds since the Unix Epoch
  */
-export function getPrevious(dateString, grouping) {
+export function getPrevious(dateString: any, grouping: any): any {
     return navigationFunctions[grouping].previous(dateString);
 }
 
@@ -433,7 +433,7 @@ export function getPrevious(dateString, grouping) {
  * @param {Object} item
  * @return {Array}
  */
-export function getAttachments(item) {
+export function getAttachments(item: any): any {
     return get(item, 'event.files', []);
 }
 
@@ -443,7 +443,7 @@ export function getAttachments(item) {
  * @param {Object} item
  * @return {Array}
  */
-export function getInternalNote(item, plan) {
+export function getInternalNote(item: any, plan: any): any {
     return get(plan, 'internal_note') || get(item, 'event.internal_note');
 }
 
@@ -453,7 +453,7 @@ export function getInternalNote(item, plan) {
  * @param {Object} item
  * @return {Object}
  */
-export function getDataFromCoverages(item) {
+export function getDataFromCoverages(item: any): any {
     const planningItems = get(item, 'planning_items', []);
     const data = {
         'internal_note': {},
@@ -531,7 +531,7 @@ const getNextPendingScheduledUpdate = (coverage) => {
  * @param {Object} item
  * @return {Array}
  */
-export function getSubjects(item) {
+export function getSubjects(item: any): any {
     return get(item, 'subject') || [];
 }
 
@@ -541,7 +541,7 @@ export function getSubjects(item) {
  * @param {Object} item
  * @return {Boolean}
  */
-export function hasAttachments(item) {
+export function hasAttachments(item: any): any {
     return !isEmpty(getAttachments(item));
 }
 
@@ -551,7 +551,7 @@ export function hasAttachments(item) {
  * @param {Object} item
  * @return {String}
  */
-export function getName(item) {
+export function getName(item: any): any {
     return item.name || item.slugline || item.headline;
 }
 
@@ -562,7 +562,7 @@ export function getName(item) {
  * @param {Object} plan
  * @return {String}
  */
-export function getDescription(item, plan) {
+export function getDescription(item: any, plan: any): any {
     return plan.description_text || item.definition_short;
 }
 
@@ -573,7 +573,7 @@ export function getDescription(item, plan) {
  * @param {Object} item
  * @return {Array} list of dates
  */
-export function getExtraDates(item) {
+export function getExtraDates(item: any): any {
     return getDisplayDates(item).map((ed) => moment(ed.date));
 }
 
@@ -582,7 +582,7 @@ export function getExtraDates(item) {
  * @param item: Event or Planning item
  * @returns {Array.<{date: moment.Moment}>}
  */
-export function getDisplayDates(item) {
+export function getDisplayDates(item: any): any {
     const matchedPlanning = get(item, '_hits.matched_planning_items');
 
     if (matchedPlanning == null) {
@@ -628,7 +628,7 @@ export function getDisplayDates(item) {
  * @param {Date} date to check (moment)
  * @return {Boolean}
  */
-export function containsExtraDate(item, dateToCheck) {
+export function containsExtraDate(item: any, dateToCheck: any): any {
     return getDisplayDates(item).map(ed => moment(ed.date).format('YYYY-MM-DD')).includes(dateToCheck.format('YYYY-MM-DD'));
 }
 
@@ -657,7 +657,7 @@ const isBetweenDay = (day, start, end) => {
  * @param activeDate: date that the grouping will start from
  * @param activeGrouping: type of grouping i.e. day, week, month
  */
-export function groupItems(items, activeDate, activeGrouping, featuredOnly) {
+export function groupItems(items: any, activeDate: any, activeGrouping: any, featuredOnly: any): any {
     const maxStart = moment(activeDate).set({'h': 0, 'm': 0, 's': 0});
     const groupedItems = {};
     const grouper = Groupers[activeGrouping];
@@ -737,7 +737,7 @@ export function groupItems(items, activeDate, activeGrouping, featuredOnly) {
  * @param item: Agenda item
  * @param group: Group Date
  */
-export function getPlanningItemsByGroup(item, group) {
+export function getPlanningItemsByGroup(item: any, group: any): any {
     const planningItems = get(item, 'planning_items') || [];
 
     if (planningItems.length === 0) {
@@ -768,7 +768,7 @@ export function getPlanningItemsByGroup(item, group) {
     return [...plansWithCoverages, ...plansWithoutCoverages];
 }
 
-export function isCoverageOnPreviousDay(coverage, group) {
+export function isCoverageOnPreviousDay(coverage: any, group: any): any {
     return (
         coverage.scheduled != null &&
         moment(coverage.scheduled).isBefore(moment(group, DATE_FORMAT), 'day')
@@ -776,7 +776,7 @@ export function isCoverageOnPreviousDay(coverage, group) {
 }
 
 
-export function getCoveragesForDisplay(item, plan, group) {
+export function getCoveragesForDisplay(item: any, plan: any, group: any): any {
     const currentCoverage = [];
     const previousCoverage = [];
     // get current and preview coverages
@@ -796,7 +796,7 @@ export function getCoveragesForDisplay(item, plan, group) {
     return {current: currentCoverage, previous: previousCoverage};
 }
 
-export function getListItems(groups, itemsById) {
+export function getListItems(groups: any, itemsById: any): any {
     const listItems = [];
 
     groups.forEach((group) => {
@@ -814,15 +814,15 @@ export function getListItems(groups, itemsById) {
     return listItems;
 }
 
-export function isCoverageBeingUpdated(coverage) {
+export function isCoverageBeingUpdated(coverage: any: any): any: any {
     return get(coverage, 'deliveries[0].delivery_state', null) &&
         !['published', 'corrected'].includes(coverage.deliveries[0].delivery_state);
 }
 
-export const groupRegions = (filter, aggregations, props) => {
+export const groupRegions = (filter: any, aggregations: any, props: any): any => {
     if (props.locators && Object.keys(props.locators).length > 0) {
-        let regions = sortBy(props.locators.filter((l) => l.state).map((l) => ({...l, 'key': l.name, 'label': l.state})), 'label');
-        const others = props.locators.filter((l) => !l.state).map((l) => ({...l, 'key': l.name, 'label': l.country || l.world_region}));
+        let regions = sortBy(props.locators.filter((l: any) => l.state).map((l: any) => ({...l, 'key': l.name, 'label': l.state})), 'label');
+        const others = props.locators.filter((l: any) => !l.state).map((l: any) => ({...l, 'key': l.name, 'label': l.country || l.world_region}));
         const separator = {'key': 'divider'};
 
         if (others.length > 0) {
@@ -838,9 +838,9 @@ export const groupRegions = (filter, aggregations, props) => {
     return aggregations[filter.field].buckets;
 };
 
-export const getRegionName = (key: any, locator: any) => locator.label || key;
+export const getRegionName = (key: any, locator: any): any => locator.label || key;
 
-export const isItemTBC = (item: any) => (
+export const isItemTBC = (item: any): any => (
     !get(item, 'event') ? get(item, `planning_items[0].${TO_BE_CONFIRMED_FIELD}`) : get(item, `event.${TO_BE_CONFIRMED_FIELD}`)
 );
 
@@ -851,13 +851,13 @@ export const isItemTBC = (item: any) => (
  * @param {String} dateString
  * @return {String}
  */
-export function formatCoverageDate(coverage: any) {
+export function formatCoverageDate(coverage: any: any): any: any {
     return get(coverage, TO_BE_CONFIRMED_FIELD) ?
         `${parseDate(coverage.scheduled).format(COVERAGE_DATE_FORMAT)} ${TO_BE_CONFIRMED_TEXT}` :
         parseDate(coverage.scheduled).format(COVERAGE_DATE_TIME_FORMAT);
 }
 
-export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
+export const getCoverageTooltip = (coverage: any, beingUpdated?: any): any => {
     const slugline = coverage.item_slugline || coverage.slugline;
     const coverageType = getCoverageDisplayName(coverage.coverage_type);
     const coverageScheduled = moment(coverage.scheduled);

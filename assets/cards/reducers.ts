@@ -32,7 +32,7 @@ const initialState = {
     search: searchReducer(),
 };
 
-export default function cardReducer(state = initialState, action) {
+export default function cardReducer(state = initialState, action: any): any {
     switch (action.type) {
 
     case SELECT_CARD: {

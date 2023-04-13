@@ -5,33 +5,33 @@ import {get} from 'lodash';
 
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(data) {
+export function initData(data: any): any {
     return {type: INIT_DATA, data};
 }
 
 export const SET_COMPANIES = 'SET_COMPANIES';
-export function setCompanies(data) {
+export function setCompanies(data: any): any {
     return {type: SET_COMPANIES, data};
 }
 
-export function initViewData(data) {
+export function initViewData(data: any): any {
     return function (dispatch) {
         dispatch(setCompanies(data.companies));
     };
 }
 
 export const NEW_MONITORING_PROFILE = 'NEW_MONITORING_PROFILE';
-export function newMonitoringProfile() {
+export function newMonitoringProfile(): any {
     return {type: NEW_MONITORING_PROFILE};
 }
 
 export const CANCEL_EDIT = 'CANCEL_EDIT';
-export function cancelEdit() {
+export function cancelEdit(): any {
     return {type: CANCEL_EDIT};
 }
 
 export const UPDATE_MONITORING_PROFILE = 'UPDATE_MONITORING_PROFILE';
-export function updateMonitoringProfile(event) {
+export function updateMonitoringProfile(event: any): any {
     const target = event.target;
     const field = target.name;
     return {
@@ -41,46 +41,46 @@ export function updateMonitoringProfile(event) {
 }
 
 export const SET_ERROR = 'SET_ERROR';
-export function setError(errors) {
+export function setError(errors: any): any {
     return {type: SET_ERROR, errors};
 }
 
 export const SET_COMPANY = 'SET_COMPANY';
-export function setCompany(company) {
+export function setCompany(company: any): any {
     return {type: SET_COMPANY, company};
 }
 
 export const SET_MONITORING_LIST = 'SET_MONITORING_LIST';
-export function setMonitoringList(data) {
+export function setMonitoringList(data: any): any {
     return {type: SET_MONITORING_LIST, data};
 }
 
 export const SET_USER_COMPANY_MONITORING_LIST = 'SET_USER_COMPANY_MONITORING_LIST';
-export function setUserCompanyMonitoringList(data) {
+export function setUserCompanyMonitoringList(data: any): any {
     return {type: SET_USER_COMPANY_MONITORING_LIST, data};
 }
 
 export const QUERY_MONITORING = 'QUERY_MONITORING';
-export function queryMonitoring() {
+export function queryMonitoring(): any {
     return {type: QUERY_MONITORING};
 }
 
 export const SELECT_MONITORING_PROFILE = 'SELECT_MONITORING_PROFILE';
-export function selectMonitoringProfile(id) {
+export function selectMonitoringProfile(id: any): any {
     return {type: SELECT_MONITORING_PROFILE, id};
 }
 
 export const SET_MONITORING_COMPANIES = 'SET_MONITORING_COMPANIES';
-export function setMonitoringCompanies(data) {
+export function setMonitoringCompanies(data: any): any {
     return {type: SET_MONITORING_COMPANIES, data};
 }
 
 export const SET_SCHEDULE_MODE = 'SET_SCHEDULE_MODE';
-export function toggleScheduleMode() {
+export function toggleScheduleMode(): any {
     return {type: SET_SCHEDULE_MODE};
 }
 
-export function postMonitoringProfile(userProfile, notifyMsg) {
+export function postMonitoringProfile(userProfile: any, notifyMsg: any): any {
     return function (dispatch, getState) {
 
         const p = userProfile || monitoringProfileToEdit(getState());
@@ -118,7 +118,7 @@ export function postMonitoringProfile(userProfile, notifyMsg) {
     };
 }
 
-export function fetchMonitoring(userCompany) {
+export function fetchMonitoring(userCompany: any): any {
     return function (dispatch, getState) {
         dispatch(queryMonitoring());
         const companyFilter = userCompany || company(getState());
@@ -142,7 +142,7 @@ export function fetchMonitoring(userCompany) {
     };
 }
 
-export function fetchMonitoringCompanies() {
+export function fetchMonitoringCompanies(): any {
     return function (dispatch) {
         return server.get('/monitoring/schedule_companies')
             .then((data) => {
@@ -152,7 +152,7 @@ export function fetchMonitoringCompanies() {
     };
 }
 
-export function saveMonitoringProfileUsers(users) {
+export function saveMonitoringProfileUsers(users: any): any {
     return function (dispatch, getState) {
         const p = monitoringProfileToEdit(getState());
         return server.post(`/monitoring/${p._id}/users`, {users})
@@ -165,7 +165,7 @@ export function saveMonitoringProfileUsers(users) {
     };
 }
 
-export function saveMonitoringProfileSchedule() {
+export function saveMonitoringProfileSchedule(): any {
     return function (dispatch, getState) {
         const p = monitoringProfileToEdit(getState());
         if (!p._id) {
@@ -182,7 +182,7 @@ export function saveMonitoringProfileSchedule() {
     };
 }
 
-export function deleteMonitoringProfile() {
+export function deleteMonitoringProfile(): any {
     return function (dispatch, getState) {
 
         const p = monitoringProfileToEdit(getState());

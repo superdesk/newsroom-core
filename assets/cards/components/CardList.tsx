@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import CardListItem from './CardListItem';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
-
-function CardList({cards, products, onClick, activeCardId}) {
-    const list = cards.map((card) =>
+function CardList({cards, products, onClick, activeCardId}: any) {
+    const list = cards.map((card: any) =>
         <CardListItem
             key={card._id}
             products={products}

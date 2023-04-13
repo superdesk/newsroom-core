@@ -34,7 +34,7 @@ const INITIAL_STATE = {
     activeView: EXTENDED_VIEW,
 };
 
-export function searchReducer(state=INITIAL_STATE, action) {
+export function searchReducer(state=INITIAL_STATE, action: any): any {
     if (!action) {
         return state;
     }

@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import AgendaFeaturedStoriesToggle from './AgendaFeaturedStoriesToogle.jsx';
-import {DISPLAY_AGENDA_FEATURED_STORIES_ONLY} from 'utils';
-import ListViewOptions from 'components/ListViewOptions';
+import ListViewOptions from 'assets/components/ListViewOptions.js';
+import {DISPLAY_AGENDA_FEATURED_STORIES_ONLY} from 'assets/utils.js';
 
-function AgendaListViewControls({activeView, setView, hideFeaturedToggle, toggleFeaturedFilter, featuredFilter, hasAgendaFeaturedItems}) {
+function AgendaListViewControls({activeView, setView, hideFeaturedToggle, toggleFeaturedFilter, featuredFilter, hasAgendaFeaturedItems}: any) {
     return(
         <div className='content-bar__right'>
             {!hideFeaturedToggle && hasAgendaFeaturedItems  && DISPLAY_AGENDA_FEATURED_STORIES_ONLY &&

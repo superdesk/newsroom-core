@@ -18,12 +18,12 @@ if (!isTouchDevice()) {
 let filterOpen = false;
 let previewOpen = false;
 
-function isGrid() {
+function isGrid(): any {
     return elementHasClass('.wire-articles__item', 'wire-articles__item--grid');
 }
 
 // Function for responsive wire item
-function responsiveWireItem() {
+function responsiveWireItem(): any {
     if (filterOpen && !previewOpen) {
         document.getElementsByClassName('wire-column__main')[0].classList.add('wire-articles__one-side-pane');
         document.getElementsByClassName('wire-column__main')[0].classList.remove('wire-articles__two-side-panes');
@@ -75,7 +75,7 @@ function responsiveWireItem() {
     }
 }
 
-function setupCarouselCaptionParallax() {
+function setupCarouselCaptionParallax(): any {
     // Carousel caption parallax
     const contentMain = document.querySelector('.content-main');
 
@@ -90,7 +90,7 @@ function setupCarouselCaptionParallax() {
     }
 }
 
-function setupContentNavbarScroll() {
+function setupContentNavbarScroll(): any {
     // Content navbar scroll
     const wireArticlesList = document.querySelector('.wire-articles--list');
 
@@ -110,7 +110,7 @@ function setupContentNavbarScroll() {
     }
 }
 
-function setupTogglingLeftBarNavigation() {
+function setupTogglingLeftBarNavigation(): any {
     // Toggle left bar navigation
     if (document.getElementsByClassName('content-bar__menu--nav')[0]) {
         document.getElementsByClassName('content-bar__menu--nav')[0].onclick = function(){
@@ -124,7 +124,7 @@ function setupTogglingLeftBarNavigation() {
     }
 }
 
-function setupOpenArticleFromWireList() {
+function setupOpenArticleFromWireList(): any {
     // Open article from wire list
     const listItem = document.getElementsByClassName('wire-articles__item');
 
@@ -154,7 +154,7 @@ function setupOpenArticleFromWireList() {
     }
 }
 
-function setupTopBarSearchFocus() {
+function setupTopBarSearchFocus(): any {
     // Top bar search items
     // TODO: Use CSS to achieve the same goal here
     const searchForm = document.getElementsByClassName('search__form')[0];
@@ -166,7 +166,7 @@ function setupTopBarSearchFocus() {
     }
 }
 
-function setupClosePreviewOnMobile() {
+function setupClosePreviewOnMobile(): any {
     // close preview on mobile
     if (isTouchDevice()) {
         onElementClicked('.wire-column__preview__mobile-bar button', () => {
@@ -178,7 +178,7 @@ function setupClosePreviewOnMobile() {
     }
 }
 
-function setupBootstrapElementsFromServerTemplates() {
+function setupBootstrapElementsFromServerTemplates(): any {
     if (!isTouchDevice()) {
         document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((ele) => {
             new Tooltip(ele);

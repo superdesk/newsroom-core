@@ -5,47 +5,47 @@ import {searchQuerySelector} from 'search/selectors';
 
 
 export const SELECT_CARD = 'SELECT_CARD';
-export function selectCard(id) {
+export function selectCard(id: any): any {
     return {type: SELECT_CARD, id};
 }
 
 export const EDIT_CARD = 'EDIT_CARD';
-export function editCard(event) {
+export function editCard(event: any): any {
     return {type: EDIT_CARD, event};
 }
 
 export const NEW_CARD = 'NEW_CARD';
-export function newCard() {
+export function newCard(): any {
     return {type: NEW_CARD};
 }
 
 export const CANCEL_EDIT = 'CANCEL_EDIT';
-export function cancelEdit(event) {
+export function cancelEdit(event: any): any {
     return {type: CANCEL_EDIT, event};
 }
 
 export const QUERY_CARDS = 'QUERY_CARDS';
-export function queryCards() {
+export function queryCards(): any {
     return {type: QUERY_CARDS};
 }
 
 export const GET_CARDS = 'GET_CARDS';
-export function getCards(data) {
+export function getCards(data: any): any {
     return {type: GET_CARDS, data};
 }
 
 export const GET_PRODUCTS = 'GET_PRODUCTS';
-export function getProducts(data) {
+export function getProducts(data: any): any {
     return {type: GET_PRODUCTS, data};
 }
 
 export const SET_ERROR = 'SET_ERROR';
-export function setError(errors) {
+export function setError(errors: any): any {
     return {type: SET_ERROR, errors};
 }
 
 export const GET_NAVIGATIONS = 'GET_NAVIGATIONS';
-export function getNavigations(data) {
+export function getNavigations(data: any): any {
     return {type: GET_NAVIGATIONS, data};
 }
 
@@ -53,7 +53,7 @@ export function getNavigations(data) {
  * Fetches cards
  *
  */
-export function fetchCards() {
+export function fetchCards(): any {
     return function (dispatch, getState) {
         dispatch(queryCards());
         const query = searchQuerySelector(getState()) || '';
@@ -69,7 +69,7 @@ export function fetchCards() {
  * Creates new cards
  *
  */
-export function postCard() {
+export function postCard(): any {
     return function (dispatch, getState) {
 
         const card = getState().cardToEdit;
@@ -145,7 +145,7 @@ export function postCard() {
  * Deletes a card
  *
  */
-export function deleteCard() {
+export function deleteCard(): any {
     return function (dispatch, getState) {
 
         const card = getState().cardToEdit;
@@ -165,7 +165,7 @@ export function deleteCard() {
  * Fetches products
  *
  */
-export function fetchProducts() {
+export function fetchProducts(): any {
     return function (dispatch) {
         return server.get('/products/search')
             .then((data) => {
@@ -176,7 +176,7 @@ export function fetchProducts() {
 }
 
 
-export function initViewData(data) {
+export function initViewData(data: any): any {
     return function (dispatch) {
         dispatch(getCards(data.cards));
         dispatch(getProducts(data.products));

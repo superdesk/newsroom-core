@@ -23,7 +23,7 @@ const store = Store.createStore([localStorage], [operationsPlugin, expirePlugin]
  *
  * @returns {Object}
  */
-export function getReadItems() {
+export function getReadItems(): any {
     return store.get(READ_ITEMS_STORE);
 }
 
@@ -33,7 +33,7 @@ export function getReadItems() {
  * @param {Object} item
  * @param {Object} state
  */
-export function markItemAsRead(item, state) {
+export function markItemAsRead(item: any, state: any): any {
     if (item && item._id) {
         const readItems = get(state, 'readItems', getReadItems()) || {};
 
@@ -46,7 +46,7 @@ export function markItemAsRead(item, state) {
  *
  * @returns {boolean}
  */
-export function getNewsOnlyParam() {
+export function getNewsOnlyParam(): any {
     return !!((store.get(NEWS_ONLY_STORE) || {}).value);
 }
 
@@ -55,7 +55,7 @@ export function getNewsOnlyParam() {
  * Toggles news only value
  *
  */
-export function toggleNewsOnlyParam() {
+export function toggleNewsOnlyParam(): any {
     store.assign(NEWS_ONLY_STORE, {value: !getNewsOnlyParam()});
 }
 
@@ -64,7 +64,7 @@ export function toggleNewsOnlyParam() {
  *
  * @returns {boolean}
  */
-export function getSearchAllVersionsParam() {
+export function getSearchAllVersionsParam(): any {
     return !!((store.get(SEARCH_ALL_VERSIONS_STORE) || {}).value);
 }
 
@@ -72,7 +72,7 @@ export function getSearchAllVersionsParam() {
  * Toggles search all versions value
  *
  */
-export function toggleSearchAllVersionsParam() {
+export function toggleSearchAllVersionsParam(): any {
     store.assign(SEARCH_ALL_VERSIONS_STORE, {value: !getSearchAllVersionsParam()});
 }
 
@@ -81,7 +81,7 @@ export function toggleSearchAllVersionsParam() {
  *
  * @returns {boolean}
  */
-export function getFeaturedOnlyParam() {
+export function getFeaturedOnlyParam(): any {
     return !!((store.get(FEATURED_ONLY_STORE) || {}).value);
 }
 
@@ -90,17 +90,17 @@ export function getFeaturedOnlyParam() {
  * Featured stories only value
  *
  */
-export function toggleFeaturedOnlyParam() {
+export function toggleFeaturedOnlyParam(): any {
     store.assign(FEATURED_ONLY_STORE, {value: !getFeaturedOnlyParam()});
 }
 
-export function getFilterPanelOpenState(context) {
+export function getFilterPanelOpenState(context: any): any {
     const defaultValue = get(getConfig('filter_panel_defaults') || {}, `open.${context}`, false);
 
     return get(store.get(FILTER_PANEL_OPEN), context, defaultValue);
 }
 
-export function setFilterPanelOpenState(open, context) {
+export function setFilterPanelOpenState(open: any, context: any): any {
     const filterTabs = {...store.get(FILTER_PANEL_OPEN) || {}};
 
     filterTabs[context] = open;
@@ -112,7 +112,7 @@ export function setFilterPanelOpenState(open, context) {
  *
  * @returns {boolean}
  */
-export function getActiveFilterTab(context) {
+export function getActiveFilterTab(context: any): any {
     const defaultValue = get(getConfig('filter_panel_defaults') || {}, `tab.${context}`, 'nav');
 
     return get(store.get(FILTER_TAB), context, defaultValue);
@@ -122,7 +122,7 @@ export function getActiveFilterTab(context) {
  * Set active filter tab
  *
  */
-export function setActiveFilterTab(tab, context) {
+export function setActiveFilterTab(tab: any, context: any): any {
     const filterTabs = {...store.get(FILTER_TAB) || {}};
     filterTabs[context] = tab;
     store.assign(FILTER_TAB, filterTabs);
@@ -136,7 +136,7 @@ export function setActiveFilterTab(tab, context) {
  * @param versionB
  * @returns {number}
  */
-export function getMaxVersion(versionA, versionB) {
+export function getMaxVersion(versionA: any, versionB: any): any {
     return Math.max(parseInt(versionA, 10) || 0, parseInt(versionB, 10) || 0);
 }
 
@@ -145,7 +145,7 @@ export function getMaxVersion(versionA, versionB) {
  * Returns the expiry date: end of the current day
  * @returns {number}
  */
-function getExpiryDate() {
+function getExpiryDate(): any {
     return moment().endOf('day').valueOf();
 }
 
@@ -155,7 +155,7 @@ function getExpiryDate() {
  *
  * @param activeDate
  */
-export function setActiveDate(activeDate) {
+export function setActiveDate(activeDate: any): any {
     store.set(ACTIVE_DATE, activeDate, getExpiryDate());
 }
 
@@ -164,7 +164,7 @@ export function setActiveDate(activeDate) {
  * Returns active date value if not expired
  * @returns {number}
  */
-export function getActiveDate() {
+export function getActiveDate(): any {
     store.removeExpiredKeys();
     return store.get(ACTIVE_DATE);
 }
@@ -176,7 +176,7 @@ export function getActiveDate() {
  * @param filter
  * @param value
  */
-export function setAgendaDropdownFilter(filter, value) {
+export function setAgendaDropdownFilter(filter: any, value: any): any {
     const filters = store.get(DROPDOWN_FILTERS) || {};
     filters[filter] = value;
     store.set(DROPDOWN_FILTERS, filters, getExpiryDate());
@@ -187,7 +187,7 @@ export function setAgendaDropdownFilter(filter, value) {
  * Returns filters and values if not expired
  * @returns {object}
  */
-export function getAgendaDropdownFilters() {
+export function getAgendaDropdownFilters(): any {
     store.removeExpiredKeys();
     return store.get(DROPDOWN_FILTERS);
 }
@@ -196,6 +196,6 @@ export function getAgendaDropdownFilters() {
  * Clears filters
  * @returns {object}
  */
-export function clearAgendaDropdownFilters() {
+export function clearAgendaDropdownFilters(): any {
     store.remove(DROPDOWN_FILTERS);
 }

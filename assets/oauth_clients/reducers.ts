@@ -20,7 +20,7 @@ const initialState = {
     search: searchReducer(),
 };
 
-function setupClients(clientList, state) {
+function setupClients(clientList: any, state: any): any {
     const clientsById = {};
     const clients = clientList.map((client) => {
         clientsById[client._id] = client;
@@ -34,7 +34,7 @@ function setupClients(clientList, state) {
     };
 }
 
-export default function clientReducer(state = initialState, action) {
+export default function clientReducer(state = initialState, action: any): any {
     switch (action.type) {
 
     case SELECT_CLIENT: {

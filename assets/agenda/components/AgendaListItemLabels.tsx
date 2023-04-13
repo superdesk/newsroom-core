@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get} from 'lodash';
 import {isPostponed, isRescheduled, isCanceled} from '../utils';
+import {gettext} from 'assets/utils';
 
-function AgendaListItemLabels({item, right}) {
+function AgendaListItemLabels({item, right}: any) {
     const getLabel = () => {
         let labelText;
         let labelColor;

@@ -4,73 +4,73 @@ import {searchQuerySelector} from 'search/selectors';
 import {get, cloneDeep} from 'lodash';
 
 export const SELECT_USER = 'SELECT_USER';
-export function selectUser(id) {
+export function selectUser(id: any): any {
     return function (dispatch) {
         dispatch(select(id));
     };
 }
 
-function select(id) {
+function select(id: any): any {
     return {type: SELECT_USER, id};
 }
 
 export const GET_USER = 'GET_USER';
-export function getUser(user) {
+export function getUser(user: any): any {
     return {type: GET_USER, user};
 }
 
 export const EDIT_USER = 'EDIT_USER';
-export function editUser(event) {
+export function editUser(event: any): any {
     return {type: EDIT_USER, event};
 }
 
 export const NEW_USER = 'NEW_USER';
-export function newUser(data) {
+export function newUser(data: any): any {
     return {type: NEW_USER, data};
 }
 
 export const CANCEL_EDIT = 'CANCEL_EDIT';
-export function cancelEdit(event) {
+export function cancelEdit(event: any): any {
     return {type: CANCEL_EDIT, event};
 }
 
 export const QUERY_USERS = 'QUERY_USERS';
-export function queryUsers() {
+export function queryUsers(): any {
     return {type: QUERY_USERS};
 }
 
 export const GET_USERS = 'GET_USERS';
-export function getUsers(data) {
+export function getUsers(data: any): any {
     return {type: GET_USERS, data};
 }
 
 export const REMOVE_USER = 'REMOVE_USER';
-function removeUser(userId) {
+function removeUser(userId: any): any {
     return {type: REMOVE_USER, userId: userId};
 }
 
 export const GET_COMPANIES = 'GET_COMPANIES';
-export function getCompanies(data) {
+export function getCompanies(data: any): any {
     return {type: GET_COMPANIES, data};
 }
 
 export const SET_ERROR = 'SET_ERROR';
-export function setError(errors) {
+export function setError(errors: any): any {
     return {type: SET_ERROR, errors};
 }
 
 export const SET_COMPANY = 'SET_COMPANY';
-export function setCompany(company) {
+export function setCompany(company: any): any {
     return {type: SET_COMPANY, company};
 }
 
 export const SET_SORT = 'SET_SORT';
-export function setSort(param) {
+export function setSort(param: any): any {
     return {type: SET_SORT, param};
 }
 
 export const TOGGLE_SORT_DIRECTION = 'TOGGLE_SORT_DIRECTION';
-export function toggleSortDirection() {
+export function toggleSortDirection(): any {
     return {type: TOGGLE_SORT_DIRECTION};
 }
 
@@ -78,7 +78,7 @@ export function toggleSortDirection() {
  * Fetches users
  *
  */
-export function fetchUsers() {
+export function fetchUsers(): any {
     return function (dispatch, getState) {
         dispatch(queryUsers());
         const state = getState();
@@ -113,7 +113,7 @@ export function fetchUsers() {
  * Creates new users
  *
  */
-export function postUser() {
+export function postUser(): any {
     return function (dispatch, getState) {
 
         const user = cloneDeep(getState().userToEdit);
@@ -145,7 +145,7 @@ export function postUser() {
 }
 
 
-export function resetPassword() {
+export function resetPassword(): any {
     return function (dispatch, getState) {
 
         const user = getState().userToEdit;
@@ -162,7 +162,7 @@ export function resetPassword() {
  * Deletes a user
  *
  */
-export function deleteUser() {
+export function deleteUser(): any {
     return function (dispatch, getState) {
 
         const user = getState().userToEdit;
@@ -179,7 +179,7 @@ export function deleteUser() {
     };
 }
 
-export function resendUserInvite() {
+export function resendUserInvite(): any {
     return function(dispatch, getState) {
         const user = getState().userToEdit;
         const url = `/users/${user._id}/resend_invite`;
@@ -191,7 +191,7 @@ export function resendUserInvite() {
 }
 
 export const INIT_VIEW_DATA = 'INIT_VIEW_DATA';
-export function initViewData(data) {
+export function initViewData(data: any): any {
     return function (dispatch) {
         dispatch({type: INIT_VIEW_DATA, data});
         dispatch(getUsers(data.users));

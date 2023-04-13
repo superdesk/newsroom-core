@@ -20,7 +20,7 @@ const initialState = {
     uiConfig: {},
 };
 
-export default function homeReducer(state=initialState, action) {
+export default function homeReducer(state=initialState, action: any): any {
 
     switch (action.type) {
 

@@ -5,52 +5,52 @@ import {searchQuerySelector} from 'search/selectors';
 
 
 export const SELECT_PRODUCT = 'SELECT_PRODUCT';
-export function selectProduct(id) {
+export function selectProduct(id: any): any {
     return {type: SELECT_PRODUCT, id};
 }
 
 export const EDIT_PRODUCT = 'EDIT_PRODUCT';
-export function editProduct(event) {
+export function editProduct(event: any): any {
     return {type: EDIT_PRODUCT, event};
 }
 
 export const NEW_PRODUCT = 'NEW_PRODUCT';
-export function newProduct() {
+export function newProduct(): any {
     return {type: NEW_PRODUCT};
 }
 
 export const CANCEL_EDIT = 'CANCEL_EDIT';
-export function cancelEdit(event) {
+export function cancelEdit(event: any): any {
     return {type: CANCEL_EDIT, event};
 }
 
 export const QUERY_PRODUCTS = 'QUERY_PRODUCTS';
-export function queryProducts() {
+export function queryProducts(): any {
     return {type: QUERY_PRODUCTS};
 }
 
 export const GET_PRODUCTS = 'GET_PRODUCTS';
-export function getProducts(data) {
+export function getProducts(data: any): any {
     return {type: GET_PRODUCTS, data};
 }
 
 export const GET_COMPANIES = 'GET_COMPANIES';
-export function getCompanies(data) {
+export function getCompanies(data: any): any {
     return {type: GET_COMPANIES, data};
 }
 
 export const GET_NAVIGATIONS = 'GET_NAVIGATIONS';
-export function getNavigations(data) {
+export function getNavigations(data: any): any {
     return {type: GET_NAVIGATIONS, data};
 }
 
 export const UPDATE_PRODUCT_NAVIGATIONS = 'UPDATE_PRODUCT_NAVIGATIONS';
-export function updateProductNavigations(product, navigations) {
+export function updateProductNavigations(product: any, navigations: any): any {
     return {type: UPDATE_PRODUCT_NAVIGATIONS, product, navigations};
 }
 
 export const SET_ERROR = 'SET_ERROR';
-export function setError(errors) {
+export function setError(errors: any): any {
     return {type: SET_ERROR, errors};
 }
 
@@ -59,7 +59,7 @@ export function setError(errors) {
  * Fetches products
  *
  */
-export function fetchProducts() {
+export function fetchProducts(): any {
     return function (dispatch, getState) {
         dispatch(queryProducts());
         const query = searchQuerySelector(getState()) || '';
@@ -75,7 +75,7 @@ export function fetchProducts() {
  * Creates new products
  *
  */
-export function postProduct() {
+export function postProduct(): any {
     return function (dispatch, getState) {
 
         const product = getState().productToEdit;
@@ -100,7 +100,7 @@ export function postProduct() {
  * Deletes a product
  *
  */
-export function deleteProduct() {
+export function deleteProduct(): any {
     return function (dispatch, getState) {
 
         const product = getState().productToEdit;
@@ -120,7 +120,7 @@ export function deleteProduct() {
  * Fetches companies
  *
  */
-export function fetchCompanies() {
+export function fetchCompanies(): any {
     return function (dispatch) {
         return server.get('/companies/search')
             .then((data) => {
@@ -134,7 +134,7 @@ export function fetchCompanies() {
  * Saves companies for a product
  *
  */
-export function saveCompanies(companies) {
+export function saveCompanies(companies: any): any {
     return function (dispatch, getState) {
         const product = getState().productToEdit;
         return server.post(`/products/${product._id}/companies`, {companies})
@@ -150,7 +150,7 @@ export function saveCompanies(companies) {
  * Fetches navigations
  *
  */
-export function fetchNavigations() {
+export function fetchNavigations(): any {
     return function (dispatch) {
         return server.get('/navigations/search')
             .then((data) => {
@@ -164,7 +164,7 @@ export function fetchNavigations() {
  * Saves navigations for a product
  *
  */
-export function saveNavigations(navigations) {
+export function saveNavigations(navigations: any): any {
     return function (dispatch, getState) {
         const product = getState().productToEdit;
         return server.post(`/products/${product._id}/navigations`, {navigations})
@@ -176,7 +176,7 @@ export function saveNavigations(navigations) {
     };
 }
 
-export function initViewData(data) {
+export function initViewData(data: any): any {
     return function (dispatch) {
         dispatch(getProducts(data.products));
         dispatch(getCompanies(data.companies));

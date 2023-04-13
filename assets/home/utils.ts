@@ -1,6 +1,6 @@
 import {get} from 'lodash';
 
-export function getNavigationImageUrl(navigation) {
+export function getNavigationImageUrl(navigation: any): any {
     if (get(navigation, 'tile_images.length', 0) === 0) {
         return null;
     }

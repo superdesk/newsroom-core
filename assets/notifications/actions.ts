@@ -3,29 +3,29 @@ import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
 
 export const UPDATE_NOTIFICATION_COUNT = 'UPDATE_NOTIFICATION_COUNT';
-export function updateNotificationCount(count) {
+export function updateNotificationCount(count: any): any {
     return {type: UPDATE_NOTIFICATION_COUNT, count};
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(data) {
+export function initData(data: any): any {
     return {type: INIT_DATA, data};
 }
 
 
 export const CLEAR_ALL_NOTIFICATIONS = 'CLEAR_ALL_NOTIFICATIONS';
-export function clearAllNotifications() {
+export function clearAllNotifications(): any {
     return {type: CLEAR_ALL_NOTIFICATIONS};
 }
 
 
 export const CLEAR_NOTIFICATION = 'CLEAR_NOTIFICATION';
-export function clearNotification(id) {
+export function clearNotification(id: any): any {
     return {type: CLEAR_NOTIFICATION, id};
 }
 
 export const SET_NOTIFICATIONS = 'SET_NOTIFICATIONS';
-export function setNotifications(items, notifications) {
+export function setNotifications(items: any, notifications: any): any {
     return {
         type: SET_NOTIFICATIONS,
         items: items,
@@ -34,11 +34,11 @@ export function setNotifications(items, notifications) {
 }
 
 export const SET_NOTIFICATIONS_LOADING = 'SET_NOTIFICATIONS_LOADING';
-export function setNotificationsLoading(loading) {
+export function setNotificationsLoading(loading: any): any {
     return {type: SET_NOTIFICATIONS_LOADING, loading};
 }
 
-export function loadNotifications() {
+export function loadNotifications(): any {
     return function (dispatch, getState) {
         dispatch(setNotificationsLoading(true));
         const user = getState().user;
@@ -59,7 +59,7 @@ export function loadNotifications() {
  * Deletes the given notification of the user
  *
  */
-export function deleteNotification(id) {
+export function deleteNotification(id: any): any {
     return function (dispatch, getState) {
         const user = getState().user;
         const url = `/users/${user}/notifications/${user}_${id}`;
@@ -77,7 +77,7 @@ export function deleteNotification(id) {
  * Deletes all notifications for the user
  *
  */
-export function deleteAllNotifications() {
+export function deleteAllNotifications(): any {
     return function (dispatch, getState) {
         const user = getState().user;
         const url = `/users/${user}/notifications`;
@@ -96,7 +96,7 @@ export function deleteAllNotifications() {
  *
  * @param {Object} push
  */
-export function pushNotification(push) {
+export function pushNotification(push: any): any {
     return (dispatch, getState) => {
         const user = getState().user;
         switch (push.event) {

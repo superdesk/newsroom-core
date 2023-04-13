@@ -7,6 +7,7 @@ interface IProps {
     itemTypeFilter: string;
     eventsOnlyAccess: boolean;
     restrictCoverageInfo: boolean;
+    activeFilter: any;
 }
 
 function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter, eventsOnlyAccess, restrictCoverageInfo}: IProps) {

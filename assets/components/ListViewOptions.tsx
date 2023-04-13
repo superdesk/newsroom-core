@@ -2,13 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Tooltip} from 'bootstrap';
 
-import {gettext} from 'utils';
-
-import {EXTENDED_VIEW, COMPACT_VIEW} from 'wire/defaults';
-import {isTouchDevice} from 'utils';
-
-class ListViewOptions extends React.PureComponent {
-    constructor(props) {
+class ListViewOptions extends React.PureComponent<any, any> {
+    constructor(props: any) {
         super(props);
         this.state = {isOpen: false};
         this.views = [

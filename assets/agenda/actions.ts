@@ -39,34 +39,34 @@ const WATCH_URL = '/agenda_watch';
 const WATCH_COVERAGE_URL = '/agenda_coverage_watch';
 
 export const SET_STATE = 'SET_STATE';
-export function setState(state) {
+export function setState(state: any): any {
     return {type: SET_STATE, state};
 }
 
 export const SET_ITEMS = 'SET_ITEMS';
-export function setItems(items) {
+export function setItems(items: any): any {
     return {type: SET_ITEMS, items};
 }
 
 export const SET_ACTIVE = 'SET_ACTIVE';
-export function setActive(item) {
+export function setActive(item: any): any {
     return {type: SET_ACTIVE, item};
 }
 
 
 export const PREVIEW_ITEM = 'PREVIEW_ITEM';
-export function preview(item, group, plan) {
+export function preview(item: any, group?: any, plan?: any): any {
     return {type: PREVIEW_ITEM, item, group, plan};
 }
 
-export function previewAndCopy(item) {
-    return (dispatch) => {
+export function previewAndCopy(item: any): any {
+    return (dispatch: any) => {
         dispatch(copyPreviewContents(item));
     };
 }
 
-export function previewItem(item, group, plan) {
-    return (dispatch, getState) => {
+export function previewItem(item?: any, group?: any, plan?: any): any {
+    return (dispatch: any, getState: any) => {
         dispatch(fetchWireItemsForAgenda(item));
         markItemAsRead(item, getState());
         dispatch(preview(item, group, plan));
@@ -74,10 +74,10 @@ export function previewItem(item, group, plan) {
     };
 }
 
-export function fetchWireItemsForAgenda(item) {
-    return (dispatch) => {
-        const wireIds = [];
-        (get(item, 'coverages') || []).forEach((c) => {
+export function fetchWireItemsForAgenda(item: any): any {
+    return (dispatch: any) => {
+        const wireIds: any = [];
+        (get(item, 'coverages') || []).forEach((c: any) => {
             if (c.coverage_type === 'text' && c.delivery_id) {
                 wireIds.push(c.delivery_id);
             }
@@ -85,26 +85,26 @@ export function fetchWireItemsForAgenda(item) {
 
         if (wireIds.length > 0){
             return server.get(`/wire/items/${wireIds.join(',')}`)
-                .then((items) => {
+                .then((items: any) => {
                     dispatch(agendaWireItems(items));
                     return Promise.resolve(items);
                 })
-                .catch((error) => errorHandler(error, dispatch));
+                .catch((error: any) => errorHandler(error, dispatch));
         }
     };
 }
 
 export const AGENDA_WIRE_ITEMS = 'AGENDA_WIRE_ITEMS';
-export function agendaWireItems(items) {
+export function agendaWireItems(items: any): any {
     return {type: AGENDA_WIRE_ITEMS, items};
 }
 
 export const OPEN_ITEM = 'OPEN_ITEM';
-export function openItemDetails(item, group, plan) {
+export function openItemDetails(item: any, group: any, plan: any): any {
     return {type: OPEN_ITEM, item, group, plan};
 }
 
-export function requestCoverage(item, message) {
+export function requestCoverage(item: any, message: any): any {
     return () => {
         const url = '/agenda/request_coverage';
         const data = {item: item._id, message};
@@ -114,8 +114,8 @@ export function requestCoverage(item, message) {
     };
 }
 
-export function openItem(item, group, plan) {
-    return (dispatch, getState) => {
+export function openItem(item: any, group: any, plan: any): any {
+    return (dispatch: any, getState: any) => {
         const state = getState();
         markItemAsRead(item, state);
         dispatch(fetchWireItemsForAgenda(item));
@@ -133,33 +133,33 @@ export function openItem(item, group, plan) {
 }
 
 export const QUERY_ITEMS = 'QUERY_ITEMS';
-export function queryItems() {
+export function queryItems(): any {
     return {type: QUERY_ITEMS};
 }
 
 export const RECIEVE_ITEMS = 'RECIEVE_ITEMS';
-export function recieveItems(data) {
+export function recieveItems(data: any): any {
     return {type: RECIEVE_ITEMS, data};
 }
 
 export const RECIEVE_ITEM = 'RECIEVE_ITEM';
-export function recieveItem(data) {
+export function recieveItem(data: any): any {
     return {type: RECIEVE_ITEM, data};
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(agendaData, readData, activeDate, featuredOnly) {
+export function initData(agendaData: any, readData: any, activeDate: any, featuredOnly: any): any {
     return {type: INIT_DATA, agendaData, readData, activeDate, featuredOnly};
 }
 
 export const SELECT_DATE = 'SELECT_DATE';
-export function selectDate(dateString, grouping) {
+export function selectDate(dateString: any, grouping: any): any {
     return {type: SELECT_DATE, dateString, grouping};
 }
 
 
-export function printItem(item) {
-    return (dispatch, getState) => {
+export function printItem(item: any): any {
+    return (dispatch: any, getState: any) => {
         const map = encodeURIComponent(getMapSource(getLocations(item), 2));
         window.open(`/agenda/${item._id}?print&map=${map}`, '_blank');
 
@@ -176,8 +176,8 @@ export function printItem(item) {
  *
  * This is an initial version, should be updated with preview markup changes.
  */
-export function copyPreviewContents(item) {
-    return (dispatch, getState) => {
+export function copyPreviewContents(item: any): any {
+    return (dispatch: any, getState: any) => {
         const state = getState();
 
         if (!state.user) {
@@ -185,7 +185,7 @@ export function copyPreviewContents(item) {
         }
 
         server.post(`/wire/${item._id}/copy?type=${state.context}`)
-            .then((response) => {
+            .then((response: any) => {
                 dispatch(setCopyItem(item._id));
                 copyTextToClipboard(response.data, item);
             })
@@ -200,7 +200,7 @@ export function copyPreviewContents(item) {
  * @param {bool} next
  * @return {Promise}
  */
-function search(state, next) {
+function search(state: any, next?: boolean): any {
     const currentMoment = moment();
     const searchParams = searchParamsSelector(state);
     const createdFilter = get(searchParams, 'created') || {};
@@ -233,7 +233,7 @@ function search(state, next) {
         dateTo = createdFilter.from;
     }
 
-    const params = {
+    const params: any = {
         q: searchParams.query,
         id: state.queryId,
         bookmarks: state.bookmarks && state.user,
@@ -258,12 +258,12 @@ function search(state, next) {
 /**
  * Fetch items for current query
  */
-export function fetchItems() {
-    return (dispatch, getState) => {
+export function fetchItems(): any {
+    return (dispatch: any, getState: any) => {
         const start = Date.now();
         dispatch(queryItems());
         return search(getState())
-            .then((data) => dispatch(recieveItems(data)))
+            .then((data: any) => dispatch(recieveItems(data)))
             .then(() => {
                 analytics.timingComplete('search', Date.now() - start);
             })
@@ -271,29 +271,29 @@ export function fetchItems() {
     };
 }
 
-export function fetchItem(id) {
-    return (dispatch) => {
+export function fetchItem(id: any): any {
+    return (dispatch: any) => {
         return server.get(`/agenda/${id}?format=json`)
-            .then((data) => dispatch(recieveItem(data)))
+            .then((data: any) => dispatch(recieveItem(data)))
             .catch(errorHandler);
     };
 }
 
 export const WATCH_EVENTS = 'WATCH_EVENTS';
-export function watchEvents(ids) {
-    return (dispatch, getState) => {
+export function watchEvents(ids: any): any {
+    return (dispatch: any, getState: any) => {
         server.post(WATCH_URL, {items: ids})
             .then(() => {
                 dispatch({type: WATCH_EVENTS, items: ids});
                 notify.success(gettext('Started watching items successfully.'));
-                analytics.multiItemEvent('watch', ids.map((_id) => getState().itemsById[_id]));
+                analytics.multiItemEvent('watch', ids.map((_id: any) => getState().itemsById[_id]));
             });
     };
 }
 
 export const STOP_WATCHING_EVENTS = 'STOP_WATCHING_EVENTS';
-export function stopWatchingEvents(items) {
-    return (dispatch, getState) => {
+export function stopWatchingEvents(items: any): any {
+    return (dispatch: any, getState: any) => {
         server.del(getState().bookmarks ? `${WATCH_URL}?bookmarks=true` : WATCH_URL, {items})
             .then(() => {
                 notify.success(gettext('Stopped watching items successfully.'));
@@ -315,29 +315,29 @@ export function stopWatchingEvents(items) {
  *
  * @return {function}
  */
-export function shareItems(items) {
-    return (dispatch, getState) => {
+export function shareItems(items: any): any {
+    return (dispatch: any, getState: any) => {
         const user = getState().user;
         const company = getState().company;
         return server.get(`/companies/${company}/users`)
-            .then((users) => users.filter((u) => u._id !== user))
-            .then((users) => dispatch(renderModal('shareItem', {items, users})))
+            .then((users: any) => users.filter((u: any) => u._id !== user))
+            .then((users: any) => dispatch(renderModal('shareItem', {items, users})))
             .catch(errorHandler);
     };
 }
 
 export const BOOKMARK_ITEMS = 'BOOKMARK_ITEMS';
-export function setBookmarkItems(items) {
+export function setBookmarkItems(items: any): any {
     return {type: BOOKMARK_ITEMS, items};
 }
 
 export const REMOVE_BOOKMARK = 'REMOVE_BOOKMARK';
-export function removeBookmarkItems(items) {
+export function removeBookmarkItems(items: any): any {
     return {type: REMOVE_BOOKMARK, items};
 }
 
-export function bookmarkItems(items) {
-    return (dispatch, getState) =>
+export function bookmarkItems(items: any): any {
+    return (dispatch: any, getState: any) =>
         server.post('/agenda_bookmark', {items})
             .then(() => {
                 if (items.length > 1) {
@@ -347,14 +347,14 @@ export function bookmarkItems(items) {
                 }
             })
             .then(() => {
-                analytics.multiItemEvent('bookmark', items.map((_id) => getState().itemsById[_id]));
+                analytics.multiItemEvent('bookmark', items.map((_id: string) => getState().itemsById[_id]));
             })
             .then(() => dispatch(setBookmarkItems(items)))
             .catch(errorHandler);
 }
 
-export function removeBookmarks(items) {
-    return (dispatch, getState) =>
+export function removeBookmarks(items: any): any {
+    return (dispatch: any, getState: any) =>
         server.del('/agenda_bookmark', {items})
             .then(() => {
                 if (items.length > 1) {
@@ -369,27 +369,27 @@ export function removeBookmarks(items) {
 }
 
 export const TOGGLE_SELECTED = 'TOGGLE_SELECTED';
-export function toggleSelected(item) {
+export function toggleSelected(item: any): any {
     return {type: TOGGLE_SELECTED, item};
 }
 
 export const SHARE_ITEMS = 'SHARE_ITEMS';
-export function setShareItems(items) {
+export function setShareItems(items: any): any {
     return {type: SHARE_ITEMS, items};
 }
 
 export const DOWNLOAD_ITEMS = 'DOWNLOAD_ITEMS';
-export function setDownloadItems(items) {
+export function setDownloadItems(items: any): any {
     return {type: DOWNLOAD_ITEMS, items};
 }
 
 export const COPY_ITEMS = 'COPY_ITEMS';
-export function setCopyItem(item) {
+export function setCopyItem(item: any): any {
     return {type: COPY_ITEMS, items: [item]};
 }
 
 export const PRINT_ITEMS = 'PRINT_ITEMS';
-export function setPrintItem(item) {
+export function setPrintItem(item: any): any {
     return {type: PRINT_ITEMS, items: [item]};
 }
 
@@ -399,12 +399,12 @@ export function setPrintItem(item) {
  *
  * @param {Array} items
  */
-export function downloadItems(items) {
+export function downloadItems(items: any): any {
     return renderModal('downloadItems', {items});
 }
 
 export const REMOVE_NEW_ITEMS = 'REMOVE_NEW_ITEMS';
-export function removeNewItems(data) {
+export function removeNewItems(data: any): any {
     return {type: REMOVE_NEW_ITEMS, data};
 }
 
@@ -413,8 +413,8 @@ export function removeNewItems(data) {
  *
  * @param {Object} data
  */
-export function pushNotification(push) {
-    return (dispatch, getState) => {
+export function pushNotification(push: any): any {
+    return (dispatch: any, getState: any) => {
         const user = getState().user;
         const company = getState().company;
 
@@ -443,11 +443,11 @@ export function pushNotification(push) {
     };
 }
 
-export function reloadMyTopics(reloadTopic = false) {
-    return function(dispatch) {
+export function reloadMyTopics(reloadTopic = false): any {
+    return function(dispatch: any) {
         return loadMyTopics()
-            .then((data) => {
-                const agendaTopics = data.filter((topic) => topic.topic_type === 'agenda');
+            .then((data: any) => {
+                const agendaTopics = data.filter((topic: any) => topic.topic_type === 'agenda');
                 dispatch(setTopics(agendaTopics));
 
                 if (reloadTopic) {
@@ -462,8 +462,8 @@ export function reloadMyTopics(reloadTopic = false) {
 }
 
 export const SET_NEW_ITEM = 'SET_NEW_ITEM';
-export function setAndUpdateNewItems(data) {
-    return function(dispatch, getState) {
+export function setAndUpdateNewItems(data: any): any {
+    return function(dispatch: any, getState: any) {
         const item = data.item || {};
 
         if (item.type !== 'agenda') {
@@ -502,12 +502,12 @@ export function setAndUpdateNewItems(data) {
 }
 
 export const UPDATE_ITEM = 'UPDATE_ITEM';
-export function updateItem(item) {
+export function updateItem(item: any): any {
     return {type: UPDATE_ITEM, item: item};
 }
 
-export function toggleDropdownFilter(key, val) {
-    return (dispatch) => {
+export function toggleDropdownFilter(key: any, val: any): any {
+    return (dispatch: any) => {
         dispatch(setActive(null));
         dispatch(preview(null));
 
@@ -523,8 +523,8 @@ export function toggleDropdownFilter(key, val) {
     };
 }
 
-function setLocationFilter(location) {
-    return (dispatch, getState) => {
+function setLocationFilter(location: any): any {
+    return (dispatch: any, getState: any) => {
         const state = getState();
         const currentFilters = cloneDeep(searchFilterSelector(state));
         const currentLocation = get(currentFilters, 'location') || {};
@@ -545,18 +545,18 @@ function setLocationFilter(location) {
 }
 
 export const START_LOADING = 'START_LOADING';
-export function startLoading() {
+export function startLoading(): any {
     return {type: START_LOADING};
 }
 
 export const RECIEVE_NEXT_ITEMS = 'RECIEVE_NEXT_ITEMS';
-export function recieveNextItems(data) {
+export function recieveNextItems(data: any): any {
     return {type: RECIEVE_NEXT_ITEMS, data};
 }
 
 const MAX_ITEMS = 1000; // server limit
-export function fetchMoreItems() {
-    return (dispatch, getState) => {
+export function fetchMoreItems(): any {
+    return (dispatch: any, getState: any) => {
         const state = getState();
         const limit = Math.min(MAX_ITEMS, state.totalItems);
 
@@ -566,7 +566,7 @@ export function fetchMoreItems() {
 
         dispatch(startLoading());
         return search(getState(), true)
-            .then((data) => dispatch(recieveNextItems(data)))
+            .then((data: any) => dispatch(recieveNextItems(data)))
             .catch(errorHandler);
     };
 }
@@ -576,12 +576,12 @@ export function fetchMoreItems() {
  *
  * @param {URLSearchParams} params
  */
-export function initParams(params) {
+export function initParams(params: any): any {
     if (params.get('filter') || params.get('created')) {
         clearAgendaDropdownFilters();
     }
 
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const featuredParam = params.get('featured');
         if (featuredParam && featuredParam !== get(getState(), 'agenda.featuredOnly', false).toString()) {
             dispatch(toggleFeaturedFilter(false));
@@ -606,8 +606,8 @@ export function initParams(params) {
  * @param {String} topicId
  * @return {Promise}
  */
-export function loadMyAgendaTopic(topicId) {
-    return (dispatch, getState) => {
+export function loadMyAgendaTopic(topicId: any): any {
+    return (dispatch: any, getState: any) => {
         // Set featured query option to false when using navigations
         if (get(getState(), 'agenda.featuredOnly')) {
             dispatch({type: TOGGLE_FEATURED_FILTER});
@@ -619,7 +619,7 @@ export function loadMyAgendaTopic(topicId) {
 }
 
 export const TOGGLE_FEATURED_FILTER = 'TOGGLE_FEATURED_FILTER';
-export function toggleFeaturedFilter(fetch = true) {
+export function toggleFeaturedFilter(fetch = true): any {
     return (dispatch) => {
         toggleFeaturedOnlyParam();
         dispatch({type: TOGGLE_FEATURED_FILTER});
@@ -632,12 +632,12 @@ export function toggleFeaturedFilter(fetch = true) {
 }
 
 export const SET_ITEM_TYPE_FILTER = 'SET_ITEM_TYPE_FILTER';
-export function setItemTypeFilter(value) {
+export function setItemTypeFilter(value: any): any {
     return {type: SET_ITEM_TYPE_FILTER, value};
 }
 
 export const WATCH_COVERAGE = 'WATCH_COVERAGE';
-export function watchCoverage(coverage, item) {
+export function watchCoverage(coverage: any, item: any): any {
     return (dispatch) => {
         server.post(WATCH_COVERAGE_URL, {
             coverage_id: coverage.coverage_id,
@@ -655,7 +655,7 @@ export function watchCoverage(coverage, item) {
 }
 
 export const STOP_WATCHING_COVERAGE = 'STOP_WATCHING_COVERAGE';
-export function stopWatchingCoverage(coverage, item) {
+export function stopWatchingCoverage(coverage: any, item: any): any {
     return (dispatch, getState) => {
         server.del(WATCH_COVERAGE_URL, {
             coverage_id: coverage.coverage_id,

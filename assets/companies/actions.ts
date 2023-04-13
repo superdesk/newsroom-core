@@ -4,54 +4,54 @@ import {searchQuerySelector} from 'search/selectors';
 
 
 export const SELECT_COMPANY = 'SELECT_COMPANY';
-export function selectCompany(id) {
+export function selectCompany(id: any): any {
     return function (dispatch) {
         dispatch(select(id));
         dispatch(fetchCompanyUsers(id));
     };
 }
 
-function select(id) {
+function select(id: any): any {
     return {type: SELECT_COMPANY, id};
 }
 
 export const EDIT_COMPANY = 'EDIT_COMPANY';
-export function editCompany(event) {
+export function editCompany(event: any): any {
     return {type: EDIT_COMPANY, event};
 }
 
 export const NEW_COMPANY = 'NEW_COMPANY';
-export function newCompany(data) {
+export function newCompany(data: any): any {
     return {type: NEW_COMPANY, data};
 }
 
 export const CANCEL_EDIT = 'CANCEL_EDIT';
-export function cancelEdit(event) {
+export function cancelEdit(event: any): any {
     return {type: CANCEL_EDIT, event};
 }
 
 export const QUERY_COMPANIES = 'QUERY_COMPANIES';
-export function queryCompanies() {
+export function queryCompanies(): any {
     return {type: QUERY_COMPANIES};
 }
 
 export const GET_COMPANIES = 'GET_COMPANIES';
-export function getCompanies(data) {
+export function getCompanies(data: any): any {
     return {type: GET_COMPANIES, data};
 }
 
 export const GET_COMPANY_USERS = 'GET_COMPANY_USERS';
-export function getCompanyUsers(data) {
+export function getCompanyUsers(data: any): any {
     return {type: GET_COMPANY_USERS, data};
 }
 
 export const GET_PRODUCTS = 'GET_PRODUCTS';
-export function getProducts(data) {
+export function getProducts(data: any): any {
     return {type: GET_PRODUCTS, data};
 }
 
 export const SET_ERROR = 'SET_ERROR';
-export function setError(errors) {
+export function setError(errors: any): any {
     return {type: SET_ERROR, errors};
 }
 
@@ -60,7 +60,7 @@ export function setError(errors) {
  * Fetches companies
  *
  */
-export function fetchCompanies() {
+export function fetchCompanies(): any {
     return function (dispatch, getState) {
         dispatch(queryCompanies());
         const query = searchQuerySelector(getState()) || '';
@@ -78,7 +78,7 @@ export function fetchCompanies() {
  *
  * @param {String} companyId
  */
-export function fetchCompanyUsers(companyId, force = false) {
+export function fetchCompanyUsers(companyId: any,  force = false): any {
     return function (dispatch, getState) {
         if (!force && !getState().companiesById[companyId].name) {
             return;
@@ -97,7 +97,7 @@ export function fetchCompanyUsers(companyId, force = false) {
  * Creates new company
  *
  */
-export function postCompany(permissions = null) {
+export function postCompany(permissions = null): any {
     return function (dispatch, getState) {
 
         const company = getState().companyToEdit;
@@ -127,7 +127,7 @@ export function postCompany(permissions = null) {
  * Fetches products
  *
  */
-export function fetchProducts() {
+export function fetchProducts(): any {
     return function (dispatch) {
         return server.get('/products/search')
             .then((data) => {
@@ -142,7 +142,7 @@ export function fetchProducts() {
  * Save permissions for a company
  *
  */
-export function savePermissions(company, permissions) {
+export function savePermissions(company: any, permissions: any): any {
     return function (dispatch) {
         return server.post(`/companies/${company._id}/permissions`, permissions)
             .catch((error) => errorHandler(error, dispatch, setError));
@@ -154,7 +154,7 @@ export function savePermissions(company, permissions) {
  * Deletes a company
  *
  */
-export function deleteCompany() {
+export function deleteCompany(): any {
     return function (dispatch, getState) {
 
         const company = getState().companyToEdit;
@@ -177,6 +177,6 @@ export function deleteCompany() {
 }
 
 export const INIT_VIEW_DATA = 'INIT_VIEW_DATA';
-export function initViewData(data) {
+export function initViewData(data: any): any {
     return {type: INIT_VIEW_DATA, data};
 }

@@ -9,7 +9,7 @@ let wsConnection;
 let connectInterval;
 const listeners = [];
 
-function connectToNotificationServer() {
+function connectToNotificationServer(): any {
     if (wsConnection == null || wsConnection.readyState === WebSocket.CLOSED) {
         const baseURL = window.newsroom && window.newsroom.websocket ?
             window.newsroom.websocket :
@@ -35,16 +35,16 @@ window.addEventListener('beforeunload', () => {
     wsConnection = null;
 });
 
-export function initWebSocket(store, action) {
+export function initWebSocket(store: any, action: any): any {
     connectToNotificationServer();
     listeners.push({store, action});
 }
 
-function onWebsocketError(event) {
+function onWebsocketError(event: any): any {
     console.error(event);
 }
 
-function onWebsocketOpen() {
+function onWebsocketOpen(): any {
     if (!firstConnection) {
         // Only show notification if the connection was re-established
         // otherwise a notification will be shown when navigating to each page
@@ -57,7 +57,7 @@ function onWebsocketOpen() {
     window.dispatchEvent(new Event('websocket:connected'));
 }
 
-function onWebsocketClose() {
+function onWebsocketClose(): any {
     if (connectInterval != null || wsConnection == null) {
         // Already attempting to reconnect to the Notification Server
         // No need to add another interval
@@ -73,7 +73,7 @@ function onWebsocketClose() {
     }, RECONNECT_INTERVAL);
 }
 
-function onWebsocketMessage(message) {
+function onWebsocketMessage(message: any): any {
     if (!message || !message.data) {
         console.error('Invalid websocket message', message);
         return;

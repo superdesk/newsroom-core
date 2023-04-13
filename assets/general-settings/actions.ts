@@ -3,11 +3,11 @@ import {errorHandler} from '../utils';
 import {gettext, notify} from 'utils';
 
 export const UPDATE_VALUES = 'UPDATE_VALUES';
-function updateValues(data) {
+function updateValues(data: any): any {
     return {type: UPDATE_VALUES, data};
 }
 
-export function save(values) {
+export function save(values: any): any {
     return (dispatch) => {
         server.post('/settings/general_settings', values)
             .then((data) => {
@@ -18,6 +18,6 @@ export function save(values) {
 }
 
 export const INIT_VIEW_DATA = 'INIT_VIEW_DATA';
-export function initViewData(data) {
+export function initViewData(data: any): any {
     return {type: INIT_VIEW_DATA, data: data};
 }

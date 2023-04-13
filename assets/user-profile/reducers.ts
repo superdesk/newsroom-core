@@ -35,7 +35,7 @@ const initialState = {
     locators: [],
 };
 
-export default function itemReducer(state = initialState, action) {
+export default function itemReducer(state = initialState, action: any): any {
     let newSelected, newState;
     switch (action.type) {
 

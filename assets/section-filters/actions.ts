@@ -5,37 +5,37 @@ import {searchQuerySelector} from 'search/selectors';
 
 
 export const SELECT_SECTION_FILTER = 'SELECT_SECTION_FILTER';
-export function selectSectionFilter(id) {
+export function selectSectionFilter(id: any): any {
     return {type: SELECT_SECTION_FILTER, id};
 }
 
 export const EDIT_SECTION_FILTER = 'EDIT_SECTION_FILTER';
-export function editSectionFilter(event) {
+export function editSectionFilter(event: any): any {
     return {type: EDIT_SECTION_FILTER, event};
 }
 
 export const NEW_SECTION_FILTER = 'NEW_SECTION_FILTER';
-export function newSectionFilter() {
+export function newSectionFilter(): any {
     return {type: NEW_SECTION_FILTER};
 }
 
 export const CANCEL_EDIT = 'CANCEL_EDIT';
-export function cancelEdit(event) {
+export function cancelEdit(event: any): any {
     return {type: CANCEL_EDIT, event};
 }
 
 export const QUERY_SECTION_FILTERS = 'QUERY_SECTION_FILTERS';
-export function querySectionFilters() {
+export function querySectionFilters(): any {
     return {type: QUERY_SECTION_FILTERS};
 }
 
 export const GET_SECTION_FILTERS = 'GET_SECTION_FILTERS';
-export function getSectionFilters(data) {
+export function getSectionFilters(data: any): any {
     return {type: GET_SECTION_FILTERS, data};
 }
 
 export const SET_ERROR = 'SET_ERROR';
-export function setError(errors) {
+export function setError(errors: any): any {
     return {type: SET_ERROR, errors};
 }
 
@@ -44,7 +44,7 @@ export function setError(errors) {
  * Fetches section Filters
  *
  */
-export function fetchSectionFilters() {
+export function fetchSectionFilters(): any {
     return function (dispatch, getState) {
         dispatch(querySectionFilters());
         const query = searchQuerySelector(getState()) || '';
@@ -60,7 +60,7 @@ export function fetchSectionFilters() {
  * Creates new section filter
  *
  */
-export function postSectionFilter() {
+export function postSectionFilter(): any {
     return function (dispatch, getState) {
 
         const sectionFilter = getState().sectionFilterToEdit;
@@ -85,7 +85,7 @@ export function postSectionFilter() {
  * Deletes a section filter
  *
  */
-export function deleteSectionFilter() {
+export function deleteSectionFilter(): any {
     return function (dispatch, getState) {
 
         const sectionFilter = getState().sectionFilterToEdit;
@@ -103,7 +103,7 @@ export function deleteSectionFilter() {
 
 
 
-export function initViewData(data) {
+export function initViewData(data: any): any {
     return function (dispatch) {
         dispatch(getSectionFilters(data.section_filters));
         dispatch(initSections(data.sections));

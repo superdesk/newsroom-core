@@ -34,7 +34,7 @@ const initialState = {
 };
 
 
-export default function companyReportReducer(state = initialState, action) {
+export default function companyReportReducer(state = initialState, action: any): any {
     switch (action.type) {
 
     case INIT_DATA:

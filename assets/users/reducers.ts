@@ -37,7 +37,7 @@ const initialState = {
     products: [],
 };
 
-export default function userReducer(state = initialState, action) {
+export default function userReducer(state = initialState, action: any): any {
     switch (action.type) {
     case INIT_VIEW_DATA:
         return {

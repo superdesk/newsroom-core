@@ -8,7 +8,7 @@ const INITIAL_STATE = {
     active: '',
 };
 
-export function dashboardReducer(state=INITIAL_STATE, action) {
+export function dashboardReducer(state=INITIAL_STATE, action: any): any {
     if (!action) {
         return state;
     }

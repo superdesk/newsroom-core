@@ -7,32 +7,32 @@ import {reloadMyTopics as reloadMyAgendaTopics} from '../agenda/actions';
 import {reloadMyTopics as reloadMyWireTopics} from '../wire/actions';
 
 export const GET_TOPICS = 'GET_TOPICS';
-export function getTopics(topics) {
+export function getTopics(topics: any): any {
     return {type: GET_TOPICS, topics};
 }
 
 export const GET_USER = 'GET_USER';
-export function getUser(user) {
+export function getUser(user: any): any {
     return {type: GET_USER, user};
 }
 
 export const EDIT_USER = 'EDIT_USER';
-export function editUser(event) {
+export function editUser(event: any): any {
     return {type: EDIT_USER, event};
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(data) {
+export function initData(data: any): any {
     return {type: INIT_DATA, data};
 }
 
 export const SET_ERROR = 'SET_ERROR';
-export function setError(errors) {
+export function setError(errors: any): any {
     return {type: SET_ERROR, errors};
 }
 
 export const SELECT_MENU = 'SELECT_MENU';
-export function selectMenu(data) {
+export function selectMenu(data: any): any {
     return function(dispatch) {
         dispatch({type: SELECT_MENU, data});
         dispatch(reloadMyTopics());
@@ -40,23 +40,23 @@ export function selectMenu(data) {
 }
 
 export const SET_TOPIC_EDITOR_FULLSCREEN = 'SET_TOPIC_EDITOR_FULLSCREEN';
-export function setTopicEditorFullscreen(fullscreen) {
+export function setTopicEditorFullscreen(fullscreen: any): any {
     return {type: SET_TOPIC_EDITOR_FULLSCREEN, payload: fullscreen};
 }
 
 export const SELECT_MENU_ITEM = 'SELECT_MENU_ITEM';
-export function selectMenuItem(item) {
+export function selectMenuItem(item: any): any {
     return {type: SELECT_MENU_ITEM, item};
 }
 
-export function createOrUpdateTopic(menu, item, fullscreen) {
+export function createOrUpdateTopic(menu: any, item: any, fullscreen: any): any {
     userProfileStore.dispatch(selectMenuItem(item));
     userProfileStore.dispatch(selectMenu(menu));
     userProfileStore.dispatch(setTopicEditorFullscreen(fullscreen));
 }
 
 export const SELECT_PROFILE_MENU = 'SELECT_PROFILE_MENU';
-export function selectProfileMenu({menu, item}) {
+export function selectProfileMenu({menu: any, item}: any): any {
     userProfileStore.dispatch({
         type: SELECT_PROFILE_MENU,
         menu: menu,
@@ -65,12 +65,12 @@ export function selectProfileMenu({menu, item}) {
 }
 
 export const TOGGLE_DROPDOWN = 'TOGGLE_DROPDOWN';
-export function toggleDropdown() {
+export function toggleDropdown(): any {
     return {type: TOGGLE_DROPDOWN};
 }
 
 export const HIDE_MODAL = 'HIDE_MODAL';
-export function hideModal() {
+export function hideModal(): any {
     return {type: HIDE_MODAL};
 }
 
@@ -78,7 +78,7 @@ export function hideModal() {
 /**
  * Fetches user details
  */
-export function fetchUser(id) {
+export function fetchUser(id: any): any {
     return function (dispatch) {
         return server.get(`/users/${id}`)
             .then((data) => {
@@ -92,7 +92,7 @@ export function fetchUser(id) {
  * Saves a user
  *
  */
-export function saveUser() {
+export function saveUser(): any {
     return function (dispatch, getState) {
 
         const editedUser = {...getState().editedUser};
@@ -123,7 +123,7 @@ export function saveUser() {
  * Fetches followed topics for the user
  *
  */
-export function fetchTopics() {
+export function fetchTopics(): any {
     return function (dispatch, getState) {
         return server.get(`/users/${getState().user._id}/topics`)
             .then((data) => {
@@ -137,7 +137,7 @@ export function fetchTopics() {
  * Deletes the given followed topic
  *
  */
-export function deleteTopic(topic) {
+export function deleteTopic(topic: any): any {
     return function (dispatch) {
         const url = `/topics/${topic._id}`;
         return server.del(url)
@@ -154,7 +154,7 @@ export function deleteTopic(topic) {
  *
  * @return {function}
  */
-export function shareTopic(items) {
+export function shareTopic(items: any): any {
     return (dispatch, getState) => {
         const user = getState().user;
         const company = getState().company;
@@ -170,7 +170,7 @@ export function shareTopic(items) {
  *
  * @param {Object} data
  */
-export function submitShareTopic(data) {
+export function submitShareTopic(data: any): any {
     return (dispatch) => {
         return server.post('/topic_share', data)
             .then(() => {
@@ -186,7 +186,7 @@ export function submitShareTopic(data) {
  * Updates a followed topic
  *
  */
-export function submitFollowTopic(topic) {
+export function submitFollowTopic(topic: any): any {
     return (dispatch) => {
         const url = `/topics/${topic._id}`;
         return server.post(url, topic)
@@ -196,7 +196,7 @@ export function submitFollowTopic(topic) {
     };
 }
 
-function reloadMyTopics() {
+function reloadMyTopics(): any {
     return function(dispatch, getState) {
         const reloadMyTopicsFunction = getState().selectedMenu === 'events' ? reloadMyAgendaTopics : reloadMyWireTopics;
 
@@ -204,7 +204,7 @@ function reloadMyTopics() {
     };
 }
 
-export function pushNotification(push) {
+export function pushNotification(push: any): any {
     return (dispatch, getState) => {
         const user = getState().user;
         const company = getState().company;

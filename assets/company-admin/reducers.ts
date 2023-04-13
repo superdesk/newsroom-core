@@ -30,7 +30,7 @@ const initialState = {
     productId: null,
 };
 
-export function companyAdminReducer(state = initialState, action) {
+export function companyAdminReducer(state = initialState, action: any): any {
     switch (action.type) {
     case INIT_VIEW_DATA:
         return {

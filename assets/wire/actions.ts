@@ -29,34 +29,34 @@ import {
 } from 'search/actions';
 
 export const SET_STATE = 'SET_STATE';
-export function setState(state) {
+export function setState(state: any): any {
     return {type: SET_STATE, state};
 }
 
 export const SET_ITEMS = 'SET_ITEMS';
-export function setItems(items) {
+export function setItems(items: any): any {
     return {type: SET_ITEMS, items};
 }
 
 export const SET_ACTIVE = 'SET_ACTIVE';
-export function setActive(item) {
+export function setActive(item: any): any {
     return {type: SET_ACTIVE, item};
 }
 
 export const PREVIEW_ITEM = 'PREVIEW_ITEM';
-export function preview(item) {
+export function preview(item: any): any {
     return {type: PREVIEW_ITEM, item};
 }
 
-export function previewAndCopy(item) {
-    return (dispatch) => {
+export function previewAndCopy(item: any): any {
+    return (dispatch: any) => {
         dispatch(previewItem(item));
         dispatch(copyPreviewContents(item));
     };
 }
 
-export function previewItem(item) {
-    return (dispatch, getState) => {
+export function previewItem(item: any): any {
+    return (dispatch: any, getState: any) => {
         markItemAsRead(item, getState());
         dispatch(preview(item));
         recordAction(item, 'preview', getState().context, getState());
@@ -64,12 +64,12 @@ export function previewItem(item) {
 }
 
 export const OPEN_ITEM = 'OPEN_ITEM';
-export function openItemDetails(item) {
+export function openItemDetails(item: any): any {
     return {type: OPEN_ITEM, item};
 }
 
-export function openItem(item) {
-    return (dispatch, getState) => {
+export function openItem(item: any): any {
+    return (dispatch: any, getState: any) => {
         const state = getState();
         markItemAsRead(item, state);
         dispatch(openItemDetails(item));
@@ -83,55 +83,55 @@ export function openItem(item) {
     };
 }
 
-export function selectCopy(item) {
+export function selectCopy(item: any): any {
     return () => {
         recordAction(item, 'clipboard');
     };
 }
 
 export const QUERY_ITEMS = 'QUERY_ITEMS';
-export function queryItems() {
+export function queryItems(): any {
     return {type: QUERY_ITEMS};
 }
 
 export const LOADING_AGGREGATIONS = 'LOADING_AGGREGATIONS';
-function loadingAggregations() {
+function loadingAggregations(): any {
     return {type: LOADING_AGGREGATIONS};
 }
 
 export const RECIEVE_ITEMS = 'RECIEVE_ITEMS';
-export function recieveItems(data) {
+export function recieveItems(data: any): any {
     return {type: RECIEVE_ITEMS, data};
 }
 
 export const RECIEVE_AGGS = 'RECIEVE_AGGS';
-function recieveAggs(data) {
+function recieveAggs(data: any): any {
     return {type: RECIEVE_AGGS, data};
 }
 
 export const RECIEVE_ITEM = 'RECIEVE_ITEM';
-export function recieveItem(data) {
+export function recieveItem(data: any): any {
     return {type: RECIEVE_ITEM, data};
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(wireData, newsOnlyFilterText,readData, newsOnly, searchAllVersions) {
+export function initData(wireData: any, newsOnlyFilterText: any, readData: any, newsOnly: any, searchAllVersions: any): any {
     return {type: INIT_DATA, wireData, newsOnlyFilterText, readData, newsOnly, searchAllVersions};
 }
 
 export const TOGGLE_NEWS = 'TOGGLE_NEWS';
-export function toggleNews() {
+export function toggleNews(): any {
     toggleNewsOnlyParam();
     return {type: TOGGLE_NEWS};
 }
 
 export const TOGGLE_SEARCH_ALL_VERSIONS = 'TOGGLE_SEARCH_ALL_VERSIONS';
-export function toggleSearchAllVersions() {
+export function toggleSearchAllVersions(): any {
     toggleSearchAllVersionsParam();
     return {type: TOGGLE_SEARCH_ALL_VERSIONS};
 }
 
-export function removeItems(items) {
+export function removeItems(items: any): any {
     if (confirm(gettext('Are you sure you want to permanently remove these item(s)?'))) {
         return server.del('/wire', {items})
             .then(() => {
@@ -152,7 +152,7 @@ export const WIRE_ITEM_REMOVED = 'WIRE_ITEM_REMOVED';
  * Marks the items as deleted when they're removed from the system
  * @param {Array<String>} ids - List of ids of items that were removed
  */
-export function onItemsDeleted(ids) {
+export function onItemsDeleted(ids: any): any {
     return {type: WIRE_ITEM_REMOVED, ids: ids};
 }
 
@@ -161,8 +161,8 @@ export function onItemsDeleted(ids) {
  *
  * This is an initial version, should be updated with preview markup changes.
  */
-export function copyPreviewContents(item) {
-    return (dispatch, getState) => {
+export function copyPreviewContents(item: any): any {
+    return (dispatch: any, getState: any) => {
         const state = getState();
 
         if (!state.user) {
@@ -170,7 +170,7 @@ export function copyPreviewContents(item) {
         }
 
         server.post(`/wire/${item._id}/copy?type=${state.context}`)
-            .then((response) => {
+            .then((response: any) => {
                 dispatch(setCopyItem(item._id));
                 copyTextToClipboard(response.data, item);
             })
@@ -178,8 +178,8 @@ export function copyPreviewContents(item) {
     };
 }
 
-export function printItem(item) {
-    return (dispatch, getState) => {
+export function printItem(item: any): any {
+    return (dispatch: any, getState: any) => {
         const userContext = context(getState());
         let uri = `/${userContext}/${item._id}?print`;
         if (userContext === 'monitoring') {
@@ -202,7 +202,7 @@ export function printItem(item) {
  * @param {bool} aggs
  * @return {Promise}
  */
-export function search(state, next, aggs) {
+export function search(state: any, next?: any, aggs?: any): any {
     const searchParams = searchParamsSelector(state);
     const createdFilter = get(searchParams, 'created') || {};
     let created_to = createdFilter.to;
@@ -215,7 +215,7 @@ export function search(state, next, aggs) {
     const searchAllVersions = !!get(state, 'wire.searchAllVersions');
     const context = get(state, 'context', 'wire');
 
-    const params = {
+    const params: any = {
         q: !searchParams.query ? null : encodeURIComponent(searchParams.query),
         bookmarks: state.bookmarks ? state.user : null,
         navigation: getNavigationUrlParam(searchParams.navigation, true, false),
@@ -246,8 +246,8 @@ export function search(state, next, aggs) {
 /**
  * Fetch items for current query
  */
-export function fetchItems() {
-    return (dispatch, getState) => {
+export function fetchItems(): any {
+    return (dispatch: any, getState: any) => {
         const start = Date.now();
         dispatch(queryItems());
         dispatch(loadingAggregations());
@@ -255,22 +255,22 @@ export function fetchItems() {
         const state = getState();
         return Promise.all([
             search(state, false, false)
-                .then((data) => dispatch(recieveItems(data)))
+                .then((data: any) => dispatch(recieveItems(data)))
                 .then(() => {
                     analytics.timingComplete('search', Date.now() - start);
                 })
                 .catch(errorHandler),
             search(state, false, true)
-                .then((data) => dispatch(recieveAggs(data))),
+                .then((data: any) => dispatch(recieveAggs(data))),
         ]);
     };
 }
 
 
-export function fetchItem(id) {
-    return (dispatch, getState) => {
+export function fetchItem(id: any): any {
+    return (dispatch: any, getState: any) => {
         return server.get(`/${context(getState())}/${id}?format=json&context=wire`)
-            .then((data) => dispatch(recieveItem(data)))
+            .then((data: any) => dispatch(recieveItem(data)))
             .catch(errorHandler);
     };
 }
@@ -280,69 +280,69 @@ export function fetchItem(id) {
  *
  * @return {function}
  */
-export function shareItems(items) {
-    return (dispatch, getState) => {
+export function shareItems(items: any): any {
+    return (dispatch: any, getState: any) => {
         const user = getState().user;
         const company = getState().company;
         return server.get(`/companies/${company}/users`)
-            .then((users) => users.filter((u) => u._id !== user))
-            .then((users) => dispatch(renderModal('shareItem', {items, users})))
+            .then((users: any) => users.filter((u: any) => u._id !== user))
+            .then((users: any) => dispatch(renderModal('shareItem', {items, users})))
             .catch(errorHandler);
     };
 }
 
 export const TOGGLE_SELECTED = 'TOGGLE_SELECTED';
-export function toggleSelected(item) {
+export function toggleSelected(item: any): any {
     return {type: TOGGLE_SELECTED, item};
 }
 
 export const SELECT_ALL = 'SELECT_ALL';
-export function selectAll() {
+export function selectAll(): any {
     return {type: SELECT_ALL};
 }
 
 export const SELECT_NONE = 'SELECT_NONE';
-export function selectNone() {
+export function selectNone(): any {
     return {type: SELECT_NONE};
 }
 
 export const SHARE_ITEMS = 'SHARE_ITEMS';
-export function setShareItems(items) {
+export function setShareItems(items: any): any {
     return {type: SHARE_ITEMS, items};
 }
 
 export const DOWNLOAD_ITEMS = 'DOWNLOAD_ITEMS';
-export function setDownloadItems(items) {
+export function setDownloadItems(items: any): any {
     return {type: DOWNLOAD_ITEMS, items};
 }
 
 export const EXPORT_ITEMS = 'EXPORT_ITEMS';
-export function setExportItems(items) {
+export function setExportItems(items: any): any {
     return {type: EXPORT_ITEMS, items};
 }
 
 export const COPY_ITEMS = 'COPY_ITEMS';
-export function setCopyItem(item) {
+export function setCopyItem(item: any): any {
     return {type: COPY_ITEMS, items: [item]};
 }
 
 export const PRINT_ITEMS = 'PRINT_ITEMS';
-export function setPrintItem(item) {
+export function setPrintItem(item: any): any {
     return {type: PRINT_ITEMS, items: [item]};
 }
 
 export const BOOKMARK_ITEMS = 'BOOKMARK_ITEMS';
-export function setBookmarkItems(items) {
+export function setBookmarkItems(items: any): any {
     return {type: BOOKMARK_ITEMS, items};
 }
 
 export const REMOVE_BOOKMARK = 'REMOVE_BOOKMARK';
-export function removeBookmarkItems(items) {
+export function removeBookmarkItems(items: any): any {
     return {type: REMOVE_BOOKMARK, items};
 }
 
-export function bookmarkItems(items) {
-    return (dispatch, getState) =>
+export function bookmarkItems(items: any): any {
+    return (dispatch: any, getState: any) =>
         server.post(`/${getState().context}_bookmark`, {items})
             .then(() => {
                 if (items.length > 1) {
@@ -352,14 +352,14 @@ export function bookmarkItems(items) {
                 }
             })
             .then(() => {
-                analytics.multiItemEvent('bookmark', items.map((_id) => getState().itemsById[_id]));
+                analytics.multiItemEvent('bookmark', items.map((_id: any) => getState().itemsById[_id]));
             })
             .then(() => dispatch(setBookmarkItems(items)))
             .catch(errorHandler);
 }
 
-export function removeBookmarks(items) {
-    return (dispatch, getState) =>
+export function removeBookmarks(items: any): any {
+    return (dispatch: any, getState: any) =>
         server.del(`/${getState().context}_bookmark`, {items})
             .then(() => {
                 if (items.length > 1) {
@@ -373,7 +373,7 @@ export function removeBookmarks(items) {
             .catch(errorHandler);
 }
 
-function errorHandler(reason) {
+function errorHandler(reason: any): any {
     console.error('error', reason);
 }
 
@@ -383,9 +383,9 @@ function errorHandler(reason) {
  * @param {Object} item
  * @return {Promise}
  */
-export function fetchVersions(item) {
+export function fetchVersions(item: any): any {
     return () => server.get(`/wire/${item._id}/versions`)
-        .then((data) => {
+        .then((data: any) => {
             return data._items;
         });
 }
@@ -396,7 +396,7 @@ export function fetchVersions(item) {
  * @param {string} id
  * @param {string} filename
  */
-export function downloadMedia(id, filename) {
+export function downloadMedia(id: any, filename: any): any {
     return () => {
         window.open(`/assets/${id}?filename=${filename}`, '_blank');
         analytics.event('download-media', filename || id);
@@ -408,7 +408,7 @@ export function downloadMedia(id, filename) {
  *
  * @param {Array} items
  */
-export function downloadItems(items) {
+export function downloadItems(items: any): any {
     return renderModal('downloadItems', {items});
 }
 
@@ -418,8 +418,8 @@ export function downloadItems(items) {
  * @param {Array} items
  * @param {String} params
  */
-export function submitDownloadItems(items, params) {
-    return (dispatch, getState) => {
+export function submitDownloadItems(items: any, params: any): any {
+    return (dispatch: any, getState: any) => {
         const {format, secondaryFormat} = params;
         const userContext = context(getState());
         let uri = `/download/${items.join(',')}?format=${format}&type=${userContext}`;
@@ -431,11 +431,11 @@ export function submitDownloadItems(items, params) {
         browserDownload(uri);
         dispatch(setDownloadItems(items));
         dispatch(closeModal());
-        analytics.multiItemEvent('download', items.map((_id) => getState().itemsById[_id]));
+        analytics.multiItemEvent('download', items.map((_id: any) => getState().itemsById[_id]));
     };
 }
 
-function browserDownload(url) {
+function browserDownload(url: any): any {
     const link = document.createElement('a');
     link.download = '';
     link.href = url;
@@ -443,7 +443,7 @@ function browserDownload(url) {
 }
 
 export const REMOVE_NEW_ITEMS = 'REMOVE_NEW_ITEMS';
-export function removeNewItems(data) {
+export function removeNewItems(data: any): any {
     return {type: REMOVE_NEW_ITEMS, data};
 }
 
@@ -452,8 +452,8 @@ export function removeNewItems(data) {
  *
  * @param {Object} push
  */
-export function pushNotification(push) {
-    return (dispatch, getState) => {
+export function pushNotification(push: any): any {
+    return (dispatch: any, getState: any) => {
         const user = getState().user;
         const company = getState().company;
 
@@ -485,11 +485,11 @@ export function pushNotification(push) {
     };
 }
 
-export function reloadMyTopics(reloadTopic = false) {
-    return function(dispatch) {
+export function reloadMyTopics(reloadTopic = false): any {
+    return function(dispatch: any) {
         return loadMyTopics()
-            .then((data) => {
-                const wireTopics = data.filter((topic) => !topic.topic_type || topic.topic_type === 'wire');
+            .then((data: any) => {
+                const wireTopics = data.filter((topic: any) => !topic.topic_type || topic.topic_type === 'wire');
                 dispatch(setTopics(wireTopics));
 
                 if (reloadTopic) {
@@ -504,8 +504,8 @@ export function reloadMyTopics(reloadTopic = false) {
 }
 
 export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
-export function setNewItems(data) {
-    return function (dispatch) {
+export function setNewItems(data: any): any {
+    return function (dispatch: any) {
         if (get(data, '_items.length') <= 0 || get(data, '_items[0].type') !== 'text') {
             return Promise.resolve();
         }
@@ -515,12 +515,12 @@ export function setNewItems(data) {
     };
 }
 
-export function fetchNewItems() {
-    return (dispatch, getState) => search(getState())
+export function fetchNewItems(): any {
+    return (dispatch: any, getState: any) => search(getState())
         .then((response) => dispatch(setNewItems(response)));
 }
 
-export function fetchNext(item) {
+export function fetchNext(item: any): any {
     return () => {
         if (!item.nextversion) {
             return Promise.reject();
@@ -531,24 +531,24 @@ export function fetchNext(item) {
 }
 
 export const TOGGLE_FILTER = 'TOGGLE_FILTER';
-export function toggleFilter(key, val, single) {
+export function toggleFilter(key: any, val: any, single: any): any {
     return (dispatch) => {
         setTimeout(() => dispatch({type: TOGGLE_FILTER, key, val, single}));
     };
 }
 
 export const START_LOADING = 'START_LOADING';
-export function startLoading() {
+export function startLoading(): any {
     return {type: START_LOADING};
 }
 
 export const RECIEVE_NEXT_ITEMS = 'RECIEVE_NEXT_ITEMS';
-export function recieveNextItems(data) {
+export function recieveNextItems(data: any): any {
     return {type: RECIEVE_NEXT_ITEMS, data};
 }
 
 const MAX_ITEMS = 1000; // server limit
-export function fetchMoreItems() {
+export function fetchMoreItems(): any {
     return (dispatch, getState) => {
         const state = getState();
         const limit = Math.min(MAX_ITEMS, state.totalItems);
@@ -564,7 +564,7 @@ export function fetchMoreItems() {
     };
 }
 
-export function loadMyWireTopic(topicId) {
+export function loadMyWireTopic(topicId: any): any {
     return (dispatch) => {
         dispatch(loadMyTopic(topicId));
         return dispatch(fetchItems());
@@ -576,7 +576,7 @@ export function loadMyWireTopic(topicId) {
  *
  * @param {URLSearchParams} params
  */
-export function initParams(params) {
+export function initParams(params: any): any {
     return (dispatch, getState) => {
         dispatch(initSearchParams(params));
         if (params.get('item')) {

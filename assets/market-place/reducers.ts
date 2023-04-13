@@ -9,7 +9,7 @@ const initialState = {
 };
 
 
-export default function marketPlaceHomeReducer(state = initialState, action) {
+export default function marketPlaceHomeReducer(state = initialState, action: any): any {
     if (action.type === INIT_DATA) {
         // map the navigation id to navigation object
         const navigationById = keyBy(action.data.navigations|| [], '_id');
