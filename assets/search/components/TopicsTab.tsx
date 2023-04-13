@@ -1,41 +1,38 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-
-import {gettext, isWireContext} from 'utils';
-
-import {removeNewItems} from 'wire/actions';
-import FilterButton from 'wire/components/filters/FilterButton';
-import {loadMyWireTopic} from 'wire/actions';
-import {loadMyAgendaTopic} from 'agenda/actions';
-import {CollapseBoxWithButton} from '../../ui/components/Collapse';
+import {loadMyAgendaTopic} from 'assets/agenda/actions';
+import {CollapseBoxWithButton} from 'assets/ui/components/Collapse';
+import {globalTopicsEnabledSelector} from 'assets/ui/selectors';
+import {isWireContext, gettext} from 'assets/utils';
+import {removeNewItems, loadMyWireTopic} from 'assets/wire/actions';
+import FilterButton from 'assets/wire/components/filters/FilterButton';
 import {TopicItem} from './TopicItem';
-import {globalTopicsEnabledSelector} from 'ui/selectors';
 
 const manageTopics = () => document.dispatchEvent(new Event('manage_topics'));
 
-function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNewItems, globalTopicsEnabled}) {
-    const clickTopic = (event, topic) => {
+function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNewItems, globalTopicsEnabled}: any) {
+    const clickTopic = (event: any, topic: any) => {
         event.preventDefault();
         removeNewItems(topic._id);
         loadMyTopic(topic);
     };
 
-    const clickManage = (event) => {
+    const clickManage = (event: any) => {
         event.preventDefault();
         manageTopics();
     };
 
-    const topicClass = (topic) => (
+    const topicClass = (topic: any) => (
         `btn w-100 btn-outline-${topic._id === activeTopicId ? 'primary' : 'secondary'}`
     );
 
     const activeTopicId = activeTopic ? activeTopic._id : null;
     const personalTopics = (topics || []).filter(
-        (topic) => !topic.is_global
+        (topic: any) => !topic.is_global
     );
     const globalTopics = (topics || []).filter(
-        (topic) => topic.is_global
+        (topic: any) => topic.is_global
     );
 
     const tabName = isWireContext() ? gettext('Wire Topics') : gettext('Agenda Topics');
@@ -48,7 +45,7 @@ function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNew
                 </div>
             ) : (
                 <div className="m-3">
-                    {personalTopics.map((topic) => (
+                    {personalTopics.map((topic: any) => (
                         <TopicItem
                             key={topic._id}
                             topic={topic}
@@ -79,7 +76,7 @@ function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNew
                     </div>
                 ) : (
                     <div className="m-3">
-                        {personalTopics.map((topic) => (
+                        {personalTopics.map((topic: any) => (
                             <TopicItem
                                 key={topic._id}
                                 topic={topic}
@@ -102,7 +99,7 @@ function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNew
                     </div>
                 ) : (
                     <div className="m-3">
-                        {globalTopics.map((topic) => (
+                        {globalTopics.map((topic: any) => (
                             <TopicItem
                                 key={topic._id}
                                 topic={topic}
@@ -134,15 +131,15 @@ TopicsTab.propTypes = {
     globalTopicsEnabled: PropTypes.bool,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     topics: state.topics || [],
     newItemsByTopic: state.newItemsByTopic,
     globalTopicsEnabled: globalTopicsEnabledSelector(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    removeNewItems: (topicId) => dispatch(removeNewItems(topicId)),
-    loadMyTopic: (topic) => topic.topic_type === 'agenda' ?
+const mapDispatchToProps = (dispatch: any) => ({
+    removeNewItems: (topicId: any) => dispatch(removeNewItems(topicId)),
+    loadMyTopic: (topic: any) => topic.topic_type === 'agenda' ?
         dispatch(loadMyAgendaTopic(topic._id)) :
         dispatch(loadMyWireTopic(topic._id)),
 });

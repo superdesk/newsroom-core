@@ -3,10 +3,13 @@ import PropTypes from 'prop-types';
 import 'react-toggle/style.css';
 import {get} from 'lodash';
 import {Tooltip} from 'bootstrap';
+import {isTouchDevice, isWireContext, gettext} from 'assets/utils';
 
-import {gettext, isTouchDevice, isWireContext} from 'utils';
+class NewItemsIcon extends React.Component<any, any> {
+    dom: any;
+    tooltip: any;
+    static propTypes: any;
 
-class NewItemsIcon extends React.Component {
     constructor(props: any) {
         super(props);
 

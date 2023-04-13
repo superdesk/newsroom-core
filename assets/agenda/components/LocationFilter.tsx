@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get, debounce} from 'lodash';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import server from 'server';
 import {KEYS} from 'common';
 
@@ -105,7 +105,7 @@ export class LocationFilter extends React.Component<any, any> {
      *
      * @param {MouseEvent} event
      */
-    handleClickOutside(event) {
+    handleClickOutside(event: any) {
         if (!this.dom.container ||
             this.dom.container.contains(event.target) ||
             !document.contains(event.target) ||

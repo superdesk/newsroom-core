@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import SectionFilterListItem from './SectionFilterListItem';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
-
-function SectionFilterList({sectionFilters, onClick, activeSectionFilterId}) {
-    const list = sectionFilters.map((sectionFilter) =>
+function SectionFilterList({sectionFilters, onClick, activeSectionFilterId}: any) {
+    const list = sectionFilters.map((sectionFilter: any) =>
         <SectionFilterListItem
             key={sectionFilter._id}
             sectionFilter={sectionFilter}

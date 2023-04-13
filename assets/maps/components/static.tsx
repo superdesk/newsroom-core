@@ -4,7 +4,7 @@ import {getMapSource} from '../utils';
 import {gettext} from '../../utils';
 
 
-class StaticMap extends React.Component{
+class StaticMap extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.state = {

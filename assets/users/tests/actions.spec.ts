@@ -4,11 +4,11 @@ import thunk from 'redux-thunk';
 
 import fetchMock from 'fetch-mock';
 
-import wireApp from 'users/reducers';
-import * as actions from 'users/actions';
+import wireApp from 'assets/users/reducers';
+import * as actions from 'assets/users/actions';
 
 describe('fetch actions', () => {
-    let store;
+    let store: any;
     const response = [{_id: 'foo'}];
 
     beforeEach(() => {

@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext} from 'utils';
-import {getOriginalRendition} from 'wire/utils';
+import {gettext} from 'assets/utils';
 
-export default function ArticleMedia({isKilled, media, download}) {
+export default function ArticleMedia({isKilled, media, download}: any) {
     const rendition = getOriginalRendition(media);
     const filename = media.slugline || rendition.media;
 

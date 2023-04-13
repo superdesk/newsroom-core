@@ -313,7 +313,7 @@ AgendaApp.propTypes = {
     groups: PropTypes.array,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     state: state,
     isLoading: state.isLoading,
     totalItems: state.totalItems,
@@ -357,26 +357,26 @@ const mapStateToProps = (state) => ({
     hasAgendaFeaturedItems: state.hasAgendaFeaturedItems,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     fetchItems: () => dispatch(fetchItems()),
     actions: getAgendaItemActions(dispatch),
     coverageActions: getCoverageItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
-    setView: (view) => dispatch(setView(view)),
+    setView: (view: any) => dispatch(setView(view)),
     closePreview: () => dispatch(previewItem(null)),
-    toggleDropdownFilter: (field, value) => {
+    toggleDropdownFilter: (field: any, value: any) => {
         setAgendaDropdownFilter(field, value);
         dispatch(toggleDropdownFilter(field, value));
     },
-    selectDate: (dateString, grouping) => {
+    selectDate: (dateString: any, grouping: any) => {
         dispatch(selectDate(dateString, grouping));
         setActiveDate(dateString);
         dispatch(fetchItems());
     },
-    openItemDetails: (item) => dispatch(openItemDetails(item)),
-    requestCoverage: (item, message) => dispatch(requestCoverage(item, message)),
-    toggleFeaturedFilter: (fetch) => dispatch(toggleFeaturedFilter(fetch)),
-    setQuery: (query) => dispatch(setQuery(query)),
+    openItemDetails: (item: any) => dispatch(openItemDetails(item)),
+    requestCoverage: (item: any, message: any) => dispatch(requestCoverage(item, message)),
+    toggleFeaturedFilter: (fetch: any) => dispatch(toggleFeaturedFilter(fetch)),
+    setQuery: (query: any) => dispatch(setQuery(query)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AgendaApp);

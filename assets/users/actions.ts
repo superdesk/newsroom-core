@@ -1,7 +1,7 @@
-import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
-import {searchQuerySelector} from 'search/selectors';
 import {get, cloneDeep} from 'lodash';
+import {searchQuerySelector} from 'assets/search/selectors';
+import {errorHandler, notify, gettext} from 'assets/utils';
 
 export const SELECT_USER = 'SELECT_USER';
 export function selectUser(id: any): any {
@@ -83,7 +83,7 @@ export function fetchUsers(): any {
         dispatch(queryUsers());
         const state = getState();
         const query = searchQuerySelector(state) || '';
-        const filterQuery = {};
+        const filterQuery: any = {};
 
         if (state.company && state.company !== '') {
             filterQuery.company = state.company;

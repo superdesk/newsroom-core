@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default function PreviewTagsBlock(props) {
+export default function PreviewTagsBlock(props: any) {
     return (
         <div className='column__preview__tags__column'>
             <span className='wire-column__preview__tags__headline'>

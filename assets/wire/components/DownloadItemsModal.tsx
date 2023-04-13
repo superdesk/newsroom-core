@@ -1,16 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {gettext} from 'utils';
-import {submitDownloadItems} from 'wire/actions';
-import {modalFormValid} from 'actions';
-import {context, modalOptions, modalSecondaryFormatOptions} from '../../selectors';
+import {gettext} from 'assets/utils';
+import {modalFormValid} from 'assets/actions';
+import SelectInput from 'assets/components/SelectInput';
+import {modalOptions, context, modalSecondaryFormatOptions} from 'assets/selectors';
+import {Modal} from 'bootstrap';
 import {get} from 'lodash';
+import {submitDownloadItems} from '../actions';
 
-import Modal from 'components/Modal';
-import SelectInput from 'components/SelectInput';
-
-class DownloadItemsModal extends React.Component {
+class DownloadItemsModal extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.state = {
@@ -30,7 +29,7 @@ class DownloadItemsModal extends React.Component {
         this.props.modalFormValid();
     }
 
-    onChange(field, event) {
+    onChange(field: any, event: any) {
         this.setState({
             ...this.state,
             params: {
@@ -40,7 +39,7 @@ class DownloadItemsModal extends React.Component {
         });
     }
 
-    onSubmit(event) {
+    onSubmit(event: any) {
         event.preventDefault();
         this.props.onSubmit(this.state);
     }
@@ -85,14 +84,14 @@ DownloadItemsModal.propTypes = {
     secondaryOptions: PropTypes.array,
 };
 
-const mapStateToProps = (state, props) => ({
+const mapStateToProps = (state: any, props: any) => ({
     options: modalOptions(state, props),
     context: context(state),
     secondaryOptions: modalSecondaryFormatOptions(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    onSubmit: ({items, params}) => dispatch(submitDownloadItems(items, params)),
+const mapDispatchToProps = (dispatch: any) => ({
+    onSubmit: ({items, params}: any) => dispatch(submitDownloadItems(items, params)),
     modalFormValid: () => dispatch(modalFormValid()),
 });
 

@@ -2,8 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
-import {gettext} from 'utils';
-
 import {
     deleteUser,
     resendUserInvite,
@@ -15,16 +13,19 @@ import {
     setError,
     cancelEdit
 } from '../actions';
-import {searchQuerySelector} from 'search/selectors';
 import {userSelector} from '../selectors';
 
 import EditUser from './EditUser';
 import UsersList from './UsersList';
-import SearchResults from 'search/components/SearchResults';
+import SearchResults from 'assets/search/components/SearchResults';
+import {searchQuerySelector} from 'assets/search/selectors';
+import {gettext} from 'assets/utils';
 
 
-class Users extends React.Component {
-    constructor(props, context) {
+class Users extends React.Component<any, any> {
+    static propTypes: any;
+
+    constructor(props: any, context: any) {
         super(props, context);
 
         this.isFormValid = this.isFormValid.bind(this);
@@ -34,7 +35,7 @@ class Users extends React.Component {
 
     isFormValid() {
         let valid = true;
-        const errors = {};
+        const errors: any = {};
 
         if (!this.props.userToEdit.email) {
             errors.email = [gettext('Please provide email')];
@@ -45,7 +46,7 @@ class Users extends React.Component {
         return valid;
     }
 
-    save(event) {
+    save(event: any) {
         event.preventDefault();
 
         if (!this.isFormValid()) {
@@ -55,7 +56,7 @@ class Users extends React.Component {
         this.props.saveUser('users');
     }
 
-    deleteUser(event) {
+    deleteUser(event: any) {
         event.preventDefault();
 
         confirm(gettext('Would you like to delete user: {{name}}?', {name: this.props.userToEdit.first_name})) &&
@@ -131,7 +132,7 @@ Users.propTypes = {
     products: PropTypes.arrayOf(PropTypes.object),
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     users: state.users.map((id) => state.usersById[id]),
     userToEdit: state.userToEdit,
     activeUserId: state.activeUserId,
@@ -145,7 +146,7 @@ const mapStateToProps = (state) => ({
     products: state.products,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     selectUser: (_id) => dispatch(selectUser(_id)),
     editUser: (event) => dispatch(editUser(event)),
     saveUser: (type) => dispatch(postUser(type)),

@@ -10,7 +10,7 @@ import {
     LIST_ANIMATIONS,
     getSlugline,
     getConfig,
-} from 'utils';
+} from 'assets/utils';
 import {
     getPicture,
     getThumbnailRendition,
@@ -19,9 +19,9 @@ import {
     isKilled,
     getVideos,
     getCaption,
-} from 'wire/utils';
+} from 'assets/wire/utils';
 
-import ActionButton from 'components/ActionButton';
+import ActionButton from 'assets/components/ActionButton';
 
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import WireListItemIcons from './WireListItemIcons';
@@ -37,7 +37,7 @@ export const DISPLAY_CHAR_COUNT = getConfig('display_char_count');
 const DEFAULT_META_FIELDS = ['source', 'charcount', 'versioncreated'];
 const DEFAULT_COMPACT_META_FIELDS = ['versioncreated'];
 
-function getShowVersionText(isExpanded, itemCount, matchCount, isExtended) {
+function getShowVersionText(isExpanded: any, itemCount: any, matchCount: any, isExtended: any) {
     if (isExpanded) {
         return (isExtended && matchCount) ?
             gettext(
@@ -67,7 +67,11 @@ function getShowVersionText(isExpanded, itemCount, matchCount, isExtended) {
     }
 }
 
-class WireListItem extends React.Component {
+class WireListItem extends React.Component<any, any> {
+    dom: any;
+    wordCount: any;
+    characterCount: any;
+    static propTypes: any;
     constructor(props: any) {
         super(props);
         this.wordCount = wordCount(props.item);
@@ -79,7 +83,7 @@ class WireListItem extends React.Component {
         this.dom = {article: null};
     }
 
-    onKeyDown(event) {
+    onKeyDown(event: any) {
         switch (event.key) {
         case ' ': // on space toggle selected item
             this.props.toggleSelected();
@@ -92,7 +96,7 @@ class WireListItem extends React.Component {
         event.preventDefault();
     }
 
-    togglePreviousVersions(event) {
+    togglePreviousVersions(event: any) {
         event.stopPropagation();
         this.setState({previousVersions: !this.state.previousVersions});
     }
@@ -103,7 +107,7 @@ class WireListItem extends React.Component {
         }
     }
 
-    stopPropagation(event) {
+    stopPropagation(event: any) {
         event.stopPropagation();
     }
 
@@ -146,7 +150,7 @@ class WireListItem extends React.Component {
         const fields = listConfig.metadata_fields || DEFAULT_META_FIELDS;
         const compactFields = listConfig.compact_metadata_fields || DEFAULT_COMPACT_META_FIELDS;
         const matchedIds = this.props.isSearchFiltered ? this.props.matchedIds : [];
-        const matchedAncestors = matchedIds.filter((id) => (item.ancestors || []).includes(id));
+        const matchedAncestors = matchedIds.filter((id: any) => (item.ancestors || []).includes(id));
 
         return (
             <article
@@ -319,7 +323,7 @@ class WireListItem extends React.Component {
                         />
 
                         {!this.props.showShortcutActionIcons ? null : this.props.actions.map(
-                            (action) => (
+                            (action: any) => (
                                 action.shortcut && (
                                     <ActionButton
                                         key={action.name}

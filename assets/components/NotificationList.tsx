@@ -4,11 +4,11 @@ import classNames from 'classnames';
 import {get} from 'lodash';
 import {Tooltip} from 'bootstrap';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {isTouchDevice} from '../utils';
 import NotificationListItem from './NotificationListItem';
 
-class NotificationList extends React.Component {
+class NotificationList extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.state = {
@@ -49,7 +49,7 @@ class NotificationList extends React.Component {
         this.setState({connected: false});
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         if (this.state.displayItems && this.props.count !== prevProps.count) {
             this.props.loadNotifications();
         }

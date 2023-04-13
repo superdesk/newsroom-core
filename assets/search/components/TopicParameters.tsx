@@ -2,15 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get, keyBy} from 'lodash';
+import {getCreatedSearchParamLabel, gettext} from 'assets/utils';
+import {filterGroupsToLabelMap, filterGroups} from '../selectors';
 
-import {gettext, getCreatedSearchParamLabel} from 'utils';
-import {filterGroupsToLabelMap, filterGroups} from 'search/selectors';
-
-const TopicParameters = ({topic, navigations, locators, filterGroupLabels, filterGroupsMain}) => {
+const TopicParameters = ({topic, navigations, locators, filterGroupLabels, filterGroupsMain}: any) => {
     const filters = get(topic, 'filter') || {};
     const navsById = keyBy(navigations, '_id');
     const navs = (get(topic, 'navigation') || [])
-        .map((navId) => get(navsById, `[${navId}].name`));
+        .map((navId: any) => get(navsById, `[${navId}].name`));
 
     const created = getCreatedSearchParamLabel(get(topic, 'created') || {});
     const dateLabels = [];
@@ -26,12 +25,12 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels, filte
         }
     }
 
-    const renderParam = (name, items) => get(items, 'length', 0) < 1 ? null : (
+    const renderParam = (name: any, items: any) => get(items, 'length', 0) < 1 ? null : (
         <div className="info-box__content">
             <span className="wire-column__preview__tags__headline">
                 {name}
             </span>
-            {items.map((item) => (
+            {items.map((item: any) => (
                 <span className="wire-column__preview__tag" key={item.toString().replace(/\s+/g, '_')}>
                     {item}
                 </span>
@@ -42,7 +41,7 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels, filte
     const filterGroups = () => {
         return (
             <div>
-                {filterGroupsMain.map((element) => renderParam(get(filterGroupLabels, element.field, element.label), filters[element.field]))}
+                {filterGroupsMain.map((element: any) => renderParam(get(filterGroupLabels, element.field, element.label), filters[element.field]))}
             </div>
         );
     };
@@ -52,7 +51,7 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels, filte
             return null;
         }
 
-        const getPlaceName = (placeId) => {
+        const getPlaceName = (placeId: any) => {
             const region = (Object.values(locators) || []).find((l) => l.name === placeId);
             return region ?
                 (get(region, 'state') || get(region, 'country') || get(region, 'world_region')) :
@@ -86,10 +85,10 @@ TopicParameters.propTypes = {
     filterGroupsMain: PropTypes.array
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     locators: get(state, 'locators.items', []),
     filterGroupLabels: filterGroupsToLabelMap(state),
     filterGroupsMain: filterGroups(state),
 });
 
-export default connect(mapStateToProps, null)(TopicParameters);
+export default connect(mapStateToProps, null)(TopicParameters as any);

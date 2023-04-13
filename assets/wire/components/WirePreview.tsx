@@ -2,8 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {isEmpty} from 'lodash';
-
-import {isDisplayed} from 'utils';
 import {
     getItemMedia,
     showItemVersions,
@@ -13,19 +11,7 @@ import {
     isCustomRendition,
     getPictureList,
 } from 'wire/utils';
-import types from 'wire/types';
-
-import Preview from 'ui/components/Preview';
-import ArticleSlugline from 'ui/components/ArticleSlugline';
-import ArticleAuthor from  'ui/components/ArticleAuthor';
-import ArticlePicture from  'ui/components/ArticlePicture';
-import ArticleMedia from  'ui/components/ArticleMedia';
-import ArticleHeadline from 'ui/components/ArticleHeadline';
-import ArticleAbstract from 'ui/components/ArticleAbstract';
-import ArticleBodyHtml from 'ui/components/ArticleBodyHtml';
-import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
-
-
+import types from 'assets/wire/types';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import PreviewTags from './PreviewTags';
 import PreviewMeta from './PreviewMeta';
@@ -33,9 +19,21 @@ import AgendaLinks from './AgendaLinks';
 import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
+import ArticleAbstract from 'assets/ui/components/ArticleAbstract';
+import ArticleAuthor from 'assets/ui/components/ArticleAuthor';
+import ArticleBodyHtml from 'assets/ui/components/ArticleBodyHtml';
+import ArticleEmbargoed from 'assets/ui/components/ArticleEmbargoed';
+import ArticleHeadline from 'assets/ui/components/ArticleHeadline';
+import ArticleMedia from 'assets/ui/components/ArticleMedia';
+import ArticlePicture from 'assets/ui/components/ArticlePicture';
+import ArticleSlugline from 'assets/ui/components/ArticleSlugline';
+import Preview from 'assets/ui/components/Preview';
+import {isDisplayed} from 'assets/utils';
 
 
 class WirePreview extends React.PureComponent<any, any> {
+    preview: any;
+    static propTypes: any;
     constructor(props: any) {
         super(props);
     }
@@ -77,7 +75,7 @@ class WirePreview extends React.PureComponent<any, any> {
                     {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item}/>}
                     {(isDisplayed('byline', previewConfig) || isDisplayed('located', previewConfig)) &&
                         <ArticleAuthor item={item} displayConfig={previewConfig} />}
-                    {pictures && pictures.map((pic)=> (
+                    {pictures && pictures.map((pic: any)=> (
                         <ArticlePicture
                             key={pic._id}
                             picture={pic}
@@ -90,9 +88,9 @@ class WirePreview extends React.PureComponent<any, any> {
                         filterGroupLabels={filterGroupLabels} />}
                     {isDisplayed('abstract', previewConfig) &&
                     <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
-                    {isDisplayed('body_html', previewConfig) && <ArticleBodyHtml item={item}/>}
+                    {isDisplayed('body_html', previewConfig) && <ArticleBodyHtml item={item} />}
 
-                    {!isEmpty(media) && media.map((media) => <ArticleMedia
+                    {!isEmpty(media) && media.map((media: any) => <ArticleMedia
                         key={media.guid}
                         media={media}
                         isKilled={isKilled(item)}

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import classNames from 'classnames';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
 import {setProductFilter, setSection} from '../actions';
 import {
@@ -32,7 +32,7 @@ import EditUser from 'users/components/EditUser';
 import {CompanyDetailsProductFilter} from './CompanyDetailsProductFilter';
 import {CompanyAdminProductSeatRequestModal} from './CompanyAdminProductSeatRequestModal';
 
-class CompanyAdminAppComponent extends React.Component {
+class CompanyAdminAppComponent extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
 
@@ -234,7 +234,7 @@ CompanyAdminAppComponent.propTypes = {
     totalUsers:PropTypes.number
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     sectionId: state.sectionId,
     user: currentUserSelector(state),
     userToEdit: state.userToEdit,
@@ -248,7 +248,7 @@ const mapStateToProps = (state) => ({
     totalUsers:state.totalUsers
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     setSection: (sectionId) => dispatch(setSection(sectionId)),
     newUser: () => dispatch(newUser()),
     editUser: (event) => dispatch(editUser(event)),

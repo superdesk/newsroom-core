@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import UserListItem from './UserListItem';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
 
-function UsersList({users, onClick, activeUserId, companiesById}) {
-    const list = users.map((user) =>
+function UsersList({users, onClick, activeUserId, companiesById}: any) {
+    const list = users.map((user: any) =>
         <UserListItem
             key={user._id}
             user={user}

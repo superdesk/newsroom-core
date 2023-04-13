@@ -1,4 +1,4 @@
-import {createStore, render} from 'utils';
+import {createStore, render} from 'assets/utils';
 import clientReducer from './reducers';
 import ClientsApp from './components/ClientsApp';
 import {initViewData} from './actions';

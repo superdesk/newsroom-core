@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {shortDate} from 'utils';
+import {shortDate} from 'assets/utils';
 
-function ClientListItem({client, onClick}) {
+function ClientListItem({client, onClick}: any) {
     return (
         <tr key={client._id}
             className={classNames({'table-secondary': false})}

@@ -6,13 +6,13 @@ import EditPanel from 'components/EditPanel';
 import FileInput from 'components/FileInput';
 import {get} from 'lodash';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {sectionsPropType} from 'features/sections/types';
 import {MAX_TILE_IMAGES} from '../actions';
 import AuditInformation from 'components/AuditInformation';
 
 
-class EditNavigation extends React.Component {
+class EditNavigation extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);

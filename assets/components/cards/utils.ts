@@ -14,7 +14,7 @@ import LargeTextOnlyCard from 'components/cards/render/LargeTextOnlyCard';
 import LargePictureTextCard from 'components/cards/render/LargePictureTextCard';
 import EventsTwoByTwoCard from 'components/cards/render/EventsTwoByTwoCard';
 import NavigationSixPerRow from 'components/cards/render/NavigationSixPerRow';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
 
 const CARD_TYPES = [

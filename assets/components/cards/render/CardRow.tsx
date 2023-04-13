@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import MoreNewsButton from './MoreNewsButton';
 
 
-class CardRow extends React.Component {
+class CardRow extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
     }

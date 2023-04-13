@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
-import {gettext} from 'utils';
 import NavLink from './NavLink';
+import {gettext} from 'assets/utils';
 
-export default function FilterButton({label, onClick, className, primary}) {
+export default function FilterButton({label, onClick, className, primary}: any) {
     return (
         <div className={classnames('filter-button', className)}>
             <NavLink isActive={primary} onClick={onClick} label={gettext(label)} />

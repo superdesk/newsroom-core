@@ -4,7 +4,7 @@ import {get} from 'lodash';
 import {connect} from 'react-redux';
 import {Modal as BSModal} from 'bootstrap';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {closeModal} from 'actions';
 
 import CloseButton from './CloseButton';
@@ -73,7 +73,7 @@ function assertButtonHandler(label, type, onClick) {
     }
 }
 
-class Modal extends React.Component {
+class Modal extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.onSubmit = this.onSubmit.bind(this);
@@ -169,6 +169,6 @@ Modal.defaultProps = {
     clickOutsideToClose: false,
 };
 
-const mapStateToProps = (state) => ({formValid: get(state, 'modal.formValid')});
+const mapStateToProps = (state: any) => ({formValid: get(state, 'modal.formValid')});
 
 export default connect(mapStateToProps, {closeModal})(Modal);

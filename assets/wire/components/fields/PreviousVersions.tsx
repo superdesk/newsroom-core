@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
-export function PreviousVersions ({item, isItemDetail, inputRef}) {
+export function PreviousVersions ({item, isItemDetail, inputRef}: any) {
     if (isItemDetail) {
         return null;
     }

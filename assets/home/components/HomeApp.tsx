@@ -26,7 +26,7 @@ const modals = {
     downloadItems: DownloadItemsModal,
 };
 
-class HomeApp extends React.Component {
+class HomeApp extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
         this.getPanels = this.getPanels.bind(this);
@@ -239,7 +239,7 @@ HomeApp.propTypes = {
     filterGroupLabels: PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     cards: state.cards,
     itemsByCard: state.itemsByCard,
     products: state.products,
@@ -258,7 +258,7 @@ const mapStateToProps = (state) => ({
     filterGroupLabels: filterGroupsToLabelMap(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     openItemDetails: (item, cardId) => {
         dispatch(openItemDetails(item));
         dispatch(setActive(cardId));

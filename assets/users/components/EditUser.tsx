@@ -3,22 +3,18 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import classNames from 'classnames';
 import {get} from 'lodash';
-
-import TextInput from 'components/TextInput';
-import SelectInput from 'components/SelectInput';
-import CheckboxInput from 'components/CheckboxInput';
-import AuditInformation from 'components/AuditInformation';
-
-import {gettext} from 'utils';
 import {isUserAdmin, getUserTypes, getUserLabel, userTypeReadOnly, getLocaleInputOptions, getDefaultLocale, isUserCompanyAdmin} from '../utils';
-import {FormToggle} from 'ui/components/FormToggle';
+import {getUserStateLabelDetails} from 'assets/company-admin/components/CompanyUserListItem';
+import {isProductEnabled} from 'assets/companies/utils';
+import {companySectionListSelector, companyProductSeatsSelector} from 'assets/company-admin/selectors';
+import AuditInformation from 'assets/components/AuditInformation';
+import CheckboxInput from 'assets/components/CheckboxInput';
+import SelectInput from 'assets/components/SelectInput';
+import TextInput from 'assets/components/TextInput';
+import {FormToggle} from 'assets/ui/components/FormToggle';
+import {gettext} from 'assets/utils';
 
-import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserListItem';
-import {isProductEnabled} from 'companies/utils';
-
-import {companyProductSeatsSelector, companySectionListSelector} from 'company-admin/selectors';
-
-const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
+const getCompanyOptions = (companies: any) => companies.map((company: any) => ({value: company._id, text: company.name}));
 
 function EditUserComponent({
     user,
@@ -36,13 +32,13 @@ function EditUserComponent({
     companySections,
     seats,
     resendUserInvite,
-}) {
+}: any) {
     const companyId = user.company;
     const localeOptions = getLocaleInputOptions();
     const stateLabelDetails = getUserStateLabelDetails(user);
     const companyProductIds = Object.keys(seats[companyId] || {});
     const sections = companySections[companyId] || [];
-    const companySectionIds = sections.map((section) => section._id);
+    const companySectionIds = sections.map((section: any) => section._id);
     const isAdmin = isUserAdmin(currentUser);
     const isCompanyAdmin = isUserCompanyAdmin(currentUser);
 
@@ -171,7 +167,7 @@ function EditUserComponent({
                         </FormToggle>
 
                         {hideFields.includes('sections') ? null : (<FormToggle title={gettext('Sections')}>
-                            {sections.filter((section) => companySectionIds.includes(section._id)).map((section) => (
+                            {sections.filter((section: any) => companySectionIds.includes(section._id)).map((section) => (
                                 <div className="list-item__preview-row" key={section._id}>
                                     <div className="form-group">
                                         <CheckboxInput
@@ -186,15 +182,15 @@ function EditUserComponent({
                         </FormToggle>)}
 
                         {hideFields.includes('products') ? null : (<FormToggle title={gettext('Products')}>
-                            {sections.filter((section) => companySectionIds.includes(section._id)).map((section) => (
+                            {sections.filter((section: any) => companySectionIds.includes(section._id)).map((section) => (
                                 <React.Fragment key={section._id}>
                                     <div className="list-item__preview-subheading">
                                         {section.name}
                                     </div>
                                     {products.filter(
-                                        (product) => product.product_type === section._id &&
+                                        (product: any) => product.product_type === section._id &&
                                             companyProductIds.includes(product._id)
-                                    ).map((product) => (
+                                    ).map((product: any) => (
                                         <div className="list-item__preview-row" key={product._id}>
                                             <div className="form-group">
                                                 <CheckboxInput
@@ -309,7 +305,7 @@ EditUserComponent.defaultProps = {
     hideFields: [],
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     companySections: companySectionListSelector(state),
     seats: companyProductSeatsSelector(state),
 });

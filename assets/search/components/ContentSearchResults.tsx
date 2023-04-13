@@ -3,20 +3,21 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {connect} from 'react-redux';
 
-import {gettext} from 'utils';
-import {toggleNavigation, toggleFilter, setCreatedFilter} from 'search/actions';
-import {removeNewItems} from 'wire/actions';
-import {loadMyWireTopic} from 'wire/actions';
-import {loadMyAgendaTopic} from 'agenda/actions';
+import {gettext} from 'assets/utils';
+import {toggleNavigation, toggleFilter, setCreatedFilter} from 'assets/search/actions';
+import {removeNewItems} from 'assets/wire/actions';
+import {loadMyWireTopic} from 'assets/wire/actions';
+import {loadMyAgendaTopic} from 'assets/agenda/actions';
 import {
     activeTopicSelector,
     navigationsByIdSelector,
     searchParamsSelector,
     searchParamTagSelector,
-} from 'search/selectors';
-import {Tag} from 'components/Tag';
+} from 'assets/search/selectors';
+import {Tag} from 'assets/components/Tag';
 
-class ContentSearchResultsComponent extends React.Component {
+class ContentSearchResultsComponent extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 
@@ -24,7 +25,7 @@ class ContentSearchResultsComponent extends React.Component {
         this.toggleExpanded = this.toggleExpanded.bind(this);
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         if (prevProps.minimizeSearchResults && !this.props.minimizeSearchResults) {
             this.setState({expanded: false});
         }
@@ -39,7 +40,7 @@ class ContentSearchResultsComponent extends React.Component {
             if (this.state.expanded) {
                 return this.props.searchParamTags;
             } else {
-                return this.props.searchParamTags.filter((tag) => (
+                return this.props.searchParamTags.filter((tag: any) => (
                     ['navigation', 'topic'].includes(tag.type)
                 ));
             }
@@ -51,7 +52,7 @@ class ContentSearchResultsComponent extends React.Component {
     renderTags() {
         const searchParamTags = this.getTagsToRender();
 
-        return searchParamTags.map((tag) => (
+        return searchParamTags.map((tag: any) => (
             <Tag
                 key={tag.key}
                 keyValue={tag.key}
@@ -208,7 +209,7 @@ ContentSearchResultsComponent.propTypes = {
     loadMyAgendaTopic: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     navigations: navigationsByIdSelector(state),
     searchParams: searchParamsSelector(state),
     searchParamTags: searchParamTagSelector(state),

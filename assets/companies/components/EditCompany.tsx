@@ -57,7 +57,7 @@ function deriveInitialPermissionState(company, sectionList, productList) {
     };
 }
 
-class EditCompany extends React.Component {
+class EditCompany extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
@@ -84,7 +84,7 @@ class EditCompany extends React.Component {
     }
 
     toggleProductPermission(key, _id) {
-        this.setState((prevState) => {
+        this.setState((prevState: any) => {
             const field = {...prevState.permissions[key]};
 
             field[_id] = !field[_id];
@@ -98,7 +98,7 @@ class EditCompany extends React.Component {
     }
 
     toggleGeneralPermission(key) {
-        this.setState((prevState) => ({
+        this.setState((prevState: any) => ({
             permissions: {
                 ...prevState.permissions,
                 [key]: !prevState.permissions[key],
@@ -107,7 +107,7 @@ class EditCompany extends React.Component {
     }
 
     updateProductSeats(productId, seats) {
-        this.setState((prevState) => ({
+        this.setState((prevState: any) => ({
             permissions: {
                 ...prevState.permissions,
                 seats: {
@@ -294,7 +294,7 @@ EditCompany.propTypes = {
     })).isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     company: state.companyToEdit,
     companiesById: state.companiesById,
     sections: state.sections,
@@ -305,7 +305,7 @@ const mapStateToProps = (state) => ({
     apiEnabled: state.apiEnabled,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     onChange: (event) => dispatch(editCompany(event)),
     saveCompany: (permissions) => dispatch(postCompany(permissions)),
     setError: (errors) => dispatch(setError(errors)),

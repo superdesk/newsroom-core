@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {bem} from 'ui/utils';
-import {formatTime} from 'utils';
+import {formatTime} from 'assets/utils';
+import {bem} from '../utils';
 
-export default function MetaTime({date, borderRight, isRecurring, cssClass}) {
+export default function MetaTime({date, borderRight, isRecurring, cssClass}: any) {
     const metaTimeClass = classNames('time-label', cssClass);
 
     return (

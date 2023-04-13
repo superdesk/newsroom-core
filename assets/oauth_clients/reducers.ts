@@ -1,3 +1,4 @@
+import {searchReducer} from 'assets/search/reducers';
 import {
     EDIT_CLIENT,
     GET_CLIENT_PASSWORD,
@@ -8,8 +9,6 @@ import {
     CANCEL_EDIT,
     INIT_VIEW_DATA,
 } from './actions';
-
-import {searchReducer} from 'search/reducers';
 
 const initialState: any = {
     query: null,

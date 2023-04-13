@@ -2,18 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
-
-import {gettext, isDisplayed} from 'utils';
-import {filterGroupsToLabelMap} from 'search/selectors';
-
-import InfoBox from 'wire/components/InfoBox';
-import PreviewTagsBlock from 'wire/components/PreviewTagsBlock';
-import {PreviewTagsLinkList} from 'wire/components/PreviewTagsLinkList';
-import {PreviewTagsSubjects} from 'wire/components/PreviewTagsSubjects';
 import {getSubjects} from '../utils';
+import {filterGroupsToLabelMap} from 'assets/search/selectors';
+import {isDisplayed, gettext} from 'assets/utils';
+import InfoBox from 'assets/wire/components/InfoBox';
+import PreviewTagsBlock from 'assets/wire/components/PreviewTagsBlock';
+import {PreviewTagsLinkList} from 'assets/wire/components/PreviewTagsLinkList';
+import {PreviewTagsSubjects} from 'assets/wire/components/PreviewTagsSubjects';
 
 
-function AgendaTagsComponent({item, plan, isItemDetail, displayConfig, filterGroupLabels}) {
+function AgendaTagsComponent({item, plan, isItemDetail, displayConfig, filterGroupLabels}: any) {
     const services = !isDisplayed('services', displayConfig) ? null : (
         <PreviewTagsLinkList
             urlPrefix="/agenda?filter="
@@ -58,7 +56,7 @@ AgendaTagsComponent.propTypes = {
     filterGroupLabels: PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     filterGroupLabels: filterGroupsToLabelMap(state),
 });
 

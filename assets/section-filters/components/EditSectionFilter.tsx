@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
-
-import TextInput from 'components/TextInput';
-import CheckboxInput from 'components/CheckboxInput';
-import AuditInformation from 'components/AuditInformation';
-import {gettext} from 'utils';
 import {sectionsPropType} from '../../features/sections/types';
+import AuditInformation from 'assets/components/AuditInformation';
+import CheckboxInput from 'assets/components/CheckboxInput';
+import TextInput from 'assets/components/TextInput';
+import {gettext} from 'assets/utils';
 
-class EditSectionFilter extends React.Component {
+class EditSectionFilter extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
     }

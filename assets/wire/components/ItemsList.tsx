@@ -3,21 +3,22 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import classNames from 'classnames';
 import {isEqual} from 'lodash';
-
-
-import {gettext, isDisplayed, shouldShowListShortcutActionIcons} from 'utils';
-import WireListItem from './WireListItem';
-import {setActive, previewItem, toggleSelected, openItem} from '../actions';
+import {searchNavigationSelector, isSearchFiltered, filterGroupsToLabelMap} from 'assets/search/selectors';
+import {getContextName} from 'assets/selectors';
+import {previewConfigSelector, listConfigSelector} from 'assets/ui/selectors';
+import {isDisplayed, shouldShowListShortcutActionIcons, gettext} from 'assets/utils';
+import {setActive, previewItem, openItem, toggleSelected} from '../actions';
 import {EXTENDED_VIEW} from '../defaults';
-import {getIntVersion} from '../utils';
-import {searchNavigationSelector, isSearchFiltered, filterGroupsToLabelMap} from 'search/selectors';
-import {previewConfigSelector, listConfigSelector} from 'ui/selectors';
-import {getContextName} from 'selectors';
+import WireListItem from './WireListItem';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
 
-class ItemsList extends React.Component {
+class ItemsList extends React.Component<any, any> {
+    previewTimeout: any;
+    clickTimeout: any;
+    elem: any;
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 
@@ -30,7 +31,7 @@ class ItemsList extends React.Component {
         this.filterActions = this.filterActions.bind(this);
     }
 
-    onKeyDown(event) {
+    onKeyDown(event: any) {
         let diff = 0;
         switch (event.key) {
         case 'ArrowDown':
@@ -90,7 +91,7 @@ class ItemsList extends React.Component {
         }
     }
 
-    onItemClick(item) {
+    onItemClick(item: any) {
         const itemId = item._id;
         this.setState({actioningItem: null});
         this.cancelPreviewTimeout();
@@ -107,13 +108,13 @@ class ItemsList extends React.Component {
         }, CLICK_TIMEOUT);
     }
 
-    onItemDoubleClick(item) {
+    onItemDoubleClick(item: any) {
         this.cancelClickTimeout();
         this.props.dispatch(setActive(item._id));
         this.props.dispatch(openItem(item));
     }
 
-    onActionList(event, item) {
+    onActionList(event: any, item: any) {
         event.stopPropagation();
         if (this.state.actioningItem && this.state.actioningItem._id === item._id) {
             this.setState({actioningItem: null});
@@ -122,8 +123,8 @@ class ItemsList extends React.Component {
         }
     }
 
-    filterActions(item, config) {
-        return this.props.actions.filter((action) =>  (!config || isDisplayed(action.id, config)) &&
+    filterActions(item: any, config: any) {
+        return this.props.actions.filter((action: any) =>  (!config || isDisplayed(action.id, config)) &&
           (!action.when || action.when(this.props, item)));
     }
 
@@ -139,7 +140,7 @@ class ItemsList extends React.Component {
         const isExtended = activeView === EXTENDED_VIEW;
         const showShortcutActionIcons = shouldShowListShortcutActionIcons(this.props.listConfig, isExtended);
 
-        const articles = items.map((_id) =>
+        const articles = items.map((_id: any) =>
             <WireListItem
                 key={_id}
                 item={itemsById[_id]}
@@ -212,7 +213,7 @@ ItemsList.propTypes = {
     onScroll: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     items: state.items,
     itemsById: state.itemsById,
     matchedIds: state.matchedIds,

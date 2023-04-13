@@ -8,7 +8,7 @@ import {
     printReport,
     toggleFilterAndQuery,
 } from '../actions';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {panels} from '../utils';
 
 const options = [
@@ -25,7 +25,7 @@ const options = [
 ];
 
 
-class CompanyReportsApp extends React.Component {
+class CompanyReportsApp extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 
@@ -92,7 +92,7 @@ CompanyReportsApp.propTypes = {
     products: PropTypes.array,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     activeReport: state.activeReport,
     results: state.results,
     companies: state.companies,

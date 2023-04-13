@@ -1,7 +1,6 @@
-import {gettext, notify, errorHandler} from 'utils';
+import {searchQuerySelector} from 'assets/search/selectors';
+import {errorHandler, notify, gettext} from 'assets/utils';
 import server from 'server';
-import {searchQuerySelector} from 'search/selectors';
-
 
 export const SELECT_CLIENT = 'SELECT_CLIENT';
 export function selectClient(id: any): any {

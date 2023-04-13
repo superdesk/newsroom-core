@@ -6,7 +6,7 @@ import {get} from 'lodash';
 import {
     toggleNavigation
 } from '../../search/actions';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
 import {
     fetchItems
@@ -51,7 +51,7 @@ MarketPlaceApp.propTypes = {
     savedItemsCount: PropTypes.number,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     user: state.user,
     company: state.company,
     navigations: get(state, 'navigations', []),
@@ -59,7 +59,7 @@ const mapStateToProps = (state) => ({
     savedItemsCount: state.savedItemsCount
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     fetchItems: (navigation) => {
         dispatch(toggleNavigation(navigation));
         return dispatch(fetchItems());

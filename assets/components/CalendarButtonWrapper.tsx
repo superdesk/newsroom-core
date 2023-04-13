@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-class CalendarButtonWrapper extends React.Component {
+class CalendarButtonWrapper extends React.Component<any, any> {
     render() {
         return (
             <button className={

@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {bem} from 'ui/utils';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import InfoBoxContent from './InfoBoxContent';
+import {bem} from 'assets/ui/utils';
 
-export default function InfoBox(props) {
+export default function InfoBox(props: any) {
     const className = bem('info-box', null, {
         'top': props.top,
     });
     const renderChildren = (props.children ? (Array.isArray(props.children) ? props.children : [props.children]) : [])
-        .filter((c) => c);
+        .filter((c: any) => c);
 
     return (
         <div className={className} id={props.id || null}>

@@ -3,10 +3,14 @@ import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
 import classNames from 'classnames';
 import {Tooltip} from 'bootstrap';
+import {getEmbargo, fullDate, gettext} from 'assets/utils';
 
-import {gettext, fullDate, getEmbargo} from 'utils';
+export class Embargo extends React.Component<any, any> {
+    timeout: any;
+    tooltip: any;
+    elem: any;
+    static propTypes: any;
 
-export class Embargo extends React.Component {
     constructor(props: any) {
         super(props);
         this.state = {

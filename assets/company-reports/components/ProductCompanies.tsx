@@ -6,9 +6,9 @@ import DropdownFilter from '../../components/DropdownFilter';
 import ReportsTable from './ReportsTable';
 import {toggleFilterAndQuery, runReport} from '../actions';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
-class ProductCompanies extends React.Component {
+class ProductCompanies extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 
@@ -99,7 +99,7 @@ ProductCompanies.propTypes = {
     isLoading: PropTypes.bool,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     products: state.products,
     reportParams: state.reportParams,
     isLoading: state.isLoading,

@@ -2,19 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
 import classNames from 'classnames';
+import ActionButton from 'assets/components/ActionButton';
+import AuditInformation from 'assets/components/AuditInformation';
+import {ToolTip} from 'assets/ui/components/ToolTip';
+import {gettext, formatDate, formatTime} from 'assets/utils';
 
-import {gettext, formatDate, formatTime} from 'utils';
-import ActionButton from 'components/ActionButton';
-import {ToolTip} from '../../ui/components/ToolTip';
-import AuditInformation from 'components/AuditInformation';
-
-const TopicList = ({topics, selectedTopicId, actions, users}) => {
+const TopicList = ({topics, selectedTopicId, actions, users}: any) => {
     if (get(topics, 'length', 0) < 0) {
         return null;
     }
 
-    const getActionButtons = (topic) => actions.map(
-        (action) => (
+    const getActionButtons = (topic: any) => actions.map(
+        (action: any) => (
             <ActionButton
                 key={action.name}
                 item={topic}
@@ -27,7 +26,7 @@ const TopicList = ({topics, selectedTopicId, actions, users}) => {
     );
 
     return topics.map(
-        (topic) => (
+        (topic: any) => (
             <div key={topic._id} className='simple-card-wrap col-12 col-lg-6'>
                 <div className={classNames(
                     'simple-card',

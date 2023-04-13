@@ -1,5 +1,5 @@
+import {errorHandler, notify, gettext} from 'assets/utils';
 import {get} from 'lodash';
-import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
 
 export const UPDATE_NOTIFICATION_COUNT = 'UPDATE_NOTIFICATION_COUNT';

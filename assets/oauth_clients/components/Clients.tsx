@@ -5,8 +5,6 @@ import {get} from 'lodash';
 
 import EditClient from './EditClient';
 import ClientList from './ClientList';
-import SearchResults from 'search/components/SearchResults';
-
 import {
     cancelEdit,
     deleteClient,
@@ -15,11 +13,13 @@ import {
     selectClient,
     setError,
 } from '../actions';
-import {searchQuerySelector} from 'search/selectors';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
+import SearchResults from 'assets/search/components/SearchResults';
+import {searchQuerySelector} from 'assets/search/selectors';
 
-class Clients extends React.Component {
-    constructor(props, context) {
+class Clients extends React.Component<any, any> {
+    static propTypes: any;
+    constructor(props: any, context: any) {
         super(props, context);
 
         this.isFormValid = this.isFormValid.bind(this);
@@ -29,7 +29,7 @@ class Clients extends React.Component {
 
     isFormValid() {
         let valid = true;
-        const errors = {};
+        const errors: any = {};
 
         if (!this.props.clientToEdit.name) {
             errors.name = [gettext('Please provide client name')];
@@ -40,7 +40,7 @@ class Clients extends React.Component {
         return valid;
     }
 
-    save(externalEvent) {
+    save(externalEvent: any) {
         if (externalEvent) {
             externalEvent.preventDefault();
 
@@ -52,7 +52,7 @@ class Clients extends React.Component {
         this.props.saveClient('clients');
     }
 
-    deleteClient(event) {
+    deleteClient(event: any) {
         event.preventDefault();
 
         if (confirm(gettext('Would you like to delete client: {{name}}', {name: this.props.clientToEdit.name}))) {
@@ -72,8 +72,7 @@ class Clients extends React.Component {
                             <div className="progress-bar" style={progressStyle} />
                         </div>
                     </div>
-                    :
-                    <div className="flex-col flex-column">
+                    : <div className="flex-col flex-column">
                         {this.props.activeQuery && (
                             <SearchResults
                                 totalItems={this.props.totalClients}
@@ -118,8 +117,8 @@ Clients.propTypes = {
 };
 
 
-const mapStateToProps = (state) => ({
-    clients: state.clients.map((id) => state.clientsById[id]),
+const mapStateToProps = (state: any) => ({
+    clients: state.clients.map((id: any) => state.clientsById[id]),
     clientToEdit: state.clientToEdit,
     activeQuery: searchQuerySelector(state),
     totalClients: state.totalClients,
@@ -127,7 +126,7 @@ const mapStateToProps = (state) => ({
 });
 
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     selectClient: (id) => dispatch(selectClient(id)),
     editClient: (event) => dispatch(editClient(event)),
     saveClient: () => dispatch(postClient()),

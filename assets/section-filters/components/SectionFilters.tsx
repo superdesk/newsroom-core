@@ -123,8 +123,8 @@ SectionFilters.propTypes = {
     sections: sectionsPropType,
 };
 
-const mapStateToProps = (state) => ({
-    sectionFilters: state.sectionFilters.map((id) => state.sectionFiltersById[id]),
+const mapStateToProps = (state: any) => ({
+    sectionFilters: state.sectionFilters.map((id: any) => state.sectionFiltersById[id]),
     sectionFilterToEdit: state.sectionFilterToEdit,
     activeSectionFilterId: state.activeSectionFilterId,
     isLoading: state.isLoading,
@@ -134,13 +134,13 @@ const mapStateToProps = (state) => ({
     sections: sectionsSelector(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    selectSectionFilter: (_id) => dispatch(selectSectionFilter(_id)),
-    editSectionFilter: (event) => dispatch(editSectionFilter(event)),
-    saveSectionFilter: (type) => dispatch(postSectionFilter(type)),
-    deleteSectionFilter: (type) => dispatch(deleteSectionFilter(type)),
+const mapDispatchToProps = (dispatch: any) => ({
+    selectSectionFilter: (_id: any) => dispatch(selectSectionFilter(_id)),
+    editSectionFilter: (event: any) => dispatch(editSectionFilter(event)),
+    saveSectionFilter: (type: any) => dispatch(postSectionFilter(type)),
+    deleteSectionFilter: (type: any) => dispatch(deleteSectionFilter(type)),
     newSectionFilter: () => dispatch(newSectionFilter()),
-    cancelEdit: (event) => dispatch(cancelEdit(event)),
+    cancelEdit: (event: any) => dispatch(cancelEdit(event)),
     dispatch: dispatch,
 });
 

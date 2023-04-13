@@ -2,7 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-export class FormToggle extends React.Component {
+export class FormToggle extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
 

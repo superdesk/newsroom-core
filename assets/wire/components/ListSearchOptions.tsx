@@ -2,9 +2,11 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import Toggle from 'react-toggle';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
 export class ListSearchOptions extends React.PureComponent<any, any> {
+    btnGroup: any;
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 

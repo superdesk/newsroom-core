@@ -1,17 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {gettext} from 'utils';
-import {
-    newClient,
-    fetchClients,
-} from '../actions';
-import {setSearchQuery} from 'search/actions';
+import ListBar from 'assets/components/ListBar';
+import {setSearchQuery} from 'assets/search/actions';
+import {gettext} from 'assets/utils';
+import {newClient, fetchClients} from '../actions';
 import Clients from './Clients';
-import ListBar from 'components/ListBar';
 
-class ClientsApp extends React.Component {
-    constructor(props, context) {
+class ClientsApp extends React.Component<any, any> {
+    static propTypes: any;
+    constructor(props: any, context: any) {
         super(props, context);
     }
 

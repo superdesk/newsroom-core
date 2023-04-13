@@ -4,8 +4,8 @@ import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {get, isEqual} from 'lodash';
 
-import {gettext, getItemFromArray, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE} from 'utils';
-import {getSingleFilterValue} from 'search/utils';
+import {gettext, getItemFromArray, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE} from 'assets/utils';
+import {getSingleFilterValue} from 'assets/search/utils';
 
 import {
     fetchItems,
@@ -14,14 +14,14 @@ import {
     toggleNews,
     toggleSearchAllVersions,
     downloadMedia,
-} from 'wire/actions';
+} from 'assets/wire/actions';
 
 import {
     setView,
     setQuery,
     followStory,
     saveMyTopic,
-} from 'search/actions';
+} from 'assets/search/actions';
 
 import {
     searchQuerySelector,
@@ -34,22 +34,22 @@ import {
     searchParamsSelector,
     showSaveTopicSelector,
     filterGroupsToLabelMap,
-} from 'search/selectors';
+} from 'assets/search/selectors';
 
-import BaseApp from 'layout/components/BaseApp';
+import BaseApp from 'assets/layout/components/BaseApp';
 import WirePreview from './WirePreview';
 import ItemsList from './ItemsList';
-import SearchBar from 'search/components/SearchBar';
-import SearchResultsInfo from 'search/components/SearchResultsInfo';
+import SearchBar from 'assets/search/components/SearchBar';
+import SearchResultsInfo from 'assets/search/components/SearchResultsInfo';
 import SearchSidebar from './SearchSidebar';
 import SelectedItemsBar from './SelectedItemsBar';
 import ListViewControls from './ListViewControls';
 import DownloadItemsModal from './DownloadItemsModal';
 import ItemDetails from './ItemDetails';
 
-import ShareItemModal from 'components/ShareItemModal';
+import ShareItemModal from 'assets/components/ShareItemModal';
 import getItemActions from '../item-actions';
-import BookmarkTabs from 'components/BookmarkTabs';
+import BookmarkTabs from 'assets/components/BookmarkTabs';
 import ItemStatisticsModal from './ItemStatisticsModal';
 
 import {
@@ -57,7 +57,7 @@ import {
     detailsConfigSelector,
     listConfigSelector,
     advancedSearchTabsConfigSelector,
-} from 'ui/selectors';
+} from 'assets/ui/selectors';
 
 const modals = {
     shareItem: ShareItemModal,
@@ -71,9 +71,9 @@ class WireApp extends BaseApp {
         this.modals = modals;
 
         // Show my-topics tab only if WireApp is in 'wire' context (not 'aapX', etc.)
-        this.tabs = this.tabs.filter((t) => get(this.props.advancedSearchTabConfig, t.id, true));
+        this.tabs = this.tabs.filter((t: any) => get(this.props.advancedSearchTabConfig, t.id, true));
         if (this.props.context === 'monitoring') {
-            const navTab = this.tabs.find((t) => t.id === 'nav');
+            const navTab = this.tabs.find((t: any) => t.id === 'nav');
             navTab.label = gettext('Monitoring Profiles');
         }
 
@@ -317,7 +317,7 @@ WireApp.propTypes = {
     filterGroupLabels: PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     state: state,
     isLoading: state.isLoading,
     newsOnlyFilterText: state.newsOnlyFilterText,
@@ -353,7 +353,7 @@ const mapStateToProps = (state) => ({
     filterGroupLabels: filterGroupsToLabelMap(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     followStory: (item) => followStory(item, 'wire'),
     fetchItems: () => dispatch(fetchItems()),
     toggleNews: () => {

@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {setActiveFilterTab, getActiveFilterTab} from 'local-store';
+import {setActiveFilterTab, getActiveFilterTab} from 'assets/local-store';
 
-class SearchSidebar extends React.Component {
+class SearchSidebar extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
         const activeTabId = getActiveFilterTab(props.props.context);
 
         this.state = {
-            active: props.tabs.findIndex((tab) => tab.id === activeTabId) >= 0 ?
+            active: props.tabs.findIndex((tab: any) => tab.id === activeTabId) >= 0 ?
                 activeTabId :
                 props.tabs[0].id
         };
@@ -19,7 +20,7 @@ class SearchSidebar extends React.Component {
         return (
             <div className='wire-column__nav__items'>
                 <ul className='nav justify-content-center' id='pills-tab' role='tablist'>
-                    {this.props.tabs.map((tab) => (
+                    {this.props.tabs.map((tab: any) => (
                         <li className='wire-column__nav__tab nav-item' key={tab.id}>
                             <a className={`nav-link ${this.state.active === tab.id && 'active'}`}
                                 role='tab'
@@ -34,7 +35,7 @@ class SearchSidebar extends React.Component {
                         </li>
                     ))}
                 </ul>
-                {this.props.tabs.map((tab) => (
+                {this.props.tabs.map((tab: any) => (
                     <div className='tab-content' key={tab.id}>
                         <div className={classNames('tab-pane tab-pane--no-padding', 'fade', {'show active': this.state.active === tab.id})} role='tabpanel'>
                             <tab.component {...this.props.props} />

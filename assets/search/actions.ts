@@ -108,7 +108,7 @@ export function toggleNavigation(navigation?: any, disableSameNavigationDeselect
 }
 
 export const TOGGLE_FILTER = 'TOGGLE_FILTER';
-export function toggleFilter(key: any, value: any, single: any): any {
+export function toggleFilter(key: any, value: any, single?: any): any {
     return function (dispatch: any, getState: any) {
         const state = getState();
         const currentFilters = cloneDeep(searchFilterSelector(state));
@@ -160,7 +160,7 @@ export function setCreatedFilter(filter: any): any {
 }
 
 export const RESET_FILTER = 'RESET_FILTER';
-export function resetFilter(filter: any): any {
+export function resetFilter(filter?: any): any {
     return function(dispatch: any, getState: any) {
         updateRouteParams({
             filter: null,

@@ -1,3 +1,5 @@
+import {ADD_EDIT_USERS} from 'assets/actions';
+import {searchReducer} from 'assets/search/reducers';
 import {
     INIT_VIEW_DATA,
     GET_USERS,
@@ -14,10 +16,6 @@ import {
     SET_SORT,
     TOGGLE_SORT_DIRECTION,
 } from './actions';
-
-import {ADD_EDIT_USERS} from 'actions';
-
-import {searchReducer} from 'search/reducers';
 
 const initialState = {
     user: null,

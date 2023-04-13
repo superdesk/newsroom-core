@@ -1,4 +1,4 @@
-import {createStore, render} from 'utils';
+import {createStore, render} from 'assets/utils';
 import sectionFiltersReducer from './reducers';
 import SectionFiltersApp from './components/SectionFiltersApp';
 import {initViewData} from './actions';

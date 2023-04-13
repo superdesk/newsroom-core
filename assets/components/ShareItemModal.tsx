@@ -11,7 +11,7 @@ import {modalFormInvalid, modalFormValid} from 'actions';
 import Modal from 'components/Modal';
 import SearchBar from 'search/components/SearchBar';
 
-class ShareItemModal extends React.Component {
+class ShareItemModal extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.state = {
@@ -149,9 +149,9 @@ ShareItemModal.propTypes = {
     }),
 };
 
-const mapStateToProps = (state) => ({formValid: get(state, 'modal.formValid')});
+const mapStateToProps = (state: any) => ({formValid: get(state, 'modal.formValid')});
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     submit: (isFolllowedTopic, data) => isFolllowedTopic ? dispatch(submitShareTopic(data)) : dispatch(submitShareItem(data)),
     modalFormInvalid: () => dispatch(modalFormInvalid()),
     modalFormValid: () => dispatch(modalFormValid()),

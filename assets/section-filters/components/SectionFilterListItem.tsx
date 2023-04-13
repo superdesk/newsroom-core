@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext, shortDate} from 'utils';
+import {gettext, shortDate} from 'assets/utils';
 
 
-function SectionFilterListItem({sectionFilter, isActive, onClick}) {
+function SectionFilterListItem({sectionFilter, isActive, onClick}: any) {
     return (
         <tr key={sectionFilter._id}
             className={isActive?'table--selected':null}

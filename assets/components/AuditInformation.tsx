@@ -7,7 +7,7 @@ import {get} from 'lodash';
 import {getEditUsers} from 'actions';
 import {gettext, fullDate, getItemFromArray} from 'utils';
 
-class AuditInformation extends React.Component {
+class AuditInformation extends React.Component<any, any> {
     componentWillMount() {
         if (!get(this.props, 'users.length')) {
             this.props.getEditUsers(this.props.item);
@@ -87,9 +87,9 @@ AuditInformation.propTypes = {
     className: PropTypes.string,
 };
 
-const mapStateToProps = (state) => ({editUsers: state.editUsers});
+const mapStateToProps = (state: any) => ({editUsers: state.editUsers});
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     getEditUsers: (item) => dispatch(getEditUsers(item))
 });
 

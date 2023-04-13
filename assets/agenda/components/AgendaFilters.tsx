@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {getCoverageDisplayName, groupRegions, getRegionName} from '../utils';
 import {agendaFiltersConfigSelector} from '../selectors';
 

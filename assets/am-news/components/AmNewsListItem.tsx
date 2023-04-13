@@ -2,27 +2,24 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get} from 'lodash';
-
-import {LIST_ANIMATIONS, wordCount} from 'utils';
-import {getPicture, getThumbnailRendition, isKilled, shortText} from '../../wire/utils';
-
-import ActionMenu from 'components/ActionMenu';
-import ActionButton from 'components/ActionButton';
-import MetaTime from 'ui/components/MetaTime';
 import AMNewsIcon from './AmNewsIcon';
-
 import ListItemPreviousVersions from '../../wire/components/ListItemPreviousVersions';
 import WireListItemDeleted from '../../wire/components/WireListItemDeleted';
-
 import {
     getAMNewsIcon,
     isAlert,
     isDataItem,
     getAMNewsToolTip,
 } from '../utils';
+import ActionButton from 'assets/components/ActionButton';
+import ActionMenu from 'assets/components/ActionMenu';
+import MetaTime from 'assets/ui/components/MetaTime';
+import {wordCount, LIST_ANIMATIONS} from 'assets/utils';
 
 
-class AmNewsListItem extends React.Component {
+class AmNewsListItem extends React.Component<any, any> {
+    wordCount: any;
+    articleElem: any;
     constructor(props: any) {
         super(props);
         this.wordCount = wordCount(props.item);
@@ -31,7 +28,7 @@ class AmNewsListItem extends React.Component {
         this.togglePreviousVersions = this.togglePreviousVersions.bind(this);
     }
 
-    onKeyDown(event) {
+    onKeyDown(event: any) {
         switch (event.key) {
         case ' ':  // on space toggle selected item
             this.props.toggleSelected();
@@ -44,7 +41,7 @@ class AmNewsListItem extends React.Component {
         event.preventDefault();
     }
 
-    togglePreviousVersions(event) {
+    togglePreviousVersions(event: any) {
         event.stopPropagation();
         this.setState({previousVersions: !this.state.previousVersions});
     }
@@ -55,7 +52,7 @@ class AmNewsListItem extends React.Component {
         }
     }
 
-    stopPropagation(event) {
+    stopPropagation(event: any) {
         event.stopPropagation();
     }
 

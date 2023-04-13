@@ -11,7 +11,7 @@ import {VersionType} from './VersionType';
 const ALLOWED_SEPARATORS = ['/', '//', '-'];
 const SEPARATOR_KEY = 'separator';
 
-const MAP_FIELD_TO_COMPONENT = {
+const MAP_FIELD_TO_COMPONENT: any = {
     urgency: UrgencyLabel,
     source: Source,
     charcount: CharCount,
@@ -27,7 +27,7 @@ const MAP_FIELD_TO_COMPONENT = {
 //   ["charcount", "/", "wordcount"] // multiple fields on the same line
 //   ["source", "//", {field: "department", styles: {fontWeight: "bold"}}] // custom styles
 // ]
-export function FieldComponents({config, item, fieldProps = {}}) {
+export function FieldComponents({config, item, fieldProps = {}}: any) {
     if (!Array.isArray(config)) {
         return [];
     }
@@ -45,7 +45,7 @@ export function FieldComponents({config, item, fieldProps = {}}) {
 
     let separator = 0;
 
-    return fields.map(({key, Component}) => {
+    return fields.map(({key, Component}: any) => {
         const _key =
             key === SEPARATOR_KEY ? `${SEPARATOR_KEY}${++separator}` : key;
 
@@ -57,7 +57,7 @@ export function FieldComponents({config, item, fieldProps = {}}) {
     });
 }
 
-function getComponentForField(item, field) {
+function getComponentForField(item: any, field: any): any {
     if (typeof field === 'object' && typeof field.field === 'string') {
         if (
             typeof field.component === 'string' &&
@@ -84,7 +84,7 @@ function getComponentForField(item, field) {
             return result
                 ? {
                     key: field.field,
-                    Component: (props) => (
+                    Component: (props: any) => (
                         <span style={field.styles || {}}>
                             <result.Component {...props} />
                         </span>
@@ -108,7 +108,7 @@ function getComponentForField(item, field) {
 
         return {
             key: components.map(({key}) => key).join('-'),
-            Component: (props) => (
+            Component: (props: any) => (
                 <span>
                     {components.map(({Component}, i) => (
                         <Component key={i} {...props} />

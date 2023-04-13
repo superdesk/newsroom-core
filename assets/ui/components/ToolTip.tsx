@@ -1,10 +1,13 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import {Tooltip} from 'bootstrap';
-
-import {isTouchDevice} from 'utils';
+import {isTouchDevice} from 'assets/utils';
 
 export class ToolTip extends React.PureComponent<any, any> {
+    tooltip: any;
+    elem: any;
+    static propTypes: any;
+
     constructor(props: any) {
         super(props);
 

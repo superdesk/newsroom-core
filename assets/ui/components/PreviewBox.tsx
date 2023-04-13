@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default function PreviewBox(props) {
+export default function PreviewBox(props: any) {
     return (
         <div className='wire-column__preview__coverage'>
             <div className={props.labelClass || 'wire-column__preview__coverage__headline'}>{props.label}</div>

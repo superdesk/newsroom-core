@@ -1,16 +1,16 @@
 import thunk from 'redux-thunk';
 import {createStore, applyMiddleware} from 'redux';
 
-import wireReducer from 'wire/reducers';
-import {initData} from 'wire/actions';
 import * as actions from '../actions';
 import * as selectors from '../selectors';
+import {initData} from 'assets/wire/actions';
+import wireReducer from 'assets/wire/reducers';
 
 describe('search actions', () => {
-    let store;
-    let params;
+    let store: any;
+    let params: any;
 
-    const updateParams = (search) => {
+    const updateParams = (search?: any) => {
         params = {
             state: store.getState(),
             url: new URLSearchParams(search != null ? search : window.location.search),

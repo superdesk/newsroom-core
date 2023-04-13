@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import {gettext, LIST_ANIMATIONS} from 'utils';
+import {gettext, LIST_ANIMATIONS} from 'assets/utils';
 
-export default function WireListItemDeleted({item, contextName}) {
+export default function WireListItemDeleted({item, contextName}: any) {
     const selectClassName = classNames('no-bindable-select', {
         'wire-articles__item-select-visible': !LIST_ANIMATIONS,
         'wire-articles__item-select': LIST_ANIMATIONS,

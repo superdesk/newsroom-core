@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {
     newCard,
     fetchCards,
@@ -13,7 +13,7 @@ import ListBar from 'components/ListBar';
 import DashboardSwitch from 'features/dashboard/DashboardSwitch';
 
 
-class CardsApp extends React.Component {
+class CardsApp extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
     }
@@ -45,7 +45,7 @@ CardsApp.propTypes = {
     activeDashboard: PropTypes.string,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     dashboards: state.dashboards.list,
     activeDashboard: state.dashboards.active,
 });

@@ -2,11 +2,11 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {isPlanningItem} from '../utils';
 import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 
-export class AgendaPreviewPlanning extends React.Component {
+export class AgendaPreviewPlanning extends React.Component<any, any> {
     render() {
         const {
             item,

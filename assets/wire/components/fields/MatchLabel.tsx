@@ -1,5 +1,5 @@
+import {gettext} from 'assets/utils';
 import * as React from 'react';
-import {gettext} from 'utils';
 
 export function MatchLabel() {
     return (

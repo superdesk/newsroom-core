@@ -1,18 +1,17 @@
 import * as React from 'react';
 import {get} from 'lodash';
-
-import {gettext, formatTime, formatDate, isToday} from 'utils';
 import {BasicNotificationItem} from './BasicNotificationItem';
+import {isToday, gettext, formatTime, formatDate} from 'assets/utils';
 
-export const registeredNotifications = [];
+export const registeredNotifications: any = [];
 
-export function registerNotification(condition, component) {
+export function registerNotification(condition: any, component: any) {
     registeredNotifications.unshift({condition, component});
 }
 
-export function renderNotificationComponent(notification, item) {
+export function renderNotificationComponent(notification: any, item: any) {
     const notificationEntry = registeredNotifications.find(
-        (entry) => entry.condition(notification, item)
+        (entry: any) => entry.condition(notification, item)
     );
 
     if (notificationEntry == null || notificationEntry.component == null) {
@@ -24,7 +23,7 @@ export function renderNotificationComponent(notification, item) {
     return notificationEntry.component(notification, item);
 }
 
-function getNotificationFooterText(notification) {
+function getNotificationFooterText(notification: any) {
     switch (notification.action) {
     case 'share':
         return (
@@ -56,7 +55,7 @@ function getNotificationFooterText(notification) {
     }
 }
 
-function getNotificationUrl(notification, item) {
+function getNotificationUrl(notification: any, item: any) {
     if (get(notification, 'data.url')) {
         return notification.data.url;
     }
@@ -66,18 +65,18 @@ function getNotificationUrl(notification, item) {
         `/wire?item=${item._id}`;
 }
 
-function getNotificationName(item) {
+function getNotificationName(item: any) {
     return item.label || item.name || item.headline || item.slugline;
 }
 
 // New Wire item that matches action history (such as item Downloaded)
 registerNotification(
-    (notification, item) => (
+    (notification: any, item: any) => (
         (get(notification, 'action') === 'history_match' && get(notification, 'resource') === 'text') ||
         // Fallback Wire notification (legacy functionality)
         get(notification, 'resource') === 'text' || item.type === 'text'
     ),
-    (notification, item) => (
+    (notification: any, item: any) => (
         <BasicNotificationItem
             header={gettext('A story you downloaded has been updated')}
             body={getNotificationName(item)}
@@ -89,13 +88,13 @@ registerNotification(
 
 // New Agenda item that matches action history (such as item Downloaded)
 registerNotification(
-    (notification, item) => (
+    (notification: any, item: any) => (
         (get(notification, 'action') === 'history_match' && get(notification, 'resource') === 'agenda') ||
         (get(notification, 'action') === 'watched_agenda_updated') ||
         // Fallback Agenda notification (legacy functionality)
         get(notification, 'resource') === 'agenda' || item.type === 'agenda'
     ),
-    (notification, item) => (
+    (notification: any, item: any) => (
         <BasicNotificationItem
             header={gettext('An event you are watching has been updated')}
             body={getNotificationName(item)}
@@ -107,11 +106,11 @@ registerNotification(
 
 // New Wire/Agenda item matches a subscribed topic
 registerNotification(
-    (notification) => (
+    (notification: any) => (
         get(notification, 'action') === 'topic_matches' &&
         ['text', 'wire', 'items', 'agenda'].includes(get(notification, 'resource'))
     ),
-    (notification, item) => (
+    (notification: any, item: any) => (
         <BasicNotificationItem
             header={notification.resource === 'agenda' ?
                 gettext('An Agenda item has arrived that matches a subscribed topic') :
@@ -126,12 +125,12 @@ registerNotification(
 
 // A Topic was shared with this User
 registerNotification(
-    (notification) => (
+    (notification: any) => (
         notification &&
         notification.action === 'share' &&
         notification.resource === 'topic'
     ),
-    (notification, item) => (
+    (notification: any, item: any) => (
         <BasicNotificationItem
             header={item.topic_type === 'agenda' ?
                 gettext('An Agenda Topic has been shared with you') :
@@ -146,11 +145,11 @@ registerNotification(
 
 // A Wire/Agenda item was shared with this user
 registerNotification(
-    (notification) => (
+    (notification: any) => (
         get(notification, 'action') === 'share' &&
         ['text', 'wire', 'items', 'agenda'].includes(get(notification, 'resource'))
     ),
-    (notification, item) => (
+    (notification: any, item: any) => (
         <BasicNotificationItem
             header={notification.resource === 'agenda' ?
                 gettext('An Agenda item was shared with you') :

@@ -1,3 +1,7 @@
+import {ADD_EDIT_USERS} from 'assets/actions';
+import {INIT_SECTIONS, SELECT_SECTION} from 'assets/features/sections/actions';
+import {sectionsReducer} from 'assets/features/sections/reducers';
+import {searchReducer} from 'assets/search/reducers';
 import {
     GET_PRODUCTS,
     SELECT_PRODUCT,
@@ -10,11 +14,6 @@ import {
     GET_NAVIGATIONS,
     UPDATE_PRODUCT_NAVIGATIONS,
 } from './actions';
-import {ADD_EDIT_USERS} from 'actions';
-
-import {INIT_SECTIONS, SELECT_SECTION} from 'features/sections/actions';
-import {sectionsReducer} from 'features/sections/reducers';
-import {searchReducer} from 'search/reducers';
 
 const initialState = {
     query: null,
@@ -98,7 +97,7 @@ export default function productReducer(state: any = initialState, action: any): 
     }
 
     case GET_COMPANIES: {
-        const companiesById = {};
+        const companiesById: any = {};
         action.data.map((company: any) => companiesById[company._id] = company);
 
         return {...state, companies: action.data, companiesById};

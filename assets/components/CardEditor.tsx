@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
 export default class CardEditor extends React.Component<any, any> {
     constructor(props: any) {

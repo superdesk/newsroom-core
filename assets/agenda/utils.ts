@@ -462,8 +462,8 @@ export function getDataFromCoverages(item: any): any {
         'scheduled_update_status': {},
     };
 
-    planningItems.forEach(p => {
-        (get(p, 'coverages') || []).forEach((c) => {
+    planningItems.forEach((p: any) => {
+        (get(p, 'coverages') || []).forEach((c: any) => {
             ['internal_note', 'ednote', 'workflow_status_reason'].forEach((field) => {
 
                 // Don't populate if the value is same as the field in upper level planning_item

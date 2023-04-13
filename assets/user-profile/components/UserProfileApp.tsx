@@ -3,34 +3,25 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
-
-import {gettext} from 'utils';
-
-import {
-    hideModal,
-    toggleDropdown,
-    selectMenu,
-} from '../actions';
-import {
-    userSelector,
-    selectedMenuSelector,
-    displayModelSelector,
-    userSectionsSelector,
-} from '../selectors';
-
-import FollowedTopics from 'search/components/FollowedTopics';
-import UserProfileMenu from './UserProfileMenu';
-import UserProfileAvatar from './UserProfileAvatar';
-import ShareItemModal from 'components/ShareItemModal';
 import UserProfile from './profile/UserProfile';
 import ProfileToggle from './ProfileToggle';
 
 import '../style';
+import ShareItemModal from 'assets/components/ShareItemModal';
+import FollowedTopics from 'assets/search/components/FollowedTopics';
+import {gettext} from 'assets/utils';
+import {selectMenu, toggleDropdown, hideModal} from '../actions';
+import {userSelector, selectedMenuSelector, displayModelSelector, userSectionsSelector} from '../selectors';
+import UserProfileAvatar from './UserProfileAvatar';
+import UserProfileMenu from './UserProfileMenu';
 
-const modals = {shareItem: ShareItemModal};
+const modals: any = {shareItem: ShareItemModal};
 
-class UserProfileApp extends React.Component {
-    constructor(props, context) {
+class UserProfileApp extends React.Component<any, any> {
+    links: any;
+    static propTypes: any;
+
+    constructor(props: any, context: any) {
         super(props, context);
         this.links = [
             {
@@ -68,29 +59,29 @@ class UserProfileApp extends React.Component {
         }
     }
 
-    isSectionEnabled(name) {
+    isSectionEnabled(name: any) {
         return !!get(this.props, 'userSections', []).find((s) => s._id === name);
     }
 
-    renderModal(specs) {
+    renderModal(specs: any) {
         if (specs) {
             const Modal = modals[specs.modal];
             return ReactDOM.createPortal(
                 <Modal data={{...specs.data, isTopic: true}} />,
-                document.getElementById('modal-container')
+                (document.getElementById('modal-container') as HTMLElement)
             );
         }
     }
 
     renderProfile() {
-        const links = this.links.map((link) => {
+        const links = this.links.map((link: any) => {
             link.active = link.name === this.props.selectedMenu;
             return link;
         });
 
         const modal = this.renderModal(this.props.modal);
-        const ActiveContent = links.find((link) => link.active).content;
-        const topicType = links.find((link) => link.active).type;
+        const ActiveContent = links.find((link: any) => link.active).content;
+        const topicType = links.find((link: any) => link.active).type;
 
         return (
             <div className="profile-container" role={gettext('dialog')} aria-label={links.find((link) => link.active).label}>
@@ -135,7 +126,7 @@ class UserProfileApp extends React.Component {
     render() {
         const profile = ReactDOM.createPortal(
             this.props.displayModal ? this.renderProfile() : null,
-            document.getElementById('user-profile-app')
+            (document.getElementById('user-profile-app') as HTMLElement)
         );
 
         const overlay = this.props.dropdown && (
@@ -153,7 +144,7 @@ class UserProfileApp extends React.Component {
                         {`${this.props.user.first_name} ${this.props.user.last_name}`}
                     </div>
                     <ul className="list-group list-group-flush">
-                        {this.links.map((link) => (
+                        {this.links.map((link: any) => (
                             <li key={link.name} className="list-group-item list-group-item--link">
                                 <a href="" onClick={(e) => this.props.selectMenu(e, link.name)}>{link.label}
                                     <i className="svg-icon--arrow-right" /></a>
@@ -167,7 +158,7 @@ class UserProfileApp extends React.Component {
             </div>
         );
 
-        const toggle = document.getElementById('header-profile-toggle');
+        const toggle: any = document.getElementById('header-profile-toggle');
 
         if (this.props.dropdown) {
             toggle.classList.add('show');
@@ -198,7 +189,7 @@ UserProfileApp.propTypes = {
     hideModal: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     user: userSelector(state),
     modal: state.modal,
     dropdown: state.dropdown,
@@ -207,7 +198,7 @@ const mapStateToProps = (state) => ({
     userSections: userSectionsSelector(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     selectMenu: (event, name) => {event.preventDefault(); dispatch(selectMenu(name));},
     toggleDropdown: () => dispatch(toggleDropdown()),
     hideModal: () => dispatch(hideModal()),

@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {gettext, formatDate, formatTime} from 'assets/utils';
 
-import {gettext, formatDate, formatTime} from 'utils';
-
-export default function Preview(props) {
+export default function Preview(props: any) {
     return (
         <div className='wire-column__preview__items' role={gettext('dialog')} aria-label={gettext('Article Preview')}>
             <h3 className="a11y-only">{gettext('Article preview')}</h3>

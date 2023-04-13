@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
 import NavLink from './NavLink';
 import NavGroup from './NavGroup';
@@ -11,13 +11,13 @@ const shortcuts = [
     {label: gettext('This month'), value: 'now/M'},
 ];
 
-function NavCreatedPicker({setCreatedFilter, createdFilter}) {
-    const onClickFactory = (value) => (event) => {
+function NavCreatedPicker({setCreatedFilter, createdFilter}: any) {
+    const onClickFactory = (value: any) => (event: any) => {
         event.preventDefault();
         setCreatedFilter({from: createdFilter.from === value ? null : value, to: null});
     };
 
-    const onInputChange = (event) => {
+    const onInputChange = (event: any) => {
         setCreatedFilter({[event.target.name]: event.target.value});
     };
 

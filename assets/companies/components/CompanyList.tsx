@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {selectCompany} from '../actions';
 import {companiesSubscriberIdEnabled} from 'ui/selectors';
 
@@ -54,7 +54,7 @@ CompanyList.propTypes = {
     selectCompany: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     companies: state.companies.map((id) => state.companiesById[id]),
     activeCompanyId: state.activeCompanyId,
     companyTypes: state.companyTypes,

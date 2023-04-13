@@ -9,7 +9,7 @@ import AgendaMap from '../../agenda/components/AgendaMap';
 import AgendaTime from '../../agenda/components/AgendaTime';
 import AgendaListItemLabels from '../../agenda/components/AgendaListItemLabels';
 
-export default function Article({image, item, children, disableTextSelection}) {
+export default function Article({image, item, children, disableTextSelection}: any) {
     return (
         <article
             id='preview-article'

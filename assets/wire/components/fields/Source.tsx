@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export function Source ({item}) {
+export function Source ({item}: any) {
     return <span>{item.source}</span>;
 }
 

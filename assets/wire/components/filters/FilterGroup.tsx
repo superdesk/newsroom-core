@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {get, cloneDeep, uniqBy} from 'lodash';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {Skeleton} from 'primereact/skeleton';
 
 import NavGroup from './NavGroup';
@@ -9,7 +9,7 @@ import FilterItem from './FilterItem';
 
 const LIMIT = 5;
 
-const getVisibleBuckets = (buckets, group, toggleGroup) => {
+const getVisibleBuckets = (buckets: any, group: any, toggleGroup: any) => {
     if (!buckets.length) {
         return;
     }
@@ -35,7 +35,7 @@ const getVisibleBuckets = (buckets, group, toggleGroup) => {
 };
 
 
-export default function FilterGroup({group, activeFilter, aggregations, toggleFilter, toggleGroup, isLoading}) {
+export default function FilterGroup({group, activeFilter, aggregations, toggleFilter, toggleGroup, isLoading}: any) {
     if (isLoading === true) {
         return (
             <NavGroup key={group.field} label={group.label}>
@@ -55,11 +55,11 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
         );
     }
 
-    const compareFunction = (a, b) => group.sorted ? -1 : String(a.key).localeCompare(String(b.key));
+    const compareFunction = (a: any, b: any) => group.sorted ? -1 : String(a.key).localeCompare(String(b.key));
 
     const groupFilter = get(activeFilter, group.field, []);
     const activeBuckets = (get(activeFilter, group.field) || [])
-        .map((filter) => ({key: filter}));
+        .map((filter: any) => ({key: filter}));
     const bucketPath = get(group, 'agg_path') || `${group.field}.buckets`;
     const buckets = uniqBy(
         cloneDeep(get(aggregations, bucketPath) || group.buckets || [])
@@ -67,7 +67,7 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
         'key'
     )
         .sort(compareFunction)
-        .map((bucket) => (
+        .map((bucket: any) => (
             <FilterItem
                 key={bucket.key}
                 bucket={bucket}

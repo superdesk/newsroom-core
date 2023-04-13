@@ -12,7 +12,7 @@ import {gettext, KEYCODES} from 'utils';
  * @name TextListInput
  * @description Component to select tags like Keyword of a news story
  */
-class TextListInput extends React.Component {
+class TextListInput extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
 

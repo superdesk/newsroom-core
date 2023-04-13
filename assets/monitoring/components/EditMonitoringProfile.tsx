@@ -12,11 +12,11 @@ import AuditInformation from 'components/AuditInformation';
 
 import MonitoringSchedule from './MonitoringSchedule';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
 const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
 
-class EditMonitoringProfile extends React.Component {
+class EditMonitoringProfile extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
@@ -52,7 +52,7 @@ class EditMonitoringProfile extends React.Component {
         ));
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         if (this.props.item._id !== prevProps.item._id) {
             this.setState({activeTab: this.props.scheduleMode ? 'schedule' : 'profile'});
             return;

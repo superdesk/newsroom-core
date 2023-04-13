@@ -7,8 +7,8 @@ import {gettext} from 'assets/utils';
 
 interface IProps {
     item: any;
-    plan: any;
-    secondaryNoteField: string;
+    plan?: any;
+    secondaryNoteField?: string;
     noMargin?: boolean;
 }
 

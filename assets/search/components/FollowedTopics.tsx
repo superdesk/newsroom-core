@@ -3,32 +3,23 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
 import classNames from 'classnames';
+import {fetchCompanyUsers} from 'assets/companies/actions';
+import {canUserEditTopic} from 'assets/topics/utils';
+import {globalTopicsEnabledSelector} from 'assets/ui/selectors';
+import {fetchTopics, shareTopic, deleteTopic, selectMenuItem} from 'assets/user-profile/actions';
+import {selectedItemSelector, selectedMenuSelector, topicEditorFullscreenSelector} from 'assets/user-profile/selectors';
+import {canUserManageTopics} from 'assets/users/utils';
+import {gettext, isActionEnabled} from 'assets/utils';
+import types from 'fetch-mock';
+import MonitoringEditor from './MonitoringEditor';
+import TopicEditor from './TopicEditor';
+import TopicList from './TopicList';
 
-import types from 'wire/types';
-import {gettext, isActionEnabled} from 'utils';
-import {canUserManageTopics} from 'users/utils';
-import {canUserEditTopic} from 'topics/utils';
-import {fetchCompanyUsers} from 'companies/actions';
+class FollowedTopics extends React.Component<any, any> {
+    actions: Array<any>;
+    static propTypes: any;
 
-import {
-    fetchTopics,
-    shareTopic,
-    deleteTopic,
-    selectMenuItem,
-} from 'user-profile/actions';
-import {
-    selectedItemSelector,
-    selectedMenuSelector,
-    topicEditorFullscreenSelector,
-    globalTopicsEnabledSelector,
-} from 'user-profile/selectors';
-
-import MonitoringEditor from 'search/components/MonitoringEditor';
-import TopicEditor from 'search/components/TopicEditor';
-import TopicList from 'search/components/TopicList';
-
-class FollowedTopics extends React.Component {
-    constructor(props, context) {
+    constructor(props: any, context: any) {
         super(props, context);
 
         this.editTopic = this.editTopic.bind(this);
@@ -60,7 +51,7 @@ class FollowedTopics extends React.Component {
                     name: gettext('Delete'),
                     icon: 'trash',
                     action: this.deleteTopic,
-                    when: (topic) => canUserEditTopic(topic, this.props.user),
+                    when: (topic: any) => canUserEditTopic(topic, this.props.user),
                 }
             ].filter(isActionEnabled('topic_actions'));
         }
@@ -73,7 +64,7 @@ class FollowedTopics extends React.Component {
         }
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         if (get(prevProps, 'selectedMenu') !== get(this.props, 'selectedMenu')) {
             this.closeEditor();
         }
@@ -83,11 +74,11 @@ class FollowedTopics extends React.Component {
         this.closeEditor();
     }
 
-    editTopic(topic) {
+    editTopic(topic: any) {
         this.props.selectMenuItem(topic);
     }
 
-    deleteTopic(topic) {
+    deleteTopic(topic: any) {
         confirm(
             gettext('Would you like to delete topic {{name}}?', {
                 name: topic.label,
@@ -105,7 +96,7 @@ class FollowedTopics extends React.Component {
         }
 
         return this.props.topics.filter(
-            (topic) => (
+            (topic: any) => (
                 topic.topic_type === this.props.topicType &&
                 (topic.is_global || false) === this.state.showGlobal
             )
@@ -121,7 +112,7 @@ class FollowedTopics extends React.Component {
     }
 
     toggleGlobal() {
-        this.setState((previousState) => ({showGlobal: !previousState.showGlobal}));
+        this.setState((previousState: any) => ({showGlobal: !previousState.showGlobal}));
     }
 
     render() {
@@ -209,7 +200,7 @@ FollowedTopics.propTypes = {
     companyUsers: PropTypes.array,
 };
 
-const mapStateToProps = (state, ownProps) => ({
+const mapStateToProps = (state: any, ownProps: any) => ({
     topics: state.topics,
     monitoringList: state.monitoringList,
     monitoringAdministrator: state.monitoringAdministrator,
@@ -217,16 +208,16 @@ const mapStateToProps = (state, ownProps) => ({
     selectedItem: selectedItemSelector(state),
     selectedMenu: selectedMenuSelector(state),
     editorFullscreen: topicEditorFullscreenSelector(state),
-    globalTopicsEnabled: globalTopicsEnabledSelector(state, ownProps.topicType),
-    companyUsers: state.monitoringProfileUsers || [],
+    globalTopicsEnabled: globalTopicsEnabledSelector(state, ownProps.topicType ),
+    companyUsers: state.monitoringProfileUsers || []
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     fetchTopics: () => dispatch(fetchTopics()),
-    shareTopic: (topic) => dispatch(shareTopic(topic)),
-    deleteTopic: (topic) => dispatch(deleteTopic(topic)),
-    selectMenuItem: (item) => dispatch(selectMenuItem(item)),
-    fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId, true)),
+    shareTopic: (topic: any) => dispatch(shareTopic(topic)),
+    deleteTopic: (topic: any) => dispatch(deleteTopic(topic)),
+    selectMenuItem: (item: any) => dispatch(selectMenuItem(item)),
+    fetchCompanyUsers: (companyId: any) => dispatch(fetchCompanyUsers(companyId, true)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(FollowedTopics);

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-export default function ArticleItemDetails(props) {
+export default function ArticleItemDetails(props: any) {
     return (
         <article
             id='preview-article'

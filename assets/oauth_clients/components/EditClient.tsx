@@ -1,15 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import TextInput from 'assets/components/TextInput';
+import {gettext} from 'assets/utils';
 
-import TextInput from 'components/TextInput';
-import {gettext} from 'utils';
-
-class EditClient extends React.Component {
+class EditClient extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
     }
-
 
     render() {
         return (

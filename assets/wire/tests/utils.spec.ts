@@ -21,5 +21,5 @@ describe('utils', () => {
             },
         };
         expect(utils.getPicture(item)).toBe(embed);
-    }); 
+    });
 });

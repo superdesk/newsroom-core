@@ -3,24 +3,23 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get, set, cloneDeep, isEqual} from 'lodash';
 import classNames from 'classnames';
-
-import {gettext, notify} from 'utils';
-import {canUserEditTopic} from 'topics/utils';
-import types from 'wire/types';
-
+import {loadMyAgendaTopic} from 'assets/agenda/actions';
+import AuditInformation from 'assets/components/AuditInformation';
+import EditPanel from 'assets/components/EditPanel';
+import {fetchNavigations} from 'assets/navigations/actions';
+import {canUserEditTopic} from 'assets/topics/utils';
+import {ToolTip} from 'assets/ui/components/ToolTip';
+import {hideModal, setTopicEditorFullscreen} from 'assets/user-profile/actions';
+import {topicEditorFullscreenSelector} from 'assets/user-profile/selectors';
+import {gettext, notify} from 'assets/utils';
+import {loadMyWireTopic} from 'assets/wire/actions';
+import types from 'fetch-mock';
+import {unsubscribeToTopic, subscribeToTopic} from '../actions';
 import TopicForm from './TopicForm';
 import TopicParameters from './TopicParameters';
-import {fetchNavigations} from 'navigations/actions';
-import {submitFollowTopic as submitWireFollowTopic, subscribeToTopic, unsubscribeToTopic} from 'search/actions';
-import {submitFollowTopic as submitProfileFollowTopic, hideModal, setTopicEditorFullscreen} from 'user-profile/actions';
-import {topicEditorFullscreenSelector} from 'user-profile/selectors';
-import {loadMyWireTopic} from 'wire/actions';
-import {loadMyAgendaTopic} from 'agenda/actions';
-import EditPanel from 'components/EditPanel';
-import AuditInformation from 'components/AuditInformation';
-import {ToolTip} from 'ui/components/ToolTip';
 
-class TopicEditor extends React.Component {
+class TopicEditor extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 
@@ -46,17 +45,17 @@ class TopicEditor extends React.Component {
         }
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         if (get(prevProps, 'topic._id') !== get(this.props, 'topic._id')) {
             this.changeTopic(this.props.topic);
         }
     }
 
-    handleTabClick(event) {
+    handleTabClick(event: any) {
         this.setState({activeTab: event.target.name});
     }
 
-    changeTopic(topic) {
+    changeTopic(topic: any) {
         topic.notifications = (topic.subscribers || []).includes(this.props.userId);
 
         this.setState({
@@ -70,7 +69,7 @@ class TopicEditor extends React.Component {
         });
     }
 
-    getTabsForTopic(topic) {
+    getTabsForTopic(topic: any) {
         return (!topic._id || !topic.is_global || !this.props.isAdmin) ?
             [] :
             [
@@ -79,7 +78,7 @@ class TopicEditor extends React.Component {
             ];
     }
 
-    updateFormValidity(topic) {
+    updateFormValidity(topic: any) {
         const original = get(this.props, 'topic') || {};
         const isDirty = ['label', 'notifications', 'is_global'].some(
             (field) => get(original, field) !== get(topic, field)
@@ -98,8 +97,8 @@ class TopicEditor extends React.Component {
         }
     }
 
-    onChangeHandler(field) {
-        return (event) => {
+    onChangeHandler(field: any) {
+        return (event: any) => {
             const topic = cloneDeep(this.state.topic);
             const value = ['notifications', 'is_global'].includes(field) ?
                 !get(topic, field) :
@@ -117,7 +116,7 @@ class TopicEditor extends React.Component {
         if (this.state.topic.notifications) {
             unsubscribeToTopic(this.state.topic);
             topic.notifications = false;
-            topic.subscribers = (topic.subscribers || []).filter((userId) => userId !== this.props.userId);
+            topic.subscribers = (topic.subscribers || []).filter((userId: any) => userId !== this.props.userId);
         } else {
             subscribeToTopic(this.state.topic);
             topic.notifications = true;
@@ -131,7 +130,7 @@ class TopicEditor extends React.Component {
         this.props.onTopicChanged();
     }
 
-    saveTopic(event) {
+    saveTopic(event: any) {
         const original = this.props.topic;
         const topic = cloneDeep(this.state.topic);
         const isExisting = !this.isNewTopic();
@@ -146,7 +145,7 @@ class TopicEditor extends React.Component {
                 subscribers.push(this.props.userId);
             } else if (!topic.notifications && alreadySubscribed) {
                 subscribers = subscribers.filter(
-                    (userId) => userId !== this.props.userId
+                    (userId: any) => userId !== this.props.userId
                 );
             }
 
@@ -160,7 +159,7 @@ class TopicEditor extends React.Component {
             isExisting,
             topic
         )
-            .then((savedTopic) => {
+            .then((savedTopic: any) => {
                 this.setState({saving: false});
                 this.props.onTopicChanged();
                 this.props.closeEditor();
@@ -248,7 +247,7 @@ class TopicEditor extends React.Component {
                 )}
                 {!showTabs ? null : (
                     <ul className='nav nav-tabs'>
-                        {this.state.tabs.map((tab) => (
+                        {this.state.tabs.map((tab: any) => (
                             <li
                                 key={tab.name}
                                 className='nav-item'
@@ -290,7 +289,7 @@ class TopicEditor extends React.Component {
                     {this.state.activeTab === 'subscribers' && updatedTopic && (
                         <EditPanel
                             parent={updatedTopic}
-                            items={this.props.companyUsers.map((user) => ({
+                            items={this.props.companyUsers.map((user: any) => ({
                                 ...user,
                                 name: `${user.first_name} ${user.last_name}`,
                             }))}
@@ -349,7 +348,7 @@ TopicEditor.propTypes = {
     user: PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     userId: get(state, 'editedUser._id'),
     isLoading: state.isLoading,
     navigations: state.navigations || [],
@@ -357,16 +356,16 @@ const mapStateToProps = (state) => ({
     companyUsers: state.monitoringProfileUsers || [],
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     fetchNavigations: () => dispatch(fetchNavigations()),
     hideModal: () => dispatch(hideModal()),
-    saveTopic: (isExisting, topic) => isExisting ?
+    saveTopic: (isExisting: any, topic: any) => isExisting ?
         dispatch(submitProfileFollowTopic(topic)) :
         dispatch(submitWireFollowTopic(topic)),
-    loadMyTopic: (topic) => topic.topic_type === 'agenda' ?
+    loadMyTopic: (topic: any) => topic.topic_type === 'agenda' ?
         dispatch(loadMyAgendaTopic(topic._id)) :
         dispatch(loadMyWireTopic(topic._id)),
-    setTopicEditorFullscreen: (fullscreen) => dispatch(setTopicEditorFullscreen(fullscreen)),
+    setTopicEditorFullscreen: (fullscreen: any) => dispatch(setTopicEditorFullscreen(fullscreen)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TopicEditor);

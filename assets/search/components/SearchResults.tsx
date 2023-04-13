@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {gettext} from 'assets/utils';
 
-import {gettext} from 'utils';
-
-const SearchResults = ({totalItems, totalItemsLabel}) => (
+const SearchResults = ({totalItems, totalItemsLabel}: any) => (
     <div className="search-results__main-header d-flex mt-0 px-3 align-items-center">
         <div className="d-flex flex-column flex-md-row h-100">
             <div className="navbar-text search-results-info">

@@ -1,16 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-
-import TextInput from 'components/TextInput';
-import CheckboxInput from 'components/CheckboxInput';
-import {ToolTip} from 'ui/components/ToolTip';
-
-import {gettext} from 'utils';
+import CheckboxInput from 'assets/components/CheckboxInput';
+import TextInput from 'assets/components/TextInput';
+import {ToolTip} from 'assets/ui/components/ToolTip';
+import {gettext} from 'assets/utils';
 
 const TOPIC_NAME_MAXLENGTH = 30;
 
-const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubscribeChanged, readOnly}) => (
+const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubscribeChanged, readOnly}: any) => (
     <div>
         <form onSubmit={save}>
             {original._id == null ? null : (

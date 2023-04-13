@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import {get} from 'lodash';
 import moment from 'moment';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import DatePicker from 'react-datepicker';
 
 import SelectInput from 'components/SelectInput';
 
-class MonitoringSchedule extends React.Component {
+class MonitoringSchedule extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
 

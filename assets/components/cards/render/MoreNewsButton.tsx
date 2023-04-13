@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
 function MoreNewsButton({title, product, photoUrl, photoUrlLabel}) {
     return ([<div key='heading' className='col-6 col-sm-8'>

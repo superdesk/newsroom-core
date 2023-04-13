@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext, shortDate, fullDate} from 'utils';
 import {getUserLabel} from '../utils';
 import {get} from 'lodash';
+import {gettext, shortDate, fullDate} from 'assets/utils';
 
 
-function UserListItem({user, isActive, onClick, companiesById}) {
+function UserListItem({user, isActive, onClick, companiesById}: any) {
     return (
         <tr key={user._id}
             className={`${isActive?'table--selected':''}

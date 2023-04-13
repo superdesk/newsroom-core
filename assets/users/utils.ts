@@ -46,5 +46,5 @@ export function getLocaleInputOptions(): any {
 }
 
 export function getDefaultLocale(): any {
-    return window.locales.find((locale) => locale.locale === window.locale).name;
+    return window.locales.find((locale: any) => locale.locale === window.locale).name;
 }

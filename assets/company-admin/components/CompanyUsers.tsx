@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {selectUser as _selectUser} from 'users/actions';
 import {currentCompanySelector, companySectionListSelector, userIdSelector, userIdMapSelector} from '../selectors';
 
@@ -55,7 +55,7 @@ CompanyUsersComponent.propTypes = {
     companySections: PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     users: userIdSelector(state),
     usersById: userIdMapSelector(state),
     activeUserId: state.activeUserId,
@@ -63,7 +63,7 @@ const mapStateToProps = (state) => ({
     companySections: companySectionListSelector(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     selectUser: (userId) => dispatch(_selectUser(userId)),
 });
 

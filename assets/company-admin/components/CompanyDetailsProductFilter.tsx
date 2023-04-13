@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {currentCompanySelector, companySectionListSelector} from '../selectors';
 
 import DropdownFilter from 'components/DropdownFilter';
@@ -75,7 +75,7 @@ CompanyDetailsProductFilterComponent.propTypes = {
     companySections: PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     currentCompany: currentCompanySelector(state),
     companySections: companySectionListSelector(state),
 });

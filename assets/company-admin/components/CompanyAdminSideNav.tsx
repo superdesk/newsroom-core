@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
 export function CompanyAdminSideNav() {
     return (

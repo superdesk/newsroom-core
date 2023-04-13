@@ -3,17 +3,14 @@ import PropTypes from 'prop-types';
 import 'react-toggle/style.css';
 import {connect} from 'react-redux';
 import {isEmpty, get} from 'lodash';
-
-import {gettext} from 'utils';
-
-import {
-    searchParamsSelector,
-} from 'search/selectors';
-
 import NewItemsIcon from './NewItemsIcon';
 import {ContentSearchResults} from './ContentSearchResults';
+import {gettext} from 'assets/utils';
+import {searchParamsSelector} from '../selectors';
 
-class SearchResultsInfo extends React.Component {
+class SearchResultsInfo extends React.Component<any, any> {
+    static propTypes: any;
+    static defaultProps: any;
     constructor(props: any) {
         super(props);
 
@@ -93,9 +90,9 @@ SearchResultsInfo.defaultProps = {
     showSaveTopic: false,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     user: state.userObject,
     searchParams: searchParamsSelector(state),
 });
 
-export default connect(mapStateToProps, null)(SearchResultsInfo);
+export default connect(mapStateToProps, null)(SearchResultsInfo as any);

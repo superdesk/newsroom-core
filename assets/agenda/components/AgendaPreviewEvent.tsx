@@ -3,11 +3,8 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get} from 'lodash';
-
-import {gettext} from 'utils';
 import {getName, getInternalNote} from '../utils';
 import {fetchItem} from '../actions';
-
 import AgendaTime from './AgendaTime';
 import AgendaListItemLabels from './AgendaListItemLabels';
 import AgendaMeta from './AgendaMeta';
@@ -16,8 +13,9 @@ import AgendaPreviewAttachments from './AgendaPreviewAttachments';
 import AgendaTags from './AgendaTags';
 import AgendaEdNote from './AgendaEdNote';
 import AgendaInternalNote from './AgendaInternalNote';
+import {gettext} from 'assets/utils';
 
-class AgendaPreviewEventComponent extends React.Component {
+class AgendaPreviewEventComponent extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
 
@@ -32,7 +30,7 @@ class AgendaPreviewEventComponent extends React.Component {
         this.reloadEvent();
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         if (get(prevProps.item, 'event_id') !== get(this.props.item, 'event_id')) {
             this.reloadEvent();
         }
@@ -49,7 +47,7 @@ class AgendaPreviewEventComponent extends React.Component {
     }
 
     toggleExpanded() {
-        this.setState((prevState) => ({expanded: !prevState.expanded}));
+        this.setState((prevState: any) => ({expanded: !prevState.expanded}));
     }
 
     render() {
@@ -121,12 +119,12 @@ AgendaPreviewEventComponent.propTypes = {
     fetchEvent: PropTypes.func,
 };
 
-const mapStateToProps = (state, ownProps) => ({
+const mapStateToProps = (state: any, ownProps: any) => ({
     event: state.itemsById[ownProps.item.event_id],
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    fetchEvent: (eventId) => dispatch(fetchItem(eventId)),
+const mapDispatchToProps = (dispatch: any) => ({
+    fetchEvent: (eventId: any) => dispatch(fetchItem(eventId)),
 });
 
 export const AgendaPreviewEvent = connect(mapStateToProps, mapDispatchToProps)(AgendaPreviewEventComponent);

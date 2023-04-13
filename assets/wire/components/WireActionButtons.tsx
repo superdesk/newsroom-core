@@ -1,15 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import types from 'wire/types';
-import {isDisplayed} from 'utils';
-
+import PreviewActionButtons from 'assets/components/PreviewActionButtons';
+import {isDisplayed} from 'assets/utils';
+import types from 'fetch-mock';
 import FollowStory from './FollowStory';
-import PreviewActionButtons from 'components/PreviewActionButtons';
 
-export default function WireActionButtons(props) {
+export default function WireActionButtons(props: any) {
     const {previewConfig} = props;
     const displayFollowStory = previewConfig == null || isDisplayed('follow_story', previewConfig);
-    
+
     return (
         <React.Fragment>
             {previewConfig == null && (

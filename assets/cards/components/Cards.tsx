@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
 import {
     cancelEdit,
@@ -20,7 +20,7 @@ import EditCard from './EditCard';
 import CardList from './CardList';
 import SearchResults from 'search/components/SearchResults';
 
-class Cards extends React.Component {
+class Cards extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 
@@ -133,7 +133,7 @@ Cards.propTypes = {
     dashboards: PropTypes.arrayOf(PropTypes.object),
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     cards: state.cards.map((id) => state.cardsById[id]),
     cardToEdit: state.cardToEdit,
     activeCardId: state.activeCardId,
@@ -147,7 +147,7 @@ const mapStateToProps = (state) => ({
     dashboards: state.dashboards.list,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     selectCard: (_id) => dispatch(selectCard(_id)),
     editCard: (event) => dispatch(editCard(event)),
     saveCard: (type) => dispatch(postCard(type)),

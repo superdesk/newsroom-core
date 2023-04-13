@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-export function TopicItem({topic, newItemsByTopic, onClick, className}) {
+export function TopicItem({topic, newItemsByTopic, onClick, className}: any) {
     return (
         <button
             className={className}

@@ -1,39 +1,17 @@
 import {get, isEmpty, includes, cloneDeep} from 'lodash';
 import moment from 'moment';
-
-import server from 'server';
-import analytics from 'analytics';
-import {
-    gettext,
-    notify,
-    updateRouteParams,
-    getTimezoneOffset,
-    errorHandler,
-    recordAction,
-    copyTextToClipboard,
-} from 'utils';
-import {noNavigationSelected, getNavigationUrlParam} from 'search/utils';
-
-import {markItemAsRead, toggleFeaturedOnlyParam} from 'local-store';
-import {renderModal, setSavedItemsCount} from 'actions';
-import {
-    getDateInputDate,
-    getMomentDate,
-} from './utils';
-
-import {
-    toggleFilter,
-    initParams as initSearchParams,
-    setNewItemByTopic,
-    loadMyTopics,
-    setTopics,
-    loadMyTopic,
-    setSearchFilters,
-} from 'search/actions';
-import {searchParamsSelector, searchFilterSelector} from 'search/selectors';
-
-import {clearAgendaDropdownFilters} from '../local-store';
+import {clearAgendaDropdownFilters, markItemAsRead, toggleFeaturedOnlyParam} from '../local-store';
 import {getLocations, getMapSource} from '../maps/utils';
+import {renderModal, setSavedItemsCount} from 'assets/actions';
+import analytics from 'assets/analytics';
+import {setNewItemByTopic, loadMyTopics, setSearchFilters, loadMyTopic} from 'assets/search/actions';
+import {searchParamsSelector, searchFilterSelector} from 'assets/search/selectors';
+import {noNavigationSelected, getNavigationUrlParam} from 'assets/search/utils';
+import {setTopics} from 'assets/topics/actions';
+import {recordAction, errorHandler, notify, gettext, updateRouteParams, copyTextToClipboard, getTimezoneOffset} from 'assets/utils';
+import {toggleFilter} from 'assets/wire/actions';
+import {server} from 'karma';
+import {getMomentDate, getDateInputDate} from './utils';
 
 const WATCH_URL = '/agenda_watch';
 const WATCH_COVERAGE_URL = '/agenda_coverage_watch';
@@ -100,7 +78,7 @@ export function agendaWireItems(items: any): any {
 }
 
 export const OPEN_ITEM = 'OPEN_ITEM';
-export function openItemDetails(item: any, group: any, plan: any): any {
+export function openItemDetails(item: any, group?: any, plan?: any): any {
     return {type: OPEN_ITEM, item, group, plan};
 }
 
@@ -672,6 +650,6 @@ export function stopWatchingCoverage(coverage: any, item: any): any {
                 if (getState().bookmarks) {
                     dispatch(fetchItems()); // item should get removed from the list in bookmarks view
                 }
-            }, (error) => { errorHandler(error, dispatch);});
+            }, (error: any) => { errorHandler(error, dispatch);});
     };
 }

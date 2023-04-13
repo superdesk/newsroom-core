@@ -3,17 +3,18 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {isEmpty} from 'lodash';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
-import {selectAll, selectNone} from 'wire/actions';
+import {selectAll, selectNone} from 'assets/wire/actions';
 
 class SelectedItemsBar extends React.PureComponent<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
         this.onAction = this.onAction.bind(this);
     }
 
-    onAction(event, action) {
+    onAction(event: any, action: any) {
         event.preventDefault();
         action.action(this.props.selectedItems) && this.props.selectNone();
     }
@@ -23,10 +24,10 @@ class SelectedItemsBar extends React.PureComponent<any, any> {
             return null;
         }
 
-        const multiActionFilter = (action) => action.multi &&
-            this.props.selectedItems.every((item) => !action.when || action.when(this.props.state, this.props.itemsById[item]));
+        const multiActionFilter = (action: any) => action.multi &&
+            this.props.selectedItems.every((item: any) => !action.when || action.when(this.props.state, this.props.itemsById[item]));
 
-        const actions = this.props.actions.filter(multiActionFilter).map((action) => (
+        const actions = this.props.actions.filter(multiActionFilter).map((action: any) => (
             <button className='icon-button'
                 key={action.name}
                 title={action.name}
@@ -66,7 +67,7 @@ SelectedItemsBar.propTypes = {
     selectNone: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     state: state,
     itemsById: state.itemsById,
     selectedItems: state.selectedItems,

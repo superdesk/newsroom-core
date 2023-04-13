@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import SelectInput from 'components/SelectInput';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
 
-class ConfigProduct extends React.Component {
+class ConfigProduct extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
 

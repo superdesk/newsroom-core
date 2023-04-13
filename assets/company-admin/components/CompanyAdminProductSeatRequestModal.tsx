@@ -5,7 +5,7 @@ import {get} from 'lodash';
 
 import {sendProductSeatRequest} from '../actions';
 import {closeModal, modalFormValid, modalFormInvalid} from 'actions';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {currentCompanySectionListSelector, productListSelector} from '../selectors';
 
 import Modal from 'components/Modal';
@@ -13,7 +13,7 @@ import TextInput from 'components/TextInput';
 import TextAreaInput from 'components/TextAreaInput';
 import {Tag} from 'components/Tag';
 
-class CompanyAdminProductSeatRequestModalComponent extends React.Component {
+class CompanyAdminProductSeatRequestModalComponent extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
 
@@ -182,13 +182,13 @@ CompanyAdminProductSeatRequestModalComponent.propTypes = {
     modalFormValid: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     products: productListSelector(state),
     productIds: get(state, 'modal.data.productIds') || [],
     sections: currentCompanySectionListSelector(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     closeModal: () => dispatch(closeModal()),
     sendRequest: (data) => dispatch(sendProductSeatRequest(data)),
     modalFormInvalid: () => dispatch(modalFormInvalid()),

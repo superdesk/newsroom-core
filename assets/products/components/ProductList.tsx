@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ProductListItem from './ProductListItem';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
-
-function ProductList({products, onClick, activeProductId, activeSection}) {
-    const list = products.map((product) =>
+function ProductList({products, onClick, activeProductId, activeSection}: any) {
+    const list = products.map((product: any) =>
         <ProductListItem
             key={product._id}
             product={product}

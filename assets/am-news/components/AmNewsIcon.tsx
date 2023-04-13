@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {bem} from 'ui/utils';
+import {bem} from 'assets/ui/utils';
 
 
-const AMNewsIcon = ({iconType, borderRight, toolTip}) => {
+const AMNewsIcon = ({iconType, borderRight, toolTip}: any) => {
     const css = classNames(
         'wire-articles__item__am-icons',
         bem('wire-articles__item', 'meta-time', {'border-right': borderRight})

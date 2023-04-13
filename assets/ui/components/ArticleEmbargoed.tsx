@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {getEmbargo, gettext, fullDate} from '../../utils';
 
-export default function ArticleEmbargoed({item}) {
+export default function ArticleEmbargoed({item}: any) {
     const embargo = getEmbargo(item);
 
     if (!embargo) {

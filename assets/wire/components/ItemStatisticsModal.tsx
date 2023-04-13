@@ -1,9 +1,9 @@
 import React from 'react';
-import Modal from 'components/Modal';
 import PropTypes from 'prop-types';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
 export default class ItemStatisticsModal extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 

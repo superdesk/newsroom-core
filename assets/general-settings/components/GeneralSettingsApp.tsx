@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {connect} from 'react-redux';
 import {get, sortBy} from 'lodash';
 
@@ -13,7 +13,7 @@ function isInput(field) {
     return field.type === 'text' || field.type === 'number';
 }
 
-class GeneralSettingsApp extends React.Component {
+class GeneralSettingsApp extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.state = {
@@ -97,7 +97,7 @@ GeneralSettingsApp.propTypes = {
     versionCreator: PropTypes.string,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     config: state.config,
     updatedTime: state._updated,
     versionCreator: state.version_creator,

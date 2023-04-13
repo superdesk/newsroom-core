@@ -2,13 +2,6 @@ import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {get, cloneDeep} from 'lodash';
 import moment from 'moment';
-
-import TextInput from 'components/TextInput';
-import ExpiryDateInput from 'components/ExpiryDateInput';
-import TextAreaInput from 'components/TextAreaInput';
-import CheckboxInput from 'components/CheckboxInput';
-import CardEditor from 'components/CardEditor';
-
 import {
     gettext,
     isInPast,
@@ -55,13 +48,13 @@ export default class EditAPIToken extends React.Component<any, any> {
                 // Retrieve the API Token from the server
                 // Then update this component's state with the token
                 getTokenForCompany(this.props.companyId)
-                    .then((token) => {
+                    .then((token: any) => {
                         this.setState({
                             token: token,
                             loaded: true,
                             creating: false,
                         });
-                    }, (error) => {
+                    }, (error: any) => {
                         if (error.response.status === 404) {
                             this.setState({
                                 loaded: true,
@@ -79,14 +72,14 @@ export default class EditAPIToken extends React.Component<any, any> {
         });
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         // reset tabs when new company is created
         if (this.props.companyId !== prevProps.companyId) {
             this.loadToken();
         }
     }
 
-    onExpiryChange(value) {
+    onExpiryChange(value: any) {
         const newState = cloneDeep(this.state);
 
         if (!value) {

@@ -2,14 +2,13 @@ import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import server from 'server';
 import {get} from 'lodash';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
 import InfoBox from './InfoBox';
 import PreviewTagsBlock from './PreviewTagsBlock';
-import PreviewBox from 'ui/components/PreviewBox';
-import AgendaCoverages from 'agenda/components/AgendaCoverages';
-import AgendaEventInfo from 'agenda/components/AgendaEventInfo';
-
+import AgendaCoverages from 'assets/agenda/components/AgendaCoverages';
+import AgendaEventInfo from 'assets/agenda/components/AgendaEventInfo';
+import PreviewBox from 'assets/ui/components/PreviewBox';
 export default class AgendaLinks extends React.PureComponent<any, any> {
     constructor(props: any) {
         super(props);
@@ -23,7 +22,7 @@ export default class AgendaLinks extends React.PureComponent<any, any> {
         this.fetchAgendaData();
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         if (get(prevProps, 'item._id') !== get(this.props, 'item._id')) {
             this.setState({
                 agenda: null,

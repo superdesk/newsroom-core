@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default function ArticleText(props) {
+export default function ArticleText(props: any) {
     return (
         <div className={`wire-column__preview__content--item-detail-item-${props.itemType}`}>
             {props.children}

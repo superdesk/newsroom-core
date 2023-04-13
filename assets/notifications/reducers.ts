@@ -22,7 +22,7 @@ export default function notificationReducer(state = initialState, action: any): 
             ...state,
             notifications: action.notifications,
             notificationCount: action.notifications.length,
-            items: action.items.reduce((itemMap, item) => {
+            items: action.items.reduce((itemMap: any, item: any) => {
                 itemMap[item._id] = item;
 
                 return itemMap;

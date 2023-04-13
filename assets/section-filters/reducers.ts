@@ -1,3 +1,7 @@
+import {ADD_EDIT_USERS} from 'assets/actions';
+import {INIT_SECTIONS, SELECT_SECTION} from 'assets/features/sections/actions';
+import {sectionsReducer} from 'assets/features/sections/reducers';
+import {searchReducer} from 'assets/search/reducers';
 import {
     GET_SECTION_FILTERS,
     SELECT_SECTION_FILTER,
@@ -7,13 +11,8 @@ import {
     NEW_SECTION_FILTER,
     SET_ERROR,
 } from './actions';
-import {ADD_EDIT_USERS} from 'actions';
 
-import {INIT_SECTIONS, SELECT_SECTION} from 'features/sections/actions';
-import {sectionsReducer} from 'features/sections/reducers';
-import {searchReducer} from 'search/reducers';
-
-const initialState = {
+const initialState: any = {
     query: null,
     sectionFilters: [],
     sectionFiltersById: {},

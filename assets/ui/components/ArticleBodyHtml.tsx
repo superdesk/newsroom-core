@@ -1,15 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {get, memoize} from 'lodash';
-import {formatHTML} from 'utils';
 import {connect} from 'react-redux';
 import {selectCopy} from '../../wire/actions';
+import {formatHTML} from 'assets/utils';
 
 /**
  * using component to fix iframely loading
  * https://iframely.com/docs/reactjs
  */
 class ArticleBodyHtml extends React.PureComponent<any, any> {
+    static propTypes: any;
+    bodyRef: React.RefObject<unknown>;
+    getBodyHTML: any;
     constructor(props: any) {
         super(props);
         this.copyClicked = this.copyClicked.bind(this);
@@ -45,7 +48,7 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
         }
     }
 
-    isLinkExternal(href) {
+    isLinkExternal(href: any) {
         try {
             const url = new URL(href);
 
@@ -72,13 +75,13 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
 
     executeScripts() {
         const tree = this.bodyRef.current;
-        const loaded = [];
+        const loaded: any = [];
 
         if (tree == null) {
             return;
         }
 
-        tree.querySelectorAll('script').forEach((s) => {
+        tree.querySelectorAll('script').forEach((s: any) => {
             if (s.hasAttribute('src') && !loaded.includes(s.getAttribute('src'))) {
                 let url = s.getAttribute('src');
 
@@ -99,7 +102,7 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
                     url = url.substring(url.indexOf(':') + 1);
                 }
 
-                const script = document.createElement('script');
+                const script: any = document.createElement('script');
 
                 script.src = url;
                 script.async = true;
@@ -108,7 +111,7 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
                     document.body.removeChild(script);
                 };
 
-                script.onerrror = (error) => {
+                script.onerrror = (error: any) => {
                     throw new URIError('The script ' + error.target.src + 'didn\'t load.');
                 };
 
@@ -126,7 +129,7 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
         document.removeEventListener('click', this.clickClicked);
     }
 
-    _getBodyHTML(bodyHtml) {
+    _getBodyHTML(bodyHtml: any) {
         return !bodyHtml ?
             null :
             this._updateImageEmbedSources(formatHTML(bodyHtml));
@@ -139,7 +142,7 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
      * @returns {string}
      * @private
      */
-    _updateImageEmbedSources(html) {
+    _updateImageEmbedSources(html: any) {
         const item = this.props.item;
 
         // Get the list of Original Rendition IDs for all Image Associations
@@ -218,8 +221,8 @@ ArticleBodyHtml.propTypes = {
     reportCopy: PropTypes.func,
 };
 
-const mapDispatchToProps = (dispatch) => ({
-    reportCopy: (item) => dispatch(selectCopy(item))
+const mapDispatchToProps = (dispatch: any) => ({
+    reportCopy: (item: any) => dispatch(selectCopy(item))
 });
 
 export default connect(null, mapDispatchToProps)(ArticleBodyHtml);

@@ -6,14 +6,14 @@ import server from 'server';
 
 import wireApp from '../reducers';
 import * as actions from '../actions';
-import * as utils from 'utils';
+import * as utils from 'assets/utils';
 import {
     setQuery,
     toggleNavigation,
     toggleFilter,
     setCreatedFilter,
     loadMyTopic,
-} from 'search/actions';
+} from 'assets/search/actions';
 import {initData} from '../actions';
 
 describe('wire actions', () => {

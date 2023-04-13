@@ -2,17 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get, set, cloneDeep, isEqual} from 'lodash';
-import {gettext} from 'utils';
-import EditPanel from 'components/EditPanel';
-import TextInput from 'components/TextInput';
-import CheckboxInput from 'components/CheckboxInput';
-import SelectInput from 'components/SelectInput';
-import MonitoringSchedule from '../../monitoring/components/MonitoringSchedule';
+import {fetchCompanyUsers} from 'assets/companies/actions';
+import CheckboxInput from 'assets/components/CheckboxInput';
+import EditPanel from 'assets/components/EditPanel';
+import SelectInput from 'assets/components/SelectInput';
+import TextInput from 'assets/components/TextInput';
+import {postMonitoringProfile} from 'assets/monitoring/actions';
+import MonitoringSchedule from 'assets/monitoring/components/MonitoringSchedule';
+import {gettext} from 'assets/utils';
 
-import {fetchCompanyUsers} from 'companies/actions';
-import {postMonitoringProfile} from 'monitoring/actions';
+class MonitoringEditor extends React.Component<any, any> {
+    tabs: Array<any>;
+    static propTypes: any;
 
-class MonitoringEditor extends React.Component {
     constructor(props: any) {
         super(props);
 
@@ -36,7 +38,7 @@ class MonitoringEditor extends React.Component {
         this.saveMonitoringProfile = this.saveMonitoringProfile.bind(this);
     }
 
-    handleTabClick(event) {
+    handleTabClick(event: any) {
         this.setState({activeTab: event.target.name});
         if (event.target.name === 'users' && get(this.props, 'item.company')) {
             this.props.fetchCompanyUsers(this.props.item.company);
@@ -49,14 +51,14 @@ class MonitoringEditor extends React.Component {
         }
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         if (get(prevProps, 'item._id') !== get(this.props, 'item._id') ||
             get(prevProps, 'item._updated') !== get(this.props, 'item._updated')) {
             this.changeMonitoringProfile(this.props.item);
         }
     }
 
-    changeMonitoringProfile(item) {
+    changeMonitoringProfile(item: any) {
         this.setState({
             profile: cloneDeep(item),
             saving: false,
@@ -64,7 +66,7 @@ class MonitoringEditor extends React.Component {
         });
     }
 
-    onChange(event) {
+    onChange(event: any) {
         const wl = cloneDeep(this.state.profile);
         let field = event.target.name;
         let value = event.target.value;
@@ -97,7 +99,7 @@ class MonitoringEditor extends React.Component {
         }
     }
 
-    saveMonitoringProfile(event) {
+    saveMonitoringProfile(event: any) {
         if (event && 'preventDefault' in event) {
             event.preventDefault();
         }
@@ -250,12 +252,12 @@ MonitoringEditor.propTypes = {
     monitoringProfileUsers: PropTypes.array,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     monitoringProfileUsers: state.monitoringProfileUsers || [],
     user: get(state, 'editedUser._id'),
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     saveMonitoringProfile: (item, notifyMsg) => dispatch(postMonitoringProfile(item, notifyMsg)),
     fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId, true)),
 });

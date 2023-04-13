@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {
     newNavigation,
     fetchNavigations,
@@ -14,7 +14,7 @@ import {sectionsPropType} from '../../features/sections/types';
 import {uiSectionsSelector, activeSectionSelector} from '../../features/sections/selectors';
 
 
-class NavigationsApp extends React.Component {
+class NavigationsApp extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
     }
@@ -50,7 +50,7 @@ NavigationsApp.propTypes = {
     activeSection: PropTypes.string.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     sections: uiSectionsSelector(state),
     activeSection: activeSectionSelector(state),
 });

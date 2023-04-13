@@ -1,7 +1,7 @@
 import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {Dropdown} from './Dropdown';
 
 function MultiSelectDropdown({values, label, field, options, onChange, showAllButton, multi}) {

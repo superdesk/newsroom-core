@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ClientListItem from './ClientListItem';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
 
-function ClientList({clients, onClick}) {
-    const list = clients.map((client) =>
+function ClientList({clients, onClick}: any) {
+    const list = clients.map((client: any) =>
         <ClientListItem
             key={client._id}
             client={client}

@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import InfoBox from './InfoBox';
 
 
-function PreviewEdnote({item}) {
+function PreviewEdnote({item}: any) {
     return (
         item.ednote ? <InfoBox label={gettext('Note')}>
             <div>{item.ednote}</div>

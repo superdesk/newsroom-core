@@ -1,9 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-
-import {gettext} from 'utils';
-
 import {
     newUser,
     fetchUsers,
@@ -11,15 +8,15 @@ import {
     setSort,
     toggleSortDirection,
 } from '../actions';
-import {setSearchQuery} from 'search/actions';
-
 import Users from './Users';
-import ListBar from 'components/ListBar';
 import {UserListSortFilter} from './filters/UserListSortFilter';
 import {UserListCompanyFilter} from './filters/UserListCompanyFilter';
+import ListBar from 'assets/components/ListBar';
+import {setSearchQuery} from 'assets/search/actions';
+import {gettext} from 'assets/utils';
 
 
-function UsersApp(props) {
+function UsersApp(props: any) {
     return ([
         <ListBar
             key="UserBar"
@@ -48,7 +45,7 @@ function UsersApp(props) {
     ]);
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     companies: state.companies,
     company: state.company,
     sort: state.sort,

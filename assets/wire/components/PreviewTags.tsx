@@ -2,18 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
-
-import {gettext, isDisplayed} from 'utils';
-import {filterGroupsToLabelMap} from 'search/selectors';
-
 import InfoBox from './InfoBox';
 import PreviewTagsBlock from './PreviewTagsBlock';
 import {PreviewTagsSubjects} from './PreviewTagsSubjects';
 import {PreviewTagsLinkList} from './PreviewTagsLinkList';
-import ArticleSlugline from 'ui/components/ArticleSlugline';
+import {filterGroupsToLabelMap} from 'assets/search/selectors';
+import ArticleSlugline from 'assets/ui/components/ArticleSlugline';
+import {isDisplayed, gettext} from 'assets/utils';
 
 
-function PreviewTagsComponent({item, isItemDetail, displayConfig, filterGroupLabels}) {
+function PreviewTagsComponent({item, isItemDetail, displayConfig, filterGroupLabels}: any) {
     const services = !isDisplayed('services', displayConfig) ? null : (
         <PreviewTagsLinkList
             urlPrefix="/wire?filter="
@@ -65,7 +63,7 @@ PreviewTagsComponent.propTypes = {
     filterGroupLabels: PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     filterGroupLabels: filterGroupsToLabelMap(state),
 });
 

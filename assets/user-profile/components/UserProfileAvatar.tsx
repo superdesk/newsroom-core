@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function UserProfileAvatar({user}) {
+function UserProfileAvatar({user}: any) {
     const initials = [user.first_name, user.last_name]
         .map((name) => name[0].toLocaleUpperCase())
         .join('');

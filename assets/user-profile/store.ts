@@ -1,4 +1,4 @@
-import {createStore} from 'utils';
+import {createStore} from 'assets/utils';
 import userReducer from './reducers';
 
 

@@ -2,7 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 
-export function PreviewText({text}) {
+export function PreviewText({text}: any) {
     if (text == null || !text.length) {
         return null;
     }

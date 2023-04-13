@@ -2,7 +2,7 @@ import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
 import {connect} from 'react-redux';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {
     newMonitoringProfile,
     setQuery,
@@ -15,7 +15,7 @@ import ListBar from 'components/ListBar';
 import DropdownFilter from 'components/DropdownFilter';
 
 
-class MonitoringApp extends React.Component {
+class MonitoringApp extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 
@@ -111,12 +111,12 @@ class MonitoringApp extends React.Component {
         if (field === 'company') {
             this.props.setCompany(value);
         }
-        
+
         this.props.fetchMonitoring();
     }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     companies: state.companies,
     company: state.company,
     monitoringListCompanies: state.monitoringListCompanies,

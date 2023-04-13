@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {hasAudio, hasVideo} from 'wire/utils';
+import {hasAudio, hasVideo} from 'assets/wire/utils';
 
-function WireListItemIcons({item, picture, divider}) {
+function WireListItemIcons({item, picture, divider}: any) {
     return (
         <div className='wire-articles__item__icons'>
             {item.type === 'text' &&

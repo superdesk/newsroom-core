@@ -1,17 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {shouldRenderLocation, getLocations} from 'maps/utils';
-import StaticMap from 'maps/components/static';
-import BannerDrop from 'components/BannerDrop';
 import {gettext} from '../../utils';
 import {get} from 'lodash';
+import BannerDrop from 'assets/components/BannerDrop';
+import StaticMap from 'assets/maps/components/static';
+import {shouldRenderLocation, getLocations} from 'assets/maps/utils';
 
 /**
  * Display map image for item location
  * @param {Object} item
  * @param {function} onClick
  */
-export default function AgendaPreviewImage({item, onClick}) {
+export default function AgendaPreviewImage({item, onClick}: any) {
     if (!shouldRenderLocation(item)) {
         return null;
     }

@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {gettext} from 'utils';
 import {get} from 'lodash';
+import {gettext} from 'assets/utils';
 
-function getHighlightColorForUrgency(item, listConfig) {
+function getHighlightColorForUrgency(item: any, listConfig: any) {
     return item.urgency > 0 &&
         listConfig &&
         listConfig.highlights &&
@@ -13,7 +13,7 @@ function getHighlightColorForUrgency(item, listConfig) {
         : null;
 }
 
-export function UrgencyItemBorder({item, listConfig}) {
+export function UrgencyItemBorder({item, listConfig}: any) {
     const urgencyHighlightColor = getHighlightColorForUrgency(item, listConfig);
 
     if (!urgencyHighlightColor) {
@@ -38,7 +38,7 @@ UrgencyItemBorder.propTypes = {
 
 const DEFAULT_URGENCY = 4;
 
-export function UrgencyLabel ({item, listConfig, filterGroupLabels, alwaysShow = false}) {
+export function UrgencyLabel ({item, listConfig, filterGroupLabels, alwaysShow = false}: any) {
     const urgencyHighlightColor = getHighlightColorForUrgency(item, listConfig);
     const label = get(filterGroupLabels, 'urgency', gettext('News Value'));
     const value = item.urgency || DEFAULT_URGENCY;

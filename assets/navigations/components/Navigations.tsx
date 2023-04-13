@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 
 import {
     cancelEdit,
@@ -24,7 +24,7 @@ import NavigationList from './NavigationList';
 import SearchResults from 'search/components/SearchResults';
 
 
-class Navigations extends React.Component {
+class Navigations extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 
@@ -129,7 +129,7 @@ Navigations.propTypes = {
     fetchProducts: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     navigations: state.navigations.map((id) => state.navigationsById[id]),
     navigationToEdit: state.navigationToEdit,
     activeNavigationId: state.activeNavigationId,
@@ -141,7 +141,7 @@ const mapStateToProps = (state) => ({
     sections: uiSectionsSelector(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     selectNavigation: (_id) => dispatch(selectNavigation(_id)),
     editNavigation: (event) => dispatch(editNavigation(event)),
     saveNavigation: (type) => dispatch(postNavigation(type)),

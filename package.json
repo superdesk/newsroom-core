@@ -20,6 +20,7 @@
     "@types/node": "^18.15.11",
     "@types/react": "^18.0.33",
     "@types/react-dom": "^18.0.11",
+    "@types/server": "^1.0.5",
     "alertifyjs": "1.11.2",
     "babel-core": "6.26.3",
     "babel-loader": "7.1.5",

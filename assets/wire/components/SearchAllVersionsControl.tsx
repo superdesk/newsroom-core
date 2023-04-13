@@ -1,10 +1,10 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Toggle from 'react-toggle';
-import {gettext} from 'utils';
-import {noNavigationSelected} from 'search/utils';
+import {gettext} from 'assets/utils';
+import {noNavigationSelected} from 'assets/search/utils';
 
-function SearchAllVersionsControl({searchAllVersions, toggleSearchAllVersions, activeNavigation}) {
+function SearchAllVersionsControl({searchAllVersions, toggleSearchAllVersions, activeNavigation}: any) {
     return !noNavigationSelected(activeNavigation) ? null : (
         <div className="d-flex align-items-center px-2 px-sm-3">
             <div className="d-flex align-items-center">

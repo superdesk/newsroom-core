@@ -9,14 +9,13 @@ import {
     SELECT_PROFILE_MENU,
     SET_TOPIC_EDITOR_FULLSCREEN,
 } from './actions';
-
-import {RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID, ADD_EDIT_USERS} from 'actions';
-import {GET_COMPANY_USERS} from 'companies/actions';
-import {SET_USER_COMPANY_MONITORING_LIST} from 'monitoring/actions';
-
-import {modalReducer} from 'reducers';
-import {GET_NAVIGATIONS, QUERY_NAVIGATIONS} from 'navigations/actions';
 import {SET_TOPICS} from '../search/actions';
+import {RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID, ADD_EDIT_USERS} from 'assets/actions';
+import {GET_NAVIGATIONS} from 'assets/cards/actions';
+import {GET_COMPANY_USERS} from 'assets/companies/actions';
+import {SET_USER_COMPANY_MONITORING_LIST} from 'assets/monitoring/actions';
+import {QUERY_NAVIGATIONS} from 'assets/navigations/actions';
+import {modalReducer} from 'assets/reducers';
 
 const initialState = {
     user: null,
@@ -35,12 +34,12 @@ const initialState = {
     locators: [],
 };
 
-export default function itemReducer(state = initialState, action: any): any {
+export default function itemReducer(state: any = initialState, action: any): any {
     let newSelected, newState;
     switch (action.type) {
 
     case GET_TOPICS: {
-        const topicsById = Object.assign({}, state.topicsById);
+        const topicsById: any = Object.assign({}, state.topicsById);
         const topics = action.topics.map((topic: any) => {
             topicsById[topic._id] = topic;
             return topic;
@@ -88,7 +87,7 @@ export default function itemReducer(state = initialState, action: any): any {
 
         const target = action.event.target;
         const field = target.name;
-        const editedUser = Object.assign({}, state.editedUser);
+        const editedUser: any = Object.assign({}, state.editedUser);
         editedUser[field] = target.type === 'checkbox' ? target.checked : target.value;
         return {...state, editedUser, errors: null};
     }

@@ -6,14 +6,14 @@ import TextInput from 'components/TextInput';
 import AuditInformation from 'components/AuditInformation';
 import SelectInput from 'components/SelectInput';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {
     CARD_TYPES,
     getCardEditComponent,
 } from 'components/cards/utils';
 
 
-class EditCard extends React.Component {
+class EditCard extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
     }

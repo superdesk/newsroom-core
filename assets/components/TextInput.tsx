@@ -20,7 +20,7 @@ function TextInput({
     autoFocus,
     copyAction,
     ...props
-}): JSX.Element {
+}: any): JSX.Element {
     return (
         <InputWrapper error={error} name={name}>
             {label && (

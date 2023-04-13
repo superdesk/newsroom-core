@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get, isEmpty} from 'lodash';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import AgendaName from './AgendaName';
 import AgendaMetaTime from './AgendaMetaTime';
 import AgendaLocation from'./AgendaLocation';

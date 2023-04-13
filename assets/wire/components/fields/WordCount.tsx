@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {wordCount, gettext} from 'utils';
+import {gettext, wordCount} from 'assets/utils';
 
-export function WordCount ({item}) {
+export function WordCount ({item}: any) {
     return <span>{wordCount(item)} {gettext('words')}</span>;
 }
 

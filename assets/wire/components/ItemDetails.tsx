@@ -4,37 +4,37 @@ import {isEmpty} from 'lodash';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import AgendaLinks from './AgendaLinks';
-import {isDisplayed, gettext, formatDate, formatTime} from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
-import {
-    getItemMedia,
-    showItemVersions,
-    isKilled,
-    DISPLAY_ABSTRACT,
-    isPreformatted,
-    isCustomRendition,
-    getPictureList,
-} from 'wire/utils';
-import types from 'wire/types';
-import Content from 'ui/components/Content';
-import ContentHeader from 'ui/components/ContentHeader';
-import ContentBar from 'ui/components/ContentBar';
-import ArticleItemDetails from 'ui/components/ArticleItemDetails';
-import ArticleContent from 'ui/components/ArticleContent';
-import ArticlePicture from 'ui/components/ArticlePicture';
-import ArticleMedia from  'ui/components/ArticleMedia';
-import ArticleContentWrapper from 'ui/components/ArticleContentWrapper';
-import ArticleContentInfoWrapper from 'ui/components/ArticleContentInfoWrapper';
-import ArticleHeadline from 'ui/components/ArticleHeadline';
-import ArticleAbstract from 'ui/components/ArticleAbstract';
-import ArticleBodyHtml from 'ui/components/ArticleBodyHtml';
-import ArticleBody from 'ui/components/ArticleBody';
-import ArticleAuthor from 'ui/components/ArticleAuthor';
-import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
+import {
+    getItemMedia,
+    showItemVersions,
+    isEqualItem,
+    isKilled,
+    DISPLAY_ABSTRACT,
+    isCustomRendition,
+    getPictureList,
+} from 'assets/wire/utils';
+import ArticleAbstract from 'assets/ui/components/ArticleAbstract';
+import ArticleAuthor from 'assets/ui/components/ArticleAuthor';
+import ArticleBody from 'assets/ui/components/ArticleBody';
+import ArticleBodyHtml from 'assets/ui/components/ArticleBodyHtml';
+import ArticleContent from 'assets/ui/components/ArticleContent';
+import ArticleContentInfoWrapper from 'assets/ui/components/ArticleContentInfoWrapper';
+import ArticleContentWrapper from 'assets/ui/components/ArticleContentWrapper';
+import ArticleEmbargoed from 'assets/ui/components/ArticleEmbargoed';
+import ArticleHeadline from 'assets/ui/components/ArticleHeadline';
+import ArticleItemDetails from 'assets/ui/components/ArticleItemDetails';
+import ArticleMedia from 'assets/ui/components/ArticleMedia';
+import ArticlePicture from 'assets/ui/components/ArticlePicture';
+import Content from 'assets/ui/components/Content';
+import ContentBar from 'assets/ui/components/ContentBar';
+import ContentHeader from 'assets/ui/components/ContentHeader';
+import {gettext, formatDate, formatTime, isDisplayed} from 'assets/utils';
+import types from 'fetch-mock';
 
 function ItemDetails({
     item,
@@ -47,7 +47,7 @@ function ItemDetails({
     followStory,
     listConfig,
     filterGroupLabels,
-}) {
+}: any) {
     const pictures = getPictureList(item);
     const media = getItemMedia(item);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
@@ -67,7 +67,7 @@ function ItemDetails({
             </ContentHeader>
             <ArticleItemDetails disableTextSelection={detailsConfig.disable_text_selection}>
                 <ArticleContent>
-                    {pictures && pictures.map((pic) => (
+                    {pictures && pictures.map((pic: any) => (
                         <ArticlePicture
                             key={pic._id}
                             picture={pic}
@@ -89,7 +89,7 @@ function ItemDetails({
                             {isDisplayed('abstract', detailsConfig) &&
                             <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                             {isDisplayed('body_html', detailsConfig) && <ArticleBodyHtml item={item}/>}
-                            {!isEmpty(media) && media.map((media) => <ArticleMedia
+                            {!isEmpty(media) && media.map((media: any) => <ArticleMedia
                                 key={media.guid}
                                 media={media}
                                 isKilled={isKilled(item)}

@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {gettext} from 'utils';
 import {Dropdown} from './Dropdown';
+import {gettext} from 'assets/utils';
 
-const compareFunction = (a, b) => String(a.key).localeCompare(String(b.key));
+const compareFunction = (a: any, b: any) => String(a.key).localeCompare(String(b.key));
 
-export const processBuckets = (buckets, filter, toggleFilter) => (filter.notSorted ? buckets : buckets.sort(compareFunction)).map(
-    (bucket, index) =>
+export const processBuckets = (buckets: any, filter: any, toggleFilter: any) => (filter.notSorted ? buckets : buckets.sort(compareFunction)).map(
+    (bucket: any, index: any) =>
         bucket.key === 'divider' ?
             <div className="dropdown-divider" key={index}/> :
             <button
@@ -22,7 +22,7 @@ export const processBuckets = (buckets, filter, toggleFilter) => (filter.notSort
             >{filter.transform ? filter.transform(bucket.key, bucket) : bucket.key}</button>);
 
 
-function getActiveFilterLabel(filter, activeFilter, isActive) {
+function getActiveFilterLabel(filter: any, activeFilter: any, isActive: any) {
     if (isActive) {
         return filter.transform ? filter.transform(activeFilter[filter.field][0]) : gettext(activeFilter[filter.field][0]);
     }
@@ -40,7 +40,8 @@ function DropdownFilter({
     getFilterLabel,
     className,
     buttonProps,
-    ...props}) {
+    ...props
+}: any) {
     const isActive = !!(activeFilter[filter.field]);
     const filterLabel = getFilterLabel ? getFilterLabel : getActiveFilterLabel;
     const label = filterLabel(filter, activeFilter, isActive, {...props});

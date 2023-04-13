@@ -3,13 +3,12 @@ import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
 import {get} from 'lodash';
 import classNames from 'classnames';
-
-import {bem} from 'ui/utils';
+import {shouldRenderLocation} from 'assets/maps/utils';
+import {bem} from 'assets/ui/utils';
+import {formatAgendaDate} from 'assets/utils';
 import {isItemTBC} from '../utils';
-import {formatAgendaDate} from 'utils';
-import {shouldRenderLocation} from'maps/utils';
 
-export default function AgendaTime({item, children}) {
+export default function AgendaTime({item, children}: any) {
     const tbcItem = isItemTBC(item);
     const getClassNames = (modifier = 'event') => {
         return bem('wire-column__preview', 'date', modifier);

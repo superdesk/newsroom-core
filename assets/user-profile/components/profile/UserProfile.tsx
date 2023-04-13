@@ -1,21 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {gettext} from 'utils';
-
-import TextInput from 'components/TextInput';
-import SelectInput from 'components/SelectInput';
-import CheckboxInput from 'components/CheckboxInput';
-import {getLocaleInputOptions, getDefaultLocale} from 'users/utils';
-
 import {
     fetchUser,
     editUser,
     saveUser,
     setError,
 } from '../../actions';
+import CheckboxInput from 'assets/components/CheckboxInput';
+import SelectInput from 'assets/components/SelectInput';
+import TextInput from 'assets/components/TextInput';
+import {getLocaleInputOptions} from 'assets/users/utils';
+import {gettext} from 'assets/utils';
+import {getDefaultLocale} from 'react-datepicker';
 
-class UserProfile extends React.Component {
+class UserProfile extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.save = this.save.bind(this);
@@ -23,7 +22,7 @@ class UserProfile extends React.Component {
 
     isFormValid() {
         let valid = true;
-        const errors = {};
+        const errors: any = {};
 
         if (!this.props.user.first_name) {
             errors.first_name = [gettext('Please provide first name')];
@@ -39,7 +38,7 @@ class UserProfile extends React.Component {
         return valid;
     }
 
-    save(event) {
+    save(event: any) {
         event.preventDefault();
 
         if (!this.isFormValid()) {
@@ -172,12 +171,12 @@ UserProfile.propTypes = {
     fetchUser: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     user: state.editedUser,
     errors: state.errors,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     saveUser: () => dispatch(saveUser()),
     fetchUser: (id) => dispatch(fetchUser(id)),
     onChange: (event) => dispatch(editUser(event)),

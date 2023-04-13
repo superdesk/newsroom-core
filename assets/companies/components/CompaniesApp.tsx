@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {newCompany, fetchCompanies} from '../actions';
 import {setSearchQuery} from 'search/actions';
 import {searchQuerySelector} from 'search/selectors';
@@ -65,7 +65,7 @@ CompaniesApp.propTypes = {
     setQuery: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     isLoading: state.isLoading,
     totalCompanies: state.totalCompanies,
     activeQuery: searchQuerySelector(state),

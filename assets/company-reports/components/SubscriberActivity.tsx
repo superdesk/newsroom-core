@@ -9,7 +9,7 @@ import DropdownFilter from '../../components/DropdownFilter';
 import CalendarButton from '../../components/CalendarButton';
 import {toggleFilterAndQuery, fetchReport, REPORTS, runReport} from '../actions';
 
-class SubscriberActivity extends React.Component {
+class SubscriberActivity extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 
@@ -213,7 +213,7 @@ SubscriberActivity.propTypes = {
     apiEnabled: PropTypes.bool,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     companies: state.companies,
     reportParams: state.reportParams,
     isLoading: state.isLoading,

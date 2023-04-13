@@ -2,16 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get, isEmpty} from 'lodash';
-
-import {gettext, fullDate} from 'utils';
 import {getCoveragesForDisplay, getCoverageIcon, getAgendaNames} from '../utils';
-
-import PreviewBox from 'ui/components/PreviewBox';
 import AgendaCoverages from './AgendaCoverages';
 import AgendaInternalNote from './AgendaInternalNote';
 import AgendaEdNote from './AgendaEdNote';
+import PreviewBox from 'assets/ui/components/PreviewBox';
+import {gettext, fullDate} from 'assets/utils';
 
-class AgendaPreviewCoverages extends React.Component {
+class AgendaPreviewCoverages extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
 
@@ -20,7 +18,7 @@ class AgendaPreviewCoverages extends React.Component {
     }
 
     toggleExpanded() {
-        this.setState((prevState) => ({expanded: !prevState.expanded}));
+        this.setState((prevState: any) => ({expanded: !prevState.expanded}));
     }
 
     render() {

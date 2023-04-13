@@ -2,13 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {fetchVersions, openItem} from '../actions';
 
 import ItemVersion from './ItemVersion';
 
 
-class ListItemPreviousVersions extends React.Component {
+class ListItemPreviousVersions extends React.Component<any, any> {
+    baseClass: string;
+    static propTypes: any;
+    static defaultProps: any;
+
     constructor(props: any) {
         super(props);
         this.state = {versions: [], loading: true, error: false};
@@ -23,14 +27,14 @@ class ListItemPreviousVersions extends React.Component {
         }
     }
 
-    open(version, event) {
+    open(version: any, event: any) {
         event.stopPropagation();
         this.props.dispatch(openItem(version));
     }
 
-    fetch(props) {
+    fetch(props: any) {
         props.dispatch(fetchVersions(props.item))
-            .then((versions) => this.setState({versions, loading: false}))
+            .then((versions: any) => this.setState({versions, loading: false}))
             .catch(() => this.setState({error: true}));
     }
 
@@ -43,7 +47,7 @@ class ListItemPreviousVersions extends React.Component {
             );
         }
 
-        const versions = this.state.versions.map((version) => (
+        const versions = this.state.versions.map((version: any) => (
             <ItemVersion
                 key={version._id}
                 version={version}

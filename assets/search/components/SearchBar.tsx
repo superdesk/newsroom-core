@@ -2,12 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {connect} from 'react-redux';
+import {gettext} from 'assets/utils';
+import {searchQuerySelector} from '../selectors';
 
-import {gettext} from 'utils';
+class SearchBar extends React.Component<any, any> {
+    static propTypes: any;
+    static defaultProps: any;
 
-import {searchQuerySelector} from 'search/selectors';
-
-class SearchBar extends React.Component {
     constructor(props: any) {
         super(props);
         this.onChange = this.onChange.bind(this);
@@ -17,11 +18,11 @@ class SearchBar extends React.Component {
         this.state = {query: props.query || ''};
     }
 
-    onChange(event) {
+    onChange(event: any) {
         this.setState({query: event.target.value});
     }
 
-    onSubmit(event) {
+    onSubmit(event: any) {
         event.preventDefault();
         this.setAndFetch(this.state.query);
     }
@@ -91,7 +92,7 @@ SearchBar.propTypes = {
     enableQueryAction: PropTypes.bool,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     query: searchQuerySelector(state),
 });
 

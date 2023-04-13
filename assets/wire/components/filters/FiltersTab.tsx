@@ -1,30 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-
 import {isEmpty, cloneDeep, pickBy, assign, isEqual} from 'lodash';
-import {gettext, toggleValue} from 'utils';
-
 import NavCreatedPicker from './NavCreatedPicker';
 import FilterGroup from './FilterGroup';
 import FilterButton from './FilterButton';
+import {selectDate} from '../../../agenda/actions';
+import {resetFilter, updateFilterStateAndURL} from 'assets/search/actions';
+import {searchFilterSelector, searchCreatedSelector, resultsFilteredSelector} from 'assets/search/selectors';
+import {toggleValue, gettext} from 'assets/utils';
 
-import {
-    resetFilter,
-    updateFilterStateAndURL,
-} from 'search/actions';
-import {
-    searchFilterSelector,
-    searchCreatedSelector,
-} from 'search/selectors';
-
-import {
-    selectDate
-} from '../../../agenda/actions';
-
-import {resultsFilteredSelector} from 'search/selectors';
-
-class FiltersTab extends React.Component {
+class FiltersTab extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
 
@@ -41,8 +27,8 @@ class FiltersTab extends React.Component {
         };
     }
 
-    componentDidUpdate(prevProps) {
-        const newState = {};
+    componentDidUpdate(prevProps: any) {
+        const newState: any = {};
         if (!isEqual(this.props.activeFilter, prevProps.activeFilter)) {
             newState.activeFilter = cloneDeep(this.props.activeFilter);
         }
@@ -55,14 +41,14 @@ class FiltersTab extends React.Component {
         }
     }
 
-    toggleGroup(event, group) {
+    toggleGroup(event: any, group: any) {
         event.preventDefault();
-        this.setState({groups: this.props.groups.map((_group) =>
+        this.setState({groups: this.props.groups.map((_group: any) =>
             _group === group ? Object.assign({}, _group, {isOpen: !_group.isOpen}) : _group
         )});
     }
 
-    updateFilter(field, key, single) {
+    updateFilter(field: any, key: any, single: any) {
         // The `value` can be an Array
         const values = Array.isArray(key) ? key : [key];
         const currentFilters = cloneDeep(this.state.activeFilter);
@@ -74,7 +60,7 @@ class FiltersTab extends React.Component {
                 delete currentFilters[field];
             } else if (single) {
                 currentFilters[field] = currentFilters[field].filter(
-                    (val) => val === _value
+                    (val: any) => val === _value
                 );
             }
         }
@@ -82,7 +68,7 @@ class FiltersTab extends React.Component {
         this.setState({activeFilter: currentFilters});
     }
 
-    setCreatedFilterAndSearch(createdFilter) {
+    setCreatedFilterAndSearch(createdFilter: any) {
         const created = pickBy(
             assign(
                 cloneDeep(this.state.createdFilter),
@@ -94,7 +80,7 @@ class FiltersTab extends React.Component {
     }
 
     getFilterGroups() {
-        return this.state.groups.map((group) => <FilterGroup
+        return this.state.groups.map((group: any) => <FilterGroup
             key={group.label}
             group={group}
             activeFilter={this.state.activeFilter}
@@ -105,13 +91,13 @@ class FiltersTab extends React.Component {
         />);
     }
 
-    search(event) {
+    search(event: any) {
         event.preventDefault();
         this.props.updateFilterStateAndURL(this.state.activeFilter, this.state.createdFilter);
         this.props.fetchItems();
     }
 
-    reset(event) {
+    reset(event: any) {
         event.preventDefault();
         this.setState({activeFilter: {}, createdFilter: {}});
         this.props.resetFilter();
@@ -125,7 +111,7 @@ class FiltersTab extends React.Component {
 
         return (
             <div className="m-3">
-                {this.getFilterGroups().filter((group) => !!group).concat([
+                {this.getFilterGroups().filter((group: any) => !!group).concat([
                     (<NavCreatedPicker
                         key="created"
                         createdFilter={createdFilter}
@@ -168,7 +154,7 @@ FiltersTab.propTypes = {
     selectDate: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     aggregations: state.aggregations,
     activeFilter: searchFilterSelector(state),
     createdFilter: searchCreatedSelector(state),

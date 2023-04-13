@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get} from 'lodash';
 
-import {getConfig, gettext} from 'utils';
+import {getConfig, gettext} from 'assets/utils';
 import {getDetailRendition, getPreviewRendition, getCaption} from 'wire/utils';
 
 
-function formatCredits(picture) {
+function formatCredits(picture: any) {
     const copyrightholder = get(picture, 'copyrightholder', '');
     const copyrightnotice = get(picture, 'copyrightnotice', '');
 
@@ -23,7 +23,7 @@ function formatCredits(picture) {
 }
 
 
-export default function ArticlePicture({isKilled, picture, isItemDetails, isCustomRendition}) {
+export default function ArticlePicture({isKilled, picture, isItemDetails, isCustomRendition}: any) {
     const getRenditions = isItemDetails ? getDetailRendition : getPreviewRendition;
     const renditions = getRenditions(picture, isCustomRendition);
 

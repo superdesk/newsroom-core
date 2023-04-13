@@ -1,12 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import {noNavigationSelected} from 'search/utils';
-
 import NewsOnlyControl from './NewsOnlyControl';
 import SearchAllVersionsControl from './SearchAllVersionsControl';
 import ListViewOptions from '../../components/ListViewOptions';
 import {ListSearchOptions} from './ListSearchOptions';
+import {noNavigationSelected} from 'assets/search/utils';
 
 function ListViewControls({
     activeView,
@@ -18,7 +16,7 @@ function ListViewControls({
     hideSearchAllVersions,
     searchAllVersions,
     toggleSearchAllVersions,
-}) {
+}: any) {
     return(
         <React.Fragment>
             <div className='content-bar__right'>

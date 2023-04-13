@@ -2,11 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import ItemVersion from './ItemVersion';
 import {fetchNext, openItem} from '../actions';
 
-class ListItemNextVersion extends React.Component {
+class ListItemNextVersion extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.state = {next: null};
@@ -20,13 +20,13 @@ class ListItemNextVersion extends React.Component {
         }
     }
 
-    fetch(props) {
+    fetch(props: any) {
         props.dispatch(fetchNext(props.item))
-            .then((next) => this.setState({next}))
+            .then((next: any) => this.setState({next}))
             .catch(() => this.setState({next: null}));
     }
 
-    open(version, event) {
+    open(version: any, event: any) {
         event.stopPropagation();
         this.props.dispatch(openItem(this.state.next));
     }

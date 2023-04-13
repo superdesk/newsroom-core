@@ -93,7 +93,7 @@ export const KEYCODES = {
  * @param {String} name
  * @return {Store}
  */
-export function createStore(reducer, name = 'default') {
+export function createStore(reducer: any, name = 'default') {
     // https://redux.js.org/api-reference/compose
     let _compose = compose;
     const middlewares = [

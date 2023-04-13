@@ -4,9 +4,9 @@ import {getPlainTextMemoized, gettext} from 'assets/utils';
 
 interface IProps {
     internalNote: string;
-    onlyIcon: boolean;
-    noMargin: boolean;
-    mt2: boolean;
+    onlyIcon?: boolean;
+    noMargin?: boolean;
+    mt2?: boolean;
     alignCenter?: boolean;
     marginRightAuto?: boolean;
     borderRight?: boolean;

@@ -9,7 +9,7 @@ import {
 
 import NotificationList from 'components/NotificationList';
 
-class NotificationsApp extends React.Component {
+class NotificationsApp extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
     }
@@ -41,7 +41,7 @@ NotificationsApp.propTypes = {
     loading: PropTypes.bool,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     user: state.user,
     items: state.items,
     notifications: state.notifications,
@@ -49,7 +49,7 @@ const mapStateToProps = (state) => ({
     loading: state.loading,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     clearNotification: (id) => dispatch(deleteNotification(id)),
     clearAll: () => dispatch(deleteAllNotifications()),
     loadNotifications: () => dispatch(loadNotifications()),

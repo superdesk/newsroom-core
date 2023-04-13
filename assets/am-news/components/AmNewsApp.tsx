@@ -3,22 +3,10 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
-
-import {noNavigationSelected} from 'search/utils';
-
-import BaseApp from '../../layout/components/BaseApp';
-import SearchBar from 'search/components/SearchBar';
-import SearchResultsInfo from 'search/components/SearchResultsInfo';
-import DownloadItemsModal from '../../wire/components/DownloadItemsModal';
-import SelectedItemsBar from 'wire/components/SelectedItemsBar';
-import ShareItemModal from '../../components/ShareItemModal';
-import BookmarkTabs from 'components/BookmarkTabs';
 import WirePreview from '../../wire/components/WirePreview';
 import ItemDetails from '../../wire/components/ItemDetails';
 import SearchSidebar from '../../wire/components/SearchSidebar';
 import getItemActions from '../../wire/item-actions';
-import {gettext} from 'utils';
-
 import {
     fetchItems,
     fetchMoreItems,
@@ -30,18 +18,17 @@ import {
 } from '../../search/actions';
 import Navigations from './Navigations';
 import AmNewsList from './AmNewsList';
-
-import {
-    previewConfigSelector,
-    detailsConfigSelector,
-    advancedSearchTabsConfigSelector,
-} from 'ui/selectors';
-import {
-    searchQuerySelector,
-    navigationsSelector,
-    searchNavigationSelector,
-} from 'search/selectors';
-
+import BookmarkTabs from 'assets/components/BookmarkTabs';
+import ShareItemModal from 'assets/components/ShareItemModal';
+import {SearchBar} from 'assets/home/components/search-bar';
+import BaseApp from 'assets/layout/components/BaseApp';
+import SearchResultsInfo from 'assets/search/components/SearchResultsInfo';
+import {searchQuerySelector, navigationsSelector, searchNavigationSelector} from 'assets/search/selectors';
+import {noNavigationSelected} from 'assets/search/utils';
+import {previewConfigSelector, detailsConfigSelector, advancedSearchTabsConfigSelector} from 'assets/ui/selectors';
+import {gettext} from 'assets/utils';
+import DownloadItemsModal from 'assets/wire/components/DownloadItemsModal';
+import SelectedItemsBar from 'assets/wire/components/SelectedItemsBar';
 
 const modals = {
     shareItem: ShareItemModal,
@@ -54,10 +41,10 @@ class AmNewsApp extends BaseApp {
         this.modals = modals;
         this.state = {isMobile: false};    // to cater for responsive behaviour during widnow resize
         this.setIsMobile = this.setIsMobile.bind(this);
-        this.tabs = this.tabs.filter((t) => get(this.props.advancedSearchTabConfig, t.id, true));
+        this.tabs = this.tabs.filter((t: any) => get(this.props.advancedSearchTabConfig, t.id, true));
     }
 
-    getSnapshotBeforeUpdate(prevProps) {
+    getSnapshotBeforeUpdate(prevProps?: any) {
         if (prevProps.itemToOpen && !this.props.itemToOpen && noNavigationSelected(this.props.activeNavigation)) {
             // enable first navigation
             this.props.toggleNavigation(get(this.props, 'navigations[0]'));
@@ -250,7 +237,7 @@ AmNewsApp.propTypes = {
     context: PropTypes.string,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     state: state,
     isLoading: state.isLoading,
     totalItems: state.totalItems,
@@ -274,7 +261,7 @@ const mapStateToProps = (state) => ({
     context: state.context,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     fetchItems: () => dispatch(fetchItems()),
     setQuery: (query) => dispatch(setQuery(query)),
     actions: getItemActions(dispatch),

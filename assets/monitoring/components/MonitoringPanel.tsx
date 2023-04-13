@@ -13,12 +13,12 @@ import {
     saveMonitoringProfileUsers,
     saveMonitoringProfileSchedule,
 } from '../actions';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {connect} from 'react-redux';
 import {fetchCompanyUsers} from '../../companies/actions';
 
 
-class MonitoringPanel extends React.Component {
+class MonitoringPanel extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 
@@ -120,7 +120,7 @@ MonitoringPanel.propTypes = {
     saveMonitoringProfileSchedule: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     monitoringList: monitoringList(state),
     monitoringProfileToEdit: state.monitoringProfileToEdit,
     companies: state.companies,
@@ -130,7 +130,7 @@ const mapStateToProps = (state) => ({
     scheduleMode: state.scheduleMode,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     selectMonitoringProfile: (_id) => dispatch(selectMonitoringProfile(_id)),
     updateMonitoringProfile: (event) => dispatch(updateMonitoringProfile(event)),
     postMonitoringProfile: () => dispatch(postMonitoringProfile()),

@@ -4,11 +4,11 @@ import moment from 'moment';
 import {get} from 'lodash';
 import ReportsTable from './ReportsTable';
 import CalendarButton from 'components/CalendarButton';
-import {gettext} from 'utils';
+import {gettext} from 'assets/utils';
 import {REPORTS} from '../actions';
 
 
-class ComapnyNewsApiUsage extends React.Component {
+class ComapnyNewsApiUsage extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
 

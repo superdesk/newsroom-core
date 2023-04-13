@@ -1,7 +1,7 @@
-import {createStore, render, initWebSocket, getInitData, closeItemOnMobile, isMobilePhone} from 'utils';
+import {createStore, render, initWebSocket, getInitData, closeItemOnMobile, isMobilePhone} from 'assets/utils';
 
 import wireReducer from './reducers';
-import {getNewsOnlyParam, getSearchAllVersionsParam, getReadItems} from 'local-store';
+import {getNewsOnlyParam, getSearchAllVersionsParam, getReadItems} from 'assets/local-store';
 import WireApp from './components/WireApp';
 import {
     fetchItems,
@@ -12,7 +12,7 @@ import {
     openItemDetails,
     previewItem,
 } from './actions';
-import {setView} from 'search/actions';
+import {setView} from 'assets/search/actions';
 
 const store = createStore(wireReducer, 'Wire');
 
