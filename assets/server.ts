@@ -14,7 +14,7 @@ function checkStatus(response: any): any {
         if (response.type === 'opaqueredirect') {
             window.location.reload();
         } else {
-            const error = new Error(response.statusText);
+            const error: any = new Error(response.statusText);
             error.response = response;
             throw error;
         }
@@ -29,7 +29,7 @@ class Server {
      * @param {String} url
      * @return {Promise}
      */
-    get(url) {
+    get(url: any) {
         return fetch(url, options({}))
             .then(checkStatus);
     }
@@ -40,7 +40,7 @@ class Server {
      * @param {String} url
      * @return {Promise}
      */
-    getJson(url) {
+    getJson(url: any) {
         return fetch(url, options({
             headers: {
                 Accept: 'application/json',
@@ -55,7 +55,7 @@ class Server {
      * @param {Object} data
      * @return {Promise}
      */
-    post(url, data) {
+    post(url: any, data: any) {
         return fetch(url, options({
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -70,7 +70,7 @@ class Server {
      * @param {Object} data
      * @return {Promise}
      */
-    postFiles(url, data) {
+    postFiles(url: any, data: any) {
         return fetch(url, options({
             method: 'POST',
             body: data,
@@ -83,7 +83,7 @@ class Server {
      * @param {String} url
      * @return {Promise}
      */
-    del(url, data) {
+    del(url: any, data: any) {
         return fetch(url, options({
             method: 'DELETE',
             headers: {'Content-Type': 'application/json'},
@@ -98,7 +98,7 @@ class Server {
      * @param {Object} data
      * @return {Promise}
      */
-    patch(url, data) {
+    patch(url: any, data: any) {
         return fetch(url, options({
             method: 'PATCH',
             headers: {'Content-Type': 'application/json'},

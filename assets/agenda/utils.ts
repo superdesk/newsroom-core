@@ -253,14 +253,14 @@ export function hasLocationNotes(item: any): any {
  * @param {Object} item
  * @return {String}
  */
-export function getPublicContacts(item: any): any {
+export function getPublicContacts(item: any): Array<any> {
     const contacts = get(item, 'event.event_contact_info', []);
-    return contacts.filter(c => c.public).map(c => ({
+    return contacts.filter((c: any) => c.public).map((c: any) => ({
         name: [c.first_name, c.last_name].filter((x: any) => !!x).join(' '),
         organisation: c.organisation || '',
         email: (c.contact_email || []).join(', '),
-        phone: (c.contact_phone || []).filter(m => m.public).map(m => m.number).join(', '),
-        mobile: (c.mobile || []).filter(m => m.public).map(m => m.number).join(', '),
+        phone: (c.contact_phone || []).filter((m: any) => m.public).map((m: any) => m.number).join(', '),
+        mobile: (c.mobile || []).filter((m: any) => m.public).map((m: any) => m.number).join(', '),
     }));
 }
 

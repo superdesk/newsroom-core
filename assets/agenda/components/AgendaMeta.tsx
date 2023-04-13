@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {hasLocation, hasLocationNotes, getEventLinks, getLocationString, getPublicContacts,
-    getCalendars} from 'agenda/utils';
+import {hasLocation, getLocationString, hasLocationNotes, getPublicContacts, getEventLinks, getCalendars} from '../utils';
 
-const url = (link) => link.startsWith('http') ? link : 'https://' + link;
+const url = (link: any) => link.startsWith('http') ? link : 'https://' + link;
 
-function AgendaPreviewMeta({item}) {
+function AgendaPreviewMeta({item}: any) {
     return (
         <div className='wire-articles__item__meta'>
             <div className='wire-articles__item__meta-info'>
@@ -19,7 +18,7 @@ function AgendaPreviewMeta({item}) {
                         <span>{item.location[0].details[0]}</span>
                     </div>
                 )}
-                {getPublicContacts(item).map((contact, index) => <div
+                {getPublicContacts(item).map((contact: any, index) => <div
                     className='wire-articles__item__meta-row'
                     key={`${contact.name}-${index}`}>
                     <i className='icon-small--user icon--gray-dark'></i>
@@ -27,7 +26,7 @@ function AgendaPreviewMeta({item}) {
                         {contact.email && <a href={`mailto:${contact.email}`} target="_blank">{contact.email}</a>}
                     </span>
                 </div>)}
-                {getEventLinks(item).map((link) => <div className='wire-articles__item__meta-row' key={link}>
+                {getEventLinks(item).map((link: any) => <div className='wire-articles__item__meta-row' key={link}>
                     <i className='icon-small--globe icon--gray-dark'></i>
                     <span><a href={url(link)} target="_blank">{link}</a></span>
                 </div>)}

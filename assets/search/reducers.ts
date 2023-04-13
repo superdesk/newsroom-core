@@ -1,4 +1,3 @@
-import {toggleValue} from 'utils';
 import {get} from 'lodash';
 
 import {
@@ -17,8 +16,9 @@ import {
     SET_SEARCH_PRODUCT,
     RESET_SEARCH_PARAMS,
 } from './actions';
+import {EXTENDED_VIEW} from 'assets/wire/defaults';
+import {toggleValue} from 'assets/utils';
 
-import {EXTENDED_VIEW} from 'wire/defaults';
 
 const INITIAL_STATE = {
     activeTopic: null,
@@ -34,7 +34,7 @@ const INITIAL_STATE = {
     activeView: EXTENDED_VIEW,
 };
 
-export function searchReducer(state=INITIAL_STATE, action: any): any {
+export function searchReducer(state: any = INITIAL_STATE, action?: any): any {
     if (!action) {
         return state;
     }

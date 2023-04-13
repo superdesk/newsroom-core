@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
 
-export default function AgendaLongDescription({item, plan}): JSX.Element | null {
+export default function AgendaLongDescription({item, plan}: any): JSX.Element | null {
     const description = get(plan, 'description_text') || item.definition_long || item.definition_short;
 
     if (!description) {

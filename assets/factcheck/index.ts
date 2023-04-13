@@ -1,6 +1,6 @@
 import {createStore, render, initWebSocket, getInitData, closeItemOnMobile, isMobilePhone} from '../utils';
 
-import {getReadItems} from 'local-store';
+
 import WireApp from '../wire/components/WireApp';
 import wireReducer from '../wire/reducers';
 import {
@@ -12,10 +12,8 @@ import {
     openItemDetails,
     previewItem,
 } from '../wire/actions';
-import {
-    toggleNavigationById,
-    setView,
-} from 'search/actions';
+import {getReadItems} from 'assets/local-store';
+import {setView, toggleNavigationById} from 'assets/search/actions';
 
 
 const store = createStore(wireReducer, 'FactCheck');

@@ -136,7 +136,7 @@ export function createStore(reducer, name = 'default') {
  * @param {Component} App
  * @param {Element} element
  */
-export function render(store, App, element, props) {
+export function render(store: any, App: any, element: any, props?: any) {
     return _render(
         <Provider store={store}>
             <App {...props}/>
@@ -175,7 +175,7 @@ export function gettext(text: string, params?: any) {
  * @param {Object} product
  * @return {string}
  */
-export function getProductQuery(product) {
+export function getProductQuery(product: any) {
     let q = product.sd_product_id ? `products.code:${product.sd_product_id}` : '';
     q += product.query ? product.sd_product_id ? ` OR (${product.query})` : product.query : '';
     return q;
@@ -188,7 +188,7 @@ export function getProductQuery(product) {
  * @param {Boolean} ignoreTimezone - avoid converting time to different timezone, will output the date as it is
  * @return {Date}
  */
-export function parseDate(dateString, ignoreTimezone = false) {
+export function parseDate(dateString: any, ignoreTimezone = false) {
     const parsed = ignoreTimezone ? moment.utc(dateString) : moment(dateString);
 
     parsed.locale(getLocale());
@@ -203,7 +203,7 @@ export function parseDate(dateString, ignoreTimezone = false) {
  * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
  * @returns {moment}
  */
-export function parseDateInTimezone(dateString, timezone = null) {
+export function parseDateInTimezone(dateString: any, timezone = null) {
     return moment.tz(dateString, timezone || moment.tz.guess());
 }
 
@@ -214,7 +214,7 @@ export function parseDateInTimezone(dateString, timezone = null) {
  * @param {String} timeForToday - if true show only time if date is today
  * @return {String}
  */
-export function shortDate(dateString, timeForToday = true) {
+export function shortDate(dateString: any, timeForToday = true) {
     const parsed = parseDate(dateString);
     return parsed.format(timeForToday === true && isToday(parsed) ? TIME_FORMAT : DATE_FORMAT);
 }
@@ -225,7 +225,7 @@ export function shortDate(dateString, timeForToday = true) {
  * @param {String} dateString
  * @return {String}
  */
-export function getDateInputDate(dateString) {
+export function getDateInputDate(dateString: any) {
     if (dateString) {
         const parsed = parseDate(dateString.substring(0, 10));
         return parsed.format('YYYY-MM-DD');
@@ -240,7 +240,7 @@ export function getDateInputDate(dateString) {
  * @param {String} dateString
  * @return {String}
  */
-export function getLocaleDate(dateString) {
+export function getLocaleDate(dateString: any) {
     return parseDate(dateString).format(DATETIME_FORMAT);
 }
 
@@ -250,7 +250,7 @@ export function getLocaleDate(dateString) {
  * @param {Date} date
  * @return {Boolean}
  */
-export function isToday(date) {
+export function isToday(date: any) {
     const parsed = typeof date === 'string' ? parseDate(date) : date;
     return parsed.format('YYYY-MM-DD') === now.format('YYYY-MM-DD');
 }
@@ -264,7 +264,7 @@ export function isToday(date) {
  * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
  * @return {Boolean}
  */
-export function isInPast(dateString, timezone) {
+export function isInPast(dateString: any, timezone: any) {
     if(!dateString) {
         return false;
     }
@@ -281,7 +281,7 @@ export function isInPast(dateString, timezone) {
  * @param {String} dateString
  * @return {String}
  */
-export function fullDate(dateString) {
+export function fullDate(dateString: any) {
     return parseDate(dateString).format(DATETIME_FORMAT);
 }
 
@@ -291,7 +291,7 @@ export function fullDate(dateString) {
  * @param {String} dateString
  * @return {String}
  */
-export function formatTime(dateString) {
+export function formatTime(dateString: any) {
     return parseDate(dateString).format(TIME_FORMAT);
 }
 
@@ -301,7 +301,7 @@ export function formatTime(dateString) {
  * @param {String} dateString
  * @return {String}
  */
-export function formatDate(dateString) {
+export function formatDate(dateString: any) {
     return parseDate(dateString).format(DATE_FORMAT);
 }
 
@@ -311,7 +311,7 @@ export function formatDate(dateString) {
  * @param {String} dateString
  * @return {String}
  */
-export function formatDatetime(dateString) {
+export function formatDatetime(dateString: any) {
     return fullDate(dateString);
 }
 
@@ -323,7 +323,7 @@ export function formatDatetime(dateString) {
  * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
  * @returns {moment}
  */
-export function getEndOfDayFromDate(dateString, timezone = null) {
+export function getEndOfDayFromDate(dateString: any, timezone = null) {
     return parseDateInTimezone(dateString + 'T23:59:59', timezone);
 }
 
@@ -334,12 +334,12 @@ export function getEndOfDayFromDate(dateString, timezone = null) {
  * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
  * @returns {moment}
  */
-export function convertUtcToTimezone(datetime, timezone) {
+export function convertUtcToTimezone(datetime: any, timezone: any) {
     return parseDateInTimezone(datetime, 'utc')
         .tz(timezone);
 }
 
-function getScheduleType(item) {
+function getScheduleType(item: any) {
     const start = moment(item.dates.start);
     const end = moment(item.dates.end);
     const duration = end.diff(start, 'minutes');
@@ -406,8 +406,8 @@ export function formatAgendaDate(item: any, group: any, {localTimeZone = true, o
                 }
                 return null;
             })
-            .filter((d) => d)
-            .sort((a, b) => {
+            .filter((d: any) => d)
+            .sort((a: any, b: any) => {
                 if (a < b) return -1;
                 if (a > b) return 1;
                 return 0;
@@ -659,7 +659,7 @@ const SHIFT_OUT_REGEXP = new RegExp(String.fromCharCode(14), 'g');
  * @param {String} html
  * @return {String}
  */
-export function formatHTML(html) {
+export function formatHTML(html: any) {
     return html.replace(SHIFT_OUT_REGEXP, html.indexOf('<pre>') === -1 ? '<br>' : '\n');
 }
 
@@ -677,7 +677,7 @@ export function errorHandler(error: any, dispatch?: any, setError?: any) {
         return;
     }
     if (setError) {
-        error.response.json().then(function(data) {
+        error.response.json().then(function(data: any) {
             dispatch(setError(data));
         });
     }

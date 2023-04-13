@@ -1,7 +1,7 @@
 import {get} from 'lodash';
 
 class Analytics {
-    _event(name, params) {
+    _event(name: any, params?: any) {
         if (window.gtag) {
             const company = get(window, 'profileData.companyName', 'none');
             const user = get(window, 'profileData.user.first_name', 'unknown');
@@ -15,28 +15,28 @@ class Analytics {
         }
     }
 
-    event(name, label, params) {
+    event(name: any, label: any, params: any) {
         this._event(name, Object.assign({
             event_label: label,
         }, params));
     }
 
-    itemEvent(name, item, params) {
+    itemEvent(name: any, item?: any, params?: any) {
         this.event(name, item.headline || item.name || item.slugline, params);
     }
 
-    timingComplete(name, value) {
+    timingComplete(name: any, value: any) {
         this._event('timing_complete', {name, value});
     }
 
-    pageview(title, path) {
+    pageview(title?: any, path?: any) {
         this._event('page_view', {
             page_title: title,
             page_path: path,
         });
     }
 
-    itemView(item) {
+    itemView(item: any) {
         if (item) {
             this.pageview(item.headline || item.slugline, `/${item._type}/${item._id}`);
         } else {
@@ -44,14 +44,14 @@ class Analytics {
         }
     }
 
-    sendEvents(events) {
-        events.forEach((event) => {
+    sendEvents(events: any) {
+        events.forEach((event: any) => {
             this._event(event);
         });
     }
 
-    multiItemEvent(event, items) {
-        items.forEach((item) => item && this.itemEvent(event, item));
+    multiItemEvent(event: any, items: any) {
+        items.forEach((item: any) => item && this.itemEvent(event, item));
     }
 }
 

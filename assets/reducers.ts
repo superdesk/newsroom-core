@@ -97,7 +97,7 @@ function updateItemActions(state: any, items: any, action: any): any {
 
 
 
-export function defaultReducer(state={}, action: any): any {
+export function defaultReducer(state: any = {}, action: any): any {
     if (!action) {
         return state;
     }
@@ -105,10 +105,10 @@ export function defaultReducer(state={}, action: any): any {
     switch (action.type) {
 
     case SET_ITEMS: {
-        const itemsById = {};
-        const items = [];
+        const itemsById: any = {};
+        const items: any = [];
 
-        action.items.forEach((item) => {
+        action.items.forEach((item: any) => {
             if (!itemsById[item._id]) {
                 itemsById[item._id] = item;
                 items.push(item._id);

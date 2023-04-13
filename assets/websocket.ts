@@ -5,9 +5,9 @@ const DEFAULT_WS_URL = 'ws://localhost:5150';
 const RECONNECT_INTERVAL = 5000;
 
 let firstConnection = true;
-let wsConnection;
-let connectInterval;
-const listeners = [];
+let wsConnection: any;
+let connectInterval: any;
+const listeners: any = [];
 
 function connectToNotificationServer(): any {
     if (wsConnection == null || wsConnection.readyState === WebSocket.CLOSED) {
@@ -86,7 +86,7 @@ function onWebsocketMessage(message: any): any {
         return;
     }
 
-    listeners.forEach(({store, action}) => {
+    listeners.forEach(({store, action}: any) => {
         store.dispatch(action(data));
     });
 }

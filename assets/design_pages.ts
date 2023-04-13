@@ -113,7 +113,7 @@ function setupContentNavbarScroll(): any {
 function setupTogglingLeftBarNavigation(): any {
     // Toggle left bar navigation
     if (document.getElementsByClassName('content-bar__menu--nav')[0]) {
-        document.getElementsByClassName('content-bar__menu--nav')[0].onclick = function(){
+        (document.getElementsByClassName('content-bar__menu--nav')[0] as HTMLElement).onclick = function() {
             document.getElementsByClassName('wire-column__nav')[0].classList.toggle('wire-column__nav--open');
             document.getElementsByClassName('content-bar__menu--nav')[0].classList.toggle('content-bar__menu--nav--open');
 
@@ -126,11 +126,11 @@ function setupTogglingLeftBarNavigation(): any {
 
 function setupOpenArticleFromWireList(): any {
     // Open article from wire list
-    const listItem = document.getElementsByClassName('wire-articles__item');
+    const listItem: any = document.getElementsByClassName('wire-articles__item');
 
-    let currentItem;
+    let currentItem: any;
     for(let i = 0; i < listItem.length; i++) {
-        listItem[i].onclick = function(event) {
+        listItem[i].onclick = function(event: any) {
             document.getElementsByClassName('wire-articles__item')[0].classList.toggle('wire-articles__item--open');
 
             // responsive wire item
@@ -158,7 +158,7 @@ function setupTopBarSearchFocus(): any {
     // Top bar search items
     // TODO: Use CSS to achieve the same goal here
     const searchForm = document.getElementsByClassName('search__form')[0];
-    const searchInput = document.getElementsByClassName('search__input')[0];
+    const searchInput: any = document.getElementsByClassName('search__input')[0];
     if (searchInput) {
         searchInput.onfocus = function() {
             searchForm.classList.add('searchForm--active');

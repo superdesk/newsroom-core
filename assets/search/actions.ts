@@ -122,7 +122,7 @@ export function toggleFilter(key: any, value: any, single: any): any {
                 delete currentFilters[key];
             } else if (single) {
                 currentFilters[key] = currentFilters[key].filter(
-                    (val) => val === _value
+                    (val: any) => val === _value
                 );
             }
         }
@@ -214,7 +214,7 @@ export function followStory(item: any, type: any): any {
  */
 export function toggleNavigationById(navigationId: any): any {
     return (dispatch: any, getState: any) => {
-        const navigation = (get(getState().search, 'navigations') || []).find((nav) => navigationId === nav._id);
+        const navigation = (get(getState().search, 'navigations') || []).find((nav: any) => navigationId === nav._id);
         if (navigation) {
             dispatch(toggleNavigation(navigation));
         }

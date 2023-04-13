@@ -11,7 +11,7 @@ import {
 import {get, cloneDeep} from 'lodash';
 
 import {defaultReducer} from '../reducers';
-import {searchReducer} from 'search/reducers';
+import {searchReducer} from 'assets/search/reducers';
 
 const initialState = {
     items: [],

@@ -4,7 +4,7 @@ import classNames from  'classnames';
 
 import {getName} from '../utils';
 
-export default function AgendaName({item, noMargin, small}) {
+export default function AgendaName({item, noMargin, small}: any) {
     return (
         <h2 className={classNames({'wire-column__preview__headline': !small},
             {'wire-articles__item__text wire-column__preview__versions__box-headline': small},
