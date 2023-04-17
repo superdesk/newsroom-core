@@ -24,6 +24,19 @@ Sourcefabric is happy to provide demonstrations of Newshub and other newsroom to
 
 See https://github.com/superdesk/newsroom-core
 
+## Design App
+
+A static react app is available for design purposes. It does not require a back-end to be running.
+
+To install & start the design app, run the following:
+
+```
+npm install
+npm run design-app
+```
+
+The design app shares the same style (```assets/styles```) and assets (```newsroom/static```) as the full Newshub application.
+
 
 ## Test Python app
 
