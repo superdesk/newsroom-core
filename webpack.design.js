@@ -86,7 +86,7 @@ const config = {
             minChunks: Infinity,
         }),
     ],
-}
+};
 
 if (process.env.NODE_ENV === 'production') {
     config.plugins.push(new webpack.DefinePlugin({
