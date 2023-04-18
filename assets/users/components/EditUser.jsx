@@ -147,7 +147,7 @@ function EditUserComponent({
                                 value={user.user_type}
                                 options={userTypeReadOnly(user, currentUser) ? [] : getUserTypes(currentUser) }
                                 defaultOption={userTypeReadOnly(user, currentUser) ? getUserLabel(user.user_type) : null}
-                                readOnly={userTypeReadOnly(user, currentUser)}
+                                readOnly={userTypeReadOnly(user, currentUser) || isUserCompanyAdmin(currentUser)}
                                 onChange={onChange}
                                 error={errors ? errors.user_type : null}/>)}
                             {hideFields.includes('company') ? (<TextInput
