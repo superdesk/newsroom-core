@@ -84,25 +84,23 @@ export default function userReducer(state = initialState, action) {
         if (field.startsWith('sections.')) {
             const sectionId = field.replace('sections.', '');
 
-            if (user.sections == null) {
-                user.sections = {};
-            }
-
-            user.sections[sectionId] = value;
+            user.sections = {
+                ...user.sections || {},
+                [sectionId]: value,
+            };
         } else if (field.startsWith('products.')) {
             const [section, productId] = field.replace('products.', '').split('.');
 
-            if (user.products == null) {
-                user.products = [];
-            }
-
             if (value) {
-                user.products.push({
-                    _id: productId,
-                    section: section,
-                });
+                user.products = [
+                    ...user.products || [],
+                    {
+                        _id: productId,
+                        section: section,
+                    },
+                ];
             } else {
-                user.products = user.products.filter((product) => product._id !== productId);
+                user.products = (user.products || []).filter((product) => product._id !== productId);
             }
         } else {
             user[field] = value;

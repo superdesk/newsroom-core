@@ -180,6 +180,7 @@ class CompanyAdminAppComponent extends React.Component {
                             </div>
                             {this.props.userToEdit == null ? null : (
                                 <EditUser
+                                    original={this.props.usersById[this.props.userToEdit._id] || {}}
                                     user={this.props.userToEdit}
                                     onChange={this.props.editUser}
                                     errors={this.props.errors}
@@ -214,6 +215,7 @@ CompanyAdminAppComponent.propTypes = {
     resetPassword: PropTypes.func,
     resendUserInvite: PropTypes.func,
     closeUserEditor: PropTypes.func,
+    usersById: PropTypes.object,
     user: PropTypes.object,
     userToEdit: PropTypes.object,
     errors: PropTypes.object,
@@ -236,6 +238,7 @@ CompanyAdminAppComponent.propTypes = {
 
 const mapStateToProps = (state) => ({
     sectionId: state.sectionId,
+    usersById: state.usersById,
     user: currentUserSelector(state),
     userToEdit: state.userToEdit,
     errors: state.errors,
