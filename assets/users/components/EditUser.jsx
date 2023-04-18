@@ -1,26 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import classNames from 'classnames';
 import {get} from 'lodash';
 
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
 import AuditInformation from 'components/AuditInformation';
+import {EditUserProductPermission} from './EditUserProductPermission';
 
 import {gettext} from 'utils';
 import {isUserAdmin, getUserTypes, getUserLabel, userTypeReadOnly, getLocaleInputOptions, getDefaultLocale, isUserCompanyAdmin} from '../utils';
 import {FormToggle} from 'ui/components/FormToggle';
 
 import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserListItem';
-import {isProductEnabled} from 'companies/utils';
 
 import {companyProductSeatsSelector, companySectionListSelector} from 'company-admin/selectors';
 
 const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
 
 function EditUserComponent({
+    original,
     user,
     onChange,
     errors,
@@ -202,20 +202,15 @@ function EditUserComponent({
                                         (product) => product.product_type === section._id &&
                                             companyProductIds.includes(product._id)
                                     ).map((product) => (
-                                        <div className="list-item__preview-row" key={product._id}>
-                                            <div className="form-group">
-                                                <CheckboxInput
-                                                    name={`products.${section._id}.${product._id}`}
-                                                    label={product.name}
-                                                    value={isProductEnabled(user.products || [], product._id)}
-                                                    onChange={onChange}
-                                                    readOnly={seats[companyId][product._id].max_reached === true}
-                                                />
-                                            </div>
-                                            <div className={classNames({'text-danger': seats[companyId][product._id].max_reached === true})}>
-                                                {seats[companyId][product._id].assigned_seats}/{seats[companyId][product._id].max_seats}
-                                            </div>
-                                        </div>
+                                        <EditUserProductPermission
+                                            key={product._id}
+                                            original={original}
+                                            user={user}
+                                            section={section}
+                                            product={product}
+                                            seats={seats}
+                                            onChange={onChange}
+                                        />
                                     ))}
                                 </React.Fragment>
                             ))}
@@ -294,6 +289,7 @@ function EditUserComponent({
 }
 
 EditUserComponent.propTypes = {
+    original: PropTypes.object,
     user: PropTypes.object.isRequired,
     onChange: PropTypes.func,
     errors: PropTypes.object,
@@ -307,7 +303,6 @@ EditUserComponent.propTypes = {
     toolbar: PropTypes.node,
     products: PropTypes.arrayOf(PropTypes.object),
     hideFields: PropTypes.arrayOf(PropTypes.string),
-
     companySections: PropTypes.object,
     seats: PropTypes.object,
 };

@@ -90,6 +90,7 @@ class Users extends React.Component {
                 )}
                 {this.props.userToEdit &&
                     <EditUser
+                        original={this.props.usersById[this.props.userToEdit._id] || {}}
                         user={this.props.userToEdit}
                         onChange={this.props.editUser}
                         errors={this.props.errors}
@@ -110,6 +111,7 @@ class Users extends React.Component {
 
 Users.propTypes = {
     users: PropTypes.arrayOf(PropTypes.object),
+    usersById: PropTypes.object,
     userToEdit: PropTypes.object,
     activeUserId: PropTypes.string,
     selectUser: PropTypes.func,
@@ -133,6 +135,7 @@ Users.propTypes = {
 
 const mapStateToProps = (state) => ({
     users: state.users.map((id) => state.usersById[id]),
+    usersById: state.usersById,
     userToEdit: state.userToEdit,
     activeUserId: state.activeUserId,
     isLoading: state.isLoading,
