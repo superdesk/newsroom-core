@@ -2,10 +2,10 @@ import {gettext} from '../utils';
 import {get} from 'lodash';
 
 export const userTypes = [
-    {value: 'administrator', text: gettext('Administrator'), show_acc_mgr: false},
-    {value: 'internal', text: gettext('Internal'), show_acc_mgr: false},
+    {value: 'administrator', text: gettext('Administrator'), show_acc_mgr: true},
+    {value: 'internal', text: gettext('Internal'), show_acc_mgr: true},
     {value: 'public', text: gettext('Public'), show_acc_mgr: true},
-    {value: 'account_management', text: gettext('Account Management'), show_acc_mgr: false},
+    {value: 'account_management', text: gettext('Account Management'), show_acc_mgr: true},
     {value: 'company_admin', text: gettext('Company Admin'), show_acc_mgr: true},
 ];
 
