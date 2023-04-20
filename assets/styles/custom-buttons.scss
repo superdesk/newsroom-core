@@ -35,6 +35,7 @@
 // smaller button bellow xxl media query
 .btn-responsive {
   @include button-size($input-btn-padding-y-sm, $input-btn-padding-x-sm, $font-size-sm, $btn-border-radius-sm);
+  line-height: 1.2;
   
   @include xxl {
     @include button-size($input-btn-padding-y, $input-btn-padding-x, $font-size-button, $btn-border-radius);    
