@@ -2,10 +2,10 @@ import {gettext} from '../utils';
 import {get} from 'lodash';
 
 export const userTypes = [
-    {value: 'administrator', text: gettext('Administrator'), show_acc_mgr: true},
-    {value: 'internal', text: gettext('Internal'), show_acc_mgr: true},
+    {value: 'administrator', text: gettext('Administrator'), show_acc_mgr: false},
+    {value: 'internal', text: gettext('Internal'), show_acc_mgr: false},
     {value: 'public', text: gettext('Public'), show_acc_mgr: true},
-    {value: 'account_management', text: gettext('Account Management'), show_acc_mgr: true},
+    {value: 'account_management', text: gettext('Account Management'), show_acc_mgr: false},
     {value: 'company_admin', text: gettext('Company Admin'), show_acc_mgr: true},
 ];
 
@@ -21,7 +21,7 @@ export function userTypeReadOnly(user, currentUser) {
 }
 
 export function getUserTypes(user) {
-    if (isUserAdmin(user)) {
+    if (isUserAdmin(user) || isUserCompanyAdmin(user)) {
         return userTypes;
     }
     return userTypes.filter((opt) => (get(opt, 'show_acc_mgr') === true));
