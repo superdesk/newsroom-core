@@ -21,7 +21,7 @@ export function userTypeReadOnly(user, currentUser) {
 }
 
 export function getUserTypes(user) {
-    if (isUserAdmin(user)) {
+    if (isUserAdmin(user) || isUserCompanyAdmin(user)) {
         return userTypes;
     }
     return userTypes.filter((opt) => (get(opt, 'show_acc_mgr') === true));
