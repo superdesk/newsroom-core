@@ -267,7 +267,7 @@ function EditUserComponent({
                     </div>
 
                     <div className='list-item__preview-footer'>
-                        {!user.is_validated ? null : (
+                        {!user.is_validated || isCompanyAdmin ? null : (
                             <input
                                 type='button'
                                 className='btn btn-outline-secondary'
