@@ -155,6 +155,7 @@ function EditUserComponent({
                                 label={gettext('Company')}
                                 value={company[0]}
                                 onChange={onChange}
+                                readOnly={isUserCompanyAdmin(currentUser)}
                                 error={errors ? errors.role : null} />) : (<SelectInput
                                 name='company'
                                 label={gettext('Company')}
