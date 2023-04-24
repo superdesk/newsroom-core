@@ -1,14 +1,14 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import {get} from 'lodash';
-import {getSubjects} from '../utils';
 import {filterGroupsToLabelMap} from 'assets/search/selectors';
-import {isDisplayed, gettext} from 'assets/utils';
+import {gettext, isDisplayed} from 'assets/utils';
 import InfoBox from 'assets/wire/components/InfoBox';
 import PreviewTagsBlock from 'assets/wire/components/PreviewTagsBlock';
 import {PreviewTagsLinkList} from 'assets/wire/components/PreviewTagsLinkList';
 import {PreviewTagsSubjects} from 'assets/wire/components/PreviewTagsSubjects';
+import {get} from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
+import {connect} from 'react-redux';
+import {getSubjects} from '../utils';
 
 
 function AgendaTagsComponent({item, plan, isItemDetail, displayConfig, filterGroupLabels}: any) {

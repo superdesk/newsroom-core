@@ -1,16 +1,16 @@
+import alertify from 'alertifyjs';
+import {cloneDeep, get, isEmpty, isInteger, keyBy, memoize, throttle} from 'lodash';
+import moment from 'moment-timezone';
 import React from 'react';
-import {get, isInteger, keyBy, isEmpty, cloneDeep, throttle, memoize} from 'lodash';
+import {render as _render} from 'react-dom';
 import {Provider} from 'react-redux';
 import {createStore as _createStore, applyMiddleware, compose} from 'redux';
 import {createLogger} from 'redux-logger';
 import thunk from 'redux-thunk';
-import {render as _render} from 'react-dom';
-import alertify from 'alertifyjs';
-import moment from 'moment-timezone';
 import {
+    SCHEDULE_TYPE,
     hasCoverages,
     isCoverageForExtraDay,
-    SCHEDULE_TYPE,
     isItemTBC,
 } from './agenda/utils';
 export {initWebSocket} from './websocket';
@@ -22,10 +22,10 @@ export {initWebSocket} from './websocket';
  * 'en' comes by default
  */
 // TODO: Improve how we load Moment locales, based on server config
-import 'moment/locale/fr-ca';
 import 'moment/locale/fi';
-import server from './server';
+import 'moment/locale/fr-ca';
 import analytics from './analytics';
+import server from './server';
 
 declare let window: Window & typeof globalThis & any;
 
@@ -264,7 +264,7 @@ export function isToday(date: any) {
  * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
  * @return {Boolean}
  */
-export function isInPast(dateString: any, timezone: any) {
+export function isInPast(dateString: any, timezone?: any) {
     if(!dateString) {
         return false;
     }

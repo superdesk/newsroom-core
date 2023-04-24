@@ -1,16 +1,16 @@
-import React, {Fragment} from 'react';
-import PropTypes from 'prop-types';
+import ActionButton from 'assets/components/ActionButton';
+import {gettext} from 'assets/utils';
 import {get} from 'lodash';
+import PropTypes from 'prop-types';
+import React, {Fragment} from 'react';
 import {
-    getCoverageStatusText,
     WORKFLOW_STATUS,
+    getCoverageStatusText,
     isCoverageBeingUpdated,
     isWatched,
 } from '../utils';
-import AgendaInternalNote from './AgendaInternalNote';
 import AgendaEdNote from './AgendaEdNote';
-import ActionButton from 'assets/components/ActionButton';
-import {gettext} from 'assets/utils';
+import AgendaInternalNote from './AgendaInternalNote';
 
 function getDeliveryHref(coverage: any) {
     return get(coverage, 'delivery_href');
@@ -45,7 +45,7 @@ export default class CoverageItemStatus extends React.Component<any, any> {
     setWireItem(props: any) {
         const wireId = getDeliveryId(props.coverage);
         if (wireId && get(props, 'wireItems.length', 0) > 0) {
-            this.setState({wireItem: props.wireItems.find((w) => w._id === wireId)});
+            this.setState({wireItem: props.wireItems.find((w: any) => w._id === wireId)});
         }
     }
 
@@ -147,7 +147,7 @@ export default class CoverageItemStatus extends React.Component<any, any> {
     }
 
     render() {
-        const coverage = this.props.coverage;
+        const coverage: any = this.props.coverage;
         const wireText = this.getItemText(coverage);
         const internalNote = get(this.props, 'coverageData.internal_note', {})[coverage.coverage_id];
         const edNote = this.state.wireItem ? this.state.wireItem.ednote :

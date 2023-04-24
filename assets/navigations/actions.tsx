@@ -1,8 +1,8 @@
-import {gettext, notify, errorHandler} from 'utils';
-import server from 'server';
-import {initSections} from 'features/sections/actions';
-import {activeSectionSelector} from 'features/sections/selectors';
-import {searchQuerySelector} from 'search/selectors';
+import {initSections} from 'assets/features/sections/actions';
+import {activeSectionSelector} from 'assets/features/sections/selectors';
+import {searchQuerySelector} from 'assets/search/selectors';
+import server from 'assets/server';
+import {errorHandler, gettext, notify} from 'assets/utils';
 
 // number of image that a navigation can have
 export const MAX_TILE_IMAGES = 4;

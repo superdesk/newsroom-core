@@ -1,24 +1,3 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import classNames from 'classnames';
-import {isEmpty} from 'lodash';
-import {
-    getItemMedia,
-    showItemVersions,
-    isEqualItem,
-    isKilled,
-    DISPLAY_ABSTRACT,
-    isCustomRendition,
-    getPictureList,
-} from 'wire/utils';
-import types from 'assets/wire/types';
-import ListItemPreviousVersions from './ListItemPreviousVersions';
-import PreviewTags from './PreviewTags';
-import PreviewMeta from './PreviewMeta';
-import AgendaLinks from './AgendaLinks';
-import PreviewEdnote from './PreviewEdnote';
-import WireActionButtons from './WireActionButtons';
-import {Authors} from './fields/Authors';
 import ArticleAbstract from 'assets/ui/components/ArticleAbstract';
 import ArticleAuthor from 'assets/ui/components/ArticleAuthor';
 import ArticleBodyHtml from 'assets/ui/components/ArticleBodyHtml';
@@ -29,6 +8,27 @@ import ArticlePicture from 'assets/ui/components/ArticlePicture';
 import ArticleSlugline from 'assets/ui/components/ArticleSlugline';
 import Preview from 'assets/ui/components/Preview';
 import {isDisplayed} from 'assets/utils';
+import types from 'assets/wire/types';
+import {
+    DISPLAY_ABSTRACT,
+    getItemMedia,
+    getPictureList,
+    isCustomRendition,
+    isEqualItem,
+    isKilled,
+    showItemVersions,
+} from 'assets/wire/utils';
+import classNames from 'classnames';
+import {isEmpty} from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
+import AgendaLinks from './AgendaLinks';
+import ListItemPreviousVersions from './ListItemPreviousVersions';
+import PreviewEdnote from './PreviewEdnote';
+import PreviewMeta from './PreviewMeta';
+import PreviewTags from './PreviewTags';
+import WireActionButtons from './WireActionButtons';
+import {Authors} from './fields/Authors';
 
 
 class WirePreview extends React.PureComponent<any, any> {
@@ -45,7 +45,17 @@ class WirePreview extends React.PureComponent<any, any> {
     }
 
     render() {
-        const {item, user, actions, followStory, topics, previewConfig, downloadMedia, listConfig, filterGroupLabels} = this.props;
+        const {
+            item,
+            user,
+            actions,
+            followStory,
+            topics,
+            previewConfig,
+            downloadMedia,
+            listConfig,
+            filterGroupLabels
+        } = this.props;
         const pictures = getPictureList(item);
         const media = getItemMedia(item);
 
@@ -71,11 +81,11 @@ class WirePreview extends React.PureComponent<any, any> {
                     )}
                 >
                     <ArticleEmbargoed item={item} />
-                    {isDisplayed('slugline', previewConfig) && <ArticleSlugline item={item}/>}
-                    {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item}/>}
+                    {isDisplayed('slugline', previewConfig) && <ArticleSlugline item={item} />}
+                    {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item} />}
                     {(isDisplayed('byline', previewConfig) || isDisplayed('located', previewConfig)) &&
                         <ArticleAuthor item={item} displayConfig={previewConfig} />}
-                    {pictures && pictures.map((pic: any)=> (
+                    {pictures && pictures.map((pic: any) => (
                         <ArticlePicture
                             key={pic._id}
                             picture={pic}
@@ -84,10 +94,17 @@ class WirePreview extends React.PureComponent<any, any> {
                         />
                     ))}
                     {isDisplayed('metadata_section', previewConfig) &&
-                    <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions} displayConfig={previewConfig} listConfig={listConfig}
-                        filterGroupLabels={filterGroupLabels} />}
+                        <PreviewMeta
+                            item={item}
+                            isItemDetail={false}
+                            inputRef={previousVersions}
+                            displayConfig={previewConfig}
+                            listConfig={listConfig}
+                            filterGroupLabels={filterGroupLabels}
+                        />
+                    }
                     {isDisplayed('abstract', previewConfig) &&
-                    <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
+                        <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT} />}
                     {isDisplayed('body_html', previewConfig) && <ArticleBodyHtml item={item} />}
 
                     {!isEmpty(media) && media.map((media: any) => <ArticleMedia
@@ -98,14 +115,14 @@ class WirePreview extends React.PureComponent<any, any> {
                     />)}
 
                     {isDisplayed('tags_section', previewConfig) &&
-                        <PreviewTags item={item} isItemDetail={false} displayConfig={previewConfig}/>}
+                        <PreviewTags item={item} isItemDetail={false} displayConfig={previewConfig} />}
 
                     {isDisplayed('authors', previewConfig) && (
                         <Authors item={item} />
                     )}
 
                     {isDisplayed('ednotes_section', previewConfig) &&
-                                <PreviewEdnote item={item} />}
+                        <PreviewEdnote item={item} />}
 
                     {isDisplayed('item_versions', previewConfig) && showItemVersions(item) &&
                         <ListItemPreviousVersions

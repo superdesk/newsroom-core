@@ -1,26 +1,22 @@
-import {get, cloneDeep, assign, pickBy} from 'lodash';
-
-import server from 'server';
-import analytics from 'analytics';
-
-import {getTimezoneOffset, errorHandler, notify, gettext, updateRouteParams, toggleValue} from 'utils';
-import {getNavigationUrlParam, getSearchParams} from './utils';
-import {getLocations, getMapSource} from 'maps/utils';
-
-import {closeModal} from 'actions';
-import {setShareItems} from 'wire/actions';
-import {createOrUpdateTopic} from 'user-profile/actions';
-
-import {multiSelectTopicsConfigSelector} from 'ui/selectors';
+import {closeModal} from 'assets/actions';
+import analytics from 'assets/analytics';
+import {getLocations, getMapSource} from 'assets/maps/utils';
+import server from 'assets/server';
+import {multiSelectTopicsConfigSelector} from 'assets/ui/selectors';
+import {createOrUpdateTopic} from 'assets/user-profile/actions';
+import {errorHandler, getTimezoneOffset, gettext, notify, toggleValue, updateRouteParams} from 'assets/utils';
+import {setShareItems} from 'assets/wire/actions';
+import {assign, cloneDeep, get, pickBy} from 'lodash';
 import {
+    activeTopicSelector,
+    searchCreatedSelector,
     searchFilterSelector,
     searchNavigationSelector,
-    searchCreatedSelector,
     searchTopicIdSelector,
-    activeTopicSelector,
 } from './selectors';
+import {getNavigationUrlParam, getSearchParams} from './utils';
 
-import {context} from 'selectors';
+import {context} from 'assets/selectors';
 
 export const SET_QUERY = 'SET_QUERY';
 export function setQuery(query: any): any {

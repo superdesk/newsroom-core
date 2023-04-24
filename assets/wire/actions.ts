@@ -1,12 +1,12 @@
-import {renderModal, closeModal, setSavedItemsCount} from 'assets/actions';
+import {closeModal, renderModal, setSavedItemsCount} from 'assets/actions';
 import analytics from 'assets/analytics';
 import {markItemAsRead, toggleNewsOnlyParam, toggleSearchAllVersionsParam} from 'assets/local-store';
-import {setNewItemByTopic, loadMyTopics, setTopics, loadMyTopic} from 'assets/search/actions';
+import {loadMyTopic, loadMyTopics, setNewItemByTopic, setTopics} from 'assets/search/actions';
 import {searchParamsSelector} from 'assets/search/selectors';
 import {getNavigationUrlParam} from 'assets/search/utils';
 import {context} from 'assets/selectors';
-import {recordAction, updateRouteParams, gettext, notify, copyTextToClipboard, getTimezoneOffset} from 'assets/utils';
-import {server} from 'karma';
+import server from 'assets/server';
+import {copyTextToClipboard, getTimezoneOffset, gettext, notify, recordAction, updateRouteParams} from 'assets/utils';
 import {get, isEmpty} from 'lodash';
 
 export const SET_STATE = 'SET_STATE';
@@ -96,7 +96,13 @@ export function recieveItem(data: any): any {
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(wireData: any, newsOnlyFilterText?: any, readData?: any, newsOnly?: any, searchAllVersions?: any): any {
+export function initData(
+    wireData: any,
+    newsOnlyFilterText?: any,
+    readData?: any,
+    newsOnly?: any,
+    searchAllVersions?: any,
+): any {
     return {type: INIT_DATA, wireData, newsOnlyFilterText, readData, newsOnly, searchAllVersions};
 }
 

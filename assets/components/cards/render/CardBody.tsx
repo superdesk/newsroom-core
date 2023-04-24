@@ -1,11 +1,10 @@
-import React from 'react';
+import {getSlugline, shortDate} from 'assets/utils';
+import {shortText} from 'assets/wire/utils';
 import PropTypes from 'prop-types';
-import {getSlugline, shortDate} from 'utils';
-import {shortText} from 'wire/utils';
+import React from 'react';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 
-
-function CardBody({item, displayMeta, displayDescription, displaySource, listConfig}) {
+function CardBody({item, displayMeta, displayDescription, displaySource, listConfig}: any): any {
     return (<div className="card-body">
         <h4 className="card-title">{item.headline}</h4>
 

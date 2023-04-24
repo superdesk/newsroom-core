@@ -1,20 +1,18 @@
-import thunk from 'redux-thunk';
-import fetchMock from 'fetch-mock';
-import {createStore, applyMiddleware} from 'redux';
-
-import server from 'server';
-
-import wireApp from '../reducers';
-import * as actions from '../actions';
-import * as utils from 'assets/utils';
 import {
-    setQuery,
-    toggleNavigation,
-    toggleFilter,
-    setCreatedFilter,
     loadMyTopic,
+    setCreatedFilter,
+    setQuery,
+    toggleFilter,
+    toggleNavigation,
 } from 'assets/search/actions';
+import server from 'assets/server';
+import * as utils from 'assets/utils';
+import fetchMock from 'fetch-mock';
+import {applyMiddleware, createStore} from 'redux';
+import thunk from 'redux-thunk';
+import * as actions from '../actions';
 import {initData} from '../actions';
+import wireApp from '../reducers';
 
 describe('wire actions', () => {
     let store: any;

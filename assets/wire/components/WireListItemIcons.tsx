@@ -1,6 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import {hasAudio, hasVideo} from 'assets/wire/utils';
+import PropTypes from 'prop-types';
+import React from 'react';
 
 function WireListItemIcons({item, picture, divider}: any) {
     return (

@@ -1,7 +1,7 @@
-import {gettext, notify, errorHandler} from 'utils';
-import server from 'server';
-import {monitoringProfileToEdit, company, scheduleMode} from './selectors';
+import server from 'assets/server';
+import {errorHandler, gettext, notify} from 'assets/utils';
 import {get} from 'lodash';
+import {company, monitoringProfileToEdit, scheduleMode} from './selectors';
 
 
 export const INIT_DATA = 'INIT_DATA';

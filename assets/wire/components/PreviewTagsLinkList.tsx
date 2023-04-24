@@ -1,8 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import {uniqBy} from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
 import PreviewTagsLink from './PreviewTagsLink';
-
 
 export function PreviewTagsLinkList({urlPrefix, items, field}: any) {
     return items == null || (items.length || 0) === 0 ? null : (

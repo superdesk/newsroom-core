@@ -1,17 +1,17 @@
-import {get, isEmpty, includes, cloneDeep} from 'lodash';
+import {renderModal, setSavedItemsCount} from 'assets/actions';
+import analytics from 'assets/analytics';
+import {loadMyTopic, loadMyTopics, setNewItemByTopic, setSearchFilters} from 'assets/search/actions';
+import {searchFilterSelector, searchParamsSelector} from 'assets/search/selectors';
+import {getNavigationUrlParam, noNavigationSelected} from 'assets/search/utils';
+import {setTopics} from 'assets/topics/actions';
+import {copyTextToClipboard, errorHandler, getTimezoneOffset, gettext, notify, recordAction, updateRouteParams} from 'assets/utils';
+import {toggleFilter} from 'assets/wire/actions';
+import {server} from 'karma';
+import {cloneDeep, get, includes, isEmpty} from 'lodash';
 import moment from 'moment';
 import {clearAgendaDropdownFilters, markItemAsRead, toggleFeaturedOnlyParam} from '../local-store';
 import {getLocations, getMapSource} from '../maps/utils';
-import {renderModal, setSavedItemsCount} from 'assets/actions';
-import analytics from 'assets/analytics';
-import {setNewItemByTopic, loadMyTopics, setSearchFilters, loadMyTopic} from 'assets/search/actions';
-import {searchParamsSelector, searchFilterSelector} from 'assets/search/selectors';
-import {noNavigationSelected, getNavigationUrlParam} from 'assets/search/utils';
-import {setTopics} from 'assets/topics/actions';
-import {recordAction, errorHandler, notify, gettext, updateRouteParams, copyTextToClipboard, getTimezoneOffset} from 'assets/utils';
-import {toggleFilter} from 'assets/wire/actions';
-import {server} from 'karma';
-import {getMomentDate, getDateInputDate} from './utils';
+import {getDateInputDate, getMomentDate} from './utils';
 
 const WATCH_URL = '/agenda_watch';
 const WATCH_COVERAGE_URL = '/agenda_coverage_watch';

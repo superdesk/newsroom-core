@@ -1,23 +1,29 @@
-import {createStore, render, initWebSocket, getInitData, closeItemOnMobile, isMobilePhone} from 'assets/utils';
-
-import wireReducer from './reducers';
-import {getNewsOnlyParam, getSearchAllVersionsParam, getReadItems} from 'assets/local-store';
-import WireApp from './components/WireApp';
+import {getNewsOnlyParam, getReadItems, getSearchAllVersionsParam} from 'assets/local-store';
+import {setView} from 'assets/search/actions';
+import {closeItemOnMobile, createStore, getInitData, initWebSocket, isMobilePhone, render} from 'assets/utils';
 import {
     fetchItems,
-    setState,
     initData,
-    pushNotification,
     initParams,
     openItemDetails,
     previewItem,
+    pushNotification,
+    setState,
 } from './actions';
-import {setView} from 'assets/search/actions';
+import WireApp from './components/WireApp';
+import wireReducer from './reducers';
 
 const store = createStore(wireReducer, 'Wire');
 
 // init data
-store.dispatch(initData(getInitData(window.wireData), window.newsroom.client_config.news_only_filter, getReadItems(), getNewsOnlyParam(), getSearchAllVersionsParam()));
+store.dispatch(
+    initData(
+        getInitData(window.wireData),
+        window.newsroom.client_config.news_only_filter,
+        getReadItems(),
+        getNewsOnlyParam(),
+        getSearchAllVersionsParam())
+);
 
 // init view
 if (localStorage.getItem('view')) {

@@ -1,12 +1,12 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
-import {get} from 'lodash';
-
 import {gettext} from 'assets/utils';
+import {get} from 'lodash';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 import {isPlanningItem} from '../utils';
 import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 
 export class AgendaPreviewPlanning extends React.Component<any, any> {
+    static propTypes: any;
     render() {
         const {
             item,
@@ -63,7 +63,7 @@ export class AgendaPreviewPlanning extends React.Component<any, any> {
                             <span className="info-box__label">
                                 {gettext('Other Planning Items')}
                             </span>
-                            {otherPlanningItems.map((planningItem) => (
+                            {otherPlanningItems.map((planningItem: any) => (
                                 <AgendaPreviewCoverages
                                     key={planningItem.guid}
                                     item={item}

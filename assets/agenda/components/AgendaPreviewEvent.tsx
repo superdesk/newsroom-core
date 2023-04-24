@@ -1,19 +1,19 @@
-import * as React from 'react';
-import {connect} from 'react-redux';
-import PropTypes from 'prop-types';
+import {gettext} from 'assets/utils';
 import classNames from 'classnames';
 import {get} from 'lodash';
-import {getName, getInternalNote} from '../utils';
+import PropTypes from 'prop-types';
+import * as React from 'react';
+import {connect} from 'react-redux';
 import {fetchItem} from '../actions';
-import AgendaTime from './AgendaTime';
-import AgendaListItemLabels from './AgendaListItemLabels';
-import AgendaMeta from './AgendaMeta';
-import AgendaLongDescription from './AgendaLongDescription';
-import AgendaPreviewAttachments from './AgendaPreviewAttachments';
-import AgendaTags from './AgendaTags';
+import {getInternalNote, getName} from '../utils';
 import AgendaEdNote from './AgendaEdNote';
 import AgendaInternalNote from './AgendaInternalNote';
-import {gettext} from 'assets/utils';
+import AgendaListItemLabels from './AgendaListItemLabels';
+import AgendaLongDescription from './AgendaLongDescription';
+import AgendaMeta from './AgendaMeta';
+import AgendaPreviewAttachments from './AgendaPreviewAttachments';
+import AgendaTags from './AgendaTags';
+import AgendaTime from './AgendaTime';
 
 class AgendaPreviewEventComponent extends React.Component<any, any> {
     constructor(props: any) {

@@ -1,12 +1,17 @@
-import React from 'react';
+import {getCaption, getPicture, getThumbnailRendition, shortText} from 'assets/wire/utils';
 import PropTypes from 'prop-types';
-import {getPicture, getThumbnailRendition, getCaption, shortText} from 'wire/utils';
-import CardRow from './CardRow';
-import CardMeta from './CardMeta';
+import React from 'react';
 import {Embargo} from '../../../wire/components/fields/Embargo';
+import CardMeta from './CardMeta';
+import CardRow from './CardRow';
 
-const getTopNewsPanel = (item, picture, openItem, cardId, listConfig) => {
-
+const getTopNewsPanel = (
+    item: any,
+    picture: any,
+    openItem: any,
+    cardId: any,
+    listConfig: any
+): any => {
     const rendition = getThumbnailRendition(picture, true);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);

@@ -1,7 +1,7 @@
-import {gettext, notify, errorHandler} from 'utils';
-import server from 'server';
-import {initSections} from 'features/sections/actions';
-import {searchQuerySelector} from 'search/selectors';
+import {initSections} from 'assets/features/sections/actions';
+import {searchQuerySelector} from 'assets/search/selectors';
+import server from 'assets/server';
+import {errorHandler, gettext, notify} from 'assets/utils';
 
 
 export const SELECT_SECTION_FILTER = 'SELECT_SECTION_FILTER';

@@ -1,7 +1,7 @@
-import {gettext, notify, errorHandler} from 'utils';
-import server from 'server';
-import {initDashboard} from 'features/dashboard/actions';
-import {searchQuerySelector} from 'search/selectors';
+import {initDashboard} from 'assets/features/dashboard/actions';
+import {searchQuerySelector} from 'assets/search/selectors';
+import server from 'assets/server';
+import {errorHandler, gettext, notify} from 'assets/utils';
 
 
 export const SELECT_CARD = 'SELECT_CARD';

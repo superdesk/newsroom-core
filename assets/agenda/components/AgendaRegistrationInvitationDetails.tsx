@@ -1,10 +1,10 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
-import {get} from 'lodash';
 import {PreviewText} from 'assets/ui/components/PreviewText';
 import {gettext} from 'assets/utils';
 import InfoBox from 'assets/wire/components/InfoBox';
 import PreviewTagsBlock from 'assets/wire/components/PreviewTagsBlock';
+import {get} from 'lodash';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 
 export function AgendaRegistrationInvitationDetails({item}: any) {
     if (!get(item, 'registration_details.length') && !get(item, 'invitation_details.length')) {

@@ -1,11 +1,11 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import moment from 'moment-timezone';
-import {get} from 'lodash';
-import classNames from 'classnames';
 import {shouldRenderLocation} from 'assets/maps/utils';
 import {bem} from 'assets/ui/utils';
 import {formatAgendaDate} from 'assets/utils';
+import classNames from 'classnames';
+import {get} from 'lodash';
+import moment from 'moment-timezone';
+import PropTypes from 'prop-types';
+import React from 'react';
 import {isItemTBC} from '../utils';
 
 export default function AgendaTime({item, children}: any) {

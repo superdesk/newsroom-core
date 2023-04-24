@@ -1,29 +1,28 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import PreviewActionButtons from 'assets/components/PreviewActionButtons';
+import Preview from 'assets/ui/components/Preview';
 import classNames from 'classnames';
 import {get} from 'lodash';
-
-import {isEqualItem} from 'wire/utils';
-import {hasCoverages, isPostponed, isRescheduled, getInternalNote, planHasEvent} from '../utils';
-
-import PreviewActionButtons from 'components/PreviewActionButtons';
-import Preview from 'ui/components/Preview';
-import AgendaName from './AgendaName';
-import AgendaTime from './AgendaTime';
-import AgendaMeta from './AgendaMeta';
+import PropTypes from 'prop-types';
+import React from 'react';
+import {getInternalNote, hasCoverages, isPostponed, isRescheduled, planHasEvent} from '../utils';
+import AgendaCoverageRequest from './AgendaCoverageRequest';
 import AgendaEdNote from './AgendaEdNote';
 import AgendaInternalNote from './AgendaInternalNote';
-import AgendaPreviewImage from './AgendaPreviewImage';
-import AgendaLongDescription from './AgendaLongDescription';
-import AgendaPreviewAttachments from './AgendaPreviewAttachments';
-import AgendaCoverageRequest from './AgendaCoverageRequest';
-import AgendaTags from './AgendaTags';
 import AgendaListItemLabels from './AgendaListItemLabels';
-import {AgendaPreviewPlanning} from './AgendaPreviewPlanning';
+import AgendaLongDescription from './AgendaLongDescription';
+import AgendaMeta from './AgendaMeta';
+import AgendaName from './AgendaName';
+import AgendaPreviewAttachments from './AgendaPreviewAttachments';
 import {AgendaPreviewEvent} from './AgendaPreviewEvent';
+import AgendaPreviewImage from './AgendaPreviewImage';
+import {AgendaPreviewPlanning} from './AgendaPreviewPlanning';
 import {AgendaRegistrationInvitationDetails} from './AgendaRegistrationInvitationDetails';
+import AgendaTags from './AgendaTags';
+import AgendaTime from './AgendaTime';
 
 class AgendaPreview extends React.PureComponent<any, any> {
+    preview: any;
+    static propTypes: any;
     constructor(props: any) {
         super(props);
     }

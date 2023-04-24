@@ -1,7 +1,6 @@
-import server from 'server';
+import server from 'assets/server';
 import {cloneDeep} from 'lodash';
-
-import {notify, gettext} from '../utils';
+import {gettext, notify} from '../utils';
 
 export function getTokenForCompany(companyId: any): any {
     return server.get(`/news_api_tokens?company=${companyId}`);

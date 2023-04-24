@@ -1,23 +1,3 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import {isEmpty} from 'lodash';
-import PreviewMeta from './PreviewMeta';
-import PreviewTags from './PreviewTags';
-import AgendaLinks from './AgendaLinks';
-import ListItemPreviousVersions from './ListItemPreviousVersions';
-import ListItemNextVersion from './ListItemNextVersion';
-import PreviewEdnote from './PreviewEdnote';
-import WireActionButtons from './WireActionButtons';
-import {Authors} from './fields/Authors';
-import {
-    getItemMedia,
-    showItemVersions,
-    isEqualItem,
-    isKilled,
-    DISPLAY_ABSTRACT,
-    isCustomRendition,
-    getPictureList,
-} from 'assets/wire/utils';
 import ArticleAbstract from 'assets/ui/components/ArticleAbstract';
 import ArticleAuthor from 'assets/ui/components/ArticleAuthor';
 import ArticleBody from 'assets/ui/components/ArticleBody';
@@ -33,8 +13,27 @@ import ArticlePicture from 'assets/ui/components/ArticlePicture';
 import Content from 'assets/ui/components/Content';
 import ContentBar from 'assets/ui/components/ContentBar';
 import ContentHeader from 'assets/ui/components/ContentHeader';
-import {gettext, formatDate, formatTime, isDisplayed} from 'assets/utils';
+import {formatDate, formatTime, gettext, isDisplayed} from 'assets/utils';
+import {
+    DISPLAY_ABSTRACT,
+    getItemMedia,
+    getPictureList,
+    isCustomRendition,
+    isKilled,
+    showItemVersions
+} from 'assets/wire/utils';
 import types from 'fetch-mock';
+import {isEmpty} from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
+import AgendaLinks from './AgendaLinks';
+import ListItemNextVersion from './ListItemNextVersion';
+import ListItemPreviousVersions from './ListItemPreviousVersions';
+import PreviewEdnote from './PreviewEdnote';
+import PreviewMeta from './PreviewMeta';
+import PreviewTags from './PreviewTags';
+import WireActionButtons from './WireActionButtons';
+import {Authors} from './fields/Authors';
 
 function ItemDetails({
     item,

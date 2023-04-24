@@ -1,8 +1,8 @@
-import React from 'react';
+import {getPicture, getVideos} from 'assets/wire/utils';
 import PropTypes from 'prop-types';
-import {getPicture, getVideos} from 'wire/utils';
-import {FieldComponents} from './fields';
+import React from 'react';
 import WireListItemIcons from './WireListItemIcons';
+import {FieldComponents} from './fields';
 
 const DEFAULT_META_FIELDS = [
     'urgency',

@@ -1,7 +1,7 @@
 import {get} from 'lodash';
 import {getItemActions} from '../item-actions';
-import * as agendaActions from './actions';
 import {gettext} from '../utils';
+import * as agendaActions from './actions';
 import {isWatched} from './utils';
 
 const canWatchAgendaItem = (state: any, item: any, includeCoverages: any) => {

@@ -1,5 +1,5 @@
 import {get, differenceBy} from 'lodash';
-import server from 'server';
+import server from 'assets/server';
 
 export const RENDER_MODAL = 'RENDER_MODAL';
 export function renderModal(modal: any, data: any): any {

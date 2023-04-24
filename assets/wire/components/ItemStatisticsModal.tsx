@@ -1,6 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import {gettext} from 'assets/utils';
+import PropTypes from 'prop-types';
+import React from 'react';
+import {Modal} from 'reactstrap';
 
 export default class ItemStatisticsModal extends React.Component<any, any> {
     static propTypes: any;

@@ -1,24 +1,21 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import {filterGroupsToLabelMap} from 'assets/search/selectors';
+import {gettext, isDisplayed} from 'assets/utils';
 import {get} from 'lodash';
-
-import {gettext, isDisplayed} from 'utils';
-import {filterGroupsToLabelMap} from 'search/selectors';
-
+import PropTypes from 'prop-types';
+import React from 'react';
+import {connect} from 'react-redux';
 import PreviewTagsBlock from './PreviewTagsBlock';
 import {PreviewTagsLinkList} from './PreviewTagsLinkList';
 
-
-function PreviewTagsSubjectsComponent({subjects, displayConfig, urlPrefix, filterGroupLabels}) {
+function PreviewTagsSubjectsComponent({subjects, displayConfig, urlPrefix, filterGroupLabels}: any) {
     if (!subjects.length) {
         return null;
     }
 
-    const subjectsByScheme = {subject: []};
+    const subjectsByScheme: any = {subject: []};
     const filterGroupSchemes = Object.keys(filterGroupLabels);
 
-    subjects.forEach((subject) => {
+    subjects.forEach((subject: any) => {
         if (subject.scheme && filterGroupSchemes.includes(subject.scheme)) {
             if (subjectsByScheme[subject.scheme] == null) {
                 subjectsByScheme[subject.scheme] = [];
@@ -61,4 +58,4 @@ const mapStateToProps = (state: any) => ({
     filterGroupLabels: filterGroupsToLabelMap(state),
 });
 
-export const PreviewTagsSubjects = connect(mapStateToProps)(PreviewTagsSubjectsComponent);
+export const PreviewTagsSubjects: any = connect(mapStateToProps)(PreviewTagsSubjectsComponent as any);

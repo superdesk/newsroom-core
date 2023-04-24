@@ -1,18 +1,24 @@
-import React, {Fragment} from 'react';
-import PropTypes from 'prop-types';
-import {get, cloneDeep} from 'lodash';
+import CardEditor from 'assets/components/CardEditor';
+import CheckboxInput from 'assets/components/CheckboxInput';
+import ExpiryDateInput from 'assets/components/ExpiryDateInput';
+import TextAreaInput from 'assets/components/TextAreaInput';
+import TextInput from 'assets/components/TextInput';
+import {cloneDeep, get} from 'lodash';
 import moment from 'moment';
+import PropTypes from 'prop-types';
+import React, {Fragment} from 'react';
 import {
+    DEFAULT_TIMEZONE,
+    SERVER_DATETIME_FORMAT,
+    convertUtcToTimezone,
+    getEndOfDayFromDate,
     gettext,
     isInPast,
-    DEFAULT_TIMEZONE,
-    getEndOfDayFromDate,
-    convertUtcToTimezone,
-    SERVER_DATETIME_FORMAT,
 } from '../../utils';
-import {getTokenForCompany, generateTokenForCompany, deleteTokenForCompany, updateTokenForCompany} from '../actions';
+import {deleteTokenForCompany, generateTokenForCompany, getTokenForCompany, updateTokenForCompany} from '../actions';
 
 export default class EditAPIToken extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 

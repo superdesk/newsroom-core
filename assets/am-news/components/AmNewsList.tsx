@@ -1,24 +1,24 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import {createSelector} from 'reselect';
 import {groupBy} from 'lodash';
 import moment from 'moment/moment';
+import PropTypes from 'prop-types';
+import React from 'react';
+import {connect} from 'react-redux';
+import {createSelector} from 'reselect';
 
-import {gettext, formatDate, DATE_FORMAT} from 'utils';
+import {getContextName} from 'assets/selectors';
+import {DATE_FORMAT, formatDate, gettext} from 'assets/utils';
+import {getIntVersion} from 'assets/wire/utils';
+import {openItem, previewItem, setActive, toggleSelected} from '../../wire/actions';
 import AmNewsListItem from './AmNewsListItem';
-import {setActive, previewItem, toggleSelected, openItem} from '../../wire/actions';
-import {getIntVersion} from '../../wire/utils';
-import {getContextName} from 'selectors';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
 
-const itemsSelector = (state: any) => state.items.map((_id) => state.itemsById[_id]);
+const itemsSelector = (state: any) => state.items.map((_id: any) => state.itemsById[_id]);
 const groupedItemsSelector = createSelector(
     [itemsSelector],
     (items) => {
-        const groupByDate = (item) => {
+        const groupByDate = (item: any) => {
             const date =  moment(item.versioncreated).set({'h': 0, 'm': 0, 's': 0});
             return formatDate(date);
         };

@@ -1,35 +1,32 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import classNames from 'classnames';
-import {get} from 'lodash';
-
+import ActionButton from 'assets/components/ActionButton';
 import {
+    LIST_ANIMATIONS,
+    characterCount,
+    getConfig,
+    getSlugline,
     gettext,
     wordCount,
-    characterCount,
-    LIST_ANIMATIONS,
-    getSlugline,
-    getConfig,
 } from 'assets/utils';
 import {
+    getCaption,
     getPicture,
     getThumbnailRendition,
-    showItemVersions,
-    shortText,
-    isKilled,
     getVideos,
-    getCaption,
+    isKilled,
+    shortText,
+    showItemVersions,
 } from 'assets/wire/utils';
-
-import ActionButton from 'assets/components/ActionButton';
-
-import ListItemPreviousVersions from './ListItemPreviousVersions';
-import WireListItemIcons from './WireListItemIcons';
+import classNames from 'classnames';
+import {get} from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
 import ActionMenu from '../../components/ActionMenu';
+import ListItemPreviousVersions from './ListItemPreviousVersions';
 import WireListItemDeleted from './WireListItemDeleted';
+import WireListItemIcons from './WireListItemIcons';
+import {FieldComponents} from './fields';
 import {Embargo} from './fields/Embargo';
 import {UrgencyItemBorder, UrgencyLabel} from './fields/UrgencyLabel';
-import {FieldComponents} from './fields';
 
 export const DISPLAY_WORD_COUNT = getConfig('display_word_count');
 export const DISPLAY_CHAR_COUNT = getConfig('display_char_count');

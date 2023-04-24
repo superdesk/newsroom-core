@@ -1,7 +1,7 @@
 import {initSections} from 'assets/features/sections/actions';
 import {searchQuerySelector} from 'assets/search/selectors';
-import {errorHandler, notify, gettext} from 'assets/utils';
-import server from 'server';
+import server from 'assets/server';
+import {errorHandler, gettext, notify} from 'assets/utils';
 
 
 export const SELECT_PRODUCT = 'SELECT_PRODUCT';

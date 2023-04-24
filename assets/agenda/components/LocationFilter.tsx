@@ -1,13 +1,11 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
-import classNames from 'classnames';
-import {get, debounce} from 'lodash';
-
+import {KEYS} from 'assets/common';
+import DropdownFilterButton from 'assets/components/DropdownFilterButton';
+import server from 'assets/server';
 import {gettext} from 'assets/utils';
-import server from 'server';
-import {KEYS} from 'common';
-
-import DropdownFilterButton from 'components/DropdownFilterButton';
+import classNames from 'classnames';
+import {debounce, get} from 'lodash';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 
 const LOCATION_TYPE = {
     CITY: 'city',

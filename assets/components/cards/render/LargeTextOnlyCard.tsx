@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import CardFooter from './CardFooter';
 import CardBody from './CardBody';
 import CardRow from './CardRow';
-import {getPicture} from 'wire/utils';
+import {getPicture} from 'assets/wire/utils';
 
-const getTextOnlyPanel = (item, openItem, cardId, listConfig) => (
+const getTextOnlyPanel = (item: any, openItem: any, cardId: any, listConfig: any): any => (
     <div key={item._id} className='col-sm-6 col-lg-4 d-flex mb-4'>
         <div className='card card--home' onClick={() => openItem(item, cardId)}>
             <CardBody item={item} displaySource={false} listConfig={listConfig} />
@@ -18,10 +18,10 @@ const getTextOnlyPanel = (item, openItem, cardId, listConfig) => (
     </div>
 );
 
-function LargeTextOnlyCard ({items, title, product, openItem, isActive, cardId, listConfig}) {
+function LargeTextOnlyCard ({items, title, product, openItem, isActive, cardId, listConfig}: any): any {
     return (
         <CardRow title={title} product={product} isActive={isActive}>
-            {items.map((item) => getTextOnlyPanel(item, openItem, cardId, listConfig))}
+            {items.map((item: any) => getTextOnlyPanel(item, openItem, cardId, listConfig))}
         </CardRow>
     );
 }

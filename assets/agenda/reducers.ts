@@ -1,22 +1,22 @@
 import {
-    RECIEVE_ITEMS,
-    INIT_DATA,
-    SELECT_DATE,
-    WATCH_EVENTS,
-    STOP_WATCHING_EVENTS,
-    UPDATE_ITEM,
-    TOGGLE_FEATURED_FILTER,
-    SET_ITEM_TYPE_FILTER,
     AGENDA_WIRE_ITEMS,
-    WATCH_COVERAGE,
+    INIT_DATA,
+    RECIEVE_ITEMS,
+    SELECT_DATE,
+    SET_ITEM_TYPE_FILTER,
     STOP_WATCHING_COVERAGE,
+    STOP_WATCHING_EVENTS,
+    TOGGLE_FEATURED_FILTER,
+    UPDATE_ITEM,
+    WATCH_COVERAGE,
+    WATCH_EVENTS,
 } from './actions';
 
+import {searchReducer} from 'assets/search/reducers';
+import {EXTENDED_VIEW} from 'assets/wire/defaults';
 import {get, uniq} from 'lodash';
 import {defaultReducer} from '../reducers';
 import {EARLIEST_DATE} from './utils';
-import {searchReducer} from 'assets/search/reducers';
-import {EXTENDED_VIEW} from 'assets/wire/defaults';
 
 const initialState = {
     items: [],

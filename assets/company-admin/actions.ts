@@ -1,6 +1,6 @@
-import {gettext, notify, errorHandler} from 'utils';
-import server from 'server';
-import {initViewData as initUserViewData, setError, fetchUsers} from 'users/actions';
+import server from 'assets/server';
+import {fetchUsers, initViewData as initUserViewData, setError} from 'assets/users/actions';
+import {errorHandler, gettext, notify} from 'assets/utils';
 
 export const INIT_VIEW_DATA = 'INIT_VIEW_DATA';
 export function initViewData(data: any): any {

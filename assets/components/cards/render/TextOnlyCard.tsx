@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import CardRow from './CardRow';
 import CardFooter from './CardFooter';
-import {getPicture, shortText} from 'wire/utils';
+import {getPicture, shortText} from 'assets/wire/utils';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 
 const getTextOnlyPanel = (item, openItem, picture, cardId, listConfig) => (

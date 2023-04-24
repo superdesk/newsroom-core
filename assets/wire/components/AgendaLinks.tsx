@@ -1,14 +1,14 @@
-import React, {Fragment} from 'react';
-import PropTypes from 'prop-types';
-import server from 'server';
-import {get} from 'lodash';
-import {gettext} from 'assets/utils';
-
-import InfoBox from './InfoBox';
-import PreviewTagsBlock from './PreviewTagsBlock';
 import AgendaCoverages from 'assets/agenda/components/AgendaCoverages';
 import AgendaEventInfo from 'assets/agenda/components/AgendaEventInfo';
+import server from 'assets/server';
 import PreviewBox from 'assets/ui/components/PreviewBox';
+import {gettext} from 'assets/utils';
+import {get} from 'lodash';
+import PropTypes from 'prop-types';
+import React, {Fragment} from 'react';
+import InfoBox from './InfoBox';
+import PreviewTagsBlock from './PreviewTagsBlock';
+
 export default class AgendaLinks extends React.PureComponent<any, any> {
     constructor(props: any) {
         super(props);

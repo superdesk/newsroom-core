@@ -1,17 +1,17 @@
-import {get, isEmpty, includes, keyBy, sortBy, partition} from 'lodash';
+import {get, includes, isEmpty, keyBy, partition, sortBy} from 'lodash';
 import moment from 'moment/moment';
 import {
+    AGENDA_DATE_FORMAT_SHORT,
+    COVERAGE_DATE_FORMAT,
+    COVERAGE_DATE_TIME_FORMAT,
+    DATE_FORMAT,
     formatDate,
     formatMonth,
+    formatTime,
     formatWeek,
     getConfig,
     gettext,
-    DATE_FORMAT,
-    COVERAGE_DATE_TIME_FORMAT,
-    COVERAGE_DATE_FORMAT,
     parseDate,
-    AGENDA_DATE_FORMAT_SHORT,
-    formatTime,
 } from '../utils';
 
 export const STATUS_KILLED = 'killed';

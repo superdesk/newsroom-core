@@ -1,17 +1,17 @@
+import {searchNavigationSelector} from 'assets/search/selectors';
+import {listConfigSelector, previewConfigSelector} from 'assets/ui/selectors';
+import {EXTENDED_VIEW} from 'assets/wire/defaults';
+import {getIntVersion} from 'assets/wire/utils';
+import classNames from 'classnames';
+import {cloneDeep, get, isEqual} from 'lodash';
+import moment from 'moment';
 import React, {Fragment} from 'react';
 import {connect} from 'react-redux';
 import {createSelector} from 'reselect';
-import {get, isEqual, cloneDeep} from 'lodash';
-import classNames from 'classnames';
-import moment from 'moment';
-import AgendaListItem from './AgendaListItem';
-import {setActive, previewItem, toggleSelected, openItem} from '../actions';
 import {AGENDA_DATE_FORMAT_LONG, AGENDA_DATE_FORMAT_SHORT, DATE_FORMAT, gettext, isDisplayed, shouldShowListShortcutActionIcons} from '../../utils';
+import {openItem, previewItem, setActive, toggleSelected} from '../actions';
 import {getListItems, getPlanningItemsByGroup, groupItems} from '../utils';
-import {EXTENDED_VIEW} from 'assets/wire/defaults';
-import {getIntVersion} from 'assets/wire/utils';
-import {searchNavigationSelector} from 'assets/search/selectors';
-import {listConfigSelector, previewConfigSelector} from 'assets/ui/selectors';
+import AgendaListItem from './AgendaListItem';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click

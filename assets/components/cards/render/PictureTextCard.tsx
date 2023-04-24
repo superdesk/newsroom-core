@@ -1,11 +1,18 @@
-import React from 'react';
+import {getCaption, getPicture, getThumbnailRendition} from 'assets/wire/utils';
 import PropTypes from 'prop-types';
-import {getPicture, getThumbnailRendition, getCaption} from 'wire/utils';
+import React from 'react';
 import CardBody from './CardBody';
 import CardFooter from './CardFooter';
 import CardRow from './CardRow';
 
-const getPictureTextPanel = (item, picture, openItem, withPictures, cardId, listConfig) => {
+const getPictureTextPanel = (
+    item: any,
+    picture: any,
+    openItem: any,
+    withPictures: any,
+    cardId: any,
+    listConfig: any
+): any => {
     const rendition = withPictures && getThumbnailRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);

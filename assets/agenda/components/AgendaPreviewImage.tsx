@@ -1,10 +1,10 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import {gettext} from '../../utils';
-import {get} from 'lodash';
 import BannerDrop from 'assets/components/BannerDrop';
 import StaticMap from 'assets/maps/components/static';
-import {shouldRenderLocation, getLocations} from 'assets/maps/utils';
+import {getLocations, shouldRenderLocation} from 'assets/maps/utils';
+import {get} from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
+import {gettext} from '../../utils';
 
 /**
  * Display map image for item location

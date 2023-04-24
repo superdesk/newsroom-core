@@ -1,9 +1,9 @@
-import React from 'react';
+import {bem} from 'assets/ui/utils';
+import {formatAgendaDate} from 'assets/utils';
 import classNames from 'classnames';
+import React from 'react';
 import {hasCoverages} from '../utils';
 import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
-import {formatAgendaDate} from 'assets/utils';
-import {bem} from 'assets/ui/utils';
 
 function format(item: any, group: any, onlyDates: any) {
     return (
@@ -54,7 +54,7 @@ export default function AgendaMetaTime({item, borderRight, isRecurring, group, i
     }
 
     const icons = (
-        <div key="icon" className={bem('wire-articles__item', 'icons',{'dashed-border': !isMobilePhone})}>
+        <div key="icon" className={bem('wire-articles__item', 'icons', {'dashed-border': !isMobilePhone})}>
             <span className={classNames(
                 'wire-articles__item__icon',
                 {'dashed-border': isMobilePhone}

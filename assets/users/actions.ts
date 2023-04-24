@@ -1,7 +1,7 @@
-import server from 'server';
-import {get, cloneDeep} from 'lodash';
 import {searchQuerySelector} from 'assets/search/selectors';
-import {errorHandler, notify, gettext} from 'assets/utils';
+import server from 'assets/server';
+import {errorHandler, gettext, notify} from 'assets/utils';
+import {cloneDeep, get} from 'lodash';
 
 export const SELECT_USER = 'SELECT_USER';
 export function selectUser(id: any): any {
