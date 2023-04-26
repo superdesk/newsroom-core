@@ -245,8 +245,6 @@ def publish_event(event, orig):
                 # item removed, reset watches on the item
                 updates["watches"] = []
 
-            service.patch(orig["_id"], updates)
-
         elif event.get("state") in [
             WORKFLOW_STATE.RESCHEDULED,
             WORKFLOW_STATE.POSTPONED,
@@ -257,7 +255,6 @@ def publish_event(event, orig):
             updates["dates"] = get_event_dates(event)
             updates["coverages"] = None
             updates["planning_items"] = None
-            service.patch(orig["_id"], updates)
 
         elif event.get("state") == WORKFLOW_STATE.SCHEDULED:
             # event is reposted (possibly after a cancel)
@@ -271,8 +268,9 @@ def publish_event(event, orig):
             }
 
             set_agenda_metadata_from_event(updates, event, False)
-            service.patch(orig["_id"], updates)
+
         if updates:
+            service.patch(orig["_id"], updates)
             updates["_id"] = orig["_id"]
             superdesk.get_resource_service("agenda").notify_agenda_update(updates, orig)
 
@@ -284,6 +282,8 @@ def get_event_dates(event):
         event["dates"]["start"] = datetime.strptime(event["dates"]["start"], "%Y-%m-%dT%H:%M:%S+0000")
     if not isinstance(event["dates"]["end"], datetime):
         event["dates"]["end"] = datetime.strptime(event["dates"]["end"], "%Y-%m-%dT%H:%M:%S+0000")
+    event["dates"].setdefault("all_day", False)
+    event["dates"].setdefault("no_end_time", False)
     return event["dates"]
 
 
