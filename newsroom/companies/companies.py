@@ -1,6 +1,9 @@
+from eve.utils import config
 from content_api import MONGO_PREFIX
 
+from superdesk import get_resource_service
 import newsroom
+from newsroom.companies.utils import get_company_section_names, get_company_product_ids
 
 
 class CompaniesResource(newsroom.Resource):
@@ -73,4 +76,34 @@ class CompaniesResource(newsroom.Resource):
 
 
 class CompaniesService(newsroom.Service):
-    pass
+    def on_update(self, updates, original):
+        if "sections" in updates:
+            original_products = updates.get("products") or original.get("products") or []
+            enabled_sections = [section for section, active in updates.get("sections").items() if active]
+            new_products = [product for product in original_products if product.get("section") in enabled_sections]
+
+            if len(new_products) != len(original_products):
+                updates["products"] = new_products
+
+    def on_updated(self, updates, original):
+        original_section_names = get_company_section_names(original)
+        original_product_ids = get_company_product_ids(original)
+
+        updated_section_names = get_company_section_names(updates) if "sections" in updates else original_section_names
+        updated_product_ids = get_company_product_ids(updates) if "products" in updates else original_product_ids
+
+        if original_section_names != updated_section_names or original_product_ids != updated_product_ids:
+            user_service = get_resource_service("users")
+            for user in user_service.get(req=None, lookup={"company": original[config.ID_FIELD]}):
+                user_updates = {
+                    "sections": {
+                        section: enabled and section in updated_section_names
+                        for section, enabled in (updates.get("sections") or original.get("sections") or {}).items()
+                    },
+                    "products": [
+                        product
+                        for product in updates.get("products") or original.get("products") or []
+                        if product.get("section") in updated_section_names and product.get("_id") in updated_product_ids
+                    ],
+                }
+                user_service.patch(user[config.ID_FIELD], updates=user_updates)

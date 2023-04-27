@@ -44,7 +44,7 @@ def manager(app, client):
 def test_user_products(app, client, manager, product):
     utils.patch_json(
         client,
-        f"/api/users/{manager['_id']}",
+        f"/api/_users/{manager['_id']}",
         {
             "products": [{"section": "wire", "_id": product["_id"]}],
         },
@@ -62,7 +62,7 @@ def test_user_products(app, client, manager, product):
 def test_user_sections(app, client, manager):
     utils.patch_json(
         client,
-        f"/api/users/{manager['_id']}",
+        f"/api/_users/{manager['_id']}",
         {
             "sections": {"wire": True, "agenda": False},
         },
@@ -74,7 +74,7 @@ def test_user_sections(app, client, manager):
 
     utils.patch_json(
         client,
-        f"/api/users/{manager['_id']}",
+        f"/api/_users/{manager['_id']}",
         {
             "sections": {"agenda": True},
         },
@@ -89,7 +89,7 @@ def test_user_sections(app, client, manager):
 
     utils.patch_json(
         client,
-        f"/api/users/{manager['_id']}",
+        f"/api/_users/{manager['_id']}",
         {
             "sections": None,
         },
@@ -112,13 +112,13 @@ def test_user_sections(app, client, manager):
 
 def test_other_company_user_changes_blocked(client, manager):
     with pytest.raises(AssertionError) as err:
-        utils.patch_json(client, f"/api/users/{USERS[0]['_id']}", {"products": []})
+        utils.patch_json(client, f"/api/_users/{USERS[0]['_id']}", {"products": []})
     assert "403" in str(err)
 
     with pytest.raises(AssertionError) as err:
-        utils.delete_json(client, f"/api/users/{USERS[0]['_id']}", {})
+        utils.delete_json(client, f"/api/_users/{USERS[0]['_id']}", {})
     assert "403" in str(err)
 
     with pytest.raises(AssertionError) as err:
-        utils.patch_json(client, f"/api/users/{USERS[1]['_id']}", {"company": COMPANIES[0]["_id"]})
+        utils.patch_json(client, f"/api/_users/{USERS[1]['_id']}", {"company": COMPANIES[0]["_id"]})
     assert "403" in str(err)
