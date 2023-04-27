@@ -22,25 +22,30 @@ class DataUpdate(_DataUpdate):
 
         for user in mongodb_collection.find({}):
             company = companies.get(user.get("company"))
-            if not company:
-                continue
+            updates = {}
 
-            company_section_names = get_company_section_names(company)
-            company_product_ids = get_company_product_ids(company)
+            if isinstance(user.get("sections"), list):
+                updates["sections"] = {name: True for name in user["sections"]}
 
-            updates = {
-                "sections": {
-                    section: enabled and section in company_section_names
-                    for section, enabled in (user.get("sections") or {}).items()
-                },
-                "products": [
-                    product
-                    for product in user.get("products") or []
-                    if product.get("section") in company_section_names and product.get("_id") in company_product_ids
-                ],
-            }
+            if company:
+                company_section_names = get_company_section_names(company)
+                company_product_ids = get_company_product_ids(company)
+                user_sections = updates.get("sections") or user.get("sections") or {}
 
-            print(mongodb_collection.update({config.ID_FIELD: user.get(config.ID_FIELD)}, {"$set": updates}))
+                updates = {
+                    "sections": {
+                        section: enabled and section in company_section_names
+                        for section, enabled in user_sections.items()
+                    },
+                    "products": [
+                        product
+                        for product in user.get("products") or []
+                        if product.get("section") in company_section_names and product.get("_id") in company_product_ids
+                    ],
+                }
+
+            if updates:
+                print(mongodb_collection.update({config.ID_FIELD: user.get(config.ID_FIELD)}, {"$set": updates}))
 
     def backwards(self, mongodb_collection, mongodb_database):
         pass
