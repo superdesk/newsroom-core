@@ -463,13 +463,19 @@ class BaseSearchService(Service):
                     )
 
                 if user_products:
+                    # User has Products assigned
                     search.products = user_products
-                else:
+                elif not get_setting("allow_companies_to_manage_products"):
+                    # If Product management is admin only, then default to the
+                    # Product list from the parent Company
                     search.products = get_products_by_company(
                         search.company,
                         search.navigation_ids,
                         product_type=search.section,
                     )
+                else:
+                    # Otherwise an empty list of Products is used
+                    search.products = []
         else:
             search.products = []
 

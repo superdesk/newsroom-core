@@ -7,6 +7,7 @@ from flask_babel import gettext
 from werkzeug.exceptions import BadRequest
 
 from newsroom.auth import get_user_id, get_user, get_company
+from newsroom.settings import get_setting
 from newsroom.utils import set_original_creator, set_version_creator
 from superdesk.utils import is_hashed, get_hash
 from newsroom.auth.utils import is_current_user_admin, is_current_user_account_mgr, is_current_user_company_admin
@@ -120,19 +121,22 @@ USER_PROFILE_UPDATES = {
 COMPANY_ADMIN_ALLOWED_UPDATES = USER_PROFILE_UPDATES.union(
     {
         "email",
-        "products",
-        "sections",
         "is_approved",
         "is_enabled",
         "expiry_alert",
         "manage_company_topics",
-        "token",
-        "token_expiry_date",
         # populated by system
         "_created",
         "_updated",
+        "token",
+        "token_expiry_date",
     }
 )
+
+COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES = {
+    "sections",
+    "products",
+}
 
 
 class UsersService(newsroom.Service):
@@ -237,9 +241,17 @@ class UsersService(newsroom.Service):
         if is_current_user_company_admin():
             manager = get_user()
             if doc.get("company") and doc["company"] == manager.get("company"):
-                if not updated_fields or all([key in COMPANY_ADMIN_ALLOWED_UPDATES for key in updated_fields]):
+                allowed_updates = (
+                    COMPANY_ADMIN_ALLOWED_UPDATES
+                    if not get_setting("allow_companies_to_manage_products")
+                    else COMPANY_ADMIN_ALLOWED_UPDATES.union(COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES)
+                )
+
+                if not updated_fields:
                     return
-                if request and request.method == "DELETE" and doc.get("_id") != manager.get("_id"):
+                elif all([key in allowed_updates for key in updated_fields]):
+                    return
+                elif request and request.method == "DELETE" and doc.get("_id") != manager.get("_id"):
                     return
 
         if request and request.url_rule and request.url_rule.rule:
