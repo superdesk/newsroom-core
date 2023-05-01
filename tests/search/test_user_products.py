@@ -88,11 +88,7 @@ def test_user_sections(app, client, manager, product):
     assert "403" in str(err)
 
     utils.patch_json(
-        client,
-        f"/api/_users/{manager['_id']}",
-        {
-            "products": [{"section": "agenda", "_id": product["_id"]}]
-        }
+        client, f"/api/_users/{manager['_id']}", {"products": [{"section": "agenda", "_id": product["_id"]}]}
     )
 
     data = utils.get_json(client, "/agenda/search")
