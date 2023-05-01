@@ -68,7 +68,6 @@ def test_user_sections(app, client, manager, product):
         f"/api/_users/{manager['_id']}",
         {
             "sections": {"wire": True, "agenda": False},
-            "products": [{"section": "agenda", "_id": product["_id"]}]
         },
     )
 
@@ -82,6 +81,18 @@ def test_user_sections(app, client, manager, product):
         {
             "sections": {"agenda": True},
         },
+    )
+
+    with pytest.raises(AssertionError) as err:
+        utils.get_json(client, "/agenda/search")
+    assert "403" in str(err)
+
+    utils.patch_json(
+        client,
+        f"/api/_users/{manager['_id']}",
+        {
+            "products": [{"section": "agenda", "_id": product["_id"]}]
+        }
     )
 
     data = utils.get_json(client, "/agenda/search")
