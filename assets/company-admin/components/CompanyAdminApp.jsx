@@ -21,6 +21,7 @@ import {
 } from 'users/actions';
 import {setSearchQuery} from 'search/actions';
 import {productListSelector, companyListSelector, currentUserSelector} from '../selectors';
+import {getConfig} from 'utils';
 
 import {CompanyDetails} from './CompanyDetails';
 import {CompanyUsers} from './CompanyUsers';
@@ -192,7 +193,10 @@ class CompanyAdminAppComponent extends React.Component {
                                     resendUserInvite={this.props.resendUserInvite}
                                     currentUser={this.props.user}
                                     products={this.props.products}
-                                    hideFields={['company']}
+                                    hideFields={getConfig('allow_companies_to_manage_products') ?
+                                        ['company'] :
+                                        ['company', 'sections', 'products']
+                                    }
                                 />
                             )}
                         </div>

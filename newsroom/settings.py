@@ -147,6 +147,14 @@ def init_app(app):
         lazy_gettext("Product Seat request recipients"),
         description=lazy_gettext("Comma separated list of email addresses who will receive product seat requests."),
     )
+    app.general_setting(
+        "allow_companies_to_manage_products",
+        lazy_gettext("Allow companies to manage their own user product permissions"),
+        description=lazy_gettext("Allow Company Admins to change section and product permissions for their users"),
+        type="boolean",
+        weight=500,
+        default=app.config.get("DEFAULT_ALLOW_COMPANIES_TO_MANAGE_PRODUCTS"),
+    )
 
 
 class SettingsApp:

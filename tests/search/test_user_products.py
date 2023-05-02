@@ -1,3 +1,4 @@
+from flask import g
 import pytest
 import tests.utils as utils
 
@@ -42,6 +43,7 @@ def manager(app, client):
 
 
 def test_user_products(app, client, manager, product):
+    g.settings["allow_companies_to_manage_products"]["value"] = True
     utils.patch_json(
         client,
         f"/api/_users/{manager['_id']}",
@@ -59,7 +61,8 @@ def test_user_products(app, client, manager, product):
     assert 1 >= len(data["_items"])
 
 
-def test_user_sections(app, client, manager):
+def test_user_sections(app, client, manager, product):
+    g.settings["allow_companies_to_manage_products"]["value"] = True
     utils.patch_json(
         client,
         f"/api/_users/{manager['_id']}",
@@ -78,6 +81,14 @@ def test_user_sections(app, client, manager):
         {
             "sections": {"agenda": True},
         },
+    )
+
+    with pytest.raises(AssertionError) as err:
+        utils.get_json(client, "/agenda/search")
+    assert "403" in str(err)
+
+    utils.patch_json(
+        client, f"/api/_users/{manager['_id']}", {"products": [{"section": "agenda", "_id": product["_id"]}]}
     )
 
     data = utils.get_json(client, "/agenda/search")
