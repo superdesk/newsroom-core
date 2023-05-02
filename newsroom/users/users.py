@@ -6,12 +6,14 @@ from flask import current_app as app, session, abort, request
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest
 
-from newsroom.auth import get_user_id, get_user
+from newsroom.auth import get_user_id, get_user, get_company
+from newsroom.settings import get_setting
 from newsroom.utils import set_original_creator, set_version_creator
 from superdesk.utils import is_hashed, get_hash
 from newsroom.auth.utils import is_current_user_admin, is_current_user_account_mgr, is_current_user_company_admin
 from newsroom.user_roles import UserRole
 from newsroom.signals import user_created, user_updated, user_deleted
+from newsroom.companies.utils import get_company_section_names, get_company_product_ids
 
 
 class UserData(TypedDict, total=False):
@@ -28,6 +30,9 @@ class UsersResource(newsroom.Resource):
     """
     Users schema
     """
+
+    # Use a private style URL, otherwise ``POST /users/<_id>`` doesn't work from behave tests
+    url = "_users"
 
     schema = {
         "password": {"type": "string", "minlength": 8},
@@ -116,19 +121,22 @@ USER_PROFILE_UPDATES = {
 COMPANY_ADMIN_ALLOWED_UPDATES = USER_PROFILE_UPDATES.union(
     {
         "email",
-        "products",
-        "sections",
         "is_approved",
         "is_enabled",
         "expiry_alert",
         "manage_company_topics",
-        "token",
-        "token_expiry_date",
         # populated by system
         "_created",
         "_updated",
+        "token",
+        "token_expiry_date",
     }
 )
+
+COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES = {
+    "sections",
+    "products",
+}
 
 
 class UsersService(newsroom.Service):
@@ -157,8 +165,31 @@ class UsersService(newsroom.Service):
         set_version_creator(updates)
         if "password" in updates:
             updates["password"] = self._get_password_hash(updates["password"])
+
+        if updates.get("company") and updates["company"] != original.get("company"):
+            self._on_company_change(updates, original)
+
         app.cache.delete(str(original.get("_id")))
         app.cache.delete(original.get("email"))
+
+    def _on_company_change(self, updates, original):
+        # Filter out any Sections & Products that the new company assigned is not permissioned for
+        company = get_company(user=updates)
+        if not company:
+            return
+
+        company_section_names = get_company_section_names(company)
+        company_product_ids = get_company_product_ids(company)
+
+        updates["sections"] = {
+            section: enabled and section in company_section_names
+            for section, enabled in (updates.get("sections") or original.get("sections") or {}).items()
+        }
+        updates["products"] = [
+            product
+            for product in updates.get("products") or original.get("products") or []
+            if product.get("section") in company_section_names and product.get("_id") in company_product_ids
+        ]
 
     def on_updated(self, updates, original):
         # set session locale if updating locale for current user
@@ -210,9 +241,17 @@ class UsersService(newsroom.Service):
         if is_current_user_company_admin():
             manager = get_user()
             if doc.get("company") and doc["company"] == manager.get("company"):
-                if not updated_fields or all([key in COMPANY_ADMIN_ALLOWED_UPDATES for key in updated_fields]):
+                allowed_updates = (
+                    COMPANY_ADMIN_ALLOWED_UPDATES
+                    if not get_setting("allow_companies_to_manage_products")
+                    else COMPANY_ADMIN_ALLOWED_UPDATES.union(COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES)
+                )
+
+                if not updated_fields:
                     return
-                if request and request.method == "DELETE" and doc.get("_id") != manager.get("_id"):
+                elif all([key in allowed_updates for key in updated_fields]):
+                    return
+                elif request and request.method == "DELETE" and doc.get("_id") != manager.get("_id"):
                     return
 
         if request and request.url_rule and request.url_rule.rule:

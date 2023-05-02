@@ -241,6 +241,26 @@ def test_push_updated_event(client, app):
     assert parsed["dates"]["end"].day == 30
 
 
+def test_push_updated_event_dates_flags(client, app):
+    event = deepcopy(test_event)
+    event["dates"]["all_day"] = True
+
+    # first push
+    client.post("/push", data=json.dumps(event), content_type="application/json")
+
+    # update comes in
+    event["dates"]["no_end_time"] = True
+    event["dates"].pop("all_day")
+
+    client.post("/push", data=json.dumps(event), content_type="application/json")
+
+    events = get_json(client, "/agenda/search")
+    parsed = events["_items"][0]
+
+    assert parsed["dates"]["no_end_time"]
+    assert not parsed["dates"].get("all_day")
+
+
 def test_push_parsed_planning_for_an_existing_event(client, app):
     event = deepcopy(test_event)
     event["guid"] = "foo4"

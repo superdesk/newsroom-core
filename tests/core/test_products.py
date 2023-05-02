@@ -221,4 +221,4 @@ def assign_product_to_companies(client, product, companies):
 def assign_product_to_user(client, product, user):
     products = user.get("products") or []
     products.append({"_id": product["_id"]})
-    utils.patch_json(client, f"/api/users/{user['_id']}", {"products": products})
+    utils.patch_json(client, f"/api/_users/{user['_id']}", {"products": products})

@@ -508,3 +508,9 @@ AGENDA_EXPIRY_DAYS = int(env("AGENDA_EXPIRY_DAYS", 0))
 #: .. versionadded:: 2.3.2
 #:
 MAX_MULTI_DAY_EVENT_DURATION = int(env("MAX_MULTI_DAY_EVENT_DURATION", 365))
+
+#:
+#:
+#: .. versionadded: 2.4.0
+#:
+DEFAULT_ALLOW_COMPANIES_TO_MANAGE_PRODUCTS = False

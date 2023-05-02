@@ -7,10 +7,11 @@ import {get, sortBy} from 'lodash';
 import {save} from '../actions';
 
 import TextInput from 'components/TextInput';
+import CheckboxInput from 'components/CheckboxInput';
 import AuditInformation from 'components/AuditInformation';
 
 function isInput(field) {
-    return field.type === 'text' || field.type === 'number';
+    return ['text', 'number', 'boolean'].includes(field.type);
 }
 
 class GeneralSettingsApp extends React.Component {
@@ -21,7 +22,18 @@ class GeneralSettingsApp extends React.Component {
             _updated: get(this.props, 'config._updated'),
         };
         Object.keys(props.config).forEach((key) => {
-            this.state.values[key] = get(props.config[key], 'value') || '';
+            const config = props.config[key] || {};
+
+            this.state.values[key] = (() => {
+                switch (config.type) {
+                case 'text':
+                    return config.value || config.default || '';
+                case 'number':
+                    return config.value || config.default || 0;
+                case 'boolean':
+                    return config.value != null ? config.value : config.default || false;
+                }
+            })();
         });
 
         this.onSubmit = this.onSubmit.bind(this);
@@ -40,6 +52,11 @@ class GeneralSettingsApp extends React.Component {
         this.setState({values});
     }
 
+    onBooleanChange(key) {
+        const values = {...this.state.values, [key]: !this.state.values[key]};
+        this.setState({values});
+    }
+
     onSubmit(event) {
         event.preventDefault();
         this.props.save(this.state.values);
@@ -50,7 +67,17 @@ class GeneralSettingsApp extends React.Component {
         const fields = sortBy(Object.keys(config), (_id) => config[_id].weight).map((_id) => {
             const field = config[_id];
             if (isInput(field)) {
-                return (
+                return field.type === 'boolean' ? (
+                    <div className="form-group">
+                        <CheckboxInput
+                            key={_id}
+                            name={_id}
+                            label={gettext(field.label)}
+                            onChange={this.onBooleanChange.bind(this, _id)}
+                            value={this.state.values[_id]}
+                        />
+                    </div>
+                ) : (
                     <TextInput
                         key={_id}
                         type={field.type}

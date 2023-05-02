@@ -21,6 +21,7 @@ import {
 } from 'users/actions';
 import {setSearchQuery} from 'search/actions';
 import {productListSelector, companyListSelector, currentUserSelector} from '../selectors';
+import {getConfig} from 'utils';
 
 import {CompanyDetails} from './CompanyDetails';
 import {CompanyUsers} from './CompanyUsers';
@@ -180,6 +181,7 @@ class CompanyAdminAppComponent extends React.Component {
                             </div>
                             {this.props.userToEdit == null ? null : (
                                 <EditUser
+                                    original={this.props.usersById[this.props.userToEdit._id] || {}}
                                     user={this.props.userToEdit}
                                     onChange={this.props.editUser}
                                     errors={this.props.errors}
@@ -191,7 +193,10 @@ class CompanyAdminAppComponent extends React.Component {
                                     resendUserInvite={this.props.resendUserInvite}
                                     currentUser={this.props.user}
                                     products={this.props.products}
-                                    hideFields={['company']}
+                                    hideFields={getConfig('allow_companies_to_manage_products') ?
+                                        ['company'] :
+                                        ['company', 'sections', 'products']
+                                    }
                                 />
                             )}
                         </div>
@@ -214,6 +219,7 @@ CompanyAdminAppComponent.propTypes = {
     resetPassword: PropTypes.func,
     resendUserInvite: PropTypes.func,
     closeUserEditor: PropTypes.func,
+    usersById: PropTypes.object,
     user: PropTypes.object,
     userToEdit: PropTypes.object,
     errors: PropTypes.object,
@@ -236,6 +242,7 @@ CompanyAdminAppComponent.propTypes = {
 
 const mapStateToProps = (state) => ({
     sectionId: state.sectionId,
+    usersById: state.usersById,
     user: currentUserSelector(state),
     userToEdit: state.userToEdit,
     errors: state.errors,

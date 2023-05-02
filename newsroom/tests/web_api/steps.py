@@ -26,6 +26,17 @@ def step_impl_ordered_list(context):
     assert ids == expected_order, "{} != {}".format(",".join(ids), ",".join(expected_order))
 
 
+@when('we get json from "{url}"')
+def step_impl_get_json_array_from_url(context, url):
+    url = apply_placeholders(context, url)
+    context.response = context.client.get(
+        get_prefixed_url(context.app, url),
+        headers=[header for header in context.headers if header[0] != "Content-Type"],
+    )
+
+    assert_ok(context.response)
+
+
 @when('we post form to "{url}"')
 def step_impl_when_post_form_to_url(context, url):
     url = apply_placeholders(context, url)
@@ -43,7 +54,7 @@ def step_impl_when_post_form_to_url(context, url):
 def step_impl_when_post_json_to_url(context, url):
     url = apply_placeholders(context, url)
     data = apply_placeholders(context, context.text)
-    context.response = context.client.post(get_prefixed_url(context.app, url), data=data, headers=context.headers)
+    context.response = context.client.post(url, data=data, headers=context.headers)
 
     assert_ok(context.response)
 

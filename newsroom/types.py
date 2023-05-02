@@ -3,7 +3,7 @@ from typing import Dict, List, TypedDict
 
 
 class UserData(TypedDict, total=False):
-    _id: str
+    _id: ObjectId
     email: str
     first_name: str
     last_name: str
@@ -19,14 +19,14 @@ class User(UserData):
 
 
 class Product(TypedDict, total=False):
-    _id: str
+    _id: ObjectId
     name: str
     product_type: str
     navigations: List[str]
 
 
 class ProductRef(TypedDict):
-    _id: str
+    _id: ObjectId
     seats: int
     section: str
 
@@ -36,3 +36,4 @@ class Company(TypedDict, total=False):
     name: str
     products: List[ProductRef]
     sections: Dict[str, bool]
+    restrict_coverage_info: bool
