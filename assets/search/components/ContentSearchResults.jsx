@@ -125,7 +125,7 @@ class ContentSearchResultsComponent extends React.Component {
                             {!this.props.showTotalLabel ? null : (
                                 <React.Fragment>
                                     <span className="search-results-info__text flex-column">
-                                        <span>{gettext('search results for:')}</span>
+                                        <span>{gettext('search results for: ') +' '+this.props.searchParams.query}</span>
                                     </span>
                                     {!(this.props.minimizeSearchResults && !this.state.expanded) ? null : (
                                         <div className="tags-list">
