@@ -59,7 +59,7 @@ def get_setting(setting_key=None, include_audit=False):
         settings = copy.deepcopy(flask.current_app._general_settings)
         if values:
             for key, val in values.get("values", {}).items():
-                if (val or val is False) and settings.get(key):
+                if not (val is None or val == "") and settings.get(key) is not None:
                     settings[key]["value"] = val
             if include_audit:
                 settings["_updated"] = values.get("_updated")
