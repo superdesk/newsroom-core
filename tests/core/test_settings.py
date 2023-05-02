@@ -18,6 +18,26 @@ def test_general_settings(client, app):
     assert "bar" == get_setting()["foo"]["default"]
 
 
+def test_boolean_settings(client, app):
+    app.general_setting("foo", "Foo", default=False)
+    assert get_setting("foo") is False
+    post_json(client, "/settings/general_settings", {"foo": True})
+    assert get_setting("foo") is True
+    post_json(client, "/settings/general_settings", {"foo": False})
+    assert get_setting("foo") is False
+    post_json(client, "/settings/general_settings", {"foo": None})
+    assert get_setting("foo") is False
+
+    app.general_setting("bar", "Bar", default=True)
+    assert get_setting("bar") is True
+    post_json(client, "/settings/general_settings", {"bar": False})
+    assert get_setting("bar") is False
+    post_json(client, "/settings/general_settings", {"bar": True})
+    assert get_setting("bar") is True
+    post_json(client, "/settings/general_settings", {"foo": None})
+    assert get_setting("bar") is True
+
+
 def test_news_only_filter(client, app):
     query = get_setting("news_only_filter")
     assert query is None
