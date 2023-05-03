@@ -29,7 +29,7 @@ class CalendarButton extends React.Component {
             customInput={
                 <CalendarButtonWrapper
                     active={isStartDateToday}
-                    date={moment(this.state.startDate).format('YYYY-MM-DD')}
+                    value={moment(this.state.startDate).format('YYYY-MM-DD')}
                 />
             }
             todayButton={gettext('Today')}
