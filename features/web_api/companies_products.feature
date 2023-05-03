@@ -63,30 +63,28 @@ Feature: Company Products
     Scenario: Company product changes affect user products
         # 1. Make sure Company and User has access to ALL sections/products
         When we get "/companies/1e65964bf5db68883df561b0"
-        Then we get existing resource
+        Then we get products assigned to items
         """
-        {
-            "_id": "1e65964bf5db68883df561b0",
-            "sections": {"wire": true, "agenda": true},
+        {"1e65964bf5db68883df561b0": {
+            "sections": ["wire", "agenda"],
             "products": [
-                {"_id": "69b4c5c61d41c8d736852fbf"},
-                {"_id": "69b4c5c61d41c8d736852fba"},
-                {"_id": "69b4c5c61d41c8d736852fbb"}
+                "69b4c5c61d41c8d736852fbf",
+                "69b4c5c61d41c8d736852fba",
+                "69b4c5c61d41c8d736852fbb"
             ]
-        }
+        }}
         """
         When we get json from "/companies/1e65964bf5db68883df561b0/users"
-        Then we get existing resource
+        Then we get products assigned to items
         """
-        [{
-            "_id": "4e65964bf5db68883df561b0",
-            "sections": {"wire": true, "agenda": true},
+        {"4e65964bf5db68883df561b0": {
+            "sections": ["wire", "agenda"],
             "products": [
-                {"_id": "69b4c5c61d41c8d736852fbf"},
-                {"_id": "69b4c5c61d41c8d736852fba"},
-                {"_id": "69b4c5c61d41c8d736852fbb"}
+                "69b4c5c61d41c8d736852fbf",
+                "69b4c5c61d41c8d736852fba",
+                "69b4c5c61d41c8d736852fbb"
             ]
-        }]
+        }}
         """
 
         # 2. Remove access to product: All wire, 69b4c5c61d41c8d736852fbf
@@ -100,23 +98,27 @@ Feature: Company Products
         """
         # Check company permissions
         When we get "/companies/1e65964bf5db68883df561b0"
-        Then we get existing resource
+        Then we get products assigned to items
         """
-        {
-            "_id": "1e65964bf5db68883df561b0",
-            "sections": {"wire": true, "agenda": true},
-            "products": [{"_id": "69b4c5c61d41c8d736852fba"}, {"_id": "69b4c5c61d41c8d736852fbb"}]
-        }
+        {"1e65964bf5db68883df561b0": {
+            "sections": ["wire", "agenda"],
+            "products": [
+                "69b4c5c61d41c8d736852fba",
+                "69b4c5c61d41c8d736852fbb"
+            ]
+        }}
         """
         # Check user permissions
         When we get json from "/companies/1e65964bf5db68883df561b0/users"
-        Then we get existing resource
+        Then we get products assigned to items
         """
-        [{
-            "_id": "4e65964bf5db68883df561b0",
-            "sections": {"wire": true, "agenda": true},
-            "products": [{"_id": "69b4c5c61d41c8d736852fba"}, {"_id": "69b4c5c61d41c8d736852fbb"}]
-        }]
+        {"4e65964bf5db68883df561b0": {
+            "sections": ["wire", "agenda"],
+            "products": [
+                "69b4c5c61d41c8d736852fba",
+                "69b4c5c61d41c8d736852fbb"
+            ]
+        }}
         """
 
         # 3. Remove access to section: wire
@@ -130,23 +132,21 @@ Feature: Company Products
         """
         # Check company permissions
         When we get "/companies/1e65964bf5db68883df561b0"
-        Then we get existing resource
+        Then we get products assigned to items
         """
-        {
-            "_id": "1e65964bf5db68883df561b0",
-            "sections": {"wire": false, "agenda": true},
-            "products": [{"_id": "69b4c5c61d41c8d736852fbb"}]
-        }
+        {"1e65964bf5db68883df561b0": {
+            "sections": ["agenda"],
+            "products": ["69b4c5c61d41c8d736852fbb"]
+        }}
         """
         # Check user permissions
         When we get json from "/companies/1e65964bf5db68883df561b0/users"
-        Then we get existing resource
+        Then we get products assigned to items
         """
-        [{
-            "_id": "4e65964bf5db68883df561b0",
-            "sections": {"wire": false, "agenda": true},
-            "products": [{"_id": "69b4c5c61d41c8d736852fbb"}]
-        }]
+        {"4e65964bf5db68883df561b0": {
+            "sections": ["agenda"],
+            "products": ["69b4c5c61d41c8d736852fbb"]
+        }}
         """
 
         # 4. Re-add access to section: wire, & product: All wire, 69b4c5c61d41c8d736852fba
@@ -160,23 +160,60 @@ Feature: Company Products
         """
         # Check company permissions
         When we get "/companies/1e65964bf5db68883df561b0"
-        Then we get existing resource
+        Then we get products assigned to items
         """
-        {
-            "_id": "1e65964bf5db68883df561b0",
-            "sections": {"wire": true, "agenda": true},
-            "products": [{"_id": "69b4c5c61d41c8d736852fba"}, {"_id": "69b4c5c61d41c8d736852fbb"}]
-        }
+        {"1e65964bf5db68883df561b0": {
+            "sections": ["wire", "agenda"],
+            "products": [
+                "69b4c5c61d41c8d736852fba",
+                "69b4c5c61d41c8d736852fbb"
+            ]
+        }}
         """
         # Check user permissions (has access to wire, but defaults products to disabled)
         When we get json from "/companies/1e65964bf5db68883df561b0/users"
-        Then we get existing resource
+        Then we get products assigned to items
         """
-        [{
-            "_id": "4e65964bf5db68883df561b0",
+        {"4e65964bf5db68883df561b0": {
+            "sections": ["wire", "agenda"],
+            "products": ["69b4c5c61d41c8d736852fbb"]
+        }}
+        """
+
+        # 5. Re-add access to product: All wire, 69b4c5c61d41c8d736852fbf
+        When we post json to "/companies/1e65964bf5db68883df561b0/permissions"
+        """
+        {
+            "name": "All Access Co. 2",
             "sections": {"wire": true, "agenda": true},
-            "products": [{"_id": "69b4c5c61d41c8d736852fbb"}]
-        }]
+            "products": {
+                "69b4c5c61d41c8d736852fbf": true,
+                "69b4c5c61d41c8d736852fba": true,
+                "69b4c5c61d41c8d736852fbb": true
+            }
+        }
+        """
+        # Check company permissions
+        When we get "/companies/1e65964bf5db68883df561b0"
+        Then we get products assigned to items
+        """
+        {"1e65964bf5db68883df561b0": {
+            "sections": ["wire", "agenda"],
+            "products": [
+                "69b4c5c61d41c8d736852fbf",
+                "69b4c5c61d41c8d736852fba",
+                "69b4c5c61d41c8d736852fbb"
+            ]
+        }}
+        """
+        # Check user permissions
+        When we get json from "/companies/1e65964bf5db68883df561b0/users"
+        Then we get products assigned to items
+        """
+        {"4e65964bf5db68883df561b0": {
+            "sections": ["wire", "agenda"],
+            "products": ["69b4c5c61d41c8d736852fbb"]
+        }}
         """
 
     @auth @admin
@@ -194,17 +231,17 @@ Feature: Company Products
         }]
         """
         When we get json from "/companies/1e65964bf5db68883df561b0/users"
-        Then we get existing resource
+        Then we get products assigned to items
         """
-        [{
-            "_id": "4e65964bf5db68883df561b0", "company": "1e65964bf5db68883df561b0",
-            "sections": {"wire": true, "agenda": true},
+        {"4e65964bf5db68883df561b0": {
+            "company": "1e65964bf5db68883df561b0",
+            "sections": ["wire", "agenda"],
             "products": [
-                {"_id": "69b4c5c61d41c8d736852fbf"},
-                {"_id": "69b4c5c61d41c8d736852fba"},
-                {"_id": "69b4c5c61d41c8d736852fbb"}
+                "69b4c5c61d41c8d736852fbf",
+                "69b4c5c61d41c8d736852fba",
+                "69b4c5c61d41c8d736852fbb"
             ]
-        }]
+        }}
         """
 
         # 2. Change the user company
@@ -220,13 +257,11 @@ Feature: Company Products
 
         # 3. Make sure agenda is disabled, and only 1 product remains
         When we get json from "/companies/1e65964bf5db68883df561b1/users"
-        Then we get existing resource
+        Then we get products assigned to items
         """
-        [{
-            "_id": "4e65964bf5db68883df561b0", "company": "1e65964bf5db68883df561b1",
-            "sections": {"wire": true, "agenda": false},
-            "products": [
-                {"_id": "69b4c5c61d41c8d736852fba"}
-            ]
-        }]
+        {"4e65964bf5db68883df561b0": {
+            "company": "1e65964bf5db68883df561b1",
+            "sections": ["wire"],
+            "products": ["69b4c5c61d41c8d736852fba"]
+        }}
         """
