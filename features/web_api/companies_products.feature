@@ -175,7 +175,7 @@ Feature: Company Products
         Then we get products assigned to items
         """
         {"4e65964bf5db68883df561b0": {
-            "sections": ["wire", "agenda"],
+            "sections": ["agenda"],
             "products": ["69b4c5c61d41c8d736852fbb"]
         }}
         """
@@ -211,7 +211,7 @@ Feature: Company Products
         Then we get products assigned to items
         """
         {"4e65964bf5db68883df561b0": {
-            "sections": ["wire", "agenda"],
+            "sections": ["agenda"],
             "products": ["69b4c5c61d41c8d736852fbb"]
         }}
         """

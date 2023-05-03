@@ -108,18 +108,18 @@ def then_we_get_users_with_products(context):
             expected_company_id = user_data.get("company")
             actual_company_id = str(user.get("company"))
             assert expected_company_id == actual_company_id, (
-                "company attribute does not match, "
-                f"expected_company_id: {expected_company_id} != "
+                "company attribute does not match\n"
+                f"expected_company_id: {expected_company_id}\n"
                 f"actual_company_id: {actual_company_id}"
             )
 
         # Test products match
         if "products" in user_data:
-            expected_product_ids = user_data.get("products")
-            actual_product_ids = [str(product.get("_id")) for product in user.get("products") or []]
-            assert sorted(actual_product_ids) == sorted(expected_product_ids), (
-                "products do not match,"
-                f"expected_product_ids: {expected_product_ids} != "
+            expected_product_ids = sorted(user_data.get("products") or [])
+            actual_product_ids = sorted([str(product.get("_id")) for product in user.get("products") or []])
+            assert actual_product_ids == expected_product_ids, (
+                "products do not match\n"
+                f"expected_product_ids: {expected_product_ids}\n"
                 f"actual_product_ids: {actual_product_ids}"
             )
 
@@ -128,7 +128,7 @@ def then_we_get_users_with_products(context):
             expected_sections = user_data.get("sections") or []
             actual_sections = [name for name, value in (user.get("sections") or {}).items() if value]
             assert sorted(actual_sections) == sorted(expected_sections), (
-                "sections do not match,"
-                f"expected_sections: {expected_sections}, != "
-                f"actual_sections: {actual_sections}"
+                "sections do not match\n"
+                f"expected_sections: {expected_sections}\n"
+                f"actual_sections: {user.get('sections')}"
             )
