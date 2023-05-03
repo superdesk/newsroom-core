@@ -26,12 +26,8 @@ class CalendarButton extends React.Component {
     render() {
         const isStartDateToday = moment.isMoment(this.state.startDate) && !this.state.startDate.isSame(moment(), 'day');
         const datePicker = (<DatePicker
-            customInput={
-                <CalendarButtonWrapper
-                    active={isStartDateToday}
-                    value={moment(this.state.startDate).format('YYYY-MM-DD')}
-                />
-            }
+            customInput={<CalendarButtonWrapper active={isStartDateToday}/>}
+            dateFormat="yyyy-MM-dd"
             todayButton={gettext('Today')}
             selected={this.state.startDate}
             onChange={this.handleChange}
