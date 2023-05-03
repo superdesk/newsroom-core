@@ -97,12 +97,11 @@ class CompaniesService(newsroom.Service):
             for user in user_service.get(req=None, lookup={"company": original[config.ID_FIELD]}):
                 user_updates = {
                     "sections": {
-                        section: enabled and section in updated_section_names
-                        for section, enabled in (updates.get("sections") or original.get("sections") or {}).items()
+                        section: (user.get("sections") or {}).get(section, False) for section in updated_section_names
                     },
                     "products": [
                         product
-                        for product in updates.get("products") or original.get("products") or []
+                        for product in user.get("products") or []
                         if product.get("section") in updated_section_names and product.get("_id") in updated_product_ids
                     ],
                 }
