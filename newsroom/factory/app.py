@@ -243,6 +243,10 @@ class BaseNewsroomApp(eve.Eve):
         if settings.get("mongo_indexes__init") and not settings.get("mongo_indexes"):
             settings["mongo_indexes"] = settings["mongo_indexes__init"]
         super().register_resource(resource, settings)
+        if settings.get("regex_url"):  # fix hateoas
+            self.config["DOMAIN"][resource]["url"] = settings["regex_url"]
+        elif "<regex(" in settings.get("url"):
+            self.logger.warning("Consider adding regex_url config to resource %s to fix HATEOAS", resource)
 
     def setup_sentry(self):
         if self.config.get("SENTRY_DSN"):
