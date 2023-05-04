@@ -9,10 +9,11 @@
     @include button-size($input-btn-padding-y, $input-btn-padding-x, $font-size-button, $btn-border-radius);
     line-height: 1.2;
     transition: padding .2s ease-out;
-
-    @include lg {
-      line-height: 1.7;
-    }
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding-block-start: 0;
+    padding-block-end: 0;
     
     &.disabled,
     &:disabled {
