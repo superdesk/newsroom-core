@@ -28,7 +28,7 @@ def init_app(app):
     )
     app.sidenav("Monitoring", "monitoring.index", "monitoring", section="monitoring")
     app.sidenav(
-        lazy_gettext("Saved/Watched Items"),
+        lazy_gettext("Saved / Watched Items"),
         "monitoring.bookmarks",
         "bookmark",
         group=1,

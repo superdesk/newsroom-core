@@ -15,7 +15,7 @@ def init_app(app):
     app.sidenav("FactCheck", "factcheck.index", "fact-check", section="factcheck")
 
     app.sidenav(
-        lazy_gettext("Saved/Watched Items"),
+        lazy_gettext("Saved / Watched Items"),
         "factcheck.bookmarks",
         "bookmark",
         group=1,
