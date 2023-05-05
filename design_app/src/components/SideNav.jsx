@@ -28,10 +28,10 @@ function SideNav() {
                 </li>    
                 <li className="sidenav-icons__item d-none d-sm-block"><span aria-hidden="true"><i className="icon--more icon--rotate-90 icon--mid-blue"></i></span></li>
                 <li className="sidenav-icons__item badge--top-right">
-                    <a href="/bookmarks_wire" title="" data-toggle="tooltip" data-placement="right" aria-label="Saved/Watched Items" role="button" data-original-title="Saved/Watched Items">
+                    <a href="/bookmarks_wire" title="" data-toggle="tooltip" data-placement="right" aria-label="Saved / Watched Items" role="button" data-original-title="Saved / Watched Items">
                     <div id="saved-items-count" className="badge rounded-pill bg-info">2</div>
                     <i className="icon--bookmark"></i>
-                    <div className="sidenav-icons__item-title">Saved/Watched Items</div>
+                    <div className="sidenav-icons__item-title">Saved / Watched Items</div>
                     </a>
                 </li>
                 <li className="sidenav-icons__item sidenav-icons__item--report">
