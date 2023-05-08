@@ -8,5 +8,5 @@ npm run start-client-server &
 sleep 2
 
 cd server
-honcho start &
+honcho start -p 5050 &
 cd ../../
