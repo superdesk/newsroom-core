@@ -169,6 +169,13 @@ class UsersService(newsroom.Service):
         if updates.get("company") and updates["company"] != original.get("company"):
             self._on_company_change(updates, original)
 
+        if updates.get("sections"):
+            updates["products"] = [
+                product
+                for product in updates.get("products") or original.get("products") or []
+                if updates["sections"].get(product.get("section")) is True
+            ]
+
         app.cache.delete(str(original.get("_id")))
         app.cache.delete(original.get("email"))
 
