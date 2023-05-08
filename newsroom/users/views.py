@@ -17,6 +17,7 @@ from newsroom.auth.utils import (
     is_current_user_account_mgr,
     is_current_user_company_admin,
 )
+from newsroom.settings import get_setting
 from newsroom.decorator import admin_only, login_required, account_manager_or_company_admin_only
 from newsroom.companies import (
     get_user_company_name,
@@ -27,7 +28,11 @@ from newsroom.notifications import push_user_notification, push_company_notifica
 from newsroom.topics import get_user_topics
 from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
-from newsroom.users.users import COMPANY_ADMIN_ALLOWED_UPDATES, USER_PROFILE_UPDATES
+from newsroom.users.users import (
+    COMPANY_ADMIN_ALLOWED_UPDATES,
+    COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES,
+    USER_PROFILE_UPDATES,
+)
 from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary
 from newsroom.monitoring.views import get_monitoring_for_company
 
@@ -201,8 +206,17 @@ def edit(_id):
             if not user_is_admin and updates.get("user_type", "") != user.get("user_type", ""):
                 flask.abort(401)
 
-            if user_is_non_admin or user_is_company_admin:
-                allowed_fields = USER_PROFILE_UPDATES if user_is_non_admin else COMPANY_ADMIN_ALLOWED_UPDATES
+            allowed_fields = None
+            if user_is_non_admin:
+                allowed_fields = USER_PROFILE_UPDATES
+            elif user_is_company_admin:
+                allowed_fields = (
+                    COMPANY_ADMIN_ALLOWED_UPDATES
+                    if not get_setting("allow_companies_to_manage_products")
+                    else COMPANY_ADMIN_ALLOWED_UPDATES.union(COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES)
+                )
+
+            if allowed_fields is not None:
                 for field in list(updates.keys()):
                     if field not in allowed_fields:
                         updates.pop(field, None)

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function InputWrapper({error, name, label, children}) {
+function InputWrapper({error, name, label, children, testId}) {
     let wrapperClass = 'form-group';
 
     if (error && error.length > 0) {
@@ -12,7 +12,7 @@ function InputWrapper({error, name, label, children}) {
         name = `input-${label}`;
     }
 
-    return (<div className={wrapperClass}>{children}</div>);
+    return (<div className={wrapperClass} data-test-id={testId}>{children}</div>);
 }
 
 InputWrapper.propTypes = {
@@ -20,6 +20,7 @@ InputWrapper.propTypes = {
     name: PropTypes.string,
     children: PropTypes.node,
     label: PropTypes.string,
+    testId: PropTypes.string,
 };
 
 export default InputWrapper;

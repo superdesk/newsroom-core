@@ -77,6 +77,7 @@
                         role="button"
                         data-bs-toggle="tooltip"
                         data-bs-placement="right"
+                        data-test-id="sidenav-link-company_admin"
                     >
                         <i class="icon--cog"></i>
                         <div class="sidenav-icons__item-title">{{ gettext('Company Admin') }}</div>
@@ -86,7 +87,15 @@
 
                 {% if is_admin_or_account_manager() %}
                 <li class="sidenav-icons__item sidenav-icons__item--report {% if request.endpoint == 'reports.company_reports' %}active{% endif %}">
-                  <a href="{{ url_for('reports.company_reports') }}" title="{{ gettext('Reports') }}" aria-label="{{ gettext('Reports') }}" role="button" data-bs-toggle="tooltip" data-bs-placement="right">
+                  <a
+                      href="{{ url_for('reports.company_reports') }}"
+                      title="{{ gettext('Reports') }}"
+                      aria-label="{{ gettext('Reports') }}"
+                      role="button"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="right"
+                      data-test-id="sidenav-link-reports"
+                  >
                       <i class="icon--report"></i>
                       <div class="sidenav-icons__item-title">{{ gettext('Reports') }}</div>
                   </a>
@@ -94,7 +103,15 @@
                 {% endif %}
                 {% for app in settings_apps|sort(attribute='weight') %}{% if loop.first and is_admin() %}
                 <li class="sidenav-icons__item sidenav-icons__item--admin {% if request.blueprint == 'settings' %}active{% endif %}">
-                  <a href="{{ url_for('settings.app', app_id=app._id) }}" title="{{ gettext('Settings') }}" aria-label="{{ gettext('Settings') }}" role="button" data-bs-toggle="tooltip" data-bs-placement="right">
+                  <a
+                      href="{{ url_for('settings.app', app_id=app._id) }}"
+                      title="{{ gettext('Settings') }}"
+                      aria-label="{{ gettext('Settings') }}"
+                      role="button"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="right"
+                      data-test-id="sidenav-link-settings"
+                  >
                       <i class="icon--cog"></i>
                       <div class="sidenav-icons__item-title">{{ gettext('Settings') }}</div>
                   </a>
