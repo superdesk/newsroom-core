@@ -1,0 +1,23 @@
+{
+  "name": "newsroom-core-e2e",
+  "license": "GPLv3",
+  "dependencies": {
+    "newsroom-core": "file:../"
+  },
+  "devDependencies": {
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "webpack": "3.11.0",
+    "webpack-dev-server": "2.11.1",
+    "cypress": "^12.0.2",
+    "http-server": "^14.1.1"
+  },
+  "scripts": {
+    "cypress-ui": "cypress open",
+    "cypress-ci": "cypress run",
+    "build": "export NODE_ENV=production && webpack --progress --profile --colors",
+    "start": "webpack-dev-server --progress --colors --content-base dist --host 0.0.0.0",
+    "start-client-server": "http-server dist -p 8080 -s"
+  }
+}

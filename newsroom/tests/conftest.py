@@ -1,12 +1,10 @@
 import os
-import pymongo
-
 from flask import Config
 from pathlib import Path
 from pytest import fixture
 
 from newsroom.web.factory import get_app
-
+from .db import reset_elastic, drop_mongo
 
 root = (Path(__file__).parent / "..").resolve()
 
@@ -38,19 +36,6 @@ def get_mongo_uri(key, dbname):
     env_uri = os.environ.get(key, "mongodb://localhost/test")
     env_host = env_uri.rsplit("/", 1)[0]
     return "/".join([env_host, dbname])
-
-
-def reset_elastic(app):
-    indices = "%s*" % app.config["CONTENTAPI_ELASTICSEARCH_INDEX"]
-    es = app.data.elastic.es
-    es.indices.delete(indices, ignore=[404])
-    with app.app_context():
-        app.data.init_elastic(app)
-
-
-def drop_mongo(config: Config):
-    client = pymongo.MongoClient(config["CONTENTAPI_MONGO_URI"])
-    client.drop_database(config["CONTENTAPI_MONGO_DBNAME"])
 
 
 @fixture
