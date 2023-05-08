@@ -1,5 +1,7 @@
 # Newshub Changelog
 
+- test e2e
+
 ## [2.0.2] 2022-01-20
 ### Features
 - [NHUB-84] setup sentry in app factory (#60)
