@@ -1,0 +1,45 @@
+name: "E2E"
+
+on: [push, pull_request]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.8']
+        node-version: ['14']
+      env:
+        E2E: true
+        TZ: Australia/Sydney
+      steps:
+        - uses: actions/checkout@v3
+        - uses: actions/setup-node@v3
+          with:
+            node-version: ${{ matrix.node-version }}
+        - uses: actions/setup-python@v4
+          with:
+            python-version: ${{ matrix.python-version }}
+            cache: 'pip'
+        - name: Install node_modules
+          run: npm install
+        - name: Install python modules
+          run: pip install -e .
+        - name: Install CypressIO
+          run: cd e2e && npm install
+        - name: Build Client
+          run: cd e2e && npm run build
+        - name: Start Services
+          run: ./scripts/ci-start-services.sh
+        - name: E2E
+          working-directory: ./e2e
+          run: npm run cypress-ci
+          env:
+            CYPRESS_SCREENSHOTS_FOLDER: /tmp/cypress
+        - name: Upload screenshots
+          if: ${{ failure() }}
+          uses: actions/upload-artifact@v2
+          with:
+            name: screenshots-e2e
+            path: /tmp/cypress/**/*.png

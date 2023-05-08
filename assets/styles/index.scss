@@ -369,9 +369,11 @@ body.print {
             color: white;
             font-size: 10px;
             font-weight: 700;
-            line-height: 10px;
+            line-height: 1;
             letter-spacing: 0.3px;
             text-transform: uppercase;
+            overflow-wrap: break-word;
+            width: 56px;
             word-break: break-all;
         }
         &.active {

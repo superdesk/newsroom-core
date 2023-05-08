@@ -53,7 +53,7 @@ def init_app(app: BaseNewsroomApp):
     app.sidenav("Wire", "wire.wire", "text", section="wire")
 
     app.sidenav(
-        lazy_gettext("Saved/Watched Items"),
+        lazy_gettext("Saved / Watched Items"),
         "wire.bookmarks",
         "bookmark",
         group=1,

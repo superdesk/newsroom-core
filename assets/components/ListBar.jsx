@@ -7,7 +7,7 @@ import SearchBar from 'search/components/SearchBar';
 class ListBar extends React.Component {
     render() {
         return (
-            <section className="content-header">
+            <section className="content-header" data-test-id={this.props.testId}>
                 <nav className={classNames(
                     'content-bar navbar',
                     {
@@ -48,6 +48,7 @@ ListBar.propTypes = {
     noSearch: PropTypes.bool,
     noLeftPadding: PropTypes.bool,
     enableQueryAction: PropTypes.bool,
+    testId: PropTypes.string,
 };
 
 ListBar.defaultProps = {enableQueryAction: true};
