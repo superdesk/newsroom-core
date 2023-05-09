@@ -21,6 +21,8 @@ jobs:
           cache: 'pip'
       - name: Install node_modules
         run: npm install
+      - name: Upgrade python tools
+        run: pip install --upgrade pip wheel setuptools
       - name: Install python modules
         run: pip install -e .
       - name: Install CypressIO
