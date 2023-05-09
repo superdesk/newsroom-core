@@ -20,14 +20,31 @@ def init(app):
 
 @pytest.fixture
 def product(app):
-    product = {"name": "test", "query": "headline:somethingthatdoesnotexist", "is_enabled": True}
+    product = {
+        "name": "test",
+        "query": "headline:somethingthatdoesnotexist",
+        "is_enabled": True,
+        "product_type": "wire",
+    }
     app.data.insert("products", [product])
     return product
 
 
 @pytest.fixture
-def manager(app, client):
+def manager(app, client, product):
+    company = COMPANIES[1].copy()
+    company["name"] = "Example co."
+    company["products"] = [
+        {
+            "_id": product["_id"],
+            "section": product["product_type"],
+        }
+    ]
+    company.pop("_id")
+    app.data.insert("companies", [company])
+
     manager = USERS[1].copy()
+    manager["company"] = company["_id"]
     manager["email"] = "manager@example.com"
     manager["user_type"] = UserRole.COMPANY_ADMIN.value
     manager.pop("_id")

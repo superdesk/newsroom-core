@@ -24,7 +24,7 @@ from flask import (
     url_for,
 )
 from flask_babel import _
-from newsroom.users import UserData
+from newsroom.types import UserData
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from newsroom.auth.utils import sign_user_by_email
 
