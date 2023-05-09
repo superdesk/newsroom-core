@@ -66,7 +66,6 @@ def test_user_products(app, client, manager, product):
         f"/api/_users/{manager['_id']}",
         {
             "products": [{"section": "wire", "_id": product["_id"]}],
-            # "products": [{"section": "wire", "_id": product["_id"]}],
         },
     )
 

@@ -201,9 +201,6 @@ class UsersService(newsroom.Service):
             # Company, Sections or Products have changed, recalculate the list of products
             updates["products"] = get_updated_products(updates, original, company)
 
-        # updates["sections"] = get_updated_sections(updates, original, company)
-        # updates["products"] = get_updated_products(updates, original, company)
-
         app.cache.delete(str(original.get("_id")))
         app.cache.delete(original.get("email"))
 
