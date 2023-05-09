@@ -7,22 +7,22 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Newsroom-Core 2.4.0.dev0\n"
+"Project-Id-Version: Newsroom-Core 2.5.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-03-23 18:10+1100\n"
+"POT-Creation-Date: 2023-05-05 13:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.11.0\n"
+"Generated-By: Babel 2.12.1\n"
 
-#: newsroom/email.py:406
+#: newsroom/email.py:414
 msgid "Kill/Takedown notice"
 msgstr ""
 
-#: newsroom/email.py:415
+#: newsroom/email.py:423
 msgid "Agenda cancelled notice"
 msgstr ""
 
@@ -47,15 +47,15 @@ msgstr ""
 msgid "Page limit exceeded"
 msgstr ""
 
-#: newsroom/search.py:512
+#: newsroom/search.py:518
 msgid "User does not belong to a company."
 msgstr ""
 
-#: newsroom/search.py:514
+#: newsroom/search.py:520
 msgid "Your company doesn't have any products defined."
 msgstr ""
 
-#: newsroom/monitoring/search.py:67 newsroom/search.py:519
+#: newsroom/monitoring/search.py:67 newsroom/search.py:525
 msgid "Invalid product parameter"
 msgstr ""
 
@@ -117,6 +117,16 @@ msgid ""
 "requests."
 msgstr ""
 
+#: newsroom/settings.py:152
+msgid "Allow companies to manage their own user product permissions"
+msgstr ""
+
+#: newsroom/settings.py:153
+msgid ""
+"Allow Company Admins to change section and product permissions for their "
+"users"
+msgstr ""
+
 #: assets/missing-translations.js:3 newsroom/agenda/utils.py:41
 #: newsroom/utils.py:198
 msgid "ALL DAY"
@@ -154,7 +164,7 @@ msgstr ""
 #: newsroom/media_releases/__init__.py:23 newsroom/monitoring/__init__.py:31
 #: newsroom/templates/bookmark_layout.html:3
 #: newsroom/templates/bookmark_layout.html:6 newsroom/wire/__init__.py:56
-msgid "Saved/Watched Items"
+msgid "Saved / Watched Items"
 msgstr ""
 
 #: newsroom/agenda/__init__.py:48
@@ -316,7 +326,7 @@ msgstr ""
 
 #: assets/company-admin/components/CompanyUsers.jsx:20
 #: assets/user-profile/components/profile/UserProfile.jsx:82
-#: assets/users/components/EditUser.jsx:100
+#: assets/users/components/EditUser.jsx:119
 #: assets/users/components/UsersList.jsx:24 newsroom/auth/forms.py:35
 #: newsroom/auth/forms.py:41 newsroom/users/forms.py:44
 msgid "Email"
@@ -357,7 +367,8 @@ msgid "Email not found"
 msgstr ""
 
 #: newsroom/auth/oauth.py:70 newsroom/auth/utils.py:43
-#: newsroom/users/views.py:160 newsroom/users/views.py:236
+#: newsroom/users/views.py:145 newsroom/users/views.py:184
+#: newsroom/users/views.py:244 newsroom/users/views.py:279
 msgid "User not found"
 msgstr ""
 
@@ -548,7 +559,8 @@ msgstr ""
 #: assets/company-reports/components/UserSavedSearches.jsx:21
 #: assets/monitoring/components/EditMonitoringProfile.jsx:139
 #: assets/monitoring/components/MonitoringList.jsx:27
-#: assets/users/components/EditUser.jsx:136
+#: assets/users/components/EditUser.jsx:155
+#: assets/users/components/EditUser.jsx:161
 #: assets/users/components/UsersList.jsx:29 newsroom/monitoring/forms.py:26
 #: newsroom/reports/reports.py:172 newsroom/users/forms.py:49
 msgid "Company"
@@ -566,7 +578,7 @@ msgstr ""
 #: assets/search/components/MonitoringEditor.jsx:195
 #: assets/section-filters/components/EditSectionFilter.jsx:78
 #: assets/section-filters/components/SectionFilterListItem.jsx:12
-#: assets/users/components/EditUser.jsx:215
+#: assets/users/components/EditUser.jsx:235
 #: assets/users/components/UserListItem.jsx:23 newsroom/monitoring/forms.py:27
 msgid "Enabled"
 msgstr ""
@@ -625,7 +637,7 @@ msgstr ""
 #: assets/company-admin/components/CompanyDetails.jsx:21
 #: assets/company-reports/components/Company.jsx:24
 #: assets/navigations/components/EditNavigation.jsx:23
-#: assets/users/components/EditUser.jsx:171 newsroom/products/__init__.py:14
+#: assets/users/components/EditUser.jsx:196 newsroom/products/__init__.py:14
 #: newsroom/users/forms.py:61
 msgid "Products"
 msgstr ""
@@ -915,7 +927,7 @@ msgid "click here to register."
 msgstr ""
 
 #: assets/user-profile/components/profile/UserProfile.jsx:136
-#: assets/users/components/EditUser.jsx:146 newsroom/templates/login.html:35
+#: assets/users/components/EditUser.jsx:171 newsroom/templates/login.html:35
 msgid "Language"
 msgstr ""
 
@@ -962,7 +974,7 @@ msgstr ""
 msgid "Validate"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:249
+#: assets/users/components/EditUser.jsx:269
 #: newsroom/templates/request_token.html:29
 msgid "Reset Password"
 msgstr ""
@@ -1043,7 +1055,7 @@ msgstr ""
 #: assets/ui/components/ContentBar.jsx:8 assets/ui/components/Preview.jsx:16
 #: assets/user-profile/components/UserProfileApp.jsx:99
 #: assets/user-profile/components/UserProfileApp.jsx:119
-#: assets/users/components/EditUser.jsx:57 newsroom/templates/wire_item.html:11
+#: assets/users/components/EditUser.jsx:60 newsroom/templates/wire_item.html:11
 msgid "Close"
 msgstr ""
 
@@ -1124,14 +1136,14 @@ msgid "Account Management"
 msgstr ""
 
 #: assets/user-profile/components/profile/UserProfile.jsx:64
-#: assets/users/components/EditUser.jsx:86
+#: assets/users/components/EditUser.jsx:105
 #: assets/users/components/filters/UserListSortFilter.jsx:20
 #: newsroom/users/forms.py:42
 msgid "First Name"
 msgstr ""
 
 #: assets/user-profile/components/profile/UserProfile.jsx:73
-#: assets/users/components/EditUser.jsx:93
+#: assets/users/components/EditUser.jsx:112
 #: assets/users/components/filters/UserListSortFilter.jsx:23
 #: newsroom/users/forms.py:43
 msgid "Last Name"
@@ -1144,18 +1156,18 @@ msgid "Telephone"
 msgstr ""
 
 #: assets/user-profile/components/profile/UserProfile.jsx:100
-#: assets/users/components/EditUser.jsx:114
+#: assets/users/components/EditUser.jsx:133
 #: assets/users/components/UsersList.jsx:26 newsroom/users/forms.py:46
 msgid "Mobile"
 msgstr ""
 
 #: assets/user-profile/components/profile/UserProfile.jsx:109
-#: assets/users/components/EditUser.jsx:121
+#: assets/users/components/EditUser.jsx:140
 #: assets/users/components/UsersList.jsx:27 newsroom/users/forms.py:47
 msgid "Role"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:127
+#: assets/users/components/EditUser.jsx:146
 #: assets/users/components/UsersList.jsx:28
 #: assets/users/components/filters/UserListSortFilter.jsx:32
 #: newsroom/users/forms.py:48
@@ -1178,7 +1190,7 @@ msgstr ""
 msgid "Account Approved"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:225 newsroom/users/forms.py:54
+#: assets/users/components/EditUser.jsx:245 newsroom/users/forms.py:54
 msgid "Company Expiry Alert"
 msgstr ""
 
@@ -1194,28 +1206,32 @@ msgstr ""
 msgid "Locale"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:235 newsroom/users/forms.py:58
+#: assets/users/components/EditUser.jsx:255 newsroom/users/forms.py:58
 msgid "Manage Company Topics"
 msgstr ""
 
 #: assets/companies/components/CompanyPermissions.jsx:55
-#: assets/users/components/EditUser.jsx:156 newsroom/users/forms.py:60
+#: assets/users/components/EditUser.jsx:181 newsroom/users/forms.py:60
 msgid "Sections"
 msgstr ""
 
-#: newsroom/users/users.py:190
+#: newsroom/users/users.py:221
 msgid "Can not delete current user"
 msgstr ""
 
-#: newsroom/users/views.py:105 newsroom/users/views.py:167
+#: newsroom/users/views.py:105 newsroom/users/views.py:191
 msgid "Email address is already in use"
 msgstr ""
 
-#: newsroom/users/views.py:122 newsroom/users/views.py:172
+#: newsroom/users/views.py:122 newsroom/users/views.py:196
 msgid "Company is required for non administrators"
 msgstr ""
 
-#: newsroom/users/views.py:231
+#: newsroom/users/views.py:147
+msgid "User is already validated"
+msgstr ""
+
+#: newsroom/users/views.py:274
 msgid "User id not provided"
 msgstr ""
 
@@ -1300,7 +1316,7 @@ msgstr ""
 #: assets/companies/components/EditCompanyDetails.jsx:125
 #: assets/components/CardEditor.jsx:64 assets/components/EditPanel.jsx:140
 #: assets/components/Modal.jsx:167
-#: assets/general-settings/components/GeneralSettingsApp.jsx:83
+#: assets/general-settings/components/GeneralSettingsApp.jsx:110
 #: assets/item-actions.js:58
 #: assets/monitoring/components/EditMonitoringProfile.jsx:205
 #: assets/monitoring/components/MonitoringSchedule.jsx:196
@@ -1311,7 +1327,7 @@ msgstr ""
 #: assets/search/components/TopicEditor.jsx:321
 #: assets/search/components/TopicEditor.jsx:324
 #: assets/section-filters/components/EditSectionFilter.jsx:87
-#: assets/users/components/EditUser.jsx:256
+#: assets/users/components/EditUser.jsx:277
 msgid "Save"
 msgstr ""
 
@@ -1407,7 +1423,7 @@ msgstr ""
 #: assets/agenda/components/AgendaDateButtons.jsx:15
 #: assets/agenda/components/AgendaList.jsx:210
 #: assets/company-reports/components/ProductStories.jsx:26
-#: assets/components/CalendarButton.jsx:33
+#: assets/components/CalendarButton.jsx:31
 #: assets/components/ExpiryDateInput.jsx:89 assets/utils.js:855
 #: assets/wire/components/filters/NavCreatedPicker.jsx:9
 msgid "Today"
@@ -2033,7 +2049,7 @@ msgstr ""
 #: assets/section-filters/components/EditSectionFilter.jsx:18
 #: assets/ui/components/Content.jsx:7 assets/ui/components/Preview.jsx:8
 #: assets/user-profile/components/UserProfileApp.jsx:96
-#: assets/users/components/EditUser.jsx:49
+#: assets/users/components/EditUser.jsx:52
 msgid "dialog"
 msgstr ""
 
@@ -2050,7 +2066,7 @@ msgstr ""
 #: assets/products/components/EditProduct.jsx:186
 #: assets/search/components/FollowedTopics.jsx:60
 #: assets/section-filters/components/EditSectionFilter.jsx:92
-#: assets/users/components/EditUser.jsx:262
+#: assets/users/components/EditUser.jsx:283
 msgid "Delete"
 msgstr ""
 
@@ -2114,7 +2130,7 @@ msgid "Disabled"
 msgstr ""
 
 #: assets/companies/components/CompanyPermissions.jsx:21
-#: assets/users/components/EditUser.jsx:82
+#: assets/users/components/EditUser.jsx:101
 msgid "General"
 msgstr ""
 
@@ -2135,7 +2151,7 @@ msgid "Seats:"
 msgstr ""
 
 #: assets/companies/components/EditCompany.jsx:77
-#: assets/company-admin/components/CompanyAdminApp.jsx:135
+#: assets/company-admin/components/CompanyAdminApp.jsx:148
 #: assets/company-admin/components/CompanyDetails.jsx:22
 #: assets/monitoring/components/EditMonitoringProfile.jsx:27
 #: assets/search/components/MonitoringEditor.jsx:31
@@ -2200,29 +2216,29 @@ msgstr ""
 msgid "Product Seat request sent"
 msgstr ""
 
-#: assets/company-admin/components/CompanyAdminApp.jsx:50
-#: assets/users/components/Users.jsx:39
+#: assets/company-admin/components/CompanyAdminApp.jsx:63
+#: assets/users/components/Users.jsx:40
 msgid "Please provide email"
 msgstr ""
 
-#: assets/company-admin/components/CompanyAdminApp.jsx:71
+#: assets/company-admin/components/CompanyAdminApp.jsx:84
 msgid "Would you like to delete user: {{ name }}"
 msgstr ""
 
-#: assets/company-admin/components/CompanyAdminApp.jsx:101
+#: assets/company-admin/components/CompanyAdminApp.jsx:114
 #: assets/users/components/UsersApp.jsx:29
 msgid "New User"
 msgstr ""
 
-#: assets/company-admin/components/CompanyAdminApp.jsx:108
+#: assets/company-admin/components/CompanyAdminApp.jsx:121
 msgid "Open Side Navigation"
 msgstr ""
 
-#: assets/company-admin/components/CompanyAdminApp.jsx:126
+#: assets/company-admin/components/CompanyAdminApp.jsx:139
 msgid "My Company"
 msgstr ""
 
-#: assets/company-admin/components/CompanyAdminApp.jsx:140
+#: assets/company-admin/components/CompanyAdminApp.jsx:153
 msgid "Users : {{total}}"
 msgstr ""
 
@@ -2266,7 +2282,11 @@ msgid "disabled"
 msgstr ""
 
 #: assets/company-admin/components/CompanyUserListItem.jsx:47
-#: assets/users/components/EditUser.jsx:72
+msgid "company admin"
+msgstr ""
+
+#: assets/company-admin/components/CompanyUserListItem.jsx:51
+#: assets/users/components/EditUser.jsx:75
 msgid "admin"
 msgstr ""
 
@@ -3181,8 +3201,7 @@ msgid "Published To"
 msgstr ""
 
 #: assets/search/components/ContentSearchResults.jsx:128
-#: assets/search/components/SearchResults.jsx:18
-msgid "search results for:"
+msgid "search results for: "
 msgstr ""
 
 #: assets/search/components/FollowedTopics.jsx:92
@@ -3238,6 +3257,10 @@ msgstr ""
 
 #: assets/search/components/SearchResults.jsx:15
 msgid "search results found"
+msgstr ""
+
+#: assets/search/components/SearchResults.jsx:18
+msgid "search results for:"
 msgstr ""
 
 #: assets/search/components/SearchResultsInfo.jsx:37
@@ -3449,7 +3472,7 @@ msgstr ""
 msgid "Published on {{ date }} at {{ time }}"
 msgstr ""
 
-#: assets/user-profile/actions.js:107 assets/users/actions.js:131
+#: assets/user-profile/actions.js:107 assets/users/actions.js:136
 msgid "User updated successfully"
 msgstr ""
 
@@ -3494,7 +3517,7 @@ msgid "Please provide last name"
 msgstr ""
 
 #: assets/user-profile/components/profile/UserProfile.jsx:91
-#: assets/users/components/EditUser.jsx:107
+#: assets/users/components/EditUser.jsx:126
 #: assets/users/components/UsersList.jsx:25
 msgid "Phone"
 msgstr ""
@@ -3511,31 +3534,44 @@ msgstr ""
 msgid "Save Changes"
 msgstr ""
 
-#: assets/users/actions.js:133
+#: assets/users/actions.js:138
 msgid "User created successfully"
 msgstr ""
 
-#: assets/users/actions.js:150
+#: assets/users/actions.js:155
 msgid "Reset password token is sent successfully"
 msgstr ""
 
-#: assets/users/actions.js:168
+#: assets/users/actions.js:174
 msgid "User deleted successfully"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:49
+#: assets/users/actions.js:188
+msgid "Invitation as been resent"
+msgstr ""
+
+#: assets/users/components/EditUser.jsx:52
 msgid "Edit User"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:51
+#: assets/users/components/EditUser.jsx:54
 msgid "Add/Edit User"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:200
+#: assets/users/components/EditUser.jsx:83
+#: assets/users/components/EditUser.jsx:92
+msgid "Resend Invite"
+msgstr ""
+
+#: assets/users/components/EditUser.jsx:87
+msgid "Would you like to resend the invitation for {{ email }}?"
+msgstr ""
+
+#: assets/users/components/EditUser.jsx:220
 msgid "User Settings"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:205
+#: assets/users/components/EditUser.jsx:225
 #: assets/users/components/UserListItem.jsx:22
 msgid "Approved"
 msgstr ""
@@ -3544,7 +3580,7 @@ msgstr ""
 msgid "Needs Approval"
 msgstr ""
 
-#: assets/users/components/Users.jsx:60
+#: assets/users/components/Users.jsx:61
 msgid "Would you like to delete user: {{name}}?"
 msgstr ""
 
