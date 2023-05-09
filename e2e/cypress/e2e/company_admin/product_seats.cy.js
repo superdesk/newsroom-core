@@ -20,9 +20,12 @@ describe('CompanyAdmin - Product Seats', function () {
 
         // Switch to the Users page, and make sure we have 2 users there
         CompanyAdminPage.changeSubPage('users');
-        CompanyAdminPage.getUserListItems().should('have.length', 2);
-        CompanyAdminPage.getUserListItems().eq(1).should('contain.text', 'Monkey Mania');
-        CompanyAdminPage.getUserListItems().eq(1).click();
+        CompanyAdminPage
+            .getUserListItems()
+            .should('have.length', 2);
+        CompanyAdminPage
+            .getUserListItem(USERS.foobar.monkey._id)
+            .click();
 
         // Make sure the form has all the appropriate values & permissions
         EditUserForm.openAllToggleBoxes();
@@ -104,19 +107,118 @@ describe('CompanyAdmin - Product Seats', function () {
 
         // Save the user, re-open it, and make sure the form has all the appropriate values & permissions
         EditUserForm.save();
-        EditUserForm.getFormElement().should('not.exist');
-        CompanyAdminPage.getUserListItems().eq(1).should('contain.text', 'Monkey 2');
-        CompanyAdminPage.getUserListItems().eq(1).click();
-        EditUserForm.getFormElement().should('be.visible');
+        EditUserForm
+            .getFormElement()
+            .should('not.exist');
+        CompanyAdminPage
+            .getUserListItem(USERS.foobar.monkey._id)
+            .should('contain.text', 'Monkey 2');
+        CompanyAdminPage
+            .getUserListItem(USERS.foobar.monkey._id)
+            .click();
+        EditUserForm
+            .getFormElement()
+            .should('be.visible');
         EditUserForm.openAllToggleBoxes();
         expectUpdatedUser();
 
         // Reload the page, re-open it, and make sure the form has all the appropriate values & permissions
         cy.reload();
         CompanyAdminPage.changeSubPage('users');
-        CompanyAdminPage.getUserListItems().eq(1).should('contain.text', 'Monkey 2');
-        CompanyAdminPage.getUserListItems().eq(1).click();
+        CompanyAdminPage
+            .getUserListItem(USERS.foobar.monkey._id)
+            .click();
         EditUserForm.openAllToggleBoxes();
         expectUpdatedUser();
+    });
+
+    it('CompanyAdmin can remove all products from a user', () => {
+        // Login and navigate to CompanyAdmin page
+        NewshubLayout.login('foo@bar.com', 'admin');
+        NewshubLayout.getSidebarLink('company_admin').click();
+
+        // Switch to the Users page, and open User 'Monkey Mania' for editing
+        CompanyAdminPage.changeSubPage('users');
+        CompanyAdminPage
+            .getUserListItem(USERS.foobar.monkey._id)
+            .click();
+
+        // Make sure the form has all the appropriate values & permissions
+        EditUserForm.openAllToggleBoxes();
+        EditUserForm.expectProducts({
+            wire: {
+                [PRODUCTS.wire.all._id]: false,
+                [PRODUCTS.wire.sports._id]: true,
+            },
+            agenda: {
+                [PRODUCTS.agenda.sports._id]: true,
+            },
+        });
+
+        // Remove all product permissions for the user
+        EditUserForm.typeProducts({
+            wire: {
+                [PRODUCTS.wire.sports._id]: false,
+            },
+            agenda: {
+                [PRODUCTS.agenda.sports._id]: false,
+            },
+        });
+
+        // Make sure the form has all the appropriate product permissions
+        EditUserForm.expectProducts({
+            wire: {
+                [PRODUCTS.wire.all._id]: false,
+                [PRODUCTS.wire.sports._id]: false,
+            },
+            agenda: {
+                [PRODUCTS.agenda.sports._id]: false,
+            },
+        });
+
+        // Save the user, re-open it, and make sure the form has all the appropriate product permissions
+        EditUserForm.save();
+        EditUserForm
+            .getFormElement()
+            .should('not.exist');
+        CompanyAdminPage
+            .getUserSeats(USERS.foobar.monkey._id, 'wire')
+            .should('contain.text', '0');
+        CompanyAdminPage
+            .getUserSeats(USERS.foobar.monkey._id, 'agenda')
+            .should('contain.text', '0');
+        CompanyAdminPage
+            .getUserListItem(USERS.foobar.monkey._id)
+            .click();
+        EditUserForm
+            .getFormElement()
+            .should('be.visible');
+        EditUserForm.openAllToggleBoxes();
+        EditUserForm.expectProducts({
+            wire: {
+                [PRODUCTS.wire.all._id]: false,
+                [PRODUCTS.wire.sports._id]: false,
+            },
+            agenda: {
+                [PRODUCTS.agenda.sports._id]: false,
+            },
+        });
+
+        // Reload the page, re-open it, and make sure the form has all the appropriate product permissions
+        cy.reload();
+        CompanyAdminPage.changeSubPage('users');
+        CompanyAdminPage
+            .getUserListItem(USERS.foobar.monkey._id)
+            .click();
+        EditUserForm.openAllToggleBoxes();
+        EditUserForm.expectProducts({
+            wire: {
+                [PRODUCTS.wire.all._id]: false,
+                [PRODUCTS.wire.sports._id]: false,
+            },
+            agenda: {
+                [PRODUCTS.agenda.sports._id]: false,
+            },
+        });
     });
 });

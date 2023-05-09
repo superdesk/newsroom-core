@@ -35,6 +35,7 @@ export function CompanyUserListItem({user, onClick, selected, sections}) {
 
     return (
         <tr
+            data-test-id={`user-list-item--${user._id}`}
             onClick={onClick}
             className={!selected ? undefined : 'table--selected'}
             tabIndex="0"
@@ -62,7 +63,7 @@ export function CompanyUserListItem({user, onClick, selected, sections}) {
             </td>
 
             {sections.map((section) => (
-                <td key={section._id}>
+                <td key={section._id} data-test-id={`user-seats--${section._id}`}>
                     <span className={classNames(
                         'badge rounded-pill bg-secondary text-dark',
                         {'badge--disabled': !productNumbers[section._id]}

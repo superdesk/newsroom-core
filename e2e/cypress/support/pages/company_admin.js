@@ -27,6 +27,14 @@ class CompanyAdminPageWrapper {
     getUserListItems() {
         return this.getUserList('> tbody > tr');
     }
+
+    getUserListItem(userId) {
+        return this.getUserList(`[data-test-id="user-list-item--${userId}"]`);
+    }
+
+    getUserSeats(userId, section) {
+        return this.getUserList(`[data-test-id="user-list-item--${userId}"] [data-test-id="user-seats--${section}"]`);
+    }
 }
 
 export const CompanyAdminPage = new CompanyAdminPageWrapper();
