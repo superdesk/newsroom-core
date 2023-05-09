@@ -193,7 +193,7 @@ class UsersService(newsroom.Service):
         company = get_company_from_user({"company": updates.get("company") or original.get("company")})
         company_changed = updates.get("company") and updates["company"] != original.get("company")
 
-        if company_changed or "sections" in updates:
+        if company_changed or "sections" in updates or "products" in updates:
             # Company or Sections have changed, recalculate the list of sections
             updates["sections"] = get_updated_sections(updates, original, company)
 
