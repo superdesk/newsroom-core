@@ -31,7 +31,7 @@ export class UserListSortFilter extends React.PureComponent {
             _id: 'user_type',
             name: gettext('User Type'),
         }, {
-            _id: 'is_enabled',
+            _id: 'is_validated',
             name: gettext('User Status'),
         }];
 
