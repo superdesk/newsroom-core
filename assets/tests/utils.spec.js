@@ -1,12 +1,13 @@
 import * as utils from 'utils';
+import {gettext as testgettext} from 'utils';
 
 describe('gettext', () => {
     it('can translate text', () => {
-        expect(utils.gettext('foo')).toBe('foo');
+        expect(testgettext('foo')).toBe('foo');
     });
 
     it('can use params', () => {
-        expect(utils.gettext('hello {{ name }}', {name: 'john'})).toBe('hello john');
+        expect(testgettext('hello {{ name }}', {name: 'john'})).toBe('hello john');
     });
 });
 
