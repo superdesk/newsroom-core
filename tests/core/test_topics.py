@@ -1,5 +1,6 @@
 from flask import json
 from unittest import mock
+from pytest import fixture
 
 from newsroom.topics.views import get_topic_url
 from ..fixtures import (  # noqa: F401
@@ -7,6 +8,7 @@ from ..fixtures import (  # noqa: F401
     init_company,
     PUBLIC_USER_ID,
     TEST_USER_ID,
+    COMPANY_1_ID,
 )
 from ..utils import mock_send_email
 
@@ -29,6 +31,19 @@ agenda_topic = {
 user_id = str(PUBLIC_USER_ID)
 test_user_id = str(TEST_USER_ID)
 topics_url = "users/%s/topics" % user_id
+
+user_topic_folders_url = "/api/users/{}/topic_folders".format(TEST_USER_ID)
+company_topic_folders_url = "/api/companies/{}/topic_folders".format(COMPANY_1_ID)
+
+
+@fixture
+def auth_client(client):
+    with client as cli:
+        with client.session_transaction() as session:
+            session["user"] = PUBLIC_USER_ID
+            session["name"] = PUBLIC_USER_NAME
+            session["company"] = COMPANY_1_ID
+        yield cli
 
 
 def test_topics_no_session(client, anonymous_user):
@@ -204,3 +219,96 @@ def test_get_topic_share_url(app):
         "&navigation=%5B%22123%22%5D"
         "&created=%7B%22from%22%3A+%222018-06-01%22%7D"
     )
+
+
+def self_href(doc):
+    return "api/{}".format(doc["_links"]["self"]["href"])
+
+
+def if_match(doc):
+    return {"if-match": doc["_etag"]}
+
+
+def test_topic_folders_crud(auth_client):
+    urls = (user_topic_folders_url, company_topic_folders_url)
+    for folders_url in urls:
+        folder = {"name": "test", "section": "wire"}
+
+        resp = auth_client.get(folders_url)
+        assert 200 == resp.status_code
+        assert 0 == len(resp.json["_items"])
+
+        resp = auth_client.post(folders_url, json=folder)
+        assert 201 == resp.status_code, resp.data.decode()
+        parent_folder = resp.json
+        assert "_id" in parent_folder
+
+        resp = auth_client.get(folders_url)
+        assert 200 == resp.status_code
+        assert 1 == len(resp.json["_items"])
+
+        folder["name"] = "test"
+        folder["parent"] = parent_folder["_id"]
+        resp = auth_client.post(folders_url, json=folder)
+        assert 201 == resp.status_code, resp.data.decode()
+        child_folder = resp.json
+
+        topic = {
+            "label": "Test",
+            "query": "test",
+            "topic_type": "wire",
+            "folder": child_folder["_id"],
+        }
+
+        resp = auth_client.post(topics_url, json=topic)
+        assert 201 == resp.status_code, resp.data.decode()
+
+        resp = auth_client.patch(self_href(parent_folder), json={"name": "bar"}, headers=if_match(parent_folder))
+        assert 200 == resp.status_code
+
+        parent_folder.update(resp.json)
+
+        resp = auth_client.get(self_href(parent_folder))
+        assert 200 == resp.status_code
+
+        resp = auth_client.delete(self_href(parent_folder), headers=if_match(parent_folder))
+        assert 204 == resp.status_code
+
+        # deleting parent will delete children
+        resp = auth_client.get(folders_url)
+        assert 200 == resp.status_code
+        assert 0 == len(resp.json["_items"]), "child folders should be deleted"
+
+        # deleting folders will delete topics
+        resp = auth_client.get(topics_url)
+        assert 200 == resp.status_code
+        assert 0 == len(resp.json["_items"]), "topics in folders should be deleted"
+
+
+def test_topic_folders_unique_validation(auth_client):
+    folder = {"name": "test", "section": "wire"}
+
+    # create user topic
+    resp = auth_client.post(user_topic_folders_url, json=folder)
+    assert 201 == resp.status_code, resp.data.decode()
+
+    # second one fails
+    resp = auth_client.post(user_topic_folders_url, json=folder)
+    assert 409 == resp.status_code, resp.data.decode()
+
+    # create company topic with same name
+    resp = auth_client.post(company_topic_folders_url, json=folder)
+    assert 201 == resp.status_code, resp.data.decode()
+
+    # second fails
+    resp = auth_client.post(company_topic_folders_url, json=folder)
+    assert 409 == resp.status_code, resp.data.decode()
+
+    # check is case insensitive
+    folder["name"] = "Test"
+    resp = auth_client.post(user_topic_folders_url, json=folder)
+    assert 409 == resp.status_code, resp.data.decode()
+
+    # for both
+    resp = auth_client.post(company_topic_folders_url, json=folder)
+    assert 409 == resp.status_code, resp.data.decode()

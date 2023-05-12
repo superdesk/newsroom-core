@@ -1,0 +1,271 @@
+openapi: 3.0.2
+
+info:
+  title: Internal API documentation
+  version: 2.5.0
+
+paths:
+  /users/{userId}/topic_folders:
+    parameters:
+      - $ref: '#/components/parameters/userId'
+    
+    get:
+      summary: Get user topic folders.
+      tags:
+        - User Topic Folders
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserTopicsFolder'
+    
+    post:
+      summary: Create new user topic folder.
+      tags:
+        - User Topic Folders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TopicFolder"
+      responses:
+        "201":
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Entity'
+                  - $ref: '#/components/schemas/TopicFolder'
+
+  /users/{userId}/topic_folders/{folderId}:
+    parameters:
+      - $ref: '#/components/parameters/userId'
+      - $ref: '#/components/parameters/folderId'
+    
+    
+    get:
+      summary: Get folder detail.
+      tags:
+        - User Topic Folders
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Entity'
+                  - $ref: '#/components/schemas/TopicFolder'
+    
+    patch:
+      summary: Update folder.
+      tags:
+        - User Topic Folders
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TopicFolder'
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Entity'
+                  - $ref: '#/components/schemas/TopicFolder'
+    
+    delete:
+      summary: Delete folder.
+      tags:
+        - User Topic Folders
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      responses:
+        "204":
+          description: "OK"
+
+  /companies/{companyId}/topic_folders:
+    parameters:
+      - $ref: '#/components/parameters/companyId'
+  
+    get:
+      summary: Get company topic folders.
+      tags:
+        - Company Topic Folders
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CompanyTopicsFolder'
+    
+    post:
+      summary: Create new company topic folder.
+      tags:
+        - Company Topic Folders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TopicFolder"
+      responses:
+        "201":
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Entity'
+                  - $ref: '#/components/schemas/TopicFolder'
+
+  /companies/{companyId}/topic_folders/{folderId}:
+    parameters:
+      - $ref: '#/components/parameters/companyId'
+      - $ref: '#/components/parameters/folderId'
+    
+    get:
+      summary: Get folder detail.
+      tags:
+        - Company Topic Folders
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Entity'
+                  - $ref: '#/components/schemas/TopicFolder'
+    
+    patch:
+      summary: Update folder.
+      tags:
+        - Company Topic Folders
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TopicFolder'
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Entity'
+                  - $ref: '#/components/schemas/TopicFolder'
+    
+    delete:
+      summary: Delete folder.
+      tags:
+        - Company Topic Folders
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      responses:
+        "204":
+          description: "OK"
+
+
+
+components:
+  schemas:
+    ObjectId:
+      type: string
+
+    Etag:
+      type: string
+
+    Entity:
+      type: object
+      properties:
+        _id:
+          $ref: "#/components/schemas/ObjectId"
+        _etag:
+          $ref: "#/components/schemas/Etag"
+
+    TopicFolder:
+      type: object
+      properties:
+        name:
+          type: string
+        parent:
+          $ref: "#/components/schemas/ObjectId"
+          description: _id of a parent folder
+        section:
+          type: string
+          enum:
+            - wire
+            - agenda
+      required:
+        - name
+        - section
+
+    UserTopicsFolder:
+      allOf:
+        - $ref: '#/components/schemas/TopicFolder'
+        - type: object
+          properties:
+            user:
+              $ref: "#/components/schemas/ObjectId"
+    
+    CompanyTopicsFolder:
+      allOf:
+        - $ref: '#/components/schemas/TopicFolder'
+        - type: object
+          properties:
+            company:
+              $ref: "#/components/schemas/ObjectId"
+
+  parameters:
+    userId:
+      in: path
+      name: userId
+      required: true
+      schema:
+        $ref: "#/components/schemas/ObjectId"
+
+    folderId:
+      in: path
+      name: folderId
+      required: true
+      schema:
+        $ref: "#/components/schemas/ObjectId"
+
+    companyId:
+      in: path
+      name: companyId
+      required: true
+      schema:
+        $ref: "#/components/schemas/ObjectId"
+
+    IfMatch:
+      in: header
+      name: If-Match
+      required: true
+      schema:
+        $ref: '#/components/schemas/Etag'

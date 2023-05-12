@@ -34,6 +34,7 @@ class TopicsResource(newsroom.Resource):
         },
         "original_creator": newsroom.Resource.rel("users"),
         "version_creator": newsroom.Resource.rel("users"),
+        "folder": newsroom.Resource.rel("topic_folders", nullable=True),
     }
 
 
@@ -43,6 +44,8 @@ class TopicsService(newsroom.Service):
         for doc in docs:
             set_original_creator(doc)
             set_version_creator(doc)
+            if doc.get("folder"):
+                doc["folder"] = ObjectId(doc["folder"])
 
     def on_update(self, updates, original):
         super().on_update(updates, original)
@@ -52,6 +55,9 @@ class TopicsService(newsroom.Service):
         # except for the owner of the Topic
         if original.get("is_global") and "is_global" in updates and not updates.get("is_global"):
             updates["subscribers"] = [original["user"]] if original["user"] in original.get("subscribers", []) else []
+
+        if updates.get("folder"):
+            updates["folder"] = ObjectId(updates["folder"])
 
     def get_items(self, item_ids):
         return self.get(req=None, lookup={"_id": {"$in": item_ids}})
@@ -104,3 +110,6 @@ def get_agenda_notification_topics_for_query_by_id(item, users):
 
     # filter out the topics those belong to inactive users
     return [t for t in topics if users.get(str(t["user"]))]
+
+
+topics_service = TopicsService()
