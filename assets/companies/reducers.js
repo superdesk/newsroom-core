@@ -1,5 +1,9 @@
+import {cloneDeep} from 'lodash';
 import {
     EDIT_COMPANY,
+    TOGGLE_COMPANY_SECTION,
+    TOGGLE_COMPANY_PRODUCT,
+    UPDATE_COMPANY_SEATS,
     NEW_COMPANY,
     QUERY_COMPANIES,
     SELECT_COMPANY,
@@ -8,7 +12,7 @@ import {
     GET_COMPANY_USERS,
     INIT_VIEW_DATA,
     SET_ERROR,
-    GET_PRODUCTS
+    GET_PRODUCTS,
 } from './actions';
 
 import {ADD_EDIT_USERS} from 'actions';
@@ -77,10 +81,54 @@ export default function companyReducer(state = initialState, action) {
     case EDIT_COMPANY: {
         const target = action.event.target;
         const field = target.name;
-        const company = {...state.companyToEdit};
+        const company = cloneDeep(state.companyToEdit);
 
         company[field] = target.type === 'checkbox' ? target.checked : target.value;
         return {...state, companyToEdit: company, errors: null};
+    }
+
+    case TOGGLE_COMPANY_SECTION: {
+        const company = cloneDeep(state.companyToEdit);
+
+        company.sections[action.sectionId] = !company.sections[action.sectionId];
+
+        return {...state, companyToEdit: company};
+    }
+
+    case TOGGLE_COMPANY_PRODUCT: {
+        const company = cloneDeep(state.companyToEdit);
+
+        const {productId, sectionId, enable} = action.payload;
+
+        if (enable === true) {
+            company.products.push({
+                _id: productId,
+                section: sectionId,
+                seats: 0,
+            });
+        } else {
+            company.products = company.products.filter(
+                (product) => (
+                    product._id !== productId
+                )
+            );
+        }
+
+        return {...state, companyToEdit: company};
+    }
+
+    case UPDATE_COMPANY_SEATS: {
+        const company = cloneDeep(state.companyToEdit);
+
+        const {productId, seats} = action.payload;
+
+        company.products.forEach((product) => {
+            if (product._id === productId) {
+                product.seats = seats;
+            }
+        });
+
+        return {...state, companyToEdit: company};
     }
 
     case NEW_COMPANY: {
