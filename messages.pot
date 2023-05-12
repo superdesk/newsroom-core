@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.4.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-02-01 14:26+0100\n"
+"POT-Creation-Date: 2023-05-10 16:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3441,14 +3441,6 @@ msgstr ""
 
 #: assets/section-filters/components/SectionFiltersApp.jsx:31
 msgid "New Section Filter"
-msgstr ""
-
-#: assets/tests/utils.spec.js:5
-msgid "foo"
-msgstr ""
-
-#: assets/tests/utils.spec.js:9
-msgid "hello {{ name }}"
 msgstr ""
 
 #: assets/ui/components/ArticleAuthor.jsx:10
