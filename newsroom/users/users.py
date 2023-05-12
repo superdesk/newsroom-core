@@ -190,15 +190,12 @@ class UsersService(newsroom.Service):
         if "password" in updates:
             updates["password"] = self._get_password_hash(updates["password"])
 
-        company = get_company_from_user({"company": updates.get("company") or original.get("company")})
+        company = get_company_from_user({"company": updates.get("company", original.get("company"))})
         company_changed = updates.get("company") and updates["company"] != original.get("company")
 
         if company_changed or "sections" in updates or "products" in updates:
-            # Company or Sections have changed, recalculate the list of sections
+            # Company, Sections or Products have changed, recalculate the list of sections & products
             updates["sections"] = get_updated_sections(updates, original, company)
-
-        if company_changed or "sections" in updates or "products" in updates:
-            # Company, Sections or Products have changed, recalculate the list of products
             updates["products"] = get_updated_products(updates, original, company)
 
         app.cache.delete(str(original.get("_id")))
