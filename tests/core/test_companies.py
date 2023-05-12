@@ -115,6 +115,7 @@ def test_get_company_users(client):
 
 
 def test_save_company_permissions(client, app):
+    sports_id = ObjectId()
     app.data.insert(
         "products",
         [
@@ -126,7 +127,7 @@ def test_save_company_permissions(client, app):
                 "is_enabled": True,
             },
             {
-                "_id": "p-2",
+                "_id": sports_id,
                 "name": "News",
                 "description": "news product",
                 "is_enabled": True,
@@ -135,10 +136,15 @@ def test_save_company_permissions(client, app):
     )
 
     test_login_succeeds_for_admin(client)
-    data = json.dumps({"products": {"p-2": True}, "sections": {"wire": True}, "archive_access": True})
     client.post(
-        f"companies/{COMPANY_1_ID}/permissions",
-        data=data,
+        f"companies/{COMPANY_1_ID}",
+        data=json.dumps(
+            {
+                "archive_access": True,
+                "sections": {"wire": True},
+                "products": [{"_id": sports_id, "section": "wire"}],
+            }
+        ),
         content_type="application/json",
     )
 
@@ -146,7 +152,7 @@ def test_save_company_permissions(client, app):
     assert updated["sections"]["wire"]
     assert not updated["sections"].get("agenda")
     assert updated["archive_access"]
-    assert updated["products"] == [{"section": "wire", "seats": 0, "_id": "p-2"}]
+    assert updated["products"] == [{"section": "wire", "seats": 0, "_id": sports_id}]
 
     # available by default
     resp = client.get(url_for("agenda.index"))
