@@ -1,4 +1,4 @@
-import {Input} from '../inputs/input';
+import {Input, SelectInput} from '../inputs/input';
 import {CheckboxInput} from '../inputs/checkbox';
 
 export class BaseForm {
@@ -44,11 +44,15 @@ export class BaseForm {
         );
     }
 
-    getInput(selector) {
-        return new Input(this.selector, selector);
+    getInput(selector, clearBeforeTyping = true) {
+        return new Input(this.selector, selector, clearBeforeTyping);
     }
 
     getCheckboxInput(selector) {
         return new CheckboxInput(this.selector, selector);
+    }
+
+    getSelectInput(selector) {
+        return new SelectInput(this.selector, selector);
     }
 }

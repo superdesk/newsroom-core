@@ -17,7 +17,10 @@ function UsersList({users, onClick, activeUserId, companiesById}) {
     return (
         <section className="content-main">
             <div className="list-items-container">
-                <table className="table table-hover">
+                <table
+                    className="table table-hover"
+                    data-test-id="user-list"
+                >
                     <thead>
                         <tr>
                             <th>{ gettext('Name') }</th>

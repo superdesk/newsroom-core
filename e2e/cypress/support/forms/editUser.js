@@ -12,7 +12,7 @@ class EditUserFormWrapper extends BaseForm {
             mobile: this.getInput('[data-test-id="field-mobile"] input'),
             role: this.getInput('[data-test-id="field-role"] input'),
             user_type: this.getInput('[data-test-id="field-user_type"] select'),
-            company: this.getInput('[data-test-id="field-company"] select'),
+            company: this.getSelectInput('[data-test-id="field-company"] select'),
             company_read_only: this.getInput('[data-test-id="field-company"] input'),
 
             locale: this.getInput('[data-test-id="field-locale"] select'),
@@ -24,8 +24,20 @@ class EditUserFormWrapper extends BaseForm {
         };
     }
 
-    save() {
-        this.getFormElement('[data-test-id="save-btn"]').click();
+    save(saveId = false) {
+        if (saveId) {
+            cy.intercept({path: '/users/new', times: 1}).as('newUser');
+            this.getFormElement('[data-test-id="save-btn"]').click();
+            cy.wait('@newUser').then((interception) => {
+                cy.wrap(interception.response.body._id).as('newUserId');
+            });
+        } else {
+            this.getFormElement('[data-test-id="save-btn"]').click();
+        }
+    }
+
+    getNewlyCreatedUserId(callback) {
+        cy.get('@newUserId').then(callback);
     }
 
     openAllToggleBoxes() {
@@ -43,6 +55,7 @@ class EditUserFormWrapper extends BaseForm {
     }
 
     typeSections(sections) {
+        cy.log('EditUserForm.typeSections');
         cy.wrap(Object.keys(sections)).each(
             (section) => {
                 this.getSectionCheckbox(section).type(sections[section]);
@@ -51,6 +64,7 @@ class EditUserFormWrapper extends BaseForm {
     }
 
     expectSections(sections) {
+        cy.log('EditUserForm.expectSections');
         cy.wrap(Object.keys(sections)).each(
             (section) => {
                 this.getSectionCheckbox(section).expect(sections[section]);
@@ -58,7 +72,17 @@ class EditUserFormWrapper extends BaseForm {
         );
     }
 
+    expectSectionsMissing(sectionIds) {
+        cy.log('EditUserForm.expectSectionsMissing');
+        cy.wrap(sectionIds).each(
+            (section) => {
+                this.getSectionCheckbox(section).getElement().should('not.exist');
+            }
+        );
+    }
+
     typeProducts(products) {
+        cy.log('EditUserForm.typeProducts');
         cy.wrap(Object.keys(products)).each(
             (section) => {
                 cy.wrap(Object.keys(products[section])).each(
@@ -70,6 +94,7 @@ class EditUserFormWrapper extends BaseForm {
         );
     }
     expectProducts(products) {
+        cy.log('EditUserForm.expectProducts');
         cy.wrap(Object.keys(products)).each(
             (section) => {
                 cy.wrap(Object.keys(products[section])).each(
@@ -79,6 +104,19 @@ class EditUserFormWrapper extends BaseForm {
                 );
             }
         );
+    }
+
+    expectProductsMissing(products) {
+        cy.log('EditUserForm.expectProductsMissing');
+        cy.wrap(Object.keys(products)).each(
+            (section) => {
+                cy.wrap(products[section]).each(
+                    (productId) => {
+                        this.getProductCheckbox(section, productId).getElement().should('not.exist');
+                    }
+                )
+            }
+        )
     }
 }
 
