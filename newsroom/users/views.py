@@ -133,9 +133,9 @@ def create():
         new_user["receive_email"] = True
         new_user["receive_app_notifications"] = True
 
-        get_resource_service("users").post([new_user])
+        ids = get_resource_service("users").post([new_user])
         send_token(new_user, token_type="new_account")
-        return jsonify({"success": True}), 201
+        return jsonify({"success": True, "_id": ids[0]}), 201
     return jsonify(form.errors), 400
 
 

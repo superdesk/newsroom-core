@@ -1,6 +1,6 @@
 
-class NewshubSettingsPageWrapper {
-    getList(additionalSelector) {
+class CompanySettingsPageWrapper {
+    getCompanyList(additionalSelector) {
         let selector = '[data-test-id="company-list"]';
 
         if (additionalSelector != null) {
@@ -10,9 +10,17 @@ class NewshubSettingsPageWrapper {
         return cy.get(selector);
     }
 
-    getListItems() {
-        return this.getList('> tbody > tr');
+    getCompanyListItems() {
+        return this.getCompanyList('> tbody > tr');
+    }
+
+    getCompanyListItem(companyId) {
+        return this.getCompanyList(`[data-test-id="company-list-item--${companyId}"]`);
+    }
+
+    getNewCompanyButton() {
+        return cy.get('[data-test-id="new-item-btn"]');
     }
 }
 
-export const NewshubSettingsPage = new NewshubSettingsPageWrapper();
+export const CompanySettingsPage = new CompanySettingsPageWrapper();

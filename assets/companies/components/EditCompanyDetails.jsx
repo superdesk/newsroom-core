@@ -120,6 +120,7 @@ export function EditCompanyDetails({company, companyTypes, users, errors, onChan
             </div>
             <div className='list-item__preview-footer'>
                 <input
+                    data-test-id="save-btn"
                     type='button'
                     className='btn btn-outline-primary'
                     value={gettext('Save')}

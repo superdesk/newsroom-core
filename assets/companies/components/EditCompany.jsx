@@ -106,6 +106,7 @@ class EditCompany extends React.Component {
     render() {
         return (
             <div
+                data-test-id="edit-company-form"
                 className={classNames(
                     'list-item__preview',
                     {'list-item__preview--large': this.props.apiEnabled}
@@ -126,10 +127,14 @@ class EditCompany extends React.Component {
                     </button>
                 </div>
                 <AuditInformation item={this.props.company} />
-                <ul className='nav nav-tabs'>
+                <ul
+                    data-test-id="form-tabs"
+                    className='nav nav-tabs'
+                >
                     {this.tabs.filter((tab, index) => index === 0 || this.props.company._id).map((tab) => (
                         <li key={tab.name} className='nav-item'>
                             <a
+                                data-test-id={`tab-${tab.name}`}
                                 name={tab.name}
                                 className={`nav-link ${this.state.activeTab === tab.name && 'active'}`}
                                 href='#'

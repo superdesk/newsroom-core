@@ -90,6 +90,10 @@ export default function companyReducer(state = initialState, action) {
     case TOGGLE_COMPANY_SECTION: {
         const company = cloneDeep(state.companyToEdit);
 
+        if (company.sections == null) {
+            company.sections = {};
+        }
+
         company.sections[action.sectionId] = !company.sections[action.sectionId];
 
         return {...state, companyToEdit: company};
@@ -97,8 +101,11 @@ export default function companyReducer(state = initialState, action) {
 
     case TOGGLE_COMPANY_PRODUCT: {
         const company = cloneDeep(state.companyToEdit);
-
         const {productId, sectionId, enable} = action.payload;
+
+        if (company.products == null) {
+            company.products = [];
+        }
 
         if (enable === true) {
             company.products.push({
@@ -119,8 +126,11 @@ export default function companyReducer(state = initialState, action) {
 
     case UPDATE_COMPANY_SEATS: {
         const company = cloneDeep(state.companyToEdit);
-
         const {productId, seats} = action.payload;
+
+        if (company.products == null) {
+            company.products = [];
+        }
 
         company.products.forEach((product) => {
             if (product._id === productId) {

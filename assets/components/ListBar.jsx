@@ -26,6 +26,7 @@ class ListBar extends React.Component {
                     <div className="content-bar__right">
                         {this.props.onNewItem && (
                             <button
+                                data-test-id="new-item-btn"
                                 className="btn btn-outline-secondary btn-responsive"
                                 onClick={() => this.props.onNewItem()}
                             >
