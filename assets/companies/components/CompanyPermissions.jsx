@@ -25,14 +25,17 @@ function CompanyPermissions({
         <div className='tab-pane active' id='company-permissions'>
             <form onSubmit={save}>
                 <div className="list-item__preview-form" key='general'>
-                    <div className="form-group">
+                    <div
+                        data-test-id="group--general"
+                        className="form-group"
+                    >
                         <label>{gettext('General')}</label>
                         <ul className="list-unstyled">
                             <li>
                                 <CheckboxInput
                                     name="archive_access"
                                     label={gettext('Grant Access To Archived Wire')}
-                                    value={company.archive_access}
+                                    value={company.archive_access === true}
                                     onChange={onChange}
                                 />
                             </li>
@@ -40,20 +43,24 @@ function CompanyPermissions({
                                 <CheckboxInput
                                     name="events_only"
                                     label={gettext('Events Only Access')}
-                                    value={company.events_only}
+                                    value={company.events_only === true}
                                     onChange={onChange}
                                 />
                                 <CheckboxInput
                                     name="restrict_coverage_info"
                                     label={gettext('Restrict Coverage Info')}
-                                    value={company.restrict_coverage_info}
+                                    value={company.restrict_coverage_info === true}
                                     onChange={onChange}
                                 />
                             </li>
                         </ul>
                     </div>
 
-                    <div className="form-group" key='sections'>
+                    <div
+                        data-test-id="group--sections"
+                        className="form-group"
+                        key="sections"
+                    >
                         <label>{gettext('Sections')}</label>
                         <ul className="list-unstyled">
                             {sections.map((item) => (
@@ -61,7 +68,7 @@ function CompanyPermissions({
                                     <CheckboxInput
                                         name={item._id}
                                         label={item.name}
-                                        value={company.sections[item._id] === true}
+                                        value={(company.sections || {})[item._id] === true}
                                         onChange={toggleCompanySection.bind(null, item._id)}
                                     />
                                 </li>
@@ -69,8 +76,12 @@ function CompanyPermissions({
                         </ul>
                     </div>
 
-                    <div className="form-group" key='products'>
-                        {sections.filter((section) => company.sections[section._id] === true).map((section) => (
+                    <div
+                        data-test-id="group--products"
+                        className="form-group"
+                        key="products"
+                    >
+                        {sections.filter((section) => (company.sections || {})[section._id] === true).map((section) => (
                             [<label key={`${section.id}label`}>{gettext('Products')} {`(${section.name})`}</label>,
                                 <ul key={`${section.id}product`} className="list-unstyled">
                                     {products.filter((p) => (p.product_type || 'wire').toLowerCase() === section._id.toLowerCase())
@@ -100,6 +111,7 @@ function CompanyPermissions({
                                                                 {gettext('Seats:')}
                                                             </label>
                                                             <input
+                                                                data-test-id={`field-${product._id}_seats`}
                                                                 type="number"
                                                                 id={`${product._id}_seats`}
                                                                 name={`${product._id}_seats`}
@@ -127,6 +139,7 @@ function CompanyPermissions({
                 </div>
                 <div className='list-item__preview-footer'>
                     <input
+                        data-test-id="save-btn"
                         type='submit'
                         className='btn btn-outline-primary'
                         value={gettext('Save')}
