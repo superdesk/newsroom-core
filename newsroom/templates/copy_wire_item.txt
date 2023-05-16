@@ -1,0 +1,8 @@
+{{ item.versioncreated | datetime_short }}
+{% if item.slugline %}{{ get_slugline(item, True) }}{% endif %}
+{% if item.headline %}{{ item.headline }}{% endif %}
+{% if item.byline %}By: {{ item.byline }}{% endif %}
+{% if item.located %}Location: {{ item.located }}{% endif %}
+{% if item.source %}Source: {{ item.source }}{% endif %}
+
+{% if item.body_text %}{{ item.body_text }}{% elif item.body_html %}{{ item.body_html | plain_text }}{% endif %}

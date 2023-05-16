@@ -1,6 +1,6 @@
 {{ item.headline }}
 
-{% if item.body_txt %}{{ item.body_txt }}{% elif item.body_html %}{{ item.body_html | plain_text }}{% endif %}
+{% if item.body_text %}{{ item.body_text }}{% elif item.body_html %}{{ item.body_html | plain_text }}{% endif %}
 
 {% if item.slugline %}Slugline: {{ item.slugline }}{% endif %}
 {% if item.headline %}Headline: {{ item.headline }}{% endif %}
