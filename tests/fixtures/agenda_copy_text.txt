@@ -1,5 +1,5 @@
 Copy Test
-Dates: 3/23/23, 12:00 AM - 3/23/23, 1:00 AM
+Dates: 3/23/23, 12:00 AM - 3/23/23, 1:00 AM
 Location: Sydney Harbour Bridge, Hickson Road, Sydney, New South Wales, 2000, Australia
 Ednote: Editorial note to make sure our partners are doing the right thing
 Description: This is a test for copying Data to/from the API and Browser clipboard.
@@ -28,7 +28,7 @@ Planning Item
 Description: This is a test for copying Data to/from the API and Browser clipboard.
 
 Coverage Type: text
-Scheduled: 3/23/23, 2:00 AM
+Scheduled: 3/23/23, 2:00 AM
 Status: draft
 
 
@@ -36,9 +36,9 @@ Planning Item
 Description: This is a test for copying Data to/from the API and Browser clipboard.
 
 Coverage Type: picture
-Scheduled: 3/23/23, 2:00 AM
+Scheduled: 3/23/23, 2:00 AM
 Status: draft
 
 Coverage Type: video
-Scheduled: 3/23/23, 2:00 AM
+Scheduled: 3/23/23, 2:00 AM
 Status: draft
