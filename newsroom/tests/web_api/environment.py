@@ -18,6 +18,10 @@ def before_all(context):
 
 
 def before_scenario(context, scenario):
+    if "skip" in scenario.tags:
+        scenario.skip("Marked with @skip")
+        return
+
     for key in list(agenda_aggs.keys()):
         agenda_aggs.pop(key)
     agenda_aggs.update(orig_agenda_aggs)
