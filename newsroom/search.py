@@ -70,7 +70,7 @@ class AdvancedSearchParams(TypedDict):
     all: str
     any: str
     exclude: str
-    fields: str
+    fields: List[str]
 
 
 class SearchQuery(object):
@@ -89,7 +89,7 @@ class SearchQuery(object):
             "all": "",
             "any": "",
             "exclude": "",
-            "fields": "",
+            "fields": [],
         }
 
         self.args = {}
@@ -664,25 +664,14 @@ class BaseSearchService(Service):
             return
 
         def gen_match_query(keywords: str, operator: str, multi_match_type):
-            if len(fields) == 1:
-                return {
-                    "match": {
-                        fields[0]: {
-                            "query": keywords,
-                            "operator": operator,
-                            "lenient": True,
-                        },
-                    },
-                }
-            else:
-                return {
-                    "multi_match": {
-                        "query": keywords,
-                        "type": multi_match_type,
-                        "fields": fields,
-                        "operator": operator,
-                    },
-                }
+            return {
+                "multi_match": {
+                    "query": keywords,
+                    "type": multi_match_type,
+                    "fields": fields,
+                    "operator": operator,
+                },
+            }
 
         if search.advanced.get("all"):
             search.query["bool"]["filter"].append(gen_match_query(search.advanced["all"], "AND", "cross_fields"))
