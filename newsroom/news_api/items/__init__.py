@@ -1,6 +1,5 @@
 import superdesk
-from content_api.items import ItemsResource as ContentApiItemsResource
-from content_api.items import ItemsService as ContentApiItemsService
+from newsroom.wire.items import ItemsResource as ContentApiItemsResource, ItemsService as ContentApiItemsService
 
 
 class ItemsResource(ContentApiItemsResource):

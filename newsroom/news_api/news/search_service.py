@@ -11,7 +11,7 @@ from flask import current_app as app
 from superdesk import get_resource_service
 from superdesk.utc import utcnow, local_to_utc
 from superdesk.errors import SuperdeskApiError
-from content_api.items.resource import ItemsResource
+from newsroom.wire.items import ItemsResource
 from content_api.errors import BadParameterValueError, UnexpectedParameterError
 from newsroom.auth import get_company
 

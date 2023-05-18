@@ -104,7 +104,7 @@ Feature: Wire Advanced Search
         ["sports-results-today-1"]
         """
 
-    @auth @admin @skip
+    @auth @admin
     Scenario: Search multiple fields
         # This scenario currently fails, due to a technical limitation with `multi_match` queries
         # across fields with different analyzers
