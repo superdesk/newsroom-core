@@ -7,11 +7,11 @@
 # Translators:
 # Srdjan Karalic <srdjan.karalic@sourcefabric.org>, 2020
 # Gideon Lehmann <gideon.lehmann@sourcefabric.org>, 2022
-# Petr Jašek <petr.jasek@sourcefabric.org>, 2022
 # Simon Peacock <simon.peacock@gmail.com>, 2023
 # Sabina <sabina.gergel@thecanadianpress.com>, 2023
 # Evzen Deulin <evgeny.deulin@sourcefabric.org>, 2023
 # Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2023
+# Petr Jašek <petr.jasek@sourcefabric.org>, 2023
 # 
 #, fuzzy
 msgid ""
@@ -20,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2023-05-10 16:20+0200\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
-"Last-Translator: Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2023\n"
+"Last-Translator: Petr Jašek <petr.jasek@sourcefabric.org>, 2023\n"
 "Language-Team: French (Canada) (https://app.transifex.com/sourcefabric/teams/6584/fr_CA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -189,7 +189,7 @@ msgstr "Calendrier"
 #: newsroom/templates/bookmark_layout.html:3
 #: newsroom/templates/bookmark_layout.html:6 newsroom/wire/__init__.py:56
 msgid "Saved / Watched Items"
-msgstr "Éléments enregistrés ou surveillés"
+msgstr "Éléments enregistrés"
 
 #: newsroom/agenda/__init__.py:48
 msgid "Google Maps Styles"
@@ -917,7 +917,7 @@ msgstr "Navigation latérale"
 #: newsroom/templates/company_admin_index.html:3
 #: newsroom/templates/company_admin_index.html:6 newsroom/users/forms.py:38
 msgid "Company Admin"
-msgstr "Administrateur"
+msgstr "Administrateur client"
 
 #: newsroom/templates/base_layout.html:89
 #: newsroom/templates/base_layout.html:91
@@ -2345,7 +2345,7 @@ msgstr "désactivé"
 
 #: assets/company-admin/components/CompanyUserListItem.jsx:47
 msgid "company admin"
-msgstr "administrateur"
+msgstr "administrateur client"
 
 #: assets/company-admin/components/CompanyUserListItem.jsx:51
 #: assets/users/components/EditUser.jsx:75
