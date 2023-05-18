@@ -67,10 +67,10 @@ def get_filter_query(
 
 
 class AdvancedSearchParams(TypedDict):
-    all: List[str]
-    any: List[str]
-    exclude: List[str]
-    fields: List[str]
+    all: str
+    any: str
+    exclude: str
+    fields: str
 
 
 class SearchQuery(object):
@@ -86,10 +86,10 @@ class SearchQuery(object):
         self.products = []
         self.requested_products = []
         self.advanced: AdvancedSearchParams = {
-            "all": [],
-            "any": [],
-            "exclude": [],
-            "fields": [],
+            "all": "",
+            "any": "",
+            "exclude": "",
+            "fields": "",
         }
 
         self.args = {}
@@ -663,12 +663,12 @@ class BaseSearchService(Service):
         if not fields:
             return
 
-        def gen_match_query(keywords: List[str], operator: str, multi_match_type):
+        def gen_match_query(keywords: str, operator: str, multi_match_type):
             if len(fields) == 1:
                 return {
                     "match": {
                         fields[0]: {
-                            "query": " ".join(keywords),
+                            "query": keywords,
                             "operator": operator,
                             "lenient": True,
                         },
@@ -677,7 +677,7 @@ class BaseSearchService(Service):
             else:
                 return {
                     "multi_match": {
-                        "query": " ".join(keywords),
+                        "query": keywords,
                         "type": multi_match_type,
                         "fields": fields,
                         "operator": operator,

@@ -27,32 +27,32 @@ Feature: Wire Advanced Search
 
     @auth @admin
     Scenario: Search for all keywords
-        When we get "/wire/search?advanced_search={"all":["Weather","Sydney"]}"
+        When we get "/wire/search?advanced_search={"all":"Weather Sydney"}"
         Then we get the following order
         """
         ["weather-today-sydney"]
         """
-        When we get "/wire/search?advanced_search={"all":["Weather","Wellington"]}"
+        When we get "/wire/search?advanced_search={"all":"Weather Wellington"}"
         Then we get the following order
         """
         []
         """
-        When we get "/wire/search?advanced_search={"all":["Weather","Sydney"],"fields":["headline"]}"
+        When we get "/wire/search?advanced_search={"all":"Weather Sydney","fields":["headline"]}"
         Then we get the following order
         """
         ["weather-today-sydney"]
         """
-        When we get "/wire/search?advanced_search={"all":["Weather","Sydney"],"fields":["slugline"]}"
+        When we get "/wire/search?advanced_search={"all":"Weather Sydney","fields":["slugline"]}"
         Then we get the following order
         """
         []
         """
-        When we get "/wire/search?advanced_search={"all":["Weather","Today"],"fields":["slugline"]}"
+        When we get "/wire/search?advanced_search={"all":"Weather Today","fields":["slugline"]}"
         Then we get the following order
         """
         ["weather-today-sydney", "weather-today-prague", "weather-today-belgrade"]
         """
-        When we get "/wire/search?advanced_search={"all":["Weather","Sydney","Report"],"fields":["body_html"]}"
+        When we get "/wire/search?advanced_search={"all":"Weather Sydney Report","fields":["body_html"]}"
         Then we get the following order
         """
         ["weather-today-sydney"]
@@ -60,27 +60,27 @@ Feature: Wire Advanced Search
 
     @auth @admin
     Scenario: Search for any keywords
-        When we get "/wire/search?advanced_search={"any":["Sydney","Prague","Belgrade","Wellington"]}"
+        When we get "/wire/search?advanced_search={"any":"Sydney Prague Belgrade Wellington"}"
         Then we get the following order
         """
         ["weather-today-sydney", "weather-today-prague", "weather-today-belgrade"]
         """
-        When we get "/wire/search?advanced_search={"any":["Wellington","Canberra"]}"
+        When we get "/wire/search?advanced_search={"any":"Wellington Canberra"}"
         Then we get the following order
         """
         []
         """
-        When we get "/wire/search?advanced_search={"any":["Sydney","Prague","Belgrade","Wellington"],"fields":["headline"]}"
+        When we get "/wire/search?advanced_search={"any":"Sydney Prague Belgrade Wellington","fields":["headline"]}"
         Then we get the following order
         """
         ["weather-today-sydney", "weather-today-prague", "weather-today-belgrade"]
         """
-        When we get "/wire/search?advanced_search={"any":["Sydney","Prague","Belgrade","Wellington"],"fields":["slugline"]}"
+        When we get "/wire/search?advanced_search={"any":"Sydney Prague Belgrade Wellington","fields":["slugline"]}"
         Then we get the following order
         """
         []
         """
-        When we get "/wire/search?advanced_search={"any":["Sydney","Prague","Belgrade","Wellington"],"fields":["body_html"]}"
+        When we get "/wire/search?advanced_search={"any":"Sydney Prague Belgrade Wellington","fields":["body_html"]}"
         Then we get the following order
         """
         ["weather-today-sydney", "weather-today-prague", "weather-today-belgrade"]
@@ -88,17 +88,17 @@ Feature: Wire Advanced Search
 
     @auth @admin
     Scenario: Search for excluded keywords
-        When we get "/wire/search?advanced_search={"exclude":["Belgrade","Wellington","Canberra"]}"
+        When we get "/wire/search?advanced_search={"exclude":"Belgrade Wellington Canberra"}"
         Then we get the following order
         """
         ["weather-today-sydney", "weather-today-prague", "sports-results-today-1"]
         """
-        When we get "/wire/search?advanced_search={"exclude":["Weather"]}"
+        When we get "/wire/search?advanced_search={"exclude":"Weather"}"
         Then we get the following order
         """
         ["sports-results-today-1"]
         """
-        When we get "/wire/search?advanced_search={"exclude":["Weather"],"fields":["headline"]}"
+        When we get "/wire/search?advanced_search={"exclude":"Weather","fields":["headline"]}"
         Then we get the following order
         """
         ["sports-results-today-1"]
@@ -109,7 +109,7 @@ Feature: Wire Advanced Search
         # This scenario currently fails, due to a technical limitation with `multi_match` queries
         # across fields with different analyzers
         # see: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/query-dsl-multi-match-query.html#cross-field-analysis
-        When we get "/wire/search?advanced_search={"all":["Sydney","Current","Report"],"fields":["headline","body_html"]}"
+        When we get "/wire/search?advanced_search={"all":"Sydney Current Report","fields":["headline","body_html"]}"
         Then we get the following order
         """
         ["weather-today-sydney"]
