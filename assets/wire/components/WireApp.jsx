@@ -164,7 +164,7 @@ class WireApp extends BaseApp {
                             title={gettext('Close filter panel')}
                             aria-label={gettext('Close filter panel')}
                             onClick={this.toggleSidebar}>
-                            <i className="icon--close-thin icon--white" />
+                            <i className="icon--close-thin" />
                         </button>}
 
                         {this.props.bookmarks &&

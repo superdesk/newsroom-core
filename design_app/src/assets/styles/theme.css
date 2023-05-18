@@ -180,7 +180,7 @@ a:hover {
 .wire-articles__item:focus-visible .wire-articles__item-select {
     width: 24px;
     opacity: 1;
-    margin-right: 10px;
+    margin-inline-end: 10px;
 }
 .wire-articles__item.wire-articles__item--selected {
     border: 4px solid #fde6e6;
@@ -290,7 +290,7 @@ a:hover {
     padding: .8rem 1rem .8rem 1rem;
 }
 .navbar__logo--fr {
-    margin-top: 8px;
+    margin-block-start: 8px;
 }
 .navbar__logo a, 
 .navbar__logo img {
@@ -352,7 +352,7 @@ a:hover {
     flex-wrap: wrap;
 }
 .footer--home {
-    margin-bottom: -50px;
+    margin-block-end: -50px;
 }
 .card :not(.bg-white) a.btn-outline-primary {
     color: white;

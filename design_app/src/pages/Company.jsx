@@ -26,7 +26,7 @@ function Company() {
             <div className="settings-inner">
                 {isCompanyNavShown && <CompanyNav />}
             <div className="content">
-                <section className="content-header">
+                <section className="content-header">                    
                     <nav className="content-bar navbar content-bar--no-left-padding">
                         <button onClick={handleClickNav} className="icon-button icon-button--border-three-sides" aria-label="Open Side Navigation">
                         {!isCompanyNavShown && <i className="icon--hamburger icon--gray"></i>}
@@ -35,14 +35,14 @@ function Company() {
 
                         <div className="btn-group btn-group--navbar">
                             <button onClick={handleSetActive} className={isActive ? 'btn btn-outline-primary active' : 'btn btn-outline-primary'}>My Company</button>
-                            <button onClick={handleSetActive} className={!isActive ? 'btn btn-outline-primary active' : 'btn btn-outline-primary'}>Users</button>
+                            <button onClick={handleSetActive} className={!isActive ? 'btn btn-outline-primary active' : 'btn btn-outline-primary'}>Users</button>                            
                         </div>
-
+                        
                         <div className="btn-group">
                             <button id="company" type="button" className="btn btn-text-only d-flex btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Product one<span>6/10</span>
                                 <i className="icon-small--arrow-down icon--gray-dark"></i>
-                            </button>
+                            </button>                            
                         </div>
                         <div className="content-bar-divider"></div>
                         <div className="btn-group">
@@ -62,7 +62,7 @@ function Company() {
                             <div className="search__form input-group">
                                 <form className="d-flex align-items-center" role="search" aria-label="search"><input type="text" name="q" className="search__input form-control" placeholder="Search for..." aria-label="Search for..." />
                                     <div className="search__form__buttons">
-                                        <button className="btn search__clear" aria-label="Search clear" type="reset"><img src="static/search_clear.png" width="16" height="16" /></button>
+                                        <button className="btn search__clear" aria-label="Search clear" type="reset"><img src="src/assets/images/search_clear.png" width="16" height="16" /></button>
                                         <button className="btn btn-outline-secondary" type="submit">Search</button>
                                     </div>
                                 </form>
@@ -83,7 +83,7 @@ function Company() {
                             </div>
                         </section>
                     </div>
-                    {!isEditCompanyShown && <EditUser />}
+                    {!isEditCompanyShown && <EditUser />}                    
                 </div>
 
             </div>
@@ -91,6 +91,7 @@ function Company() {
 
         </div>
     );
-}
-
-export default Company;
+  }
+  
+  export default Company;
+  

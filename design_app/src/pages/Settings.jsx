@@ -1,7 +1,7 @@
 import React from 'react';
 //import { useNavigate } from 'react-router-dom';
 
-function Settings() {
+function Settings() { 
     return (
         <div className="settingsWrap">
             <div className="settings-inner">
@@ -15,7 +15,7 @@ function Settings() {
                         <li>
                             <a className="side-navigation__btn " href="/settings/oauth_clients">
                                 OAuth Clients</a>
-                        </li>
+                        </li>                
                         <li>
                             <a className="side-navigation__btn " href="/settings/users">
                                 User Management</a>
@@ -54,7 +54,7 @@ function Settings() {
                             <div className="search__form input-group">
                                 <form className="d-flex align-items-center" role="search" aria-label="search"><input type="text" name="q" className="search__input form-control" placeholder="Search for..." aria-label="Search for..." />
                                     <div className="search__form__buttons">
-                                        <button className="btn search__clear" aria-label="Search clear" type="reset"><img src="static/search_clear.png" width="16" height="16" /></button>
+                                        <button className="btn search__clear" aria-label="Search clear" type="reset"><img src="src/assets/images/search_clear.png" width="16" height="16" /></button>
                                         <button className="btn btn-outline-secondary" type="submit">Search</button>
                                     </div>
                                 </form>
@@ -135,7 +135,7 @@ function Settings() {
                         </section>
                     </div>
 
-
+                    
                     <div className="list-item__preview" role="dialog" aria-label="Edit Company">
                         <div className="list-item__preview-header">
                             <h3>Awesome company</h3>
@@ -163,13 +163,13 @@ function Settings() {
                                 <form>
                                     <div className="list-item__preview-form">
                                         <div className="form-group">
-                                            <label htmlFor="name">Name</label>
+                                            <label for="name">Name</label>
                                             <div className="field">
                                                 <input type="text" id="name" name="name" className="form-control" value="Awesome company" />
                                             </div>
                                         </div>
                                         <div className="form-group">
-                                        <label htmlFor="company_type">Company Type</label>
+                                        <label for="company_type">Company Type</label>
                                         <div className="field">
                                             <select id="company_type" name="company_type" className="form-control">
                                                 <option value=""></option>
@@ -177,43 +177,43 @@ function Settings() {
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="url">Company Url</label>
+                                        <label for="url">Company Url</label>
                                         <div className="field">
                                             <input type="text" id="url" name="url" className="form-control" value="www.awesome.com" />
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="sd_subscriber_id">Superdesk Subscriber Id</label>
+                                        <label for="sd_subscriber_id">Superdesk Subscriber Id</label>
                                         <div className="field">
                                             <input type="text" id="sd_subscriber_id" name="sd_subscriber_id" className="form-control" value="899998767" />
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="account_manager">Account Manager</label>
+                                        <label for="account_manager">Account Manager</label>
                                         <div className="field">
                                             <input type="text" id="account_manager" name="account_manager" className="form-control" value="" />
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="phone">Telephone</label>
+                                        <label for="phone">Telephone</label>
                                         <div className="field">
                                             <input type="text" id="phone" name="phone" className="form-control" value="+776766766" />
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="contact_name">Contact Name</label>
+                                        <label for="contact_name">Contact Name</label>
                                         <div className="field">
                                             <input type="text" id="contact_name" name="contact_name" className="form-control" value="Antonin Dvorak" />
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="contact_email">Contact Email</label>
+                                        <label for="contact_email">Contact Email</label>
                                         <div className="field">
                                             <input type="text" id="contact_email" name="contact_email" className="form-control" value="dvorak@awesome.com" />
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="country">Country</label>
+                                        <label for="country">Country</label>
                                         <div className="field">
                                             <select id="country" name="country" className="form-control">
                                                 <option value="au">Australia</option>
@@ -224,7 +224,7 @@ function Settings() {
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="expiry_date">Expiry Date</label>
+                                        <label for="expiry_date">Expiry Date</label>
                                         <div className="field">
                                             <input type="date" id="expiry_date" name="expiry_date" className="form-control" value="" />
                                         </div>
@@ -232,7 +232,7 @@ function Settings() {
                                     <div className="form-check p-0">
                                         <div className="form-check" tabIndex="-1">
                                             <input type="checkbox" name="is_enabled" className="form-check-input" id="is_enabled" tabIndex="0" checked="" />
-                                            <label className="form-check-label" htmlFor="is_enabled">Enabled</label>
+                                            <label className="form-check-label" for="is_enabled">Enabled</label>
                                         </div>
                                     </div>
                                     </div>
@@ -243,7 +243,7 @@ function Settings() {
                             </div>
                         </div>
                     </div>
-
+                        
 
 
                 </div>
@@ -254,5 +254,6 @@ function Settings() {
         </div>
     );
   }
-
+  
   export default Settings;
+  

@@ -54,7 +54,7 @@
     .navbar__date {
         margin-inline-end: 0.5rem;
         display: none;
-
+    
         @include md {
             display: block;
         }
@@ -67,14 +67,17 @@
         display: flex;
         justify-content: center;
         align-items: center;
-
-        &--disconnected {
-            background: #cc0000;
-        }
     }
     .notif__list {
+        position: absolute;
+        inset-block-start: 44px;
+        inset-block-end: 0px;
+        background: $background-color;
+        box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
         min-width: 300px;
+        overflow: auto;
         max-height: calc(100vh - 56px);
+        z-index: 1000;
         @include sm {
             min-width: 420px;
         }
@@ -111,12 +114,7 @@
             font-size: 1.1rem;
             font-weight: 400;
             text-shadow: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0;
             padding-inline-start: 1px;
-            padding-block-start: 1px;
 
             &:focus {
                 outline: 0;
@@ -269,10 +267,10 @@
     margin-inline-start: auto;
     flex-shrink: 0;
     flex-grow: 0;
-
+    
     &--login {
         padding-inline-end: 0.5rem;
-
+       
         @include sm {
             padding-inline-end: 1rem;
         }
@@ -345,4 +343,28 @@
 
 nav.search {
     width: 100%;
+}
+
+.nav-tabs--light {
+    border: none;
+    .nav-item {
+        .nav-link {
+            font-size: 13px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: $body-text;
+            padding: 10px 0 6px 0 !important;
+            margin: 0 12px;
+            border: none;
+            &:hover {
+                text-decoration: none;
+                color: $gray-dark;
+            }
+            &.active {
+                border-color: black;
+                border-width: 0 0 4px 0;
+                border-style: solid;
+            }
+        }
+    }
 }
