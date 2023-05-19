@@ -132,8 +132,7 @@ BLUEPRINTS = [
 CORE_APPS = [
     "superdesk.notification",
     "superdesk.data_updates",
-    "content_api.items",
-    "content_api.items_versions",
+    "newsroom.wire.items",
     "content_api.search",
     "content_api.auth",
     "content_api.publish",

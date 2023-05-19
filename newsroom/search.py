@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional, Union, Dict, Any
+from typing import List, Optional, Union, Dict, Any, TypedDict
 from copy import deepcopy
 
 from flask import current_app as app, json, abort
@@ -66,6 +66,13 @@ def get_filter_query(
     return {"terms": {aggregation_field: val}}
 
 
+class AdvancedSearchParams(TypedDict):
+    all: str
+    any: str
+    exclude: str
+    fields: List[str]
+
+
 class SearchQuery(object):
     """Class for storing the search parameters for validation and query generation"""
 
@@ -78,6 +85,12 @@ class SearchQuery(object):
         self.navigation_ids = []
         self.products = []
         self.requested_products = []
+        self.advanced: AdvancedSearchParams = {
+            "all": "",
+            "any": "",
+            "exclude": "",
+            "fields": [],
+        }
 
         self.args = {}
         self.lookup = {}
@@ -98,6 +111,7 @@ class BaseSearchService(Service):
     default_sort = [{"versioncreated": "desc"}]
     default_page_size = 25
     _matched_ids = []  # array of IDs matched on the request, used when searching all versions
+    default_advanced_search_fields = []
 
     def get(self, req, lookup):
         search = SearchQuery()
@@ -243,6 +257,7 @@ class BaseSearchService(Service):
         self.apply_time_limit_filter(search)
         self.apply_products_filter(search)
         self.apply_request_filter(search)
+        self.apply_request_advanced_search(search)
         self.apply_embargoed_filters(search)
 
         if len(search.query["bool"].get("should", [])):
@@ -638,6 +653,32 @@ class BaseSearchService(Service):
 
             if search.args.get("created_from") or search.args.get("created_to"):
                 search.source["post_filter"]["bool"]["filter"].append(self.versioncreated_range(search.args))
+
+    def apply_request_advanced_search(self, search: SearchQuery):
+        if not search.args.get("advanced_search"):
+            return
+
+        search.advanced = json.loads(search.args["advanced_search"])
+        fields = search.advanced.get("fields") or self.default_advanced_search_fields
+        if not fields:
+            return
+
+        def gen_match_query(keywords: str, operator: str, multi_match_type):
+            return {
+                "multi_match": {
+                    "query": keywords,
+                    "type": multi_match_type,
+                    "fields": fields,
+                    "operator": operator,
+                },
+            }
+
+        if search.advanced.get("all"):
+            search.query["bool"]["filter"].append(gen_match_query(search.advanced["all"], "AND", "cross_fields"))
+        if search.advanced.get("any"):
+            search.query["bool"]["filter"].append(gen_match_query(search.advanced["any"], "OR", "best_fields"))
+        if search.advanced.get("exclude"):
+            search.query["bool"]["must_not"].append(gen_match_query(search.advanced["exclude"], "OR", "best_fields"))
 
     def apply_embargoed_filters(self, search):
         """Generate filters for embargoed params"""
