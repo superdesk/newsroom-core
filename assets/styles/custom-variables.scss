@@ -12,7 +12,7 @@
 $body-text: var(--body-text);
 $gray-light: #c9c9c9;
 $gray-mid: #9a9a9a;
-$gray-dark: #676C7B;
+$gray-dark: #747474;
 $background-color: var(--background-color);
 $main-blue: #007EAD;
 $mid-blue: #00658A;
@@ -220,8 +220,10 @@ $container-max-widths: (
 }
 .icon--arrow-right {
     &.icon--collapsible-closed {
-        transform: rotate(-90deg);
-
+        transform: rotate(90deg);
+    }
+    &.icon--collapsible-open {
+        transform: rotate(270deg);
     }
 }
 

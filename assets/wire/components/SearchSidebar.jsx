@@ -18,7 +18,7 @@ class SearchSidebar extends React.Component {
     render() {
         return (
             <div className='wire-column__nav__items'>
-                <ul className='nav justify-content-center' id='pills-tab' role='tablist'>
+                <ul className='nav' id='pills-tab' role='tablist'>
                     {this.props.tabs.map((tab) => (
                         <li className='wire-column__nav__tab nav-item' key={tab.id}>
                             <a className={`nav-link ${this.state.active === tab.id && 'active'}`}

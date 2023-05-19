@@ -161,7 +161,7 @@ class AgendaApp extends BaseApp {
                                 title={gettext('Close filter panel')}
                                 aria-label={gettext('Close')}
                                 onClick={this.toggleSidebar}>
-                                <i className='icon--close-thin icon--white' />
+                                <i className='icon--close-thin' />
                             </span>
                         )}
 
