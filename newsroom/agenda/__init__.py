@@ -28,7 +28,7 @@ def init_app(app):
     app.section("agenda", lazy_gettext("Agenda"), "agenda")
     app.sidenav(lazy_gettext("Agenda"), "agenda.index", "calendar", section="agenda")
     app.sidenav(
-        lazy_gettext("Saved / Watched Items"),
+        lazy_gettext("Saved / Watched"),
         "agenda.bookmarks",
         "bookmark",
         group=1,

@@ -287,7 +287,7 @@ body.print {
 }
 
 .sidenav {
-    flex: 0 0 64px;
+    flex: 0 0 80px;
     background-color: var(--sidenav-bg-color);
     position: relative;
     box-shadow: inset -3px 0px 8px rgba(0, 0, 0, 0.1);
@@ -341,7 +341,7 @@ body.print {
 
         }
         a, span {
-            width: 56px;
+            width: 72px;
             min-height: 56px;
             padding: 2px 0;
             line-height: 56px;
@@ -388,7 +388,7 @@ body.print {
             letter-spacing: 0.3px;
             text-transform: uppercase;
             overflow-wrap: break-word;
-            width: 56px;
+            width: 72px;
             @include sm {
                 display: block;
             }
