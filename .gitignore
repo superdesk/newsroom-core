@@ -121,3 +121,7 @@ newsroom/static/dist
 
 # data dumps
 dump
+
+.DS_Store
+/.history
+
