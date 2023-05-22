@@ -51,6 +51,7 @@ import ShareItemModal from 'components/ShareItemModal';
 import getItemActions from '../item-actions';
 import BookmarkTabs from 'components/BookmarkTabs';
 import ItemStatisticsModal from './ItemStatisticsModal';
+import {AdvancedSearchPanel} from 'search/components/AdvancedSearchPanel';
 
 import {
     previewConfigSelector,
@@ -78,6 +79,13 @@ class WireApp extends BaseApp {
         }
 
         this.state.initialLoad = this.props.isLoading;
+
+        this.toggleAdvancedSearchPanel = this.toggleAdvancedSearchPanel.bind(this);
+        this.state.isAdvancedSearchShown = false;
+    }
+
+    toggleAdvancedSearchPanel() {
+        this.setState((prevState) => ({isAdvancedSearchShown: !prevState.isAdvancedSearchShown}));
     }
 
     render() {
@@ -85,6 +93,22 @@ class WireApp extends BaseApp {
             return this.renderLoader();
         }
 
+        return (
+            <React.Fragment>
+                <div className="content">
+                    {this.renderPageContent()}
+                </div>
+                {!this.state.isAdvancedSearchShown ? null : (
+                    <AdvancedSearchPanel
+                        fetchItems={this.props.fetchItems}
+                        toggleAdvancedSearchPanel={this.toggleAdvancedSearchPanel}
+                    />
+                )}
+            </React.Fragment>
+        );
+    }
+
+    renderPageContent() {
         const newsOnlyFilterText = this.props.newsOnlyFilterText;
         const modal = this.renderModal(this.props.modal);
 
@@ -183,6 +207,7 @@ class WireApp extends BaseApp {
                         <SearchBar
                             fetchItems={this.props.fetchItems}
                             setQuery={this.props.setQuery}
+                            toggleAdvancedSearchPanel={this.toggleAdvancedSearchPanel}
                         />
 
                         <ListViewControls

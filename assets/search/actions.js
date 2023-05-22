@@ -370,6 +370,24 @@ export function resetSearchParams() {
     return {type: RESET_SEARCH_PARAMS};
 }
 
+export const TOGGLE_ADVANCED_SEARCH_FIELD = 'TOGGLE_ADVANCED_SEARCH_FIELD';
+export function toggleAdvancedSearchField(field) {
+    return {type: TOGGLE_ADVANCED_SEARCH_FIELD, payload: field};
+}
+
+export const SET_ADVANCED_SEARCH_KEYWORDS = 'SET_ADVANCED_SEARCH_KEYWORDS';
+export function setAdvancedSearchKeywords(field, keywords) {
+    return {type: SET_ADVANCED_SEARCH_KEYWORDS, payload: {
+        field: field,
+        keywords: keywords,
+    }};
+}
+
+export const CLEAR_ADVANCED_SEARCH_PARAMS = 'CLEAR_ADVANCED_SEARCH_PARAMS';
+export function clearAdvanedSearchParams() {
+    return {type: CLEAR_ADVANCED_SEARCH_PARAMS};
+}
+
 export function setParams(params) {
     return function(dispatch) {
         if (get(params, 'created')) {
