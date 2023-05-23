@@ -9,6 +9,14 @@ export const searchNavigationSelector = (state) => get(state, 'search.activeNavi
 export const searchTopicIdSelector = (state) => get(state, 'search.activeTopic') || null;
 export const searchProductSelector = (state) => get(state, 'search.productId') || null;
 
+const DEFAULT_ADVANCED_SEARCH_PARAMS = {
+    all: '',
+    any: '',
+    exclude: '',
+    fields: [],
+};
+export const advancedSearchParamsSelector = (state) => get(state, 'search.advanced') || DEFAULT_ADVANCED_SEARCH_PARAMS;
+
 export const activeViewSelector = (state) => get(state, 'search.activeView');
 export const navigationsSelector = (state) => get(state, 'search.navigations') || [];
 
@@ -47,8 +55,8 @@ export const activeProductSelector = createSelector(
 export const resultsFilteredSelector = (state) => state.resultsFiltered;
 
 export const searchParamsSelector = createSelector(
-    [searchQuerySelector, searchCreatedSelector, searchNavigationSelector, searchFilterSelector, searchProductSelector],
-    (query, created, navigation, filter, product) => {
+    [searchQuerySelector, searchCreatedSelector, searchNavigationSelector, searchFilterSelector, searchProductSelector, advancedSearchParamsSelector],
+    (query, created, navigation, filter, product, advancedSearchParams) => {
         const params = {};
 
         if (!isEmpty(query)) {
@@ -65,6 +73,20 @@ export const searchParamsSelector = createSelector(
 
         if (product) {
             params.product = product;
+        }
+
+        if (advancedSearchParams.all || advancedSearchParams.any || advancedSearchParams.exclude) {
+            params.advancedSearch = {fields: advancedSearchParams.fields};
+
+            if (advancedSearchParams.all) {
+                params.advancedSearch.all = advancedSearchParams.all;
+            }
+            if (advancedSearchParams.any) {
+                params.advancedSearch.any = advancedSearchParams.any;
+            }
+            if (advancedSearchParams.exclude) {
+                params.advancedSearch.exclude = advancedSearchParams.exclude;
+            }
         }
 
         if (filter && Object.keys(filter).length > 0) {
