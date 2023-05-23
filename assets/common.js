@@ -1,5 +1,4 @@
 import 'alertifyjs';
-import 'babel-polyfill';
 
 import 'bootstrap';
 import 'classnames';

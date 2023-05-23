@@ -43,17 +43,16 @@ const config = {
     module: {
         rules: [
             {
-                test: /\.jsx?$/,
+                test: /\.(ts|tsx|js|jsx)$/,
                 include: [
                     path.resolve(__dirname, 'assets'),
                     path.resolve(__dirname, 'node_modules/bootstrap'),
                     path.resolve(process.cwd(), 'node_modules/bootstrap'),
                 ],
-                loader: 'babel-loader',
+                loader: 'ts-loader',
                 options: {
-                    presets: ['es2015', 'react'],
-                    plugins: ['transform-object-rest-spread'],
-                }
+                    transpileOnly: true,
+                },
             },
             {
                 test: /\.css$/,
@@ -79,7 +78,7 @@ const config = {
         ]
     },
     resolve: {
-        extensions: ['.js', '.jsx'],
+        extensions: [ '.ts', '.tsx', '.js', '.jsx'],
         modules: [
             path.resolve(__dirname, 'assets'),
             'node_modules',
