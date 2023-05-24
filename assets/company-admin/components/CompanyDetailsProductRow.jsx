@@ -1,9 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import {gettext} from 'utils';
-import {getConfig} from 'utils';
-
+import {gettext, getConfig} from 'utils';
 export function CompanyDetailsProductRow({seat, onNameClicked, showSeatRequestModal}) {
     return (
         <tr>
