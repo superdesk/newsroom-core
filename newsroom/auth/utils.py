@@ -141,7 +141,10 @@ def get_user_sections() -> Dict[str, bool]:
     user = get_user()
     if not user:
         return {}
-    if user.get("sections"):
+    elif is_current_user_admin():
+        # Admin users should see all sections
+        return {section["_id"]: True for section in app.sections}
+    elif user.get("sections"):
         return user["sections"]
     company = get_company(user)
     if company and company.get("sections"):

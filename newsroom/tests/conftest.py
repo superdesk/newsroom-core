@@ -1,12 +1,10 @@
 import os
 import pymongo
-
 from flask import Config
 from pathlib import Path
 from pytest import fixture
 
 from newsroom.web.factory import get_app
-
 
 root = (Path(__file__).parent / "..").resolve()
 

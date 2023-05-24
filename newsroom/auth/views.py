@@ -7,7 +7,7 @@ from flask_babel import gettext
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
 
-from newsroom.auth import blueprint, get_auth_user_by_email, get_user_by_email
+from newsroom.auth import blueprint, get_auth_user_by_email, get_user_by_email, get_company_from_user
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
 from newsroom.auth.utils import clear_user_session, start_user_session, send_token
 from newsroom.utils import (
@@ -37,11 +37,7 @@ def login():
             user = get_resource_service("users").find_one(req=None, _id=user["_id"])
             company = None
             if user:
-                company = (
-                    get_resource_service("companies").find_one(req=None, _id=user["company"])
-                    if user.get("company")
-                    else None
-                )
+                company = get_company_from_user(user)
             if is_valid_user(user, company):
                 start_user_session(user, permanent=form.remember_me.data)
                 update_user_last_active(user)
@@ -124,9 +120,7 @@ def get_login_token():
 
     if user is not None and _is_password_valid(password.encode("UTF-8"), user):
         user = get_resource_service("users").find_one(req=None, _id=user["_id"])
-        company = (
-            get_resource_service("companies").find_one(req=None, _id=user["company"]) if user.get("company") else None
-        )
+        company = get_company_from_user(user)
 
         if not is_company_enabled(user, company):
             abort(401, gettext("Company account has been disabled."))

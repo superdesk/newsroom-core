@@ -1,12 +1,13 @@
 import bcrypt
 import newsroom
 
-from typing import TypedDict
+from typing import Dict, Optional, List
 from flask import current_app as app, session, abort, request
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest
 
-from newsroom.auth import get_user_id, get_user, get_company
+from newsroom.types import Company, ProductRef
+from newsroom.auth import get_user_id, get_user, get_company_from_user
 from newsroom.settings import get_setting
 from newsroom.utils import set_original_creator, set_version_creator
 from superdesk.utils import is_hashed, get_hash
@@ -14,16 +15,6 @@ from newsroom.auth.utils import is_current_user_admin, is_current_user_account_m
 from newsroom.user_roles import UserRole
 from newsroom.signals import user_created, user_updated, user_deleted
 from newsroom.companies.utils import get_company_section_names, get_company_product_ids
-
-
-class UserData(TypedDict, total=False):
-    _id: str
-    email: str
-    first_name: str
-    last_name: str
-    user_type: str
-    company: str
-    is_enabled: bool
 
 
 class UsersResource(newsroom.Resource):
@@ -139,6 +130,39 @@ COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES = {
 }
 
 
+def get_updated_sections(updates, original, company: Optional[Company]) -> Dict[str, bool]:
+    sections: Dict[str, bool] = {}
+    if "sections" in updates:
+        sections = updates["sections"] or {}
+    elif "sections" in original:
+        sections = original["sections"] or {}
+
+    if not company:
+        return sections
+
+    company_section_names = get_company_section_names(company)
+    return {section: enabled and section in company_section_names for section, enabled in sections.items()}
+
+
+def get_updated_products(updates, original, company: Optional[Company]) -> List[ProductRef]:
+    products: List[ProductRef] = []
+    if "products" in updates:
+        products = updates["products"] or []
+    elif "products" in original:
+        products = original["products"] or []
+
+    if not company:
+        return products
+
+    company_section_names = get_company_section_names(company)
+    company_product_ids = get_company_product_ids(company)
+    return [
+        product
+        for product in products
+        if product.get("section") in company_section_names and product.get("_id") in company_product_ids
+    ]
+
+
 class UsersService(newsroom.Service):
     """
     A service that knows how to perform CRUD operations on the `users`
@@ -166,30 +190,16 @@ class UsersService(newsroom.Service):
         if "password" in updates:
             updates["password"] = self._get_password_hash(updates["password"])
 
-        if updates.get("company") and updates["company"] != original.get("company"):
-            self._on_company_change(updates, original)
+        company = get_company_from_user({"company": updates.get("company", original.get("company"))})
+        company_changed = updates.get("company") and updates["company"] != original.get("company")
+
+        if company_changed or "sections" in updates or "products" in updates:
+            # Company, Sections or Products have changed, recalculate the list of sections & products
+            updates["sections"] = get_updated_sections(updates, original, company)
+            updates["products"] = get_updated_products(updates, original, company)
 
         app.cache.delete(str(original.get("_id")))
         app.cache.delete(original.get("email"))
-
-    def _on_company_change(self, updates, original):
-        # Filter out any Sections & Products that the new company assigned is not permissioned for
-        company = get_company(user=updates)
-        if not company:
-            return
-
-        company_section_names = get_company_section_names(company)
-        company_product_ids = get_company_product_ids(company)
-
-        updates["sections"] = {
-            section: enabled and section in company_section_names
-            for section, enabled in (updates.get("sections") or original.get("sections") or {}).items()
-        }
-        updates["products"] = [
-            product
-            for product in updates.get("products") or original.get("products") or []
-            if product.get("section") in company_section_names and product.get("_id") in company_product_ids
-        ]
 
     def on_updated(self, updates, original):
         # set session locale if updating locale for current user

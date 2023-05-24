@@ -108,6 +108,7 @@ class CompanyAdminAppComponent extends React.Component {
                     {!this.state.sideNavOpen ? null : <CompanyAdminSideNav />}
                     <div className="content">
                         <ListBar
+                            testId="company-admin--navbar"
                             onNewItem={this.props.sectionId !== 'users' ? undefined : this.props.newUser}
                             setQuery={this.props.setQuery}
                             fetch={this.props.sectionId === 'users' ?  this.props.fetchUsers : this.setProductFilterQuery }
@@ -135,6 +136,7 @@ class CompanyAdminAppComponent extends React.Component {
                                         'btn btn-outline-primary',
                                         {active: this.props.sectionId === 'my_company'}
                                     )}
+                                    data-test-id="company-admin--companies-btn"
                                 >
                                     {gettext('My Company')}
                                 </button>
@@ -144,6 +146,7 @@ class CompanyAdminAppComponent extends React.Component {
                                         'btn btn-outline-primary',
                                         {active: this.props.sectionId === 'users'}
                                     )}
+                                    data-test-id="company-admin--users-btn"
                                 >
                                     {gettext('Users')}
                                 </button>

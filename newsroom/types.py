@@ -2,22 +2,6 @@ from bson import ObjectId
 from typing import Dict, List, TypedDict
 
 
-class UserData(TypedDict, total=False):
-    _id: ObjectId
-    email: str
-    first_name: str
-    last_name: str
-    user_type: str
-    company: str
-    is_enabled: bool
-    is_validated: bool
-    sections: Dict[str, bool]
-
-
-class User(UserData):
-    pass
-
-
 class Product(TypedDict, total=False):
     _id: ObjectId
     name: str
@@ -29,6 +13,23 @@ class ProductRef(TypedDict):
     _id: ObjectId
     seats: int
     section: str
+
+
+class UserData(TypedDict, total=False):
+    _id: ObjectId
+    email: str
+    first_name: str
+    last_name: str
+    user_type: str
+    company: ObjectId
+    is_enabled: bool
+    is_validated: bool
+    sections: Dict[str, bool]
+    products: List[ProductRef]
+
+
+class User(UserData):
+    pass
 
 
 class Company(TypedDict, total=False):

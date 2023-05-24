@@ -13,13 +13,16 @@ const SelectInput = ({
     className,
     readOnly}) => {
     return (
-        <div className={className ? className : 'form-group'}>
+        <div
+            className={className ? className : 'form-group'}
+            data-test-id={`field-${name}`}
+        >
             <label htmlFor={name}>{label}</label>
             <div className="field">
                 <select
                     id={name}
                     name={name}
-                    value={value}
+                    value={value || ''}
                     onChange={onChange}
                     className="form-control"
                     disabled={readOnly}>
