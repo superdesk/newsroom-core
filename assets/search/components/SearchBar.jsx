@@ -50,40 +50,52 @@ class SearchBar extends React.Component {
 
     render() {
         return (
-            <div className="search d-flex align-items-center">
-                <span className="search__icon">
-                    <i className="icon--search icon--gray" />
-                </span>
-                <div className={classNames('search__form input-group', {
-                    'searchForm--active': !!this.state.query,
-                })}>
-                    <form className='d-flex align-items-center' role="search" aria-label={gettext('search')} onSubmit={this.onSubmit}>
-                        <input
-                            type='text'
-                            name='q'
-                            className='search__input form-control'
-                            placeholder={gettext('Search for...')}
-                            aria-label={gettext('Search for...')}
-                            value={this.state.query || ''}
-                            onChange={this.onChange}
-                            onFocus={this.onFocus}
-                        />
-                        <div className='search__form__buttons'>
-                            <button
-                                className='btn search__clear'
-                                aria-label={gettext('Search clear')}
-                                onClick={this.onClear}
-                                type="reset"
-                            >
-                                <img src='/static/search_clear.png' width='16' height='16'/>
-                            </button>
-                            <button className='btn btn-outline-secondary' type='submit'>
-                                {gettext('Search')}
-                            </button>
-                        </div>
-                    </form>
+            <React.Fragment>
+                <div className="search d-flex align-items-center">
+                    <span className="search__icon">
+                        <i className="icon--search icon--gray" />
+                    </span>
+                    <div className={classNames('search__form input-group', {
+                        'searchForm--active': !!this.state.query,
+                    })}>
+                        <form className='d-flex align-items-center' role="search" aria-label={gettext('search')} onSubmit={this.onSubmit}>
+                            <input
+                                type='text'
+                                name='q'
+                                className='search__input form-control'
+                                placeholder={gettext('Search for...')}
+                                aria-label={gettext('Search for...')}
+                                value={this.state.query || ''}
+                                onChange={this.onChange}
+                                onFocus={this.onFocus}
+                            />
+                            <div className='search__form__buttons'>
+                                <button
+                                    className='btn search__clear'
+                                    aria-label={gettext('Search clear')}
+                                    onClick={this.onClear}
+                                    type="reset"
+                                >
+                                    <img src='/static/search_clear.png' width='16' height='16'/>
+                                </button>
+                                <button className='btn btn-outline-secondary' type='submit'>
+                                    {gettext('Search')}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </div>
+                {this.props.toggleAdvancedSearchPanel == null ? this.props.toggleAdvancedSearchPanel : (
+                    <div className="mx-2 d-flex gap-2">
+                        <button
+                            className="btn btn-primary"
+                            onClick={this.props.toggleAdvancedSearchPanel}
+                        >
+                            {gettext('Advanced Search')}
+                        </button>
+                    </div>
+                )}
+            </React.Fragment>
         );
     }
 }
@@ -93,6 +105,7 @@ SearchBar.propTypes = {
     setQuery: PropTypes.func,
     fetchItems: PropTypes.func,
     enableQueryAction: PropTypes.bool,
+    toggleAdvancedSearchPanel: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({

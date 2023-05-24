@@ -16,6 +16,9 @@ import {
     SET_SEARCH_CREATED,
     SET_SEARCH_PRODUCT,
     RESET_SEARCH_PARAMS,
+    TOGGLE_ADVANCED_SEARCH_FIELD,
+    SET_ADVANCED_SEARCH_KEYWORDS,
+    CLEAR_ADVANCED_SEARCH_PARAMS,
 } from './actions';
 
 import {EXTENDED_VIEW} from 'wire/defaults';
@@ -32,6 +35,13 @@ const INITIAL_STATE = {
     products: [],
 
     activeView: EXTENDED_VIEW,
+
+    advanced: {
+        all: '',
+        any: '',
+        exclude: '',
+        fields: [],
+    },
 };
 
 export function searchReducer(state=INITIAL_STATE, action) {
@@ -142,6 +152,43 @@ export function searchReducer(state=INITIAL_STATE, action) {
             activeFilter: INITIAL_STATE.activeFilter,
             createdFilter: INITIAL_STATE.createdFilter,
             productId: INITIAL_STATE.productId,
+            advanced: {
+                all: '',
+                any: '',
+                exclude: '',
+                fields: [],
+            },
+        };
+
+    case TOGGLE_ADVANCED_SEARCH_FIELD:
+        return {
+            ...state,
+            advanced: {
+                ...state.advanced,
+                fields: state.advanced.fields.includes(action.payload) ?
+                    state.advanced.fields.filter((field) => field !== action.payload) :
+                    [...state.advanced.fields, action.payload],
+            },
+        };
+
+    case SET_ADVANCED_SEARCH_KEYWORDS:
+        return {
+            ...state,
+            advanced: {
+                ...state.advanced,
+                [action.payload.field]: action.payload.keywords,
+            },
+        };
+
+    case CLEAR_ADVANCED_SEARCH_PARAMS:
+        return {
+            ...state,
+            advanced: {
+                all: '',
+                any: '',
+                exclude: '',
+                fields: [],
+            },
         };
 
     default:

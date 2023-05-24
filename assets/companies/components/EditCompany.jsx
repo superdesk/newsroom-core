@@ -2,11 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import classNames from 'classnames';
-import {isEmpty, isEqual} from 'lodash';
+import {isEmpty} from 'lodash';
 
 import {gettext, shortDate} from 'utils';
 import {
     editCompany,
+    toggleCompanySection,
+    toggleCompanyProduct,
+    updateCompanySeats,
     postCompany,
     setError,
     deleteCompany,
@@ -19,58 +22,16 @@ import EditCompanyAPI from './EditCompanyAPI';
 import AuditInformation from 'components/AuditInformation';
 import {EditCompanyDetails} from './EditCompanyDetails';
 
-function deriveInitialPermissionState(company, sectionList, productList) {
-    const sections = {};
-    const products = {};
-    const seats = {};
-    const companyProductsById = (company.products || []).reduce((productMap, product) => {
-        productMap[product._id] = product;
-
-        return productMap;
-    }, {});
-
-    productList.forEach((product) => {
-        if (companyProductsById[product._id] != null) {
-            products[product._id] = true;
-            seats[product._id] = companyProductsById[product._id].seats || 0;
-        } else {
-            products[product._id] = false;
-            seats[product._id] = 0;
-        }
-    });
-
-    if (company.sections) {
-        Object.assign(sections, company.sections);
-    } else {
-        sectionList.forEach((section) => {
-            sections[section._id] = false;
-        });
-    }
-
-    return {
-        sections: sections,
-        products: products,
-        seats: seats,
-        archive_access: !!company.archive_access,
-        events_only: !!company.events_only,
-        restrict_coverage_info: !!company.restrict_coverage_info,
-    };
-}
-
 class EditCompany extends React.Component {
     constructor(props) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
         this.getUsers = this.getUsers.bind(this);
-        this.toggleProductPermission = this.toggleProductPermission.bind(this);
-        this.toggleGeneralPermission = this.toggleGeneralPermission.bind(this);
-        this.updateProductSeats = this.updateProductSeats.bind(this);
         this.save = this.save.bind(this);
         this.deleteCompany = this.deleteCompany.bind(this);
 
         this.state = {
             activeTab: 'company-details',
-            permissions: deriveInitialPermissionState(this.props.company, this.props.sections, this.props.products),
         };
         this.tabs = [
             {label: gettext('Company'), name: 'company-details'},
@@ -81,41 +42,6 @@ class EditCompany extends React.Component {
         if (this.props.apiEnabled) {
             this.tabs.push({label: gettext('API'), name: 'api'});
         }
-    }
-
-    toggleProductPermission(key, _id) {
-        this.setState((prevState) => {
-            const field = {...prevState.permissions[key]};
-
-            field[_id] = !field[_id];
-            return {
-                permissions: {
-                    ...prevState.permissions,
-                    [key]: field,
-                },
-            };
-        });
-    }
-
-    toggleGeneralPermission(key) {
-        this.setState((prevState) => ({
-            permissions: {
-                ...prevState.permissions,
-                [key]: !prevState.permissions[key],
-            },
-        }));
-    }
-
-    updateProductSeats(productId, seats) {
-        this.setState((prevState) => ({
-            permissions: {
-                ...prevState.permissions,
-                seats: {
-                    ...prevState.permissions.seats,
-                    [productId]: parseInt(seats),
-                },
-            },
-        }));
     }
 
     handleTabClick(event) {
@@ -165,13 +91,7 @@ class EditCompany extends React.Component {
             }
         }
 
-        const originalPermissions = deriveInitialPermissionState(
-            this.props.company,
-            this.props.sections,
-            this.props.products
-        );
-
-        this.props.saveCompany(!isEqual(originalPermissions, this.state.permissions) ? this.state.permissions : null);
+        this.props.saveCompany();
     }
 
     deleteCompany(event) {
@@ -186,6 +106,7 @@ class EditCompany extends React.Component {
     render() {
         return (
             <div
+                data-test-id="edit-company-form"
                 className={classNames(
                     'list-item__preview',
                     {'list-item__preview--large': this.props.apiEnabled}
@@ -206,10 +127,14 @@ class EditCompany extends React.Component {
                     </button>
                 </div>
                 <AuditInformation item={this.props.company} />
-                <ul className='nav nav-tabs'>
+                <ul
+                    data-test-id="form-tabs"
+                    className='nav nav-tabs'
+                >
                     {this.tabs.filter((tab, index) => index === 0 || this.props.company._id).map((tab) => (
                         <li key={tab.name} className='nav-item'>
                             <a
+                                data-test-id={`tab-${tab.name}`}
                                 name={tab.name}
                                 className={`nav-link ${this.state.activeTab === tab.name && 'active'}`}
                                 href='#'
@@ -242,13 +167,14 @@ class EditCompany extends React.Component {
                     }
                     {this.state.activeTab === 'permissions' && this.props.company._id &&
                         <CompanyPermissions
+                            company={this.props.company}
                             sections={this.props.sections}
                             products={this.props.products}
-                            permissions={this.state.permissions}
                             save={this.save}
-                            toggleGeneralPermission={this.toggleGeneralPermission}
-                            toggleProductPermission={this.toggleProductPermission}
-                            updateProductSeats={this.updateProductSeats}
+                            onChange={this.props.onChange}
+                            toggleCompanySection={this.props.toggleCompanySection}
+                            toggleCompanyProduct={this.props.toggleCompanyProduct}
+                            updateCompanySeats={this.props.updateCompanySeats}
                         />
                     }
                     {this.props.apiEnabled && this.state.activeTab === 'api' && this.props.company._id && (
@@ -272,6 +198,9 @@ class EditCompany extends React.Component {
 EditCompany.propTypes = {
     company: PropTypes.object.isRequired,
     onChange: PropTypes.func,
+    toggleCompanySection: PropTypes.func,
+    toggleCompanyProduct: PropTypes.func,
+    updateCompanySeats: PropTypes.func,
     errors: PropTypes.object,
     users: PropTypes.arrayOf(PropTypes.object),
     saveCompany: PropTypes.func.isRequired,
@@ -307,6 +236,9 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     onChange: (event) => dispatch(editCompany(event)),
+    toggleCompanySection: (sectionId) => dispatch(toggleCompanySection(sectionId)),
+    toggleCompanyProduct: (productId, sectionId, enable) => dispatch(toggleCompanyProduct(productId, sectionId, enable)),
+    updateCompanySeats: (productId, seats) => dispatch(updateCompanySeats(productId, seats)),
     saveCompany: (permissions) => dispatch(postCompany(permissions)),
     setError: (errors) => dispatch(setError(errors)),
     deleteCompany: () => dispatch(deleteCompany()),

@@ -24,7 +24,7 @@ def product(app):
 @fixture
 def companies(app):
     _companies = [
-        {"name": "test1"},
+        {"name": "test1", "sections": {"wire": True}},
         {"name": "test2"},
         {"name": "test3"},
     ]

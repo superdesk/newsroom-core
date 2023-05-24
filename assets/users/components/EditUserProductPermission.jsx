@@ -8,11 +8,16 @@ import CheckboxInput from 'components/CheckboxInput';
 export function EditUserProductPermission({original, user, section, product, seats, onChange}) {
     const originallyEnabled = isProductEnabled(original.products || [], product._id);
     const currentlyEnabled = isProductEnabled(user.products || [], product._id);
-    const maxSeats = seats[user.company][product._id].max_seats;
-    let assignedSeats = seats[user.company][product._id].assigned_seats;
+
+    const maxSeats = user.company != null ?
+        seats[user.company][product._id].max_seats :
+        null;
+    let assignedSeats = user.company != null ?
+        seats[user.company][product._id].assigned_seats :
+        null;
 
     // Update the count/max reached for this form only, to reflect any current changes
-    if (originallyEnabled !== currentlyEnabled) {
+    if (maxSeats != null && originallyEnabled !== currentlyEnabled) {
         if (currentlyEnabled) {
             assignedSeats += 1;
         } else {
@@ -29,12 +34,14 @@ export function EditUserProductPermission({original, user, section, product, sea
                     label={product.name}
                     value={currentlyEnabled}
                     onChange={onChange}
-                    readOnly={currentlyEnabled === false && maxReached === true}
+                    readOnly={maxSeats !== null && currentlyEnabled === false && maxReached === true}
                 />
             </div>
-            <div className={classNames({'text-danger': maxReached === true})}>
-                {assignedSeats}/{maxSeats}
-            </div>
+            {maxSeats == null ? null : (
+                <div className={classNames({'text-danger': maxReached === true})}>
+                    {assignedSeats}/{maxSeats}
+                </div>
+            )}
         </div>
     );
 }

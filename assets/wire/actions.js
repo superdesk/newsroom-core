@@ -232,6 +232,7 @@ export function search(state, next, aggs) {
         aggs: aggs === false ? '0' : '1',
         size: aggs === true ? 0 : null,
         tick: Date.now().toString(),
+        advanced_search: !searchParams.advancedSearch ? null : encodeURIComponent(JSON.stringify(searchParams.advancedSearch))
     };
 
 

@@ -24,7 +24,11 @@ function CompanyList({companies, selectCompany, activeCompanyId, companyTypes, s
     return (
         <section className="content-main">
             <div className="list-items-container">
-                <table className="table table-hover" tabIndex='-1'>
+                <table
+                    className="table table-hover"
+                    tabIndex='-1'
+                    data-test-id="company-list"
+                >
                     <thead>
                         <tr>
                             <th>{ gettext('Name') }</th>

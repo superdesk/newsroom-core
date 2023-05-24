@@ -34,6 +34,16 @@ USERS = [
         "is_validated": True,
         "is_enabled": True,
         "is_approved": True,
+        "sections": {
+            "wire": True,
+            "agenda": True,
+        },
+        "products": [
+            {"_id": PROD_1, "section": "wire"},
+            {"_id": PROD_3, "section": "wire"},
+            {"_id": PROD_4, "section": "agenda"},
+            {"_id": PROD_5, "section": "wire"},
+        ],
     },
     {
         "_id": PUBLIC_USER_ID,
@@ -43,6 +53,15 @@ USERS = [
         "is_validated": True,
         "is_enabled": True,
         "is_approved": True,
+        "sections": {
+            "wire": True,
+            "agenda": True,
+        },
+        "products": [
+            {"_id": PROD_1, "section": "wire"},
+            {"_id": PROD_2, "section": "wire"},
+            {"_id": PROD_4, "section": "agenda"},
+        ],
     },
     {
         "_id": TEST_USER_ID,
@@ -53,6 +72,14 @@ USERS = [
         "is_validated": True,
         "is_enabled": True,
         "is_approved": True,
+        "sections": {
+            "wire": True,
+            "agenda": False,
+        },
+        "products": [
+            {"_id": PROD_2, "section": "wire"},
+            {"_id": PROD_5, "section": "wire"},
+        ],
     },
 ]
 
@@ -62,6 +89,10 @@ COMPANIES = [
         "name": "Press 2 co.",
         "is_enabled": True,
         "company_type": "internal",
+        "sections": {
+            "wire": True,
+            "agenda": True,
+        },
         "products": [
             {"_id": PROD_1, "section": "wire"},
             {"_id": PROD_3, "section": "wire"},
@@ -75,6 +106,10 @@ COMPANIES = [
         "is_enabled": True,
         "company_type": "public",
         "archive_access": False,
+        "sections": {
+            "wire": True,
+            "agenda": True,
+        },
         "products": [
             {"_id": PROD_1, "section": "wire"},
             {"_id": PROD_2, "section": "wire"},
@@ -87,6 +122,10 @@ COMPANIES = [
         "is_enabled": True,
         "company_type": "test",
         "archive_access": True,
+        "sections": {
+            "wire": True,
+            "agenda": False,
+        },
         "products": [
             {"_id": PROD_2, "section": "wire"},
             {"_id": PROD_5, "section": "wire"},

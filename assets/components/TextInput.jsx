@@ -24,7 +24,7 @@ function TextInput({
     ...props
 }) {
     return (
-        <InputWrapper error={error} name={name}>
+        <InputWrapper error={error} name={name} testId={`field-${name}`}>
             {label && (
                 <label htmlFor={name} className={labelClasses}>{label}</label>
             )}

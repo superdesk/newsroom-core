@@ -3,6 +3,7 @@
         data-bs-toggle="tooltip"
         data-bs-placement="right"
         aria-label="{{  gettext(nav.name) }}"
+        data-test-id="sidenav-link-{{ nav.name.lower().replace('/', '_').replace(' ', '_') }}"
         role="button"
         {% if nav.url %}target="_blank"{% endif %}
     >

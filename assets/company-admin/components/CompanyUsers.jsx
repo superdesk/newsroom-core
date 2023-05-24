@@ -12,7 +12,11 @@ function CompanyUsersComponent({users, usersById, selectUser, activeUserId, curr
     const sections = companySections[currentCompany._id];
 
     return (
-        <table className="table table-hover table--extended" tabIndex="-1">
+        <table
+            className="table table-hover table--extended"
+            tabIndex="-1"
+            data-test-id="company-admin--users-list"
+        >
             <thead>
                 <tr>
                     <th>
