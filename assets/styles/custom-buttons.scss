@@ -116,13 +116,11 @@
 
 .btn-text-only {
   text-transform: initial;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0;
   display: flex;
   align-items: center;
-  gap: 4px;
-  line-height: 1.5rem;
   &:hover {
     border: 1px solid #999;
   }

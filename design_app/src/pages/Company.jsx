@@ -26,9 +26,9 @@ function Company() {
             <div className="settings-inner">
                 {isCompanyNavShown && <CompanyNav />}
             <div className="content">
-                <section className="content-header">                    
-                    <nav className="content-bar navbar content-bar--no-left-padding">
-                        <button onClick={handleClickNav} className="icon-button icon-button--border-three-sides" aria-label="Open Side Navigation">
+                <section className="content-header">
+                    <nav className="content-bar navbar content-bar--no-left-padding flex-nowrap">
+                        <button onClick={handleClickNav} className="icon-button icon-button--border-three-sides d-none d-lg-block" aria-label="Open Side Navigation">
                         {!isCompanyNavShown && <i className="icon--hamburger icon--gray"></i>}
                         {isCompanyNavShown && <i className="icon--arrow-right icon--rotate-180 icon--gray"></i>}
                         </button>

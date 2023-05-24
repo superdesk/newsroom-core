@@ -9,7 +9,7 @@ class ListBar extends React.Component {
         return (
             <section className="content-header">
                 <nav className={classNames(
-                    'content-bar navbar',
+                    'content-bar navbar flex-nowrap',
                     {
                         'content-bar--side-padding': !this.props.noLeftPadding,
                         'content-bar--no-left-padding': this.props.noLeftPadding,
