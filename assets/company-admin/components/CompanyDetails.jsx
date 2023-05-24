@@ -7,6 +7,7 @@ import {setSection as _setSection, setProductFilter as _setProductFilter} from '
 import {CompanyDetailsProductRow} from './CompanyDetailsProductRow';
 import {searchQuerySelector} from 'search/selectors';
 import {companySectionListSelector, companyProductSeatsSelector, currentCompanySelector} from '../selectors';
+import {getConfig} from 'utils';
 
 function CompanyDetailsComponent({company, showSeatRequestModal, setSection, companySections, products, query}) {
     const sections = companySections[company._id];
@@ -19,7 +20,11 @@ function CompanyDetailsComponent({company, showSeatRequestModal, setSection, com
                 <thead>
                     <tr>
                         <th>{gettext('Products')}</th>
-                        <th>{gettext('Users')}</th>
+                        {getConfig('allow_companies_to_manage_products') && (
+                            <td>
+                                <th>{gettext('Users')}</th>
+                            </td>
+                        )}
                         <th colSpan={numSections}>{gettext('Description')}</th>
                     </tr>
                 </thead>
