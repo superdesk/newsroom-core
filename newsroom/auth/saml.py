@@ -7,8 +7,8 @@ To enable:
 
 """
 
-import enum
 import logging
+import pathlib
 import superdesk
 
 from typing import Dict, List
@@ -39,6 +39,17 @@ logger = logging.getLogger(__name__)
 
 
 def init_saml_auth(req):
+    saml_client = session.get("_saml_client")
+
+    if app.config.get("SAML_CLIENTS") and saml_client and saml_client in app.config["SAML_CLIENTS"]:
+        logging.info("Using SAML config for %s", saml_client)
+        config_path = pathlib.Path(app.config["SAML_BASE_PATH"]).joinpath(saml_client)
+        if config_path.exists():
+            return OneLogin_Saml2_Auth(req, custom_base_path=str(config_path))
+        logger.error("SAML config not found in %s", config_path)
+    elif saml_client:
+        logging.warn("Unknown SAML client %s", saml_client)
+
     auth = OneLogin_Saml2_Auth(req, custom_base_path=str(app.config["SAML_PATH"]))
     return auth
 
@@ -56,22 +67,33 @@ def prepare_flask_request(request):
     }
 
 
-class UserDataMapping(enum.Enum):
-    username = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
-    first_name = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"
-    last_name = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname"
-    email = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
-
-
 def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
+    logger.debug("Attributes for %s = %s", nameid, saml_data)
+
     userdata = UserData(
         email=nameid,
-        first_name=saml_data[UserDataMapping.first_name.value][0],
-        last_name=saml_data[UserDataMapping.last_name.value][0],
         user_type="internal",
     )
 
-    if app.config.get("SAML_COMPANY"):
+    for saml_key, user_key in app.config["SAML_USER_MAPPING"].items():
+        if saml_data.get(saml_key):
+            userdata[user_key] = saml_data[saml_key][0]  # type: ignore
+
+    # first we try to find company based on email domain
+    domain = nameid.split("@")[-1]
+    if domain:
+        company = superdesk.get_resource_service("companies").find_one(req=None, auth_domain=domain)
+        if company is not None:
+            userdata["company"] = company["_id"]
+
+    # then based on preconfigured saml client
+    if session.get("_saml_client") and not userdata.get("company"):
+        company = superdesk.get_resource_service("companies").find_one(req=None, auth_domain=session["_saml_client"])
+        if company is not None:
+            userdata["company"] = company["_id"]
+
+    # last option is global env variable
+    if app.config.get("SAML_COMPANY") and not userdata.get("company"):
         company = superdesk.get_resource_service("companies").find_one(req=None, name=app.config["SAML_COMPANY"])
         if company is not None:
             userdata["company"] = company["_id"]

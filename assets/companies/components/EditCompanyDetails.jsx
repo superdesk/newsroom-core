@@ -81,6 +81,14 @@ export function EditCompanyDetails({company, companyTypes, users, errors, onChan
                     error={errors ? errors.contact_email : null}
                 />
 
+                <TextInput
+                    name='auth_domain'
+                    label={gettext('SSO domain')}
+                    value={company.auth_domain || ''}
+                    onChange={onChange}
+                    error={errors ? errors.auth_domain : null}
+                />
+
                 <SelectInput
                     name='country'
                     label={gettext('Country')}
