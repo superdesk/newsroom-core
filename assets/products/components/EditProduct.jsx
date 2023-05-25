@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {get} from 'lodash';
+import {get, isEmpty} from 'lodash';
 
 import TextInput from 'components/TextInput';
 import CheckboxInput from 'components/CheckboxInput';
@@ -51,22 +51,22 @@ class EditProduct extends React.Component {
         let q;
 
         if (product.product_type === 'agenda') {
-            q = JSON.stringify({
+            q = JSON.stringify({    
                 query: product.query,
-                planning_item_query: product.planning_item_query
-            });
+                planning_item_query: product.planning_item_query,
+                sd_product_id: product.sd_product_id,
+            });      
         } else {
-            q = getProductQuery(product);
+            q = getProductQuery(product); 
         }
 
-
-        if (q) {
+        if (!isEmpty(q) && q !== '{}') {
             return (
                 <a href={`/${product.product_type}?q=${q}`} target="_blank"
                     className='btn btn-outline-secondary float-end'>{gettext('Test product')}
                 </a>
             );
-        }
+        }   
     }
 
     getQueryString(product, field) {
