@@ -51,13 +51,13 @@ class EditProduct extends React.Component {
         let q;
 
         if (product.product_type === 'agenda') {
-            q = JSON.stringify({    
+            q = JSON.stringify({
                 query: product.query,
                 planning_item_query: product.planning_item_query,
                 sd_product_id: product.sd_product_id,
-            });      
+            });
         } else {
-            q = getProductQuery(product); 
+            q = getProductQuery(product);
         }
 
         if (!isEmpty(q) && q !== '{}') {
@@ -66,7 +66,7 @@ class EditProduct extends React.Component {
                     className='btn btn-outline-secondary float-end'>{gettext('Test product')}
                 </a>
             );
-        }   
+        }
     }
 
     getQueryString(product, field) {
