@@ -182,6 +182,16 @@ class EditCompany extends React.Component {
                                         defaultOption=""
                                         onChange={this.props.onChange}/>}
 
+                                    {ssoEnabled && (
+                                        <TextInput
+                                            name='auth_domain'
+                                            label={gettext('SSO domain')}
+                                            value={company.auth_domain || ''}
+                                            onChange={onChange}
+                                            error={errors ? errors.auth_domain : null}
+                                        />
+                                    )}
+
                                     <CheckboxInput
                                         labelClass={isInPast(this.props.company.expiry_date) ? 'text-danger' : ''}
                                         name='is_enabled'
@@ -243,6 +253,7 @@ EditCompany.propTypes = {
     fetchCompanyUsers: PropTypes.func.isRequired,
     companyTypes: PropTypes.array,
     apiEnabled: PropTypes.bool,
+    ssoEnabled: PropTypes.bool,
     originalItem: PropTypes.object,
 };
 

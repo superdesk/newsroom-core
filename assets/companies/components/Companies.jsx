@@ -106,6 +106,7 @@ class Companies extends React.Component {
                         products={this.props.products}
                         companyTypes={this.props.companyTypes}
                         apiEnabled={this.props.apiEnabled}
+                        ssoEnabled={this.props.ssoEnabled}
                     />
                 }
             </div>
@@ -133,6 +134,7 @@ Companies.propTypes = {
     products: PropTypes.array,
     companyTypes: PropTypes.array,
     apiEnabled: PropTypes.bool,
+    ssoEnabled: PropTypes.bool,
     showSubscriberId: PropTypes.bool,
     companiesById: PropTypes.object,
 };
@@ -151,6 +153,7 @@ const mapStateToProps = (state) => ({
     errors: state.errors,
     companyTypes: state.companyTypes,
     apiEnabled: state.apiEnabled,
+    ssoEnabled: state.ssoEnabled,
     showSubscriberId: companiesSubscriberIdEnabled(state),
 });
 

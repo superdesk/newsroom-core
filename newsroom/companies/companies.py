@@ -45,6 +45,10 @@ class CompaniesResource(newsroom.Resource):
         "allowed_ip_list": {"type": "list", "mapping": {"type": "string"}},
         "original_creator": newsroom.Resource.rel("users"),
         "version_creator": newsroom.Resource.rel("users"),
+        "auth_domain": {
+            "type": "string",
+            "nullable": True,
+        },
     }
     datasource = {"source": "companies", "default_sort": [("name", 1)]}
     item_methods = ["GET", "PATCH", "DELETE"]
@@ -55,6 +59,14 @@ class CompaniesResource(newsroom.Resource):
         "name_1": (
             [("name", 1)],
             {"unique": True, "collation": {"locale": "en", "strength": 2}},
+        ),
+        "auth_domain_1": (
+            [("auth_domain", 1)],
+            {
+                "unique": True,
+                "collation": {"locale": "en", "strength": 2},
+                "partialFilterExpression": {"auth_domain": {"$gt": ""}},  # filters out None and ""
+            },
         ),
     }
 

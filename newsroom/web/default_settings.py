@@ -1,5 +1,6 @@
 import os
 import pathlib
+from typing import List
 import tzlocal
 import logging
 
@@ -475,7 +476,7 @@ DELETE_DASHBOARD_CACHE_ON_PUSH = True
 #:
 #: .. versionadded:: 2.3
 #:
-SAML_PATH = ""
+SAML_PATH = os.environ.get("SAML_PATH") or ""
 
 #: Company name which will be assigned to newsly created users
 #:
@@ -488,6 +489,27 @@ SAML_COMPANY = ""
 #: .. versionadded:: 2.3
 #:
 SAML_LABEL = "SSO"
+
+#: List of available configs for SAML, there should be a folder inside SAML_BASE_PATH for each.
+#:
+#: .. versionadded:: 2.5
+#:
+SAML_CLIENTS: List[str] = []
+
+#: Base path for SAML_COMPANIES config
+#:
+#: .. versionadded:: 2.5
+#:
+SAML_BASE_PATH: str = os.environ.get("SAML_BASE_PATH") or ""
+
+#: Mapping SAML claims to user data fields.
+#:
+#: .. versionadded:: 2.5
+#:
+SAML_USER_MAPPING = {
+    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname": "first_name",
+    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname": "last_name",
+}
 
 #: Rebuild elastic mapping on ``initialize_data`` mapping error
 #:

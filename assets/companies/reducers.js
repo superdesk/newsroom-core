@@ -139,6 +139,7 @@ export default function companyReducer(state = initialState, action) {
             sections: action.data.sections,
             companyTypes: action.data.company_types || [],
             apiEnabled: action.data.api_enabled || false,
+            ssoEnabled: action.data.sso_enabled || false,
             ui_config: action.data.ui_config,
         };
 
