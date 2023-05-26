@@ -2,14 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
-import {gettext} from 'utils';
+import {gettext, getConfig} from 'utils';
 import {selectUser as _selectUser} from 'users/actions';
 import {currentCompanySelector, companySectionListSelector, userIdSelector, userIdMapSelector} from '../selectors';
 
 import {CompanyUserListItem} from './CompanyUserListItem';
 
 function CompanyUsersComponent({users, usersById, selectUser, activeUserId, currentCompany, companySections}) {
-    const sections = companySections[currentCompany._id];
+    const sections = getConfig('allow_companies_to_manage_products') ? companySections[currentCompany._id] : [];
 
     return (
         <table
@@ -24,7 +24,7 @@ function CompanyUsersComponent({users, usersById, selectUser, activeUserId, curr
                         <div>{gettext('Email')}</div>
                     </th>
                     <th>{gettext('Status')}</th>
-                    {sections.map((section) => (
+                    {getConfig('allow_companies_to_manage_products') && sections.map(section => (
                         <th key={section._id}>
                             {gettext('{{ section }} Products', {section: section.name})}
                         </th>
