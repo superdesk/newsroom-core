@@ -11,7 +11,7 @@ import DateInput from 'components/DateInput';
 import CheckboxInput from 'components/CheckboxInput';
 
 
-export function EditCompanyDetails({company, companyTypes, users, errors, onChange, save, deleteCompany}) {
+export function EditCompanyDetails({company, companyTypes, users, errors, onChange, save, deleteCompany, ssoEnabled}) {
     return (
         <form>
             <div className="list-item__preview-form">
@@ -81,13 +81,15 @@ export function EditCompanyDetails({company, companyTypes, users, errors, onChan
                     error={errors ? errors.contact_email : null}
                 />
 
-                <TextInput
-                    name='auth_domain'
-                    label={gettext('SSO domain')}
-                    value={company.auth_domain || ''}
-                    onChange={onChange}
-                    error={errors ? errors.auth_domain : null}
-                />
+                {ssoEnabled && (
+                    <TextInput
+                        name='auth_domain'
+                        label={gettext('SSO domain')}
+                        value={company.auth_domain || ''}
+                        onChange={onChange}
+                        error={errors ? errors.auth_domain : null}
+                    />
+                )}
 
                 <SelectInput
                     name='country'
@@ -153,4 +155,5 @@ EditCompanyDetails.propTypes = {
     onChange: PropTypes.func,
     save: PropTypes.func,
     deleteCompany: PropTypes.func,
+    ssoEnabled: PropTypes.bool,
 };
