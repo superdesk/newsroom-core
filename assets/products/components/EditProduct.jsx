@@ -52,9 +52,8 @@ class EditProduct extends React.Component {
 
         if (product.product_type === 'agenda') {
             q = JSON.stringify({
-                query: product.query,
+                query: getProductQuery(product),
                 planning_item_query: product.planning_item_query,
-                sd_product_id: product.sd_product_id,
             });
         } else {
             q = getProductQuery(product);
