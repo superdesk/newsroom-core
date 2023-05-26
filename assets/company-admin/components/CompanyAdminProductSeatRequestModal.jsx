@@ -139,7 +139,7 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component {
                         {selectedProducts.map((product) => (
                             <Tag
                                 key={product._id}
-                                label={product.product_type === 'wire' ? gettext('Wire') : gettext('Agenda')}
+                                label={product.product_type === 'wire' ? sectionNames.wire : sectionNames.agenda}
                                 text={product.name}
                                 keyValue={product._id}
                                 onClick={() => this.toggleProduct(product._id)}

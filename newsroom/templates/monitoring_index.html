@@ -1,9 +1,9 @@
 {% extends "products_layout.html" %}
 
-{% block title %}{{ gettext('Monitoring') }}{% endblock %}
+{% block title %}{{ config.MONITORING_SECTION }}{% endblock %}
 
 {% block breadcrumb %}
-<span class="breadcrumb-item active">{{ gettext('Monitoring') }}</span>
+<span class="breadcrumb-item active">{{ config.MONITORING_SECTION }}</span>
 <span id="nav-breadcrumb" class="breadcrumb-item active breadcrumb-sub-item"></span>
 {% endblock %}
 

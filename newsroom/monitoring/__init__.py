@@ -18,17 +18,17 @@ from . import views  # noqa
 
 def init_app(app):
     superdesk.register_resource("monitoring", MonitoringResource, MonitoringService, _app=app)
-    app.section("monitoring", "Monitoring", "monitoring", "wire")
+    app.section("monitoring", app.config["MONITORING_SECTION"], "monitoring", "wire")
     app.settings_app(
         "monitoring",
-        lazy_gettext("Monitoring"),
+        app.config["MONITORING_SECTION"],
         weight=200,
         data=views.get_settings_data,
         allow_account_mgr=True,
     )
-    app.sidenav("Monitoring", "monitoring.index", "monitoring", section="monitoring")
+    app.sidenav(app.config["MONITORING_SECTION"], "monitoring.index", "monitoring", section="monitoring")
     app.sidenav(
-        lazy_gettext("Saved / Watched"),
+        app.config["SAVED_SECTION"],
         "monitoring.bookmarks",
         "bookmark",
         group=1,

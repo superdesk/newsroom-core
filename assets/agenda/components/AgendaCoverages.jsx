@@ -53,7 +53,7 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                     )}
                     key={coverage.coverage_id}
                     onClick={onClick}
-                    title={onClick ? gettext('Open Agenda in new tab') : onClick}
+                    title={onClick ? gettext('Open {{agenda}} in a new tab', sectionNames) : onClick}
                 >
                     <div
                         className='coverage-item__row flex-column align-items-start'

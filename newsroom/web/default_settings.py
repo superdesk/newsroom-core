@@ -514,3 +514,28 @@ MAX_MULTI_DAY_EVENT_DURATION = int(env("MAX_MULTI_DAY_EVENT_DURATION", 365))
 #: .. versionadded: 2.4.0
 #:
 DEFAULT_ALLOW_COMPANIES_TO_MANAGE_PRODUCTS = False
+
+#:
+#:
+#:
+HOME_SECTION = lazy_gettext("Home")
+
+#:
+#: .. versionadded: 2.5.0
+#:
+WIRE_SECTION = lazy_gettext("Wire")
+
+#:
+#: .. versionadded: 2.5.0
+#:
+AGENDA_SECTION = lazy_gettext("Agenda")
+
+#:
+#: .. versionadded: 2.5.0
+#:
+MONITORING_SECTION = lazy_gettext("Monitoring")
+
+#:
+#: .. versionadded: 2.5.0
+#:
+SAVED_SECTION = lazy_gettext("Saved / Watched")

@@ -32,7 +32,7 @@ def init_app(app):
     )
 
     app.sidenav(
-        lazy_gettext("Saved / Watched"),
+        app.config["SAVED_SECTION"],
         "{}.bookmarks".format(SECTION_ID),
         "bookmark",
         group=1,

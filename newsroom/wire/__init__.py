@@ -31,7 +31,7 @@ def init_app(app: BaseNewsroomApp):
     _update_items_schema(app)
     superdesk.register_resource("wire_search", WireSearchResource, WireSearchService, _app=app)
 
-    app.section("wire", "Wire", "wire")
+    app.section("wire", app.config["WIRE_SECTION"], "wire")
     app.dashboard(
         "newsroom",
         lazy_gettext("Newsroom"),
@@ -49,11 +49,11 @@ def init_app(app: BaseNewsroomApp):
         ],
     )
 
-    app.sidenav("Home", "wire.index", "home")
-    app.sidenav("Wire", "wire.wire", "text", section="wire")
+    app.sidenav(app.config["HOME_SECTION"], "wire.index", "home")
+    app.sidenav(app.config["WIRE_SECTION"], "wire.wire", "text", section="wire")
 
     app.sidenav(
-        lazy_gettext("Saved / Watched"),
+        app.config["SAVED_SECTION"],
         "wire.bookmarks",
         "bookmark",
         group=1,
@@ -103,7 +103,7 @@ def init_app(app: BaseNewsroomApp):
 
     app.general_setting(
         "wire_time_limit_days",
-        lazy_gettext("Time limit for Wire products (in days)"),
+        lazy_gettext("Time limit for %(section)s products (in days)", section=app.config["WIRE_SECTION"]),
         type="number",
         min=0,
         weight=300,

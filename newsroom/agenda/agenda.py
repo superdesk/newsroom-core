@@ -1450,7 +1450,7 @@ class AgendaService(BaseSearchService):
                     action = "been {}.".format(
                         agenda.get("state")
                         if agenda.get("state") != WORKFLOW_STATE.KILLED
-                        else "removed from the Agenda calendar"
+                        else "removed from the calendar"
                     )
 
                 if (
