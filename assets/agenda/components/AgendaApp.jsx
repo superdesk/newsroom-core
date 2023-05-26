@@ -85,11 +85,15 @@ class AgendaApp extends BaseApp {
     }
 
     render() {
-        if (this.state.initialLoad) {
-            return <div className="wire-articles__item-wrap col-12">
-                <div className="alert alert-secondary">{
-                    gettext('There is no product associated with your user. Please reach out to your Company Admin.')}</div>
-            </div>;
+        if (this.state.initialLoad) {    
+            if(this.props.userType !== 'administrator') {
+                return <div className="wire-articles__item-wrap col-12">
+                    <div className="alert alert-secondary">{
+                        gettext('There is no product associated with your user. Please reach out to your Company Admin.')}</div>
+                </div>;
+            } else {
+                return this.renderLoader();
+            }
         }
 
         const modal = this.renderModal(this.props.modal);
