@@ -9,8 +9,8 @@ import {currentCompanySelector, companySectionListSelector, userIdSelector, user
 import {CompanyUserListItem} from './CompanyUserListItem';
 
 function CompanyUsersComponent({users, usersById, selectUser, activeUserId, currentCompany, companySections}) {
-    const allow_companies_to_manage_products = getConfig('allow_companies_to_manage_products');
-    const sections = allow_companies_to_manage_products ? companySections[currentCompany._id] : [];
+    const allowCompaniesToManageProducts = getConfig('allow_companies_to_manage_products');
+    const sections = allowCompaniesToManageProducts ? companySections[currentCompany._id] : [];
 
     return (
         <table
@@ -25,7 +25,7 @@ function CompanyUsersComponent({users, usersById, selectUser, activeUserId, curr
                         <div>{gettext('Email')}</div>
                     </th>
                     <th>{gettext('Status')}</th>
-                    {allow_companies_to_manage_products && sections.map(section => (
+                    {allowCompaniesToManageProducts && sections.map(section => (
                         <th key={section._id}>
                             {gettext('{{ section }} Products', {section: section.name})}
                         </th>
