@@ -36,6 +36,7 @@ def get_settings_data():
         "company_types": get_company_types_options(app.config.get("COMPANY_TYPES", [])),
         "api_enabled": app.config.get("NEWS_API_ENABLED", False),
         "ui_config": get_resource_service("ui_config").get_section_config("companies"),
+        "sso_enabled": bool(app.config.get("SAML_COMPANIES") or app.config.get("SAML_PATH")),
     }
 
 
@@ -104,6 +105,7 @@ def get_company_updates(data, original=None):
         "company_type": data.get("company_type") or original.get("company_type"),
         "monitoring_administrator": data.get("monitoring_administrator") or original.get("monitoring_administrator"),
         "allowed_ip_list": data.get("allowed_ip_list") or original.get("allowed_ip_list"),
+        "auth_domain": data.get("auth_domain"),
     }
 
     for field in ["sections", "archive_access", "events_only", "restrict_coverage_info", "products", "seats"]:

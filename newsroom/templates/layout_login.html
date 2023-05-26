@@ -1,0 +1,22 @@
+{% extends "layout_wire.html" %}
+
+{% block contentMain %}
+<div class="container-fluid py-5 overflow-auto">
+    <div class="row">
+        <div class="col-12 col-md-8 col-lg-6 col-xxl-4 mx-auto">
+            <div class="card border-0 bg-white box-shadow--z1">
+                <div class="card-header pt-4 border-0 bg-white">
+                    <div class="text-center mb-4">
+                        {% include 'login_logo.html' %}
+                    </div>
+                    {% block login_title %}
+                    {% endblock %}
+                </div>
+
+                {% block login_content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

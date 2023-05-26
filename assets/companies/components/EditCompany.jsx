@@ -155,6 +155,7 @@ class EditCompany extends React.Component {
                                 onChange={this.props.onChange}
                                 save={this.save}
                                 deleteCompany={this.deleteCompany}
+                                ssoEnabled={this.props.ssoEnabled}
                             />
                         </div>
                     }
@@ -210,6 +211,7 @@ EditCompany.propTypes = {
     fetchCompanyUsers: PropTypes.func.isRequired,
     companyTypes: PropTypes.array,
     apiEnabled: PropTypes.bool,
+    ssoEnabled: PropTypes.bool,
     companiesById: PropTypes.object,
 
     sections: PropTypes.arrayOf(PropTypes.shape({
@@ -232,6 +234,7 @@ const mapStateToProps = (state) => ({
     users: state.companyUsers,
     companyTypes: state.companyTypes,
     apiEnabled: state.apiEnabled,
+    ssoEnabled: state.ssoEnabled,
 });
 
 const mapDispatchToProps = (dispatch) => ({
