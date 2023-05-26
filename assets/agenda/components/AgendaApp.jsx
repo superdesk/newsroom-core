@@ -86,7 +86,10 @@ class AgendaApp extends BaseApp {
 
     render() {
         if (this.state.initialLoad) {
-            return this.renderLoader();
+            return <div className="wire-articles__item-wrap col-12">
+                <div className="alert alert-secondary">{
+                    gettext('There is no product associated with your user. Please reach out to your Company Admin.')}</div>
+            </div>;
         }
 
         const modal = this.renderModal(this.props.modal);
