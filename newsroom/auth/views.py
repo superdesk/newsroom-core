@@ -255,11 +255,3 @@ def set_locale():
     if locale and locale in app.config["LANGUAGES"]:
         flask.session["locale"] = locale
     return flask.redirect(flask.url_for("auth.login"))
-
-
-@blueprint.route("/login/<client>", methods=["GET"])
-def client_login(client):
-    if not client or client not in app.config["SAML_CLIENTS"]:
-        return abort(404)
-    flask.session["_saml_client"] = client
-    return flask.render_template("login_client.html", client=client)

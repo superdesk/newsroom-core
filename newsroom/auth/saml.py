@@ -22,6 +22,8 @@ from flask import (
     session,
     flash,
     url_for,
+    render_template,
+    abort,
 )
 from flask_babel import _
 from newsroom.types import UserData
@@ -34,12 +36,13 @@ from . import blueprint
 SESSION_NAME_ID = "samlNameId"
 SESSION_SESSION_ID = "samlSessionIndex"
 SESSION_USERDATA_KEY = "samlUserdata"
+SESSION_SAML_CLIENT = "_saml_client"
 
 logger = logging.getLogger(__name__)
 
 
 def init_saml_auth(req):
-    saml_client = session.get("_saml_client")
+    saml_client = session.get(SESSION_SAML_CLIENT)
 
     if app.config.get("SAML_CLIENTS") and saml_client and saml_client in app.config["SAML_CLIENTS"]:
         logging.info("Using SAML config for %s", saml_client)
@@ -87,8 +90,10 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
             userdata["company"] = company["_id"]
 
     # then based on preconfigured saml client
-    if session.get("_saml_client") and not userdata.get("company"):
-        company = superdesk.get_resource_service("companies").find_one(req=None, auth_domain=session["_saml_client"])
+    if session.get(SESSION_SAML_CLIENT) and not userdata.get("company"):
+        company = superdesk.get_resource_service("companies").find_one(
+            req=None, auth_domain=session[SESSION_SAML_CLIENT]
+        )
         if company is not None:
             userdata["company"] = company["_id"]
 
@@ -163,3 +168,11 @@ def saml_metadata():
     else:
         resp = make_response(", ".join(errors), 500)
     return resp
+
+
+@blueprint.route("/login/<client>", methods=["GET"])
+def client_login(client):
+    if not client or client not in app.config["SAML_CLIENTS"]:
+        return abort(404)
+    session[SESSION_SAML_CLIENT] = client
+    return render_template("login_client.html", client=client)
