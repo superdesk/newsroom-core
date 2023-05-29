@@ -11,7 +11,7 @@ import {
     AGENDA_WIRE_ITEMS,
     WATCH_COVERAGE,
     STOP_WATCHING_COVERAGE,
-    GET_USER,
+    SET_ERROR_MESSAGE,
     SET_ERROR
 } from './actions';
 
@@ -60,7 +60,7 @@ const initialState = {
     uiConfig: {},
     groups: [],
     hasAgendaFeaturedItems: false,
-    userDetail: null,
+    errorMessage: null
 };
 
 function recieveItems(state, data) {
@@ -245,11 +245,12 @@ export default function agendaReducer(state = initialState, action) {
             }
         };
 
-    case GET_USER: {
+    case SET_ERROR_MESSAGE:
         return {
-            userDetail: action.user,
+            ...state,
+            isLoading: false,
+            errorMessage: action.message
         };
-    }
 
     case SET_ERROR: {
         return {...state,

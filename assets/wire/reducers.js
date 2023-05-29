@@ -6,8 +6,8 @@ import {
     WIRE_ITEM_REMOVED,
     RECIEVE_AGGS,
     LOADING_AGGREGATIONS,
-    GET_USER,
     SET_ERROR,
+    SET_ERROR_MESSAGE,
 } from './actions';
 
 import {get, cloneDeep} from 'lodash';
@@ -46,7 +46,7 @@ const initialState = {
     groups: [],
     searchInitiated: false,
     loadingAggregations: false,
-    userDetail:null
+    errorMessage : null,
 };
 
 function recieveItems(state, data) {
@@ -191,11 +191,12 @@ export default function wireReducer(state = initialState, action) {
     case WIRE_ITEM_REMOVED:
         return markItemsRemoved(state, action.ids);
 
-    case GET_USER: {
+    case SET_ERROR_MESSAGE:
         return {
-            userDetail: action.user,
+            ...state,
+            isLoading: false,
+            errorMessage: action.message
         };
-    }
 
     case SET_ERROR: {
         return {...state,

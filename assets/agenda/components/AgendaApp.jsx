@@ -55,8 +55,6 @@ import AgendaDateNavigation from './AgendaDateNavigation';
 import BookmarkTabs from 'components/BookmarkTabs';
 import {setActiveDate, setAgendaDropdownFilter} from 'local-store';
 import {previewConfigSelector, detailsConfigSelector} from 'ui/selectors';
-import {fetchUser} from '../actions';
-import {isUserAdmin} from '../../users/utils';
 
 const modals = {
     shareItem: ShareItemModal,
@@ -86,17 +84,11 @@ class AgendaApp extends BaseApp {
         this.props.fetchItems();
     }
 
-    componentDidMount(){
-        this.props.fetchUser(this.props.user);
-    }
-
     render() {
         if (this.state.initialLoad){
             return this.renderLoader();
         }
-        if (this.props.userDetail && ! isUserAdmin(this.props.userDetail) &&
-            this.props.userDetail.products.length === 0
-        ) {
+        if (this.props.errorMessage !== null) {
             return (
                 <div className="wire-articles__item-wrap col-12">
                     <div className="alert alert-secondary">
@@ -399,7 +391,7 @@ const mapStateToProps = (state) => ({
     detailsConfig: detailsConfigSelector(state),
     groups: get(state, 'groups', []),
     hasAgendaFeaturedItems: state.hasAgendaFeaturedItems,
-    userDetail: state.userDetail
+    errorMessage:state.errorMessage
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -422,7 +414,6 @@ const mapDispatchToProps = (dispatch) => ({
     requestCoverage: (item, message) => dispatch(requestCoverage(item, message)),
     toggleFeaturedFilter: (fetch) => dispatch(toggleFeaturedFilter(fetch)),
     setQuery: (query) => dispatch(setQuery(query)),
-    fetchUser: (id) => dispatch(fetchUser(id)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AgendaApp);

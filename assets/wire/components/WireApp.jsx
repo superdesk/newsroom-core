@@ -14,7 +14,6 @@ import {
     toggleNews,
     toggleSearchAllVersions,
     downloadMedia,
-    fetchUser
 } from 'wire/actions';
 
 import {
@@ -60,8 +59,6 @@ import {
     advancedSearchTabsConfigSelector,
 } from 'ui/selectors';
 
-import {isUserAdmin} from '../../users/utils';
-
 const modals = {
     shareItem: ShareItemModal,
     downloadItems: DownloadItemsModal,
@@ -82,17 +79,11 @@ class WireApp extends BaseApp {
 
     }
 
-    componentDidMount(){
-        this.props.fetchUser(this.props.user);
-    }
-
     render() {
         if (this.state.initialLoad){
             return this.renderLoader();
         }
-        if (this.props.userDetail && ! isUserAdmin(this.props.userDetail) &&
-            this.props.userDetail.products.length === 0
-        ) {
+        if (this.props.errorMessage !== null) {
             return (
                 <div className="wire-articles__item-wrap col-12">
                     <div className="alert alert-secondary">
@@ -368,7 +359,7 @@ const mapStateToProps = (state) => ({
     searchParams: searchParamsSelector(state),
     showSaveTopic: showSaveTopicSelector(state),
     filterGroupLabels: filterGroupsToLabelMap(state),
-    userDetail: state.userDetail
+    errorMessage: state.errorMessage
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -388,7 +379,6 @@ const mapDispatchToProps = (dispatch) => ({
     setView: (view) => dispatch(setView(view)),
     closePreview: () => dispatch(previewItem(null)),
     downloadMedia: (href, id, mimeType) => dispatch(downloadMedia(href, id, mimeType)),
-    fetchUser: (id) => dispatch(fetchUser(id)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);

@@ -155,16 +155,19 @@ export const SELECT_DATE = 'SELECT_DATE';
 export function selectDate(dateString, grouping) {
     return {type: SELECT_DATE, dateString, grouping};
 }
-export const GET_USER = 'GET_USER';
-export function getUser(user) {
-    return {type: GET_USER, user};
-}
 
 export const SET_ERROR = 'SET_ERROR';
 export function setError(errors) {
     return {type: SET_ERROR, errors};
 }
 
+export const SET_ERROR_MESSAGE = 'SET_ERROR_MESSAGE';
+export function setErrorMessage(message) {
+    return {
+        type: SET_ERROR_MESSAGE,
+        message
+    };
+}
 
 export function printItem(item) {
     return (dispatch, getState) => {
@@ -684,21 +687,15 @@ export function stopWatchingCoverage(coverage, item) {
     };
 }
 
-export function fetchUser(id) {
-    return function (dispatch) {
-        return server.get(`/users/${id}`)
-            .then((data) => {
-                dispatch(getUser(data));
-            })
-            .catch((error) => errorHandler(error, dispatch, setError));
-    };
-}
-
 export function errorHandler(error, dispatch, setError) {
     console.error('error', error);
     if (setError) {
-        error.response.json().then(function(data) {
-            dispatch(setError(data));
-        });
+        if (error.response && error.response.status === 403) {
+            dispatch(setErrorMessage('No Products'));
+        } else {
+            error.response.json().then(function(data) {
+                dispatch(setError(data));
+            });
+        }
     }
 }

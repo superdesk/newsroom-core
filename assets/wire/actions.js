@@ -342,9 +342,12 @@ export function removeBookmarkItems(items) {
     return {type: REMOVE_BOOKMARK, items};
 }
 
-export const GET_USER = 'GET_USER';
-export function getUser(user) {
-    return {type: GET_USER, user};
+export const SET_ERROR_MESSAGE = 'SET_ERROR_MESSAGE';
+export function setErrorMessage(message) {
+    return {
+        type: SET_ERROR_MESSAGE,
+        message
+    };
 }
 
 export const SET_ERROR = 'SET_ERROR';
@@ -387,9 +390,13 @@ export function removeBookmarks(items) {
 export function errorHandler(error, dispatch, setError) {
     console.error('error', error);
     if (setError) {
-        error.response.json().then(function(data) {
-            dispatch(setError(data));
-        });
+        if (error.response && error.response.status === 403) {
+            dispatch(setErrorMessage('No Products'));
+        } else {
+            error.response.json().then(function(data) {
+                dispatch(setError(data));
+            });
+        }
     }
 }
 
@@ -605,12 +612,3 @@ export function initParams(params) {
     };
 }
 
-export function fetchUser(id) {
-    return function (dispatch) {
-        return server.get(`/users/${id}`)
-            .then((data) => {
-                dispatch(getUser(data));
-            })
-            .catch((error) => errorHandler(error, dispatch, setError));
-    };
-}
