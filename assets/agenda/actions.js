@@ -691,7 +691,8 @@ export function errorHandler(error, dispatch, setError) {
     console.error('error', error);
     if (setError) {
         if (error.response && error.response.status === 403) {
-            dispatch(setErrorMessage('No Products'));
+            dispatch(setErrorMessage(gettext(
+                'There is no product associated with your user. Please reach out to your Company Admin')));
         } else {
             error.response.json().then(function(data) {
                 dispatch(setError(data));

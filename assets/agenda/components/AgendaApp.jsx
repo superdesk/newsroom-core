@@ -88,11 +88,11 @@ class AgendaApp extends BaseApp {
         if (this.state.initialLoad){
             return this.renderLoader();
         }
-        if (this.props.errorMessage !== null) {
+        if (this.props.errorMessage) {
             return (
                 <div className="wire-articles__item-wrap col-12">
                     <div className="alert alert-secondary">
-                        {gettext('There is no product associated with your user. Please reach out to your Company Admin.')}
+                        {this.props.errorMessage}
                     </div>
                 </div>
             );
