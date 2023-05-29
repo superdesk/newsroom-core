@@ -1,8 +1,11 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
+interface IProps {
+    text: string;
+}
 
-export function PreviewText({text}) {
+export function PreviewText({text}: IProps) {
     if (text == null || !text.length) {
         return null;
     }
