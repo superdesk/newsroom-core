@@ -652,7 +652,7 @@ article.list {
 }
 .content-bar--no-left-padding {
     padding: 0 10px 0 0;
-    @include sm {
+    @include xxl {
         padding: 0 20px 0 0;
     }
 }
@@ -958,9 +958,9 @@ article.list {
     @include sm {
         flex: 1 1 auto;
     }
-    @include lg {
-        flex-wrap: wrap;
-    }
+    // @include lg {
+    //     flex-wrap: wrap;
+    // }
     + .content-bar__right {
         margin-inline-start: 0;
         @include sm {
@@ -1010,10 +1010,10 @@ article.list {
 .searchForm--active {
     .search__form__buttons {
         @include sm {
-            display: block;
+            display: flex;
         }
         > * {
-            margin: 0px 10px;
+            margin: 0px 4px;
         }
     }
 }
@@ -1037,7 +1037,7 @@ article.list {
     }
     &.form-control {
         display: inline-block;
-        width: auto;
+        // width: auto;
         vertical-align: middle;
     }
 }

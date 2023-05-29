@@ -116,9 +116,9 @@ class CompanyAdminAppComponent extends React.Component {
                             enableQueryAction={true}
                             noLeftPadding={true}
                         >
-                            <button
+                            {/* <button
                                 onClick={this.toggleSideNav}
-                                className="icon-button icon-button--border-three-sides"
+                                className="icon-button icon-button--border-three-sides d-none d-lg-block"
                                 aria-label={gettext('Open Side Navigation')}
                             >
                                 <i className={classNames(
@@ -128,7 +128,7 @@ class CompanyAdminAppComponent extends React.Component {
                                         'icon--arrow-right icon--rotate-180': this.state.sideNavOpen,
                                     }
                                 )} />
-                            </button>
+                            </button> */}
                             <div className="btn-group btn-group--navbar">
                                 <button
                                     onClick={() => this.props.setSection('my_company')}
@@ -152,7 +152,7 @@ class CompanyAdminAppComponent extends React.Component {
                                 </button>
                             </div>
 
-                            {this.props.sectionId === 'users' ? <label className='label label--big label--rounded'>{
+                            {this.props.sectionId === 'users' ? <label className='label label--big label--rounded me-2'>{
                                 gettext('Users : {{total}}', {total : this.props.totalUsers})}</label> : ''}
                             <div className="content-bar-divider" />
                             {this.props.sectionId !== 'users' ? null : (
