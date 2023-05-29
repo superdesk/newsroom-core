@@ -16,6 +16,8 @@ def product(app):
         "name": "Sport",
         "description": "Top level sport product",
         "is_enabled": True,
+        "query": "sports",
+        "product_type": "wire",
     }
     app.data.insert("products", [_product])
     return _product
@@ -207,6 +209,35 @@ def test_delete_assigned_product(client, app, product, companies, user):
     assert 0 == len(updated_user["products"])
 
 
+def test_company_and_user_products(client, app, public_company, public_user, product):
+    product2 = {
+        "name": "test",
+        "is_enabled": True,
+        "query": "finance",
+        "product_type": "wire",
+    }
+
+    app.data.insert("products", [product2])
+    app.data.insert(
+        "items",
+        [
+            {"headline": "finance item", "type": "text"},
+            {"headline": "sports item", "type": "text"},
+        ],
+    )
+
+    print("COMP", public_company)
+
+    assign_product_to_companies(client, product, [public_company])
+    assign_product_to_user(client, product2, public_user)
+
+    utils.login(client, public_user)
+
+    resp = client.get("/wire/search")
+    assert 200 == resp.status_code
+    assert 2 == len(resp.json["_items"]), resp.json["_items"]
+
+
 def assign_product_to_companies(client, product, companies):
     resp = client.post(
         "/products/{}/companies".format(product["_id"]),
@@ -220,5 +251,5 @@ def assign_product_to_companies(client, product, companies):
 
 def assign_product_to_user(client, product, user):
     products = user.get("products") or []
-    products.append({"_id": product["_id"]})
+    products.append({"_id": product["_id"], "section": product.get("product_type", "wire")})
     utils.patch_json(client, f"/api/_users/{user['_id']}", {"products": products})

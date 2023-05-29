@@ -1,12 +1,13 @@
 from typing import Dict, Any
 from os import path
 from flask import json, current_app as app, url_for
+from flask.testing import FlaskClient
 
 from superdesk import get_resource_service
 from superdesk.emails import SuperdeskMessage
 
 
-def post_json(client, url, data):
+def post_json(client: FlaskClient, url, data):
     """Post json data to client."""
     resp = client.post(url, json=data)
     assert resp.status_code in [200, 201], "error %d on post to %s:\n%s" % (
@@ -17,7 +18,7 @@ def post_json(client, url, data):
     return resp
 
 
-def patch_json(client, url, data):
+def patch_json(client: FlaskClient, url, data):
     headers = get_etag_header(client, url)
     resp = client.patch(url, json=data, headers=headers)
     assert resp.status_code in (200, 201), "error {}: {} on patch to {}".format(
@@ -28,7 +29,7 @@ def patch_json(client, url, data):
     return resp.json
 
 
-def delete_json(client, url, data=None):
+def delete_json(client: FlaskClient, url, data=None):
     headers = get_etag_header(client, url)
     resp = client.delete(url, json=data, headers=headers)
     assert resp.status_code in [200, 204], "error %d on delete to %s" % (
@@ -38,7 +39,7 @@ def delete_json(client, url, data=None):
     return resp
 
 
-def get_etag_header(client, url):
+def get_etag_header(client: FlaskClient, url):
     headers = {}
     orig = client.get(url).json
     assert orig, "Could not fetch {}".format(url)
@@ -47,7 +48,7 @@ def get_etag_header(client, url):
     return headers
 
 
-def get_json(client, url, expected_code=200):
+def get_json(client: FlaskClient, url, expected_code=200):
     """Get json from client."""
     resp = client.get(url, headers={"Accept": "application/json"})
     assert resp.status_code == expected_code, "error %d on get to %s:\n%s" % (
@@ -81,16 +82,17 @@ def mock_send_email(to, subject, text_body, html_body=None, sender=None, attachm
         return _app.mail.send(msg)
 
 
-def login(client, user):
+def login(client: FlaskClient, user):
+    client.get(url_for("auth.logout"))
+
     resp = client.post(
         url_for("auth.login"),
         data={
             "email": user["email"],
             "password": "admin",
         },
-        follow_redirects=True,
     )
-    assert resp.status_code == 200, f"Login failed for user {user['email']}"
+    assert resp.status_code == 302, f"Login failed for user {user['email']}"
 
 
 def load_fixture(filename: str) -> str:
