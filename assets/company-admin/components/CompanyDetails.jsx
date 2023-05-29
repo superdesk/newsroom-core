@@ -30,7 +30,7 @@ function CompanyDetailsComponent({company, showSeatRequestModal, setSection, com
                     {sections.map((section) => (
                         <React.Fragment key={section._id}>
                             <tr colSpan={2 + numSections} className="subheading">
-                                <td>{section.name}</td>
+                                <td>{gettext(section.name)}</td>
                             </tr>
 
                             {
