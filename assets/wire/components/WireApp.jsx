@@ -14,6 +14,7 @@ import {
     toggleNews,
     toggleSearchAllVersions,
     downloadMedia,
+    fetchUser
 } from 'wire/actions';
 
 import {
@@ -59,6 +60,8 @@ import {
     advancedSearchTabsConfigSelector,
 } from 'ui/selectors';
 
+import {isUserAdmin} from '../../users/utils';
+
 const modals = {
     shareItem: ShareItemModal,
     downloadItems: DownloadItemsModal,
@@ -77,19 +80,26 @@ class WireApp extends BaseApp {
             navTab.label = gettext('Monitoring Profiles');
         }
 
-        this.state.initialLoad = this.props.isLoading;
+    }
+
+    componentDidMount(){
+        this.props.fetchUser(this.props.user);
     }
 
     render() {
-        if (this.state.initialLoad) {    
-            if(this.props.userType !== 'administrator') {
-                return <div className="wire-articles__item-wrap col-12">
-                    <div className="alert alert-secondary">{
-                        gettext('There is no product associated with your user. Please reach out to your Company Admin.')}</div>
-                </div>;
-            } else {
-                return this.renderLoader();
-            }
+        if (this.state.initialLoad){
+            return this.renderLoader();
+        }
+        if (this.props.userDetail && ! isUserAdmin(this.props.userDetail) &&
+            this.props.userDetail.products.length === 0
+        ) {
+            return (
+                <div className="wire-articles__item-wrap col-12">
+                    <div className="alert alert-secondary">
+                        {gettext('There is no product associated with your user. Please reach out to your Company Admin.')}
+                    </div>
+                </div>
+            );
         }
 
         const newsOnlyFilterText = this.props.newsOnlyFilterText;
@@ -358,6 +368,7 @@ const mapStateToProps = (state) => ({
     searchParams: searchParamsSelector(state),
     showSaveTopic: showSaveTopicSelector(state),
     filterGroupLabels: filterGroupsToLabelMap(state),
+    userDetail: state.userDetail
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -377,6 +388,7 @@ const mapDispatchToProps = (dispatch) => ({
     setView: (view) => dispatch(setView(view)),
     closePreview: () => dispatch(previewItem(null)),
     downloadMedia: (href, id, mimeType) => dispatch(downloadMedia(href, id, mimeType)),
+    fetchUser: (id) => dispatch(fetchUser(id)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);

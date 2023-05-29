@@ -262,7 +262,8 @@ export function fetchItems() {
                 .catch(errorHandler),
             search(state, false, true)
                 .then((data) => dispatch(recieveAggs(data))),
-        ]);
+        ])
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -341,6 +342,16 @@ export function removeBookmarkItems(items) {
     return {type: REMOVE_BOOKMARK, items};
 }
 
+export const GET_USER = 'GET_USER';
+export function getUser(user) {
+    return {type: GET_USER, user};
+}
+
+export const SET_ERROR = 'SET_ERROR';
+export function setError(errors) {
+    return {type: SET_ERROR, errors};
+}
+
 export function bookmarkItems(items) {
     return (dispatch, getState) =>
         server.post(`/${getState().context}_bookmark`, {items})
@@ -373,8 +384,13 @@ export function removeBookmarks(items) {
             .catch(errorHandler);
 }
 
-function errorHandler(reason) {
-    console.error('error', reason);
+export function errorHandler(error, dispatch, setError) {
+    console.error('error', error);
+    if (setError) {
+        error.response.json().then(function(data) {
+            dispatch(setError(data));
+        });
+    }
 }
 
 /**
@@ -586,5 +602,15 @@ export function initParams(params) {
                     dispatch(openItem(item));
                 });
         }
+    };
+}
+
+export function fetchUser(id) {
+    return function (dispatch) {
+        return server.get(`/users/${id}`)
+            .then((data) => {
+                dispatch(getUser(data));
+            })
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }

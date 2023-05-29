@@ -69,7 +69,6 @@ class AgendaApp extends BaseApp {
         this.modals = modals;
 
         this.fetchItemsOnNavigation = this.fetchItemsOnNavigation.bind(this);
-        this.props.fetchUser(this.props.user);
     }
 
     getTabs() {
@@ -85,6 +84,10 @@ class AgendaApp extends BaseApp {
 
 
         this.props.fetchItems();
+    }
+
+    componentDidMount(){
+        this.props.fetchUser(this.props.user);
     }
 
     render() {
