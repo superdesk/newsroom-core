@@ -55,6 +55,8 @@ import AgendaDateNavigation from './AgendaDateNavigation';
 import BookmarkTabs from 'components/BookmarkTabs';
 import {setActiveDate, setAgendaDropdownFilter} from 'local-store';
 import {previewConfigSelector, detailsConfigSelector} from 'ui/selectors';
+import {fetchUser} from '../actions';
+import {isUserAdmin} from '../../users/utils';
 
 const modals = {
     shareItem: ShareItemModal,
@@ -67,6 +69,7 @@ class AgendaApp extends BaseApp {
         this.modals = modals;
 
         this.fetchItemsOnNavigation = this.fetchItemsOnNavigation.bind(this);
+        this.props.fetchUser(this.props.user);
     }
 
     getTabs() {
@@ -85,15 +88,19 @@ class AgendaApp extends BaseApp {
     }
 
     render() {
-        if (this.state.initialLoad) {    
-            if(this.props.userType !== 'administrator') {
-                return <div className="wire-articles__item-wrap col-12">
-                    <div className="alert alert-secondary">{
-                        gettext('There is no product associated with your user. Please reach out to your Company Admin.')}</div>
-                </div>;
-            } else {
-                return this.renderLoader();
-            }
+        if (this.state.initialLoad){
+            return this.renderLoader();
+        }
+        if (this.props.userDetail && ! isUserAdmin(this.props.userDetail) &&
+            this.props.userDetail.products.length === 0
+        ) {
+            return (
+                <div className="wire-articles__item-wrap col-12">
+                    <div className="alert alert-secondary">
+                        {gettext('There is no product associated with your user. Please reach out to your Company Admin.')}
+                    </div>
+                </div>
+            );
         }
 
         const modal = this.renderModal(this.props.modal);
@@ -389,6 +396,7 @@ const mapStateToProps = (state) => ({
     detailsConfig: detailsConfigSelector(state),
     groups: get(state, 'groups', []),
     hasAgendaFeaturedItems: state.hasAgendaFeaturedItems,
+    userDetail: state.userDetail
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -411,6 +419,7 @@ const mapDispatchToProps = (dispatch) => ({
     requestCoverage: (item, message) => dispatch(requestCoverage(item, message)),
     toggleFeaturedFilter: (fetch) => dispatch(toggleFeaturedFilter(fetch)),
     setQuery: (query) => dispatch(setQuery(query)),
+    fetchUser: (id) => dispatch(fetchUser(id)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AgendaApp);
