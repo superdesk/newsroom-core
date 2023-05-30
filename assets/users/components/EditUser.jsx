@@ -198,7 +198,7 @@ function EditUserComponent({
                                         <div className="form-group">
                                             <CheckboxInput
                                                 name={`sections.${section._id}`}
-                                                label={gettext(section.name)}
+                                                label={section.name}
                                                 value={get(user, `sections.${section._id}`) === true}
                                                 onChange={onChange}
                                             />
@@ -219,7 +219,7 @@ function EditUserComponent({
                                 )).map((section) => (
                                     <React.Fragment key={section._id}>
                                         <div className="list-item__preview-subheading">
-                                            {gettext(section.name)}
+                                            {section.name}
                                         </div>
                                         {products.filter(
                                             (product) => product.product_type === section._id &&

@@ -26,15 +26,27 @@ def get_view_data():
     company = get_company(user) or {}
     company_users = list(query_resource("users", lookup={"company": ObjectId(company["_id"])}))
     products = get_products_by_company(company)
+    sections = get_translated_sections(app.sections)
 
     return {
         "users": company_users,
         "companyId": str(company["_id"]),
         "companies": [company],
-        "sections": app.sections,
+        "sections": sections,
         "products": products,
     }
 
+def get_translated_sections(sections):
+    translated_sections = []
+    for section in sections:
+        translated_section = {
+            "_id": section["_id"],
+            "name": gettext(section["name"]),  # Translate the section name
+            "group": section["group"],
+            "search_type": section["search_type"],
+        }
+        translated_sections.append(translated_section)
+    return translated_sections
 
 @blueprint.route("/company_admin/send_product_seat_request", methods=["POST"])
 @login_required
