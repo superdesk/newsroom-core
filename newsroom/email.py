@@ -420,7 +420,7 @@ def _send_wire_killed_notification_email(user, item):
 def _send_agenda_killed_notification_email(user, item):
     formatter = current_app.download_formatters["text"]["formatter"]
     recipients = [user["email"]]
-    subject = gettext("Agenda cancelled notice")
+    subject = gettext("%(section)s cancelled notice", section=current_app.config["AGENDA_SECTION"])
     text_body = formatter.format_item(item, item_type="agenda")
 
     send_email(to=recipients, subject=subject, text_body=text_body)

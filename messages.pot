@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.5.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-05-10 16:20+0200\n"
+"POT-Creation-Date: 2023-05-29 13:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,7 +23,8 @@ msgid "Kill/Takedown notice"
 msgstr ""
 
 #: newsroom/email.py:423
-msgid "Agenda cancelled notice"
+#, python-format
+msgid "%(section)s cancelled notice"
 msgstr ""
 
 #: newsroom/email_templates.py:74
@@ -43,19 +44,19 @@ msgstr ""
 msgid "Unknown type {}"
 msgstr ""
 
-#: newsroom/search.py:264
+#: newsroom/search.py:279
 msgid "Page limit exceeded"
 msgstr ""
 
-#: newsroom/search.py:518
+#: newsroom/search.py:533
 msgid "User does not belong to a company."
 msgstr ""
 
-#: newsroom/search.py:520
+#: newsroom/search.py:535
 msgid "Your company doesn't have any products defined."
 msgstr ""
 
-#: newsroom/monitoring/search.py:67 newsroom/search.py:525
+#: newsroom/monitoring/search.py:67 newsroom/search.py:540
 msgid "Invalid product parameter"
 msgstr ""
 
@@ -144,27 +145,12 @@ msgstr ""
 msgid "Insufficient Permissions. Access denied."
 msgstr ""
 
-#: newsroom/auth/views.py:132 newsroom/utils.py:389
+#: newsroom/auth/views.py:126 newsroom/utils.py:389
 msgid "Company account has been disabled."
 msgstr ""
 
-#: newsroom/auth/views.py:135 newsroom/utils.py:393
+#: newsroom/auth/views.py:129 newsroom/utils.py:393
 msgid "Company account has expired."
-msgstr ""
-
-#: assets/company-admin/components/CompanyAdminProductSeatRequestModal.jsx:142
-#: assets/wire/components/AgendaLinks.jsx:82 newsroom/agenda/__init__.py:29
-#: newsroom/templates/agenda_index.html:3
-#: newsroom/templates/agenda_index.html:6
-msgid "Agenda"
-msgstr ""
-
-#: newsroom/agenda/__init__.py:31 newsroom/am_news/__init__.py:18
-#: newsroom/factcheck/__init__.py:18 newsroom/market_place/__init__.py:35
-#: newsroom/media_releases/__init__.py:23 newsroom/monitoring/__init__.py:31
-#: newsroom/templates/bookmark_layout.html:3
-#: newsroom/templates/bookmark_layout.html:6 newsroom/wire/__init__.py:56
-msgid "Saved / Watched Items"
 msgstr ""
 
 #: newsroom/agenda/__init__.py:48
@@ -261,7 +247,8 @@ msgid "Error removing watch."
 msgstr ""
 
 #: newsroom/agenda/views.py:271
-msgid "Agenda item not found"
+#, python-format
+msgid "%(section)s item not found"
 msgstr ""
 
 #: newsroom/auth/forms.py:10
@@ -324,10 +311,10 @@ msgstr ""
 msgid "I agree to"
 msgstr ""
 
-#: assets/company-admin/components/CompanyUsers.jsx:20
+#: assets/company-admin/components/CompanyUsers.jsx:24
 #: assets/user-profile/components/profile/UserProfile.jsx:82
-#: assets/users/components/EditUser.jsx:119
-#: assets/users/components/UsersList.jsx:24 newsroom/auth/forms.py:35
+#: assets/users/components/EditUser.jsx:129
+#: assets/users/components/UsersList.jsx:27 newsroom/auth/forms.py:35
 #: newsroom/auth/forms.py:41 newsroom/users/forms.py:44
 msgid "Email"
 msgstr ""
@@ -356,8 +343,8 @@ msgstr ""
 msgid "Confirm new password"
 msgstr ""
 
-#: newsroom/auth/oauth.py:59 newsroom/auth/views.py:146
-#: newsroom/auth/views.py:150 newsroom/news_api/news/assets/assets.py:24
+#: newsroom/auth/oauth.py:59 newsroom/auth/views.py:140
+#: newsroom/auth/views.py:144 newsroom/news_api/news/assets/assets.py:24
 #: newsroom/news_api/news/item/item.py:23
 msgid "Invalid token"
 msgstr ""
@@ -367,8 +354,8 @@ msgid "Email not found"
 msgstr ""
 
 #: newsroom/auth/oauth.py:70 newsroom/auth/utils.py:43
-#: newsroom/users/views.py:145 newsroom/users/views.py:184
-#: newsroom/users/views.py:244 newsroom/users/views.py:279
+#: newsroom/users/views.py:150 newsroom/users/views.py:189
+#: newsroom/users/views.py:258 newsroom/users/views.py:293
 msgid "User not found"
 msgstr ""
 
@@ -388,31 +375,31 @@ msgstr ""
 msgid "There was an error when using SSO"
 msgstr ""
 
-#: newsroom/auth/views.py:50 newsroom/auth/views.py:140
+#: newsroom/auth/views.py:46 newsroom/auth/views.py:134
 msgid "Invalid username or password."
 msgstr ""
 
-#: newsroom/auth/views.py:121
+#: newsroom/auth/views.py:117
 msgid "Exceeded number of allowed login attempts"
 msgstr ""
 
-#: newsroom/auth/views.py:180
+#: newsroom/auth/views.py:174
 msgid "Account already exists."
 msgstr ""
 
-#: newsroom/auth/views.py:205
+#: newsroom/auth/views.py:199
 msgid "Your account has been validated."
 msgstr ""
 
-#: newsroom/auth/views.py:208
+#: newsroom/auth/views.py:202
 msgid "Token has expired. Please create a new token"
 msgstr ""
 
-#: newsroom/auth/views.py:227
+#: newsroom/auth/views.py:221
 msgid "Your password has been changed. Please login again."
 msgstr ""
 
-#: newsroom/auth/views.py:244
+#: newsroom/auth/views.py:238
 msgid "A reset password token has been sent to your email address."
 msgstr ""
 
@@ -436,20 +423,20 @@ msgstr ""
 msgid "Company Management"
 msgstr ""
 
-#: newsroom/companies/views.py:67
+#: newsroom/companies/views.py:66
 msgid "Company already exists"
 msgstr ""
 
-#: newsroom/companies/views.py:74 newsroom/navigations/views.py:64
+#: newsroom/companies/views.py:76 newsroom/navigations/views.py:64
 #: newsroom/products/views.py:64 newsroom/section_filters/views.py:55
 msgid "Name not found"
 msgstr ""
 
-#: newsroom/companies/views.py:82
+#: newsroom/companies/views.py:84
 msgid "{0}: {1}"
 msgstr ""
 
-#: newsroom/companies/views.py:118 newsroom/company_admin/views.py:47
+#: newsroom/companies/views.py:131 newsroom/company_admin/views.py:47
 msgid "Company not found"
 msgstr ""
 
@@ -488,12 +475,6 @@ msgstr ""
 msgid "Time limit for access to Media Release items"
 msgstr ""
 
-#: newsroom/monitoring/__init__.py:24
-#: newsroom/templates/monitoring_index.html:3
-#: newsroom/templates/monitoring_index.html:6
-msgid "Monitoring"
-msgstr ""
-
 #: newsroom/monitoring/__init__.py:39 newsroom/monitoring/forms.py:11
 msgid "PDF"
 msgstr ""
@@ -510,9 +491,9 @@ msgstr ""
 msgid "Linked extract(s)"
 msgstr ""
 
-#: assets/companies/components/CompanyList.jsx:30
+#: assets/companies/components/CompanyList.jsx:34
 #: assets/companies/components/EditCompanyDetails.jsx:20
-#: assets/company-admin/components/CompanyUsers.jsx:19
+#: assets/company-admin/components/CompanyUsers.jsx:23
 #: assets/monitoring/components/EditMonitoringProfile.jsx:112
 #: assets/monitoring/components/MonitoringList.jsx:23
 #: assets/navigations/components/EditNavigation.jsx:78
@@ -524,11 +505,11 @@ msgstr ""
 #: assets/search/components/TopicForm.jsx:41
 #: assets/section-filters/components/EditSectionFilter.jsx:36
 #: assets/section-filters/components/SectionFilterList.jsx:22
-#: assets/users/components/UsersList.jsx:23 newsroom/monitoring/forms.py:21
+#: assets/users/components/UsersList.jsx:26 newsroom/monitoring/forms.py:21
 msgid "Name"
 msgstr ""
 
-#: assets/company-admin/components/CompanyDetails.jsx:23
+#: assets/company-admin/components/CompanyDetails.jsx:26
 #: assets/monitoring/components/EditMonitoringProfile.jsx:132
 #: assets/monitoring/components/MonitoringList.jsx:25
 #: assets/navigations/components/EditNavigation.jsx:85
@@ -548,7 +529,7 @@ msgstr ""
 msgid "Format Type"
 msgstr ""
 
-#: assets/companies/components/EditCompany.jsx:76
+#: assets/companies/components/EditCompany.jsx:37
 #: assets/company-reports/components/ComapnyNewsApiUsage.jsx:77
 #: assets/company-reports/components/Company.jsx:86
 #: assets/company-reports/components/CompanyProducts.jsx:32
@@ -559,14 +540,14 @@ msgstr ""
 #: assets/company-reports/components/UserSavedSearches.jsx:21
 #: assets/monitoring/components/EditMonitoringProfile.jsx:139
 #: assets/monitoring/components/MonitoringList.jsx:27
-#: assets/users/components/EditUser.jsx:155
-#: assets/users/components/EditUser.jsx:161
-#: assets/users/components/UsersList.jsx:29 newsroom/monitoring/forms.py:26
+#: assets/users/components/EditUser.jsx:165
+#: assets/users/components/EditUser.jsx:171
+#: assets/users/components/UsersList.jsx:32 newsroom/monitoring/forms.py:26
 #: newsroom/reports/reports.py:172 newsroom/users/forms.py:49
 msgid "Company"
 msgstr ""
 
-#: assets/companies/components/CompanyListItem.jsx:17
+#: assets/companies/components/CompanyListItem.jsx:20
 #: assets/companies/components/EditCompanyDetails.jsx:115
 #: assets/monitoring/components/EditMonitoringProfile.jsx:189
 #: assets/monitoring/components/MonitoringItem.jsx:18
@@ -578,8 +559,8 @@ msgstr ""
 #: assets/search/components/MonitoringEditor.jsx:195
 #: assets/section-filters/components/EditSectionFilter.jsx:78
 #: assets/section-filters/components/SectionFilterListItem.jsx:12
-#: assets/users/components/EditUser.jsx:235
-#: assets/users/components/UserListItem.jsx:23 newsroom/monitoring/forms.py:27
+#: assets/users/components/EditUser.jsx:261
+#: assets/users/components/UserListItem.jsx:26 newsroom/monitoring/forms.py:27
 msgid "Enabled"
 msgstr ""
 
@@ -633,11 +614,11 @@ msgstr ""
 msgid "Client not found"
 msgstr ""
 
-#: assets/companies/components/CompanyPermissions.jsx:74
-#: assets/company-admin/components/CompanyDetails.jsx:21
+#: assets/companies/components/CompanyPermissions.jsx:85
+#: assets/company-admin/components/CompanyDetails.jsx:20
 #: assets/company-reports/components/Company.jsx:24
 #: assets/navigations/components/EditNavigation.jsx:23
-#: assets/users/components/EditUser.jsx:196 newsroom/products/__init__.py:14
+#: assets/users/components/EditUser.jsx:213 newsroom/products/__init__.py:14
 #: newsroom/users/forms.py:61
 msgid "Products"
 msgstr ""
@@ -648,7 +629,7 @@ msgid "Must provide a section for this report"
 msgstr ""
 
 #: assets/company-reports/components/ContentActivity.jsx:106
-#: assets/search/selectors.js:135
+#: assets/search/selectors.js:157
 #: assets/wire/components/filters/NavCreatedPicker.jsx:27
 #: newsroom/reports/content_activity.py:186
 msgid "Published"
@@ -656,6 +637,7 @@ msgstr ""
 
 #: assets/company-reports/components/ContentActivity.jsx:107
 #: assets/components/cards/edit/ConfigEvent.jsx:26
+#: assets/search/components/AdvancedSearchPanel.jsx:96
 #: newsroom/reports/content_activity.py:187
 msgid "Headline"
 msgstr ""
@@ -813,17 +795,11 @@ msgstr ""
 msgid "Please contact Newsroom administrator to unlock your account"
 msgstr ""
 
-#: newsroom/templates/account_locked.html:17 newsroom/templates/home.html:4
-#: newsroom/templates/home_default.html:3
-#: newsroom/templates/signup_success.html:18
-msgid "Home"
-msgstr ""
-
 #: newsroom/templates/agenda_item_print.html:18
 msgid "Where"
 msgstr ""
 
-#: assets/companies/components/CompanyList.jsx:35
+#: assets/companies/components/CompanyList.jsx:39
 #: assets/company-reports/components/Company.jsx:37
 #: newsroom/templates/agenda_item_print.html:30
 msgid "Contact"
@@ -869,21 +845,23 @@ msgstr ""
 
 #: assets/users/utils.js:9 newsroom/templates/base_layout.html:75
 #: newsroom/templates/base_layout.html:76
-#: newsroom/templates/base_layout.html:82
+#: newsroom/templates/base_layout.html:83
 #: newsroom/templates/company_admin_index.html:3
 #: newsroom/templates/company_admin_index.html:6 newsroom/users/forms.py:38
 msgid "Company Admin"
 msgstr ""
 
-#: newsroom/templates/base_layout.html:89
-#: newsroom/templates/base_layout.html:91
+#: newsroom/templates/base_layout.html:92
+#: newsroom/templates/base_layout.html:93
+#: newsroom/templates/base_layout.html:100
 #: newsroom/templates/company_reports.html:3
 #: newsroom/templates/company_reports.html:6
 msgid "Reports"
 msgstr ""
 
-#: newsroom/templates/base_layout.html:97
-#: newsroom/templates/base_layout.html:99 newsroom/templates/settings.html:3
+#: newsroom/templates/base_layout.html:108
+#: newsroom/templates/base_layout.html:109
+#: newsroom/templates/base_layout.html:116 newsroom/templates/settings.html:3
 #: newsroom/templates/settings.html:6
 msgid "Settings"
 msgstr ""
@@ -927,7 +905,7 @@ msgid "click here to register."
 msgstr ""
 
 #: assets/user-profile/components/profile/UserProfile.jsx:136
-#: assets/users/components/EditUser.jsx:171 newsroom/templates/login.html:35
+#: assets/users/components/EditUser.jsx:181 newsroom/templates/login.html:35
 msgid "Language"
 msgstr ""
 
@@ -974,7 +952,7 @@ msgstr ""
 msgid "Validate"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:269
+#: assets/users/components/EditUser.jsx:295
 #: newsroom/templates/request_token.html:29
 msgid "Reset Password"
 msgstr ""
@@ -995,8 +973,8 @@ msgstr ""
 #: assets/components/CardEditor.jsx:72 assets/components/CardEditor.jsx:74
 #: assets/components/EditPanel.jsx:132 assets/components/Modal.jsx:168
 #: assets/search/components/MonitoringEditor.jsx:203
-#: assets/search/components/TopicEditor.jsx:313
-#: assets/search/components/TopicEditor.jsx:316
+#: assets/search/components/TopicEditor.jsx:302
+#: assets/search/components/TopicEditor.jsx:305
 #: assets/user-profile/components/profile/UserProfile.jsx:152
 #: assets/wire/components/SelectedItemsBar.jsx:43
 #: newsroom/templates/reset_password.html:38
@@ -1036,26 +1014,22 @@ msgstr ""
 msgid "User Profile"
 msgstr ""
 
-#: assets/company-admin/components/CompanyAdminProductSeatRequestModal.jsx:142
-#: newsroom/templates/wire_index.html:3 newsroom/templates/wire_index.html:6
-msgid "Wire"
-msgstr ""
-
 #: assets/agenda/components/AgendaApp.jsx:162
 #: assets/cards/components/EditCard.jsx:52
-#: assets/companies/components/EditCompany.jsx:203
+#: assets/companies/components/EditCompany.jsx:124
 #: assets/components/CloseButton.jsx:9 assets/components/SortItems.jsx:46
 #: assets/monitoring/components/EditMonitoringProfile.jsx:86
 #: assets/navigations/components/EditNavigation.jsx:51
 #: assets/oauth_clients/components/EditClient.jsx:26
 #: assets/products/components/EditProduct.jsx:89
+#: assets/search/components/AdvancedSearchPanel.jsx:30
 #: assets/search/components/MonitoringEditor.jsx:131
-#: assets/search/components/TopicEditor.jsx:238
+#: assets/search/components/TopicEditor.jsx:227
 #: assets/section-filters/components/EditSectionFilter.jsx:26
 #: assets/ui/components/ContentBar.jsx:8 assets/ui/components/Preview.jsx:16
 #: assets/user-profile/components/UserProfileApp.jsx:99
 #: assets/user-profile/components/UserProfileApp.jsx:119
-#: assets/users/components/EditUser.jsx:60 newsroom/templates/wire_item.html:11
+#: assets/users/components/EditUser.jsx:69 newsroom/templates/wire_item.html:11
 msgid "Close"
 msgstr ""
 
@@ -1136,39 +1110,39 @@ msgid "Account Management"
 msgstr ""
 
 #: assets/user-profile/components/profile/UserProfile.jsx:64
-#: assets/users/components/EditUser.jsx:105
+#: assets/users/components/EditUser.jsx:115
 #: assets/users/components/filters/UserListSortFilter.jsx:20
 #: newsroom/users/forms.py:42
 msgid "First Name"
 msgstr ""
 
 #: assets/user-profile/components/profile/UserProfile.jsx:73
-#: assets/users/components/EditUser.jsx:112
+#: assets/users/components/EditUser.jsx:122
 #: assets/users/components/filters/UserListSortFilter.jsx:23
 #: newsroom/users/forms.py:43
 msgid "Last Name"
 msgstr ""
 
-#: assets/companies/components/CompanyList.jsx:36
+#: assets/companies/components/CompanyList.jsx:40
 #: assets/companies/components/EditCompanyDetails.jsx:62
 #: newsroom/users/forms.py:45
 msgid "Telephone"
 msgstr ""
 
 #: assets/user-profile/components/profile/UserProfile.jsx:100
-#: assets/users/components/EditUser.jsx:133
-#: assets/users/components/UsersList.jsx:26 newsroom/users/forms.py:46
+#: assets/users/components/EditUser.jsx:143
+#: assets/users/components/UsersList.jsx:29 newsroom/users/forms.py:46
 msgid "Mobile"
 msgstr ""
 
 #: assets/user-profile/components/profile/UserProfile.jsx:109
-#: assets/users/components/EditUser.jsx:140
-#: assets/users/components/UsersList.jsx:27 newsroom/users/forms.py:47
+#: assets/users/components/EditUser.jsx:150
+#: assets/users/components/UsersList.jsx:30 newsroom/users/forms.py:47
 msgid "Role"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:146
-#: assets/users/components/UsersList.jsx:28
+#: assets/users/components/EditUser.jsx:156
+#: assets/users/components/UsersList.jsx:31
 #: assets/users/components/filters/UserListSortFilter.jsx:32
 #: newsroom/users/forms.py:48
 msgid "User Type"
@@ -1190,7 +1164,7 @@ msgstr ""
 msgid "Account Approved"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:245 newsroom/users/forms.py:54
+#: assets/users/components/EditUser.jsx:271 newsroom/users/forms.py:54
 msgid "Company Expiry Alert"
 msgstr ""
 
@@ -1206,32 +1180,32 @@ msgstr ""
 msgid "Locale"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:255 newsroom/users/forms.py:58
+#: assets/users/components/EditUser.jsx:281 newsroom/users/forms.py:58
 msgid "Manage Company Topics"
 msgstr ""
 
-#: assets/companies/components/CompanyPermissions.jsx:55
-#: assets/users/components/EditUser.jsx:181 newsroom/users/forms.py:60
+#: assets/companies/components/CompanyPermissions.jsx:64
+#: assets/users/components/EditUser.jsx:193 newsroom/users/forms.py:60
 msgid "Sections"
 msgstr ""
 
-#: newsroom/users/users.py:221
+#: newsroom/users/users.py:231
 msgid "Can not delete current user"
 msgstr ""
 
-#: newsroom/users/views.py:105 newsroom/users/views.py:191
+#: newsroom/users/views.py:110 newsroom/users/views.py:196
 msgid "Email address is already in use"
 msgstr ""
 
-#: newsroom/users/views.py:122 newsroom/users/views.py:196
+#: newsroom/users/views.py:127 newsroom/users/views.py:201
 msgid "Company is required for non administrators"
 msgstr ""
 
-#: newsroom/users/views.py:147
+#: newsroom/users/views.py:152
 msgid "User is already validated"
 msgstr ""
 
-#: newsroom/users/views.py:274
+#: newsroom/users/views.py:288
 msgid "User id not provided"
 msgstr ""
 
@@ -1279,6 +1253,26 @@ msgstr ""
 msgid "Video Explainer"
 msgstr ""
 
+#: newsroom/web/default_settings.py:521
+msgid "Home"
+msgstr ""
+
+#: newsroom/web/default_settings.py:526
+msgid "Wire"
+msgstr ""
+
+#: newsroom/web/default_settings.py:531
+msgid "Agenda"
+msgstr ""
+
+#: newsroom/web/default_settings.py:536
+msgid "Monitoring"
+msgstr ""
+
+#: newsroom/web/default_settings.py:541
+msgid "Saved / Watched"
+msgstr ""
+
 #: newsroom/wire/__init__.py:37
 msgid "Newsroom"
 msgstr ""
@@ -1302,8 +1296,9 @@ msgid ""
 "matching this filter will not be displayed."
 msgstr ""
 
-#: assets/missing-translations.js:12 newsroom/wire/__init__.py:106
-msgid "Time limit for Wire products (in days)"
+#: newsroom/wire/__init__.py:106
+#, python-format
+msgid "Time limit for %(section)s products (in days)"
 msgstr ""
 
 #: newsroom/wire/views.py:363
@@ -1311,9 +1306,9 @@ msgid "Not found"
 msgstr ""
 
 #: assets/cards/components/EditCard.jsx:89
-#: assets/companies/components/CompanyPermissions.jsx:125
+#: assets/companies/components/CompanyPermissions.jsx:145
 #: assets/companies/components/EditCompanyAPI.jsx:85
-#: assets/companies/components/EditCompanyDetails.jsx:125
+#: assets/companies/components/EditCompanyDetails.jsx:126
 #: assets/components/CardEditor.jsx:64 assets/components/EditPanel.jsx:140
 #: assets/components/Modal.jsx:167
 #: assets/general-settings/components/GeneralSettingsApp.jsx:110
@@ -1324,10 +1319,10 @@ msgstr ""
 #: assets/oauth_clients/components/EditClient.jsx:63
 #: assets/products/components/EditProduct.jsx:181
 #: assets/search/components/MonitoringEditor.jsx:210
-#: assets/search/components/TopicEditor.jsx:321
-#: assets/search/components/TopicEditor.jsx:324
+#: assets/search/components/TopicEditor.jsx:310
+#: assets/search/components/TopicEditor.jsx:313
 #: assets/section-filters/components/EditSectionFilter.jsx:87
-#: assets/users/components/EditUser.jsx:277
+#: assets/users/components/EditUser.jsx:304
 msgid "Save"
 msgstr ""
 
@@ -1366,6 +1361,10 @@ msgstr ""
 
 #: assets/missing-translations.js:10
 msgid "Non-media"
+msgstr ""
+
+#: assets/missing-translations.js:12
+msgid "Time limit for Wire products (in days)"
 msgstr ""
 
 #: assets/missing-translations.js:13
@@ -1467,19 +1466,19 @@ msgstr ""
 msgid "Stopped watching items successfully."
 msgstr ""
 
-#: assets/agenda/actions.js:344 assets/wire/actions.js:349
+#: assets/agenda/actions.js:344 assets/wire/actions.js:350
 msgid "Items were bookmarked successfully."
 msgstr ""
 
-#: assets/agenda/actions.js:346 assets/wire/actions.js:351
+#: assets/agenda/actions.js:346 assets/wire/actions.js:352
 msgid "Item was bookmarked successfully."
 msgstr ""
 
-#: assets/agenda/actions.js:361 assets/wire/actions.js:366
+#: assets/agenda/actions.js:361 assets/wire/actions.js:367
 msgid "Items were removed from bookmarks successfully."
 msgstr ""
 
-#: assets/agenda/actions.js:363 assets/wire/actions.js:368
+#: assets/agenda/actions.js:363 assets/wire/actions.js:369
 msgid "Item was removed from bookmarks successfully."
 msgstr ""
 
@@ -1579,19 +1578,19 @@ msgstr ""
 
 #: assets/agenda/components/AgendaApp.jsx:127
 #: assets/layout/components/BaseApp.jsx:91
-#: assets/wire/components/WireApp.jsx:123
+#: assets/wire/components/WireApp.jsx:147
 msgid "Custom View"
 msgstr ""
 
 #: assets/agenda/components/AgendaApp.jsx:152
-msgid "Agenda Content"
+msgid "{{agenda}} Content"
 msgstr ""
 
 #: assets/agenda/components/AgendaApp.jsx:161
 #: assets/am-news/components/AmNewsApp.jsx:122
 #: assets/am-news/components/AmNewsApp.jsx:123
-#: assets/wire/components/WireApp.jsx:164
-#: assets/wire/components/WireApp.jsx:165
+#: assets/wire/components/WireApp.jsx:188
+#: assets/wire/components/WireApp.jsx:189
 msgid "Close filter panel"
 msgstr ""
 
@@ -1599,14 +1598,14 @@ msgstr ""
 #: assets/agenda/components/AgendaApp.jsx:173
 #: assets/am-news/components/AmNewsApp.jsx:130
 #: assets/am-news/components/AmNewsApp.jsx:131
-#: assets/wire/components/WireApp.jsx:177
-#: assets/wire/components/WireApp.jsx:178
+#: assets/wire/components/WireApp.jsx:201
+#: assets/wire/components/WireApp.jsx:202
 msgid "Open filter panel"
 msgstr ""
 
 #: assets/agenda/components/AgendaApp.jsx:211
 #: assets/am-news/components/AmNewsApp.jsx:149
-#: assets/wire/components/WireApp.jsx:204
+#: assets/wire/components/WireApp.jsx:229
 msgid "Side filter panel"
 msgstr ""
 
@@ -1671,8 +1670,7 @@ msgid "Submit inquiry"
 msgstr ""
 
 #: assets/agenda/components/AgendaCoverages.jsx:56
-#: assets/agenda/components/AgendaEventInfo.jsx:19
-msgid "Open Agenda in new tab"
+msgid "Open {{agenda}} in a new tab"
 msgstr ""
 
 #: assets/agenda/components/AgendaCoverages.jsx:69
@@ -1724,6 +1722,10 @@ msgstr ""
 #: assets/agenda/components/AgendaEdNote.jsx:43
 #: assets/agenda/components/AgendaEdNote.jsx:55
 msgid "Event Cancelled: {{reason}}"
+msgstr ""
+
+#: assets/agenda/components/AgendaEventInfo.jsx:19
+msgid "Open {{agenda}} in new tab"
 msgstr ""
 
 #: assets/agenda/components/AgendaFeaturedStoriesToogle.jsx:10
@@ -1849,13 +1851,13 @@ msgid "Invitation Details"
 msgstr ""
 
 #: assets/agenda/components/CoverageItemStatus.jsx:79
-#: assets/companies/components/CompanyList.jsx:34
-#: assets/company-admin/components/CompanyUsers.jsx:22
+#: assets/companies/components/CompanyList.jsx:38
+#: assets/company-admin/components/CompanyUsers.jsx:26
 #: assets/monitoring/components/MonitoringList.jsx:28
 #: assets/navigations/components/NavigationList.jsx:24
 #: assets/products/components/ProductList.jsx:23
 #: assets/section-filters/components/SectionFilterList.jsx:23
-#: assets/users/components/UsersList.jsx:30
+#: assets/users/components/UsersList.jsx:33
 msgid "Status"
 msgstr ""
 
@@ -1995,7 +1997,7 @@ msgstr ""
 
 #: assets/cards/components/CardList.jsx:24
 #: assets/cards/components/EditCard.jsx:69
-#: assets/companies/components/CompanyList.jsx:31
+#: assets/companies/components/CompanyList.jsx:35
 msgid "Type"
 msgstr ""
 
@@ -2013,12 +2015,12 @@ msgid "Order"
 msgstr ""
 
 #: assets/cards/components/CardList.jsx:27
-#: assets/companies/components/CompanyList.jsx:38
+#: assets/companies/components/CompanyList.jsx:42
 #: assets/navigations/components/NavigationList.jsx:25
 #: assets/oauth_clients/components/ClientList.jsx:23
 #: assets/products/components/ProductList.jsx:27
 #: assets/section-filters/components/SectionFilterList.jsx:26
-#: assets/users/components/UsersList.jsx:31
+#: assets/users/components/UsersList.jsx:34
 msgid "Created On"
 msgstr ""
 
@@ -2039,7 +2041,7 @@ msgid "New Card"
 msgstr ""
 
 #: assets/cards/components/EditCard.jsx:44
-#: assets/companies/components/EditCompany.jsx:193
+#: assets/companies/components/EditCompany.jsx:114
 #: assets/components/Modal.jsx:121
 #: assets/monitoring/components/EditMonitoringProfile.jsx:78
 #: assets/navigations/components/EditNavigation.jsx:43
@@ -2049,7 +2051,7 @@ msgstr ""
 #: assets/section-filters/components/EditSectionFilter.jsx:18
 #: assets/ui/components/Content.jsx:7 assets/ui/components/Preview.jsx:8
 #: assets/user-profile/components/UserProfileApp.jsx:96
-#: assets/users/components/EditUser.jsx:52
+#: assets/users/components/EditUser.jsx:59
 msgid "dialog"
 msgstr ""
 
@@ -2058,7 +2060,7 @@ msgid "Edit Cards"
 msgstr ""
 
 #: assets/cards/components/EditCard.jsx:94
-#: assets/companies/components/EditCompanyDetails.jsx:131
+#: assets/companies/components/EditCompanyDetails.jsx:132
 #: assets/components/CardEditor.jsx:105
 #: assets/monitoring/components/EditMonitoringProfile.jsx:211
 #: assets/navigations/components/EditNavigation.jsx:121
@@ -2066,19 +2068,19 @@ msgstr ""
 #: assets/products/components/EditProduct.jsx:186
 #: assets/search/components/FollowedTopics.jsx:60
 #: assets/section-filters/components/EditSectionFilter.jsx:92
-#: assets/users/components/EditUser.jsx:283
+#: assets/users/components/EditUser.jsx:310
 msgid "Delete"
 msgstr ""
 
-#: assets/companies/actions.js:113
+#: assets/companies/actions.js:130
 msgid "Company updated successfully"
 msgstr ""
 
-#: assets/companies/actions.js:115
+#: assets/companies/actions.js:132
 msgid "Company created successfully"
 msgstr ""
 
-#: assets/companies/actions.js:165
+#: assets/companies/actions.js:170
 msgid "Company deleted successfully"
 msgstr ""
 
@@ -2098,87 +2100,87 @@ msgstr ""
 msgid "New Company"
 msgstr ""
 
-#: assets/companies/components/CompanyList.jsx:32
+#: assets/companies/components/CompanyList.jsx:36
 #: assets/companies/components/EditCompanyDetails.jsx:46
 msgid "Superdesk Subscriber Id"
 msgstr ""
 
-#: assets/companies/components/CompanyList.jsx:33
+#: assets/companies/components/CompanyList.jsx:37
 #: assets/companies/components/EditCompanyDetails.jsx:54
 #: assets/company-reports/components/Company.jsx:69
 msgid "Account Manager"
 msgstr ""
 
-#: assets/companies/components/CompanyList.jsx:37
+#: assets/companies/components/CompanyList.jsx:41
 #: assets/companies/components/EditCompanyDetails.jsx:86
 msgid "Country"
 msgstr ""
 
-#: assets/companies/components/CompanyList.jsx:39
+#: assets/companies/components/CompanyList.jsx:43
 msgid "Expires On"
 msgstr ""
 
-#: assets/companies/components/CompanyListItem.jsx:17
+#: assets/companies/components/CompanyListItem.jsx:20
 #: assets/company-reports/components/Company.jsx:57
 #: assets/company-reports/components/ExpiredCompanies.jsx:12
 #: assets/monitoring/components/MonitoringItem.jsx:18
 #: assets/navigations/components/NavigationListItem.jsx:13
 #: assets/products/components/ProductListItem.jsx:12
 #: assets/section-filters/components/SectionFilterListItem.jsx:12
-#: assets/users/components/UserListItem.jsx:23
+#: assets/users/components/UserListItem.jsx:26
 msgid "Disabled"
 msgstr ""
 
-#: assets/companies/components/CompanyPermissions.jsx:21
-#: assets/users/components/EditUser.jsx:101
+#: assets/companies/components/CompanyPermissions.jsx:32
+#: assets/users/components/EditUser.jsx:110
 msgid "General"
 msgstr ""
 
-#: assets/companies/components/CompanyPermissions.jsx:26
-msgid "Grant Access To Archived Wire"
+#: assets/companies/components/CompanyPermissions.jsx:37
+msgid "Grant Access To Archived {{wire}}"
 msgstr ""
 
-#: assets/companies/components/CompanyPermissions.jsx:36
+#: assets/companies/components/CompanyPermissions.jsx:45
 msgid "Events Only Access"
 msgstr ""
 
-#: assets/companies/components/CompanyPermissions.jsx:44
+#: assets/companies/components/CompanyPermissions.jsx:51
 msgid "Restrict Coverage Info"
 msgstr ""
 
-#: assets/companies/components/CompanyPermissions.jsx:96
+#: assets/companies/components/CompanyPermissions.jsx:111
 msgid "Seats:"
 msgstr ""
 
-#: assets/companies/components/EditCompany.jsx:77
-#: assets/company-admin/components/CompanyAdminApp.jsx:148
-#: assets/company-admin/components/CompanyDetails.jsx:22
+#: assets/companies/components/EditCompany.jsx:38
+#: assets/company-admin/components/CompanyAdminApp.jsx:151
+#: assets/company-admin/components/CompanyDetails.jsx:23
 #: assets/monitoring/components/EditMonitoringProfile.jsx:27
 #: assets/search/components/MonitoringEditor.jsx:31
 msgid "Users"
 msgstr ""
 
-#: assets/companies/components/EditCompany.jsx:78
+#: assets/companies/components/EditCompany.jsx:39
 msgid "Permissions"
 msgstr ""
 
-#: assets/companies/components/EditCompany.jsx:82
+#: assets/companies/components/EditCompany.jsx:43
 msgid "API"
 msgstr ""
 
-#: assets/companies/components/EditCompany.jsx:132
+#: assets/companies/components/EditCompany.jsx:58
 msgid "There are no users in the company."
 msgstr ""
 
-#: assets/companies/components/EditCompany.jsx:150
+#: assets/companies/components/EditCompany.jsx:76
 msgid "Please provide company name"
 msgstr ""
 
-#: assets/companies/components/EditCompany.jsx:180
+#: assets/companies/components/EditCompany.jsx:100
 msgid "Would you like to delete company: {{name}}"
 msgstr ""
 
-#: assets/companies/components/EditCompany.jsx:194
+#: assets/companies/components/EditCompany.jsx:115
 msgid "Edit Company"
 msgstr ""
 
@@ -2209,7 +2211,7 @@ msgid "Expiry Date"
 msgstr ""
 
 #: assets/companies/components/EditCompanyDetails.jsx:103
-msgid "Monitoring Administrator"
+msgid "{{monitoring}} Administrator"
 msgstr ""
 
 #: assets/company-admin/actions.js:29
@@ -2225,25 +2227,25 @@ msgstr ""
 msgid "Would you like to delete user: {{ name }}"
 msgstr ""
 
-#: assets/company-admin/components/CompanyAdminApp.jsx:114
+#: assets/company-admin/components/CompanyAdminApp.jsx:115
 #: assets/users/components/UsersApp.jsx:29
 msgid "New User"
 msgstr ""
 
-#: assets/company-admin/components/CompanyAdminApp.jsx:121
+#: assets/company-admin/components/CompanyAdminApp.jsx:122
 msgid "Open Side Navigation"
 msgstr ""
 
-#: assets/company-admin/components/CompanyAdminApp.jsx:139
+#: assets/company-admin/components/CompanyAdminApp.jsx:141
 msgid "My Company"
 msgstr ""
 
-#: assets/company-admin/components/CompanyAdminApp.jsx:153
+#: assets/company-admin/components/CompanyAdminApp.jsx:156
 msgid "Users : {{total}}"
 msgstr ""
 
 #: assets/company-admin/components/CompanyAdminProductSeatRequestModal.jsx:97
-#: assets/company-admin/components/CompanyDetailsProductRow.jsx:23
+#: assets/company-admin/components/CompanyDetailsProductRow.jsx:26
 msgid "Request more seats"
 msgstr ""
 
@@ -2281,24 +2283,24 @@ msgstr ""
 msgid "disabled"
 msgstr ""
 
-#: assets/company-admin/components/CompanyUserListItem.jsx:47
+#: assets/company-admin/components/CompanyUserListItem.jsx:48
 msgid "company admin"
 msgstr ""
 
-#: assets/company-admin/components/CompanyUserListItem.jsx:51
-#: assets/users/components/EditUser.jsx:75
+#: assets/company-admin/components/CompanyUserListItem.jsx:52
+#: assets/users/components/EditUser.jsx:84
 msgid "admin"
 msgstr ""
 
-#: assets/company-admin/components/CompanyUsers.jsx:25
+#: assets/company-admin/components/CompanyUsers.jsx:29
 msgid "{{ section }} Products"
 msgstr ""
 
-#: assets/company-admin/components/CompanyUsers.jsx:29
+#: assets/company-admin/components/CompanyUsers.jsx:33
 msgid "Created on"
 msgstr ""
 
-#: assets/company-admin/components/CompanyUsers.jsx:30
+#: assets/company-admin/components/CompanyUsers.jsx:34
 msgid "Last active"
 msgstr ""
 
@@ -2698,18 +2700,18 @@ msgid "Warning"
 msgstr ""
 
 #: assets/home/components/HomeApp.jsx:150
-msgid "There's no card defined for home page!"
+msgid "There's no card defined for {{home}} page!"
 msgstr ""
 
 #: assets/home/components/search-bar.jsx:19
-#: assets/search/components/SearchBar.jsx:60
+#: assets/search/components/SearchBar.jsx:61
 msgid "search"
 msgstr ""
 
 #: assets/home/components/search-bar.jsx:21
 #: assets/home/components/search-bar.jsx:22
-#: assets/search/components/SearchBar.jsx:65
 #: assets/search/components/SearchBar.jsx:66
+#: assets/search/components/SearchBar.jsx:67
 msgid "Search for..."
 msgstr ""
 
@@ -2719,7 +2721,8 @@ msgstr ""
 
 #: assets/home/components/search-bar.jsx:33
 #: assets/home/components/search-bar.jsx:34
-#: assets/search/components/SearchBar.jsx:81
+#: assets/search/components/AdvancedSearchPanel.jsx:130
+#: assets/search/components/SearchBar.jsx:82
 #: assets/search/components/TopicParameters.jsx:68
 #: assets/wire/components/filters/FiltersTab.jsx:138
 msgid "Search"
@@ -2749,27 +2752,27 @@ msgid "There's no navigations defined!"
 msgstr ""
 
 #: assets/monitoring/actions.js:92
-msgid "Monitoring Profile updated successfully"
+msgid "{{monitoring}} Profile updated successfully"
 msgstr ""
 
 #: assets/monitoring/actions.js:94
-msgid "Monitoring Profile created successfully"
+msgid "{{monitoring}} Profile created successfully"
 msgstr ""
 
 #: assets/monitoring/actions.js:160
-msgid "Monitoring Profile users updated successfully"
+msgid "{{monitoring}} Profile users updated successfully"
 msgstr ""
 
 #: assets/monitoring/actions.js:172
-msgid "Please create the monitoring profile first."
+msgid "Please create {{monitoring}} profile first."
 msgstr ""
 
 #: assets/monitoring/actions.js:177
-msgid "Monitoring Profile schedule updated successfully"
+msgid "{{monitoring}} Profile schedule updated successfully"
 msgstr ""
 
 #: assets/monitoring/actions.js:193
-msgid "Monitoring Profile deleted successfully"
+msgid "{{monitoring}} Profile deleted successfully"
 msgstr ""
 
 #: assets/monitoring/components/EditMonitoringProfile.jsx:26
@@ -2786,11 +2789,11 @@ msgstr ""
 
 #: assets/monitoring/components/EditMonitoringProfile.jsx:78
 #: assets/search/components/MonitoringEditor.jsx:122
-msgid "Edit Monitoring"
+msgid "Edit {{monitoring}}"
 msgstr ""
 
 #: assets/monitoring/components/EditMonitoringProfile.jsx:80
-msgid "Add/Edit Monitoring Profile"
+msgid "Add/Edit {{monitoring}} Profile"
 msgstr ""
 
 #: assets/monitoring/components/EditMonitoringProfile.jsx:119
@@ -2799,7 +2802,7 @@ msgid "Subject line"
 msgstr ""
 
 #: assets/monitoring/components/EditMonitoringProfile.jsx:154
-msgid "Test Monitoring Profile query"
+msgid "Test {{monitoring}} Profile query"
 msgstr ""
 
 #: assets/monitoring/components/EditMonitoringProfile.jsx:159
@@ -2816,8 +2819,8 @@ msgid "Format type"
 msgstr ""
 
 #: assets/monitoring/components/MonitoringApp.jsx:27
-#: assets/wire/components/WireApp.jsx:77
-msgid "Monitoring Profiles"
+#: assets/wire/components/WireApp.jsx:78
+msgid "{{monitoring}} Profiles"
 msgstr ""
 
 #: assets/monitoring/components/MonitoringApp.jsx:28
@@ -2829,7 +2832,7 @@ msgid "Companies with schedules"
 msgstr ""
 
 #: assets/monitoring/components/MonitoringApp.jsx:82
-msgid "New Monitoring Profile"
+msgid "New {{monitoring}} Profile"
 msgstr ""
 
 #: assets/monitoring/components/MonitoringPanel.jsx:36
@@ -2845,7 +2848,7 @@ msgid "Please provide a query"
 msgstr ""
 
 #: assets/monitoring/components/MonitoringPanel.jsx:67
-msgid "Would you like to delete the Monitoring Profile: {{name}}?"
+msgid "Would you like to delete the {{monitoring}} Profile: {{name}}?"
 msgstr ""
 
 #: assets/monitoring/components/MonitoringSchedule.jsx:18
@@ -3041,27 +3044,19 @@ msgid "An event you are watching has been updated"
 msgstr ""
 
 #: assets/notifications/components/notificationItems.jsx:117
-msgid "An Agenda item has arrived that matches a subscribed topic"
+msgid "{{ agenda }} item has arrived that matches a subscribed topic"
 msgstr ""
 
 #: assets/notifications/components/notificationItems.jsx:118
 msgid "A story has arrived that matches a subscribed topic"
 msgstr ""
 
-#: assets/notifications/components/notificationItems.jsx:137
-msgid "An Agenda Topic has been shared with you"
+#: assets/notifications/components/notificationItems.jsx:136
+msgid "{{ section }} Topic has been shared with you"
 msgstr ""
 
-#: assets/notifications/components/notificationItems.jsx:138
-msgid "A Wire Topic has been shared with you"
-msgstr ""
-
-#: assets/notifications/components/notificationItems.jsx:156
-msgid "An Agenda item was shared with you"
-msgstr ""
-
-#: assets/notifications/components/notificationItems.jsx:157
-msgid "A Wire item was shared with you"
+#: assets/notifications/components/notificationItems.jsx:154
+msgid "{{ section }} item was shared with you"
 msgstr ""
 
 #: assets/oauth_clients/actions.js:84
@@ -3180,24 +3175,80 @@ msgstr ""
 msgid "Item was shared successfully."
 msgstr ""
 
-#: assets/search/actions.js:429
+#: assets/search/actions.js:447
 msgid "Topic subscribed successfully"
 msgstr ""
 
-#: assets/search/actions.js:437
+#: assets/search/actions.js:455
 msgid "Topic unsubscribed successfully"
 msgstr ""
 
-#: assets/search/selectors.js:110 assets/search/selectors.js:122
+#: assets/search/selectors.js:132 assets/search/selectors.js:144
 msgid "Topic"
 msgstr ""
 
-#: assets/search/selectors.js:144
+#: assets/search/selectors.js:166
 msgid "Published From"
 msgstr ""
 
-#: assets/search/selectors.js:153
+#: assets/search/selectors.js:175
 msgid "Published To"
+msgstr ""
+
+#: assets/search/components/AdvancedSearchPanel.jsx:23
+msgid "Advanced Search dialog"
+msgstr ""
+
+#: assets/search/components/AdvancedSearchPanel.jsx:25
+#: assets/search/components/SearchBar.jsx:94
+msgid "Advanced Search"
+msgstr ""
+
+#: assets/search/components/AdvancedSearchPanel.jsx:43
+msgid "All of these:"
+msgstr ""
+
+#: assets/search/components/AdvancedSearchPanel.jsx:47
+#: assets/search/components/AdvancedSearchPanel.jsx:64
+#: assets/search/components/AdvancedSearchPanel.jsx:80
+msgid "Add words here..."
+msgstr ""
+
+#: assets/search/components/AdvancedSearchPanel.jsx:55
+msgid "Finds every item that contains keyword1 AND keyword2 etc."
+msgstr ""
+
+#: assets/search/components/AdvancedSearchPanel.jsx:60
+msgid "Any of these:"
+msgstr ""
+
+#: assets/search/components/AdvancedSearchPanel.jsx:71
+msgid "And every item contain keyword1 OR keyword 2 etc."
+msgstr ""
+
+#: assets/search/components/AdvancedSearchPanel.jsx:76
+msgid "None of these:"
+msgstr ""
+
+#: assets/search/components/AdvancedSearchPanel.jsx:87
+msgid "And every item will NOT contain keyword1 nor keyword2 etc."
+msgstr ""
+
+#: assets/search/components/AdvancedSearchPanel.jsx:92
+msgid "Apply these keyword rules to these text fields:"
+msgstr ""
+
+#: assets/search/components/AdvancedSearchPanel.jsx:102
+#: assets/wire/components/PreviewTags.jsx:35
+msgid "Slugline"
+msgstr ""
+
+#: assets/search/components/AdvancedSearchPanel.jsx:108
+msgid "Body"
+msgstr ""
+
+#: assets/search/components/AdvancedSearchPanel.jsx:121
+msgid "Clear all"
 msgstr ""
 
 #: assets/search/components/ContentSearchResults.jsx:128
@@ -3214,7 +3265,7 @@ msgid "Company Topics"
 msgstr ""
 
 #: assets/search/components/MonitoringEditor.jsx:27
-msgid "Monitoring Profile"
+msgid "{{monitoring}} Profile"
 msgstr ""
 
 #: assets/search/components/MonitoringEditor.jsx:78
@@ -3251,7 +3302,7 @@ msgstr ""
 msgid "Refresh"
 msgstr ""
 
-#: assets/search/components/SearchBar.jsx:74
+#: assets/search/components/SearchBar.jsx:75
 msgid "Search clear"
 msgstr ""
 
@@ -3287,39 +3338,23 @@ msgstr ""
 msgid "Email Notifications"
 msgstr ""
 
+#: assets/search/components/TopicEditor.jsx:168
+msgid "Topic updated successfully"
+msgstr ""
+
 #: assets/search/components/TopicEditor.jsx:170
-msgid "Agenda Topic updated successfully"
+msgid "Topic created successfully"
 msgstr ""
 
-#: assets/search/components/TopicEditor.jsx:171
-msgid "Wire Topic updated successfully"
+#: assets/search/components/TopicEditor.jsx:192
+msgid "Create new Topic"
 msgstr ""
 
-#: assets/search/components/TopicEditor.jsx:175
-msgid "Agenda Topic created successfully"
+#: assets/search/components/TopicEditor.jsx:194
+msgid "Save Topic"
 msgstr ""
 
-#: assets/search/components/TopicEditor.jsx:176
-msgid "Wire Topic created successfully"
-msgstr ""
-
-#: assets/search/components/TopicEditor.jsx:200
-msgid "Create new Agenda Topic"
-msgstr ""
-
-#: assets/search/components/TopicEditor.jsx:201
-msgid "Create new Wire Topic"
-msgstr ""
-
-#: assets/search/components/TopicEditor.jsx:204
-msgid "Save Agenda Topic"
-msgstr ""
-
-#: assets/search/components/TopicEditor.jsx:205
-msgid "Save Wire Topic"
-msgstr ""
-
-#: assets/search/components/TopicEditor.jsx:304
+#: assets/search/components/TopicEditor.jsx:293
 msgid "Send notifications to:"
 msgstr ""
 
@@ -3373,11 +3408,7 @@ msgid "Coverage Status"
 msgstr ""
 
 #: assets/search/components/TopicsTab.jsx:41
-msgid "Wire Topics"
-msgstr ""
-
-#: assets/search/components/TopicsTab.jsx:41
-msgid "Agenda Topics"
+msgid "{{ section }} Topics"
 msgstr ""
 
 #: assets/search/components/TopicsTab.jsx:47
@@ -3485,15 +3516,12 @@ msgid "My Profile"
 msgstr ""
 
 #: assets/user-profile/components/UserProfileApp.jsx:46
-msgid "My Wire Topics"
-msgstr ""
-
 #: assets/user-profile/components/UserProfileApp.jsx:55
-msgid "My Agenda Topics"
+msgid "My {{ section }} Topics"
 msgstr ""
 
 #: assets/user-profile/components/UserProfileApp.jsx:64
-msgid "My Monitoring"
+msgid "My {{ monitoring }}"
 msgstr ""
 
 #: assets/user-profile/components/UserProfileApp.jsx:164
@@ -3509,8 +3537,8 @@ msgid "Please provide last name"
 msgstr ""
 
 #: assets/user-profile/components/profile/UserProfile.jsx:91
-#: assets/users/components/EditUser.jsx:126
-#: assets/users/components/UsersList.jsx:25
+#: assets/users/components/EditUser.jsx:136
+#: assets/users/components/UsersList.jsx:28
 msgid "Phone"
 msgstr ""
 
@@ -3542,33 +3570,33 @@ msgstr ""
 msgid "Invitation as been resent"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:52
+#: assets/users/components/EditUser.jsx:60
 msgid "Edit User"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:54
+#: assets/users/components/EditUser.jsx:63
 msgid "Add/Edit User"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:83
 #: assets/users/components/EditUser.jsx:92
+#: assets/users/components/EditUser.jsx:101
 msgid "Resend Invite"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:87
+#: assets/users/components/EditUser.jsx:96
 msgid "Would you like to resend the invitation for {{ email }}?"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:220
+#: assets/users/components/EditUser.jsx:244
 msgid "User Settings"
 msgstr ""
 
-#: assets/users/components/EditUser.jsx:225
-#: assets/users/components/UserListItem.jsx:22
+#: assets/users/components/EditUser.jsx:251
+#: assets/users/components/UserListItem.jsx:25
 msgid "Approved"
 msgstr ""
 
-#: assets/users/components/UserListItem.jsx:22
+#: assets/users/components/UserListItem.jsx:25
 msgid "Needs Approval"
 msgstr ""
 
@@ -3576,7 +3604,7 @@ msgstr ""
 msgid "Would you like to delete user: {{name}}?"
 msgstr ""
 
-#: assets/users/components/UsersList.jsx:32
+#: assets/users/components/UsersList.jsx:35
 #: assets/users/components/filters/UserListSortFilter.jsx:26
 msgid "Last Active"
 msgstr ""
@@ -3668,16 +3696,12 @@ msgstr ""
 msgid "News only"
 msgstr ""
 
-#: assets/wire/components/PreviewTags.jsx:35
-msgid "Slugline"
-msgstr ""
-
 #: assets/wire/components/SelectedItemsBar.jsx:49
 msgid "{{ count }} item(s) selected"
 msgstr ""
 
-#: assets/wire/components/WireApp.jsx:156
-msgid "Wire Content"
+#: assets/wire/components/WireApp.jsx:180
+msgid "{{wire}} Content"
 msgstr ""
 
 #: assets/wire/components/WireListItem.jsx:43

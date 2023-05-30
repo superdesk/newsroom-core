@@ -1,9 +1,9 @@
 {% extends "products_layout.html" %}
 
-{% block title %}{{ _('Agenda') }}{% if title %} - {{ title }}{% endif %}{% endblock %}
+{% block title %}{{ config.AGENDA_SECTION }}{% if title %} - {{ title }}{% endif %}{% endblock %}
 
 {% block breadcrumb %}
-<span class="breadcrumb-item active">{{ gettext('Agenda') }}</span>
+<span class="breadcrumb-item active">{{ config.AGENDA_SECTION }}</span>
 <span id="nav-breadcrumb" class="breadcrumb-item active breadcrumb-sub-item"></span>
 {% endblock %}
 

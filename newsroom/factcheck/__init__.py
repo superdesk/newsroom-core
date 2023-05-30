@@ -1,6 +1,5 @@
 import superdesk
 from flask import Blueprint
-from flask_babel import lazy_gettext
 
 blueprint = Blueprint("factcheck", __name__)
 
@@ -15,7 +14,7 @@ def init_app(app):
     app.sidenav("FactCheck", "factcheck.index", "fact-check", section="factcheck")
 
     app.sidenav(
-        lazy_gettext("Saved / Watched"),
+        app.config["SAVED_SECTION"],
         "factcheck.bookmarks",
         "bookmark",
         group=1,

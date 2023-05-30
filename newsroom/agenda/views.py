@@ -268,7 +268,10 @@ def related_wire_items(wire_id):
     agenda_result, _ = elastic.find("agenda", internal_req, None)
 
     if len(agenda_result.docs) == 0:
-        return flask.jsonify({"error": gettext("Agenda item not found")}), 404
+        return (
+            flask.jsonify({"error": gettext("%(section)s item not found", section=app.config["AGENDA_SECTION"])}),
+            404,
+        )
 
     if restrict_coverage_info(get_company()):
         remove_restricted_coverage_info([agenda_result.docs[0]])

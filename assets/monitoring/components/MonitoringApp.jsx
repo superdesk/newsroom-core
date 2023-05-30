@@ -24,7 +24,7 @@ class MonitoringApp extends React.Component {
         this.onSectionChange = this.onSectionChange.bind(this);
 
         this.sections = [
-            {name: gettext('Monitoring Profiles')},
+            {name: gettext('{{monitoring}} Profiles', sectionNames)},
             {name: gettext('Schedules')},
         ];
 
@@ -79,7 +79,7 @@ class MonitoringApp extends React.Component {
             <Fragment>
                 <ListBar
                     onNewItem={this.isScheduleMode() ? null : this.props.newMonitoringProfile}
-                    buttonText={gettext('New Monitoring Profile')}
+                    buttonText={gettext('New {{monitoring}} Profile', sectionNames)}
                     noSearch>
                     <div className="btn-group btn-group--navbar ms-0 me-3">
                         {this.sections.map((section) => (

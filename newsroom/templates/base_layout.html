@@ -134,70 +134,12 @@
 </div>
 
 <div id="modal-container"></div>
-
-<script>
-    window.newsroom = {{ get_client_config() | tojson | safe }};
-    window.notificationData = {{ get_initial_notifications() | tojson | safe }};
-    window.profileData = {{ get_user_profile_data() | tojson | safe }};
-    window.translations = {{ get_client_translations() | tojson | safe }};
-    window.locales = {{ get_client_locales() | tojson | safe }};
-    window.locale = '{{ get_locale() | tojson | safe }}';
-</script>
-
-{{ javascript_tag('newsroom_js') | safe }}
-{{ javascript_tag('app') | safe }}
-
-{% if session.get('name') %}
-    {{ javascript_tag('notifications_js') | safe }}
-    {{ javascript_tag('user_profile_js') | safe }}
-{% endif %}
-
-{% block script %}{% endblock %}
-
-{% if get_setting('google_analytics') %}
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id={{ get_setting('google_analytics') | safe }}"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', '{{ get_setting('google_analytics') | tojson }}', {
-      custom_map: {
-          dimension1: 'company',
-          dimension2: 'user',
-      }
-  });
-
-  {% if session.get('user') %}
-  gtag('set', {'user_id': '{{ hash(session['user']) | tojson }}' });
-  {% endif %}
-
-  {% with messages = get_flashed_messages(category_filter=['analytics']) %}
-    {% if messages %}
-        analytics.sendEvents({{ messages | tojson | safe }});
-    {% endif %}
-  {% endwith %}
-</script>
-{% endif %}
-
-{% if config.GOOGLE_MAPS_KEY %}
-<script>
-    window.mapsProvider = 'google';
-    window.googleMapsKey = '{{ config.GOOGLE_MAPS_KEY | tojson }}';
-    function setMapsLoaded() {
-        window.mapsLoaded = true;
-    }
-</script>
-<script src="https://maps.googleapis.com/maps/api/js?key={{ config.GOOGLE_MAPS_KEY }}&callback=setMapsLoaded" async defer></script>
-<div id="google-map"></div>
-{% endif %}
-
-{% if config.IFRAMELY %}
-<script src="//cdn.iframe.ly/embed.js" async></script>
-{% endif %}
-
 <textarea id="copy-area"></textarea>
+
+{% include "scripts.html" %}
+
+{% block script %}
+{% endblock %}
 
 </body>
 </html>

@@ -135,7 +135,6 @@ class TopicEditor extends React.Component {
         const original = this.props.topic;
         const topic = cloneDeep(this.state.topic);
         const isExisting = !this.isNewTopic();
-        const isAgendaTopic = this.isAgendaTopic();
 
         // Construct new list of subscribers
         if (!isExisting || !original.is_global) {
@@ -166,15 +165,9 @@ class TopicEditor extends React.Component {
                 this.props.closeEditor();
 
                 if (isExisting) {
-                    notify.success(isAgendaTopic ?
-                        gettext('Agenda Topic updated successfully') :
-                        gettext('Wire Topic updated successfully')
-                    );
+                    notify.success(gettext('Topic updated successfully'));
                 } else {
-                    notify.success(isAgendaTopic ?
-                        gettext('Agenda Topic created successfully') :
-                        gettext('Wire Topic created successfully')
-                    );
+                    notify.success(gettext('Topic created successfully'));
 
                     this.props.loadMyTopic(savedTopic);
                 }
@@ -196,13 +189,9 @@ class TopicEditor extends React.Component {
 
     getTitle() {
         if (this.isNewTopic()) {
-            return this.isAgendaTopic() ?
-                gettext('Create new Agenda Topic') :
-                gettext('Create new Wire Topic');
+            return gettext('Create new Topic');
         } else {
-            return this.isAgendaTopic() ?
-                gettext('Save Agenda Topic') :
-                gettext('Save Wire Topic');
+            return gettext('Save Topic');
         }
     }
 
