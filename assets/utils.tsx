@@ -7,7 +7,10 @@ import {createStore as _createStore, applyMiddleware, compose} from 'redux';
 import {createLogger} from 'redux-logger';
 import thunk from 'redux-thunk';
 import {render as _render} from 'react-dom';
+
+// @ts-ignore
 import alertify from 'alertifyjs';
+
 import moment from 'moment-timezone';
 import {
     hasCoverages,
