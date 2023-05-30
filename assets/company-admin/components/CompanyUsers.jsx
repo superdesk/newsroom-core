@@ -27,7 +27,7 @@ function CompanyUsersComponent({users, usersById, selectUser, activeUserId, curr
                     <th>{gettext('Status')}</th>
                     {allowCompaniesToManageProducts && sections.map(section => (
                         <th key={section._id}>
-                            {`${section.name} ${gettext('Products')}`}
+                            {gettext('{{ section }} Products', {section: section.name})}
                         </th>
                     ))}
                     <th>
