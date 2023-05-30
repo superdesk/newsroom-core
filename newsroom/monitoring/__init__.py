@@ -18,7 +18,7 @@ from . import views  # noqa
 
 def init_app(app):
     superdesk.register_resource("monitoring", MonitoringResource, MonitoringService, _app=app)
-    app.section("monitoring", "Monitoring", "monitoring", "wire")
+    app.section("monitoring", lazy_gettext("Monitoring"), "monitoring", "wire")
     app.settings_app(
         "monitoring",
         lazy_gettext("Monitoring"),
