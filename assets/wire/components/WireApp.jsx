@@ -77,12 +77,21 @@ class WireApp extends BaseApp {
             navTab.label = gettext('Monitoring Profiles');
         }
 
-        this.state.initialLoad = this.props.isLoading;
     }
 
     render() {
-        if (this.state.initialLoad) {
+        if (this.state.initialLoad){
             return this.renderLoader();
+        }
+
+        if (this.props.errorMessage) {
+            return (
+                <div className="wire-articles__item-wrap col-12">
+                    <div className="alert alert-secondary">
+                        {this.props.errorMessage}
+                    </div>
+                </div>
+            );
         }
 
         const newsOnlyFilterText = this.props.newsOnlyFilterText;
@@ -351,6 +360,7 @@ const mapStateToProps = (state) => ({
     searchParams: searchParamsSelector(state),
     showSaveTopic: showSaveTopicSelector(state),
     filterGroupLabels: filterGroupsToLabelMap(state),
+    errorMessage: state.errorMessage
 });
 
 const mapDispatchToProps = (dispatch) => ({

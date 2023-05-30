@@ -8,7 +8,6 @@ import {
     notify,
     updateRouteParams,
     getTimezoneOffset,
-    errorHandler,
     recordAction,
     copyTextToClipboard,
 } from 'utils';
@@ -157,6 +156,18 @@ export function selectDate(dateString, grouping) {
     return {type: SELECT_DATE, dateString, grouping};
 }
 
+export const SET_ERROR = 'SET_ERROR';
+export function setError(errors) {
+    return {type: SET_ERROR, errors};
+}
+
+export const SET_ERROR_MESSAGE = 'SET_ERROR_MESSAGE';
+export function setErrorMessage(message) {
+    return {
+        type: SET_ERROR_MESSAGE,
+        message
+    };
+}
 
 export function printItem(item) {
     return (dispatch, getState) => {
@@ -267,7 +278,7 @@ export function fetchItems() {
             .then(() => {
                 analytics.timingComplete('search', Date.now() - start);
             })
-            .catch(errorHandler);
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -674,4 +685,18 @@ export function stopWatchingCoverage(coverage, item) {
                 }
             }, (error) => { errorHandler(error, dispatch);});
     };
+}
+
+export function errorHandler(error, dispatch, setError) {
+    console.error('error', error);
+    if (setError) {
+        if (error.response && error.response.status === 403) {
+            dispatch(setErrorMessage(gettext(
+                'There is no product associated with your user. Please reach out to your Company Admin')));
+        } else {
+            error.response.json().then(function(data) {
+                dispatch(setError(data));
+            });
+        }
+    }
 }
