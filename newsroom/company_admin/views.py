@@ -36,6 +36,7 @@ def get_view_data():
         "products": products,
     }
 
+
 def get_translated_sections(sections):
     translated_sections = []
     for section in sections:
@@ -47,6 +48,7 @@ def get_translated_sections(sections):
         }
         translated_sections.append(translated_section)
     return translated_sections
+
 
 @blueprint.route("/company_admin/send_product_seat_request", methods=["POST"])
 @login_required
