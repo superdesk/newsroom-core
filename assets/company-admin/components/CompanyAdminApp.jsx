@@ -129,12 +129,12 @@ class CompanyAdminAppComponent extends React.Component {
                                     }
                                 )} />
                             </button> */}
-                            <div className="btn-group btn-group--navbar">
+                            <div className="toggle-button__group toggle-button__group--navbar">
                                 <button
                                     onClick={() => this.props.setSection('my_company')}
                                     className={classNames(
-                                        'btn btn-outline-primary',
-                                        {active: this.props.sectionId === 'my_company'}
+                                        'toggle-button',
+                                        {'toggle-button--active': this.props.sectionId === 'my_company'}
                                     )}
                                     data-test-id="company-admin--companies-btn"
                                 >
@@ -143,8 +143,8 @@ class CompanyAdminAppComponent extends React.Component {
                                 <button
                                     onClick={() => this.props.setSection('users')}
                                     className={classNames(
-                                        'btn btn-outline-primary',
-                                        {active: this.props.sectionId === 'users'}
+                                        'toggle-button',
+                                        {'toggle-button--active': this.props.sectionId === 'users'}
                                     )}
                                     data-test-id="company-admin--users-btn"
                                 >

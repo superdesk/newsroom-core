@@ -9,7 +9,7 @@ function PreviewActionButtons({item, user, actions, plan, group}) {
         <ActionButton
             key={action.name}
             item={item}
-            className='icon-button'
+            className='icon-button icon-button--primary'
             isVisited={action.visited && action.visited(user, item)}
             displayName={false}
             action={action}

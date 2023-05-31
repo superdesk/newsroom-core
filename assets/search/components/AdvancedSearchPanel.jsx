@@ -44,7 +44,7 @@ function AdvancedSearchPanelComponent({
                         </p>
                         <textarea
                             name="all"
-                            placeholder={gettext('Add words here...')}
+                            placeholder={gettext('keyword1 keyword2...')}
                             rows="2"
                             className="form-control"
                             value={params.all || ''}
@@ -61,7 +61,7 @@ function AdvancedSearchPanelComponent({
                         </p>
                         <textarea
                             name="any"
-                            placeholder={gettext('Add words here...')}
+                            placeholder={gettext('keyword1 keyword2...')}
                             rows="2"
                             className="form-control"
                             value={params.any || ''}
@@ -77,7 +77,7 @@ function AdvancedSearchPanelComponent({
                         </p>
                         <textarea
                             name="exclude"
-                            placeholder={gettext('Add words here...')}
+                            placeholder={gettext('keyword1 keyword2...')}
                             rows="2"
                             className="form-control"
                             value={params.exclude || ''}

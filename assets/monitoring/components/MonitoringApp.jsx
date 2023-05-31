@@ -81,10 +81,10 @@ class MonitoringApp extends React.Component {
                     onNewItem={this.isScheduleMode() ? null : this.props.newMonitoringProfile}
                     buttonText={gettext('New {{monitoring}} Profile', sectionNames)}
                     noSearch>
-                    <div className="btn-group btn-group--navbar ms-0 me-3">
+                    <div className="toggle-button__group toggle-button__group--navbar ms-0 me-3">
                         {this.sections.map((section) => (
                             <button key={section.name}
-                                className={'btn btn-outline-primary' + (section.name === this.state.activeSection ? ' active' :
+                                className={'toggle-button' + (section.name === this.state.activeSection ? ' toggle-button--active' :
                                     '')}
                                 onClick={this.onSectionChange.bind(null, section.name)}
                             >{gettext(section.name)}</button>

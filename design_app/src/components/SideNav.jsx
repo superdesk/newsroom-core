@@ -28,10 +28,10 @@ function SideNav() {
                 </li>    
                 <li className="sidenav-icons__item"><span aria-hidden="true"><i className="icon--more icon--mid-blue"></i></span></li>
                 <li className="sidenav-icons__item badge--top-right">
-                    <a href="/bookmarks_wire" title="" data-toggle="tooltip" data-placement="right" aria-label="Saved / Watched Items" role="button" data-original-title="Saved / Watched Items">
-                    <div id="saved-items-count" className="badge rounded-pill bg-info">2</div>
+                    <a href="/bookmarks_wire" title="" data-toggle="tooltip" data-placement="right" aria-label="Saved / Watched Items" role="button" data-original-title="Saved / Watched">
+                    <div id="saved-items-count" className="badge rounded-pill">2</div>
                     <i className="icon--bookmark"></i>
-                    <div className="sidenav-icons__item-title">Saved / Watched Items</div>
+                    <div className="sidenav-icons__item-title">Saved / Watched</div>
                     </a>
                 </li>
                 <li className="sidenav-icons__item sidenav-icons__item--report">
@@ -49,7 +49,7 @@ function SideNav() {
                 <li className="sidenav-icons__item"><span aria-hidden="true"><i className="icon--more icon--mid-blue"></i></span></li>
                 <li className="sidenav-icons__item  badge--top-right">
                     <a href="https://www.cpimages.com/" title="" data-toggle="tooltip" data-placement="right" aria-label="CP Images" target="_blank" data-original-title="CP Images">      
-                        <div className="badge rounded-pill bg-info badge--icon">
+                        <div className="badge rounded-pill badge--icon">
                             <i className="icon-small--external icon--red"></i>
                         </div>        
                         <i className="icon--photo icon--red"></i>
