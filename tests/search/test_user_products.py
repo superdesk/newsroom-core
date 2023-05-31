@@ -100,9 +100,9 @@ def test_user_sections(app, client, manager, product):
         },
     )
 
-    with pytest.raises(AssertionError) as err:
-        utils.get_json(client, "/agenda/search")
-    assert "403" in str(err)
+    # company has a product without limit, so this should work now
+    data = utils.get_json(client, "/agenda/search")
+    assert data
 
     utils.patch_json(
         client, f"/api/_users/{manager['_id']}", {"products": [{"section": "agenda", "_id": product["_id"]}]}
