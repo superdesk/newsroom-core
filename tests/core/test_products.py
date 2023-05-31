@@ -226,8 +226,6 @@ def test_company_and_user_products(client, app, public_company, public_user, pro
         ],
     )
 
-    print("COMP", public_company)
-
     assign_product_to_companies(client, product, [public_company])
     assign_product_to_user(client, product2, public_user)
 
