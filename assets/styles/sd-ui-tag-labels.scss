@@ -1,36 +1,36 @@
 :root {
     --badge-bg-default:         var(--gray-light);
-    --badge-txt-default:        var(--body-text);
+    --badge-txt-default:        var(--color-text);
     --badge-remove-bg:          var(--gray-lighter);
     --badge-icon-color:         var(--gray-dark);
 
     --badge-bg-darker:          var(--gray-mid);
-    --badge-txt-darker:         var(--body-text);
+    --badge-txt-darker:         var(--color-text);
 
     --badge-bg-highlight1:      var(--main-blue);
-    --badge-txt-highlight1:     var(--background-color);
+    --badge-txt-highlight1:     var(--color-background);
 
     --badge-bg-highlight2:      var(--mid-blue-light);
-    --badge-txt-highlight2:     var(--background-color);
+    --badge-txt-highlight2:     var(--color-background);
 
     //------------------
 
     --tag-label-bg-default:         hsla(0, 0%, 30%, 0.18);
-    --tag-label-txt-default:        var(--body-text);
+    --tag-label-txt-default:        var(--color-text);
     --tag-label-remove-bg:          var(--gray-lighter);
     --tag-label-icon-color:         hsl(0, 0%, 40%);
 
     --tag-label-bg-darker:          hsla(0, 0%, 30%, 0.32);
-    --tag-label-txt-darker:         var(--body-text);
+    --tag-label-txt-darker:         var(--color-text);
 
-    --tag-label-bg-inverse:         hsl(0, 3%, 15%);
+    --tag-label-bg-inverse:         hsl(0, 3%, 36%);
     --tag-label-txt-inverse:        hsl(0, 0%, 100%);
 
     --tag-label-bg-highlight1:      var(--main-blue);
-    --tag-label-txt-highlight1:     var(--background-color);
+    --tag-label-txt-highlight1:     var(--color-background);
 
     --tag-label-bg-highlight2:      var(--mid-blue-light);
-    --tag-label-txt-highlight2:     var(--background-color);
+    --tag-label-txt-highlight2:     var(--color-background);
 }
 
 $tag-bg-colors: (

@@ -116,7 +116,7 @@ class CompanyAdminAppComponent extends React.Component {
                             enableQueryAction={true}
                             noLeftPadding={true}
                         >
-                            <button
+                            {/* <button
                                 onClick={this.toggleSideNav}
                                 className="icon-button icon-button--border-three-sides"
                                 aria-label={gettext('Open Side Navigation')}
@@ -128,13 +128,13 @@ class CompanyAdminAppComponent extends React.Component {
                                         'icon--arrow-right icon--rotate-180': this.state.sideNavOpen,
                                     }
                                 )} />
-                            </button>
-                            <div className="btn-group btn-group--navbar">
+                            </button> */}
+                            <div className="toggle-button__group toggle-button__group--navbar">
                                 <button
                                     onClick={() => this.props.setSection('my_company')}
                                     className={classNames(
-                                        'btn btn-outline-primary',
-                                        {active: this.props.sectionId === 'my_company'}
+                                        'toggle-button',
+                                        {'toggle-button--active': this.props.sectionId === 'my_company'}
                                     )}
                                     data-test-id="company-admin--companies-btn"
                                 >
@@ -143,8 +143,8 @@ class CompanyAdminAppComponent extends React.Component {
                                 <button
                                     onClick={() => this.props.setSection('users')}
                                     className={classNames(
-                                        'btn btn-outline-primary',
-                                        {active: this.props.sectionId === 'users'}
+                                        'toggle-button',
+                                        {'toggle-button--active': this.props.sectionId === 'users'}
                                     )}
                                     data-test-id="company-admin--users-btn"
                                 >

@@ -1,19 +1,8 @@
-// Custom variables
-:root {
-    --body-text: hsl(0, 0%, 14%);
-    --background-color: #f8f8f8;
-    --primary-color: #007EAD;
-    --main-blue: #007EAD;
-    --top-bar-bg-color: #2D2D2D;
-    --sidenav-bg-color: var(--primary-color);
-    --footer-height: 30px;
-}
 
-$body-text: var(--body-text);
 $gray-light: #c9c9c9;
 $gray-mid: #9a9a9a;
 $gray-dark: #747474;
-$background-color: var(--background-color);
+$background-color: var(--color-background);
 $main-blue: #007EAD;
 $mid-blue: #00658A;
 $mid-blue-light: #427A8F;
@@ -64,7 +53,7 @@ $btn-block-spacing-y: .625rem;
 $input-focus-border-color: $blue;
 $input-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .15);
 $input-bg: $background-color;
-$input-placeholder-color: $gray-dark;
+$input-placeholder-color: var(--color-text--muted);
 $custom-checkbox-indicator-border-radius: 2px;
 $custom-control-indicator-bg: transparent;
 
@@ -124,58 +113,8 @@ $container-max-widths: (
 // NEW COLORS
 //--------------------------
 
-// return css color variable with different opacity value
-@function alpha($color, $opacity){
-    $color: str-replace($color, 'var(');
-    $color: str-replace($color, ')');
-    $color-h: var(#{$color+'-h'});
-    $color-s: var(#{$color+'-s'});
-    $color-l: var(#{$color+'-l'});
-    @return hsla($color-h, $color-s, $color-l, $opacity);
-}
-// return css color variable with different lightness value
-@function lightness($color, $lightnessMultiplier){
-    $color: str-replace($color, 'var(');
-    $color: str-replace($color, ')');
-    $color-h: var(#{$color+'-h'});
-    $color-s: var(#{$color+'-s'});
-    $color-l: var(#{$color+'-l'});
-    @return hsl($color-h, $color-s, calc(#{$color-l} * #{$lightnessMultiplier}));
-}
-  
-  // replace substring with another string
-  // credits: https://css-tricks.com/snippets/sass/str-replace-function/
-@function str-replace($string, $search, $replace: '') {
-    $index: str-index($string, $search);
-    @if $index {
-        @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
-    }
-    @return $string;
-}
-
-@mixin defineColorHSL($color, $hue, $saturation, $lightness){
-    #{$color}: unquote("hsl(#{$hue}, #{$saturation}, #{$lightness})");#{$color}-h: #{$hue};#{$color}-s: #{$saturation};#{$color}-l: #{$lightness};
-}
-  
 :root {
-    --color-text:                 hsla(0, 0%, 14%, 1);
-    --color-text--light:          hsla(0, 0%, 40%, 1);
-    --color-text--inverse:        hsla(0, 0%, 96%, 1);
-    --color-dark:                 hsla(0, 3%, 15%, 1);
-    --color-light:                hsla(0, 0%, 84%, 1);
-
-    --line-shadow-end--light: 0 1px 0 var(--color-light);
-    --line-shadow-start--light: 0 -1px 0 var(--color-light);
-
-    //space
-    --space--0:     0;
-    --space--0-5:   4px;
-    --space--1:     8px;
-    --space--2:     16px;
-    --space--3:     24px;
-    --space--4:     32px;
-    --space--5:     40px;
-
+    // CORE COLORS
     @include defineColorHSL(--color-success, 95, 50%, 34%);
     @include defineColorHSL(--color-warning, 36, 100%, 40%);
     @include defineColorHSL(--color-alert, 356, 72%, 46%);
@@ -183,6 +122,295 @@ $container-max-widths: (
     @include defineColorHSL(--color-highlight, 356, 72%, 46%);
     @include defineColorHSL(--color-highlight1, 268, 68%, 45%);
     @include defineColorHSL(--color-highlight2, 310, 89%, 36%);
+
+    // THEME COLORS
+    @include defineColorHSL(--color-primary, 196, 100%, 34%);
+
+    --main-blue:        hsl(196, 100%, 34%);
+
+    // CORE: FOCUS - focus color for interactive elements -- input fields, search, selected elements etc.
+    --color-interactive-focus-base: 196, 100%;
+    --color-interactive-focus-l: 34%;
+    --color-interactive-focus: hsla(var(--color-interactive-focus-base), var(--color-interactive-focus-l), 1);
+    --color-interactive-focus--translucent: hsla(var(--color-interactive-focus-base), var(--color-interactive-focus-l), 0.25);
+    --color-text--focus: var(--color-text);
+    
+    --color-home-section-heading: var(--color-primary);
+    --color-text--slugline: hsl(201, 62%, 30%);
+    --color-text-link: var(--color-primary);
+    --color-text-link--navbar: var(--color-primary);
+    --color-icon-font: var(--color-primary);
+
+    // --------------------------------------------------------------------
+    //     C O R E
+    // --------------------------------------------------------------------
+    
+    // CORE: BACKGROUNDS
+    --color-background: hsl(0, 0%, 100%);
+    --color-background--muted: hsl(0, 0%, 97%);
+
+    // CORE: CONTENT ITEM BACKGROUND
+    --color-background-content-item: hsl(0, 0%, 100%);
+    
+    // CORE: TEXT COLORS
+    --color-text:                 hsla(0, 0%, 14%, 1);
+    --color-text--muted:          hsla(0, 0%, 40%, 1);
+    --color-text--muted-2:        hsla(0, 0%, 54%, 1);
+    --color-text--inverse:        hsla(0, 0%, 96%, 1);
+    --color-text--disabled:       hsla(0, 0%, 20%, 0.5);
+
+    // CORE: LINE COLORS
+    --color-line--x-light:        hsla(0, 0%, 92%, 1);
+    --color-line--light:          hsla(0, 0%, 84%, 1);
+    --color-line--medium:         hsla(0, 0%, 74%, 1);
+    --color-line--strong:         hsla(0, 0%, 54%, 1);
+    --color-line--x-strong:       hsla(0, 0%, 34%, 1);
+
+    // CORE: SHADOW
+    --line-shadow-end--light: 0 1px 0 var(--color-line--light);
+    --line-shadow-start--light: 0 -1px 0 var(--color-line--light);
+    
+    // CORE: SPACE
+    --space--0:     0;
+    --space--0-5:   4px;
+    --space--1:     8px;
+    --space--1-5:   12px;
+    --space--2:     16px;
+    --space--3:     24px;
+    --space--4:     32px;
+    --space--5:     40px;
+
+    // CORE: BORDER RADIUS
+    --border-radius--xs: 2px;
+    --border-radius--s: 4px;
+    --border-radius--m: 6px;
+    --border-radius--l: 8px;
+    --boder-radius--xl: 12px;
+    --border-radius--full: 1000px;
+
+    // CORE: TYPOGRAPHY
+    --font-family-core--sans: "Roboto", "Helvetica Neue", Arial, sans-serif;
+    --font-family-core--serif: "Merriweather", serif;
+
+    // CORE: ICONS
+    --icon-size--default: 24px;
+    --icon-size--small: 16px;
+    --icon-color--muted: var(--color-text--muted);
+    --icon-color--muted-2: var(--color-text--muted-2);
+
+    // CORE: FORME ELEMENTS HEIGHT (unify the heights of buttons, inputs and other form elements 
+    --size-form-element--large: 40px; // default size
+    --size-form-element--small: 32px;
+    --size-form-element--x-small: 24px;
+
+    // CORE: MISC 
+    --transition-base: 0.2s ease;
+    --table-selected-shadow: inset 0 0 0 3px var(--color-interactive-focus--translucent);
+    
+
+    // --------------------------------------------------------------------
+    //     C O M P O N E N T S
+    // --------------------------------------------------------------------
+    
+    // COMPONENT: SEARCHBAR
+    --searchbar-size-height: 40px;
+    --searchbar-border-radius: var(--border-radius--full);
+    --searchbar-color-bg: hsl(0, 0%, 96%);
+    --searchbar-color-fg: var(--color-text);
+    --searchbar-color-border--normal: hsla(0, 0%, 80%, 0);
+    --searchbar-color-border--hover: hsla(0, 0%, 80%, 1);
+    --searchbar-color-border--focus: var(--color-interactive-focus);
+    --searchbar-color-shadow--focus: var(--color-interactive-focus--translucent);
+    --searchbar-color-button-bg: var(--color-text--muted);
+    --searchbar-color-button-bg--active: var(--button-color-bg--primary);
+    --searchbar-color-button-bg--active-hover: var(--button-color-bg--primary--hover);
+
+    // COMPONENT: NAVBAR MAIN
+    --top-bar-color-bg: hsl(0, 0%, 14%);
+    --top-bar-color-fg: hsl(0, 0%, 60%);
+
+    // COMPONENT: INPUT FIELD
+    --input-color-bg: hsl(0, 0%, 96%);
+    --input-color-bg--focus: hsl(0, 0%, 98%);
+    --input-color-bg--disabled: hsl(0, 0%, 98%);
+    --input-color-fg: var(--color-text);
+    --input-color-border: hsl(0, 0%, 86%);
+    --input-color-border--hover: hsl(0, 0%, 66%);
+    --input-border-radius: var(--border-radius--s);
+    --input-font-size: 1rem;
+    --input-size-height: 40px;
+
+    // COMPONENT: ICON BUTTON
+    --icon-button-border-radius: var(--border-radius--s);
+    --icon-button-color-bg: transparent;
+    --icon-button-color-bg--hover: hsl(0, 0%, 96%);
+
+    --icon-button-color-icon--primary: var(--color-primary);
+    --icon-button-color-icon--secondary: var(--icon-color--muted);
+    --icon-button-color-icon--tertiary: var(--icon-color--muted-2);
+
+    --icon-button-color-border--primary: transparent;
+    --icon-button-color-border--primary-hover: var(--icon-button-color-fg);
+    --icon-button-color-border--secondary: transparent;
+    --icon-button-color-border--secondary-hover: var(--icon-button-color-fg);
+    --icon-button-color-border--tertiary: transparent;
+    --icon-button-color-border--tertiary-hover: var(--icon-button-color-fg);
+
+    --icon-button-color-border: var(--color-line--light);
+
+    --icon-button-size: 40px;
+    --icon-button-size--small: 32px;
+
+
+    // COMPONENT: CARD ITEM & SIMPLE CARD ITEM
+    --card-item-border-radius: var(--border-radius--s);
+    --card-item-color-bg: hsl(0,0%,100%);
+    --card-item-shadow: 0px 1px 4px hsla(0, 0%, 0%, 0.24);
+    --card-item-shadow--hover: 0px 1px 8px hsla(0, 0%, 0%, 0.32);
+    --card-item-title-color: var(--color-text);
+    --card-item-image-color-bg: hsl(223, 17%, 29%);
+    --card-item-footer-border-color: var(--color-line--x-light);
+
+    --simplecard-item-outline-color: transparent;
+    --simplecard-item-outline-color--hover: var(--color-line--medium);
+    --simplecard-item-border-color: transparent;
+    --simplecard-item-border-color--hover: var(--color-line--x-light);
+    --simplecard-item-padding: 6px 15px 10px 15px;
+
+    
+    // COMPONENT: LIST ITEM
+    --list-item-bortder-radius: var(--border-radius--s);
+    --list-item-color-bg: hsl(0,0%,100%);
+
+    // COMPONENT: SIDENAV
+    --sidenav-size-width: 80px;
+    --sidenav-color-bg:                 var(--color-primary);
+    --sidenav-color-item-bg:            transparent;
+    --sidenav-color-item-fg:            hsla(0, 0%, 100%, 1);
+    --sidenav-color-item-bg--active:    hsla(0, 0%, 100%, 1);
+    --sidenav-color-item-fg--active:    var(--color-primary);
+    --sidenav-color-badge-bg:           hsla(0, 0%, 16%, 1);
+    --sidenav-color-badge-fg:           hsla(0, 0%, 98%, 1);
+
+    // COMPONENT: PROFILE SIDEBAR
+    --profile-sidebar-color-bg:                              hsl(222, 18%, 29%);
+    --profile-sidebar-color-fg:                              hsl(222, 18%, 95%);
+    --profile-sidebar-padding:                               20px;
+    --profile-sidebar-padding--md:                           30px 40px;
+    --profile-sidebar-width--md:                             300px;
+    --profile-sidebar-button-color-bg--primary:              var(--button-color-bg--primary);
+    --profile-sidebar-button-color-fg--primary:              var(--button-color-fg--primary);
+    --profile-sidebar-button-color-bg--secondary:            transparent;
+    --profile-sidebar-button-color-fg--secondary:            hsla(0, 0%, 100%, 0.75);
+    --profile-sidebar-button-color-border--secondary:        hsla(0, 0%, 100%, 0.45);
+    --profile-sidebar-button-color-fg--secondary-hover:      hsla(0, 0%, 100%, 0.98);
+    --profile-sidebar-button-color-border--secondary-hover:  hsla(0, 0%, 100%, 0.65);
+    // sidebar avatar
+    --profile-sidebar-avatar-color-bg:                       hsl(222, 18%, 25%);
+    --profile-sidebar-avatar-color-fg:                       hsl(222, 18%, 95%);
+    --profile-sidebar-avatar-color-border:                   hsl(222, 7%, 57%);
+    
+    // COMPONENT: NEW BUTTONS
+    --button-lightness-change--10: 10%;
+    --button-lightness-change--20: 20%;
+
+    --button-padding--small: 0 var(--space--1-5);
+    --button-padding--large: 0 var(--space--2);
+    --button-padding: var(--button-padding--large);
+    --button-margin: 0;
+
+    --button-border-radius: var(--border-radius--s);
+    --button-font-family: var(--font-family-core--sans);
+    --botton-font-size: 0.75rem;
+    --button-text-transform: uppercase;
+    --button-letter-spacing: 0.04rem;
+    --button-line-height: 1.1;
+    --button-font-weight: 500;
+    --button-icon-size--large: 24px;
+    --button-icon-size--small: 18px;
+    --button-gap: var(--space--1);
+    --button-shadow-spread-radius: 3px;
+    
+
+    --button-height: var(--size-form-element--large);
+    
+
+    // Primary
+    --button-color-bg--primary-base: 196, 100%;
+    --button-color-bg--primary-l: 34%;
+    --button-color-bg--primary: hsla(var(--button-color-bg--primary-base), var(--button-color-bg--primary-l), 1);
+    --button-color-bg--primary-translucent: hsla(var(--button-color-bg--primary-base), var(--button-color-bg--primary-l), 0.25);
+    --button-color-bg--primary-hover: hsla(var(--button-color-bg--primary-base), var(--button-color-bg--primary-l), 1);
+    --button-color-fg--primary: hsla(0, 0%, 100%, 1);
+    --button-color-border--primary: var(--button-color-bg--primary);
+    --button-color-border--primary-hover: hsla(var(--button-color-bg--primary-base), calc(var(--button-color-bg--primary-l) - var(--button-lightness-change--10)), 1);
+    --button-color-shadow--primary-hover: hsla(var(--button-color-bg--primary-base), calc(var(--button-color-bg--primary-l) - 25%), 0.25);
+
+    // Secondary (Default)
+    --button-color-bg--secondary-base: 0, 0%;
+    --button-color-bg--secondary-l: 20%;
+    --button-color-bg--secondary: hsla(var(--button-color-bg--secondary-base), var(--button-color-bg--secondary-l), 0);
+    --button-color-bg--secondary-translucent: hsla(var(--button-color-bg--secondary-base), var(--button-color-bg--secondary-l), 0.25);
+    --button-color-bg--secondary-hover: hsla(var(--button-color-bg--secondary-base), var(--button-color-bg--secondary-l), 0);
+    --button-color-fg--secondary: hsla(var(--button-color-bg--secondary-base), var(--button-color-bg--secondary-l), 1);
+    --button-color-border--secondary: hsla(var(--button-color-bg--secondary-base), var(--button-color-bg--secondary-l), 0.7);
+    --button-color-border--secondary-hover: hsla(var(--button-color-bg--secondary-base), var(--button-color-bg--secondary-l), 1);
+    --button-color-shadow--secondary-hover: hsla(var(--button-color-bg--secondary-base), var(--button-color-bg--secondary-l), 0.2);
+
+    // Tertiary
+    --button-color-bg--tertiary-base: 0, 0%;
+    --button-color-bg--tertiary-l: 34%;
+    --button-color-bg--tertiary: hsla(var(--button-color-bg--tertiary-base), var(--button-color-bg--tertiary-l), 0);
+    --button-color-bg--tertiary-translucent: hsla(var(--button-color-bg--tertiary-base), var(--button-color-bg--tertiary-l), 0.25);
+    --button-color-bg--tertiary-hover: hsla(var(--button-color-bg--tertiary-base), var(--button-color-bg--tertiary-l), 0);
+    --button-color-fg--tertiary: hsla(var(--button-color-bg--tertiary-base), var(--button-color-bg--tertiary-l), 1);
+    --button-color-border--tertiary: hsla(var(--button-color-bg--tertiary-base), var(--button-color-bg--tertiary-l), 0.3);
+    --button-color-border--tertiary-hover: hsla(var(--button-color-bg--tertiary-base), var(--button-color-bg--tertiary-l), 0.8);
+    --button-color-shadow--tertiary-hover: hsla(var(--button-color-bg--tertiary-base), var(--button-color-bg--tertiary-l), 0.2);
+
+
+    // COMPONENT: TOGGLE BUTTON
+    --toggle-button-color-bg--active-base: 202, 10%;
+    --toggle-button-color-bg--active-l: 45%;
+    --toggle-button-color-bg--active: hsla(var(--toggle-button-color-bg--active-base), var(--toggle-button-color-bg--active-l), 1);
+    --toggle-button-color-bg--active-translucent: hsla(var(--toggle-button-color-bg--active-base), var(--toggle-button-color-bg--active-l), 0.25);
+    --toggle-button-color-bg--active-hover: hsla(var(--toggle-button-color-bg--active-base), calc(var(--toggle-button-color-bg--active-l) + var(--button-lightness-change--10)), 1);
+    --toggle-button-color-shadow--active: hsla(var(--toggle-button-color-bg--active-base), calc(var(--toggle-button-color-bg--active-l) - var(--button-lightness-change--20)), 0.3);
+    --toggle-button-color-bg: transparent;
+    --toggle-button-color-fg: var(--color-text--muted);
+    --toggle-button-color-fg--active: hsla(0, 0%, 100%, 1);
+    --toggle-button-color-border: hsla(var(--toggle-button-color-bg--active-base), calc(var(--toggle-button-color-bg--active-l) - var(--button-lightness-change--10)), 0.6);
+    --toggle-button-color-border-hover: hsla(var(--toggle-button-color-bg--active-base), calc(var(--toggle-button-color-bg--active-l) - var(--button-lightness-change--10)), 0.95);
+    --toggle-button-border-radius: var(--border-radius--s);
+    --toggle-button-padding: 0 1rem;
+    --toggle-button-text-transform: uppercase;
+    --toggle-button-height: var(--size-form-element--large);
+    --toggle-button-font-weight: 500;
+
+    
+    // COMPONENT: FILTER PANE
+    --color-filterpane-bg: hsl(0, 0%, 99%);
+    --color-filterpane-text: hsl(0, 0%, 14%);
+
+    // COMPONENT: COLLAPSIBLE BOX
+    --collapsible-box-height: 48px;
+
+    // COMPONENT: MAIN FOOTER
+    --footer-size--height: 32px;
+    --footer-color-bg: hsl(0, 0%, 90%);
+    --footer-color-fg: var(--color-text);
+    --footer-shadow: 0px 0px 2px hsla(0, 0%, 0%, 0.3);
+
+    // COMPONENT: MULTI ACTION BAR
+    --multi-action-bar-color-bg: hsl(196, 100%, 92%);
+
+    // COMPONENT: CHECKBOX & RADIO & SWITCH
+    --color-core-checked-bg: var(--button-color-bg--primary);
+    --react-toggle-color-bg: hsl(0, 0%, 80%);
+    --react-toggle-color-bg--checked: var(--color-core-checked-bg);
+    --css-checkbox-color-bg--checked: var(--color-core-checked-bg);
+    --css-checkbox-color-fg--checked: hsl(0, 0%, 100%);
+    --form-check-color-bg--checked: var(--color-core-checked-bg);
 }
 
 .line-shadow-end--light {
@@ -208,16 +436,6 @@ $container-max-widths: (
     line-height: 1;
 }
 
-.icon-button {
-    &.icon-button--bordered {
-        border: 1px solid var(--color-light);
-        height: 40px;
-        [class^="icon--"],
-        [class*=" icon--"] {
-            color: var(--color-text--light);
-        }
-    }
-}
 .icon--arrow-right {
     &.icon--collapsible-closed {
         transform: rotate(90deg);
@@ -272,7 +490,7 @@ $container-max-widths: (
     flex-grow: 0;
     flex-shrink: 0;
     width: 1px;
-    border-inline-start: 1px solid var(--color-light);
+    border-inline-start: 1px solid var(--color-line--light);
     opacity: 0.75;
     margin-inline: var(--space--2);
     margin-block: var(--space--1);
@@ -284,9 +502,9 @@ $container-max-widths: (
     gap: var(--space--1);
     label {
         margin: 0 !important;
-        color: var(--color-text);
+        color: var(--color-text--muted);
         font-size: 14px;
-        font-weight: 500;
+        font-weight: 400;
         line-height: 1;
         &:hover {
             cursor: pointer;
@@ -303,13 +521,13 @@ $container-max-widths: (
     transition: all 0.2s ease;
     [class^="icon--"],
     [class*=" icon--"] {
-        color: var(--color-text--light);
+        color: var(--color-text--muted);
         transition: all 0.2s ease;
     }
     .icon-link__text {
-        color: var(--color-text);
+        color: var(--color-text--muted);
         font-size: 14px;
-        font-weight: 500;
+        font-weight: 400;
         display: inline-flex;
         line-height: 1;
     }

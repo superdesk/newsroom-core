@@ -14,7 +14,7 @@ export function PreviousVersions ({item, isItemDetail, inputRef}) {
 
     return (
         <span>
-            <div className="blue-text" onClick={onClick}>
+            <div className="versions-link" onClick={onClick}>
                 {gettext('{{ count }} previous versions', {
                     count: item.ancestors
                         ? item.ancestors.length
