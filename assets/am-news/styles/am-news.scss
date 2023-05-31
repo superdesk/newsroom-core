@@ -1,4 +1,4 @@
-@import '../../styles/custom-variables';
+
 @import '../../styles/breakpoints';
 
 .am-news {
@@ -54,7 +54,7 @@
     }
 
     .time-label {
-        font-family: $font-family-sans-serif;
+        font-family: var(--font-family-core--sans);
         &--stories {
             background-color: #99dff9;
             color: #000;
