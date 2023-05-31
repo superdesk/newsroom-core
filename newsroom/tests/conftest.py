@@ -1,6 +1,6 @@
 import os
 import pymongo
-from flask import Config
+from flask import Config, Flask
 from pathlib import Path
 from pytest import fixture
 
@@ -66,5 +66,5 @@ def app():
 
 
 @fixture
-def client(app):
+def client(app: Flask):
     return app.test_client()
