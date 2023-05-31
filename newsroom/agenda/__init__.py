@@ -25,7 +25,7 @@ def init_app(app):
     superdesk.register_resource("agenda", AgendaResource, AgendaService, _app=app)
     superdesk.register_resource("agenda_featured", FeaturedResource, FeaturedService, _app=app)
 
-    app.section("agenda", "Agenda", "agenda")
+    app.section("agenda", lazy_gettext("Agenda"), "agenda")
     app.sidenav(lazy_gettext("Agenda"), "agenda.index", "calendar", section="agenda")
     app.sidenav(
         lazy_gettext("Saved / Watched Items"),
