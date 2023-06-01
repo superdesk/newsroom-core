@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.4.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-05-31 11:13+0200\n"
+"POT-Creation-Date: 2023-05-31 15:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,15 +47,15 @@ msgstr ""
 msgid "Page limit exceeded"
 msgstr ""
 
-#: newsroom/search.py:518
+#: newsroom/search.py:522
 msgid "User does not belong to a company."
 msgstr ""
 
-#: newsroom/search.py:520
+#: newsroom/search.py:524
 msgid "Your company doesn't have any products defined."
 msgstr ""
 
-#: newsroom/monitoring/search.py:67 newsroom/search.py:525
+#: newsroom/monitoring/search.py:67 newsroom/search.py:529
 msgid "Invalid product parameter"
 msgstr ""
 
@@ -528,7 +528,7 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: assets/company-admin/components/CompanyDetails.jsx:26
+#: assets/company-admin/components/CompanyDetails.jsx:24
 #: assets/monitoring/components/EditMonitoringProfile.jsx:132
 #: assets/monitoring/components/MonitoringList.jsx:25
 #: assets/navigations/components/EditNavigation.jsx:85
@@ -2153,7 +2153,7 @@ msgstr ""
 
 #: assets/companies/components/EditCompany.jsx:38
 #: assets/company-admin/components/CompanyAdminApp.jsx:151
-#: assets/company-admin/components/CompanyDetails.jsx:23
+#: assets/company-admin/components/CompanyDetails.jsx:22
 #: assets/monitoring/components/EditMonitoringProfile.jsx:27
 #: assets/search/components/MonitoringEditor.jsx:31
 msgid "Users"
@@ -2240,7 +2240,7 @@ msgid "Users : {{total}}"
 msgstr ""
 
 #: assets/company-admin/components/CompanyAdminProductSeatRequestModal.jsx:97
-#: assets/company-admin/components/CompanyDetailsProductRow.jsx:26
+#: assets/company-admin/components/CompanyDetailsProductRow.jsx:38
 msgid "Request more seats"
 msgstr ""
 
@@ -2264,6 +2264,10 @@ msgstr ""
 #: assets/company-admin/components/CompanyDetailsProductFilter.jsx:16
 #: assets/company-reports/components/ProductCompanies.jsx:19
 msgid "All Products"
+msgstr ""
+
+#: assets/company-admin/components/CompanyDetailsProductRow.jsx:25
+msgid "Unlimited"
 msgstr ""
 
 #: assets/company-admin/components/CompanyUserListItem.jsx:11
