@@ -57,9 +57,6 @@ const renderFilter = {
                 aggregations={props.aggregations}
                 toggleFilter={props.toggleFilter}
                 activeFilter={props.activeFilter}
-                // buttonProps={{
-                //     textOnly: true,
-                // }}
                 getDropdownItems={getDropdownItems}
                 locators={props.locators}
                 getFilterLabel={(filter, activeFilter, isActive, props) => {
@@ -93,9 +90,6 @@ const renderFilter = {
                 aggregations={props.aggregations}
                 toggleFilter={props.toggleFilter}
                 activeFilter={props.activeFilter}
-                // buttonProps={{
-                //     textOnly: true,
-                // }}
                 getDropdownItems={getDropdownItems}
                 filter={{
                     label: gettext('Any coverage type'),
