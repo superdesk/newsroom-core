@@ -507,7 +507,11 @@ class BaseSearchService(Service):
                     "lenient": True,
                 },
             )
-            elastic_highlight_query["fields"] = {"body_html": elastic_highlight_query["fields"]["body_html"]}
+            elastic_highlight_query["fields"] = {
+                "body_html": elastic_highlight_query["fields"]["body_html"],
+                "headline": elastic_highlight_query["fields"]["headline"],
+                "slugline": elastic_highlight_query["fields"]["slugline"],
+            }
 
             search.highlight = elastic_highlight_query
 
