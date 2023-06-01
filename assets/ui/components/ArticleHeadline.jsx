@@ -3,7 +3,13 @@ import PropTypes from 'prop-types';
 
 export default function ArticleHeadline({item}) {
     return (
-        item.headline && <h2 className='wire-column__preview__headline'>{item.headline}</h2> || null
+        <h2 className='wire-column__preview__headline'>
+            {item.es_highlight && item.es_highlight.headline ? (
+                <span dangerouslySetInnerHTML={{__html: item.es_highlight.headline[0]}} />
+            ) : item.headline ? (
+                item.headline
+            ) : null}
+        </h2>
     );
 }
 
