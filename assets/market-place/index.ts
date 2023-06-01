@@ -1,4 +1,5 @@
-import {createStore, render, initWebSocket, getInitData, closeItemOnMobile, isMobilePhone} from '../utils';
+import {createStore, render, getInitData, closeItemOnMobile, isMobilePhone} from '../utils';
+import {initWebSocket} from 'websocket';
 
 import {getReadItems} from 'local-store';
 import  MarketPlaceApp from './components/MarketPlaceApp';

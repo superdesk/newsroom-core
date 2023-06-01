@@ -1,4 +1,5 @@
-import {createStore, render, initWebSocket, getInitData, isMobilePhone, closeItemOnMobile} from 'utils';
+import {createStore, render, getInitData, isMobilePhone, closeItemOnMobile} from 'utils';
+import {initWebSocket} from 'websocket';
 
 import agendaReducer from './reducers';
 import {getActiveDate, getReadItems, getFeaturedOnlyParam} from 'local-store';

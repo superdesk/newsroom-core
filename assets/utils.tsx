@@ -18,7 +18,6 @@ import {
     SCHEDULE_TYPE,
     isItemTBC,
 } from './agenda/utils';
-export {initWebSocket} from './websocket';
 
 /*
  * Import and load all locales that will be used in moment.js

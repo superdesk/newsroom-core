@@ -1,4 +1,5 @@
-import {createStore, render, getInitData, initWebSocket} from 'utils';
+import {createStore, render, getInitData} from 'utils';
+import {initWebSocket} from 'websocket';
 import homeReducer from './reducers';
 import HomeApp from './components/HomeApp';
 import {initData, pushNotification} from './actions';

@@ -1,4 +1,5 @@
-import {render, isWireContext, initWebSocket} from 'utils';
+import {render, isWireContext} from 'utils';
+import {initWebSocket} from 'websocket';
 import UserProfileApp from './components/UserProfileApp';
 import {initData, selectMenu, pushNotification} from './actions';
 import {store} from './store';
