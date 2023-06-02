@@ -241,7 +241,6 @@ export function search(state, next, aggs) {
         .map((key) => `${key}=${params[key]}`)
         .join('&');
 
-        console.log("Ddddddddddddd", queryString)
     return server.get(`/${context}/search?${queryString}`);
 }
 
