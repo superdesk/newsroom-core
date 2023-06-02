@@ -5,53 +5,62 @@ import {gettext} from 'utils';
 import CheckboxInput from 'components/CheckboxInput';
 
 function CompanyPermissions({
+    company,
     sections,
     products,
-    permissions,
     save,
-    toggleGeneralPermission,
-    toggleProductPermission,
-    updateProductSeats,
+    onChange,
+    toggleCompanySection,
+    toggleCompanyProduct,
+    updateCompanySeats,
 }) {
+    const productsEnabled = (company.products || []).map((product) => product._id);
+    const seats = (company.products || []).reduce((productSeats, product) => {
+        productSeats[product._id] = product.seats;
+
+        return productSeats;
+    }, {});
+
     return (
         <div className='tab-pane active' id='company-permissions'>
             <form onSubmit={save}>
                 <div className="list-item__preview-form" key='general'>
-                    <div className="form-group">
+                    <div
+                        data-test-id="group--general"
+                        className="form-group"
+                    >
                         <label>{gettext('General')}</label>
                         <ul className="list-unstyled">
                             <li>
                                 <CheckboxInput
                                     name="archive_access"
-                                    label={gettext('Grant Access To Archived Wire')}
-                                    value={!!permissions.archive_access}
-                                    onChange={() => {
-                                        toggleGeneralPermission('archive_access');
-                                    }}
+                                    label={gettext('Grant Access To Archived {{wire}}', sectionNames)}
+                                    value={company.archive_access === true}
+                                    onChange={onChange}
                                 />
                             </li>
                             <li>
                                 <CheckboxInput
                                     name="events_only"
                                     label={gettext('Events Only Access')}
-                                    value={!!permissions.events_only}
-                                    onChange={() => {
-                                        toggleGeneralPermission('events_only');
-                                    }}
+                                    value={company.events_only === true}
+                                    onChange={onChange}
                                 />
                                 <CheckboxInput
                                     name="restrict_coverage_info"
                                     label={gettext('Restrict Coverage Info')}
-                                    value={!!permissions.restrict_coverage_info}
-                                    onChange={() => {
-                                        toggleGeneralPermission('restrict_coverage_info');
-                                    }}
+                                    value={company.restrict_coverage_info === true}
+                                    onChange={onChange}
                                 />
                             </li>
                         </ul>
                     </div>
 
-                    <div className="form-group" key='sections'>
+                    <div
+                        data-test-id="group--sections"
+                        className="form-group"
+                        key="sections"
+                    >
                         <label>{gettext('Sections')}</label>
                         <ul className="list-unstyled">
                             {sections.map((item) => (
@@ -59,18 +68,20 @@ function CompanyPermissions({
                                     <CheckboxInput
                                         name={item._id}
                                         label={item.name}
-                                        value={!!permissions.sections[item._id]}
-                                        onChange={() => {
-                                            toggleProductPermission('sections', item._id);
-                                        }}
+                                        value={(company.sections || {})[item._id] === true}
+                                        onChange={toggleCompanySection.bind(null, item._id)}
                                     />
                                 </li>
                             ))}
                         </ul>
                     </div>
 
-                    <div className="form-group" key='products'>
-                        {sections.map((section) => (
+                    <div
+                        data-test-id="group--products"
+                        className="form-group"
+                        key="products"
+                    >
+                        {sections.filter((section) => (company.sections || {})[section._id] === true).map((section) => (
                             [<label key={`${section.id}label`}>{gettext('Products')} {`(${section.name})`}</label>,
                                 <ul key={`${section.id}product`} className="list-unstyled">
                                     {products.filter((p) => (p.product_type || 'wire').toLowerCase() === section._id.toLowerCase())
@@ -81,13 +92,17 @@ function CompanyPermissions({
                                                         <CheckboxInput
                                                             name={product._id}
                                                             label={product.name}
-                                                            value={!!permissions.products[product._id]}
+                                                            value={productsEnabled.includes(product._id)}
                                                             onChange={() => {
-                                                                toggleProductPermission('products', product._id);
+                                                                toggleCompanyProduct(
+                                                                    product._id,
+                                                                    section._id,
+                                                                    !productsEnabled.includes(product._id)
+                                                                );
                                                             }}
                                                         />
                                                     </div>
-                                                    {!permissions.products[product._id] ? null : (
+                                                    {!productsEnabled.includes(product._id) ? null : (
                                                         <React.Fragment>
                                                             <label
                                                                 className="input-group-text border-0 bg-transparent ms-auto"
@@ -96,6 +111,7 @@ function CompanyPermissions({
                                                                 {gettext('Seats:')}
                                                             </label>
                                                             <input
+                                                                data-test-id={`field-${product._id}_seats`}
                                                                 type="number"
                                                                 id={`${product._id}_seats`}
                                                                 name={`${product._id}_seats`}
@@ -103,9 +119,12 @@ function CompanyPermissions({
                                                                 style={{maxWidth: '100px'}}
                                                                 min="0"
                                                                 tabIndex="0"
-                                                                value={(permissions.seats[product._id] || 0).toString()}
+                                                                value={(seats[product._id] || 0).toString()}
                                                                 onChange={(event) => {
-                                                                    updateProductSeats(product._id, event.target.value);
+                                                                    updateCompanySeats(
+                                                                        product._id,
+                                                                        parseInt(event.target.value)
+                                                                    );
                                                                 }}
                                                             />
                                                         </React.Fragment>
@@ -120,6 +139,7 @@ function CompanyPermissions({
                 </div>
                 <div className='list-item__preview-footer'>
                     <input
+                        data-test-id="save-btn"
                         type='submit'
                         className='btn btn-outline-primary'
                         value={gettext('Save')}
@@ -131,6 +151,7 @@ function CompanyPermissions({
 }
 
 CompanyPermissions.propTypes = {
+    company: PropTypes.object,
     sections: PropTypes.arrayOf(PropTypes.shape({
         _id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
@@ -150,9 +171,10 @@ CompanyPermissions.propTypes = {
     }),
 
     save: PropTypes.func.isRequired,
-    toggleGeneralPermission: PropTypes.func.isRequired,
-    toggleProductPermission: PropTypes.func.isRequired,
-    updateProductSeats: PropTypes.func.isRequired,
+    onChange: PropTypes.func.isRequired,
+    toggleCompanySection: PropTypes.func.isRequired,
+    toggleCompanyProduct: PropTypes.func.isRequired,
+    updateCompanySeats: PropTypes.func.isRequired,
 };
 
 export default CompanyPermissions;

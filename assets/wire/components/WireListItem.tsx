@@ -186,7 +186,9 @@ class WireListItem extends React.Component {
                                 )}
                                 <Embargo item={item} />
                                 <UrgencyLabel item={item} listConfig={listConfig} filterGroupLabels={this.props.filterGroupLabels} />
-                                {item.headline}
+                                {item.es_highlight && item.es_highlight.headline ? <div
+                                    dangerouslySetInnerHTML={({__html: item.es_highlight.headline && item.es_highlight.headline[0]})}
+                                /> : item.headline}
                             </div>
                         </h4>
 
@@ -199,7 +201,9 @@ class WireListItem extends React.Component {
                                 />
                                 <div className="wire-articles__item__meta-info">
                                     <span className="bold">
-                                        {getSlugline(item, true)}
+                                        {item.es_highlight && item.es_highlight.slugline ? <div
+                                            dangerouslySetInnerHTML={({__html:item.es_highlight.slugline && item.es_highlight.slugline[0]})}
+                                        /> : getSlugline(item, true)}
                                     </span>
                                     <span>
                                         <FieldComponents
@@ -261,7 +265,9 @@ class WireListItem extends React.Component {
 
                         {isExtended && (
                             <div className="wire-articles__item__text">
-                                <p>{shortText(item, 40, listConfig)}</p>
+                                {item.es_highlight ? <div
+                                    dangerouslySetInnerHTML={({__html:item.es_highlight.body_html && item.es_highlight.body_html[0]})}
+                                /> : <p>{shortText(item, 40, listConfig)}</p>}
                             </div>
                         )}
 

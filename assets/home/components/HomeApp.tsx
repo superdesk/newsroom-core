@@ -147,7 +147,7 @@ class HomeApp extends React.Component {
                         this.props.cards.filter((c) => c.dashboard === 'newsroom').map((card) => this.getPanels(card))}
                         {this.props.cards.length === 0 &&
                         <div className="alert alert-warning" role="alert">
-                            <strong>{gettext('Warning')}!</strong> {gettext('There\'s no card defined for home page!')}
+                            <strong>{gettext('Warning')}!</strong> {gettext('There\'s no card defined for {{home}} page!', sectionNames)}
                         </div>
                         }
                     </div>

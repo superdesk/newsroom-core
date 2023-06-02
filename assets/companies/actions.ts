@@ -20,6 +20,28 @@ export function editCompany(event: any) {
     return {type: EDIT_COMPANY, event};
 }
 
+export const TOGGLE_COMPANY_SECTION = 'TOGGLE_COMPANY_SECTION';
+export function toggleCompanySection(sectionId) {
+    return {type: TOGGLE_COMPANY_SECTION, sectionId: sectionId};
+}
+
+export const TOGGLE_COMPANY_PRODUCT = 'TOGGLE_COMPANY_PRODUCT';
+export function toggleCompanyProduct(productId, sectionId, enable) {
+    return {type: TOGGLE_COMPANY_PRODUCT, payload: {
+        productId: productId,
+        sectionId: sectionId,
+        enable: enable,
+    }};
+}
+
+export const UPDATE_COMPANY_SEATS = 'UPDATE_COMPANY_SEATS';
+export function updateCompanySeats(productId, seats) {
+    return {type: UPDATE_COMPANY_SEATS, payload: {
+        productId: productId,
+        seats: seats,
+    }};
+}
+
 export const NEW_COMPANY = 'NEW_COMPANY';
 export function newCompany(data: any) {
     return {type: NEW_COMPANY, data};
@@ -97,28 +119,23 @@ export function fetchCompanyUsers(companyId: any, force: any = false) {
  * Creates new company
  *
  */
-export function postCompany(permissions: any = null) {
+export function postCompany() {
     return function (dispatch, getState) {
-
         const company = getState().companyToEdit;
         const url = `/companies/${company._id ? company._id : 'new'}`;
 
-        return (permissions == null ?
-            Promise.resolve() :
-            dispatch(savePermissions(company, permissions))
-        ).then(() => {
-            return server.post(url, company)
-                .then(function() {
-                    if (company._id) {
-                        notify.success(gettext('Company updated successfully'));
-                    } else {
-                        notify.success(gettext('Company created successfully'));
-                    }
-                    dispatch(fetchProducts());
-                    dispatch(fetchCompanies());
-                })
-                .catch((error) => errorHandler(error, dispatch, setError));
-        });
+        return server.post(url, company)
+            .then(function () {
+                if (company._id) {
+                    notify.success(gettext('Company updated successfully'));
+                } else {
+                    notify.success(gettext('Company created successfully'));
+                }
+                dispatch(fetchProducts());
+                dispatch(fetchCompanies());
+                dispatch(cancelEdit());
+            })
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -133,18 +150,6 @@ export function fetchProducts() {
             .then((data) => {
                 dispatch(getProducts(data));
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
-    };
-}
-
-
-/**
- * Save permissions for a company
- *
- */
-export function savePermissions(company: any, permissions: any) {
-    return function (dispatch) {
-        return server.post(`/companies/${company._id}/permissions`, permissions)
             .catch((error) => errorHandler(error, dispatch, setError));
     };
 }

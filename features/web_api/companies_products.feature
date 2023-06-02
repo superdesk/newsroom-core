@@ -88,12 +88,14 @@ Feature: Company Products
         """
 
         # 2. Remove access to product: All wire, 69b4c5c61d41c8d736852fbf
-        When we post json to "/companies/1e65964bf5db68883df561b0/permissions"
+        When we post json to "/companies/1e65964bf5db68883df561b0"
         """
         {
-            "name": "All Access Co. 2",
             "sections": {"wire": true, "agenda": true},
-            "products": {"69b4c5c61d41c8d736852fba": true, "69b4c5c61d41c8d736852fbb": true}
+            "products": [
+                {"_id": "69b4c5c61d41c8d736852fba", "section": "wire"},
+                {"_id": "69b4c5c61d41c8d736852fbb", "section": "agenda"}
+            ]
         }
         """
         # Check company permissions
@@ -122,12 +124,14 @@ Feature: Company Products
         """
 
         # 3. Remove access to section: wire
-        When we post json to "/companies/1e65964bf5db68883df561b0/permissions"
+        When we post json to "/companies/1e65964bf5db68883df561b0"
         """
         {
-            "name": "All Access Co. 2",
             "sections": {"wire": false, "agenda": true},
-            "products": {"69b4c5c61d41c8d736852fba": true, "69b4c5c61d41c8d736852fbb": true}
+            "products": [
+                {"_id": "69b4c5c61d41c8d736852fba", "section": "wire"},
+                {"_id": "69b4c5c61d41c8d736852fbb", "section": "agenda"}
+            ]
         }
         """
         # Check company permissions
@@ -150,12 +154,14 @@ Feature: Company Products
         """
 
         # 4. Re-add access to section: wire, & product: All wire, 69b4c5c61d41c8d736852fba
-        When we post json to "/companies/1e65964bf5db68883df561b0/permissions"
+        When we post json to "/companies/1e65964bf5db68883df561b0"
         """
         {
-            "name": "All Access Co. 2",
             "sections": {"wire": true, "agenda": true},
-            "products": {"69b4c5c61d41c8d736852fba": true, "69b4c5c61d41c8d736852fbb": true}
+            "products": [
+                {"_id": "69b4c5c61d41c8d736852fba", "section": "wire"},
+                {"_id": "69b4c5c61d41c8d736852fbb", "section": "agenda"}
+            ]
         }
         """
         # Check company permissions
@@ -181,16 +187,15 @@ Feature: Company Products
         """
 
         # 5. Re-add access to product: All wire, 69b4c5c61d41c8d736852fbf
-        When we post json to "/companies/1e65964bf5db68883df561b0/permissions"
+        When we post json to "/companies/1e65964bf5db68883df561b0"
         """
         {
-            "name": "All Access Co. 2",
             "sections": {"wire": true, "agenda": true},
-            "products": {
-                "69b4c5c61d41c8d736852fbf": true,
-                "69b4c5c61d41c8d736852fba": true,
-                "69b4c5c61d41c8d736852fbb": true
-            }
+            "products": [
+                {"_id": "69b4c5c61d41c8d736852fbf", "section": "wire"},
+                {"_id": "69b4c5c61d41c8d736852fba", "section": "wire"},
+                {"_id": "69b4c5c61d41c8d736852fbb", "section": "agenda"}
+            ]
         }
         """
         # Check company permissions

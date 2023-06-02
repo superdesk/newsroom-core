@@ -801,9 +801,59 @@ def test_wire_delete(client, app):
 
 
 def test_highlighting(client, app):
-    app.data.insert("items", [{"_id": "foo", "body_html": "Story that involves cheese and onions"}])
+    app.data.insert(
+        "items",
+        [
+            {
+                "_id": "foo",
+                "body_html": "Story that involves cheese and onions",
+                "slugline": "That's the test slugline cheese",
+                "headline": "Demo Article",
+            }
+        ],
+    )
     resp = client.get("/wire/search?q=cheese&es_highlight=1")
     data = json.loads(resp.get_data())
+    assert (
+        data["_items"][0]["es_highlight"]["body_html"][0] == 'Story that involves <span class="es-highlight">'
+        "cheese</span> and onions"
+    )
+    assert (
+        data["_items"][0]["es_highlight"]["slugline"][0]
+        == 'That\'s the test slugline <span class="es-highlight">cheese</span>'
+    )
+
+    resp = client.get("/wire/search?q=demo&es_highlight=1")
+    data = json.loads(resp.get_data())
+    assert data["_items"][0]["es_highlight"]["headline"][0] == '<span class="es-highlight">Demo</span> Article'
+
+
+def test_highlighting_with_advanced_search(client, app):
+    app.data.insert(
+        "items",
+        [
+            {
+                "_id": "foo",
+                "body_html": "Story that involves cheese and onions",
+                "slugline": "That's the test slugline cheese",
+                "headline": "Demo Article",
+            }
+        ],
+    )
+    advanced_search_params = parse.quote('{"fields":[],"all":"demo"}')
+    url = f"/wire/search?advanced_search={advanced_search_params}&es_highlight=1"
+    resp = client.get(url)
+    data = json.loads(resp.get_data())
+    assert data["_items"][0]["es_highlight"]["headline"][0] == '<span class="es-highlight">Demo</span> Article'
+
+    advanced_search_params = parse.quote('{"fields":[],"any":"cheese"}')
+    url = f"/wire/search?advanced_search={advanced_search_params}&es_highlight=1"
+    resp = client.get(url)
+    data = json.loads(resp.get_data())
+    assert (
+        data["_items"][0]["es_highlight"]["slugline"][0]
+        == 'That\'s the test slugline <span class="es-highlight">cheese</span>'
+    )
     assert (
         data["_items"][0]["es_highlight"]["body_html"][0] == 'Story that involves <span class="es-highlight">'
         "cheese</span> and onions"

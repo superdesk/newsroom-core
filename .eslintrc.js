@@ -5,7 +5,8 @@ module.exports = {
         "jasmine": true
     },
     "globals": {
-        "$": true
+        "$": true,
+        "sectionNames": "readonly",
     },
     "extends": ["eslint:recommended", "plugin:react/recommended"],
     "parserOptions": {

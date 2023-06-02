@@ -1,6 +1,5 @@
 import superdesk
 from flask import Blueprint
-from flask_babel import lazy_gettext
 
 blueprint = Blueprint("am_news", __name__)
 
@@ -15,7 +14,7 @@ def init_app(app):
     app.sidenav("AM", "am_news.index", "clock", section="am_news")
 
     app.sidenav(
-        lazy_gettext("Saved / Watched"),
+        app.config["SAVED_SECTION"],
         "am_news.bookmarks",
         "bookmark",
         group=1,

@@ -5,7 +5,7 @@ import InputWrapper from './InputWrapper';
 
 function DateInput({name, label, onChange, value, error, required}) {
     return (
-        <InputWrapper error={error} name={name}>
+        <InputWrapper error={error} name={name} testId={`field-${name}`}>
             <label htmlFor={name}>{label}</label>
             <div className="field">
                 <input type="date"

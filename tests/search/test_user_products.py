@@ -20,14 +20,31 @@ def init(app):
 
 @pytest.fixture
 def product(app):
-    product = {"name": "test", "query": "headline:somethingthatdoesnotexist", "is_enabled": True}
+    product = {
+        "name": "test",
+        "query": "headline:somethingthatdoesnotexist",
+        "is_enabled": True,
+        "product_type": "wire",
+    }
     app.data.insert("products", [product])
     return product
 
 
 @pytest.fixture
-def manager(app, client):
+def manager(app, client, product):
+    company = COMPANIES[1].copy()
+    company["name"] = "Example co."
+    company["products"] = [
+        {
+            "_id": product["_id"],
+            "section": product["product_type"],
+        }
+    ]
+    company.pop("_id")
+    app.data.insert("companies", [company])
+
     manager = USERS[1].copy()
+    manager["company"] = company["_id"]
     manager["email"] = "manager@example.com"
     manager["user_type"] = UserRole.COMPANY_ADMIN.value
     manager.pop("_id")
@@ -83,9 +100,9 @@ def test_user_sections(app, client, manager, product):
         },
     )
 
-    with pytest.raises(AssertionError) as err:
-        utils.get_json(client, "/agenda/search")
-    assert "403" in str(err)
+    # company has a product without limit, so this should work now
+    data = utils.get_json(client, "/agenda/search")
+    assert data
 
     utils.patch_json(
         client, f"/api/_users/{manager['_id']}", {"products": [{"section": "agenda", "_id": product["_id"]}]}

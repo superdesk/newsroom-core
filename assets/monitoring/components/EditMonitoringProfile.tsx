@@ -75,9 +75,9 @@ class EditMonitoringProfile extends React.Component {
         const getError = (field) => errors ? errors[field] : null;
 
         return (
-            <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit Monitoring')}>
+            <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit {{monitoring}}', sectionNames)}>
                 <div className='list-item__preview-header'>
-                    <h3>{ gettext('Add/Edit Monitoring Profile') }</h3>
+                    <h3>{ gettext('Add/Edit {{monitoring}} Profile', sectionNames) }</h3>
                     <button
                         id='hide-sidebar'
                         type='button'
@@ -151,7 +151,7 @@ class EditMonitoringProfile extends React.Component {
                                         error={getError('query')}>
                                         {item.query &&
                                                 <a target="_blank" href={`/${'wire'}?q=${item.query}`}
-                                                    className='btn btn-outline-secondary float-end mt-3'>{gettext('Test Monitoring Profile query')}
+                                                    className='btn btn-outline-secondary float-end mt-3'>{gettext('Test {{monitoring}} Profile query', sectionNames)}
                                                 </a>}
                                     </TextAreaInput>
 

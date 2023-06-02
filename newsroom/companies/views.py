@@ -17,7 +17,6 @@ from newsroom.companies import blueprint
 from newsroom.utils import (
     query_resource,
     find_one,
-    get_entity_or_404,
     get_json_or_400,
     set_original_creator,
     set_version_creator,
@@ -37,6 +36,7 @@ def get_settings_data():
         "company_types": get_company_types_options(app.config.get("COMPANY_TYPES", [])),
         "api_enabled": app.config.get("NEWS_API_ENABLED", False),
         "ui_config": get_resource_service("ui_config").get_section_config("companies"),
+        "sso_enabled": bool(app.config.get("SAML_CLIENTS") or app.config.get("SAML_PATH")),
     }
 
 
@@ -69,13 +69,16 @@ def create():
     return jsonify({"success": True, "_id": ids[0]}), 201
 
 
-def get_errors_company(company):
-    if not company.get("name"):
+def get_errors_company(updates, original=None):
+    if original is None:
+        original = {}
+
+    if not (updates.get("name") or original.get("name")):
         return jsonify({"name": gettext("Name not found")}), 400
 
-    if company.get("allowed_ip_list"):
+    if updates.get("allowed_ip_list"):
         errors = []
-        for ip in company["allowed_ip_list"]:
+        for ip in updates["allowed_ip_list"]:
             try:
                 ipaddress.ip_network(ip, strict=True)
             except ValueError as e:
@@ -85,24 +88,36 @@ def get_errors_company(company):
             return jsonify({"allowed_ip_list": errors}), 400
 
 
-def get_company_updates(company):
+def get_company_updates(data, original=None):
+    if original is None:
+        original = {}
+
     updates = {
-        "name": company.get("name"),
-        "url": company.get("url"),
-        "sd_subscriber_id": company.get("sd_subscriber_id"),
-        "account_manager": company.get("account_manager"),
-        "contact_name": company.get("contact_name"),
-        "contact_email": company.get("contact_email"),
-        "phone": company.get("phone"),
-        "country": company.get("country"),
-        "is_enabled": company.get("is_enabled"),
-        "company_type": company.get("company_type"),
-        "monitoring_administrator": company.get("monitoring_administrator"),
-        "allowed_ip_list": company.get("allowed_ip_list"),
+        "name": data.get("name") or original.get("name"),
+        "url": data.get("url") or original.get("url"),
+        "sd_subscriber_id": data.get("sd_subscriber_id") or original.get("sd_subscriber_id"),
+        "account_manager": data.get("account_manager") or original.get("account_manager"),
+        "contact_name": data.get("contact_name") or original.get("contact_name"),
+        "contact_email": data.get("contact_email") or original.get("contact_email"),
+        "phone": data.get("phone") or original.get("phone"),
+        "country": data.get("country") or original.get("country"),
+        "is_enabled": data.get("is_enabled") or original.get("is_enabled"),
+        "company_type": data.get("company_type") or original.get("company_type"),
+        "monitoring_administrator": data.get("monitoring_administrator") or original.get("monitoring_administrator"),
+        "allowed_ip_list": data.get("allowed_ip_list") or original.get("allowed_ip_list"),
+        "auth_domain": data.get("auth_domain"),
     }
 
-    if company.get("expiry_date"):
-        updates["expiry_date"] = datetime.strptime(str(company.get("expiry_date"))[:10], "%Y-%m-%d")
+    for field in ["sections", "archive_access", "events_only", "restrict_coverage_info", "products", "seats"]:
+        if field in data:
+            updates[field] = data[field]
+
+    for product in updates.get("products") or []:
+        product["_id"] = ObjectId(product["_id"])
+        product.setdefault("seats", 0)
+
+    if data.get("expiry_date"):
+        updates["expiry_date"] = datetime.strptime(str(data.get("expiry_date"))[:10], "%Y-%m-%d")
     else:
         updates["expiry_date"] = None
 
@@ -112,23 +127,23 @@ def get_company_updates(company):
 @blueprint.route("/companies/<_id>", methods=["GET", "POST"])
 @account_manager_only
 def edit(_id):
-    company = find_one("companies", _id=ObjectId(_id))
+    original = find_one("companies", _id=ObjectId(_id))
 
-    if not company:
+    if not original:
         return NotFound(gettext("Company not found"))
 
     if flask.request.method == "POST":
         company = get_json_or_400()
-        errors = get_errors_company(company)
+        errors = get_errors_company(company, original)
         if errors:
             return errors
 
-        updates = get_company_updates(company)
+        updates = get_company_updates(company, original)
         set_version_creator(updates)
         get_resource_service("companies").patch(ObjectId(_id), updates=updates)
         app.cache.delete(_id)
         return jsonify({"success": True}), 200
-    return jsonify(company), 200
+    return jsonify(original), 200
 
 
 @blueprint.route("/companies/<_id>", methods=["DELETE"])
@@ -168,26 +183,3 @@ def get_product_updates(updates: Dict[str, bool], seats: Dict[str, int]):
         }
         for product in products
     ]
-
-
-def update_company(data, _id):
-    updates = {
-        k: v
-        for k, v in data.items()
-        if k in ("sections", "archive_access", "events_only", "restrict_coverage_info", "products")
-    }
-    get_resource_service("companies").patch(_id, updates=updates)
-
-
-@blueprint.route("/companies/<_id>/permissions", methods=["POST"])
-@account_manager_only
-def save_company_permissions(_id):
-    orig = get_entity_or_404(_id, "companies")
-    data = get_json_or_400()
-    seats = {product["_id"]: product.get("seats") or 0 for product in orig.get("products") or []}
-    if data.get("seats"):
-        seats.update(data["seats"])
-    if data.get("products"):
-        data["products"] = get_product_updates(data["products"], seats)
-    update_company(data, orig["_id"])
-    return jsonify(), 200

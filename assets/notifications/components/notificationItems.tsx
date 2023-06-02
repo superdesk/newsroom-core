@@ -114,7 +114,7 @@ registerNotification(
     (notification, item) => (
         <BasicNotificationItem
             header={notification.resource === 'agenda' ?
-                gettext('An Agenda item has arrived that matches a subscribed topic') :
+                gettext('{{ agenda }} item has arrived that matches a subscribed topic', sectionNames) :
                 gettext('A story has arrived that matches a subscribed topic')
             }
             body={getNotificationName(item)}
@@ -133,10 +133,9 @@ registerNotification(
     ),
     (notification, item) => (
         <BasicNotificationItem
-            header={item.topic_type === 'agenda' ?
-                gettext('An Agenda Topic has been shared with you') :
-                gettext('A Wire Topic has been shared with you')
-            }
+            header={gettext('{{ section }} Topic has been shared with you', {
+                section: item.topic_type === 'agenda' ? sectionNames.agenda : sectionNames.wire,
+            })}
             body={getNotificationName(item)}
             url={getNotificationUrl(notification, item)}
             footer={getNotificationFooterText(notification)}
@@ -152,10 +151,9 @@ registerNotification(
     ),
     (notification, item) => (
         <BasicNotificationItem
-            header={notification.resource === 'agenda' ?
-                gettext('An Agenda item was shared with you') :
-                gettext('A Wire item was shared with you')
-            }
+            header={gettext('{{ section }} item was shared with you', {
+                section: notification.resource === 'agenda' ? sectionNames.agenda : sectionNames.wire,
+            })}
             body={getNotificationName(item)}
             url={getNotificationUrl(notification, item)}
             footer={getNotificationFooterText(notification)}

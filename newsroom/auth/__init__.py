@@ -38,9 +38,16 @@ def get_company(user=None, required=False) -> Optional[Company]:
     if user is None:
         user = get_user(required=required)
     if user and user.get("company"):
-        return superdesk.get_resource_service("companies").find_one(req=None, _id=user["company"])
+        return get_company_from_user(user)
     if hasattr(flask.g, "company_id"):  # if there is no user this might be company session (in news api)
         return superdesk.get_resource_service("companies").find_one(req=None, _id=flask.g.company_id)
+    return None
+
+
+def get_company_from_user(user: User) -> Optional[Company]:
+    if user.get("company"):
+        return superdesk.get_resource_service("companies").find_one(req=None, _id=user["company"])
+
     return None
 
 

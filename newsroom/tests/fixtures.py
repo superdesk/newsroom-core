@@ -232,6 +232,7 @@ def setup_user_company(app):
                 "_created": utcnow(),
                 "receive_email": True,
                 "receive_app_notifications": True,
+                "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
             },
             {
                 "_id": TEST_USER_ID,
@@ -244,6 +245,7 @@ def setup_user_company(app):
                 "_created": utcnow(),
                 "receive_email": True,
                 "receive_app_notifications": True,
+                "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
             },
         ],
     )
@@ -252,6 +254,16 @@ def setup_user_company(app):
 @fixture(autouse=True)
 def init_company(app):
     setup_user_company(app)
+
+
+@fixture
+def public_company(app, init_company):
+    return app.data.find_one("companies", req=None, _id=COMPANY_1_ID)
+
+
+@fixture
+def public_user(app, init_company):
+    return app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
 
 
 @fixture

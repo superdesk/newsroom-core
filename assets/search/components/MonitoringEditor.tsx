@@ -24,7 +24,7 @@ class MonitoringEditor extends React.Component {
         };
 
         this.tabs = [
-            {label: gettext('Monitoring Profile'), name: 'profile'}
+            {label: gettext('{{monitoring}} Profile', sectionNames), name: 'profile'}
         ];
 
         if (this.props.isAdmin) {
@@ -119,7 +119,7 @@ class MonitoringEditor extends React.Component {
         const subscribed = (get(this.state, 'profile.users') || []).includes(user);
 
         return (
-            <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit Monitoring')}>
+            <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit {{monitoring}}', sectionNames)}>
                 <div className="list-item__preview-header">
                     <h3>{get(item, 'name')}</h3>
                     <button

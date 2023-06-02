@@ -470,27 +470,31 @@ class BaseSearchService(Service):
                     company_id=search.company.get("_id"),
                 )
             else:
-                user_products = []
+                search.products = []
+
                 if search.user and search.user.get("products"):
                     user_products = get_products_by_user(
                         search.user,
                         search.section,
                     )
 
-                if user_products:
-                    # User has Products assigned
-                    search.products = user_products
-                elif not get_setting("allow_companies_to_manage_products"):
-                    # If Product management is admin only, then default to the
-                    # Product list from the parent Company
-                    search.products = get_products_by_company(
-                        search.company,
-                        search.navigation_ids,
-                        product_type=search.section,
-                    )
-                else:
-                    # Otherwise an empty list of Products is used
-                    search.products = []
+                    if user_products:
+                        # User has Products assigned
+                        search.products += user_products
+
+                # add unlimited (seats=0) company products
+                company_products = get_products_by_company(
+                    search.company,
+                    search.navigation_ids,
+                    product_type=search.section,
+                    unlimited_only=True,
+                )
+
+                if company_products:
+                    for product in company_products:
+                        if product not in search.products:
+                            search.products.append(product)
+
         else:
             search.products = []
 
@@ -509,7 +513,12 @@ class BaseSearchService(Service):
     def prefill_search_highlights(self, search, req):
         query_string = search.args.get("q")
         query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
-        if app.data.elastic.should_highlight(req) and query_string:
+        advanced_search = search.args.get("advanced_search")
+        if app.data.elastic.should_highlight(req) and (
+            query_string
+            or (advanced_search and json.loads(advanced_search).get("all"))
+            or (advanced_search and json.loads(advanced_search).get("any"))
+        ):
             elastic_highlight_query = get_elastic_highlight_query(
                 query_string={
                     "query": query_string,
@@ -518,7 +527,11 @@ class BaseSearchService(Service):
                     "lenient": True,
                 },
             )
-            elastic_highlight_query["fields"] = {"body_html": elastic_highlight_query["fields"]["body_html"]}
+            elastic_highlight_query["fields"] = {
+                "body_html": {},
+                "headline": {},
+                "slugline": {},
+            }
 
             search.highlight = elastic_highlight_query
 

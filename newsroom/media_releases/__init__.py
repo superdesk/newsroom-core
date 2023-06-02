@@ -20,7 +20,7 @@ def init_app(app):
     app.sidenav("Media Releases", "media_releases.index", "factory", section="media_releases")
 
     app.sidenav(
-        lazy_gettext("Saved / Watched"),
+        app.config["SAVED_SECTION"],
         "media_releases.bookmarks",
         "bookmark",
         group=1,

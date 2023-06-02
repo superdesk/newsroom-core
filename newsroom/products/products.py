@@ -74,7 +74,9 @@ def get_product_by_id(product_id, product_type=None, company_id=None):
     return list(superdesk.get_resource_service("products").get(req=None, lookup=lookup))
 
 
-def get_products_by_company(company: Optional[Company], navigation_id=None, product_type=None) -> List[Product]:
+def get_products_by_company(
+    company: Optional[Company], navigation_id=None, product_type=None, unlimited_only=False
+) -> List[Product]:
     """Get the list of products for a company
 
     :param company_id: Company Id
@@ -87,7 +89,11 @@ def get_products_by_company(company: Optional[Company], navigation_id=None, prod
     if "products" in company:
         product_ids = []
         if company.get("products"):
-            product_ids = [ObjectId(p["_id"]) for p in company["products"] if p["section"] == product_type]
+            product_ids = [
+                ObjectId(p["_id"])
+                for p in company["products"]
+                if p["section"] == product_type and (not unlimited_only or not p.get("seats"))
+            ]
         if product_ids:
             lookup["_id"] = {"$in": product_ids}
     else:

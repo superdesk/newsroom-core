@@ -4,7 +4,7 @@ from flask import Blueprint
 from flask_babel import lazy_gettext
 
 
-from .users import UsersResource, UsersService, UserData  # noqa: F401
+from .users import UsersResource, UsersService
 
 blueprint = Blueprint("users", __name__)
 

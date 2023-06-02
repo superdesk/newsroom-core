@@ -11,7 +11,7 @@ import DateInput from 'components/DateInput';
 import CheckboxInput from 'components/CheckboxInput';
 
 
-export function EditCompanyDetails({company, companyTypes, users, errors, onChange, save, deleteCompany}) {
+export function EditCompanyDetails({company, companyTypes, users, errors, onChange, save, deleteCompany, ssoEnabled}) {
     return (
         <form>
             <div className="list-item__preview-form">
@@ -81,6 +81,16 @@ export function EditCompanyDetails({company, companyTypes, users, errors, onChan
                     error={errors ? errors.contact_email : null}
                 />
 
+                {ssoEnabled && (
+                    <TextInput
+                        name='auth_domain'
+                        label={gettext('SSO domain')}
+                        value={company.auth_domain || ''}
+                        onChange={onChange}
+                        error={errors ? errors.auth_domain : null}
+                    />
+                )}
+
                 <SelectInput
                     name='country'
                     label={gettext('Country')}
@@ -100,7 +110,7 @@ export function EditCompanyDetails({company, companyTypes, users, errors, onChan
 
                 {get(company, 'sections.monitoring') && <SelectInput
                     name='monitoring_administrator'
-                    label={gettext('Monitoring Administrator')}
+                    label={gettext('{{monitoring}} Administrator', sectionNames)}
                     value={company.monitoring_administrator}
                     options={sortBy(users || [], 'first_name').map((u) => ({
                         text: `${u.first_name} ${u.last_name}`,
@@ -120,6 +130,7 @@ export function EditCompanyDetails({company, companyTypes, users, errors, onChan
             </div>
             <div className='list-item__preview-footer'>
                 <input
+                    data-test-id="save-btn"
                     type='button'
                     className='btn btn-outline-primary'
                     value={gettext('Save')}
@@ -144,4 +155,5 @@ EditCompanyDetails.propTypes = {
     onChange: PropTypes.func,
     save: PropTypes.func,
     deleteCompany: PropTypes.func,
+    ssoEnabled: PropTypes.bool,
 };

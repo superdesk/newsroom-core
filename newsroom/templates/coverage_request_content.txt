@@ -1,5 +1,5 @@
 {% block content %}
-A coverage inquiry has been submitted by {{ name }} ({{ email }}) from {{ company }} regarding Agenda item "{{ item_name }}" ({{ url }})
+A coverage inquiry has been submitted by {{ name }} ({{ email }}) from {{ company }} regarding {{config.AGENDA_SECTION}} item "{{ item_name }}" ({{ url }})
 Message:
 {{ message }}
 {% endblock %}

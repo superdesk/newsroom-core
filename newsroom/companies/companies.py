@@ -60,6 +60,10 @@ class CompaniesResource(newsroom.Resource):
                 },
             },
         },
+        "auth_domain": {
+            "type": "string",
+            "nullable": True,
+        },
     }
 
     datasource = {"source": "companies", "default_sort": [("name", 1)]}
@@ -72,18 +76,26 @@ class CompaniesResource(newsroom.Resource):
             [("name", 1)],
             {"unique": True, "collation": {"locale": "en", "strength": 2}},
         ),
+        "auth_domain_1": (
+            [("auth_domain", 1)],
+            {
+                "unique": True,
+                "collation": {"locale": "en", "strength": 2},
+                "partialFilterExpression": {"auth_domain": {"$gt": ""}},  # filters out None and ""
+            },
+        ),
     }
 
 
 class CompaniesService(newsroom.Service):
     def on_update(self, updates, original):
-        if "sections" in updates:
-            original_products = updates.get("products") or original.get("products") or []
-            enabled_sections = [section for section, active in updates.get("sections").items() if active]
-            new_products = [product for product in original_products if product.get("section") in enabled_sections]
-
-            if len(new_products) != len(original_products):
-                updates["products"] = new_products
+        if "sections" in updates or "products" in updates:
+            sections = updates.get("sections", original.get("sections")) or {}
+            updates["products"] = [
+                product
+                for product in updates.get("products", original.get("products")) or []
+                if product.get("section") and sections.get(product["section"]) is True
+            ]
 
     def on_updated(self, updates, original):
         original_section_names = get_company_section_names(original)

@@ -108,6 +108,7 @@ class CompanyAdminAppComponent extends React.Component {
                     {!this.state.sideNavOpen ? null : <CompanyAdminSideNav />}
                     <div className="content">
                         <ListBar
+                            testId="company-admin--navbar"
                             onNewItem={this.props.sectionId !== 'users' ? undefined : this.props.newUser}
                             setQuery={this.props.setQuery}
                             fetch={this.props.sectionId === 'users' ?  this.props.fetchUsers : this.setProductFilterQuery }
@@ -115,9 +116,9 @@ class CompanyAdminAppComponent extends React.Component {
                             enableQueryAction={true}
                             noLeftPadding={true}
                         >
-                            <button
+                            {/* <button
                                 onClick={this.toggleSideNav}
-                                className="icon-button icon-button--border-three-sides"
+                                className="icon-button icon-button--border-three-sides d-none d-lg-block"
                                 aria-label={gettext('Open Side Navigation')}
                             >
                                 <i className={classNames(
@@ -127,7 +128,7 @@ class CompanyAdminAppComponent extends React.Component {
                                         'icon--arrow-right icon--rotate-180': this.state.sideNavOpen,
                                     }
                                 )} />
-                            </button>
+                            </button> */}
                             <div className="btn-group btn-group--navbar">
                                 <button
                                     onClick={() => this.props.setSection('my_company')}
@@ -135,6 +136,7 @@ class CompanyAdminAppComponent extends React.Component {
                                         'btn btn-outline-primary',
                                         {active: this.props.sectionId === 'my_company'}
                                     )}
+                                    data-test-id="company-admin--companies-btn"
                                 >
                                     {gettext('My Company')}
                                 </button>
@@ -144,12 +146,13 @@ class CompanyAdminAppComponent extends React.Component {
                                         'btn btn-outline-primary',
                                         {active: this.props.sectionId === 'users'}
                                     )}
+                                    data-test-id="company-admin--users-btn"
                                 >
                                     {gettext('Users')}
                                 </button>
                             </div>
 
-                            {this.props.sectionId === 'users' ? <label className='label label--big label--rounded'>{
+                            {this.props.sectionId === 'users' ? <label className='label label--big label--rounded me-2'>{
                                 gettext('Users : {{total}}', {total : this.props.totalUsers})}</label> : ''}
                             <div className="content-bar-divider" />
                             {this.props.sectionId !== 'users' ? null : (

@@ -77,6 +77,7 @@
                         role="button"
                         data-bs-toggle="tooltip"
                         data-bs-placement="right"
+                        data-test-id="sidenav-link-company_admin"
                     >
                         <i class="icon--cog"></i>
                         <div class="sidenav-icons__item-title">{{ gettext('Company Admin') }}</div>
@@ -86,7 +87,15 @@
 
                 {% if is_admin_or_account_manager() %}
                 <li class="sidenav-icons__item sidenav-icons__item--report {% if request.endpoint == 'reports.company_reports' %}active{% endif %}">
-                  <a href="{{ url_for('reports.company_reports') }}" title="{{ gettext('Reports') }}" aria-label="{{ gettext('Reports') }}" role="button" data-bs-toggle="tooltip" data-bs-placement="right">
+                  <a
+                      href="{{ url_for('reports.company_reports') }}"
+                      title="{{ gettext('Reports') }}"
+                      aria-label="{{ gettext('Reports') }}"
+                      role="button"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="right"
+                      data-test-id="sidenav-link-reports"
+                  >
                       <i class="icon--report"></i>
                       <div class="sidenav-icons__item-title">{{ gettext('Reports') }}</div>
                   </a>
@@ -94,7 +103,15 @@
                 {% endif %}
                 {% for app in settings_apps|sort(attribute='weight') %}{% if loop.first and is_admin() %}
                 <li class="sidenav-icons__item sidenav-icons__item--admin {% if request.blueprint == 'settings' %}active{% endif %}">
-                  <a href="{{ url_for('settings.app', app_id=app._id) }}" title="{{ gettext('Settings') }}" aria-label="{{ gettext('Settings') }}" role="button" data-bs-toggle="tooltip" data-bs-placement="right">
+                  <a
+                      href="{{ url_for('settings.app', app_id=app._id) }}"
+                      title="{{ gettext('Settings') }}"
+                      aria-label="{{ gettext('Settings') }}"
+                      role="button"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="right"
+                      data-test-id="sidenav-link-settings"
+                  >
                       <i class="icon--cog"></i>
                       <div class="sidenav-icons__item-title">{{ gettext('Settings') }}</div>
                   </a>
@@ -117,70 +134,12 @@
 </div>
 
 <div id="modal-container"></div>
-
-<script>
-    window.newsroom = {{ get_client_config() | tojson | safe }};
-    window.notificationData = {{ get_initial_notifications() | tojson | safe }};
-    window.profileData = {{ get_user_profile_data() | tojson | safe }};
-    window.translations = {{ get_client_translations() | tojson | safe }};
-    window.locales = {{ get_client_locales() | tojson | safe }};
-    window.locale = '{{ get_locale() | tojson | safe }}';
-</script>
-
-{{ javascript_tag('newsroom_js') | safe }}
-{{ javascript_tag('app') | safe }}
-
-{% if session.get('name') %}
-    {{ javascript_tag('notifications_js') | safe }}
-    {{ javascript_tag('user_profile_js') | safe }}
-{% endif %}
-
-{% block script %}{% endblock %}
-
-{% if get_setting('google_analytics') %}
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id={{ get_setting('google_analytics') | safe }}"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', '{{ get_setting('google_analytics') | tojson }}', {
-      custom_map: {
-          dimension1: 'company',
-          dimension2: 'user',
-      }
-  });
-
-  {% if session.get('user') %}
-  gtag('set', {'user_id': '{{ hash(session['user']) | tojson }}' });
-  {% endif %}
-
-  {% with messages = get_flashed_messages(category_filter=['analytics']) %}
-    {% if messages %}
-        analytics.sendEvents({{ messages | tojson | safe }});
-    {% endif %}
-  {% endwith %}
-</script>
-{% endif %}
-
-{% if config.GOOGLE_MAPS_KEY %}
-<script>
-    window.mapsProvider = 'google';
-    window.googleMapsKey = '{{ config.GOOGLE_MAPS_KEY | tojson }}';
-    function setMapsLoaded() {
-        window.mapsLoaded = true;
-    }
-</script>
-<script src="https://maps.googleapis.com/maps/api/js?key={{ config.GOOGLE_MAPS_KEY }}&callback=setMapsLoaded" async defer></script>
-<div id="google-map"></div>
-{% endif %}
-
-{% if config.IFRAMELY %}
-<script src="//cdn.iframe.ly/embed.js" async></script>
-{% endif %}
-
 <textarea id="copy-area"></textarea>
+
+{% include "scripts.html" %}
+
+{% block script %}
+{% endblock %}
 
 </body>
 </html>

@@ -21,6 +21,7 @@ export class FormToggle extends React.Component {
         return (
             <React.Fragment>
                 <div
+                    data-test-id={this.props.testId}
                     className="list-item__preview-collapsible"
                     onClick={this.toggle}
                 >
@@ -47,4 +48,5 @@ FormToggle.propTypes = {
         PropTypes.arrayOf(PropTypes.node),
         PropTypes.node,
     ]).isRequired,
+    testId: PropTypes.string,
 };

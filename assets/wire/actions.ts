@@ -226,7 +226,7 @@ export function search(state, next, aggs) {
         timezone_offset: getTimezoneOffset(),
         newsOnly,
         product: searchParams.product,
-        es_highlight: !searchParams.query ? null : 1,
+        es_highlight: !searchParams.query && !searchParams.advancedSearch ? null : 1,
         all_versions: !searchAllVersions ? null : 1,
         prepend_embargoed: !state.bookmarks ? null : 0,
         aggs: aggs === false ? '0' : '1',

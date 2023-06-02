@@ -15,7 +15,7 @@ import {FormToggle} from 'ui/components/FormToggle';
 
 import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserListItem';
 
-import {companyProductSeatsSelector, companySectionListSelector} from 'company-admin/selectors';
+import {companyProductSeatsSelector, companySectionListSelector, sectionListSelector} from 'company-admin/selectors';
 
 const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
 
@@ -33,6 +33,7 @@ function EditUserComponent({
     toolbar,
     products,
     hideFields,
+    allSections,
     companySections,
     seats,
     resendUserInvite,
@@ -40,8 +41,12 @@ function EditUserComponent({
     const companyId = user.company;
     const localeOptions = getLocaleInputOptions();
     const stateLabelDetails = getUserStateLabelDetails(user);
-    const companyProductIds = Object.keys(seats[companyId] || {});
-    const sections = companySections[companyId] || [];
+    const companyProductIds = companyId != null ?
+        Object.keys(seats[companyId] || {}) :
+        products.map((product) => product._id);
+    const sections = companyId != null ?
+        companySections[companyId] || [] :
+        allSections;
     const companySectionIds = sections.map((section) => section._id);
     const isAdmin = isUserAdmin(currentUser);
     const isCompanyAdmin = isUserCompanyAdmin(currentUser);
@@ -49,7 +54,11 @@ function EditUserComponent({
     let company = companies.map((value)=> value.name);
 
     return (
-        <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit User')}>
+        <div
+            data-test-id="edit-user-form"
+            className='list-item__preview' role={gettext('dialog')}
+            aria-label={gettext('Edit User')}
+        >
             <div className='list-item__preview-header'>
                 <h3>{ gettext('Add/Edit User') }</h3>
                 <button
@@ -99,6 +108,7 @@ function EditUserComponent({
                         <FormToggle
                             expanded={true}
                             title={gettext('General')}
+                            testId="toggle--general"
                         >
                             {hideFields.includes('first_name') ? null : (<TextInput
                                 name='first_name'
@@ -178,52 +188,68 @@ function EditUserComponent({
                             )}
                         </FormToggle>
 
-                        {hideFields.includes('sections') ? null : (<FormToggle title={gettext('Sections')}>
-                            {sections.filter((section) => companySectionIds.includes(section._id)).map((section) => (
-                                <div className="list-item__preview-row" key={section._id}>
-                                    <div className="form-group">
-                                        <CheckboxInput
-                                            name={`sections.${section._id}`}
-                                            label={section.name}
-                                            value={get(user, `sections.${section._id}`) || false}
-                                            onChange={onChange}
-                                        />
+                        {hideFields.includes('sections') ? null : (
+                            <FormToggle
+                                title={gettext('Sections')}
+                                testId="toggle--sections"
+                            >
+                                {sections.filter((section) => companySectionIds.includes(section._id)).map((section) => (
+                                    <div className="list-item__preview-row" key={section._id}>
+                                        <div className="form-group">
+                                            <CheckboxInput
+                                                name={`sections.${section._id}`}
+                                                label={section.name}
+                                                value={get(user, `sections.${section._id}`) === true}
+                                                onChange={onChange}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </FormToggle>)}
+                                ))}
+                            </FormToggle>
+                        )}
 
-                        {hideFields.includes('products') ? null : (<FormToggle title={gettext('Products')}>
-                            {sections.filter((section) => companySectionIds.includes(section._id)).map((section) => (
-                                <React.Fragment key={section._id}>
-                                    <div className="list-item__preview-subheading">
-                                        {section.name}
-                                    </div>
-                                    {products.filter(
-                                        (product) => product.product_type === section._id &&
-                                            companyProductIds.includes(product._id)
-                                    ).map((product) => (
-                                        <EditUserProductPermission
-                                            key={product._id}
-                                            original={original}
-                                            user={user}
-                                            section={section}
-                                            product={product}
-                                            seats={seats}
-                                            onChange={onChange}
-                                        />
-                                    ))}
-                                </React.Fragment>
-                            ))}
-                        </FormToggle>)}
+                        {hideFields.includes('products') ? null : (
+                            <FormToggle
+                                title={gettext('Products')}
+                                testId="toggle--products"
+                            >
+                                {sections.filter((section) => (
+                                    companySectionIds.includes(section._id) &&
+                                    get(user, `sections.${section._id}`) === true
+                                )).map((section) => (
+                                    <React.Fragment key={section._id}>
+                                        <div className="list-item__preview-subheading">
+                                            {section.name}
+                                        </div>
+                                        {products.filter(
+                                            (product) => product.product_type === section._id &&
+                                                companyProductIds.includes(product._id)
+                                        ).map((product) => (
+                                            <EditUserProductPermission
+                                                key={product._id}
+                                                original={original}
+                                                user={user}
+                                                section={section}
+                                                product={product}
+                                                seats={seats}
+                                                onChange={onChange}
+                                            />
+                                        ))}
+                                    </React.Fragment>
+                                ))}
+                            </FormToggle>
+                        )}
 
-                        <FormToggle title={gettext('User Settings')}>
+                        <FormToggle
+                            title={gettext('User Settings')}
+                            testId="toggle--user-settings"
+                        >
                             {hideFields.includes('is_approved') ? null : (<div className="list-item__preview-row">
                                 <div className="form-group">
                                     <CheckboxInput
                                         name='is_approved'
                                         label={gettext('Approved')}
-                                        value={user.is_approved}
+                                        value={user.is_approved === true}
                                         onChange={onChange} />
                                 </div>
                             </div>)}
@@ -233,7 +259,7 @@ function EditUserComponent({
                                     <CheckboxInput
                                         name='is_enabled'
                                         label={gettext('Enabled')}
-                                        value={user.is_enabled}
+                                        value={user.is_enabled === true}
                                         onChange={onChange} />
                                 </div>
                             </div>)}
@@ -243,7 +269,7 @@ function EditUserComponent({
                                     <CheckboxInput
                                         name='expiry_alert'
                                         label={gettext('Company Expiry Alert')}
-                                        value={user.expiry_alert}
+                                        value={user.expiry_alert === true}
                                         onChange={onChange} />
                                 </div>
                             </div>)}
@@ -253,7 +279,7 @@ function EditUserComponent({
                                     <CheckboxInput
                                         name='manage_company_topics'
                                         label={gettext('Manage Company Topics')}
-                                        value={user.manage_company_topics}
+                                        value={user.manage_company_topics === true}
                                         onChange={onChange} />
                                 </div>
                             </div>)}
@@ -272,6 +298,7 @@ function EditUserComponent({
                         )}
 
                         <input
+                            data-test-id="save-btn"
                             type='button'
                             className='btn btn-outline-primary'
                             value={gettext('Save')}
@@ -304,6 +331,7 @@ EditUserComponent.propTypes = {
     toolbar: PropTypes.node,
     products: PropTypes.arrayOf(PropTypes.object),
     hideFields: PropTypes.arrayOf(PropTypes.string),
+    allSections: PropTypes.arrayOf(PropTypes.object),
     companySections: PropTypes.object,
     seats: PropTypes.object,
 };
@@ -313,6 +341,7 @@ EditUserComponent.defaultProps = {
 };
 
 const mapStateToProps = (state) => ({
+    allSections: sectionListSelector(state),
     companySections: companySectionListSelector(state),
     seats: companyProductSeatsSelector(state),
 });
