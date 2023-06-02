@@ -513,11 +513,11 @@ class BaseSearchService(Service):
     def prefill_search_highlights(self, search, req):
         query_string = search.args.get("q")
         query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
-        advanced_search_query = search.args.get("advanced_search")
-        if (
-            (app.data.elastic.should_highlight(req) and query_string)
-            or advanced_search_query
-            and len(json.loads(advanced_search_query).get("fields", [])) != 0
+        advanced_search = search.args.get("advanced_search")
+        if app.data.elastic.should_highlight(req) and (
+            query_string
+            or (advanced_search and json.loads(advanced_search).get("all"))
+            or (advanced_search and json.loads(advanced_search).get("any"))
         ):
             elastic_highlight_query = get_elastic_highlight_query(
                 query_string={
