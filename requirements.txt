@@ -32,9 +32,9 @@ blinker==1.4
     #   raven
     #   sentry-sdk
     #   superdesk-core
-boto3==1.26.144
+boto3==1.26.145
     # via superdesk-core
-botocore==1.29.144
+botocore==1.29.145
     # via
     #   boto3
     #   s3transfer
@@ -154,6 +154,8 @@ idna==3.4
     # via requests
 importlib-resources==5.12.0
     # via limits
+isodate==0.6.1
+    # via python3-saml
 itsdangerous==1.1.0
     # via
     #   flask
@@ -182,8 +184,10 @@ limits==3.5.0
 lxml==4.6.5
     # via
     #   draftjs-exporter
+    #   python3-saml
     #   superdesk-core
     #   svglib
+    #   xmlsec
 markupsafe==2.0.1
     # via
     #   -r requirements.in
@@ -255,6 +259,8 @@ python-magic==0.4.27
     # via superdesk-core
 python-twitter==3.5
     # via superdesk-core
+python3-saml==1.15.0
+    # via -r requirements.in
 pytz==2023.3
     # via
     #   celery
@@ -308,6 +314,7 @@ six==1.16.0
     #   flask-limiter
     #   flask-oidc-ex
     #   html5lib
+    #   isodate
     #   oauth2client
     #   python-bidi
     #   python-dateutil
@@ -321,7 +328,7 @@ tinycss2==1.2.1
     # via
     #   cssselect2
     #   svglib
-typing-extensions==4.6.2
+typing-extensions==4.6.3
     # via
     #   limits
     #   qrcode
@@ -367,6 +374,8 @@ wtforms==2.2.1
     #   flask-wtf
 xhtml2pdf==0.2.11
     # via -r requirements.in
+xmlsec==1.3.13
+    # via python3-saml
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
