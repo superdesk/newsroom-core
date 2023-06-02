@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import {bem} from 'ui/utils';
-import {hasCoverages} from '../utils';
-import {formatAgendaDate} from 'utils';
+import {formatAgendaDate, hasCoverages} from '../utils';
 
 import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
 

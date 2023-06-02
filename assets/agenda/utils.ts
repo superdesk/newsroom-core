@@ -12,6 +12,7 @@ import {
     parseDate,
     AGENDA_DATE_FORMAT_SHORT,
     formatTime,
+    DAY_IN_MINUTES,
 } from '../utils';
 
 export const STATUS_KILLED = 'killed';
@@ -28,7 +29,7 @@ const navigationFunctions = {
     'week': {
         'next': getNextWeek,
         'previous': getPreviousWeek,
-        'format': (dateString) => `${moment(dateString).format('D MMMM')} - 
+        'format': (dateString) => `${moment(dateString).format('D MMMM')} -
         ${moment(dateString).add(6, 'days').format('D MMMM')}`,
     },
     'month': {
@@ -645,7 +646,7 @@ const isBetweenDay = (day, start, end) => {
     // it will be converted to local time
     // if passed as string which we need
     // for all day events which are in utc mode
-    const startDate = start.format('YYYY-MM-DD'); 
+    const startDate = start.format('YYYY-MM-DD');
     const endDate = end.format('YYYY-MM-DD');
 
     return day.isBetween(startDate, endDate, 'day', '[]');
@@ -902,3 +903,153 @@ export const getCoverageTooltip = (coverage, beingUpdated) => {
 
     return gettext('{{ type }} coverage', {type: coverageType});
 };
+
+function getScheduleType(item) {
+    const start = moment(item.dates.start)
+    const end = moment(item.dates.end);
+    const duration = end.diff(start, 'minutes');
+
+    if (item.dates.all_day) {
+        return duration === 0 ? SCHEDULE_TYPE.ALL_DAY : SCHEDULE_TYPE.MULTI_DAY;
+    }
+
+    if (item.dates.no_end_time) {
+        return SCHEDULE_TYPE.NO_DURATION;
+    }
+
+    if (duration > DAY_IN_MINUTES || !start.isSame(end, 'day')) {
+        return SCHEDULE_TYPE.MULTI_DAY;
+    }
+
+    if (duration === DAY_IN_MINUTES && start.isSame(end, 'day')) {
+        return SCHEDULE_TYPE.ALL_DAY;
+    }
+
+    if (duration === 0) {
+        return SCHEDULE_TYPE.NO_DURATION;
+    }
+
+    return SCHEDULE_TYPE.REGULAR;
+}
+
+/**
+ * Format agenda item start and end dates
+ *
+ * @param {String} dateString
+ * @param {String} group: date of the selected event group
+ * @param {Object} options
+ * @return {Array} [time string, date string]
+ */
+export function formatAgendaDate(item, group, {localTimeZone = true, onlyDates = false} = {}) {
+    const getFormattedTimezone = (date) => {
+        let tzStr = date.format('z');
+        if (tzStr.indexOf('+0') >= 0) {
+            return tzStr.replace('+0', 'GMT+');
+        }
+
+        if (tzStr.indexOf('+') >= 0) {
+            return tzStr.replace('+', 'GMT+');
+        }
+
+        return tzStr;
+    };
+
+    const isTBCItem = isItemTBC(item);
+    let start = parseDate(item.dates.start, item.dates.all_day);
+    let end = parseDate(item.dates.end, item.dates.all_day || item.dates.no_end_time);
+    let dateGroup = group ? moment(group, DATE_FORMAT) : null;
+
+    let isGroupBetweenEventDates = dateGroup ?
+        start.isSameOrBefore(dateGroup, 'day') && end.isSameOrAfter(dateGroup, 'day') : true;
+
+    if (!isGroupBetweenEventDates && hasCoverages(item)) {
+        // we rendering for extra days
+        const scheduleDates = item.coverages
+            .map((coverage) => {
+                if (isCoverageForExtraDay(coverage, group)) {
+                    return coverage.scheduled;
+                }
+                return null;
+            })
+            .filter((d) => d)
+            .sort((a, b) => {
+                if (a < b) return -1;
+                if (a > b) return 1;
+                return 0;
+            });
+        if (scheduleDates.length > 0) {
+            start = moment(scheduleDates[0]);
+        }
+    }
+
+    const scheduleType = getScheduleType(item);
+    const startDate = formatDate(start);
+    const startTime = formatTime(start);
+    const endDate = formatDate(end);
+    const endTime = formatTime(end);
+    const timezone = localTimeZone ? '' : getFormattedTimezone(start);
+
+    switch (true) {
+    case isTBCItem && startDate !== endDate:
+        return gettext('{{startDate}} to {{endDate}} (Time to be confirmed)', {
+            startDate,
+            endDate,
+        });
+
+    case isTBCItem:
+        return gettext('{{startDate}} (Time to be confirmed)', {
+            startDate,
+        });
+
+    case startDate !== endDate && (item.dates.all_day || onlyDates || (startTime === '00:00' && endTime === '23:59')):
+        return gettext('{{startDate}} to {{endDate}}', {
+            startDate,
+            endDate,
+        });
+
+    case startDate === endDate && (item.dates.all_day || onlyDates || scheduleType === SCHEDULE_TYPE.ALL_DAY):
+        return startDate;
+
+    case item.dates.no_end_time && startDate !== endDate:
+        return gettext('{{startTime}} {{startDate}} - {{endDate}} {{timezone}}', {
+            startTime,
+            startDate,
+            endDate,
+            timezone,
+        });
+
+    case item.dates.no_end_time || scheduleType === SCHEDULE_TYPE.NO_DURATION:
+        return gettext('{{startTime}} {{startDate}} {{timezone}}', {
+            startTime,
+            startDate,
+            timezone,
+        });
+
+    case scheduleType === SCHEDULE_TYPE.REGULAR:
+        return gettext('{{startTime}} - {{endTime}} {{startDate}} {{timezone}}', {
+            startTime,
+            startDate,
+            endTime,
+            timezone,
+        });
+
+    case scheduleType === SCHEDULE_TYPE.MULTI_DAY:
+        return gettext('{{startTime}} {{startDate}} to {{endTime}} {{endDate}} {{timezone}}', {
+            startTime,
+            startDate,
+            endTime,
+            endDate,
+            timezone,
+        });
+
+    default:
+        console.warn('not sure about the datetime format', item, scheduleType);
+        return gettext('{{startTime}} {{startDate}} to {{endTime}} {{endDate}} {{timezone}}', {
+            startTime,
+            startDate,
+            endTime,
+            endDate,
+            timezone
+        });
+    }
+}

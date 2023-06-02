@@ -5,8 +5,7 @@ import {get} from 'lodash';
 import classNames from 'classnames';
 
 import {bem} from 'ui/utils';
-import {isItemTBC} from '../utils';
-import {formatAgendaDate} from 'utils';
+import {formatAgendaDate, isItemTBC} from '../utils';
 import {shouldRenderLocation} from'maps/utils';
 
 export default function AgendaTime({item, children}) {
