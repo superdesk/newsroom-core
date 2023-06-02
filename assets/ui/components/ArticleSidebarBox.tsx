@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default function ArticleSidebarBox(props) {
+export default function ArticleSidebarBox(props: any) {
     return (
         <div>
             <span className="column__preview__tags__box-headline">

@@ -9,22 +9,22 @@ import 'tests/setup';
 import WireApp from '../components/WireApp';
 
 
-function setup(state) {
+function setup(state: any) {
     const store = createStore(() => state, applyMiddleware(thunk));
     const enzymeWrapper = mount(<Provider store={store}><WireApp /></Provider>);
     return enzymeWrapper;
 }
 
-function getActions(enzymeWrapper) {
+function getActions(enzymeWrapper: any) {
     return enzymeWrapper.find('WirePreview').props().actions;
 }
 
-function getMultiActions(enzymeWrapper) {
+function getMultiActions(enzymeWrapper: any) {
     return enzymeWrapper.find('SelectedItemsBar')
         .find('.multi-action-bar__icons').children();
 }
 
-function getNames(actions) {
+function getNames(actions: any) {
     return actions.map((action) => action.name);
 }
 

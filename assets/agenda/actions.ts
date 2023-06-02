@@ -443,7 +443,7 @@ export function pushNotification(push) {
     };
 }
 
-export function reloadMyTopics(reloadTopic = false) {
+export function reloadMyTopics(reloadTopic: any = false) {
     return function(dispatch) {
         return loadMyTopics()
             .then((data) => {
@@ -462,7 +462,7 @@ export function reloadMyTopics(reloadTopic = false) {
 }
 
 export const SET_NEW_ITEM = 'SET_NEW_ITEM';
-export function setAndUpdateNewItems(data) {
+export function setAndUpdateNewItems(data: any) {
     return function(dispatch, getState) {
         const item = data.item || {};
 
@@ -502,11 +502,11 @@ export function setAndUpdateNewItems(data) {
 }
 
 export const UPDATE_ITEM = 'UPDATE_ITEM';
-export function updateItem(item) {
+export function updateItem(item: any) {
     return {type: UPDATE_ITEM, item: item};
 }
 
-export function toggleDropdownFilter(key, val) {
+export function toggleDropdownFilter(key: any, val: any) {
     return (dispatch) => {
         dispatch(setActive(null));
         dispatch(preview(null));
@@ -523,7 +523,7 @@ export function toggleDropdownFilter(key, val) {
     };
 }
 
-function setLocationFilter(location) {
+function setLocationFilter(location: any) {
     return (dispatch, getState) => {
         const state = getState();
         const currentFilters = cloneDeep(searchFilterSelector(state));
@@ -550,7 +550,7 @@ export function startLoading() {
 }
 
 export const RECIEVE_NEXT_ITEMS = 'RECIEVE_NEXT_ITEMS';
-export function recieveNextItems(data) {
+export function recieveNextItems(data: any) {
     return {type: RECIEVE_NEXT_ITEMS, data};
 }
 
@@ -576,7 +576,7 @@ export function fetchMoreItems() {
  *
  * @param {URLSearchParams} params
  */
-export function initParams(params) {
+export function initParams(params: any) {
     if (params.get('filter') || params.get('created')) {
         clearAgendaDropdownFilters();
     }
@@ -606,7 +606,7 @@ export function initParams(params) {
  * @param {String} topicId
  * @return {Promise}
  */
-export function loadMyAgendaTopic(topicId) {
+export function loadMyAgendaTopic(topicId: any) {
     return (dispatch, getState) => {
         // Set featured query option to false when using navigations
         if (get(getState(), 'agenda.featuredOnly')) {
@@ -619,7 +619,7 @@ export function loadMyAgendaTopic(topicId) {
 }
 
 export const TOGGLE_FEATURED_FILTER = 'TOGGLE_FEATURED_FILTER';
-export function toggleFeaturedFilter(fetch = true) {
+export function toggleFeaturedFilter(fetch: any = true) {
     return (dispatch) => {
         toggleFeaturedOnlyParam();
         dispatch({type: TOGGLE_FEATURED_FILTER});
@@ -632,12 +632,12 @@ export function toggleFeaturedFilter(fetch = true) {
 }
 
 export const SET_ITEM_TYPE_FILTER = 'SET_ITEM_TYPE_FILTER';
-export function setItemTypeFilter(value) {
+export function setItemTypeFilter(value: any) {
     return {type: SET_ITEM_TYPE_FILTER, value};
 }
 
 export const WATCH_COVERAGE = 'WATCH_COVERAGE';
-export function watchCoverage(coverage, item) {
+export function watchCoverage(coverage: any, item: any) {
     return (dispatch) => {
         server.post(WATCH_COVERAGE_URL, {
             coverage_id: coverage.coverage_id,
@@ -655,7 +655,7 @@ export function watchCoverage(coverage, item) {
 }
 
 export const STOP_WATCHING_COVERAGE = 'STOP_WATCHING_COVERAGE';
-export function stopWatchingCoverage(coverage, item) {
+export function stopWatchingCoverage(coverage: any, item: any) {
     return (dispatch, getState) => {
         server.del(WATCH_COVERAGE_URL, {
             coverage_id: coverage.coverage_id,

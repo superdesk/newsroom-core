@@ -4,7 +4,7 @@ import {shortDate} from 'utils';
 import {gettext} from '../../utils';
 
 
-function getProductName(products, id) {
+function getProductName(products: any, id: any) {
     const product = products.find((product) => product._id == id);
     return product && product.name;
 }

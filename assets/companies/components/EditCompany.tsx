@@ -19,7 +19,7 @@ import EditCompanyAPI from './EditCompanyAPI';
 import AuditInformation from 'components/AuditInformation';
 import {EditCompanyDetails} from './EditCompanyDetails';
 
-function deriveInitialPermissionState(company, sectionList, productList) {
+function deriveInitialPermissionState(company: any, sectionList: any, productList: any) {
     const sections = {};
     const products = {};
     const seats = {};

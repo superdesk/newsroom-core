@@ -1,5 +1,5 @@
 
-export function setElementStyle(selector, field, value) {
+export function setElementStyle(selector: any, field: any, value: any) {
     const ele = document.querySelector(selector);
 
     if (ele) {
@@ -7,13 +7,13 @@ export function setElementStyle(selector, field, value) {
     }
 }
 
-export function elementHasClass(selector, className) {
+export function elementHasClass(selector: any, className: any) {
     const ele = document.querySelector(selector);
 
     return ele && ele.classList.contains(className);
 }
 
-export function replaceElementClasses(selector, classNames) {
+export function replaceElementClasses(selector: any, classNames: any) {
     const ele = document.querySelector(selector);
 
     if (ele) {
@@ -21,7 +21,7 @@ export function replaceElementClasses(selector, classNames) {
     }
 }
 
-export function removeElementClass(selector, className) {
+export function removeElementClass(selector: any, className: any) {
     const ele = document.querySelector(selector);
 
     if (ele) {
@@ -29,7 +29,7 @@ export function removeElementClass(selector, className) {
     }
 }
 
-export function onElementClicked(selector, callback) {
+export function onElementClicked(selector: any, callback: any) {
     const ele = document.querySelector(selector);
 
     if (ele) {

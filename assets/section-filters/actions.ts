@@ -5,12 +5,12 @@ import {searchQuerySelector} from 'search/selectors';
 
 
 export const SELECT_SECTION_FILTER = 'SELECT_SECTION_FILTER';
-export function selectSectionFilter(id) {
+export function selectSectionFilter(id: any) {
     return {type: SELECT_SECTION_FILTER, id};
 }
 
 export const EDIT_SECTION_FILTER = 'EDIT_SECTION_FILTER';
-export function editSectionFilter(event) {
+export function editSectionFilter(event: any) {
     return {type: EDIT_SECTION_FILTER, event};
 }
 
@@ -20,7 +20,7 @@ export function newSectionFilter() {
 }
 
 export const CANCEL_EDIT = 'CANCEL_EDIT';
-export function cancelEdit(event) {
+export function cancelEdit(event: any) {
     return {type: CANCEL_EDIT, event};
 }
 
@@ -30,12 +30,12 @@ export function querySectionFilters() {
 }
 
 export const GET_SECTION_FILTERS = 'GET_SECTION_FILTERS';
-export function getSectionFilters(data) {
+export function getSectionFilters(data: any) {
     return {type: GET_SECTION_FILTERS, data};
 }
 
 export const SET_ERROR = 'SET_ERROR';
-export function setError(errors) {
+export function setError(errors: any) {
     return {type: SET_ERROR, errors};
 }
 
@@ -103,7 +103,7 @@ export function deleteSectionFilter() {
 
 
 
-export function initViewData(data) {
+export function initViewData(data: any) {
     return function (dispatch) {
         dispatch(getSectionFilters(data.section_filters));
         dispatch(initSections(data.sections));

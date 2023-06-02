@@ -17,7 +17,7 @@ const FILTER_VALUES = {
     NOT_PLANNED: 'not planned',
 };
 
-function getActiveFilterLabel(filter, activeFilter) {
+function getActiveFilterLabel(filter: any, activeFilter: any) {
     const filterValue = get(activeFilter, `${filter.field}[0]`);
 
     switch (filterValue) {

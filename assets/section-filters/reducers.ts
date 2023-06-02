@@ -25,7 +25,7 @@ const initialState = {
     search: searchReducer,
 };
 
-export default function sectionFiltersReducer(state = initialState, action) {
+export default function sectionFiltersReducer(state: any = initialState, action: any) {
     switch (action.type) {
 
     case SELECT_SECTION_FILTER: {

@@ -486,7 +486,7 @@ export function pushNotification(push) {
     };
 }
 
-export function reloadMyTopics(reloadTopic = false) {
+export function reloadMyTopics(reloadTopic: any = false) {
     return function(dispatch) {
         return loadMyTopics()
             .then((data) => {
@@ -505,7 +505,7 @@ export function reloadMyTopics(reloadTopic = false) {
 }
 
 export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
-export function setNewItems(data) {
+export function setNewItems(data: any) {
     return function (dispatch) {
         if (get(data, '_items.length') <= 0 || get(data, '_items[0].type') !== 'text') {
             return Promise.resolve();
@@ -521,7 +521,7 @@ export function fetchNewItems() {
         .then((response) => dispatch(setNewItems(response)));
 }
 
-export function fetchNext(item) {
+export function fetchNext(item: any) {
     return () => {
         if (!item.nextversion) {
             return Promise.reject();
@@ -532,7 +532,7 @@ export function fetchNext(item) {
 }
 
 export const TOGGLE_FILTER = 'TOGGLE_FILTER';
-export function toggleFilter(key, val, single) {
+export function toggleFilter(key: any, val: any, single: any) {
     return (dispatch) => {
         setTimeout(() => dispatch({type: TOGGLE_FILTER, key, val, single}));
     };
@@ -544,7 +544,7 @@ export function startLoading() {
 }
 
 export const RECIEVE_NEXT_ITEMS = 'RECIEVE_NEXT_ITEMS';
-export function recieveNextItems(data) {
+export function recieveNextItems(data: any) {
     return {type: RECIEVE_NEXT_ITEMS, data};
 }
 
@@ -565,7 +565,7 @@ export function fetchMoreItems() {
     };
 }
 
-export function loadMyWireTopic(topicId) {
+export function loadMyWireTopic(topicId: any) {
     return (dispatch) => {
         dispatch(loadMyTopic(topicId));
         return dispatch(fetchItems());
@@ -577,7 +577,7 @@ export function loadMyWireTopic(topicId) {
  *
  * @param {URLSearchParams} params
  */
-export function initParams(params) {
+export function initParams(params: any) {
     return (dispatch, getState) => {
         dispatch(initSearchParams(params));
         if (params.get('item')) {

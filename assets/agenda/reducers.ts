@@ -60,7 +60,7 @@ const initialState = {
     hasAgendaFeaturedItems: false,
 };
 
-function recieveItems(state, data) {
+function recieveItems(state: any, data: any) {
     const itemsById = Object.assign({}, state.itemsById);
     const items = data._items.map((item) => {
         itemsById[item._id] = item;
@@ -79,7 +79,7 @@ function recieveItems(state, data) {
     };
 }
 
-function _agendaReducer(state, action) {
+function _agendaReducer(state: any, action: any) {
     switch (action.type) {
 
     case SELECT_DATE:
@@ -95,7 +95,7 @@ function _agendaReducer(state, action) {
     }
 }
 
-export default function agendaReducer(state = initialState, action) {
+export default function agendaReducer(state: any = initialState, action: any) {
     switch (action.type) {
 
     case RECIEVE_ITEMS:

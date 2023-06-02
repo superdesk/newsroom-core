@@ -46,7 +46,7 @@ const initialState = {
     loadingAggregations: false,
 };
 
-function recieveItems(state, data) {
+function recieveItems(state: any, data: any) {
     const itemsById = Object.assign({}, state.itemsById);
     const items = data._items.map((item) => {
         itemsById[item._id] = item;
@@ -70,7 +70,7 @@ function recieveItems(state, data) {
     };
 }
 
-function recieveAggs(state, data) {
+function recieveAggs(state: any, data: any) {
     return {
         ...state,
         aggregations: data._aggregations || null,
@@ -78,7 +78,7 @@ function recieveAggs(state, data) {
     };
 }
 
-function markItemsRemoved(state, ids) {
+function markItemsRemoved(state: any, ids: any) {
     const itemsById = cloneDeep(state.itemsById || {});
     let activeItem = state.activeItem;
     let previewItem = state.previewItem;
@@ -114,7 +114,7 @@ function markItemsRemoved(state, ids) {
 }
 
 
-function _wireReducer(state, action) {
+function _wireReducer(state: any, action: any) {
     switch (action.type) {
 
     case TOGGLE_NEWS: {
@@ -136,7 +136,7 @@ function _wireReducer(state, action) {
     }
 }
 
-export default function wireReducer(state = initialState, action) {
+export default function wireReducer(state: any = initialState, action: any) {
     switch (action.type) {
 
     case RECIEVE_ITEMS:

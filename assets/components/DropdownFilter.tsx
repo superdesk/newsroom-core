@@ -22,7 +22,7 @@ export const processBuckets = (buckets, filter, toggleFilter) => (filter.notSort
             >{filter.transform ? filter.transform(bucket.key, bucket) : bucket.key}</button>);
 
 
-function getActiveFilterLabel(filter, activeFilter, isActive) {
+function getActiveFilterLabel(filter: any, activeFilter: any, isActive: any) {
     if (isActive) {
         return filter.transform ? filter.transform(activeFilter[filter.field][0]) : gettext(activeFilter[filter.field][0]);
     }

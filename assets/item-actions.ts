@@ -1,6 +1,6 @@
 import {gettext, isActionEnabled} from './utils';
 
-export function getItemActions(dispatch, actions) {
+export function getItemActions(dispatch: any, actions: any) {
     const {
         openItem,
         shareItems,

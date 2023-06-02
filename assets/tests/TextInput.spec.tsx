@@ -6,7 +6,7 @@ import {spy} from 'sinon';
 
 import 'tests/setup';
 
-function setup(errorStrings) {
+function setup(errorStrings: any) {
     const handleChange = spy();
 
     const props = {

@@ -35,12 +35,12 @@ window.addEventListener('beforeunload', () => {
     wsConnection = null;
 });
 
-export function initWebSocket(store, action) {
+export function initWebSocket(store: any, action: any) {
     connectToNotificationServer();
     listeners.push({store, action});
 }
 
-function onWebsocketError(event) {
+function onWebsocketError(event: any) {
     console.error(event);
 }
 
@@ -73,7 +73,7 @@ function onWebsocketClose() {
     }, RECONNECT_INTERVAL);
 }
 
-function onWebsocketMessage(message) {
+function onWebsocketMessage(message: any) {
     if (!message || !message.data) {
         console.error('Invalid websocket message', message);
         return;

@@ -8,7 +8,7 @@ const INITIAL_STATE = {
     active: '',
 };
 
-export function sectionsReducer(state=INITIAL_STATE, action) {
+export function sectionsReducer(state: any = INITIAL_STATE, action: any) {
     if (!action) {
         return state;
     }

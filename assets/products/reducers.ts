@@ -30,7 +30,7 @@ const initialState = {
     search: searchReducer(),
 };
 
-export default function productReducer(state = initialState, action) {
+export default function productReducer(state: any = initialState, action: any) {
     switch (action.type) {
 
     case SELECT_PRODUCT: {

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default function ArticleContentInfoWrapper(props) {
+export default function ArticleContentInfoWrapper(props: any) {
     return (
         <div className="wire-column__preview__content--item-detail-info-wrap">
             {props.children}

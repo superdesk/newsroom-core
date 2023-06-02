@@ -57,7 +57,7 @@ export function FieldComponents({config, item, fieldProps = {}}) {
     });
 }
 
-function getComponentForField(item, field) {
+function getComponentForField(item: any, field: any) {
     if (typeof field === 'object' && typeof field.field === 'string') {
         if (
             typeof field.component === 'string' &&

@@ -44,7 +44,7 @@ const INITIAL_STATE = {
     },
 };
 
-export function searchReducer(state=INITIAL_STATE, action) {
+export function searchReducer(state: any = INITIAL_STATE, action: any) {
     if (!action) {
         return state;
     }

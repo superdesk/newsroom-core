@@ -3,9 +3,9 @@ import {
     SET_TOPICS
 } from './actions';
 
-const initialState = [];
+const initialState: Array<any> = [];
 
-export function topicsReducer(state=initialState, action) {
+export function topicsReducer(state = initialState, action: any) {
     switch (action.type) {
     case SET_TOPICS:
         return action.topics;

@@ -67,7 +67,7 @@ ModalSecondaryButton.propTypes = {
  * @param {string} type
  * @param {func} onClick
  */
-function assertButtonHandler(label, type, onClick) {
+function assertButtonHandler(label: any, type: any, onClick: any) {
     if (!type && !onClick) {
         console.warn('You should use either type or onClick handler for button', label);
     }

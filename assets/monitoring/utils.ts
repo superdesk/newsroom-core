@@ -7,6 +7,6 @@ export const userTypes = [
     {value: 'account_management', text: gettext('Account Management')},
 ];
 
-export function getUserLabel(code) {
+export function getUserLabel(code: any) {
     return (userTypes.find(c => c.value === code) || {}).text;
 }

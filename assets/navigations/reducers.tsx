@@ -32,7 +32,7 @@ const initialState = {
     search: searchReducer(),
 };
 
-export default function navigationReducer(state = initialState, action) {
+export default function navigationReducer(state: any = initialState, action: any) {
     switch (action.type) {
 
     case SELECT_NAVIGATION: {

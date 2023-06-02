@@ -36,7 +36,7 @@ if (getLocale() === 'fr_CA') {
 
 export const now = moment(); // to enable mocking in tests
 
-function getLocaleFormat(formatType, defaultFormat) {
+function getLocaleFormat(formatType: any, defaultFormat: any) {
     const formats = getConfig('locale_formats', {});
     const locale = getLocale();
 
@@ -87,7 +87,7 @@ export const KEYCODES = {
  * @param {String} name
  * @return {Store}
  */
-export function createStore(reducer, name = 'default') {
+export function createStore(reducer: any, name: any = 'default') {
     // https://redux.js.org/api-reference/compose
     let _compose = compose;
     const middlewares = [
@@ -130,7 +130,7 @@ export function createStore(reducer, name = 'default') {
  * @param {Component} App
  * @param {Element} element
  */
-export function render(store, App, element, props) {
+export function render(store: any, App: any, element: any, props: any) {
     return _render(
         <Provider store={store}>
             <App {...props}/>
@@ -150,7 +150,7 @@ export function render(store, App, element, props) {
  * @param {Object} params
  * @return {String}
  */
-export function gettext(text, params) {
+export function gettext(text: any, params: any) {
     let translated = get(window.translations, text, text);
 
     if (params) {
@@ -169,7 +169,7 @@ export function gettext(text, params) {
  * @param {Object} product
  * @return {string}
  */
-export function getProductQuery(product) {
+export function getProductQuery(product: any) {
     let q = product.sd_product_id ? `products.code:${product.sd_product_id}` : '';
     q += product.query ? product.sd_product_id ? ` OR (${product.query})` : product.query : '';
     return q;
@@ -182,7 +182,7 @@ export function getProductQuery(product) {
  * @param {Boolean} ignoreTimezone - avoid converting time to different timezone, will output the date as it is
  * @return {Date}
  */
-export function parseDate(dateString, ignoreTimezone = false) {
+export function parseDate(dateString: any, ignoreTimezone: any = false) {
     const parsed = ignoreTimezone ? moment.utc(dateString) : moment(dateString);
 
     parsed.locale(getLocale());
@@ -197,7 +197,7 @@ export function parseDate(dateString, ignoreTimezone = false) {
  * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
  * @returns {moment}
  */
-export function parseDateInTimezone(dateString, timezone = null) {
+export function parseDateInTimezone(dateString: any, timezone: any = null) {
     return moment.tz(dateString, timezone || moment.tz.guess());
 }
 
@@ -208,7 +208,7 @@ export function parseDateInTimezone(dateString, timezone = null) {
  * @param {String} timeForToday - if true show only time if date is today
  * @return {String}
  */
-export function shortDate(dateString, timeForToday = true) {
+export function shortDate(dateString: any, timeForToday: any = true) {
     const parsed = parseDate(dateString);
     return parsed.format(timeForToday === true && isToday(parsed) ? TIME_FORMAT : DATE_FORMAT);
 }
@@ -219,7 +219,7 @@ export function shortDate(dateString, timeForToday = true) {
  * @param {String} dateString
  * @return {String}
  */
-export function getDateInputDate(dateString) {
+export function getDateInputDate(dateString: any) {
     if (dateString) {
         const parsed = parseDate(dateString.substring(0, 10));
         return parsed.format('YYYY-MM-DD');
@@ -234,7 +234,7 @@ export function getDateInputDate(dateString) {
  * @param {String} dateString
  * @return {String}
  */
-export function getLocaleDate(dateString) {
+export function getLocaleDate(dateString: any) {
     return parseDate(dateString).format(DATETIME_FORMAT);
 }
 
@@ -244,7 +244,7 @@ export function getLocaleDate(dateString) {
  * @param {Date} date
  * @return {Boolean}
  */
-export function isToday(date) {
+export function isToday(date: any) {
     const parsed = typeof date === 'string' ? parseDate(date) : date;
     return parsed.format('YYYY-MM-DD') === now.format('YYYY-MM-DD');
 }
@@ -258,7 +258,7 @@ export function isToday(date) {
  * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
  * @return {Boolean}
  */
-export function isInPast(dateString, timezone) {
+export function isInPast(dateString: any, timezone: any) {
     if(!dateString) {
         return false;
     }
@@ -275,7 +275,7 @@ export function isInPast(dateString, timezone) {
  * @param {String} dateString
  * @return {String}
  */
-export function fullDate(dateString) {
+export function fullDate(dateString: any) {
     return parseDate(dateString).format(DATETIME_FORMAT);
 }
 
@@ -285,7 +285,7 @@ export function fullDate(dateString) {
  * @param {String} dateString
  * @return {String}
  */
-export function formatTime(dateString) {
+export function formatTime(dateString: any) {
     return parseDate(dateString).format(TIME_FORMAT);
 }
 
@@ -295,7 +295,7 @@ export function formatTime(dateString) {
  * @param {String} dateString
  * @return {String}
  */
-export function formatDate(dateString) {
+export function formatDate(dateString: any) {
     return parseDate(dateString).format(DATE_FORMAT);
 }
 
@@ -305,7 +305,7 @@ export function formatDate(dateString) {
  * @param {String} dateString
  * @return {String}
  */
-export function formatDatetime(dateString) {
+export function formatDatetime(dateString: any) {
     return fullDate(dateString);
 }
 
@@ -317,7 +317,7 @@ export function formatDatetime(dateString) {
  * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
  * @returns {moment}
  */
-export function getEndOfDayFromDate(dateString, timezone = null) {
+export function getEndOfDayFromDate(dateString: any, timezone: any = null) {
     return parseDateInTimezone(dateString + 'T23:59:59', timezone);
 }
 
@@ -328,7 +328,7 @@ export function getEndOfDayFromDate(dateString, timezone = null) {
  * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
  * @returns {moment}
  */
-export function convertUtcToTimezone(datetime, timezone) {
+export function convertUtcToTimezone(datetime: any, timezone: any) {
     return parseDateInTimezone(datetime, 'utc')
         .tz(timezone);
 }
@@ -339,7 +339,7 @@ export function convertUtcToTimezone(datetime, timezone) {
  * @param {String} dateString
  * @return {String}
  */
-export function formatWeek(dateString) {
+export function formatWeek(dateString: any) {
     const startDate = parseDate(dateString).isoWeekday(1);
     const endDate = parseDate(dateString).isoWeekday(7);
     return `${startDate.format(DATE_FORMAT)} - ${endDate.format(DATE_FORMAT)}`;
@@ -351,7 +351,7 @@ export function formatWeek(dateString) {
  * @param {String} dateString
  * @return {String}
  */
-export function formatMonth(dateString) {
+export function formatMonth(dateString: any) {
     return parseDate(dateString).format('MMMM');
 }
 
@@ -370,7 +370,7 @@ export const notify = {
  * @param {string} html
  * @return {string}
  */
-export function getTextFromHtml(html) {
+export function getTextFromHtml(html: any) {
     let raw_html = (html || '').trim();
 
     if (raw_html.length === 0) {
@@ -420,7 +420,7 @@ export function getTextFromHtml(html) {
  * @param {Object} item
  * @return {number}
  */
-export function wordCount(item) {
+export function wordCount(item: any) {
     if (isInteger(item.wordcount)) {
         return item.wordcount;
     }
@@ -439,7 +439,7 @@ export function wordCount(item) {
  * @param {Object} item
  * @return {number}
  */
-export function characterCount(item) {
+export function characterCount(item: any) {
 
     if (isInteger(item.charcount)) {
         return item.charcount;
@@ -464,7 +464,7 @@ export function characterCount(item) {
  * @param {mixed} value
  * @return {Array}
  */
-export function toggleValue(items, value) {
+export function toggleValue(items: any, value: any) {
     if (!items) {
         return [value];
     }
@@ -474,7 +474,7 @@ export function toggleValue(items, value) {
 }
 
 
-export function updateRouteParams(updates, state, deleteEmpty = true) {
+export function updateRouteParams(updates: any, state: any, deleteEmpty: any = true) {
     const params = new URLSearchParams(window.location.search);
 
     Object.keys(updates).forEach((key) => {
@@ -503,7 +503,7 @@ const SHIFT_OUT_REGEXP = new RegExp(String.fromCharCode(14), 'g');
  * @param {String} html
  * @return {String}
  */
-export function formatHTML(html) {
+export function formatHTML(html: any) {
     return html.replace(SHIFT_OUT_REGEXP, html.indexOf('<pre>') === -1 ? '<br>' : '\n');
 }
 
@@ -513,7 +513,7 @@ export function formatHTML(html) {
  * @param dispatch
  * @param setError
  */
-export function errorHandler(error, dispatch, setError) {
+export function errorHandler(error: any, dispatch: any, setError: any) {
     console.error('error', error);
 
     if (error.response.status !== 400) {
@@ -534,7 +534,7 @@ export function errorHandler(error, dispatch, setError) {
  * @param {Mixed} defaultValue
  * @return {Mixed}
  */
-export function getConfig(key, defaultValue) {
+export function getConfig(key: any, defaultValue: any) {
     const clientConfig = window && window.newsroom && window.newsroom.client_config || {};
 
     if (Object.keys(clientConfig).length === 0) {
@@ -589,7 +589,7 @@ const getNow = throttle(moment, 500);
  * @param {String} embargoed
  * @return {Moment}
  */
-export function getEmbargo(item) {
+export function getEmbargo(item: any) {
     if (!item.embargoed) {
         return null;
     }
@@ -600,15 +600,15 @@ export function getEmbargo(item) {
     return parsed.isAfter(now) ? parsed : null;
 }
 
-export function getItemFromArray(value, items = [], field = '_id') {
+export function getItemFromArray(value: any, items: any = [], field: any = '_id') {
     return items.find((i) => i[field] === value);
 }
 
-export function upperCaseFirstCharacter(text) {
+export function upperCaseFirstCharacter(text: any) {
     return (text && text.toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase()));
 }
 
-export function postHistoryAction(item, action, section='wire') {
+export function postHistoryAction(item: any, action: any, section: any = 'wire') {
     server.post('/history/new', {
         item: item,
         action: action,
@@ -616,7 +616,7 @@ export function postHistoryAction(item, action, section='wire') {
     }).catch((error) => errorHandler(error));
 }
 
-export function recordAction(item, action = 'open', section = 'wire', state = null) {
+export function recordAction(item: any, action: any = 'open', section: any = 'wire', state: any = null) {
     if (item) {
         analytics.itemEvent(action, item);
         analytics.itemView(item, section);
@@ -631,7 +631,7 @@ export function recordAction(item, action = 'open', section = 'wire', state = nu
     }
 }
 
-export function closeItemOnMobile(dispatch, state, openItemDetails, previewItem) {
+export function closeItemOnMobile(dispatch: any, state: any, openItemDetails: any, previewItem: any) {
     if (isMobilePhone()) {
         dispatch(openItemDetails(null));
         dispatch(previewItem(null));
@@ -644,7 +644,7 @@ export function closeItemOnMobile(dispatch, state, openItemDetails, previewItem)
  * @param {boolean} withTakeKey - If true, appends the takekey to the response
  * @returns {String}
  */
-export function getSlugline(item, withTakeKey = false) {
+export function getSlugline(item: any, withTakeKey: any = false) {
     if (!item || !item.slugline) {
         return '';
     }
@@ -662,14 +662,14 @@ export function getSlugline(item, withTakeKey = false) {
 /**
  * Factory for filter function to check if action is enabled
  */
-export function isActionEnabled(configKey) {
+export function isActionEnabled(configKey: any) {
     const config = getConfig(configKey, {});
     return (action) => config[action.id] == null || config[action.id];
 }
 
 export const getPlainTextMemoized = memoize((html) => getTextFromHtml(html));
 
-export function shouldShowListShortcutActionIcons(listConfig, isExtended) {
+export function shouldShowListShortcutActionIcons(listConfig: any, isExtended: any) {
     const showActionIconsConfig = listConfig.show_list_action_icons || {
         large: true,
         compact: true,
@@ -684,7 +684,7 @@ export function shouldShowListShortcutActionIcons(listConfig, isExtended) {
         );
 }
 
-export function getCreatedSearchParamLabel(created) {
+export function getCreatedSearchParamLabel(created: any) {
     if (created.to) {
         if (created.from) {
             return {
@@ -711,7 +711,7 @@ export function getCreatedSearchParamLabel(created) {
     return {};
 }
 
-export function copyTextToClipboard(text, item) {
+export function copyTextToClipboard(text: any, item: any) {
     navigator.clipboard.writeText(text).then(
         () => {
             notify.success(gettext('Item copied successfully.'));

@@ -112,7 +112,7 @@ const renderFilter = {
     ),
 };
 
-export function getDropdownItems(filter, aggregations, toggleFilter, processBuckets, props) {
+export function getDropdownItems(filter: any, aggregations: any, toggleFilter: any, processBuckets: any, props: any) {
     if (!filter.nestedField && aggregations && aggregations[filter.field]) {
         return processBuckets(transformFilterBuckets(filter, aggregations, props), filter, toggleFilter);
     }
@@ -124,7 +124,7 @@ export function getDropdownItems(filter, aggregations, toggleFilter, processBuck
     return [];
 }
 
-function AgendaFiltersComponent(props) {
+function AgendaFiltersComponent(props: any) {
     return (
         <div className='wire-column__main-header-agenda d-flex m-0 px-3 align-items-center flex-wrap flex-sm-nowrap'>
             {props.filtersConfig.map((filterName) => (

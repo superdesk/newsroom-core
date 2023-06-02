@@ -15,7 +15,7 @@ const initialState = {
     loading: false,
 };
 
-export default function notificationReducer(state = initialState, action) {
+export default function notificationReducer(state: any = initialState, action: any) {
     switch (action.type) {
     case SET_NOTIFICATIONS:
         return {

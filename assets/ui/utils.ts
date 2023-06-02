@@ -11,7 +11,7 @@ const isNotEmpty = (x) => !isEmpty(x);
  * @param {Object} modifier 
  * @return {String}
  */
-export function bem(block, element, modifier) {
+export function bem(block: any, element: any, modifier: any) {
     const main = [block, element].filter(isNotEmpty).join('__');
     const classes = [main];
 

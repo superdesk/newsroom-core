@@ -30,7 +30,7 @@ const initialState = {
     search: searchReducer(),
 };
 
-function setupCompanies(companyList, state) {
+function setupCompanies(companyList: any, state: any) {
     const companiesById = {};
     const companyOptions = [];
     const companies = companyList.map((company) => {
@@ -49,7 +49,7 @@ function setupCompanies(companyList, state) {
     };
 }
 
-export default function companyReducer(state = initialState, action) {
+export default function companyReducer(state: any = initialState, action: any) {
     switch (action.type) {
 
     case SELECT_COMPANY: {

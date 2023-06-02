@@ -5,7 +5,7 @@ import CoverageItemStatus from '../components/CoverageItemStatus';
 
 import 'tests/setup';
 
-function setup(coverage) {
+function setup(coverage: any) {
     return shallow(<CoverageItemStatus coverage={coverage} />);
 }
 

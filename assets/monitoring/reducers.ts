@@ -25,7 +25,7 @@ const initialState = {
     monitoringListCompanies: [],
 };
 
-export default function monitoringReducer(state = initialState, action) {
+export default function monitoringReducer(state: any = initialState, action: any) {
     switch (action.type) {
 
     case SELECT_MONITORING_PROFILE:

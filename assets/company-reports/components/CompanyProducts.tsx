@@ -5,7 +5,7 @@ import ReportsTable from './ReportsTable';
 import {gettext} from 'utils';
 
 
-function getProductDetails(products) {
+function getProductDetails(products: any) {
     return (products.map((product) => (<div key={product._id} className="d-flex align-items-center m-2">
         <div><span className="font-italic">{gettext('Product name')}:</span> {product.name}</div>
         <div className="ms-3"><span className="font-italic">{gettext('Is enabled')}:</span>{product.is_enabled.toString()}</div>

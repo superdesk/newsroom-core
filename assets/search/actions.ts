@@ -23,7 +23,7 @@ import {
 import {context} from 'selectors';
 
 export const SET_QUERY = 'SET_QUERY';
-export function setQuery(query) {
+export function setQuery(query: any) {
     return function(dispatch, getState) {
         query && analytics.event('search', query);
         dispatch(setSearchQuery(query));
@@ -35,17 +35,17 @@ export function setQuery(query) {
 }
 
 export const TOGGLE_TOPIC = 'TOGGLE_TOPIC';
-export function toggleTopic(topic) {
+export function toggleTopic(topic: any) {
     return {type: TOGGLE_TOPIC, topic};
 }
 
 export const ADD_TOPIC = 'ADD_TOPIC';
-export function addTopic(topic) {
+export function addTopic(topic: any) {
     return {type: ADD_TOPIC, topic};
 }
 
 export const SET_NEW_ITEM_BY_TOPIC = 'SET_NEW_ITEM_BY_TOPIC';
-export function setNewItemByTopic(data) {
+export function setNewItemByTopic(data: any) {
     return {type: SET_NEW_ITEM_BY_TOPIC, data};
 }
 
@@ -54,12 +54,12 @@ export function loadMyTopics() {
 }
 
 export const SET_TOPICS = 'SET_TOPICS';
-export function setTopics(topics) {
+export function setTopics(topics: any) {
     return {type: SET_TOPICS, topics};
 }
 
 export const TOGGLE_NAVIGATION = 'TOGGLE_NAVIGATION';
-export function toggleNavigation(navigation, disableSameNavigationDeselect) {
+export function toggleNavigation(navigation: any, disableSameNavigationDeselect: any) {
     return (dispatch, getState) => {
         const state = getState();
         const currentNavigation = searchNavigationSelector(state);
@@ -108,7 +108,7 @@ export function toggleNavigation(navigation, disableSameNavigationDeselect) {
 }
 
 export const TOGGLE_FILTER = 'TOGGLE_FILTER';
-export function toggleFilter(key, value, single) {
+export function toggleFilter(key: any, value: any, single: any) {
     return function (dispatch, getState) {
         const state = getState();
         const currentFilters = cloneDeep(searchFilterSelector(state));
@@ -137,7 +137,7 @@ export function toggleFilter(key, value, single) {
 }
 
 export const SET_CREATED_FILTER = 'SET_CREATED_FILTER';
-export function setCreatedFilter(filter) {
+export function setCreatedFilter(filter: any) {
     return function(dispatch, getState) {
         const state = getState();
 
@@ -160,7 +160,7 @@ export function setCreatedFilter(filter) {
 }
 
 export const RESET_FILTER = 'RESET_FILTER';
-export function resetFilter(filter) {
+export function resetFilter(filter: any) {
     return function(dispatch, getState) {
         updateRouteParams({
             filter: null,
@@ -171,7 +171,7 @@ export function resetFilter(filter) {
 }
 
 export const SET_VIEW = 'SET_VIEW';
-export function setView(view) {
+export function setView(view: any) {
     localStorage.setItem('view', view);
     return {type: SET_VIEW, view};
 }
@@ -181,7 +181,7 @@ export function setView(view) {
  *
  * @param {Object} searchParams
  */
-export function saveMyTopic(searchParams) {
+export function saveMyTopic(searchParams: any) {
     const type = get(searchParams, 'topic_type') || 'wire';
 
     const menu = type === 'agenda' ?
@@ -197,7 +197,7 @@ export function saveMyTopic(searchParams) {
     createOrUpdateTopic(menu, searchParams, true);
 }
 
-export function followStory(item, type) {
+export function followStory(item: any, type: any) {
     const slugline = get(item, 'slugline');
 
     saveMyTopic({
@@ -212,7 +212,7 @@ export function followStory(item, type) {
  *
  * @param {String} navigationId
  */
-export function toggleNavigationById(navigationId) {
+export function toggleNavigationById(navigationId: any) {
     return (dispatch, getState) => {
         const navigation = (get(getState().search, 'navigations') || []).find((nav) => navigationId === nav._id);
         if (navigation) {
@@ -226,7 +226,7 @@ export function toggleNavigationById(navigationId) {
  *
  * @param {Array<String>} navigationIds
  */
-export function toggleNavigationByIds(navigationIds) {
+export function toggleNavigationByIds(navigationIds: any) {
     return (dispatch, getState) => {
         const navigations = (get(getState().search, 'navigations') || []);
 
@@ -237,7 +237,7 @@ export function toggleNavigationByIds(navigationIds) {
     };
 }
 
-export function submitFollowTopic(data) {
+export function submitFollowTopic(data: any) {
     return (dispatch, getState) => {
         const user = getState().user;
         const userId = get(user, '_id') || user;
@@ -261,7 +261,7 @@ export function submitFollowTopic(data) {
  *
  * @param {Object} data
  */
-export function submitShareItem(data) {
+export function submitShareItem(data: any) {
     return (dispatch, getState) => {
         const userContext = context(getState());
         const type = userContext || data.items[0].topic_type;
@@ -290,7 +290,7 @@ export function submitShareItem(data) {
     };
 }
 
-export function loadMyTopic(topicId) {
+export function loadMyTopic(topicId: any) {
     return (dispatch, getState) => {
         const state = getState();
         const currentTopicId = searchTopicIdSelector(state);
@@ -318,7 +318,7 @@ export function updateSearchParams() {
     };
 }
 
-export function updateFilterStateAndURL(activeFilter, createdFilter) {
+export function updateFilterStateAndURL(activeFilter: any, createdFilter: any) {
     return function(dispatch, getState) {
         const state = getState();
         dispatch(setSearchFilters(activeFilter));
@@ -332,17 +332,17 @@ export function updateFilterStateAndURL(activeFilter, createdFilter) {
 }
 
 export const SET_SEARCH_TOPIC_ID = 'SET_SEARCH_TOPIC_ID';
-export function setSearchTopicId(topicId) {
+export function setSearchTopicId(topicId: any) {
     return {type: SET_SEARCH_TOPIC_ID, payload: topicId};
 }
 
 export const SET_SEARCH_NAVIGATION_IDS = 'SET_SEARCH_NAVIGATION_IDS';
-export function setSearchNavigationIds(navIds) {
+export function setSearchNavigationIds(navIds: any) {
     return {type: SET_SEARCH_NAVIGATION_IDS, payload: navIds};
 }
 
 export const SET_SEARCH_QUERY = 'SET_SEARCH_QUERY';
-export function setSearchQuery(query) {
+export function setSearchQuery(query: any) {
     if (query) {
         analytics.event('search', query);
     }
@@ -351,17 +351,17 @@ export function setSearchQuery(query) {
 }
 
 export const SET_SEARCH_FILTERS = 'SET_SEARCH_FILTERS';
-export function setSearchFilters(filters) {
+export function setSearchFilters(filters: any) {
     return {type: SET_SEARCH_FILTERS, payload: filters};
 }
 
 export const SET_SEARCH_CREATED = 'SET_SEARCH_CREATED';
-export function setSearchCreated(created) {
+export function setSearchCreated(created: any) {
     return {type: SET_SEARCH_CREATED, payload: created};
 }
 
 export const SET_SEARCH_PRODUCT = 'SET_SEARCH_PRODUCT';
-export function setSearchProduct(productId) {
+export function setSearchProduct(productId: any) {
     return {type: SET_SEARCH_PRODUCT, payload: productId};
 }
 
@@ -371,12 +371,12 @@ export function resetSearchParams() {
 }
 
 export const TOGGLE_ADVANCED_SEARCH_FIELD = 'TOGGLE_ADVANCED_SEARCH_FIELD';
-export function toggleAdvancedSearchField(field) {
+export function toggleAdvancedSearchField(field: any) {
     return {type: TOGGLE_ADVANCED_SEARCH_FIELD, payload: field};
 }
 
 export const SET_ADVANCED_SEARCH_KEYWORDS = 'SET_ADVANCED_SEARCH_KEYWORDS';
-export function setAdvancedSearchKeywords(field, keywords) {
+export function setAdvancedSearchKeywords(field: any, keywords: any) {
     return {type: SET_ADVANCED_SEARCH_KEYWORDS, payload: {
         field: field,
         keywords: keywords,
@@ -388,7 +388,7 @@ export function clearAdvanedSearchParams() {
     return {type: CLEAR_ADVANCED_SEARCH_PARAMS};
 }
 
-export function setParams(params) {
+export function setParams(params: any) {
     return function(dispatch) {
         if (get(params, 'created')) {
             dispatch(setSearchCreated(params.created));
@@ -417,7 +417,7 @@ export function setParams(params) {
  *
  * @param {URLSearchParams} params
  */
-export function initParams(params) {
+export function initParams(params: any) {
     return (dispatch, getState) => {
         const custom = {
             query: params.get('q'),
@@ -441,7 +441,7 @@ export function initParams(params) {
     };
 }
 
-export function subscribeToTopic(topic) {
+export function subscribeToTopic(topic: any) {
     server.post(`/topics/${topic._id}/subscribe`)
         .then(() => {
             notify.success(gettext('Topic subscribed successfully'));
@@ -449,7 +449,7 @@ export function subscribeToTopic(topic) {
         .catch(errorHandler);
 }
 
-export function unsubscribeToTopic(topic) {
+export function unsubscribeToTopic(topic: any) {
     server.del(`/topics/${topic._id}/subscribe`)
         .then(() => {
             notify.success(gettext('Topic unsubscribed successfully'));

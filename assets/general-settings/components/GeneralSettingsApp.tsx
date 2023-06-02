@@ -10,7 +10,7 @@ import TextInput from 'components/TextInput';
 import CheckboxInput from 'components/CheckboxInput';
 import AuditInformation from 'components/AuditInformation';
 
-function isInput(field) {
+function isInput(field: any) {
     return ['text', 'number', 'boolean'].includes(field.type);
 }
 

@@ -7,7 +7,7 @@ const MAPS_URL = 'https://maps.googleapis.com/maps/api/staticmap';
  * Get item locations
  * @param {Object} item
  */
-export function getLocations(item) {
+export function getLocations(item: any) {
     return (get(item, 'location')) || [];
 }
 
@@ -16,7 +16,7 @@ export function getLocations(item) {
  * @param {Object} item 
  * @return {Array}
  */
-export function getGeoLocations(locations) {
+export function getGeoLocations(locations: any) {
     return locations.filter((loc) => get(loc, 'location.lat'));
 }
 
@@ -26,7 +26,7 @@ export function getGeoLocations(locations) {
  * @param {Object} item 
  * @return {Object}
  */
-export function getAddress(item) {
+export function getAddress(item: any) {
     return get(item, 'location.0.address');
 }
 
@@ -35,7 +35,7 @@ export function getAddress(item) {
  * @param {Object} location 
  * @return {Array}
  */
-export function getBoundingBox(location) {
+export function getBoundingBox(location: any) {
     return get(location, 'address.boundingbox');
 }
 
@@ -44,7 +44,7 @@ export function getBoundingBox(location) {
  * @param {Object} location 
  * @return {String}
  */
-export function getAddressLine(location) {
+export function getAddressLine(location: any) {
     return get(location, 'address.line.0');
 }
 
@@ -53,7 +53,7 @@ export function getAddressLine(location) {
  *
  * @param {Object} location
  */
-export function getAddressState(location) {
+export function getAddressState(location: any) {
     return get(location, 'address.state') || get(location, 'address.locality');
 }
 
@@ -62,7 +62,7 @@ export function getAddressState(location) {
  *
  * @param {Object} location
  */
-export function getAddressCountry(location) {
+export function getAddressCountry(location: any) {
     return get(location, 'address.country');
 }
 
@@ -71,7 +71,7 @@ export function getAddressCountry(location) {
  * @param {Object} location 
  * @return {LatLngBoundsLiteral}
  */
-export function getBounds(location) {
+export function getBounds(location: any) {
     const bbox = getBoundingBox(location);
 
     if (bbox) {
@@ -89,7 +89,7 @@ export function getBounds(location) {
  * @param {Object} location 
  * @return {LatLngLiteral}
  */
-export function getLatLng(location) {
+export function getLatLng(location: any) {
     return {
         lat: get(location, 'location.lat'),
         lng: get(location, 'location.lon'),
@@ -108,7 +108,7 @@ export function mapsKey() {
  * Get zoom param based on location
  * @param {Object} location
  */
-function getZoom(location) {
+function getZoom(location: any) {
     const box = getBoundingBox(location);
     const line = getAddressLine(location);
 
@@ -123,7 +123,7 @@ function getZoom(location) {
     return !isEmpty(line) ? 'zoom=15' : 'zoom=8';
 }
 
-function getLocationDetails(location) {
+function getLocationDetails(location: any) {
     return [location.name,
         getAddressLine(location),
         getAddressState(location),
@@ -131,7 +131,7 @@ function getLocationDetails(location) {
     ].filter((x) => !!x).join(', ');
 }
 
-export function getMapSource(locations, scale = 1) {
+export function getMapSource(locations: any, scale: any = 1) {
     if (isEmpty(locations)) {
         return '';
     }
@@ -168,6 +168,6 @@ export function getMapSource(locations, scale = 1) {
     return src;
 }
 
-export function shouldRenderLocation(item) {
+export function shouldRenderLocation(item: any) {
     return !isEmpty(mapsKey()) && !isEmpty(getLocations(item));
 }

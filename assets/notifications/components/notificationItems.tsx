@@ -6,11 +6,11 @@ import {BasicNotificationItem} from './BasicNotificationItem';
 
 export const registeredNotifications = [];
 
-export function registerNotification(condition, component) {
+export function registerNotification(condition: any, component: any) {
     registeredNotifications.unshift({condition, component});
 }
 
-export function renderNotificationComponent(notification, item) {
+export function renderNotificationComponent(notification: any, item: any) {
     let notificationEntry = registeredNotifications.find(
         (entry) => entry.condition(notification, item)
     );
@@ -24,7 +24,7 @@ export function renderNotificationComponent(notification, item) {
     return notificationEntry.component(notification, item);
 }
 
-function getNotificationFooterText(notification) {
+function getNotificationFooterText(notification: any) {
     switch (notification.action) {
     case 'share':
         return (
@@ -56,7 +56,7 @@ function getNotificationFooterText(notification) {
     }
 }
 
-function getNotificationUrl(notification, item) {
+function getNotificationUrl(notification: any, item: any) {
     if (get(notification, 'data.url')) {
         return notification.data.url;
     }
@@ -66,7 +66,7 @@ function getNotificationUrl(notification, item) {
         `/wire?item=${item._id}`;
 }
 
-function getNotificationName(item) {
+function getNotificationName(item: any) {
     return item.label || item.name || item.headline || item.slugline;
 }
 

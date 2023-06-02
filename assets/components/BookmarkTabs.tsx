@@ -3,7 +3,7 @@ import PropTypes from  'prop-types';
 import {gettext} from '../utils';
 
 
-export default function BookmarkTabs(props) {
+export default function BookmarkTabs(props: any) {
     const sections = Object.keys(props.sections).map((id) => {
         const section = props.sections[id];
 

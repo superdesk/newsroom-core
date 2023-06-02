@@ -8,12 +8,12 @@ import {searchQuerySelector} from 'search/selectors';
 export const MAX_TILE_IMAGES = 4;
 
 export const SELECT_NAVIGATION = 'SELECT_NAVIGATION';
-export function selectNavigation(id) {
+export function selectNavigation(id: any) {
     return {type: SELECT_NAVIGATION, id};
 }
 
 export const EDIT_NAVIGATION = 'EDIT_NAVIGATION';
-export function editNavigation(event) {
+export function editNavigation(event: any) {
     return {type: EDIT_NAVIGATION, event};
 }
 
@@ -23,7 +23,7 @@ export function newNavigation() {
 }
 
 export const CANCEL_EDIT = 'CANCEL_EDIT';
-export function cancelEdit(event) {
+export function cancelEdit(event: any) {
     return {type: CANCEL_EDIT, event};
 }
 
@@ -33,17 +33,17 @@ export function queryNavigations() {
 }
 
 export const GET_NAVIGATIONS = 'GET_NAVIGATIONS';
-export function getNavigations(data) {
+export function getNavigations(data: any) {
     return {type: GET_NAVIGATIONS, data};
 }
 
 export const GET_PRODUCTS = 'GET_PRODUCTS';
-export function getProducts(data) {
+export function getProducts(data: any) {
     return {type: GET_PRODUCTS, data};
 }
 
 export const SET_ERROR = 'SET_ERROR';
-export function setError(errors) {
+export function setError(errors: any) {
     return {type: SET_ERROR, errors};
 }
 
@@ -138,7 +138,7 @@ export function fetchProducts() {
     };
 }
 
-export function initViewData(data) {
+export function initViewData(data: any) {
     return function (dispatch) {
         dispatch(getNavigations(data.navigations));
         dispatch(getProducts(data.products));

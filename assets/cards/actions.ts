@@ -5,12 +5,12 @@ import {searchQuerySelector} from 'search/selectors';
 
 
 export const SELECT_CARD = 'SELECT_CARD';
-export function selectCard(id) {
+export function selectCard(id: any) {
     return {type: SELECT_CARD, id};
 }
 
 export const EDIT_CARD = 'EDIT_CARD';
-export function editCard(event) {
+export function editCard(event: any) {
     return {type: EDIT_CARD, event};
 }
 
@@ -20,7 +20,7 @@ export function newCard() {
 }
 
 export const CANCEL_EDIT = 'CANCEL_EDIT';
-export function cancelEdit(event) {
+export function cancelEdit(event: any) {
     return {type: CANCEL_EDIT, event};
 }
 
@@ -30,22 +30,22 @@ export function queryCards() {
 }
 
 export const GET_CARDS = 'GET_CARDS';
-export function getCards(data) {
+export function getCards(data: any) {
     return {type: GET_CARDS, data};
 }
 
 export const GET_PRODUCTS = 'GET_PRODUCTS';
-export function getProducts(data) {
+export function getProducts(data: any) {
     return {type: GET_PRODUCTS, data};
 }
 
 export const SET_ERROR = 'SET_ERROR';
-export function setError(errors) {
+export function setError(errors: any) {
     return {type: SET_ERROR, errors};
 }
 
 export const GET_NAVIGATIONS = 'GET_NAVIGATIONS';
-export function getNavigations(data) {
+export function getNavigations(data: any) {
     return {type: GET_NAVIGATIONS, data};
 }
 
@@ -176,7 +176,7 @@ export function fetchProducts() {
 }
 
 
-export function initViewData(data) {
+export function initViewData(data: any) {
     return function (dispatch) {
         dispatch(getCards(data.cards));
         dispatch(getProducts(data.products));

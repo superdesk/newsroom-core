@@ -7,7 +7,7 @@ import {formatAgendaDate, hasCoverages} from '../utils';
 
 import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
 
-function format(item, group, onlyDates) {
+function format(item: any, group: any, onlyDates: any) {
     return (
         <span key="date">
             {formatAgendaDate(item, group, {onlyDates})}
@@ -15,7 +15,7 @@ function format(item, group, onlyDates) {
     );
 }
 
-function getCalendarClass(item) {
+function getCalendarClass(item: any) {
     if (item.state === 'rescheduled') {
         return 'icon--orange';
     }

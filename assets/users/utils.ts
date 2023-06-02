@@ -9,33 +9,33 @@ export const userTypes = [
     {value: 'company_admin', text: gettext('Company Admin'), show_acc_mgr: true},
 ];
 
-export function getUserLabel(code) {
+export function getUserLabel(code: any) {
     return (userTypes.find(c => c.value === code) || {}).text;
 }
 
-export function userTypeReadOnly(user, currentUser) {
+export function userTypeReadOnly(user: any, currentUser: any) {
     if (get(currentUser, 'user_type') === 'account_management' &&
             (userTypes.find(c => c.value === get(user, 'user_type')) || {}).show_acc_mgr === false)
         return true;
     return false;
 }
 
-export function getUserTypes(user) {
+export function getUserTypes(user: any) {
     if (isUserAdmin(user) || isUserCompanyAdmin(user)) {
         return userTypes;
     }
     return userTypes.filter((opt) => (get(opt, 'show_acc_mgr') === true));
 }
 
-export function isUserAdmin(user) {
+export function isUserAdmin(user: any) {
     return get(user, 'user_type') === 'administrator';
 }
 
-export function isUserCompanyAdmin(user) {
+export function isUserCompanyAdmin(user: any) {
     return get(user, 'user_type') === 'company_admin';
 }
 
-export function canUserManageTopics(user) {
+export function canUserManageTopics(user: any) {
     return isUserAdmin(user) || get(user, 'manage_company_topics') === true;
 }
 

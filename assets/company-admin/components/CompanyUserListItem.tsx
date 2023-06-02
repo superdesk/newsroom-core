@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 import {gettext, fullDate} from 'utils';
 
-export function getUserStateLabelDetails(user) {
+export function getUserStateLabelDetails(user: any) {
     if (user.is_approved && user.is_enabled && user.is_validated) {
         return {
             colour: 'green',

@@ -7,7 +7,7 @@ import {getConfig, gettext} from 'utils';
 import {getDetailRendition, getPreviewRendition, getCaption} from 'wire/utils';
 
 
-function formatCredits(picture) {
+function formatCredits(picture: any) {
     const copyrightholder = get(picture, 'copyrightholder', '');
     const copyrightnotice = get(picture, 'copyrightnotice', '');
 

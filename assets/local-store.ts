@@ -33,7 +33,7 @@ export function getReadItems() {
  * @param {Object} item
  * @param {Object} state
  */
-export function markItemAsRead(item, state) {
+export function markItemAsRead(item: any, state: any) {
     if (item && item._id) {
         const readItems = get(state, 'readItems', getReadItems()) || {};
 
@@ -94,13 +94,13 @@ export function toggleFeaturedOnlyParam() {
     store.assign(FEATURED_ONLY_STORE, {value: !getFeaturedOnlyParam()});
 }
 
-export function getFilterPanelOpenState(context) {
+export function getFilterPanelOpenState(context: any) {
     const defaultValue = get(getConfig('filter_panel_defaults') || {}, `open.${context}`, false);
 
     return get(store.get(FILTER_PANEL_OPEN), context, defaultValue);
 }
 
-export function setFilterPanelOpenState(open, context) {
+export function setFilterPanelOpenState(open: any, context: any) {
     const filterTabs = {...store.get(FILTER_PANEL_OPEN) || {}};
 
     filterTabs[context] = open;
@@ -112,7 +112,7 @@ export function setFilterPanelOpenState(open, context) {
  *
  * @returns {boolean}
  */
-export function getActiveFilterTab(context) {
+export function getActiveFilterTab(context: any) {
     const defaultValue = get(getConfig('filter_panel_defaults') || {}, `tab.${context}`, 'nav');
 
     return get(store.get(FILTER_TAB), context, defaultValue);
@@ -122,7 +122,7 @@ export function getActiveFilterTab(context) {
  * Set active filter tab
  *
  */
-export function setActiveFilterTab(tab, context) {
+export function setActiveFilterTab(tab: any, context: any) {
     let filterTabs = {...store.get(FILTER_TAB) || {}};
     filterTabs[context] = tab;
     store.assign(FILTER_TAB, filterTabs);
@@ -136,7 +136,7 @@ export function setActiveFilterTab(tab, context) {
  * @param versionB
  * @returns {number}
  */
-export function getMaxVersion(versionA, versionB) {
+export function getMaxVersion(versionA: any, versionB: any) {
     return Math.max(parseInt(versionA, 10) || 0, parseInt(versionB, 10) || 0);
 }
 
@@ -155,7 +155,7 @@ function getExpiryDate() {
  *
  * @param activeDate
  */
-export function setActiveDate(activeDate) {
+export function setActiveDate(activeDate: any) {
     store.set(ACTIVE_DATE, activeDate, getExpiryDate());
 }
 
@@ -176,7 +176,7 @@ export function getActiveDate() {
  * @param filter
  * @param value
  */
-export function setAgendaDropdownFilter(filter, value) {
+export function setAgendaDropdownFilter(filter: any, value: any) {
     const filters = store.get(DROPDOWN_FILTERS) || {};
     filters[filter] = value;
     store.set(DROPDOWN_FILTERS, filters, getExpiryDate());

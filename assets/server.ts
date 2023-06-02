@@ -3,11 +3,11 @@ const defaultOptions = {
     redirect: 'manual',
 };
 
-function options(custom={}) {
+function options(custom: any = {}) {
     return Object.assign({}, defaultOptions, custom);
 }
 
-function checkStatus(response) {
+function checkStatus(response: any) {
     if (response.status >= 200 && response.status < 300) {
         return response.json();
     } else {

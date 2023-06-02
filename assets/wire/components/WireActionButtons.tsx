@@ -6,7 +6,7 @@ import {isDisplayed} from 'utils';
 import FollowStory from './FollowStory';
 import PreviewActionButtons from 'components/PreviewActionButtons';
 
-export default function WireActionButtons(props) {
+export default function WireActionButtons(props: any) {
     const {previewConfig} = props;
     const displayFollowStory = previewConfig == null || isDisplayed('follow_story', previewConfig);
     

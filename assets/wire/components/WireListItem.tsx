@@ -37,7 +37,7 @@ export const DISPLAY_CHAR_COUNT = getConfig('display_char_count');
 const DEFAULT_META_FIELDS = ['source', 'charcount', 'versioncreated'];
 const DEFAULT_COMPACT_META_FIELDS = ['versioncreated'];
 
-function getShowVersionText(isExpanded, itemCount, matchCount, isExtended) {
+function getShowVersionText(isExpanded: any, itemCount: any, matchCount: any, isExtended: any) {
     if (isExpanded) {
         return (isExtended && matchCount) ?
             gettext(

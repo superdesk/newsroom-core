@@ -13,11 +13,11 @@ import AgendaInternalNote from './AgendaInternalNote';
 import AgendaEdNote from './AgendaEdNote';
 import ActionButton from 'components/ActionButton';
 
-function getDeliveryHref(coverage) {
+function getDeliveryHref(coverage: any) {
     return get(coverage, 'delivery_href');
 }
 
-function getDeliveryId(coverage) {
+function getDeliveryId(coverage: any) {
     return get(coverage, 'delivery_id');
 }
 

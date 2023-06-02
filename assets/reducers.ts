@@ -39,7 +39,7 @@ import {REMOVE_NEW_ITEMS, SET_NEW_ITEM} from './agenda/actions';
 import {toggleValue} from 'utils';
 import {topicsReducer} from './topics/reducer';
 
-export function modalReducer(state, action) {
+export function modalReducer(state: any, action: any) {
     if (!action) {
         return state;
     }
@@ -73,7 +73,7 @@ export function modalReducer(state, action) {
 }
 
 
-function getReadItems(state, item) {
+function getReadItems(state: any, item: any) {
     const readItems = Object.assign({}, state.readItems);
 
     if (item) {
@@ -84,7 +84,7 @@ function getReadItems(state, item) {
 }
 
 
-function updateItemActions(state, items, action) {
+function updateItemActions(state: any, items: any, action: any) {
     const itemsById = Object.assign({}, state.itemsById);
 
     items.map((item) => {
@@ -97,7 +97,7 @@ function updateItemActions(state, items, action) {
 
 
 
-export function defaultReducer(state={}, action) {
+export function defaultReducer(state: any = {}, action: any) {
     if (!action) {
         return state;
     }

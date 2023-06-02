@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 import {get} from 'lodash';
 
-function getHighlightColorForUrgency(item, listConfig) {
+function getHighlightColorForUrgency(item: any, listConfig: any) {
     return item.urgency > 0 &&
         listConfig &&
         listConfig.highlights &&

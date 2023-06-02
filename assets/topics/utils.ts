@@ -1,6 +1,6 @@
 import {canUserManageTopics} from 'users/utils';
 
-export function canUserEditTopic(topic, user) {
+export function canUserEditTopic(topic: any, user: any) {
     return !(
         topic.is_global &&
             !canUserManageTopics(user) &&

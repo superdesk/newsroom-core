@@ -5,12 +5,12 @@ import {searchQuerySelector} from 'search/selectors';
 
 
 export const SELECT_PRODUCT = 'SELECT_PRODUCT';
-export function selectProduct(id) {
+export function selectProduct(id: any) {
     return {type: SELECT_PRODUCT, id};
 }
 
 export const EDIT_PRODUCT = 'EDIT_PRODUCT';
-export function editProduct(event) {
+export function editProduct(event: any) {
     return {type: EDIT_PRODUCT, event};
 }
 
@@ -20,7 +20,7 @@ export function newProduct() {
 }
 
 export const CANCEL_EDIT = 'CANCEL_EDIT';
-export function cancelEdit(event) {
+export function cancelEdit(event: any) {
     return {type: CANCEL_EDIT, event};
 }
 
@@ -30,27 +30,27 @@ export function queryProducts() {
 }
 
 export const GET_PRODUCTS = 'GET_PRODUCTS';
-export function getProducts(data) {
+export function getProducts(data: any) {
     return {type: GET_PRODUCTS, data};
 }
 
 export const GET_COMPANIES = 'GET_COMPANIES';
-export function getCompanies(data) {
+export function getCompanies(data: any) {
     return {type: GET_COMPANIES, data};
 }
 
 export const GET_NAVIGATIONS = 'GET_NAVIGATIONS';
-export function getNavigations(data) {
+export function getNavigations(data: any) {
     return {type: GET_NAVIGATIONS, data};
 }
 
 export const UPDATE_PRODUCT_NAVIGATIONS = 'UPDATE_PRODUCT_NAVIGATIONS';
-export function updateProductNavigations(product, navigations) {
+export function updateProductNavigations(product: any, navigations: any) {
     return {type: UPDATE_PRODUCT_NAVIGATIONS, product, navigations};
 }
 
 export const SET_ERROR = 'SET_ERROR';
-export function setError(errors) {
+export function setError(errors: any) {
     return {type: SET_ERROR, errors};
 }
 
@@ -134,7 +134,7 @@ export function fetchCompanies() {
  * Saves companies for a product
  *
  */
-export function saveCompanies(companies) {
+export function saveCompanies(companies: any) {
     return function (dispatch, getState) {
         const product = getState().productToEdit;
         return server.post(`/products/${product._id}/companies`, {companies})
@@ -164,7 +164,7 @@ export function fetchNavigations() {
  * Saves navigations for a product
  *
  */
-export function saveNavigations(navigations) {
+export function saveNavigations(navigations: any) {
     return function (dispatch, getState) {
         const product = getState().productToEdit;
         return server.post(`/products/${product._id}/navigations`, {navigations})
@@ -176,7 +176,7 @@ export function saveNavigations(navigations) {
     };
 }
 
-export function initViewData(data) {
+export function initViewData(data: any) {
     return function (dispatch) {
         dispatch(getProducts(data.products));
         dispatch(getCompanies(data.companies));

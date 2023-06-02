@@ -4,7 +4,7 @@ import {bem} from 'ui/utils';
 import {gettext} from 'utils';
 import InfoBoxContent from './InfoBoxContent';
 
-export default function InfoBox(props) {
+export default function InfoBox(props: any) {
     const className = bem('info-box', null, {
         'top': props.top,
     });

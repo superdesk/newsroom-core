@@ -2,7 +2,7 @@ import {get, differenceBy} from 'lodash';
 import server from 'server';
 
 export const RENDER_MODAL = 'RENDER_MODAL';
-export function renderModal(modal, data) {
+export function renderModal(modal: any, data: any) {
     return {type: RENDER_MODAL, modal, data};
 }
 
@@ -12,12 +12,12 @@ export function closeModal() {
 }
 
 export const SAVED_ITEMS_COUNT = 'SAVED_ITEMS_COUNT';
-export function setSavedItemsCount(count) {
+export function setSavedItemsCount(count: any) {
     return {type: SAVED_ITEMS_COUNT, count: count};
 }
 
 export const SET_UI_CONFIG = 'SET_UI_CONFIG';
-export function setUiConfig(config) {
+export function setUiConfig(config: any) {
     return {type: SET_UI_CONFIG, config: config};
 }
 
@@ -49,7 +49,7 @@ export function userProfileClosed() {
 }
 
 export const ADD_EDIT_USERS = 'ADD_EDIT_USERS';
-export function getEditUsers(item) {
+export function getEditUsers(item: any) {
     return function (dispatch, getState) {
         let findUsers = [];
         const itemUsers = ([

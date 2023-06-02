@@ -8,7 +8,7 @@ const initialState = {
     config: {},
 };
 
-export default function settingsReducer(state=initialState, action) {
+export default function settingsReducer(state: any = initialState, action: any) {
     switch (action.type) {
 
     case INIT_VIEW_DATA:
