@@ -858,3 +858,11 @@ def test_highlighting_with_advanced_search(client, app):
         data["_items"][0]["es_highlight"]["body_html"][0] == 'Story that involves <span class="es-highlight">'
         "cheese</span> and onions"
     )
+
+
+def test_french_accents_search(client, app):
+    app.data.insert("items", [{"_id": "foo", "body_html": "Story that involves élection"}])
+    resp = client.get("/wire/search?q=election")
+    assert 1 == len(resp.json["_items"])
+    resp = client.get("/wire/search?q=electión")
+    assert 1 == len(resp.json["_items"])
