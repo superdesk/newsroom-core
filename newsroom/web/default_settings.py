@@ -14,6 +14,7 @@ from superdesk.default_settings import (  # noqa
     VERSION,
     MONGO_URI,
     REDIS_URL,
+    BROKER_URL,
     CONTENTAPI_MONGO_URI,
     CONTENTAPI_ELASTICSEARCH_URL,
     CONTENTAPI_ELASTICSEARCH_INDEX,

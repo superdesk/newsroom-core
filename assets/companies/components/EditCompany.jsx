@@ -182,13 +182,13 @@ class EditCompany extends React.Component {
                                         defaultOption=""
                                         onChange={this.props.onChange}/>}
 
-                                    {ssoEnabled && (
+                                    {this.props.ssoEnabled && (
                                         <TextInput
                                             name='auth_domain'
                                             label={gettext('SSO domain')}
-                                            value={company.auth_domain || ''}
-                                            onChange={onChange}
-                                            error={errors ? errors.auth_domain : null}
+                                            value={this.props.company.auth_domain || ''}
+                                            onChange={this.props.onChange}
+                                            error={this.props.errors ? this.props.errors.auth_domain : null}
                                         />
                                     )}
 
