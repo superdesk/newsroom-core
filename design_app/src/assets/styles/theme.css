@@ -2,10 +2,17 @@
 
 /* Theme variables */
 :root {    
-    --background-color: white;
-    --badge-bg-highlight1: #CC212C;
-    --primary-color: #CC212C;
-    --top-bar-bg-color: #262424; 
+    --color-background:     hsl(0, 0%, 100%);
+    --badge-bg-highlight1:  hsl(356, 72%, 46%);
+    --color-primary:        hsl(356, 72%, 46%);
+    --top-bar-color-bg:     hsl(0, 3%, 15%);
+
+    --sidenav-color-bg: var(--color-primary);
+
+    --color-home-section-heading: var(--color-text);
+
+    --top-bar-color-bg: hsl(0, 0%, 18%);
+    --top-bar-color-fg: hsl(0, 0%, 60%);
 }
 
 /* Fonts */
@@ -33,12 +40,9 @@ h5,
 h6 {
     font-family: 'Titillium Web', sans-serif;
 }
-h3.home-section-heading,
-.simple-card__headline {
-    color: #333;
-}
-a, 
-.card a.btn-outline-primary,
+
+
+/* .card a.btn-outline-primary,
 .btn-outline-primary,
 .icon-button:hover,
 .wire-articles__item__versions-btn,
@@ -107,8 +111,10 @@ a:hover {
 .btn-outline-primary:not([disabled]):not(.disabled):active,
 .show > .btn-outline-primary.dropdown-toggle {
     box-shadow: 0 0 0 0.2rem rgba(236, 0, 0, 0.4);
-}
-.wire-column__nav .tab-pane .btn-outline-primary,
+} */
+
+
+/* .wire-column__nav .tab-pane .btn-outline-primary,
 .profile-side-navigation .btn-outline-primary {
     color: white;
     border-color: #CC212C;
@@ -134,7 +140,7 @@ a:hover {
     background-color: transparent;
     border-color: #CC212C;
     box-shadow: 0 0 0 0.2rem rgba(236, 0, 0, 0.4);
-}
+} */
 .btn-outline-secondary:not([disabled]):not(.disabled):active {
     color: white;
     background-color: #000;
@@ -194,22 +200,18 @@ a:hover {
 .content-bar__menu--nav--open {
     background: #737373;
 }
-.sidenav {
-    background-color: #CC212C;
-}
+
 .profile-side-navigation {
     background-color: #e0e0e0;
 }
 .profile__group.profile__group--dark-bck .profile__name {
     color: inherit;
 }
-.wire-articles__item__meta-info .blue-text,
+
 .no-touch .dropdown-item:hover [class^="icon--"],
 .no-touch .dropdown-item:hover [class*=" icon--"],
 .no-touch .dropdown-item:focus [class^="icon--"],
-.no-touch .dropdown-item:focus [class*=" icon--"],
-.side-navigation__btn.active,
-.sidenav-icons .sidenav-icons__item.active i {
+.no-touch .dropdown-item:focus [class*=" icon--"] {
     color: #CC212C !important;
 }
 .no-touch .dropdown-item:active [class^="icon--"] {
@@ -218,54 +220,14 @@ a:hover {
 .side-navigation__btn {
     font-weight: 700;
 }
-.sidenav-icons__item {
-    margin: 4px 0;
-}
-.sidenav-icons__item a {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-}
-.sidenav-icons__item a:hover {
-    text-decoration: none;
-}
-.sidenav-icons__item.active {
-    display: flex !important;
-    justify-content: center;
-}
-.sidenav-icons__item.active a {
-    background-color: white;
-    border-radius: 50%;    
-}
-.sidenav-icons__item.active .bg-info {
-    color: #CC212C;
-    background-color: white;
-    border: 2px solid #CC212C;
-}
+
 .badge--top-right .badge {
     top: 0px;
     right: 2px;
 }
-.sidenav-icons__item .badge--icon {
-    top: 2px !important;
-    right: 7px !important;
-}
-.sidenav-icons__item.active i {
-    color: #CC212C;
-}
-.sidenav-icons .sidenav-icons__item [class^="icon-small--"], 
-.sidenav-icons .sidenav-icons__item [class*=" icon-small--"] {
-    color: #CC212C;
-}
-.wire-column__nav {
-    background: #262424;
-}
-.wire-column__nav a {
-    color: white;
-}
-.wire-column__nav__items .nav {
-    border-bottom: 1px solid #473235;
-}
+
+
+
 .wire-articles__item--open,
 .table-hover tbody tr.table--selected,
 .table-hover tbody tr.table--selected:hover {
@@ -308,18 +270,18 @@ a:hover {
 }
 .navbar-brand {
     margin: 0;
-    padding: 15px 0 6px 16px;
-    border-left: 1px solid white;
+    padding: 0 0 0 16px;
+    border-left: 1px solid hsla(0, 0%, 100%, 0.1);
 }
 .navbar__date {
-    padding: 15px 0 6px 16px;
+    padding: 0 0 0 16px;
 }
 .navbar-brand span.breadcrumb-item {
     font-size: 1rem;
     color: #A6A6A6;
     font-family: 'Lato', sans-serif;
 }
-.wire-column__nav__tab a.active {
+/* .wire-column__nav__tab a.active {
     color: #fff !important;
     border-bottom: 3px solid #CC212C;
 }
@@ -334,7 +296,7 @@ a:hover {
 }
 .wire-column__preview__slug {
     color: #262424;
-}
+} */
 .wire-articles__item.wire-articles__item--selected {
     outline: 1px solid #CC212C;
 }
@@ -417,10 +379,7 @@ a:hover {
     display: -webkit-flex !important;
     display: flex !important;
 }
-.sidenav-icons__item .bg-info {
-    color: #CC212C;
-    background-color: white !important;
-}
+
 .wire-column__main-header .badge-info {
     color: white;
     background-color: #CC212C;

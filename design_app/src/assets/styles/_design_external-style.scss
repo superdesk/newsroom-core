@@ -2,23 +2,33 @@
 @import '../../../../assets/styles/breakpoints.scss';
 
 .navbar-brand {
-  font-size: 1rem;
+  font-size: 14px;
 }
 .navbar {
 
   h6 {
     margin-block-end: 0;
-    color: #333;
+    font-size: 14px;
+    color: var(--color-text);
   }
   &.design {
-    background-color:bisque;
+    background-color:hsl(287, 100%, 92%);
     padding: 0 10px;
     height: 40px;
     display: none;
+    border-radius: var(--border-radius--s);
+    padding-inline: 16px;
+    margin-inline: auto;
+    .navbar-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-inline-start: 8px;
+    }
 
     a.nav-link {
       color:green !important;
-      font-weight: bold;
+      font-weight: 500;
     }
 
     @include lg {

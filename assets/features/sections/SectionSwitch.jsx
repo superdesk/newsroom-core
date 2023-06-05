@@ -8,10 +8,10 @@ import {gettext} from '../../utils';
 
 function SectionSwitch({sections, activeSection, selectSection}) {
     return (
-        <div className="btn-group btn-group--navbar ms-0 me-3">
+        <div className="toggle-button__group toggle-button__group--navbar ms-0 me-3">
             {sections.map((section) => (
                 <button key={section._id}
-                    className={'btn btn-outline-primary' + (section._id === activeSection ? ' active' : '')}
+                    className={'toggle-button' + (section._id === activeSection ? ' toggle-button--active' : '')}
                     onClick={() => selectSection(section._id)}
                 >{gettext(section.name)}</button>
             ))}

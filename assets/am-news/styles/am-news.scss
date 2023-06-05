@@ -1,7 +1,5 @@
-@import '../../styles/custom-variables';
-@import '../../styles/breakpoints';
 
-$am-mid-blue: #99dff9;
+@import '../../styles/breakpoints';
 
 .am-news {
     &__nav-tabs {
@@ -14,7 +12,7 @@ $am-mid-blue: #99dff9;
             cursor: default;
         }
         a {
-            color: #444;
+            color: var(--color-text);
         }
     }
 
@@ -56,9 +54,9 @@ $am-mid-blue: #99dff9;
     }
 
     .time-label {
-        font-family: $font-family-sans-serif;
+        font-family: var(--font-family-core--sans);
         &--stories {
-            background-color: $am-mid-blue;
+            background-color: #99dff9;
             color: #000;
         }
         &--data {

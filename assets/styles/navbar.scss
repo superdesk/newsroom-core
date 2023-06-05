@@ -13,8 +13,8 @@
 
     &.main {
         padding: 0px;
-        color: #969696;
-        background-color: var(--top-bar-bg-color);
+        color: var(--top-bar-color-fg);
+        background-color: var(--top-bar-color-bg);
         box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);
         z-index: 1007;
         flex: 0 0 auto;
@@ -60,7 +60,7 @@
         }
     }
     .notif__circle {
-        background: #000;
+        background: hsl(0, 0%, 0%);
         width: 33px;
         height: 33px;
         border-radius: 100%;
@@ -89,7 +89,7 @@
     }
     .notif__list__header-headline {
         font-size: 1rem;
-        color: $body-text;
+        color: var(--color-text);
         font-weight: 700;
     }
     .notif__list__message {
@@ -123,7 +123,7 @@
     }
     .notif__list__headline {
         font-size: 0.875rem; // 14px
-        color: $body-text;
+        color: var(--color-text);
         font-weight: 700;
         line-height: 1.4;
         margin-block-end: 6px;
@@ -270,6 +270,12 @@
     
     &--login {
         padding-inline-end: 0.5rem;
+        .nav-link {
+            color: var(--color-text-link--navbar);
+            &:hover {
+                color: var(--color-text-link--navbar);
+            }
+        }
        
         @include sm {
             padding-inline-end: 1rem;
@@ -352,13 +358,13 @@ nav.search {
             font-size: 13px;
             text-transform: uppercase;
             font-weight: 700;
-            color: $body-text;
+            color: var(--color-text);
             padding: 10px 0 6px 0 !important;
             margin: 0 12px;
             border: none;
             &:hover {
                 text-decoration: none;
-                color: $gray-dark;
+                color: var(--color-text--muted);
             }
             &.active {
                 border-color: black;

@@ -12,12 +12,13 @@
     // new card 
     &.card--home {
         flex-basis: 100%;
-        border-radius: 0;
+        border-radius: var(--card-item-border-radius);
+        background-color: var(--card-item-color-bg);
         border: none;
-        box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.2);
+        box-shadow: var(--card-item-shadow);
 
         &:hover {
-            box-shadow: 0px 1px 9px rgba(0, 0, 0, 0.4);
+            box-shadow: var(--card-item-shadow--hover);
             cursor: pointer;
         }
 
@@ -31,11 +32,21 @@
         h4.card-title { font-size: 1rem; font-weight: 900; line-height: 1.4; }
         h5.card-title { font-size: 0.875rem; font-weight: 900; line-height: 1.4; }
         
-        h1.card-title, h2.card-title { color: #3e4557; }
+        h1.card-title, 
+        h2.card-title { 
+            color: var(--card-item-title-color); 
+        }
         
+        .card-header {
+            border-radius: var(--card-item-border-radius) var(--card-item-border-radius) 0 0;
+        }
+        .card-footer {
+            border-radius: 0 0 var(--card-item-border-radius) var(--card-item-border-radius);
+            border-top: 1px solid var(--card-item-footer-border-color);
+        }
         .card-header, 
         .card-footer {
-            background-color: white;
+            background-color: var(--card-item-color-bg);
         }
         
         .card-body {
@@ -61,7 +72,7 @@
                 }
             }
             &.card-body--green-border {
-                border-inline-start: 4px solid #7ed321;
+                border-inline-start: 4px solid hsl(89, 73%, 48%);
             }
             .card-body__sidebar {
                 flex: 0 0 45%;
@@ -112,7 +123,7 @@
 
         // use wrapper class to retain image aspect ratio within the home page card
         .card-img-top-wrapper { 
-            background-color: #3e4557;
+            background-color: var(--card-item-image-color-bg);
             position: relative;
             height: 0;
 

@@ -101,7 +101,7 @@
 
 .dropdown-header {
   font-size: 1rem;
-  color: $body-text;
+  color: var(--color-text);
   font-weight: 500;
   padding: 1rem;
   border-inline-end: 1px solid #e7e7e7;
