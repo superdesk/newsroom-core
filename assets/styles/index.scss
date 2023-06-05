@@ -1475,34 +1475,30 @@ article.list {
         overflow: auto;
 
         .tab-pane {
-            padding: 20px 0;
+            padding: 16px 0;
 
             &--no-padding {
                 padding: 0;
             }
-
-            #reset-filter-buffer {
-                height: 80px;
+            &.active {
+                display: flex;
+                flex-direction: column;
+                overflow: auto;
+                height: 100vh;
             }
-
+            &__inner {
+                display: flex;
+                flex-direction: column;
+                overflow: auto;
+                padding: 16px;
+                flex-grow: 1;
+            }
             .filter-button {
-                position: absolute;
-                inset-inline-start: 0;
-                inset-inline-end: 15px;
-                padding: 10px 20px 0 20px;
+                padding: 8px 16px 0 16px;
                 background: #FFF;
-
-                &.reset {
-                    inset-block-end: 0;
-                }
-
-                &.search {
-                    inset-block-end: 50px;
-                    border: none;
-                    height: auto;
-                    margin: 0;
-                    border-radius: 0;
-                }
+                .btn {
+                    margin-block-end: 8px;
+                }                
 
                 &--border {
                     border-block-start: 1px solid #DDD;
