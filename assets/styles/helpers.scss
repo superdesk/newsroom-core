@@ -80,3 +80,19 @@
     width: 1px;
     overflow: hidden;
 }
+
+hr.dashed {
+    border: none;
+    border-top: 1px dashed #676C7B;
+    color: #fff;
+    background-color: #fff;
+    opacity: 1;
+    height: 1px;
+    width: 100%;
+}
+
+// Display
+// --------------------------------------------------
+.d-contents {
+    display: contents !important;
+}

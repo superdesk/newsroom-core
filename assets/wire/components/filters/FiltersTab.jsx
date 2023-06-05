@@ -124,30 +124,30 @@ class FiltersTab extends React.Component {
             || Object.keys(createdFilter).find((key) => !isEmpty(createdFilter[key]));
 
         return (
-            <div className="m-3">
-                {this.getFilterGroups().filter((group) => !!group).concat([
-                    (<NavCreatedPicker
-                        key="created"
-                        createdFilter={createdFilter}
-                        setCreatedFilter={this.setCreatedFilterAndSearch}
-                    />),
-                    !isResetActive && !this.props.resultsFiltered ? null : ([
-                        <div key="reset-buffer" id="reset-filter-buffer" />,
-                        <FilterButton
-                            key='search'
-                            label={gettext('Search')}
-                            onClick={this.search}
-                            className='search filter-button--border'
-                            primary={true}
-                        />,
-                        <FilterButton
-                            key='reset'
-                            label={gettext('Clear filters')}
-                            onClick={this.reset}
-                            className='reset'
-                            primary={false}
-                        />,
-                    ]),
+            <div className="d-contents">
+                <div className='tab-pane__inner'>
+                    {this.getFilterGroups().filter((group) => !!group).concat([
+                        (<NavCreatedPicker
+                            key="created"
+                            createdFilter={createdFilter}
+                            setCreatedFilter={this.setCreatedFilterAndSearch}
+                        />)
+                    ])}
+                </div>
+                {!isResetActive && !this.props.resultsFiltered ? null : ([                    
+                    <FilterButton
+                        key='search'
+                        label={gettext('Search')}
+                        onClick={this.search}
+                        className='filter-button--border'
+                        primary={true}
+                    />,
+                    <FilterButton
+                        key='reset'
+                        label={gettext('Clear filters')}
+                        onClick={this.reset}
+                        primary={false}
+                    />
                 ])}
             </div>
         );
