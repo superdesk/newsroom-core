@@ -19,6 +19,7 @@ import {
     TOGGLE_ADVANCED_SEARCH_FIELD,
     SET_ADVANCED_SEARCH_KEYWORDS,
     CLEAR_ADVANCED_SEARCH_PARAMS,
+    SET_ADVANCED_SEARCH_PARAMS,
 } from './actions';
 
 import {EXTENDED_VIEW} from 'wire/defaults';
@@ -188,6 +189,17 @@ export function searchReducer(state=INITIAL_STATE, action) {
                 any: '',
                 exclude: '',
                 fields: [],
+            },
+        };
+
+    case SET_ADVANCED_SEARCH_PARAMS:
+        return {
+            ...state,
+            advanced: {
+                all: action.payload.all || '',
+                any: action.payload.any || '',
+                exclude: action.payload.exclude || '',
+                fields: action.payload.fields || [],
             },
         };
 
