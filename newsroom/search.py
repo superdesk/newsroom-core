@@ -513,7 +513,7 @@ class BaseSearchService(Service):
     def prefill_search_highlights(self, search, req):
         query_string = search.args.get("q")
         query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
-        advanced_search = search.args.get("advanced_search")
+        advanced_search = search.args.get("advanced")
         if app.data.elastic.should_highlight(req) and (
             query_string
             or (advanced_search and json.loads(advanced_search).get("all"))
@@ -668,13 +668,13 @@ class BaseSearchService(Service):
                 search.source["post_filter"]["bool"]["filter"].append(self.versioncreated_range(search.args))
 
     def apply_request_advanced_search(self, search: SearchQuery):
-        if not search.args.get("advanced_search"):
+        if not search.args.get("advanced"):
             return
 
-        if isinstance(search.args["advanced_search"], str):
-            search.advanced = json.loads(search.args["advanced_search"])
+        if isinstance(search.args["advanced"], str):
+            search.advanced = json.loads(search.args["advanced"])
         else:
-            search.advanced = search.args["advanced_search"]
+            search.advanced = search.args["advanced"]
 
         fields = search.advanced.get("fields") or self.default_advanced_search_fields
         if not fields:
@@ -766,7 +766,7 @@ class BaseSearchService(Service):
                 self.set_bool_query_from_filters(search.query["bool"], topic["filter"])
 
             if topic.get("advanced"):
-                search.args["advanced_search"] = topic["advanced"]
+                search.args["advanced"] = topic["advanced"]
 
             # for now even if there's no active company matching for the user
             # continuing with the search

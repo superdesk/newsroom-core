@@ -841,13 +841,13 @@ def test_highlighting_with_advanced_search(client, app):
         ],
     )
     advanced_search_params = parse.quote('{"fields":[],"all":"demo"}')
-    url = f"/wire/search?advanced_search={advanced_search_params}&es_highlight=1"
+    url = f"/wire/search?advanced={advanced_search_params}&es_highlight=1"
     resp = client.get(url)
     data = json.loads(resp.get_data())
     assert data["_items"][0]["es_highlight"]["headline"][0] == '<span class="es-highlight">Demo</span> Article'
 
     advanced_search_params = parse.quote('{"fields":[],"any":"cheese"}')
-    url = f"/wire/search?advanced_search={advanced_search_params}&es_highlight=1"
+    url = f"/wire/search?advanced={advanced_search_params}&es_highlight=1"
     resp = client.get(url)
     data = json.loads(resp.get_data())
     assert (
