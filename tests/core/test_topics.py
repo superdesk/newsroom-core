@@ -205,12 +205,19 @@ def test_get_topic_share_url(app):
     topic = {"topic_type": "wire", "created": {"from": "2018-06-01"}}
     assert get_topic_url(topic) == "http://localhost:5050/wire?created=%7B%22from%22%3A+%222018-06-01%22%7D"
 
+    topic = {"topic_type": "wire", "advanced": {"all": "Weather Sydney", "fields": ["headline", "body_html"]}}
+    assert get_topic_url(topic) == (
+        "http://localhost:5050/wire?advanced="
+        "%7B%22all%22%3A+%22Weather+Sydney%22%2C+%22fields%22%3A+%5B%22headline%22%2C+%22body_html%22%5D%7D"
+    )
+
     topic = {
         "topic_type": "wire",
         "query": "art exhibition",
         "filter": {"urgency": [3]},
         "navigation": ["123"],
         "created": {"from": "2018-06-01"},
+        "advanced": {"all": "Weather Sydney", "fields": ["headline", "body_html"]},
     }
     assert (
         get_topic_url(topic) == "http://localhost:5050/wire?"
@@ -218,6 +225,7 @@ def test_get_topic_share_url(app):
         "&filter=%7B%22urgency%22%3A+%5B3%5D%7D"
         "&navigation=%5B%22123%22%5D"
         "&created=%7B%22from%22%3A+%222018-06-01%22%7D"
+        "&advanced=%7B%22all%22%3A+%22Weather+Sydney%22%2C+%22fields%22%3A+%5B%22headline%22%2C+%22body_html%22%5D%7D"
     )
 
 
