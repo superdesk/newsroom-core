@@ -39,6 +39,19 @@ $enable-shadows:true;
   flex: 1 1 auto;
 }
 
+
+.settingsWrap {
+  .input-group {
+   .btn {
+    height: 32px;
+    margin-right: 5px;
+   }
+   .tag-label {
+    margin-bottom: 5px;
+    margin-right: 5px;
+   }
+  }
+}
 // Custom checkbox style
 .custom-control {
   &.custom-checkbox {
