@@ -42,7 +42,7 @@ class CardRow extends React.Component {
         if (Object.keys(user).length && !isUserAdmin(user)) {
             if (user.products.length === 0) {
                 moreNews = false;
-            } else if (user.products.length !== 0) {
+            } else {
                 moreNews = user.products.some((userProduct) => userProduct._id === product._id);
             }
         }
