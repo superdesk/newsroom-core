@@ -128,7 +128,10 @@ class ContentSearchResultsComponent extends React.Component {
                                         <span>{gettext('search results for: ') +' '+this.props.searchParams.query}</span>
                                     </span>
                                     {!(this.props.minimizeSearchResults && !this.state.expanded) ? null : (
-                                        <div className="tags-list">
+                                        <div
+                                            data-test-id="search-result-tags"
+                                            className="tags-list"
+                                        >
                                             {this.renderTags()}
                                         </div>
                                     )}
@@ -137,7 +140,10 @@ class ContentSearchResultsComponent extends React.Component {
                             {!this.props.showSaveTopic && !this.props.children ? null : (
                                 <div className="d-flex ms-auto align-items-center">
                                     {this.props.showSaveTopic && (
-                                        <div className="d-none d-md-flex align-items-center flex-shrink-0 ml-auto">
+                                        <div
+                                            data-test-id="save-topic-btn"
+                                            className="d-none d-md-flex align-items-center flex-shrink-0 ml-auto"
+                                        >
                                             <button
                                                 className="btn btn-outline-primary btn-sm d-none d-sm-block mb-1 mt-1"
                                                 onClick={this.props.saveMyTopic}
@@ -157,7 +163,10 @@ class ContentSearchResultsComponent extends React.Component {
                             )}
                         </div>
                         {(this.props.minimizeSearchResults && !this.state.expanded) ? null : (
-                            <div className="tags-list">
+                            <div
+                                data-test-id="search-result-tags"
+                                className="tags-list"
+                            >
                                 {this.renderTags()}
                             </div>
                         )}

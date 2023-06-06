@@ -18,7 +18,7 @@ function AdvancedSearchPanelComponent({
     clearParams
 }) {
     return (
-        <div className="advanced-search__wrapper">
+        <div className="advanced-search__wrapper" data-test-id="advanced-search-panel">
             <div className="advanced-search__header">
                 <h3 className="a11y-only">{gettext('Advanced Search dialog')}</h3>
                 <nav className="content-bar navbar">
@@ -38,7 +38,10 @@ function AdvancedSearchPanelComponent({
             </div>
             <div className="advanced-search__content-wrapper">
                 <div className="advanced-search__content">
-                    <div className="advanced-search__content-block">
+                    <div
+                        data-test-id="field-all"
+                        className="advanced-search__content-block"
+                    >
                         <p className="advanced-search__content-block-text advanced-search__content-block-text--bold">
                             {gettext('All of these:')}
                         </p>
@@ -55,7 +58,10 @@ function AdvancedSearchPanelComponent({
                             {gettext('Finds every item that contains keyword1 AND keyword2 etc.')}
                         </p>
                     </div>
-                    <div className="advanced-search__content-block">
+                    <div
+                        data-test-id="field-any"
+                        className="advanced-search__content-block"
+                    >
                         <p className="advanced-search__content-block-text advanced-search__content-block-text--bold">
                             {gettext('Any of these:')}
                         </p>
@@ -71,7 +77,10 @@ function AdvancedSearchPanelComponent({
                             {gettext('And every item contain keyword1 OR keyword 2 etc.')}
                         </p>
                     </div>
-                    <div className="advanced-search__content-block">
+                    <div
+                        data-test-id="field-none"
+                        className="advanced-search__content-block"
+                    >
                         <p className="advanced-search__content-block-text advanced-search__content-block-text--bold">
                             {gettext('None of these:')}
                         </p>
@@ -121,6 +130,7 @@ function AdvancedSearchPanelComponent({
                     {gettext('Clear all')}
                 </button>
                 <button
+                    data-test-id="run-advanced-search-btn"
                     className="btn btn-primary"
                     onClick={() => {
                         fetchItems();

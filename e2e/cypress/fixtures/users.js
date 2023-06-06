@@ -8,7 +8,7 @@ export const USERS = {
             _id: '445460066f6a58e1c6b11540',
             first_name: 'Admin',
             last_name: 'Nistrator',
-            email: 'admin@nistrator.org',
+            email: 'admin@example.com',
             password: '$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG',
             user_type: 'administrator',
             is_validated: true,

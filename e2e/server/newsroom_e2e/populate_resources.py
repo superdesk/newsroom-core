@@ -68,6 +68,6 @@ class NewshubPopulateResourcesService(Service):
                 else:
                     for item in items:
                         app.data.mongo._mongotize(item, resource)
-                        app.data.insert(resource, [item])
+                        ids.extend(app.data.insert(resource, [item]))
 
         return ids
