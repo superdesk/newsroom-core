@@ -671,7 +671,11 @@ class BaseSearchService(Service):
         if not search.args.get("advanced_search"):
             return
 
-        search.advanced = json.loads(search.args["advanced_search"])
+        if isinstance(search.args["advanced_search"], str):
+            search.advanced = json.loads(search.args["advanced_search"])
+        else:
+            search.advanced = search.args["advanced_search"]
+
         fields = search.advanced.get("fields") or self.default_advanced_search_fields
         if not fields:
             return
@@ -761,6 +765,9 @@ class BaseSearchService(Service):
             if topic.get("filter"):
                 self.set_bool_query_from_filters(search.query["bool"], topic["filter"])
 
+            if topic.get("advanced"):
+                search.args["advanced_search"] = topic["advanced"]
+
             # for now even if there's no active company matching for the user
             # continuing with the search
             try:
@@ -769,6 +776,7 @@ class BaseSearchService(Service):
                 self.apply_company_filter(search)
                 self.apply_time_limit_filter(search)
                 self.apply_products_filter(search)
+                self.apply_request_advanced_search(search)
             except Forbidden as exc:
                 logger.info(
                     "Notification for user:{} and topic:{} is skipped".format(user.get("_id"), topic.get("_id")),

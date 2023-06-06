@@ -35,6 +35,7 @@ class TopicsResource(newsroom.Resource):
         "original_creator": newsroom.Resource.rel("users"),
         "version_creator": newsroom.Resource.rel("users"),
         "folder": newsroom.Resource.rel("topic_folders", nullable=True),
+        "advanced": {"type": "dict", "nullable": True},
     }
 
 
