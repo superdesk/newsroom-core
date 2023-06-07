@@ -18,6 +18,7 @@ const initialState = {
     itemsByCard: {},
     activeCard: null,
     uiConfig: {},
+    userProducts:[],
 };
 
 export default function homeReducer(state=initialState, action) {
@@ -32,6 +33,7 @@ export default function homeReducer(state=initialState, action) {
             products: action.data.products,
             user: action.data.user,
             userType: action.data.userType,
+            userProducts:action.data.userProducts,
             company: action.data.company,
             formats: action.data.formats || [],
             userSections: action.data.userSections,
