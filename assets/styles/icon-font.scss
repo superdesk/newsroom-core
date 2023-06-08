@@ -13,13 +13,14 @@
 }
 @include fontFace('aap_newsroom_icons','/static/fonts/aap_newsroom_icons', normal, normal);
 
-@mixin icon-base ($width: 24px, $height: 24px, $line-height: 24px, $font-size: 24px) {
+@mixin icon-base {
+    --icon-size: var(--icon-size--default);
     display: inline-block;
-    width: $width;
-    height: $height;
-    line-height: $line-height;
+    width: var(--icon-size);
+    height: var(--icon-size);
+    line-height: var(--icon-size);
     font-family: 'aap_newsroom_icons' !important;
-    font-size: $font-size;
+    font-size: var(--icon-size);
     color: $main_blue;
     speak: none;
     font-style: normal;
@@ -74,9 +75,13 @@
     &.icon--purple {
         color: $purple;
     }
+    &.icon--small {
+        --icon-size: var(--icon-size--small);
+    }
 }
+
 [class^="icon--coverage-"], [class*=" icon--coverage-"] {
-    color: $gray-dark;
+    color: var(--color-text--muted);
 }
 
 .icon--rotate-90 {
@@ -286,4 +291,34 @@
 }
 .icon--filter:before {
   content: "\e641";
+}
+.icon--plus:before {
+    content: "\e642";
+}
+.icon--minus:before {
+    content: "\e643";
+}
+.icon--folder:before {
+    content: "\e644";
+}
+.icon--folder-create:before {
+    content: "\e645";
+}
+.icon--folder-add-to:before {
+    content: "\e646";
+}
+.icon--folder-remove-from:before {
+    content: "\e647";
+}
+.icon--arrow-start:before {
+    content: "\e648";
+}
+.icon--arrow-end:before {
+    content: "\e649";
+}
+.icon--arrow-top:before {
+    content: "\e64a";
+}
+.icon--arrow-bottom:before {
+    content: "\e64b";
 }

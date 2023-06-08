@@ -158,24 +158,7 @@ $container-max-widths: (
 }
   
 :root {
-    --color-text:                 hsla(0, 0%, 14%, 1);
-    --color-text--light:          hsla(0, 0%, 40%, 1);
-    --color-text--inverse:        hsla(0, 0%, 96%, 1);
-    --color-dark:                 hsla(0, 3%, 15%, 1);
-    --color-light:                hsla(0, 0%, 84%, 1);
-
-    --line-shadow-end--light: 0 1px 0 var(--color-light);
-    --line-shadow-start--light: 0 -1px 0 var(--color-light);
-
-    //space
-    --space--0:     0;
-    --space--0-5:   4px;
-    --space--1:     8px;
-    --space--2:     16px;
-    --space--3:     24px;
-    --space--4:     32px;
-    --space--5:     40px;
-
+    // CORE COLORS
     @include defineColorHSL(--color-success, 95, 50%, 34%);
     @include defineColorHSL(--color-warning, 36, 100%, 40%);
     @include defineColorHSL(--color-alert, 356, 72%, 46%);
@@ -183,6 +166,96 @@ $container-max-widths: (
     @include defineColorHSL(--color-highlight, 356, 72%, 46%);
     @include defineColorHSL(--color-highlight1, 268, 68%, 45%);
     @include defineColorHSL(--color-highlight2, 310, 89%, 36%);
+
+    // --------------------------------------------------------------------
+    //     C O R E
+    // --------------------------------------------------------------------
+    
+    // CORE: BACKGROUNDS
+    --color-background: hsl(0, 0%, 100%);
+    --color-background--muted: hsl(0, 0%, 97%);
+    --color-background--muted-2: hsl(0, 0%, 95%);
+
+    // CORE: CONTENT ITEM BACKGROUND
+    --color-background-content-item: hsl(0, 0%, 100%);
+
+    // CORE: TEXT COLORS
+    --color-text:                 hsla(0, 0%, 14%, 1);
+    --color-text--muted:          hsla(0, 0%, 40%, 1);
+    --color-text--muted-2:        hsla(0, 0%, 54%, 1);
+    --color-text--inverse:        hsla(0, 0%, 96%, 1);
+    --color-text--disabled:       hsla(0, 0%, 20%, 0.5);
+
+    // CORE: LINE COLORS
+    --color-line--x-light:        hsla(0, 0%, 92%, 1);
+    --color-line--light:          hsla(0, 0%, 84%, 1);
+    --color-line--medium:         hsla(0, 0%, 74%, 1);
+    --color-line--strong:         hsla(0, 0%, 54%, 1);
+    --color-line--x-strong:       hsla(0, 0%, 34%, 1);
+
+    // CORE: SHADOW
+    --line-shadow-end--light: 0 1px 0 var(--color-line--light);
+    --line-shadow-start--light: 0 -1px 0 var(--color-line--light);
+
+    // CORE: SPACE
+    --space--0:     0;
+    --space--0-5:   4px;
+    --space--1:     8px;
+    --space--1-5:   12px;
+    --space--2:     16px;
+    --space--3:     24px;
+    --space--4:     32px;
+    --space--5:     40px;
+
+    // CORE: BORDER RADIUS
+    --border-radius--xs: 2px;
+    --border-radius--s: 4px;
+    --border-radius--m: 6px;
+    --border-radius--l: 8px;
+    --boder-radius--xl: 12px;
+    --border-radius--full: 1000px;
+
+    // CORE: TYPOGRAPHY
+    --font-family-core--sans: "Roboto", "Helvetica Neue", Arial, sans-serif;
+    --font-family-core--serif: "Merriweather", serif;
+    --font-size-base: 1rem; // 16px
+    --text-size--large: var(--font-size-base); // 16px
+    --text-size--medium: calc(var(--font-size-base) * 0.875); // 14px
+    --text-size--small: calc(var(--font-size-base) * 0.75);  // 12px
+
+    // CORE: ICONS
+    --icon-size--default: 24px;
+    --icon-size--small: 20px;
+    --icon-size--x-small: 16px;
+    --icon-color--muted: var(--color-text--muted);
+    --icon-color--muted-2: var(--color-text--muted-2);
+
+    // CORE: FORME ELEMENTS HEIGHT (unify the heights of buttons, inputs and other form elements 
+    --size-form-element--large: 40px; // default size
+    --size-form-element--small: 32px;
+    --size-form-element--x-small: 24px;
+
+    // CORE: MISC 
+    --transition-base: 0.2s ease;
+
+
+    // --------------------------------------------------------------------
+    //     C O M P O N E N T S
+    // --------------------------------------------------------------------
+
+    // COMPONENT: INPUT FIELD
+    --input-color-bg: hsl(0, 0%, 96%);
+    --input-color-bg--focus: hsl(0, 0%, 98%);
+    --input-color-bg--disabled: hsl(0, 0%, 98%);
+    --input-color-fg: var(--color-text);
+    --input-color-border: hsl(0, 0%, 86%);
+    --input-color-border--hover: hsl(0, 0%, 66%);
+    --input-border-radius: var(--border-radius--s);
+    --input-font-size--default: var(--text-size--large);
+    --input-font-size--small: var(--text-size--medium);
+    --input-size-height--default: 40px;
+    --input-size-height--small: 32px;
+
 }
 
 .line-shadow-end--light {
@@ -210,11 +283,11 @@ $container-max-widths: (
 
 .icon-button {
     &.icon-button--bordered {
-        border: 1px solid var(--color-light);
+        border: 1px solid var(--color-line--light);
         height: 40px;
         [class^="icon--"],
         [class*=" icon--"] {
-            color: var(--color-text--light);
+            color: var(--color-text--muted);
         }
     }
 }
@@ -270,7 +343,7 @@ $container-max-widths: (
     flex-grow: 0;
     flex-shrink: 0;
     width: 1px;
-    border-inline-start: 1px solid var(--color-light);
+    border-inline-start: 1px solid var(--color-line--light);
     opacity: 0.75;
     margin-inline: var(--space--2);
     margin-block: var(--space--1);
@@ -301,7 +374,7 @@ $container-max-widths: (
     transition: all 0.2s ease;
     [class^="icon--"],
     [class*=" icon--"] {
-        color: var(--color-text--light);
+        color: var(--color-text--muted);
         transition: all 0.2s ease;
     }
     .icon-link__text {
