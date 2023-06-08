@@ -514,6 +514,7 @@ class BaseSearchService(Service):
         query_string = search.args.get("q")
         query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
         advanced_search = search.args.get("advanced")
+        field_settings = {"number_of_fragments": 0}
         if app.data.elastic.should_highlight(req) and (
             query_string
             or (advanced_search and json.loads(advanced_search).get("all"))
@@ -528,9 +529,9 @@ class BaseSearchService(Service):
                 },
             )
             elastic_highlight_query["fields"] = {
-                "body_html": {},
-                "headline": {},
-                "slugline": {},
+                "body_html": field_settings,
+                "headline": field_settings,
+                "slugline": field_settings,
             }
 
             search.highlight = elastic_highlight_query
