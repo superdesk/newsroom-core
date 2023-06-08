@@ -513,13 +513,11 @@ class BaseSearchService(Service):
     def prefill_search_highlights(self, search, req):
         query_string = search.args.get("q")
         query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
-        advanced_search = json.loads(search.args.get("advanced")) if search.args.get("advanced") else None
+        advanced_search = json.loads(search.args.get("advanced")) if search.args.get("advanced") else {}
 
         field_settings = {"number_of_fragments": 0}
         if app.data.elastic.should_highlight(req) and (
-            query_string
-            or (advanced_search and advanced_search.get("all"))
-            or (advanced_search and advanced_search.get("any"))
+            query_string or advanced_search.get("all") or advanced_search.get("any")
         ):
             elastic_highlight_query = get_elastic_highlight_query(
                 query_string={
@@ -529,15 +527,15 @@ class BaseSearchService(Service):
                     "lenient": True,
                 },
             )
-            selected_fields = advanced_search.get("fields") if advanced_search else []
-            if not selected_fields:
+            selected_field = advanced_search.get("fields") or []
+            if not selected_field:
                 elastic_highlight_query["fields"] = {
                     "body_html": field_settings,
                     "headline": field_settings,
                     "slugline": field_settings,
                 }
             else:
-                elastic_highlight_query["fields"] = {field: field_settings for field in selected_fields}
+                elastic_highlight_query["fields"] = {field: field_settings for field in selected_field}
 
             search.highlight = elastic_highlight_query
 
