@@ -38,6 +38,7 @@ const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubs
                 </div>
             )}
             <TextInput
+                name="name"
                 label={gettext('Name')}
                 required={true}
                 value={topic.label}
@@ -48,6 +49,7 @@ const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubs
             />
             {original._id != null ? null : (
                 <CheckboxInput
+                    name="notifications"
                     label={gettext('Send me notifications')}
                     value={topic.notifications || false}
                     onChange={onChange('notifications')}
@@ -56,6 +58,7 @@ const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubs
             )}
             {!(globalTopicsEnabled && (original._id == null || original.user)) ? null : (
                 <CheckboxInput
+                    name="is_global"
                     label={gettext('Share with my Company')}
                     value={topic.is_global || false}
                     onChange={onChange('is_global')}

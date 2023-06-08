@@ -76,16 +76,16 @@ export const searchParamsSelector = createSelector(
         }
 
         if (advancedSearchParams.all || advancedSearchParams.any || advancedSearchParams.exclude) {
-            params.advancedSearch = {fields: advancedSearchParams.fields};
+            params.advanced = {fields: advancedSearchParams.fields};
 
             if (advancedSearchParams.all) {
-                params.advancedSearch.all = advancedSearchParams.all;
+                params.advanced.all = advancedSearchParams.all;
             }
             if (advancedSearchParams.any) {
-                params.advancedSearch.any = advancedSearchParams.any;
+                params.advanced.any = advancedSearchParams.any;
             }
             if (advancedSearchParams.exclude) {
-                params.advancedSearch.exclude = advancedSearchParams.exclude;
+                params.advanced.exclude = advancedSearchParams.exclude;
             }
         }
 

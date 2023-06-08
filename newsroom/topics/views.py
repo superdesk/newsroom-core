@@ -156,6 +156,8 @@ def get_topic_url(topic):
         url_params["navigation"] = json.dumps(topic.get("navigation"))
     if topic.get("created"):
         url_params["created"] = json.dumps(topic.get("created"))
+    if topic.get("advanced"):
+        url_params["advanced"] = json.dumps(topic["advanced"])
 
     section = topic.get("topic_type")
     return url_for(

@@ -66,6 +66,13 @@ CONTENTAPI_MONGO_URI = env("CONTENTAPI_MONGO_URI", f"mongodb://localhost/{MONGO_
 ELASTICSEARCH_INDEX = env("ELASTICSEARCH_INDEX", MONGO_DBNAME)  # noqa
 CONTENTAPI_ELASTICSEARCH_INDEX = env("CONTENTAPI_ELASTICSEARCH_INDEX", MONGO_DBNAME)  # noqa
 
+# handle non-ascii characters by default
+CONTENTAPI_ELASTICSEARCH_SETTINGS["settings"]["analysis"]["analyzer"]["html_field_analyzer"]["filter"] = [
+    "lowercase",
+    "asciifolding",
+    "stop",
+]
+
 XML = False
 IF_MATCH = True
 JSON_SORT_KEYS = False
