@@ -24,6 +24,8 @@ import {
 
 import {EXTENDED_VIEW} from 'wire/defaults';
 
+const ADVANCED_FIELDS = ['headline', 'slugline', 'body_html'];
+
 const INITIAL_STATE = {
     activeTopic: null,
     activeNavigation: [],
@@ -41,7 +43,7 @@ const INITIAL_STATE = {
         all: '',
         any: '',
         exclude: '',
-        fields: [],
+        fields: ADVANCED_FIELDS,
     },
 };
 
@@ -157,7 +159,7 @@ export function searchReducer(state=INITIAL_STATE, action) {
                 all: '',
                 any: '',
                 exclude: '',
-                fields: [],
+                fields: ADVANCED_FIELDS,
             },
         };
 
@@ -188,7 +190,7 @@ export function searchReducer(state=INITIAL_STATE, action) {
                 all: '',
                 any: '',
                 exclude: '',
-                fields: [],
+                fields: ADVANCED_FIELDS,
             },
         };
 
@@ -199,7 +201,7 @@ export function searchReducer(state=INITIAL_STATE, action) {
                 all: action.payload.all || '',
                 any: action.payload.any || '',
                 exclude: action.payload.exclude || '',
-                fields: action.payload.fields || [],
+                fields: action.payload.fields || ADVANCED_FIELDS,
             },
         };
 
