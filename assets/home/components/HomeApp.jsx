@@ -241,7 +241,6 @@ HomeApp.propTypes = {
 
 const mapStateToProps = (state) =>({
     cards: state.cards,
-    userProducts:state.userProducts,
     itemsByCard: state.itemsByCard,
     products: state.products,
     user: state.user,
