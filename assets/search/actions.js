@@ -375,10 +375,17 @@ export function resetSearchParams() {
 export const TOGGLE_ADVANCED_SEARCH_FIELD = 'TOGGLE_ADVANCED_SEARCH_FIELD';
 export function toggleAdvancedSearchField(field) {
     return function(dispatch, getState) {
+        const selected = getState().search.advanced.fields;
+
+        if (selected.length === 1 && selected.includes(field)) {
+            return; // at least 1 fields must be selected
+        }
+
         dispatch({
             type: TOGGLE_ADVANCED_SEARCH_FIELD,
             payload: field,
         });
+
         const state = getState();
 
         updateRouteParams(

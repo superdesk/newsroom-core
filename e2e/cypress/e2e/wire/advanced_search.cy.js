@@ -4,6 +4,14 @@ import {WirePage} from '../../support/pages/wire';
 import {AdvancedSearchForm} from '../../support/forms/advancedSearch';
 import {UserTopicForm} from '../../support/forms/userTopicForm';
 
+const encodeSearchParams = (params) => {
+    const p = new URLSearchParams();
+
+    p.set('advanced', JSON.stringify(params));
+
+    return p.toString();
+};
+
 describe('Wire - Advanced Search', function() {
     beforeEach(() => {
         setup();
@@ -17,12 +25,10 @@ describe('Wire - Advanced Search', function() {
         WirePage.showAdvancedSearchModal();
         AdvancedSearchForm.type({
             all: 'Sydney Weather',
-            'fields.headline': true,
-            'fields.body_html': true,
+            'fields.slugline': false,
         });
         AdvancedSearchForm.runSearch();
-        const advancedSearchUrlParam = 'advanced=%7B%22all%22%3A%22Sydney+Weather%22%2C%22any%22%3A%22%22%2C%22' +
-            'exclude%22%3A%22%22%2C%22fields%22%3A%5B%22headline%22%2C%22body_html%22%5D%7D';
+        const advancedSearchUrlParam = encodeSearchParams({all: 'Sydney Weather', any: '', exclude: '', fields: ['headline', 'body_html']});
         cy.url().should('include', advancedSearchUrlParam);
 
         cy.reload();
