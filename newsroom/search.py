@@ -528,11 +528,15 @@ class BaseSearchService(Service):
                     "lenient": True,
                 },
             )
-            elastic_highlight_query["fields"] = {
-                "body_html": field_settings,
-                "headline": field_settings,
-                "slugline": field_settings,
-            }
+            selected_fields = json.loads(advanced_search).get("fields") if advanced_search else []
+            if not selected_fields:
+                elastic_highlight_query["fields"] = {
+                    "body_html": field_settings,
+                    "headline": field_settings,
+                    "slugline": field_settings,
+                }
+            else:
+                elastic_highlight_query["fields"] = {field: field_settings for field in selected_fields}
 
             search.highlight = elastic_highlight_query
 
