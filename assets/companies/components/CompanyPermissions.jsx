@@ -94,67 +94,67 @@ function CompanyPermissions({
                         key="products"
                     >
                         {sections.filter((section) => (company.sections || {})[section._id] === true).map((section) => (
-                            [<div className="list-item__preview-collapsible list-item__preview-collapsible--read-only list-item__preview-collapsible--small mb-2">
+                            [<div key={`${section.id}product`} className="list-item__preview-collapsible list-item__preview-collapsible--read-only list-item__preview-collapsible--small mb-2">
                                 <div className="list-item__preview-collapsible-header">
                                     <i className="icon--arrow-right icon--rotate-90"></i>
                                     <h3 key={`${section.id}label`}>{gettext('Products')} {`(${section.name})`}</h3>
                                 </div>
                             </div>,
 
-                            <div className="products-list__heading d-flex justify-content-between align-items-center">
+                            <div key={`${section.id}product`} className="products-list__heading d-flex justify-content-between align-items-center">
                                 <span className="item--left">{gettext('Product')}</span>
                                 <span className="item--right">{gettext('Number of seats')}</span>
                             </div>,
-                                <ul key={`${section.id}product`} className="list-unstyled">
-                                    {products.filter((p) => (p.product_type || 'wire').toLowerCase() === section._id.toLowerCase())
-                                        .map((product) => (
-                                            <li key={product._id}>
-                                                <div className="products-list__product">
-                                                    <div className="products-list__product-select">
-                                                        <CheckboxInput
-                                                            name={product._id}
-                                                            label={product.name}
-                                                            value={productsEnabled.includes(product._id)}
-                                                            onChange={() => {
-                                                                toggleCompanyProduct(
+                            <ul key={`${section.id}product`} className="list-unstyled">
+                                {products.filter((p) => (p.product_type || 'wire').toLowerCase() === section._id.toLowerCase())
+                                    .map((product) => (
+                                        <li key={product._id}>
+                                            <div className="products-list__product">
+                                                <div className="products-list__product-select">
+                                                    <CheckboxInput
+                                                        name={product._id}
+                                                        label={product.name}
+                                                        value={productsEnabled.includes(product._id)}
+                                                        onChange={() => {
+                                                            toggleCompanyProduct(
+                                                                product._id,
+                                                                section._id,
+                                                                !productsEnabled.includes(product._id)
+                                                            );
+                                                        }}
+                                                    />
+                                                </div>
+                                                {!productsEnabled.includes(product._id) ? null : (
+                                                    <div className="products-list__value">
+                                                        <label
+                                                            className="a11y-only"
+                                                            htmlFor={`${product._id}_seats`}
+                                                        >
+                                                            {gettext('Seats:')}
+                                                        </label>
+                                                        <input
+                                                            data-test-id={`field-${product._id}_seats`}
+                                                            type="number"
+                                                            id={`${product._id}_seats`}
+                                                            name={`${product._id}_seats`}
+                                                            className="form-control form-control--small form-control--right form-control--compact"
+                                                            style={{maxWidth: '60px'}}
+                                                            min="0"
+                                                            tabIndex="0"
+                                                            value={(seats[product._id] || 0).toString()}
+                                                            onChange={(event) => {
+                                                                updateCompanySeats(
                                                                     product._id,
-                                                                    section._id,
-                                                                    !productsEnabled.includes(product._id)
+                                                                    parseInt(event.target.value)
                                                                 );
                                                             }}
                                                         />
                                                     </div>
-                                                    {!productsEnabled.includes(product._id) ? null : (
-                                                        <div className="products-list__value">
-                                                            <label
-                                                                className="a11y-only"
-                                                                htmlFor={`${product._id}_seats`}
-                                                            >
-                                                                {gettext('Seats:')}
-                                                            </label>
-                                                            <input
-                                                                data-test-id={`field-${product._id}_seats`}
-                                                                type="number"
-                                                                id={`${product._id}_seats`}
-                                                                name={`${product._id}_seats`}
-                                                                className="form-control form-control--small form-control--right form-control--compact"
-                                                                style={{maxWidth: '60px'}}
-                                                                min="0"
-                                                                tabIndex="0"
-                                                                value={(seats[product._id] || 0).toString()}
-                                                                onChange={(event) => {
-                                                                    updateCompanySeats(
-                                                                        product._id,
-                                                                        parseInt(event.target.value)
-                                                                    );
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </li>
-                                        ))}
-                                </ul>]
+                                                )}
+                                            </div>
+                                        </li>
+                                    ))}
+                            </ul>]
                         ))}
                     </div>
 
