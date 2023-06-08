@@ -239,7 +239,7 @@ HomeApp.propTypes = {
     filterGroupLabels: PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state) =>({
     cards: state.cards,
     itemsByCard: state.itemsByCard,
     products: state.products,
