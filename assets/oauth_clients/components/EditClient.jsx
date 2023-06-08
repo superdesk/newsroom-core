@@ -57,16 +57,16 @@ class EditClient extends React.Component {
                                 }
                             </div>
                             <div className='list-item__preview-footer'>
-                                <input
-                                    type='button'
-                                    className='btn btn-outline-primary'
-                                    value={gettext('Save')}
-                                    onClick={this.props.onSave}/>
                                 {this.props.client._id && <input
                                     type='button'
-                                    className='btn btn-outline-secondary'
+                                    className='nh-button nh-button--secondary'
                                     value={gettext('Delete')}
                                     onClick={this.props.onDelete}/>}
+                                <input
+                                    type='button'
+                                    className='nh-button nh-button--primary'
+                                    value={gettext('Save')}
+                                    onClick={this.props.onSave}/>
                             </div>
                         </form>
                     </div>

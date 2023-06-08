@@ -14,23 +14,27 @@ $labels-palette: (
 
 /// Generates base styles for a label.
 @mixin label {
-    display: inline-block;
-    padding: 0 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--space--1);
     vertical-align: middle;
-    border-radius: 2px;
+    border-radius: var(--border-radius--xs);
     text-transform: uppercase;
-    line-height: 1rem;
+    line-height: 1;
     letter-spacing: 0.125em;
     font-size: 9px;
     white-space: nowrap;
     cursor: default;
     border: 1px solid transparent;
-    font-weight: 700;
-    font-family: $font-family-sans-serif;
+    font-weight: 600;
+    font-family: var(--font-family-core--sans);
+    height: var(--label-height);
 }
 
 .label {
     @include label;
+    --label-height: 20px;
 
     background-color: transparent;
     border-style: solid;
@@ -40,7 +44,7 @@ $labels-palette: (
 
     @each $name, $color in $labels-palette {
         &.label--#{$name} {
-            border-color: $color;
+            border-color: transparent;
             color: $color;
             text-decoration-color: $color;
         }
@@ -51,9 +55,12 @@ $labels-palette: (
         }
     }
 
-    &.label--big {
+    &.label--big,
+    &.label--large {
+        --label-height: 24px;
         font-size: 11px;
-        padding: 6px 14px 5px 14px;
+        line-height: 1;
+        padding: 0 var(--space--1-5);
     }
     &.label--fill {
         @each $name, $color in $labels-palette {
@@ -68,21 +75,36 @@ $labels-palette: (
 }
 
 .label--rounded {
+    --label-height: 20px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 1px 8px 0 8px;
-    border-radius: 20px;
+    height: var(--label-height);
+    padding: 0 var(--space--1-5);
+    border-radius: var(--border-radius--full);
     font-size: 10px;
     letter-spacing: 0.125em;
+    line-height: 1;
     text-transform: uppercase;
     white-space: nowrap;
     cursor: default;
-    border: none;
+    border-color: transparent;
     font-weight: 600;
-    width: fit-content;
-    background-color: rgba($gray-mid, 0.2);
+    background-color: hsla(0, 0%, 60%, 0.25);
+    color: var(--color-text--muted);
+    &.label--alert {
+        background-color: alpha(var(--color-alert), 0.25);
+        color: lightness(var(--color-alert), 0.85);
+    }
+    &.label--big,
+    &.label--large {
+        --label-height: 24px;
+        font-size: 11px;
+        line-height: 1;
+        padding: 0 var(--space--1-5);
+    }
+
 }
 .label + .label {
-    margin-inline-start: 10px;
+    margin-inline-start: var(--space--1);
 }

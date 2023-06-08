@@ -1,38 +1,58 @@
 $enable-shadows:true;
 
 .form-control {
-  padding: 0.5rem 0.75rem;
-  display: block;
-  width: 100%;
-  font-size: var(--input-font-size);
-  font-weight: 400;
-  line-height: 1.2;
-  color: var(--color-text);
-  background-color: var(--input-color-bg);
-  border: 1px solid var(--input-color-border);
-  appearance: none;
-  border-radius: var(--input-border-radius);
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-  height: var(--input-size-height);
-  &:hover {
-    border-color: var(--input-color-border--hover);
-  }
-  &[disabled] {
-    color: var(--color-text--muted);
-    background-color: var(--input-color-bg--disabled);
-    cursor: not-allowed;
-    &:hover {
-      border-color: var(--input-color-border);
-    }
-  }
-  @include form-control-focus();
-  -webkit-appearance: menulist;
-
-  &::placeholder { 
-    color: var(--color-text--muted-2);
+    --input-size-height: var(--input-size-height--default);
+    --input-font-size: var(--input-font-size--default);
+    padding: 0.5rem 0.75rem;
+    display: block;
+    width: 100%;
+    font-size: var(--input-font-size);
     font-weight: 400;
-    font-size: 14px;
-  }
+    line-height: 1.2;
+    color: var(--color-text);
+    background-color: var(--input-color-bg);
+    border: 1px solid var(--input-color-border);
+    appearance: none;
+    border-radius: var(--input-border-radius);
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    height: var(--input-size-height);
+    &:hover {
+        border-color: var(--input-color-border--hover);
+    }
+    &[disabled] {
+        color: var(--color-text--muted);
+        background-color: var(--input-color-bg--disabled);
+        cursor: not-allowed;
+        &:hover {
+            border-color: var(--input-color-border);
+        }
+    }
+    @include form-control-focus();
+    -webkit-appearance: menulist;
+
+    &::placeholder { 
+        color: var(--color-text--muted-2);
+        font-weight: 400;
+        font-size: 14px;
+    }
+    &--small {
+        --input-size-height: var(--input-size-height--small);
+        --input-font-size: var(--input-font-size--small);
+    }
+    &--right {
+        text-align: end;
+    }
+    &--compact {
+        padding-inline: 4px;
+
+    }
+    &select {
+        --input-font-size: var(--input-font-size--default);
+    }
+
+}
+select.form-control {
+    --input-font-size: var(--input-font-size--small);
 }
 
 .input-group .form-control {
@@ -41,37 +61,37 @@ $enable-shadows:true;
 
 // Custom checkbox style
 .custom-control {
-  &.custom-checkbox {
-    margin-block-end: 0.3rem;
-  }
-  .custom-control-input {
-    margin-inline-end: .5rem;
-    margin-block-end: 0;
-  }
+    &.custom-checkbox {
+        margin-block-end: 0.3rem;
+    }
+    .custom-control-input {
+        margin-inline-end: .5rem;
+        margin-block-end: 0;
+    }
 }
 
 .custom-control-label {
-  color: var(--color-text);
-  line-height: 1.2;
-  display: flex;
-  align-items: center;
+    color: var(--color-text);
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
 
-  &:hover {
-    color: $gray-600;
-  }
+    &:hover {
+        color: $gray-600;
+    }
 
-  &::before {
-    border-width: 1px;
-    border-style: solid;
-    border-color: $gray-600;
-  }
+    &::before {
+        border-width: 1px;
+        border-style: solid;
+        border-color: $gray-600;
+    }
 }
 
 .custom-control-input:checked ~ .custom-control-label::before {
   border-color: var();
 }
 .custom-control-input:focus-visible ~ .custom-control-label::before {
-  box-shadow: 0 0 0 1px var(--color-interactive-focus), 0 0 3px 4px var(--color-interactive-focus--translucent);
+    box-shadow: 0 0 0 1px var(--color-interactive-focus), 0 0 3px 4px var(--color-interactive-focus--translucent);
 }
 
 // UI dark
@@ -88,76 +108,78 @@ $enable-shadows:true;
 }
 
 .form-check {
-  margin-block-end: 0.125rem;
-  .form-check-input {
-    border-radius: 0.15em;
-    &:focus {
-      box-shadow: 0 0 0 3px var(--color-interactive-focus--translucent);
-    }
-    &:checked {
-      background-color: var(--form-check-color-bg--checked) !important;
-      border-color: var(--form-check-color-bg--checked) !important;
-    }
-  }
-  .form-check-label {
-    font-weight: 400;
-    color: var(--color-text--muted);
-    margin-block-end: 0;
-  }
-  &.ui-dark {
-    .form-check-label {
-      color: $gray-400;      
-      font-size: 0.9rem;
-    }
+    margin-block-end: 0.125rem;
     .form-check-input {
-      background-color: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      &:checked {
-        background-color: var(--form-check-color-bg--checked) !important;
-        border-color: var(--form-check-color-bg--checked) !important;
-      }
-      &:focus {
-        box-shadow: 0 0 0 3px var(--color-interactive-focus--translucent);
-      }
+        background-color: transparent;
+        border: 2px solid var(--color-line--medium);
+        border-radius: var(--border-radius--xs);
+        &:focus {
+            box-shadow: 0 0 0 3px var(--color-interactive-focus--translucent);
+        }
+        &:checked {
+            background-color: var(--form-check-color-bg--checked) !important;
+            border-color: var(--form-check-color-bg--checked) !important;
+        }
     }
-  }
+    .form-check-label {
+        font-weight: 400;
+        color: var(--color-text--muted);
+        margin-block-end: 0;
+    }
+    &.ui-dark {
+        .form-check-label {
+            color: $gray-400;      
+            font-size: 0.9rem;
+        }
+        .form-check-input {
+            background-color: transparent;
+            border: 2px solid var(--color-line--medium);
+            &:checked {
+                background-color: var(--form-check-color-bg--checked) !important;
+                border-color: var(--form-check-color-bg--checked) !important;
+            }
+            &:focus {
+                box-shadow: 0 0 0 3px var(--color-interactive-focus--translucent);
+            }
+        }
+    }
 }
 
 .form-row {
-  &--navigation-card {
-    overflow-y: auto;
-    height: 300px;
-    width: 100%;
-  }
+    &--navigation-card {
+        overflow-y: auto;
+        height: 300px;
+        width: 100%;
+    }
 }
 .form-group {
-  margin-block-end: 1rem;
+    margin-block-end: 1rem;
 }
 
 .expiry-date {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .expiry-date__input-container {
-  display: flex;
-  flex-direction: row;
+    display: flex;
+    flex-direction: row;
 
-  .expiry-date__select-input {
-    width: auto;
-  }
+    .expiry-date__select-input {
+        width: auto;
+    }
 
-  .react-datepicker-wrapper {
-    width: 50%;
-    margin-inline-start: auto;
-  }
-  .react-datepicker__input-container {
-    width: 100%;
-    height: 100%;
-  }
+    .react-datepicker-wrapper {
+        width: 50%;
+        margin-inline-start: auto;
+    }
+    .react-datepicker__input-container {
+        width: 100%;
+        height: 100%;
+    }
 
-  .expiry-date__date-input {
-    width: 100%;
-    height: 100%;
-  }
+    .expiry-date__date-input {
+        width: 100%;
+        height: 100%;
+    }
 }

@@ -58,26 +58,9 @@ function Wire() {
                             </form>
                         </div>
                         <div className="mx-2 d-flex gap-2">
-                            <button onClick={handleClickAdvancedSearch} className='btn btn-primary' >Advanced Search</button>
-                            <button onClick={handleClickAdvancedSearchTips} className="icon-button icon-button--bordered" aria-label="Info"><i className="icon--info"></i></button>
-                        </div>
-                        {/* <div className="content-bar__right">
-                            <div className="d-flex align-items-center px-2 px-sm-3">
-                                <div className="d-flex align-items-center">
-                                    <label for="all-versions" className="mr-2">All Versions</label>
-                                    <Toggle
-                                        id="all-versions"
-                                        defaultChecked={true}
-                                        className='toggle-background'
-                                        icons={false}
-                                    />
-                                </div>
-                            </div>
-                            <div className="btn-group list-view__options" data-original-title="" title="">
-                                <button className="content-bar__menu" title="Change view" aria-label="Change view" role="button"><i className="icon--list-view"></i>
-                                </button>
-                            </div>
-                        </div>                         */}
+                            <button onClick={handleClickAdvancedSearch} className="nh-button nh-button--secondary" >Advanced Search</button>
+                            <button onClick={handleClickAdvancedSearchTips} className="icon-button icon-button--tertiary icon-button--bordered" aria-label="Info"><i className="icon--info"></i></button>
+                        </div>                     
                     </nav>
                 </section>
                 <section className="content-main">
@@ -177,8 +160,8 @@ function Wire() {
                                 <div className="navbar navbar--flex line-shadow-end--light">
                                     <div className="search-result-count">12,339 results</div>
                                     <div className="navbar__button-group">
-                                        <button class="btn btn-outline-secondary">Clear all</button>
-                                        <button onClick={handleClickTag} class="icon-button icon-button--bordered">
+                                        <button class="nh-button nh-button--tertiary">Clear all</button>
+                                        <button onClick={handleClickTag} class="icon-button icon-button--tertiary icon-button--bordered">
                                             {isTagSectionShown && <i class="icon--arrow-right icon--collapsible-open"></i>}
                                             {!isTagSectionShown && <i class="icon--arrow-right icon--collapsible-closed"></i>}
                                         </button>
@@ -187,6 +170,7 @@ function Wire() {
                                 {isTagSectionShown &&
                                     <div className="navbar navbar--flex line-shadow-end--light navbar--auto-height">
                                         <ul className="search-result__tags-list">
+                                            
                                             <li className="search-result__tags-list-row">
                                                 <span className="search-result__tags-list-row-label">Topic</span>
                                                 <div className="tags-list">
@@ -200,24 +184,17 @@ function Wire() {
                                                     </span>
                                                 </div>
                                                 <div class="tags-list-row__button-group">
-                                                    <button class="btn btn-outline-secondary btn-responsive btn--small">Update topic</button>
-                                                    <button class="btn btn-outline-secondary btn-responsive btn--small">Save as new topic</button>
+                                                    <button class="nh-button nh-button--tertiary nh-button--small">Update topic</button>
+                                                    <button class="nh-button nh-button--tertiary nh-button--small">Save as new topic</button>
                                                 </div>
                                             </li>
+
                                             <li className="search-result__tags-list-row">
-                                                <span className="search-result__tags-list-row-label">Text fields</span>
+                                                <span className="search-result__tags-list-row-label">Searched for</span>
                                                 <div className="tags-list">
                                                     <span class="tag-label">
                                                         <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">Headline</span>
-                                                        </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
-                                                        </button>
-                                                    </span>
-                                                    <span class="tag-label">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">Headline</span>
+                                                            <span class="tag-label--text">Donetsk</span>
                                                         </span>
                                                         <button class="tag-label__remove">
                                                             <i class="icon--close-thin"></i>
@@ -225,31 +202,11 @@ function Wire() {
                                                     </span>
                                                 </div>
                                             </li>
+
                                             <li className="search-result__tags-list-row">
-                                                <span className="search-result__tags-list-row-label">Search terms</span>
+                                                <span className="search-result__tags-list-row-label">Searched for</span>
                                                 <div className="tags-list">
-                                                    <span class="tag-label tag-label--info">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">Zelensky</span>
-                                                        </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
-                                                        </button>
-                                                    </span>
-                                                    <span class="tag-label tag-label--operator tag-label--info">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">or</span>
-                                                        </span>
-                                                    </span>
-                                                    <span class="tag-label tag-label--info">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">Peace</span>
-                                                        </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
-                                                        </button>
-                                                    </span>
-                                                    <span class="tag-label tag-label--operator">
+                                                <span class="tag-label tag-label--operator tag-label--success">
                                                         <span class="tag-label--text-wrapper">
                                                             <span class="tag-label--text">and</span>
                                                         </span>
@@ -262,11 +219,6 @@ function Wire() {
                                                             <i class="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--operator tag-label--success">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">and</span>
-                                                        </span>
-                                                    </span>
                                                     <span class="tag-label tag-label--success">
                                                         <span class="tag-label--text-wrapper">
                                                             <span class="tag-label--text">War</span>
@@ -275,11 +227,33 @@ function Wire() {
                                                             <i class="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--operator">
+
+                                                    <span className="tag-list__separator"></span>
+
+                                                    <span class="tag-label tag-label--operator tag-label--info">
                                                         <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">and</span>
+                                                            <span class="tag-label--text">or</span>
                                                         </span>
                                                     </span>
+                                                    <span class="tag-label tag-label--info">
+                                                        <span class="tag-label--text-wrapper">
+                                                            <span class="tag-label--text">Zelensky</span>
+                                                        </span>
+                                                        <button class="tag-label__remove">
+                                                            <i class="icon--close-thin"></i>
+                                                        </button>
+                                                    </span>
+                                                    <span class="tag-label tag-label--info">
+                                                        <span class="tag-label--text-wrapper">
+                                                            <span class="tag-label--text">Peace</span>
+                                                        </span>
+                                                        <button class="tag-label__remove">
+                                                            <i class="icon--close-thin"></i>
+                                                        </button>
+                                                    </span>
+
+                                                    <span className="tag-list__separator"></span>
+
                                                     <span class="tag-label tag-label--operator tag-label--alert">
                                                         <span class="tag-label--text-wrapper">
                                                             <span class="tag-label--text">not</span>
@@ -293,11 +267,6 @@ function Wire() {
                                                             <i class="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--operator tag-label--alert">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">not</span>
-                                                        </span>
-                                                    </span>
                                                     <span class="tag-label tag-label--alert">
                                                         <span class="tag-label--text-wrapper">
                                                             <span class="tag-label--text">Bomb</span>
@@ -307,6 +276,14 @@ function Wire() {
                                                         </button>
                                                     </span>
                                                 </div>
+                                            </li>
+                                            <li className="search-result__tags-list-row">
+                                                <span className="search-result__tags-list-row-label">Fields searched</span>
+                                                <div className="toggle-button__group toggle-button__group--spaced toggle-button__group--loose">
+                                                        <button className="toggle-button toggle-button--no-txt-transform toggle-button--small toggle-button--active">Headline</button>
+                                                        <button className="toggle-button toggle-button--no-txt-transform toggle-button--small toggle-button--active">Slugline</button>
+                                                        <button className="toggle-button toggle-button--no-txt-transform toggle-button--small">Body</button>
+                                                    </div>
                                             </li>
                                             <li className="search-result__tags-list-row">
                                                 <span className="search-result__tags-list-row-label">Filters applied</span>
@@ -376,6 +353,12 @@ function Wire() {
                                                     </span>
                                                 </div>
                                             </li>
+                                            <li className="search-result__tags-list-row">
+                                            </li>
+                                            <li className="search-result__tags-list-row">
+                                                <h4 className="pt-2">For Testing:</h4>
+                                            </li>
+
                                             <li className="search-result__tags-list-row">
                                                 <span className="search-result__tags-list-row-label">Test svih opcija</span>
                                                 <div className="tags-list">

@@ -49,7 +49,6 @@ export class UserListCompanyFilter extends React.PureComponent {
                 toggleFilter={this.onChange}
                 buttonProps={{
                     textOnly: true,
-                    iconColour: 'gray-dark'
                 }}
             />
         );

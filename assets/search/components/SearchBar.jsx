@@ -87,7 +87,7 @@ class SearchBar extends React.Component {
                 {this.props.toggleAdvancedSearchPanel == null ? this.props.toggleAdvancedSearchPanel : (
                     <div className="mx-2 d-flex gap-2">
                         <button
-                            className="btn btn-primary"
+                            className="nh-button nh-button--secondary"
                             onClick={this.props.toggleAdvancedSearchPanel}
                         >
                             {gettext('Advanced Search')}

@@ -8,13 +8,13 @@ export default class ExpiryButtonWrapper extends React.PureComponent {
             <button
                 onClick={this.props.onClick}
                 className={classNames(
-                    'expiry-date__date-input btn align-items-center px-2 btn-with-icon btn-outline-secondary',
+                    'expiry-date__date-input btn nh-dropdown-button',
                     {'active': this.props.active}
                 )}
                 disabled={this.props.disabled}
             >
                 {this.props.value}
-                <i className={classNames('icon-small--arrow-down icon--gray-dark ms-1', {'icon--white': this.props.active})}/>
+                <i className={classNames('icon-small--arrow-down')}/>
             </button>
         );
     }

@@ -104,7 +104,7 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component {
                 <form onSubmit={(event) => {event.preventDefault();}}>
                     <div className="input-group">
                         <button
-                            className="btn btn-outline-secondary"
+                            className="nh-button nh-button--secondary"
                             type="button"
                             data-bs-toggle="dropdown"
                             aria-haspopup='true'

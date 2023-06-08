@@ -89,7 +89,7 @@ function AdvancedSearchPanelComponent({
                     </div>
                     <hr className="dashed" />
                     <div className="advanced-search__content-bottom">
-                        <p>{gettext('Apply these keyword rules to these text fields:')}</p>
+                        <p>{gettext('Apply these keyword rules to at least one of these search fields:')}</p>
                         <InputWrapper>
                             <CheckboxInput
                                 name="headline"
@@ -115,13 +115,13 @@ function AdvancedSearchPanelComponent({
             </div>
             <div className="advanced-search__footer">
                 <button
-                    className="btn btn-outline-secondary"
+                    className="nh-button nh-button--secondary"
                     onClick={clearParams}
                 >
                     {gettext('Clear all')}
                 </button>
                 <button
-                    className="btn btn-primary"
+                    className="nh-button nh-button--primary"
                     onClick={() => {
                         fetchItems();
                         toggleAdvancedSearchPanel();

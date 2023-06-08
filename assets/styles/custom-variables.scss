@@ -133,13 +133,14 @@ $container-max-widths: (
     --color-interactive-focus-l: 34%;
     --color-interactive-focus: hsla(var(--color-interactive-focus-base), var(--color-interactive-focus-l), 1);
     --color-interactive-focus--translucent: hsla(var(--color-interactive-focus-base), var(--color-interactive-focus-l), 0.25);
+    --color-interactive-focus--light-bg: hsla(var(--color-interactive-focus-base), calc(var(--color-interactive-focus-l) + 50%), 1);
     --color-text--focus: var(--color-text);
     
     --color-home-section-heading: var(--color-primary);
     --color-text--slugline: hsl(201, 62%, 30%);
     --color-text-link: var(--color-primary);
     --color-text-link--navbar: var(--color-primary);
-    --color-icon-font: var(--color-primary);
+    --color-icon-font: var(--color-text--muted);
 
     // --------------------------------------------------------------------
     //     C O R E
@@ -148,6 +149,7 @@ $container-max-widths: (
     // CORE: BACKGROUNDS
     --color-background: hsl(0, 0%, 100%);
     --color-background--muted: hsl(0, 0%, 97%);
+    --color-background--muted-2: hsl(0, 0%, 95%);
 
     // CORE: CONTENT ITEM BACKGROUND
     --color-background-content-item: hsl(0, 0%, 100%);
@@ -191,10 +193,15 @@ $container-max-widths: (
     // CORE: TYPOGRAPHY
     --font-family-core--sans: "Roboto", "Helvetica Neue", Arial, sans-serif;
     --font-family-core--serif: "Merriweather", serif;
+    --font-size-base: 1rem; // 16px
+    --text-size--large: var(--font-size-base); // 16px
+    --text-size--medium: calc(var(--font-size-base) * 0.875); // 14px
+    --text-size--small: calc(var(--font-size-base) * 0.75);  // 12px
 
     // CORE: ICONS
     --icon-size--default: 24px;
-    --icon-size--small: 16px;
+    --icon-size--small: 20px;
+    --icon-size--x-small: 16px;
     --icon-color--muted: var(--color-text--muted);
     --icon-color--muted-2: var(--color-text--muted-2);
 
@@ -237,8 +244,10 @@ $container-max-widths: (
     --input-color-border: hsl(0, 0%, 86%);
     --input-color-border--hover: hsl(0, 0%, 66%);
     --input-border-radius: var(--border-radius--s);
-    --input-font-size: 1rem;
-    --input-size-height: 40px;
+    --input-font-size--default: var(--text-size--large);
+    --input-font-size--small: var(--text-size--medium);
+    --input-size-height--default: 40px;
+    --input-size-height--small: 32px;
 
     // COMPONENT: ICON BUTTON
     --icon-button-border-radius: var(--border-radius--s);
@@ -321,20 +330,17 @@ $container-max-widths: (
 
     --button-border-radius: var(--border-radius--s);
     --button-font-family: var(--font-family-core--sans);
-    --botton-font-size: 0.75rem;
+    --button-font-size: 0.75rem;
     --button-text-transform: uppercase;
     --button-letter-spacing: 0.04rem;
     --button-line-height: 1.1;
     --button-font-weight: 500;
     --button-icon-size--large: 24px;
-    --button-icon-size--small: 18px;
+    --button-icon-size--small: 20px;
     --button-gap: var(--space--1);
     --button-shadow-spread-radius: 3px;
-    
-
     --button-height: var(--size-form-element--large);
     
-
     // Primary
     --button-color-bg--primary-base: 196, 100%;
     --button-color-bg--primary-l: 34%;
@@ -385,6 +391,7 @@ $container-max-widths: (
     --toggle-button-padding: 0 1rem;
     --toggle-button-text-transform: uppercase;
     --toggle-button-height: var(--size-form-element--large);
+    --toggle-button-height--small: var(--size-form-element--small);
     --toggle-button-font-weight: 500;
 
     
@@ -453,6 +460,7 @@ $container-max-widths: (
 .navbar {
     flex-shrink: 0;
     flex-grow: 0;
+    gap: var(--space--1);
     &.navbar--flex {
         display: flex;
         align-items: center;

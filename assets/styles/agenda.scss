@@ -7,9 +7,8 @@
     z-index: 100;
     background-color: white;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-
-    padding-inline-start: 0 !important;
     padding-inline-end: 0 !important;
+    gap: var(--space--1);
 
     @include phone {
         justify-content: space-evenly;
