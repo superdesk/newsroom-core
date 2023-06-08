@@ -82,7 +82,7 @@ class HomeApp extends React.Component {
     getPanels(card) {
         if (this.state.loadingItems) {
             return (
-                <CardRow key={card.label} title={card.label} product={this.getProduct(card)} userProducts={this.props.userProducts} isActive={this.props.activeCard === card._id}>
+                <CardRow key={card.label} title={card.label} product={this.getProduct(card)} isActive={this.props.activeCard === card._id}>
                     <div className='col-sm-6 col-md-4 col-lg-3 col-xxl-2 d-flex mb-4'>
                         <div className="spinner-border text-success" />
                         <span className="a11y-only">{gettext('Loading Card Items')}</span>
@@ -237,7 +237,6 @@ HomeApp.propTypes = {
     isFollowing: PropTypes.bool,
     isSearchEnabled: PropTypes.bool,
     filterGroupLabels: PropTypes.object,
-    userProducts: PropTypes.array,
 };
 
 const mapStateToProps = (state) =>({
