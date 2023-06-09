@@ -548,8 +548,10 @@ class BaseSearchService(Service):
         if not search.is_admin:
             if not search.company:
                 abort(403, gettext("User does not belong to a company."))
-            elif not len(search.products) and self.is_product_assigned_to_company(search):
+            elif not len(search.products):
                 abort(403, gettext("Your company doesn't have any products defined."))
+            elif len(search.products) and self.is_product_assigned_to_company(search):
+                abort(403, gettext("Your product is not assigned to your company."))
             # If a product list string has been provided it is assumed to be a comma delimited string of product id's
             elif search.args.get("requested_products"):
                 # Ensure that all the provided products are permissioned for this request
