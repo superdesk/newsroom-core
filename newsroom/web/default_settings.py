@@ -497,7 +497,7 @@ SAML_LABEL = "SSO"
 #:
 SAML_CLIENTS: List[str] = []
 
-#: Base path for SAML_COMPANIES config
+#: Base path for SAML_CLIENTS config
 #:
 #: .. versionadded:: 2.5
 #:
