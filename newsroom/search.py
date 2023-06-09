@@ -548,13 +548,22 @@ class BaseSearchService(Service):
         if not search.is_admin:
             if not search.company:
                 abort(403, gettext("User does not belong to a company."))
-            elif not len(search.products):
+            elif not len(search.products) and self.is_product_assigned_to_company(search):
                 abort(403, gettext("Your company doesn't have any products defined."))
             # If a product list string has been provided it is assumed to be a comma delimited string of product id's
             elif search.args.get("requested_products"):
                 # Ensure that all the provided products are permissioned for this request
                 if not all(p in [c.get("_id") for c in search.products] for p in search.args["requested_products"]):
                     abort(404, gettext("Invalid product parameter"))
+
+    def is_product_assigned_to_company(self, search):
+        """Check the product is assigned to a company
+
+        :param SearchQuery search: The search query instance
+        """
+        product_id = search.products[0].get("_id")
+        company_products = search.company.get("products", [])
+        return product_id not in (product.get("_id") for product in company_products)
 
     def apply_section_filter(self, search, filters=None):
         """Generate the section filter
