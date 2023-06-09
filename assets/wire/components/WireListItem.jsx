@@ -265,7 +265,9 @@ class WireListItem extends React.Component {
 
                         {isExtended && (
                             <div className="wire-articles__item__text">
-                                {<p>{shortText(item, 40, listConfig)}</p>}
+                                {item.es_highlight ? <div
+                                    dangerouslySetInnerHTML={({__html:item.es_highlight.body_html && item.es_highlight.body_html[0]})}
+                                /> : <p>{shortText(item, 40, listConfig)}</p>}
                             </div>
                         )}
 
