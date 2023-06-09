@@ -550,7 +550,9 @@ class BaseSearchService(Service):
                 abort(403, gettext("User does not belong to a company."))
             elif not len(search.products):
                 abort(403, gettext("Your company doesn't have any products defined."))
-            elif len(search.products) and self.is_product_assigned_to_company(search):
+            elif (
+                search.args.get("product") and len(search.products) and not self.is_product_assigned_to_company(search)
+            ):
                 abort(403, gettext("Your product is not assigned to your company."))
             # If a product list string has been provided it is assumed to be a comma delimited string of product id's
             elif search.args.get("requested_products"):
@@ -565,7 +567,7 @@ class BaseSearchService(Service):
         """
         product_id = search.products[0].get("_id")
         company_products = search.company.get("products", [])
-        return product_id not in (product.get("_id") for product in company_products)
+        return product_id in (product.get("_id") for product in company_products)
 
     def apply_section_filter(self, search, filters=None):
         """Generate the section filter
