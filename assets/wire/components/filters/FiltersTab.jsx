@@ -131,6 +131,7 @@ class FiltersTab extends React.Component {
                             key="created"
                             createdFilter={createdFilter}
                             setCreatedFilter={this.setCreatedFilterAndSearch}
+                            context = {this.props.context}
                         />)
                     ])}
                 </div>
@@ -166,6 +167,7 @@ FiltersTab.propTypes = {
     fetchItems: PropTypes.func.isRequired,
     groups: PropTypes.array,
     selectDate: PropTypes.func,
+    context: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
@@ -174,6 +176,7 @@ const mapStateToProps = (state) => ({
     createdFilter: searchCreatedSelector(state),
     resultsFiltered: resultsFilteredSelector(state),
     isLoading: state.loadingAggregations,
+    context: state.context
 });
 
 const mapDispatchToProps = {
