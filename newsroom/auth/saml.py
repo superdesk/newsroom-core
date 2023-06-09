@@ -131,6 +131,7 @@ def saml():
             session[SESSION_USERDATA_KEY] = auth.get_attributes()
         else:
             logger.error("SAML %s reason=%s", errors, auth.get_last_error_reason())
+            logger.info("SAML response %s", auth.get_last_response_xml())
             flash(_("There was an error when using SSO"), "danger")
             return redirect(url_for("auth.login", user_error=1))
     elif "sls" in request.args:
