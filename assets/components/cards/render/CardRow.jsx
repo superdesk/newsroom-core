@@ -22,7 +22,7 @@ class CardRow extends React.Component {
 
         return (
             <div className='row' ref={(elem) => (this.cardElem = elem)}>
-                {<MoreNewsButton title={title} product={product} moreNews = {moreNews} />}
+                <MoreNewsButton title={title} product={product} moreNews = {moreNews}/>
                 {children}
             </div>
         );
