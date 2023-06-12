@@ -10,7 +10,7 @@ import superdesk
 from superdesk import register_resource  # noqa
 from typing import Dict, List, Tuple
 
-__version__ = "2.4.0"
+__version__ = "2.4.1"
 
 # reuse content api dbs
 MONGO_PREFIX = "CONTENTAPI_MONGO"
