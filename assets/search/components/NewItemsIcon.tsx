@@ -46,7 +46,7 @@ class NewItemsIcon extends React.Component {
         return (
             <button
                 type="button"
-                ref={(elem) => this.dom.tooltip = elem}
+                ref={(elem: any) => this.dom.tooltip = elem}
                 title={newItemsTooltip}
                 className="button__reset-styles d-flex align-items-center ms-3"
                 onClick={this.props.refresh}

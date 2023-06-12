@@ -85,13 +85,13 @@ DownloadItemsModal.propTypes = {
     secondaryOptions: PropTypes.array,
 };
 
-const mapStateToProps = (state, props) => ({
+const mapStateToProps = (state: any, props: any) => ({
     options: modalOptions(state, props),
     context: context(state),
     secondaryOptions: modalSecondaryFormatOptions(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     onSubmit: ({items, params}) => dispatch(submitDownloadItems(items, params)),
     modalFormValid: () => dispatch(modalFormValid()),
 });

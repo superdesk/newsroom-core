@@ -21,7 +21,7 @@ class CardRow extends React.Component {
         }
 
         return (
-            <div className='row' ref={(elem) => (this.cardElem = elem)}>
+            <div className='row' ref={(elem: any) => (this.cardElem = elem)}>
                 {moreNews && <MoreNewsButton title={title} product={product} />}
                 {children}
             </div>
@@ -40,7 +40,7 @@ CardRow.propTypes = {
     userType: PropTypes.string,
 };
 
-const mapStateToProps = (state) =>  ({
+const mapStateToProps = (state: any) =>  ({
     userProducts: state.userProducts,
     userType: state.userType,
 });

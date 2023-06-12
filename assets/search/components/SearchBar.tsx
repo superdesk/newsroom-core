@@ -108,7 +108,7 @@ SearchBar.propTypes = {
     toggleAdvancedSearchPanel: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     query: searchQuerySelector(state),
 });
 

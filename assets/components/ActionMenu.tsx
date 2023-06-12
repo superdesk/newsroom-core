@@ -22,8 +22,8 @@ class ActionMenu extends React.Component {
         return (
             <div className='btn-group'>
                 <button
-                    ref={(elem) => this.referenceElem = elem}
-                    onClick={(event) => onActionList(event, item, group, plan)}
+                    ref={(elem: any) => this.referenceElem = elem}
+                    onClick={(event: any) => onActionList(event, item, group, plan)}
                     className="icon-button icon-button--secondary"
                     aria-label={gettext('More Actions')}>
                     <i className='icon--more'></i>

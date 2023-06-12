@@ -93,7 +93,7 @@ SearchResultsInfo.defaultProps = {
     showSaveTopic: false,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     user: state.userObject,
     searchParams: searchParamsSelector(state),
 });

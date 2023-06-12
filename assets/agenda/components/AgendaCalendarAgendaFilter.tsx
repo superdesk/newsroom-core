@@ -15,7 +15,7 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent {
             field: 'calendar',
             icon: 'icon-small--calendar',
             itemTypes: ['events', 'combined'],
-            isItemActive: (key) => (
+            isItemActive: (key: any) => (
                 (this.props.activeFilter.calendar || []).includes(key)
             ),
         };
@@ -25,7 +25,7 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent {
             nestedField: 'agenda',
             icon: 'icon-small--calendar',
             itemTypes: ['planning', 'combined'],
-            isItemActive: (key) => (
+            isItemActive: (key: any) => (
                 (this.props.activeFilter.agendas || []).includes(key)
             ),
         };

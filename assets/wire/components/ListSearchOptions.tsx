@@ -27,7 +27,7 @@ export class ListSearchOptions extends React.PureComponent {
         return (
             <div
                 className="btn-group"
-                ref={(elem) => this.btnGroup = elem}
+                ref={(elem: any) => this.btnGroup = elem}
             >
                 <button
                     id="listSearchOptionsButton"

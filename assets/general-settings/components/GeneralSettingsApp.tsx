@@ -85,7 +85,7 @@ class GeneralSettingsApp extends React.Component {
                         label={gettext(field.label)}
                         value={this.state.values[_id]}
                         placeholder={field.default ? field.default.toString() : ''}
-                        onChange={(event) => this.onChange(_id, event.target.value)}
+                        onChange={(event: any) => this.onChange(_id, event.target.value)}
                         description={gettext(field.description)}
                         min={field.min}
                     />
@@ -124,7 +124,7 @@ GeneralSettingsApp.propTypes = {
     versionCreator: PropTypes.string,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     config: state.config,
     updatedTime: state._updated,
     versionCreator: state.version_creator,

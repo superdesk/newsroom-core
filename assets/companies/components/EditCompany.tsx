@@ -225,7 +225,7 @@ EditCompany.propTypes = {
     })).isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     company: state.companyToEdit,
     companiesById: state.companiesById,
     sections: state.sections,
@@ -237,16 +237,16 @@ const mapStateToProps = (state) => ({
     ssoEnabled: state.ssoEnabled,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    onChange: (event) => dispatch(editCompany(event)),
-    toggleCompanySection: (sectionId) => dispatch(toggleCompanySection(sectionId)),
-    toggleCompanyProduct: (productId, sectionId, enable) => dispatch(toggleCompanyProduct(productId, sectionId, enable)),
-    updateCompanySeats: (productId, seats) => dispatch(updateCompanySeats(productId, seats)),
-    saveCompany: (permissions) => dispatch(postCompany(permissions)),
-    setError: (errors) => dispatch(setError(errors)),
+const mapDispatchToProps = (dispatch: any) => ({
+    onChange: (event: any) => dispatch(editCompany(event)),
+    toggleCompanySection: (sectionId: any) => dispatch(toggleCompanySection(sectionId)),
+    toggleCompanyProduct: (productId: any, sectionId: any, enable: any) => dispatch(toggleCompanyProduct(productId, sectionId, enable)),
+    updateCompanySeats: (productId: any, seats: any) => dispatch(updateCompanySeats(productId, seats)),
+    saveCompany: (permissions: any) => dispatch(postCompany(permissions)),
+    setError: (errors: any) => dispatch(setError(errors)),
     deleteCompany: () => dispatch(deleteCompany()),
-    cancelEdit: (event) => dispatch(cancelEdit(event)),
-    fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId)),
+    cancelEdit: (event: any) => dispatch(cancelEdit(event)),
+    fetchCompanyUsers: (companyId: any) => dispatch(fetchCompanyUsers(companyId)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditCompany);

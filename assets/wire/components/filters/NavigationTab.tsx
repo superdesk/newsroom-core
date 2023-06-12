@@ -19,7 +19,7 @@ function NavigationTab({
     const navLinks = navigations.map((navigation) => (
         <NavLink key={navigation.name}
             isActive={activeNavigation.includes(navigation._id) || navigations.length === 1}
-            onClick={(event) => {
+            onClick={(event: any) => {
                 event.preventDefault();
                 toggleNavigation(navigation, disableSameNavigationDeselect);
                 fetchItems();
@@ -31,7 +31,7 @@ function NavigationTab({
     const all = (
         <NavLink key="all"
             isActive={noNavigationSelected(activeNavigation)}
-            onClick={(event) => {
+            onClick={(event: any) => {
                 event.preventDefault();
                 toggleNavigation();
                 fetchItems();

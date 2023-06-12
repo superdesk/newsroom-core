@@ -66,7 +66,7 @@ class WirePreview extends React.PureComponent {
                 </div>
                 <div
                     id='preview-article'
-                    ref={(preview) => this.preview = preview}
+                    ref={(preview: any) => this.preview = preview}
                     className={classNames(
                         'wire-column__preview__content',
                         {noselect: this.props.previewConfig.disable_text_selection}

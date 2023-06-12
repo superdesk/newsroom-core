@@ -121,12 +121,12 @@ AgendaPreviewEventComponent.propTypes = {
     fetchEvent: PropTypes.func,
 };
 
-const mapStateToProps = (state, ownProps) => ({
+const mapStateToProps = (state: any, ownProps: any) => ({
     event: state.itemsById[ownProps.item.event_id],
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    fetchEvent: (eventId) => dispatch(fetchItem(eventId)),
+const mapDispatchToProps = (dispatch: any) => ({
+    fetchEvent: (eventId: any) => dispatch(fetchItem(eventId)),
 });
 
 export const AgendaPreviewEvent = connect(mapStateToProps, mapDispatchToProps)(AgendaPreviewEventComponent);

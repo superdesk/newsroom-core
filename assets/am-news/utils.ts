@@ -2,16 +2,16 @@ import {get} from 'lodash';
 import {gettext} from '../utils';
 
 
-export const isFuel = (item) => (get(item, 'slugline') || '').match(/fuel/gi);
-export const isWeather = (item) => (get(item, 'slugline') || '').match(/weather|observation|forecast/gi);
-export const isTraffic = (item) => (get(item, 'slugline') || '').match(/traffic/gi);
-export const isPublicTransport = (item) => (get(item, 'slugline') || '').match(/public transport/gi);
-export const isAlert = (item) => !isFuel(item) && (get(item, 'slugline') || '').match(/^alert /gi);
-export const isQuote = (item) => !isFuel(item) && (get(item, 'slugline') || '').match(/^quote /gi);
-export const isHeadlines = (item) => !isFuel(item) && (get(item, 'slugline') || '').match(/headlines/gi);
-export const isDataItem = (item) => (isFuel(item) || isWeather(item));
+export const isFuel = (item: any) => (get(item, 'slugline') || '').match(/fuel/gi);
+export const isWeather = (item: any) => (get(item, 'slugline') || '').match(/weather|observation|forecast/gi);
+export const isTraffic = (item: any) => (get(item, 'slugline') || '').match(/traffic/gi);
+export const isPublicTransport = (item: any) => (get(item, 'slugline') || '').match(/public transport/gi);
+export const isAlert = (item: any) => !isFuel(item) && (get(item, 'slugline') || '').match(/^alert /gi);
+export const isQuote = (item: any) => !isFuel(item) && (get(item, 'slugline') || '').match(/^quote /gi);
+export const isHeadlines = (item: any) => !isFuel(item) && (get(item, 'slugline') || '').match(/headlines/gi);
+export const isDataItem = (item: any) => (isFuel(item) || isWeather(item));
 
-export const getAMNewsIcon = (item) => {
+export const getAMNewsIcon = (item: any) => {
     let iconType = 'text';
 
     if (isDataItem(item)) {
@@ -33,7 +33,7 @@ export const getAMNewsIcon = (item) => {
     return iconType;
 };
 
-export const getAMNewsToolTip = (item) => {
+export const getAMNewsToolTip = (item: any) => {
     let iconType = gettext('Text');
 
     if (isDataItem(item)) {

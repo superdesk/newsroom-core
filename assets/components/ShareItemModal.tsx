@@ -32,7 +32,7 @@ class ShareItemModal extends React.Component {
     }
 
     onChangeHandler(field) {
-        return (event) => {
+        return (event: any) => {
             this.setState({
                 [field]: event.target.value,
             });
@@ -149,10 +149,10 @@ ShareItemModal.propTypes = {
     }),
 };
 
-const mapStateToProps = (state) => ({formValid: get(state, 'modal.formValid')});
+const mapStateToProps = (state: any) => ({formValid: get(state, 'modal.formValid')});
 
-const mapDispatchToProps = (dispatch) => ({
-    submit: (isFolllowedTopic, data) => isFolllowedTopic ? dispatch(submitShareTopic(data)) : dispatch(submitShareItem(data)),
+const mapDispatchToProps = (dispatch: any) => ({
+    submit: (isFolllowedTopic: any, data: any) => isFolllowedTopic ? dispatch(submitShareTopic(data)) : dispatch(submitShareItem(data)),
     modalFormInvalid: () => dispatch(modalFormInvalid()),
     modalFormValid: () => dispatch(modalFormValid()),
 });

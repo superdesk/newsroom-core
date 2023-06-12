@@ -17,7 +17,7 @@ export default function AgendaEdNote({item, plan, secondaryNoteField, noMargin})
     }
 
     const tooltip = !item.ednote && !planEdnote ? gettext('Reason') : gettext('Editorial Note');
-    const fixText = (text) => {
+    const fixText = (text: any) => {
         // remove prefixes added by planning
         // which are always in english
         const POSTPONED = 0;

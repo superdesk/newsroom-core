@@ -120,7 +120,7 @@ MonitoringPanel.propTypes = {
     saveMonitoringProfileSchedule: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     monitoringList: monitoringList(state),
     monitoringProfileToEdit: state.monitoringProfileToEdit,
     companies: state.companies,
@@ -130,14 +130,14 @@ const mapStateToProps = (state) => ({
     scheduleMode: state.scheduleMode,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    selectMonitoringProfile: (_id) => dispatch(selectMonitoringProfile(_id)),
-    updateMonitoringProfile: (event) => dispatch(updateMonitoringProfile(event)),
+const mapDispatchToProps = (dispatch: any) => ({
+    selectMonitoringProfile: (_id: any) => dispatch(selectMonitoringProfile(_id)),
+    updateMonitoringProfile: (event: any) => dispatch(updateMonitoringProfile(event)),
     postMonitoringProfile: () => dispatch(postMonitoringProfile()),
-    deleteMonitoringProfile: (type) => dispatch(deleteMonitoringProfile(type)),
-    cancelEdit: (event) => dispatch(cancelEdit(event)),
-    fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId, true)),
-    saveMonitoringProfileUsers: (users) => dispatch(saveMonitoringProfileUsers(users)),
+    deleteMonitoringProfile: (type: any) => dispatch(deleteMonitoringProfile(type)),
+    cancelEdit: (event: any) => dispatch(cancelEdit(event)),
+    fetchCompanyUsers: (companyId: any) => dispatch(fetchCompanyUsers(companyId, true)),
+    saveMonitoringProfileUsers: (users: any) => dispatch(saveMonitoringProfileUsers(users)),
     saveMonitoringProfileSchedule: () => dispatch(saveMonitoringProfileSchedule()),
     dispatch: dispatch,
 });

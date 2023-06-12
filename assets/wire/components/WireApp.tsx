@@ -342,7 +342,7 @@ WireApp.propTypes = {
     filterGroupLabels: PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     state: state,
     isLoading: state.isLoading,
     newsOnlyFilterText: state.newsOnlyFilterText,
@@ -378,8 +378,8 @@ const mapStateToProps = (state) => ({
     filterGroupLabels: filterGroupsToLabelMap(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    followStory: (item) => followStory(item, 'wire'),
+const mapDispatchToProps = (dispatch: any) => ({
+    followStory: (item: any) => followStory(item, 'wire'),
     fetchItems: () => dispatch(fetchItems()),
     toggleNews: () => {
         dispatch(toggleNews());
@@ -389,12 +389,12 @@ const mapDispatchToProps = (dispatch) => ({
         dispatch(toggleSearchAllVersions());
         dispatch(fetchItems());
     },
-    setQuery: (query) => dispatch(setQuery(query)),
+    setQuery: (query: any) => dispatch(setQuery(query)),
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
-    setView: (view) => dispatch(setView(view)),
+    setView: (view: any) => dispatch(setView(view)),
     closePreview: () => dispatch(previewItem(null)),
-    downloadMedia: (href, id, mimeType) => dispatch(downloadMedia(href, id, mimeType)),
+    downloadMedia: (href: any, id: any, mimeType: any) => dispatch(downloadMedia(href, id, mimeType)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WireApp);

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import MoreNewsButton from './MoreNewsButton';
 
-const getMediaPanel = (photo, index) => {
+const getMediaPanel = (photo: any, index: any) => {
     return (<div key={index} className='col-sm-6 col-lg-3 d-flex mb-4'>
         <div className='card card--home card--gallery'
             onClick={()=>{window.open(photo.href,'_blank');}}>

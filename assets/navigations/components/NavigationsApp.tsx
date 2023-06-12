@@ -50,7 +50,7 @@ NavigationsApp.propTypes = {
     activeSection: PropTypes.string.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     sections: uiSectionsSelector(state),
     activeSection: activeSectionSelector(state),
 });

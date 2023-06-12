@@ -9,7 +9,7 @@ import FilterItem from './FilterItem';
 
 const LIMIT = 5;
 
-const getVisibleBuckets = (buckets, group, toggleGroup) => {
+const getVisibleBuckets = (buckets: any, group: any, toggleGroup: any) => {
     if (!buckets.length) {
         return;
     }
@@ -17,7 +17,7 @@ const getVisibleBuckets = (buckets, group, toggleGroup) => {
     let visibleBuckets = buckets;
     if (buckets.length > LIMIT && !group.isOpen) {
         visibleBuckets = buckets.slice(0, LIMIT).concat([
-            <a key={'more'} onClick={(event) => toggleGroup(event, group)} className="small" href="">
+            <a key={'more'} onClick={(event: any) => toggleGroup(event, group)} className="small" href="">
                 {gettext('Show more')}
             </a>
         ]);
@@ -25,7 +25,7 @@ const getVisibleBuckets = (buckets, group, toggleGroup) => {
 
     if (buckets.length > LIMIT && group.isOpen) {
         visibleBuckets = buckets.concat([
-            <a key={'less'} onClick={(event) => toggleGroup(event, group)} className="small" href="">
+            <a key={'less'} onClick={(event: any) => toggleGroup(event, group)} className="small" href="">
                 {gettext('Show less')}
             </a>
         ]);
@@ -55,7 +55,7 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
         );
     }
 
-    const compareFunction = (a, b) => group.sorted ? -1 : String(a.key).localeCompare(String(b.key));
+    const compareFunction = (a: any, b: any) => group.sorted ? -1 : String(a.key).localeCompare(String(b.key));
 
     const groupFilter = get(activeFilter, group.field, []);
     const activeBuckets = (get(activeFilter, group.field) || [])

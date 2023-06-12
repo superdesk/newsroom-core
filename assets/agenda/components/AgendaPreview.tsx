@@ -78,7 +78,7 @@ class AgendaPreview extends React.PureComponent {
 
                     <div
                         id='preview-article'
-                        ref={(preview) => this.preview = preview}
+                        ref={(preview: any) => this.preview = preview}
                         className={classNames(
                             'wire-column__preview__content pt-0',
                             {noselect: this.props.previewConfig.disable_text_selection}

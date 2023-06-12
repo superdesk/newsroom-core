@@ -5,7 +5,7 @@ import CardFooter from './CardFooter';
 import CardBody from './CardBody';
 import CardRow from './CardRow';
 
-const getPictureTextPanel = (item, picture, openItem, cardId, listConfig) => {
+const getPictureTextPanel = (item: any, picture: any, openItem: any, cardId: any, listConfig: any) => {
     const rendition = getThumbnailRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);

@@ -70,7 +70,7 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component {
                 _id: section._id,
                 name: section.name,
                 products: this.props.products.filter(
-                    (product) => (product.product_type === section._id)
+                    (product: any) => (product.product_type === section._id)
                 ),
             });
         });
@@ -101,7 +101,7 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component {
                 closeModal={this.props.closeModal}
                 clickOutsideToClose={true}
             >
-                <form onSubmit={(event) => {event.preventDefault();}}>
+                <form onSubmit={(event: any) => {event.preventDefault();}}>
                     <div className="tags-list">
                         <button
                             className="icon-button icon-button--primary icon-button--small icon-button--bordered"
@@ -183,15 +183,15 @@ CompanyAdminProductSeatRequestModalComponent.propTypes = {
     modalFormValid: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     products: productListSelector(state),
     productIds: get(state, 'modal.data.productIds') || [],
     sections: currentCompanySectionListSelector(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     closeModal: () => dispatch(closeModal()),
-    sendRequest: (data) => dispatch(sendProductSeatRequest(data)),
+    sendRequest: (data: any) => dispatch(sendProductSeatRequest(data)),
     modalFormInvalid: () => dispatch(modalFormInvalid()),
     modalFormValid: () => dispatch(modalFormValid()),
 });

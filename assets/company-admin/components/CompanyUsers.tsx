@@ -59,7 +59,7 @@ CompanyUsersComponent.propTypes = {
     companySections: PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     users: userIdSelector(state),
     usersById: userIdMapSelector(state),
     activeUserId: state.activeUserId,
@@ -67,8 +67,8 @@ const mapStateToProps = (state) => ({
     companySections: companySectionListSelector(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    selectUser: (userId) => dispatch(_selectUser(userId)),
+const mapDispatchToProps = (dispatch: any) => ({
+    selectUser: (userId: any) => dispatch(_selectUser(userId)),
 });
 
 export const CompanyUsers = connect(mapStateToProps, mapDispatchToProps)(CompanyUsersComponent);

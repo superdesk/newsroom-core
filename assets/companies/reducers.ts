@@ -115,7 +115,7 @@ export default function companyReducer(state: any = initialState, action: any) {
             });
         } else {
             company.products = company.products.filter(
-                (product) => (
+                (product: any) => (
                     product._id !== productId
                 )
             );

@@ -5,7 +5,7 @@ import CardBody from './CardBody';
 import CardRow from './CardRow';
 import {getPicture} from 'wire/utils';
 
-const getTextOnlyPanel = (item, openItem, cardId, listConfig) => (
+const getTextOnlyPanel = (item: any, openItem: any, cardId: any, listConfig: any) => (
     <div key={item._id} className='col-sm-6 col-lg-4 d-flex mb-4'>
         <div className='card card--home' onClick={() => openItem(item, cardId)}>
             <CardBody item={item} displaySource={false} listConfig={listConfig} />

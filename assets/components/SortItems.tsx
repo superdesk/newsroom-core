@@ -44,7 +44,7 @@ class SortItems extends React.Component {
                 <button type="button"
                     className="icon-button icon-button--small float-end"
                     aria-label={gettext('Close')}
-                    onClick={(e) => {
+                    onClick={(e: any) => {
                         e.preventDefault();
                         e.stopPropagation();
                         this.onRemove(item);

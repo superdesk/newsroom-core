@@ -75,7 +75,7 @@ CompanyDetailsProductFilterComponent.propTypes = {
     companySections: PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     currentCompany: currentCompanySelector(state),
     companySections: companySectionListSelector(state),
 });

@@ -26,7 +26,7 @@ class SearchSidebar extends React.Component {
                                 aria-selected={`${this.state.active === tab.id ? 'true' : 'false'}`}
                                 aria-label={tab.label}
                                 href=''
-                                onClick={(event) => {
+                                onClick={(event: any) => {
                                     event.preventDefault();
                                     setActiveFilterTab(tab.id, this.props.props.context);
                                     this.setState({active: tab.id});

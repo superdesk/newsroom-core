@@ -243,7 +243,7 @@ CompanyAdminAppComponent.propTypes = {
     totalUsers:PropTypes.number
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     sectionId: state.sectionId,
     usersById: state.usersById,
     user: currentUserSelector(state),
@@ -258,22 +258,22 @@ const mapStateToProps = (state) => ({
     totalUsers:state.totalUsers
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    setSection: (sectionId) => dispatch(setSection(sectionId)),
+const mapDispatchToProps = (dispatch: any) => ({
+    setSection: (sectionId: any) => dispatch(setSection(sectionId)),
     newUser: () => dispatch(newUser()),
-    editUser: (event) => dispatch(editUser(event)),
-    setError: (errors) => dispatch(setError(errors)),
+    editUser: (event: any) => dispatch(editUser(event)),
+    setError: (errors: any) => dispatch(setError(errors)),
     saveUser: () => dispatch(postUser()),
     closeUserEditor: () => dispatch(cancelEdit()),
     deleteUser: () => dispatch(deleteUser()),
     resetPassword: () => dispatch(resetPassword()),
     resendUserInvite: () => dispatch(resendUserInvite()),
 
-    setQuery: (query) => dispatch(setSearchQuery(query)),
+    setQuery: (query: any) => dispatch(setSearchQuery(query)),
     fetchUsers: () => dispatch(fetchUsers()),
-    setSort: (param) => dispatch(setSort(param)),
+    setSort: (param: any) => dispatch(setSort(param)),
     toggleSortDirection: () => dispatch(toggleSortDirection()),
-    setProductFilter: (productId) => dispatch(setProductFilter(productId)),
+    setProductFilter: (productId: any) => dispatch(setProductFilter(productId)),
 });
 
 export const CompanyAdminApp = connect(mapStateToProps, mapDispatchToProps)(CompanyAdminAppComponent);

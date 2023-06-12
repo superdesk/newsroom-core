@@ -29,7 +29,7 @@ window.moment = moment;
 // CP don't want 2e 3e etc., only 1er
 if (getLocale() === 'fr_CA') {
     moment.updateLocale('fr-ca', {
-        ordinal: (number) => number + (number === 1 ? 'er' : ''),
+        ordinal: (number: any) => number + (number === 1 ? 'er' : ''),
         weekdays: 'Dimanche_Lundi_Mardi_Mercredi_Jeudi_Vendredi_Samedi'.split('_'),
     });
 }
@@ -102,7 +102,7 @@ export function createStore(reducer: any, name: any = 'default') {
                 duration: true,
                 collapsed: true,
                 timestamp: false,
-                titleFormatter: (action, time, took) => (
+                titleFormatter: (action: any, time: any, took: any) => (
                     // Adds the name of the store to the console logs
                     // derived based on the defaultTitleFormatter from redux-logger
                     // https://github.com/LogRocket/redux-logger/blob/master/src/core.js#L25
@@ -359,9 +359,9 @@ export function formatMonth(dateString: any) {
  * Wrapper for alertifyjs
  */
 export const notify = {
-    success: (message) => alertify.success(message),
-    error: (message) => alertify.error(message),
-    warning: (message) => alertify.warning(message),
+    success: (message: any) => alertify.success(message),
+    error: (message: any) => alertify.error(message),
+    warning: (message: any) => alertify.warning(message),
 };
 
 /**
@@ -572,7 +572,7 @@ export function isWireContext() {
     return window.location.pathname.includes('/wire');
 }
 
-export const getInitData = (data) => {
+export const getInitData = (data: any) => {
     let initData = data || {};
     return {
         ...initData,
@@ -580,7 +580,7 @@ export const getInitData = (data) => {
     };
 };
 
-export const isDisplayed = (field, config) => get(config, `${field}.displayed`, true);
+export const isDisplayed = (field: any, config: any) => get(config, `${field}.displayed`, true);
 
 const getNow = throttle(moment, 500);
 
@@ -664,7 +664,7 @@ export function getSlugline(item: any, withTakeKey: any = false) {
  */
 export function isActionEnabled(configKey: any) {
     const config = getConfig(configKey, {});
-    return (action) => config[action.id] == null || config[action.id];
+    return (action: any) => config[action.id] == null || config[action.id];
 }
 
 export const getPlainTextMemoized = memoize((html) => getTextFromHtml(html));

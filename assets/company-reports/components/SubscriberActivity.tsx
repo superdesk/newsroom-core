@@ -49,7 +49,7 @@ class SubscriberActivity extends React.Component {
 
     getDropdownItems(filter) {
         const {toggleFilterAndQuery, sections, apiEnabled} = this.props;
-        let getName = (text) => (text);
+        let getName = (text: any) => (text);
         let itemsArray = [];
         // Company is not filtered, always show full list
         switch(filter.field) {
@@ -213,7 +213,7 @@ SubscriberActivity.propTypes = {
     apiEnabled: PropTypes.bool,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     companies: state.companies,
     reportParams: state.reportParams,
     isLoading: state.isLoading,

@@ -8,12 +8,12 @@ function updateValues(data: any) {
 }
 
 export function save(values: any) {
-    return (dispatch) => {
+    return (dispatch: any) => {
         server.post('/settings/general_settings', values)
             .then((data) => {
                 notify.success(gettext('Settings were updated successfully.'));
                 dispatch(updateValues(data));
-            }, (reason) => errorHandler(reason));
+            }, (reason: any) => errorHandler(reason));
     };
 }
 

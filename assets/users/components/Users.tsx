@@ -133,7 +133,7 @@ Users.propTypes = {
     products: PropTypes.arrayOf(PropTypes.object),
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     users: state.users.map((id) => state.usersById[id]),
     usersById: state.usersById,
     userToEdit: state.userToEdit,
@@ -148,15 +148,15 @@ const mapStateToProps = (state) => ({
     products: state.products,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    selectUser: (_id) => dispatch(selectUser(_id)),
-    editUser: (event) => dispatch(editUser(event)),
-    saveUser: (type) => dispatch(postUser(type)),
-    deleteUser: (type) => dispatch(deleteUser(type)),
+const mapDispatchToProps = (dispatch: any) => ({
+    selectUser: (_id: any) => dispatch(selectUser(_id)),
+    editUser: (event: any) => dispatch(editUser(event)),
+    saveUser: (type: any) => dispatch(postUser(type)),
+    deleteUser: (type: any) => dispatch(deleteUser(type)),
     resendUserInvite: () => dispatch(resendUserInvite()),
-    newUser: (data) => dispatch(newUser(data)),
+    newUser: (data: any) => dispatch(newUser(data)),
     resetPassword: () => dispatch(resetPassword()),
-    cancelEdit: (event) => dispatch(cancelEdit(event)),
+    cancelEdit: (event: any) => dispatch(cancelEdit(event)),
     dispatch: dispatch,
 });
 

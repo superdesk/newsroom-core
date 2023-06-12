@@ -31,7 +31,7 @@ export function Dropdown({children, isActive, icon, label, className, buttonProp
             'btn-group',
             className ? className : ''
         )}
-        onClick={(event) => {
+        onClick={(event: any) => {
             event.stopPropagation();
             dropdownInstance.toggle();
         }}

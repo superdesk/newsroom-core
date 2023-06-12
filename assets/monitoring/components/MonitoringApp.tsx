@@ -116,7 +116,7 @@ class MonitoringApp extends React.Component {
     }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     companies: state.companies,
     company: state.company,
     monitoringListCompanies: state.monitoringListCompanies,

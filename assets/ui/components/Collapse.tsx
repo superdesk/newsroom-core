@@ -60,7 +60,7 @@ export class CollapseBoxWithButton extends React.Component {
                 <div
                     className="collapse"
                     id={contentId}
-                    ref={(elem) => this.dom.content = elem}
+                    ref={(elem: any) => this.dom.content = elem}
                 >
                     {this.props.children}
                 </div>

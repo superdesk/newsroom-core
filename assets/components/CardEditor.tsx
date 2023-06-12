@@ -51,7 +51,7 @@ export default class CardEditor extends React.Component {
 
         return (
             <div className={`tab-pane active tab-pane--no-scroll ${editorClassNames}`} id='card-editor'>
-                <form onSubmit={(event) => {event.preventDefault();}}>
+                <form onSubmit={(event: any) => {event.preventDefault();}}>
                     <div className="list-item__preview-form list-item__preview-form--no-scroll pb-0 pt-0">
                         <div className="card mt-3 d-block">
                             <div className="card-header d-flex flex-row">{editorTitle || label}</div>
@@ -94,7 +94,7 @@ export default class CardEditor extends React.Component {
 
         return (
             <div className={`tab-pane active ${previewClassNames}`} id='card-preview'>
-                <form onSubmit={(event) => {event.preventDefault();}}>
+                <form onSubmit={(event: any) => {event.preventDefault();}}>
                     <div className="list-item__preview-form  pb-0 pt-0">
                         <div className="card mt-3 d-block">
                             <div className="card-header d-flex justify-content-start align-items-center">

@@ -5,7 +5,7 @@ import {getPicture, getThumbnailRendition, getCaption} from 'wire/utils';
 import CardRow from './CardRow';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 
-const getMediaPanel = (item, picture, openItem, cardId) => {
+const getMediaPanel = (item: any, picture: any, openItem: any, cardId: any) => {
 
     const rendition = getThumbnailRendition(picture);
     const imageUrl = rendition && rendition.href;

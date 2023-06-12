@@ -97,7 +97,7 @@ export function deleteAllNotifications() {
  * @param {Object} push
  */
 export function pushNotification(push) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const user = getState().user;
         switch (push.event) {
         case 'new_notifications':

@@ -672,6 +672,6 @@ export function stopWatchingCoverage(coverage: any, item: any) {
                 if (getState().bookmarks) {
                     dispatch(fetchItems()); // item should get removed from the list in bookmarks view
                 }
-            }, (error) => { errorHandler(error, dispatch);});
+            }, (error: any) => { errorHandler(error, dispatch);});
     };
 }

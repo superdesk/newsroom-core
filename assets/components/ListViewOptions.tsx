@@ -55,11 +55,11 @@ class ListViewOptions extends React.PureComponent {
 
     render() {
         return(
-            <div className='btn-group list-view__options' ref={(elem) => this.elem = elem}>
+            <div className='btn-group list-view__options' ref={(elem: any) => this.elem = elem}>
                 <button
                     className='content-bar__menu'
                     onClick={this.toggleOpen}
-                    ref={(elem) => this.elem = elem}
+                    ref={(elem: any) => this.elem = elem}
                     title={gettext('Change view')}
                     aria-label={gettext('Change view')}
                     role="button">

@@ -85,7 +85,7 @@ function markItemsRemoved(state: any, ids: any) {
     let openItem = state.openItem;
 
     (ids || []).forEach(
-        (itemId) => {
+        (itemId: any) => {
             if (get(itemsById, itemId)) {
                 itemsById[itemId].deleted = true;
             }

@@ -108,7 +108,7 @@ class ArticleBodyHtml extends React.PureComponent {
                     document.body.removeChild(script);
                 };
 
-                script.onerrror = (error) => {
+                script.onerrror = (error: any) => {
                     throw new URIError('The script ' + error.target.src + 'didn\'t load.');
                 };
 
@@ -218,8 +218,8 @@ ArticleBodyHtml.propTypes = {
     reportCopy: PropTypes.func,
 };
 
-const mapDispatchToProps = (dispatch) => ({
-    reportCopy: (item) => dispatch(selectCopy(item))
+const mapDispatchToProps = (dispatch: any) => ({
+    reportCopy: (item: any) => dispatch(selectCopy(item))
 });
 
 export default connect(null, mapDispatchToProps)(ArticleBodyHtml);

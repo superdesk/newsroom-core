@@ -153,7 +153,7 @@ class ContentActivity extends React.Component {
         const companies = keyBy(this.props.companies, '_id');
 
         const results = props.results.map(
-            (item) => ({
+            (item: any) => ({
                 _id: item._id,
                 versioncreated: formatTime(get(item, 'versioncreated') || ''),
                 headline: get(item, 'headline') || '',
@@ -315,7 +315,7 @@ ContentActivity.propTypes = {
     apiEnabled: PropTypes.bool,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     companies: state.companies,
     reportParams: state.reportParams,
     isLoading: state.isLoading,

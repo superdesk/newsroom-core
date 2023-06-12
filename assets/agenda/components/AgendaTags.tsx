@@ -58,7 +58,7 @@ AgendaTagsComponent.propTypes = {
     filterGroupLabels: PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     filterGroupLabels: filterGroupsToLabelMap(state),
 });
 

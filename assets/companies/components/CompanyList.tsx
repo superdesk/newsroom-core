@@ -58,7 +58,7 @@ CompanyList.propTypes = {
     selectCompany: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     companies: state.companies.map((id) => state.companiesById[id]),
     activeCompanyId: state.activeCompanyId,
     companyTypes: state.companyTypes,

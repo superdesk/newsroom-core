@@ -152,7 +152,7 @@ class WireListItem extends React.Component {
             <article
                 key={item._id}
                 className={cardClassName}
-                ref={(elem) => this.dom.article = elem}
+                ref={(elem: any) => this.dom.article = elem}
                 onClick={() => onClick(item)}
                 onDoubleClick={() => onDoubleClick(item)}
                 onKeyDown={this.onKeyDown}
@@ -323,7 +323,7 @@ class WireListItem extends React.Component {
                         />
 
                         {!this.props.showShortcutActionIcons ? null : this.props.actions.map(
-                            (action) => (
+                            (action: any) => (
                                 action.shortcut && (
                                     <ActionButton
                                         key={action.name}

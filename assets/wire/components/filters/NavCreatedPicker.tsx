@@ -17,7 +17,7 @@ function NavCreatedPicker({setCreatedFilter, createdFilter, context}) {
         setCreatedFilter({from: createdFilter.from === value ? null : value, to: null});
     };
 
-    const onInputChange = (event) => {
+    const onInputChange = (event: any) => {
         setCreatedFilter({[event.target.name]: event.target.value});
     };
 

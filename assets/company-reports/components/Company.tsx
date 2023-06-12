@@ -7,7 +7,7 @@ import ReportsTable from './ReportsTable';
 
 function getProductDetails(products: any = []) {
     const productsByGroup = groupBy(products, (p) => p.product_type);
-    const getProductSectionName = (productType) => {
+    const getProductSectionName = (productType: any) => {
         if (productType === 'am_news') {
             return gettext('AM');
         }

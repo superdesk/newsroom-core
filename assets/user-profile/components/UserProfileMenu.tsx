@@ -9,7 +9,7 @@ function UserProfileMenu({links, onClick}) {
                     href="#"
                     className={`btn w-100 btn-outline-${link.active ? 'primary' : 'secondary'}`}
                     name={link.name}
-                    onClick={(event) => onClick(event, link.name)}
+                    onClick={(event: any) => onClick(event, link.name)}
                 >{link.label}</a>
             ))}
         </div>

@@ -65,7 +65,7 @@ class SectionFilters extends React.Component {
 
     render() {
         const progressStyle = {width: '25%'};
-        const sectionFilter = (sectionFilter) => !this.props.activeSection || get(sectionFilter, 'filter_type', 'wire') === this.props.activeSection;
+        const sectionFilter = (sectionFilter: any) => !this.props.activeSection || get(sectionFilter, 'filter_type', 'wire') === this.props.activeSection;
         const getActiveSection = () => this.props.sections.filter(s => s._id === this.props.activeSection);
 
         return (
@@ -125,7 +125,7 @@ SectionFilters.propTypes = {
     sections: sectionsPropType,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     sectionFilters: state.sectionFilters.map((id) => state.sectionFiltersById[id]),
     sectionFilterToEdit: state.sectionFilterToEdit,
     activeSectionFilterId: state.activeSectionFilterId,
@@ -136,13 +136,13 @@ const mapStateToProps = (state) => ({
     sections: sectionsSelector(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    selectSectionFilter: (_id) => dispatch(selectSectionFilter(_id)),
-    editSectionFilter: (event) => dispatch(editSectionFilter(event)),
-    saveSectionFilter: (type) => dispatch(postSectionFilter(type)),
-    deleteSectionFilter: (type) => dispatch(deleteSectionFilter(type)),
+const mapDispatchToProps = (dispatch: any) => ({
+    selectSectionFilter: (_id: any) => dispatch(selectSectionFilter(_id)),
+    editSectionFilter: (event: any) => dispatch(editSectionFilter(event)),
+    saveSectionFilter: (type: any) => dispatch(postSectionFilter(type)),
+    deleteSectionFilter: (type: any) => dispatch(deleteSectionFilter(type)),
     newSectionFilter: () => dispatch(newSectionFilter()),
-    cancelEdit: (event) => dispatch(cancelEdit(event)),
+    cancelEdit: (event: any) => dispatch(cancelEdit(event)),
     dispatch: dispatch,
 });
 

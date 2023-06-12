@@ -13,8 +13,8 @@ const TopicList = ({topics, selectedTopicId, actions, users}) => {
         return null;
     }
 
-    const getActionButtons = (topic) => actions.map(
-        (action) => (
+    const getActionButtons = (topic: any) => actions.map(
+        (action: any) => (
             <ActionButton
                 key={action.name}
                 item={topic}
@@ -27,7 +27,7 @@ const TopicList = ({topics, selectedTopicId, actions, users}) => {
     );
 
     return topics.map(
-        (topic) => (
+        (topic: any) => (
             <div key={topic._id} className=''>
                 <div className={classNames(
                     'simple-card',

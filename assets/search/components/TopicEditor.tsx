@@ -82,7 +82,7 @@ class TopicEditor extends React.Component {
     updateFormValidity(topic) {
         const original = get(this.props, 'topic') || {};
         const isDirty = ['label', 'notifications', 'is_global'].some(
-            (field) => get(original, field) !== get(topic, field)
+            (field: any) => get(original, field) !== get(topic, field)
         ) || !isEqual(original.subscribers, topic.subscribers);
 
         if (!topic.label) {
@@ -99,7 +99,7 @@ class TopicEditor extends React.Component {
     }
 
     onChangeHandler(field) {
-        return (event) => {
+        return (event: any) => {
             const topic = cloneDeep(this.state.topic);
             const value = ['notifications', 'is_global'].includes(field) ?
                 !get(topic, field) :
@@ -145,7 +145,7 @@ class TopicEditor extends React.Component {
                 subscribers.push(this.props.userId);
             } else if (!topic.notifications && alreadySubscribed) {
                 subscribers = subscribers.filter(
-                    (userId) => userId !== this.props.userId
+                    (userId: any) => userId !== this.props.userId
                 );
             }
 
@@ -342,7 +342,7 @@ TopicEditor.propTypes = {
     user: PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     userId: get(state, 'editedUser._id'),
     isLoading: state.isLoading,
     navigations: state.navigations || [],
@@ -350,16 +350,16 @@ const mapStateToProps = (state) => ({
     companyUsers: state.monitoringProfileUsers || [],
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     fetchNavigations: () => dispatch(fetchNavigations()),
     hideModal: () => dispatch(hideModal()),
-    saveTopic: (isExisting, topic) => isExisting ?
+    saveTopic: (isExisting: any, topic: any) => isExisting ?
         dispatch(submitProfileFollowTopic(topic)) :
         dispatch(submitWireFollowTopic(topic)),
-    loadMyTopic: (topic) => topic.topic_type === 'agenda' ?
+    loadMyTopic: (topic: any) => topic.topic_type === 'agenda' ?
         dispatch(loadMyAgendaTopic(topic._id)) :
         dispatch(loadMyWireTopic(topic._id)),
-    setTopicEditorFullscreen: (fullscreen) => dispatch(setTopicEditorFullscreen(fullscreen)),
+    setTopicEditorFullscreen: (fullscreen: any) => dispatch(setTopicEditorFullscreen(fullscreen)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TopicEditor);

@@ -25,7 +25,7 @@ class ProductCompanies extends React.Component {
 
     getDropdownItems(filter) {
         const {toggleFilterAndQuery} = this.props;
-        let getName = (text) => (text);
+        let getName = (text: any) => (text);
         let itemsArray = [];
         switch (filter.field) {
         case 'product':
@@ -99,7 +99,7 @@ ProductCompanies.propTypes = {
     isLoading: PropTypes.bool,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     products: state.products,
     reportParams: state.reportParams,
     isLoading: state.isLoading,

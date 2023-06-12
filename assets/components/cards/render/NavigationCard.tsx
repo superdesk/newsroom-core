@@ -5,7 +5,7 @@ import {gettext} from 'utils';
 
 
 const NavigationCard = ({navigation}) => {
-    const imageUrl = (navigation) => {
+    const imageUrl = (navigation: any) => {
         if (get(navigation, 'tile_images.length', 0) === 0) {
             return null;
         }

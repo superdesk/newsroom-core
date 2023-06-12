@@ -250,7 +250,7 @@ AmNewsApp.propTypes = {
     context: PropTypes.string,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     state: state,
     isLoading: state.isLoading,
     totalItems: state.totalItems,
@@ -274,13 +274,13 @@ const mapStateToProps = (state) => ({
     context: state.context,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     fetchItems: () => dispatch(fetchItems()),
-    setQuery: (query) => dispatch(setQuery(query)),
+    setQuery: (query: any) => dispatch(setQuery(query)),
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     closePreview: () => dispatch(previewItem(null)),
-    toggleNavigation: (navigation) => dispatch(toggleNavigation(navigation)),
+    toggleNavigation: (navigation: any) => dispatch(toggleNavigation(navigation)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AmNewsApp);

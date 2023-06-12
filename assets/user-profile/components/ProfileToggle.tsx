@@ -27,13 +27,13 @@ class ProfileToggle extends React.Component {
         const initials = this.props.user.first_name[0].toLocaleUpperCase() + this.props.user.last_name[0].toLocaleUpperCase();
 
         return (
-            <div className="header-profile" onClick={(event) => {
+            <div className="header-profile" onClick={(event: any) => {
                 event.preventDefault();
                 this.props.onClick();
             }}>
                 <figure className="header-profile__avatar">
                     <span className="header-profile__characters"
-                        ref={(elem) => this.elem = elem}
+                        ref={(elem: any) => this.elem = elem}
                         title={`${this.props.user.first_name} ${this.props.user.last_name}`}
                     >{initials}</span>
                 </figure>

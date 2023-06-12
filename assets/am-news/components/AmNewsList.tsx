@@ -219,7 +219,7 @@ AmNewsList.propTypes = {
     contextName: PropTypes.string,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     items: state.items,
     itemsById: state.itemsById,
     activeItem: state.activeItem,

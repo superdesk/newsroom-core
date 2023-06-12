@@ -10,7 +10,7 @@ import EditPanel from '../../components/EditPanel';
 import AuditInformation from 'components/AuditInformation';
 import {sectionsPropType} from '../../features/sections/types';
 
-const getProductCompanies = (product, companies) => ({
+const getProductCompanies = (product: any, companies: any) => ({
     companies: companies.filter((company) => {
         const companyProducts = company.products || [];
         return companyProducts.some((_product) => _product._id === product._id);

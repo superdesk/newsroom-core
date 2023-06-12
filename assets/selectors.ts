@@ -2,25 +2,25 @@ import {get} from 'lodash';
 import {createSelector} from 'reselect';
 import {getPicture} from './wire/utils';
 
-export const formats = (state) => get(state, 'formats') || [];
-export const secondaryFormats = (state) => get(state, 'secondaryFormats') || [];
-export const context = (state) => get(state, 'context') || null;
-export const allItemsById = (state) => get(state, 'itemsById') || null;
-export const itemToOpen = (state) => get(state, 'itemToOpen') || null;
-export const userSectionsSelector = (state) => get(state, 'userSections');
-export const modalItems = (state) => get(state, 'modal.data.items') || [];
+export const formats = (state: any) => get(state, 'formats') || [];
+export const secondaryFormats = (state: any) => get(state, 'secondaryFormats') || [];
+export const context = (state: any) => get(state, 'context') || null;
+export const allItemsById = (state: any) => get(state, 'itemsById') || null;
+export const itemToOpen = (state: any) => get(state, 'itemToOpen') || null;
+export const userSectionsSelector = (state: any) => get(state, 'userSections');
+export const modalItems = (state: any) => get(state, 'modal.data.items') || [];
 
 export const getFormats = createSelector([formats],(f) => (f.map((format) =>
     ({value: format.format, text: format.name}))));
 
 export const getContextName = createSelector(
     [context, userSectionsSelector],
-    (currentSection, sections) => get(sections, `${currentSection}.name`)
+    (currentSection: any, sections: any) => get(sections, `${currentSection}.name`)
 );
 
 export const modalOptions = createSelector(
     [modalItems, formats, context, allItemsById, itemToOpen],
-    (items, fmts, cntxt, itemsById, openItem) => {
+    (items: any, fmts: any, cntxt: any, itemsById: any, openItem: any) => {
         let options = fmts;
         if (items && items.length) {
             const itemType = cntxt === 'agenda' ? 'agenda' : 'wire';

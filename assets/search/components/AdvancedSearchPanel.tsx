@@ -51,7 +51,7 @@ function AdvancedSearchPanelComponent({
                             rows="2"
                             className="form-control"
                             value={params.all || ''}
-                            onChange={(event) => setKeywords('all', event.target.value)}
+                            onChange={(event: any) => setKeywords('all', event.target.value)}
                             autoFocus={true}
                         />
                         <p className="advanced-search__content-description-text">
@@ -71,7 +71,7 @@ function AdvancedSearchPanelComponent({
                             rows="2"
                             className="form-control"
                             value={params.any || ''}
-                            onChange={(event) => setKeywords('any', event.target.value)}
+                            onChange={(event: any) => setKeywords('any', event.target.value)}
                         />
                         <p className="advanced-search__content-description-text">
                             {gettext('And every item contain keyword1 OR keyword 2 etc.')}
@@ -90,7 +90,7 @@ function AdvancedSearchPanelComponent({
                             rows="2"
                             className="form-control"
                             value={params.exclude || ''}
-                            onChange={(event) => setKeywords('exclude', event.target.value)}
+                            onChange={(event: any) => setKeywords('exclude', event.target.value)}
                         />
                         <p className="advanced-search__content-description-text">
                             {gettext('And every item will NOT contain keyword1 nor keyword2 etc.')}
@@ -157,13 +157,13 @@ AdvancedSearchPanelComponent.propTypes = {
     clearParams: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     params: advancedSearchParamsSelector(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    toggleField: (field) => dispatch(toggleAdvancedSearchField(field)),
-    setKeywords: (field, keywords) => dispatch(setAdvancedSearchKeywords(field, keywords)),
+const mapDispatchToProps = (dispatch: any) => ({
+    toggleField: (field: any) => dispatch(toggleAdvancedSearchField(field)),
+    setKeywords: (field: any, keywords: any) => dispatch(setAdvancedSearchKeywords(field, keywords)),
     clearParams: () => dispatch(clearAdvanedSearchParams()),
 });
 

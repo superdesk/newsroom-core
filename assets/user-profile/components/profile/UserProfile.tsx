@@ -172,16 +172,16 @@ UserProfile.propTypes = {
     fetchUser: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     user: state.editedUser,
     errors: state.errors,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     saveUser: () => dispatch(saveUser()),
-    fetchUser: (id) => dispatch(fetchUser(id)),
-    onChange: (event) => dispatch(editUser(event)),
-    setError: (errors) => dispatch(setError(errors)),
+    fetchUser: (id: any) => dispatch(fetchUser(id)),
+    onChange: (event: any) => dispatch(editUser(event)),
+    setError: (errors: any) => dispatch(setError(errors)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserProfile);

@@ -41,7 +41,7 @@ NotificationsApp.propTypes = {
     loading: PropTypes.bool,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     user: state.user,
     items: state.items,
     notifications: state.notifications,
@@ -49,8 +49,8 @@ const mapStateToProps = (state) => ({
     loading: state.loading,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    clearNotification: (id) => dispatch(deleteNotification(id)),
+const mapDispatchToProps = (dispatch: any) => ({
+    clearNotification: (id: any) => dispatch(deleteNotification(id)),
     clearAll: () => dispatch(deleteAllNotifications()),
     loadNotifications: () => dispatch(loadNotifications()),
 });

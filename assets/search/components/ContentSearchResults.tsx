@@ -217,7 +217,7 @@ ContentSearchResultsComponent.propTypes = {
     loadMyAgendaTopic: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     navigations: navigationsByIdSelector(state),
     searchParams: searchParamsSelector(state),
     searchParamTags: searchParamTagSelector(state),

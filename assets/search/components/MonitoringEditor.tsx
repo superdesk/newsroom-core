@@ -250,14 +250,14 @@ MonitoringEditor.propTypes = {
     monitoringProfileUsers: PropTypes.array,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     monitoringProfileUsers: state.monitoringProfileUsers || [],
     user: get(state, 'editedUser._id'),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    saveMonitoringProfile: (item, notifyMsg) => dispatch(postMonitoringProfile(item, notifyMsg)),
-    fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId, true)),
+const mapDispatchToProps = (dispatch: any) => ({
+    saveMonitoringProfile: (item: any, notifyMsg: any) => dispatch(postMonitoringProfile(item, notifyMsg)),
+    fetchCompanyUsers: (companyId: any) => dispatch(fetchCompanyUsers(companyId, true)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(MonitoringEditor);

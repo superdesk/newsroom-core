@@ -62,7 +62,7 @@ export default class Map extends React.PureComponent {
         }
 
         return (
-            <div ref={(elem) => this.elem = elem} style={{height: 300}} />
+            <div ref={(elem: any) => this.elem = elem} style={{height: 300}} />
         );
     }
 }

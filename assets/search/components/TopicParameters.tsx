@@ -26,7 +26,7 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels, filte
         }
     }
 
-    const renderParam = (name, items) => get(items, 'length', 0) < 1 ? null : (
+    const renderParam = (name: any, items: any) => get(items, 'length', 0) < 1 ? null : (
         <div className="info-box__content">
             <span className="wire-column__preview__tags__headline">
                 {name}
@@ -52,7 +52,7 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels, filte
             return null;
         }
 
-        const getPlaceName = (placeId) => {
+        const getPlaceName = (placeId: any) => {
             let region = (Object.values(locators) || []).find((l) => l.name === placeId);
             return region ?
                 (get(region, 'state') || get(region, 'country') || get(region, 'world_region')) :
@@ -86,7 +86,7 @@ TopicParameters.propTypes = {
     filterGroupsMain: PropTypes.array
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     locators: get(state, 'locators.items', []),
     filterGroupLabels: filterGroupsToLabelMap(state),
     filterGroupsMain: filterGroups(state),

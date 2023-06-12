@@ -45,7 +45,7 @@ CardsApp.propTypes = {
     activeDashboard: PropTypes.string,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     dashboards: state.dashboards.list,
     activeDashboard: state.dashboards.active,
 });

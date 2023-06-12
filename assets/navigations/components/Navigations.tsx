@@ -66,7 +66,7 @@ class Navigations extends React.Component {
 
     render() {
         const progressStyle = {width: '25%'};
-        const sectionFilter = (navigation) => !this.props.activeSection || get(navigation, 'product_type', 'wire') === this.props.activeSection;
+        const sectionFilter = (navigation: any) => !this.props.activeSection || get(navigation, 'product_type', 'wire') === this.props.activeSection;
 
         return (
             <div className="flex-row">
@@ -129,7 +129,7 @@ Navigations.propTypes = {
     fetchProducts: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     navigations: state.navigations.map((id) => state.navigationsById[id]),
     navigationToEdit: state.navigationToEdit,
     activeNavigationId: state.activeNavigationId,
@@ -141,13 +141,13 @@ const mapStateToProps = (state) => ({
     sections: uiSectionsSelector(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    selectNavigation: (_id) => dispatch(selectNavigation(_id)),
-    editNavigation: (event) => dispatch(editNavigation(event)),
-    saveNavigation: (type) => dispatch(postNavigation(type)),
-    deleteNavigation: (type) => dispatch(deleteNavigation(type)),
+const mapDispatchToProps = (dispatch: any) => ({
+    selectNavigation: (_id: any) => dispatch(selectNavigation(_id)),
+    editNavigation: (event: any) => dispatch(editNavigation(event)),
+    saveNavigation: (type: any) => dispatch(postNavigation(type)),
+    deleteNavigation: (type: any) => dispatch(deleteNavigation(type)),
     newNavigation: () => dispatch(newNavigation()),
-    cancelEdit: (event) => dispatch(cancelEdit(event)),
+    cancelEdit: (event: any) => dispatch(cancelEdit(event)),
     fetchProducts: () => dispatch(fetchProducts()),
     dispatch: dispatch,
 });

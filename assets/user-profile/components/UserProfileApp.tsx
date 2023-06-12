@@ -155,7 +155,7 @@ class UserProfileApp extends React.Component {
                     <ul className="list-group list-group-flush">
                         {this.links.map((link) => (
                             <li key={link.name} className="list-group-item list-group-item--link">
-                                <a href="" onClick={(e) => this.props.selectMenu(e, link.name)}>{link.label}
+                                <a href="" onClick={(e: any) => this.props.selectMenu(e, link.name)}>{link.label}
                                     <i className="svg-icon--arrow-right" /></a>
                             </li>
                         ))}
@@ -198,7 +198,7 @@ UserProfileApp.propTypes = {
     hideModal: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     user: userSelector(state),
     modal: state.modal,
     dropdown: state.dropdown,
@@ -207,8 +207,8 @@ const mapStateToProps = (state) => ({
     userSections: userSectionsSelector(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    selectMenu: (event, name) => {event.preventDefault(); dispatch(selectMenu(name));},
+const mapDispatchToProps = (dispatch: any) => ({
+    selectMenu: (event: any, name: any) => {event.preventDefault(); dispatch(selectMenu(name));},
     toggleDropdown: () => dispatch(toggleDropdown()),
     hideModal: () => dispatch(hideModal()),
 });

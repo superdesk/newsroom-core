@@ -14,7 +14,7 @@ import MonitoringSchedule from './MonitoringSchedule';
 
 import {gettext} from 'utils';
 
-const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
+const getCompanyOptions = (companies: any) => companies.map(company => ({value: company._id, text: company.name}));
 
 class EditMonitoringProfile extends React.Component {
     constructor(props) {
@@ -72,7 +72,7 @@ class EditMonitoringProfile extends React.Component {
 
     render() {
         const {item, onChange, errors, companies, onSave, onClose, onDelete} = this.props;
-        const getError = (field) => errors ? errors[field] : null;
+        const getError = (field: any) => errors ? errors[field] : null;
 
         return (
             <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit {{monitoring}}', sectionNames)}>

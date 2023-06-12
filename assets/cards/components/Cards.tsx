@@ -68,7 +68,7 @@ class Cards extends React.Component {
 
     render() {
         const progressStyle = {width: '25%'};
-        const cardFilter = (card) =>  !this.props.activeDashboard ||
+        const cardFilter = (card: any) =>  !this.props.activeDashboard ||
             get(card, 'dashboard', 'newsroom') === this.props.activeDashboard;
 
         return (
@@ -133,7 +133,7 @@ Cards.propTypes = {
     dashboards: PropTypes.arrayOf(PropTypes.object),
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     cards: state.cards.map((id) => state.cardsById[id]),
     cardToEdit: state.cardToEdit,
     activeCardId: state.activeCardId,
@@ -147,13 +147,13 @@ const mapStateToProps = (state) => ({
     dashboards: state.dashboards.list,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    selectCard: (_id) => dispatch(selectCard(_id)),
-    editCard: (event) => dispatch(editCard(event)),
-    saveCard: (type) => dispatch(postCard(type)),
-    deleteCard: (type) => dispatch(deleteCard(type)),
+const mapDispatchToProps = (dispatch: any) => ({
+    selectCard: (_id: any) => dispatch(selectCard(_id)),
+    editCard: (event: any) => dispatch(editCard(event)),
+    saveCard: (type: any) => dispatch(postCard(type)),
+    deleteCard: (type: any) => dispatch(deleteCard(type)),
     newCard: () => dispatch(newCard()),
-    cancelEdit: (event) => dispatch(cancelEdit(event)),
+    cancelEdit: (event: any) => dispatch(cancelEdit(event)),
     dispatch: dispatch,
 });
 

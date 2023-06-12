@@ -5,7 +5,7 @@ import CardRow from './CardRow';
 import CardMeta from './CardMeta';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 
-const getTopNewsPanel = (item, picture, openItem, cardId, listConfig) => {
+const getTopNewsPanel = (item: any, picture: any, openItem: any, cardId: any, listConfig: any) => {
 
     const rendition = getThumbnailRendition(picture, true);
     const imageUrl = rendition && rendition.href;

@@ -53,7 +53,7 @@ class CompanyReportsApp extends React.Component {
                             id={'company-reports'}
                             name={'company-reports'}
                             value={this.props.activeReport || ''}
-                            onChange={(event) => this.props.setActiveReport(event.target.value)}>
+                            onChange={(event: any) => this.props.setActiveReport(event.target.value)}>
                             {reportOptions.map((option) => <option key={option.value} value={option.value}>{option.text}</option>)}
                         </select>
                     </div>
@@ -92,7 +92,7 @@ CompanyReportsApp.propTypes = {
     products: PropTypes.array,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     activeReport: state.activeReport,
     results: state.results,
     companies: state.companies,

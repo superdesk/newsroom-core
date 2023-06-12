@@ -5,7 +5,7 @@ export function TopicItem({topic, newItemsByTopic, onClick, className}) {
     return (
         <button
             className={className}
-            onClick={(e) => onClick(e, topic)}
+            onClick={(e: any) => onClick(e, topic)}
         >
             {topic.label}
             {newItemsByTopic && newItemsByTopic[topic._id] && (

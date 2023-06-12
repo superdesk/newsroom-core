@@ -169,7 +169,7 @@ class ItemsList extends React.Component {
         });
 
         return (
-            <div className={listClassName} onKeyDown={this.onKeyDown} onScroll={this.props.onScroll} ref={(elem) => this.elem = elem}>
+            <div className={listClassName} onKeyDown={this.onKeyDown} onScroll={this.props.onScroll} ref={(elem: any) => this.elem = elem}>
                 {articles}
                 {!articles.length &&
                     <div className="wire-articles__item-wrap col-12">
@@ -212,7 +212,7 @@ ItemsList.propTypes = {
     onScroll: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     items: state.items,
     itemsById: state.itemsById,
     matchedIds: state.matchedIds,

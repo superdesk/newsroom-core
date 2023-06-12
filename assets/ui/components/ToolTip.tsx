@@ -43,7 +43,7 @@ export class ToolTip extends React.PureComponent {
     render() {
         return (
             <div
-                ref={(elem) => this.elem = elem}
+                ref={(elem: any) => this.elem = elem}
                 style={{display: 'contents'}}
             >
                 {this.props.children}

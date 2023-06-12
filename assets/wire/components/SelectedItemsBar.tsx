@@ -23,14 +23,14 @@ class SelectedItemsBar extends React.PureComponent {
             return null;
         }
 
-        const multiActionFilter = (action) => action.multi &&
+        const multiActionFilter = (action: any) => action.multi &&
             this.props.selectedItems.every((item) => !action.when || action.when(this.props.state, this.props.itemsById[item]));
 
         const actions = this.props.actions.filter(multiActionFilter).map((action) => (
             <button className='icon-button icon-button--primary'
                 key={action.name}
                 title={action.name}
-                onClick={(e) => this.onAction(e, action)}
+                onClick={(e: any) => this.onAction(e, action)}
                 aria-label={gettext(action.name)}
             >
                 <i className={`icon--${action.icon}`}></i>
@@ -66,7 +66,7 @@ SelectedItemsBar.propTypes = {
     selectNone: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     state: state,
     itemsById: state.itemsById,
     selectedItems: state.selectedItems,

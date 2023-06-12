@@ -15,27 +15,27 @@ import {globalTopicsEnabledSelector} from 'ui/selectors';
 const manageTopics = () => document.dispatchEvent(new Event('manage_topics'));
 
 function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNewItems, globalTopicsEnabled}) {
-    const clickTopic = (event, topic) => {
+    const clickTopic = (event: any, topic: any) => {
         event.preventDefault();
         removeNewItems(topic._id);
         loadMyTopic(topic);
     };
 
-    const clickManage = (event) => {
+    const clickManage = (event: any) => {
         event.preventDefault();
         manageTopics();
     };
 
-    const topicClass = (topic) => (
+    const topicClass = (topic: any) => (
         `btn w-100 btn-outline-${topic._id === activeTopicId ? 'primary' : 'secondary'}`
     );
 
     const activeTopicId = activeTopic ? activeTopic._id : null;
     const personalTopics = (topics || []).filter(
-        (topic) => !topic.is_global
+        (topic: any) => !topic.is_global
     );
     const globalTopics = (topics || []).filter(
-        (topic) => topic.is_global
+        (topic: any) => topic.is_global
     );
 
     const tabName = gettext('{{ section }} Topics', {section: isWireContext() ? sectionNames.wire : sectionNames.agenda});
@@ -136,15 +136,15 @@ TopicsTab.propTypes = {
     globalTopicsEnabled: PropTypes.bool,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     topics: state.topics || [],
     newItemsByTopic: state.newItemsByTopic,
     globalTopicsEnabled: globalTopicsEnabledSelector(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    removeNewItems: (topicId) => dispatch(removeNewItems(topicId)),
-    loadMyTopic: (topic) => topic.topic_type === 'agenda' ?
+const mapDispatchToProps = (dispatch: any) => ({
+    removeNewItems: (topicId: any) => dispatch(removeNewItems(topicId)),
+    loadMyTopic: (topic: any) => topic.topic_type === 'agenda' ?
         dispatch(loadMyAgendaTopic(topic._id)) :
         dispatch(loadMyWireTopic(topic._id)),
 });

@@ -87,10 +87,10 @@ AuditInformation.propTypes = {
     className: PropTypes.string,
 };
 
-const mapStateToProps = (state) => ({editUsers: state.editUsers});
+const mapStateToProps = (state: any) => ({editUsers: state.editUsers});
 
-const mapDispatchToProps = (dispatch) => ({
-    getEditUsers: (item) => dispatch(getEditUsers(item))
+const mapDispatchToProps = (dispatch: any) => ({
+    getEditUsers: (item: any) => dispatch(getEditUsers(item))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AuditInformation);

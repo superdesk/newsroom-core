@@ -17,7 +17,7 @@ import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserList
 
 import {companyProductSeatsSelector, companySectionListSelector, sectionListSelector} from 'company-admin/selectors';
 
-const getCompanyOptions = (companies) => companies.map(company => ({value: company._id, text: company.name}));
+const getCompanyOptions = (companies: any) => companies.map(company => ({value: company._id, text: company.name}));
 
 function EditUserComponent({
     original,
@@ -90,7 +90,7 @@ function EditUserComponent({
                                 type="button"
                                 className="btn btn-sm btn-outline-light"
                                 aria-label={gettext('Resend Invite')}
-                                onClick={(event) => {
+                                onClick={(event: any) => {
                                     event.preventDefault();
 
                                     if (confirm(gettext('Would you like to resend the invitation for {{ email }}?', {email: user.email}))) {
@@ -222,7 +222,7 @@ function EditUserComponent({
                                             {section.name}
                                         </div>
                                         {products.filter(
-                                            (product) => product.product_type === section._id &&
+                                            (product: any) => product.product_type === section._id &&
                                                 companyProductIds.includes(product._id)
                                         ).map((product) => (
                                             <EditUserProductPermission
@@ -340,7 +340,7 @@ EditUserComponent.defaultProps = {
     hideFields: [],
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     allSections: sectionListSelector(state),
     companySections: companySectionListSelector(state),
     seats: companyProductSeatsSelector(state),

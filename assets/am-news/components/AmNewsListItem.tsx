@@ -93,7 +93,7 @@ class AmNewsListItem extends React.Component {
         return (
             <article key={item._id}
                 className={cardClassName}
-                ref={(elem) => this.articleElem = elem}
+                ref={(elem: any) => this.articleElem = elem}
                 onClick={() => onClick(item)}
                 onDoubleClick={() => onDoubleClick(item)}
                 onKeyDown={this.onKeyDown}

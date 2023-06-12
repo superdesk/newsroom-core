@@ -44,7 +44,7 @@ class ActionButton extends React.Component {
                         }
                     }
                 }
-                ref={(elem) => this.elem = elem}
+                ref={(elem: any) => this.elem = elem}
                 title={!this.props.displayName ? this.props.action.tooltip || this.props.action.name : ''}
                 aria-label={!this.props.displayName ? this.props.action.tooltip || this.props.action.name : this.props.action.name }>
                 <i className={classes}></i>

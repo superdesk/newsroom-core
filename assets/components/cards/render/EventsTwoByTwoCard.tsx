@@ -5,14 +5,14 @@ import moment from 'moment/moment';
 import {gettext} from 'utils';
 
 
-const getEventPanel = (event, index) => {
+const getEventPanel = (event: any, index: any) => {
 
-    const isSameMonth = (d1, d2) => !!d2 && d1.format('MMMM') === d2.format('MMMM');
+    const isSameMonth = (d1: any, d2: any) => !!d2 && d1.format('MMMM') === d2.format('MMMM');
 
-    const isDifferentMonth = (d1, d2) => !!d2 && d1.format('MMMM') !== d2.format('MMMM');
+    const isDifferentMonth = (d1: any, d2: any) => !!d2 && d1.format('MMMM') !== d2.format('MMMM');
 
     // Checks if the date range is for the whole month
-    const isWholeMonth = (d1, d2) => {
+    const isWholeMonth = (d1: any, d2: any) => {
         if (!d2) {
             return false;
         }
@@ -22,7 +22,7 @@ const getEventPanel = (event, index) => {
           date1.add(-1, 'days').format('MMMM') !== date2.format('MMMM');
     };
 
-    const getDateSpans = (d1, d2) => ([
+    const getDateSpans = (d1: any, d2: any) => ([
         isWholeMonth(d1, d2) ? <div key='day' className='date-round__number'><span>{gettext('all')}</span></div> :
             <div key='day' className='date-round__number'>
                 <span>{d1.format('D')}</span>{isSameMonth(d1, d2) && '-'}<span>{isSameMonth(d1, d2) && d2.format('D')}</span>

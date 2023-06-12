@@ -31,7 +31,7 @@ export function getVideos(item: any) {
     return getRelatedItemsByType(item, 'video');
 }
 
-const isMedia = (item) => item.type === 'audio' || item.type === 'video';
+const isMedia = (item: any) => item.type === 'audio' || item.type === 'video';
 
 /**
  * 
@@ -226,5 +226,5 @@ function hasMedia(item: any, type: any) {
     return item != null && getItemMedia(item).some((_item) => _item.type === type);
 }
 
-export const hasAudio = (item) => hasMedia(item, 'audio');
-export const hasVideo = (item) => hasMedia(item, 'video');
+export const hasAudio = (item: any) => hasMedia(item, 'audio');
+export const hasVideo = (item: any) => hasMedia(item, 'video');

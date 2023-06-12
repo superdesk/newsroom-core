@@ -120,7 +120,7 @@ function CompanyPermissions({
                                                                 min="0"
                                                                 tabIndex="0"
                                                                 value={(seats[product._id] || 0).toString()}
-                                                                onChange={(event) => {
+                                                                onChange={(event: any) => {
                                                                     updateCompanySeats(
                                                                         product._id,
                                                                         parseInt(event.target.value)

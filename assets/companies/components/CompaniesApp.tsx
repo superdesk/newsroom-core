@@ -65,7 +65,7 @@ CompaniesApp.propTypes = {
     setQuery: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     isLoading: state.isLoading,
     totalCompanies: state.totalCompanies,
     activeQuery: searchQuerySelector(state),

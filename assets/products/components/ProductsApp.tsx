@@ -49,7 +49,7 @@ ProductsApp.propTypes = {
     newProduct: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     sections: sectionsSelector(state),
     activeSection: activeSectionSelector(state),
 });

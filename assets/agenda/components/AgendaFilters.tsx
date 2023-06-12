@@ -13,7 +13,7 @@ import AgendaItemTypeFilter from './AgendaItemTypeFilter';
 import {AgendaCalendarAgendaFilter} from './AgendaCalendarAgendaFilter';
 import {LocationFilter} from './LocationFilter';
 
-export const transformFilterBuckets = (filter, aggregations, props) => {
+export const transformFilterBuckets = (filter: any, aggregations: any, props: any) => {
     if (!filter.transformBuckets) {
         return aggregations[filter.field].buckets;
     }
@@ -22,7 +22,7 @@ export const transformFilterBuckets = (filter, aggregations, props) => {
 };
 
 const renderFilter = {
-    item_type: (props) => (
+    item_type: (props: any) => (
         <AgendaItemTypeFilter
             key="item_type"
             activeFilter={props.activeFilter}
@@ -32,7 +32,7 @@ const renderFilter = {
             restrictCoverageInfo={props.restrictCoverageInfo}
         />
     ),
-    calendar: (props) => (
+    calendar: (props: any) => (
         <AgendaCalendarAgendaFilter
             key="calendar"
             aggregations={props.aggregations}
@@ -41,7 +41,7 @@ const renderFilter = {
             itemTypeFilter={props.itemTypeFilter}
         />
     ),
-    location: (props) => (
+    location: (props: any) => (
         !['events', 'combined'].includes(props.itemTypeFilter || 'combined') ? null : (
             <LocationFilter
                 key="location"
@@ -50,7 +50,7 @@ const renderFilter = {
             />
         )
     ),
-    region: (props) => (
+    region: (props: any) => (
         !['events', 'planning', 'combined'].includes(props.itemTypeFilter || 'combined') ? null : (
             <DropdownFilter
                 key="region"
@@ -59,7 +59,7 @@ const renderFilter = {
                 activeFilter={props.activeFilter}
                 getDropdownItems={getDropdownItems}
                 locators={props.locators}
-                getFilterLabel={(filter, activeFilter, isActive, props) => {
+                getFilterLabel={(filter: any, activeFilter: any, isActive: any, props: any) => {
                     if (!isActive) {
                         return filter.label;
                     }
@@ -83,7 +83,7 @@ const renderFilter = {
             />
         )
     ),
-    coverage_type: (props) => (
+    coverage_type: (props: any) => (
         !['planning', 'combined'].includes(props.itemTypeFilter || 'combined') ? null : (
             <DropdownFilter
                 key="coverage_type"
@@ -101,7 +101,7 @@ const renderFilter = {
             />
         )
     ),
-    coverage_status: (props) => (
+    coverage_status: (props: any) => (
         (props.eventsOnlyAccess || props.itemTypeFilter === 'events') ? null : (
             <AgendaCoverageExistsFilter
                 key="coverage_status"
@@ -145,7 +145,7 @@ AgendaFiltersComponent.propTypes = {
     filtersConfig: PropTypes.arrayOf(PropTypes.string),
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     filtersConfig: agendaFiltersConfigSelector(state),
 });
 

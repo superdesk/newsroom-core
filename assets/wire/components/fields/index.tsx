@@ -84,7 +84,7 @@ function getComponentForField(item: any, field: any) {
             return result
                 ? {
                     key: field.field,
-                    Component: (props) => (
+                    Component: (props: any) => (
                         <span style={field.styles || {}}>
                             <result.Component {...props} />
                         </span>
@@ -108,7 +108,7 @@ function getComponentForField(item: any, field: any) {
 
         return {
             key: components.map(({key}) => key).join('-'),
-            Component: (props) => (
+            Component: (props: any) => (
                 <span>
                     {components.map(({Component}, i) => (
                         <Component key={i} {...props} />

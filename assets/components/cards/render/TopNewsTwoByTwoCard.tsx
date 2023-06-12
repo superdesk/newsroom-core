@@ -8,7 +8,7 @@ import CardMeta from './CardMeta';
 import CardBody from './CardBody';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 
-const getTopNewsLeftPanel = (item, picture, openItem, cardId, listConfig) => {
+const getTopNewsLeftPanel = (item: any, picture: any, openItem: any, cardId: any, listConfig: any) => {
 
     const rendition = getThumbnailRendition(picture, true);
     const imageUrl = rendition && rendition.href;
@@ -37,7 +37,7 @@ const getTopNewsLeftPanel = (item, picture, openItem, cardId, listConfig) => {
     );
 };
 
-const getTopNewsRightPanel = (item, picture, openItem, cardId, listConfig) => {
+const getTopNewsRightPanel = (item: any, picture: any, openItem: any, cardId: any, listConfig: any) => {
 
     const rendition = getThumbnailRendition(picture);
     const imageUrl = rendition && rendition.href;
@@ -55,7 +55,7 @@ const getTopNewsRightPanel = (item, picture, openItem, cardId, listConfig) => {
     </div>);
 };
 
-const getTopNews = (items, openItem, cardId, listConfig) => {
+const getTopNews = (items: any, openItem: any, cardId: any, listConfig: any) => {
     const topNews = [];
     for(var i=0; i<items.length; i+=2) {
         topNews.push(getTopNewsLeftPanel(items[i], getPicture(items[i]), openItem, cardId, listConfig));

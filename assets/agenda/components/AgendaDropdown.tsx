@@ -8,7 +8,7 @@ export function AgendaDropdown({filter, activeFilter, toggleFilter, children, ge
     const isActive = activeFilter[filter.field];
     const getActiveFilterLabel = getFilterLabel != null ?
         getFilterLabel :
-        (filter, activeFilter, isActive) => {
+        (filter: any, activeFilter: any, isActive: any) => {
             return isActive ? gettext(activeFilter[filter.field][0]) : gettext(filter.label);
         };
 

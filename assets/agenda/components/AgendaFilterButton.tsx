@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 import classNames from 'classnames';
 
-const getActiveFilterLabel = (filter, activeFilter, isActive) => {
+const getActiveFilterLabel = (filter: any, activeFilter: any, isActive: any) => {
     return isActive ? gettext(activeFilter[filter.field][0]) : gettext(filter.label);
 };
 

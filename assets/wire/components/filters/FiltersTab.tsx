@@ -74,7 +74,7 @@ class FiltersTab extends React.Component {
                 delete currentFilters[field];
             } else if (single) {
                 currentFilters[field] = currentFilters[field].filter(
-                    (val) => val === _value
+                    (val: any) => val === _value
                 );
             }
         }
@@ -170,7 +170,7 @@ FiltersTab.propTypes = {
     context: PropTypes.string,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     aggregations: state.aggregations,
     activeFilter: searchFilterSelector(state),
     createdFilter: searchCreatedSelector(state),

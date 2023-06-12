@@ -4,10 +4,10 @@ import classNames from 'classnames';
 import {gettext} from 'utils';
 import {Dropdown} from './Dropdown';
 
-const compareFunction = (a, b) => String(a.key).localeCompare(String(b.key));
+const compareFunction = (a: any, b: any) => String(a.key).localeCompare(String(b.key));
 
-export const processBuckets = (buckets, filter, toggleFilter) => (filter.notSorted ? buckets : buckets.sort(compareFunction)).map(
-    (bucket, index) =>
+export const processBuckets = (buckets: any, filter: any, toggleFilter: any) => (filter.notSorted ? buckets : buckets.sort(compareFunction)).map(
+    (bucket: any, index: any) =>
         bucket.key === 'divider' ?
             <div className="dropdown-divider" key={index}/> :
             <button

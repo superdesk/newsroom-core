@@ -15,7 +15,7 @@ const Navigations = ({navigations=[], activeNavigation, toggleNavigation, fetchI
                     'nav-link',
                     {active: get(activeNavigation, '[0]') === navigation._id}
                 )}
-                onClick={(event) => {
+                onClick={(event: any) => {
                     event.preventDefault();
                     toggleNavigation(navigation);
                     fetchItems();

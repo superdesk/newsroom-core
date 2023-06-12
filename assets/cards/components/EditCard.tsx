@@ -23,7 +23,7 @@ class EditCard extends React.Component {
         const cardType = this.props.card.type || '';
         const CardComponent = getCardEditComponent(cardType);
         const cardTypes = CARD_TYPES.filter(
-            (card) =>  dashboard.cards.includes(card._id)
+            (card: any) =>  dashboard.cards.includes(card._id)
         ).map((c) => ({value: c._id, text: c.text}));
 
         cardTypes.unshift({value: '', text: '', component: getCardEditComponent('')});

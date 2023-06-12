@@ -118,7 +118,7 @@ Clients.propTypes = {
 };
 
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     clients: state.clients.map((id) => state.clientsById[id]),
     clientToEdit: state.clientToEdit,
     activeQuery: searchQuerySelector(state),
@@ -127,12 +127,12 @@ const mapStateToProps = (state) => ({
 });
 
 
-const mapDispatchToProps = (dispatch) => ({
-    selectClient: (id) => dispatch(selectClient(id)),
-    editClient: (event) => dispatch(editClient(event)),
+const mapDispatchToProps = (dispatch: any) => ({
+    selectClient: (id: any) => dispatch(selectClient(id)),
+    editClient: (event: any) => dispatch(editClient(event)),
     saveClient: () => dispatch(postClient()),
     deleteClient: () => dispatch(deleteClient()),
-    cancelEdit: (event) => dispatch(cancelEdit(event)),
+    cancelEdit: (event: any) => dispatch(cancelEdit(event)),
     dispatch: dispatch,
 });
 

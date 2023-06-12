@@ -23,7 +23,7 @@ export class SearchBar extends React.PureComponent {
                                 className="search__input form-control"
                                 placeholder={gettext('Search for...')}
                                 aria-label={gettext('Search for...')}
-                                onChange={(event) => this.setState({value: event.target.value})}
+                                onChange={(event: any) => this.setState({value: event.target.value})}
                             />
                             <div className="search__form-buttons">
                                 {this.state.value && (

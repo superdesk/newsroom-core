@@ -67,16 +67,16 @@ CompanyDetailsComponent.propTypes = {
     query: PropTypes.string,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     company: currentCompanySelector(state),
     companySections: companySectionListSelector(state),
     products: companyProductSeatsSelector(state),
     query: searchQuerySelector(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    showSeatRequestModal: (productIds) => dispatch(renderModal('productSeatRequest', {productIds})),
-    setSection: (sectionId, productId) => {
+const mapDispatchToProps = (dispatch: any) => ({
+    showSeatRequestModal: (productIds: any) => dispatch(renderModal('productSeatRequest', {productIds})),
+    setSection: (sectionId: any, productId: any) => {
         dispatch(_setSection(sectionId));
         dispatch(_setProductFilter(productId));
     },

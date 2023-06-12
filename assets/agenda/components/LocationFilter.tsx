@@ -417,7 +417,7 @@ export class LocationFilter extends React.Component {
             <div
                 key="location"
                 className="btn-group"
-                ref={(ref) => this.dom.container = ref}
+                ref={(ref: any) => this.dom.container = ref}
             >
                 <DropdownFilterButton
                     id="subnav_location"
@@ -447,7 +447,7 @@ export class LocationFilter extends React.Component {
                                 aria-haspopup="listbox"
                                 aria-owns="dropdown-list-menu"
                                 role="combobox"
-                                ref={(ref) => this.dom.searchInput = ref}
+                                ref={(ref: any) => this.dom.searchInput = ref}
                             />
                         </div>
                         <div
@@ -463,7 +463,7 @@ export class LocationFilter extends React.Component {
                                         type="button"
                                         className="dropdown-item"
                                         onClick={() => this.onChange()}
-                                        ref={(ref) => this.dom.clearButton = ref}
+                                        ref={(ref: any) => this.dom.clearButton = ref}
                                     >
                                         {gettext('Any location')}
                                     </button>

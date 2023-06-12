@@ -23,7 +23,7 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
         return null;
     }
 
-    const getSlugline = (coverage) => {
+    const getSlugline = (coverage: any) => {
         const slugline = coverage.item_slugline || coverage.slugline;
 
         return slugline ? ` | ${slugline}` : '';
@@ -104,7 +104,7 @@ AgendaCoveragesComponent.propTypes = {
     contentLinkTarget: PropTypes.string,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     contentLinkTarget: agendaContentLinkTarget(state),
 });
 

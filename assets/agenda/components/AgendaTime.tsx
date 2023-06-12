@@ -10,14 +10,14 @@ import {shouldRenderLocation} from'maps/utils';
 
 export default function AgendaTime({item, children}) {
     const tbcItem = isItemTBC(item);
-    const getClassNames = (modifier = 'event') => {
+    const getClassNames = (modifier: any = 'event') => {
         return bem('wire-column__preview', 'date', modifier);
     };
     const startDateInRemoteTZ = moment.tz(moment(item.dates.start).utc(), item.dates.tz);
     const isRemoteTimezone = get(item, 'dates.tz') &&
         moment.tz(moment.tz.guess()).format('Z') !== startDateInRemoteTZ.format('Z');
 
-    const getDates = (remoteTz = false) => {
+    const getDates = (remoteTz: any = false) => {
         if (remoteTz) {
             if (!isRemoteTimezone) {
                 return null;

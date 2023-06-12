@@ -70,7 +70,7 @@ class Products extends React.Component {
 
     render() {
         const progressStyle = {width: '25%'};
-        const sectionFilter = (product) => !this.props.activeSection || get(product, 'product_type', 'wire') === this.props.activeSection;
+        const sectionFilter = (product: any) => !this.props.activeSection || get(product, 'product_type', 'wire') === this.props.activeSection;
         const getActiveSection = () => this.props.sections.filter(s => s._id === this.props.activeSection);
 
         return (
@@ -144,7 +144,7 @@ Products.propTypes = {
     saveNavigations: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     products: state.products.map((id) => state.productsById[id]),
     productToEdit: state.productToEdit,
     activeProductId: state.activeProductId,
@@ -158,17 +158,17 @@ const mapStateToProps = (state) => ({
     sections: sectionsSelector(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    selectProduct: (_id) => dispatch(selectProduct(_id)),
-    editProduct: (event) => dispatch(editProduct(event)),
-    saveProduct: (type) => dispatch(postProduct(type)),
-    deleteProduct: (type) => dispatch(deleteProduct(type)),
+const mapDispatchToProps = (dispatch: any) => ({
+    selectProduct: (_id: any) => dispatch(selectProduct(_id)),
+    editProduct: (event: any) => dispatch(editProduct(event)),
+    saveProduct: (type: any) => dispatch(postProduct(type)),
+    deleteProduct: (type: any) => dispatch(deleteProduct(type)),
     newProduct: () => dispatch(newProduct()),
-    saveCompanies: (companies) => dispatch(saveCompanies(companies)),
+    saveCompanies: (companies: any) => dispatch(saveCompanies(companies)),
     fetchCompanies: () => dispatch(fetchCompanies()),
-    saveNavigations: (navigations) => dispatch(saveNavigations(navigations)),
+    saveNavigations: (navigations: any) => dispatch(saveNavigations(navigations)),
     fetchNavigations: () => dispatch(fetchNavigations()),
-    cancelEdit: (event) => dispatch(cancelEdit(event)),
+    cancelEdit: (event: any) => dispatch(cancelEdit(event)),
     dispatch: dispatch,
 });
 

@@ -24,18 +24,18 @@ const navigationFunctions = {
     'day': {
         'next': getNextDay,
         'previous': getPreviousDay,
-        'format': (dateString) => moment(dateString).format(AGENDA_DATE_FORMAT_SHORT),
+        'format': (dateString: any) => moment(dateString).format(AGENDA_DATE_FORMAT_SHORT),
     },
     'week': {
         'next': getNextWeek,
         'previous': getPreviousWeek,
-        'format': (dateString) => `${moment(dateString).format('D MMMM')} -
+        'format': (dateString: any) => `${moment(dateString).format('D MMMM')} -
         ${moment(dateString).add(6, 'days').format('D MMMM')}`,
     },
     'month': {
         'next': getNextMonth,
         'previous': getPreviousMonth,
-        'format': (dateString) => moment(dateString).format('MMMM, YYYY'),
+        'format': (dateString: any) => moment(dateString).format('MMMM, YYYY'),
     }
 };
 
@@ -491,7 +491,7 @@ export function getDataFromCoverages(item: any) {
     return data;
 }
 
-const getNextPendingScheduledUpdate = (coverage) => {
+const getNextPendingScheduledUpdate = (coverage: any) => {
     if (coverage.scheduled == null) {
         // Not privileged to see coverage details
         return null;
@@ -634,15 +634,15 @@ export function containsExtraDate(item: any, dateToCheck: any) {
 }
 
 // get start date in utc mode if there is no time info
-const getStartDate = (item) => item.dates.all_day ? moment.utc(item.dates.start) : moment(item.dates.start);
+const getStartDate = (item: any) => item.dates.all_day ? moment.utc(item.dates.start) : moment(item.dates.start);
 
 // get end date in utc mode if there is no end time info
-const getEndDate = (item) => item.dates.no_end_time || item.dates.all_day ?
+const getEndDate = (item: any) => item.dates.no_end_time || item.dates.all_day ?
     moment.utc(item.dates.end || item.dates.start) :
     moment(item.dates.end || item.dates.start);
 
 // compare days without being affected by timezone
-const isBetweenDay = (day, start, end) => {
+const isBetweenDay = (day: any, start: any, end: any) => {
     // it will be converted to local time
     // if passed as string which we need
     // for all day events which are in utc mode
@@ -730,7 +730,7 @@ export function groupItems(items: any, activeDate: any, activeGrouping: any, fea
                 items: groupedItems[k],
                 _sortDate: moment(k, DATE_FORMAT)
             })),
-        (g) => g._sortDate);
+        (g: any) => g._sortDate);
 }
 
 /**
@@ -820,7 +820,7 @@ export function isCoverageBeingUpdated(coverage: any) {
         !['published', 'corrected'].includes(coverage.deliveries[0].delivery_state);
 }
 
-export const groupRegions = (filter, aggregations, props) => {
+export const groupRegions = (filter: any, aggregations: any, props: any) => {
     if (props.locators && Object.keys(props.locators).length > 0) {
         let regions = sortBy(props.locators.filter((l) => l.state).map((l) => ({...l, 'key': l.name, 'label': l.state})), 'label');
         const others = props.locators.filter((l) => !l.state).map((l) => ({...l, 'key': l.name, 'label': l.country || l.world_region}));
@@ -839,9 +839,9 @@ export const groupRegions = (filter, aggregations, props) => {
     return aggregations[filter.field].buckets;
 };
 
-export const getRegionName = (key, locator) => locator.label || key;
+export const getRegionName = (key: any, locator: any) => locator.label || key;
 
-export const isItemTBC = (item) => (
+export const isItemTBC = (item: any) => (
     !get(item, 'event') ? get(item, `planning_items[0].${TO_BE_CONFIRMED_FIELD}`) : get(item, `event.${TO_BE_CONFIRMED_FIELD}`)
 );
 
@@ -858,7 +858,7 @@ export function formatCoverageDate(coverage: any) {
         parseDate(coverage.scheduled).format(COVERAGE_DATE_TIME_FORMAT);
 }
 
-export const getCoverageTooltip = (coverage, beingUpdated) => {
+export const getCoverageTooltip = (coverage: any, beingUpdated: any) => {
     const slugline = coverage.item_slugline || coverage.slugline;
     const coverageType = getCoverageDisplayName(coverage.coverage_type);
     const coverageScheduled = moment(coverage.scheduled);
@@ -941,7 +941,7 @@ function getScheduleType(item: any) {
  * @return {Array} [time string, date string]
  */
 export function formatAgendaDate(item: any, group: any, {localTimeZone = true, onlyDates = false}) {
-    const getFormattedTimezone = (date) => {
+    const getFormattedTimezone = (date: any) => {
         let tzStr = date.format('z');
         if (tzStr.indexOf('+0') >= 0) {
             return tzStr.replace('+0', 'GMT+');

@@ -14,7 +14,7 @@ function openItem(item) {
 
 export const OPEN_ITEM = 'OPEN_ITEM';
 export function openItemDetails(item) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         dispatch(openItem(item, get(getState(), 'context')));
         recordAction(item, 'open');
     };
@@ -36,7 +36,7 @@ export function getMultipleCardItems(itemsByCard) {
 }
 
 export function fetchCompanyCardItems() {
-    return (dispatch) => {
+    return (dispatch: any) => {
         return server.get('/card_items')
             .then((data) => dispatch(getMultipleCardItems(data._items)))
             .catch(errorHandler);
@@ -44,7 +44,7 @@ export function fetchCompanyCardItems() {
 }
 
 export function fetchCardExternalItems(cardId, cardLabel) {
-    return (dispatch) => {
+    return (dispatch: any) => {
         return server.get(`/media_card_external/${cardId}`)
             .then((data) => dispatch(
                 setCardItems(cardLabel, get(data, '_items', []))
@@ -54,7 +54,7 @@ export function fetchCardExternalItems(cardId, cardLabel) {
 }
 
 export function pushNotification(push) {
-    return (dispatch) => {
+    return (dispatch: any) => {
         if (push.event === 'items_deleted') {
             setTimeout(
                 () => window.location.reload(),

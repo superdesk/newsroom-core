@@ -1,7 +1,7 @@
 import {isEmpty} from 'lodash';
 import classNames from 'classnames';
 
-const isNotEmpty = (x) => !isEmpty(x);
+const isNotEmpty = (x: any) => !isEmpty(x);
 
 /**
  * Get bem classes

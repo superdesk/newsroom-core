@@ -205,7 +205,7 @@ function reloadMyTopics() {
 }
 
 export function pushNotification(push) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const user = getState().user;
         const company = getState().company;
         const shouldReloadTopics = [

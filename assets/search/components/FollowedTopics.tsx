@@ -60,7 +60,7 @@ class FollowedTopics extends React.Component {
                     name: gettext('Delete'),
                     icon: 'trash',
                     action: this.deleteTopic,
-                    when: (topic) => canUserEditTopic(topic, this.props.user),
+                    when: (topic: any) => canUserEditTopic(topic, this.props.user),
                 }
             ].filter(isActionEnabled('topic_actions'));
         }
@@ -105,7 +105,7 @@ class FollowedTopics extends React.Component {
         }
 
         return this.props.topics.filter(
-            (topic) => (
+            (topic: any) => (
                 topic.topic_type === this.props.topicType &&
                 (topic.is_global || false) === this.state.showGlobal
             )
@@ -209,7 +209,7 @@ FollowedTopics.propTypes = {
     companyUsers: PropTypes.array,
 };
 
-const mapStateToProps = (state, ownProps) => ({
+const mapStateToProps = (state: any, ownProps: any) => ({
     topics: state.topics,
     monitoringList: state.monitoringList,
     monitoringAdministrator: state.monitoringAdministrator,
@@ -221,12 +221,12 @@ const mapStateToProps = (state, ownProps) => ({
     companyUsers: state.monitoringProfileUsers || [],
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: any) => ({
     fetchTopics: () => dispatch(fetchTopics()),
-    shareTopic: (topic) => dispatch(shareTopic(topic)),
-    deleteTopic: (topic) => dispatch(deleteTopic(topic)),
-    selectMenuItem: (item) => dispatch(selectMenuItem(item)),
-    fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId, true)),
+    shareTopic: (topic: any) => dispatch(shareTopic(topic)),
+    deleteTopic: (topic: any) => dispatch(deleteTopic(topic)),
+    selectMenuItem: (item: any) => dispatch(selectMenuItem(item)),
+    fetchCompanyUsers: (companyId: any) => dispatch(fetchCompanyUsers(companyId, true)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(FollowedTopics);

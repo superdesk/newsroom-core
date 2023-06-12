@@ -306,7 +306,7 @@ class AgendaList extends React.Component {
         return (
             <div className={listClassName}
                 onKeyDown={this.onKeyDown}
-                ref={(elem) => {
+                ref={(elem: any) => {
                     if (elem) {
                         refNode(elem);
                         this.elem = elem;
@@ -355,7 +355,7 @@ AgendaList.propTypes = {
     listConfig: PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     itemsById: state.itemsById,
     activeItem: state.activeItem,
     previewItem: state.previewItem,

@@ -4,9 +4,9 @@ import {get} from 'lodash';
 import {gettext} from 'utils';
 import types from 'wire/types';
 
-const isFollowing = (item, topics) => 
+const isFollowing = (item: any, topics: any) => 
     item && item.slugline && topics && topics.find(
-        (topic) => topic.query === `slugline:"${item.slugline}"`
+        (topic: any) => topic.query === `slugline:"${item.slugline}"`
     );
 
 export default function FollowStory({item, user, topics, followStory}) {

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {AgendaDropdown} from './AgendaDropdown';
 
-const compareFunction = (a, b) => String(a.key).localeCompare(String(b.key));
+const compareFunction = (a: any, b: any) => String(a.key).localeCompare(String(b.key));
 
 const processBuckets = (buckets, filter, toggleFilter) => buckets.sort(compareFunction).map((bucket) =>
     <button

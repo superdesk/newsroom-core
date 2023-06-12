@@ -1,10 +1,10 @@
 import {get} from 'lodash';
 
-export const noNavigationSelected = (activeNavigation) => (
+export const noNavigationSelected = (activeNavigation: any) => (
     get(activeNavigation, 'length', 0) < 1
 );
 
-export const getNavigationUrlParam = (activeNavigation, ignoreEmpty = true, useJSON = true) => {
+export const getNavigationUrlParam = (activeNavigation: any, ignoreEmpty: any = true, useJSON: any = true) => {
     if (!ignoreEmpty && noNavigationSelected(activeNavigation)) {
         return null;
     }
@@ -14,11 +14,11 @@ export const getNavigationUrlParam = (activeNavigation, ignoreEmpty = true, useJ
         (activeNavigation || []).join(',');
 };
 
-export const getSearchParams = (custom, topic) => {
+export const getSearchParams = (custom: any, topic: any) => {
     const params = {};
 
     ['query', 'created', 'navigation', 'filter', 'product', 'advanced'].forEach(
-        (field) => {
+        (field: any) => {
             if (get(custom, field)) {
                 params[field] = custom[field];
             } else if (get(topic, field)) {
@@ -30,7 +30,7 @@ export const getSearchParams = (custom, topic) => {
     return params;
 };
 
-export const getSingleFilterValue = (activeFilter, fields) => {
+export const getSingleFilterValue = (activeFilter: any, fields: any) => {
     const filterKeys = Object.keys(activeFilter || {});
 
     if (filterKeys.length !== 1 || !fields.includes(filterKeys[0])) {

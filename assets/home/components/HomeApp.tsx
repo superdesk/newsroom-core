@@ -140,7 +140,7 @@ class HomeApp extends React.Component {
 
                 <section className="content-main d-block py-4 px-2 p-md-3 p-lg-4"
                     onScroll={this.onHomeScroll}
-                    ref={(elem) => this.elem = elem}
+                    ref={(elem: any) => this.elem = elem}
                 >
                     <div className="container-fluid">
                         {this.props.cards.length > 0 &&
@@ -239,7 +239,7 @@ HomeApp.propTypes = {
     filterGroupLabels: PropTypes.object,
 };
 
-const mapStateToProps = (state) =>({
+const mapStateToProps = (state: any) =>({
     cards: state.cards,
     itemsByCard: state.itemsByCard,
     products: state.products,
@@ -258,16 +258,16 @@ const mapStateToProps = (state) =>({
     filterGroupLabels: filterGroupsToLabelMap(state),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    openItemDetails: (item, cardId) => {
+const mapDispatchToProps = (dispatch: any) => ({
+    openItemDetails: (item: any, cardId: any) => {
         dispatch(openItemDetails(item));
         dispatch(setActive(cardId));
     },
     actions: getItemActions(dispatch),
-    fetchCardExternalItems: (cardId, cardLabel) => dispatch(fetchCardExternalItems(cardId, cardLabel)),
+    fetchCardExternalItems: (cardId: any, cardLabel: any) => dispatch(fetchCardExternalItems(cardId, cardLabel)),
     fetchCompanyCardItems: () => dispatch(fetchCompanyCardItems()),
-    followStory: (item) => followStory(item, 'wire'),
-    downloadMedia: (href, id, mimeType) => dispatch(downloadMedia(href, id, mimeType)),
+    followStory: (item: any) => followStory(item, 'wire'),
+    downloadMedia: (href: any, id: any, mimeType: any) => dispatch(downloadMedia(href, id, mimeType)),
 });
 
 
