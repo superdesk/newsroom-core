@@ -23,7 +23,7 @@ export function setUiConfig(config: any) {
 
 export const MODAL_FORM_VALID = 'MODAL_FORM_VALID';
 export function modalFormValid() {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         if (!get(getState(), 'modal.formValid')) {
             dispatch({type: MODAL_FORM_VALID});
         }
@@ -34,7 +34,7 @@ export function modalFormValid() {
 
 export const MODAL_FORM_INVALID = 'MODAL_FORM_INVALID';
 export function modalFormInvalid() {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         if (get(getState(), 'modal.formValid')) {
             dispatch({type: MODAL_FORM_INVALID});
         }
@@ -50,7 +50,7 @@ export function userProfileClosed() {
 
 export const ADD_EDIT_USERS = 'ADD_EDIT_USERS';
 export function getEditUsers(item: any) {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         let findUsers = [];
         const itemUsers = ([
             item.original_creator,
@@ -61,7 +61,7 @@ export function getEditUsers(item: any) {
         if (!get(item, 'version_creator') && !get(item, 'original_creator')) {
             return Promise.resolve();
         }
-        
+
         findUsers = differenceBy(editUsers, itemUsers.map((u) => ({'_id': u})), '_id');
         if (editUsers.length === 0 || findUsers.length > 0) {
             return server.get(`/users/search?ids=${itemUsers.join(',')}`)
@@ -70,9 +70,9 @@ export function getEditUsers(item: any) {
                         type: ADD_EDIT_USERS,
                         data
                     });
-                });    
+                });
         }
 
         return Promise.resolve();
-    };    
+    };
 }
