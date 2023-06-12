@@ -16,7 +16,7 @@ function AdvancedSearchPanelComponent({
     toggleField,
     setKeywords,
     clearParams
-}) {
+}: any) {
     return (
         <div className="advanced-search__wrapper" data-test-id="advanced-search-panel">
             <div className="advanced-search__header">

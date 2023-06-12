@@ -4,7 +4,7 @@ import CardListItem from './CardListItem';
 import {gettext} from 'utils';
 
 
-function CardList({cards, products, onClick, activeCardId}) {
+function CardList({cards, products, onClick, activeCardId}: any) {
     const list = cards.map((card) =>
         <CardListItem
             key={card._id}

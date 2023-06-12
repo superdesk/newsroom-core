@@ -4,7 +4,7 @@ import Toggle from 'react-toggle';
 import {gettext} from 'utils';
 import {noNavigationSelected} from 'search/utils';
 
-function SearchAllVersionsControl({searchAllVersions, toggleSearchAllVersions, activeNavigation}) {
+function SearchAllVersionsControl({searchAllVersions, toggleSearchAllVersions, activeNavigation}: any) {
     return !noNavigationSelected(activeNavigation) ? null : (
         <div className="d-flex align-items-center px-2 px-sm-3">
             <div className="d-flex align-items-center">

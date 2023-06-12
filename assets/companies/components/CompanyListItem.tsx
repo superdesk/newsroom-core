@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import {gettext, shortDate, isInPast} from 'utils';
 import {getCountryLabel} from '../utils';
 
-function CompanyListItem({company, type, isActive, onClick, showSubscriberId}) {
+function CompanyListItem({company, type, isActive, onClick, showSubscriberId}: any) {
     return (
         <tr key={company._id}
             className={classNames({'table--selected': isActive, 'table-secondary': !company.is_enabled})}

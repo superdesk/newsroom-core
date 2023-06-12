@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function UserProfileMenu({links, onClick}) {
+function UserProfileMenu({links, onClick}: any) {
     return (
         <div className="profile-side-navigation__items">
             {links.map((link) => (

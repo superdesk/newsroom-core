@@ -4,7 +4,7 @@ import ProductListItem from './ProductListItem';
 import {gettext} from 'utils';
 
 
-function ProductList({products, onClick, activeProductId, activeSection}) {
+function ProductList({products, onClick, activeProductId, activeSection}: any) {
     const list = products.map((product) =>
         <ProductListItem
             key={product._id}

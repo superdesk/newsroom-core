@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function InputWrapper({error, name, label, children, testId}) {
+function InputWrapper({error, name, label, children, testId}: any) {
     let wrapperClass = 'form-group';
 
     if (error && error.length > 0) {

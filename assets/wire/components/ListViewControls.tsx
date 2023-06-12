@@ -18,7 +18,7 @@ function ListViewControls({
     hideSearchAllVersions,
     searchAllVersions,
     toggleSearchAllVersions,
-}) {
+}: any) {
     return(
         <React.Fragment>
             <div className='content-bar__right'>

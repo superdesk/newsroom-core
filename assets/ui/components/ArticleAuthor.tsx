@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {gettext, isDisplayed} from 'utils';
 
-export default function ArticleAuthor({item, displayConfig}) {
+export default function ArticleAuthor({item, displayConfig}: any) {
     return (
         (item.byline || item.located || item.versioncreated) && (
             <p className='wire-column__preview__author'>

@@ -30,7 +30,7 @@ function getActiveFilterLabel(filter: any, activeFilter: any) {
     return filter.label;
 }
 
-function AgendaCoverageExistsFilter ({toggleFilter, activeFilter}) {
+function AgendaCoverageExistsFilter ({toggleFilter, activeFilter}: any) {
     return (
         <AgendaDropdown
             filter={filter}

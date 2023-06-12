@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-export function BasicNotificationItem({header, body, url, footer}) {
+export function BasicNotificationItem({header, body, url, footer}: any) {
     return (
         <React.Fragment>
             {header == null ? null : (

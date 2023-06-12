@@ -6,7 +6,7 @@ import {selectSection} from './actions';
 import {sectionsPropType} from './types';
 import {gettext} from '../../utils';
 
-function SectionSwitch({sections, activeSection, selectSection}) {
+function SectionSwitch({sections, activeSection, selectSection}: any) {
     return (
         <div className="toggle-button__group toggle-button__group--navbar ms-0 me-3">
             {sections.map((section) => (

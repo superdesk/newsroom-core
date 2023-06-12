@@ -5,7 +5,7 @@ import {gettext} from 'utils';
 
 import InfoBox from '../InfoBox';
 
-export function Authors({item}) {
+export function Authors({item}: any) {
     if (!item || !item.authors || !item.authors.length) {
         return null;
     }

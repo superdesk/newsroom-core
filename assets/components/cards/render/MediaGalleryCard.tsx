@@ -27,7 +27,7 @@ const getMediaPanel = (item: any, picture: any, openItem: any, cardId: any) => {
     </div>);
 };
 
-function MediaGalleryCard ({items, title, product, openItem, isActive, cardId}) {
+function MediaGalleryCard ({items, title, product, openItem, isActive, cardId}: any) {
     return (
         <CardRow title={title} product={product} isActive={isActive}>
             {items.map((item) => getMediaPanel(item, getPicture(item), openItem, cardId))}

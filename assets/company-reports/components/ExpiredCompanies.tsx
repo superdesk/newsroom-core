@@ -5,7 +5,7 @@ import {get} from 'lodash';
 import ReportsTable from './ReportsTable';
 
 
-function ExpiredCompanies({results, print}) {
+function ExpiredCompanies({results, print}: any) {
     const list = results && results.map((item) =>
         <tr key={item._id}>
             <td>{get(item, 'name')}</td>

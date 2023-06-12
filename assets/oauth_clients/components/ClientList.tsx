@@ -4,7 +4,7 @@ import ClientListItem from './ClientListItem';
 import {gettext} from 'utils';
 
 
-function ClientList({clients, onClick}) {
+function ClientList({clients, onClick}: any) {
     const list = clients.map((client) =>
         <ClientListItem
             key={client._id}

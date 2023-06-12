@@ -4,7 +4,7 @@ import AgendaDateButtons from './AgendaDateButtons';
 import CalendarButton from '../../components/CalendarButton';
 
 
-function AgendaDateNavigation({selectDate, activeDate, activeGrouping, displayCalendar}) {
+function AgendaDateNavigation({selectDate, activeDate, activeGrouping, displayCalendar}: any) {
     return (<div className='d-none d-lg-flex align-items-center me-3'>
         {displayCalendar && <CalendarButton selectDate={selectDate} activeDate={activeDate} />}
 

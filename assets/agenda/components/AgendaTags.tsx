@@ -13,7 +13,7 @@ import {PreviewTagsSubjects} from 'wire/components/PreviewTagsSubjects';
 import {getSubjects} from '../utils';
 
 
-function AgendaTagsComponent({item, plan, isItemDetail, displayConfig, filterGroupLabels}) {
+function AgendaTagsComponent({item, plan, isItemDetail, displayConfig, filterGroupLabels}: any) {
     const services = !isDisplayed('services', displayConfig) ? null : (
         <PreviewTagsLinkList
             urlPrefix="/agenda?filter="

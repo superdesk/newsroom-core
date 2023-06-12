@@ -11,7 +11,7 @@ const shortcuts = [
     {label: gettext('This month'), value: 'now/M'},
 ];
 
-function NavCreatedPicker({setCreatedFilter, createdFilter, context}) {
+function NavCreatedPicker({setCreatedFilter, createdFilter, context}: any) {
     const onClickFactory = (value) => (event) => {
         event.preventDefault();
         setCreatedFilter({from: createdFilter.from === value ? null : value, to: null});

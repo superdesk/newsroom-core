@@ -6,7 +6,7 @@ import {get} from 'lodash';
 import {isPostponed, isRescheduled, isCanceled} from '../utils';
 import {gettext} from 'utils';
 
-function AgendaListItemLabels({item, right}) {
+function AgendaListItemLabels({item, right}: any) {
     const getLabel = () => {
         let labelText: any;
         let labelColor: any;

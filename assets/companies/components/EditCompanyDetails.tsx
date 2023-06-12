@@ -11,7 +11,7 @@ import DateInput from 'components/DateInput';
 import CheckboxInput from 'components/CheckboxInput';
 
 
-export function EditCompanyDetails({company, companyTypes, users, errors, onChange, save, deleteCompany, ssoEnabled}) {
+export function EditCompanyDetails({company, companyTypes, users, errors, onChange, save, deleteCompany, ssoEnabled}: any) {
     return (
         <form>
             <div className="list-item__preview-form">

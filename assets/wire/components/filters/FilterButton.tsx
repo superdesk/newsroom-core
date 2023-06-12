@@ -5,7 +5,7 @@ import classnames from 'classnames';
 import {gettext} from 'utils';
 import NavLink from './NavLink';
 
-export default function FilterButton({label, onClick, className, primary}) {
+export default function FilterButton({label, onClick, className, primary}: any) {
     return (
         <div className={classnames('filter-button', className)}>
             <NavLink isActive={primary} onClick={onClick} label={gettext(label)} />

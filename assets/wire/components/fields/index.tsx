@@ -27,7 +27,7 @@ const MAP_FIELD_TO_COMPONENT = {
 //   ["charcount", "/", "wordcount"] // multiple fields on the same line
 //   ["source", "//", {field: "department", styles: {fontWeight: "bold"}}] // custom styles
 // ]
-export function FieldComponents({config, item, fieldProps = {}}) {
+export function FieldComponents({config, item, fieldProps = {}}: any) {
     if (!Array.isArray(config)) {
         return [];
     }

@@ -4,7 +4,7 @@ import UserListItem from './UserListItem';
 import {gettext} from 'utils';
 
 
-function UsersList({users, onClick, activeUserId, companiesById}) {
+function UsersList({users, onClick, activeUserId, companiesById}: any) {
     const list = users.map((user) =>
         <UserListItem
             key={user._id}

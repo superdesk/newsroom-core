@@ -18,7 +18,7 @@ const getTextOnlyPanel = (item: any, openItem: any, cardId: any, listConfig: any
     </div>
 );
 
-function LargeTextOnlyCard ({items, title, product, openItem, isActive, cardId, listConfig}) {
+function LargeTextOnlyCard ({items, title, product, openItem, isActive, cardId, listConfig}: any) {
     return (
         <CardRow title={title} product={product} isActive={isActive}>
             {items.map((item) => getTextOnlyPanel(item, openItem, cardId, listConfig))}

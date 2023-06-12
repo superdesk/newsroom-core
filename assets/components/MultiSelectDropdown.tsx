@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import {gettext} from 'utils';
 import {Dropdown} from './Dropdown';
 
-function MultiSelectDropdown({values, label, field, options, onChange, showAllButton, multi}) {
+function MultiSelectDropdown({values, label, field, options, onChange, showAllButton, multi}: any) {
     const onChanged = (option: any) => {
         if (multi) {
             if (option === 'all') {

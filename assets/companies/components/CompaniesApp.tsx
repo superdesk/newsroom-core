@@ -20,7 +20,7 @@ function CompaniesApp({
     activeQuery,
     totalCompanies,
     companyToEdit,
-}) {
+}: any) {
     return (
         <React.Fragment>
             <ListBar

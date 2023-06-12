@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-function ReportsTable({headers, rows, print, onScroll, tableClass}) {
+function ReportsTable({headers, rows, print, onScroll, tableClass}: any) {
     return (
         <section className="content-main">
             <div className="list-items-container reports-container" onScroll={onScroll}>

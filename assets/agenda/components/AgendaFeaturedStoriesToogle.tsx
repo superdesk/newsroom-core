@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Toggle from 'react-toggle';
 import {gettext} from 'utils';
 
-function AgendaFeaturedStoriesToogle ({featuredFilter, onChange}) {
+function AgendaFeaturedStoriesToogle ({featuredFilter, onChange}: any) {
     return (
         <div className="d-flex align-items-center px-2 px-sm-3">
             <div className={'d-flex align-items-center'}>

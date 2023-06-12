@@ -4,7 +4,7 @@ import {MatchLabel} from './fields/MatchLabel';
 
 import {formatTime, formatDate, wordCount, characterCount, gettext, isDisplayed, getSlugline} from 'utils';
 
-export default function ItemVersion({version, baseClass, showDivider, onClick, displayConfig, matchedIds}) {
+export default function ItemVersion({version, baseClass, showDivider, onClick, displayConfig, matchedIds}: any) {
     return (
         <div className={`${baseClass}__versions__item`} onClick={(event: any) => onClick(version, event)}>
             <div className={`${baseClass}__versions__wrap`}>

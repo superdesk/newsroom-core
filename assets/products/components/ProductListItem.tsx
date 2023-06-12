@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {gettext, shortDate} from 'utils';
 
 
-function ProductListItem({product, isActive, onClick}) {
+function ProductListItem({product, isActive, onClick}: any) {
     return (
         <tr key={product._id}
             className={isActive?'table--selected':null}

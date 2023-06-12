@@ -6,7 +6,7 @@ import {get} from 'lodash';
 import {gettext} from 'utils';
 import {STATUS_CANCELED, STATUS_POSTPONED, STATUS_RESCHEDULED} from '../utils';
 
-export default function AgendaEdNote({item, plan, secondaryNoteField, noMargin}) {
+export default function AgendaEdNote({item, plan, secondaryNoteField, noMargin}: any) {
     const planEdnote = get(plan, 'ednote');
 
     // We display Secondary Note only from 'item' for now

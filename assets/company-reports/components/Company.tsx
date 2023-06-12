@@ -49,7 +49,7 @@ function getUsers(users: any = []) {
         </div>);
 }
 
-function Company({results, print}) {
+function Company({results, print}: any) {
 
     const list = results && results.map((item) =>
         [<tr key={item._id} className="table-secondary" tabIndex='0'>

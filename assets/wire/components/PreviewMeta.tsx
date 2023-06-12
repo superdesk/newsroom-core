@@ -18,13 +18,13 @@ function PreviewMeta({
     displayConfig,
     listConfig,
     filterGroupLabels,
-}) {
+}: any) {
     const picture = getPicture(item);
     const fields = displayConfig.metadata_fields || DEFAULT_META_FIELDS;
 
     return (
         <div className="wire-articles__item__meta">
-            <WireListItemIcons 
+            <WireListItemIcons
                 item={item}
                 videos={getVideos(item)}
                 picture={picture}

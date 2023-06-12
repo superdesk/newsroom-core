@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import InputWrapper from './InputWrapper';
 
-function TextAreaInput({name, label, onChange, value, error, required, readOnly, maxLength, children, rows}) {
+function TextAreaInput({name, label, onChange, value, error, required, readOnly, maxLength, children, rows}: any) {
     return (
         <InputWrapper error={error} name={name}>
             <label htmlFor={name}>{label}</label>

@@ -5,7 +5,7 @@ import ReportsTable from './ReportsTable';
 import {gettext} from 'utils';
 
 
-function ProductStories({results, print}) {
+function ProductStories({results, print}: any) {
     const list = results && results.map((item) =>
         <tr key={item._id}>
             <td>{item.name}</td>

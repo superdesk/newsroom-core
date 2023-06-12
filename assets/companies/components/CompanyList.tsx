@@ -9,7 +9,7 @@ import {companiesSubscriberIdEnabled} from 'ui/selectors';
 import CompanyListItem from './CompanyListItem';
 
 
-function CompanyList({companies, selectCompany, activeCompanyId, companyTypes, showSubscriberId}) {
+function CompanyList({companies, selectCompany, activeCompanyId, companyTypes, showSubscriberId}: any) {
     const list = companies.map((company) =>
         <CompanyListItem
             key={company._id}

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {fullDate} from 'utils';
 
-export function VersionCreated ({item}) {
+export function VersionCreated ({item}: any) {
     return (
         <time
             dateTime={fullDate(

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {get} from 'lodash';
 
 
-export default function AgendaLongDescription({item, plan}) {
+export default function AgendaLongDescription({item, plan}: any) {
     const description = get(plan, 'description_text') || item.definition_long || item.definition_short;
 
     if (!description) {

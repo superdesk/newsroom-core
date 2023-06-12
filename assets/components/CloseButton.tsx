@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 
-function CloseButton({onClick}) {
+function CloseButton({onClick}: any) {
     return (
         <button type="button"
             className="close"

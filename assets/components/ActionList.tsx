@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import ActionButton from './ActionButton';
 
 
-function ActionList({item, group, plan, user, actions, onMouseLeave, showShortcutActions}) {
+function ActionList({item, group, plan, user, actions, onMouseLeave, showShortcutActions}: any) {
     return (
         <div onMouseLeave={onMouseLeave}>
             {actions.map((action) => (showShortcutActions || !action.shortcut) &&

@@ -7,7 +7,7 @@ import {hasAttachments} from '../utils';
 import PreviewBox from 'ui/components/PreviewBox';
 import AgendaAttachments from './AgendaAttachments';
 
-export default function AgendaPreviewAttachments({item}) {
+export default function AgendaPreviewAttachments({item}: any) {
     if (!hasAttachments(item)) {
         return null;
     }

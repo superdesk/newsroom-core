@@ -8,7 +8,7 @@ import {bem} from 'ui/utils';
 import {formatAgendaDate, isItemTBC} from '../utils';
 import {shouldRenderLocation} from'maps/utils';
 
-export default function AgendaTime({item, children}) {
+export default function AgendaTime({item, children}: any) {
     const tbcItem = isItemTBC(item);
     const getClassNames = (modifier: any = 'event') => {
         return bem('wire-column__preview', 'date', modifier);

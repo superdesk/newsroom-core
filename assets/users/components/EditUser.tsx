@@ -37,7 +37,7 @@ function EditUserComponent({
     companySections,
     seats,
     resendUserInvite,
-}) {
+}: any) {
     const companyId = user.company;
     const localeOptions = getLocaleInputOptions();
     const stateLabelDetails = getUserStateLabelDetails(user);

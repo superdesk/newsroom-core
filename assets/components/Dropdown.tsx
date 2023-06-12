@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {Dropdown as BootstrapDropdown} from 'bootstrap';
 
-export function Dropdown({children, isActive, icon, label, className, buttonProps}) {
+export function Dropdown({children, isActive, icon, label, className, buttonProps}: any) {
 
     const dropdown = React.useRef();
     let dropdownInstance = null;

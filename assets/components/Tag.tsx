@@ -2,7 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-export function Tag({text, keyValue, shade, readOnly, onClick, label}) {
+export function Tag({text, keyValue, shade, readOnly, onClick, label}: any) {
     let classes = classNames('tag-label', {
         [`tag-label--${shade}`]: shade && shade !== 'light',
     });

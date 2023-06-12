@@ -5,7 +5,7 @@ import AgendaFeaturedStoriesToogle from './AgendaFeaturedStoriesToogle';
 import {DISPLAY_AGENDA_FEATURED_STORIES_ONLY} from 'utils';
 import ListViewOptions from 'components/ListViewOptions';
 
-function AgendaListViewControls({activeView, setView, hideFeaturedToggle, toggleFeaturedFilter, featuredFilter, hasAgendaFeaturedItems}) {
+function AgendaListViewControls({activeView, setView, hideFeaturedToggle, toggleFeaturedFilter, featuredFilter, hasAgendaFeaturedItems}: any) {
     return(
         <div className='content-bar__right'>
             {!hideFeaturedToggle && hasAgendaFeaturedItems  && DISPLAY_AGENDA_FEATURED_STORIES_ONLY &&

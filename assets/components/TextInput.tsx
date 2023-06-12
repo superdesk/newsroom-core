@@ -22,7 +22,7 @@ function TextInput({
     autoFocus,
     copyAction,
     ...props
-}) {
+}: any) {
     return (
         <InputWrapper error={error} name={name} testId={`field-${name}`}>
             {label && (

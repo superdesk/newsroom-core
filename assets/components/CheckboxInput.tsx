@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
 
-function CheckboxInput({name, label, onChange, value, labelClass, readOnly}) {
+function CheckboxInput({name, label, onChange, value, labelClass, readOnly}: any) {
     if (!name) {
         name = `input-${label}`;
     }

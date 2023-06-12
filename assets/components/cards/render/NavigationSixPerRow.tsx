@@ -4,7 +4,7 @@ import {get} from 'lodash';
 import NavigationCard from './NavigationCard';
 
 
-function NavigationSixPerRow({card}) {
+function NavigationSixPerRow({card}: any) {
     const navigations = get(card, 'config.navigations') || [];
 
     const cards = navigations.map((nav) => <NavigationCard

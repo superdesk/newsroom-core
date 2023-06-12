@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-function DropdownFilterButton({id, isActive, autoToggle, onClick, icon, label, textOnly, iconColour}) {
+function DropdownFilterButton({id, isActive, autoToggle, onClick, icon, label, textOnly, iconColour}: any) {
     return (
         <button
             id={id}

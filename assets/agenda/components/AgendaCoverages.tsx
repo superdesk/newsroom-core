@@ -18,7 +18,7 @@ import {
 import {agendaContentLinkTarget} from 'ui/selectors';
 
 
-function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, onClick, hideViewContentItems, contentLinkTarget}) {
+function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, onClick, hideViewContentItems, contentLinkTarget}: any) {
     if (isEmpty(coverages)) {
         return null;
     }

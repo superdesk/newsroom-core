@@ -15,7 +15,7 @@ function NavigationTab({
     fetchItems,
     addAllOption,
     disableSameNavigationDeselect,
-}) {
+}: any) {
     const navLinks = navigations.map((navigation) => (
         <NavLink key={navigation.name}
             isActive={activeNavigation.includes(navigation._id) || navigations.length === 1}

@@ -9,7 +9,7 @@ function getProductName(products: any, id: any) {
     return product && product.name;
 }
 
-function CardListItem({card, products, isActive, onClick}) {
+function CardListItem({card, products, isActive, onClick}: any) {
     return (
         <tr key={card._id}
             className={isActive?'table--selected':null}

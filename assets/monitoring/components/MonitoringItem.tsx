@@ -4,7 +4,7 @@ import {gettext} from 'utils';
 import {get} from 'lodash';
 
 
-function MonitoringItem({item, isActive, onClick, companiesById}) {
+function MonitoringItem({item, isActive, onClick, companiesById}: any) {
     return (
         <tr key={item._id}
             className={`${isActive?'table--selected':''}

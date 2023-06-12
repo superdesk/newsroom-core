@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import {isProductEnabled} from 'companies/utils';
 import CheckboxInput from 'components/CheckboxInput';
 
-export function EditUserProductPermission({original, user, section, product, seats, onChange}) {
+export function EditUserProductPermission({original, user, section, product, seats, onChange}: any) {
     const originallyEnabled = isProductEnabled(original.products || [], product._id);
     const currentlyEnabled = isProductEnabled(user.products || [], product._id);
 

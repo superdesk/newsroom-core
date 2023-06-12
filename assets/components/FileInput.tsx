@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import InputWrapper from './InputWrapper';
 
-function FileInput({name, label, onChange, error, accept, required}) {
+function FileInput({name, label, onChange, error, accept, required}: any) {
     return (
         <InputWrapper error={error} name={name}>
             <label htmlFor={name}>{label}</label>

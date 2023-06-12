@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 import {Dropdown} from '../../components/Dropdown';
 
-export function AgendaDropdown({filter, activeFilter, toggleFilter, children, getFilterLabel}) {
+export function AgendaDropdown({filter, activeFilter, toggleFilter, children, getFilterLabel}: any) {
 
     const isActive = activeFilter[filter.field];
     const getActiveFilterLabel = getFilterLabel != null ?

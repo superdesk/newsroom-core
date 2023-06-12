@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 import {hasLocation, getLocationString} from '../utils';
 
-export default function AgendaLocation({item, isMobilePhone, border}) {
+export default function AgendaLocation({item, isMobilePhone, border}: any) {
     if  (!hasLocation(item)) {
         return null;
     }

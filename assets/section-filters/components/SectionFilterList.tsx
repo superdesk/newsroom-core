@@ -4,7 +4,7 @@ import SectionFilterListItem from './SectionFilterListItem';
 import {gettext} from 'utils';
 
 
-function SectionFilterList({sectionFilters, onClick, activeSectionFilterId}) {
+function SectionFilterList({sectionFilters, onClick, activeSectionFilterId}: any) {
     const list = sectionFilters.map((sectionFilter) =>
         <SectionFilterListItem
             key={sectionFilter._id}

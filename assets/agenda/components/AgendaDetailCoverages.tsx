@@ -6,7 +6,7 @@ import {gettext} from 'utils';
 import {hasCoverages} from '../utils';
 import AgendaCoverages from './AgendaCoverages';
 
-export default function AgendaDetailCoverages({item}) {
+export default function AgendaDetailCoverages({item}: any) {
     if (!hasCoverages(item)) {
         return null;
     }

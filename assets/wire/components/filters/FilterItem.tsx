@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default function FilterItem({bucket, group, toggleFilter, groupFilter}) {
+export default function FilterItem({bucket, group, toggleFilter, groupFilter}: any) {
     const isActive = groupFilter.indexOf(bucket.key) !== -1;
 
     return (

@@ -7,7 +7,7 @@ const getActiveFilterLabel = (filter: any, activeFilter: any, isActive: any) => 
     return isActive ? gettext(activeFilter[filter.field][0]) : gettext(filter.label);
 };
 
-function AgendaFilterButton({filter, activeFilter, autoToggle, onClick, getFilterLabel}) {
+function AgendaFilterButton({filter, activeFilter, autoToggle, onClick, getFilterLabel}: any) {
     const filterLabel = getFilterLabel ? getFilterLabel : getActiveFilterLabel;
     const isActive = activeFilter[filter.field];
     return (<button

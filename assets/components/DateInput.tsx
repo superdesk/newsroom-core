@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import InputWrapper from './InputWrapper';
 
-function DateInput({name, label, onChange, value, error, required}) {
+function DateInput({name, label, onChange, value, error, required}: any) {
     return (
         <InputWrapper error={error} name={name} testId={`field-${name}`}>
             <label htmlFor={name}>{label}</label>

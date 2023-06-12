@@ -75,7 +75,7 @@ const getEventPanel = (event: any, index: any) => {
 };
 
 
-function EventsTwoByTwoCard({events, title}) {
+function EventsTwoByTwoCard({events, title}: any) {
     return (
         <div className='row'>
             <MoreNewsButton title={title}/>

@@ -23,7 +23,7 @@ class SortItems extends React.Component<any, any> {
         this.props.onChange(items);
     }
 
-    onSortEnd({oldIndex, newIndex}) {
+    onSortEnd({oldIndex, newIndex}: any) {
         const items = arrayMove(this.state.items, oldIndex, newIndex);
         this.setState({items});
         document.body.style.cursor = this.cursor;

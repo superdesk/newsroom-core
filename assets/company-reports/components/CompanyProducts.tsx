@@ -14,7 +14,7 @@ function getProductDetails(products: any) {
     </div>)));
 }
 
-function CompanyProducts({results, print}) {
+function CompanyProducts({results, print}: any) {
 
     const list = results && results.map((item) =>
         [<tr key={item._id} className="table-secondary" tabIndex='0'>

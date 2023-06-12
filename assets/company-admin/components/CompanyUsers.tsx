@@ -8,7 +8,7 @@ import {currentCompanySelector, companySectionListSelector, userIdSelector, user
 
 import {CompanyUserListItem} from './CompanyUserListItem';
 
-function CompanyUsersComponent({users, usersById, selectUser, activeUserId, currentCompany, companySections}) {
+function CompanyUsersComponent({users, usersById, selectUser, activeUserId, currentCompany, companySections}: any) {
     const sections = companySections[currentCompany._id];
 
     return (

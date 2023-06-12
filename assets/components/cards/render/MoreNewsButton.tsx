@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 
-function MoreNewsButton({title, product, photoUrl, photoUrlLabel}) {
+function MoreNewsButton({title, product, photoUrl, photoUrlLabel}: any) {
     return ([<div key='heading' className='col-6 col-sm-8'>
         <h3 className='home-section-heading'>{title}</h3>
     </div>,

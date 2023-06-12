@@ -35,7 +35,7 @@ const getVisibleBuckets = (buckets: any, group: any, toggleGroup: any) => {
 };
 
 
-export default function FilterGroup({group, activeFilter, aggregations, toggleFilter, toggleGroup, isLoading}) {
+export default function FilterGroup({group, activeFilter, aggregations, toggleFilter, toggleGroup, isLoading}: any) {
     if (isLoading === true) {
         return (
             <NavGroup key={group.field} label={group.label}>

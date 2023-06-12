@@ -40,7 +40,7 @@ function DropdownFilter({
     getFilterLabel,
     className,
     buttonProps,
-    ...props}) {
+    ...props}: any) {
     const isActive = !!(activeFilter[filter.field]);
     const filterLabel = getFilterLabel ? getFilterLabel : getActiveFilterLabel;
     const label = filterLabel(filter, activeFilter, isActive, {...props});

@@ -10,7 +10,7 @@ import PreviewTagsBlock from './PreviewTagsBlock';
 import {PreviewTagsLinkList} from './PreviewTagsLinkList';
 
 
-function PreviewTagsSubjectsComponent({subjects, displayConfig, urlPrefix, filterGroupLabels}) {
+function PreviewTagsSubjectsComponent({subjects, displayConfig, urlPrefix, filterGroupLabels}: any) {
     if (!subjects.length) {
         return null;
     }

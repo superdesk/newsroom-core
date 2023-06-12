@@ -13,7 +13,7 @@ function CompanyPermissions({
     toggleCompanySection,
     toggleCompanyProduct,
     updateCompanySeats,
-}) {
+}: any) {
     const productsEnabled = (company.products || []).map((product) => product._id);
     const seats = (company.products || []).reduce((productSeats, product) => {
         productSeats[product._id] = product.seats;

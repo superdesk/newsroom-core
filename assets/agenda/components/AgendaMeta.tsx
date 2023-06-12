@@ -5,7 +5,7 @@ import {hasLocation, hasLocationNotes, getEventLinks, getLocationString, getPubl
 
 const url = (link: any) => link.startsWith('http') ? link : 'https://' + link;
 
-function AgendaPreviewMeta({item}) {
+function AgendaPreviewMeta({item}: any) {
     return (
         <div className='wire-articles__item__meta'>
             <div className='wire-articles__item__meta-info'>

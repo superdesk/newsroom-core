@@ -47,7 +47,7 @@ function ItemDetails({
     followStory,
     listConfig,
     filterGroupLabels,
-}) {
+}: any) {
     const pictures = getPictureList(item);
     const media = getItemMedia(item);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';

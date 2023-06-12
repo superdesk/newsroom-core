@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import CardMeta from './CardMeta';
 
-function CardFooter({item, picture, listConfig}) {
+function CardFooter({item, picture, listConfig}: any) {
     return (<div className="card-footer">
         <CardMeta
             item={item}

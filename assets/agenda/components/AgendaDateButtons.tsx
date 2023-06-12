@@ -5,7 +5,7 @@ import {gettext} from 'utils';
 import {formatNavigationDate, getNext, getPrevious} from '../utils';
 
 
-function AgendaDateButtons({selectDate, activeDate, activeGrouping}) {
+function AgendaDateButtons({selectDate, activeDate, activeGrouping}: any) {
     return ([<span className='me-3' key='label'>{formatNavigationDate(activeDate, activeGrouping)}</span>,
         <button
             key='today'

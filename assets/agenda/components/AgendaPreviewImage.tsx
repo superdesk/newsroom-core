@@ -11,7 +11,7 @@ import {get} from 'lodash';
  * @param {Object} item
  * @param {function} onClick
  */
-export default function AgendaPreviewImage({item, onClick}) {
+export default function AgendaPreviewImage({item, onClick}: any) {
     if (!shouldRenderLocation(item)) {
         return null;
     }

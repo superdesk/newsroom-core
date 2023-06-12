@@ -4,7 +4,7 @@ import NavigationListItem from './NavigationListItem';
 import {gettext} from 'utils';
 
 
-function NavigationList({navigations, onClick, activeNavigationId}) {
+function NavigationList({navigations, onClick, activeNavigationId}: any) {
     const list = navigations.map((navigation) =>
         <NavigationListItem
             key={navigation._id}

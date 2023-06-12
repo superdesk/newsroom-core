@@ -14,7 +14,7 @@ const getMediaPanel = (photo: any, index: any) => {
     </div>);
 };
 
-function PhotoGalleryCard({photos, title, moreUrl, moreUrlLabel}) {
+function PhotoGalleryCard({photos, title, moreUrl, moreUrlLabel}: any) {
     return (
         <div className='row'>
             <MoreNewsButton key="more" title={title} photoUrl={moreUrl} photoUrlLabel={moreUrlLabel} />

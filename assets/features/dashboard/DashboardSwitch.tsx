@@ -6,7 +6,7 @@ import {get} from 'lodash';
 import {selectDashboard} from './actions';
 import {dashboardPropType} from './types';
 
-function DashboardSwitch({dashboards, activeDashboard, selectDashboard}) {
+function DashboardSwitch({dashboards, activeDashboard, selectDashboard}: any) {
     if (get(dashboards, 'length', 0) <= 1) {
         // don't render the switch if configure dashboards is one
         return null;

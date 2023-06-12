@@ -8,7 +8,7 @@ import TextAreaInput from'components/TextAreaInput';
 import {gettext} from 'utils';
 
 
-function ConfigEvent ({card, onChange, errors}) {
+function ConfigEvent ({card, onChange, errors}: any) {
 
     const events = card.config.events || [{}, {}, {}, {}];
 

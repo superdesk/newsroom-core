@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {gettext, shortDate} from 'utils';
 
 
-function NavigationListItem({navigation, isActive, onClick}) {
+function NavigationListItem({navigation, isActive, onClick}: any) {
     return (
         <tr key={navigation._id}
             className={isActive?'table--selected':null}

@@ -23,7 +23,7 @@ function formatCredits(picture: any) {
 }
 
 
-export default function ArticlePicture({isKilled, picture, isItemDetails, isCustomRendition}) {
+export default function ArticlePicture({isKilled, picture, isItemDetails, isCustomRendition}: any) {
     const getRenditions = isItemDetails ? getDetailRendition : getPreviewRendition;
     const renditions = getRenditions(picture, isCustomRendition);
 

@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import {bem} from 'ui/utils';
 import {formatTime} from 'utils';
 
-export default function MetaTime({date, borderRight, isRecurring, cssClass}) {
+export default function MetaTime({date, borderRight, isRecurring, cssClass}: any) {
     const metaTimeClass = classNames('time-label', cssClass);
 
     return (

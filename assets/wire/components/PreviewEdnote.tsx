@@ -4,7 +4,7 @@ import {gettext} from 'utils';
 import InfoBox from './InfoBox';
 
 
-function PreviewEdnote({item}) {
+function PreviewEdnote({item}: any) {
     return (
         item.ednote ? <InfoBox label={gettext('Note')}>
             <div>{item.ednote}</div>

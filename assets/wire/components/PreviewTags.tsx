@@ -13,7 +13,7 @@ import {PreviewTagsLinkList} from './PreviewTagsLinkList';
 import ArticleSlugline from 'ui/components/ArticleSlugline';
 
 
-function PreviewTagsComponent({item, isItemDetail, displayConfig, filterGroupLabels}) {
+function PreviewTagsComponent({item, isItemDetail, displayConfig, filterGroupLabels}: any) {
     const services = !isDisplayed('services', displayConfig) ? null : (
         <PreviewTagsLinkList
             urlPrefix="/wire?filter="

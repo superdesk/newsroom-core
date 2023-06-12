@@ -5,7 +5,7 @@ import {gettext} from 'utils';
 import {get} from 'lodash';
 
 
-function ConfigExternalMedia ({card, onChange, errors}) {
+function ConfigExternalMedia ({card, onChange, errors}: any) {
     const sources = card.config.sources || [{}, {}, {}, {}];
 
     return (

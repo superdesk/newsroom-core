@@ -23,7 +23,7 @@ export function getUserStateLabelDetails(user: any) {
     }
 }
 
-export function CompanyUserListItem({user, onClick, selected, sections}) {
+export function CompanyUserListItem({user, onClick, selected, sections}: any) {
     const stateLabelDetails = getUserStateLabelDetails(user);
     const productNumbers = sections.reduce((sectionProductCount, section) => {
         sectionProductCount[section._id] = (user.products || [])

@@ -4,7 +4,7 @@ import {get} from 'lodash';
 
 import {Tag} from './Tag';
 
-export default function TagList({tags, onClick, readOnly}) {
+export default function TagList({tags, onClick, readOnly}: any) {
     return ((get(tags, 'length', 0) > 0 && <div className='tag-list'>
         <ul>
             {tags.map((t, index) => (

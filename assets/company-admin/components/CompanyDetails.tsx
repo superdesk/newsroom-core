@@ -7,7 +7,7 @@ import {setSection as _setSection, setProductFilter as _setProductFilter} from '
 import {CompanyDetailsProductRow} from './CompanyDetailsProductRow';
 import {searchQuerySelector} from 'search/selectors';
 import {companySectionListSelector, companyProductSeatsSelector, currentCompanySelector} from '../selectors';
-function CompanyDetailsComponent({company, showSeatRequestModal, setSection, companySections, products, query}) {
+function CompanyDetailsComponent({company, showSeatRequestModal, setSection, companySections, products, query}: any) {
     const sections = companySections[company._id];
     const numSections = sections.length;
 
@@ -36,8 +36,8 @@ function CompanyDetailsComponent({company, showSeatRequestModal, setSection, com
                             {
                                 (query === null ?
                                     Object.values(products[company._id]).filter((product) => product.section === section._id) :
-                                    Object.values(products[company._id]).filter((product) => 
-                                        product.section === section._id && 
+                                    Object.values(products[company._id]).filter((product) =>
+                                        product.section === section._id &&
                                       product.name.toString().toLowerCase().includes(query.toLowerCase())
                                     )
                                 )

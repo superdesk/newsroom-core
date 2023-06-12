@@ -17,7 +17,7 @@ import classNames from 'classnames';
  * @param {string} type
  * @param {func} onClick
  */
-export function ModalPrimaryButton({label, type, onClick, disabled}) {
+export function ModalPrimaryButton({label, type, onClick, disabled}: any) {
     assertButtonHandler(label, type, onClick);
     return (
         <button type={type || 'button'}
@@ -42,7 +42,7 @@ ModalPrimaryButton.propTypes = {
  * @param {string} type
  * @param {func} onClick
  */
-export function ModalSecondaryButton({label, type, onClick}) {
+export function ModalSecondaryButton({label, type, onClick}: any) {
     assertButtonHandler(label, type, onClick);
     return (
         <button type={type || 'button'}

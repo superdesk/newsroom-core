@@ -2,7 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import {gettext, getConfig} from 'utils';
-export function CompanyDetailsProductRow({seat, onNameClicked, showSeatRequestModal}) {
+export function CompanyDetailsProductRow({seat, onNameClicked, showSeatRequestModal}: any) {
     return (
         <tr>
             <td

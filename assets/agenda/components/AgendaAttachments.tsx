@@ -18,7 +18,7 @@ function filesize (size) {
     }
 }
 
-export default function AgendaAttachments({item}) {
+export default function AgendaAttachments({item}: any) {
     if (!hasAttachments(item)) {
         return null;
     }

@@ -14,7 +14,7 @@ import {globalTopicsEnabledSelector} from 'ui/selectors';
 
 const manageTopics = () => document.dispatchEvent(new Event('manage_topics'));
 
-function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNewItems, globalTopicsEnabled}) {
+function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNewItems, globalTopicsEnabled}: any) {
     const clickTopic = (event: any, topic: any) => {
         event.preventDefault();
         removeNewItems(topic._id);

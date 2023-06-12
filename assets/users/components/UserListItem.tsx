@@ -5,7 +5,7 @@ import {getUserLabel} from '../utils';
 import {get} from 'lodash';
 
 
-function UserListItem({user, isActive, onClick, companiesById}) {
+function UserListItem({user, isActive, onClick, companiesById}: any) {
     return (
         <tr key={user._id}
             className={`${isActive?'table--selected':''}

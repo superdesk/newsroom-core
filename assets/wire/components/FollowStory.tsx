@@ -4,12 +4,12 @@ import {get} from 'lodash';
 import {gettext} from 'utils';
 import types from 'wire/types';
 
-const isFollowing = (item: any, topics: any) => 
+const isFollowing = (item: any, topics: any) =>
     item && item.slugline && topics && topics.find(
         (topic: any) => topic.query === `slugline:"${item.slugline}"`
     );
 
-export default function FollowStory({item, user, topics, followStory}) {
+export default function FollowStory({item, user, topics, followStory}: any) {
     const canFollowStory = followStory && user && (get(item, 'slugline') || '').trim();
     const disabled = isFollowing(item, topics);
 

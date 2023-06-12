@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {gettext, getPlainTextMemoized} from 'utils';
 
-export default function AgendaInternalNote({internalNote, onlyIcon, noMargin, mt2, alignCenter, marginRightAuto, borderRight, noPaddingRight}) {
+export default function AgendaInternalNote({internalNote, onlyIcon, noMargin, mt2, alignCenter, marginRightAuto, borderRight, noPaddingRight}: any) {
     const note = getPlainTextMemoized(internalNote);
 
     if (!note) {
