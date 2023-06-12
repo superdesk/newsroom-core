@@ -30,7 +30,7 @@ export default class ExpiryDateInput extends React.Component {
 
     onSelectChange(event) {
         this.setState({value: event.target.value});
-        let newDate;
+        let newDate: any;
 
         switch (event.target.value) {
         case '1 week':

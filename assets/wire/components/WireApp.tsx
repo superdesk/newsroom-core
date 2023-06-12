@@ -124,7 +124,7 @@ class WireApp extends BaseApp {
             !this.props.bookmarks;
         let showTotalItems = false;
         let showTotalLabel = false;
-        let totalItemsLabel;
+        let totalItemsLabel: any;
         const filterValue = getSingleFilterValue(this.props.activeFilter, ['genre', 'subject']);
 
         if (get(this.props, 'context') === 'wire') {

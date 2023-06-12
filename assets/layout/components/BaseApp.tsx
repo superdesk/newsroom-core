@@ -81,7 +81,7 @@ export default class BaseApp extends React.Component {
             return null;
         }
 
-        let name;
+        let name: any;
         const numNavigations = get(activeNavigation, 'length', 0);
         const filterValue = getSingleFilterValue(activeFilter, ['genre', 'subject']);
 

@@ -48,7 +48,7 @@ class EditProduct extends React.Component {
     }
 
     getPoductTestButton(product) {
-        let q;
+        let q: any;
 
         if (product.product_type === 'agenda') {
             q = JSON.stringify({

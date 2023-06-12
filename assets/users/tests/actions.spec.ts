@@ -8,7 +8,7 @@ import wireApp from 'users/reducers';
 import * as actions from 'users/actions';
 
 describe('fetch actions', () => {
-    let store;
+    let store: any;
     const response = [{_id: 'foo'}];
 
     beforeEach(() => {

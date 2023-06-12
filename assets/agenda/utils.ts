@@ -889,7 +889,7 @@ export const getCoverageTooltip = (coverage: any, beingUpdated: any) => {
             slugline: slugline,
         });
     } else if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
-        let deliveryState;
+        let deliveryState: any;
         if (get(coverage, 'deliveries.length', 0) > 1) {
             deliveryState = beingUpdated ? gettext('(update to come)') : gettext('(updated)');
         }

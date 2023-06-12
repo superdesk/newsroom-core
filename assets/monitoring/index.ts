@@ -24,7 +24,7 @@ import {
 } from 'search/actions';
 
 
-let store;
+let store: any;
 
 if (get(window.viewData, 'context', '') === 'monitoring') {
     store = createStore(wireReducer, 'Monitoring');

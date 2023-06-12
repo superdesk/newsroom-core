@@ -144,7 +144,7 @@ export function fetchReport(url: any, next: any, exportReport: any) {
         }
 
         let queryString = getReportQueryString(getState(), next, exportReport, notify);
-        let apiRequest;
+        let apiRequest: any;
 
         if (exportReport) {
             if (getState().results.length <= 0) {

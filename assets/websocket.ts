@@ -5,8 +5,8 @@ const DEFAULT_WS_URL = 'ws://localhost:5150';
 const RECONNECT_INTERVAL = 5000;
 
 let firstConnection = true;
-let wsConnection;
-let connectInterval;
+let wsConnection: any;
+let connectInterval: any;
 const listeners = [];
 
 function connectToNotificationServer() {

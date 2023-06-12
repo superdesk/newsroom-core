@@ -64,7 +64,7 @@ const renderFilter = {
                         return filter.label;
                     }
 
-                    let region;
+                    let region: any;
                     if (get(activeFilter, `${filter.field}[0]`) && props.locators) {
                         region = (Object.values(props.locators) || []).find((l) => l.name === get(activeFilter, `${filter.field}[0]`));
                     }

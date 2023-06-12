@@ -40,7 +40,7 @@ class ShareItemModal extends React.Component {
     }
 
     toggleUser(userId, all) {
-        let newValue;
+        let newValue: any;
         if (all) {
             newValue = this.props.data.users.length === this.state.users.length ? [] :
                 this.props.data.users.map((u) => u._id);

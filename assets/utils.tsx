@@ -150,7 +150,7 @@ export function render(store: any, App: any, element: any, props: any) {
  * @param {Object} params
  * @return {String}
  */
-export function gettext(text: any, params: any) {
+export function gettext(text: any, params?: any) {
     let translated = get(window.translations, text, text);
 
     if (params) {

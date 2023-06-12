@@ -7,8 +7,8 @@ import * as actions from '../actions';
 import * as selectors from '../selectors';
 
 describe('search actions', () => {
-    let store;
-    let params;
+    let store: any;
+    let params: any;
 
     const updateParams = (search) => {
         params = {

@@ -112,7 +112,7 @@ class AgendaApp extends BaseApp {
             !this.props.featuredOnly;
         let showTotalItems = false;
         let showTotalLabel = false;
-        let totalItemsLabel;
+        let totalItemsLabel: any;
 
         if (get(this.props, 'activeTopic.label')) {
             totalItemsLabel = this.props.activeTopic.label;

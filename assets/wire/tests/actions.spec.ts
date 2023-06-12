@@ -17,7 +17,7 @@ import {
 import {initData} from '../actions';
 
 describe('wire actions', () => {
-    let store;
+    let store: any;
     const response = {
         _meta: {total: 2},
         _items: [{_id: 'foo'}],

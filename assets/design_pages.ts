@@ -121,7 +121,7 @@ function setupOpenArticleFromWireList() {
     // Open article from wire list
     var listItem = document.getElementsByClassName('wire-articles__item');
 
-    var currentItem;
+    var currentItem: any;
     for(var i = 0; i < listItem.length; i++) {
         listItem[i].onclick = function(event) {
             document.getElementsByClassName('wire-articles__item')[0].classList.toggle('wire-articles__item--open');

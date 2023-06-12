@@ -212,7 +212,7 @@ function search(state, next) {
         !eventsOnlyFilter &&
         get(state, 'agenda.featuredOnly');
 
-    let fromDateFilter;
+    let fromDateFilter: any;
 
     if (featuredFilter) {
         fromDateFilter = getMomentDate(get(state, 'agenda.activeDate')).set({

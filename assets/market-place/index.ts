@@ -38,7 +38,7 @@ const handleHistory = () => {
     };
 };
 
-let store;
+let store: any;
 
 if (window.marketPlaceData.home_page) {
     store = createStore(marketPlaceHomeReducer, 'aapX');

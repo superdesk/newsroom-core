@@ -8,8 +8,8 @@ import {gettext} from 'utils';
 
 function AgendaListItemLabels({item, right}) {
     const getLabel = () => {
-        let labelText;
-        let labelColor;
+        let labelText: any;
+        let labelColor: any;
         if (isPostponed(item)) {
             labelText = gettext('postponed');
             labelColor = 'label--blue';
@@ -35,7 +35,7 @@ function AgendaListItemLabels({item, right}) {
         }
 
         return (<div><span className={classNames('label', labelColor, {'pull-right': right})}>{labelText}</span></div>);
-        
+
     };
 
     return getLabel();

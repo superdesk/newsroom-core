@@ -1,7 +1,7 @@
 import {defaultReducer} from 'reducers';
 
 describe('default reducer', () => {
-    let initialState;
+    let initialState: any;
 
     beforeEach(() => {
         initialState = {

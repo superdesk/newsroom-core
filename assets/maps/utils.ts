@@ -13,7 +13,7 @@ export function getLocations(item: any) {
 
 /**
  * Get locations with geo coordinates
- * @param {Object} item 
+ * @param {Object} item
  * @return {Array}
  */
 export function getGeoLocations(locations: any) {
@@ -23,7 +23,7 @@ export function getGeoLocations(locations: any) {
 /**
  * Get location address for item
  *
- * @param {Object} item 
+ * @param {Object} item
  * @return {Object}
  */
 export function getAddress(item: any) {
@@ -32,7 +32,7 @@ export function getAddress(item: any) {
 
 /**
  * Get location bounding box
- * @param {Object} location 
+ * @param {Object} location
  * @return {Array}
  */
 export function getBoundingBox(location: any) {
@@ -41,7 +41,7 @@ export function getBoundingBox(location: any) {
 
 /**
  * Get location address line
- * @param {Object} location 
+ * @param {Object} location
  * @return {String}
  */
 export function getAddressLine(location: any) {
@@ -68,7 +68,7 @@ export function getAddressCountry(location: any) {
 
 /**
  * Get bounds for location
- * @param {Object} location 
+ * @param {Object} location
  * @return {LatLngBoundsLiteral}
  */
 export function getBounds(location: any) {
@@ -86,7 +86,7 @@ export function getBounds(location: any) {
 
 /**
  * Get position for location
- * @param {Object} location 
+ * @param {Object} location
  * @return {LatLngLiteral}
  */
 export function getLatLng(location: any) {
@@ -152,7 +152,7 @@ export function getMapSource(locations: any, scale: any = 1) {
     }
 
     const geoLocations = getGeoLocations(locations);
-    let src;
+    let src: any;
 
     if (!isEmpty(geoLocations)) {
         const markers = geoLocations.map((loc) => 'markers=' + encodeURIComponent(loc.location.lat + ',' + loc.location.lon));
