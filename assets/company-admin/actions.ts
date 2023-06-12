@@ -4,7 +4,7 @@ import {initViewData as initUserViewData, setError, fetchUsers} from 'users/acti
 
 export const INIT_VIEW_DATA = 'INIT_VIEW_DATA';
 export function initViewData(data: any) {
-    return (dispatch) => {
+    return (dispatch: any) => {
         dispatch({type: INIT_VIEW_DATA, data: data});
         dispatch(initUserViewData(data));
     };

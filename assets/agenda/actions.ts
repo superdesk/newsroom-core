@@ -60,13 +60,13 @@ export function preview(item, group, plan) {
 }
 
 export function previewAndCopy(item) {
-    return (dispatch) => {
+    return (dispatch: any) => {
         dispatch(copyPreviewContents(item));
     };
 }
 
 export function previewItem(item, group, plan) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         dispatch(fetchWireItemsForAgenda(item));
         markItemAsRead(item, getState());
         dispatch(preview(item, group, plan));
@@ -75,7 +75,7 @@ export function previewItem(item, group, plan) {
 }
 
 export function fetchWireItemsForAgenda(item) {
-    return (dispatch) => {
+    return (dispatch: any) => {
         let wireIds = [];
         (get(item, 'coverages') || []).forEach((c) => {
             if (c.coverage_type === 'text' && c.delivery_id) {
@@ -115,7 +115,7 @@ export function requestCoverage(item, message) {
 }
 
 export function openItem(item, group, plan) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const state = getState();
         markItemAsRead(item, state);
         dispatch(fetchWireItemsForAgenda(item));
@@ -159,7 +159,7 @@ export function selectDate(dateString, grouping) {
 
 
 export function printItem(item) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const map = encodeURIComponent(getMapSource(getLocations(item), 2));
         window.open(`/agenda/${item._id}?print&map=${map}`, '_blank');
 
@@ -177,7 +177,7 @@ export function printItem(item) {
  * This is an initial version, should be updated with preview markup changes.
  */
 export function copyPreviewContents(item) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const state = getState();
 
         if (!state.user) {
@@ -259,7 +259,7 @@ function search(state, next) {
  * Fetch items for current query
  */
 export function fetchItems() {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const start = Date.now();
         dispatch(queryItems());
         return search(getState())
@@ -272,7 +272,7 @@ export function fetchItems() {
 }
 
 export function fetchItem(id) {
-    return (dispatch) => {
+    return (dispatch: any) => {
         return server.get(`/agenda/${id}?format=json`)
             .then((data) => dispatch(recieveItem(data)))
             .catch(errorHandler);
@@ -281,7 +281,7 @@ export function fetchItem(id) {
 
 export const WATCH_EVENTS = 'WATCH_EVENTS';
 export function watchEvents(ids) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         server.post(WATCH_URL, {items: ids})
             .then(() => {
                 dispatch({type: WATCH_EVENTS, items: ids});
@@ -293,7 +293,7 @@ export function watchEvents(ids) {
 
 export const STOP_WATCHING_EVENTS = 'STOP_WATCHING_EVENTS';
 export function stopWatchingEvents(items) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         server.del(getState().bookmarks ? `${WATCH_URL}?bookmarks=true` : WATCH_URL, {items})
             .then(() => {
                 notify.success(gettext('Stopped watching items successfully.'));
@@ -316,7 +316,7 @@ export function stopWatchingEvents(items) {
  * @return {function}
  */
 export function shareItems(items) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const user = getState().user;
         const company = getState().company;
         return server.get(`/companies/${company}/users`)
@@ -337,7 +337,7 @@ export function removeBookmarkItems(items) {
 }
 
 export function bookmarkItems(items) {
-    return (dispatch, getState) =>
+    return (dispatch: any, getState: any) =>
         server.post('/agenda_bookmark', {items})
             .then(() => {
                 if (items.length > 1) {
@@ -354,7 +354,7 @@ export function bookmarkItems(items) {
 }
 
 export function removeBookmarks(items) {
-    return (dispatch, getState) =>
+    return (dispatch: any, getState: any) =>
         server.del('/agenda_bookmark', {items})
             .then(() => {
                 if (items.length > 1) {
@@ -414,7 +414,7 @@ export function removeNewItems(data) {
  * @param {Object} data
  */
 export function pushNotification(push) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const user = getState().user;
         const company = getState().company;
 
@@ -507,7 +507,7 @@ export function updateItem(item: any) {
 }
 
 export function toggleDropdownFilter(key: any, val: any) {
-    return (dispatch) => {
+    return (dispatch: any) => {
         dispatch(setActive(null));
         dispatch(preview(null));
 
@@ -524,7 +524,7 @@ export function toggleDropdownFilter(key: any, val: any) {
 }
 
 function setLocationFilter(location: any) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const state = getState();
         const currentFilters = cloneDeep(searchFilterSelector(state));
         const currentLocation = get(currentFilters, 'location') || {};
@@ -556,7 +556,7 @@ export function recieveNextItems(data: any) {
 
 const MAX_ITEMS = 1000; // server limit
 export function fetchMoreItems() {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const state = getState();
         const limit = Math.min(MAX_ITEMS, state.totalItems);
 
@@ -581,7 +581,7 @@ export function initParams(params: any) {
         clearAgendaDropdownFilters();
     }
 
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const featuredParam = params.get('featured');
         if (featuredParam && featuredParam !== get(getState(), 'agenda.featuredOnly', false).toString()) {
             dispatch(toggleFeaturedFilter(false));
@@ -607,7 +607,7 @@ export function initParams(params: any) {
  * @return {Promise}
  */
 export function loadMyAgendaTopic(topicId: any) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         // Set featured query option to false when using navigations
         if (get(getState(), 'agenda.featuredOnly')) {
             dispatch({type: TOGGLE_FEATURED_FILTER});
@@ -620,7 +620,7 @@ export function loadMyAgendaTopic(topicId: any) {
 
 export const TOGGLE_FEATURED_FILTER = 'TOGGLE_FEATURED_FILTER';
 export function toggleFeaturedFilter(fetch: any = true) {
-    return (dispatch) => {
+    return (dispatch: any) => {
         toggleFeaturedOnlyParam();
         dispatch({type: TOGGLE_FEATURED_FILTER});
         if (!fetch) {
@@ -638,7 +638,7 @@ export function setItemTypeFilter(value: any) {
 
 export const WATCH_COVERAGE = 'WATCH_COVERAGE';
 export function watchCoverage(coverage: any, item: any) {
-    return (dispatch) => {
+    return (dispatch: any) => {
         server.post(WATCH_COVERAGE_URL, {
             coverage_id: coverage.coverage_id,
             item_id: item._id
@@ -650,13 +650,13 @@ export function watchCoverage(coverage: any, item: any) {
                     item
                 });
                 notify.success(gettext('Started watching coverage successfully.'));
-            }, (error) => { errorHandler(error, dispatch);});
+            }, (error: any) => { errorHandler(error, dispatch);});
     };
 }
 
 export const STOP_WATCHING_COVERAGE = 'STOP_WATCHING_COVERAGE';
 export function stopWatchingCoverage(coverage: any, item: any) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         server.del(WATCH_COVERAGE_URL, {
             coverage_id: coverage.coverage_id,
             item_id: item._id

@@ -10,7 +10,7 @@ describe('search actions', () => {
     let store: any;
     let params: any;
 
-    const updateParams = (search) => {
+    const updateParams = (search: any) => {
         params = {
             state: store.getState(),
             url: new URLSearchParams(search != null ? search : window.location.search),

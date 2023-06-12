@@ -155,7 +155,7 @@ export function deleteTopic(topic) {
  * @return {function}
  */
 export function shareTopic(items) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const user = getState().user;
         const company = getState().company;
         return server.get(`/companies/${company}/users`)
@@ -171,7 +171,7 @@ export function shareTopic(items) {
  * @param {Object} data
  */
 export function submitShareTopic(data) {
-    return (dispatch) => {
+    return (dispatch: any) => {
         return server.post('/topic_share', data)
             .then(() => {
                 notify.success(gettext('Topic was shared successfully.'));
@@ -187,7 +187,7 @@ export function submitShareTopic(data) {
  *
  */
 export function submitFollowTopic(topic) {
-    return (dispatch) => {
+    return (dispatch: any) => {
         const url = `/topics/${topic._id}`;
         return server.post(url, topic)
             .then(() => dispatch(fetchTopics()))

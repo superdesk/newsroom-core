@@ -61,7 +61,7 @@ export default class EditAPIToken extends React.Component<any, any> {
                             loaded: true,
                             creating: false,
                         });
-                    }, (error) => {
+                    }, (error: any) => {
                         if (error.response.status === 404) {
                             this.setState({
                                 loaded: true,

@@ -60,7 +60,7 @@ export function setTopics(topics: any) {
 
 export const TOGGLE_NAVIGATION = 'TOGGLE_NAVIGATION';
 export function toggleNavigation(navigation: any, disableSameNavigationDeselect: any) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const state = getState();
         const currentNavigation = searchNavigationSelector(state);
         let newNavigation = [...currentNavigation];
@@ -74,7 +74,7 @@ export function toggleNavigation(navigation: any, disableSameNavigationDeselect:
             if (currentNavigation.includes(navigationId)) {
                 // The navigation is already selected, so deselect it
                 newNavigation = newNavigation.filter(
-                    (navId) => navId !== navigationId
+                    (navId: any) => navId !== navigationId
                 );
             } else {
                 // The navigation is not selected, so select it now
@@ -123,7 +123,7 @@ export function toggleFilter(key: any, value: any, single: any) {
                 delete currentFilters[key];
             } else if (single) {
                 currentFilters[key] = currentFilters[key].filter(
-                    (val) => val === _value
+                    (val: any) => val === _value
                 );
             }
         }
@@ -214,7 +214,7 @@ export function followStory(item: any, type: any) {
  * @param {String} navigationId
  */
 export function toggleNavigationById(navigationId: any) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const navigation = (get(getState().search, 'navigations') || []).find((nav) => navigationId === nav._id);
         if (navigation) {
             dispatch(toggleNavigation(navigation));
@@ -228,7 +228,7 @@ export function toggleNavigationById(navigationId: any) {
  * @param {Array<String>} navigationIds
  */
 export function toggleNavigationByIds(navigationIds: any) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const navigations = (get(getState().search, 'navigations') || []);
 
         toggleNavigation();
@@ -239,7 +239,7 @@ export function toggleNavigationByIds(navigationIds: any) {
 }
 
 export function submitFollowTopic(data: any) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const user = getState().user;
         const userId = get(user, '_id') || user;
 
@@ -263,7 +263,7 @@ export function submitFollowTopic(data: any) {
  * @param {Object} data
  */
 export function submitShareItem(data: any) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const userContext = context(getState());
         const type = userContext || data.items[0].topic_type;
         data.maps = [];
@@ -292,7 +292,7 @@ export function submitShareItem(data: any) {
 }
 
 export function loadMyTopic(topicId: any) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const state = getState();
         const currentTopicId = searchTopicIdSelector(state);
         const nextTopicId = topicId === currentTopicId ? null : topicId;
@@ -466,7 +466,7 @@ export function setParams(params: any) {
  * @param {URLSearchParams} params
  */
 export function initParams(params: any) {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const custom = {
             query: params.get('q'),
             created: params.get('created') ? JSON.parse(params.get('created')) : null,

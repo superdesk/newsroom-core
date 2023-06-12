@@ -17,8 +17,8 @@ const CLICK_TIMEOUT = 200; // time when we wait for double click after click
 const itemsSelector = (state) => state.items.map((_id) => state.itemsById[_id]);
 const groupedItemsSelector = createSelector(
     [itemsSelector],
-    (items) => {
-        const groupByDate = (item) => {
+    (items: any) => {
+        const groupByDate = (item: any) => {
             const date =  moment(item.versioncreated).set({'h': 0, 'm': 0, 's': 0});
             return formatDate(date);
         };

@@ -22,10 +22,10 @@ const CLICK_TIMEOUT = 200; // time when we wait for double click after click
 
 
 const itemsSelector = (state) => state.items.map((_id) => state.itemsById[_id]);
-const activeDateSelector = (state) => get(state, 'agenda.activeDate');
-const activeGroupingSelector = (state) => get(state, 'agenda.activeGrouping');
-const itemsByIdSelector = (state) => get(state, 'itemsById', {});
-const featuredOnlySelector = (state) => get(state, 'agenda.featuredOnly', false);
+const activeDateSelector = (state: any) => get(state, 'agenda.activeDate');
+const activeGroupingSelector = (state: any) => get(state, 'agenda.activeGrouping');
+const itemsByIdSelector = (state: any) => get(state, 'itemsById', {});
+const featuredOnlySelector = (state: any) => get(state, 'agenda.featuredOnly', false);
 
 const groupedItemsSelector = createSelector(
     [itemsSelector, activeDateSelector, activeGroupingSelector, featuredOnlySelector],
