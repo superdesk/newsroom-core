@@ -29,33 +29,33 @@ import {
 } from 'search/actions';
 
 export const SET_STATE = 'SET_STATE';
-export function setState(state) {
+export function setState(state: any) {
     return {type: SET_STATE, state};
 }
 
 export const SET_ITEMS = 'SET_ITEMS';
-export function setItems(items) {
+export function setItems(items: any) {
     return {type: SET_ITEMS, items};
 }
 
 export const SET_ACTIVE = 'SET_ACTIVE';
-export function setActive(item) {
+export function setActive(item: any) {
     return {type: SET_ACTIVE, item};
 }
 
 export const PREVIEW_ITEM = 'PREVIEW_ITEM';
-export function preview(item) {
+export function preview(item: any) {
     return {type: PREVIEW_ITEM, item};
 }
 
-export function previewAndCopy(item) {
+export function previewAndCopy(item: any) {
     return (dispatch: any) => {
         dispatch(previewItem(item));
         dispatch(copyPreviewContents(item));
     };
 }
 
-export function previewItem(item) {
+export function previewItem(item: any) {
     return (dispatch: any, getState: any) => {
         markItemAsRead(item, getState());
         dispatch(preview(item));
@@ -64,11 +64,11 @@ export function previewItem(item) {
 }
 
 export const OPEN_ITEM = 'OPEN_ITEM';
-export function openItemDetails(item) {
+export function openItemDetails(item: any) {
     return {type: OPEN_ITEM, item};
 }
 
-export function openItem(item) {
+export function openItem(item: any) {
     return (dispatch: any, getState: any) => {
         const state = getState();
         markItemAsRead(item, state);
@@ -83,7 +83,7 @@ export function openItem(item) {
     };
 }
 
-export function selectCopy(item) {
+export function selectCopy(item: any) {
     return () => {
         recordAction(item, 'clipboard');
     };
@@ -100,22 +100,22 @@ function loadingAggregations() {
 }
 
 export const RECIEVE_ITEMS = 'RECIEVE_ITEMS';
-export function recieveItems(data) {
+export function recieveItems(data: any) {
     return {type: RECIEVE_ITEMS, data};
 }
 
 export const RECIEVE_AGGS = 'RECIEVE_AGGS';
-function recieveAggs(data) {
+function recieveAggs(data: any) {
     return {type: RECIEVE_AGGS, data};
 }
 
 export const RECIEVE_ITEM = 'RECIEVE_ITEM';
-export function recieveItem(data) {
+export function recieveItem(data: any) {
     return {type: RECIEVE_ITEM, data};
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(wireData, newsOnlyFilterText,readData, newsOnly, searchAllVersions) {
+export function initData(wireData: any, newsOnlyFilterText: any, readData: any, newsOnly: any, searchAllVersions: any) {
     return {type: INIT_DATA, wireData, newsOnlyFilterText, readData, newsOnly, searchAllVersions};
 }
 
@@ -131,7 +131,7 @@ export function toggleSearchAllVersions() {
     return {type: TOGGLE_SEARCH_ALL_VERSIONS};
 }
 
-export function removeItems(items) {
+export function removeItems(items: any) {
     if (confirm(gettext('Are you sure you want to permanently remove these item(s)?'))) {
         return server.del('/wire', {items})
             .then(() => {
@@ -152,7 +152,7 @@ export const WIRE_ITEM_REMOVED = 'WIRE_ITEM_REMOVED';
  * Marks the items as deleted when they're removed from the system
  * @param {Array<String>} ids - List of ids of items that were removed
  */
-export function onItemsDeleted(ids) {
+export function onItemsDeleted(ids: any) {
     return {type: WIRE_ITEM_REMOVED, ids: ids};
 }
 
@@ -161,7 +161,7 @@ export function onItemsDeleted(ids) {
  *
  * This is an initial version, should be updated with preview markup changes.
  */
-export function copyPreviewContents(item) {
+export function copyPreviewContents(item: any) {
     return (dispatch: any, getState: any) => {
         const state = getState();
 
@@ -178,7 +178,7 @@ export function copyPreviewContents(item) {
     };
 }
 
-export function printItem(item) {
+export function printItem(item: any) {
     return (dispatch: any, getState: any) => {
         const userContext = context(getState());
         let uri = `/${userContext}/${item._id}?print`;
@@ -202,7 +202,7 @@ export function printItem(item) {
  * @param {bool} aggs
  * @return {Promise}
  */
-export function search(state, next, aggs) {
+export function search(state: any, next: any, aggs: any) {
     const searchParams = searchParamsSelector(state);
     const createdFilter = get(searchParams, 'created') || {};
     let created_to = createdFilter.to;
@@ -268,7 +268,7 @@ export function fetchItems() {
 }
 
 
-export function fetchItem(id) {
+export function fetchItem(id: any) {
     return (dispatch: any, getState: any) => {
         return server.get(`/${context(getState())}/${id}?format=json&context=wire`)
             .then((data) => dispatch(recieveItem(data)))
@@ -281,7 +281,7 @@ export function fetchItem(id) {
  *
  * @return {function}
  */
-export function shareItems(items) {
+export function shareItems(items: any) {
     return (dispatch: any, getState: any) => {
         const user = getState().user;
         const company = getState().company;
@@ -293,7 +293,7 @@ export function shareItems(items) {
 }
 
 export const TOGGLE_SELECTED = 'TOGGLE_SELECTED';
-export function toggleSelected(item) {
+export function toggleSelected(item: any) {
     return {type: TOGGLE_SELECTED, item};
 }
 
@@ -308,41 +308,41 @@ export function selectNone() {
 }
 
 export const SHARE_ITEMS = 'SHARE_ITEMS';
-export function setShareItems(items) {
+export function setShareItems(items: any) {
     return {type: SHARE_ITEMS, items};
 }
 
 export const DOWNLOAD_ITEMS = 'DOWNLOAD_ITEMS';
-export function setDownloadItems(items) {
+export function setDownloadItems(items: any) {
     return {type: DOWNLOAD_ITEMS, items};
 }
 
 export const EXPORT_ITEMS = 'EXPORT_ITEMS';
-export function setExportItems(items) {
+export function setExportItems(items: any) {
     return {type: EXPORT_ITEMS, items};
 }
 
 export const COPY_ITEMS = 'COPY_ITEMS';
-export function setCopyItem(item) {
+export function setCopyItem(item: any) {
     return {type: COPY_ITEMS, items: [item]};
 }
 
 export const PRINT_ITEMS = 'PRINT_ITEMS';
-export function setPrintItem(item) {
+export function setPrintItem(item: any) {
     return {type: PRINT_ITEMS, items: [item]};
 }
 
 export const BOOKMARK_ITEMS = 'BOOKMARK_ITEMS';
-export function setBookmarkItems(items) {
+export function setBookmarkItems(items: any) {
     return {type: BOOKMARK_ITEMS, items};
 }
 
 export const REMOVE_BOOKMARK = 'REMOVE_BOOKMARK';
-export function removeBookmarkItems(items) {
+export function removeBookmarkItems(items: any) {
     return {type: REMOVE_BOOKMARK, items};
 }
 
-export function bookmarkItems(items) {
+export function bookmarkItems(items: any) {
     return (dispatch: any, getState: any) =>
         server.post(`/${getState().context}_bookmark`, {items})
             .then(() => {
@@ -359,7 +359,7 @@ export function bookmarkItems(items) {
             .catch(errorHandler);
 }
 
-export function removeBookmarks(items) {
+export function removeBookmarks(items: any) {
     return (dispatch: any, getState: any) =>
         server.del(`/${getState().context}_bookmark`, {items})
             .then(() => {
@@ -374,7 +374,7 @@ export function removeBookmarks(items) {
             .catch(errorHandler);
 }
 
-function errorHandler(reason) {
+function errorHandler(reason: any) {
     console.error('error', reason);
 }
 
@@ -384,7 +384,7 @@ function errorHandler(reason) {
  * @param {Object} item
  * @return {Promise}
  */
-export function fetchVersions(item) {
+export function fetchVersions(item: any) {
     return () => server.get(`/wire/${item._id}/versions`)
         .then((data) => {
             return data._items;
@@ -397,7 +397,7 @@ export function fetchVersions(item) {
  * @param {string} id
  * @param {string} filename
  */
-export function downloadMedia(id, filename) {
+export function downloadMedia(id: any, filename: any) {
     return () => {
         window.open(`/assets/${id}?filename=${filename}`, '_blank');
         analytics.event('download-media', filename || id);
@@ -409,7 +409,7 @@ export function downloadMedia(id, filename) {
  *
  * @param {Array} items
  */
-export function downloadItems(items) {
+export function downloadItems(items: any) {
     return renderModal('downloadItems', {items});
 }
 
@@ -419,7 +419,7 @@ export function downloadItems(items) {
  * @param {Array} items
  * @param {String} params
  */
-export function submitDownloadItems(items, params) {
+export function submitDownloadItems(items: any, params: any) {
     return (dispatch: any, getState: any) => {
         const {format, secondaryFormat} = params;
         const userContext = context(getState());
@@ -436,7 +436,7 @@ export function submitDownloadItems(items, params) {
     };
 }
 
-function browserDownload(url) {
+function browserDownload(url: any) {
     const link = document.createElement('a');
     link.download = '';
     link.href = url;
@@ -444,7 +444,7 @@ function browserDownload(url) {
 }
 
 export const REMOVE_NEW_ITEMS = 'REMOVE_NEW_ITEMS';
-export function removeNewItems(data) {
+export function removeNewItems(data: any) {
     return {type: REMOVE_NEW_ITEMS, data};
 }
 

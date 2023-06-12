@@ -7,32 +7,32 @@ import {reloadMyTopics as reloadMyAgendaTopics} from '../agenda/actions';
 import {reloadMyTopics as reloadMyWireTopics} from '../wire/actions';
 
 export const GET_TOPICS = 'GET_TOPICS';
-export function getTopics(topics) {
+export function getTopics(topics: any) {
     return {type: GET_TOPICS, topics};
 }
 
 export const GET_USER = 'GET_USER';
-export function getUser(user) {
+export function getUser(user: any) {
     return {type: GET_USER, user};
 }
 
 export const EDIT_USER = 'EDIT_USER';
-export function editUser(event) {
+export function editUser(event: any) {
     return {type: EDIT_USER, event};
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(data) {
+export function initData(data: any) {
     return {type: INIT_DATA, data};
 }
 
 export const SET_ERROR = 'SET_ERROR';
-export function setError(errors) {
+export function setError(errors: any) {
     return {type: SET_ERROR, errors};
 }
 
 export const SELECT_MENU = 'SELECT_MENU';
-export function selectMenu(data) {
+export function selectMenu(data: any) {
     return function(dispatch) {
         dispatch({type: SELECT_MENU, data});
         dispatch(reloadMyTopics());
@@ -40,16 +40,16 @@ export function selectMenu(data) {
 }
 
 export const SET_TOPIC_EDITOR_FULLSCREEN = 'SET_TOPIC_EDITOR_FULLSCREEN';
-export function setTopicEditorFullscreen(fullscreen) {
+export function setTopicEditorFullscreen(fullscreen: any) {
     return {type: SET_TOPIC_EDITOR_FULLSCREEN, payload: fullscreen};
 }
 
 export const SELECT_MENU_ITEM = 'SELECT_MENU_ITEM';
-export function selectMenuItem(item) {
+export function selectMenuItem(item: any) {
     return {type: SELECT_MENU_ITEM, item};
 }
 
-export function createOrUpdateTopic(menu, item, fullscreen) {
+export function createOrUpdateTopic(menu: any, item: any, fullscreen: any) {
     userProfileStore.dispatch(selectMenuItem(item));
     userProfileStore.dispatch(selectMenu(menu));
     userProfileStore.dispatch(setTopicEditorFullscreen(fullscreen));
@@ -78,7 +78,7 @@ export function hideModal() {
 /**
  * Fetches user details
  */
-export function fetchUser(id) {
+export function fetchUser(id: any) {
     return function (dispatch) {
         return server.get(`/users/${id}`)
             .then((data) => {
@@ -137,7 +137,7 @@ export function fetchTopics() {
  * Deletes the given followed topic
  *
  */
-export function deleteTopic(topic) {
+export function deleteTopic(topic: any) {
     return function (dispatch) {
         const url = `/topics/${topic._id}`;
         return server.del(url)
@@ -154,7 +154,7 @@ export function deleteTopic(topic) {
  *
  * @return {function}
  */
-export function shareTopic(items) {
+export function shareTopic(items: any) {
     return (dispatch: any, getState: any) => {
         const user = getState().user;
         const company = getState().company;
@@ -170,7 +170,7 @@ export function shareTopic(items) {
  *
  * @param {Object} data
  */
-export function submitShareTopic(data) {
+export function submitShareTopic(data: any) {
     return (dispatch: any) => {
         return server.post('/topic_share', data)
             .then(() => {
@@ -186,7 +186,7 @@ export function submitShareTopic(data) {
  * Updates a followed topic
  *
  */
-export function submitFollowTopic(topic) {
+export function submitFollowTopic(topic: any) {
     return (dispatch: any) => {
         const url = `/topics/${topic._id}`;
         return server.post(url, topic)

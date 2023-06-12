@@ -21,12 +21,12 @@ export function editCompany(event: any) {
 }
 
 export const TOGGLE_COMPANY_SECTION = 'TOGGLE_COMPANY_SECTION';
-export function toggleCompanySection(sectionId) {
+export function toggleCompanySection(sectionId: any) {
     return {type: TOGGLE_COMPANY_SECTION, sectionId: sectionId};
 }
 
 export const TOGGLE_COMPANY_PRODUCT = 'TOGGLE_COMPANY_PRODUCT';
-export function toggleCompanyProduct(productId, sectionId, enable) {
+export function toggleCompanyProduct(productId: any, sectionId: any, enable: any) {
     return {type: TOGGLE_COMPANY_PRODUCT, payload: {
         productId: productId,
         sectionId: sectionId,
@@ -35,7 +35,7 @@ export function toggleCompanyProduct(productId, sectionId, enable) {
 }
 
 export const UPDATE_COMPANY_SEATS = 'UPDATE_COMPANY_SEATS';
-export function updateCompanySeats(productId, seats) {
+export function updateCompanySeats(productId: any, seats: any) {
     return {type: UPDATE_COMPANY_SEATS, payload: {
         productId: productId,
         seats: seats,

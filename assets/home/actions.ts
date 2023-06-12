@@ -4,16 +4,16 @@ import {pushNotification as wirePushNotification} from 'wire/actions';
 import {get} from 'lodash';
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(data) {
+export function initData(data: any) {
     return {type: INIT_DATA, data};
 }
 
-function openItem(item) {
+function openItem(item: any) {
     return {type: OPEN_ITEM, item};
 }
 
 export const OPEN_ITEM = 'OPEN_ITEM';
-export function openItemDetails(item) {
+export function openItemDetails(item: any) {
     return (dispatch: any, getState: any) => {
         dispatch(openItem(item, get(getState(), 'context')));
         recordAction(item, 'open');
@@ -21,17 +21,17 @@ export function openItemDetails(item) {
 }
 
 export const SET_ACTIVE = 'SET_ACTIVE';
-export function setActive(cardId) {
+export function setActive(cardId: any) {
     return {type: SET_ACTIVE, cardId};
 }
 
 export const SET_CARD_ITEMS = 'SET_CARD_ITEMS';
-export function setCardItems(cardLabel, items) {
+export function setCardItems(cardLabel: any, items: any) {
     return {type: SET_CARD_ITEMS, payload: {card: cardLabel, items: items}};
 }
 
 export const SET_MULTIPLE_CARD_ITEMS = 'SET_MULTIPLE_CARD_ITEMS';
-export function getMultipleCardItems(itemsByCard) {
+export function getMultipleCardItems(itemsByCard: any) {
     return {type: SET_MULTIPLE_CARD_ITEMS, payload: itemsByCard};
 }
 
@@ -43,7 +43,7 @@ export function fetchCompanyCardItems() {
     };
 }
 
-export function fetchCardExternalItems(cardId, cardLabel) {
+export function fetchCardExternalItems(cardId: any, cardLabel: any) {
     return (dispatch: any) => {
         return server.get(`/media_card_external/${cardId}`)
             .then((data) => dispatch(

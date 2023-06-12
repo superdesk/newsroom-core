@@ -39,33 +39,33 @@ const WATCH_URL = '/agenda_watch';
 const WATCH_COVERAGE_URL = '/agenda_coverage_watch';
 
 export const SET_STATE = 'SET_STATE';
-export function setState(state) {
+export function setState(state: any) {
     return {type: SET_STATE, state};
 }
 
 export const SET_ITEMS = 'SET_ITEMS';
-export function setItems(items) {
+export function setItems(items: any) {
     return {type: SET_ITEMS, items};
 }
 
 export const SET_ACTIVE = 'SET_ACTIVE';
-export function setActive(item) {
+export function setActive(item: any) {
     return {type: SET_ACTIVE, item};
 }
 
 
 export const PREVIEW_ITEM = 'PREVIEW_ITEM';
-export function preview(item, group, plan) {
+export function preview(item: any, group: any, plan: any) {
     return {type: PREVIEW_ITEM, item, group, plan};
 }
 
-export function previewAndCopy(item) {
+export function previewAndCopy(item: any) {
     return (dispatch: any) => {
         dispatch(copyPreviewContents(item));
     };
 }
 
-export function previewItem(item, group, plan) {
+export function previewItem(item: any, group: any, plan: any) {
     return (dispatch: any, getState: any) => {
         dispatch(fetchWireItemsForAgenda(item));
         markItemAsRead(item, getState());
@@ -74,7 +74,7 @@ export function previewItem(item, group, plan) {
     };
 }
 
-export function fetchWireItemsForAgenda(item) {
+export function fetchWireItemsForAgenda(item: any) {
     return (dispatch: any) => {
         let wireIds = [];
         (get(item, 'coverages') || []).forEach((c) => {
@@ -95,16 +95,16 @@ export function fetchWireItemsForAgenda(item) {
 }
 
 export const AGENDA_WIRE_ITEMS = 'AGENDA_WIRE_ITEMS';
-export function agendaWireItems(items) {
+export function agendaWireItems(items: any) {
     return {type: AGENDA_WIRE_ITEMS, items};
 }
 
 export const OPEN_ITEM = 'OPEN_ITEM';
-export function openItemDetails(item, group, plan) {
+export function openItemDetails(item: any, group: any, plan: any) {
     return {type: OPEN_ITEM, item, group, plan};
 }
 
-export function requestCoverage(item, message) {
+export function requestCoverage(item: any, message: any) {
     return () => {
         const url = '/agenda/request_coverage';
         const data = {item: item._id, message};
@@ -114,7 +114,7 @@ export function requestCoverage(item, message) {
     };
 }
 
-export function openItem(item, group, plan) {
+export function openItem(item: any, group: any, plan: any) {
     return (dispatch: any, getState: any) => {
         const state = getState();
         markItemAsRead(item, state);
@@ -138,27 +138,27 @@ export function queryItems() {
 }
 
 export const RECIEVE_ITEMS = 'RECIEVE_ITEMS';
-export function recieveItems(data) {
+export function recieveItems(data: any) {
     return {type: RECIEVE_ITEMS, data};
 }
 
 export const RECIEVE_ITEM = 'RECIEVE_ITEM';
-export function recieveItem(data) {
+export function recieveItem(data: any) {
     return {type: RECIEVE_ITEM, data};
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(agendaData, readData, activeDate, featuredOnly) {
+export function initData(agendaData: any, readData: any, activeDate: any, featuredOnly: any) {
     return {type: INIT_DATA, agendaData, readData, activeDate, featuredOnly};
 }
 
 export const SELECT_DATE = 'SELECT_DATE';
-export function selectDate(dateString, grouping) {
+export function selectDate(dateString: any, grouping: any) {
     return {type: SELECT_DATE, dateString, grouping};
 }
 
 
-export function printItem(item) {
+export function printItem(item: any) {
     return (dispatch: any, getState: any) => {
         const map = encodeURIComponent(getMapSource(getLocations(item), 2));
         window.open(`/agenda/${item._id}?print&map=${map}`, '_blank');
@@ -176,7 +176,7 @@ export function printItem(item) {
  *
  * This is an initial version, should be updated with preview markup changes.
  */
-export function copyPreviewContents(item) {
+export function copyPreviewContents(item: any) {
     return (dispatch: any, getState: any) => {
         const state = getState();
 
@@ -200,7 +200,7 @@ export function copyPreviewContents(item) {
  * @param {bool} next
  * @return {Promise}
  */
-function search(state, next) {
+function search(state: any, next: any) {
     const currentMoment = moment();
     const searchParams = searchParamsSelector(state);
     const createdFilter = get(searchParams, 'created') || {};
@@ -271,7 +271,7 @@ export function fetchItems() {
     };
 }
 
-export function fetchItem(id) {
+export function fetchItem(id: any) {
     return (dispatch: any) => {
         return server.get(`/agenda/${id}?format=json`)
             .then((data) => dispatch(recieveItem(data)))
@@ -280,7 +280,7 @@ export function fetchItem(id) {
 }
 
 export const WATCH_EVENTS = 'WATCH_EVENTS';
-export function watchEvents(ids) {
+export function watchEvents(ids: any) {
     return (dispatch: any, getState: any) => {
         server.post(WATCH_URL, {items: ids})
             .then(() => {
@@ -292,7 +292,7 @@ export function watchEvents(ids) {
 }
 
 export const STOP_WATCHING_EVENTS = 'STOP_WATCHING_EVENTS';
-export function stopWatchingEvents(items) {
+export function stopWatchingEvents(items: any) {
     return (dispatch: any, getState: any) => {
         server.del(getState().bookmarks ? `${WATCH_URL}?bookmarks=true` : WATCH_URL, {items})
             .then(() => {
@@ -315,7 +315,7 @@ export function stopWatchingEvents(items) {
  *
  * @return {function}
  */
-export function shareItems(items) {
+export function shareItems(items: any) {
     return (dispatch: any, getState: any) => {
         const user = getState().user;
         const company = getState().company;
@@ -327,16 +327,16 @@ export function shareItems(items) {
 }
 
 export const BOOKMARK_ITEMS = 'BOOKMARK_ITEMS';
-export function setBookmarkItems(items) {
+export function setBookmarkItems(items: any) {
     return {type: BOOKMARK_ITEMS, items};
 }
 
 export const REMOVE_BOOKMARK = 'REMOVE_BOOKMARK';
-export function removeBookmarkItems(items) {
+export function removeBookmarkItems(items: any) {
     return {type: REMOVE_BOOKMARK, items};
 }
 
-export function bookmarkItems(items) {
+export function bookmarkItems(items: any) {
     return (dispatch: any, getState: any) =>
         server.post('/agenda_bookmark', {items})
             .then(() => {
@@ -353,7 +353,7 @@ export function bookmarkItems(items) {
             .catch(errorHandler);
 }
 
-export function removeBookmarks(items) {
+export function removeBookmarks(items: any) {
     return (dispatch: any, getState: any) =>
         server.del('/agenda_bookmark', {items})
             .then(() => {
@@ -369,27 +369,27 @@ export function removeBookmarks(items) {
 }
 
 export const TOGGLE_SELECTED = 'TOGGLE_SELECTED';
-export function toggleSelected(item) {
+export function toggleSelected(item: any) {
     return {type: TOGGLE_SELECTED, item};
 }
 
 export const SHARE_ITEMS = 'SHARE_ITEMS';
-export function setShareItems(items) {
+export function setShareItems(items: any) {
     return {type: SHARE_ITEMS, items};
 }
 
 export const DOWNLOAD_ITEMS = 'DOWNLOAD_ITEMS';
-export function setDownloadItems(items) {
+export function setDownloadItems(items: any) {
     return {type: DOWNLOAD_ITEMS, items};
 }
 
 export const COPY_ITEMS = 'COPY_ITEMS';
-export function setCopyItem(item) {
+export function setCopyItem(item: any) {
     return {type: COPY_ITEMS, items: [item]};
 }
 
 export const PRINT_ITEMS = 'PRINT_ITEMS';
-export function setPrintItem(item) {
+export function setPrintItem(item: any) {
     return {type: PRINT_ITEMS, items: [item]};
 }
 
@@ -399,12 +399,12 @@ export function setPrintItem(item) {
  *
  * @param {Array} items
  */
-export function downloadItems(items) {
+export function downloadItems(items: any) {
     return renderModal('downloadItems', {items});
 }
 
 export const REMOVE_NEW_ITEMS = 'REMOVE_NEW_ITEMS';
-export function removeNewItems(data) {
+export function removeNewItems(data: any) {
     return {type: REMOVE_NEW_ITEMS, data};
 }
 
