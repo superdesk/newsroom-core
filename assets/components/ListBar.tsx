@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 import SearchBar from 'search/components/SearchBar';
 
-class ListBar extends React.Component {
+class ListBar extends React.Component<any, any> {
     render() {
         return (
             <section className="content-header" data-test-id={this.props.testId}>

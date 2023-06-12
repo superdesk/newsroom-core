@@ -15,7 +15,7 @@ import {
     setError,
 } from '../../actions';
 
-class UserProfile extends React.Component {
+class UserProfile extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.save = this.save.bind(this);

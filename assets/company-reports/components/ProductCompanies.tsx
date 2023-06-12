@@ -8,7 +8,7 @@ import {toggleFilterAndQuery, runReport} from '../actions';
 
 import {gettext} from 'utils';
 
-class ProductCompanies extends React.Component {
+class ProductCompanies extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 

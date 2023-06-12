@@ -14,7 +14,7 @@ const getMap = () => {
     return _map;
 };
 
-export default class Map extends React.PureComponent {
+export default class Map extends React.PureComponent<any, any> {
     constructor(props) {
         super(props);
 

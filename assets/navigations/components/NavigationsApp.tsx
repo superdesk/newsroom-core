@@ -14,7 +14,7 @@ import {sectionsPropType} from '../../features/sections/types';
 import {uiSectionsSelector, activeSectionSelector} from '../../features/sections/selectors';
 
 
-class NavigationsApp extends React.Component {
+class NavigationsApp extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
     }

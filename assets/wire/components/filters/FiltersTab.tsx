@@ -24,7 +24,7 @@ import {
 
 import {resultsFilteredSelector} from 'search/selectors';
 
-class FiltersTab extends React.Component {
+class FiltersTab extends React.Component<any, any> {
     constructor(props) {
         super(props);
 
@@ -135,7 +135,7 @@ class FiltersTab extends React.Component {
                         />)
                     ])}
                 </div>
-                {!isResetActive && !this.props.resultsFiltered ? null : ([                    
+                {!isResetActive && !this.props.resultsFiltered ? null : ([
                     <FilterButton
                         key='search'
                         label={gettext('Search')}

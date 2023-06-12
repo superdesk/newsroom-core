@@ -12,7 +12,7 @@ import TopicsTab from 'search/components/TopicsTab';
 import FiltersTab from 'wire/components/filters/FiltersTab';
 import NavigationTab from 'wire/components/filters/NavigationTab';
 
-export default class BaseApp extends React.Component {
+export default class BaseApp extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

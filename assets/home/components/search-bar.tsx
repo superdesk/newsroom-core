@@ -2,7 +2,7 @@ import React from 'react';
 import {gettext} from 'utils';
 import classNames from 'classnames';
 
-export class SearchBar extends React.PureComponent {
+export class SearchBar extends React.PureComponent<any, any> {
     constructor(props) {
         super(props);
         this.state = {value: ''};
@@ -27,7 +27,7 @@ export class SearchBar extends React.PureComponent {
                             />
                             <div className="search__form-buttons">
                                 {this.state.value && (
-                                    <button 
+                                    <button
                                         type="reset"
                                         className="search__button-clear"
                                         title={gettext('Clear search')}>

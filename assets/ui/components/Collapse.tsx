@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {Collapse} from 'bootstrap';
 
-export class CollapseBoxWithButton extends React.Component {
+export class CollapseBoxWithButton extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

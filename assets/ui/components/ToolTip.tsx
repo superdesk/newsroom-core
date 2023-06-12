@@ -4,7 +4,7 @@ import {Tooltip} from 'bootstrap';
 
 import {isTouchDevice} from 'utils';
 
-export class ToolTip extends React.PureComponent {
+export class ToolTip extends React.PureComponent<any, any> {
     constructor(props) {
         super(props);
 

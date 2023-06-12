@@ -30,7 +30,7 @@ const groupedItemsSelector = createSelector(
 );
 
 
-class AmNewsList extends React.Component {
+class AmNewsList extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

@@ -22,7 +22,7 @@ import EditCompanyAPI from './EditCompanyAPI';
 import AuditInformation from 'components/AuditInformation';
 import {EditCompanyDetails} from './EditCompanyDetails';
 
-class EditCompany extends React.Component {
+class EditCompany extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);

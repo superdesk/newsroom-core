@@ -67,7 +67,7 @@ function getShowVersionText(isExpanded: any, itemCount: any, matchCount: any, is
     }
 }
 
-class WireListItem extends React.Component {
+class WireListItem extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.wordCount = wordCount(props.item);

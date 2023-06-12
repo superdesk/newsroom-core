@@ -14,7 +14,7 @@ function isInput(field: any) {
     return ['text', 'number', 'boolean'].includes(field.type);
 }
 
-class GeneralSettingsApp extends React.Component {
+class GeneralSettingsApp extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {

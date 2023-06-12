@@ -19,7 +19,7 @@ import AgendaLocation from './AgendaLocation';
 import {gettext} from 'utils';
 
 
-class AgendaListItemIcons extends React.Component {
+class AgendaListItemIcons extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

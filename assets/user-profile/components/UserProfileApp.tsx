@@ -29,7 +29,7 @@ import '../style';
 
 const modals = {shareItem: ShareItemModal};
 
-class UserProfileApp extends React.Component {
+class UserProfileApp extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
         this.links = [

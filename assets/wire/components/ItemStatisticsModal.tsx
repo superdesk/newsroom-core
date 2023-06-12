@@ -3,7 +3,7 @@ import Modal from 'components/Modal';
 import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 
-export default class ItemStatisticsModal extends React.Component {
+export default class ItemStatisticsModal extends React.Component<any, any> {
     constructor(props) {
         super(props);
 
@@ -24,7 +24,7 @@ export default class ItemStatisticsModal extends React.Component {
 
         const pieces = guid.split(':');
         const id = pieces[pieces.length - 1];
-        
+
         fetch('https://56dtrivaof.execute-api.eu-north-1.amazonaws.com/production/api/v1/embed?organization=stt&versionId=' + id)
             .then((res) => res.json())
             .then((data) => {

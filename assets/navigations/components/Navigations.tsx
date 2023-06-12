@@ -24,7 +24,7 @@ import NavigationList from './NavigationList';
 import SearchResults from 'search/components/SearchResults';
 
 
-class Navigations extends React.Component {
+class Navigations extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 

@@ -20,7 +20,7 @@ import EditPanel from 'components/EditPanel';
 import AuditInformation from 'components/AuditInformation';
 import {ToolTip} from 'ui/components/ToolTip';
 
-class TopicEditor extends React.Component {
+class TopicEditor extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

@@ -8,7 +8,7 @@ import ExpiryButtonWrapper from './ExpiryButtonWrapper';
 import {gettext} from '../utils';
 
 
-export default class ExpiryDateInput extends React.Component {
+export default class ExpiryDateInput extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

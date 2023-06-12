@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import TextInput from 'components/TextInput';
 import {gettext} from 'utils';
 
-class EditClient extends React.Component {
+class EditClient extends React.Component<any, any> {
     constructor(props) {
         super(props);
     }

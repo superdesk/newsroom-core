@@ -13,7 +13,7 @@ import ListBar from 'components/ListBar';
 import DashboardSwitch from 'features/dashboard/DashboardSwitch';
 
 
-class CardsApp extends React.Component {
+class CardsApp extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
     }

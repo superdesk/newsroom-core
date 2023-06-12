@@ -7,7 +7,7 @@ import SortItems from 'components/SortItems';
 import {gettext, notify} from 'utils';
 
 
-class ConfigNavigation extends React.Component {
+class ConfigNavigation extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

@@ -17,7 +17,7 @@ import {getContextName} from 'selectors';
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
 
-class ItemsList extends React.Component {
+class ItemsList extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

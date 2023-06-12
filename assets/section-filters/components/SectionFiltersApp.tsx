@@ -17,7 +17,7 @@ import {sectionsSelector, activeSectionSelector} from 'features/sections/selecto
 import SectionFilters from './SectionFilters';
 import ListBar from 'components/ListBar';
 
-class SectionFiltersApp extends React.Component {
+class SectionFiltersApp extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
     }

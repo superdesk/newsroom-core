@@ -27,7 +27,7 @@ import MonitoringEditor from 'search/components/MonitoringEditor';
 import TopicEditor from 'search/components/TopicEditor';
 import TopicList from 'search/components/TopicList';
 
-class FollowedTopics extends React.Component {
+class FollowedTopics extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 

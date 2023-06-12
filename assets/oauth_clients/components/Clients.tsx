@@ -18,7 +18,7 @@ import {
 import {searchQuerySelector} from 'search/selectors';
 import {gettext} from 'utils';
 
-class Clients extends React.Component {
+class Clients extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 

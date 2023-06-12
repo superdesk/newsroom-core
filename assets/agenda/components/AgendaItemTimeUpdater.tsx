@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import {bem} from 'ui/utils';
 import {gettext} from 'utils';
 
-class AgendaItemTimeUpdater extends React.Component {
+class AgendaItemTimeUpdater extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

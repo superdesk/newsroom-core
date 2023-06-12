@@ -23,7 +23,7 @@ import {
 import ActionMenu from '../../components/ActionMenu';
 import {LIST_ANIMATIONS, isMobilePhone} from 'utils';
 
-class AgendaListItem extends React.Component {
+class AgendaListItem extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.slugline = props.item.slugline && props.item.slugline.trim();

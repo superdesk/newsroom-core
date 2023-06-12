@@ -11,7 +11,7 @@ import AgendaCoverages from './AgendaCoverages';
 import AgendaInternalNote from './AgendaInternalNote';
 import AgendaEdNote from './AgendaEdNote';
 
-class AgendaPreviewCoverages extends React.Component {
+class AgendaPreviewCoverages extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

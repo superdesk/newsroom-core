@@ -13,7 +13,7 @@ import {
 import NewItemsIcon from './NewItemsIcon';
 import {ContentSearchResults} from './ContentSearchResults';
 
-class SearchResultsInfo extends React.Component {
+class SearchResultsInfo extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

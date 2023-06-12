@@ -25,7 +25,7 @@ const options = [
 ];
 
 
-class CompanyReportsApp extends React.Component {
+class CompanyReportsApp extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 

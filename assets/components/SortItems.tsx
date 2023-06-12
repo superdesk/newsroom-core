@@ -4,7 +4,7 @@ import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc'
 import {gettext} from 'utils';
 
 
-class SortItems extends React.Component {
+class SortItems extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {items: this.props.items};

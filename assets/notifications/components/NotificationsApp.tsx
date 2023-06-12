@@ -9,7 +9,7 @@ import {
 
 import NotificationList from 'components/NotificationList';
 
-class NotificationsApp extends React.Component {
+class NotificationsApp extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
     }

@@ -7,7 +7,7 @@ import {gettext} from 'utils';
 
 import {searchQuerySelector} from 'search/selectors';
 
-class SearchBar extends React.Component {
+class SearchBar extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.onChange = this.onChange.bind(this);

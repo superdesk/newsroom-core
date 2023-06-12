@@ -9,7 +9,7 @@ import {selectCopy} from '../../wire/actions';
  * using component to fix iframely loading
  * https://iframely.com/docs/reactjs
  */
-class ArticleBodyHtml extends React.PureComponent {
+class ArticleBodyHtml extends React.PureComponent<any, any> {
     constructor(props) {
         super(props);
         this.copyClicked = this.copyClicked.bind(this);
@@ -87,7 +87,7 @@ class ArticleBodyHtml extends React.PureComponent {
                 if (url.includes('twitter.com/') && window.twttr != null) {
                     window.twttr.widgets.load();
                     return;
-                } 
+                }
 
                 if (url.includes('instagram.com/') && window.instgrm != null) {
                     window.instgrm.Embeds.process();

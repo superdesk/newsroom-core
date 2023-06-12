@@ -23,7 +23,7 @@ import UsersList from './UsersList';
 import SearchResults from 'search/components/SearchResults';
 
 
-class Users extends React.Component {
+class Users extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 

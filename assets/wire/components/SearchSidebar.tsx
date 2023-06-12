@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {setActiveFilterTab, getActiveFilterTab} from 'local-store';
 
-class SearchSidebar extends React.Component {
+class SearchSidebar extends React.Component<any, any> {
     constructor(props) {
         super(props);
         const activeTabId = getActiveFilterTab(props.props.context);

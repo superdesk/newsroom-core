@@ -8,7 +8,7 @@ import {fetchVersions, openItem} from '../actions';
 import ItemVersion from './ItemVersion';
 
 
-class ListItemPreviousVersions extends React.Component {
+class ListItemPreviousVersions extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {versions: [], loading: true, error: false};

@@ -28,7 +28,7 @@ import ProductList from './ProductList';
 
 import SearchResults from 'search/components/SearchResults';
 
-class Products extends React.Component {
+class Products extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 

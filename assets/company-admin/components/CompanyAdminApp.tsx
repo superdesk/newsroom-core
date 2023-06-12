@@ -33,7 +33,7 @@ import EditUser from 'users/components/EditUser';
 import {CompanyDetailsProductFilter} from './CompanyDetailsProductFilter';
 import {CompanyAdminProductSeatRequestModal} from './CompanyAdminProductSeatRequestModal';
 
-class CompanyAdminAppComponent extends React.Component {
+class CompanyAdminAppComponent extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

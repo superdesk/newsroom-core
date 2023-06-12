@@ -21,7 +21,7 @@ function getDeliveryId(coverage: any) {
     return get(coverage, 'delivery_id');
 }
 
-export default class CoverageItemStatus extends React.Component {
+export default class CoverageItemStatus extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {wireItem: null};

@@ -17,7 +17,7 @@ const getProductCompanies = (product: any, companies: any) => ({
     }).map((company) => company._id),
 });
 
-class EditProduct extends React.Component {
+class EditProduct extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);

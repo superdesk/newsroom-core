@@ -23,7 +23,7 @@ import {AgendaPreviewPlanning} from './AgendaPreviewPlanning';
 import {AgendaPreviewEvent} from './AgendaPreviewEvent';
 import {AgendaRegistrationInvitationDetails} from './AgendaRegistrationInvitationDetails';
 
-class AgendaPreview extends React.PureComponent {
+class AgendaPreview extends React.PureComponent<any, any> {
     constructor(props) {
         super(props);
     }

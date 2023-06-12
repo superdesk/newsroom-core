@@ -4,7 +4,7 @@ import {Tooltip} from 'bootstrap';
 
 import {isTouchDevice} from '../../utils';
 
-class ProfileToggle extends React.Component {
+class ProfileToggle extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

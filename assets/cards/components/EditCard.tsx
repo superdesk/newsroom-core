@@ -13,7 +13,7 @@ import {
 } from 'components/cards/utils';
 
 
-class EditCard extends React.Component {
+class EditCard extends React.Component<any, any> {
     constructor(props) {
         super(props);
     }

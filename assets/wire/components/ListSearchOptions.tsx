@@ -4,7 +4,7 @@ import Toggle from 'react-toggle';
 
 import {gettext} from 'utils';
 
-export class ListSearchOptions extends React.PureComponent {
+export class ListSearchOptions extends React.PureComponent<any, any> {
     constructor(props) {
         super(props);
 

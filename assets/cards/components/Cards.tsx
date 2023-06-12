@@ -20,7 +20,7 @@ import EditCard from './EditCard';
 import CardList from './CardList';
 import SearchResults from 'search/components/SearchResults';
 
-class Cards extends React.Component {
+class Cards extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 

@@ -8,7 +8,7 @@ import AuditInformation from 'components/AuditInformation';
 import {gettext} from 'utils';
 import {sectionsPropType} from '../../features/sections/types';
 
-class EditSectionFilter extends React.Component {
+class EditSectionFilter extends React.Component<any, any> {
     constructor(props) {
         super(props);
     }

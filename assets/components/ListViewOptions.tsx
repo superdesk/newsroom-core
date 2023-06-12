@@ -7,7 +7,7 @@ import {gettext} from 'utils';
 import {EXTENDED_VIEW, COMPACT_VIEW} from 'wire/defaults';
 import {isTouchDevice} from 'utils';
 
-class ListViewOptions extends React.PureComponent {
+class ListViewOptions extends React.PureComponent<any, any> {
     constructor(props) {
         super(props);
         this.state = {isOpen: false};

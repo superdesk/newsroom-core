@@ -7,7 +7,7 @@ import {gettext} from 'utils';
 
 import DropdownFilter from 'components/DropdownFilter';
 
-export class UserListSortFilter extends React.PureComponent {
+export class UserListSortFilter extends React.PureComponent<any, any> {
     constructor(props) {
         super(props);
 

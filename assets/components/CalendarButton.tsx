@@ -6,7 +6,7 @@ import moment from 'moment';
 import CalendarButtonWrapper from './CalendarButtonWrapper';
 import {EARLIEST_DATE} from '../agenda/utils';
 
-class CalendarButton extends React.Component {
+class CalendarButton extends React.Component<any, any> {
     constructor (props) {
         super(props);
 

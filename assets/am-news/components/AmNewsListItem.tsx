@@ -22,7 +22,7 @@ import {
 } from '../utils';
 
 
-class AmNewsListItem extends React.Component {
+class AmNewsListItem extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.wordCount = wordCount(props.item);

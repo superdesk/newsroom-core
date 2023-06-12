@@ -8,7 +8,7 @@ import {gettext} from 'utils';
 import {isTouchDevice} from '../utils';
 import NotificationListItem from './NotificationListItem';
 
-class NotificationList extends React.Component {
+class NotificationList extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {

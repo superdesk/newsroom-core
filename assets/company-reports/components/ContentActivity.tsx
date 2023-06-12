@@ -11,7 +11,7 @@ import CalendarButton from '../../components/CalendarButton';
 import MultiSelectDropdown from '../../components/MultiSelectDropdown';
 import ReportsTable from './ReportsTable';
 
-class ContentActivity extends React.Component {
+class ContentActivity extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

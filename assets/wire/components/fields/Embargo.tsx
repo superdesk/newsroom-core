@@ -6,7 +6,7 @@ import {Tooltip} from 'bootstrap';
 
 import {gettext, fullDate, getEmbargo} from 'utils';
 
-export class Embargo extends React.Component {
+export class Embargo extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {

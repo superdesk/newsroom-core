@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import MoreNewsButton from './MoreNewsButton';
 import {connect} from 'react-redux';
 
-class CardRow extends React.Component {
+class CardRow extends React.Component<any, any> {
     constructor(props) {
         super(props);
     }

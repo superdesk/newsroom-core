@@ -12,7 +12,7 @@ import MonitoringSchedule from '../../monitoring/components/MonitoringSchedule';
 import {fetchCompanyUsers} from 'companies/actions';
 import {postMonitoringProfile} from 'monitoring/actions';
 
-class MonitoringEditor extends React.Component {
+class MonitoringEditor extends React.Component<any, any> {
     constructor(props) {
         super(props);
 
@@ -84,7 +84,7 @@ class MonitoringEditor extends React.Component {
         } else if (field === 'is_enabled') {
             value = !get(this.state, 'profile.is_enabled');
         }
-        
+
         set(wl, field, value);
 
         this.setState({
@@ -111,7 +111,7 @@ class MonitoringEditor extends React.Component {
         if (!profile) {
             return null;
         }
-        
+
         const propsToFields = {
             'onChange': this.onChange,
             'readOnly': !isAdmin,
@@ -172,7 +172,7 @@ class MonitoringEditor extends React.Component {
                                         name='description'
                                         label={gettext('Description')}
                                         value={profile.description}
-                                        {...propsToFields} /> 
+                                        {...propsToFields} />
 
                                     <SelectInput
                                         name='alert_type'
@@ -184,7 +184,7 @@ class MonitoringEditor extends React.Component {
                                         ]}
                                         {...propsToFields} />
 
-                                    <MonitoringSchedule 
+                                    <MonitoringSchedule
                                         item={profile}
                                         onsaveMonitoringProfileSchedule={this.onChange}
                                         {...propsToFields}

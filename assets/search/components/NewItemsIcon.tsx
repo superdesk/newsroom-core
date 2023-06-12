@@ -6,7 +6,7 @@ import {Tooltip} from 'bootstrap';
 
 import {gettext, isTouchDevice, isWireContext} from 'utils';
 
-class NewItemsIcon extends React.Component {
+class NewItemsIcon extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

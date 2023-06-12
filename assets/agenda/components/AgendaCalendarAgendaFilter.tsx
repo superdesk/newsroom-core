@@ -7,7 +7,7 @@ import {processBuckets} from '../../components/DropdownFilter';
 
 import {getDropdownItems} from './AgendaFilters';
 
-export class AgendaCalendarAgendaFilter extends React.PureComponent {
+export class AgendaCalendarAgendaFilter extends React.PureComponent<any, any> {
     render() {
         const isActive = !!(this.props.activeFilter.calendar) || !!(this.props.activeFilter.agendas);
         const calendarFilter = {

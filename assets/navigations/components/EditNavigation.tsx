@@ -12,7 +12,7 @@ import {MAX_TILE_IMAGES} from '../actions';
 import AuditInformation from 'components/AuditInformation';
 
 
-class EditNavigation extends React.Component {
+class EditNavigation extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);

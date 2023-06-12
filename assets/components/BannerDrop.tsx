@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-class BannerDrop extends React.Component {
+class BannerDrop extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {open: this.props.isOpen};

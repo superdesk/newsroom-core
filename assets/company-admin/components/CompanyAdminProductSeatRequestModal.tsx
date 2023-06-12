@@ -13,7 +13,7 @@ import TextInput from 'components/TextInput';
 import TextAreaInput from 'components/TextAreaInput';
 import {Tag} from 'components/Tag';
 
-class CompanyAdminProductSeatRequestModalComponent extends React.Component {
+class CompanyAdminProductSeatRequestModalComponent extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

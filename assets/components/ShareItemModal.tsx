@@ -11,7 +11,7 @@ import {modalFormInvalid, modalFormValid} from 'actions';
 import Modal from 'components/Modal';
 import SearchBar from 'search/components/SearchBar';
 
-class ShareItemModal extends React.Component {
+class ShareItemModal extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {

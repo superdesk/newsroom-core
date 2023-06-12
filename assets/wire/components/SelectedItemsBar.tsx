@@ -7,7 +7,7 @@ import {gettext} from 'utils';
 
 import {selectAll, selectNone} from 'wire/actions';
 
-class SelectedItemsBar extends React.PureComponent {
+class SelectedItemsBar extends React.PureComponent<any, any> {
     constructor(props) {
         super(props);
         this.onAction = this.onAction.bind(this);

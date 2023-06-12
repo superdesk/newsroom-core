@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment from 'moment';
 import {AGENDA_DATE_PICKER_FORMAT_SHORT} from '../utils';
 
-class CalendarButtonWrapper extends React.Component {
+class CalendarButtonWrapper extends React.Component<any, any> {
     render() {
         return (
             <button className={

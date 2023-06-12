@@ -35,7 +35,7 @@ import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
 
 
-class WirePreview extends React.PureComponent {
+class WirePreview extends React.PureComponent<any, any> {
     constructor(props) {
         super(props);
     }

@@ -5,7 +5,7 @@ import {Tooltip} from 'bootstrap';
 import {isTouchDevice} from 'utils';
 
 
-class ActionButton extends React.Component {
+class ActionButton extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

@@ -13,7 +13,7 @@ import {
     WORKFLOW_COLORS,
 } from '../utils';
 
-class AgendaListCoverageItem extends React.Component {
+class AgendaListCoverageItem extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

@@ -10,7 +10,7 @@ import {setSearchQuery} from 'search/actions';
 import Clients from './Clients';
 import ListBar from 'components/ListBar';
 
-class ClientsApp extends React.Component {
+class ClientsApp extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
     }

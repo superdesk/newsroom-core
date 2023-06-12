@@ -5,7 +5,7 @@ import {Popover, PopoverBody} from 'reactstrap';
 
 import {gettext} from 'utils';
 
-class ActionMenu extends React.Component {
+class ActionMenu extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.onMouseLeave = this.onMouseLeave.bind(this);

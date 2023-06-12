@@ -42,7 +42,7 @@ const listItemsSelector = createSelector(
 );
 
 
-class AgendaList extends React.Component {
+class AgendaList extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

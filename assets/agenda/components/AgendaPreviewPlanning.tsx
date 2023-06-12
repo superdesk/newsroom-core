@@ -6,7 +6,7 @@ import {gettext} from 'utils';
 import {isPlanningItem} from '../utils';
 import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 
-export class AgendaPreviewPlanning extends React.Component {
+export class AgendaPreviewPlanning extends React.Component<any, any> {
     render() {
         const {
             item,

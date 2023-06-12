@@ -17,7 +17,7 @@ import {sectionsSelector, activeSectionSelector} from 'features/sections/selecto
 import Products from './Products';
 import ListBar from 'components/ListBar';
 
-class ProductsApp extends React.Component {
+class ProductsApp extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
     }

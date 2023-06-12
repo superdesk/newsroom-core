@@ -10,7 +10,7 @@ import {get} from 'lodash';
 import Modal from 'components/Modal';
 import SelectInput from 'components/SelectInput';
 
-class DownloadItemsModal extends React.Component {
+class DownloadItemsModal extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {

@@ -26,7 +26,7 @@ const modals = {
     downloadItems: DownloadItemsModal,
 };
 
-class HomeApp extends React.Component {
+class HomeApp extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
         this.getPanels = this.getPanels.bind(this);

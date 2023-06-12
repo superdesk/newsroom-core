@@ -23,7 +23,7 @@ import EditSectionFilter from './EditSectionFilter';
 import SectionFilterList from './SectionFilterList';
 import SearchResults from 'search/components/SearchResults';
 
-class SectionFilters extends React.Component {
+class SectionFilters extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 

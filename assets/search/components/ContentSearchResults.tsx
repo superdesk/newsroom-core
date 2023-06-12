@@ -16,7 +16,7 @@ import {
 } from 'search/selectors';
 import {Tag} from 'components/Tag';
 
-class ContentSearchResultsComponent extends React.Component {
+class ContentSearchResultsComponent extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

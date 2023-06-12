@@ -18,7 +18,7 @@ import {connect} from 'react-redux';
 import {fetchCompanyUsers} from '../../companies/actions';
 
 
-class MonitoringPanel extends React.Component {
+class MonitoringPanel extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 

@@ -15,7 +15,7 @@ import ListBar from 'components/ListBar';
 import DropdownFilter from 'components/DropdownFilter';
 
 
-class MonitoringApp extends React.Component {
+class MonitoringApp extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
 
@@ -111,7 +111,7 @@ class MonitoringApp extends React.Component {
         if (field === 'company') {
             this.props.setCompany(value);
         }
-        
+
         this.props.fetchMonitoring();
     }
 }

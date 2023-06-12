@@ -16,7 +16,7 @@ const LOCATION_TYPE = {
     PLACE: 'location',
 };
 
-export class LocationFilter extends React.Component {
+export class LocationFilter extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

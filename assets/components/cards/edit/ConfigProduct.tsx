@@ -5,7 +5,7 @@ import SelectInput from 'components/SelectInput';
 import {gettext} from 'utils';
 
 
-class ConfigProduct extends React.Component {
+class ConfigProduct extends React.Component<any, any> {
     constructor(props) {
         super(props);
 

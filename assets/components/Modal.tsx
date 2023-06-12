@@ -73,7 +73,7 @@ function assertButtonHandler(label: any, type: any, onClick: any) {
     }
 }
 
-class Modal extends React.Component {
+class Modal extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.onSubmit = this.onSubmit.bind(this);

@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import {gettext} from 'utils';
 
 
-class AgendaCoverageRequest extends React.Component {
+class AgendaCoverageRequest extends React.Component<any, any> {
     constructor(props, context) {
         super(props, context);
         this.onRequestClick = this.onRequestClick.bind(this);
