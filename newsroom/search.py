@@ -24,6 +24,7 @@ from newsroom.auth import get_company, get_user
 from newsroom.settings import get_setting
 from newsroom.template_filters import is_admin
 from newsroom.utils import get_local_date, get_end_date
+from bson.objectid import ObjectId
 
 logger = logging.getLogger(__name__)
 
@@ -550,24 +551,42 @@ class BaseSearchService(Service):
                 abort(403, gettext("User does not belong to a company."))
             elif not len(search.products):
                 abort(403, gettext("Your company doesn't have any products defined."))
-            elif (
-                search.args.get("product") and len(search.products) and not self.is_product_assigned_to_company(search)
-            ):
-                abort(403, gettext("Your product is not assigned to your company."))
+            elif search.args.get("product") and not self.is_validate_product(search):
+                abort(403, gettext("Your product is not assigned to you or your company."))
             # If a product list string has been provided it is assumed to be a comma delimited string of product id's
             elif search.args.get("requested_products"):
                 # Ensure that all the provided products are permissioned for this request
                 if not all(p in [c.get("_id") for c in search.products] for p in search.args["requested_products"]):
                     abort(404, gettext("Invalid product parameter"))
 
+    def is_validate_product(self, data):
+        """
+        Check product is assigned to the company but not to the respective user.
+
+        :param SearchQuery search: The search query instance
+        """
+        user = data.user
+        company = data.company
+        product = data.args.get("product")
+
+        if user and company and product:
+            company_products_with_zero_seats = [p["_id"] for p in company.get("products", []) if p.get("seats") == 0]
+            user_specific_products = [p["_id"] for p in user.get("products", [])]
+
+            if company_products_with_zero_seats and not ObjectId(product) in user_specific_products:
+                return False
+            elif not self.is_product_assigned_to_company(data):
+                return False
+            return True
+
     def is_product_assigned_to_company(self, search):
-        """Check the product is assigned to a company
+        """Check if the product is assigned to the company
 
         :param SearchQuery search: The search query instance
         """
         product_id = search.products[0].get("_id")
         company_products = search.company.get("products", [])
-        return product_id in (product.get("_id") for product in company_products)
+        return ObjectId(product_id) in [product.get("_id") for product in company_products]
 
     def apply_section_filter(self, search, filters=None):
         """Generate the section filter
