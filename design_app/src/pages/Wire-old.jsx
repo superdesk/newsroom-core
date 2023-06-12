@@ -12,39 +12,33 @@ function WireOld() {
                 <nav className="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
                     <button className="content-bar__menu content-bar__menu--nav" title="" aria-label="Open filter panel" data-original-title="Open filter panel"><i className="icon--hamburger"></i></button>
 
-                    <div className="search d-flex align-items-center">
-                        <span className="search__icon">
-                            <i className="icon--search icon--gray" />
-                        </span>
-                        <div className='search__form input-group'>
-                            <form className='d-flex align-items-center' role="search" aria-label='search'>
-                                <input
-                                    type='text'
-                                    name='q'
-                                    className='search__input form-control'
-                                    placeholder='Search for...'
-                                    aria-label='Search for...'
-                                />
-                                <div className='search__form__buttons'>
-                                    <button
-                                        className='btn search__clear'
-                                        aria-label='Search clear'
-                                        type="reset"
-                                    >
-                                        <img src='static/search_clear.png' width='16' height='16'/>
-                                    </button>
-                                    <button className='btn btn-outline-secondary' type='submit'>
-                                        Search
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                    {/* Search */}
+                    <div className="search">
+                        <form className="search__form search__form--active" role="search" aria-label="search">
+                            <input
+                                type='text'
+                                name='q'
+                                className='search__input form-control'
+                                placeholder="Search for..."
+                                aria-label="Search for..."
+                            />
+                            <div className='search__form-buttons'>
+                                <button className='search__button-clear' aria-label="Clear search" type="reset">
+                                    <svg fill="none" height="18" viewBox="0 0 18 18" width="18" xmlns="http://www.w3.org/2000/svg">
+                                        <path clip-rule="evenodd" d="m9 18c4.9706 0 9-4.0294 9-9 0-4.97056-4.0294-9-9-9-4.97056 0-9 4.02944-9 9 0 4.9706 4.02944 9 9 9zm4.9884-12.58679-3.571 3.57514 3.5826 3.58675-1.4126 1.4143-3.58252-3.5868-3.59233 3.5965-1.41255-1.4142 3.59234-3.59655-3.54174-3.54592 1.41254-1.41422 3.54174 3.54593 3.57092-3.57515z" fill="var(--color-text)" fill-rule="evenodd" opacity="1"/>
+                                    </svg>
+                                </button>
+                                <button className='search__button-submit' type='submit' aria-label="Search">
+                                    <i class="icon--search"></i>
+                                </button>
+                            </div>
+                        </form>
                     </div>
 
                     <div className="content-bar__right">
                         <div className="d-flex align-items-center px-2 px-sm-3">
                             <div className="d-flex align-items-center">
-                                <label htmlFor="all-versions" className="mr-2">All Versions</label>
+                                <label htmlFor="all-versions" className="mr-2 mb-0">All Versions</label>
                                 <Toggle
                                     id="all-versions"
                                     defaultChecked={true}

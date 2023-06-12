@@ -265,9 +265,7 @@ class WireListItem extends React.Component {
 
                         {isExtended && (
                             <div className="wire-articles__item__text">
-                                {item.es_highlight ? <div
-                                    dangerouslySetInnerHTML={({__html:item.es_highlight.body_html && item.es_highlight.body_html[0]})}
-                                /> : <p>{shortText(item, 40, listConfig)}</p>}
+                                {<p>{shortText(item, 40, listConfig)}</p>}
                             </div>
                         )}
 
@@ -329,7 +327,7 @@ class WireListItem extends React.Component {
                                 action.shortcut && (
                                     <ActionButton
                                         key={action.name}
-                                        className="icon-button"
+                                        className="icon-button icon-button--primary"
                                         action={action}
                                         isVisited={
                                             action.visited &&

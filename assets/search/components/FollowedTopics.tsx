@@ -138,11 +138,11 @@ class FollowedTopics extends React.Component {
                     <div className="d-flex flex-column flex-grow-1">
                         {!this.props.globalTopicsEnabled ? null : (
                             <div className="pt-xl-4 pt-3 px-xl-4 me-0">
-                                <div className="btn-group btn-group--navbar ms-0 me-3">
+                                <div className="toggle-button__group toggle-button__group--navbar ms-0 me-3">
                                     <button
                                         className={classNames(
-                                            'btn btn-outline-primary',
-                                            {active: !this.state.showGlobal}
+                                            'toggle-button',
+                                            {'toggle-button--active': !this.state.showGlobal}
                                         )}
                                         onClick={this.toggleGlobal}
                                     >
@@ -150,8 +150,8 @@ class FollowedTopics extends React.Component {
                                     </button>
                                     <button
                                         className={classNames(
-                                            'btn btn-outline-primary',
-                                            {active: this.state.showGlobal}
+                                            'toggle-button',
+                                            {'toggle-button--active': this.state.showGlobal}
                                         )}
                                         onClick={this.toggleGlobal}
                                     >
@@ -160,7 +160,7 @@ class FollowedTopics extends React.Component {
                                 </div>
                             </div>
                         )}
-                        <div className="row pt-xl-4 pt-3 px-xl-4 me-0">
+                        <div className="simple-card__list pt-xl-4 pt-3 px-xl-4 me-0">
                             <TopicList
                                 topics={this.getFilteredTopics()}
                                 selectedTopicId={get(this.props.selectedItem, '_id')}

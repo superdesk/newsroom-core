@@ -13,14 +13,16 @@
 }
 @include fontFace('aap_newsroom_icons','/static/fonts/aap_newsroom_icons', normal, normal);
 
-@mixin icon-base ($width: 24px, $height: 24px, $line-height: 24px, $font-size: 24px) {
+@mixin icon-base {
+    --icon-size: 24px;
+    --icon-color: var(--color-icon-font);
     display: inline-block;
-    width: $width;
-    height: $height;
-    line-height: $line-height;
+    width: var(--icon-size);
+    height: var(--icon-size);
     font-family: 'aap_newsroom_icons' !important;
-    font-size: $font-size;
-    color: $main_blue;
+    line-height: var(--icon-size);
+    font-size: var(--icon-size);
+    color: var(--icon-color);
     speak: none;
     font-style: normal;
     font-weight: normal;
@@ -39,7 +41,7 @@
         color: $gray-light;
     }
     &.icon--gray-dark {
-        color: $gray-dark;
+        color: var(--color-text--muted);
     }
     &.icon--gray {
         color: $gray-mid;
@@ -76,7 +78,7 @@
     }
 }
 [class^="icon--coverage-"], [class*=" icon--coverage-"] {
-    color: $gray-dark;
+    color: var(--color-text--muted);
 }
 
 .icon--rotate-90 {

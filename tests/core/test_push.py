@@ -305,14 +305,39 @@ def test_notify_topic_matches_for_new_item(client, app, mocker):
         )
         assert 201 == resp.status_code
 
+        resp = cli.post(
+            f"users/{user}/topics",
+            json={
+                "label": "Sydney Weather",
+                "subscribers": [user],
+                "is_global": False,
+                "topic_type": "wire",
+                "advanced": {
+                    "all": "Weather Sydney",
+                    "fields": ["headline", "body_html"],
+                },
+            },
+        )
+        assert 201 == resp.status_code
+
     key = b"something random"
     app.config["PUSH_KEY"] = key
-    data = json.dumps({"guid": "foo", "type": "text", "headline": "this is a test"})
     push_mock = mocker.patch("newsroom.push.push_notification")
+
+    data = json.dumps({"guid": "foo", "type": "text", "headline": "this is a test"})
     headers = get_signature_headers(data, key)
     resp = client.post("/push", data=data, content_type="application/json", headers=headers)
     assert 200 == resp.status_code
     assert push_mock.call_args[1]["item"]["_id"] == "foo"
+    assert len(push_mock.call_args[1]["topics"]) == 1
+
+    data = json.dumps(
+        {"guid": "syd_weather_1", "type": "text", "headline": "today", "body_html": "This is the weather for sydney"}
+    )
+    headers = get_signature_headers(data, key)
+    resp = client.post("/push", data=data, content_type="application/json", headers=headers)
+    assert 200 == resp.status_code
+    assert push_mock.call_args[1]["item"]["_id"] == "syd_weather_1"
     assert len(push_mock.call_args[1]["topics"]) == 1
 
 

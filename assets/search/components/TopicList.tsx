@@ -18,7 +18,7 @@ const TopicList = ({topics, selectedTopicId, actions, users}) => {
             <ActionButton
                 key={action.name}
                 item={topic}
-                className='icon-button'
+                className='icon-button icon-button--primary'
                 displayName={false}
                 action={action}
                 disabled={action.when != null && !action.when(topic)}
@@ -28,7 +28,7 @@ const TopicList = ({topics, selectedTopicId, actions, users}) => {
 
     return topics.map(
         (topic) => (
-            <div key={topic._id} className='simple-card-wrap col-12 col-lg-6'>
+            <div key={topic._id} className=''>
                 <div className={classNames(
                     'simple-card',
                     {'simple-card--selected': selectedTopicId === topic._id}

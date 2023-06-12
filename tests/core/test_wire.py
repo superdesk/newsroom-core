@@ -841,13 +841,13 @@ def test_highlighting_with_advanced_search(client, app):
         ],
     )
     advanced_search_params = parse.quote('{"fields":[],"all":"demo"}')
-    url = f"/wire/search?advanced_search={advanced_search_params}&es_highlight=1"
+    url = f"/wire/search?advanced={advanced_search_params}&es_highlight=1"
     resp = client.get(url)
     data = json.loads(resp.get_data())
     assert data["_items"][0]["es_highlight"]["headline"][0] == '<span class="es-highlight">Demo</span> Article'
 
     advanced_search_params = parse.quote('{"fields":[],"any":"cheese"}')
-    url = f"/wire/search?advanced_search={advanced_search_params}&es_highlight=1"
+    url = f"/wire/search?advanced={advanced_search_params}&es_highlight=1"
     resp = client.get(url)
     data = json.loads(resp.get_data())
     assert (
@@ -858,3 +858,11 @@ def test_highlighting_with_advanced_search(client, app):
         data["_items"][0]["es_highlight"]["body_html"][0] == 'Story that involves <span class="es-highlight">'
         "cheese</span> and onions"
     )
+
+
+def test_french_accents_search(client, app):
+    app.data.insert("items", [{"_id": "foo", "body_html": "Story that involves élection"}])
+    resp = client.get("/wire/search?q=election")
+    assert 1 == len(resp.json["_items"])
+    resp = client.get("/wire/search?q=electión")
+    assert 1 == len(resp.json["_items"])

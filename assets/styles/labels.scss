@@ -8,7 +8,7 @@ $labels-palette: (
   orange2: $orange2,
   red: $red,
   available: $green,
-  restricted: $gray-dark,
+  restricted: var(--color-text--muted),
   yellow: $yellow
 );
 

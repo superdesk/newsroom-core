@@ -76,6 +76,6 @@
 // css checkbox
 .circle-checkbox {
     .css-checkbox {
-        @include css-checkbox(24px, $selectedColor: $main-blue, $checkColor: white, $rounded: circle);
+        @include css-checkbox(24px, $selectedColor: var(--css-checkbox-color-bg--checked), $checkColor: var(--css-checkbox-color-fg--checked), $rounded: circle);
     }
 }

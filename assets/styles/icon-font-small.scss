@@ -47,10 +47,10 @@
         color: $gray-light;
     }
     &.icon--gray {
-        color: $gray-dark;
+        color: var(--color-text--muted);
     }
     &.icon--gray-dark {
-        color: $gray-dark;
+        color: var(--color-text--muted);
     }
     &.icon--mid-blue {
         color: $mid-blue;
@@ -70,7 +70,7 @@
 }
 
 [class^="icon-small--coverage-"], [class*=" icon-small--coverage-"] {
-    color: $gray-dark;
+    color: var(--color-text--muted);
 }
 
 .icon-small--arrow-down:before {

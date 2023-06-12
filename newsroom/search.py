@@ -513,11 +513,11 @@ class BaseSearchService(Service):
     def prefill_search_highlights(self, search, req):
         query_string = search.args.get("q")
         query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
-        advanced_search = search.args.get("advanced_search")
+        advanced_search = json.loads(search.args.get("advanced")) if search.args.get("advanced") else {}
+
+        field_settings = {"number_of_fragments": 0}
         if app.data.elastic.should_highlight(req) and (
-            query_string
-            or (advanced_search and json.loads(advanced_search).get("all"))
-            or (advanced_search and json.loads(advanced_search).get("any"))
+            query_string or advanced_search.get("all") or advanced_search.get("any")
         ):
             elastic_highlight_query = get_elastic_highlight_query(
                 query_string={
@@ -527,11 +527,15 @@ class BaseSearchService(Service):
                     "lenient": True,
                 },
             )
-            elastic_highlight_query["fields"] = {
-                "body_html": {},
-                "headline": {},
-                "slugline": {},
-            }
+            selected_field = advanced_search.get("fields") or []
+            if not selected_field:
+                elastic_highlight_query["fields"] = {
+                    "body_html": field_settings,
+                    "headline": field_settings,
+                    "slugline": field_settings,
+                }
+            else:
+                elastic_highlight_query["fields"] = {field: field_settings for field in selected_field}
 
             search.highlight = elastic_highlight_query
 
@@ -668,10 +672,14 @@ class BaseSearchService(Service):
                 search.source["post_filter"]["bool"]["filter"].append(self.versioncreated_range(search.args))
 
     def apply_request_advanced_search(self, search: SearchQuery):
-        if not search.args.get("advanced_search"):
+        if not search.args.get("advanced"):
             return
 
-        search.advanced = json.loads(search.args["advanced_search"])
+        if isinstance(search.args["advanced"], str):
+            search.advanced = json.loads(search.args["advanced"])
+        else:
+            search.advanced = search.args["advanced"]
+
         fields = search.advanced.get("fields") or self.default_advanced_search_fields
         if not fields:
             return
@@ -761,6 +769,9 @@ class BaseSearchService(Service):
             if topic.get("filter"):
                 self.set_bool_query_from_filters(search.query["bool"], topic["filter"])
 
+            if topic.get("advanced"):
+                search.args["advanced"] = topic["advanced"]
+
             # for now even if there's no active company matching for the user
             # continuing with the search
             try:
@@ -769,6 +780,7 @@ class BaseSearchService(Service):
                 self.apply_company_filter(search)
                 self.apply_time_limit_filter(search)
                 self.apply_products_filter(search)
+                self.apply_request_advanced_search(search)
             except Forbidden as exc:
                 logger.info(
                     "Notification for user:{} and topic:{} is skipped".format(user.get("_id"), topic.get("_id")),

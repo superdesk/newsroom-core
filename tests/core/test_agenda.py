@@ -151,6 +151,13 @@ def test_basic_search(client, agenda_user):
     assert data["_meta"]["total"]
 
 
+def test_search_with_accents(client, agenda_user):
+    resp = client.get("/agenda/search?q=héadlíne")
+    assert resp.status_code == 200
+    data = json.loads(resp.get_data())
+    assert data["_meta"]["total"]
+
+
 def test_bookmarks(client, app):
     user_id = get_admin_user_id(app)
     assert user_id
