@@ -30,7 +30,7 @@ const previewConfig = PropTypes.shape({
 
 });
 
-const types = {
+const types: any = {
     user,
     item,
     topic,

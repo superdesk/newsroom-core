@@ -19,7 +19,7 @@ import {ADD_EDIT_USERS} from 'actions';
 
 import {searchReducer} from 'search/reducers';
 
-const initialState = {
+const initialState: any = {
     query: null,
     companies: [],
     companiesById: {},
@@ -35,7 +35,7 @@ const initialState = {
 };
 
 function setupCompanies(companyList: any, state: any) {
-    const companiesById = {};
+    const companiesById: any = {};
     const companyOptions = [];
     const companies = companyList.map((company) => {
         companiesById[company._id] = company;
@@ -57,7 +57,7 @@ export default function companyReducer(state: any = initialState, action: any) {
     switch (action.type) {
 
     case SELECT_COMPANY: {
-        const defaultCompany = {
+        const defaultCompany: any = {
             is_enabled: true,
             _id: null,
             name: '',
@@ -153,7 +153,7 @@ export default function companyReducer(state: any = initialState, action: any) {
             company: '',
         };
 
-        const newCompany = {
+        const newCompany: any = {
             name: '',
             sd_subscriber_id: '',
             account_manager: '',
@@ -191,7 +191,7 @@ export default function companyReducer(state: any = initialState, action: any) {
         return {...state, products: action.data};
 
     case INIT_VIEW_DATA: {
-        const nextState = {
+        const nextState: any = {
             ...state,
             services: action.data.services,
             products: action.data.products,

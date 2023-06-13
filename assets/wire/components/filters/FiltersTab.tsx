@@ -42,7 +42,7 @@ class FiltersTab extends React.Component<any, any> {
     }
 
     componentDidUpdate(prevProps: any) {
-        const newState = {};
+        const newState: any = {};
         if (!isEqual(this.props.activeFilter, prevProps.activeFilter)) {
             newState.activeFilter = cloneDeep(this.props.activeFilter);
         }
@@ -179,7 +179,7 @@ const mapStateToProps = (state: any) => ({
     context: state.context
 });
 
-const mapDispatchToProps = {
+const mapDispatchToProps: any = {
     resetFilter,
     updateFilterStateAndURL,
     selectDate,

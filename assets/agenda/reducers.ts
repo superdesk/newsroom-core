@@ -19,7 +19,7 @@ import {searchReducer} from 'search/reducers';
 import {defaultReducer} from '../reducers';
 import {EARLIEST_DATE} from './utils';
 
-const initialState = {
+const initialState: any = {
     items: [],
     itemsById: {},
     aggregations: null,
@@ -178,7 +178,7 @@ export default function agendaReducer(state: any = initialState, action: any) {
     case INIT_DATA: {
         const navigations = get(action, 'agendaData.navigations', []);
         const openItem = get(action, 'agendaData.item', null);
-        const agenda = {
+        const agenda: any = {
             ...state.agenda,
             activeDate: action.agendaData.bookmarks ? EARLIEST_DATE : action.activeDate || state.agenda.activeDate,
             eventsOnlyAccess: action.agendaData.events_only,

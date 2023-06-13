@@ -9,7 +9,7 @@ import 'tests/setup';
 function setup(errorStrings: any) {
     const handleChange = spy();
 
-    const props = {
+    const props: any = {
         name: 'test-ctr',
         label: 'test label',
         onChange: handleChange,

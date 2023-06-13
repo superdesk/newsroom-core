@@ -19,7 +19,7 @@ import {ADD_EDIT_USERS} from 'actions';
 
 import {searchReducer} from 'search/reducers';
 
-const initialState = {
+const initialState: any = {
     user: null,
     query: null,
     users: [],
@@ -46,7 +46,7 @@ export default function userReducer(state: any = initialState, action: any) {
             products: action.data.products,
         };
     case SELECT_USER: {
-        const defaultUser = {
+        const defaultUser: any = {
             user_type: 'public',
             is_approved: true,
             is_enabled: true,
@@ -78,7 +78,7 @@ export default function userReducer(state: any = initialState, action: any) {
     case EDIT_USER: {
         const target = action.event.target;
         const field = target.name;
-        let user = {...state.userToEdit};
+        let user: any = {...state.userToEdit};
         const value = target.type === 'checkbox' ? target.checked : target.value;
 
         if (field.startsWith('sections.')) {
@@ -173,7 +173,7 @@ export default function userReducer(state: any = initialState, action: any) {
     }
 
     case GET_COMPANIES: {
-        const companiesById = {};
+        const companiesById: any = {};
         action.data.map((company) => companiesById[company._id] = company);
 
         return {...state, companies: action.data, companiesById};

@@ -16,7 +16,7 @@ export const REPORTS_NAMES = {
 };
 
 
-export const REPORTS = {
+export const REPORTS: any = {
     [REPORTS_NAMES.COMPANY_SAVED_SEARCHES]: '/reports/company-saved-searches',
     [REPORTS_NAMES.USER_SAVED_SEARCHES]: '/reports/user-saved-searches',
     [REPORTS_NAMES.COMPANY_PRODUCTS]: '/reports/company-products',

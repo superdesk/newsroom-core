@@ -21,7 +21,7 @@ import {previewConfigSelector, listConfigSelector, detailsConfigSelector, isSear
 import {filterGroupsToLabelMap} from 'search/selectors';
 import CardRow from 'components/cards/render/CardRow';
 
-const modals = {
+const modals: any = {
     shareItem: ShareItemModal,
     downloadItems: DownloadItemsModal,
 };

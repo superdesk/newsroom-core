@@ -18,7 +18,7 @@ import {modalReducer} from 'reducers';
 import {GET_NAVIGATIONS, QUERY_NAVIGATIONS} from 'navigations/actions';
 import {SET_TOPICS} from '../search/actions';
 
-const initialState = {
+const initialState: any = {
     user: null,
     editedUser: null,
     company: null,

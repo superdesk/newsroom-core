@@ -72,7 +72,7 @@ const mapStateToProps = (state: any) => ({
     selectedItems: state.selectedItems,
 });
 
-const mapDispatchToProps = {
+const mapDispatchToProps: any = {
     selectAll,
     selectNone,
 };

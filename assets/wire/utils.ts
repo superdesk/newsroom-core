@@ -34,8 +34,8 @@ export function getVideos(item: any) {
 const isMedia = (item: any) => item.type === 'audio' || item.type === 'video';
 
 /**
- * 
- * @param {*} item 
+ *
+ * @param {*} item
  */
 export function getItemMedia(item: any) {
     if (isMedia(item)) {
@@ -197,7 +197,7 @@ export function getCaption(picture: any) {
 }
 
 export function getActiveQuery(query: any, activeFilter: any, createdFilter: any) {
-    const queryParams = {
+    const queryParams: any = {
         query: query || null,
         filter: pickBy(activeFilter),
         created: pickBy(createdFilter),

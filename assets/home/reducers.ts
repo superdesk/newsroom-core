@@ -11,7 +11,7 @@ import {CLOSE_MODAL, MODAL_FORM_VALID, RENDER_MODAL} from '../actions';
 import {modalReducer} from '../reducers';
 import {topicsReducer} from '../topics/reducer';
 
-const initialState = {
+const initialState: any = {
     cards: [],
     topics: [],
     products: [],

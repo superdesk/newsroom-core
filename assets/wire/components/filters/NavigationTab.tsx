@@ -58,7 +58,7 @@ NavigationTab.propTypes = {
 
 NavigationTab.defaultProps = {addAllOption: true};
 
-const mapDispatchToProps = {
+const mapDispatchToProps: any = {
     toggleNavigation,
 };
 

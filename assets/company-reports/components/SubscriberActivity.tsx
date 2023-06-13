@@ -220,6 +220,6 @@ const mapStateToProps = (state: any) => ({
     sections: state.sections,
 });
 
-const mapDispatchToProps = {toggleFilterAndQuery, fetchReport, runReport};
+const mapDispatchToProps: any = {toggleFilterAndQuery, fetchReport, runReport};
 
 export default connect(mapStateToProps, mapDispatchToProps)(SubscriberActivity);

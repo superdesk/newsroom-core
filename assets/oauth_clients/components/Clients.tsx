@@ -29,7 +29,7 @@ class Clients extends React.Component<any, any> {
 
     isFormValid() {
         let valid = true;
-        let errors = {};
+        let errors: any = {};
 
         if (!this.props.clientToEdit.name) {
             errors.name = [gettext('Please provide client name')];
@@ -61,7 +61,7 @@ class Clients extends React.Component<any, any> {
     }
 
     render() {
-        const progressStyle = {width: '25%'};
+        const progressStyle: any = {width: '25%'};
         const originalClientEdited = !get(this.props, 'clientToEdit._id') ? this.props.clientToEdit :
             this.props.clientsById[this.props.clientToEdit._id];
         return (

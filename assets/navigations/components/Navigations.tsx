@@ -35,7 +35,7 @@ class Navigations extends React.Component<any, any> {
 
     isFormValid() {
         let valid = true;
-        let errors = {};
+        let errors: any = {};
 
         if (!this.props.navigationToEdit.name) {
             errors.name = [gettext('Please provide navigation name')];
@@ -65,7 +65,7 @@ class Navigations extends React.Component<any, any> {
     }
 
     render() {
-        const progressStyle = {width: '25%'};
+        const progressStyle: any = {width: '25%'};
         const sectionFilter = (navigation: any) => !this.props.activeSection || get(navigation, 'product_type', 'wire') === this.props.activeSection;
 
         return (

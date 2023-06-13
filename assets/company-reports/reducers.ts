@@ -13,7 +13,7 @@ import {
     GET_PRODUCTS,
 } from './actions';
 
-const initialState = {
+const initialState: any = {
     isLoading: false,
     activeReport: null,
     results: [],
@@ -97,7 +97,7 @@ export default function companyReportReducer(state: any = initialState, action: 
         };
 
     case GET_PRODUCTS:
-        return {...state, products: action.data};        
+        return {...state, products: action.data};
 
     case 'RECEIVE_REPORT_AGGREGATIONS':
         return {

@@ -28,7 +28,7 @@ class EditCard extends React.Component<any, any> {
 
         cardTypes.unshift({value: '', text: '', component: getCardEditComponent('')});
 
-        const cardProps = {
+        const cardProps: any = {
             card: this.props.card,
             onChange: this.props.onChange,
             errors: this.props.errors

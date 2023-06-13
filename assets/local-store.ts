@@ -101,7 +101,7 @@ export function getFilterPanelOpenState(context: any) {
 }
 
 export function setFilterPanelOpenState(open: any, context: any) {
-    const filterTabs = {...store.get(FILTER_PANEL_OPEN) || {}};
+    const filterTabs: any = {...store.get(FILTER_PANEL_OPEN) || {}};
 
     filterTabs[context] = open;
     store.assign(FILTER_PANEL_OPEN, filterTabs);
@@ -123,7 +123,7 @@ export function getActiveFilterTab(context: any) {
  *
  */
 export function setActiveFilterTab(tab: any, context: any) {
-    let filterTabs = {...store.get(FILTER_TAB) || {}};
+    let filterTabs: any = {...store.get(FILTER_TAB) || {}};
     filterTabs[context] = tab;
     store.assign(FILTER_TAB, filterTabs);
 }

@@ -4,7 +4,7 @@ import {
     UPDATE_VALUES,
 } from './actions';
 
-const initialState = {
+const initialState: any = {
     config: {},
 };
 
@@ -18,7 +18,7 @@ export default function settingsReducer(state: any = initialState, action: any) 
             _updated: action.data._updated,
             version_creator: action.data.version_creator,
         };
-    
+
     case UPDATE_VALUES: {
         let config = Object.assign({}, state.config);
         Object.keys(action.data.values).forEach((key) => {

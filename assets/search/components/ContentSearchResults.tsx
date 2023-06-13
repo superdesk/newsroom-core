@@ -75,7 +75,7 @@ class ContentSearchResultsComponent extends React.Component<any, any> {
                         this.props.fetchItems();
                     } else if (tag.type === 'created') {
                         // toggle created
-                        const params = {...tag.params};
+                        const params: any = {...tag.params};
 
                         switch (tag.key) {
                         case 'published_relative':
@@ -224,7 +224,7 @@ const mapStateToProps = (state: any) => ({
     currentTopic: activeTopicSelector(state),
 });
 
-const mapDispatchToProps = {
+const mapDispatchToProps: any = {
     toggleNavigation,
     toggleFilter,
     setCreatedFilter,

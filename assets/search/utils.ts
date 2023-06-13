@@ -15,7 +15,7 @@ export const getNavigationUrlParam = (activeNavigation: any, ignoreEmpty: any = 
 };
 
 export const getSearchParams = (custom: any, topic: any) => {
-    const params = {};
+    const params: any = {};
 
     ['query', 'created', 'navigation', 'filter', 'product', 'advanced'].forEach(
         (field: any) => {

@@ -83,7 +83,7 @@ export function fetchUsers() {
         dispatch(queryUsers());
         const state = getState();
         const query = searchQuerySelector(state) || '';
-        const filterQuery = {};
+        const filterQuery: any = {};
 
         if (state.company && state.company !== '') {
             filterQuery.company = state.company;

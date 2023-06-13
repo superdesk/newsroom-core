@@ -72,7 +72,7 @@ const mapStateToProps = (state: any) => ({
     companyToEdit: state.companyToEdit,
 });
 
-const mapDispatchToProps = {
+const mapDispatchToProps: any = {
     newCompany: newCompany,
     fetchCompanies: fetchCompanies,
     setQuery: setSearchQuery,

@@ -50,7 +50,7 @@ ClientsApp.propTypes = {
 };
 
 
-const mapDispatchToProps = {
+const mapDispatchToProps: any = {
     newClient,
     fetchClients,
     setQuery: setSearchQuery,

@@ -58,7 +58,7 @@ const mapStateToProps = (state: any) => ({
     activeSection: activeSectionSelector(state),
 });
 
-const mapDispatchToProps = {
+const mapDispatchToProps: any = {
     fetchSectionFilters,
     setQuery: setSearchQuery,
     newSectionFilter,

@@ -26,7 +26,7 @@ SectionSwitch.propTypes = {
     selectSection: PropTypes.func.isRequired,
 };
 
-const mapDispatchToProps = {
+const mapDispatchToProps: any = {
     selectSection,
 };
 

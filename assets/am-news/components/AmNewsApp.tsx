@@ -43,7 +43,7 @@ import {
 } from 'search/selectors';
 
 
-const modals = {
+const modals: any = {
     shareItem: ShareItemModal,
     downloadItems: DownloadItemsModal,
 };

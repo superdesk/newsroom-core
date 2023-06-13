@@ -22,7 +22,7 @@ class EditPanel extends React.Component<any, any> {
     }
 
     toggleSelectAll(availableItems: any, allActive: any) {
-        let items = {};
+        let items: any = {};
 
         if (!allActive) {
             availableItems.forEach((item) => {
@@ -51,7 +51,7 @@ class EditPanel extends React.Component<any, any> {
     }
 
     initItems(props: any) {
-        const items = {};
+        const items: any = {};
         props.items.map((item) =>
             items[item._id] = (props.parent[props.field] || []).includes(item._id));
 
@@ -69,7 +69,7 @@ class EditPanel extends React.Component<any, any> {
             return;
         }
 
-        let items = {};
+        let items: any = {};
         nextProps.items.map((item) =>
             items[item._id] = (nextProps.parent[nextProps.field] || []).includes(item._id));
         if (!isEqual(this.state.items, items)) {

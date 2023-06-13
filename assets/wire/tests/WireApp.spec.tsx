@@ -29,7 +29,7 @@ function getNames(actions: any) {
 }
 
 describe('WireApp', () => {
-    const state = {
+    const state: any = {
         items: [],
         itemsById: {'foo': {}},
         previewItem: 'foo',

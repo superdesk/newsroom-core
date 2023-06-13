@@ -105,7 +105,7 @@ export function defaultReducer(state: any = {}, action: any) {
     switch (action.type) {
 
     case SET_ITEMS: {
-        const itemsById = {};
+        const itemsById: any = {};
         const items = [];
 
         action.items.forEach((item) => {

@@ -65,7 +65,7 @@ const mapStateToProps = (state: any) => ({
     showSubscriberId: companiesSubscriberIdEnabled(state),
 });
 
-const mapDispatchToProps = {
+const mapDispatchToProps: any = {
     selectCompany: selectCompany,
 };
 

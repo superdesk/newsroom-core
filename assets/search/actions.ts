@@ -467,7 +467,7 @@ export function setParams(params: any) {
  */
 export function initParams(params: any) {
     return (dispatch: any, getState: any) => {
-        const custom = {
+        const custom: any = {
             query: params.get('q'),
             created: params.get('created') ? JSON.parse(params.get('created')) : null,
             navigation: params.get('navigation') ? JSON.parse(params.get('navigation')) : null,
@@ -475,7 +475,7 @@ export function initParams(params: any) {
             product: params.get('product'),
             advanced: params.get('advanced') ? JSON.parse(params.get('advanced')) : null,
         };
-        let topic = {};
+        let topic: any = {};
 
         if (params.get('topic')) {
             dispatch(setSearchTopicId(params.get('topic')));

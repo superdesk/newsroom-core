@@ -11,7 +11,7 @@ import {
 
 import {searchReducer} from 'search/reducers';
 
-const initialState = {
+const initialState: any = {
     query: null,
     clients: [],
     clientsById: {},
@@ -21,7 +21,7 @@ const initialState = {
 };
 
 function setupClients(clientList: any, state: any) {
-    const clientsById = {};
+    const clientsById: any = {};
     const clients = clientList.map((client) => {
         clientsById[client._id] = client;
         return client._id;
@@ -38,7 +38,7 @@ export default function clientReducer(state: any = initialState, action: any) {
     switch (action.type) {
 
     case SELECT_CLIENT: {
-        const defaultClient = {
+        const defaultClient: any = {
             name: '',
         };
 
@@ -87,7 +87,7 @@ export default function clientReducer(state: any = initialState, action: any) {
     }
 
     case INIT_VIEW_DATA: {
-        const nextState = {
+        const nextState: any = {
             ...state,
             products: action.data.products,
             sections: action.data.sections,
@@ -107,5 +107,5 @@ export default function clientReducer(state: any = initialState, action: any) {
 
         return state;
     }
-    }    
+    }
 }

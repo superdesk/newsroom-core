@@ -21,7 +21,7 @@ export const transformFilterBuckets = (filter: any, aggregations: any, props: an
     return filter.transformBuckets(filter, aggregations, props);
 };
 
-const renderFilter = {
+const renderFilter: any = {
     item_type: (props: any) => (
         <AgendaItemTypeFilter
             key="item_type"

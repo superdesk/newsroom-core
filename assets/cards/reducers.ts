@@ -18,7 +18,7 @@ import {searchReducer} from 'search/reducers';
 import {getCard} from 'components/cards/utils';
 
 
-const initialState = {
+const initialState: any = {
     query: null,
     cards: [],
     cardsById: {},
@@ -36,7 +36,7 @@ export default function cardReducer(state: any = initialState, action: any) {
     switch (action.type) {
 
     case SELECT_CARD: {
-        const defaultCard = {
+        const defaultCard: any = {
             label: '',
             type: '',
             config: {},
@@ -53,7 +53,7 @@ export default function cardReducer(state: any = initialState, action: any) {
     case EDIT_CARD: {
         const target = action.event.target;
         const field = target.name;
-        let card = {...state.cardToEdit};
+        let card: any = {...state.cardToEdit};
         let size = get(getCard(card.type), 'size', 0);
 
         if (!card.dashboard) {
@@ -93,7 +93,7 @@ export default function cardReducer(state: any = initialState, action: any) {
     }
 
     case NEW_CARD: {
-        const cardToEdit = {
+        const cardToEdit: any = {
             label: '',
             type: '',
             config: {},

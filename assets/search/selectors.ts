@@ -57,7 +57,7 @@ export const resultsFilteredSelector = (state: any) => state.resultsFiltered;
 export const searchParamsSelector = createSelector(
     [searchQuerySelector, searchCreatedSelector, searchNavigationSelector, searchFilterSelector, searchProductSelector, advancedSearchParamsSelector],
     (query: any, created: any, navigation: any, filter: any, product: any, advancedSearchParams: any) => {
-        const params = {};
+        const params: any = {};
 
         if (!isEmpty(query)) {
             params.query = query;

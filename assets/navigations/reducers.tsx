@@ -19,7 +19,7 @@ import {sectionsReducer} from 'features/sections/reducers';
 import {searchReducer} from 'search/reducers';
 import {ADD_EDIT_USERS} from 'actions';
 
-const initialState = {
+const initialState: any = {
     query: null,
     navigations: [],
     navigationsById: {},
@@ -36,7 +36,7 @@ export default function navigationReducer(state: any = initialState, action: any
     switch (action.type) {
 
     case SELECT_NAVIGATION: {
-        const defaultNavigation = {
+        const defaultNavigation: any = {
             is_enabled: true,
             name: '',
             description: '',
@@ -73,7 +73,7 @@ export default function navigationReducer(state: any = initialState, action: any
     }
 
     case NEW_NAVIGATION: {
-        const navigationToEdit = {
+        const navigationToEdit: any = {
             is_enabled: true,
             name: '',
             description: '',

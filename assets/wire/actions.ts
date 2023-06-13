@@ -215,7 +215,7 @@ export function search(state: any, next?: any, aggs?: any) {
     const searchAllVersions = !!get(state, 'wire.searchAllVersions');
     const context = get(state, 'context', 'wire');
 
-    const params = {
+    const params: any = {
         q: !searchParams.query ? null : encodeURIComponent(searchParams.query),
         bookmarks: state.bookmarks ? state.user : null,
         navigation: getNavigationUrlParam(searchParams.navigation, true, false),

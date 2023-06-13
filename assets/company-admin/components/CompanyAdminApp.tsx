@@ -57,7 +57,7 @@ class CompanyAdminAppComponent extends React.Component<any, any> {
 
     isFormValid() {
         let valid = true;
-        let errors = {};
+        let errors: any = {};
 
         if (!this.props.userToEdit.email) {
             errors.email = [gettext('Please provide email')];

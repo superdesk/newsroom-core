@@ -10,7 +10,7 @@ import ProductCompanies from './components/ProductCompanies';
 import ExpiredCompanies from './components/ExpiredCompanies';
 import {REPORTS_NAMES} from './actions';
 
-export const panels = {
+export const panels: any = {
     [REPORTS_NAMES.COMPANY_SAVED_SEARCHES]: CompanySavedSearches,
     [REPORTS_NAMES.USER_SAVED_SEARCHES]: UserSavedSearches,
     [REPORTS_NAMES.COMPANY_PRODUCTS]: CompanyProducts,

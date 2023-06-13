@@ -323,7 +323,7 @@ const mapStateToProps = (state: any) => ({
     aggregations: state.reportAggregations,
 });
 
-const mapDispatchToProps = {
+const mapDispatchToProps: any = {
     toggleFilter,
     fetchReport,
     runReport,

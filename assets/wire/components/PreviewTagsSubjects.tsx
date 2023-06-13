@@ -15,7 +15,7 @@ function PreviewTagsSubjectsComponent({subjects, displayConfig, urlPrefix, filte
         return null;
     }
 
-    const subjectsByScheme = {subject: []};
+    const subjectsByScheme: any = {subject: []};
     const filterGroupSchemes = Object.keys(filterGroupLabels);
 
     subjects.forEach((subject) => {

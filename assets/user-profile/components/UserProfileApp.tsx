@@ -27,7 +27,7 @@ import ProfileToggle from './ProfileToggle';
 
 import '../style';
 
-const modals = {shareItem: ShareItemModal};
+const modals: any = {shareItem: ShareItemModal};
 
 class UserProfileApp extends React.Component<any, any> {
     constructor(props: any, context: any) {

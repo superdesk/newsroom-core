@@ -5,7 +5,7 @@ class Analytics {
         if (window.gtag) {
             const company = get(window, 'profileData.companyName', 'none');
             const user = get(window, 'profileData.user.first_name', 'unknown');
-            const userParams = {
+            const userParams: any = {
                 event_category: company,
                 company: company,
                 user: user,

@@ -82,7 +82,7 @@ class Modal extends React.Component<any, any> {
     }
 
     componentDidMount() {
-        const options = {};
+        const options: any = {};
 
         if (!this.props.clickOutsideToClose) {
             options.backdrop = 'static';

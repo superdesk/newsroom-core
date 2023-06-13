@@ -48,12 +48,12 @@ class GeneralSettingsApp extends React.Component<any, any> {
     }
 
     onChange(key: any, val: any) {
-        const values = {...this.state.values, [key]: val};
+        const values: any = {...this.state.values, [key]: val};
         this.setState({values});
     }
 
     onBooleanChange(key: any) {
-        const values = {...this.state.values, [key]: !this.state.values[key]};
+        const values: any = {...this.state.values, [key]: !this.state.values[key]};
         this.setState({values});
     }
 
@@ -93,7 +93,7 @@ class GeneralSettingsApp extends React.Component<any, any> {
             }
             return null;
         });
-        const audit = {
+        const audit: any = {
             '_updated': this.props.updatedTime,
             'version_creator': this.props.versionCreator
         };
@@ -130,7 +130,7 @@ const mapStateToProps = (state: any) => ({
     versionCreator: state.version_creator,
 });
 
-const mapDispatchToProps = {
+const mapDispatchToProps: any = {
     save,
 };
 

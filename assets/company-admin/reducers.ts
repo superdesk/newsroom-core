@@ -5,7 +5,7 @@ import {modalReducer} from 'reducers';
 import {searchReducer} from 'search/reducers';
 import userReducer from 'users/reducers';
 
-const initialState = {
+const initialState: any = {
     user: null,
     query: null,
     users: [],

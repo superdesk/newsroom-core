@@ -13,7 +13,7 @@ import {get, cloneDeep} from 'lodash';
 import {defaultReducer} from '../reducers';
 import {searchReducer} from 'search/reducers';
 
-const initialState = {
+const initialState: any = {
     items: [],
     itemsById: {},
     matchedIds: [],

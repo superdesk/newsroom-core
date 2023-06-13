@@ -39,7 +39,7 @@ class Products extends React.Component<any, any> {
 
     isFormValid() {
         let valid = true;
-        let errors = {};
+        let errors: any = {};
 
         if (!this.props.productToEdit.name) {
             errors.name = [gettext('Please provide product name')];
@@ -69,7 +69,7 @@ class Products extends React.Component<any, any> {
     }
 
     render() {
-        const progressStyle = {width: '25%'};
+        const progressStyle: any = {width: '25%'};
         const sectionFilter = (product: any) => !this.props.activeSection || get(product, 'product_type', 'wire') === this.props.activeSection;
         const getActiveSection = () => this.props.sections.filter(s => s._id === this.props.activeSection);
 

@@ -112,7 +112,7 @@ class MonitoringEditor extends React.Component<any, any> {
             return null;
         }
 
-        const propsToFields = {
+        const propsToFields: any = {
             'onChange': this.onChange,
             'readOnly': !isAdmin,
         };

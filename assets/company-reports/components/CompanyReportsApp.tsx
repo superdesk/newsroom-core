@@ -103,7 +103,7 @@ const mapStateToProps = (state: any) => ({
     products: state.products,
 });
 
-const mapDispatchToProps = {
+const mapDispatchToProps: any = {
     setActiveReport,
     runReport,
     printReport,

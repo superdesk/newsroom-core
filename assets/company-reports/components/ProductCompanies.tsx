@@ -105,6 +105,6 @@ const mapStateToProps = (state: any) => ({
     isLoading: state.isLoading,
 });
 
-const mapDispatchToProps = {toggleFilterAndQuery, runReport};
+const mapDispatchToProps: any = {toggleFilterAndQuery, runReport};
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProductCompanies);

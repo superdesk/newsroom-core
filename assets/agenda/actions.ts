@@ -107,7 +107,7 @@ export function openItemDetails(item: any, group: any, plan: any) {
 export function requestCoverage(item: any, message: any) {
     return () => {
         const url = '/agenda/request_coverage';
-        const data = {item: item._id, message};
+        const data: any = {item: item._id, message};
         return server.post(url, data)
             .then(() => notify.success(gettext('Your inquiry has been sent successfully')))
             .catch((arg) => {
@@ -235,7 +235,7 @@ function search(state: any, next: any) {
         dateTo = createdFilter.from;
     }
 
-    const params = {
+    const params: any = {
         q: searchParams.query,
         id: state.queryId,
         bookmarks: state.bookmarks && state.user,

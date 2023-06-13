@@ -60,7 +60,7 @@ import {
     advancedSearchTabsConfigSelector,
 } from 'ui/selectors';
 
-const modals = {
+const modals: any = {
     shareItem: ShareItemModal,
     downloadItems: DownloadItemsModal,
     itemStatistics: ItemStatisticsModal,

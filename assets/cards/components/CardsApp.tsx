@@ -50,7 +50,7 @@ const mapStateToProps = (state: any) => ({
     activeDashboard: state.dashboards.active,
 });
 
-const mapDispatchToProps = {
+const mapDispatchToProps: any = {
     newCard,
     fetchCards,
     setQuery: setSearchQuery,

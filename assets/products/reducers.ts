@@ -16,7 +16,7 @@ import {INIT_SECTIONS, SELECT_SECTION} from 'features/sections/actions';
 import {sectionsReducer} from 'features/sections/reducers';
 import {searchReducer} from 'search/reducers';
 
-const initialState = {
+const initialState: any = {
     query: null,
     products: [],
     productsById: {},
@@ -34,7 +34,7 @@ export default function productReducer(state: any = initialState, action: any) {
     switch (action.type) {
 
     case SELECT_PRODUCT: {
-        const defaultProduct = {
+        const defaultProduct: any = {
             is_enabled: true,
             name: '',
             description: '',
@@ -57,7 +57,7 @@ export default function productReducer(state: any = initialState, action: any) {
     }
 
     case NEW_PRODUCT: {
-        const productToEdit = {
+        const productToEdit: any = {
             is_enabled: true,
             name: '',
             description: '',
@@ -98,14 +98,14 @@ export default function productReducer(state: any = initialState, action: any) {
     }
 
     case GET_COMPANIES: {
-        const companiesById = {};
+        const companiesById: any = {};
         action.data.map((company) => companiesById[company._id] = company);
 
         return {...state, companies: action.data, companiesById};
     }
 
     case GET_NAVIGATIONS: {
-        const navigationsById = {};
+        const navigationsById: any = {};
         action.data.map((navigation) => navigationsById[navigation._id] = navigation);
 
         return {...state, navigations: action.data, navigationsById};

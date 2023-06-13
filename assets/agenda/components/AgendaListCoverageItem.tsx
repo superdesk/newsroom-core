@@ -33,7 +33,7 @@ class AgendaListCoverageItem extends React.Component<any, any> {
     getUpdatedState(props: any) {
         const watched = isWatched(props.coverage, props.user);
 
-        const state = {
+        const state: any = {
             coverageClass: `icon--coverage-${getCoverageIcon(props.coverage.coverage_type)}`,
             beingUpdated: isCoverageBeingUpdated(props.coverage),
             isWatched: watched,

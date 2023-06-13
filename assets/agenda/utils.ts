@@ -20,7 +20,7 @@ export const STATUS_CANCELED = 'cancelled';
 export const STATUS_POSTPONED = 'postponed';
 export const STATUS_RESCHEDULED = 'rescheduled';
 
-const navigationFunctions = {
+const navigationFunctions: any = {
     'day': {
         'next': getNextDay,
         'previous': getPreviousDay,
@@ -39,7 +39,7 @@ const navigationFunctions = {
     }
 };
 
-const Groupers = {
+const Groupers: any = {
     'day': formatDate,
     'week': formatWeek,
     'month': formatMonth,
@@ -456,7 +456,7 @@ export function getInternalNote(item: any, plan: any) {
  */
 export function getDataFromCoverages(item: any) {
     const planningItems = get(item, 'planning_items', []);
-    let data = {
+    let data: any = {
         'internal_note': {},
         'ednote': {},
         'workflow_status_reason': {},
@@ -660,7 +660,7 @@ const isBetweenDay = (day: any, start: any, end: any) => {
  */
 export function groupItems(items: any, activeDate: any, activeGrouping: any, featuredOnly: any) {
     const maxStart = moment(activeDate).set({'h': 0, 'm': 0, 's': 0});
-    const groupedItems = {};
+    const groupedItems: any = {};
     const grouper = Groupers[activeGrouping];
 
     items
@@ -750,7 +750,7 @@ export function getPlanningItemsByGroup(item: any, group: any) {
         formatDate(p.planning_date) === group && get(p, 'coverages.length', 0) === 0);
 
     const allPlans = keyBy(planningItems, '_id');
-    const processed = {};
+    const processed: any = {};
 
     // get unique plans for that group based on the coverage.
     const plansWithCoverages = (item.coverages || [])
@@ -824,7 +824,7 @@ export const groupRegions = (filter: any, aggregations: any, props: any) => {
     if (props.locators && Object.keys(props.locators).length > 0) {
         let regions = sortBy(props.locators.filter((l) => l.state).map((l) => ({...l, 'key': l.name, 'label': l.state})), 'label');
         const others = props.locators.filter((l) => !l.state).map((l) => ({...l, 'key': l.name, 'label': l.country || l.world_region}));
-        const separator = {'key': 'divider'};
+        const separator: any = {'key': 'divider'};
 
         if (others.length > 0) {
             if (regions.length > 0) {

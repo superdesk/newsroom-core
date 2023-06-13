@@ -31,7 +31,7 @@ class Cards extends React.Component<any, any> {
 
     isFormValid() {
         let valid = true;
-        let errors = {};
+        let errors: any = {};
 
         if (!this.props.cardToEdit.label) {
             errors.label = [gettext('Please provide card label')];
@@ -67,7 +67,7 @@ class Cards extends React.Component<any, any> {
     }
 
     render() {
-        const progressStyle = {width: '25%'};
+        const progressStyle: any = {width: '25%'};
         const cardFilter = (card: any) =>  !this.props.activeDashboard ||
             get(card, 'dashboard', 'newsroom') === this.props.activeDashboard;
 

@@ -31,7 +31,7 @@ DashboardSwitch.propTypes = {
     selectDashboard: PropTypes.func.isRequired,
 };
 
-const mapDispatchToProps = {
+const mapDispatchToProps: any = {
     selectDashboard,
 };
 

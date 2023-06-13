@@ -16,7 +16,7 @@ function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter, eventsOnlyAccess, 
         ]
     };
 
-    const filter = {
+    const filter: any = {
         label: gettext('Events & Coverages'),
         field: 'itemType',
         icon: 'icon-small--coverage-infographics'

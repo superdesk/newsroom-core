@@ -13,7 +13,7 @@ import {INIT_SECTIONS, SELECT_SECTION} from 'features/sections/actions';
 import {sectionsReducer} from 'features/sections/reducers';
 import {searchReducer} from 'search/reducers';
 
-const initialState = {
+const initialState: any = {
     query: null,
     sectionFilters: [],
     sectionFiltersById: {},
@@ -29,7 +29,7 @@ export default function sectionFiltersReducer(state: any = initialState, action:
     switch (action.type) {
 
     case SELECT_SECTION_FILTER: {
-        const defaultSectionFilter = {
+        const defaultSectionFilter: any = {
             is_enabled: true,
             name: '',
             description: '',
@@ -52,7 +52,7 @@ export default function sectionFiltersReducer(state: any = initialState, action:
     }
 
     case NEW_SECTION_FILTER: {
-        const sectionFilterToEdit = {
+        const sectionFilterToEdit: any = {
             is_enabled: true,
             name: '',
             description: '',

@@ -34,7 +34,7 @@ class Users extends React.Component<any, any> {
 
     isFormValid() {
         let valid = true;
-        let errors = {};
+        let errors: any = {};
 
         if (!this.props.userToEdit.email) {
             errors.email = [gettext('Please provide email')];
@@ -63,7 +63,7 @@ class Users extends React.Component<any, any> {
     }
 
     render() {
-        const progressStyle = {width: '25%'};
+        const progressStyle: any = {width: '25%'};
 
         return (
             <div className="flex-row">

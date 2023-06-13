@@ -3,7 +3,7 @@ import {get, keyBy} from 'lodash';
 import {INIT_DATA} from './actions';
 import {getNavigationUrlParam} from 'search/utils';
 
-const initialState = {
+const initialState: any = {
     cards: [],
     navigations: []
 };

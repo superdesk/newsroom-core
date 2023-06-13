@@ -54,7 +54,7 @@ const mapStateToProps = (state: any) => ({
     activeSection: activeSectionSelector(state),
 });
 
-const mapDispatchToProps = {
+const mapDispatchToProps: any = {
     fetchProducts,
     setQuery: setSearchQuery,
     newProduct,

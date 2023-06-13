@@ -138,7 +138,7 @@ MonitoringApp.propTypes = {
     fetchMonitoring: PropTypes.func,
 };
 
-const mapDispatchToProps = {
+const mapDispatchToProps: any = {
     newMonitoringProfile,
     setQuery,
     fetchMonitoring,

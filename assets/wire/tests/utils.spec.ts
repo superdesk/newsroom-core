@@ -14,12 +14,12 @@ describe('utils', () => {
     });
 
     it('can get picture from body if featured is not set', () => {
-        const embed = {guid: 'embed', type: 'picture'};
-        const item = {
+        const embed: any = {guid: 'embed', type: 'picture'};
+        const item: any = {
             associations: {
                 embed123: embed,
             },
         };
         expect(utils.getPicture(item)).toBe(embed);
-    }); 
+    });
 });

@@ -77,7 +77,7 @@ export function postCard() {
         data.append('card', JSON.stringify(card));
 
         if (card.type === '4-photo-gallery') {
-            const errors = {
+            const errors: any = {
                 config: {
                     sources: [{}, {}, {}, {}]
                 }

@@ -7,7 +7,7 @@ import {
     CLEAR_ALL_NOTIFICATIONS,
 } from './actions';
 
-const initialState = {
+const initialState: any = {
     user: null,
     items: {},
     notifications: [],

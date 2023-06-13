@@ -85,7 +85,7 @@ UsersApp.propTypes = {
 
 };
 
-const mapDispatchToProps = {
+const mapDispatchToProps: any = {
     newUser,
     fetchUsers,
     setQuery: setSearchQuery,
