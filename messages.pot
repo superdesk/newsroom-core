@@ -7,16 +7,16 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Newsroom-Core 2.4.0\n"
+"Project-Id-Version: Newsroom-Core 2.4.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-05-31 15:04+0200\n"
+"POT-Creation-Date: 2023-06-13 12:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.12.1\n"
+"Generated-By: Babel 2.10.3\n"
 
 #: newsroom/email.py:414
 msgid "Kill/Takedown notice"
@@ -43,19 +43,23 @@ msgstr ""
 msgid "Unknown type {}"
 msgstr ""
 
-#: newsroom/search.py:264
+#: newsroom/search.py:265
 msgid "Page limit exceeded"
 msgstr ""
 
-#: newsroom/search.py:522
+#: newsroom/search.py:523
 msgid "User does not belong to a company."
 msgstr ""
 
-#: newsroom/search.py:524
+#: newsroom/search.py:525
 msgid "Your company doesn't have any products defined."
 msgstr ""
 
-#: newsroom/monitoring/search.py:67 newsroom/search.py:529
+#: newsroom/search.py:527
+msgid "Your product is not assigned to you or your company."
+msgstr ""
+
+#: newsroom/monitoring/search.py:67 newsroom/search.py:532
 msgid "Invalid product parameter"
 msgstr ""
 
@@ -152,7 +156,7 @@ msgstr ""
 msgid "Company account has expired."
 msgstr ""
 
-#: assets/company-admin/components/CompanyAdminProductSeatRequestModal.jsx:142
+#: assets/company-admin/components/CompanyAdminProductSeatRequestModal.jsx:143
 #: assets/wire/components/AgendaLinks.jsx:82 newsroom/agenda/__init__.py:28
 #: newsroom/agenda/__init__.py:29 newsroom/templates/agenda_index.html:3
 #: newsroom/templates/agenda_index.html:6
@@ -633,7 +637,7 @@ msgstr ""
 msgid "Client not found"
 msgstr ""
 
-#: assets/companies/components/CompanyPermissions.jsx:85
+#: assets/companies/components/CompanyPermissions.jsx:100
 #: assets/company-admin/components/CompanyDetails.jsx:20
 #: assets/company-reports/components/Company.jsx:24
 #: assets/navigations/components/EditNavigation.jsx:23
@@ -1038,7 +1042,7 @@ msgstr ""
 msgid "User Profile"
 msgstr ""
 
-#: assets/company-admin/components/CompanyAdminProductSeatRequestModal.jsx:142
+#: assets/company-admin/components/CompanyAdminProductSeatRequestModal.jsx:143
 #: newsroom/templates/wire_index.html:3 newsroom/templates/wire_index.html:6
 #: newsroom/wire/__init__.py:34
 msgid "Wire"
@@ -1213,7 +1217,7 @@ msgstr ""
 msgid "Manage Company Topics"
 msgstr ""
 
-#: assets/companies/components/CompanyPermissions.jsx:64
+#: assets/companies/components/CompanyPermissions.jsx:74
 #: assets/users/components/EditUser.jsx:193 newsroom/users/forms.py:60
 msgid "Sections"
 msgstr ""
@@ -1309,12 +1313,12 @@ msgstr ""
 msgid "Time limit for Wire products (in days)"
 msgstr ""
 
-#: newsroom/wire/views.py:363
+#: newsroom/wire/views.py:364
 msgid "Not found"
 msgstr ""
 
 #: assets/cards/components/EditCard.jsx:89
-#: assets/companies/components/CompanyPermissions.jsx:145
+#: assets/companies/components/CompanyPermissions.jsx:167
 #: assets/companies/components/EditCompanyAPI.jsx:85
 #: assets/companies/components/EditCompanyDetails.jsx:126
 #: assets/components/CardEditor.jsx:64 assets/components/EditPanel.jsx:140
@@ -2001,6 +2005,7 @@ msgid "Type"
 msgstr ""
 
 #: assets/cards/components/CardList.jsx:25
+#: assets/companies/components/CompanyPermissions.jsx:105
 #: assets/company-reports/components/ProductCompanies.jsx:53
 #: assets/company-reports/components/ProductStories.jsx:24
 #: assets/components/cards/edit/ConfigProduct.jsx:28
@@ -2130,24 +2135,28 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
-#: assets/companies/components/CompanyPermissions.jsx:32
+#: assets/companies/components/CompanyPermissions.jsx:35
 #: assets/users/components/EditUser.jsx:110
 msgid "General"
 msgstr ""
 
-#: assets/companies/components/CompanyPermissions.jsx:37
+#: assets/companies/components/CompanyPermissions.jsx:42
 msgid "Grant Access To Archived Wire"
 msgstr ""
 
-#: assets/companies/components/CompanyPermissions.jsx:45
+#: assets/companies/components/CompanyPermissions.jsx:50
 msgid "Events Only Access"
 msgstr ""
 
-#: assets/companies/components/CompanyPermissions.jsx:51
+#: assets/companies/components/CompanyPermissions.jsx:58
 msgid "Restrict Coverage Info"
 msgstr ""
 
-#: assets/companies/components/CompanyPermissions.jsx:111
+#: assets/companies/components/CompanyPermissions.jsx:106
+msgid "Number of seats"
+msgstr ""
+
+#: assets/companies/components/CompanyPermissions.jsx:133
 msgid "Seats:"
 msgstr ""
 
@@ -2248,11 +2257,11 @@ msgstr ""
 msgid "Send Request"
 msgstr ""
 
-#: assets/company-admin/components/CompanyAdminProductSeatRequestModal.jsx:152
+#: assets/company-admin/components/CompanyAdminProductSeatRequestModal.jsx:153
 msgid "Number of additional seats"
 msgstr ""
 
-#: assets/company-admin/components/CompanyAdminProductSeatRequestModal.jsx:161
+#: assets/company-admin/components/CompanyAdminProductSeatRequestModal.jsx:162
 #: assets/wire/components/PreviewEdnote.jsx:9
 msgid "Note"
 msgstr ""
@@ -2722,7 +2731,7 @@ msgstr ""
 #: assets/home/components/search-bar.jsx:34
 #: assets/search/components/SearchBar.jsx:81
 #: assets/search/components/TopicParameters.jsx:68
-#: assets/wire/components/filters/FiltersTab.jsx:138
+#: assets/wire/components/filters/FiltersTab.jsx:141
 msgid "Search"
 msgstr ""
 
@@ -2733,7 +2742,7 @@ msgstr ""
 
 #: assets/layout/components/BaseApp.jsx:44
 #: assets/search/components/FollowedTopics.jsx:149
-#: assets/search/components/TopicsTab.jsx:73
+#: assets/search/components/TopicsTab.jsx:74
 msgid "My Topics"
 msgstr ""
 
@@ -3210,7 +3219,7 @@ msgid "Would you like to delete topic {{name}}?"
 msgstr ""
 
 #: assets/search/components/FollowedTopics.jsx:158
-#: assets/search/components/TopicsTab.jsx:96
+#: assets/search/components/TopicsTab.jsx:97
 msgid "Company Topics"
 msgstr ""
 
@@ -3382,13 +3391,13 @@ msgid "Agenda Topics"
 msgstr ""
 
 #: assets/search/components/TopicsTab.jsx:47
-#: assets/search/components/TopicsTab.jsx:78
-#: assets/search/components/TopicsTab.jsx:101
+#: assets/search/components/TopicsTab.jsx:79
+#: assets/search/components/TopicsTab.jsx:102
 msgid "No {{name}} created."
 msgstr ""
 
 #: assets/search/components/TopicsTab.jsx:63
-#: assets/search/components/TopicsTab.jsx:118
+#: assets/search/components/TopicsTab.jsx:120
 msgid "Manage my {{name}}"
 msgstr ""
 
@@ -3729,8 +3738,12 @@ msgstr ""
 msgid "Show less"
 msgstr ""
 
-#: assets/wire/components/filters/FiltersTab.jsx:145
+#: assets/wire/components/filters/FiltersTab.jsx:148
 msgid "Clear filters"
+msgstr ""
+
+#: assets/wire/components/filters/NavCreatedPicker.jsx:27
+msgid "Event date"
 msgstr ""
 
 #: assets/wire/components/filters/NavCreatedPicker.jsx:36
