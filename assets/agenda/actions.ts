@@ -76,8 +76,8 @@ export function previewItem(item: any, group: any, plan: any) {
 
 export function fetchWireItemsForAgenda(item: any) {
     return (dispatch: any) => {
-        let wireIds = [];
-        (get(item, 'coverages') || []).forEach((c) => {
+        let wireIds: Array<any> = [];
+        (get(item, 'coverages') || []).forEach((c: any) => {
             if (c.coverage_type === 'text' && c.delivery_id) {
                 wireIds.push(c.delivery_id);
             }
@@ -110,7 +110,9 @@ export function requestCoverage(item: any, message: any) {
         const data = {item: item._id, message};
         return server.post(url, data)
             .then(() => notify.success(gettext('Your inquiry has been sent successfully')))
-            .catch(errorHandler);
+            .catch((arg) => {
+                errorHandler(arg);
+            });
     };
 }
 
@@ -184,8 +186,8 @@ export function copyPreviewContents(item: any) {
             return;
         }
 
-        server.post(`/wire/${item._id}/copy?type=${state.context}`)
-            .then((response) => {
+        (server as any).post(`/wire/${item._id}/copy?type=${state.context}`)
+            .then((response: any) => {
                 dispatch(setCopyItem(item._id));
                 copyTextToClipboard(response.data, item);
             })
@@ -202,10 +204,10 @@ export function copyPreviewContents(item: any) {
  */
 function search(state: any, next: any) {
     const currentMoment = moment();
-    const searchParams = searchParamsSelector(state);
-    const createdFilter = get(searchParams, 'created') || {};
-    const itemTypeFilter = get(state, 'agenda.itemType');
-    const eventsOnlyFilter = !state.bookmarks && itemTypeFilter === 'events';
+    const searchParams: any = searchParamsSelector(state);
+    const createdFilter: any = get(searchParams, 'created') || {};
+    const itemTypeFilter: any = get(state, 'agenda.itemType');
+    const eventsOnlyFilter: any = !state.bookmarks && itemTypeFilter === 'events';
 
     const featuredFilter = noNavigationSelected(searchParams.navigation) &&
         !state.bookmarks &&

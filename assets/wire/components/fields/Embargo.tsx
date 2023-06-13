@@ -7,6 +7,11 @@ import {Tooltip} from 'bootstrap';
 import {gettext, fullDate, getEmbargo} from 'utils';
 
 export class Embargo extends React.Component<any, any> {
+    static propTypes: any;
+    timeout: any;
+    tooltip: any;
+    elem: any;
+
     constructor(props: any) {
         super(props);
         this.state = {

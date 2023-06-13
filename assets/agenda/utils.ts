@@ -335,7 +335,7 @@ export function getDateInputDate(dateString: any) {
  * @param {String} dateString
  * @return {String}
  */
-export function getMomentDate(dateString: any) {
+export function getMomentDate(dateString: any): any {
     if (dateString) {
         return moment(parseInt(dateString));
     }

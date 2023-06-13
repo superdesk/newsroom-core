@@ -513,7 +513,7 @@ export function formatHTML(html: any) {
  * @param dispatch
  * @param setError
  */
-export function errorHandler(error: any, dispatch: any, setError: any) {
+export function errorHandler(error: any, dispatch?: any, setError?: any) {
     console.error('error', error);
 
     if (error.response.status !== 400) {
