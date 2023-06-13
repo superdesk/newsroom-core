@@ -89,9 +89,9 @@ export function postMonitoringProfile(userProfile: any, notifyMsg: any) {
         return server.post(url, p)
             .then(function(item) {
                 if (p._id) {
-                    notify.success(notifyMsg || gettext('{{monitoring}} Profile updated successfully', sectionNames));
+                    notify.success(notifyMsg || gettext('{{monitoring}} Profile updated successfully', window.sectionNames));
                 } else {
-                    notify.success(gettext('{{monitoring}} Profile created successfully', sectionNames));
+                    notify.success(gettext('{{monitoring}} Profile created successfully', window.sectionNames));
                     if (!userProfile) {
                         dispatch(updateMonitoringProfile({
                             target: {
@@ -157,7 +157,7 @@ export function saveMonitoringProfileUsers(users: any) {
         const p = monitoringProfileToEdit(getState());
         return server.post(`/monitoring/${p._id}/users`, {users})
             .then(() => {
-                notify.success(gettext('{{monitoring}} Profile users updated successfully', sectionNames));
+                notify.success(gettext('{{monitoring}} Profile users updated successfully', window.sectionNames));
                 dispatch(fetchMonitoring());
                 dispatch(cancelEdit());
             })
@@ -169,12 +169,12 @@ export function saveMonitoringProfileSchedule() {
     return function (dispatch, getState) {
         const p = monitoringProfileToEdit(getState());
         if (!p._id) {
-            notify.error(gettext('Please create {{monitoring}} profile first.', sectionNames));
+            notify.error(gettext('Please create {{monitoring}} profile first.', window.sectionNames));
         }
 
         return server.post(`/monitoring/${p._id}/schedule`, {schedule: p.schedule})
             .then(() => {
-                notify.success(gettext('{{monitoring}} Profile schedule updated successfully', sectionNames));
+                notify.success(gettext('{{monitoring}} Profile schedule updated successfully', window.sectionNames));
                 dispatch(fetchMonitoring());
                 dispatch(cancelEdit());
             })
@@ -190,7 +190,7 @@ export function deleteMonitoringProfile() {
 
         return server.del(url)
             .then(() => {
-                notify.success(gettext('{{monitoring}} Profile deleted successfully', sectionNames));
+                notify.success(gettext('{{monitoring}} Profile deleted successfully', window.sectionNames));
                 dispatch(fetchMonitoring());
                 dispatch(cancelEdit());
             })

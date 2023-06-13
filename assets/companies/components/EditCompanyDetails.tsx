@@ -110,7 +110,7 @@ export function EditCompanyDetails({company, companyTypes, users, errors, onChan
 
                 {get(company, 'sections.monitoring') && <SelectInput
                     name='monitoring_administrator'
-                    label={gettext('{{monitoring}} Administrator', sectionNames)}
+                    label={gettext('{{monitoring}} Administrator', window.sectionNames)}
                     value={company.monitoring_administrator}
                     options={sortBy(users || [], 'first_name').map((u) => ({
                         text: `${u.first_name} ${u.last_name}`,

@@ -75,7 +75,7 @@ class WireApp extends BaseApp {
         this.tabs = this.tabs.filter((t) => get(this.props.advancedSearchTabConfig, t.id, true));
         if (this.props.context === 'monitoring') {
             let navTab = this.tabs.find((t) => t.id === 'nav');
-            navTab.label = gettext('{{monitoring}} Profiles', sectionNames);
+            navTab.label = gettext('{{monitoring}} Profiles', window.sectionNames);
         }
 
         this.state.initialLoad = this.props.isLoading;
@@ -177,7 +177,7 @@ class WireApp extends BaseApp {
                 filterGroupLabels={this.props.filterGroupLabels}
             />] : [
                 <section key="contentHeader" className='content-header'>
-                    <h3 className="a11y-only">{gettext('{{wire}} Content', sectionNames)}</h3>
+                    <h3 className="a11y-only">{gettext('{{wire}} Content', window.sectionNames)}</h3>
                     <SelectedItemsBar
                         actions={this.props.actions}
                     />

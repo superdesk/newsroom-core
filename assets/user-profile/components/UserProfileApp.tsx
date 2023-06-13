@@ -43,7 +43,7 @@ class UserProfileApp extends React.Component<any, any> {
         if (this.isSectionEnabled('wire')) {
             this.links.push({
                 name: 'topics',
-                label: gettext('My {{ section }} Topics', {section: sectionNames.wire}),
+                label: gettext('My {{ section }} Topics', {section: window.sectionNames.wire}),
                 content: FollowedTopics,
                 type: 'wire',
             });
@@ -52,7 +52,7 @@ class UserProfileApp extends React.Component<any, any> {
         if (this.isSectionEnabled('agenda')) {
             this.links.push({
                 name: 'events',
-                label: gettext('My {{ section }} Topics', {section: sectionNames.agenda}),
+                label: gettext('My {{ section }} Topics', {section: window.sectionNames.agenda}),
                 content: FollowedTopics,
                 type: 'agenda',
             });
@@ -61,7 +61,7 @@ class UserProfileApp extends React.Component<any, any> {
         if (this.isSectionEnabled('monitoring')) {
             this.links.push({
                 name: 'monitoring',
-                label: gettext('My {{ monitoring }}', sectionNames),
+                label: gettext('My {{ monitoring }}', window.sectionNames),
                 content: FollowedTopics,
                 type: 'monitoring',
             });

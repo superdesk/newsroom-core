@@ -149,7 +149,7 @@ class AgendaApp extends BaseApp {
                 restrictCoverageInfo={this.props.restrictCoverageInfo}
             />] : [
                 <section key="contentHeader" className='content-header'>
-                    <h3 className="a11y-only">{gettext('{{agenda}} Content', sectionNames)}</h3>
+                    <h3 className="a11y-only">{gettext('{{agenda}} Content', window.sectionNames)}</h3>
                     <SelectedItemsBar
                         actions={this.props.actions}
                     />

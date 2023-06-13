@@ -79,7 +79,7 @@ export default class AgendaLinks extends React.PureComponent<any, any> {
 
         return (
             <Fragment>
-                <InfoBox label={sectionNames.agenda}>
+                <InfoBox label={window.sectionNames.agenda}>
                     {get(agenda, 'event', null) &&
                         <PreviewTagsBlock label={gettext('Related Event')}>
                             <AgendaEventInfo item={agenda} onClick={this.openAgenda}/>

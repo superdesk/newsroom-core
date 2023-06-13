@@ -16,7 +16,7 @@ const AgendaEventInfo = ({item, onClick}) => {
 
     return (
         <div className={classNames('coverage-item mt-3', {'coverage-item--clickable': onClick})} onClick={onClick}
-            title={onClick ? gettext('Open {{agenda}} in new tab', sectionNames) : onClick}>
+            title={onClick ? gettext('Open {{agenda}} in new tab', window.sectionNames) : onClick}>
             <div className='coverage-item__row'>
                 <AgendaName item={item} noMargin small/>
             </div>

@@ -38,7 +38,7 @@ function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNew
         (topic: any) => topic.is_global
     );
 
-    const tabName = gettext('{{ section }} Topics', {section: isWireContext() ? sectionNames.wire : sectionNames.agenda});
+    const tabName = gettext('{{ section }} Topics', {section: isWireContext() ? window.sectionNames.wire : window.sectionNames.agenda});
 
     return !globalTopicsEnabled ? (
         <React.Fragment>
