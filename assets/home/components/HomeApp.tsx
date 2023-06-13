@@ -27,6 +27,10 @@ const modals: any = {
 };
 
 class HomeApp extends React.Component<any, any> {
+    static propTypes: any;
+
+    height: number;
+    elem: any;
     constructor(props: any, context: any) {
         super(props, context);
         this.getPanels = this.getPanels.bind(this);
@@ -39,15 +43,15 @@ class HomeApp extends React.Component<any, any> {
     }
 
     componentDidMount() {
-        document.getElementById('footer').className = 'footer footer--home';
+        (document.getElementById('footer') as any).className = 'footer footer--home';
         this.height = this.elem.offsetHeight;
 
         // Load items for cards
         Promise.all([
             this.props.fetchCompanyCardItems(),
             ...this.props.cards
-                .filter((card) => card.dashboard === 'newsroom' && card.type === '4-photo-gallery')
-                .map((card) => (
+                .filter((card: any) => card.dashboard === 'newsroom' && card.type === '4-photo-gallery')
+                .map((card: any) => (
                     this.props.fetchCardExternalItems(get(card, '_id'), get(card, 'label'))
                 )),
         ])
@@ -69,14 +73,14 @@ class HomeApp extends React.Component<any, any> {
         const container = event.target;
         const BUFFER = 100;
         if(container.scrollTop + this.height + BUFFER >= container.scrollHeight) {
-            document.getElementById('footer').className = 'footer';
+            (document.getElementById('footer') as any).className = 'footer';
         } else {
-            document.getElementById('footer').className = 'footer footer--home';
+            (document.getElementById('footer') as any).className = 'footer footer--home';
         }
     }
 
     getProduct(card: any) {
-        return this.props.products.find(p => p._id === card.config.product);
+        return this.props.products.find((p: any) => p._id === card.config.product);
     }
 
     getPanels(card: any) {
@@ -91,7 +95,7 @@ class HomeApp extends React.Component<any, any> {
             );
         }
 
-        const Panel = getCardDashboardComponent(card.type);
+        const Panel: React.ComponentType<any> = getCardDashboardComponent(card.type);
         const items = this.props.itemsByCard[card.label] || [];
 
         if (card.type === '4-photo-gallery') {
@@ -127,11 +131,11 @@ class HomeApp extends React.Component<any, any> {
     }
 
     filterActions(item: any, config: any) {
-        return this.props.actions.filter((action) =>  (!config || isDisplayed(action.id, config)) &&
+        return this.props.actions.filter((action: any) =>  (!config || isDisplayed(action.id, config)) &&
           (!action.when || action.when(this.props, item)));
     }
 
-    renderContent(children: any) {
+    renderContent(children?: any): any {
         return (
             <React.Fragment>
                 {this.props.isSearchEnabled && (
@@ -144,7 +148,7 @@ class HomeApp extends React.Component<any, any> {
                 >
                     <div className="container-fluid">
                         {this.props.cards.length > 0 &&
-                        this.props.cards.filter((c) => c.dashboard === 'newsroom').map((card) => this.getPanels(card))}
+                        this.props.cards.filter((c: any) => c.dashboard === 'newsroom').map((card: any) => this.getPanels(card))}
                         {this.props.cards.length === 0 &&
                         <div className="alert alert-warning" role="alert">
                             <strong>{gettext('Warning')}!</strong> {gettext('There\'s no card defined for {{home}} page!', window.sectionNames)}
@@ -166,7 +170,7 @@ class HomeApp extends React.Component<any, any> {
                 user={this.props.user}
                 topics={this.props.topics}
                 actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
-                onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
+                onClose={() => this.props.actions.filter((a: any) => a.id === 'open')[0].action(null)}
                 followStory={this.props.followStory}
                 detailsConfig={this.props.detailsConfig}
                 filterGroupLabels={this.props.filterGroupLabels}
@@ -180,7 +184,7 @@ class HomeApp extends React.Component<any, any> {
     renderMobile() {
         const modal = this.renderModal(this.props.modal);
         const isFollowing = get(this.props, 'itemToOpen.slugline') && this.props.topics &&
-            this.props.topics.find((topic) => topic.query === `slugline:"${this.props.itemToOpen.slugline}"`);
+            this.props.topics.find((topic: any) => topic.query === `slugline:"${this.props.itemToOpen.slugline}"`);
 
         return this.renderContent([
             <div key='preview_test' className={`wire-column__preview ${this.props.itemToOpen ? 'wire-column__preview--open' : ''}`}>
@@ -191,7 +195,7 @@ class HomeApp extends React.Component<any, any> {
                         actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
                         followStory={this.props.followStory}
                         isFollowing={!!isFollowing}
-                        closePreview={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
+                        closePreview={() => this.props.actions.filter((a: any) => a.id === 'open')[0].action(null)}
                         previewConfig={this.props.previewConfig}
                         downloadMedia={this.props.downloadMedia}
                         listConfig={this.props.listConfig}
@@ -246,7 +250,6 @@ const mapStateToProps = (state: any) =>({
     user: state.user,
     userType: state.userType,
     company: state.company,
-    format: PropTypes.format,
     itemToOpen: state.itemToOpen,
     modal: state.modal,
     activeCard: state.activeCard,
@@ -267,7 +270,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     fetchCardExternalItems: (cardId: any, cardLabel: any) => dispatch(fetchCardExternalItems(cardId, cardLabel)),
     fetchCompanyCardItems: () => dispatch(fetchCompanyCardItems()),
     followStory: (item: any) => followStory(item, 'wire'),
-    downloadMedia: (href: any, id: any, mimeType: any) => dispatch(downloadMedia(href, id, mimeType)),
+    downloadMedia: (href: any, id: any, mimeType: any) => dispatch(downloadMedia(href, id)),
 });
 
 

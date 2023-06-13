@@ -17,6 +17,11 @@ const LOCATION_TYPE = {
 };
 
 export class LocationFilter extends React.Component<any, any> {
+    static propTypes: any;
+
+    dom: any;
+    handleSearch: any;
+
     constructor(props: any) {
         super(props);
 
@@ -130,8 +135,8 @@ export class LocationFilter extends React.Component<any, any> {
 
         const activeElement = document.activeElement;
         const numResults = this.state.results.places.length + this.state.results.regions.length;
-        const activeIndex = activeElement.getAttribute('data-item-index') != null ?
-            parseInt(activeElement.getAttribute('data-item-index'), 10) :
+        const activeIndex = activeElement?.getAttribute('data-item-index') != null ?
+            parseInt(activeElement.getAttribute('data-item-index') as any, 10) :
             null;
 
         if (event.code === KEYS.UP) {
@@ -241,7 +246,7 @@ export class LocationFilter extends React.Component<any, any> {
         } else if (activeIndex != null) {
             // If a search result item is currently focused, select that
             event.preventDefault();
-            document.querySelector(`[data-item-index="${activeIndex}"]`).click();
+            (document.querySelector(`[data-item-index="${activeIndex}"]`) as HTMLElement).click();
         }
     }
 
@@ -252,7 +257,7 @@ export class LocationFilter extends React.Component<any, any> {
      */
     focusItem(index: any) {
         this.setState({selectedIndex: index});
-        const item = document.querySelector(`[data-item-index="${index}"]`);
+        const item: HTMLElement = document.querySelector(`[data-item-index="${index}"]`) as HTMLElement;
 
         if (item != null) {
             item.focus();
@@ -264,7 +269,7 @@ export class LocationFilter extends React.Component<any, any> {
      *
      * @param {Object} selected
      */
-    onChange(selected: any) {
+    onChange(selected?: any) {
         this.toggleDropdown();
         this.props.toggleFilter('location', selected);
     }
@@ -274,7 +279,7 @@ export class LocationFilter extends React.Component<any, any> {
      *
      * @param {Event} e
      */
-    onSearchInputChange(e) {
+    onSearchInputChange(e: any) {
         this.handleSearch(e.target.value);
     }
 
@@ -284,7 +289,7 @@ export class LocationFilter extends React.Component<any, any> {
      * @param {String | undefined} query
      * @private
      */
-    _handleSearch(query) {
+    _handleSearch(query?: any) {
         this.setState({isSearchLoading: true});
         let searchURL = '/agenda/search_locations';
 
@@ -441,7 +446,7 @@ export class LocationFilter extends React.Component<any, any> {
                                 className="form-control"
                                 placeholder={gettext('Search for a region or place')}
                                 onChange={this.onSearchInputChange}
-                                aria-activedescendant={true}
+                                // aria-activedescendant={true}
                                 aria-autocomplete="both"
                                 aria-expanded={true}
                                 aria-haspopup="listbox"

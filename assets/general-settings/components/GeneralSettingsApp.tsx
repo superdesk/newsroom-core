@@ -15,6 +15,8 @@ function isInput(field: any) {
 }
 
 class GeneralSettingsApp extends React.Component<any, any> {
+    static propTypes: any;
+
     constructor(props: any) {
         super(props);
         this.state = {
@@ -64,7 +66,7 @@ class GeneralSettingsApp extends React.Component<any, any> {
 
     render() {
         const {config} = this.props;
-        const fields = sortBy(Object.keys(config), (_id) => config[_id].weight).map((_id) => {
+        const fields = sortBy(Object.keys(config), (_id) => config[_id].weight).map((_id: any) => {
             const field = config[_id];
             if (isInput(field)) {
                 return field.type === 'boolean' ? (

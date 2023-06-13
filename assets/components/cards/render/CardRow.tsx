@@ -49,4 +49,7 @@ CardRow.defaultProps = {
     moreNews: true
 };
 
-export default connect(mapStateToProps)(CardRow);
+
+const component: React.ComponentType<any> = connect(mapStateToProps)(CardRow);
+
+export default component;
