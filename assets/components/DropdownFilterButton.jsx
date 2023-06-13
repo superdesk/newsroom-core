@@ -27,9 +27,7 @@ function DropdownFilterButton({id, isActive, autoToggle, onClick, icon, label, t
                     {label}
                 </span>
             )}
-            <i className={classNames(
-                'icon-small--arrow-down',
-            )} />
+            <i className='icon-small--arrow-down' />
         </button>
     );
 }

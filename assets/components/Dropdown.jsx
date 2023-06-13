@@ -55,9 +55,7 @@ export function Dropdown({children, isActive, icon, label, className, buttonProp
                     {label}
                 </span>
             )}
-            <i className={classNames(
-                'icon-small--arrow-down',
-            )} />
+            <i className='icon-small--arrow-down' />
         </button>
         <div className='dropdown-menu'>
             {children}
