@@ -573,20 +573,7 @@ class BaseSearchService(Service):
             company_products_with_zero_seats = [p["_id"] for p in company.get("products", []) if p.get("seats") == 0]
             user_specific_products = [p["_id"] for p in user.get("products", [])]
 
-            if company_products_with_zero_seats and not ObjectId(product) in user_specific_products:
-                return False
-            elif not self.is_product_assigned_to_company(data):
-                return False
-            return True
-
-    def is_product_assigned_to_company(self, search):
-        """Check if the product is assigned to the company
-
-        :param SearchQuery search: The search query instance
-        """
-        product_id = search.products[0].get("_id")
-        company_products = search.company.get("products", [])
-        return ObjectId(product_id) in [product.get("_id") for product in company_products]
+            return ObjectId(product) in user_specific_products or ObjectId(product) in company_products_with_zero_seats
 
     def apply_section_filter(self, search, filters=None):
         """Generate the section filter
