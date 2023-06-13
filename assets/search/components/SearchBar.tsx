@@ -8,6 +8,9 @@ import {gettext} from 'utils';
 import {searchQuerySelector} from 'search/selectors';
 
 class SearchBar extends React.Component<any, any> {
+    static propTypes: any;
+    static defaultProps: any;
+
     constructor(props: any) {
         super(props);
         this.onChange = this.onChange.bind(this);
@@ -108,10 +111,12 @@ SearchBar.propTypes = {
     toggleAdvancedSearchPanel: PropTypes.func,
 };
 
-const mapStateToProps = (state: any) => ({
+const mapStateToProps: any = (state: any) => ({
     query: searchQuerySelector(state),
 });
 
 SearchBar.defaultProps = {enableQueryAction: true};
 
-export default connect(mapStateToProps, null)(SearchBar);
+const component: React.ComponentType<any> = connect(mapStateToProps, null)(SearchBar);
+
+export default component;

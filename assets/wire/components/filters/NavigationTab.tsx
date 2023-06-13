@@ -62,4 +62,6 @@ const mapDispatchToProps: any = {
     toggleNavigation,
 };
 
-export default connect(null, mapDispatchToProps)(NavigationTab);
+const component: React.ComponentType<any> = connect(null, mapDispatchToProps)(NavigationTab);
+
+export default component;

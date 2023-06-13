@@ -346,6 +346,6 @@ const mapStateToProps = (state: any) => ({
     seats: companyProductSeatsSelector(state),
 });
 
-const EditUser = connect(mapStateToProps)(EditUserComponent);
+const EditUser: React.ComponentType<any> = connect(mapStateToProps)(EditUserComponent);
 
 export default EditUser;

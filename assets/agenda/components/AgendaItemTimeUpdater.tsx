@@ -8,6 +8,12 @@ import {bem} from 'ui/utils';
 import {gettext} from 'utils';
 
 class AgendaItemTimeUpdater extends React.Component<any, any> {
+    static propTypes: any;
+    static defaultProps: any;
+
+    interval: number;
+    timerIntervalId: any;
+
     constructor(props: any) {
         super(props);
 

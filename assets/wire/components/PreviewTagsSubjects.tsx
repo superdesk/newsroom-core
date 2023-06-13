@@ -10,7 +10,7 @@ import PreviewTagsBlock from './PreviewTagsBlock';
 import {PreviewTagsLinkList} from './PreviewTagsLinkList';
 
 
-function PreviewTagsSubjectsComponent({subjects, displayConfig, urlPrefix, filterGroupLabels}: any) {
+function PreviewTagsSubjectsComponent({subjects, displayConfig, urlPrefix, filterGroupLabels}: any): any {
     if (!subjects.length) {
         return null;
     }
@@ -61,4 +61,4 @@ const mapStateToProps = (state: any) => ({
     filterGroupLabels: filterGroupsToLabelMap(state),
 });
 
-export const PreviewTagsSubjects = connect(mapStateToProps)(PreviewTagsSubjectsComponent);
+export const PreviewTagsSubjects: React.ComponentType<any> = connect(mapStateToProps)(PreviewTagsSubjectsComponent);

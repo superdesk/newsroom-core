@@ -61,4 +61,6 @@ const mapDispatchToProps: any = {
     setQuery: setSearchQuery,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(NavigationsApp);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(NavigationsApp);
+
+export default component;

@@ -62,6 +62,11 @@ const modals = {
 };
 
 class AgendaApp extends BaseApp {
+    static propTypes: any;
+
+    modals: any;
+    tabs: any;
+
     constructor(props: any) {
         super(props);
         this.modals = modals;
@@ -70,7 +75,7 @@ class AgendaApp extends BaseApp {
     }
 
     getTabs() {
-        return this.props.featuredOnly ?  this.tabs.filter((t) => t.id !== 'filters') : this.tabs;
+        return this.props.featuredOnly ?  this.tabs.filter((t: any) => t.id !== 'filters') : this.tabs;
     }
 
 
@@ -99,7 +104,7 @@ class AgendaApp extends BaseApp {
         });
 
         const onDetailClose = this.props.detail ? null :
-            () => this.props.actions.filter(a => a.id === 'open')[0].action(null, this.props.previewGroup, this.props.previewPlan);
+            () => this.props.actions.filter((a: any) => a.id === 'open')[0].action(null, this.props.previewGroup, this.props.previewPlan);
         const eventsOnly = this.props.itemTypeFilter === 'events' || this.props.eventsOnlyAccess;
         const hideFeaturedToggle = !noNavigationSelected(this.props.activeNavigation) ||
             this.props.bookmarks ||
@@ -273,7 +278,7 @@ class AgendaApp extends BaseApp {
                         />
                     </div>
                 </section>
-            ]).concat([
+            ] as any).concat([
                 modal,
                 this.renderNavBreadcrumb(
                     this.props.navigations,
@@ -406,4 +411,6 @@ const mapDispatchToProps = (dispatch: any) => ({
     setQuery: (query: any) => dispatch(setQuery(query)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(AgendaApp);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(AgendaApp);
+
+export default component;

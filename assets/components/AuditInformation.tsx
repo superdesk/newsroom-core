@@ -93,4 +93,6 @@ const mapDispatchToProps = (dispatch: any) => ({
     getEditUsers: (item: any) => dispatch(getEditUsers(item))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(AuditInformation);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(AuditInformation);
+
+export default component;

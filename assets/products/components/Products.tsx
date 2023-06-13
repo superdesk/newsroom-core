@@ -172,4 +172,6 @@ const mapDispatchToProps = (dispatch: any) => ({
     dispatch: dispatch,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Products);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(Products);
+
+export default component;

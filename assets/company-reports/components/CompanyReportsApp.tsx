@@ -110,4 +110,6 @@ const mapDispatchToProps: any = {
     toggleFilterAndQuery,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(CompanyReportsApp);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(CompanyReportsApp);
+
+export default component;

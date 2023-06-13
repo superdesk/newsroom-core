@@ -88,7 +88,7 @@ export function getPictureList(item: any) {
  * @param {Boolean} large
  * @return {Object}
  */
-export function getThumbnailRendition(picture: any, large: any) {
+export function getThumbnailRendition(picture: any, large?: any) {
     const rendition = large ? 'renditions._newsroom_thumbnail_large' : 'renditions._newsroom_thumbnail';
     return get(picture, rendition, get(picture, 'renditions.thumbnail'));
 }

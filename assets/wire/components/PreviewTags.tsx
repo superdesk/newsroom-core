@@ -69,6 +69,6 @@ const mapStateToProps = (state: any) => ({
     filterGroupLabels: filterGroupsToLabelMap(state),
 });
 
-const PreviewTags = connect(mapStateToProps)(PreviewTagsComponent);
+const PreviewTags: React.ComponentType<any> = connect(mapStateToProps)(PreviewTagsComponent);
 
 export default PreviewTags;

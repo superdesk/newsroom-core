@@ -100,7 +100,7 @@ export function agendaWireItems(items: any) {
 }
 
 export const OPEN_ITEM = 'OPEN_ITEM';
-export function openItemDetails(item: any, group: any, plan: any) {
+export function openItemDetails(item: any, group?: any, plan?: any) {
     return {type: OPEN_ITEM, item, group, plan};
 }
 

@@ -71,4 +71,4 @@ const mapDispatchToProps = (dispatch: any) => ({
     selectUser: (userId: any) => dispatch(_selectUser(userId)),
 });
 
-export const CompanyUsers = connect(mapStateToProps, mapDispatchToProps)(CompanyUsersComponent);
+export const CompanyUsers: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(CompanyUsersComponent);

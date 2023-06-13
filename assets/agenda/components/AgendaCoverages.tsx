@@ -29,14 +29,14 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
         return slugline ? ` | ${slugline}` : '';
     };
 
-    const coveragesWithoutState = coverages.filter((coverage) => WORKFLOW_COLORS[coverage.workflow_status] == null);
-    const coveragesWithState = coverages.filter((coverage) => WORKFLOW_COLORS[coverage.workflow_status] != null);
+    const coveragesWithoutState = coverages.filter((coverage: any) => WORKFLOW_COLORS[coverage.workflow_status] == null);
+    const coveragesWithState = coverages.filter((coverage: any) => WORKFLOW_COLORS[coverage.workflow_status] != null);
 
     return (
         <React.Fragment>
             {!coveragesWithoutState.length ? null : (
                 <div>
-                    {coveragesWithoutState.map((coverage) => (
+                    {coveragesWithoutState.map((coverage: any) => (
                         <i
                             className={`icon--coverage-${getCoverageIcon(coverage.coverage_type)} me-2`}
                             key={coverage.coverage_id}
@@ -45,7 +45,7 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                     ))}
                 </div>
             )}
-            {coveragesWithState.map((coverage) => (
+            {coveragesWithState.map((coverage: any) => (
                 <div
                     className={classNames(
                         'coverage-item',
@@ -108,6 +108,6 @@ const mapStateToProps = (state: any) => ({
     contentLinkTarget: agendaContentLinkTarget(state),
 });
 
-const AgendaCoverages = connect(mapStateToProps)(AgendaCoveragesComponent);
+const AgendaCoverages: React.ComponentType<any> = connect(mapStateToProps)(AgendaCoveragesComponent);
 
 export default AgendaCoverages;

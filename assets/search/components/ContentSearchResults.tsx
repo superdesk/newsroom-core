@@ -233,7 +233,7 @@ const mapDispatchToProps: any = {
     loadMyAgendaTopic,
 };
 
-export const ContentSearchResults = connect(
+export const ContentSearchResults: React.ComponentType<any> = connect(
     mapStateToProps,
     mapDispatchToProps
 )(ContentSearchResultsComponent);

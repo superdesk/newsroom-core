@@ -149,4 +149,6 @@ const mapDispatchToProps = (dispatch: any) => ({
         dispatch(loadMyWireTopic(topic._id)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(TopicsTab);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(TopicsTab);
+
+export default component;

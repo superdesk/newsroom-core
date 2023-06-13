@@ -61,4 +61,6 @@ ListItemNextVersion.propTypes = {
     displayConfig: PropTypes.object,
 };
 
-export default connect()(ListItemNextVersion);
+const component: React.ComponentType<any> = connect()(ListItemNextVersion);
+
+export default component;

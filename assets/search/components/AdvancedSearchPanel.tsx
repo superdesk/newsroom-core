@@ -168,4 +168,4 @@ const mapDispatchToProps = (dispatch: any) => ({
 });
 
 
-export const AdvancedSearchPanel = connect(mapStateToProps, mapDispatchToProps)(AdvancedSearchPanelComponent);
+export const AdvancedSearchPanel: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(AdvancedSearchPanelComponent);

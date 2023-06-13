@@ -397,4 +397,6 @@ const mapDispatchToProps = (dispatch: any) => ({
     downloadMedia: (href: any, id: any, mimeType: any) => dispatch(downloadMedia(href, id, mimeType)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(WireApp);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(WireApp);
+
+export default component;

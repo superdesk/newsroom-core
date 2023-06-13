@@ -234,4 +234,6 @@ const mapStateToProps = (state: any) => ({
     contextName: getContextName(state),
 });
 
-export default connect(mapStateToProps)(AmNewsList);
+const component: React.ComponentType<any> = connect(mapStateToProps)(AmNewsList);
+
+export default component;

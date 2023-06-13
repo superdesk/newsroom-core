@@ -64,4 +64,6 @@ const mapDispatchToProps: any = {
     newSectionFilter,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(SectionFiltersApp);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(SectionFiltersApp);
+
+export default component;

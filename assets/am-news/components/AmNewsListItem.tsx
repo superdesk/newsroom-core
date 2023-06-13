@@ -23,6 +23,10 @@ import {
 
 
 class AmNewsListItem extends React.Component<any, any> {
+    static propTypes: any;
+    wordCount: any;
+    articleElem: any;
+
     constructor(props: any) {
         super(props);
         this.wordCount = wordCount(props.item);
@@ -98,7 +102,7 @@ class AmNewsListItem extends React.Component<any, any> {
                 onDoubleClick={() => onDoubleClick(item)}
                 onKeyDown={this.onKeyDown}
             >
-                <div className={wrapClassName} tabIndex='0'>
+                <div className={wrapClassName} tabIndex={0}>
                     <div className='wire-articles__item-text'>
                         <h4 className='wire-articles__item-headline'>
                             <div className={selectClassName} onClick={this.stopPropagation}>
@@ -138,7 +142,7 @@ class AmNewsListItem extends React.Component<any, any> {
                             showActions={this.props.showActions}
                         />
 
-                        {this.props.actions.map((action) =>
+                        {this.props.actions.map((action: any) =>
                             action.shortcut &&
                           <ActionButton
                               key={action.name}

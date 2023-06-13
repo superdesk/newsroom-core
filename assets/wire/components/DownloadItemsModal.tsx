@@ -96,4 +96,6 @@ const mapDispatchToProps = (dispatch: any) => ({
     modalFormValid: () => dispatch(modalFormValid()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(DownloadItemsModal);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(DownloadItemsModal);
+
+export default component;

@@ -229,4 +229,6 @@ const mapDispatchToProps = (dispatch: any) => ({
     fetchCompanyUsers: (companyId: any) => dispatch(fetchCompanyUsers(companyId, true)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(FollowedTopics);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(FollowedTopics);
+
+export default component;

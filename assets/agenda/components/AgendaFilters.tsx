@@ -149,6 +149,6 @@ const mapStateToProps = (state: any) => ({
     filtersConfig: agendaFiltersConfigSelector(state),
 });
 
-const AgendaFilters = connect(mapStateToProps)(AgendaFiltersComponent);
+const AgendaFilters: React.ComponentType<any> = connect(mapStateToProps)(AgendaFiltersComponent);
 
 export default AgendaFilters;

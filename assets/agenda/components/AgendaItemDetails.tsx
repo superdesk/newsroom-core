@@ -30,8 +30,7 @@ import {AgendaPreviewPlanning} from './AgendaPreviewPlanning';
 import {AgendaPreviewEvent} from './AgendaPreviewEvent';
 import {AgendaRegistrationInvitationDetails} from './AgendaRegistrationInvitationDetails';
 
-
-export default function AgendaItemDetails(
+function AgendaItemDetails(
     {
         item,
         user,
@@ -133,3 +132,7 @@ AgendaItemDetails.propTypes = {
     detailsConfig: PropTypes.object,
     restrictCoverageInfo: PropTypes.bool,
 };
+
+const component: React.ComponentType<any> = AgendaItemDetails;
+
+export default component;

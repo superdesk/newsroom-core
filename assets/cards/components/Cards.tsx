@@ -157,4 +157,6 @@ const mapDispatchToProps = (dispatch: any) => ({
     dispatch: dispatch,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Cards);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(Cards);
+
+export default component;

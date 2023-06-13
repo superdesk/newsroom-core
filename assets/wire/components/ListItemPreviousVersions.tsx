@@ -9,6 +9,10 @@ import ItemVersion from './ItemVersion';
 
 
 class ListItemPreviousVersions extends React.Component<any, any> {
+    baseClass: string;
+    static propTypes: any;
+    static defaultProps: any;
+
     constructor(props: any) {
         super(props);
         this.state = {versions: [], loading: true, error: false};
@@ -30,7 +34,7 @@ class ListItemPreviousVersions extends React.Component<any, any> {
 
     fetch(props: any) {
         props.dispatch(fetchVersions(props.item))
-            .then((versions) => this.setState({versions, loading: false}))
+            .then((versions: any) => this.setState({versions, loading: false}))
             .catch(() => this.setState({error: true}));
     }
 
@@ -43,7 +47,7 @@ class ListItemPreviousVersions extends React.Component<any, any> {
             );
         }
 
-        const versions = this.state.versions.map((version) => (
+        const versions = this.state.versions.map((version: any) => (
             <ItemVersion
                 key={version._id}
                 version={version}
@@ -83,4 +87,6 @@ ListItemPreviousVersions.defaultProps = {
     matchedIds: [],
 };
 
-export default connect()(ListItemPreviousVersions);
+const component: React.ComponentType<any> = connect()(ListItemPreviousVersions);
+
+export default component;

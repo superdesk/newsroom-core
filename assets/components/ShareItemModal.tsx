@@ -157,4 +157,6 @@ const mapDispatchToProps = (dispatch: any) => ({
     modalFormValid: () => dispatch(modalFormValid()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ShareItemModal);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(ShareItemModal);
+
+export default component;

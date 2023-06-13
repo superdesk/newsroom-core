@@ -47,6 +47,7 @@ ItemVersion.propTypes = {
     onClick: PropTypes.func.isRequired,
     displayConfig: PropTypes.object,
     matchedIds: PropTypes.array,
+    withDivider: PropTypes.any,
 };
 
 ItemVersion.defaultProps = {

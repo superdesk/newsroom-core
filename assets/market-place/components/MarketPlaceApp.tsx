@@ -66,4 +66,6 @@ const mapDispatchToProps = (dispatch: any) => ({
     }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(MarketPlaceApp);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(MarketPlaceApp);
+
+export default component;

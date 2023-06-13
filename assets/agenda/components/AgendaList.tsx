@@ -383,4 +383,6 @@ const mapStateToProps = (state: any) => ({
     listConfig: listConfigSelector(state),
 });
 
-export default connect(mapStateToProps)(AgendaList);
+const component: React.ComponentType<any> = connect(mapStateToProps)(AgendaList);
+
+export default component;

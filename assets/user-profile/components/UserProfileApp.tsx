@@ -213,4 +213,6 @@ const mapDispatchToProps = (dispatch: any) => ({
     hideModal: () => dispatch(hideModal()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserProfileApp);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(UserProfileApp);
+
+export default component;

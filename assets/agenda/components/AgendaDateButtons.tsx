@@ -5,7 +5,7 @@ import {gettext} from 'utils';
 import {formatNavigationDate, getNext, getPrevious} from '../utils';
 
 
-function AgendaDateButtons({selectDate, activeDate, activeGrouping}: any) {
+function AgendaDateButtons({selectDate, activeDate, activeGrouping}: any): any {
     return ([<span className='me-3' key='label'>{formatNavigationDate(activeDate, activeGrouping)}</span>,
         <button
             key='today'
@@ -59,4 +59,6 @@ AgendaDateButtons.propTypes = {
     activeGrouping: PropTypes.string,
 };
 
-export default AgendaDateButtons;
+const component: React.ComponentType<any> = AgendaDateButtons;
+
+export default component;

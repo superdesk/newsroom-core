@@ -134,4 +134,6 @@ const mapDispatchToProps: any = {
     save,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(GeneralSettingsApp);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(GeneralSettingsApp);
+
+export default component;

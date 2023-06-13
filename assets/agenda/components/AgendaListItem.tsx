@@ -24,6 +24,12 @@ import ActionMenu from '../../components/ActionMenu';
 import {LIST_ANIMATIONS, isMobilePhone} from 'utils';
 
 class AgendaListItem extends React.Component<any, any> {
+    static propTypes: any;
+
+    slugline: any;
+    state: any;
+    dom: any;
+
     constructor(props: any) {
         super(props);
         this.slugline = props.item.slugline && props.item.slugline.trim();
@@ -121,7 +127,7 @@ class AgendaListItem extends React.Component<any, any> {
     renderListItem(isMobile: any, children: any) {
         const {item, isExtended, group, planningId} = this.props;
         const classes = this.getClassNames(isExtended);
-        const planningItem = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
+        const planningItem = (get(item, 'planning_items') || []).find((p: any) => p.guid === planningId) || {};
         const description = getDescription(item, planningItem);
 
         // Show headline for adhoc planning items
@@ -136,7 +142,7 @@ class AgendaListItem extends React.Component<any, any> {
                 onMouseEnter={this.onMouseEnter}
                 onKeyDown={this.onKeyDown}
             >
-                <div className={classes.wrap} tabIndex='0'>
+                <div className={classes.wrap} tabIndex={0}>
                     <div className={classes.article} key="article">
                         <h4 className='wire-articles__item-headline'>
                             <div className={classes.select} onClick={this.stopPropagation}>
@@ -184,7 +190,7 @@ class AgendaListItem extends React.Component<any, any> {
 
     renderNonMobile() {
         const {item, planningId} = this.props;
-        const planningItem = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
+        const planningItem = (get(item, 'planning_items') || []).find((p: any) => p.guid === planningId) || {};
 
         return this.renderListItem(false, !this.props.actions.length ? null : (
             <div className='wire-articles__item-actions' onClick={this.stopPropagation}>
@@ -199,7 +205,7 @@ class AgendaListItem extends React.Component<any, any> {
                     showShortcutActions={!this.props.showShortcutActionIcons}
                 />
 
-                {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action) => action.shortcut && (
+                {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action: any) => action.shortcut && (
                     <ActionButton
                         key={action.name}
                         className="icon-button icon-button--primary"
@@ -214,7 +220,7 @@ class AgendaListItem extends React.Component<any, any> {
 
     renderMobile() {
         const {item, planningId} = this.props;
-        const planningItem = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
+        const planningItem = (get(item, 'planning_items') || []).find((p: any) => p.guid === planningId) || {};
         const internalNote = getInternalNote(item, planningItem);
 
         return this.renderListItem(true, (
@@ -229,7 +235,7 @@ class AgendaListItem extends React.Component<any, any> {
                     noPaddingRight={true}
                 />
 
-                {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action) => action.shortcut && (
+                {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action: any) => action.shortcut && (
                     <ActionButton
                         key={action.name}
                         className="icon-button icon-button--primary"

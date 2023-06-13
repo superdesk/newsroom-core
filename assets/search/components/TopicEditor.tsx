@@ -362,4 +362,6 @@ const mapDispatchToProps = (dispatch: any) => ({
     setTopicEditorFullscreen: (fullscreen: any) => dispatch(setTopicEditorFullscreen(fullscreen)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(TopicEditor);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(TopicEditor);
+
+export default component;

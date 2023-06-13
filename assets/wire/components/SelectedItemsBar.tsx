@@ -77,4 +77,6 @@ const mapDispatchToProps: any = {
     selectNone,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(SelectedItemsBar);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(SelectedItemsBar);
+
+export default component;

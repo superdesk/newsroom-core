@@ -14,6 +14,9 @@ import NewItemsIcon from './NewItemsIcon';
 import {ContentSearchResults} from './ContentSearchResults';
 
 class SearchResultsInfo extends React.Component<any, any> {
+    static propTypes: any;
+    static defaultProps: any;
+
     constructor(props: any) {
         super(props);
 
@@ -93,9 +96,11 @@ SearchResultsInfo.defaultProps = {
     showSaveTopic: false,
 };
 
-const mapStateToProps = (state: any) => ({
+const mapStateToProps: any = (state: any) => ({
     user: state.userObject,
     searchParams: searchParamsSelector(state),
 });
 
-export default connect(mapStateToProps, null)(SearchResultsInfo);
+const component: React.ComponentType<any> = connect(mapStateToProps, null)(SearchResultsInfo);
+
+export default component;

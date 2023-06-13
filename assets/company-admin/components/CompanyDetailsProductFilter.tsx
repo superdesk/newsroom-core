@@ -80,4 +80,4 @@ const mapStateToProps = (state: any) => ({
     companySections: companySectionListSelector(state),
 });
 
-export const CompanyDetailsProductFilter = connect(mapStateToProps)(CompanyDetailsProductFilterComponent);
+export const CompanyDetailsProductFilter: React.ComponentType<any> = connect(mapStateToProps)(CompanyDetailsProductFilterComponent);

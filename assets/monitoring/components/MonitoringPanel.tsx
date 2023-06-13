@@ -142,4 +142,6 @@ const mapDispatchToProps = (dispatch: any) => ({
     dispatch: dispatch,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(MonitoringPanel);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(MonitoringPanel);
+
+export default component;

@@ -69,4 +69,6 @@ const mapDispatchToProps: any = {
     selectCompany: selectCompany,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(CompanyList);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(CompanyList);
+
+export default component;

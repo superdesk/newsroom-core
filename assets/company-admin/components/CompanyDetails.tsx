@@ -82,4 +82,4 @@ const mapDispatchToProps = (dispatch: any) => ({
     },
 });
 
-export const CompanyDetails = connect(mapStateToProps, mapDispatchToProps)(CompanyDetailsComponent);
+export const CompanyDetails:  React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(CompanyDetailsComponent);

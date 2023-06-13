@@ -35,4 +35,6 @@ const mapDispatchToProps: any = {
     selectDashboard,
 };
 
-export default connect(null, mapDispatchToProps)(DashboardSwitch);
+const component: React.ComponentType<any> = connect(null, mapDispatchToProps)(DashboardSwitch);
+
+export default component;

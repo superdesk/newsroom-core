@@ -107,4 +107,6 @@ const mapStateToProps = (state: any) => ({
 
 const mapDispatchToProps: any = {toggleFilterAndQuery, runReport};
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProductCompanies);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(ProductCompanies);
+
+export default component;

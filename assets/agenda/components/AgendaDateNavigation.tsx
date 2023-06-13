@@ -18,6 +18,7 @@ AgendaDateNavigation.propTypes = {
     activeDate: PropTypes.number,
     activeGrouping: PropTypes.string,
     displayCalendar: PropTypes.bool,
+    createdFilter: PropTypes.any,
 };
 
 export default AgendaDateNavigation;

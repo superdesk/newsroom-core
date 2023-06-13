@@ -276,4 +276,4 @@ const mapDispatchToProps = (dispatch: any) => ({
     setProductFilter: (productId: any) => dispatch(setProductFilter(productId)),
 });
 
-export const CompanyAdminApp = connect(mapStateToProps, mapDispatchToProps)(CompanyAdminAppComponent);
+export const CompanyAdminApp: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(CompanyAdminAppComponent);

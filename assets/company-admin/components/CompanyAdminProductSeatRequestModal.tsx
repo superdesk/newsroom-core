@@ -196,7 +196,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     modalFormValid: () => dispatch(modalFormValid()),
 });
 
-export const CompanyAdminProductSeatRequestModal = connect(
+export const CompanyAdminProductSeatRequestModal: React.ComponentType<any> = connect(
     mapStateToProps,
     mapDispatchToProps
 )(CompanyAdminProductSeatRequestModalComponent);

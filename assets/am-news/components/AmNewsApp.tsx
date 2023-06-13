@@ -283,4 +283,6 @@ const mapDispatchToProps = (dispatch: any) => ({
     toggleNavigation: (navigation: any) => dispatch(toggleNavigation(navigation)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(AmNewsApp);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(AmNewsApp);
+
+export default component;
