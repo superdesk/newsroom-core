@@ -49,7 +49,7 @@ const modals = {
 };
 
 class AmNewsApp extends BaseApp {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.modals = modals;
         this.state = {isMobile: false};    // to cater for responsive behaviour during widnow resize
@@ -57,7 +57,7 @@ class AmNewsApp extends BaseApp {
         this.tabs = this.tabs.filter((t) => get(this.props.advancedSearchTabConfig, t.id, true));
     }
 
-    getSnapshotBeforeUpdate(prevProps) {
+    getSnapshotBeforeUpdate(prevProps: any) {
         if (prevProps.itemToOpen && !this.props.itemToOpen && noNavigationSelected(this.props.activeNavigation)) {
             // enable first navigation
             this.props.toggleNavigation(get(this.props, 'navigations[0]'));

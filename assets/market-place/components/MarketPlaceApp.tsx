@@ -16,7 +16,7 @@ import NavigationSixPerRow from 'components/cards/render/NavigationSixPerRow';
 
 
 class MarketPlaceApp extends BaseApp {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
     }
 

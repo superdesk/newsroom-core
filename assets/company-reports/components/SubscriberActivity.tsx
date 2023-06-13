@@ -10,7 +10,7 @@ import CalendarButton from '../../components/CalendarButton';
 import {toggleFilterAndQuery, fetchReport, REPORTS, runReport} from '../actions';
 
 class SubscriberActivity extends React.Component<any, any> {
-    constructor(props, context) {
+    constructor(props: any, context: any) {
         super(props, context);
 
         this.companies = [...this.props.companies.map((c) => ({...c, 'label': c.name}))];
@@ -40,14 +40,14 @@ class SubscriberActivity extends React.Component<any, any> {
         this.props.runReport();
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (this.props.reportParams !== nextProps.reportParams) {
             // Filtering done
             this.previousScrollTop = 0;
         }
     }
 
-    getDropdownItems(filter) {
+    getDropdownItems(filter: any) {
         const {toggleFilterAndQuery, sections, apiEnabled} = this.props;
         let getName = (text: any) => (text);
         let itemsArray = [];
@@ -102,7 +102,7 @@ class SubscriberActivity extends React.Component<any, any> {
         >{getName(item.name)}</button>));
     }
 
-    getFilterLabel(filter, activeFilter) {
+    getFilterLabel(filter: any, activeFilter: any) {
         if (activeFilter[filter.field]) {
             if (activeFilter.action === 'api' && filter.field === 'action')
                 return 'api retrieval';
@@ -112,7 +112,7 @@ class SubscriberActivity extends React.Component<any, any> {
         }
     }
 
-    onScroll(event) {
+    onScroll(event: any) {
         if (this.props.isLoading) {
             return;
         }
@@ -127,12 +127,12 @@ class SubscriberActivity extends React.Component<any, any> {
         }
     }
 
-    onFromDateChange(value) {
+    onFromDateChange(value: any) {
         this.props.toggleFilterAndQuery('date_from', value);
 
     }
 
-    onEndDateChange(value) {
+    onEndDateChange(value: any) {
         this.props.toggleFilterAndQuery('date_to', value);
     }
 

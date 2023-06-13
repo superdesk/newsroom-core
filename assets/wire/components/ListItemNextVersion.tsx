@@ -7,26 +7,26 @@ import ItemVersion from './ItemVersion';
 import {fetchNext, openItem} from '../actions';
 
 class ListItemNextVersion extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {next: null};
         this.open = this.open.bind(this);
         this.fetch(props);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (nextProps.item.nextversion !== this.props.item.nextversion) {
             this.fetch(nextProps);
         }
     }
 
-    fetch(props) {
+    fetch(props: any) {
         props.dispatch(fetchNext(props.item))
             .then((next) => this.setState({next}))
             .catch(() => this.setState({next: null}));
     }
 
-    open(version, event) {
+    open(version: any, event: any) {
         event.stopPropagation();
         this.props.dispatch(openItem(this.state.next));
     }

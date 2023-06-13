@@ -18,7 +18,7 @@ const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
 
 class ItemsList extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {actioningItem: null};
@@ -30,7 +30,7 @@ class ItemsList extends React.Component<any, any> {
         this.filterActions = this.filterActions.bind(this);
     }
 
-    onKeyDown(event) {
+    onKeyDown(event: any) {
         let diff = 0;
         switch (event.key) {
         case 'ArrowDown':
@@ -90,7 +90,7 @@ class ItemsList extends React.Component<any, any> {
         }
     }
 
-    onItemClick(item) {
+    onItemClick(item: any) {
         const itemId = item._id;
         this.setState({actioningItem: null});
         this.cancelPreviewTimeout();
@@ -107,13 +107,13 @@ class ItemsList extends React.Component<any, any> {
         }, CLICK_TIMEOUT);
     }
 
-    onItemDoubleClick(item) {
+    onItemDoubleClick(item: any) {
         this.cancelClickTimeout();
         this.props.dispatch(setActive(item._id));
         this.props.dispatch(openItem(item));
     }
 
-    onActionList(event, item) {
+    onActionList(event: any, item: any) {
         event.stopPropagation();
         if (this.state.actioningItem && this.state.actioningItem._id === item._id) {
             this.setState({actioningItem: null});
@@ -122,12 +122,12 @@ class ItemsList extends React.Component<any, any> {
         }
     }
 
-    filterActions(item, config) {
+    filterActions(item: any, config: any) {
         return this.props.actions.filter((action) =>  (!config || isDisplayed(action.id, config)) &&
           (!action.when || action.when(this.props, item)));
     }
 
-    componentDidUpdate(nextProps) {
+    componentDidUpdate(nextProps: any) {
         if (!isEqual(nextProps.activeNavigation, this.props.activeNavigation) ||
             (!nextProps.searchInitiated && this.props.searchInitiated)) {
             this.elem.scrollTop = 0;

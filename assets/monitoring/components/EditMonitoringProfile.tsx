@@ -17,7 +17,7 @@ import {gettext} from 'utils';
 const getCompanyOptions = (companies: any) => companies.map(company => ({value: company._id, text: company.name}));
 
 class EditMonitoringProfile extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
         this.getUsers = this.getUsers.bind(this);
@@ -29,7 +29,7 @@ class EditMonitoringProfile extends React.Component<any, any> {
         ];
     }
 
-    handleTabClick(event) {
+    handleTabClick(event: any) {
         this.setState({activeTab: event.target.name});
         if (event.target.name === 'users' && get(this.props, 'item.company')) {
             this.props.fetchCompanyUsers(this.props.item.company);
@@ -52,7 +52,7 @@ class EditMonitoringProfile extends React.Component<any, any> {
         ));
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         if (this.props.item._id !== prevProps.item._id) {
             this.setState({activeTab: this.props.scheduleMode ? 'schedule' : 'profile'});
             return;

@@ -9,7 +9,7 @@ import {REPORTS} from '../actions';
 
 
 class ComapnyNewsApiUsage extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.onFromDateChange = this.onFromDateChange.bind(this);
@@ -19,14 +19,14 @@ class ComapnyNewsApiUsage extends React.Component<any, any> {
         this.previousScrollTop = 0;
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (this.props.reportParams !== nextProps.reportParams) {
             // Filtering done
             this.previousScrollTop = 0;
         }
     }
 
-    onScroll(event) {
+    onScroll(event: any) {
         if (this.props.isLoading) {
             return;
         }
@@ -46,11 +46,11 @@ class ComapnyNewsApiUsage extends React.Component<any, any> {
         this.props.runReport();
     }
 
-    onFromDateChange(value) {
+    onFromDateChange(value: any) {
         this.props.toggleFilterAndQuery('date_from', value);
     }
 
-    onEndDateChange(value) {
+    onEndDateChange(value: any) {
         this.props.toggleFilterAndQuery('date_to', value);
     }
 

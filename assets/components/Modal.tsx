@@ -74,7 +74,7 @@ function assertButtonHandler(label: any, type: any, onClick: any) {
 }
 
 class Modal extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.onSubmit = this.onSubmit.bind(this);
         this.state = {submitting: false};
@@ -103,7 +103,7 @@ class Modal extends React.Component<any, any> {
         }
     }
 
-    onSubmit(e) {
+    onSubmit(e: any) {
         if (this.props.disableButtonOnSubmit) {
             this.setState({submitting: true});
             this.props.onSubmit(e);

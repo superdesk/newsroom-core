@@ -14,7 +14,7 @@ class AuditInformation extends React.Component<any, any> {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (!get(this.props, 'users.length') && (
             get(this.props, 'item._created') !== get(nextProps, 'item._created') ||
             get(this.props, 'item._updated') !== get(nextProps, 'item._updated')
@@ -23,7 +23,7 @@ class AuditInformation extends React.Component<any, any> {
         }
     }
 
-    getElement(field) {
+    getElement(field: any) {
         const {item} = this.props;
         const users = get(this.props, 'users.length') ? this.props.users : this.props.editUsers;
         const system = gettext('System');

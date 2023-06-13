@@ -9,7 +9,7 @@ import {isTouchDevice} from '../utils';
 import NotificationListItem from './NotificationListItem';
 
 class NotificationList extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {
             displayItems: false,
@@ -49,7 +49,7 @@ class NotificationList extends React.Component<any, any> {
         this.setState({connected: false});
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         if (this.state.displayItems && this.props.count !== prevProps.count) {
             this.props.loadNotifications();
         }

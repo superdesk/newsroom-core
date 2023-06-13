@@ -5,7 +5,7 @@ import {gettext} from 'utils';
 
 
 class SortItems extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {items: this.props.items};
         this.onSortEnd = this.onSortEnd.bind(this);
@@ -13,11 +13,11 @@ class SortItems extends React.Component<any, any> {
         this.onRemove = this.onRemove.bind(this);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         this.setState({items: nextProps.items});
     }
 
-    onRemove(itemToRemove) {
+    onRemove(itemToRemove: any) {
         const items = [...this.state.items].filter((item) => itemToRemove.value !== item.value);
         this.setState({items: items});
         this.props.onChange(items);

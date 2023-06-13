@@ -30,7 +30,7 @@ import '../style';
 const modals = {shareItem: ShareItemModal};
 
 class UserProfileApp extends React.Component<any, any> {
-    constructor(props, context) {
+    constructor(props: any, context: any) {
         super(props, context);
         this.links = [
             {
@@ -68,11 +68,11 @@ class UserProfileApp extends React.Component<any, any> {
         }
     }
 
-    isSectionEnabled(name) {
+    isSectionEnabled(name: any) {
         return !!get(this.props, 'userSections', []).find((s) => s._id === name);
     }
 
-    renderModal(specs) {
+    renderModal(specs: any) {
         if (specs) {
             const Modal = modals[specs.modal];
             return ReactDOM.createPortal(

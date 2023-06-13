@@ -15,7 +15,7 @@ const getMap = () => {
 };
 
 export default class Map extends React.PureComponent<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.markers = [];

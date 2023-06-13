@@ -21,7 +21,7 @@ import CardList from './CardList';
 import SearchResults from 'search/components/SearchResults';
 
 class Cards extends React.Component<any, any> {
-    constructor(props, context) {
+    constructor(props: any, context: any) {
         super(props, context);
 
         this.isFormValid = this.isFormValid.bind(this);
@@ -48,7 +48,7 @@ class Cards extends React.Component<any, any> {
         return valid;
     }
 
-    save(event) {
+    save(event: any) {
         event.preventDefault();
 
         if (!this.isFormValid()) {
@@ -58,7 +58,7 @@ class Cards extends React.Component<any, any> {
         this.props.saveCard();
     }
 
-    deleteCard(event) {
+    deleteCard(event: any) {
         event.preventDefault();
 
         if (confirm(gettext('Would you like to delete card: {{label}}', {label: this.props.cardToEdit.label}))) {

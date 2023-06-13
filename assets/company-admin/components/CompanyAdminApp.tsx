@@ -34,7 +34,7 @@ import {CompanyDetailsProductFilter} from './CompanyDetailsProductFilter';
 import {CompanyAdminProductSeatRequestModal} from './CompanyAdminProductSeatRequestModal';
 
 class CompanyAdminAppComponent extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {
@@ -68,7 +68,7 @@ class CompanyAdminAppComponent extends React.Component<any, any> {
         return valid;
     }
 
-    saveUser(event) {
+    saveUser(event: any) {
         event.preventDefault();
 
         if (!this.isFormValid()) {
@@ -78,7 +78,7 @@ class CompanyAdminAppComponent extends React.Component<any, any> {
         this.props.saveUser();
     }
 
-    deleteUser(event) {
+    deleteUser(event: any) {
         event.preventDefault();
 
         confirm(gettext('Would you like to delete user: {{ name }}', {name: this.props.userToEdit.first_name})) &&
@@ -97,7 +97,7 @@ class CompanyAdminAppComponent extends React.Component<any, any> {
         return null;
     }
 
-    setProductFilterQuery(query) {
+    setProductFilterQuery(query: any) {
         this.setState({productFilter: query});
     }
 

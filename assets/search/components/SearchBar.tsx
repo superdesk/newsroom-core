@@ -8,7 +8,7 @@ import {gettext} from 'utils';
 import {searchQuerySelector} from 'search/selectors';
 
 class SearchBar extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -17,11 +17,11 @@ class SearchBar extends React.Component<any, any> {
         this.state = {query: props.query || ''};
     }
 
-    onChange(event) {
+    onChange(event: any) {
         this.setState({query: event.target.value});
     }
 
-    onSubmit(event) {
+    onSubmit(event: any) {
         event.preventDefault();
         this.setAndFetch(this.state.query);
     }
@@ -44,7 +44,7 @@ class SearchBar extends React.Component<any, any> {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         this.setState({query: nextProps.query});
     }
 

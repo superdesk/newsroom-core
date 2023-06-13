@@ -18,7 +18,7 @@ const getProductCompanies = (product: any, companies: any) => ({
 });
 
 class EditProduct extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
         this.getPoductTestButton = this.getPoductTestButton.bind(this);
@@ -37,7 +37,7 @@ class EditProduct extends React.Component<any, any> {
         }
     }
 
-    handleTabClick(event) {
+    handleTabClick(event: any) {
         this.setState({activeTab: event.target.name});
         if(event.target.name === 'companies') {
             this.props.fetchCompanies();
@@ -47,7 +47,7 @@ class EditProduct extends React.Component<any, any> {
         }
     }
 
-    getPoductTestButton(product) {
+    getPoductTestButton(product: any) {
         let q: any;
 
         if (product.product_type === 'agenda') {
@@ -68,7 +68,7 @@ class EditProduct extends React.Component<any, any> {
         }
     }
 
-    getQueryString(product, field) {
+    getQueryString(product: any, field: any) {
         if (get(product, field) && product.product_type === 'agenda') {
             return JSON.stringify({[field]: get(product, field)});
         }

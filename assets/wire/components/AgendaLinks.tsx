@@ -11,7 +11,7 @@ import AgendaCoverages from 'agenda/components/AgendaCoverages';
 import AgendaEventInfo from 'agenda/components/AgendaEventInfo';
 
 export default class AgendaLinks extends React.PureComponent<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.openAgenda = this.openAgenda.bind(this);
@@ -23,7 +23,7 @@ export default class AgendaLinks extends React.PureComponent<any, any> {
         this.fetchAgendaData();
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         if (get(prevProps, 'item._id') !== get(this.props, 'item._id')) {
             this.setState({
                 agenda: null,

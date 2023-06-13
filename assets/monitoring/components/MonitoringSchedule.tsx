@@ -9,7 +9,7 @@ import DatePicker from 'react-datepicker';
 import SelectInput from 'components/SelectInput';
 
 class MonitoringSchedule extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.options = [
@@ -77,17 +77,17 @@ class MonitoringSchedule extends React.Component<any, any> {
         this.state = {needTime: this.getNeedTime(get(this.props, 'item.schedule.interval'))};
     }
 
-    componentDidUpdate(prevPops) {
+    componentDidUpdate(prevPops: any) {
         if (get(this.props, 'item._id') !== get(prevPops, 'item._id')) {
             this.setState({needTime: this.getNeedTime(get(this.props, 'item.schedule.interval'))});
         }
     }
 
-    getNeedTime(option) {
+    getNeedTime(option: any) {
         return ([this.options[3].value, this.options[4].value].includes(option));
     }
 
-    onChangeSchedule(event) {
+    onChangeSchedule(event: any) {
         const needTime = this.getNeedTime(event.target.value);
         if (needTime) {
             this.setState({needTime: true});
@@ -111,7 +111,7 @@ class MonitoringSchedule extends React.Component<any, any> {
         });
     }
 
-    onTimeChange(date, schedule) {
+    onTimeChange(date: any, schedule: any) {
         this.props.onChange({
             target: {
                 name: 'schedule',
@@ -124,7 +124,7 @@ class MonitoringSchedule extends React.Component<any, any> {
         });
     }
 
-    onChangeDay(event) {
+    onChangeDay(event: any) {
         this.props.onChange({
             target: {
                 name: 'schedule',

@@ -20,7 +20,7 @@ import {
 import {getTokenForCompany, generateTokenForCompany, deleteTokenForCompany, updateTokenForCompany} from '../actions';
 
 export default class EditAPIToken extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {
@@ -79,14 +79,14 @@ export default class EditAPIToken extends React.Component<any, any> {
         });
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         // reset tabs when new company is created
         if (this.props.companyId !== prevProps.companyId) {
             this.loadToken();
         }
     }
 
-    onExpiryChange(value) {
+    onExpiryChange(value: any) {
         const newState = cloneDeep(this.state);
 
         if (!value) {
@@ -111,7 +111,7 @@ export default class EditAPIToken extends React.Component<any, any> {
             .format('YYYY-MM-DD') : this.state.token.expiry;
     }
 
-    saveToken(event) {
+    saveToken(event: any) {
         if (event) {
             event.preventDefault();
         }
@@ -141,7 +141,7 @@ export default class EditAPIToken extends React.Component<any, any> {
         }
     }
 
-    editToken(event) {
+    editToken(event: any) {
         if (event) {
             event.preventDefault();
         }
@@ -153,7 +153,7 @@ export default class EditAPIToken extends React.Component<any, any> {
         }
     }
 
-    deleteToken(event) {
+    deleteToken(event: any) {
         if (event) {
             event.preventDefault();
         }
@@ -174,7 +174,7 @@ export default class EditAPIToken extends React.Component<any, any> {
             });
     }
 
-    onEnabledChange(event) {
+    onEnabledChange(event: any) {
         if (event) {
             event.preventDefault();
         }

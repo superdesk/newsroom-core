@@ -8,12 +8,12 @@ import {gettext} from 'utils';
 import {selectAll, selectNone} from 'wire/actions';
 
 class SelectedItemsBar extends React.PureComponent<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.onAction = this.onAction.bind(this);
     }
 
-    onAction(event, action) {
+    onAction(event: any, action: any) {
         event.preventDefault();
         action.action(this.props.selectedItems) && this.props.selectNone();
     }

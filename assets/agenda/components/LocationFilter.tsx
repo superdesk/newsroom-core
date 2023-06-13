@@ -17,7 +17,7 @@ const LOCATION_TYPE = {
 };
 
 export class LocationFilter extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {
@@ -101,7 +101,7 @@ export class LocationFilter extends React.Component<any, any> {
      *
      * @param {MouseEvent} event
      */
-    handleClickOutside(event) {
+    handleClickOutside(event: any) {
         if (!this.dom.container ||
             this.dom.container.contains(event.target) ||
             !document.contains(event.target) ||
@@ -120,7 +120,7 @@ export class LocationFilter extends React.Component<any, any> {
      *
      * @param {KeyboardEvent} event
      */
-    handleKeydown(event) {
+    handleKeydown(event: any) {
         if (event.code === KEYS.ESCAPE) {
             event.preventDefault();
             event.stopPropagation();
@@ -151,7 +151,7 @@ export class LocationFilter extends React.Component<any, any> {
      * @param {Number} numResults - The number of search results (both regions & places)
      * @param {Number | null} activeIndex - The `data-item-index` attribute of current focused element
      */
-    handleKeyUpArrow(event, activeElement, numResults, activeIndex) {
+    handleKeyUpArrow(event: any, activeElement: any, numResults: any, activeIndex: any) {
         if (activeElement === this.dom.searchInput) {
             // Place focus on the last item in the search results
             event.preventDefault();
@@ -188,7 +188,7 @@ export class LocationFilter extends React.Component<any, any> {
      * @param {Number} numResults - The number of search results (both regions & places)
      * @param {Number | null} activeIndex - The `data-item-index` attribute of current focused element
      */
-    handleKeyDownArrow(event, activeElement, numResults, activeIndex) {
+    handleKeyDownArrow(event: any, activeElement: any, numResults: any, activeIndex: any) {
         if (activeElement === this.dom.searchInput) {
             // Place focus on either the 'Any Location' button or first item in search results
             event.preventDefault();
@@ -230,7 +230,7 @@ export class LocationFilter extends React.Component<any, any> {
      * @param {Number} numResults - The number of search results (both regions & places)
      * @param {Number | null} activeIndex - The `data-item-index` attribute of current focused element
      */
-    handleKeyEnter(event, activeElement, numResults, activeIndex) {
+    handleKeyEnter(event: any, activeElement: any, numResults: any, activeIndex: any) {
         if (activeElement === this.dom.searchInput && numResults === 1) {
             // If there is only 1 result, then select that one
             event.preventDefault();
@@ -250,7 +250,7 @@ export class LocationFilter extends React.Component<any, any> {
      *
      * @param {Number} index
      */
-    focusItem(index) {
+    focusItem(index: any) {
         this.setState({selectedIndex: index});
         const item = document.querySelector(`[data-item-index="${index}"]`);
 
@@ -264,7 +264,7 @@ export class LocationFilter extends React.Component<any, any> {
      *
      * @param {Object} selected
      */
-    onChange(selected) {
+    onChange(selected: any) {
         this.toggleDropdown();
         this.props.toggleFilter('location', selected);
     }
@@ -308,7 +308,7 @@ export class LocationFilter extends React.Component<any, any> {
      * @param {Number} index - The index in the results list
      * @returns {JSX.Element}
      */
-    renderRegionSearchResult(item, index) {
+    renderRegionSearchResult(item: any, index: any) {
         const {selectedIndex} = this.state;
 
         if (item.type === LOCATION_TYPE.CITY) {

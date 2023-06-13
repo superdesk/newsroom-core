@@ -6,7 +6,7 @@ import {gettext} from 'utils';
 
 
 class ConfigProduct extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.getProducts = this.getProducts.bind(this);

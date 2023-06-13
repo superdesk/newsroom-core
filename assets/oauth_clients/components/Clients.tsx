@@ -19,7 +19,7 @@ import {searchQuerySelector} from 'search/selectors';
 import {gettext} from 'utils';
 
 class Clients extends React.Component<any, any> {
-    constructor(props, context) {
+    constructor(props: any, context: any) {
         super(props, context);
 
         this.isFormValid = this.isFormValid.bind(this);
@@ -40,7 +40,7 @@ class Clients extends React.Component<any, any> {
         return valid;
     }
 
-    save(externalEvent) {
+    save(externalEvent: any) {
         if (externalEvent) {
             externalEvent.preventDefault();
 
@@ -52,7 +52,7 @@ class Clients extends React.Component<any, any> {
         this.props.saveClient('clients');
     }
 
-    deleteClient(event) {
+    deleteClient(event: any) {
         event.preventDefault();
 
         if (confirm(gettext('Would you like to delete client: {{name}}', {name: this.props.clientToEdit.name}))) {

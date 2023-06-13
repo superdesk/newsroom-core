@@ -24,7 +24,7 @@ import SearchResults from 'search/components/SearchResults';
 
 
 class Users extends React.Component<any, any> {
-    constructor(props, context) {
+    constructor(props: any, context: any) {
         super(props, context);
 
         this.isFormValid = this.isFormValid.bind(this);
@@ -45,7 +45,7 @@ class Users extends React.Component<any, any> {
         return valid;
     }
 
-    save(event) {
+    save(event: any) {
         event.preventDefault();
 
         if (!this.isFormValid()) {
@@ -55,7 +55,7 @@ class Users extends React.Component<any, any> {
         this.props.saveUser('users');
     }
 
-    deleteUser(event) {
+    deleteUser(event: any) {
         event.preventDefault();
 
         confirm(gettext('Would you like to delete user: {{name}}?', {name: this.props.userToEdit.first_name})) &&

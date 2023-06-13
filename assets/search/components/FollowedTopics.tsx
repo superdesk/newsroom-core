@@ -28,7 +28,7 @@ import TopicEditor from 'search/components/TopicEditor';
 import TopicList from 'search/components/TopicList';
 
 class FollowedTopics extends React.Component<any, any> {
-    constructor(props, context) {
+    constructor(props: any, context: any) {
         super(props, context);
 
         this.editTopic = this.editTopic.bind(this);
@@ -73,7 +73,7 @@ class FollowedTopics extends React.Component<any, any> {
         }
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         if (get(prevProps, 'selectedMenu') !== get(this.props, 'selectedMenu')) {
             this.closeEditor();
         }
@@ -83,11 +83,11 @@ class FollowedTopics extends React.Component<any, any> {
         this.closeEditor();
     }
 
-    editTopic(topic) {
+    editTopic(topic: any) {
         this.props.selectMenuItem(topic);
     }
 
-    deleteTopic(topic) {
+    deleteTopic(topic: any) {
         confirm(
             gettext('Would you like to delete topic {{name}}?', {
                 name: topic.label,

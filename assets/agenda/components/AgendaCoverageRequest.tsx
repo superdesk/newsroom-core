@@ -6,7 +6,7 @@ import {gettext} from 'utils';
 
 
 class AgendaCoverageRequest extends React.Component<any, any> {
-    constructor(props, context) {
+    constructor(props: any, context: any) {
         super(props, context);
         this.onRequestClick = this.onRequestClick.bind(this);
         this.reset = this.reset.bind(this);
@@ -23,7 +23,7 @@ class AgendaCoverageRequest extends React.Component<any, any> {
         this.setState({opened: false, message: '', status: null});
     }
 
-    onMessageChange(event) {
+    onMessageChange(event: any) {
         this.setState({message: event.target.value, status: null});
     }
 

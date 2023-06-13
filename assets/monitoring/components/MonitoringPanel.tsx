@@ -19,7 +19,7 @@ import {fetchCompanyUsers} from '../../companies/actions';
 
 
 class MonitoringPanel extends React.Component<any, any> {
-    constructor(props, context) {
+    constructor(props: any, context: any) {
         super(props, context);
 
         this.isFormValid = this.isFormValid.bind(this);
@@ -51,7 +51,7 @@ class MonitoringPanel extends React.Component<any, any> {
         return valid;
     }
 
-    save(event) {
+    save(event: any) {
         event.preventDefault();
 
         if (!this.isFormValid()) {
@@ -61,7 +61,7 @@ class MonitoringPanel extends React.Component<any, any> {
         this.props.postMonitoringProfile();
     }
 
-    deleteMonitoringProfile(event) {
+    deleteMonitoringProfile(event: any) {
         event.preventDefault();
 
         confirm(gettext('Would you like to delete the {{monitoring}} Profile: {{name}}?',

@@ -27,7 +27,7 @@ const modals = {
 };
 
 class HomeApp extends React.Component<any, any> {
-    constructor(props, context) {
+    constructor(props: any, context: any) {
         super(props, context);
         this.getPanels = this.getPanels.bind(this);
         this.filterActions = this.filterActions.bind(this);
@@ -56,7 +56,7 @@ class HomeApp extends React.Component<any, any> {
             });
     }
 
-    renderModal(specs) {
+    renderModal(specs: any) {
         if (specs) {
             const Modal = modals[specs.modal];
             return (
@@ -65,7 +65,7 @@ class HomeApp extends React.Component<any, any> {
         }
     }
 
-    onHomeScroll(event) {
+    onHomeScroll(event: any) {
         const container = event.target;
         const BUFFER = 100;
         if(container.scrollTop + this.height + BUFFER >= container.scrollHeight) {
@@ -75,11 +75,11 @@ class HomeApp extends React.Component<any, any> {
         }
     }
 
-    getProduct(card) {
+    getProduct(card: any) {
         return this.props.products.find(p => p._id === card.config.product);
     }
 
-    getPanels(card) {
+    getPanels(card: any) {
         if (this.state.loadingItems) {
             return (
                 <CardRow key={card.label} title={card.label} product={this.getProduct(card)} isActive={this.props.activeCard === card._id}>
@@ -126,12 +126,12 @@ class HomeApp extends React.Component<any, any> {
         />;
     }
 
-    filterActions(item, config) {
+    filterActions(item: any, config: any) {
         return this.props.actions.filter((action) =>  (!config || isDisplayed(action.id, config)) &&
           (!action.when || action.when(this.props, item)));
     }
 
-    renderContent(children) {
+    renderContent(children: any) {
         return (
             <React.Fragment>
                 {this.props.isSearchEnabled && (

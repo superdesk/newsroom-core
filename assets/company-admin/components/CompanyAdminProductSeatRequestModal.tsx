@@ -14,7 +14,7 @@ import TextAreaInput from 'components/TextAreaInput';
 import {Tag} from 'components/Tag';
 
 class CompanyAdminProductSeatRequestModalComponent extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {
@@ -42,7 +42,7 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component<any, 
         });
     }
 
-    toggleProduct(productId) {
+    toggleProduct(productId: any) {
         let productIds = Array.from(this.state.productIds);
 
         if (productIds.includes(productId)) {
@@ -54,11 +54,11 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component<any, 
         this.setState({productIds: productIds}, this.validateForm);
     }
 
-    updateNumberOfSeats(event) {
+    updateNumberOfSeats(event: any) {
         this.setState({numberOfSeats: parseInt(event.target.value, 10)}, this.validateForm);
     }
 
-    updateNote(event) {
+    updateNote(event: any) {
         this.setState({note: event.target.value});
     }
 

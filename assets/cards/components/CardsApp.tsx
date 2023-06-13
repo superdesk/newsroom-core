@@ -14,7 +14,7 @@ import DashboardSwitch from 'features/dashboard/DashboardSwitch';
 
 
 class CardsApp extends React.Component<any, any> {
-    constructor(props, context) {
+    constructor(props: any, context: any) {
         super(props, context);
     }
 

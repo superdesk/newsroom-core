@@ -29,7 +29,7 @@ import ProductList from './ProductList';
 import SearchResults from 'search/components/SearchResults';
 
 class Products extends React.Component<any, any> {
-    constructor(props, context) {
+    constructor(props: any, context: any) {
         super(props, context);
 
         this.isFormValid = this.isFormValid.bind(this);
@@ -50,7 +50,7 @@ class Products extends React.Component<any, any> {
         return valid;
     }
 
-    save(event) {
+    save(event: any) {
         event.preventDefault();
 
         if (!this.isFormValid()) {
@@ -60,7 +60,7 @@ class Products extends React.Component<any, any> {
         this.props.saveProduct();
     }
 
-    deleteProduct(event) {
+    deleteProduct(event: any) {
         event.preventDefault();
 
         if (confirm(gettext('Would you like to delete product: {{name}}', {name: this.props.productToEdit.name}))) {

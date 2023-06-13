@@ -18,7 +18,7 @@ import AgendaEdNote from './AgendaEdNote';
 import AgendaInternalNote from './AgendaInternalNote';
 
 class AgendaPreviewEventComponent extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {
@@ -32,7 +32,7 @@ class AgendaPreviewEventComponent extends React.Component<any, any> {
         this.reloadEvent();
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         if (get(prevProps.item, 'event_id') !== get(this.props.item, 'event_id')) {
             this.reloadEvent();
         }

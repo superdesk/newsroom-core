@@ -9,7 +9,7 @@ import CardEditor from 'components/CardEditor';
 
 
 export default class EditCompanyAPI extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.onIpWhitelistChange = this.onIpWhitelistChange.bind(this);
         this.onCardEdit = this.onCardEdit.bind(this);
@@ -19,7 +19,7 @@ export default class EditCompanyAPI extends React.Component<any, any> {
         this.state = {noListInput: true};
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (!isEqual(get(this.props, 'company.allowed_ip_list'), get(nextProps, 'company.allowed_ip_list'))) {
             this.setState({noListInput: true});
         }
@@ -29,7 +29,7 @@ export default class EditCompanyAPI extends React.Component<any, any> {
         }
     }
 
-    onIpWhitelistChange(event) {
+    onIpWhitelistChange(event: any) {
         this.props.onEditCompany({
             target: {
                 name: 'allowed_ip_list',

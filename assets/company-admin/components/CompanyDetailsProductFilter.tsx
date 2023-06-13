@@ -9,7 +9,7 @@ import {currentCompanySelector, companySectionListSelector} from '../selectors';
 import DropdownFilter from 'components/DropdownFilter';
 
 class CompanyDetailsProductFilterComponent extends React.PureComponent<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.filter = {
@@ -21,11 +21,11 @@ class CompanyDetailsProductFilterComponent extends React.PureComponent<any, any>
         this.getDropdownItems = this.getDropdownItems.bind(this);
     }
 
-    onChange(field, value) {
+    onChange(field: any, value: any) {
         this.props.setProductFilter(value);
     }
 
-    getDropdownItems(filter) {
+    getDropdownItems(filter: any) {
         const sectionIds = this.props.companySections[this.props.currentCompany._id].map((section) => section._id);
 
         return this.props.products

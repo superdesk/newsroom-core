@@ -5,7 +5,7 @@ import {isEmpty, get, pickBy, isEqual, every} from 'lodash';
 import CheckboxInput from 'components/CheckboxInput';
 
 class EditPanel extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.onItemChange = this.onItemChange.bind(this);
         this.toggleSelectAll = this.toggleSelectAll.bind(this);
@@ -14,14 +14,14 @@ class EditPanel extends React.Component<any, any> {
         this.state = {activeParent: props.parent._id, items: {}};
     }
 
-    onItemChange(event) {
+    onItemChange(event: any) {
         const item = event.target.name;
         const items = Object.assign({}, this.state.items);
         items[item] = !items[item];
         this.updateItems(items);
     }
 
-    toggleSelectAll(availableItems, allActive) {
+    toggleSelectAll(availableItems: any, allActive: any) {
         let items = {};
 
         if (!allActive) {
@@ -33,7 +33,7 @@ class EditPanel extends React.Component<any, any> {
         this.updateItems(items);
     }
 
-    updateItems(items) {
+    updateItems(items: any) {
         this.setState({items});
         if (this.props.onChange) {
             this.props.onChange({
@@ -45,12 +45,12 @@ class EditPanel extends React.Component<any, any> {
         }
     }
 
-    saveItems(event) {
+    saveItems(event: any) {
         event.preventDefault();
         this.props.onSave(Object.keys(pickBy(this.state.items)));
     }
 
-    initItems(props) {
+    initItems(props: any) {
         const items = {};
         props.items.map((item) =>
             items[item._id] = (props.parent[props.field] || []).includes(item._id));
@@ -62,7 +62,7 @@ class EditPanel extends React.Component<any, any> {
         this.initItems(this.props);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (this.state.activeParent !== nextProps.parent._id ||
             get(this.props, 'items.length', 0) !== get(nextProps, 'items.length', 0)) {
             this.initItems(nextProps);
@@ -78,7 +78,7 @@ class EditPanel extends React.Component<any, any> {
 
     }
 
-    renderList(items) {
+    renderList(items: any) {
         const allActive = every(items, (item) => {
             return !!this.state.items[item._id];
         });

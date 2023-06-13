@@ -13,7 +13,7 @@ import {fetchCompanyUsers} from 'companies/actions';
 import {postMonitoringProfile} from 'monitoring/actions';
 
 class MonitoringEditor extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {
@@ -36,7 +36,7 @@ class MonitoringEditor extends React.Component<any, any> {
         this.saveMonitoringProfile = this.saveMonitoringProfile.bind(this);
     }
 
-    handleTabClick(event) {
+    handleTabClick(event: any) {
         this.setState({activeTab: event.target.name});
         if (event.target.name === 'users' && get(this.props, 'item.company')) {
             this.props.fetchCompanyUsers(this.props.item.company);
@@ -49,14 +49,14 @@ class MonitoringEditor extends React.Component<any, any> {
         }
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         if (get(prevProps, 'item._id') !== get(this.props, 'item._id') ||
             get(prevProps, 'item._updated') !== get(this.props, 'item._updated')) {
             this.changeMonitoringProfile(this.props.item);
         }
     }
 
-    changeMonitoringProfile(item) {
+    changeMonitoringProfile(item: any) {
         this.setState({
             profile: cloneDeep(item),
             saving: false,
@@ -64,7 +64,7 @@ class MonitoringEditor extends React.Component<any, any> {
         });
     }
 
-    onChange(event) {
+    onChange(event: any) {
         let wl = cloneDeep(this.state.profile);
         let field = event.target.name;
         let value = event.target.value;
@@ -97,7 +97,7 @@ class MonitoringEditor extends React.Component<any, any> {
         }
     }
 
-    saveMonitoringProfile(event) {
+    saveMonitoringProfile(event: any) {
         if (event && 'preventDefault' in event) {
             event.preventDefault();
         }

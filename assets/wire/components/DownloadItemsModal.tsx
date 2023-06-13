@@ -11,7 +11,7 @@ import Modal from 'components/Modal';
 import SelectInput from 'components/SelectInput';
 
 class DownloadItemsModal extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {
             items: props.data.items,
@@ -30,7 +30,7 @@ class DownloadItemsModal extends React.Component<any, any> {
         this.props.modalFormValid();
     }
 
-    onChange(field, event) {
+    onChange(field: any, event: any) {
         this.setState({
             ...this.state,
             params: {
@@ -40,7 +40,7 @@ class DownloadItemsModal extends React.Component<any, any> {
         });
     }
 
-    onSubmit(event) {
+    onSubmit(event: any) {
         event.preventDefault();
         this.props.onSubmit(this.state);
     }

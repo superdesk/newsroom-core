@@ -22,14 +22,14 @@ function getDeliveryId(coverage: any) {
 }
 
 export default class CoverageItemStatus extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {wireItem: null};
         this.filterActions = this.filterActions.bind(this);
         this.onAnchorClick = this.onAnchorClick.bind(this);
     }
 
-    onAnchorClick(e) {
+    onAnchorClick(e: any) {
         e.stopPropagation();
     }
 
@@ -37,11 +37,11 @@ export default class CoverageItemStatus extends React.Component<any, any> {
         this.setWireItem(this.props);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         this.setWireItem(nextProps);
     }
 
-    setWireItem(props) {
+    setWireItem(props: any) {
         const wireId = getDeliveryId(props.coverage);
         if (wireId && get(props, 'wireItems.length', 0) > 0) {
             this.setState({wireItem: props.wireItems.find((w) => w._id === wireId)});
@@ -58,7 +58,7 @@ export default class CoverageItemStatus extends React.Component<any, any> {
         return '';
     }
 
-    getStatusContent(coverage) {
+    getStatusContent(coverage: any) {
         const actionsToShow = this.filterActions();
         const parentWatched = isWatched(this.props.item, this.props.user);
         const actions = actionsToShow.map((action) =>

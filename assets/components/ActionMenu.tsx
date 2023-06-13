@@ -6,12 +6,12 @@ import {Popover, PopoverBody} from 'reactstrap';
 import {gettext} from 'utils';
 
 class ActionMenu extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.onMouseLeave = this.onMouseLeave.bind(this);
     }
 
-    onMouseLeave(event) {
+    onMouseLeave(event: any) {
         if (this.props.showActions) {
             this.props.onActionList(event, this.props.item, this.props.group);
         }

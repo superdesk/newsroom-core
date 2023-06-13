@@ -68,7 +68,7 @@ function getShowVersionText(isExpanded: any, itemCount: any, matchCount: any, is
 }
 
 class WireListItem extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.wordCount = wordCount(props.item);
         this.characterCount = characterCount(props.item);
@@ -79,7 +79,7 @@ class WireListItem extends React.Component<any, any> {
         this.dom = {article: null};
     }
 
-    onKeyDown(event) {
+    onKeyDown(event: any) {
         switch (event.key) {
         case ' ': // on space toggle selected item
             this.props.toggleSelected();
@@ -92,7 +92,7 @@ class WireListItem extends React.Component<any, any> {
         event.preventDefault();
     }
 
-    togglePreviousVersions(event) {
+    togglePreviousVersions(event: any) {
         event.stopPropagation();
         this.setState({previousVersions: !this.state.previousVersions});
     }
@@ -103,7 +103,7 @@ class WireListItem extends React.Component<any, any> {
         }
     }
 
-    stopPropagation(event) {
+    stopPropagation(event: any) {
         event.stopPropagation();
     }
 

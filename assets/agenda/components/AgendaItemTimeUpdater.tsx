@@ -8,7 +8,7 @@ import {bem} from 'ui/utils';
 import {gettext} from 'utils';
 
 class AgendaItemTimeUpdater extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {timeText: ''};
@@ -22,7 +22,7 @@ class AgendaItemTimeUpdater extends React.Component<any, any> {
         this.activateTimer(this.props.item);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (get(this.props, 'item._created') !== get(nextProps, 'item._created') ||
             get(this.props, 'item._updated') !== get(nextProps, 'item._updated')) {
             this.activateTimer(nextProps.item);
@@ -33,7 +33,7 @@ class AgendaItemTimeUpdater extends React.Component<any, any> {
         this.deactivateTimer();
     }
 
-    activateTimer(item) {
+    activateTimer(item: any) {
         // Deactivate if a timer already exits
         this.deactivateTimer();
 
@@ -55,13 +55,13 @@ class AgendaItemTimeUpdater extends React.Component<any, any> {
         }
     }
 
-    isItemPastTime(item) {
+    isItemPastTime(item: any) {
         // Check if the updated (and created) time is past the interval duration
         return item && (moment().diff(moment(item._created), 'minutes') >= this.interval &&
             moment().diff(moment(item._updated), 'minutes') >= this.interval);
     }
 
-    updateState(item, checkPastTime = true) {
+    updateState(item: any, checkPastTime: any = true) {
         if (checkPastTime && this.isItemPastTime(item)) {
             this.deactivateTimer();
             return;

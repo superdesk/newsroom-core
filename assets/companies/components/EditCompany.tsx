@@ -23,7 +23,7 @@ import AuditInformation from 'components/AuditInformation';
 import {EditCompanyDetails} from './EditCompanyDetails';
 
 class EditCompany extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
         this.getUsers = this.getUsers.bind(this);
@@ -44,7 +44,7 @@ class EditCompany extends React.Component<any, any> {
         }
     }
 
-    handleTabClick(event) {
+    handleTabClick(event: any) {
         this.setState({activeTab: event.target.name});
         if (event.target.name === 'users' && this.props.company._id) {
             this.props.fetchCompanyUsers(this.props.company._id);
@@ -81,7 +81,7 @@ class EditCompany extends React.Component<any, any> {
         return valid;
     }
 
-    save(externalEvent) {
+    save(externalEvent: any) {
         if (externalEvent) {
             externalEvent.preventDefault();
 
@@ -94,7 +94,7 @@ class EditCompany extends React.Component<any, any> {
         this.props.saveCompany();
     }
 
-    deleteCompany(event) {
+    deleteCompany(event: any) {
         event.preventDefault();
 
         if (confirm(gettext('Would you like to delete company: {{name}}', {name: this.props.company.name}))) {

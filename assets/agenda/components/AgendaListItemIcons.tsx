@@ -20,29 +20,29 @@ import {gettext} from 'utils';
 
 
 class AgendaListItemIcons extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = this.getUpdatedState(props);
     }
 
-    itemChanged(nextProps) {
+    itemChanged(nextProps: any) {
         return get(this.props, 'item._id') !== get(nextProps, 'item._id') ||
             get(this.props, 'item._etag') !== get(nextProps, 'item._etag') ||
             !isEqual(get(this.props, 'item.coverages'), get(nextProps, 'item.coverages'));
     }
 
-    shouldComponentUpdate(nextProps) {
+    shouldComponentUpdate(nextProps: any) {
         return this.itemChanged(nextProps);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (this.itemChanged(nextProps)) {
             this.setState(this.getUpdatedState(nextProps));
         }
     }
 
-    getUpdatedState(props) {
+    getUpdatedState(props: any) {
         return {
             internalNote: getInternalNote(props.item, props.planningItem),
             coveragesToDisplay: !hasCoverages(props.item) || props.hideCoverages ?

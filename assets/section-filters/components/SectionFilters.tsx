@@ -24,7 +24,7 @@ import SectionFilterList from './SectionFilterList';
 import SearchResults from 'search/components/SearchResults';
 
 class SectionFilters extends React.Component<any, any> {
-    constructor(props, context) {
+    constructor(props: any, context: any) {
         super(props, context);
 
         this.isFormValid = this.isFormValid.bind(this);
@@ -45,7 +45,7 @@ class SectionFilters extends React.Component<any, any> {
         return valid;
     }
 
-    save(event) {
+    save(event: any) {
         event.preventDefault();
 
         if (!this.isFormValid()) {
@@ -55,7 +55,7 @@ class SectionFilters extends React.Component<any, any> {
         this.props.saveSectionFilter();
     }
 
-    deleteSectionFilter(event) {
+    deleteSectionFilter(event: any) {
         event.preventDefault();
 
         if (confirm(gettext('Would you like to delete Section Filter: {{name}}', {name: this.props.sectionFilterToEdit.name}))) {

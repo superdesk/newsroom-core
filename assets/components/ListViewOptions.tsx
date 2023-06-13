@@ -8,7 +8,7 @@ import {EXTENDED_VIEW, COMPACT_VIEW} from 'wire/defaults';
 import {isTouchDevice} from 'utils';
 
 class ListViewOptions extends React.PureComponent<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {isOpen: false};
         this.views = [
@@ -26,7 +26,7 @@ class ListViewOptions extends React.PureComponent<any, any> {
         this.setState({isOpen: !this.state.isOpen});
     }
 
-    setView(view) {
+    setView(view: any) {
         this.setState({isOpen: false});
         this.props.setView(view.type);
     }

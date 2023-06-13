@@ -25,7 +25,7 @@ import {
 import {resultsFilteredSelector} from 'search/selectors';
 
 class FiltersTab extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.toggleGroup = this.toggleGroup.bind(this);
@@ -41,7 +41,7 @@ class FiltersTab extends React.Component<any, any> {
         };
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         const newState = {};
         if (!isEqual(this.props.activeFilter, prevProps.activeFilter)) {
             newState.activeFilter = cloneDeep(this.props.activeFilter);
@@ -55,14 +55,14 @@ class FiltersTab extends React.Component<any, any> {
         }
     }
 
-    toggleGroup(event, group) {
+    toggleGroup(event: any, group: any) {
         event.preventDefault();
         this.setState({groups: this.props.groups.map((_group) =>
             _group === group ? Object.assign({}, _group, {isOpen: !_group.isOpen}) : _group
         )});
     }
 
-    updateFilter(field, key, single) {
+    updateFilter(field: any, key: any, single: any) {
         // The `value` can be an Array
         let values = Array.isArray(key) ? key : [key];
         const currentFilters = cloneDeep(this.state.activeFilter);
@@ -82,7 +82,7 @@ class FiltersTab extends React.Component<any, any> {
         this.setState({activeFilter: currentFilters});
     }
 
-    setCreatedFilterAndSearch(createdFilter) {
+    setCreatedFilterAndSearch(createdFilter: any) {
         const created = pickBy(
             assign(
                 cloneDeep(this.state.createdFilter),
@@ -105,13 +105,13 @@ class FiltersTab extends React.Component<any, any> {
         />);
     }
 
-    search(event) {
+    search(event: any) {
         event.preventDefault();
         this.props.updateFilterStateAndURL(this.state.activeFilter, this.state.createdFilter);
         this.props.fetchItems();
     }
 
-    reset(event) {
+    reset(event: any) {
         event.preventDefault();
         this.setState({activeFilter: {}, createdFilter: {}});
         this.props.resetFilter();

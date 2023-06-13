@@ -24,7 +24,7 @@ import ActionMenu from '../../components/ActionMenu';
 import {LIST_ANIMATIONS, isMobilePhone} from 'utils';
 
 class AgendaListItem extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.slugline = props.item.slugline && props.item.slugline.trim();
 
@@ -38,7 +38,7 @@ class AgendaListItem extends React.Component<any, any> {
         this.onMouseEnter = this.onMouseEnter.bind(this);
     }
 
-    onKeyDown(event) {
+    onKeyDown(event: any) {
         switch (event.key) {
         case ' ':  // on space toggle selected item
             this.props.toggleSelected();
@@ -51,7 +51,7 @@ class AgendaListItem extends React.Component<any, any> {
         event.preventDefault();
     }
 
-    setArticleRef(elem) {
+    setArticleRef(elem: any) {
         this.dom.article = elem;
     }
 
@@ -69,7 +69,7 @@ class AgendaListItem extends React.Component<any, any> {
         }
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
+    shouldComponentUpdate(nextProps: any, nextState: any) {
         const {props, state} = this;
 
         return props.item._etag !== nextProps.item._etag || state.hover !== nextState.hover ||
@@ -90,11 +90,11 @@ class AgendaListItem extends React.Component<any, any> {
         }
     }
 
-    stopPropagation(event) {
+    stopPropagation(event: any) {
         event.stopPropagation();
     }
 
-    getClassNames(isExtended) {
+    getClassNames(isExtended: any) {
         return {
             card: classNames('wire-articles__item-wrap col-12 agenda-item'),
             wrap: classNames('wire-articles__item wire-articles__item--list', {
@@ -118,7 +118,7 @@ class AgendaListItem extends React.Component<any, any> {
         };
     }
 
-    renderListItem(isMobile, children) {
+    renderListItem(isMobile: any, children: any) {
         const {item, isExtended, group, planningId} = this.props;
         const classes = this.getClassNames(isExtended);
         const planningItem = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};

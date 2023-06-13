@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 class BannerDrop extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {open: this.props.isOpen};
         this.toggleOpen = this.toggleOpen.bind(this);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (this.props.id !== nextProps.id &&
                 this.state.open !== nextProps.isOpen) {
             this.setState({open: nextProps.isOpen});

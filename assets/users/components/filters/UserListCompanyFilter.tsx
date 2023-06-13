@@ -6,7 +6,7 @@ import {gettext} from 'utils';
 import DropdownFilter from 'components/DropdownFilter';
 
 export class UserListCompanyFilter extends React.PureComponent<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.filter = {
@@ -18,12 +18,12 @@ export class UserListCompanyFilter extends React.PureComponent<any, any> {
         this.getDropdownItems = this.getDropdownItems.bind(this);
     }
 
-    onChange(field, value) {
+    onChange(field: any, value: any) {
         this.props.setCompany(value);
         this.props.fetchUsers();
     }
 
-    getDropdownItems(filter) {
+    getDropdownItems(filter: any) {
         return this.props.companies.map((item, i) => (<button
             key={i}
             className='dropdown-item'

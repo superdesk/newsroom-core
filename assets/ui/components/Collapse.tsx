@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import {Collapse} from 'bootstrap';
 
 export class CollapseBoxWithButton extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {open: this.props.initiallyOpen};

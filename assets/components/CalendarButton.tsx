@@ -14,12 +14,12 @@ class CalendarButton extends React.Component<any, any> {
         this.handleChange = this.handleChange.bind(this);
     }
 
-    handleChange(date) {
+    handleChange(date: any) {
         this.props.selectDate(date.valueOf(), 'day');
         this.setState({startDate: date});
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         prevProps.activeDate === EARLIEST_DATE && this.setState({startDate: moment(this.props.activeDate)});
     }
 

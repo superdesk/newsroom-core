@@ -9,7 +9,7 @@ import {toggleFilterAndQuery, runReport} from '../actions';
 import {gettext} from 'utils';
 
 class ProductCompanies extends React.Component<any, any> {
-    constructor(props, context) {
+    constructor(props: any, context: any) {
         super(props, context);
 
         this.products = [...this.props.products.map((p) => ({...p, 'label': p.name}))];
@@ -23,7 +23,7 @@ class ProductCompanies extends React.Component<any, any> {
         this.results = [];
     }
 
-    getDropdownItems(filter) {
+    getDropdownItems(filter: any) {
         const {toggleFilterAndQuery} = this.props;
         let getName = (text: any) => (text);
         let itemsArray = [];
@@ -40,7 +40,7 @@ class ProductCompanies extends React.Component<any, any> {
         >{getName(item.name)}</button>));
     }
 
-    getFilterLabel(filter, activeFilter) {
+    getFilterLabel(filter: any, activeFilter: any) {
         if (activeFilter[filter.field]) {
             return activeFilter[filter.field];
         } else {

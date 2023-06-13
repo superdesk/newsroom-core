@@ -5,7 +5,7 @@ import {gettext} from '../../utils';
 
 
 class StaticMap extends React.Component<any, any>{
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {
             mapLoaded: false

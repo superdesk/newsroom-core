@@ -13,7 +13,7 @@ import {gettext, KEYCODES} from 'utils';
  * @description Component to select tags like Keyword of a news story
  */
 class TextListInput extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {inputText: ''};
@@ -47,7 +47,7 @@ class TextListInput extends React.Component<any, any> {
         }
     }
 
-    removeKeyword(index) {
+    removeKeyword(index: any) {
         const newValue = [...this.props.value];
 
         newValue.splice(index, 1);
@@ -59,7 +59,7 @@ class TextListInput extends React.Component<any, any> {
         });
     }
 
-    inputChange(event) {
+    inputChange(event: any) {
         this.setState({inputText: get(event, 'target.value')});
     }
 

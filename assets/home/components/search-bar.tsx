@@ -3,7 +3,7 @@ import {gettext} from 'utils';
 import classNames from 'classnames';
 
 export class SearchBar extends React.PureComponent<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {value: ''};
     }

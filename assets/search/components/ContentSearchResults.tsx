@@ -17,14 +17,14 @@ import {
 import {Tag} from 'components/Tag';
 
 class ContentSearchResultsComponent extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {expanded: false};
         this.toggleExpanded = this.toggleExpanded.bind(this);
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         if (prevProps.minimizeSearchResults && !this.props.minimizeSearchResults) {
             this.setState({expanded: false});
         }

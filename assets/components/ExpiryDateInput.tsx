@@ -9,7 +9,7 @@ import {gettext} from '../utils';
 
 
 export default class ExpiryDateInput extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {value: !this.props.value ? 'never' : 'on'};
@@ -28,7 +28,7 @@ export default class ExpiryDateInput extends React.Component<any, any> {
         this.onDateChange = this.onDateChange.bind(this);
     }
 
-    onSelectChange(event) {
+    onSelectChange(event: any) {
         this.setState({value: event.target.value});
         let newDate: any;
 
@@ -57,7 +57,7 @@ export default class ExpiryDateInput extends React.Component<any, any> {
         }
     }
 
-    onDateChange(newExpiry) {
+    onDateChange(newExpiry: any) {
         this.setState({value: 'on'});
         this.props.onChange(newExpiry.format('YYYY-MM-DD'));
     }

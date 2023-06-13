@@ -14,23 +14,23 @@ import {
 } from '../utils';
 
 class AgendaListCoverageItem extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = this.getUpdatedState(props);
     }
 
-    shouldComponentUpdate(nextProps) {
+    shouldComponentUpdate(nextProps: any) {
         return !isEqual(this.props.coverage, nextProps.coverage);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (!isEqual(this.props.coverage, nextProps.coverage)) {
             this.setState(this.getUpdatedState(nextProps));
         }
     }
 
-    getUpdatedState(props) {
+    getUpdatedState(props: any) {
         const watched = isWatched(props.coverage, props.user);
 
         const state = {

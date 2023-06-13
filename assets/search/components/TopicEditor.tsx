@@ -21,7 +21,7 @@ import AuditInformation from 'components/AuditInformation';
 import {ToolTip} from 'ui/components/ToolTip';
 
 class TopicEditor extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {
@@ -46,17 +46,17 @@ class TopicEditor extends React.Component<any, any> {
         }
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
         if (get(prevProps, 'topic._id') !== get(this.props, 'topic._id')) {
             this.changeTopic(this.props.topic);
         }
     }
 
-    handleTabClick(event) {
+    handleTabClick(event: any) {
         this.setState({activeTab: event.target.name});
     }
 
-    changeTopic(topic) {
+    changeTopic(topic: any) {
         topic.notifications = (topic.subscribers || []).includes(this.props.userId);
 
         this.setState({
@@ -70,7 +70,7 @@ class TopicEditor extends React.Component<any, any> {
         });
     }
 
-    getTabsForTopic(topic) {
+    getTabsForTopic(topic: any) {
         return (!topic._id || !topic.is_global || !this.props.isAdmin) ?
             [] :
             [
@@ -79,7 +79,7 @@ class TopicEditor extends React.Component<any, any> {
             ];
     }
 
-    updateFormValidity(topic) {
+    updateFormValidity(topic: any) {
         const original = get(this.props, 'topic') || {};
         const isDirty = ['label', 'notifications', 'is_global'].some(
             (field: any) => get(original, field) !== get(topic, field)
@@ -98,7 +98,7 @@ class TopicEditor extends React.Component<any, any> {
         }
     }
 
-    onChangeHandler(field) {
+    onChangeHandler(field: any) {
         return (event: any) => {
             const topic = cloneDeep(this.state.topic);
             const value = ['notifications', 'is_global'].includes(field) ?
@@ -131,7 +131,7 @@ class TopicEditor extends React.Component<any, any> {
         this.props.onTopicChanged();
     }
 
-    saveTopic(event) {
+    saveTopic(event: any) {
         const original = this.props.topic;
         const topic = cloneDeep(this.state.topic);
         const isExisting = !this.isNewTopic();

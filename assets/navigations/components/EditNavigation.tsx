@@ -13,7 +13,7 @@ import AuditInformation from 'components/AuditInformation';
 
 
 class EditNavigation extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
         this.state = {activeTab: 'navigation-details'};
@@ -26,7 +26,7 @@ class EditNavigation extends React.Component<any, any> {
         this.sectionIds = this.props.sections.map((section) => section._id);
     }
 
-    handleTabClick(event) {
+    handleTabClick(event: any) {
         this.setState({activeTab: event.target.name});
         if(event.target.name === 'products' && this.props.navigation._id) {
             this.props.fetchProducts();

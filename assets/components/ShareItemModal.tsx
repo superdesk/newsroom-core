@@ -12,7 +12,7 @@ import Modal from 'components/Modal';
 import SearchBar from 'search/components/SearchBar';
 
 class ShareItemModal extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {
             message: '',
@@ -24,14 +24,14 @@ class ShareItemModal extends React.Component<any, any> {
         this.getUsers = this.getUsers.bind(this);
     }
 
-    onSubmit(event) {
+    onSubmit(event: any) {
         event.preventDefault();
         if (this.state.users.length) {
             return this.props.submit(!!this.props.data.isTopic, omit(this.state, 'displayUsers'));
         }
     }
 
-    onChangeHandler(field) {
+    onChangeHandler(field: any) {
         return (event: any) => {
             this.setState({
                 [field]: event.target.value,
@@ -39,7 +39,7 @@ class ShareItemModal extends React.Component<any, any> {
         };
     }
 
-    toggleUser(userId, all) {
+    toggleUser(userId: any, all: any) {
         let newValue: any;
         if (all) {
             newValue = this.props.data.users.length === this.state.users.length ? [] :
@@ -61,14 +61,14 @@ class ShareItemModal extends React.Component<any, any> {
         this.toggleUser(null, true);
     }
 
-    getUsers(q) {
+    getUsers(q: any) {
         this.setState({
             displayUsers: q ? this.props.data.users.filter((u) =>
                 (this.getUserName(u).toLowerCase()).includes(q.toLowerCase())) : this.props.data.users
         });
     }
 
-    getUserName(user) {
+    getUserName(user: any) {
         return `${user.first_name} ${user.last_name}`;
     }
 

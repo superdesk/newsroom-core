@@ -16,7 +16,7 @@ import DropdownFilter from 'components/DropdownFilter';
 
 
 class MonitoringApp extends React.Component<any, any> {
-    constructor(props, context) {
+    constructor(props: any, context: any) {
         super(props, context);
 
         this.onChange = this.onChange.bind(this);
@@ -37,11 +37,11 @@ class MonitoringApp extends React.Component<any, any> {
         };
     }
 
-    isScheduleMode(sectionName = this.state.activeSection) {
+    isScheduleMode(sectionName: any = this.state.activeSection) {
         return sectionName === 'Schedules';
     }
 
-    onSectionChange(sectionName) {
+    onSectionChange(sectionName: any) {
         if (sectionName !== this.state.activeSection) {
             this.setState({
                 activeSection: sectionName,
@@ -57,7 +57,7 @@ class MonitoringApp extends React.Component<any, any> {
         }
     }
 
-    getDropdownItems(filter) {
+    getDropdownItems(filter: any) {
         const companies = this.isScheduleMode() ? this.props.monitoringListCompanies : this.props.companies;
         return (companies).map((item, i) => (<button
             key={i}

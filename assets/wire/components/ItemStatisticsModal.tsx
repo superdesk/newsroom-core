@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 
 export default class ItemStatisticsModal extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {loading: true, iframe: null};

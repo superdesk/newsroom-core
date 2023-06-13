@@ -8,7 +8,7 @@ import {gettext} from 'utils';
 import DropdownFilter from 'components/DropdownFilter';
 
 export class UserListSortFilter extends React.PureComponent<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.filter = {
@@ -41,7 +41,7 @@ export class UserListSortFilter extends React.PureComponent<any, any> {
         this.getFilterLabel = this.getFilterLabel.bind(this);
     }
 
-    onChange(field, value) {
+    onChange(field: any, value: any) {
         this.props.setSort(value);
         this.props.fetchUsers();
     }
@@ -51,7 +51,7 @@ export class UserListSortFilter extends React.PureComponent<any, any> {
         this.props.fetchUsers();
     }
 
-    getDropdownItems(filter) {
+    getDropdownItems(filter: any) {
         return this.sortFields.map((item, i) => (
             <button
                 key={i}
@@ -72,7 +72,7 @@ export class UserListSortFilter extends React.PureComponent<any, any> {
         };
     }
 
-    getFilterLabel(filter, activeFilter, isActive) {
+    getFilterLabel(filter: any, activeFilter: any, isActive: any) {
         const label = !isActive ? this.sortFields[0].name : activeFilter[filter.field][0];
 
         return (

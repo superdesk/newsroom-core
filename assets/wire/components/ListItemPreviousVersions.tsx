@@ -9,7 +9,7 @@ import ItemVersion from './ItemVersion';
 
 
 class ListItemPreviousVersions extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {versions: [], loading: true, error: false};
         this.baseClass = this.props.isPreview ? 'wire-column__preview' : 'wire-articles';
@@ -17,18 +17,18 @@ class ListItemPreviousVersions extends React.Component<any, any> {
         this.fetch(props);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (nextProps.item._id !== this.props.item._id) {
             this.fetch(nextProps);
         }
     }
 
-    open(version, event) {
+    open(version: any, event: any) {
         event.stopPropagation();
         this.props.dispatch(openItem(version));
     }
 
-    fetch(props) {
+    fetch(props: any) {
         props.dispatch(fetchVersions(props.item))
             .then((versions) => this.setState({versions, loading: false}))
             .catch(() => this.setState({error: true}));

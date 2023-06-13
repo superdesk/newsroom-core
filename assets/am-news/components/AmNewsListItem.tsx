@@ -23,7 +23,7 @@ import {
 
 
 class AmNewsListItem extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.wordCount = wordCount(props.item);
         this.state = {previousVersions: false};
@@ -31,7 +31,7 @@ class AmNewsListItem extends React.Component<any, any> {
         this.togglePreviousVersions = this.togglePreviousVersions.bind(this);
     }
 
-    onKeyDown(event) {
+    onKeyDown(event: any) {
         switch (event.key) {
         case ' ':  // on space toggle selected item
             this.props.toggleSelected();
@@ -44,7 +44,7 @@ class AmNewsListItem extends React.Component<any, any> {
         event.preventDefault();
     }
 
-    togglePreviousVersions(event) {
+    togglePreviousVersions(event: any) {
         event.stopPropagation();
         this.setState({previousVersions: !this.state.previousVersions});
     }
@@ -55,7 +55,7 @@ class AmNewsListItem extends React.Component<any, any> {
         }
     }
 
-    stopPropagation(event) {
+    stopPropagation(event: any) {
         event.stopPropagation();
     }
 

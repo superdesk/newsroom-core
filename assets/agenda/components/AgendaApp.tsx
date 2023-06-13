@@ -62,7 +62,7 @@ const modals = {
 };
 
 class AgendaApp extends BaseApp {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.modals = modals;
 

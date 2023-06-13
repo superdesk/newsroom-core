@@ -15,7 +15,7 @@ function isInput(field: any) {
 }
 
 class GeneralSettingsApp extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {
             values: {},
@@ -39,7 +39,7 @@ class GeneralSettingsApp extends React.Component<any, any> {
         this.onSubmit = this.onSubmit.bind(this);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (nextProps.updatedTime !== this.props.updatedTime) {
             this.setState({
                 _updated: nextProps.updatedTime
@@ -47,17 +47,17 @@ class GeneralSettingsApp extends React.Component<any, any> {
         }
     }
 
-    onChange(key, val) {
+    onChange(key: any, val: any) {
         const values = {...this.state.values, [key]: val};
         this.setState({values});
     }
 
-    onBooleanChange(key) {
+    onBooleanChange(key: any) {
         const values = {...this.state.values, [key]: !this.state.values[key]};
         this.setState({values});
     }
 
-    onSubmit(event) {
+    onSubmit(event: any) {
         event.preventDefault();
         this.props.save(this.state.values);
     }

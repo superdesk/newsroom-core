@@ -12,7 +12,7 @@ import MultiSelectDropdown from '../../components/MultiSelectDropdown';
 import ReportsTable from './ReportsTable';
 
 class ContentActivity extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.onDateChange = this.onDateChange.bind(this);
@@ -81,7 +81,7 @@ class ContentActivity extends React.Component<any, any> {
         this.props.fetchAggregations(REPORTS['content-activity']);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (this.props.results !== nextProps.results) {
             this.updateResults(nextProps);
         }
@@ -126,7 +126,7 @@ class ContentActivity extends React.Component<any, any> {
         return headers;
     }
 
-    updateAggregations(props) {
+    updateAggregations(props: any) {
         const genre = cloneDeep(this.state.genre);
         const company = cloneDeep(this.state.company);
 
@@ -149,7 +149,7 @@ class ContentActivity extends React.Component<any, any> {
         });
     }
 
-    updateResults(props) {
+    updateResults(props: any) {
         const companies = keyBy(this.props.companies, '_id');
 
         const results = props.results.map(
@@ -186,12 +186,12 @@ class ContentActivity extends React.Component<any, any> {
         this.setState({results});
     }
 
-    onDateChange(value) {
+    onDateChange(value: any) {
         this.props.toggleFilter('date_from', value);
         this.props.fetchAggregations(REPORTS['content-activity']);
     }
 
-    onChangeSection(field, value) {
+    onChangeSection(field: any, value: any) {
         this.props.toggleFilter('section', value);
         this.props.fetchAggregations(REPORTS['content-activity']);
     }

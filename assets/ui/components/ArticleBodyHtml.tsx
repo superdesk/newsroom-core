@@ -10,7 +10,7 @@ import {selectCopy} from '../../wire/actions';
  * https://iframely.com/docs/reactjs
  */
 class ArticleBodyHtml extends React.PureComponent<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.copyClicked = this.copyClicked.bind(this);
         this.clickClicked = this.clickClicked.bind(this);
@@ -28,7 +28,7 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
         document.addEventListener('click', this.clickClicked);
     }
 
-    clickClicked(event) {
+    clickClicked(event: any) {
         if (event != null) {
             const target = event.target;
 
@@ -45,7 +45,7 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
         }
     }
 
-    isLinkExternal(href) {
+    isLinkExternal(href: any) {
         try {
             const url = new URL(href);
 

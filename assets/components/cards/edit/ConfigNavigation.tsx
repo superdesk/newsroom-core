@@ -8,7 +8,7 @@ import {gettext, notify} from 'utils';
 
 
 class ConfigNavigation extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.getNavigations = this.getNavigations.bind(this);
@@ -23,7 +23,7 @@ class ConfigNavigation extends React.Component<any, any> {
         };
     }
 
-    getCardNavigations(items) {
+    getCardNavigations(items: any) {
         return items ? items.map(
             item => ({
                 value: this.navigationsById[item]._id,
@@ -32,7 +32,7 @@ class ConfigNavigation extends React.Component<any, any> {
         ) : [];
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (nextProps.card._id !== this.props.card._id) {
             this.setState({items: this.getCardNavigations(get(nextProps.card, 'config.navigations') || [])});
         }
@@ -50,7 +50,7 @@ class ConfigNavigation extends React.Component<any, any> {
         return navigationList;
     }
 
-    onAdd(navigation) {
+    onAdd(navigation: any) {
         if(!navigation) {
             notify.error(gettext('Select a navigation.'));
             return;
@@ -66,11 +66,11 @@ class ConfigNavigation extends React.Component<any, any> {
         this.onChange([...this.state.items, {text: nav.name, value:nav._id}]);
     }
 
-    onSelect(event) {
+    onSelect(event: any) {
         this.setState({selected: event.target.value});
     }
 
-    onChange(items) {
+    onChange(items: any) {
         this.setState({items});
         this.props.onChange({
             target: {

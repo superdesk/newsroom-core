@@ -13,7 +13,7 @@ import FiltersTab from 'wire/components/filters/FiltersTab';
 import NavigationTab from 'wire/components/filters/NavigationTab';
 
 export default class BaseApp extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {
@@ -54,19 +54,19 @@ export default class BaseApp extends React.Component<any, any> {
         return null;
     }
 
-    setOpenRef(elem) {
+    setOpenRef(elem: any) {
         this.dom.open = elem;
     }
 
-    setCloseRef(elem) {
+    setCloseRef(elem: any) {
         this.dom.close = elem;
     }
 
-    setListRef(elem) {
+    setListRef(elem: any) {
         this.dom.list = elem;
     }
 
-    renderModal(specs) {
+    renderModal(specs: any) {
         if (specs) {
             const Modal = this.modals[specs.modal];
             return (
@@ -75,7 +75,7 @@ export default class BaseApp extends React.Component<any, any> {
         }
     }
 
-    renderNavBreadcrumb(navigations, activeNavigation, activeTopic, activeProduct = null, activeFilter = null) {
+    renderNavBreadcrumb(navigations: any, activeNavigation: any, activeTopic: any, activeProduct: any = null, activeFilter: any = null) {
         const dest = document.getElementById('nav-breadcrumb');
         if (!dest) {
             return null;
@@ -119,13 +119,13 @@ export default class BaseApp extends React.Component<any, any> {
         );
     }
 
-    toggleSidebar(event) {
+    toggleSidebar(event: any) {
         event.preventDefault();
         this.setState({withSidebar: !this.state.withSidebar});
         setFilterPanelOpenState(!this.state.withSidebar, this.props.context);
     }
 
-    onListScroll(event) {
+    onListScroll(event: any) {
         const BUFFER = 10;
         const container = event.target;
 
@@ -152,7 +152,7 @@ export default class BaseApp extends React.Component<any, any> {
         }
     }
 
-    filterActions(item, config, includeCoverages=false) {
+    filterActions(item: any, config: any, includeCoverages: any = false) {
         return this.props.actions.filter((action) => (!config || isDisplayed(action.id, config)) &&
           (!action.when || action.when(this.props.state, item, includeCoverages)));
     }
@@ -192,7 +192,7 @@ export default class BaseApp extends React.Component<any, any> {
         return null;
     }
 
-    componentDidUpdate(nextProps) {
+    componentDidUpdate(nextProps: any) {
         if ((nextProps.activeQuery || this.props.activeQuery) && (nextProps.activeQuery !== this.props.activeQuery) && this.dom.list != null) {
             this.dom.list.scrollTop = 0;
         }

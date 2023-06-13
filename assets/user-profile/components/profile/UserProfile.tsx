@@ -16,7 +16,7 @@ import {
 } from '../../actions';
 
 class UserProfile extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.save = this.save.bind(this);
     }
@@ -39,7 +39,7 @@ class UserProfile extends React.Component<any, any> {
         return valid;
     }
 
-    save(event) {
+    save(event: any) {
         event.preventDefault();
 
         if (!this.isFormValid()) {

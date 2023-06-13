@@ -43,7 +43,7 @@ const listItemsSelector = createSelector(
 
 
 class AgendaList extends React.Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {actioningItem: null};
@@ -57,7 +57,7 @@ class AgendaList extends React.Component<any, any> {
         this.isActiveItem = this.isActiveItem.bind(this);
     }
 
-    onKeyDown(event) {
+    onKeyDown(event: any) {
         let diff = 0;
         switch (event.key) {
         case 'ArrowDown':
@@ -125,7 +125,7 @@ class AgendaList extends React.Component<any, any> {
         }
     }
 
-    onItemClick(item, group, plan) {
+    onItemClick(item: any, group: any, plan: any) {
         const itemId = item._id;
         this.setState({actioningItem: null});
         this.cancelPreviewTimeout();
@@ -148,13 +148,13 @@ class AgendaList extends React.Component<any, any> {
         this.setState({actioningItem: null});
     }
 
-    onItemDoubleClick(item, group, plan) {
+    onItemDoubleClick(item: any, group: any, plan: any) {
         this.cancelClickTimeout();
         this.props.dispatch(setActive({_id: item._id, group: group, plan: plan}));
         this.props.dispatch(openItem(item, group, plan));
     }
 
-    onActionList(event, item, group, plan) {
+    onActionList(event: any, item: any, group: any, plan: any) {
         event.stopPropagation();
         if (this.state.actioningItem && this.state.actioningItem._id === item._id &&
             (!this.state.activePlan || (this.state.activePlan && this.state.activePlan.guid === get(plan, 'guid')))) {
@@ -164,12 +164,12 @@ class AgendaList extends React.Component<any, any> {
         }
     }
 
-    filterActions(item, config) {
+    filterActions(item: any, config: any) {
         return this.props.actions.filter((action) =>  (!config || isDisplayed(action.id, config)) &&
           (!action.when || action.when(this.props, item)));
     }
 
-    isActiveItem(_id, group, plan) {
+    isActiveItem(_id: any, group: any, plan: any) {
         const {activeItem} = this.props;
 
         if (!activeItem || (!_id && !group && !plan)) {
@@ -187,7 +187,7 @@ class AgendaList extends React.Component<any, any> {
         return _id === activeItem._id;
     }
 
-    componentDidUpdate(nextProps) {
+    componentDidUpdate(nextProps: any) {
         if (!isEqual(nextProps.activeDate, this.props.activeDate) ||
           !isEqual(nextProps.activeNavigation, this.props.activeNavigation) ||
           (!nextProps.searchInitiated && this.props.searchInitiated)) {
@@ -195,13 +195,13 @@ class AgendaList extends React.Component<any, any> {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         if (!nextProps.groupedItems) {
             return;
         }
     }
 
-    getListGroupDate(group) {
+    getListGroupDate(group: any) {
         if (get(group, 'date')) {
             const groupDate = moment(group.date, DATE_FORMAT);
             const today = moment();

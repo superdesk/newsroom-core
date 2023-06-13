@@ -67,7 +67,7 @@ const modals = {
 };
 
 class WireApp extends BaseApp {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.modals = modals;
 
