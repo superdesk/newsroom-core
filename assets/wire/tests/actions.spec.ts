@@ -24,7 +24,7 @@ describe('wire actions', () => {
     };
 
     beforeEach(() => {
-        spyOn(utils.now, 'utcOffset').and.returnValue('');
+        (spyOn(utils.now, 'utcOffset') as any).and.returnValue('');
         fetchMock.get('/wire/search', response, {
             name: 'wire_search:from_0',
             query: {from: 0}
@@ -148,7 +148,7 @@ describe('wire actions', () => {
         fetchMock.get(`/wire/${item._id}/versions`, {_items: [{_id: 'bar'}, {_id: 'baz'}]});
 
         return store.dispatch(actions.fetchVersions(item))
-            .then((versions) => {
+            .then((versions: any) => {
                 expect(versions.length).toBe(2);
                 expect(versions[0]._id).toBe('bar');
             });
@@ -222,7 +222,7 @@ describe('wire actions', () => {
             store.dispatch(setCreatedFilter({from: 'now/M'}));
 
             actions.search(store.getState());
-            const url = server.get.calls.argsFor(0)[0];
+            const url = (server.get as any).calls.argsFor(0)[0];
 
             expect(url).toContain('q=search%20something');
             expect(url).toContain('navigation=nav1,nav2');
@@ -244,7 +244,7 @@ describe('wire actions', () => {
             store.dispatch(loadMyTopic('topic1'));
 
             actions.search(store.getState());
-            const url = server.get.calls.argsFor(0)[0];
+            const url = (server.get as any).calls.argsFor(0)[0];
 
             expect(url).toContain('q=search%20something');
             expect(url).toContain('navigation=nav1,nav2');

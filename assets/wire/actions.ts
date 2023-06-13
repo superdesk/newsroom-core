@@ -115,7 +115,7 @@ export function recieveItem(data: any) {
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(wireData: any, newsOnlyFilterText: any, readData: any, newsOnly: any, searchAllVersions: any) {
+export function initData(wireData: any, newsOnlyFilterText?: any, readData?: any, newsOnly?: any, searchAllVersions?: any) {
     return {type: INIT_DATA, wireData, newsOnlyFilterText, readData, newsOnly, searchAllVersions};
 }
 
@@ -202,7 +202,7 @@ export function printItem(item: any) {
  * @param {bool} aggs
  * @return {Promise}
  */
-export function search(state: any, next: any, aggs: any) {
+export function search(state: any, next?: any, aggs?: any) {
     const searchParams = searchParamsSelector(state);
     const createdFilter = get(searchParams, 'created') || {};
     let created_to = createdFilter.to;

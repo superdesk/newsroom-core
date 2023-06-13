@@ -6,6 +6,9 @@ import {gettext} from 'utils';
 import DropdownFilter from 'components/DropdownFilter';
 
 export class UserListCompanyFilter extends React.PureComponent<any, any> {
+    static propTypes: any;
+    filter: {label: any; field: string;};
+
     constructor(props: any) {
         super(props);
 
@@ -24,7 +27,7 @@ export class UserListCompanyFilter extends React.PureComponent<any, any> {
     }
 
     getDropdownItems(filter: any) {
-        return this.props.companies.map((item, i) => (<button
+        return this.props.companies.map((item: any, i: number) => (<button
             key={i}
             className='dropdown-item'
             onClick={() => {this.onChange(filter.field, item._id);}}
@@ -34,7 +37,7 @@ export class UserListCompanyFilter extends React.PureComponent<any, any> {
 
     getActiveQuery() {
         return {
-            company: this.props.company ? [get(this.props.companies.find((c) => c._id === this.props.company), 'name')] :
+            company: this.props.company ? [get(this.props.companies.find((c: any) => c._id === this.props.company), 'name')] :
                 null,
         };
     }

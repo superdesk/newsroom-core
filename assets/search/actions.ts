@@ -59,7 +59,7 @@ export function setTopics(topics: any) {
 }
 
 export const TOGGLE_NAVIGATION = 'TOGGLE_NAVIGATION';
-export function toggleNavigation(navigation: any, disableSameNavigationDeselect: any) {
+export function toggleNavigation(navigation?: any, disableSameNavigationDeselect?: any) {
     return (dispatch: any, getState: any) => {
         const state = getState();
         const currentNavigation = searchNavigationSelector(state);
@@ -109,8 +109,8 @@ export function toggleNavigation(navigation: any, disableSameNavigationDeselect:
 }
 
 export const TOGGLE_FILTER = 'TOGGLE_FILTER';
-export function toggleFilter(key: any, value: any, single: any) {
-    return function (dispatch, getState) {
+export function toggleFilter(key: any, value: any, single?: any) {
+    return function (dispatch: any, getState: any) {
         const state = getState();
         const currentFilters = cloneDeep(searchFilterSelector(state));
 
