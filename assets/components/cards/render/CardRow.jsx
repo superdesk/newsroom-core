@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import MoreNewsButton from './MoreNewsButton';
-
+import {connect} from 'react-redux';
 
 class CardRow extends React.Component {
     constructor(props) {
@@ -13,14 +13,17 @@ class CardRow extends React.Component {
             this.cardElem.scrollIntoView({behavior: 'instant', block: 'end', inline: 'nearest'});
         }
     }
-
     render() {
+        const {title, product, children, userProducts,userType} = this.props;
+        let moreNews = this.props.moreNews;
+        if (userType !== 'administrator'){
+            moreNews = userProducts.some((userProduct) => userProduct._id === product._id);
+        }
+
         return (
-            <div className='row' ref={(elem) => this.cardElem = elem}>
-                {this.props.moreNews && <MoreNewsButton
-                    title={this.props.title}
-                    product={this.props.product}/>}
-                {this.props.children}
+            <div className='row' ref={(elem) => (this.cardElem = elem)}>
+                <MoreNewsButton title={title} product={product} moreNews = {moreNews}/>
+                {children}
             </div>
         );
     }
@@ -32,10 +35,18 @@ CardRow.propTypes = {
     isActive: PropTypes.bool,
     children: PropTypes.node.isRequired,
     moreNews: PropTypes.bool,
+    user: PropTypes.object,
+    userProducts: PropTypes.array,
+    userType: PropTypes.string,
 };
+
+const mapStateToProps = (state) =>  ({
+    userProducts: state.userProducts,
+    userType: state.userType,
+});
 
 CardRow.defaultProps = {
     moreNews: true
 };
 
-export default CardRow;
+export default connect(mapStateToProps)(CardRow);

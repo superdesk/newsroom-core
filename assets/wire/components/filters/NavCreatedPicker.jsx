@@ -11,7 +11,7 @@ const shortcuts = [
     {label: gettext('This month'), value: 'now/M'},
 ];
 
-function NavCreatedPicker({setCreatedFilter, createdFilter}) {
+function NavCreatedPicker({setCreatedFilter, createdFilter, context}) {
     const onClickFactory = (value) => (event) => {
         event.preventDefault();
         setCreatedFilter({from: createdFilter.from === value ? null : value, to: null});
@@ -24,7 +24,7 @@ function NavCreatedPicker({setCreatedFilter, createdFilter}) {
     const activeShortcut = shortcuts.find((shortcut) => shortcut.value === createdFilter.from);
 
     return (
-        <NavGroup label={gettext('Published')}>
+        <NavGroup label={context === 'agenda' ? (gettext('Event date')) : (gettext('Published'))}>
             {shortcuts.map((shortcut) => (
                 <NavLink key={shortcut.value}
                     label={shortcut.label}
@@ -55,6 +55,7 @@ function NavCreatedPicker({setCreatedFilter, createdFilter}) {
 NavCreatedPicker.propTypes = {
     createdFilter: PropTypes.object.isRequired,
     setCreatedFilter: PropTypes.func.isRequired,
+    context: PropTypes.string,
 };
 
 export default NavCreatedPicker;

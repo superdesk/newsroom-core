@@ -226,13 +226,13 @@ export function search(state, next, aggs) {
         timezone_offset: getTimezoneOffset(),
         newsOnly,
         product: searchParams.product,
-        es_highlight: !searchParams.query ? null : 1,
+        es_highlight: !searchParams.query && !searchParams.advanced ? null : 1,
         all_versions: !searchAllVersions ? null : 1,
         prepend_embargoed: !state.bookmarks ? null : 0,
         aggs: aggs === false ? '0' : '1',
         size: aggs === true ? 0 : null,
         tick: Date.now().toString(),
-        advanced_search: !searchParams.advancedSearch ? null : encodeURIComponent(JSON.stringify(searchParams.advancedSearch))
+        advanced: !searchParams.advanced ? null : encodeURIComponent(JSON.stringify(searchParams.advanced))
     };
 
 

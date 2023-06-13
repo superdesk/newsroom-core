@@ -28,7 +28,7 @@ def create_default_user() -> User:
                     "_id": USER_ADMIN_ID,
                     "first_name": "Admin",
                     "last_name": "Nistrator",
-                    "email": "admin@nistrator.org",
+                    "email": "admin@example.com",
                     "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
                     "user_type": "administrator",
                     "is_validated": True,

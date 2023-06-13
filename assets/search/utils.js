@@ -17,7 +17,7 @@ export const getNavigationUrlParam = (activeNavigation, ignoreEmpty = true, useJ
 export const getSearchParams = (custom, topic) => {
     const params = {};
 
-    ['query', 'created', 'navigation', 'filter', 'product'].forEach(
+    ['query', 'created', 'navigation', 'filter', 'product', 'advanced'].forEach(
         (field) => {
             if (get(custom, field)) {
                 params[field] = custom[field];

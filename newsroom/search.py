@@ -24,6 +24,7 @@ from newsroom.auth import get_company, get_user
 from newsroom.settings import get_setting
 from newsroom.template_filters import is_admin
 from newsroom.utils import get_local_date, get_end_date
+from bson.objectid import ObjectId
 
 logger = logging.getLogger(__name__)
 
@@ -467,8 +468,8 @@ class BaseSearchService(Service):
                 search.products = get_product_by_id(
                     search.args["product"],
                     product_type=search.section,
-                    company_id=search.company.get("_id"),
                 )
+
             else:
                 search.products = []
 
@@ -513,7 +514,12 @@ class BaseSearchService(Service):
     def prefill_search_highlights(self, search, req):
         query_string = search.args.get("q")
         query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
-        if app.data.elastic.should_highlight(req) and query_string:
+        advanced_search = json.loads(search.args.get("advanced")) if search.args.get("advanced") else {}
+
+        field_settings = {"number_of_fragments": 0}
+        if app.data.elastic.should_highlight(req) and (
+            query_string or advanced_search.get("all") or advanced_search.get("any")
+        ):
             elastic_highlight_query = get_elastic_highlight_query(
                 query_string={
                     "query": query_string,
@@ -522,7 +528,15 @@ class BaseSearchService(Service):
                     "lenient": True,
                 },
             )
-            elastic_highlight_query["fields"] = {"body_html": elastic_highlight_query["fields"]["body_html"]}
+            selected_field = advanced_search.get("fields") or []
+            if not selected_field:
+                elastic_highlight_query["fields"] = {
+                    "body_html": field_settings,
+                    "headline": field_settings,
+                    "slugline": field_settings,
+                }
+            else:
+                elastic_highlight_query["fields"] = {field: field_settings for field in selected_field}
 
             search.highlight = elastic_highlight_query
 
@@ -537,11 +551,31 @@ class BaseSearchService(Service):
                 abort(403, gettext("User does not belong to a company."))
             elif not len(search.products):
                 abort(403, gettext("Your company doesn't have any products defined."))
+            elif search.args.get("product") and not self.is_validate_product(search):
+                abort(403, gettext("Your product is not assigned to you or your company."))
             # If a product list string has been provided it is assumed to be a comma delimited string of product id's
             elif search.args.get("requested_products"):
                 # Ensure that all the provided products are permissioned for this request
                 if not all(p in [c.get("_id") for c in search.products] for p in search.args["requested_products"]):
                     abort(404, gettext("Invalid product parameter"))
+
+    def is_validate_product(self, data):
+        """
+        Check if the product is assigned to the user or to the company with zero or unlimited seats.
+
+        :param SearchQuery data: The search query instance
+        :return: True if the product is assigned to the user or to the company with zero or unlimited seats, False otherwise.
+        :rtype: bool
+        """
+        user = data.user
+        company = data.company
+        product = data.args.get("product")
+
+        if user and company and product:
+            company_products_with_zero_seats = [p["_id"] for p in company.get("products", []) if not p.get("seats")]
+            user_specific_products = [p["_id"] for p in user.get("products", [])]
+
+            return ObjectId(product) in user_specific_products or ObjectId(product) in company_products_with_zero_seats
 
     def apply_section_filter(self, search, filters=None):
         """Generate the section filter
@@ -659,10 +693,14 @@ class BaseSearchService(Service):
                 search.source["post_filter"]["bool"]["filter"].append(self.versioncreated_range(search.args))
 
     def apply_request_advanced_search(self, search: SearchQuery):
-        if not search.args.get("advanced_search"):
+        if not search.args.get("advanced"):
             return
 
-        search.advanced = json.loads(search.args["advanced_search"])
+        if isinstance(search.args["advanced"], str):
+            search.advanced = json.loads(search.args["advanced"])
+        else:
+            search.advanced = search.args["advanced"]
+
         fields = search.advanced.get("fields") or self.default_advanced_search_fields
         if not fields:
             return
@@ -752,6 +790,9 @@ class BaseSearchService(Service):
             if topic.get("filter"):
                 self.set_bool_query_from_filters(search.query["bool"], topic["filter"])
 
+            if topic.get("advanced"):
+                search.args["advanced"] = topic["advanced"]
+
             # for now even if there's no active company matching for the user
             # continuing with the search
             try:
@@ -760,6 +801,7 @@ class BaseSearchService(Service):
                 self.apply_company_filter(search)
                 self.apply_time_limit_filter(search)
                 self.apply_products_filter(search)
+                self.apply_request_advanced_search(search)
             except Forbidden as exc:
                 logger.info(
                     "Notification for user:{} and topic:{} is skipped".format(user.get("_id"), topic.get("_id")),

@@ -18,6 +18,7 @@ from planning.planning.planning import planning_schema
 from superdesk import get_resource_service
 from superdesk.resource import Resource, not_enabled, not_analyzed, not_indexed
 from superdesk.utils import ListCursor
+from superdesk.metadata.item import metadata_schema
 
 import newsroom
 from newsroom.agenda.email import (
@@ -131,11 +132,11 @@ class AgendaResource(newsroom.Resource):
     }
 
     # content metadata
-    schema["name"] = events_schema["name"]
+    schema["name"] = metadata_schema["body_html"].copy()
     schema["slugline"] = not_analyzed
-    schema["definition_short"] = events_schema["definition_short"]
-    schema["definition_long"] = events_schema["definition_long"]
-    schema["headline"] = planning_schema["headline"]
+    schema["definition_short"] = metadata_schema["body_html"].copy()
+    schema["definition_long"] = metadata_schema["body_html"].copy()
+    schema["headline"] = metadata_schema["body_html"].copy()
     schema["firstcreated"] = events_schema["firstcreated"]
     schema["version"] = events_schema["version"]
     schema["versioncreated"] = events_schema["versioncreated"]

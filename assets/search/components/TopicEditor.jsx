@@ -215,7 +215,10 @@ class TopicEditor extends React.Component {
         );
 
         return (
-            <div className={showTabs ? 'list-item__preview' : containerClasses}>
+            <div
+                data-test-id="user-topic-editor"
+                className={showTabs ? 'list-item__preview' : containerClasses}
+            >
                 <div className="list-item__preview-header">
                     <h3>{this.getTitle()}</h3>
                     <button
@@ -305,6 +308,7 @@ class TopicEditor extends React.Component {
                             aria-label={gettext('Cancel')}
                         />
                         <input
+                            data-test-id="save-topic-btn"
                             type="button"
                             className="nh-button nh-button--primary"
                             value={gettext('Save')}

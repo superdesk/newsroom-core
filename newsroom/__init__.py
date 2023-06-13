@@ -17,8 +17,8 @@ MONGO_PREFIX = "CONTENTAPI_MONGO"
 ELASTIC_PREFIX = "CONTENTAPI_ELASTICSEARCH"
 
 SCHEMA_VERSIONS = {
-    "wire": 2,
-    "agenda": 3,
+    "wire": 3,
+    "agenda": 4,
 }
 
 logging.basicConfig()

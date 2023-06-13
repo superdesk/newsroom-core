@@ -101,6 +101,7 @@ export function toggleNavigation(navigation, disableSameNavigationDeselect) {
                 navigation: getNavigationUrlParam(newNavigation, false),
                 filter: null,
                 product: null,
+                advanced: null,
             },
             state
         );
@@ -304,6 +305,7 @@ export function loadMyTopic(topicId) {
             created: null,
             navigation: null,
             filter: null,
+            advanced: null,
         }, state);
 
         dispatch(updateSearchParams());
@@ -372,22 +374,64 @@ export function resetSearchParams() {
 
 export const TOGGLE_ADVANCED_SEARCH_FIELD = 'TOGGLE_ADVANCED_SEARCH_FIELD';
 export function toggleAdvancedSearchField(field) {
-    return {type: TOGGLE_ADVANCED_SEARCH_FIELD, payload: field};
+    return function(dispatch, getState) {
+        const selected = getState().search.advanced.fields;
+
+        if (selected.length === 1 && selected.includes(field)) {
+            return; // at least 1 fields must be selected
+        }
+
+        dispatch({
+            type: TOGGLE_ADVANCED_SEARCH_FIELD,
+            payload: field,
+        });
+
+        const state = getState();
+
+        updateRouteParams(
+            {advanced: state.search.advanced},
+            state
+        );
+    };
 }
 
 export const SET_ADVANCED_SEARCH_KEYWORDS = 'SET_ADVANCED_SEARCH_KEYWORDS';
 export function setAdvancedSearchKeywords(field, keywords) {
-    return {type: SET_ADVANCED_SEARCH_KEYWORDS, payload: {
-        field: field,
-        keywords: keywords,
-    }};
+    return function(dispatch, getState) {
+        dispatch({
+            type: SET_ADVANCED_SEARCH_KEYWORDS,
+            payload: {
+                field: field,
+                keywords: keywords,
+            }
+        });
+        const state = getState();
+
+        updateRouteParams(
+            {advanced: state.search.advanced},
+            state
+        );
+    };
 }
 
 export const CLEAR_ADVANCED_SEARCH_PARAMS = 'CLEAR_ADVANCED_SEARCH_PARAMS';
 export function clearAdvanedSearchParams() {
-    return {type: CLEAR_ADVANCED_SEARCH_PARAMS};
+    return function(dispatch, getState) {
+        dispatch({type: CLEAR_ADVANCED_SEARCH_PARAMS});
+        updateRouteParams(
+            {advanced: null},
+            getState()
+        );
+    };
 }
 
+export const SET_ADVANCED_SEARCH_PARAMS = 'SET_ADVANCED_SEARCH_PARAMS';
+function setAdvancedSearchParams(params) {
+    return {
+        type: SET_ADVANCED_SEARCH_PARAMS,
+        payload: params,
+    };
+}
 export function setParams(params) {
     return function(dispatch) {
         if (get(params, 'created')) {
@@ -409,6 +453,10 @@ export function setParams(params) {
         if (get(params, 'product')) {
             dispatch(setSearchProduct(params.product));
         }
+
+        if (get(params, 'advanced')) {
+            dispatch(setAdvancedSearchParams(params.advanced));
+        }
     };
 }
 
@@ -425,6 +473,7 @@ export function initParams(params) {
             navigation: params.get('navigation') ? JSON.parse(params.get('navigation')) : null,
             filter: params.get('filter') ? JSON.parse(params.get('filter')) : null,
             product: params.get('product'),
+            advanced: params.get('advanced') ? JSON.parse(params.get('advanced')) : null,
         };
         let topic = {};
 

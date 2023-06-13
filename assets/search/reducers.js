@@ -19,9 +19,12 @@ import {
     TOGGLE_ADVANCED_SEARCH_FIELD,
     SET_ADVANCED_SEARCH_KEYWORDS,
     CLEAR_ADVANCED_SEARCH_PARAMS,
+    SET_ADVANCED_SEARCH_PARAMS,
 } from './actions';
 
 import {EXTENDED_VIEW} from 'wire/defaults';
+
+const ADVANCED_FIELDS = ['headline', 'slugline', 'body_html'];
 
 const INITIAL_STATE = {
     activeTopic: null,
@@ -40,7 +43,7 @@ const INITIAL_STATE = {
         all: '',
         any: '',
         exclude: '',
-        fields: [],
+        fields: ADVANCED_FIELDS,
     },
 };
 
@@ -156,7 +159,7 @@ export function searchReducer(state=INITIAL_STATE, action) {
                 all: '',
                 any: '',
                 exclude: '',
-                fields: [],
+                fields: ADVANCED_FIELDS,
             },
         };
 
@@ -187,7 +190,18 @@ export function searchReducer(state=INITIAL_STATE, action) {
                 all: '',
                 any: '',
                 exclude: '',
-                fields: [],
+                fields: ADVANCED_FIELDS,
+            },
+        };
+
+    case SET_ADVANCED_SEARCH_PARAMS:
+        return {
+            ...state,
+            advanced: {
+                all: action.payload.all || '',
+                any: action.payload.any || '',
+                exclude: action.payload.exclude || '',
+                fields: action.payload.fields || ADVANCED_FIELDS,
             },
         };
 

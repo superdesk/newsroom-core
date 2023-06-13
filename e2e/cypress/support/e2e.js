@@ -2,6 +2,7 @@ import {NAVIGATIONS} from '../fixtures/navigations';
 import {PRODUCTS} from '../fixtures/products';
 import {COMPANIES} from '../fixtures/companies';
 import {USERS} from '../fixtures/users';
+import {WIRE_ITEMS} from '../fixtures/wire';
 
 export const baseUrl = 'http://localhost:5050/';
 
@@ -77,6 +78,14 @@ export function addDefaultResources() {
         resource: 'users', items: [
             USERS.foobar.admin,
             USERS.foobar.monkey,
+        ],
+    }]);
+}
+
+export function addDefaultWireItems() {
+    addResources([{
+        resource: 'items', use_resource_service: false, items: [
+            WIRE_ITEMS.syd_weather_1,
         ],
     }]);
 }

@@ -109,6 +109,7 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component {
                             data-bs-toggle="dropdown"
                             aria-haspopup='true'
                             aria-expanded="false"
+                            aria-label="Add Product"
                         >
                             <i className="icon--plus"></i>
                         </button>
