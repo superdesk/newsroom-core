@@ -47,6 +47,7 @@ $labels-palette: (
             border-color: transparent;
             color: $color;
             text-decoration-color: $color;
+            background-color: rgba($color, 0.2);
         }
     }
     @each $name, $color in $labels-palette {

@@ -302,8 +302,8 @@ $container-max-widths: (
     --sidenav-color-badge-fg:           hsla(0, 0%, 98%, 1);
 
     // COMPONENT: PROFILE SIDEBAR
-    --profile-sidebar-color-bg:                              hsl(222, 18%, 29%);
-    --profile-sidebar-color-fg:                              hsl(222, 18%, 95%);
+    --profile-sidebar-color-bg:                              hsl(222, 10%, 85%);
+    --profile-sidebar-color-fg:                              var(--color-text);
     --profile-sidebar-padding:                               20px;
     --profile-sidebar-padding--md:                           30px 40px;
     --profile-sidebar-width--md:                             300px;
@@ -393,14 +393,35 @@ $container-max-widths: (
     --toggle-button-height: var(--size-form-element--large);
     --toggle-button-height--small: var(--size-form-element--small);
     --toggle-button-font-weight: 500;
-
-    
+   
     // COMPONENT: FILTER PANE
     --color-filterpane-bg: hsl(0, 0%, 99%);
     --color-filterpane-text: hsl(0, 0%, 14%);
 
     // COMPONENT: COLLAPSIBLE BOX
     --collapsible-box-height: 48px;
+    --collapsible-box-color-bg: hsla(0, 0%, 100%, 1);
+    --collapsible-box-color-border: var(--color-line--light);
+    --collapsible-box-color-border--active-within: var(--color-line--medium);
+    --collapsible-box-shadow--active-within: inset 0 0 0 4px hsla(0, 0%, 0%, 0.04), 0 0 6px hsla(0, 0%, 0%, 0.12);
+    --collapsible-box-header-color-bg: transparent;
+    --collapsible-box-header-color-bg--hover: hsla(0, 0%, 96%, 1);
+    --collapsible-box-header-color-bg--active: hsla(0, 0%, 92%, 1);
+    --collapsible-box-padding-block: var(--space--1);
+    --collapsible-box-padding-inline: var(--space--2);
+    --collapsible-box-padding-inlinestart--hover: var(--space--3);
+
+
+    // COMPONENT: TOPIC LIST (Side panel)
+    --topic-list-item-font-size: var(--text-size--medium);
+    --topic-list-item-color-fg: var(--color-text--muted);
+    --topic-list-item-color-fg--hover: var(--color-text);
+    --topic-list-item-color-fg--active: var(--color-interactive-focus);
+    --topic-list-item-color-bg: transparent;
+    --topic-list-item-color-bg--hover: hsla(0, 0%, 96%, 1);
+    --topic-list-item-color-bg--active: hsla(0, 0%, 96%, 1);
+    --topic-list-item-min-height: 40px;
+
 
     // COMPONENT: MAIN FOOTER
     --footer-size--height: 32px;

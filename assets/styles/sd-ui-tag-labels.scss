@@ -221,5 +221,12 @@ $tag-x-palette: $tag-x-colors !default;
         color: var(--color-text--muted-2);
         opacity: 0.75;
     }
+    &--blanc {
+        --separator-width: 2px;
+        &:before {
+            color: transparent;
+            font-size: 1px;
+        }
+    }
 }
 

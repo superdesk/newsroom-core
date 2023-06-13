@@ -102,15 +102,15 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component {
                 clickOutsideToClose={true}
             >
                 <form onSubmit={(event) => {event.preventDefault();}}>
-                    <div className="input-group">
+                    <div className="tags-list mb-3">
                         <button
-                            className="nh-button nh-button--secondary"
+                            className="icon-button icon-button--primary icon-button--small icon-button--bordered"
                             type="button"
                             data-bs-toggle="dropdown"
                             aria-haspopup='true'
                             aria-expanded="false"
                         >
-                            +
+                            <i className="icon--plus"></i>
                         </button>
                         <ul className="dropdown-menu">
                             {sectionProducts.map((section, index) => (

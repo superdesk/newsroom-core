@@ -21,9 +21,9 @@ function MyTopics() {
                             </div>
                         </div>
                         <div className="profile-side-navigation__items">
-                            <a href="#" className="btn w-100 btn-outline-secondary" name="profile">My Profile</a>
-                            <a href="#" className="btn w-100 btn-outline-primary" name="topics">My Wire Topics</a>
-                            <a href="#" className="btn w-100 btn-outline-secondary" name="events">My Agenda Topics</a>
+                            <a href="#" className="nh-button btn w-100 nh-button--secondary" name="profile">My Profile</a>
+                            <a href="#" className="nh-button btn w-100 nh-button--primary" name="topics">My Wire Topics</a>
+                            <a href="#" className="nh-button btn w-100 nh-button--secondary" name="events">My Agenda Topics</a>
                         </div>
                     </nav>
                     <div className="content">
