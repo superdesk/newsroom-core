@@ -24,6 +24,7 @@ from newsroom.auth import get_company, get_user
 from newsroom.settings import get_setting
 from newsroom.template_filters import is_admin
 from newsroom.utils import get_local_date, get_end_date
+from bson.objectid import ObjectId
 
 logger = logging.getLogger(__name__)
 
@@ -452,8 +453,8 @@ class BaseSearchService(Service):
                 search.products = get_product_by_id(
                     search.args["product"],
                     product_type=search.section,
-                    company_id=search.company.get("_id"),
                 )
+
             else:
                 search.products = []
 
@@ -522,11 +523,31 @@ class BaseSearchService(Service):
                 abort(403, gettext("User does not belong to a company."))
             elif not len(search.products):
                 abort(403, gettext("Your company doesn't have any products defined."))
+            elif search.args.get("product") and not self.is_validate_product(search):
+                abort(403, gettext("Your product is not assigned to you or your company."))
             # If a product list string has been provided it is assumed to be a comma delimited string of product id's
             elif search.args.get("requested_products"):
                 # Ensure that all the provided products are permissioned for this request
                 if not all(p in [c.get("_id") for c in search.products] for p in search.args["requested_products"]):
                     abort(404, gettext("Invalid product parameter"))
+
+    def is_validate_product(self, data):
+        """
+        Check if the product is assigned to the user or to the company with zero or unlimited seats.
+
+        :param SearchQuery data: The search query instance
+        :return: True if the product is assigned to the user or to the company with zero or unlimited seats, False otherwise.
+        :rtype: bool
+        """
+        user = data.user
+        company = data.company
+        product = data.args.get("product")
+
+        if user and company and product:
+            company_products_with_zero_seats = [p["_id"] for p in company.get("products", []) if not p.get("seats")]
+            user_specific_products = [p["_id"] for p in user.get("products", [])]
+
+            return ObjectId(product) in user_specific_products or ObjectId(product) in company_products_with_zero_seats
 
     def apply_section_filter(self, search, filters=None):
         """Generate the section filter
