@@ -561,16 +561,18 @@ class BaseSearchService(Service):
 
     def is_validate_product(self, data):
         """
-        Check product is assigned to the company but not to the respective user.
+        Check if the product is assigned to the user or to the company with zero or unlimited seats.
 
-        :param SearchQuery search: The search query instance
+        :param SearchQuery data: The search query instance
+        :return: True if the product is assigned to the user or to the company with zero or unlimited seats, False otherwise.
+        :rtype: bool
         """
         user = data.user
         company = data.company
         product = data.args.get("product")
 
         if user and company and product:
-            company_products_with_zero_seats = [p["_id"] for p in company.get("products", []) if p.get("seats") == 0]
+            company_products_with_zero_seats = [p["_id"] for p in company.get("products", []) if not p.get("seats")]
             user_specific_products = [p["_id"] for p in user.get("products", [])]
 
             return ObjectId(product) in user_specific_products or ObjectId(product) in company_products_with_zero_seats
