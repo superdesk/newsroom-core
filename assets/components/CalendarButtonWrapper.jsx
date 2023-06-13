@@ -11,7 +11,7 @@ class CalendarButtonWrapper extends React.Component {
                 classNames('nh-dropdown-button', {'active': this.props.active})}
             onClick={this.props.onClick}>
                 {moment(this.props.value).format(AGENDA_DATE_PICKER_FORMAT_SHORT)}
-                <i className={classNames('icon-small--arrow-down')}></i>
+                <i className='icon-small--arrow-down'></i>
             </button>
         );
     }

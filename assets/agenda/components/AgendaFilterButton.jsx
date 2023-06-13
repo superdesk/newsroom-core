@@ -20,7 +20,7 @@ function AgendaFilterButton({filter, activeFilter, autoToggle, onClick, getFilte
         onClick={onClick} >
         <i className={`${filter.icon} d-md-none`}></i>
         <span className='d-none d-md-block'>{filterLabel(filter, activeFilter, isActive)}</span>
-        <i className={classNames('icon-small--arrow-down')}></i>
+        <i className='icon-small--arrow-down'></i>
     </button>);
 }
 

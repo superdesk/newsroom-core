@@ -14,7 +14,7 @@ export default class ExpiryButtonWrapper extends React.PureComponent {
                 disabled={this.props.disabled}
             >
                 {this.props.value}
-                <i className={classNames('icon-small--arrow-down')}/>
+                <i className='icon-small--arrow-down' />
             </button>
         );
     }

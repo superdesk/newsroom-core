@@ -39,7 +39,7 @@ function CompanyPermissions({
                             <li className="item--min-height-40">
                                 <CheckboxInput
                                     name="archive_access"
-                                    label={gettext('Grant Access To Archived Wire')}
+                                    label={gettext('Grant Access To Archived {{wire}}', sectionNames)}
                                     value={company.archive_access === true}
                                     onChange={onChange}
                                 />
