@@ -39,7 +39,7 @@ function CompanyPermissions({
                             <li className="item--min-height-40">
                                 <CheckboxInput
                                     name="archive_access"
-                                    label={gettext('Grant Access To Archived {{wire}}', sectionNames)}
+                                    label={gettext('Grant Access To Archived Wire')}
                                     value={company.archive_access === true}
                                     onChange={onChange}
                                 />
@@ -94,13 +94,14 @@ function CompanyPermissions({
                         key="products"
                     >
                         {sections.filter((section) => (company.sections || {})[section._id] === true).map((section) => (
-                            [<div className="list-item__preview-collapsible list-item__preview-collapsible--read-only list-item__preview-collapsible--small mb-2">
+                            [<div key={`${section.id}product`} className="list-item__preview-collapsible list-item__preview-collapsible--read-only list-item__preview-collapsible--small mb-2">
                                 <div className="list-item__preview-collapsible-header">
                                     <i className="icon--arrow-right icon--rotate-90"></i>
                                     <h3 key={`${section.id}label`}>{gettext('Products')} {`(${section.name})`}</h3>
                                 </div>
                             </div>,
-                            <div className="products-list__heading d-flex justify-content-between align-items-center">
+
+                            <div key={`${section.id}product`} className="products-list__heading d-flex justify-content-between align-items-center">
                                 <span className="item--left">{gettext('Product')}</span>
                                 <span className="item--right">{gettext('Number of seats')}</span>
                             </div>,

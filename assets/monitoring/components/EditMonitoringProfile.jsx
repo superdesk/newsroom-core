@@ -200,10 +200,10 @@ class EditMonitoringProfile extends React.Component {
 
                                 <div className='list-item__preview-footer'>
                                     {item._id && <input
-                                            type='button'
-                                            className='nh-button nh-button--secondary'
-                                            value={gettext('Delete')}
-                                            onClick={onDelete} />}
+                                        type='button'
+                                        className='nh-button nh-button--secondary'
+                                        value={gettext('Delete')}
+                                        onClick={onDelete} />}
                                     <input
                                         type='button'
                                         className='nh-button nh-button--primary'

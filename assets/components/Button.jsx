@@ -14,7 +14,7 @@ function Button({onClick}) {
     );
 }
 
-CloseButton.propTypes = {
+Button.propTypes = {
     onClick: PropTypes.func.isRequired,
 };
 
