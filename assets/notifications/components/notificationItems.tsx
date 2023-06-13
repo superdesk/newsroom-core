@@ -4,7 +4,7 @@ import {get} from 'lodash';
 import {gettext, formatTime, formatDate, isToday} from 'utils';
 import {BasicNotificationItem} from './BasicNotificationItem';
 
-export const registeredNotifications = [];
+export const registeredNotifications: Array<any> = [];
 
 export function registerNotification(condition: any, component: any) {
     registeredNotifications.unshift({condition, component});

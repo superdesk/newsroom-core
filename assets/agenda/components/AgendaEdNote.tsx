@@ -23,7 +23,7 @@ export default function AgendaEdNote({item, plan, secondaryNoteField, noMargin}:
         const POSTPONED = 0;
         const RESCHEDULED = 1;
         const CANCELLED = 2;
-        const prefixes = [];
+        const prefixes: Array<any> = [];
 
         prefixes[POSTPONED] = 'Event Postponed: ';
         prefixes[RESCHEDULED] = 'Event Rescheduled: ';

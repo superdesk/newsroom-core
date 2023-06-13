@@ -56,7 +56,7 @@ class ComapnyNewsApiUsage extends React.Component<any, any> {
 
     render() {
         const {results, print, reportParams, resultHeaders} = this.props;
-        let list = [];
+        let list: Array<any> = [];
         Object.keys(results).forEach((company) => {
             const rowColums = [
                 (<td key={'name-' + company}>{company}</td>),

@@ -72,7 +72,7 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
 
     executeScripts() {
         const tree = this.bodyRef.current;
-        const loaded = [];
+        const loaded: Array<any> = [];
 
         if (tree == null) {
             return;

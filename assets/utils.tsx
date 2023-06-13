@@ -383,7 +383,7 @@ export function getTextFromHtml(html: any) {
     const div = document.createElement('div');
     div.innerHTML = formatHTML(raw_html);
     const tree = document.createTreeWalker(div, NodeFilter.SHOW_TEXT, null, false); // ie requires all params
-    const text = [];
+    const text: Array<any> = [];
     while (tree.nextNode()) {
         text.push(tree.currentNode.textContent);
         if (tree.currentNode.nextSibling) {
@@ -600,7 +600,7 @@ export function getEmbargo(item: any) {
     return parsed.isAfter(now) ? parsed : null;
 }
 
-export function getItemFromArray(value: any, items: any = [], field: any = '_id') {
+export function getItemFromArray(value: any, items: Array<any> = [], field: any = '_id') {
     return items.find((i) => i[field] === value);
 }
 

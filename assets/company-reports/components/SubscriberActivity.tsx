@@ -50,7 +50,7 @@ class SubscriberActivity extends React.Component<any, any> {
     getDropdownItems(filter: any) {
         const {toggleFilterAndQuery, sections, apiEnabled} = this.props;
         let getName = (text: any) => (text);
-        let itemsArray = [];
+        let itemsArray: Array<any> = [];
         // Company is not filtered, always show full list
         switch(filter.field) {
         case 'company':

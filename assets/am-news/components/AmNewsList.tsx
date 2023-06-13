@@ -145,7 +145,7 @@ class AmNewsList extends React.Component<any, any> {
         const today = formatDate(todayMoment);
 
         const groups = Object.keys(groupedItems).map((keyDate) => {
-            const groupItem = [];
+            const groupItem: Array<any> = [];
 
             if(today !== keyDate) {
                 const keyDateMoment = moment(keyDate, DATE_FORMAT);

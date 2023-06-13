@@ -26,7 +26,7 @@ class ProductCompanies extends React.Component<any, any> {
     getDropdownItems(filter: any) {
         const {toggleFilterAndQuery} = this.props;
         let getName = (text: any) => (text);
-        let itemsArray = [];
+        let itemsArray: Array<any> = [];
         switch (filter.field) {
         case 'product':
             itemsArray = this.products;

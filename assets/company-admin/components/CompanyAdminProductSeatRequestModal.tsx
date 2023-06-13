@@ -63,7 +63,7 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component<any, 
     }
 
     getProductGroups() {
-        const products = [];
+        const products: Array<any> = [];
 
         this.props.sections.forEach((section) => {
             products.push({

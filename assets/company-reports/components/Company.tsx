@@ -5,7 +5,7 @@ import {get, groupBy} from 'lodash';
 import ReportsTable from './ReportsTable';
 
 
-function getProductDetails(products: any = []) {
+function getProductDetails(products: Array<any> = []) {
     const productsByGroup = groupBy(products, (p) => p.product_type);
     const getProductSectionName = (productType: any) => {
         if (productType === 'am_news') {
@@ -39,7 +39,7 @@ function getContactDetails(company: any) {
         </div>);
 }
 
-function getUsers(users: any = []) {
+function getUsers(users: Array<any> = []) {
     const usersInfo = users.length <= 0 ? '-' : users.map((u) =>
         `${u.first_name} ${u.last_name} (${u.email})`).join(', ');
 
