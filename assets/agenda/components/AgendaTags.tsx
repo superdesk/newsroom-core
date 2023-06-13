@@ -62,6 +62,6 @@ const mapStateToProps = (state: any) => ({
     filterGroupLabels: filterGroupsToLabelMap(state),
 });
 
-const AgendaTags = connect(mapStateToProps)(AgendaTagsComponent);
+const AgendaTags: React.ComponentType<any> = connect(mapStateToProps)(AgendaTagsComponent);
 
 export default AgendaTags;

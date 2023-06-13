@@ -16,6 +16,8 @@ import DropdownFilter from 'components/DropdownFilter';
 
 
 class MonitoringApp extends React.Component<any, any> {
+    sections: Array<{name: string}>;
+
     constructor(props: any, context: any) {
         super(props, context);
 
@@ -59,7 +61,7 @@ class MonitoringApp extends React.Component<any, any> {
 
     getDropdownItems(filter: any) {
         const companies = this.isScheduleMode() ? this.props.monitoringListCompanies : this.props.companies;
-        return (companies).map((item, i) => (<button
+        return (companies).map((item: any, i: number) => (<button
             key={i}
             className='dropdown-item'
             onClick={() => {this.onChange(filter.field, item._id);}}

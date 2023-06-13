@@ -10,7 +10,7 @@ describe('search actions', () => {
     let store: any;
     let params: any;
 
-    const updateParams = (search: any) => {
+    const updateParams = (search?: any) => {
         params = {
             state: store.getState(),
             url: new URLSearchParams(search != null ? search : window.location.search),
@@ -18,7 +18,7 @@ describe('search actions', () => {
     };
 
     beforeEach(() => {
-        history.pushState({}, null, ''); // reset window.location.search
+        (history as any).pushState({}, null, ''); // reset window.location.search
         store = createStore(wireReducer, applyMiddleware(thunk));
         updateParams('');
     });

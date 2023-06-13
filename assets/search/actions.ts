@@ -161,8 +161,8 @@ export function setCreatedFilter(filter: any) {
 }
 
 export const RESET_FILTER = 'RESET_FILTER';
-export function resetFilter(filter: any) {
-    return function(dispatch, getState) {
+export function resetFilter(filter?: any) {
+    return function(dispatch: any, getState: any) {
         updateRouteParams({
             filter: null,
             created: null,

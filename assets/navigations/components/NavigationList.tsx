@@ -5,7 +5,7 @@ import {gettext} from 'utils';
 
 
 function NavigationList({navigations, onClick, activeNavigationId}: any) {
-    const list = navigations.map((navigation) =>
+    const list = navigations.map((navigation: any) =>
         <NavigationListItem
             key={navigation._id}
             navigation={navigation}
@@ -16,7 +16,7 @@ function NavigationList({navigations, onClick, activeNavigationId}: any) {
     return (
         <section className="content-main">
             <div className="list-items-container">
-                <table className="table table-hover" tabIndex='-1'>
+                <table className="table table-hover" tabIndex={-1}>
                     <thead>
                         <tr>
                             <th>{ gettext('Name') }</th>

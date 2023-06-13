@@ -37,6 +37,7 @@ export default function Article({image, item, children, disableTextSelection}: a
 Article.propTypes = {
     image: PropTypes.element,
     item: PropTypes.object,
+    group: PropTypes.any,
     children: PropTypes.node,
     disableTextSelection: PropTypes.bool,
 };

@@ -45,7 +45,7 @@ export default function AgendaItemDetails(
         coverageActions,
         detailsConfig,
         restrictCoverageInfo,
-    })
+    }: any)
 {
     const locations = getLocations(item);
     let map = null;
@@ -60,7 +60,7 @@ export default function AgendaItemDetails(
         map = <StaticMap locations={locations} scale={2} />;
     }
 
-    const plan = (get(item, 'planning_items') || []).find((p) => p.guid === planningId);
+    const plan = (get(item, 'planning_items') || []).find((p: any) => p.guid === planningId);
     const internalNotes = getInternalNote(item, plan);
 
     return (

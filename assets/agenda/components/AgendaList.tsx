@@ -21,7 +21,7 @@ const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
 
 
-const itemsSelector = (state) => state.items.map((_id) => state.itemsById[_id]);
+const itemsSelector = (state: any) => state.items.map((_id: any) => state.itemsById[_id]);
 const activeDateSelector = (state: any) => get(state, 'agenda.activeDate');
 const activeGroupingSelector = (state: any) => get(state, 'agenda.activeGrouping');
 const itemsByIdSelector = (state: any) => get(state, 'itemsById', {});
@@ -43,6 +43,11 @@ const listItemsSelector = createSelector(
 
 
 class AgendaList extends React.Component<any, any> {
+    static propTypes: any;
+    previewTimeout: any;
+    clickTimeout: any;
+    elem: any;
+
     constructor(props: any) {
         super(props);
 
@@ -83,7 +88,7 @@ class AgendaList extends React.Component<any, any> {
         event.preventDefault();
         const activeItem = this.props.activeItem;
 
-        const activeIndex = this.props.activeItem ? this.props.listItems.findIndex((item) => {
+        const activeIndex = this.props.activeItem ? this.props.listItems.findIndex((item: any) => {
             return item._id === activeItem._id &&
                 item.group === activeItem.group &&
                 get(item, 'plan._id') === get(activeItem, 'plan._id');
@@ -165,7 +170,7 @@ class AgendaList extends React.Component<any, any> {
     }
 
     filterActions(item: any, config: any) {
-        return this.props.actions.filter((action) =>  (!config || isDisplayed(action.id, config)) &&
+        return this.props.actions.filter((action: any) =>  (!config || isDisplayed(action.id, config)) &&
           (!action.when || action.when(this.props, item)));
     }
 
@@ -230,14 +235,14 @@ class AgendaList extends React.Component<any, any> {
         } = this.props;
         const isExtended = activeView === EXTENDED_VIEW;
         const showShortcutActionIcons = shouldShowListShortcutActionIcons(this.props.listConfig, isExtended);
-        const articleGroups = groupedItems.map((group) =>
+        const articleGroups = groupedItems.map((group: any) =>
             [
                 <div className='wire-articles__header' key={`${group.date}header`}>
                     {this.getListGroupDate(group)}
                 </div>,
 
                 <div className = 'wire-articles__group' key={`${group.date}group`}>
-                    {group.items.map((_id, groupIndex) => {
+                    {group.items.map((_id: any, groupIndex: any) => {
 
                         const plans = getPlanningItemsByGroup(itemsById[_id], group.date);
 

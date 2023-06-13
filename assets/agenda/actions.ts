@@ -55,7 +55,7 @@ export function setActive(item: any) {
 
 
 export const PREVIEW_ITEM = 'PREVIEW_ITEM';
-export function preview(item: any, group: any, plan: any) {
+export function preview(item: any, group?: any, plan?: any) {
     return {type: PREVIEW_ITEM, item, group, plan};
 }
 
@@ -65,7 +65,7 @@ export function previewAndCopy(item: any) {
     };
 }
 
-export function previewItem(item: any, group: any, plan: any) {
+export function previewItem(item?: any, group?: any, plan?: any) {
     return (dispatch: any, getState: any) => {
         dispatch(fetchWireItemsForAgenda(item));
         markItemAsRead(item, getState());
@@ -202,7 +202,7 @@ export function copyPreviewContents(item: any) {
  * @param {bool} next
  * @return {Promise}
  */
-function search(state: any, next: any) {
+function search(state: any, next?: any) {
     const currentMoment = moment();
     const searchParams: any = searchParamsSelector(state);
     const createdFilter: any = get(searchParams, 'created') || {};
@@ -288,7 +288,7 @@ export function watchEvents(ids: any) {
             .then(() => {
                 dispatch({type: WATCH_EVENTS, items: ids});
                 notify.success(gettext('Started watching items successfully.'));
-                analytics.multiItemEvent('watch', ids.map((_id) => getState().itemsById[_id]));
+                analytics.multiItemEvent('watch', ids.map((_id: any) => getState().itemsById[_id]));
             });
     };
 }
@@ -322,7 +322,7 @@ export function shareItems(items: any) {
         const user = getState().user;
         const company = getState().company;
         return server.get(`/companies/${company}/users`)
-            .then((users) => users.filter((u) => u._id !== user))
+            .then((users) => users.filter((u: any) => u._id !== user))
             .then((users) => dispatch(renderModal('shareItem', {items, users})))
             .catch(errorHandler);
     };
@@ -349,7 +349,7 @@ export function bookmarkItems(items: any) {
                 }
             })
             .then(() => {
-                analytics.multiItemEvent('bookmark', items.map((_id) => getState().itemsById[_id]));
+                analytics.multiItemEvent('bookmark', items.map((_id: any) => getState().itemsById[_id]));
             })
             .then(() => dispatch(setBookmarkItems(items)))
             .catch(errorHandler);
@@ -415,7 +415,7 @@ export function removeNewItems(data: any) {
  *
  * @param {Object} data
  */
-export function pushNotification(push) {
+export function pushNotification(push: any) {
     return (dispatch: any, getState: any) => {
         const user = getState().user;
         const company = getState().company;
@@ -446,10 +446,10 @@ export function pushNotification(push) {
 }
 
 export function reloadMyTopics(reloadTopic: any = false) {
-    return function(dispatch) {
+    return function(dispatch: any) {
         return loadMyTopics()
             .then((data) => {
-                const agendaTopics = data.filter((topic) => topic.topic_type === 'agenda');
+                const agendaTopics = data.filter((topic: any) => topic.topic_type === 'agenda');
                 dispatch(setTopics(agendaTopics));
 
                 if (reloadTopic) {
@@ -465,7 +465,7 @@ export function reloadMyTopics(reloadTopic: any = false) {
 
 export const SET_NEW_ITEM = 'SET_NEW_ITEM';
 export function setAndUpdateNewItems(data: any) {
-    return function(dispatch, getState) {
+    return function(dispatch: any, getState: any) {
         const item = data.item || {};
 
         if (item.type !== 'agenda') {
@@ -482,7 +482,7 @@ export function setAndUpdateNewItems(data: any) {
                 return Promise.resolve();
             }
 
-            const coveragesToCheck = (agendaItem.coverages || []).map((c) => c.coverage_id);
+            const coveragesToCheck = (agendaItem.coverages || []).map((c: any) => c.coverage_id);
 
             if (coveragesToCheck.includes(item.coverage_id)) {
                 dispatch(fetchWireItemsForAgenda(agendaItem));
