@@ -14,10 +14,15 @@ class CardRow extends React.Component {
         }
     }
     render() {
-        const {title, product, children, userProducts,userType} = this.props;
+        const {title, product, children, userProducts, userType, companyProducts} = this.props;
         let moreNews = this.props.moreNews;
-        if (userType !== 'administrator'){
-            moreNews = userProducts.some((userProduct) => userProduct._id === product._id);
+
+        if (userType !== 'administrator') {
+            const isProductInUserProducts = userProducts.some(userProduct => userProduct._id === product._id);
+            const isProductInCompanyProductsWithoutSeats = companyProducts.some(
+                companyProduct => companyProduct._id === product._id && !companyProduct.seats
+            );
+            moreNews = isProductInUserProducts || isProductInCompanyProductsWithoutSeats;
         }
 
         return (
@@ -38,11 +43,13 @@ CardRow.propTypes = {
     user: PropTypes.object,
     userProducts: PropTypes.array,
     userType: PropTypes.string,
+    companyProducts: PropTypes.array,
 };
 
 const mapStateToProps = (state) =>  ({
     userProducts: state.userProducts,
     userType: state.userType,
+    companyProducts: state.companyProducts,
 });
 
 CardRow.defaultProps = {

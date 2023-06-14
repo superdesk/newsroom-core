@@ -33,6 +33,7 @@ export default function homeReducer(state=initialState, action) {
             products: action.data.products,
             user: action.data.user,
             userType: action.data.userType,
+            companyProducts: action.data.companyProducts,
             userProducts: action.data.userProducts,
             company: action.data.company,
             formats: action.data.formats || [],
