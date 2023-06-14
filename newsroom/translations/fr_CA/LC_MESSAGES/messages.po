@@ -10,23 +10,23 @@
 # Simon Peacock <simon.peacock@gmail.com>, 2023
 # Evzen Deulin <evgeny.deulin@sourcefabric.org>, 2023
 # Petr Jašek <petr.jasek@sourcefabric.org>, 2023
-# Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2023
 # Gideon Lehmann, 2023
 # Sabina <sabina.gergel@thecanadianpress.com>, 2023
+# Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2023
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Newsroom-Core 2.4.0\n"
+"Project-Id-Version: Newsroom-Core 2.4.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-06-08 11:48+0200\n"
+"POT-Creation-Date: 2023-06-13 12:24+0200\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
-"Last-Translator: Sabina <sabina.gergel@thecanadianpress.com>, 2023\n"
+"Last-Translator: Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2023\n"
 "Language-Team: French (Canada) (https://app.transifex.com/sourcefabric/teams/6584/fr_CA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.12.1\n"
+"Generated-By: Babel 2.10.3\n"
 "Language: fr_CA\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
@@ -55,19 +55,19 @@ msgstr "Historique d'activité: demande invalide"
 msgid "Unknown type {}"
 msgstr "Type inconnu {}"
 
-#: newsroom/search.py:264
+#: newsroom/search.py:265
 msgid "Page limit exceeded"
 msgstr "Limite du nombre de pages excédée"
 
-#: newsroom/search.py:531
+#: newsroom/search.py:523
 msgid "User does not belong to a company."
 msgstr "L'utilisateur n'appartient pas à une entreprise."
 
-#: newsroom/search.py:533
+#: newsroom/search.py:525
 msgid "Your company doesn't have any products defined."
 msgstr "Votre entreprise n'a pas de produits définis."
 
-#: newsroom/monitoring/search.py:67 newsroom/search.py:538
+#: newsroom/monitoring/search.py:67 newsroom/search.py:532
 msgid "Invalid product parameter"
 msgstr "Paramètre de produit invalide"
 
@@ -671,7 +671,7 @@ msgstr "Clients OAuth"
 msgid "Client not found"
 msgstr "Client non trouvé"
 
-#: assets/companies/components/CompanyPermissions.jsx:85
+#: assets/companies/components/CompanyPermissions.jsx:100
 #: assets/company-admin/components/CompanyDetails.jsx:20
 #: assets/company-reports/components/Company.jsx:24
 #: assets/navigations/components/EditNavigation.jsx:23
@@ -1119,7 +1119,7 @@ msgstr "Par:"
 
 #: assets/components/cards/render/CardMeta.jsx:15
 #: assets/wire/components/ItemVersion.jsx:24
-#: assets/wire/components/WireListItem.jsx:244
+#: assets/wire/components/WireListItem.jsx:240
 #: assets/wire/components/fields/WordCount.jsx:6
 #: newsroom/templates/wire_item.html:62 newsroom/templates/wire_item.html:108
 msgid "words"
@@ -1265,7 +1265,7 @@ msgstr "Endroit"
 msgid "Manage Company Topics"
 msgstr "Gérer les sujets partagés"
 
-#: assets/companies/components/CompanyPermissions.jsx:64
+#: assets/companies/components/CompanyPermissions.jsx:74
 #: assets/users/components/EditUser.jsx:193 newsroom/users/forms.py:60
 msgid "Sections"
 msgstr "Sections"
@@ -1365,12 +1365,12 @@ msgstr ""
 msgid "Time limit for Wire products (in days)"
 msgstr "Expiration des produits du fil (en jours)"
 
-#: newsroom/wire/views.py:363
+#: newsroom/wire/views.py:364
 msgid "Not found"
 msgstr "Non trouvé"
 
 #: assets/cards/components/EditCard.jsx:89
-#: assets/companies/components/CompanyPermissions.jsx:145
+#: assets/companies/components/CompanyPermissions.jsx:167
 #: assets/companies/components/EditCompanyAPI.jsx:85
 #: assets/companies/components/EditCompanyDetails.jsx:126
 #: assets/components/CardEditor.jsx:64 assets/components/EditPanel.jsx:140
@@ -2066,6 +2066,7 @@ msgid "Type"
 msgstr "Type"
 
 #: assets/cards/components/CardList.jsx:25
+#: assets/companies/components/CompanyPermissions.jsx:105
 #: assets/company-reports/components/ProductCompanies.jsx:53
 #: assets/company-reports/components/ProductStories.jsx:24
 #: assets/components/cards/edit/ConfigProduct.jsx:28
@@ -2195,24 +2196,28 @@ msgstr "Expire le"
 msgid "Disabled"
 msgstr "Désactivé"
 
-#: assets/companies/components/CompanyPermissions.jsx:32
+#: assets/companies/components/CompanyPermissions.jsx:35
 #: assets/users/components/EditUser.jsx:110
 msgid "General"
 msgstr "Général"
 
-#: assets/companies/components/CompanyPermissions.jsx:37
+#: assets/companies/components/CompanyPermissions.jsx:42
 msgid "Grant Access To Archived Wire"
 msgstr "Accorder l'accès au fil archivé"
 
-#: assets/companies/components/CompanyPermissions.jsx:45
+#: assets/companies/components/CompanyPermissions.jsx:50
 msgid "Events Only Access"
 msgstr "Accès aux événements uniquement"
 
-#: assets/companies/components/CompanyPermissions.jsx:51
+#: assets/companies/components/CompanyPermissions.jsx:58
 msgid "Restrict Coverage Info"
 msgstr "Restreindre l'information sur la couverture"
 
-#: assets/companies/components/CompanyPermissions.jsx:111
+#: assets/companies/components/CompanyPermissions.jsx:106
+msgid "Number of seats"
+msgstr "Nombre d'accès"
+
+#: assets/companies/components/CompanyPermissions.jsx:133
 msgid "Seats:"
 msgstr "Accès:"
 
@@ -2787,7 +2792,7 @@ msgstr "Effacer"
 #: assets/home/components/search-bar.jsx:34
 #: assets/search/components/SearchBar.jsx:81
 #: assets/search/components/TopicParameters.jsx:68
-#: assets/wire/components/filters/FiltersTab.jsx:140
+#: assets/wire/components/filters/FiltersTab.jsx:141
 msgid "Search"
 msgstr "Rechercher"
 
@@ -3801,9 +3806,13 @@ msgstr "En afficher plus"
 msgid "Show less"
 msgstr "En afficher moins"
 
-#: assets/wire/components/filters/FiltersTab.jsx:147
+#: assets/wire/components/filters/FiltersTab.jsx:148
 msgid "Clear filters"
 msgstr "Effacer les filtres"
+
+#: assets/wire/components/filters/NavCreatedPicker.jsx:27
+msgid "Event date"
+msgstr "Date de l'événement"
 
 #: assets/wire/components/filters/NavCreatedPicker.jsx:36
 msgid "From"
