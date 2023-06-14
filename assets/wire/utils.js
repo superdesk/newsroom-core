@@ -191,7 +191,7 @@ export function shortHighlightedtext(text, maxLength = 40) {
     const match = text.match(spanRegex);
   
     if (match) {
-        const startIndex = text.indexOf(match[0]);
+        const startIndex = match.index;
         const highlightedText = text.substring(startIndex);
         const surroundingWords = highlightedText.split(/\s/).filter(w => w);
   
@@ -206,6 +206,7 @@ export function shortHighlightedtext(text, maxLength = 40) {
     const words = text.split(/\s/).filter(w => w);
     return words.slice(0, maxLength).join(' ') + (words.length > maxLength ? '...' : '');
 }
+  
   
 /**
  * Get caption for picture
