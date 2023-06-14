@@ -19,6 +19,7 @@ import {
     isKilled,
     getVideos,
     getCaption,
+    shortHighlightedtext,
 } from 'wire/utils';
 
 import ActionButton from 'components/ActionButton';
@@ -265,7 +266,9 @@ class WireListItem extends React.Component {
 
                         {isExtended && (
                             <div className="wire-articles__item__text">
-                                {<p>{shortText(item, 40, listConfig)}</p>}
+                                {item.es_highlight && item.es_highlight.body_html ? <div
+                                    dangerouslySetInnerHTML={({__html: shortHighlightedtext(item.es_highlight.body_html[0], 40)})}
+                                /> : <p>{shortText(item, 40, listConfig)}</p>}
                             </div>
                         )}
 

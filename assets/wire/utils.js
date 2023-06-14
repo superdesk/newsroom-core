@@ -186,6 +186,27 @@ export function shortText(item, length=40, config) {
     return words.slice(0, length).join(' ') + (words.length > length ? '...' : '');
 }
 
+export function shortHighlightedtext(text, maxLength = 40) {
+    const spanRegex = /<span\s+class="es-highlight">([^<]+)<\/span>/i;
+    const match = text.match(spanRegex);
+  
+    if (match) {
+        const startIndex = text.indexOf(match[0]);
+        const highlightedText = text.substring(startIndex);
+        const surroundingWords = highlightedText.split(/\s/).filter(w => w);
+  
+        if (surroundingWords.length <= maxLength) {
+            return highlightedText;
+        }
+  
+        const truncatedText = surroundingWords.slice(0, maxLength).join(' ');
+        return truncatedText + '...';
+    }
+  
+    const words = text.split(/\s/).filter(w => w);
+    return words.slice(0, maxLength).join(' ') + (words.length > maxLength ? '...' : '');
+}
+  
 /**
  * Get caption for picture
  *
