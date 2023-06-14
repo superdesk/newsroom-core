@@ -11,6 +11,8 @@ import {
     AGENDA_WIRE_ITEMS,
     WATCH_COVERAGE,
     STOP_WATCHING_COVERAGE,
+    SET_ERROR_MESSAGE,
+    SET_ERROR
 } from './actions';
 
 import {get, uniq} from 'lodash';
@@ -58,6 +60,7 @@ const initialState = {
     uiConfig: {},
     groups: [],
     hasAgendaFeaturedItems: false,
+    errorMessage: null
 };
 
 function recieveItems(state, data) {
@@ -242,6 +245,18 @@ export default function agendaReducer(state = initialState, action) {
             }
         };
 
+    case SET_ERROR_MESSAGE:
+        return {
+            ...state,
+            isLoading: false,
+            errorMessage: action.message
+        };
+
+    case SET_ERROR: {
+        return {...state,
+            isLoading: false,
+            errors: action.errors};
+    }
     default:
         return defaultReducer(state || initialState, action);
     }

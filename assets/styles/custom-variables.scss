@@ -464,6 +464,16 @@ $container-max-widths: (
     line-height: 1;
 }
 
+.icon-button {
+    &.icon-button--bordered {
+        border: 1px solid var(--color-line--light);
+        height: 40px;
+        [class^="icon--"],
+        [class*=" icon--"] {
+            color: var(--color-text--muted);
+        }
+    }
+}
 .icon--arrow-right {
     &.icon--collapsible-closed {
         transform: rotate(90deg);
