@@ -7,7 +7,7 @@ function UserProfileMenu({links, onClick}) {
             {links.map((link) => (
                 <a key={link.name}
                     href="#"
-                    className={`btn w-100 btn-outline-${link.active ? 'primary' : 'secondary'}`}
+                    className={`nh-button w-100 nh-button--${link.active ? 'primary' : 'secondary'}`}
                     name={link.name}
                     onClick={(event) => onClick(event, link.name)}
                 >{link.label}</a>

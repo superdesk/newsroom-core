@@ -161,7 +161,7 @@ class UserProfileApp extends React.Component {
                         ))}
                     </ul>
                     <div className="card-footer">
-                        <a href="/logout" className="btn btn-outline-secondary float-end">{gettext('Logout')}</a>
+                        <a href="/logout" className="nh-button nh-button--tertiary float-end">{gettext('Logout')}</a>
                     </div>
                 </div>
             </div>

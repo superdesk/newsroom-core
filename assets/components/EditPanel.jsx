@@ -128,7 +128,7 @@ class EditPanel extends React.Component {
                         {this.props.onCancel && (
                             <input
                                 type="button"
-                                className="btn btn-outline-secondary"
+                                className="nh-button nh-button--secondary"
                                 value={gettext('Cancel')}
                                 onClick={this.props.onCancel}
                                 disabled={this.props.cancelDisabled}
@@ -136,7 +136,7 @@ class EditPanel extends React.Component {
                         )}
                         <input
                             type='submit'
-                            className='btn btn-outline-primary'
+                            className='nh-button nh-button--primary'
                             value={gettext('Save')}
                             disabled={this.props.saveDisabled}
                         />

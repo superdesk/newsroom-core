@@ -27,6 +27,34 @@ function Wire() {
             setState(state === 'red' ? 'blue' : 'red');
     };
 
+    const [isMyTopicsShown, setIsMyTopicsShown] = useState(true);
+    const [isCompanyTopicsShown, setIsCompanyTopicsShown] = useState(false);
+    const handleClickMyTopics = event => {
+        setIsMyTopicsShown(current => !current);
+    };
+    const handleClickCompanyTopics = event => {
+        setIsCompanyTopicsShown(current => !current);
+    };
+
+    const [isTopicFolderOneOpen, setIsTopicFolderOneOpen] = useState(true);
+    const [isTopicFolderTwoOpen, setIsTopicFolderTwoOpen] = useState(true);
+    const [isTopicFolderThreeOpen, setIsTopicFolderThreeOpen] = useState(false);
+    const handleClickFolderOne = event => {
+        setIsTopicFolderOneOpen(current => !current);
+    };
+    const handleClickFolderTwo = event => {
+        setIsTopicFolderTwoOpen(current => !current);
+    };
+    const handleClickFolderThree = event => {
+        setIsTopicFolderThreeOpen(current => !current);
+    };
+
+
+
+
+
+
+
 
     return (
         <div className="wire-wrap">
@@ -58,26 +86,9 @@ function Wire() {
                             </form>
                         </div>
                         <div className="mx-2 d-flex gap-2">
-                            <button onClick={handleClickAdvancedSearch} className='btn btn-primary' >Advanced Search</button>
-                            <button onClick={handleClickAdvancedSearchTips} className="icon-button icon-button--bordered" aria-label="Info"><i className="icon--info"></i></button>
-                        </div>
-                        {/* <div className="content-bar__right">
-                            <div className="d-flex align-items-center px-2 px-sm-3">
-                                <div className="d-flex align-items-center">
-                                    <label for="all-versions" className="mr-2">All Versions</label>
-                                    <Toggle
-                                        id="all-versions"
-                                        defaultChecked={true}
-                                        className='toggle-background'
-                                        icons={false}
-                                    />
-                                </div>
-                            </div>
-                            <div className="btn-group list-view__options" data-original-title="" title="">
-                                <button className="content-bar__menu" title="Change view" aria-label="Change view" role="button"><i className="icon--list-view"></i>
-                                </button>
-                            </div>
-                        </div>                         */}
+                            <button onClick={handleClickAdvancedSearch} className="nh-button nh-button--secondary" >Advanced Search</button>
+                            <button onClick={handleClickAdvancedSearchTips} className="icon-button icon-button--tertiary icon-button--bordered" aria-label="Info"><i className="icon--info"></i></button>
+                        </div>                     
                     </nav>
                 </section>
                 <section className="content-main">
@@ -98,76 +109,165 @@ function Wire() {
                             </ul>
                             <div className="tab-content ">
                                 <div className="filter-panel__topics-list">
-                                    <div className="collapsible-box collapsible-box--open">
-                                        <div className="collapsible-box__header" onClick={colorHandler}>
-                                            <h4 className="collapsible-box__header-title">Politics ATP World Tour Millennium Estoril Open Results</h4>
-                                            <div className="collapsible-box__header-caret">
-                                                <i class="icon--arrow-right icon--collapsible-open"></i>
+
+                                     {/* My topics */}
+                                    <div className={`nh-collapsible-panel pt-0 nh-collapsible-panel--small ${isMyTopicsShown ? 'nh-collapsible-panel--open' : 'nh-collapsible-panel--closed'}`}>
+                                        <div className="nh-collapsible-panel__header">
+                                            <div className='nh-collapsible-panel__button' role='button' onClick={handleClickMyTopics}>
+                                                <div className="nh-collapsible-panel__caret">
+                                                    <i className="icon--arrow-right"></i>
+                                                </div>
+                                                <h3 className='nh-collapsible-panel__title'>My Topics</h3>
                                             </div>
+                                            <div className='nh-collapsible-panel__line'></div>
+                                            <button className='nh-button nh-button--tertiary nh-button--small'>Edit</button>
                                         </div>
-                                        <div className="collapsible-box__content">
-                                            <ul className="topic-list">
-                                                <li className="topic-list__item">
-                                                    <a className="topic-list__item-link" aria-selected="false" href="">
-                                                        <span className="topic-list__item-link_label">Ontario</span>
-                                                        <span className="badge rounded-pill bg-info">4</span>
-                                                    </a>
-                                                </li>
-                                                <li className="topic-list__item">
-                                                    <a className="topic-list__item-link" aria-selected="false" href="">
-                                                        <span className="topic-list__item-link_label">Donald Trump</span>
-                                                    </a>
-                                                </li>
-                                                <li className="topic-list__item">
-                                                    <a className="topic-list__item-link" aria-selected="false" href="">
-                                                        <span className="topic-list__item-link_label">Rishi Sunak</span>
-                                                    </a>
-                                                </li>
-                                                <li className="topic-list__item">
-                                                    <a className="topic-list__item-link" aria-selected="false" href="">
-                                                        <span className="topic-list__item-link_label">Donetsk</span>
-                                                        <span className="badge rounded-pill bg-info">8</span>
-                                                    </a>
-                                                </li>
-                                            </ul>
+
+                                        <div className='nh-collapsible-panel__content-wraper'>
+                                            <div className='nh-collapsible-panel__content'>
+                                                <div className={`collapsible-box collapsible-box--active-within ${isTopicFolderOneOpen ? 'collapsible-box--open' : 'collapsible-box--closed'}`}>
+                                                    <div className="collapsible-box__header" onClick={handleClickFolderOne} role='button'>
+                                                        <h4 className="collapsible-box__header-title">Politics Topic Folder</h4>
+                                                        <div className="collapsible-box__header-caret">
+                                                            <i class="icon--arrow-start"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div className="collapsible-box__content">
+                                                        <ul className="topic-list">
+                                                            <li className="topic-list__item">
+                                                                <a className="topic-list__item-link" aria-selected="false" href="">
+                                                                    <span className="topic-list__item-link_label">Ontario</span>
+                                                                    <span className="badge rounded-pill bg-info">4</span>
+                                                                </a>
+                                                            </li>
+                                                            <li className="topic-list__item">
+                                                                <a className="topic-list__item-link" aria-selected="false" href="">
+                                                                    <span className="topic-list__item-link_label">Donald Trump</span>
+                                                                </a>
+                                                            </li>
+                                                            <li className="topic-list__item">
+                                                                <a className="topic-list__item-link" aria-selected="false" href="">
+                                                                    <span className="topic-list__item-link_label">Rishi Sunak</span>
+                                                                </a>
+                                                            </li>
+                                                            <li className="topic-list__item">
+                                                                <a className="topic-list__item-link topic-list__item-link--active" aria-selected="true" href="">
+                                                                    <span className="topic-list__item-link_label">Donetsk (testing active state)</span>
+                                                                    <span className="badge rounded-pill bg-info">8</span>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+
+                                                <div className={`collapsible-box ${isTopicFolderTwoOpen ? 'collapsible-box--open' : 'collapsible-box--closed'}`}>
+                                                    <div className="collapsible-box__header" onClick={handleClickFolderTwo} role='button'>
+                                                        <h4 className="collapsible-box__header-title">Culture Topic folder</h4>
+                                                        <div className="collapsible-box__header-caret">
+                                                            <i class="icon--arrow-start"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div className="collapsible-box__content">
+                                                    <ul className="topic-list">
+                                                            <li className="topic-list__item">
+                                                                <a className="topic-list__item-link" aria-selected="false" href="">
+                                                                    <span className="topic-list__item-link_label">My Culture Topic one</span>
+                                                                    <span className="badge rounded-pill bg-info">2</span>
+                                                                </a>
+                                                            </li>
+                                                            <li className="topic-list__item">
+                                                                <a className="topic-list__item-link" aria-selected="false" href="">
+                                                                    <span className="topic-list__item-link_label">My Culture Topic two</span>
+                                                                </a>
+                                                            </li>
+                                                            <li className="topic-list__item">
+                                                                <a className="topic-list__item-link" aria-selected="false" href="">
+                                                                    <span className="topic-list__item-link_label">My Culture Topic three</span>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    
+                                                    </div>
+                                                </div>
+                                                <ul className="topic-list topic-list--unsorted">
+                                                    <li className="topic-list__item">
+                                                        <a className="topic-list__item-link" aria-selected="false" href="">
+                                                            <span className="topic-list__item-link_label">Ontario</span>
+                                                            <span className="badge rounded-pill bg-info">4</span>
+                                                        </a>
+                                                    </li>
+                                                    <li className="topic-list__item">
+                                                        <a className="topic-list__item-link" aria-selected="false" href="">
+                                                            <span className="topic-list__item-link_label">Donald Trump</span>
+                                                        </a>
+                                                    </li>
+                                                    <li className="topic-list__item">
+                                                        <a className="topic-list__item-link" aria-selected="false" href="">
+                                                            <span className="topic-list__item-link_label">Rishi Sunak</span>
+                                                        </a>
+                                                    </li>
+                                                    <li className="topic-list__item">
+                                                        <a className="topic-list__item-link" aria-selected="false" href="">
+                                                            <span className="topic-list__item-link_label">Donetsk</span>
+                                                            <span className="badge rounded-pill bg-info">8</span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div className="collapsible-box">
-                                        <div className="collapsible-box__header 11" onClick={colorHandler}>
-                                            <h4 className="collapsible-box__header-title">Culture</h4>
-                                            <div className="collapsible-box__header-caret">
-                                                <i class="icon--arrow-right icon--collapsible-closed"></i>
+
+                                    {/* Company topics */}
+
+                                    <div className={`nh-collapsible-panel nh-collapsible-panel--small ${isCompanyTopicsShown ? 'nh-collapsible-panel--open' : 'nh-collapsible-panel--closed'}`}>
+                                        <div className="nh-collapsible-panel__header">
+                                            <div className='nh-collapsible-panel__button' role='button' onClick={handleClickCompanyTopics}>
+                                                <div className="nh-collapsible-panel__caret">
+                                                    <i className="icon--arrow-right"></i>
+                                                </div>
+                                                <h3 className='nh-collapsible-panel__title'>Company Topics</h3>
                                             </div>
+                                            <div className='nh-collapsible-panel__line'></div>
+                                            <button className='nh-button nh-button--tertiary nh-button--small'>Edit</button>
                                         </div>
-                                        <div className="collapsible-box__content">
-                                        
+
+                                        <div className='nh-collapsible-panel__content-wraper'>
+                                            <div className='nh-collapsible-panel__content'>
+                                                <div className={`collapsible-box ${isTopicFolderThreeOpen ? 'collapsible-box--open' : 'collapsible-box--closed'}`}>
+                                                    <div className="collapsible-box__header" onClick={handleClickFolderThree} role='button'>
+                                                        <h4 className="collapsible-box__header-title">Company Topic folder</h4>
+                                                        <div className="collapsible-box__header-caret">
+                                                            <i class="icon--arrow-start"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div className="collapsible-box__content">
+                                                    
+                                                    </div>
+                                                </div>
+                                                <ul className="topic-list topic-list--unsorted">
+                                                    <li className="topic-list__item">
+                                                        <a className="topic-list__item-link topic-list__item-link--active" aria-selected="false" href="">
+                                                            <span className="topic-list__item-link_label">Ontario (testing active state)</span>
+                                                            <span className="badge rounded-pill bg-info">2</span>
+                                                        </a>
+                                                    </li>
+                                                    <li className="topic-list__item">
+                                                        <a className="topic-list__item-link" aria-selected="false" href="">
+                                                            <span className="topic-list__item-link_label">Donald Trump</span>
+                                                        </a>
+                                                    </li>
+                                                    <li className="topic-list__item">
+                                                        <a className="topic-list__item-link" aria-selected="false" href="">
+                                                            <span className="topic-list__item-link_label">Rishi Sunak</span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div> 
                                         </div>
+
                                     </div>
-                                    <ul className="topic-list topic-list--unsorted">
-                                                <li className="topic-list__item">
-                                                    <a className="topic-list__item-link" aria-selected="false" href="">
-                                                        <span className="topic-list__item-link_label">Ontario</span>
-                                                        <span className="badge rounded-pill bg-info">4</span>
-                                                    </a>
-                                                </li>
-                                                <li className="topic-list__item">
-                                                    <a className="topic-list__item-link" aria-selected="false" href="">
-                                                        <span className="topic-list__item-link_label">Donald Trump</span>
-                                                    </a>
-                                                </li>
-                                                <li className="topic-list__item">
-                                                    <a className="topic-list__item-link" aria-selected="false" href="">
-                                                        <span className="topic-list__item-link_label">Rishi Sunak</span>
-                                                    </a>
-                                                </li>
-                                                <li className="topic-list__item">
-                                                    <a className="topic-list__item-link" aria-selected="false" href="">
-                                                        <span className="topic-list__item-link_label">Donetsk</span>
-                                                        <span className="badge rounded-pill bg-info">8</span>
-                                                    </a>
-                                                </li>
-                                            </ul>
+
                                 </div>
                             </div>
                         </div>
@@ -177,8 +277,8 @@ function Wire() {
                                 <div className="navbar navbar--flex line-shadow-end--light">
                                     <div className="search-result-count">12,339 results</div>
                                     <div className="navbar__button-group">
-                                        <button class="btn btn-outline-secondary">Clear all</button>
-                                        <button onClick={handleClickTag} class="icon-button icon-button--bordered">
+                                        <button class="nh-button nh-button--tertiary">Clear all</button>
+                                        <button onClick={handleClickTag} class="icon-button icon-button--tertiary icon-button--bordered">
                                             {isTagSectionShown && <i class="icon--arrow-right icon--collapsible-open"></i>}
                                             {!isTagSectionShown && <i class="icon--arrow-right icon--collapsible-closed"></i>}
                                         </button>
@@ -187,6 +287,7 @@ function Wire() {
                                 {isTagSectionShown &&
                                     <div className="navbar navbar--flex line-shadow-end--light navbar--auto-height">
                                         <ul className="search-result__tags-list">
+                                            
                                             <li className="search-result__tags-list-row">
                                                 <span className="search-result__tags-list-row-label">Topic</span>
                                                 <div className="tags-list">
@@ -200,24 +301,17 @@ function Wire() {
                                                     </span>
                                                 </div>
                                                 <div class="tags-list-row__button-group">
-                                                    <button class="btn btn-outline-secondary btn-responsive btn--small">Update topic</button>
-                                                    <button class="btn btn-outline-secondary btn-responsive btn--small">Save as new topic</button>
+                                                    <button class="nh-button nh-button--tertiary nh-button--small">Update topic</button>
+                                                    <button class="nh-button nh-button--tertiary nh-button--small">Save as new topic</button>
                                                 </div>
                                             </li>
+
                                             <li className="search-result__tags-list-row">
-                                                <span className="search-result__tags-list-row-label">Text fields</span>
+                                                <span className="search-result__tags-list-row-label">Searched for</span>
                                                 <div className="tags-list">
                                                     <span class="tag-label">
                                                         <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">Headline</span>
-                                                        </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
-                                                        </button>
-                                                    </span>
-                                                    <span class="tag-label">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">Headline</span>
+                                                            <span class="tag-label--text">Donetsk</span>
                                                         </span>
                                                         <button class="tag-label__remove">
                                                             <i class="icon--close-thin"></i>
@@ -225,31 +319,11 @@ function Wire() {
                                                     </span>
                                                 </div>
                                             </li>
+
                                             <li className="search-result__tags-list-row">
-                                                <span className="search-result__tags-list-row-label">Search terms</span>
+                                                <span className="search-result__tags-list-row-label">Searched for</span>
                                                 <div className="tags-list">
-                                                    <span class="tag-label tag-label--info">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">Zelensky</span>
-                                                        </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
-                                                        </button>
-                                                    </span>
-                                                    <span class="tag-label tag-label--operator tag-label--info">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">or</span>
-                                                        </span>
-                                                    </span>
-                                                    <span class="tag-label tag-label--info">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">Peace</span>
-                                                        </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
-                                                        </button>
-                                                    </span>
-                                                    <span class="tag-label tag-label--operator">
+                                                <span class="tag-label tag-label--operator tag-label--success">
                                                         <span class="tag-label--text-wrapper">
                                                             <span class="tag-label--text">and</span>
                                                         </span>
@@ -262,11 +336,6 @@ function Wire() {
                                                             <i class="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--operator tag-label--success">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">and</span>
-                                                        </span>
-                                                    </span>
                                                     <span class="tag-label tag-label--success">
                                                         <span class="tag-label--text-wrapper">
                                                             <span class="tag-label--text">War</span>
@@ -275,11 +344,33 @@ function Wire() {
                                                             <i class="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--operator">
+
+                                                    <span className="tag-list__separator"></span>
+
+                                                    <span class="tag-label tag-label--operator tag-label--info">
                                                         <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">and</span>
+                                                            <span class="tag-label--text">or</span>
                                                         </span>
                                                     </span>
+                                                    <span class="tag-label tag-label--info">
+                                                        <span class="tag-label--text-wrapper">
+                                                            <span class="tag-label--text">Zelensky</span>
+                                                        </span>
+                                                        <button class="tag-label__remove">
+                                                            <i class="icon--close-thin"></i>
+                                                        </button>
+                                                    </span>
+                                                    <span class="tag-label tag-label--info">
+                                                        <span class="tag-label--text-wrapper">
+                                                            <span class="tag-label--text">Peace</span>
+                                                        </span>
+                                                        <button class="tag-label__remove">
+                                                            <i class="icon--close-thin"></i>
+                                                        </button>
+                                                    </span>
+
+                                                    <span className="tag-list__separator"></span>
+
                                                     <span class="tag-label tag-label--operator tag-label--alert">
                                                         <span class="tag-label--text-wrapper">
                                                             <span class="tag-label--text">not</span>
@@ -293,11 +384,6 @@ function Wire() {
                                                             <i class="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--operator tag-label--alert">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">not</span>
-                                                        </span>
-                                                    </span>
                                                     <span class="tag-label tag-label--alert">
                                                         <span class="tag-label--text-wrapper">
                                                             <span class="tag-label--text">Bomb</span>
@@ -306,7 +392,18 @@ function Wire() {
                                                             <i class="icon--close-thin"></i>
                                                         </button>
                                                     </span>
+
+                                                    <span className="tag-list__separator tag-list__separator--blanc"></span>
+                                                    <button className='nh-button nh-button--tertiary nh-button--small'>Clear</button>
                                                 </div>
+                                            </li>
+                                            <li className="search-result__tags-list-row">
+                                                <span className="search-result__tags-list-row-label">Fields searched</span>
+                                                <div className="toggle-button__group toggle-button__group--spaced toggle-button__group--loose">
+                                                        <button className="toggle-button toggle-button--no-txt-transform toggle-button--small toggle-button--active">Headline</button>
+                                                        <button className="toggle-button toggle-button--no-txt-transform toggle-button--small toggle-button--active">Slugline</button>
+                                                        <button className="toggle-button toggle-button--no-txt-transform toggle-button--small">Body</button>
+                                                    </div>
                                             </li>
                                             <li className="search-result__tags-list-row">
                                                 <span className="search-result__tags-list-row-label">Filters applied</span>
@@ -374,8 +471,17 @@ function Wire() {
                                                             <i class="icon--close-thin"></i>
                                                         </button>
                                                     </span>
+
+                                                    <span className="tag-list__separator tag-list__separator--blanc"></span>
+                                                    <button className='nh-button nh-button--tertiary nh-button--small'>Clear filters</button>
                                                 </div>
                                             </li>
+                                            <li className="search-result__tags-list-row">
+                                            </li>
+                                            <li className="search-result__tags-list-row">
+                                                <h4 className="pt-2">FOR TESTING ONLY:</h4>
+                                            </li>
+
                                             <li className="search-result__tags-list-row">
                                                 <span className="search-result__tags-list-row-label">Test svih opcija</span>
                                                 <div className="tags-list">

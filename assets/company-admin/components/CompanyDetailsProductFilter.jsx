@@ -60,7 +60,6 @@ class CompanyDetailsProductFilterComponent extends React.PureComponent {
                 toggleFilter={this.onChange}
                 buttonProps={{
                     textOnly: true,
-                    iconColour: 'gray-dark'
                 }}
             />
         );

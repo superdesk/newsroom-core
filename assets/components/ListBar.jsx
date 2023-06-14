@@ -27,7 +27,7 @@ class ListBar extends React.Component {
                         {this.props.onNewItem && (
                             <button
                                 data-test-id="new-item-btn"
-                                className="btn btn-outline-secondary btn-responsive"
+                                className="nh-button nh-button--primary"
                                 onClick={() => this.props.onNewItem()}
                             >
                                 {this.props.buttonText}

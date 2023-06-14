@@ -145,7 +145,7 @@ class ContentSearchResultsComponent extends React.Component {
                                             className="d-none d-md-flex align-items-center flex-shrink-0 ml-auto"
                                         >
                                             <button
-                                                className="btn btn-outline-primary btn-sm d-none d-sm-block mb-1 mt-1"
+                                                className="nh-button nh-button--secondary d-none d-sm-block mb-1 mt-1"
                                                 onClick={this.props.saveMyTopic}
                                             >{this.props.saveButtonText}</button>
                                         </div>
@@ -153,7 +153,7 @@ class ContentSearchResultsComponent extends React.Component {
                                     {(this.props.showSaveTopic || this.props.children) && (
                                         <div className="d-flex ms-auto align-items-end align-items-md-center flex-column flex-md-row flex-shrink-0">
                                             <button
-                                                className="btn btn-outline-primary btn-sm d-block d-sm-none mb-1 mt-1"
+                                                className="nh-button nh-button--secondary d-block d-sm-none mb-1 mt-1"
                                                 onClick={this.props.saveMyTopic}
                                             >{this.props.saveButtonText}</button>
                                             {this.props.children}

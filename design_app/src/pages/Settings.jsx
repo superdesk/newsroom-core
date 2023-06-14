@@ -73,7 +73,7 @@ function Settings() {
                         </div>
                         
                         <div className="content-bar__right">
-                            <button className="btn btn-outline-secondary btn-responsive">New Company</button>
+                            <button className="nh-button nh-button--primary">New Company</button>
                         </div>
                     </nav>
                 </section>
@@ -249,7 +249,7 @@ function Settings() {
                                     </div>
                                     </div>
                                     <div className="list-item__preview-footer">
-                                        <input type="button" className="btn btn-outline-primary" value="Save" /><input type="button" className="btn btn-outline-secondary" value="Delete" />
+                                        <input type="button" className="nh-button nh-button--primary" value="Save" /><input type="button" className="nh-button nh-button--secondary" value="Delete" />
                                     </div>
                                 </form>
                             </div>

@@ -97,7 +97,6 @@ class MonitoringApp extends React.Component {
                         getDropdownItems={this.getDropdownItems}
                         activeFilter={activeQuery}
                         toggleFilter={this.onChange}
-                        className='ps-3'
                     />
                 </div>
                 <MonitoringPanel />

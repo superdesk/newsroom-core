@@ -22,7 +22,7 @@ export function ModalPrimaryButton({label, type, onClick, disabled}) {
     return (
         <button type={type || 'button'}
             onClick={onClick}
-            className="btn btn-outline-primary"
+            className="nh-button nh-button--primary"
             disabled={disabled}
         >{label}</button>
     );
@@ -47,7 +47,7 @@ export function ModalSecondaryButton({label, type, onClick}) {
     return (
         <button type={type || 'button'}
             onClick={onClick}
-            className="btn btn-outline-secondary"
+            className="nh-button nh-button--secondary"
         >{label}</button>
     );
 }

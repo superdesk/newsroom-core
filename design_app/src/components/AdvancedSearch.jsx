@@ -36,7 +36,7 @@ function AdvancedSearch() {
                     </div>
                     <hr className="dashed" />
                     <div className="advanced-search__content-bottom">
-                        <p>Apply these keyword rules to these text fields:</p>
+                        <p>Apply these keyword rules to at least one of these search fields:</p>
                         <div className="form-group">
                             <div className="form-check">
                                 <input type="checkbox" className="form-check-input" id="headline" tabIndex="0" />
@@ -55,8 +55,8 @@ function AdvancedSearch() {
                 </div>
             </div>
             <div className="advanced-search__footer">
-                    <button className="btn btn-outline-secondary">Clear all</button>
-                    <button className="btn btn-primary">Search</button>
+                    <button className="nh-button nh-button--secondary">Clear all</button>
+                    <button className="nh-button nh-button--primary">Search</button>
             </div>
         </div>
     )

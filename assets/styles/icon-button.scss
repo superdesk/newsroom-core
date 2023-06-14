@@ -5,6 +5,8 @@
     display: inline-flex;
     justify-content: center;
     align-items: center;
+    flex-shrink: 0;
+    flex-grow: 0;
     width: var(--icon-button-size);
     height: var(--icon-button-size);
     cursor: pointer;

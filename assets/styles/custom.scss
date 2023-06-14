@@ -2,6 +2,7 @@
 
 @import './custom-variables.scss'; // custom variables, Bootstrap overrides
 @import './custom-utilities.scss'; // custom utilities for RTL support
+@import './custom-animation.scss'; // custom keyframe animations
 @import '~bootstrap/scss/bootstrap'; // default Bootstrap from node modules
 @import './custom-mixins.scss'; // custom mixins, Bootstrap overrides
 @import './custom-buttons.scss'; // custom buttons

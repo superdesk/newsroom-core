@@ -8,11 +8,11 @@ function MoreNewsButton({title, product, photoUrl, photoUrlLabel, moreNews}) {
     </div>,
     <div key='more-news' className='col-6 col-sm-4 d-flex align-items-start justify-content-end'>
         {moreNews && product &&
-                <a href={`/wire?product=${product._id}`} role='button' className='btn btn-outline-primary mb-3'>
+                <a href={`/wire?product=${product._id}`} role='button' className='nh-button nh-button--tertiary mb-3'>
                     {gettext('More news')}
                 </a>}
         {photoUrl &&
-            <a href={photoUrl} target='_blank' rel='noopener noreferrer' role='button' className='btn btn-outline-primary mb-3'>
+            <a href={photoUrl} target='_blank' rel='noopener noreferrer' role='button' className='nh-button nh-button--tertiary mb-3'>
                 {gettext(photoUrlLabel)}
             </a>}
     </div>]);

@@ -8,10 +8,10 @@ class CalendarButtonWrapper extends React.Component {
     render() {
         return (
             <button className={
-                classNames('btn btn-outline-primary btn-sm me-3 align-items-center px-2 btn-with-icon', {'active': this.props.active})}
+                classNames('nh-dropdown-button', {'active': this.props.active})}
             onClick={this.props.onClick}>
                 {moment(this.props.value).format(AGENDA_DATE_PICKER_FORMAT_SHORT)}
-                <i className={classNames('icon-small--arrow-down ms-1', {'icon--white': this.props.active})}></i>
+                <i className='icon-small--arrow-down'></i>
             </button>
         );
     }

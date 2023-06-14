@@ -58,7 +58,7 @@ export default class CardEditor extends React.Component {
                             <div className="card-body">{editorCardBody}</div>
                             <div className="card-footer d-flex">
                                 <button
-                                    className="btn btn-outline-primary ms-auto"
+                                    className="nh-button nh-button--primary ms-auto"
                                     onClick={this.onSave}
                                     disabled={Object.keys(errors || {}).length > 0}
                                     aria-label={gettext('Save')}
@@ -67,7 +67,7 @@ export default class CardEditor extends React.Component {
                                 </button>
                                 {!hideCancel && (
                                     <button
-                                        className='btn btn-outline-secondary ms-3'
+                                        className='nh-button nh-button--secondary ms-3'
                                         onClick={this.onCancelClick}
                                         aria-label={gettext('Cancel')}
                                     >

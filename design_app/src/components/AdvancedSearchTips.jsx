@@ -69,10 +69,6 @@ function AdvancedSearchTips() {
                     </div>
                 </div>
             </div>
-            {/* <div className="advanced-search__footer">
-                    <button className="btn btn-outline-secondary">Clear all</button>
-                    <button className="btn btn-primary">Search</button>
-            </div> */}
         </div>
     )
 }

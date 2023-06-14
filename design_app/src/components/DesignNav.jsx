@@ -7,6 +7,8 @@ function DesignNav() {
         { path: '/wire', title: 'Wire' },
         //{ path: '/settings', title: 'Settings' },
         { path: '/company', title: 'Company' },
+        { path: '/mytopics', title: 'My Topics' },
+        { path: '/savetopic', title: 'Save Topic' },
     ];
     
     return (        
