@@ -8,7 +8,7 @@ import {noNavigationSelected} from 'search/utils';
 
 import BaseApp from '../../layout/components/BaseApp';
 import SearchBar from 'search/components/SearchBar';
-import SearchResultsInfo from 'search/components/SearchResultsInfo';
+import {SearchResultsBar} from 'search/components/SearchResultsBar';
 import DownloadItemsModal from '../../wire/components/DownloadItemsModal';
 import SelectedItemsBar from 'wire/components/SelectedItemsBar';
 import ShareItemModal from '../../components/ShareItemModal';
@@ -163,20 +163,16 @@ class AmNewsApp extends BaseApp {
                                 </div>
                             }
 
-                            {(this.props.activeQuery || get(this.props, 'newItems.length', 0) > 0) && (
-                                <SearchResultsInfo
-                                    minimizeSearchResults={this.state.minimizeSearchResults}
-                                    user={this.props.user}
-                                    query={this.props.activeQuery}
-                                    bookmarks={this.props.bookmarks}
-                                    totalItems={this.props.totalItems}
-                                    newItems={this.props.newItems}
-                                    refresh={this.props.fetchItems}
-                                    activeNavigation={this.props.activeNavigation}
-                                    displayTotalItems={this.props.activeQuery}
-                                    resultsLabel={searchResultsLabel}
-                                />
-                            )}
+                            <SearchResultsBar
+                                minimizeSearchResults={this.state.minimizeSearchResults}
+                                totalItems={this.props.totalItems}
+                                totalItemsLabel={searchResultsLabel}
+                                activeTopic={this.props.activeNavigation}
+                                showTotalItems={this.props.activeQuery}
+                                newItems={this.props.newItems}
+                                refresh={this.props.fetchItems}
+                                setQuery={this.props.setQuery}
+                            />
 
                             <AmNewsList
                                 actions={this.props.actions}
