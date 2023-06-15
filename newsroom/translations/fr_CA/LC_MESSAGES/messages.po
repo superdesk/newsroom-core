@@ -67,6 +67,10 @@ msgstr "L'utilisateur n'appartient pas à une entreprise."
 msgid "Your company doesn't have any products defined."
 msgstr "Votre entreprise n'a pas de produits définis."
 
+#: newsroom/search.py:527
+msgid "Your product is not assigned to you or your company."
+msgstr "Les membres de votre entreprise n'ont pas accès à ce produit."
+
 #: newsroom/monitoring/search.py:67 newsroom/search.py:532
 msgid "Invalid product parameter"
 msgstr "Paramètre de produit invalide"
