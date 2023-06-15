@@ -3235,7 +3235,7 @@ msgid "And every item will NOT contain keyword1 nor keyword2 etc."
 msgstr ""
 
 #: assets/search/components/AdvancedSearchPanel.jsx:92
-msgid "Apply these keyword rules to these text fields:"
+msgid "Apply these keyword rules to at least one of these search fields:"
 msgstr ""
 
 #: assets/search/components/AdvancedSearchPanel.jsx:102

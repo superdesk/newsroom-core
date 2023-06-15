@@ -34,7 +34,7 @@ function EditUser() {
                         <label className="label label--green label--big label--rounded">active</label>
                         <label className="label label--green label--fill label--big label--rounded">admin</label>
                     </div>
-                    <button className="btn btn-sm btn-outline-light">Resend Invite</button>
+                    <button className="nh-button nh-button--tertiary nh-button--small">Resend Invite</button>
                 </div>
                     <form>
                         <div className="list-item__preview-form pt-0">
@@ -241,9 +241,9 @@ function EditUser() {
 
                         </div>
                         <div className="list-item__preview-footer">
-                            <input type="button" className="btn btn-outline-secondary" value="Reset Password" />
-                            <input type="button" className="btn btn-outline-secondary" value="Delete" />
-                            <input type="button" className="btn btn-outline-primary" value="Save" />
+                            <input type="button" className="nh-button nh-button--secondary" value="Reset Password" />
+                            <input type="button" className="nh-button nh-button--secondary" value="Delete" />
+                            <input type="button" className="nh-button nh-button--primary" value="Save" />
                         </div>
                     </form>
 

@@ -13,10 +13,10 @@ function DashboardSwitch({dashboards, activeDashboard, selectDashboard}) {
     }
 
     return (
-        <div className="btn-group btn-group--navbar ms-0 me-3">
+        <div className="toggle-button__group toggle-button__group--navbar ms-0 me-3">
             {dashboards.map((dashboard) => (
                 <button key={dashboard._id}
-                    className={'btn btn-outline-primary' + (dashboard._id === activeDashboard ? ' active' : '')}
+                    className={'toggle-button' + (dashboard._id === activeDashboard ? ' toggle-button--active' : '')}
                     onClick={() => selectDashboard(dashboard._id)}
                 >{dashboard.name}</button>
             ))}

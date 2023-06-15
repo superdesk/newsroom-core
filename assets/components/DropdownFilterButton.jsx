@@ -2,17 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-function DropdownFilterButton({id, isActive, autoToggle, onClick, icon, label, textOnly, iconColour}) {
+function DropdownFilterButton({id, isActive, autoToggle, onClick, icon, label, textOnly}) {
     return (
         <button
             id={id}
             type="button"
             className={classNames(
-                'btn btn-sm d-flex align-items-center px-2 ms-2',
+                'nh-dropdown-button',
                 {
-                    active: isActive,
-                    'btn-text-only': textOnly,
-                    'btn-outline-primary': !textOnly,
+                    'nh-dropdown-button--active': isActive,
+                    'nh-dropdown-button--text-only': textOnly,
                 }
             )}
             data-bs-toggle={autoToggle ? 'dropdown' : undefined}
@@ -28,13 +27,7 @@ function DropdownFilterButton({id, isActive, autoToggle, onClick, icon, label, t
                     {label}
                 </span>
             )}
-            <i className={classNames(
-                'icon-small--arrow-down ms-1',
-                {
-                    'icon--white': isActive && !iconColour,
-                    [`icon--${iconColour}`]: iconColour
-                }
-            )} />
+            <i className='icon-small--arrow-down' />
         </button>
     );
 }
@@ -51,7 +44,6 @@ DropdownFilterButton.propTypes = {
         PropTypes.string
     ]),
     textOnly: PropTypes.bool,
-    iconColour: PropTypes.string,
 };
 
 DropdownFilterButton.defaultProps = {autoToggle: true};

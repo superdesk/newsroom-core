@@ -11,7 +11,7 @@ export class SearchBar extends React.PureComponent {
     render() {
         return (
             <section className="content-header">
-                <nav className="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
+                <nav className="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap content-bar--side-padding">
                     <div className="search">
                         <form
                             className={classNames('search__form', {'search__form--active': !!this.state.value,})}

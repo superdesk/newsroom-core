@@ -23,12 +23,10 @@ export function Dropdown({children, isActive, icon, label, className, buttonProp
     });
 
     const textOnly = (buttonProps || {}).textOnly;
-    const iconColour= (buttonProps || {}).iconColour;
 
     return (<div
         className={classNames(
             'dropdown',
-            'btn-group',
             className ? className : ''
         )}
         onClick={(event) => {
@@ -39,11 +37,10 @@ export function Dropdown({children, isActive, icon, label, className, buttonProp
         <button
             type="button"
             className={classNames(
-                'btn btn-sm d-flex align-items-center px-2 ms-1',
+                'nh-dropdown-button',
                 {
                     active: isActive,
-                    'btn-text-only': textOnly,
-                    'btn-outline-primary': !textOnly,
+                    'nh-dropdown-button--text-only': textOnly,
                 }
             )}
             aria-haspopup="true"
@@ -58,13 +55,7 @@ export function Dropdown({children, isActive, icon, label, className, buttonProp
                     {label}
                 </span>
             )}
-            <i className={classNames(
-                'icon-small--arrow-down ms-1',
-                {
-                    'icon--white': isActive && !iconColour,
-                    [`icon--${iconColour}`]: iconColour
-                }
-            )} />
+            <i className='icon-small--arrow-down' />
         </button>
         <div className='dropdown-menu'>
             {children}
@@ -82,6 +73,5 @@ Dropdown.propTypes = {
     reset: PropTypes.func,
     buttonProps: PropTypes.shape({
         textOnly: PropTypes.bool,
-        iconColour: PropTypes.string,
     }),
 };

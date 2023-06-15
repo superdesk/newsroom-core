@@ -37,6 +37,16 @@
     inset-inline-end: 11px !important;
   }
 }
-.badge.bg-secondary {
-  background-color: rgba($gray-300, var(--bs-bg-opacity)) !important;;
+.badge {
+    &.bg-secondary {
+        background-color: rgba($gray-300, var(--bs-bg-opacity)) !important;
+    }
+    &.badge--neutral {
+        color: var(--color-text--inverse);
+        background-color: hsla(202, 10%, 45%, 1);
+    }
+    &.badge--neutral-translucent {
+        color: var(--color-text--muted-2);
+        background-color: hsla(202, 10%, 45%, 0.1);
+    }
 }

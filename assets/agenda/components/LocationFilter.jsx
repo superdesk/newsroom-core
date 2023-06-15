@@ -416,7 +416,7 @@ export class LocationFilter extends React.Component {
         return (
             <div
                 key="location"
-                className="btn-group"
+                className="d-inline-flex position-relative"
                 ref={(ref) => this.dom.container = ref}
             >
                 <DropdownFilterButton

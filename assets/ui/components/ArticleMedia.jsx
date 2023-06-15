@@ -24,7 +24,7 @@ export default function ArticleMedia({isKilled, media, download}) {
                     </audio>
                 )}
                 {rendition.media && (
-                    <button className="btn btn-outline-primary btn-with-icon btn-sm mt-3 mb-4"
+                    <button className="nh-button nh-button--secondary nh-button--small mt-3 mb-4"
                         onClick={() => download(rendition.media, filename)}>
                         <i className="icon--download"></i>{gettext('Download')}
                     </button>

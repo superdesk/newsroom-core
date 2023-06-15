@@ -95,7 +95,6 @@ export class UserListSortFilter extends React.PureComponent {
                     getFilterLabel={this.getFilterLabel}
                     buttonProps={{
                         textOnly: true,
-                        iconColour: 'gray-dark'
                     }}
                 />
                 <div className="btn-group">
