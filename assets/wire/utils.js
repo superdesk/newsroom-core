@@ -186,36 +186,44 @@ export function shortText(item, length=40, config) {
     return words.slice(0, length).join(' ') + (words.length > length ? '...' : '');
 }
 
-export function shortHighlightedtext(text, maxLength = 40) {
-    const spanRegex = /<span\s+class="es-highlight">([^<]+)<\/span>/i;
-    const match = text.match(spanRegex);
+export function shortHighlightedtext(html, maxLength = 40) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const span = doc.querySelector('span.es-highlight');
   
-    if (match) {
-        const startIndex = match.index;
-        let start = text.lastIndexOf('.', startIndex) + 1;
-        let end = start;
-
-        // Find the end index by counting words
-        let wordCount = 0;
-        while (end < text.length && wordCount < maxLength) {
-            if (text[end] === ' ' || text[end] === '\n') {
-                wordCount++;
-            }
-            end++;
-        }
-        // Adjust the end index to ensure it ends at a word boundary
-        if (end < text.length) {
-            while (end < text.length && !/\s/.test(text[end])) {
-                end++;
-            }
-        }
-        const truncatedText = text.substring(start, end).trim();
-        return truncatedText + (end < text.length ? '...' : '');
+    if (!span) {
+        const plainText = doc.documentElement.textContent.trim();
+        const words = plainText.split(/\s/).filter(w => w);
+        return words.slice(0, maxLength).join(' ') + (words.length > maxLength ? '...' : '');
     }
   
-    const words = text.split(/\s/).filter(w => w);
-    return words.slice(0, maxLength).join(' ') + (words.length > maxLength ? '...' : '');
-}
+    const parentElement = span.parentElement;
+    const treeWalker = document.createTreeWalker(parentElement, NodeFilter.SHOW_TEXT, null, false);
+    let node = treeWalker.firstChild();
+    let text = '';
+    let count = 0;
+  
+    while (node && count < maxLength) {
+        const content = node.textContent.trim();
+        const words = content.split(/\s/).filter(w => w);
+        const remainingCount = maxLength - count;
+  
+        if (words.length <= remainingCount) {
+            text += content + ' ';
+            count += words.length;
+        } else {
+            text += words.slice(0, remainingCount).join(' ');
+            count += remainingCount;
+        }
+  
+        node = treeWalker.nextSibling();
+    }
+  
+    const truncatedText = text.trim();
+    const highlightedText = span.outerHTML;
+    const output = truncatedText + (count > maxLength ? '' : '...');
+    return output.replace(span.textContent, highlightedText);
+}  
 
 /**
  * Get caption for picture
