@@ -82,8 +82,21 @@ describe('shortHighlightedtext', () => {
         const output = shortHighlightedtext(html, maxLength);
         expect(output).toEqual('<span class="es-highlight">Turvattomuuden</span> kokemukset sen sijaan voivat\n          altistaa jatkossakin sille, että ihmissuhteet katkeavat herkemmin.\n          Kokemukset turvattomuudesta saattavat heikentää ihmisen kykyä\n          altistaa omaa ja toisen ihmisen mieltä....');
     });
+    
+    it('returns truncated text with highlighted span inside a list', () => {
+        const html = '<ul><li>Foo</li><li><span class="es-highlight">Bar</span></li><li>Baz</li></ul>';
       
-   
-      
+        const maxLength = 10;
+        const output = shortHighlightedtext(html, maxLength);
+        expect(output).toEqual('<span class="es-highlight">Bar</span>...');
+    });
+
+    it('returns truncated text with highlighted span across different HTML tags', () => {
+        const html = '<p>part of a paragraph</p><h2>something and something else <span class="es-highlight">matching word</span></h2>';
+        const maxLength = 40;
+        const output = shortHighlightedtext(html, maxLength);
+        expect(output).toEqual('something and something else <span class="es-highlight">matching word</span>...');
+    });
+            
 });
   
