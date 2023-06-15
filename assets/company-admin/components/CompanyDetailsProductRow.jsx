@@ -32,7 +32,7 @@ export function CompanyDetailsProductRow({product, onNameClicked, showSeatReques
             {getConfig('allow_companies_to_manage_products') && !unlimited && (
                 <td>
                     <button
-                        className="btn btn-sm btn-outline-light"
+                        className="nh-button nh-button--tertiary nh-button--small"
                         onClick={() => showSeatRequestModal([product._id])}
                     >
                         {gettext('Request more seats')}
