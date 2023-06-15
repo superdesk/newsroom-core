@@ -91,7 +91,6 @@ export function toggleNavigation(navigation, disableSameNavigationDeselect) {
             }
         }
 
-        dispatch(resetSearchParams());
         dispatch(setSearchNavigationIds(newNavigation));
         updateRouteParams(
             {
@@ -291,6 +290,25 @@ export function submitShareItem(data) {
     };
 }
 
+export function deselectMyTopic() {
+    return function(dispatch, getState) {
+        const state = getState();
+        const currentTopic = activeTopicSelector(state);
+
+        dispatch(setSearchTopicId(null));
+        dispatch(setParams(currentTopic));
+        updateRouteParams({
+            topic: null,
+            q: currentTopic.query,
+            created: currentTopic.created,
+            filter: currentTopic.filter,
+            navigation: currentTopic.navigation,
+            product: currentTopic.product,
+            advanced: currentTopic.advanced,
+        }, getState());
+    };
+}
+
 export function loadMyTopic(topicId) {
     return (dispatch, getState) => {
         const state = getState();
@@ -372,6 +390,24 @@ export function resetSearchParams() {
     return {type: RESET_SEARCH_PARAMS};
 }
 
+export function resetSearchParamsAndUpdateURL() {
+    return function(dispatch, getState) {
+        dispatch(resetSearchParams());
+        updateRouteParams(
+            {
+                topic: null,
+                q: null,
+                created: null,
+                navigation: null,
+                filter: null,
+                product: null,
+                advanced: null,
+            },
+            getState()
+        );
+    };
+}
+
 export const TOGGLE_ADVANCED_SEARCH_FIELD = 'TOGGLE_ADVANCED_SEARCH_FIELD';
 export function toggleAdvancedSearchField(field) {
     return function(dispatch, getState) {
@@ -415,7 +451,7 @@ export function setAdvancedSearchKeywords(field, keywords) {
 }
 
 export const CLEAR_ADVANCED_SEARCH_PARAMS = 'CLEAR_ADVANCED_SEARCH_PARAMS';
-export function clearAdvanedSearchParams() {
+export function clearAdvancedSearchParams() {
     return function(dispatch, getState) {
         dispatch({type: CLEAR_ADVANCED_SEARCH_PARAMS});
         updateRouteParams(

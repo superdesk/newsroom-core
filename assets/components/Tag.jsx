@@ -2,9 +2,10 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-export function Tag({text, keyValue, shade, readOnly, onClick, label}) {
+export function Tag({text, keyValue, shade, readOnly, onClick, label, operator}) {
     let classes = classNames('tag-label', {
         [`tag-label--${shade}`]: shade && shade !== 'light',
+        'tag-label--operator': operator,
     });
 
     return (
@@ -48,9 +49,17 @@ Tag.propTypes = {
     shade: PropTypes.oneOf([
         'light',
         'darker',
+        'highlight',
         'highlight1',
         'highlight2',
+
+        'inverse',
+        'info',
+        'success',
+        'alert',
+        'warning',
     ]),
+    operator: PropTypes.bool,
     readOnly: PropTypes.bool,
-    onClick: PropTypes.func.isRequired,
+    onClick: PropTypes.func,
 };
