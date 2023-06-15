@@ -192,22 +192,31 @@ export function shortHighlightedtext(text, maxLength = 40) {
   
     if (match) {
         const startIndex = match.index;
-        const highlightedText = text.substring(startIndex);
-        const surroundingWords = highlightedText.split(/\s/).filter(w => w);
-  
-        if (surroundingWords.length <= maxLength) {
-            return highlightedText;
+        let start = text.lastIndexOf('.', startIndex) + 1;
+        let end = start;
+
+        // Find the end index by counting words
+        let wordCount = 0;
+        while (end < text.length && wordCount < maxLength) {
+            if (text[end] === ' ' || text[end] === '\n') {
+                wordCount++;
+            }
+            end++;
         }
-  
-        const truncatedText = surroundingWords.slice(0, maxLength).join(' ');
-        return truncatedText + '...';
+        // Adjust the end index to ensure it ends at a word boundary
+        if (end < text.length) {
+            while (end < text.length && !/\s/.test(text[end])) {
+                end++;
+            }
+        }
+        const truncatedText = text.substring(start, end).trim();
+        return truncatedText + (end < text.length ? '...' : '');
     }
   
     const words = text.split(/\s/).filter(w => w);
     return words.slice(0, maxLength).join(' ') + (words.length > maxLength ? '...' : '');
 }
-  
-  
+
 /**
  * Get caption for picture
  *
