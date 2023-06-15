@@ -12,4 +12,6 @@ interface Window {
             debug: boolean;
         }
     };
+
+    locale: any;
 }

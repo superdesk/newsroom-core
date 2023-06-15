@@ -256,12 +256,12 @@ export function hasLocationNotes(item: any) {
  */
 export function getPublicContacts(item: any) {
     const contacts = get(item, 'event.event_contact_info', []);
-    return contacts.filter(c => c.public).map(c => ({
+    return contacts.filter((c: any) => c.public).map((c: any) => ({
         name: [c.first_name, c.last_name].filter((x) => !!x).join(' '),
         organisation: c.organisation || '',
         email: (c.contact_email || []).join(', '),
-        phone: (c.contact_phone || []).filter(m => m.public).map(m => m.number).join(', '),
-        mobile: (c.mobile || []).filter(m => m.public).map(m => m.number).join(', '),
+        phone: (c.contact_phone || []).filter((m: any) => m.public).map((m: any) => m.number).join(', '),
+        mobile: (c.mobile || []).filter((m: any) => m.public).map((m: any) => m.number).join(', '),
     }));
 }
 
@@ -272,12 +272,12 @@ export function getPublicContacts(item: any) {
  * @return {String}
  */
 export function getCalendars(item: any) {
-    return (get(item, 'calendars') || []).map(cal => cal.name).join(', ');
+    return (get(item, 'calendars') || []).map((cal: any) => cal.name).join(', ');
 }
 
 export function getAgendaNames(item: any) {
     return (get(item, 'agendas') || [])
-        .map((agenda) => agenda.name)
+        .map((agenda: any) => agenda.name)
         .join(', ');
 }
 
@@ -463,8 +463,8 @@ export function getDataFromCoverages(item: any) {
         'scheduled_update_status': {},
     };
 
-    planningItems.forEach(p => {
-        (get(p, 'coverages') || []).forEach((c) => {
+    planningItems.forEach((p: any) => {
+        (get(p, 'coverages') || []).forEach((c: any) => {
             ['internal_note', 'ednote', 'workflow_status_reason'].forEach((field) => {
 
                 // Don't populate if the value is same as the field in upper level planning_item
@@ -506,13 +506,13 @@ const getNextPendingScheduledUpdate = (coverage: any) => {
         return coverage.scheduled_updates[0];
     }
 
-    const lastScheduledDelivery = (coverage.deliveries.reverse()).find((d) => d.scheduled_update_id);
+    const lastScheduledDelivery = (coverage.deliveries.reverse()).find((d: any) => d.scheduled_update_id);
     // More deliveries, but no scheduled_update was published
     if (!lastScheduledDelivery) {
         return coverage.scheduled_updates[0];
     }
 
-    const lastPublishedShceduledUpdateIndex = coverage.scheduled_updates.findIndex((s) =>
+    const lastPublishedShceduledUpdateIndex = coverage.scheduled_updates.findIndex((s: any) =>
         s.scheduled_update_id === lastScheduledDelivery.scheduled_update_id);
 
     if (lastPublishedShceduledUpdateIndex === coverage.scheduled_updates.length - 1) {
@@ -575,7 +575,7 @@ export function getDescription(item: any, plan: any) {
  * @return {Array} list of dates
  */
 export function getExtraDates(item: any) {
-    return getDisplayDates(item).map((ed) => moment(ed.date));
+    return getDisplayDates(item).map((ed: any) => moment(ed.date));
 }
 
 /**
@@ -590,20 +590,20 @@ export function getDisplayDates(item: any) {
         return get(item, 'display_dates') || [];
     }
 
-    const dates = [];
+    const dates: Array<any> = [];
     const planningItems = get(item, 'planning_items') || [];
     const planningIds = item._hits.matched_planning_items;
     const coverageIds = get(item, '_hits.matched_coverages') != null ?
         item._hits.matched_coverages :
-        (get(item, 'coverages') || []).map((coverage) => coverage.coverage_id);
+        (get(item, 'coverages') || []).map((coverage: any) => coverage.coverage_id);
 
     planningItems
-        .forEach((plan) => {
+        .forEach((plan: any) => {
             if (!planningIds.includes(plan._id)) {
                 return;
             }
 
-            const coverages = (get(plan, 'coverages') || []).filter((coverage) => coverage.scheduled);
+            const coverages = (get(plan, 'coverages') || []).filter((coverage: any) => coverage.scheduled);
 
             if (!coverages.length) {
                 dates.push({date: plan.planning_date});
