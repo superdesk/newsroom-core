@@ -45,13 +45,13 @@ class Analytics {
     }
 
     sendEvents(events: any) {
-        events.forEach((event) => {
+        events.forEach((event: any) => {
             this._event(event);
         });
     }
 
     multiItemEvent(event: any, items: any) {
-        items.forEach((item) => item && this.itemEvent(event, item));
+        items.forEach((item: any) => item && this.itemEvent(event, item));
     }
 }
 

@@ -85,11 +85,11 @@ export function fetchWireItemsForAgenda(item: any) {
 
         if (wireIds.length > 0){
             return server.get(`/wire/items/${wireIds.join(',')}`)
-                .then((items) => {
+                .then((items: any) => {
                     dispatch(agendaWireItems(items));
                     return Promise.resolve(items);
                 })
-                .catch((error) => errorHandler(error, dispatch));
+                .catch((error: any) => errorHandler(error, dispatch));
         }
     };
 }
@@ -110,7 +110,7 @@ export function requestCoverage(item: any, message: any) {
         const data: any = {item: item._id, message};
         return server.post(url, data)
             .then(() => notify.success(gettext('Your inquiry has been sent successfully')))
-            .catch((arg) => {
+            .catch((arg: any) => {
                 errorHandler(arg);
             });
     };
@@ -250,8 +250,8 @@ function search(state: any, next?: any) {
     };
 
     const queryString = Object.keys(params)
-        .filter((key) => params[key])
-        .map((key) => [key, params[key]].join('='))
+        .filter((key: any) => params[key])
+        .map((key: any) => [key, params[key]].join('='))
         .join('&');
 
     return server.get(`/agenda/search?${queryString}&tick=${Date.now().toString()}`);
@@ -265,7 +265,7 @@ export function fetchItems() {
         const start = Date.now();
         dispatch(queryItems());
         return search(getState())
-            .then((data) => dispatch(recieveItems(data)))
+            .then((data: any) => dispatch(recieveItems(data)))
             .then(() => {
                 analytics.timingComplete('search', Date.now() - start);
             })
@@ -276,7 +276,7 @@ export function fetchItems() {
 export function fetchItem(id: any) {
     return (dispatch: any) => {
         return server.get(`/agenda/${id}?format=json`)
-            .then((data) => dispatch(recieveItem(data)))
+            .then((data: any) => dispatch(recieveItem(data)))
             .catch(errorHandler);
     };
 }
@@ -323,7 +323,7 @@ export function shareItems(items: any) {
         const company = getState().company;
         return server.get(`/companies/${company}/users`)
             .then((users) => users.filter((u: any) => u._id !== user))
-            .then((users) => dispatch(renderModal('shareItem', {items, users})))
+            .then((users: any) => dispatch(renderModal('shareItem', {items, users})))
             .catch(errorHandler);
     };
 }
@@ -448,7 +448,7 @@ export function pushNotification(push: any) {
 export function reloadMyTopics(reloadTopic: any = false) {
     return function(dispatch: any) {
         return loadMyTopics()
-            .then((data) => {
+            .then((data: any) => {
                 const agendaTopics = data.filter((topic: any) => topic.topic_type === 'agenda');
                 dispatch(setTopics(agendaTopics));
 
@@ -568,7 +568,7 @@ export function fetchMoreItems() {
 
         dispatch(startLoading());
         return search(getState(), true)
-            .then((data) => dispatch(recieveNextItems(data)))
+            .then((data: any) => dispatch(recieveNextItems(data)))
             .catch(errorHandler);
     };
 }

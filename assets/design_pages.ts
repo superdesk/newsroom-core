@@ -172,13 +172,13 @@ function setupClosePreviewOnMobile() {
 
 function setupBootstrapElementsFromServerTemplates() {
     if (!isTouchDevice()) {
-        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((ele) => {
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((ele: any) => {
             new Tooltip(ele);
         });
     }
 
     // design view dropdown fix
-    document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach((ele) => {
+    document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach((ele: any) => {
         new Dropdown(ele);
     });
 }

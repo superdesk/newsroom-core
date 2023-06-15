@@ -55,17 +55,17 @@ export function getEditUsers(item: any) {
         const itemUsers = ([
             item.original_creator,
             item.version_creator
-        ].filter((u) => u));
+        ].filter((u: any) => u));
         const editUsers = getState().editUsers || [];
 
         if (!get(item, 'version_creator') && !get(item, 'original_creator')) {
             return Promise.resolve();
         }
 
-        findUsers = differenceBy(editUsers, itemUsers.map((u) => ({'_id': u})), '_id');
+        findUsers = differenceBy(editUsers, itemUsers.map((u: any) => ({'_id': u})), '_id');
         if (editUsers.length === 0 || findUsers.length > 0) {
             return server.get(`/users/search?ids=${itemUsers.join(',')}`)
-                .then((data) => {
+                .then((data: any) => {
                     dispatch({
                         type: ADD_EDIT_USERS,
                         data

@@ -154,7 +154,7 @@ export function gettext(text: any, params?: any) {
     let translated = get(window.translations, text, text);
 
     if (params) {
-        Object.keys(params).forEach((param) => {
+        Object.keys(params).forEach((param: any) => {
             const paramRegexp = new RegExp('{{ ?' + param + ' ?}}', 'g');
             translated = translated.replace(paramRegexp, params[param] || '');
         });
@@ -469,7 +469,7 @@ export function toggleValue(items: any, value: any) {
         return [value];
     }
 
-    const without = items.filter((x) => value !== x);
+    const without = items.filter((x: any) => value !== x);
     return without.length === items.length ? without.concat([value]) : without;
 }
 
@@ -477,7 +477,7 @@ export function toggleValue(items: any, value: any) {
 export function updateRouteParams(updates: any, state: any, deleteEmpty: any = true) {
     const params = new URLSearchParams(window.location.search);
 
-    Object.keys(updates).forEach((key) => {
+    Object.keys(updates).forEach((key: any) => {
         let updatedValue = updates[key];
         if (!deleteEmpty || !isEmpty(updatedValue) || typeof updatedValue === 'boolean') {
             if (typeof updatedValue === 'object') {
@@ -601,7 +601,7 @@ export function getEmbargo(item: any) {
 }
 
 export function getItemFromArray(value: any, items: Array<any> = [], field: any = '_id') {
-    return items.find((i) => i[field] === value);
+    return items.find((i: any) => i[field] === value);
 }
 
 export function upperCaseFirstCharacter(text: any) {
@@ -613,7 +613,7 @@ export function postHistoryAction(item: any, action: any, section: any = 'wire')
         item: item,
         action: action,
         section: section
-    }).catch((error) => errorHandler(error));
+    }).catch((error: any) => errorHandler(error));
 }
 
 export function recordAction(item: any, action: any = 'open', section: any = 'wire', state: any = null) {
@@ -667,7 +667,7 @@ export function isActionEnabled(configKey: any) {
     return (action: any) => config[action.id] == null || config[action.id];
 }
 
-export const getPlainTextMemoized = memoize((html) => getTextFromHtml(html));
+export const getPlainTextMemoized = memoize((html: any) => getTextFromHtml(html));
 
 export function shouldShowListShortcutActionIcons(listConfig: any, isExtended: any) {
     const showActionIconsConfig = listConfig.show_list_action_icons || {

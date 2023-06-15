@@ -10,7 +10,7 @@ export const itemToOpen = (state: any) => get(state, 'itemToOpen') || null;
 export const userSectionsSelector = (state: any) => get(state, 'userSections');
 export const modalItems = (state: any) => get(state, 'modal.data.items') || [];
 
-export const getFormats = createSelector([formats],(f) => (f.map((format) =>
+export const getFormats = createSelector([formats],(f) => (f.map((format: any) =>
     ({value: format.format, text: format.name}))));
 
 export const getContextName = createSelector(
@@ -24,17 +24,17 @@ export const modalOptions = createSelector(
         let options = fmts;
         if (items && items.length) {
             const itemType = cntxt === 'agenda' ? 'agenda' : 'wire';
-            const hasPicture = items.every((itemId) => getPicture(itemsById && itemsById[itemId] || openItem));
-            options = options.filter((opt) => get(opt, 'types', ['wire', 'agenda']).includes(itemType));
+            const hasPicture = items.every((itemId: any) => getPicture(itemsById && itemsById[itemId] || openItem));
+            options = options.filter((opt: any) => get(opt, 'types', ['wire', 'agenda']).includes(itemType));
             if (!hasPicture) {
-                options = options.filter((opt) => get(opt, 'assets', ['text']).includes('text'));
+                options = options.filter((opt: any) => get(opt, 'assets', ['text']).includes('text'));
             }
         }
 
-        return options.map((format) => ({value: format.format, text: format.name}));
+        return options.map((format: any) => ({value: format.format, text: format.name}));
     }
 );
 
 export const modalSecondaryFormatOptions = createSelector(
-    [secondaryFormats], (fmts) => ( fmts.map((format) => ({value: format.format, text: format.name})) )
+    [secondaryFormats], (fmts) => ( fmts.map((format: any) => ({value: format.format, text: format.name})) )
 );

@@ -10,7 +10,7 @@ const canWatchAgendaItem = (state: any, item: any, includeCoverages: any) => {
         return result;
     }
 
-    const coveragesWatched = (get(item, 'coverages') || []).filter((c) => isWatched(c, state.user));
+    const coveragesWatched = (get(item, 'coverages') || []).filter((c: any) => isWatched(c, state.user));
     return coveragesWatched.length > 0 ? false : result;
 };
 

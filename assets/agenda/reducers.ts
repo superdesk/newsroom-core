@@ -62,7 +62,7 @@ const initialState: any = {
 
 function recieveItems(state: any, data: any) {
     const itemsById = Object.assign({}, state.itemsById);
-    const items = data._items.map((item) => {
+    const items = data._items.map((item: any) => {
         itemsById[item._id] = item;
         return item._id;
     });
@@ -106,10 +106,10 @@ export default function agendaReducer(state: any = initialState, action: any) {
 
     case WATCH_EVENTS: {
         const itemsById = Object.assign({}, state.itemsById);
-        action.items.forEach((_id) => {
+        action.items.forEach((_id: any) => {
             const watches = get(itemsById[_id], 'watches', []).concat(state.user);
             itemsById[_id] = Object.assign({}, itemsById[_id], {watches});
-            (get(itemsById[_id], 'coverages') || []).forEach((c) => {
+            (get(itemsById[_id], 'coverages') || []).forEach((c: any) => {
                 if (get(c, 'watches.length', 0) > 0) {
                     c.watches = [];
                 }
@@ -122,7 +122,7 @@ export default function agendaReducer(state: any = initialState, action: any) {
     case WATCH_COVERAGE: {
         const itemsById = Object.assign({}, state.itemsById);
         const item = itemsById[get(action, 'item._id')];
-        const coverage = (get(item, 'coverages') || []).find((c) => c.coverage_id === action.coverage.coverage_id);
+        const coverage = (get(item, 'coverages') || []).find((c: any) => c.coverage_id === action.coverage.coverage_id);
         if (coverage) {
             coverage['watches'] = uniq([
                 ...(get(coverage, 'watches') || []),
@@ -136,9 +136,9 @@ export default function agendaReducer(state: any = initialState, action: any) {
     case STOP_WATCHING_COVERAGE: {
         const itemsById = Object.assign({}, state.itemsById);
         const item = itemsById[get(action, 'item._id')];
-        const coverage = (get(item, 'coverages') || []).find((c) => c.coverage_id === action.coverage.coverage_id);
+        const coverage = (get(item, 'coverages') || []).find((c: any) => c.coverage_id === action.coverage.coverage_id);
         if (coverage) {
-            coverage['watches'] = (get(coverage, 'watches') || []).filter((u) => u !== state.user);
+            coverage['watches'] = (get(coverage, 'watches') || []).filter((u: any) => u !== state.user);
         }
 
         return {...state, itemsById};
@@ -146,8 +146,8 @@ export default function agendaReducer(state: any = initialState, action: any) {
 
     case STOP_WATCHING_EVENTS: {
         const itemsById = Object.assign({}, state.itemsById);
-        action.items.forEach((_id) => {
-            const watches = get(itemsById[_id], 'watches', []).filter((userId) => userId !== state.user);
+        action.items.forEach((_id: any) => {
+            const watches = get(itemsById[_id], 'watches', []).filter((userId: any) => userId !== state.user);
             itemsById[_id] = Object.assign({}, itemsById[_id], {watches});
         });
 
@@ -162,7 +162,7 @@ export default function agendaReducer(state: any = initialState, action: any) {
         if(itemsById[item._id]) {
             if (get(item, 'state') === 'killed') {
                 delete itemsById[item._id];
-                updatedItems = updatedItems.filter((i) => i !== item._id);
+                updatedItems = updatedItems.filter((i: any) => i !== item._id);
             } else {
                 itemsById[item._id] = item;
             }

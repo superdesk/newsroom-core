@@ -87,7 +87,7 @@ function getReadItems(state: any, item: any) {
 function updateItemActions(state: any, items: any, action: any) {
     const itemsById = Object.assign({}, state.itemsById);
 
-    items.map((item) => {
+    items.map((item: any) => {
         itemsById[item] = Object.assign({}, itemsById[item]);
         itemsById[item][action] = (itemsById[item][action] || []).concat([state.user]);
     });
@@ -108,7 +108,7 @@ export function defaultReducer(state: any = {}, action: any) {
         const itemsById: any = {};
         const items = [];
 
-        action.items.forEach((item) => {
+        action.items.forEach((item: any) => {
             if (!itemsById[item._id]) {
                 itemsById[item._id] = item;
                 items.push(item._id);
@@ -186,7 +186,7 @@ export function defaultReducer(state: any = {}, action: any) {
 
     case RECIEVE_NEXT_ITEMS: {
         const itemsById = Object.assign({}, state.itemsById);
-        const newItems = action.data._items.map((item) => {
+        const newItems = action.data._items.map((item: any) => {
             if (!itemsById[item._id]) {
                 itemsById[item._id] = item;
             }
@@ -277,7 +277,7 @@ export function defaultReducer(state: any = {}, action: any) {
         const itemsById = Object.assign({}, state.itemsById);
         const bookmarkedItems = state.bookmarkedItems || [];
 
-        const missing = action.items.filter((item) => {
+        const missing = action.items.filter((item: any) => {
             itemsById[item] = Object.assign({}, itemsById[item]);
             itemsById[item].bookmarks = (itemsById[item].bookmarks || []).concat([state.user]);
             return bookmarkedItems.indexOf(item) === -1;
@@ -294,9 +294,9 @@ export function defaultReducer(state: any = {}, action: any) {
         const itemsById = Object.assign({}, state.itemsById);
         const bookmarkedItems = state.bookmarkedItems || [];
 
-        const bookmarks = action.items.filter((item) => {
+        const bookmarks = action.items.filter((item: any) => {
             itemsById[item] = Object.assign({}, itemsById[item]);
-            itemsById[item].bookmarks = (itemsById[item].bookmarks || []).filter((val) => val !== state.user);
+            itemsById[item].bookmarks = (itemsById[item].bookmarks || []).filter((val: any) => val !== state.user);
             return bookmarkedItems.indexOf(item) === -1;
         });
 
@@ -309,7 +309,7 @@ export function defaultReducer(state: any = {}, action: any) {
 
     case SET_NEW_ITEM_BY_TOPIC: {
         const newItemsByTopic = Object.assign({}, state.newItemsByTopic);
-        action.data.topics.map((topic) => {
+        action.data.topics.map((topic: any) => {
             const previous = newItemsByTopic[topic] || [];
             newItemsByTopic[topic] = previous.concat([action.data.item]);
         });
@@ -341,8 +341,8 @@ export function defaultReducer(state: any = {}, action: any) {
             ...state,
             newItems: uniq([
                 ...state.newItems,
-                ...(action.data._items.filter((item) => (!item.nextversion && !state.itemsById[item._id]
-                ) || get(state.itemsById, `${item._id}.versioncreated`) !== item.versioncreated).map((item) => item._id))
+                ...(action.data._items.filter((item: any) => (!item.nextversion && !state.itemsById[item._id]
+                ) || get(state.itemsById, `${item._id}.versioncreated`) !== item.versioncreated).map((item: any) => item._id))
             ]),
         };
     }
