@@ -4,7 +4,9 @@ import {get} from 'lodash';
 
 import {gettext} from 'utils';
 import {canUserUpdateTopic} from 'users/utils';
+
 import {SearchResultTagList} from './SearchResultTagList';
+import {Tag} from 'components/Tag';
 
 export function SearchResultsTopicRow({
     user,
@@ -19,75 +21,40 @@ export function SearchResultsTopicRow({
     deselectMyTopic,
 }) {
     const tags = [];
-    const buttons = [];
     const hasActiveTopic = get(activeTopic, '_id') != null;
 
     if (hasActiveTopic) {
-        tags.push({
-            text: activeTopic.label,
-            shade: 'inverse',
-            onClick: () => {
-                deselectMyTopic(activeTopic._id);
-            },
-        });
-
-        if (showSaveTopic && canUserUpdateTopic(user, activeTopic)) {
-            buttons.push((
-                <button
-                    key="update_topic_button"
-                    className="btn btn-outline-secondary btn-responsive btn--small"
-                    onClick={() => {
-                        saveMyTopic(Object.assign(
-                            {},
-                            activeTopic,
-                            searchParams,
-                            {query: searchParams.query},
-                            {topic_type: topicType},
-                            {filter: searchParams.filter}
-                        ));
-                    }}
-                >
-                    {gettext('Update topic')}
-                </button>
-            ));
-        }
+        tags.push(
+            <Tag
+                key="tags-topics--topic"
+                text={activeTopic.label}
+                shade="inverse"
+                onClick={() => {
+                    deselectMyTopic(activeTopic._id);
+                }}
+            />
+        );
     }
 
     if (get(searchParams, 'navigation.length', 0)) {
         searchParams.navigation.forEach((navId) => {
             const navigation = navigations[navId];
 
-            tags.push({
-                text: navigation.name,
-                shade: 'inverse',
-                onClick: () => {
-                    toggleNavigation(navigation);
-                    refresh();
-                },
-            });
+            tags.push(
+                <Tag
+                    key={`tags-topics--nav-${navId}`}
+                    text={navigation.name}
+                    shade="inverse"
+                    onClick={() => {
+                        toggleNavigation(navigation);
+                        refresh();
+                    }}
+                />
+            );
         });
     }
 
-    if (showSaveTopic) {
-        buttons.push((
-            <button
-                key="save_topic_button"
-                className="btn btn-outline-secondary btn-responsive btn--small"
-                onClick={() => {
-                    saveMyTopic(Object.assign(
-                        {},
-                        searchParams,
-                        {topic_type: topicType},
-                        {filter: searchParams.filter}
-                    ));
-                }}
-            >
-                {hasActiveTopic ? gettext('Save as new topic') : gettext('Save new topic')}
-            </button>
-        ));
-    }
-
-    if (!tags.length && !buttons.length) {
+    if (!tags.length && !showSaveTopic) {
         return null;
     }
 
@@ -95,8 +62,45 @@ export function SearchResultsTopicRow({
         <SearchResultTagList
             title={tags.length ? gettext('Topic') : null}
             tags={tags}
-            buttons={buttons}
-        />
+        >
+            {!showSaveTopic ? null : (
+                <div className="tags-list-row__button-group">
+                    {!hasActiveTopic || !canUserUpdateTopic(user, activeTopic) ? null : (
+                        <button
+                            className="nh-button nh-button--tertiary nh-button--small"
+                            onClick={() => {
+                                saveMyTopic(Object.assign(
+                                    {},
+                                    activeTopic,
+                                    searchParams,
+                                    {query: searchParams.query},
+                                    {topic_type: topicType},
+                                    {filter: searchParams.filter}
+                                ));
+                            }}
+                        >
+                            {gettext('Update topic')}
+                        </button>
+                    )}
+                    <button
+                        className="nh-button nh-button--tertiary nh-button--small"
+                        onClick={() => {
+                            saveMyTopic(Object.assign(
+                                {},
+                                searchParams,
+                                {topic_type: topicType},
+                                {filter: searchParams.filter}
+                            ));
+                        }}
+                    >
+                        {hasActiveTopic ?
+                            gettext('Save as new topic') :
+                            gettext('Save new topic')
+                        }
+                    </button>
+                </div>
+            )}
+        </SearchResultTagList>
     );
 }
 

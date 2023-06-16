@@ -1,10 +1,11 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
+import classNames from 'classnames';
 
 import {gettext} from 'utils';
 import {SearchResultTagList} from './SearchResultTagList';
-import classNames from 'classnames';
+import {Tag} from 'components/Tag';
 
 function splitTermKeywords(keywordText) {
     const trimmedKeywordText = keywordText == null ? '' : keywordText.trim();
@@ -40,53 +41,97 @@ export function SearchResultsAdvancedSearchRow({searchParams, toggleAdvancedSear
     };
 
     if (keywords.all.length) {
-        advancedSearchTags.push({text: gettext('and'), operator: true, shade: 'success', readOnly: true});
+        advancedSearchTags.push(
+            <Tag
+                key="tags-advanced--and"
+                text={gettext('and')}
+                operator={true}
+                shade="success"
+                readOnly={true}
+            />
+        );
 
         keywords.all.forEach((term, index) => {
-            advancedSearchTags.push({
-                text: term,
-                shade: 'success',
-                onClick: () => {
-                    removeKeywordEntry('all', index);
-                    refresh();
-                },
-            });
+            advancedSearchTags.push(
+                <Tag
+                    key={`tags-advanced--and-${term}`}
+                    text={term}
+                    shade="success"
+                    onClick={() => {
+                        removeKeywordEntry('all', index);
+                        refresh();
+                    }}
+                />
+            );
         });
     }
 
     if (keywords.any.length) {
         if (advancedSearchTags.length) {
-            advancedSearchTags.push('/');
+            advancedSearchTags.push(
+                <span
+                    key="tag-advanced--separator-any"
+                    className="tag-list__separator"
+                />
+            );
         }
-        advancedSearchTags.push({text: gettext('or'), operator: true, shade: 'info', readOnly: true});
+
+        advancedSearchTags.push(
+            <Tag
+                key="tags-advanced--or"
+                text={gettext('or')}
+                operator={true}
+                shade="info"
+                readOnly={true}
+            />
+        );
 
         keywords.any.forEach((term, index) => {
-            advancedSearchTags.push({
-                text: term,
-                shade: 'info',
-                onClick: () => {
-                    removeKeywordEntry('any', index);
-                    refresh();
-                },
-            });
+            advancedSearchTags.push(
+                <Tag
+                    key={`tags-advanced--or-${term}`}
+                    text={term}
+                    shade="info"
+                    onClick={() => {
+                        removeKeywordEntry('any', index);
+                        refresh();
+                    }}
+                />
+            );
         });
     }
 
     if (keywords.exclude.length) {
         if (advancedSearchTags.length) {
-            advancedSearchTags.push('/');
+            advancedSearchTags.push(
+                <span
+                    key="tag-separator--exclude"
+                    className="tag-list__separator"
+                />
+            );
         }
-        advancedSearchTags.push({text: gettext('not'), operator: true, shade: 'alert', readOnly: true});
+        advancedSearchTags.push(
+            <Tag
+                key="tags-advanced--exclude"
+                text={gettext('not')}
+                operator={true}
+                shade="alert"
+                readOnly={true}
+            />
+        );
 
         keywords.exclude.forEach((term, index) => {
-            advancedSearchTags.push({
-                text: term,
-                shade: 'alert',
-                onClick: () => {
-                    removeKeywordEntry('exclude', index);
-                    refresh();
-                },
-            });
+            advancedSearchTags.push(
+                <Tag
+                    key={`tags-advanced--exclude-${term}`}
+                    text={term}
+                    shade="alert"
+                    onClick={() => {
+                        removeKeywordEntry('exclude', index);
+                        refresh();
+                    }}
+                />
+            );
         });
     }
 
@@ -94,61 +139,64 @@ export function SearchResultsAdvancedSearchRow({searchParams, toggleAdvancedSear
         return null;
     }
 
+    advancedSearchTags.push(
+        <span
+            key="tag-separator--clear"
+            className="tag-list__separator tag-list__separator--blanc"
+        />
+    );
+    advancedSearchTags.push(
+        <button
+            key="tag-clear-button"
+            className='nh-button nh-button--tertiary nh-button--small'
+        >
+            {gettext('Clear')}
+        </button>
+    );
+
     return (
         <React.Fragment>
             <SearchResultTagList
                 title={gettext('Search for')}
                 tags={advancedSearchTags}
-                buttons={[
-                    <button
-                        key="update_topic_button"
-                        className="btn btn-outline-secondary btn-responsive btn--small"
-                        onClick={clearAdvancedSearchParams}
-                    >
-                        {gettext('Clear')}
-                    </button>
-                ]}
             />
             <SearchResultTagList
                 title={gettext('Fields searched')}
             >
-                <div className="tags-list">
+                <div className="toggle-button__group toggle-button__group--spaced toggle-button__group--loose">
                     <button
                         className={classNames(
-                            'toggle-button',
+                            'toggle-button toggle-button--no-txt-transform toggle-button--small',
                             {'toggle-button--active': fields.includes('headline')}
                         )}
                         onClick={() => {
                             toggleAdvancedSearchField('headline');
                             refresh();
                         }}
-                        style={{height: '32px'}}
                     >
                         {gettext('Headline')}
                     </button>
                     <button
                         className={classNames(
-                            'toggle-button',
+                            'toggle-button toggle-button--no-txt-transform toggle-button--small',
                             {'toggle-button--active': fields.includes('slugline')}
                         )}
                         onClick={() => {
                             toggleAdvancedSearchField('slugline');
                             refresh();
                         }}
-                        style={{height: '32px'}}
                     >
                         {gettext('Slugline')}
                     </button>
                     <button
                         className={classNames(
-                            'toggle-button',
+                            'toggle-button toggle-button--no-txt-transform toggle-button--small',
                             {'toggle-button--active': fields.includes('body_html')}
                         )}
                         onClick={() => {
                             toggleAdvancedSearchField('body_html');
                             refresh();
                         }}
-                        style={{height: '32px'}}
                     >
                         {gettext('Body')}
                     </button>

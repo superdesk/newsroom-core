@@ -17,10 +17,8 @@ import {
     deselectMyTopic,
 } from '../../actions';
 
-import {SearchResultsTopicRow} from './SearchResultsTopicRow';
-import {SearchResultsQueryRow} from './SearchResultsQueryRow';
-import {SearchResultsAdvancedSearchRow} from './SearchResultsAdvancedSearchRow';
-import {SearchResultsFiltersRow} from './SearchResultsFiltersRow';
+import {SearchResultTagsList} from './SearchResultTagsList';
+import NewItemsIcon from '../NewItemsIcon';
 
 
 class SearchResultsBarComponent extends React.Component {
@@ -37,89 +35,86 @@ class SearchResultsBarComponent extends React.Component {
 
     render() {
         const {isTagSectionShown} = this.state;
-        const numberFormat = (new Intl.NumberFormat(window.locale || 'en', {style: 'decimal'}));
+        const numberFormatter = (new Intl.NumberFormat(undefined, {style: 'decimal'}));
 
         return (
-            <div className="wire-column__main-header-container">
-                {!this.props.showTotalItems ? null : (
-                    <div className="navbar navbar--flex line-shadow-end--light">
-                        {!this.props.showTotalItems ? null : (
-                            <div className="search-result-count">
-                                {this.props.totalItems === 1 ?
-                                    gettext('1 result') :
-                                    gettext('{{ count }} results', {
-                                        count: numberFormat.format(this.props.totalItems || 0)
-                                    })
-                                }
-                            </div>
-                        )}
-                        <div className="navbar__button-group">
-                            <button
-                                className="btn btn-outline-secondary"
-                                onClick={() => {
-                                    this.props.resetSearchParamsAndUpdateURL();
-                                    this.toggleTagSection();
-                                    this.props.refresh();
-                                }}
-                            >
-                                {gettext('Clear all')}
-                            </button>
-                            <button
-                                onClick={this.toggleTagSection}
-                                className="icon-button icon-button--bordered"
-                            >
-                                <i className={classNames(
-                                    'icon--arrow-right',
-                                    {
-                                        'icon--collapsible-open': isTagSectionShown,
-                                        'icon--collapsible-closed': !isTagSectionShown,
+            <React.Fragment>
+                <div className="wire-column__main-header-container">
+                    {!this.props.showTotalItems ? null : (
+                        <div className="navbar navbar--flex line-shadow-end--light">
+                            {!this.props.showTotalItems ? null : (
+                                <div className="search-result-count">
+                                    {this.props.totalItems === 1 ?
+                                        gettext('1 result') :
+                                        gettext('{{ count }} results', {
+                                            count: numberFormatter.format(this.props.totalItems || 0)
+                                        })
                                     }
-                                )} />
-                            </button>
+                                </div>
+                            )}
+                            <div className="navbar__button-group">
+                                <button
+                                    className="nh-button nh-button--tertiary"
+                                    onClick={() => {
+                                        this.props.resetSearchParamsAndUpdateURL();
+                                        this.toggleTagSection();
+                                        this.props.refresh();
+                                    }}
+                                >
+                                    {gettext('Clear all')}
+                                </button>
+                                <button
+                                    onClick={this.toggleTagSection}
+                                    className="icon-button icon-button--tertiary icon-button--bordered"
+                                >
+                                    <i className={classNames(
+                                        'icon--arrow-right',
+                                        {
+                                            'icon--collapsible-open': isTagSectionShown,
+                                            'icon--collapsible-closed': !isTagSectionShown,
+                                        }
+                                    )} />
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                    {!isTagSectionShown ? null : (
+                        <SearchResultTagsList
+                            user={this.props.user}
+                            showSaveTopic={this.props.showSaveTopic}
+                            saveMyTopic={this.props.saveMyTopic}
+                            searchParams={this.props.searchParams}
+                            activeTopic={this.props.activeTopic}
+                            topicType={this.props.topicType}
+                            refresh={this.props.refresh}
+                            navigations={this.props.navigations}
+                            filterGroups={this.props.filterGroups}
+                            toggleNavigation={this.props.toggleNavigation}
+                            toggleAdvancedSearchField={this.props.toggleAdvancedSearchField}
+                            setQuery={this.props.setQuery}
+                            setAdvancedSearchKeywords={this.props.setAdvancedSearchKeywords}
+                            toggleFilter={this.props.toggleFilter}
+                            setCreatedFilter={this.props.setCreatedFilter}
+                            clearAdvancedSearchParams={this.props.clearAdvancedSearchParams}
+                            deselectMyTopic={this.props.deselectMyTopic}
+                            resetFilter={this.props.resetFilter}
+                        />
+                    )}
+
+                    {this.props.children}
+                </div>
+
+                {!(this.props.newItems || []).length ? null : (
+                    <div className="navbar navbar--flex navbar--small">
+                        <div className="navbar__inner navbar__inner--end">
+                            <NewItemsIcon
+                                newItems={this.props.newItems}
+                                refresh={this.props.refresh}
+                            />
                         </div>
                     </div>
                 )}
-                {!isTagSectionShown ? null : (
-                    <div className="navbar navbar--flex line-shadow-end--light navbar--auto-height">
-                        <ul className="search-result__tags-list">
-                            <SearchResultsTopicRow
-                                user={this.props.user}
-                                searchParams={this.props.searchParams}
-                                activeTopic={this.props.activeTopic}
-                                navigations={this.props.navigations}
-                                showSaveTopic={this.props.showSaveTopic}
-                                topicType={this.props.topicType}
-                                saveMyTopic={this.props.saveMyTopic}
-                                toggleNavigation={this.props.toggleNavigation}
-                                refresh={this.props.refresh}
-                                deselectMyTopic={this.props.deselectMyTopic}
-                            />
-                            <SearchResultsQueryRow
-                                searchParams={this.props.searchParams}
-                                setQuery={this.props.setQuery}
-                                refresh={this.props.refresh}
-                            />
-                            <SearchResultsAdvancedSearchRow
-                                searchParams={this.props.searchParams}
-                                toggleAdvancedSearchField={this.props.toggleAdvancedSearchField}
-                                setAdvancedSearchKeywords={this.props.setAdvancedSearchKeywords}
-                                refresh={this.props.refresh}
-                                clearAdvancedSearchParams={this.props.clearAdvancedSearchParams}
-                            />
-                            <SearchResultsFiltersRow
-                                searchParams={this.props.searchParams}
-                                filterGroups={this.props.filterGroups}
-                                toggleFilter={this.props.toggleFilter}
-                                setCreatedFilter={this.props.setCreatedFilter}
-                                resetFilter={this.props.resetFilter}
-                                refresh={this.props.refresh}
-                            />
-                        </ul>
-                    </div>
-                )}
-
-                {this.props.children}
-            </div>
+            </React.Fragment>
         );
     }
 }
