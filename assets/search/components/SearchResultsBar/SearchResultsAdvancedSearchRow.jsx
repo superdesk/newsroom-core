@@ -149,6 +149,10 @@ export function SearchResultsAdvancedSearchRow({searchParams, toggleAdvancedSear
         <button
             key="tag-clear-button"
             className='nh-button nh-button--tertiary nh-button--small'
+            onClick={() => {
+                clearAdvancedSearchParams();
+                refresh();
+            }}
         >
             {gettext('Clear')}
         </button>
