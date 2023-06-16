@@ -9,11 +9,10 @@ import {canUserEditTopic} from 'topics/utils';
 import types from 'wire/types';
 
 import TopicForm from './TopicForm';
-import TopicParameters from './TopicParameters';
 import {fetchNavigations} from 'navigations/actions';
 import {submitFollowTopic as submitWireFollowTopic, subscribeToTopic, unsubscribeToTopic} from 'search/actions';
 import {submitFollowTopic as submitProfileFollowTopic, hideModal, setTopicEditorFullscreen} from 'user-profile/actions';
-import {topicEditorFullscreenSelector} from 'user-profile/selectors';
+import {topicEditorFullscreenSelector, foldersSelector} from 'user-profile/selectors';
 import {loadMyWireTopic} from 'wire/actions';
 import {loadMyAgendaTopic} from 'agenda/actions';
 import EditPanel from 'components/EditPanel';
@@ -36,6 +35,7 @@ class TopicEditor extends React.Component {
         this.onSubscribeChanged = this.onSubscribeChanged.bind(this);
         this.saveTopic = this.saveTopic.bind(this);
         this.handleTabClick = this.handleTabClick.bind(this);
+        this.onFolderChange = this.onFolderChange.bind(this);
     }
 
     componentDidMount() {
@@ -81,7 +81,7 @@ class TopicEditor extends React.Component {
 
     updateFormValidity(topic) {
         const original = get(this.props, 'topic') || {};
-        const isDirty = ['label', 'notifications', 'is_global'].some(
+        const isDirty = ['label', 'notifications', 'is_global', 'folder'].some(
             (field) => get(original, field) !== get(topic, field)
         ) || !isEqual(original.subscribers, topic.subscribers);
 
@@ -129,6 +129,15 @@ class TopicEditor extends React.Component {
 
         this.setState({topic});
         this.props.onTopicChanged();
+    }
+
+    onFolderChange(folder) {
+        const topic = {...this.state.topic};
+
+        topic.folder = folder ? folder._id : null;
+
+        this.setState({topic});
+        this.updateFormValidity(topic);
     }
 
     saveTopic(event) {
@@ -216,6 +225,8 @@ class TopicEditor extends React.Component {
 
         return (
             <div
+                role="dialog"
+                aria-label={this.getTitle()}
                 data-test-id="user-topic-editor"
                 className={showTabs ? 'list-item__preview' : containerClasses}
             >
@@ -258,10 +269,7 @@ class TopicEditor extends React.Component {
                         ))}
                     </ul>
                 )}
-                <div className={classNames(
-                    'list-item__preview-form',
-                    {'list-item__preview-form--no-padding': this.state.activeTab === 'subscribers'}
-                )}>
+                <div className="list-item__preview-content">
                     {this.state.activeTab === 'topic' && updatedTopic && (
                         <React.Fragment>
                             <TopicForm
@@ -272,10 +280,8 @@ class TopicEditor extends React.Component {
                                 onChange={this.onChangeHandler}
                                 onSubscribeChanged={this.onSubscribeChanged}
                                 readOnly={isReadOnly}
-                            />
-                            <TopicParameters
-                                topic={updatedTopic}
-                                navigations={this.props.navigations}
+                                folders={this.props.folders}
+                                onFolderChange={this.onFolderChange}
                             />
                         </React.Fragment>
                     )}
@@ -340,6 +346,7 @@ TopicEditor.propTypes = {
     isAdmin: PropTypes.bool,
     companyUsers: PropTypes.array,
     user: PropTypes.object,
+    folders: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
@@ -348,6 +355,7 @@ const mapStateToProps = (state) => ({
     navigations: state.navigations || [],
     editorFullscreen: topicEditorFullscreenSelector(state),
     companyUsers: state.monitoringProfileUsers || [],
+    folders: foldersSelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({

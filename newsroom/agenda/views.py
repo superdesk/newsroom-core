@@ -10,7 +10,7 @@ from superdesk import get_resource_service
 
 from newsroom.agenda import blueprint
 from newsroom.template_filters import is_admin_or_internal, is_admin
-from newsroom.topics import get_user_topics
+from newsroom.topics import get_company_folders, get_user_folders, get_user_topics
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.auth import get_company, get_user, get_user_id
 from newsroom.decorator import login_required, section
@@ -138,6 +138,8 @@ def get_view_data():
         "ui_config": get_resource_service("ui_config").get_section_config("agenda"),
         "groups": app.config.get("AGENDA_GROUPS", []),
         "has_agenda_featured_items": get_resource_service("agenda_featured").find_one(req=None) is not None,
+        "user_folders": get_user_folders(user, "agenda") if user else [],
+        "company_folders": get_company_folders(company, "agenda") if company else [],
     }
 
 

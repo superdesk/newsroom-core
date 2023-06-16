@@ -1,14 +1,15 @@
-from bson import ObjectId
 import newsroom
-from newsroom.utils import set_original_creator, set_version_creator
 import superdesk
+
+from bson import ObjectId
+from newsroom.utils import set_original_creator, set_version_creator
 
 
 class TopicsResource(newsroom.Resource):
     url = 'users/<regex("[a-f0-9]{24}"):user>/topics'
     resource_methods = ["GET", "POST"]
     item_methods = ["GET", "PATCH", "DELETE"]
-    internal_resource = True
+    collation = True
     schema = {
         "label": {"type": "string", "required": True},
         "query": {"type": "string", "nullable": True},
@@ -37,6 +38,7 @@ class TopicsResource(newsroom.Resource):
         "folder": newsroom.Resource.rel("topic_folders", nullable=True),
         "advanced": {"type": "dict", "nullable": True},
     }
+    datasource = {"source": "topics", "default_sort": [("name", 1)]}
 
 
 class TopicsService(newsroom.Service):

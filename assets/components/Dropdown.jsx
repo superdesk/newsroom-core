@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {Dropdown as BootstrapDropdown} from 'bootstrap';
 
-export function Dropdown({children, isActive, icon, label, className, buttonProps}) {
+export function Dropdown({children, isActive, icon, label, className, buttonProps, small, stretch}) {
 
     const dropdown = React.useRef();
     let dropdownInstance = null;
 
     React.useEffect(() => {
-        dropdownInstance = BootstrapDropdown.getOrCreateInstance(dropdown.current, {autoClose: true});
+        dropdownInstance = BootstrapDropdown.getOrCreateInstance(dropdown.current, {boundary: 'window'});
 
         function clickOutside() {
             dropdownInstance.hide();
@@ -41,6 +41,8 @@ export function Dropdown({children, isActive, icon, label, className, buttonProp
                 {
                     active: isActive,
                     'nh-dropdown-button--text-only': textOnly,
+                    'nh-dropdown-button--small': small,
+                    'nh-dropdown-button--stretch': stretch,
                 }
             )}
             aria-haspopup="true"
@@ -48,14 +50,14 @@ export function Dropdown({children, isActive, icon, label, className, buttonProp
             ref={dropdown}
         >
             {!icon ? null : (
-                <i className={`${icon} d-md-none`} />
+                <i className={icon} />
             )}
             {textOnly ? label : (
-                <span className="d-none d-md-block">
+                <span className="nh-dropdown-button__text-label">
                     {label}
                 </span>
             )}
-            <i className='icon-small--arrow-down' />
+            <i className='nh-dropdown-button__caret icon-small--arrow-down' />
         </button>
         <div className='dropdown-menu'>
             {children}
@@ -71,6 +73,8 @@ Dropdown.propTypes = {
     className: PropTypes.string,
     autoToggle: PropTypes.bool,
     reset: PropTypes.func,
+    small: PropTypes.bool,
+    stretch: PropTypes.bool,
     buttonProps: PropTypes.shape({
         textOnly: PropTypes.bool,
     }),

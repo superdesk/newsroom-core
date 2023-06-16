@@ -8,17 +8,30 @@ function options(custom={}) {
 }
 
 function checkStatus(response) {
-    if (response.status >= 200 && response.status < 300) {
+    if (response.status === 204) {
+        return {};
+    } else if (response.status >= 200 && response.status < 300) {
         return response.json();
+    } else if (response.status >= 400 && response.status < 500) {
+        return response.json().then((data) => Promise.reject(data));
     } else {
         if (response.type === 'opaqueredirect') {
             window.location.reload();
         } else {
-            var error = new Error(response.statusText);
-            error.response = response;
-            throw error;
+            console.error(response.statusText);
+            return Promise.reject(response);
         }
     }
+}
+
+function getHeaders(etag) {
+    const headers = {'Content-Type': 'application/json'};
+
+    if (etag != null) {
+        headers['If-Match'] = etag;
+    }
+
+    return headers;
 }
 
 
@@ -83,10 +96,10 @@ class Server {
      * @param {String} url
      * @return {Promise}
      */
-    del(url, data) {
+    del(url, data, etag) {
         return fetch(url, options({
             method: 'DELETE',
-            headers: {'Content-Type': 'application/json'},
+            headers: getHeaders(etag),
             body: data ? JSON.stringify(data) : null,
         })).then(checkStatus);
     }
@@ -98,10 +111,10 @@ class Server {
      * @param {Object} data
      * @return {Promise}
      */
-    patch(url, data) {
+    patch(url, data, etag) {
         return fetch(url, options({
             method: 'PATCH',
-            headers: {'Content-Type': 'application/json'},
+            headers: getHeaders(etag),
             body: JSON.stringify(data),
         })).then(checkStatus);
     }

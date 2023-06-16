@@ -220,3 +220,115 @@ export function pushNotification(push) {
         }
     };
 }
+
+function getUserFoldersUrl(state, id) {
+    const baseUrl = `/api/users/${state.user._id}/topic_folders`;
+
+    return id != null ? `${baseUrl}/${id}` : baseUrl;
+}
+
+function getFoldersUrl(state, global, id) {
+    const baseUrl = global ?
+        `/api/companies/${state.company}/topic_folders` :
+        `/api/users/${state.user._id}/topic_folders`;
+
+    return id != null ? `${baseUrl}/${id}` : baseUrl;
+}
+
+function mergeUpdates(updates, response) {
+    updates._id = response._id;
+    updates._etag = response._etag;
+    updates._status = response._status;
+    updates._updated = response._updated;
+}
+
+export const FOLDER_UPDATED = 'FOLDER_UPDATED';
+export function saveFolder(folder, data, global) {
+    return (dispatch, getState) => {
+        const state = getState();
+        const url = getFoldersUrl(state, global, folder._id);
+
+        if (folder._etag) {
+            const updates = {...data};
+
+            return server.patch(url, updates, folder._etag)
+                .then(() => {
+                    dispatch(fetchFolders(global, true));
+                });
+        } else {
+            const payload = {...data, section: state.selectedMenu === 'events' ? 'agenda' : 'wire'};
+
+            return server.post(url, payload)
+                .then(() => {
+                    dispatch(fetchFolders(global));
+                });
+        }
+    };
+}
+
+export const FOLDER_DELETED = 'FOLDER_DELETED';
+export function deleteFolder(folder, deleteTopics) {
+    return (dispatch, getState) => {
+        const state = getState();
+        const url = getUserFoldersUrl(state, folder._id);
+
+        if (!window.confirm(gettext('Are you sure you want to delete folder?'))) {
+            return;
+        }
+
+        return server.del(url, {topics: deleteTopics}, folder._etag)
+            .then(() => dispatch({type: FOLDER_DELETED, payload: {folder}}));
+    };
+}
+
+export const RECIEVE_FOLDERS = 'RECIEVE_FOLDERS';
+
+export function fetchUserFolders() {
+    return (dispatch, getState) => {
+        const state = getState();
+        const url = getUserFoldersUrl(state);
+
+        return server.get(url).then((res) => {
+            dispatch({type: RECIEVE_FOLDERS, payload: res._items});
+        }, (reason) => {
+            console.error(reason);
+            return Promise.reject();
+        });
+    };
+}
+
+/**
+ * @param {bool} global - fetch company or user folders
+ * @param {bool} force  - force refresh via adding timestamp to url
+ */
+export function fetchFolders(global, force) {
+    return (dispatch, getState) => {
+        const state = getState();
+        const url = getFoldersUrl(state, global) + (force ? `?time=${Date.now()}` : '');
+
+        return server.get(url).then((res) => {
+            dispatch({type: RECIEVE_FOLDERS, payload: res._items});
+        }, (reason) => {
+            console.error(reason);
+            return Promise.reject();
+        });
+    };
+}
+
+export const TOPIC_UPDATED = 'TOPIC_UPDATED';
+export function moveTopic(topicId, folder) {
+    return (dispatch, getState) => {
+        const updates = {
+            folder: folder != null ? folder._id : null,
+        };
+
+        const state = getState();
+        const topic = state.topics.find((topic) => topic._id === topicId);
+        const url = `/api/users/${state.user._id}/topics/${topicId}`;
+
+        server.patch(url, updates, topic._etag).then((response) => {
+            mergeUpdates(updates, response);
+            dispatch({type: TOPIC_UPDATED, payload: {topic, updates}});
+        });
+    };
+}

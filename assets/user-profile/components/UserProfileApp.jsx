@@ -83,6 +83,13 @@ class UserProfileApp extends React.Component {
         }
     }
 
+    hideModal() {
+        // Reload the page when closing the modal
+        // so that all changes to folders/topics are
+        // visible to the user.
+        location.reload();
+    }
+
     renderProfile() {
         const links = this.links.map((link) => {
             link.active = link.name === this.props.selectedMenu;
@@ -97,7 +104,7 @@ class UserProfileApp extends React.Component {
             <div className="profile-container" role={gettext('dialog')} aria-label={links.find((link) => link.active).label}>
                 <div className="profileWrap">
                     <div className="profile__mobile-close d-md-none">
-                        <button className="icon-button" aria-label={gettext('Close')} onClick={this.props.hideModal}>
+                        <button className="icon-button" aria-label={gettext('Close')} onClick={this.hideModal}>
                             <i className="icon--close-thin icon--gray-dark" />
                         </button>
                     </div>
@@ -115,7 +122,7 @@ class UserProfileApp extends React.Component {
                             <h5 className="profile__profile-content-title">
                                 {links.find((link) => link.active).label}
                             </h5>
-                            <button className="profile__profile-content-close" aria-label={gettext('Close')} role="button" onClick={this.props.hideModal}>
+                            <button className="profile__profile-content-close" aria-label={gettext('Close')} role="button" onClick={this.hideModal}>
                                 <i className="icon--close-thin" />
                             </button>
                         </section>
@@ -180,6 +187,7 @@ class UserProfileApp extends React.Component {
             />,
             dropdown,
             profile,
+            <div key="dropdown-placeholder" id="dropdown-placeholder"></div>,
         ];
     }
 }

@@ -19,4 +19,27 @@ def init_app(app):
     )
 
 
+def get_user_folders(user, section):
+    return list(
+        superdesk.get_resource_service("user_topic_folders").get(
+            req=None,
+            lookup={
+                "user": user["_id"],
+                "section": section,
+            },
+        )
+    )
+
+
+def get_company_folders(company, section):
+    return list(
+        superdesk.get_resource_service("company_topic_folders").get(
+            req=None,
+            lookup={
+                "company": company["_id"],
+                "section": section,
+            },
+        )
+    )
+
 from . import views  # noqa
