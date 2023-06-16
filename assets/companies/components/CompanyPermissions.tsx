@@ -118,7 +118,7 @@ function CompanyPermissions({
                                                                 className="form-control"
                                                                 style={{maxWidth: '100px'}}
                                                                 min="0"
-                                                                tabIndex="0"
+                                                                tabIndex={0}
                                                                 value={(seats[product._id] || 0).toString()}
                                                                 onChange={(event: any) => {
                                                                     updateCompanySeats(

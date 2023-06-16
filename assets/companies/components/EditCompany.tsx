@@ -23,6 +23,9 @@ import AuditInformation from 'components/AuditInformation';
 import {EditCompanyDetails} from './EditCompanyDetails';
 
 class EditCompany extends React.Component<any, any> {
+    static propTypes: any;
+    tabs: Array<{label: any; name: string}>;
+
     constructor(props: any) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
@@ -55,7 +58,7 @@ class EditCompany extends React.Component<any, any> {
         if (isEmpty(this.props.users)) {
             return (
                 <tr>
-                    <td colSpan="2">{gettext('There are no users in the company.')}</td>
+                    <td colSpan={2}>{gettext('There are no users in the company.')}</td>
                 </tr>
             );
         }
@@ -135,7 +138,7 @@ class EditCompany extends React.Component<any, any> {
                         <li key={tab.name} className='nav-item'>
                             <a
                                 data-test-id={`tab-${tab.name}`}
-                                name={tab.name}
+                                title={tab.name}
                                 className={`nav-link ${this.state.activeTab === tab.name && 'active'}`}
                                 href='#'
                                 onClick={this.handleTabClick}>{tab.label}
@@ -242,7 +245,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     toggleCompanySection: (sectionId: any) => dispatch(toggleCompanySection(sectionId)),
     toggleCompanyProduct: (productId: any, sectionId: any, enable: any) => dispatch(toggleCompanyProduct(productId, sectionId, enable)),
     updateCompanySeats: (productId: any, seats: any) => dispatch(updateCompanySeats(productId, seats)),
-    saveCompany: (permissions: any) => dispatch(postCompany(permissions)),
+    saveCompany: () => dispatch(postCompany()),
     setError: (errors: any) => dispatch(setError(errors)),
     deleteCompany: () => dispatch(deleteCompany()),
     cancelEdit: (event: any) => dispatch(cancelEdit(event)),

@@ -534,7 +534,7 @@ export function errorHandler(error: any, dispatch?: any, setError?: any) {
  * @param {Mixed} defaultValue
  * @return {Mixed}
  */
-export function getConfig(key: any, defaultValue: any) {
+export function getConfig(key: any, defaultValue?: any) {
     const clientConfig = window && window.newsroom && window.newsroom.client_config || {};
 
     if (Object.keys(clientConfig).length === 0) {

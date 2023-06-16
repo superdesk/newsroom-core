@@ -4,7 +4,7 @@ import {get} from 'lodash';
 import {gettext} from 'utils';
 
 
-const NavigationCard = ({navigation}) => {
+const NavigationCard = ({navigation}: any) => {
     const imageUrl = (navigation: any) => {
         if (get(navigation, 'tile_images.length', 0) === 0) {
             return null;
