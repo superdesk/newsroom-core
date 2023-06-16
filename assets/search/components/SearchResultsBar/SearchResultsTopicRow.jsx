@@ -67,6 +67,7 @@ export function SearchResultsTopicRow({
                 <div className="tags-list-row__button-group">
                     {!hasActiveTopic || !canUserUpdateTopic(user, activeTopic) ? null : (
                         <button
+                            data-test-id="update-topic-btn"
                             className="nh-button nh-button--tertiary nh-button--small"
                             onClick={() => {
                                 saveMyTopic(Object.assign(
@@ -83,6 +84,7 @@ export function SearchResultsTopicRow({
                         </button>
                     )}
                     <button
+                        data-test-id="save-topic-btn"
                         className="nh-button nh-button--tertiary nh-button--small"
                         onClick={() => {
                             saveMyTopic(Object.assign(

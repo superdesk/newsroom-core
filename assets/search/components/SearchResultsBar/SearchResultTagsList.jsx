@@ -28,7 +28,10 @@ export function SearchResultTagsList({
     resetFilter,
 }) {
     return (
-        <ul className="search-result__tags-list">
+        <ul
+            data-test-id="search-result-tags"
+            className="search-result__tags-list"
+        >
             <SearchResultsTopicRow
                 user={user}
                 searchParams={searchParams}

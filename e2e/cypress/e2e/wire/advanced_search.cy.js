@@ -34,6 +34,7 @@ describe('Wire - Advanced Search', function() {
         cy.reload();
         cy.url().should('include', advancedSearchUrlParam);
 
+        WirePage.toggleSearchResultsBar();
         WirePage.showSaveTopicModal();
         UserTopicForm.type({name: 'Sydney Weather'});
         UserTopicForm.saveTopic(true);
@@ -50,6 +51,7 @@ describe('Wire - Advanced Search', function() {
         UserTopicForm.getNewlyCreatedTopicId((topicId) => {
             cy.url().should('include', `topic=${topicId}`);
         });
+        WirePage.toggleSearchResultsBar();
         WirePage
             .getSearchResultTags()
             .contains('Sydney Weather');

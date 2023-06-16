@@ -39,7 +39,10 @@ class SearchResultsBarComponent extends React.Component {
 
         return (
             <React.Fragment>
-                <div className="wire-column__main-header-container">
+                <div
+                    data-test-id="search-results-bar"
+                    className="wire-column__main-header-container"
+                >
                     {!this.props.showTotalItems ? null : (
                         <div className="navbar navbar--flex line-shadow-end--light">
                             {!this.props.showTotalItems ? null : (
@@ -64,6 +67,7 @@ class SearchResultsBarComponent extends React.Component {
                                     {gettext('Clear all')}
                                 </button>
                                 <button
+                                    data-test-id="toggle-search-bar"
                                     onClick={this.toggleTagSection}
                                     className="icon-button icon-button--tertiary icon-button--bordered"
                                 >
