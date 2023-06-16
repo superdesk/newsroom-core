@@ -68,7 +68,7 @@ class ListViewOptions extends React.PureComponent<any, any> {
                 {this.state.isOpen && (
                     <div className='dropdown-menu dropdown-menu-right show'>
                         <h6 className='dropdown-header'>{gettext('Change view')}</h6>
-                        {this.views.map((view) => (
+                        {this.views.map((view: any) => (
                             <button key={view.type}
                                 className='dropdown-item'
                                 onClick={() => this.setView(view)}

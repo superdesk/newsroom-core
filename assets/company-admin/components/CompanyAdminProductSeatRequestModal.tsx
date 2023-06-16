@@ -46,7 +46,7 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component<any, 
         let productIds = Array.from(this.state.productIds);
 
         if (productIds.includes(productId)) {
-            productIds = productIds.filter((pId) => pId !== productId);
+            productIds = productIds.filter((pId: any) => pId !== productId);
         } else {
             productIds.push(productId);
         }
@@ -65,7 +65,7 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component<any, 
     getProductGroups() {
         const products: Array<any> = [];
 
-        this.props.sections.forEach((section) => {
+        this.props.sections.forEach((section: any) => {
             products.push({
                 _id: section._id,
                 name: section.name,
@@ -88,8 +88,8 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component<any, 
 
     render() {
         const sectionProducts = this.getProductGroups();
-        const selectedProducts = this.state.productIds.map((productId) => (
-            this.props.products.find((product) => product._id === productId)
+        const selectedProducts = this.state.productIds.map((productId: any) => (
+            this.props.products.find((product: any) => product._id === productId)
         ));
 
         return (
@@ -114,13 +114,13 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component<any, 
                             <i className="icon--plus">+</i>
                         </button>
                         <ul className="dropdown-menu">
-                            {sectionProducts.map((section, index) => (
+                            {sectionProducts.map((section: any, index: any) => (
                                 <React.Fragment key={section._id}>
                                     <h6 className="dropdown-header">
                                         {section.name}
                                     </h6>
                                     <div className="dropdown-divider" />
-                                    {section.products.map((product) => (
+                                    {section.products.map((product: any) => (
                                         <li key={product._id}>
                                             <button
                                                 className="dropdown-item"
@@ -137,7 +137,7 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component<any, 
                                 </React.Fragment>
                             ))}
                         </ul>
-                        {selectedProducts.map((product) => (
+                        {selectedProducts.map((product: any) => (
                             <Tag
                                 key={product._id}
                                 label={product.product_type === 'wire' ? window.sectionNames.wire : window.sectionNames.agenda}

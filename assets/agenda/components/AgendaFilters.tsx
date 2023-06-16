@@ -66,7 +66,7 @@ const renderFilter: any = {
 
                     let region: any;
                     if (get(activeFilter, `${filter.field}[0]`) && props.locators) {
-                        region = (Object.values(props.locators) || []).find((l) => l.name === get(activeFilter, `${filter.field}[0]`));
+                        region = (Object.values(props.locators) || []).find((l: any) => l.name === get(activeFilter, `${filter.field}[0]`));
                     }
 
                     return region ? (get(region, 'state') || get(region, 'country') || get(region, 'world_region')) : get(activeFilter, `${filter.field}[0]`);
@@ -127,7 +127,7 @@ export function getDropdownItems(filter: any, aggregations: any, toggleFilter: a
 function AgendaFiltersComponent(props: any) {
     return (
         <div className='wire-column__main-header-agenda d-flex m-0 px-3 align-items-center flex-wrap flex-sm-nowrap'>
-            {props.filtersConfig.map((filterName) => (
+            {props.filtersConfig.map((filterName: any) => (
                 renderFilter[filterName](props)
             ))}
         </div>

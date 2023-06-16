@@ -22,7 +22,7 @@ export default function notificationReducer(state: any = initialState, action: a
             ...state,
             notifications: action.notifications,
             notificationCount: action.notifications.length,
-            items: action.items.reduce((itemMap, item) => {
+            items: action.items.reduce((itemMap: any, item: any) => {
                 itemMap[item._id] = item;
 
                 return itemMap;
@@ -51,7 +51,7 @@ export default function notificationReducer(state: any = initialState, action: a
 
 
     case CLEAR_NOTIFICATION:{
-        const notifications = state.notifications.filter((n) => n.item !== action.id);
+        const notifications = state.notifications.filter((n: any) => n.item !== action.id);
         return {
             ...state,
             notifications: notifications,

@@ -24,7 +24,7 @@ function CompanyUsersComponent({users, usersById, selectUser, activeUserId, curr
                         <div>{gettext('Email')}</div>
                     </th>
                     <th>{gettext('Status')}</th>
-                    {sections.map((section) => (
+                    {sections.map((section: any) => (
                         <th key={section._id}>
                             {gettext('{{ section }} Products', {section: section.name})}
                         </th>
@@ -36,7 +36,7 @@ function CompanyUsersComponent({users, usersById, selectUser, activeUserId, curr
                 </tr>
             </thead>
             <tbody>
-                {users.map((userId) => (
+                {users.map((userId: any) => (
                     <CompanyUserListItem
                         key={userId}
                         user={usersById[userId]}

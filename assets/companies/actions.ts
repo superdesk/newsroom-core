@@ -88,10 +88,10 @@ export function fetchCompanies() {
         const query = searchQuerySelector(getState()) || '';
 
         return server.get(`/companies/search?q=${query}`)
-            .then((data) => {
+            .then((data: any) => {
                 dispatch(getCompanies(data));
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -107,10 +107,10 @@ export function fetchCompanyUsers(companyId: any, force: any = false) {
         }
 
         return server.get(`/companies/${companyId}/users`)
-            .then((data) => {
+            .then((data: any) => {
                 return dispatch(getCompanyUsers(data));
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -135,7 +135,7 @@ export function postCompany() {
                 dispatch(fetchCompanies());
                 dispatch(cancelEdit());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -147,10 +147,10 @@ export function postCompany() {
 export function fetchProducts() {
     return function (dispatch) {
         return server.get('/products/search')
-            .then((data) => {
+            .then((data: any) => {
                 dispatch(getProducts(data));
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -170,7 +170,7 @@ export function deleteCompany() {
                 notify.success(gettext('Company deleted successfully'));
                 dispatch(fetchCompanies());
             })
-            .catch((error) => {
+            .catch((error: any) => {
                 if (error.response.status == 403) {
                     error.response.json().then(function(data) {
                         notify.error(data['error']);

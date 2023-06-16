@@ -48,7 +48,7 @@ function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNew
                 </div>
             ) : (
                 <div className="my-3">
-                    {personalTopics.map((topic) => (
+                    {personalTopics.map((topic: any) => (
                         <TopicItem
                             key={topic._id}
                             topic={topic}
@@ -80,7 +80,7 @@ function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNew
                         </div>
                     ) : (
                         <div className="mb-3">
-                            {personalTopics.map((topic) => (
+                            {personalTopics.map((topic: any) => (
                                 <TopicItem
                                     key={topic._id}
                                     topic={topic}
@@ -103,7 +103,7 @@ function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNew
                         </div>
                     ) : (
                         <div className="mb-3">
-                            {globalTopics.map((topic) => (
+                            {globalTopics.map((topic: any) => (
                                 <TopicItem
                                     key={topic._id}
                                     topic={topic}

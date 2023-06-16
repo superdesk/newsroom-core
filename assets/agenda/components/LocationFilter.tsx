@@ -298,7 +298,7 @@ export class LocationFilter extends React.Component<any, any> {
         }
 
         server.get(searchURL)
-            .then((results) => {
+            .then((results: any) => {
                 this.setState({
                     isSearchLoading: false,
                     results: results,

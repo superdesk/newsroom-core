@@ -35,7 +35,7 @@ export default class AgendaLinks extends React.PureComponent<any, any> {
 
     fetchAgendaData() {
         if (get(this.props, 'item._id')) {
-            server.getJson(`agenda/wire_items/${this.props.item._id}`).then((data) => {
+            server.getJson(`agenda/wire_items/${this.props.item._id}`).then((data: any) => {
                 this.setState({
                     'agenda': get(data, 'agenda_item'),
                     'agendaWireItems': get(data, 'wire_items'),
@@ -61,7 +61,7 @@ export default class AgendaLinks extends React.PureComponent<any, any> {
             return [];
         }
 
-        return (get(this.state.agenda, 'coverages') || []).filter((c) => c.coverage_id !== this.props.item.coverage_id);
+        return (get(this.state.agenda, 'coverages') || []).filter((c: any) => c.coverage_id !== this.props.item.coverage_id);
     }
 
     render() {

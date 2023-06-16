@@ -59,7 +59,7 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
 
     const groupFilter = get(activeFilter, group.field, []);
     const activeBuckets = (get(activeFilter, group.field) || [])
-        .map((filter) => ({key: filter}));
+        .map((filter: any) => ({key: filter}));
     const bucketPath = get(group, 'agg_path') || `${group.field}.buckets`;
     const buckets = uniqBy(
         cloneDeep(get(aggregations, bucketPath) || group.buckets || [])
@@ -67,7 +67,7 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
         'key'
     )
         .sort(compareFunction)
-        .map((bucket) => (
+        .map((bucket: any) => (
             <FilterItem
                 key={bucket.key}
                 bucket={bucket}

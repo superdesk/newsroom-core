@@ -49,7 +49,7 @@ class AgendaPreviewEventComponent extends React.Component<any, any> {
     }
 
     toggleExpanded() {
-        this.setState((prevState) => ({expanded: !prevState.expanded}));
+        this.setState((prevState: any) => ({expanded: !prevState.expanded}));
     }
 
     render() {

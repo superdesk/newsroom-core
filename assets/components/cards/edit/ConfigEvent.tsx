@@ -13,7 +13,7 @@ function ConfigEvent ({card, onChange, errors}: any) {
     const events = card.config.events || [{}, {}, {}, {}];
 
     return (
-        events.map((event, index) => {
+        events.map((event: any, index: any) => {
             const prefix = `config.events[${index}].`;
             return (
                 <div key={prefix} className='card' style={{display:'block', marginBottom: '20px'}}>

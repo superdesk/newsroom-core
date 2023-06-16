@@ -43,11 +43,11 @@ function EditUserComponent({
     const stateLabelDetails = getUserStateLabelDetails(user);
     const companyProductIds = companyId != null ?
         Object.keys(seats[companyId] || {}) :
-        products.map((product) => product._id);
+        products.map((product: any) => product._id);
     const sections = companyId != null ?
         companySections[companyId] || [] :
         allSections;
-    const companySectionIds = sections.map((section) => section._id);
+    const companySectionIds = sections.map((section: any) => section._id);
     const isAdmin = isUserAdmin(currentUser);
     const isCompanyAdmin = isUserCompanyAdmin(currentUser);
 
@@ -193,7 +193,7 @@ function EditUserComponent({
                                 title={gettext('Sections')}
                                 testId="toggle--sections"
                             >
-                                {sections.filter((section) => companySectionIds.includes(section._id)).map((section) => (
+                                {sections.filter((section: any) => companySectionIds.includes(section._id)).map((section: any) => (
                                     <div className="list-item__preview-row" key={section._id}>
                                         <div className="form-group">
                                             <CheckboxInput
@@ -213,10 +213,10 @@ function EditUserComponent({
                                 title={gettext('Products')}
                                 testId="toggle--products"
                             >
-                                {sections.filter((section) => (
+                                {sections.filter((section: any) => (
                                     companySectionIds.includes(section._id) &&
                                     get(user, `sections.${section._id}`) === true
-                                )).map((section) => (
+                                )).map((section: any) => (
                                     <React.Fragment key={section._id}>
                                         <div className="list-item__preview-subheading">
                                             {section.name}
@@ -224,7 +224,7 @@ function EditUserComponent({
                                         {products.filter(
                                             (product: any) => product.product_type === section._id &&
                                                 companyProductIds.includes(product._id)
-                                        ).map((product) => (
+                                        ).map((product: any) => (
                                             <EditUserProductPermission
                                                 key={product._id}
                                                 original={original}

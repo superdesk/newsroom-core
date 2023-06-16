@@ -322,7 +322,7 @@ export function shareItems(items: any) {
         const user = getState().user;
         const company = getState().company;
         return server.get(`/companies/${company}/users`)
-            .then((users) => users.filter((u: any) => u._id !== user))
+            .then((users: any) => users.filter((u: any) => u._id !== user))
             .then((users: any) => dispatch(renderModal('shareItem', {items, users})))
             .catch(errorHandler);
     };

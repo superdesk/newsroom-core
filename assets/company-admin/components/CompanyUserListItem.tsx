@@ -25,9 +25,9 @@ export function getUserStateLabelDetails(user: any) {
 
 export function CompanyUserListItem({user, onClick, selected, sections}: any) {
     const stateLabelDetails = getUserStateLabelDetails(user);
-    const productNumbers = sections.reduce((sectionProductCount, section) => {
+    const productNumbers = sections.reduce((sectionProductCount: any, section: any) => {
         sectionProductCount[section._id] = (user.products || [])
-            .filter((product) => product.section === section._id)
+            .filter((product: any) => product.section === section._id)
             .length;
 
         return sectionProductCount;
@@ -62,7 +62,7 @@ export function CompanyUserListItem({user, onClick, selected, sections}: any) {
                 </label>
             </td>
 
-            {sections.map((section) => (
+            {sections.map((section: any) => (
                 <td key={section._id} data-test-id={`user-seats--${section._id}`}>
                     <span className={classNames(
                         'badge rounded-pill bg-secondary text-dark',

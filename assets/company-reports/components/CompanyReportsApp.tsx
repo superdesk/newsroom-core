@@ -54,7 +54,7 @@ class CompanyReportsApp extends React.Component<any, any> {
                             name={'company-reports'}
                             value={this.props.activeReport || ''}
                             onChange={(event: any) => this.props.setActiveReport(event.target.value)}>
-                            {reportOptions.map((option) => <option key={option.value} value={option.value}>{option.text}</option>)}
+                            {reportOptions.map((option: any) => <option key={option.value} value={option.value}>{option.text}</option>)}
                         </select>
                     </div>
 

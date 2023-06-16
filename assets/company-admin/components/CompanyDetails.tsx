@@ -27,7 +27,7 @@ function CompanyDetailsComponent({company, showSeatRequestModal, setSection, com
                     </tr>
                 </thead>
                 <tbody>
-                    {sections.map((section) => (
+                    {sections.map((section: any) => (
                         <React.Fragment key={section._id}>
                             <tr colSpan={2 + numSections} className="subheading">
                                 <td>{section.name}</td>
@@ -35,13 +35,13 @@ function CompanyDetailsComponent({company, showSeatRequestModal, setSection, com
 
                             {
                                 (query === null ?
-                                    Object.values(products[company._id]).filter((product) => product.section === section._id) :
-                                    Object.values(products[company._id]).filter((product) =>
+                                    Object.values(products[company._id]).filter((product: any) => product.section === section._id) :
+                                    Object.values(products[company._id]).filter((product: any) =>
                                         product.section === section._id &&
                                       product.name.toString().toLowerCase().includes(query.toLowerCase())
                                     )
                                 )
-                                    .map((product) => (
+                                    .map((product: any) => (
 
                                         <CompanyDetailsProductRow
                                             key={product._id}

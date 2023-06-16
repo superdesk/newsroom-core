@@ -18,7 +18,7 @@ class SortItems extends React.Component<any, any> {
     }
 
     onRemove(itemToRemove: any) {
-        const items = [...this.state.items].filter((item) => itemToRemove.value !== item.value);
+        const items = [...this.state.items].filter((item: any) => itemToRemove.value !== item.value);
         this.setState({items: items});
         this.props.onChange(items);
     }
@@ -56,7 +56,7 @@ class SortItems extends React.Component<any, any> {
         const SortableList = SortableContainer(({items}) => {
             return (
                 <ul className="list-group flex-grow-1">
-                    {items.map((item, index) => (
+                    {items.map((item: any, index: any) => (
                         <SortableItem key={`item-${index}`} index={index} item={item}/>
                     ))}
                 </ul>

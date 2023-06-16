@@ -18,7 +18,7 @@ export function bem(block: any, element: any, modifier: any) {
     if (!isEmpty(modifier)) {
         const modifiers = classNames(modifier).split(' ');
 
-        modifiers.forEach((suffix) => {
+        modifiers.forEach((suffix: any) => {
             classes.push(main + '--' + suffix);
         });
     }

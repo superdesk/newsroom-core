@@ -39,7 +39,7 @@ export default function AgendaInternalNote({internalNote, onlyIcon, noMargin, mt
                 <i className="icon--info icon--red icon--info--smaller" title={labelText}/>
                 <span className='ms-1'>
                     {internalNote[0] !== '<' ?
-                        internalNote.split('\n').map((item, key) => (
+                        internalNote.split('\n').map((item: any, key: any) => (
                             <p key={key}>{item}</p>
                         ))
                         : (

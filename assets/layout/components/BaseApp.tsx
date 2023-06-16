@@ -90,7 +90,7 @@ export default class BaseApp extends React.Component<any, any> {
         } else if (numNavigations > 1) {
             name = '/ ' + gettext('Custom View');
         } else if (numNavigations === 1) {
-            name = '/ ' + get(navigations.find((nav) => nav._id === activeNavigation[0]), 'name', '');
+            name = '/ ' + get(navigations.find((nav: any) => nav._id === activeNavigation[0]), 'name', '');
         } else if (activeProduct != null) {
             name = `/ ${activeProduct.name}`;
         } else if (filterValue !== null) {
@@ -153,7 +153,7 @@ export default class BaseApp extends React.Component<any, any> {
     }
 
     filterActions(item: any, config: any, includeCoverages: any = false) {
-        return this.props.actions.filter((action) => (!config || isDisplayed(action.id, config)) &&
+        return this.props.actions.filter((action: any) => (!config || isDisplayed(action.id, config)) &&
           (!action.when || action.when(this.props.state, item, includeCoverages)));
     }
 

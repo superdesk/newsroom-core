@@ -14,7 +14,7 @@ class ConfigProduct extends React.Component<any, any> {
 
     getProducts() {
         const productList = [{value: '', text: ''}];
-        this.props.products.map((product) => {
+        this.props.products.map((product: any) => {
             productList.push({value: product._id, text: product.name});
         });
         return productList;

@@ -39,7 +39,7 @@ class ContentSearchResultsComponent extends React.Component<any, any> {
             if (this.state.expanded) {
                 return this.props.searchParamTags;
             } else {
-                return this.props.searchParamTags.filter((tag) => (
+                return this.props.searchParamTags.filter((tag: any) => (
                     ['navigation', 'topic'].includes(tag.type)
                 ));
             }
@@ -51,7 +51,7 @@ class ContentSearchResultsComponent extends React.Component<any, any> {
     renderTags() {
         const searchParamTags = this.getTagsToRender();
 
-        return searchParamTags.map((tag) => (
+        return searchParamTags.map((tag: any) => (
             <Tag
                 key={tag.key}
                 keyValue={tag.key}

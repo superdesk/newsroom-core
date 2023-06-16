@@ -22,7 +22,7 @@ class ListItemNextVersion extends React.Component<any, any> {
 
     fetch(props: any) {
         props.dispatch(fetchNext(props.item))
-            .then((next) => this.setState({next}))
+            .then((next: any) => this.setState({next}))
             .catch(() => this.setState({next: null}));
     }
 

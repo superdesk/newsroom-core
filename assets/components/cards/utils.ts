@@ -97,7 +97,7 @@ const CARD_TYPES = [
     }
 ];
 
-const getCard = memoize((cardId) => CARD_TYPES.find((card) => card._id === cardId));
+const getCard = memoize((cardId: any) => CARD_TYPES.find((card: any) => card._id === cardId));
 const getCardEditComponent = (cardId: any) => get(getCard(cardId), 'editComponent', ConfigProduct);
 const getCardDashboardComponent: (cardId: any) => any = (cardId: any) => get(getCard(cardId), 'dashboardComponent');
 

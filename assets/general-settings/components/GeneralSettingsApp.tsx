@@ -23,7 +23,7 @@ class GeneralSettingsApp extends React.Component<any, any> {
             values: {},
             _updated: get(this.props, 'config._updated'),
         };
-        Object.keys(props.config).forEach((key) => {
+        Object.keys(props.config).forEach((key: any) => {
             const config = props.config[key] || {};
 
             this.state.values[key] = (() => {

@@ -14,8 +14,8 @@ function CompanyPermissions({
     toggleCompanyProduct,
     updateCompanySeats,
 }: any) {
-    const productsEnabled = (company.products || []).map((product) => product._id);
-    const seats = (company.products || []).reduce((productSeats, product) => {
+    const productsEnabled = (company.products || []).map((product: any) => product._id);
+    const seats = (company.products || []).reduce((productSeats: any, product: any) => {
         productSeats[product._id] = product.seats;
 
         return productSeats;
@@ -63,7 +63,7 @@ function CompanyPermissions({
                     >
                         <label>{gettext('Sections')}</label>
                         <ul className="list-unstyled">
-                            {sections.map((item) => (
+                            {sections.map((item: any) => (
                                 <li key={item._id}>
                                     <CheckboxInput
                                         name={item._id}
@@ -81,11 +81,11 @@ function CompanyPermissions({
                         className="form-group"
                         key="products"
                     >
-                        {sections.filter((section) => (company.sections || {})[section._id] === true).map((section) => (
+                        {sections.filter((section: any) => (company.sections || {})[section._id] === true).map((section: any) => (
                             [<label key={`${section.id}label`}>{gettext('Products')} {`(${section.name})`}</label>,
                                 <ul key={`${section.id}product`} className="list-unstyled">
-                                    {products.filter((p) => (p.product_type || 'wire').toLowerCase() === section._id.toLowerCase())
-                                        .map((product) => (
+                                    {products.filter((p: any) => (p.product_type || 'wire').toLowerCase() === section._id.toLowerCase())
+                                        .map((product: any) => (
                                             <li key={product._id}>
                                                 <div className="input-group">
                                                     <div className="input-group-text border-0 bg-transparent">

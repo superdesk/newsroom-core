@@ -34,7 +34,7 @@ const getTopNewsPanel = (item: any, picture: any, openItem: any, cardId: any, li
 function TopNewsOneByOneCard ({items, title, product, openItem, isActive, cardId, listConfig}: any) {
     return (
         <CardRow title={title} product={product} isActive={isActive}>
-            {items.map((item) => getTopNewsPanel(item, getPicture(item), openItem, cardId, listConfig))}
+            {items.map((item: any) => getTopNewsPanel(item, getPicture(item), openItem, cardId, listConfig))}
         </CardRow>
     );
 }

@@ -119,7 +119,7 @@ export default function cardReducer(state: any = initialState, action: any) {
 
     case GET_CARDS: {
         const cardsById = Object.assign({}, state.cardsById);
-        const cards = action.data.map((card) => {
+        const cards = action.data.map((card: any) => {
             cardsById[card._id] = card;
             return card._id;
         });

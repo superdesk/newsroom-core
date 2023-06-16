@@ -5,7 +5,7 @@ import {gettext} from 'utils';
 
 
 function ProductList({products, onClick, activeProductId, activeSection}: any) {
-    const list = products.map((product) =>
+    const list = products.map((product: any) =>
         <ProductListItem
             key={product._id}
             product={product}

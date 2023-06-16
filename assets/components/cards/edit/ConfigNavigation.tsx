@@ -41,7 +41,7 @@ class ConfigNavigation extends React.Component<any, any> {
     getNavigations() {
         const navigationList = [{value: '', text: ''}];
         const dashboard = this.props.card.dashboard === 'newsroom' ? 'wire' : this.props.card.dashboard;
-        this.props.navigations.forEach((navigation) => {
+        this.props.navigations.forEach((navigation: any) => {
             if (!(get(this.props.card.config.navigations) || []).includes(navigation._id) &&
                 navigation.product_type === dashboard) {
                 navigationList.push({value: navigation._id, text: navigation.name});
@@ -56,7 +56,7 @@ class ConfigNavigation extends React.Component<any, any> {
             return;
         }
 
-        if (this.state.items.find((item) => item.value === navigation)) {
+        if (this.state.items.find((item: any) => item.value === navigation)) {
             notify.error(gettext('Navigation is already added.'));
             return;
         }
@@ -75,7 +75,7 @@ class ConfigNavigation extends React.Component<any, any> {
         this.props.onChange({
             target: {
                 name: 'config.navigations',
-                value: items.map((item) => item.value) || []
+                value: items.map((item: any) => item.value) || []
             }
         });
     }

@@ -26,11 +26,11 @@ class CompanyDetailsProductFilterComponent extends React.PureComponent<any, any>
     }
 
     getDropdownItems(filter: any) {
-        const sectionIds = this.props.companySections[this.props.currentCompany._id].map((section) => section._id);
+        const sectionIds = this.props.companySections[this.props.currentCompany._id].map((section: any) => section._id);
 
         return this.props.products
-            .filter((product) => sectionIds.includes(product.product_type))
-            .map((product) => (
+            .filter((product: any) => sectionIds.includes(product.product_type))
+            .map((product: any) => (
                 <button
                     key={product._id}
                     className="dropdown-item"
@@ -45,7 +45,7 @@ class CompanyDetailsProductFilterComponent extends React.PureComponent<any, any>
     getActiveQuery() {
         return {
             product: !this.props.product ? null : [
-                get(this.props.products.find((product) => product._id === this.props.product), 'name')
+                get(this.props.products.find((product: any) => product._id === this.props.product), 'name')
             ]
         };
     }

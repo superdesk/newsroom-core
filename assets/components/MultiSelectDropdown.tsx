@@ -10,7 +10,7 @@ function MultiSelectDropdown({values, label, field, options, onChange, showAllBu
             if (option === 'all') {
                 onChange(field, []);
             } else if (values.includes(option)) {
-                onChange(field, values.filter((o) => o !== option));
+                onChange(field, values.filter((o: any) => o !== option));
             } else {
                 onChange(field, [...values, option]);
             }
@@ -61,7 +61,7 @@ function MultiSelectDropdown({values, label, field, options, onChange, showAllBu
                     <div className='dropdown-divider' />
                 </Fragment>
             )}
-            {options.map((option) => (
+            {options.map((option: any) => (
                 <Fragment key={option.value}>
                     <button
                         className='dropdown-item'

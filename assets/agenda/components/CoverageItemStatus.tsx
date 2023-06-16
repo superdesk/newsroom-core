@@ -44,7 +44,7 @@ export default class CoverageItemStatus extends React.Component<any, any> {
     setWireItem(props: any) {
         const wireId = getDeliveryId(props.coverage);
         if (wireId && get(props, 'wireItems.length', 0) > 0) {
-            this.setState({wireItem: props.wireItems.find((w) => w._id === wireId)});
+            this.setState({wireItem: props.wireItems.find((w: any) => w._id === wireId)});
         }
     }
 
@@ -61,7 +61,7 @@ export default class CoverageItemStatus extends React.Component<any, any> {
     getStatusContent(coverage: any) {
         const actionsToShow = this.filterActions();
         const parentWatched = isWatched(this.props.item, this.props.user);
-        const actions = actionsToShow.map((action) =>
+        const actions = actionsToShow.map((action: any) =>
             <span className="coverage-item--element-grow" key="action-button">
                 <ActionButton
                     key={action.name}
@@ -122,7 +122,7 @@ export default class CoverageItemStatus extends React.Component<any, any> {
     }
 
     filterActions() {
-        return this.props.actions.filter((action) => !action.when ||
+        return this.props.actions.filter((action: any) => !action.when ||
             action.when(this.props.coverage, this.props.user, this.props.item));
     }
 

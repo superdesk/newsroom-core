@@ -69,7 +69,7 @@ class UserProfileApp extends React.Component<any, any> {
     }
 
     isSectionEnabled(name: any) {
-        return !!get(this.props, 'userSections', []).find((s) => s._id === name);
+        return !!get(this.props, 'userSections', []).find((s: any) => s._id === name);
     }
 
     renderModal(specs: any) {
@@ -83,17 +83,17 @@ class UserProfileApp extends React.Component<any, any> {
     }
 
     renderProfile() {
-        const links = this.links.map((link) => {
+        const links = this.links.map((link: any) => {
             link.active = link.name === this.props.selectedMenu;
             return link;
         });
 
         const modal = this.renderModal(this.props.modal);
-        const ActiveContent = links.find((link) => link.active).content;
-        const topicType = links.find((link) => link.active).type;
+        const ActiveContent = links.find((link: any) => link.active).content;
+        const topicType = links.find((link: any) => link.active).type;
 
         return (
-            <div className="profile-container" role={gettext('dialog')} aria-label={links.find((link) => link.active).label}>
+            <div className="profile-container" role={gettext('dialog')} aria-label={links.find((link: any) => link.active).label}>
                 <div className="profileWrap">
                     <div className="profile__mobile-close d-md-none">
                         <button className="icon-button" aria-label={gettext('Close')} onClick={this.props.hideModal}>
@@ -113,7 +113,7 @@ class UserProfileApp extends React.Component<any, any> {
                         <section className="content-header">
                             <nav className="profile-nav content-bar navbar content-bar--side-padding pe-0 d-none d-md-flex">
                                 <h5 className="ps-xl-4 mb-0">
-                                    {links.find((link) => link.active).label}
+                                    {links.find((link: any) => link.active).label}
                                 </h5>
                                 <div className="content-bar__right">
                                     <button className="content-bar__menu" aria-label={gettext('Close')} role="button" onClick={this.props.hideModal}>
@@ -153,7 +153,7 @@ class UserProfileApp extends React.Component<any, any> {
                         {`${this.props.user.first_name} ${this.props.user.last_name}`}
                     </div>
                     <ul className="list-group list-group-flush">
-                        {this.links.map((link) => (
+                        {this.links.map((link: any) => (
                             <li key={link.name} className="list-group-item list-group-item--link">
                                 <a href="" onClick={(e: any) => this.props.selectMenu(e, link.name)}>{link.label}
                                     <i className="svg-icon--arrow-right" /></a>

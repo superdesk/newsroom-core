@@ -5,7 +5,7 @@ import {gettext} from 'utils';
 
 
 function MonitoringList({list, onClick, activeMonitoringProfileId, companiesById}: any) {
-    const listElement = list.map((m) =>
+    const listElement = list.map((m: any) =>
         <MonitoringItem
             key={m._id}
             item={m}

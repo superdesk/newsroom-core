@@ -17,7 +17,7 @@ class CardRow extends React.Component<any, any> {
         const {title, product, children, userProducts,userType} = this.props;
         let moreNews = this.props.moreNews;
         if (userType !== 'administrator'){
-            moreNews = userProducts.some((userProduct) => userProduct._id === product._id);
+            moreNews = userProducts.some((userProduct: any) => userProduct._id === product._id);
         }
 
         return (

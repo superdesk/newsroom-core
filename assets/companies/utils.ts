@@ -12,5 +12,5 @@ export function getCountryLabel(code: any) {
 }
 
 export function isProductEnabled(products: any, productId: any) {
-    return products.findIndex((product) => product._id === productId) !== -1;
+    return products.findIndex((product: any) => product._id === productId) !== -1;
 }

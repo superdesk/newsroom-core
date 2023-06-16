@@ -103,8 +103,8 @@ export function fetchUsers() {
             `&sort=[("${sortField}", ${getState().sortDirection}), ("first_name", 1)]`;
 
         return server.get(`/users/search?q=${query}${filter}${sort}`)
-            .then((data) => dispatch(getUsers(data)))
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .then((data: any) => dispatch(getUsers(data)))
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -121,12 +121,12 @@ export function postUser() {
 
         if (user.sections != null) {
             user.sections = Object.keys(user.sections)
-                .filter((sectionId) => user.sections[sectionId] === true)
+                .filter((sectionId: any) => user.sections[sectionId] === true)
                 .join(',');
         }
         if (user.products != null) {
             user.products = user.products
-                .map((product) => product._id)
+                .map((product: any) => product._id)
                 .join(',');
         }
 
@@ -139,7 +139,7 @@ export function postUser() {
                 }
                 dispatch(fetchUsers());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
 
     };
 }
@@ -153,7 +153,7 @@ export function resetPassword() {
 
         return server.post(url, {})
             .then(() => notify.success(gettext('Reset password token is sent successfully')))
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
 
     };
 }
@@ -175,7 +175,7 @@ export function deleteUser() {
                 dispatch(removeUser(userId));
                 dispatch(fetchUsers());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -186,7 +186,7 @@ export function resendUserInvite() {
 
         return server.post(url, {})
             .then(() => notify.success(gettext('Invitation as been resent')))
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 

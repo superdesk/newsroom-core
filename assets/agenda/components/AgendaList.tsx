@@ -249,7 +249,7 @@ class AgendaList extends React.Component<any, any> {
                         if (plans.length > 0) {
                             return (<Fragment key={`${_id}--${groupIndex}`}>
                                 {
-                                    plans.map((plan) =>
+                                    plans.map((plan: any) =>
                                         <AgendaListItem
                                             key={`${_id}--${plan._id}`}
                                             group={group.date}

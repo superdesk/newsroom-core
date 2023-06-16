@@ -70,7 +70,7 @@ class MonitoringApp extends React.Component<any, any> {
 
     getActiveQuery() {
         return {
-            company: this.props.company ? [get(this.props.companies.find((c) => c._id === this.props.company), 'name')] :
+            company: this.props.company ? [get(this.props.companies.find((c: any) => c._id === this.props.company), 'name')] :
                 null,
         };
     }
@@ -84,7 +84,7 @@ class MonitoringApp extends React.Component<any, any> {
                     buttonText={gettext('New {{monitoring}} Profile', window.sectionNames)}
                     noSearch>
                     <div className="toggle-button__group toggle-button__group--navbar ms-0 me-3">
-                        {this.sections.map((section) => (
+                        {this.sections.map((section: any) => (
                             <button key={section.name}
                                 className={'toggle-button' + (section.name === this.state.activeSection ? ' toggle-button--active' :
                                     '')}

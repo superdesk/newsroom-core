@@ -27,7 +27,7 @@ function ConfigExternalMedia ({card, onChange, errors}: any) {
             <div className="alert alert-primary" key="info">
                 {gettext('Total media count across all media config should be between 1 and 4.')}
             </div>,
-            sources.map((source, index) => {
+            sources.map((source: any, index: any) => {
                 const prefix = `config.sources[${index}].`;
                 return (
                     <div key={prefix} className='card' style={{display:'block', marginBottom: '20px'}}>

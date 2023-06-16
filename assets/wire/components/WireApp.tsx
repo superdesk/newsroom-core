@@ -72,9 +72,9 @@ class WireApp extends BaseApp {
         this.modals = modals;
 
         // Show my-topics tab only if WireApp is in 'wire' context (not 'aapX', etc.)
-        this.tabs = this.tabs.filter((t) => get(this.props.advancedSearchTabConfig, t.id, true));
+        this.tabs = this.tabs.filter((t: any) => get(this.props.advancedSearchTabConfig, t.id, true));
         if (this.props.context === 'monitoring') {
-            let navTab = this.tabs.find((t) => t.id === 'nav');
+            let navTab = this.tabs.find((t: any) => t.id === 'nav');
             navTab.label = gettext('{{monitoring}} Profiles', window.sectionNames);
         }
 
@@ -85,7 +85,7 @@ class WireApp extends BaseApp {
     }
 
     toggleAdvancedSearchPanel() {
-        this.setState((prevState) => ({isAdvancedSearchShown: !prevState.isAdvancedSearchShown}));
+        this.setState((prevState: any) => ({isAdvancedSearchShown: !prevState.isAdvancedSearchShown}));
     }
 
     render() {
@@ -112,7 +112,7 @@ class WireApp extends BaseApp {
         const newsOnlyFilterText = this.props.newsOnlyFilterText;
         const modal = this.renderModal(this.props.modal);
 
-        const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x) => x).length;
+        const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x: any) => x).length;
         const mainClassName = classNames('wire-column__main', {
             'wire-articles__one-side-pane': panesCount === 1,
             'wire-articles__two-side-panes': panesCount === 2,

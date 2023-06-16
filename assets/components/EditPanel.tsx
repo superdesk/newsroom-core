@@ -25,7 +25,7 @@ class EditPanel extends React.Component<any, any> {
         let items: any = {};
 
         if (!allActive) {
-            availableItems.forEach((item) => {
+            availableItems.forEach((item: any) => {
                 items[item._id] = true;
             });
         }
@@ -39,7 +39,7 @@ class EditPanel extends React.Component<any, any> {
             this.props.onChange({
                 target: {
                     name: this.props.field,
-                    value: Object.keys(items).filter((k) => items[k])
+                    value: Object.keys(items).filter((k: any) => items[k])
                 }
             });
         }
@@ -52,7 +52,7 @@ class EditPanel extends React.Component<any, any> {
 
     initItems(props: any) {
         const items: any = {};
-        props.items.map((item) =>
+        props.items.map((item: any) =>
             items[item._id] = (props.parent[props.field] || []).includes(item._id));
 
         this.setState({activeParent: props.parent._id, items});
@@ -70,7 +70,7 @@ class EditPanel extends React.Component<any, any> {
         }
 
         let items: any = {};
-        nextProps.items.map((item) =>
+        nextProps.items.map((item: any) =>
             items[item._id] = (nextProps.parent[nextProps.field] || []).includes(item._id));
         if (!isEqual(this.state.items, items)) {
             this.initItems(nextProps);
@@ -95,7 +95,7 @@ class EditPanel extends React.Component<any, any> {
                         />
                     </li>
                 )}
-                {items.map((item) => (
+                {items.map((item: any) => (
                     <li key={item._id}>
                         <CheckboxInput
                             name={item._id}
@@ -116,10 +116,10 @@ class EditPanel extends React.Component<any, any> {
                         {!this.props.title ? null : (
                             <div>{this.props.title}</div>
                         )}
-                        {!isEmpty(this.props.groups) && this.props.groups.map((group) => (
+                        {!isEmpty(this.props.groups) && this.props.groups.map((group: any) => (
                             <div className="form-group" key={group._id}>
                                 <label>{group.name}</label>
-                                {this.renderList(this.props.items.filter((item) => get(item, this.props.groupField, this.props.groupDefaultValue) === group._id))}
+                                {this.renderList(this.props.items.filter((item: any) => get(item, this.props.groupField, this.props.groupDefaultValue) === group._id))}
                             </div>
                         ))}
                         {isEmpty(this.props.groups) && this.renderList(this.props.items)}

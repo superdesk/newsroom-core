@@ -6,7 +6,7 @@ import {gettext} from 'utils';
 
 
 function ProductStories({results, print}: any) {
-    const list = results && results.map((item) =>
+    const list = results && results.map((item: any) =>
         <tr key={item._id}>
             <td>{item.name}</td>
             <td>{item.is_enabled.toString()}</td>

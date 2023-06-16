@@ -45,8 +45,8 @@ export default function navigationReducer(state: any = initialState, action: any
 
         if (navigationToEdit != null) {
             navigationToEdit.products = state.products
-                .filter((product) => (product.navigations && product.navigations.includes(action.id)))
-                .map((product) => product._id);
+                .filter((product: any) => (product.navigations && product.navigations.includes(action.id)))
+                .map((product: any) => product._id);
         }
 
         return {
@@ -99,7 +99,7 @@ export default function navigationReducer(state: any = initialState, action: any
 
     case GET_NAVIGATIONS: {
         const navigationsById = Object.assign({}, state.navigationsById);
-        const navigations = action.data.map((navigation) => {
+        const navigations = action.data.map((navigation: any) => {
             navigationsById[navigation._id] = navigation;
             return navigation._id;
         });

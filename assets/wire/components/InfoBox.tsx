@@ -9,7 +9,7 @@ export default function InfoBox(props: any) {
         'top': props.top,
     });
     const renderChildren = (props.children ? (Array.isArray(props.children) ? props.children : [props.children]) : [])
-        .filter((c) => c);
+        .filter((c: any) => c);
 
     return (
         <div className={className} id={props.id || null}>

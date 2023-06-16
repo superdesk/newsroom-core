@@ -27,7 +27,7 @@ export function EditCompanyDetails({company, companyTypes, users, errors, onChan
                     name='company_type'
                     label={gettext('Company Type')}
                     value={company.company_type || ''}
-                    options={companyTypes.map((ctype) => ({text: gettext(ctype.name), value: ctype.id}))}
+                    options={companyTypes.map((ctype: any) => ({text: gettext(ctype.name), value: ctype.id}))}
                     defaultOption=""
                     onChange={onChange}
                     error={errors ? errors.company_type : null}
@@ -112,7 +112,7 @@ export function EditCompanyDetails({company, companyTypes, users, errors, onChan
                     name='monitoring_administrator'
                     label={gettext('{{monitoring}} Administrator', window.sectionNames)}
                     value={company.monitoring_administrator}
-                    options={sortBy(users || [], 'first_name').map((u) => ({
+                    options={sortBy(users || [], 'first_name').map((u: any) => ({
                         text: `${u.first_name} ${u.last_name}`,
                         value: u._id}))}
                     defaultOption=""

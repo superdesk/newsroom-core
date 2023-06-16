@@ -5,7 +5,7 @@ import {gettext} from '../../utils';
 
 
 function getProductName(products: any, id: any) {
-    const product = products.find((product) => product._id == id);
+    const product = products.find((product: any) => product._id == id);
     return product && product.name;
 }
 

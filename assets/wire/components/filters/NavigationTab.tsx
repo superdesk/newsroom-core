@@ -16,7 +16,7 @@ function NavigationTab({
     addAllOption,
     disableSameNavigationDeselect,
 }: any) {
-    const navLinks = navigations.map((navigation) => (
+    const navLinks = navigations.map((navigation: any) => (
         <NavLink key={navigation.name}
             isActive={activeNavigation.includes(navigation._id) || navigations.length === 1}
             onClick={(event: any) => {

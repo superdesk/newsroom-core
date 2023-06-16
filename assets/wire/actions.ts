@@ -170,7 +170,7 @@ export function copyPreviewContents(item: any) {
         }
 
         server.post(`/wire/${item._id}/copy?type=${state.context}`)
-            .then((response) => {
+            .then((response: any) => {
                 dispatch(setCopyItem(item._id));
                 copyTextToClipboard(response.data, item);
             })
@@ -237,8 +237,8 @@ export function search(state: any, next?: any, aggs?: any) {
 
 
     const queryString = Object.keys(params)
-        .filter((key) => params[key] != null && params[key].toString() !== '')
-        .map((key) => `${key}=${params[key]}`)
+        .filter((key: any) => params[key] != null && params[key].toString() !== '')
+        .map((key: any) => `${key}=${params[key]}`)
         .join('&');
 
     return server.get(`/${context}/search?${queryString}`);
@@ -256,13 +256,13 @@ export function fetchItems() {
         const state = getState();
         return Promise.all([
             search(state, false, false)
-                .then((data) => dispatch(recieveItems(data)))
+                .then((data: any) => dispatch(recieveItems(data)))
                 .then(() => {
                     analytics.timingComplete('search', Date.now() - start);
                 })
                 .catch(errorHandler),
             search(state, false, true)
-                .then((data) => dispatch(recieveAggs(data))),
+                .then((data: any) => dispatch(recieveAggs(data))),
         ]);
     };
 }
@@ -271,7 +271,7 @@ export function fetchItems() {
 export function fetchItem(id: any) {
     return (dispatch: any, getState: any) => {
         return server.get(`/${context(getState())}/${id}?format=json&context=wire`)
-            .then((data) => dispatch(recieveItem(data)))
+            .then((data: any) => dispatch(recieveItem(data)))
             .catch(errorHandler);
     };
 }
@@ -286,8 +286,8 @@ export function shareItems(items: any) {
         const user = getState().user;
         const company = getState().company;
         return server.get(`/companies/${company}/users`)
-            .then((users) => users.filter((u) => u._id !== user))
-            .then((users) => dispatch(renderModal('shareItem', {items, users})))
+            .then((users: any) => users.filter((u: any) => u._id !== user))
+            .then((users: any) => dispatch(renderModal('shareItem', {items, users})))
             .catch(errorHandler);
     };
 }
@@ -353,7 +353,7 @@ export function bookmarkItems(items: any) {
                 }
             })
             .then(() => {
-                analytics.multiItemEvent('bookmark', items.map((_id) => getState().itemsById[_id]));
+                analytics.multiItemEvent('bookmark', items.map((_id: any) => getState().itemsById[_id]));
             })
             .then(() => dispatch(setBookmarkItems(items)))
             .catch(errorHandler);
@@ -386,7 +386,7 @@ function errorHandler(reason: any) {
  */
 export function fetchVersions(item: any) {
     return () => server.get(`/wire/${item._id}/versions`)
-        .then((data) => {
+        .then((data: any) => {
             return data._items;
         });
 }
@@ -432,7 +432,7 @@ export function submitDownloadItems(items: any, params: any) {
         browserDownload(uri);
         dispatch(setDownloadItems(items));
         dispatch(closeModal());
-        analytics.multiItemEvent('download', items.map((_id) => getState().itemsById[_id]));
+        analytics.multiItemEvent('download', items.map((_id: any) => getState().itemsById[_id]));
     };
 }
 
@@ -489,8 +489,8 @@ export function pushNotification(push) {
 export function reloadMyTopics(reloadTopic: any = false) {
     return function(dispatch) {
         return loadMyTopics()
-            .then((data) => {
-                const wireTopics = data.filter((topic) => !topic.topic_type || topic.topic_type === 'wire');
+            .then((data: any) => {
+                const wireTopics = data.filter((topic: any) => !topic.topic_type || topic.topic_type === 'wire');
                 dispatch(setTopics(wireTopics));
 
                 if (reloadTopic) {
@@ -518,7 +518,7 @@ export function setNewItems(data: any) {
 
 export function fetchNewItems() {
     return (dispatch: any, getState: any) => search(getState())
-        .then((response) => dispatch(setNewItems(response)));
+        .then((response: any) => dispatch(setNewItems(response)));
 }
 
 export function fetchNext(item: any) {
@@ -560,7 +560,7 @@ export function fetchMoreItems() {
 
         dispatch(startLoading());
         return search(getState(), true)
-            .then((data) => dispatch(recieveNextItems(data)))
+            .then((data: any) => dispatch(recieveNextItems(data)))
             .catch(errorHandler);
     };
 }

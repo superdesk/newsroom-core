@@ -21,7 +21,7 @@ export default function settingsReducer(state: any = initialState, action: any) 
 
     case UPDATE_VALUES: {
         let config = Object.assign({}, state.config);
-        Object.keys(action.data.values).forEach((key) => {
+        Object.keys(action.data.values).forEach((key: any) => {
             if (!['_updated', 'version_creator'].includes(key)) {
                 config[key].value = action.data.values[key] || null;
             }

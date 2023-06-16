@@ -23,7 +23,7 @@ export default function AgendaAttachments({item}: any) {
         return null;
     }
 
-    return getAttachments(item).map((attachment) => (
+    return getAttachments(item).map((attachment: any) => (
         <div key={attachment.media} className="coverage-item flex-row">
             <div className={bem('coverage-item', 'column', 'grow')}>
                 <div className="coverage-item__row">

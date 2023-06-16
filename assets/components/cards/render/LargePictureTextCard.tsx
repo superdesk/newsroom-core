@@ -30,7 +30,7 @@ const getPictureTextPanel = (item: any, picture: any, openItem: any, cardId: any
 function LargePictureTextCard ({items, title, product, openItem, isActive, cardId, listConfig}: any) {
     return (
         <CardRow title={title} product={product} isActive={isActive}>
-            {items.map((item) => getPictureTextPanel(item, getPicture(item), openItem, cardId, listConfig))}
+            {items.map((item: any) => getPictureTextPanel(item, getPicture(item), openItem, cardId, listConfig))}
         </CardRow>
     );
 }

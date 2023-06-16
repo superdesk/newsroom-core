@@ -55,7 +55,7 @@ export default class EditAPIToken extends React.Component<any, any> {
                 // Retrieve the API Token from the server
                 // Then update this component's state with the token
                 getTokenForCompany(this.props.companyId)
-                    .then((token) => {
+                    .then((token: any) => {
                         this.setState({
                             token: token,
                             loaded: true,
@@ -124,7 +124,7 @@ export default class EditAPIToken extends React.Component<any, any> {
 
         if (this.state.creating) {
             generateTokenForCompany(this.state.token)
-                .then((token) => {
+                .then((token: any) => {
                     this.setState({
                         token: {
                             ...this.state.token,

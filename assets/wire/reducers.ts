@@ -48,7 +48,7 @@ const initialState: any = {
 
 function recieveItems(state: any, data: any) {
     const itemsById = Object.assign({}, state.itemsById);
-    const items = data._items.map((item) => {
+    const items = data._items.map((item: any) => {
         itemsById[item._id] = item;
         item.deleted = false;
         return item._id;

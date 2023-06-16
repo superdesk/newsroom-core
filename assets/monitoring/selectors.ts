@@ -9,10 +9,10 @@ export const monitoringProfileList = (state: any) => get(state, 'monitoringList'
 
 export const monitoringList = createSelector([monitoringListById, monitoringProfileList, scheduleMode],
     (pById: any, ps: any, sched: any) => {
-        const allProfiles = ps.map((id) => pById[id]);
+        const allProfiles = ps.map((id: any) => pById[id]);
         if (!sched) {
             return allProfiles;
         }
 
-        return allProfiles.filter((p) => get(p, 'schedule.interval'));
+        return allProfiles.filter((p: any) => get(p, 'schedule.interval'));
     });

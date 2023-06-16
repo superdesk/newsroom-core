@@ -146,7 +146,7 @@ class WireListItem extends React.Component<any, any> {
         const fields = listConfig.metadata_fields || DEFAULT_META_FIELDS;
         const compactFields = listConfig.compact_metadata_fields || DEFAULT_COMPACT_META_FIELDS;
         const matchedIds = this.props.isSearchFiltered ? this.props.matchedIds : [];
-        const matchedAncestors = matchedIds.filter((id) => (item.ancestors || []).includes(id));
+        const matchedAncestors = matchedIds.filter((id: any) => (item.ancestors || []).includes(id));
 
         return (
             <article

@@ -5,7 +5,7 @@ import {gettext} from 'utils';
 
 
 function UsersList({users, onClick, activeUserId, companiesById}: any) {
-    const list = users.map((user) =>
+    const list = users.map((user: any) =>
         <UserListItem
             key={user._id}
             user={user}

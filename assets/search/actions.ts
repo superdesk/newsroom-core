@@ -215,7 +215,7 @@ export function followStory(item: any, type: any) {
  */
 export function toggleNavigationById(navigationId: any) {
     return (dispatch: any, getState: any) => {
-        const navigation = (get(getState().search, 'navigations') || []).find((nav) => navigationId === nav._id);
+        const navigation = (get(getState().search, 'navigations') || []).find((nav: any) => navigationId === nav._id);
         if (navigation) {
             dispatch(toggleNavigation(navigation));
         }
@@ -233,8 +233,8 @@ export function toggleNavigationByIds(navigationIds: any) {
 
         toggleNavigation();
         navigations
-            .filter((nav) => navigationIds.includes(nav._id))
-            .forEach((nav) => dispatch(toggleNavigation(nav)));
+            .filter((nav: any) => navigationIds.includes(nav._id))
+            .forEach((nav: any) => dispatch(toggleNavigation(nav)));
     };
 }
 
@@ -246,7 +246,7 @@ export function submitFollowTopic(data: any) {
         const url = `/users/${userId}/topics`;
         data.timezone_offset = getTimezoneOffset();
         return server.post(url, data)
-            .then((updates) => {
+            .then((updates: any) => {
                 const topic = Object.assign(data, updates);
 
                 dispatch(addTopic(topic));
@@ -274,7 +274,7 @@ export function submitShareItem(data: any) {
         }
 
         if (type === 'agenda') {
-            data.items.map((_id) => data.maps.push(getMapSource(getLocations(getState().itemsById[_id]), 2)));
+            data.items.map((_id: any) => data.maps.push(getMapSource(getLocations(getState().itemsById[_id]), 2)));
         }
         return server.post(`/${url}?type=${type}`, data)
             .then(() => {
@@ -286,7 +286,7 @@ export function submitShareItem(data: any) {
                     notify.success(gettext('Item was shared successfully.'));
                 }
             })
-            .then(() => analytics.multiItemEvent('share', data.items.map((_id) => getState().itemsById[_id])))
+            .then(() => analytics.multiItemEvent('share', data.items.map((_id: any) => getState().itemsById[_id])))
             .catch(errorHandler);
     };
 }

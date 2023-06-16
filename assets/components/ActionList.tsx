@@ -6,7 +6,7 @@ import ActionButton from './ActionButton';
 function ActionList({item, group, plan, user, actions, onMouseLeave, showShortcutActions}: any) {
     return (
         <div onMouseLeave={onMouseLeave}>
-            {actions.map((action) => (showShortcutActions || !action.shortcut) &&
+            {actions.map((action: any) => (showShortcutActions || !action.shortcut) &&
                 <ActionButton
                     key={action.name}
                     action={action}

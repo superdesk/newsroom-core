@@ -54,7 +54,7 @@ class AmNewsApp extends BaseApp {
         this.modals = modals;
         this.state = {isMobile: false};    // to cater for responsive behaviour during widnow resize
         this.setIsMobile = this.setIsMobile.bind(this);
-        this.tabs = this.tabs.filter((t) => get(this.props.advancedSearchTabConfig, t.id, true));
+        this.tabs = this.tabs.filter((t: any) => get(this.props.advancedSearchTabConfig, t.id, true));
     }
 
     getSnapshotBeforeUpdate(prevProps: any) {
@@ -93,7 +93,7 @@ class AmNewsApp extends BaseApp {
 
     renderListAndPreview() {
         let mainClassName = '';
-        const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x) => x).length;
+        const panesCount = [this.state.withSidebar, this.props.itemToPreview].filter((x: any) => x).length;
         if (this.state.isMobile) {
             mainClassName = classNames('wire-column__main', {
                 'wire-articles__one-side-pane': panesCount === 1,

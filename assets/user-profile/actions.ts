@@ -81,10 +81,10 @@ export function hideModal() {
 export function fetchUser(id: any) {
     return function (dispatch) {
         return server.get(`/users/${id}`)
-            .then((data) => {
+            .then((data: any) => {
                 dispatch(getUser(data));
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -114,7 +114,7 @@ export function saveUser() {
                     );
                 }
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
 
     };
 }
@@ -126,10 +126,10 @@ export function saveUser() {
 export function fetchTopics() {
     return function (dispatch, getState) {
         return server.get(`/users/${getState().user._id}/topics`)
-            .then((data) => {
+            .then((data: any) => {
                 return dispatch(getTopics(data._items));
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -145,7 +145,7 @@ export function deleteTopic(topic: any) {
                 notify.success(gettext('Topic deleted successfully'));
                 dispatch(fetchTopics());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -159,8 +159,8 @@ export function shareTopic(items: any) {
         const user = getState().user;
         const company = getState().company;
         return server.get(`/companies/${company}/users`)
-            .then((users) => users.filter((u) => u._id !== user._id))
-            .then((users) => dispatch(renderModal('shareItem', {items, users})))
+            .then((users: any) => users.filter((u: any) => u._id !== user._id))
+            .then((users: any) => dispatch(renderModal('shareItem', {items, users})))
             .catch(errorHandler);
     };
 }

@@ -7,7 +7,7 @@ import NavigationCard from './NavigationCard';
 function NavigationSixPerRow({card}: any) {
     const navigations = get(card, 'config.navigations') || [];
 
-    const cards = navigations.map((nav) => <NavigationCard
+    const cards = navigations.map((nav: any) => <NavigationCard
         navigation={nav}
         key={nav._id} />);
 

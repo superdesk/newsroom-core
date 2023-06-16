@@ -23,7 +23,7 @@ class EditNavigation extends React.Component<any, any> {
             {label: gettext('Products'), name: 'products'}
         ];
 
-        this.sectionIds = this.props.sections.map((section) => section._id);
+        this.sectionIds = this.props.sections.map((section: any) => section._id);
     }
 
     handleTabClick(event: any) {
@@ -56,7 +56,7 @@ class EditNavigation extends React.Component<any, any> {
                 <AuditInformation item={this.props.navigation} />
 
                 <ul className='nav nav-tabs'>
-                    {this.tabs.map((tab) => (
+                    {this.tabs.map((tab: any) => (
                         <li key={tab.name} className='nav-item'>
                             <a
                                 name={tab.name}
@@ -97,7 +97,7 @@ class EditNavigation extends React.Component<any, any> {
                                         <div className="card mt-3 d-block">
                                             <div className="card-header">{'Tile Images (Marketplace)'}</div>
                                             <div className="card-body">
-                                                {[...Array(MAX_TILE_IMAGES)].map((_, index) => (
+                                                {[...Array(MAX_TILE_IMAGES)].map((_: any, index: any) => (
                                                     <FileInput key={index}
                                                         name={`tile_images_file_${index}`}
                                                         label={get(tile_images, `[${index}.file]`) ||

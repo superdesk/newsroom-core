@@ -74,7 +74,7 @@ class MonitoringEditor extends React.Component<any, any> {
             field = 'users';
             value = get(this.state, 'profile.users') || [];
             if (value.includes(this.props.user)) {
-                value = value.filter((u) => u !== this.props.user);
+                value = value.filter((u: any) => u !== this.props.user);
                 msg = gettext('Unsubscribed');
             } else {
                 value.push(this.props.user);
@@ -134,7 +134,7 @@ class MonitoringEditor extends React.Component<any, any> {
                     </button>
                 </div>
                 <ul className='nav nav-tabs'>
-                    {this.tabs.filter((tab, index) => index === 0 || this.props.item._id).map((tab) => (
+                    {this.tabs.filter((tab: any, index: any) => index === 0 || this.props.item._id).map((tab: any) => (
                         <li key={tab.name} className='nav-item'>
                             <a
                                 name={tab.name}
@@ -217,7 +217,7 @@ class MonitoringEditor extends React.Component<any, any> {
                         {this.state.activeTab === 'users' &&
                             <EditPanel
                                 parent={profile}
-                                items={this.props.monitoringProfileUsers.map((u) => ({
+                                items={this.props.monitoringProfileUsers.map((u: any) => ({
                                     ...u,
                                     name: `${u.first_name} ${u.last_name}`
                                 }))}

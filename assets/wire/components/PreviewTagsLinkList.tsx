@@ -7,7 +7,7 @@ import PreviewTagsLink from './PreviewTagsLink';
 
 export function PreviewTagsLinkList({urlPrefix, items, field}: any) {
     return items == null || (items.length || 0) === 0 ? null : (
-        uniqBy(items, 'code').map((item) => (
+        uniqBy(items, 'code').map((item: any) => (
             <PreviewTagsLink
                 key={item.code}
                 href={urlPrefix + encodeURIComponent(JSON.stringify({[field]: [item.name]}))}

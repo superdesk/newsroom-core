@@ -13,7 +13,7 @@ function ReportsTable({headers, rows, print, onScroll, tableClass}: any) {
                 )}>
                     <thead className={classNames({'report-thead': !print}, 'thead-dark')}>
                         <tr>
-                            {headers.map((h, i) => (<th key={i}>{h}</th>))}
+                            {headers.map((h: any, i: any) => (<th key={i}>{h}</th>))}
                         </tr>
                     </thead>
                     <tbody>{rows}</tbody>

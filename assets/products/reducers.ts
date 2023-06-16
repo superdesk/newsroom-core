@@ -83,7 +83,7 @@ export default function productReducer(state: any = initialState, action: any) {
 
     case GET_PRODUCTS: {
         const productsById = Object.assign({}, state.productsById);
-        const products = action.data.map((product) => {
+        const products = action.data.map((product: any) => {
             productsById[product._id] = product;
             return product._id;
         });
@@ -99,14 +99,14 @@ export default function productReducer(state: any = initialState, action: any) {
 
     case GET_COMPANIES: {
         const companiesById: any = {};
-        action.data.map((company) => companiesById[company._id] = company);
+        action.data.map((company: any) => companiesById[company._id] = company);
 
         return {...state, companies: action.data, companiesById};
     }
 
     case GET_NAVIGATIONS: {
         const navigationsById: any = {};
-        action.data.map((navigation) => navigationsById[navigation._id] = navigation);
+        action.data.map((navigation: any) => navigationsById[navigation._id] = navigation);
 
         return {...state, navigations: action.data, navigationsById};
     }

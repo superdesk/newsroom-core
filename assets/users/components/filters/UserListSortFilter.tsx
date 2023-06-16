@@ -52,7 +52,7 @@ export class UserListSortFilter extends React.PureComponent<any, any> {
     }
 
     getDropdownItems(filter: any) {
-        return this.sortFields.map((item, i) => (
+        return this.sortFields.map((item: any, i: any) => (
             <button
                 key={i}
                 className='dropdown-item'
@@ -67,7 +67,7 @@ export class UserListSortFilter extends React.PureComponent<any, any> {
     getActiveQuery() {
         return {
             sort: !this.props.sort ? null : [
-                get(this.sortFields.find((s) => s._id === this.props.sort), 'name')
+                get(this.sortFields.find((s: any) => s._id === this.props.sort), 'name')
             ],
         };
     }

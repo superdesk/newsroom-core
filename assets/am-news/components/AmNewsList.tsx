@@ -14,7 +14,7 @@ import {getContextName} from 'selectors';
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
 
-const itemsSelector = (state) => state.items.map((_id) => state.itemsById[_id]);
+const itemsSelector = (state) => state.items.map((_id: any) => state.itemsById[_id]);
 const groupedItemsSelector = createSelector(
     [itemsSelector],
     (items: any) => {
@@ -136,7 +136,7 @@ class AmNewsList extends React.Component<any, any> {
     }
 
     filterActions(item: any) {
-        return this.props.actions.filter((action) => !action.when || action.when(this.props, item));
+        return this.props.actions.filter((action: any) => !action.when || action.when(this.props, item));
     }
 
     render() {
@@ -144,7 +144,7 @@ class AmNewsList extends React.Component<any, any> {
         const todayMoment = moment();
         const today = formatDate(todayMoment);
 
-        const groups = Object.keys(groupedItems).map((keyDate) => {
+        const groups = Object.keys(groupedItems).map((keyDate: any) => {
             const groupItem: Array<any> = [];
 
             if(today !== keyDate) {
@@ -159,7 +159,7 @@ class AmNewsList extends React.Component<any, any> {
             groupItem.push(
                 <div className = 'wire-articles__group' key={`${keyDate}group`}>
                     {
-                        groupedItems[keyDate].map((item) =>
+                        groupedItems[keyDate].map((item: any) =>
                             <AmNewsListItem
                                 key={item._id}
                                 item={item}

@@ -6,7 +6,7 @@ import ReportsTable from './ReportsTable';
 
 
 function ExpiredCompanies({results, print}: any) {
-    const list = results && results.map((item) =>
+    const list = results && results.map((item: any) =>
         <tr key={item._id}>
             <td>{get(item, 'name')}</td>
             <td className='fw-bold'>{item.is_enabled ? gettext('Active') : gettext('Disabled')}</td>

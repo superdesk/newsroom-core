@@ -110,7 +110,7 @@ class NotificationList extends React.Component<any, any> {
                                 {gettext('Loading...')}
                             </div>
                         ) : (
-                            this.props.notifications.map((notification) => (
+                            this.props.notifications.map((notification: any) => (
                                 <NotificationListItem
                                     key={get(this.props.items, `${notification.item}._id`, 'test')}
                                     item={get(

@@ -19,8 +19,8 @@ export class AgendaPreviewPlanning extends React.Component<any, any> {
         } = this.props;
 
         const planningItems = get(item, 'planning_items') || [];
-        const plan = planningItems.find((p) => p.guid === planningId);
-        const otherPlanningItems = planningItems.filter((p) => p.guid !== planningId);
+        const plan = planningItems.find((p: any) => p.guid === planningId);
+        const otherPlanningItems = planningItems.filter((p: any) => p.guid !== planningId);
 
         if (isPlanningItem(item) || restrictCoverageInfo) {
             return (
@@ -63,7 +63,7 @@ export class AgendaPreviewPlanning extends React.Component<any, any> {
                             <span className="info-box__label">
                                 {gettext('Other Planning Items')}
                             </span>
-                            {otherPlanningItems.map((planningItem) => (
+                            {otherPlanningItems.map((planningItem: any) => (
                                 <AgendaPreviewCoverages
                                     key={planningItem.guid}
                                     item={item}

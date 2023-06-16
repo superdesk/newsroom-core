@@ -32,7 +32,7 @@ export default class Map extends React.PureComponent<any, any> {
         getMapElement().style.height = '100%';
 
         // add markers
-        this.markers = this.props.locations.map((location) => {
+        this.markers = this.props.locations.map((location: any) => {
             const bounds = getBounds(location);
             const position = getLatLng(location);
 
@@ -52,7 +52,7 @@ export default class Map extends React.PureComponent<any, any> {
         document.body.appendChild(getMapElement());
 
         // remove markers
-        this.markers.forEach((marker) => marker.setMap(null));
+        this.markers.forEach((marker: any) => marker.setMap(null));
         this.markers = [];
     }
 

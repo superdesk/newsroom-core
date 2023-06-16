@@ -4,7 +4,7 @@ import {AgendaDropdown} from './AgendaDropdown';
 
 const compareFunction = (a: any, b: any) => String(a.key).localeCompare(String(b.key));
 
-const processBuckets = (buckets, filter, toggleFilter) => buckets.sort(compareFunction).map((bucket) =>
+const processBuckets = (buckets, filter, toggleFilter) => buckets.sort(compareFunction).map((bucket: any) =>
     <button
         key={bucket.key}
         className='dropdown-item'

@@ -130,7 +130,7 @@ Navigations.propTypes = {
 };
 
 const mapStateToProps = (state: any) => ({
-    navigations: state.navigations.map((id) => state.navigationsById[id]),
+    navigations: state.navigations.map((id: any) => state.navigationsById[id]),
     navigationToEdit: state.navigationToEdit,
     activeNavigationId: state.activeNavigationId,
     isLoading: state.isLoading,

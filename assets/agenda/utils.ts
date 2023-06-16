@@ -231,7 +231,7 @@ export function getLocationString(item: any) {
         get(item, 'location.0.address.state') || get(item, 'location.0.address.locality'),
         get(item, 'location.0.address.postal_code'),
         get(item, 'location.0.address.country'),
-    ].filter((d) => d).join(', ');
+    ].filter((d: any) => d).join(', ');
 }
 
 /**
@@ -257,7 +257,7 @@ export function hasLocationNotes(item: any) {
 export function getPublicContacts(item: any) {
     const contacts = get(item, 'event.event_contact_info', []);
     return contacts.filter((c: any) => c.public).map((c: any) => ({
-        name: [c.first_name, c.last_name].filter((x) => !!x).join(' '),
+        name: [c.first_name, c.last_name].filter((x: any) => !!x).join(' '),
         organisation: c.organisation || '',
         email: (c.contact_email || []).join(', '),
         phone: (c.contact_phone || []).filter((m: any) => m.public).map((m: any) => m.number).join(', '),
@@ -465,7 +465,7 @@ export function getDataFromCoverages(item: any) {
 
     planningItems.forEach((p: any) => {
         (get(p, 'coverages') || []).forEach((c: any) => {
-            ['internal_note', 'ednote', 'workflow_status_reason'].forEach((field) => {
+            ['internal_note', 'ednote', 'workflow_status_reason'].forEach((field: any) => {
 
                 // Don't populate if the value is same as the field in upper level planning_item
                 // Don't populate workflow_status_reason is planning_item is cancelled to avoid UI duplication
@@ -610,7 +610,7 @@ export function getDisplayDates(item: any) {
                 return;
             }
 
-            coverages.forEach((coverage) => {
+            coverages.forEach((coverage: any) => {
                 if (!coverageIds.includes(coverage.coverage_id)) {
                     return;
                 }
@@ -665,12 +665,12 @@ export function groupItems(items: any, activeDate: any, activeGrouping: any, fea
 
     items
         // Filter out items that didn't match any Planning items
-        .filter((item) => (
+        .filter((item: any) => (
             get(item, 'planning_items.length', 0) === 0 ||
             get(item, '_hits.matched_planning_items') == null ||
             get(item, '_hits.matched_planning_items.length', 0) > 0)
         )
-        .forEach((item) => {
+        .forEach((item: any) => {
             const itemExtraDates = getExtraDates(item);
             const itemStartDate = getStartDate(item);
             const start = item._display_from ? moment(item._display_from) :
@@ -711,20 +711,20 @@ export function groupItems(items: any, activeDate: any, activeGrouping: any, fea
             }
         });
 
-    Object.keys(groupedItems).forEach((k) => {
+    Object.keys(groupedItems).forEach((k: any) => {
         if (featuredOnly) {
-            groupedItems[k] = groupedItems[k].map((i) => i._id);
+            groupedItems[k] = groupedItems[k].map((i: any) => i._id);
         } else {
             const tbcPartitioned = partition(groupedItems[k], (i) => isItemTBC(i));
             groupedItems[k] = [
                 ...tbcPartitioned[0],
                 ...tbcPartitioned[1],
-            ].map((i) => i._id);
+            ].map((i: any) => i._id);
         }
     });
 
     return sortBy(
-        Object.keys(groupedItems).map((k) => (
+        Object.keys(groupedItems).map((k: any) => (
             {
                 date: k,
                 items: groupedItems[k],
@@ -746,7 +746,7 @@ export function getPlanningItemsByGroup(item: any, group: any) {
     }
 
     // Planning item without coverages
-    const plansWithoutCoverages = planningItems.filter((p) =>
+    const plansWithoutCoverages = planningItems.filter((p: any) =>
         formatDate(p.planning_date) === group && get(p, 'coverages.length', 0) === 0);
 
     const allPlans = keyBy(planningItems, '_id');
@@ -754,7 +754,7 @@ export function getPlanningItemsByGroup(item: any, group: any) {
 
     // get unique plans for that group based on the coverage.
     const plansWithCoverages = (item.coverages || [])
-        .map((coverage) => {
+        .map((coverage: any) => {
             if (isCoverageForExtraDay(coverage, group)) {
                 if (!processed[coverage.planning_id]) {
                     processed[coverage.planning_id] = 1;
@@ -764,7 +764,7 @@ export function getPlanningItemsByGroup(item: any, group: any) {
             }
             return null;
         })
-        .filter((p) => p);
+        .filter((p: any) => p);
 
     return [...plansWithCoverages, ...plansWithoutCoverages];
 }
@@ -782,7 +782,7 @@ export function getCoveragesForDisplay(item: any, plan: any, group: any) {
     const previousCoverage = [];
     // get current and preview coverages
     (get(item, 'coverages') || [])
-        .forEach((coverage) => {
+        .forEach((coverage: any) => {
             if (!get(plan, 'guid') || coverage.planning_id === get(plan, 'guid')) {
                 if (isCoverageForExtraDay(coverage, group)) {
                     currentCoverage.push(coverage);
@@ -800,11 +800,11 @@ export function getCoveragesForDisplay(item: any, plan: any, group: any) {
 export function getListItems(groups: any, itemsById: any) {
     const listItems = [];
 
-    groups.forEach((group) => {
-        group.items.forEach((_id) => {
+    groups.forEach((group: any) => {
+        group.items.forEach((_id: any) => {
             const plans = getPlanningItemsByGroup(itemsById[_id], group.date);
             if (plans.length > 0) {
-                plans.forEach((plan) => {
+                plans.forEach((plan: any) => {
                     listItems.push({_id, group: group.date, plan});
                 });
             } else {
@@ -822,8 +822,8 @@ export function isCoverageBeingUpdated(coverage: any) {
 
 export const groupRegions = (filter: any, aggregations: any, props: any) => {
     if (props.locators && Object.keys(props.locators).length > 0) {
-        let regions = sortBy(props.locators.filter((l) => l.state).map((l) => ({...l, 'key': l.name, 'label': l.state})), 'label');
-        const others = props.locators.filter((l) => !l.state).map((l) => ({...l, 'key': l.name, 'label': l.country || l.world_region}));
+        let regions = sortBy(props.locators.filter((l: any) => l.state).map((l: any) => ({...l, 'key': l.name, 'label': l.state})), 'label');
+        const others = props.locators.filter((l: any) => !l.state).map((l: any) => ({...l, 'key': l.name, 'label': l.country || l.world_region}));
         const separator: any = {'key': 'divider'};
 
         if (others.length > 0) {
@@ -965,14 +965,14 @@ export function formatAgendaDate(item: any, group: any, {localTimeZone = true, o
     if (!isGroupBetweenEventDates && hasCoverages(item)) {
         // we rendering for extra days
         const scheduleDates = item.coverages
-            .map((coverage) => {
+            .map((coverage: any) => {
                 if (isCoverageForExtraDay(coverage, group)) {
                     return coverage.scheduled;
                 }
                 return null;
             })
-            .filter((d) => d)
-            .sort((a, b) => {
+            .filter((d: any) => d)
+            .sort((a: any, b: any) => {
                 if (a < b) return -1;
                 if (a > b) return 1;
                 return 0;

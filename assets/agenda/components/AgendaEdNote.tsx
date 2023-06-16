@@ -29,7 +29,7 @@ export default function AgendaEdNote({item, plan, secondaryNoteField, noMargin}:
         prefixes[RESCHEDULED] = 'Event Rescheduled: ';
         prefixes[CANCELLED] = 'Event Cancelled: ';
 
-        const index = prefixes.findIndex((_prefix) => text.startsWith(_prefix));
+        const index = prefixes.findIndex((_prefix: any) => text.startsWith(_prefix));
 
         if (index !== -1) {
             const reason = text.substr(prefixes[index].length);
@@ -58,7 +58,7 @@ export default function AgendaEdNote({item, plan, secondaryNoteField, noMargin}:
         return text;
     };
 
-    const getMultiLineNote = (note) => (note && fixText(note).split('\n').map((t, key) =>
+    const getMultiLineNote = (note: any) => (note && fixText(note).split('\n').map((t: any, key: any) =>
         <span key={key}>{t}<br/></span>)
     );
 

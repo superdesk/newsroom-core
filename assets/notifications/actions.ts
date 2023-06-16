@@ -44,10 +44,10 @@ export function loadNotifications() {
         const user = getState().user;
 
         return server.get(`/users/${user}/notifications`)
-            .then((data) => {
+            .then((data: any) => {
                 dispatch(setNotifications(data.items, data.notifications));
             })
-            .catch((error) => errorHandler(error, dispatch))
+            .catch((error: any) => errorHandler(error, dispatch))
             .finally(() => {
                 dispatch(setNotificationsLoading(false));
             });
@@ -68,7 +68,7 @@ export function deleteNotification(id: any) {
                 notify.success(gettext('Notification cleared successfully'));
                 dispatch(clearNotification(id));
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error: any) => errorHandler(error, dispatch));
     };
 }
 
@@ -86,7 +86,7 @@ export function deleteAllNotifications() {
                 notify.success(gettext('Notifications cleared successfully'));
                 dispatch(clearAllNotifications());
             })
-            .catch((error) => errorHandler(error, dispatch));
+            .catch((error: any) => errorHandler(error, dispatch));
     };
 }
 

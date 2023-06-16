@@ -13,7 +13,7 @@ class SubscriberActivity extends React.Component<any, any> {
     constructor(props: any, context: any) {
         super(props, context);
 
-        this.companies = [...this.props.companies.map((c) => ({...c, 'label': c.name}))];
+        this.companies = [...this.props.companies.map((c: any) => ({...c, 'label': c.name}))];
         this.state = {company: this.props.companies[0]};
 
         this.filters = [{
@@ -95,7 +95,7 @@ class SubscriberActivity extends React.Component<any, any> {
         }
 
 
-        return itemsArray.map((item, i) => (<button
+        return itemsArray.map((item: any, i: any) => (<button
             key={i}
             className='dropdown-item'
             onClick={() => toggleFilterAndQuery(filter.field, item.value || item.name)}
@@ -139,7 +139,7 @@ class SubscriberActivity extends React.Component<any, any> {
     render() {
         const {results, print, reportParams, toggleFilterAndQuery} = this.props;
         const headers = [gettext('Company'), gettext('Section'), gettext('Item'), gettext('Action'), gettext('User'), gettext('Time')];
-        let list = get(results, 'length', 0) > 0 ? results.map((item) =>
+        let list = get(results, 'length', 0) > 0 ? results.map((item: any) =>
             <tr key={item._id}>
                 <td>{item.company}</td>
                 <td>{item.section}</td>
@@ -161,7 +161,7 @@ class SubscriberActivity extends React.Component<any, any> {
             <td></td>
         </tr>)]);
 
-        let filterNodes = this.filters.map((filter) => (
+        let filterNodes = this.filters.map((filter: any) => (
             <DropdownFilter
                 key={filter.label}
                 filter={filter}

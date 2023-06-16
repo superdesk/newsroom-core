@@ -81,7 +81,7 @@ export function searchReducer(state: any = INITIAL_STATE, action: any) {
             delete activeFilter[action.key];
         }
         else if (action.single) {
-            activeFilter[action.key] = activeFilter[action.key].filter((val) => val === action.val);
+            activeFilter[action.key] = activeFilter[action.key].filter((val: any) => val === action.val);
         }
         return {
             ...state,
@@ -169,7 +169,7 @@ export function searchReducer(state: any = INITIAL_STATE, action: any) {
             advanced: {
                 ...state.advanced,
                 fields: state.advanced.fields.includes(action.payload) ?
-                    state.advanced.fields.filter((field) => field !== action.payload) :
+                    state.advanced.fields.filter((field: any) => field !== action.payload) :
                     [...state.advanced.fields, action.payload],
             },
         };

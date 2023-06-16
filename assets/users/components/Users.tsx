@@ -134,7 +134,7 @@ Users.propTypes = {
 };
 
 const mapStateToProps = (state: any) => ({
-    users: state.users.map((id) => state.usersById[id]),
+    users: state.users.map((id: any) => state.usersById[id]),
     usersById: state.usersById,
     userToEdit: state.userToEdit,
     activeUserId: state.activeUserId,

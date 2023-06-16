@@ -21,11 +21,11 @@ function NavCreatedPicker({setCreatedFilter, createdFilter, context}: any) {
         setCreatedFilter({[event.target.name]: event.target.value});
     };
 
-    const activeShortcut = shortcuts.find((shortcut) => shortcut.value === createdFilter.from);
+    const activeShortcut = shortcuts.find((shortcut: any) => shortcut.value === createdFilter.from);
 
     return (
         <NavGroup label={context === 'agenda' ? (gettext('Event date')) : (gettext('Published'))}>
-            {shortcuts.map((shortcut) => (
+            {shortcuts.map((shortcut: any) => (
                 <NavLink key={shortcut.value}
                     label={shortcut.label}
                     onClick={onClickFactory(shortcut.value)}

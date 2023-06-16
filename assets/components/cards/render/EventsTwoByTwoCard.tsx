@@ -79,7 +79,7 @@ function EventsTwoByTwoCard({events, title}: any) {
     return (
         <div className='row'>
             <MoreNewsButton title={title}/>
-            {events.map((event, index) => getEventPanel(event, index))}
+            {events.map((event: any, index: any) => getEventPanel(event, index))}
         </div>
     );
 }

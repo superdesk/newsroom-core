@@ -113,7 +113,7 @@ export function postMonitoringProfile(userProfile: any, notifyMsg: any) {
                 dispatch(cancelEdit());
                 dispatch(fetchMonitoring(get(userProfile, 'company')));
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
 
     };
 }
@@ -125,7 +125,7 @@ export function fetchMonitoring(userCompany: any) {
         const filter = get(companyFilter, 'length', 0) > 0 ? '&where={"company":"' + companyFilter + '"}' : '';
 
         return server.get(`/monitoring/all?q=${filter}`)
-            .then((data) => {
+            .then((data: any) => {
                 if (!userCompany) {
                     dispatch(setMonitoringList(data));
                 } else {
@@ -138,17 +138,17 @@ export function fetchMonitoring(userCompany: any) {
 
                 return dispatch(fetchMonitoringCompanies());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
 export function fetchMonitoringCompanies() {
     return function (dispatch) {
         return server.get('/monitoring/schedule_companies')
-            .then((data) => {
+            .then((data: any) => {
                 dispatch(setMonitoringCompanies(data));
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -161,7 +161,7 @@ export function saveMonitoringProfileUsers(users: any) {
                 dispatch(fetchMonitoring());
                 dispatch(cancelEdit());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -178,7 +178,7 @@ export function saveMonitoringProfileSchedule() {
                 dispatch(fetchMonitoring());
                 dispatch(cancelEdit());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -194,6 +194,6 @@ export function deleteMonitoringProfile() {
                 dispatch(fetchMonitoring());
                 dispatch(cancelEdit());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }

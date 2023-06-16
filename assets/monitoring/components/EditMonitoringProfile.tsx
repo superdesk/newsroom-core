@@ -45,7 +45,7 @@ class EditMonitoringProfile extends React.Component<any, any> {
             );
         }
 
-        return this.props.users.map((user) => (
+        return this.props.users.map((user: any) => (
             <tr key={user._id}>
                 <td>{user.first_name} {user.last_name}</td>
             </tr>
@@ -90,7 +90,7 @@ class EditMonitoringProfile extends React.Component<any, any> {
                 </div>
                 <AuditInformation item={item} />
                 <ul className='nav nav-tabs'>
-                    {this.tabs.filter((tab, index) => index === 0 || this.props.item._id).map((tab) => (
+                    {this.tabs.filter((tab: any, index: any) => index === 0 || this.props.item._id).map((tab: any) => (
                         <li key={tab.name} className='nav-item'>
                             <a
                                 name={tab.name}
@@ -217,7 +217,7 @@ class EditMonitoringProfile extends React.Component<any, any> {
                     {this.state.activeTab === 'users' &&
                         <EditPanel
                             parent={this.props.item}
-                            items={this.props.users.map((u) => ({
+                            items={this.props.users.map((u: any) => ({
                                 ...u,
                                 name: `${u.first_name} ${u.last_name}`
                             }))}

@@ -59,8 +59,8 @@ export function fetchCards() {
         const query = searchQuerySelector(getState()) || '';
 
         return server.get(`/cards/search?q=${query}`)
-            .then((data) => dispatch(getCards(data)))
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .then((data: any) => dispatch(getCards(data)))
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -84,7 +84,7 @@ export function postCard() {
             };
             let errorFound = false;
             let mediaCount = 0;
-            (card.config.sources || []).forEach((source, index) => {
+            (card.config.sources || []).forEach((source: any, index: any) => {
                 if (!source.url && parseInt(source.count, 10) > 0) {
                     errors.config.sources[index].url = gettext('Invalid Url.');
                     errorFound = true;
@@ -116,7 +116,7 @@ export function postCard() {
         }
 
         if (card.type === '2x2-events') {
-            [...Array(4)].forEach((_, i) => {
+            [...Array(4)].forEach((_: any, i: any) => {
                 const input = document.getElementById(`config.events[${i}].file`);
                 if (input && input.files.length > 0) {
                     data.append(`file${i}`, input.files[0]);
@@ -135,7 +135,7 @@ export function postCard() {
                 }
                 dispatch(fetchCards());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
 
     };
 }
@@ -156,7 +156,7 @@ export function deleteCard() {
                 notify.success(gettext('Card deleted successfully'));
                 dispatch(fetchCards());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -168,10 +168,10 @@ export function deleteCard() {
 export function fetchProducts() {
     return function (dispatch) {
         return server.get('/products/search')
-            .then((data) => {
+            .then((data: any) => {
                 dispatch(getProducts(data));
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 

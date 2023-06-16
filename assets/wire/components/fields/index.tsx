@@ -33,9 +33,9 @@ export function FieldComponents({config, item, fieldProps = {}}: any) {
     }
 
     const fields = config
-        .map((field) => getComponentForField(item, field))
+        .map((field: any) => getComponentForField(item, field))
         .filter(Boolean)
-        .reduce((acc, curr) => {
+        .reduce((acc: any, curr: any) => {
             if (acc.length > 0 && acc[acc.length - 1].key === curr.key) {
                 // remove adjacent separators
                 return acc;
@@ -97,7 +97,7 @@ function getComponentForField(item: any, field: any) {
     } else if (Array.isArray(field) && field.length > 0) {
         // example: ["source", "//", "department"]
         const components = field
-            .map((f) => getComponentForField(item, f))
+            .map((f: any) => getComponentForField(item, f))
             .filter(Boolean);
 
         // remove orphan separators. For example in ['source', '//', 'department']

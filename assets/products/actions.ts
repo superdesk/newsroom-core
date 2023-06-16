@@ -65,8 +65,8 @@ export function fetchProducts() {
         const query = searchQuerySelector(getState()) || '';
 
         return server.get(`/products/search?q=${query}`)
-            .then((data) => dispatch(getProducts(data)))
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .then((data: any) => dispatch(getProducts(data)))
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -90,7 +90,7 @@ export function postProduct() {
                 }
                 dispatch(fetchProducts());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
 
     };
 }
@@ -111,7 +111,7 @@ export function deleteProduct() {
                 notify.success(gettext('Product deleted successfully'));
                 dispatch(fetchProducts());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -123,10 +123,10 @@ export function deleteProduct() {
 export function fetchCompanies() {
     return function (dispatch) {
         return server.get('/companies/search')
-            .then((data) => {
+            .then((data: any) => {
                 dispatch(getCompanies(data));
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -142,7 +142,7 @@ export function saveCompanies(companies: any) {
                 notify.success(gettext('Product updated successfully'));
                 dispatch(fetchCompanies());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -153,10 +153,10 @@ export function saveCompanies(companies: any) {
 export function fetchNavigations() {
     return function (dispatch) {
         return server.get('/navigations/search')
-            .then((data) => {
+            .then((data: any) => {
                 dispatch(getNavigations(data));
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -172,7 +172,7 @@ export function saveNavigations(navigations: any) {
                 notify.success(gettext('Product updated successfully'));
                 dispatch(updateProductNavigations(product, navigations));
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 

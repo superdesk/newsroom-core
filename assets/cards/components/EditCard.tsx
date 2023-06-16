@@ -19,12 +19,12 @@ class EditCard extends React.Component<any, any> {
     }
 
     render() {
-        const dashboard = (get(this.props, 'dashboards') || []).find((d) => d._id === this.props.card.dashboard);
+        const dashboard = (get(this.props, 'dashboards') || []).find((d: any) => d._id === this.props.card.dashboard);
         const cardType = this.props.card.type || '';
         const CardComponent = getCardEditComponent(cardType);
         const cardTypes = CARD_TYPES.filter(
             (card: any) =>  dashboard.cards.includes(card._id)
-        ).map((c) => ({value: c._id, text: c.text}));
+        ).map((c: any) => ({value: c._id, text: c.text}));
 
         cardTypes.unshift({value: '', text: '', component: getCardEditComponent('')});
 

@@ -66,7 +66,7 @@ class AgendaPreview extends React.PureComponent<any, any> {
             'wire-column__preview--watched': isWatching,
         });
 
-        const plan = (get(item, 'planning_items') || []).find((p) => p.guid === previewPlan);
+        const plan = (get(item, 'planning_items') || []).find((p: any) => p.guid === previewPlan);
         const previewInnerElement = (<AgendaListItemLabels item={item} />);
 
         return (

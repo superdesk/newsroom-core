@@ -19,7 +19,7 @@ function AgendaPreviewMeta({item}: any) {
                         <span>{item.location[0].details[0]}</span>
                     </div>
                 )}
-                {getPublicContacts(item).map((contact, index) => <div
+                {getPublicContacts(item).map((contact: any, index: any) => <div
                     className='wire-articles__item__meta-row'
                     key={`${contact.name}-${index}`}>
                     <i className='icon-small--user icon--gray-dark'></i>
@@ -27,7 +27,7 @@ function AgendaPreviewMeta({item}: any) {
                         {contact.email && <a href={`mailto:${contact.email}`} target="_blank">{contact.email}</a>}
                     </span>
                 </div>)}
-                {getEventLinks(item).map((link) => <div className='wire-articles__item__meta-row' key={link}>
+                {getEventLinks(item).map((link: any) => <div className='wire-articles__item__meta-row' key={link}>
                     <i className='icon-small--globe icon--gray-dark'></i>
                     <span><a href={url(link)} target="_blank">{link}</a></span>
                 </div>)}

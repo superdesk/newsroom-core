@@ -12,7 +12,7 @@ class ProductCompanies extends React.Component<any, any> {
     constructor(props: any, context: any) {
         super(props, context);
 
-        this.products = [...this.props.products.map((p) => ({...p, 'label': p.name}))];
+        this.products = [...this.props.products.map((p: any) => ({...p, 'label': p.name}))];
         this.state = {product: this.props.products[0]};
 
         this.filters = [{
@@ -33,7 +33,7 @@ class ProductCompanies extends React.Component<any, any> {
             break;
         }
 
-        return itemsArray.map((item, i) => (<button
+        return itemsArray.map((item: any, i: any) => (<button
             key={i}
             className='dropdown-item'
             onClick={() => toggleFilterAndQuery(filter.field, item.name)}
@@ -51,15 +51,15 @@ class ProductCompanies extends React.Component<any, any> {
     render() {
         const {results, print, reportParams, toggleFilterAndQuery} = this.props;
         const headers = [gettext('Product'), gettext('Active Companies'), gettext('Disabled Companies')];
-        const list = get(results, 'length', 0) > 0 ? results.map((item) =>
+        const list = get(results, 'length', 0) > 0 ? results.map((item: any) =>
             <tr key={item._id}>
                 <td>{item.product}</td>
-                <td>{item.enabled_companies.map((company) => (
+                <td>{item.enabled_companies.map((company: any) => (
                     <Fragment key={company}>
                         {company}<br />
                     </Fragment>
                 ))}</td>
-                <td>{item.disabled_companies.map((company) => (
+                <td>{item.disabled_companies.map((company: any) => (
                     <Fragment key={company}>
                         {company}<br />
                     </Fragment>
@@ -71,7 +71,7 @@ class ProductCompanies extends React.Component<any, any> {
             <td></td>
         </tr>)]);
 
-        let filterNodes = this.filters.map((filter) => (
+        let filterNodes = this.filters.map((filter: any) => (
             <DropdownFilter
                 key={filter.label}
                 filter={filter}

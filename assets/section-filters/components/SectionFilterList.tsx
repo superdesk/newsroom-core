@@ -5,7 +5,7 @@ import {gettext} from 'utils';
 
 
 function SectionFilterList({sectionFilters, onClick, activeSectionFilterId}: any) {
-    const list = sectionFilters.map((sectionFilter) =>
+    const list = sectionFilters.map((sectionFilter: any) =>
         <SectionFilterListItem
             key={sectionFilter._id}
             sectionFilter={sectionFilter}

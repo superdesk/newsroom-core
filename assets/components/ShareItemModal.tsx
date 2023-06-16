@@ -43,7 +43,7 @@ class ShareItemModal extends React.Component<any, any> {
         let newValue: any;
         if (all) {
             newValue = this.props.data.users.length === this.state.users.length ? [] :
-                this.props.data.users.map((u) => u._id);
+                this.props.data.users.map((u: any) => u._id);
         } else {
             newValue = toggleValue(this.state.users, userId);
         }
@@ -63,7 +63,7 @@ class ShareItemModal extends React.Component<any, any> {
 
     getUsers(q: any) {
         this.setState({
-            displayUsers: q ? this.props.data.users.filter((u) =>
+            displayUsers: q ? this.props.data.users.filter((u: any) =>
                 (this.getUserName(u).toLowerCase()).includes(q.toLowerCase())) : this.props.data.users
         });
     }
@@ -75,7 +75,7 @@ class ShareItemModal extends React.Component<any, any> {
     render() {
         const selectAllText = this.props.data.users.length === this.state.users.length ? gettext('Deselect All') :
             gettext('Select All');
-        const usersList = sortBy(this.state.displayUsers, 'first_name').map((user, index) => (
+        const usersList = sortBy(this.state.displayUsers, 'first_name').map((user: any, index: any) => (
             <tr key={index}>
                 <td>
                     <input id={user._id} type="checkbox"

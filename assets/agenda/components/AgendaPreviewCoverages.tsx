@@ -20,7 +20,7 @@ class AgendaPreviewCoverages extends React.Component<any, any> {
     }
 
     toggleExpanded() {
-        this.setState((prevState) => ({expanded: !prevState.expanded}));
+        this.setState((prevState: any) => ({expanded: !prevState.expanded}));
     }
 
     render() {
@@ -78,7 +78,7 @@ class AgendaPreviewCoverages extends React.Component<any, any> {
                 </p>
                 {!this.state.expanded ? (
                     <div style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
-                        {displayCoverages.current.concat(displayCoverages.previous).map((coverage) => (
+                        {displayCoverages.current.concat(displayCoverages.previous).map((coverage: any) => (
                             <i
                                 key={coverage.coverage_id}
                                 className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} mr-2`}

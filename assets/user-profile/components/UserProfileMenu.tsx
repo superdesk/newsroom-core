@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 function UserProfileMenu({links, onClick}: any) {
     return (
         <div className="profile-side-navigation__items">
-            {links.map((link) => (
+            {links.map((link: any) => (
                 <a key={link.name}
                     href="#"
                     className={`btn w-100 btn-outline-${link.active ? 'primary' : 'secondary'}`}

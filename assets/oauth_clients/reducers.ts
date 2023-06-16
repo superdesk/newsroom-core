@@ -22,7 +22,7 @@ const initialState: any = {
 
 function setupClients(clientList: any, state: any) {
     const clientsById: any = {};
-    const clients = clientList.map((client) => {
+    const clients = clientList.map((client: any) => {
         clientsById[client._id] = client;
         return client._id;
     });

@@ -61,10 +61,10 @@ export function fetchClients() {
         const query = searchQuerySelector(getState()) || '';
 
         return server.get(`/oauth_clients/search?q=${query}`)
-            .then((data) => {
+            .then((data: any) => {
                 dispatch(getClients(data));
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -79,7 +79,7 @@ export function postClient() {
         const url = `/oauth_clients/${client._id ? client._id : 'new'}`;
 
         return server.post(url, client)
-            .then((data) => {
+            .then((data: any) => {
                 if (client._id) {
                     notify.success(gettext('Client updated successfully'));
                 } else {
@@ -88,7 +88,7 @@ export function postClient() {
                 }
                 dispatch(fetchClients());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
 
     };
 }
@@ -109,7 +109,7 @@ export function deleteClient() {
                 notify.success(gettext('Client deleted successfully'));
                 dispatch(fetchClients());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 

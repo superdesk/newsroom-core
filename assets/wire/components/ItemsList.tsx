@@ -123,7 +123,7 @@ class ItemsList extends React.Component<any, any> {
     }
 
     filterActions(item: any, config: any) {
-        return this.props.actions.filter((action) =>  (!config || isDisplayed(action.id, config)) &&
+        return this.props.actions.filter((action: any) =>  (!config || isDisplayed(action.id, config)) &&
           (!action.when || action.when(this.props, item)));
     }
 
@@ -139,7 +139,7 @@ class ItemsList extends React.Component<any, any> {
         const isExtended = activeView === EXTENDED_VIEW;
         const showShortcutActionIcons = shouldShowListShortcutActionIcons(this.props.listConfig, isExtended);
 
-        const articles = items.map((_id) =>
+        const articles = items.map((_id: any) =>
             <WireListItem
                 key={_id}
                 item={itemsById[_id]}

@@ -10,7 +10,7 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels, filte
     const filters = get(topic, 'filter') || {};
     const navsById = keyBy(navigations, '_id');
     const navs = (get(topic, 'navigation') || [])
-        .map((navId) => get(navsById, `[${navId}].name`));
+        .map((navId: any) => get(navsById, `[${navId}].name`));
 
     const created = getCreatedSearchParamLabel(get(topic, 'created') || {});
     const dateLabels: Array<any> = [];
@@ -31,7 +31,7 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels, filte
             <span className="wire-column__preview__tags__headline">
                 {name}
             </span>
-            {items.map((item) => (
+            {items.map((item: any) => (
                 <span className="wire-column__preview__tag" key={item.toString().replace(/\s+/g, '_')}>
                     {item}
                 </span>
@@ -42,7 +42,7 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels, filte
     const filterGroups = () => {
         return (
             <div>
-                {filterGroupsMain.map((element) => renderParam(get(filterGroupLabels, element.field, element.label), filters[element.field]))}
+                {filterGroupsMain.map((element: any) => renderParam(get(filterGroupLabels, element.field, element.label), filters[element.field]))}
             </div>
         );
     };
@@ -53,7 +53,7 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels, filte
         }
 
         const getPlaceName = (placeId: any) => {
-            let region = (Object.values(locators) || []).find((l) => l.name === placeId);
+            let region = (Object.values(locators) || []).find((l: any) => l.name === placeId);
             return region ?
                 (get(region, 'state') || get(region, 'country') || get(region, 'world_region')) :
                 placeId;

@@ -134,7 +134,7 @@ Cards.propTypes = {
 };
 
 const mapStateToProps = (state: any) => ({
-    cards: state.cards.map((id) => state.cardsById[id]),
+    cards: state.cards.map((id: any) => state.cardsById[id]),
     cardToEdit: state.cardToEdit,
     activeCardId: state.activeCardId,
     isLoading: state.isLoading,

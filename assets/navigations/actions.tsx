@@ -58,8 +58,8 @@ export function fetchNavigations() {
         const query = searchQuerySelector(getState()) || '';
 
         return server.get(`/navigations/search?q=${query}`)
-            .then((data) => dispatch(getNavigations(data)))
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .then((data: any) => dispatch(getNavigations(data)))
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -98,7 +98,7 @@ export function postNavigation() {
                 dispatch(fetchNavigations());
                 dispatch(fetchProducts());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
 
     };
 }
@@ -119,7 +119,7 @@ export function deleteNavigation() {
                 notify.success(gettext('Navigation deleted successfully'));
                 dispatch(fetchNavigations());
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -131,10 +131,10 @@ export function deleteNavigation() {
 export function fetchProducts() {
     return function (dispatch) {
         return server.get('/products/search')
-            .then((data) => {
+            .then((data: any) => {
                 dispatch(getProducts(data));
             })
-            .catch((error) => errorHandler(error, dispatch, setError));
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }
 

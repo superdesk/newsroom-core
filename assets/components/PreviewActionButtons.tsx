@@ -5,7 +5,7 @@ import types from 'wire/types';
 
 
 function PreviewActionButtons({item, user, actions, plan, group}: any) {
-    const actionButtons = actions.map((action) =>
+    const actionButtons = actions.map((action: any) =>
         <ActionButton
             key={action.name}
             item={item}

@@ -78,7 +78,7 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
             return;
         }
 
-        tree.querySelectorAll('script').forEach((s) => {
+        tree.querySelectorAll('script').forEach((s: any) => {
             if (s.hasAttribute('src') && !loaded.includes(s.getAttribute('src'))) {
                 let url = s.getAttribute('src');
 
@@ -145,9 +145,9 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
         // Get the list of Original Rendition IDs for all Image Associations
         const imageEmbedOriginalIds = Object
             .keys(item.associations || {})
-            .filter((key) => key.startsWith('editor_'))
-            .map((key) => get(item.associations[key], 'renditions.original.media'))
-            .filter((value) => value);
+            .filter((key: any) => key.startsWith('editor_'))
+            .map((key: any) => get(item.associations[key], 'renditions.original.media'))
+            .filter((value: any) => value);
 
         if (!imageEmbedOriginalIds.length) {
             // This item has no Image Embeds
@@ -163,9 +163,9 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
         container.innerHTML = html;
         container
             .querySelectorAll('img')
-            .forEach((imageTag) => {
+            .forEach((imageTag: any) => {
                 // Using the tag's `src` attribute, find the Original Rendition's ID
-                const originalMediaId = imageEmbedOriginalIds.find((mediaId) => (
+                const originalMediaId = imageEmbedOriginalIds.find((mediaId: any) => (
                     !imageTag.src.startsWith('/assets/') &&
                     imageTag.src.includes(mediaId))
                 );

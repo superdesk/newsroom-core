@@ -74,7 +74,7 @@ export default class ExpiryDateInput extends React.Component<any, any> {
                         onChange={this.onSelectChange}
                         className="form-control expiry-date__select-input"
                     >
-                        {this.options.map((option) => {
+                        {this.options.map((option: any) => {
                             return (
                                 <option key={option.value} value={option.value}>{option.text}</option>
                             );

@@ -121,7 +121,7 @@ class FollowedTopics extends React.Component<any, any> {
     }
 
     toggleGlobal() {
-        this.setState((previousState) => ({showGlobal: !previousState.showGlobal}));
+        this.setState((previousState: any) => ({showGlobal: !previousState.showGlobal}));
     }
 
     render() {

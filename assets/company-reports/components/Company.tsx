@@ -22,9 +22,9 @@ function getProductDetails(products: Array<any> = []) {
     return (
         <div className="m-2">
             <div><span className="font-italic">{gettext('Products')}: </span></div>
-            {Object.keys(productsByGroup).map((productType) =>
+            {Object.keys(productsByGroup).map((productType: any) =>
                 <div className='ps-3' key={productType}>{getProductSectionName(productType)}
-                    <div className='ps-3'>{productsByGroup[productType].map((p) => <div key={p._id}>{p.name}</div>)}</div>
+                    <div className='ps-3'>{productsByGroup[productType].map((p: any) => <div key={p._id}>{p.name}</div>)}</div>
                 </div>
             )}
         </div>);
@@ -40,7 +40,7 @@ function getContactDetails(company: any) {
 }
 
 function getUsers(users: Array<any> = []) {
-    const usersInfo = users.length <= 0 ? '-' : users.map((u) =>
+    const usersInfo = users.length <= 0 ? '-' : users.map((u: any) =>
         `${u.first_name} ${u.last_name} (${u.email})`).join(', ');
 
     return (
@@ -51,7 +51,7 @@ function getUsers(users: Array<any> = []) {
 
 function Company({results, print}: any) {
 
-    const list = results && results.map((item) =>
+    const list = results && results.map((item: any) =>
         [<tr key={item._id} className="table-secondary" tabIndex='0'>
             <td>{item.name}</td>
             <td className='fw-bold'>{item.is_enabled ? gettext('Active') : gettext('Disabled')}</td>

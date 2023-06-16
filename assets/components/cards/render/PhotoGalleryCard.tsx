@@ -18,7 +18,7 @@ function PhotoGalleryCard({photos, title, moreUrl, moreUrlLabel}: any) {
     return (
         <div className='row'>
             <MoreNewsButton key="more" title={title} photoUrl={moreUrl} photoUrlLabel={moreUrlLabel} />
-            {photos.map((photo, index) => getMediaPanel(photo, index))}
+            {photos.map((photo: any, index: any) => getMediaPanel(photo, index))}
         </div>
     );
 }

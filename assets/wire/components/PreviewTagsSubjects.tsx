@@ -18,7 +18,7 @@ function PreviewTagsSubjectsComponent({subjects, displayConfig, urlPrefix, filte
     const subjectsByScheme: any = {subject: []};
     const filterGroupSchemes = Object.keys(filterGroupLabels);
 
-    subjects.forEach((subject) => {
+    subjects.forEach((subject: any) => {
         if (subject.scheme && filterGroupSchemes.includes(subject.scheme)) {
             if (subjectsByScheme[subject.scheme] == null) {
                 subjectsByScheme[subject.scheme] = [];
@@ -31,12 +31,12 @@ function PreviewTagsSubjectsComponent({subjects, displayConfig, urlPrefix, filte
     });
 
     const schemesToDisplay = Object.keys(subjectsByScheme)
-        .filter((scheme) => (
+        .filter((scheme: any) => (
             subjectsByScheme[scheme].length > 0 &&
             isDisplayed(scheme === 'subject' ? 'subjects' : scheme, displayConfig))
         );
 
-    return !schemesToDisplay.length ? null : schemesToDisplay.map((scheme) => (
+    return !schemesToDisplay.length ? null : schemesToDisplay.map((scheme: any) => (
         <PreviewTagsBlock
             key={scheme}
             label={get(filterGroupLabels, scheme, gettext('Subject'))}

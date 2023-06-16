@@ -8,7 +8,7 @@ import {gettext} from 'utils';
 
 const Navigations = ({navigations=[], activeNavigation, toggleNavigation, fetchItems}) => {
 
-    const tabs = navigations.map((navigation) => (
+    const tabs = navigations.map((navigation: any) => (
         <li className="nav-item" key={navigation.name}>
             <a href=""
                 className={classNames(

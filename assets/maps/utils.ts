@@ -17,7 +17,7 @@ export function getLocations(item: any) {
  * @return {Array}
  */
 export function getGeoLocations(locations: any) {
-    return locations.filter((loc) => get(loc, 'location.lat'));
+    return locations.filter((loc: any) => get(loc, 'location.lat'));
 }
 
 /**
@@ -116,7 +116,7 @@ function getZoom(location: any) {
         return [
             {lat: box[0], lon: box[2]},
             {lat: box[1], lon: box[3]},
-        ].map((point) => 'visible=' + encodeURIComponent(point.lat + ',' + point.lon)).join('&');
+        ].map((point: any) => 'visible=' + encodeURIComponent(point.lat + ',' + point.lon)).join('&');
     }
 
     // fallback to zoom, use 15 if we are on street level, 8 otherwise
@@ -128,7 +128,7 @@ function getLocationDetails(location: any) {
         getAddressLine(location),
         getAddressState(location),
         getAddressCountry(location),
-    ].filter((x) => !!x).join(', ');
+    ].filter((x: any) => !!x).join(', ');
 }
 
 export function getMapSource(locations: any, scale: any = 1) {
@@ -145,7 +145,7 @@ export function getMapSource(locations: any, scale: any = 1) {
     const google_maps_styles = getConfig('google_maps_styles');
 
     if (google_maps_styles) {
-        const styles = google_maps_styles.split('&').filter((s) => s).map((s) => `style=${s}`);
+        const styles = google_maps_styles.split('&').filter((s: any) => s).map((s: any) => `style=${s}`);
         if (get(styles, 'length', 0) > 0) {
             params = params.concat(styles);
         }
@@ -155,7 +155,7 @@ export function getMapSource(locations: any, scale: any = 1) {
     let src: any;
 
     if (!isEmpty(geoLocations)) {
-        const markers = geoLocations.map((loc) => 'markers=' + encodeURIComponent(loc.location.lat + ',' + loc.location.lon));
+        const markers = geoLocations.map((loc: any) => 'markers=' + encodeURIComponent(loc.location.lat + ',' + loc.location.lon));
         params.push(getZoom(geoLocations[0]));
         src = MAPS_URL + '?' + markers.concat(params).join('&');
     } else {

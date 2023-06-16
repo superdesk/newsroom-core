@@ -33,7 +33,7 @@ function PictureTextCard ({type, items, title, product, openItem, isActive, card
 
     return (
         <CardRow title={title} product={product} isActive={isActive}>
-            {items.map((item) => getPictureTextPanel(item, getPicture(item), openItem, withPictures, cardId, listConfig))}
+            {items.map((item: any) => getPictureTextPanel(item, getPicture(item), openItem, withPictures, cardId, listConfig))}
         </CardRow>
     );
 }

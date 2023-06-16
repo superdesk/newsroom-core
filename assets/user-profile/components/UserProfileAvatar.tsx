@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 function UserProfileAvatar({user}: any) {
     const initials = [user.first_name, user.last_name]
-        .map((name) => name[0].toLocaleUpperCase())
+        .map((name: any) => name[0].toLocaleUpperCase())
         .join('');
     return (
         <div className="profile__group profile__group--dark-bck">

@@ -67,7 +67,7 @@ function ItemDetails({
             </ContentHeader>
             <ArticleItemDetails disableTextSelection={detailsConfig.disable_text_selection}>
                 <ArticleContent>
-                    {pictures && pictures.map((pic) => (
+                    {pictures && pictures.map((pic: any) => (
                         <ArticlePicture
                             key={pic._id}
                             picture={pic}
@@ -89,7 +89,7 @@ function ItemDetails({
                             {isDisplayed('abstract', detailsConfig) &&
                             <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                             {isDisplayed('body_html', detailsConfig) && <ArticleBodyHtml item={item}/>}
-                            {!isEmpty(media) && media.map((media) => <ArticleMedia
+                            {!isEmpty(media) && media.map((media: any) => <ArticleMedia
                                 key={media.guid}
                                 media={media}
                                 isKilled={isKilled(item)}

@@ -68,7 +68,7 @@ export default function homeReducer(state: any = initialState, action: any) {
 
     case REMOVE_BOOKMARK: {
         const itemToOpen = Object.assign({}, state.itemToOpen);
-        itemToOpen.bookmarks = (itemToOpen.bookmarks || []).filter((val) => val !== state.user);
+        itemToOpen.bookmarks = (itemToOpen.bookmarks || []).filter((val: any) => val !== state.user);
 
         return {
             ...state,

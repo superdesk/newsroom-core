@@ -145,7 +145,7 @@ Products.propTypes = {
 };
 
 const mapStateToProps = (state: any) => ({
-    products: state.products.map((id) => state.productsById[id]),
+    products: state.products.map((id: any) => state.productsById[id]),
     productToEdit: state.productToEdit,
     activeProductId: state.activeProductId,
     isLoading: state.isLoading,

@@ -25,7 +25,7 @@ function getMultiActions(enzymeWrapper: any) {
 }
 
 function getNames(actions: any) {
-    return actions.map((action) => action.name);
+    return actions.map((action: any) => action.name);
 }
 
 describe('WireApp', () => {

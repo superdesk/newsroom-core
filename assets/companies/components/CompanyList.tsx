@@ -10,13 +10,13 @@ import CompanyListItem from './CompanyListItem';
 
 
 function CompanyList({companies, selectCompany, activeCompanyId, companyTypes, showSubscriberId}: any) {
-    const list = companies.map((company) =>
+    const list = companies.map((company: any) =>
         <CompanyListItem
             key={company._id}
             company={company}
             onClick={selectCompany}
             isActive={activeCompanyId===company._id}
-            type={companyTypes.find((ctype) => ctype.id === company.company_type)}
+            type={companyTypes.find((ctype: any) => ctype.id === company.company_type)}
             showSubscriberId={showSubscriberId}
         />
     );
@@ -59,7 +59,7 @@ CompanyList.propTypes = {
 };
 
 const mapStateToProps = (state: any) => ({
-    companies: state.companies.map((id) => state.companiesById[id]),
+    companies: state.companies.map((id: any) => state.companiesById[id]),
     activeCompanyId: state.activeCompanyId,
     companyTypes: state.companyTypes,
     showSubscriberId: companiesSubscriberIdEnabled(state),

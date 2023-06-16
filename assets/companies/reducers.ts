@@ -37,7 +37,7 @@ const initialState: any = {
 function setupCompanies(companyList: any, state: any) {
     const companiesById: any = {};
     const companyOptions = [];
-    const companies = companyList.map((company) => {
+    const companies = companyList.map((company: any) => {
         companiesById[company._id] = company;
         companyOptions.push({value: company._id, text: company.name});
         return company._id;
@@ -132,7 +132,7 @@ export default function companyReducer(state: any = initialState, action: any) {
             company.products = [];
         }
 
-        company.products.forEach((product) => {
+        company.products.forEach((product: any) => {
             if (product._id === productId) {
                 product.seats = seats;
             }

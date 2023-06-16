@@ -117,7 +117,7 @@ class TopicEditor extends React.Component<any, any> {
         if (this.state.topic.notifications) {
             unsubscribeToTopic(this.state.topic);
             topic.notifications = false;
-            topic.subscribers = (topic.subscribers || []).filter((userId) => userId !== this.props.userId);
+            topic.subscribers = (topic.subscribers || []).filter((userId: any) => userId !== this.props.userId);
         } else {
             subscribeToTopic(this.state.topic);
             topic.notifications = true;
@@ -159,7 +159,7 @@ class TopicEditor extends React.Component<any, any> {
             isExisting,
             topic
         )
-            .then((savedTopic) => {
+            .then((savedTopic: any) => {
                 this.setState({saving: false});
                 this.props.onTopicChanged();
                 this.props.closeEditor();
@@ -240,7 +240,7 @@ class TopicEditor extends React.Component<any, any> {
                 )}
                 {!showTabs ? null : (
                     <ul className='nav nav-tabs'>
-                        {this.state.tabs.map((tab) => (
+                        {this.state.tabs.map((tab: any) => (
                             <li
                                 key={tab.name}
                                 className='nav-item'
@@ -282,7 +282,7 @@ class TopicEditor extends React.Component<any, any> {
                     {this.state.activeTab === 'subscribers' && updatedTopic && (
                         <EditPanel
                             parent={updatedTopic}
-                            items={this.props.companyUsers.map((user) => ({
+                            items={this.props.companyUsers.map((user: any) => ({
                                 ...user,
                                 name: `${user.first_name} ${user.last_name}`,
                             }))}

@@ -57,7 +57,7 @@ class FiltersTab extends React.Component<any, any> {
 
     toggleGroup(event: any, group: any) {
         event.preventDefault();
-        this.setState({groups: this.props.groups.map((_group) =>
+        this.setState({groups: this.props.groups.map((_group: any) =>
             _group === group ? Object.assign({}, _group, {isOpen: !_group.isOpen}) : _group
         )});
     }
@@ -94,7 +94,7 @@ class FiltersTab extends React.Component<any, any> {
     }
 
     getFilterGroups() {
-        return this.state.groups.map((group) => <FilterGroup
+        return this.state.groups.map((group: any) => <FilterGroup
             key={group.label}
             group={group}
             activeFilter={this.state.activeFilter}
@@ -120,13 +120,13 @@ class FiltersTab extends React.Component<any, any> {
 
     render() {
         const {activeFilter, createdFilter} = this.state;
-        const isResetActive = Object.keys(activeFilter).find((key) => !isEmpty(activeFilter[key]))
-            || Object.keys(createdFilter).find((key) => !isEmpty(createdFilter[key]));
+        const isResetActive = Object.keys(activeFilter).find((key: any) => !isEmpty(activeFilter[key]))
+            || Object.keys(createdFilter).find((key: any) => !isEmpty(createdFilter[key]));
 
         return (
             <div className="d-contents">
                 <div className='tab-pane__inner'>
-                    {this.getFilterGroups().filter((group) => !!group).concat([
+                    {this.getFilterGroups().filter((group: any) => !!group).concat([
                         (<NavCreatedPicker
                             key="created"
                             createdFilter={createdFilter}

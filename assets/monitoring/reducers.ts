@@ -38,7 +38,7 @@ export default function monitoringReducer(state: any = initialState, action: any
 
     case SET_COMPANIES: {
         const companiesById: any = {};
-        action.data.map((company) => companiesById[company._id] = company);
+        action.data.map((company: any) => companiesById[company._id] = company);
         return {...state, companies: action.data, companiesById};
 
     }
@@ -85,7 +85,7 @@ export default function monitoringReducer(state: any = initialState, action: any
 
     case SET_MONITORING_LIST: {
         let monitoringListById = Object.assign({}, state.monitoringListById);
-        const profiles = action.data.map((p) => {
+        const profiles = action.data.map((p: any) => {
             monitoringListById[p._id] = p;
             return p._id;
         });

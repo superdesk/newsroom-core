@@ -22,7 +22,7 @@ export const navigationsSelector = (state: any) => get(state, 'search.navigation
 
 export const navigationsByIdSelector = createSelector(
     [navigationsSelector],
-    (navigations) => navigations.reduce((navs, nav) => {
+    (navigations) => navigations.reduce((navs: any, nav: any) => {
         navs[nav._id] = nav;
 
         return navs;
@@ -35,7 +35,7 @@ export const productsSelector = (state: any) => get(state, 'search.products') ||
 export const filterGroups = (state: any) => get(state, 'groups') || [];
 export const filterGroupsByIdSelector = createSelector(
     [filterGroups],
-    (listOfGroups) => listOfGroups.reduce((groups, group) => {
+    (listOfGroups) => listOfGroups.reduce((groups: any, group: any) => {
         groups[group.field] = group;
 
         return groups;
@@ -91,7 +91,7 @@ export const searchParamsSelector = createSelector(
 
         if (filter && Object.keys(filter).length > 0) {
             params.filter = {};
-            Object.keys(filter).forEach((key) => {
+            Object.keys(filter).forEach((key: any) => {
                 if (key === 'location') {
                     params.filter[key] = filter[key];
                     return;
@@ -119,7 +119,7 @@ export const searchParamTagSelector = createSelector(
         const paramTags = [];
 
         if (params.navigation) {
-            params.navigation.forEach((navId) => {
+            params.navigation.forEach((navId: any) => {
                 if (activeTopic != null && navId === activeTopic._id) {
                     return;
                 }
@@ -182,7 +182,7 @@ export const searchParamTagSelector = createSelector(
         }
 
         if (params.filter) {
-            Object.keys(params.filter).forEach((field) => {
+            Object.keys(params.filter).forEach((field: any) => {
                 const group = groups[field];
 
                 if (!group) {
@@ -192,7 +192,7 @@ export const searchParamTagSelector = createSelector(
                     return;
                 }
 
-                params.filter[field].forEach((filterValue) => {
+                params.filter[field].forEach((filterValue: any) => {
                     paramTags.push({
                         key: `${field}.${filterValue}`,
                         label: group.label,
@@ -256,8 +256,8 @@ export const isSearchFiltered = createSelector(
     [searchParamsSelector],
     (params: any) => {
         return get(params, 'query', '').length > 0 ||
-            Object.keys(get(params, 'created', {})).filter((key) => get(params.created, key)).length > 0 ||
-            Object.keys(get(params, 'filter', {})).filter((key) => get(params.filter, key)).length > 0;
+            Object.keys(get(params, 'created', {})).filter((key: any) => get(params.created, key)).length > 0 ||
+            Object.keys(get(params, 'filter', {})).filter((key: any) => get(params.filter, key)).length > 0;
     }
 );
 

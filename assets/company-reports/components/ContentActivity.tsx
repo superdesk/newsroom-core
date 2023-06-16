@@ -26,9 +26,9 @@ class ContentActivity extends React.Component<any, any> {
                 field: 'section',
                 label: gettext('Section'),
                 options: this.props.sections
-                    .filter((section) => section.group === 'wire' || (section.group === 'api' && this.props.apiEnabled)
+                    .filter((section: any) => section.group === 'wire' || (section.group === 'api' && this.props.apiEnabled)
                     || section.group === 'monitoring')
-                    .map((section) => ({
+                    .map((section: any) => ({
                         label: section.name,
                         value: section.name,
                     })),
@@ -132,13 +132,13 @@ class ContentActivity extends React.Component<any, any> {
 
         genre.options = props.aggregations.genres
             .sort()
-            .map((genre) => ({
+            .map((genre: any) => ({
                 label: genre,
                 value: genre,
             }));
         company.options = props.companies
-            .filter((company) => props.aggregations.companies.includes(company._id))
-            .map((company) => ({
+            .filter((company: any) => props.aggregations.companies.includes(company._id))
+            .map((company: any) => ({
                 label: company.name,
                 value: company.name,
             }));
@@ -159,17 +159,17 @@ class ContentActivity extends React.Component<any, any> {
                 headline: get(item, 'headline') || '',
                 anpa_take_key: get(item, 'anpa_take_key') || '',
                 place: (get(item, 'place') || [])
-                    .map((place) => place.name)
+                    .map((place: any) => place.name)
                     .sort(),
                 service: (get(item, 'service') || [])
-                    .map((service) => service.name)
+                    .map((service: any) => service.name)
                     .sort(),
                 subject: (get(item, 'subject') || [])
-                    .map((subject) => subject.name)
+                    .map((subject: any) => subject.name)
                     .sort(),
                 total: get(item, 'aggs.total') || 0,
                 companies: (get(item, 'aggs.companies') || [])
-                    .map((company) => companies[company].name)
+                    .map((company: any) => companies[company].name)
                     .sort(),
                 actions: {
                     download: get(item, 'aggs.actions.download') || 0,
@@ -209,27 +209,27 @@ class ContentActivity extends React.Component<any, any> {
         const actions = this.getFilteredActions();
 
         if (get(results, 'length', 0) > 0) {
-            return results.map((item) =>
+            return results.map((item: any) =>
                 <tr key={item._id}>
                     <td>{item.versioncreated}</td>
                     <td>{item.headline}</td>
                     <td>{item.anpa_take_key}</td>
-                    <td>{item.place.map((place) => (
+                    <td>{item.place.map((place: any) => (
                         <Fragment key={place}>
                             {place}<br />
                         </Fragment>
                     ))}</td>
-                    <td>{item.service.map((service) => (
+                    <td>{item.service.map((service: any) => (
                         <Fragment key={service}>
                             {service}<br />
                         </Fragment>
                     ))}</td>
-                    <td>{item.subject.map((subject) => (
+                    <td>{item.subject.map((subject: any) => (
                         <Fragment key={subject}>
                             {subject}<br />
                         </Fragment>
                     ))}</td>
-                    <td>{item.companies.map((company) => (
+                    <td>{item.companies.map((company: any) => (
                         <Fragment key={company}>
                             {company}<br />
                         </Fragment>
@@ -269,7 +269,7 @@ class ContentActivity extends React.Component<any, any> {
                         />
                     </div>
 
-                    {filters.map((filterName) => {
+                    {filters.map((filterName: any) => {
                         const filter = this.state[filterName];
 
                         return (

@@ -126,7 +126,7 @@ SectionFilters.propTypes = {
 };
 
 const mapStateToProps = (state: any) => ({
-    sectionFilters: state.sectionFilters.map((id) => state.sectionFiltersById[id]),
+    sectionFilters: state.sectionFilters.map((id: any) => state.sectionFiltersById[id]),
     sectionFilterToEdit: state.sectionFilterToEdit,
     activeSectionFilterId: state.activeSectionFilterId,
     isLoading: state.isLoading,

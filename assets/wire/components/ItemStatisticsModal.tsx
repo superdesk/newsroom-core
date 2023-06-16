@@ -26,11 +26,11 @@ export default class ItemStatisticsModal extends React.Component<any, any> {
         const id = pieces[pieces.length - 1];
 
         fetch('https://56dtrivaof.execute-api.eu-north-1.amazonaws.com/production/api/v1/embed?organization=stt&versionId=' + id)
-            .then((res) => res.json())
-            .then((data) => {
+            .then((res: any) => res.json())
+            .then((data: any) => {
                 this.setState({iframe: data.iframeSrc});
             })
-            .catch((err) => {
+            .catch((err: any) => {
                 console.error(err);
             })
             .finally(() => {

@@ -41,7 +41,7 @@ export default function itemReducer(state: any = initialState, action: any) {
 
     case GET_TOPICS: {
         const topicsById = Object.assign({}, state.topicsById);
-        const topics = action.topics.map((topic) => {
+        const topics = action.topics.map((topic: any) => {
             topicsById[topic._id] = topic;
             return topic;
         });
@@ -167,7 +167,7 @@ export default function itemReducer(state: any = initialState, action: any) {
         return {...state, monitoringProfileUsers: action.data};
 
     case SET_USER_COMPANY_MONITORING_LIST:
-        newSelected = state.selectedItem && (action.data || []).find((w) => w._id === state.selectedItem._id);
+        newSelected = state.selectedItem && (action.data || []).find((w: any) => w._id === state.selectedItem._id);
         newState = {
             ...state,
             monitoringList: action.data,

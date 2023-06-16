@@ -42,11 +42,11 @@ export function getItemMedia(item: any) {
         return [item];
     }
 
-    return Object.values(get(item, 'associations', {}) || {}).filter((assoc) => assoc != null && isMedia(assoc));
+    return Object.values(get(item, 'associations', {}) || {}).filter((assoc: any) => assoc != null && isMedia(assoc));
 }
 
 function getRelatedItemsByType(item: any, type: any) {
-    return item.type === type ? [item] : Object.values(get(item, 'associations', {}) || {}).filter((assoc) => get(assoc, 'type') === type);
+    return item.type === type ? [item] : Object.values(get(item, 'associations', {}) || {}).filter((assoc: any) => get(assoc, 'type') === type);
 }
 
 /**
@@ -72,12 +72,12 @@ export function getPicture(item: any) {
 }
 
 function getBodyPicture(item: any) {
-    const pictures = Object.values(get(item, 'associations', {}) || {}).filter((assoc) => get(assoc, 'type') === 'picture');
+    const pictures = Object.values(get(item, 'associations', {}) || {}).filter((assoc: any) => get(assoc, 'type') === 'picture');
     return pictures.length ? pictures[0] : null;
 }
 
 export function getPictureList(item: any) {
-    const pictures = Object.values(get(item, 'associations', {}) || {}).filter((assoc) => get(assoc, 'type') === 'picture');
+    const pictures = Object.values(get(item, 'associations', {}) || {}).filter((assoc: any) => get(assoc, 'type') === 'picture');
     return pictures.length ? pictures : [];
 }
 
@@ -182,7 +182,7 @@ export function shortText(item: any, length: any = 40, config: any) {
     const useBody = (config === true || config === false) ? config : isDisplayed('abstract', config) === false;
     const html = (useBody ? item.body_html : item.description_html || item.body_html) || '<p></p>';
     const text = useBody ?  getTextFromHtml(html) : item.description_text || getTextFromHtml(html);
-    const words = text.split(/\s/).filter((w) => w);
+    const words = text.split(/\s/).filter((w: any) => w);
     return words.slice(0, length).join(' ') + (words.length > length ? '...' : '');
 }
 
@@ -223,7 +223,7 @@ export function isEqualItem(a: any, b: any) {
 }
 
 function hasMedia(item: any, type: any) {
-    return item != null && getItemMedia(item).some((_item) => _item.type === type);
+    return item != null && getItemMedia(item).some((_item: any) => _item.type === type);
 }
 
 export const hasAudio = (item: any) => hasMedia(item, 'audio');

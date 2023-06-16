@@ -6,7 +6,7 @@ import {gettext} from 'utils';
 
 
 function getProductDetails(products: any) {
-    return (products.map((product) => (<div key={product._id} className="d-flex align-items-center m-2">
+    return (products.map((product: any) => (<div key={product._id} className="d-flex align-items-center m-2">
         <div><span className="font-italic">{gettext('Product name')}:</span> {product.name}</div>
         <div className="ms-3"><span className="font-italic">{gettext('Is enabled')}:</span>{product.is_enabled.toString()}</div>
         {product.query && <div className="ms-3"><span className="font-italic">{gettext('Query')}:</span>{product.query}</div>}
@@ -16,7 +16,7 @@ function getProductDetails(products: any) {
 
 function CompanyProducts({results, print}: any) {
 
-    const list = results && results.map((item) =>
+    const list = results && results.map((item: any) =>
         [<tr key={item._id} className="table-secondary" tabIndex='0'>
             <td>{item.name}</td>
             <td>{item.is_enabled.toString()}</td>

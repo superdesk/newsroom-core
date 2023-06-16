@@ -29,7 +29,7 @@ const SelectInput = ({
                     {defaultOption != null &&
                         <option value="">{defaultOption}</option>
                     }
-                    {options.map((option) => {
+                    {options.map((option: any) => {
                         return <option key={option.value} value={option.value}>{gettext(option.text)}</option>;
                     })}
                 </select>

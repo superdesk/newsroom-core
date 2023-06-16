@@ -119,7 +119,7 @@ Clients.propTypes = {
 
 
 const mapStateToProps = (state: any) => ({
-    clients: state.clients.map((id) => state.clientsById[id]),
+    clients: state.clients.map((id: any) => state.clientsById[id]),
     clientToEdit: state.clientToEdit,
     activeQuery: searchQuerySelector(state),
     totalClients: state.totalClients,

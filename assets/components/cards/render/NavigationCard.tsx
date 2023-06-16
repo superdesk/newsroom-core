@@ -10,7 +10,7 @@ const NavigationCard = ({navigation}) => {
             return null;
         }
 
-        const urls = get(navigation, 'tile_images', []).map((image) => image.file_url).filter((url) => url);
+        const urls = get(navigation, 'tile_images', []).map((image: any) => image.file_url).filter((url: any) => url);
 
         if (urls.length === 1) {
             return urls[0];

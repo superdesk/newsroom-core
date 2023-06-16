@@ -47,7 +47,7 @@ class AgendaListItemIcons extends React.Component<any, any> {
             internalNote: getInternalNote(props.item, props.planningItem),
             coveragesToDisplay: !hasCoverages(props.item) || props.hideCoverages ?
                 [] :
-                (props.item.coverages || []).filter((c) => (
+                (props.item.coverages || []).filter((c: any) => (
                     !props.group ||
                     c.scheduled == null ||
                     (isCoverageForExtraDay(c, props.group) && c.planning_id === get(props, 'planningItem.guid'))
@@ -74,7 +74,7 @@ class AgendaListItemIcons extends React.Component<any, any> {
 
                 {state.coveragesToDisplay.length > 0 && (
                     <div className='wire-articles__item__icons wire-articles__item__icons--dashed-border'>
-                        {state.coveragesToDisplay.map((coverage, index) => (
+                        {state.coveragesToDisplay.map((coverage: any, index: any) => (
                             <AgendaListCoverageItem
                                 key={index}
                                 planningItem={props.planningItem}

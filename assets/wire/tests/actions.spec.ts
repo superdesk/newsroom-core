@@ -160,7 +160,7 @@ describe('wire actions', () => {
         fetchMock.get('/wire/bar?format=json', next);
 
         return store.dispatch(actions.fetchNext(item))
-            .then((_next) => {
+            .then((_next: any) => {
                 expect(_next).toEqual(next);
             });
     });

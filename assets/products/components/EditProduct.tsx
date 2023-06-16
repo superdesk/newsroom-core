@@ -11,10 +11,10 @@ import AuditInformation from 'components/AuditInformation';
 import {sectionsPropType} from '../../features/sections/types';
 
 const getProductCompanies = (product: any, companies: any) => ({
-    companies: companies.filter((company) => {
+    companies: companies.filter((company: any) => {
         const companyProducts = company.products || [];
-        return companyProducts.some((_product) => _product._id === product._id);
-    }).map((company) => company._id),
+        return companyProducts.some((_product: any) => _product._id === product._id);
+    }).map((company: any) => company._id),
 });
 
 class EditProduct extends React.Component<any, any> {
@@ -92,7 +92,7 @@ class EditProduct extends React.Component<any, any> {
                 </div>
                 <AuditInformation item={this.props.product} />
                 <ul className='nav nav-tabs'>
-                    {this.tabs.map((tab) => (
+                    {this.tabs.map((tab: any) => (
                         <li key={tab.name} className='nav-item'>
                             <a
                                 name={tab.name}

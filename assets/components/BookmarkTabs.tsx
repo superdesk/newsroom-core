@@ -4,7 +4,7 @@ import {gettext} from '../utils';
 
 
 export default function BookmarkTabs(props: any) {
-    const sections = Object.keys(props.sections).map((id) => {
+    const sections = Object.keys(props.sections).map((id: any) => {
         const section = props.sections[id];
 
         return <a key={section._id}
