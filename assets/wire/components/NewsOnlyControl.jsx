@@ -6,8 +6,8 @@ import {noNavigationSelected} from 'search/utils';
 
 function NewsOnlyControl ({newsOnly, toggleNews, activeNavigation}) {
     return !noNavigationSelected(activeNavigation) ? null : (
-        <div className="react-toggle__wrapper">
-            <label htmlFor="news-only" className="mr-2">{gettext('News only')}</label>
+        <div className="react-toggle__wrapper ms-2">
+            <label htmlFor="news-only" className="me-2">{gettext('News only')}</label>
             <Toggle
                 id="news-only"
                 defaultChecked={newsOnly}

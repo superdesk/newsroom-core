@@ -7,7 +7,7 @@ import {noNavigationSelected} from 'search/utils';
 function SearchAllVersionsControl({searchAllVersions, toggleSearchAllVersions, activeNavigation}) {
     return !noNavigationSelected(activeNavigation) ? null : (
         <div className="react-toggle__wrapper">
-            <label htmlFor='all-versions' className="mr-2">{gettext('All Versions')}</label>
+            <label htmlFor='all-versions' className="me-2">{gettext('All Versions')}</label>
             <Toggle
                 id="all-versions"
                 defaultChecked={searchAllVersions}
