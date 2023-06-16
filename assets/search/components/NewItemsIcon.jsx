@@ -53,7 +53,7 @@ class NewItemsIcon extends React.Component {
                 aria-label={gettext('Refresh')}
             >
                 <i className="icon--refresh icon--pink"/>
-                <span className="badge rounded-pill ms-2">
+                <span className="badge rounded-pill bg-info ms-2">
                     {newItemsLength}
                 </span>
             </button>
