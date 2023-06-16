@@ -186,6 +186,45 @@ export function shortText(item, length=40, config) {
     return words.slice(0, length).join(' ') + (words.length > length ? '...' : '');
 }
 
+export function shortHighlightedtext(html, maxLength = 40) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const span = doc.querySelector('span.es-highlight');
+  
+    if (!span) {
+        const plainText = doc.documentElement.textContent.trim();
+        const words = plainText.split(/\s/).filter(w => w);
+        return words.slice(0, maxLength).join(' ') + (words.length > maxLength ? '...' : '');
+    }
+  
+    const parentElement = span.parentElement;
+    const treeWalker = document.createTreeWalker(parentElement, NodeFilter.SHOW_TEXT, null, false);
+    let node = treeWalker.firstChild();
+    let text = '';
+    let count = 0;
+  
+    while (node && count < maxLength) {
+        const content = node.textContent.trim();
+        const words = content.split(/\s/).filter(w => w);
+        const remainingCount = maxLength - count;
+  
+        if (words.length <= remainingCount) {
+            text += content + ' ';
+            count += words.length;
+        } else {
+            text += words.slice(0, remainingCount).join(' ');
+            count += remainingCount;
+        }
+  
+        node = treeWalker.nextSibling();
+    }
+  
+    const truncatedText = text.trim();
+    const highlightedText = span.outerHTML;
+    const output = truncatedText + (count > maxLength ? '' : '...');
+    return output.replace(span.textContent, highlightedText);
+}  
+
 /**
  * Get caption for picture
  *
