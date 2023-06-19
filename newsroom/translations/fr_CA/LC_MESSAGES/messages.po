@@ -3811,7 +3811,7 @@ msgid "Clear filters"
 msgstr "Effacer les filtres"
 
 #: assets/wire/components/filters/NavCreatedPicker.jsx:27
-msgid "Event date"
+msgid "Event Date"
 msgstr "Date de l'événement"
 
 #: assets/wire/components/filters/NavCreatedPicker.jsx:36
