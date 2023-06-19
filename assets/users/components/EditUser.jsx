@@ -45,7 +45,7 @@ function EditUserComponent({
         Object.keys(seats[companyId] || {}) :
         products.map((product) => product._id);
     const sections = companyId != null ?
-        (isUserAdmin(user) ? allSections : companySections[companyId] || []) :
+        companySections[companyId] || [] :
         allSections;
     const companySectionIds = sections.map((section) => section._id);
     const isAdmin = isUserAdmin(currentUser);
