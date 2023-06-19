@@ -26,6 +26,7 @@ import UserProfile from './profile/UserProfile';
 import ProfileToggle from './ProfileToggle';
 
 import '../style';
+import {isUserAdmin} from '../../users/utils';
 
 const modals = {shareItem: ShareItemModal};
 
@@ -69,7 +70,7 @@ class UserProfileApp extends React.Component {
     }
 
     isSectionEnabled(name) {
-        return !!get(this.props, 'userSections', []).find((s) => s._id === name);
+        return isUserAdmin(this.props.user) || !!get(this.props, 'userSections', []).find((s) => s._id === name);
     }
 
     renderModal(specs) {
