@@ -5,7 +5,7 @@ import {get, cloneDeep} from 'lodash';
 
 export const SELECT_USER = 'SELECT_USER';
 export function selectUser(id: any) {
-    return function (dispatch) {
+    return function (dispatch: any) {
         dispatch(select(id));
     };
 }
@@ -79,7 +79,7 @@ export function toggleSortDirection() {
  *
  */
 export function fetchUsers() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         dispatch(queryUsers());
         const state = getState();
         const query = searchQuerySelector(state) || '';
@@ -114,7 +114,7 @@ export function fetchUsers() {
  *
  */
 export function postUser() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const user = cloneDeep(getState().userToEdit);
         const url = `/users/${user._id ? user._id : 'new'}`;
@@ -146,7 +146,7 @@ export function postUser() {
 
 
 export function resetPassword() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const user = getState().userToEdit;
         const url = `/users/${user._id}/reset_password`;
@@ -163,7 +163,7 @@ export function resetPassword() {
  *
  */
 export function deleteUser() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const user = getState().userToEdit;
         const userId = user._id;
@@ -192,7 +192,7 @@ export function resendUserInvite() {
 
 export const INIT_VIEW_DATA = 'INIT_VIEW_DATA';
 export function initViewData(data: any) {
-    return function (dispatch) {
+    return function (dispatch: any) {
         dispatch({type: INIT_VIEW_DATA, data});
         dispatch(getUsers(data.users));
         dispatch(getCompanies(data.companies));

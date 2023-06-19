@@ -39,7 +39,7 @@ export function setNotificationsLoading(loading: any) {
 }
 
 export function loadNotifications() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         dispatch(setNotificationsLoading(true));
         const user = getState().user;
 
@@ -60,7 +60,7 @@ export function loadNotifications() {
  *
  */
 export function deleteNotification(id: any) {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         const user = getState().user;
         const url = `/users/${user}/notifications/${user}_${id}`;
         return server.del(url)
@@ -78,7 +78,7 @@ export function deleteNotification(id: any) {
  *
  */
 export function deleteAllNotifications() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         const user = getState().user;
         const url = `/users/${user}/notifications`;
         return server.del(url)

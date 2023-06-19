@@ -506,7 +506,7 @@ export function reloadMyTopics(reloadTopic: any = false) {
 
 export const SET_NEW_ITEMS = 'SET_NEW_ITEMS';
 export function setNewItems(data: any) {
-    return function (dispatch) {
+    return function (dispatch: any) {
         if (get(data, '_items.length') <= 0 || get(data, '_items[0].type') !== 'text') {
             return Promise.resolve();
         }

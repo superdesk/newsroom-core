@@ -24,7 +24,7 @@ export function setProductFilter(id: any) {
 }
 
 export function sendProductSeatRequest(data: any) {
-    return function (dispatch) {
+    return function (dispatch: any) {
         return server.post('/company_admin/send_product_seat_request', data)
             .then(() => notify.success(gettext('Product Seat request sent')))
             .catch((error: any) => errorHandler(error, dispatch, setError));

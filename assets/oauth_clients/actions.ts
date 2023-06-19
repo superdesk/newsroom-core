@@ -5,7 +5,7 @@ import {searchQuerySelector} from 'search/selectors';
 
 export const SELECT_CLIENT = 'SELECT_CLIENT';
 export function selectClient(id: any) {
-    return function (dispatch) {
+    return function (dispatch: any) {
         dispatch(select(id));
     };
 }
@@ -56,7 +56,7 @@ export function getClientPassword(data: any) {
  *
  */
 export function fetchClients() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         dispatch(queryClients());
         const query = searchQuerySelector(getState()) || '';
 
@@ -74,7 +74,7 @@ export function fetchClients() {
  *
  */
 export function postClient() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         const client = getState().clientToEdit;
         const url = `/oauth_clients/${client._id ? client._id : 'new'}`;
 
@@ -99,7 +99,7 @@ export function postClient() {
  *
  */
 export function deleteClient() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const client = getState().clientToEdit;
         const url = `/oauth_clients/${client._id}`;

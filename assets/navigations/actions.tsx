@@ -53,7 +53,7 @@ export function setError(errors: any) {
  *
  */
 export function fetchNavigations() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         dispatch(queryNavigations());
         const query = searchQuerySelector(getState()) || '';
 
@@ -69,7 +69,7 @@ export function fetchNavigations() {
  *
  */
 export function postNavigation() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const navigation = getState().navigationToEdit;
         if (!navigation._id) {
@@ -109,7 +109,7 @@ export function postNavigation() {
  *
  */
 export function deleteNavigation() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const navigation = getState().navigationToEdit;
         const url = `/navigations/${navigation._id}`;
@@ -129,7 +129,7 @@ export function deleteNavigation() {
  *
  */
 export function fetchProducts() {
-    return function (dispatch) {
+    return function (dispatch: any) {
         return server.get('/products/search')
             .then((data: any) => {
                 dispatch(getProducts(data));
@@ -139,7 +139,7 @@ export function fetchProducts() {
 }
 
 export function initViewData(data: any) {
-    return function (dispatch) {
+    return function (dispatch: any) {
         dispatch(getNavigations(data.navigations));
         dispatch(getProducts(data.products));
         dispatch(initSections(data.sections));

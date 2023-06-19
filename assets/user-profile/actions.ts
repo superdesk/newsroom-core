@@ -79,7 +79,7 @@ export function hideModal() {
  * Fetches user details
  */
 export function fetchUser(id: any) {
-    return function (dispatch) {
+    return function (dispatch: any) {
         return server.get(`/users/${id}`)
             .then((data: any) => {
                 dispatch(getUser(data));
@@ -93,7 +93,7 @@ export function fetchUser(id: any) {
  *
  */
 export function saveUser() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const editedUser: any = {...getState().editedUser};
         const url = `/users/${editedUser._id}/profile`;
@@ -124,7 +124,7 @@ export function saveUser() {
  *
  */
 export function fetchTopics() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         return server.get(`/users/${getState().user._id}/topics`)
             .then((data: any) => {
                 return dispatch(getTopics(data._items));
@@ -138,7 +138,7 @@ export function fetchTopics() {
  *
  */
 export function deleteTopic(topic: any) {
-    return function (dispatch) {
+    return function (dispatch: any) {
         const url = `/topics/${topic._id}`;
         return server.del(url)
             .then(() => {

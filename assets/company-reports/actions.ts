@@ -71,7 +71,7 @@ function getReportQueryString(currentState: any, next: any, exportReport: any, n
 
 export const INIT_DATA = 'INIT_DATA';
 export function initData(data: any) {
-    return function (dispatch) {
+    return function (dispatch: any) {
         dispatch(fetchProducts());
         dispatch({type: INIT_DATA, data});
     };
@@ -113,7 +113,7 @@ export function getProducts(data: any) {
 }
 
 export function runReport() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         dispatch(queryReport());
         dispatch(fetchReport(REPORTS[getState().activeReport]));
     };
@@ -138,7 +138,7 @@ export function fetchAggregations(url: any) {
  *
  */
 export function fetchReport(url: any, next: any, exportReport: any) {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         if (next) {
             dispatch(isLoading(next));
         }
@@ -186,14 +186,14 @@ export function toggleFilter(filter: any, value: any) {
 }
 
 export function toggleFilterAndQuery(filter: any, value: any) {
-    return function (dispatch) {
+    return function (dispatch: any) {
         dispatch(toggleFilter(filter, value));
         return dispatch(runReport());
     };
 }
 
 export function printReport() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         const state = getState();
         const activeReport = state.activeReport;
 
@@ -213,7 +213,7 @@ export function printReport() {
  *
  */
 export function fetchProducts() {
-    return function (dispatch) {
+    return function (dispatch: any) {
         return server.get('/products/search')
             .then((data: any) => {
                 dispatch(getProducts(data));

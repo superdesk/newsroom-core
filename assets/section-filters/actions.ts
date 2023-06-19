@@ -45,7 +45,7 @@ export function setError(errors: any) {
  *
  */
 export function fetchSectionFilters() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         dispatch(querySectionFilters());
         const query = searchQuerySelector(getState()) || '';
 
@@ -61,7 +61,7 @@ export function fetchSectionFilters() {
  *
  */
 export function postSectionFilter() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const sectionFilter = getState().sectionFilterToEdit;
         const url = `/section_filters/${sectionFilter._id ? sectionFilter._id : 'new'}`;
@@ -86,7 +86,7 @@ export function postSectionFilter() {
  *
  */
 export function deleteSectionFilter() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const sectionFilter = getState().sectionFilterToEdit;
         const url = `/section_filters/${sectionFilter._id}`;
@@ -104,7 +104,7 @@ export function deleteSectionFilter() {
 
 
 export function initViewData(data: any) {
-    return function (dispatch) {
+    return function (dispatch: any) {
         dispatch(getSectionFilters(data.section_filters));
         dispatch(initSections(data.sections));
     };

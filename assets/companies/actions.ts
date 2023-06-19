@@ -120,7 +120,7 @@ export function fetchCompanyUsers(companyId: any, force: any = false) {
  *
  */
 export function postCompany() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         const company = getState().companyToEdit;
         const url = `/companies/${company._id ? company._id : 'new'}`;
 
@@ -145,7 +145,7 @@ export function postCompany() {
  *
  */
 export function fetchProducts() {
-    return function (dispatch) {
+    return function (dispatch: any) {
         return server.get('/products/search')
             .then((data: any) => {
                 dispatch(getProducts(data));
@@ -160,7 +160,7 @@ export function fetchProducts() {
  *
  */
 export function deleteCompany() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
 
         const company = getState().companyToEdit;
         const url = `/companies/${company._id}`;
