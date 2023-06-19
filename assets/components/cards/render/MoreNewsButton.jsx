@@ -8,7 +8,7 @@ function MoreNewsButton({title, product, photoUrl, photoUrlLabel, moreNews}) {
     </div>,
     <div key='more-news' className='col-6 col-sm-4 d-flex align-items-start justify-content-end'>
         {moreNews && product &&
-                <a href={`/wire?product=${product._id}`} role='button' className='nh-button nh-button--tertiary mb-3'>
+                <a href={`/wire?product=${product}`} role='button' className='nh-button nh-button--tertiary mb-3'>
                     {gettext('More news')}
                 </a>}
         {photoUrl &&
