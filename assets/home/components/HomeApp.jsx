@@ -76,7 +76,11 @@ class HomeApp extends React.Component {
     }
 
     getProduct(card) {
-        return this.props.products.find(p => p._id === card.config.product);
+        const {userType, products} = this.props;
+        if (userType === 'administrator' && !products.length) {
+            return {_id: card.config.product};
+        }
+        return products.find(p => p._id === card.config.product) || null;
     }
 
     getPanels(card) {

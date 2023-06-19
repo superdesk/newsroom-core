@@ -130,15 +130,6 @@ def delete_dashboard_caches():
         app.cache.delete(f"{HOME_ITEMS_CACHE_KEY}{company['_id']}")
 
 
-def get_products_by_card(cards, user):
-    if user.get("user_type") == "administrator" and not user.get("company"):
-        products = []
-        for card in cards:
-            products += get_product_by_id(card.get("config", {}).get("product", ""))
-        return products
-    return []
-
-
 def get_home_data():
     user = get_user()
     company = get_company(user)
@@ -148,7 +139,7 @@ def get_home_data():
 
     return {
         "cards": cards,
-        "products": get_products_by_company(company) if company else get_products_by_card(cards, user),
+        "products": get_products_by_company(company) if company else [],
         "user": str(user["_id"]) if user else None,
         "userProducts": user.get("products") if user else [],
         "userType": user.get("user_type"),
