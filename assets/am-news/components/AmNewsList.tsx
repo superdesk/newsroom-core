@@ -14,7 +14,7 @@ import {getContextName} from 'selectors';
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
 
-const itemsSelector = (state) => state.items.map((_id: any) => state.itemsById[_id]);
+const itemsSelector = (state: any) => state.items.map((_id: any) => state.itemsById[_id]);
 const groupedItemsSelector = createSelector(
     [itemsSelector],
     (items: any) => {
@@ -31,6 +31,10 @@ const groupedItemsSelector = createSelector(
 
 
 class AmNewsList extends React.Component<any, any> {
+    static propTypes: any;
+    previewTimeout: any;
+    clickTimeout: any;
+
     constructor(props: any) {
         super(props);
 

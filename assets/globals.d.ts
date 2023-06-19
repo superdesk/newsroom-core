@@ -14,4 +14,6 @@ interface Window {
     };
 
     locale: any;
+    gtag: any;
+    analytics: any;
 }

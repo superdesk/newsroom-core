@@ -18,7 +18,7 @@ describe('utils', () => {
                 },
             ];
 
-            const groupedItems = keyBy(utils.groupItems(items, '2018-10-13', 'day'), 'date');
+            const groupedItems: any = keyBy(utils.groupItems(items, '2018-10-13', 'day'), 'date');
 
             expect(groupedItems.hasOwnProperty('13-10-2018')).toBe(false);
             expect(groupedItems.hasOwnProperty('14-10-2018')).toBe(false);
@@ -42,7 +42,7 @@ describe('utils', () => {
                 },
             ];
 
-            const groupedItems = keyBy(utils.groupItems(items, '2018-10-21', 'day'), 'date');
+            const groupedItems: any = keyBy(utils.groupItems(items, '2018-10-21', 'day'), 'date');
 
             expect(groupedItems['15-10-2018']['items']).toEqual(['foo']);
             expect(groupedItems['16-10-2018']['items']).toEqual(['foo']);
@@ -60,7 +60,7 @@ describe('utils', () => {
                     event: {_id: 'foo'}
                 }];
 
-            const groupedItems = keyBy(utils.groupItems(items, '2018-10-11', 'day'), 'date');
+            const groupedItems: any = keyBy(utils.groupItems(items, '2018-10-11', 'day'), 'date');
 
             expect(groupedItems.hasOwnProperty('11-10-2018')).toBe(false);
             expect(groupedItems.hasOwnProperty('12-10-2018')).toBe(false);
@@ -84,7 +84,7 @@ describe('utils', () => {
                     event: null
                 }];
 
-            const groupedItems = keyBy(utils.groupItems(items, '2018-10-15', 'day'), 'date');
+            const groupedItems: any = keyBy(utils.groupItems(items, '2018-10-15', 'day'), 'date');
 
             expect(groupedItems.hasOwnProperty('15-10-2018')).toBe(false);
             expect(groupedItems.hasOwnProperty('17-10-2018')).toBe(false);
@@ -103,7 +103,7 @@ describe('utils', () => {
                     event: null
                 }];
 
-            const groupedItems = keyBy(utils.groupItems(items, '2018-10-15', 'day'), 'date');
+            const groupedItems: any = keyBy(utils.groupItems(items, '2018-10-15', 'day'), 'date');
 
             expect(groupedItems.hasOwnProperty('15-10-2018')).toBe(false);
             expect(groupedItems.hasOwnProperty('16-10-2018')).toBe(false);

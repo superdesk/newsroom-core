@@ -1,7 +1,7 @@
 import {get} from 'lodash';
 
 class Analytics {
-    _event(name, params) {
+    _event(name: any, params?: any) {
         if (window.gtag) {
             const company = get(window, 'profileData.companyName', 'none');
             const user = get(window, 'profileData.user.first_name', 'unknown');
@@ -21,7 +21,7 @@ class Analytics {
         }, params));
     }
 
-    itemEvent(name: any, item: any, params: any) {
+    itemEvent(name: any, item: any, params?: any) {
         this.event(name, item.headline || item.name || item.slugline, params);
     }
 
@@ -29,14 +29,14 @@ class Analytics {
         this._event('timing_complete', {name, value});
     }
 
-    pageview(title: any, path: any) {
+    pageview(title?: any, path?: any) {
         this._event('page_view', {
             page_title: title,
             page_path: path,
         });
     }
 
-    itemView(item) {
+    itemView(item: any) {
         if (item) {
             this.pageview(item.headline || item.slugline, `/${item._type}/${item._id}`);
         } else {

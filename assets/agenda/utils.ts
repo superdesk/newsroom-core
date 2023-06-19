@@ -630,7 +630,7 @@ export function getDisplayDates(item: any) {
  * @return {Boolean}
  */
 export function containsExtraDate(item: any, dateToCheck: any) {
-    return getDisplayDates(item).map(ed => moment(ed.date).format('YYYY-MM-DD')).includes(dateToCheck.format('YYYY-MM-DD'));
+    return getDisplayDates(item).map((ed: any) => moment(ed.date).format('YYYY-MM-DD')).includes(dateToCheck.format('YYYY-MM-DD'));
 }
 
 // get start date in utc mode if there is no time info
@@ -658,7 +658,7 @@ const isBetweenDay = (day: any, start: any, end: any) => {
  * @param activeDate: date that the grouping will start from
  * @param activeGrouping: type of grouping i.e. day, week, month
  */
-export function groupItems(items: any, activeDate: any, activeGrouping: any, featuredOnly: any) {
+export function groupItems(items: any, activeDate: any, activeGrouping: any, featuredOnly?: any) {
     const maxStart = moment(activeDate).set({'h': 0, 'm': 0, 's': 0});
     const groupedItems: any = {};
     const grouper = Groupers[activeGrouping];
@@ -755,7 +755,7 @@ export function getPlanningItemsByGroup(item: any, group: any) {
     // get unique plans for that group based on the coverage.
     const plansWithCoverages = (item.coverages || [])
         .map((coverage: any) => {
-            if (isCoverageForExtraDay(coverage, group)) {
+            if (isCoverageForExtraDay(coverage)) {
                 if (!processed[coverage.planning_id]) {
                     processed[coverage.planning_id] = 1;
                     return allPlans[coverage.planning_id];
@@ -778,13 +778,13 @@ export function isCoverageOnPreviousDay(coverage: any, group: any) {
 
 
 export function getCoveragesForDisplay(item: any, plan: any, group: any) {
-    const currentCoverage = [];
-    const previousCoverage = [];
+    const currentCoverage: any = [];
+    const previousCoverage: any = [];
     // get current and preview coverages
     (get(item, 'coverages') || [])
         .forEach((coverage: any) => {
             if (!get(plan, 'guid') || coverage.planning_id === get(plan, 'guid')) {
-                if (isCoverageForExtraDay(coverage, group)) {
+                if (isCoverageForExtraDay(coverage)) {
                     currentCoverage.push(coverage);
                 } else if (isCoverageOnPreviousDay(coverage, group)) {
                     previousCoverage.push(coverage);
@@ -798,7 +798,7 @@ export function getCoveragesForDisplay(item: any, plan: any, group: any) {
 }
 
 export function getListItems(groups: any, itemsById: any) {
-    const listItems = [];
+    const listItems: any = [];
 
     groups.forEach((group: any) => {
         group.items.forEach((_id: any) => {
@@ -966,7 +966,7 @@ export function formatAgendaDate(item: any, group: any, {localTimeZone = true, o
         // we rendering for extra days
         const scheduleDates = item.coverages
             .map((coverage: any) => {
-                if (isCoverageForExtraDay(coverage, group)) {
+                if (isCoverageForExtraDay(coverage)) {
                     return coverage.scheduled;
                 }
                 return null;

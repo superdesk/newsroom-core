@@ -5,7 +5,7 @@ import {searchQuerySelector} from 'search/selectors';
 
 export const SELECT_COMPANY = 'SELECT_COMPANY';
 export function selectCompany(id: any) {
-    return function (dispatch) {
+    return function (dispatch: any) {
         dispatch(select(id));
         dispatch(fetchCompanyUsers(id));
     };
@@ -83,7 +83,7 @@ export function setError(errors: any) {
  *
  */
 export function fetchCompanies() {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         dispatch(queryCompanies());
         const query = searchQuerySelector(getState()) || '';
 
@@ -101,7 +101,7 @@ export function fetchCompanies() {
  * @param {String} companyId
  */
 export function fetchCompanyUsers(companyId: any, force: any = false) {
-    return function (dispatch, getState) {
+    return function (dispatch: any, getState: any) {
         if (!force && !getState().companiesById[companyId].name) {
             return;
         }
