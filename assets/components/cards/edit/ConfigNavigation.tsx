@@ -8,6 +8,8 @@ import {gettext, notify} from 'utils';
 
 
 class ConfigNavigation extends React.Component<any, any> {
+    static propTypes: any;
+    navigationsById: any;
     constructor(props: any) {
         super(props);
 
@@ -25,7 +27,7 @@ class ConfigNavigation extends React.Component<any, any> {
 
     getCardNavigations(items: any) {
         return items ? items.map(
-            item => ({
+            (item: any) => ({
                 value: this.navigationsById[item]._id,
                 text: this.navigationsById[item].name,
             })
@@ -42,7 +44,7 @@ class ConfigNavigation extends React.Component<any, any> {
         const navigationList = [{value: '', text: ''}];
         const dashboard = this.props.card.dashboard === 'newsroom' ? 'wire' : this.props.card.dashboard;
         this.props.navigations.forEach((navigation: any) => {
-            if (!(get(this.props.card.config.navigations) || []).includes(navigation._id) &&
+            if (!((get as any)(this.props.card.config.navigations) || []).includes(navigation._id) &&
                 navigation.product_type === dashboard) {
                 navigationList.push({value: navigation._id, text: navigation.name});
             }

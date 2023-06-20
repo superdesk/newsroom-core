@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 export class FormToggle extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 

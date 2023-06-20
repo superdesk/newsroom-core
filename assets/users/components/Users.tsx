@@ -24,6 +24,7 @@ import SearchResults from 'search/components/SearchResults';
 
 
 class Users extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any, context: any) {
         super(props, context);
 
@@ -151,8 +152,8 @@ const mapStateToProps = (state: any) => ({
 const mapDispatchToProps = (dispatch: any) => ({
     selectUser: (_id: any) => dispatch(selectUser(_id)),
     editUser: (event: any) => dispatch(editUser(event)),
-    saveUser: (type: any) => dispatch(postUser(type)),
-    deleteUser: (type: any) => dispatch(deleteUser(type)),
+    saveUser: (type: any) => dispatch(postUser()),
+    deleteUser: (type: any) => dispatch(deleteUser()),
     resendUserInvite: () => dispatch(resendUserInvite()),
     newUser: (data: any) => dispatch(newUser(data)),
     resetPassword: () => dispatch(resetPassword()),

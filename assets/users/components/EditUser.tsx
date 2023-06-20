@@ -17,7 +17,7 @@ import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserList
 
 import {companyProductSeatsSelector, companySectionListSelector, sectionListSelector} from 'company-admin/selectors';
 
-const getCompanyOptions = (companies: any) => companies.map(company => ({value: company._id, text: company.name}));
+const getCompanyOptions = (companies: any) => companies.map((company: any) => ({value: company._id, text: company.name}));
 
 function EditUserComponent({
     original,
@@ -51,7 +51,7 @@ function EditUserComponent({
     const isAdmin = isUserAdmin(currentUser);
     const isCompanyAdmin = isUserCompanyAdmin(currentUser);
 
-    let company = companies.map((value)=> value.name);
+    let company = companies.map((value: any)=> value.name);
 
     return (
         <div

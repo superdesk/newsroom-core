@@ -50,7 +50,6 @@ function DropdownFilter({
             key={filter.field}
             icon={filter.icon}
             label={label}
-            resetLabel={gettext(filter.label)}
             className={className}
             buttonProps={buttonProps}
         >
@@ -75,6 +74,7 @@ DropdownFilter.propTypes = {
     className: PropTypes.string,
     autoToggle: PropTypes.bool,
     onClick: PropTypes.func,
+    locators: PropTypes.any,
     buttonProps: PropTypes.shape({
         textOnly: PropTypes.bool,
         iconColour: PropTypes.string,

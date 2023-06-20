@@ -12,7 +12,7 @@ function getProductName(products: any, id: any) {
 function CardListItem({card, products, isActive, onClick}: any) {
     return (
         <tr key={card._id}
-            className={isActive?'table--selected':null}
+            className={isActive ? 'table--selected' : undefined}
             onClick={() => onClick(card._id)}>
             <td className="name">{card.label}</td>
             <td>{gettext(card.type)}</td>

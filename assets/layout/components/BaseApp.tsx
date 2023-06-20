@@ -13,6 +13,11 @@ import FiltersTab from 'wire/components/filters/FiltersTab';
 import NavigationTab from 'wire/components/filters/NavigationTab';
 
 export default class BaseApp extends React.Component<any, any> {
+    static propTypes: any;
+    dom: any;
+    tooltips: any;
+    tabs: any;
+    modals: any;
     constructor(props: any) {
         super(props);
 
@@ -46,7 +51,7 @@ export default class BaseApp extends React.Component<any, any> {
         ];
     }
 
-    static getDerivedStateFromProps(props) {
+    static getDerivedStateFromProps(props: any) {
         if (props.isLoading === false) {
             return {initialLoad: false};
         }
@@ -152,7 +157,7 @@ export default class BaseApp extends React.Component<any, any> {
         }
     }
 
-    filterActions(item: any, config: any, includeCoverages: any = false) {
+    filterActions(item: any, config?: any, includeCoverages: any = false) {
         return this.props.actions.filter((action: any) => (!config || isDisplayed(action.id, config)) &&
           (!action.when || action.when(this.props.state, item, includeCoverages)));
     }

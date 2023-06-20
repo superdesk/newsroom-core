@@ -18,6 +18,7 @@ import SectionFilters from './SectionFilters';
 import ListBar from 'components/ListBar';
 
 class SectionFiltersApp extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any, context: any) {
         super(props, context);
     }

@@ -28,7 +28,7 @@ import {
 
 const handleHistory = () => {
     // handle history
-    window.onpopstate = function(event) {
+    window.onpopstate = function(event: any) {
         if (event.state) {
             closeItemOnMobile(store.dispatch, event.state, openItemDetails, previewItem);
             if (!isMobilePhone()) {

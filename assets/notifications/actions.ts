@@ -63,7 +63,7 @@ export function deleteNotification(id: any) {
     return function (dispatch: any, getState: any) {
         const user = getState().user;
         const url = `/users/${user}/notifications/${user}_${id}`;
-        return server.del(url)
+        return (server as any).del(url)
             .then(() => {
                 notify.success(gettext('Notification cleared successfully'));
                 dispatch(clearNotification(id));
@@ -81,7 +81,7 @@ export function deleteAllNotifications() {
     return function (dispatch: any, getState: any) {
         const user = getState().user;
         const url = `/users/${user}/notifications`;
-        return server.del(url)
+        return (server as any).del(url)
             .then(() => {
                 notify.success(gettext('Notifications cleared successfully'));
                 dispatch(clearAllNotifications());
@@ -96,7 +96,7 @@ export function deleteAllNotifications() {
  *
  * @param {Object} push
  */
-export function pushNotification(push) {
+export function pushNotification(push: any): any {
     return (dispatch: any, getState: any) => {
         const user = getState().user;
         switch (push.event) {

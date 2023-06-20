@@ -25,7 +25,6 @@ const renderFilter: any = {
     item_type: (props: any) => (
         <AgendaItemTypeFilter
             key="item_type"
-            activeFilter={props.activeFilter}
             itemTypeFilter={props.itemTypeFilter}
             toggleFilter={props.toggleFilter}
             eventsOnlyAccess={props.eventsOnlyAccess}

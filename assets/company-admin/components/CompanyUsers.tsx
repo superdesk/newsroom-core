@@ -14,7 +14,7 @@ function CompanyUsersComponent({users, usersById, selectUser, activeUserId, curr
     return (
         <table
             className="table table-hover table--extended"
-            tabIndex="-1"
+            tabIndex={-1}
             data-test-id="company-admin--users-list"
         >
             <thead>

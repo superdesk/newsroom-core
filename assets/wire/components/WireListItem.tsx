@@ -68,6 +68,11 @@ function getShowVersionText(isExpanded: any, itemCount: any, matchCount: any, is
 }
 
 class WireListItem extends React.Component<any, any> {
+    static propTypes: any;
+    static defaultProps: any;
+    wordCount: any;
+    characterCount: any;
+    dom: any;
     constructor(props: any) {
         super(props);
         this.wordCount = wordCount(props.item);
@@ -158,7 +163,7 @@ class WireListItem extends React.Component<any, any> {
                 onKeyDown={this.onKeyDown}
             >
                 <UrgencyItemBorder item={item} listConfig={listConfig} />
-                <div className={wrapClassName} tabIndex='0'>
+                <div className={wrapClassName} tabIndex={0}>
                     <div className="wire-articles__item-text">
                         <h4 className="wire-articles__item-headline">
                             <div
@@ -180,7 +185,6 @@ class WireListItem extends React.Component<any, any> {
                                     <WireListItemIcons
                                         item={item}
                                         picture={picture}
-                                        videos={videos}
                                         divider={false}
                                     />
                                 )}
@@ -197,7 +201,6 @@ class WireListItem extends React.Component<any, any> {
                                 <WireListItemIcons
                                     item={item}
                                     picture={picture}
-                                    videos={videos}
                                 />
                                 <div className="wire-articles__item__meta-info">
                                     <span className="bold">
@@ -237,7 +240,6 @@ class WireListItem extends React.Component<any, any> {
                                 <WireListItemIcons
                                     item={item}
                                     picture={picture}
-                                    videos={videos}
                                 />
                                 <div className="wire-articles__item__meta-info">
                                     <span>

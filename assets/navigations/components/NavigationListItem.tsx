@@ -6,7 +6,7 @@ import {gettext, shortDate} from 'utils';
 function NavigationListItem({navigation, isActive, onClick}: any) {
     return (
         <tr key={navigation._id}
-            className={isActive?'table--selected':null}
+            className={isActive ? 'table--selected' : undefined}
             onClick={() => onClick(navigation._id)}>
             <td className="name">{navigation.name}</td>
             <td>{navigation.description}</td>

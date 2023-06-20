@@ -25,6 +25,7 @@ import SearchResults from 'search/components/SearchResults';
 
 
 class Navigations extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any, context: any) {
         super(props, context);
 
@@ -144,12 +145,14 @@ const mapStateToProps = (state: any) => ({
 const mapDispatchToProps = (dispatch: any) => ({
     selectNavigation: (_id: any) => dispatch(selectNavigation(_id)),
     editNavigation: (event: any) => dispatch(editNavigation(event)),
-    saveNavigation: (type: any) => dispatch(postNavigation(type)),
-    deleteNavigation: (type: any) => dispatch(deleteNavigation(type)),
+    saveNavigation: (type: any) => dispatch(postNavigation()),
+    deleteNavigation: (type: any) => dispatch(deleteNavigation()),
     newNavigation: () => dispatch(newNavigation()),
     cancelEdit: (event: any) => dispatch(cancelEdit(event)),
     fetchProducts: () => dispatch(fetchProducts()),
     dispatch: dispatch,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Navigations);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(Navigations);
+
+export default component;

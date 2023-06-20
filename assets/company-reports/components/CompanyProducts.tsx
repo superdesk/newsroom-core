@@ -17,13 +17,13 @@ function getProductDetails(products: any) {
 function CompanyProducts({results, print}: any) {
 
     const list = results && results.map((item: any) =>
-        [<tr key={item._id} className="table-secondary" tabIndex='0'>
+        [<tr key={item._id} className="table-secondary" tabIndex={0}>
             <td>{item.name}</td>
             <td>{item.is_enabled.toString()}</td>
             <td>{item.products.length}</td>
         </tr>,
         <tr key={`${item._id}-products`}>
-            <td colSpan="3">
+            <td colSpan={3}>
                 {getProductDetails(item.products)}
             </td>
         </tr>]

@@ -9,6 +9,10 @@ import {isTouchDevice} from '../utils';
 import NotificationListItem from './NotificationListItem';
 
 class NotificationList extends React.Component<any, any> {
+    static propTypes: any;
+    tooltip: any;
+    elem: any;
+
     constructor(props: any) {
         super(props);
         this.state = {
@@ -59,9 +63,9 @@ class NotificationList extends React.Component<any, any> {
         this.setState({displayItems:!this.state.displayItems});
         if (!this.state.displayItems) {
             this.props.loadNotifications();
-            document.getElementById('header-notification').classList.add('notif--open');
+            (document.getElementById('header-notification') as any).classList.add('notif--open');
         } else {
-            document.getElementById('header-notification').classList.remove('notif--open');
+            (document.getElementById('header-notification') as any).classList.remove('notif--open');
         }
     }
 

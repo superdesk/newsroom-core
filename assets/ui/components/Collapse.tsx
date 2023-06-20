@@ -4,6 +4,9 @@ import classNames from 'classnames';
 import {Collapse} from 'bootstrap';
 
 export class CollapseBoxWithButton extends React.Component<any, any> {
+    static propTypes: any;
+    dom: any;
+    collapse: any;
     constructor(props: any) {
         super(props);
 

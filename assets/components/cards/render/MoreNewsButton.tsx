@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 
-function MoreNewsButton({title, product, photoUrl, photoUrlLabel}: any) {
+function MoreNewsButton({title, product, photoUrl, photoUrlLabel}: any): any {
     return ([<div key='heading' className='col-6 col-sm-8'>
         <h3 className='home-section-heading'>{title}</h3>
     </div>,
@@ -25,4 +25,6 @@ MoreNewsButton.propTypes = {
     photoUrlLabel: PropTypes.string,
 };
 
-export default MoreNewsButton;
+const component: React.ComponentType<any> = MoreNewsButton;
+
+export default component;

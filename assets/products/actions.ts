@@ -75,7 +75,7 @@ export function fetchProducts() {
  * Creates new products
  *
  */
-export function postProduct() {
+export function postProduct(): any {
     return function (dispatch: any, getState: any) {
 
         const product = getState().productToEdit;
@@ -106,7 +106,7 @@ export function deleteProduct() {
         const product = getState().productToEdit;
         const url = `/products/${product._id}`;
 
-        return server.del(url)
+        return (server as any).del(url)
             .then(() => {
                 notify.success(gettext('Product deleted successfully'));
                 dispatch(fetchProducts());
@@ -176,7 +176,7 @@ export function saveNavigations(navigations: any) {
     };
 }
 
-export function initViewData(data: any) {
+export function initViewData(data: any): any {
     return function (dispatch: any) {
         dispatch(getProducts(data.products));
         dispatch(getCompanies(data.companies));

@@ -15,6 +15,7 @@ import {uiSectionsSelector, activeSectionSelector} from '../../features/sections
 
 
 class NavigationsApp extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any, context: any) {
         super(props, context);
     }

@@ -15,7 +15,7 @@ function openItem(item: any) {
 export const OPEN_ITEM = 'OPEN_ITEM';
 export function openItemDetails(item: any) {
     return (dispatch: any, getState: any) => {
-        dispatch(openItem(item, get(getState(), 'context')));
+        dispatch(openItem(item));
         recordAction(item, 'open');
     };
 }
@@ -53,7 +53,7 @@ export function fetchCardExternalItems(cardId: any, cardLabel: any) {
     };
 }
 
-export function pushNotification(push) {
+export function pushNotification(push: any) {
     return (dispatch: any) => {
         if (push.event === 'items_deleted') {
             setTimeout(

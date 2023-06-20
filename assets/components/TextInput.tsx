@@ -81,4 +81,6 @@ TextInput.propTypes = {
 
 TextInput.defaultProps = {autoFocus: false};
 
-export default TextInput;
+const component: React.ComponentType<any> = TextInput;
+
+export default component;

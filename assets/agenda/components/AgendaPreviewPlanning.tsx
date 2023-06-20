@@ -7,6 +7,7 @@ import {isPlanningItem} from '../utils';
 import AgendaPreviewCoverages from './AgendaPreviewCoverages';
 
 export class AgendaPreviewPlanning extends React.Component<any, any> {
+    static propTypes: any;
     render() {
         const {
             item,

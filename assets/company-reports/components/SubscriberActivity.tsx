@@ -10,6 +10,10 @@ import CalendarButton from '../../components/CalendarButton';
 import {toggleFilterAndQuery, fetchReport, REPORTS, runReport} from '../actions';
 
 class SubscriberActivity extends React.Component<any, any> {
+    static propTypes: any;
+    companies: Array<any>;
+    filters: Array<any>;
+    previousScrollTop: number;
     constructor(props: any, context: any) {
         super(props, context);
 

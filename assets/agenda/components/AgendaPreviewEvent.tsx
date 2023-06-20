@@ -18,6 +18,7 @@ import AgendaEdNote from './AgendaEdNote';
 import AgendaInternalNote from './AgendaInternalNote';
 
 class AgendaPreviewEventComponent extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 

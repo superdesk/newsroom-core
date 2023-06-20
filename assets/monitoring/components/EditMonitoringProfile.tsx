@@ -14,9 +14,11 @@ import MonitoringSchedule from './MonitoringSchedule';
 
 import {gettext} from 'utils';
 
-const getCompanyOptions = (companies: any) => companies.map(company => ({value: company._id, text: company.name}));
+const getCompanyOptions = (companies: any) => companies.map((company: any) => ({value: company._id, text: company.name}));
 
 class EditMonitoringProfile extends React.Component<any, any> {
+    static propTypes: any;
+    tabs: any;
     constructor(props: any) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
@@ -40,7 +42,7 @@ class EditMonitoringProfile extends React.Component<any, any> {
         if (isEmpty(this.props.users)) {
             return (
                 <tr>
-                    <td colSpan="2">{gettext('There are no users for this monitoring profile.')}</td>
+                    <td colSpan={2}>{gettext('There are no users for this monitoring profile.')}</td>
                 </tr>
             );
         }
@@ -93,7 +95,7 @@ class EditMonitoringProfile extends React.Component<any, any> {
                     {this.tabs.filter((tab: any, index: any) => index === 0 || this.props.item._id).map((tab: any) => (
                         <li key={tab.name} className='nav-item'>
                             <a
-                                name={tab.name}
+                                title={tab.name}
                                 className={`nav-link ${this.state.activeTab === tab.name && 'active'}`}
                                 href='#'
                                 onClick={this.handleTabClick}>{tab.label}

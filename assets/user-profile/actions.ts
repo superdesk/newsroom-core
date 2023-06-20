@@ -32,8 +32,8 @@ export function setError(errors: any) {
 }
 
 export const SELECT_MENU = 'SELECT_MENU';
-export function selectMenu(data: any) {
-    return function(dispatch) {
+export function selectMenu(data: any): any {
+    return function(dispatch: any) {
         dispatch({type: SELECT_MENU, data});
         dispatch(reloadMyTopics());
     };
@@ -56,7 +56,7 @@ export function createOrUpdateTopic(menu: any, item: any, fullscreen: any) {
 }
 
 export const SELECT_PROFILE_MENU = 'SELECT_PROFILE_MENU';
-export function selectProfileMenu({menu, item}) {
+export function selectProfileMenu({menu, item}: any) {
     userProfileStore.dispatch({
         type: SELECT_PROFILE_MENU,
         menu: menu,
@@ -140,7 +140,7 @@ export function fetchTopics() {
 export function deleteTopic(topic: any) {
     return function (dispatch: any) {
         const url = `/topics/${topic._id}`;
-        return server.del(url)
+        return (server as any).del(url)
             .then(() => {
                 notify.success(gettext('Topic deleted successfully'));
                 dispatch(fetchTopics());
@@ -197,14 +197,14 @@ export function submitFollowTopic(topic: any) {
 }
 
 function reloadMyTopics() {
-    return function(dispatch, getState) {
+    return function(dispatch: any, getState: any) {
         const reloadMyTopicsFunction = getState().selectedMenu === 'events' ? reloadMyAgendaTopics : reloadMyWireTopics;
 
         return dispatch(reloadMyTopicsFunction());
     };
 }
 
-export function pushNotification(push) {
+export function pushNotification(push: any): any {
     return (dispatch: any, getState: any) => {
         const user = getState().user;
         const company = getState().company;

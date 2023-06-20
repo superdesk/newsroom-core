@@ -36,7 +36,7 @@ if (getLocale() === 'fr_CA') {
 
 export const now = moment(); // to enable mocking in tests
 
-function getLocaleFormat(formatType: any, defaultFormat: any) {
+function getLocaleFormat(formatType: any, defaultFormat?: any) {
     const formats = getConfig('locale_formats', {});
     const locale = getLocale();
 
@@ -130,7 +130,7 @@ export function createStore(reducer: any, name: any = 'default') {
  * @param {Component} App
  * @param {Element} element
  */
-export function render(store: any, App: any, element: any, props: any) {
+export function render(store: any, App: any, element?: any, props?: any) {
     return _render(
         <Provider store={store}>
             <App {...props}/>
@@ -258,7 +258,7 @@ export function isToday(date: any) {
  * @param {String} timezone - The name of the timezone region, i.e. Australia/Sydney
  * @return {Boolean}
  */
-export function isInPast(dateString: any, timezone: any) {
+export function isInPast(dateString: any, timezone?: any) {
     if(!dateString) {
         return false;
     }
@@ -382,7 +382,7 @@ export function getTextFromHtml(html: any) {
 
     const div = document.createElement('div');
     div.innerHTML = formatHTML(raw_html);
-    const tree = document.createTreeWalker(div, NodeFilter.SHOW_TEXT, null, false); // ie requires all params
+    const tree = (document as any).createTreeWalker(div, NodeFilter.SHOW_TEXT, null, false); // ie requires all params
     const text: Array<any> = [];
     while (tree.nextNode()) {
         text.push(tree.currentNode.textContent);
@@ -430,7 +430,7 @@ export function wordCount(item: any) {
     }
 
     const text = getTextFromHtml(item.body_html);
-    return text.split(' ').filter(x => x.trim()).length || 0;
+    return text.split(' ').filter((x: any) => x.trim()).length || 0;
 }
 
 /**
@@ -492,7 +492,7 @@ export function updateRouteParams(updates: any, state: any, deleteEmpty: any = t
     const stateClone = cloneDeep(state);
     stateClone.items = [];
     stateClone.itemsById = {};
-    history.pushState(stateClone, null, `?${params.toString()}`);
+    (history as any).pushState(stateClone, null, `?${params.toString()}`);
 }
 
 const SHIFT_OUT_REGEXP = new RegExp(String.fromCharCode(14), 'g');
@@ -521,7 +521,7 @@ export function errorHandler(error: any, dispatch?: any, setError?: any) {
         return;
     }
     if (setError) {
-        error.response.json().then(function(data) {
+        error.response.json().then(function(data: any) {
             dispatch(setError(data));
         });
     }
@@ -605,7 +605,7 @@ export function getItemFromArray(value: any, items: Array<any> = [], field: any 
 }
 
 export function upperCaseFirstCharacter(text: any) {
-    return (text && text.toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase()));
+    return (text && text.toLowerCase().replace(/\b\w/g, (l: any) => l.toUpperCase()));
 }
 
 export function postHistoryAction(item: any, action: any, section: any = 'wire') {

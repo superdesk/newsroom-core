@@ -46,7 +46,7 @@ export default function AgendaTime({item, children}: any) {
 
         return (
             <div key='time' className={getClassNames('event')}>
-                {formatAgendaDate(item, null)}
+                {formatAgendaDate(item, null, {})}
             </div>
         );
     };

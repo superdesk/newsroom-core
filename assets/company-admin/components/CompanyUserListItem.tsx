@@ -38,7 +38,7 @@ export function CompanyUserListItem({user, onClick, selected, sections}: any) {
             data-test-id={`user-list-item--${user._id}`}
             onClick={onClick}
             className={!selected ? undefined : 'table--selected'}
-            tabIndex="0"
+            tabIndex={0}
         >
             <td>
                 <div className="name">

@@ -18,6 +18,8 @@ const getProductCompanies = (product: any, companies: any) => ({
 });
 
 class EditProduct extends React.Component<any, any> {
+    static propTypes: any;
+    tabs: any;
     constructor(props: any) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
@@ -95,7 +97,7 @@ class EditProduct extends React.Component<any, any> {
                     {this.tabs.map((tab: any) => (
                         <li key={tab.name} className='nav-item'>
                             <a
-                                name={tab.name}
+                                title={tab.name}
                                 className={`nav-link ${this.state.activeTab === tab.name && 'active'}`}
                                 href='#'
                                 onClick={this.handleTabClick}>{tab.label}

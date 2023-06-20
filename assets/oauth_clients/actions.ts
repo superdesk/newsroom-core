@@ -104,7 +104,7 @@ export function deleteClient() {
         const client = getState().clientToEdit;
         const url = `/oauth_clients/${client._id}`;
 
-        return server.del(url)
+        return (server as any).del(url)
             .then(() => {
                 notify.success(gettext('Client deleted successfully'));
                 dispatch(fetchClients());

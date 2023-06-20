@@ -11,7 +11,7 @@ const SelectInput = ({
     error,
     options,
     className,
-    readOnly}) => {
+    readOnly}: any) => {
     return (
         <div
             className={className ? className : 'form-group'}

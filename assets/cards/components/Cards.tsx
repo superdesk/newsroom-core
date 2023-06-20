@@ -21,6 +21,7 @@ import CardList from './CardList';
 import SearchResults from 'search/components/SearchResults';
 
 class Cards extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any, context: any) {
         super(props, context);
 
@@ -150,8 +151,8 @@ const mapStateToProps = (state: any) => ({
 const mapDispatchToProps = (dispatch: any) => ({
     selectCard: (_id: any) => dispatch(selectCard(_id)),
     editCard: (event: any) => dispatch(editCard(event)),
-    saveCard: (type: any) => dispatch(postCard(type)),
-    deleteCard: (type: any) => dispatch(deleteCard(type)),
+    saveCard: (type: any) => dispatch(postCard()),
+    deleteCard: (type: any) => dispatch(deleteCard()),
     newCard: () => dispatch(newCard()),
     cancelEdit: (event: any) => dispatch(cancelEdit(event)),
     dispatch: dispatch,

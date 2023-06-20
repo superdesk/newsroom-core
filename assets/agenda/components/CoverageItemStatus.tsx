@@ -22,6 +22,8 @@ function getDeliveryId(coverage: any) {
 }
 
 export default class CoverageItemStatus extends React.Component<any, any> {
+    static propTypes: any;
+    static defaultProps: any;
     constructor(props: any) {
         super(props);
         this.state = {wireItem: null};
@@ -147,7 +149,7 @@ export default class CoverageItemStatus extends React.Component<any, any> {
 
     render() {
         const coverage = this.props.coverage;
-        const wireText = this.getItemText(coverage);
+        const wireText = this.getItemText();
         const internalNote = get(this.props, 'coverageData.internal_note', {})[coverage.coverage_id];
         const edNote = this.state.wireItem ? this.state.wireItem.ednote :
             get(this.props, 'coverageData.ednote', {})[coverage.coverage_id];

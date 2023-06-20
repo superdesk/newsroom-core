@@ -20,7 +20,7 @@ export function generateTokenForCompany(token: any) {
 }
 
 export function deleteTokenForCompany(companyId: any) {
-    return server.del(`/news_api_tokens?company=${companyId}`)
+    return (server as any).del(`/news_api_tokens?company=${companyId}`)
         .then(() => {
             notify.success(gettext('API Token deleted successfully'));
         });

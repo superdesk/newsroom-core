@@ -13,7 +13,7 @@ export default function WireListItemDeleted({item, contextName}: any) {
     return (
         <article key={item._id}
             className="wire-articles__item-wrap col-12 wire-item item--deleted"
-            tabIndex='0'
+            tabIndex={0}
         >
             <div className="wire-articles__item wire-articles__item--list wire-articles__item--visited">
                 <div className='wire-articles__item-text'>

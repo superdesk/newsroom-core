@@ -14,6 +14,7 @@ import TextAreaInput from 'components/TextAreaInput';
 import {Tag} from 'components/Tag';
 
 class CompanyAdminProductSeatRequestModalComponent extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 

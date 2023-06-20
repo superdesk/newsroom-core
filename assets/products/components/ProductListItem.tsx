@@ -6,7 +6,7 @@ import {gettext, shortDate} from 'utils';
 function ProductListItem({product, isActive, onClick}: any) {
     return (
         <tr key={product._id}
-            className={isActive?'table--selected':null}
+            className={isActive ? 'table--selected' : undefined}
             onClick={() => onClick(product._id)}>
             <td className="name">{product.name}</td>
             <td>{(product.is_enabled ? gettext('Enabled') : gettext('Disabled'))}</td>

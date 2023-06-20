@@ -117,7 +117,7 @@ export function postCard() {
 
         if (card.type === '2x2-events') {
             [...Array(4)].forEach((_: any, i: any) => {
-                const input = document.getElementById(`config.events[${i}].file`);
+                const input: any = document.getElementById(`config.events[${i}].file`);
                 if (input && input.files.length > 0) {
                     data.append(`file${i}`, input.files[0]);
                 }
@@ -151,7 +151,7 @@ export function deleteCard() {
         const card = getState().cardToEdit;
         const url = `/cards/${card._id}`;
 
-        return server.del(url)
+        return (server as any).del(url)
             .then(() => {
                 notify.success(gettext('Card deleted successfully'));
                 dispatch(fetchCards());
@@ -176,7 +176,7 @@ export function fetchProducts() {
 }
 
 
-export function initViewData(data: any) {
+export function initViewData(data: any): any {
     return function (dispatch: any) {
         dispatch(getCards(data.cards));
         dispatch(getProducts(data.products));

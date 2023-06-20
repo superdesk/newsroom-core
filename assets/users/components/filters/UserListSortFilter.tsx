@@ -8,6 +8,9 @@ import {gettext} from 'utils';
 import DropdownFilter from 'components/DropdownFilter';
 
 export class UserListSortFilter extends React.PureComponent<any, any> {
+    static propTypes: any;
+    filter: any;
+    sortFields: any;
     constructor(props: any) {
         super(props);
 

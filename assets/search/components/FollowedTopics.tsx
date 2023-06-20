@@ -28,6 +28,8 @@ import TopicEditor from 'search/components/TopicEditor';
 import TopicList from 'search/components/TopicList';
 
 class FollowedTopics extends React.Component<any, any> {
+    static propTypes: any;
+    actions: any;
     constructor(props: any, context: any) {
         super(props, context);
 

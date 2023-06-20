@@ -6,7 +6,7 @@ import {gettext, shortDate} from 'utils';
 function SectionFilterListItem({sectionFilter, isActive, onClick}: any) {
     return (
         <tr key={sectionFilter._id}
-            className={isActive?'table--selected':null}
+            className={isActive ? 'table--selected' : undefined}
             onClick={() => onClick(sectionFilter._id)}>
             <td className="name">{sectionFilter.name}</td>
             <td>{(sectionFilter.is_enabled ? gettext('Enabled') : gettext('Disabled'))}</td>

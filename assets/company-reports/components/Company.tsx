@@ -13,7 +13,7 @@ function getProductDetails(products: Array<any> = []) {
         }
 
         if (productType !== 'aapX') {
-            return productType.toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase());
+            return productType.toLowerCase().replace(/\b\w/g, (l: any) => l.toUpperCase());
         }
 
         return productType;
@@ -52,19 +52,19 @@ function getUsers(users: Array<any> = []) {
 function Company({results, print}: any) {
 
     const list = results && results.map((item: any) =>
-        [<tr key={item._id} className="table-secondary" tabIndex='0'>
+        [<tr key={item._id} className="table-secondary" tabIndex={0}>
             <td>{item.name}</td>
             <td className='fw-bold'>{item.is_enabled ? gettext('Active') : gettext('Disabled')}</td>
             <td>{formatDate(get(item, 'company._created'))}</td>
             <td>{get(item, 'company.expiry_date') ? formatDate(item.company.expiry_date) : gettext('Unspecified')}</td>
         </tr>,
         <tr key={`${item._id}-contact`}>
-            <td colSpan="4">
+            <td colSpan={4}>
                 {getContactDetails(item.company)}
             </td>
         </tr>,
         <tr key={`${item._id}-account_manager`}>
-            <td colSpan="4">
+            <td colSpan={4}>
                 <div className="d-flex align-items-center m-2">
                     <div><span className="font-italic">{gettext('Account Manager')}: </span>
                         {item.account_manager}</div>
@@ -72,12 +72,12 @@ function Company({results, print}: any) {
             </td>
         </tr>,
         <tr key={`${item._id}-users`}>
-            <td colSpan="5">
+            <td colSpan={5}>
                 {getUsers(item.users)}
             </td>
         </tr>,
         <tr key={`${item._id}-products`}>
-            <td colSpan="5">
+            <td colSpan={5}>
                 {getProductDetails(item.products)}
             </td>
         </tr>]

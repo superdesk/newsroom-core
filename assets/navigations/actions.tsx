@@ -82,7 +82,7 @@ export function postNavigation() {
 
         data.append('navigation', JSON.stringify(navigation));
         for(let i = 0; i < MAX_TILE_IMAGES; i++) {
-            const fileInput = document.getElementById(`tile_images_file_${i}`);
+            const fileInput: any = document.getElementById(`tile_images_file_${i}`);
             if (fileInput && fileInput.files.length > 0) {
                 data.append(`file${i}`, fileInput.files[0]);
             }
@@ -114,7 +114,7 @@ export function deleteNavigation() {
         const navigation = getState().navigationToEdit;
         const url = `/navigations/${navigation._id}`;
 
-        return server.del(url)
+        return (server as any).del(url)
             .then(() => {
                 notify.success(gettext('Navigation deleted successfully'));
                 dispatch(fetchNavigations());
@@ -138,7 +138,7 @@ export function fetchProducts() {
     };
 }
 
-export function initViewData(data: any) {
+export function initViewData(data: any): any {
     return function (dispatch: any) {
         dispatch(getNavigations(data.navigations));
         dispatch(getProducts(data.products));

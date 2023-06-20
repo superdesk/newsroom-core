@@ -8,7 +8,7 @@ import AgendaName from './AgendaName';
 import AgendaMetaTime from './AgendaMetaTime';
 import AgendaLocation from'./AgendaLocation';
 
-const AgendaEventInfo = ({item, onClick}) => {
+const AgendaEventInfo = ({item, onClick}: any) => {
     const event = get(item, 'event');
     if (isEmpty(event)) {
         return null;

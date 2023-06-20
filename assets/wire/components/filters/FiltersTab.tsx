@@ -25,6 +25,8 @@ import {
 import {resultsFilteredSelector} from 'search/selectors';
 
 class FiltersTab extends React.Component<any, any> {
+    static propTypes: any;
+
     constructor(props: any) {
         super(props);
 

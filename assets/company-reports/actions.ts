@@ -70,7 +70,7 @@ function getReportQueryString(currentState: any, next: any, exportReport: any, n
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(data: any) {
+export function initData(data: any): any {
     return function (dispatch: any) {
         dispatch(fetchProducts());
         dispatch({type: INIT_DATA, data});
@@ -120,7 +120,7 @@ export function runReport() {
 }
 
 export function fetchAggregations(url: any) {
-    return function(dispatch, getState) {
+    return function(dispatch: any, getState: any) {
         let queryString = getReportQueryString(getState(), 0, false, notify);
 
         server.get(`${url}?${queryString}&aggregations=1`)
@@ -137,7 +137,7 @@ export function fetchAggregations(url: any) {
  * Fetches the report data
  *
  */
-export function fetchReport(url: any, next: any, exportReport: any) {
+export function fetchReport(url: any, next?: any, exportReport?: any) {
     return function (dispatch: any, getState: any) {
         if (next) {
             dispatch(isLoading(next));

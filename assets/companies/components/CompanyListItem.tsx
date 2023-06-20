@@ -9,14 +9,14 @@ function CompanyListItem({company, type, isActive, onClick, showSubscriberId}: a
         <tr key={company._id}
             className={classNames({'table--selected': isActive, 'table-secondary': !company.is_enabled})}
             onClick={() => onClick(company._id)}
-            tabIndex="0"
+            tabIndex={0}
             data-test-id={`company-list-item--${company._id}`}
         >
             <td className="name">{company.name}</td>
             <td className="type">{type ? gettext(type.name) : ''}</td>
             {showSubscriberId && <td>{company.sd_subscriber_id}</td>}
             <td>{company.account_manager}</td>
-            <td className={isInPast(company.expiry_date) ? 'text-danger' : null}>
+            <td className={isInPast(company.expiry_date) ? 'text-danger' : undefined}>
                 {(company.is_enabled ? gettext('Enabled') : gettext('Disabled'))}
             </td>
             <td>{company.contact_name}</td>

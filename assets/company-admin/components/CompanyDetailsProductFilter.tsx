@@ -9,6 +9,8 @@ import {currentCompanySelector, companySectionListSelector} from '../selectors';
 import DropdownFilter from 'components/DropdownFilter';
 
 class CompanyDetailsProductFilterComponent extends React.PureComponent<any, any> {
+    static propTypes: any;
+    filter: any;
     constructor(props: any) {
         super(props);
 

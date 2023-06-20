@@ -31,7 +31,7 @@ function getCalendarClass(item: any) {
     }
 }
 
-export default function AgendaMetaTime({item, borderRight, isRecurring, group, isMobilePhone, onlyDates}: any) {
+export default function AgendaMetaTime({item, borderRight, isRecurring, group, isMobilePhone, onlyDates}: any): any {
     const times = (
         <div key="times" className={classNames(
             bem('wire-articles__item', 'meta-time', {'border-right': borderRight}),

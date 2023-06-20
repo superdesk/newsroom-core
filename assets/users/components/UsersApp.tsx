@@ -19,7 +19,7 @@ import {UserListSortFilter} from './filters/UserListSortFilter';
 import {UserListCompanyFilter} from './filters/UserListCompanyFilter';
 
 
-function UsersApp(props: any) {
+function UsersApp(props: any): any {
     return ([
         <ListBar
             key="UserBar"

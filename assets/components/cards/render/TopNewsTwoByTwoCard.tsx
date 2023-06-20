@@ -37,7 +37,7 @@ const getTopNewsLeftPanel = (item: any, picture: any, openItem: any, cardId: any
     );
 };
 
-const getTopNewsRightPanel = (item: any, picture: any, openItem: any, cardId: any, listConfig: any) => {
+const getTopNewsRightPanel = (item: any, picture: any, openItem: any, cardId: any, listConfig?: any): any => {
 
     const rendition = getThumbnailRendition(picture);
     const imageUrl = rendition && rendition.href;

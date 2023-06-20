@@ -48,7 +48,7 @@ function AdvancedSearchPanelComponent({
                         <textarea
                             name="all"
                             placeholder={gettext('keyword1 keyword2...')}
-                            rows="2"
+                            rows={2}
                             className="form-control"
                             value={params.all || ''}
                             onChange={(event: any) => setKeywords('all', event.target.value)}
@@ -68,7 +68,7 @@ function AdvancedSearchPanelComponent({
                         <textarea
                             name="any"
                             placeholder={gettext('keyword1 keyword2...')}
-                            rows="2"
+                            rows={2}
                             className="form-control"
                             value={params.any || ''}
                             onChange={(event: any) => setKeywords('any', event.target.value)}
@@ -87,7 +87,7 @@ function AdvancedSearchPanelComponent({
                         <textarea
                             name="exclude"
                             placeholder={gettext('keyword1 keyword2...')}
-                            rows="2"
+                            rows={2}
                             className="form-control"
                             value={params.exclude || ''}
                             onChange={(event: any) => setKeywords('exclude', event.target.value)}

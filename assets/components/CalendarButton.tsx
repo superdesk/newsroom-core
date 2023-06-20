@@ -7,7 +7,8 @@ import CalendarButtonWrapper from './CalendarButtonWrapper';
 import {EARLIEST_DATE} from '../agenda/utils';
 
 class CalendarButton extends React.Component<any, any> {
-    constructor (props) {
+    static propTypes: any;
+    constructor (props: any) {
         super(props);
 
         this.state = {startDate: moment(this.props.activeDate).toDate()};

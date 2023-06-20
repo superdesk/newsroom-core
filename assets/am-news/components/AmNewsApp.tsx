@@ -49,6 +49,11 @@ const modals: any = {
 };
 
 class AmNewsApp extends BaseApp {
+    static propTypes: any;
+
+    modals: any;
+    tabs: any;
+
     constructor(props: any) {
         super(props);
         this.modals = modals;
@@ -87,7 +92,7 @@ class AmNewsApp extends BaseApp {
                 user={this.props.user}
                 actions={this.filterActions(this.props.itemToOpen)}
                 detailsConfig={this.props.detailsConfig}
-                onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)} />
+                onClose={() => this.props.actions.filter((a: any) => a.id === 'open')[0].action(null)} />
         ]);
     }
 
@@ -207,7 +212,7 @@ class AmNewsApp extends BaseApp {
         const modal = this.renderModal(this.props.modal);
 
         return (
-            (this.props.itemToOpen ? this.renderItemDetails() : this.renderListAndPreview())
+            (this.props.itemToOpen ? this.renderItemDetails() : this.renderListAndPreview() as any)
                 .concat([
                     modal,
                     this.renderNavBreadcrumb(

@@ -14,6 +14,7 @@ import {
 } from '../utils';
 
 class AgendaListCoverageItem extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 
@@ -38,7 +39,7 @@ class AgendaListCoverageItem extends React.Component<any, any> {
             beingUpdated: isCoverageBeingUpdated(props.coverage),
             isWatched: watched,
             watchText: watched ? gettext('(Watching)') : '',
-            isCoverageForExtraDay: isCoverageForExtraDay(props.coverage, props.group),
+            isCoverageForExtraDay: isCoverageForExtraDay(props.coverage),
         };
 
         state.tooltip = `${state.watchText} ${getCoverageTooltip(props.coverage, state.beingUpdated)}`;

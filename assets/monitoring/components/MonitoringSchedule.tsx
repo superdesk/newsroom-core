@@ -9,6 +9,9 @@ import DatePicker from 'react-datepicker';
 import SelectInput from 'components/SelectInput';
 
 class MonitoringSchedule extends React.Component<any, any> {
+    static propTypes: any;
+    options: Array<any>;
+    days: Array<any>;
     constructor(props: any) {
         super(props);
 

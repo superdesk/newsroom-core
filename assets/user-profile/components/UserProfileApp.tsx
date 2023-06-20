@@ -30,6 +30,8 @@ import '../style';
 const modals: any = {shareItem: ShareItemModal};
 
 class UserProfileApp extends React.Component<any, any> {
+    static propTypes: any;
+    links: any;
     constructor(props: any, context: any) {
         super(props, context);
         this.links = [
@@ -77,7 +79,7 @@ class UserProfileApp extends React.Component<any, any> {
             const Modal = modals[specs.modal];
             return ReactDOM.createPortal(
                 <Modal data={{...specs.data, isTopic: true}} />,
-                document.getElementById('modal-container')
+                document.getElementById('modal-container') as any
             );
         }
     }
@@ -135,7 +137,7 @@ class UserProfileApp extends React.Component<any, any> {
     render() {
         const profile = ReactDOM.createPortal(
             this.props.displayModal ? this.renderProfile() : null,
-            document.getElementById('user-profile-app')
+            document.getElementById('user-profile-app') as any
         );
 
         const overlay = this.props.dropdown && (
@@ -167,7 +169,7 @@ class UserProfileApp extends React.Component<any, any> {
             </div>
         );
 
-        const toggle = document.getElementById('header-profile-toggle');
+        const toggle: any = document.getElementById('header-profile-toggle');
 
         if (this.props.dropdown) {
             toggle.classList.add('show');

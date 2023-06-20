@@ -11,6 +11,7 @@ import Clients from './Clients';
 import ListBar from 'components/ListBar';
 
 class ClientsApp extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any, context: any) {
         super(props, context);
     }

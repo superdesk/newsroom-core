@@ -13,6 +13,9 @@ import {fetchCompanyUsers} from 'companies/actions';
 import {postMonitoringProfile} from 'monitoring/actions';
 
 class MonitoringEditor extends React.Component<any, any> {
+    static propTypes: any;
+    tabs: any;
+    saveprofile: any;
     constructor(props: any) {
         super(props);
 
@@ -137,7 +140,7 @@ class MonitoringEditor extends React.Component<any, any> {
                     {this.tabs.filter((tab: any, index: any) => index === 0 || this.props.item._id).map((tab: any) => (
                         <li key={tab.name} className='nav-item'>
                             <a
-                                name={tab.name}
+                                title={tab.name}
                                 className={`nav-link ${this.state.activeTab === tab.name && 'active'}`}
                                 href='#'
                                 onClick={this.handleTabClick}>{tab.label}
@@ -260,4 +263,6 @@ const mapDispatchToProps = (dispatch: any) => ({
     fetchCompanyUsers: (companyId: any) => dispatch(fetchCompanyUsers(companyId, true)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(MonitoringEditor);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(MonitoringEditor);
+
+export default component;

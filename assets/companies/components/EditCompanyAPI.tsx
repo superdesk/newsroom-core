@@ -9,6 +9,7 @@ import CardEditor from 'components/CardEditor';
 
 
 export default class EditCompanyAPI extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
         this.onIpWhitelistChange = this.onIpWhitelistChange.bind(this);

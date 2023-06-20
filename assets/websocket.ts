@@ -7,7 +7,7 @@ const RECONNECT_INTERVAL = 5000;
 let firstConnection = true;
 let wsConnection: any;
 let connectInterval: any;
-const listeners = [];
+const listeners: any = [];
 
 function connectToNotificationServer() {
     if (wsConnection == null || wsConnection.readyState === WebSocket.CLOSED) {
@@ -86,7 +86,7 @@ function onWebsocketMessage(message: any) {
         return;
     }
 
-    listeners.forEach(({store, action}) => {
+    listeners.forEach(({store, action}: any) => {
         store.dispatch(action(data));
     });
 }

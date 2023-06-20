@@ -21,6 +21,7 @@ import AuditInformation from 'components/AuditInformation';
 import {ToolTip} from 'ui/components/ToolTip';
 
 class TopicEditor extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 
@@ -247,7 +248,6 @@ class TopicEditor extends React.Component<any, any> {
                             >
                                 <ToolTip placement="bottom">
                                     <a
-                                        name={tab.name}
                                         className={`nav-link ${this.state.activeTab === tab.name && 'active'}`}
                                         href='#'
                                         title={tab.tooltip}

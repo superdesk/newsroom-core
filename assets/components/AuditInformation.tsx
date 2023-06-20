@@ -8,6 +8,7 @@ import {getEditUsers} from 'actions';
 import {gettext, fullDate, getItemFromArray} from 'utils';
 
 class AuditInformation extends React.Component<any, any> {
+    static propTypes: any;
     componentWillMount() {
         if (!get(this.props, 'users.length')) {
             this.props.getEditUsers(this.props.item);

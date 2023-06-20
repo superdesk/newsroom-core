@@ -106,7 +106,7 @@ function setupContentNavbarScroll() {
 function setupTogglingLeftBarNavigation() {
     // Toggle left bar navigation
     if (document.getElementsByClassName('content-bar__menu--nav')[0]) {
-        document.getElementsByClassName('content-bar__menu--nav')[0].onclick = function(){
+        (document.getElementsByClassName('content-bar__menu--nav')[0] as any).onclick = function(){
             document.getElementsByClassName('wire-column__nav')[0].classList.toggle('wire-column__nav--open');
             document.getElementsByClassName('content-bar__menu--nav')[0].classList.toggle('content-bar__menu--nav--open');
 
@@ -123,7 +123,7 @@ function setupOpenArticleFromWireList() {
 
     var currentItem: any;
     for(var i = 0; i < listItem.length; i++) {
-        listItem[i].onclick = function(event) {
+        (listItem[i] as any).onclick = function(event: any) {
             document.getElementsByClassName('wire-articles__item')[0].classList.toggle('wire-articles__item--open');
 
             // responsive wire item
@@ -152,7 +152,7 @@ function setupTopBarSearchFocus() {
     var searchForm = document.getElementsByClassName('search__form')[0];
     var searchInput = document.getElementsByClassName('search__input')[0];
     if (searchInput) {
-        searchInput.onfocus = function() {
+        (searchInput as any).onfocus = function() {
             searchForm.classList.add('searchForm--active');
         };
     }

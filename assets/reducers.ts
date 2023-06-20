@@ -39,7 +39,7 @@ import {REMOVE_NEW_ITEMS, SET_NEW_ITEM} from './agenda/actions';
 import {toggleValue} from 'utils';
 import {topicsReducer} from './topics/reducer';
 
-export function modalReducer(state: any, action: any) {
+export function modalReducer(state?: any, action?: any): any {
     if (!action) {
         return state;
     }
@@ -106,7 +106,7 @@ export function defaultReducer(state: any = {}, action: any) {
 
     case SET_ITEMS: {
         const itemsById: any = {};
-        const items = [];
+        const items: any = [];
 
         action.items.forEach((item: any) => {
             if (!itemsById[item._id]) {
@@ -130,7 +130,7 @@ export function defaultReducer(state: any = {}, action: any) {
         };
 
     case PREVIEW_ITEM: {
-        const readItems = getReadItems(state, action.item, action.group);
+        const readItems = getReadItems(state, action.item);
 
         return {
             ...state,

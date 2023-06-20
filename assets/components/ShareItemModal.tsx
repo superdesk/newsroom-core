@@ -12,6 +12,7 @@ import Modal from 'components/Modal';
 import SearchBar from 'search/components/SearchBar';
 
 class ShareItemModal extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
         this.state = {
@@ -39,7 +40,7 @@ class ShareItemModal extends React.Component<any, any> {
         };
     }
 
-    toggleUser(userId: any, all: any) {
+    toggleUser(userId: any, all?: any) {
         let newValue: any;
         if (all) {
             newValue = this.props.data.users.length === this.state.users.length ? [] :

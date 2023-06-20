@@ -122,7 +122,7 @@ describe('wire actions', () => {
 
     it('open item records history actions', () => {
         fetchMock.post('/history/new', {});
-        spyOn(utils, 'postHistoryAction').and.callFake(function(item, action, section) {
+        spyOn(utils, 'postHistoryAction').and.callFake(function(item: any, action: any, section: any) {
             expect(item).toEqual({_id: 'foo'});
             expect(action).toEqual('open');
             expect(section).toEqual('wire');
@@ -134,7 +134,7 @@ describe('wire actions', () => {
 
     it('preview item records history actions', () => {
         fetchMock.post('/history/new', {});
-        spyOn(utils, 'postHistoryAction').and.callFake(function(item, action, section) {
+        spyOn(utils, 'postHistoryAction').and.callFake(function(item: any, action: any, section: any) {
             expect(item).toEqual({_id: 'foo'});
             expect(action).toEqual('preview');
             expect(section).toEqual('wire');

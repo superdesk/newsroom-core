@@ -3,7 +3,7 @@ import server from 'server';
 import {initViewData as initUserViewData, setError, fetchUsers} from 'users/actions';
 
 export const INIT_VIEW_DATA = 'INIT_VIEW_DATA';
-export function initViewData(data: any) {
+export function initViewData(data?: any): any {
     return (dispatch: any) => {
         dispatch({type: INIT_VIEW_DATA, data: data});
         dispatch(initUserViewData(data));
@@ -17,7 +17,7 @@ export function setSection(id: any) {
 
 export const SET_PRODUCT_FILTER = 'SET_PRODUCT_FILTER';
 export function setProductFilter(id: any) {
-    return function(dispatch) {
+    return function(dispatch: any) {
         dispatch({type: SET_PRODUCT_FILTER, id: id});
         dispatch(fetchUsers());
     };

@@ -17,6 +17,7 @@ import {
 import {Tag} from 'components/Tag';
 
 class ContentSearchResultsComponent extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 

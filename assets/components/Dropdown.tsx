@@ -5,8 +5,8 @@ import {Dropdown as BootstrapDropdown} from 'bootstrap';
 
 export function Dropdown({children, isActive, icon, label, className, buttonProps}: any) {
 
-    const dropdown = React.useRef();
-    let dropdownInstance = null;
+    const dropdown: any = React.useRef();
+    let dropdownInstance: any = null;
 
     React.useEffect(() => {
         dropdownInstance = BootstrapDropdown.getOrCreateInstance(dropdown.current, {autoClose: true});

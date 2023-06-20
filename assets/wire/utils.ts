@@ -168,7 +168,7 @@ export function isPreformatted(item: any) {
  * @param {bool} next toggle if checking for next or previous versions
  * @return {Boolean}
  */
-export function showItemVersions(item: any, next: any) {
+export function showItemVersions(item: any, next?: any) {
     return !isKilled(item) && (next || item.ancestors && item.ancestors.length);
 }
 

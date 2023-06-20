@@ -80,14 +80,14 @@ export function toggleScheduleMode() {
     return {type: SET_SCHEDULE_MODE};
 }
 
-export function postMonitoringProfile(userProfile: any, notifyMsg: any) {
+export function postMonitoringProfile(userProfile?: any, notifyMsg?: any): any {
     return function (dispatch: any, getState: any) {
 
         const p = userProfile || monitoringProfileToEdit(getState());
         const url = `/monitoring/${p._id ? p._id : 'new'}`;
 
         return server.post(url, p)
-            .then(function(item) {
+            .then(function(item: any) {
                 if (p._id) {
                     notify.success(notifyMsg || gettext('{{monitoring}} Profile updated successfully', window.sectionNames));
                 } else {
@@ -118,7 +118,7 @@ export function postMonitoringProfile(userProfile: any, notifyMsg: any) {
     };
 }
 
-export function fetchMonitoring(userCompany: any) {
+export function fetchMonitoring(userCompany?: any) {
     return function (dispatch: any, getState: any) {
         dispatch(queryMonitoring());
         const companyFilter = userCompany || company(getState());
@@ -182,13 +182,13 @@ export function saveMonitoringProfileSchedule() {
     };
 }
 
-export function deleteMonitoringProfile() {
+export function deleteMonitoringProfile(): any {
     return function (dispatch: any, getState: any) {
 
         const p = monitoringProfileToEdit(getState());
         const url = `/monitoring/${p._id}`;
 
-        return server.del(url)
+        return (server as any).del(url)
             .then(() => {
                 notify.success(gettext('{{monitoring}} Profile deleted successfully', window.sectionNames));
                 dispatch(fetchMonitoring());

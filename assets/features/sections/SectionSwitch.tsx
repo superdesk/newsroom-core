@@ -30,4 +30,6 @@ const mapDispatchToProps: any = {
     selectSection,
 };
 
-export default connect(null, mapDispatchToProps)(SectionSwitch);
+const component: React.ComponentType<any> = connect(null, mapDispatchToProps)(SectionSwitch);
+
+export default component;

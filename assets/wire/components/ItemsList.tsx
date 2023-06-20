@@ -18,6 +18,10 @@ const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
 
 class ItemsList extends React.Component<any, any> {
+    static propTypes: any;
+    previewTimeout: any;
+    clickTimeout: any;
+    elem: any;
     constructor(props: any) {
         super(props);
 

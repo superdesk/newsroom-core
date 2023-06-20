@@ -8,16 +8,16 @@ const INITIAL_STATE = {
     active: '',
 };
 
-export function dashboardReducer(state: any = INITIAL_STATE, action: any) {
+export function dashboardReducer(state: any = INITIAL_STATE, action?: any): any {
     if (!action) {
         return state;
     }
 
     switch (action.type) {
-    
+
     case INIT_DASHBOARD:
         return {...state, list: action.dashboards, active: action.dashboards[0]._id};
-    
+
     case SELECT_DASHBOARD:
         return {...state, active: action.dashboard || ''};
 

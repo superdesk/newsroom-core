@@ -7,8 +7,12 @@ import ExpiryButtonWrapper from './ExpiryButtonWrapper';
 
 import {gettext} from '../utils';
 
+const DatePickerComponent: React.ComponentType<any> = DatePicker;
+
 
 export default class ExpiryDateInput extends React.Component<any, any> {
+    static propTypes: any;
+    options: any;
     constructor(props: any) {
         super(props);
 
@@ -81,7 +85,7 @@ export default class ExpiryDateInput extends React.Component<any, any> {
                         })}
                     </select>
 
-                    <DatePicker
+                    <DatePickerComponent
                         dropdownMode="select"
                         disabled={this.state.value === 'never'}
                         customInput={<ExpiryButtonWrapper />}

@@ -5,7 +5,6 @@ import {connect} from 'react-redux';
 import {gettext} from 'utils';
 import {
     newMonitoringProfile,
-    setQuery,
     fetchMonitoring,
     setCompany,
     toggleScheduleMode
@@ -16,6 +15,7 @@ import DropdownFilter from 'components/DropdownFilter';
 
 
 class MonitoringApp extends React.Component<any, any> {
+    static propTypes: any;
     sections: Array<{name: string}>;
 
     constructor(props: any, context: any) {
@@ -108,7 +108,7 @@ class MonitoringApp extends React.Component<any, any> {
         );
     }
 
-    onChange(field, value)
+    onChange(field: any, value: any)
     {
         if (field === 'company') {
             this.props.setCompany(value);
@@ -128,7 +128,6 @@ MonitoringApp.propTypes = {
     users: PropTypes.arrayOf(PropTypes.object),
     activeQuery: PropTypes.string,
     companies: PropTypes.arrayOf(PropTypes.object),
-    setQuery: PropTypes.func,
     errors: PropTypes.object,
     dispatch: PropTypes.func,
     fetchCompanies: PropTypes.func,
@@ -142,7 +141,6 @@ MonitoringApp.propTypes = {
 
 const mapDispatchToProps: any = {
     newMonitoringProfile,
-    setQuery,
     fetchMonitoring,
     setCompany,
     toggleScheduleMode,

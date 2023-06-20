@@ -4,6 +4,10 @@ import MoreNewsButton from './MoreNewsButton';
 import {connect} from 'react-redux';
 
 class CardRow extends React.Component<any, any> {
+    static propTypes: any;
+    static defaultProps: any;
+    cardElem: any;
+
     constructor(props: any) {
         super(props);
     }

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {getPicture, getVideos} from 'wire/utils';
+import {getPicture} from 'wire/utils';
 import {FieldComponents} from './fields';
 import WireListItemIcons from './WireListItemIcons';
 
@@ -26,7 +26,6 @@ function PreviewMeta({
         <div className="wire-articles__item__meta">
             <WireListItemIcons
                 item={item}
-                videos={getVideos(item)}
                 picture={picture}
             />
             <div className="wire-articles__item__meta-info">

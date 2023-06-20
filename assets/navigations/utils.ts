@@ -4,7 +4,7 @@
  * @param products
  * @returns {string}
  */
-export function  getProductTypes(navigation, products) {
+export function getProductTypes(navigation: any, products: any): any {
     if (!navigation || !products) {
         return '';
     }

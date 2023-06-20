@@ -6,7 +6,7 @@ import {get, keyBy} from 'lodash';
 import {gettext, getCreatedSearchParamLabel} from 'utils';
 import {filterGroupsToLabelMap, filterGroups} from 'search/selectors';
 
-const TopicParameters = ({topic, navigations, locators, filterGroupLabels, filterGroupsMain}) => {
+const TopicParameters = ({topic, navigations, locators, filterGroupLabels, filterGroupsMain}: any) => {
     const filters = get(topic, 'filter') || {};
     const navsById = keyBy(navigations, '_id');
     const navs = (get(topic, 'navigation') || [])
@@ -86,10 +86,12 @@ TopicParameters.propTypes = {
     filterGroupsMain: PropTypes.array
 };
 
-const mapStateToProps = (state: any) => ({
+const mapStateToProps: any = (state: any) => ({
     locators: get(state, 'locators.items', []),
     filterGroupLabels: filterGroupsToLabelMap(state),
     filterGroupsMain: filterGroups(state),
 });
 
-export default connect(mapStateToProps, null)(TopicParameters);
+const component: React.ComponentType<any> = connect(mapStateToProps, null)(TopicParameters);
+
+export default component;

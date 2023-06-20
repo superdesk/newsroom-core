@@ -11,6 +11,7 @@ import AgendaCoverages from 'agenda/components/AgendaCoverages';
 import AgendaEventInfo from 'agenda/components/AgendaEventInfo';
 
 export default class AgendaLinks extends React.PureComponent<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 

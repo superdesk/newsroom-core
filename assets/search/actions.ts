@@ -24,7 +24,7 @@ import {context} from 'selectors';
 
 export const SET_QUERY = 'SET_QUERY';
 export function setQuery(query: any) {
-    return function(dispatch, getState) {
+    return function(dispatch: any, getState: any) {
         query && analytics.event('search', query);
         dispatch(setSearchQuery(query));
         updateRouteParams(
@@ -59,7 +59,7 @@ export function setTopics(topics: any) {
 }
 
 export const TOGGLE_NAVIGATION = 'TOGGLE_NAVIGATION';
-export function toggleNavigation(navigation?: any, disableSameNavigationDeselect?: any) {
+export function toggleNavigation(navigation?: any, disableSameNavigationDeselect?: any): any {
     return (dispatch: any, getState: any) => {
         const state = getState();
         const currentNavigation = searchNavigationSelector(state);
@@ -139,7 +139,7 @@ export function toggleFilter(key: any, value: any, single?: any) {
 
 export const SET_CREATED_FILTER = 'SET_CREATED_FILTER';
 export function setCreatedFilter(filter: any) {
-    return function(dispatch, getState) {
+    return function(dispatch: any, getState: any) {
         const state = getState();
 
         // Combine the current created filter with the one provided
@@ -213,7 +213,7 @@ export function followStory(item: any, type: any) {
  *
  * @param {String} navigationId
  */
-export function toggleNavigationById(navigationId: any) {
+export function toggleNavigationById(navigationId: any): any {
     return (dispatch: any, getState: any) => {
         const navigation = (get(getState().search, 'navigations') || []).find((nav: any) => navigationId === nav._id);
         if (navigation) {
@@ -313,7 +313,7 @@ export function loadMyTopic(topicId: any) {
 }
 
 export function updateSearchParams() {
-    return function(dispatch, getState) {
+    return function(dispatch: any, getState: any) {
         dispatch(setParams(
             activeTopicSelector(getState())
         ));
@@ -321,7 +321,7 @@ export function updateSearchParams() {
 }
 
 export function updateFilterStateAndURL(activeFilter: any, createdFilter: any) {
-    return function(dispatch, getState) {
+    return function(dispatch: any, getState: any) {
         const state = getState();
         dispatch(setSearchFilters(activeFilter));
         dispatch(setSearchCreated(createdFilter));
@@ -416,7 +416,7 @@ export function setAdvancedSearchKeywords(field: any, keywords: any) {
 
 export const CLEAR_ADVANCED_SEARCH_PARAMS = 'CLEAR_ADVANCED_SEARCH_PARAMS';
 export function clearAdvanedSearchParams() {
-    return function(dispatch, getState) {
+    return function(dispatch: any, getState: any) {
         dispatch({type: CLEAR_ADVANCED_SEARCH_PARAMS});
         updateRouteParams(
             {advanced: null},
@@ -491,7 +491,7 @@ export function initParams(params: any) {
 }
 
 export function subscribeToTopic(topic: any) {
-    server.post(`/topics/${topic._id}/subscribe`)
+    (server as any).post(`/topics/${topic._id}/subscribe`)
         .then(() => {
             notify.success(gettext('Topic subscribed successfully'));
         })
@@ -499,7 +499,7 @@ export function subscribeToTopic(topic: any) {
 }
 
 export function unsubscribeToTopic(topic: any) {
-    server.del(`/topics/${topic._id}/subscribe`)
+    (server as any).del(`/topics/${topic._id}/subscribe`)
         .then(() => {
             notify.success(gettext('Topic unsubscribed successfully'));
         })

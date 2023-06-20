@@ -29,6 +29,7 @@ import ProductList from './ProductList';
 import SearchResults from 'search/components/SearchResults';
 
 class Products extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any, context: any) {
         super(props, context);
 
@@ -71,7 +72,7 @@ class Products extends React.Component<any, any> {
     render() {
         const progressStyle: any = {width: '25%'};
         const sectionFilter = (product: any) => !this.props.activeSection || get(product, 'product_type', 'wire') === this.props.activeSection;
-        const getActiveSection = () => this.props.sections.filter(s => s._id === this.props.activeSection);
+        const getActiveSection = () => this.props.sections.filter((s: any) => s._id === this.props.activeSection);
 
         return (
             <div className="flex-row">
@@ -161,8 +162,8 @@ const mapStateToProps = (state: any) => ({
 const mapDispatchToProps = (dispatch: any) => ({
     selectProduct: (_id: any) => dispatch(selectProduct(_id)),
     editProduct: (event: any) => dispatch(editProduct(event)),
-    saveProduct: (type: any) => dispatch(postProduct(type)),
-    deleteProduct: (type: any) => dispatch(deleteProduct(type)),
+    saveProduct: (type: any) => dispatch(postProduct()),
+    deleteProduct: (type: any) => dispatch(deleteProduct()),
     newProduct: () => dispatch(newProduct()),
     saveCompanies: (companies: any) => dispatch(saveCompanies(companies)),
     fetchCompanies: () => dispatch(fetchCompanies()),

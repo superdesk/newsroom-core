@@ -5,6 +5,8 @@ import {gettext} from 'utils';
 
 
 class SortItems extends React.Component<any, any> {
+    static propTypes: any;
+    cursor: any;
     constructor(props: any) {
         super(props);
         this.state = {items: this.props.items};
@@ -38,7 +40,7 @@ class SortItems extends React.Component<any, any> {
 
 
     render() {
-        const SortableItem = SortableElement(({item}) =>
+        const SortableItem = SortableElement(({item}: any) =>
             <li className="list-group-item">
                 <span>{item.text}</span>
                 <button type="button"
@@ -53,7 +55,7 @@ class SortItems extends React.Component<any, any> {
             </li>
         );
 
-        const SortableList = SortableContainer(({items}) => {
+        const SortableList = SortableContainer(({items}: any) => {
             return (
                 <ul className="list-group flex-grow-1">
                     {items.map((item: any, index: any) => (

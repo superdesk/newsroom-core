@@ -20,6 +20,7 @@ import {
 import {getTokenForCompany, generateTokenForCompany, deleteTokenForCompany, updateTokenForCompany} from '../actions';
 
 export default class EditAPIToken extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 

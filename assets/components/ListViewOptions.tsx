@@ -8,6 +8,11 @@ import {EXTENDED_VIEW, COMPACT_VIEW} from 'wire/defaults';
 import {isTouchDevice} from 'utils';
 
 class ListViewOptions extends React.PureComponent<any, any> {
+    static propTypes: any;
+    views: any;
+    tooltip: any;
+    elem: any;
+
     constructor(props: any) {
         super(props);
         this.state = {isOpen: false};
@@ -47,7 +52,7 @@ class ListViewOptions extends React.PureComponent<any, any> {
         document.removeEventListener('mousedown', this.handleClickOutside);
     }
 
-    handleClickOutside(e) {
+    handleClickOutside(e: any) {
         if (this.state.isOpen && !this.elem.contains(e.target)) {
             this.setState({isOpen: false});
         }

@@ -10,7 +10,7 @@ import {gettext} from 'utils';
 
 const TOPIC_NAME_MAXLENGTH = 30;
 
-const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubscribeChanged, readOnly}) => (
+const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubscribeChanged, readOnly}: any) => (
     <div>
         <form onSubmit={save}>
             {original._id == null ? null : (

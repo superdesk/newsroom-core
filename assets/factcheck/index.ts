@@ -29,7 +29,7 @@ const params = new URLSearchParams(window.location.search);
 store.dispatch(initParams(params));
 
 // handle history
-window.onpopstate = function(event) {
+window.onpopstate = function(event: any) {
     if (event.state) {
         closeItemOnMobile(store.dispatch, event.state, openItemDetails, previewItem);
         if (!isMobilePhone()) {

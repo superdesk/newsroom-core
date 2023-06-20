@@ -11,6 +11,7 @@ import Modal from 'components/Modal';
 import SelectInput from 'components/SelectInput';
 
 class DownloadItemsModal extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
         this.state = {
@@ -56,7 +57,6 @@ class DownloadItemsModal extends React.Component<any, any> {
                     <SelectInput
                         name='format'
                         label={gettext('Format')}
-                        required={true}
                         value={this.state.params.format}
                         onChange={this.onChange.bind(null, 'format')}
                         options={this.props.options}
@@ -92,7 +92,7 @@ const mapStateToProps = (state: any, props: any) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    onSubmit: ({items, params}) => dispatch(submitDownloadItems(items, params)),
+    onSubmit: ({items, params}: any) => dispatch(submitDownloadItems(items, params)),
     modalFormValid: () => dispatch(modalFormValid()),
 });
 

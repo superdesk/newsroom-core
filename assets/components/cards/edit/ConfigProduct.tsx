@@ -6,6 +6,7 @@ import {gettext} from 'utils';
 
 
 class ConfigProduct extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 

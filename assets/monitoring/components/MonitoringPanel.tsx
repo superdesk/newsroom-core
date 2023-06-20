@@ -19,6 +19,7 @@ import {fetchCompanyUsers} from '../../companies/actions';
 
 
 class MonitoringPanel extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any, context: any) {
         super(props, context);
 
@@ -134,8 +135,8 @@ const mapDispatchToProps = (dispatch: any) => ({
     selectMonitoringProfile: (_id: any) => dispatch(selectMonitoringProfile(_id)),
     updateMonitoringProfile: (event: any) => dispatch(updateMonitoringProfile(event)),
     postMonitoringProfile: () => dispatch(postMonitoringProfile()),
-    deleteMonitoringProfile: (type: any) => dispatch(deleteMonitoringProfile(type)),
-    cancelEdit: (event: any) => dispatch(cancelEdit(event)),
+    deleteMonitoringProfile: (type: any) => dispatch(deleteMonitoringProfile()),
+    cancelEdit: (event: any) => dispatch(cancelEdit()),
     fetchCompanyUsers: (companyId: any) => dispatch(fetchCompanyUsers(companyId, true)),
     saveMonitoringProfileUsers: (users: any) => dispatch(saveMonitoringProfileUsers(users)),
     saveMonitoringProfileSchedule: () => dispatch(saveMonitoringProfileSchedule()),

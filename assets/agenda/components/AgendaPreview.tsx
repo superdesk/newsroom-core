@@ -24,6 +24,9 @@ import {AgendaPreviewEvent} from './AgendaPreviewEvent';
 import {AgendaRegistrationInvitationDetails} from './AgendaRegistrationInvitationDetails';
 
 class AgendaPreview extends React.PureComponent<any, any> {
+    static propTypes: any;
+    static defaultProps: any;
+    preview: any;
     constructor(props: any) {
         super(props);
     }
@@ -85,7 +88,7 @@ class AgendaPreview extends React.PureComponent<any, any> {
                         )}
                     >
                         <AgendaName item={item} />
-                        <AgendaTime item={item} group={previewGroup}>
+                        <AgendaTime item={item}>
                             <AgendaListItemLabels
                                 item={item}
                             />

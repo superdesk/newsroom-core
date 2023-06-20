@@ -14,6 +14,7 @@ import {
 
 
 class EditCard extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
     }
@@ -22,7 +23,7 @@ class EditCard extends React.Component<any, any> {
         const dashboard = (get(this.props, 'dashboards') || []).find((d: any) => d._id === this.props.card.dashboard);
         const cardType = this.props.card.type || '';
         const CardComponent = getCardEditComponent(cardType);
-        const cardTypes = CARD_TYPES.filter(
+        const cardTypes: any = CARD_TYPES.filter(
             (card: any) =>  dashboard.cards.includes(card._id)
         ).map((c: any) => ({value: c._id, text: c.text}));
 

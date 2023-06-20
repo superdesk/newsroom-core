@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 
 export default class CardEditor extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
         this.state = {open: this.props.forceEditor};

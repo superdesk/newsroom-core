@@ -18,7 +18,7 @@ export const getContextName = createSelector(
     (currentSection: any, sections: any) => get(sections, `${currentSection}.name`)
 );
 
-export const modalOptions = createSelector(
+export const modalOptions: any = createSelector(
     [modalItems, formats, context, allItemsById, itemToOpen],
     (items: any, fmts: any, cntxt: any, itemsById: any, openItem: any) => {
         let options = fmts;

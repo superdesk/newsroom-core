@@ -169,7 +169,7 @@ export function copyPreviewContents(item: any) {
             return;
         }
 
-        server.post(`/wire/${item._id}/copy?type=${state.context}`)
+        (server as any).post(`/wire/${item._id}/copy?type=${state.context}`)
             .then((response: any) => {
                 dispatch(setCopyItem(item._id));
                 copyTextToClipboard(response.data, item);
@@ -247,7 +247,7 @@ export function search(state: any, next?: any, aggs?: any) {
 /**
  * Fetch items for current query
  */
-export function fetchItems() {
+export function fetchItems(): any {
     return (dispatch: any, getState: any) => {
         const start = Date.now();
         dispatch(queryItems());
@@ -453,7 +453,7 @@ export function removeNewItems(data: any) {
  *
  * @param {Object} push
  */
-export function pushNotification(push) {
+export function pushNotification(push: any): any {
     return (dispatch: any, getState: any) => {
         const user = getState().user;
         const company = getState().company;
@@ -487,7 +487,7 @@ export function pushNotification(push) {
 }
 
 export function reloadMyTopics(reloadTopic: any = false) {
-    return function(dispatch) {
+    return function(dispatch: any) {
         return loadMyTopics()
             .then((data: any) => {
                 const wireTopics = data.filter((topic: any) => !topic.topic_type || topic.topic_type === 'wire');
@@ -577,7 +577,7 @@ export function loadMyWireTopic(topicId: any) {
  *
  * @param {URLSearchParams} params
  */
-export function initParams(params: any) {
+export function initParams(params: any): any {
     return (dispatch: any, getState: any) => {
         dispatch(initSearchParams(params));
         if (params.get('item')) {

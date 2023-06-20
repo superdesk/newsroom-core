@@ -5,6 +5,8 @@ import Toggle from 'react-toggle';
 import {gettext} from 'utils';
 
 export class ListSearchOptions extends React.PureComponent<any, any> {
+    static propTypes: any;
+    btnGroup: any;
     constructor(props: any) {
         super(props);
 
@@ -32,7 +34,6 @@ export class ListSearchOptions extends React.PureComponent<any, any> {
                 <button
                     id="listSearchOptionsButton"
                     className="content-bar__menu"
-                    onClick={this.toggleOpen}
                     data-bs-toggle="dropdown"
                     aria-haspopup="menu"
                     aria-expanded={this.state.isOpen}

@@ -6,6 +6,7 @@ import {gettext} from 'utils';
 
 
 class AgendaCoverageRequest extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any, context: any) {
         super(props, context);
         this.onRequestClick = this.onRequestClick.bind(this);

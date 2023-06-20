@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {getBounds, getLatLng, mapsLoaded} from '../utils';
 
-let _map;
+let _map: any;
 
-const getMapElement = () => document.getElementById('google-map');
+const getMapElement: any = () => document.getElementById('google-map');
 
 const getMap = () => {
     if (!_map) {
@@ -15,6 +15,9 @@ const getMap = () => {
 };
 
 export default class Map extends React.PureComponent<any, any> {
+    static propTypes: any;
+    markers: never[];
+    elem: any;
     constructor(props: any) {
         super(props);
 

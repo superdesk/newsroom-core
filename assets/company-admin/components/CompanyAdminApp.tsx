@@ -34,6 +34,8 @@ import {CompanyDetailsProductFilter} from './CompanyDetailsProductFilter';
 import {CompanyAdminProductSeatRequestModal} from './CompanyAdminProductSeatRequestModal';
 
 class CompanyAdminAppComponent extends React.Component<any, any> {
+    static propTypes: any;
+    modals: any;
     constructor(props: any) {
         super(props);
 

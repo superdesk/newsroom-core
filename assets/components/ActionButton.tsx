@@ -6,6 +6,9 @@ import {isTouchDevice} from 'utils';
 
 
 class ActionButton extends React.Component<any, any> {
+    static propTypes: any;
+    tooltip: any;
+    elem: any;
     constructor(props: any) {
         super(props);
 

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 export default class ExpiryButtonWrapper extends React.PureComponent<any, any> {
+    static propTypes: any;
     render() {
         return (
             <button

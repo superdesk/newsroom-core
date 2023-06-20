@@ -10,6 +10,10 @@ import {selectCopy} from '../../wire/actions';
  * https://iframely.com/docs/reactjs
  */
 class ArticleBodyHtml extends React.PureComponent<any, any> {
+    static propTypes: any;
+    getBodyHTML: any;
+    bodyRef: any;
+
     constructor(props: any) {
         super(props);
         this.copyClicked = this.copyClicked.bind(this);
@@ -37,7 +41,7 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
                 event.stopPropagation();
 
                 // security https://mathiasbynens.github.io/rel-noopener/
-                var nextWindow = window.open();
+                var nextWindow: any = window.open();
 
                 nextWindow.opener = null;
                 nextWindow.location.href = target.href;
@@ -71,7 +75,7 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
     }
 
     executeScripts() {
-        const tree = this.bodyRef.current;
+        const tree: any = this.bodyRef.current;
         const loaded: Array<any> = [];
 
         if (tree == null) {
@@ -99,7 +103,7 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
                     url = url.substring(url.indexOf(':') + 1);
                 }
 
-                const script = document.createElement('script');
+                const script: any = document.createElement('script');
 
                 script.src = url;
                 script.async = true;
@@ -126,7 +130,7 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
         document.removeEventListener('click', this.clickClicked);
     }
 
-    _getBodyHTML(bodyHtml) {
+    _getBodyHTML(bodyHtml: any) {
         return !bodyHtml ?
             null :
             this._updateImageEmbedSources(formatHTML(bodyHtml));
@@ -139,7 +143,7 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
      * @returns {string}
      * @private
      */
-    _updateImageEmbedSources(html) {
+    _updateImageEmbedSources(html: any) {
         const item = this.props.item;
 
         // Get the list of Original Rendition IDs for all Image Associations
@@ -222,4 +226,6 @@ const mapDispatchToProps = (dispatch: any) => ({
     reportCopy: (item: any) => dispatch(selectCopy(item))
 });
 
-export default connect(null, mapDispatchToProps)(ArticleBodyHtml);
+const component: React.ComponentType<any> = connect(null, mapDispatchToProps)(ArticleBodyHtml);
+
+export default component;

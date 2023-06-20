@@ -12,7 +12,7 @@ function UserListItem({user, isActive, onClick, companiesById}: any) {
             ${(user.company && companiesById[user.company] && !get(companiesById[user.company],'is_enabled')) ||
             !user.is_enabled?'table-secondary':null}`}
             onClick={() => onClick(user._id)}
-            tabIndex="0"
+            tabIndex={0}
             data-test-id={`user-list-item--${user._id}`}
         >
             <td className="name">{user.first_name} {user.last_name}</td>

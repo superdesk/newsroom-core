@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 
 export default class ItemStatisticsModal extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 

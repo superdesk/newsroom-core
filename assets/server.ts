@@ -14,7 +14,7 @@ function checkStatus(response: any) {
         if (response.type === 'opaqueredirect') {
             window.location.reload();
         } else {
-            var error = new Error(response.statusText);
+            var error: any = new Error(response.statusText);
             error.response = response;
             throw error;
         }

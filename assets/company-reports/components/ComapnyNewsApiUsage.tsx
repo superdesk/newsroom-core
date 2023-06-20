@@ -9,6 +9,8 @@ import {REPORTS} from '../actions';
 
 
 class ComapnyNewsApiUsage extends React.Component<any, any> {
+    static propTypes: any;
+    previousScrollTop: any;
     constructor(props: any) {
         super(props);
 

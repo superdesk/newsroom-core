@@ -12,6 +12,7 @@ import MultiSelectDropdown from '../../components/MultiSelectDropdown';
 import ReportsTable from './ReportsTable';
 
 class ContentActivity extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any) {
         super(props);
 

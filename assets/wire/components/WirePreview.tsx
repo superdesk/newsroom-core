@@ -36,6 +36,8 @@ import {Authors} from './fields/Authors';
 
 
 class WirePreview extends React.PureComponent<any, any> {
+    static propTypes: any;
+    preview: any;
     constructor(props: any) {
         super(props);
     }
@@ -77,7 +79,7 @@ class WirePreview extends React.PureComponent<any, any> {
                     {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item}/>}
                     {(isDisplayed('byline', previewConfig) || isDisplayed('located', previewConfig)) &&
                         <ArticleAuthor item={item} displayConfig={previewConfig} />}
-                    {pictures && pictures.map((pic)=> (
+                    {pictures && pictures.map((pic: any)=> (
                         <ArticlePicture
                             key={pic._id}
                             picture={pic}

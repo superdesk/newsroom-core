@@ -26,7 +26,7 @@ function CompanyList({companies, selectCompany, activeCompanyId, companyTypes, s
             <div className="list-items-container">
                 <table
                     className="table table-hover"
-                    tabIndex='-1'
+                    tabIndex={-1}
                     data-test-id="company-list"
                 >
                     <thead>

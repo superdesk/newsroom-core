@@ -18,6 +18,7 @@ import Products from './Products';
 import ListBar from 'components/ListBar';
 
 class ProductsApp extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any, context: any) {
         super(props, context);
     }

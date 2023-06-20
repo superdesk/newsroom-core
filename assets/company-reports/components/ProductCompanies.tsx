@@ -9,6 +9,10 @@ import {toggleFilterAndQuery, runReport} from '../actions';
 import {gettext} from 'utils';
 
 class ProductCompanies extends React.Component<any, any> {
+    static propTypes: any;
+    products: any;
+    filters: any;
+    results: any;
     constructor(props: any, context: any) {
         super(props, context);
 

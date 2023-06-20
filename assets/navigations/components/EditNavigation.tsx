@@ -13,6 +13,9 @@ import AuditInformation from 'components/AuditInformation';
 
 
 class EditNavigation extends React.Component<any, any> {
+    static propTypes: any;
+    tabs: any;
+    sectionIds: any;
     constructor(props: any) {
         super(props);
         this.handleTabClick = this.handleTabClick.bind(this);
@@ -36,7 +39,7 @@ class EditNavigation extends React.Component<any, any> {
     render() {
         const tile_images = get(this.props, 'navigation.tile_images') || [];
         const getActiveSection = () => this.props.sections.filter(
-            s => s._id === get(this.props.navigation, 'product_type')
+            (s: any) => s._id === get(this.props.navigation, 'product_type')
         );
 
         return (
@@ -59,7 +62,7 @@ class EditNavigation extends React.Component<any, any> {
                     {this.tabs.map((tab: any) => (
                         <li key={tab.name} className='nav-item'>
                             <a
-                                name={tab.name}
+                                title={tab.name}
                                 className={`nav-link ${this.state.activeTab === tab.name && 'active'}`}
                                 href='#'
                                 onClick={this.handleTabClick}>{tab.label}

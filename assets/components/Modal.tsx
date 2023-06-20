@@ -74,6 +74,11 @@ function assertButtonHandler(label: any, type: any, onClick: any) {
 }
 
 class Modal extends React.Component<any, any> {
+    static propTypes: any;
+    static defaultProps: any;
+
+    modal: any;
+    elem: any;
     constructor(props: any) {
         super(props);
         this.onSubmit = this.onSubmit.bind(this);
@@ -171,4 +176,6 @@ Modal.defaultProps = {
 
 const mapStateToProps = (state: any) => ({formValid: get(state, 'modal.formValid')});
 
-export default connect(mapStateToProps, {closeModal})(Modal);
+const component: React.ComponentType<any> = connect(mapStateToProps, {closeModal})(Modal);
+
+export default component;

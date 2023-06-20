@@ -260,7 +260,7 @@ function search(state: any, next?: any) {
 /**
  * Fetch items for current query
  */
-export function fetchItems() {
+export function fetchItems(): any {
     return (dispatch: any, getState: any) => {
         const start = Date.now();
         dispatch(queryItems());
@@ -578,7 +578,7 @@ export function fetchMoreItems() {
  *
  * @param {URLSearchParams} params
  */
-export function initParams(params: any) {
+export function initParams(params: any): any {
     if (params.get('filter') || params.get('created')) {
         clearAgendaDropdownFilters();
     }

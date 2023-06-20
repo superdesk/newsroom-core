@@ -8,7 +8,7 @@ import {bem} from 'ui/utils';
 const kB = 1024;
 const MB = kB * kB;
 
-function filesize (size) {
+function filesize (size: any) {
     if (size > MB) {
         return (size / MB).toFixed(1) + ' MB';
     } else if (size > kB) {

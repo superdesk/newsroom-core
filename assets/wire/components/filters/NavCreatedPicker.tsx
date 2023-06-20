@@ -12,7 +12,7 @@ const shortcuts = [
 ];
 
 function NavCreatedPicker({setCreatedFilter, createdFilter, context}: any) {
-    const onClickFactory = (value) => (event) => {
+    const onClickFactory = (value: any) => (event: any) => {
         event.preventDefault();
         setCreatedFilter({from: createdFilter.from === value ? null : value, to: null});
     };

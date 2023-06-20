@@ -11,7 +11,7 @@ import {VersionType} from './VersionType';
 const ALLOWED_SEPARATORS = ['/', '//', '-'];
 const SEPARATOR_KEY = 'separator';
 
-const MAP_FIELD_TO_COMPONENT = {
+const MAP_FIELD_TO_COMPONENT: any = {
     urgency: UrgencyLabel,
     source: Source,
     charcount: CharCount,
@@ -45,7 +45,7 @@ export function FieldComponents({config, item, fieldProps = {}}: any) {
 
     let separator = 0;
 
-    return fields.map(({key, Component}) => {
+    return fields.map(({key, Component}: any) => {
         const _key =
             key === SEPARATOR_KEY ? `${SEPARATOR_KEY}${++separator}` : key;
 
@@ -57,7 +57,7 @@ export function FieldComponents({config, item, fieldProps = {}}: any) {
     });
 }
 
-function getComponentForField(item: any, field: any) {
+function getComponentForField(item: any, field: any): any {
     if (typeof field === 'object' && typeof field.field === 'string') {
         if (
             typeof field.component === 'string' &&

@@ -25,12 +25,12 @@ export function editUser(event: any) {
 }
 
 export const NEW_USER = 'NEW_USER';
-export function newUser(data: any) {
+export function newUser(data?: any) {
     return {type: NEW_USER, data};
 }
 
 export const CANCEL_EDIT = 'CANCEL_EDIT';
-export function cancelEdit(event: any) {
+export function cancelEdit(event?: any) {
     return {type: CANCEL_EDIT, event};
 }
 
@@ -169,7 +169,7 @@ export function deleteUser() {
         const userId = user._id;
         const url = `/users/${userId}`;
 
-        return server.del(url)
+        return (server as any).del(url)
             .then(() => {
                 notify.success(gettext('User deleted successfully'));
                 dispatch(removeUser(userId));
@@ -180,7 +180,7 @@ export function deleteUser() {
 }
 
 export function resendUserInvite() {
-    return function(dispatch, getState) {
+    return function(dispatch: any, getState: any) {
         const user = getState().userToEdit;
         const url = `/users/${user._id}/resend_invite`;
 
@@ -191,7 +191,7 @@ export function resendUserInvite() {
 }
 
 export const INIT_VIEW_DATA = 'INIT_VIEW_DATA';
-export function initViewData(data: any) {
+export function initViewData(data: any): any {
     return function (dispatch: any) {
         dispatch({type: INIT_VIEW_DATA, data});
         dispatch(getUsers(data.users));

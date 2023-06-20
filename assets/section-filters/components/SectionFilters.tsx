@@ -24,6 +24,7 @@ import SectionFilterList from './SectionFilterList';
 import SearchResults from 'search/components/SearchResults';
 
 class SectionFilters extends React.Component<any, any> {
+    static propTypes: any;
     constructor(props: any, context: any) {
         super(props, context);
 
@@ -66,7 +67,7 @@ class SectionFilters extends React.Component<any, any> {
     render() {
         const progressStyle: any = {width: '25%'};
         const sectionFilter = (sectionFilter: any) => !this.props.activeSection || get(sectionFilter, 'filter_type', 'wire') === this.props.activeSection;
-        const getActiveSection = () => this.props.sections.filter(s => s._id === this.props.activeSection);
+        const getActiveSection = () => this.props.sections.filter((s: any) => s._id === this.props.activeSection);
 
         return (
             <div className="flex-row">
@@ -139,11 +140,13 @@ const mapStateToProps = (state: any) => ({
 const mapDispatchToProps = (dispatch: any) => ({
     selectSectionFilter: (_id: any) => dispatch(selectSectionFilter(_id)),
     editSectionFilter: (event: any) => dispatch(editSectionFilter(event)),
-    saveSectionFilter: (type: any) => dispatch(postSectionFilter(type)),
-    deleteSectionFilter: (type: any) => dispatch(deleteSectionFilter(type)),
+    saveSectionFilter: (type: any) => dispatch(postSectionFilter()),
+    deleteSectionFilter: (type: any) => dispatch(deleteSectionFilter()),
     newSectionFilter: () => dispatch(newSectionFilter()),
     cancelEdit: (event: any) => dispatch(cancelEdit(event)),
     dispatch: dispatch,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(SectionFilters);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(SectionFilters);
+
+export default component;

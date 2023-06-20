@@ -91,7 +91,7 @@ export function deleteSectionFilter() {
         const sectionFilter = getState().sectionFilterToEdit;
         const url = `/section_filters/${sectionFilter._id}`;
 
-        return server.del(url)
+        return (server as any).del(url)
             .then(() => {
                 notify.success(gettext('Section Filter deleted successfully'));
                 dispatch(fetchSectionFilters());
@@ -103,7 +103,7 @@ export function deleteSectionFilter() {
 
 
 
-export function initViewData(data: any) {
+export function initViewData(data: any): any {
     return function (dispatch: any) {
         dispatch(getSectionFilters(data.section_filters));
         dispatch(initSections(data.sections));

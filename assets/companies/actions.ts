@@ -48,7 +48,7 @@ export function newCompany(data: any) {
 }
 
 export const CANCEL_EDIT = 'CANCEL_EDIT';
-export function cancelEdit(event: any) {
+export function cancelEdit(event?: any) {
     return {type: CANCEL_EDIT, event};
 }
 
@@ -165,14 +165,14 @@ export function deleteCompany() {
         const company = getState().companyToEdit;
         const url = `/companies/${company._id}`;
 
-        return server.del(url)
+        return (server as any).del(url)
             .then(() => {
                 notify.success(gettext('Company deleted successfully'));
                 dispatch(fetchCompanies());
             })
             .catch((error: any) => {
                 if (error.response.status == 403) {
-                    error.response.json().then(function(data) {
+                    error.response.json().then(function(data: any) {
                         notify.error(data['error']);
                     });
                 }

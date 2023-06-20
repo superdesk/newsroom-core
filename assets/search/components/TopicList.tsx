@@ -8,7 +8,7 @@ import ActionButton from 'components/ActionButton';
 import {ToolTip} from '../../ui/components/ToolTip';
 import AuditInformation from 'components/AuditInformation';
 
-const TopicList = ({topics, selectedTopicId, actions, users}) => {
+const TopicList = ({topics, selectedTopicId, actions, users}: any) => {
     if (get(topics, 'length', 0) < 0) {
         return null;
     }

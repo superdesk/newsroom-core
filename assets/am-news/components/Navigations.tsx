@@ -6,7 +6,7 @@ import {get} from 'lodash';
 import {gettext} from 'utils';
 
 
-const Navigations = ({navigations=[], activeNavigation, toggleNavigation, fetchItems}) => {
+const Navigations: React.ComponentType<any> = ({navigations=[], activeNavigation, toggleNavigation, fetchItems}) => {
 
     const tabs = navigations.map((navigation: any) => (
         <li className="nav-item" key={navigation.name}>
