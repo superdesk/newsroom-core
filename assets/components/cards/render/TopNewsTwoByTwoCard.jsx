@@ -66,9 +66,9 @@ const getTopNews = (items, openItem, cardId, listConfig) => {
     return topNews;
 };
 
-function TopNewsTwoByTwoCard ({items, title, product, openItem, isActive, cardId, listConfig}) {
+function TopNewsTwoByTwoCard ({items, title, productId, openItem, isActive, cardId, listConfig}) {
     return (
-        <CardRow title={title} product={product} isActive={isActive}>
+        <CardRow title={title} productId={productId} isActive={isActive}>
             {getTopNews(items, openItem, cardId, listConfig)}
         </CardRow>
     );
@@ -77,7 +77,7 @@ function TopNewsTwoByTwoCard ({items, title, product, openItem, isActive, cardId
 TopNewsTwoByTwoCard.propTypes = {
     items: PropTypes.array,
     title: PropTypes.string,
-    product: PropTypes.object,
+    productId: PropTypes.string,
     openItem: PropTypes.func,
     isActive: PropTypes.bool,
     cardId: PropTypes.string,

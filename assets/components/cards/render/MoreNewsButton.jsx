@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 
-function MoreNewsButton({title, product, photoUrl, photoUrlLabel, moreNews}) {
+function MoreNewsButton({title, productId, photoUrl, photoUrlLabel, moreNews}) {
     return ([<div key='heading' className='col-6 col-sm-8'>
         <h3 className='home-section-heading'>{title}</h3>
     </div>,
     <div key='more-news' className='col-6 col-sm-4 d-flex align-items-start justify-content-end'>
-        {moreNews && product &&
-                <a href={`/wire?product=${product._id}`} role='button' className='nh-button nh-button--tertiary mb-3'>
+        {moreNews && productId &&
+                <a href={`/wire?product=${productId}`} role='button' className='nh-button nh-button--tertiary mb-3'>
                     {gettext('More news')}
                 </a>}
         {photoUrl &&
@@ -20,7 +20,7 @@ function MoreNewsButton({title, product, photoUrl, photoUrlLabel, moreNews}) {
 
 MoreNewsButton.propTypes = {
     title: PropTypes.string,
-    product: PropTypes.object,
+    productId: PropTypes.string,
     photoUrl: PropTypes.string,
     photoUrlLabel: PropTypes.string,
 };

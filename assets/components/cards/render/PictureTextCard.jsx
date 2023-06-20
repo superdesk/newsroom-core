@@ -28,11 +28,11 @@ const getPictureTextPanel = (item, picture, openItem, withPictures, cardId, list
 };
 
 
-function PictureTextCard ({type, items, title, product, openItem, isActive, cardId, listConfig}) {
+function PictureTextCard ({type, items, title, productId, openItem, isActive, cardId, listConfig}) {
     const withPictures = type.indexOf('picture') > -1;
 
     return (
-        <CardRow title={title} product={product} isActive={isActive}>
+        <CardRow title={title} productId={productId} isActive={isActive}>
             {items.map((item) => getPictureTextPanel(item, getPicture(item), openItem, withPictures, cardId, listConfig))}
         </CardRow>
     );
@@ -42,7 +42,7 @@ PictureTextCard.propTypes = {
     type: PropTypes.string,
     items: PropTypes.array,
     title: PropTypes.string,
-    product: PropTypes.object,
+    productId: PropTypes.string,
     openItem: PropTypes.func,
     isActive: PropTypes.bool,
     cardId: PropTypes.string,
