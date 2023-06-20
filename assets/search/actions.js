@@ -18,6 +18,7 @@ import {
     searchCreatedSelector,
     searchTopicIdSelector,
     activeTopicSelector,
+    searchParamsSelector,
 } from './selectors';
 
 import {context} from 'selectors';
@@ -293,18 +294,18 @@ export function submitShareItem(data) {
 export function deselectMyTopic() {
     return function(dispatch, getState) {
         const state = getState();
-        const currentTopic = activeTopicSelector(state);
+        const currentParams = searchParamsSelector(state);
 
         dispatch(setSearchTopicId(null));
-        dispatch(setParams(currentTopic));
+        dispatch(setParams(currentParams));
         updateRouteParams({
             topic: null,
-            q: currentTopic.query,
-            created: currentTopic.created,
-            filter: currentTopic.filter,
-            navigation: currentTopic.navigation,
-            product: currentTopic.product,
-            advanced: currentTopic.advanced,
+            q: currentParams.query,
+            created: currentParams.created,
+            filter: currentParams.filter,
+            navigation: currentParams.navigation,
+            product: currentParams.product,
+            advanced: currentParams.advanced,
         }, getState());
     };
 }

@@ -2,7 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-export function Tag({text, keyValue, shade, readOnly, onClick, label, operator}) {
+export function Tag({testId, text, keyValue, shade, readOnly, onClick, label, operator}) {
     let classes = classNames('tag-label', {
         [`tag-label--${shade}`]: shade && shade !== 'light',
         'tag-label--operator': operator,
@@ -12,7 +12,12 @@ export function Tag({text, keyValue, shade, readOnly, onClick, label, operator})
         <React.Fragment>
             {label
                 ?
-                <span className={classes} key={keyValue}>
+                <span
+                    data-test-id={testId}
+                    data-tag-type={shade}
+                    className={classes}
+                    key={keyValue}
+                >
                     <span className='tag-label--text-wrapper'>
                         <span className='tag-label--text-label'>
                             {label}:
@@ -21,18 +26,35 @@ export function Tag({text, keyValue, shade, readOnly, onClick, label, operator})
                             {text}
                         </span>
                     </span>
-                    {!readOnly ? <button className='tag-label__remove' onClick={onClick}>
-                        <i className="icon--close-thin" />
-                    </button> : null}
+                    {readOnly ? null : (
+                        <button
+                            data-test-id="remove-tag-button"
+                            className='tag-label__remove'
+                            onClick={onClick}
+                        >
+                            <i className="icon--close-thin" />
+                        </button>
+                    )}
                 </span>
                 :
-                <span className={classes} key={keyValue}>
+                <span
+                    data-test-id={keyValue}
+                    data-tag-type={shade}
+                    className={classes}
+                    key={keyValue}
+                >
                     <span className='tag-label--text'>
                         {text}
                     </span>
-                    {!readOnly ? <button className='tag-label__remove' onClick={onClick}>
-                        <i className="icon--close-thin" />
-                    </button> : null}
+                    {readOnly ? null : (
+                        <button
+                            data-test-id="remove-tag-button"
+                            className='tag-label__remove'
+                            onClick={onClick}
+                        >
+                            <i className="icon--close-thin" />
+                        </button>
+                    )}
                 </span>
             }
         </React.Fragment>
@@ -40,6 +62,7 @@ export function Tag({text, keyValue, shade, readOnly, onClick, label, operator})
 }
 
 Tag.propTypes = {
+    testId: PropTypes.string,
     text: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.number,

@@ -161,14 +161,17 @@ export function SearchResultsAdvancedSearchRow({searchParams, toggleAdvancedSear
     return (
         <React.Fragment>
             <SearchResultTagList
+                testId="search-results--advanced-keywords"
                 title={gettext('Search for')}
                 tags={advancedSearchTags}
             />
             <SearchResultTagList
+                testId="search-results--advanced-fields"
                 title={gettext('Fields searched')}
             >
                 <div className="toggle-button__group toggle-button__group--spaced toggle-button__group--loose">
                     <button
+                        data-test-id="toggle-headline-button"
                         className={classNames(
                             'toggle-button toggle-button--no-txt-transform toggle-button--small',
                             {'toggle-button--active': fields.includes('headline')}
@@ -181,6 +184,7 @@ export function SearchResultsAdvancedSearchRow({searchParams, toggleAdvancedSear
                         {gettext('Headline')}
                     </button>
                     <button
+                        data-test-id="toggle-slugline-button"
                         className={classNames(
                             'toggle-button toggle-button--no-txt-transform toggle-button--small',
                             {'toggle-button--active': fields.includes('slugline')}
@@ -193,6 +197,7 @@ export function SearchResultsAdvancedSearchRow({searchParams, toggleAdvancedSear
                         {gettext('Slugline')}
                     </button>
                     <button
+                        data-test-id="toggle-body-button"
                         className={classNames(
                             'toggle-button toggle-button--no-txt-transform toggle-button--small',
                             {'toggle-button--active': fields.includes('body_html')}

@@ -1,9 +1,12 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-export function SearchResultTagList({title, tags, children}) {
+export function SearchResultTagList({testId, title, tags, children}) {
     return (
-        <li className="search-result__tags-list-row">
+        <li
+            data-test-id={testId}
+            className="search-result__tags-list-row"
+        >
             {!title ? null : (
                 <span className="search-result__tags-list-row-label">
                     {title}
@@ -20,6 +23,7 @@ export function SearchResultTagList({title, tags, children}) {
 }
 
 SearchResultTagList.propTypes = {
+    testId: PropTypes.string,
     title: PropTypes.string,
     tags: PropTypes.arrayOf(PropTypes.node),
     children: PropTypes.node,

@@ -27,6 +27,7 @@ export function SearchResultsTopicRow({
         tags.push(
             <Tag
                 key="tags-topics--topic"
+                testId="tags-topics--topic"
                 text={activeTopic.label}
                 shade="inverse"
                 onClick={() => {
@@ -43,6 +44,7 @@ export function SearchResultsTopicRow({
             tags.push(
                 <Tag
                     key={`tags-topics--nav-${navId}`}
+                    testId={`tags-topics--nav-${navId}`}
                     text={navigation.name}
                     shade="inverse"
                     onClick={() => {
@@ -60,6 +62,7 @@ export function SearchResultsTopicRow({
 
     return (
         <SearchResultTagList
+            testId="search-results--topics"
             title={tags.length ? gettext('Topic') : null}
             tags={tags}
         >
