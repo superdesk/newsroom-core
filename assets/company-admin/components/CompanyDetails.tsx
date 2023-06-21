@@ -19,9 +19,7 @@ function CompanyDetailsComponent({company, showSeatRequestModal, setSection, com
                     <tr>
                         <th>{gettext('Products')}</th>
                         {getConfig('allow_companies_to_manage_products') && (
-                            <td>
-                                <th>{gettext('Users')}</th>
-                            </td>
+                            <th>{gettext('Users')}</th>
                         )}
                         <th colSpan={numSections}>{gettext('Description')}</th>
                     </tr>
@@ -45,7 +43,7 @@ function CompanyDetailsComponent({company, showSeatRequestModal, setSection, com
 
                                         <CompanyDetailsProductRow
                                             key={product._id}
-                                            seat={product}
+                                            product={product}
                                             showSeatRequestModal={showSeatRequestModal}
                                             onNameClicked={() => setSection('users', product._id)}
                                         />

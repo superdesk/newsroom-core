@@ -95,7 +95,7 @@ export const companyProductSeatsSelector = createSelector(
                         section: productMap[companyProduct._id].product_type,
                         max_seats: companyProduct.seats,
                         assigned_seats: userSeats.length,
-                        max_reached: userSeats.length >= companyProduct.seats
+                        max_reached: !!companyProducts.seats && userSeats.length >= companyProduct.seats,
                     };
 
                     return productSeats;

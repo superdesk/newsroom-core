@@ -10,7 +10,7 @@ function AgendaDateButtons({selectDate, activeDate, activeGrouping}: any): any {
         <button
             key='today'
             type='button'
-            className='btn btn-outline-primary btn-sm me-3'
+            className='nh-button nh-button--secondary nh-button--small me-3'
             onClick={() => selectDate(Date.now(), 'day')}>
             {gettext('Today')}
         </button>,
@@ -33,21 +33,21 @@ function AgendaDateButtons({selectDate, activeDate, activeGrouping}: any): any {
         <button
             key='D'
             type='button'
-            className={classnames('btn btn-outline-primary btn-sm me-2', {'active': activeGrouping === 'day'})}
+            className={classnames('nh-button nh-button--secondary nh-button--small me-2', {'active': activeGrouping === 'day'})}
             onClick={() => selectDate(activeDate, 'day')}>
             {gettext('D')}
         </button>,
         <button
             key='W'
             type='button'
-            className={classnames('btn btn-outline-primary btn-sm me-2', {'active': activeGrouping === 'week'})}
+            className={classnames('nh-button nh-button--secondary nh-button--small me-2', {'active': activeGrouping === 'week'})}
             onClick={() => selectDate(activeDate, 'week')}>
             {gettext('W')}
         </button>,
         <button
             key='M'
             type='button'
-            className={classnames('btn btn-outline-primary btn-sm', {'active': activeGrouping === 'month'})}
+            className={classnames('nh-button nh-button--secondary nh-button--small', {'active': activeGrouping === 'month'})}
             onClick={() => selectDate(activeDate, 'month')}>
             {gettext('M')}
         </button>]);

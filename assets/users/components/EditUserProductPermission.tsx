@@ -5,16 +5,17 @@ import classNames from 'classnames';
 import {isProductEnabled} from 'companies/utils';
 import CheckboxInput from 'components/CheckboxInput';
 
-export function EditUserProductPermission({original, user, section, product, seats, onChange}: any) {
-    const originallyEnabled = isProductEnabled(original.products || [], product._id);
-    const currentlyEnabled = isProductEnabled(user.products || [], product._id);
-
+export function EditUserProductPermission({original, user, section, product, seats, onChange}: any): any {
     const maxSeats = user.company != null ?
         seats[user.company][product._id].max_seats :
         null;
     let assignedSeats = user.company != null ?
         seats[user.company][product._id].assigned_seats :
         null;
+
+    const originallyEnabled = isProductEnabled(original.products || [], product._id);
+    const currentlyEnabled = isProductEnabled(user.products || [], product._id);
+    const unlimited = maxSeats == null || maxSeats < 1;
 
     // Update the count/max reached for this form only, to reflect any current changes
     if (maxSeats != null && originallyEnabled !== currentlyEnabled) {
@@ -24,7 +25,7 @@ export function EditUserProductPermission({original, user, section, product, sea
             assignedSeats -= 1;
         }
     }
-    const maxReached = assignedSeats >= maxSeats;
+    const maxReached = maxSeats && assignedSeats >= maxSeats;
 
     return (
         <div className="list-item__preview-row">
@@ -32,12 +33,12 @@ export function EditUserProductPermission({original, user, section, product, sea
                 <CheckboxInput
                     name={`products.${section._id}.${product._id}`}
                     label={product.name}
-                    value={currentlyEnabled}
+                    value={currentlyEnabled || unlimited}
                     onChange={onChange}
-                    readOnly={maxSeats !== null && currentlyEnabled === false && maxReached === true}
+                    readOnly={(maxSeats !== null && currentlyEnabled === false && maxReached === true) || unlimited}
                 />
             </div>
-            {maxSeats == null ? null : (
+            {maxSeats == null || unlimited ? null : (
                 <div className={classNames({'text-danger': maxReached === true})}>
                     {assignedSeats}/{maxSeats}
                 </div>

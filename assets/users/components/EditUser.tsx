@@ -88,7 +88,7 @@ function EditUserComponent({
                         {(user._id == null || user.is_validated === true) ? null : (
                             <button
                                 type="button"
-                                className="btn btn-sm btn-outline-light"
+                                className="nh-button nh-button--tertiary nh-button--small"
                                 aria-label={gettext('Resend Invite')}
                                 onClick={(event: any) => {
                                     event.preventDefault();
@@ -291,24 +291,22 @@ function EditUserComponent({
                         {!user.is_validated || isCompanyAdmin ? null : (
                             <input
                                 type='button'
-                                className='btn btn-outline-secondary'
+                                className='nh-button nh-button--secondary'
                                 value={gettext('Reset Password')}
                                 id='resetPassword'
                                 onClick={onResetPassword} />
                         )}
-
+                        {user._id && (isAdmin||isCompanyAdmin) && user._id !== currentUser._id && <input
+                            type='button'
+                            className='nh-button nh-button--secondary'
+                            value={gettext('Delete')}
+                            onClick={onDelete} />}
                         <input
                             data-test-id="save-btn"
                             type='button'
-                            className='btn btn-outline-primary'
+                            className='nh-button nh-button--primary'
                             value={gettext('Save')}
                             onClick={onSave} />
-
-                        {user._id && (isAdmin||isCompanyAdmin) && user._id !== currentUser._id && <input
-                            type='button'
-                            className='btn btn-outline-primary'
-                            value={gettext('Delete')}
-                            onClick={onDelete} />}
                     </div>
                 </form>
             </div>

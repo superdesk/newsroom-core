@@ -80,7 +80,7 @@ function Company() {
                         </div>
 
                         <div className="content-bar__right">
-                            <button onClick={handleClickEdit} className="btn btn-outline-secondary btn-responsive">Add User</button>
+                            <button onClick={handleClickEdit} className="nh-button nh-button--primary">Add User</button>
                         </div>
                     </nav>
                 </section>

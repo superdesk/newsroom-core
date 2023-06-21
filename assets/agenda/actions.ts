@@ -8,7 +8,6 @@ import {
     notify,
     updateRouteParams,
     getTimezoneOffset,
-    errorHandler,
     recordAction,
     copyTextToClipboard,
 } from 'utils';
@@ -159,6 +158,18 @@ export function selectDate(dateString: any, grouping: any) {
     return {type: SELECT_DATE, dateString, grouping};
 }
 
+export const SET_ERROR = 'SET_ERROR';
+export function setError(errors: any) {
+    return {type: SET_ERROR, errors};
+}
+
+export const SET_ERROR_MESSAGE = 'SET_ERROR_MESSAGE';
+export function setErrorMessage(message: any) {
+    return {
+        type: SET_ERROR_MESSAGE,
+        message
+    };
+}
 
 export function printItem(item: any) {
     return (dispatch: any, getState: any) => {
@@ -269,7 +280,7 @@ export function fetchItems(): any {
             .then(() => {
                 analytics.timingComplete('search', Date.now() - start);
             })
-            .catch(errorHandler);
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -676,4 +687,18 @@ export function stopWatchingCoverage(coverage: any, item: any) {
                 }
             }, (error: any) => { errorHandler(error, dispatch);});
     };
+}
+
+export function errorHandler(error: any, dispatch?: any, setError?: any) {
+    console.error('error', error);
+    if (setError) {
+        if (error.response && error.response.status === 403) {
+            dispatch(setErrorMessage(gettext(
+                'There is no product associated with your user. Please reach out to your Company Admin')));
+        } else {
+            error.response.json().then(function(data: any) {
+                dispatch(setError(data));
+            });
+        }
+    }
 }

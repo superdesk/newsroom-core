@@ -301,7 +301,7 @@ class TopicEditor extends React.Component<any, any> {
                     <div className="list-item__preview-footer">
                         <input
                             type="button"
-                            className="btn btn-outline-secondary"
+                            className="nh-button nh-button--secondary"
                             value={gettext('Cancel')}
                             onClick={this.props.closeEditor}
                             disabled={this.state.saving}
@@ -310,7 +310,7 @@ class TopicEditor extends React.Component<any, any> {
                         <input
                             data-test-id="save-topic-btn"
                             type="button"
-                            className="btn btn-outline-primary"
+                            className="nh-button nh-button--primary"
                             value={gettext('Save')}
                             onClick={this.saveTopic}
                             disabled={this.state.saving || !this.state.valid}

@@ -2,17 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 
-function MoreNewsButton({title, product, photoUrl, photoUrlLabel}: any): any {
+function MoreNewsButton({title, productId, photoUrl, photoUrlLabel, moreNews}: any): any {
     return ([<div key='heading' className='col-6 col-sm-8'>
         <h3 className='home-section-heading'>{title}</h3>
     </div>,
     <div key='more-news' className='col-6 col-sm-4 d-flex align-items-start justify-content-end'>
-        {product &&
-                <a href={`/wire?product=${product._id}`} role='button' className='btn btn-outline-primary mb-3'>
+        {moreNews && productId &&
+                <a href={`/wire?product=${productId}`} role='button' className='nh-button nh-button--tertiary mb-3'>
                     {gettext('More news')}
                 </a>}
         {photoUrl &&
-            <a href={photoUrl} target='_blank' rel='noopener noreferrer' role='button' className='btn btn-outline-primary mb-3'>
+            <a href={photoUrl} target='_blank' rel='noopener noreferrer' role='button' className='nh-button nh-button--tertiary mb-3'>
                 {gettext(photoUrlLabel)}
             </a>}
     </div>]);
@@ -20,7 +20,7 @@ function MoreNewsButton({title, product, photoUrl, photoUrlLabel}: any): any {
 
 MoreNewsButton.propTypes = {
     title: PropTypes.string,
-    product: PropTypes.object,
+    productId: PropTypes.string,
     photoUrl: PropTypes.string,
     photoUrlLabel: PropTypes.string,
 };

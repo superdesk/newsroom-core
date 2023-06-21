@@ -109,7 +109,7 @@ class GeneralSettingsApp extends React.Component<any, any> {
                             <form onSubmit={this.onSubmit}>
                                 {fields}
 
-                                <button type="submit" className="btn btn-primary">{gettext('Save')}</button>
+                                <button type="submit" className="nh-button nh-button--primary">{gettext('Save')}</button>
                             </form>
                         </div>
                     </section>

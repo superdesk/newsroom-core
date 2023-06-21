@@ -90,8 +90,17 @@ class AgendaApp extends BaseApp {
     }
 
     render() {
-        if (this.state.initialLoad) {
+        if (this.state.initialLoad){
             return this.renderLoader();
+        }
+        if (this.props.errorMessage) {
+            return (
+                <div className="wire-articles__item-wrap col-12">
+                    <div className="alert alert-secondary">
+                        {this.props.errorMessage}
+                    </div>
+                </div>
+            );
         }
 
         const modal = this.renderModal(this.props.modal);
@@ -387,6 +396,7 @@ const mapStateToProps = (state: any) => ({
     detailsConfig: detailsConfigSelector(state),
     groups: get(state, 'groups', []),
     hasAgendaFeaturedItems: state.hasAgendaFeaturedItems,
+    errorMessage:state.errorMessage
 });
 
 const mapDispatchToProps = (dispatch: any) => ({

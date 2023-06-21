@@ -26,6 +26,7 @@ import UserProfile from './profile/UserProfile';
 import ProfileToggle from './ProfileToggle';
 
 import '../style';
+import {isUserAdmin} from '../../users/utils';
 
 const modals: any = {shareItem: ShareItemModal};
 
@@ -71,7 +72,7 @@ class UserProfileApp extends React.Component<any, any> {
     }
 
     isSectionEnabled(name: any) {
-        return !!get(this.props, 'userSections', []).find((s: any) => s._id === name);
+        return isUserAdmin(this.props.user) || !!get(this.props, 'userSections', []).find((s: any) => s._id === name);
     }
 
     renderModal(specs: any) {
@@ -163,7 +164,7 @@ class UserProfileApp extends React.Component<any, any> {
                         ))}
                     </ul>
                     <div className="card-footer">
-                        <a href="/logout" className="btn btn-outline-secondary float-end">{gettext('Logout')}</a>
+                        <a href="/logout" className="nh-button nh-button--tertiary float-end">{gettext('Logout')}</a>
                     </div>
                 </div>
             </div>

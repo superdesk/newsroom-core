@@ -284,7 +284,7 @@ class ContentActivity extends React.Component<any, any> {
 
                     <button
                         key='content_activity_export'
-                        className="btn btn-outline-secondary ms-auto me-3"
+                        className="nh-button nh-button--secondary ms-auto me-3"
                         type="button"
                         onClick={this.exportToCSV}
                     >{gettext('Export to CSV')}</button>

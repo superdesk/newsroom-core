@@ -6,17 +6,17 @@ import {get} from 'lodash';
 import {selectDashboard} from './actions';
 import {dashboardPropType} from './types';
 
-function DashboardSwitch({dashboards, activeDashboard, selectDashboard}: any) {
+function DashboardSwitch({dashboards, activeDashboard, selectDashboard}: any): any {
     if (get(dashboards, 'length', 0) <= 1) {
         // don't render the switch if configure dashboards is one
         return null;
     }
 
     return (
-        <div className="btn-group btn-group--navbar ms-0 me-3">
+        <div className="toggle-button__group toggle-button__group--navbar ms-0 me-3">
             {dashboards.map((dashboard: any) => (
                 <button key={dashboard._id}
-                    className={'btn btn-outline-primary' + (dashboard._id === activeDashboard ? ' active' : '')}
+                    className={'toggle-button' + (dashboard._id === activeDashboard ? ' toggle-button--active' : '')}
                     onClick={() => selectDashboard(dashboard._id)}
                 >{dashboard.name}</button>
             ))}

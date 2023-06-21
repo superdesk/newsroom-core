@@ -195,7 +195,7 @@ class MonitoringSchedule extends React.Component<any, any> {
                     <div className='list-item__preview-footer'>
                         <input
                             type='button'
-                            className='btn btn-outline-primary'
+                            className='nh-button nh-button--primary'
                             value={gettext('Save')}
                             onClick={onsaveMonitoringProfileSchedule}
                         />

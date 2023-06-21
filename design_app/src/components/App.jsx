@@ -9,6 +9,8 @@ import Wire from '../pages/Wire';
 import WireOld from '../pages/Wire-old';
 import Settings from '../pages/Settings';
 import Company from '../pages/Company';
+import MyTopics from '../pages/MyTopics';
+import SaveTopic from '../pages/SaveTopic';
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
           <Route path="wire-old" element={<WireOld />} />
           <Route path="settings" element={<Settings />} />   
           <Route path="company" element={<Company />} />   
+          <Route path="mytopics" element={<MyTopics />} />   
+          <Route path="savetopic" element={<SaveTopic />} />   
         </Route>          
       </Routes>      
     </BrowserRouter>

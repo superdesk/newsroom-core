@@ -77,7 +77,6 @@ DropdownFilter.propTypes = {
     locators: PropTypes.any,
     buttonProps: PropTypes.shape({
         textOnly: PropTypes.bool,
-        iconColour: PropTypes.string,
     }),
 };
 

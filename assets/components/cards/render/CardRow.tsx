@@ -18,15 +18,15 @@ class CardRow extends React.Component<any, any> {
         }
     }
     render() {
-        const {title, product, children, userProducts,userType} = this.props;
+        const {title, productId, children, userProducts,userType} = this.props;
         let moreNews = this.props.moreNews;
         if (userType !== 'administrator'){
-            moreNews = userProducts.some((userProduct: any) => userProduct._id === product._id);
+            moreNews = userProducts.some((userProduct: any) => userProduct._id === productId);
         }
 
         return (
-            <div className='row' ref={(elem: any) => (this.cardElem = elem)}>
-                {moreNews && <MoreNewsButton title={title} product={product} />}
+            <div className='row' ref={(elem) => (this.cardElem = elem)}>
+                <MoreNewsButton title={title} productId={productId} moreNews = {moreNews}/>
                 {children}
             </div>
         );
@@ -35,7 +35,7 @@ class CardRow extends React.Component<any, any> {
 
 CardRow.propTypes = {
     title: PropTypes.string,
-    product: PropTypes.object,
+    productId: PropTypes.string,
     isActive: PropTypes.bool,
     children: PropTypes.node.isRequired,
     moreNews: PropTypes.bool,

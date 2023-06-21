@@ -193,7 +193,7 @@ class SubscriberActivity extends React.Component<any, any> {
         // Commented out currently until there is a workaround for pagination with export/print.
         /* filterNodes.push(<span
             key='subscriver_activity_export'
-            className="btn btn-outline-secondary ml-2"
+            className="nh-button nh-button--secondary ml-2"
             type="button"
             onClick={() => {this.props.fetchReport(REPORTS['subscriber-activity'], false, true);}}>Export to CSV</span>); */
 

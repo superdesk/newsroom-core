@@ -17,7 +17,7 @@ export default function FollowStory({item, user, topics, followStory}: any) {
         return (
             <button type="button"
                 disabled={disabled}
-                className="btn btn-outline-primary btn-responsive"
+                className="nh-button nh-button--secondary"
                 onClick={() => followStory(item)}>
                 {gettext('Follow story')}
             </button>

@@ -13,15 +13,14 @@ function AgendaFilterButton({filter, activeFilter, autoToggle, onClick, getFilte
     return (<button
         id={filter.field}
         type='button'
-        className={classNames('btn btn-outline-primary btn-sm d-flex align-items-center px-2 ms-2',
-            {'active': isActive})}
+        className={classNames('nh-dropdown-button ms-2',{' nh-dropdown-button--active': isActive})}
         data-bs-toggle={autoToggle ? 'dropdown' : undefined}
         aria-haspopup='true'
         aria-expanded='false'
         onClick={onClick} >
         <i className={`${filter.icon} d-md-none`}></i>
         <span className='d-none d-md-block'>{filterLabel(filter, activeFilter, isActive)}</span>
-        <i className={classNames('icon-small--arrow-down ms-1', {'icon--white': isActive})}></i>
+        <i className='icon-small--arrow-down'></i>
     </button>);
 }
 

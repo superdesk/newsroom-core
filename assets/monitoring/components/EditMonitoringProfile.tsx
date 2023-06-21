@@ -153,7 +153,7 @@ class EditMonitoringProfile extends React.Component<any, any> {
                                         error={getError('query')}>
                                         {item.query &&
                                                 <a target="_blank" href={`/${'wire'}?q=${item.query}`}
-                                                    className='btn btn-outline-secondary float-end mt-3'>{gettext('Test {{monitoring}} Profile query', window.sectionNames)}
+                                                    className='nh-button nh-button--secondary float-end mt-3'>{gettext('Test {{monitoring}} Profile query', window.sectionNames)}
                                                 </a>}
                                     </TextAreaInput>
 
@@ -201,17 +201,16 @@ class EditMonitoringProfile extends React.Component<any, any> {
                                 </div>
 
                                 <div className='list-item__preview-footer'>
-                                    <input
-                                        type='button'
-                                        className='btn btn-outline-primary'
-                                        value={gettext('Save')}
-                                        onClick={onSave} />
-
                                     {item._id && <input
                                         type='button'
-                                        className='btn btn-outline-primary'
+                                        className='nh-button nh-button--secondary'
                                         value={gettext('Delete')}
                                         onClick={onDelete} />}
+                                    <input
+                                        type='button'
+                                        className='nh-button nh-button--primary'
+                                        value={gettext('Save')}
+                                        onClick={onSave} />
                                 </div>
                             </form>
                         </div>

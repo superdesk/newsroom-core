@@ -36,8 +36,8 @@ class AgendaCoverageRequest extends React.Component<any, any> {
     render() {
         return (<div className='collapsible'>
             <a href='#' className='collapsible__link' onClick={this.onRequestClick}>
-                <i className={classNames('icon-small--arrow-down me-1', {'rotate-90-ccw': this.state.opened})}></i>
-                {gettext('Coverage inquiries')}
+                <i className={classNames('icon-small--arrow-down me-1', {'rotate-90-ccw': !this.state.opened})}></i>
+                <span>{gettext('Coverage inquiries')}</span>
             </a>
             <div className={classNames({'collapsible__form': !this.state.opened})}>
                 <div className='form-group'>
@@ -50,16 +50,16 @@ class AgendaCoverageRequest extends React.Component<any, any> {
                         ></textarea>
                     </div>
                 </div>
-                <div className='form-group'>
+                <div className='nh-button__group'>
                     <input
                         type='button'
-                        className='btn btn-outline-secondary'
+                        className='nh-button nh-button--secondary'
                         value={gettext('Cancel')}
                         onClick={this.reset}
                     ></input>
                     <input
                         type='button'
-                        className='btn btn-outline-primary ms-2'
+                        className='nh-button nh-button--primary'
                         value={gettext('Submit inquiry')}
                         disabled={!this.state.message}
                         onClick={this.requestCoverage}

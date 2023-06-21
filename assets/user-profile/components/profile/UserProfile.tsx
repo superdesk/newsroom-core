@@ -149,13 +149,13 @@ class UserProfile extends React.Component<any, any> {
                 <div className='profile-content__footer px-xl-4'>
                     <input
                         type='button'
-                        className='btn btn-outline-secondary'
+                        className='nh-button nh-button--secondary'
                         value={gettext('Cancel')}
                         onClick={onCancel} />
 
                     <input
                         type='button'
-                        className='btn btn-outline-primary'
+                        className='nh-button nh-button--primary'
                         value={gettext('Save Changes')}
                         onClick={this.save} />
                 </div>

@@ -21,10 +21,10 @@ const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubs
                             <button
                                 type="button"
                                 className={classNames(
-                                    'btn',
+                                    'nh-button',
                                     {
-                                        'btn-primary': topic.notifications,
-                                        'btn-outline-primary': !topic.notifications
+                                        'nh-button--primary': topic.notifications,
+                                        'nh-button--secondary': !topic.notifications
                                     }
                                 )}
                                 title={gettext('Toggle email notifications')}

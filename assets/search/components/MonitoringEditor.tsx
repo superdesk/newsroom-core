@@ -159,7 +159,7 @@ class MonitoringEditor extends React.Component<any, any> {
                                             <input
                                                 name='notifications'
                                                 type="button"
-                                                className="btn btn-outline-primary"
+                                                className="nh-button nh-button--secondary"
                                                 value={subscribed ? gettext('Unsubscribe') : gettext('Subscribe')}
                                                 onClick={this.onChange}
                                                 disabled={this.state.saving} />
@@ -202,14 +202,14 @@ class MonitoringEditor extends React.Component<any, any> {
                                 {isAdmin && (<div className="list-item__preview-footer">
                                     <input
                                         type="button"
-                                        className="btn btn-outline-secondary"
+                                        className="nh-button nh-button--secondary"
                                         value={gettext('Cancel')}
                                         onClick={this.props.closeEditor}
                                         disabled={this.state.saving}
                                     />
                                     <input
                                         type="button"
-                                        className="btn btn-outline-primary"
+                                        className="nh-button nh-button--primary"
                                         value={gettext('Save')}
                                         onClick={this.saveprofile}
                                         disabled={this.state.saving || !this.state.dirty}

@@ -40,12 +40,14 @@ class SelectedItemsBar extends React.PureComponent<any, any> {
 
         return (
             <div className='multi-action-bar multi-action-bar--open'>
-                <button className='btn btn-outline-secondary btn-responsive'
-                    onClick={this.props.selectNone}>{gettext('Cancel')}
-                </button>
-                <button className='btn btn-outline-primary btn-responsive'
+                <button className='nh-button nh-button--primary me-2'
                     onClick={this.props.selectAll}>{gettext('Select All')}
                 </button>
+
+                <button className='nh-button nh-button--secondary'
+                    onClick={this.props.selectNone}>{gettext('Cancel')}
+                </button>
+
                 <span className='multi-action-bar__count'>
                     {gettext('{{ count }} item(s) selected', {count: this.props.selectedItems.length})}
                 </span>

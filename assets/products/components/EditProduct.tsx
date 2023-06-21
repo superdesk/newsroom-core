@@ -64,7 +64,7 @@ class EditProduct extends React.Component<any, any> {
         if (!isEmpty(q) && q !== '{}') {
             return (
                 <a href={`/${product.product_type}?q=${q}`} target="_blank"
-                    className='btn btn-outline-secondary float-end'>{gettext('Test product')}
+                    className='nh-button nh-button--secondary float-end'>{gettext('Test product')}
                 </a>
             );
         }
@@ -135,7 +135,7 @@ class EditProduct extends React.Component<any, any> {
                                         />
                                         {this.props.product.sd_product_id &&
                                         <a href={`/${this.props.product.product_type || 'wire'}?q=products.code:${this.props.product.sd_product_id}`} target="_blank"
-                                            className='btn btn-outline-secondary float-end mt-2'>{gettext('Test product id')}
+                                            className='nh-button nh-button--tertiary float-end mt-2'>{gettext('Test product id')}
                                         </a>}
                                     </div>
 
@@ -149,7 +149,7 @@ class EditProduct extends React.Component<any, any> {
                                         />
                                         {this.props.product.query &&
                                         <a href={`/${this.props.product.product_type || 'wire'}?q=${this.getQueryString(this.props.product, 'query')}`} target="_blank"
-                                            className='btn btn-outline-secondary float-end mt-3'>{gettext('Test query')}
+                                            className='nh-button nh-button--tertiary float-end mt-3'>{gettext('Test query')}
                                         </a>}
                                     </div>
 
@@ -163,7 +163,7 @@ class EditProduct extends React.Component<any, any> {
                                         />
                                         {this.props.product.planning_item_query &&
                                         <a href={`/${this.props.product.product_type || 'wire'}?q=${this.getQueryString(this.props.product, 'planning_item_query')}`} target="_blank"
-                                            className='btn btn-outline-secondary float-end mt-3'>{gettext('Test Planning Item query')}
+                                            className='nh-button nh-button--tertiary float-end mt-3'>{gettext('Test Planning Item query')}
                                         </a>}
                                     </div>}
 
@@ -178,14 +178,14 @@ class EditProduct extends React.Component<any, any> {
                                     {this.getPoductTestButton(this.props.product)}
                                     <input
                                         type='button'
-                                        className='btn btn-outline-primary'
-                                        value={gettext('Save')}
-                                        onClick={this.props.onSave}/>
-                                    <input
-                                        type='button'
-                                        className='btn btn-outline-secondary'
+                                        className='nh-button nh-button--secondary'
                                         value={gettext('Delete')}
                                         onClick={this.props.onDelete}/>
+                                    <input
+                                        type='button'
+                                        className='nh-button nh-button--primary'
+                                        value={gettext('Save')}
+                                        onClick={this.props.onSave}/>
                                 </div>
                             </form>
                         </div>
