@@ -20,8 +20,8 @@ function ListViewControls({
     toggleSearchAllVersions,
 }) {
     return(
-        <React.Fragment>
-            <div className='content-bar__right'>
+        <div className="navbar navbar--flex navbar--small">
+            <div className="navbar__inner navbar__inner--end">
                 {hideSearchAllVersions ? null : (
                     <SearchAllVersionsControl
                         activeNavigation={activeNavigation}
@@ -34,21 +34,22 @@ function ListViewControls({
                     newsOnly={newsOnly}
                     toggleNews={toggleNews}
                 />}
+                <span className="navbar__divider"></span>
                 <ListViewOptions setView={setView} activeView={activeView} />
+                {(!noNavigationSelected(activeNavigation) || (hideSearchAllVersions && hideNewsOnly)) ? null : (
+                    <div className="content-bar__right--mobile">
+                        <ListSearchOptions
+                            hideSearchAllVersions={hideSearchAllVersions}
+                            searchAllVersions={searchAllVersions}
+                            toggleSearchAllVersions={toggleSearchAllVersions}
+                            hideNewsOnly={hideNewsOnly}
+                            newsOnly={newsOnly}
+                            toggleNews={toggleNews}
+                        />
+                    </div>
+                )}
             </div>
-            {(!noNavigationSelected(activeNavigation) || (hideSearchAllVersions && hideNewsOnly)) ? null : (
-                <div className="content-bar__right--mobile">
-                    <ListSearchOptions
-                        hideSearchAllVersions={hideSearchAllVersions}
-                        searchAllVersions={searchAllVersions}
-                        toggleSearchAllVersions={toggleSearchAllVersions}
-                        hideNewsOnly={hideNewsOnly}
-                        newsOnly={newsOnly}
-                        toggleNews={toggleNews}
-                    />
-                </div>
-            )}
-        </React.Fragment>
+        </div>
     );
 }
 

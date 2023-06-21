@@ -116,7 +116,7 @@ def get_view_data():
     topics = get_user_topics(user["_id"]) if user else []
     company = get_company(user) or {}
     return {
-        "user": str(user["_id"]) if user else None,
+        "user": user,
         "company": str(user["company"]) if user and user.get("company") else None,
         "topics": [t for t in topics if t.get("topic_type") == "agenda"],
         "formats": [

@@ -46,7 +46,6 @@ import SelectedItemsBar from 'wire/components/SelectedItemsBar';
 import AgendaListViewControls from './AgendaListViewControls';
 import DownloadItemsModal from 'wire/components/DownloadItemsModal';
 import AgendaItemDetails from 'agenda/components/AgendaItemDetails';
-import SearchResultsInfo from 'search/components/SearchResultsInfo';
 
 import ShareItemModal from 'components/ShareItemModal';
 import {getAgendaItemActions, getCoverageItemActions} from '../item-actions';
@@ -55,6 +54,7 @@ import AgendaDateNavigation from './AgendaDateNavigation';
 import BookmarkTabs from 'components/BookmarkTabs';
 import {setActiveDate, setAgendaDropdownFilter} from 'local-store';
 import {previewConfigSelector, detailsConfigSelector} from 'ui/selectors';
+import {SearchResultsBar} from 'search/components/SearchResultsBar';
 
 const modals = {
     shareItem: ShareItemModal,
@@ -203,15 +203,6 @@ class AgendaApp extends BaseApp {
                                 displayCalendar={true}
                             />
                         )}
-
-                        <AgendaListViewControls
-                            activeView={this.props.activeView}
-                            setView={this.props.setView}
-                            hideFeaturedToggle={!!hideFeaturedToggle}
-                            toggleFeaturedFilter={this.props.toggleFeaturedFilter}
-                            featuredFilter={this.props.featuredOnly}
-                            hasAgendaFeaturedItems={this.props.hasAgendaFeaturedItems}
-                        />
                     </nav>
                 </section>,
                 <section key="contentMain" className='content-main'>
@@ -240,8 +231,9 @@ class AgendaApp extends BaseApp {
                                 />
                             )}
 
-                            <SearchResultsInfo
+                            <SearchResultsBar
                                 minimizeSearchResults={this.state.minimizeSearchResults}
+
                                 showTotalItems={showTotalItems}
                                 showTotalLabel={showTotalLabel}
                                 showSaveTopic={showSaveTopic}
@@ -255,7 +247,18 @@ class AgendaApp extends BaseApp {
 
                                 newItems={this.props.newItems}
                                 refresh={this.props.fetchItems}
-                            />
+
+                                setQuery={this.props.setQuery}
+                            >
+                                <AgendaListViewControls
+                                    activeView={this.props.activeView}
+                                    setView={this.props.setView}
+                                    hideFeaturedToggle={!!hideFeaturedToggle}
+                                    toggleFeaturedFilter={this.props.toggleFeaturedFilter}
+                                    featuredFilter={this.props.featuredOnly}
+                                    hasAgendaFeaturedItems={this.props.hasAgendaFeaturedItems}
+                                />
+                            </SearchResultsBar>
 
                             <AgendaList
                                 actions={this.props.actions}
