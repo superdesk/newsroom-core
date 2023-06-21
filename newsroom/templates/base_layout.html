@@ -127,16 +127,25 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', '{{ get_setting('google_analytics') | tojson }}', {
-      custom_map: {
-          dimension1: 'company',
-          dimension2: 'user',
-      }
+  gtag('set', 'user_properties', {
+      company: (window.profileData || {}).companyName || 'none',
+      user: ((window.profileData || {}).user || {}).first_name || 'unknown',
   });
 
   {% if session.get('user') %}
   gtag('set', {'user_id': '{{ hash(session['user']) | tojson }}' });
   {% endif %}
+
+  if ('{{ get_setting('google_analytics') }}'.startsWith('UA')) {
+      gtag('config', '{{ get_setting('google_analytics') | tojson }}', {
+          custom_map: {
+              dimension1: 'company',
+              dimension2: 'user',
+          }
+      });
+  } else {
+      gtag('config', '{{ get_setting('google_analytics') | tojson }}');
+  }
 
   {% with messages = get_flashed_messages(category_filter=['analytics']) %}
     {% if messages %}
