@@ -240,4 +240,6 @@ const mapStateToProps = (state: any) => ({
     filterGroupLabels: filterGroupsToLabelMap(state),
 });
 
-export default connect(mapStateToProps)(ItemsList);
+const component: React.ComponentType<any> = connect(mapStateToProps)(ItemsList);
+
+export default component;

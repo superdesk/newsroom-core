@@ -178,7 +178,7 @@ export function showItemVersions(item: any, next?: any) {
  * @param {Item} item
  * @return {Node}
  */
-export function shortText(item: any, length: any = 40, config: any) {
+export function shortText(item: any, length: any = 40, config?: any) {
     const useBody = (config === true || config === false) ? config : isDisplayed('abstract', config) === false;
     const html = (useBody ? item.body_html : item.description_html || item.body_html) || '<p></p>';
     const text = useBody ?  getTextFromHtml(html) : item.description_text || getTextFromHtml(html);

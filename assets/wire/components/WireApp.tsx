@@ -78,10 +78,12 @@ class WireApp extends BaseApp {
             navTab.label = gettext('{{monitoring}} Profiles', window.sectionNames);
         }
 
-        this.state.initialLoad = this.props.isLoading;
+        this.state = {
+            initialLoad: this.props.isLoading,
+            isAdvancedSearchShown: false,
+        };
 
         this.toggleAdvancedSearchPanel = this.toggleAdvancedSearchPanel.bind(this);
-        this.state.isAdvancedSearchShown = false;
     }
 
     toggleAdvancedSearchPanel() {
@@ -173,7 +175,7 @@ class WireApp extends BaseApp {
                 listConfig={this.props.listConfig}
                 downloadMedia={this.props.downloadMedia}
                 followStory={this.props.followStory}
-                onClose={() => this.props.actions.filter(a => a.id === 'open')[0].action(null)}
+                onClose={() => this.props.actions.filter((a: any) => a.id === 'open')[0].action(null)}
                 filterGroupLabels={this.props.filterGroupLabels}
             />] : [
                 <section key="contentHeader" className='content-header'>
@@ -278,7 +280,7 @@ class WireApp extends BaseApp {
                         </div>
                     </div>
                 </section>
-            ]).concat([
+            ] as any).concat([
                 modal,
                 this.renderNavBreadcrumb(
                     this.props.navigations,

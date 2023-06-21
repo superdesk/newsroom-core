@@ -1,5 +1,4 @@
 import {
-    SET_EVENT_QUERY,
     RECIEVE_ITEMS,
     INIT_DATA,
     SELECT_DATE,
@@ -100,9 +99,6 @@ export default function agendaReducer(state: any = initialState, action: any) {
 
     case RECIEVE_ITEMS:
         return recieveItems(state, action.data);
-
-    case SET_EVENT_QUERY:
-        return {...state, query: action.query, activeItem: null};
 
     case WATCH_EVENTS: {
         const itemsById = Object.assign({}, state.itemsById);

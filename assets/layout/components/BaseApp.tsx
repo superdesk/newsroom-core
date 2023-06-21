@@ -192,7 +192,7 @@ export default class BaseApp extends React.Component<any, any> {
         this.disposeTooltips();
     }
 
-    getSnapshotBeforeUpdate() {
+    getSnapshotBeforeUpdate(prevProps: any) {
         this.disposeTooltips();
         return null;
     }

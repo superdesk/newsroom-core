@@ -69,6 +69,7 @@
     "@types/redux-logger": "^3.0.9",
     "@types/sinon": "^10.0.15",
     "@types/store": "^2.0.2",
+    "@types/webpack-env": "^1.18.1",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "copy-webpack-plugin": "^4.6.0",
     "enzyme": "^3.0.0",
