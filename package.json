@@ -10,7 +10,7 @@
     "start": "webpack-dev-server --progress --colors --content-base dist --host 0.0.0.0",
     "build": "export NODE_ENV=production && webpack --config webpack.config.js --progress --profile --colors",
     "lint": "eslint assets --ext .js --ext .jsx --ext .ts --ext .tsx",
-    "fix": "eslint *.js assets --ext .js --ext .jsx --fix",
+    "fix": "eslint assets --ext .js --ext .jsx --ext .ts --ext .tsx --fix",
     "test": "karma start --single-run",
     "karma": "karma start",
     "design-app": "webpack-dev-server --config=webpack.design.js"

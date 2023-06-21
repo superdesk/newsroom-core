@@ -22,6 +22,7 @@ module.exports = {
         '@typescript-eslint',
     ],
     "rules": {
+        '@typescript-eslint/no-explicit-any': 0,
         "indent": [
             "error",
             4
