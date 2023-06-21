@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import {keyBy} from 'lodash';
 import * as utils from '../utils';
 

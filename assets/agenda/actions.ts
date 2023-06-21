@@ -75,7 +75,7 @@ export function previewItem(item?: any, group?: any, plan?: any) {
 
 export function fetchWireItemsForAgenda(item: any) {
     return (dispatch: any) => {
-        let wireIds: Array<any> = [];
+        const wireIds: Array<any> = [];
         (get(item, 'coverages') || []).forEach((c: any) => {
             if (c.coverage_type === 'text' && c.delivery_id) {
                 wireIds.push(c.delivery_id);

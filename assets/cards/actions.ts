@@ -73,7 +73,7 @@ export function postCard() {
     return function (dispatch: any, getState: any) {
 
         const card = getState().cardToEdit;
-        let data = new FormData();
+        const data = new FormData();
         data.append('card', JSON.stringify(card));
 
         if (card.type === '4-photo-gallery') {

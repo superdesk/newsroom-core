@@ -143,7 +143,7 @@ class SubscriberActivity extends React.Component<any, any> {
     render() {
         const {results, print, reportParams, toggleFilterAndQuery} = this.props;
         const headers = [gettext('Company'), gettext('Section'), gettext('Item'), gettext('Action'), gettext('User'), gettext('Time')];
-        let list = get(results, 'length', 0) > 0 ? results.map((item: any) =>
+        const list = get(results, 'length', 0) > 0 ? results.map((item: any) =>
             <tr key={item._id}>
                 <td>{item.company}</td>
                 <td>{item.section}</td>

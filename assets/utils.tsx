@@ -7,10 +7,7 @@ import {createStore as _createStore, applyMiddleware, compose} from 'redux';
 import {createLogger} from 'redux-logger';
 import thunk from 'redux-thunk';
 import {render as _render} from 'react-dom';
-
-// @ts-ignore
 import alertify from 'alertifyjs';
-
 import moment from 'moment-timezone';
 
 /*
@@ -371,7 +368,7 @@ export const notify = {
  * @return {string}
  */
 export function getTextFromHtml(html: any) {
-    let raw_html = (html || '').trim();
+    const raw_html = (html || '').trim();
 
     if (raw_html.length === 0) {
         return '';
@@ -573,7 +570,7 @@ export function isWireContext() {
 }
 
 export const getInitData = (data: any) => {
-    let initData = data || {};
+    const initData = data || {};
     return {
         ...initData,
         userSections: keyBy(get(window.profileData, 'userSections', {}), '_id')

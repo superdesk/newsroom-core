@@ -78,7 +78,7 @@ export function postNavigation() {
         }
 
         const url = `/navigations/${navigation._id ? navigation._id : 'new'}`;
-        let data = new FormData();
+        const data = new FormData();
 
         data.append('navigation', JSON.stringify(navigation));
         for(let i = 0; i < MAX_TILE_IMAGES; i++) {

@@ -84,7 +84,7 @@ export default function monitoringReducer(state: any = initialState, action: any
     }
 
     case SET_MONITORING_LIST: {
-        let monitoringListById = Object.assign({}, state.monitoringListById);
+        const monitoringListById = Object.assign({}, state.monitoringListById);
         const profiles = action.data.map((p: any) => {
             monitoringListById[p._id] = p;
             return p._id;

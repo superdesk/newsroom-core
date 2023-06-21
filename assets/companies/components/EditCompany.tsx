@@ -73,7 +73,7 @@ class EditCompany extends React.Component<any, any> {
 
     isFormValid() {
         let valid = true;
-        let errors: any = {};
+        const errors: any = {};
 
         if (!this.props.company.name) {
             errors.name = [gettext('Please provide company name')];

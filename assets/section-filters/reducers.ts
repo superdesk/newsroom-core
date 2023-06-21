@@ -46,7 +46,7 @@ export default function sectionFiltersReducer(state: any = initialState, action:
     case EDIT_SECTION_FILTER: {
         const target = action.event.target;
         const field = target.name;
-        let sectionFilter = state.sectionFilterToEdit;
+        const sectionFilter = state.sectionFilterToEdit;
         sectionFilter[field] = target.type === 'checkbox' ? target.checked : target.value;
         return {...state, sectionFilterToEdit: sectionFilter, errors: null};
     }

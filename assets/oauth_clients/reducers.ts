@@ -53,7 +53,7 @@ export default function clientReducer(state: any = initialState, action: any) {
     case EDIT_CLIENT: {
         const target = action.event.target;
         const field = target.name;
-        let client = state.clientToEdit;
+        const client = state.clientToEdit;
         client[field] = target.value;
         return {...state, clientToEdit: client, errors: null};
     }
@@ -80,7 +80,7 @@ export default function clientReducer(state: any = initialState, action: any) {
         return setupClients(action.data, state);
 
     case GET_CLIENT_PASSWORD:{
-        let newClient = state.clientToEdit;
+        const newClient = state.clientToEdit;
         newClient['secret_key'] = action.data.password;
         newClient['_id'] = action.data._id;
         return {...state, clientToEdit: newClient, errors: null};

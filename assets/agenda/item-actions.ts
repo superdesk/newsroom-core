@@ -5,7 +5,7 @@ import {gettext} from '../utils';
 import {isWatched} from './utils';
 
 const canWatchAgendaItem = (state: any, item: any, includeCoverages: any) => {
-    let result = state.user && !isWatched(item, state.user);
+    const result = state.user && !isWatched(item, state.user);
     if (!state.bookmarks || includeCoverages) {
         return result;
     }

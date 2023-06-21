@@ -456,7 +456,7 @@ export function getInternalNote(item: any, plan: any) {
  */
 export function getDataFromCoverages(item: any) {
     const planningItems = get(item, 'planning_items', []);
-    let data: any = {
+    const data: any = {
         'internal_note': {},
         'ednote': {},
         'workflow_status_reason': {},
@@ -905,7 +905,7 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
 };
 
 function getScheduleType(item: any) {
-    const start = moment(item.dates.start)
+    const start = moment(item.dates.start);
     const end = moment(item.dates.end);
     const duration = end.diff(start, 'minutes');
 
@@ -942,7 +942,7 @@ function getScheduleType(item: any) {
  */
 export function formatAgendaDate(item: any, group: any, {localTimeZone = true, onlyDates = false}) {
     const getFormattedTimezone = (date: any) => {
-        let tzStr = date.format('z');
+        const tzStr = date.format('z');
         if (tzStr.indexOf('+0') >= 0) {
             return tzStr.replace('+0', 'GMT+');
         }
@@ -956,10 +956,10 @@ export function formatAgendaDate(item: any, group: any, {localTimeZone = true, o
 
     const isTBCItem = isItemTBC(item);
     let start = parseDate(item.dates.start, item.dates.all_day);
-    let end = parseDate(item.dates.end, item.dates.all_day || item.dates.no_end_time);
-    let dateGroup = group ? moment(group, DATE_FORMAT) : null;
+    const end = parseDate(item.dates.end, item.dates.all_day || item.dates.no_end_time);
+    const dateGroup = group ? moment(group, DATE_FORMAT) : null;
 
-    let isGroupBetweenEventDates = dateGroup ?
+    const isGroupBetweenEventDates = dateGroup ?
         start.isSameOrBefore(dateGroup, 'day') && end.isSameOrAfter(dateGroup, 'day') : true;
 
     if (!isGroupBetweenEventDates && hasCoverages(item)) {

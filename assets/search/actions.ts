@@ -115,9 +115,9 @@ export function toggleFilter(key: any, value: any, single?: any) {
         const currentFilters = cloneDeep(searchFilterSelector(state));
 
         // the `value` can be an Array
-        let values = Array.isArray(value) ? value : [value];
+        const values = Array.isArray(value) ? value : [value];
 
-        for (let _value of values) {
+        for (const _value of values) {
             currentFilters[key] = toggleValue(currentFilters[key], _value);
             if (!_value || !currentFilters[key] || currentFilters[key].length === 0) {
                 delete currentFilters[key];

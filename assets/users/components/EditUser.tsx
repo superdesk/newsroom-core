@@ -51,7 +51,7 @@ function EditUserComponent({
     const isAdmin = isUserAdmin(currentUser);
     const isCompanyAdmin = isUserCompanyAdmin(currentUser);
 
-    let company = companies.map((value: any)=> value.name);
+    const company = companies.map((value: any)=> value.name);
 
     return (
         <div

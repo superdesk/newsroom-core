@@ -119,10 +119,10 @@ function setupTogglingLeftBarNavigation() {
 
 function setupOpenArticleFromWireList() {
     // Open article from wire list
-    var listItem = document.getElementsByClassName('wire-articles__item');
+    const listItem = document.getElementsByClassName('wire-articles__item');
 
-    var currentItem: any;
-    for(var i = 0; i < listItem.length; i++) {
+    const currentItem: any;
+    for(const i = 0; i < listItem.length; i++) {
         (listItem[i] as any).onclick = function(event: any) {
             document.getElementsByClassName('wire-articles__item')[0].classList.toggle('wire-articles__item--open');
 
@@ -137,6 +137,7 @@ function setupOpenArticleFromWireList() {
 
             if (currentItem !== this) {
                 document.getElementsByClassName('wire-column__preview')[0].classList.add('wire-column__preview--open');
+                // eslint-disable-next-line @typescript-eslint/no-this-alias
                 return currentItem = this;
             } else {
                 document.getElementsByClassName('wire-column__preview')[0].classList.remove('wire-column__preview--open');
@@ -149,8 +150,8 @@ function setupOpenArticleFromWireList() {
 function setupTopBarSearchFocus() {
     // Top bar search items
     // TODO: Use CSS to achieve the same goal here
-    var searchForm = document.getElementsByClassName('search__form')[0];
-    var searchInput = document.getElementsByClassName('search__input')[0];
+    const searchForm = document.getElementsByClassName('search__form')[0];
+    const searchInput = document.getElementsByClassName('search__input')[0];
     if (searchInput) {
         (searchInput as any).onfocus = function() {
             searchForm.classList.add('search_form--active');

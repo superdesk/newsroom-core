@@ -41,7 +41,7 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
                 event.stopPropagation();
 
                 // security https://mathiasbynens.github.io/rel-noopener/
-                var nextWindow: any = window.open();
+                const nextWindow: any = window.open();
 
                 nextWindow.opener = null;
                 nextWindow.location.href = target.href;

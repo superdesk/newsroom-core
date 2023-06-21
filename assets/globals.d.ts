@@ -45,3 +45,4 @@ interface Window {
 }
 
 declare module 'expect';
+declare module 'alertifyjs';

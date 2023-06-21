@@ -16,7 +16,7 @@ const getEventPanel = (event: any, index: any) => {
         if (!d2) {
             return false;
         }
-        let date1 = moment(d1), date2 = moment(d2);
+        const date1 = moment(d1), date2 = moment(d2);
         return date1.format('MMMM') === date2.format('MMMM') &&
           date1.format('MMMM') !== date2.add(1, 'days').format('MMMM') &&
           date1.add(-1, 'days').format('MMMM') !== date2.format('MMMM');

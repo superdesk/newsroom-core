@@ -53,7 +53,7 @@ const TopicParameters = ({topic, navigations, locators, filterGroupLabels, filte
         }
 
         const getPlaceName = (placeId: any) => {
-            let region = (Object.values(locators) || []).find((l: any) => l.name === placeId);
+            const region = (Object.values(locators) || []).find((l: any) => l.name === placeId);
             return region ?
                 (get(region, 'state') || get(region, 'country') || get(region, 'world_region')) :
                 placeId;

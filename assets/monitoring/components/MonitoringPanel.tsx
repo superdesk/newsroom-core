@@ -30,7 +30,7 @@ class MonitoringPanel extends React.Component<any, any> {
 
     isFormValid() {
         let valid = true;
-        let errors: any = {};
+        const errors: any = {};
         const wl = this.props.monitoringProfileToEdit;
 
         if (!wl.name) {

@@ -29,7 +29,7 @@ class ProductCompanies extends React.Component<any, any> {
 
     getDropdownItems(filter: any) {
         const {toggleFilterAndQuery} = this.props;
-        let getName = (text: any) => (text);
+        const getName = (text: any) => (text);
         let itemsArray: Array<any> = [];
         switch (filter.field) {
         case 'product':
@@ -75,7 +75,7 @@ class ProductCompanies extends React.Component<any, any> {
             <td></td>
         </tr>)]);
 
-        let filterNodes = this.filters.map((filter: any) => (
+        const filterNodes = this.filters.map((filter: any) => (
             <DropdownFilter
                 key={filter.label}
                 filter={filter}

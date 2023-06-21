@@ -35,7 +35,7 @@ class SectionFilters extends React.Component<any, any> {
 
     isFormValid() {
         let valid = true;
-        let errors: any = {};
+        const errors: any = {};
 
         if (!this.props.sectionFilterToEdit.name) {
             errors.name = [gettext('Please provide Section Filter name')];

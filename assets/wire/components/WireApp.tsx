@@ -74,7 +74,7 @@ class WireApp extends BaseApp {
         // Show my-topics tab only if WireApp is in 'wire' context (not 'aapX', etc.)
         this.tabs = this.tabs.filter((t: any) => get(this.props.advancedSearchTabConfig, t.id, true));
         if (this.props.context === 'monitoring') {
-            let navTab = this.tabs.find((t: any) => t.id === 'nav');
+            const navTab = this.tabs.find((t: any) => t.id === 'nav');
             navTab.label = gettext('{{monitoring}} Profiles', window.sectionNames);
         }
 
@@ -131,7 +131,7 @@ class WireApp extends BaseApp {
         });
 
         const numNavigations = get(this.props, 'searchParams.navigation.length', 0);
-        let showSaveTopic = this.props.context === 'wire' &&
+        const showSaveTopic = this.props.context === 'wire' &&
             this.props.showSaveTopic &&
             !this.props.bookmarks;
         let showTotalItems = false;

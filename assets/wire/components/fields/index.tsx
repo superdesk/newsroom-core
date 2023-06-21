@@ -128,6 +128,7 @@ function getComponentForField(item: any, field: any): any {
         let Component = null;
 
         // example: "source"
+        // eslint-disable-next-line no-prototype-builtins
         if (MAP_FIELD_TO_COMPONENT.hasOwnProperty(field)) {
             // predefined component
             Component = MAP_FIELD_TO_COMPONENT[field];
