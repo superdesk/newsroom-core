@@ -59,33 +59,34 @@ class ListViewOptions extends React.PureComponent<any, any> {
     }
 
     render() {
-        return(
-            <div className='btn-group list-view__options' ref={(elem: any) => this.elem = elem}>
-                <button
-                    className='content-bar__menu'
+        return (
+            <React.Fragment>
+                <a
+                    className="icon-link--plain"
+                    ref={(elem) => this.elem = elem}
                     onClick={this.toggleOpen}
-                    ref={(elem: any) => this.elem = elem}
-                    title={gettext('Change view')}
-                    aria-label={gettext('Change view')}
-                    role="button">
-                    <i className={`icon--${this.props.activeView}`}></i>
-                </button>
+                >
+                    <span className="icon-link__text">{gettext('Change view')}</span>
+                    <i className={`icon--${this.props.activeView}`} />
+                </a>
                 {this.state.isOpen && (
                     <div className='dropdown-menu dropdown-menu-right show'>
                         <h6 className='dropdown-header'>{gettext('Change view')}</h6>
                         {this.views.map((view: any) => (
-                            <button key={view.type}
+                            <button
+                                key={view.type}
                                 className='dropdown-item'
                                 onClick={() => this.setView(view)}
                                 aria-label={view.label}
-                                type='button'>
+                                type='button'
+                            >
                                 <i className={`icon--${view.type}`} />
                                 {' '}{view.label}
                             </button>
                         ))}
                     </div>
                 )}
-            </div>
+            </React.Fragment>
         );
     }
 }

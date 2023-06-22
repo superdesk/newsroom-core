@@ -7,7 +7,7 @@ class AdvancedSearchFormWrapper extends BaseForm {
         this.fields = {
             all: this.getInput('[data-test-id="field-all"] textarea'),
             any: this.getInput('[data-test-id="field-any"] textarea'),
-            none: this.getInput('[data-test-id="field-none"] textarea'),
+            exclude: this.getInput('[data-test-id="field-none"] textarea'),
             'fields.headline': this.getCheckboxInput('[data-test-id="field-headline"] input'),
             'fields.slugline': this.getCheckboxInput('[data-test-id="field-slugline"] input'),
             'fields.body_html': this.getCheckboxInput('[data-test-id="field-body_html"] input'),

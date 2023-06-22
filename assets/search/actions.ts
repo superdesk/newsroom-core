@@ -18,6 +18,7 @@ import {
     searchCreatedSelector,
     searchTopicIdSelector,
     activeTopicSelector,
+    searchParamsSelector,
 } from './selectors';
 
 import {context} from 'selectors';
@@ -91,7 +92,6 @@ export function toggleNavigation(navigation?: any, disableSameNavigationDeselect
             }
         }
 
-        dispatch(resetSearchParams());
         dispatch(setSearchNavigationIds(newNavigation));
         updateRouteParams(
             {
@@ -291,7 +291,26 @@ export function submitShareItem(data: any) {
     };
 }
 
-export function loadMyTopic(topicId: any) {
+export function deselectMyTopic() {
+    return function(dispatch: any, getState: any) {
+        const state = getState();
+        const currentParams = searchParamsSelector(state);
+
+        dispatch(setSearchTopicId(null));
+        dispatch(setParams(currentParams));
+        updateRouteParams({
+            topic: null,
+            q: currentParams.query,
+            created: currentParams.created,
+            filter: currentParams.filter,
+            navigation: currentParams.navigation,
+            product: currentParams.product,
+            advanced: currentParams.advanced,
+        }, getState());
+    };
+}
+
+export function loadMyTopic(topicId: any): any {
     return (dispatch: any, getState: any) => {
         const state = getState();
         const currentTopicId = searchTopicIdSelector(state);
@@ -372,6 +391,24 @@ export function resetSearchParams() {
     return {type: RESET_SEARCH_PARAMS};
 }
 
+export function resetSearchParamsAndUpdateURL() {
+    return function(dispatch: any, getState: any) {
+        dispatch(resetSearchParams());
+        updateRouteParams(
+            {
+                topic: null,
+                q: null,
+                created: null,
+                navigation: null,
+                filter: null,
+                product: null,
+                advanced: null,
+            },
+            getState()
+        );
+    };
+}
+
 export const TOGGLE_ADVANCED_SEARCH_FIELD = 'TOGGLE_ADVANCED_SEARCH_FIELD';
 export function toggleAdvancedSearchField(field: any) {
     return function(dispatch: any, getState: any) {
@@ -415,7 +452,7 @@ export function setAdvancedSearchKeywords(field: any, keywords: any) {
 }
 
 export const CLEAR_ADVANCED_SEARCH_PARAMS = 'CLEAR_ADVANCED_SEARCH_PARAMS';
-export function clearAdvanedSearchParams() {
+export function clearAdvancedSearchParams() {
     return function(dispatch: any, getState: any) {
         dispatch({type: CLEAR_ADVANCED_SEARCH_PARAMS});
         updateRouteParams(

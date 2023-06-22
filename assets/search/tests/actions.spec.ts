@@ -130,36 +130,6 @@ describe('search actions', () => {
             expect(selectors.searchNavigationSelector(params.state)).toEqual([]);
             expect(params.url.get('navigation')).toEqual(null);
         });
-
-        it('resets current search params', () => {
-            store.dispatch(initData({ui_config: {multi_select_topics: true}}));
-            store.dispatch(actions.toggleNavigation('nav1'));
-            store.dispatch(actions.toggleNavigation('nav2'));
-            store.dispatch(actions.setQuery('search something'));
-            store.dispatch(actions.toggleFilter('service', 'serv1'));
-            store.dispatch(actions.setCreatedFilter({from: 'now/M'}));
-
-            updateParams();
-            expect(selectors.searchNavigationSelector(params.state)).toEqual(['nav1', 'nav2']);
-            expect(params.url.get('navigation')).toEqual('["nav1","nav2"]');
-            expect(selectors.searchQuerySelector(params.state)).toEqual('search something');
-            expect(params.url.get('q')).toEqual('search something');
-            expect(selectors.searchFilterSelector(params.state)).toEqual({service: ['serv1']});
-            expect(params.url.get('filter')).toEqual('{"service":["serv1"]}');
-            expect(selectors.searchCreatedSelector(params.state)).toEqual({from: 'now/M'});
-            expect(params.url.get('created')).toEqual('{"from":"now/M"}');
-
-            store.dispatch(actions.toggleNavigation());
-            updateParams();
-            expect(selectors.searchNavigationSelector(params.state)).toEqual([]);
-            expect(params.url.get('navigation')).toEqual(null);
-            expect(selectors.searchQuerySelector(params.state)).toEqual(null);
-            expect(params.url.get('q')).toEqual(null);
-            expect(selectors.searchFilterSelector(params.state)).toEqual({});
-            expect(params.url.get('filter')).toEqual(null);
-            expect(selectors.searchCreatedSelector(params.state)).toEqual({});
-            expect(params.url.get('created')).toEqual(null);
-        });
     });
 
     it('resetFilter', () => {

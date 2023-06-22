@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 
 import {gettext} from 'utils';
 import {advancedSearchParamsSelector} from '../selectors';
-import {toggleAdvancedSearchField, setAdvancedSearchKeywords, clearAdvanedSearchParams} from '../actions';
+import {toggleAdvancedSearchField, setAdvancedSearchKeywords, clearAdvancedSearchParams} from '../actions';
 
 import CheckboxInput from 'components/CheckboxInput';
 import InputWrapper from 'components/InputWrapper';
@@ -164,7 +164,7 @@ const mapStateToProps = (state: any) => ({
 const mapDispatchToProps = (dispatch: any) => ({
     toggleField: (field: any) => dispatch(toggleAdvancedSearchField(field)),
     setKeywords: (field: any, keywords: any) => dispatch(setAdvancedSearchKeywords(field, keywords)),
-    clearParams: () => dispatch(clearAdvanedSearchParams()),
+    clearParams: () => dispatch(clearAdvancedSearchParams()),
 });
 
 

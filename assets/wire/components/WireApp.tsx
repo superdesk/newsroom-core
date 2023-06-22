@@ -40,7 +40,6 @@ import BaseApp from 'layout/components/BaseApp';
 import WirePreview from './WirePreview';
 import ItemsList from './ItemsList';
 import SearchBar from 'search/components/SearchBar';
-import SearchResultsInfo from 'search/components/SearchResultsInfo';
 import SearchSidebar from './SearchSidebar';
 import SelectedItemsBar from './SelectedItemsBar';
 import ListViewControls from './ListViewControls';
@@ -52,6 +51,8 @@ import getItemActions from '../item-actions';
 import BookmarkTabs from 'components/BookmarkTabs';
 import ItemStatisticsModal from './ItemStatisticsModal';
 import {AdvancedSearchPanel} from 'search/components/AdvancedSearchPanel';
+
+import {SearchResultsBar} from 'search/components/SearchResultsBar';
 
 import {
     previewConfigSelector,
@@ -221,18 +222,6 @@ class WireApp extends BaseApp {
                             setQuery={this.props.setQuery}
                             toggleAdvancedSearchPanel={this.toggleAdvancedSearchPanel}
                         />
-
-                        <ListViewControls
-                            activeView={this.props.activeView}
-                            setView={this.props.setView}
-                            activeNavigation={this.props.activeNavigation}
-                            newsOnly={this.props.newsOnly}
-                            toggleNews={this.props.toggleNews}
-                            hideNewsOnly={!(this.props.context === 'wire' && DISPLAY_NEWS_ONLY && newsOnlyFilterText)}
-                            hideSearchAllVersions={!(this.props.context === 'wire' && DISPLAY_ALL_VERSIONS_TOGGLE)}
-                            searchAllVersions={this.props.searchAllVersions}
-                            toggleSearchAllVersions={this.props.toggleSearchAllVersions}
-                        />
                     </nav>
                 </section>,
                 <section key="contentMain" className='content-main'>
@@ -246,7 +235,7 @@ class WireApp extends BaseApp {
                         <div className={mainClassName}
                             ref={this.setListRef}
                         >
-                            <SearchResultsInfo
+                            <SearchResultsBar
                                 minimizeSearchResults={this.state.minimizeSearchResults}
 
                                 showTotalItems={showTotalItems}
@@ -262,7 +251,21 @@ class WireApp extends BaseApp {
 
                                 newItems={this.props.newItems}
                                 refresh={this.props.fetchItems}
-                            />
+
+                                setQuery={this.props.setQuery}
+                            >
+                                <ListViewControls
+                                    activeView={this.props.activeView}
+                                    setView={this.props.setView}
+                                    activeNavigation={this.props.activeNavigation}
+                                    newsOnly={this.props.newsOnly}
+                                    toggleNews={this.props.toggleNews}
+                                    hideNewsOnly={!(this.props.context === 'wire' && DISPLAY_NEWS_ONLY && newsOnlyFilterText)}
+                                    hideSearchAllVersions={!(this.props.context === 'wire' && DISPLAY_ALL_VERSIONS_TOGGLE)}
+                                    searchAllVersions={this.props.searchAllVersions}
+                                    toggleSearchAllVersions={this.props.toggleSearchAllVersions}
+                                />
+                            </SearchResultsBar>
 
                             <ItemsList
                                 actions={this.props.actions}

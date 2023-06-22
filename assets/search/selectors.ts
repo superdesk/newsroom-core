@@ -1,6 +1,5 @@
 import {createSelector} from 'reselect';
 import {get, find, filter as removeNulls, isEqual, isEmpty} from 'lodash';
-import {getCreatedSearchParamLabel, gettext} from 'utils';
 
 export const searchQuerySelector = (state: any) => get(state, 'search.activeQuery') || null;
 export const searchFilterSelector = (state: any) => get(state, 'search.activeFilter');
@@ -113,105 +112,6 @@ export const searchParamsSelector = createSelector(
     }
 );
 
-export const searchParamTagSelector = createSelector(
-    [searchParamsSelector, navigationsByIdSelector, filterGroupsByIdSelector, activeTopicSelector],
-    (params: any, navs: any, groups: any, activeTopic: any) => {
-        const paramTags = [];
-
-        if (params.navigation) {
-            params.navigation.forEach((navId: any) => {
-                if (activeTopic != null && navId === activeTopic._id) {
-                    return;
-                }
-
-                const nav = navs[navId];
-
-                if (nav && nav._id) {
-                    paramTags.push({
-                        key: nav._id,
-                        label: gettext('Topic'),
-                        text: nav.name,
-                        shade: 'highlight1',
-                        type: 'navigation',
-                        params: nav,
-                    });
-                }
-            });
-        }
-        if (activeTopic) {
-            paramTags.push({
-                key: activeTopic._id,
-                label: gettext('Topic'),
-                text: activeTopic.label,
-                shade: 'highlight1',
-                type: 'topic',
-                params: activeTopic,
-            });
-        }
-        if (params.created) {
-            const created = getCreatedSearchParamLabel(params.created);
-
-            if (created.relative) {
-                paramTags.push({
-                    key: 'published_relative',
-                    label: gettext('Published'),
-                    text: created.relative,
-                    type: 'created',
-                    params: params.created,
-                });
-            } else {
-                if (created.from) {
-                    paramTags.push({
-                        key: 'published_from',
-                        label: gettext('Published From'),
-                        text: created.from,
-                        type: 'created',
-                        params: params.created,
-                    });
-                }
-                if (created.to) {
-                    paramTags.push({
-                        key: 'published_to',
-                        label: gettext('Published To'),
-                        text: created.to,
-                        type: 'created',
-                        params: params.created,
-                    });
-                }
-            }
-        }
-
-        if (params.filter) {
-            Object.keys(params.filter).forEach((field: any) => {
-                const group = groups[field];
-
-                if (!group) {
-                    // If no group is defined, then this filter is not from
-                    // the filters tab in the side-panel
-                    // So we exclude it from the list of tags
-                    return;
-                }
-
-                params.filter[field].forEach((filterValue: any) => {
-                    paramTags.push({
-                        key: `${field}.${filterValue}`,
-                        label: group.label,
-                        text: filterValue,
-                        type: 'filter',
-                        params: {
-                            group: group,
-                            field: field,
-                            value: filterValue,
-                        },
-                    });
-                });
-            });
-        }
-
-        return paramTags;
-    }
-);
-
 export const showSaveTopicSelector = createSelector(
     [searchParamsSelector, activeTopicSelector],
     (current: any, topic: any) => {
@@ -242,6 +142,8 @@ export const showSaveTopicSelector = createSelector(
         } else if (!areTopicFieldsSame(get(current, 'created'), get(topic, 'created'))) {
             return true;
         } else if (!areTopicFieldsSame(get(current, 'filter'), get(topic, 'filter'))) {
+            return true;
+        } else if(!areTopicFieldsSame(get(current, 'advanced'), get(topic, 'advanced'))) {
             return true;
         }
 

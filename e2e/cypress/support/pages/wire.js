@@ -1,16 +1,18 @@
-import {AdvancedSearchForm} from '../forms/advancedSearch';
+import {SearchResultsBar} from '../containers/searchResultsBar';
 
 class WirePageWrapper {
+    constructor() {
+        this.searchResults = new SearchResultsBar();
+    }
+
     showAdvancedSearchModal() {
         cy.get('[data-test-id="show-advanced-search-panel-btn"]').click();
     }
 
     showSaveTopicModal() {
-        cy.get('[data-test-id="save-topic-btn"]').click();
-    }
-
-    getSearchResultTags() {
-        return cy.get('[data-test-id="search-result-tags"]');
+        this.searchResults
+            .getSearchResultElement('topics', '[data-test-id="save-topic-btn"]')
+            .click();
     }
 }
 
