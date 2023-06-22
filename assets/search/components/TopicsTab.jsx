@@ -62,7 +62,7 @@ function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNew
             <FilterButton
                 label={gettext('Manage my {{name}}', {name: tabName})}
                 onClick={clickManage}
-                className='filter-button--border'
+                className='tab-pane__footer'
                 primary={true}
             />
         </React.Fragment>
@@ -116,12 +116,9 @@ function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNew
                     )}
                 </CollapseBoxWithButton>
             </div>
-            <FilterButton
-                label={gettext('Manage my {{name}}', {name: tabName})}
-                onClick={clickManage}
-                className='filter-button--border'
-                primary={true}
-            />
+            <div className='tab-pane__footer'>
+                <button className='nh-button nh-button--secondary' onClick={clickManage}>{gettext('Manage my {{name}}', {name: tabName})}</button>
+            </div>
         </React.Fragment>
     );
 }

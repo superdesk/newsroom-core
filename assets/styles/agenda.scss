@@ -3,87 +3,27 @@
 .wire-column__main-header-agenda {
     flex-shrink: 0;
     height: 56px;
-    transition: all .2s ease;
+    transition: all var(--transition-base);
     z-index: 100;
-    background-color: white;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    background-color: var(--color-background);
+    box-shadow: 0 1px 2px hsla(0, 0%, 0%, 0.1);
     padding-inline-end: 0 !important;
     gap: var(--space--1);
 
     @include phone {
-        justify-content: space-evenly;
-        height: 45px;
-    }
-
-    @include small_phone {
-        .btn-group > .btn {
-            margin-inline-start: 0 !important;
-            padding-inline-start: 0.25rem !important;
-            padding-inline-end: 0.25rem !important;
-        }
-    }
-
-    .btn-outline-primary:hover {
-        i {
-            color: white;
-        }
+        justify-content: flex-start;
+        height: auto;
+        padding-block: var(--space--1);
+        padding-inline-start: var(--space--1) !important;
+        gap: var(--space--0-5);
     }
 }
 .wire-column__main-header-container {
-    min-height: 56px;
     position: relative;
     display: flex;
     flex-direction: column;
-    background-color: white;
+    background-color: var(--color-background);
     box-shadow: 0 3px 6px hsla(0, 0%, 0%, 0.1), 0 1px 0 hsla(0, 0%, 0%, 0.06);
     gap: 1px;
     flex-shrink: 0;
-}
-
-
-.agenda-item {
-    margin-block-start: 0;
-
-    @include md {
-        margin-block-start: 10px;
-    }
-
-    .wire-articles__item--list {
-        padding: 4px 8px;
-
-        @include md {
-            padding: 12px 20px;
-        }
-    }
-    .wire-articles--list-compact & {
-        .wire-articles__item--list {
-            padding: 0 0 0 5px;
-        }
-    }
-    .wire-articles__item-text {
-        padding-inline-end: 58px;
-        @include sm {
-            padding-inline-end: 0;
-        }
-    }
-    .wire-articles__item__meta {
-        align-items: stretch;
-        flex-wrap: wrap;
-        margin-inline-start: 0;
-        padding: 5px 0;
-    }
-
-    .wire-articles__item__meta-info {        
-        margin-block-end: 0;
-        flex-direction: row;
-        gap: 6px;
-
-        @include md {
-            margin-block-start: 0;
-        }
-        & > span {
-            display: flex;
-            align-items: center;
-        }
-    }
 }

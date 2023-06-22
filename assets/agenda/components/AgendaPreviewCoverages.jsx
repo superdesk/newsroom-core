@@ -67,7 +67,7 @@ class AgendaPreviewCoverages extends React.Component {
             )}>
                 <div className="agenda-planning__preview-header">
                     <a href='#' onClick={this.toggleExpanded}>
-                        <i className={classNames('icon-small--arrow-down mr-1', {
+                        <i className={classNames('icon-small--arrow-down me-1', {
                             'rotate-90-ccw': !this.state.expanded,
                         })} />
                     </a>
@@ -81,7 +81,7 @@ class AgendaPreviewCoverages extends React.Component {
                         {displayCoverages.current.concat(displayCoverages.previous).map((coverage) => (
                             <i
                                 key={coverage.coverage_id}
-                                className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} mr-2`}
+                                className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} me-2`}
                             />
                         ))}
                     </div>

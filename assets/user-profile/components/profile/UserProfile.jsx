@@ -54,10 +54,10 @@ class UserProfile extends React.Component {
         const onCancel = () => this.props.fetchUser(this.props.user._id);
         const localeOptions = getLocaleInputOptions();
         return (
-            <form className="profile-content container-fluid">
-                <div className="row">
-                    <div className="col-12 col-xl-8">
-                        <div className="row pt-xl-4 pt-3 px-xl-4">
+            <form className="profile-content profile-content--user">
+                <div className="profile-content__main">
+                    <div className="col-12 col-xl-10 mx-auto">
+                        <div className="row pt-xl-4 pt-3 px-4">
                             <div className="col-lg-6">
                                 <TextInput
                                     name='first_name'
@@ -145,7 +145,7 @@ class UserProfile extends React.Component {
                     </div>
                 </div>
 
-                <div className='profile-content__footer px-xl-4'>
+                <div className='profile-content__footer'>
                     <input
                         type='button'
                         className='nh-button nh-button--secondary'

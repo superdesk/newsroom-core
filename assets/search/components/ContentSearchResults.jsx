@@ -142,7 +142,7 @@ class ContentSearchResultsComponent extends React.Component {
                                     {this.props.showSaveTopic && (
                                         <div
                                             data-test-id="save-topic-btn"
-                                            className="d-none d-md-flex align-items-center flex-shrink-0 ml-auto"
+                                            className="d-none d-md-flex align-items-center flex-shrink-0 ms-auto"
                                         >
                                             <button
                                                 className="nh-button nh-button--secondary d-none d-sm-block mb-1 mt-1"

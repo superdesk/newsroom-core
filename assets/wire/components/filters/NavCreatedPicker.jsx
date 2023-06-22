@@ -25,14 +25,16 @@ function NavCreatedPicker({setCreatedFilter, createdFilter, context}) {
 
     return (
         <NavGroup label={context === 'agenda' ? (gettext('Event date')) : (gettext('Published'))}>
-            {shortcuts.map((shortcut) => (
-                <NavLink key={shortcut.value}
-                    label={shortcut.label}
-                    onClick={onClickFactory(shortcut.value)}
-                    isActive={shortcut === activeShortcut}
-                />
-            ))}
-            <div className="formGroup">
+            <div className='nh-button__group nh-button__group--vertical mb-2'>
+                {shortcuts.map((shortcut) => (
+                    <NavLink key={shortcut.value}
+                        label={shortcut.label}
+                        onClick={onClickFactory(shortcut.value)}
+                        isActive={shortcut === activeShortcut}
+                    />
+                ))}
+            </div>
+            <div className="formGroup mb-2">
                 <label htmlFor="created-from">{gettext('From')}</label>
                 <input id="created-from" type="date" name="from"
                     className="form-control"

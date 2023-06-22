@@ -75,7 +75,7 @@ class AgendaPreviewEventComponent extends React.Component {
                             <React.Fragment>
                                 <div className="agenda-planning__preview-header">
                                     <a href='#' onClick={this.toggleExpanded}>
-                                        <i className={classNames('icon-small--arrow-down mr-1', {
+                                        <i className={classNames('icon-small--arrow-down me-1', {
                                             'rotate-90-ccw': !this.state.expanded,
                                         })} />
                                     </a>

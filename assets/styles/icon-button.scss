@@ -64,33 +64,6 @@
     &.icon-button--bordered {
         --icon-button-border-width: 1px;
     }
-    // &:hover {
-    //     border-color: var(--icon-button-color-border--hover);
-    //     text-decoration: none;
-    // }
-    // &:focus {
-    //     outline: 0;
-    // }
-    // &:focus-visible {
-    //     box-shadow: 0 0 0 1px var(--color-interactive-focus), 0 0 0 3px var(--color-interactive-focus--translucent);
-    // }
-    // &:active {
-    //     box-shadow: inset 0 0 0 4px var(--color-interactive-focus--translucent);
-    // }
-    // &--gray-light {
-    //     &:hover {
-    //         border-color: $gray-light;
-    //     }
-    //     &:focus {
-    //         outline: 0;
-    //     }
-    //     &:focus-visible {
-    //         box-shadow: 0 0 0 1px var(--color-interactive-focus), 0 0 0 3px var(--color-interactive-focus--translucent);
-    //     }
-    //     &:active {
-    //         box-shadow: inset 0 0 0 2px var(--color-interactive-focus--translucent);
-    //     }
-    // }
     &--border-three-sides {
         border-color: var(--color-line--light);
         border-width: 1px 1px 1px 0;

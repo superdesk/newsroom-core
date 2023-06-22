@@ -6,7 +6,7 @@ import {gettext, LIST_ANIMATIONS} from 'utils';
 
 export default function WireListItemDeleted({item, contextName}) {
     const selectClassName = classNames('no-bindable-select', {
-        'wire-articles__item-select-visible': !LIST_ANIMATIONS,
+        'wire-articles__item-select--visible': !LIST_ANIMATIONS,
         'wire-articles__item-select': LIST_ANIMATIONS,
     });
 
@@ -16,7 +16,7 @@ export default function WireListItemDeleted({item, contextName}) {
             tabIndex='0'
         >
             <div className="wire-articles__item wire-articles__item--list wire-articles__item--visited">
-                <div className='wire-articles__item-text'>
+                <div className='wire-articles__item-text-block'>
                     <h4 className='wire-articles__item-headline'>
                         <div className={selectClassName}>
                             <label>
