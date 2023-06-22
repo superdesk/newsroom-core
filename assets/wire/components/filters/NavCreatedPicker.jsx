@@ -24,7 +24,7 @@ function NavCreatedPicker({setCreatedFilter, createdFilter, context}) {
     const activeShortcut = shortcuts.find((shortcut) => shortcut.value === createdFilter.from);
 
     return (
-        <NavGroup label={context === 'agenda' ? (gettext('Event date')) : (gettext('Published'))}>
+        <NavGroup label={context === 'agenda' ? (gettext('Event Date')) : (gettext('Published'))}>
             <div className='nh-button__group nh-button__group--vertical mb-2'>
                 {shortcuts.map((shortcut) => (
                     <NavLink key={shortcut.value}

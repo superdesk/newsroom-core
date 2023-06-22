@@ -117,7 +117,10 @@ function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNew
                 </CollapseBoxWithButton>
             </div>
             <div className='tab-pane__footer'>
-                <button className='nh-button nh-button--secondary' onClick={clickManage}>{gettext('Manage my {{name}}', {name: tabName})}</button>
+                <button className='nh-button nh-button--secondary'
+                    onClick={clickManage}>
+                    {gettext('Manage my {{name}}', {name: tabName})}
+                </button>
             </div>
         </React.Fragment>
     );

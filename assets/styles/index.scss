@@ -362,11 +362,7 @@ body.print {
                 height: calc(var(--navbar-height--mobile) - var(--space--1));
                 line-height: var(--navbar-height--mobile);
                 min-height: auto;
-            }
-
-            // i {
-            //     vertical-align: middle;
-            // }           
+            }     
             &:focus {
                 outline: none;
             }
@@ -1327,7 +1323,6 @@ article.list {
 
 .multi-action-bar {
     display: none;
-   //justify-content: space-between;
     align-items: center;
     position: absolute;
     inset-block-start: 0;
@@ -1859,11 +1854,6 @@ article.list {
     font-weight: 500;
 }
 
-
-
-
-
-
 .time-label {
     color: white;
     background-color: #bfc3c7;
@@ -1916,10 +1906,6 @@ article.list {
 
     .wire-articles__item__meta-time--border-right & {
         inset-inline-end: -5px;
-
-        // @include lg {
-        //     inset-inline-end: 10px;
-        // }
     }
 
     i {
@@ -2581,10 +2567,6 @@ article.list {
     margin-block-end: 5px;
 }
 
-.column__preview__tags__column__headline {
-
-}
-
 .wire-column__preview__tags__headline {
     font-size: 0.6875rem; // 11px
     color: var(--color-text);
@@ -3165,13 +3147,6 @@ article.list {
     }
 }
 
-//.modal, .modal-backdrop {
-//    position: absolute;
-//    position: fixed;
-//    inset-block-start:0;
-//    background: white;
-//}
-
 // home event
 .date-round {
     width: 100%;
@@ -3730,7 +3705,6 @@ article.list {
     display: flex;
     gap: 0;
     border-radius: var(--toggle-button-border-radius);
-    //height: var(--toggle-button-height);
     .toggle-button {
         border-radius: 0;
         border-width: 1px 0 1px 1px;
