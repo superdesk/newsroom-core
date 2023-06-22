@@ -27,9 +27,9 @@ const getPictureTextPanel = (item, picture, openItem, cardId, listConfig) => {
     </div>);
 };
 
-function LargePictureTextCard ({items, title, product, openItem, isActive, cardId, listConfig}) {
+function LargePictureTextCard ({items, title, productId, openItem, isActive, cardId, listConfig}) {
     return (
-        <CardRow title={title} product={product} isActive={isActive}>
+        <CardRow title={title} productId={productId} isActive={isActive}>
             {items.map((item) => getPictureTextPanel(item, getPicture(item), openItem, cardId, listConfig))}
         </CardRow>
     );
@@ -38,7 +38,7 @@ function LargePictureTextCard ({items, title, product, openItem, isActive, cardI
 LargePictureTextCard.propTypes = {
     items: PropTypes.array,
     title: PropTypes.string,
-    product: PropTypes.object,
+    productId: PropTypes.string,
     openItem: PropTypes.func,
     isActive: PropTypes.bool,
     cardId: PropTypes.string,

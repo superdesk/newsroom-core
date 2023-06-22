@@ -48,3 +48,7 @@ export function getLocaleInputOptions() {
 export function getDefaultLocale() {
     return window.locales.find((locale) => locale.locale === window.locale).name;
 }
+
+export function canUserUpdateTopic(user, topic) {
+    return !topic.is_global || (topic.is_global && user.manage_company_topics === true);
+}

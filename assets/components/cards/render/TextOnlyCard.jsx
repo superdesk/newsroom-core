@@ -25,9 +25,9 @@ const getTextOnlyPanel = (item, openItem, picture, cardId, listConfig) => (
 );
 
 
-function TextOnlyCard ({items, title, product, openItem, isActive, cardId, listConfig}) {
+function TextOnlyCard ({items, title, productId, openItem, isActive, cardId, listConfig}) {
     return (
-        <CardRow title={title} product={product} isActive={isActive}>
+        <CardRow title={title} productId={productId} isActive={isActive}>
             {items.map((item) => getTextOnlyPanel(item, openItem, getPicture(item), cardId, listConfig))}
         </CardRow>
     );
@@ -36,7 +36,7 @@ function TextOnlyCard ({items, title, product, openItem, isActive, cardId, listC
 TextOnlyCard.propTypes = {
     items: PropTypes.array,
     title: PropTypes.string,
-    product: PropTypes.object,
+    productId: PropTypes.string,
     openItem: PropTypes.func,
     isActive: PropTypes.bool,
     cardId: PropTypes.string,

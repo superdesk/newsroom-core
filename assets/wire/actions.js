@@ -263,7 +263,8 @@ export function fetchItems() {
                 .catch(errorHandler),
             search(state, false, true)
                 .then((data) => dispatch(recieveAggs(data))),
-        ]);
+        ])
+            .catch((error) => errorHandler(error, dispatch, setError));
     };
 }
 
@@ -342,6 +343,19 @@ export function removeBookmarkItems(items) {
     return {type: REMOVE_BOOKMARK, items};
 }
 
+export const SET_ERROR_MESSAGE = 'SET_ERROR_MESSAGE';
+export function setErrorMessage(message) {
+    return {
+        type: SET_ERROR_MESSAGE,
+        message
+    };
+}
+
+export const SET_ERROR = 'SET_ERROR';
+export function setError(errors) {
+    return {type: SET_ERROR, errors};
+}
+
 export function bookmarkItems(items) {
     return (dispatch, getState) =>
         server.post(`/${getState().context}_bookmark`, {items})
@@ -374,8 +388,18 @@ export function removeBookmarks(items) {
             .catch(errorHandler);
 }
 
-function errorHandler(reason) {
-    console.error('error', reason);
+export function errorHandler(error, dispatch, setError) {
+    console.error('error', error);
+    if (setError) {
+        if (error.response && error.response.status === 403) {
+            dispatch(setErrorMessage(gettext(
+                'There is no product associated with your user. Please reach out to your Company Admin')));
+        } else {
+            error.response.json().then(function(data) {
+                dispatch(setError(data));
+            });
+        }
+    }
 }
 
 /**
@@ -589,3 +613,4 @@ export function initParams(params) {
         }
     };
 }
+

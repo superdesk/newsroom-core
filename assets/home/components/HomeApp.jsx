@@ -75,14 +75,14 @@ class HomeApp extends React.Component {
         }
     }
 
-    getProduct(card) {
-        return this.props.products.find(p => p._id === card.config.product);
+    getProductId(card) {
+        return card.config.product;
     }
 
     getPanels(card) {
         if (this.state.loadingItems) {
             return (
-                <CardRow key={card.label} title={card.label} product={this.getProduct(card)} isActive={this.props.activeCard === card._id}>
+                <CardRow key={card.label} title={card.label} productId={this.getProductId(card)} isActive={this.props.activeCard === card._id}>
                     <div className='col-sm-6 col-md-4 col-lg-3 col-xxl-2 d-flex mb-4'>
                         <div className="spinner-border text-success" />
                         <span className="a11y-only">{gettext('Loading Card Items')}</span>
@@ -118,7 +118,7 @@ class HomeApp extends React.Component {
             type={card.type}
             items={items}
             title={card.label}
-            product={this.getProduct(card)}
+            productId={this.getProductId(card)}
             openItem={this.props.openItemDetails}
             isActive={this.props.activeCard === card._id}
             cardId={card._id}

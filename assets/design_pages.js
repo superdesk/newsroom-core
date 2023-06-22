@@ -154,7 +154,7 @@ function setupTopBarSearchFocus() {
     var searchInput = document.getElementsByClassName('search__input')[0];
     if (searchInput) {
         searchInput.onfocus = function() {
-            searchForm.classList.add('searchForm--active');
+            searchForm.classList.add('search_form--active');
         };
     }
 }

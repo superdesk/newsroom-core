@@ -26,7 +26,6 @@ def get_view_data():
     company = get_company(user) or {}
     company_users = list(query_resource("users", lookup={"company": ObjectId(company["_id"])}))
     products = get_products_by_company(company)
-
     return {
         "users": company_users,
         "companyId": str(company["_id"]),

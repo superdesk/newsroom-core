@@ -2,26 +2,38 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import {gettext, getConfig} from 'utils';
-export function CompanyDetailsProductRow({seat, onNameClicked, showSeatRequestModal}) {
+import classNames from 'classnames';
+
+export function CompanyDetailsProductRow({product, onNameClicked, showSeatRequestModal}) {
+    const unlimited = product.max_seats == null || product.max_seats < 1;
+    const textClassName = classNames({
+        'text-danger': product.max_reached,
+        'text-secondary': unlimited,
+    });
+
     return (
         <tr>
             <td
                 onClick={onNameClicked}
-                className={!seat.max_reached ? undefined : 'text-danger'}
+                className={textClassName}
             >
-                {seat.name}
+                {product.name}
             </td>
             {getConfig('allow_companies_to_manage_products') && (
-                <td className={!seat.max_reached ? undefined : 'text-danger'}>
-                    {seat.assigned_seats}/{seat.max_seats}
+                <td className={textClassName}>
+                    {unlimited ? (
+                        gettext('Unlimited')
+                    ) : (
+                        `${product.assigned_seats}/${product.max_seats}`
+                    )}
                 </td>
             )}
-            <td className="font-light">{seat.description}</td>
-            {getConfig('allow_companies_to_manage_products') && (
+            <td className="font-light">{product.description}</td>
+            {getConfig('allow_companies_to_manage_products') && !unlimited && (
                 <td>
                     <button
                         className="nh-button nh-button--tertiary nh-button--small"
-                        onClick={() => showSeatRequestModal([seat._id])}
+                        onClick={() => showSeatRequestModal([product._id])}
                     >
                         {gettext('Request more seats')}
                     </button>
@@ -32,7 +44,7 @@ export function CompanyDetailsProductRow({seat, onNameClicked, showSeatRequestMo
 }
 
 CompanyDetailsProductRow.propTypes = {
-    seat: PropTypes.shape({
+    product: PropTypes.shape({
         _id: PropTypes.string,
         name: PropTypes.string,
         description: PropTypes.string,

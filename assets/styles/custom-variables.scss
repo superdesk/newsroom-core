@@ -195,6 +195,10 @@ $container-max-widths: (
     // CORE: TYPOGRAPHY
     --font-family-core--sans: "Roboto", "Helvetica Neue", Arial, sans-serif;
     --font-family-core--serif: "Merriweather", serif;
+    --font-size-base: 1rem; // 16px
+    --text-size--large: var(--font-size-base); // 16px
+    --text-size--medium: calc(var(--font-size-base) * 0.875); // 14px
+    --text-size--small: calc(var(--font-size-base) * 0.75);  // 12px
 
     --font-family-core--primary: var(--font-family-core--sans);
     --font-family-core--secondary: var(--font-family-core--serif);
