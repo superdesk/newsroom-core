@@ -21,8 +21,10 @@ import {SearchResultTagsList} from './SearchResultTagsList';
 import NewItemsIcon from '../NewItemsIcon';
 
 
-class SearchResultsBarComponent extends React.Component {
-    constructor(props) {
+class SearchResultsBarComponent extends React.Component<any, any> {
+    static propTypes: any;
+    static defaultProps: any;
+    constructor(props: any) {
         super(props);
 
         this.state = {isTagSectionShown: false};
@@ -30,7 +32,7 @@ class SearchResultsBarComponent extends React.Component {
     }
 
     toggleTagSection() {
-        this.setState((prevState) => ({isTagSectionShown: !prevState.isTagSectionShown}));
+        this.setState((prevState: any) => ({isTagSectionShown: !prevState.isTagSectionShown}));
     }
 
     render() {
@@ -166,7 +168,7 @@ SearchResultsBarComponent.defaultProps = {
     showSaveTopic: false,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: any) => ({
     user: state.userObject,
     searchParams: searchParamsSelector(state),
     navigations: navigationsByIdSelector(state),
@@ -185,4 +187,4 @@ const mapDispatchToProps = {
     resetFilter,
 };
 
-export const SearchResultsBar = connect(mapStateToProps, mapDispatchToProps)(SearchResultsBarComponent);
+export const SearchResultsBar: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(SearchResultsBarComponent);

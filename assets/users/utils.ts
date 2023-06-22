@@ -49,6 +49,6 @@ export function getDefaultLocale() {
     return window.locales.find((locale: any) => locale.locale === window.locale).name;
 }
 
-export function canUserUpdateTopic(user, topic) {
+export function canUserUpdateTopic(user: any, topic: any) {
     return !topic.is_global || (topic.is_global && user.manage_company_topics === true);
 }
