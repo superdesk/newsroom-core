@@ -6,7 +6,7 @@ function NavGroup({label, children}) {
     return (
         <div className='wire-column__nav__group'>
             <h6>{gettext(label)}</h6>
-                {children}
+            {children}
         </div>
     );
 }

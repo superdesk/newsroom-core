@@ -7,7 +7,6 @@ import {gettext, toggleValue} from 'utils';
 
 import NavCreatedPicker from './NavCreatedPicker';
 import FilterGroup from './FilterGroup';
-import FilterButton from './FilterButton';
 
 import {
     resetFilter,
@@ -137,8 +136,8 @@ class FiltersTab extends React.Component {
                 </div>
                 {!isResetActive && !this.props.resultsFiltered ? null : ([
                     <div className='tab-pane__footer'>
-                        <button className='nh-button nh-button--primary' onClick={this.search}>{gettext('Search')}</button>
-                        <button className='nh-button nh-button--secondary' onClick={this.reset}>{gettext('Clear filters')}</button>
+                        <button className='nh-button nh-button--primary' onClick={this.search} key='search'>{gettext('Search')}</button>
+                        <button className='nh-button nh-button--secondary' onClick={this.reset} key='reset'>{gettext('Clear filters')}</button>
                     </div>
                 ])}
             </div>
