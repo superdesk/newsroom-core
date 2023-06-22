@@ -13,6 +13,6 @@ window.sectionNames = {
     saved: 'Saved / Watched',
 };
 
-const testsContext = require.context('.', true, /[Ss]pec.(js|jsx)$/);
+const testsContext = require.context('.', true, /[Ss]pec.(ts|tsx)$/);
 
 testsContext.keys().forEach(testsContext);
