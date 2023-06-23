@@ -479,7 +479,7 @@ export class LocationFilter extends React.Component<any, any> {
                             {this.state.isSearchLoading ? (
                                 <div className="dropdown-item disabled d-flex">
                                     <div className="spinner-border text-success" />
-                                    <span className="ml-3 mt-auto mb-auto">
+                                    <span className="ms-3 mt-auto mb-auto">
                                         {gettext('Searching locations...')}
                                     </span>
                                 </div>

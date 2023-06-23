@@ -80,7 +80,7 @@ function Wire() {
                                         </svg>
                                     </button>
                                     <button className='search__button-submit' type='submit' aria-label="Search">
-                                        <i class="icon--search"></i>
+                                        <i className="icon--search"></i>
                                     </button>
                                 </div>
                             </form>
@@ -129,7 +129,7 @@ function Wire() {
                                                     <div className="collapsible-box__header" onClick={handleClickFolderOne} role='button'>
                                                         <h4 className="collapsible-box__header-title">Politics Topic Folder</h4>
                                                         <div className="collapsible-box__header-caret">
-                                                            <i class="icon--arrow-start"></i>
+                                                            <i className="icon--arrow-start"></i>
                                                         </div>
                                                     </div>
                                                     <div className="collapsible-box__content">
@@ -164,7 +164,7 @@ function Wire() {
                                                     <div className="collapsible-box__header" onClick={handleClickFolderTwo} role='button'>
                                                         <h4 className="collapsible-box__header-title">Culture Topic folder</h4>
                                                         <div className="collapsible-box__header-caret">
-                                                            <i class="icon--arrow-start"></i>
+                                                            <i className="icon--arrow-start"></i>
                                                         </div>
                                                     </div>
                                                     <div className="collapsible-box__content">
@@ -238,7 +238,7 @@ function Wire() {
                                                     <div className="collapsible-box__header" onClick={handleClickFolderThree} role='button'>
                                                         <h4 className="collapsible-box__header-title">Company Topic folder</h4>
                                                         <div className="collapsible-box__header-caret">
-                                                            <i class="icon--arrow-start"></i>
+                                                            <i className="icon--arrow-start"></i>
                                                         </div>
                                                     </div>
                                                     <div className="collapsible-box__content">
@@ -277,10 +277,10 @@ function Wire() {
                                 <div className="navbar navbar--flex line-shadow-end--light">
                                     <div className="search-result-count">12,339 results</div>
                                     <div className="navbar__button-group">
-                                        <button class="nh-button nh-button--tertiary">Clear all</button>
-                                        <button onClick={handleClickTag} class="icon-button icon-button--tertiary icon-button--bordered">
-                                            {isTagSectionShown && <i class="icon--arrow-right icon--collapsible-open"></i>}
-                                            {!isTagSectionShown && <i class="icon--arrow-right icon--collapsible-closed"></i>}
+                                        <button className="nh-button nh-button--tertiary">Clear all</button>
+                                        <button onClick={handleClickTag} className="icon-button icon-button--tertiary icon-button--bordered">
+                                            {isTagSectionShown && <i className="icon--arrow-right icon--collapsible-open"></i>}
+                                            {!isTagSectionShown && <i className="icon--arrow-right icon--collapsible-closed"></i>}
                                         </button>
                                     </div>
                                 </div>
@@ -291,105 +291,105 @@ function Wire() {
                                             <li className="search-result__tags-list-row">
                                                 <span className="search-result__tags-list-row-label">Topic</span>
                                                 <div className="tags-list">
-                                                    <span class="tag-label tag-label--inverse">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">My Ukraine War Topic</span>
+                                                    <span className="tag-label tag-label--inverse">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text">My Ukraine War Topic</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
                                                 </div>
-                                                <div class="tags-list-row__button-group">
-                                                    <button class="nh-button nh-button--tertiary nh-button--small">Update topic</button>
-                                                    <button class="nh-button nh-button--tertiary nh-button--small">Save as new topic</button>
-                                                </div>
-                                            </li>
-
-                                            <li className="search-result__tags-list-row">
-                                                <span className="search-result__tags-list-row-label">Searched for</span>
-                                                <div className="tags-list">
-                                                    <span class="tag-label">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">Donetsk</span>
-                                                        </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
-                                                        </button>
-                                                    </span>
+                                                <div className="tags-list-row__button-group">
+                                                    <button className="nh-button nh-button--tertiary nh-button--small">Update topic</button>
+                                                    <button className="nh-button nh-button--tertiary nh-button--small">Save as new topic</button>
                                                 </div>
                                             </li>
 
                                             <li className="search-result__tags-list-row">
                                                 <span className="search-result__tags-list-row-label">Searched for</span>
                                                 <div className="tags-list">
-                                                <span class="tag-label tag-label--operator tag-label--success">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">and</span>
+                                                    <span className="tag-label">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text">Donetsk</span>
                                                         </span>
-                                                    </span>
-                                                    <span class="tag-label tag-label--success">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">Russia</span>
-                                                        </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--success">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">War</span>
+                                                </div>
+                                            </li>
+
+                                            <li className="search-result__tags-list-row">
+                                                <span className="search-result__tags-list-row-label">Searched for</span>
+                                                <div className="tags-list">
+                                                <span className="tag-label tag-label--operator tag-label--success">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text">and</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                    </span>
+                                                    <span className="tag-label tag-label--success">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text">Russia</span>
+                                                        </span>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
+                                                        </button>
+                                                    </span>
+                                                    <span className="tag-label tag-label--success">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text">War</span>
+                                                        </span>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
 
                                                     <span className="tag-list__separator"></span>
 
-                                                    <span class="tag-label tag-label--operator tag-label--info">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">or</span>
+                                                    <span className="tag-label tag-label--operator tag-label--info">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text">or</span>
                                                         </span>
                                                     </span>
-                                                    <span class="tag-label tag-label--info">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">Zelensky</span>
+                                                    <span className="tag-label tag-label--info">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text">Zelensky</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--info">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">Peace</span>
+                                                    <span className="tag-label tag-label--info">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text">Peace</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
 
                                                     <span className="tag-list__separator"></span>
 
-                                                    <span class="tag-label tag-label--operator tag-label--alert">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">not</span>
+                                                    <span className="tag-label tag-label--operator tag-label--alert">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text">not</span>
                                                         </span>
                                                     </span>
-                                                    <span class="tag-label tag-label--alert">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">Trufeau</span>
+                                                    <span className="tag-label tag-label--alert">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text">Trufeau</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--alert">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text">Bomb</span>
+                                                    <span className="tag-label tag-label--alert">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text">Bomb</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
 
@@ -408,67 +408,67 @@ function Wire() {
                                             <li className="search-result__tags-list-row">
                                                 <span className="search-result__tags-list-row-label">Filters applied</span>
                                                 <div className="tags-list">
-                                                    <span class="tag-label">
-                                                        <span class="tag-label--text-wrapper">
-                                                        <span class="tag-label--text-label">Source:</span>
-                                                            <span class="tag-label--text">Cision</span>
+                                                    <span className="tag-label">
+                                                        <span className="tag-label--text-wrapper">
+                                                        <span className="tag-label--text-label">Source:</span>
+                                                            <span className="tag-label--text">Cision</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label">
-                                                        <span class="tag-label--text-wrapper">
-                                                        <span class="tag-label--text-label">Category:</span>
-                                                            <span class="tag-label--text">Politics</span>
+                                                    <span className="tag-label">
+                                                        <span className="tag-label--text-wrapper">
+                                                        <span className="tag-label--text-label">Category:</span>
+                                                            <span className="tag-label--text">Politics</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label">
-                                                        <span class="tag-label--text-wrapper">
-                                                        <span class="tag-label--text-label">From:</span>
-                                                            <span class="tag-label--text">Feb 1st,2023</span>
+                                                    <span className="tag-label">
+                                                        <span className="tag-label--text-wrapper">
+                                                        <span className="tag-label--text-label">From:</span>
+                                                            <span className="tag-label--text">Feb 1st,2023</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label">
-                                                        <span class="tag-label--text-wrapper">
-                                                        <span class="tag-label--text-label">To:</span>
-                                                            <span class="tag-label--text">Mar 1st,2023</span>
+                                                    <span className="tag-label">
+                                                        <span className="tag-label--text-wrapper">
+                                                        <span className="tag-label--text-label">To:</span>
+                                                            <span className="tag-label--text">Mar 1st,2023</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label">
-                                                        <span class="tag-label--text-wrapper">
-                                                        <span class="tag-label--text-label">Subject:</span>
-                                                            <span class="tag-label--text">Affairs</span>
+                                                    <span className="tag-label">
+                                                        <span className="tag-label--text-wrapper">
+                                                        <span className="tag-label--text-label">Subject:</span>
+                                                            <span className="tag-label--text">Affairs</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label">
-                                                        <span class="tag-label--text-wrapper">
-                                                        <span class="tag-label--text-label">Ranking:</span>
-                                                            <span class="tag-label--text">2</span>
+                                                    <span className="tag-label">
+                                                        <span className="tag-label--text-wrapper">
+                                                        <span className="tag-label--text-label">Ranking:</span>
+                                                            <span className="tag-label--text">2</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label">
-                                                        <span class="tag-label--text-wrapper">
-                                                        <span class="tag-label--text-label">Version:</span>
-                                                            <span class="tag-label--text">2</span>
+                                                    <span className="tag-label">
+                                                        <span className="tag-label--text-wrapper">
+                                                        <span className="tag-label--text-label">Version:</span>
+                                                            <span className="tag-label--text">2</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
 
@@ -485,112 +485,112 @@ function Wire() {
                                             <li className="search-result__tags-list-row">
                                                 <span className="search-result__tags-list-row-label">Test svih opcija</span>
                                                 <div className="tags-list">
-                                                    <span class="tag-label">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text-label">Type:</span>
-                                                            <span class="tag-label--text">Default</span>
+                                                    <span className="tag-label">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text-label">Type:</span>
+                                                            <span className="tag-label--text">Default</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--darker">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text-label">Type:</span>
-                                                            <span class="tag-label--text">Darker</span>
+                                                    <span className="tag-label tag-label--darker">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text-label">Type:</span>
+                                                            <span className="tag-label--text">Darker</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--inverse">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text-label">Type:</span>
-                                                            <span class="tag-label--text">Inverse</span>
+                                                    <span className="tag-label tag-label--inverse">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text-label">Type:</span>
+                                                            <span className="tag-label--text">Inverse</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--highlight">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text-label">Type:</span>
-                                                            <span class="tag-label--text">Highlight</span>
+                                                    <span className="tag-label tag-label--highlight">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text-label">Type:</span>
+                                                            <span className="tag-label--text">Highlight</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--success">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text-label">Type:</span>
-                                                            <span class="tag-label--text">Success</span>
+                                                    <span className="tag-label tag-label--success">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text-label">Type:</span>
+                                                            <span className="tag-label--text">Success</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--warning">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text-label">Type:</span>
-                                                            <span class="tag-label--text">Warning</span>
+                                                    <span className="tag-label tag-label--warning">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text-label">Type:</span>
+                                                            <span className="tag-label--text">Warning</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--alert">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text-label">Type:</span>
-                                                            <span class="tag-label--text">Alert</span>
+                                                    <span className="tag-label tag-label--alert">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text-label">Type:</span>
+                                                            <span className="tag-label--text">Alert</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--info">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text-label">Type:</span>
-                                                            <span class="tag-label--text">Info</span>
+                                                    <span className="tag-label tag-label--info">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text-label">Type:</span>
+                                                            <span className="tag-label--text">Info</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--highlight1">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text-label">Type:</span>
-                                                            <span class="tag-label--text">Highlight 1</span>
+                                                    <span className="tag-label tag-label--highlight1">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text-label">Type:</span>
+                                                            <span className="tag-label--text">Highlight 1</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
-                                                    <span class="tag-label tag-label--highlight2">
-                                                        <span class="tag-label--text-wrapper">
-                                                            <span class="tag-label--text-label">Type:</span>
-                                                            <span class="tag-label--text">Highlight 2</span>
+                                                    <span className="tag-label tag-label--highlight2">
+                                                        <span className="tag-label--text-wrapper">
+                                                            <span className="tag-label--text-label">Type:</span>
+                                                            <span className="tag-label--text">Highlight 2</span>
                                                         </span>
-                                                        <button class="tag-label__remove">
-                                                            <i class="icon--close-thin"></i>
+                                                        <button className="tag-label__remove">
+                                                            <i className="icon--close-thin"></i>
                                                         </button>
                                                     </span>
                                                 </div>
                                             </li>
                                             <li className="search-result__tags-list-row">
                                             <span className="search-result__tags-list-row-label">Icon Buttons</span>
-                                                <button type="button" class="icon-button icon-button--primary" title=""><i class="icon--text"></i></button>
-                                                <button type="button" class="icon-button icon-button--secondary" title=""><i class="icon--text"></i></button>
-                                                <button type="button" class="icon-button" title=""><i class="icon--text"></i></button>
+                                                <button type="button" className="icon-button icon-button--primary" title=""><i className="icon--text"></i></button>
+                                                <button type="button" className="icon-button icon-button--secondary" title=""><i className="icon--text"></i></button>
+                                                <button type="button" className="icon-button" title=""><i className="icon--text"></i></button>
 
-                                                <button type="button" class="icon-button icon-button--tertiary" title=""><i class="icon--text"></i></button>
+                                                <button type="button" className="icon-button icon-button--tertiary" title=""><i className="icon--text"></i></button>
                                                 
 
-                                                <button type="button" class="icon-button icon-button--primary icon-button--bordered" title=""><i class="icon--text"></i></button>
-                                                <button type="button" class="icon-button icon-button--secondary icon-button--bordered" title=""><i class="icon--text"></i></button>
-                                                <button type="button" class="icon-button icon-button--bordered" title=""><i class="icon--text"></i></button>
+                                                <button type="button" className="icon-button icon-button--primary icon-button--bordered" title=""><i className="icon--text"></i></button>
+                                                <button type="button" className="icon-button icon-button--secondary icon-button--bordered" title=""><i className="icon--text"></i></button>
+                                                <button type="button" className="icon-button icon-button--bordered" title=""><i className="icon--text"></i></button>
 
-                                                <button type="button" class="icon-button icon-button--tertiary icon-button--bordered" title=""><i class="icon--text"></i></button>
+                                                <button type="button" className="icon-button icon-button--tertiary icon-button--bordered" title=""><i className="icon--text"></i></button>
                                                 
 
 
@@ -598,22 +598,22 @@ function Wire() {
                                             <li className="search-result__tags-list-row">
                                                 <span className="search-result__tags-list-row-label">Buttons</span>
 
-                                                <button type="button" class="nh-button nh-button--primary" title=""><i class="icon--text"></i>Primary</button>
-                                                <button type="button" class="nh-button nh-button--primary" title="">Primary</button>
-                                                <button type="button" class="nh-button nh-button--secondary" title=""><i class="icon--text"></i>Secondary</button>
-                                                <button type="button" class="nh-button nh-button--secondary" title="">Secondary</button>
-                                                <button type="button" class="nh-button nh-button--tertiary" title=""><i class="icon--text"></i>Tertiary</button>
-                                                <button type="button" class="nh-button nh-button--tertiary" title="">Tertiary</button>
+                                                <button type="button" className="nh-button nh-button--primary" title=""><i className="icon--text"></i>Primary</button>
+                                                <button type="button" className="nh-button nh-button--primary" title="">Primary</button>
+                                                <button type="button" className="nh-button nh-button--secondary" title=""><i className="icon--text"></i>Secondary</button>
+                                                <button type="button" className="nh-button nh-button--secondary" title="">Secondary</button>
+                                                <button type="button" className="nh-button nh-button--tertiary" title=""><i className="icon--text"></i>Tertiary</button>
+                                                <button type="button" className="nh-button nh-button--tertiary" title="">Tertiary</button>
                                             </li>
                                             <li className="search-result__tags-list-row">
                                                 <span className="search-result__tags-list-row-label">Buttons -- small</span>
 
-                                                <button type="button" class="nh-button nh-button--primary nh-button--small" title=""><i class="icon--text"></i>Primary</button>
-                                                <button type="button" class="nh-button nh-button--primary nh-button--small" title="">Primary</button>
-                                                <button type="button" class="nh-button nh-button--secondary nh-button--small" title=""><i class="icon--text"></i>Secondary</button>
-                                                <button type="button" class="nh-button nh-button--secondary nh-button--small" title="">Secondary</button>
-                                                <button type="button" class="nh-button nh-button--tertiary nh-button--small" title=""><i class="icon--text"></i>Tertiary</button>
-                                                <button type="button" class="nh-button nh-button--tertiary nh-button--small" title="">Tertiary</button>
+                                                <button type="button" className="nh-button nh-button--primary nh-button--small" title=""><i className="icon--text"></i>Primary</button>
+                                                <button type="button" className="nh-button nh-button--primary nh-button--small" title="">Primary</button>
+                                                <button type="button" className="nh-button nh-button--secondary nh-button--small" title=""><i className="icon--text"></i>Secondary</button>
+                                                <button type="button" className="nh-button nh-button--secondary nh-button--small" title="">Secondary</button>
+                                                <button type="button" className="nh-button nh-button--tertiary nh-button--small" title=""><i className="icon--text"></i>Tertiary</button>
+                                                <button type="button" className="nh-button nh-button--tertiary nh-button--small" title="">Tertiary</button>
                                             </li>
                                         </ul>
                                     </div>
@@ -621,7 +621,7 @@ function Wire() {
                                 <div className="navbar navbar--flex navbar--small">
                                     <div className="navbar__inner navbar__inner--end">
                                         <div className="react-toggle__wrapper">
-                                            <label for="all-versions" className="mr-2">All Versions</label>
+                                            <label for="all-versions" className="me-2">All Versions</label>
                                             <Toggle
                                                 id="all-versions"
                                                 defaultChecked={true}
@@ -632,15 +632,57 @@ function Wire() {
                                         <span className="navbar__divider"></span>
                                         <a href=" " className="icon-link--plain">
                                             <span className="icon-link__text">Change view</span>
-                                            <i class="icon--list-view"></i>
+                                            <i className="icon--list-view"></i>
                                         </a>
                                     </div>
                                 </div>
                             </div>
                             <div className="wire-articles wire-articles--list">
-                                <article className="wire-articles__item-wrap col-12 wire-item"><div className="wire-articles__item wire-articles__item--list" tabIndex="0"><div className="wire-articles__item-text"><h4 className="wire-articles__item-headline"><div className="no-bindable-select wire-articles__item-select"><label className="circle-checkbox"><input type="checkbox" className="css-checkbox" /><i></i></label></div><div className="wire-articles__item-headline-inner">Correct me later on and see what fields appear</div></h4><div className="wire-articles__item__meta"><div className="wire-articles__item__icons"><span className="wire-articles__item__icon"><i className="icon--text icon--gray-dark"></i></span></div><div className="wire-articles__item__meta-info"><span className="bold">Correctme</span><span><span></span><span><span>The Canadian Press</span></span><span><span> // </span></span><span><span>1 words</span></span><span><span> // </span></span><span><time dateTime="12:51 19/12/2022">12:51 19/12/2022</time></span></span></div></div><div className="wire-articles__item__text"><p>hello3</p></div></div><div className="wire-articles__item-actions"><div className="btn-group"><button className="icon-button" aria-label="More Actions"><i className="icon--more icon--gray-dark"></i></button></div><button type="button" className="icon-button" title="" aria-label="Share" data-original-title="Share"><i className="icon--share"></i></button><button type="button" className="icon-button" title="" aria-label="Save" data-original-title="Save"><i className="icon--bookmark-add"></i></button></div></div></article>
-                                <article className="wire-articles__item-wrap col-12 wire-item"><div className="wire-articles__item wire-articles__item--list" tabIndex="0"><div className="wire-articles__item-text"><h4 className="wire-articles__item-headline"><div className="no-bindable-select wire-articles__item-select"><label className="circle-checkbox"><input type="checkbox" className="css-checkbox" /><i></i></label></div><div className="wire-articles__item-headline-inner">Correct me later on and see what fields appear</div></h4><div className="wire-articles__item__meta"><div className="wire-articles__item__icons"><span className="wire-articles__item__icon"><i className="icon--text icon--gray-dark"></i></span></div><div className="wire-articles__item__meta-info"><span className="bold">Correctme</span><span><span></span><span><span>The Canadian Press</span></span><span><span> // </span></span><span><span>1 words</span></span><span><span> // </span></span><span><time dateTime="12:51 19/12/2022">12:51 19/12/2022</time></span></span></div></div><div className="wire-articles__item__text"><p>hello3</p></div></div><div className="wire-articles__item-actions"><div className="btn-group"><button className="icon-button" aria-label="More Actions"><i className="icon--more icon--gray-dark"></i></button></div><button type="button" className="icon-button" title="" aria-label="Share" data-original-title="Share"><i className="icon--share"></i></button><button type="button" className="icon-button" title="" aria-label="Save" data-original-title="Save"><i className="icon--bookmark-add"></i></button></div></div></article>
-                                <article className="wire-articles__item-wrap col-12 wire-item"><div className="wire-articles__item wire-articles__item--list" tabIndex="0"><div className="wire-articles__item-text"><h4 className="wire-articles__item-headline"><div className="no-bindable-select wire-articles__item-select"><label className="circle-checkbox"><input type="checkbox" className="css-checkbox" /><i></i></label></div><div className="wire-articles__item-headline-inner">Correct me later on and see what fields appear</div></h4><div className="wire-articles__item__meta"><div className="wire-articles__item__icons"><span className="wire-articles__item__icon"><i className="icon--text icon--gray-dark"></i></span></div><div className="wire-articles__item__meta-info"><span className="bold">Correctme</span><span><span></span><span><span>The Canadian Press</span></span><span><span> // </span></span><span><span>1 words</span></span><span><span> // </span></span><span><time dateTime="12:51 19/12/2022">12:51 19/12/2022</time></span></span></div></div><div className="wire-articles__item__text"><p>hello3</p></div></div><div className="wire-articles__item-actions"><div className="btn-group"><button className="icon-button" aria-label="More Actions"><i className="icon--more icon--gray-dark"></i></button></div><button type="button" className="icon-button" title="" aria-label="Share" data-original-title="Share"><i className="icon--share"></i></button><button type="button" className="icon-button" title="" aria-label="Save" data-original-title="Save"><i className="icon--bookmark-add"></i></button></div></div></article>
+                                <article className="wire-articles__item-wrap col-12 wire-item"><div className="wire-articles__item wire-articles__item--list" tabIndex="0"><div className="wire-articles__item-text-block"><h4 className="wire-articles__item-headline"><div className="no-bindable-select wire-articles__item-select"><label className="circle-checkbox"><input type="checkbox" className="css-checkbox" /><i></i></label></div><div className="wire-articles__item-headline-inner">Correct me later on and see what fields appear</div></h4><div className="wire-articles__item__meta"><div className="wire-articles__item__icons"><span className="wire-articles__item__icon"><i className="icon--text icon--gray-dark"></i></span></div><div className="wire-articles__item__meta-info"><span className="bold">Correctme</span><span><span></span><span><span>The Canadian Press</span></span><span><span> // </span></span><span><span>1 words</span></span><span><span> // </span></span><span><time dateTime="12:51 19/12/2022">12:51 19/12/2022</time></span></span></div></div><div className="wire-articles__item__text"><p>hello3</p></div></div><div className="wire-articles__item-actions"><div className="btn-group"><button className="icon-button" aria-label="More Actions"><i className="icon--more icon--gray-dark"></i></button></div><button type="button" className="icon-button icon-button--primary" title="" aria-label="Share" data-original-title="Share"><i className="icon--share"></i></button><button type="button" className="icon-button icon-button--primary" title="" aria-label="Save" data-original-title="Save"><i className="icon--bookmark-add"></i></button></div></div></article>
+                                <article className="wire-articles__item-wrap col-12 wire-item"><div className="wire-articles__item wire-articles__item--list" tabIndex="0"><div className="wire-articles__item-text-block"><h4 className="wire-articles__item-headline"><div className="no-bindable-select wire-articles__item-select"><label className="circle-checkbox"><input type="checkbox" className="css-checkbox" /><i></i></label></div><div className="wire-articles__item-headline-inner">Correct me later on and see what fields appear</div></h4><div className="wire-articles__item__meta"><div className="wire-articles__item__icons"><span className="wire-articles__item__icon"><i className="icon--text icon--gray-dark"></i></span></div><div className="wire-articles__item__meta-info"><span className="bold">Correctme</span><span><span></span><span><span>The Canadian Press</span></span><span><span> // </span></span><span><span>1 words</span></span><span><span> // </span></span><span><time dateTime="12:51 19/12/2022">12:51 19/12/2022</time></span></span></div></div><div className="wire-articles__item__text"><p>hello3</p></div></div><div className="wire-articles__item-actions"><div className="btn-group"><button className="icon-button" aria-label="More Actions"><i className="icon--more icon--gray-dark"></i></button></div><button type="button" className="icon-button icon-button--primary" title="" aria-label="Share" data-original-title="Share"><i className="icon--share"></i></button><button type="button" className="icon-button icon-button--primary" title="" aria-label="Save" data-original-title="Save"><i className="icon--bookmark-add"></i></button></div></div></article>
+                                {/* AGENDA Item for testing */}
+                                <article className="wire-articles__item-wrap col-12 agenda-item">
+                                    <div className="wire-articles__item wire-articles__item--list wire-articles__item--not-covering" tabindex="0">
+                                        <div className="wire-articles__item-text-block">
+                                            <h4 className="wire-articles__item-headline">
+                                                <div className="no-bindable-select wire-articles__item-select">
+                                                    <label className="circle-checkbox">
+                                                        <input type="checkbox" className="css-checkbox" /><i></i>
+                                                    </label>
+                                                </div>
+                                                <div className="wire-articles__item-headline-inner">Agenda item for testing, isco spice up last day of transfers in Germany</div>
+                                            </h4>
+                                            <div className="wire-articles__item__meta wire-articles__item__meta--">
+                                                <div className="wire-articles__item__icons wire-articles__item__icons--dashed-border">
+                                                    <span className="wire-articles__item__icon"><i className="icon--calendar"></i></span>
+                                                </div>
+                                                <div className="wire-articles__item__meta-time wire-articles__item__meta-time--border-right">
+                                                    <span>20/06/2023 to 23/06/2023</span>
+                                                </div>
+                                                <div className="wire-articles__item__icons wire-articles__item__icons--dashed-border">
+                                                    <span className="wire-articles__item__icon coverage--completed" title=" Text coverage MEL-TEST-NBA-RAPTORS available (updated)"><i className="icon--coverage-text"></i></span>
+                                                    <span className="wire-articles__item__icon coverage--assigned" title=" Planned Picture coverage MEL-TEST-NBA-RAPTORS, expected Apr 13th, 2023 at 23:00"><i className="icon--coverage-photo"></i></span>
+                                                    <span className="wire-articles__item__icon coverage--assigned" title=" Planned Text coverage MEL-TEST-NBA-RAPTORS-sidebar, expected Apr 13th, 2023 at 23:00"><i className="icon--coverage-text"></i></span>
+                                                    <span className="wire-articles__item__icon coverage--completed" title=" Text coverage MEL-TEST-April13-Breaking available (update to come)"><i className="icon--coverage-text"><i className="blue-circle"></i></i></span>
+                                                </div>
+                                                <div className="wire-articles__item__meta-info align-items-center">
+                                                    <span><i className="icon-small--location icon--gray-dark"></i></span>
+                                                    <span className="me-2 align-self-stretch">Messezentrum Salzburg GmbH, Am Messezentrum 1, Salzburg, Austria</span>
+                                                </div>
+                                            </div>
+                                            <div className="wire-articles__item__text">
+                                                <p>DÜSSELDORF, Germany (AP) — Portugal left back João Cancelo’s switch to Bayern Munich and former Real Madrid star Isco Alarcón's potential signing by Union Berlin brought excitement to the last day of the winter transfer period in Germany. After seeing...</p>
+                                            </div>
+                                        </div>
+                                        <div className="wire-articles__item-actions">
+                                            <div className="btn-group">
+                                                <button className="icon-button icon-button--secondary" aria-label="More Actions"><i className="icon--more"></i></button>
+                                            </div>
+                                            <button type="button" className="icon-button icon-button--primary" title="" aria-label="Share" data-bs-original-title="Share"><i className="icon--share"></i></button>
+                                            <button type="button" className="icon-button icon-button--primary" title="" aria-label="Save" data-bs-original-title="Save"><i className="icon--bookmark-add"></i></button>
+                                        </div>
+                                    </div>
+                                </article>
                             </div>
                         </div>
                     </div>

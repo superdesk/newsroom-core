@@ -130,16 +130,16 @@ class FollowedTopics extends React.Component<any, any> {
         const editorOpen = this.props.selectedItem;
         const editorOpenInFullscreen = editorOpen && this.props.editorFullscreen;
         const containerClasses = classNames(
-            'profile-content profile-content--topics container-fluid pe-0',
+            'profile-content profile-content--topics',
             {'ps-0': editorOpenInFullscreen}
         );
 
         return (
             <div className={containerClasses}>
                 {!editorOpenInFullscreen && (
-                    <div className="profile-content__topics-main d-flex flex-column flex-grow-1">
+                    <div className="profile-content__main d-flex flex-column flex-grow-1">
                         {!this.props.globalTopicsEnabled ? null : (
-                            <div className="pt-xl-4 pt-3 px-xl-4 me-0">
+                            <div className="pt-xl-4 pt-3">
                                 <div className="toggle-button__group toggle-button__group--navbar ms-0 me-3">
                                     <button
                                         className={classNames(
@@ -162,7 +162,7 @@ class FollowedTopics extends React.Component<any, any> {
                                 </div>
                             </div>
                         )}
-                        <div className="simple-card__list pt-xl-4 pt-3 px-xl-4 me-0">
+                        <div className="simple-card__list pt-xl-4 pt-3">
                             <TopicList
                                 topics={this.getFilteredTopics()}
                                 selectedTopicId={get(this.props.selectedItem, '_id')}

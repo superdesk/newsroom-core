@@ -84,7 +84,7 @@ class AmNewsListItem extends React.Component<any, any> {
             'wire-articles__item--not-alert': !isAlert(item),
         });
         const selectClassName = classNames('no-bindable-select', {
-            'wire-articles__item-select-visible': !LIST_ANIMATIONS,
+            'wire-articles__item-select--visible': !LIST_ANIMATIONS,
             'wire-articles__item-select': LIST_ANIMATIONS,
         });
         const metaTimeClassName = classNames('', {
@@ -103,7 +103,7 @@ class AmNewsListItem extends React.Component<any, any> {
                 onKeyDown={this.onKeyDown}
             >
                 <div className={wrapClassName} tabIndex={0}>
-                    <div className='wire-articles__item-text'>
+                    <div className='wire-articles__item-text-block'>
                         <h4 className='wire-articles__item-headline'>
                             <div className={selectClassName} onClick={this.stopPropagation}>
                                 <label className="circle-checkbox">

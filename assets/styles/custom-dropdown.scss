@@ -1,121 +1,116 @@
 // Custom dropdowns
 
 .dropdown-menu {
-  font-size: 0.875rem; // 14px
-  margin-block-start: 0px;
-  border-radius: 0px;
-  box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
-  max-height: 60vh;
-  overflow-y: auto;
-  overflow-x: hidden;
+    font-size: var(--text-size--medium); // 14px
+    margin-block-start: 0px;
+    border-radius: var(--border-radius--s);
+    box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
+    max-height: 60vh;
+    overflow-y: auto;
+    overflow-x: hidden;
 
-  [class^="icon--"], [class*=" icon--"] {
-      vertical-align: middle;
-  }
-  .card-header, .card-footer {
-    padding: 0.75rem 1.25rem;
-  }
+    [class^="icon--"], [class*=" icon--"] {
+        vertical-align: middle;
+    }
+    .card-header, .card-footer {
+        padding: 0.75rem 1.25rem;
+    }
 }
 
 .dropdown-menu-typeahead {
-  overflow: visible;
-  width: 400px;
-  top: 100%;
-  left: 0;
-
-  @include phone {
-    position: fixed;
-    top: 180.5px;
+    overflow: visible;
+    width: 400px;
+    top: 100%;
     left: 0;
-    right: 0;
-    bottom: calc(var(--footer-height) + 10px);
-    width: unset;
-    max-height: unset;
-    background-color: transparent;
-  }
+
+    @include phone {
+        position: fixed;
+        top: 180.5px;
+        left: 0;
+        right: 0;
+        bottom: calc(var(--footer-height) + 10px);
+        width: unset;
+        max-height: unset;
+        background-color: transparent;
+    }
 }
 
 .dropdown-menu-typeahead .dropdown-menu-typeahead {
-  @include phone {
-    width: 100%;
-    position: relative;
-    top: 0;
-    max-height: unset;
-    background-color: white;
-  }
+    @include phone {
+        width: 100%;
+        position: relative;
+        top: 0;
+        max-height: unset;
+        background-color: white;
+    }
 }
 
 .dropdown-item {
-  padding: 0.7rem 1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-
-  [class^="icon--"], [class*=" icon--"] {
-    margin-inline-end: 1rem;
-  }
-
-  &--active {
-    color: #fff !important;
-    background-color: $main-blue !important;
-    [class^="icon--"], [class*=" icon--"] {
-      color: white !important;
+    padding: 0.7rem 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--space--1);
+    color: var(--color-text);
+    transition: all var(--transition-base) !important;
+    box-shadow: inset 0 0 0 0 transparent;
+    &:focus {
+        outline: none;
+        box-shadow: none;
+        background-color: transparent;
     }
-  }
-
-  &:focus {
-    color: #16181b;
-    background-color: #eff4f6 !important;
-  }
-  &:active, &:hover {
-    color: #fff !important;
-    background-color: $main-blue !important;
-    [class^="icon--"], [class*=" icon--"] {
-      color: white !important;
+    &:focus-visible {
+        outline: 1px solid var(--color-interactive-focus);
+        outline-offset: -1px;
+        box-shadow: inset 0 0 0 4px var(--color-interactive-focus--translucent);
+        background-color: transparent;
     }
-  }
-  .no-touch & {
-    &:hover, &:focus {
-      color: #16181b !important;
-      background-color: #eff4f6 !important;
-      [class^="icon--"], [class*=" icon--"] {
-        color: $main-blue !important;
-      }
+    &:hover {
+        background-color: var(--color-interactive-focus--translucent-2);
     }
-    &:active {
-      color: #fff !important;
-      background-color: $main-blue !important;
-      [class^="icon--"], [class*=" icon--"] {
-        color: white !important;
-      }
+    &:active,
+    &--active {
+        box-shadow: inset 0 0 0 4px var(--color-interactive-focus--translucent);
+        color: var(--color-text);
     }
-  }
 }
 
 .dropdown-menu-right {
-  inset-inline-end: 0;
-  inset-inline-start: auto !important;
-  transform: initial !important;
-  inset-block-start: 100% !important;
+    inset-inline-end: 0;
+    inset-inline-start: auto !important;
+    transform: initial !important;
+    inset-block-start: 100% !important;
 }
 
 .dropdown-header {
-  font-size: 1rem;
-  color: var(--color-text);
-  font-weight: 500;
-  padding: 1rem;
-  border-inline-end: 1px solid #e7e7e7;
+    font-size: var(--text-size--medium);
+    color: var(--color-text--muted);
+    font-weight: 500;
+    padding: var(--space--1-5) var(--space--2);
+    border-block-end: 1px solid var(--color-line--x-light);
 }
 
 .dropdown-divider {
-  margin: 0.3rem 0;
+    margin: 0.3rem 0;
 }
 
 .rbt-input-hint {
-  inset-block-start: 3px !important;
-  width: 100%;
+    inset-block-start: 3px !important;
+    width: 100%;
 }
 
 .rbt-input-hint-container {
-  overflow: hidden;
+    overflow: hidden;
+}
+
+
+.popover {
+    box-shadow: 0px 0px 2px hsla(0, 0%, 0%, 0.08), 0px 1px 10px hsla(0, 0%, 0%, 0.12);
+}
+.popover-body {
+    padding: var(--space--1-5) !important;
+    color: var(--color-text);
+    .dropdown-item {
+        border-radius: var(--border-radius--s);
+    }
 }

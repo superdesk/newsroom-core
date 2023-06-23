@@ -5,10 +5,10 @@
 }
 
 .navbar {
-    height: 56px;
+    height: var(--navbar-height);
 
     @include phone {
-        height: 45px;
+        height: var(--navbar-height--mobile);
     }
 
     &.main {
@@ -21,20 +21,17 @@
         align-items: stretch;
         justify-content: flex-start;
         flex-wrap: nowrap;
-
-        // [SDCP-609]: Commenting the next line until a better fix is implemented
-        //overflow: hidden;
     }
     .notif {
-        width: 56px;
-        height: 56px;
+        width: var(--navbar-height);
+        height: var(--navbar-height);
         display: flex;
         justify-content: center;
         align-items: center;
 
         @include phone {
-            width: 45px;
-            height: 45px;
+            width: var(--navbar-height--mobile);
+            height: var(--navbar-height--mobile);
         }
 
         .badge {
@@ -42,7 +39,7 @@
             inset-inline-end: -7px;
         }
         &:hover .notif__circle {
-            background: #4a4a4a;
+            background: var(--top-bar-color-bg-notifications--hover);
             cursor: pointer;
         }
 
@@ -54,15 +51,17 @@
     .navbar__date {
         margin-inline-end: 0.5rem;
         display: none;
+        color: var(--top-bar-color-fg);
+        opacity: 0.7;
     
         @include md {
             display: block;
         }
     }
     .notif__circle {
-        background: hsl(0, 0%, 0%);
-        width: 33px;
-        height: 33px;
+        background: var(--top-bar-color-bg-notifications);
+        width: 32px;
+        height: 32px;
         border-radius: 100%;
         display: flex;
         justify-content: center;
@@ -70,7 +69,7 @@
     }
     .notif__list {
         position: absolute;
-        inset-block-start: 44px;
+        inset-block-start: var(--navbar-height--mobile);
         inset-block-end: 0px;
         background: $background-color;
         box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.3);
@@ -83,8 +82,8 @@
         }
     }
     .notif__list__header {
-        background: #fff;
-        border-inline-end: 1px solid #e7e7e7;
+        background: var(--color-background);
+        border-inline-end: 1px solid var(--color-line--light);
         padding: 1rem 0;
     }
     .notif__list__header-headline {
@@ -133,6 +132,54 @@
         color: $gray-mid;
         margin-block-end: 6px;
     }
+}
+
+.navbar {
+    flex-shrink: 0;
+    flex-grow: 0;
+    gap: var(--space--1);
+    &.navbar--flex {
+        display: flex;
+        align-items: center;
+        padding-inline: 16px;
+        padding-block: 0;
+    }
+    &.navbar--small {
+        height: 40px;
+    }
+    .navbar__inner {
+        display: flex;
+        align-items: center;
+        align-self: stretch;
+        &--end {
+            margin-inline-start: auto;
+        }
+        &--start {
+            margin-inline-end: auto;
+        }
+    }
+    &.navbar--auto-height {
+        min-height: var(--navbar-height);
+        height: auto;
+        flex-shrink: 0;
+    }
+}
+
+.navbar__button-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space--1);
+}
+.navbar__divider {
+    display: inline-flex;
+    align-self: stretch;
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 1px;
+    border-inline-start: 1px solid var(--color-line--light);
+    opacity: 0.75;
+    margin-inline: var(--space--2);
+    margin-block: var(--space--1);
 }
 
 .navbar-header {
@@ -286,21 +333,21 @@
 .header-profile {
     display: flex;
     flex-direction: column;
-    width: 56px;
-    height: 56px;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 9px;
+    width: var(--navbar-height);
+    height: var(--navbar-height);
+    background: var(--top-bar-color-bg-avatar-block);
+    padding: var(--space--1);
 
     @include phone {
-        width: 45px;
-        height: 45px;
-        padding: 5px;
+        width: var(--navbar-height--mobile);
+        height: var(--navbar-height--mobile);
+        padding: var(--space--0-5);
     }
 
     &:hover {
         cursor: pointer;
         .header-profile__avatar {
-            background: #475166;
+            background: var(--top-bar-color-bg-avatar--hover);
         }
     }
     // active state
@@ -332,8 +379,8 @@
 }
 
 .header-profile__avatar {
-    background: #333a4a;
-    color: #fff;
+    background: var(--top-bar-color-bg-avatar);
+    color: var(--top-bar-color-fg-avatar);
     border-radius: 50%;
     margin: 0;
     flex: 1;

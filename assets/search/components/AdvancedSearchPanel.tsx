@@ -125,7 +125,11 @@ function AdvancedSearchPanelComponent({
             <div className="advanced-search__footer">
                 <button
                     className="nh-button nh-button--secondary"
-                    onClick={clearParams}
+                    onClick={() => {
+                        clearParams();
+                        toggleAdvancedSearchPanel();
+                        fetchItems();
+                    }}
                 >
                     {gettext('Clear all')}
                 </button>

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 function UserProfileMenu({links, onClick}: any) {
     return (
-        <div className="profile-side-navigation__items">
+        <div className="profile__side-navigation__items">
             {links.map((link: any) => (
                 <a key={link.name}
                     href="#"

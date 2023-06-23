@@ -103,7 +103,7 @@ class UserProfileApp extends React.Component<any, any> {
                             <i className="icon--close-thin icon--gray-dark" />
                         </button>
                     </div>
-                    <nav className='profile-side-navigation' id='profile-menu'>
+                    <nav className='profile__side-navigation' id='profile-menu'>
                         <UserProfileAvatar
                             user={this.props.user}
                         />
@@ -112,20 +112,16 @@ class UserProfileApp extends React.Component<any, any> {
                             links={links}
                         />
                     </nav>
-                    <div className="content">
-                        <section className="content-header">
-                            <nav className="profile-nav content-bar navbar content-bar--side-padding pe-0 d-none d-md-flex">
-                                <h5 className="ps-xl-4 mb-0">
-                                    {links.find((link: any) => link.active).label}
-                                </h5>
-                                <div className="content-bar__right">
-                                    <button className="content-bar__menu" aria-label={gettext('Close')} role="button" onClick={this.props.hideModal}>
-                                        <i className="icon--close-thin" />
-                                    </button>
-                                </div>
-                            </nav>
+                    <div className="profile__profile-content">
+                        <section className="profile__profile-content-header">
+                            <h5 className="profile__profile-content-title">
+                                {links.find((link: any) => link.active).label}
+                            </h5>
+                            <button className="profile__profile-content-close" aria-label={gettext('Close')} role="button" onClick={this.props.hideModal}>
+                                <i className="icon--close-thin" />
+                            </button>
                         </section>
-                        <section className="content-main">
+                        <section className="profile__profile-content-main">
                             <ActiveContent topicType={topicType}/>
                         </section>
                     </div>

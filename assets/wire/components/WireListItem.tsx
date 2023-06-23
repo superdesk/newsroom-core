@@ -143,7 +143,7 @@ class WireListItem extends React.Component<any, any> {
             }
         );
         const selectClassName = classNames('no-bindable-select', {
-            'wire-articles__item-select-visible': !LIST_ANIMATIONS,
+            'wire-articles__item-select--visible': !LIST_ANIMATIONS,
             'wire-articles__item-select': LIST_ANIMATIONS,
         });
         const picture = getPicture(item);
@@ -165,7 +165,7 @@ class WireListItem extends React.Component<any, any> {
             >
                 <UrgencyItemBorder item={item} listConfig={listConfig} />
                 <div className={wrapClassName} tabIndex={0}>
-                    <div className="wire-articles__item-text">
+                    <div className="wire-articles__item-text-block">
                         <h4 className="wire-articles__item-headline">
                             <div
                                 className={selectClassName}
