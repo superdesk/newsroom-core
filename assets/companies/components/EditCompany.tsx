@@ -47,9 +47,10 @@ class EditCompany extends React.Component<any, any> {
         }
     }
 
-    handleTabClick(event: any) {
-        this.setState({activeTab: event.target.name});
-        if (event.target.name === 'users' && this.props.company._id) {
+    handleTabClick(name: string) {
+        this.setState({activeTab: name});
+
+        if (name === 'users' && this.props.company._id) {
             this.props.fetchCompanyUsers(this.props.company._id);
         }
     }
@@ -123,7 +124,6 @@ class EditCompany extends React.Component<any, any> {
                         id='hide-sidebar'
                         type='button'
                         className='icon-button'
-                        data-bs-dismiss='modal'
                         aria-label={gettext('Close')}
                         onClick={this.props.cancelEdit}>
                         <i className="icon--close-thin icon--gray-dark" aria-hidden='true' />
@@ -141,7 +141,11 @@ class EditCompany extends React.Component<any, any> {
                                 title={tab.name}
                                 className={`nav-link ${this.state.activeTab === tab.name && 'active'}`}
                                 href='#'
-                                onClick={this.handleTabClick}>{tab.label}
+                                onClick={() => {
+                                    this.handleTabClick(tab.name);
+                                }}
+                            >
+                                {tab.label}
                             </a>
                         </li>
                     ))}
