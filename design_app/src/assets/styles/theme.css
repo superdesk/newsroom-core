@@ -81,12 +81,12 @@ a:hover {
     color: white;
 }
 .btn-outline-secondary, 
-.profile-side-navigation .btn-outline-secondary {
+.profile__side-navigation .btn-outline-secondary {
     color: #333;
     border-color: #333;
 }
 .btn-outline-secondary:hover,
-.profile-side-navigation .btn-outline-secondary:hover {
+.profile__side-navigation .btn-outline-secondary:hover {
     background-color: #000;
     border-color: #000;
     color: white;
@@ -115,13 +115,13 @@ a:hover {
 
 
 /* .wire-column__nav .tab-pane .btn-outline-primary,
-.profile-side-navigation .btn-outline-primary {
+.profile__side-navigation .btn-outline-primary {
     color: white;
     border-color: #CC212C;
     background-color: #CC212C;
 }
 .wire-column__nav .tab-pane .btn-outline-primary:hover,
-.profile-side-navigation .btn-outline-primary:hover {
+.profile__side-navigation .btn-outline-primary:hover {
     color: white;
     border-color: #a50606;
     background-color: #a50606;
@@ -201,7 +201,7 @@ a:hover {
     background: #737373;
 }
 
-.profile-side-navigation {
+.profile__side-navigation {
     background-color: #e0e0e0;
 }
 .profile__group.profile__group--dark-bck .profile__name {

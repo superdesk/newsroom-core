@@ -2,8 +2,9 @@
 
 .navbar-brand {
   span.breadcrumb-item {
-    font-size: 0.8125rem; // 13px
+    font-size: var(--text-size--medium); // 14px
     line-height: 1.1;
+    color: var(--top-bar-color-fg);
 
     @include sm {
       font-size: 1rem; // 16px
@@ -33,7 +34,8 @@
   }
 }
 .breadcrumb-item.active {
-  color: #9ba4ad;
+  color: var(--top-bar-color-fg);
+  opacity: 0.7;
 
   @include sm {
     overflow: visible;

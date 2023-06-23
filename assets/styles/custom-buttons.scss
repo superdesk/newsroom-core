@@ -239,6 +239,15 @@
             --icon-size: var(--button-icon-size--small);
         }
     }
+    &--active {
+        --button-color-border: var(--button-color-border--secondary);
+        --button-color-border--hover: var(--button-color-border--secondary-hover);
+        --button-color-fg: var(--button-color-fg--secondary);
+        --button-color-bg: var(--button-color-bg--secondary);
+        --button-color-bg--hover: var(--button-color-bg--secondary-hover);
+        --button-color-shadow--hover: var(--button-color-shadow--tertiary-hover);
+        box-shadow: inset 0 0 0 var(--button-shadow-spread-radius) var(--button-color-shadow--hover);
+    }
 }
 
 .nh-dropdown-button {
@@ -323,5 +332,9 @@
         justify-content: flex-end;
         margin-inline-start: auto;
         text-align: end;
+    }
+    &--vertical {
+        flex-direction: column;
+        align-items: stretch;
     }
 }

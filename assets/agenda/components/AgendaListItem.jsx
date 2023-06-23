@@ -109,10 +109,10 @@ class AgendaListItem extends React.Component {
                 'wire-articles__item--open': this.props.isActive,
             }),
             select: classNames('no-bindable-select', {
-                'wire-articles__item-select-visible': !LIST_ANIMATIONS,
+                'wire-articles__item-select--visible': !LIST_ANIMATIONS,
                 'wire-articles__item-select': LIST_ANIMATIONS,
             }),
-            article: classNames('wire-articles__item-text', {
+            article: classNames('wire-articles__item-text-block', {
                 'flex-column align-items-start': !isExtended
             }),
         };

@@ -17,10 +17,10 @@
             <label class="form-check-label" for="remember_me">{{ form.remember_me.label.text }}</label>
         </div>
     </div>
-    <button type="submit" class="btn btn-primary w-100">{{ gettext("Login") }}</button>
+    <button type="submit" class="nh-button nh-button--primary w-100">{{ gettext("Login") }}</button>
     {% if config.GOOGLE_LOGIN %}
     <a href="{{ url_for('oauth.google_login', next=next_page) }}"
-       class="btn btn-secondary w-100 text-white"
+       class="nh-button nh-button--secondary w-100"
        role="button"
     >
         {{ gettext('Log In with Google') }}

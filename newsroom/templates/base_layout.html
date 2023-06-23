@@ -68,8 +68,10 @@
                     {% endfor %}
                 {%  endblock %}
 
+                <li class="sidenav-icons__stretch-separator"></li>
+
                 {% if is_company_admin() %}
-                <li class="sidenav-icons__item sidenav-icons__item--admin {% if request.endpoint == 'company_admin.index' %}active{% endif %}">
+                <li class="sidenav-icons__item  {% if request.endpoint == 'company_admin.index' %}active{% endif %}">
                     <a
                         href="{{ url_for('company_admin.index') }}"
                         title="{{ gettext('Company Admin') }}"
@@ -86,7 +88,7 @@
                 {% endif %}
 
                 {% if is_admin_or_account_manager() %}
-                <li class="sidenav-icons__item sidenav-icons__item--report {% if request.endpoint == 'reports.company_reports' %}active{% endif %}">
+                <li class="sidenav-icons__item  {% if request.endpoint == 'reports.company_reports' %}active{% endif %}">
                   <a
                       href="{{ url_for('reports.company_reports') }}"
                       title="{{ gettext('Reports') }}"
@@ -102,7 +104,7 @@
                 </li>
                 {% endif %}
                 {% for app in settings_apps|sort(attribute='weight') %}{% if loop.first and is_admin() %}
-                <li class="sidenav-icons__item sidenav-icons__item--admin {% if request.blueprint == 'settings' %}active{% endif %}">
+                <li class="sidenav-icons__item  {% if request.blueprint == 'settings' %}active{% endif %}">
                   <a
                       href="{{ url_for('settings.app', app_id=app._id) }}"
                       title="{{ gettext('Settings') }}"

@@ -40,15 +40,15 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
         return (
             <NavGroup key={group.field} label={group.label}>
                 <div className="d-flex align-items-start">
-                    <Skeleton size="1rem" className="mr-2" />
+                    <Skeleton size="1rem" className="me-2" />
                     <Skeleton width="8rem" className="mb-2" />
                 </div>
                 <div className="d-flex align-items-start">
-                    <Skeleton size="1rem" className="mr-2" />
+                    <Skeleton size="1rem" className="me-2" />
                     <Skeleton width="13rem" className="mb-2" />
                 </div>
                 <div className="d-flex align-items-start">
-                    <Skeleton size="1rem" className="mr-2" />
+                    <Skeleton size="1rem" className="me-2" />
                     <Skeleton width="8rem" className="mb-2" />
                 </div>
             </NavGroup>
