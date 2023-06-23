@@ -29,6 +29,10 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
         return slugline ? ` | ${slugline}` : '';
     };
 
+    const getGenreName = (coverage) => {
+        return coverage.genre.length !==0 ? `  ( ${gettext(coverage.genre[0].name)} ) ` : '';
+    };
+
     const coveragesWithoutState = coverages.filter((coverage) => WORKFLOW_COLORS[coverage.workflow_status] == null);
     const coveragesWithState = coverages.filter((coverage) => WORKFLOW_COLORS[coverage.workflow_status] != null);
 
@@ -61,7 +65,7 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                     >
                         <span className={classNames('coverage-item__coverage-icon', WORKFLOW_COLORS[coverage.workflow_status])}>
                             <i className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} me-2`}></i>
-                            <span>{`${coverage.genre.length !==0 ? gettext(coverage.genre[0].name) : getCoverageDisplayName(coverage.coverage_type)}${getSlugline(coverage)}`}</span>
+                            <span>{`${getCoverageDisplayName(coverage.coverage_type)}${getGenreName(coverage)}${getSlugline(coverage)}`}</span>
                         </span>
                         {coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED && coverage.scheduled != null && (
                             <span className='d-flex text-nowrap'>
