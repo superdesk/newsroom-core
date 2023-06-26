@@ -172,6 +172,7 @@ CORE_APPS = [
     "newsroom.auth_server.client",
     "newsroom.email_templates",
     "newsroom.company_admin",
+    "newsroom.search",
 ]
 
 SITE_NAME = "AAP Newsroom"

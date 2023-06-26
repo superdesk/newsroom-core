@@ -1,5 +1,3 @@
-from typing import Dict
-
 from flask import render_template
 
 from newsroom.gettext import get_session_locale

@@ -7,7 +7,7 @@ from eve.utils import ParsedRequest
 from superdesk import get_resource_service
 from superdesk.lock import lock, unlock
 
-from newsroom.search_config import nested_agg_groups, SearchGroupNestedConfig
+from newsroom.search.config import nested_agg_groups, SearchGroupNestedConfig
 from .manager import manager
 
 

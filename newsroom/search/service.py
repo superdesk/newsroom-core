@@ -13,7 +13,7 @@ from superdesk.default_settings import strtobool as _strtobool
 from content_api.errors import BadParameterValueError
 
 from newsroom import Service
-from newsroom.search_config import SearchGroupNestedConfig, get_nested_config, is_search_field_nested
+from newsroom.search.config import SearchGroupNestedConfig, get_nested_config, is_search_field_nested
 from newsroom.products.products import (
     get_products_by_navigation,
     get_products_by_company,
