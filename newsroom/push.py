@@ -648,6 +648,7 @@ def get_coverages(planning_items, original_coverages, new_plan):
                     "workflow_status": coverage.get("workflow_status"),
                     "coverage_status": coverage.get("news_coverage_status", {}).get("name"),
                     "slugline": coverage_planning.get("slugline"),
+                    "genre": coverage_planning.get("genre", []),
                     "coverage_provider": (coverage.get("coverage_provider") or {}).get("name"),
                     "watches": existing_coverage.get("watches") or coverage.get("watches", []),
                 }
