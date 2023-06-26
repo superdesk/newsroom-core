@@ -3460,15 +3460,22 @@ a.wire-articles__versions {
         padding: 0;
         margin: 10px 0;
     }
+
+    .blue {
+        color: #00658A;
+    }
+    .green {
+        color: #51831C;
+    }
+    .red {
+        color: #BC3434;
+    }
 }
 .advanced-search__content-block-text {
     font-weight: 400;
     margin-block-end: 0;
     &--bold {
         font-weight: 700;
-    }
-    span {
-        text-decoration: underline;
     }
     .blue {
         color: #00658A;
