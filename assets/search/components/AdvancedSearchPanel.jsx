@@ -13,6 +13,7 @@ function AdvancedSearchPanelComponent({
     params,
     fetchItems,
     toggleAdvancedSearchPanel,
+    toggleSearchTipsPanel,
     toggleField,
     setKeywords,
     clearParams
@@ -24,6 +25,15 @@ function AdvancedSearchPanelComponent({
                 <nav className="content-bar navbar">
                     <h3>{gettext('Advanced Search')}</h3>
                     <div className="btn-group">
+                        <div className="mx-2">
+                            <button
+                                className="icon-button"
+                                aria-label={gettext('Show Search Tips')}
+                                onClick={toggleSearchTipsPanel}
+                            >
+                                <i className="icon--info" />
+                            </button>
+                        </div>
                         <div className="mx-2">
                             <button
                                 className="icon-button icon-button icon-button--bordered"
@@ -156,6 +166,7 @@ AdvancedSearchPanelComponent.propTypes = {
     }),
     fetchItems: PropTypes.func,
     toggleAdvancedSearchPanel: PropTypes.func,
+    toggleSearchTipsPanel: PropTypes.func,
     toggleField: PropTypes.func,
     setKeywords: PropTypes.func,
     clearParams: PropTypes.func,

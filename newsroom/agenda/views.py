@@ -31,7 +31,7 @@ from newsroom.agenda.email import send_coverage_request_email
 from newsroom.agenda.utils import remove_fields_for_public_user, remove_restricted_coverage_info
 from newsroom.companies.utils import restrict_coverage_info
 from newsroom.notifications import push_user_notification
-from newsroom.search_config import merge_planning_aggs
+from newsroom.search.config import merge_planning_aggs
 
 
 @blueprint.route("/agenda")

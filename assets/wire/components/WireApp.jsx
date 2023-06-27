@@ -51,6 +51,7 @@ import getItemActions from '../item-actions';
 import BookmarkTabs from 'components/BookmarkTabs';
 import ItemStatisticsModal from './ItemStatisticsModal';
 import {AdvancedSearchPanel} from 'search/components/AdvancedSearchPanel';
+import {SearchTipsPanel} from 'search/components/SearchTipsPanel';
 
 import {SearchResultsBar} from 'search/components/SearchResultsBar';
 
@@ -83,10 +84,17 @@ class WireApp extends BaseApp {
 
         this.toggleAdvancedSearchPanel = this.toggleAdvancedSearchPanel.bind(this);
         this.state.isAdvancedSearchShown = false;
+
+        this.toggleSearchTipsPanel = this.toggleSearchTipsPanel.bind(this);
+        this.state.isSearchTipsShown = false;
     }
 
     toggleAdvancedSearchPanel() {
         this.setState((prevState) => ({isAdvancedSearchShown: !prevState.isAdvancedSearchShown}));
+    }
+
+    toggleSearchTipsPanel() {
+        this.setState((prevState) => ({isSearchTipsShown: !prevState.isSearchTipsShown}));
     }
 
     render() {
@@ -103,6 +111,13 @@ class WireApp extends BaseApp {
                     <AdvancedSearchPanel
                         fetchItems={this.props.fetchItems}
                         toggleAdvancedSearchPanel={this.toggleAdvancedSearchPanel}
+                        toggleSearchTipsPanel={this.toggleSearchTipsPanel}
+                    />
+                )}
+                {!this.state.isSearchTipsShown ? null : (
+                    <SearchTipsPanel
+                        toggleSearchTipsPanel={this.toggleSearchTipsPanel}
+                        defaultTab={this.state.isAdvancedSearchShown ? 'advanced' : 'regular'}
                     />
                 )}
             </React.Fragment>
@@ -219,6 +234,7 @@ class WireApp extends BaseApp {
                             fetchItems={this.props.fetchItems}
                             setQuery={this.props.setQuery}
                             toggleAdvancedSearchPanel={this.toggleAdvancedSearchPanel}
+                            toggleSearchTipsPanel={this.toggleSearchTipsPanel}
                         />
                     </nav>
                 </section>,

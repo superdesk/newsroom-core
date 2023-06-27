@@ -40,8 +40,8 @@ from newsroom.utils import (
 from newsroom.utils import get_local_date, get_end_date
 from datetime import datetime
 from newsroom.wire import url_for_wire
-from newsroom.search import BaseSearchService, SearchQuery, query_string, get_filter_query
-from newsroom.search_config import is_search_field_nested, get_nested_config
+from newsroom.search.service import BaseSearchService, SearchQuery, query_string, get_filter_query
+from newsroom.search.config import is_search_field_nested, get_nested_config
 from .utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD, push_agenda_item_notification
 
 
