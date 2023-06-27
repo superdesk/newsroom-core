@@ -12,6 +12,10 @@
         monitoring: "{{ config.MONITORING_SECTION }}",
         saved: "{{ config.SAVED_SECTION }}",
     };
+    window.searchTipsHtml = {
+        regular: `{{ render_search_tips_html('regular') | safe }}`,
+        advanced: `{{ render_search_tips_html('advanced') | safe }}`,
+    }
 </script>
 
 {{ javascript_tag('newsroom_js') | safe }}
