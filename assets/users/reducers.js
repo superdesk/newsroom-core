@@ -103,8 +103,11 @@ export default function userReducer(state = initialState, action) {
                 user.products = (user.products || []).filter((product) => product._id !== productId);
             }
         } else if (field.includes('selectAllBtn')) {
-            user.products = state.products.filter((product)=> user.sections[product.product_type]);
-        } else {
+            user.products = state.products
+                .filter((product) => user.sections[product.product_type])
+                .map((product) => ({_id : product._id , section: product.product_type}));
+        }
+        else {
             user[field] = value;
         }
 
