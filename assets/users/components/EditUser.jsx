@@ -213,10 +213,10 @@ function EditUserComponent({
                                 title={gettext('Products')}
                                 testId="toggle--products"
                             >
-                            {isCompanyAdmin ? <div className="products-list__heading d-flex justify-content-between align-items-center">
-                                <button type='button' name='selectAllBtn' className='nh-button nh-button--tertiary nh-button--small' onClick={onChange} >
+                                {isCompanyAdmin ? <div className="products-list__heading d-flex justify-content-between align-items-center">
+                                    <button type='button' name='selectAllBtn' className='nh-button nh-button--tertiary nh-button--small' onClick={onChange} >
                                     Select All
-                                </button>
+                                    </button>
                                 </div> : null}
                                 {sections.filter((section) => (
                                     companySectionIds.includes(section._id) &&
