@@ -215,7 +215,7 @@ function EditUserComponent({
                             >
                                 {isCompanyAdmin ? <div className="products-list__heading d-flex justify-content-between align-items-center">
                                     <button type='button' name='selectAllBtn' className='nh-button nh-button--tertiary nh-button--small' onClick={onChange} >
-                                    Select All
+                                        {gettext('Select All')}
                                     </button>
                                 </div> : null}
                                 {sections.filter((section) => (
