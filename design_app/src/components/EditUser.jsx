@@ -30,11 +30,17 @@ function EditUser() {
         </div>
         <div className="list-item__preview-content">
                 <div className="list-item__preview-toolbar">
-                    <div>
+                    <div className="list-item__preview-toolbar-left">
                         <label className="label label--green label--big label--rounded">active</label>
-                        <label className="label label--green label--fill label--big label--rounded">admin</label>
+                        <label className="label label--fill label--big label--rounded">admin</label>
+                        {/* This button apperas only for pending users */}
+                        <button className="icon-button icon-button--small icon-button--secondary" title="Resend invite" aria-label="Resend invite">
+                            <i class="icon--refresh" role="presentation"></i>
+                        </button>
                     </div>
-                    <button className="nh-button nh-button--tertiary nh-button--small">Resend Invite</button>
+                    <div className="list-item__preview-toolbar-right">
+                        <button className="nh-button nh-button--tertiary nh-button--small">Impersonate user</button>
+                    </div>
                 </div>
                     <form>
                         <div className="list-item__preview-form pt-0">
@@ -241,7 +247,7 @@ function EditUser() {
 
                         </div>
                         <div className="list-item__preview-footer">
-                            <input type="button" className="nh-button nh-button--secondary" value="Reset Password" />
+                            <input type="button" className="nh-button nh-button--tertiary me-auto" value="Reset Password" />
                             <input type="button" className="nh-button nh-button--secondary" value="Delete" />
                             <input type="button" className="nh-button nh-button--primary" value="Save" />
                         </div>
