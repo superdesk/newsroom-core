@@ -93,12 +93,14 @@ const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubs
                             icon={'icon--folder'}
                             label={getFolderName(topic, folders)}
                         >
-                            <button
-                                key={'top'}
-                                type="button"
-                                className='dropdown-item'
-                                onClick={() => onFolderChange(null)}
-                            >{gettext('Top level')}</button>
+                            {topic.folder && (
+                                <button
+                                    key={'top'}
+                                    type="button"
+                                    className='dropdown-item'
+                                    onClick={() => onFolderChange(null)}
+                                >{gettext('Remove from folder')}</button>
+                            )}
                             {folders.map((folder) => (
                                 <button key={folder._id}
                                     type="button"
