@@ -8,6 +8,7 @@ import {
     isRecurring,
     getInternalNote,
     getAttachments,
+    getSubjects
 } from '../utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
@@ -17,7 +18,8 @@ import AgendaListCoverageItem from './AgendaListCoverageItem';
 import AgendaLocation from './AgendaLocation';
 
 import {gettext} from 'utils';
-
+import {connect} from 'react-redux';
+import {listConfigSelector} from '../../ui/selectors';
 
 class AgendaListItemIcons extends React.Component {
     constructor(props) {
@@ -57,10 +59,26 @@ class AgendaListItemIcons extends React.Component {
         };
     }
 
+    getItemByschema(props) {
+        const {listConfig} = props;
+        if (listConfig && listConfig.subject && listConfig.subject.scheme) {
+            const subjects = getSubjects(props.item);
+            const filteredSubjects = subjects.filter((item) => {
+                if (Array.isArray(listConfig.subject.scheme)) {
+                    return listConfig.subject.scheme.includes(item.scheme);
+                }
+                return item.scheme === listConfig.subject.scheme;
+            });
+            return filteredSubjects;
+        }
+        return [];
+    }
+
     render() {
         const props = this.props;
         const state = this.state;
         const className = bem('wire-articles', 'item__meta', {row: props.row});
+        const subject = this.getItemByschema(props);
 
         return (
             <div className={className}>
@@ -86,6 +104,21 @@ class AgendaListItemIcons extends React.Component {
                         ))}
                     </div>
                 )}
+
+                <div>
+                    {subject.length != 0 && (
+                        <span className="label label--rounded">
+                            {subject.map((item, index) => (
+                                <span
+                                    key={index}
+                                    className={`subject--${item.qcode}`}
+                                >
+                                    {item.name}
+                                </span>
+                            ))}
+                        </span>
+                    )}
+                </div>
 
                 {state.attachments > 0 && (
                     <div className='d-flex align-items-center wire-articles__item__icons--dashed-border'>
@@ -117,8 +150,13 @@ AgendaListItemIcons.propTypes = {
     row: PropTypes.bool,
     isMobilePhone: PropTypes.bool,
     user: PropTypes.string,
+    listConfig : PropTypes.object,
 };
+
+const mapStateToProps = (state) => ({
+    listConfig: listConfigSelector(state),
+});
 
 AgendaListItemIcons.defaultProps = {isMobilePhone: false};
 
-export default AgendaListItemIcons;
+export default connect(mapStateToProps)(AgendaListItemIcons);
