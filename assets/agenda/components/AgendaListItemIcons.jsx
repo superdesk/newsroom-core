@@ -18,8 +18,6 @@ import AgendaListCoverageItem from './AgendaListCoverageItem';
 import AgendaLocation from './AgendaLocation';
 
 import {gettext} from 'utils';
-import {connect} from 'react-redux';
-import {listConfigSelector} from '../../ui/selectors';
 
 class AgendaListItemIcons extends React.Component {
     constructor(props) {
@@ -105,20 +103,18 @@ class AgendaListItemIcons extends React.Component {
                     </div>
                 )}
 
-                <div>
-                    {subject.length != 0 && (
-                        <span className="label label--rounded">
-                            {subject.map((item, index) => (
-                                <span
-                                    key={index}
-                                    className={`subject--${item.qcode}`}
-                                >
-                                    {item.name}
-                                </span>
-                            ))}
-                        </span>
-                    )}
-                </div>
+                {subject.length !== 0 && (
+                    <div>
+                        {subject.map((item, index) => (
+                            <span
+                                key={index}
+                                className={`label label--rounded subject--${item.qcode}`}
+                            >
+                                {item.name}
+                            </span>
+                        ))}
+                    </div>
+                )}
 
                 {state.attachments > 0 && (
                     <div className='d-flex align-items-center wire-articles__item__icons--dashed-border'>
@@ -153,10 +149,6 @@ AgendaListItemIcons.propTypes = {
     listConfig : PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({
-    listConfig: listConfigSelector(state),
-});
-
 AgendaListItemIcons.defaultProps = {isMobilePhone: false};
 
-export default connect(mapStateToProps)(AgendaListItemIcons);
+export default AgendaListItemIcons;
