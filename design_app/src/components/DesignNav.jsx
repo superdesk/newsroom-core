@@ -9,6 +9,7 @@ function DesignNav() {
         { path: '/company', title: 'Company' },
         { path: '/mytopics', title: 'My Topics' },
         { path: '/savetopic', title: 'Save Topic' },
+        { path: '/mydashboard', title: 'My Dashboard' },
     ];
     
     return (        
