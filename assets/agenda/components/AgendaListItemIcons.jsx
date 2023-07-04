@@ -59,15 +59,17 @@ class AgendaListItemIcons extends React.Component {
 
     getItemByschema(props) {
         const {listConfig} = props;
-        if (listConfig && listConfig.subject && listConfig.subject.scheme) {
+        const {scheme} = listConfig && listConfig.subject || {};
+
+        if (scheme) {
             const subjects = getSubjects(props.item);
-            const filteredSubjects = subjects.filter((item) => {
-                if (Array.isArray(listConfig.subject.scheme)) {
-                    return listConfig.subject.scheme.includes(item.scheme);
-                }
-                return item.scheme === listConfig.subject.scheme;
+            const filteredSubjects = subjects.filter(item => {
+                return Array.isArray(scheme) ? scheme.includes(item.scheme) : item.scheme === scheme;
             });
             return filteredSubjects;
+        }
+        if (listConfig.subject) {
+            return getSubjects(props.item);
         }
         return [];
     }
@@ -105,9 +107,9 @@ class AgendaListItemIcons extends React.Component {
 
                 {subject.length !== 0 && (
                     <div>
-                        {subject.map((item, index) => (
+                        {subject.map((item) => (
                             <span
-                                key={index}
+                                key={item.qcode}
                                 className={`label label--rounded subject--${item.qcode}`}
                             >
                                 {item.name}
