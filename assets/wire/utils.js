@@ -205,7 +205,7 @@ export function shortHighlightedtext(html, maxLength = 40) {
   
     while (node && count < maxLength) {
         const content = node.textContent.trim();
-        const words = content.split(/\s/).filter(w => w);
+        const words = content.split(/(?= [A-Z])/).filter(w => w);
         const remainingCount = maxLength - count;
   
         if (words.length <= remainingCount) {
