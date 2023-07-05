@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import classNames from 'classnames';
 
@@ -32,8 +31,38 @@ import {UserListSortFilter} from 'users/components/filters/UserListSortFilter';
 import EditUser from 'users/components/EditUser';
 import {CompanyDetailsProductFilter} from './CompanyDetailsProductFilter';
 import {CompanyAdminProductSeatRequestModal} from './CompanyAdminProductSeatRequestModal';
+import {IUser} from 'interfaces/user';
 
-class CompanyAdminAppComponent extends React.Component<any, any> {
+interface IProps {
+    sectionId: any;
+    setSection: any;
+    editUser: any;
+    newUser: IUser;
+    setError: any;
+    saveUser: any;
+    deleteUser: any;
+    resetPassword: any;
+    resendUserInvite: any;
+    closeUserEditor: any;
+    usersById: any;
+    user: IUser;
+    userToEdit: IUser;
+    errors: any;
+    products: any;
+    modal: any;
+    setQuery: any;
+    fetchUsers: any;
+    sort: any;
+    sortDirection: any;
+    setSort: any;
+    toggleSortDirection: any;
+    productId: any;
+    setProductFilter: any;
+    companies: any;
+    totalUsers: any;
+}
+
+class CompanyAdminAppComponent extends React.Component<IProps, any> {
     static propTypes: any;
     modals: any;
     constructor(props: any) {
@@ -104,6 +133,10 @@ class CompanyAdminAppComponent extends React.Component<any, any> {
     }
 
     render() {
+        const coreHiddenFields = this.props.user.user_type === 'company_admin'
+            ? ['is_approved', 'is_enabled']
+            : [];
+
         return (
             <React.Fragment>
                 <div className="settings-inner">
@@ -184,26 +217,32 @@ class CompanyAdminAppComponent extends React.Component<any, any> {
                                     </div>
                                 </section>
                             </div>
-                            {this.props.userToEdit == null ? null : (
-                                <EditUser
-                                    original={this.props.usersById[this.props.userToEdit._id] || {}}
-                                    user={this.props.userToEdit}
-                                    onChange={this.props.editUser}
-                                    errors={this.props.errors}
-                                    companies={this.props.companies}
-                                    onSave={this.saveUser}
-                                    onResetPassword={this.props.resetPassword}
-                                    onClose={this.props.closeUserEditor}
-                                    onDelete={this.deleteUser}
-                                    resendUserInvite={this.props.resendUserInvite}
-                                    currentUser={this.props.user}
-                                    products={this.props.products}
-                                    hideFields={getConfig('allow_companies_to_manage_products') ?
-                                        ['company'] :
-                                        ['company', 'sections', 'products']
-                                    }
-                                />
-                            )}
+                            {
+                                this.props.userToEdit !== null && (
+                                    <EditUser
+                                        original={this.props.usersById[this.props.userToEdit._id ?? ''] || {}}
+                                        user={this.props.userToEdit}
+                                        onChange={this.props.editUser}
+                                        errors={this.props.errors}
+                                        companies={this.props.companies}
+                                        onSave={this.saveUser}
+                                        onResetPassword={this.props.resetPassword}
+                                        onClose={this.props.closeUserEditor}
+                                        onDelete={this.deleteUser}
+                                        resendUserInvite={this.props.resendUserInvite}
+                                        currentUser={this.props.user}
+                                        products={this.props.products}
+                                        hideFields={[
+                                            ...coreHiddenFields,
+                                            ...(
+                                                getConfig('allow_companies_to_manage_products')
+                                                    ? ['company']
+                                                    : ['company', 'sections', 'products']
+                                            )
+                                        ]}
+                                    />
+                                )
+                            }
                         </div>
                     </div>
                 </div>
@@ -212,38 +251,6 @@ class CompanyAdminAppComponent extends React.Component<any, any> {
         );
     }
 }
-
-CompanyAdminAppComponent.propTypes = {
-    sectionId: PropTypes.string,
-    setSection: PropTypes.func,
-    editUser: PropTypes.func,
-    newUser: PropTypes.func,
-    setError: PropTypes.func,
-    saveUser: PropTypes.func,
-    deleteUser: PropTypes.func,
-    resetPassword: PropTypes.func,
-    resendUserInvite: PropTypes.func,
-    closeUserEditor: PropTypes.func,
-    usersById: PropTypes.object,
-    user: PropTypes.object,
-    userToEdit: PropTypes.object,
-    errors: PropTypes.object,
-    products: PropTypes.arrayOf(PropTypes.object),
-    modal: PropTypes.shape({
-        modal: PropTypes.string,
-        data: PropTypes.object,
-    }),
-    setQuery: PropTypes.func,
-    fetchUsers: PropTypes.func,
-    sort: PropTypes.string,
-    sortDirection:PropTypes.number,
-    setSort: PropTypes.func,
-    toggleSortDirection: PropTypes.func,
-    productId: PropTypes.string,
-    setProductFilter: PropTypes.func,
-    companies: PropTypes.arrayOf(PropTypes.object),
-    totalUsers:PropTypes.number
-};
 
 const mapStateToProps = (state: any) => ({
     sectionId: state.sectionId,

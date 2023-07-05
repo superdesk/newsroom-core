@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
 
@@ -16,8 +15,29 @@ import {FormToggle} from 'ui/components/FormToggle';
 import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserListItem';
 
 import {companyProductSeatsSelector, companySectionListSelector, sectionListSelector} from 'company-admin/selectors';
+import {IUser} from 'interfaces/user';
 
 const getCompanyOptions = (companies: any) => companies.map((company: any) => ({value: company._id, text: company.name}));
+
+interface IProps {
+    original: any;
+    user: IUser;
+    onChange: any;
+    errors: any;
+    companies: any;
+    onSave: any;
+    onResetPassword: any;
+    onClose: any;
+    onDelete: any;
+    currentUser: any;
+    toolbar: any;
+    products: any;
+    hideFields: any;
+    allSections: any;
+    companySections: any;
+    seats: any;
+    resendUserInvite: any;
+}
 
 function EditUserComponent({
     original,
@@ -37,7 +57,7 @@ function EditUserComponent({
     companySections,
     seats,
     resendUserInvite,
-}: any) {
+}: IProps) {
     const companyId = user.company;
     const localeOptions = getLocaleInputOptions();
     const stateLabelDetails = getUserStateLabelDetails(user);
@@ -313,26 +333,6 @@ function EditUserComponent({
         </div>
     );
 }
-
-EditUserComponent.propTypes = {
-    original: PropTypes.object,
-    user: PropTypes.object.isRequired,
-    onChange: PropTypes.func,
-    errors: PropTypes.object,
-    companies: PropTypes.arrayOf(PropTypes.object),
-    onSave: PropTypes.func.isRequired,
-    onResetPassword: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired,
-    onDelete: PropTypes.func.isRequired,
-    resendUserInvite: PropTypes.func.isRequired,
-    currentUser: PropTypes.object,
-    toolbar: PropTypes.node,
-    products: PropTypes.arrayOf(PropTypes.object),
-    hideFields: PropTypes.arrayOf(PropTypes.string),
-    allSections: PropTypes.arrayOf(PropTypes.object),
-    companySections: PropTypes.object,
-    seats: PropTypes.object,
-};
 
 EditUserComponent.defaultProps = {
     hideFields: [],
