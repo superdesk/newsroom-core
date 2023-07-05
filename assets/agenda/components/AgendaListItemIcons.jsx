@@ -8,6 +8,7 @@ import {
     isRecurring,
     getInternalNote,
     getAttachments,
+    getSubjects
 } from '../utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
@@ -17,7 +18,6 @@ import AgendaListCoverageItem from './AgendaListCoverageItem';
 import AgendaLocation from './AgendaLocation';
 
 import {gettext} from 'utils';
-
 
 class AgendaListItemIcons extends React.Component {
     constructor(props) {
@@ -57,10 +57,26 @@ class AgendaListItemIcons extends React.Component {
         };
     }
 
+    getItemByschema(props) {
+        const {listConfig} = props;
+        if ((listConfig || {}).subject != null) {
+            const scheme = listConfig.subject.scheme;
+            const subjects = getSubjects(props.item);
+            return scheme == null ?
+                subjects :
+                subjects.filter((item) => Array.isArray(scheme) ?
+                    scheme.includes(item.scheme) :
+                    item.scheme === scheme
+                );
+        }
+        return [];
+    }
+
     render() {
         const props = this.props;
         const state = this.state;
         const className = bem('wire-articles', 'item__meta', {row: props.row});
+        const subject = this.getItemByschema(props);
 
         return (
             <div className={className}>
@@ -83,6 +99,19 @@ class AgendaListItemIcons extends React.Component {
                                 showBorder={props.isMobilePhone && index === state.coveragesToDisplay.length - 1}
                                 group={props.group}
                             />
+                        ))}
+                    </div>
+                )}
+
+                {subject.length !== 0 && (
+                    <div>
+                        {subject.map((item) => (
+                            <span
+                                key={item.qcode}
+                                className={`label label--rounded subject--${item.qcode}`}
+                            >
+                                {item.name}
+                            </span>
                         ))}
                     </div>
                 )}
@@ -117,6 +146,7 @@ AgendaListItemIcons.propTypes = {
     row: PropTypes.bool,
     isMobilePhone: PropTypes.bool,
     user: PropTypes.string,
+    listConfig : PropTypes.object,
 };
 
 AgendaListItemIcons.defaultProps = {isMobilePhone: false};

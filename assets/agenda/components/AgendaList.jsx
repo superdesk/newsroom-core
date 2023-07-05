@@ -227,6 +227,7 @@ class AgendaList extends React.Component {
             readItems,
             refNode,
             onScroll,
+            listConfig
         } = this.props;
         const isExtended = activeView === EXTENDED_VIEW;
         const showShortcutActionIcons = shouldShowListShortcutActionIcons(this.props.listConfig, isExtended);
@@ -267,6 +268,7 @@ class AgendaList extends React.Component {
                                             planningId={plan.guid}
                                             resetActioningItem={this.resetActioningItem}
                                             showShortcutActionIcons={showShortcutActionIcons}
+                                            listConfig = {listConfig}
                                         />
                                     )
                                 }
