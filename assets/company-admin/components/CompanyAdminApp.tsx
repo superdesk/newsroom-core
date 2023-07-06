@@ -34,35 +34,43 @@ import {CompanyAdminProductSeatRequestModal} from './CompanyAdminProductSeatRequ
 import {IUser} from 'interfaces/user';
 
 interface IProps {
-    sectionId: any;
-    setSection: any;
-    editUser: any;
+    sectionId: string;
+    setSection: (section: string) => void;
+    editUser: () => void;
     newUser: IUser;
-    setError: any;
-    saveUser: any;
-    deleteUser: any;
-    resetPassword: any;
-    resendUserInvite: any;
-    closeUserEditor: any;
+    setError: (errors: any) => void;
+    saveUser: () => void;
+    deleteUser: () => void;
+    resetPassword: () => void;
+    resendUserInvite: () => void;
+    closeUserEditor: () => void;
     usersById: any;
     user: IUser;
     userToEdit: IUser;
     errors: any;
-    products: any;
-    modal: any;
-    setQuery: any;
-    fetchUsers: any;
-    sort: any;
-    sortDirection: any;
-    setSort: any;
-    toggleSortDirection: any;
-    productId: any;
-    setProductFilter: any;
-    companies: any;
-    totalUsers: any;
+    products: Array<any>;
+    modal: {
+        modal: string;
+        data: any;
+    }
+    setQuery: () => void;
+    fetchUsers: () => void;
+    sort: string;
+    sortDirection: number;
+    setSort: () => void;
+    toggleSortDirection: () => void;
+    productId: string;
+    setProductFilter: () => void;
+    companies: Array<any>;
+    totalUsers: number;
 }
 
-class CompanyAdminAppComponent extends React.Component<IProps, any> {
+interface IState {
+    sideNavOpen: boolean;
+    productFilter: string;
+}
+
+class CompanyAdminAppComponent extends React.Component<IProps, IState> {
     static propTypes: any;
     modals: any;
     constructor(props: any) {
@@ -136,6 +144,8 @@ class CompanyAdminAppComponent extends React.Component<IProps, any> {
         const coreHiddenFields = this.props.user.user_type === 'company_admin'
             ? ['is_approved', 'is_enabled']
             : [];
+
+        const {userToEdit} = this.props;
 
         return (
             <React.Fragment>
@@ -218,10 +228,10 @@ class CompanyAdminAppComponent extends React.Component<IProps, any> {
                                 </section>
                             </div>
                             {
-                                this.props.userToEdit !== null && (
+                                userToEdit !== null && (
                                     <EditUser
-                                        original={this.props.usersById[this.props.userToEdit._id ?? ''] || {}}
-                                        user={this.props.userToEdit}
+                                        original={userToEdit._id != null ? this.props.usersById[userToEdit._id] : {}}
+                                        user={userToEdit}
                                         onChange={this.props.editUser}
                                         errors={this.props.errors}
                                         companies={this.props.companies}
@@ -285,4 +295,4 @@ const mapDispatchToProps = (dispatch: any) => ({
     setProductFilter: (productId: any) => dispatch(setProductFilter(productId)),
 });
 
-export const CompanyAdminApp: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(CompanyAdminAppComponent);
+export const CompanyAdminApp: React.ComponentType<IProps> = connect(mapStateToProps, mapDispatchToProps)(CompanyAdminAppComponent);

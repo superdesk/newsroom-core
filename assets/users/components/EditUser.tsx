@@ -9,7 +9,15 @@ import AuditInformation from 'components/AuditInformation';
 import {EditUserProductPermission} from './EditUserProductPermission';
 
 import {gettext} from 'utils';
-import {isUserAdmin, getUserTypes, getUserLabel, userTypeReadOnly, getLocaleInputOptions, getDefaultLocale, isUserCompanyAdmin} from '../utils';
+import {
+    isUserAdmin,
+    getUserTypes,
+    getUserLabel,
+    userTypeReadOnly,
+    getLocaleInputOptions,
+    getDefaultLocale,
+    isUserCompanyAdmin,
+} from '../utils';
 import {FormToggle} from 'ui/components/FormToggle';
 
 import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserListItem';
@@ -22,21 +30,21 @@ const getCompanyOptions = (companies: any) => companies.map((company: any) => ({
 interface IProps {
     original: any;
     user: IUser;
-    onChange: any;
+    onChange: () => void;
     errors: any;
-    companies: any;
-    onSave: any;
-    onResetPassword: any;
-    onClose: any;
-    onDelete: any;
-    currentUser: any;
-    toolbar: any;
-    products: any;
-    hideFields: any;
-    allSections: any;
-    companySections: any;
-    seats: any;
-    resendUserInvite: any;
+    companies: Array<any>;
+    onSave: (event: any) => void;
+    onResetPassword: () => void;
+    onClose: (event: any) => void;
+    onDelete: (event: any) => void;
+    currentUser: IUser;
+    products: Array<any>;
+    resendUserInvite: () => void;
+    hideFields: Array<string>;
+    toolbar?: any;
+    allSections?: Array<any>;
+    companySections?: any;
+    seats?: any;
 }
 
 function EditUserComponent({
@@ -334,16 +342,12 @@ function EditUserComponent({
     );
 }
 
-EditUserComponent.defaultProps = {
-    hideFields: [],
-};
-
 const mapStateToProps = (state: any) => ({
     allSections: sectionListSelector(state),
     companySections: companySectionListSelector(state),
     seats: companyProductSeatsSelector(state),
 });
 
-const EditUser: React.ComponentType<any> = connect(mapStateToProps)(EditUserComponent);
+const EditUser: React.ComponentType<IProps> = connect(mapStateToProps)(EditUserComponent);
 
 export default EditUser;
