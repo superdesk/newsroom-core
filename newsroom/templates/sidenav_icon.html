@@ -8,11 +8,11 @@
         {% if nav.url %}target="_blank"{% endif %}
     >
         {% if nav.badge %}
-        <div id="{{ nav.badge }}" class="badge rounded-pill bg-info"></div>
+        <div id="{{ nav.badge }}" class="sidenav-icons__badge"></div>
         {% endif %}
         {% block navurl %}
         {% if nav.url %}
-        <div class="badge rounded-pill bg-info">
+        <div class="sidenav-icons__helper-icon">
             <i class="icon-small--external"></i>
         </div>
         {% endif %}
