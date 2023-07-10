@@ -18,12 +18,65 @@ function MainNavbar() {
                  <DesignNav />
             </div>
 
-            <div className="navbar__right navbar__right--login">
-                <div className="navbar__date">Tuesday, 13/12/2022</div>
+            {/* <div className="navbar__right navbar__right--login">
+                <div className="navbar__date">Tuesday, 05.07.2023</div>
                 <a className="nav-link" href="#">Login</a>
                 <a className="nav-link"
                    href="#"
                    target="_blank">Contact Us</a>
+            </div> */}
+
+            <div className="navbar__right">
+                <div className="navbar__date">July 5, 2023, 12:02:33 PM EDT</div>
+                <div className="navbar-notifications navbar-notifications--open" id="header-notification">
+
+                    <div className="navbar-notifications__inner">
+                        <h3 className="a11y-only">Notification Bell</h3>
+                        <div className="navbar-notifications__badge">379</div>
+                        <span className="navbar-notifications__inner-circle" title="" data-bs-original-title="Notifications">
+                            <h3 className="a11y-only">Notification bell</h3>
+                            <i className="icon--alert"></i>
+                        </span>
+
+                        <div className="notif__list dropdown-menu dropdown-menu-right show--">
+                            <div className="notif__list__header d-flex">
+                                <span className="notif__list__header-headline ms-3">Notifications</span>
+                                <button type="button" className="button-pill ms-auto me-3">Clear All</button>
+                            </div>
+                            {/* Item 1 */}
+                            <div className="notif__list__item">
+                                <button type="button" className="close" aria-label="Close" role="button">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                                <div className="notif__list__info">A story has arrived that matches a subscribed topic</div>
+                                <div className="notif__list__headline">
+                                    <a href="/wire?item=b8ad40d5-cd15-4266-a684-93cec30aed2c">AP News Digest 2 pm</a>
+                                </div>
+                                <div className="wire-articles__item__meta-info">Created at 19:56</div>
+                            </div>
+                            {/* Item 2 */}
+                            <div className="notif__list__item">
+                                <button type="button" className="close" aria-label="Close" role="button">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                                <div className="notif__list__info">A story has arrived that matches a subscribed topic</div>
+                                <div className="notif__list__headline">
+                                    <a href="/wire?item=b8ad40d5-cd15-4266-a684-93cec30aed2c">Dutch museums will return art and artifacts that were looted from Sri Lanka and Indonesia</a>
+                                </div>
+                                <div className="wire-articles__item__meta-info">Created on Jul 6th, 2023</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div id="header-profile-toggle">
+                    <div className="header-profile">
+                        <figure className="header-profile__avatar">
+                            <span className="header-profile__characters" title="" data-bs-original-title="Admin Admin">AA</span>
+                        </figure>
+                    </div>
+                    {/* <div className="dropdown-menu dropdown-menu-right show"><div className="card card--inside-dropdown"><div className="card-header">Admin Admin</div><ul className="list-group list-group-flush"><li className="list-group-item list-group-item--link"><a href="">My Profile<i className="svg-icon--arrow-right"></i></a></li><li className="list-group-item list-group-item--link"><a href="">My Wire Topics<i className="svg-icon--arrow-right"></i></a></li><li className="list-group-item list-group-item--link"><a href="">My Agenda Topics<i className="svg-icon--arrow-right"></i></a></li><li className="list-group-item list-group-item--link"><a href="">My Monitoring<i className="svg-icon--arrow-right"></i></a></li></ul><div className="card-footer"><a href="/logout" className="nh-button nh-button--tertiary float-end">Logout</a></div></div></div> */}
+                </div>
             </div>
 
         </nav>
