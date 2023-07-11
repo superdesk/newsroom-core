@@ -59,31 +59,31 @@ class NotificationList extends React.Component {
         this.setState({displayItems:!this.state.displayItems});
         if (!this.state.displayItems) {
             this.props.loadNotifications();
-            document.getElementById('header-notification').classList.add('notif--open');
+            document.getElementById('header-notification').classList.add('navbar-notifications--open');
         } else {
-            document.getElementById('header-notification').classList.remove('notif--open');
+            document.getElementById('header-notification').classList.remove('navbar-notifications--open');
         }
     }
 
     render() {
         return (
-            <div className="badge--top-right">
+            <div className="navbar-notifications__inner">
                 <h3 className="a11y-only">Notification Bell</h3>
                 {this.props.count > 0 &&
-                    <div className="badge rounded-pill">
+                    <div className="navbar-notifications__badge">
                         {this.props.count}
                     </div>
                 }
 
                 <span
                     className={classNames(
-                        'notif__circle',
-                        {'notif__circle--disconnected': !this.state.connected}
+                        'navbar-notifications__inner-circle',
+                        {'navbar-notifications__inner-circle--disconnected': !this.state.connected}
                     )}
                     ref={(elem) => this.elem = elem}
                     title={gettext('Notifications')}>
                     <h3 className="a11y-only">Notification bell</h3>
-                    <i className='icon--alert icon--white' onClick={this.toggleDisplay} />
+                    <i className='icon--alert' onClick={this.toggleDisplay} />
                 </span>
 
                 {!this.state.displayItems ? null : this.props.count === 0 ? (

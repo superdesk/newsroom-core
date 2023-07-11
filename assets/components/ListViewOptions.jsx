@@ -55,10 +55,9 @@ class ListViewOptions extends React.PureComponent {
 
     render() {
         return (
-            <React.Fragment>
+            <div ref={(elem) => this.elem = elem}>
                 <a
                     className="icon-link--plain"
-                    ref={(elem) => this.elem = elem}
                     onClick={this.toggleOpen}
                 >
                     <span className="icon-link__text">{gettext('Change view')}</span>
@@ -81,7 +80,7 @@ class ListViewOptions extends React.PureComponent {
                         ))}
                     </div>
                 )}
-            </React.Fragment>
+            </div>
         );
     }
 }

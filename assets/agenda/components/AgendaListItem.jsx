@@ -119,7 +119,7 @@ class AgendaListItem extends React.Component {
     }
 
     renderListItem(isMobile, children) {
-        const {item, isExtended, group, planningId} = this.props;
+        const {item, isExtended, group, planningId, listConfig} = this.props;
         const classes = this.getClassNames(isExtended);
         const planningItem = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
         const description = getDescription(item, planningItem);
@@ -168,6 +168,7 @@ class AgendaListItem extends React.Component {
                             planningItem={planningItem}
                             isMobilePhone={isMobile}
                             user={this.props.user}
+                            listConfig = {listConfig}
                         />
 
                         {(isMobile || isExtended) && description && (
@@ -282,6 +283,7 @@ AgendaListItem.propTypes = {
     resetActioningItem: PropTypes.func,
     planningId: PropTypes.string,
     showShortcutActionIcons: PropTypes.bool,
+    listConfig: PropTypes.object,
 };
 
 export default AgendaListItem;

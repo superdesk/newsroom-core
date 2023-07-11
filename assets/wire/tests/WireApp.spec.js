@@ -97,6 +97,23 @@ describe('shortHighlightedtext', () => {
         const output = shortHighlightedtext(html, maxLength);
         expect(output).toEqual('something and something else <span class="es-highlight">matching word</span>...');
     });
-            
+
+    it('returns text if we have also searchterm is in long paragraph', () => {
+        const html = `<p>On olemassa myös sellaisia ihmisiä, joiden silmissä 
+        jokainen parisuhde muuttuu huonoksi jo muutaman vuoden kuluessa.
+        Tällöin kyse voi olla siitä, etteivät he kestä suhteen arkipäiväistymistä,
+        kuvailee yksilö- ja pariterapeutti Jouni Pölönen mukaanalkuhuuma
+        <span class="es-highlight">kestää</span> yleensä 1–2 vuotta.
+        </p><p>–Suhteen alussa on usein paljon seksiä ja ihmiset tuovat parhaat puolensa esiin.
+        Kun suhde sitten arkipäiväistyy ja intohimo väistyy arjen tieltä</p>`;
+
+        const maxLength = 40;
+        const output = shortHighlightedtext(html, maxLength);
+        expect(output).toEqual(`On olemassa myös sellaisia ihmisiä, joiden silmissä 
+        jokainen parisuhde muuttuu huonoksi jo muutaman vuoden kuluessa.
+        Tällöin kyse voi olla siitä, etteivät he kestä suhteen arkipäiväistymistä,
+        kuvailee yksilö- ja pariterapeutti Jouni Pölönen mukaanalkuhuuma <span class="es-highlight">kestää</span> yleensä 1–2 vuotta....`);
+    });
+       
 });
   

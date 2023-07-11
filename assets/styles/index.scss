@@ -308,6 +308,7 @@ body.print {
     position: relative;
     padding: 0 4px;
     display: flex;
+    overflow-y: auto;
 
     &:dir(rtl) {
         box-shadow: inset 3px 0px 8px rgba(0, 0, 0, 0.1);
@@ -316,6 +317,7 @@ body.print {
     @include phone {
         padding: 0 2px;
         flex: 0 0 var(--navbar-height--mobile);
+        overflow-y: hidden;
     }
 }
 
@@ -345,6 +347,9 @@ body.print {
     .sidenav-icons__item {
         margin: 4px 0;
         align-self: stretch;
+        position: relative;
+        display: flex !important;
+        justify-content: center;
         a {
             display: flex;
             align-items: center;
@@ -361,7 +366,9 @@ body.print {
 
         }
         a, span {
-            width: 72px;
+            border-radius: var(--sidenav-item-border-radius);              
+            text-decoration: none;
+            width: var(--sidenav-item-width);
             min-height: var(--navbar-height);
             padding: 2px 0;
             line-height: var(--navbar-height);
@@ -397,7 +404,7 @@ body.print {
             }
         }
         .sidenav-icons__item-title {
-            display: none;
+            display: var(--sidenav-item-title-display);
             color: var(--sidenav-color-item-fg);
             font-size: 10px;
             font-weight: 700;
@@ -405,9 +412,9 @@ body.print {
             letter-spacing: 0.3px;
             text-transform: uppercase;
             overflow-wrap: break-word;
-            width: 72px;
-            @include sm {
-                display: block;
+            align-self: stretch;
+            @include phone {
+                display: none;
             }
         }
         .badge {
@@ -422,15 +429,54 @@ body.print {
                 }
             }
         }
+        .sidenav-icons__badge,
+        .sidenav-icons__helper-icon {
+            position: absolute;
+            font-size: var(--sidenav-item-badge-font-size);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius--full);
+            inset-block-start: -1px;
+            inset-inline-end: 3px;
+            background-color: var(--sidenav-color-badge-bg);
+            color: var(--sidenav-color-badge-fg);
+            outline: 2px solid var(--sidenav-color-bg);
+            @include phone {
+                inset-block-start: -3px;
+                inset-inline-end: -3px;
+            }
+        }
+        .sidenav-icons__badge {
+            height: var(--sidenav-item-badge-size);
+            min-width: var(--sidenav-item-badge-size);
+            font-size: var(--sidenav-item-badge-font-size);
+            font-weight: 700;
+            line-height: 1;
+            background-color: var(--sidenav-color-badge-bg);
+            color: var(--sidenav-color-badge-fg);
+            padding: 0.35em 0.6em;
+        }
+
+        .sidenav-icons__helper-icon {
+            height: var(--sidenav-item-helper-icon-size);
+            width: var(--sidenav-item-helper-icon-size);
+            background-color: var(--sidenav-color-item-fg);
+            color: var(--sidenav-color-item-fg--active);
+            inset-block-start: -1px;
+            inset-inline-end: 6px;
+            padding: 0;
+            [class^="icon-small--"],
+            [class^="icon-small--"] {
+                color: var(--sidenav-color-item-fg--active) !important;
+            }
+        }
 
         &.active {
-            display: flex !important;
-            justify-content: center;
+            
 
             a {
                 background-color: var(--sidenav-color-item-bg--active);
-                border-radius: 4px;                
-                text-decoration: none;
             }
             i, .sidenav-icons__item-title {
                 color: var(--sidenav-color-item-fg--active);
@@ -470,6 +516,30 @@ body.print {
         align-self: stretch;
         justify-self: stretch;
         margin: auto;
+    }
+    .sidenav-icons__separator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-grow: 0;
+        flex-shrink: 0;
+        gap: calc(var(--separator-dot-size) * 1.5);
+        margin-block: var(--space--1-5);
+        .separator__dot {
+            border-radius: var(--border-radius--full);
+            display: block;
+            height: var(--separator-dot-size);
+            width: var(--separator-dot-size);
+            background-color: var(--separator-dot-color-bg);
+            opacity: 0.4;
+        }
+        @include phone {
+            flex-direction: column;
+            margin-block: auto;
+            margin-inline: var(--space--0-5);
+            gap: calc(var(--separator-dot-size) * 1);
+        }
+
     }
 }
 
@@ -2378,15 +2448,16 @@ article.list {
     flex-direction: column;
     background-color: white;
     position: absolute;
-    top: 109px;
-    bottom: var(--footer-size--height);
-    left: 0;
-    right: 0;
+    inset-block-start: calc(var(--navbar-height--mobile) * 2);
+    inset-block-end: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
     z-index: 103;
 
     @include md {
-        top: 56px;
-        left: var(--sidenav-size-width);
+        inset-block-start: var(--navbar-height);
+        inset-inline-start: var(--sidenav-size-width);
+        inset-block-end: var(--footer-size--height);
     }
 
     h3 {
