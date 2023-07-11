@@ -28,9 +28,9 @@ import {IUser} from 'interfaces/user';
 const getCompanyOptions = (companies: any) => companies.map((company: any) => ({value: company._id, text: company.name}));
 
 interface IProps {
-    original: any;
+    original: IUser;
     user: IUser;
-    onChange: () => void;
+    onChange: (event: any) => void;
     errors: any;
     companies: Array<any>;
     onSave: (event: any) => void;
@@ -69,17 +69,14 @@ function EditUserComponent({
     const companyId = user.company;
     const localeOptions = getLocaleInputOptions();
     const stateLabelDetails = getUserStateLabelDetails(user);
-    const companyProductIds = companyId != null ?
-        Object.keys(seats[companyId] || {}) :
-        products.map((product: any) => product._id);
-    const sections = companyId != null ?
-        companySections[companyId] || [] :
-        allSections;
+    const companyProductIds = companyId != null
+        ? Object.keys(seats[companyId] || {})
+        : products.map((product: any) => product._id);
+    const sections = companyId != null ? companySections[companyId] || [] : allSections;
     const companySectionIds = sections.map((section: any) => section._id);
     const isAdmin = isUserAdmin(currentUser);
     const isCompanyAdmin = isUserCompanyAdmin(currentUser);
-
-    const company = companies.map((value: any)=> value.name);
+    const company = companies.map((value: any) => value.name);
 
     return (
         <div

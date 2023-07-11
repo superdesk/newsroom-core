@@ -36,7 +36,7 @@ import {IUser} from 'interfaces/user';
 interface IProps {
     sectionId: string;
     setSection: (section: string) => void;
-    editUser: () => void;
+    editUser: (event: any) => void;
     newUser: IUser;
     setError: (errors: any) => void;
     saveUser: () => void;
