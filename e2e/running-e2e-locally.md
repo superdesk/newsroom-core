@@ -2,6 +2,7 @@
 ```
 cd e2e
 
+npm install
 npm run start
 ```
 # Terminal 2 - starting the e2e backend:

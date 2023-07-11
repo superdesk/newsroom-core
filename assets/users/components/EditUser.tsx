@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
@@ -27,7 +28,13 @@ import {IUser} from 'interfaces/user';
 
 const getCompanyOptions = (companies: any) => companies.map((company: any) => ({value: company._id, text: company.name}));
 
-interface IProps {
+interface IReduxStateProps {
+    allSections?: Array<any>;
+    companySections?: any;
+    seats?: any;
+}
+
+interface IProps extends IReduxStateProps {
     original: IUser;
     user: IUser;
     onChange: (event: any) => void;
@@ -42,12 +49,10 @@ interface IProps {
     resendUserInvite: () => void;
     hideFields: Array<string>;
     toolbar?: any;
-    allSections?: Array<any>;
-    companySections?: any;
-    seats?: any;
+
 }
 
-function EditUserComponent({
+const EditUserComponent: React.ComponentType<IProps> = ({
     original,
     user,
     onChange,
@@ -65,7 +70,7 @@ function EditUserComponent({
     companySections,
     seats,
     resendUserInvite,
-}: IProps) {
+}) => {
     const companyId = user.company;
     const localeOptions = getLocaleInputOptions();
     const stateLabelDetails = getUserStateLabelDetails(user);
@@ -337,14 +342,14 @@ function EditUserComponent({
             </div>
         </div>
     );
-}
+};
 
-const mapStateToProps = (state: any) => ({
+const mapStateToProps = (state: IReduxStateProps) => ({
     allSections: sectionListSelector(state),
     companySections: companySectionListSelector(state),
     seats: companyProductSeatsSelector(state),
 });
 
-const EditUser: React.ComponentType<IProps> = connect(mapStateToProps)(EditUserComponent);
+const EditUser = connect<IReduxStateProps>(mapStateToProps)(EditUserComponent);
 
 export default EditUser;

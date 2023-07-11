@@ -33,8 +33,25 @@ import {CompanyDetailsProductFilter} from './CompanyDetailsProductFilter';
 import {CompanyAdminProductSeatRequestModal} from './CompanyAdminProductSeatRequestModal';
 import {IUser} from 'interfaces/user';
 
-interface IProps {
+interface IReduxStoreProps {
     sectionId: string;
+    usersById: any;
+    user: IUser;
+    userToEdit: IUser;
+    errors: any;
+    products: Array<any>;
+    modal: {
+        modal: string;
+        data: any;
+    };
+    sort: string;
+    sortDirection: number;
+    productId: string;
+    companies: Array<any>;
+    totalUsers: number;
+}
+
+interface IProps extends IReduxStoreProps {
     setSection: (section: string) => void;
     editUser: (event: any) => void;
     newUser: IUser;
@@ -44,25 +61,11 @@ interface IProps {
     resetPassword: () => void;
     resendUserInvite: () => void;
     closeUserEditor: () => void;
-    usersById: any;
-    user: IUser;
-    userToEdit: IUser;
-    errors: any;
-    products: Array<any>;
-    modal: {
-        modal: string;
-        data: any;
-    }
     setQuery: () => void;
     fetchUsers: () => void;
-    sort: string;
-    sortDirection: number;
     setSort: () => void;
     toggleSortDirection: () => void;
-    productId: string;
     setProductFilter: () => void;
-    companies: Array<any>;
-    totalUsers: number;
 }
 
 interface IState {
@@ -262,7 +265,7 @@ class CompanyAdminAppComponent extends React.Component<IProps, IState> {
     }
 }
 
-const mapStateToProps = (state: any) => ({
+const mapStateToProps = (state: IReduxStoreProps) => ({
     sectionId: state.sectionId,
     usersById: state.usersById,
     user: currentUserSelector(state),
@@ -287,7 +290,6 @@ const mapDispatchToProps = (dispatch: any) => ({
     deleteUser: () => dispatch(deleteUser()),
     resetPassword: () => dispatch(resetPassword()),
     resendUserInvite: () => dispatch(resendUserInvite()),
-
     setQuery: (query: any) => dispatch(setSearchQuery(query)),
     fetchUsers: () => dispatch(fetchUsers()),
     setSort: (param: any) => dispatch(setSort(param)),
@@ -295,4 +297,4 @@ const mapDispatchToProps = (dispatch: any) => ({
     setProductFilter: (productId: any) => dispatch(setProductFilter(productId)),
 });
 
-export const CompanyAdminApp: React.ComponentType<IProps> = connect(mapStateToProps, mapDispatchToProps)(CompanyAdminAppComponent);
+export const CompanyAdminApp = connect<IReduxStoreProps>(mapStateToProps, mapDispatchToProps)(CompanyAdminAppComponent);
