@@ -213,7 +213,7 @@ export function shortHighlightedtext(html, maxLength = 40) {
         node = treeWalker.nextSibling();
     }
     const truncatedText = text.trim();
-    highlightedSpans = Array.from(parentElement.querySelectorAll('span.es-highlight'));
+    highlightedSpans = parentElement.querySelectorAll('span.es-highlight');
     let output = truncatedText;
     let highlightedText = '';
     let lastIndex = 0;
