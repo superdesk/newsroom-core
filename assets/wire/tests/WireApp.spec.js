@@ -114,6 +114,16 @@ describe('shortHighlightedtext', () => {
         Tällöin kyse voi olla siitä, etteivät he kestä suhteen arkipäiväistymistä,
         kuvailee yksilö- ja pariterapeutti Jouni Pölönen mukaanalkuhuuma <span class="es-highlight">kestää</span> yleensä 1–2 vuotta....`);
     });
+
+    it('returns highlighted text if we have multiple words search term span together', () => {
+        const html = `<p>On olemassa myös sellaisia ihmisiä, joiden silmissä
+        jokainen parisuhde muuttuu <span class="es-highlight">mukaanalkuhuuma</span> <span class="es-highlight">kestää</span> yleensä 1–2 vuotta`;
+
+        const maxLength = 40;
+        const output = shortHighlightedtext(html, maxLength);
+        expect(output).toEqual(`On olemassa myös sellaisia ihmisiä, joiden silmissä
+        jokainen parisuhde muuttuu <span class="es-highlight">mukaanalkuhuuma</span>  <span class="es-highlight">kestää</span> yleensä 1–2 vuotta...`);
+    });
        
 });
   
