@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 import {connect} from 'react-redux';
 import {get, range, partition, isMatch} from 'lodash';
@@ -11,15 +12,13 @@ import {IUser} from 'interfaces/user';
 import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 
 interface IReduxStoreProps {
-    itemsById: Array<any>;
     formValid: any;
     topics: Array<any>;
 }
 
 interface IProps extends IReduxStoreProps {
-    closeModal: () => void;
-    submit: any;
-    data: any;
+    closeModal?: () => void;
+    data?: any;
 }
 
 interface IState {
@@ -349,5 +348,5 @@ const mapDispatchToProps = (dispatch: any) => ({
     reloadTopics: () => dispatch(reloadMyWireTopics(true))
 });
 
-export const PersonalizeHomeSettingsModal: React.ComponentType<any> =
-    connect(mapStateToProps, mapDispatchToProps)(PersonalizeHomeModal);
+export const PersonalizeHomeSettingsModal =
+    connect<IReduxStoreProps>(mapStateToProps, mapDispatchToProps)(PersonalizeHomeModal);
