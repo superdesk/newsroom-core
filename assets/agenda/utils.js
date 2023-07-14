@@ -593,10 +593,13 @@ export function getHighlightedDescription(item, plan) {
     if (item.es_highlight.description_text) {
         return item.es_highlight.description_text[0];
     }
-    else if (item.es_highlight.definition_short){
+    else if (item.es_highlight.definition_short) {
         return item.es_highlight.definition_short[0];
     }
-    else{
+    else if (item.es_highlight.definition_long) {
+        return item.es_highlight.definition_long[0];
+    }
+    else {
         return getDescription(item, plan);
     }
 }

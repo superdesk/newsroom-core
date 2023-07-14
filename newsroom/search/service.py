@@ -539,6 +539,7 @@ class BaseSearchService(Service):
                     "description_text": field_settings,
                     "definition_short": field_settings,
                     "name": field_settings,
+                    "definition_long": field_settings,
                 }
             else:
                 elastic_highlight_query["fields"] = {field: field_settings for field in selected_field}
