@@ -3,11 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {gettext, isDisplayed, isMobilePhone} from 'utils';
 import {get} from 'lodash';
-import {
-    getCardDashboardComponent,
-} from 'components/cards/utils';
-
-
+import {getCardDashboardComponent} from 'components/cards/utils';
 import getItemActions from 'wire/item-actions';
 import ItemDetails from 'wire/components/ItemDetails';
 import {openItemDetails, setActive, fetchCardExternalItems, fetchCompanyCardItems} from '../actions';
@@ -20,10 +16,14 @@ import {SearchBar} from './search-bar';
 import {previewConfigSelector, listConfigSelector, detailsConfigSelector, isSearchEnabled} from 'ui/selectors';
 import {filterGroupsToLabelMap} from 'search/selectors';
 import CardRow from 'components/cards/render/CardRow';
+import {PersonalizeHomeSettingsModal} from 'components/PersonalizeHomeModal';
+import {personalizeHome} from 'agenda/actions';
+import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 
 const modals: any = {
     shareItem: ShareItemModal,
     downloadItems: DownloadItemsModal,
+    personalizeHome: PersonalizeHomeSettingsModal,
 };
 
 class HomeApp extends React.Component<any, any> {
@@ -136,23 +136,101 @@ class HomeApp extends React.Component<any, any> {
     }
 
     renderContent(children?: any): any {
+        const {cards} = this.props;
+
         return (
             <React.Fragment>
                 {this.props.isSearchEnabled && (
                     <SearchBar />
                 )}
 
-                <section className="content-main d-block py-4 px-2 p-md-3 p-lg-4"
+                <section
+                    className="content-main d-block py-4 px-2 p-md-3 p-lg-4"
                     onScroll={this.onHomeScroll}
                     ref={(elem: any) => this.elem = elem}
                 >
                     <div className="container-fluid">
-                        {this.props.cards.length > 0 &&
-                        this.props.cards.filter((c: any) => c.dashboard === 'newsroom').map((card: any) => this.getPanels(card))}
-                        {this.props.cards.length === 0 &&
-                        <div className="alert alert-warning" role="alert">
-                            <strong>{gettext('Warning')}!</strong> {gettext('There\'s no card defined for {{home}} page!', window.sectionNames)}
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: 8,
+                            }}
+                        >
+                            <div className="home-tools">
+                                <button
+                                    onClick={() => {
+                                        this.props.personalizeHome();
+                                    }}
+                                    type="button"
+                                    className="nh-button nh-button--secondary nh-button--small"
+                                    title="Personalize Home"
+                                >
+                                    Personalize Home
+                                </button>
+                            </div>
+                            {/*
+                                TODO: The next block should only appear if
+                                there already is personal home/dashboard
+                            */}
+                            <div>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        alignItems: 'center'
+                                    }}
+                                    className="home-tools"
+                                >
+                                    <RadioButtonGroup
+                                        options={[
+                                            {
+                                                _id: 'default',
+                                                name: 'Default'
+                                            },
+                                            {
+                                                _id: 'my-home',
+                                                name: 'My home'
+                                            }
+                                        ]}
+                                        activeOptionId='default'
+                                        switchOptions={(optionId) => {
+                                            //
+                                        }}
+                                    />
+                                    <button
+                                        onClick={() => {
+                                            this.props.personalizeHome();
+                                        }}
+                                        type="button"
+                                        className="icon-button icon-button--small icon-button--tertiary icon-button--bordered"
+                                        title="Edit personal Home"
+                                    >
+                                        <i className="icon--settings"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
+                        {
+                            this.props.modal?.modal === 'personalizeHome' && (
+                                <PersonalizeHomeSettingsModal />
+                            )
+                        }
+                        {
+                            cards.length > 0 && (
+                                this.props.cards
+                                    .filter((c: any) => c.dashboard === 'newsroom')
+                                    .map((card: any) => this.getPanels(card))
+                            )
+                        }
+                        {
+                            cards.length === 0 && (
+                                <div className="alert alert-warning" role="alert">
+                                    <strong>{gettext('Warning')}!</strong>
+                                    {gettext('There\'s no card defined for {{home}} page!', window.sectionNames)}
+                                </div>
+                            )
                         }
                     </div>
                     {children}
@@ -165,18 +243,21 @@ class HomeApp extends React.Component<any, any> {
         const modal = this.renderModal(this.props.modal);
 
         return (
-            (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
-                item={this.props.itemToOpen}
-                user={this.props.user}
-                topics={this.props.topics}
-                actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
-                onClose={() => this.props.actions.filter((a: any) => a.id === 'open')[0].action(null)}
-                followStory={this.props.followStory}
-                detailsConfig={this.props.detailsConfig}
-                filterGroupLabels={this.props.filterGroupLabels}
-                downloadMedia={this.props.downloadMedia}
-            />, modal] :
-                this.renderContent()
+            (
+                this.props.itemToOpen ? [
+                    <ItemDetails key="itemDetails"
+                        item={this.props.itemToOpen}
+                        user={this.props.user}
+                        topics={this.props.topics}
+                        actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
+                        onClose={() => this.props.actions.filter((a: any) => a.id === 'open')[0].action(null)}
+                        followStory={this.props.followStory}
+                        detailsConfig={this.props.detailsConfig}
+                        filterGroupLabels={this.props.filterGroupLabels}
+                        downloadMedia={this.props.downloadMedia}
+                    />,
+                    modal
+                ] : this.renderContent()
             )
         );
     }
@@ -261,10 +342,13 @@ const mapStateToProps = (state: any) =>({
     filterGroupLabels: filterGroupsToLabelMap(state),
 });
 
-const mapDispatchToProps = (dispatch: any) => ({
+const mapDispatchToProps = (dispatch: any, state: any) => ({
     openItemDetails: (item: any, cardId: any) => {
         dispatch(openItemDetails(item));
         dispatch(setActive(cardId));
+    },
+    personalizeHome: () => {
+        dispatch(personalizeHome());
     },
     actions: getItemActions(dispatch),
     fetchCardExternalItems: (cardId: any, cardLabel: any) => dispatch(fetchCardExternalItems(cardId, cardLabel)),

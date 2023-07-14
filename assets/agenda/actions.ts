@@ -416,6 +416,15 @@ export function downloadItems(items: any) {
     return renderModal('downloadItems', {items});
 }
 
+/**
+ * Personalize Home - display modal to personalize home
+ *
+ * @param {Array} items
+ */
+export function personalizeHome(items?: any) {
+    return renderModal('personalizeHome', {items});
+}
+
 export const REMOVE_NEW_ITEMS = 'REMOVE_NEW_ITEMS';
 export function removeNewItems(data: any) {
     return {type: REMOVE_NEW_ITEMS, data};
