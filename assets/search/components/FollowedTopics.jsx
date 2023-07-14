@@ -203,9 +203,13 @@ class FollowedTopics extends React.Component {
                                 </div>
                             )}
                             <div className="toggle-button__group toggle-button__group--navbar ms-0 me-0">
-                                <button type="button" className="nh-button nh-button--tertiary"
+                                <button
+                                    type="button"
+                                    className="nh-button nh-button--tertiary"
                                     title={gettext('Create new folder')}
-                                    onClick={() => this.createNewFolder()}>
+                                    data-test-id="create-folder-btn"
+                                    onClick={() => this.createNewFolder()}
+                                >
                                     <i className="icon--folder-create"></i>{gettext('New folder')}
                                 </button>
                             </div>

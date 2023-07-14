@@ -33,7 +33,10 @@ export function TopicFolder({folder, topics, folderPopover, toggleFolderPopover,
     ];
 
     return (
-        <div key={folder._id} className="simple-card__group" 
+        <div
+            key={folder._id}
+            className="simple-card__group"
+            data-test-id={`folder-card--${folder.name}`}
             onDragOver={(event) => {
                 event.preventDefault();
                 event.dataTransfer.dropEffect = 'move';
@@ -46,11 +49,15 @@ export function TopicFolder({folder, topics, folderPopover, toggleFolderPopover,
                 const topic = event.dataTransfer.getData('topic');
 
                 setDragOver(false);
-                moveTopic(topic, folder);
+                moveTopic(topic, folder).then(() => {
+                    if (!opened) {
+                        setOpened(true);
+                    }
+                });
             }}
         >
             {editing ? (
-                <TopicFolderEditor 
+                <TopicFolderEditor
                     folder={folder}
                     error={editing === EDITING_ERROR ? {} : null}
                     onSave={(name) => {
@@ -64,9 +71,15 @@ export function TopicFolder({folder, topics, folderPopover, toggleFolderPopover,
                     'simple-card__group-header--ondragover': dragover,
                 })}>
                     {opened ? (
-                        <button type="button" className="icon-button icon-button--tertiary" title={gettext('Close')} onClick={() => setOpened(false)}><i className="icon--minus"></i></button>
+                        <button
+                            type="button"
+                            className="icon-button icon-button--tertiary"
+                            title={gettext('Close')}
+                            onClick={() => setOpened(false)}
+                        ><i className="icon--minus"></i></button>
                     ) : (
-                        <button type="button" className="icon-button icon-button--tertiary"
+                        <button
+                            type="button" className="icon-button icon-button--tertiary"
                             title={gettext('Open')}
                             onClick={() => setOpened(true)}
                             disabled={topics.length === 0}

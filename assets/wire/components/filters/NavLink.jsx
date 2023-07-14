@@ -4,12 +4,15 @@ import classNames from 'classnames';
 
 function NavLink({isActive, onClick, label}) {
     return (
-        <a href=''
+        <a
+            href=''
             className={classNames('nh-button nh-button--tertiary w-100', {
                 'nh-button--active': isActive,
                 '': !isActive,
             })}
-            onClick={onClick}>{label}</a>
+            onClick={onClick}
+            data-test-id={`nav-link--${label.toLowerCase()}`}
+        >{label}</a>
     );
 }
 

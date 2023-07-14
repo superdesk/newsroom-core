@@ -20,7 +20,11 @@ class SearchSidebar extends React.Component {
             <div className='wire-column__nav__items'>
                 <ul className='nav' id='pills-tab' role='tablist'>
                     {this.props.tabs.map((tab) => (
-                        <li className='wire-column__nav__tab nav-item' key={tab.id}>
+                        <li
+                            className='wire-column__nav__tab nav-item'
+                            key={tab.id}
+                            data-test-id={`filter-panel-tab--${tab.id}`}
+                        >
                             <a className={`nav-link ${this.state.active === tab.id && 'active'}`}
                                 role='tab'
                                 aria-selected={`${this.state.active === tab.id ? 'true' : 'false'}`}
@@ -35,8 +39,16 @@ class SearchSidebar extends React.Component {
                     ))}
                 </ul>
                 {this.props.tabs.map((tab) => (
-                    <div className='tab-content' key={tab.id}>
-                        <div className={classNames('tab-pane tab-pane--no-padding', 'fade', {'show active': this.state.active === tab.id})} role='tabpanel'>
+                    <div
+                        className="tab-content"
+                        key={tab.id}
+                        data-test-id={`filter-panel-content--${tab.id}`}
+                    >
+                        <div
+                            className={classNames('tab-pane tab-pane--no-padding', 'fade', {'show active': this.state.active === tab.id})}
+                            role='tabpanel'
+                            data-test-id={this.state.active === tab.id ? 'tab-panel-content--active' : undefined}
+                        >
                             <tab.component {...this.props.props} />
                         </div>
                     </div>

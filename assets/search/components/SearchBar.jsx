@@ -51,7 +51,10 @@ class SearchBar extends React.Component {
     render() {
         return (
             <React.Fragment>
-                <div className="search">
+                <div
+                    className="search"
+                    data-test-id="top-search-bar"
+                >
                     <form
                         className={classNames('search__form', {'search__form--active': !!this.state.query,})}
                         role="search"

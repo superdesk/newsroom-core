@@ -110,7 +110,7 @@ describe('Wire - Advanced Search', function() {
             exclude: ['London'],
         });
         WirePage.searchResults
-            .getSearchResultElement('topics', '[data-test-id="tags-topics--topic"]')
+            .getSearchResultElement('topics', '[data-test-id="tags-topics--my-topic"]')
             .should('have.length', 0);
         WirePage.searchResults.getAdvancedSearchKeywords('and')
             .should('have.length', 0);

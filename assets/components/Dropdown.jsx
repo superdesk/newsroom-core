@@ -33,6 +33,7 @@ export function Dropdown({children, isActive, icon, label, className, buttonProp
             event.stopPropagation();
             dropdownInstance.toggle();
         }}
+        data-test-id="dropdown-btn"
     >
         <button
             type="button"

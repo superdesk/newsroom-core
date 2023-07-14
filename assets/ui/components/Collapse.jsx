@@ -14,7 +14,7 @@ export class CollapseBoxWithButton extends React.Component {
         const contentId = this.props.id + '-content';
 
         return (
-            <div id={this.props.id} 
+            <div id={this.props.id}
                 className={classNames('nh-collapsible-panel pt-0 nh-collapsible-panel--small', {
                     'nh-collapsible-panel--open': this.state.open,
                     'nh-collapsible-panel--closed': !this.state.open,
@@ -34,7 +34,11 @@ export class CollapseBoxWithButton extends React.Component {
                     </div>
                     <div className='nh-collapsible-panel__line'></div>
                     {this.props.edit && (
-                        <button className='nh-button nh-button--tertiary nh-button--small' onClick={this.props.edit}>{gettext('Edit')}</button>
+                        <button
+                            data-test-id="edit-btn"
+                            className='nh-button nh-button--tertiary nh-button--small'
+                            onClick={this.props.edit}
+                        >{gettext('Edit')}</button>
                     )}
                 </div>
                 <div id={contentId} className='nh-collapsible-panel__content-wraper'>
