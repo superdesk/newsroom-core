@@ -326,7 +326,7 @@ export function moveTopic(topicId, folder) {
         const topic = state.topics.find((topic) => topic._id === topicId);
         const url = `/api/users/${state.user._id}/topics/${topicId}`;
 
-        server.patch(url, updates, topic._etag).then((response) => {
+        return server.patch(url, updates, topic._etag).then((response) => {
             mergeUpdates(updates, response);
             dispatch({type: TOPIC_UPDATED, payload: {topic, updates}});
         });

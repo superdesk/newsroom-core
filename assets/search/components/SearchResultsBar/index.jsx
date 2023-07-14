@@ -27,10 +27,58 @@ class SearchResultsBarComponent extends React.Component {
 
         this.state = {isTagSectionShown: false};
         this.toggleTagSection = this.toggleTagSection.bind(this);
+        this.toggleNavigation = this.toggleNavigation.bind(this);
+        this.setQuery = this.setQuery.bind(this);
+        this.setAdvancedSearchKeywords = this.setAdvancedSearchKeywords.bind(this);
+        this.toggleAdvancedSearchField = this.toggleAdvancedSearchField.bind(this);
+        this.clearAdvancedSearchParams = this.clearAdvancedSearchParams.bind(this);
+        this.setCreatedFilter = this.setCreatedFilter.bind(this);
+        this.toggleFilter = this.toggleFilter.bind(this);
+        this.resetFilter = this.resetFilter.bind(this);
     }
 
     toggleTagSection() {
         this.setState((prevState) => ({isTagSectionShown: !prevState.isTagSectionShown}));
+    }
+
+    toggleNavigation(navigation) {
+        this.props.toggleNavigation(navigation);
+        this.props.refresh();
+    }
+
+    setQuery(query) {
+        this.props.setQuery(query);
+        this.props.refresh();
+    }
+
+    setAdvancedSearchKeywords(field, keywords) {
+        this.props.setAdvancedSearchKeywords(field, keywords);
+        this.props.refresh();
+    }
+
+    toggleAdvancedSearchField(field) {
+        this.props.toggleAdvancedSearchField(field);
+        this.props.refresh();
+    }
+
+    clearAdvancedSearchParams() {
+        this.props.clearAdvancedSearchParams();
+        this.props.refresh();
+    }
+
+    setCreatedFilter(filter) {
+        this.props.setCreatedFilter(filter);
+        this.props.refresh();
+    }
+
+    toggleFilter(key, value, single) {
+        this.props.toggleFilter(key, value, single);
+        this.props.refresh();
+    }
+
+    resetFilter() {
+        this.props.resetFilter();
+        this.props.refresh();
     }
 
     render() {
@@ -90,18 +138,17 @@ class SearchResultsBarComponent extends React.Component {
                             searchParams={this.props.searchParams}
                             activeTopic={this.props.activeTopic}
                             topicType={this.props.topicType}
-                            refresh={this.props.refresh}
                             navigations={this.props.navigations}
                             filterGroups={this.props.filterGroups}
-                            toggleNavigation={this.props.toggleNavigation}
-                            toggleAdvancedSearchField={this.props.toggleAdvancedSearchField}
-                            setQuery={this.props.setQuery}
-                            setAdvancedSearchKeywords={this.props.setAdvancedSearchKeywords}
-                            toggleFilter={this.props.toggleFilter}
-                            setCreatedFilter={this.props.setCreatedFilter}
-                            clearAdvancedSearchParams={this.props.clearAdvancedSearchParams}
+                            toggleNavigation={this.toggleNavigation}
+                            toggleAdvancedSearchField={this.toggleAdvancedSearchField}
+                            setQuery={this.setQuery}
+                            setAdvancedSearchKeywords={this.setAdvancedSearchKeywords}
+                            toggleFilter={this.toggleFilter}
+                            setCreatedFilter={this.setCreatedFilter}
+                            clearAdvancedSearchParams={this.clearAdvancedSearchParams}
                             deselectMyTopic={this.props.deselectMyTopic}
-                            resetFilter={this.props.resetFilter}
+                            resetFilter={this.resetFilter}
                         />
                     )}
 

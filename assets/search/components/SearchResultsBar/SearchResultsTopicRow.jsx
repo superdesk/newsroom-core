@@ -14,23 +14,24 @@ export function SearchResultsTopicRow({
     activeTopic,
     navigations,
     showSaveTopic,
+    showMyTopic,
     topicType,
     saveMyTopic,
     toggleNavigation,
-    refresh,
     deselectMyTopic,
 }) {
     const tags = [];
     const hasActiveTopic = get(activeTopic, '_id') != null;
 
-    if (hasActiveTopic) {
+    if (hasActiveTopic && showMyTopic) {
         tags.push(
             <Tag
                 key="tags-topics--topic"
-                testId="tags-topics--topic"
+                testId="tags-topics--my-topic"
                 text={activeTopic.label}
                 shade="inverse"
-                onClick={() => {
+                onClick={(event) => {
+                    event.preventDefault();
                     deselectMyTopic(activeTopic._id);
                 }}
             />
@@ -44,12 +45,12 @@ export function SearchResultsTopicRow({
             tags.push(
                 <Tag
                     key={`tags-topics--nav-${navId}`}
-                    testId={`tags-topics--nav-${navId}`}
+                    testId="tags-topic"
                     text={navigation.name}
                     shade="inverse"
-                    onClick={() => {
+                    onClick={(event) => {
+                        event.preventDefault();
                         toggleNavigation(navigation);
-                        refresh();
                     }}
                 />
             );
@@ -72,7 +73,8 @@ export function SearchResultsTopicRow({
                         <button
                             data-test-id="update-topic-btn"
                             className="nh-button nh-button--tertiary nh-button--small"
-                            onClick={() => {
+                            onClick={(event) => {
+                                event.preventDefault();
                                 saveMyTopic(Object.assign(
                                     {},
                                     activeTopic,
@@ -89,7 +91,8 @@ export function SearchResultsTopicRow({
                     <button
                         data-test-id="save-topic-btn"
                         className="nh-button nh-button--tertiary nh-button--small"
-                        onClick={() => {
+                        onClick={(event) => {
+                            event.preventDefault();
                             saveMyTopic(Object.assign(
                                 {},
                                 searchParams,
@@ -115,9 +118,9 @@ SearchResultsTopicRow.propTypes = {
     activeTopic: PropTypes.object,
     navigations: PropTypes.object,
     showSaveTopic: PropTypes.bool,
+    showMyTopic: PropTypes.bool,
     topicType: PropTypes.string,
     saveMyTopic: PropTypes.func,
     toggleNavigation: PropTypes.func.isRequired,
-    refresh: PropTypes.func.isRequired,
-    deselectMyTopic: PropTypes.func.isRequired,
+    deselectMyTopic: PropTypes.func,
 };

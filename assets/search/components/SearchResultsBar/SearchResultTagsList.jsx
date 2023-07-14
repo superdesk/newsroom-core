@@ -10,11 +10,11 @@ import {SearchResultsFiltersRow} from './SearchResultsFiltersRow';
 export function SearchResultTagsList({
     user,
     showSaveTopic,
+    showMyTopic,
     saveMyTopic,
     searchParams,
     activeTopic,
     topicType,
-    refresh,
     navigations,
     filterGroups,
     toggleNavigation,
@@ -38,22 +38,20 @@ export function SearchResultTagsList({
                 activeTopic={activeTopic}
                 navigations={navigations}
                 showSaveTopic={showSaveTopic}
+                showMyTopic={showMyTopic}
                 topicType={topicType}
                 saveMyTopic={saveMyTopic}
                 toggleNavigation={toggleNavigation}
-                refresh={refresh}
                 deselectMyTopic={deselectMyTopic}
             />
             <SearchResultsQueryRow
                 searchParams={searchParams}
                 setQuery={setQuery}
-                refresh={refresh}
             />
             <SearchResultsAdvancedSearchRow
                 searchParams={searchParams}
                 toggleAdvancedSearchField={toggleAdvancedSearchField}
                 setAdvancedSearchKeywords={setAdvancedSearchKeywords}
-                refresh={refresh}
                 clearAdvancedSearchParams={clearAdvancedSearchParams}
             />
             <SearchResultsFiltersRow
@@ -62,7 +60,6 @@ export function SearchResultTagsList({
                 toggleFilter={toggleFilter}
                 setCreatedFilter={setCreatedFilter}
                 resetFilter={resetFilter}
-                refresh={refresh}
             />
         </ul>
     );
@@ -71,13 +68,12 @@ export function SearchResultTagsList({
 SearchResultTagsList.propTypes = {
     user: PropTypes.object,
     showSaveTopic: PropTypes.bool,
+    showMyTopic: PropTypes.bool,
 
     saveMyTopic: PropTypes.func,
     searchParams: PropTypes.object,
     activeTopic: PropTypes.object,
     topicType: PropTypes.string,
-
-    refresh: PropTypes.func,
 
     navigations: PropTypes.object,
     filterGroups: PropTypes.object,
@@ -89,10 +85,12 @@ SearchResultTagsList.propTypes = {
     toggleFilter: PropTypes.func.isRequired,
     setCreatedFilter: PropTypes.func.isRequired,
     clearAdvancedSearchParams: PropTypes.func.isRequired,
-    deselectMyTopic: PropTypes.func.isRequired,
+
+    deselectMyTopic: PropTypes.func,  // required if `showMyTopic === true`
     resetFilter: PropTypes.func.isRequired,
 };
 
 SearchResultTagsList.defaultProps = {
     showSaveTopic: false,
+    showMyTopic: true,
 };

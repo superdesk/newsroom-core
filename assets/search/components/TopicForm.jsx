@@ -11,21 +11,42 @@ import {ToolTip} from 'ui/components/ToolTip';
 import {Dropdown} from 'components/Dropdown';
 import {FormSection} from 'components/FormSection';
 
-import TopicParameters from './TopicParameters';
+import {SearchResultTagsList} from './SearchResultsBar/SearchResultTagsList';
 
 const TOPIC_NAME_MAXLENGTH = 30;
 
 const getFolderName = (topic, folders) => {
-    const folder = topic.folder ? folders.find((folder) => folder._id == topic.folder) : null;
+    const folder = topic.folder ? folders.find((folder) => folder._id === topic.folder) : null;
 
     return folder ? folder.name : gettext('Add to folder');
 };
 
-const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubscribeChanged, readOnly, folders, onFolderChange}) => (
+const TopicForm = ({
+    original,
+    topic,
+    save,
+    onChange,
+    globalTopicsEnabled,
+    onSubscribeChanged,
+    readOnly,
+    folders,
+    onFolderChange,
+    user,
+    navigations,
+    filterGroups,
+    toggleNavigation,
+    clearSearchQuery,
+    toggleAdvancedSearchField,
+    setAdvancedSearchKeywords,
+    clearAdvancedSearchParams,
+    toggleFilter,
+    setCreatedFilter,
+    resetFilter,
+}) => (
     <form onSubmit={save}>
         <div className="nh-flex-container list-item__preview-form pt-0">
             <div className="nh-flex__row">
-                <div className="nh-flex__column">
+                <div className="nh-flex__column" data-test-id="topic-form-group--details">
                     <TextInput
                         name="name"
                         label={gettext('Name')}
@@ -61,7 +82,7 @@ const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubs
             </div>
             <div className="nh-flex__row">
                 {original._id == null ? null : (
-                    <FormSection name={gettext('Email Notifications:')}>
+                    <FormSection name={gettext('Email Notifications:')} testId="topic-form-group--notifications">
                         <div className="form-group">
                             <div className="field">
                                 <ToolTip>
@@ -85,7 +106,7 @@ const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubs
                         </div>
                     </FormSection>
                 )}
-                <FormSection name={gettext('Organize your Topic')}>
+                <FormSection name={gettext('Organize your Topic')} testId="topic-form-group--folder">
                     <div className="nh-container nh-container--direction-row mb-3 pt-2 pb-3">
                         <Dropdown
                             small={true}
@@ -95,15 +116,18 @@ const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubs
                         >
                             {topic.folder && (
                                 <button
-                                    key={'top'}
+                                    key="top"
                                     type="button"
+                                    data-test-id="dropdown-item--remove-from-folder"
                                     className='dropdown-item'
                                     onClick={() => onFolderChange(null)}
                                 >{gettext('Remove from folder')}</button>
                             )}
                             {folders.map((folder) => (
-                                <button key={folder._id}
+                                <button
+                                    key={folder._id}
                                     type="button"
+                                    data-test-id={`dropdown-item--${folder.name}`}
                                     className="dropdown-item"
                                     onClick={() => onFolderChange(folder)}
                                 >
@@ -115,9 +139,24 @@ const TopicForm = ({original, topic, save, onChange, globalTopicsEnabled, onSubs
                 </FormSection>
             </div>
             <div className="nh-flex__row">
-                <FormSection name={gettext('Topic details')}>
-                    <TopicParameters
-                        topic={topic}
+                <FormSection name={gettext('Topic details')} testId="topic-form-group--params">
+                    <SearchResultTagsList
+                        user={user}
+                        showSaveTopic={false}
+                        showMyTopic={false}
+                        searchParams={topic}
+                        activeTopic={topic}
+                        topicType={topic.topic_type}
+                        navigations={navigations}
+                        filterGroups={filterGroups}
+                        toggleNavigation={toggleNavigation}
+                        setQuery={clearSearchQuery}
+                        toggleAdvancedSearchField={toggleAdvancedSearchField}
+                        setAdvancedSearchKeywords={setAdvancedSearchKeywords}
+                        clearAdvancedSearchParams={clearAdvancedSearchParams}
+                        toggleFilter={toggleFilter}
+                        setCreatedFilter={setCreatedFilter}
+                        resetFilter={resetFilter}
                     />
                 </FormSection>
             </div>
@@ -135,6 +174,19 @@ TopicForm.propTypes = {
     readOnly: PropTypes.bool,
     folders: PropTypes.array,
     onFolderChange: PropTypes.func,
+
+    user: PropTypes.object,
+    navigations: PropTypes.object,
+    filterGroups: PropTypes.object,
+
+    toggleNavigation: PropTypes.func,
+    clearSearchQuery: PropTypes.func,
+    toggleAdvancedSearchField: PropTypes.func,
+    setAdvancedSearchKeywords: PropTypes.func,
+    clearAdvancedSearchParams: PropTypes.func,
+    toggleFilter: PropTypes.func,
+    setCreatedFilter: PropTypes.func,
+    resetFilter: PropTypes.func,
 };
 
 export default TopicForm;
