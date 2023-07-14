@@ -48,7 +48,8 @@ SECRET_KEY=newsroom
 * `cd server`
 * create virtual environment `python3 -m venv env`
 * activate virtual environment `source env/bin/activate`
-* install pyhon dependencies - `pip install -r dev-requirements.txt`
+* install python dependencies - `pip install -r dev-requirements.txt`
+* link local server - `pip install -Ue <path-to-newsroom-core>`
 * create a user - `python manage.py create_user admin@localhost.com admin John Doe true`
 * `python manage.py elastic_init`
 * start server - `honcho start -p 5050`
