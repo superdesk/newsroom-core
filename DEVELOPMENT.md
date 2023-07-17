@@ -2,7 +2,7 @@
 
 ## Repositories
 
-Use `develop` branch of `newsroom-core` repository and `master` branch of `superdesk-app`.
+Use `develop` branches of `newsroom-core` and `newsroom-app` repositories.
 
 ## Install dependencies
 
@@ -44,15 +44,25 @@ SECRET_KEY=newsroom
 
 ## Starting local server
 * navigate to `newsroom-app`
-* make sure you're on `master` branch
 * `cd server`
 * create virtual environment `python3 -m venv env`
 * activate virtual environment `source env/bin/activate`
 * install python dependencies - `pip install -r dev-requirements.txt`
 * link local server - `pip install -Ue <path-to-newsroom-core>`
-* create a user - `python manage.py create_user admin@localhost.com admin John Doe true`
+* prepare system including elastic `python manage.py initialize_data`
+* create a user - `python manage.py create_user admin@example.com admin John Doe true`
 * `python manage.py elastic_init`
 * start server - `honcho start -p 5050`
+
+## Updating local server after pulling new code via git
+
+After fetching latest code run the following commands:
+
+* `python manage.py data_upgrade`
+* `python manage.py schema_migrate || true `
+
+It will run database migrations when needed.
+
 
 ## Setup Superdesk to publish news items to Newshub
 
@@ -65,6 +75,8 @@ SECRET_KEY=newsroom
 * Set "Format" to "Newsroom NINJS"
 * Set "Delivery type" to "HTTP Push"
 * Set "Resource URL" to "http://localhost:5050/push"
+* Set "Assets URL" to "http://localhost:5050/push_binary"
+* Set "Secret token" to "newsroom"
 * Save destination
 * Save subscriber
 
