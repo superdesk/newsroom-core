@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
 import {gettext} from 'utils';
+import {getAdvancedSearchFields} from '../utils';
 import {advancedSearchParamsSelector} from '../selectors';
 import {toggleAdvancedSearchField, setAdvancedSearchKeywords, clearAdvancedSearchParams} from '../actions';
 
@@ -16,7 +17,8 @@ function AdvancedSearchPanelComponent({
     toggleSearchTipsPanel,
     toggleField,
     setKeywords,
-    clearParams
+    clearParams,
+    availableFields,
 }) {
     return (
         <div className="advanced-search__wrapper" data-test-id="advanced-search-panel">
@@ -110,24 +112,46 @@ function AdvancedSearchPanelComponent({
                     <div className="advanced-search__content-bottom">
                         <p>{gettext('Apply these keyword rules to at least one of these search fields:')}</p>
                         <InputWrapper>
-                            <CheckboxInput
-                                name="headline"
-                                label={gettext('Headline')}
-                                onChange={() => toggleField('headline')}
-                                value={params.fields.includes('headline')}
-                            />
-                            <CheckboxInput
-                                name="slugline"
-                                label={gettext('Slugline')}
-                                onChange={() => toggleField('slugline')}
-                                value={params.fields.includes('slugline')}
-                            />
-                            <CheckboxInput
-                                name="body_html"
-                                label={gettext('Body')}
-                                onChange={() => toggleField('body_html')}
-                                value={params.fields.includes('body_html')}
-                            />
+                            {!availableFields.includes('name') ? null : (
+                                <CheckboxInput
+                                    name="name"
+                                    label={gettext('Name')}
+                                    onChange={() => toggleField('name')}
+                                    value={params.fields.includes('name')}
+                                />
+                            )}
+                            {!availableFields.includes('headline') ? null : (
+                                <CheckboxInput
+                                    name="headline"
+                                    label={gettext('Headline')}
+                                    onChange={() => toggleField('headline')}
+                                    value={params.fields.includes('headline')}
+                                />
+                            )}
+                            {!availableFields.includes('slugline') ? null : (
+                                <CheckboxInput
+                                    name="slugline"
+                                    label={gettext('Slugline')}
+                                    onChange={() => toggleField('slugline')}
+                                    value={params.fields.includes('slugline')}
+                                />
+                            )}
+                            {!availableFields.includes('description') ? null : (
+                                <CheckboxInput
+                                    name="description"
+                                    label={gettext('Description')}
+                                    onChange={() => toggleField('description')}
+                                    value={params.fields.includes('description')}
+                                />
+                            )}
+                            {!availableFields.includes('body_html') ? null : (
+                                <CheckboxInput
+                                    name="body_html"
+                                    label={gettext('Body')}
+                                    onChange={() => toggleField('body_html')}
+                                    value={params.fields.includes('body_html')}
+                                />
+                            )}
                         </InputWrapper>
                     </div>
                 </div>
@@ -170,10 +194,12 @@ AdvancedSearchPanelComponent.propTypes = {
     toggleField: PropTypes.func,
     setKeywords: PropTypes.func,
     clearParams: PropTypes.func,
+    availableFields: PropTypes.arrayOf(PropTypes.string),
 };
 
 const mapStateToProps = (state) => ({
     params: advancedSearchParamsSelector(state),
+    availableFields: getAdvancedSearchFields(state.context),
 });
 
 const mapDispatchToProps = (dispatch) => ({

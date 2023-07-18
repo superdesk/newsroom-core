@@ -50,8 +50,6 @@ import ShareItemModal from 'components/ShareItemModal';
 import getItemActions from '../item-actions';
 import BookmarkTabs from 'components/BookmarkTabs';
 import ItemStatisticsModal from './ItemStatisticsModal';
-import {AdvancedSearchPanel} from 'search/components/AdvancedSearchPanel';
-import {SearchTipsPanel} from 'search/components/SearchTipsPanel';
 
 import {SearchResultsBar} from 'search/components/SearchResultsBar';
 
@@ -79,49 +77,6 @@ class WireApp extends BaseApp {
             let navTab = this.tabs.find((t) => t.id === 'nav');
             navTab.label = gettext('{{monitoring}} Profiles', sectionNames);
         }
-
-        this.state.initialLoad = this.props.isLoading;
-
-        this.toggleAdvancedSearchPanel = this.toggleAdvancedSearchPanel.bind(this);
-        this.state.isAdvancedSearchShown = false;
-
-        this.toggleSearchTipsPanel = this.toggleSearchTipsPanel.bind(this);
-        this.state.isSearchTipsShown = false;
-    }
-
-    toggleAdvancedSearchPanel() {
-        this.setState((prevState) => ({isAdvancedSearchShown: !prevState.isAdvancedSearchShown}));
-    }
-
-    toggleSearchTipsPanel() {
-        this.setState((prevState) => ({isSearchTipsShown: !prevState.isSearchTipsShown}));
-    }
-
-    render() {
-        if (this.state.initialLoad){
-            return this.renderLoader();
-        }
-
-        return (
-            <React.Fragment>
-                <div className="content">
-                    {this.renderPageContent()}
-                </div>
-                {!this.state.isAdvancedSearchShown ? null : (
-                    <AdvancedSearchPanel
-                        fetchItems={this.props.fetchItems}
-                        toggleAdvancedSearchPanel={this.toggleAdvancedSearchPanel}
-                        toggleSearchTipsPanel={this.toggleSearchTipsPanel}
-                    />
-                )}
-                {!this.state.isSearchTipsShown ? null : (
-                    <SearchTipsPanel
-                        toggleSearchTipsPanel={this.toggleSearchTipsPanel}
-                        defaultTab={this.state.isAdvancedSearchShown ? 'advanced' : 'regular'}
-                    />
-                )}
-            </React.Fragment>
-        );
     }
 
     renderPageContent() {
@@ -208,27 +163,33 @@ class WireApp extends BaseApp {
                         actions={this.props.actions}
                     />
                     <nav className="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
-                        {this.state.withSidebar && <button
-                            className='content-bar__menu content-bar__menu--nav--open'
-                            ref={this.setOpenRef}
-                            title={gettext('Close filter panel')}
-                            aria-label={gettext('Close filter panel')}
-                            onClick={this.toggleSidebar}>
-                            <i className="icon--close-thin" />
-                        </button>}
+                        {this.state.withSidebar && (
+                            <button
+                                className="content-bar__menu content-bar__menu--nav--open"
+                                ref={this.setOpenRef}
+                                title={gettext('Close filter panel')}
+                                aria-label={gettext('Close filter panel')}
+                                onClick={this.toggleSidebar}
+                            >
+                                <i className="icon--close-thin" />
+                            </button>
+                        )}
 
                         {this.props.bookmarks &&
                             <BookmarkTabs active={this.props.context} sections={this.props.userSections}/>
                         }
 
-                        {!this.state.withSidebar && !this.props.bookmarks && <button
-                            className="content-bar__menu content-bar__menu--nav"
-                            ref={this.setCloseRef}
-                            title={gettext('Open filter panel')}
-                            aria-label={gettext('Open filter panel')}
-                            onClick={this.toggleSidebar}>
-                            <i className="icon--hamburger" />
-                        </button>}
+                        {!this.state.withSidebar && !this.props.bookmarks && (
+                            <button
+                                className="content-bar__menu content-bar__menu--nav"
+                                ref={this.setCloseRef}
+                                title={gettext('Open filter panel')}
+                                aria-label={gettext('Open filter panel')}
+                                onClick={this.toggleSidebar}
+                            >
+                                <i className="icon--hamburger" />
+                            </button>
+                        )}
 
                         <SearchBar
                             fetchItems={this.props.fetchItems}
