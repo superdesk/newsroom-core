@@ -47,7 +47,7 @@ export function getAdvancedSearchFields(context) {
     const config = getConfig('advanced_search', {
         fields: {
             wire: ['headline', 'slugline', 'body_html'],
-            agenda: ['name', 'headling', 'slugline', 'description'],
+            agenda: ['name', 'headline', 'slugline', 'description'],
         },
     });
 
