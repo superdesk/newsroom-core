@@ -535,9 +535,15 @@ class BaseSearchService(Service):
             selected_field = advanced_search.get("fields") or []
             if not selected_field:
                 elastic_highlight_query["fields"] = {
+                    # wire
                     "body_html": field_settings,
                     "headline": field_settings,
                     "slugline": field_settings,
+                    # Agenda
+                    "description_text": field_settings,
+                    "definition_short": field_settings,
+                    "name": field_settings,
+                    "definition_long": field_settings,
                 }
             else:
                 elastic_highlight_query["fields"] = {field: field_settings for field in selected_field}
