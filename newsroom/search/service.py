@@ -8,7 +8,6 @@ from eve.utils import ParsedRequest
 from werkzeug.exceptions import Forbidden
 
 from superdesk import get_resource_service
-from superdesk.metadata.utils import get_elastic_highlight_query
 from superdesk.default_settings import strtobool as _strtobool
 from content_api.errors import BadParameterValueError
 
