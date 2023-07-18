@@ -333,6 +333,12 @@ CLIENT_CONFIG = {
             "agenda": False,
         },
     },
+    "advanced_search": {
+        "fields": {
+            "wire": ["headline", "slugline", "body_html"],
+            "agenda": ["name", "headline", "slugline", "description"],
+        },
+    },
 }
 
 # Enable iframely support for item body_html
