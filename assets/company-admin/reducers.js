@@ -19,7 +19,7 @@ const initialState = {
     sort: null,
     sortDirection: 1,
     modal: modalReducer(),
-    search: searchReducer(),
+    search: searchReducer(undefined, undefined, 'settings'),
 
     userToEdit: null,
     errors: null,

@@ -17,7 +17,7 @@ const initialState = {
     clientsById: {},
     totalClients: null,
     activeQuery: null,
-    search: searchReducer(),
+    search: searchReducer(undefined, undefined, 'settings'),
 };
 
 function setupClients(clientList, state) {
@@ -99,7 +99,7 @@ export default function clientReducer(state = initialState, action) {
     }
 
     default: {
-        const search = searchReducer(state.search, action);
+        const search = searchReducer(state.search, action, 'settings');
 
         if (search !== state.search) {
             return {...state, search};
