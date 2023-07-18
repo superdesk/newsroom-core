@@ -19,12 +19,20 @@ import {AGENDA_DATE_FORMAT_LONG, AGENDA_DATE_FORMAT_SHORT} from '../../utils';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
+const EMPTY_ARRAY = [];
+const EMPTY_OBJECT = {};
+
+const itemIdsSelector = (state) => state.items || EMPTY_ARRAY;
+const itemsByIdSelector = (state) => state.itemsById || EMPTY_OBJECT;
 
 
-const itemsSelector = (state) => state.items.map((_id) => state.itemsById[_id]);
+const itemsSelector = createSelector(
+    [itemIdsSelector, itemsByIdSelector],
+    (ids, items) => ids.map((itemId) => items[itemId])
+);
+
 const activeDateSelector = (state) => get(state, 'agenda.activeDate');
 const activeGroupingSelector = (state) => get(state, 'agenda.activeGrouping');
-const itemsByIdSelector = (state) => get(state, 'itemsById', {});
 const featuredOnlySelector = (state) => get(state, 'agenda.featuredOnly', false);
 
 const groupedItemsSelector = createSelector(
@@ -192,12 +200,6 @@ class AgendaList extends React.Component {
           !isEqual(nextProps.activeNavigation, this.props.activeNavigation) ||
           (!nextProps.searchInitiated && this.props.searchInitiated)) {
             this.elem.scrollTop = 0;
-        }
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (!nextProps.groupedItems) {
-            return;
         }
     }
 
