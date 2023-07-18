@@ -256,6 +256,8 @@ function search(state, next) {
         timezone_offset: getTimezoneOffset(),
         featured: featuredFilter,
         itemType: itemTypeFilter,
+        advanced: !searchParams.advanced ? null : encodeURIComponent(JSON.stringify(searchParams.advanced)),
+        es_highlight: !searchParams.query && !searchParams.advancedSearch ? null : 1,
     };
 
     const queryString = Object.keys(params)

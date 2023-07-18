@@ -1,4 +1,5 @@
 import {get} from 'lodash';
+import {getConfig} from 'utils';
 
 export const noNavigationSelected = (activeNavigation) => (
     get(activeNavigation, 'length', 0) < 1
@@ -41,3 +42,14 @@ export const getSingleFilterValue = (activeFilter, fields) => {
 
     return null;
 };
+
+export function getAdvancedSearchFields(context) {
+    const config = getConfig('advanced_search', {
+        fields: {
+            wire: ['headline', 'slugline', 'body_html'],
+            agenda: ['name', 'headline', 'slugline', 'description'],
+        },
+    });
+
+    return (config.fields || {})[context];
+}

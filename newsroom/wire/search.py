@@ -89,7 +89,6 @@ def items_query(ignore_latest=False):
 
 class WireSearchService(BaseSearchService):
     section = "wire"
-    default_advanced_search_fields = ["headline", "slugline", "body_html"]
 
     def get_bookmarks_count(self, user_id):
         req = ParsedRequest()

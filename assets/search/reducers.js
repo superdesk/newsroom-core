@@ -1,5 +1,7 @@
-import {toggleValue} from 'utils';
 import {get} from 'lodash';
+
+import {toggleValue} from 'utils';
+import {getAdvancedSearchFields} from './utils';
 
 import {
     SET_VIEW,
@@ -24,8 +26,6 @@ import {
 
 import {EXTENDED_VIEW} from 'wire/defaults';
 
-const ADVANCED_FIELDS = ['headline', 'slugline', 'body_html'];
-
 const INITIAL_STATE = {
     activeTopic: null,
     activeNavigation: [],
@@ -43,12 +43,14 @@ const INITIAL_STATE = {
         all: '',
         any: '',
         exclude: '',
-        fields: ADVANCED_FIELDS,
+        fields: [],
     },
 };
 
-export function searchReducer(state=INITIAL_STATE, action) {
+export function searchReducer(state=INITIAL_STATE, action, context) {
     if (!action) {
+        state.advanced.fields = getAdvancedSearchFields(context);
+
         return state;
     }
 
@@ -159,7 +161,7 @@ export function searchReducer(state=INITIAL_STATE, action) {
                 all: '',
                 any: '',
                 exclude: '',
-                fields: ADVANCED_FIELDS,
+                fields: getAdvancedSearchFields(context),
             },
         };
 
@@ -190,7 +192,7 @@ export function searchReducer(state=INITIAL_STATE, action) {
                 all: '',
                 any: '',
                 exclude: '',
-                fields: ADVANCED_FIELDS,
+                fields: getAdvancedSearchFields(context),
             },
         };
 
@@ -201,7 +203,7 @@ export function searchReducer(state=INITIAL_STATE, action) {
                 all: action.payload.all || '',
                 any: action.payload.any || '',
                 exclude: action.payload.exclude || '',
-                fields: action.payload.fields || ADVANCED_FIELDS,
+                fields: action.payload.fields || getAdvancedSearchFields(context),
             },
         };
 

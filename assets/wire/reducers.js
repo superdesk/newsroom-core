@@ -42,7 +42,7 @@ const initialState = {
     wire: {
         newsOnly: false,
     },
-    search: searchReducer(),
+    search: searchReducer(undefined, undefined, 'wire'),
     userSections: {},
     uiConfig: {},
     groups: [],

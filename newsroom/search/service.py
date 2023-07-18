@@ -13,7 +13,12 @@ from superdesk.default_settings import strtobool as _strtobool
 from content_api.errors import BadParameterValueError
 
 from newsroom import Service
-from newsroom.search.config import SearchGroupNestedConfig, get_nested_config, is_search_field_nested
+from newsroom.search.config import (
+    SearchGroupNestedConfig,
+    get_nested_config,
+    is_search_field_nested,
+    get_advanced_search_fields,
+)
 from newsroom.products.products import (
     get_products_by_navigation,
     get_products_by_company,
@@ -112,7 +117,6 @@ class BaseSearchService(Service):
     default_sort = [{"versioncreated": "desc"}]
     default_page_size = 25
     _matched_ids = []  # array of IDs matched on the request, used when searching all versions
-    default_advanced_search_fields = []
 
     def get(self, req, lookup):
         search = SearchQuery()
@@ -531,9 +535,15 @@ class BaseSearchService(Service):
             selected_field = advanced_search.get("fields") or []
             if not selected_field:
                 elastic_highlight_query["fields"] = {
+                    # wire
                     "body_html": field_settings,
                     "headline": field_settings,
                     "slugline": field_settings,
+                    # Agenda
+                    "description_text": field_settings,
+                    "definition_short": field_settings,
+                    "name": field_settings,
+                    "definition_long": field_settings,
                 }
             else:
                 elastic_highlight_query["fields"] = {field: field_settings for field in selected_field}
@@ -692,6 +702,9 @@ class BaseSearchService(Service):
             if search.args.get("created_from") or search.args.get("created_to"):
                 search.source["post_filter"]["bool"]["filter"].append(self.versioncreated_range(search.args))
 
+    def get_advanced_search_fields(self, search: SearchQuery) -> List[str]:
+        return search.advanced.get("fields") or get_advanced_search_fields(self.section)
+
     def apply_request_advanced_search(self, search: SearchQuery):
         if not search.args.get("advanced"):
             return
@@ -701,7 +714,7 @@ class BaseSearchService(Service):
         else:
             search.advanced = search.args["advanced"]
 
-        fields = search.advanced.get("fields") or self.default_advanced_search_fields
+        fields = self.get_advanced_search_fields(search)
         if not fields:
             return
 

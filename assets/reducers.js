@@ -370,7 +370,7 @@ export function defaultReducer(state={}, action) {
         return {...state, savedItemsCount: action.count};
 
     default: {
-        const search = searchReducer(state.search, action);
+        const search = searchReducer(state.search, action, state.context);
 
         if (search !== state.search) {
             return {...state, search};
