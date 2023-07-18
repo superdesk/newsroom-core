@@ -514,37 +514,45 @@ class BaseSearchService(Service):
     def prefill_search_highlights(self, search, req):
         query_string = search.args.get("q")
         query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
-        advanced_search = json.loads(search.args.get("advanced")) if search.args.get("advanced") else {}
+        advanced_search = json.loads(search.args.get("advanced", "{}"))
 
-        field_settings = {"number_of_fragments": 0}
         if app.data.elastic.should_highlight(req) and (
             query_string or advanced_search.get("all") or advanced_search.get("any")
         ):
-            elastic_highlight_query = get_elastic_highlight_query(
-                query_string={
-                    "query": query_string,
-                    "default_operator": "AND",
-                    "analyze_wildcard": query_string_settings["analyze_wildcard"],
-                    "lenient": True,
-                },
-            )
-            selected_field = advanced_search.get("fields") or []
-            if not selected_field:
-                elastic_highlight_query["fields"] = {
-                    # wire
-                    "body_html": field_settings,
-                    "headline": field_settings,
-                    "slugline": field_settings,
-                    # Agenda
-                    "description_text": field_settings,
-                    "definition_short": field_settings,
-                    "name": field_settings,
-                    "definition_long": field_settings,
-                }
-            else:
-                elastic_highlight_query["fields"] = {field: field_settings for field in selected_field}
+            selected_field = advanced_search.get("fields", [])
 
-            search.highlight = elastic_highlight_query
+            search.source.setdefault("highlight", {})
+            search.source["highlight"].setdefault("fields", {})
+
+            fields_to_highlight = (
+                selected_field
+                if selected_field
+                else [
+                    "body_html",
+                    "headline",
+                    "slugline",
+                    "description_text",
+                    "definition_short",
+                    "name",
+                    "definition_long",
+                ]
+            )
+            for field in fields_to_highlight:
+                search.source["highlight"]["fields"][field] = {
+                    "number_of_fragments": 0,
+                    "highlight_query": {
+                        "query_string": {
+                            "query": query_string or advanced_search.get("all") or advanced_search.get("any"),
+                            "default_operator": "AND",
+                            "analyze_wildcard": query_string_settings["analyze_wildcard"],
+                            "lenient": True,
+                        }
+                    },
+                }
+
+            search.source["highlight"]["pre_tags"] = ["<span class='es-highlight'>"]
+            search.source["highlight"]["post_tags"] = ["</span>"]
+            search.source["highlight"]["require_field_match"] = False
 
     def validate_request(self, search):
         """Validate the request parameters
