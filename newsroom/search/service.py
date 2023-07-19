@@ -511,21 +511,33 @@ class BaseSearchService(Service):
             )
 
     def prefill_search_highlights(self, search, req):
-        query_string = search.args.get("q")
-        query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
+        query = search.args.get("q")
         advanced_search = json.loads(search.args.get("advanced", "{}"))
 
         if app.data.elastic.should_highlight(req) and (
-            query_string or advanced_search.get("all") or advanced_search.get("any")
+            query or advanced_search.get("all") or advanced_search.get("any")
         ):
-            selected_field = advanced_search.get("fields", [])
+            selected_fields = advanced_search.get("fields", [])
+
+            should_queries = []
+            if query:
+                should_queries.append(query_string(query))
+            all_query = advanced_search.get("all")
+            if all_query:
+                should_queries.append(query_string(all_query))
+            any_query = advanced_search.get("any")
+            if any_query:
+                should_queries.append(query_string(any_query))
+
+            search.query.setdefault("bool", {})
+            search.query["bool"]["should"] = should_queries
 
             search.source.setdefault("highlight", {})
             search.source["highlight"].setdefault("fields", {})
 
             fields_to_highlight = (
-                selected_field
-                if selected_field
+                selected_fields
+                if selected_fields
                 else [
                     "body_html",
                     "headline",
@@ -536,17 +548,11 @@ class BaseSearchService(Service):
                     "definition_long",
                 ]
             )
+
             for field in fields_to_highlight:
                 search.source["highlight"]["fields"][field] = {
                     "number_of_fragments": 0,
-                    "highlight_query": {
-                        "query_string": {
-                            "query": query_string or advanced_search.get("all") or advanced_search.get("any"),
-                            "default_operator": "AND",
-                            "analyze_wildcard": query_string_settings["analyze_wildcard"],
-                            "lenient": True,
-                        }
-                    },
+                    "highlight_query": {"bool": {"should": should_queries}},
                 }
 
             search.source["highlight"]["pre_tags"] = ["<span class='es-highlight'>"]
