@@ -27,12 +27,21 @@ Use `develop` branches of `newsroom-core` and `newsroom-app` repositories.
 * `npm link newsroom-core`
 * `npm start`
 
-## Starting required services via docker (redis, mongo, elastic)
+## Start server
+
+### Run server via docker (if you only do client development)
+* navigate to `newsroom-app`
+* `cd server`
+* `docker-compose up server`
+
+### Running the server in dev mode (if you need to do backend changes)
+
+#### Starting required services via docker (redis, mongo, elastic)
 * navigate to `newsroom-app`
 * `cd server`
 * `sudo docker-compose up redis mongo elastic`
 
-## Create .env file
+#### Create .env file
 * navigate to `newsroom-app/server`
 * create .env file with the following contents:
 
@@ -42,7 +51,7 @@ WEBPACK_SERVER_URL=http://localhost:8080
 SECRET_KEY=newsroom
 ```
 
-## Starting local server
+#### Starting local server
 * navigate to `newsroom-app`
 * `cd server`
 * create virtual environment `python3 -m venv env`
@@ -54,7 +63,7 @@ SECRET_KEY=newsroom
 * `python manage.py elastic_init`
 * start server - `honcho start -p 5050`
 
-## Updating local server after pulling new code via git
+#### Updating local server after pulling new code via git
 
 After fetching latest code run the following commands:
 
