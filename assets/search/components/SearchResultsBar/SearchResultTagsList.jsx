@@ -17,6 +17,7 @@ export function SearchResultTagsList({
     refresh,
     navigations,
     filterGroups,
+    availableFields,
     toggleNavigation,
     toggleAdvancedSearchField,
     setQuery,
@@ -51,6 +52,7 @@ export function SearchResultTagsList({
             />
             <SearchResultsAdvancedSearchRow
                 searchParams={searchParams}
+                availableFields={availableFields}
                 toggleAdvancedSearchField={toggleAdvancedSearchField}
                 setAdvancedSearchKeywords={setAdvancedSearchKeywords}
                 refresh={refresh}
@@ -81,6 +83,7 @@ SearchResultTagsList.propTypes = {
 
     navigations: PropTypes.object,
     filterGroups: PropTypes.object,
+    availableFields: PropTypes.arrayOf(PropTypes.string),
 
     toggleNavigation: PropTypes.func.isRequired,
     toggleAdvancedSearchField: PropTypes.func.isRequired,

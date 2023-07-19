@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 
 import {gettext} from 'utils';
 import {searchParamsSelector, navigationsByIdSelector, filterGroupsByIdSelector} from '../../selectors';
+import {getAdvancedSearchFields} from '../../utils';
 import {
     toggleNavigation,
     toggleAdvancedSearchField,
@@ -93,6 +94,7 @@ class SearchResultsBarComponent extends React.Component {
                             refresh={this.props.refresh}
                             navigations={this.props.navigations}
                             filterGroups={this.props.filterGroups}
+                            availableFields={this.props.availableFields}
                             toggleNavigation={this.props.toggleNavigation}
                             toggleAdvancedSearchField={this.props.toggleAdvancedSearchField}
                             setQuery={this.props.setQuery}
@@ -144,6 +146,7 @@ SearchResultsBarComponent.propTypes = {
 
     navigations: PropTypes.object,
     filterGroups: PropTypes.object,
+    availableFields: PropTypes.arrayOf(PropTypes.string),
 
     toggleNavigation: PropTypes.func.isRequired,
     toggleAdvancedSearchField: PropTypes.func.isRequired,
@@ -171,6 +174,7 @@ const mapStateToProps = (state) => ({
     searchParams: searchParamsSelector(state),
     navigations: navigationsByIdSelector(state),
     filterGroups: filterGroupsByIdSelector(state),
+    availableFields: getAdvancedSearchFields(state.context),
 });
 
 const mapDispatchToProps = {
