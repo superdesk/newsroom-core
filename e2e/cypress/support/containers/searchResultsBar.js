@@ -13,7 +13,7 @@ export class SearchResultsBar {
     }
 
     expectAdvancedFields(enabledFields) {
-        ['headline', 'slugline', 'body'].forEach((field) => {
+        ['headline', 'slugline', 'body_html'].forEach((field) => {
             this
                 .getSearchResultElement('advanced-fields', `[data-test-id="toggle-${field}-button"]`)
                 .should(enabledFields.includes(field) ? 'have.class' : 'not.have.class', 'toggle-button--active');

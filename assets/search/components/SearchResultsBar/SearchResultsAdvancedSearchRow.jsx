@@ -15,7 +15,14 @@ function splitTermKeywords(keywordText) {
         trimmedKeywordText.split(' ');
 }
 
-export function SearchResultsAdvancedSearchRow({searchParams, toggleAdvancedSearchField, setAdvancedSearchKeywords, refresh, clearAdvancedSearchParams}) {
+export function SearchResultsAdvancedSearchRow({
+    searchParams,
+    availableFields,
+    toggleAdvancedSearchField,
+    setAdvancedSearchKeywords,
+    refresh,
+    clearAdvancedSearchParams,
+}) {
     const advancedSearchParams = get(searchParams, 'advanced', {});
     const keywords = {
         all: splitTermKeywords(advancedSearchParams.all),
@@ -157,6 +164,13 @@ export function SearchResultsAdvancedSearchRow({searchParams, toggleAdvancedSear
             {gettext('Clear')}
         </button>
     );
+    const fieldNameToLabel = {
+        name: gettext('Name'),
+        headline: gettext('Headline'),
+        slugline: gettext('Slugline'),
+        description: gettext('Description'),
+        body_html: gettext('Body'),
+    };
 
     return (
         <React.Fragment>
@@ -170,45 +184,25 @@ export function SearchResultsAdvancedSearchRow({searchParams, toggleAdvancedSear
                 title={gettext('Fields searched')}
             >
                 <div className="toggle-button__group toggle-button__group--spaced toggle-button__group--loose">
-                    <button
-                        data-test-id="toggle-headline-button"
-                        className={classNames(
-                            'toggle-button toggle-button--no-txt-transform toggle-button--small',
-                            {'toggle-button--active': fields.includes('headline')}
-                        )}
-                        onClick={() => {
-                            toggleAdvancedSearchField('headline');
-                            refresh();
-                        }}
-                    >
-                        {gettext('Headline')}
-                    </button>
-                    <button
-                        data-test-id="toggle-slugline-button"
-                        className={classNames(
-                            'toggle-button toggle-button--no-txt-transform toggle-button--small',
-                            {'toggle-button--active': fields.includes('slugline')}
-                        )}
-                        onClick={() => {
-                            toggleAdvancedSearchField('slugline');
-                            refresh();
-                        }}
-                    >
-                        {gettext('Slugline')}
-                    </button>
-                    <button
-                        data-test-id="toggle-body-button"
-                        className={classNames(
-                            'toggle-button toggle-button--no-txt-transform toggle-button--small',
-                            {'toggle-button--active': fields.includes('body_html')}
-                        )}
-                        onClick={() => {
-                            toggleAdvancedSearchField('body_html');
-                            refresh();
-                        }}
-                    >
-                        {gettext('Body')}
-                    </button>
+                    {Object.keys(fieldNameToLabel)
+                        .filter((fieldName) => availableFields.includes(fieldName))
+                        .map((fieldName) => (
+                            <button
+                                key={fieldName}
+                                data-test-id={`toggle-${fieldName}-button`}
+                                className={classNames(
+                                    'toggle-button toggle-button--no-txt-transform toggle-button--small',
+                                    {'toggle-button--active': fields.includes(fieldName)}
+                                )}
+                                onClick={() => {
+                                    toggleAdvancedSearchField(fieldName);
+                                    refresh();
+                                }}
+                            >
+                                {fieldNameToLabel[fieldName]}
+                            </button>
+                        ))
+                    }
                 </div>
             </SearchResultTagList>
         </React.Fragment>
@@ -217,6 +211,7 @@ export function SearchResultsAdvancedSearchRow({searchParams, toggleAdvancedSear
 
 SearchResultsAdvancedSearchRow.propTypes = {
     searchParams: PropTypes.object,
+    availableFields: PropTypes.arrayOf(PropTypes.string),
     toggleAdvancedSearchField: PropTypes.func.isRequired,
     setAdvancedSearchKeywords: PropTypes.func.isRequired,
     refresh: PropTypes.func.isRequired,
