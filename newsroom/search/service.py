@@ -519,21 +519,21 @@ class BaseSearchService(Service):
         ):
             selected_fields = advanced_search.get("fields", [])
 
-            should_queries = []
-            if query:
-                should_queries.append(query_string(query))
-            all_query = advanced_search.get("all")
-            if all_query:
-                should_queries.append(query_string(all_query))
-            any_query = advanced_search.get("any")
-            if any_query:
-                should_queries.append(query_string(any_query))
+            # Create a separate search query object for highlighting settings
+            highlight_search = SearchQuery()
 
-            search.query.setdefault("bool", {})
-            search.query["bool"]["should"] = should_queries
+            # Call prefill_search_args with the request object
+            self.prefill_search_args(highlight_search, req)
 
-            search.source.setdefault("highlight", {})
-            search.source["highlight"].setdefault("fields", {})
+            # Set up the search query for filtering
+            self.apply_request_filter(highlight_search)
+
+            # Set up the search query for advanced search options
+            self.apply_request_advanced_search(highlight_search)
+
+            # Set up highlighting settings
+            highlight_search.source.setdefault("highlight", {})
+            highlight_search.source["highlight"].setdefault("fields", {})
 
             fields_to_highlight = (
                 selected_fields
@@ -550,14 +550,16 @@ class BaseSearchService(Service):
             )
 
             for field in fields_to_highlight:
-                search.source["highlight"]["fields"][field] = {
+                highlight_search.source["highlight"]["fields"][field] = {
                     "number_of_fragments": 0,
-                    "highlight_query": {"bool": {"should": should_queries}},
+                    "highlight_query": {"bool": {"filter": highlight_search.query["bool"]["filter"]}},
                 }
 
-            search.source["highlight"]["pre_tags"] = ['<span class="es-highlight">']
-            search.source["highlight"]["post_tags"] = ["</span>"]
-            search.source["highlight"]["require_field_match"] = False
+            highlight_search.source["highlight"]["pre_tags"] = ['<span class="es-highlight">']
+            highlight_search.source["highlight"]["post_tags"] = ["</span>"]
+            highlight_search.source["highlight"]["require_field_match"] = False
+
+            search.source.update(highlight_search.source)
 
     def validate_request(self, search):
         """Validate the request parameters
