@@ -555,7 +555,7 @@ class BaseSearchService(Service):
                     "highlight_query": {"bool": {"should": should_queries}},
                 }
 
-            search.source["highlight"]["pre_tags"] = ["<span class='es-highlight'>"]
+            search.source["highlight"]["pre_tags"] = ['<span class="es-highlight">']
             search.source["highlight"]["post_tags"] = ["</span>"]
             search.source["highlight"]["require_field_match"] = False
 
