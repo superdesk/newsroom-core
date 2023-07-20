@@ -1,4 +1,11 @@
 import {BaseForm} from './baseForm';
+import {SearchResultsBar} from '../containers/searchResultsBar';
+
+class TopicFormSearchParams extends SearchResultsBar {
+    getSearchResultElement(searchType, selector) {
+        return cy.get(`[data-test-id="user-topic-editor"] [data-test-id="search-results--${searchType}"] ${selector}`);
+    }
+}
 
 class UserTopicFormWrapper extends BaseForm {
     constructor() {
@@ -9,6 +16,7 @@ class UserTopicFormWrapper extends BaseForm {
             notifications: this.getCheckboxInput('[data-test-id="field-notifications"] input'),
             is_global: this.getCheckboxInput('[data-test-id="field-is_global"] input'),
         };
+        this.searchParams = new TopicFormSearchParams();
     }
 
     saveTopic(saveId = false) {
@@ -25,6 +33,20 @@ class UserTopicFormWrapper extends BaseForm {
 
     getNewlyCreatedTopicId(callback) {
         cy.get('@newTopicId').then(callback);
+    }
+
+    getFormGroup(name, additionalSelector) {
+        let selector = `[data-test-id="topic-form-group--${name}"]`;
+
+        if (additionalSelector != null) {
+            selector += ` ${additionalSelector}`;
+        }
+
+        return this.getFormElement(selector);
+    }
+
+    toggleFormGroup(name) {
+        this.getFormGroup(name, '[data-test-id="toggle-btn"]').click();
     }
 }
 

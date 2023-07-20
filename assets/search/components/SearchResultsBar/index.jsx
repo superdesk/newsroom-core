@@ -28,10 +28,58 @@ class SearchResultsBarComponent extends React.Component {
 
         this.state = {isTagSectionShown: false};
         this.toggleTagSection = this.toggleTagSection.bind(this);
+        this.toggleNavigation = this.toggleNavigation.bind(this);
+        this.setQuery = this.setQuery.bind(this);
+        this.setAdvancedSearchKeywords = this.setAdvancedSearchKeywords.bind(this);
+        this.toggleAdvancedSearchField = this.toggleAdvancedSearchField.bind(this);
+        this.clearAdvancedSearchParams = this.clearAdvancedSearchParams.bind(this);
+        this.setCreatedFilter = this.setCreatedFilter.bind(this);
+        this.toggleFilter = this.toggleFilter.bind(this);
+        this.resetFilter = this.resetFilter.bind(this);
     }
 
     toggleTagSection() {
         this.setState((prevState) => ({isTagSectionShown: !prevState.isTagSectionShown}));
+    }
+
+    toggleNavigation(navigation) {
+        this.props.toggleNavigation(navigation);
+        this.props.refresh();
+    }
+
+    setQuery(query) {
+        this.props.setQuery(query);
+        this.props.refresh();
+    }
+
+    setAdvancedSearchKeywords(field, keywords) {
+        this.props.setAdvancedSearchKeywords(field, keywords);
+        this.props.refresh();
+    }
+
+    toggleAdvancedSearchField(field) {
+        this.props.toggleAdvancedSearchField(field);
+        this.props.refresh();
+    }
+
+    clearAdvancedSearchParams() {
+        this.props.clearAdvancedSearchParams();
+        this.props.refresh();
+    }
+
+    setCreatedFilter(filter) {
+        this.props.setCreatedFilter(filter);
+        this.props.refresh();
+    }
+
+    toggleFilter(key, value, single) {
+        this.props.toggleFilter(key, value, single);
+        this.props.refresh();
+    }
+
+    resetFilter() {
+        this.props.resetFilter();
+        this.props.refresh();
     }
 
     render() {
@@ -91,7 +139,6 @@ class SearchResultsBarComponent extends React.Component {
                             searchParams={this.props.searchParams}
                             activeTopic={this.props.activeTopic}
                             topicType={this.props.topicType}
-                            refresh={this.props.refresh}
                             navigations={this.props.navigations}
                             filterGroups={this.props.filterGroups}
                             availableFields={this.props.availableFields}
@@ -103,7 +150,7 @@ class SearchResultsBarComponent extends React.Component {
                             setCreatedFilter={this.props.setCreatedFilter}
                             clearAdvancedSearchParams={this.props.clearAdvancedSearchParams}
                             deselectMyTopic={this.props.deselectMyTopic}
-                            resetFilter={this.props.resetFilter}
+                            resetFilter={this.resetFilter}
                         />
                     )}
 
@@ -146,7 +193,7 @@ SearchResultsBarComponent.propTypes = {
 
     navigations: PropTypes.object,
     filterGroups: PropTypes.object,
-    availableFields: PropTypes.arrayOf(PropTypes.string),
+    availableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
 
     toggleNavigation: PropTypes.func.isRequired,
     toggleAdvancedSearchField: PropTypes.func.isRequired,

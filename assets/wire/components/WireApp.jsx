@@ -169,6 +169,7 @@ class WireApp extends BaseApp {
                                 ref={this.setOpenRef}
                                 title={gettext('Close filter panel')}
                                 aria-label={gettext('Close filter panel')}
+                                data-test-id="toggle-filter-panel"
                                 onClick={this.toggleSidebar}
                             >
                                 <i className="icon--close-thin" />
@@ -185,6 +186,7 @@ class WireApp extends BaseApp {
                                 ref={this.setCloseRef}
                                 title={gettext('Open filter panel')}
                                 aria-label={gettext('Open filter panel')}
+                                data-test-id="toggle-filter-panel"
                                 onClick={this.toggleSidebar}
                             >
                                 <i className="icon--hamburger" />

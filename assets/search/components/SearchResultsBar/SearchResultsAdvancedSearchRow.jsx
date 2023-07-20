@@ -20,7 +20,6 @@ export function SearchResultsAdvancedSearchRow({
     availableFields,
     toggleAdvancedSearchField,
     setAdvancedSearchKeywords,
-    refresh,
     clearAdvancedSearchParams,
 }) {
     const advancedSearchParams = get(searchParams, 'advanced', {});
@@ -64,9 +63,9 @@ export function SearchResultsAdvancedSearchRow({
                     key={`tags-advanced--and-${term}`}
                     text={term}
                     shade="success"
-                    onClick={() => {
+                    onClick={(event) => {
+                        event.preventDefault();
                         removeKeywordEntry('all', index);
-                        refresh();
                     }}
                 />
             );
@@ -99,9 +98,9 @@ export function SearchResultsAdvancedSearchRow({
                     key={`tags-advanced--or-${term}`}
                     text={term}
                     shade="info"
-                    onClick={() => {
+                    onClick={(event) => {
+                        event.preventDefault();
                         removeKeywordEntry('any', index);
-                        refresh();
                     }}
                 />
             );
@@ -133,9 +132,9 @@ export function SearchResultsAdvancedSearchRow({
                     key={`tags-advanced--exclude-${term}`}
                     text={term}
                     shade="alert"
-                    onClick={() => {
+                    onClick={(event) => {
+                        event.preventDefault();
                         removeKeywordEntry('exclude', index);
-                        refresh();
                     }}
                 />
             );
@@ -156,9 +155,9 @@ export function SearchResultsAdvancedSearchRow({
         <button
             key="tag-clear-button"
             className='nh-button nh-button--tertiary nh-button--small'
-            onClick={() => {
+            onClick={(event) => {
+                event.preventDefault();
                 clearAdvancedSearchParams();
-                refresh();
             }}
         >
             {gettext('Clear')}
@@ -194,9 +193,9 @@ export function SearchResultsAdvancedSearchRow({
                                     'toggle-button toggle-button--no-txt-transform toggle-button--small',
                                     {'toggle-button--active': fields.includes(fieldName)}
                                 )}
-                                onClick={() => {
+                                onClick={(event) => {
+                                    event.preventDefault();
                                     toggleAdvancedSearchField(fieldName);
-                                    refresh();
                                 }}
                             >
                                 {fieldNameToLabel[fieldName]}
@@ -211,9 +210,8 @@ export function SearchResultsAdvancedSearchRow({
 
 SearchResultsAdvancedSearchRow.propTypes = {
     searchParams: PropTypes.object,
-    availableFields: PropTypes.arrayOf(PropTypes.string),
+    availableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
     toggleAdvancedSearchField: PropTypes.func.isRequired,
     setAdvancedSearchKeywords: PropTypes.func.isRequired,
-    refresh: PropTypes.func.isRequired,
     clearAdvancedSearchParams: PropTypes.func.isRequired,
 };

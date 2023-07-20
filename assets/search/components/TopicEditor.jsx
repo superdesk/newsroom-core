@@ -8,14 +8,17 @@ import {gettext, notify} from 'utils';
 import {canUserEditTopic} from 'topics/utils';
 import types from 'wire/types';
 
-import TopicForm from './TopicForm';
-import TopicParameters from './TopicParameters';
+import {topicEditorFullscreenSelector, foldersSelector, sectionSelector} from 'user-profile/selectors';
+import {filterGroupsByIdSelector, navigationsByIdSelector} from '../selectors';
+import {getAdvancedSearchFields} from '../utils';
+
 import {fetchNavigations} from 'navigations/actions';
 import {submitFollowTopic as submitWireFollowTopic, subscribeToTopic, unsubscribeToTopic} from 'search/actions';
 import {submitFollowTopic as submitProfileFollowTopic, hideModal, setTopicEditorFullscreen} from 'user-profile/actions';
-import {topicEditorFullscreenSelector} from 'user-profile/selectors';
 import {loadMyWireTopic} from 'wire/actions';
 import {loadMyAgendaTopic} from 'agenda/actions';
+
+import TopicForm from './TopicForm';
 import EditPanel from 'components/EditPanel';
 import AuditInformation from 'components/AuditInformation';
 import {ToolTip} from 'ui/components/ToolTip';
@@ -36,6 +39,16 @@ class TopicEditor extends React.Component {
         this.onSubscribeChanged = this.onSubscribeChanged.bind(this);
         this.saveTopic = this.saveTopic.bind(this);
         this.handleTabClick = this.handleTabClick.bind(this);
+        this.onFolderChange = this.onFolderChange.bind(this);
+
+        this.toggleNavigation = this.toggleNavigation.bind(this);
+        this.clearSearchQuery = this.clearSearchQuery.bind(this);
+        this.toggleAdvancedSearchField = this.toggleAdvancedSearchField.bind(this);
+        this.setAdvancedSearchKeywords = this.setAdvancedSearchKeywords.bind(this);
+        this.clearAdvancedSearchParams = this.clearAdvancedSearchParams.bind(this);
+        this.toggleFilter = this.toggleFilter.bind(this);
+        this.setCreatedFilter = this.setCreatedFilter.bind(this);
+        this.resetFilter = this.resetFilter.bind(this);
     }
 
     componentDidMount() {
@@ -81,9 +94,18 @@ class TopicEditor extends React.Component {
 
     updateFormValidity(topic) {
         const original = get(this.props, 'topic') || {};
-        const isDirty = ['label', 'notifications', 'is_global'].some(
-            (field) => get(original, field) !== get(topic, field)
-        ) || !isEqual(original.subscribers, topic.subscribers);
+        const isDirty = [
+            'label',
+            'notifications',
+            'is_global',
+            'folder',
+            'navigation',
+            'query',
+            'advanced',
+            'filter',
+            'created'
+        ].some((field) => get(original, field) !== get(topic, field))
+            || !isEqual(original.subscribers, topic.subscribers);
 
         if (!topic.label) {
             // The topic must have a label so disable the save button
@@ -129,6 +151,15 @@ class TopicEditor extends React.Component {
 
         this.setState({topic});
         this.props.onTopicChanged();
+    }
+
+    onFolderChange(folder) {
+        const topic = {...this.state.topic};
+
+        topic.folder = folder ? folder._id : null;
+
+        this.setState({topic});
+        this.updateFormValidity(topic);
     }
 
     saveTopic(event) {
@@ -195,6 +226,114 @@ class TopicEditor extends React.Component {
         }
     }
 
+    toggleNavigation(navigation) {
+        this.setState((prevState) => ({
+            topic: {
+                ...prevState.topic,
+                navigation: prevState.topic.navigation.filter((navId) => navId !== navigation._id)
+            },
+        }), () => {
+            this.updateFormValidity(this.state.topic);
+        });
+    }
+
+    clearSearchQuery() {
+        this.setState((prevState) => ({
+            topic: {
+                ...prevState.topic,
+                query: '',
+            },
+        }), () => {
+            this.updateFormValidity(this.state.topic);
+        });
+    }
+
+    toggleAdvancedSearchField(field) {
+        this.setState((prevState) => {
+            const topic = cloneDeep(prevState.topic);
+
+            topic.advanced.fields = (topic.advanced.fields || []).includes(field) ?
+                topic.advanced.fields.filter((fieldName) => fieldName !== field) :
+                [...topic.advanced.fields, field];
+
+            if (!topic.advanced.fields.length) {
+                // At least 1 field must be selected
+                return {};
+            }
+
+            return {topic: topic};
+        }, () => {
+            this.updateFormValidity(this.state.topic);
+        });
+    }
+
+    setAdvancedSearchKeywords(field, keywords) {
+        this.setState((prevState) => ({
+            topic: {
+                ...prevState.topic,
+                advanced: {
+                    ...prevState.topic.advanced,
+                    [field]: keywords,
+                },
+            },
+        }), () => {
+            this.updateFormValidity(this.state.topic);
+        });
+    }
+
+    clearAdvancedSearchParams() {
+        this.setState((prevState) => ({
+            topic: {
+                ...prevState.topic,
+                advanced: {
+                    all: '',
+                    any: '',
+                    exclude: '',
+                    fields: ['headline', 'slugline', 'body_html'],
+                },
+            },
+        }), () => {
+            this.updateFormValidity(this.state.topic);
+        });
+    }
+
+    toggleFilter(key, value) {
+        this.setState((prevState) => ({
+            topic: {
+                ...prevState.topic,
+                filter: {
+                    ...prevState.topic.filter,
+                    [key]: prevState.topic.filter[key].filter((filterValue) => filterValue !== value),
+                },
+            },
+        }), () => {
+            this.updateFormValidity(this.state.topic);
+        });
+    }
+
+    setCreatedFilter(createdFilter) {
+        this.setState((prevState) => ({
+            topic: {
+                ...prevState.topic,
+                created: createdFilter,
+            },
+        }), () => {
+            this.updateFormValidity(this.state.topic);
+        });
+    }
+
+    resetFilter() {
+        this.setState((prevState) => ({
+            topic: {
+                ...prevState.topic,
+                filter: null,
+                created: null,
+            },
+        }), () => {
+            this.updateFormValidity(this.state.topic);
+        });
+    }
+
     render() {
         // Wait for navigations to be loaded
         if (this.props.isLoading) {
@@ -216,6 +355,8 @@ class TopicEditor extends React.Component {
 
         return (
             <div
+                role="dialog"
+                aria-label={this.getTitle()}
                 data-test-id="user-topic-editor"
                 className={showTabs ? 'list-item__preview' : containerClasses}
             >
@@ -258,10 +399,7 @@ class TopicEditor extends React.Component {
                         ))}
                     </ul>
                 )}
-                <div className={classNames(
-                    'list-item__preview-form',
-                    {'list-item__preview-form--no-padding': this.state.activeTab === 'subscribers'}
-                )}>
+                <div className="list-item__preview-content">
                     {this.state.activeTab === 'topic' && updatedTopic && (
                         <React.Fragment>
                             <TopicForm
@@ -272,10 +410,22 @@ class TopicEditor extends React.Component {
                                 onChange={this.onChangeHandler}
                                 onSubscribeChanged={this.onSubscribeChanged}
                                 readOnly={isReadOnly}
-                            />
-                            <TopicParameters
-                                topic={updatedTopic}
-                                navigations={this.props.navigations}
+                                folders={this.props.folders}
+                                onFolderChange={this.onFolderChange}
+
+                                user={this.props.user}
+                                navigations={this.props.navigationsById}
+                                filterGroups={this.props.filterGroups}
+
+                                toggleNavigation={this.toggleNavigation}
+                                clearSearchQuery={this.clearSearchQuery}
+                                toggleAdvancedSearchField={this.toggleAdvancedSearchField}
+                                setAdvancedSearchKeywords={this.setAdvancedSearchKeywords}
+                                clearAdvancedSearchParams={this.clearAdvancedSearchParams}
+                                toggleFilter={this.toggleFilter}
+                                setCreatedFilter={this.setCreatedFilter}
+                                resetFilter={this.resetFilter}
+                                availableFields={this.props.availableFields}
                             />
                         </React.Fragment>
                     )}
@@ -328,6 +478,7 @@ TopicEditor.propTypes = {
     userId: PropTypes.string,
     isLoading: PropTypes.bool,
     navigations: PropTypes.arrayOf(PropTypes.object),
+    navigationsById: PropTypes.object,
     fetchNavigations: PropTypes.func,
     closeEditor: PropTypes.func,
     saveTopic: PropTypes.func,
@@ -340,6 +491,10 @@ TopicEditor.propTypes = {
     isAdmin: PropTypes.bool,
     companyUsers: PropTypes.array,
     user: PropTypes.object,
+    folders: PropTypes.array,
+
+    filterGroups: PropTypes.object,
+    availableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -348,6 +503,11 @@ const mapStateToProps = (state) => ({
     navigations: state.navigations || [],
     editorFullscreen: topicEditorFullscreenSelector(state),
     companyUsers: state.monitoringProfileUsers || [],
+    folders: foldersSelector(state),
+
+    navigationsById: navigationsByIdSelector(state),
+    filterGroups: filterGroupsByIdSelector(state),
+    availableFields: getAdvancedSearchFields(sectionSelector(state)),
 });
 
 const mapDispatchToProps = (dispatch) => ({
