@@ -8,7 +8,6 @@ from eve.utils import ParsedRequest
 from werkzeug.exceptions import Forbidden
 
 from superdesk import get_resource_service
-from superdesk.metadata.utils import get_elastic_highlight_query
 from superdesk.default_settings import strtobool as _strtobool
 from content_api.errors import BadParameterValueError
 
@@ -516,39 +515,54 @@ class BaseSearchService(Service):
             )
 
     def prefill_search_highlights(self, search, req):
-        query_string = search.args.get("q")
-        query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
-        advanced_search = json.loads(search.args.get("advanced")) if search.args.get("advanced") else {}
+        query = search.args.get("q")
+        advanced_search = json.loads(search.args.get("advanced", "{}"))
 
-        field_settings = {"number_of_fragments": 0}
         if app.data.elastic.should_highlight(req) and (
-            query_string or advanced_search.get("all") or advanced_search.get("any")
+            query or advanced_search.get("all") or advanced_search.get("any")
         ):
-            elastic_highlight_query = get_elastic_highlight_query(
-                query_string={
-                    "query": query_string,
-                    "default_operator": "AND",
-                    "analyze_wildcard": query_string_settings["analyze_wildcard"],
-                    "lenient": True,
-                },
-            )
-            selected_field = advanced_search.get("fields") or []
-            if not selected_field:
-                elastic_highlight_query["fields"] = {
-                    # wire
-                    "body_html": field_settings,
-                    "headline": field_settings,
-                    "slugline": field_settings,
-                    # Agenda
-                    "description_text": field_settings,
-                    "definition_short": field_settings,
-                    "name": field_settings,
-                    "definition_long": field_settings,
-                }
-            else:
-                elastic_highlight_query["fields"] = {field: field_settings for field in selected_field}
+            selected_fields = advanced_search.get("fields", [])
 
-            search.highlight = elastic_highlight_query
+            # Create a separate search query object for highlighting settings
+            highlight_search = SearchQuery()
+
+            # Call prefill_search_args with the request object
+            self.prefill_search_args(highlight_search, req)
+
+            # Set up the search query for filtering
+            self.apply_request_filter(highlight_search)
+
+            # Set up the search query for advanced search options
+            self.apply_request_advanced_search(highlight_search)
+
+            # Set up highlighting settings
+            highlight_search.source.setdefault("highlight", {})
+            highlight_search.source["highlight"].setdefault("fields", {})
+
+            fields_to_highlight = (
+                selected_fields
+                if selected_fields
+                else [
+                    "body_html",
+                    "headline",
+                    "slugline",
+                    "description_text",
+                    "definition_short",
+                    "name",
+                    "definition_long",
+                ]
+            )
+
+            for field in fields_to_highlight:
+                highlight_search.source["highlight"]["fields"][field] = {
+                    "number_of_fragments": 0,
+                    "highlight_query": {"bool": {"filter": highlight_search.query["bool"]["filter"]}},
+                }
+
+            highlight_search.source["highlight"]["pre_tags"] = ['<span class="es-highlight">']
+            highlight_search.source["highlight"]["post_tags"] = ["</span>"]
+
+            search.source.update(highlight_search.source)
 
     def validate_request(self, search):
         """Validate the request parameters
