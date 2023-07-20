@@ -12,6 +12,8 @@ libjpeg-dev zlib1g-dev \
 libmagic-dev \
 # windows
 dos2unix \
+# xmlsec
+pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl \
 && rm -rf /var/lib/apt/lists/* 
 
 # setup venv
