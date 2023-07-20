@@ -8,9 +8,9 @@ import {gettext, notify} from 'utils';
 import {canUserEditTopic} from 'topics/utils';
 import types from 'wire/types';
 
-
-import {topicEditorFullscreenSelector, foldersSelector} from 'user-profile/selectors';
+import {topicEditorFullscreenSelector, foldersSelector, sectionSelector} from 'user-profile/selectors';
 import {filterGroupsByIdSelector, navigationsByIdSelector} from '../selectors';
+import {getAdvancedSearchFields} from '../utils';
 
 import {fetchNavigations} from 'navigations/actions';
 import {submitFollowTopic as submitWireFollowTopic, subscribeToTopic, unsubscribeToTopic} from 'search/actions';
@@ -425,6 +425,7 @@ class TopicEditor extends React.Component {
                                 toggleFilter={this.toggleFilter}
                                 setCreatedFilter={this.setCreatedFilter}
                                 resetFilter={this.resetFilter}
+                                availableFields={this.props.availableFields}
                             />
                         </React.Fragment>
                     )}
@@ -493,6 +494,7 @@ TopicEditor.propTypes = {
     folders: PropTypes.array,
 
     filterGroups: PropTypes.object,
+    availableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -505,6 +507,7 @@ const mapStateToProps = (state) => ({
 
     navigationsById: navigationsByIdSelector(state),
     filterGroups: filterGroupsByIdSelector(state),
+    availableFields: getAdvancedSearchFields(sectionSelector(state)),
 });
 
 const mapDispatchToProps = (dispatch) => ({

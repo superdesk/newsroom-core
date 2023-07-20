@@ -79,7 +79,7 @@ SearchResultTagsList.propTypes = {
 
     navigations: PropTypes.object,
     filterGroups: PropTypes.object,
-    availableFields: PropTypes.arrayOf(PropTypes.string),
+    availableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
 
     toggleNavigation: PropTypes.func.isRequired,
     toggleAdvancedSearchField: PropTypes.func.isRequired,

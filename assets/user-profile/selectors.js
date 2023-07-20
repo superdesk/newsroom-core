@@ -1,20 +1,21 @@
 import {get} from 'lodash';
 import {DEFAULT_ENABLE_GLOBAL_TOPICS} from 'defaults';
 
+const MENU_SECTION_MAPPING = {
+    topics: 'wire',
+    events: 'agenda',
+    monitoring: 'monitoring',
+};
+
 export const userSelector = (state) => get(state, 'user');
 export const selectedMenuSelector = (state) => get(state, 'selectedMenu');
 export const selectedItemSelector = (state) => get(state, 'selectedItem');
 export const displayModelSelector = (state) => get(state, 'displayModal');
 export const userSectionsSelector = (state) => get(state, 'userSections');
 export const topicEditorFullscreenSelector = (state) => get(state, 'editorFullscreen') || false;
+export const sectionSelector = (state) => MENU_SECTION_MAPPING[state.selectedMenu];
 export const foldersSelector = (state) => {
-    const sectionMapping = {
-        topics: 'wire',
-        events: 'agenda',
-        monitoring: 'monitoring',
-    };
-
-    const activeSection = sectionMapping[state.selectedMenu];
+    const activeSection = sectionSelector(state);
 
     return state.folders.filter((folder) => folder.section === activeSection); 
 };

@@ -42,6 +42,7 @@ const TopicForm = ({
     toggleFilter,
     setCreatedFilter,
     resetFilter,
+    availableFields,
 }) => (
     <form onSubmit={save}>
         <div className="nh-flex-container list-item__preview-form pt-0">
@@ -157,6 +158,7 @@ const TopicForm = ({
                         toggleFilter={toggleFilter}
                         setCreatedFilter={setCreatedFilter}
                         resetFilter={resetFilter}
+                        availableFields={availableFields}
                     />
                 </FormSection>
             </div>
@@ -187,6 +189,7 @@ TopicForm.propTypes = {
     toggleFilter: PropTypes.func,
     setCreatedFilter: PropTypes.func,
     resetFilter: PropTypes.func,
+    availableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default TopicForm;

@@ -210,7 +210,7 @@ export function SearchResultsAdvancedSearchRow({
 
 SearchResultsAdvancedSearchRow.propTypes = {
     searchParams: PropTypes.object,
-    availableFields: PropTypes.arrayOf(PropTypes.string),
+    availableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
     toggleAdvancedSearchField: PropTypes.func.isRequired,
     setAdvancedSearchKeywords: PropTypes.func.isRequired,
     clearAdvancedSearchParams: PropTypes.func.isRequired,

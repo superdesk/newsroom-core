@@ -19,7 +19,7 @@ describe('Wire - Topics', function () {
         function expectSearchResultsBarTags(includeMyTopic, fromTopicForm = false) {
             const expectedSearchResults = {
                 advanced: {
-                    fields: ['headline', 'body'],
+                    fields: ['headline', 'body_html'],
                     keywords: {
                         and: ['Weather'],
                         any: ['Sydney', 'Prague', 'Belgrade'],
