@@ -119,11 +119,21 @@ class Modal extends React.Component<any, any> {
     }
 
     render() {
+        const className = ['modal'];
+
+        if (this.props.width === 'full') {
+            className.push('modal--full-width');
+        } else {
+            className.push('mt-xl-5'); // adds top margin
+        }
+
         return (
-            <div className={classNames('modal mt-xl-5', {
-                'modal--full-width': this.props.width === 'full',
-            })}
-            ref={(elem: any) => this.elem = elem} role={gettext('dialog')} aria-label={this.props.title}>
+            <div
+                className={className.join(' ')}
+                ref={(elem: any) => this.elem = elem}
+                role={gettext('dialog')}
+                aria-label={this.props.title}
+            >
                 <h3 className="a11y-only">{this.props.title}</h3>
                 <div className="modal-dialog">
                     <div className="modal-content">
