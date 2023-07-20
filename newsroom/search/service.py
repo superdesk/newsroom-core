@@ -557,7 +557,6 @@ class BaseSearchService(Service):
 
             highlight_search.source["highlight"]["pre_tags"] = ['<span class="es-highlight">']
             highlight_search.source["highlight"]["post_tags"] = ["</span>"]
-            highlight_search.source["highlight"]["require_field_match"] = False
 
             search.source.update(highlight_search.source)
 
