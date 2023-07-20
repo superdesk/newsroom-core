@@ -23,7 +23,7 @@ describe('Wire - Advanced Search', function() {
 
     it('can search', () => {
         function expectSearchResultBarTags() {
-            WirePage.searchResults.expectAdvancedFields(['headline', 'body']);
+            WirePage.searchResults.expectAdvancedFields(['headline', 'body_html']);
             WirePage.searchResults.expectAdvancedSearchKeywords({
                 and: ['Weather'],
                 any: ['Sydney', 'Prague', 'Belgrade'],
@@ -104,7 +104,7 @@ describe('Wire - Advanced Search', function() {
         WirePage.searchResults
             .getSearchResultElement('topics', '[data-test-id="remove-tag-button"]')
             .click();
-        WirePage.searchResults.expectAdvancedFields(['headline', 'body']);
+        WirePage.searchResults.expectAdvancedFields(['headline', 'body_html']);
         WirePage.searchResults.expectAdvancedSearchKeywords({
             any: ['Sydney', 'Prague', 'Belgrade'],
             exclude: ['London'],

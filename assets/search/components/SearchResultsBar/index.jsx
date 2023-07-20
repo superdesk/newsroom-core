@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 
 import {gettext} from 'utils';
 import {searchParamsSelector, navigationsByIdSelector, filterGroupsByIdSelector} from '../../selectors';
+import {getAdvancedSearchFields} from '../../utils';
 import {
     toggleNavigation,
     toggleAdvancedSearchField,
@@ -140,13 +141,14 @@ class SearchResultsBarComponent extends React.Component {
                             topicType={this.props.topicType}
                             navigations={this.props.navigations}
                             filterGroups={this.props.filterGroups}
-                            toggleNavigation={this.toggleNavigation}
-                            toggleAdvancedSearchField={this.toggleAdvancedSearchField}
-                            setQuery={this.setQuery}
-                            setAdvancedSearchKeywords={this.setAdvancedSearchKeywords}
-                            toggleFilter={this.toggleFilter}
-                            setCreatedFilter={this.setCreatedFilter}
-                            clearAdvancedSearchParams={this.clearAdvancedSearchParams}
+                            availableFields={this.props.availableFields}
+                            toggleNavigation={this.props.toggleNavigation}
+                            toggleAdvancedSearchField={this.props.toggleAdvancedSearchField}
+                            setQuery={this.props.setQuery}
+                            setAdvancedSearchKeywords={this.props.setAdvancedSearchKeywords}
+                            toggleFilter={this.props.toggleFilter}
+                            setCreatedFilter={this.props.setCreatedFilter}
+                            clearAdvancedSearchParams={this.props.clearAdvancedSearchParams}
                             deselectMyTopic={this.props.deselectMyTopic}
                             resetFilter={this.resetFilter}
                         />
@@ -191,6 +193,7 @@ SearchResultsBarComponent.propTypes = {
 
     navigations: PropTypes.object,
     filterGroups: PropTypes.object,
+    availableFields: PropTypes.arrayOf(PropTypes.string),
 
     toggleNavigation: PropTypes.func.isRequired,
     toggleAdvancedSearchField: PropTypes.func.isRequired,
@@ -218,6 +221,7 @@ const mapStateToProps = (state) => ({
     searchParams: searchParamsSelector(state),
     navigations: navigationsByIdSelector(state),
     filterGroups: filterGroupsByIdSelector(state),
+    availableFields: getAdvancedSearchFields(state.context),
 });
 
 const mapDispatchToProps = {
