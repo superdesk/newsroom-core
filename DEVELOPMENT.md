@@ -29,17 +29,22 @@ Use `develop` branches of `newsroom-core` and `newsroom-app` repositories.
 
 ## Start server
 
-### Run server via docker (if you only do client development)
+There are two options, if you only need to develop UI go for A,
+otherwise B.
+
+### A) Start server via docker
 * navigate to `newsroom-app`
-* `cd server`
 * `docker-compose up server`
 
-### Running the server in dev mode (if you need to do backend changes)
+#### Updating local server after pulling new code via git
+* `docker-compose stop`
+* `docker-compose build --no-cache server`
+
+### B) Running the server in dev mode
 
 #### Starting required services via docker (redis, mongo, elastic)
 * navigate to `newsroom-app`
-* `cd server`
-* `sudo docker-compose up redis mongo elastic`
+* `docker-compose up redis mongo elastic`
 
 #### Create .env file
 * navigate to `newsroom-app/server`
@@ -51,12 +56,12 @@ WEBPACK_SERVER_URL=http://localhost:8080
 SECRET_KEY=newsroom
 ```
 
-#### Starting local server
+#### Start local server
 * navigate to `newsroom-app`
 * `cd server`
 * create virtual environment `python3 -m venv env`
 * activate virtual environment `source env/bin/activate`
-* install python dependencies - `pip install -r dev-requirements.txt`
+* install python dependencies - `pip install -Ur requirements.txt`
 * link local server - `pip install -Ue <path-to-newsroom-core>`
 * prepare system including elastic `python manage.py initialize_data`
 * create a user - `python manage.py create_user admin@example.com admin John Doe true`
