@@ -114,3 +114,11 @@ Feature: Wire Advanced Search
         """
         ["weather-today-sydney"]
         """
+
+    @auth @admin
+    Scenario: Support wildcards query in advanced search
+        When we get "/wire/search?advanced={"all":"W?ather S*ney"}"
+        Then we get list with 1 items
+        """
+        {"_items": [{"_id": "weather-today-sydney"}]}
+        """

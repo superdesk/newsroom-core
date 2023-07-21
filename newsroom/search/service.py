@@ -732,22 +732,24 @@ class BaseSearchService(Service):
         if not fields:
             return
 
-        def gen_match_query(keywords: str, operator: str, multi_match_type):
+        def gen_advanced_query(keywords: str, operator: str, multi_match_type: str):
             return {
-                "multi_match": {
+                "query_string": {
                     "query": keywords,
-                    "type": multi_match_type,
                     "fields": fields,
-                    "operator": operator,
+                    "default_operator": operator,
+                    "type": multi_match_type,
+                    "lenient": True,
+                    "analyze_wildcard": True,
                 },
             }
 
         if search.advanced.get("all"):
-            search.query["bool"]["filter"].append(gen_match_query(search.advanced["all"], "AND", "cross_fields"))
+            search.query["bool"]["filter"].append(gen_advanced_query(search.advanced["all"], "AND", "cross_fields"))
         if search.advanced.get("any"):
-            search.query["bool"]["filter"].append(gen_match_query(search.advanced["any"], "OR", "best_fields"))
+            search.query["bool"]["filter"].append(gen_advanced_query(search.advanced["any"], "OR", "best_fields"))
         if search.advanced.get("exclude"):
-            search.query["bool"]["must_not"].append(gen_match_query(search.advanced["exclude"], "OR", "best_fields"))
+            search.query["bool"]["must_not"].append(gen_advanced_query(search.advanced["exclude"], "OR", "best_fields"))
 
     def apply_embargoed_filters(self, search):
         """Generate filters for embargoed params"""
