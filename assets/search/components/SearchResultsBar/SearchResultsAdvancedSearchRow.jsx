@@ -7,12 +7,16 @@ import {gettext} from 'utils';
 import {SearchResultTagList} from './SearchResultTagList';
 import {Tag} from 'components/Tag';
 
+const searchTokenRegEx = /[^\s"]+|(?:"[^"]+?"(?:~[0-9]+)?)/g;
+
 function splitTermKeywords(keywordText) {
     const trimmedKeywordText = keywordText == null ? '' : keywordText.trim();
 
-    return !trimmedKeywordText.length ?
-        [] :
-        trimmedKeywordText.split(' ');
+    if (trimmedKeywordText === '') {
+        return [];
+    }
+
+    return trimmedKeywordText.match(searchTokenRegEx);
 }
 
 export function SearchResultsAdvancedSearchRow({
@@ -61,7 +65,7 @@ export function SearchResultsAdvancedSearchRow({
         keywords.all.forEach((term, index) => {
             advancedSearchTags.push(
                 <Tag
-                    key={`tags-advanced--and-${term}`}
+                    key={`tags-advanced--and-${index}`} // using index instead of term which might not be unique
                     text={term}
                     shade="success"
                     onClick={() => {
