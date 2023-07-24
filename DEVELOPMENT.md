@@ -27,12 +27,26 @@ Use `develop` branches of `newsroom-core` and `newsroom-app` repositories.
 * `npm link newsroom-core`
 * `npm start`
 
-## Starting required services via docker (redis, mongo, elastic)
-* navigate to `newsroom-app`
-* `cd server`
-* `sudo docker-compose up redis mongo elastic`
+## Start server
 
-## Create .env file
+There are two options, if you only need to develop UI go for A,
+otherwise B.
+
+### A) Start server via docker
+* navigate to `newsroom-app`
+* `docker-compose up server`
+
+#### Updating local server after pulling new code via git
+* `docker-compose stop`
+* `docker-compose build --no-cache server`
+
+### B) Running the server in dev mode
+
+#### Starting required services via docker (redis, mongo, elastic)
+* navigate to `newsroom-app`
+* `docker-compose up redis mongo elastic`
+
+#### Create .env file
 * navigate to `newsroom-app/server`
 * create .env file with the following contents:
 
@@ -42,19 +56,19 @@ WEBPACK_SERVER_URL=http://localhost:8080
 SECRET_KEY=newsroom
 ```
 
-## Starting local server
+#### Start local server
 * navigate to `newsroom-app`
 * `cd server`
 * create virtual environment `python3 -m venv env`
 * activate virtual environment `source env/bin/activate`
-* install python dependencies - `pip install -r dev-requirements.txt`
+* install python dependencies - `pip install -Ur requirements.txt`
 * link local server - `pip install -Ue <path-to-newsroom-core>`
 * prepare system including elastic `python manage.py initialize_data`
 * create a user - `python manage.py create_user admin@example.com admin John Doe true`
 * `python manage.py elastic_init`
 * start server - `honcho start -p 5050`
 
-## Updating local server after pulling new code via git
+#### Updating local server after pulling new code via git
 
 After fetching latest code run the following commands:
 
