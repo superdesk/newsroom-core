@@ -14,7 +14,7 @@ import {getAdvancedSearchFields} from '../utils';
 
 import {fetchNavigations} from 'navigations/actions';
 import {submitFollowTopic as submitWireFollowTopic, subscribeToTopic, unsubscribeToTopic} from 'search/actions';
-import {submitFollowTopic as submitProfileFollowTopic, hideModal, setTopicEditorFullscreen} from 'user-profile/actions';
+import {submitFollowTopic as submitProfileFollowTopic, hideModal, setTopicEditorFullscreen, fetchFolders} from 'user-profile/actions';
 import {loadMyWireTopic} from 'wire/actions';
 import {loadMyAgendaTopic} from 'agenda/actions';
 
@@ -126,6 +126,11 @@ class TopicEditor extends React.Component {
             const value = ['notifications', 'is_global'].includes(field) ?
                 !get(topic, field) :
                 event.target.value;
+
+            if (field === 'is_global') {
+                this.props.fetchFolders(value);
+                topic.folder = null;
+            }
 
             set(topic, field, value);
             this.setState({topic});
@@ -492,6 +497,7 @@ TopicEditor.propTypes = {
     companyUsers: PropTypes.array,
     user: PropTypes.object,
     folders: PropTypes.array,
+    fetchFolders: PropTypes.func,
 
     filterGroups: PropTypes.object,
     availableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -520,6 +526,7 @@ const mapDispatchToProps = (dispatch) => ({
         dispatch(loadMyAgendaTopic(topic._id)) :
         dispatch(loadMyWireTopic(topic._id)),
     setTopicEditorFullscreen: (fullscreen) => dispatch(setTopicEditorFullscreen(fullscreen)),
+    fetchFolders: (global) => dispatch(fetchFolders(global))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TopicEditor);
