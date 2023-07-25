@@ -54,9 +54,7 @@ class TopicEditor extends React.Component {
 
     componentDidMount() {
         this.props.fetchNavigations();
-        this.props.fetchFolders(this.props.topic != null && this.props.topic.is_global).then((folders) => {
-            this.setState({folders});
-        });
+        this.reloadFolders(this.props.topic != null && this.props.topic.is_global);
 
         if (this.props.topic != null) {
             this.changeTopic(this.props.topic);
@@ -133,9 +131,7 @@ class TopicEditor extends React.Component {
 
             if (field === 'is_global') {
                 topic.folder = null;
-                this.props.fetchFolders(value).then((folders) => {
-                    this.setState({folders});
-                });
+                this.reloadFolders(value);
             }
 
             set(topic, field, value);
@@ -345,6 +341,12 @@ class TopicEditor extends React.Component {
         });
     }
 
+    reloadFolders(global) {
+        this.props.fetchFolders(global).then((folders) => {
+            this.setState({folders: folders.filter((folder) => folder.section === this.props.section)});
+        });
+    }
+
     render() {
         // Wait for navigations to be loaded
         if (this.props.isLoading) {
@@ -503,6 +505,7 @@ TopicEditor.propTypes = {
     companyUsers: PropTypes.array,
     user: PropTypes.object,
     fetchFolders: PropTypes.func,
+    section: PropTypes.string,
 
     filterGroups: PropTypes.object,
     availableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -518,6 +521,7 @@ const mapStateToProps = (state) => ({
     navigationsById: navigationsByIdSelector(state),
     filterGroups: filterGroupsByIdSelector(state),
     availableFields: getAdvancedSearchFields(sectionSelector(state)),
+    section: sectionSelector(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({
