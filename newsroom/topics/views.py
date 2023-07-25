@@ -62,7 +62,11 @@ def update_topic(topic_id):
         "folder": data.get("folder", None),
     }
 
-    if original and updates.get("is_global") != original.get("is_global"):
+    if (
+        original
+        and updates.get("is_global") != original.get("is_global")
+        and original.get("folder") == updates.get("folder")
+    ):
         # reset folder when going from company to user and vice versa
         updates["folder"] = None
 
