@@ -329,7 +329,7 @@ export function moveTopic(topicId, folder) {
 
         const state = getState();
         const topic = state.topics.find((topic) => topic._id === topicId);
-        const url = `/api/users/${state.user._id}/topics/${topicId}`;
+        const url = `/api/users/${topic.user}/topics/${topicId}`;
 
         return server.patch(url, updates, topic._etag).then((response) => {
             mergeUpdates(updates, response);
