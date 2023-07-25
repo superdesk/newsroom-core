@@ -97,14 +97,16 @@ class SearchBar extends React.Component {
                             {gettext('Advanced Search')}
                         </button>
                     )}
-                    <button
-                        data-test-id="show-search-tips-panel-btn"
-                        className="icon-button icon-button--tertiary icon-button--bordered"
-                        aria-label={gettext('Show Search tips')}
-                        onClick={this.props.toggleSearchTipsPanel}
-                    >
-                        <i className="icon--info" />
-                    </button>
+                    {this.props.toggleSearchTipsPanel == null ? null : (
+                        <button
+                            data-test-id="show-search-tips-panel-btn"
+                            className="icon-button icon-button--tertiary icon-button--bordered"
+                            aria-label={gettext('Show Search tips')}
+                            onClick={this.props.toggleSearchTipsPanel}
+                        >
+                            <i className="icon--info" />
+                        </button>
+                    )}
                 </div>
             </React.Fragment>
         );

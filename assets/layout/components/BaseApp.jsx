@@ -74,6 +74,10 @@ export default class BaseApp extends React.Component {
 
     toggleAdvancedSearchPanel() {
         this.setState((prevState) => ({isAdvancedSearchShown: !prevState.isAdvancedSearchShown}));
+
+        if (this.props.setQuery != null) {
+            this.props.setQuery('');
+        }
     }
 
     toggleSearchTipsPanel() {
@@ -251,4 +255,5 @@ BaseApp.propTypes = {
     savedItemsCount: PropTypes.number,
     bookmarks: PropTypes.bool,
     isLoading: PropTypes.bool,
+    setQuery: PropTypes.func,
 };
