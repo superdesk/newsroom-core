@@ -52,9 +52,6 @@ describe('Wire - Topics', function () {
         WirePage.filterPanel.toggleFilterPanel();
         WirePage.filterPanel.getTopicButton('all wire').click();
 
-        // Enter in 'Today' in the top search bar
-        WirePage.getTopSearchBarInput().type('Today{enter}');
-
         // Add some filter params
         WirePage.filterPanel.selectTab('filters');
         WirePage.filterPanel.type({
@@ -79,6 +76,9 @@ describe('Wire - Topics', function () {
             'fields.slugline': false,
         });
         AdvancedSearchForm.runSearch();
+
+        // Enter in 'Today' in the top search bar
+        WirePage.getTopSearchBarInput().type('Today{enter}');
 
         // Open the search results bar, and make sure all search params are applied
         WirePage.searchResults.toggleBar();
