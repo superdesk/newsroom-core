@@ -300,13 +300,18 @@ export function fetchUserFolders() {
 /**
  * @param {bool} global - fetch company or user folders
  * @param {bool} force  - force refresh via adding timestamp to url
+ * @param {bool} skipDispatch - if true it won't replace folders in store
  */
-export function fetchFolders(global, force) {
+export function fetchFolders(global, force, skipDispatch) {
     return (dispatch, getState) => {
         const state = getState();
         const url = getFoldersUrl(state, global) + (force ? `?time=${Date.now()}` : '');
 
         return server.get(url).then((res) => {
+            if (skipDispatch) {
+                return res._items;
+            }
+
             dispatch({type: RECIEVE_FOLDERS, payload: res._items});
         }, (reason) => {
             console.error(reason);

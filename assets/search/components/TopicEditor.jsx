@@ -8,7 +8,7 @@ import {gettext, notify} from 'utils';
 import {canUserEditTopic} from 'topics/utils';
 import types from 'wire/types';
 
-import {topicEditorFullscreenSelector, foldersSelector, sectionSelector} from 'user-profile/selectors';
+import {topicEditorFullscreenSelector, sectionSelector} from 'user-profile/selectors';
 import {filterGroupsByIdSelector, navigationsByIdSelector} from '../selectors';
 import {getAdvancedSearchFields} from '../utils';
 
@@ -33,6 +33,7 @@ class TopicEditor extends React.Component {
             valid: false,
             tabs: [],
             activeTab: 'topic',
+            folders: [],
         };
 
         this.onChangeHandler = this.onChangeHandler.bind(this);
@@ -53,6 +54,9 @@ class TopicEditor extends React.Component {
 
     componentDidMount() {
         this.props.fetchNavigations();
+        this.props.fetchFolders(this.props.topic != null && this.props.topic.is_global).then((folders) => {
+            this.setState({folders});
+        });
 
         if (this.props.topic != null) {
             this.changeTopic(this.props.topic);
@@ -128,8 +132,10 @@ class TopicEditor extends React.Component {
                 event.target.value;
 
             if (field === 'is_global') {
-                this.props.fetchFolders(value);
                 topic.folder = null;
+                this.props.fetchFolders(value).then((folders) => {
+                    this.setState({folders});
+                });
             }
 
             set(topic, field, value);
@@ -415,7 +421,7 @@ class TopicEditor extends React.Component {
                                 onChange={this.onChangeHandler}
                                 onSubscribeChanged={this.onSubscribeChanged}
                                 readOnly={isReadOnly}
-                                folders={this.props.folders}
+                                folders={this.state.folders}
                                 onFolderChange={this.onFolderChange}
 
                                 user={this.props.user}
@@ -496,7 +502,6 @@ TopicEditor.propTypes = {
     isAdmin: PropTypes.bool,
     companyUsers: PropTypes.array,
     user: PropTypes.object,
-    folders: PropTypes.array,
     fetchFolders: PropTypes.func,
 
     filterGroups: PropTypes.object,
@@ -509,7 +514,6 @@ const mapStateToProps = (state) => ({
     navigations: state.navigations || [],
     editorFullscreen: topicEditorFullscreenSelector(state),
     companyUsers: state.monitoringProfileUsers || [],
-    folders: foldersSelector(state),
 
     navigationsById: navigationsByIdSelector(state),
     filterGroups: filterGroupsByIdSelector(state),
@@ -526,7 +530,7 @@ const mapDispatchToProps = (dispatch) => ({
         dispatch(loadMyAgendaTopic(topic._id)) :
         dispatch(loadMyWireTopic(topic._id)),
     setTopicEditorFullscreen: (fullscreen) => dispatch(setTopicEditorFullscreen(fullscreen)),
-    fetchFolders: (global) => dispatch(fetchFolders(global))
+    fetchFolders: (global) => dispatch(fetchFolders(global, false, true)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TopicEditor);
