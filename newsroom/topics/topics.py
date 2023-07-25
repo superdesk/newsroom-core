@@ -38,7 +38,7 @@ class TopicsResource(newsroom.Resource):
         "folder": newsroom.Resource.rel("topic_folders", nullable=True),
         "advanced": {"type": "dict", "nullable": True},
     }
-    datasource = {"source": "topics", "default_sort": [("name", 1)]}
+    datasource = {"source": "topics", "default_sort": [("label", 1)]}
 
 
 class TopicsService(newsroom.Service):
