@@ -23,6 +23,7 @@ from newsroom.utils import (
 )
 from newsroom.companies.utils import load_countries_list
 
+
 def get_company_types_options(company_types):
     return [dict([(k, v) for k, v in company_type.items() if k in {"id", "name"}]) for company_type in company_types]
 
@@ -36,7 +37,7 @@ def get_settings_data():
         "company_types": get_company_types_options(app.config.get("COMPANY_TYPES", [])),
         "api_enabled": app.config.get("NEWS_API_ENABLED", False),
         "ui_config": get_resource_service("ui_config").get_section_config("companies"),
-        "countries": load_countries_list(), 
+        "countries": load_countries_list(),
         "sso_enabled": bool(app.config.get("SAML_CLIENTS") or app.config.get("SAML_PATH")),
     }
 

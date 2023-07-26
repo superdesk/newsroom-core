@@ -5,6 +5,7 @@ from newsroom.types import Company
 from apps.prepopulate.app_initialize import get_filepath
 from flask import json
 
+
 def restrict_coverage_info(company: Optional[Company]) -> bool:
     if company:
         return company.get("restrict_coverage_info", False)
@@ -24,6 +25,7 @@ def get_company_product_ids(company: Company) -> List[ObjectId]:
         ],
         key=lambda o: str(o),
     )
+
 
 def load_countries_list():
     with open(get_filepath("vocabularies.json")) as f:
