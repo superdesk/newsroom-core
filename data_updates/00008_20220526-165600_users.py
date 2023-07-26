@@ -14,6 +14,8 @@ from superdesk.commands.data_updates import DataUpdate as _DataUpdate
 class DataUpdate(_DataUpdate):
     resource = "users"
 
+    print("sdnsdlkfnslkdfnlsdknflskd")
+
     def forwards(self, mongodb_collection, mongodb_database):
         for user in mongodb_collection.find({}):
             if "receive_app_notifications" in user:
