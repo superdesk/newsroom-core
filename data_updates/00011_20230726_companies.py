@@ -13,6 +13,7 @@ from eve.utils import config
 
 class DataUpdate(_DataUpdate):
     resource = "companies"
+
     def forwards(self, mongodb_collection, mongodb_database):
         for company in mongodb_collection.find({}):
 
@@ -26,10 +27,12 @@ class DataUpdate(_DataUpdate):
                 elif old_country_code == "fin":
                     new_country_qcode = "FIN"
 
-                print(mongodb_collection.update(
-                    {config.ID_FIELD: company.get(config.ID_FIELD)},
-                    {"$set": {"country": new_country_qcode}},
-                ))
-    
+                print(
+                    mongodb_collection.update(
+                        {config.ID_FIELD: company.get(config.ID_FIELD)},
+                        {"$set": {"country": new_country_qcode}},
+                    )
+                )
+
     def backwards(self, mongodb_collection, mongodb_database):
         pass
