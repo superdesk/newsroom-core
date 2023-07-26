@@ -33,6 +33,18 @@ def get_user_company_name(user) -> str:
     return ""
 
 
+def load_countries_list():
+    with open(get_filepath("vocabularies.json")) as f:
+        data = json.load(f)
+        countries = [
+            {"value": item.get("qcode", ""), "text": item.get("name", "")}
+            for cv in data
+            if cv["_id"] == "countries"
+            for item in cv["items"]
+        ]
+    return countries
+
+
 def init_app(app):
     superdesk.register_resource("companies", CompaniesResource, CompaniesService, _app=app)
     app.add_template_global(get_user_company_name)
@@ -46,14 +58,7 @@ def init_app(app):
 
     # Populate countries data based on superdesk-core vocabularies.json file.
     with app.app_context():
-        with open(get_filepath("vocabularies.json")) as f:
-            data = json.load(f)
-            app.countries = [
-                {"value": item.get("qcode", ""), "text": item.get("name", "")}
-                for cv in data
-                if cv["_id"] == "countries"
-                for item in cv["items"]
-            ]
+        app.countries = load_countries_list()
 
 
 from . import views  # noqa
