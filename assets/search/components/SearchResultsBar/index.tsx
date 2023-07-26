@@ -44,22 +44,22 @@ class SearchResultsBarComponent extends React.Component<any, any> {
         this.setState((prevState: any) => ({isTagSectionShown: !prevState.isTagSectionShown}));
     }
 
-    toggleNavigation(navigation) {
+    toggleNavigation(navigation: any) {
         this.props.toggleNavigation(navigation);
         this.props.refresh();
     }
 
-    setQuery(query) {
+    setQuery(query: any) {
         this.props.setQuery(query);
         this.props.refresh();
     }
 
-    setAdvancedSearchKeywords(field, keywords) {
+    setAdvancedSearchKeywords(field: any, keywords: any) {
         this.props.setAdvancedSearchKeywords(field, keywords);
         this.props.refresh();
     }
 
-    toggleAdvancedSearchField(field) {
+    toggleAdvancedSearchField(field: any) {
         this.props.toggleAdvancedSearchField(field);
         this.props.refresh();
     }
@@ -69,12 +69,12 @@ class SearchResultsBarComponent extends React.Component<any, any> {
         this.props.refresh();
     }
 
-    setCreatedFilter(filter) {
+    setCreatedFilter(filter: any) {
         this.props.setCreatedFilter(filter);
         this.props.refresh();
     }
 
-    toggleFilter(key, value, single) {
+    toggleFilter(key: any, value: any, single: any) {
         this.props.toggleFilter(key, value, single);
         this.props.refresh();
     }

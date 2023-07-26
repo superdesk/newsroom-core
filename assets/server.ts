@@ -96,7 +96,7 @@ class Server {
      * @param {String} url
      * @return {Promise}
      */
-    del(url: any, data: any, etag: any) {
+    del(url: any, data: any, etag?: any) {
         return fetch(url, options({
             method: 'DELETE',
             headers: getHeaders(etag),
@@ -111,7 +111,7 @@ class Server {
      * @param {Object} data
      * @return {Promise}
      */
-    patch(url: any, data: any, etag: any) {
+    patch(url: any, data: any, etag?: any) {
         return fetch(url, options({
             method: 'PATCH',
             headers: getHeaders(etag),

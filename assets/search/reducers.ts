@@ -65,7 +65,7 @@ const INITIAL_STATE: IInitialState = {
     },
 };
 
-export function searchReducer(state=INITIAL_STATE, action: any, context: any) {
+export function searchReducer(state=INITIAL_STATE, action?: any, context?: any) {
     if (!action) {
         state.advanced.fields = getAdvancedSearchFields(context);
 

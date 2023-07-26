@@ -104,8 +104,8 @@ export default function userReducer(state: any = initialState, action: any) {
             }
         } else if (field.includes('selectAllBtn')) {
             user.products = state.products
-                .filter((product) => user.sections[product.product_type])
-                .map((product) => ({_id : product._id , section: product.product_type}));
+                .filter((product: any) => user.sections[product.product_type])
+                .map((product: any) => ({_id : product._id , section: product.product_type}));
         }
         else {
             user[field] = value;

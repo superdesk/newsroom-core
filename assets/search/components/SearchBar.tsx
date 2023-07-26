@@ -125,6 +125,6 @@ const mapStateToProps: any = (state: any) => ({
 
 SearchBar.defaultProps = {enableQueryAction: true};
 
-const component: React.ComponentType<any> = connect(mapStateToProps, null)(SearchBar);
+const component: React.ComponentType<any> = connect(mapStateToProps)(SearchBar);
 
 export default component;

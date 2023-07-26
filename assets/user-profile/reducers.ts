@@ -200,11 +200,11 @@ export default function itemReducer(state: any = initialState, action: any) {
             ...state,
             folders: action.payload,
         };
- 
+
     case TOPIC_UPDATED:
         return {
             ...state,
-            topics: state.topics.map((topic) => {
+            topics: state.topics.map((topic: any) => {
                 if (topic._id !== action.payload.topic._id) {
                     return topic;
                 }
@@ -212,11 +212,11 @@ export default function itemReducer(state: any = initialState, action: any) {
                 return {...topic, ...action.payload.updates};
             }),
         };
-    
+
     case FOLDER_UPDATED:
         return {
             ...state,
-            folders: state.folders.map((folder) => {
+            folders: state.folders.map((folder: any) => {
                 if (folder._id !== action.payload.folder._id) {
                     return folder;
                 }
@@ -224,11 +224,11 @@ export default function itemReducer(state: any = initialState, action: any) {
                 return {...folder, ...action.payload.updates};
             }),
         };
-    
+
     case FOLDER_DELETED:
         return {
             ...state,
-            folders: state.folders.filter((folder) => folder._id !== action.payload.folder._id),
+            folders: state.folders.filter((folder: any) => folder._id !== action.payload.folder._id),
         };
 
     default:

@@ -129,7 +129,7 @@ class AgendaListItem extends React.Component<any, any> {
     renderListItem(isMobile: any, children: any) {
         const {item, isExtended, group, planningId, listConfig} = this.props;
         const classes = this.getClassNames(isExtended);
-        const planningItem = (get(item, 'planning_items') || []).find((p) => p.guid === planningId) || {};
+        const planningItem = (get(item, 'planning_items') || []).find((p: any) => p.guid === planningId) || {};
         const description =item.es_highlight ? getHighlightedDescription(item, planningItem) : getDescription(item,planningItem);
         // Show headline for adhoc planning items
         const showHeadline = !item.event && get(item, 'headline.length', 0) > 0;

@@ -107,7 +107,7 @@ class UserProfileApp extends React.Component<any, any> {
                 data-test-id="profile-container"
                 className="profile-container"
                 role={gettext('dialog')}
-                aria-label={links.find((link) => link.active).label}
+                aria-label={links.find((link: any) => link.active).label}
             >
                 <div className="profileWrap">
                     <div className="profile__mobile-close d-md-none">

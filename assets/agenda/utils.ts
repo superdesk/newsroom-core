@@ -556,7 +556,7 @@ export function getName(item: any) {
     return item.name || item.slugline || item.headline;
 }
 
-export function getHighlightedName(item) {
+export function getHighlightedName(item: any) {
     if (item.es_highlight.name){
         return item.es_highlight.name[0];
     }
@@ -589,7 +589,7 @@ export function getDescription(item: any, plan: any) {
  * @param {Object} plan
  * @return {String}
  */
-export function getHighlightedDescription(item, plan) {
+export function getHighlightedDescription(item: any, plan: any) {
 
     if (item.es_highlight.description_text) {
         return item.es_highlight.description_text[0];

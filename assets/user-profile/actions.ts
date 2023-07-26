@@ -221,13 +221,13 @@ export function pushNotification(push: any): any {
     };
 }
 
-function getUserFoldersUrl(state, id) {
+function getUserFoldersUrl(state: any, id?: any) {
     const baseUrl = `/api/users/${state.user._id}/topic_folders`;
 
     return id != null ? `${baseUrl}/${id}` : baseUrl;
 }
 
-function getFoldersUrl(state, global, id) {
+function getFoldersUrl(state: any, global: any, id?: any) {
     const baseUrl = global ?
         `/api/companies/${state.company}/topic_folders` :
         `/api/users/${state.user._id}/topic_folders`;
@@ -235,7 +235,7 @@ function getFoldersUrl(state, global, id) {
     return id != null ? `${baseUrl}/${id}` : baseUrl;
 }
 
-function mergeUpdates(updates, response) {
+function mergeUpdates(updates: any, response: any) {
     updates._id = response._id;
     updates._etag = response._etag;
     updates._status = response._status;
@@ -243,8 +243,8 @@ function mergeUpdates(updates, response) {
 }
 
 export const FOLDER_UPDATED = 'FOLDER_UPDATED';
-export function saveFolder(folder, data, global) {
-    return (dispatch, getState) => {
+export function saveFolder(folder: any, data: any, global: any) {
+    return (dispatch: any, getState: any) => {
         const state = getState();
         const url = getFoldersUrl(state, global, folder._id);
 
@@ -267,8 +267,8 @@ export function saveFolder(folder, data, global) {
 }
 
 export const FOLDER_DELETED = 'FOLDER_DELETED';
-export function deleteFolder(folder, deleteTopics?: any) {
-    return (dispatch, getState) => {
+export function deleteFolder(folder: any, deleteTopics?: any) {
+    return (dispatch: any, getState: any) => {
         const state = getState();
         const url = getUserFoldersUrl(state, folder._id);
 
@@ -284,7 +284,7 @@ export function deleteFolder(folder, deleteTopics?: any) {
 export const RECIEVE_FOLDERS = 'RECIEVE_FOLDERS';
 
 export function fetchUserFolders() {
-    return (dispatch, getState) => {
+    return (dispatch: any, getState: any) => {
         const state = getState();
         const url = getUserFoldersUrl(state);
 
@@ -302,8 +302,8 @@ export function fetchUserFolders() {
  * @param {bool} force  - force refresh via adding timestamp to url
  * @param {bool} skipDispatch - if true it won't replace folders in store
  */
-export function fetchFolders(global, force?: any, skipDispatch?: any) {
-    return (dispatch, getState) => {
+export function fetchFolders(global: any, force?: any, skipDispatch?: any) {
+    return (dispatch: any, getState: any) => {
         const state = getState();
         const url = getFoldersUrl(state, global) + (force ? `?time=${Date.now()}` : '');
 
@@ -321,14 +321,14 @@ export function fetchFolders(global, force?: any, skipDispatch?: any) {
 }
 
 export const TOPIC_UPDATED = 'TOPIC_UPDATED';
-export function moveTopic(topicId, folder) {
-    return (dispatch, getState) => {
+export function moveTopic(topicId: any, folder: any) {
+    return (dispatch: any, getState: any) => {
         const updates = {
             folder: folder != null ? folder._id : null,
         };
 
         const state = getState();
-        const topic = state.topics.find((topic) => topic._id === topicId);
+        const topic = state.topics.find((topic: any) => topic._id === topicId);
         const url = `/api/users/${topic.user}/topics/${topicId}`;
 
         return server.patch(url, updates, topic._etag).then((response) => {

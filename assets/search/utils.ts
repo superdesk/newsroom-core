@@ -43,7 +43,7 @@ export const getSingleFilterValue = (activeFilter: any, fields: any) => {
     return null;
 };
 
-export function getAdvancedSearchFields(context) {
+export function getAdvancedSearchFields(context: any) {
     const config = getConfig('advanced_search', {
         fields: {
             wire: ['headline', 'slugline', 'body_html'],

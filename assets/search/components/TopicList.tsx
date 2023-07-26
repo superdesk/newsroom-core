@@ -6,7 +6,18 @@ import {get} from 'lodash';
 import {Topic} from './Topic';
 import {TopicFolder} from './TopicFolder';
 
-const TopicList = ({topics, selectedTopicId, actions, users, folders, folderPopover, toggleFolderPopover, moveTopic, saveFolder, deleteFolder}: any) => {
+const TopicList = ({
+    topics,
+    selectedTopicId,
+    actions,
+    users,
+    folders,
+    folderPopover,
+    toggleFolderPopover,
+    moveTopic,
+    saveFolder,
+    deleteFolder,
+}: any): any => {
 
     if (get(topics, 'length', 0) < 0 && get(folders, 'length', 0) < 0) {
         return null;
