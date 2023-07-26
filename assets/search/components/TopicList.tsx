@@ -1,73 +1,41 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import {get} from 'lodash';
-import classNames from 'classnames';
 
-import {gettext, formatDate, formatTime} from 'utils';
-import ActionButton from 'components/ActionButton';
-import {ToolTip} from '../../ui/components/ToolTip';
-import AuditInformation from 'components/AuditInformation';
+import {Topic} from './Topic';
+import {TopicFolder} from './TopicFolder';
 
-const TopicList = ({topics, selectedTopicId, actions, users}: any) => {
-    if (get(topics, 'length', 0) < 0) {
+const TopicList = ({topics, selectedTopicId, actions, users, folders, folderPopover, toggleFolderPopover, moveTopic, saveFolder, deleteFolder}: any) => {
+
+    if (get(topics, 'length', 0) < 0 && get(folders, 'length', 0) < 0) {
         return null;
     }
 
-    const getActionButtons = (topic: any) => actions.map(
-        (action: any) => (
-            <ActionButton
-                key={action.name}
-                item={topic}
-                className='icon-button icon-button--primary'
-                displayName={false}
-                action={action}
-                disabled={action.when != null && !action.when(topic)}
-            />
-        )
+    const renderTopic = (topic: any) => (
+        <Topic key={topic._id} topic={topic} actions={actions} users={users} selected={selectedTopicId === topic._id} />
     );
 
-    return topics.map(
-        (topic: any) => (
-            <div key={topic._id} className=''>
-                <div className={classNames(
-                    'simple-card',
-                    {'simple-card--selected': selectedTopicId === topic._id}
-                )}>
-                    <div className="simple-card__header simple-card__header-with-icons">
-                        <ToolTip>
-                            <h6
-                                className="simple-card__headline"
-                                title={topic.label || topic.name}
-                            >
-                                {topic.label || topic.name}
-                            </h6>
-                        </ToolTip>
-                        <div className='simple-card__icons'>
-                            {getActionButtons(topic)}
-                        </div>
-                    </div>
-                    <p>{topic.description || ' '}</p>
-                    {topic.is_global ? (
-                        <span className="simple-card__date">
-                            <AuditInformation
-                                item={topic}
-                                users={users}
-                                className="p-0"
-                                noPadding={true}
-                            />
-                        </span>
-                    ) : (
-                        <span className="simple-card__date">
-                            {gettext('Created on {{ date }} at {{ time }}', {
-                                date: formatDate(topic._created),
-                                time: formatTime(topic._created),
-                            })}
-                        </span>
-                    )}
-                </div>
-            </div>
-        )
-    );
+    const renderedFolders = folders.map((folder: any) => {
+        const filteredTopics = topics.filter((topic: any) => topic.folder === folder._id);
+        return (
+            <TopicFolder key={folder._id}
+                folder={folder}
+                topics={filteredTopics}
+                folderPopover={folderPopover}
+                toggleFolderPopover={toggleFolderPopover}
+                moveTopic={moveTopic}
+                saveFolder={saveFolder}
+                deleteFolder={deleteFolder}
+            >
+                {filteredTopics.map(renderTopic)}
+            </TopicFolder>
+        );
+    });
+
+    const renderedTopics = topics.filter((topic: any) => topic.folder == null).map(renderTopic);
+
+    return Array.prototype.concat(renderedFolders, renderedTopics);
 };
 
 TopicList.propTypes = {
@@ -79,6 +47,14 @@ TopicList.propTypes = {
         action: PropTypes.func,
     })),
     users: PropTypes.array,
+    folders: PropTypes.arrayOf(PropTypes.shape({
+        name: PropTypes.string,
+    })),
+    folderPopover: PropTypes.string,
+    toggleFolderPopover: PropTypes.func,
+    moveTopic: PropTypes.func,
+    saveFolder: PropTypes.func,
+    deleteFolder: PropTypes.func,
 };
 
 export default TopicList;

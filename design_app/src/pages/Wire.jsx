@@ -58,6 +58,7 @@ function Wire() {
 
     return (
         <div className="wire-wrap">
+
             <div className="content">
                 <section className="content-header">
                     <h3 className="a11y-only">Wire Content</h3>

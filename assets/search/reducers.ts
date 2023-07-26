@@ -1,5 +1,7 @@
-import {toggleValue} from 'utils';
 import {get} from 'lodash';
+
+import {toggleValue} from 'utils';
+import {getAdvancedSearchFields} from './utils';
 
 import {
     SET_VIEW,
@@ -24,9 +26,25 @@ import {
 
 import {EXTENDED_VIEW} from 'wire/defaults';
 
-const ADVANCED_FIELDS = ['headline', 'slugline', 'body_html'];
+interface IInitialState {
+    activeTopic: any;
+    activeNavigation: any;
+    activeQuery: any;
+    activeFilter: any;
+    createdFilter: any;
+    productId: any;
+    navigations: any;
+    products: any;
+    activeView: typeof EXTENDED_VIEW;
+    advanced: {
+        all: any;
+        any: any;
+        exclude: any;
+        fields: any;
+    };
+}
 
-const INITIAL_STATE = {
+const INITIAL_STATE: IInitialState = {
     activeTopic: null,
     activeNavigation: [],
     activeQuery: '',
@@ -43,12 +61,14 @@ const INITIAL_STATE = {
         all: '',
         any: '',
         exclude: '',
-        fields: ADVANCED_FIELDS,
+        fields: [],
     },
 };
 
-export function searchReducer(state: any = INITIAL_STATE, action?: any) {
+export function searchReducer(state=INITIAL_STATE, action: any, context: any) {
     if (!action) {
+        state.advanced.fields = getAdvancedSearchFields(context);
+
         return state;
     }
 
@@ -75,7 +95,7 @@ export function searchReducer(state: any = INITIAL_STATE, action?: any) {
     }
 
     case TOGGLE_FILTER: {
-        const activeFilter = Object.assign({}, state.activeFilter);
+        const activeFilter: any = Object.assign({}, state.activeFilter);
         activeFilter[action.key] = toggleValue(activeFilter[action.key], action.val);
         if (!action.val || !activeFilter[action.key] || activeFilter[action.key].length === 0) {
             delete activeFilter[action.key];
@@ -159,7 +179,7 @@ export function searchReducer(state: any = INITIAL_STATE, action?: any) {
                 all: '',
                 any: '',
                 exclude: '',
-                fields: ADVANCED_FIELDS,
+                fields: getAdvancedSearchFields(context),
             },
         };
 
@@ -190,7 +210,7 @@ export function searchReducer(state: any = INITIAL_STATE, action?: any) {
                 all: '',
                 any: '',
                 exclude: '',
-                fields: ADVANCED_FIELDS,
+                fields: getAdvancedSearchFields(context),
             },
         };
 
@@ -201,7 +221,7 @@ export function searchReducer(state: any = INITIAL_STATE, action?: any) {
                 all: action.payload.all || '',
                 any: action.payload.any || '',
                 exclude: action.payload.exclude || '',
-                fields: action.payload.fields || ADVANCED_FIELDS,
+                fields: action.payload.fields || getAdvancedSearchFields(context),
             },
         };
 

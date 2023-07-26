@@ -8,6 +8,7 @@ import {
     isRecurring,
     getInternalNote,
     getAttachments,
+    getSubjects
 } from '../utils';
 
 import AgendaListItemLabels from './AgendaListItemLabels';
@@ -18,10 +19,10 @@ import AgendaLocation from './AgendaLocation';
 
 import {gettext} from 'utils';
 
-
-class AgendaListItemIcons extends React.Component<any, any> {
+class AgendaListItemIcons extends React.Component {
     static propTypes: any;
     static defaultProps: any;
+
     constructor(props: any) {
         super(props);
 
@@ -59,10 +60,26 @@ class AgendaListItemIcons extends React.Component<any, any> {
         };
     }
 
+    getItemByschema(props: any) {
+        const {listConfig} = props;
+        if ((listConfig || {}).subject != null) {
+            const scheme = listConfig.subject.scheme;
+            const subjects = getSubjects(props.item);
+            return scheme == null ?
+                subjects :
+                subjects.filter((item: any) => Array.isArray(scheme) ?
+                    scheme.includes(item.scheme) :
+                    item.scheme === scheme
+                );
+        }
+        return [];
+    }
+
     render() {
-        const props = this.props;
-        const state = this.state;
+        const props: any = this.props;
+        const state: any = this.state;
         const className = bem('wire-articles', 'item__meta', {row: props.row});
+        const subject = this.getItemByschema(props);
 
         return (
             <div className={className}>
@@ -85,6 +102,19 @@ class AgendaListItemIcons extends React.Component<any, any> {
                                 showBorder={props.isMobilePhone && index === state.coveragesToDisplay.length - 1}
                                 group={props.group}
                             />
+                        ))}
+                    </div>
+                )}
+
+                {subject.length !== 0 && (
+                    <div>
+                        {subject.map((item: any) => (
+                            <span
+                                key={item.qcode}
+                                className={`label label--rounded subject--${item.qcode}`}
+                            >
+                                {item.name}
+                            </span>
                         ))}
                     </div>
                 )}
@@ -119,6 +149,7 @@ AgendaListItemIcons.propTypes = {
     row: PropTypes.bool,
     isMobilePhone: PropTypes.bool,
     user: PropTypes.string,
+    listConfig : PropTypes.object,
 };
 
 AgendaListItemIcons.defaultProps = {isMobilePhone: false};

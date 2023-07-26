@@ -49,7 +49,10 @@ class SearchBar extends React.Component<any, any> {
     render() {
         return (
             <React.Fragment>
-                <div className="search">
+                <div
+                    className="search"
+                    data-test-id="top-search-bar"
+                >
                     <form
                         className={classNames('search__form', {'search__form--active': !!this.state.query,})}
                         role="search"
@@ -81,8 +84,8 @@ class SearchBar extends React.Component<any, any> {
                         </div>
                     </form>
                 </div>
-                {this.props.toggleAdvancedSearchPanel == null ? this.props.toggleAdvancedSearchPanel : (
-                    <div className="mx-2 d-flex gap-2">
+                <div className="mx-2 d-flex gap-2">
+                    {this.props.toggleAdvancedSearchPanel == null ? null : (
                         <button
                             data-test-id="show-advanced-search-panel-btn"
                             className="nh-button nh-button--secondary"
@@ -90,8 +93,18 @@ class SearchBar extends React.Component<any, any> {
                         >
                             {gettext('Advanced Search')}
                         </button>
-                    </div>
-                )}
+                    )}
+                    {this.props.toggleSearchTipsPanel == null ? null : (
+                        <button
+                            data-test-id="show-search-tips-panel-btn"
+                            className="icon-button icon-button--tertiary icon-button--bordered"
+                            aria-label={gettext('Show Search tips')}
+                            onClick={this.props.toggleSearchTipsPanel}
+                        >
+                            <i className="icon--info" />
+                        </button>
+                    )}
+                </div>
             </React.Fragment>
         );
     }
@@ -103,6 +116,7 @@ SearchBar.propTypes = {
     fetchItems: PropTypes.func,
     enableQueryAction: PropTypes.bool,
     toggleAdvancedSearchPanel: PropTypes.func,
+    toggleSearchTipsPanel: PropTypes.func,
 };
 
 const mapStateToProps: any = (state: any) => ({

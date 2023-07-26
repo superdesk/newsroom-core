@@ -38,7 +38,7 @@ export function Tag({testId, text, keyValue, shade, readOnly, onClick, label, op
                 </span>
                 :
                 <span
-                    data-test-id={keyValue}
+                    data-test-id={testId}
                     data-tag-type={shade}
                     className={classes}
                     key={keyValue}

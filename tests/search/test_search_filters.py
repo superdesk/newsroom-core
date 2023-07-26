@@ -5,8 +5,8 @@ from eve.utils import ParsedRequest
 from content_api.errors import BadParameterValueError
 
 from newsroom import auth  # noqa
-from newsroom.search import SearchQuery, BaseSearchService
-from newsroom.search_config import init_nested_aggregation
+from newsroom.search.service import SearchQuery, BaseSearchService
+from newsroom.search.config import init_nested_aggregation
 from newsroom.utils import get_local_date
 from newsroom.wire.search import WireSearchResource
 

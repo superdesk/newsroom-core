@@ -20,7 +20,7 @@ from newsroom.news_api.utils import (
     remove_internal_renditions,
     check_association_permission,
 )
-from newsroom.search import BaseSearchService, query_string
+from newsroom.search.service import BaseSearchService, query_string
 from newsroom.products.products import get_products_by_company
 
 

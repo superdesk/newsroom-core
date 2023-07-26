@@ -23,6 +23,24 @@ function Company() {
 
     return (
         <div className="settingsWrap">
+            <div className="impersonate-user__wrapper">
+                <div className="impersonate-user">
+                    <div className="impersonate-user__inner">
+                        <div className="impersonate-user__avatar">
+                            <span className="impersonate-user__avatar-characters">JL</span>
+                        </div>
+                        <div className="impersonate-user__inner-text">
+                            <span className="impersonate-user__inner-text-label">Impersonating</span>
+                            <span className="impersonate-user__inner-text-name">Jeffrey Lebowski</span>
+                        </div>
+                    </div>
+                    <div className="impersonate-user__button-group">
+                        <button className="impersonate-user__button" aria-label="Stop impersonation">
+                            <i className="icon--close-thin" role="presentation"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
             <div className="settings-inner">
                 {isCompanyNavShown && <CompanyNav />}
             <div className="content">

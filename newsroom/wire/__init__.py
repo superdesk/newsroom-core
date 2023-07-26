@@ -6,7 +6,7 @@ from content_api.items.resource import code_mapping
 
 from newsroom.factory.app import BaseNewsroomApp
 from newsroom.wire.search import WireSearchResource, WireSearchService
-from newsroom.search_config import init_nested_aggregation
+from newsroom.search.config import init_nested_aggregation
 from . import utils
 
 

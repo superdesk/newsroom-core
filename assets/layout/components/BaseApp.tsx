@@ -11,6 +11,8 @@ import {getFilterPanelOpenState, setFilterPanelOpenState} from 'local-store';
 import TopicsTab from 'search/components/TopicsTab';
 import FiltersTab from 'wire/components/filters/FiltersTab';
 import NavigationTab from 'wire/components/filters/NavigationTab';
+import {AdvancedSearchPanel} from 'search/components/AdvancedSearchPanel';
+import {SearchTipsPanel} from 'search/components/SearchTipsPanel';
 
 export default class BaseApp extends React.Component<any, any> {
     static propTypes: any;
@@ -25,6 +27,8 @@ export default class BaseApp extends React.Component<any, any> {
             withSidebar: props.bookmarks !== true && getFilterPanelOpenState(props.context),
             minimizeSearchResults: isMobilePhone(),
             initialLoad: props.isLoading,
+            isAdvancedSearchShown: false,
+            isSearchTipsShown: false,
         };
 
         this.dom = {
@@ -43,6 +47,8 @@ export default class BaseApp extends React.Component<any, any> {
         this.setOpenRef = this.setOpenRef.bind(this);
         this.setCloseRef = this.setCloseRef.bind(this);
         this.setListRef = this.setListRef.bind(this);
+        this.toggleAdvancedSearchPanel = this.toggleAdvancedSearchPanel.bind(this);
+        this.toggleSearchTipsPanel = this.toggleSearchTipsPanel.bind(this);
 
         this.tabs = [
             {id: 'nav', label: gettext('Topics'), component: NavigationTab},
@@ -69,6 +75,18 @@ export default class BaseApp extends React.Component<any, any> {
 
     setListRef(elem: any) {
         this.dom.list = elem;
+    }
+
+    toggleAdvancedSearchPanel() {
+        this.setState((prevState: any) => ({isAdvancedSearchShown: !prevState.isAdvancedSearchShown}));
+
+        if (this.props.setQuery != null) {
+            this.props.setQuery('');
+        }
+    }
+
+    toggleSearchTipsPanel() {
+        this.setState((prevState: any) => ({isSearchTipsShown: !prevState.isSearchTipsShown}));
     }
 
     renderModal(specs: any) {
@@ -203,6 +221,33 @@ export default class BaseApp extends React.Component<any, any> {
         }
         this.initTooltips();
     }
+
+    renderPageContent() {
+        return <div/>;
+    }
+
+    render() {
+        return (
+            <React.Fragment>
+                <div className="content">
+                    {this.renderPageContent()}
+                </div>
+                {!this.state.isAdvancedSearchShown ? null : (
+                    <AdvancedSearchPanel
+                        fetchItems={this.props.fetchItems}
+                        toggleAdvancedSearchPanel={this.toggleAdvancedSearchPanel}
+                        toggleSearchTipsPanel={this.toggleSearchTipsPanel}
+                    />
+                )}
+                {!this.state.isSearchTipsShown ? null : (
+                    <SearchTipsPanel
+                        toggleSearchTipsPanel={this.toggleSearchTipsPanel}
+                        defaultTab={this.state.isAdvancedSearchShown ? 'advanced' : 'regular'}
+                    />
+                )}
+            </React.Fragment>
+        );
+    }
 }
 
 BaseApp.propTypes = {
@@ -211,7 +256,9 @@ BaseApp.propTypes = {
     actions: PropTypes.arrayOf(PropTypes.object).isRequired,
     activeQuery: PropTypes.string,
     fetchMoreItems: PropTypes.func.isRequired,
+    fetchItems: PropTypes.func.isRequired,
     savedItemsCount: PropTypes.number,
     bookmarks: PropTypes.bool,
     isLoading: PropTypes.bool,
+    setQuery: PropTypes.func,
 };
