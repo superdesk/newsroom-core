@@ -20,6 +20,7 @@ function CompaniesApp({
     activeQuery,
     totalCompanies,
     companyToEdit,
+    countries
 }) {
     return (
         <React.Fragment>
@@ -44,11 +45,13 @@ function CompaniesApp({
                                 totalItemsLabel={activeQuery}
                             />
                         )}
-                        <CompanyList />
+                        <CompanyList 
+                            countries = {countries}
+                        />
                     </div>
                 )}
                 {!companyToEdit ? null : (
-                    <EditCompany key={companyToEdit._id || '_new'} />
+                    <EditCompany key={companyToEdit._id || '_new'} countries = {countries} />
                 )}
             </div>
         </React.Fragment>
@@ -63,6 +66,7 @@ CompaniesApp.propTypes = {
     totalCompanies: PropTypes.number,
     fetchCompanies: PropTypes.func,
     setQuery: PropTypes.func,
+    countries: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
@@ -70,6 +74,7 @@ const mapStateToProps = (state) => ({
     totalCompanies: state.totalCompanies,
     activeQuery: searchQuerySelector(state),
     companyToEdit: state.companyToEdit,
+    countries: state.countries,
 });
 
 const mapDispatchToProps = {

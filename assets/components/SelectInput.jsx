@@ -30,7 +30,10 @@ const SelectInput = ({
                         <option value="">{defaultOption}</option>
                     }
                     {options.map((option) => {
-                        return <option key={option.value} value={option.value}>{gettext(option.text)}</option>;
+                        return <option 
+                            key={option.value || option.qcode}
+                            value={option.value || option.qcode}
+                        >{gettext(option.text || option.name)}</option>;
                     })}
                 </select>
                 {error && <div className="alert alert-danger">{error}</div>}
@@ -47,8 +50,10 @@ SelectInput.propTypes = {
     value: PropTypes.string,
     error: PropTypes.arrayOf(PropTypes.string),
     options: PropTypes.arrayOf(PropTypes.shape({
-        text: PropTypes.string.isRequired,
-        value: PropTypes.string.isRequired,
+        text: PropTypes.string,
+        value: PropTypes.string,
+        qcode: PropTypes.string,
+        name: PropTypes.string,
     })).isRequired,
     className: PropTypes.string,
     readOnly: PropTypes.bool,
