@@ -1,6 +1,6 @@
 
 export function getCountryLabel(code, _countries) {
-    return (_countries.find(c => c.qcode === code) || {}).name;
+    return (_countries.find(c => c.value === code) || {}).text;
 }
 
 export function isProductEnabled(products, productId) {

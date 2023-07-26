@@ -29,8 +29,11 @@ def get_company_product_ids(company: Company) -> List[ObjectId]:
 
 def load_countries_list():
     with open(get_filepath("vocabularies.json")) as f:
-        cvs = json.load(f)
-    for cv in cvs:
-        if cv["_id"] == "countries":
-            return cv["items"]
-    return []
+        data = json.load(f)
+    countries = [
+        {"value": item.get("qcode", ""), "text": item.get("name", "")}
+        for cv in data
+        if cv["_id"] == "countries"
+        for item in cv["items"]
+    ]
+    return countries
