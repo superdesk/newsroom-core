@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {gettext, isDisplayed, isMobilePhone} from 'utils';
 import {get} from 'lodash';
@@ -16,7 +15,7 @@ import {SearchBar} from './search-bar';
 import {previewConfigSelector, listConfigSelector, detailsConfigSelector, isSearchEnabled} from 'ui/selectors';
 import {filterGroupsToLabelMap} from 'search/selectors';
 import CardRow from 'components/cards/render/CardRow';
-import {PersonalizeHomeSettingsModal} from 'components/PersonalizeHomeModal';
+import {IPersonalizedDashboard, ITopic, PersonalizeHomeSettingsModal} from 'components/PersonalizeHomeModal';
 import {personalizeHome} from 'agenda/actions';
 import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 
@@ -26,7 +25,39 @@ const modals: any = {
     personalizeHome: PersonalizeHomeSettingsModal,
 };
 
-class HomeApp extends React.Component<any, any> {
+interface IState {
+    loadingItems: boolean;
+    activeOptionId: string;
+}
+
+interface IProps {
+    cards: Array<any>;
+    itemsByCard: any;
+    products: Array<any>;
+    user: string;
+    userType: string;
+    company: string;
+    format: Array<any>;
+    itemToOpen: any;
+    modal: any;
+    openItemDetails: () => void;
+    activeCard: string;
+    actions: Array<{name: string; action: (action?: any) => void;}>;
+    fetchCardExternalItems: (cardId: string, cardLabel: string) => void;
+    personalizeHome: () => void;
+    fetchCompanyCardItems: () => void;
+    followStory: () => void;
+    previewConfig: any;
+    listConfig: any;
+    detailsConfig: any;
+    downloadMedia: () => void;
+    topics: Array<ITopic>;
+    isFollowing: boolean;
+    isSearchEnabled: boolean;
+    filterGroupLabels: any;
+}
+
+class HomeApp extends React.Component<IProps, IState> {
     static propTypes: any;
 
     height: number;
@@ -39,7 +70,10 @@ class HomeApp extends React.Component<any, any> {
         this.onHomeScroll = this.onHomeScroll.bind(this);
         this.height = 0;
 
-        this.state = {loadingItems: true};
+        this.state = {
+            loadingItems: true,
+            activeOptionId: 'default',
+        };
     }
 
     componentDidMount() {
@@ -81,6 +115,80 @@ class HomeApp extends React.Component<any, any> {
 
     getProductId(card: any) {
         return card.config.product;
+    }
+
+    getPanelsForPersonalizedDashboard(card: any) {
+        const personalizedDashboardTopics = localStorage.getItem('personal-dashboard');
+        const homePersonalizedDashboard: IPersonalizedDashboard = personalizedDashboardTopics != null
+            ? JSON.parse(personalizedDashboardTopics).find(({name}: IPersonalizedDashboard) => name === 'My Home')
+            : null;
+
+        const savedTopicsForPersonalizedDashboard: Array<ITopic> =
+            this.props.topics.filter(({_id}) => homePersonalizedDashboard.topicIds.includes(_id));
+
+        const Panel: React.ComponentType<any> = getCardDashboardComponent('4-media-gallery');
+        const rawItems: Array<any> = this.props.itemsByCard[card.label] ?? [];
+        const topicQueries = savedTopicsForPersonalizedDashboard.map(({query}) => query);
+
+        const groupedItemsByTopic: Dictionary<Array<ITopic>> = topicQueries.reduce((acc, _, i) => {
+            const topicQuery = topicQueries?.[i];
+
+            if (topicQuery) {
+                const matchedItem = rawItems.filter((x) => x.body_html.toLowerCase().includes(topicQuery));
+
+                return {
+                    ...acc,
+                    [topicQuery]: matchedItem,
+                };
+            }
+
+            return acc;
+        }, {});
+
+        if (this.state.loadingItems) {
+            return (
+                <CardRow
+                    key={card.label}
+                    title={card.label}
+                    productId={this.getProductId(card)}
+                    isActive={this.props.activeCard === card._id}
+                >
+                    <div className='col-sm-6 col-md-4 col-lg-3 col-xxl-2 d-flex mb-4'>
+                        <div className="spinner-border text-success" />
+                        <span className="a11y-only">{gettext('Loading Card Items')}</span>
+                    </div>
+                </CardRow>
+            );
+        }
+
+        const gropedItemsTuple = Object.entries(groupedItemsByTopic);
+
+        return (
+            !(gropedItemsTuple[0][1].length > 0) ? (
+                <div style={{margin: 12}} className="alert alert-warning" role="alert">
+                    <strong>{gettext('Warning')}! </strong>
+                    {gettext('There\'s no items in these topics!', window.sectionNames)}
+                </div>
+            ) : (
+                gropedItemsTuple.map(([key, items]) => {
+                    if (items.length > 0) {
+                        return (
+                            <Panel
+                                key={key}
+                                type="4-picture-text"
+                                items={items}
+                                title={key}
+                                productId={this.getProductId(card)}
+                                openItem={this.props.openItemDetails}
+                                isActive={this.props.activeCard === card._id}
+                                cardId={card._id}
+                                listConfig={this.props.listConfig}
+                            />
+                        );
+                    }
+                })
+            )
+        );
     }
 
     getPanels(card: any) {
@@ -194,9 +302,11 @@ class HomeApp extends React.Component<any, any> {
                                                 name: 'My home'
                                             }
                                         ]}
-                                        activeOptionId='default'
+                                        activeOptionId={this.state.activeOptionId}
                                         switchOptions={(optionId) => {
-                                            //
+                                            this.setState({
+                                                activeOptionId: optionId
+                                            });
                                         }}
                                     />
                                     <button
@@ -212,17 +322,15 @@ class HomeApp extends React.Component<any, any> {
                                 </div>
                             </div>
                         </div>
+                        {this.props.modal?.modal === 'personalizeHome' && <PersonalizeHomeSettingsModal />}
                         {
-                            this.props.modal?.modal === 'personalizeHome' && (
-                                <PersonalizeHomeSettingsModal />
-                            )
-                        }
-                        {
-                            cards.length > 0 && (
-                                this.props.cards
-                                    .filter((c: any) => c.dashboard === 'newsroom')
-                                    .map((card: any) => this.getPanels(card))
-                            )
+                            this.state.activeOptionId != 'my-home' && cards.length > 0
+                                ? (
+                                    this.props.cards
+                                        .filter((c: any) => c.dashboard === 'newsroom')
+                                        .map((card: any) => this.getPanels(card))
+                                )
+                                : cards.length > 0 && this.getPanelsForPersonalizedDashboard(this.props.cards[0])
                         }
                         {
                             cards.length === 0 && (
@@ -295,35 +403,6 @@ class HomeApp extends React.Component<any, any> {
     }
 }
 
-HomeApp.propTypes = {
-    cards: PropTypes.arrayOf(PropTypes.object),
-    itemsByCard: PropTypes.object,
-    products: PropTypes.array,
-    user: PropTypes.string,
-    userType: PropTypes.string,
-    company: PropTypes.string,
-    format: PropTypes.array,
-    itemToOpen: PropTypes.object,
-    modal: PropTypes.object,
-    openItemDetails: PropTypes.func,
-    activeCard: PropTypes.string,
-    actions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string,
-        action: PropTypes.func,
-    })),
-    fetchCardExternalItems: PropTypes.func,
-    fetchCompanyCardItems: PropTypes.func,
-    followStory: PropTypes.func,
-    previewConfig: PropTypes.object,
-    listConfig: PropTypes.object,
-    detailsConfig: PropTypes.object,
-    downloadMedia: PropTypes.func,
-    topics: PropTypes.array,
-    isFollowing: PropTypes.bool,
-    isSearchEnabled: PropTypes.bool,
-    filterGroupLabels: PropTypes.object,
-};
-
 const mapStateToProps = (state: any) =>({
     cards: state.cards,
     itemsByCard: state.itemsByCard,
@@ -354,7 +433,7 @@ const mapDispatchToProps = (dispatch: any, state: any) => ({
     fetchCardExternalItems: (cardId: any, cardLabel: any) => dispatch(fetchCardExternalItems(cardId, cardLabel)),
     fetchCompanyCardItems: () => dispatch(fetchCompanyCardItems()),
     followStory: (item: any) => followStory(item, 'wire'),
-    downloadMedia: (href: any, id: any, mimeType: any) => dispatch(downloadMedia(href, id)),
+    downloadMedia: (href: any, id: any) => dispatch(downloadMedia(href, id)),
 });
 
 

@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 import {connect} from 'react-redux';
-import {get, range, partition, isMatch} from 'lodash';
+import {partition} from 'lodash';
 import {gettext} from 'utils';
 import Modal from 'components/Modal';
 import {Input} from 'reactstrap';
@@ -10,10 +10,12 @@ import {FormToggle} from 'ui/components/FormToggle';
 import {reloadMyTopics as reloadMyWireTopics} from 'wire/actions';
 import {IUser} from 'interfaces/user';
 import {RadioButtonGroup} from 'features/sections/SectionSwitch';
+import {modalFormInvalid, modalFormValid} from 'actions';
 
 interface IReduxStoreProps {
-    formValid: any;
-    topics: Array<any>;
+    topics?: Array<ITopic>;
+    modalFormValid?: () => void;
+    modalFormInvalid?: () => void;
 }
 
 interface IProps extends IReduxStoreProps {
@@ -23,20 +25,18 @@ interface IProps extends IReduxStoreProps {
 
 interface IState {
     checked: boolean;
-    checkedTopics: Array<ITopic>;
-    allTopics: Array<ITopic>;
+    selectedTopics: Set<string>;
     activeSection: string;
     searchTerm: string;
+    isLoading: boolean;
 }
 
-type Dictionary = {[key: string]: string};
-
-interface ITopic {
+export interface ITopic {
     _id: string;
     label: string;
     query?: string;
-    filter?: Dictionary;
-    created?: Dictionary;
+    filter?: Dictionary<string>;
+    created?: Dictionary<string>;
     user: IUser['_id'];
     company: any;
     is_global?: boolean;
@@ -47,8 +47,16 @@ interface ITopic {
     original_creator: IUser['_id'];
     version_creator: IUser['_id'];
     folder: string;
-    advanced?: Dictionary;
+    advanced?: Dictionary<string>;
 }
+
+export interface IPersonalizedDashboard {
+    type: string;
+    name: string;
+    topicIds: Array<string>;
+}
+
+const MAX_SELECTED_TOPICS = 6;
 
 class PersonalizeHomeModal extends React.Component<IProps, IState> {
     constructor(props: any) {
@@ -56,102 +64,124 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
 
         this.state = {
             checked: false,
-            checkedTopics: [],
-            allTopics: [],
+            selectedTopics: new Set<string>(),
             activeSection: '1',
             searchTerm: '',
+            isLoading: false,
         };
     }
 
-    // componentDidMount(): void {
-    //     server.get('/topics/my_topics').then((topics) => {
-    //         this.setState({
-    //             allTopics: topics,
-    //         });
-    //     });
-    // }
-
-    handleChange(isIncluded: boolean, topic: ITopic) {
-        if (this.state.checkedTopics.length < 6) {
-            if (isIncluded) {
-                this.setState({
-                    checkedTopics: this.state.checkedTopics
-                        .filter((topic) => topic._id !== topic._id)
-                });
-            } else {
-                this.setState({
-                    checkedTopics: [
-                        topic,
-                        ...this.state.checkedTopics
-                    ],
-                });
-            }
+    componentDidUpdate(): void {
+        if (this.state.selectedTopics.size > 0) {
+            this.props.modalFormValid?.();
+        } else {
+            this.props.modalFormInvalid?.();
         }
     }
 
-    isIncluded(topicId: string) {
-        return this.state.checkedTopics.map(({_id}) => _id).includes(topicId);
+    handleChange(topicId: string) {
+        const updatedSet = new Set(this.state.selectedTopics);
+
+        if (this.state.selectedTopics.has(topicId)) {
+            updatedSet.delete(topicId);
+        } else if (this.state.selectedTopics.size < MAX_SELECTED_TOPICS) {
+            updatedSet.add(topicId);
+        }
+
+        this.setState({
+            selectedTopics: updatedSet
+        });
+    }
+
+    addCustomDashboard(name: string) {
+        this.setState({isLoading: true});
+
+        const newDashboard: IPersonalizedDashboard = {
+            type: '4-picture-text',
+            topicIds: Array.from(this.state.selectedTopics),
+            name: name,
+        };
+
+        Promise.resolve(setTimeout(() => {
+            localStorage.setItem(
+                'personal-dashboard',
+                JSON.stringify([newDashboard])
+            );
+        }, 3000));
+
+        this.setState({isLoading: false});
     }
 
     render() {
-        if (this.state.allTopics == null) {
-            return (
-                <div className="empty-state__container mt-3">
-                    <div className="empty-state">
-                        <figure className="empty-state__graphic">
-                            <img src="/static/empty-states/empty_state--small.svg" role="presentation" alt="" />
-                        </figure>
-                        <figcaption className="empty-state__text">
-                            <h4 className="empty-state__text-heading">You don't have any saved Topics yet</h4>
-                            <p className="empty-state__text-description">
-                                You can create Topics by saving search terms and/or filters from the Wire and Agenda sections.
-                            </p>
-                            <div className="empty-state__links">
-                                <a className="" href="">Go to Wire</a>
-                                <a className="" href="">Go to Agenda</a>
-                            </div>
-                        </figcaption>
-                    </div>
+        const [wireTopics, agendaTopics] = partition(this.props.topics, (topic) => topic.topic_type === 'wire');
+
+        const NoSearchMatches = () => (
+            <div className="empty-state__container mt-3">
+                <div className="empty-state">
+                    <figure className="empty-state__graphic">
+                        <img src="/static/empty-states/empty_state--small.svg" role="presentation" alt="" />
+                    </figure>
+                    <figcaption className="empty-state__text">
+                        <h4 className="empty-state__text-heading">You don't have any saved Topics yet</h4>
+                        <p className="empty-state__text-description">
+                            You can create Topics by saving search terms and/or filters from the Wire and Agenda sections.
+                        </p>
+                        <div className="empty-state__links">
+                            <a className="" href="">Go to Wire</a>
+                            <a className="" href="">Go to Agenda</a>
+                        </div>
+                    </figcaption>
                 </div>
-            );
-        }
+            </div>
+        );
 
-        const topicsMocked: Array<ITopic> = range(1, 10).map((x) => {
-            return {
-                _id: x,
-                label: `${x}`,
-                user: x,
-                company: x,
-                subscribers: [x],
-                topic_type: x % 2 === 0 ? 'wire' : 'agenda',
-                original_creator: x,
-                version_creator: x,
-                folder: x,
-            } as unknown as ITopic;
-        });
+        const NoSelectedTopics = () => (
+            <div className="empty-state__container empty-state__container--full-height">
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                    }}
+                    className="empty-state empty-state--large"
+                >
+                    <figure className="empty-state__graphic">
+                        <img src="/static/empty-states/empty_state--small.svg" role="presentation" alt="" />
+                    </figure>
+                    <figcaption className="empty-state__text">
+                        <h4 className="empty-state__text-heading">You don't have any saved Topics yet</h4>
+                        <p className="empty-state__text-description">
+                            You can create Topics by saving search terms and/or filters from the Wire and Agenda sections.
+                        </p>
+                    </figcaption>
+                </div>
+            </div>
+        );
 
-        const [wireTopics, agendaTopics] = partition(topicsMocked, (topic) => topic.topic_type === 'wire');
+        const filteredTopics = (topics: Array<ITopic>) =>
+            topics.filter(({is_global}) => this.state.activeSection === '1' ? is_global != true : is_global === true);
 
-        const searchedTopics = topicsMocked.map((topic) => {
-            if (isMatch(topic, {label: this.state.searchTerm})) {
-                const isIncluded = this.isIncluded(topic._id);
+        const searchMatches = filteredTopics(this.props.topics ?? [])
+            .filter((topic) => topic.label.toLowerCase().includes(this.state.searchTerm.toLowerCase()))
+            .map((topic) => (
+                <CheckboxInput
+                    key={topic._id}
+                    value={this.state.selectedTopics.has(topic._id)}
+                    onChange={() => {
+                        this.handleChange(topic._id);
+                    }}
+                    label={gettext(topic.label)}
+                />
+            ));
 
-                return (
-                    <CheckboxInput
-                        key={topic._id}
-                        value={isIncluded}
-                        onChange={() => {
-                            this.handleChange(isIncluded, topic);
-                        }}
-                        label={gettext(topic.label)}
-                    />
-                );
-            }
+        const topicSearch = (searchMatches?.length ?? 0) > 0
+            ? (
+                <div style={{padding: 4}}>
+                    {searchMatches}
+                </div>
+            ) : <NoSearchMatches />;
 
-            return null;
-        });
-
-        const groupedTopics = (topicsMocked?.length ?? 0) > 0 ? (
+        const groupedTopics = (this.props.topics?.length ?? 0) > 0 ? (
             <div>
                 <FormToggle
                     expanded={true}
@@ -159,20 +189,16 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                     testId="toggle--general"
                 >
                     {
-                        wireTopics.map((wireTopic) => {
-                            const isIncluded = this.isIncluded(wireTopic._id);
-
-                            return (
-                                <CheckboxInput
-                                    key={wireTopic._id}
-                                    value={isIncluded}
-                                    onChange={() => {
-                                        this.handleChange(isIncluded, wireTopic);
-                                    }}
-                                    label={gettext(wireTopic.label)}
-                                />
-                            );
-                        })
+                        filteredTopics(wireTopics).map((wireTopic) => (
+                            <CheckboxInput
+                                key={wireTopic._id}
+                                value={this.state.selectedTopics.has(wireTopic._id)}
+                                onChange={() => {
+                                    this.handleChange(wireTopic._id);
+                                }}
+                                label={gettext(wireTopic.label)}
+                            />
+                        ))
                     }
                 </FormToggle>
                 <FormToggle
@@ -181,20 +207,16 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                     testId="toggle--general"
                 >
                     {
-                        agendaTopics.map((agendaTopic) => {
-                            const isIncluded = this.isIncluded(agendaTopic._id);
-
-                            return (
-                                <CheckboxInput
-                                    key={agendaTopic._id}
-                                    value={isIncluded}
-                                    onChange={() => {
-                                        this.handleChange(isIncluded, agendaTopic);
-                                    }}
-                                    label={gettext(agendaTopic.label)}
-                                />
-                            );
-                        })
+                        filteredTopics(agendaTopics).map((agendaTopic) => (
+                            <CheckboxInput
+                                key={agendaTopic._id}
+                                value={this.state.selectedTopics.has(agendaTopic._id)}
+                                onChange={() => {
+                                    this.handleChange(agendaTopic._id);
+                                }}
+                                label={gettext(agendaTopic.label)}
+                            />
+                        ))
                     }
                 </FormToggle>
             </div>
@@ -218,24 +240,69 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
             </div>
         );
 
+        const selectedTopics = (
+            <div className="simple-card__list pt-3">
+                {(this.props.topics as Array<ITopic>).filter((topic) => this.state.selectedTopics.has(topic._id)).map((topic) => (
+                    <div
+                        style={{
+                            width: '100%',
+                        }}
+                        key={topic._id}
+                        className="simple-card flex-row simple-card--compact simple-card--draggable"
+                    >
+                        <div style={{paddingLeft: 24}} className='simple-card__content'>
+                            <h6 className="simple-card__headline" title="">{topic.label}</h6>
+                            <div className="simple-card__row">
+                                <div className="simple-card__column simple-card__column--align-start">
+                                    <span className="simple-card__date">
+                                        {topic.is_global != false ? 'Company Topics' : 'My Topics'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className='simple-card__actions'>
+                            <button
+                                type="button"
+                                className="icon-button icon-button--secondary icon-button--small"
+                                title=""
+                                aria-label="Delete"
+                                onClick={() => {
+                                    this.handleChange(topic._id);
+                                }}
+                            >
+                                <i className="icon--trash" />
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        );
+
         return (
             <Modal
                 width="full"
                 closeModal={this.props.closeModal}
                 title={gettext('Personalize Home')}
                 onSubmitLabel={gettext('Save')}
-                disableButtonOnSubmit
+                disableButtonOnSubmit={this.state.isLoading}
+                onSubmit={() => {
+                    this.addCustomDashboard('My Home');
+                }}
             >
                 <div
                     style={{
                         display: 'flex',
                         flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        gap: 12,
                     }}
                 >
-                    <aside className="full-page-layout__content-aside">
+                    <aside style={{width: '25%'}} className="full-page-layout__content-aside">
                         <div className="full-page-layout__content-aside-inner">
-                            <p className='font-size--medium text-color--muted mt-1 mb-3'>Select up to 6 Topics you want to display on your personal Home screen.</p>
-                            <p className='font-size--large'>{this.state.checkedTopics.length} out of 6 topics selected</p>
+                            <p className='font-size--medium text-color--muted mt-1 mb-3'>
+                                Select up to 6 Topics you want to display on your personal Home screen.
+                            </p>
+                            <p className='font-size--large'>{this.state.selectedTopics.size} out of 6 topics selected</p>
                             <RadioButtonGroup
                                 activeOptionId={this.state.activeSection}
                                 options={[
@@ -255,9 +322,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                                 }}
                             />
                             <div style={{padding: 6}} />
-                            <div
-                                className="search search--small search--with-icon search--bordered m-0"
-                            >
+                            <div className="search search--small search--with-icon search--bordered m-0">
                                 <form className="search__form" role="search" aria-label="search">
                                     <i className="icon--search icon--muted-2"></i>
                                     <input
@@ -282,7 +347,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                                     </div>
                                 </form>
                             </div>
-                            {this.state.searchTerm ? searchedTopics : groupedTopics}
+                            {this.state.searchTerm ? topicSearch : groupedTopics}
                         </div>
                     </aside>
                     <div
@@ -290,48 +355,19 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                             width: '75%',
                             display: 'flex',
                             flexDirection: 'column',
+                            alignItems: 'center',
                         }}
+                        className='full-page-layout__content-main'
                     >
                         <Input disabled value={gettext('My Home')} />
-                        {/* <CheckboxInput
-                            value={this.state.checked}
-                            onChange={() => {
-                                this.setState({
-                                    checked: !this.state.checked,
-                                });
-                            }}
-                            label={gettext('Make this my default home screen')}
-                        /> */}
-                        <div className="py-3 mt-4 mb-2 border border--medium border-start-0 border-end-0 border--dotted">
+                        {/* FIXME: For the MVP we won't have the option for draggable list items sorting */}
+                        {/* <div className="py-3 mt-4 mb-2 border border--medium border-start-0 border-end-0 border--dotted">
                             <p className='font-size--medium text-color--muted m-0'>
                                 <span className='text-color--default fw-bold'>Hint: </span>
                                 Drag and drop items to change the order. This will change the order of the topics are displayed on the Home screen.
                             </p>
-                        </div>
-                        <div className="simple-card__list pt-3">
-                            {
-                                this.state.checkedTopics.map((topic) => (
-                                    <div
-                                        key={topic._id}
-                                        className="simple-card flex-row simple-card--compact simple-card--draggable"
-                                    >
-                                        <div style={{paddingLeft: 24}} className='simple-card__content'>
-                                            <h6 className="simple-card__headline" title="">{topic.label}</h6>
-                                            <div className="simple-card__row">
-                                                <div className="simple-card__column simple-card__column--align-start">
-                                                    <span className="simple-card__date">
-                                                        {topic.company != null ? 'Company Topics' : 'My Topics'}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className='simple-card__actions'>
-                                            <button type="button" className="icon-button icon-button--secondary icon-button--small" title="" aria-label="Delete"><i className="icon--trash"></i></button>
-                                        </div>
-                                    </div>
-                                ))
-                            }
-                        </div>
+                        </div> */}
+                        {this.state.selectedTopics.size > 0 ? selectedTopics : <NoSelectedTopics />}
                     </div>
                 </div>
             </Modal>
@@ -340,12 +376,13 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
 }
 
 const mapStateToProps = (state: IReduxStoreProps) => ({
-    formValid: get(state, 'modal.formValid'),
     topics: state.topics,
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    reloadTopics: () => dispatch(reloadMyWireTopics(true))
+    reloadTopics: () => dispatch(reloadMyWireTopics(true)),
+    modalFormValid: () => dispatch(modalFormValid()),
+    modalFormInvalid: () => dispatch(modalFormInvalid()),
 });
 
 export const PersonalizeHomeSettingsModal =
