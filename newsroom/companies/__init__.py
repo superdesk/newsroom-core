@@ -42,6 +42,7 @@ def load_countries_list():
             if cv["_id"] == "countries"
             for item in cv["items"]
         ]
+    countries.append({"value": "other", "text": "Other"})
     return countries
 
 
