@@ -534,7 +534,7 @@ const mapDispatchToProps = (dispatch) => ({
         dispatch(loadMyAgendaTopic(topic._id)) :
         dispatch(loadMyWireTopic(topic._id)),
     setTopicEditorFullscreen: (fullscreen) => dispatch(setTopicEditorFullscreen(fullscreen)),
-    fetchFolders: (global) => dispatch(fetchFolders(global, false, true)),
+    fetchFolders: (global) => dispatch(fetchFolders(global, true)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TopicEditor);
