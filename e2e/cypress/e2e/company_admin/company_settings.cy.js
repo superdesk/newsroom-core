@@ -35,7 +35,7 @@ describe('CompanySettings', function() {
             phone: '1234 5678',
             contact_name: 'Foo',
             contact_email: 'foo@bar.org',
-            country: 'other',
+            country: 'Aruba',
             expiry_date: '2030-12-31',
             is_enabled: true,
         });
@@ -53,7 +53,7 @@ describe('CompanySettings', function() {
             phone: '1234 5678',
             contact_name: 'Foo',
             contact_email: 'foo@bar.org',
-            country: 'other',
+            country: 'Aruba',
             expiry_date: '2030-12-31',
             is_enabled: true,
         });
