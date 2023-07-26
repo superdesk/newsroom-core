@@ -40,11 +40,11 @@ class EditProduct extends React.Component<any, any> {
     }
 
     handleTabClick(event: any) {
-        this.setState({activeTab: event.target.name});
-        if(event.target.name === 'companies') {
+        this.setState({activeTab: event.target.title});
+        if(event.target.title === 'companies') {
             this.props.fetchCompanies();
         }
-        if(event.target.name === 'navigations') {
+        if(event.target.title === 'navigations') {
             this.props.fetchNavigations();
         }
     }
@@ -95,12 +95,17 @@ class EditProduct extends React.Component<any, any> {
                 <AuditInformation item={this.props.product} />
                 <ul className='nav nav-tabs'>
                     {this.tabs.map((tab: any) => (
-                        <li key={tab.name} className='nav-item'>
+                        <li
+                            key={tab.name}
+                            className='nav-item'
+                        >
                             <a
                                 title={tab.name}
                                 className={`nav-link ${this.state.activeTab === tab.name && 'active'}`}
                                 href='#'
-                                onClick={this.handleTabClick}>{tab.label}
+                                onClick={this.handleTabClick}
+                            >
+                                {tab.label}
                             </a>
                         </li>
                     ))}
