@@ -1,9 +1,10 @@
 import superdesk
 
-from flask import Blueprint, current_app as newsroom_app
+from flask import Blueprint, current_app as newsroom_app, json
 from flask_babel import lazy_gettext
 from newsroom.auth import get_company
 from .companies import CompaniesResource, CompaniesService
+from apps.prepopulate.app_initialize import get_filepath
 
 blueprint = Blueprint("companies", __name__)
 
@@ -42,6 +43,17 @@ def init_app(app):
         data=views.get_settings_data,
         allow_account_mgr=True,
     )
+
+    # Populate countries data based on superdesk-core vocabularies.json file.
+    with app.app_context():
+        with open(get_filepath("vocabularies.json")) as f:
+            data = json.load(f)
+            app.countries = [
+                {"value": item.get("qcode", ""), "text": item.get("name", "")}
+                for cv in data
+                if cv["_id"] == "countries"
+                for item in cv["items"]
+            ]
 
 
 from . import views  # noqa

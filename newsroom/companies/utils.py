@@ -2,8 +2,6 @@ from typing import Optional, List
 from bson import ObjectId
 
 from newsroom.types import Company
-from apps.prepopulate.app_initialize import get_filepath
-from flask import json
 
 
 def restrict_coverage_info(company: Optional[Company]) -> bool:
@@ -25,15 +23,3 @@ def get_company_product_ids(company: Company) -> List[ObjectId]:
         ],
         key=lambda o: str(o),
     )
-
-
-def load_countries_list():
-    with open(get_filepath("vocabularies.json")) as f:
-        data = json.load(f)
-    countries = [
-        {"value": item.get("qcode", ""), "text": item.get("name", "")}
-        for cv in data
-        if cv["_id"] == "countries"
-        for item in cv["items"]
-    ]
-    return countries
