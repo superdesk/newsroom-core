@@ -21,6 +21,7 @@ from superdesk.default_settings import (  # noqa
     ELASTICSEARCH_SETTINGS,
     ELASTIC_DATE_FORMAT,
     CELERY_BROKER_URL,
+    BROKER_URL,
     celery_queue,
     AMAZON_SECRET_ACCESS_KEY,
     AMAZON_ACCESS_KEY_ID,
