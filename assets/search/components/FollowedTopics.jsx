@@ -46,6 +46,7 @@ class FollowedTopics extends React.Component {
         this.toggleGlobal = this.toggleGlobal.bind(this);
         this.toggleFolderPopover = this.toggleFolderPopover.bind(this);
         this.saveFolder = this.saveFolder.bind(this);
+        this.deleteFolder = this.deleteFolder.bind(this);
         this.removeTopicFolder = this.removeTopicFolder.bind(this);
 
         this.state = {showGlobal: false, newFolder: null, folderPopover: null};
@@ -159,6 +160,10 @@ class FollowedTopics extends React.Component {
         });
     }
 
+    deleteFolder(folder) {
+        this.props.deleteFolder(folder, this.state.showGlobal);
+    }
+
     toggleFolderPopover(folder) {
         this.setState({folderPopover: !this.state.folderPopover || this.state.folderPopover !== folder._id ? folder._id : null});
     }
@@ -235,7 +240,7 @@ class FollowedTopics extends React.Component {
                                 toggleFolderPopover={this.toggleFolderPopover}
                                 moveTopic={this.props.moveTopic}
                                 saveFolder={this.props.saveFolder}
-                                deleteFolder={this.props.deleteFolder}
+                                deleteFolder={this.deleteFolder}
                             />
                         </div>
                     </div>
@@ -309,7 +314,7 @@ const mapDispatchToProps = (dispatch) => ({
     saveFolder: (folder, data, global) => dispatch(saveFolder(folder, data, global)),
     fetchFolders: (global) => dispatch(fetchFolders(global)),
     moveTopic: (topicId, folder) => dispatch(moveTopic(topicId, folder)),
-    deleteFolder: (folder) => dispatch(deleteFolder(folder)),
+    deleteFolder: (folder, global) => dispatch(deleteFolder(folder, global)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(FollowedTopics);

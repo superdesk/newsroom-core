@@ -221,12 +221,6 @@ export function pushNotification(push) {
     };
 }
 
-function getUserFoldersUrl(state, id) {
-    const baseUrl = `/api/users/${state.user._id}/topic_folders`;
-
-    return id != null ? `${baseUrl}/${id}` : baseUrl;
-}
-
 function getFoldersUrl(state, global, id) {
     const baseUrl = global ?
         `/api/companies/${state.company}/topic_folders` :
@@ -253,7 +247,7 @@ export function saveFolder(folder, data, global) {
 
             return server.patch(url, updates, folder._etag)
                 .then(() => {
-                    dispatch(fetchFolders(global, true));
+                    dispatch(fetchFolders(global));
                 });
         } else {
             const payload = {...data, section: state.selectedMenu === 'events' ? 'agenda' : 'wire'};
@@ -267,10 +261,10 @@ export function saveFolder(folder, data, global) {
 }
 
 export const FOLDER_DELETED = 'FOLDER_DELETED';
-export function deleteFolder(folder, deleteTopics) {
+export function deleteFolder(folder, global, deleteTopics) {
     return (dispatch, getState) => {
         const state = getState();
-        const url = getUserFoldersUrl(state, folder._id);
+        const url = getFoldersUrl(state, global, folder._id);
 
         if (!window.confirm(gettext('Are you sure you want to delete folder?'))) {
             return;
@@ -283,29 +277,14 @@ export function deleteFolder(folder, deleteTopics) {
 
 export const RECIEVE_FOLDERS = 'RECIEVE_FOLDERS';
 
-export function fetchUserFolders() {
-    return (dispatch, getState) => {
-        const state = getState();
-        const url = getUserFoldersUrl(state);
-
-        return server.get(url).then((res) => {
-            dispatch({type: RECIEVE_FOLDERS, payload: res._items});
-        }, (reason) => {
-            console.error(reason);
-            return Promise.reject();
-        });
-    };
-}
-
 /**
  * @param {bool} global - fetch company or user folders
- * @param {bool} force  - force refresh via adding timestamp to url
  * @param {bool} skipDispatch - if true it won't replace folders in store
  */
-export function fetchFolders(global, force, skipDispatch) {
+export function fetchFolders(global, skipDispatch) {
     return (dispatch, getState) => {
         const state = getState();
-        const url = getFoldersUrl(state, global) + (force ? `?time=${Date.now()}` : '');
+        const url = getFoldersUrl(state, global);
 
         return server.get(url).then((res) => {
             if (skipDispatch) {
