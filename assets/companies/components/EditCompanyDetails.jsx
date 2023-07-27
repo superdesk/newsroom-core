@@ -3,15 +3,13 @@ import PropTypes from 'prop-types';
 import {get, sortBy} from 'lodash';
 
 import {getDateInputDate, gettext, isInPast} from 'utils';
-import {countries} from '../utils';
-
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
 import DateInput from 'components/DateInput';
 import CheckboxInput from 'components/CheckboxInput';
 
 
-export function EditCompanyDetails({company, companyTypes, users, errors, onChange, save, deleteCompany, ssoEnabled}) {
+export function EditCompanyDetails({company, companyTypes, users, errors, onChange, save, deleteCompany, ssoEnabled, countries}) {
     return (
         <form>
             <div className="list-item__preview-form">
@@ -156,4 +154,5 @@ EditCompanyDetails.propTypes = {
     save: PropTypes.func,
     deleteCompany: PropTypes.func,
     ssoEnabled: PropTypes.bool,
+    countries: PropTypes.array,
 };
