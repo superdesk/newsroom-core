@@ -231,3 +231,7 @@ def get_slugline(item, with_take_key: bool = False):
         slugline += take_key_suffix
 
     return slugline
+
+
+def initials(name):
+    return "".join([piece[0].upper() for piece in name.split(" ") if piece])
