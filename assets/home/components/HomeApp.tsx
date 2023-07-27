@@ -10,7 +10,7 @@ import ShareItemModal from 'components/ShareItemModal';
 import DownloadItemsModal from 'wire/components/DownloadItemsModal';
 import WirePreview from 'wire/components/WirePreview';
 import {followStory} from 'search/actions';
-import {downloadMedia} from 'wire/actions';
+import {downloadMedia, fetchItems} from 'wire/actions';
 import {SearchBar} from './search-bar';
 import {previewConfigSelector, listConfigSelector, detailsConfigSelector, isSearchEnabled} from 'ui/selectors';
 import {filterGroupsToLabelMap} from 'search/selectors';
@@ -18,6 +18,7 @@ import CardRow from 'components/cards/render/CardRow';
 import {IPersonalizedDashboard, ITopic, PersonalizeHomeSettingsModal} from 'components/PersonalizeHomeModal';
 import {personalizeHome} from 'agenda/actions';
 import {RadioButtonGroup} from 'features/sections/SectionSwitch';
+import {getCurrentUser} from 'company-admin/selectors';
 
 const modals: any = {
     shareItem: ShareItemModal,
@@ -55,6 +56,8 @@ interface IProps {
     isFollowing: boolean;
     isSearchEnabled: boolean;
     filterGroupLabels: any;
+    currentUser: any;
+    fetchItems: () => any;
 }
 
 class HomeApp extends React.Component<IProps, IState> {
@@ -118,19 +121,15 @@ class HomeApp extends React.Component<IProps, IState> {
     }
 
     getPanelsForPersonalizedDashboard(card: any) {
-        const personalizedDashboardTopics = localStorage.getItem('personal-dashboard');
-        const homePersonalizedDashboard: IPersonalizedDashboard = personalizedDashboardTopics != null
-            ? JSON.parse(personalizedDashboardTopics).find(({name}: IPersonalizedDashboard) => name === 'My Home')
-            : null;
-
+        const homePersonalizedDashboard: IPersonalizedDashboard = this.props.currentUser?.dashboards?.[0];
         const savedTopicsForPersonalizedDashboard: Array<ITopic> =
-            this.props.topics.filter(({_id}) => homePersonalizedDashboard.topicIds.includes(_id));
+            this.props.topics.filter(({_id}) => homePersonalizedDashboard?.topic_ids.includes(_id));
 
         const Panel: React.ComponentType<any> = getCardDashboardComponent('4-media-gallery');
         const rawItems: Array<any> = this.props.itemsByCard[card.label] ?? [];
-        const topicQueries = savedTopicsForPersonalizedDashboard.map(({query}) => query);
+        const topicQueries = savedTopicsForPersonalizedDashboard?.map(({query}) => query);
 
-        const groupedItemsByTopic: Dictionary<Array<ITopic>> = topicQueries.reduce((acc, _, i) => {
+        const groupedItemsByTopic: Dictionary<Array<ITopic>> | null = topicQueries?.reduce((acc, _, i) => {
             const topicQuery = topicQueries?.[i];
 
             if (topicQuery) {
@@ -161,32 +160,40 @@ class HomeApp extends React.Component<IProps, IState> {
             );
         }
 
-        const gropedItemsTuple = Object.entries(groupedItemsByTopic);
+        const gropedItemsTuple: Array<[string, Array<ITopic>]> | null = !groupedItemsByTopic
+            ? Object.entries(groupedItemsByTopic)
+            : null;
+
+        // const test123 = this.props.fetchItems(savedTopicsForPersonalizedDashboard[0].query);
 
         return (
-            !(gropedItemsTuple[0][1].length > 0) ? (
-                <div style={{margin: 12}} className="alert alert-warning" role="alert">
-                    <strong>{gettext('Warning')}! </strong>
-                    {gettext('There\'s no items in these topics!', window.sectionNames)}
-                </div>
+            gropedItemsTuple ? (
+                !(gropedItemsTuple[0][1].length > 0) ? (
+                    <div style={{margin: 12}} className="alert alert-warning" role="alert">
+                        <strong>{gettext('Warning')}! </strong>
+                        {gettext('There\'s no items in these topics!', window.sectionNames)}
+                    </div>
+                ) : (
+                    gropedItemsTuple.map(([key, items]) => {
+                        if (items.length > 0) {
+                            return (
+                                <Panel
+                                    key={key}
+                                    type="4-picture-text"
+                                    items={items}
+                                    title={key}
+                                    productId={this.getProductId(card)}
+                                    openItem={this.props.openItemDetails}
+                                    isActive={this.props.activeCard === card._id}
+                                    cardId={card._id}
+                                    listConfig={this.props.listConfig}
+                                />
+                            );
+                        }
+                    })
+                )
             ) : (
-                gropedItemsTuple.map(([key, items]) => {
-                    if (items.length > 0) {
-                        return (
-                            <Panel
-                                key={key}
-                                type="4-picture-text"
-                                items={items}
-                                title={key}
-                                productId={this.getProductId(card)}
-                                openItem={this.props.openItemDetails}
-                                isActive={this.props.activeCard === card._id}
-                                cardId={card._id}
-                                listConfig={this.props.listConfig}
-                            />
-                        );
-                    }
-                })
+                <div>no!</div>
             )
         );
     }
@@ -419,6 +426,7 @@ const mapStateToProps = (state: any) =>({
     topics: state.topics || [],
     isSearchEnabled: isSearchEnabled(state),
     filterGroupLabels: filterGroupsToLabelMap(state),
+    currentUser: getCurrentUser(state),
 });
 
 const mapDispatchToProps = (dispatch: any, state: any) => ({
@@ -426,6 +434,7 @@ const mapDispatchToProps = (dispatch: any, state: any) => ({
         dispatch(openItemDetails(item));
         dispatch(setActive(cardId));
     },
+    fetchItems: () => dispatch(fetchItems()),
     personalizeHome: () => {
         dispatch(personalizeHome());
     },

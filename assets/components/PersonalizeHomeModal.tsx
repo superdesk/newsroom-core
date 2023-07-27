@@ -10,12 +10,18 @@ import {FormToggle} from 'ui/components/FormToggle';
 import {reloadMyTopics as reloadMyWireTopics} from 'wire/actions';
 import {IUser} from 'interfaces/user';
 import {RadioButtonGroup} from 'features/sections/SectionSwitch';
-import {modalFormInvalid, modalFormValid} from 'actions';
+import {modalFormInvalid, modalFormValid, setUser} from 'actions';
+import {updateUser} from 'users/actions';
+import {getCurrentUser} from 'company-admin/selectors';
 
 interface IReduxStoreProps {
     topics?: Array<ITopic>;
     modalFormValid?: () => void;
     modalFormInvalid?: () => void;
+    getCurrentUser?: () => any;
+    currentUser?: any;
+    saveUser?: () => void;
+    setUser?: (user: any) => void;
 }
 
 interface IProps extends IReduxStoreProps {
@@ -53,7 +59,7 @@ export interface ITopic {
 export interface IPersonalizedDashboard {
     type: string;
     name: string;
-    topicIds: Array<string>;
+    topic_ids: Array<string>;
 }
 
 const MAX_SELECTED_TOPICS = 6;
@@ -69,6 +75,14 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
             searchTerm: '',
             isLoading: false,
         };
+    }
+
+    componentDidMount(): void {
+        if ((this.props.currentUser.dashboards?.length ?? 0) > 0){
+            this.setState({
+                selectedTopics: new Set(this.props.currentUser.dashboards[0].topic_ids)
+            });
+        }
     }
 
     componentDidUpdate(): void {
@@ -98,16 +112,16 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
 
         const newDashboard: IPersonalizedDashboard = {
             type: '4-picture-text',
-            topicIds: Array.from(this.state.selectedTopics),
+            topic_ids: Array.from(this.state.selectedTopics),
             name: name,
         };
 
-        Promise.resolve(setTimeout(() => {
-            localStorage.setItem(
-                'personal-dashboard',
-                JSON.stringify([newDashboard])
-            );
-        }, 3000));
+        this.props.setUser?.({
+            ...this.props.currentUser,
+            dashboards: [newDashboard],
+        });
+
+        this.props.saveUser?.();
 
         this.setState({isLoading: false});
     }
@@ -377,12 +391,15 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
 
 const mapStateToProps = (state: IReduxStoreProps) => ({
     topics: state.topics,
+    currentUser: getCurrentUser(state),
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
     reloadTopics: () => dispatch(reloadMyWireTopics(true)),
     modalFormValid: () => dispatch(modalFormValid()),
     modalFormInvalid: () => dispatch(modalFormInvalid()),
+    saveUser: () => dispatch(updateUser()),
+    setUser: (user: any) => dispatch(setUser(user))
 });
 
 export const PersonalizeHomeSettingsModal =

@@ -7,7 +7,7 @@ import {
     SET_MULTIPLE_CARD_ITEMS,
 } from './actions';
 import {BOOKMARK_ITEMS, REMOVE_BOOKMARK} from '../wire/actions';
-import {CLOSE_MODAL, MODAL_FORM_VALID, RENDER_MODAL} from '../actions';
+import {CLOSE_MODAL, MODAL_FORM_VALID, RENDER_MODAL, SET_USER} from '../actions';
 import {modalReducer} from '../reducers';
 import {topicsReducer} from '../topics/reducer';
 
@@ -19,6 +19,7 @@ const initialState: any = {
     activeCard: null,
     uiConfig: {},
     userProducts: [],
+    currentUser: {},
 };
 
 export default function homeReducer(state: any = initialState, action: any) {
@@ -30,6 +31,7 @@ export default function homeReducer(state: any = initialState, action: any) {
             ...state,
             cards: action.data.cards,
             itemsByCard: {},
+            currentUser: action.data.currentUser,
             products: action.data.products,
             user: action.data.user,
             userType: action.data.userType,
@@ -47,6 +49,13 @@ export default function homeReducer(state: any = initialState, action: any) {
         return {
             ...state,
             itemToOpen: action.item || null,
+        };
+    }
+
+    case SET_USER: {
+        return {
+            ...state,
+            currentUser: action.data
         };
     }
 

@@ -2,6 +2,7 @@ import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
 import {searchQuerySelector} from 'search/selectors';
 import {get, cloneDeep} from 'lodash';
+import {cleanUserEntityBeforePatch} from './utils';
 
 export const SELECT_USER = 'SELECT_USER';
 export function selectUser(id: any) {
@@ -108,6 +109,39 @@ export function fetchUsers() {
     };
 }
 
+export function updateUser() {
+    return function (dispatch: any, getState: any) {
+
+        const user = cloneDeep(getState().currentUser);
+        const url = `api/_users/${user._id}`;
+
+        if (user.sections != null) {
+            user.sections = Object.keys(user.sections)
+                .filter((sectionId: any) => user.sections[sectionId] === true)
+                .join(',');
+        }
+
+        if (user.products != null) {
+            user.products = user.products
+                .map((product: any) => product._id)
+                .join(',');
+        }
+
+        const _etag = user._etag;
+
+        return server.patchEntity(url, cleanUserEntityBeforePatch(user), _etag)
+            .then(function() {
+                if (user._id) {
+                    notify.success(gettext('It works'));
+                } else {
+                    notify.success(gettext('It works'));
+                }
+                dispatch(fetchUsers());
+            })
+            .catch((error: any) => errorHandler(error, dispatch, setError));
+
+    };
+}
 
 /**
  * Creates new users
