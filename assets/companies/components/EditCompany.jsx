@@ -156,6 +156,7 @@ class EditCompany extends React.Component {
                                 save={this.save}
                                 deleteCompany={this.deleteCompany}
                                 ssoEnabled={this.props.ssoEnabled}
+                                countries = {this.props.countries}
                             />
                         </div>
                     }
@@ -223,6 +224,7 @@ EditCompany.propTypes = {
         name: PropTypes.string,
         product_type: PropTypes.string,
     })).isRequired,
+    countries : PropTypes.array
 };
 
 const mapStateToProps = (state) => ({
