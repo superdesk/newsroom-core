@@ -16,7 +16,6 @@ class DataUpdate(_DataUpdate):
 
     def forwards(self, mongodb_collection, mongodb_database):
         for company in mongodb_collection.find({}):
-
             old_country_code = company.get("country")
             if old_country_code in ("au", "nz", "fin"):
                 # Replace the old country code with the new qcode based on vocabularies
