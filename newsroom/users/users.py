@@ -120,6 +120,7 @@ USER_PROFILE_UPDATES = {
     "receive_email",
     "receive_app_notifications",
     "role",
+    "dashboards",
 }
 
 
