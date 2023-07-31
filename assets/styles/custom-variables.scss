@@ -220,7 +220,7 @@ $container-max-widths: (
 
     // CORE: MISC 
     --transition-base: 0.2s ease;
-    --table-selected-shadow: inset 0 0 0 3px var(--color-interactive-focus--translucent);
+    
 
     // CORE: TOP BAR HEIGHT (NavBar, Search, Mobile navigation) 
     --navbar-height: 56px;
@@ -230,6 +230,16 @@ $container-max-widths: (
     // --------------------------------------------------------------------
     //     C O M P O N E N T S
     // --------------------------------------------------------------------
+
+    // COMPONENT: TABLE
+    --table-cell-line-color: var(--color-line--x-light);
+    --table-cell-padding-inline: var(--space--1-5);
+    --table-cell-padding-inline--small: var(--space--1);
+    --table-cell-padding-block: var(--space--2);
+    --table-cell-padding-block--small: var(--space--1-5);
+
+    --table-selected-shadow: inset 0 0 0 3px var(--color-interactive-focus--translucent);
+
     
     // COMPONENT: SEARCHBAR
     --searchbar-size-height: 40px;

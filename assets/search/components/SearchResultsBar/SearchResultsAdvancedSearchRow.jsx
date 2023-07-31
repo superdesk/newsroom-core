@@ -184,7 +184,8 @@ export function SearchResultsAdvancedSearchRow({
             />
             <SearchResultTagList
                 testId="search-results--advanced-fields"
-                title={gettext('Fields searched')}
+                secondary={true}
+                title={gettext('inside')}
             >
                 <div className="toggle-button__group toggle-button__group--spaced toggle-button__group--loose">
                     {Object.keys(fieldNameToLabel)

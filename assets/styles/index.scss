@@ -104,33 +104,36 @@ label {
             font-weight: 400;
             vertical-align: top;
             color: var(--color-text--muted);
+            padding-inline: var(--table-cell-padding-inline);
+            padding-block: var(--table-cell-padding-block--small);
         }
     }
     tr {
         outline: 1px solid transparent;
-        border-block-end: 1px solid #e9ecef;
+        border-block-end: 1px solid var(--table-cell-line-color);
 
         &:focus-visible {
             box-shadow: 0 0 0 1px var(--color-interactive-focus), 0 0 0 4px var(--color-interactive-focus--translucent);
         }
     }
     td {
-        padding: 1rem .75rem;
+        padding-inline: var(--table-cell-padding-inline);
+        padding-block: var(--table-cell-padding-block);
         border-block-end: none;
         &.name {
             font-size: 14px;
             font-weight: 700;
-            line-height: 120%;
+            line-height: 1.2;
         }
     }
     &.table-hover > tbody > tr:hover {
-        outline: 1px solid #999;
+        outline: 1px solid hsl(0, 0%, 60%);
     }
     &.table-hover > tbody > tr:hover > * {
         --bs-table-accent-bg: white;
         background-color: white;
     }
-    &--extended {
+    &.table--extended {
         border-collapse:separate;
         border-spacing:0 4px;
         background-color: transparent;
@@ -190,7 +193,7 @@ label {
             margin-inline-start: 4px;
         }
     }
-    &--hollow {
+    &.table--hollow {
         background-color: transparent;
         margin-block-start: 30px;
         & > :not(:first-child) {
@@ -231,7 +234,6 @@ label {
                 font-size: 16px;
                 font-weight: 800;
                 color: $gray-900;
-                padding: 1rem 0.5rem;
 
                 &.font-light {
                     font-size: 14px;
@@ -247,7 +249,24 @@ label {
             outline: none;
         }
     }
+    &.table--small {
+        table-layout: auto !important;
+        thead {
+            th {
+                padding-block: var(--space--1);
+            }
+        }
+        td {
+            --table-cell-padding-block: var(--space--1);
+        }
+    }
 
+}
+// .table > tbody {
+//     border-block-start: 2px solid var(--color-line--medium);
+// }
+.table > :not(:first-child) {
+    border-top-color: var(--color-line--medium);
 }
 .table.table-hover tbody tr {
     border-radius: var(--border-radius--xs);
@@ -456,6 +475,9 @@ body.print {
             background-color: var(--sidenav-color-badge-bg);
             color: var(--sidenav-color-badge-fg);
             padding: 0.35em 0.6em;
+            &:empty {
+                display: none;
+            }
         }
 
         .sidenav-icons__helper-icon {
@@ -1223,7 +1245,7 @@ article.list {
     border-color: var(--searchbar-color-border--normal);
     border-radius: var(--searchbar-border-radius);
     transition: all 0.2s ease;
-    margin-inline-end: var(--space--1);
+    //margin-inline-end: var(--space--1);
     .input-group {
         width: 100%;
         @include sm {

@@ -18,15 +18,18 @@ export function SearchResultsQueryRow({searchParams, setQuery}) {
             testId="search-results--query"
             title={gettext('Search For')}
             tags={[
-                <Tag
-                    key="tags-query"
-                    testId="query-value"
-                    text={searchParams.query}
-                    onClick={(event) => {
-                        event.preventDefault();
-                        setQuery('');
-                    }}
-                />
+                <React.Fragment>
+                    <Tag
+                        key="tags-query"
+                        testId="query-value"
+                        text={searchParams.query}
+                        onClick={(event) => {
+                            event.preventDefault();
+                            setQuery('');
+                        }}
+                    />
+                    <span className="search-result__tags-list-row-helper-text">{gettext('in all fields')}</span>
+                </React.Fragment>
             ]}
         />
     );

@@ -115,7 +115,7 @@ class Modal extends React.Component {
 
     render() {
         return (
-            <div className={classNames('modal mt-xl-5', {
+            <div className={classNames('modal', {
                 'modal--full-width': this.props.width === 'full',
             })}
             ref={(elem) => this.elem = elem} role={gettext('dialog')} aria-label={this.props.title}>

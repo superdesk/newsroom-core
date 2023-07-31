@@ -61,10 +61,11 @@
                         {% for nav in sidenavs(request.blueprint)|selectattr("group", "equalto", group) %}
                         {% if group > 0 and loop.first and loop.length %}
                         <li class="sidenav-icons__separator">
-                            <span className="separator__dot" aria-hidden="true"></span>
-                            <span className="separator__dot" aria-hidden="true"></span>
-                            <span className="separator__dot" aria-hidden="true"></span>
-                            <span className="separator__dot" aria-hidden="true"></span>
+                            test
+                            <span class="separator__dot" aria-hidden="true"></span>
+                            <span class="separator__dot" aria-hidden="true"></span>
+                            <span class="separator__dot" aria-hidden="true"></span>
+                            <span class="separator__dot" aria-hidden="true"></span>
                         </li>
                         {% endif %}
 
