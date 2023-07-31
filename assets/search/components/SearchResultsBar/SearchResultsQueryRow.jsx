@@ -18,9 +18,8 @@ export function SearchResultsQueryRow({searchParams, setQuery}) {
             testId="search-results--query"
             title={gettext('Search For')}
             tags={[
-                <React.Fragment>
+                <div className="d-contents" key="tags-query">
                     <Tag
-                        key="tags-query"
                         testId="query-value"
                         text={searchParams.query}
                         onClick={(event) => {
@@ -29,7 +28,7 @@ export function SearchResultsQueryRow({searchParams, setQuery}) {
                         }}
                     />
                     <span className="search-result__tags-list-row-helper-text">{gettext('in all fields')}</span>
-                </React.Fragment>
+                </div>
             ]}
         />
     );
