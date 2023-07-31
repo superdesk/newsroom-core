@@ -8,7 +8,7 @@ export function SearchResultTagList({testId, title, tags, children, secondary}) 
             data-test-id={testId}
             className={classNames(
                 'search-result__tags-list-row',
-                {'search-result__tags-list-row--secondary': secondary},
+                {'search-result__tags-list-row--secondary': secondary}
             )}
         >
             {!title ? null : (
