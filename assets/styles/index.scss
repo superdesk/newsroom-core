@@ -484,13 +484,13 @@ body.print {
             height: var(--sidenav-item-helper-icon-size);
             width: var(--sidenav-item-helper-icon-size);
             background-color: var(--sidenav-color-item-fg);
-            color: var(--sidenav-color-item-fg--active);
+            color: var(--sidenav-item-helper-icon-fg);
             inset-block-start: -1px;
             inset-inline-end: 6px;
             padding: 0;
             [class^="icon-small--"],
             [class^="icon-small--"] {
-                color: var(--sidenav-color-item-fg--active) !important;
+                color: var(--sidenav-item-helper-icon-fg) !important;
             }
         }
 
