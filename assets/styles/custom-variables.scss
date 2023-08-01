@@ -299,6 +299,8 @@ $container-max-widths: (
     --icon-button-color-border--tertiary-hover: var(--icon-button-color-fg);
 
     --icon-button-color-border: var(--color-line--light);
+    --icon-button-shadow--active: var(--button-color-shadow--secondary-hover);
+    --icon-button-shadow-primary--active: var(--color-interactive-focus--translucent);
 
     --icon-button-size: 40px;
     --icon-button-size--small: 32px;
