@@ -787,58 +787,17 @@ class BaseSearchService(Service):
         section_filters = get_resource_service("section_filters").get_section_filters_dict()
 
         for topic in topics:
-            search = SearchQuery()
-
             user = users.get(str(topic["user"]))
             if not user:
                 continue
 
-            search.user = user
-            search.is_admin = is_admin(user)
-            search.company = companies.get(str(user.get("company", "")))
+            company = companies.get(str(user.get("company", "")))
 
-            search.query = deepcopy(query)
-            search.section = topic.get("topic_type")
-
-            self.prefill_search_products(search)
-
-            if topic.get("query"):
-                search.query["bool"]["filter"].append(query_string(topic["query"]))
-
-            if topic.get("created"):
-                search.query["bool"]["filter"].append(
-                    self.versioncreated_range(
-                        dict(
-                            created_from=topic["created"].get("from"),
-                            created_to=topic["created"].get("to"),
-                            timezone_offset=topic.get("timezone_offset", "0"),
-                        )
-                    )
-                )
-
-            if topic.get("filter"):
-                self.set_bool_query_from_filters(search.query["bool"], topic["filter"])
-
-            if topic.get("advanced"):
-                search.args["advanced"] = topic["advanced"]
-
-            # for now even if there's no active company matching for the user
-            # continuing with the search
-            try:
-                self.validate_request(search)
-                self.apply_section_filter(search, section_filters)
-                self.apply_company_filter(search)
-                self.apply_time_limit_filter(search)
-                self.apply_products_filter(search)
-                self.apply_request_advanced_search(search)
-            except Forbidden as exc:
-                logger.info(
-                    "Notification for user:{} and topic:{} is skipped".format(user.get("_id"), topic.get("_id")),
-                    exc_info=exc,
-                )
+            topic_query = self.get_topic_query(topic, user, company, section_filters, query)
+            if not topic_query:
                 continue
 
-            aggs["topics"]["filters"]["filters"][str(topic["_id"])] = search.query
+            aggs["topics"]["filters"]["filters"][str(topic["_id"])] = topic_query.query
 
             queried_topics.append(topic)
 
@@ -866,3 +825,62 @@ class BaseSearchService(Service):
             raise
 
         return topic_matches
+
+    def get_topic_query(self, topic, user, company, section_filters, query=None):
+        search = SearchQuery()
+
+        search.user = user
+        search.is_admin = is_admin(user)
+        search.company = company
+
+        if query is not None:
+            search.query = deepcopy(query)
+        search.section = topic.get("topic_type")
+
+        self.prefill_search_products(search)
+
+        if topic.get("query"):
+            search.query["bool"]["filter"].append(query_string(topic["query"]))
+
+        if topic.get("created"):
+            search.query["bool"]["filter"].append(
+                self.versioncreated_range(
+                    dict(
+                        created_from=topic["created"].get("from"),
+                        created_to=topic["created"].get("to"),
+                        timezone_offset=topic.get("timezone_offset", "0"),
+                    )
+                )
+            )
+
+        if topic.get("filter"):
+            self.set_bool_query_from_filters(search.query["bool"], topic["filter"])
+
+        if topic.get("advanced"):
+            search.args["advanced"] = topic["advanced"]
+
+        # for now even if there's no active company matching for the user
+        # continuing with the search
+        try:
+            self.validate_request(search)
+            self.apply_section_filter(search, section_filters)
+            self.apply_company_filter(search)
+            self.apply_time_limit_filter(search)
+            self.apply_products_filter(search)
+            self.apply_request_advanced_search(search)
+        except Forbidden as exc:
+            logger.info(
+                "Notification for user:{} and topic:{} is skipped".format(user.get("_id"), topic.get("_id")),
+                exc_info=exc,
+            )
+            return
+
+        return search
+
+    def get_items_by_query(self, search, size=10, aggs=None):
+        search.args["size"] = size
+        search.args["aggs"] = "false"
+        self.gen_source_from_search(search)
+        internal_req = self.get_internal_request(search)
+        print("REQ", internal_req.args)
+        return self.internal_get(internal_req, search.lookup)
