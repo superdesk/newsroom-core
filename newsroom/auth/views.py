@@ -6,6 +6,7 @@ from flask import current_app as app, abort
 from flask_babel import gettext
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
+from newsroom.decorator import admin_only, login_required
 
 from newsroom.auth import blueprint, get_auth_user_by_email, get_user_by_email, get_company_from_user
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
@@ -255,3 +256,26 @@ def set_locale():
     if locale and locale in app.config["LANGUAGES"]:
         flask.session["locale"] = locale
     return flask.redirect(flask.url_for("auth.login"))
+
+
+@blueprint.route("/auth/impersonate", methods=["POST"])
+@admin_only
+def impersonate_user():
+    if not flask.session.get("auth_user"):
+        flask.session["auth_user"] = flask.session["user"]
+    user_id = flask.request.form.get("user")
+    assert user_id
+    user = get_resource_service("users").find_one(req=None, _id=user_id)
+    assert user
+    start_user_session(user)
+    return flask.redirect(flask.url_for("wire.index"))
+
+
+@blueprint.route("/auth/impersonate_stop", methods=["POST"])
+@login_required
+def impersonate_stop():
+    assert flask.session.get("auth_user")
+    user = get_resource_service("users").find_one(req=None, _id=flask.session.get("auth_user"))
+    start_user_session(user)
+    flask.session.pop("auth_user")
+    return flask.redirect(flask.url_for("settings.app", app_id="users"))
