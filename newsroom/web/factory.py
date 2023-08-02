@@ -26,6 +26,7 @@ from newsroom.template_filters import (
     theme_url,
     to_json,
     get_slugline,
+    initials,
 )
 from newsroom.notifications.notifications import get_initial_notifications
 from newsroom.limiter import limiter
@@ -107,6 +108,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_filter(date_short)
         self.add_template_filter(word_count)
         self.add_template_filter(char_count)
+        self.add_template_filter(initials)
         self.add_template_global(get_company_sidenavs, "sidenavs")
         self.add_template_global(sidenavs_by_names)
         self.add_template_global(sidenavs_by_group)
