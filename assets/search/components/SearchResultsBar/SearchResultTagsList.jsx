@@ -31,7 +31,7 @@ export function SearchResultTagsList({
     return (
         <ul
             data-test-id="search-result-tags"
-            className="search-result__tags-list"
+            className="search-result__tags-list line-shadow-end--light"
         >
             <SearchResultsTopicRow
                 user={user}

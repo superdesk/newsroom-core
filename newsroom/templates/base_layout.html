@@ -69,7 +69,12 @@
                     {% for group in range(0, 10) %}
                         {% for nav in sidenavs(request.blueprint)|selectattr("group", "equalto", group) %}
                         {% if group > 0 and loop.first and loop.length %}
-                        <li class="sidenav-icons__item"><span aria-hidden="true"><i class="icon--more icon--rotate-90 icon--gray"></i></span></li>
+                        <li class="sidenav-icons__separator">
+                            <span class="separator__dot" aria-hidden="true"></span>
+                            <span class="separator__dot" aria-hidden="true"></span>
+                            <span class="separator__dot" aria-hidden="true"></span>
+                            <span class="separator__dot" aria-hidden="true"></span>
+                        </li>
                         {% endif %}
 
                         {% include "sidenav_icon.html" %}

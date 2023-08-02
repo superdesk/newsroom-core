@@ -78,12 +78,18 @@ class ShareItemModal extends React.Component {
         const usersList = sortBy(this.state.displayUsers, 'first_name').map((user, index) => (
             <tr key={index}>
                 <td>
-                    <input id={user._id} type="checkbox"
-                        checked={this.state.users.indexOf(user._id) > -1}
-                        onChange={() => this.toggleUser(user._id)} />
+                    <div className="form-check form-check--flex">
+                        <input id={user._id} type="checkbox"
+                            className="form-check-input"
+                            checked={this.state.users.indexOf(user._id) > -1}
+                            onChange={() => this.toggleUser(user._id)} />
+                    </div>
                 </td>
                 <td>
-                    <label htmlFor={user._id}>{this.getUserName(user)}</label>
+                    <div className="form-check form-check--flex">
+                        <label className="form-check-label" htmlFor={user._id}>{this.getUserName(user)}</label>
+                    </div>
+                    
                 </td>
             </tr>
         ));
@@ -94,41 +100,57 @@ class ShareItemModal extends React.Component {
                 title={gettext('Share Item')}
                 onSubmitLabel={gettext('Share')}
                 disableButtonOnSubmit >
-                <SearchBar
-                    fetchItems={this.getUsers}
-                    enableQueryAction={false}
-                />
-                <form onSubmit={this.onSubmit}>
-                    <div className="form-group search-user-list">
-                        <label htmlFor="users">{gettext('People')}</label>
-                        <table className="table">
-                            <thead>
-                                {usersList.length > 0 && <tr>
-                                    <th>
-                                        <input id="check-all" type="checkbox"
-                                            onChange={() => this.toggleAllUsers()}
-                                            checked={this.state.users.length === this.props.data.users.length}
-                                        />
-                                    </th>
-                                    <th>
-                                        <label htmlFor="check-all">{selectAllText}</label>
-                                    </th>
-                                </tr>}
-                            </thead>
-                            <tbody>
-                                {usersList}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div className="form-group user-msg">
-                        <label htmlFor="message">{gettext('Message')}</label>
-                        <textarea className="form-control"
-                            id="message"
-                            value={this.state.message}
-                            onChange={this.onChangeHandler('message')}
+
+                <div className='modal-body__inner'>
+                    <div className="modal-body__inner-header">
+                        <SearchBar
+                            fetchItems={this.getUsers}
+                            enableQueryAction={false}
                         />
                     </div>
-                </form>
+                    <form className="modal-body__inner-content inner-content-grid" onSubmit={this.onSubmit}>
+                        <div className="form-group inner-content-grid__main">
+                            <table className="table table--small mt-3">
+                                <colgroup>
+                                    <col style={{width: '8%'}} />
+                                    <col style={{width: '92%'}} />
+                                </colgroup>
+                                <thead>
+                                    {usersList.length > 0 && <tr>
+                                        <th>
+                                            <div className="form-check form-check--flex">
+                                                <input id="check-all" type="checkbox"
+                                                    className="form-check-input"
+                                                    onChange={() => this.toggleAllUsers()}
+                                                    checked={this.state.users.length === this.props.data.users.length}
+                                                />
+                                                
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div className="form-check form-check--flex">
+                                                <label className="form-check-label form-check-label--strong" htmlFor="check-all">{selectAllText}</label>
+                                            </div>
+                                            
+                                        </th>
+                                    </tr>}
+                                </thead>
+                                <tbody>
+                                    {usersList}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="form-group user-msg inner-content-grid__footer">
+                            <label className="a11y-only" htmlFor="message">{gettext('Message')}</label>
+                            <textarea className="form-control"
+                                id="message"
+                                placeholder={gettext('Message')}
+                                value={this.state.message}
+                                onChange={this.onChangeHandler('message')}
+                            />
+                        </div>
+                    </form>
+                </div>
             </Modal>
         );
     }

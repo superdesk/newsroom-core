@@ -1,0 +1,56 @@
+:root {
+    /* CORE: TYPOGRAPHY */
+    --font-family-core--sans: "Lato", sans-serif;
+    --font-family-core--serif: "Titilium Web", sans-serif;
+
+    --color-background:     hsl(0, 0%, 97%);
+    --badge-bg-highlight1:  hsl(356, 72%, 46%);
+    --color-primary:        hsl(356, 72%, 46%);
+
+    --color-home-section-heading: var(--color-text);
+
+    --color-interactive-focus-base: 356, 72%;
+    --color-interactive-focus-l: 46%;
+
+    // COMPONENT: NAVBAR MAIN
+    --top-bar-color-bg: var(--color-primary);
+    --top-bar-color-bg-notifications: hsla(216, 45%, 4%, 0.3);
+    --top-bar-color-bg-notifications--hover: hsla(216, 45%, 0%, 0.5);
+    --top-bar-color-bg-avatar-block: hsla(216, 45%, 4%, 0);
+    --top-bar-color-bg-avatar: hsla(216, 45%, 4%, 0.3);
+    --top-bar-color-bg-avatar--hover: hsla(216, 45%, 4%, 0.5);
+    --top-bar-color-bg-badge: hsl(0, 3%, 15%);
+
+    // COMPONENT: SIDENAV
+    --sidenav-color-bg:                 hsl(0, 3%, 15%);
+    --sidenav-color-item-bg--active:    hsl(356, 72%, 46%);
+    --sidenav-color-item-fg--active:    hsla(0, 0%, 100%, 1);
+    --sidenav-color-badge-bg:           hsla(0, 0%, 98%, 1);
+    --sidenav-color-badge-fg:           hsl(356, 72%, 46%);
+
+    // COMPONENT: BUTTONS
+    // Primary
+    --button-color-bg--primary-base: 0, 3%;
+    --button-color-bg--primary-l: 25%;
+
+    // COMPONENT: ICON BUTTON
+    // Primary
+    --icon-button-color-icon--primary: hsl(0, 3%, 15%);
+    --icon-button-color-border--primary-hover: var(--icon-button-color-fg);
+    --icon-button-shadow-primary--active: var(--icon-button-shadow--active);
+
+    // COMPONENT: PROFILE SIDEBAR
+    --profile-sidebar-color-bg:                hsl(0, 0%, 88%);
+    --profile-sidebar-color-fg:                var(--color-text);
+    --profile-sidebar-button-color-fg--secondary:            hsla(0, 0%, 10%, 0.75);
+    --profile-sidebar-button-color-border--secondary:        hsla(0, 0%, 10%, 0.45);
+    --profile-sidebar-button-color-fg--secondary-hover:      hsla(0, 0%, 10%, 0.98);
+    --profile-sidebar-button-color-border--secondary-hover:  hsla(0, 0%, 10%, 0.65);
+    // sidebar avatar
+    --profile-sidebar-avatar-color-bg:         hsl(0, 0%, 14%);
+    --profile-sidebar-avatar-color-fg:         hsl(0, 0%, 99%);
+    --profile-sidebar-avatar-color-border:     hsl(0, 0%, 60%);
+
+    // COMPONENT: MAIN FOOTER
+    --footer-size--height: 48px;
+}
