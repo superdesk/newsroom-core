@@ -882,5 +882,4 @@ class BaseSearchService(Service):
         search.args["aggs"] = "false"
         self.gen_source_from_search(search)
         internal_req = self.get_internal_request(search)
-        print("REQ", internal_req.args)
         return self.internal_get(internal_req, search.lookup)
