@@ -89,6 +89,7 @@ X_HEADERS = [
 ]
 X_EXPOSE_HEADERS = ["Access-Control-Allow-Origin"]
 X_ALLOW_CREDENTIALS = True
+CACHE_CONTROL = "max-age=0, no-cache"  # disable caching api responses
 
 URL_PREFIX = "api"
 

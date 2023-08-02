@@ -534,7 +534,7 @@ const mapDispatchToProps = (dispatch: any) => ({
         dispatch(loadMyAgendaTopic(topic._id)) :
         dispatch(loadMyWireTopic(topic._id)),
     setTopicEditorFullscreen: (fullscreen: any) => dispatch(setTopicEditorFullscreen(fullscreen)),
-    fetchFolders: (global: any) => dispatch(fetchFolders(global, false, true)),
+    fetchFolders: (global: boolean) => dispatch(fetchFolders(global, true)),
 });
 
 const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(TopicEditor);

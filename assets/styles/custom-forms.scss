@@ -132,6 +132,10 @@ select.form-control {
         color: var(--color-text--muted);
         margin-block-end: 0;
         word-break: break-word;
+        &.form-check-label--strong {
+            font-weight: 500;
+            color: var(--color-text);
+        }
 
 
     }
@@ -153,6 +157,17 @@ select.form-control {
             &:focus {
                 box-shadow: 0 0 0 3px var(--color-interactive-focus--translucent);
             }
+        }
+    }
+    &.form-check--flex {
+        display: flex;
+        align-items: center;
+        padding: 0;
+        margin: 0;
+        gap: var(--space--1);
+        .form-check-input {
+            margin: 0 !important;
+            padding: 0;
         }
     }
 }

@@ -17,6 +17,10 @@ class UserSettingsPageWrapper {
     getNewUserButton() {
         return cy.get('[data-test-id="new-item-btn"]');
     }
+
+    getPreview() {
+        return cy.get('[data-test-id="edit-user-form"]');
+    }
 }
 
 export const UserSettingsPage = new UserSettingsPageWrapper();
