@@ -130,12 +130,8 @@ export function updateUser() {
         const _etag = user._etag;
 
         return server.patchEntity(url, cleanUserEntityBeforePatch(user), _etag)
-            .then(function() {
-                if (user._id) {
-                    notify.success(gettext('It works'));
-                } else {
-                    notify.success(gettext('It works'));
-                }
+            .then(() => {
+                notify.success(gettext('Personalized dashboard saved!'));
                 dispatch(fetchUsers());
             })
             .catch((error: any) => errorHandler(error, dispatch, setError));

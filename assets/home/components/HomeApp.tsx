@@ -15,10 +15,11 @@ import {SearchBar} from './search-bar';
 import {previewConfigSelector, listConfigSelector, detailsConfigSelector, isSearchEnabled} from 'ui/selectors';
 import {filterGroupsToLabelMap} from 'search/selectors';
 import CardRow from 'components/cards/render/CardRow';
-import {IPersonalizedDashboard, ITopic, PersonalizeHomeSettingsModal} from 'components/PersonalizeHomeModal';
+import {ITopic, PersonalizeHomeSettingsModal} from 'components/PersonalizeHomeModal';
 import {personalizeHome} from 'agenda/actions';
 import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 import {getCurrentUser} from 'company-admin/selectors';
+import {IPersonalizedDashboardsWithData} from 'home/reducers';
 
 const modals: any = {
     shareItem: ShareItemModal,
@@ -40,6 +41,7 @@ interface IProps {
     company: string;
     format: Array<any>;
     itemToOpen: any;
+    personalizedDashboards: Array<IPersonalizedDashboardsWithData>;
     modal: any;
     openItemDetails: () => void;
     activeCard: string;
@@ -75,7 +77,7 @@ class HomeApp extends React.Component<IProps, IState> {
 
         this.state = {
             loadingItems: true,
-            activeOptionId: 'default',
+            activeOptionId: 'my-home',
         };
     }
 
@@ -120,81 +122,30 @@ class HomeApp extends React.Component<IProps, IState> {
         return card.config.product;
     }
 
-    getPanelsForPersonalizedDashboard(card: any) {
-        const homePersonalizedDashboard: IPersonalizedDashboard = this.props.currentUser?.dashboards?.[0];
-        const savedTopicsForPersonalizedDashboard: Array<ITopic> =
-            this.props.topics.filter(({_id}) => homePersonalizedDashboard?.topic_ids.includes(_id));
-
+    getPanelsForPersonalizedDashboard() {
+        const {personalizedDashboards} = this.props;
         const Panel: React.ComponentType<any> = getCardDashboardComponent('4-media-gallery');
-        const rawItems: Array<any> = this.props.itemsByCard[card.label] ?? [];
-        const topicQueries = savedTopicsForPersonalizedDashboard?.map(({query}) => query);
-
-        const groupedItemsByTopic: Dictionary<Array<ITopic>> | null = topicQueries?.reduce((acc, _, i) => {
-            const topicQuery = topicQueries?.[i];
-
-            if (topicQuery) {
-                const matchedItem = rawItems.filter((x) => x.body_html.toLowerCase().includes(topicQuery));
-
-                return {
-                    ...acc,
-                    [topicQuery]: matchedItem,
-                };
-            }
-
-            return acc;
-        }, {});
-
-        if (this.state.loadingItems) {
-            return (
-                <CardRow
-                    key={card.label}
-                    title={card.label}
-                    productId={this.getProductId(card)}
-                    isActive={this.props.activeCard === card._id}
-                >
-                    <div className='col-sm-6 col-md-4 col-lg-3 col-xxl-2 d-flex mb-4'>
-                        <div className="spinner-border text-success" />
-                        <span className="a11y-only">{gettext('Loading Card Items')}</span>
-                    </div>
-                </CardRow>
-            );
-        }
-
-        const gropedItemsTuple: Array<[string, Array<ITopic>]> | null = !groupedItemsByTopic
-            ? Object.entries(groupedItemsByTopic)
-            : null;
-
-        // const test123 = this.props.fetchItems(savedTopicsForPersonalizedDashboard[0].query);
+        const personalizedDashboardTopicIds = personalizedDashboards?.[0].topic_items?.map(({_id}: any) => _id);
+        const topicItems = this.props.topics.filter((topic) => personalizedDashboardTopicIds?.includes(topic._id));
 
         return (
-            gropedItemsTuple ? (
-                !(gropedItemsTuple[0][1].length > 0) ? (
-                    <div style={{margin: 12}} className="alert alert-warning" role="alert">
-                        <strong>{gettext('Warning')}! </strong>
-                        {gettext('There\'s no items in these topics!', window.sectionNames)}
-                    </div>
-                ) : (
-                    gropedItemsTuple.map(([key, items]) => {
-                        if (items.length > 0) {
-                            return (
-                                <Panel
-                                    key={key}
-                                    type="4-picture-text"
-                                    items={items}
-                                    title={key}
-                                    productId={this.getProductId(card)}
-                                    openItem={this.props.openItemDetails}
-                                    isActive={this.props.activeCard === card._id}
-                                    cardId={card._id}
-                                    listConfig={this.props.listConfig}
-                                />
-                            );
-                        }
-                    })
-                )
-            ) : (
-                <div>no!</div>
-            )
+            personalizedDashboards?.[0].topic_items?.map((item: any) => {
+                const currentTopic = topicItems.find((x) => x._id === item._id);
+
+                return (
+                    <Panel
+                        key={item._id}
+                        type="4-picture-text"
+                        items={item.items}
+                        title={currentTopic?.label}
+                        productId={item.items[0].productId ?? ''}
+                        openItem={this.props.openItemDetails}
+                        isActive={this.props.activeCard === item._id}
+                        cardId={item._id}
+                        listConfig={this.props.listConfig}
+                    />
+                );
+            })
         );
     }
 
@@ -273,71 +224,69 @@ class HomeApp extends React.Component<IProps, IState> {
                                 gap: 8,
                             }}
                         >
-                            <div className="home-tools">
-                                <button
-                                    onClick={() => {
-                                        this.props.personalizeHome();
-                                    }}
-                                    type="button"
-                                    className="nh-button nh-button--secondary nh-button--small"
-                                    title="Personalize Home"
-                                >
-                                    Personalize Home
-                                </button>
-                            </div>
-                            {/*
-                                TODO: The next block should only appear if
-                                there already is personal home/dashboard
-                            */}
-                            <div>
-                                <div
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'row',
-                                        alignItems: 'center'
-                                    }}
-                                    className="home-tools"
-                                >
-                                    <RadioButtonGroup
-                                        options={[
-                                            {
-                                                _id: 'default',
-                                                name: 'Default'
-                                            },
-                                            {
-                                                _id: 'my-home',
-                                                name: 'My home'
-                                            }
-                                        ]}
-                                        activeOptionId={this.state.activeOptionId}
-                                        switchOptions={(optionId) => {
-                                            this.setState({
-                                                activeOptionId: optionId
-                                            });
-                                        }}
-                                    />
-                                    <button
-                                        onClick={() => {
-                                            this.props.personalizeHome();
-                                        }}
-                                        type="button"
-                                        className="icon-button icon-button--small icon-button--tertiary icon-button--bordered"
-                                        title="Edit personal Home"
-                                    >
-                                        <i className="icon--settings"></i>
-                                    </button>
-                                </div>
-                            </div>
+                            {
+                                (this.props.personalizedDashboards?.[0]?.topic_items?.length ?? 0) < 1 ? (
+                                    <div className="home-tools">
+                                        <button
+                                            onClick={() => {
+                                                this.props.personalizeHome();
+                                            }}
+                                            type="button"
+                                            className="nh-button nh-button--secondary nh-button--small"
+                                            title="Personalize Home"
+                                        >
+                                            {gettext('Personalize Home')}
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                flexDirection: 'row',
+                                                alignItems: 'center'
+                                            }}
+                                            className="home-tools"
+                                        >
+                                            <RadioButtonGroup
+                                                options={[
+                                                    {
+                                                        _id: 'default',
+                                                        name: gettext('Default')
+                                                    },
+                                                    {
+                                                        _id: 'my-home',
+                                                        name: gettext('My home')
+                                                    },
+                                                ]}
+                                                activeOptionId={this.state.activeOptionId}
+                                                switchOptions={(optionId) => {
+                                                    this.setState({
+                                                        activeOptionId: optionId
+                                                    });
+                                                }}
+                                            />
+                                            <button
+                                                onClick={() => {
+                                                    this.props.personalizeHome();
+                                                }}
+                                                type="button"
+                                                className="icon-button icon-button--small icon-button--tertiary icon-button--bordered"
+                                                title="Edit personal Home"
+                                            >
+                                                <i className="icon--settings"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                )
+                            }
                         </div>
                         {this.props.modal?.modal === 'personalizeHome' && <PersonalizeHomeSettingsModal />}
                         {
-                            this.state.activeOptionId != 'my-home' && cards.length > 0
-                                ? (
-                                    this.props.cards
-                                        .filter((c: any) => c.dashboard === 'newsroom')
-                                        .map((card: any) => this.getPanels(card))
-                                )
-                                : cards.length > 0 && this.getPanelsForPersonalizedDashboard(this.props.cards[0])
+                            this.state.activeOptionId !== 'my-home' && cards.length > 0
+                                ? (this.props.cards.filter((c: any) => c.dashboard === 'newsroom')
+                                    .map((card: any) => this.getPanels(card)))
+                                : cards.length > 0 && this.getPanelsForPersonalizedDashboard()
                         }
                         {
                             cards.length === 0 && (
@@ -412,6 +361,7 @@ class HomeApp extends React.Component<IProps, IState> {
 
 const mapStateToProps = (state: any) =>({
     cards: state.cards,
+    personalizedDashboards: state.personalizedDashboards,
     itemsByCard: state.itemsByCard,
     products: state.products,
     user: state.user,

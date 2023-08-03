@@ -175,7 +175,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
         const filteredTopics = (topics: Array<ITopic>) =>
             topics.filter(({is_global}) => this.state.activeSection === '1' ? is_global != true : is_global === true);
 
-        const searchMatches = filteredTopics(this.props.topics ?? [])
+        const searchMatches = filteredTopics(wireTopics ?? [])
             .filter((topic) => topic.label.toLowerCase().includes(this.state.searchTerm.toLowerCase()))
             .map((topic) => (
                 <CheckboxInput
@@ -215,7 +215,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                         ))
                     }
                 </FormToggle>
-                <FormToggle
+                {/* <FormToggle
                     expanded={true}
                     title={gettext('Agenda topics')}
                     testId="toggle--general"
@@ -232,7 +232,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                             />
                         ))
                     }
-                </FormToggle>
+                </FormToggle> */}
             </div>
         ) : (
             <div className="empty-state__container mt-3">
@@ -256,7 +256,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
 
         const selectedTopics = (
             <div className="simple-card__list pt-3">
-                {(this.props.topics as Array<ITopic>).filter((topic) => this.state.selectedTopics.has(topic._id)).map((topic) => (
+                {(wireTopics as Array<ITopic>).filter((topic) => this.state.selectedTopics.has(topic._id)).map((topic) => (
                     <div
                         style={{
                             width: '100%',
@@ -309,6 +309,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                         gap: 12,
+                        height: '100%',
                     }}
                 >
                     <aside style={{width: '25%'}} className="full-page-layout__content-aside">
