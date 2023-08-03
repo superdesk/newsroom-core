@@ -31,7 +31,7 @@ const initialState: any = {
     sections: [],
     companyTypes: [],
     apiEnabled: false,
-    search: searchReducer(),
+    search: searchReducer(undefined, undefined, 'settings'),
 };
 
 function setupCompanies(companyList: any, state: any) {
@@ -216,7 +216,7 @@ export default function companyReducer(state: any = initialState, action: any) {
     }
 
     default: {
-        const search = searchReducer(state.search, action);
+        const search = searchReducer(state.search, action, 'settings');
 
         if (search !== state.search) {
             return {...state, search};

@@ -556,6 +556,21 @@ export function getName(item: any) {
     return item.name || item.slugline || item.headline;
 }
 
+export function getHighlightedName(item: any) {
+    if (item.es_highlight.name){
+        return item.es_highlight.name[0];
+    }
+    else if (item.es_highlight.slugline){
+        return item.es_highlight.slugline [0];
+    }
+    else if (item.es_highlight.headline){
+        return item.es_highlight.headline [0];
+    }
+    else{
+        return getName(item);
+    }
+}
+
 /**
  * Get agenda item description
  *
@@ -565,6 +580,29 @@ export function getName(item: any) {
  */
 export function getDescription(item: any, plan: any) {
     return plan.description_text || item.definition_short;
+}
+
+/**
+ * Get agenda item highlighted description
+ *
+ * @param {Object} item
+ * @param {Object} plan
+ * @return {String}
+ */
+export function getHighlightedDescription(item: any, plan: any) {
+
+    if (item.es_highlight.description_text) {
+        return item.es_highlight.description_text[0];
+    }
+    else if (item.es_highlight.definition_short) {
+        return item.es_highlight.definition_short[0];
+    }
+    else if (item.es_highlight.definition_long) {
+        return item.es_highlight.definition_long[0];
+    }
+    else {
+        return getDescription(item, plan);
+    }
 }
 
 

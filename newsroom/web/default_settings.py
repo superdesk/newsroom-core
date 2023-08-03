@@ -172,6 +172,7 @@ CORE_APPS = [
     "newsroom.auth_server.client",
     "newsroom.email_templates",
     "newsroom.company_admin",
+    "newsroom.search",
 ]
 
 SITE_NAME = "AAP Newsroom"
@@ -330,6 +331,12 @@ CLIENT_CONFIG = {
         "open": {
             "wire": False,
             "agenda": False,
+        },
+    },
+    "advanced_search": {
+        "fields": {
+            "wire": ["headline", "slugline", "body_html"],
+            "agenda": ["name", "headline", "slugline", "description"],
         },
     },
 }

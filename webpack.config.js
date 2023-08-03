@@ -89,7 +89,7 @@ const config = {
         mainFields: ['browser', 'main'],
     },
     plugins: [
-        new ManifestPlugin(),
+        new ManifestPlugin({writeToFileEmit: true}),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'common',
             minChunks: Infinity,

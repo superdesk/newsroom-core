@@ -4,7 +4,7 @@ from flask_babel import lazy_gettext
 
 from newsroom.utils import url_for_agenda
 from .agenda import AgendaResource, AgendaService, aggregations
-from newsroom.search_config import init_nested_aggregation
+from newsroom.search.config import init_nested_aggregation
 from .featured import FeaturedResource, FeaturedService
 from . import formatters
 from .utils import (

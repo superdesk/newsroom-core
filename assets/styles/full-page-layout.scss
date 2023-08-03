@@ -130,17 +130,16 @@
 .empty-state__container {
     display: flex;
     flex-direction: column;
+    align-items: center;
     &.empty-state__container--full-height {
         flex-grow: 1;
         align-items: center;
         justify-content: center;
     }
 }
-
 .empty-state {
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: var(--space--0-5);
     &.empty-state--large {
         gap: var(--space--2);

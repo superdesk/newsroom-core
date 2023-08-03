@@ -48,8 +48,9 @@ function EditUserComponent({
         companySections[companyId] || [] :
         allSections;
     const companySectionIds = sections.map((section: any) => section._id);
-    const isAdmin = isUserAdmin(currentUser);
+    const currentUserIsAdmin = isUserAdmin(currentUser);
     const isCompanyAdmin = isUserCompanyAdmin(currentUser);
+    const userIsAdmin = isUserAdmin(user);
 
     const company = companies.map((value: any)=> value.name);
 
@@ -188,7 +189,7 @@ function EditUserComponent({
                             )}
                         </FormToggle>
 
-                        {hideFields.includes('sections') ? null : (
+                        {(userIsAdmin || hideFields.includes('sections')) ? null : (
                             <FormToggle
                                 title={gettext('Sections')}
                                 testId="toggle--sections"
@@ -208,11 +209,16 @@ function EditUserComponent({
                             </FormToggle>
                         )}
 
-                        {hideFields.includes('products') ? null : (
+                        {(userIsAdmin || hideFields.includes('products')) ? null : (
                             <FormToggle
                                 title={gettext('Products')}
                                 testId="toggle--products"
                             >
+                                {isCompanyAdmin ? <div className="products-list__heading d-flex justify-content-between align-items-center">
+                                    <button type='button' name='selectAllBtn' className='nh-button nh-button--tertiary nh-button--small' onClick={onChange} >
+                                        {gettext('Select All')}
+                                    </button>
+                                </div> : null}
                                 {sections.filter((section: any) => (
                                     companySectionIds.includes(section._id) &&
                                     get(user, `sections.${section._id}`) === true
@@ -296,7 +302,7 @@ function EditUserComponent({
                                 id='resetPassword'
                                 onClick={onResetPassword} />
                         )}
-                        {user._id && (isAdmin||isCompanyAdmin) && user._id !== currentUser._id && <input
+                        {user._id && (currentUserIsAdmin||isCompanyAdmin) && user._id !== currentUser._id && <input
                             type='button'
                             className='nh-button nh-button--secondary'
                             value={gettext('Delete')}

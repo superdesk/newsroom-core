@@ -30,8 +30,8 @@ class EditNavigation extends React.Component<any, any> {
     }
 
     handleTabClick(event: any) {
-        this.setState({activeTab: event.target.name});
-        if(event.target.name === 'products' && this.props.navigation._id) {
+        this.setState({activeTab: event.target.title});
+        if(event.target.title === 'products' && this.props.navigation._id) {
             this.props.fetchProducts();
         }
     }
@@ -65,7 +65,9 @@ class EditNavigation extends React.Component<any, any> {
                                 title={tab.name}
                                 className={`nav-link ${this.state.activeTab === tab.name && 'active'}`}
                                 href='#'
-                                onClick={this.handleTabClick}>{tab.label}
+                                onClick={this.handleTabClick}
+                            >
+                                {tab.label}
                             </a>
                         </li>
                     ))}

@@ -27,8 +27,8 @@ $line-height-sm: 1.25;
 $border-radius: .1875rem;
 $btn-border-radius-sm: .125rem;
 
-$font-family-sans-serif: "Roboto", "Helvetica Neue", Arial, sans-serif;
-$font-family-serif: "Merriweather", serif;
+$font-family-sans-serif: var(--font-family-core--sans);
+$font-family-serif: var(--font-family-core--serif);
 $font-size-base: 1rem;
 $font-size-button: ($font-size-base * .75) !default;
 $font-weight-medium: 500 !default;
@@ -196,19 +196,15 @@ $container-max-widths: (
     --font-family-core--sans: "Roboto", "Helvetica Neue", Arial, sans-serif;
     --font-family-core--serif: "Merriweather", serif;
     --font-size-base: 1rem; // 16px
-    --text-size--large: var(--font-size-base); // 16px
-    --text-size--medium: calc(var(--font-size-base) * 0.875); // 14px
     --text-size--small: calc(var(--font-size-base) * 0.75);  // 12px
+    --text-size--medium: calc(var(--font-size-base) * 0.875); // 14px
+    --text-size--large: var(--font-size-base); // 16px
+    --text-size--x-large: calc(var(--font-size-base) * 1.25); // 20px
+    --text-size--xx-large: calc(var(--font-size-base) * 1.5); // 24px
 
     --font-family-core--primary: var(--font-family-core--sans);
     --font-family-core--secondary: var(--font-family-core--serif);
 
-    --font-size-base: 1rem; // 16px
-    --text-size--xx-large: calc(var(--font-size-base) * 1.5); // 24px
-    --text-size--x-large: calc(var(--font-size-base) * 1.25); // 20px
-    --text-size--large: var(--font-size-base); // 16px
-    --text-size--medium: calc(var(--font-size-base) * 0.875); // 14px
-    --text-size--small: calc(var(--font-size-base) * 0.75);  // 12px
 
     // CORE: ICONS
     --icon-size--default: 24px;
@@ -253,10 +249,15 @@ $container-max-widths: (
     --top-bar-color-fg: hsl(0, 0%, 100%);
     --top-bar-color-bg-notifications: hsla(216, 45%, 4%, 0.4);
     --top-bar-color-bg-notifications--hover: hsla(216, 45%, 0%, 0.8);
+    --top-bar-color-fg-notifications: var(--top-bar-color-fg);
+    --top-bar-notifications-inner-size: 32px;
     --top-bar-color-bg-avatar-block: hsla(216, 45%, 4%, 0.4);
     --top-bar-color-fg-avatar: hsl(222, 18%, 100%);
     --top-bar-color-bg-avatar: hsl(222, 18%, 24%);
     --top-bar-color-bg-avatar--hover: hsl(222, 18%, 34%);
+    --top-bar-color-bg-badge: hsl(321, 100%, 42%);
+    --top-bar-color-fg-badge: hsl(0, 0%, 100%);
+    --top-bar-badge-size: 1.25rem;
 
     // COMPONENT: INPUT FIELD
     --input-color-bg: hsl(0, 0%, 96%);
@@ -306,10 +307,11 @@ $container-max-widths: (
     --simplecard-item-outline-color--hover: var(--color-line--medium);
     --simplecard-item-border-color: transparent;
     --simplecard-item-border-color--hover: var(--color-line--x-light);
-    --simplecard-item-padding: 6px 15px 10px 15px;
+    --simplecard-item-padding: var(--space--0-5) var(--space--2) var(--space--1-5) var(--space--3);
+    --simplecard-item-padding--compact: var(--space--1) var(--space--1) var(--space--1) var(--space--3);
 
     // COMPONENT: SIDENAV
-    --sidenav-size-width: 80px;
+    
     --sidenav-color-bg:                 var(--color-primary);
     --sidenav-color-item-bg:            transparent;
     --sidenav-color-item-fg:            hsla(0, 0%, 100%, 1);
@@ -317,6 +319,17 @@ $container-max-widths: (
     --sidenav-color-item-fg--active:    var(--color-primary);
     --sidenav-color-badge-bg:           hsla(0, 0%, 16%, 1);
     --sidenav-color-badge-fg:           hsla(0, 0%, 98%, 1);
+    --sidenav-item-badge-size:          1.25rem;
+    --sidenav-item-badge-font-size:     0.6875rem;
+    --sidenav-item-helper-icon-size:    1.125rem;
+    --sidenav-item-border-radius:       var(--border-radius--s);
+    --separator-dot-size:               3px;
+    --separator-dot-color-bg:           var(--sidenav-color-item-fg);
+    // Title and size options
+    --sidenav-item-title-display:       block; // set to none to hide the title
+    --sidenav-size-width:               80px; // width of the sidenav on desktop
+    --sidenav-item-gap:                 8px; // left and right spacing between item and the bar on desktop
+    --sidenav-item-width:               calc(var(--sidenav-size-width) - var(--sidenav-item-gap)); // width of the sidenav item on desktop
 
     // COMPONENT: PROFILE MODAL
     --profile-header-height: 56px;
@@ -453,8 +466,12 @@ $container-max-widths: (
     --multi-action-bar-color-bg: hsl(196, 100%, 92%);
 
     // COMPONENT: CHECKBOX & RADIO & SWITCH
+    --checkbox-size: 18px;
     --color-core-checked-bg: var(--button-color-bg--primary);
     --react-toggle-color-bg: hsl(0, 0%, 80%);
+    --checkbox-color-border: hsl(0, 0%, 25%);
+    --checkbox-color-border--hover: hsl(0, 0%, 5%);
+    --checkbox-color-border--checked: var(--color-core-checked-bg);
     --react-toggle-color-bg--checked: var(--color-core-checked-bg);
     --css-checkbox-color-bg--checked: var(--color-core-checked-bg);
     --css-checkbox-color-fg--checked: hsl(0, 0%, 100%);
@@ -488,6 +505,31 @@ $container-max-widths: (
     --content-item-text-line-height: 1.6;
     --content-item-text-font-weight: 300;
     --content-item-text-font-family: var(--font-family-core--secondary);
+
+    // COMPONENT: IMPERSONATE USER
+    --impersonate-user-chip-height: var(--space--5);
+    --impersonate-user-chip-border-radius: var(--border-radius--full);
+    --impersonate-user-chip-border-color: hsla(0, 0%, 100%, 0.24);
+    --impersonate-user-chip-color-bg: hsla(0, 0%, 0%, 0.5);
+    --impersonate-user-chip-color-fg: var(--color-text--inverse);
+    --impersonate-user-chip-inner-color-bg: hsla(0, 0%, 0%, 1);
+    --impersonate-user-chip-inner-font-size: var(--text-size--medium);
+    --impersonate-user-chip-inner-padding: var(--space--0-5) var(--space--3) var(--space--0-5) var(--space--0-5);
+    --impersonate-user-chip-avatar-color-bg: var(--color-primary);
+    --impersonate-user-chip-avatar-color-fg: var(--color-text--inverse);
+    --impersonate-user-chip-avatar-size: var(--space--4);
+    --impersonate-user-chip-avatar-text-size: var(--text-size--medium);
+    --impersonate-user-chip-avatar-border-radius: var(--border-radius--full);
+    --impersonate-user-chip-button-size: var(--space--4);
+    --impersonate-user-chip-button-color-bg: hsla(0, 0%, 20%, 0.6);
+    --impersonate-user-chip-button-color-border: hsla(0, 0%, 100%, 0.2);
+    --impersonate-user-chip-button-color-border--hover: hsla(0, 0%, 100%, 0.4);
+    --impersonate-user-chip-button-color-bg--hover: hsla(0, 0%, 0%, 0.9);
+    --impersonate-user-chip-button-color-bg--active: var(--color-primary);
+    --impersonate-user-chip-button-color-fg: var(--color-text--inverse);
+    --impersonate-user-chip-button-border-radius: var(--border-radius--full);
+
+
 
 }
 

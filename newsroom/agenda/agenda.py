@@ -1,4 +1,4 @@
-from typing import Dict, Set, Any, Optional
+from typing import Dict, Set, Any, Optional, List
 import logging
 from copy import deepcopy
 
@@ -16,7 +16,7 @@ from planning.common import (
 from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
 from superdesk import get_resource_service
-from superdesk.resource import Resource, not_enabled, not_analyzed, not_indexed
+from superdesk.resource import Resource, not_enabled, not_analyzed, not_indexed, string_with_analyzer
 from superdesk.utils import ListCursor
 from superdesk.metadata.item import metadata_schema
 
@@ -40,8 +40,8 @@ from newsroom.utils import (
 from newsroom.utils import get_local_date, get_end_date
 from datetime import datetime
 from newsroom.wire import url_for_wire
-from newsroom.search import BaseSearchService, SearchQuery, query_string, get_filter_query
-from newsroom.search_config import is_search_field_nested, get_nested_config
+from newsroom.search.service import BaseSearchService, SearchQuery, query_string, get_filter_query
+from newsroom.search.config import is_search_field_nested, get_nested_config
 from .utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD, push_agenda_item_notification
 
 
@@ -133,9 +133,10 @@ class AgendaResource(newsroom.Resource):
 
     # content metadata
     schema["name"] = metadata_schema["body_html"].copy()
-    schema["slugline"] = not_analyzed
+    schema["slugline"] = metadata_schema["body_html"].copy()
     schema["definition_short"] = metadata_schema["body_html"].copy()
     schema["definition_long"] = metadata_schema["body_html"].copy()
+    schema["description_text"] = metadata_schema["body_html"].copy()
     schema["headline"] = metadata_schema["body_html"].copy()
     schema["firstcreated"] = events_schema["firstcreated"]
     schema["version"] = events_schema["version"]
@@ -182,6 +183,7 @@ class AgendaResource(newsroom.Resource):
         "type": "list",
         "mapping": {
             "type": "nested",
+            "include_in_parent": True,  # Enabled so advanced search works across multiple fields
             "properties": {
                 "planning_id": not_analyzed,
                 "coverage_id": not_analyzed,
@@ -190,7 +192,7 @@ class AgendaResource(newsroom.Resource):
                 "workflow_status": not_analyzed,
                 "coverage_status": not_analyzed,
                 "coverage_provider": not_analyzed,
-                "slugline": not_analyzed,
+                "slugline": string_with_analyzer,
                 "delivery_id": not_analyzed,  # To point ot the latest published item
                 "delivery_href": not_analyzed,  # To point ot the latest published item
                 TO_BE_CONFIRMED_FIELD: {"type": "boolean"},
@@ -238,7 +240,7 @@ class AgendaResource(newsroom.Resource):
         "type": "list",
         "mapping": {
             "type": "nested",
-            "include_in_all": False,
+            "include_in_parent": True,
             "properties": {
                 "_id": not_analyzed,
                 "guid": not_analyzed,
@@ -657,6 +659,26 @@ class AgendaService(BaseSearchService):
     default_sort = [{"dates.start": "asc"}]
     default_page_size = 100
 
+    def get_advanced_search_fields(self, search: SearchQuery) -> List[str]:
+        fields = super().get_advanced_search_fields(search)
+
+        if "slugline" in fields:
+            # Add ``slugline`` field for Planning & Coverages too
+            fields.extend(["planning_items.slugline", "coverages.slugline"])
+
+        if "headline" in fields:
+            # Add ``headline`` field for Planning items too
+            fields.append("planning_items.headline")
+
+        if "description" in fields:
+            # Replace ``description`` alias with appropriate description fields
+            fields.remove("description")
+            fields.extend(
+                ["definition_short", "definition_long", "description_text", "planning_items.description_text"]
+            )
+
+        return fields
+
     def on_fetched(self, doc):
         self.enhance_items(doc[config.ITEMS])
 
@@ -851,6 +873,7 @@ class AgendaService(BaseSearchService):
         # Apply agenda based filters
         self.apply_section_filter(search)
         self.apply_request_filter(search)
+        self.apply_request_advanced_search(search)
 
         if not is_admin_or_internal(search.user):
             _remove_fields(search.source, PRIVATE_FIELDS)

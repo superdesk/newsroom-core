@@ -34,11 +34,13 @@ const initialState = {
     totalItems: null,
     activeQuery: null,
     user: null,
+    userFolders: [],
     company: null,
+    companyFolders: [],
     topics: [],
     selectedItems: [],
     bookmarks: false,
-    context: null,
+    context: 'agenda',
     formats: [],
     newItems: [],
     newItemsByTopic: {},
@@ -52,7 +54,7 @@ const initialState = {
         featuredOnly: false,
         agendaWireItems: [],
     },
-    search: searchReducer(),
+    search: searchReducer(undefined, undefined, 'agenda'),
     detail: false,
     userSections: {},
     searchInitiated: false,
@@ -205,6 +207,8 @@ export default function agendaReducer(state = initialState, action) {
             uiConfig: action.agendaData.ui_config || {},
             groups: action.agendaData.groups || [],
             hasAgendaFeaturedItems: action.agendaData.has_agenda_featured_items || false,
+            userFolders: action.agendaData.user_folders,
+            companyFolders: action.agendaData.company_folders,
         };
     }
 

@@ -190,22 +190,16 @@ export function shortHighlightedtext(html: any, maxLength = 40) {
     const parser = new DOMParser();
     const doc: any = parser.parseFromString(html, 'text/html');
     const span = doc.querySelector('span.es-highlight');
-
-    if (!span) {
-        const plainText = doc.documentElement.textContent.trim();
-        const words = plainText.split(/\s/).filter((w: any) => w);
-        return words.slice(0, maxLength).join(' ') + (words.length > maxLength ? '...' : '');
-    }
-
     const parentElement = span.parentElement;
     const treeWalker = (document as any).createTreeWalker(parentElement, NodeFilter.SHOW_TEXT, null, false);
     let node = treeWalker.firstChild();
     let text = '';
     let count = 0;
+    let highlightedSpans = [];
 
     while (node && count < maxLength) {
         const content = node.textContent.trim();
-        const words = content.split(/\s/).filter((w: any) => w);
+        const words = content.split(/(?= [A-Z])/).filter((w: any) => w);
         const remainingCount = maxLength - count;
 
         if (words.length <= remainingCount) {
@@ -218,11 +212,27 @@ export function shortHighlightedtext(html: any, maxLength = 40) {
 
         node = treeWalker.nextSibling();
     }
-
     const truncatedText = text.trim();
-    const highlightedText = span.outerHTML;
-    const output = truncatedText + (count > maxLength ? '' : '...');
-    return output.replace(span.textContent, highlightedText);
+    highlightedSpans = parentElement.querySelectorAll('span.es-highlight');
+    let output = truncatedText;
+    let highlightedText = '';
+    let lastIndex = 0;
+
+    highlightedSpans.forEach((span: any) => {
+        const spanText = span.textContent.trim();
+        const spanIndex = truncatedText.indexOf(spanText, lastIndex);
+
+        if (spanIndex !== -1) {
+            const spanStart = spanIndex;
+            const spanEnd = spanStart + spanText.length;
+            highlightedText += output.slice(lastIndex, spanStart) + span.outerHTML;
+            lastIndex = spanEnd;
+        }
+    });
+
+    output = highlightedText + output.slice(lastIndex);
+
+    return output + (count > maxLength ? '' : '...');
 }
 
 /**

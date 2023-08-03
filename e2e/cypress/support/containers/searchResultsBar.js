@@ -13,7 +13,7 @@ export class SearchResultsBar {
     }
 
     expectAdvancedFields(enabledFields) {
-        ['headline', 'slugline', 'body'].forEach((field) => {
+        ['headline', 'slugline', 'body_html'].forEach((field) => {
             this
                 .getSearchResultElement('advanced-fields', `[data-test-id="toggle-${field}-button"]`)
                 .should(enabledFields.includes(field) ? 'have.class' : 'not.have.class', 'toggle-button--active');
@@ -36,5 +36,42 @@ export class SearchResultsBar {
                 this.getAdvancedSearchKeywords(field).contains(keyword);
             });
         });
+    }
+
+    expectFilterTags(filterParams) {
+        Object.keys(filterParams).forEach((group) => {
+            filterParams[group].forEach((filterValue) => {
+                this.getSearchResultElement('filters', `[data-test-id="tags-filters--${group}"]`)
+                    .contains(filterValue);
+            });
+        });
+    }
+
+    expectSearchResults(params) {
+        if (params.advanced != null) {
+            if (params.advanced.fields != null) {
+                this.expectAdvancedFields(params.advanced.fields);
+            }
+            if (params.advanced.keywords != null) {
+                this.expectAdvancedSearchKeywords(params.advanced.keywords);
+            }
+        }
+        if (params.query != null) {
+            this.getSearchResultElement('query', '[data-test-id="query-value"]')
+                .contains(params.query);
+        }
+        if (params.topics != null) {
+            params.topics.forEach((topicName) => {
+                this.getSearchResultElement('topics', '[data-test-id="tags-topic"]')
+                    .contains(topicName);
+            });
+        }
+        if (params.myTopic != null) {
+            this.getSearchResultElement('topics', '[data-test-id="tags-topics--my-topic"]')
+                .contains(params.myTopic);
+        }
+        if (params.filters != null) {
+            this.expectFilterTags(params.filters);
+        }
     }
 }

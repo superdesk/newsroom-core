@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 
 import {gettext} from 'utils';
 import {searchParamsSelector, navigationsByIdSelector, filterGroupsByIdSelector} from '../../selectors';
+import {getAdvancedSearchFields} from '../../utils';
 import {
     toggleNavigation,
     toggleAdvancedSearchField,
@@ -29,10 +30,58 @@ class SearchResultsBarComponent extends React.Component<any, any> {
 
         this.state = {isTagSectionShown: false};
         this.toggleTagSection = this.toggleTagSection.bind(this);
+        this.toggleNavigation = this.toggleNavigation.bind(this);
+        this.setQuery = this.setQuery.bind(this);
+        this.setAdvancedSearchKeywords = this.setAdvancedSearchKeywords.bind(this);
+        this.toggleAdvancedSearchField = this.toggleAdvancedSearchField.bind(this);
+        this.clearAdvancedSearchParams = this.clearAdvancedSearchParams.bind(this);
+        this.setCreatedFilter = this.setCreatedFilter.bind(this);
+        this.toggleFilter = this.toggleFilter.bind(this);
+        this.resetFilter = this.resetFilter.bind(this);
     }
 
     toggleTagSection() {
         this.setState((prevState: any) => ({isTagSectionShown: !prevState.isTagSectionShown}));
+    }
+
+    toggleNavigation(navigation: any) {
+        this.props.toggleNavigation(navigation);
+        this.props.refresh();
+    }
+
+    setQuery(query: any) {
+        this.props.setQuery(query);
+        this.props.refresh();
+    }
+
+    setAdvancedSearchKeywords(field: any, keywords: any) {
+        this.props.setAdvancedSearchKeywords(field, keywords);
+        this.props.refresh();
+    }
+
+    toggleAdvancedSearchField(field: any) {
+        this.props.toggleAdvancedSearchField(field);
+        this.props.refresh();
+    }
+
+    clearAdvancedSearchParams() {
+        this.props.clearAdvancedSearchParams();
+        this.props.refresh();
+    }
+
+    setCreatedFilter(filter: any) {
+        this.props.setCreatedFilter(filter);
+        this.props.refresh();
+    }
+
+    toggleFilter(key: any, value: any, single: any) {
+        this.props.toggleFilter(key, value, single);
+        this.props.refresh();
+    }
+
+    resetFilter() {
+        this.props.resetFilter();
+        this.props.refresh();
     }
 
     render() {
@@ -92,9 +141,9 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                             searchParams={this.props.searchParams}
                             activeTopic={this.props.activeTopic}
                             topicType={this.props.topicType}
-                            refresh={this.props.refresh}
                             navigations={this.props.navigations}
                             filterGroups={this.props.filterGroups}
+                            availableFields={this.props.availableFields}
                             toggleNavigation={this.props.toggleNavigation}
                             toggleAdvancedSearchField={this.props.toggleAdvancedSearchField}
                             setQuery={this.props.setQuery}
@@ -103,7 +152,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                             setCreatedFilter={this.props.setCreatedFilter}
                             clearAdvancedSearchParams={this.props.clearAdvancedSearchParams}
                             deselectMyTopic={this.props.deselectMyTopic}
-                            resetFilter={this.props.resetFilter}
+                            resetFilter={this.resetFilter}
                         />
                     )}
 
@@ -146,6 +195,7 @@ SearchResultsBarComponent.propTypes = {
 
     navigations: PropTypes.object,
     filterGroups: PropTypes.object,
+    availableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
 
     toggleNavigation: PropTypes.func.isRequired,
     toggleAdvancedSearchField: PropTypes.func.isRequired,
@@ -173,6 +223,7 @@ const mapStateToProps = (state: any) => ({
     searchParams: searchParamsSelector(state),
     navigations: navigationsByIdSelector(state),
     filterGroups: filterGroupsByIdSelector(state),
+    availableFields: getAdvancedSearchFields(state.context),
 });
 
 const mapDispatchToProps = {

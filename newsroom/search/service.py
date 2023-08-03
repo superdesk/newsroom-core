@@ -8,12 +8,16 @@ from eve.utils import ParsedRequest
 from werkzeug.exceptions import Forbidden
 
 from superdesk import get_resource_service
-from superdesk.metadata.utils import get_elastic_highlight_query
 from superdesk.default_settings import strtobool as _strtobool
 from content_api.errors import BadParameterValueError
 
 from newsroom import Service
-from newsroom.search_config import SearchGroupNestedConfig, get_nested_config, is_search_field_nested
+from newsroom.search.config import (
+    SearchGroupNestedConfig,
+    get_nested_config,
+    is_search_field_nested,
+    get_advanced_search_fields,
+)
 from newsroom.products.products import (
     get_products_by_navigation,
     get_products_by_company,
@@ -112,7 +116,6 @@ class BaseSearchService(Service):
     default_sort = [{"versioncreated": "desc"}]
     default_page_size = 25
     _matched_ids = []  # array of IDs matched on the request, used when searching all versions
-    default_advanced_search_fields = []
 
     def get(self, req, lookup):
         search = SearchQuery()
@@ -512,33 +515,54 @@ class BaseSearchService(Service):
             )
 
     def prefill_search_highlights(self, search, req):
-        query_string = search.args.get("q")
-        query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
-        advanced_search = json.loads(search.args.get("advanced")) if search.args.get("advanced") else {}
+        query = search.args.get("q")
+        advanced_search = json.loads(search.args.get("advanced", "{}"))
 
-        field_settings = {"number_of_fragments": 0}
         if app.data.elastic.should_highlight(req) and (
-            query_string or advanced_search.get("all") or advanced_search.get("any")
+            query or advanced_search.get("all") or advanced_search.get("any")
         ):
-            elastic_highlight_query = get_elastic_highlight_query(
-                query_string={
-                    "query": query_string,
-                    "default_operator": "AND",
-                    "analyze_wildcard": query_string_settings["analyze_wildcard"],
-                    "lenient": True,
-                },
-            )
-            selected_field = advanced_search.get("fields") or []
-            if not selected_field:
-                elastic_highlight_query["fields"] = {
-                    "body_html": field_settings,
-                    "headline": field_settings,
-                    "slugline": field_settings,
-                }
-            else:
-                elastic_highlight_query["fields"] = {field: field_settings for field in selected_field}
+            selected_fields = advanced_search.get("fields", [])
 
-            search.highlight = elastic_highlight_query
+            # Create a separate search query object for highlighting settings
+            highlight_search = SearchQuery()
+
+            # Call prefill_search_args with the request object
+            self.prefill_search_args(highlight_search, req)
+
+            # Set up the search query for filtering
+            self.apply_request_filter(highlight_search)
+
+            # Set up the search query for advanced search options
+            self.apply_request_advanced_search(highlight_search)
+
+            # Set up highlighting settings
+            highlight_search.source.setdefault("highlight", {})
+            highlight_search.source["highlight"].setdefault("fields", {})
+
+            fields_to_highlight = (
+                selected_fields
+                if selected_fields
+                else [
+                    "body_html",
+                    "headline",
+                    "slugline",
+                    "description_text",
+                    "definition_short",
+                    "name",
+                    "definition_long",
+                ]
+            )
+
+            for field in fields_to_highlight:
+                highlight_search.source["highlight"]["fields"][field] = {
+                    "number_of_fragments": 0,
+                    "highlight_query": {"bool": {"filter": highlight_search.query["bool"]["filter"]}},
+                }
+
+            highlight_search.source["highlight"]["pre_tags"] = ['<span class="es-highlight">']
+            highlight_search.source["highlight"]["post_tags"] = ["</span>"]
+
+            search.source.update(highlight_search.source)
 
     def validate_request(self, search):
         """Validate the request parameters
@@ -692,6 +716,9 @@ class BaseSearchService(Service):
             if search.args.get("created_from") or search.args.get("created_to"):
                 search.source["post_filter"]["bool"]["filter"].append(self.versioncreated_range(search.args))
 
+    def get_advanced_search_fields(self, search: SearchQuery) -> List[str]:
+        return search.advanced.get("fields") or get_advanced_search_fields(self.section)
+
     def apply_request_advanced_search(self, search: SearchQuery):
         if not search.args.get("advanced"):
             return
@@ -701,26 +728,28 @@ class BaseSearchService(Service):
         else:
             search.advanced = search.args["advanced"]
 
-        fields = search.advanced.get("fields") or self.default_advanced_search_fields
+        fields = self.get_advanced_search_fields(search)
         if not fields:
             return
 
-        def gen_match_query(keywords: str, operator: str, multi_match_type):
+        def gen_advanced_query(keywords: str, operator: str, multi_match_type: str):
             return {
-                "multi_match": {
+                "query_string": {
                     "query": keywords,
-                    "type": multi_match_type,
                     "fields": fields,
-                    "operator": operator,
+                    "default_operator": operator,
+                    "type": multi_match_type,
+                    "lenient": True,
+                    "analyze_wildcard": True,
                 },
             }
 
         if search.advanced.get("all"):
-            search.query["bool"]["filter"].append(gen_match_query(search.advanced["all"], "AND", "cross_fields"))
+            search.query["bool"]["filter"].append(gen_advanced_query(search.advanced["all"], "AND", "cross_fields"))
         if search.advanced.get("any"):
-            search.query["bool"]["filter"].append(gen_match_query(search.advanced["any"], "OR", "best_fields"))
+            search.query["bool"]["filter"].append(gen_advanced_query(search.advanced["any"], "OR", "best_fields"))
         if search.advanced.get("exclude"):
-            search.query["bool"]["must_not"].append(gen_match_query(search.advanced["exclude"], "OR", "best_fields"))
+            search.query["bool"]["must_not"].append(gen_advanced_query(search.advanced["exclude"], "OR", "best_fields"))
 
     def apply_embargoed_filters(self, search):
         """Generate filters for embargoed params"""

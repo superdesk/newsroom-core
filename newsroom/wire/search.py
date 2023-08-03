@@ -10,7 +10,7 @@ import newsroom
 from newsroom.products.products import get_products_by_navigation
 from newsroom.settings import get_setting
 from newsroom.utils import get_local_date, get_end_date
-from newsroom.search import BaseSearchService, SearchQuery, query_string
+from newsroom.search.service import BaseSearchService, SearchQuery, query_string
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +89,6 @@ def items_query(ignore_latest=False):
 
 class WireSearchService(BaseSearchService):
     section = "wire"
-    default_advanced_search_fields = ["headline", "slugline", "body_html"]
 
     def get_bookmarks_count(self, user_id):
         req = ParsedRequest()

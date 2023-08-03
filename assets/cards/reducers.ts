@@ -29,7 +29,7 @@ const initialState: any = {
     products: [],
     navigations: [],
     dashboards: dashboardReducer(),
-    search: searchReducer(),
+    search: searchReducer(undefined, undefined, 'settings'),
 };
 
 export default function cardReducer(state: any = initialState, action: any) {
@@ -156,7 +156,7 @@ export default function cardReducer(state: any = initialState, action: any) {
     }
 
     default: {
-        const search = searchReducer(state.search, action);
+        const search = searchReducer(state.search, action, 'settings');
 
         if (search !== state.search) {
             return {...state, search};
