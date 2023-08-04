@@ -250,6 +250,7 @@ class WireSearchService(BaseSearchService):
                     ],
                     "filter": [{"term": {"_id": item_id}}],
                     "should": [],
+                    "must": [],
                 }
             },
         )
