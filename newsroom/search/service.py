@@ -71,6 +71,23 @@ def get_filter_query(
     return {"terms": {aggregation_field: val}}
 
 
+def parse_sort(value):
+    if not value:
+        return None
+
+    if not isinstance(value, str):
+        return value
+
+    def parse_field(field_spec):
+        try:
+            field, direction = field_spec.split(":")
+            return {field: direction}
+        except ValueError:
+            return field_spec
+
+    return list(filter(None, [parse_field(field) for field in value.split(",")]))
+
+
 class AdvancedSearchParams(TypedDict):
     all: str
     any: str
@@ -104,7 +121,7 @@ class SearchQuery(object):
 
         self.aggs = None
         self.source = {}
-        self.query = {"bool": {"filter": [], "must_not": [], "should": []}}
+        self.query = {"bool": {"filter": [], "must": [], "must_not": [], "should": []}}
         self.highlight = None
         self.item_type = None
         self.planning_items_should = []
@@ -274,7 +291,7 @@ class BaseSearchService(Service):
         """
 
         search.source["query"] = search.query
-        search.source["sort"] = search.args.get("sort") or self.default_sort
+        search.source["sort"] = parse_sort(search.args.get("sort")) or self.default_sort
         search.source["size"] = int(search.args.get("size", self.default_page_size))
         search.source["from"] = int(search.args.get("from", 0))
 
@@ -556,7 +573,7 @@ class BaseSearchService(Service):
             for field in fields_to_highlight:
                 highlight_search.source["highlight"]["fields"][field] = {
                     "number_of_fragments": 0,
-                    "highlight_query": {"bool": {"filter": highlight_search.query["bool"]["filter"]}},
+                    "highlight_query": {"bool": {"filter": highlight_search.query["bool"]["must"]}},
                 }
 
             highlight_search.source["highlight"]["pre_tags"] = ['<span class="es-highlight">']
@@ -681,7 +698,7 @@ class BaseSearchService(Service):
 
     def apply_request_filter(self, search):
         if search.args.get("q"):
-            search.query["bool"]["filter"].append(
+            search.query["bool"].setdefault("must", []).append(
                 query_string(search.args["q"], search.args.get("default_operator") or "AND")
             )
 
@@ -745,9 +762,13 @@ class BaseSearchService(Service):
             }
 
         if search.advanced.get("all"):
-            search.query["bool"]["filter"].append(gen_advanced_query(search.advanced["all"], "AND", "cross_fields"))
+            search.query["bool"].setdefault("must", []).append(
+                gen_advanced_query(search.advanced["all"], "AND", "cross_fields")
+            )
         if search.advanced.get("any"):
-            search.query["bool"]["filter"].append(gen_advanced_query(search.advanced["any"], "OR", "best_fields"))
+            search.query["bool"].setdefault("must", []).append(
+                gen_advanced_query(search.advanced["any"], "OR", "best_fields")
+            )
         if search.advanced.get("exclude"):
             search.query["bool"]["must_not"].append(gen_advanced_query(search.advanced["exclude"], "OR", "best_fields"))
 
