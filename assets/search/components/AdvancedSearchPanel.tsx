@@ -112,44 +112,44 @@ function AdvancedSearchPanelComponent({
                     <div className="advanced-search__content-bottom">
                         <p>{gettext('Apply these keyword rules to at least one of these search fields:')}</p>
                         <InputWrapper>
-                            {!availableFields.includes('name') ? null : (
+                            {!availableFields?.includes('name') ? null : (
                                 <CheckboxInput
                                     name="name"
                                     label={gettext('Name')}
                                     onChange={() => toggleField('name')}
-                                    value={params.fields.includes('name')}
+                                    value={params.fields?.includes('name')}
                                 />
                             )}
-                            {!availableFields.includes('headline') ? null : (
+                            {!availableFields?.includes('headline') ? null : (
                                 <CheckboxInput
                                     name="headline"
                                     label={gettext('Headline')}
                                     onChange={() => toggleField('headline')}
-                                    value={params.fields.includes('headline')}
+                                    value={params.fields?.includes('headline')}
                                 />
                             )}
-                            {!availableFields.includes('slugline') ? null : (
+                            {!availableFields?.includes('slugline') ? null : (
                                 <CheckboxInput
                                     name="slugline"
                                     label={gettext('Slugline')}
                                     onChange={() => toggleField('slugline')}
-                                    value={params.fields.includes('slugline')}
+                                    value={params.fields?.includes('slugline')}
                                 />
                             )}
-                            {!availableFields.includes('description') ? null : (
+                            {!availableFields?.includes('description') ? null : (
                                 <CheckboxInput
                                     name="description"
                                     label={gettext('Description')}
                                     onChange={() => toggleField('description')}
-                                    value={params.fields.includes('description')}
+                                    value={params.fields?.includes('description')}
                                 />
                             )}
-                            {!availableFields.includes('body_html') ? null : (
+                            {!availableFields?.includes('body_html') ? null : (
                                 <CheckboxInput
                                     name="body_html"
                                     label={gettext('Body')}
                                     onChange={() => toggleField('body_html')}
-                                    value={params.fields.includes('body_html')}
+                                    value={params.fields?.includes('body_html')}
                                 />
                             )}
                         </InputWrapper>
