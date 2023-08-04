@@ -4,10 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    {% block title_wrapper %}
     <title>{{ config.SITE_NAME }} - {% block title %}{% endblock %}</title>
+    {% endblock %}
 
+    {% block fonts %}
     <link href="https://fonts.googleapis.com/css?family=Merriweather:300,400,700,900" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900" rel="stylesheet">
+    {% endblock %}
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/css/alertify.min.css"/>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/css/themes/bootstrap.min.css"/>
 
@@ -25,18 +29,23 @@
     {% block topnav %}
         <nav class="main navbar">
             <h3 class="a11y-only">{{ gettext('Main Navigation Bar') }}</h3>
+            {% block logo %}
             {% include 'logo.html' %}
+            {% endblock %}
+
             <div class="navbar-brand">
                 <nav>
                     {% block breadcrumb %}{% endblock %}
                 </nav>
             </div>
 
+            {% include "impersonate_user.html" %}
+
             {% if session.get('name') %}
             <div class="navbar__right">
                 <div class="navbar__date">{{ get_date() | date_header }}</div>
                 <div class="navbar-notifications" id="header-notification"></div>
-                <div id="header-profile-toggle"></div>
+                <div id="header-profile-toggle" data-test-id="header-avatar"></div>
             </div>
             {% else %}
             <div class="navbar__right navbar__right--login">

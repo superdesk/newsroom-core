@@ -79,6 +79,20 @@ class UsersResource(newsroom.Resource):
             "type": "dict",
             "nullable": True,
         },
+        "dashboards": {
+            "type": "list",
+            "schema": {
+                "type": "dict",
+                "schema": {
+                    "name": {"type": "string"},
+                    "type": {"type": "string"},
+                    "topic_ids": {
+                        "type": "list",
+                        "schema": newsroom.Resource.rel("topics"),
+                    },
+                },
+            },
+        },
     }
 
     item_methods = ["GET", "PATCH", "PUT", "DELETE"]
@@ -106,6 +120,7 @@ USER_PROFILE_UPDATES = {
     "receive_email",
     "receive_app_notifications",
     "role",
+    "dashboards",
 }
 
 
