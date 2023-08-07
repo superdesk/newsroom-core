@@ -28,8 +28,9 @@ class ListBar extends React.Component<any, any> {
                     <div className="content-bar__right">
                         {this.props.onNewItem && (
                             <button
-                                data-test-id="new-item-btn"
                                 className="nh-button nh-button--primary"
+                                data-test-id="new-item-btn"
+                                disabled={this.props.disabled}
                                 onClick={() => this.props.onNewItem()}
                             >
                                 {this.props.buttonText}
@@ -52,6 +53,7 @@ ListBar.propTypes = {
     noLeftPadding: PropTypes.bool,
     enableQueryAction: PropTypes.bool,
     testId: PropTypes.string,
+    disabled: PropTypes.bool,
 };
 
 ListBar.defaultProps = {enableQueryAction: true};

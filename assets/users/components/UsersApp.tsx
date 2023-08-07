@@ -22,11 +22,12 @@ import {UserListCompanyFilter} from './filters/UserListCompanyFilter';
 function UsersApp(props: any): any {
     return ([
         <ListBar
+            buttonText={gettext('New User')}
             key="UserBar"
+            disabled={props.userToEdit != null && true}
             onNewItem={props.newUser}
             setQuery={props.setQuery}
             fetch={props.fetchUsers}
-            buttonText={gettext('New User')}
         >
             <UserListCompanyFilter
                 companies={props.companies}
@@ -53,6 +54,7 @@ const mapStateToProps = (state: any) => ({
     company: state.company,
     sort: state.sort,
     sortDirection: state.sortDirection,
+    userToEdit: state.userToEdit,
 });
 
 UsersApp.propTypes = {
