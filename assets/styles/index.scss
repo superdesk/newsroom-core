@@ -713,6 +713,12 @@ article.list {
     &:focus-visible {
         box-shadow: inset 0 0 0 1px var(--color-interactive-focus), inset 0 0 3px 4px var(--color-interactive-focus--translucent);
     }
+    .navbar--small & {
+        @include phone {
+            width: var(--navbar-height--small);
+            height: var(--navbar-height--small);
+        }
+    }
 }
 
 .show .content-bar__menu {
@@ -3776,7 +3782,7 @@ article.list {
 .topic-list {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: var(--topic-list-density);
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -3796,6 +3802,9 @@ article.list {
     padding-inline: var(--collapsible-box-padding-inline);
     min-height: var(--topic-list-item-min-height);
     transition: all var(--transition-base);
+    background-color: var(--topic-list-item-color-bg);
+    border-radius: var(--border-radius--s);
+    margin-inline: var(--topic-list-item-inline-margin);
     &:hover {
         text-decoration: none;
         color: var(--topic-list-item-color-fg--hover);
@@ -3815,8 +3824,7 @@ article.list {
 }
 .topic-list--unsorted {
     .topic-list__item-link {
-        border-radius: var(--border-radius--s);
-
+        margin-inline: 0;
     }
 }
 
@@ -4197,3 +4205,6 @@ article.list {
 
 }
 
+.nh-login-page__content { // login page background color
+    background-color: var(--login-page-color-bg);
+}
