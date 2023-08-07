@@ -12,6 +12,9 @@
     --color-interactive-focus-base: 356, 72%;
     --color-interactive-focus-l: 46%;
 
+    // LOGIN PAGE
+    --login-page-color-bg: var(--color-background--muted);
+
     // COMPONENT: NAVBAR MAIN
     --top-bar-color-bg: var(--color-primary);
     --top-bar-color-bg-notifications: hsla(216, 45%, 4%, 0.3);
@@ -19,7 +22,8 @@
     --top-bar-color-bg-avatar-block: hsla(216, 45%, 4%, 0);
     --top-bar-color-bg-avatar: hsla(216, 45%, 4%, 0.3);
     --top-bar-color-bg-avatar--hover: hsla(216, 45%, 4%, 0.5);
-    --top-bar-color-bg-badge: hsl(0, 3%, 15%);
+    --top-bar-color-bg-badge: hsl(0, 0%, 100%);
+    --top-bar-color-fg-badge: hsl(0, 3%, 15%);
 
     // COMPONENT: SIDENAV
     --sidenav-color-bg:                 hsl(0, 3%, 15%);
