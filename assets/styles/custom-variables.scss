@@ -225,6 +225,10 @@ $container-max-widths: (
     // CORE: TOP BAR HEIGHT (NavBar, Search, Mobile navigation) 
     --navbar-height: 56px;
     --navbar-height--mobile: 48px;
+    --navbar-height--small: 40px;
+
+    // LOGIN PAGE
+    --login-page-color-bg: var(--color-background--muted);
     
 
     // --------------------------------------------------------------------
@@ -323,7 +327,6 @@ $container-max-widths: (
     --simplecard-item-padding--compact: var(--space--1) var(--space--1) var(--space--1) var(--space--3);
 
     // COMPONENT: SIDENAV
-    
     --sidenav-color-bg:                 var(--color-primary);
     --sidenav-color-item-bg:            transparent;
     --sidenav-color-item-fg:            hsla(0, 0%, 100%, 1);
@@ -460,6 +463,7 @@ $container-max-widths: (
     --collapsible-box-padding-inlinestart--hover: var(--space--3);
 
     // COMPONENT: TOPIC LIST (Side panel)
+    --topic-list-density: var(--space--0-5);
     --topic-list-item-font-size: var(--text-size--medium);
     --topic-list-item-color-fg: var(--color-text--muted);
     --topic-list-item-color-fg--hover: var(--color-text);
@@ -468,6 +472,7 @@ $container-max-widths: (
     --topic-list-item-color-bg--hover: hsla(0, 0%, 96%, 1);
     --topic-list-item-color-bg--active: hsla(0, 0%, 96%, 1);
     --topic-list-item-min-height: 40px;
+    --topic-list-item-inline-margin: var(--space--1);
 
     // COMPONENT: MAIN FOOTER
     --footer-size--height: 32px;
@@ -615,6 +620,7 @@ $container-max-widths: (
     }
     &:hover {
         text-decoration: none;
+        cursor: pointer;
         [class^="icon--"],
         [class*=" icon--"] {
             color: var(--color-text);

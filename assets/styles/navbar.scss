@@ -228,7 +228,7 @@
         padding-block: 0;
     }
     &.navbar--small {
-        height: 40px;
+        height: var(--navbar-height--small);
     }
     .navbar__inner {
         display: flex;
