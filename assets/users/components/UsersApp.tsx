@@ -24,7 +24,7 @@ function UsersApp(props: any): any {
         <ListBar
             buttonText={gettext('New User')}
             key="UserBar"
-            disabled={props.userToEdit != null && true}
+            disabled={props.userToEdit != null}
             onNewItem={props.newUser}
             setQuery={props.setQuery}
             fetch={props.fetchUsers}
