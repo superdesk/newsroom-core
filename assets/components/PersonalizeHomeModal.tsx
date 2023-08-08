@@ -6,14 +6,12 @@ import {gettext} from 'utils';
 import Modal from 'components/Modal';
 import {Input} from 'reactstrap';
 import CheckboxInput from './CheckboxInput';
-import {FormToggle} from 'ui/components/FormToggle';
 import {reloadMyTopics as reloadMyWireTopics} from 'wire/actions';
 import {IUser} from 'interfaces/user';
 import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 import {modalFormInvalid, modalFormValid, setUser} from 'actions';
 import {updateUser} from 'users/actions';
 import {getCurrentUser} from 'company-admin/selectors';
-import classNames from 'classnames';
 
 interface IReduxStoreProps {
     topics?: Array<ITopic>;
