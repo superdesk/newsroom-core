@@ -21,6 +21,7 @@ import {
     setQuery,
     followStory,
     saveMyTopic,
+    setSortQuery,
 } from 'search/actions';
 
 import {
@@ -34,6 +35,7 @@ import {
     searchParamsSelector,
     showSaveTopicSelector,
     filterGroupsToLabelMap,
+    searchSortQuerySelector,
 } from 'search/selectors';
 
 import BaseApp from 'layout/components/BaseApp';
@@ -228,7 +230,7 @@ class WireApp extends BaseApp {
 
                                 newItems={this.props.newItems}
                                 refresh={this.props.fetchItems}
-
+                                setSortQuery={this.props.setSortQuery}
                                 setQuery={this.props.setQuery}
                             >
                                 <ListViewControls
@@ -290,6 +292,7 @@ WireApp.propTypes = {
     isLoading: PropTypes.bool,
     totalItems: PropTypes.number,
     activeQuery: PropTypes.string,
+    activeSortQuery: PropTypes.string,
     itemToPreview: PropTypes.object,
     itemToOpen: PropTypes.object,
     itemsById: PropTypes.object,
@@ -335,40 +338,41 @@ WireApp.propTypes = {
 };
 
 const mapStateToProps = (state: any) => ({
-    state: state,
-    isLoading: state.isLoading,
-    newsOnlyFilterText: state.newsOnlyFilterText,
-    totalItems: state.totalItems,
-    activeQuery: searchQuerySelector(state),
-    itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
-    itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
-    itemsById: state.itemsById,
-    modal: state.modal,
-    user: state.user,
-    company: state.company,
-    topics: state.topics || [],
-    activeView: activeViewSelector(state),
-    newItems: state.newItems,
-    navigations: navigationsSelector(state),
-    activeNavigation: searchNavigationSelector(state),
-    newsOnly: !!get(state, 'wire.newsOnly'),
-    searchAllVersions: !!get(state, 'wire.searchAllVersions'),
-    bookmarks: state.bookmarks,
-    savedItemsCount: state.savedItemsCount,
-    userSections: state.userSections,
-    activeTopic: activeTopicSelector(state),
-    activeProduct: activeProductSelector(state),
-    activeFilter: searchFilterSelector(state),
-    context: state.context,
-    previewConfig: previewConfigSelector(state),
-    detailsConfig: detailsConfigSelector(state),
-    listConfig: listConfigSelector(state),
-    advancedSearchTabConfig: advancedSearchTabsConfigSelector(state),
-    groups: get(state, 'groups', []),
-    searchParams: searchParamsSelector(state),
-    showSaveTopic: showSaveTopicSelector(state),
-    filterGroupLabels: filterGroupsToLabelMap(state),
-    errorMessage: state.errorMessage
+        state: state,
+        isLoading: state.isLoading,
+        newsOnlyFilterText: state.newsOnlyFilterText,
+        totalItems: state.totalItems,
+        activeQuery: searchQuerySelector(state),
+        activeSortQuery: searchSortQuerySelector(state),
+        itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
+        itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
+        itemsById: state.itemsById,
+        modal: state.modal,
+        user: state.user,
+        company: state.company,
+        topics: state.topics || [],
+        activeView: activeViewSelector(state),
+        newItems: state.newItems,
+        navigations: navigationsSelector(state),
+        activeNavigation: searchNavigationSelector(state),
+        newsOnly: !!get(state, 'wire.newsOnly'),
+        searchAllVersions: !!get(state, 'wire.searchAllVersions'),
+        bookmarks: state.bookmarks,
+        savedItemsCount: state.savedItemsCount,
+        userSections: state.userSections,
+        activeTopic: activeTopicSelector(state),
+        activeProduct: activeProductSelector(state),
+        activeFilter: searchFilterSelector(state),
+        context: state.context,
+        previewConfig: previewConfigSelector(state),
+        detailsConfig: detailsConfigSelector(state),
+        listConfig: listConfigSelector(state),
+        advancedSearchTabConfig: advancedSearchTabsConfigSelector(state),
+        groups: get(state, 'groups', []),
+        searchParams: searchParamsSelector(state),
+        showSaveTopic: showSaveTopicSelector(state),
+        filterGroupLabels: filterGroupsToLabelMap(state),
+        errorMessage: state.errorMessage
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
@@ -383,6 +387,7 @@ const mapDispatchToProps = (dispatch: any) => ({
         dispatch(fetchItems());
     },
     setQuery: (query: any) => dispatch(setQuery(query)),
+    setSortQuery: (query: any) => dispatch(setSortQuery(query)),
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view: any) => dispatch(setView(view)),

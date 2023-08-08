@@ -216,6 +216,7 @@ export function search(state: any, next?: any, aggs?: any) {
     const context = get(state, 'context', 'wire');
 
     const params: any = {
+        sort: !searchParams.sortQuery ? null : `versioncreated:${searchParams.sortQuery}`,
         q: !searchParams.query ? null : encodeURIComponent(searchParams.query),
         bookmarks: state.bookmarks ? state.user : null,
         navigation: getNavigationUrlParam(searchParams.navigation, true, false),

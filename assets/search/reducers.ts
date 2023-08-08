@@ -22,6 +22,7 @@ import {
     SET_ADVANCED_SEARCH_KEYWORDS,
     CLEAR_ADVANCED_SEARCH_PARAMS,
     SET_ADVANCED_SEARCH_PARAMS,
+    SET_SEARCH_SORT_QUERY,
 } from './actions';
 
 import {EXTENDED_VIEW} from 'wire/defaults';
@@ -30,6 +31,7 @@ interface IInitialState {
     activeTopic: any;
     activeNavigation: any;
     activeQuery: any;
+    activeSortQuery: any;
     activeFilter: any;
     createdFilter: any;
     productId: any;
@@ -48,6 +50,7 @@ const INITIAL_STATE: IInitialState = {
     activeTopic: null,
     activeNavigation: [],
     activeQuery: '',
+    activeSortQuery: '',
     activeFilter: {},
     createdFilter: {},
     productId: null,
@@ -148,6 +151,12 @@ export function searchReducer(state=INITIAL_STATE, action?: any, context?: any) 
             activeQuery: action.payload,
         };
 
+    case SET_SEARCH_SORT_QUERY:
+        return {
+            ...state,
+            activeSortQuery: action.payload,
+        };
+
     case SET_SEARCH_FILTERS:
         return {
             ...state,
@@ -172,6 +181,7 @@ export function searchReducer(state=INITIAL_STATE, action?: any, context?: any) 
             activeTopic: INITIAL_STATE.activeTopic,
             activeNavigation: INITIAL_STATE.activeNavigation,
             activeQuery: INITIAL_STATE.activeQuery,
+            activeSortQuery: INITIAL_STATE.activeSortQuery,
             activeFilter: INITIAL_STATE.activeFilter,
             createdFilter: INITIAL_STATE.createdFilter,
             productId: INITIAL_STATE.productId,

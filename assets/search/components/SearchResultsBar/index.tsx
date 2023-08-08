@@ -18,20 +18,44 @@ import {
     deselectMyTopic,
 } from '../../actions';
 
+import {Dropdown} from './../../../components/Dropdown';
+
 import {SearchResultTagsList} from './SearchResultTagsList';
 import NewItemsIcon from '../NewItemsIcon';
 
 
 class SearchResultsBarComponent extends React.Component<any, any> {
+    sortValues = [
+        {
+            label: 'Date (Newest)',
+            value: 'desc',
+            sortFunction: () => this.setSortQuery('desc'),
+        },
+        {
+            label: 'Date (Oldest)',
+            value: 'asc',
+            sortFunction: () => this.setSortQuery('asc'),
+        },
+        {
+            label: 'Relevance',
+            value: '',
+            sortFunction: () => false,
+        },
+    ]
+
     static propTypes: any;
     static defaultProps: any;
     constructor(props: any) {
         super(props);
 
-        this.state = {isTagSectionShown: false};
+        this.state = {
+            isTagSectionShown: false,
+            sortValue: this.sortValues[0].label,
+        };
         this.toggleTagSection = this.toggleTagSection.bind(this);
         this.toggleNavigation = this.toggleNavigation.bind(this);
         this.setQuery = this.setQuery.bind(this);
+        this.setSortQuery = this.setSortQuery.bind(this);
         this.setAdvancedSearchKeywords = this.setAdvancedSearchKeywords.bind(this);
         this.toggleAdvancedSearchField = this.toggleAdvancedSearchField.bind(this);
         this.clearAdvancedSearchParams = this.clearAdvancedSearchParams.bind(this);
@@ -51,6 +75,11 @@ class SearchResultsBarComponent extends React.Component<any, any> {
 
     setQuery(query: any) {
         this.props.setQuery(query);
+        this.props.refresh();
+    }
+
+    setSortQuery(sortQuery: string) {
+        this.props.setSortQuery(sortQuery);
         this.props.refresh();
     }
 
@@ -107,6 +136,25 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                 </div>
                             )}
                             <div className="navbar__button-group">
+                                <Dropdown
+                                    label={gettext(`Sort by: {{sort}}`, {sort :this.state.sortValue})}
+                                >
+                                    {this.sortValues.map((value) => {
+                                        return (
+                                            <button
+                                                type='button'
+                                                className='dropdown-item'
+                                                onClick={() => {
+                                                    value.sortFunction();
+                                                    this.setState({sortValue: value.label})
+                                                    console.log(value.sortFunction());
+                                                    
+                                                }}
+                                            >
+                                                {gettext(value.label)}
+                                            </button>
+                                    )})}
+                                </Dropdown>
                                 <button
                                     className="nh-button nh-button--tertiary"
                                     onClick={() => {
