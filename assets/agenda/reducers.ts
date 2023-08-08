@@ -185,7 +185,7 @@ export default function agendaReducer(state: any = initialState, action: any) {
         return {
             ...state,
             readItems: action.readData || {},
-            user: action.agendaData.user || null,
+            user: (action.agendaData.user || {})._id || null,
             topics: action.agendaData.topics || [],
             company: action.agendaData.company || null,
             bookmarks: action.agendaData.bookmarks || false,

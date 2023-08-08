@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import {gettext, shortDate, isInPast} from 'utils';
 import {getCountryLabel} from '../utils';
 
-function CompanyListItem({company, type, isActive, onClick, showSubscriberId}: any) {
+function CompanyListItem({company, type, isActive, onClick, showSubscriberId, countries}: any) {
     return (
         <tr key={company._id}
             className={classNames({'table--selected': isActive, 'table-secondary': !company.is_enabled})}
@@ -21,7 +21,7 @@ function CompanyListItem({company, type, isActive, onClick, showSubscriberId}: a
             </td>
             <td>{company.contact_name}</td>
             <td>{company.phone}</td>
-            <td>{getCountryLabel(company.country)}</td>
+            <td>{getCountryLabel(company.country, countries)}</td>
             <td>{shortDate(company._created)}</td>
             <td>{company.expiry_date && shortDate(company.expiry_date.substring(0, 10), false)}</td>
         </tr>
@@ -36,6 +36,7 @@ CompanyListItem.propTypes = {
     isActive: PropTypes.bool,
     onClick: PropTypes.func,
     showSubscriberId: PropTypes.bool,
+    countries: PropTypes.array
 };
 
 export default CompanyListItem;

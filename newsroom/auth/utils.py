@@ -72,6 +72,7 @@ def clear_user_session():
     flask.session["name"] = None
     flask.session["user_type"] = None
     flask.session["auth_ttl"] = None
+    flask.session["auth_user"] = None
 
 
 def is_current_user_admin() -> bool:

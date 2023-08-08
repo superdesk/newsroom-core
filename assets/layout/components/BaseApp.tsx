@@ -82,6 +82,9 @@ export default class BaseApp extends React.Component<any, any> {
 
         if (this.props.setQuery != null) {
             this.props.setQuery('');
+            if (this.props.fetchItems != null) {
+                this.props.fetchItems();
+            }
         }
     }
 

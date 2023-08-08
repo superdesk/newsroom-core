@@ -200,6 +200,7 @@ export default function companyReducer(state: any = initialState, action: any) {
             apiEnabled: action.data.api_enabled || false,
             ssoEnabled: action.data.sso_enabled || false,
             ui_config: action.data.ui_config,
+            countries: action.data.countries,
         };
 
         return setupCompanies(action.data.companies, nextState);

@@ -39,7 +39,7 @@
         box-shadow: 0 0 0 1px var(--color-interactive-focus), 0 0 0 3px var(--color-interactive-focus--translucent);
     }
     &:active {
-        box-shadow: inset 0 0 0 3px var(--color-interactive-focus--translucent);
+        box-shadow: inset 0 0 0 3px var(--icon-button-shadow--active);
         border-color: var(--icon-button-color-fg);
     }
 }
@@ -52,6 +52,9 @@
     &.icon-button--primary {
         --icon-button-color-fg: var(--icon-button-color-icon--primary);
         --icon-button-color-border-hover: var(--icon-button-color-border--primary-hover);
+        &:active {
+            box-shadow: inset 0 0 0 3px var(--icon-button-shadow-primary--active);
+        }
     }
     &.icon-button--secondary {
         --icon-button-color-fg: var(--icon-button-color-icon--secondary);

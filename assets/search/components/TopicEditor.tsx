@@ -68,8 +68,8 @@ class TopicEditor extends React.Component<any, any> {
         }
     }
 
-    handleTabClick(event: any) {
-        this.setState({activeTab: event.target.name});
+    handleTabClick(tabName: string) {
+        this.setState({activeTab: tabName});
     }
 
     changeTopic(topic: any) {
@@ -405,7 +405,9 @@ class TopicEditor extends React.Component<any, any> {
                                         className={`nav-link ${this.state.activeTab === tab.name && 'active'}`}
                                         href='#'
                                         title={tab.tooltip}
-                                        onClick={this.handleTabClick}>{tab.label}
+                                        onClick={() => this.handleTabClick(tab.name)}
+                                    >
+                                        {tab.label}
                                     </a>
                                 </ToolTip>
                             </li>
@@ -534,7 +536,7 @@ const mapDispatchToProps = (dispatch: any) => ({
         dispatch(loadMyAgendaTopic(topic._id)) :
         dispatch(loadMyWireTopic(topic._id)),
     setTopicEditorFullscreen: (fullscreen: any) => dispatch(setTopicEditorFullscreen(fullscreen)),
-    fetchFolders: (global: any) => dispatch(fetchFolders(global, false, true)),
+    fetchFolders: (global: boolean) => dispatch(fetchFolders(global, true)),
 });
 
 const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(TopicEditor);

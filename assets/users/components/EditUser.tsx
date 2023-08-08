@@ -76,7 +76,7 @@ function EditUserComponent({
             <div className="list-item__preview-content">
                 {toolbar ? toolbar : (
                     <div className="list-item__preview-toolbar">
-                        <div>
+                        <div className="list-item__preview-toolbar-left">
                             <label className={`label label--${stateLabelDetails.colour} label--big label--rounded`}>
                                 {stateLabelDetails.text}
                             </label>
@@ -85,22 +85,38 @@ function EditUserComponent({
                                     {gettext('admin')}
                                 </label>
                             )}
-                        </div>
-                        {(user._id == null || user.is_validated === true) ? null : (
-                            <button
-                                type="button"
-                                className="nh-button nh-button--tertiary nh-button--small"
-                                aria-label={gettext('Resend Invite')}
-                                onClick={(event: any) => {
-                                    event.preventDefault();
+                            {(user._id == null || user.is_validated === true) ? null : (
+                                <button
+                                    type="button"
+                                    className="icon-button icon-button--small icon-button--secondary"
+                                    aria-label={gettext('Resend Invite')}
+                                    title={gettext('Resend Invite')}
+                                    onClick={(event: any) => {
+                                        event.preventDefault();
 
-                                    if (confirm(gettext('Would you like to resend the invitation for {{ email }}?', {email: user.email}))) {
-                                        resendUserInvite();
-                                    }
-                                }}
-                            >
-                                {gettext('Resend Invite')}
-                            </button>
+                                        if (confirm(gettext('Would you like to resend the invitation for {{ email }}?', {email: user.email}))) {
+                                            resendUserInvite();
+                                        }
+                                    }}
+                                >
+                                    <i className="icon--refresh" role="presentation"></i>
+                                </button>
+                            )}
+                        </div>
+                        {(currentUserIsAdmin && user._id != null && user._id !== currentUser._id) && (
+                            <div className="list-item__preview-toolbar-right">
+                                <form method="POST" action={'/auth/impersonate'}>
+                                    <input type="hidden" name="user" value={user._id} />
+                                    <button
+                                        type="submit"
+                                        className="nh-button nh-button--tertiary nh-button--small"
+                                        aria-label={gettext('Impersonate User')}
+                                        data-test-id="impersonate-user-btn"
+                                    >
+                                        {gettext('Impersonate User')}
+                                    </button>
+                                </form>
+                            </div>
                         )}
                     </div>
                 )}
