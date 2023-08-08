@@ -109,30 +109,18 @@ export function fetchUsers() {
     };
 }
 
-export function updateUser() {
+export function updateUser(updates: Dictionary<any>) {
     return function (dispatch: any, getState: any) {
 
         const user = cloneDeep(getState().currentUser);
         const url = `api/_users/${user._id}`;
 
-        if (user.sections != null) {
-            user.sections = Object.keys(user.sections)
-                .filter((sectionId: any) => user.sections[sectionId] === true)
-                .join(',');
-        }
-
-        if (user.products != null) {
-            user.products = user.products
-                .map((product: any) => product._id)
-                .join(',');
-        }
-
         const _etag = user._etag;
 
-        return server.patchEntity(url, cleanUserEntityBeforePatch(user), _etag)
-            .then(() => {
+        return server.patchEntity(url, cleanUserEntityBeforePatch(updates), _etag)
+            .then((updated) => {
                 notify.success(gettext('Personalized dashboard saved!'));
-                dispatch(fetchUsers());
+                window.location.reload(); // reload the page to show the updated dashboard
             })
             .catch((error: any) => errorHandler(error, dispatch, setError));
 

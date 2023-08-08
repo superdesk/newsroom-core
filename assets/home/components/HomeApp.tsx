@@ -29,7 +29,7 @@ const modals: any = {
 
 interface IState {
     loadingItems: boolean;
-    activeOptionId: string;
+    activeOptionId: 'default' | 'my-home';
 }
 
 interface IProps {
@@ -77,7 +77,7 @@ class HomeApp extends React.Component<IProps, IState> {
 
         this.state = {
             loadingItems: true,
-            activeOptionId: 'my-home',
+            activeOptionId: this.props.personalizedDashboards.length ? 'my-home' : 'default',
         };
     }
 
@@ -225,7 +225,7 @@ class HomeApp extends React.Component<IProps, IState> {
                             }}
                         >
                             {
-                                (this.props.personalizedDashboards?.[0]?.topic_items?.length ?? 0) < 1 ? (
+                                (this.props.personalizedDashboards?.length ?? 0) < 1 ? (
                                     <div className="home-tools">
                                         <button
                                             onClick={() => {
@@ -233,7 +233,7 @@ class HomeApp extends React.Component<IProps, IState> {
                                             }}
                                             type="button"
                                             className="nh-button nh-button--secondary nh-button--small"
-                                            title="Personalize Home"
+                                            title={gettext('Personalize Home')}
                                         >
                                             {gettext('Personalize Home')}
                                         </button>
@@ -261,9 +261,11 @@ class HomeApp extends React.Component<IProps, IState> {
                                                 ]}
                                                 activeOptionId={this.state.activeOptionId}
                                                 switchOptions={(optionId) => {
-                                                    this.setState({
-                                                        activeOptionId: optionId
-                                                    });
+                                                    if (optionId === 'default' || optionId === 'my-home') {
+                                                        this.setState({
+                                                            activeOptionId: optionId
+                                                        });
+                                                    }
                                                 }}
                                             />
                                             <button
@@ -272,7 +274,7 @@ class HomeApp extends React.Component<IProps, IState> {
                                                 }}
                                                 type="button"
                                                 className="icon-button icon-button--small icon-button--tertiary icon-button--bordered"
-                                                title="Edit personal Home"
+                                                title={gettext('Edit personal Home')}
                                             >
                                                 <i className="icon--settings"></i>
                                             </button>

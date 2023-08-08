@@ -13,6 +13,7 @@ import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 import {modalFormInvalid, modalFormValid, setUser} from 'actions';
 import {updateUser} from 'users/actions';
 import {getCurrentUser} from 'company-admin/selectors';
+import classNames from 'classnames';
 
 interface IReduxStoreProps {
     topics?: Array<ITopic>;
@@ -20,8 +21,8 @@ interface IReduxStoreProps {
     modalFormInvalid?: () => void;
     getCurrentUser?: () => any;
     currentUser?: any;
-    saveUser?: () => void;
-    setUser?: (user: any) => void;
+    saveUser?: (updates: Dictionary<any>) => void;
+    setUser?: (user: Dictionary<any>) => void;
 }
 
 interface IProps extends IReduxStoreProps {
@@ -31,7 +32,7 @@ interface IProps extends IReduxStoreProps {
 
 interface IState {
     checked: boolean;
-    selectedTopics: Set<string>;
+    selectedTopics: Array<string>;
     activeSection: string;
     searchTerm: string;
     isLoading: boolean;
@@ -70,7 +71,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
 
         this.state = {
             checked: false,
-            selectedTopics: new Set<string>(),
+            selectedTopics: [],
             activeSection: '1',
             searchTerm: '',
             isLoading: false,
@@ -80,13 +81,13 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
     componentDidMount(): void {
         if ((this.props.currentUser.dashboards?.length ?? 0) > 0){
             this.setState({
-                selectedTopics: new Set(this.props.currentUser.dashboards[0].topic_ids)
+                selectedTopics: this.props.currentUser.dashboards[0].topic_ids || [],
             });
         }
     }
 
     componentDidUpdate(): void {
-        if (this.state.selectedTopics.size > 0) {
+        if (this.state.selectedTopics.length > 0) {
             this.props.modalFormValid?.();
         } else {
             this.props.modalFormInvalid?.();
@@ -94,16 +95,16 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
     }
 
     handleChange(topicId: string) {
-        const updatedSet = new Set(this.state.selectedTopics);
+        let updatedTopics = this.state.selectedTopics.concat();
 
-        if (this.state.selectedTopics.has(topicId)) {
-            updatedSet.delete(topicId);
-        } else if (this.state.selectedTopics.size < MAX_SELECTED_TOPICS) {
-            updatedSet.add(topicId);
+        if (this.state.selectedTopics.includes(topicId)) {
+            updatedTopics = updatedTopics.filter((_id) => _id !== topicId);
+        } else if (this.state.selectedTopics.length < MAX_SELECTED_TOPICS) {
+            updatedTopics.unshift(topicId);
         }
 
         this.setState({
-            selectedTopics: updatedSet
+            selectedTopics: updatedTopics
         });
     }
 
@@ -112,7 +113,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
 
         const newDashboard: IPersonalizedDashboard = {
             type: '4-picture-text',
-            topic_ids: Array.from(this.state.selectedTopics),
+            topic_ids: this.state.selectedTopics,
             name: name,
         };
 
@@ -121,7 +122,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
             dashboards: [newDashboard],
         });
 
-        this.props.saveUser?.();
+        this.props.saveUser?.({dashboards: [newDashboard]});
 
         this.setState({isLoading: false});
     }
@@ -136,13 +137,13 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                         <img src="/static/empty-states/empty_state--small.svg" role="presentation" alt="" />
                     </figure>
                     <figcaption className="empty-state__text">
-                        <h4 className="empty-state__text-heading">You don't have any saved Topics yet</h4>
+                        <h4 className="empty-state__text-heading">{gettext('You don\'t have any saved Topics yet.')}</h4>
                         <p className="empty-state__text-description">
-                            You can create Topics by saving search terms and/or filters from the Wire and Agenda sections.
+                            {gettext('You can create Topics by saving search terms and/or filters from the Wire and Agenda sections.')}
                         </p>
                         <div className="empty-state__links">
-                            <a className="" href="">Go to Wire</a>
-                            <a className="" href="">Go to Agenda</a>
+                            <a className="" href="/wire">{gettext('Go to Wire')}</a>
+                            <a className="" href="/agenda">{gettext('Go to Agenda')}</a>
                         </div>
                     </figcaption>
                 </div>
@@ -163,9 +164,9 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                         <img src="/static/empty-states/empty_state--small.svg" role="presentation" alt="" />
                     </figure>
                     <figcaption className="empty-state__text">
-                        <h4 className="empty-state__text-heading">You don't have any saved Topics yet</h4>
+                        <h4 className="empty-state__text-heading">{gettext('You don\'t have any saved Topics yet')}</h4>
                         <p className="empty-state__text-description">
-                            You can create Topics by saving search terms and/or filters from the Wire and Agenda sections.
+                            {gettext('You can create Topics by saving search terms and/or filters from the Wire and Agenda sections.')}
                         </p>
                     </figcaption>
                 </div>
@@ -180,7 +181,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
             .map((topic) => (
                 <CheckboxInput
                     key={topic._id}
-                    value={this.state.selectedTopics.has(topic._id)}
+                    value={this.state.selectedTopics.includes(topic._id)}
                     onChange={() => {
                         this.handleChange(topic._id);
                     }}
@@ -197,24 +198,18 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
 
         const groupedTopics = (this.props.topics?.length ?? 0) > 0 ? (
             <div>
-                <FormToggle
-                    expanded={true}
-                    title={gettext('Wire topics')}
-                    testId="toggle--general"
-                >
-                    {
-                        filteredTopics(wireTopics).map((wireTopic) => (
-                            <CheckboxInput
-                                key={wireTopic._id}
-                                value={this.state.selectedTopics.has(wireTopic._id)}
-                                onChange={() => {
-                                    this.handleChange(wireTopic._id);
-                                }}
-                                label={gettext(wireTopic.label)}
-                            />
-                        ))
-                    }
-                </FormToggle>
+                <div className='boxed-checklist'>
+                    {filteredTopics(wireTopics).map((wireTopic) => (
+                        <CheckboxInput
+                            key={wireTopic._id}
+                            value={this.state.selectedTopics.includes(wireTopic._id)}
+                            onChange={() => {
+                                this.handleChange(wireTopic._id);
+                            }}
+                            label={gettext(wireTopic.label)}
+                        />
+                    ))}
+                </div>
                 {/* <FormToggle
                     expanded={true}
                     title={gettext('Agenda topics')}
@@ -235,60 +230,50 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                 </FormToggle> */}
             </div>
         ) : (
-            <div className="empty-state__container mt-3">
-                <div className="empty-state">
-                    <figure className="empty-state__graphic">
-                        <img src="/static/empty-states/empty_state--small.svg" role="presentation" alt="" />
-                    </figure>
-                    <figcaption className="empty-state__text">
-                        <h4 className="empty-state__text-heading">You don't have any saved Topics yet</h4>
-                        <p className="empty-state__text-description">
-                            You can create Topics by saving search terms and/or filters from the Wire and Agenda sections.
-                        </p>
-                        <div className="empty-state__links">
-                            <a className="" href="">Go to Wire</a>
-                            <a className="" href="">Go to Agenda</a>
-                        </div>
-                    </figcaption>
-                </div>
-            </div>
+            NoSearchMatches()
         );
 
         const selectedTopics = (
             <div className="simple-card__list pt-3">
-                {(wireTopics as Array<ITopic>).filter((topic) => this.state.selectedTopics.has(topic._id)).map((topic) => (
-                    <div
-                        style={{
-                            width: '100%',
-                        }}
-                        key={topic._id}
-                        className="simple-card flex-row simple-card--compact simple-card--draggable"
-                    >
-                        <div style={{paddingLeft: 24}} className='simple-card__content'>
-                            <h6 className="simple-card__headline" title="">{topic.label}</h6>
-                            <div className="simple-card__row">
-                                <div className="simple-card__column simple-card__column--align-start">
-                                    <span className="simple-card__date">
-                                        {topic.is_global != false ? 'Company Topics' : 'My Topics'}
-                                    </span>
+                {this.state.selectedTopics.map((topicId: string) => wireTopics.find((topic) => topic._id === topicId)).map((topic) => {
+                    if (topic == null) {
+                        return null;
+                    }
+
+                    return (
+                        <div
+                            style={{
+                                width: '100%',
+                            }}
+                            key={topic._id}
+                            className="simple-card flex-row simple-card--compact simple-card--draggable"
+                        >
+                            <div style={{paddingLeft: 24}} className='simple-card__content'>
+                                <h6 className="simple-card__headline" title="">{topic.label}</h6>
+                                <div className="simple-card__row">
+                                    <div className="simple-card__column simple-card__column--align-start">
+                                        <span className="simple-card__date">
+                                            {topic.is_global != false ? gettext('Company Topics') : gettext('My Topics')}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
+                            <div className='simple-card__actions'>
+                                <button
+                                    type="button"
+                                    className="icon-button icon-button--secondary icon-button--small"
+                                    title=""
+                                    aria-label={gettext('Delete')}
+                                    onClick={() => {
+                                        this.handleChange(topic._id);
+                                    }}
+                                >
+                                    <i className="icon--trash" />
+                                </button>
+                            </div>
                         </div>
-                        <div className='simple-card__actions'>
-                            <button
-                                type="button"
-                                className="icon-button icon-button--secondary icon-button--small"
-                                title=""
-                                aria-label="Delete"
-                                onClick={() => {
-                                    this.handleChange(topic._id);
-                                }}
-                            >
-                                <i className="icon--trash" />
-                            </button>
-                        </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         );
 
@@ -300,7 +285,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                 onSubmitLabel={gettext('Save')}
                 disableButtonOnSubmit={this.state.isLoading}
                 onSubmit={() => {
-                    this.addCustomDashboard('My Home');
+                    this.addCustomDashboard(gettext('My Home'));
                 }}
             >
                 <div
@@ -315,19 +300,19 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                     <aside style={{width: '25%'}} className="full-page-layout__content-aside">
                         <div className="full-page-layout__content-aside-inner">
                             <p className='font-size--medium text-color--muted mt-1 mb-3'>
-                                Select up to 6 Topics you want to display on your personal Home screen.
+                                {gettext('Select up to 6 Topics you want to display on your personal Home screen.')}
                             </p>
-                            <p className='font-size--large'>{this.state.selectedTopics.size} out of 6 topics selected</p>
+                            <p className='font-size--large'>{gettext('{{size}} out of 6 topics selected', {size: this.state.selectedTopics.length || 0})}</p>
                             <RadioButtonGroup
                                 activeOptionId={this.state.activeSection}
                                 options={[
                                     {
                                         _id: '1',
-                                        name: 'My topics'
+                                        name: gettext('My topics'),
                                     },
                                     {
                                         _id: '2',
-                                        name: 'Company topics'
+                                        name: gettext('Company topics'),
                                     },
                                 ]}
                                 switchOptions={(optionId) => {
@@ -350,11 +335,11 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                                         type="text"
                                         name="q"
                                         className="search__input form-control"
-                                        placeholder="Search Topics"
-                                        aria-label="Search Topics"
+                                        placeholder={gettext('Search Topics')}
+                                        aria-label={gettext('Search Topics')}
                                     />
                                     <div className="search__form-buttons">
-                                        <button className="search__button-clear" aria-label="Clear search" type="reset">
+                                        <button className="search__button-clear" aria-label={gettext('Clear search')} type="reset">
                                             <svg fill="none" height="18" viewBox="0 0 18 18" width="18" xmlns="http://www.w3.org/2000/svg">
                                                 <path clipRule="evenodd" d="m9 18c4.9706 0 9-4.0294 9-9 0-4.97056-4.0294-9-9-9-4.97056 0-9 4.02944-9 9 0 4.9706 4.02944 9 9 9zm4.9884-12.58679-3.571 3.57514 3.5826 3.58675-1.4126 1.4143-3.58252-3.5868-3.59233 3.5965-1.41255-1.4142 3.59234-3.59655-3.54174-3.54592 1.41254-1.41422 3.54174 3.54593 3.57092-3.57515z" fill="var(--color-text)" fillRule="evenodd" opacity="1"></path>
                                             </svg>
@@ -382,7 +367,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                                 Drag and drop items to change the order. This will change the order of the topics are displayed on the Home screen.
                             </p>
                         </div> */}
-                        {this.state.selectedTopics.size > 0 ? selectedTopics : <NoSelectedTopics />}
+                        {this.state.selectedTopics.length > 0 ? selectedTopics : <NoSelectedTopics />}
                     </div>
                 </div>
             </Modal>
@@ -399,7 +384,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     reloadTopics: () => dispatch(reloadMyWireTopics(true)),
     modalFormValid: () => dispatch(modalFormValid()),
     modalFormInvalid: () => dispatch(modalFormInvalid()),
-    saveUser: () => dispatch(updateUser()),
+    saveUser: (updates: Dictionary<any>) => dispatch(updateUser(updates)),
     setUser: (user: any) => dispatch(setUser(user))
 });
 

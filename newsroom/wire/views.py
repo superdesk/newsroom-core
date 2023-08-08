@@ -139,7 +139,7 @@ def get_personal_dashboards_data(user, company, topics):
 
     def get_topic_items(topic):
         query = superdesk.get_resource_service("wire_search").get_topic_query(topic, user, company, section_filters)
-        return list(superdesk.get_resource_service("wire_search").get_items_by_query(query))
+        return list(superdesk.get_resource_service("wire_search").get_items_by_query(query, size=4))
 
     def _get_topic_data(topic_id):
         for topic in topics:
