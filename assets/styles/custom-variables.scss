@@ -272,6 +272,28 @@ $container-max-widths: (
     --top-bar-color-bg-badge: hsl(321, 100%, 42%);
     --top-bar-color-fg-badge: hsl(0, 0%, 100%);
     --top-bar-badge-size: 1.25rem;
+    // Logo main
+    --top-bar-logo-main-max-width: 196px;
+    --top-bar-logo-main-max-width--mobile: 160px;
+    --top-bar-logo-main-padding-y: 12px;
+    --top-bar-logo-main-padding-x: 16px;
+    --top-bar-logo-main-margin-top: 0;
+    --top-bar-logo-main-margin-top--mobile: 0;
+    // Logo additional
+    --top-bar-logo-additional-display: none;
+    --top-bar-logo-additional-max-width: 89px;
+    --top-bar-logo-additional-min-width--mobile: 0px;
+    --top-bar-logo-additional-padding-y: 12px;
+    --top-bar-logo-additional-padding-start: 0;
+    --top-bar-logo-additional-padding-end: var(--space--1);
+    --top-bar-logo-additiona-margin-top: 0;
+    // Navbar Brand
+    --top-bar-nav-brand-margin-x: 0;
+    --top-bar-nav-brand-margin-y: 16px;
+    --top-bar-nav-brand-padding-x: 16px;
+    --top-bar-nav-brand-border-color: var(--color-text--muted-2);
+    --top-bar-nav-brand-border-type: dashed;
+
 
     // COMPONENT: INPUT FIELD
     --input-color-bg: hsl(0, 0%, 96%);

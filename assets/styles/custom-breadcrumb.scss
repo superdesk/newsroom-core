@@ -3,7 +3,7 @@
 .navbar-brand {
   span.breadcrumb-item {
     font-size: var(--text-size--medium); // 14px
-    line-height: 1.1;
+    line-height: 1;
     color: var(--top-bar-color-fg);
 
     @include sm {
