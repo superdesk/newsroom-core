@@ -12,7 +12,6 @@ const store = createStore(agendaReducer, 'Agenda');
 // init data
 store.dispatch(initData(getInitData(window.agendaData), getReadItems(), getActiveDate(), getFeaturedOnlyParam()));
 
-
 // init query
 const params = new URLSearchParams(window.location.search);
 store.dispatch(initParams(params));

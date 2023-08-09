@@ -1,3 +1,9 @@
+export interface IUserDashboard {
+    type: string;
+    name: string;
+    topic_ids: Array<string>;
+}
+
 export interface IUser {
     user_type: 'administrator' | 'company_admin' | 'public';
     is_approved: boolean;
@@ -15,4 +21,5 @@ export interface IUser {
     manage_company_topics: boolean;
     expiry_alert: boolean;
     _id: string | null;
+    dashboards?: Array<IUserDashboard>;
 }

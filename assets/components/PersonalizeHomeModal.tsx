@@ -7,88 +7,65 @@ import Modal from 'components/Modal';
 import {Input} from 'reactstrap';
 import CheckboxInput from './CheckboxInput';
 import {reloadMyTopics as reloadMyWireTopics} from 'wire/actions';
-import {IUser} from 'interfaces/user';
+import {IUser, IUserDashboard} from 'interfaces/user';
 import {RadioButtonGroup} from 'features/sections/SectionSwitch';
-import {modalFormInvalid, modalFormValid, setUser} from 'actions';
+import {modalFormInvalid, modalFormValid} from 'actions';
 import {updateUser} from 'users/actions';
 import {getCurrentUser} from 'company-admin/selectors';
+import {IAgendaState} from 'agenda/reducers';
+import {ITopic} from 'interfaces/topic';
 
-interface IReduxStoreProps {
-    topics?: Array<ITopic>;
-    modalFormValid?: () => void;
-    modalFormInvalid?: () => void;
-    getCurrentUser?: () => any;
-    currentUser?: any;
-    saveUser?: (updates: Dictionary<any>) => void;
-    setUser?: (user: Dictionary<any>) => void;
+interface IStateProps {
+    topics: Array<ITopic>;
+    currentUser: IUser;
 }
 
-interface IProps extends IReduxStoreProps {
+interface IDispatchProps {
+    saveUser: (updates: Partial<IUser>) => void;
+    modalFormValid: () => void;
+    modalFormInvalid: () => void;
+}
+
+interface IOwnProps {
     closeModal?: () => void;
-    data?: any;
 }
+
+type IProps = IStateProps & IDispatchProps & IOwnProps;
 
 interface IState {
-    checked: boolean;
     selectedTopics: Array<string>;
     activeSection: string;
     searchTerm: string;
     isLoading: boolean;
 }
 
-export interface ITopic {
-    _id: string;
-    label: string;
-    query?: string;
-    filter?: Dictionary<string>;
-    created?: Dictionary<string>;
-    user: IUser['_id'];
-    company: any;
-    is_global?: boolean;
-    subscribers: Array<IUser['_id']>;
-    timezone_offset?: number;
-    topic_type: 'wire' | 'agenda';
-    navigation?: Array<string>;
-    original_creator: IUser['_id'];
-    version_creator: IUser['_id'];
-    folder: string;
-    advanced?: Dictionary<string>;
-}
-
-export interface IPersonalizedDashboard {
-    type: string;
-    name: string;
-    topic_ids: Array<string>;
-}
-
 const MAX_SELECTED_TOPICS = 6;
+
+const getSelectedTopics = (user: IUser) => {
+    if (user.dashboards?.length) {
+        return user.dashboards[0].topic_ids || [];
+    }
+
+    return [];
+};
 
 class PersonalizeHomeModal extends React.Component<IProps, IState> {
     constructor(props: any) {
         super(props);
 
         this.state = {
-            checked: false,
-            selectedTopics: [],
+            selectedTopics: getSelectedTopics(this.props.currentUser),
             activeSection: '1',
             searchTerm: '',
             isLoading: false,
         };
     }
 
-    componentDidMount(): void {
-        if ((this.props.currentUser.dashboards?.length ?? 0) > 0){
-            this.setState({
-                selectedTopics: this.props.currentUser.dashboards[0].topic_ids || [],
-            });
-        }
-    }
-
     componentDidUpdate(): void {
         if (this.state.selectedTopics.length > 0) {
-            this.props.modalFormValid?.();
+            this.props.modalFormValid();
         } else {
-            this.props.modalFormInvalid?.();
+            this.props.modalFormInvalid();
         }
     }
 
@@ -109,18 +86,13 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
     addCustomDashboard(name: string) {
         this.setState({isLoading: true});
 
-        const newDashboard: IPersonalizedDashboard = {
+        const newDashboard: IUserDashboard = {
             type: '4-picture-text',
             topic_ids: this.state.selectedTopics,
             name: name,
         };
 
-        this.props.setUser?.({
-            ...this.props.currentUser,
-            dashboards: [newDashboard],
-        });
-
-        this.props.saveUser?.({dashboards: [newDashboard]});
+        this.props.saveUser({dashboards: [newDashboard]});
 
         this.setState({isLoading: false});
     }
@@ -373,18 +345,16 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
     }
 }
 
-const mapStateToProps = (state: IReduxStoreProps) => ({
+const mapStateToProps = (state: IAgendaState) : IStateProps => ({
     topics: state.topics,
     currentUser: getCurrentUser(state),
 });
 
-const mapDispatchToProps = (dispatch: any) => ({
-    reloadTopics: () => dispatch(reloadMyWireTopics(true)),
-    modalFormValid: () => dispatch(modalFormValid()),
-    modalFormInvalid: () => dispatch(modalFormInvalid()),
-    saveUser: (updates: Dictionary<any>) => dispatch(updateUser(updates)),
-    setUser: (user: any) => dispatch(setUser(user))
+const mapDispatchToProps = ({
+    modalFormValid: () => modalFormValid(),
+    modalFormInvalid: () => modalFormInvalid(),
+    saveUser: (updates: Partial<IUser>) => updateUser(updates),
 });
 
 export const PersonalizeHomeSettingsModal =
-    connect<IReduxStoreProps>(mapStateToProps, mapDispatchToProps)(PersonalizeHomeModal);
+    connect<IStateProps, IDispatchProps, IOwnProps, IAgendaState>(mapStateToProps, mapDispatchToProps)(PersonalizeHomeModal);

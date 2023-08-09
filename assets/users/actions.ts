@@ -3,6 +3,7 @@ import server from 'server';
 import {searchQuerySelector} from 'search/selectors';
 import {get, cloneDeep} from 'lodash';
 import {cleanUserEntityBeforePatch} from './utils';
+import {IUser} from 'interfaces/user';
 
 export const SELECT_USER = 'SELECT_USER';
 export function selectUser(id: any) {
@@ -109,7 +110,7 @@ export function fetchUsers() {
     };
 }
 
-export function updateUser(updates: Dictionary<any>) {
+export function updateUser(updates: Partial<IUser>) {
     return function (dispatch: any, getState: any) {
 
         const user = cloneDeep(getState().currentUser);

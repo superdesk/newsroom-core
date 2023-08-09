@@ -15,11 +15,12 @@ import {SearchBar} from './search-bar';
 import {previewConfigSelector, listConfigSelector, detailsConfigSelector, isSearchEnabled} from 'ui/selectors';
 import {filterGroupsToLabelMap} from 'search/selectors';
 import CardRow from 'components/cards/render/CardRow';
-import {ITopic, PersonalizeHomeSettingsModal} from 'components/PersonalizeHomeModal';
+import {PersonalizeHomeSettingsModal} from 'components/PersonalizeHomeModal';
 import {personalizeHome} from 'agenda/actions';
 import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 import {getCurrentUser} from 'company-admin/selectors';
 import {IPersonalizedDashboardsWithData} from 'home/reducers';
+import {ITopic} from 'interfaces/topic';
 
 const modals: any = {
     shareItem: ShareItemModal,
@@ -77,7 +78,7 @@ class HomeApp extends React.Component<IProps, IState> {
 
         this.state = {
             loadingItems: true,
-            activeOptionId: this.props.personalizedDashboards.length ? 'my-home' : 'default',
+            activeOptionId: this.props.personalizedDashboards.length > 0 ? 'my-home' : 'default',
         };
     }
 
