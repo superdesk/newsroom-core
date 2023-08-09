@@ -6,11 +6,11 @@ const webpackConfig = require('./webpack.config.js');
 module.exports = function(config) {
     config.set({
         files: [
-            'assets/tests.js',
+            'assets/tests.ts',
         ],
 
         preprocessors: {
-            'assets/tests.js': ['webpack', 'sourcemap'],
+            'assets/tests.ts': ['webpack', 'sourcemap'],
         },
 
         webpack: {
@@ -27,5 +27,10 @@ module.exports = function(config) {
         reporters: ['dots'],
         frameworks: ['jasmine'],
         browsers: ['ChromeHeadless'],
+
+        // Allow typescript files
+        mime: {
+            'text/x-typescript': ['ts', 'tsx'],
+        },
     });
 };

@@ -8,7 +8,8 @@ module.exports = {
         "$": true,
         "sectionNames": "readonly",
     },
-    "extends": ["eslint:recommended", "plugin:react/recommended"],
+    'extends': ['eslint:recommended', 'plugin:react/recommended', 'plugin:@typescript-eslint/recommended'],
+    'parser': '@typescript-eslint/parser',
     "parserOptions": {
         "ecmaFeatures": {
             "experimentalObjectRestSpread": true,
@@ -17,9 +18,11 @@ module.exports = {
         "sourceType": "module"
     },
     "plugins": [
-        "react"
+        "react",
+        '@typescript-eslint',
     ],
     "rules": {
+        '@typescript-eslint/no-explicit-any': 0,
         "indent": [
             "error",
             4

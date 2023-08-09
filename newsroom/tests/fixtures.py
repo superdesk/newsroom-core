@@ -270,3 +270,36 @@ def public_user(app, init_company):
 def anonymous_user(client):
     with client.session_transaction() as session:
         session.clear()
+
+
+@fixture
+def company_products(app):
+    app.data.insert(
+        "products",
+        [
+            {
+                "_id": 12,
+                "name": "product test",
+                "query": "headline:more",
+                "companies": [COMPANY_1_ID],
+                "is_enabled": True,
+                "product_type": "wire",
+            },
+            {
+                "_id": 13,
+                "name": "product test 2",
+                "query": "headline:Weather",
+                "companies": [COMPANY_1_ID],
+                "is_enabled": True,
+                "product_type": "wire",
+            },
+            {
+                "_id": 15,
+                "name": "all content",
+                "query": "*:*",
+                "companies": [COMPANY_1_ID],
+                "is_enabled": True,
+                "product_type": "wire",
+            },
+        ],
+    )
