@@ -573,7 +573,11 @@ class BaseSearchService(Service):
             for field in fields_to_highlight:
                 highlight_search.source["highlight"]["fields"][field] = {
                     "number_of_fragments": 0,
-                    "highlight_query": {"bool": {"filter": highlight_search.query["bool"]["must"]}},
+                    "highlight_query": {
+                        "bool": {
+                            "filter": highlight_search.query["bool"]["must"] or highlight_search.query["bool"]["filter"]
+                        }
+                    },
                 }
 
             highlight_search.source["highlight"]["pre_tags"] = ['<span class="es-highlight">']
