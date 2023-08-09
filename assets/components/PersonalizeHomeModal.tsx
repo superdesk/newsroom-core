@@ -6,7 +6,6 @@ import {gettext} from 'utils';
 import Modal from 'components/Modal';
 import {Input} from 'reactstrap';
 import CheckboxInput from './CheckboxInput';
-import {reloadMyTopics as reloadMyWireTopics} from 'wire/actions';
 import {IUser, IUserDashboard} from 'interfaces/user';
 import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 import {modalFormInvalid, modalFormValid} from 'actions';
@@ -33,15 +32,17 @@ interface IOwnProps {
 type IProps = IStateProps & IDispatchProps & IOwnProps;
 
 interface IState {
-    selectedTopics: Array<string>;
+    selectedTopicIds: Array<string>;
     activeSection: string;
     searchTerm: string;
     isLoading: boolean;
+    wireTopics: Array<ITopic>;
+    wireTopicsById: Map<string, ITopic>;
 }
 
 const MAX_SELECTED_TOPICS = 6;
 
-const getSelectedTopics = (user: IUser) => {
+const getSelectedTopicIds = (user: IUser) => {
     if (user.dashboards?.length) {
         return user.dashboards[0].topic_ids || [];
     }
@@ -53,16 +54,23 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
     constructor(props: any) {
         super(props);
 
+        const [wireTopics, agendaTopics] = partition(this.props.topics, (topic) => topic.topic_type === 'wire');
+        const wireTopicsById = new Map();
+
+        wireTopics.forEach((topic) => wireTopicsById.set(topic._id, topic));
+
         this.state = {
-            selectedTopics: getSelectedTopics(this.props.currentUser),
+            selectedTopicIds: getSelectedTopicIds(this.props.currentUser),
             activeSection: '1',
             searchTerm: '',
             isLoading: false,
+            wireTopics,
+            wireTopicsById,
         };
     }
 
     componentDidUpdate(): void {
-        if (this.state.selectedTopics.length > 0) {
+        if (this.state.selectedTopicIds.length > 0) {
             this.props.modalFormValid();
         } else {
             this.props.modalFormInvalid();
@@ -70,16 +78,16 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
     }
 
     handleChange(topicId: string) {
-        let updatedTopics = this.state.selectedTopics.concat();
+        let updatedTopics = this.state.selectedTopicIds.concat();
 
-        if (this.state.selectedTopics.includes(topicId)) {
+        if (this.state.selectedTopicIds.includes(topicId)) {
             updatedTopics = updatedTopics.filter((_id) => _id !== topicId);
-        } else if (this.state.selectedTopics.length < MAX_SELECTED_TOPICS) {
+        } else if (this.state.selectedTopicIds.length < MAX_SELECTED_TOPICS) {
             updatedTopics.unshift(topicId);
         }
 
         this.setState({
-            selectedTopics: updatedTopics
+            selectedTopicIds: updatedTopics,
         });
     }
 
@@ -88,7 +96,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
 
         const newDashboard: IUserDashboard = {
             type: '4-picture-text',
-            topic_ids: this.state.selectedTopics,
+            topic_ids: this.state.selectedTopicIds,
             name: name,
         };
 
@@ -97,9 +105,19 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
         this.setState({isLoading: false});
     }
 
-    render() {
-        const [wireTopics, agendaTopics] = partition(this.props.topics, (topic) => topic.topic_type === 'wire');
+    getSelectedTopics() {
+        const topics: Array<ITopic> = [];
 
+        this.state.selectedTopicIds.map((topicId) => this.state.wireTopicsById.get(topicId)).map((topic) => {
+            if (topic != null) {
+                topics.push(topic);
+            }
+        });
+
+        return topics;
+    }
+
+    render() {
         const NoSearchMatches = () => (
             <div className="empty-state__container mt-3">
                 <div className="empty-state">
@@ -146,12 +164,12 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
         const filteredTopics = (topics: Array<ITopic>) =>
             topics.filter(({is_global}) => this.state.activeSection === '1' ? is_global != true : is_global === true);
 
-        const searchMatches = filteredTopics(wireTopics ?? [])
+        const searchMatches = filteredTopics(this.state.wireTopics ?? [])
             .filter((topic) => topic.label.toLowerCase().includes(this.state.searchTerm.toLowerCase()))
             .map((topic) => (
                 <CheckboxInput
                     key={topic._id}
-                    value={this.state.selectedTopics.includes(topic._id)}
+                    value={this.state.selectedTopicIds.includes(topic._id)}
                     onChange={() => {
                         this.handleChange(topic._id);
                     }}
@@ -169,10 +187,10 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
         const groupedTopics = (this.props.topics?.length ?? 0) > 0 ? (
             <div>
                 <div className='boxed-checklist'>
-                    {filteredTopics(wireTopics).map((wireTopic) => (
+                    {filteredTopics(this.state.wireTopics).map((wireTopic) => (
                         <CheckboxInput
                             key={wireTopic._id}
-                            value={this.state.selectedTopics.includes(wireTopic._id)}
+                            value={this.state.selectedTopicIds.includes(wireTopic._id)}
                             onChange={() => {
                                 this.handleChange(wireTopic._id);
                             }}
@@ -180,24 +198,6 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                         />
                     ))}
                 </div>
-                {/* <FormToggle
-                    expanded={true}
-                    title={gettext('Agenda topics')}
-                    testId="toggle--general"
-                >
-                    {
-                        filteredTopics(agendaTopics).map((agendaTopic) => (
-                            <CheckboxInput
-                                key={agendaTopic._id}
-                                value={this.state.selectedTopics.has(agendaTopic._id)}
-                                onChange={() => {
-                                    this.handleChange(agendaTopic._id);
-                                }}
-                                label={gettext(agendaTopic.label)}
-                            />
-                        ))
-                    }
-                </FormToggle> */}
             </div>
         ) : (
             NoSearchMatches()
@@ -205,11 +205,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
 
         const selectedTopics = (
             <div className="simple-card__list pt-3">
-                {this.state.selectedTopics.map((topicId: string) => wireTopics.find((topic) => topic._id === topicId)).map((topic) => {
-                    if (topic == null) {
-                        return null;
-                    }
-
+                {this.getSelectedTopics().map((topic) => {
                     return (
                         <div
                             style={{
@@ -272,7 +268,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                             <p className='font-size--medium text-color--muted mt-1 mb-3'>
                                 {gettext('Select up to 6 Topics you want to display on your personal Home screen.')}
                             </p>
-                            <p className='font-size--large'>{gettext('{{size}} out of 6 topics selected', {size: this.state.selectedTopics.length || 0})}</p>
+                            <p className='font-size--large'>{gettext('{{size}} out of 6 topics selected', {size: this.state.selectedTopicIds.length || 0})}</p>
                             <RadioButtonGroup
                                 activeOptionId={this.state.activeSection}
                                 options={[
@@ -337,7 +333,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                                 Drag and drop items to change the order. This will change the order of the topics are displayed on the Home screen.
                             </p>
                         </div> */}
-                        {this.state.selectedTopics.length > 0 ? selectedTopics : <NoSelectedTopics />}
+                        {this.state.selectedTopicIds.length > 0 ? selectedTopics : <NoSelectedTopics />}
                     </div>
                 </div>
             </Modal>
