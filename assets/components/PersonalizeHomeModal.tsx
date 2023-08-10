@@ -14,12 +14,12 @@ import {getCurrentUser} from 'company-admin/selectors';
 import {IAgendaState} from 'agenda/reducers';
 import {ITopic} from 'interfaces/topic';
 
-interface IStateProps {
+interface IMapStateProps {
     topics: Array<ITopic>;
     currentUser: IUser;
 }
 
-interface IDispatchProps {
+interface IMapDispatchProps {
     saveUser: (updates: Partial<IUser>) => void;
     modalFormValid: () => void;
     modalFormInvalid: () => void;
@@ -29,43 +29,43 @@ interface IOwnProps {
     closeModal?: () => void;
 }
 
-type IProps = IStateProps & IDispatchProps & IOwnProps;
+type IProps = IMapStateProps & IMapDispatchProps & IOwnProps;
 
 interface IState {
     selectedTopicIds: Array<string>;
     activeSection: string;
     searchTerm: string;
     isLoading: boolean;
-    wireTopics: Array<ITopic>;
-    wireTopicsById: Map<string, ITopic>;
 }
 
 const MAX_SELECTED_TOPICS = 6;
 
 const getSelectedTopicIds = (user: IUser) => {
     if (user.dashboards?.length) {
-        return user.dashboards[0].topic_ids || [];
+        return user.dashboards[0].topic_ids ?? [];
     }
 
     return [];
 };
 
 class PersonalizeHomeModal extends React.Component<IProps, IState> {
+
+    wireTopics: Array<ITopic>;
+    wireTopicsById: Map<ITopic['_id'], ITopic>;
+
     constructor(props: any) {
         super(props);
 
         const [wireTopics, agendaTopics] = partition(this.props.topics, (topic) => topic.topic_type === 'wire');
-        const wireTopicsById = new Map();
 
-        wireTopics.forEach((topic) => wireTopicsById.set(topic._id, topic));
+        this.wireTopics = wireTopics;
+        this.wireTopicsById = new Map(wireTopics.map((topic) => [topic._id, topic]));
 
         this.state = {
             selectedTopicIds: getSelectedTopicIds(this.props.currentUser),
             activeSection: '1',
             searchTerm: '',
             isLoading: false,
-            wireTopics,
-            wireTopicsById,
         };
     }
 
@@ -108,7 +108,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
     getSelectedTopics() {
         const topics: Array<ITopic> = [];
 
-        this.state.selectedTopicIds.map((topicId) => this.state.wireTopicsById.get(topicId)).map((topic) => {
+        this.state.selectedTopicIds.map((topicId) => this.wireTopicsById.get(topicId)).forEach((topic) => {
             if (topic != null) {
                 topics.push(topic);
             }
@@ -164,7 +164,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
         const filteredTopics = (topics: Array<ITopic>) =>
             topics.filter(({is_global}) => this.state.activeSection === '1' ? is_global != true : is_global === true);
 
-        const searchMatches = filteredTopics(this.state.wireTopics ?? [])
+        const searchMatches = filteredTopics(this.wireTopics ?? [])
             .filter((topic) => topic.label.toLowerCase().includes(this.state.searchTerm.toLowerCase()))
             .map((topic) => (
                 <CheckboxInput
@@ -187,7 +187,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
         const groupedTopics = (this.props.topics?.length ?? 0) > 0 ? (
             <div>
                 <div className='boxed-checklist'>
-                    {filteredTopics(this.state.wireTopics).map((wireTopic) => (
+                    {filteredTopics(this.wireTopics).map((wireTopic) => (
                         <CheckboxInput
                             key={wireTopic._id}
                             value={this.state.selectedTopicIds.includes(wireTopic._id)}
@@ -341,7 +341,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
     }
 }
 
-const mapStateToProps = (state: IAgendaState) : IStateProps => ({
+const mapStateToProps = (state: IAgendaState) : IMapStateProps => ({
     topics: state.topics,
     currentUser: getCurrentUser(state),
 });
@@ -353,4 +353,4 @@ const mapDispatchToProps = ({
 });
 
 export const PersonalizeHomeSettingsModal =
-    connect<IStateProps, IDispatchProps, IOwnProps, IAgendaState>(mapStateToProps, mapDispatchToProps)(PersonalizeHomeModal);
+    connect<IMapStateProps, IMapDispatchProps, IOwnProps, IAgendaState>(mapStateToProps, mapDispatchToProps)(PersonalizeHomeModal);
