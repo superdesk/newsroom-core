@@ -8,6 +8,7 @@ from .fixtures import (
     USERS,
     COMPANIES,
     PRODUCTS,
+    PUBLIC_USER_ID,
 )
 
 
@@ -150,3 +151,9 @@ def test_other_company_user_changes_blocked(client, manager):
     with pytest.raises(AssertionError) as err:
         utils.patch_json(client, f"/api/_users/{USERS[1]['_id']}", {"company": COMPANIES[0]["_id"]})
     assert "403" in str(err)
+
+
+def test_public_user_can_edit_his_dashboard(client, manager):
+    public_user = next((user for user in USERS if user["_id"] == PUBLIC_USER_ID))
+    utils.login(client, public_user)
+    utils.patch_json(client, f"/api/_users/{PUBLIC_USER_ID}", {"dashboards": []})
