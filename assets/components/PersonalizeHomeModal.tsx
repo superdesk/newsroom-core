@@ -14,6 +14,17 @@ import {getCurrentUser} from 'company-admin/selectors';
 import {IAgendaState} from 'agenda/reducers';
 import {ITopic} from 'interfaces/topic';
 
+interface IMapStateProps {
+    topics: Array<ITopic>;
+    currentUser: IUser;
+}
+
+interface IMapDispatchProps {
+    saveUser: (updates: Partial<IUser>) => void;
+    modalFormValid: () => void;
+    modalFormInvalid: () => void;
+}
+
 interface IOwnProps {
     closeModal?: () => void;
 }
@@ -47,8 +58,8 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
 
         const [wireTopics, agendaTopics] = partition(this.props.topics, (topic) => topic.topic_type === 'wire');
 
-        this.wireTopics = wireTopics;
-        this.wireTopicsById = new Map(wireTopics.map((topic) => [topic._id, topic]));
+        this.wireTopics = wireTopics ?? [];
+        this.wireTopicsById = new Map(this.wireTopics.map((topic) => [topic._id, topic]));
 
         this.state = {
             selectedTopicIds: getSelectedTopicIds(this.props.currentUser),
@@ -153,7 +164,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
         const filteredTopics = (topics: Array<ITopic>) =>
             topics.filter(({is_global}) => this.state.activeSection === '1' ? is_global != true : is_global === true);
 
-        const searchMatches = filteredTopics(this.wireTopics ?? [])
+        const searchMatches = filteredTopics(this.wireTopics)
             .filter((topic) => topic.label.toLowerCase().includes(this.state.searchTerm.toLowerCase()))
             .map((topic) => (
                 <CheckboxInput
@@ -340,9 +351,6 @@ const mapDispatchToProps = ({
     modalFormInvalid: () => modalFormInvalid(),
     saveUser: (updates: Partial<IUser>) => updateUser(updates),
 });
-
-type IMapStateProps = ReturnType<typeof mapStateToProps>;
-type IMapDispatchProps = typeof mapDispatchToProps;
 
 export const PersonalizeHomeSettingsModal =
     connect<IMapStateProps, IMapDispatchProps, IOwnProps, IAgendaState>(mapStateToProps, mapDispatchToProps)(PersonalizeHomeModal);
