@@ -48,6 +48,7 @@ USERS = [
     {
         "_id": PUBLIC_USER_ID,
         "company": COMPANY_2,
+        "user_type": "public",
         "email": "public@sourcefabric.org",
         "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
         "is_validated": True,
@@ -62,6 +63,7 @@ USERS = [
             {"_id": PROD_2, "section": "wire"},
             {"_id": PROD_4, "section": "agenda"},
         ],
+        "manage_company_topics": False,
     },
     {
         "_id": TEST_USER_ID,
