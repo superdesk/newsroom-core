@@ -70,7 +70,6 @@ CONTENTAPI_ELASTICSEARCH_INDEX = env("CONTENTAPI_ELASTICSEARCH_INDEX", MONGO_DBN
 CONTENTAPI_ELASTICSEARCH_SETTINGS["settings"]["analysis"]["analyzer"]["html_field_analyzer"]["filter"] = [
     "lowercase",
     "asciifolding",
-    "stop",
 ]
 
 XML = False
