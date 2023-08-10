@@ -65,6 +65,16 @@ class TopicsService(newsroom.Service):
     def get_items(self, item_ids):
         return self.get(req=None, lookup={"_id": {"$in": item_ids}})
 
+    def on_delete(self, doc):
+        super().on_delete(doc)
+        # remove topic from users personal dashboards
+        users = superdesk.get_resource_service("users").get(req=None, lookup={"dashboards.topic_ids": doc["_id"]})
+        for user in users:
+            updates = {"dashboards": user["dashboards"].copy()}
+            for dashboard in updates["dashboards"]:
+                dashboard["topic_ids"] = [topic_id for topic_id in dashboard["topic_ids"] if topic_id != doc["_id"]]
+            superdesk.get_resource_service("users").system_update(user["_id"], updates, user)
+
 
 def get_user_topics(user_id):
     user = superdesk.get_resource_service("users").find_one(req=None, _id=ObjectId(user_id))

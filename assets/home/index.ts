@@ -9,7 +9,9 @@ const store = createStore(homeReducer, 'Home');
 
 
 if (window.homeData) {
-    store.dispatch(initData(getInitData(window.homeData)));
+    const data = getInitData({...window.homeData, currentUser: {...window.profileData.user}});
+
+    store.dispatch(initData(data));
 }
 
 render(
