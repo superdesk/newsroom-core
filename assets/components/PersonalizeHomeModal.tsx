@@ -341,7 +341,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
     }
 }
 
-const mapStateToProps = (state: IAgendaState) : IMapStateProps => ({
+const mapStateToProps = (state: IAgendaState) => ({
     topics: state.topics,
     currentUser: getCurrentUser(state),
 });
