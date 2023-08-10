@@ -576,3 +576,31 @@ MONITORING_SECTION = lazy_gettext("Monitoring")
 #: .. versionadded: 2.5.0
 #:
 SAVED_SECTION = lazy_gettext("Saved / Watched")
+
+#:
+#: .. versionadded: 2.5.0
+#:
+WIRE_SEARCH_FIELDS = [
+    "slugline",
+    "headline",
+    "byline",
+    "body_html",
+    "body_text",
+    "description_html",
+    "description_text",
+    "keywords",
+    "located",
+]
+
+#:
+#: .. versionadded: 2.5.0
+#:
+AGENDA_SEARCH_FIELDS = [
+    "name",
+    "slugline",
+    "headline",
+    "definition_short",
+    "definition_long",
+    "description_text",
+    "location.name",
+]

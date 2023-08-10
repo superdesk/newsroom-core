@@ -39,7 +39,7 @@ def strtobool(val):
     return _strtobool(val)
 
 
-def query_string(query, default_operator="AND"):
+def query_string(query, default_operator="AND", fields=["*"]):
     query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
     return {
         "query_string": {
@@ -47,6 +47,7 @@ def query_string(query, default_operator="AND"):
             "default_operator": default_operator,
             "analyze_wildcard": query_string_settings["analyze_wildcard"],
             "lenient": True,
+            "fields": fields,
         }
     }
 
@@ -698,12 +699,12 @@ class BaseSearchService(Service):
             return
 
         if product.get("query"):
-            search.query["bool"]["should"].append(query_string(product["query"]))
+            search.query["bool"]["should"].append(self.query_string(product["query"]))
 
     def apply_request_filter(self, search):
         if search.args.get("q"):
             search.query["bool"].setdefault("must", []).append(
-                query_string(search.args["q"], search.args.get("default_operator") or "AND")
+                self.query_string(search.args["q"], search.args.get("default_operator") or "AND")
             )
 
         filters = None
@@ -865,7 +866,7 @@ class BaseSearchService(Service):
         self.prefill_search_products(search)
 
         if topic.get("query"):
-            search.query["bool"]["filter"].append(query_string(topic["query"]))
+            search.query["bool"]["filter"].append(self.query_string(topic["query"]))
 
         if topic.get("created"):
             search.query["bool"]["filter"].append(
@@ -908,3 +909,8 @@ class BaseSearchService(Service):
         self.gen_source_from_search(search)
         internal_req = self.get_internal_request(search)
         return self.internal_get(internal_req, search.lookup)
+
+    def query_string(self, query, default_operator="AND"):
+        fields_config_key = "WIRE_SEARCH_FIELDS" if self.section == "wire" else "AGENDA_SEARCH_FIELDS"
+        fields = app.config.get(fields_config_key, ["*"])
+        return query_string(query, default_operator=default_operator, fields=fields)
