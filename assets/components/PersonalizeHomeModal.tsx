@@ -14,17 +14,6 @@ import {getCurrentUser} from 'company-admin/selectors';
 import {IAgendaState} from 'agenda/reducers';
 import {ITopic} from 'interfaces/topic';
 
-interface IMapStateProps {
-    topics: Array<ITopic>;
-    currentUser: IUser;
-}
-
-interface IMapDispatchProps {
-    saveUser: (updates: Partial<IUser>) => void;
-    modalFormValid: () => void;
-    modalFormInvalid: () => void;
-}
-
 interface IOwnProps {
     closeModal?: () => void;
 }
@@ -351,6 +340,9 @@ const mapDispatchToProps = ({
     modalFormInvalid: () => modalFormInvalid(),
     saveUser: (updates: Partial<IUser>) => updateUser(updates),
 });
+
+type IMapStateProps = ReturnType<typeof mapStateToProps>;
+type IMapDispatchProps = typeof mapDispatchToProps;
 
 export const PersonalizeHomeSettingsModal =
     connect<IMapStateProps, IMapDispatchProps, IOwnProps, IAgendaState>(mapStateToProps, mapDispatchToProps)(PersonalizeHomeModal);
