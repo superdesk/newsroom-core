@@ -9,7 +9,7 @@ import CheckboxInput from 'components/CheckboxInput';
 import AuditInformation from 'components/AuditInformation';
 import {EditUserProductPermission} from './EditUserProductPermission';
 
-import {gettext} from 'utils';
+import {getConfig, gettext} from 'utils';
 import {isUserAdmin, getUserTypes, getUserLabel, userTypeReadOnly, getLocaleInputOptions, getDefaultLocale, isUserCompanyAdmin} from '../utils';
 import {FormToggle} from 'ui/components/FormToggle';
 
@@ -53,7 +53,7 @@ function EditUserComponent({
     const userIsAdmin = isUserAdmin(user);
 
     const company = companies.map((value: any)=> value.name);
-
+    const allowCompaniesToManageProducts = getConfig('allow_companies_to_manage_products');
     return (
         <div
             data-test-id="edit-user-form"
@@ -205,7 +205,7 @@ function EditUserComponent({
                             )}
                         </FormToggle>
 
-                        {(userIsAdmin || hideFields.includes('sections')) ? null : (
+                        {(userIsAdmin || !allowCompaniesToManageProducts|| hideFields.includes('sections')) ? null : (
                             <FormToggle
                                 title={gettext('Sections')}
                                 testId="toggle--sections"
@@ -225,7 +225,7 @@ function EditUserComponent({
                             </FormToggle>
                         )}
 
-                        {(userIsAdmin || hideFields.includes('products')) ? null : (
+                        {(userIsAdmin || !allowCompaniesToManageProducts || hideFields.includes('products')) ? null : (
                             <FormToggle
                                 title={gettext('Products')}
                                 testId="toggle--products"
