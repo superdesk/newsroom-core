@@ -678,27 +678,32 @@ class BaseSearchService(Service):
             # admin will see everything by default
             return
 
-        product_ids = [p["sd_product_id"] for p in search.products if p.get("sd_product_id")]
+        product_filters = []
 
+        product_ids = [p["sd_product_id"] for p in search.products if p.get("sd_product_id")]
         if product_ids:
-            search.query["bool"]["should"].append({"terms": {"products.code": product_ids}})
+            product_filters.append({"terms": {"products.code": product_ids}})
 
         for product in search.products:
-            self.apply_product_filter(search, product)
+            product_filter = self.get_product_filter(search, product)
+            if product_filter:
+                product_filters.append(product_filter)
 
-    def apply_product_filter(self, search, product):
+        if product_filters:
+            search.query["bool"]["filter"].append({"bool": {"should": product_filters}})
+
+    def get_product_filter(self, search, product):
         """Generate the filter for a single product
 
         :param SearchQuery search: The search query instance
         :param dict product: The product to filter
         :return:
         """
-
         if search.args.get("requested_products") and product["_id"] not in search.args["requested_products"]:
             return
 
         if product.get("query"):
-            search.query["bool"]["should"].append(query_string(product["query"]))
+            return query_string(product["query"])
 
     def apply_request_filter(self, search):
         if search.args.get("q"):

@@ -144,12 +144,12 @@ def test_apply_products_filter(client, app):
                         "analyze_wildcard": query_string_settings["analyze_wildcard"],
                         "lenient": True,
                     }
-                } in search.query["bool"]["should"]
+                } in search.query["bool"]["filter"][-1]["bool"]["should"]
 
         sd_product_ids = [product["sd_product_id"] for product in products if product.get("sd_product_id")]
 
         if len(sd_product_ids):
-            assert {"terms": {"products.code": sd_product_ids}} in search.query["bool"]["should"]
+            assert {"terms": {"products.code": sd_product_ids}} in search.query["bool"]["filter"][-1]["bool"]["should"]
 
     with app.test_request_context():
         # Admin has access to everything by default
