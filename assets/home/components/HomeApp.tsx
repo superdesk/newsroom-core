@@ -286,17 +286,18 @@ class HomeApp extends React.Component<IProps, IState> {
                         </div>
                         {this.props.modal?.modal === 'personalizeHome' && <PersonalizeHomeSettingsModal />}
                         {
-                            this.state.activeOptionId !== 'my-home' && cards.length > 0
-                                ? (this.props.cards.filter((c: any) => c.dashboard === 'newsroom')
-                                    .map((card: any) => this.getPanels(card)))
-                                : cards.length > 0 && this.getPanelsForPersonalizedDashboard()
-                        }
-                        {
-                            cards.length === 0 && (
-                                <div className="alert alert-warning" role="alert">
-                                    <strong>{gettext('Warning')}!</strong>
-                                    {gettext('There\'s no card defined for {{home}} page!', window.sectionNames)}
-                                </div>
+                            this.state.activeOptionId === 'my-home' ? (
+                                this.getPanelsForPersonalizedDashboard()
+                            ) : (
+                                cards.length === 0 ? (
+                                    <div className="alert alert-warning my-4" role="alert">
+                                        <strong>{gettext('Warning')}!</strong>
+                                        {gettext('There\'s no card defined for {{home}} page!', window.sectionNames)}
+                                    </div>
+                                ) : (
+                                    this.props.cards.filter((c: any) => c.dashboard === 'newsroom')
+                                        .map((card: any) => this.getPanels(card))
+                                )
                             )
                         }
                     </div>
