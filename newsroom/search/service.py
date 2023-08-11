@@ -71,6 +71,23 @@ def get_filter_query(
     return {"terms": {aggregation_field: val}}
 
 
+def parse_sort(value):
+    if not value:
+        return None
+
+    if not isinstance(value, str):
+        return value
+
+    def parse_field(field_spec):
+        try:
+            field, direction = field_spec.split(":")
+            return {field: direction}
+        except ValueError:
+            return field_spec
+
+    return list(filter(None, [parse_field(field) for field in value.split(",")]))
+
+
 class AdvancedSearchParams(TypedDict):
     all: str
     any: str
@@ -104,7 +121,7 @@ class SearchQuery(object):
 
         self.aggs = None
         self.source = {}
-        self.query = {"bool": {"filter": [], "must_not": [], "should": []}}
+        self.query = {"bool": {"filter": [], "must": [], "must_not": [], "should": []}}
         self.highlight = None
         self.item_type = None
         self.planning_items_should = []
@@ -274,7 +291,7 @@ class BaseSearchService(Service):
         """
 
         search.source["query"] = search.query
-        search.source["sort"] = search.args.get("sort") or self.default_sort
+        search.source["sort"] = parse_sort(search.args.get("sort")) or self.default_sort
         search.source["size"] = int(search.args.get("size", self.default_page_size))
         search.source["from"] = int(search.args.get("from", 0))
 
@@ -556,7 +573,11 @@ class BaseSearchService(Service):
             for field in fields_to_highlight:
                 highlight_search.source["highlight"]["fields"][field] = {
                     "number_of_fragments": 0,
-                    "highlight_query": {"bool": {"filter": highlight_search.query["bool"]["filter"]}},
+                    "highlight_query": {
+                        "bool": {
+                            "filter": highlight_search.query["bool"]["must"] or highlight_search.query["bool"]["filter"]
+                        }
+                    },
                 }
 
             highlight_search.source["highlight"]["pre_tags"] = ['<span class="es-highlight">']
@@ -658,30 +679,33 @@ class BaseSearchService(Service):
             return
 
         product_ids = [p["sd_product_id"] for p in search.products if p.get("sd_product_id")]
-
         if product_ids:
             search.query["bool"]["should"].append({"terms": {"products.code": product_ids}})
 
         for product in search.products:
-            self.apply_product_filter(search, product)
+            product_filter = self.get_product_filter(search, product)
+            if product_filter:
+                search.query["bool"]["should"].append(product_filter)
 
-    def apply_product_filter(self, search, product):
+        if search.query["bool"]["should"]:
+            search.query["bool"]["minimum_should_match"] = 1
+
+    def get_product_filter(self, search, product):
         """Generate the filter for a single product
 
         :param SearchQuery search: The search query instance
         :param dict product: The product to filter
         :return:
         """
-
         if search.args.get("requested_products") and product["_id"] not in search.args["requested_products"]:
             return
 
         if product.get("query"):
-            search.query["bool"]["should"].append(query_string(product["query"]))
+            return query_string(product["query"])
 
     def apply_request_filter(self, search):
         if search.args.get("q"):
-            search.query["bool"]["filter"].append(
+            search.query["bool"].setdefault("must", []).append(
                 query_string(search.args["q"], search.args.get("default_operator") or "AND")
             )
 
@@ -745,9 +769,13 @@ class BaseSearchService(Service):
             }
 
         if search.advanced.get("all"):
-            search.query["bool"]["filter"].append(gen_advanced_query(search.advanced["all"], "AND", "cross_fields"))
+            search.query["bool"].setdefault("must", []).append(
+                gen_advanced_query(search.advanced["all"], "AND", "cross_fields")
+            )
         if search.advanced.get("any"):
-            search.query["bool"]["filter"].append(gen_advanced_query(search.advanced["any"], "OR", "best_fields"))
+            search.query["bool"].setdefault("must", []).append(
+                gen_advanced_query(search.advanced["any"], "OR", "best_fields")
+            )
         if search.advanced.get("exclude"):
             search.query["bool"]["must_not"].append(gen_advanced_query(search.advanced["exclude"], "OR", "best_fields"))
 
@@ -787,58 +815,17 @@ class BaseSearchService(Service):
         section_filters = get_resource_service("section_filters").get_section_filters_dict()
 
         for topic in topics:
-            search = SearchQuery()
-
             user = users.get(str(topic["user"]))
             if not user:
                 continue
 
-            search.user = user
-            search.is_admin = is_admin(user)
-            search.company = companies.get(str(user.get("company", "")))
+            company = companies.get(str(user.get("company", "")))
 
-            search.query = deepcopy(query)
-            search.section = topic.get("topic_type")
-
-            self.prefill_search_products(search)
-
-            if topic.get("query"):
-                search.query["bool"]["filter"].append(query_string(topic["query"]))
-
-            if topic.get("created"):
-                search.query["bool"]["filter"].append(
-                    self.versioncreated_range(
-                        dict(
-                            created_from=topic["created"].get("from"),
-                            created_to=topic["created"].get("to"),
-                            timezone_offset=topic.get("timezone_offset", "0"),
-                        )
-                    )
-                )
-
-            if topic.get("filter"):
-                self.set_bool_query_from_filters(search.query["bool"], topic["filter"])
-
-            if topic.get("advanced"):
-                search.args["advanced"] = topic["advanced"]
-
-            # for now even if there's no active company matching for the user
-            # continuing with the search
-            try:
-                self.validate_request(search)
-                self.apply_section_filter(search, section_filters)
-                self.apply_company_filter(search)
-                self.apply_time_limit_filter(search)
-                self.apply_products_filter(search)
-                self.apply_request_advanced_search(search)
-            except Forbidden as exc:
-                logger.info(
-                    "Notification for user:{} and topic:{} is skipped".format(user.get("_id"), topic.get("_id")),
-                    exc_info=exc,
-                )
+            topic_query = self.get_topic_query(topic, user, company, section_filters, query)
+            if not topic_query:
                 continue
 
-            aggs["topics"]["filters"]["filters"][str(topic["_id"])] = search.query
+            aggs["topics"]["filters"]["filters"][str(topic["_id"])] = topic_query.query
 
             queried_topics.append(topic)
 
@@ -866,3 +853,57 @@ class BaseSearchService(Service):
             raise
 
         return topic_matches
+
+    def get_topic_query(self, topic, user, company, section_filters=None, query=None):
+        search = SearchQuery()
+
+        search.user = user
+        search.is_admin = is_admin(user)
+        search.company = company
+
+        if query is not None:
+            search.query = deepcopy(query)
+        search.section = topic.get("topic_type")
+
+        self.prefill_search_products(search)
+
+        if topic.get("query"):
+            search.query["bool"]["filter"].append(query_string(topic["query"]))
+
+        if topic.get("created"):
+            search.query["bool"]["filter"].append(
+                self.versioncreated_range(
+                    dict(
+                        created_from=topic["created"].get("from"),
+                        created_to=topic["created"].get("to"),
+                        timezone_offset=topic.get("timezone_offset", "0"),
+                    )
+                )
+            )
+
+        if topic.get("filter"):
+            self.set_bool_query_from_filters(search.query["bool"], topic["filter"])
+
+        if topic.get("advanced"):
+            search.args["advanced"] = topic["advanced"]
+
+        # for now even if there's no active company matching for the user
+        # continuing with the search
+        try:
+            self.validate_request(search)
+            self.apply_filters(search)
+        except Forbidden as exc:
+            logger.info(
+                "Notification for user:{} and topic:{} is skipped".format(user.get("_id"), topic.get("_id")),
+                exc_info=exc,
+            )
+            return
+
+        return search
+
+    def get_items_by_query(self, search, size=10, aggs=None):
+        search.args["size"] = size
+        search.args["aggs"] = "false"
+        self.gen_source_from_search(search)
+        internal_req = self.get_internal_request(search)
+        return self.internal_get(internal_req, search.lookup)

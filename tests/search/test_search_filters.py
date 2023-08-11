@@ -178,7 +178,7 @@ def test_apply_request_filter__query_string(client, app):
                 "analyze_wildcard": query_string_settings["analyze_wildcard"],
                 "lenient": True,
             }
-        } in search.query["bool"]["filter"]
+        } in search.query["bool"]["must"]
 
         search.args = {"q": "Sport AND Tennis", "default_operator": "OR"}
         service.apply_request_filter(search)
@@ -189,7 +189,7 @@ def test_apply_request_filter__query_string(client, app):
                 "analyze_wildcard": query_string_settings["analyze_wildcard"],
                 "lenient": True,
             }
-        } in search.query["bool"]["filter"]
+        } in search.query["bool"]["must"]
 
 
 def test_apply_request_filter__filters(client, app):

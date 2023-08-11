@@ -199,6 +199,9 @@ $tag-x-palette: $tag-x-colors !default;
     align-items: center;
     flex-wrap: wrap;
     gap: var(--space--1);
+    &:empty {
+        display: none;
+    }
 }
 
 .tag-list__separator {

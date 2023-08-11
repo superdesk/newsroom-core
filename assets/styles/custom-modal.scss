@@ -1,56 +1,140 @@
 // Modal header
 // Top section of the modal w/ title and dismiss
-.modal-header {
-  .close {
-    i {
-      color: $black;
-      opacity: .5;
+.modal {
+    inset: 0;
+    z-index: 1055;
+    // overflow-x: hidden;
+    // overflow-y: auto;
+}
+.modal-content {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 1fr;
+    .modal-header {
+        grid-row: 1 / 2;
+        z-index: 1;
     }
-  }
-
-  @include phone {
-    padding: 0.5rem 1rem 0 1rem;
-  }
+    .modal-body {
+        grid-row: 2 / 3;
+        overflow-y: auto;
+    }
+    .modal-footer {
+        grid-row: 3 / 4;
+        z-index: 2;
+    }
+    @include phone {
+        bottom: 0;
+        top: 0;
+    }
+}
+.modal-header {
+    .close {
+        i {
+            //color: $black;
+            opacity: .5;
+        }
+    }
+    @include phone {
+        padding-block: var(--space--1);
+    }
 }
 
 // Title text within header
 .modal-title {
-  font-weight: 700;
+    font-weight: 700;
 }
 
 // Shell div to position the modal with bottom padding
 .modal-dialog {
-  // When fading in the modal, animate it to slide down
-  .modal.fade & {
-    transform: translate(0, 0);
-  }
+    position: absolute;
+    inset: 0;
+    margin-block: 40px;
+    margin-inline: auto;
+    max-height: 100%;
+// When fading in the modal, animate it to slide down
+    .modal.fade & {
+        transform: translate(0, 0);
+    }
+    @include phone {
+        margin: 0 !important;
+    }
+}
+
+.modal-body {
+  overflow: auto;
 }
 
 // Footer (for actions)
 .modal-footer {
-  // Easily place margin between footer elements
-  > :not(:first-child) { margin-inline-start: 10px; }
-  > :not(:last-child) { margin-inline-end: 10px; }
-
-  @include phone {
-    padding: 0.5rem 1rem;
-  }
+    gap: var(--space--1);
+    @include phone {
+        padding: 0.5rem 1rem;
+    }
 }
 
 .modal--full-width {
-  .modal-dialog {
-    max-width: 100%;
-    height: 100%;
-    margin: 1.5rem 1rem;
+    .modal-dialog {
+        max-width: 100%;
+        height: calc(100% - 1.5rem - 1.5rem);
+        margin: 1.5rem 1rem;
 
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
     }
-  }
-  .modal-content {
+    .modal-content {
+        height: 100%;
+        padding-block-end: 2rem;
+    }
+}
+.modal-body {
+    overflow-y: auto;
+}
+.modal-content {
+    position: absolute;
+    inset-inline: 0;
+    max-height: 100%;
+}
+
+.modal-body__inner {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 1fr;
     height: 100%;
-    padding-block-end: 2rem;
-  }
+    padding: 0;
+    .modal-body__inner-header {
+        grid-row: 1 / 2;
+    }
+    .modal-body__inner-content {
+        grid-row: 2 / 3;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    .inner-content-grid {
+        display: grid;
+        grid-template-rows: 1fr auto ;
+        grid-template-columns: 1fr;
+        height: 100%;
+        padding: 0;
+        .inner-content-grid__main {
+            grid-row: 1 / 2;
+            overflow-y: auto;
+            margin: 0;
+        }
+        .inner-content-grid__footer {
+            grid-row: 2 / 3;
+            margin: 0;
+        }
+    }
+    .modal-body__inner-footer {
+        grid-row: 3 / 4;
+    }
+}
+
+.form-group.user-msg {
+    textarea.form-control {
+        min-height: 64px;
+    }
 }

@@ -79,6 +79,20 @@ class UsersResource(newsroom.Resource):
             "type": "dict",
             "nullable": True,
         },
+        "dashboards": {
+            "type": "list",
+            "schema": {
+                "type": "dict",
+                "schema": {
+                    "name": {"type": "string"},
+                    "type": {"type": "string"},
+                    "topic_ids": {
+                        "type": "list",
+                        "schema": newsroom.Resource.rel("topics"),
+                    },
+                },
+            },
+        },
     }
 
     item_methods = ["GET", "PATCH", "PUT", "DELETE"]
@@ -106,6 +120,9 @@ USER_PROFILE_UPDATES = {
     "receive_email",
     "receive_app_notifications",
     "role",
+    "dashboards",
+    "expiry_alert",
+    "_updated",
 }
 
 
@@ -267,7 +284,9 @@ class UsersService(newsroom.Service):
         if request and request.url_rule and request.url_rule.rule:
             if request.url_rule.rule in ["/reset_password/<token>", "/token/<token_type>"]:
                 return
-            elif request.url_rule.rule in ["/users/<_id>", "/users/<_id>/profile"]:
+            elif request.url_rule.rule in ["/users/<_id>", "/users/<_id>/profile"] or (
+                request.endpoint and "|item" in request.endpoint and request.method == "PATCH"
+            ):
                 if not updated_fields or all([key in USER_PROFILE_UPDATES for key in updated_fields]):
                     return
         abort(403)

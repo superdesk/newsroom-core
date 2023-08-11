@@ -220,16 +220,30 @@ $container-max-widths: (
 
     // CORE: MISC 
     --transition-base: 0.2s ease;
-    --table-selected-shadow: inset 0 0 0 3px var(--color-interactive-focus--translucent);
+    
 
     // CORE: TOP BAR HEIGHT (NavBar, Search, Mobile navigation) 
     --navbar-height: 56px;
     --navbar-height--mobile: 48px;
+    --navbar-height--small: 40px;
+
+    // LOGIN PAGE
+    --login-page-color-bg: var(--color-background--muted);
     
 
     // --------------------------------------------------------------------
     //     C O M P O N E N T S
     // --------------------------------------------------------------------
+
+    // COMPONENT: TABLE
+    --table-cell-line-color: var(--color-line--x-light);
+    --table-cell-padding-inline: var(--space--1-5);
+    --table-cell-padding-inline--small: var(--space--1);
+    --table-cell-padding-block: var(--space--2);
+    --table-cell-padding-block--small: var(--space--1-5);
+
+    --table-selected-shadow: inset 0 0 0 3px var(--color-interactive-focus--translucent);
+
     
     // COMPONENT: SEARCHBAR
     --searchbar-size-height: 40px;
@@ -258,6 +272,28 @@ $container-max-widths: (
     --top-bar-color-bg-badge: hsl(321, 100%, 42%);
     --top-bar-color-fg-badge: hsl(0, 0%, 100%);
     --top-bar-badge-size: 1.25rem;
+    // Logo main
+    --top-bar-logo-main-max-width: 196px;
+    --top-bar-logo-main-max-width--mobile: 160px;
+    --top-bar-logo-main-padding-y: 12px;
+    --top-bar-logo-main-padding-x: 16px;
+    --top-bar-logo-main-margin-top: 0;
+    --top-bar-logo-main-margin-top--mobile: 0;
+    // Logo additional
+    --top-bar-logo-additional-display: none;
+    --top-bar-logo-additional-max-width: 89px;
+    --top-bar-logo-additional-min-width--mobile: 0px;
+    --top-bar-logo-additional-padding-y: 12px;
+    --top-bar-logo-additional-padding-start: 0;
+    --top-bar-logo-additional-padding-end: var(--space--1);
+    --top-bar-logo-additiona-margin-top: 0;
+    // Navbar Brand
+    --top-bar-nav-brand-margin-x: 0;
+    --top-bar-nav-brand-margin-y: 16px;
+    --top-bar-nav-brand-padding-x: 16px;
+    --top-bar-nav-brand-border-color: var(--color-text--muted-2);
+    --top-bar-nav-brand-border-type: dashed;
+
 
     // COMPONENT: INPUT FIELD
     --input-color-bg: hsl(0, 0%, 96%);
@@ -289,6 +325,8 @@ $container-max-widths: (
     --icon-button-color-border--tertiary-hover: var(--icon-button-color-fg);
 
     --icon-button-color-border: var(--color-line--light);
+    --icon-button-shadow--active: var(--button-color-shadow--secondary-hover);
+    --icon-button-shadow-primary--active: var(--color-interactive-focus--translucent);
 
     --icon-button-size: 40px;
     --icon-button-size--small: 32px;
@@ -311,7 +349,6 @@ $container-max-widths: (
     --simplecard-item-padding--compact: var(--space--1) var(--space--1) var(--space--1) var(--space--3);
 
     // COMPONENT: SIDENAV
-    
     --sidenav-color-bg:                 var(--color-primary);
     --sidenav-color-item-bg:            transparent;
     --sidenav-color-item-fg:            hsla(0, 0%, 100%, 1);
@@ -322,6 +359,7 @@ $container-max-widths: (
     --sidenav-item-badge-size:          1.25rem;
     --sidenav-item-badge-font-size:     0.6875rem;
     --sidenav-item-helper-icon-size:    1.125rem;
+    --sidenav-item-helper-icon-fg:      var(--sidenav-color-bg);
     --sidenav-item-border-radius:       var(--border-radius--s);
     --separator-dot-size:               3px;
     --separator-dot-color-bg:           var(--sidenav-color-item-fg);
@@ -447,6 +485,7 @@ $container-max-widths: (
     --collapsible-box-padding-inlinestart--hover: var(--space--3);
 
     // COMPONENT: TOPIC LIST (Side panel)
+    --topic-list-density: var(--space--0-5);
     --topic-list-item-font-size: var(--text-size--medium);
     --topic-list-item-color-fg: var(--color-text--muted);
     --topic-list-item-color-fg--hover: var(--color-text);
@@ -455,6 +494,7 @@ $container-max-widths: (
     --topic-list-item-color-bg--hover: hsla(0, 0%, 96%, 1);
     --topic-list-item-color-bg--active: hsla(0, 0%, 96%, 1);
     --topic-list-item-min-height: 40px;
+    --topic-list-item-inline-margin: var(--space--1);
 
     // COMPONENT: MAIN FOOTER
     --footer-size--height: 32px;
@@ -602,6 +642,7 @@ $container-max-widths: (
     }
     &:hover {
         text-decoration: none;
+        cursor: pointer;
         [class^="icon--"],
         [class*=" icon--"] {
             color: var(--color-text);

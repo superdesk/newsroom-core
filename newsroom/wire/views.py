@@ -134,6 +134,36 @@ def delete_dashboard_caches():
         app.cache.delete(f"{HOME_ITEMS_CACHE_KEY}{company['_id']}")
 
 
+def get_personal_dashboards_data(user, company, topics):
+    def get_topic_items(topic):
+        query = superdesk.get_resource_service("wire_search").get_topic_query(topic, user, company)
+        return list(superdesk.get_resource_service("wire_search").get_items_by_query(query, size=4))
+
+    def _get_topic_data(topic_id):
+        for topic in topics:
+            if topic["_id"] == topic_id:
+                items = get_topic_items(topic)
+                if items:
+                    return {
+                        "_id": topic["_id"],
+                        "items": items,
+                    }
+                break
+        return None
+
+    def _get_dashboard_data(dashboard, index):
+        return {
+            "dashboard_id": f"d{index}",
+            "dashboard_name": dashboard.get("name", ""),
+            "topic_items": list(
+                filter(None, [_get_topic_data(topic_id) for topic_id in dashboard.get("topic_ids") or []])
+            ),
+        }
+
+    dashboards = user.get("dashboards") or []
+    return [_get_dashboard_data(dashboard, i) for i, dashboard in enumerate(dashboards)]
+
+
 def get_home_data():
     user = get_user()
     company = get_company(user)
@@ -161,6 +191,7 @@ def get_home_data():
         "topics": topics,
         "ui_config": get_resource_service("ui_config").get_section_config("home"),
         "groups": app.config.get("WIRE_GROUPS", []),
+        "personalizedDashboards": get_personal_dashboards_data(user, company, topics),
     }
 
 
