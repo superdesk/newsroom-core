@@ -2,6 +2,8 @@ import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
 import {searchQuerySelector} from 'search/selectors';
 import {get, cloneDeep} from 'lodash';
+import {cleanUserEntityBeforePatch} from './utils';
+import {IUser} from 'interfaces/user';
 
 export const SELECT_USER = 'SELECT_USER';
 export function selectUser(id: any) {
@@ -108,6 +110,23 @@ export function fetchUsers() {
     };
 }
 
+export function updateUser(updates: Partial<IUser>) {
+    return function (dispatch: any, getState: any) {
+
+        const user = cloneDeep(getState().currentUser);
+        const url = `api/_users/${user._id}`;
+
+        const _etag = user._etag;
+
+        return server.patchEntity(url, cleanUserEntityBeforePatch(updates), _etag)
+            .then((updated) => {
+                notify.success(gettext('Personalized dashboard saved!'));
+                window.location.reload(); // reload the page to show the updated dashboard
+            })
+            .catch((error: any) => errorHandler(error, dispatch, setError));
+
+    };
+}
 
 /**
  * Creates new users

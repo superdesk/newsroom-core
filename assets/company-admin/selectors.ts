@@ -30,6 +30,7 @@ export const companySectionListSelector = createSelector(
     )
 );
 
+export const getCurrentUser = (state: any) => state.currentUser;
 export const currentUserSelector = (state: any) => state.user || {};
 export const userIdSelector = (state: any) => state.users || [];
 export const userIdMapSelector = (state: any) => state.usersById || {};

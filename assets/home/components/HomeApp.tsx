@@ -1,13 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {gettext, isDisplayed, isMobilePhone} from 'utils';
 import {get} from 'lodash';
-import {
-    getCardDashboardComponent,
-} from 'components/cards/utils';
-
-
+import {getCardDashboardComponent} from 'components/cards/utils';
 import getItemActions from 'wire/item-actions';
 import ItemDetails from 'wire/components/ItemDetails';
 import {openItemDetails, setActive, fetchCardExternalItems, fetchCompanyCardItems} from '../actions';
@@ -15,18 +10,60 @@ import ShareItemModal from 'components/ShareItemModal';
 import DownloadItemsModal from 'wire/components/DownloadItemsModal';
 import WirePreview from 'wire/components/WirePreview';
 import {followStory} from 'search/actions';
-import {downloadMedia} from 'wire/actions';
+import {downloadMedia, fetchItems} from 'wire/actions';
 import {SearchBar} from './search-bar';
 import {previewConfigSelector, listConfigSelector, detailsConfigSelector, isSearchEnabled} from 'ui/selectors';
 import {filterGroupsToLabelMap} from 'search/selectors';
 import CardRow from 'components/cards/render/CardRow';
+import {PersonalizeHomeSettingsModal} from 'components/PersonalizeHomeModal';
+import {personalizeHome} from 'agenda/actions';
+import {RadioButtonGroup} from 'features/sections/SectionSwitch';
+import {getCurrentUser} from 'company-admin/selectors';
+import {IPersonalizedDashboardsWithData} from 'home/reducers';
+import {ITopic} from 'interfaces/topic';
 
 const modals: any = {
     shareItem: ShareItemModal,
     downloadItems: DownloadItemsModal,
+    personalizeHome: PersonalizeHomeSettingsModal,
 };
 
-class HomeApp extends React.Component<any, any> {
+interface IState {
+    loadingItems: boolean;
+    activeOptionId: 'default' | 'my-home';
+}
+
+interface IProps {
+    cards: Array<any>;
+    itemsByCard: any;
+    products: Array<any>;
+    user: string;
+    userType: string;
+    company: string;
+    format: Array<any>;
+    itemToOpen: any;
+    personalizedDashboards: Array<IPersonalizedDashboardsWithData>;
+    modal: any;
+    openItemDetails: () => void;
+    activeCard: string;
+    actions: Array<{name: string; action: (action?: any) => void;}>;
+    fetchCardExternalItems: (cardId: string, cardLabel: string) => void;
+    personalizeHome: () => void;
+    fetchCompanyCardItems: () => void;
+    followStory: () => void;
+    previewConfig: any;
+    listConfig: any;
+    detailsConfig: any;
+    downloadMedia: () => void;
+    topics: Array<ITopic>;
+    isFollowing: boolean;
+    isSearchEnabled: boolean;
+    filterGroupLabels: any;
+    currentUser: any;
+    fetchItems: () => any;
+}
+
+class HomeApp extends React.Component<IProps, IState> {
     static propTypes: any;
 
     height: number;
@@ -39,7 +76,10 @@ class HomeApp extends React.Component<any, any> {
         this.onHomeScroll = this.onHomeScroll.bind(this);
         this.height = 0;
 
-        this.state = {loadingItems: true};
+        this.state = {
+            loadingItems: true,
+            activeOptionId: this.props.personalizedDashboards.length > 0 ? 'my-home' : 'default',
+        };
     }
 
     componentDidMount() {
@@ -81,6 +121,33 @@ class HomeApp extends React.Component<any, any> {
 
     getProductId(card: any) {
         return card.config.product;
+    }
+
+    getPanelsForPersonalizedDashboard() {
+        const {personalizedDashboards} = this.props;
+        const Panel: React.ComponentType<any> = getCardDashboardComponent('4-media-gallery');
+        const personalizedDashboardTopicIds = personalizedDashboards?.[0].topic_items?.map(({_id}: any) => _id);
+        const topicItems = this.props.topics.filter((topic) => personalizedDashboardTopicIds?.includes(topic._id));
+
+        return (
+            personalizedDashboards?.[0].topic_items?.map((item: any) => {
+                const currentTopic = topicItems.find((x) => x._id === item._id);
+
+                return (
+                    <Panel
+                        key={item._id}
+                        type="4-picture-text"
+                        items={item.items}
+                        title={currentTopic?.label}
+                        productId={item.items[0].productId ?? ''}
+                        openItem={this.props.openItemDetails}
+                        isActive={this.props.activeCard === item._id}
+                        cardId={item._id}
+                        listConfig={this.props.listConfig}
+                    />
+                );
+            })
+        );
     }
 
     getPanels(card: any) {
@@ -136,23 +203,102 @@ class HomeApp extends React.Component<any, any> {
     }
 
     renderContent(children?: any): any {
+        const {cards} = this.props;
+
         return (
             <React.Fragment>
                 {this.props.isSearchEnabled && (
                     <SearchBar />
                 )}
 
-                <section className="content-main d-block py-4 px-2 p-md-3 p-lg-4"
+                <section
+                    className="content-main d-block py-4 px-2 p-md-3 p-lg-4"
                     onScroll={this.onHomeScroll}
                     ref={(elem: any) => this.elem = elem}
                 >
                     <div className="container-fluid">
-                        {this.props.cards.length > 0 &&
-                        this.props.cards.filter((c: any) => c.dashboard === 'newsroom').map((card: any) => this.getPanels(card))}
-                        {this.props.cards.length === 0 &&
-                        <div className="alert alert-warning" role="alert">
-                            <strong>{gettext('Warning')}!</strong> {gettext('There\'s no card defined for {{home}} page!', window.sectionNames)}
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: 8,
+                            }}
+                        >
+                            {
+                                (this.props.personalizedDashboards?.length ?? 0) < 1 ? (
+                                    <div className="home-tools">
+                                        <button
+                                            onClick={() => {
+                                                this.props.personalizeHome();
+                                            }}
+                                            type="button"
+                                            className="nh-button nh-button--secondary nh-button--small"
+                                            title={gettext('Personalize Home')}
+                                        >
+                                            {gettext('Personalize Home')}
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                flexDirection: 'row',
+                                                alignItems: 'center'
+                                            }}
+                                            className="home-tools"
+                                        >
+                                            <RadioButtonGroup
+                                                options={[
+                                                    {
+                                                        _id: 'default',
+                                                        name: gettext('Default')
+                                                    },
+                                                    {
+                                                        _id: 'my-home',
+                                                        name: gettext('My home')
+                                                    },
+                                                ]}
+                                                activeOptionId={this.state.activeOptionId}
+                                                switchOptions={(optionId) => {
+                                                    if (optionId === 'default' || optionId === 'my-home') {
+                                                        this.setState({
+                                                            activeOptionId: optionId
+                                                        });
+                                                    }
+                                                }}
+                                            />
+                                            <button
+                                                onClick={() => {
+                                                    this.props.personalizeHome();
+                                                }}
+                                                type="button"
+                                                className="icon-button icon-button--small icon-button--tertiary icon-button--bordered"
+                                                title={gettext('Edit personal Home')}
+                                            >
+                                                <i className="icon--settings"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                )
+                            }
                         </div>
+                        {this.props.modal?.modal === 'personalizeHome' && <PersonalizeHomeSettingsModal />}
+                        {
+                            this.state.activeOptionId === 'my-home' ? (
+                                this.getPanelsForPersonalizedDashboard()
+                            ) : (
+                                cards.length === 0 ? (
+                                    <div className="alert alert-warning my-4" role="alert">
+                                        <strong>{gettext('Warning')}!</strong>
+                                        {gettext('There\'s no card defined for {{home}} page!', window.sectionNames)}
+                                    </div>
+                                ) : (
+                                    this.props.cards.filter((c: any) => c.dashboard === 'newsroom')
+                                        .map((card: any) => this.getPanels(card))
+                                )
+                            )
                         }
                     </div>
                     {children}
@@ -165,18 +311,21 @@ class HomeApp extends React.Component<any, any> {
         const modal = this.renderModal(this.props.modal);
 
         return (
-            (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
-                item={this.props.itemToOpen}
-                user={this.props.user}
-                topics={this.props.topics}
-                actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
-                onClose={() => this.props.actions.filter((a: any) => a.id === 'open')[0].action(null)}
-                followStory={this.props.followStory}
-                detailsConfig={this.props.detailsConfig}
-                filterGroupLabels={this.props.filterGroupLabels}
-                downloadMedia={this.props.downloadMedia}
-            />, modal] :
-                this.renderContent()
+            (
+                this.props.itemToOpen ? [
+                    <ItemDetails key="itemDetails"
+                        item={this.props.itemToOpen}
+                        user={this.props.user}
+                        topics={this.props.topics}
+                        actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
+                        onClose={() => this.props.actions.filter((a: any) => a.id === 'open')[0].action(null)}
+                        followStory={this.props.followStory}
+                        detailsConfig={this.props.detailsConfig}
+                        filterGroupLabels={this.props.filterGroupLabels}
+                        downloadMedia={this.props.downloadMedia}
+                    />,
+                    modal
+                ] : this.renderContent()
             )
         );
     }
@@ -214,37 +363,9 @@ class HomeApp extends React.Component<any, any> {
     }
 }
 
-HomeApp.propTypes = {
-    cards: PropTypes.arrayOf(PropTypes.object),
-    itemsByCard: PropTypes.object,
-    products: PropTypes.array,
-    user: PropTypes.string,
-    userType: PropTypes.string,
-    company: PropTypes.string,
-    format: PropTypes.array,
-    itemToOpen: PropTypes.object,
-    modal: PropTypes.object,
-    openItemDetails: PropTypes.func,
-    activeCard: PropTypes.string,
-    actions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string,
-        action: PropTypes.func,
-    })),
-    fetchCardExternalItems: PropTypes.func,
-    fetchCompanyCardItems: PropTypes.func,
-    followStory: PropTypes.func,
-    previewConfig: PropTypes.object,
-    listConfig: PropTypes.object,
-    detailsConfig: PropTypes.object,
-    downloadMedia: PropTypes.func,
-    topics: PropTypes.array,
-    isFollowing: PropTypes.bool,
-    isSearchEnabled: PropTypes.bool,
-    filterGroupLabels: PropTypes.object,
-};
-
 const mapStateToProps = (state: any) =>({
     cards: state.cards,
+    personalizedDashboards: state.personalizedDashboards,
     itemsByCard: state.itemsByCard,
     products: state.products,
     user: state.user,
@@ -259,18 +380,23 @@ const mapStateToProps = (state: any) =>({
     topics: state.topics || [],
     isSearchEnabled: isSearchEnabled(state),
     filterGroupLabels: filterGroupsToLabelMap(state),
+    currentUser: getCurrentUser(state),
 });
 
-const mapDispatchToProps = (dispatch: any) => ({
+const mapDispatchToProps = (dispatch: any, state: any) => ({
     openItemDetails: (item: any, cardId: any) => {
         dispatch(openItemDetails(item));
         dispatch(setActive(cardId));
+    },
+    fetchItems: () => dispatch(fetchItems()),
+    personalizeHome: () => {
+        dispatch(personalizeHome());
     },
     actions: getItemActions(dispatch),
     fetchCardExternalItems: (cardId: any, cardLabel: any) => dispatch(fetchCardExternalItems(cardId, cardLabel)),
     fetchCompanyCardItems: () => dispatch(fetchCompanyCardItems()),
     followStory: (item: any) => followStory(item, 'wire'),
-    downloadMedia: (href: any, id: any, mimeType: any) => dispatch(downloadMedia(href, id)),
+    downloadMedia: (href: any, id: any) => dispatch(downloadMedia(href, id)),
 });
 
 

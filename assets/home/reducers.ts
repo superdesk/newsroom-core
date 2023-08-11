@@ -7,11 +7,29 @@ import {
     SET_MULTIPLE_CARD_ITEMS,
 } from './actions';
 import {BOOKMARK_ITEMS, REMOVE_BOOKMARK} from '../wire/actions';
-import {CLOSE_MODAL, MODAL_FORM_VALID, RENDER_MODAL} from '../actions';
+import {CLOSE_MODAL, MODAL_FORM_VALID, RENDER_MODAL, SET_USER} from '../actions';
 import {modalReducer} from '../reducers';
 import {topicsReducer} from '../topics/reducer';
 
-const initialState: any = {
+export interface IPersonalizedDashboardsWithData {
+    dashboard_id?: string;
+    dashboard_name?: string;
+    topic_items?: Array<{_id: string, items: Array<any>}>;
+}
+
+interface IState {
+    personalizedDashboards: Array<IPersonalizedDashboardsWithData>;
+    cards: Array<any>;
+    topics: Array<any>;
+    products: Array<any>;
+    itemsByCard: any;
+    activeCard: any;
+    uiConfig: any;
+    userProducts: Array<any>;
+    currentUser: any;
+}
+
+const initialState: IState = {
     cards: [],
     topics: [],
     products: [],
@@ -19,17 +37,21 @@ const initialState: any = {
     activeCard: null,
     uiConfig: {},
     userProducts: [],
+    currentUser: {},
+    personalizedDashboards: [],
 };
 
-export default function homeReducer(state: any = initialState, action: any) {
+export default function homeReducer(state: IState & any = initialState, action: any): IState {
 
     switch (action.type) {
 
     case INIT_DATA:
         return {
             ...state,
+            personalizedDashboards: action.data?.personalizedDashboards,
             cards: action.data.cards,
             itemsByCard: {},
+            currentUser: action.data.currentUser,
             products: action.data.products,
             user: action.data.user,
             userType: action.data.userType,
@@ -47,6 +69,13 @@ export default function homeReducer(state: any = initialState, action: any) {
         return {
             ...state,
             itemToOpen: action.item || null,
+        };
+    }
+
+    case SET_USER: {
+        return {
+            ...state,
+            currentUser: action.data
         };
     }
 
