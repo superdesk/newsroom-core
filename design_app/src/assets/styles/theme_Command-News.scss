@@ -78,14 +78,14 @@
 
 .navbar__logo {
     img.navbar__logo-img--fr {
-        max-width: 200px;
+        width: 200px;
         margin-block-start: 0;
     }
 }
 
 .navbar__additional-logo {
     .navbar__additional-logo-img--fr {
-        max-width: 120px;
+        width: 120px;
     }
 }
 
@@ -93,7 +93,7 @@
     .navbar__logo {
         img.navbar__logo-img--fr {
             margin-block-start: 0;
-            max-width: 160px;
+            width: 160px;
         }
     }
 }
