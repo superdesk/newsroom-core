@@ -268,12 +268,12 @@ class BaseSearchService(Service):
         self.prefill_search_items(search)
         self.prefill_search_highlights(search, req)
 
-    def apply_filters(self, search, section_filters=None):
+    def apply_filters(self, search):
         """Generate and apply the different search filters
 
         :param SearchQuery search: the search query instance
         """
-        self.apply_section_filter(search, filters=section_filters)
+        self.apply_section_filter(search)
         self.apply_company_filter(search)
         self.apply_time_limit_filter(search)
         self.apply_products_filter(search)
@@ -854,7 +854,7 @@ class BaseSearchService(Service):
 
         return topic_matches
 
-    def get_topic_query(self, topic, user, company, section_filters, query=None):
+    def get_topic_query(self, topic, user, company, section_filters=None, query=None):
         search = SearchQuery()
 
         search.user = user
@@ -891,7 +891,7 @@ class BaseSearchService(Service):
         # continuing with the search
         try:
             self.validate_request(search)
-            self.apply_filters(search, section_filters=section_filters)
+            self.apply_filters(search)
         except Forbidden as exc:
             logger.info(
                 "Notification for user:{} and topic:{} is skipped".format(user.get("_id"), topic.get("_id")),
