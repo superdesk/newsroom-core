@@ -268,12 +268,12 @@ class BaseSearchService(Service):
         self.prefill_search_items(search)
         self.prefill_search_highlights(search, req)
 
-    def apply_filters(self, search):
+    def apply_filters(self, search, section_filters=None):
         """Generate and apply the different search filters
 
         :param SearchQuery search: the search query instance
         """
-        self.apply_section_filter(search)
+        self.apply_section_filter(search, filters=section_filters)
         self.apply_company_filter(search)
         self.apply_time_limit_filter(search)
         self.apply_products_filter(search)
@@ -678,19 +678,17 @@ class BaseSearchService(Service):
             # admin will see everything by default
             return
 
-        product_filters = []
-
         product_ids = [p["sd_product_id"] for p in search.products if p.get("sd_product_id")]
         if product_ids:
-            product_filters.append({"terms": {"products.code": product_ids}})
+            search.query["bool"]["should"].append({"terms": {"products.code": product_ids}})
 
         for product in search.products:
             product_filter = self.get_product_filter(search, product)
             if product_filter:
-                product_filters.append(product_filter)
+                search.query["bool"]["should"].append(product_filter)
 
-        if product_filters:
-            search.query["bool"]["filter"].append({"bool": {"should": product_filters}})
+        if search.query["bool"]["should"]:
+            search.query["bool"]["minimum_should_match"] = 1
 
     def get_product_filter(self, search, product):
         """Generate the filter for a single product
@@ -893,11 +891,7 @@ class BaseSearchService(Service):
         # continuing with the search
         try:
             self.validate_request(search)
-            self.apply_section_filter(search, section_filters)
-            self.apply_company_filter(search)
-            self.apply_time_limit_filter(search)
-            self.apply_products_filter(search)
-            self.apply_request_advanced_search(search)
+            self.apply_filters(search, section_filters=section_filters)
         except Forbidden as exc:
             logger.info(
                 "Notification for user:{} and topic:{} is skipped".format(user.get("_id"), topic.get("_id")),

@@ -73,10 +73,16 @@ def test_user_products(app, client, manager, product):
     data = utils.get_json(client, "/wire/search")
     assert 0 == len(data["_items"])
 
+    data = utils.get_json(client, "/wire/search?q=weather")
+    assert 0 == len(data["_items"])
+
     app.data.update("products", product["_id"], {"query": "headline:WEATHER"}, product)
 
     data = utils.get_json(client, "/wire/search")
-    assert 1 >= len(data["_items"])
+    assert 1 == len(data["_items"])
+
+    data = utils.get_json(client, "/wire/search?q=amazon")
+    assert 0 == len(data["_items"])
 
 
 def test_user_sections(app, client, manager, product):
