@@ -334,11 +334,10 @@
     padding-block: var(--top-bar-logo-main-padding-y);
     padding-inline: var(--top-bar-logo-main-padding-x);
     img {
-        width: 100%;
-        max-width: var(--top-bar-logo-main-max-width);
+        width: var(--top-bar-logo-main-max-width);
         margin-block-start: var(--top-bar-logo-main-margin-top);
         @include phone {
-            max-width: var(--top-bar-logo-main-max-width--mobile);
+            width: var(--top-bar-logo-main-max-width--mobile);
             margin-block-start: var(--top-bar-logo-main-margin-top--mobile);
         }
     }
@@ -380,8 +379,7 @@
         height: auto;
         position: relative;
         display: var(--top-bar-logo-additional-display);
-        max-width: var(--top-bar-logo-additional-max-width);
-        width: 100%;
+        width: var(--top-bar-logo-additional-max-width);
         height: auto;
         margin-block-start: var(--top-bar-logo-additiona-margin-top);
     }
