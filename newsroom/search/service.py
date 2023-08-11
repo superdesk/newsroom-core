@@ -679,26 +679,29 @@ class BaseSearchService(Service):
             return
 
         product_ids = [p["sd_product_id"] for p in search.products if p.get("sd_product_id")]
-
         if product_ids:
             search.query["bool"]["should"].append({"terms": {"products.code": product_ids}})
 
         for product in search.products:
-            self.apply_product_filter(search, product)
+            product_filter = self.get_product_filter(search, product)
+            if product_filter:
+                search.query["bool"]["should"].append(product_filter)
 
-    def apply_product_filter(self, search, product):
+        if search.query["bool"]["should"]:
+            search.query["bool"]["minimum_should_match"] = 1
+
+    def get_product_filter(self, search, product):
         """Generate the filter for a single product
 
         :param SearchQuery search: The search query instance
         :param dict product: The product to filter
         :return:
         """
-
         if search.args.get("requested_products") and product["_id"] not in search.args["requested_products"]:
             return
 
         if product.get("query"):
-            search.query["bool"]["should"].append(query_string(product["query"]))
+            return query_string(product["query"])
 
     def apply_request_filter(self, search):
         if search.args.get("q"):
@@ -851,7 +854,7 @@ class BaseSearchService(Service):
 
         return topic_matches
 
-    def get_topic_query(self, topic, user, company, section_filters, query=None):
+    def get_topic_query(self, topic, user, company, section_filters=None, query=None):
         search = SearchQuery()
 
         search.user = user
@@ -888,11 +891,7 @@ class BaseSearchService(Service):
         # continuing with the search
         try:
             self.validate_request(search)
-            self.apply_section_filter(search, section_filters)
-            self.apply_company_filter(search)
-            self.apply_time_limit_filter(search)
-            self.apply_products_filter(search)
-            self.apply_request_advanced_search(search)
+            self.apply_filters(search)
         except Forbidden as exc:
             logger.info(
                 "Notification for user:{} and topic:{} is skipped".format(user.get("_id"), topic.get("_id")),
