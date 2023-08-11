@@ -11,6 +11,12 @@ export function closeModal() {
     return {type: CLOSE_MODAL};
 }
 
+export const SET_USER = 'SET_USER';
+export function setUser(user: any) {
+    return {type: SET_USER, data: user};
+}
+
+
 export const SAVED_ITEMS_COUNT = 'SAVED_ITEMS_COUNT';
 export function setSavedItemsCount(count: any) {
     return {type: SAVED_ITEMS_COUNT, count: count};

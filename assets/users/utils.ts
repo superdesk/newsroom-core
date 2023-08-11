@@ -52,3 +52,13 @@ export function getDefaultLocale() {
 export function canUserUpdateTopic(user: any, topic: any) {
     return !topic.is_global || (topic.is_global && user.manage_company_topics === true);
 }
+
+export function cleanUserEntityBeforePatch(data: Dictionary<any>) {
+    const fieldsToRemove = ['products', 'sections', 'signup_details', '_created', '_updated', '_etag'];
+
+    fieldsToRemove.forEach((x) => {
+        delete data[x];
+    });
+
+    return data;
+}

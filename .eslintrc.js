@@ -1,60 +1,60 @@
 module.exports = {
-    "env": {
-        "browser": true,
-        "es6": true,
-        "jasmine": true
+    'env': {
+        'browser': true,
+        'es6': true,
+        'jasmine': true
     },
-    "globals": {
-        "$": true,
-        "sectionNames": "readonly",
+    'globals': {
+        '$': true,
+        'sectionNames': 'readonly',
     },
     'extends': ['eslint:recommended', 'plugin:react/recommended', 'plugin:@typescript-eslint/recommended'],
     'parser': '@typescript-eslint/parser',
-    "parserOptions": {
-        "ecmaFeatures": {
-            "experimentalObjectRestSpread": true,
-            "jsx": true
+    'parserOptions': {
+        'ecmaFeatures': {
+            'experimentalObjectRestSpread': true,
+            'jsx': true
         },
-        "sourceType": "module"
+        'sourceType': 'module'
     },
-    "plugins": [
-        "react",
+    'plugins': [
+        'react',
         '@typescript-eslint',
     ],
-    "rules": {
+    'rules': {
         '@typescript-eslint/no-explicit-any': 0,
-        "indent": [
-            "error",
+        'indent': [
+            'error',
             4
         ],
-        "linebreak-style": [
-            "error",
-            "unix"
+        'linebreak-style': [
+            'error',
+            'unix'
         ],
-        "quotes": [
-            "error",
-            "single"
+        'quotes': [
+            'error',
+            'single'
         ],
-        "semi": [
-            "error",
-            "always"
+        'semi': [
+            'error',
+            'always'
         ],
-        "no-console": [
-            "error",
-            {"allow": ["warn", "error"]}
+        'no-console': [
+            'error',
+            {'allow': ['warn', 'error']}
         ],
-        "object-curly-spacing": ["error", "never"],
-        "react/no-deprecated": [
+        'object-curly-spacing': ['error', 'never'],
+        'react/no-deprecated': [
             1,
         ],
-        "react/jsx-no-target-blank": [
+        'react/jsx-no-target-blank': [
             0,
         ],
-        "react/display-name": [0]
+        'react/display-name': [0]
     },
-    "settings": {
-        "react": {
-            "version": "16.2"
+    'settings': {
+        'react': {
+            'version': '16.2'
         }
     }
 };
