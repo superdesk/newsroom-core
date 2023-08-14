@@ -387,7 +387,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view: any) => dispatch(setView(view)),
     closePreview: () => dispatch(previewItem(null)),
-    downloadMedia: (href: any, id: any, mimeType: any) => dispatch(downloadMedia(href, id)),
+    downloadMedia: (href: any, id: any) => dispatch(downloadMedia(href, id)),
 });
 
 const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(WireApp);
