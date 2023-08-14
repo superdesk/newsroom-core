@@ -842,7 +842,7 @@ def notify_agenda_topic_matches(item, users_dict, companies_dict):
 
     if topic_matches:
         push_agenda_item_notification("topic_matches", item=item, topics=topic_matches)
-        send_topic_notification_emails(item, topics, topic_matches, users_dict)
+        send_topic_notification_emails(item, topics, topic_matches, users_dict, companies_dict)
 
 
 def send_topic_notification_emails(item, topics, topic_matches, users, companies):
@@ -858,7 +858,7 @@ def send_topic_notification_emails(item, topics, topic_matches, users, companies
             if not user:
                 continue
 
-            company = companies[str(user.get("company"))]
+            company = companies.get(str(user.get("company")))
 
             section = topic.get("topic_type") or "wire"
             save_user_notifications(

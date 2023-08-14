@@ -294,7 +294,7 @@ def send_new_item_notification_email(user, topic_name, item, section="wire"):
 
 
 def _send_new_wire_notification_email(user, topic_name, item, section):
-    url = url_for("wire.item", _id=item["guid"], _external=True)
+    url = url_for("wire.item", _id=item.get("guid") or item["_id"], _external=True)
     recipients = [user["email"]]
     template_kwargs = dict(
         app_name=current_app.config["SITE_NAME"],
@@ -357,7 +357,7 @@ def send_history_match_notification_email(user, item, section):
 
 def _send_history_match_wire_notification_email(user, item, section):
     app_name = current_app.config["SITE_NAME"]
-    url = url_for("wire.item", _id=item["guid"], _external=True)
+    url = url_for("wire.item", _id=item.get("guid") or item["_id"], _external=True)
     recipients = [user["email"]]
     template_kwargs = dict(
         app_name=app_name,
