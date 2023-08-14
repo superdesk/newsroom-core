@@ -186,7 +186,48 @@ export function shortText(item: any, length: any = 40, config?: any) {
     return words.slice(0, length).join(' ') + (words.length > length ? '...' : '');
 }
 
-export function shortHighlightedtext(html: any, maxLength = 40) {
+/**
+ * Split text into an array of words
+ *
+ * @todo: Any changes to this code **must** be reflected in the python version as well
+ * @see superdesk-client-core:scripts/core/count-words.ts:countWords
+ * @see newsroom.utils.split_words
+ */
+function splitWords(str: string): Array<string> {
+    const strTrimmed = str.trim();
+
+    if (strTrimmed.length < 1) {
+        return [];
+    }
+
+    return strTrimmed
+        .replace(/\n/g, ' ') // replace newlines with spaces
+
+        // Remove spaces between two numbers
+        // 1 000 000 000 -> 1000000000
+        .replace(/([0-9]) ([0-9])/g, '$1$2')
+
+        // remove anything that is not a unicode letter, a space, comma or a number
+        .replace(/[^\p{L} 0-9,]/gu, '')
+
+        // replace two or more spaces with one space
+        .replace(/ {2,}/g, ' ')
+
+        .trim()
+        .split(' ');
+}
+
+/**
+ * Returns first paragraph with highlighted text, and truncates output to ``max_length`` words
+ *
+ * @todo Any changes to this code **must** be reflected in the python version as well
+ * @see newsroom.utils.short_highlighted_text
+ *
+ * @param {string} html - Original text
+ * @param {number} maxLength - Maximum number of words
+ * @returns {string}
+ */
+export function shortHighlightedtext(html: string, maxLength = 40) {
     const parser = new DOMParser();
     const doc: any = parser.parseFromString(html, 'text/html');
     const span = doc.querySelector('span.es-highlight');
@@ -199,7 +240,7 @@ export function shortHighlightedtext(html: any, maxLength = 40) {
 
     while (node && count < maxLength) {
         const content = node.textContent.trim();
-        const words = content.split(/(?= [A-Z])/).filter((w: any) => w);
+        const words = splitWords(content);
         const remainingCount = maxLength - count;
 
         if (words.length <= remainingCount) {
