@@ -822,7 +822,7 @@ def notify_wire_topic_matches(item, users_dict, companies_dict):
 
     if topic_matches:
         push_notification("topic_matches", item=item, topics=topic_matches)
-        send_topic_notification_emails(item, topics, topic_matches, users_dict)
+        send_topic_notification_emails(item, topics, topic_matches, users_dict, companies_dict)
 
 
 def notify_agenda_topic_matches(item, users_dict, companies_dict):
@@ -845,33 +845,55 @@ def notify_agenda_topic_matches(item, users_dict, companies_dict):
         send_topic_notification_emails(item, topics, topic_matches, users_dict)
 
 
-def send_topic_notification_emails(item, topics, topic_matches, users):
+def send_topic_notification_emails(item, topics, topic_matches, users, companies):
+    section_filters = superdesk.get_resource_service("section_filters").get_section_filters_dict()
+
     for topic in topics:
         if topic["_id"] not in topic_matches:
             continue
 
-        for user_id in topic.get("subscribers") or []:
-            user = users.get(str(user_id))
+        for subscriber in topic.get("subscribers") or []:
+            user = users.get(str(subscriber["user_id"]))
 
-            if user:
-                section = topic.get("topic_type") or "wire"
-                save_user_notifications(
-                    [
-                        UserNotification(
-                            user=user["_id"],
-                            item=item["_id"],
-                            resource=section,
-                            action="topic_matches",
-                            data=None,
-                        )
-                    ]
-                )
+            if not user:
+                continue
 
-                if user.get("receive_email"):
+            company = companies[str(user.get("company"))]
+
+            section = topic.get("topic_type") or "wire"
+            save_user_notifications(
+                [
+                    UserNotification(
+                        user=user["_id"],
+                        item=item["_id"],
+                        resource=section,
+                        action="topic_matches",
+                        data=None,
+                    )
+                ]
+            )
+
+            if user.get("receive_email"):
+                if subscriber.get("notification_type") == "scheduled":
+                    superdesk.get_resource_service("notification_queue").add_item_to_queue(
+                        user["_id"], section, topic["_id"], item
+                    )
+                else:
+                    search_service = superdesk.get_resource_service(
+                        "wire_search" if topic["topic_type"] == "wire" else "agenda"
+                    )
+                    query = search_service.get_topic_query(
+                        topic, user, company, section_filters, args={"es_highlight": 1, "ids": [item["_id"]]}
+                    )
+                    items = search_service.get_items_by_query(query, size=1)
+                    highlighted_item = item
+                    if items.count():
+                        highlighted_item = items[0]
+
                     send_new_item_notification_email(
                         user,
                         topic["label"],
-                        item=item,
+                        item=highlighted_item,
                         section=section,
                     )
 

@@ -20,7 +20,7 @@ from newsroom.utils import (
     get_public_contacts,
 )
 from newsroom.template_filters import is_admin_or_internal
-from newsroom.utils import url_for_agenda, query_resource
+from newsroom.utils import url_for_agenda
 from superdesk.logging import logger
 
 
@@ -140,7 +140,7 @@ def send_new_signup_email(user):
 def map_email_recipients_by_language(
     emails: List[str], template_name: str, ignore_preferences=False
 ) -> Dict[str, EmailGroup]:
-    users = {user["email"]: user for user in query_resource("users", lookup={"email": {"$in": emails}}) or []}
+    users = {user["email"]: user for user in get_resource_service("users").find(where={"email": {"$in": emails}}) or []}
     default_language = current_app.config["DEFAULT_LANGUAGE"]
     groups: Dict[str, EmailGroup] = {}
     default_html_template = get_language_template_name(template_name, default_language, "html")
