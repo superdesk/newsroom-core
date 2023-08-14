@@ -1,11 +1,10 @@
 from bson import ObjectId
 from superdesk import get_resource_service
-from flask import json, jsonify, abort, current_app as app, request, url_for
+from flask import json, jsonify, abort, current_app as app, url_for
 from flask_babel import gettext
 
 from newsroom.topics import blueprint
 from newsroom.topics.topics import get_user_topics as _get_user_topics
-from newsroom.utils import find_one
 from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required
 from newsroom.utils import get_json_or_400, get_entity_or_404
@@ -43,7 +42,11 @@ def update_topic(topic_id):
 
     # If notifications are enabled, check to see if user is configured to receive emails
     data.setdefault("subscribers", [])
-    if str(current_user["_id"]) in data["subscribers"]:
+
+    subscriber = next(
+        (subscriber for subscriber in data["subscribers"] if subscriber["user_id"] == current_user["_id"]), None
+    )
+    if subscriber is not None:
         user = get_resource_service("users").find_one(req=None, _id=current_user["_id"])
         if not user.get("receive_email"):
             return "", gettext(
@@ -57,10 +60,13 @@ def update_topic(topic_id):
         "filter": data.get("filter"),
         "navigation": data.get("navigation"),
         "company": current_user.get("company"),
-        "subscribers": [ObjectId(uid) for uid in data["subscribers"]],
+        "subscribers": data["subscribers"],
         "is_global": data.get("is_global", False),
         "folder": data.get("folder", None),
     }
+
+    for subscriber in updates["subscribers"]:
+        subscriber["user_id"] = ObjectId(subscriber["user_id"])
 
     if (
         original
@@ -93,34 +99,6 @@ def delete(topic_id):
         push_company_notification("topics")
     else:
         push_user_notification("topics")
-    return jsonify({"success": True}), 200
-
-
-@blueprint.route("/topics/<topic_id>/subscribe", methods=["POST", "DELETE"])
-@login_required
-def subscribe_to_topic(topic_id):
-    current_user = get_user(required=True)
-    topic = find_one("topics", _id=ObjectId(topic_id))
-
-    if not is_user_or_company_topic(topic, current_user):
-        abort(403)
-
-    subscribers = topic.get("subscribers") or []
-    currently_subscribed = current_user["_id"] in subscribers
-    topic_updated = False
-    if request.method == "POST" and not currently_subscribed:
-        subscribers.append(current_user["_id"])
-        topic_updated = True
-    elif request.method == "DELETE" and currently_subscribed:
-        subscribers = [subscriber for subscriber in subscribers if subscriber != current_user["_id"]]
-        topic_updated = True
-
-    if topic_updated:
-        # Use the ``update`` method, so we don't update the ``version_creator`` field unnecessarily
-        get_resource_service("topics").update(id=topic["_id"], updates={"subscribers": subscribers}, original=topic)
-
-        push_company_notification("topics")
-
     return jsonify({"success": True}), 200
 
 

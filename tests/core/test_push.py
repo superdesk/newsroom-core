@@ -298,7 +298,7 @@ def test_notify_topic_matches_for_new_item(client, app, mocker):
             json={
                 "label": "bar",
                 "query": "test",
-                "subscribers": [user],
+                "subscribers": [{"user_id": user, "notification_type": "real-time"}],
                 "is_global": False,
                 "topic_type": "wire",
             },
@@ -309,7 +309,7 @@ def test_notify_topic_matches_for_new_item(client, app, mocker):
             f"users/{user}/topics",
             json={
                 "label": "Sydney Weather",
-                "subscribers": [user],
+                "subscribers": [{"user_id": user, "notification_type": "real-time"}],
                 "is_global": False,
                 "topic_type": "wire",
                 "advanced": {
@@ -684,7 +684,7 @@ def test_send_notification_emails(client, app):
                 "label": "topic-1",
                 "query": "test",
                 "user": user_ids[0],
-                "subscribers": [user_ids[0]],
+                "subscribers": [{"user_id": user_ids[0], "notification_type": "real-time"}],
                 "is_global": False,
                 "topic_type": "wire",
             },
@@ -692,7 +692,7 @@ def test_send_notification_emails(client, app):
                 "label": "topic-2",
                 "query": "mock",
                 "user": user_ids[0],
-                "subscribers": [user_ids[0]],
+                "subscribers": [{"user_id": user_ids[0], "notification_type": "real-time"}],
                 "is_global": False,
                 "topic_type": "wire",
             },
