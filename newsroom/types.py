@@ -1,5 +1,6 @@
 from bson import ObjectId
-from typing import Dict, List, TypedDict
+from typing import Dict, List, TypedDict, Any
+from datetime import datetime
 
 
 class Product(TypedDict, total=False):
@@ -15,6 +16,24 @@ class ProductRef(TypedDict):
     section: str
 
 
+class NotificationSchedule(TypedDict, total=False):
+    timezone: str
+    times: List[str]
+    last_run_time: datetime
+
+
+class NotificationQueueTopic(TypedDict, total=False):
+    items: List[str]
+    topic_id: ObjectId
+    last_item_arrived: datetime
+    section: str
+
+
+class NotificationQueue(TypedDict):
+    user: ObjectId
+    topics: List[NotificationQueueTopic]
+
+
 class UserData(TypedDict, total=False):
     _id: ObjectId
     email: str
@@ -26,6 +45,7 @@ class UserData(TypedDict, total=False):
     is_validated: bool
     sections: Dict[str, bool]
     products: List[ProductRef]
+    notification_schedule: NotificationSchedule
 
 
 class User(UserData):
@@ -38,3 +58,27 @@ class Company(TypedDict, total=False):
     products: List[ProductRef]
     sections: Dict[str, bool]
     restrict_coverage_info: bool
+
+
+class TopicSubscriber(TypedDict):
+    user_id: ObjectId
+    notification_type: str
+
+
+class Topic(TypedDict):
+    _id: ObjectId
+    label: str
+    query: str
+    filter: Dict[str, Any]
+    created: Dict[str, Any]
+    user: ObjectId
+    company: ObjectId
+    is_global: bool
+    timezone_offset: int
+    topic_type: str
+    navigation: List[str]
+    original_creator: ObjectId
+    version_creator: ObjectId
+    folder: ObjectId
+    advanced: Dict[str, Any]
+    subscribers: List[TopicSubscriber]
