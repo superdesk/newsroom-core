@@ -11,6 +11,8 @@
 
 
 import logging
+from urllib.parse import urlparse
+
 from newsroom.web import NewsroomWebApp
 import newsroom.commands  # noqa
 
@@ -18,3 +20,6 @@ import newsroom.commands  # noqa
 logger = logging.getLogger(__name__)
 app = NewsroomWebApp("newsroom_celery")
 celery = app.celery
+
+# Set ``SERVER_NAME`` so ``url_for(_external=True)`` works
+app.config["SERVER_NAME"] = urlparse(app.config["CLIENT_URL"]).netloc or None
