@@ -57,9 +57,9 @@ Link: {{ item_url }}
             item_url=item_url,
         ),
         html_body=render_template_string(
-            """
-{% extends "new_item_notification.html" %}
-{% block content %}<h1>Albion Park Greyhound VIC TAB DIVS 1-2 Monday</h1>
+            """{% extends "new_item_notification.html" %}
+{% block content %}
+<h1>Albion Park Greyhound VIC TAB DIVS 1-2 Monday</h1>
 
 <p>HTML Body</p>
 
