@@ -838,7 +838,7 @@ class AgendaService(BaseSearchService):
 
         pass
 
-    def apply_filters(self, search):
+    def apply_filters(self, search, section_filters=None):
         """Generate and apply the different search filters
 
         :param newsroom.search.SearchQuery search: the search query instance
@@ -871,7 +871,7 @@ class AgendaService(BaseSearchService):
         search.query = agenda_query
 
         # Apply agenda based filters
-        self.apply_section_filter(search)
+        self.apply_section_filter(search, section_filters)
         self.apply_request_filter(search)
         self.apply_request_advanced_search(search)
 
@@ -1097,9 +1097,9 @@ class AgendaService(BaseSearchService):
             }
         }
         get_resource_service("section_filters").apply_section_filter(query, self.section)
-        return self.get_items_by_query(query, size=len(item_ids))
+        return self.get_agenda_items_by_query(query, size=len(item_ids))
 
-    def get_items_by_query(self, query, size=50):
+    def get_agenda_items_by_query(self, query, size=50):
         try:
             source = {"query": query}
 
@@ -1172,7 +1172,7 @@ class AgendaService(BaseSearchService):
             }
         }
 
-        agenda_items = self.get_items_by_query(query)
+        agenda_items = self.get_agenda_items_by_query(query)
         agenda_updated_notification_sent = False
 
         def update_coverage_details(coverage):
@@ -1536,7 +1536,7 @@ class AgendaService(BaseSearchService):
         self.apply_filters(search)
         set_saved_items_query(search.query, str(search.user["_id"]))
 
-        cursor = self.get_items_by_query(search.query, size=0)
+        cursor = self.get_agenda_items_by_query(search.query, size=0)
         return cursor.count() if cursor else 0
 
     def get_featured_stories(self, req, lookup):
