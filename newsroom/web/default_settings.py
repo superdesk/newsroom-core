@@ -174,6 +174,7 @@ CORE_APPS = [
     "newsroom.email_templates",
     "newsroom.company_admin",
     "newsroom.search",
+    "newsroom.notifications.send_scheduled_notifications",
 ]
 
 SITE_NAME = "AAP Newsroom"
@@ -311,6 +312,16 @@ CLIENT_LOCALE_FORMATS = {
     },
 }
 
+#: Default times for scheduled topic notifications
+#:
+#: .. versionadded: 2.5.0
+#:
+DEFAULT_SCHEDULED_NOTIFICATION_TIMES = [
+    "07:00",
+    "15:00",
+    "19:00",
+]
+
 # Client configuration
 CLIENT_CONFIG = {
     "debug": DEBUG,
@@ -340,6 +351,7 @@ CLIENT_CONFIG = {
             "agenda": ["name", "headline", "slugline", "description"],
         },
     },
+    "scheduled_notifications": {"default_times": DEFAULT_SCHEDULED_NOTIFICATION_TIMES},
 }
 
 # Enable iframely support for item body_html
@@ -391,6 +403,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "newsroom.commands.async_remove_expired_agenda",
         "schedule": crontab(hour=local_to_utc_hour(3), minute=0),  # Runs every day at 3am
     },
+    "newsroom:send_scheduled_notifications": {
+        "task": "newsroom.notifications.send_scheduled_notifications.send_scheduled_notifications",
+        "schedule": crontab(minute="*/1"),
+    },
 }
 
 MAX_EXPIRY_QUERY_LIMIT = os.environ.get("MAX_EXPIRY_QUERY_LIMIT", 100)
@@ -430,6 +446,9 @@ DATE_FORMAT_HEADER = "EEEE, dd/MM/yyyy"
 DATETIME_FORMAT_SHORT = "short"
 DATETIME_FORMAT_LONG = "dd/MM/yyyy HH:mm"
 AGENDA_EMAIL_LIST_DATE_FORMAT = "HH:mm (dd/MM/yyyy)"
+
+NOTIFICATION_EMAIL_TIME_FORMAT = "HH:mm a"
+NOTIFICATION_EMAIL_DATE_FORMAT = "MMMM d, yyyy"
 
 PREPEND_EMBARGOED_TO_WIRE_SEARCH = False
 
