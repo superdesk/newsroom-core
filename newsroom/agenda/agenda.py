@@ -1,4 +1,4 @@
-from typing import Dict, Set, Any, Optional
+from typing import Dict, Set, Any, Optional, List
 import logging
 from copy import deepcopy
 
@@ -16,7 +16,7 @@ from planning.common import (
 from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
 from superdesk import get_resource_service
-from superdesk.resource import Resource, not_enabled, not_analyzed, not_indexed
+from superdesk.resource import Resource, not_enabled, not_analyzed, not_indexed, string_with_analyzer
 from superdesk.utils import ListCursor
 from superdesk.metadata.item import metadata_schema
 
@@ -40,8 +40,8 @@ from newsroom.utils import (
 from newsroom.utils import get_local_date, get_end_date
 from datetime import datetime
 from newsroom.wire import url_for_wire
-from newsroom.search import BaseSearchService, SearchQuery, query_string, get_filter_query
-from newsroom.search_config import is_search_field_nested, get_nested_config
+from newsroom.search.service import BaseSearchService, SearchQuery, query_string, get_filter_query
+from newsroom.search.config import is_search_field_nested, get_nested_config
 from .utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD, push_agenda_item_notification
 
 
@@ -133,9 +133,10 @@ class AgendaResource(newsroom.Resource):
 
     # content metadata
     schema["name"] = metadata_schema["body_html"].copy()
-    schema["slugline"] = not_analyzed
+    schema["slugline"] = metadata_schema["body_html"].copy()
     schema["definition_short"] = metadata_schema["body_html"].copy()
     schema["definition_long"] = metadata_schema["body_html"].copy()
+    schema["description_text"] = metadata_schema["body_html"].copy()
     schema["headline"] = metadata_schema["body_html"].copy()
     schema["firstcreated"] = events_schema["firstcreated"]
     schema["version"] = events_schema["version"]
@@ -182,6 +183,7 @@ class AgendaResource(newsroom.Resource):
         "type": "list",
         "mapping": {
             "type": "nested",
+            "include_in_parent": True,  # Enabled so advanced search works across multiple fields
             "properties": {
                 "planning_id": not_analyzed,
                 "coverage_id": not_analyzed,
@@ -190,7 +192,7 @@ class AgendaResource(newsroom.Resource):
                 "workflow_status": not_analyzed,
                 "coverage_status": not_analyzed,
                 "coverage_provider": not_analyzed,
-                "slugline": not_analyzed,
+                "slugline": string_with_analyzer,
                 "delivery_id": not_analyzed,  # To point ot the latest published item
                 "delivery_href": not_analyzed,  # To point ot the latest published item
                 TO_BE_CONFIRMED_FIELD: {"type": "boolean"},
@@ -238,7 +240,7 @@ class AgendaResource(newsroom.Resource):
         "type": "list",
         "mapping": {
             "type": "nested",
-            "include_in_all": False,
+            "include_in_parent": True,
             "properties": {
                 "_id": not_analyzed,
                 "guid": not_analyzed,
@@ -606,28 +608,7 @@ def _remove_fields(source, fields):
 
 
 def planning_items_query_string(query, fields=None):
-    plan_query_string = query_string(query)
-
-    if fields:
-        plan_query_string["query_string"]["fields"] = fields
-    else:
-        plan_query_string["query_string"]["fields"] = ["planning_items.*"]
-
-    return plan_query_string
-
-
-def get_agenda_query(query, events_only=False):
-    if events_only:
-        return query_string(query)
-    else:
-        return {
-            "bool": {
-                "should": [
-                    query_string(query),
-                    nested_query("planning_items", planning_items_query_string(query), name="query"),
-                ]
-            },
-        }
+    return query_string(query, fields=fields or ["planning_items.*"])
 
 
 def is_events_only_access(user, company):
@@ -656,6 +637,26 @@ class AgendaService(BaseSearchService):
     limit_days_setting = None
     default_sort = [{"dates.start": "asc"}]
     default_page_size = 100
+
+    def get_advanced_search_fields(self, search: SearchQuery) -> List[str]:
+        fields = super().get_advanced_search_fields(search)
+
+        if "slugline" in fields:
+            # Add ``slugline`` field for Planning & Coverages too
+            fields.extend(["planning_items.slugline", "coverages.slugline"])
+
+        if "headline" in fields:
+            # Add ``headline`` field for Planning items too
+            fields.append("planning_items.headline")
+
+        if "description" in fields:
+            # Replace ``description`` alias with appropriate description fields
+            fields.remove("description")
+            fields.extend(
+                ["definition_short", "definition_long", "description_text", "planning_items.description_text"]
+            )
+
+        return fields
 
     def on_fetched(self, doc):
         self.enhance_items(doc[config.ITEMS])
@@ -851,6 +852,7 @@ class AgendaService(BaseSearchService):
         # Apply agenda based filters
         self.apply_section_filter(search)
         self.apply_request_filter(search)
+        self.apply_request_advanced_search(search)
 
         if not is_admin_or_internal(search.user):
             _remove_fields(search.source, PRIVATE_FIELDS)
@@ -926,7 +928,7 @@ class AgendaService(BaseSearchService):
             return
 
         if product.get("query"):
-            search.query["bool"]["should"].append(query_string(product["query"]))
+            search.query["bool"]["should"].append(self.query_string(product["query"]))
 
             if product.get("planning_item_query") and search.item_type != "events":
                 search.planning_items_should.append(planning_items_query_string(product.get("planning_item_query")))
@@ -944,7 +946,7 @@ class AgendaService(BaseSearchService):
                 if isinstance(q, dict):
                     # used for product testing
                     if q.get("query"):
-                        test_query["bool"]["should"].append(query_string(q.get("query")))
+                        test_query["bool"]["should"].append(self.query_string(q.get("query")))
 
                     if q.get("planning_item_query"):
                         test_query["bool"]["should"].append(
@@ -961,7 +963,9 @@ class AgendaService(BaseSearchService):
                 pass
 
             if not test_query["bool"]["should"]:
-                search.query["bool"]["filter"].append(get_agenda_query(search.args["q"], search.item_type == "events"))
+                search.query["bool"]["filter"].append(
+                    self.get_agenda_query(search.args["q"], search.item_type == "events")
+                )
 
         if search.args.get("id"):
             search.query["bool"]["filter"].append({"term": {"_id": search.args["id"]}})
@@ -1022,7 +1026,7 @@ class AgendaService(BaseSearchService):
             name="featured",
         )
         if req.args.get("q"):
-            query["bool"]["filter"].append(query_string(req.args["q"]))
+            query["bool"]["filter"].append(self.query_string(req.args["q"]))
             planning_items_query["nested"]["query"]["bool"]["filter"].append(planning_items_query_string(req.args["q"]))
 
         query["bool"]["filter"].append(planning_items_query)
@@ -1526,3 +1530,16 @@ class AgendaService(BaseSearchService):
         )
         featured_doc = get_resource_service("agenda_featured").find_one_for_date(local_date)
         return self.featured(req, lookup, featured_doc)
+
+    def get_agenda_query(self, query, events_only=False):
+        if events_only:
+            return self.query_string(query)
+        else:
+            return {
+                "bool": {
+                    "should": [
+                        self.query_string(query),
+                        nested_query("planning_items", planning_items_query_string(query), name="query"),
+                    ]
+                },
+            }

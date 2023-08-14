@@ -19,12 +19,20 @@ import {AGENDA_DATE_FORMAT_LONG, AGENDA_DATE_FORMAT_SHORT} from '../../utils';
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
 const CLICK_TIMEOUT = 200; // time when we wait for double click after click
+const EMPTY_ARRAY: Array<any> = [];
+const EMPTY_OBJECT = {};
+
+const itemIdsSelector = (state: any) => state.items || EMPTY_ARRAY;
+const itemsByIdSelector = (state: any) => state.itemsById || EMPTY_OBJECT;
 
 
-const itemsSelector = (state: any) => state.items.map((_id: any) => state.itemsById[_id]);
+const itemsSelector = createSelector(
+    [itemIdsSelector, itemsByIdSelector],
+    (ids, items) => ids.map((itemId: any) => items[itemId])
+);
+
 const activeDateSelector = (state: any) => get(state, 'agenda.activeDate');
 const activeGroupingSelector = (state: any) => get(state, 'agenda.activeGrouping');
-const itemsByIdSelector = (state: any) => get(state, 'itemsById', {});
 const featuredOnlySelector = (state: any) => get(state, 'agenda.featuredOnly', false);
 
 const groupedItemsSelector = createSelector(
@@ -200,12 +208,6 @@ class AgendaList extends React.Component<any, any> {
         }
     }
 
-    componentWillReceiveProps(nextProps: any) {
-        if (!nextProps.groupedItems) {
-            return;
-        }
-    }
-
     getListGroupDate(group: any) {
         if (get(group, 'date')) {
             const groupDate = moment(group.date, DATE_FORMAT);
@@ -232,6 +234,7 @@ class AgendaList extends React.Component<any, any> {
             readItems,
             refNode,
             onScroll,
+            listConfig
         } = this.props;
         const isExtended = activeView === EXTENDED_VIEW;
         const showShortcutActionIcons = shouldShowListShortcutActionIcons(this.props.listConfig, isExtended);
@@ -272,6 +275,7 @@ class AgendaList extends React.Component<any, any> {
                                             planningId={plan.guid}
                                             resetActioningItem={this.resetActioningItem}
                                             showShortcutActionIcons={showShortcutActionIcons}
+                                            listConfig = {listConfig}
                                         />
                                     )
                                 }

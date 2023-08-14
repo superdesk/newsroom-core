@@ -1,7 +1,7 @@
 import superdesk
 
 import newsroom
-from newsroom.search import query_string
+from newsroom.search.service import query_string
 
 
 class SectionFiltersResource(newsroom.Resource):

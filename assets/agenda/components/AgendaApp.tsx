@@ -89,10 +89,7 @@ class AgendaApp extends BaseApp {
         this.props.fetchItems();
     }
 
-    render() {
-        if (this.state.initialLoad){
-            return this.renderLoader();
-        }
+    renderPageContent() {
         if (this.props.errorMessage) {
             return (
                 <div className="wire-articles__item-wrap col-12">
@@ -167,27 +164,29 @@ class AgendaApp extends BaseApp {
                     <SelectedItemsBar
                         actions={this.props.actions}
                     />
-                    <nav className='content-bar navbar justify-content-start flex-nowrap flex-sm-wrap'>
+                    <nav className="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
                         {this.state.withSidebar && (
-                            <span
-                                className='content-bar__menu content-bar__menu--nav--open'
+                            <button
+                                className="content-bar__menu content-bar__menu--nav--open"
                                 ref={this.setOpenRef}
                                 title={gettext('Close filter panel')}
-                                aria-label={gettext('Close')}
-                                onClick={this.toggleSidebar}>
-                                <i className='icon--close-thin' />
-                            </span>
+                                aria-label={gettext('Close filter panel')}
+                                onClick={this.toggleSidebar}
+                            >
+                                <i className="icon--close-thin" />
+                            </button>
                         )}
 
                         {!this.state.withSidebar && !this.props.bookmarks && (
-                            <span
-                                className='content-bar__menu content-bar__menu--nav'
+                            <button
+                                className="content-bar__menu content-bar__menu--nav"
                                 ref={this.setCloseRef}
                                 title={gettext('Open filter panel')}
                                 aria-label={gettext('Open filter panel')}
-                                onClick={this.toggleSidebar}>
-                                <i className='icon--hamburger' />
-                            </span>
+                                onClick={this.toggleSidebar}
+                            >
+                                <i className="icon--hamburger" />
+                            </button>
                         )}
 
                         {this.props.bookmarks && (
@@ -197,6 +196,8 @@ class AgendaApp extends BaseApp {
                         <SearchBar
                             fetchItems={this.props.fetchItems}
                             setQuery={this.props.setQuery}
+                            toggleAdvancedSearchPanel={this.toggleAdvancedSearchPanel}
+                            toggleSearchTipsPanel={this.toggleSearchTipsPanel}
                         />
 
                         {showDatePicker && (

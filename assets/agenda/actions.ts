@@ -258,6 +258,8 @@ function search(state: any, next?: any) {
         timezone_offset: getTimezoneOffset(),
         featured: featuredFilter,
         itemType: itemTypeFilter,
+        advanced: !searchParams.advanced ? null : encodeURIComponent(JSON.stringify(searchParams.advanced)),
+        es_highlight: !searchParams.query && !searchParams.advancedSearch ? null : 1,
     };
 
     const queryString = Object.keys(params)
@@ -414,6 +416,15 @@ export function setPrintItem(item: any) {
  */
 export function downloadItems(items: any) {
     return renderModal('downloadItems', {items});
+}
+
+/**
+ * Personalize Home - display modal to personalize home
+ *
+ * @param {Array} items
+ */
+export function personalizeHome(items?: any) {
+    return renderModal('personalizeHome', {items});
 }
 
 export const REMOVE_NEW_ITEMS = 'REMOVE_NEW_ITEMS';

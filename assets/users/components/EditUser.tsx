@@ -79,9 +79,10 @@ const EditUserComponent: React.ComponentType<IProps> = ({
         : products.map((product: any) => product._id);
     const sections = companyId != null ? companySections[companyId] || [] : allSections;
     const companySectionIds = sections.map((section: any) => section._id);
-    const isAdmin = isUserAdmin(currentUser);
+    const currentUserIsAdmin = isUserAdmin(currentUser);
     const isCompanyAdmin = isUserCompanyAdmin(currentUser);
     const company = companies.map((value: any) => value.name);
+    const userIsAdmin = isUserAdmin(user);
 
     return (
         <div
@@ -105,7 +106,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
             <div className="list-item__preview-content">
                 {toolbar ? toolbar : (
                     <div className="list-item__preview-toolbar">
-                        <div>
+                        <div className="list-item__preview-toolbar-left">
                             <label className={`label label--${stateLabelDetails.colour} label--big label--rounded`}>
                                 {stateLabelDetails.text}
                             </label>
@@ -114,22 +115,38 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                     {gettext('admin')}
                                 </label>
                             )}
-                        </div>
-                        {(user._id == null || user.is_validated === true) ? null : (
-                            <button
-                                type="button"
-                                className="nh-button nh-button--tertiary nh-button--small"
-                                aria-label={gettext('Resend Invite')}
-                                onClick={(event: any) => {
-                                    event.preventDefault();
+                            {(user._id == null || user.is_validated === true) ? null : (
+                                <button
+                                    type="button"
+                                    className="icon-button icon-button--small icon-button--secondary"
+                                    aria-label={gettext('Resend Invite')}
+                                    title={gettext('Resend Invite')}
+                                    onClick={(event: any) => {
+                                        event.preventDefault();
 
-                                    if (confirm(gettext('Would you like to resend the invitation for {{ email }}?', {email: user.email}))) {
-                                        resendUserInvite();
-                                    }
-                                }}
-                            >
-                                {gettext('Resend Invite')}
-                            </button>
+                                        if (confirm(gettext('Would you like to resend the invitation for {{ email }}?', {email: user.email}))) {
+                                            resendUserInvite();
+                                        }
+                                    }}
+                                >
+                                    <i className="icon--refresh" role="presentation"></i>
+                                </button>
+                            )}
+                        </div>
+                        {(currentUserIsAdmin && user._id != null && user._id !== currentUser._id) && (
+                            <div className="list-item__preview-toolbar-right">
+                                <form method="POST" action={'/auth/impersonate'}>
+                                    <input type="hidden" name="user" value={user._id} />
+                                    <button
+                                        type="submit"
+                                        className="nh-button nh-button--tertiary nh-button--small"
+                                        aria-label={gettext('Impersonate User')}
+                                        data-test-id="impersonate-user-btn"
+                                    >
+                                        {gettext('Impersonate User')}
+                                    </button>
+                                </form>
+                            </div>
                         )}
                     </div>
                 )}
@@ -218,7 +235,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                             )}
                         </FormToggle>
 
-                        {hideFields.includes('sections') ? null : (
+                        {(userIsAdmin || hideFields.includes('sections')) ? null : (
                             <FormToggle
                                 title={gettext('Sections')}
                                 testId="toggle--sections"
@@ -238,11 +255,16 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                             </FormToggle>
                         )}
 
-                        {hideFields.includes('products') ? null : (
+                        {(userIsAdmin || hideFields.includes('products')) ? null : (
                             <FormToggle
                                 title={gettext('Products')}
                                 testId="toggle--products"
                             >
+                                {isCompanyAdmin ? <div className="products-list__heading d-flex justify-content-between align-items-center">
+                                    <button type='button' name='selectAllBtn' className='nh-button nh-button--tertiary nh-button--small' onClick={onChange} >
+                                        {gettext('Select All')}
+                                    </button>
+                                </div> : null}
                                 {sections.filter((section: any) => (
                                     companySectionIds.includes(section._id) &&
                                     get(user, `sections.${section._id}`) === true
@@ -326,7 +348,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                 id='resetPassword'
                                 onClick={onResetPassword} />
                         )}
-                        {user._id && (isAdmin||isCompanyAdmin) && user._id !== currentUser._id && <input
+                        {user._id && (currentUserIsAdmin||isCompanyAdmin) && user._id !== currentUser._id && <input
                             type='button'
                             className='nh-button nh-button--secondary'
                             value={gettext('Delete')}

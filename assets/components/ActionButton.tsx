@@ -35,6 +35,7 @@ class ActionButton extends React.Component<any, any> {
 
         return (
             <button
+                data-test-id={this.props.testId}
                 type='button'
                 className={this.props.className}
                 disabled={disabled}
@@ -57,6 +58,7 @@ class ActionButton extends React.Component<any, any> {
 }
 
 ActionButton.propTypes = {
+    testId: PropTypes.string,
     item: PropTypes.object,
     group: PropTypes.string,
     plan: PropTypes.oneOfType([

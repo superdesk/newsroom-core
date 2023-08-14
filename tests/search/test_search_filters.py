@@ -5,8 +5,8 @@ from eve.utils import ParsedRequest
 from content_api.errors import BadParameterValueError
 
 from newsroom import auth  # noqa
-from newsroom.search import SearchQuery, BaseSearchService
-from newsroom.search_config import init_nested_aggregation
+from newsroom.search.service import SearchQuery, BaseSearchService
+from newsroom.search.config import init_nested_aggregation
 from newsroom.utils import get_local_date
 from newsroom.wire.search import WireSearchResource
 
@@ -53,6 +53,7 @@ def test_apply_section_filter(client, app):
                 "default_operator": "AND",
                 "analyze_wildcard": query_string_settings["analyze_wildcard"],
                 "lenient": True,
+                "fields": ["*"],
             }
         } in search.query["bool"]["filter"]
 
@@ -65,6 +66,7 @@ def test_apply_section_filter(client, app):
                 "default_operator": "AND",
                 "analyze_wildcard": query_string_settings["analyze_wildcard"],
                 "lenient": True,
+                "fields": ["*"],
             }
         } in search.query["bool"]["filter"]
 
@@ -143,6 +145,7 @@ def test_apply_products_filter(client, app):
                         "default_operator": "AND",
                         "analyze_wildcard": query_string_settings["analyze_wildcard"],
                         "lenient": True,
+                        "fields": app.config["WIRE_SEARCH_FIELDS"],
                     }
                 } in search.query["bool"]["should"]
 
@@ -177,8 +180,9 @@ def test_apply_request_filter__query_string(client, app):
                 "default_operator": "AND",
                 "analyze_wildcard": query_string_settings["analyze_wildcard"],
                 "lenient": True,
+                "fields": app.config["WIRE_SEARCH_FIELDS"],
             }
-        } in search.query["bool"]["filter"]
+        } in search.query["bool"]["must"]
 
         search.args = {"q": "Sport AND Tennis", "default_operator": "OR"}
         service.apply_request_filter(search)
@@ -188,8 +192,9 @@ def test_apply_request_filter__query_string(client, app):
                 "default_operator": "OR",
                 "analyze_wildcard": query_string_settings["analyze_wildcard"],
                 "lenient": True,
+                "fields": app.config["WIRE_SEARCH_FIELDS"],
             }
-        } in search.query["bool"]["filter"]
+        } in search.query["bool"]["must"]
 
 
 def test_apply_request_filter__filters(client, app):

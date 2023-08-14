@@ -239,6 +239,20 @@ def test_filter_by_product_anonymous_user_gets_all(client, app):
     assert "_aggregations" in data
 
 
+def test_search_sort(client, app):
+    resp = client.get("/wire/search?sort=versioncreated:asc")
+    data = json.loads(resp.get_data())
+    assert "urn:localhost:weather" == data["_items"][0]["_id"]
+
+    resp = client.get("/wire/search?sort=versioncreated:desc")
+    data = json.loads(resp.get_data())
+    assert "urn:localhost:weather" == data["_items"][2]["_id"]
+
+    resp = client.get("/wire/search?q=weather+OR+flood+OR+waters&sort=_score")
+    data = json.loads(resp.get_data())
+    assert "urn:localhost:flood" == data["_items"][0]["_id"]
+
+
 def test_logged_in_user_no_product_gets_no_results(client, app):
     with client.session_transaction() as session:
         session["user"] = str(PUBLIC_USER_ID)

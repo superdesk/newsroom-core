@@ -89,3 +89,12 @@ export function addDefaultWireItems() {
         ],
     }]);
 }
+
+export function addAllWireItems() {
+    addResources([{
+        resource: 'items', use_resource_service: false, items: [
+            WIRE_ITEMS.syd_weather_1,
+            WIRE_ITEMS.bris_traffic_1,
+        ],
+    }]);
+}

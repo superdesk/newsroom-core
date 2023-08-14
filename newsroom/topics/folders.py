@@ -7,6 +7,7 @@ class FoldersResource(newsroom.Resource):
     resource_title = "topic_folders"
     resource_methods = ["GET"]
     item_methods = ["GET"]
+    collation = True
     datasource = {"source": "topic_folders", "default_sort": [("name", 1)]}
     schema = {
         "name": {"type": "string", "required": True},
@@ -14,7 +15,7 @@ class FoldersResource(newsroom.Resource):
         "section": {
             "type": "string",
             "required": True,
-            "allowed": ["wire", "agenda"],
+            "allowed": ["wire", "agenda", "monitoring"],
         },
     }
 

@@ -8,6 +8,10 @@ import {
     SELECT_MENU_ITEM,
     SELECT_PROFILE_MENU,
     SET_TOPIC_EDITOR_FULLSCREEN,
+    RECIEVE_FOLDERS,
+    TOPIC_UPDATED,
+    FOLDER_UPDATED,
+    FOLDER_DELETED,
 } from './actions';
 
 import {RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID, ADD_EDIT_USERS} from 'actions';
@@ -33,6 +37,7 @@ const initialState: any = {
     selectedItem: null,
     editorFullscreen: false,
     locators: [],
+    folders: [],
 };
 
 export default function itemReducer(state: any = initialState, action: any) {
@@ -189,6 +194,42 @@ export default function itemReducer(state: any = initialState, action: any) {
             ]
         };
     }
+
+    case RECIEVE_FOLDERS:
+        return {
+            ...state,
+            folders: action.payload,
+        };
+
+    case TOPIC_UPDATED:
+        return {
+            ...state,
+            topics: state.topics.map((topic: any) => {
+                if (topic._id !== action.payload.topic._id) {
+                    return topic;
+                }
+
+                return {...topic, ...action.payload.updates};
+            }),
+        };
+
+    case FOLDER_UPDATED:
+        return {
+            ...state,
+            folders: state.folders.map((folder: any) => {
+                if (folder._id !== action.payload.folder._id) {
+                    return folder;
+                }
+
+                return {...folder, ...action.payload.updates};
+            }),
+        };
+
+    case FOLDER_DELETED:
+        return {
+            ...state,
+            folders: state.folders.filter((folder: any) => folder._id !== action.payload.folder._id),
+        };
 
     default:
         return state;

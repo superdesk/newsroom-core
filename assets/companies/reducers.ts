@@ -31,7 +31,7 @@ const initialState: any = {
     sections: [],
     companyTypes: [],
     apiEnabled: false,
-    search: searchReducer(),
+    search: searchReducer(undefined, undefined, 'settings'),
 };
 
 function setupCompanies(companyList: any, state: any) {
@@ -200,6 +200,7 @@ export default function companyReducer(state: any = initialState, action: any) {
             apiEnabled: action.data.api_enabled || false,
             ssoEnabled: action.data.sso_enabled || false,
             ui_config: action.data.ui_config,
+            countries: action.data.countries,
         };
 
         return setupCompanies(action.data.companies, nextState);
@@ -216,7 +217,7 @@ export default function companyReducer(state: any = initialState, action: any) {
     }
 
     default: {
-        const search = searchReducer(state.search, action);
+        const search = searchReducer(state.search, action, 'settings');
 
         if (search !== state.search) {
             return {...state, search};

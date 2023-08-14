@@ -10,7 +10,7 @@ import newsroom
 from newsroom.products.products import get_products_by_navigation
 from newsroom.settings import get_setting
 from newsroom.utils import get_local_date, get_end_date
-from newsroom.search import BaseSearchService, SearchQuery, query_string
+from newsroom.search.service import BaseSearchService, SearchQuery
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +89,6 @@ def items_query(ignore_latest=False):
 
 class WireSearchService(BaseSearchService):
     section = "wire"
-    default_advanced_search_fields = ["headline", "slugline", "body_html"]
 
     def get_bookmarks_count(self, user_id):
         req = ParsedRequest()
@@ -173,7 +172,7 @@ class WireSearchService(BaseSearchService):
             search.query["bool"]["should"].append({"term": {"products.code": product["sd_product_id"]}})
 
         if product.get("query"):
-            search.query["bool"]["should"].append(query_string(product["query"]))
+            search.query["bool"]["should"].append(self.query_string(product["query"]))
 
         search.query["bool"]["minimum_should_match"] = 1
 
@@ -202,7 +201,7 @@ class WireSearchService(BaseSearchService):
             navigation_filter = {"bool": {"should": [], "minimum_should_match": 1}}
             for product in products:
                 if product.get("query"):
-                    navigation_filter["bool"]["should"].append(query_string(product.get("query")))
+                    navigation_filter["bool"]["should"].append(self.query_string(product.get("query")))
 
             if navigation_filter["bool"]["should"]:
                 aggs.setdefault("navigations", {}).setdefault("filters", {}).setdefault("filters", {})[
@@ -251,6 +250,7 @@ class WireSearchService(BaseSearchService):
                     ],
                     "filter": [{"term": {"_id": item_id}}],
                     "should": [],
+                    "must": [],
                 }
             },
         )
@@ -279,7 +279,7 @@ class WireSearchService(BaseSearchService):
         if search.args.get("newsOnly") and not (search.args.get("navigation") or search.args.get("product_type")):
             news_only_filter = get_setting("news_only_filter")
             if news_only_filter:
-                search.query["bool"]["must_not"].append(query_string(news_only_filter))
+                search.query["bool"]["must_not"].append(self.query_string(news_only_filter))
             elif app.config.get("NEWS_ONLY_FILTERS"):
                 for f in app.config.get("NEWS_ONLY_FILTERS", []):
                     search.query["bool"]["must_not"].append(f)
@@ -299,7 +299,7 @@ class WireSearchService(BaseSearchService):
             query["bool"]["should"].append({"term": {"products.code": product["sd_product_id"]}})
 
         if product.get("query"):
-            query["bool"]["should"].append(query_string(product["query"]))
+            query["bool"]["should"].append(self.query_string(product["query"]))
 
         query["bool"]["minimum_should_match"] = 1
         query["bool"]["must_not"].append({"term": {"pubstatus": "canceled"}})

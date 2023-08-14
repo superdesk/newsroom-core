@@ -18,6 +18,8 @@ import {
     getName,
     isWatched,
     getDescription,
+    getHighlightedDescription,
+    getHighlightedName,
     getInternalNote,
 } from '../utils';
 import ActionMenu from '../../components/ActionMenu';
@@ -125,11 +127,10 @@ class AgendaListItem extends React.Component<any, any> {
     }
 
     renderListItem(isMobile: any, children: any) {
-        const {item, isExtended, group, planningId} = this.props;
+        const {item, isExtended, group, planningId, listConfig} = this.props;
         const classes = this.getClassNames(isExtended);
         const planningItem = (get(item, 'planning_items') || []).find((p: any) => p.guid === planningId) || {};
-        const description = getDescription(item, planningItem);
-
+        const description =item.es_highlight ? getHighlightedDescription(item, planningItem) : getDescription(item,planningItem);
         // Show headline for adhoc planning items
         const showHeadline = !item.event && get(item, 'headline.length', 0) > 0;
 
@@ -154,10 +155,13 @@ class AgendaListItem extends React.Component<any, any> {
 
                             <span className={
                                 classNames({'wire-articles__item__meta-time': showHeadline})}>
-                                {getName(item)}</span>
+                                {item.es_highlight ?  <div
+                                    dangerouslySetInnerHTML={({__html: getHighlightedName(item)})}/> : getName(item)}</span>
                             {showHeadline && <span
                                 className='wire-articles__item__text wire-articles__item__text--large wire-articles__item__text--headline'>
-                                {item.headline}</span>}
+                                {item.es_highlight && item.es_highlight.headline ? <div
+                                    dangerouslySetInnerHTML={({__html: item.es_highlight.headline && item.es_highlight.headline[0]})}
+                                /> : item.headline}</span>}
                         </h4>
 
                         {!isMobile ? null : (
@@ -174,11 +178,14 @@ class AgendaListItem extends React.Component<any, any> {
                             planningItem={planningItem}
                             isMobilePhone={isMobile}
                             user={this.props.user}
+                            listConfig = {listConfig}
                         />
 
                         {(isMobile || isExtended) && description && (
                             <p className="wire-articles__item__text">
-                                <PlainText text={description} />
+                                {item.es_highlight && item.es_highlight ? <span
+                                    dangerouslySetInnerHTML={({__html: description})}
+                                /> : <PlainText text={description} />}
                             </p>
                         )}
                     </div>
@@ -288,6 +295,7 @@ AgendaListItem.propTypes = {
     resetActioningItem: PropTypes.func,
     planningId: PropTypes.string,
     showShortcutActionIcons: PropTypes.bool,
+    listConfig: PropTypes.object,
 };
 
 export default AgendaListItem;

@@ -180,7 +180,7 @@ def test_push_parsed_event(client, app):
     event = deepcopy(test_event)
     client.post("/push", data=json.dumps(event), content_type="application/json")
     parsed = get_entity_or_404(event["guid"], "agenda")
-    assert type(parsed["firstcreated"]) == datetime
+    assert isinstance(parsed["firstcreated"], datetime)
     assert parsed["dates"]["tz"] == "Australia/Sydney"
     assert parsed["dates"]["end"] == datetime.strptime("2018-05-28T05:00:00+0000", "%Y-%m-%dT%H:%M:%S+0000").replace(
         tzinfo=pytz.UTC
@@ -214,7 +214,7 @@ def test_push_cancelled_event(client, app):
     resp = client.post("/push", data=json.dumps(event), content_type="application/json")
     assert resp.status_code == 200
     parsed = get_entity_or_404(event["guid"], "agenda")
-    assert type(parsed["firstcreated"]) == datetime
+    assert isinstance(parsed["firstcreated"], datetime)
     assert 1 == len(parsed["event"]["event_contact_info"])
     assert 1 == len(parsed["location"])
     assert parsed["event"]["pubstatus"] == "cancelled"
@@ -235,7 +235,7 @@ def test_push_updated_event(client, app):
     }
     client.post("/push", data=json.dumps(event), content_type="application/json")
     parsed = get_entity_or_404(event["guid"], "agenda")
-    assert type(parsed["firstcreated"]) == datetime
+    assert isinstance(parsed["firstcreated"], datetime)
     assert 1 == len(parsed["event"]["event_contact_info"])
     assert 1 == len(parsed["location"])
     assert parsed["dates"]["end"].day == 30
@@ -266,7 +266,7 @@ def test_push_parsed_planning_for_an_existing_event(client, app):
     event["guid"] = "foo4"
     client.post("/push", data=json.dumps(event), content_type="application/json")
     parsed = get_entity_or_404(event["guid"], "agenda")
-    assert type(parsed["firstcreated"]) == datetime
+    assert isinstance(parsed["firstcreated"], datetime)
     assert 1 == len(parsed["event"]["event_contact_info"])
     assert 1 == len(parsed["location"])
 
@@ -308,7 +308,7 @@ def test_push_coverages_with_different_dates_for_an_existing_event(client, app):
     event["guid"] = "foo4"
     client.post("/push", data=json.dumps(event), content_type="application/json")
     parsed = get_entity_or_404(event["guid"], "agenda")
-    assert type(parsed["firstcreated"]) == datetime
+    assert isinstance(parsed["firstcreated"], datetime)
     assert 1 == len(parsed["event"]["event_contact_info"])
     assert 1 == len(parsed["location"])
 
@@ -345,7 +345,7 @@ def test_push_planning_with_different_dates_for_an_existing_event(client, app):
     event["guid"] = "foo4"
     client.post("/push", data=json.dumps(event), content_type="application/json")
     parsed = get_entity_or_404(event["guid"], "agenda")
-    assert type(parsed["firstcreated"]) == datetime
+    assert isinstance(parsed["firstcreated"], datetime)
     assert 1 == len(parsed["event"]["event_contact_info"])
     assert 1 == len(parsed["location"])
 
@@ -376,7 +376,7 @@ def test_push_cancelled_planning_for_an_existing_event(client, app):
     event["guid"] = "foo5"
     client.post("/push", data=json.dumps(event), content_type="application/json")
     parsed = get_entity_or_404(event["guid"], "agenda")
-    assert type(parsed["firstcreated"]) == datetime
+    assert isinstance(parsed["firstcreated"], datetime)
     assert 1 == len(parsed["event"]["event_contact_info"])
     assert 1 == len(parsed["location"])
 
@@ -413,7 +413,7 @@ def test_push_parsed_adhoc_planning_for_an_non_existing_event(client, app):
 
     client.post("/push", data=json.dumps(planning), content_type="application/json")
     parsed = get_entity_or_404("bar3", "agenda")
-    assert type(parsed["firstcreated"]) == datetime
+    assert isinstance(parsed["firstcreated"], datetime)
     assert 2 == len(parsed["coverages"])
     assert 1 == len(parsed["planning_items"])
     assert parsed["headline"] == "Planning headline"

@@ -8,14 +8,17 @@ import {gettext, notify} from 'utils';
 import {canUserEditTopic} from 'topics/utils';
 import types from 'wire/types';
 
-import TopicForm from './TopicForm';
-import TopicParameters from './TopicParameters';
+import {topicEditorFullscreenSelector, sectionSelector} from 'user-profile/selectors';
+import {filterGroupsByIdSelector, navigationsByIdSelector} from '../selectors';
+import {getAdvancedSearchFields} from '../utils';
+
 import {fetchNavigations} from 'navigations/actions';
 import {submitFollowTopic as submitWireFollowTopic, subscribeToTopic, unsubscribeToTopic} from 'search/actions';
-import {submitFollowTopic as submitProfileFollowTopic, hideModal, setTopicEditorFullscreen} from 'user-profile/actions';
-import {topicEditorFullscreenSelector} from 'user-profile/selectors';
+import {submitFollowTopic as submitProfileFollowTopic, hideModal, setTopicEditorFullscreen, fetchFolders} from 'user-profile/actions';
 import {loadMyWireTopic} from 'wire/actions';
 import {loadMyAgendaTopic} from 'agenda/actions';
+
+import TopicForm from './TopicForm';
 import EditPanel from 'components/EditPanel';
 import AuditInformation from 'components/AuditInformation';
 import {ToolTip} from 'ui/components/ToolTip';
@@ -31,16 +34,28 @@ class TopicEditor extends React.Component<any, any> {
             valid: false,
             tabs: [],
             activeTab: 'topic',
+            folders: [],
         };
 
         this.onChangeHandler = this.onChangeHandler.bind(this);
         this.onSubscribeChanged = this.onSubscribeChanged.bind(this);
         this.saveTopic = this.saveTopic.bind(this);
         this.handleTabClick = this.handleTabClick.bind(this);
+        this.onFolderChange = this.onFolderChange.bind(this);
+
+        this.toggleNavigation = this.toggleNavigation.bind(this);
+        this.clearSearchQuery = this.clearSearchQuery.bind(this);
+        this.toggleAdvancedSearchField = this.toggleAdvancedSearchField.bind(this);
+        this.setAdvancedSearchKeywords = this.setAdvancedSearchKeywords.bind(this);
+        this.clearAdvancedSearchParams = this.clearAdvancedSearchParams.bind(this);
+        this.toggleFilter = this.toggleFilter.bind(this);
+        this.setCreatedFilter = this.setCreatedFilter.bind(this);
+        this.resetFilter = this.resetFilter.bind(this);
     }
 
     componentDidMount() {
         this.props.fetchNavigations();
+        this.reloadFolders(this.props.topic != null && this.props.topic.is_global);
 
         if (this.props.topic != null) {
             this.changeTopic(this.props.topic);
@@ -53,8 +68,8 @@ class TopicEditor extends React.Component<any, any> {
         }
     }
 
-    handleTabClick(event: any) {
-        this.setState({activeTab: event.target.name});
+    handleTabClick(tabName: string) {
+        this.setState({activeTab: tabName});
     }
 
     changeTopic(topic: any) {
@@ -82,9 +97,18 @@ class TopicEditor extends React.Component<any, any> {
 
     updateFormValidity(topic: any) {
         const original = get(this.props, 'topic') || {};
-        const isDirty = ['label', 'notifications', 'is_global'].some(
-            (field: any) => get(original, field) !== get(topic, field)
-        ) || !isEqual(original.subscribers, topic.subscribers);
+        const isDirty = [
+            'label',
+            'notifications',
+            'is_global',
+            'folder',
+            'navigation',
+            'query',
+            'advanced',
+            'filter',
+            'created'
+        ].some((field) => get(original, field) !== get(topic, field))
+            || !isEqual(original.subscribers, topic.subscribers);
 
         if (!topic.label) {
             // The topic must have a label so disable the save button
@@ -105,6 +129,11 @@ class TopicEditor extends React.Component<any, any> {
             const value = ['notifications', 'is_global'].includes(field) ?
                 !get(topic, field) :
                 event.target.value;
+
+            if (field === 'is_global') {
+                topic.folder = null;
+                this.reloadFolders(value);
+            }
 
             set(topic, field, value);
             this.setState({topic});
@@ -130,6 +159,15 @@ class TopicEditor extends React.Component<any, any> {
 
         this.setState({topic});
         this.props.onTopicChanged();
+    }
+
+    onFolderChange(folder: any) {
+        const topic = {...this.state.topic};
+
+        topic.folder = folder ? folder._id : null;
+
+        this.setState({topic});
+        this.updateFormValidity(topic);
     }
 
     saveTopic(event: any) {
@@ -196,6 +234,120 @@ class TopicEditor extends React.Component<any, any> {
         }
     }
 
+    toggleNavigation(navigation: any) {
+        this.setState((prevState: any) => ({
+            topic: {
+                ...prevState.topic,
+                navigation: prevState.topic.navigation.filter((navId: any) => navId !== navigation._id)
+            },
+        }), () => {
+            this.updateFormValidity(this.state.topic);
+        });
+    }
+
+    clearSearchQuery() {
+        this.setState((prevState: any) => ({
+            topic: {
+                ...prevState.topic,
+                query: '',
+            },
+        }), () => {
+            this.updateFormValidity(this.state.topic);
+        });
+    }
+
+    toggleAdvancedSearchField(field: any) {
+        this.setState((prevState: any) => {
+            const topic = cloneDeep(prevState.topic);
+
+            topic.advanced.fields = (topic.advanced.fields || []).includes(field) ?
+                topic.advanced.fields.filter((fieldName: any) => fieldName !== field) :
+                [...topic.advanced.fields, field];
+
+            if (!topic.advanced.fields.length) {
+                // At least 1 field must be selected
+                return {};
+            }
+
+            return {topic: topic};
+        }, () => {
+            this.updateFormValidity(this.state.topic);
+        });
+    }
+
+    setAdvancedSearchKeywords(field: any, keywords: any) {
+        this.setState((prevState: any) => ({
+            topic: {
+                ...prevState.topic,
+                advanced: {
+                    ...prevState.topic.advanced,
+                    [field]: keywords,
+                },
+            },
+        }), () => {
+            this.updateFormValidity(this.state.topic);
+        });
+    }
+
+    clearAdvancedSearchParams() {
+        this.setState((prevState: any) => ({
+            topic: {
+                ...prevState.topic,
+                advanced: {
+                    all: '',
+                    any: '',
+                    exclude: '',
+                    fields: ['headline', 'slugline', 'body_html'],
+                },
+            },
+        }), () => {
+            this.updateFormValidity(this.state.topic);
+        });
+    }
+
+    toggleFilter(key: any, value: any) {
+        this.setState((prevState: any) => ({
+            topic: {
+                ...prevState.topic,
+                filter: {
+                    ...prevState.topic.filter,
+                    [key]: prevState.topic.filter[key].filter((filterValue: any) => filterValue !== value),
+                },
+            },
+        }), () => {
+            this.updateFormValidity(this.state.topic);
+        });
+    }
+
+    setCreatedFilter(createdFilter: any) {
+        this.setState((prevState: any) => ({
+            topic: {
+                ...prevState.topic,
+                created: createdFilter,
+            },
+        }), () => {
+            this.updateFormValidity(this.state.topic);
+        });
+    }
+
+    resetFilter() {
+        this.setState((prevState: any) => ({
+            topic: {
+                ...prevState.topic,
+                filter: null,
+                created: null,
+            },
+        }), () => {
+            this.updateFormValidity(this.state.topic);
+        });
+    }
+
+    reloadFolders(global: any) {
+        this.props.fetchFolders(global).then((folders: any) => {
+            this.setState({folders: folders.filter((folder: any) => folder.section === this.props.section)});
+        });
+    }
+
     render() {
         // Wait for navigations to be loaded
         if (this.props.isLoading) {
@@ -217,6 +369,8 @@ class TopicEditor extends React.Component<any, any> {
 
         return (
             <div
+                role="dialog"
+                aria-label={this.getTitle()}
                 data-test-id="user-topic-editor"
                 className={showTabs ? 'list-item__preview' : containerClasses}
             >
@@ -251,17 +405,16 @@ class TopicEditor extends React.Component<any, any> {
                                         className={`nav-link ${this.state.activeTab === tab.name && 'active'}`}
                                         href='#'
                                         title={tab.tooltip}
-                                        onClick={this.handleTabClick}>{tab.label}
+                                        onClick={() => this.handleTabClick(tab.name)}
+                                    >
+                                        {tab.label}
                                     </a>
                                 </ToolTip>
                             </li>
                         ))}
                     </ul>
                 )}
-                <div className={classNames(
-                    'list-item__preview-form',
-                    {'list-item__preview-form--no-padding': this.state.activeTab === 'subscribers'}
-                )}>
+                <div className="list-item__preview-content">
                     {this.state.activeTab === 'topic' && updatedTopic && (
                         <React.Fragment>
                             <TopicForm
@@ -272,10 +425,22 @@ class TopicEditor extends React.Component<any, any> {
                                 onChange={this.onChangeHandler}
                                 onSubscribeChanged={this.onSubscribeChanged}
                                 readOnly={isReadOnly}
-                            />
-                            <TopicParameters
-                                topic={updatedTopic}
-                                navigations={this.props.navigations}
+                                folders={this.state.folders}
+                                onFolderChange={this.onFolderChange}
+
+                                user={this.props.user}
+                                navigations={this.props.navigationsById}
+                                filterGroups={this.props.filterGroups}
+
+                                toggleNavigation={this.toggleNavigation}
+                                clearSearchQuery={this.clearSearchQuery}
+                                toggleAdvancedSearchField={this.toggleAdvancedSearchField}
+                                setAdvancedSearchKeywords={this.setAdvancedSearchKeywords}
+                                clearAdvancedSearchParams={this.clearAdvancedSearchParams}
+                                toggleFilter={this.toggleFilter}
+                                setCreatedFilter={this.setCreatedFilter}
+                                resetFilter={this.resetFilter}
+                                availableFields={this.props.availableFields}
                             />
                         </React.Fragment>
                     )}
@@ -328,6 +493,7 @@ TopicEditor.propTypes = {
     userId: PropTypes.string,
     isLoading: PropTypes.bool,
     navigations: PropTypes.arrayOf(PropTypes.object),
+    navigationsById: PropTypes.object,
     fetchNavigations: PropTypes.func,
     closeEditor: PropTypes.func,
     saveTopic: PropTypes.func,
@@ -340,6 +506,11 @@ TopicEditor.propTypes = {
     isAdmin: PropTypes.bool,
     companyUsers: PropTypes.array,
     user: PropTypes.object,
+    fetchFolders: PropTypes.func,
+    section: PropTypes.string,
+
+    filterGroups: PropTypes.object,
+    availableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 const mapStateToProps = (state: any) => ({
@@ -348,6 +519,11 @@ const mapStateToProps = (state: any) => ({
     navigations: state.navigations || [],
     editorFullscreen: topicEditorFullscreenSelector(state),
     companyUsers: state.monitoringProfileUsers || [],
+
+    navigationsById: navigationsByIdSelector(state),
+    filterGroups: filterGroupsByIdSelector(state),
+    availableFields: getAdvancedSearchFields(sectionSelector(state)),
+    section: sectionSelector(state),
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
@@ -360,6 +536,7 @@ const mapDispatchToProps = (dispatch: any) => ({
         dispatch(loadMyAgendaTopic(topic._id)) :
         dispatch(loadMyWireTopic(topic._id)),
     setTopicEditorFullscreen: (fullscreen: any) => dispatch(setTopicEditorFullscreen(fullscreen)),
+    fetchFolders: (global: boolean) => dispatch(fetchFolders(global, true)),
 });
 
 const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(TopicEditor);

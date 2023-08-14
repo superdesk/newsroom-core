@@ -18,7 +18,7 @@ ELASTIC_PREFIX = "CONTENTAPI_ELASTICSEARCH"
 
 SCHEMA_VERSIONS = {
     "wire": 3,
-    "agenda": 4,
+    "agenda": 5,
 }
 
 logging.basicConfig()

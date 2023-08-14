@@ -9,7 +9,7 @@ function CheckboxInput({name, label, onChange, value, labelClass, readOnly}: any
     }
 
     return (
-        <div className='form-check' tabIndex={-1} data-test-id={`field-${name}`}>
+        <div className={classNames('form-check', {'form-check--checked': value})} tabIndex={-1} data-test-id={`field-${name}`}>
             <input type="checkbox"
                 name={name}
                 className="form-check-input"

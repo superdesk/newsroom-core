@@ -220,3 +220,99 @@ export function pushNotification(push: any): any {
         }
     };
 }
+
+function getFoldersUrl(state: any, global: any, id?: any) {
+    const baseUrl = global ?
+        `/api/companies/${state.company}/topic_folders` :
+        `/api/users/${state.user._id}/topic_folders`;
+
+    return id != null ? `${baseUrl}/${id}` : baseUrl;
+}
+
+function mergeUpdates(updates: any, response: any) {
+    updates._id = response._id;
+    updates._etag = response._etag;
+    updates._status = response._status;
+    updates._updated = response._updated;
+}
+
+export const FOLDER_UPDATED = 'FOLDER_UPDATED';
+export function saveFolder(folder: any, data: any, global: any) {
+    return (dispatch: any, getState: any) => {
+        const state = getState();
+        const url = getFoldersUrl(state, global, folder._id);
+
+        if (folder._etag) {
+            const updates = {...data};
+
+            return server.patch(url, updates, folder._etag)
+                .then(() => {
+                    dispatch(fetchFolders(global));
+                });
+        } else {
+            const payload = {...data, section: state.selectedMenu === 'events' ? 'agenda' : 'wire'};
+
+            return server.post(url, payload)
+                .then(() => {
+                    dispatch(fetchFolders(global));
+                });
+        }
+    };
+}
+
+export const FOLDER_DELETED = 'FOLDER_DELETED';
+export function deleteFolder(folder: any, global: boolean, deleteTopics?: boolean) {
+    return (dispatch: any, getState: any) => {
+        const state = getState();
+        const url = getFoldersUrl(state, global, folder._id);
+
+        if (!window.confirm(gettext('Are you sure you want to delete folder?'))) {
+            return;
+        }
+
+        return server.del(url, {topics: deleteTopics}, folder._etag)
+            .then(() => dispatch({type: FOLDER_DELETED, payload: {folder}}));
+    };
+}
+
+export const RECIEVE_FOLDERS = 'RECIEVE_FOLDERS';
+
+/**
+ * @param {bool} global - fetch company or user folders
+ * @param {bool} skipDispatch - if true it won't replace folders in store
+ */
+export function fetchFolders(global: boolean, skipDispatch?: boolean) {
+    return (dispatch: any, getState: any) => {
+        const state = getState();
+        const url = getFoldersUrl(state, global);
+
+        return server.get(url).then((res) => {
+            if (skipDispatch) {
+                return res._items;
+            }
+
+            dispatch({type: RECIEVE_FOLDERS, payload: res._items});
+        }, (reason) => {
+            console.error(reason);
+            return Promise.reject();
+        });
+    };
+}
+
+export const TOPIC_UPDATED = 'TOPIC_UPDATED';
+export function moveTopic(topicId: any, folder: any) {
+    return (dispatch: any, getState: any) => {
+        const updates = {
+            folder: folder != null ? folder._id : null,
+        };
+
+        const state = getState();
+        const topic = state.topics.find((topic: any) => topic._id === topicId);
+        const url = `/api/users/${topic.user}/topics/${topicId}`;
+
+        return server.patch(url, updates, topic._etag).then((response) => {
+            mergeUpdates(updates, response);
+            dispatch({type: TOPIC_UPDATED, payload: {topic, updates}});
+        });
+    };
+}

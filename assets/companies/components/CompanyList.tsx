@@ -9,7 +9,7 @@ import {companiesSubscriberIdEnabled} from 'ui/selectors';
 import CompanyListItem from './CompanyListItem';
 
 
-function CompanyList({companies, selectCompany, activeCompanyId, companyTypes, showSubscriberId}: any) {
+function CompanyList({companies, selectCompany, activeCompanyId, companyTypes, showSubscriberId, countries}: any) {
     const list = companies.map((company: any) =>
         <CompanyListItem
             key={company._id}
@@ -18,6 +18,7 @@ function CompanyList({companies, selectCompany, activeCompanyId, companyTypes, s
             isActive={activeCompanyId===company._id}
             type={companyTypes.find((ctype: any) => ctype.id === company.company_type)}
             showSubscriberId={showSubscriberId}
+            countries = {countries}
         />
     );
 
@@ -56,6 +57,7 @@ CompanyList.propTypes = {
     companyTypes: PropTypes.array,
     showSubscriberId: PropTypes.bool,
     selectCompany: PropTypes.func.isRequired,
+    countries: PropTypes.array
 };
 
 const mapStateToProps = (state: any) => ({

@@ -6,7 +6,7 @@ from werkzeug.datastructures import ImmutableMultiDict
 from content_api.errors import BadParameterValueError
 
 from newsroom import auth  # noqa
-from newsroom.search import SearchQuery, BaseSearchService
+from newsroom.search.service import SearchQuery, BaseSearchService
 
 from .fixtures import (
     PUBLIC_USER_ID,

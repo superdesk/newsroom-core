@@ -1,14 +1,15 @@
-from bson import ObjectId
 import newsroom
-from newsroom.utils import set_original_creator, set_version_creator
 import superdesk
+
+from bson import ObjectId
+from newsroom.utils import set_original_creator, set_version_creator
 
 
 class TopicsResource(newsroom.Resource):
     url = 'users/<regex("[a-f0-9]{24}"):user>/topics'
     resource_methods = ["GET", "POST"]
     item_methods = ["GET", "PATCH", "DELETE"]
-    internal_resource = True
+    collation = True
     schema = {
         "label": {"type": "string", "required": True},
         "query": {"type": "string", "nullable": True},
@@ -37,6 +38,7 @@ class TopicsResource(newsroom.Resource):
         "folder": newsroom.Resource.rel("topic_folders", nullable=True),
         "advanced": {"type": "dict", "nullable": True},
     }
+    datasource = {"source": "topics", "default_sort": [("label", 1)]}
 
 
 class TopicsService(newsroom.Service):
@@ -62,6 +64,16 @@ class TopicsService(newsroom.Service):
 
     def get_items(self, item_ids):
         return self.get(req=None, lookup={"_id": {"$in": item_ids}})
+
+    def on_delete(self, doc):
+        super().on_delete(doc)
+        # remove topic from users personal dashboards
+        users = superdesk.get_resource_service("users").get(req=None, lookup={"dashboards.topic_ids": doc["_id"]})
+        for user in users:
+            updates = {"dashboards": user["dashboards"].copy()}
+            for dashboard in updates["dashboards"]:
+                dashboard["topic_ids"] = [topic_id for topic_id in dashboard["topic_ids"] if topic_id != doc["_id"]]
+            superdesk.get_resource_service("users").system_update(user["_id"], updates, user)
 
 
 def get_user_topics(user_id):

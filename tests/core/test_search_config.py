@@ -8,7 +8,7 @@ from newsroom.wire.search import (
     WireSearchResource,
     get_aggregations as get_wire_aggregations,
 )
-from newsroom.search_config import init_nested_aggregation
+from newsroom.search.config import init_nested_aggregation
 from newsroom.utils import deep_get
 from newsroom.tests.conftest import reset_elastic
 

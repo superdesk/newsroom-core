@@ -17,7 +17,7 @@ const DEFAULT_ADVANCED_SEARCH_PARAMS = {
 export const advancedSearchParamsSelector = (state: any) => get(state, 'search.advanced') || DEFAULT_ADVANCED_SEARCH_PARAMS;
 
 export const activeViewSelector = (state: any) => get(state, 'search.activeView');
-export const navigationsSelector = (state: any) => get(state, 'search.navigations') || [];
+export const navigationsSelector = (state: any) => get(state, 'search.navigations') || get(state, 'navigations') || [];
 
 export const navigationsByIdSelector = createSelector(
     [navigationsSelector],

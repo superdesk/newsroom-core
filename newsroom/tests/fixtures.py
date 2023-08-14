@@ -36,7 +36,7 @@ items = [
         "body_html": "<p>Weather report</p>",
         "ancestors": ["tag:weather", "tag:weather:old"],
         "firstcreated": datetime.now() - timedelta(days=5),
-        "versioncreated": datetime.now().replace(hour=23, minute=55) - timedelta(days=5),
+        "versioncreated": datetime.now().replace(hour=23, minute=55, second=10) - timedelta(days=5),
         "service": [{"code": "b", "name": "Service B"}],
         "products": [{"code": 2, "name": "product-2"}],
     },
@@ -48,7 +48,7 @@ items = [
         "slugline": "Disaster",
         "body_html": "<p>Water levels keep rising</p>",
         "firstcreated": datetime.now() - timedelta(days=5),
-        "versioncreated": datetime.now().replace(hour=23, minute=55) - timedelta(days=5),
+        "versioncreated": datetime.now().replace(hour=23, minute=55, second=20) - timedelta(days=5),
         "service": [{"code": "c", "name": "Service C"}],
         "products": [{"code": 7, "name": "product-7"}],
     },
@@ -223,6 +223,7 @@ def setup_user_company(app):
         [
             {
                 "_id": PUBLIC_USER_ID,
+                "user_type": "public",
                 "email": "foo@bar.com",
                 "first_name": PUBLIC_USER_FIRSTNAME,
                 "last_name": PUBLIC_USER_LASTNAME,
@@ -233,9 +234,11 @@ def setup_user_company(app):
                 "receive_email": True,
                 "receive_app_notifications": True,
                 "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
+                "manage_company_topics": False,
             },
             {
                 "_id": TEST_USER_ID,
+                "user_type": "public",
                 "email": "test@bar.com",
                 "first_name": "Test",
                 "last_name": "Bar",
@@ -246,6 +249,7 @@ def setup_user_company(app):
                 "receive_email": True,
                 "receive_app_notifications": True,
                 "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
+                "manage_company_topics": False,
             },
         ],
     )
@@ -270,3 +274,36 @@ def public_user(app, init_company):
 def anonymous_user(client):
     with client.session_transaction() as session:
         session.clear()
+
+
+@fixture
+def company_products(app):
+    app.data.insert(
+        "products",
+        [
+            {
+                "_id": 12,
+                "name": "product test",
+                "query": "headline:more",
+                "companies": [COMPANY_1_ID],
+                "is_enabled": True,
+                "product_type": "wire",
+            },
+            {
+                "_id": 13,
+                "name": "product test 2",
+                "query": "headline:Weather",
+                "companies": [COMPANY_1_ID],
+                "is_enabled": True,
+                "product_type": "wire",
+            },
+            {
+                "_id": 15,
+                "name": "all content",
+                "query": "*:*",
+                "companies": [COMPANY_1_ID],
+                "is_enabled": True,
+                "product_type": "wire",
+            },
+        ],
+    )

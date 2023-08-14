@@ -1,0 +1,24 @@
+{% if session.get("auth_user") %}
+<div class="impersonate-user__wrapper">
+    <div class="impersonate-user">
+        <div class="impersonate-user__inner">
+            <div class="impersonate-user__avatar">
+                <span class="impersonate-user__avatar-characters">
+                    {{ session.get("name")|initials|upper }}
+                </span>
+            </div>
+            <div class="impersonate-user__inner-text" data-test-id="impersonate-user-info">
+                <span class="impersonate-user__inner-text-label">{{ gettext("Impersonating") }}</span>
+                <span class="impersonate-user__inner-text-name">{{ session.get("name") }}</span>
+            </div>
+        </div>
+        <div class="impersonate-user__button-group">
+            <form method="POST" action="{{ url_for('auth.impersonate_stop') }}">
+                <button class="impersonate-user__button" aria-label="{{ gettext('Stop impersonation') }}" type="submit" data-test-id="impersonate-stop-btn">
+                    <i class="icon--close-thin" role="presentation"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}

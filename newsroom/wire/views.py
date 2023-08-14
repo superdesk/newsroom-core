@@ -21,7 +21,7 @@ from newsroom.wire import blueprint
 from newsroom.wire.utils import update_action_list
 from newsroom.auth import get_company, get_user, get_user_id
 from newsroom.decorator import login_required, admin_only, section
-from newsroom.topics import get_user_topics
+from newsroom.topics import get_user_topics, get_user_folders, get_company_folders
 from newsroom.email import send_template_email, get_language_template_name
 from newsroom.utils import (
     get_entity_or_404,
@@ -85,6 +85,8 @@ def get_view_data():
     company = get_company(user)
     topics = get_user_topics(user["_id"]) if user else []
     company_id = str(user["company"]) if user and user.get("company") else None
+    user_folders = get_user_folders(user, "wire") if user else []
+    company_folders = get_company_folders(company, "wire") if company else []
 
     return {
         "user": user,
@@ -101,6 +103,8 @@ def get_view_data():
         "context": "wire",
         "ui_config": get_resource_service("ui_config").get_section_config("wire"),
         "groups": app.config.get("WIRE_GROUPS", []),
+        "user_folders": user_folders,
+        "company_folders": company_folders,
     }
 
 
@@ -130,6 +134,36 @@ def delete_dashboard_caches():
         app.cache.delete(f"{HOME_ITEMS_CACHE_KEY}{company['_id']}")
 
 
+def get_personal_dashboards_data(user, company, topics):
+    def get_topic_items(topic):
+        query = superdesk.get_resource_service("wire_search").get_topic_query(topic, user, company)
+        return list(superdesk.get_resource_service("wire_search").get_items_by_query(query, size=4))
+
+    def _get_topic_data(topic_id):
+        for topic in topics:
+            if topic["_id"] == topic_id:
+                items = get_topic_items(topic)
+                if items:
+                    return {
+                        "_id": topic["_id"],
+                        "items": items,
+                    }
+                break
+        return None
+
+    def _get_dashboard_data(dashboard, index):
+        return {
+            "dashboard_id": f"d{index}",
+            "dashboard_name": dashboard.get("name", ""),
+            "topic_items": list(
+                filter(None, [_get_topic_data(topic_id) for topic_id in dashboard.get("topic_ids") or []])
+            ),
+        }
+
+    dashboards = user.get("dashboards") or []
+    return [_get_dashboard_data(dashboard, i) for i, dashboard in enumerate(dashboards)]
+
+
 def get_home_data():
     user = get_user()
     company = get_company(user)
@@ -157,6 +191,7 @@ def get_home_data():
         "topics": topics,
         "ui_config": get_resource_service("ui_config").get_section_config("home"),
         "groups": app.config.get("WIRE_GROUPS", []),
+        "personalizedDashboards": get_personal_dashboards_data(user, company, topics),
     }
 
 

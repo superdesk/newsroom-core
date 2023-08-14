@@ -2,7 +2,9 @@ from typing import List, Dict, Any, Optional, Type, TypedDict
 import logging
 from copy import deepcopy
 
+from flask import current_app as app
 from newsroom import Resource
+from newsroom.web.default_settings import CLIENT_CONFIG as DEFAULT_CLIENT_CONFIG
 
 
 class SearchGroupNestedConfig(TypedDict, total=False):
@@ -176,3 +178,12 @@ def _update_agg_to_nested(
         parent,
         {"bool": {"must_not": [{"terms": {f"{parent}.{field}": [config["value"] for config in configs]}}]}},
     )
+
+
+def get_advanced_search_fields(context: str) -> List[str]:
+    config = app.config["CLIENT_CONFIG"].get("advanced_search") or {}
+    return (
+        (config.get("fields") or {}).get(context)
+        or DEFAULT_CLIENT_CONFIG["advanced_search"]["fields"].get(context)
+        or []
+    ).copy()

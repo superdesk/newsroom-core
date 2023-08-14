@@ -11,6 +11,7 @@ import Settings from '../pages/Settings';
 import Company from '../pages/Company';
 import MyTopics from '../pages/MyTopics';
 import SaveTopic from '../pages/SaveTopic';
+import MyDashboard from '../pages/MyDashboard';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="company" element={<Company />} />   
           <Route path="mytopics" element={<MyTopics />} />   
           <Route path="savetopic" element={<SaveTopic />} />   
+          <Route path="mydashboard" element={<MyDashboard />} />
         </Route>          
       </Routes>      
     </BrowserRouter>

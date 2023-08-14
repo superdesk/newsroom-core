@@ -6,7 +6,7 @@ import {gettext, getCreatedSearchParamLabel} from 'utils';
 import {SearchResultTagList} from './SearchResultTagList';
 import {Tag} from 'components/Tag';
 
-export function SearchResultsFiltersRow({searchParams, filterGroups, toggleFilter, setCreatedFilter, resetFilter, refresh}) {
+export function SearchResultsFiltersRow({searchParams, filterGroups, toggleFilter, setCreatedFilter, resetFilter}) {
     const tags = [];
 
     if (searchParams.created) {
@@ -16,15 +16,16 @@ export function SearchResultsFiltersRow({searchParams, filterGroups, toggleFilte
             tags.push(
                 <Tag
                     key="tags-filters--from"
+                    testId="tags-filters--created-from"
                     label={gettext('From')}
                     text={created.relative}
-                    onClick={() => {
+                    onClick={(event) => {
+                        event.preventDefault();
                         setCreatedFilter({
                             ...searchParams.created,
                             from: null,
                             to: null,
                         });
-                        refresh();
                     }}
                 />
             );
@@ -33,14 +34,15 @@ export function SearchResultsFiltersRow({searchParams, filterGroups, toggleFilte
                 tags.push(
                     <Tag
                         key="tags-filters--from"
+                        testId="tags-filters--created-from"
                         label={gettext('From')}
                         text={created.from}
-                        onClick={() => {
+                        onClick={(event) => {
+                            event.preventDefault();
                             setCreatedFilter({
                                 ...searchParams.created,
                                 from: null,
                             });
-                            refresh();
                         }}
                     />
                 );
@@ -49,14 +51,15 @@ export function SearchResultsFiltersRow({searchParams, filterGroups, toggleFilte
                 tags.push(
                     <Tag
                         key="tags-filters--to"
+                        testId="tags-filters--created-to"
                         label={gettext('To')}
                         text={created.to}
-                        onClick={() => {
+                        onClick={(event) => {
+                            event.preventDefault();
                             setCreatedFilter({
                                 ...searchParams.created,
                                 to: null,
                             });
-                            refresh();
                         }}
                     />
                 );
@@ -79,11 +82,13 @@ export function SearchResultsFiltersRow({searchParams, filterGroups, toggleFilte
                 tags.push(
                     <Tag
                         key={`tags-filters--${group.label}--${filterValue}`}
+                        // testId={`tags-filters--${group.label}--${filterValue}`}
+                        testId={`tags-filters--${group.label}`}
                         label={group.label}
                         text={filterValue}
-                        onClick={() => {
+                        onClick={(event) => {
+                            event.preventDefault();
                             toggleFilter(group.field, filterValue, group.single);
-                            refresh();
                         }}
                     />
                 );
@@ -105,9 +110,9 @@ export function SearchResultsFiltersRow({searchParams, filterGroups, toggleFilte
         <button
             key="tag-filters--clear-button"
             className='nh-button nh-button--tertiary nh-button--small'
-            onClick={() => {
+            onClick={(event) => {
+                event.preventDefault();
                 resetFilter();
-                refresh();
             }}
         >
             {gettext('Clear filters')}
@@ -116,20 +121,9 @@ export function SearchResultsFiltersRow({searchParams, filterGroups, toggleFilte
 
     return (
         <SearchResultTagList
+            testId="search-results--filters"
             title={gettext('Filters applied')}
             tags={tags}
-            // buttons={[
-            //     <button
-            //         key="clear_filters_button"
-            //         className="nh-button nh-button--secondary btn-responsive btn--small"
-            //         onClick={() => {
-            //             resetFilter();
-            //             refresh();
-            //         }}
-            //     >
-            //         {gettext('Clear filters')}
-            //     </button>
-            // ]}
         />
     );
 }
@@ -140,5 +134,4 @@ SearchResultsFiltersRow.propTypes = {
     toggleFilter: PropTypes.func.isRequired,
     setCreatedFilter: PropTypes.func.isRequired,
     resetFilter: PropTypes.func.isRequired,
-    refresh: PropTypes.func.isRequired,
 };
