@@ -39,7 +39,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
         {
             label: gettext('Relevance'),
             value: '',
-            sortFunction: () => false,
+            sortFunction: () => this.setSortQuery('_score'),
         },
     ];
 
