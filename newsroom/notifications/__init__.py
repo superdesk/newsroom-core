@@ -7,6 +7,7 @@ import superdesk
 
 from superdesk.notification import push_notification
 from newsroom.auth import get_user, get_user_id
+from .notification_queue import NotificationQueueResource, NotificationQueueService
 
 blueprint = flask.Blueprint("notifications", __name__)
 
@@ -55,3 +56,4 @@ from .notifications import (  # noqa: F401,E402
 
 def init_app(app):
     superdesk.register_resource("notifications", NotificationsResource, NotificationsService, _app=app)
+    superdesk.register_resource("notification_queue", NotificationQueueResource, NotificationQueueService, _app=app)
