@@ -27,21 +27,21 @@ import NewItemsIcon from '../NewItemsIcon';
 class SearchResultsBarComponent extends React.Component<any, any> {
     sortValues = [
         {
-            label: 'Date (Newest)',
+            label: gettext('Date (Newest)'),
             value: 'desc',
             sortFunction: () => this.setSortQuery('desc'),
         },
         {
-            label: 'Date (Oldest)',
+            label: gettext('Date (Oldest)'),
             value: 'asc',
             sortFunction: () => this.setSortQuery('asc'),
         },
         {
-            label: 'Relevance',
+            label: gettext('Relevance'),
             value: '',
             sortFunction: () => false,
         },
-    ]
+    ];
 
     static propTypes: any;
     static defaultProps: any;
@@ -137,7 +137,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                             )}
                             <div className="navbar__button-group">
                                 <Dropdown
-                                    label={gettext(`Sort by: {{sort}}`, {sort :this.state.sortValue})}
+                                    label={gettext('Sort by: {{sort}}', {sort :this.state.sortValue})}
                                 >
                                     {this.sortValues.map((value) => {
                                         return (
@@ -146,14 +146,14 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                                 className='dropdown-item'
                                                 onClick={() => {
                                                     value.sortFunction();
-                                                    this.setState({sortValue: value.label})
+                                                    this.setState({sortValue: value.label});
                                                     console.log(value.sortFunction());
-                                                    
+
                                                 }}
                                             >
                                                 {gettext(value.label)}
                                             </button>
-                                    )})}
+                                        );})}
                                 </Dropdown>
                                 <button
                                     className="nh-button nh-button--tertiary"
