@@ -1,3 +1,5 @@
+import {IUser} from 'newshub-api';
+
 import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
 import {renderModal, closeModal} from 'actions';
@@ -165,6 +167,14 @@ export function shareTopic(items: any) {
     };
 }
 
+export function openEditTopicNotificationsModal() {
+    return (dispatch: any, getState: any) => {
+        const user = getState().user;
+
+        dispatch(renderModal('editNotificationSchedule', {user}));
+    };
+}
+
 /**
  * Submit share followed topic form and close modal if that works
  *
@@ -314,5 +324,19 @@ export function moveTopic(topicId: any, folder: any) {
             mergeUpdates(updates, response);
             dispatch({type: TOPIC_UPDATED, payload: {topic, updates}});
         });
+    };
+}
+
+export function updateUserNotificationSchedules(schedule: Omit<IUser['notification_schedule'], 'last_run_time'>) {
+    return (dispatch: any, getState: any) => {
+        const user = getState().user;
+
+        return server.post(`/users/${user._id}/notification_schedules`, schedule)
+            .then(() => {
+                notify.success(gettext('Global schedule updated'));
+                dispatch(fetchUser(user._id));
+                dispatch(closeModal());
+            })
+            .catch((error) => errorHandler(error, dispatch, setError(error)));
     };
 }

@@ -1,7 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {gettext} from 'utils';
+
+import {IUser} from 'newshub-api';
+import {gettext, getSubscriptionTimesString} from 'utils';
 
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
@@ -13,9 +14,20 @@ import {
     editUser,
     saveUser,
     setError,
+    openEditTopicNotificationsModal,
 } from '../../actions';
 
-class UserProfile extends React.Component<any, any> {
+interface IProps {
+    user: IUser;
+    errors: {[key: string]: string};
+    onChange(event: React.ChangeEvent): void;
+    saveUser(): void;
+    setError(errors: {[key: string]: string}): void;
+    fetchUser(userId: IUser['_id']): void;
+    openEditTopicNotificationsModal(): void;
+}
+
+class UserProfile extends React.Component<IProps, any> {
     static propTypes: any;
     constructor(props: any) {
         super(props);
@@ -130,6 +142,31 @@ class UserProfile extends React.Component<any, any> {
                                     onChange={onChange}
                                 />
                             </div>
+
+                            <div className="ng-flex__row">
+                                <div className="col-lg-6">
+                                    <div className="nh-container nh-container--highlight mb-3">
+                                        <p className="nh-container__text--small">
+                                            {gettext('You will receive email notifications daily, sent in a digest ' +
+                                                'format at regular intervals. This setting will apply to all subscribed ' +
+                                                'scheduled email notifications (e.g. {{ wire }} Topics, ' +
+                                                '{{ agenda }} Topics).', window.sectionNames)}
+                                        </p>
+                                        <div className="h-spacer h-spacer--medium" />
+                                        <span className="nh-container__schedule-info mb-3">
+                                            {getSubscriptionTimesString(user)}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            className="nh-button nh-button--small nh-button--tertiary"
+                                            onClick={this.props.openEditTopicNotificationsModal}
+                                        >
+                                            {gettext('Edit schedule')}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                             {!!localeOptions.length &&
                                 <div className="col-lg-6">
                                     <SelectInput
@@ -164,25 +201,17 @@ class UserProfile extends React.Component<any, any> {
     }
 }
 
-UserProfile.propTypes = {
-    user: PropTypes.object.isRequired,
-    onChange: PropTypes.func,
-    errors: PropTypes.object,
-    saveUser: PropTypes.func,
-    setError: PropTypes.func,
-    fetchUser: PropTypes.func,
-};
-
 const mapStateToProps = (state: any) => ({
     user: state.editedUser,
-    errors: state.errors,
+    errors: state.errors ?? {},
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
     saveUser: () => dispatch(saveUser()),
-    fetchUser: (id: any) => dispatch(fetchUser(id)),
-    onChange: (event: any) => dispatch(editUser(event)),
-    setError: (errors: any) => dispatch(setError(errors)),
+    fetchUser: (userId: IUser['_id']) => dispatch(fetchUser(userId)),
+    onChange: (event: React.ChangeEvent) => dispatch(editUser(event)),
+    setError: (errors: {[key: string]: string}) => dispatch(setError(errors)),
+    openEditTopicNotificationsModal: () => dispatch(openEditTopicNotificationsModal()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserProfile);
