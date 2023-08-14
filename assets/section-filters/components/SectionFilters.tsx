@@ -140,8 +140,8 @@ const mapStateToProps = (state: any) => ({
 const mapDispatchToProps = (dispatch: any) => ({
     selectSectionFilter: (_id: any) => dispatch(selectSectionFilter(_id)),
     editSectionFilter: (event: any) => dispatch(editSectionFilter(event)),
-    saveSectionFilter: (type: any) => dispatch(postSectionFilter()),
-    deleteSectionFilter: (type: any) => dispatch(deleteSectionFilter()),
+    saveSectionFilter: () => dispatch(postSectionFilter()),
+    deleteSectionFilter: () => dispatch(deleteSectionFilter()),
     newSectionFilter: () => dispatch(newSectionFilter()),
     cancelEdit: (event: any) => dispatch(cancelEdit(event)),
     dispatch: dispatch,

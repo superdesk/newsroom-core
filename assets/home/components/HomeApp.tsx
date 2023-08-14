@@ -270,7 +270,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     fetchCardExternalItems: (cardId: any, cardLabel: any) => dispatch(fetchCardExternalItems(cardId, cardLabel)),
     fetchCompanyCardItems: () => dispatch(fetchCompanyCardItems()),
     followStory: (item: any) => followStory(item, 'wire'),
-    downloadMedia: (href: any, id: any, mimeType: any) => dispatch(downloadMedia(href, id)),
+    downloadMedia: (href: any, id: any) => dispatch(downloadMedia(href, id)),
 });
 
 
