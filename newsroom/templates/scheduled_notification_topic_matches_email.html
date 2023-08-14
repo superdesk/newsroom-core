@@ -1,0 +1,75 @@
+{% extends "email_layout.html" %}
+{% block htmlhead %}
+<style>
+table {
+    width: 600px;
+    border: 1px solid #dee2e6;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+td, th {
+    border: 1px solid #dee2e6;
+    color: #212529;
+    padding: 0.5rem;
+    text-align: start;
+}
+.es-highlight {
+    background-color: rgba(255, 61, 61, 0.25);
+}
+</style>
+{% endblock %}
+{% block name %}{% endblock %}
+{% block content %}
+
+<p>{{ date | notification_datetime }}</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Your Saved Topic</th>
+            <th>Count</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for section, matches in topic_match_table.items() %}
+{% for name, count in matches %}
+        <tr>
+            <td>New {{ config.AGENDA_SECTION if section == "agenda" else config.WIRE_SECTION }} items for "{{ name }}"</td>
+            <td>{{ count }}</td>
+        </tr>
+{% endfor %}
+{% endfor %}
+    </tbody>
+</table>
+
+{% for section, entries in entries.items() %}
+{% for entry in entries %}
+
+<h2>Latest new {{ config.AGENDA_SECTION if section == "agenda" else config.WIRE_SECTION }} items for "{{ entry.topic.label }}"</h2>
+{% if section == "wire" %}
+
+<p><strong>{{ get_highlighted_field(entry.item, ["headline"]) | safe }}</strong></p>
+<p>Slugline: {{ entry.item.slugline }} | Source: {{ entry.item.source}}</p>
+<p>Published on: {{ entry.item.versioncreated | notification_datetime }} | {{ entry.item.body_html | word_count }} words{% if entry.item.service %} | Category: {{ entry.item | category_names }}{% endif %}</p>
+{{ short_highlighted_text(get_highlighted_field(entry.item, ["body_html"])) | safe }}
+<p>View this item in your account: <a href="{{ url_for_wire(entry.item, True, section) }}">Link</a></p>
+<p>View all item(s): <a href="{{ url_for('wire.wire', _external=True) }}?topic={{ entry.topic._id }}">Link</a></p>
+
+{% elif section == "agenda" %}
+
+<p><strong>{{ get_highlighted_field(entry.item, ["headline", "name"]) | safe }}</strong></p>
+<p>Event date & time: {{ entry.item | agenda_dates_string }}{% if entry.item.location %} | Location: {{ entry.item | location_string }}{% endif %}</p>
+<p>Published on: {{ entry.item.versioncreated | notification_datetime }}{% if entry.item.service %} | Category: {{ entry.item | category_names }}{% endif %}</p>
+
+{{ short_highlighted_text(get_highlighted_field(entry.item, ["definition_long", "description_text", "definition_short"])) | safe }}
+
+
+<p>View this item in your account: <a href="{{ url_for_wire(entry.item, True, section) }}">Link</a></p>
+<p>View all item(s): <a href="{{ url_for('agenda.index', _external=True) }}?topic={{ entry.topic._id }}">Link</a></p>
+
+{% endif %}
+
+{% endfor %}
+{% endfor %}
+{% endblock %}
