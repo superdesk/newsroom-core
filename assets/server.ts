@@ -118,6 +118,17 @@ class Server {
             body: JSON.stringify(data),
         })).then(checkStatus);
     }
+
+    patchEntity(url: string, data: any, _etag: string) {
+        return fetch(
+            url,
+            options({
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json', 'If-Match': _etag},
+                body: JSON.stringify(data),
+            })
+        ).then(checkStatus);
+    }
 }
 
 export default new Server();

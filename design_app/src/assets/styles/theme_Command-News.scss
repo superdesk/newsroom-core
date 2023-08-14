@@ -13,7 +13,7 @@
     --color-interactive-focus-l: 46%;
 
     // LOGIN PAGE
-    --login-page-color-bg: var(--color-background--muted);
+    --login-page-color-bg: hsl(0, 3%, 15%);
 
     // COMPONENT: NAVBAR MAIN
     --top-bar-color-bg: var(--color-primary);
@@ -24,6 +24,23 @@
     --top-bar-color-bg-avatar--hover: hsla(216, 45%, 4%, 0.5);
     --top-bar-color-bg-badge: hsl(0, 0%, 100%);
     --top-bar-color-fg-badge: hsl(0, 3%, 15%);
+    // Logo main
+    --top-bar-logo-main-max-width: 224px;
+    --top-bar-logo-main-max-width--mobile: 200px;
+    --top-bar-logo-main-margin-top: -9px;
+    --top-bar-logo-main-margin-top--mobile: -6px;
+    // Logo additional
+    --top-bar-logo-additional-display: flex;
+    --top-bar-logo-additional-max-width: 78px;
+    --top-bar-logo-additional-min-width--mobile: 0px;
+    --top-bar-logo-additional-padding-y: 12px;
+    --top-bar-logo-additional-padding-x: 0;
+    // Navbar Brand
+    --top-bar-nav-brand-margin-x: 0;
+    --top-bar-nav-brand-margin-y: 16px;
+    --top-bar-nav-brand-padding-x: 16px;
+    --top-bar-nav-brand-border-color: hsla(0, 0%, 100%, 0.4);
+    --top-bar-nav-brand-border-type: solid;
 
     // COMPONENT: SIDENAV
     --sidenav-color-bg:                 hsl(0, 3%, 15%);
@@ -57,4 +74,26 @@
 
     // COMPONENT: MAIN FOOTER
     --footer-size--height: 48px;
+}
+
+.navbar__logo {
+    img.navbar__logo-img--fr {
+        width: 200px;
+        margin-block-start: 0;
+    }
+}
+
+.navbar__additional-logo {
+    .navbar__additional-logo-img--fr {
+        width: 120px;
+    }
+}
+
+@media only screen and (max-width: 575px) {
+    .navbar__logo {
+        img.navbar__logo-img--fr {
+            margin-block-start: 0;
+            width: 160px;
+        }
+    }
 }

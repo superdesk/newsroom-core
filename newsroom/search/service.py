@@ -41,7 +41,7 @@ def strtobool(val):
     return _strtobool(val)
 
 
-def query_string(query, default_operator="AND"):
+def query_string(query, default_operator="AND", fields=["*"]):
     query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
     return {
         "query_string": {
@@ -49,6 +49,7 @@ def query_string(query, default_operator="AND"):
             "default_operator": default_operator,
             "analyze_wildcard": query_string_settings["analyze_wildcard"],
             "lenient": True,
+            "fields": fields,
         }
     }
 
@@ -695,31 +696,34 @@ class BaseSearchService(Service):
             return
 
         product_ids = [p["sd_product_id"] for p in search.products if p.get("sd_product_id")]
-
         if product_ids:
             search.query["bool"]["should"].append({"terms": {"products.code": product_ids}})
 
         for product in search.products:
-            self.apply_product_filter(search, product)
+            product_filter = self.get_product_filter(search, product)
+            if product_filter:
+                search.query["bool"]["should"].append(product_filter)
 
-    def apply_product_filter(self, search, product):
+        if search.query["bool"]["should"]:
+            search.query["bool"]["minimum_should_match"] = 1
+
+    def get_product_filter(self, search, product):
         """Generate the filter for a single product
 
         :param SearchQuery search: The search query instance
         :param dict product: The product to filter
         :return:
         """
-
         if search.args.get("requested_products") and product["_id"] not in search.args["requested_products"]:
             return
 
         if product.get("query"):
-            search.query["bool"]["should"].append(query_string(product["query"]))
+            return self.query_string(product["query"])
 
     def apply_request_filter(self, search):
         if search.args.get("q"):
             search.query["bool"].setdefault("must", []).append(
-                query_string(search.args["q"], search.args.get("default_operator") or "AND")
+                self.query_string(search.args["q"], search.args.get("default_operator") or "AND")
             )
 
         if search.args.get("ids"):
@@ -866,7 +870,7 @@ class BaseSearchService(Service):
 
         return topic_matches
 
-    def get_topic_query(self, topic, user, company, section_filters, query=None, args=None):
+    def get_topic_query(self, topic, user, company, section_filters=None, query=None, args=None):
         search = SearchQuery()
 
         search.user = user
@@ -921,3 +925,8 @@ class BaseSearchService(Service):
         self.gen_source_from_search(search)
         internal_req = self.get_internal_request(search)
         return self.internal_get(internal_req, search.lookup)
+
+    def query_string(self, query, default_operator="AND"):
+        fields_config_key = "WIRE_SEARCH_FIELDS" if self.section == "wire" else "AGENDA_SEARCH_FIELDS"
+        fields = app.config.get(fields_config_key, ["*"])
+        return query_string(query, default_operator=default_operator, fields=fields)

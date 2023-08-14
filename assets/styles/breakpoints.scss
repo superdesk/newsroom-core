@@ -50,13 +50,13 @@
 }
 
 @mixin small_phone {
-    @media only screen and (orientation: portrait) and (max-width: 374px), (orientation: landscape) and (max-width: 575px) {
+    @media only screen and (max-width: 374px) {
         @content;
     }
 }
 
 @mixin phone {
-    @media only screen and (orientation: portrait) and (max-width: 575px), (orientation: landscape) and (max-width: 991px) {
+    @media only screen and (max-width: 575px) {
         @content;
     }
 }

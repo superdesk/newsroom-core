@@ -41,5 +41,7 @@ interface Window {
     __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any;
 }
 
+type Dictionary<T> = {[key: string]: T};
+
 declare module 'expect';
 declare module 'alertifyjs';

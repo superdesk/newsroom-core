@@ -608,28 +608,7 @@ def _remove_fields(source, fields):
 
 
 def planning_items_query_string(query, fields=None):
-    plan_query_string = query_string(query)
-
-    if fields:
-        plan_query_string["query_string"]["fields"] = fields
-    else:
-        plan_query_string["query_string"]["fields"] = ["planning_items.*"]
-
-    return plan_query_string
-
-
-def get_agenda_query(query, events_only=False):
-    if events_only:
-        return query_string(query)
-    else:
-        return {
-            "bool": {
-                "should": [
-                    query_string(query),
-                    nested_query("planning_items", planning_items_query_string(query), name="query"),
-                ]
-            },
-        }
+    return query_string(query, fields=fields or ["planning_items.*"])
 
 
 def is_events_only_access(user, company):
@@ -949,7 +928,7 @@ class AgendaService(BaseSearchService):
             return
 
         if product.get("query"):
-            search.query["bool"]["should"].append(query_string(product["query"]))
+            search.query["bool"]["should"].append(self.query_string(product["query"]))
 
             if product.get("planning_item_query") and search.item_type != "events":
                 search.planning_items_should.append(planning_items_query_string(product.get("planning_item_query")))
@@ -967,7 +946,7 @@ class AgendaService(BaseSearchService):
                 if isinstance(q, dict):
                     # used for product testing
                     if q.get("query"):
-                        test_query["bool"]["should"].append(query_string(q.get("query")))
+                        test_query["bool"]["should"].append(self.query_string(q.get("query")))
 
                     if q.get("planning_item_query"):
                         test_query["bool"]["should"].append(
@@ -984,7 +963,9 @@ class AgendaService(BaseSearchService):
                 pass
 
             if not test_query["bool"]["should"]:
-                search.query["bool"]["filter"].append(get_agenda_query(search.args["q"], search.item_type == "events"))
+                search.query["bool"]["filter"].append(
+                    self.get_agenda_query(search.args["q"], search.item_type == "events")
+                )
 
         if search.args.get("id"):
             search.query["bool"]["filter"].append({"term": {"_id": search.args["id"]}})
@@ -1045,7 +1026,7 @@ class AgendaService(BaseSearchService):
             name="featured",
         )
         if req.args.get("q"):
-            query["bool"]["filter"].append(query_string(req.args["q"]))
+            query["bool"]["filter"].append(self.query_string(req.args["q"]))
             planning_items_query["nested"]["query"]["bool"]["filter"].append(planning_items_query_string(req.args["q"]))
 
         query["bool"]["filter"].append(planning_items_query)
@@ -1549,3 +1530,16 @@ class AgendaService(BaseSearchService):
         )
         featured_doc = get_resource_service("agenda_featured").find_one_for_date(local_date)
         return self.featured(req, lookup, featured_doc)
+
+    def get_agenda_query(self, query, events_only=False):
+        if events_only:
+            return self.query_string(query)
+        else:
+            return {
+                "bool": {
+                    "should": [
+                        self.query_string(query),
+                        nested_query("planning_items", planning_items_query_string(query), name="query"),
+                    ]
+                },
+            }

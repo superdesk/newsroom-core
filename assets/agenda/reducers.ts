@@ -17,8 +17,9 @@ import {EXTENDED_VIEW} from 'wire/defaults';
 import {searchReducer} from 'search/reducers';
 import {defaultReducer} from '../reducers';
 import {EARLIEST_DATE} from './utils';
+import {ITopic} from 'interfaces/topic';
 
-const initialState: any = {
+const initialState = {
     items: [],
     itemsById: {},
     aggregations: null,
@@ -36,7 +37,7 @@ const initialState: any = {
     topics: [],
     selectedItems: [],
     bookmarks: false,
-    context: null,
+    context: 'agenda',
     formats: [],
     newItems: [],
     newItemsByTopic: {},
@@ -50,7 +51,7 @@ const initialState: any = {
         featuredOnly: false,
         agendaWireItems: [],
     },
-    search: searchReducer(),
+    search: searchReducer(undefined, undefined, 'agenda'),
     detail: false,
     userSections: {},
     searchInitiated: false,
@@ -58,6 +59,10 @@ const initialState: any = {
     groups: [],
     hasAgendaFeaturedItems: false,
 };
+
+export interface IAgendaState {
+    topics: Array<ITopic>;
+}
 
 function recieveItems(state: any, data: any) {
     const itemsById = Object.assign({}, state.itemsById);
@@ -94,7 +99,7 @@ function _agendaReducer(state: any, action: any) {
     }
 }
 
-export default function agendaReducer(state: any = initialState, action: any) {
+export default function agendaReducer(state: any = initialState, action: any): IAgendaState {
     switch (action.type) {
 
     case RECIEVE_ITEMS:

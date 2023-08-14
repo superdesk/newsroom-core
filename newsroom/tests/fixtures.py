@@ -223,6 +223,7 @@ def setup_user_company(app):
         [
             {
                 "_id": PUBLIC_USER_ID,
+                "user_type": "public",
                 "email": "foo@bar.com",
                 "first_name": PUBLIC_USER_FIRSTNAME,
                 "last_name": PUBLIC_USER_LASTNAME,
@@ -233,9 +234,11 @@ def setup_user_company(app):
                 "receive_email": True,
                 "receive_app_notifications": True,
                 "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
+                "manage_company_topics": False,
             },
             {
                 "_id": TEST_USER_ID,
+                "user_type": "public",
                 "email": "test@bar.com",
                 "first_name": "Test",
                 "last_name": "Bar",
@@ -246,6 +249,7 @@ def setup_user_company(app):
                 "receive_email": True,
                 "receive_app_notifications": True,
                 "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
+                "manage_company_topics": False,
             },
         ],
     )
