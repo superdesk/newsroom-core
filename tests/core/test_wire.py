@@ -243,7 +243,7 @@ def test_search_sort(client, app):
     resp = client.get("/wire/search?sort=versioncreated:asc")
     data = json.loads(resp.get_data())
     assert "urn:localhost:weather" == data["_items"][0]["_id"]
-# //
+
     resp = client.get("/wire/search?sort=versioncreated:desc")
     data = json.loads(resp.get_data())
     assert "urn:localhost:weather" == data["_items"][2]["_id"]
