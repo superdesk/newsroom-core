@@ -28,17 +28,14 @@ class SearchResultsBarComponent extends React.Component<any, any> {
     sortValues = [
         {
             label: gettext('Date (Newest)'),
-            value: 'desc',
-            sortFunction: () => this.setSortQuery('desc'),
+            sortFunction: () => this.setSortQuery('versioncreated:desc'),
         },
         {
             label: gettext('Date (Oldest)'),
-            value: 'asc',
-            sortFunction: () => this.setSortQuery('asc'),
+            sortFunction: () => this.setSortQuery('versioncreated:asc'),
         },
         {
             label: gettext('Relevance'),
-            value: '',
             sortFunction: () => this.setSortQuery('_score'),
         },
     ];
@@ -142,7 +139,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                     {
                                         this.sortValues.map((option) => (
                                             <button
-                                                key={option.value}
+                                                key={option.label}
                                                 type='button'
                                                 className='dropdown-item'
                                                 onClick={() => {

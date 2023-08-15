@@ -36,11 +36,11 @@ export function setQuery(query: any) {
 }
 
 export const SET_SORT_QUERY = 'SET_SORT_QUERY';
-export function setSortQuery(sortQuery: any) {
+export function setSortQuery(sortQuery: string) {
     return function(dispatch: any, getState: any) {
         dispatch(setSearchSortQuery(sortQuery));
         updateRouteParams(
-            {sort: `versioncreated:${sortQuery}`},
+            {sort: sortQuery},
             getState()
         );
     };
