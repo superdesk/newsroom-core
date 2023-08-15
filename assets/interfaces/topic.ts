@@ -14,8 +14,8 @@ export interface ITopic {
     _id: string;
     label: string;
     query?: string;
-    filter?: {[key: string]: any};
-    created: string;
+    filter?: Dictionary<string>;
+    created: Dictionary<string>;
     original_creator: IUser['_id'];
     version_creator: IUser['_id'];
     user: IUser['_id'];
