@@ -117,12 +117,16 @@ class Modal extends React.Component<IProps, IState> {
 
     render() {
         return (
-            <div className={classNames('modal', {
-                'modal--full-width': this.props.width === 'full',
-                'mt-xl-5': this.props.width !== 'full',
-                [this.props.className ?? '']: this.props.className != null,
-            })}
-            ref={(elem: any) => this.elem = elem} role={gettext('dialog')} aria-label={this.props.title}>
+            <div
+                className={classNames('modal', {
+                    'modal--full-width': this.props.width === 'full',
+                    'mt-xl-5': this.props.width !== 'full',
+                    [this.props.className ?? '']: this.props.className != null,
+                })}
+                ref={(elem: HTMLDivElement) => this.elem = elem}
+                role="dialog"
+                aria-label={this.props.title}
+            >
                 <h3 className="a11y-only">{this.props.title}</h3>
                 <div className="modal-dialog">
                     <div className="modal-content">
