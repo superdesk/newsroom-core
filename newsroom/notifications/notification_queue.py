@@ -19,7 +19,7 @@ class NotificationQueueResource(Resource):
                         "type": "list",
                         "schema": Resource.rel("items"),
                     },
-                    "topic_id": {"type": Resource.rel("topics")},
+                    "topic_id": Resource.rel("topics"),
                     "last_item_arrived": {"type": "datetime"},
                     "section": {"type": "string"},
                 },
