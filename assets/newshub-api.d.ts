@@ -59,6 +59,11 @@ export interface IUser {
         section: 'wire' | 'agenda';
     }>;
     sections: {[key: string]: boolean};
+    dashboards: Array<{
+        name: string;
+        type: string;
+        topic_ids: Array<ITopic['_id']>;
+    }>;
     notification_schedule?: {
         timezone: string;
         times: Array<string>;
