@@ -139,21 +139,21 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                 <Dropdown
                                     label={gettext('Sort by: {{sort}}', {sort :this.state.sortValue})}
                                 >
-                                    {this.sortValues.map((value) => {
-                                        return (
+                                    {
+                                        this.sortValues.map((option) => (
                                             <button
+                                                key={option.value}
                                                 type='button'
                                                 className='dropdown-item'
                                                 onClick={() => {
-                                                    value.sortFunction();
-                                                    this.setState({sortValue: value.label});
-                                                    console.log(value.sortFunction());
-
+                                                    option.sortFunction();
+                                                    this.setState({sortValue: option.label});
                                                 }}
                                             >
-                                                {gettext(value.label)}
+                                                {gettext(option.label)}
                                             </button>
-                                        );})}
+                                        ))
+                                    }
                                 </Dropdown>
                                 <button
                                     className="nh-button nh-button--tertiary"
