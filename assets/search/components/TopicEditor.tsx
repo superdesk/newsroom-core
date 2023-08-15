@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {get, set, cloneDeep, isEqual} from 'lodash';
 import classNames from 'classnames';
 
-import {IUser, ITopic, ITopicFolder, INavigation, IFilterGroup, ITopicNotificationScheduleType} from 'newshub-api';
+import {IUser, ITopic, ITopicFolder, INavigation, IFilterGroup, ITopicNotificationScheduleType} from 'interfaces';
 import {gettext, notify} from 'utils';
 import {canUserEditTopic} from 'topics/utils';
 

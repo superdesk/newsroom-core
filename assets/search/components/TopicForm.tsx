@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import {IUser, ITopic, ITopicFolder, INavigation, IFilterGroup, ITopicNotificationScheduleType} from 'newshub-api';
+import {IUser, ITopic, ITopicFolder, INavigation, IFilterGroup, ITopicNotificationScheduleType} from 'interfaces';
 import {gettext, getSubscriptionTimesString} from 'utils';
 
 import TextInput from 'components/TextInput';

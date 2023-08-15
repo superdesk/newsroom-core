@@ -1,4 +1,4 @@
-import {IUser} from 'newshub-api';
+import {IUser} from 'interfaces';
 
 import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';

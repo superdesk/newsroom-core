@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 
-import {IUser} from 'newshub-api';
+import {IUser} from 'interfaces';
 import {gettext, getSubscriptionTimesString} from 'utils';
 
 import TextInput from 'components/TextInput';

@@ -2,7 +2,7 @@ import * as React from 'react';
 import {connect} from 'react-redux';
 import moment from 'moment-timezone';
 
-import {IUser} from 'newshub-api';
+import {IUser} from 'interfaces';
 import {gettext, getScheduledNotificationConfig} from 'utils';
 import {modalFormInvalid, modalFormValid} from 'actions';
 import {updateUserNotificationSchedules} from 'user-profile/actions';

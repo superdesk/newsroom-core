@@ -10,7 +10,7 @@ import {render as _render} from 'react-dom';
 import alertify from 'alertifyjs';
 import moment from 'moment-timezone';
 
-import {IClientConfig, IUser} from 'newshub-api';
+import {IClientConfig, IUser} from 'interfaces';
 
 /*
  * Import and load all locales that will be used in moment.js
