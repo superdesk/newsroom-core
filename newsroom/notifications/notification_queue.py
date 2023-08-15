@@ -72,10 +72,4 @@ class NotificationQueueService(Service):
             self.update(original["_id"], updates, original)
 
     def reset_queue(self, user_id):
-        original = self.find_one(req=None, user=user_id)
-
-        if not original:
-            # No schedule found, no need to clear
-            return
-
-        self.update(original["_id"], {"topics": []}, original)
+        self.delete_action({"user": user_id})

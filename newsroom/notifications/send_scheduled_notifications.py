@@ -50,6 +50,8 @@ class SendScheduledNotificationEmails(Command):
 
                 if not user:
                     # User not found, this account might be disabled
+                    # Reset the queue for this user, so it does not get checked on future runs
+                    get_resource_service("notification_queue").reset_queue(schedule["user"])
                     continue
 
                 if not user.get("notification_schedule"):
