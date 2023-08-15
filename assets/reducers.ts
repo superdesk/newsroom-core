@@ -30,6 +30,7 @@ import {
 
 import {
     SET_QUERY,
+    SET_SORT_QUERY,
     ADD_TOPIC,
     SET_NEW_ITEM_BY_TOPIC,
 } from 'search/actions';
@@ -164,6 +165,10 @@ export function defaultReducer(state: any = {}, action: any) {
         return {...state, query: action.query, activeItem: null, search: search};
     }
 
+    case SET_SORT_QUERY: {
+        return {...state, sortQuery: action.sortQuery, activeItem: null};
+    }
+
     case QUERY_ITEMS: {
         const resultsFiltered = !isEmpty(get(state, 'search.activeFilter')) ||
             !isEmpty(get(state, 'search.createdFilter.from')) ||
@@ -174,6 +179,7 @@ export function defaultReducer(state: any = {}, action: any) {
             isLoading: true,
             totalItems: null,
             activeQuery: state.query,
+            activeSortQuery: state.sortQuery,
             resultsFiltered,
         };
     }
