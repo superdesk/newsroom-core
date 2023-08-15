@@ -1,5 +1,6 @@
 from bson import ObjectId
 from typing import Dict, List, TypedDict
+from datetime import datetime
 
 
 class Product(TypedDict, total=False):
@@ -15,6 +16,30 @@ class ProductRef(TypedDict):
     section: str
 
 
+class NotificationSchedule(TypedDict, total=False):
+    timezone: str
+    times: List[str]
+    last_run_time: datetime
+
+
+class NotificationQueueTopic(TypedDict, total=False):
+    items: List[str]
+    topic_id: ObjectId
+    last_item_arrived: datetime
+    section: str
+
+
+class NotificationQueue(TypedDict):
+    user: ObjectId
+    topics: List[NotificationQueueTopic]
+
+
+class UserDashboardEntry(TypedDict):
+    name: str
+    type: str
+    topic_ids: List[ObjectId]
+
+
 class UserData(TypedDict, total=False):
     _id: ObjectId
     email: str
@@ -26,6 +51,8 @@ class UserData(TypedDict, total=False):
     is_validated: bool
     sections: Dict[str, bool]
     products: List[ProductRef]
+    dashboards: List[UserDashboardEntry]
+    notification_schedule: NotificationSchedule
 
 
 class User(UserData):

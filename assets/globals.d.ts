@@ -8,10 +8,7 @@ interface Window {
     };
 
     newsroom: {
-        client_config: {
-            debug: boolean;
-            news_only_filter?: any;
-        }
+        client_config: any;
         websocket?: any;
     };
 

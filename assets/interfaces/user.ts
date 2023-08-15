@@ -1,25 +1,46 @@
+import {TDatetime} from './common';
+import {ICompany} from './company';
+import {ITopic} from './topic';
+
 export interface IUserDashboard {
     type: string;
     name: string;
-    topic_ids: Array<string>;
+    topic_ids: Array<ITopic['_id']>;
 }
 
 export interface IUser {
-    user_type: 'administrator' | 'company_admin' | 'public';
-    is_approved: boolean;
-    is_enabled: boolean;
-    company?: string;
-    phone: string;
-    email: string;
-    name: string;
-    is_validated: boolean;
+    _id: string;
     first_name: string;
     last_name: string;
-    mobile: any;
-    locale: any;
-    role: any;
-    manage_company_topics: boolean;
-    expiry_alert: boolean;
-    _id: string | null;
+    email: string;
+    phone: string;
+    mobile: string;
+    role: string;
+    signup_details?: {[key: string]: any};
+    country: string;
+    company: ICompany['_id'];
+    user_type: 'administrator' | 'internal' | 'public' | 'company_admin' | 'account_management';
+    is_validated?: boolean;
+    is_enabled?: boolean;
+    is_approved?: boolean;
+    expiry_alert?: boolean;
+    receive_email?: boolean;
+    receive_app_notifications?: boolean;
+    locale: string;
+    manage_company_topics?: boolean;
+    last_active?: TDatetime;
+
+    original_creator?: IUser['_id'];
+    version_creator?: IUser['_id'];
+    products: Array<{
+        _id: string;
+        section: 'wire' | 'agenda';
+    }>;
+    sections: {[key: string]: boolean};
     dashboards?: Array<IUserDashboard>;
+    notification_schedule?: {
+        timezone: string;
+        times: Array<string>;
+        last_run_time?: TDatetime;
+    };
 }

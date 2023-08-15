@@ -162,8 +162,8 @@ const mapStateToProps = (state: any) => ({
 const mapDispatchToProps = (dispatch: any) => ({
     selectProduct: (_id: any) => dispatch(selectProduct(_id)),
     editProduct: (event: any) => dispatch(editProduct(event)),
-    saveProduct: (type: any) => dispatch(postProduct()),
-    deleteProduct: (type: any) => dispatch(deleteProduct()),
+    saveProduct: () => dispatch(postProduct()),
+    deleteProduct: () => dispatch(deleteProduct()),
     newProduct: () => dispatch(newProduct()),
     saveCompanies: (companies: any) => dispatch(saveCompanies(companies)),
     fetchCompanies: () => dispatch(fetchCompanies()),
