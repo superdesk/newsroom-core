@@ -2,6 +2,7 @@ import {createSelector} from 'reselect';
 import {get, find, filter as removeNulls, isEqual, isEmpty} from 'lodash';
 
 export const searchQuerySelector = (state: any) => get(state, 'search.activeQuery') || null;
+export const searchSortQuerySelector = (state: any) => get(state, 'search.activeSortQuery') || null;
 export const searchFilterSelector = (state: any) => get(state, 'search.activeFilter');
 export const searchCreatedSelector = (state: any) => get(state, 'search.createdFilter');
 export const searchNavigationSelector = (state: any) => get(state, 'search.activeNavigation') || [];
@@ -54,12 +55,16 @@ export const activeProductSelector = createSelector(
 export const resultsFilteredSelector = (state: any) => state.resultsFiltered;
 
 export const searchParamsSelector = createSelector(
-    [searchQuerySelector, searchCreatedSelector, searchNavigationSelector, searchFilterSelector, searchProductSelector, advancedSearchParamsSelector],
-    (query: any, created: any, navigation: any, filter: any, product: any, advancedSearchParams: any) => {
+    [searchQuerySelector, searchSortQuerySelector, searchCreatedSelector, searchNavigationSelector, searchFilterSelector, searchProductSelector, advancedSearchParamsSelector],
+    (query: any, sortQuery: any, created: any, navigation: any, filter: any, product: any, advancedSearchParams: any) => {
         const params: any = {};
 
         if (!isEmpty(query)) {
             params.query = query;
+        }
+
+        if (!isEmpty(sortQuery)) {
+            params.sortQuery = sortQuery;
         }
 
         if (!isEmpty(created)) {
