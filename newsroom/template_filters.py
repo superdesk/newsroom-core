@@ -88,19 +88,23 @@ def date_short(datetime):
 
 def notification_time(datetime):
     if datetime:
-        return format_time(parse_date(datetime), app.config["NOTIFICATION_EMAIL_TIME_FORMAT"])
+        return format_time(parse_date(datetime), get_client_format("NOTIFICATION_EMAIL_TIME_FORMAT"))
 
 
 def notification_date(datetime):
     if datetime:
-        return format_date(parse_date(datetime), app.config["NOTIFICATION_EMAIL_DATE_FORMAT"])
+        return format_date(parse_date(datetime), get_client_format("NOTIFICATION_EMAIL_DATE_FORMAT"))
 
 
 def notification_datetime(datetime):
     if datetime:
         return format_datetime(
             parse_date(datetime),
-            app.config["NOTIFICATION_EMAIL_DATE_FORMAT"] + " " + app.config["NOTIFICATION_EMAIL_TIME_FORMAT"],
+            (
+                get_client_format("NOTIFICATION_EMAIL_DATE_FORMAT")
+                + " "
+                + get_client_format("NOTIFICATION_EMAIL_TIME_FORMAT")
+            ),
         )
 
 

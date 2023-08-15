@@ -304,6 +304,8 @@ CLIENT_LOCALE_FORMATS = {
         "COVERAGE_DATE_TIME_FORMAT": "HH:mm DD/MM",
         "COVERAGE_DATE_FORMAT": "DD/MM",
         "DATE_FORMAT_HEADER": "EEEE, dd/MM/yyyy",
+        "NOTIFICATION_EMAIL_TIME_FORMAT": "HH:mm a",
+        "NOTIFICATION_EMAIL_DATE_FORMAT": "MMMM d, yyyy",
     },
     "fr_CA": {  # example - you can overwrite any format above
         "DATE_FORMAT": "DD/MM/YYYY",
@@ -445,9 +447,6 @@ DATE_FORMAT_HEADER = "EEEE, dd/MM/yyyy"
 DATETIME_FORMAT_SHORT = "short"
 DATETIME_FORMAT_LONG = "dd/MM/yyyy HH:mm"
 AGENDA_EMAIL_LIST_DATE_FORMAT = "HH:mm (dd/MM/yyyy)"
-
-NOTIFICATION_EMAIL_TIME_FORMAT = "HH:mm a"
-NOTIFICATION_EMAIL_DATE_FORMAT = "MMMM d, yyyy"
 
 PREPEND_EMBARGOED_TO_WIRE_SEARCH = False
 
