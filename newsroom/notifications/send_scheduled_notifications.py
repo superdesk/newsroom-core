@@ -1,6 +1,6 @@
 from typing import List, Dict, Any, Optional, TypedDict, Tuple
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from copy import deepcopy
 
 from bson import ObjectId
@@ -55,11 +55,10 @@ class SendScheduledNotificationEmails(Command):
                     continue
 
                 if not user.get("notification_schedule"):
-                    # No schedule information defined, using system defaults instead
-                    user["notification_schedule"] = NotificationSchedule(
-                        timezone=get_session_timezone(),
-                        times=app.config["DEFAULT_SCHEDULED_NOTIFICATION_TIMES"],
-                    )
+                    user["notification_schedule"] = {}
+
+                user["notification_schedule"].setdefault("timezone", get_session_timezone())
+                user["notification_schedule"].setdefault("times", app.config["DEFAULT_SCHEDULED_NOTIFICATION_TIMES"])
 
                 company = companies.get(str(user.get("company", "")))
                 self.process_schedule(schedule, user, company, now_utc, user_topic_map.get(user["_id"]) or {}, force)
@@ -80,37 +79,14 @@ class SendScheduledNotificationEmails(Command):
         user_topics: Dict[ObjectId, Topic],
         force: bool,
     ):
-        timezone = user["notification_schedule"].get("timezone") or app.config["DEFAULT_TIMEZONE"]
-        now_local = utc_to_local(timezone, now_utc)
+        now_local = utc_to_local(user["notification_schedule"]["timezone"], now_utc)
 
-        schedule_datetimes = self._convert_schedule_times(
-            now_local, user["notification_schedule"].get("times") or app.config["DEFAULT_SCHEDULED_NOTIFICATION_TIMES"]
-        )
+        if not self._is_scheduled_to_run_for_user(user["notification_schedule"], now_local, force):
+            return
 
         # Set the timezone on the session, so Babel is able to get the timezone for this user
         # when rendering the email, otherwise it uses the system default
-        set_session_timezone(timezone)
-
-        try:
-            last_run_time_local = utc_to_local(timezone, user["notification_schedule"]["last_run_time"]).replace(
-                second=0, microsecond=0
-            )
-        except KeyError:
-            last_run_time_local = None
-
-        run_schedule = False
-
-        if last_run_time_local is None and force:
-            run_schedule = True
-        else:
-            for schedule_datetime in schedule_datetimes:
-                if last_run_time_local is None and schedule_datetime == now_local:
-                    run_schedule = True
-                elif last_run_time_local is not None and last_run_time_local < schedule_datetime == now_local:
-                    run_schedule = True
-
-        if not run_schedule:
-            return
+        set_session_timezone(user["notification_schedule"]["timezone"])
 
         topic_entries: Dict[str, List[NotificationEmailTopicEntry]] = {
             "wire": [],
@@ -179,6 +155,27 @@ class SendScheduledNotificationEmails(Command):
 
         # Now clear the topic match queue
         self._clear_user_notification_queue(user)
+
+    def _is_scheduled_to_run_for_user(self, schedule: NotificationSchedule, now_local: datetime, force: bool):
+        try:
+            last_run_time_local = utc_to_local(schedule["timezone"], schedule["last_run_time"]).replace(
+                second=0, microsecond=0
+            )
+        except KeyError:
+            last_run_time_local = None
+
+        if last_run_time_local is None and force:
+            return True
+
+        for schedule_datetime in self._convert_schedule_times(now_local, schedule["times"]):
+            schedule_within_time = schedule_datetime - now_local < timedelta(minutes=5)
+
+            if last_run_time_local is None and schedule_within_time:
+                return True
+            elif last_run_time_local is not None and last_run_time_local < schedule_datetime and schedule_within_time:
+                return True
+
+        return False
 
     def _clear_user_notification_queue(self, user: User):
         get_resource_service("notification_queue").reset_queue(user["_id"])

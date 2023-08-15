@@ -406,7 +406,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     "newsroom:send_scheduled_notifications": {
         "task": "newsroom.notifications.send_scheduled_notifications.send_scheduled_notifications",
-        "schedule": crontab(minute="*/1"),
+        "schedule": crontab(minute="*/5"),
     },
 }
 

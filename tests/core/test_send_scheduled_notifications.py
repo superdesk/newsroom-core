@@ -1,8 +1,8 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from bson import ObjectId
 
 from superdesk.utc import utcnow, utc_to_local
-from newsroom.types import Topic, NotificationQueueTopic
+from newsroom.types import Topic, NotificationQueueTopic, NotificationSchedule
 from newsroom.notifications.send_scheduled_notifications import SendScheduledNotificationEmails
 
 from newsroom.tests.users import ADMIN_USER_ID
@@ -127,3 +127,38 @@ def test_get_latest_item_from_topic_queue(app):
     assert item["_id"] == "topic1_item1"
     assert '<span class="es-highlight">cheese</span>' in item["es_highlight"]["body_html"][0]
     assert '<span class="es-highlight">cheese</span>' in item["es_highlight"]["slugline"][0]
+
+
+def test_is_scheduled_to_run_for_user():
+    command = SendScheduledNotificationEmails()
+    timezone = "Australia/Sydney"
+
+    # Run schedule if ``last_run_time`` is not defined and ``force=True``
+    assert command._is_scheduled_to_run_for_user({"timezone": timezone}, utcnow(), True) is True
+
+    times = ["07:00", "15:00", "20:00"]
+    tests = [
+        {"result": False, "now": (6, 0)},
+        {"result": True, "now": (7, 0)},
+        {"result": False, "now": (10, 0), "last_run": (7, 0)},
+        {"result": True, "now": (15, 0), "last_run": (7, 0)},
+        {"result": False, "now": (19, 45), "last_run": (15, 1)},
+        {"result": True, "now": (20, 0), "last_run": (15, 1)},
+        {"result": False, "now": (22, 0), "last_run": (20, 0)},
+        {"result": False, "now": (2, 0), "last_run": (20, 0)},
+    ]
+
+    def create_datetime_instance(hour: int, minute: int) -> datetime:
+        return utc_to_local(timezone, utcnow()).replace(hour=hour, minute=minute, second=0, microsecond=0)
+
+    for test in tests:
+        schedule: NotificationSchedule = {
+            "timezone": timezone,
+            "times": times,
+        }
+        if test.get("last_run"):
+            schedule["last_run_time"] = create_datetime_instance(test["last_run"][0], test["last_run"][1])
+
+        now = create_datetime_instance(test["now"][0], test["now"][1])
+
+        assert command._is_scheduled_to_run_for_user(schedule, now, False) == test["result"], test
