@@ -25,11 +25,17 @@ import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserList
 
 import {companyProductSeatsSelector, companySectionListSelector, sectionListSelector} from 'company-admin/selectors';
 import {IUser} from 'interfaces/user';
-import {IUserProfileStore, IUserProfileStore} from 'user-profile/reducers';
+import {IUserProfileStore} from 'user-profile/reducers';
 
 const getCompanyOptions = (companies: any) => companies.map((company: any) => ({value: company._id, text: company.name}));
 
-interface IProps extends IUserProfileStore {
+interface IReduxStoreProps {
+    allSections?: Array<any>;
+    companySections?: any;
+    seats?: any;
+}
+
+interface IProps extends IReduxStoreProps {
     original: IUser;
     user: IUser;
     onChange: (event: any) => void;
@@ -367,6 +373,6 @@ const mapStateToProps = (state: IUserProfileStore) => ({
     seats: companyProductSeatsSelector(state),
 });
 
-const EditUser = connect<IUserProfileStore>(mapStateToProps)(EditUserComponent);
+const EditUser = connect<IReduxStoreProps>(mapStateToProps)(EditUserComponent);
 
 export default EditUser;
