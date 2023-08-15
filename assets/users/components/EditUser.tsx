@@ -367,7 +367,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
     );
 };
 
-const mapStateToProps = (state: IUserProfileStore) => ({
+const mapStateToProps = (state: IUserProfileStore): IReduxStoreProps => ({
     allSections: sectionListSelector(state),
     companySections: companySectionListSelector(state),
     seats: companyProductSeatsSelector(state),
