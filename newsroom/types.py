@@ -34,6 +34,12 @@ class NotificationQueue(TypedDict):
     topics: List[NotificationQueueTopic]
 
 
+class UserDashboardEntry(TypedDict):
+    name: str
+    type: str
+    topic_ids: List[ObjectId]
+
+
 class UserData(TypedDict, total=False):
     _id: ObjectId
     email: str
@@ -45,6 +51,7 @@ class UserData(TypedDict, total=False):
     is_validated: bool
     sections: Dict[str, bool]
     products: List[ProductRef]
+    dashboards: List[UserDashboardEntry]
     notification_schedule: NotificationSchedule
 
 
