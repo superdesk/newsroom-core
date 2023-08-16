@@ -69,7 +69,11 @@ interface IDispatchProps {
     setProductFilter: (productId: any) => any;
 }
 
-type IProps = IDispatchProps & IStateProps;
+interface IOwnProps {
+    // empty
+}
+
+type IProps = IDispatchProps & IStateProps & IOwnProps;
 
 interface IState {
     sideNavOpen: boolean;
@@ -303,6 +307,6 @@ const mapDispatchToProps = (dispatch: any): IDispatchProps => ({
 export const CompanyAdminApp = connect<
     IStateProps,
     IDispatchProps,
-    unknown,
+    IOwnProps,
     ICompanyAdminStore
 >(mapStateToProps, mapDispatchToProps)(CompanyAdminAppComponent);

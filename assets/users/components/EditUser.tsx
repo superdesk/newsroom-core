@@ -30,9 +30,9 @@ import {IUserProfileStore} from 'user-profile/reducers';
 const getCompanyOptions = (companies: any) => companies.map((company: any) => ({value: company._id, text: company.name}));
 
 interface IReduxStoreProps {
-    allSections?: Array<any>;
-    companySections?: any;
-    seats?: any;
+    allSections: Array<any>;
+    companySections: any;
+    seats: any;
 }
 
 interface IProps extends IReduxStoreProps {
