@@ -69,7 +69,7 @@ interface IDispatchProps {
     setProductFilter: (productId: any) => any;
 }
 
-interface IOwnProps {
+type IOwnProps = {
     // empty
 }
 
