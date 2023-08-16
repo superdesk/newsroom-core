@@ -1,12 +1,18 @@
+from copy import deepcopy
 from bson import ObjectId
+import pytz
+
 from flask import json
 from flask import url_for
+from eve.utils import str_to_date
 from datetime import datetime, timedelta
 from superdesk import get_resource_service
+from superdesk.utc import utcnow
 
 from newsroom.auth import get_user_by_email
 from newsroom.utils import get_user_dict, get_company_dict, is_valid_user
 from newsroom.tests.fixtures import COMPANY_1_ID
+from newsroom.tests.users import ADMIN_USER_ID
 from newsroom.signals import user_created, user_updated, user_deleted
 from unittest import mock
 
@@ -566,3 +572,43 @@ def test_signals(client, app):
     deleted_listener.assert_called_once()
     assert user_id == deleted_listener.call_args.kwargs["user"]["_id"]
     assert user["email"] == deleted_listener.call_args.kwargs["user"]["email"]
+
+
+def test_user_can_update_notification_schedule(app, client):
+    def update_user_schedule(data):
+        response = client.post(
+            f"/users/{ADMIN_USER_ID}/notification_schedules",
+            data=json.dumps(data),
+            content_type="application/json",
+        )
+        assert response.status_code == 200
+
+    # Start out with an undefined notification schedule
+    user = client.get(f"/users/{ADMIN_USER_ID}").get_json()
+    user["_id"] = ObjectId(user["_id"])
+    assert user.get("notification_schedule") is None
+
+    # Now update the schedule with timezone and times
+    update_user_schedule({"timezone": "Australia/Sydney", "times": ["08:00", "16:00", "20:00"]})
+    user = client.get(f"/users/{ADMIN_USER_ID}").get_json()
+    user["_id"] = ObjectId(user["_id"])
+    assert user["notification_schedule"]["timezone"] == "Australia/Sydney"
+    assert user["notification_schedule"]["times"] == ["08:00", "16:00", "20:00"]
+    assert user["notification_schedule"].get("last_run_time") is None
+
+    # Update the schedules ``last_run_time``
+    now = utcnow()
+    get_resource_service("users").update_notification_schedule_run_time(user, now)
+    user = client.get(f"/users/{ADMIN_USER_ID}").get_json()
+    assert user["notification_schedule"]["timezone"] == "Australia/Sydney"
+    assert user["notification_schedule"]["times"] == ["08:00", "16:00", "20:00"]
+    assert str_to_date(user["notification_schedule"]["last_run_time"]).replace(tzinfo=pytz.utc) == now
+
+    # Update the schedule's timezone and times
+    update_user_schedule({"timezone": "Europe/Prague", "times": ["09:00", "17:00", "21:00"]})
+    user = client.get(f"/users/{ADMIN_USER_ID}").get_json()
+    user["_id"] = ObjectId(user["_id"])
+    # Make sure all attributes were retained, specifically the ``last_run_time``
+    assert user["notification_schedule"]["timezone"] == "Europe/Prague"
+    assert user["notification_schedule"]["times"] == ["09:00", "17:00", "21:00"]
+    assert str_to_date(user["notification_schedule"]["last_run_time"]).replace(tzinfo=pytz.utc) == now

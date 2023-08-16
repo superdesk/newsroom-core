@@ -1,12 +1,14 @@
 import bcrypt
 import newsroom
+from datetime import datetime
+from copy import deepcopy
 
 from typing import Dict, Optional, List
 from flask import current_app as app, session, abort, request
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest
 
-from newsroom.types import Company, ProductRef
+from newsroom.types import Company, ProductRef, User
 from newsroom.auth import get_user_id, get_user, get_company_from_user
 from newsroom.settings import get_setting
 from newsroom.utils import set_original_creator, set_version_creator
@@ -244,6 +246,13 @@ class UsersService(newsroom.Service):
         updated = original.copy()
         updated.update(updates)
         user_updated.send(self, user=updated, updates=updates)
+
+    def update_notification_schedule_run_time(self, user: User, run_time: datetime):
+        notification_schedule = deepcopy(user["notification_schedule"])
+        notification_schedule["last_run_time"] = run_time
+        self.update(user["_id"], {"notification_schedule": notification_schedule}, user)
+        app.cache.delete(str(user["_id"]))
+        app.cache.delete(user.get("email"))
 
     def _get_password_hash(self, password):
         return get_hash(password, app.config.get("BCRYPT_GENSALT_WORK_FACTOR", 12))

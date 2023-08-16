@@ -179,10 +179,7 @@ class SendScheduledNotificationEmails(Command):
 
     def _clear_user_notification_queue(self, user: User):
         get_resource_service("notification_queue").reset_queue(user["_id"])
-
-        notification_schedule = deepcopy(user["notification_schedule"])
-        notification_schedule["last_run_time"] = utcnow()
-        get_resource_service("users").update(user["_id"], {"notification_schedule": notification_schedule}, user)
+        get_resource_service("users").update_notification_schedule_run_time(user, utcnow())
 
     def _convert_schedule_times(self, now_local: datetime, times: List[str]) -> List[datetime]:
         schedule_datetimes: List[datetime] = []

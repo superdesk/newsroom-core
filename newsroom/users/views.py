@@ -1,5 +1,6 @@
 import re
 
+from copy import deepcopy
 import flask
 from bson import ObjectId
 from flask import jsonify, current_app as app
@@ -279,7 +280,8 @@ def edit_user_notification_schedules(_id):
 
     data = get_json_or_400()
 
-    updates = {"notification_schedule": data}
+    updates = {"notification_schedule": deepcopy(user.get("notification_schedule") or {})}
+    updates["notification_schedule"].update(data)
     get_resource_service("users").patch(user_id, updates=updates)
     return jsonify({"success": True}), 200
 
