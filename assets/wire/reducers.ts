@@ -26,6 +26,7 @@ const initialState: any = {
     isLoading: false,
     totalItems: null,
     activeQuery: null,
+    activeSortQuery: null,
     user: null,
     userType: null,
     userFolders: [],

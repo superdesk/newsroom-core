@@ -1,8 +1,22 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 
-const SelectInput = ({
+export interface ISelectInputProps {
+    name: string;
+    label: string;
+    onChange(event: React.ChangeEvent<HTMLSelectElement>): void;
+    defaultOption?: string;
+    value?: string;
+    error?: Array<string>;
+    options: Array<{
+        text: string;
+        value: string;
+    }>;
+    className?: string;
+    readOnly?: boolean;
+}
+
+const SelectInput: React.FC<ISelectInputProps> = ({
     name,
     label,
     onChange,
@@ -11,7 +25,8 @@ const SelectInput = ({
     error,
     options,
     className,
-    readOnly}: any) => {
+    readOnly
+}): React.ReactElement => {
     return (
         <div
             className={className ? className : 'form-group'}
@@ -37,21 +52,6 @@ const SelectInput = ({
             </div>
         </div>
     );
-};
-
-SelectInput.propTypes = {
-    name: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired,
-    defaultOption: PropTypes.string,
-    value: PropTypes.string,
-    error: PropTypes.arrayOf(PropTypes.string),
-    options: PropTypes.arrayOf(PropTypes.shape({
-        text: PropTypes.string.isRequired,
-        value: PropTypes.string.isRequired,
-    })).isRequired,
-    className: PropTypes.string,
-    readOnly: PropTypes.bool,
 };
 
 export default SelectInput;

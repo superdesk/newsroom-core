@@ -145,8 +145,8 @@ const mapStateToProps = (state: any) => ({
 const mapDispatchToProps = (dispatch: any) => ({
     selectNavigation: (_id: any) => dispatch(selectNavigation(_id)),
     editNavigation: (event: any) => dispatch(editNavigation(event)),
-    saveNavigation: (type: any) => dispatch(postNavigation()),
-    deleteNavigation: (type: any) => dispatch(deleteNavigation()),
+    saveNavigation: () => dispatch(postNavigation()),
+    deleteNavigation: () => dispatch(deleteNavigation()),
     newNavigation: () => dispatch(newNavigation()),
     cancelEdit: (event: any) => dispatch(cancelEdit(event)),
     fetchProducts: () => dispatch(fetchProducts()),

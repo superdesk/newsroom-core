@@ -21,6 +21,7 @@ import {
     setQuery,
     followStory,
     saveMyTopic,
+    setSortQuery,
 } from 'search/actions';
 
 import {
@@ -34,6 +35,7 @@ import {
     searchParamsSelector,
     showSaveTopicSelector,
     filterGroupsToLabelMap,
+    searchSortQuerySelector,
 } from 'search/selectors';
 
 import BaseApp from 'layout/components/BaseApp';
@@ -228,7 +230,7 @@ class WireApp extends BaseApp {
 
                                 newItems={this.props.newItems}
                                 refresh={this.props.fetchItems}
-
+                                setSortQuery={this.props.setSortQuery}
                                 setQuery={this.props.setQuery}
                             >
                                 <ListViewControls
@@ -290,6 +292,7 @@ WireApp.propTypes = {
     isLoading: PropTypes.bool,
     totalItems: PropTypes.number,
     activeQuery: PropTypes.string,
+    activeSortQuery: PropTypes.string,
     itemToPreview: PropTypes.object,
     itemToOpen: PropTypes.object,
     itemsById: PropTypes.object,
@@ -340,6 +343,7 @@ const mapStateToProps = (state: any) => ({
     newsOnlyFilterText: state.newsOnlyFilterText,
     totalItems: state.totalItems,
     activeQuery: searchQuerySelector(state),
+    activeSortQuery: searchSortQuerySelector(state),
     itemToPreview: state.previewItem ? state.itemsById[state.previewItem] : null,
     itemToOpen: state.openItem ? state.itemsById[state.openItem._id] : null,
     itemsById: state.itemsById,
@@ -383,11 +387,12 @@ const mapDispatchToProps = (dispatch: any) => ({
         dispatch(fetchItems());
     },
     setQuery: (query: any) => dispatch(setQuery(query)),
+    setSortQuery: (query: any) => dispatch(setSortQuery(query)),
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view: any) => dispatch(setView(view)),
     closePreview: () => dispatch(previewItem(null)),
-    downloadMedia: (href: any, id: any, mimeType: any) => dispatch(downloadMedia(href, id)),
+    downloadMedia: (href: any, id: any) => dispatch(downloadMedia(href, id)),
 });
 
 const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(WireApp);
