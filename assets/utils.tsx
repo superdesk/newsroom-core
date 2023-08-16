@@ -510,17 +510,14 @@ export function formatHTML(html: any) {
  * @param dispatch
  * @param setError
  */
-export function errorHandler(error: any, dispatch?: any, setError?: any) {
-    console.error('error', error);
-
-    if (error.response.status !== 400) {
-        notify.error(error.response.statusText || gettext('Failed to process request!'));
+export function errorHandler(error: {errorData: any} | Response, dispatch?: any, setError?: any) {
+    if ('errorData' in error) {
+        if (setError) {
+            dispatch(setError(error.errorData));
+        }
+    } else {
+        notify.error(error.statusText || gettext('Failed to process request!'));
         return;
-    }
-    if (setError) {
-        error.response.json().then(function(data: any) {
-            dispatch(setError(data));
-        });
     }
 }
 

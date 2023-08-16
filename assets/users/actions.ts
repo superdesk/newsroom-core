@@ -157,9 +157,8 @@ export function postUser() {
                     notify.success(gettext('User created successfully'));
                 }
                 dispatch(fetchUsers());
-            }, (error) => {
-                dispatch(setError(error));
-            });
+            })
+            .catch((error: any) => errorHandler(error, dispatch, setError));
 
     };
 }
