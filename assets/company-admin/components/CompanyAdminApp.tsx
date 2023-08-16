@@ -53,7 +53,7 @@ interface IStateProps {
 }
 
 interface IDispatchProps {
-    setSection: (sectionId: any) => any;
+    setSection: (sectionId: string) => any;
     newUser: () => IUser;
     editUser: (event: any) => any;
     setError: (errors: any) => any;
@@ -303,6 +303,6 @@ const mapDispatchToProps = (dispatch: any): IDispatchProps => ({
 export const CompanyAdminApp = connect<
     IStateProps,
     IDispatchProps,
-    Record<string, never>,
+    unknown,
     ICompanyAdminStore
 >(mapStateToProps, mapDispatchToProps)(CompanyAdminAppComponent);
