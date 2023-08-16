@@ -145,6 +145,7 @@ class WireListItem extends React.Component<any, any> {
             'wire-articles__item-select--visible': !LIST_ANIMATIONS,
             'wire-articles__item-select': LIST_ANIMATIONS,
         });
+
         const pictureOrVideoThumbnail = getPictureOrVideo(item);
         const isMarketPlace = this.props.context === 'aapX';
         const fields = listConfig.metadata_fields || DEFAULT_META_FIELDS;

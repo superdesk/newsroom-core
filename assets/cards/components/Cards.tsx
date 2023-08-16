@@ -151,8 +151,8 @@ const mapStateToProps = (state: any) => ({
 const mapDispatchToProps = (dispatch: any) => ({
     selectCard: (_id: any) => dispatch(selectCard(_id)),
     editCard: (event: any) => dispatch(editCard(event)),
-    saveCard: (type: any) => dispatch(postCard()),
-    deleteCard: (type: any) => dispatch(deleteCard()),
+    saveCard: () => dispatch(postCard()),
+    deleteCard: () => dispatch(deleteCard()),
     newCard: () => dispatch(newCard()),
     cancelEdit: (event: any) => dispatch(cancelEdit(event)),
     dispatch: dispatch,

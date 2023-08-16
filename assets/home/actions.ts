@@ -14,7 +14,7 @@ function openItem(item: any) {
 
 export const OPEN_ITEM = 'OPEN_ITEM';
 export function openItemDetails(item: any) {
-    return (dispatch: any, getState: any) => {
+    return (dispatch: any) => {
         dispatch(openItem(item));
         recordAction(item, 'open');
     };
