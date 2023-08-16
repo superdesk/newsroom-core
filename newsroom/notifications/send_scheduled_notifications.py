@@ -1,7 +1,6 @@
 from typing import List, Dict, Any, Optional, TypedDict, Tuple
 import logging
 from datetime import datetime, timedelta
-from copy import deepcopy
 
 from bson import ObjectId
 from flask import current_app as app
