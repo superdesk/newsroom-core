@@ -94,7 +94,7 @@ $tag-x-palette: $tag-x-colors !default;
     font-weight: 400;
     transition: background-color .2s ease-out, opacity .1s ease-out;
     margin: 0;
-    height: var(--size-form-element--small);
+    min-height: var(--size-form-element--small);
     color: var(--tag-label-txt-default);
     background-color: var(--tag-label-bg-default);
 }
@@ -175,9 +175,15 @@ $tag-x-palette: $tag-x-colors !default;
     }
     .tag-label--text {
         font-weight: 500;
+        text-align: left;
+        line-height: 1.2;
+        margin-block: 5px;
     }
     .tag-label--text-label {
-        opacity: 0.9;
+        opacity: 0.8;
+        line-height: 1.2;
+        align-self: start;
+        margin-block: 5px;
     }
     &.tag-label--operator {
         padding-inline: var(--space--1);

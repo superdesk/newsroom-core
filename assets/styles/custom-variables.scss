@@ -114,6 +114,24 @@ $container-max-widths: (
 //--------------------------
 
 :root {
+    // NEUTRAL COLORS
+    // Light
+    --color-neutral-000: hsl(0, 2%, 100%);
+    --color-neutral-050: hsl(0, 2%, 97%);
+    --color-neutral-100: hsl(0, 2%, 95%);
+    --color-neutral-150: hsl(0, 2%, 92%);
+    --color-neutral-200: hsl(0, 2%, 84%);
+    // Medium
+    --color-neutral-300: hsl(0, 2%, 74%);
+    --color-neutral-400: hsl(0, 2%, 54%);
+    --color-neutral-500: hsl(0, 2%, 40%);
+
+    --color-neutral-600: hsl(0, 2%, 34%);
+    // Dark
+    --color-neutral-700: hsl(0, 2%, 20%);
+    --color-neutral-800: hsl(0, 2%, 14%);
+    --color-neutral-900: hsl(0, 2%, 4%);
+
     // CORE COLORS
     @include defineColorHSL(--color-success, 95, 50%, 34%);
     @include defineColorHSL(--color-warning, 36, 100%, 40%);
@@ -148,26 +166,26 @@ $container-max-widths: (
     // --------------------------------------------------------------------
     
     // CORE: BACKGROUNDS
-    --color-background: hsl(0, 0%, 100%);
-    --color-background--muted: hsl(0, 0%, 97%);
-    --color-background--muted-2: hsl(0, 0%, 95%);
+    --color-background:           var(--color-neutral-000);
+    --color-background--muted:    var(--color-neutral-050);
+    --color-background--muted-2:  var(--color-neutral-100);
 
     // CORE: CONTENT ITEM BACKGROUND
-    --color-background-content-item: hsl(0, 0%, 100%);
+    --color-background-content-item: var(--color-neutral-000);
     
     // CORE: TEXT COLORS
-    --color-text:                 hsla(0, 0%, 14%, 1);
-    --color-text--muted:          hsla(0, 0%, 40%, 1);
-    --color-text--muted-2:        hsla(0, 0%, 54%, 1);
-    --color-text--inverse:        hsla(0, 0%, 96%, 1);
-    --color-text--disabled:       hsla(0, 0%, 20%, 0.5);
+    --color-text:                 var(--color-neutral-800);
+    --color-text--muted:          var(--color-neutral-500);
+    --color-text--muted-2:        var(--color-neutral-400);
+    --color-text--inverse:        var(--color-neutral-050);
+    --color-text--disabled:       var(--color-neutral-600);
 
     // CORE: LINE COLORS
-    --color-line--x-light:        hsla(0, 0%, 92%, 1);
-    --color-line--light:          hsla(0, 0%, 84%, 1);
-    --color-line--medium:         hsla(0, 0%, 74%, 1);
-    --color-line--strong:         hsla(0, 0%, 54%, 1);
-    --color-line--x-strong:       hsla(0, 0%, 34%, 1);
+    --color-line--x-light:        var(--color-neutral-150);
+    --color-line--light:          var(--color-neutral-200);
+    --color-line--medium:         var(--color-neutral-300);
+    --color-line--strong:         var(--color-neutral-400);
+    --color-line--x-strong:       var(--color-neutral-600);
 
     // CORE: SHADOW
     --line-shadow-end--light: 0 1px 0 var(--color-line--light);
@@ -241,9 +259,10 @@ $container-max-widths: (
     --table-cell-padding-inline--small: var(--space--1);
     --table-cell-padding-block: var(--space--2);
     --table-cell-padding-block--small: var(--space--1-5);
-
     --table-selected-shadow: inset 0 0 0 3px var(--color-interactive-focus--translucent);
 
+    // COMPONENT: MAIN HEADER / TOOLBAR
+    --main-header-color-bg: var(--color-neutral-000);
     
     // COMPONENT: SEARCHBAR
     --searchbar-size-height: 40px;
