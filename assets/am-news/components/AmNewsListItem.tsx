@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import {get} from 'lodash';
 
 import {LIST_ANIMATIONS, wordCount} from 'utils';
-import {getPicture, getThumbnailRendition, isKilled, shortText} from '../../wire/utils';
+import {getPictureOrVideo, getThumbnailRendition, isKilled, shortText} from '../../wire/utils';
 
 import ActionMenu from 'components/ActionMenu';
 import ActionButton from 'components/ActionButton';
@@ -91,7 +91,7 @@ class AmNewsListItem extends React.Component<any, any> {
             'time-label--data': isDataItem(item),
             'time-label--stories': !isDataItem(item),
         });
-        const picture = getPicture(item);
+        const picture = getPictureOrVideo(item);
 
 
         return (

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {getCaption, getPicture, getThumbnailRendition} from 'wire/utils';
+import {getCaption, getPictureOrVideo, getThumbnailRendition} from 'wire/utils';
 import CardFooter from './CardFooter';
 import CardBody from './CardBody';
 import CardRow from './CardRow';
@@ -30,7 +30,7 @@ const getPictureTextPanel = (item: any, picture: any, openItem: any, cardId: any
 function LargePictureTextCard ({items, title, productId, openItem, isActive, cardId, listConfig}: any) {
     return (
         <CardRow title={title} productId={productId} isActive={isActive}>
-            {items.map((item: any) => getPictureTextPanel(item, getPicture(item), openItem, cardId, listConfig))}
+            {items.map((item: any) => getPictureTextPanel(item, getPictureOrVideo(item), openItem, cardId, listConfig))}
         </CardRow>
     );
 }

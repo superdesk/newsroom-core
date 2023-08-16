@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {getSlugline} from 'utils';
-import {getPicture, getThumbnailRendition, getCaption, shortText} from 'wire/utils';
+import {getPictureOrVideo, getThumbnailRendition, getCaption, shortText} from 'wire/utils';
 import CardRow from './CardRow';
 import CardFooter from './CardFooter';
 import CardMeta from './CardMeta';
@@ -58,9 +58,9 @@ const getTopNewsRightPanel = (item: any, picture: any, openItem: any, cardId: an
 const getTopNews = (items: any, openItem: any, cardId: any, listConfig: any) => {
     const topNews: Array<any> = [];
     for(let i=0; i<items.length; i+=2) {
-        topNews.push(getTopNewsLeftPanel(items[i], getPicture(items[i]), openItem, cardId, listConfig));
+        topNews.push(getTopNewsLeftPanel(items[i], getPictureOrVideo(items[i]), openItem, cardId, listConfig));
         if (i+1 < items.length) {
-            topNews.push(getTopNewsRightPanel(items[i+1], getPicture(items[i+1]), openItem, cardId));
+            topNews.push(getTopNewsRightPanel(items[i+1], getPictureOrVideo(items[i+1]), openItem, cardId));
         }
     }
     return topNews;

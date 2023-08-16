@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {shortDate} from 'utils';
-import {getPicture, getThumbnailRendition, getCaption} from 'wire/utils';
+import {getPictureOrVideo, getThumbnailRendition, getCaption} from 'wire/utils';
 import CardRow from './CardRow';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 
 const getMediaPanel = (item: any, picture: any, openItem: any, cardId: any) => {
-
     const rendition = getThumbnailRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
@@ -30,7 +29,7 @@ const getMediaPanel = (item: any, picture: any, openItem: any, cardId: any) => {
 function MediaGalleryCard ({items, title, productId, openItem, isActive, cardId}: any) {
     return (
         <CardRow title={title} productId={productId} isActive={isActive}>
-            {items.map((item: any) => getMediaPanel(item, getPicture(item), openItem, cardId))}
+            {items.map((item: any) => getMediaPanel(item, getPictureOrVideo(item), openItem, cardId))}
         </CardRow>
     );
 }

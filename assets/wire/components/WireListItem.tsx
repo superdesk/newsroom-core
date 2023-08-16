@@ -12,12 +12,11 @@ import {
     getConfig,
 } from 'utils';
 import {
-    getPicture,
+    getPictureOrVideo,
     getThumbnailRendition,
     showItemVersions,
     shortText,
     isKilled,
-    getVideos,
     getCaption,
     shortHighlightedtext,
 } from 'wire/utils';
@@ -146,8 +145,7 @@ class WireListItem extends React.Component<any, any> {
             'wire-articles__item-select--visible': !LIST_ANIMATIONS,
             'wire-articles__item-select': LIST_ANIMATIONS,
         });
-        const picture = getPicture(item);
-        const videos = getVideos(item);
+        const pictureOrVideoThumbnail = getPictureOrVideo(item);
         const isMarketPlace = this.props.context === 'aapX';
         const fields = listConfig.metadata_fields || DEFAULT_META_FIELDS;
         const compactFields = listConfig.compact_metadata_fields || DEFAULT_COMPACT_META_FIELDS;
@@ -185,7 +183,7 @@ class WireListItem extends React.Component<any, any> {
                                 {!isExtended && (
                                     <WireListItemIcons
                                         item={item}
-                                        picture={picture}
+                                        picture={pictureOrVideoThumbnail}
                                         divider={false}
                                     />
                                 )}
@@ -201,7 +199,7 @@ class WireListItem extends React.Component<any, any> {
                             <div className="wire-articles__item__meta">
                                 <WireListItemIcons
                                     item={item}
-                                    picture={picture}
+                                    picture={pictureOrVideoThumbnail}
                                 />
                                 <div className="wire-articles__item__meta-info">
                                     <span className="bold">
@@ -240,7 +238,7 @@ class WireListItem extends React.Component<any, any> {
                             >
                                 <WireListItemIcons
                                     item={item}
-                                    picture={picture}
+                                    picture={pictureOrVideoThumbnail}
                                 />
                                 <div className="wire-articles__item__meta-info">
                                     <span>
@@ -301,14 +299,14 @@ class WireListItem extends React.Component<any, any> {
 
                     {isExtended &&
                         !isKilled(item) &&
-                        getThumbnailRendition(picture) && (
+                        getThumbnailRendition(pictureOrVideoThumbnail) && (
                         <div className="wire-articles__item-image">
                             <figure>
                                 <img
                                     src={
-                                        getThumbnailRendition(picture).href
+                                        getThumbnailRendition(pictureOrVideoThumbnail).href
                                     }
-                                    alt={getCaption(picture)}
+                                    alt={getCaption(pictureOrVideoThumbnail)}
                                 />
                             </figure>
                         </div>

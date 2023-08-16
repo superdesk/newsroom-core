@@ -57,14 +57,14 @@ function getRelatedItemsByType(item: any, type: any) {
  * @param {Object} item
  * @return {Object}
  */
-export function getPicture(item: any) {
-    if (item.type === 'picture') {
+export function getPictureOrVideo(item: any) {
+    if (item.type === 'picture' || item.type === 'video') {
         return item;
     }
 
-    const featured = get(item, 'associations.featuremedia');
+    const featured = item?.associations?.featuremedia;
 
-    if (featured != null && featured.type === 'picture') {
+    if (featured != null && featured?.type === 'picture' || featured?.type === 'video') {
         return featured;
     }
 
@@ -72,13 +72,21 @@ export function getPicture(item: any) {
 }
 
 function getBodyPicture(item: any) {
-    const pictures = Object.values(get(item, 'associations', {}) || {}).filter((assoc: any) => get(assoc, 'type') === 'picture');
+    const pictures = Object.values(
+        get(item, 'associations', {}) || {}).filter((assoc: any) => assoc.type === 'picture' || assoc.type === 'video');
     return pictures.length ? pictures[0] : null;
 }
 
 export function getPictureList(item: any) {
-    const pictures = Object.values(get(item, 'associations', {}) || {}).filter((assoc: any) => get(assoc, 'type') === 'picture');
-    return pictures.length ? pictures : [];
+    const picturesOrVideos = Object.values(Object.values(item.associations ?? {})
+        .filter((association: any) => association.type === 'picture'));
+
+    return picturesOrVideos.length ? picturesOrVideos : [];
+}
+
+export function getVideoThumbnail(item: any): string | undefined {
+    const video: any = Object.values(item.associations).find((association: any) => association.type === 'video');
+    return video?.renditions.thumbnail.href;
 }
 
 /**

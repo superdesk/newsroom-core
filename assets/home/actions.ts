@@ -38,7 +38,9 @@ export function getMultipleCardItems(itemsByCard: any) {
 export function fetchCompanyCardItems() {
     return (dispatch: any) => {
         return server.get('/card_items')
-            .then((data: any) => dispatch(getMultipleCardItems(data._items)))
+            .then((data: any) => {
+                dispatch(getMultipleCardItems(data._items));
+            })
             .catch(errorHandler);
     };
 }

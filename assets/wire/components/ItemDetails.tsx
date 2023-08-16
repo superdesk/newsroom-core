@@ -15,6 +15,7 @@ import {
     isPreformatted,
     isCustomRendition,
     getPictureList,
+    getVideoThumbnail,
 } from 'wire/utils';
 import types from 'wire/types';
 import Content from 'ui/components/Content';
@@ -75,6 +76,17 @@ function ItemDetails({
                             isCustomRendition={isCustomRendition(pic)}
                         />
                     ))}
+                    {
+                        !isEmpty(media) && media.map((media: any) => (
+                            <ArticleMedia
+                                thumbnail={getVideoThumbnail(item)}
+                                key={media.guid}
+                                media={media}
+                                isKilled={isKilled(item)}
+                                download={downloadMedia}
+                            />
+                        ))
+                    }
                     <ArticleContentWrapper itemType={itemType}>
                         <ArticleBody itemType={itemType}>
                             <ArticleEmbargoed item={item} />
@@ -89,12 +101,6 @@ function ItemDetails({
                             {isDisplayed('abstract', detailsConfig) &&
                             <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                             {isDisplayed('body_html', detailsConfig) && <ArticleBodyHtml item={item}/>}
-                            {!isEmpty(media) && media.map((media: any) => <ArticleMedia
-                                key={media.guid}
-                                media={media}
-                                isKilled={isKilled(item)}
-                                download={downloadMedia}
-                            />)}
                         </ArticleBody>
 
                         {isDisplayed('metadata_section', detailsConfig) && (
