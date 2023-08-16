@@ -32,8 +32,9 @@ import EditUser from 'users/components/EditUser';
 import {CompanyDetailsProductFilter} from './CompanyDetailsProductFilter';
 import {CompanyAdminProductSeatRequestModal} from './CompanyAdminProductSeatRequestModal';
 import {IUser} from 'interfaces/user';
+import {ICompanyAdminStore} from 'company-admin/reducers';
 
-interface IReduxStoreProps {
+interface IStateProps {
     sectionId: string;
     usersById: any;
     user: IUser;
@@ -51,22 +52,24 @@ interface IReduxStoreProps {
     totalUsers: number;
 }
 
-interface IProps extends IReduxStoreProps {
-    setSection: (section: string) => void;
-    editUser: (event: any) => void;
-    newUser: IUser;
-    setError: (errors: any) => void;
-    saveUser: () => void;
-    deleteUser: () => void;
-    resetPassword: () => void;
-    resendUserInvite: () => void;
-    closeUserEditor: () => void;
-    setQuery: () => void;
-    fetchUsers: () => void;
-    setSort: () => void;
-    toggleSortDirection: () => void;
-    setProductFilter: () => void;
+interface IDispatchProps {
+    setSection: (sectionId: any) => any;
+    newUser: () => IUser;
+    editUser: (event: any) => any;
+    setError: (errors: any) => any;
+    saveUser: () => any;
+    closeUserEditor: () => any;
+    deleteUser: () => any;
+    resetPassword: () => any;
+    resendUserInvite: () => any;
+    setQuery: (query: any) => any;
+    fetchUsers: () => any;
+    setSort: (param: any) => any;
+    toggleSortDirection: () => any;
+    setProductFilter: (productId: any) => any;
 }
+
+type IProps = IDispatchProps & IStateProps;
 
 interface IState {
     sideNavOpen: boolean;
@@ -265,7 +268,7 @@ class CompanyAdminAppComponent extends React.Component<IProps, IState> {
     }
 }
 
-const mapStateToProps = (state: IReduxStoreProps) => ({
+const mapStateToProps = (state: ICompanyAdminStore): IStateProps => ({
     sectionId: state.sectionId,
     usersById: state.usersById,
     user: currentUserSelector(state),
@@ -280,7 +283,7 @@ const mapStateToProps = (state: IReduxStoreProps) => ({
     totalUsers:state.totalUsers
 });
 
-const mapDispatchToProps = (dispatch: any) => ({
+const mapDispatchToProps = (dispatch: any): IDispatchProps => ({
     setSection: (sectionId: any) => dispatch(setSection(sectionId)),
     newUser: () => dispatch(newUser()),
     editUser: (event: any) => dispatch(editUser(event)),
@@ -297,4 +300,9 @@ const mapDispatchToProps = (dispatch: any) => ({
     setProductFilter: (productId: any) => dispatch(setProductFilter(productId)),
 });
 
-export const CompanyAdminApp = connect<IReduxStoreProps>(mapStateToProps, mapDispatchToProps)(CompanyAdminAppComponent);
+export const CompanyAdminApp = connect<
+    IStateProps,
+    IDispatchProps,
+    Record<string, never>,
+    ICompanyAdminStore
+>(mapStateToProps, mapDispatchToProps)(CompanyAdminAppComponent);
