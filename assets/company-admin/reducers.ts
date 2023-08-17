@@ -1,3 +1,4 @@
+import {IUser} from 'interfaces/user';
 import {INIT_VIEW_DATA, SET_PRODUCT_FILTER, SET_SECTION} from './actions';
 
 import {RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID} from 'actions';
@@ -5,7 +6,25 @@ import {modalReducer} from 'reducers';
 import {searchReducer} from 'search/reducers';
 import userReducer from 'users/reducers';
 
-const initialState: any = {
+export interface ICompanyAdminStore {
+    sectionId: string;
+    usersById: any;
+    user: IUser;
+    userToEdit: IUser;
+    errors: any;
+    products: Array<any>;
+    modal: {
+        modal: string;
+        data: any;
+    };
+    sort: string;
+    sortDirection: number;
+    productId: string;
+    companies: Array<any>;
+    totalUsers: number;
+}
+
+const initialState = {
     user: null,
     query: null,
     users: [],
@@ -30,7 +49,7 @@ const initialState: any = {
     productId: null,
 };
 
-export function companyAdminReducer(state: any = initialState, action: any) {
+export function companyAdminReducer(state: any = initialState, action: any): ICompanyAdminStore {
     switch (action.type) {
     case INIT_VIEW_DATA:
         return {
