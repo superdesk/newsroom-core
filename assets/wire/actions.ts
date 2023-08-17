@@ -9,7 +9,7 @@ import {
     updateRouteParams,
     getTimezoneOffset,
     recordAction,
-    errorHandler as notifyErrors,
+    errorHandler,
     copyTextToClipboard,
 } from 'utils';
 import {getNavigationUrlParam} from 'search/utils';
@@ -141,7 +141,7 @@ export function removeItems(items: any) {
                     notify.success(gettext('Item was removed successfully'));
                 }
             })
-            .catch(notifyErrors);
+            .catch(errorHandler);
     }
 
     return Promise.resolve();
@@ -343,14 +343,6 @@ export function removeBookmarkItems(items: any) {
     return {type: REMOVE_BOOKMARK, items};
 }
 
-export const SET_ERROR_MESSAGE = 'SET_ERROR_MESSAGE';
-export function setErrorMessage(message: any) {
-    return {
-        type: SET_ERROR_MESSAGE,
-        message
-    };
-}
-
 export const SET_ERROR = 'SET_ERROR';
 export function setError(errors: any) {
     return {type: SET_ERROR, errors};
@@ -386,20 +378,6 @@ export function removeBookmarks(items: any) {
             .then(() => dispatch(removeBookmarkItems(items)))
             .then(() => getState().bookmarks &&  dispatch(fetchItems()))
             .catch(errorHandler);
-}
-
-export function errorHandler(error?: any, dispatch?: any, setError?: any) {
-    console.error('error', error);
-    if (setError) {
-        if (error.response && error.response.status === 403) {
-            dispatch(setErrorMessage(gettext(
-                'There is no product associated with your user. Please reach out to your Company Admin')));
-        } else {
-            error.response.json().then(function(data: any) {
-                dispatch(setError(data));
-            });
-        }
-    }
 }
 
 /**

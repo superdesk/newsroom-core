@@ -7,7 +7,6 @@ import {
     RECIEVE_AGGS,
     LOADING_AGGREGATIONS,
     SET_ERROR,
-    SET_ERROR_MESSAGE,
 } from './actions';
 
 import {get, cloneDeep} from 'lodash';
@@ -194,13 +193,6 @@ export default function wireReducer(state: any = initialState, action: any) {
 
     case WIRE_ITEM_REMOVED:
         return markItemsRemoved(state, action.ids);
-
-    case SET_ERROR_MESSAGE:
-        return {
-            ...state,
-            isLoading: false,
-            errorMessage: action.message
-        };
 
     case SET_ERROR: {
         return {...state,

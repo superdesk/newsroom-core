@@ -504,6 +504,14 @@ export function formatHTML(html: any) {
     return html.replace(SHIFT_OUT_REGEXP, html.indexOf('<pre>') === -1 ? '<br>' : '\n');
 }
 
+export const SET_ERROR_MESSAGE = 'SET_ERROR_MESSAGE';
+function setErrorMessage(message: any) {
+    return {
+        type: SET_ERROR_MESSAGE,
+        message
+    };
+}
+
 /**
  * Generic error handler for http requests
  * @param error
@@ -516,8 +524,13 @@ export function errorHandler(error: {errorData: any} | Response, dispatch?: any,
             dispatch(setError(error.errorData));
         }
     } else {
-        notify.error(error.statusText || gettext('Failed to process request!'));
-        return;
+        if (error.status === 403) {
+            dispatch(setErrorMessage(gettext(
+                'There is no product associated with your user. Please reach out to your Company Admin',
+            )));
+        } else {
+            notify.error(error.statusText || gettext('Failed to process request!'));
+        }
     }
 }
 

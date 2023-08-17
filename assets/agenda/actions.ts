@@ -10,6 +10,7 @@ import {
     getTimezoneOffset,
     recordAction,
     copyTextToClipboard,
+    errorHandler,
 } from 'utils';
 import {noNavigationSelected, getNavigationUrlParam} from 'search/utils';
 
@@ -161,14 +162,6 @@ export function selectDate(dateString: any, grouping: any) {
 export const SET_ERROR = 'SET_ERROR';
 export function setError(errors: any) {
     return {type: SET_ERROR, errors};
-}
-
-export const SET_ERROR_MESSAGE = 'SET_ERROR_MESSAGE';
-export function setErrorMessage(message: any) {
-    return {
-        type: SET_ERROR_MESSAGE,
-        message
-    };
 }
 
 export function printItem(item: any) {
@@ -698,18 +691,4 @@ export function stopWatchingCoverage(coverage: any, item: any) {
                 }
             }, (error: any) => { errorHandler(error, dispatch);});
     };
-}
-
-export function errorHandler(error: any, dispatch?: any, setError?: any) {
-    console.error('error', error);
-    if (setError) {
-        if (error.response && error.response.status === 403) {
-            dispatch(setErrorMessage(gettext(
-                'There is no product associated with your user. Please reach out to your Company Admin')));
-        } else {
-            error.response.json().then(function(data: any) {
-                dispatch(setError(data));
-            });
-        }
-    }
 }

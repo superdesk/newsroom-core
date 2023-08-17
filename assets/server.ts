@@ -12,7 +12,7 @@ function checkStatus(response: Response): Promise<any> {
         return Promise.resolve({});
     } else if (response.status >= 200 && response.status < 300) {
         return response.json();
-    } else if (response.status >= 400 && response.status < 500) {
+    } else if (response.status === 400) {
         return response.json().then((data: any) => Promise.reject({errorData: data}));
     } else if (response.type === 'opaqueredirect') {
         window.location.reload();
