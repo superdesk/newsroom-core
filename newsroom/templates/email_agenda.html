@@ -1,4 +1,4 @@
-<h1>{{ item.headline or item.name }}</h1>
+<h1>{{ get_highlighted_field(item, ["headline", "name"]) | safe }}</h1>
 <a href="{{ url_for_agenda(item) }}">{{ url_for_agenda(item) }}</a>
 
 {%  if item.event %}<p class="h3">{{ dateString }}</p>{% endif %}
@@ -33,7 +33,7 @@
 
 {% if item.definition_long or item.definition_short %}
     <p>
-        {{ item.definition_long or item.definition_short }}
+        {{ get_highlighted_field(item, ["definition_long", "definition_short"]) | safe }}
     </p>
 {% endif %}
 

@@ -1,5 +1,6 @@
 import re
 
+from copy import deepcopy
 import flask
 from bson import ObjectId
 from flask import jsonify, current_app as app
@@ -265,6 +266,26 @@ def edit_user_profile(_id):
     return jsonify(form.errors), 400
 
 
+@blueprint.route("/users/<_id>/notification_schedules", methods=["POST"])
+@login_required
+def edit_user_notification_schedules(_id):
+    if not is_current_user(_id):
+        flask.abort(403)
+
+    user_id = ObjectId(_id)
+    user = find_one("users", _id=user_id)
+
+    if not user:
+        return NotFound(gettext("User not found"))
+
+    data = get_json_or_400()
+
+    updates = {"notification_schedule": deepcopy(user.get("notification_schedule") or {})}
+    updates["notification_schedule"].update(data)
+    get_resource_service("users").patch(user_id, updates=updates)
+    return jsonify({"success": True}), 200
+
+
 @blueprint.route("/users/<_id>/validate", methods=["POST"])
 @admin_only
 def validate(_id):
@@ -326,7 +347,9 @@ def post_topic(_id):
     topic = get_json_or_400()
     topic["user"] = user["_id"]
     topic["company"] = user.get("company")
-    topic["subscribers"] = [ObjectId(uid) for uid in topic.get("subscribers") or []]
+
+    for subscriber in topic.get("subscribers") or []:
+        subscriber["user_id"] = ObjectId(subscriber["user_id"])
 
     ids = get_resource_service("topics").post([topic])
     if topic.get("is_global"):

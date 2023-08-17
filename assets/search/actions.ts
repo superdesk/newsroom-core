@@ -542,19 +542,3 @@ export function initParams(params: any) {
         );
     };
 }
-
-export function subscribeToTopic(topic: any) {
-    (server as any).post(`/topics/${topic._id}/subscribe`)
-        .then(() => {
-            notify.success(gettext('Topic subscribed successfully'));
-        })
-        .catch(errorHandler);
-}
-
-export function unsubscribeToTopic(topic: any) {
-    (server as any).del(`/topics/${topic._id}/subscribe`)
-        .then(() => {
-            notify.success(gettext('Topic unsubscribed successfully'));
-        })
-        .catch(errorHandler);
-}

@@ -1,9 +1,10 @@
 import os
-from typing import Optional
+from typing import Optional, List, Dict, Any
 import arrow
 from bson.objectid import ObjectId
 import flask
 import hashlib
+import logging
 
 from flask import current_app as app
 from eve.utils import str_to_date
@@ -17,6 +18,7 @@ from datetime import datetime
 from newsroom.user_roles import UserRole
 
 
+logger = logging.getLogger(__name__)
 _hash_cache = {}
 
 
@@ -82,6 +84,28 @@ def time_short(datetime):
 def date_short(datetime):
     if datetime:
         return format_date(parse_date(datetime), app.config["DATE_FORMAT_SHORT"])
+
+
+def notification_time(datetime):
+    if datetime:
+        return format_time(parse_date(datetime), get_client_format("NOTIFICATION_EMAIL_TIME_FORMAT"))
+
+
+def notification_date(datetime):
+    if datetime:
+        return format_date(parse_date(datetime), get_client_format("NOTIFICATION_EMAIL_DATE_FORMAT"))
+
+
+def notification_datetime(datetime):
+    if datetime:
+        return format_datetime(
+            parse_date(datetime),
+            (
+                get_client_format("NOTIFICATION_EMAIL_DATE_FORMAT")
+                + " "
+                + get_client_format("NOTIFICATION_EMAIL_TIME_FORMAT")
+            ),
+        )
 
 
 def plain_text(html):
@@ -235,3 +259,24 @@ def get_slugline(item, with_take_key: bool = False):
 
 def initials(name):
     return "".join([piece[0].upper() for piece in name.split(" ") if piece])
+
+
+def get_highlighted_field(item: Dict[str, Any], fields: List[str]) -> str:
+    for field in fields:
+        if not item.get(field):
+            continue
+
+        try:
+            return item["es_highlight"][field][0]
+        except (IndexError, KeyError):
+            return item[field]
+
+    logger.warning(f"Failed to find any highlighted fields {fields}")
+    return ""
+
+
+def get_item_category_names(item: Dict[str, Any]) -> str:
+    if not len(item.get("service") or []):
+        return ""
+
+    return ", ".join([category["name"] for category in item["service"]])

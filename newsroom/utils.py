@@ -3,18 +3,23 @@ import pytz
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from uuid import uuid4
+import regex
 from typing import List, Dict, Any, Optional, Union
 from pymongo.cursor import Cursor as MongoCursor
 
 import superdesk
 from superdesk.utc import utcnow
 from superdesk.json_utils import try_cast
+from superdesk.etree import parse_html
+from superdesk.text_utils import get_text
+
 from bson import ObjectId
 from eve.utils import config, parse_request
 from eve_elastic.elastic import parse_date, ElasticCursor
 from flask import current_app as app, json, abort, request, g, flash, session, url_for
 from flask_babel import gettext
 
+from newsroom.types import User, Company
 from newsroom.template_filters import (
     time_short,
     parse_date as parse_short_date,
@@ -185,7 +190,7 @@ def date_short(datetime):
         return format_datetime(parse_short_date(datetime), "dd/MM/yyyy")
 
 
-def get_agenda_dates(agenda, date_paranthesis=False):
+def get_agenda_dates(agenda: Dict[str, Any], date_paranthesis: bool = False) -> str:
     start = parse_date_str(agenda.get("dates", {}).get("start"))
     end = parse_date_str(agenda.get("dates", {}).get("end"))
 
@@ -299,13 +304,15 @@ def is_account_enabled(user):
     return True
 
 
-def get_user_dict():
+def get_user_dict(use_globals: bool = True) -> Dict[str, User]:
     """Get all active users indexed by _id."""
-    if "user_dict" not in g or app.testing:
-        lookup = {"is_enabled": True}
-        all_users = query_resource("users", lookup=lookup)
-        companies = get_company_dict()
-        user_dict = {
+
+    def _get_users() -> Dict[str, User]:
+        all_users = superdesk.get_resource_service("users").find(where={"is_enabled": True})
+
+        companies = get_company_dict(use_globals)
+
+        return {
             str(user["_id"]): user
             for user in all_users
             if (
@@ -313,6 +320,11 @@ def get_user_dict():
                 and not is_company_expired(user, companies.get(str(user.get("company"))))
             )
         }
+
+    if not use_globals:
+        return _get_users()
+    elif "user_dict" not in g or app.testing:
+        user_dict = _get_users()
         g.user_dict = user_dict
     return g.user_dict
 
@@ -321,19 +333,25 @@ def get_users_by_email(emails: List[str]):
     return query_resource("users", lookup={"email": {"$in": emails}})
 
 
-def get_company_dict():
+def get_company_dict(use_globals: bool = True) -> Dict[str, Company]:
     """Get all active companies indexed by _id.
 
     Must reload when testing because there it's using single context.
     """
-    if "company_dict" not in g or app.testing:
-        lookup = {"is_enabled": True}
-        all_companies = list(query_resource("companies", lookup=lookup))
-        g.company_dict = {
+
+    def _get_companies() -> Dict[str, Company]:
+        all_companies = superdesk.get_resource_service("companies").find(where={"is_enabled": True})
+
+        return {
             str(company["_id"]): company
             for company in all_companies
             if is_company_enabled({"company": company["_id"]}, company) and not is_company_expired(company=company)
         }
+
+    if not use_globals:
+        return _get_companies()
+    elif "company_dict" not in g or app.testing:
+        g.company_dict = _get_companies()
     return g.company_dict
 
 
@@ -515,3 +533,99 @@ def deep_get(val: Dict[str, Any], keys: str, default: Optional[Any] = None) -> A
         keys.split("."),
         val,
     )
+
+
+def split_words(text: str) -> List[str]:
+    """Get word count for given plain text.
+
+    Any changes to this code **must** be reflected in the typescript version as well
+    Copied from ``superdesk-core:superdesk/text_utils.py:get_text_word_count``
+    """
+
+    flags = regex.MULTILINE | regex.UNICODE
+    initial_text_trimmed = text.strip()
+
+    if len(initial_text_trimmed) < 1:
+        return []
+
+    r0 = get_text(initial_text_trimmed, space_on_elements=True)
+    r1 = regex.sub(r"\n", " ", r0, flags=flags)
+
+    # Remove spaces between two numbers
+    # 1 000 000 000 -> 1000000000
+    r2 = regex.sub(r"([0-9]) ([0-9])", "\\1\\2", r1, flags=flags)
+
+    # remove anything that is not a unicode letter, a space, comma or a number
+    r3 = regex.sub(r"[^\p{L} 0-9,]", "", r2, flags=flags)
+
+    # replace two or more spaces with one space
+    r4 = regex.sub(r" {2,}", " ", r3, flags=flags)
+
+    return r4.strip().split(" ")
+
+
+def short_highlighted_text(html: str, max_length: int = 40, output_html: bool = True) -> str:
+    """Returns first paragraph with highlighted text, and truncates output to ``max_length`` words
+
+    Any changes to this code **must** be reflected in the typescript version as well
+    Copied from ``assets/wire/utils.ts:shortHighlightedtext``
+    """
+
+    doc = parse_html(html, content="html")
+    try:
+        parent_element = doc.xpath('//span[@class="es-highlight"]/..')[0]
+    except IndexError:
+        words = split_words(html)
+
+        if len(words) >= max_length:
+            return " ".join(words[:max_length]) + "..."
+        else:
+            return html
+
+    text = ""
+    count = 0
+    for content in parent_element.itertext():
+        if count >= max_length:
+            break
+
+        content = content.strip()
+        words = split_words(content)
+        word_count = len(words)
+        remaining_count = max_length - count
+
+        if word_count <= remaining_count:
+            text += content + " "
+            count += word_count
+        else:
+            text += " ".join(words[:remaining_count])
+            count += remaining_count
+
+    truncated_text = text.strip()
+    highlighted_spans = parent_element.xpath('//span[@class="es-highlight"]')
+    output = truncated_text
+    highlighted_text = ""
+    last_index = 0
+
+    for span in highlighted_spans:
+        span_text = span.text.strip()
+
+        try:
+            span_index = truncated_text.index(span_text, last_index)
+            span_start = span_index
+            span_end = span_start + len(span_text)
+
+            highlighted_text += output[last_index:span_start]
+
+            if output_html:
+                highlighted_text += f'<span class="es-highlight">{span_text}</span>'
+            else:
+                highlighted_text += f"*{span_text}*"
+
+            last_index = span_end
+        except ValueError:
+            # ``span_text`` not found
+            pass
+
+    output = highlighted_text + output[last_index:]
+
+    return output + ("" if count > max_length else "...")

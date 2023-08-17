@@ -173,6 +173,7 @@ CORE_APPS = [
     "newsroom.email_templates",
     "newsroom.company_admin",
     "newsroom.search",
+    "newsroom.notifications.send_scheduled_notifications",
 ]
 
 SITE_NAME = "AAP Newsroom"
@@ -303,12 +304,24 @@ CLIENT_LOCALE_FORMATS = {
         "COVERAGE_DATE_TIME_FORMAT": "HH:mm DD/MM",
         "COVERAGE_DATE_FORMAT": "DD/MM",
         "DATE_FORMAT_HEADER": "EEEE, dd/MM/yyyy",
+        "NOTIFICATION_EMAIL_TIME_FORMAT": "HH:mm a",
+        "NOTIFICATION_EMAIL_DATE_FORMAT": "MMMM d, yyyy",
     },
     "fr_CA": {  # example - you can overwrite any format above
         "DATE_FORMAT": "DD/MM/YYYY",
         "DATE_FORMAT_HEADER": "EEEE, 'le' d MMMM yyyy",
     },
 }
+
+#: Default times for scheduled topic notifications
+#:
+#: .. versionadded: 2.5.0
+#:
+DEFAULT_SCHEDULED_NOTIFICATION_TIMES = [
+    "07:00",
+    "15:00",
+    "19:00",
+]
 
 # Client configuration
 CLIENT_CONFIG = {
@@ -339,6 +352,7 @@ CLIENT_CONFIG = {
             "agenda": ["name", "headline", "slugline", "description"],
         },
     },
+    "scheduled_notifications": {"default_times": DEFAULT_SCHEDULED_NOTIFICATION_TIMES},
 }
 
 # Enable iframely support for item body_html
@@ -389,6 +403,10 @@ CELERY_BEAT_SCHEDULE = {
     "newsroom:remove_expired_agenda": {
         "task": "newsroom.commands.async_remove_expired_agenda",
         "schedule": crontab(hour=local_to_utc_hour(3), minute=0),  # Runs every day at 3am
+    },
+    "newsroom:send_scheduled_notifications": {
+        "task": "newsroom.notifications.send_scheduled_notifications.send_scheduled_notifications",
+        "schedule": crontab(minute="*/5"),
     },
 }
 

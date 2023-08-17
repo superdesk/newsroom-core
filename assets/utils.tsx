@@ -10,6 +10,8 @@ import {render as _render} from 'react-dom';
 import alertify from 'alertifyjs';
 import moment from 'moment-timezone';
 
+import {IClientConfig, IUser} from 'interfaces';
+
 /*
  * Import and load all locales that will be used in moment.js
  * This should match the LANGUAGES defined in settings.py
@@ -722,4 +724,38 @@ export function copyTextToClipboard(text: any, item: any) {
             notify.error(gettext('Sorry, Copy is not supported.'));
         }
     );
+}
+
+export function getScheduledNotificationConfig(): IClientConfig['scheduled_notifications'] {
+    return getConfig('scheduled_notifications', {default_times: [
+        '07:00',
+        '15:00',
+        '19:00',
+    ]});
+}
+
+export function getSubscriptionTimesString(user: IUser): string {
+    const schedule = user.notification_schedule || {
+        timezone: DEFAULT_TIMEZONE,
+        times: getScheduledNotificationConfig().default_times,
+    };
+    const now = moment.tz(schedule.timezone);
+    const timezoneAbbreviation = now.zoneAbbr();
+    const timeStrings = [];
+
+    for (const time of schedule.times) {
+        const time_parts = time.split(':');
+
+        now.hours(parseInt(time_parts[0], 10))
+            .minutes(parseInt(time_parts[1], 10));
+
+        timeStrings.push(formatTime(now));
+    }
+
+    return gettext('Daily @ {{ time1 }}, {{ time2 }} and {{ time3 }} {{ timezone }}', {
+        time1: timeStrings[0],
+        time2: timeStrings[1],
+        time3: timeStrings[2],
+        timezone: timezoneAbbreviation,
+    });
 }

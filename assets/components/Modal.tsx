@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {get} from 'lodash';
 import {connect} from 'react-redux';
 import {Modal as BSModal} from 'bootstrap';
@@ -10,17 +9,20 @@ import {closeModal} from 'actions';
 import CloseButton from './CloseButton';
 import classNames from 'classnames';
 
+interface IButtonProps {
+    label: string;
+    type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'];
+    onClick?(event: React.MouseEvent<HTMLButtonElement>): void;
+}
+
 /**
  * Primary modal button for actions like save/send/etc
- *
- * @param {string} label
- * @param {string} type
- * @param {func} onClick
  */
-export function ModalPrimaryButton({label, type, onClick, disabled}: any) {
+function ModalPrimaryButton({label, type, onClick, disabled}: IButtonProps & {disabled?: boolean}): React.ReactElement {
     assertButtonHandler(label, type, onClick);
     return (
-        <button type={type || 'button'}
+        <button
+            type={type || 'button'}
             onClick={onClick}
             className="nh-button nh-button--primary"
             disabled={disabled}
@@ -28,55 +30,50 @@ export function ModalPrimaryButton({label, type, onClick, disabled}: any) {
     );
 }
 
-ModalPrimaryButton.propTypes = {
-    label: PropTypes.string.isRequired,
-    type: PropTypes.string,
-    onClick: PropTypes.func,
-    disabled: PropTypes.bool,
-};
-
 /**
  * Secondary modal button for actions like cancel/reset
- *
- * @param {string} label
- * @param {string} type
- * @param {func} onClick
  */
-export function ModalSecondaryButton({label, type, onClick}: any) {
+export function ModalSecondaryButton({label, type, onClick}: IButtonProps): React.ReactElement {
     assertButtonHandler(label, type, onClick);
     return (
-        <button type={type || 'button'}
+        <button
+            type={type || 'button'}
             onClick={onClick}
             className="nh-button nh-button--secondary"
         >{label}</button>
     );
 }
 
-ModalSecondaryButton.propTypes = {
-    'label': PropTypes.string.isRequired,
-    onClick: PropTypes.func,
-    type: PropTypes.string,
-};
-
 /**
  * Test if button makes any sense
  *
  * either type or onClick handler must be specified
- *
- * @param {string} label
- * @param {string} type
- * @param {func} onClick
  */
-function assertButtonHandler(label: any, type: any, onClick: any) {
+function assertButtonHandler(label: IButtonProps['label'], type: IButtonProps['type'], onClick: IButtonProps['onClick']) {
     if (!type && !onClick) {
         console.warn('You should use either type or onClick handler for button', label);
     }
 }
 
-class Modal extends React.Component<any, any> {
-    static propTypes: any;
-    static defaultProps: any;
+interface IProps {
+    title: string;
+    children: React.ReactNode | Array<React.ReactNode>;
+    onSubmitLabel?: string; // defaults to 'Save'
+    onCancelLabel: string; // defaults to 'Cancel'
+    disableButtonOnSubmit?: boolean;
+    clickOutsideToClose?: boolean; // defaults to false
+    width?: 'full';
+    className?: string;
+    formValid: boolean; // provided by Redux state
+    onSubmit(event: React.MouseEvent<HTMLButtonElement>): void;
+    closeModal(event?: React.MouseEvent<HTMLButtonElement>): void;
+}
 
+interface IState {
+    submitting: boolean;
+}
+
+class Modal extends React.Component<IProps, IState> {
     modal: any;
     elem: any;
     constructor(props: any) {
@@ -89,7 +86,7 @@ class Modal extends React.Component<any, any> {
     componentDidMount() {
         const options: any = {};
 
-        if (!this.props.clickOutsideToClose) {
+        if (this.props.clickOutsideToClose !== true) {
             options.backdrop = 'static';
         }
 
@@ -119,19 +116,15 @@ class Modal extends React.Component<any, any> {
     }
 
     render() {
-        const className = ['modal'];
-
-        if (this.props.width === 'full') {
-            className.push('modal--full-width');
-        } else {
-            className.push('mt-xl-5'); // adds top margin
-        }
-
         return (
             <div
-                className={className.join(' ')}
-                ref={(elem: any) => this.elem = elem}
-                role={gettext('dialog')}
+                className={classNames('modal', {
+                    'modal--full-width': this.props.width === 'full',
+                    'mt-xl-5': this.props.width !== 'full',
+                    [this.props.className ?? '']: this.props.className != null,
+                })}
+                ref={(elem: HTMLDivElement) => this.elem = elem}
+                role="dialog"
                 aria-label={this.props.title}
             >
                 <h3 className="a11y-only">{this.props.title}</h3>
@@ -147,13 +140,13 @@ class Modal extends React.Component<any, any> {
                         <div className="modal-footer">
                             <ModalSecondaryButton
                                 type="reset"
-                                label={this.props.onCancelLabel}
+                                label={this.props.onCancelLabel || gettext('Cancel')}
                                 onClick={this.props.closeModal}
                             />
                             {' '}
                             <ModalPrimaryButton
                                 type="submit"
-                                label={this.props.onSubmitLabel}
+                                label={this.props.onSubmitLabel || gettext('Save')}
                                 onClick={this.onSubmit}
                                 disabled={this.state.submitting || !this.props.formValid}
                             />
@@ -165,27 +158,9 @@ class Modal extends React.Component<any, any> {
     }
 }
 
-Modal.propTypes = {
-    title: PropTypes.string.isRequired,
-    children: PropTypes.node.isRequired,
-    onSubmit: PropTypes.func,
-    onSubmitLabel: PropTypes.string,
-    onCancelLabel: PropTypes.string,
-    closeModal: PropTypes.func.isRequired,
-    disableButtonOnSubmit: PropTypes.bool,
-    formValid: PropTypes.bool,
-    clickOutsideToClose: PropTypes.bool,
-    width: PropTypes.string,
-};
+const mapStateToProps = (state: any) => ({formValid: get(state, 'modal.formValid') === true});
+const mapDispatchToProps = (dispatch: any) => ({closeModal: () => dispatch(closeModal())});
 
-Modal.defaultProps = {
-    onSubmitLabel: gettext('Save'),
-    onCancelLabel: gettext('Cancel'),
-    clickOutsideToClose: false,
-};
-
-const mapStateToProps = (state: any) => ({formValid: get(state, 'modal.formValid')});
-
-const component: React.ComponentType<any> = connect(mapStateToProps, {closeModal})(Modal);
+const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(Modal);
 
 export default component;

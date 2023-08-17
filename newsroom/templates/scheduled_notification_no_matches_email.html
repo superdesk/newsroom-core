@@ -1,0 +1,30 @@
+{% extends "email_layout.html" %}
+{% block htmlhead %}
+<style>
+{% include "email_stylesheet.css" %}
+</style>
+{% endblock %}
+{% block content %}
+<p>{{ date | notification_datetime }}</p>
+
+<p>No new items have arrived for your subscribed topics.</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Your Saved Topic</th>
+            <th>Count</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for section, matches in topic_match_table.items() %}
+{% for name, count in matches %}
+        <tr>
+            <td>New {{ config.AGENDA_SECTION if section == "agenda" else config.WIRE_SECTION }} items for "{{ name }}"</td>
+            <td>{{ count }}</td>
+        </tr>
+{% endfor %}
+{% endfor %}
+    </tbody>
+</table>
+{% endblock %}
