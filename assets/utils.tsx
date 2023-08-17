@@ -77,6 +77,10 @@ export const KEYCODES = {
     DOWN: 40,
 };
 
+export function assertNever(x: never): never {
+    throw new Error('Unexpected object: ' + x);
+}
+
 /**
  * Create redux store with default middleware
  *
