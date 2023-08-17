@@ -91,6 +91,7 @@ class Users extends React.Component<any, any> {
                 )}
                 {this.props.userToEdit &&
                     <EditUser
+                        hideFields={[]}
                         original={this.props.usersById[this.props.userToEdit._id] || {}}
                         user={this.props.userToEdit}
                         onChange={this.props.editUser}

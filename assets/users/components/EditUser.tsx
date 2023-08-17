@@ -1,5 +1,5 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
 
@@ -10,16 +10,50 @@ import AuditInformation from 'components/AuditInformation';
 import {EditUserProductPermission} from './EditUserProductPermission';
 
 import {gettext} from 'utils';
-import {isUserAdmin, getUserTypes, getUserLabel, userTypeReadOnly, getLocaleInputOptions, getDefaultLocale, isUserCompanyAdmin} from '../utils';
+import {
+    isUserAdmin,
+    getUserTypes,
+    getUserLabel,
+    userTypeReadOnly,
+    getLocaleInputOptions,
+    getDefaultLocale,
+    isUserCompanyAdmin,
+} from '../utils';
 import {FormToggle} from 'ui/components/FormToggle';
 
 import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserListItem';
 
 import {companyProductSeatsSelector, companySectionListSelector, sectionListSelector} from 'company-admin/selectors';
+import {IUser} from 'interfaces/user';
+import {IUserProfileStore} from 'user-profile/reducers';
 
 const getCompanyOptions = (companies: any) => companies.map((company: any) => ({value: company._id, text: company.name}));
 
-function EditUserComponent({
+interface IReduxStoreProps {
+    allSections: Array<any>;
+    companySections: any;
+    seats: any;
+}
+
+interface IProps extends IReduxStoreProps {
+    original: IUser;
+    user: IUser;
+    onChange: (event: any) => void;
+    errors: any;
+    companies: Array<any>;
+    onSave: (event: any) => void;
+    onResetPassword: () => void;
+    onClose: (event: any) => void;
+    onDelete: (event: any) => void;
+    currentUser: IUser;
+    products: Array<any>;
+    resendUserInvite: () => void;
+    hideFields: Array<string>;
+    toolbar?: any;
+
+}
+
+const EditUserComponent: React.ComponentType<IProps> = ({
     original,
     user,
     onChange,
@@ -37,22 +71,19 @@ function EditUserComponent({
     companySections,
     seats,
     resendUserInvite,
-}: any) {
+}) => {
     const companyId = user.company;
     const localeOptions = getLocaleInputOptions();
     const stateLabelDetails = getUserStateLabelDetails(user);
-    const companyProductIds = companyId != null ?
-        Object.keys(seats[companyId] || {}) :
-        products.map((product: any) => product._id);
-    const sections = companyId != null ?
-        companySections[companyId] || [] :
-        allSections;
+    const companyProductIds = companyId != null
+        ? Object.keys(seats[companyId] || {})
+        : products.map((product: any) => product._id);
+    const sections = companyId != null ? companySections[companyId] || [] : allSections;
     const companySectionIds = sections.map((section: any) => section._id);
     const currentUserIsAdmin = isUserAdmin(currentUser);
     const isCompanyAdmin = isUserCompanyAdmin(currentUser);
+    const company = companies.map((value: any) => value.name);
     const userIsAdmin = isUserAdmin(user);
-
-    const company = companies.map((value: any)=> value.name);
 
     return (
         <div
@@ -334,38 +365,14 @@ function EditUserComponent({
             </div>
         </div>
     );
-}
-
-EditUserComponent.propTypes = {
-    original: PropTypes.object,
-    user: PropTypes.object.isRequired,
-    onChange: PropTypes.func,
-    errors: PropTypes.object,
-    companies: PropTypes.arrayOf(PropTypes.object),
-    onSave: PropTypes.func.isRequired,
-    onResetPassword: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired,
-    onDelete: PropTypes.func.isRequired,
-    resendUserInvite: PropTypes.func.isRequired,
-    currentUser: PropTypes.object,
-    toolbar: PropTypes.node,
-    products: PropTypes.arrayOf(PropTypes.object),
-    hideFields: PropTypes.arrayOf(PropTypes.string),
-    allSections: PropTypes.arrayOf(PropTypes.object),
-    companySections: PropTypes.object,
-    seats: PropTypes.object,
 };
 
-EditUserComponent.defaultProps = {
-    hideFields: [],
-};
-
-const mapStateToProps = (state: any) => ({
+const mapStateToProps = (state: IUserProfileStore): IReduxStoreProps => ({
     allSections: sectionListSelector(state),
     companySections: companySectionListSelector(state),
     seats: companyProductSeatsSelector(state),
 });
 
-const EditUser: React.ComponentType<any> = connect(mapStateToProps)(EditUserComponent);
+const EditUser = connect<IReduxStoreProps>(mapStateToProps)(EditUserComponent);
 
 export default EditUser;

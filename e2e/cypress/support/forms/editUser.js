@@ -14,11 +14,7 @@ class EditUserFormWrapper extends BaseForm {
             user_type: this.getInput('[data-test-id="field-user_type"] select'),
             company: this.getSelectInput('[data-test-id="field-company"] select'),
             company_read_only: this.getInput('[data-test-id="field-company"] input'),
-
             locale: this.getInput('[data-test-id="field-locale"] select'),
-
-            is_approved: this.getCheckboxInput('[data-test-id="field-is_approved"] input'),
-            is_enabled: this.getCheckboxInput('[data-test-id="field-is_enabled"] input'),
             expiry_alert: this.getCheckboxInput('[data-test-id="field-expiry_alert"] input'),
             manage_company_topics: this.getCheckboxInput('[data-test-id="field-manage_company_topics"] input'),
         };
@@ -60,7 +56,7 @@ class EditUserFormWrapper extends BaseForm {
             (section) => {
                 this.getSectionCheckbox(section).type(sections[section]);
             }
-        )
+        );
     }
 
     expectSections(sections) {
@@ -114,9 +110,9 @@ class EditUserFormWrapper extends BaseForm {
                     (productId) => {
                         this.getProductCheckbox(section, productId).getElement().should('not.exist');
                     }
-                )
+                );
             }
-        )
+        );
     }
 }
 

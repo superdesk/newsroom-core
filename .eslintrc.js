@@ -27,6 +27,14 @@ module.exports = {
             'error',
             4
         ],
+        '@typescript-eslint/ban-types': [
+            'error',
+            {
+                types: {
+                    '{}': false
+                }
+            }
+        ],
         'linebreak-style': [
             'error',
             'unix'
