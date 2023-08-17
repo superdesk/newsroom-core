@@ -209,7 +209,7 @@ class FollowedTopics extends React.Component<any, any> {
                                     </button>
                                 </div>
                             )}
-                            <div className="toggle-button__group toggle-button__group--navbar ms-0 me-0">
+                            <div className="toggle-button__group toggle-button__group--navbar ms-auto me-0">
                                 <button
                                     type="button"
                                     className="nh-button nh-button--tertiary"

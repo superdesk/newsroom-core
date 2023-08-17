@@ -208,13 +208,10 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                 {this.getSelectedTopics().map((topic) => {
                     return (
                         <div
-                            style={{
-                                width: '100%',
-                            }}
                             key={topic._id}
-                            className="simple-card flex-row simple-card--compact simple-card--draggable"
+                            className="simple-card flex-row simple-card--compact" // class simple-card--draggable is removed because drag and drop isn't implemented yet
                         >
-                            <div style={{paddingLeft: 24}} className='simple-card__content'>
+                            <div className='simple-card__content'>
                                 <h6 className="simple-card__headline" title="">{topic.label}</h6>
                                 <div className="simple-card__row">
                                     <div className="simple-card__column simple-card__column--align-start">
@@ -255,15 +252,12 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                 }}
             >
                 <div
+                    className="full-page-layout__content"
                     style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        gap: 12,
                         height: '100%',
                     }}
                 >
-                    <aside style={{width: '25%'}} className="full-page-layout__content-aside">
+                    <aside className="full-page-layout__content-aside">
                         <div className="full-page-layout__content-aside-inner">
                             <p className='font-size--medium text-color--muted mt-1 mb-3'>
                                 {gettext('Select up to 6 Topics you want to display on your personal Home screen.')}
@@ -317,12 +311,6 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                         </div>
                     </aside>
                     <div
-                        style={{
-                            width: '75%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                        }}
                         className='full-page-layout__content-main'
                     >
                         <Input disabled value={gettext('My Home')} />
