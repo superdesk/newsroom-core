@@ -551,7 +551,9 @@ def _filter_terms(filters, item_type):
                 must_term_filters.append(
                     nested_query(
                         path="coverages",
-                        query={"bool": {"filter": [{"terms": {"coverages.coverage_status": ["coverage not decided yet"]}}]}},
+                        query={
+                            "bool": {"filter": [{"terms": {"coverages.coverage_status": ["coverage not decided yet"]}}]}
+                        },
                         name="coverage_status",
                     )
                 )
@@ -559,7 +561,9 @@ def _filter_terms(filters, item_type):
                 must_term_filters.append(
                     nested_query(
                         path="coverages",
-                        query={"bool": {"filter": [{"terms": {"coverages.coverage_status": ["coverage not intended"]}}]}},
+                        query={
+                            "bool": {"filter": [{"terms": {"coverages.coverage_status": ["coverage not intended"]}}]}
+                        },
                         name="coverage_status",
                     )
                 )
