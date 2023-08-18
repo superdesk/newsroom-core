@@ -37,7 +37,7 @@ import {
 
 import {getMaxVersion} from 'local-store';
 import {REMOVE_NEW_ITEMS, SET_NEW_ITEM} from './agenda/actions';
-import {toggleValue} from 'utils';
+import {SET_ERROR_MESSAGE, toggleValue} from 'utils';
 import {topicsReducer} from './topics/reducer';
 
 export function modalReducer(state?: any, action?: any): any {
@@ -374,6 +374,13 @@ export function defaultReducer(state: any = {}, action: any) {
 
     case SAVED_ITEMS_COUNT:
         return {...state, savedItemsCount: action.count};
+
+    case SET_ERROR_MESSAGE:
+        return {
+            ...state,
+            isLoading: false,
+            errorMessage: action.message
+        };
 
     default: {
         const search = searchReducer(state.search, action, state.context);

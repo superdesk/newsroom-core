@@ -510,23 +510,33 @@ export function formatHTML(html: any) {
     return html.replace(SHIFT_OUT_REGEXP, html.indexOf('<pre>') === -1 ? '<br>' : '\n');
 }
 
+export const SET_ERROR_MESSAGE = 'SET_ERROR_MESSAGE';
+function setErrorMessage(message: any) {
+    return {
+        type: SET_ERROR_MESSAGE,
+        message
+    };
+}
+
 /**
  * Generic error handler for http requests
  * @param error
  * @param dispatch
  * @param setError
  */
-export function errorHandler(error: any, dispatch?: any, setError?: any) {
-    console.error('error', error);
-
-    if (error.response.status !== 400) {
-        notify.error(error.response.statusText || gettext('Failed to process request!'));
-        return;
-    }
-    if (setError) {
-        error.response.json().then(function(data: any) {
-            dispatch(setError(data));
-        });
+export function errorHandler(error: {errorData: any} | Response, dispatch?: any, setError?: any) {
+    if ('errorData' in error) {
+        if (setError) {
+            dispatch(setError(error.errorData));
+        }
+    } else {
+        if (error.status === 403) {
+            dispatch(setErrorMessage(gettext(
+                'There is no product associated with your user. Please reach out to your Company Admin',
+            )));
+        } else {
+            notify.error(error.statusText || gettext('Failed to process request!'));
+        }
     }
 }
 
