@@ -15,6 +15,7 @@ const filter = {
 const FILTER_VALUES = {
     PLANNED: 'planned',
     NOT_PLANNED: 'not planned',
+    MAY_BE: 'may be'
 };
 
 function getActiveFilterLabel(filter: any, activeFilter: any) {
@@ -49,6 +50,12 @@ function AgendaCoverageExistsFilter ({toggleFilter, activeFilter}: any) {
                 className='dropdown-item'
                 onClick={() => toggleFilter(filter.field, FILTER_VALUES.NOT_PLANNED)}
             >{gettext('Coverage not planned')}
+            </button>
+            <button
+                key='coverage-not-planned'
+                className='dropdown-item'
+                onClick={() => toggleFilter(filter.field, FILTER_VALUES.MAY_BE)}
+            >{gettext('Coverage not decided')}
             </button>
         </AgendaDropdown>
     );
