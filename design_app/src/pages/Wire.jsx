@@ -5,6 +5,7 @@ import 'react-toggle/style.css';
 import {useState} from 'react';
 import AdvancedSearch from '../components/AdvancedSearch';
 import AdvancedSearchTips from '../components/AdvancedSearchTips';
+import {RadioButtonGroup} from '../../../assets/features/sections/SectionSwitch.tsx';
 //import { useNavigate } from 'react-router-dom';
 
 function Wire() { 
@@ -48,6 +49,8 @@ function Wire() {
     const handleClickFolderThree = event => {
         setIsTopicFolderThreeOpen(current => !current);
     };
+
+    const [activeSection, setactiveSection] = useState('1');
 
 
 
@@ -592,10 +595,29 @@ function Wire() {
                                                 <button type="button" className="icon-button icon-button--bordered" title=""><i className="icon--text"></i></button>
 
                                                 <button type="button" className="icon-button icon-button--tertiary icon-button--bordered" title=""><i className="icon--text"></i></button>
-                                                
-
-
                                             </li>
+
+                                            <li className="search-result__tags-list-row">
+                                                <RadioButtonGroup
+                                                    activeOptionId={activeSection}
+                                                    size='small'
+                                                    fullWidth
+                                                    options={[
+                                                        {
+                                                            _id: '1',
+                                                            name: 'My topics',
+                                                        },
+                                                        {
+                                                            _id: '2',
+                                                            name: 'Company topics',
+                                                        },
+                                                    ]}
+                                                    switchOptions={(optionId) => {
+                                                        setactiveSection(optionId)
+                                                    }}
+                                                />
+                                            </li>
+
                                             <li className="search-result__tags-list-row">
                                                 <span className="search-result__tags-list-row-label">Buttons</span>
 
@@ -643,7 +665,7 @@ function Wire() {
                                 <article className="wire-articles__item-wrap col-12 wire-item"><div className="wire-articles__item wire-articles__item--list" tabIndex="0"><div className="wire-articles__item-text-block"><h4 className="wire-articles__item-headline"><div className="no-bindable-select wire-articles__item-select"><label className="circle-checkbox"><input type="checkbox" className="css-checkbox" /><i></i></label></div><div className="wire-articles__item-headline-inner">Correct me later on and see what fields appear</div></h4><div className="wire-articles__item__meta"><div className="wire-articles__item__icons"><span className="wire-articles__item__icon"><i className="icon--text icon--gray-dark"></i></span></div><div className="wire-articles__item__meta-info"><span className="bold">Correctme</span><span><span></span><span><span>The Canadian Press</span></span><span><span> // </span></span><span><span>1 words</span></span><span><span> // </span></span><span><time dateTime="12:51 19/12/2022">12:51 19/12/2022</time></span></span></div></div><div className="wire-articles__item__text"><p>hello3</p></div></div><div className="wire-articles__item-actions"><div className="btn-group"><button className="icon-button" aria-label="More Actions"><i className="icon--more icon--gray-dark"></i></button></div><button type="button" className="icon-button icon-button--primary" title="" aria-label="Share" data-original-title="Share"><i className="icon--share"></i></button><button type="button" className="icon-button icon-button--primary" title="" aria-label="Save" data-original-title="Save"><i className="icon--bookmark-add"></i></button></div></div></article>
                                 {/* AGENDA Item for testing */}
                                 <article className="wire-articles__item-wrap col-12 agenda-item">
-                                    <div className="wire-articles__item wire-articles__item--list wire-articles__item--not-covering" tabindex="0">
+                                    <div className="wire-articles__item wire-articles__item--list wire-articles__item--not-covering" tabIndex="0">
                                         <div className="wire-articles__item-text-block">
                                             <h4 className="wire-articles__item-headline">
                                                 <div className="no-bindable-select wire-articles__item-select">

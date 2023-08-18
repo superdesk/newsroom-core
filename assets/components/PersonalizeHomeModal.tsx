@@ -265,6 +265,9 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                             <p className='font-size--large'>{gettext('{{size}} out of 6 topics selected', {size: this.state.selectedTopicIds.length || 0})}</p>
                             <RadioButtonGroup
                                 activeOptionId={this.state.activeSection}
+                                size='small'
+                                fullWidth
+                                className='mb-3'
                                 options={[
                                     {
                                         _id: '1',
@@ -281,7 +284,6 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                                     });
                                 }}
                             />
-                            <div style={{padding: 6}} />
                             <div className="search search--small search--with-icon search--bordered m-0">
                                 <form className="search__form" role="search" aria-label="search">
                                     <i className="icon--search icon--muted-2"></i>

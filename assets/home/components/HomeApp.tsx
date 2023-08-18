@@ -240,47 +240,41 @@ class HomeApp extends React.Component<IProps, IState> {
                                         </button>
                                     </div>
                                 ) : (
-                                    <div>
-                                        <div
-                                            style={{
-                                                display: 'flex',
-                                                flexDirection: 'row',
-                                                alignItems: 'center'
+
+                                    <div className="home-tools">
+                                        <RadioButtonGroup
+                                            size='small'
+                                            options={[
+                                                {
+                                                    _id: 'default',
+                                                    name: gettext('Default')
+                                                },
+                                                {
+                                                    _id: 'my-home',
+                                                    name: gettext('My home')
+                                                },
+                                            ]}
+                                            activeOptionId={this.state.activeOptionId}
+                                            switchOptions={(optionId) => {
+                                                if (optionId === 'default' || optionId === 'my-home') {
+                                                    this.setState({
+                                                        activeOptionId: optionId
+                                                    });
+                                                }
                                             }}
-                                            className="home-tools"
+                                        />
+                                        <button
+                                            onClick={() => {
+                                                this.props.personalizeHome();
+                                            }}
+                                            type="button"
+                                            className="icon-button icon-button--small icon-button--tertiary icon-button--bordered"
+                                            title={gettext('Edit personal Home')}
                                         >
-                                            <RadioButtonGroup
-                                                options={[
-                                                    {
-                                                        _id: 'default',
-                                                        name: gettext('Default')
-                                                    },
-                                                    {
-                                                        _id: 'my-home',
-                                                        name: gettext('My home')
-                                                    },
-                                                ]}
-                                                activeOptionId={this.state.activeOptionId}
-                                                switchOptions={(optionId) => {
-                                                    if (optionId === 'default' || optionId === 'my-home') {
-                                                        this.setState({
-                                                            activeOptionId: optionId
-                                                        });
-                                                    }
-                                                }}
-                                            />
-                                            <button
-                                                onClick={() => {
-                                                    this.props.personalizeHome();
-                                                }}
-                                                type="button"
-                                                className="icon-button icon-button--small icon-button--tertiary icon-button--bordered"
-                                                title={gettext('Edit personal Home')}
-                                            >
-                                                <i className="icon--settings"></i>
-                                            </button>
-                                        </div>
+                                            <i className="icon--settings"></i>
+                                        </button>
                                     </div>
+
                                 )
                             }
                         </div>

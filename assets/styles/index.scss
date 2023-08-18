@@ -456,15 +456,9 @@ body.print {
             align-items: center;
             justify-content: center;
             border-radius: var(--border-radius--full);
-            inset-block-start: -1px;
-            inset-inline-end: 3px;
             background-color: var(--sidenav-color-badge-bg);
             color: var(--sidenav-color-badge-fg);
             outline: 2px solid var(--sidenav-color-bg);
-            @include phone {
-                inset-block-start: -3px;
-                inset-inline-end: -3px;
-            }
         }
         .sidenav-icons__badge {
             height: var(--sidenav-item-badge-size);
@@ -472,11 +466,17 @@ body.print {
             font-size: var(--sidenav-item-badge-font-size);
             font-weight: 700;
             line-height: 1;
+            inset-block-start: 3px;
+            inset-inline-end: 3px;
             background-color: var(--sidenav-color-badge-bg);
             color: var(--sidenav-color-badge-fg);
             padding: 0.35em 0.6em;
             &:empty {
                 display: none;
+            }
+            @include phone {
+                inset-block-start: 2px;
+                inset-inline-end: -4px;
             }
         }
 
@@ -485,17 +485,23 @@ body.print {
             width: var(--sidenav-item-helper-icon-size);
             background-color: var(--sidenav-color-item-fg);
             color: var(--sidenav-item-helper-icon-fg);
-            inset-block-start: -1px;
-            inset-inline-end: 6px;
             padding: 0;
+            inset-block-start: 2px;
+            inset-inline-end: 8px;
             [class^="icon-small--"],
             [class^="icon-small--"] {
                 color: var(--sidenav-item-helper-icon-fg) !important;
             }
+            @include phone {
+                inset-block-start: 2px;
+                inset-inline-end: -4px;
+            }
         }
 
         &.active {
-
+            .sidenav-icons__badge {
+                outline: 2px solid var(--sidenav-color-item-bg--active);
+            }
 
             a {
                 background-color: var(--sidenav-color-item-bg--active);

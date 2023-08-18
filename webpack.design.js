@@ -30,6 +30,7 @@ const config = {
                 test: /\.jsx?$/,
                 include: [
                     path.resolve(__dirname, 'design_app/src'),
+                    path.resolve(__dirname, 'assets'),
                     path.resolve(__dirname, 'node_modules/bootstrap'),
                     path.resolve(process.cwd(), 'node_modules/bootstrap'),
                 ],
@@ -60,12 +61,16 @@ const config = {
                     'file-loader',
                 ],
             },
+            { 
+                test: /\.([cm]?ts|tsx)$/, loader: "ts-loader",
+            },
         ],
     },
     resolve: {
-        extensions: ['.js', '.jsx'],
+        extensions: [ '.ts', '.tsx', '.js', '.jsx'],
         modules: [
             path.resolve(__dirname, 'design_app/src'),
+            path.resolve(__dirname, 'assets'),
             'node_modules',
         ],
         alias: {
