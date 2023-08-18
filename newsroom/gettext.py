@@ -43,10 +43,39 @@ def get_session_locale():
     return current_app.config["DEFAULT_LANGUAGE"]
 
 
+def get_session_timezone():
+    try:
+        if session.get("timezone"):
+            return session["timezone"]
+        user = get_user()
+        if user and user["notification_schedule"]["timezone"]:
+            return user["notification_schedule"]["timezone"]
+    except (RuntimeError, KeyError):
+        pass
+
+    try:
+        if current_app.session_timezone is not None:
+            return current_app.session_timezone
+    except AttributeError:
+        pass
+
+    return current_app.config.get("BABEL_DEFAULT_TIMEZONE") or current_app.config["DEFAULT_TIMEZONE"]
+
+
+def set_session_timezone(timezone: str):
+    try:
+        session["timezone"] = timezone
+    except RuntimeError:
+        pass
+
+    current_app.session_timezone = timezone
+
+
 def setup_babel(app):
     babel = Babel(app)
 
     babel.localeselector(get_session_locale)
+    babel.timezoneselector(get_session_timezone)
     app.add_template_global(get_client_translations)
     app.add_template_global(get_client_locales)
     app.add_template_global(get_session_locale, "get_locale")

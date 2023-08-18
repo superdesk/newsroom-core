@@ -57,6 +57,7 @@ def test_apply_section_filter(client, app):
             }
         } in search.query["bool"]["filter"]
 
+        search = SearchQuery()
         service.section = "agenda"
         service.prefill_search_query(search)
         service.apply_section_filter(search)

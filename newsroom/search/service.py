@@ -36,6 +36,8 @@ logger = logging.getLogger(__name__)
 def strtobool(val):
     if isinstance(val, bool):
         return val
+    elif isinstance(val, int):
+        return val != 0
     return _strtobool(val)
 
 
@@ -108,12 +110,7 @@ class SearchQuery(object):
         self.navigation_ids = []
         self.products = []
         self.requested_products = []
-        self.advanced: AdvancedSearchParams = {
-            "all": "",
-            "any": "",
-            "exclude": "",
-            "fields": [],
-        }
+        self.advanced: Optional[AdvancedSearchParams] = None
 
         self.args = {}
         self.lookup = {}
@@ -267,14 +264,15 @@ class BaseSearchService(Service):
         self.prefill_search_navigation(search)
         self.prefill_search_products(search)
         self.prefill_search_items(search)
+        self.prefill_search_advanced(search)
         self.prefill_search_highlights(search, req)
 
-    def apply_filters(self, search):
+    def apply_filters(self, search, section_filters=None):
         """Generate and apply the different search filters
 
         :param SearchQuery search: the search query instance
         """
-        self.apply_section_filter(search)
+        self.apply_section_filter(search, section_filters)
         self.apply_company_filter(search)
         self.apply_time_limit_filter(search)
         self.apply_products_filter(search)
@@ -405,6 +403,11 @@ class BaseSearchService(Service):
         :param SearchQuery search: The search query instance
         """
 
+        if search.user is not None:
+            # If the user has been defined elsewhere, then don't prefill here
+            search.is_admin = is_admin(search.user)
+            return
+
         current_user = get_user(required=False)
         search.is_admin = is_admin(current_user)
 
@@ -420,7 +423,7 @@ class BaseSearchService(Service):
         :param SearchQuery search: The search query instance
         """
 
-        search.company = get_company(search.user)
+        search.company = get_company(search.user) if search.company is None else search.company
 
     def prefill_search_page(self, search):
         """Prefill the search page parameters
@@ -441,7 +444,7 @@ class BaseSearchService(Service):
         :param SearchQuery search: The search query instance
         """
 
-        search.section = search.args.get("section") or self.section
+        search.section = search.section or search.args.get("section") or self.section
 
     def prefill_search_navigation(self, search):
         """Prefill the search navigation
@@ -532,20 +535,33 @@ class BaseSearchService(Service):
                 {"constant_score": {"filter": {"exists": {"field": "nextversion"}}}}
             )
 
+    def prefill_search_advanced(self, search):
+        """Prefill the advanced search params"""
+
+        if search.args.get("advanced"):
+            if isinstance(search.args["advanced"], dict):
+                search.advanced = search.args["advanced"]
+            else:
+                try:
+                    search.advanced = json.loads(search.args["advanced"])
+                except TypeError:
+                    raise BadParameterValueError(gettext("Incorrect type supplied for advanced search params"))
+
+            search.advanced["fields"] = self.get_advanced_search_fields(search)
+
     def prefill_search_highlights(self, search, req):
         query = search.args.get("q")
-        advanced_search = json.loads(search.args.get("advanced", "{}"))
+        advanced_search = search.advanced or {}
 
-        if app.data.elastic.should_highlight(req) and (
+        if app.data.elastic.should_highlight(search) and (
             query or advanced_search.get("all") or advanced_search.get("any")
         ):
             selected_fields = advanced_search.get("fields", [])
 
             # Create a separate search query object for highlighting settings
             highlight_search = SearchQuery()
-
-            # Call prefill_search_args with the request object
-            self.prefill_search_args(highlight_search, req)
+            highlight_search.args = deepcopy(search.args)
+            highlight_search.advanced = deepcopy(search.advanced)
 
             # Set up the search query for filtering
             self.apply_request_filter(highlight_search)
@@ -710,6 +726,9 @@ class BaseSearchService(Service):
                 self.query_string(search.args["q"], search.args.get("default_operator") or "AND")
             )
 
+        if search.args.get("ids"):
+            search.query["bool"]["filter"].append({"terms": {"_id": search.args["ids"]}})
+
         filters = None
         if search.args.get("filter"):
             if isinstance(search.args["filter"], dict):
@@ -742,18 +761,14 @@ class BaseSearchService(Service):
                 search.source["post_filter"]["bool"]["filter"].append(self.versioncreated_range(search.args))
 
     def get_advanced_search_fields(self, search: SearchQuery) -> List[str]:
-        return search.advanced.get("fields") or get_advanced_search_fields(self.section)
+        advanced_fields = search.advanced.get("fields") if search.advanced is not None else []
+        return advanced_fields or get_advanced_search_fields(self.section)
 
     def apply_request_advanced_search(self, search: SearchQuery):
-        if not search.args.get("advanced"):
+        if search.advanced is None:
             return
 
-        if isinstance(search.args["advanced"], str):
-            search.advanced = json.loads(search.args["advanced"])
-        else:
-            search.advanced = search.args["advanced"]
-
-        fields = self.get_advanced_search_fields(search)
+        fields = search.advanced.get("fields")
         if not fields:
             return
 
@@ -855,44 +870,46 @@ class BaseSearchService(Service):
 
         return topic_matches
 
-    def get_topic_query(self, topic, user, company, section_filters=None, query=None):
+    def get_topic_query(self, topic, user, company, section_filters=None, query=None, args=None):
         search = SearchQuery()
 
         search.user = user
-        search.is_admin = is_admin(user)
         search.company = company
+        search.section = topic.get("topic_type") or "wire"
+
+        if args is None:
+            args = {}
+
+        if topic.get("query"):
+            args["q"] = topic["query"]
+
+        if topic.get("created"):
+            if topic["created"].get("from"):
+                args["created_from"] = topic["created"]["from"]
+            if topic["created"].get("to"):
+                args["created_to"] = topic["created"]["to"]
+
+        if topic.get("timezone_offset"):
+            args["timezone_offset"] = topic["timezone_offset"]
+
+        if topic.get("filter"):
+            args["filter"] = topic["filter"]
+
+        if topic.get("advanced"):
+            args["advanced"] = topic["advanced"]
+
+        if topic.get("navigation"):
+            args["navigation"] = topic["navigation"]
+
+        search.args = args
 
         if query is not None:
             search.query = deepcopy(query)
-        search.section = topic.get("topic_type")
 
-        self.prefill_search_products(search)
-
-        if topic.get("query"):
-            search.query["bool"]["filter"].append(self.query_string(topic["query"]))
-
-        if topic.get("created"):
-            search.query["bool"]["filter"].append(
-                self.versioncreated_range(
-                    dict(
-                        created_from=topic["created"].get("from"),
-                        created_to=topic["created"].get("to"),
-                        timezone_offset=topic.get("timezone_offset", "0"),
-                    )
-                )
-            )
-
-        if topic.get("filter"):
-            self.set_bool_query_from_filters(search.query["bool"], topic["filter"])
-
-        if topic.get("advanced"):
-            search.args["advanced"] = topic["advanced"]
-
-        # for now even if there's no active company matching for the user
-        # continuing with the search
         try:
+            self.prefill_search_query(search)
             self.validate_request(search)
-            self.apply_filters(search)
+            self.apply_filters(search, section_filters)
         except Forbidden as exc:
             logger.info(
                 "Notification for user:{} and topic:{} is skipped".format(user.get("_id"), topic.get("_id")),
@@ -904,7 +921,7 @@ class BaseSearchService(Service):
 
     def get_items_by_query(self, search, size=10, aggs=None):
         search.args["size"] = size
-        search.args["aggs"] = "false"
+        search.args["aggs"] = str(aggs or False)
         self.gen_source_from_search(search)
         internal_req = self.get_internal_request(search)
         return self.internal_get(internal_req, search.lookup)

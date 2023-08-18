@@ -1,0 +1,32 @@
+{% extends "email_layout.txt" %}
+{% block name %}{% endblock %}
+{% block content %}
+{{ date | notification_datetime }}
+
+Your Saved Topic\tCount
+{% for section, matches in topic_match_table.items() %}
+{% for name, count in matches %}
+New {{ config.AGENDA_SECTION if section == "agenda" else config.WIRE_SECTION }} items for "{{ name }}"\t{{ count }}
+{% endfor %}
+{% endfor %}
+
+{% for section, topic_entries in entries.items() %}
+{% for topic_entry in topic_entries %}
+
+Latest new {{ section }} items for {{ topic_entry.topic.label }}
+{% if section == "wire" %}
+{{ topic_entry.item.headline }}
+
+Slugline: {{ topic_entry.item.slugline }} | Source: {{ topic_entry.item.source}}
+Published on: {{ topic_entry.item.versioncreated | notification_datetime }} | {{ topic_entry.item.body_html | word_count }} words{% if topic_entry.item.service[0].name %} | Category: {{ topic_entry.item.service[0].name }}{% endif %}
+{{ short_highlighted_text(get_highlighted_field(topic_entry.item, ["body_html"]), output_html=False) }}
+View this item in your account: {{ url_for_wire(topic_entry.item, True, section) }}
+View all item(s): {{ url_for('wire.wire', _external=True) }}?topic={{ topic_entry.topic._id }}
+
+{% elif section == "agenda" %}
+
+{% endif %}
+
+{% endfor %}
+{% endfor %}
+{% endblock %}

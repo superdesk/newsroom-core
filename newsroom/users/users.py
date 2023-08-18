@@ -1,12 +1,14 @@
 import bcrypt
 import newsroom
+from datetime import datetime
+from copy import deepcopy
 
 from typing import Dict, Optional, List
 from flask import current_app as app, session, abort, request
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest
 
-from newsroom.types import Company, ProductRef
+from newsroom.types import Company, ProductRef, User
 from newsroom.auth import get_user_id, get_user, get_company_from_user
 from newsroom.settings import get_setting
 from newsroom.utils import set_original_creator, set_version_creator
@@ -93,6 +95,24 @@ class UsersResource(newsroom.Resource):
                 },
             },
         },
+        "notification_schedule": {
+            "type": "dict",
+            "nullable": True,
+            "schema": {
+                "timezone": {
+                    "type": "string",
+                    "required": True,
+                },
+                "times": {
+                    "type": "list",
+                    "required": True,
+                    "schema": {"type": "string"},
+                },
+                "last_run_time": {
+                    "type": "datetime",
+                },
+            },
+        },
     }
 
     item_methods = ["GET", "PATCH", "PUT", "DELETE"]
@@ -121,6 +141,7 @@ USER_PROFILE_UPDATES = {
     "receive_app_notifications",
     "role",
     "dashboards",
+    "notification_schedule",
     "expiry_alert",
     "_updated",
 }
@@ -226,6 +247,13 @@ class UsersService(newsroom.Service):
         updated.update(updates)
         user_updated.send(self, user=updated, updates=updates)
 
+    def update_notification_schedule_run_time(self, user: User, run_time: datetime):
+        notification_schedule = deepcopy(user["notification_schedule"])
+        notification_schedule["last_run_time"] = run_time
+        self.update(user["_id"], {"notification_schedule": notification_schedule}, user)
+        app.cache.delete(str(user["_id"]))
+        app.cache.delete(user.get("email"))
+
     def _get_password_hash(self, password):
         return get_hash(password, app.config.get("BCRYPT_GENSALT_WORK_FACTOR", 12))
 
@@ -284,9 +312,12 @@ class UsersService(newsroom.Service):
         if request and request.url_rule and request.url_rule.rule:
             if request.url_rule.rule in ["/reset_password/<token>", "/token/<token_type>"]:
                 return
-            elif request.url_rule.rule in ["/users/<_id>", "/users/<_id>/profile"] or (
-                request.endpoint and "|item" in request.endpoint and request.method == "PATCH"
-            ):
+
+            elif request.url_rule.rule in [
+                "/users/<_id>",
+                "/users/<_id>/profile",
+                "/users/<_id>/notification_schedules",
+            ] or (request.endpoint and "|item" in request.endpoint and request.method == "PATCH"):
                 if not updated_fields or all([key in USER_PROFILE_UPDATES for key in updated_fields]):
                     return
         abort(403)

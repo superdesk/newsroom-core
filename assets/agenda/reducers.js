@@ -10,8 +10,7 @@ import {
     AGENDA_WIRE_ITEMS,
     WATCH_COVERAGE,
     STOP_WATCHING_COVERAGE,
-    SET_ERROR_MESSAGE,
-    SET_ERROR
+    SET_ERROR,
 } from './actions';
 
 import {get, uniq} from 'lodash';
@@ -244,13 +243,6 @@ export default function agendaReducer(state = initialState, action) {
                 ...state.agenda,
                 agendaWireItems: action.items
             }
-        };
-
-    case SET_ERROR_MESSAGE:
-        return {
-            ...state,
-            isLoading: false,
-            errorMessage: action.message
         };
 
     case SET_ERROR: {

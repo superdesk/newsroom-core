@@ -8,6 +8,9 @@ from newsroom.template_filters import (
     datetime_long,
     time_short,
     date_short,
+    notification_time,
+    notification_date,
+    notification_datetime,
     plain_text,
     word_count,
     char_count,
@@ -27,12 +30,15 @@ from newsroom.template_filters import (
     to_json,
     get_slugline,
     initials,
+    get_highlighted_field,
+    get_item_category_names,
 )
 from newsroom.notifications.notifications import get_initial_notifications
 from newsroom.limiter import limiter
 from newsroom.celery_app import init_celery
 from newsroom.settings import SettingsApp
 from newsroom.webpack import NewsroomWebpack
+from newsroom.utils import short_highlighted_text, get_location_string, get_agenda_dates
 
 
 class NewsroomWebApp(BaseNewsroomApp):
@@ -59,6 +65,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         # avoid event sockets on these
         self.generate_renditions = None
         self.generate_embed_renditions = None
+        self.session_timezone = None
 
         super(NewsroomWebApp, self).__init__(import_name=import_name, config=config, **kwargs)
 
@@ -102,6 +109,9 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_filter(to_json, name="tojson")
         self.add_template_filter(datetime_short)
         self.add_template_filter(datetime_long)
+        self.add_template_filter(notification_time)
+        self.add_template_filter(notification_date)
+        self.add_template_filter(notification_datetime)
         self.add_template_filter(date_header)
         self.add_template_filter(plain_text)
         self.add_template_filter(time_short)
@@ -124,6 +134,11 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_global(get_multi_line_message)
         self.add_template_global(theme_url)
         self.add_template_global(get_slugline)
+        self.add_template_global(get_highlighted_field)
+        self.add_template_global(short_highlighted_text)
+        self.add_template_filter(get_location_string, "location_string")
+        self.add_template_filter(get_agenda_dates, "agenda_dates_string")
+        self.add_template_filter(get_item_category_names, "category_names")
 
         jinja2_loaders = [jinja2.FileSystemLoader(folder) for folder in self._theme_folders]
 

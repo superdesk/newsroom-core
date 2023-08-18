@@ -210,3 +210,13 @@ select.form-control {
         height: 100%;
     }
 }
+
+.schedule-times__input-container > * {
+    margin-inline-end: var(--space--2);
+}
+
+.edit-schedule__modal {
+    .modal-body {
+        padding: 0;
+    }
+}

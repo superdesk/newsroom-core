@@ -1,5 +1,5 @@
 from bson import ObjectId
-from typing import Dict, List, TypedDict
+from typing import Dict, List, TypedDict, Any
 from datetime import datetime
 
 
@@ -65,3 +65,27 @@ class Company(TypedDict, total=False):
     products: List[ProductRef]
     sections: Dict[str, bool]
     restrict_coverage_info: bool
+
+
+class TopicSubscriber(TypedDict):
+    user_id: ObjectId
+    notification_type: str
+
+
+class Topic(TypedDict):
+    _id: ObjectId
+    label: str
+    query: str
+    filter: Dict[str, Any]
+    created: Dict[str, Any]
+    user: ObjectId
+    company: ObjectId
+    is_global: bool
+    timezone_offset: int
+    topic_type: str
+    navigation: List[str]
+    original_creator: ObjectId
+    version_creator: ObjectId
+    folder: ObjectId
+    advanced: Dict[str, Any]
+    subscribers: List[TopicSubscriber]
