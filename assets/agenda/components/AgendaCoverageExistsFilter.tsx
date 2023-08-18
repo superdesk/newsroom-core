@@ -26,6 +26,8 @@ function getActiveFilterLabel(filter: any, activeFilter: any) {
         return gettext('Planned');
     case FILTER_VALUES.NOT_PLANNED:
         return gettext('Not Planned');
+    case FILTER_VALUES.MAY_BE:
+        return gettext("May Be")
     }
 
     return filter.label;

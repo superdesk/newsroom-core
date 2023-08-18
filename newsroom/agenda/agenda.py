@@ -557,7 +557,7 @@ def _filter_terms(filters, item_type):
                         name="coverage_status",
                     )
                 )
-            else:
+            elif val == ["not planned"]:
                 must_term_filters.append(
                     nested_query(
                         path="coverages",
