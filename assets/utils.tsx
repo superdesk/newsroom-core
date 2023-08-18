@@ -153,11 +153,11 @@ export function render(store: any, App: any, element?: any, props?: any) {
  * @param {Object} params
  * @return {String}
  */
-export function gettext(text: any, params?: any) {
+export function gettext(text: string, params?: {[key: string]: any}): string {
     let translated = get(window.translations, text, text);
 
     if (params) {
-        Object.keys(params).forEach((param: any) => {
+        Object.keys(params).forEach((param: string) => {
             const paramRegexp = new RegExp('{{ ?' + param + ' ?}}', 'g');
             translated = translated.replace(paramRegexp, params[param] || '');
         });

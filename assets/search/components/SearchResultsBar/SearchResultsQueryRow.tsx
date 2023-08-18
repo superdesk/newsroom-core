@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import {get} from 'lodash';
 
 import {gettext} from 'utils';
@@ -7,8 +6,15 @@ import {gettext} from 'utils';
 import {SearchResultTagList} from './SearchResultTagList';
 import {Tag} from 'components/Tag';
 
+import {ISearchParams} from 'interfaces/topic';
 
-export function SearchResultsQueryRow({searchParams, setQuery}) {
+interface IProps {
+    searchParams: ISearchParams;
+    setQuery: (query: string) => void;
+    readonly?: boolean;
+}
+
+export function SearchResultsQueryRow({searchParams, setQuery, readonly}: IProps) {
     if (!get(searchParams, 'query.length')) {
         return null;
     }
@@ -20,8 +26,9 @@ export function SearchResultsQueryRow({searchParams, setQuery}) {
             tags={[
                 <div className="d-contents" key="tags-query">
                     <Tag
+                        readOnly={readonly === true}
                         testId="query-value"
-                        text={searchParams.query}
+                        text={searchParams.query ?? ''}
                         onClick={(event) => {
                             event.preventDefault();
                             setQuery('');
@@ -33,8 +40,3 @@ export function SearchResultsQueryRow({searchParams, setQuery}) {
         />
     );
 }
-
-SearchResultsQueryRow.propTypes = {
-    searchParams: PropTypes.object,
-    setQuery: PropTypes.func.isRequired,
-};
