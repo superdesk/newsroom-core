@@ -20,7 +20,9 @@ class ProfileTopicsWrapper {
 
     createNewFolder(name) {
         this.getCreateFolderButton().click();
+        cy.intercept('/api/users/*/topic_folders').as('getFolders');
         this.getFolderNameInput().type(name + '{enter}');
+        cy.wait('@getFolders');
     }
 
     getTopicCard(name, additionalSelector) {

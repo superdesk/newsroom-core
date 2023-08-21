@@ -202,6 +202,7 @@ const TopicForm: React.FC<IProps> = ({
                     <FormSection name={gettext('Topic details')} testId="topic-form-group--params">
                         <SearchResultTagsList
                             user={user}
+                            readonly={true}
                             showSaveTopic={false}
                             showMyTopic={false}
                             searchParams={topic}

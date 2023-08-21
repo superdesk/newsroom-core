@@ -2,7 +2,15 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-export function SearchResultTagList({testId, title, tags, children, secondary}) {
+interface IProps {
+    testId: string;
+    title?: string;
+    secondary?: boolean;
+    tags?: React.ReactNode[];
+    children?: React.ReactNode;
+}
+
+export function SearchResultTagList({testId, title, tags, children, secondary}: IProps) {
     return (
         <li
             data-test-id={testId}

@@ -10,12 +10,31 @@ export interface ITopicFolder {
     section: 'wire' | 'agenda' | 'monitoring';
 }
 
-export interface ITopic {
+export type ISearchFields = Array<string>;
+
+export interface ISearchParams {
+    query?: string;
+    filter?: {
+        [field: string]: string[];
+    };
+    timezone_offset?: number;
+    topic_type: 'wire' | 'agenda';
+    navigation: Array<string>;
+    advanced?: {
+        all: string;
+        any: string;
+        exclude: string;
+        fields: ISearchFields;
+    };
+    created?: {
+        from?: string | null;
+        to?: string | null;
+    };
+}
+
+export interface ITopic extends ISearchParams {
     _id: string;
     label: string;
-    query?: string;
-    filter?: Dictionary<string>;
-    created: Dictionary<string>;
     original_creator: IUser['_id'];
     version_creator: IUser['_id'];
     user: IUser['_id'];
@@ -25,14 +44,5 @@ export interface ITopic {
         user_id: IUser['_id'];
         notification_type: ITopicNotificationScheduleType;
     }>;
-    timezone_offset?: number;
-    topic_type: 'wire' | 'agenda';
-    navigation: Array<string>;
     folder?: ITopicFolder['_id'] | null;
-    advanced?: {
-        fields: Array<string>;
-        all: string;
-        any: string;
-        exclude: string;
-    };
 }

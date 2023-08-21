@@ -71,7 +71,6 @@ describe('Wire - Advanced Search', function() {
         UserTopicForm.getNewlyCreatedTopicId((topicId) => {
             cy.url().should('include', `topic=${topicId}`);
         });
-        WirePage.searchResults.toggleBar();
         WirePage.searchResults
             .getSearchResultTags('topics')
             .contains('Sofab Weather');
