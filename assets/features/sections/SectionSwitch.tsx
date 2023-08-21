@@ -34,9 +34,9 @@ interface IProps {
 export const RadioButtonGroup: React.ComponentType<IProps> = (props) => {
     const {options, switchOptions, activeOptionId, fullWidth, gap, className} = props;
 
-    const wrapperClasses = classNames('toggle-button__group toggle-button__group--navbar ms-0 me-3', {
+    const wrapperClasses = classNames('toggle-button__group', {
         'toggle-button__group--spaced': gap,
-        'toggle-button__group--stretch-items': fullWidth,
+        'toggle-button__group--stretch-items w-100': fullWidth,
         [`${className}`]: className,
     });
 
