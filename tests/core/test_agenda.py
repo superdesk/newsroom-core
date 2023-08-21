@@ -629,8 +629,9 @@ def test_filter_agenda_by_coverage_status(client):
     assert "foo" == data["_items"][0]["_id"]
 
     data = get_json(client, '/agenda/search?filter={"coverage_status":["not planned"]}')
-    assert 1 == data["_meta"]["total"]
-    assert "bar" == data["_items"][0]["_id"]
+    assert 3 == data["_meta"]["total"]
+    assert "baz" == data["_items"][0]["_id"]
+    assert "bar" == data["_items"][1]["_id"]
 
     data = get_json(client, '/agenda/search?filter={"coverage_status":["may be"]}')
     assert 1 == data["_meta"]["total"]
