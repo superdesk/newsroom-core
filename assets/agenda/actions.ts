@@ -252,7 +252,7 @@ function search(state: any, next?: any) {
         featured: featuredFilter,
         itemType: itemTypeFilter,
         advanced: !searchParams.advanced ? null : encodeURIComponent(JSON.stringify(searchParams.advanced)),
-        es_highlight: !searchParams.query && !searchParams.advancedSearch ? null : 1,
+        es_highlight: !searchParams.query && !searchParams.advanced ? null : 1,
     };
 
     const queryString = Object.keys(params)
