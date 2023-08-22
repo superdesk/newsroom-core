@@ -292,7 +292,7 @@ $container-max-widths: (
     --top-bar-color-fg-badge: hsl(0, 0%, 100%);
     --top-bar-badge-size: 1.25rem;
     // Logo main
-    --top-bar-logo-main-max-width: 196px;
+    --top-bar-logo-main-max-width: 240px;
     --top-bar-logo-main-max-width--mobile: 160px;
     --top-bar-logo-main-padding-y: 12px;
     --top-bar-logo-main-padding-x: 16px;
@@ -588,6 +588,15 @@ $container-max-widths: (
     --impersonate-user-chip-button-color-fg: var(--color-text--inverse);
     --impersonate-user-chip-button-border-radius: var(--border-radius--full);
 
+    // COMPONENT: COVERAGE STATUS ICONS
+    --coverage-status-icon--active:         hsl(286, 72%, 54%);
+    --coverage-status-icon--assigned:       hsl(196, 100%, 28%);
+    --coverage-status-icon--cancelled:      hsl(360, 100%, 35%);
+    --coverage-status-icon--not-covering:   hsl(360, 100%, 35%);
+    --coverage-status-icon--completed:      hsl(89, 66%, 30%);
+    --coverage-status-icon--undecided:      hsl(44, 100%, 32%);
+    --coverage-status-icon--request:        hsl(44, 100%, 32%);
+    
 
 
 }

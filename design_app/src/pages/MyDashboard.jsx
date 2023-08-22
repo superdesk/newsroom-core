@@ -88,20 +88,19 @@ function MyDashboard() {
                         <input  placeholder="Personal home name" type="text" className="form-control" value="My Dashboard" />
 
                         {/* // EMPTY STATE -- enable if there ar no Topics added to the personal dashboare */}
-
-                        {/* <div className="empty-state__container empty-state__container--full-height">
+                        <div className="empty-state__container empty-state__container--full-height">
                             <div className="empty-state empty-state--large">
                                 <figure className="empty-state__graphic">
                                     <img src="/static/empty-states/empty_state--large.svg" role="presentation" alt="" />
                                 </figure>
                                 <figcaption className="empty-state__text">
-                                    <h4 className="empty-state__text-heading">You don't have any saved Topics yet</h4>
+                                    <h4 className="empty-state__text-heading">No items yet</h4>
                                     <p className="empty-state__text-description">
-                                        You can create Topics by saving search terms and/or filters from the Wire and Agenda sections.
+                                        Select some topics from the sidebar to add them here. 
                                     </p>
                                 </figcaption>
                             </div>
-                        </div> */}
+                        </div>
 
                         <div className="py-3 mt-4 mb-2 border border--medium border-start-0 border-end-0 border--dotted">
                             <p className='font-size--medium text-color--muted m-0'><span className='text-color--default fw-bold'>Hint:</span> Drag and drop items to change the order. This will change the order of the topics are displayed on the Home screen.</p>
