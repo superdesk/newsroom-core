@@ -338,15 +338,15 @@ def _set_event_date_range(search):
         should = [
             {
                 "bool": {
-                    "filter": {"range": {"dates.start": {"gte": date_from}}},
                     "must_not": {"term": {"dates.all_day": True}},
+                    "filter": {"range": {"dates.end": {"gte": date_from}}},
                 },
             },
             {
                 "bool": {
                     "filter": [
                         {"term": {"dates.all_day": True}},
-                        {"range": {"dates.start": {"gte": search.args["date_from"]}}},
+                        {"range": {"dates.end": {"gte": search.args["date_from"]}}},
                     ],
                 },
             },
