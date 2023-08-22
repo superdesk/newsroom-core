@@ -45,8 +45,10 @@ class SearchResultsBarComponent extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
 
+        const urlParams = new URLSearchParams(window.location.search);
+
         this.state = {
-            isTagSectionShown: false,
+            isTagSectionShown: urlParams.get('topic') != null,
             sortValue: this.sortValues[0].label,
         };
         this.toggleTagSection = this.toggleTagSection.bind(this);

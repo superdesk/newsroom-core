@@ -602,6 +602,28 @@ def test_filter_agenda_by_coverage_status(client):
     test_planning["coverages"] = []
     client.post("/push", data=json.dumps(test_planning), content_type="application/json")
 
+    test_planning["guid"] = "123foo"
+    test_planning["planning_date"] = "2023-08-17T10:45:52+0000"
+    test_planning["coverages"] = (
+        {
+            "coverage_id": "placeholder_urn:newsml:stt.fi:20230529:620121",
+            "workflow_status": "draft",
+            "firstcreated": "2023-08-17T10:45:52+0000",
+            "planning": {
+                "slugline": "Placeholder Coverage",
+                "g2_content_type": "text",
+                "scheduled": "2023-08-17T10:45:52+0000",
+            },
+            "flags": {"placeholder": True},
+            "news_coverage_status": {
+                "name": "coverage not decided yet",
+                "label": "On merit",
+                "qcode": "ncostat:notdec",
+            },
+        },
+    )
+    client.post("/push", data=json.dumps(test_planning), content_type="application/json")
+
     data = get_json(client, '/agenda/search?filter={"coverage_status":["planned"]}')
     assert 1 == data["_meta"]["total"]
     assert "foo" == data["_items"][0]["_id"]
@@ -610,7 +632,10 @@ def test_filter_agenda_by_coverage_status(client):
     assert 3 == data["_meta"]["total"]
     assert "baz" == data["_items"][0]["_id"]
     assert "bar" == data["_items"][1]["_id"]
-    assert "urn:conference" == data["_items"][2]["_id"]
+
+    data = get_json(client, '/agenda/search?filter={"coverage_status":["may be"]}')
+    assert 1 == data["_meta"]["total"]
+    assert "123foo" == data["_items"][0]["_id"]
 
 
 def test_filter_events_only(client):
