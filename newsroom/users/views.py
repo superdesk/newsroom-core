@@ -189,6 +189,10 @@ def edit(_id):
     if not user:
         return NotFound(gettext("User not found"))
 
+    etag = flask.request.headers.get("If-Match")
+    if etag and user["_etag"] != etag:
+        return flask.abort(412)
+
     if flask.request.method == "POST":
         form = UserForm(user=user)
         if form.validate_on_submit():
@@ -204,6 +208,7 @@ def edit(_id):
                 )
 
             updates = get_updates_from_form(form)
+
             if not user_is_admin and updates.get("user_type", "") != user.get("user_type", ""):
                 flask.abort(401)
 
