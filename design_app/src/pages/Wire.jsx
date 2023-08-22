@@ -685,8 +685,11 @@ function Wire() {
                                                 <div className="wire-articles__item__icons wire-articles__item__icons--dashed-border">
                                                     <span className="wire-articles__item__icon coverage--completed" title=" Text coverage MEL-TEST-NBA-RAPTORS available (updated)"><i className="icon--coverage-text"></i></span>
                                                     <span className="wire-articles__item__icon coverage--assigned" title=" Planned Picture coverage MEL-TEST-NBA-RAPTORS, expected Apr 13th, 2023 at 23:00"><i className="icon--coverage-photo"></i></span>
-                                                    <span className="wire-articles__item__icon coverage--assigned" title=" Planned Text coverage MEL-TEST-NBA-RAPTORS-sidebar, expected Apr 13th, 2023 at 23:00"><i className="icon--coverage-text"></i></span>
-                                                    <span className="wire-articles__item__icon coverage--completed" title=" Text coverage MEL-TEST-April13-Breaking available (update to come)"><i className="icon--coverage-text"><i className="blue-circle"></i></i></span>
+                                                    <span className="wire-articles__item__icon coverage--active" title=" Planned Text coverage MEL-TEST-NBA-RAPTORS-sidebar, expected Apr 13th, 2023 at 23:00"><i className="icon--coverage-text"></i></span>
+                                                    {/* <span className="wire-articles__item__icon coverage--cancelled" title=" Text coverage MEL-TEST-April13-Breaking available (update to come)"><i className="icon--coverage-text"><i className="blue-circle"></i></i></span> */}
+                                                    <span className="wire-articles__item__icon coverage--cancelled" title=" Text coverage MEL-TEST-April13-Breaking available (update to come)"><i className="icon--coverage-text"></i></span>
+                                                    <span className="wire-articles__item__icon coverage--not-covering" title=" Text coverage MEL-TEST-April13-Breaking available (update to come)"><i className="icon--coverage-infographics"></i></span>
+                                                    <span className="wire-articles__item__icon coverage--undecided" title=" Text coverage MEL-TEST-April13-Breaking available (update to come)"><i className="icon--coverage-video"></i></span>
                                                 </div>
                                                 <div className="wire-articles__item__meta-info align-items-center">
                                                     <span><i className="icon-small--location icon--gray-dark"></i></span>

@@ -513,26 +513,44 @@
     }
     &.coverage--active {
         &::after {
-            background-color: $purple;
+            background-color: var(--coverage-status-icon--active);
             background-image: url('/static/overlay_icon--active.svg');
         }
     }
     &.coverage--assigned {
         &::after {
-            background-color: $mid-blue;
+            background-color: var(--coverage-status-icon--assigned);
             background-image: url('/static/overlay_icon--assigned.svg');
         }
     }
     &.coverage--cancelled {
         &::after {
-            background-color: $red;
+            background-color: var(--coverage-status-icon--cancelled);
             background-image: url('/static/overlay_icon--cancelled.svg');
+        }
+    }
+    &.coverage--not-covering {
+        &::after {
+            background-color: var(--coverage-status-icon--not-covering);
+            background-image: url('/static/overlay_icon--not-covering.svg');
         }
     }
     &.coverage--completed {
         &::after {
-            background-color: $green;
+            background-color: var(--coverage-status-icon--completed);
             background-image: url('/static/overlay_icon--completed.svg');
+        }
+    }
+    &.coverage--undecided {
+        &::after {
+            background-color: var(--coverage-status-icon--undecided);
+            background-image: url('/static/overlay_icon--udecided.svg');
+        }
+    }
+    &.coverage--request {
+        &::after {
+            background-color: var(--coverage-status-icon--request);
+            background-image: url('/static/overlay_icon--udecided.svg');
         }
     }
 }
