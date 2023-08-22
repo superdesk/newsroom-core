@@ -136,7 +136,7 @@ export function createStore(reducer: any, name: any = 'default') {
 export function render(store: any, App: any, element?: any, props?: any) {
     return _render(
         <Provider store={store}>
-            <App {...props} />
+            <App {...props}/>
         </Provider>,
         element
     );
@@ -159,7 +159,7 @@ export function gettext(text: string, params?: {[key: string]: any}): string {
     if (params) {
         Object.keys(params).forEach((param: string) => {
             const paramRegexp = new RegExp('{{ ?' + param + ' ?}}', 'g');
-            translated = translated.replace(paramRegexp, params[param] ?? '');
+            translated = translated.replace(paramRegexp, params[param] || '');
         });
     }
 
@@ -262,7 +262,7 @@ export function isToday(date: any) {
  * @return {Boolean}
  */
 export function isInPast(dateString: any, timezone?: any) {
-    if (!dateString) {
+    if(!dateString) {
         return false;
     }
 
@@ -390,27 +390,27 @@ export function getTextFromHtml(html: any) {
     while (tree.nextNode()) {
         text.push(tree.currentNode.textContent);
         if (tree.currentNode.nextSibling) {
-            switch (tree.currentNode.nextSibling.nodeName) {
-                case 'BR':
-                case 'HR':
-                    text.push('\n');
+            switch(tree.currentNode.nextSibling.nodeName) {
+            case 'BR':
+            case 'HR':
+                text.push('\n');
             }
 
             continue;
         }
 
         switch (tree.currentNode.parentNode.nodeName) {
-            case 'P':
-            case 'LI':
-            case 'H1':
-            case 'H2':
-            case 'H3':
-            case 'H4':
-            case 'H5':
-            case 'DIV':
-            case 'TABLE':
-            case 'BLOCKQUOTE':
-                text.push('\n');
+        case 'P':
+        case 'LI':
+        case 'H1':
+        case 'H2':
+        case 'H3':
+        case 'H4':
+        case 'H5':
+        case 'DIV':
+        case 'TABLE':
+        case 'BLOCKQUOTE':
+            text.push('\n');
         }
     }
 
@@ -455,7 +455,7 @@ export function characterCount(item: any) {
     const text = getTextFromHtml(item.body_html);
 
     // Ignore the last line break
-    return text.length - 1;
+    return text.length - 1 ;
 }
 
 /**
@@ -524,261 +524,248 @@ function setErrorMessage(message: any) {
  * @param dispatch
  * @param setError
  */
-export function errorHandler(error: any, dispatch?: any, setError?: any) {
-    console.error('error', error);
-
-    if (error.response.status !== 400) {
-        notify.error(error.response.statusText || gettext('Failed to process request!'));
-        return;
+export function errorHandler(error: {errorData: any} | Response, dispatch?: any, setError?: any) {
+    if ('errorData' in error) {
+        if (setError) {
+            dispatch(setError(error.errorData));
+        }
+    } else {
+        if (error.status === 403) {
+            dispatch(setErrorMessage(gettext(
+                'There is no product associated with your user. Please reach out to your Company Admin',
+            )));
+        } else {
+            notify.error(error.statusText || gettext('Failed to process request!'));
+        }
     }
-    if (setError) {
-        error.response.json().then(function (data: any) {
-            dispatch(setError(data));
-        });
-        export function errorHandler(error: {errorData: any} | Response, dispatch?: any, setError?: any) {
-            if ('errorData' in error) {
-                if (setError) {
-                    dispatch(setError(error.errorData));
-                }
-            } else {
-                if (error.status === 403) {
-                    dispatch(setErrorMessage(gettext(
-                        'There is no product associated with your user. Please reach out to your Company Admin',
-                    )));
-                } else {
-                    notify.error(error.statusText || gettext('Failed to process request!'));
-                }
-            }
+}
+
+/**
+ * Get config value
+ *
+ * @param {String} key
+ * @param {Mixed} defaultValue
+ * @return {Mixed}
+ */
+export function getConfig(key: any, defaultValue?: any) {
+    const clientConfig = window && window.newsroom && window.newsroom.client_config || {};
+
+    if (Object.keys(clientConfig).length === 0) {
+        console.warn('Client config is not yet available for key', key);
+    }
+
+    return get(clientConfig, key, defaultValue);
+}
+
+export function getLocale() {
+    const defaultLanguage = getConfig('default_language', 'en');
+    const locale = get(window, 'locale', defaultLanguage);
+
+    return locale;
+}
+
+export function getTimezoneOffset() {
+    return now.utcOffset() ? now.utcOffset() * -1 : 0; // it's oposite to Date.getTimezoneOffset
+}
+
+export function isTouchDevice() {
+    return 'ontouchstart' in window        // works on most browsers
+    || navigator.maxTouchPoints > 0;       // works on IE10/11 and Surface
+}
+
+export function isMobilePhone() {
+    return isTouchDevice() && screen.width < 768;
+}
+
+/**
+ * Checks if wire context
+ * @returns {boolean}
+ */
+export function isWireContext() {
+    return window.location.pathname.includes('/wire');
+}
+
+export const getInitData = (data: any) => {
+    const initData = data || {};
+    return {
+        ...initData,
+        userSections: keyBy(get(window.profileData, 'userSections', {}), '_id')
+    };
+};
+
+export const isDisplayed = (field: any, config: any) => get(config, `${field}.displayed`, true);
+
+const getNow = throttle(moment, 500);
+
+/**
+ * Test if item is embargoed, if not returns null, otherwise returns its embargo time
+ * @param {String} embargoed
+ * @return {Moment}
+ */
+export function getEmbargo(item: any) {
+    if (!item.embargoed) {
+        return null;
+    }
+
+    const now = getNow();
+    const parsed = moment(item.embargoed);
+
+    return parsed.isAfter(now) ? parsed : null;
+}
+
+export function getItemFromArray(value: any, items: Array<any> = [], field: any = '_id') {
+    return items.find((i: any) => i[field] === value);
+}
+
+export function upperCaseFirstCharacter(text: any) {
+    return (text && text.toLowerCase().replace(/\b\w/g, (l: any) => l.toUpperCase()));
+}
+
+export function postHistoryAction(item: any, action: any, section: any = 'wire') {
+    server.post('/history/new', {
+        item: item,
+        action: action,
+        section: section
+    }).catch((error: any) => errorHandler(error));
+}
+
+export function recordAction(item: any, action: any = 'open', section: any = 'wire', state: any = null) {
+    if (item) {
+        analytics.itemEvent(action, item);
+        analytics.itemView(item, section);
+        postHistoryAction(item, action, section);
+
+        if (action === 'preview') {
+            updateRouteParams({}, {
+                ...state,
+                previewItem: get(item, '_id')
+            });
         }
+    }
+}
 
-        /**
-         * Get config value
-         *
-         * @param {String} key
-         * @param {Mixed} defaultValue
-         * @return {Mixed}
-         */
-        export function getConfig(key: any, defaultValue?: any) {
-            const clientConfig = window && window.newsroom && window.newsroom.client_config || {};
+export function closeItemOnMobile(dispatch: any, state: any, openItemDetails: any, previewItem: any) {
+    if (isMobilePhone()) {
+        dispatch(openItemDetails(null));
+        dispatch(previewItem(null));
+    }
+}
 
-            if (Object.keys(clientConfig).length === 0) {
-                console.warn('Client config is not yet available for key', key);
-            }
+/**
+ * Get the slugline appended by the takekey if one is defined
+ * @param {Object} item - The wire item to get the slugline from
+ * @param {boolean} withTakeKey - If true, appends the takekey to the response
+ * @returns {String}
+ */
+export function getSlugline(item: any, withTakeKey: any = false) {
+    if (!item || !item.slugline) {
+        return '';
+    }
 
-            return get(clientConfig, key, defaultValue);
-        }
+    let slugline = item.slugline.trim();
+    const takeKey = ` | ${item.anpa_take_key}`;
 
-        export function getLocale() {
-            const defaultLanguage = getConfig('default_language', 'en');
-            const locale = get(window, 'locale', defaultLanguage);
+    if (withTakeKey && item.anpa_take_key && !slugline.endsWith(takeKey)) {
+        slugline += takeKey;
+    }
 
-            return locale;
-        }
+    return slugline;
+}
 
-        export function getTimezoneOffset() {
-            return now.utcOffset() ? now.utcOffset() * -1 : 0; // it's oposite to Date.getTimezoneOffset
-        }
+/**
+ * Factory for filter function to check if action is enabled
+ */
+export function isActionEnabled(configKey: any) {
+    const config = getConfig(configKey, {});
+    return (action: any) => config[action.id] == null || config[action.id];
+}
 
-        export function isTouchDevice() {
-            return 'ontouchstart' in window        // works on most browsers
-                || navigator.maxTouchPoints > 0;       // works on IE10/11 and Surface
-        }
+export const getPlainTextMemoized = memoize((html: any) => getTextFromHtml(html));
 
-        export function isMobilePhone() {
-            return isTouchDevice() && screen.width < 768;
-        }
+export function shouldShowListShortcutActionIcons(listConfig: any, isExtended: any) {
+    const showActionIconsConfig = listConfig.show_list_action_icons || {
+        large: true,
+        compact: true,
+        mobile: false,
+    };
 
-        /**
-         * Checks if wire context
-         * @returns {boolean}
-         */
-        export function isWireContext() {
-            return window.location.pathname.includes('/wire');
-        }
+    return isMobilePhone() ?
+        showActionIconsConfig.mobile : (
+            isExtended ?
+                showActionIconsConfig.large :
+                showActionIconsConfig.compact
+        );
+}
 
-        export const getInitData = (data: any) => {
-            const initData = data || {};
+export function getCreatedSearchParamLabel(created: any) {
+    if (created.to) {
+        if (created.from) {
             return {
-                ...initData,
-                userSections: keyBy(get(window.profileData, 'userSections', {}), '_id')
+                from: formatDate(created.from),
+                to: formatDate(created.to),
             };
-        };
-
-        export const isDisplayed = (field: any, config: any) => get(config, `${field}.displayed`, true);
-
-        const getNow = throttle(moment, 500);
-
-        /**
-         * Test if item is embargoed, if not returns null, otherwise returns its embargo time
-         * @param {String} embargoed
-         * @return {Moment}
-         */
-        export function getEmbargo(item: any) {
-            if (!item.embargoed) {
-                return null;
-            }
-
-            const now = getNow();
-            const parsed = moment(item.embargoed);
-
-            return parsed.isAfter(now) ? parsed : null;
-        }
-
-        export function getItemFromArray(value: any, items: Array<any> = [], field: any = '_id') {
-            return items.find((i: any) => i[field] === value);
-        }
-
-        export function upperCaseFirstCharacter(text: any) {
-            return (text && text.toLowerCase().replace(/\b\w/g, (l: any) => l.toUpperCase()));
-        }
-
-        export function postHistoryAction(item: any, action: any, section: any = 'wire') {
-            server.post('/history/new', {
-                item: item,
-                action: action,
-                section: section
-            }).catch((error: any) => errorHandler(error));
-        }
-
-        export function recordAction(item: any, action: any = 'open', section: any = 'wire', state: any = null) {
-            if (item) {
-                analytics.itemEvent(action, item);
-                analytics.itemView(item, section);
-                postHistoryAction(item, action, section);
-
-                if (action === 'preview') {
-                    updateRouteParams({}, {
-                        ...state,
-                        previewItem: get(item, '_id')
-                    });
-                }
-            }
-        }
-
-        export function closeItemOnMobile(dispatch: any, state: any, openItemDetails: any, previewItem: any) {
-            if (isMobilePhone()) {
-                dispatch(openItemDetails(null));
-                dispatch(previewItem(null));
-            }
-        }
-
-        /**
-         * Get the slugline appended by the takekey if one is defined
-         * @param {Object} item - The wire item to get the slugline from
-         * @param {boolean} withTakeKey - If true, appends the takekey to the response
-         * @returns {String}
-         */
-        export function getSlugline(item: any, withTakeKey: any = false) {
-            if (!item || !item.slugline) {
-                return '';
-            }
-
-            let slugline = item.slugline.trim();
-            const takeKey = ` | ${item.anpa_take_key}`;
-
-            if (withTakeKey && item.anpa_take_key && !slugline.endsWith(takeKey)) {
-                slugline += takeKey;
-            }
-
-            return slugline;
-        }
-
-        /**
-         * Factory for filter function to check if action is enabled
-         */
-        export function isActionEnabled(configKey: any) {
-            const config = getConfig(configKey, {});
-            return (action: any) => config[action.id] == null || config[action.id];
-        }
-
-        export const getPlainTextMemoized = memoize((html: any) => getTextFromHtml(html));
-
-        export function shouldShowListShortcutActionIcons(listConfig: any, isExtended: any) {
-            const showActionIconsConfig = listConfig.show_list_action_icons || {
-                large: true,
-                compact: true,
-                mobile: false,
+        } else {
+            return {
+                to: formatDate(created.to),
             };
-
-            return isMobilePhone() ?
-                showActionIconsConfig.mobile : (
-                    isExtended ?
-                        showActionIconsConfig.large :
-                        showActionIconsConfig.compact
-                );
         }
-
-        export function getCreatedSearchParamLabel(created: any) {
-            if (created.to) {
-                if (created.from) {
-                    return {
-                        from: formatDate(created.from),
-                        to: formatDate(created.to),
-                    };
-                } else {
-                    return {
-                        to: formatDate(created.to),
-                    };
-                }
-            } else if (created.from) {
-                if (created.from === 'now/d') {
-                    return {relative: gettext('Today')};
-                } else if (created.from === 'now/w') {
-                    return {relative: gettext('This week')};
-                } else if (created.from === 'now/M') {
-                    return {relative: gettext('This month')};
-                } else {
-                    return {from: formatDate(created.from)};
-                }
-            }
-
-            return {};
+    } else if (created.from) {
+        if (created.from === 'now/d') {
+            return {relative: gettext('Today')};
+        } else if (created.from === 'now/w') {
+            return {relative: gettext('This week')};
+        } else if (created.from === 'now/M') {
+            return {relative: gettext('This month')};
+        } else {
+            return {from: formatDate(created.from)};
         }
+    }
 
-        export function copyTextToClipboard(text: any, item: any) {
-            navigator.clipboard.writeText(text).then(
-                () => {
-                    notify.success(gettext('Item copied successfully.'));
-                    item && analytics.itemEvent('copy', item);
-                },
-                () => {
-                    notify.error(gettext('Sorry, Copy is not supported.'));
-                }
-            );
+    return {};
+}
+
+export function copyTextToClipboard(text: any, item: any) {
+    navigator.clipboard.writeText(text).then(
+        () => {
+            notify.success(gettext('Item copied successfully.'));
+            item && analytics.itemEvent('copy', item);
+        },
+        () => {
+            notify.error(gettext('Sorry, Copy is not supported.'));
         }
+    );
+}
 
-        export function getScheduledNotificationConfig(): IClientConfig['scheduled_notifications'] {
-            return getConfig('scheduled_notifications', {
-                default_times: [
-                    '07:00',
-                    '15:00',
-                    '19:00',
-                ]
-            });
-        }
+export function getScheduledNotificationConfig(): IClientConfig['scheduled_notifications'] {
+    return getConfig('scheduled_notifications', {default_times: [
+        '07:00',
+        '15:00',
+        '19:00',
+    ]});
+}
 
-        export function getSubscriptionTimesString(user: IUser): string {
-            const schedule = user.notification_schedule || {
-                timezone: DEFAULT_TIMEZONE,
-                times: getScheduledNotificationConfig().default_times,
-            };
-            const now = moment.tz(schedule.timezone);
-            const timezoneAbbreviation = now.zoneAbbr();
-            const timeStrings = [];
+export function getSubscriptionTimesString(user: IUser): string {
+    const schedule = user.notification_schedule || {
+        timezone: DEFAULT_TIMEZONE,
+        times: getScheduledNotificationConfig().default_times,
+    };
+    const now = moment.tz(schedule.timezone);
+    const timezoneAbbreviation = now.zoneAbbr();
+    const timeStrings = [];
 
-            for (const time of schedule.times) {
-                const time_parts = time.split(':');
+    for (const time of schedule.times) {
+        const time_parts = time.split(':');
 
-                now.hours(parseInt(time_parts[0], 10))
-                    .minutes(parseInt(time_parts[1], 10));
+        now.hours(parseInt(time_parts[0], 10))
+            .minutes(parseInt(time_parts[1], 10));
 
-                timeStrings.push(formatTime(now));
-            }
+        timeStrings.push(formatTime(now));
+    }
 
-            return gettext('Daily @ {{ time1 }}, {{ time2 }} and {{ time3 }} {{ timezone }}', {
-                time1: timeStrings[0],
-                time2: timeStrings[1],
-                time3: timeStrings[2],
-                timezone: timezoneAbbreviation,
-            });
-        }
+    return gettext('Daily @ {{ time1 }}, {{ time2 }} and {{ time3 }} {{ timezone }}', {
+        time1: timeStrings[0],
+        time2: timeStrings[1],
+        time3: timeStrings[2],
+        timezone: timezoneAbbreviation,
+    });
+}
