@@ -7,3 +7,4 @@ export {IUserDashboard, IUser} from './user';
 export {IDashboardCard} from './dashboard';
 export {IProduct} from './product';
 export {ISectionFilter} from './section_filter';
+export {IAgendaItem} from './agenda';
