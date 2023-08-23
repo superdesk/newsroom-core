@@ -180,9 +180,9 @@ SITE_NAME = "AAP Newsroom"
 COPYRIGHT_HOLDER = "AAP"
 COPYRIGHT_NOTICE = ""
 USAGE_TERMS = ""
-CONTACT_ADDRESS = "https://www.aap.com.au/contact/sales-inquiries/"
-PRIVACY_POLICY = "https://www.aap.com.au/legal/"
-TERMS_AND_CONDITIONS = "https://www.aap.com.au/legal/"
+CONTACT_ADDRESS = "#"
+PRIVACY_POLICY = "#"
+TERMS_AND_CONDITIONS = "#"
 SHOW_COPYRIGHT = True
 SHOW_USER_REGISTER = False
 
