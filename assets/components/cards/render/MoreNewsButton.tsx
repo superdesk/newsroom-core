@@ -16,7 +16,7 @@ function MoreNewsButton({title, productId, photoUrl, photoUrlLabel, moreNews}: a
                 )}
                 {photoUrl && (
                     <a href={photoUrl} target='_blank' rel='noopener noreferrer' role='button' className='nh-button nh-button--tertiary mb-3'>
-                        {gettext(photoUrlLabel)}
+                        {photoUrlLabel}
                     </a>
                 )}
             </div>
