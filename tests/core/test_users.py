@@ -611,3 +611,39 @@ def test_user_can_update_notification_schedule(app, client):
     assert user["notification_schedule"]["timezone"] == "Europe/Prague"
     assert user["notification_schedule"]["times"] == ["09:00", "17:00", "21:00"]
     assert str_to_date(user["notification_schedule"]["last_run_time"]).replace(tzinfo=pytz.utc) == now
+
+
+def test_check_etag_when_updating_user(client):
+    # Register a new account
+    response = client.post(
+        "/users/new",
+        data={
+            "email": "newuser@abc.org",
+            "first_name": "John",
+            "last_name": "Doe",
+            "password": "abc",
+            "phone": "1234567",
+            "company": ObjectId("59b4c5c61d41c8d736852fbf"),
+            "user_type": "public",
+            "sections": "wire,agenda",
+        },
+    )
+
+    response = client.get("/users/search?q=jo")
+    assert "John" in response.get_data(as_text=True)
+
+    user_data = response.get_json()[0]
+    patch_data = user_data.copy()
+    patch_data["first_name"] = "Foo"
+
+    response = client.post(f"/users/{user_data['_id']}", data=patch_data, headers={"If-Match": "something random"})
+
+    assert response.status_code == 412
+
+    response = client.post(
+        f"/users/{user_data['_id']}",
+        data=patch_data,
+        headers={"If-Match": user_data["_etag"]},
+    )
+
+    assert response.status_code == 200
