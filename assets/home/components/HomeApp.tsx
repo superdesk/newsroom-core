@@ -68,8 +68,6 @@ class HomeApp extends React.Component<IProps, IState> {
 
     height: number;
     elem: any;
-    hasPersonalDashboard: boolean;
-
     constructor(props: any, context: any) {
         super(props, context);
         this.getPanels = this.getPanels.bind(this);
@@ -77,11 +75,10 @@ class HomeApp extends React.Component<IProps, IState> {
         this.renderModal = this.renderModal.bind(this);
         this.onHomeScroll = this.onHomeScroll.bind(this);
         this.height = 0;
-        this.hasPersonalDashboard = (this.props.personalizedDashboards?.[0].topic_items?.length ?? 0) > 0;
 
         this.state = {
             loadingItems: true,
-            activeOptionId: this.hasPersonalDashboard ? 'my-home' : 'default',
+            activeOptionId: this.props.personalizedDashboards.length > 0 ? 'my-home' : 'default',
         };
     }
 
@@ -115,7 +112,7 @@ class HomeApp extends React.Component<IProps, IState> {
     onHomeScroll(event: any) {
         const container = event.target;
         const BUFFER = 100;
-        if (container.scrollTop + this.height + BUFFER >= container.scrollHeight) {
+        if(container.scrollTop + this.height + BUFFER >= container.scrollHeight) {
             (document.getElementById('footer') as any).className = 'footer';
         } else {
             (document.getElementById('footer') as any).className = 'footer footer--home';
@@ -128,7 +125,7 @@ class HomeApp extends React.Component<IProps, IState> {
 
     getPanelsForPersonalizedDashboard() {
         const {personalizedDashboards} = this.props;
-        const Panel: React.ComponentType<any> = getCardDashboardComponent('4-picture-text');
+        const Panel: React.ComponentType<any> = getCardDashboardComponent('4-media-gallery');
         const personalizedDashboardTopicIds = personalizedDashboards?.[0].topic_items?.map(({_id}: any) => _id);
         const topicItems = this.props.topics.filter((topic) => personalizedDashboardTopicIds?.includes(topic._id));
 
@@ -142,7 +139,7 @@ class HomeApp extends React.Component<IProps, IState> {
                         type="4-picture-text"
                         items={item.items}
                         title={currentTopic?.label}
-                        productId={item.items[0].products[0].code ?? 'no-product'}
+                        productId={item.items[0].productId ?? ''}
                         openItem={this.props.openItemDetails}
                         isActive={this.props.activeCard === item._id}
                         cardId={item._id}
@@ -201,8 +198,8 @@ class HomeApp extends React.Component<IProps, IState> {
     }
 
     filterActions(item: any, config: any) {
-        return this.props.actions.filter((action: any) => (!config || isDisplayed(action.id, config)) &&
-            (!action.when || action.when(this.props, item)));
+        return this.props.actions.filter((action: any) =>  (!config || isDisplayed(action.id, config)) &&
+          (!action.when || action.when(this.props, item)));
     }
 
     renderContent(children?: any): any {
@@ -229,7 +226,7 @@ class HomeApp extends React.Component<IProps, IState> {
                             }}
                         >
                             {
-                                !this.hasPersonalDashboard ? (
+                                (this.props.personalizedDashboards?.length ?? 0) < 1 ? (
                                     <div className="home-tools">
                                         <button
                                             onClick={() => {
@@ -281,13 +278,7 @@ class HomeApp extends React.Component<IProps, IState> {
                                 )
                             }
                         </div>
-                        {
-                            this.props.modal?.modal === 'personalizeHome' && (
-                                <PersonalizeHomeSettingsModal
-                                    personalizedDashboards={this.props.personalizedDashboards}
-                                />
-                            )
-                        }
+                        {this.props.modal?.modal === 'personalizeHome' && <PersonalizeHomeSettingsModal />}
                         {
                             this.state.activeOptionId === 'my-home' ? (
                                 this.getPanelsForPersonalizedDashboard()
@@ -366,7 +357,7 @@ class HomeApp extends React.Component<IProps, IState> {
     }
 }
 
-const mapStateToProps = (state: any) => ({
+const mapStateToProps = (state: any) =>({
     cards: state.cards,
     personalizedDashboards: state.personalizedDashboards,
     itemsByCard: state.itemsByCard,
