@@ -13,6 +13,7 @@ import {updateUser} from 'users/actions';
 import {getCurrentUser} from 'company-admin/selectors';
 import {IAgendaState} from 'agenda/reducers';
 import {ITopic} from 'interfaces/topic';
+import {IPersonalizedDashboardsWithData} from 'home/reducers';
 
 interface IMapStateProps {
     topics: Array<ITopic>;
@@ -26,6 +27,7 @@ interface IMapDispatchProps {
 }
 
 interface IOwnProps {
+    personalizedDashboards: Array<IPersonalizedDashboardsWithData>;
     closeModal?: () => void;
 }
 
@@ -39,14 +41,6 @@ interface IState {
 }
 
 const MAX_SELECTED_TOPICS = 6;
-
-const getSelectedTopicIds = (user: IUser) => {
-    if (user.dashboards?.length) {
-        return user.dashboards[0].topic_ids ?? [];
-    }
-
-    return [];
-};
 
 class PersonalizeHomeModal extends React.Component<IProps, IState> {
 
@@ -62,7 +56,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
         this.wireTopicsById = new Map(this.wireTopics.map((topic) => [topic._id, topic]));
 
         this.state = {
-            selectedTopicIds: getSelectedTopicIds(this.props.currentUser),
+            selectedTopicIds: this.props.personalizedDashboards[0].topic_items?.map((item) => item._id) ?? [],
             activeSection: '1',
             searchTerm: '',
             isLoading: false,
@@ -149,12 +143,12 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                     className="empty-state empty-state--large"
                 >
                     <figure className="empty-state__graphic">
-                        <img src="/static/empty-states/empty_state--small.svg" role="presentation" alt="" />
+                        <img src="/static/empty-states/empty_state--large.svg" role="presentation" alt="" />
                     </figure>
                     <figcaption className="empty-state__text">
-                        <h4 className="empty-state__text-heading">{gettext('You don\'t have any saved Topics yet')}</h4>
+                        <h4 className="empty-state__text-heading">{gettext('No items yet')}</h4>
                         <p className="empty-state__text-description">
-                            {gettext('You can create Topics by saving search terms and/or filters from the Wire and Agenda sections.')}
+                            {gettext('Select some topics from the sidebar to add them here.')}
                         </p>
                     </figcaption>
                 </div>
@@ -262,7 +256,14 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                             <p className='font-size--medium text-color--muted mt-1 mb-3'>
                                 {gettext('Select up to 6 Topics you want to display on your personal Home screen.')}
                             </p>
-                            <p className='font-size--large'>{gettext('{{size}} out of 6 topics selected', {size: this.state.selectedTopicIds.length || 0})}</p>
+                            <p className='font-size--large'>
+                                {
+                                    gettext(
+                                        '{{size}} out of 6 topics selected',
+                                        {size: this.state.selectedTopicIds.length}
+                                    )
+                                }
+                            </p>
                             <RadioButtonGroup
                                 activeOptionId={this.state.activeSection}
                                 size='small'
