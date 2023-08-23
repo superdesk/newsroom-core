@@ -27,7 +27,8 @@ type IProps = Pick<IParentProps,
     'availableFields' |
     'toggleAdvancedSearchField' |
     'setAdvancedSearchKeywords' |
-    'clearAdvancedSearchParams'
+    'clearAdvancedSearchParams' |
+    'refresh'
 >;
 
 export function SearchResultsAdvancedSearchRow({
@@ -37,6 +38,7 @@ export function SearchResultsAdvancedSearchRow({
     toggleAdvancedSearchField,
     setAdvancedSearchKeywords,
     clearAdvancedSearchParams,
+    refresh,
 }: IProps) {
     const advancedSearchParams: ISearchParams['advanced'] = searchParams.advanced ?? {
         all: '',
@@ -89,6 +91,7 @@ export function SearchResultsAdvancedSearchRow({
                     onClick={(event) => {
                         event.preventDefault();
                         removeKeywordEntry('all', index);
+                        refresh?.();
                     }}
                 />
             );
@@ -227,6 +230,7 @@ export function SearchResultsAdvancedSearchRow({
                                 onClick={(event) => {
                                     event.preventDefault();
                                     toggleAdvancedSearchField(fieldName);
+                                    refresh?.();
                                 }}
                             >
                                 {fieldNameToLabel[fieldName]}

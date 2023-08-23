@@ -136,7 +136,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                             )}
                             <div className="navbar__button-group">
                                 <Dropdown
-                                    label={gettext('Sort by: {{sort}}', {sort :this.state.sortValue})}
+                                    label={gettext('Sort by: {{sort}}', {sort: this.state.sortValue})}
                                 >
                                     {
                                         this.sortValues.map((option) => (
@@ -182,6 +182,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                     )}
                     {!isTagSectionShown ? null : (
                         <SearchResultTagsList
+                            refresh={this.props.refresh}
                             user={this.props.user}
                             showSaveTopic={this.props.showSaveTopic}
                             saveMyTopic={this.props.saveMyTopic}

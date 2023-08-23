@@ -108,7 +108,7 @@ const TopicForm: React.FC<IProps> = ({
                                 readOnly={readOnly}
                             />
                         )}
-                        {!(original._id != null && original.user == null ) ? null : (
+                        {!(original._id != null && original.user == null) ? null : (
                             <label htmlFor={original._id}>{gettext('Created Externally')}</label>
                         )}
                     </div>
