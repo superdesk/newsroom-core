@@ -595,7 +595,7 @@ export const getInitData = (data: any) => {
     };
 };
 
-export const isDisplayed = (field: any, config: any) => get(config, `${field}.displayed`, true);
+export const isDisplayed = (field: any, config: any, defaultValue = true) => get(config, `${field}.displayed`, defaultValue);
 
 const getNow = throttle(moment, 500);
 

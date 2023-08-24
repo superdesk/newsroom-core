@@ -28,7 +28,7 @@ const getPictureTextPanel = (item: any, picture: any, openItem: any, withPicture
 };
 
 
-function PictureTextCard ({type, items, title, productId, openItem, isActive, cardId, listConfig}: any) {
+function PictureTextCard({type, items, title, productId, openItem, isActive, cardId, listConfig}: any) {
     const withPictures = type.indexOf('picture') > -1;
 
     return (

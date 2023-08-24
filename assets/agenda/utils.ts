@@ -14,6 +14,7 @@ import {
     formatTime,
     DAY_IN_MINUTES,
 } from '../utils';
+import {IAgendaItem} from 'interfaces';
 
 export const STATUS_KILLED = 'killed';
 export const STATUS_CANCELED = 'cancelled';
@@ -244,8 +245,12 @@ export function hasLocation(item: any) {
     return !!getLocationString(item);
 }
 
-export function hasLocationNotes(item: any) {
+export function hasLocationNotes(item: IAgendaItem) {
     return get(item, 'location[0].details[0].length', 0) > 0;
+}
+
+export function getLocationDetails(item: IAgendaItem) {
+    return item.location && item.location[0] && item.location[0].details && item.location[0].details[0];
 }
 
 /**
@@ -254,9 +259,10 @@ export function hasLocationNotes(item: any) {
  * @param {Object} item
  * @return {String}
  */
-export function getPublicContacts(item: any) {
-    const contacts = get(item, 'event.event_contact_info', []);
-    return contacts.filter((c: any) => c.public).map((c: any) => ({
+export function getPublicContacts(item: IAgendaItem) {
+    const contacts = item.event?.event_contact_info ?? [];
+    return contacts.filter((c) => c.public).map((c) => ({
+        _id: c._id,
         name: [c.first_name, c.last_name].filter((x: any) => !!x).join(' '),
         organisation: c.organisation || '',
         email: (c.contact_email || []).join(', '),
