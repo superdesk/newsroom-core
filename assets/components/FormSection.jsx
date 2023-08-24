@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 
 export function FormSection({name, testId, children}) {
-    const [opened, setOpened] = useState(name == null);
+    const [opened, setOpened] = useState(true);
 
     return (
         <div className="nh-flex__column" data-test-id={testId}>

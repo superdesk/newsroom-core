@@ -1,4 +1,4 @@
-import {IUser} from 'interfaces';
+import {ITopic, IUser} from 'interfaces';
 
 import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
@@ -312,18 +312,11 @@ export function fetchFolders(global: boolean, skipDispatch?: boolean) {
 export const TOPIC_UPDATED = 'TOPIC_UPDATED';
 export function moveTopic(topicId: any, folder: any) {
     return (dispatch: any, getState: any) => {
-        const updates = {
-            folder: folder != null ? folder._id : null,
-        };
-
         const state = getState();
+        const updates = {folder: folder != null ? folder._id : null};
         const topic = state.topics.find((topic: any) => topic._id === topicId);
-        const url = `/api/users/${topic.user}/topics/${topicId}`;
 
-        return server.patch(url, updates, topic._etag).then((response) => {
-            mergeUpdates(updates, response);
-            dispatch({type: TOPIC_UPDATED, payload: {topic, updates}});
-        });
+        return updateTopic(topic, updates, dispatch);
     };
 }
 
@@ -339,4 +332,20 @@ export function updateUserNotificationSchedules(schedule: Omit<IUser['notificati
             })
             .catch((error) => errorHandler(error, dispatch, setError(error)));
     };
+}
+
+export function setTopicSubscribers(topic: ITopic, subscribers: ITopic['subscribers']) {
+    return (dispatch: any, getState: any) => {
+        const updates = {subscribers};
+        return updateTopic(topic, updates, dispatch);
+    };
+}
+
+function updateTopic(topic: ITopic, updates: any, dispatch: any) {
+    const url = `/api/users/${topic.user}/topics/${topic._id}`;
+
+    return server.patch(url, updates, topic._etag).then((response) => {
+        mergeUpdates(updates, response);
+        dispatch({type: TOPIC_UPDATED, payload: {topic, updates}});
+    });
 }

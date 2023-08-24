@@ -21,6 +21,7 @@ import {SET_USER_COMPANY_MONITORING_LIST} from 'monitoring/actions';
 import {modalReducer} from 'reducers';
 import {GET_NAVIGATIONS, QUERY_NAVIGATIONS} from 'navigations/actions';
 import {SET_TOPICS} from '../search/actions';
+import {ITopic} from 'interfaces';
 
 export interface IUserProfileStore {
     allSections?: Array<any>;
@@ -217,6 +218,7 @@ export default function itemReducer(state: any = initialState, action: any): IUs
 
                 return {...topic, ...action.payload.updates};
             }),
+            selectedItem: state.selectedItem?._id === action.payload.topic._id ? {...state.selectedItem, ...action.payload.updates} : state.selectedItem,
         };
 
     case FOLDER_UPDATED:
