@@ -96,7 +96,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                 resendUserInvite();
             }
         },
-    }
+    };
 
     return (
         <div
