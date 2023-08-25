@@ -277,7 +277,7 @@ export function deleteFolder(folder: any, global: boolean, deleteTopics?: boolea
         const state = getState();
         const url = getFoldersUrl(state, global, folder._id);
 
-        if (!window.confirm(gettext("Are you sure you want to delete the folder {{name}} and all of its contents?", {name: folder.name}))) {
+        if (!window.confirm(gettext('Are you sure you want to delete the folder {{name}} and all of its contents?', {name: folder.name}))) {
             return;
         }
 
