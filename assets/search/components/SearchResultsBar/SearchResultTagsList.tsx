@@ -23,6 +23,7 @@ export interface IProps {
 
     setQuery(): void;
     resetFilter(): void;
+    refresh?(): void;
     toggleNavigation(navigation: INavigation): void;
     toggleAdvancedSearchField(field: string): void;
     setAdvancedSearchKeywords(field: string, keywords: string): void;
@@ -55,6 +56,7 @@ export function SearchResultTagsList({
     clearAdvancedSearchParams,
     deselectMyTopic,
     resetFilter,
+    refresh,
 }: IProps) {
     return (
         <ul
@@ -82,6 +84,7 @@ export function SearchResultTagsList({
             <SearchResultsAdvancedSearchRow
                 searchParams={searchParams}
                 availableFields={availableFields}
+                refresh={refresh}
                 toggleAdvancedSearchField={toggleAdvancedSearchField}
                 setAdvancedSearchKeywords={setAdvancedSearchKeywords}
                 clearAdvancedSearchParams={clearAdvancedSearchParams}

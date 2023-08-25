@@ -178,7 +178,7 @@ class AgendaListItem extends React.Component<any, any> {
                             planningItem={planningItem}
                             isMobilePhone={isMobile}
                             user={this.props.user}
-                            listConfig = {listConfig}
+                            listConfig={listConfig}
                         />
 
                         {(isMobile || isExtended) && description && (

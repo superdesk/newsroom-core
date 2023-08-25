@@ -17,9 +17,9 @@ function MainLayout() {
                   © The Canadian Press 2023
               </div>
               <div>
-                  <a href="https://www.thecanadianpress.com/terms-of-use-cp/" target="_blank">Terms of Use</a>
-                  <a href="https://www.thecanadianpress.com/privacy-policy/" target="_blank">Privacy and Accessibility</a>
-                  <a href="https://www.thecanadianpress.com/contact/" target="_blank">Contact</a>
+                  <a href="#" target="_blank">Terms of Use</a>
+                  <a href="#" target="_blank">Privacy and Accessibility</a>
+                  <a href="#" target="_blank">Contact</a>
               </div>
             </footer>
         </div>

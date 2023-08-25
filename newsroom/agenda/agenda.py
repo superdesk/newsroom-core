@@ -590,6 +590,13 @@ def _filter_terms(filters, item_type):
                         name="coverage_status",
                     )
                 )
+            elif val == ["completed"]:
+                must_term_filters.append(
+                    nested_query(
+                        path="coverages",
+                        query={"bool": {"must": [{"exists": {"field": "coverages.delivery_id"}}]}},
+                    )
+                )
         elif key == "agendas":
             must_term_filters.append(
                 nested_query(

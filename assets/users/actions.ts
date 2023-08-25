@@ -149,7 +149,7 @@ export function postUser() {
                 .join(',');
         }
 
-        return server.post(url, user)
+        return server.post(url, user, user._etag)
             .then(function() {
                 if (user._id) {
                     notify.success(gettext('User updated successfully'));
