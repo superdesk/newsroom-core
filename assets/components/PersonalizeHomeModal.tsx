@@ -56,7 +56,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
         this.wireTopicsById = new Map(this.wireTopics.map((topic) => [topic._id, topic]));
 
         this.state = {
-            selectedTopicIds: this.props.personalizedDashboards[0].topic_items?.map((item) => item._id) ?? [],
+            selectedTopicIds: this.props.personalizedDashboards[0]?.topic_items?.map((item) => item._id) ?? [],
             activeSection: '1',
             searchTerm: '',
             isLoading: false,
