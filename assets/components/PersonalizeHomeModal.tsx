@@ -114,7 +114,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
     render() {
         const NoSearchMatches = () => (
             <div className="empty-state__container mt-3">
-                <div className="empty-state">
+                <div className="empty-state empty-state--small">
                     <figure className="empty-state__graphic">
                         <img src="/static/empty-states/empty_state--small.svg" role="presentation" alt="" />
                     </figure>
