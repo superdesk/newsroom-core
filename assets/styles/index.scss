@@ -1993,6 +1993,9 @@ article.list {
 .wire-column__nav__group {
     margin-block-end: 20px;
 }
+.wire-column__nav-heading {
+    font-weight: 700;
+}
 
 .wire-column__info {
     color: #B3B5BD;
@@ -2229,11 +2232,14 @@ article.list {
 
 .wire-column__preview__image {
     position: relative;
-    margin-inline-start: -20px;
-    margin-inline-end: -20px;
+    margin-inline-start: calc(-1 * var(--space--3));
+    margin-inline-end: calc(-1 * var(--space--3));
     img {
         width: 100%;
         height: auto;
+        background-color: var(--color-background--muted);
+        font-size: var(--text-size--medium);
+        color: var(--color-text--muted);
     }
 }
 
@@ -2265,9 +2271,9 @@ article.list {
 }
 
 .wire-column__preview__caption {
-    font-size: 0.8125rem; // 13px
+    font-size: var(--text-size--medium);
     color: var(--color-text);
-    margin: 10px 20px;
+    margin: var(--space--1-5) var(--space--3);
 }
 
 .wire-column__preview-image-link {
@@ -2748,25 +2754,28 @@ article.list {
 
 .wire-column__preview__tag {
     font-size: 0.8125rem; // 13px
-    background: #EDEDED;
+    background-color: var(--tag-label-bg-default);
     color: var(--color-text);
     white-space: nowrap;
     display: inline-block;
-    padding: 5px 20px;
-    margin-block-end: 5px;
+    padding: var(--space--0-5) var(--space--2);
+    margin-block-end: var(--space--0-5);
     border-radius: 2px;
-    margin-inline-end: 10px;
+    margin-inline-end: var(--space--0-5);
     text-decoration: none;
+    transition: background-color var(--transition-base);
+    //word-break: break-all;
     &:hover {
         color: var(--color-text);
-        background: #e2e1e1;
+        background-color: var(--tag-label-bg-darker);
         text-decoration: none;
     }
     &:focus {
         outline: 0;
     }
     &:focus-visible {
-        box-shadow: 0 0 0 1px rgba(0, 172, 236, .6), 0 0 3px 4px rgba(0, 172, 236, .4);
+        outline: 1px solid var(--color-interactive-focus);
+        box-shadow: 0 0 0 4px var(--color-interactive-focus--translucent);
     }
 }
 
@@ -2860,7 +2869,10 @@ article.list {
 }
 
 .content--item-detail .wire-column__preview__buttons {
-    margin: 0 15px;
+    margin: 0 var(--space--2);
+    @include phone {
+        margin: 0;
+    }
 }
 
 .content--item-detail .wire-column__preview__content {
@@ -2981,23 +2993,31 @@ article.list {
     font-size: var(--content-item-headline-font-size--large);
 }
 
-.content--item-detail .wire-articles__item__meta {
-    order: 1;
-    flex-direction: row;
-    @include lg {
-        flex-direction: column;
-        flex: 1 0 125px;
-        align-items: flex-start;
-        padding-block-start: 6px;
-        word-break: break-word;
+.content--item-detail {
+    .wire-articles__item__meta {
+        order: 1;
+        flex-direction: row;
+        margin-block-end: var(--space--3);
+        @include lg {
+            flex-direction: column;
+            flex: 1 0 125px;
+            align-items: flex-start;
+            padding: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            //padding-block-start: 6px !important;
+            word-break: break-word;
+            margin-block-end: 0;
+            .wire-articles__item__meta-info {
+                margin-block-start: var(--space--1);
+                span {
+                    gap: 0;
+                    flex-wrap: wrap;
+                }
+            }
+        }
     }
 }
-
-.content--item-detail .wire-articles__item__meta-info {
-    margin-block-start: 10px;
-}
-
-
 
 .wire-column__preview__content--item-detail-info-wrap,
 .wire-column__preview__content--event-detail-info-wrap {
@@ -3038,8 +3058,8 @@ article.list {
 }
 
 .content--item-detail .column__preview__tags__column, .info-box__content {
-    border-block-start: 1px dotted #cacaca;
-    padding: 10px 0px;
+    border-block-start: 1px dotted var(--color-line--medium);
+    padding: var(--space--1) 0px;
 }
 
 .info-box__content .column__preview__tags__column,
@@ -4216,4 +4236,19 @@ article.list {
 
 .nh-login-page__content { // login page background color
     background-color: var(--login-page-color-bg);
+}
+.login-logo {
+    padding-inline: var(--login-logo-padding--inline);
+    padding-block: var(--login-logo-padding--block);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    img {
+        width: 100%;
+        height: auto;
+        display: block;
+        min-width: var(--login-logo-image-width--min);
+        max-width: var(--login-logo-image-width--max);
+    }
 }

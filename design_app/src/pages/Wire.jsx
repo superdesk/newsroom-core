@@ -661,11 +661,138 @@ function Wire() {
                                 </div>
                             </div>
                             <div className="wire-articles wire-articles--list">
-                                <article className="wire-articles__item-wrap col-12 wire-item"><div className="wire-articles__item wire-articles__item--list" tabIndex="0"><div className="wire-articles__item-text-block"><h4 className="wire-articles__item-headline"><div className="no-bindable-select wire-articles__item-select"><label className="circle-checkbox"><input type="checkbox" className="css-checkbox" /><i></i></label></div><div className="wire-articles__item-headline-inner">Correct me later on and see what fields appear</div></h4><div className="wire-articles__item__meta"><div className="wire-articles__item__icons"><span className="wire-articles__item__icon"><i className="icon--text icon--gray-dark"></i></span></div><div className="wire-articles__item__meta-info"><span className="bold">Correctme</span><span><span></span><span><span>The Canadian Press</span></span><span><span> // </span></span><span><span>1 words</span></span><span><span> // </span></span><span><time dateTime="12:51 19/12/2022">12:51 19/12/2022</time></span></span></div></div><div className="wire-articles__item__text"><p>hello3</p></div></div><div className="wire-articles__item-actions"><div className="btn-group"><button className="icon-button" aria-label="More Actions"><i className="icon--more icon--gray-dark"></i></button></div><button type="button" className="icon-button icon-button--primary" title="" aria-label="Share" data-original-title="Share"><i className="icon--share"></i></button><button type="button" className="icon-button icon-button--primary" title="" aria-label="Save" data-original-title="Save"><i className="icon--bookmark-add"></i></button></div></div></article>
-                                <article className="wire-articles__item-wrap col-12 wire-item"><div className="wire-articles__item wire-articles__item--list" tabIndex="0"><div className="wire-articles__item-text-block"><h4 className="wire-articles__item-headline"><div className="no-bindable-select wire-articles__item-select"><label className="circle-checkbox"><input type="checkbox" className="css-checkbox" /><i></i></label></div><div className="wire-articles__item-headline-inner">Correct me later on and see what fields appear</div></h4><div className="wire-articles__item__meta"><div className="wire-articles__item__icons"><span className="wire-articles__item__icon"><i className="icon--text icon--gray-dark"></i></span></div><div className="wire-articles__item__meta-info"><span className="bold">Correctme</span><span><span></span><span><span>The Canadian Press</span></span><span><span> // </span></span><span><span>1 words</span></span><span><span> // </span></span><span><time dateTime="12:51 19/12/2022">12:51 19/12/2022</time></span></span></div></div><div className="wire-articles__item__text"><p>hello3</p></div></div><div className="wire-articles__item-actions"><div className="btn-group"><button className="icon-button" aria-label="More Actions"><i className="icon--more icon--gray-dark"></i></button></div><button type="button" className="icon-button icon-button--primary" title="" aria-label="Share" data-original-title="Share"><i className="icon--share"></i></button><button type="button" className="icon-button icon-button--primary" title="" aria-label="Save" data-original-title="Save"><i className="icon--bookmark-add"></i></button></div></div></article>
+                                <article className="wire-articles__item-wrap col-12 wire-item">
+                                    <div className="wire-articles__item wire-articles__item--list wire-articles__item--wire" tabIndex="0">
+                                        <div className="wire-articles__item-text-block">
+                                            <h4 className="wire-articles__item-headline">
+                                                <div className="no-bindable-select wire-articles__item-select">
+                                                    <label className="circle-checkbox">
+                                                        <input type="checkbox" className="css-checkbox" />
+                                                        <i></i>
+                                                    </label>
+                                                </div>
+                                                <div className="wire-articles__item-headline-inner">Correct me later on and see what fields appear</div>
+                                            </h4>
+                                            <div className="wire-articles__item__meta">
+                                                <div className="wire-articles__item__icons">
+                                                    <span className="wire-articles__item__icon">
+                                                        <i className="icon--text"></i>
+                                                    </span>
+                                                    <span className="wire-articles__item__icon">
+                                                        <i className="icon--photo"></i>
+                                                    </span>
+                                                </div>
+                                                <div className="wire-articles__item__meta-info">
+                                                    <span className="bold">Correctme</span>
+                                                    <span>
+                                                        <span></span>
+                                                        <span>
+                                                            <span>The Canadian Press</span>
+                                                        </span>
+                                                        <span>
+                                                            <span> // </span>
+                                                        </span>
+                                                        <span>
+                                                            <span>1 words</span>
+                                                        </span>
+                                                        <span>
+                                                            <span> // </span>
+                                                        </span>
+                                                        <span>
+                                                            <time dateTime="12:51 19/12/2022">12:51 19/12/2022</time>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="wire-articles__item__text">
+                                                <p>Sed posuere consectetur est at lobortis. Donec sed odio dui. Maecenas sed diam eget risus varius blandit sit amet non magna. 
+                                                Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Morbi leo risus, porta ac consectetur ac, 
+                                                vestibulum at eros. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+                                            </div>
+                                        </div>
+                                        <div className="wire-articles__item-actions">
+                                            <div className="btn-group">
+                                                <button className="icon-button" aria-label="More Actions">
+                                                    <i className="icon--more icon--gray-dark"></i>
+                                                </button>
+                                            </div>
+                                            <button type="button" className="icon-button icon-button--primary" title="" aria-label="Share" data-original-title="Share">
+                                                <i className="icon--share"></i>
+                                            </button>
+                                            <button type="button" className="icon-button icon-button--primary" title="" aria-label="Save" data-original-title="Save">
+                                                <i className="icon--bookmark-add"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </article>
+                                <article className="wire-articles__item-wrap col-12 wire-item">
+                                    <div className="wire-articles__item wire-articles__item--list wire-articles__item--wire" tabIndex="0">
+                                        <div className="wire-articles__item-text-block">
+                                            <h4 className="wire-articles__item-headline">
+                                                <div className="no-bindable-select wire-articles__item-select">
+                                                    <label className="circle-checkbox">
+                                                        <input type="checkbox" className="css-checkbox" />
+                                                        <i></i>
+                                                    </label>
+                                                </div>
+                                                <div className="wire-articles__item-headline-inner">Maecenas faucibus mollis interdum natoque penatibus</div>
+                                            </h4>
+                                            <div className="wire-articles__item__meta">
+                                                <div className="wire-articles__item__icons">
+                                                    <span className="wire-articles__item__icon">
+                                                        <i className="icon--text"></i>
+                                                    </span>
+                                                    <span className="wire-articles__item__icon">
+                                                        <i className="icon--photo"></i>
+                                                    </span>
+                                                </div>
+                                                <div className="wire-articles__item__meta-info">
+                                                    <span className="bold">Correctme</span>
+                                                    <span>
+                                                        <span></span>
+                                                        <span>
+                                                            <span>The Canadian Press</span>
+                                                        </span>
+                                                        <span>
+                                                            <span> // </span>
+                                                        </span>
+                                                        <span>
+                                                            <span>1 words</span>
+                                                        </span>
+                                                        <span>
+                                                            <span> // </span>
+                                                        </span>
+                                                        <span>
+                                                            <time dateTime="12:51 19/12/2022">12:51 19/12/2022</time>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="wire-articles__item__text">
+                                                <p>Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. 
+                                                Maecenas faucibus mollis interdum. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Sed posuere 
+                                                consectetur est at lobortis.</p>
+                                            </div>
+                                        </div>
+                                        <div className="wire-articles__item-actions">
+                                            <div className="btn-group">
+                                                <button className="icon-button" aria-label="More Actions">
+                                                    <i className="icon--more icon--gray-dark"></i>
+                                                </button>
+                                            </div>
+                                            <button type="button" className="icon-button icon-button--primary" title="" aria-label="Share" data-original-title="Share">
+                                                <i className="icon--share"></i>
+                                            </button>
+                                            <button type="button" className="icon-button icon-button--primary" title="" aria-label="Save" data-original-title="Save">
+                                                <i className="icon--bookmark-add"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </article>
+
                                 {/* AGENDA Item for testing */}
                                 <article className="wire-articles__item-wrap col-12 agenda-item">
-                                    <div className="wire-articles__item wire-articles__item--list wire-articles__item--not-covering" tabIndex="0">
+                                    <div className="wire-articles__item wire-articles__item--list wire-articles__item--agenda wire-articles__item--not-covering" tabIndex="0">
                                         <div className="wire-articles__item-text-block">
                                             <h4 className="wire-articles__item-headline">
                                                 <div className="no-bindable-select wire-articles__item-select">

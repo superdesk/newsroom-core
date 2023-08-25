@@ -134,7 +134,7 @@ class WireListItem extends React.Component<any, any> {
             'wire-articles__item-wrap col-12 wire-item'
         );
         const wrapClassName = classNames(
-            'wire-articles__item wire-articles__item--list',
+            'wire-articles__item wire-articles__item--wire wire-articles__item--list',
             {
                 'wire-articles__item--visited': this.props.isRead,
                 'wire-articles__item--open': this.props.isActive,
