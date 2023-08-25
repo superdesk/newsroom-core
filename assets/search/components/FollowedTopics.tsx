@@ -59,7 +59,7 @@ class FollowedTopics extends React.Component<any, any> {
                 name: gettext('Remove from folder'),
                 icon: 'folder-remove-from',
                 action: this.removeTopicFolder,
-                if: (topic: any) => topic.folder != null,
+                if: (topic: any) => topic.folder != null && canUserEditTopic(topic, this.props.user),
             },
             {
                 id: 'edit',
@@ -209,17 +209,19 @@ class FollowedTopics extends React.Component<any, any> {
                                     </button>
                                 </div>
                             )}
-                            <div className="toggle-button__group toggle-button__group--navbar ms-auto me-0">
-                                <button
-                                    type="button"
-                                    className="nh-button nh-button--tertiary"
-                                    title={gettext('Create new folder')}
-                                    data-test-id="create-folder-btn"
-                                    onClick={() => this.createNewFolder()}
-                                >
-                                    <i className="icon--folder-create"></i>{gettext('New folder')}
-                                </button>
-                            </div>
+                            {(this.state.showGlobal === false || canUserManageTopics(this.props.user)) && (
+                                <div className="toggle-button__group toggle-button__group--navbar ms-auto me-0">
+                                    <button
+                                        type="button"
+                                        className="nh-button nh-button--tertiary"
+                                        title={gettext('Create new folder')}
+                                        data-test-id="create-folder-btn"
+                                        onClick={() => this.createNewFolder()}
+                                    >
+                                        <i className="icon--folder-create"></i>{gettext('New folder')}
+                                    </button>
+                                </div>
+                            )}
                         </div>
                         <div className="simple-card__list pt-xl-4 pt-3">
                             {this.state.newFolder != null && (
