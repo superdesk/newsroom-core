@@ -97,6 +97,15 @@ export const WORKFLOW_COLORS = {
     [WORKFLOW_STATUS.CANCELLED]: 'coverage--cancelled',
 };
 
+export const COVERAGE_STATUS_COLORS = {
+    'coverage intended': null,
+    'coverage not planned': 'coverage--not-covering',
+    'coverage not intended': 'coverage--not-covering',
+    'coverage not decided': 'coverage--undecided',
+    'coverage not decided yet': 'coverage--undecided',
+    'coverage upon request': 'coverage--request',
+};
+
 export const SCHEDULE_TYPE = {
     REGULAR: 'REGULAR',
     ALL_DAY: 'ALL_DAY',
