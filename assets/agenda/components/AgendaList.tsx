@@ -236,6 +236,7 @@ class AgendaList extends React.Component<any, any> {
             onScroll,
             listConfig
         } = this.props;
+
         const isExtended = activeView === EXTENDED_VIEW;
         const showShortcutActionIcons = shouldShowListShortcutActionIcons(this.props.listConfig, isExtended);
         const articleGroups = groupedItems.map((group: any) =>
@@ -275,7 +276,7 @@ class AgendaList extends React.Component<any, any> {
                                             planningId={plan.guid}
                                             resetActioningItem={this.resetActioningItem}
                                             showShortcutActionIcons={showShortcutActionIcons}
-                                            listConfig = {listConfig}
+                                            listConfig={listConfig}
                                         />
                                     )
                                 }
@@ -300,6 +301,7 @@ class AgendaList extends React.Component<any, any> {
                                 actioningItem={this.state.actioningItem}
                                 resetActioningItem={this.resetActioningItem}
                                 showShortcutActionIcons={showShortcutActionIcons}
+                                listConfig={listConfig}
                             />);
                         }
                     })}
