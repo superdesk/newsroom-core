@@ -77,7 +77,8 @@ class HomeApp extends React.Component<IProps, IState> {
         this.renderModal = this.renderModal.bind(this);
         this.onHomeScroll = this.onHomeScroll.bind(this);
         this.height = 0;
-        this.hasPersonalDashboard = (this.props.personalizedDashboards?.[0].topic_items?.length ?? 0) > 0;
+
+        this.hasPersonalDashboard = (this.props.personalizedDashboards?.[0]?.topic_items?.length ?? 0) > 0;
 
         this.state = {
             loadingItems: true,

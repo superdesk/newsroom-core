@@ -17,7 +17,8 @@ import AgendaInternalNote from './AgendaInternalNote';
 import AgendaListCoverageItem from './AgendaListCoverageItem';
 import AgendaLocation from './AgendaLocation';
 
-import {gettext} from 'utils';
+import {gettext, isDisplayed} from 'utils';
+import {AgendaContacs} from './AgendaContacts';
 
 class AgendaListItemIcons extends React.Component {
     static propTypes: any;
@@ -129,6 +130,10 @@ class AgendaListItemIcons extends React.Component {
 
                 <div className='wire-articles__item__meta-info align-items-center'>
                     <AgendaLocation item={props.item} isMobilePhone={props.isMobilePhone} border={state.internalNote} />
+
+                    {isDisplayed('contacts', props.listConfig) && (
+                        <AgendaContacs item={props.item} inList={true} />
+                    )}
 
                     {!props.isMobilePhone && (
                         <AgendaInternalNote internalNote={state.internalNote} onlyIcon={true}/>

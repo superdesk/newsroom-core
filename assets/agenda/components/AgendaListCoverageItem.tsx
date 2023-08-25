@@ -11,6 +11,7 @@ import {
     isCoverageForExtraDay,
     isWatched,
     WORKFLOW_COLORS,
+    COVERAGE_STATUS_COLORS
 } from '../utils';
 
 class AgendaListCoverageItem extends React.Component<any, any> {
@@ -50,14 +51,14 @@ class AgendaListCoverageItem extends React.Component<any, any> {
     render() {
         const props = this.props;
         const state = this.state;
-
+        const coverage_icon = get(COVERAGE_STATUS_COLORS, props.coverage.coverage_status) || WORKFLOW_COLORS[props.coverage.workflow_status];
         return (
             !props.group ||
             props.coverage.scheduled == null ||
             (state.isCoverageForExtraDay && props.coverage.planning_id === get(props, 'planningItem.guid'))
         ) && (
             <span
-                className={classNames('wire-articles__item__icon', WORKFLOW_COLORS[props.coverage.workflow_status], {'dashed-border': props.showBorder})}
+                className={classNames('wire-articles__item__icon',`${coverage_icon}`, {'dashed-border': props.showBorder})}
                 title={state.tooltip}
             >
                 <i className={`${state.coverageClass}`}>
