@@ -14,6 +14,7 @@ import {
     formatTime,
     DAY_IN_MINUTES,
 } from '../utils';
+import {IAgendaItem} from 'interfaces';
 
 export const STATUS_KILLED = 'killed';
 export const STATUS_CANCELED = 'cancelled';
@@ -94,6 +95,15 @@ export const WORKFLOW_COLORS = {
     [WORKFLOW_STATUS.ACTIVE]: 'coverage--active',
     [WORKFLOW_STATUS.COMPLETED]: 'coverage--completed',
     [WORKFLOW_STATUS.CANCELLED]: 'coverage--cancelled',
+};
+
+export const COVERAGE_STATUS_COLORS = {
+    'coverage intended': null,
+    'coverage not planned': 'coverage--not-covering',
+    'coverage not intended': 'coverage--not-covering',
+    'coverage not decided': 'coverage--undecided',
+    'coverage not decided yet': 'coverage--undecided',
+    'coverage upon request': 'coverage--request',
 };
 
 export const SCHEDULE_TYPE = {
@@ -244,8 +254,12 @@ export function hasLocation(item: any) {
     return !!getLocationString(item);
 }
 
-export function hasLocationNotes(item: any) {
+export function hasLocationNotes(item: IAgendaItem) {
     return get(item, 'location[0].details[0].length', 0) > 0;
+}
+
+export function getLocationDetails(item: IAgendaItem) {
+    return item.location && item.location[0] && item.location[0].details && item.location[0].details[0];
 }
 
 /**
@@ -254,9 +268,10 @@ export function hasLocationNotes(item: any) {
  * @param {Object} item
  * @return {String}
  */
-export function getPublicContacts(item: any) {
-    const contacts = get(item, 'event.event_contact_info', []);
-    return contacts.filter((c: any) => c.public).map((c: any) => ({
+export function getPublicContacts(item: IAgendaItem) {
+    const contacts = item.event?.event_contact_info ?? [];
+    return contacts.filter((c) => c.public).map((c) => ({
+        _id: c._id,
         name: [c.first_name, c.last_name].filter((x: any) => !!x).join(' '),
         organisation: c.organisation || '',
         email: (c.contact_email || []).join(', '),
@@ -561,10 +576,10 @@ export function getHighlightedName(item: any) {
         return item.es_highlight.name[0];
     }
     else if (item.es_highlight.slugline){
-        return item.es_highlight.slugline [0];
+        return item.es_highlight.slugline[0];
     }
     else if (item.es_highlight.headline){
-        return item.es_highlight.headline [0];
+        return item.es_highlight.headline[0];
     }
     else{
         return getName(item);

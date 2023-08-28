@@ -19,6 +19,7 @@ import {
     setTopicEditorFullscreen,
     fetchFolders,
     openEditTopicNotificationsModal,
+    setTopicSubscribers,
 } from 'user-profile/actions';
 import {loadMyWireTopic} from 'wire/actions';
 import {loadMyAgendaTopic} from 'agenda/actions';
@@ -52,6 +53,7 @@ interface IProps {
     setTopicEditorFullscreen(fullscreen: boolean): void;
     fetchFolders(global: boolean): Promise<Array<ITopicFolder>>;
     openEditTopicNotificationsModal(): void;
+    setTopicSubscribers(topic: ITopic, subscribers: ITopic['subscribers']): void;
 }
 
 interface IState {
@@ -108,7 +110,9 @@ class TopicEditor extends React.Component<IProps, IState> {
     }
 
     componentDidUpdate(prevProps: Readonly<IProps>) {
-        if (get(prevProps, 'topic._id') !== get(this.props, 'topic._id')) {
+        if (get(prevProps, 'topic._id') !== get(this.props, 'topic._id') ||
+            get(prevProps, 'topic._etag') !== get(this.props, 'topic._etag')
+        ) {
             this.changeTopic(this.props.topic);
         }
     }
@@ -235,8 +239,12 @@ class TopicEditor extends React.Component<IProps, IState> {
             }
         }
 
-        this.setState({topic});
-        this.updateFormValidity(topic);
+        if (!canUserEditTopic(topic, this.props.user)) {
+            this.props.setTopicSubscribers(topic, topic.subscribers);
+        } else {
+            this.setState({topic});
+            this.updateFormValidity(topic);
+        }
     }
 
     onFolderChange(folder: ITopicFolder | null) {
@@ -589,6 +597,8 @@ const mapDispatchToProps = (dispatch: any) => ({
     setTopicEditorFullscreen: (fullscreen: boolean) => dispatch(setTopicEditorFullscreen(fullscreen)),
     fetchFolders: (global: boolean) => dispatch(fetchFolders(global, true)),
     openEditTopicNotificationsModal: () => dispatch(openEditTopicNotificationsModal()),
+    setTopicSubscribers: (topic: ITopic, subscribers: ITopic['subscribers']) =>
+        dispatch(setTopicSubscribers(topic, subscribers)),
 });
 
 const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(TopicEditor);

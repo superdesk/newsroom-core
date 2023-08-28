@@ -58,7 +58,7 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                 disableButtonOnSubmit={true}
                 className="edit-schedule__modal"
             >
-                <div className="nh-container nh-container--highlight">
+                <div className="nh-container nh-container--highlight rounded--none">
                     <p className="nh-container__text--small">
                         {gettext(
                             'Editing the global notifications schedule will adjust the ' +

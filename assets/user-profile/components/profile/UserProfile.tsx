@@ -125,7 +125,7 @@ class UserProfile extends React.Component<IProps, any> {
                                     error={errors ? errors.role : null} />
                             </div>
 
-                            <div className="col-lg-12">
+                            <div className="col-lg-12 mb-2">
                                 <CheckboxInput
                                     name='receive_app_notifications'
                                     label={gettext('Receive inApp notifications')}
@@ -145,7 +145,7 @@ class UserProfile extends React.Component<IProps, any> {
 
                             <div className="ng-flex__row">
                                 <div className="col-lg-6">
-                                    <div className="nh-container nh-container--highlight mb-3">
+                                    <div className="nh-container nh-container--highlight mb-3 mt-3">
                                         <p className="nh-container__text--small">
                                             {gettext('You will receive email notifications daily, sent in a digest ' +
                                                 'format at regular intervals. This setting will apply to all subscribed ' +

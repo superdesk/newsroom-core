@@ -7,34 +7,34 @@ function MainNavbar() {
             <h3 className="a11y-only">main nav bar</h3>
             <div className="navbar__logo">
                 {/* Default */}
-                {/* <a href="#">
-                    <h1 className="a11y-only">Newsroom</h1>
-                    <img className="navbar__logo-img navbar__logo-img--en" src="static/logo.svg" alt="Newsroom" aria-hidden="true" />
-                </a> */}
+                <a href="#">
+                    <h1 className="a11y-only">Newshub</h1>
+                    <img className="navbar__logo-img navbar__logo-img--en" src="static/newshub_logo.svg" alt="Newhub" aria-hidden="true" />
+                </a>
                 
                 {/* Canadian Press */}
-                <a href="#">
+                {/* <a href="#">
                     <h1 className="a11y-only">The Canadian Press</h1>
-                    <img className="navbar__logo-img navbar__logo-img--en" src="static/temp_logos/logo.svg" alt="The Canadian Press" aria-hidden="true" />
-                </a>
+                    <img className="navbar__logo-img navbar__logo-img--en" src="static/temp_logos/cp_logo.svg" alt="The Canadian Press" aria-hidden="true" />
+                </a> */}
 
                 {/* Canadian Press - French */}
                 {/* <a href="#">
                     <h1 className="a11y-only">La Presse Canadienne</h1>
-                    <img className="navbar__logo-img navbar__logo-img--fr" src="static/temp_logos/logo-fr.svg" alt="La Presse Canadienne" aria-hidden="true" />
+                    <img className="navbar__logo-img navbar__logo-img--fr" src="static/temp_logos/cp_logo-fr.svg" alt="La Presse Canadienne" aria-hidden="true" />
                 </a> */}
             </div>
 
             {/* NewsPro */}
-            <div className="navbar__additional-logo">
+            {/* <div className="navbar__additional-logo">
                 <h1 className="a11y-only">NewsPro</h1>
-                <img className="navbar__additional-logo-img navbar__additional-logo-img--en" src="static/temp_logos/logo-newspro.svg" alt="Newspro" aria-hidden="true" />
-            </div>
+                <img className="navbar__additional-logo-img navbar__additional-logo-img--en" src="static/temp_logos/cp_logo-newspro.svg" alt="Newspro" aria-hidden="true" />
+            </div> */}
 
             {/* NewsPro French */}
             {/* <div className="navbar__additional-logo">
                 <h1 className="a11y-only">NouvellesPro</h1>
-                <img className="navbar__additional-logo-img navbar__additional-logo-img--fr" src="static/temp_logos/logo-newspro-fr.svg" alt="NouvellesPro" aria-hidden="true" />
+                <img className="navbar__additional-logo-img navbar__additional-logo-img--fr" src="static/temp_logos/cp_logo-newspro-fr.svg" alt="NouvellesPro" aria-hidden="true" />
             </div> */}
             <div className="navbar-brand">
                 <nav>

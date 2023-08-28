@@ -50,7 +50,7 @@ export function FieldComponents({config, item, fieldProps = {}}: any) {
             key === SEPARATOR_KEY ? `${SEPARATOR_KEY}${++separator}` : key;
 
         return (
-            <span key={_key}>
+            <span className="probam" key={_key}>
                 <Component item={item} {...fieldProps} />
             </span>
         );
@@ -134,7 +134,7 @@ function getComponentForField(item: any, field: any): any {
             Component = MAP_FIELD_TO_COMPONENT[field];
         } else if (typeof item[field] === 'string') {
             // string value from item
-            Component = () => <span>{item[field]}</span>;
+            Component = () => <span className="test">{item[field]}</span>;
         }
 
         if (Component) {

@@ -7,7 +7,7 @@ import '../../assets/styles/app.scss'; // Newshub - import of everything
 import './assets/styles/_design_external-style.scss'; // Static file
 //import './assets/styles/theme.css'; // CP Theme
 //import './assets/styles/theme_News-Pro.scss'; // CP News Pro Theme - test SCSS import
-import './assets/styles/theme_Command-News.scss'; // CP News Pro Theme - test SCSS import
+//import './assets/styles/theme_Command-News.scss'; // CP News Pro Theme - test SCSS import
 
 ReactDOM.render(
   React.createElement(App),

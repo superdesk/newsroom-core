@@ -23,7 +23,7 @@ function PreviewMeta({
     const fields = displayConfig.metadata_fields || DEFAULT_META_FIELDS;
 
     return (
-        <div className="wire-articles__item__meta">
+        <div className="wire-articles__item__meta wire-articles__item__meta--boxed">
             <WireListItemIcons
                 item={item}
                 picture={picture}
