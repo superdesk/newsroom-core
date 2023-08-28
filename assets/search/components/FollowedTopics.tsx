@@ -33,10 +33,11 @@ import MonitoringEditor from 'search/components/MonitoringEditor';
 import TopicEditor from 'search/components/TopicEditor';
 import TopicList from 'search/components/TopicList';
 import {TopicFolderEditor} from './TopicFolderEditor';
+import {ITopicAction} from './Topic';
 
 class FollowedTopics extends React.Component<any, any> {
     static propTypes: any;
-    actions: any;
+    actions: Array<ITopicAction>;
     constructor(props: any, context: any) {
         super(props, context);
 
@@ -59,7 +60,7 @@ class FollowedTopics extends React.Component<any, any> {
                 name: gettext('Remove from folder'),
                 icon: 'folder-remove-from',
                 action: this.removeTopicFolder,
-                if: (topic: any) => topic.folder != null && canUserEditTopic(topic, this.props.user),
+                if: (topic) => topic.folder != null && canUserEditTopic(topic, this.props.user),
             },
             {
                 id: 'edit',
@@ -69,8 +70,7 @@ class FollowedTopics extends React.Component<any, any> {
             }];
 
         if (this.props.topicType !== 'monitoring') {
-            this.actions = [
-                ...this.actions,
+            this.actions = this.actions.concat([
                 {
                     id: 'share',
                     name: gettext('Share'),
@@ -81,9 +81,9 @@ class FollowedTopics extends React.Component<any, any> {
                     name: gettext('Delete'),
                     icon: 'trash',
                     action: this.deleteTopic,
-                    when: (topic: any) => canUserEditTopic(topic, this.props.user),
+                    if: (topic) => canUserEditTopic(topic, this.props.user),
                 }
-            ].filter(isActionEnabled('topic_actions'));
+            ]).filter(isActionEnabled('topic_actions'));
         }
     }
 
@@ -238,6 +238,7 @@ class FollowedTopics extends React.Component<any, any> {
                                 topics={this.getFilteredTopics()}
                                 selectedTopicId={get(this.props.selectedItem, '_id')}
                                 actions={this.actions}
+                                user={this.props.user}
                                 users={this.props.companyUsers}
                                 folders={this.props.folders}
                                 folderPopover={this.state.folderPopover}
