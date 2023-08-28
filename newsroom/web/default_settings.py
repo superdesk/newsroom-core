@@ -621,3 +621,11 @@ AGENDA_SEARCH_FIELDS = [
     "description_text",
     "location.name",
 ]
+
+#:
+#: If `True` it will show multi day events only on starting day,
+#  when `False` those will be visible on every day.
+#:
+#: .. versionadded: 2.5.0
+#:
+AGENDA_SHOW_MULTIDAY_ON_START_ONLY = True

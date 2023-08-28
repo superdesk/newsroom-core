@@ -334,19 +334,20 @@ def _set_event_date_range(search):
     should = []
 
     if date_from and not date_to:
+        dates_field = "dates.start" if app.config.get("AGENDA_SHOW_MULTIDAY_ON_START_ONLY") else "dates.end"
         # Filter from a particular date onwards
         should = [
             {
                 "bool": {
                     "must_not": {"term": {"dates.all_day": True}},
-                    "filter": {"range": {"dates.end": {"gte": date_from}}},
+                    "filter": {"range": {dates_field: {"gte": date_from}}},
                 },
             },
             {
                 "bool": {
                     "filter": [
                         {"term": {"dates.all_day": True}},
-                        {"range": {"dates.end": {"gte": search.args["date_from"]}}},
+                        {"range": {dates_field: {"gte": search.args["date_from"]}}},
                     ],
                 },
             },
