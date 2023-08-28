@@ -1,11 +1,25 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import MoreNewsButton from './MoreNewsButton';
+import MoreNewsButton, {MoreNewsSearchKind} from './MoreNewsButton';
 import {connect} from 'react-redux';
 
-class CardRow extends React.Component<any, any> {
-    static propTypes: any;
-    static defaultProps: any;
+interface IOwnProps {
+    id: string;
+    title: string;
+    children: any;
+    isActive?: boolean;
+    moreNews?: boolean;
+    user?: any;
+    kind?: MoreNewsSearchKind;
+}
+
+interface IReduxStateProps {
+    userProducts: Array<any>;
+    userType: string;
+}
+
+type IComponentProps = IOwnProps & IReduxStateProps
+
+class CardRow extends React.Component<IComponentProps, any> {
     cardElem: any;
 
     constructor(props: any) {
@@ -17,43 +31,29 @@ class CardRow extends React.Component<any, any> {
             this.cardElem.scrollIntoView({behavior: 'instant', block: 'end', inline: 'nearest'});
         }
     }
+
     render() {
-        const {title, productId, children, userProducts,userType} = this.props;
-        let moreNews = this.props.moreNews;
-        if (userType !== 'administrator'){
-            moreNews = userProducts.some((userProduct: any) => userProduct._id === productId);
+        const {title, id, children, userProducts, userType, kind} = this.props;
+        let moreNews = this.props.moreNews == null ? true : this.props.moreNews;
+
+        if (userType !== 'administrator' && kind == null) {
+            moreNews = userProducts.some((userProduct: any) => userProduct._id === id);
         }
 
         return (
             <div className='row' ref={(elem) => (this.cardElem = elem)}>
-                <MoreNewsButton title={title} productId={productId} moreNews = {moreNews}/>
+                <MoreNewsButton title={title} id={id} kind={kind ?? MoreNewsSearchKind.product} moreNews={moreNews} />
                 {children}
             </div>
         );
     }
 }
 
-CardRow.propTypes = {
-    title: PropTypes.string,
-    productId: PropTypes.string,
-    isActive: PropTypes.bool,
-    children: PropTypes.node.isRequired,
-    moreNews: PropTypes.bool,
-    user: PropTypes.object,
-    userProducts: PropTypes.array,
-    userType: PropTypes.string,
-};
-
-const mapStateToProps = (state: any) =>  ({
+const mapStateToProps = (state: any): IReduxStateProps => ({
     userProducts: state.userProducts,
     userType: state.userType,
 });
 
-CardRow.defaultProps = {
-    moreNews: true
-};
-
-
-const component: React.ComponentType<any> = connect(mapStateToProps)(CardRow);
+const component: React.ComponentType<IOwnProps> = connect<IReduxStateProps, {}, IOwnProps>(mapStateToProps)(CardRow);
 
 export default component;

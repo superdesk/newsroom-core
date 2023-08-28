@@ -21,6 +21,7 @@ import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 import {getCurrentUser} from 'company-admin/selectors';
 import {IPersonalizedDashboardsWithData} from 'home/reducers';
 import {ITopic} from 'interfaces/topic';
+import {MoreNewsSearchKind} from 'components/cards/render/MoreNewsButton';
 
 const modals: any = {
     shareItem: ShareItemModal,
@@ -139,11 +140,12 @@ class HomeApp extends React.Component<IProps, IState> {
 
                 return (
                     <Panel
+                        kind={MoreNewsSearchKind.topic}
                         key={item._id}
                         type="4-picture-text"
                         items={item.items}
                         title={currentTopic?.label}
-                        productId={item.items[0].products[0].code ?? 'no-product'}
+                        id={currentTopic?._id}
                         openItem={this.props.openItemDetails}
                         isActive={this.props.activeCard === item._id}
                         cardId={item._id}
@@ -157,7 +159,7 @@ class HomeApp extends React.Component<IProps, IState> {
     getPanels(card: any) {
         if (this.state.loadingItems) {
             return (
-                <CardRow key={card.label} title={card.label} productId={this.getProductId(card)} isActive={this.props.activeCard === card._id}>
+                <CardRow key={card.label} title={card.label} id={this.getProductId(card)} isActive={this.props.activeCard === card._id}>
                     <div className='col-sm-6 col-md-4 col-lg-3 col-xxl-2 d-flex mb-4'>
                         <div className="spinner-border text-success" />
                         <span className="a11y-only">{gettext('Loading Card Items')}</span>
@@ -170,35 +172,42 @@ class HomeApp extends React.Component<IProps, IState> {
         const items = this.props.itemsByCard[card.label] || [];
 
         if (card.type === '4-photo-gallery') {
-            return <Panel
-                key={card.label}
-                photos={items}
-                title={card.label}
-                moreUrl={card.config.more_url}
-                moreUrlLabel={card.config.more_url_label}
-                listConfig={this.props.listConfig}
-            />;
-        }
-        if (card.type === '2x2-events') {
-            return <Panel
-                key={card.label}
-                events={get(card, 'config.events')}
-                title={card.label}
-                listConfig={this.props.listConfig}
-            />;
+            return (
+                <Panel
+                    key={card.label}
+                    photos={items}
+                    title={card.label}
+                    moreUrl={card.config.more_url}
+                    moreUrlLabel={card.config.more_url_label}
+                    listConfig={this.props.listConfig}
+                />
+            );
         }
 
-        return <Panel
-            key={card.label}
-            type={card.type}
-            items={items}
-            title={card.label}
-            productId={this.getProductId(card)}
-            openItem={this.props.openItemDetails}
-            isActive={this.props.activeCard === card._id}
-            cardId={card._id}
-            listConfig={this.props.listConfig}
-        />;
+        if (card.type === '2x2-events') {
+            return (
+                <Panel
+                    key={card.label}
+                    events={get(card, 'config.events')}
+                    title={card.label}
+                    listConfig={this.props.listConfig}
+                />
+            );
+        }
+
+        return (
+            <Panel
+                key={card.label}
+                type={card.type}
+                items={items}
+                title={card.label}
+                id={this.getProductId(card)}
+                openItem={this.props.openItemDetails}
+                isActive={this.props.activeCard === card._id}
+                cardId={card._id}
+                listConfig={this.props.listConfig}
+            />
+        );
     }
 
     filterActions(item: any, config: any) {

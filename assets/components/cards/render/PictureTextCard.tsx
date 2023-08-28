@@ -1,9 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {getPicture, getThumbnailRendition, getCaption} from 'wire/utils';
 import CardBody from './CardBody';
 import CardFooter from './CardFooter';
 import CardRow from './CardRow';
+import {MoreNewsSearchKind} from './MoreNewsButton';
 
 const getPictureTextPanel = (item: any, picture: any, openItem: any, withPictures: any, cardId: any, listConfig: any) => {
     const rendition = withPictures && getThumbnailRendition(picture);
@@ -27,26 +27,26 @@ const getPictureTextPanel = (item: any, picture: any, openItem: any, withPicture
     </div>);
 };
 
+interface IProps {
+    type: string;
+    items: Array<any>;
+    title: string;
+    id: string;
+    openItem?: any;
+    isActive?: boolean;
+    cardId?: string;
+    listConfig?: any;
+    kind?: MoreNewsSearchKind;
+}
 
-function PictureTextCard({type, items, title, productId, openItem, isActive, cardId, listConfig}: any) {
+function PictureTextCard({type, items, title, id, openItem, isActive, cardId, listConfig, kind}: IProps) {
     const withPictures = type.indexOf('picture') > -1;
 
     return (
-        <CardRow title={title} productId={productId} isActive={isActive}>
+        <CardRow kind={kind} title={title} id={id} isActive={isActive}>
             {items.map((item: any) => getPictureTextPanel(item, getPicture(item), openItem, withPictures, cardId, listConfig))}
         </CardRow>
     );
 }
-
-PictureTextCard.propTypes = {
-    type: PropTypes.string,
-    items: PropTypes.array,
-    title: PropTypes.string,
-    productId: PropTypes.string,
-    openItem: PropTypes.func,
-    isActive: PropTypes.bool,
-    cardId: PropTypes.string,
-    listConfig: PropTypes.object,
-};
 
 export default PictureTextCard;

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MoreNewsButton from './MoreNewsButton';
+import MoreNewsButton, {MoreNewsSearchKind} from './MoreNewsButton';
 import moment from 'moment/moment';
 import {gettext} from 'utils';
 
@@ -78,7 +78,7 @@ const getEventPanel = (event: any, index: any) => {
 function EventsTwoByTwoCard({events, title}: any) {
     return (
         <div className='row'>
-            <MoreNewsButton title={title}/>
+            <MoreNewsButton kind={MoreNewsSearchKind.product} title={title}/>
             {events.map((event: any, index: any) => getEventPanel(event, index))}
         </div>
     );

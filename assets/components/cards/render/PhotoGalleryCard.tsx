@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MoreNewsButton from './MoreNewsButton';
+import MoreNewsButton, {MoreNewsSearchKind} from './MoreNewsButton';
 
 const getMediaPanel = (photo: any, index: any) => {
     return (<div key={index} className='col-sm-6 col-lg-3 d-flex mb-4'>
@@ -17,7 +17,7 @@ const getMediaPanel = (photo: any, index: any) => {
 function PhotoGalleryCard({photos, title, moreUrl, moreUrlLabel}: any) {
     return (
         <div className='row'>
-            <MoreNewsButton key="more" title={title} photoUrl={moreUrl} photoUrlLabel={moreUrlLabel} />
+            <MoreNewsButton kind={MoreNewsSearchKind.product} key="more" title={title} photoUrl={moreUrl} photoUrlLabel={moreUrlLabel} />
             {photos.map((photo: any, index: any) => getMediaPanel(photo, index))}
         </div>
     );
