@@ -335,13 +335,13 @@ export function updateUserNotificationSchedules(schedule: Omit<IUser['notificati
 }
 
 export function setTopicSubscribers(topic: ITopic, subscribers: ITopic['subscribers']) {
-    return (dispatch: any, getState: any) => {
+    return (dispatch: any) => {
         const updates = {subscribers};
         return updateTopic(topic, updates, dispatch);
     };
 }
 
-function updateTopic(topic: ITopic, updates: any, dispatch: any) {
+function updateTopic(topic: ITopic, updates: Partial<ITopic>, dispatch: any) {
     const url = `/api/users/${topic.user}/topics/${topic._id}`;
 
     return server.patch(url, updates, topic._etag).then((response) => {

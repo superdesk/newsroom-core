@@ -21,7 +21,6 @@ import {SET_USER_COMPANY_MONITORING_LIST} from 'monitoring/actions';
 import {modalReducer} from 'reducers';
 import {GET_NAVIGATIONS, QUERY_NAVIGATIONS} from 'navigations/actions';
 import {SET_TOPICS} from '../search/actions';
-import {ITopic} from 'interfaces';
 
 export interface IUserProfileStore {
     allSections?: Array<any>;
