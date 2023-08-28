@@ -34,6 +34,7 @@ export interface ISearchParams {
 
 export interface ITopic extends ISearchParams {
     _id: string;
+    _etag: string;
     label: string;
     original_creator: IUser['_id'];
     version_creator: IUser['_id'];

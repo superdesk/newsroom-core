@@ -576,10 +576,10 @@ export function getHighlightedName(item: any) {
         return item.es_highlight.name[0];
     }
     else if (item.es_highlight.slugline){
-        return item.es_highlight.slugline [0];
+        return item.es_highlight.slugline[0];
     }
     else if (item.es_highlight.headline){
-        return item.es_highlight.headline [0];
+        return item.es_highlight.headline[0];
     }
     else{
         return getName(item);
