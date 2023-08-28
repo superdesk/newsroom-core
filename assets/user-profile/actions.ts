@@ -272,11 +272,12 @@ export function saveFolder(folder: any, data: any, global: any) {
 
 export const FOLDER_DELETED = 'FOLDER_DELETED';
 export function deleteFolder(folder: any, global: boolean, deleteTopics?: boolean) {
+
     return (dispatch: any, getState: any) => {
         const state = getState();
         const url = getFoldersUrl(state, global, folder._id);
 
-        if (!window.confirm(gettext('Are you sure you want to delete folder?'))) {
+        if (!window.confirm(gettext('Are you sure you want to delete the folder {{name}} and all of its contents?', {name: folder.name}))) {
             return;
         }
 
