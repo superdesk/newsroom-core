@@ -235,6 +235,7 @@ class FollowedTopics extends React.Component<any, any> {
                                 </div>
                             )}
                             <TopicList
+                                createNewFolder={this.createNewFolder}
                                 topics={this.getFilteredTopics()}
                                 selectedTopicId={get(this.props.selectedItem, '_id')}
                                 actions={this.actions}
