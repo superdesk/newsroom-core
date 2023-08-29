@@ -66,10 +66,10 @@ class Server {
      * @param {Object} data
      * @return {Promise}
      */
-    post(url: any, data: any) {
+    post(url: any, data: any, etag?: string) {
         return fetch(url, options({
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: getHeaders(etag),
             body: data ? JSON.stringify(data) : null,
         })).then(checkStatus);
     }

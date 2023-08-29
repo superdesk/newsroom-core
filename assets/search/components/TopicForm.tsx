@@ -108,7 +108,7 @@ const TopicForm: React.FC<IProps> = ({
                                 readOnly={readOnly}
                             />
                         )}
-                        {!(original._id != null && original.user == null ) ? null : (
+                        {!(original._id != null && original.user == null) ? null : (
                             <label htmlFor={original._id}>{gettext('Created Externally')}</label>
                         )}
                     </div>
@@ -174,7 +174,7 @@ const TopicForm: React.FC<IProps> = ({
                                 icon={'icon--folder'}
                                 label={getFolderName(topic, folders)}
                             >
-                                {topic.folder && (
+                                {readOnly !== true && topic.folder && (
                                     <button
                                         key="top"
                                         type="button"
@@ -183,13 +183,14 @@ const TopicForm: React.FC<IProps> = ({
                                         onClick={() => onFolderChange(null)}
                                     >{gettext('Remove from folder')}</button>
                                 )}
-                                {folders.map((folder: any) => (
+                                {readOnly !== true && folders.map((folder: any) => (
                                     <button
                                         key={folder._id}
                                         type="button"
                                         data-test-id={`dropdown-item--${folder.name}`}
                                         className="dropdown-item"
                                         onClick={() => onFolderChange(folder)}
+                                        disabled={readOnly}
                                     >
                                         {folder.name}
                                     </button>

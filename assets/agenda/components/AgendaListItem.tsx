@@ -105,7 +105,7 @@ class AgendaListItem extends React.Component<any, any> {
     getClassNames(isExtended: any) {
         return {
             card: classNames('wire-articles__item-wrap col-12 agenda-item'),
-            wrap: classNames('wire-articles__item wire-articles__item--list', {
+            wrap: classNames('wire-articles__item wire-articles__item--agenda wire-articles__item--list', {
                 'wire-articles__item--covering': hasCoverages(this.props.item),
                 'wire-articles__item--watched': isWatched(this.props.item, this.props.user),
                 'wire-articles__item--not-covering': !hasCoverages(this.props.item),
@@ -178,7 +178,7 @@ class AgendaListItem extends React.Component<any, any> {
                             planningItem={planningItem}
                             isMobilePhone={isMobile}
                             user={this.props.user}
-                            listConfig = {listConfig}
+                            listConfig={listConfig}
                         />
 
                         {(isMobile || isExtended) && description && (

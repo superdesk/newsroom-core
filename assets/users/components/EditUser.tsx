@@ -28,6 +28,7 @@ import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserList
 import {companyProductSeatsSelector, companySectionListSelector, sectionListSelector} from 'company-admin/selectors';
 import {IUser} from 'interfaces/user';
 import {IUserProfileStore} from 'user-profile/reducers';
+import ActionButton from 'components/ActionButton';
 
 const getCompanyOptions = (companies: Array<ICompany>) => companies.map((company) => ({value: company._id, text: company.name}));
 
@@ -90,6 +91,18 @@ const EditUserComponent: React.ComponentType<IProps> = ({
         (company?.auth_provider ?? 'newshub') === 'newshub'
     );
 
+    const resendInviteButton = {
+        name: gettext('Resend Invite'),
+        icon: 'refresh',
+        tooltip: gettext('Resend Invite'),
+        multi: false,
+        action: () => {
+            if (confirm(gettext('Would you like to resend the invitation for {{ email }}?', {email: user.email}))) {
+                resendUserInvite();
+            }
+        },
+    };
+
     return (
         <div
             data-test-id="edit-user-form"
@@ -122,21 +135,12 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                 </label>
                             )}
                             {!showResendInvite ? null : (
-                                <button
-                                    type="button"
+                                <ActionButton
+                                    key={resendInviteButton.name}
                                     className="icon-button icon-button--small icon-button--secondary"
                                     aria-label={gettext('Resend Invite')}
-                                    title={gettext('Resend Invite')}
-                                    onClick={(event: any) => {
-                                        event.preventDefault();
-
-                                        if (confirm(gettext('Would you like to resend the invitation for {{ email }}?', {email: user.email}))) {
-                                            resendUserInvite();
-                                        }
-                                    }}
-                                >
-                                    <i className="icon--refresh" role="presentation"></i>
-                                </button>
+                                    action={resendInviteButton}
+                                />
                             )}
                         </div>
                         {(currentUserIsAdmin && user._id != null && user._id !== currentUser._id) && (

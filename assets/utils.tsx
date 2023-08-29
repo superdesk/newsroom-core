@@ -534,6 +534,8 @@ export function errorHandler(error: {errorData: any} | Response, dispatch?: any,
             dispatch(setErrorMessage(gettext(
                 'There is no product associated with your user. Please reach out to your Company Admin',
             )));
+        } else if (error.status === 412) {
+            notify.warning(gettext('Resource was updated in the meantime, please refresh.'));
         } else {
             notify.error(error.statusText || gettext('Failed to process request!'));
         }
@@ -593,7 +595,7 @@ export const getInitData = (data: any) => {
     };
 };
 
-export const isDisplayed = (field: any, config: any) => get(config, `${field}.displayed`, true);
+export const isDisplayed = (field: any, config: any, defaultValue = true) => get(config, `${field}.displayed`, defaultValue);
 
 const getNow = throttle(moment, 500);
 
