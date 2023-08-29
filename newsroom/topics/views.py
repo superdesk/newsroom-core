@@ -63,6 +63,7 @@ def update_topic(topic_id):
         "subscribers": data["subscribers"],
         "is_global": data.get("is_global", False),
         "folder": data.get("folder", None),
+        "advanced": data.get("advanced", None),
     }
 
     for subscriber in updates["subscribers"]:
