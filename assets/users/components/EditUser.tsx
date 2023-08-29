@@ -3,6 +3,8 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
 
+import {ICompany, IProduct} from '../../interfaces';
+
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
 import CheckboxInput from 'components/CheckboxInput';
@@ -27,7 +29,7 @@ import {companyProductSeatsSelector, companySectionListSelector, sectionListSele
 import {IUser} from 'interfaces/user';
 import {IUserProfileStore} from 'user-profile/reducers';
 
-const getCompanyOptions = (companies: any) => companies.map((company: any) => ({value: company._id, text: company.name}));
+const getCompanyOptions = (companies: Array<ICompany>) => companies.map((company) => ({value: company._id, text: company.name}));
 
 interface IReduxStoreProps {
     allSections: Array<any>;
@@ -40,13 +42,13 @@ interface IProps extends IReduxStoreProps {
     user: IUser;
     onChange: (event: any) => void;
     errors: any;
-    companies: Array<any>;
+    companies: Array<ICompany>;
     onSave: (event: any) => void;
     onResetPassword: () => void;
     onClose: (event: any) => void;
     onDelete: (event: any) => void;
     currentUser: IUser;
-    products: Array<any>;
+    products: Array<IProduct>;
     resendUserInvite: () => void;
     hideFields: Array<string>;
     toolbar?: any;
@@ -82,8 +84,11 @@ const EditUserComponent: React.ComponentType<IProps> = ({
     const companySectionIds = sections.map((section: any) => section._id);
     const currentUserIsAdmin = isUserAdmin(currentUser);
     const isCompanyAdmin = isUserCompanyAdmin(currentUser);
-    const company = companies.map((value: any) => value.name);
+    const company = companies.find((c) => c._id === user.company);
     const userIsAdmin = isUserAdmin(user);
+    const showResendInvite = (user._id == null || user.is_validated === true) && (
+        (company?.auth_provider ?? 'newshub') === 'newshub'
+    );
 
     return (
         <div
@@ -116,7 +121,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                     {gettext('admin')}
                                 </label>
                             )}
-                            {(user._id == null || user.is_validated === true) ? null : (
+                            {!showResendInvite ? null : (
                                 <button
                                     type="button"
                                     className="icon-button icon-button--small icon-button--secondary"
@@ -208,20 +213,26 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                 readOnly={userTypeReadOnly(user, currentUser) || isUserCompanyAdmin(currentUser)}
                                 onChange={onChange}
                                 error={errors ? errors.user_type : null}/>)}
-                            {hideFields.includes('company') ? (<TextInput
-                                name='company'
-                                label={gettext('Company')}
-                                value={company[0]}
-                                onChange={onChange}
-                                readOnly={isUserCompanyAdmin(currentUser)}
-                                error={errors ? errors.role : null} />) : (<SelectInput
-                                name='company'
-                                label={gettext('Company')}
-                                value={user.company}
-                                defaultOption={''}
-                                options={getCompanyOptions(companies)}
-                                onChange={onChange}
-                                error={errors ? errors.company : null} />)}
+                            {hideFields.includes('company') ? (
+                                <TextInput
+                                    name='company'
+                                    label={gettext('Company')}
+                                    value={company?.name}
+                                    onChange={onChange}
+                                    readOnly={isUserCompanyAdmin(currentUser)}
+                                    error={errors ? errors.company : null}
+                                />
+                            ) : (
+                                <SelectInput
+                                    name='company'
+                                    label={gettext('Company')}
+                                    value={user.company}
+                                    defaultOption={''}
+                                    options={getCompanyOptions(companies)}
+                                    onChange={onChange}
+                                    error={errors ? errors.company : null}
+                                />
+                            )}
 
                             {(!localeOptions.length || hideFields.includes('language')) ? null : (
                                 <SelectInput
