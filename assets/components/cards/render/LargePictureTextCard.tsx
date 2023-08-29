@@ -1,9 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {getCaption, getPicture, getThumbnailRendition} from 'wire/utils';
 import CardFooter from './CardFooter';
 import CardBody from './CardBody';
 import CardRow from './CardRow';
+import {IPropsRest} from '../utils';
 
 const getPictureTextPanel = (item: any, picture: any, openItem: any, cardId: any, listConfig: any) => {
     const rendition = getThumbnailRendition(picture);
@@ -27,22 +27,14 @@ const getPictureTextPanel = (item: any, picture: any, openItem: any, cardId: any
     </div>);
 };
 
-function LargePictureTextCard ({items, title, productId, openItem, isActive, cardId, listConfig}: any) {
+const LargePictureTextCard: React.ComponentType<IPropsRest> = (props: IPropsRest) => {
+    const {items, title, id, openItem, isActive, cardId, listConfig} = props;
+
     return (
-        <CardRow title={title} id={productId} isActive={isActive}>
-            {items.map((item: any) => getPictureTextPanel(item, getPicture(item), openItem, cardId, listConfig))}
+        <CardRow title={title} id={id} isActive={isActive}>
+            {items.map((item) => getPictureTextPanel(item, getPicture(item), openItem, cardId, listConfig))}
         </CardRow>
     );
-}
-
-LargePictureTextCard.propTypes = {
-    items: PropTypes.array,
-    title: PropTypes.string,
-    productId: PropTypes.string,
-    openItem: PropTypes.func,
-    isActive: PropTypes.bool,
-    cardId: PropTypes.string,
-    listConfig: PropTypes.object,
 };
 
 export default LargePictureTextCard;

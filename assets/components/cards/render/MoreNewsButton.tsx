@@ -10,22 +10,20 @@ interface IProps {
     moreNews?: boolean;
 }
 
-export enum MoreNewsSearchKind {
-    product,
-    topic,
-}
+export type MoreNewsSearchKind = 'product' | 'topic';
+type MoreNewsInternalType = {[Property in MoreNewsSearchKind]: React.ComponentType<{id: string}>;};
 
-const MoreNewsInternal = {
-    [MoreNewsSearchKind.product]: (props: {id: string}) => (
+const MoreNewsInternal: MoreNewsInternalType = {
+    'product': (props: {id: string}) => (
         <a href={`/wire?product=${props.id}`} role='button' className='nh-button nh-button--tertiary mb-3'>
             {gettext('More news')}
         </a>
     ),
-    [MoreNewsSearchKind.topic]:  (props: {id: string}) => (
+    'topic':  (props: {id: string}) => (
         <a href={`/wire?topic=${props.id}`} role='button' className='nh-button nh-button--tertiary mb-3'>
             {gettext('More news')}
         </a>
-    )
+    ),
 };
 
 function MoreNewsButton(props: IProps): any {

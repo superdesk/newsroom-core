@@ -42,7 +42,7 @@ class CardRow extends React.Component<IComponentProps, any> {
 
         return (
             <div className='row' ref={(elem) => (this.cardElem = elem)}>
-                <MoreNewsButton title={title} id={id} kind={kind ?? MoreNewsSearchKind.product} moreNews={moreNews} />
+                <MoreNewsButton title={title} id={id} kind={kind ?? 'product'} moreNews={moreNews} />
                 {children}
             </div>
         );

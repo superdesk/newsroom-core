@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {get} from 'lodash';
 import NavigationCard from './NavigationCard';
 
@@ -7,9 +6,12 @@ import NavigationCard from './NavigationCard';
 function NavigationSixPerRow({card}: any) {
     const navigations = get(card, 'config.navigations') || [];
 
-    const cards = navigations.map((nav: any) => <NavigationCard
-        navigation={nav}
-        key={nav._id} />);
+    const cards = navigations.map((nav: any) => (
+        <NavigationCard
+            navigation={nav}
+            key={nav._id}
+        />
+    ));
 
     if (get(cards, 'length', 0) === 0) {
         return null;
@@ -24,9 +26,5 @@ function NavigationSixPerRow({card}: any) {
         </div>
     );
 }
-
-NavigationSixPerRow.propTypes = {
-    card: PropTypes.object.isRequired,
-};
 
 export default NavigationSixPerRow;

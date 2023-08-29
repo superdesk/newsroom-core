@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {gettext, isDisplayed, isMobilePhone} from 'utils';
 import {get} from 'lodash';
-import {getCardDashboardComponent} from 'components/cards/utils';
+import {getCard} from 'components/cards/utils';
 import getItemActions from 'wire/item-actions';
 import ItemDetails from 'wire/components/ItemDetails';
 import {openItemDetails, setActive, fetchCardExternalItems, fetchCompanyCardItems} from '../actions';
@@ -21,7 +21,6 @@ import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 import {getCurrentUser} from 'company-admin/selectors';
 import {IPersonalizedDashboardsWithData} from 'home/reducers';
 import {ITopic} from 'interfaces/topic';
-import {MoreNewsSearchKind} from 'components/cards/render/MoreNewsButton';
 
 const modals: any = {
     shareItem: ShareItemModal,
@@ -130,27 +129,29 @@ class HomeApp extends React.Component<IProps, IState> {
 
     getPanelsForPersonalizedDashboard() {
         const {personalizedDashboards} = this.props;
-        const Panel: React.ComponentType<any> = getCardDashboardComponent('4-picture-text');
-        const personalizedDashboardTopicIds = personalizedDashboards?.[0].topic_items?.map(({_id}: any) => _id);
-        const topicItems = this.props.topics.filter((topic) => personalizedDashboardTopicIds?.includes(topic._id));
+        const Card = getCard('4-picture-text');
+        const personalizedDashboardTopicIds = personalizedDashboards?.[0].topic_items?.map(({_id}) => _id);
+        const topicItems = this.props.topics.filter(({_id}) => personalizedDashboardTopicIds?.includes(_id));
 
         return (
-            personalizedDashboards?.[0].topic_items?.map((item: any) => {
-                const currentTopic = topicItems.find((x) => x._id === item._id);
+            personalizedDashboards?.[0].topic_items?.map((item) => {
+                const currentTopic = topicItems.find(({_id}) => _id === item._id);
 
                 return (
-                    <Panel
-                        kind={MoreNewsSearchKind.topic}
-                        key={item._id}
-                        type="4-picture-text"
-                        items={item.items}
-                        title={currentTopic?.label}
-                        id={currentTopic?._id}
-                        openItem={this.props.openItemDetails}
-                        isActive={this.props.activeCard === item._id}
-                        cardId={item._id}
-                        listConfig={this.props.listConfig}
-                    />
+                    Card?._id === '4-picture-text' && currentTopic && (
+                        <Card.dashboardComponent
+                            kind="topic"
+                            key={item._id}
+                            type="4-picture-text"
+                            items={item.items}
+                            title={currentTopic?.label}
+                            id={currentTopic?._id}
+                            openItem={this.props.openItemDetails}
+                            isActive={this.props.activeCard === item._id}
+                            cardId={item._id}
+                            listConfig={this.props.listConfig}
+                        />
+                    )
                 );
             })
         );
@@ -168,12 +169,12 @@ class HomeApp extends React.Component<IProps, IState> {
             );
         }
 
-        const Panel: React.ComponentType<any> = getCardDashboardComponent(card.type);
+        const Card = getCard(card.type);
         const items = this.props.itemsByCard[card.label] || [];
 
-        if (card.type === '4-photo-gallery') {
+        if (Card?._id === '4-photo-gallery') {
             return (
-                <Panel
+                <Card.dashboardComponent
                     key={card.label}
                     photos={items}
                     title={card.label}
@@ -184,29 +185,41 @@ class HomeApp extends React.Component<IProps, IState> {
             );
         }
 
-        if (card.type === '2x2-events') {
+        if (Card?._id === '2x2-events') {
             return (
-                <Panel
+                <Card.dashboardComponent
                     key={card.label}
                     events={get(card, 'config.events')}
                     title={card.label}
-                    listConfig={this.props.listConfig}
                 />
             );
         }
 
+        if (Card?._id === '6-navigation-row') {
+            return (
+                <Card.dashboardComponent
+                    key={card.label}
+                    card={card}
+                />
+            );
+        }
+
+        const DashboardComponent = Card?.dashboardComponent;
+
         return (
-            <Panel
-                key={card.label}
-                type={card.type}
-                items={items}
-                title={card.label}
-                id={this.getProductId(card)}
-                openItem={this.props.openItemDetails}
-                isActive={this.props.activeCard === card._id}
-                cardId={card._id}
-                listConfig={this.props.listConfig}
-            />
+            DashboardComponent && (
+                <DashboardComponent
+                    key={card.label}
+                    type={card.type}
+                    items={items}
+                    title={card.label}
+                    id={this.getProductId(card)}
+                    openItem={this.props.openItemDetails}
+                    isActive={this.props.activeCard === card._id}
+                    cardId={card._id}
+                    listConfig={this.props.listConfig}
+                />
+            )
         );
     }
 

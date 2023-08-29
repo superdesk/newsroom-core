@@ -1,9 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {shortDate} from 'utils';
 import {getPicture, getThumbnailRendition, getCaption} from 'wire/utils';
 import CardRow from './CardRow';
 import {Embargo} from '../../../wire/components/fields/Embargo';
+import {IPropsRest} from '../utils';
 
 const getMediaPanel = (item: any, picture: any, openItem: any, cardId: any) => {
 
@@ -27,21 +27,14 @@ const getMediaPanel = (item: any, picture: any, openItem: any, cardId: any) => {
     </div>);
 };
 
-function MediaGalleryCard ({items, title, productId, openItem, isActive, cardId}: any) {
+const MediaGalleryCard: React.ComponentType<IPropsRest> = (props: IPropsRest) => {
+    const {items, title, id, openItem, isActive, cardId} = props;
+
     return (
-        <CardRow title={title} id={productId} isActive={isActive}>
+        <CardRow title={title} id={id} isActive={isActive}>
             {items.map((item: any) => getMediaPanel(item, getPicture(item), openItem, cardId))}
         </CardRow>
     );
-}
-
-MediaGalleryCard.propTypes = {
-    items: PropTypes.array,
-    title: PropTypes.string,
-    productId: PropTypes.string,
-    openItem: PropTypes.func,
-    isActive: PropTypes.bool,
-    cardId: PropTypes.string,
 };
 
 export default MediaGalleryCard;
