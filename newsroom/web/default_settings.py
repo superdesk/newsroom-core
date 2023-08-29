@@ -621,3 +621,15 @@ AGENDA_SEARCH_FIELDS = [
     "description_text",
     "location.name",
 ]
+
+#: The available authentication providers
+#:
+#: .. versionadded:: 2.5.0
+#:
+AUTH_PROVIDERS = [
+    {
+        "_id": "newshub",
+        "name": lazy_gettext("Newshub"),
+        "auth_type": "password",
+    }
+]
