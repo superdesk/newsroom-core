@@ -6,17 +6,19 @@ from flask import current_app as app, abort
 from flask_babel import gettext
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
-from newsroom.decorator import admin_only, login_required
 
+from newsroom.types import AuthProviderType
+from newsroom.decorator import admin_only, login_required
 from newsroom.auth import blueprint, get_auth_user_by_email, get_user_by_email, get_company_from_user
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
-from newsroom.auth.utils import clear_user_session, start_user_session, send_token
+from newsroom.auth.utils import clear_user_session, start_user_session, send_token, get_company_auth_provider
 from newsroom.utils import (
     is_company_enabled,
     is_account_enabled,
     is_company_expired,
     is_valid_user,
     update_user_last_active,
+    is_admin,
 )
 from newsroom.email import send_new_signup_email
 from newsroom.limiter import limiter
@@ -30,25 +32,31 @@ def login():
     form = LoginForm()
     next_page = flask.request.args.get("next") or flask.url_for("wire.index")
     if form.validate_on_submit():
-        if not is_valid_login_attempt(form.email.data):
+        if email_has_exceeded_max_login_attempts(form.email.data):
             return flask.render_template("account_locked.html", form=form)
 
-        user = get_auth_user_by_email(form.email.data)
-        if user is not None and _is_password_valid(form.password.data.encode("UTF-8"), user):
-            user = get_resource_service("users").find_one(req=None, _id=user["_id"])
-            company = None
-            if user:
-                company = get_company_from_user(user)
-            if is_valid_user(user, company):
-                start_user_session(user, permanent=form.remember_me.data)
-                update_user_last_active(user)
-                return flask.redirect(next_page)
-        else:
-            flask.flash(gettext("Invalid username or password."), "danger")
+        user = get_user_by_email(form.email.data)
+        company = get_company_from_user(user) if user is not None else None
+
+        if is_valid_user(user, company):
+            auth_provider = get_company_auth_provider(company)
+            if auth_provider["auth_type"] != AuthProviderType.PASSWORD.value and not is_admin(user):
+                # Password login is not enabled for this user's company, and the user is not an admin
+                provider_name = auth_provider["name"]
+                flask.flash(gettext(f"Invalid login type, please login using '{provider_name}'"), "danger")
+            else:
+                user_auth = get_auth_user_by_email(user["email"])
+                if not _is_password_valid(form.password.data.encode("UTF-8"), user_auth):
+                    flask.flash(gettext("Invalid username or password."), "danger")
+                else:
+                    start_user_session(user, permanent=form.remember_me.data)
+                    update_user_last_active(user)
+                    return flask.redirect(next_page)
+
     return flask.render_template("login.html", form=form, next_page=next_page)
 
 
-def is_valid_login_attempt(email):
+def email_has_exceeded_max_login_attempts(email):
     """
     Checks if the user with given email has exceeded maximum number of
     allowed attempts before the successful login.
@@ -57,13 +65,13 @@ def is_valid_login_attempt(email):
     the user account
     """
     if not email:
-        return False
+        return True
 
     login_attempt = app.cache.get(email)
 
     if not login_attempt:
         app.cache.set(email, {"attempt_count": 0})
-        return True
+        return False
 
     login_attempt["attempt_count"] += 1
     app.cache.set(email, login_attempt)
@@ -72,12 +80,9 @@ def is_valid_login_attempt(email):
     if login_attempt["attempt_count"] == max_attempt_allowed:
         if login_attempt.get("user_id"):
             get_resource_service("users").patch(id=ObjectId(login_attempt["user_id"]), updates={"is_enabled": False})
-        return False
+        return True
 
-    if login_attempt["attempt_count"] > max_attempt_allowed:
-        return False
-
-    return True
+    return login_attempt["attempt_count"] >= max_attempt_allowed
 
 
 def _is_password_valid(password, user):
@@ -114,7 +119,7 @@ def get_login_token():
     if not email or not password:
         abort(400)
 
-    if not is_valid_login_attempt(email):
+    if email_has_exceeded_max_login_attempts(email):
         abort(401, gettext("Exceeded number of allowed login attempts"))
 
     user = get_auth_user_by_email(email)
@@ -233,20 +238,25 @@ def token(token_type):
     form = TokenForm()
     if form.validate_on_submit():
         user = get_user_by_email(form.email.data)
-        token_sent = send_token(user, token_type)
-        if token_sent:
+        company = get_company_from_user(user) if user else None
+        auth_provider = get_company_auth_provider(company)
+
+        if auth_provider["auth_type"] != AuthProviderType.PASSWORD.value:
+            flask.flash(gettext("Password login is not enabled for this user"), "danger")
+        elif not send_token(user, token_type):
+            message = gettext(
+                f"""Your email is not registered to {app_name},
+                please <a href="{contact_address}" target="_blank"
+                rel="noopener noreferrer">contact us</a> for more details."""
+            )
+            flask.flash(gettext(message), "danger")
+        else:
             flask.flash(
                 gettext("A reset password token has been sent to your email address."),
                 "success",
             )
-        else:
-            message = """Your email is not registered to {},
-            please <a href="{}" target="_blank"
-            rel="noopener noreferrer">contact us</a> for more details.""".format(
-                app_name, contact_address
-            )
-            flask.flash(gettext(message), "danger")
         return flask.redirect(flask.url_for("auth.login"))
+
     return flask.render_template("request_token.html", form=form, token_type=token_type)
 
 
