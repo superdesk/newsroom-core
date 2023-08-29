@@ -3,15 +3,16 @@ import superdesk
 from flask import Blueprint, current_app as newsroom_app, json
 from flask_babel import lazy_gettext
 from newsroom.auth import get_company
+from newsroom.user_roles import UserRole
 from .companies import CompaniesResource, CompaniesService
 from apps.prepopulate.app_initialize import get_filepath
 
 blueprint = Blueprint("companies", __name__)
 
 
-def get_company_sections_monitoring_data(company_id):
+def get_company_sections_monitoring_data(company_id, user):
     """get the section configured for the company"""
-    if not company_id:
+    if not company_id or user["user_type"] == UserRole.ADMINISTRATOR.value:
         return {"userSections": newsroom_app.sections}
 
     company = superdesk.get_resource_service("companies").find_one(req=None, _id=company_id)
