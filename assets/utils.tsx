@@ -79,7 +79,7 @@ export const KEYCODES = {
     DOWN: 40,
 };
 
-export function assertNever(x: never): never {
+export function assertNever(x: any): never {
     throw new Error('Unexpected object: ' + x);
 }
 
