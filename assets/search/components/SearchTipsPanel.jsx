@@ -59,7 +59,7 @@ export class SearchTipsPanel extends React.Component {
                                             this.handleTabClick('regular');
                                         }}
                                     >
-                                        {gettext('Regular search')}
+                                        {gettext('Search bar')}
                                     </a>
                                 </li>
                                 <li className="nav-item">
