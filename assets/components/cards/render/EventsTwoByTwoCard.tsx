@@ -2,7 +2,7 @@ import React from 'react';
 import MoreNewsButton from './MoreNewsButton';
 import moment from 'moment/moment';
 import {gettext} from 'utils';
-import {IProps2x2} from '../utils';
+import {IEventsCardProps} from '../utils';
 
 
 const getEventPanel = (event: any, index: any) => {
@@ -75,7 +75,7 @@ const getEventPanel = (event: any, index: any) => {
 };
 
 
-const EventsTwoByTwoCard: React.ComponentType<IProps2x2> = ({events, title}: IProps2x2) => {
+const EventsTwoByTwoCard: React.ComponentType<IEventsCardProps> = ({events, title}: IEventsCardProps) => {
     return (
         <div className='row'>
             <MoreNewsButton kind='product' title={title}/>

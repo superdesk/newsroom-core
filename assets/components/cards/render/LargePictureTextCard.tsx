@@ -3,7 +3,7 @@ import {getCaption, getPicture, getThumbnailRendition} from 'wire/utils';
 import CardFooter from './CardFooter';
 import CardBody from './CardBody';
 import CardRow from './CardRow';
-import {IPropsRest} from '../utils';
+import {ICardProps} from '../utils';
 
 const getPictureTextPanel = (item: any, picture: any, openItem: any, cardId: any, listConfig: any) => {
     const rendition = getThumbnailRendition(picture);
@@ -27,7 +27,7 @@ const getPictureTextPanel = (item: any, picture: any, openItem: any, cardId: any
     </div>);
 };
 
-const LargePictureTextCard: React.ComponentType<IPropsRest> = (props: IPropsRest) => {
+const LargePictureTextCard: React.ComponentType<ICardProps> = (props: ICardProps) => {
     const {items, title, id, openItem, isActive, cardId, listConfig} = props;
 
     return (

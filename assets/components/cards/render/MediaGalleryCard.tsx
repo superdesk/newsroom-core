@@ -3,7 +3,7 @@ import {shortDate} from 'utils';
 import {getPicture, getThumbnailRendition, getCaption} from 'wire/utils';
 import CardRow from './CardRow';
 import {Embargo} from '../../../wire/components/fields/Embargo';
-import {IPropsRest} from '../utils';
+import {ICardProps} from '../utils';
 
 const getMediaPanel = (item: any, picture: any, openItem: any, cardId: any) => {
 
@@ -27,7 +27,7 @@ const getMediaPanel = (item: any, picture: any, openItem: any, cardId: any) => {
     </div>);
 };
 
-const MediaGalleryCard: React.ComponentType<IPropsRest> = (props: IPropsRest) => {
+const MediaGalleryCard: React.ComponentType<ICardProps> = (props: ICardProps) => {
     const {items, title, id, openItem, isActive, cardId} = props;
 
     return (

@@ -3,7 +3,7 @@ import CardRow from './CardRow';
 import CardFooter from './CardFooter';
 import {getPicture, shortText} from 'wire/utils';
 import {Embargo} from '../../../wire/components/fields/Embargo';
-import {IPropsRest} from '../utils';
+import {ICardProps} from '../utils';
 
 const getTextOnlyPanel = (item: any, openItem: any, picture: any, cardId: any, listConfig: any) => (
     <div key={item._id} className='col-sm-6 col-md-4 col-lg-3 col-xxl-2 d-flex mb-4'>
@@ -24,7 +24,7 @@ const getTextOnlyPanel = (item: any, openItem: any, picture: any, cardId: any, l
     </div>
 );
 
-const TextOnlyCard: ComponentType<IPropsRest> = (props: IPropsRest) => {
+const TextOnlyCard: ComponentType<ICardProps> = (props: ICardProps) => {
     const {items, title, id, openItem, isActive, cardId, listConfig} = props;
 
     return (

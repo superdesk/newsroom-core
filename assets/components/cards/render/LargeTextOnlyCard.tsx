@@ -3,7 +3,7 @@ import CardFooter from './CardFooter';
 import CardBody from './CardBody';
 import CardRow from './CardRow';
 import {getPicture} from 'wire/utils';
-import {IPropsRest} from '../utils';
+import {ICardProps} from '../utils';
 
 const getTextOnlyPanel = (item: any, openItem: any, cardId: any, listConfig: any) => (
     <div key={item._id} className='col-sm-6 col-lg-4 d-flex mb-4'>
@@ -18,7 +18,7 @@ const getTextOnlyPanel = (item: any, openItem: any, cardId: any, listConfig: any
     </div>
 );
 
-const LargeTextOnlyCard: React.ComponentType<IPropsRest> = (props: IPropsRest) => {
+const LargeTextOnlyCard: React.ComponentType<ICardProps> = (props: ICardProps) => {
     const {items, title, id, openItem, isActive, cardId, listConfig} = props;
 
     return (

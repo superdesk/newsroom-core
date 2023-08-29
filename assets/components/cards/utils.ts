@@ -18,16 +18,16 @@ import {gettext} from 'utils';
 import {MoreNewsSearchKind} from './render/MoreNewsButton';
 import {ComponentType} from 'react';
 
-export interface IProps2x2 {
+export interface IEventsCardProps {
     events: any;
     title: string;
 }
 
-export interface I6NavigationRow {
+export interface INavigationRowProps {
     card: any;
 }
 
-export interface IProps4PhotoGallery {
+export interface IPictureCardProps {
     photos: Array<any>;
     title: string;
     moreUrl: string;
@@ -35,7 +35,7 @@ export interface IProps4PhotoGallery {
     listConfig: any;
 }
 
-export interface IPropsRest {
+export interface ICardProps {
     items: Array<any>;
     title: string;
     id: string;
@@ -47,23 +47,31 @@ export interface IPropsRest {
     type: string;
 }
 
-interface ICard1 {
+interface IEventsCard {
     _id: '2x2-events';
     text: string;
     editComponent: ComponentType<any>;
     size: number;
-    dashboardComponent: ComponentType<IProps2x2>;
+    dashboardComponent: ComponentType<IEventsCardProps>;
 }
 
-interface ICard2 {
+interface IPhotoCard {
     _id: '4-photo-gallery';
     text: string;
     editComponent: ComponentType<any>;
     size: number;
-    dashboardComponent: ComponentType<IProps4PhotoGallery>;
+    dashboardComponent: ComponentType<IPictureCardProps>;
 }
 
-interface ICard3 {
+interface INavigationRowCard {
+    _id: '6-navigation-row';
+    text: string;
+    editComponent: ComponentType<any>;
+    size: number;
+    dashboardComponent: ComponentType<INavigationRowProps>;
+}
+
+interface ICard {
     _id: '6-text-only'
     | '4-picture-text'
     | '4-media-gallery'
@@ -75,18 +83,10 @@ interface ICard3 {
     text: string;
     editComponent: ComponentType<any>;
     size: number;
-    dashboardComponent: ComponentType<IPropsRest>;
+    dashboardComponent: ComponentType<ICardProps>;
 }
 
-interface ICard4 {
-    _id: '6-navigation-row';
-    text: string;
-    editComponent: ComponentType<any>;
-    size: number;
-    dashboardComponent: ComponentType<I6NavigationRow>;
-}
-
-type ICardUnified = ICard1 | ICard2 | ICard3 | ICard4;
+type ICardUnified = IEventsCard | IPhotoCard | ICard | INavigationRowCard;
 
 const CARD_TYPES: Array<ICardUnified> = [
     {

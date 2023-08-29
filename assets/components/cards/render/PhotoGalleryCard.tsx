@@ -1,6 +1,6 @@
 import React from 'react';
 import MoreNewsButton from './MoreNewsButton';
-import {IProps4PhotoGallery} from '../utils';
+import {IPictureCardProps} from '../utils';
 
 const getMediaPanel = (photo: any, index: any) => {
     return (<div key={index} className='col-sm-6 col-lg-3 d-flex mb-4'>
@@ -14,7 +14,7 @@ const getMediaPanel = (photo: any, index: any) => {
     </div>);
 };
 
-const PhotoGalleryCard: React.ComponentType<IProps4PhotoGallery> = (props: IProps4PhotoGallery) => {
+const PhotoGalleryCard: React.ComponentType<IPictureCardProps> = (props: IPictureCardProps) => {
     const {photos, title, moreUrl, moreUrlLabel} = props;
 
     return (

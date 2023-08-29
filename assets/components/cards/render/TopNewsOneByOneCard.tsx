@@ -3,7 +3,7 @@ import {getPicture, getThumbnailRendition, getCaption, shortText} from 'wire/uti
 import CardRow from './CardRow';
 import CardMeta from './CardMeta';
 import {Embargo} from '../../../wire/components/fields/Embargo';
-import {IPropsRest} from '../utils';
+import {ICardProps} from '../utils';
 
 const getTopNewsPanel = (item: any, picture: any, openItem: any, cardId: any, listConfig: any) => {
 
@@ -31,7 +31,7 @@ const getTopNewsPanel = (item: any, picture: any, openItem: any, cardId: any, li
     </div>);
 };
 
-const TopNewsOneByOneCard: React.ComponentType<IPropsRest> = (props: IPropsRest) => {
+const TopNewsOneByOneCard: React.ComponentType<ICardProps> = (props: ICardProps) => {
     const {items, title, id, openItem, isActive, cardId, listConfig} = props;
 
     return (
