@@ -63,7 +63,7 @@ def app(request):
         cfg["FORCE_ENABLE_GOOGLE_OAUTH"] = True
 
     if markers.enable_saml.name in active_markers:
-        cfg.setdefault("INSTALLED_APPS").append("newsroom.auth.saml")
+        cfg.setdefault("INSTALLED_APPS", []).append("newsroom.auth.saml")
 
     # drop mongodb now, indexes will be created during app init
     drop_mongo(cfg)
