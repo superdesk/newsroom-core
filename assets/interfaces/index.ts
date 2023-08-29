@@ -1,5 +1,5 @@
-export {TDatetime, IFilterGroup} from './common';
-export {ICompany} from './company';
+export {TDatetime, IFilterGroup, ISection, ICountry} from './common';
+export {ICompany, ICompanyType, IAuthProvider, IService} from './company';
 export {IClientConfig} from './config';
 export {INavigation} from './navigation';
 export {ITopicNotificationScheduleType, ITopicFolder, ITopic, ISearchParams, ISearchFields} from './topic';
