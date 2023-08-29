@@ -265,7 +265,7 @@ def test_account_is_locked_after_5_wrong_passwords(app, client):
                 "email": "test@sourcefabric.org",
                 "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
                 "user_type": "public",
-                "company": disabled_company,
+                "company": company,
                 "is_validated": True,
                 "is_approved": True,
                 "is_enabled": True,
@@ -302,7 +302,7 @@ def test_account_stays_unlocked_after_few_wrong_attempts(app, client):
                 "email": "test@sourcefabric.org",
                 "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
                 "user_type": "public",
-                "company": disabled_company,
+                "company": company,
                 "is_validated": True,
                 "is_approved": True,
                 "is_enabled": True,
@@ -369,7 +369,7 @@ def test_login_with_remember_me_selected_creates_permanent_session(app, client):
                 "email": "test@sourcefabric.org",
                 "password": "$2b$12$HGyWCf9VNfnVAwc2wQxQW.Op3Ejk7KIGE6urUXugpI0KQuuK6RWIG",
                 "user_type": "public",
-                "company": disabled_company,
+                "company": company,
                 "is_validated": True,
                 "is_approved": True,
                 "is_enabled": True,
@@ -377,8 +377,6 @@ def test_login_with_remember_me_selected_creates_permanent_session(app, client):
             }
         ],
     )
-
-    get_resource_service("companies").patch(id=disabled_company, updates={"is_enabled": True})
 
     # login with remember_me = None
     client.post(
