@@ -241,7 +241,7 @@ def token(token_type):
         company = get_company_from_user(user) if user else None
         auth_provider = get_company_auth_provider(company)
 
-        if auth_provider["auth_type"] != AuthProviderType.PASSWORD.value:
+        if not auth_provider.get("features", {}).get("verify_email"):
             flask.flash(gettext("Password login is not enabled for this user"), "danger")
         elif not send_token(user, token_type):
             message = gettext(

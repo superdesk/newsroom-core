@@ -631,6 +631,7 @@ AUTH_PROVIDERS = [
         "_id": "newshub",
         "name": lazy_gettext("Newshub"),
         "auth_type": "password",
+        "features": {"verify_email": True},
     }
 ]
 

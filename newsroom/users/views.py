@@ -8,7 +8,6 @@ from flask_babel import gettext
 from superdesk import get_resource_service
 from werkzeug.exceptions import BadRequest, NotFound
 
-from newsroom.types import AuthProviderType
 from newsroom.user_roles import UserRole
 from newsroom.auth import get_user, get_user_by_email, get_company
 from newsroom.auth.utils import (
@@ -137,12 +136,10 @@ def create():
 
         company = get_company(new_user)
         auth_provider = get_company_auth_provider(company)
-        if auth_provider["auth_type"] == AuthProviderType.PASSWORD.value:
-            add_token_data(new_user)
 
         ids = get_resource_service("users").post([new_user])
 
-        if auth_provider["auth_type"] == AuthProviderType.PASSWORD.value:
+        if auth_provider.get("features", {}).get("verify_email"):
             send_token(new_user, token_type="new_account")
 
         return jsonify({"success": True, "_id": ids[0]}), 201
@@ -164,8 +161,8 @@ def resent_invite(_id):
     elif user_is_company_admin and (company is None or user["company"] != ObjectId(company["_id"])):
         # Company admins can only resent invites for members of their company only
         flask.abort(403)
-    elif auth_provider["auth_type"] != AuthProviderType.PASSWORD.value:
-        # Can only send invites for users of a Company with "Newshub" as auth provider
+    elif not auth_provider.get("features", {}).get("verify_email"):
+        # Can only regenerate new token if ``verify_email`` is enabled in ``AuthProvider``
         flask.abort(403)
 
     updates = {}

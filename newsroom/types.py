@@ -74,10 +74,15 @@ class AuthProviderType(Enum):
     SAML = "saml"
 
 
+class AuthProviderFeatures(TypedDict, total=False):
+    verify_email: bool
+
+
 class AuthProvider(TypedDict):
     _id: str
     name: str
     auth_type: AuthProviderType
+    features: AuthProviderFeatures
 
 
 class Company(TypedDict, total=False):
