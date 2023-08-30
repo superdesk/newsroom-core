@@ -203,7 +203,7 @@ const TopicForm: React.FC<IProps> = ({
                                     </Dropdown>
                                 )
                                 : (
-                                    <p className='nh-container__text--small'>To organize your topics, please create a folder in the “My Wire Topics” section.</p>
+                                    <p className='nh-container__text--small'>{gettext('To organize your topics, please create a folder in the “My Wire Topics” section.')}</p>
                                 )
                             }
                         </div>
