@@ -21,7 +21,7 @@ describe('Wire - Topics', function () {
                 advanced: {
                     fields: ['headline', 'body_html'],
                     keywords: {
-                        and: ['Weather'],
+                        all: ['Weather'],
                         any: ['Sydney', 'Prague', 'Belgrade'],
                         exclude: ['London'],
                     },
