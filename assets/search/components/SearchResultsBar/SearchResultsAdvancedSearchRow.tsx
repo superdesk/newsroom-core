@@ -85,27 +85,30 @@ export function SearchResultsAdvancedSearchRow({
 
     let key: keyof typeof keywords;
     for (key in keywords) {
-        if (keywords[key].length) {
+        // due to the declaration outside key would be the last key
+        // at the end but we need the current value for the onClick callback
+        const field = key;
+        if (keywords[field].length) {
             advancedSearchTags.push(
                 <Tag
-                    key={`tags-advanced--${key}`}
-                    text={labels[key]}
+                    key={`tags-advanced--${field}`}
+                    text={labels[field]}
                     operator={true}
-                    shade={shades[key]}
+                    shade={shades[field]}
                     readOnly={true}
                 />
             );
 
-            keywords[key].forEach((term, index) => {
+            keywords[field].forEach((term, index) => {
                 advancedSearchTags.push(
                     <Tag
-                        key={`tags-advanced--${key}-${index}`} // using index instead of term which might not be unique
+                        key={`tags-advanced--${field}-${index}`} // using index instead of term which might not be unique
                         text={term}
-                        shade={shades[key]}
+                        shade={shades[field]}
                         readOnly={readonly}
                         onClick={(event) => {
                             event.preventDefault();
-                            removeKeywordEntry(key, index);
+                            removeKeywordEntry(field, index);
                             refresh?.();
                         }}
                     />

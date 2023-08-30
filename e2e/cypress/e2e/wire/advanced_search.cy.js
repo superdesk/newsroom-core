@@ -25,7 +25,7 @@ describe('Wire - Advanced Search', function() {
         function expectSearchResultBarTags() {
             WirePage.searchResults.expectAdvancedFields(['headline', 'body_html']);
             WirePage.searchResults.expectAdvancedSearchKeywords({
-                and: ['Weather'],
+                all: ['Weather'],
                 any: ['Sydney', 'Prague', 'Belgrade'],
                 exclude: ['London'],
             });
@@ -84,13 +84,13 @@ describe('Wire - Advanced Search', function() {
             .getSearchResultElement('topics', '[data-test-id="save-topic-btn"]')
             .should('not.exist');
 
-        WirePage.searchResults.getAdvancedSearchKeywords('and')
+        WirePage.searchResults.getAdvancedSearchKeywords('all')
             .should('have.length', 2);
         WirePage.searchResults
             .getSearchResultElement('advanced-keywords', '[data-test-id="remove-tag-button"]')
             .first()
             .click();
-        WirePage.searchResults.getAdvancedSearchKeywords('and')
+        WirePage.searchResults.getAdvancedSearchKeywords('all')
             .should('have.length', 0);
         WirePage.searchResults
             .getSearchResultElement('topics', '[data-test-id="update-topic-btn"]')
@@ -111,7 +111,7 @@ describe('Wire - Advanced Search', function() {
         WirePage.searchResults
             .getSearchResultElement('topics', '[data-test-id="tags-topics--my-topic"]')
             .should('have.length', 0);
-        WirePage.searchResults.getAdvancedSearchKeywords('and')
+        WirePage.searchResults.getAdvancedSearchKeywords('all')
             .should('have.length', 0);
     });
 });
