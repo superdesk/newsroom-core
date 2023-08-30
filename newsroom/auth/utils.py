@@ -120,20 +120,24 @@ def is_current_user(user_id):
     return flask.session["user"] == str(user_id)
 
 
-def send_token(user, token_type="validate"):
+def send_token(user, token_type="validate", update_token=True):
     if user is not None and user.get("is_enabled", False):
         if token_type == "validate" and user.get("is_validated", False):
             return False
 
-        updates = {}
-        add_token_data(updates)
-        superdesk.get_resource_service("users").patch(id=bson.ObjectId(user["_id"]), updates=updates)
+        token = user.get("token")
+        if update_token:
+            updates = {}
+            add_token_data(updates)
+            superdesk.get_resource_service("users").patch(id=bson.ObjectId(user["_id"]), updates=updates)
+            token = updates["token"]
+
         if token_type == "validate":
-            send_validate_account_email(user["first_name"], user["email"], updates["token"])
+            send_validate_account_email(user["first_name"], user["email"], token)
         if token_type == "new_account":
-            send_new_account_email(user["first_name"], user["email"], updates["token"])
+            send_new_account_email(user["first_name"], user["email"], token)
         elif token_type == "reset_password":
-            send_reset_password_email(user["first_name"], user["email"], updates["token"])
+            send_reset_password_email(user["first_name"], user["email"], token)
         return True
     return False
 

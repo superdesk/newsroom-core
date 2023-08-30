@@ -137,10 +137,13 @@ def create():
         company = get_company(new_user)
         auth_provider = get_company_auth_provider(company)
 
+        if auth_provider.get("features", {}).get("verify_email"):
+            add_token_data(new_user)
+
         ids = get_resource_service("users").post([new_user])
 
         if auth_provider.get("features", {}).get("verify_email"):
-            send_token(new_user, token_type="new_account")
+            send_token(new_user, token_type="new_account", update_token=False)
 
         return jsonify({"success": True, "_id": ids[0]}), 201
     return jsonify(form.errors), 400
@@ -165,11 +168,6 @@ def resent_invite(_id):
         # Can only regenerate new token if ``verify_email`` is enabled in ``AuthProvider``
         flask.abort(403)
 
-    updates = {}
-    add_token_data(updates)
-    get_resource_service("users").patch(ObjectId(_id), updates=updates)
-
-    user.update(updates)
     send_token(user, token_type="new_account")
     return jsonify({"success": True}), 200
 
