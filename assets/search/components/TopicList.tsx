@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {get} from 'lodash';
 
 import {Topic} from './Topic';
-import {TopicFolder} from './TopicFolder';
+import {IFolder, TopicFolder} from './TopicFolder';
 
 const TopicList = ({
     topics,
@@ -27,10 +27,12 @@ const TopicList = ({
         <Topic key={topic._id} topic={topic} actions={actions} users={users} selected={selectedTopicId === topic._id} />
     );
 
-    const renderedFolders = folders.map((folder: any) => {
+    const renderedFolders = folders.map((folder: IFolder) => {
         const filteredTopics = topics.filter((topic: any) => topic.folder === folder._id);
+
         return (
-            <TopicFolder key={folder._id}
+            <TopicFolder
+                key={folder._id}
                 folder={folder}
                 topics={filteredTopics}
                 folderPopover={folderPopover}

@@ -1,19 +1,46 @@
+/* eslint-disable react/prop-types */
 import React, {useState, useRef} from 'react';
-import PropTypes from 'prop-types';
 import {gettext} from 'utils';
-import {Popover, PopoverBody} from 'reactstrap';
 import classNames from 'classnames';
 import {TopicFolderEditor} from './TopicFolderEditor';
+import {TopicFolderActions} from './TopicFolderActions';
 
 const EDITING_OFF = 0;
 const EDITING_ON = 1;
 const EDITING_ERROR = 2;
 
-export function TopicFolder({folder, topics, folderPopover, toggleFolderPopover, moveTopic, saveFolder, deleteFolder, children}) {
+export interface IFolder {
+    name: string;
+    section: 'wire' | 'agenda';
+    _id: string;
+}
+
+interface IProps {
+    folder: IFolder;
+    topics: any;
+    folderPopover: string;
+    toggleFolderPopover: (folder: any) => void;
+    moveTopic: any;
+    saveFolder: any;
+    deleteFolder: any;
+    children: any;
+}
+
+export function TopicFolder({
+    folder,
+    topics,
+    folderPopover,
+    toggleFolderPopover,
+    moveTopic,
+    saveFolder,
+    deleteFolder,
+    children
+}: IProps) {
     const [opened, setOpened] = useState(false);
     const [editing, setEditing] = useState(EDITING_OFF);
     const [dragover, setDragOver] = useState(false);
     const buttonRef = useRef(null);
+
     const actions = [
         {
             id: 'edit',
@@ -95,38 +122,25 @@ export function TopicFolder({folder, topics, folderPopover, toggleFolderPopover,
                     })}>{topics.length}</span>
                     <div className="simple-card__group-header-actions">
                         <button
+                            onClick={() => {
+                                toggleFolderPopover(folder);
+                            }}
                             ref={buttonRef}
-                            onClick={() => toggleFolderPopover(folder)}
                             className="icon-button icon-button--tertiary"
                             aria-label={gettext('Folder Actions')}>
                             <i className='icon--more'></i>
                         </button>
-                        {buttonRef.current && (
-                            <Popover
-                                key={'popover-folder-' + folder._id}
-                                isOpen={folderPopover === folder._id}
-                                target={buttonRef}
-                                className="action-popover"
-                                delay={0}
-                                fade={false}
-                            >
-                                <PopoverBody>
-                                    {actions.map((action) => (
-                                        <button key={action.id}
-                                            type="button"
-                                            className="dropdown-item"
-                                            onClick={() => {
-                                                toggleFolderPopover(folder);
-                                                action.callback();
-                                            }}
-                                        >
-                                            <i className={'icon--' + action.icon} />
-                                            {action.name}
-                                        </button>
-                                    ))}
-                                </PopoverBody>
-                            </Popover>
-                        )}
+                        {
+                            folderPopover != null && (
+                                <TopicFolderActions
+                                    buttonRef={buttonRef}
+                                    actions={actions}
+                                    folder={folder}
+                                    folderPopover={folderPopover}
+                                    toggleFolderPopover={toggleFolderPopover}
+                                />
+                            )
+                        }
                     </div>
                 </div>
             )}
@@ -139,16 +153,4 @@ export function TopicFolder({folder, topics, folderPopover, toggleFolderPopover,
     );
 }
 
-TopicFolder.propTypes = {
-    folder: PropTypes.shape({
-        _id: PropTypes.string,
-        name: PropTypes.string,
-    }),
-    topics: PropTypes.array,
-    saveFolder: PropTypes.func,
-    deleteFolder: PropTypes.func,
-    moveTopic: PropTypes.func,
-    folderPopover: PropTypes.string,
-    toggleFolderPopover: PropTypes.func,
-    children: PropTypes.node,
-};
+
