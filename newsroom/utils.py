@@ -391,6 +391,7 @@ def get_cached_resource_by_id(resource, _id, black_list_keys=None):
 def is_valid_user(user, company) -> bool:
     """Validate if user is valid and should be able to login to the system."""
     if not user:
+        flash(gettext("Invalid username or password."), "danger")
         return False
 
     session.pop("_flashes", None)  # remove old messages and just show one message

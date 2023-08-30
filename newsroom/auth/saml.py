@@ -149,6 +149,7 @@ def saml():
             session[SESSION_NAME_ID],
             create_missing=True,
             userdata=get_userdata(session[SESSION_NAME_ID], session[SESSION_USERDATA_KEY]),
+            validate_login_attempt=True,
         )
 
     return redirect(auth.login())

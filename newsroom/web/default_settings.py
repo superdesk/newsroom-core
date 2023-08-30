@@ -622,6 +622,19 @@ AGENDA_SEARCH_FIELDS = [
     "location.name",
 ]
 
+#: The available authentication providers
+#:
+#: .. versionadded:: 2.5.0
+#:
+AUTH_PROVIDERS = [
+    {
+        "_id": "newshub",
+        "name": lazy_gettext("Newshub"),
+        "auth_type": "password",
+        "features": {"verify_email": True},
+    }
+]
+
 #:
 #: If `True` it will show multi day events only on starting day,
 #  when `False` those will be visible on every day.

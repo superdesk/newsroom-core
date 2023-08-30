@@ -5,6 +5,7 @@ from pathlib import Path
 from pytest import fixture
 
 from newsroom.web.factory import get_app
+from newsroom.tests import markers
 
 root = (Path(__file__).parent / "..").resolve()
 
@@ -52,9 +53,17 @@ def drop_mongo(config: Config):
 
 
 @fixture
-def app():
+def app(request):
     cfg = Config(root)
     update_config(cfg)
+
+    active_markers = [mark.name for mark in request.node.own_markers]
+
+    if markers.enable_google_login.name in active_markers:
+        cfg["FORCE_ENABLE_GOOGLE_OAUTH"] = True
+
+    if markers.enable_saml.name in active_markers:
+        cfg.setdefault("INSTALLED_APPS", []).append("newsroom.auth.saml")
 
     # drop mongodb now, indexes will be created during app init
     drop_mongo(cfg)
