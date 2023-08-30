@@ -83,11 +83,9 @@ export function SearchResultsAdvancedSearchRow({
         }
     };
 
-    let key: keyof typeof keywords;
-    for (key in keywords) {
+    for (const field of Object.keys(keywords) as Array<keyof typeof keywords>) {
         // due to the declaration outside key would be the last key
         // at the end but we need the current value for the onClick callback
-        const field = key;
         if (keywords[field].length) {
             advancedSearchTags.push(
                 <Tag
