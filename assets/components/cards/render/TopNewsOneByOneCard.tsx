@@ -1,9 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {getPicture, getThumbnailRendition, getCaption, shortText} from 'wire/utils';
 import CardRow from './CardRow';
 import CardMeta from './CardMeta';
 import {Embargo} from '../../../wire/components/fields/Embargo';
+import {ICardProps} from '../utils';
 
 const getTopNewsPanel = (item: any, picture: any, openItem: any, cardId: any, listConfig: any) => {
 
@@ -31,22 +31,14 @@ const getTopNewsPanel = (item: any, picture: any, openItem: any, cardId: any, li
     </div>);
 };
 
-function TopNewsOneByOneCard ({items, title, productId, openItem, isActive, cardId, listConfig}: any): any {
+const TopNewsOneByOneCard: React.ComponentType<ICardProps> = (props: ICardProps) => {
+    const {items, title, id, openItem, isActive, cardId, listConfig} = props;
+
     return (
-        <CardRow title={title} productId={productId} isActive={isActive}>
+        <CardRow title={title} id={id} isActive={isActive}>
             {items.map((item: any) => getTopNewsPanel(item, getPicture(item), openItem, cardId, listConfig))}
         </CardRow>
     );
-}
-
-TopNewsOneByOneCard.propTypes = {
-    items: PropTypes.array,
-    title: PropTypes.string,
-    productId: PropTypes.string,
-    openItem: PropTypes.func,
-    isActive: PropTypes.bool,
-    cardId: PropTypes.string,
-    listConfig: PropTypes.object,
 };
 
 export default TopNewsOneByOneCard;

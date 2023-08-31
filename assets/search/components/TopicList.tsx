@@ -1,15 +1,30 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import {get} from 'lodash';
 
-import {Topic} from './Topic';
-import {IFolder, TopicFolder} from './TopicFolder';
+import {ITopicAction, Topic} from './Topic';
+import {TopicFolder} from './TopicFolder';
+import {ITopic, ITopicFolder, IUser} from 'interfaces';
+
+interface IProps {
+    topics: Array<ITopic>;
+    selectedTopicId: ITopic['_id'];
+    actions: Array<ITopicAction>;
+    user: IUser;
+    users: Array<IUser>;
+    folders: Array<ITopicFolder>;
+    folderPopover: string;
+    toggleFolderPopover: (folder: ITopicFolder) => void;
+    moveTopic: (topic: ITopic, folder: ITopicFolder) => Promise<any>;
+    saveFolder: (folder: ITopicFolder, updates: Partial<ITopicFolder>) => Promise<any>;
+    deleteFolder: (folder: ITopicFolder) => void;
+}
 
 const TopicList = ({
     topics,
     selectedTopicId,
     actions,
+    user,
     users,
     folders,
     folderPopover,
@@ -17,19 +32,27 @@ const TopicList = ({
     moveTopic,
     saveFolder,
     deleteFolder,
-}: any): any => {
+}: IProps) => {
 
     if (get(topics, 'length', 0) < 0 && get(folders, 'length', 0) < 0) {
         return null;
     }
 
-    const renderTopic = (topic: any) => (
-        <Topic key={topic._id} topic={topic} actions={actions} users={users} selected={selectedTopicId === topic._id} />
-    );
+    const renderTopic = (topic: ITopic) => {
+        const subscription = topic.subscribers?.find((sub) => sub.user_id === user._id);
+        return (
+            <Topic key={topic._id}
+                topic={topic}
+                actions={actions}
+                users={users}
+                selected={selectedTopicId === topic._id}
+                subscriptionType={subscription?.notification_type}
+            />
+        );
+    };
 
-    const renderedFolders = folders.map((folder: IFolder) => {
-        const filteredTopics = topics.filter((topic: any) => topic.folder === folder._id);
-
+    const renderedFolders = folders.map((folder) => {
+        const filteredTopics = topics.filter((topic) => topic.folder === folder._id);
         return (
             <TopicFolder
                 key={folder._id}
@@ -48,26 +71,12 @@ const TopicList = ({
 
     const renderedTopics = topics.filter((topic: any) => topic.folder == null).map(renderTopic);
 
-    return Array.prototype.concat(renderedFolders, renderedTopics);
-};
-
-TopicList.propTypes = {
-    topics: PropTypes.arrayOf(PropTypes.object),
-    selectedTopicId: PropTypes.string,
-    actions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string,
-        icon: PropTypes.string,
-        action: PropTypes.func,
-    })),
-    users: PropTypes.array,
-    folders: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string,
-    })),
-    folderPopover: PropTypes.string,
-    toggleFolderPopover: PropTypes.func,
-    moveTopic: PropTypes.func,
-    saveFolder: PropTypes.func,
-    deleteFolder: PropTypes.func,
+    return (
+        <>
+            {renderedFolders}
+            {renderedTopics}
+        </>
+    );
 };
 
 export default TopicList;

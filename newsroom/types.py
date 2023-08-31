@@ -1,6 +1,7 @@
 from bson import ObjectId
 from typing import Dict, List, TypedDict, Any
 from datetime import datetime
+from enum import Enum
 
 
 class Product(TypedDict, total=False):
@@ -59,12 +60,38 @@ class User(UserData):
     pass
 
 
+class UserAuth(TypedDict):
+    _id: str
+    email: str
+    password: str
+    is_enabled: bool
+    is_approved: bool
+
+
+class AuthProviderType(Enum):
+    PASSWORD = "password"
+    GOOGLE_OAUTH = "google_oauth"
+    SAML = "saml"
+
+
+class AuthProviderFeatures(TypedDict, total=False):
+    verify_email: bool
+
+
+class AuthProvider(TypedDict):
+    _id: str
+    name: str
+    auth_type: AuthProviderType
+    features: AuthProviderFeatures
+
+
 class Company(TypedDict, total=False):
     _id: ObjectId
     name: str
     products: List[ProductRef]
     sections: Dict[str, bool]
     restrict_coverage_info: bool
+    auth_provider: str
 
 
 class TopicSubscriber(TypedDict):

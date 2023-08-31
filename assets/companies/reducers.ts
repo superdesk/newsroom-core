@@ -1,3 +1,4 @@
+import {IAuthProvider, ICompany, ICompanyType, ICountry, IProduct, ISection, IService, IUser} from 'interfaces';
 import {cloneDeep} from 'lodash';
 import {
     EDIT_COMPANY,
@@ -19,7 +20,34 @@ import {ADD_EDIT_USERS} from 'actions';
 
 import {searchReducer} from 'search/reducers';
 
-const initialState: any = {
+export interface ICompanySettingsStore {
+    query: string | null;
+    companies: Array<ICompany>;
+    companiesById: {[companyId: string]: ICompany};
+    activeCompanyId: ICompany['_id'] | null;
+    isLoading: boolean;
+    totalCompanies: number | null,
+    activeQuery: string | null;
+    services: Array<IService>;
+    sections: Array<ISection>;
+    companyTypes: Array<ICompanyType>;
+    apiEnabled: boolean;
+    ssoEnabled: boolean;
+    search: any;
+    companyToEdit: ICompany | null;
+    errors: {[field: string]: Array<string>} | null;
+    companyUsers: Array<IUser>;
+    products: Array<IProduct>;
+    authProviders: Array<IAuthProvider>;
+    ui_config: {[key: string]: any};
+    countries: Array<ICountry>;
+    companyOptions: Array<{
+        value: ICompany['_id'];
+        text: ICompany['name'];
+    }>
+}
+
+const initialState: ICompanySettingsStore = {
     query: null,
     companies: [],
     companiesById: {},
@@ -32,6 +60,15 @@ const initialState: any = {
     companyTypes: [],
     apiEnabled: false,
     search: searchReducer(undefined, undefined, 'settings'),
+    companyToEdit: null,
+    errors: null,
+    companyUsers: [],
+    products: [],
+    ssoEnabled: false,
+    authProviders: [],
+    ui_config: {},
+    countries: [],
+    companyOptions: [],
 };
 
 function setupCompanies(companyList: any, state: any) {
@@ -199,6 +236,7 @@ export default function companyReducer(state: any = initialState, action: any) {
             companyTypes: action.data.company_types || [],
             apiEnabled: action.data.api_enabled || false,
             ssoEnabled: action.data.sso_enabled || false,
+            authProviders: action.data.auth_providers || [],
             ui_config: action.data.ui_config,
             countries: action.data.countries,
         };

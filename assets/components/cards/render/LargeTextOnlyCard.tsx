@@ -1,9 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import CardFooter from './CardFooter';
 import CardBody from './CardBody';
 import CardRow from './CardRow';
 import {getPicture} from 'wire/utils';
+import {ICardProps} from '../utils';
 
 const getTextOnlyPanel = (item: any, openItem: any, cardId: any, listConfig: any) => (
     <div key={item._id} className='col-sm-6 col-lg-4 d-flex mb-4'>
@@ -18,22 +18,14 @@ const getTextOnlyPanel = (item: any, openItem: any, cardId: any, listConfig: any
     </div>
 );
 
-function LargeTextOnlyCard ({items, title, productId, openItem, isActive, cardId, listConfig}: any) {
+const LargeTextOnlyCard: React.ComponentType<ICardProps> = (props: ICardProps) => {
+    const {items, title, id, openItem, isActive, cardId, listConfig} = props;
+
     return (
-        <CardRow title={title} productId={productId} isActive={isActive}>
-            {items.map((item: any) => getTextOnlyPanel(item, openItem, cardId, listConfig))}
+        <CardRow title={title} id={id} isActive={isActive}>
+            {items.map((item) => getTextOnlyPanel(item, openItem, cardId, listConfig))}
         </CardRow>
     );
-}
-
-LargeTextOnlyCard.propTypes = {
-    items: PropTypes.array,
-    title: PropTypes.string,
-    productId: PropTypes.string,
-    openItem: PropTypes.func,
-    isActive: PropTypes.bool,
-    cardId: PropTypes.string,
-    listConfig: PropTypes.object,
 };
 
 export default LargeTextOnlyCard;
