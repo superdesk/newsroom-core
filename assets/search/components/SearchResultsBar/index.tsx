@@ -48,7 +48,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
         const urlParams = new URLSearchParams(window.location.search);
 
         this.state = {
-            isTagSectionShown: urlParams.get('topic') != null,
+            isTagSectionShown: this.props.initiallyOpen || urlParams.get('topic') != null,
             sortValue: this.sortValues[0].label,
         };
         this.toggleTagSection = this.toggleTagSection.bind(this);
@@ -224,6 +224,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
 
 SearchResultsBarComponent.propTypes = {
     user: PropTypes.object,
+    initiallyOpen: PropTypes.bool,
 
     minimizeSearchResults: PropTypes.bool,
     showTotalItems: PropTypes.bool,
