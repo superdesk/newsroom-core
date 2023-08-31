@@ -1,6 +1,8 @@
+import flask
+import newsroom
 import superdesk
 
-import newsroom
+from typing import Dict, List
 from newsroom.search.service import query_string
 
 
@@ -27,26 +29,28 @@ class SectionFiltersResource(newsroom.Resource):
 
 
 class SectionFiltersService(newsroom.Service):
-    def get_section_filters(self, filter_type):
+    def get_section_filters(self, filter_type) -> List:
         """Get the list of section filter by filter type
 
         :param filter_type: Type of filter
         """
-        lookup = {"is_enabled": True, "filter_type": filter_type}
-        section_filters = list(superdesk.get_resource_service("section_filters").get(req=None, lookup=lookup))
-        return section_filters
+        section_filters = self.get_section_filters_dict()
+        return section_filters.get(filter_type) or []
 
-    def get_section_filters_dict(self):
+    def get_section_filters_dict(self) -> Dict[str, List]:
         """Get the list of all section filters"""
-        lookup = {"is_enabled": True}
-        section_filters = list(superdesk.get_resource_service("section_filters").get(req=None, lookup=lookup))
-        filters = {}
-        for f in section_filters:
-            if not filters.get(f.get("filter_type")):
-                filters[f.get("filter_type")] = []
-            filters[f.get("filter_type")].append(f)
-
-        return filters
+        if not getattr(flask.g, "section_filters", None):
+            lookup = {"is_enabled": True}
+            section_filters = list(
+                superdesk.get_resource_service("section_filters").get_from_mongo(req=None, lookup=lookup)
+            )
+            filters: Dict[str, List] = {}
+            for f in section_filters:
+                if not filters.get(f.get("filter_type")):
+                    filters[f.get("filter_type")] = []
+                filters[f.get("filter_type")].append(f)
+            flask.g.section_filters = filters
+        return flask.g.section_filters
 
     def apply_section_filter(self, query, product_type, filters=None):
         """Get the list of base products for product type

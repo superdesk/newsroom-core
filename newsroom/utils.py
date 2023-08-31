@@ -14,7 +14,7 @@ from superdesk.etree import parse_html
 from superdesk.text_utils import get_text
 
 from bson import ObjectId
-from eve.utils import config, parse_request
+from eve.utils import config, ParsedRequest
 from eve_elastic.elastic import parse_date, ElasticCursor
 from flask import current_app as app, json, abort, request, g, flash, session, url_for
 from flask_babel import gettext
@@ -39,15 +39,15 @@ def get_user_id():
 
 
 def query_resource(resource, lookup=None, max_results=0, projection=None) -> Union[ElasticCursor, MongoCursor]:
-    req = parse_request(resource)
+    req = ParsedRequest()
     req.max_results = max_results
     req.projection = json.dumps(projection) if projection else None
-    cursor, count = app.data.find(resource, req, lookup)
+    cursor, count = app.data.find(resource, req, lookup, perform_count=False)
     return cursor
 
 
 def find_one(resource, **lookup):
-    req = parse_request(resource)
+    req = ParsedRequest()
     return app.data.find_one(resource, req, **lookup)
 
 

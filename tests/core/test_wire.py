@@ -576,6 +576,8 @@ def test_search_using_section_filter_for_public_user(client, app):
         ],
     )
 
+    g.section_filters = None
+
     resp = client.get("/wire/search")
     data = json.loads(resp.get_data())
     assert 1 == len(data["_items"])
