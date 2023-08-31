@@ -4,19 +4,14 @@ import {gettext} from 'utils';
 import classNames from 'classnames';
 import {TopicFolderEditor} from './TopicFolderEditor';
 import {TopicFolderActions} from './TopicFolderActions';
+import {ITopicFolder} from 'interfaces';
 
 const EDITING_OFF = 0;
 const EDITING_ON = 1;
 const EDITING_ERROR = 2;
 
-export interface IFolder {
-    name: string;
-    section: 'wire' | 'agenda';
-    _id: string;
-}
-
 interface IProps {
-    folder: IFolder;
+    folder: ITopicFolder;
     topics: any;
     folderPopover: string;
     toggleFolderPopover: (folder: any) => void;

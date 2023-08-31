@@ -1,10 +1,10 @@
 import React, {useCallback, useEffect} from 'react';
 import {Popover, PopoverBody} from 'reactstrap';
-import {IFolder} from './TopicFolder';
+import {ITopicFolder} from 'interfaces/topic';
 
 interface IProps {
-    folder: IFolder;
-    toggleFolderPopover: (folder: IFolder) => void;
+    folder: ITopicFolder;
+    toggleFolderPopover: (folder: ITopicFolder) => void;
     folderPopover: string;
     actions: Array<any>;
     buttonRef: React.MutableRefObject<any>;
