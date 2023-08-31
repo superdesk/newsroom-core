@@ -372,13 +372,22 @@ CELERY_TASK_QUEUES = (
         Exchange(celery_queue("newsroom"), type="topic"),
         routing_key="newsroom.#",
     ),
+    Queue(
+        celery_queue("newsroom.push"),
+        Exchange(celery_queue("newsroom.push")),
+        routing_key="newsroom.push",
+    ),
 )
 
 CELERY_TASK_ROUTES = {
+    "newsroom.push.*": {
+        "queue": celery_queue("newsroom.push"),
+        "routing_key": "newsroom.push",
+    },
     "newsroom.*": {
         "queue": celery_queue("newsroom"),
         "routing_key": "newsroom.task",
-    }
+    },
 }
 
 
