@@ -14,7 +14,7 @@ from newsroom.types import User, NotificationSchedule, Company, NotificationQueu
 from newsroom.utils import get_user_dict, get_company_dict
 from newsroom.email import send_template_email
 from newsroom.celery_app import celery
-from newsroom.topics.topics import get_user_id_to_topic_for_subscribers
+from newsroom.topics.topics import get_user_id_to_topic_for_subscribers, TopicNotificationType
 from newsroom.gettext import get_session_timezone, set_session_timezone
 
 logger = logging.getLogger(__name__)
@@ -41,7 +41,7 @@ class SendScheduledNotificationEmails(Command):
             now_utc = utcnow().replace(second=0, microsecond=0)
             companies = get_company_dict(False)
             users = get_user_dict(False)
-            user_topic_map = get_user_id_to_topic_for_subscribers()
+            user_topic_map = get_user_id_to_topic_for_subscribers(TopicNotificationType.SCHEDULED.value)
 
             schedules: List[NotificationQueue] = get_resource_service("notification_queue").get(req=None, lookup={})
             for schedule in schedules:
