@@ -28,15 +28,21 @@ class NotificationEmailTopicEntry(TypedDict):
 class SendScheduledNotificationEmails(Command):
     def run(self, force: bool = False):
         self.log_msg = "Scheduled Notifications: {}".format(utcnow())
-
         logger.info(f"{self.log_msg} Starting to send scheduled notifications")
 
         lock_name = get_lock_id("newsroom", "send_scheduled_notifications")
-
         if not lock(lock_name, expire=610):
             logger.error(f"{self.log_msg} Job already running")
             return
 
+        self.run_schedules(force)
+
+        unlock(lock_name)
+        remove_locks()
+
+        logger.info(f"{self.log_msg} Completed sending scheduled notifications")
+
+    def run_schedules(self, force: bool):
         try:
             now_utc = utcnow().replace(second=0, microsecond=0)
             companies = get_company_dict(False)
@@ -44,8 +50,15 @@ class SendScheduledNotificationEmails(Command):
             user_topic_map = get_user_id_to_topic_for_subscribers()
 
             schedules: List[NotificationQueue] = get_resource_service("notification_queue").get(req=None, lookup={})
-            for schedule in schedules:
-                user = users.get(str(schedule["user"]))
+        except Exception as e:
+            logger.error(f"{self.log_msg} Failed to retrieve data to run schedules")
+            logger.exception(e)
+            return
+
+        for schedule in schedules:
+            user_id = schedule.get("user")
+            try:
+                user = users.get(str(user_id))
 
                 if not user:
                     # User not found, this account might be disabled
@@ -61,13 +74,9 @@ class SendScheduledNotificationEmails(Command):
 
                 company = companies.get(str(user.get("company", "")))
                 self.process_schedule(schedule, user, company, now_utc, user_topic_map.get(user["_id"]) or {}, force)
-        except Exception as e:
-            logger.exception(e)
-
-        unlock(lock_name)
-        remove_locks()
-
-        logger.info(f"{self.log_msg} Completed sending scheduled notifications")
+            except Exception as e:
+                logger.error(f"{self.log_msg} Failed to run schedule for user {user_id}")
+                logger.exception(e)
 
     def process_schedule(
         self,
@@ -167,7 +176,7 @@ class SendScheduledNotificationEmails(Command):
             return True
 
         for schedule_datetime in self._convert_schedule_times(now_local, schedule["times"]):
-            schedule_within_time = schedule_datetime - now_local < timedelta(minutes=5)
+            schedule_within_time = timedelta() <= now_local - schedule_datetime < timedelta(minutes=5)
 
             if last_run_time_local is None and schedule_within_time:
                 return True
