@@ -28,11 +28,9 @@ class NotificationEmailTopicEntry(TypedDict):
 class SendScheduledNotificationEmails(Command):
     def run(self, force: bool = False):
         self.log_msg = "Scheduled Notifications: {}".format(utcnow())
-
         logger.info(f"{self.log_msg} Starting to send scheduled notifications")
 
         lock_name = get_lock_id("newsroom", "send_scheduled_notifications")
-
         if not lock(lock_name, expire=610):
             logger.error(f"{self.log_msg} Job already running")
             return
@@ -167,7 +165,7 @@ class SendScheduledNotificationEmails(Command):
             return True
 
         for schedule_datetime in self._convert_schedule_times(now_local, schedule["times"]):
-            schedule_within_time = schedule_datetime - now_local < timedelta(minutes=5)
+            schedule_within_time = timedelta() <= now_local - schedule_datetime < timedelta(minutes=5)
 
             if last_run_time_local is None and schedule_within_time:
                 return True
