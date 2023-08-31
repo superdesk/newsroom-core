@@ -1,6 +1,7 @@
 from flask import json
 from unittest import mock
 from pytest import fixture
+from copy import deepcopy
 
 from newsroom.topics.views import get_topic_url
 from ..fixtures import (  # noqa: F401
@@ -10,9 +11,9 @@ from ..fixtures import (  # noqa: F401
     TEST_USER_ID,
     COMPANY_1_ID,
 )
-from ..utils import mock_send_email
+from ..utils import mock_send_email, get_resource_by_id
 
-topic = {
+base_topic = {
     "label": "Foo",
     "query": "foo",
     "notifications": False,
@@ -49,7 +50,7 @@ def auth_client(client):
 def test_topics_no_session(client, anonymous_user):
     resp = client.get(topics_url)
     assert 302 == resp.status_code
-    resp = client.post(topics_url, data=topic)
+    resp = client.post(topics_url, data=deepcopy(base_topic))
     assert 302 == resp.status_code
 
 
@@ -58,7 +59,7 @@ def test_post_topic_user(client):
         with client.session_transaction() as session:
             session["user"] = user_id
             session["name"] = PUBLIC_USER_NAME
-        resp = cli.post(topics_url, json=topic)
+        resp = cli.post(topics_url, json=deepcopy(base_topic))
         assert 201 == resp.status_code
         resp = cli.get(topics_url)
         assert 200 == resp.status_code
@@ -71,7 +72,7 @@ def test_update_topic_fails_for_different_user(client):
         with client.session_transaction() as session:
             session["user"] = user_id
             session["name"] = PUBLIC_USER_NAME
-        resp = app.post(topics_url, json=topic)
+        resp = app.post(topics_url, json=deepcopy(base_topic))
         assert 201 == resp.status_code
 
         resp = app.get(topics_url)
@@ -90,7 +91,7 @@ def test_update_topic(client):
         with client.session_transaction() as session:
             session["user"] = user_id
             session["name"] = PUBLIC_USER_NAME
-        resp = app.post(topics_url, json=topic)
+        resp = app.post(topics_url, json=deepcopy(base_topic))
         assert 201 == resp.status_code
 
         resp = app.get(topics_url)
@@ -114,7 +115,7 @@ def test_delete_topic(client):
         with client.session_transaction() as session:
             session["user"] = user_id
             session["name"] = PUBLIC_USER_NAME
-        resp = app.post(topics_url, json=topic, content_type="application/json")
+        resp = app.post(topics_url, json=deepcopy(base_topic), content_type="application/json")
         assert 201 == resp.status_code
 
         resp = app.get(topics_url)
@@ -131,6 +132,7 @@ def test_delete_topic(client):
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
 def test_share_wire_topics(client, app):
+    topic = deepcopy(base_topic)
     topic_ids = app.data.insert("topics", [topic])
     topic["_id"] = topic_ids[0]
 
@@ -320,3 +322,62 @@ def test_topic_folders_unique_validation(auth_client):
     # for both
     resp = auth_client.post(company_topic_folders_url, json=folder)
     assert 409 == resp.status_code, resp.data.decode()
+
+
+def test_topic_subscriber_auto_enable_user_emails(app, auth_client):
+    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    topic = deepcopy(base_topic)
+
+    def disable_user_emails():
+        user["receive_email"] = False
+        resp = auth_client.post(f"/users/{PUBLIC_USER_ID}", data=user)
+        assert resp.status_code == 200, resp.get_data(as_text=True)
+
+    # Make sure we start with user emails disabled
+    disable_user_emails()
+    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    assert user["receive_email"] is False
+
+    # Create a new topic, with the current user as a subscriber
+    topic["subscribers"] = [
+        {
+            "user_id": user["_id"],
+            "notification_type": "real-time",
+        }
+    ]
+    resp = auth_client.post(topics_url, json=topic)
+    assert resp.status_code == 201, resp.get_data(as_text=True)
+    topic_id = resp.get_json()["_id"]
+    topic = get_resource_by_id("topics", topic_id)
+
+    # Make sure user emails are enabled after creating the topic
+    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    assert user["receive_email"] is True
+
+    # Disable the user emails again
+    disable_user_emails()
+    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    assert user["receive_email"] is False
+
+    # Update the topic, this time removing the user as a subscriber
+    topic["subscribers"] = []
+    resp = auth_client.post(f"/topics/{topic_id}", json=topic)
+    assert resp.status_code == 200, resp.get_data(as_text=True)
+
+    # Make sure user emails are still disabled
+    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    assert user["receive_email"] is False
+
+    # Update the topic, this time adding the user as a subscriber
+    topic["subscribers"] = [
+        {
+            "user_id": user["_id"],
+            "notification_type": "real-time",
+        }
+    ]
+    resp = auth_client.post(f"/topics/{topic_id}", json=topic)
+    assert resp.status_code == 200, resp.get_data(as_text=True)
+
+    # And make sure user emails are re-enabled again
+    user = get_resource_by_id("users", PUBLIC_USER_ID)
+    assert user["receive_email"] is True

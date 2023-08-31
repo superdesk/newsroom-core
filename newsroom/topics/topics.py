@@ -5,7 +5,7 @@ import newsroom
 import superdesk
 
 from bson import ObjectId
-from newsroom.utils import set_original_creator, set_version_creator
+from newsroom.utils import set_original_creator, set_version_creator, get_user_dict
 from newsroom.types import Topic
 
 
@@ -71,6 +71,11 @@ class TopicsService(newsroom.Service):
             if doc.get("folder"):
                 doc["folder"] = ObjectId(doc["folder"])
 
+    def on_created(self, docs):
+        super().on_created(docs)
+        for doc in docs:
+            self.auto_enable_user_emails(doc, {})
+
     def on_update(self, updates, original):
         super().on_update(updates, original)
         set_version_creator(updates)
@@ -93,6 +98,33 @@ class TopicsService(newsroom.Service):
 
         if updates.get("folder"):
             updates["folder"] = ObjectId(updates["folder"])
+
+    def on_updated(self, updates, original):
+        super().on_updated(updates, original)
+        self.auto_enable_user_emails(updates, original)
+
+    def auto_enable_user_emails(self, updates, original):
+        if not updates.get("subscribers"):
+            return
+
+        users = get_user_dict()
+        users_service = superdesk.get_resource_service("users")
+        original_subscribers = [subscriber["user_id"] for subscriber in original.get("subscribers") or []]
+        for subscriber in updates["subscribers"]:
+            if subscriber["user_id"] in original_subscribers:
+                # This user was not recently added
+                continue
+
+            user = users.get(str(subscriber["user_id"]))
+            if not user:
+                # This user was not found for some reason
+                continue
+            elif user.get("receive_email"):
+                # User already has email notifications enabled
+                continue
+
+            # Email notifications are currently disabled for this user, enable them now
+            users_service.patch(user["_id"], updates={"receive_email": True})
 
     def get_items(self, item_ids):
         return self.get(req=None, lookup={"_id": {"$in": item_ids}})
