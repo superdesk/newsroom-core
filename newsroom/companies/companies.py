@@ -67,11 +67,7 @@ class CompaniesResource(newsroom.Resource):
             "type": "string",
             "nullable": True,
         },
-        "auth_provider": {
-            "type": "string",
-            "required": True,
-            "default": "newshub",
-        },
+        "auth_provider": {"type": "string"},
     }
 
     datasource = {"source": "companies", "default_sort": [("name", 1)]}
