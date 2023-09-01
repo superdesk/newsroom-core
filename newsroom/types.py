@@ -43,15 +43,32 @@ class UserDashboardEntry(TypedDict):
 
 class UserData(TypedDict, total=False):
     _id: ObjectId
-    email: str
     first_name: str
     last_name: str
-    user_type: str
+    email: str
+    phone: str
+    mobile: str
+    role: str
+    signup_details: Dict[str, Any]
+    country: str
     company: ObjectId
-    is_enabled: bool
+    user_type: str
     is_validated: bool
-    sections: Dict[str, bool]
+    is_enabled: bool
+    is_approved: bool
+
+    expiry_alert: bool
+    receive_email: bool
+    receive_app_notifications: bool
+    locale: str
+    manage_company_topics: bool
+    last_active: datetime
+
+    original_creator: ObjectId
+    version_creator: ObjectId
+
     products: List[ProductRef]
+    sections: Dict[str, bool]
     dashboards: List[UserDashboardEntry]
     notification_schedule: NotificationSchedule
 
@@ -99,7 +116,7 @@ class TopicSubscriber(TypedDict):
     notification_type: str
 
 
-class Topic(TypedDict):
+class Topic(TypedDict, total=False):
     _id: ObjectId
     label: str
     query: str

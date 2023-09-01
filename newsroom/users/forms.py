@@ -24,11 +24,12 @@ class CommaSeparatedListField(Field):
             self.data = []
 
 
+BooleanField.false_values = {False, "false", "", "False"}
+
+
 class UserForm(FlaskForm):
     class Meta:
         csrf = False
-
-    BooleanField.false_values = {False, "false", ""}
 
     user_types = [
         ("administrator", gettext("Administrator")),

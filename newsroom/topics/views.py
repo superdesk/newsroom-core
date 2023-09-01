@@ -1,10 +1,10 @@
 from bson import ObjectId
 from superdesk import get_resource_service
 from flask import json, jsonify, abort, current_app as app, url_for
-from flask_babel import gettext
 
+from newsroom.types import Topic
 from newsroom.topics import blueprint
-from newsroom.topics.topics import get_user_topics as _get_user_topics
+from newsroom.topics.topics import get_user_topics as _get_user_topics, auto_enable_user_emails
 from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required
 from newsroom.utils import get_json_or_400, get_entity_or_404
@@ -40,27 +40,14 @@ def update_topic(topic_id):
     if not can_edit_topic(original, current_user):
         abort(403)
 
-    # If notifications are enabled, check to see if user is configured to receive emails
-    data.setdefault("subscribers", [])
-
-    subscriber = next(
-        (subscriber for subscriber in data["subscribers"] if subscriber["user_id"] == current_user["_id"]), None
-    )
-    if subscriber is not None:
-        user = get_resource_service("users").find_one(req=None, _id=current_user["_id"])
-        if not user.get("receive_email"):
-            return "", gettext(
-                "Please enable 'Receive notifications' option in your profile to receive topic notifications"
-            )  # noqa
-
-    updates = {
+    updates: Topic = {
         "label": data.get("label"),
         "query": data.get("query"),
         "created": data.get("created"),
         "filter": data.get("filter"),
         "navigation": data.get("navigation"),
         "company": current_user.get("company"),
-        "subscribers": data["subscribers"],
+        "subscribers": data.get("subscribers") or [],
         "is_global": data.get("is_global", False),
         "folder": data.get("folder", None),
         "advanced": data.get("advanced", None),
@@ -78,6 +65,9 @@ def update_topic(topic_id):
         updates["folder"] = None
 
     response = get_resource_service("topics").patch(id=ObjectId(topic_id), updates=updates)
+
+    auto_enable_user_emails(updates, original, current_user)
+
     if response.get("is_global") or updates.get("is_global", False) != original.get("is_global", False):
         push_company_notification("topics")
     else:

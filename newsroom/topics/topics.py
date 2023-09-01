@@ -5,8 +5,8 @@ import newsroom
 import superdesk
 
 from bson import ObjectId
+from newsroom.types import Topic, User
 from newsroom.utils import set_original_creator, set_version_creator
-from newsroom.types import Topic
 
 
 class TopicNotificationType(enum.Enum):
@@ -175,6 +175,30 @@ def get_agenda_notification_topics_for_query_by_id(item, users):
 
     # filter out the topics those belong to inactive users
     return [t for t in topics if users.get(str(t["user"]))]
+
+
+def auto_enable_user_emails(updates: Topic, original: Topic, user: User):
+    if not updates.get("subscribers"):
+        return
+
+    # If current user is already subscribed to this topic,
+    # then no need to enable their email notifications
+    for subscriber in original.get("subscribers") or []:
+        if subscriber["user_id"] == user["_id"]:
+            return
+
+    user_newly_subscribed = False
+    for subscriber in updates.get("subscribers") or []:
+        if subscriber["user_id"] == user["_id"]:
+            user_newly_subscribed = True
+            break
+
+    if not user_newly_subscribed:
+        return
+
+    # The current user subscribed to this topic in this update
+    # Enable their email notifications now
+    superdesk.get_resource_service("users").patch(user["_id"], updates={"receive_email": True})
 
 
 topics_service = TopicsService()
