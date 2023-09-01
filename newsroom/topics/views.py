@@ -2,8 +2,9 @@ from bson import ObjectId
 from superdesk import get_resource_service
 from flask import json, jsonify, abort, current_app as app, url_for
 
+from newsroom.types import Topic
 from newsroom.topics import blueprint
-from newsroom.topics.topics import get_user_topics as _get_user_topics
+from newsroom.topics.topics import get_user_topics as _get_user_topics, auto_enable_user_emails
 from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required
 from newsroom.utils import get_json_or_400, get_entity_or_404
@@ -39,7 +40,7 @@ def update_topic(topic_id):
     if not can_edit_topic(original, current_user):
         abort(403)
 
-    updates = {
+    updates: Topic = {
         "label": data.get("label"),
         "query": data.get("query"),
         "created": data.get("created"),
@@ -64,6 +65,9 @@ def update_topic(topic_id):
         updates["folder"] = None
 
     response = get_resource_service("topics").patch(id=ObjectId(topic_id), updates=updates)
+
+    auto_enable_user_emails(updates, original, current_user)
+
     if response.get("is_global") or updates.get("is_global", False) != original.get("is_global", False):
         push_company_notification("topics")
     else:

@@ -28,6 +28,7 @@ from newsroom.companies import (
 from newsroom.notifications.notifications import get_notifications_with_items
 from newsroom.notifications import push_user_notification, push_company_notification
 from newsroom.topics import get_user_topics
+from newsroom.topics.topics import auto_enable_user_emails
 from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
 from newsroom.users.users import (
@@ -365,6 +366,9 @@ def post_topic(_id):
         subscriber["user_id"] = ObjectId(subscriber["user_id"])
 
     ids = get_resource_service("topics").post([topic])
+
+    auto_enable_user_emails(topic, {}, user)
+
     if topic.get("is_global"):
         push_company_notification("topic_created", user_id=str(user["_id"]))
     else:

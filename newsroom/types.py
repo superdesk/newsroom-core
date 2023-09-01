@@ -116,7 +116,7 @@ class TopicSubscriber(TypedDict):
     notification_type: str
 
 
-class Topic(TypedDict):
+class Topic(TypedDict, total=False):
     _id: ObjectId
     label: str
     query: str
