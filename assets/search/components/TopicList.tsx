@@ -10,7 +10,6 @@ interface IProps {
     topics: Array<ITopic>;
     selectedTopicId: ITopic['_id'];
     actions: Array<ITopicAction>;
-
     user: IUser;
     users: Array<IUser>;
     folders: Array<ITopicFolder>;
@@ -55,7 +54,8 @@ const TopicList = ({
     const renderedFolders = folders.map((folder) => {
         const filteredTopics = topics.filter((topic) => topic.folder === folder._id);
         return (
-            <TopicFolder key={folder._id}
+            <TopicFolder
+                key={folder._id}
                 folder={folder}
                 topics={filteredTopics}
                 folderPopover={folderPopover}

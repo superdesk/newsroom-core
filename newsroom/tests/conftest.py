@@ -25,6 +25,7 @@ def update_config(conf):
     conf["NEWS_API_ENABLED"] = True
     conf["AUTH_SERVER_SHARED_SECRET"] = "secret123"
     conf["SECRET_KEY"] = "foo"
+    conf["CELERY_TASK_ALWAYS_EAGER"] = True
     return conf
 
 

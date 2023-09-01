@@ -22,7 +22,7 @@ export class SearchResultsBar {
 
     getAdvancedSearchKeywords(field) {
         const tagType = {
-            and: 'success',
+            all: 'success',
             any: 'info',
             exclude: 'alert',
         }[field];
