@@ -108,7 +108,7 @@ def get_company_updates(data, original=None):
         "monitoring_administrator": data.get("monitoring_administrator") or original.get("monitoring_administrator"),
         "allowed_ip_list": data.get("allowed_ip_list") or original.get("allowed_ip_list"),
         "auth_domain": data.get("auth_domain"),
-        "auth_provider": data.get("auth_provider"),
+        "auth_provider": data.get("auth_provider") or original.get("auth_provider") or "newshub",
     }
 
     for field in ["sections", "archive_access", "events_only", "restrict_coverage_info", "products", "seats"]:
