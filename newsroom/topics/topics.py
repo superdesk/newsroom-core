@@ -191,6 +191,7 @@ def auto_enable_user_emails(updates: Topic, original: Topic, user: User):
     for subscriber in updates.get("subscribers") or []:
         if subscriber["user_id"] == user["_id"]:
             user_newly_subscribed = True
+            break
 
     if not user_newly_subscribed:
         return
