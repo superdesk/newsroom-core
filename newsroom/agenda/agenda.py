@@ -334,19 +334,20 @@ def _set_event_date_range(search):
     should = []
 
     if date_from and not date_to:
+        dates_field = "dates.start" if app.config.get("AGENDA_SHOW_MULTIDAY_ON_START_ONLY") else "dates.end"
         # Filter from a particular date onwards
         should = [
             {
                 "bool": {
-                    "filter": {"range": {"dates.start": {"gte": date_from}}},
                     "must_not": {"term": {"dates.all_day": True}},
+                    "filter": {"range": {dates_field: {"gte": date_from}}},
                 },
             },
             {
                 "bool": {
                     "filter": [
                         {"term": {"dates.all_day": True}},
-                        {"range": {"dates.start": {"gte": search.args["date_from"]}}},
+                        {"range": {dates_field: {"gte": search.args["date_from"]}}},
                     ],
                 },
             },
@@ -547,12 +548,54 @@ def _filter_terms(filters, item_type):
                         name="coverage_status",
                     )
                 )
-            else:
+            elif val == ["may be"]:
+                must_term_filters.append(
+                    nested_query(
+                        path="coverages",
+                        query={
+                            "bool": {
+                                "filter": [
+                                    {
+                                        "terms": {
+                                            "coverages.coverage_status": [
+                                                "coverage not decided yet",
+                                                "coverage upon request",
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        name="coverage_status",
+                    )
+                )
+            elif val == ["not planned"]:
                 must_not_term_filters.append(
                     nested_query(
                         path="coverages",
-                        query={"bool": {"filter": [{"terms": {"coverages.coverage_status": ["coverage intended"]}}]}},
+                        query={
+                            "bool": {
+                                "filter": [
+                                    {
+                                        "terms": {
+                                            "coverages.coverage_status": [
+                                                "coverage intended",
+                                                "coverage not decided yet",
+                                                "coverage upon request",
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        },
                         name="coverage_status",
+                    )
+                )
+            elif val == ["completed"]:
+                must_term_filters.append(
+                    nested_query(
+                        path="coverages",
+                        query={"bool": {"must": [{"exists": {"field": "coverages.delivery_id"}}]}},
                     )
                 )
         elif key == "agendas":
@@ -608,28 +651,7 @@ def _remove_fields(source, fields):
 
 
 def planning_items_query_string(query, fields=None):
-    plan_query_string = query_string(query)
-
-    if fields:
-        plan_query_string["query_string"]["fields"] = fields
-    else:
-        plan_query_string["query_string"]["fields"] = ["planning_items.*"]
-
-    return plan_query_string
-
-
-def get_agenda_query(query, events_only=False):
-    if events_only:
-        return query_string(query)
-    else:
-        return {
-            "bool": {
-                "should": [
-                    query_string(query),
-                    nested_query("planning_items", planning_items_query_string(query), name="query"),
-                ]
-            },
-        }
+    return query_string(query, fields=fields or ["planning_items.*"])
 
 
 def is_events_only_access(user, company):
@@ -838,7 +860,7 @@ class AgendaService(BaseSearchService):
 
         pass
 
-    def apply_filters(self, search):
+    def apply_filters(self, search, section_filters=None):
         """Generate and apply the different search filters
 
         :param newsroom.search.SearchQuery search: the search query instance
@@ -871,7 +893,7 @@ class AgendaService(BaseSearchService):
         search.query = agenda_query
 
         # Apply agenda based filters
-        self.apply_section_filter(search)
+        self.apply_section_filter(search, section_filters)
         self.apply_request_filter(search)
         self.apply_request_advanced_search(search)
 
@@ -949,7 +971,7 @@ class AgendaService(BaseSearchService):
             return
 
         if product.get("query"):
-            search.query["bool"]["should"].append(query_string(product["query"]))
+            search.query["bool"]["should"].append(self.query_string(product["query"]))
 
             if product.get("planning_item_query") and search.item_type != "events":
                 search.planning_items_should.append(planning_items_query_string(product.get("planning_item_query")))
@@ -967,7 +989,7 @@ class AgendaService(BaseSearchService):
                 if isinstance(q, dict):
                     # used for product testing
                     if q.get("query"):
-                        test_query["bool"]["should"].append(query_string(q.get("query")))
+                        test_query["bool"]["should"].append(self.query_string(q.get("query")))
 
                     if q.get("planning_item_query"):
                         test_query["bool"]["should"].append(
@@ -984,7 +1006,9 @@ class AgendaService(BaseSearchService):
                 pass
 
             if not test_query["bool"]["should"]:
-                search.query["bool"]["filter"].append(get_agenda_query(search.args["q"], search.item_type == "events"))
+                search.query["bool"]["filter"].append(
+                    self.get_agenda_query(search.args["q"], search.item_type == "events")
+                )
 
         if search.args.get("id"):
             search.query["bool"]["filter"].append({"term": {"_id": search.args["id"]}})
@@ -1045,7 +1069,7 @@ class AgendaService(BaseSearchService):
             name="featured",
         )
         if req.args.get("q"):
-            query["bool"]["filter"].append(query_string(req.args["q"]))
+            query["bool"]["filter"].append(self.query_string(req.args["q"]))
             planning_items_query["nested"]["query"]["bool"]["filter"].append(planning_items_query_string(req.args["q"]))
 
         query["bool"]["filter"].append(planning_items_query)
@@ -1097,9 +1121,9 @@ class AgendaService(BaseSearchService):
             }
         }
         get_resource_service("section_filters").apply_section_filter(query, self.section)
-        return self.get_items_by_query(query, size=len(item_ids))
+        return self.get_agenda_items_by_query(query, size=len(item_ids))
 
-    def get_items_by_query(self, query, size=50):
+    def get_agenda_items_by_query(self, query, size=50):
         try:
             source = {"query": query}
 
@@ -1172,7 +1196,7 @@ class AgendaService(BaseSearchService):
             }
         }
 
-        agenda_items = self.get_items_by_query(query)
+        agenda_items = self.get_agenda_items_by_query(query)
         agenda_updated_notification_sent = False
 
         def update_coverage_details(coverage):
@@ -1536,7 +1560,7 @@ class AgendaService(BaseSearchService):
         self.apply_filters(search)
         set_saved_items_query(search.query, str(search.user["_id"]))
 
-        cursor = self.get_items_by_query(search.query, size=0)
+        cursor = self.get_agenda_items_by_query(search.query, size=0)
         return cursor.count() if cursor else 0
 
     def get_featured_stories(self, req, lookup):
@@ -1549,3 +1573,16 @@ class AgendaService(BaseSearchService):
         )
         featured_doc = get_resource_service("agenda_featured").find_one_for_date(local_date)
         return self.featured(req, lookup, featured_doc)
+
+    def get_agenda_query(self, query, events_only=False):
+        if events_only:
+            return self.query_string(query)
+        else:
+            return {
+                "bool": {
+                    "should": [
+                        self.query_string(query),
+                        nested_query("planning_items", planning_items_query_string(query), name="query"),
+                    ]
+                },
+            }

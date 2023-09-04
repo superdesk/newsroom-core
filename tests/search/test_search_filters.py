@@ -53,9 +53,11 @@ def test_apply_section_filter(client, app):
                 "default_operator": "AND",
                 "analyze_wildcard": query_string_settings["analyze_wildcard"],
                 "lenient": True,
+                "fields": ["*"],
             }
         } in search.query["bool"]["filter"]
 
+        search = SearchQuery()
         service.section = "agenda"
         service.prefill_search_query(search)
         service.apply_section_filter(search)
@@ -65,6 +67,7 @@ def test_apply_section_filter(client, app):
                 "default_operator": "AND",
                 "analyze_wildcard": query_string_settings["analyze_wildcard"],
                 "lenient": True,
+                "fields": ["*"],
             }
         } in search.query["bool"]["filter"]
 
@@ -143,6 +146,7 @@ def test_apply_products_filter(client, app):
                         "default_operator": "AND",
                         "analyze_wildcard": query_string_settings["analyze_wildcard"],
                         "lenient": True,
+                        "fields": app.config["WIRE_SEARCH_FIELDS"],
                     }
                 } in search.query["bool"]["should"]
 
@@ -177,6 +181,7 @@ def test_apply_request_filter__query_string(client, app):
                 "default_operator": "AND",
                 "analyze_wildcard": query_string_settings["analyze_wildcard"],
                 "lenient": True,
+                "fields": app.config["WIRE_SEARCH_FIELDS"],
             }
         } in search.query["bool"]["must"]
 
@@ -188,6 +193,7 @@ def test_apply_request_filter__query_string(client, app):
                 "default_operator": "OR",
                 "analyze_wildcard": query_string_settings["analyze_wildcard"],
                 "lenient": True,
+                "fields": app.config["WIRE_SEARCH_FIELDS"],
             }
         } in search.query["bool"]["must"]
 

@@ -1,30 +1,52 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 
-function MoreNewsButton({title, productId, photoUrl, photoUrlLabel, moreNews}: any): any {
-    return ([<div key='heading' className='col-6 col-sm-8'>
-        <h3 className='home-section-heading'>{title}</h3>
-    </div>,
-    <div key='more-news' className='col-6 col-sm-4 d-flex align-items-start justify-content-end'>
-        {moreNews && productId &&
-                <a href={`/wire?product=${productId}`} role='button' className='nh-button nh-button--tertiary mb-3'>
-                    {gettext('More news')}
-                </a>}
-        {photoUrl &&
-            <a href={photoUrl} target='_blank' rel='noopener noreferrer' role='button' className='nh-button nh-button--tertiary mb-3'>
-                {gettext(photoUrlLabel)}
-            </a>}
-    </div>]);
+interface IProps {
+    title: string;
+    photoUrl?: string;
+    kind: MoreNewsSearchKind;
+    id?: string;
+    photoUrlLabel?: string;
+    moreNews?: boolean;
 }
 
-MoreNewsButton.propTypes = {
-    title: PropTypes.string,
-    productId: PropTypes.string,
-    photoUrl: PropTypes.string,
-    photoUrlLabel: PropTypes.string,
+export type MoreNewsSearchKind = 'product' | 'topic';
+type MoreNewsInternalType = {[Property in MoreNewsSearchKind]: React.ComponentType<{id: string}>;};
+
+const MoreNewsInternal: MoreNewsInternalType = {
+    'product': (props: {id: string}) => (
+        <a href={`/wire?product=${props.id}`} role='button' className='nh-button nh-button--tertiary mb-3'>
+            {gettext('More news')}
+        </a>
+    ),
+    'topic':  (props: {id: string}) => (
+        <a href={`/wire?topic=${props.id}`} role='button' className='nh-button nh-button--tertiary mb-3'>
+            {gettext('More news')}
+        </a>
+    ),
 };
 
-const component: React.ComponentType<any> = MoreNewsButton;
+function MoreNewsButton(props: IProps): any {
+    const {title, photoUrl, photoUrlLabel, moreNews, kind, id} = props;
+    const MoreNewsLink = MoreNewsInternal[kind];
+
+    return (
+        [
+            <div key='heading' className='col-6 col-sm-8'>
+                <h3 className='home-section-heading'>{title}</h3>
+            </div>,
+            <div key='more-news' className='col-6 col-sm-4 d-flex align-items-start justify-content-end'>
+                {moreNews && id && <MoreNewsLink id={id} />}
+                {photoUrl && (
+                    <a href={photoUrl} target='_blank' rel='noopener noreferrer' role='button' className='nh-button nh-button--tertiary mb-3'>
+                        {photoUrlLabel}
+                    </a>
+                )}
+            </div>
+        ]
+    );
+}
+
+const component: React.ComponentType<IProps> = MoreNewsButton;
 
 export default component;

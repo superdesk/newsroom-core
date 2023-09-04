@@ -7,6 +7,21 @@ import {canUserUpdateTopic} from 'users/utils';
 
 import {SearchResultTagList} from './SearchResultTagList';
 import {Tag} from 'components/Tag';
+import {IProps as IParentProps} from './SearchResultTagsList';
+
+type IProps = Pick<IParentProps,
+    'user' |
+    'readonly' |
+    'searchParams' |
+    'activeTopic' |
+    'navigations' |
+    'showSaveTopic' |
+    'showMyTopic' |
+    'topicType' |
+    'saveMyTopic' |
+    'toggleNavigation' |
+    'deselectMyTopic'
+>;
 
 export function SearchResultsTopicRow({
     user,
@@ -19,7 +34,8 @@ export function SearchResultsTopicRow({
     saveMyTopic,
     toggleNavigation,
     deselectMyTopic,
-}) {
+    readonly,
+}: IProps) {
     const tags = [];
     const hasActiveTopic = get(activeTopic, '_id') != null;
 
@@ -28,10 +44,14 @@ export function SearchResultsTopicRow({
             <Tag
                 key="tags-topics--topic"
                 testId="tags-topics--my-topic"
+                readOnly={readonly}
                 text={activeTopic.label}
                 shade="inverse"
                 onClick={(event) => {
                     event.preventDefault();
+                    if (!deselectMyTopic) {
+                        return;
+                    }
                     deselectMyTopic(activeTopic._id);
                 }}
             />
@@ -48,6 +68,7 @@ export function SearchResultsTopicRow({
                     testId="tags-topic"
                     text={navigation.name}
                     shade="inverse"
+                    readOnly={readonly}
                     onClick={(event) => {
                         event.preventDefault();
                         toggleNavigation(navigation);
@@ -64,7 +85,7 @@ export function SearchResultsTopicRow({
     return (
         <SearchResultTagList
             testId="search-results--topics"
-            title={tags.length ? gettext('Topic') : null}
+            title={tags.length ? gettext('Topic') : ''}
             tags={tags}
         >
             {!showSaveTopic ? null : (
@@ -75,13 +96,15 @@ export function SearchResultsTopicRow({
                             className="nh-button nh-button--tertiary nh-button--small"
                             onClick={(event) => {
                                 event.preventDefault();
+                                if (!saveMyTopic) {
+                                    return;
+                                }
+
                                 saveMyTopic(Object.assign(
                                     {},
                                     activeTopic,
                                     searchParams,
-                                    {query: searchParams.query},
                                     {topic_type: topicType},
-                                    {filter: searchParams.filter}
                                 ));
                             }}
                         >
@@ -93,11 +116,14 @@ export function SearchResultsTopicRow({
                         className="nh-button nh-button--tertiary nh-button--small"
                         onClick={(event) => {
                             event.preventDefault();
+                            if (!saveMyTopic) {
+                                return;
+                            }
+
                             saveMyTopic(Object.assign(
                                 {},
                                 searchParams,
                                 {topic_type: topicType},
-                                {filter: searchParams.filter}
                             ));
                         }}
                     >

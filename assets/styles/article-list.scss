@@ -460,6 +460,12 @@
     img {
         height: 35px;
     }
+    &.wire-articles__item__meta--boxed {
+        border: 1px solid var(--color-line--light);
+        padding: var(--space--1-5);
+        background-color: var(--color-background--muted);
+        border-radius: var(--border-radius--m);
+    }
 }
 
 .wire-articles__item__icons {
@@ -470,9 +476,12 @@
     display: flex;
     gap: var(--space--1-5);
     flex-grow: 0;
-    &--dashed-border {
+    &.wire-articles__item__icons--dashed-border {
         padding-inline-end: var(--space--1-5);
         border-inline-end: 1px dotted var(--color-line--light);
+    }
+    &.wire-articles__item__icons--compact {
+        gap: var(--space--0-5);
     }
 }
 
@@ -513,26 +522,44 @@
     }
     &.coverage--active {
         &::after {
-            background-color: $purple;
+            background-color: var(--coverage-status-icon--active);
             background-image: url('/static/overlay_icon--active.svg');
         }
     }
     &.coverage--assigned {
         &::after {
-            background-color: $mid-blue;
+            background-color: var(--coverage-status-icon--assigned);
             background-image: url('/static/overlay_icon--assigned.svg');
         }
     }
     &.coverage--cancelled {
         &::after {
-            background-color: $red;
+            background-color: var(--coverage-status-icon--cancelled);
             background-image: url('/static/overlay_icon--cancelled.svg');
+        }
+    }
+    &.coverage--not-covering {
+        &::after {
+            background-color: var(--coverage-status-icon--not-covering);
+            background-image: url('/static/overlay_icon--not-covering.svg');
         }
     }
     &.coverage--completed {
         &::after {
-            background-color: $green;
+            background-color: var(--coverage-status-icon--completed);
             background-image: url('/static/overlay_icon--completed.svg');
+        }
+    }
+    &.coverage--undecided {
+        &::after {
+            background-color: var(--coverage-status-icon--undecided);
+            background-image: url('/static/overlay_icon--udecided.svg');
+        }
+    }
+    &.coverage--request {
+        &::after {
+            background-color: var(--coverage-status-icon--request);
+            background-image: url('/static/overlay_icon--udecided.svg');
         }
     }
 }
@@ -561,7 +588,13 @@
     .wire-column__preview--canceled & {
         text-decoration: line-through;
     }
+    span {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space--1);
+    }
 }
+
 .wire-articles__item__meta-row {
     display: flex;
     margin-block-end: 6px;

@@ -109,3 +109,7 @@ def add_fixture_to_db(resource: str, filename: str):
     _app = app._get_current_object()
     _app.data.insert(resource, [item])
     return item
+
+
+def get_resource_by_id(resource: str, item_id: str):
+    return app.data.find_one(resource, req=None, _id=item_id)

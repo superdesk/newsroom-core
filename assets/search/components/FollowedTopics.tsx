@@ -33,10 +33,11 @@ import MonitoringEditor from 'search/components/MonitoringEditor';
 import TopicEditor from 'search/components/TopicEditor';
 import TopicList from 'search/components/TopicList';
 import {TopicFolderEditor} from './TopicFolderEditor';
+import {ITopicAction} from './Topic';
 
 class FollowedTopics extends React.Component<any, any> {
     static propTypes: any;
-    actions: any;
+    actions: Array<ITopicAction>;
     constructor(props: any, context: any) {
         super(props, context);
 
@@ -59,7 +60,7 @@ class FollowedTopics extends React.Component<any, any> {
                 name: gettext('Remove from folder'),
                 icon: 'folder-remove-from',
                 action: this.removeTopicFolder,
-                if: (topic: any) => topic.folder != null,
+                if: (topic) => topic.folder != null && canUserEditTopic(topic, this.props.user),
             },
             {
                 id: 'edit',
@@ -69,8 +70,7 @@ class FollowedTopics extends React.Component<any, any> {
             }];
 
         if (this.props.topicType !== 'monitoring') {
-            this.actions = [
-                ...this.actions,
+            this.actions = this.actions.concat([
                 {
                     id: 'share',
                     name: gettext('Share'),
@@ -81,9 +81,9 @@ class FollowedTopics extends React.Component<any, any> {
                     name: gettext('Delete'),
                     icon: 'trash',
                     action: this.deleteTopic,
-                    when: (topic: any) => canUserEditTopic(topic, this.props.user),
+                    if: (topic) => canUserEditTopic(topic, this.props.user),
                 }
-            ].filter(isActionEnabled('topic_actions'));
+            ]).filter(isActionEnabled('topic_actions'));
         }
     }
 
@@ -209,17 +209,19 @@ class FollowedTopics extends React.Component<any, any> {
                                     </button>
                                 </div>
                             )}
-                            <div className="toggle-button__group toggle-button__group--navbar ms-0 me-0">
-                                <button
-                                    type="button"
-                                    className="nh-button nh-button--tertiary"
-                                    title={gettext('Create new folder')}
-                                    data-test-id="create-folder-btn"
-                                    onClick={() => this.createNewFolder()}
-                                >
-                                    <i className="icon--folder-create"></i>{gettext('New folder')}
-                                </button>
-                            </div>
+                            {(this.state.showGlobal === false || canUserManageTopics(this.props.user)) && (
+                                <div className="toggle-button__group toggle-button__group--navbar ms-auto me-0">
+                                    <button
+                                        type="button"
+                                        className="nh-button nh-button--tertiary"
+                                        title={gettext('Create new folder')}
+                                        data-test-id="create-folder-btn"
+                                        onClick={() => this.createNewFolder()}
+                                    >
+                                        <i className="icon--folder-create"></i>{gettext('New folder')}
+                                    </button>
+                                </div>
+                            )}
                         </div>
                         <div className="simple-card__list pt-xl-4 pt-3">
                             {this.state.newFolder != null && (
@@ -236,6 +238,7 @@ class FollowedTopics extends React.Component<any, any> {
                                 topics={this.getFilteredTopics()}
                                 selectedTopicId={get(this.props.selectedItem, '_id')}
                                 actions={this.actions}
+                                user={this.props.user}
                                 users={this.props.companyUsers}
                                 folders={this.props.folders}
                                 folderPopover={this.state.folderPopover}

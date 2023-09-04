@@ -14,6 +14,7 @@ from superdesk.text_utils import get_word_count, get_char_count
 from superdesk.utc import utcnow
 from superdesk.errors import SuperdeskApiError
 from planning.common import WORKFLOW_STATE
+from newsroom.celery_app import celery
 
 from newsroom.notifications import (
     push_notification,
@@ -85,11 +86,8 @@ def push():
 
     if item.get("type") == "event":
         orig = app.data.find_one("agenda", req=None, guid=item["guid"])
-        id = publish_event(item, orig)
-        agenda = app.data.find_one("agenda", req=None, _id=id)
-        if agenda:
-            superdesk.get_resource_service("agenda").enhance_items([agenda])
-        notify_new_item(agenda, check_topics=True)
+        _id = publish_event(item, orig)
+        notify_new_agenda_item.delay(_id, check_topics=True)
     elif item.get("type") == "planning":
         orig = app.data.find_one("agenda", req=None, guid=item["guid"]) or {}
         item["planning_date"] = parse_date_str(item["planning_date"])
@@ -97,14 +95,11 @@ def push():
         event_id = publish_planning_into_event(item)
         # Prefer parent Event when sending notificaitons
         _id = event_id or plan_id
-        agenda = app.data.find_one("agenda", req=None, _id=_id)
-        if agenda:
-            superdesk.get_resource_service("agenda").enhance_items([agenda])
-        notify_new_item(agenda, check_topics=True)
+        notify_new_agenda_item.delay(_id, check_topics=True)
     elif item.get("type") == "text":
         orig = superdesk.get_resource_service("items").find_one(req=None, _id=item["guid"])
         item["_id"] = publish_item(item, orig)
-        notify_new_item(item, check_topics=orig is None)
+        notify_new_wire_item.delay(item["_id"], check_topics=orig is None)
     elif item["type"] == "planning_featured":
         publish_planning_featured(item)
     else:
@@ -168,7 +163,7 @@ def publish_item(doc, original):
         if doc.get("coverage_id"):
             agenda_items = superdesk.get_resource_service("agenda").set_delivery(doc)
             if agenda_items:
-                [notify_new_item(item, check_topics=False) for item in agenda_items]
+                [notify_new_agenda_item.delay(item["_id"], check_topics=False) for item in agenda_items]
     except Exception as ex:
         logger.info("Failed to notify new wire item for Agenda watches")
         logger.exception(ex)
@@ -708,7 +703,22 @@ def set_item_reference(coverage):
             )
             item["planning_id"] = coverage.get("planning_id")
             item["coverage_id"] = coverage.get("coverage_id")
-            notify_new_item(item, check_topics=False)
+            notify_new_wire_item.delay(item["_id"], check_topics=False)
+
+
+@celery.task
+def notify_new_wire_item(_id, check_topics=True):
+    item = superdesk.get_resource_service("items").find_one(req=None, _id=_id)
+    if item:
+        notify_new_item(item, check_topics=check_topics)
+
+
+@celery.task
+def notify_new_agenda_item(_id, check_topics=True):
+    agenda = app.data.find_one("agenda", req=None, _id=_id)
+    if agenda:
+        superdesk.get_resource_service("agenda").enhance_items([agenda])
+        notify_new_item(agenda, check_topics=check_topics)
 
 
 def notify_new_item(item, check_topics=True):
@@ -822,7 +832,7 @@ def notify_wire_topic_matches(item, users_dict, companies_dict):
 
     if topic_matches:
         push_notification("topic_matches", item=item, topics=topic_matches)
-        send_topic_notification_emails(item, topics, topic_matches, users_dict)
+        send_topic_notification_emails(item, topics, topic_matches, users_dict, companies_dict)
 
 
 def notify_agenda_topic_matches(item, users_dict, companies_dict):
@@ -842,36 +852,58 @@ def notify_agenda_topic_matches(item, users_dict, companies_dict):
 
     if topic_matches:
         push_agenda_item_notification("topic_matches", item=item, topics=topic_matches)
-        send_topic_notification_emails(item, topics, topic_matches, users_dict)
+        send_topic_notification_emails(item, topics, topic_matches, users_dict, companies_dict)
 
 
-def send_topic_notification_emails(item, topics, topic_matches, users):
+def send_topic_notification_emails(item, topics, topic_matches, users, companies):
+    section_filters = superdesk.get_resource_service("section_filters").get_section_filters_dict()
+
     for topic in topics:
         if topic["_id"] not in topic_matches:
             continue
 
-        for user_id in topic.get("subscribers") or []:
-            user = users.get(str(user_id))
+        for subscriber in topic.get("subscribers") or []:
+            user = users.get(str(subscriber["user_id"]))
 
-            if user:
-                section = topic.get("topic_type") or "wire"
-                save_user_notifications(
-                    [
-                        UserNotification(
-                            user=user["_id"],
-                            item=item["_id"],
-                            resource=section,
-                            action="topic_matches",
-                            data=None,
-                        )
-                    ]
-                )
+            if not user:
+                continue
 
-                if user.get("receive_email"):
+            company = companies.get(str(user.get("company")))
+
+            section = topic.get("topic_type") or "wire"
+            save_user_notifications(
+                [
+                    UserNotification(
+                        user=user["_id"],
+                        item=item["_id"],
+                        resource=section,
+                        action="topic_matches",
+                        data=None,
+                    )
+                ]
+            )
+
+            if user.get("receive_email"):
+                if subscriber.get("notification_type") == "scheduled":
+                    superdesk.get_resource_service("notification_queue").add_item_to_queue(
+                        user["_id"], section, topic["_id"], item
+                    )
+                else:
+                    search_service = superdesk.get_resource_service(
+                        "wire_search" if topic["topic_type"] == "wire" else "agenda"
+                    )
+                    query = search_service.get_topic_query(
+                        topic, user, company, section_filters, args={"es_highlight": 1, "ids": [item["_id"]]}
+                    )
+                    items = search_service.get_items_by_query(query, size=1)
+                    highlighted_item = item
+                    if items.count():
+                        highlighted_item = items[0]
+
                     send_new_item_notification_email(
                         user,
                         topic["label"],
-                        item=item,
+                        item=highlighted_item,
                         section=section,
                     )
 

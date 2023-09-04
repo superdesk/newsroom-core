@@ -1,3 +1,5 @@
+import {ITopic, IUser} from 'interfaces';
+
 import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
 import {renderModal, closeModal} from 'actions';
@@ -165,6 +167,14 @@ export function shareTopic(items: any) {
     };
 }
 
+export function openEditTopicNotificationsModal() {
+    return (dispatch: any, getState: any) => {
+        const user = getState().user;
+
+        dispatch(renderModal('editNotificationSchedule', {user}));
+    };
+}
+
 /**
  * Submit share followed topic form and close modal if that works
  *
@@ -262,11 +272,12 @@ export function saveFolder(folder: any, data: any, global: any) {
 
 export const FOLDER_DELETED = 'FOLDER_DELETED';
 export function deleteFolder(folder: any, global: boolean, deleteTopics?: boolean) {
+
     return (dispatch: any, getState: any) => {
         const state = getState();
         const url = getFoldersUrl(state, global, folder._id);
 
-        if (!window.confirm(gettext('Are you sure you want to delete folder?'))) {
+        if (!window.confirm(gettext('Are you sure you want to delete the folder {{name}} and all of its contents?', {name: folder.name}))) {
             return;
         }
 
@@ -302,17 +313,40 @@ export function fetchFolders(global: boolean, skipDispatch?: boolean) {
 export const TOPIC_UPDATED = 'TOPIC_UPDATED';
 export function moveTopic(topicId: any, folder: any) {
     return (dispatch: any, getState: any) => {
-        const updates = {
-            folder: folder != null ? folder._id : null,
-        };
-
         const state = getState();
+        const updates = {folder: folder != null ? folder._id : null};
         const topic = state.topics.find((topic: any) => topic._id === topicId);
-        const url = `/api/users/${topic.user}/topics/${topicId}`;
 
-        return server.patch(url, updates, topic._etag).then((response) => {
-            mergeUpdates(updates, response);
-            dispatch({type: TOPIC_UPDATED, payload: {topic, updates}});
-        });
+        return updateTopic(topic, updates, dispatch);
     };
+}
+
+export function updateUserNotificationSchedules(schedule: Omit<IUser['notification_schedule'], 'last_run_time'>) {
+    return (dispatch: any, getState: any) => {
+        const user = getState().user;
+
+        return server.post(`/users/${user._id}/notification_schedules`, schedule)
+            .then(() => {
+                notify.success(gettext('Global schedule updated'));
+                dispatch(fetchUser(user._id));
+                dispatch(closeModal());
+            })
+            .catch((error) => errorHandler(error, dispatch, setError(error)));
+    };
+}
+
+export function setTopicSubscribers(topic: ITopic, subscribers: ITopic['subscribers']) {
+    return (dispatch: any) => {
+        const updates = {subscribers};
+        return updateTopic(topic, updates, dispatch);
+    };
+}
+
+function updateTopic(topic: ITopic, updates: Partial<ITopic>, dispatch: any) {
+    const url = `/api/users/${topic.user}/topics/${topic._id}`;
+
+    return server.patch(url, updates, topic._etag).then((response) => {
+        mergeUpdates(updates, response);
+        dispatch({type: TOPIC_UPDATED, payload: {topic, updates}});
+    });
 }

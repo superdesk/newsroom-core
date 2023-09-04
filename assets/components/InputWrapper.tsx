@@ -16,7 +16,7 @@ function InputWrapper({error, name, label, children, testId}: any) {
 }
 
 InputWrapper.propTypes = {
-    error: PropTypes.object,
+    error: PropTypes.array,
     name: PropTypes.string,
     children: PropTypes.node,
     label: PropTypes.string,

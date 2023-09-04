@@ -22,6 +22,12 @@ import {modalReducer} from 'reducers';
 import {GET_NAVIGATIONS, QUERY_NAVIGATIONS} from 'navigations/actions';
 import {SET_TOPICS} from '../search/actions';
 
+export interface IUserProfileStore {
+    allSections?: Array<any>;
+    companySections?: any;
+    seats?: any;
+}
+
 const initialState: any = {
     user: null,
     editedUser: null,
@@ -40,7 +46,7 @@ const initialState: any = {
     folders: [],
 };
 
-export default function itemReducer(state: any = initialState, action: any) {
+export default function itemReducer(state: any = initialState, action: any): IUserProfileStore {
     let newSelected, newState;
     switch (action.type) {
 
@@ -211,6 +217,7 @@ export default function itemReducer(state: any = initialState, action: any) {
 
                 return {...topic, ...action.payload.updates};
             }),
+            selectedItem: state.selectedItem?._id === action.payload.topic._id ? {...state.selectedItem, ...action.payload.updates} : state.selectedItem,
         };
 
     case FOLDER_UPDATED:

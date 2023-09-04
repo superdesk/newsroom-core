@@ -10,6 +10,8 @@ import {render as _render} from 'react-dom';
 import alertify from 'alertifyjs';
 import moment from 'moment-timezone';
 
+import {IClientConfig, IUser} from 'interfaces';
+
 /*
  * Import and load all locales that will be used in moment.js
  * This should match the LANGUAGES defined in settings.py
@@ -76,6 +78,10 @@ export const KEYCODES = {
     ENTER: 13,
     DOWN: 40,
 };
+
+export function assertNever(x: any): never {
+    throw new Error('Unexpected object: ' + x);
+}
 
 /**
  * Create redux store with default middleware
@@ -147,11 +153,11 @@ export function render(store: any, App: any, element?: any, props?: any) {
  * @param {Object} params
  * @return {String}
  */
-export function gettext(text: any, params?: any) {
+export function gettext(text: string, params?: {[key: string]: any}): string {
     let translated = get(window.translations, text, text);
 
     if (params) {
-        Object.keys(params).forEach((param: any) => {
+        Object.keys(params).forEach((param: string) => {
             const paramRegexp = new RegExp('{{ ?' + param + ' ?}}', 'g');
             translated = translated.replace(paramRegexp, params[param] || '');
         });
@@ -504,23 +510,35 @@ export function formatHTML(html: any) {
     return html.replace(SHIFT_OUT_REGEXP, html.indexOf('<pre>') === -1 ? '<br>' : '\n');
 }
 
+export const SET_ERROR_MESSAGE = 'SET_ERROR_MESSAGE';
+function setErrorMessage(message: any) {
+    return {
+        type: SET_ERROR_MESSAGE,
+        message
+    };
+}
+
 /**
  * Generic error handler for http requests
  * @param error
  * @param dispatch
  * @param setError
  */
-export function errorHandler(error: any, dispatch?: any, setError?: any) {
-    console.error('error', error);
-
-    if (error.response.status !== 400) {
-        notify.error(error.response.statusText || gettext('Failed to process request!'));
-        return;
-    }
-    if (setError) {
-        error.response.json().then(function(data: any) {
-            dispatch(setError(data));
-        });
+export function errorHandler(error: {errorData: any} | Response, dispatch?: any, setError?: any) {
+    if ('errorData' in error) {
+        if (setError) {
+            dispatch(setError(error.errorData));
+        }
+    } else {
+        if (error.status === 403) {
+            dispatch(setErrorMessage(gettext(
+                'There is no product associated with your user. Please reach out to your Company Admin',
+            )));
+        } else if (error.status === 412) {
+            notify.warning(gettext('Resource was updated in the meantime, please refresh.'));
+        } else {
+            notify.error(error.statusText || gettext('Failed to process request!'));
+        }
     }
 }
 
@@ -577,7 +595,7 @@ export const getInitData = (data: any) => {
     };
 };
 
-export const isDisplayed = (field: any, config: any) => get(config, `${field}.displayed`, true);
+export const isDisplayed = (field: any, config: any, defaultValue = true) => get(config, `${field}.displayed`, defaultValue);
 
 const getNow = throttle(moment, 500);
 
@@ -718,4 +736,38 @@ export function copyTextToClipboard(text: any, item: any) {
             notify.error(gettext('Sorry, Copy is not supported.'));
         }
     );
+}
+
+export function getScheduledNotificationConfig(): IClientConfig['scheduled_notifications'] {
+    return getConfig('scheduled_notifications', {default_times: [
+        '07:00',
+        '15:00',
+        '19:00',
+    ]});
+}
+
+export function getSubscriptionTimesString(user: IUser): string {
+    const schedule = user.notification_schedule || {
+        timezone: DEFAULT_TIMEZONE,
+        times: getScheduledNotificationConfig().default_times,
+    };
+    const now = moment.tz(schedule.timezone);
+    const timezoneAbbreviation = now.zoneAbbr();
+    const timeStrings = [];
+
+    for (const time of schedule.times) {
+        const time_parts = time.split(':');
+
+        now.hours(parseInt(time_parts[0], 10))
+            .minutes(parseInt(time_parts[1], 10));
+
+        timeStrings.push(formatTime(now));
+    }
+
+    return gettext('Daily @ {{ time1 }}, {{ time2 }} and {{ time3 }} {{ timezone }}', {
+        time1: timeStrings[0],
+        time2: timeStrings[1],
+        time3: timeStrings[2],
+        timezone: timezoneAbbreviation,
+    });
 }

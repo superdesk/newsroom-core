@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import classNames from 'classnames';
 
@@ -32,8 +31,56 @@ import {UserListSortFilter} from 'users/components/filters/UserListSortFilter';
 import EditUser from 'users/components/EditUser';
 import {CompanyDetailsProductFilter} from './CompanyDetailsProductFilter';
 import {CompanyAdminProductSeatRequestModal} from './CompanyAdminProductSeatRequestModal';
+import {IUser} from 'interfaces/user';
+import {ICompanyAdminStore} from 'company-admin/reducers';
 
-class CompanyAdminAppComponent extends React.Component<any, any> {
+interface IStateProps {
+    sectionId: string;
+    usersById: any;
+    user: IUser;
+    userToEdit: IUser;
+    errors: any;
+    products: Array<any>;
+    modal: {
+        modal: string;
+        data: any;
+    };
+    sort: string;
+    sortDirection: number;
+    productId: string;
+    companies: Array<any>;
+    totalUsers: number;
+}
+
+interface IDispatchProps {
+    setSection: (sectionId: string) => any;
+    newUser: () => IUser;
+    editUser: (event: any) => any;
+    setError: (errors: any) => any;
+    saveUser: () => any;
+    closeUserEditor: () => any;
+    deleteUser: () => any;
+    resetPassword: () => any;
+    resendUserInvite: () => any;
+    setQuery: (query: any) => any;
+    fetchUsers: () => any;
+    setSort: (param: any) => any;
+    toggleSortDirection: () => any;
+    setProductFilter: (productId: any) => any;
+}
+
+type IOwnProps = {
+    // empty
+}
+
+type IProps = IDispatchProps & IStateProps & IOwnProps;
+
+interface IState {
+    sideNavOpen: boolean;
+    productFilter: string;
+}
+
+class CompanyAdminAppComponent extends React.Component<IProps, IState> {
     static propTypes: any;
     modals: any;
     constructor(props: any) {
@@ -104,6 +151,12 @@ class CompanyAdminAppComponent extends React.Component<any, any> {
     }
 
     render() {
+        const coreHiddenFields = this.props.user.user_type === 'company_admin'
+            ? ['is_approved', 'is_enabled']
+            : [];
+
+        const {userToEdit} = this.props;
+
         return (
             <React.Fragment>
                 <div className="settings-inner">
@@ -184,26 +237,32 @@ class CompanyAdminAppComponent extends React.Component<any, any> {
                                     </div>
                                 </section>
                             </div>
-                            {this.props.userToEdit == null ? null : (
-                                <EditUser
-                                    original={this.props.usersById[this.props.userToEdit._id] || {}}
-                                    user={this.props.userToEdit}
-                                    onChange={this.props.editUser}
-                                    errors={this.props.errors}
-                                    companies={this.props.companies}
-                                    onSave={this.saveUser}
-                                    onResetPassword={this.props.resetPassword}
-                                    onClose={this.props.closeUserEditor}
-                                    onDelete={this.deleteUser}
-                                    resendUserInvite={this.props.resendUserInvite}
-                                    currentUser={this.props.user}
-                                    products={this.props.products}
-                                    hideFields={getConfig('allow_companies_to_manage_products') ?
-                                        ['company'] :
-                                        ['company', 'sections', 'products']
-                                    }
-                                />
-                            )}
+                            {
+                                userToEdit !== null && (
+                                    <EditUser
+                                        original={userToEdit._id != null ? this.props.usersById[userToEdit._id] : {}}
+                                        user={userToEdit}
+                                        onChange={this.props.editUser}
+                                        errors={this.props.errors}
+                                        companies={this.props.companies}
+                                        onSave={this.saveUser}
+                                        onResetPassword={this.props.resetPassword}
+                                        onClose={this.props.closeUserEditor}
+                                        onDelete={this.deleteUser}
+                                        resendUserInvite={this.props.resendUserInvite}
+                                        currentUser={this.props.user}
+                                        products={this.props.products}
+                                        hideFields={[
+                                            ...coreHiddenFields,
+                                            ...(
+                                                getConfig('allow_companies_to_manage_products')
+                                                    ? ['company']
+                                                    : ['company', 'sections', 'products']
+                                            )
+                                        ]}
+                                    />
+                                )
+                            }
                         </div>
                     </div>
                 </div>
@@ -213,39 +272,7 @@ class CompanyAdminAppComponent extends React.Component<any, any> {
     }
 }
 
-CompanyAdminAppComponent.propTypes = {
-    sectionId: PropTypes.string,
-    setSection: PropTypes.func,
-    editUser: PropTypes.func,
-    newUser: PropTypes.func,
-    setError: PropTypes.func,
-    saveUser: PropTypes.func,
-    deleteUser: PropTypes.func,
-    resetPassword: PropTypes.func,
-    resendUserInvite: PropTypes.func,
-    closeUserEditor: PropTypes.func,
-    usersById: PropTypes.object,
-    user: PropTypes.object,
-    userToEdit: PropTypes.object,
-    errors: PropTypes.object,
-    products: PropTypes.arrayOf(PropTypes.object),
-    modal: PropTypes.shape({
-        modal: PropTypes.string,
-        data: PropTypes.object,
-    }),
-    setQuery: PropTypes.func,
-    fetchUsers: PropTypes.func,
-    sort: PropTypes.string,
-    sortDirection:PropTypes.number,
-    setSort: PropTypes.func,
-    toggleSortDirection: PropTypes.func,
-    productId: PropTypes.string,
-    setProductFilter: PropTypes.func,
-    companies: PropTypes.arrayOf(PropTypes.object),
-    totalUsers:PropTypes.number
-};
-
-const mapStateToProps = (state: any) => ({
+const mapStateToProps = (state: ICompanyAdminStore): IStateProps => ({
     sectionId: state.sectionId,
     usersById: state.usersById,
     user: currentUserSelector(state),
@@ -260,7 +287,7 @@ const mapStateToProps = (state: any) => ({
     totalUsers:state.totalUsers
 });
 
-const mapDispatchToProps = (dispatch: any) => ({
+const mapDispatchToProps = (dispatch: any): IDispatchProps => ({
     setSection: (sectionId: any) => dispatch(setSection(sectionId)),
     newUser: () => dispatch(newUser()),
     editUser: (event: any) => dispatch(editUser(event)),
@@ -270,7 +297,6 @@ const mapDispatchToProps = (dispatch: any) => ({
     deleteUser: () => dispatch(deleteUser()),
     resetPassword: () => dispatch(resetPassword()),
     resendUserInvite: () => dispatch(resendUserInvite()),
-
     setQuery: (query: any) => dispatch(setSearchQuery(query)),
     fetchUsers: () => dispatch(fetchUsers()),
     setSort: (param: any) => dispatch(setSort(param)),
@@ -278,4 +304,9 @@ const mapDispatchToProps = (dispatch: any) => ({
     setProductFilter: (productId: any) => dispatch(setProductFilter(productId)),
 });
 
-export const CompanyAdminApp: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(CompanyAdminAppComponent);
+export const CompanyAdminApp = connect<
+    IStateProps,
+    IDispatchProps,
+    IOwnProps,
+    ICompanyAdminStore
+>(mapStateToProps, mapDispatchToProps)(CompanyAdminAppComponent);

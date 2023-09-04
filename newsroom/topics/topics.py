@@ -1,8 +1,18 @@
+from typing import Optional, List, Dict, Any
+import enum
+
 import newsroom
 import superdesk
 
 from bson import ObjectId
+from newsroom.types import Topic, User
 from newsroom.utils import set_original_creator, set_version_creator
+
+
+class TopicNotificationType(enum.Enum):
+    # NONE = "none"
+    REAL_TIME = "real-time"
+    SCHEDULED = "scheduled"
 
 
 class TopicsResource(newsroom.Resource):
@@ -20,7 +30,18 @@ class TopicsResource(newsroom.Resource):
         "is_global": {"type": "boolean", "default": False},
         "subscribers": {
             "type": "list",
-            "schema": newsroom.Resource.rel("users", required=True),
+            "schema": {
+                "type": "dict",
+                "schema": {
+                    "user_id": newsroom.Resource.rel("users", required=True),
+                    "notification_type": {
+                        "type": "string",
+                        "required": True,
+                        "default": TopicNotificationType.REAL_TIME.value,
+                        "allowed": [notify_type.value for notify_type in TopicNotificationType],
+                    },
+                },
+            },
         },
         "timezone_offset": {"type": "integer", "nullable": True},
         "topic_type": {
@@ -57,7 +78,18 @@ class TopicsService(newsroom.Service):
         # If ``is_global`` has been turned off, then remove all subscribers
         # except for the owner of the Topic
         if original.get("is_global") and "is_global" in updates and not updates.get("is_global"):
-            updates["subscribers"] = [original["user"]] if original["user"] in original.get("subscribers", []) else []
+            # First find the subscriber entry for the original user
+            subscriber = next(
+                (
+                    subscriber
+                    for subscriber in original.get("subscribers", [])
+                    if subscriber["user_id"] == original["user"]
+                ),
+                None,
+            )
+
+            # Then construct new array with either subscriber found or empty list
+            updates["subscribers"] = [subscriber] if subscriber is not None else []
 
         if updates.get("folder"):
             updates["folder"] = ObjectId(updates["folder"])
@@ -91,18 +123,38 @@ def get_user_topics(user_id):
     )
 
 
-def get_topics_with_subscribers(topic_type: str):
+def get_topics_with_subscribers(topic_type: Optional[str] = None) -> List[Topic]:
+    lookup: Dict[str, Any] = (
+        {"subscribers": {"$exists": True, "$ne": []}}
+        if topic_type is None
+        else {
+            "$and": [
+                {"subscribers": {"$exists": True, "$ne": []}},
+                {"topic_type": topic_type},
+            ]
+        }
+    )
+
     return list(
         superdesk.get_resource_service("topics").get(
             req=None,
-            lookup={
-                "$and": [
-                    {"subscribers": {"$exists": True, "$ne": []}},
-                    {"topic_type": topic_type},
-                ]
-            },
+            lookup=lookup,
         )
     )
+
+
+def get_user_id_to_topic_for_subscribers(
+    notification_type: Optional[str] = None,
+) -> Dict[ObjectId, Dict[ObjectId, Topic]]:
+    user_topic_map: Dict[ObjectId, Dict[ObjectId, Topic]] = {}
+    for topic in get_topics_with_subscribers():
+        for subscriber in topic.get("subscribers") or []:
+            if notification_type is not None and subscriber["notification_type"] != notification_type:
+                continue
+            user_topic_map.setdefault(subscriber["user_id"], {})
+            user_topic_map[subscriber["user_id"]][topic["_id"]] = topic
+
+    return user_topic_map
 
 
 def get_agenda_notification_topics_for_query_by_id(item, users):
@@ -123,6 +175,30 @@ def get_agenda_notification_topics_for_query_by_id(item, users):
 
     # filter out the topics those belong to inactive users
     return [t for t in topics if users.get(str(t["user"]))]
+
+
+def auto_enable_user_emails(updates: Topic, original: Topic, user: User):
+    if not updates.get("subscribers"):
+        return
+
+    # If current user is already subscribed to this topic,
+    # then no need to enable their email notifications
+    for subscriber in original.get("subscribers") or []:
+        if subscriber["user_id"] == user["_id"]:
+            return
+
+    user_newly_subscribed = False
+    for subscriber in updates.get("subscribers") or []:
+        if subscriber["user_id"] == user["_id"]:
+            user_newly_subscribed = True
+            break
+
+    if not user_newly_subscribed:
+        return
+
+    # The current user subscribed to this topic in this update
+    # Enable their email notifications now
+    superdesk.get_resource_service("users").patch(user["_id"], updates={"receive_email": True})
 
 
 topics_service = TopicsService()

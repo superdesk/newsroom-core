@@ -447,7 +447,7 @@ def test_notify_topic_matches_for_new_event_item(client, app, mocker):
         topic = {
             "label": "bar",
             "query": "foo",
-            "subscribers": [user],
+            "subscribers": [{"user_id": user, "notification_type": "real-time"}],
             "is_global": False,
             "topic_type": "agenda",
         }
@@ -491,7 +491,7 @@ def test_notify_topic_matches_for_new_planning_item(client, app, mocker):
         topic = {
             "label": "bar",
             "query": "foo",
-            "subscribers": [user],
+            "subscribers": [{"user_id": user, "notification_type": "real-time"}],
             "is_global": False,
             "topic_type": "agenda",
         }
@@ -542,7 +542,7 @@ def test_notify_topic_matches_for_ad_hoc_planning_item(client, app, mocker):
         topic = {
             "label": "bar",
             "query": "bar3",
-            "subscribers": [user],
+            "subscribers": [{"user_id": user, "notification_type": "real-time"}],
             "is_global": False,
             "topic_type": "agenda",
         }

@@ -7,7 +7,7 @@ from typing import Optional
 from bson import ObjectId
 from eve.auth import BasicAuth
 from flask import Blueprint, session, abort
-from newsroom.types import Company, User
+from newsroom.types import Company, User, UserAuth
 
 blueprint = Blueprint("auth", __name__)
 
@@ -61,12 +61,12 @@ def get_user_id():
     return None
 
 
-def get_auth_user_by_email(email):
+def get_auth_user_by_email(email) -> Optional[UserAuth]:
     """Returns the user from auth by the email case insensitive"""
     return _get_user_by_email(email, "auth_user")
 
 
-def get_user_by_email(email):
+def get_user_by_email(email) -> Optional[User]:
     """Returns the user from users by the email case insensitive"""
     return _get_user_by_email(email, "users")
 

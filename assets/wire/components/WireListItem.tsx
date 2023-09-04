@@ -17,7 +17,6 @@ import {
     showItemVersions,
     shortText,
     isKilled,
-    getVideos,
     getCaption,
     shortHighlightedtext,
 } from 'wire/utils';
@@ -135,7 +134,7 @@ class WireListItem extends React.Component<any, any> {
             'wire-articles__item-wrap col-12 wire-item'
         );
         const wrapClassName = classNames(
-            'wire-articles__item wire-articles__item--list',
+            'wire-articles__item wire-articles__item--wire wire-articles__item--list',
             {
                 'wire-articles__item--visited': this.props.isRead,
                 'wire-articles__item--open': this.props.isActive,
@@ -147,7 +146,6 @@ class WireListItem extends React.Component<any, any> {
             'wire-articles__item-select': LIST_ANIMATIONS,
         });
         const picture = getPicture(item);
-        const videos = getVideos(item);
         const isMarketPlace = this.props.context === 'aapX';
         const fields = listConfig.metadata_fields || DEFAULT_META_FIELDS;
         const compactFields = listConfig.compact_metadata_fields || DEFAULT_COMPACT_META_FIELDS;

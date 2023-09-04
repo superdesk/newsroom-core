@@ -1,7 +1,9 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
+
+import {ICompany, IProduct} from '../../interfaces';
 
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
@@ -10,16 +12,51 @@ import AuditInformation from 'components/AuditInformation';
 import {EditUserProductPermission} from './EditUserProductPermission';
 
 import {gettext} from 'utils';
-import {isUserAdmin, getUserTypes, getUserLabel, userTypeReadOnly, getLocaleInputOptions, getDefaultLocale, isUserCompanyAdmin} from '../utils';
+import {
+    isUserAdmin,
+    getUserTypes,
+    getUserLabel,
+    userTypeReadOnly,
+    getLocaleInputOptions,
+    getDefaultLocale,
+    isUserCompanyAdmin,
+} from '../utils';
 import {FormToggle} from 'ui/components/FormToggle';
 
 import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserListItem';
 
 import {companyProductSeatsSelector, companySectionListSelector, sectionListSelector} from 'company-admin/selectors';
+import {IUser} from 'interfaces/user';
+import {IUserProfileStore} from 'user-profile/reducers';
+import ActionButton from 'components/ActionButton';
 
-const getCompanyOptions = (companies: any) => companies.map((company: any) => ({value: company._id, text: company.name}));
+const getCompanyOptions = (companies: Array<ICompany>) => companies.map((company) => ({value: company._id, text: company.name}));
 
-function EditUserComponent({
+interface IReduxStoreProps {
+    allSections: Array<any>;
+    companySections: any;
+    seats: any;
+}
+
+interface IProps extends IReduxStoreProps {
+    original: IUser;
+    user: IUser;
+    onChange: (event: any) => void;
+    errors: any;
+    companies: Array<ICompany>;
+    onSave: (event: any) => void;
+    onResetPassword: () => void;
+    onClose: (event: any) => void;
+    onDelete: (event: any) => void;
+    currentUser: IUser;
+    products: Array<IProduct>;
+    resendUserInvite: () => void;
+    hideFields: Array<string>;
+    toolbar?: any;
+
+}
+
+const EditUserComponent: React.ComponentType<IProps> = ({
     original,
     user,
     onChange,
@@ -37,22 +74,34 @@ function EditUserComponent({
     companySections,
     seats,
     resendUserInvite,
-}: any) {
+}) => {
     const companyId = user.company;
     const localeOptions = getLocaleInputOptions();
     const stateLabelDetails = getUserStateLabelDetails(user);
-    const companyProductIds = companyId != null ?
-        Object.keys(seats[companyId] || {}) :
-        products.map((product: any) => product._id);
-    const sections = companyId != null ?
-        companySections[companyId] || [] :
-        allSections;
+    const companyProductIds = companyId != null
+        ? Object.keys(seats[companyId] || {})
+        : products.map((product: any) => product._id);
+    const sections = companyId != null ? companySections[companyId] || [] : allSections;
     const companySectionIds = sections.map((section: any) => section._id);
     const currentUserIsAdmin = isUserAdmin(currentUser);
     const isCompanyAdmin = isUserCompanyAdmin(currentUser);
+    const company = companies.find((c) => c._id === user.company);
     const userIsAdmin = isUserAdmin(user);
+    const showResendInvite = (user._id == null || user.is_validated === true) && (
+        (company?.auth_provider ?? 'newshub') === 'newshub'
+    );
 
-    const company = companies.map((value: any)=> value.name);
+    const resendInviteButton = {
+        name: gettext('Resend Invite'),
+        icon: 'refresh',
+        tooltip: gettext('Resend Invite'),
+        multi: false,
+        action: () => {
+            if (confirm(gettext('Would you like to resend the invitation for {{ email }}?', {email: user.email}))) {
+                resendUserInvite();
+            }
+        },
+    };
 
     return (
         <div
@@ -85,22 +134,13 @@ function EditUserComponent({
                                     {gettext('admin')}
                                 </label>
                             )}
-                            {(user._id == null || user.is_validated === true) ? null : (
-                                <button
-                                    type="button"
+                            {!showResendInvite ? null : (
+                                <ActionButton
+                                    key={resendInviteButton.name}
                                     className="icon-button icon-button--small icon-button--secondary"
                                     aria-label={gettext('Resend Invite')}
-                                    title={gettext('Resend Invite')}
-                                    onClick={(event: any) => {
-                                        event.preventDefault();
-
-                                        if (confirm(gettext('Would you like to resend the invitation for {{ email }}?', {email: user.email}))) {
-                                            resendUserInvite();
-                                        }
-                                    }}
-                                >
-                                    <i className="icon--refresh" role="presentation"></i>
-                                </button>
+                                    action={resendInviteButton}
+                                />
                             )}
                         </div>
                         {(currentUserIsAdmin && user._id != null && user._id !== currentUser._id) && (
@@ -173,24 +213,30 @@ function EditUserComponent({
                                 label={gettext('User Type')}
                                 value={user.user_type}
                                 options={userTypeReadOnly(user, currentUser) ? [] : getUserTypes(currentUser) }
-                                defaultOption={userTypeReadOnly(user, currentUser) ? getUserLabel(user.user_type) : null}
+                                defaultOption={userTypeReadOnly(user, currentUser) ? getUserLabel(user.user_type) : undefined}
                                 readOnly={userTypeReadOnly(user, currentUser) || isUserCompanyAdmin(currentUser)}
                                 onChange={onChange}
                                 error={errors ? errors.user_type : null}/>)}
-                            {hideFields.includes('company') ? (<TextInput
-                                name='company'
-                                label={gettext('Company')}
-                                value={company[0]}
-                                onChange={onChange}
-                                readOnly={isUserCompanyAdmin(currentUser)}
-                                error={errors ? errors.role : null} />) : (<SelectInput
-                                name='company'
-                                label={gettext('Company')}
-                                value={user.company}
-                                defaultOption={''}
-                                options={getCompanyOptions(companies)}
-                                onChange={onChange}
-                                error={errors ? errors.company : null} />)}
+                            {hideFields.includes('company') ? (
+                                <TextInput
+                                    name='company'
+                                    label={gettext('Company')}
+                                    value={company?.name}
+                                    onChange={onChange}
+                                    readOnly={isUserCompanyAdmin(currentUser)}
+                                    error={errors ? errors.company : null}
+                                />
+                            ) : (
+                                <SelectInput
+                                    name='company'
+                                    label={gettext('Company')}
+                                    value={user.company}
+                                    defaultOption={''}
+                                    options={getCompanyOptions(companies)}
+                                    onChange={onChange}
+                                    error={errors ? errors.company : null}
+                                />
+                            )}
 
                             {(!localeOptions.length || hideFields.includes('language')) ? null : (
                                 <SelectInput
@@ -334,38 +380,14 @@ function EditUserComponent({
             </div>
         </div>
     );
-}
-
-EditUserComponent.propTypes = {
-    original: PropTypes.object,
-    user: PropTypes.object.isRequired,
-    onChange: PropTypes.func,
-    errors: PropTypes.object,
-    companies: PropTypes.arrayOf(PropTypes.object),
-    onSave: PropTypes.func.isRequired,
-    onResetPassword: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired,
-    onDelete: PropTypes.func.isRequired,
-    resendUserInvite: PropTypes.func.isRequired,
-    currentUser: PropTypes.object,
-    toolbar: PropTypes.node,
-    products: PropTypes.arrayOf(PropTypes.object),
-    hideFields: PropTypes.arrayOf(PropTypes.string),
-    allSections: PropTypes.arrayOf(PropTypes.object),
-    companySections: PropTypes.object,
-    seats: PropTypes.object,
 };
 
-EditUserComponent.defaultProps = {
-    hideFields: [],
-};
-
-const mapStateToProps = (state: any) => ({
+const mapStateToProps = (state: IUserProfileStore): IReduxStoreProps => ({
     allSections: sectionListSelector(state),
     companySections: companySectionListSelector(state),
     seats: companyProductSeatsSelector(state),
 });
 
-const EditUser: React.ComponentType<any> = connect(mapStateToProps)(EditUserComponent);
+const EditUser = connect<IReduxStoreProps>(mapStateToProps)(EditUserComponent);
 
 export default EditUser;

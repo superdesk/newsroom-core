@@ -173,15 +173,16 @@ CORE_APPS = [
     "newsroom.email_templates",
     "newsroom.company_admin",
     "newsroom.search",
+    "newsroom.notifications.send_scheduled_notifications",
 ]
 
 SITE_NAME = "AAP Newsroom"
 COPYRIGHT_HOLDER = "AAP"
 COPYRIGHT_NOTICE = ""
 USAGE_TERMS = ""
-CONTACT_ADDRESS = "https://www.aap.com.au/contact/sales-inquiries/"
-PRIVACY_POLICY = "https://www.aap.com.au/legal/"
-TERMS_AND_CONDITIONS = "https://www.aap.com.au/legal/"
+CONTACT_ADDRESS = "#"
+PRIVACY_POLICY = "#"
+TERMS_AND_CONDITIONS = "#"
 SHOW_COPYRIGHT = True
 SHOW_USER_REGISTER = False
 
@@ -303,12 +304,24 @@ CLIENT_LOCALE_FORMATS = {
         "COVERAGE_DATE_TIME_FORMAT": "HH:mm DD/MM",
         "COVERAGE_DATE_FORMAT": "DD/MM",
         "DATE_FORMAT_HEADER": "EEEE, dd/MM/yyyy",
+        "NOTIFICATION_EMAIL_TIME_FORMAT": "HH:mm a",
+        "NOTIFICATION_EMAIL_DATE_FORMAT": "MMMM d, yyyy",
     },
     "fr_CA": {  # example - you can overwrite any format above
         "DATE_FORMAT": "DD/MM/YYYY",
         "DATE_FORMAT_HEADER": "EEEE, 'le' d MMMM yyyy",
     },
 }
+
+#: Default times for scheduled topic notifications
+#:
+#: .. versionadded: 2.5.0
+#:
+DEFAULT_SCHEDULED_NOTIFICATION_TIMES = [
+    "07:00",
+    "15:00",
+    "19:00",
+]
 
 # Client configuration
 CLIENT_CONFIG = {
@@ -339,6 +352,7 @@ CLIENT_CONFIG = {
             "agenda": ["name", "headline", "slugline", "description"],
         },
     },
+    "scheduled_notifications": {"default_times": DEFAULT_SCHEDULED_NOTIFICATION_TIMES},
 }
 
 # Enable iframely support for item body_html
@@ -358,13 +372,22 @@ CELERY_TASK_QUEUES = (
         Exchange(celery_queue("newsroom"), type="topic"),
         routing_key="newsroom.#",
     ),
+    Queue(
+        celery_queue("newsroom.push"),
+        Exchange(celery_queue("newsroom.push")),
+        routing_key="newsroom.push",
+    ),
 )
 
 CELERY_TASK_ROUTES = {
+    "newsroom.push.*": {
+        "queue": celery_queue("newsroom.push"),
+        "routing_key": "newsroom.push",
+    },
     "newsroom.*": {
         "queue": celery_queue("newsroom"),
         "routing_key": "newsroom.task",
-    }
+    },
 }
 
 
@@ -389,6 +412,10 @@ CELERY_BEAT_SCHEDULE = {
     "newsroom:remove_expired_agenda": {
         "task": "newsroom.commands.async_remove_expired_agenda",
         "schedule": crontab(hour=local_to_utc_hour(3), minute=0),  # Runs every day at 3am
+    },
+    "newsroom:send_scheduled_notifications": {
+        "task": "newsroom.notifications.send_scheduled_notifications.send_scheduled_notifications",
+        "schedule": crontab(minute="*/5"),
     },
 }
 
@@ -575,3 +602,52 @@ MONITORING_SECTION = lazy_gettext("Monitoring")
 #: .. versionadded: 2.5.0
 #:
 SAVED_SECTION = lazy_gettext("Saved / Watched")
+
+#:
+#: .. versionadded: 2.5.0
+#:
+WIRE_SEARCH_FIELDS = [
+    "slugline",
+    "headline",
+    "byline",
+    "body_html",
+    "body_text",
+    "description_html",
+    "description_text",
+    "keywords",
+    "located",
+]
+
+#:
+#: .. versionadded: 2.5.0
+#:
+AGENDA_SEARCH_FIELDS = [
+    "name",
+    "slugline",
+    "headline",
+    "definition_short",
+    "definition_long",
+    "description_text",
+    "location.name",
+]
+
+#: The available authentication providers
+#:
+#: .. versionadded:: 2.5.0
+#:
+AUTH_PROVIDERS = [
+    {
+        "_id": "newshub",
+        "name": lazy_gettext("Newshub"),
+        "auth_type": "password",
+        "features": {"verify_email": True},
+    }
+]
+
+#:
+#: If `True` it will show multi day events only on starting day,
+#  when `False` those will be visible on every day.
+#:
+#: .. versionadded: 2.5.0
+#:
+AGENDA_SHOW_MULTIDAY_ON_START_ONLY = True

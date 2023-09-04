@@ -2,6 +2,7 @@ import {createSelector} from 'reselect';
 import {get, find, filter as removeNulls, isEqual, isEmpty} from 'lodash';
 
 export const searchQuerySelector = (state: any) => get(state, 'search.activeQuery') || null;
+export const searchSortQuerySelector = (state: any) => get(state, 'search.activeSortQuery') || null;
 export const searchFilterSelector = (state: any) => get(state, 'search.activeFilter');
 export const searchCreatedSelector = (state: any) => get(state, 'search.createdFilter');
 export const searchNavigationSelector = (state: any) => get(state, 'search.activeNavigation') || [];
@@ -54,25 +55,15 @@ export const activeProductSelector = createSelector(
 export const resultsFilteredSelector = (state: any) => state.resultsFiltered;
 
 export const searchParamsSelector = createSelector(
-    [searchQuerySelector, searchCreatedSelector, searchNavigationSelector, searchFilterSelector, searchProductSelector, advancedSearchParamsSelector],
-    (query: any, created: any, navigation: any, filter: any, product: any, advancedSearchParams: any) => {
-        const params: any = {};
-
-        if (!isEmpty(query)) {
-            params.query = query;
-        }
-
-        if (!isEmpty(created)) {
-            params.created = created;
-        }
-
-        if (!isEmpty(navigation)) {
-            params.navigation = navigation;
-        }
-
-        if (product) {
-            params.product = product;
-        }
+    [searchQuerySelector, searchSortQuerySelector, searchCreatedSelector, searchNavigationSelector, searchFilterSelector, searchProductSelector, advancedSearchParamsSelector],
+    (query: any, sortQuery: any, created: any, navigation: any, filter: any, product: any, advancedSearchParams: any) => {
+        const params: any = {
+            query: !isEmpty(query) ? query : null,
+            sortQuery: !isEmpty(sortQuery) ? sortQuery : null,
+            created: !isEmpty(created) ? created : null,
+            navigation: !isEmpty(navigation) ? navigation : null,
+            product: !isEmpty(product) ? product : null,
+        };
 
         if (advancedSearchParams.all || advancedSearchParams.any || advancedSearchParams.exclude) {
             params.advanced = {fields: advancedSearchParams.fields};
@@ -86,6 +77,8 @@ export const searchParamsSelector = createSelector(
             if (advancedSearchParams.exclude) {
                 params.advanced.exclude = advancedSearchParams.exclude;
             }
+        } else {
+            params.advanced = null;
         }
 
         if (filter && Object.keys(filter).length > 0) {
@@ -106,6 +99,8 @@ export const searchParamsSelector = createSelector(
             if (isEmpty(params.filter)) {
                 delete params.filter;
             }
+        } else {
+            params.filter = null;
         }
 
         return params;
@@ -157,9 +152,14 @@ export const showSaveTopicSelector = createSelector(
 export const isSearchFiltered = createSelector(
     [searchParamsSelector],
     (params: any) => {
-        return get(params, 'query', '').length > 0 ||
-            Object.keys(get(params, 'created', {})).filter((key: any) => get(params.created, key)).length > 0 ||
-            Object.keys(get(params, 'filter', {})).filter((key: any) => get(params.filter, key)).length > 0;
+        return (
+            (params.query?.length ?? 0) > 0 ||
+            Object.keys(params.created ?? {}).filter((key) => params.created?.[key]).length > 0 ||
+            Object.keys(params.filter ?? {}).filter((key) => params.filter?.[key]).length > 0 ||
+            (params.advanced?.all?.length ?? 0) > 0 ||
+            (params.advanced?.any?.length ?? 0) > 0 ||
+            (params.advanced?.exclude?.length ?? 0) > 0
+        );
     }
 );
 

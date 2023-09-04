@@ -39,8 +39,6 @@ describe('CompanyAdmin - Product Seats', function () {
             user_type: USERS.foobar.monkey.user_type,
             company_read_only: COMPANIES.foobar.name,
             locale: '',
-            is_approved: true,
-            is_enabled: true,
             expiry_alert: false,
             manage_company_topics: false,
         });
@@ -85,8 +83,6 @@ describe('CompanyAdmin - Product Seats', function () {
                 user_type: 'public',
                 company_read_only: 'Foo Bar & Co',
                 locale: '',
-                is_approved: true,
-                is_enabled: true,
                 expiry_alert: true,
                 manage_company_topics: false,
             });

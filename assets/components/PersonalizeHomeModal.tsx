@@ -13,6 +13,7 @@ import {updateUser} from 'users/actions';
 import {getCurrentUser} from 'company-admin/selectors';
 import {IAgendaState} from 'agenda/reducers';
 import {ITopic} from 'interfaces/topic';
+import {IPersonalizedDashboardsWithData} from 'home/reducers';
 
 interface IMapStateProps {
     topics: Array<ITopic>;
@@ -26,6 +27,7 @@ interface IMapDispatchProps {
 }
 
 interface IOwnProps {
+    personalizedDashboards: Array<IPersonalizedDashboardsWithData>;
     closeModal?: () => void;
 }
 
@@ -39,14 +41,6 @@ interface IState {
 }
 
 const MAX_SELECTED_TOPICS = 6;
-
-const getSelectedTopicIds = (user: IUser) => {
-    if (user.dashboards?.length) {
-        return user.dashboards[0].topic_ids ?? [];
-    }
-
-    return [];
-};
 
 class PersonalizeHomeModal extends React.Component<IProps, IState> {
 
@@ -62,7 +56,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
         this.wireTopicsById = new Map(this.wireTopics.map((topic) => [topic._id, topic]));
 
         this.state = {
-            selectedTopicIds: getSelectedTopicIds(this.props.currentUser),
+            selectedTopicIds: (this.props.personalizedDashboards?.[0]?.topic_items ?? []).map((item) => item._id),
             activeSection: '1',
             searchTerm: '',
             isLoading: false,
@@ -120,7 +114,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
     render() {
         const NoSearchMatches = () => (
             <div className="empty-state__container mt-3">
-                <div className="empty-state">
+                <div className="empty-state empty-state--small">
                     <figure className="empty-state__graphic">
                         <img src="/static/empty-states/empty_state--small.svg" role="presentation" alt="" />
                     </figure>
@@ -149,12 +143,12 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                     className="empty-state empty-state--large"
                 >
                     <figure className="empty-state__graphic">
-                        <img src="/static/empty-states/empty_state--small.svg" role="presentation" alt="" />
+                        <img src="/static/empty-states/empty_state--large.svg" role="presentation" alt="" />
                     </figure>
                     <figcaption className="empty-state__text">
-                        <h4 className="empty-state__text-heading">{gettext('You don\'t have any saved Topics yet')}</h4>
+                        <h4 className="empty-state__text-heading">{gettext('No items yet')}</h4>
                         <p className="empty-state__text-description">
-                            {gettext('You can create Topics by saving search terms and/or filters from the Wire and Agenda sections.')}
+                            {gettext('Select some topics from the sidebar to add them here.')}
                         </p>
                     </figcaption>
                 </div>
@@ -208,13 +202,10 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                 {this.getSelectedTopics().map((topic) => {
                     return (
                         <div
-                            style={{
-                                width: '100%',
-                            }}
                             key={topic._id}
-                            className="simple-card flex-row simple-card--compact simple-card--draggable"
+                            className="simple-card flex-row simple-card--compact" // class simple-card--draggable is removed because drag and drop isn't implemented yet
                         >
-                            <div style={{paddingLeft: 24}} className='simple-card__content'>
+                            <div className='simple-card__content'>
                                 <h6 className="simple-card__headline" title="">{topic.label}</h6>
                                 <div className="simple-card__row">
                                     <div className="simple-card__column simple-card__column--align-start">
@@ -255,22 +246,29 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                 }}
             >
                 <div
+                    className="full-page-layout__content"
                     style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        gap: 12,
                         height: '100%',
                     }}
                 >
-                    <aside style={{width: '25%'}} className="full-page-layout__content-aside">
+                    <aside className="full-page-layout__content-aside">
                         <div className="full-page-layout__content-aside-inner">
                             <p className='font-size--medium text-color--muted mt-1 mb-3'>
                                 {gettext('Select up to 6 Topics you want to display on your personal Home screen.')}
                             </p>
-                            <p className='font-size--large'>{gettext('{{size}} out of 6 topics selected', {size: this.state.selectedTopicIds.length || 0})}</p>
+                            <p className='font-size--large'>
+                                {
+                                    gettext(
+                                        '{{size}} out of 6 topics selected',
+                                        {size: this.state.selectedTopicIds.length}
+                                    )
+                                }
+                            </p>
                             <RadioButtonGroup
                                 activeOptionId={this.state.activeSection}
+                                size='small'
+                                fullWidth
+                                className='mb-3'
                                 options={[
                                     {
                                         _id: '1',
@@ -287,7 +285,6 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                                     });
                                 }}
                             />
-                            <div style={{padding: 6}} />
                             <div className="search search--small search--with-icon search--bordered m-0">
                                 <form className="search__form" role="search" aria-label="search">
                                     <i className="icon--search icon--muted-2"></i>
@@ -317,12 +314,6 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                         </div>
                     </aside>
                     <div
-                        style={{
-                            width: '75%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                        }}
                         className='full-page-layout__content-main'
                     >
                         <Input disabled value={gettext('My Home')} />

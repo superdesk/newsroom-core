@@ -38,6 +38,7 @@ def get_settings_data():
         "ui_config": get_resource_service("ui_config").get_section_config("companies"),
         "countries": app.countries,
         "sso_enabled": bool(app.config.get("SAML_CLIENTS") or app.config.get("SAML_PATH")),
+        "auth_providers": app.config.get("AUTH_PROVIDERS"),
     }
 
 
@@ -107,6 +108,7 @@ def get_company_updates(data, original=None):
         "monitoring_administrator": data.get("monitoring_administrator") or original.get("monitoring_administrator"),
         "allowed_ip_list": data.get("allowed_ip_list") or original.get("allowed_ip_list"),
         "auth_domain": data.get("auth_domain"),
+        "auth_provider": data.get("auth_provider") or original.get("auth_provider") or "newshub",
     }
 
     for field in ["sections", "archive_access", "events_only", "restrict_coverage_info", "products", "seats"]:

@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {gettext, isDisplayed, isMobilePhone} from 'utils';
 import {get} from 'lodash';
-import {getCardDashboardComponent} from 'components/cards/utils';
+import {getCard} from 'components/cards/utils';
 import getItemActions from 'wire/item-actions';
 import ItemDetails from 'wire/components/ItemDetails';
 import {openItemDetails, setActive, fetchCardExternalItems, fetchCompanyCardItems} from '../actions';
@@ -68,6 +68,8 @@ class HomeApp extends React.Component<IProps, IState> {
 
     height: number;
     elem: any;
+    hasPersonalDashboard: boolean;
+
     constructor(props: any, context: any) {
         super(props, context);
         this.getPanels = this.getPanels.bind(this);
@@ -76,9 +78,11 @@ class HomeApp extends React.Component<IProps, IState> {
         this.onHomeScroll = this.onHomeScroll.bind(this);
         this.height = 0;
 
+        this.hasPersonalDashboard = (this.props.personalizedDashboards?.[0]?.topic_items?.length ?? 0) > 0;
+
         this.state = {
             loadingItems: true,
-            activeOptionId: this.props.personalizedDashboards.length > 0 ? 'my-home' : 'default',
+            activeOptionId: this.hasPersonalDashboard ? 'my-home' : 'default',
         };
     }
 
@@ -112,7 +116,7 @@ class HomeApp extends React.Component<IProps, IState> {
     onHomeScroll(event: any) {
         const container = event.target;
         const BUFFER = 100;
-        if(container.scrollTop + this.height + BUFFER >= container.scrollHeight) {
+        if (container.scrollTop + this.height + BUFFER >= container.scrollHeight) {
             (document.getElementById('footer') as any).className = 'footer';
         } else {
             (document.getElementById('footer') as any).className = 'footer footer--home';
@@ -125,26 +129,29 @@ class HomeApp extends React.Component<IProps, IState> {
 
     getPanelsForPersonalizedDashboard() {
         const {personalizedDashboards} = this.props;
-        const Panel: React.ComponentType<any> = getCardDashboardComponent('4-media-gallery');
-        const personalizedDashboardTopicIds = personalizedDashboards?.[0].topic_items?.map(({_id}: any) => _id);
-        const topicItems = this.props.topics.filter((topic) => personalizedDashboardTopicIds?.includes(topic._id));
+        const Card = getCard('4-picture-text');
+        const personalizedDashboardTopicIds = personalizedDashboards?.[0].topic_items?.map(({_id}) => _id);
+        const topicItems = this.props.topics.filter(({_id}) => personalizedDashboardTopicIds?.includes(_id));
 
         return (
-            personalizedDashboards?.[0].topic_items?.map((item: any) => {
-                const currentTopic = topicItems.find((x) => x._id === item._id);
+            personalizedDashboards?.[0].topic_items?.map((item) => {
+                const currentTopic = topicItems.find(({_id}) => _id === item._id);
 
                 return (
-                    <Panel
-                        key={item._id}
-                        type="4-picture-text"
-                        items={item.items}
-                        title={currentTopic?.label}
-                        productId={item.items[0].productId ?? ''}
-                        openItem={this.props.openItemDetails}
-                        isActive={this.props.activeCard === item._id}
-                        cardId={item._id}
-                        listConfig={this.props.listConfig}
-                    />
+                    Card?._id === '4-picture-text' && currentTopic && (
+                        <Card.dashboardComponent
+                            kind="topic"
+                            key={item._id}
+                            type="4-picture-text"
+                            items={item.items}
+                            title={currentTopic?.label}
+                            id={currentTopic?._id}
+                            openItem={this.props.openItemDetails}
+                            isActive={this.props.activeCard === item._id}
+                            cardId={item._id}
+                            listConfig={this.props.listConfig}
+                        />
+                    )
                 );
             })
         );
@@ -153,7 +160,7 @@ class HomeApp extends React.Component<IProps, IState> {
     getPanels(card: any) {
         if (this.state.loadingItems) {
             return (
-                <CardRow key={card.label} title={card.label} productId={this.getProductId(card)} isActive={this.props.activeCard === card._id}>
+                <CardRow key={card.label} title={card.label} id={this.getProductId(card)} isActive={this.props.activeCard === card._id}>
                     <div className='col-sm-6 col-md-4 col-lg-3 col-xxl-2 d-flex mb-4'>
                         <div className="spinner-border text-success" />
                         <span className="a11y-only">{gettext('Loading Card Items')}</span>
@@ -162,44 +169,63 @@ class HomeApp extends React.Component<IProps, IState> {
             );
         }
 
-        const Panel: React.ComponentType<any> = getCardDashboardComponent(card.type);
+        const Card = getCard(card.type);
         const items = this.props.itemsByCard[card.label] || [];
 
-        if (card.type === '4-photo-gallery') {
-            return <Panel
-                key={card.label}
-                photos={items}
-                title={card.label}
-                moreUrl={card.config.more_url}
-                moreUrlLabel={card.config.more_url_label}
-                listConfig={this.props.listConfig}
-            />;
-        }
-        if (card.type === '2x2-events') {
-            return <Panel
-                key={card.label}
-                events={get(card, 'config.events')}
-                title={card.label}
-                listConfig={this.props.listConfig}
-            />;
+        if (Card?._id === '4-photo-gallery') {
+            return (
+                <Card.dashboardComponent
+                    key={card.label}
+                    photos={items}
+                    title={card.label}
+                    moreUrl={card.config.more_url}
+                    moreUrlLabel={card.config.more_url_label}
+                    listConfig={this.props.listConfig}
+                />
+            );
         }
 
-        return <Panel
-            key={card.label}
-            type={card.type}
-            items={items}
-            title={card.label}
-            productId={this.getProductId(card)}
-            openItem={this.props.openItemDetails}
-            isActive={this.props.activeCard === card._id}
-            cardId={card._id}
-            listConfig={this.props.listConfig}
-        />;
+        if (Card?._id === '2x2-events') {
+            return (
+                <Card.dashboardComponent
+                    key={card.label}
+                    events={get(card, 'config.events')}
+                    title={card.label}
+                />
+            );
+        }
+
+        if (Card?._id === '6-navigation-row') {
+            return (
+                <Card.dashboardComponent
+                    key={card.label}
+                    card={card}
+                />
+            );
+        }
+
+        const DashboardComponent = Card?.dashboardComponent;
+
+        return (
+            DashboardComponent && (
+                <DashboardComponent
+                    key={card.label}
+                    type={card.type}
+                    items={items}
+                    title={card.label}
+                    id={this.getProductId(card)}
+                    openItem={this.props.openItemDetails}
+                    isActive={this.props.activeCard === card._id}
+                    cardId={card._id}
+                    listConfig={this.props.listConfig}
+                />
+            )
+        );
     }
 
     filterActions(item: any, config: any) {
-        return this.props.actions.filter((action: any) =>  (!config || isDisplayed(action.id, config)) &&
-          (!action.when || action.when(this.props, item)));
+        return this.props.actions.filter((action: any) => (!config || isDisplayed(action.id, config)) &&
+            (!action.when || action.when(this.props, item)));
     }
 
     renderContent(children?: any): any {
@@ -226,7 +252,7 @@ class HomeApp extends React.Component<IProps, IState> {
                             }}
                         >
                             {
-                                (this.props.personalizedDashboards?.length ?? 0) < 1 ? (
+                                !this.hasPersonalDashboard ? (
                                     <div className="home-tools">
                                         <button
                                             onClick={() => {
@@ -240,51 +266,51 @@ class HomeApp extends React.Component<IProps, IState> {
                                         </button>
                                     </div>
                                 ) : (
-                                    <div>
-                                        <div
-                                            style={{
-                                                display: 'flex',
-                                                flexDirection: 'row',
-                                                alignItems: 'center'
+
+                                    <div className="home-tools">
+                                        <RadioButtonGroup
+                                            size='small'
+                                            options={[
+                                                {
+                                                    _id: 'default',
+                                                    name: gettext('Default')
+                                                },
+                                                {
+                                                    _id: 'my-home',
+                                                    name: gettext('My home')
+                                                },
+                                            ]}
+                                            activeOptionId={this.state.activeOptionId}
+                                            switchOptions={(optionId) => {
+                                                if (optionId === 'default' || optionId === 'my-home') {
+                                                    this.setState({
+                                                        activeOptionId: optionId
+                                                    });
+                                                }
                                             }}
-                                            className="home-tools"
+                                        />
+                                        <button
+                                            onClick={() => {
+                                                this.props.personalizeHome();
+                                            }}
+                                            type="button"
+                                            className="icon-button icon-button--small icon-button--tertiary icon-button--bordered"
+                                            title={gettext('Edit personal Home')}
                                         >
-                                            <RadioButtonGroup
-                                                options={[
-                                                    {
-                                                        _id: 'default',
-                                                        name: gettext('Default')
-                                                    },
-                                                    {
-                                                        _id: 'my-home',
-                                                        name: gettext('My home')
-                                                    },
-                                                ]}
-                                                activeOptionId={this.state.activeOptionId}
-                                                switchOptions={(optionId) => {
-                                                    if (optionId === 'default' || optionId === 'my-home') {
-                                                        this.setState({
-                                                            activeOptionId: optionId
-                                                        });
-                                                    }
-                                                }}
-                                            />
-                                            <button
-                                                onClick={() => {
-                                                    this.props.personalizeHome();
-                                                }}
-                                                type="button"
-                                                className="icon-button icon-button--small icon-button--tertiary icon-button--bordered"
-                                                title={gettext('Edit personal Home')}
-                                            >
-                                                <i className="icon--settings"></i>
-                                            </button>
-                                        </div>
+                                            <i className="icon--settings"></i>
+                                        </button>
                                     </div>
+
                                 )
                             }
                         </div>
-                        {this.props.modal?.modal === 'personalizeHome' && <PersonalizeHomeSettingsModal />}
+                        {
+                            this.props.modal?.modal === 'personalizeHome' && (
+                                <PersonalizeHomeSettingsModal
+                                    personalizedDashboards={this.props.personalizedDashboards}
+                                />
+                            )
+                        }
                         {
                             this.state.activeOptionId === 'my-home' ? (
                                 this.getPanelsForPersonalizedDashboard()
@@ -363,7 +389,7 @@ class HomeApp extends React.Component<IProps, IState> {
     }
 }
 
-const mapStateToProps = (state: any) =>({
+const mapStateToProps = (state: any) => ({
     cards: state.cards,
     personalizedDashboards: state.personalizedDashboards,
     itemsByCard: state.itemsByCard,

@@ -18,20 +18,43 @@ import {
     deselectMyTopic,
 } from '../../actions';
 
+import {Dropdown} from './../../../components/Dropdown';
+
 import {SearchResultTagsList} from './SearchResultTagsList';
 import NewItemsIcon from '../NewItemsIcon';
 
 
 class SearchResultsBarComponent extends React.Component<any, any> {
+    sortValues = [
+        {
+            label: gettext('Date (Newest)'),
+            sortFunction: () => this.setSortQuery('versioncreated:desc'),
+        },
+        {
+            label: gettext('Date (Oldest)'),
+            sortFunction: () => this.setSortQuery('versioncreated:asc'),
+        },
+        {
+            label: gettext('Relevance'),
+            sortFunction: () => this.setSortQuery('_score'),
+        },
+    ];
+
     static propTypes: any;
     static defaultProps: any;
     constructor(props: any) {
         super(props);
 
-        this.state = {isTagSectionShown: false};
+        const urlParams = new URLSearchParams(window.location.search);
+
+        this.state = {
+            isTagSectionShown: urlParams.get('topic') != null,
+            sortValue: this.sortValues[0].label,
+        };
         this.toggleTagSection = this.toggleTagSection.bind(this);
         this.toggleNavigation = this.toggleNavigation.bind(this);
         this.setQuery = this.setQuery.bind(this);
+        this.setSortQuery = this.setSortQuery.bind(this);
         this.setAdvancedSearchKeywords = this.setAdvancedSearchKeywords.bind(this);
         this.toggleAdvancedSearchField = this.toggleAdvancedSearchField.bind(this);
         this.clearAdvancedSearchParams = this.clearAdvancedSearchParams.bind(this);
@@ -51,6 +74,11 @@ class SearchResultsBarComponent extends React.Component<any, any> {
 
     setQuery(query: any) {
         this.props.setQuery(query);
+        this.props.refresh();
+    }
+
+    setSortQuery(sortQuery: string) {
+        this.props.setSortQuery(sortQuery);
         this.props.refresh();
     }
 
@@ -107,6 +135,25 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                 </div>
                             )}
                             <div className="navbar__button-group">
+                                <Dropdown
+                                    label={gettext('Sort by: {{sort}}', {sort: this.state.sortValue})}
+                                >
+                                    {
+                                        this.sortValues.map((option) => (
+                                            <button
+                                                key={option.label}
+                                                type='button'
+                                                className='dropdown-item'
+                                                onClick={() => {
+                                                    option.sortFunction();
+                                                    this.setState({sortValue: option.label});
+                                                }}
+                                            >
+                                                {gettext(option.label)}
+                                            </button>
+                                        ))
+                                    }
+                                </Dropdown>
                                 <button
                                     className="nh-button nh-button--tertiary"
                                     onClick={() => {
@@ -135,6 +182,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                     )}
                     {!isTagSectionShown ? null : (
                         <SearchResultTagsList
+                            refresh={this.props.refresh}
                             user={this.props.user}
                             showSaveTopic={this.props.showSaveTopic}
                             saveMyTopic={this.props.saveMyTopic}

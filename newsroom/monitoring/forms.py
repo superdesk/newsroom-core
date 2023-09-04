@@ -15,8 +15,6 @@ class MonitoringForm(FlaskForm):
     class Meta:
         csrf = False
 
-    BooleanField.false_values = {False, "false", ""}
-
     id = HiddenField("Id")
     name = StringField(gettext("Name"), validators=[DataRequired()])
     subject = StringField(gettext("Subject"))

@@ -21,7 +21,7 @@ describe('Wire - Topics', function () {
                 advanced: {
                     fields: ['headline', 'body_html'],
                     keywords: {
-                        and: ['Weather'],
+                        all: ['Weather'],
                         any: ['Sydney', 'Prague', 'Belgrade'],
                         exclude: ['London'],
                     },
@@ -67,6 +67,9 @@ describe('Wire - Topics', function () {
             .type('2023-06-30');
         WirePage.filterPanel.runSearch();
 
+        // Enter in 'Today' in the top search bar
+        WirePage.getTopSearchBarInput().type('Today{enter}');
+
         // Add advanced search params
         WirePage.showAdvancedSearchModal();
         AdvancedSearchForm.type({
@@ -76,9 +79,6 @@ describe('Wire - Topics', function () {
             'fields.slugline': false,
         });
         AdvancedSearchForm.runSearch();
-
-        // Enter in 'Today' in the top search bar
-        WirePage.getTopSearchBarInput().type('Today{enter}');
 
         // Open the search results bar, and make sure all search params are applied
         WirePage.searchResults.toggleBar();

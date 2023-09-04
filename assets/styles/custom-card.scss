@@ -97,27 +97,18 @@
             }
         }
 
-        .card-footer {
-            .wire-articles__item__icon {
-                margin-inline-end: 5px;
-                @include xxl {
-                    margin-inline-end: 7px;
-                }
-            }
-        }
-
         .card-text {
             font-size: 1rem;
             line-height: 1.5;
 
             &.small {
                 font-size: 0.875rem;
-                font-weight: 300;
+                font-weight: 400;
             }
 
             &.tiny {
                 font-size: 0.8125rem;
-                font-weight: 300;
+                font-weight: 400;
             }
         }
 
@@ -147,6 +138,11 @@
                 height: 100%;
                 object-fit: contain;
             }              
+        }
+        .wire-articles__item__icons {
+            flex-shrink: 0;
+            flex-wrap: nowrap;
+            gap: var(--space--0-5);
         }
     }
 

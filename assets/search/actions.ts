@@ -35,6 +35,17 @@ export function setQuery(query: any) {
     };
 }
 
+export const SET_SORT_QUERY = 'SET_SORT_QUERY';
+export function setSortQuery(sortQuery: string) {
+    return function(dispatch: any, getState: any) {
+        dispatch(setSearchSortQuery(sortQuery));
+        updateRouteParams(
+            {sort: sortQuery},
+            getState()
+        );
+    };
+}
+
 export const TOGGLE_TOPIC = 'TOGGLE_TOPIC';
 export function toggleTopic(topic: any) {
     return {type: TOGGLE_TOPIC, topic};
@@ -371,6 +382,11 @@ export function setSearchQuery(query: any) {
     return {type: SET_SEARCH_QUERY, payload: query};
 }
 
+export const SET_SEARCH_SORT_QUERY = 'SET_SEARCH_SORT_QUERY';
+export function setSearchSortQuery(sortQuery: any) {
+    return {type: SET_SEARCH_SORT_QUERY, payload: sortQuery};
+}
+
 export const SET_SEARCH_FILTERS = 'SET_SEARCH_FILTERS';
 export function setSearchFilters(filters: any) {
     return {type: SET_SEARCH_FILTERS, payload: filters};
@@ -525,20 +541,4 @@ export function initParams(params: any) {
             )
         );
     };
-}
-
-export function subscribeToTopic(topic: any) {
-    (server as any).post(`/topics/${topic._id}/subscribe`)
-        .then(() => {
-            notify.success(gettext('Topic subscribed successfully'));
-        })
-        .catch(errorHandler);
-}
-
-export function unsubscribeToTopic(topic: any) {
-    (server as any).del(`/topics/${topic._id}/subscribe`)
-        .then(() => {
-            notify.success(gettext('Topic unsubscribed successfully'));
-        })
-        .catch(errorHandler);
 }

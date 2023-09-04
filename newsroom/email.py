@@ -20,7 +20,7 @@ from newsroom.utils import (
     get_public_contacts,
 )
 from newsroom.template_filters import is_admin_or_internal
-from newsroom.utils import url_for_agenda, query_resource
+from newsroom.utils import url_for_agenda
 from superdesk.logging import logger
 
 
@@ -140,7 +140,7 @@ def send_new_signup_email(user):
 def map_email_recipients_by_language(
     emails: List[str], template_name: str, ignore_preferences=False
 ) -> Dict[str, EmailGroup]:
-    users = {user["email"]: user for user in query_resource("users", lookup={"email": {"$in": emails}}) or []}
+    users = {user["email"]: user for user in get_resource_service("users").find(where={"email": {"$in": emails}}) or []}
     default_language = current_app.config["DEFAULT_LANGUAGE"]
     groups: Dict[str, EmailGroup] = {}
     default_html_template = get_language_template_name(template_name, default_language, "html")
@@ -294,7 +294,7 @@ def send_new_item_notification_email(user, topic_name, item, section="wire"):
 
 
 def _send_new_wire_notification_email(user, topic_name, item, section):
-    url = url_for("wire.item", _id=item["guid"], _external=True)
+    url = url_for("wire.item", _id=item.get("guid") or item["_id"], _external=True)
     recipients = [user["email"]]
     template_kwargs = dict(
         app_name=current_app.config["SITE_NAME"],
@@ -357,7 +357,7 @@ def send_history_match_notification_email(user, item, section):
 
 def _send_history_match_wire_notification_email(user, item, section):
     app_name = current_app.config["SITE_NAME"]
-    url = url_for("wire.item", _id=item["guid"], _external=True)
+    url = url_for("wire.item", _id=item.get("guid") or item["_id"], _external=True)
     recipients = [user["email"]]
     template_kwargs = dict(
         app_name=app_name,

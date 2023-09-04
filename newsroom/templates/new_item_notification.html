@@ -1,4 +1,9 @@
 {% extends "email_layout.html" %}
+{% block htmlhead %}
+<style>
+{% include "email_stylesheet.css" %}
+</style>
+{% endblock %}
 {% block name %}{% endblock %}
 {% block content %}
 {% if type == 'wire' %}{% include "email_item.html" %}{% endif %}

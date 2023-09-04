@@ -1,0 +1,6 @@
+{% extends "email_layout.txt" %}
+{% block content %}
+{{ date | notification_datetime }}
+
+No new items have arrived for your subscribed topics.
+{% endblock %}

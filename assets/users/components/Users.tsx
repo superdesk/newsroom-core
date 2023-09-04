@@ -91,6 +91,7 @@ class Users extends React.Component<any, any> {
                 )}
                 {this.props.userToEdit &&
                     <EditUser
+                        hideFields={[]}
                         original={this.props.usersById[this.props.userToEdit._id] || {}}
                         user={this.props.userToEdit}
                         onChange={this.props.editUser}
@@ -152,8 +153,8 @@ const mapStateToProps = (state: any) => ({
 const mapDispatchToProps = (dispatch: any) => ({
     selectUser: (_id: any) => dispatch(selectUser(_id)),
     editUser: (event: any) => dispatch(editUser(event)),
-    saveUser: (type: any) => dispatch(postUser()),
-    deleteUser: (type: any) => dispatch(deleteUser()),
+    saveUser: () => dispatch(postUser()),
+    deleteUser: () => dispatch(deleteUser()),
     resendUserInvite: () => dispatch(resendUserInvite()),
     newUser: (data: any) => dispatch(newUser(data)),
     resetPassword: () => dispatch(resetPassword()),

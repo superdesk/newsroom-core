@@ -14,6 +14,7 @@ import {
     formatTime,
     DAY_IN_MINUTES,
 } from '../utils';
+import {IAgendaItem} from 'interfaces';
 
 export const STATUS_KILLED = 'killed';
 export const STATUS_CANCELED = 'cancelled';
@@ -94,6 +95,15 @@ export const WORKFLOW_COLORS = {
     [WORKFLOW_STATUS.ACTIVE]: 'coverage--active',
     [WORKFLOW_STATUS.COMPLETED]: 'coverage--completed',
     [WORKFLOW_STATUS.CANCELLED]: 'coverage--cancelled',
+};
+
+export const COVERAGE_STATUS_COLORS = {
+    'coverage intended': null,
+    'coverage not planned': 'coverage--not-covering',
+    'coverage not intended': 'coverage--not-covering',
+    'coverage not decided': 'coverage--undecided',
+    'coverage not decided yet': 'coverage--undecided',
+    'coverage upon request': 'coverage--request',
 };
 
 export const SCHEDULE_TYPE = {
@@ -244,8 +254,12 @@ export function hasLocation(item: any) {
     return !!getLocationString(item);
 }
 
-export function hasLocationNotes(item: any) {
+export function hasLocationNotes(item: IAgendaItem) {
     return get(item, 'location[0].details[0].length', 0) > 0;
+}
+
+export function getLocationDetails(item: IAgendaItem) {
+    return item.location && item.location[0] && item.location[0].details && item.location[0].details[0];
 }
 
 /**
@@ -254,9 +268,10 @@ export function hasLocationNotes(item: any) {
  * @param {Object} item
  * @return {String}
  */
-export function getPublicContacts(item: any) {
-    const contacts = get(item, 'event.event_contact_info', []);
-    return contacts.filter((c: any) => c.public).map((c: any) => ({
+export function getPublicContacts(item: IAgendaItem) {
+    const contacts = item.event?.event_contact_info ?? [];
+    return contacts.filter((c) => c.public).map((c) => ({
+        _id: c._id,
         name: [c.first_name, c.last_name].filter((x: any) => !!x).join(' '),
         organisation: c.organisation || '',
         email: (c.contact_email || []).join(', '),
@@ -561,10 +576,10 @@ export function getHighlightedName(item: any) {
         return item.es_highlight.name[0];
     }
     else if (item.es_highlight.slugline){
-        return item.es_highlight.slugline [0];
+        return item.es_highlight.slugline[0];
     }
     else if (item.es_highlight.headline){
-        return item.es_highlight.headline [0];
+        return item.es_highlight.headline[0];
     }
     else{
         return getName(item);
@@ -680,12 +695,22 @@ const getEndDate = (item: any) => item.dates.no_end_time || item.dates.all_day ?
     moment(item.dates.end || item.dates.start);
 
 // compare days without being affected by timezone
-const isBetweenDay = (day: any, start: any, end: any) => {
-    // it will be converted to local time
-    // if passed as string which we need
-    // for all day events which are in utc mode
-    const startDate = start.format('YYYY-MM-DD');
-    const endDate = end.format('YYYY-MM-DD');
+const isBetweenDay = (day: moment.Moment, start: moment.Moment, end: moment.Moment, allDay=false, noEndTime=false) => {
+    let testDay = day;
+    let startDate = start;
+    let endDate = end;
+
+    if (allDay) {
+        // we ignore times and only check dates
+        testDay = moment(day.format('YYYY-MM-DD'));
+        startDate = moment(start.format('YYYY-MM-DD'));
+        endDate = moment(end.format('YYYY-MM-DD'));
+    } else if (noEndTime) {
+        // we ignore time for end date
+        testDay = moment(day.format('YYYY-MM-DD'));
+        endDate = moment(end.format('YYYY-MM-DD'));
+        return day.isSameOrAfter(start) && testDay.isSameOrBefore(endDate);
+    }
 
     return day.isBetween(startDate, endDate, 'day', '[]');
 };
@@ -697,7 +722,7 @@ const isBetweenDay = (day: any, start: any, end: any) => {
  * @param activeGrouping: type of grouping i.e. day, week, month
  */
 export function groupItems(items: any, activeDate: any, activeGrouping: any, featuredOnly?: any) {
-    const maxStart = moment(activeDate).set({'h': 0, 'm': 0, 's': 0});
+    const minStart = moment(activeDate).set({'h': 0, 'm': 0, 's': 0});
     const groupedItems: any = {};
     const grouper = Groupers[activeGrouping];
 
@@ -712,7 +737,7 @@ export function groupItems(items: any, activeDate: any, activeGrouping: any, fea
             const itemExtraDates = getExtraDates(item);
             const itemStartDate = getStartDate(item);
             const start = item._display_from ? moment(item._display_from) :
-                moment.min(maxStart, moment.min(itemExtraDates.concat([itemStartDate])));
+                moment.max(minStart, moment.min(itemExtraDates.concat([itemStartDate])));
             const itemEndDate = getEndDate(item);
 
             // If item is an event and was actioned (postponed, rescheduled, cancelled only incase of multi-day event)
@@ -722,7 +747,7 @@ export function groupItems(items: any, activeDate: any, activeGrouping: any, fea
                 end = item._display_to ? moment(item._display_to) :
                     moment.max(
                         itemExtraDates
-                            .concat([maxStart])
+                            .concat([minStart])
                             // If event is all day the end timestamp is the same as
                             // start and depending on the local timezone offset it
                             // might not give enough room for the event to show up,
@@ -730,11 +755,13 @@ export function groupItems(items: any, activeDate: any, activeGrouping: any, fea
                             .concat([itemEndDate.clone().add(1, 'd')])
                     );
             }
+
             let key = null;
+            end = moment.min(end, minStart.clone().add(10, 'd')); // show each event for 10 days max not to destroy the UI
 
             // use clone otherwise it would modify start and potentially also maxStart, moments are mutable
             for (const day = start.clone(); day.isSameOrBefore(end, 'day'); day.add(1, 'd')) {
-                const isBetween = isBetweenDay(day, itemStartDate, itemEndDate);
+                const isBetween = isBetweenDay(day, itemStartDate, itemEndDate, item.dates.all_day, item.dates.no_end_time);
                 const containsExtra = containsExtraDate(item, day);
                 const addGroupItem = (item.event == null || get(item, '_hits.matched_planning_items') != null) ?
                     containsExtra :

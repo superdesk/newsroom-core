@@ -1,6 +1,7 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import {get, sortBy} from 'lodash';
+
+import {ICompany, IAuthProvider, IUser, ICountry, ICompanyType} from 'interfaces';
 
 import {getDateInputDate, gettext, isInPast} from 'utils';
 import TextInput from 'components/TextInput';
@@ -8,8 +9,31 @@ import SelectInput from 'components/SelectInput';
 import DateInput from 'components/DateInput';
 import CheckboxInput from 'components/CheckboxInput';
 
+interface IProps {
+    company: ICompany;
+    companyTypes: Array<ICompanyType>;
+    users: Array<IUser>;
+    errors: {[field: string]: Array<string>} | null;
+    onChange(event: React.ChangeEvent): void;
+    save(event: React.MouseEvent): void;
+    deleteCompany(event: React.MouseEvent): void;
+    ssoEnabled: boolean;
+    authProviders: Array<IAuthProvider>;
+    countries: Array<ICountry>;
+}
 
-export function EditCompanyDetails({company, companyTypes, users, errors, onChange, save, deleteCompany, ssoEnabled, countries}: any) {
+export function EditCompanyDetails({
+    company,
+    companyTypes,
+    users,
+    errors,
+    onChange,
+    save,
+    deleteCompany,
+    ssoEnabled,
+    authProviders,
+    countries,
+}: IProps) {
     return (
         <form>
             <div className="list-item__preview-form">
@@ -21,14 +45,38 @@ export function EditCompanyDetails({company, companyTypes, users, errors, onChan
                     error={errors ? errors.name : null}
                 />
 
+                {authProviders.length <= 1 ? null : (
+                    <SelectInput
+                        name="auth_provider"
+                        label={gettext('Authentication Provider')}
+                        value={company.auth_provider || 'newshub'}
+                        options={authProviders.map((provider) => ({
+                            value: provider._id,
+                            text: provider.name,
+                        }))}
+                        onChange={onChange}
+                        error={errors?.auth_provider}
+                    />
+                )}
+
+                {ssoEnabled && (
+                    <TextInput
+                        name='auth_domain'
+                        label={gettext('SSO domain')}
+                        value={company.auth_domain || ''}
+                        onChange={onChange}
+                        error={errors ? errors.auth_domain : null}
+                    />
+                )}
+
                 <SelectInput
                     name='company_type'
                     label={gettext('Company Type')}
                     value={company.company_type || ''}
-                    options={companyTypes.map((ctype: any) => ({text: gettext(ctype.name), value: ctype.id}))}
+                    options={companyTypes.map((ctype) => ({text: gettext(ctype.name), value: ctype.id}))}
                     defaultOption=""
                     onChange={onChange}
-                    error={errors ? errors.company_type : null}
+                    error={errors ? errors.company_type : undefined}
                 />
 
                 <TextInput
@@ -79,23 +127,13 @@ export function EditCompanyDetails({company, companyTypes, users, errors, onChan
                     error={errors ? errors.contact_email : null}
                 />
 
-                {ssoEnabled && (
-                    <TextInput
-                        name='auth_domain'
-                        label={gettext('SSO domain')}
-                        value={company.auth_domain || ''}
-                        onChange={onChange}
-                        error={errors ? errors.auth_domain : null}
-                    />
-                )}
-
                 <SelectInput
                     name='country'
                     label={gettext('Country')}
                     value={company.country}
                     options={countries}
                     onChange={onChange}
-                    error={errors ? errors.country : null}
+                    error={errors ? errors.country : undefined}
                 />
 
                 <DateInput
@@ -144,15 +182,3 @@ export function EditCompanyDetails({company, companyTypes, users, errors, onChan
         </form>
     );
 }
-
-EditCompanyDetails.propTypes = {
-    company: PropTypes.object.isRequired,
-    companyTypes: PropTypes.array,
-    users: PropTypes.arrayOf(PropTypes.object),
-    errors: PropTypes.object,
-    onChange: PropTypes.func,
-    save: PropTypes.func,
-    deleteCompany: PropTypes.func,
-    ssoEnabled: PropTypes.bool,
-    countries: PropTypes.array,
-};

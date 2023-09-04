@@ -1,11 +1,10 @@
 from bson import ObjectId
 from superdesk import get_resource_service
-from flask import json, jsonify, abort, current_app as app, request, url_for
-from flask_babel import gettext
+from flask import json, jsonify, abort, current_app as app, url_for
 
+from newsroom.types import Topic
 from newsroom.topics import blueprint
-from newsroom.topics.topics import get_user_topics as _get_user_topics
-from newsroom.utils import find_one
+from newsroom.topics.topics import get_user_topics as _get_user_topics, auto_enable_user_emails
 from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required
 from newsroom.utils import get_json_or_400, get_entity_or_404
@@ -41,26 +40,21 @@ def update_topic(topic_id):
     if not can_edit_topic(original, current_user):
         abort(403)
 
-    # If notifications are enabled, check to see if user is configured to receive emails
-    data.setdefault("subscribers", [])
-    if str(current_user["_id"]) in data["subscribers"]:
-        user = get_resource_service("users").find_one(req=None, _id=current_user["_id"])
-        if not user.get("receive_email"):
-            return "", gettext(
-                "Please enable 'Receive notifications' option in your profile to receive topic notifications"
-            )  # noqa
-
-    updates = {
+    updates: Topic = {
         "label": data.get("label"),
         "query": data.get("query"),
         "created": data.get("created"),
         "filter": data.get("filter"),
         "navigation": data.get("navigation"),
         "company": current_user.get("company"),
-        "subscribers": [ObjectId(uid) for uid in data["subscribers"]],
+        "subscribers": data.get("subscribers") or [],
         "is_global": data.get("is_global", False),
         "folder": data.get("folder", None),
+        "advanced": data.get("advanced", None),
     }
+
+    for subscriber in updates["subscribers"]:
+        subscriber["user_id"] = ObjectId(subscriber["user_id"])
 
     if (
         original
@@ -71,6 +65,9 @@ def update_topic(topic_id):
         updates["folder"] = None
 
     response = get_resource_service("topics").patch(id=ObjectId(topic_id), updates=updates)
+
+    auto_enable_user_emails(updates, original, current_user)
+
     if response.get("is_global") or updates.get("is_global", False) != original.get("is_global", False):
         push_company_notification("topics")
     else:
@@ -93,34 +90,6 @@ def delete(topic_id):
         push_company_notification("topics")
     else:
         push_user_notification("topics")
-    return jsonify({"success": True}), 200
-
-
-@blueprint.route("/topics/<topic_id>/subscribe", methods=["POST", "DELETE"])
-@login_required
-def subscribe_to_topic(topic_id):
-    current_user = get_user(required=True)
-    topic = find_one("topics", _id=ObjectId(topic_id))
-
-    if not is_user_or_company_topic(topic, current_user):
-        abort(403)
-
-    subscribers = topic.get("subscribers") or []
-    currently_subscribed = current_user["_id"] in subscribers
-    topic_updated = False
-    if request.method == "POST" and not currently_subscribed:
-        subscribers.append(current_user["_id"])
-        topic_updated = True
-    elif request.method == "DELETE" and currently_subscribed:
-        subscribers = [subscriber for subscriber in subscribers if subscriber != current_user["_id"]]
-        topic_updated = True
-
-    if topic_updated:
-        # Use the ``update`` method, so we don't update the ``version_creator`` field unnecessarily
-        get_resource_service("topics").update(id=topic["_id"], updates={"subscribers": subscribers}, original=topic)
-
-        push_company_notification("topics")
-
     return jsonify({"success": True}), 200
 
 
