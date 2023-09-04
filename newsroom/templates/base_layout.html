@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     {% block title_wrapper %}
-    <title>{{ config.SITE_NAME }} - {% block title %}{% endblock %}</title>
+    <title>{{ config.SITE_NAME }}{% if self.title() %} - {% endif %}{% block title %}{% endblock %}</title>
     {% endblock %}
 
     {% block fonts %}
