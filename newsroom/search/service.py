@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional, Union, Dict, Any, TypedDict
+from typing import List, Literal, Optional, Union, Dict, Any, TypedDict
 from copy import deepcopy
 
 from flask import current_app as app, json, abort
@@ -41,15 +41,22 @@ def strtobool(val):
     return _strtobool(val)
 
 
-def query_string(query, default_operator="AND", fields=["*"]):
+def query_string(
+    query: str,
+    default_operator: Literal["AND", "OR"] = "AND",
+    fields: List[str] = ["*"],
+    multimatch_type: Literal["cross_fields", "best_fields"] = "cross_fields",
+    analyze_wildcard=False,
+):
     query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
     return {
         "query_string": {
             "query": query,
             "default_operator": default_operator,
-            "analyze_wildcard": query_string_settings["analyze_wildcard"],
+            "analyze_wildcard": query_string_settings["analyze_wildcard"] or analyze_wildcard,
             "lenient": True,
             "fields": fields,
+            "type": multimatch_type,
         }
     }
 
@@ -772,28 +779,20 @@ class BaseSearchService(Service):
         if not fields:
             return
 
-        def gen_advanced_query(keywords: str, operator: str, multi_match_type: str):
-            return {
-                "query_string": {
-                    "query": keywords,
-                    "fields": fields,
-                    "default_operator": operator,
-                    "type": multi_match_type,
-                    "lenient": True,
-                    "analyze_wildcard": True,
-                },
-            }
-
         if search.advanced.get("all"):
             search.query["bool"].setdefault("must", []).append(
-                gen_advanced_query(search.advanced["all"], "AND", "cross_fields")
+                query_string(search.advanced["all"], "AND", multimatch_type="cross_fields", analyze_wildcard=True)
             )
+
         if search.advanced.get("any"):
             search.query["bool"].setdefault("must", []).append(
-                gen_advanced_query(search.advanced["any"], "OR", "best_fields")
+                query_string(search.advanced["any"], "OR", multimatch_type="best_fields", analyze_wildcard=True)
             )
+
         if search.advanced.get("exclude"):
-            search.query["bool"]["must_not"].append(gen_advanced_query(search.advanced["exclude"], "OR", "best_fields"))
+            search.query["bool"]["must_not"].append(
+                query_string(search.advanced["exclude"], "OR", multimatch_type="best_fields", analyze_wildcard=True)
+            )
 
     def apply_embargoed_filters(self, search):
         """Generate filters for embargoed params"""
