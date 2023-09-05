@@ -153,7 +153,7 @@ def test_share_wire_topics(client, app):
         assert len(outbox) == 1
         assert outbox[0].recipients == ["test@bar.com"]
         assert outbox[0].sender == "newsroom@localhost"
-        assert outbox[0].subject == "From AAP Newsroom: %s" % topic["label"]
+        assert outbox[0].subject == "From Newshub: %s" % topic["label"]
         assert "Hi Test Bar" in outbox[0].body
         assert "Foo Bar (foo@bar.com) shared " in outbox[0].body
         assert topic["query"] in outbox[0].body
@@ -183,7 +183,7 @@ def test_share_agenda_topics(client, app):
         assert len(outbox) == 1
         assert outbox[0].recipients == ["test@bar.com"]
         assert outbox[0].sender == "newsroom@localhost"
-        assert outbox[0].subject == "From AAP Newsroom: %s" % agenda_topic["label"]
+        assert outbox[0].subject == "From Newshub: %s" % agenda_topic["label"]
         assert "Hi Test Bar" in outbox[0].body
         assert "Foo Bar (foo@bar.com) shared " in outbox[0].body
         assert agenda_topic["query"] in outbox[0].body

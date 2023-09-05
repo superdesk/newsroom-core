@@ -236,7 +236,7 @@ def test_share_items(client, app, mocker):
         assert resp.status_code == 201, resp.get_data().decode("utf-8")
         assert len(outbox) == 1
         assert outbox[0].recipients == ["foo2@bar.com"]
-        assert outbox[0].subject == "From AAP Newsroom: test headline"
+        assert outbox[0].subject == "From Newshub: test headline"
         assert "Hi Foo Bar" in outbox[0].body
         assert "admin admin (admin@sourcefabric.org) shared " in outbox[0].body
         assert "Conference Planning" in outbox[0].body

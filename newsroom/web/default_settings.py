@@ -176,8 +176,8 @@ CORE_APPS = [
     "newsroom.notifications.send_scheduled_notifications",
 ]
 
-SITE_NAME = "AAP Newsroom"
-COPYRIGHT_HOLDER = "AAP"
+SITE_NAME = "Newshub"
+COPYRIGHT_HOLDER = "Sourcefabric"
 COPYRIGHT_NOTICE = ""
 USAGE_TERMS = ""
 CONTACT_ADDRESS = "#"
