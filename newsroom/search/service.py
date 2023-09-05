@@ -781,17 +781,27 @@ class BaseSearchService(Service):
 
         if search.advanced.get("all"):
             search.query["bool"].setdefault("must", []).append(
-                query_string(search.advanced["all"], "AND", multimatch_type="cross_fields", analyze_wildcard=True)
+                query_string(
+                    search.advanced["all"], "AND", fields=fields, multimatch_type="cross_fields", analyze_wildcard=True
+                )
             )
 
         if search.advanced.get("any"):
             search.query["bool"].setdefault("must", []).append(
-                query_string(search.advanced["any"], "OR", multimatch_type="best_fields", analyze_wildcard=True)
+                query_string(
+                    search.advanced["any"], "OR", fields=fields, multimatch_type="best_fields", analyze_wildcard=True
+                )
             )
 
         if search.advanced.get("exclude"):
             search.query["bool"]["must_not"].append(
-                query_string(search.advanced["exclude"], "OR", multimatch_type="best_fields", analyze_wildcard=True)
+                query_string(
+                    search.advanced["exclude"],
+                    "OR",
+                    fields=fields,
+                    multimatch_type="best_fields",
+                    analyze_wildcard=True,
+                )
             )
 
     def apply_embargoed_filters(self, search):
