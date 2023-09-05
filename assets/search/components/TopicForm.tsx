@@ -114,7 +114,7 @@ const TopicForm: React.FC<IProps> = ({
                     </div>
                 </div>
                 <div className="nh-flex__row">
-                    <FormSection initiallyOpen={true} name={gettext('Organize your Topic')} data-test-id="topic-form-group--folder">
+                    <FormSection initiallyOpen={true} name={gettext('Organize your Topic')} dataTestId="topic-form-group--folder">
                         <div className={'nh-container nh-container--direction-row mb-3 pt-2 pb-3'  + (folders.length > 0 ? '' : ' nh-container--highlight text-start')}>
                             {folders.length > 0
                                 ? (
@@ -156,7 +156,7 @@ const TopicForm: React.FC<IProps> = ({
                             }
                         </div>
                     </FormSection>
-                    <FormSection initiallyOpen={true} name={gettext('Email Notifications:')} data-test-id="topic-form-group--notifications">
+                    <FormSection initiallyOpen={true} name={gettext('Email Notifications:')} dataTestId="topic-form-group--notifications">
                         <div>
                             <div className="toggle-button__group toggle-button__group--spaced toggle-button__group--stretch-items my-2">
                                 <button
@@ -210,7 +210,7 @@ const TopicForm: React.FC<IProps> = ({
                     </FormSection>
                 </div>
                 <div className="nh-flex__row">
-                    <FormSection initiallyOpen={true} name={gettext('Topic details')} data-test-id="topic-form-group--params">
+                    <FormSection initiallyOpen={true} name={gettext('Topic details')} dataTestId="topic-form-group--params">
                         <SearchResultTagsList
                             user={user}
                             readonly={true}

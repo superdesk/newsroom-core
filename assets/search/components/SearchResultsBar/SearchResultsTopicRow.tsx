@@ -58,7 +58,7 @@ export function SearchResultsTopicRow({
         );
     }
 
-    if ((searchParams.navigation?.length ?? 0) > 0 && ((Object.keys(navigations ?? []).length ?? 0) > 0)) {
+    if ((searchParams.navigation?.length ?? 0) > 0 && (Object.keys(navigations ?? []).length > 0)) {
         searchParams.navigation.forEach((navId) => {
             const navigation = navigations[navId];
 
