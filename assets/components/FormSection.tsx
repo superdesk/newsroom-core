@@ -2,16 +2,16 @@ import React, {useState} from 'react';
 
 interface IProps {
     initiallyOpen?: boolean;
-    name?: string;
-    testId: string;
+    name: string;
+    dataTestId?: string;
     children: JSX.Element;
 }
 
-export function FormSection({initiallyOpen, name, testId, children}: IProps) {
+export function FormSection({initiallyOpen, name, children, dataTestId}: IProps) {
     const [opened, setOpened] = useState(initiallyOpen ?? name == null);
 
     return (
-        <div className="nh-flex__column" data-test-id={testId}>
+        <div className="nh-flex__column" data-test-id={dataTestId}>
             <div
                 className="list-item__preview-collapsible"
                 data-test-id="toggle-btn"
