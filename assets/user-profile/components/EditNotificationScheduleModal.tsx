@@ -26,6 +26,7 @@ interface IState {
 
 
 class EditNotificationScheduleModalComponent extends React.Component<IProps, IState> {
+    formRef: React.RefObject<HTMLFormElement>;
     constructor(props: IProps) {
         super(props);
 
@@ -33,6 +34,9 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
             timezone: this.props.data.user.notification_schedule?.timezone ?? moment.tz.guess(),
             times: this.props.data.user.notification_schedule?.times ?? getScheduledNotificationConfig().default_times,
         };
+
+        this.onSubmitForm = this.onSubmitForm.bind(this);
+        this.formRef = React.createRef<HTMLFormElement>();
     }
 
     componentDidMount() {
@@ -49,13 +53,36 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
         });
     }
 
+    onSubmitForm(event: React.FormEvent<HTMLFormElement>) {
+        event.stopPropagation();
+        event.preventDefault();
+
+        if (this.formRef.current == null) {
+            return;
+        }
+
+        const inputs = this.formRef.current.querySelectorAll('input') as NodeListOf<HTMLInputElement>;
+
+        const hasErrors = [...inputs].some(input => {
+            return input.checkValidity() !== true;
+        });
+
+        if (hasErrors === true) {
+            this.formRef.current.reportValidity();
+        } else {
+            this.props.updateUserNotificationSchedules(this.state);
+        }
+    }
+
     render() {
         return (
             <Modal
-                onSubmit={() => this.props.updateUserNotificationSchedules(this.state)}
+                onSubmit={() => {
+                    this.formRef.current?.dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}));
+                }}
                 title={gettext('Edit global notifications schedule')}
                 onSubmitLabel={gettext('Save')}
-                disableButtonOnSubmit={true}
+                disableButtonOnSubmit={false}
                 className="edit-schedule__modal"
             >
                 <div className="nh-container nh-container--highlight rounded--none">
@@ -69,7 +96,10 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                     <span className="nh-container__schedule-info form-label">
                         {gettext('Daily, at:')}
                     </span>
-                    <form>
+                    <form
+                        ref={this.formRef}
+                        onSubmit={(event) => this.onSubmitForm(event)}
+                    >
                         <div className="form-group schedule-times__input-container">
                             <input
                                 type="time"
@@ -77,6 +107,8 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                                 onChange={(event) => {
                                     this.updateTime(event.target.value, 0);
                                 }}
+                                step="900"
+                                min="00:00"
                             />
                             <input
                                 type="time"
@@ -84,6 +116,8 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                                 onChange={(event) => {
                                     this.updateTime(event.target.value, 1);
                                 }}
+                                step="900"
+                                min="00:00"
                             />
                             <input
                                 type="time"
@@ -91,6 +125,8 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                                 onChange={(event) => {
                                     this.updateTime(event.target.value, 2);
                                 }}
+                                step="900"
+                                min="00:00"
                             />
                         </div>
                         <TimezoneInput
