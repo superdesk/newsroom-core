@@ -1,9 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import classNames from 'classnames';
 import {isEmpty} from 'lodash';
 
+import {IAuthProvider, ICompany, ICompanyType, ICountry, IProduct, ISection, IUser} from 'interfaces';
+import {ICompanySettingsStore} from '../reducers';
 import {gettext, shortDate} from 'utils';
 import {
     editCompany,
@@ -16,13 +17,46 @@ import {
     cancelEdit,
     fetchCompanyUsers,
 } from '../actions';
+import {getCurrentCompanyForEditor} from '../selectors';
 
 import CompanyPermissions from './CompanyPermissions';
 import EditCompanyAPI from './EditCompanyAPI';
 import AuditInformation from 'components/AuditInformation';
 import {EditCompanyDetails} from './EditCompanyDetails';
 
-class EditCompany extends React.Component<any, any> {
+interface IStateProps {
+    company: ICompany;
+    companiesById: {[companyId: string]: ICompany};
+    sections: Array<ISection>;
+    products: Array<IProduct>;
+    errors: {[field: string]: Array<string>} | null;
+    users: Array<IUser>;
+    companyTypes: Array<ICompanyType>;
+    apiEnabled: boolean;
+    ssoEnabled: boolean;
+    authProviders: Array<IAuthProvider>;
+    countries: Array<ICountry>;
+}
+
+interface IDispatchProps {
+    onChange(event: React.ChangeEvent): void;
+    toggleCompanySection(sectionId: ISection['_id']): void;
+    toggleCompanyProduct(productId: IProduct['_id'], sectionId: ISection['_id'], enable: boolean): void;
+    updateCompanySeats(productId: IProduct['_id'], seats: number): void;
+    saveCompany(): void;
+    setError(errors: {[field: string]: Array<string>}): void;
+    deleteCompany(): void;
+    cancelEdit(event?: React.MouseEvent): void;
+    fetchCompanyUsers(companyId: ICompany['_id']): void;
+}
+
+type IProps = IDispatchProps & IStateProps;
+
+interface IState {
+    activeTab: string;
+}
+
+class EditCompany extends React.Component<IProps, IState> {
     static propTypes: any;
     tabs: Array<{label: any; name: string}>;
 
@@ -85,7 +119,7 @@ class EditCompany extends React.Component<any, any> {
         return valid;
     }
 
-    save(externalEvent: any) {
+    save(externalEvent: React.MouseEvent) {
         if (externalEvent) {
             externalEvent.preventDefault();
 
@@ -98,16 +132,20 @@ class EditCompany extends React.Component<any, any> {
         this.props.saveCompany();
     }
 
-    deleteCompany(event: any) {
+    deleteCompany(event: React.MouseEvent) {
         event.preventDefault();
 
         if (confirm(gettext('Would you like to delete company: {{name}}', {name: this.props.company.name}))) {
-            this.props.deleteCompany('companies');
+            this.props.deleteCompany();
             this.props.cancelEdit();
         }
     }
 
     render() {
+        const currentAuthProvider =  this.props.authProviders.find(
+            (provider) => provider._id === (this.props.company.auth_provider ?? 'newshub')
+        );
+
         return (
             <div
                 data-test-id="edit-company-form"
@@ -162,7 +200,8 @@ class EditCompany extends React.Component<any, any> {
                                 onChange={this.props.onChange}
                                 save={this.save}
                                 deleteCompany={this.deleteCompany}
-                                ssoEnabled={this.props.ssoEnabled}
+                                ssoEnabled={this.props.ssoEnabled && currentAuthProvider?.auth_type === 'saml'}
+                                authProviders={this.props.authProviders}
                                 countries = {this.props.countries}
                             />
                         </div>
@@ -194,7 +233,7 @@ class EditCompany extends React.Component<any, any> {
                             errors={this.props.errors}
                             originalItem={!this.props.company._id ?
                                 this.props.company :
-                                this.props.company[this.props.company._id]
+                                this.props.companiesById[this.props.company._id]
                             }
                         />
                     )}
@@ -204,38 +243,8 @@ class EditCompany extends React.Component<any, any> {
     }
 }
 
-EditCompany.propTypes = {
-    company: PropTypes.object.isRequired,
-    onChange: PropTypes.func,
-    toggleCompanySection: PropTypes.func,
-    toggleCompanyProduct: PropTypes.func,
-    updateCompanySeats: PropTypes.func,
-    errors: PropTypes.object,
-    users: PropTypes.arrayOf(PropTypes.object),
-    saveCompany: PropTypes.func.isRequired,
-    setError: PropTypes.func.isRequired,
-    deleteCompany: PropTypes.func.isRequired,
-    cancelEdit: PropTypes.func.isRequired,
-    fetchCompanyUsers: PropTypes.func.isRequired,
-    companyTypes: PropTypes.array,
-    apiEnabled: PropTypes.bool,
-    ssoEnabled: PropTypes.bool,
-    companiesById: PropTypes.object,
-
-    sections: PropTypes.arrayOf(PropTypes.shape({
-        _id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-    })),
-    products: PropTypes.arrayOf(PropTypes.shape({
-        _id: PropTypes.string,
-        name: PropTypes.string,
-        product_type: PropTypes.string,
-    })).isRequired,
-    countries : PropTypes.array
-};
-
-const mapStateToProps = (state: any) => ({
-    company: state.companyToEdit,
+const mapStateToProps = (state: ICompanySettingsStore): IStateProps => ({
+    company: getCurrentCompanyForEditor(state),
     companiesById: state.companiesById,
     sections: state.sections,
     products: state.products,
@@ -244,19 +253,25 @@ const mapStateToProps = (state: any) => ({
     companyTypes: state.companyTypes,
     apiEnabled: state.apiEnabled,
     ssoEnabled: state.ssoEnabled,
+    authProviders: state.authProviders,
     countries: state.countries,
 });
 
-const mapDispatchToProps = (dispatch: any) => ({
-    onChange: (event: any) => dispatch(editCompany(event)),
-    toggleCompanySection: (sectionId: any) => dispatch(toggleCompanySection(sectionId)),
-    toggleCompanyProduct: (productId: any, sectionId: any, enable: any) => dispatch(toggleCompanyProduct(productId, sectionId, enable)),
-    updateCompanySeats: (productId: any, seats: any) => dispatch(updateCompanySeats(productId, seats)),
+const mapDispatchToProps = (dispatch: any): IDispatchProps => ({
+    onChange: (event) => dispatch(editCompany(event)),
+    toggleCompanySection: (sectionId) => dispatch(toggleCompanySection(sectionId)),
+    toggleCompanyProduct: (productId, sectionId, enable) => dispatch(toggleCompanyProduct(productId, sectionId, enable)),
+    updateCompanySeats: (productId, seats) => dispatch(updateCompanySeats(productId, seats)),
     saveCompany: () => dispatch(postCompany()),
-    setError: (errors: any) => dispatch(setError(errors)),
+    setError: (errors) => dispatch(setError(errors)),
     deleteCompany: () => dispatch(deleteCompany()),
-    cancelEdit: (event: any) => dispatch(cancelEdit(event)),
-    fetchCompanyUsers: (companyId: any) => dispatch(fetchCompanyUsers(companyId)),
+    cancelEdit: (event) => dispatch(cancelEdit(event)),
+    fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(EditCompany);
+export default connect<
+    IStateProps,
+    IDispatchProps,
+    {},
+    ICompanySettingsStore
+>(mapStateToProps, mapDispatchToProps)(EditCompany);

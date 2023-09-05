@@ -217,6 +217,7 @@ export default function itemReducer(state: any = initialState, action: any): IUs
 
                 return {...topic, ...action.payload.updates};
             }),
+            selectedItem: state.selectedItem?._id === action.payload.topic._id ? {...state.selectedItem, ...action.payload.updates} : state.selectedItem,
         };
 
     case FOLDER_UPDATED:

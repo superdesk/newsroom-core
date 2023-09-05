@@ -104,9 +104,7 @@ export function SearchResultsTopicRow({
                                     {},
                                     activeTopic,
                                     searchParams,
-                                    {query: searchParams.query},
                                     {topic_type: topicType},
-                                    {filter: searchParams.filter}
                                 ));
                             }}
                         >
@@ -126,7 +124,6 @@ export function SearchResultsTopicRow({
                                 {},
                                 searchParams,
                                 {topic_type: topicType},
-                                {filter: searchParams.filter}
                             ));
                         }}
                     >

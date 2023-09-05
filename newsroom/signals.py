@@ -15,3 +15,8 @@ push = signals.signal("push")
 user_created = signals.signal("user-created")
 user_updated = signals.signal("user-updated")
 user_deleted = signals.signal("user-deleted")
+
+#:
+#: ..versionadded:: 2.5.0
+#:
+company_create = signals.signal("company-create")

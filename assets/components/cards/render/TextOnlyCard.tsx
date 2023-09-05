@@ -1,9 +1,9 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, {ComponentType} from 'react';
 import CardRow from './CardRow';
 import CardFooter from './CardFooter';
 import {getPicture, shortText} from 'wire/utils';
 import {Embargo} from '../../../wire/components/fields/Embargo';
+import {ICardProps} from '../utils';
 
 const getTextOnlyPanel = (item: any, openItem: any, picture: any, cardId: any, listConfig: any) => (
     <div key={item._id} className='col-sm-6 col-md-4 col-lg-3 col-xxl-2 d-flex mb-4'>
@@ -24,23 +24,14 @@ const getTextOnlyPanel = (item: any, openItem: any, picture: any, cardId: any, l
     </div>
 );
 
+const TextOnlyCard: ComponentType<ICardProps> = (props: ICardProps) => {
+    const {items, title, id, openItem, isActive, cardId, listConfig} = props;
 
-function TextOnlyCard ({items, title, productId, openItem, isActive, cardId, listConfig}: any): any {
     return (
-        <CardRow title={title} productId={productId} isActive={isActive}>
+        <CardRow title={title} id={id} isActive={isActive}>
             {items.map((item: any) => getTextOnlyPanel(item, openItem, getPicture(item), cardId, listConfig))}
         </CardRow>
     );
-}
-
-TextOnlyCard.propTypes = {
-    items: PropTypes.array,
-    title: PropTypes.string,
-    productId: PropTypes.string,
-    openItem: PropTypes.func,
-    isActive: PropTypes.bool,
-    cardId: PropTypes.string,
-    listConfig: PropTypes.object,
 };
 
 export default TextOnlyCard;

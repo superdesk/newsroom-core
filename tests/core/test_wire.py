@@ -68,7 +68,7 @@ def test_share_items(client, app):
         assert len(outbox) == 1
         assert outbox[0].recipients == ["foo2@bar.com"]
         assert outbox[0].sender == "newsroom@localhost"
-        assert outbox[0].subject == "From AAP Newsroom: %s" % items[0]["headline"]
+        assert outbox[0].subject == "From Newshub: %s" % items[0]["headline"]
         assert "Hi Foo Bar" in outbox[0].body
         assert "admin admin (admin@sourcefabric.org) shared " in outbox[0].body
         assert items[0]["headline"] in outbox[0].body
@@ -575,6 +575,8 @@ def test_search_using_section_filter_for_public_user(client, app):
             }
         ],
     )
+
+    g.section_filters = None
 
     resp = client.get("/wire/search")
     data = json.loads(resp.get_data())

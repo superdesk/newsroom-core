@@ -1,6 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import MoreNewsButton from './MoreNewsButton';
+import {IPictureCardProps} from '../utils';
 
 const getMediaPanel = (photo: any, index: any) => {
     return (<div key={index} className='col-sm-6 col-lg-3 d-flex mb-4'>
@@ -14,20 +14,15 @@ const getMediaPanel = (photo: any, index: any) => {
     </div>);
 };
 
-function PhotoGalleryCard({photos, title, moreUrl, moreUrlLabel}: any) {
+const PhotoGalleryCard: React.ComponentType<IPictureCardProps> = (props: IPictureCardProps) => {
+    const {photos, title, moreUrl, moreUrlLabel} = props;
+
     return (
         <div className='row'>
-            <MoreNewsButton key="more" title={title} photoUrl={moreUrl} photoUrlLabel={moreUrlLabel} />
+            <MoreNewsButton kind="product" key="more" title={title} photoUrl={moreUrl} photoUrlLabel={moreUrlLabel} />
             {photos.map((photo: any, index: any) => getMediaPanel(photo, index))}
         </div>
     );
-}
-
-PhotoGalleryCard.propTypes = {
-    photos: PropTypes.array,
-    title: PropTypes.string,
-    moreUrl: PropTypes.string,
-    moreUrlLabel: PropTypes.string,
 };
 
 export default PhotoGalleryCard;

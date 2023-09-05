@@ -334,19 +334,20 @@ def _set_event_date_range(search):
     should = []
 
     if date_from and not date_to:
+        dates_field = "dates.start" if app.config.get("AGENDA_SHOW_MULTIDAY_ON_START_ONLY") else "dates.end"
         # Filter from a particular date onwards
         should = [
             {
                 "bool": {
-                    "filter": {"range": {"dates.start": {"gte": date_from}}},
                     "must_not": {"term": {"dates.all_day": True}},
+                    "filter": {"range": {dates_field: {"gte": date_from}}},
                 },
             },
             {
                 "bool": {
                     "filter": [
                         {"term": {"dates.all_day": True}},
-                        {"range": {"dates.start": {"gte": search.args["date_from"]}}},
+                        {"range": {dates_field: {"gte": search.args["date_from"]}}},
                     ],
                 },
             },
@@ -569,23 +570,11 @@ def _filter_terms(filters, item_type):
                     )
                 )
             elif val == ["not planned"]:
-                must_not_term_filters.append(
+                must_term_filters.append(
                     nested_query(
                         path="coverages",
                         query={
-                            "bool": {
-                                "filter": [
-                                    {
-                                        "terms": {
-                                            "coverages.coverage_status": [
-                                                "coverage intended",
-                                                "coverage not decided yet",
-                                                "coverage upon request",
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
+                            "bool": {"filter": [{"terms": {"coverages.coverage_status": ["coverage not intended"]}}]}
                         },
                         name="coverage_status",
                     )

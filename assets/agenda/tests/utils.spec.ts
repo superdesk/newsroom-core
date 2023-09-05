@@ -43,7 +43,7 @@ describe('utils', () => {
                 },
             ];
 
-            const groupedItems: any = keyBy(utils.groupItems(items, '2018-10-21', 'day'), 'date');
+            const groupedItems: any = keyBy(utils.groupItems(items, '2018-10-15', 'day'), 'date');
 
             expect(groupedItems['15-10-2018']['items']).toEqual(['foo']);
             expect(groupedItems['16-10-2018']['items']).toEqual(['foo']);

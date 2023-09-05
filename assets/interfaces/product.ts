@@ -3,6 +3,7 @@ import {ICompany} from './company';
 import {INavigation} from './navigation';
 
 export interface IProduct {
+    _id: string;
     name: string;
     description?: string;
     sd_product_id?: string;

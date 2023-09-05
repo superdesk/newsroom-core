@@ -17,6 +17,7 @@ from newsroom.auth.utils import (
     is_current_user,
     is_current_user_account_mgr,
     is_current_user_company_admin,
+    get_company_auth_provider,
 )
 from newsroom.settings import get_setting
 from newsroom.decorator import admin_only, login_required, account_manager_or_company_admin_only
@@ -27,6 +28,7 @@ from newsroom.companies import (
 from newsroom.notifications.notifications import get_notifications_with_items
 from newsroom.notifications import push_user_notification, push_company_notification
 from newsroom.topics import get_user_topics
+from newsroom.topics.topics import auto_enable_user_emails
 from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
 from newsroom.users.users import (
@@ -64,7 +66,7 @@ def get_view_data():
     if app.config.get("ENABLE_MONITORING"):
         rv["monitoring_list"] = get_monitoring_for_company(user)
 
-    rv.update(get_company_sections_monitoring_data(company))
+    rv.update(get_company_sections_monitoring_data(company, user))
 
     return rv
 
@@ -111,7 +113,6 @@ def create():
             return jsonify({"email": [gettext("Email address is already in use")]}), 400
 
         new_user = get_updates_from_form(form)
-        add_token_data(new_user)
         user_is_company_admin = is_current_user_company_admin()
         if user_is_company_admin:
             company = get_company()
@@ -134,8 +135,17 @@ def create():
         new_user["receive_email"] = True
         new_user["receive_app_notifications"] = True
 
+        company = get_company(new_user)
+        auth_provider = get_company_auth_provider(company)
+
+        if auth_provider.get("features", {}).get("verify_email"):
+            add_token_data(new_user)
+
         ids = get_resource_service("users").post([new_user])
-        send_token(new_user, token_type="new_account")
+
+        if auth_provider.get("features", {}).get("verify_email"):
+            send_token(new_user, token_type="new_account", update_token=False)
+
         return jsonify({"success": True, "_id": ids[0]}), 201
     return jsonify(form.errors), 400
 
@@ -146,6 +156,7 @@ def resent_invite(_id):
     user = find_one("users", _id=ObjectId(_id))
     company = get_company()
     user_is_company_admin = is_current_user_company_admin()
+    auth_provider = get_company_auth_provider(get_company(user))
 
     if not user:
         return NotFound(gettext("User not found"))
@@ -154,12 +165,10 @@ def resent_invite(_id):
     elif user_is_company_admin and (company is None or user["company"] != ObjectId(company["_id"])):
         # Company admins can only resent invites for members of their company only
         flask.abort(403)
+    elif not auth_provider.get("features", {}).get("verify_email"):
+        # Can only regenerate new token if ``verify_email`` is enabled in ``AuthProvider``
+        flask.abort(403)
 
-    updates = {}
-    add_token_data(updates)
-    get_resource_service("users").patch(ObjectId(_id), updates=updates)
-
-    user.update(updates)
     send_token(user, token_type="new_account")
     return jsonify({"success": True}), 200
 
@@ -357,6 +366,9 @@ def post_topic(_id):
         subscriber["user_id"] = ObjectId(subscriber["user_id"])
 
     ids = get_resource_service("topics").post([topic])
+
+    auto_enable_user_emails(topic, {}, user)
+
     if topic.get("is_global"):
         push_company_notification("topic_created", user_id=str(user["_id"]))
     else:

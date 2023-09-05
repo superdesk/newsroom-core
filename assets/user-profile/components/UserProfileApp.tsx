@@ -76,7 +76,7 @@ class UserProfileApp extends React.Component<any, any> {
     }
 
     isSectionEnabled(name: any) {
-        return isUserAdmin(this.props.user) || !!get(this.props, 'userSections', []).find((s: any) => s._id === name);
+        return !!get(this.props, 'userSections', []).find((s: any) => s._id === name);
     }
 
     renderModal(specs: any) {
