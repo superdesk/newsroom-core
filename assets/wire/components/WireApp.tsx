@@ -216,7 +216,7 @@ class WireApp extends BaseApp {
                         >
                             <SearchResultsBar
                                 minimizeSearchResults={this.state.minimizeSearchResults}
-
+                                initiallyOpen={true}
                                 showTotalItems={showTotalItems}
                                 showTotalLabel={showTotalLabel}
                                 showSaveTopic={showSaveTopic}

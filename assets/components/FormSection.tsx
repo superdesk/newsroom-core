@@ -1,11 +1,17 @@
 import React, {useState} from 'react';
-import PropTypes from 'prop-types';
 
-export function FormSection({name, testId, children}) {
-    const [opened, setOpened] = useState(name == null);
+interface IProps {
+    initiallyOpen?: boolean;
+    name: string;
+    dataTestId?: string;
+    children: JSX.Element;
+}
+
+export function FormSection({initiallyOpen, name, children, dataTestId}: IProps) {
+    const [opened, setOpened] = useState(initiallyOpen ?? name == null);
 
     return (
-        <div className="nh-flex__column" data-test-id={testId}>
+        <div className="nh-flex__column" data-test-id={dataTestId}>
             <div
                 className="list-item__preview-collapsible"
                 data-test-id="toggle-btn"
@@ -26,9 +32,3 @@ export function FormSection({name, testId, children}) {
         </div>
     );
 }
-
-FormSection.propTypes = {
-    name: PropTypes.string.isRequired,
-    testId: PropTypes.string,
-    children: PropTypes.node,
-};
