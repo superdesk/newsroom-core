@@ -46,6 +46,7 @@ describe('Wire - Advanced Search', function() {
             fields: ['headline', 'body_html'],
         });
         cy.url().should('include', advancedSearchUrlParam);
+        WirePage.searchResults.toggleBar();
         expectSearchResultBarTags();
 
         cy.reload();
