@@ -22,6 +22,8 @@ import {getCurrentUser} from 'company-admin/selectors';
 import {IPersonalizedDashboardsWithData} from 'home/reducers';
 import {ITopic} from 'interfaces/topic';
 
+export const WIRE_SECTION = 'wire';
+
 const modals: any = {
     shareItem: ShareItemModal,
     downloadItems: DownloadItemsModal,
@@ -231,7 +233,7 @@ class HomeApp extends React.Component<IProps, IState> {
 
     renderContent(children?: any): any {
         const {cards} = this.props;
-        const isWireSectionConfigured = Object.keys(this.props.userSections).find((key) => key === 'wire');
+        const isWireSectionConfigured = this.props.userSections[WIRE_SECTION] != null;
 
         return (
             <React.Fragment>
@@ -246,7 +248,7 @@ class HomeApp extends React.Component<IProps, IState> {
                 >
                     <div className="container-fluid">
                         {
-                            isWireSectionConfigured != null && (
+                            isWireSectionConfigured && (
                                 <div
                                     style={{
                                         display: 'flex',
