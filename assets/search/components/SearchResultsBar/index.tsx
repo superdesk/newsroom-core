@@ -39,16 +39,16 @@ class SearchResultsBarComponent extends React.Component<any, any> {
             sortFunction: () => this.setSortQuery('_score'),
         },
     ];
+    urlParams = new URLSearchParams(window.location.search);
 
     static propTypes: any;
     static defaultProps: any;
     constructor(props: any) {
         super(props);
 
-        const urlParams = new URLSearchParams(window.location.search);
 
         this.state = {
-            isTagSectionShown: this.props.initiallyOpen || urlParams.get('topic') != null,
+            isTagSectionShown: this.props.initiallyOpen || this.urlParams.get('topic') != null,
             sortValue: this.sortValues[0].label,
         };
         this.toggleTagSection = this.toggleTagSection.bind(this);
@@ -61,6 +61,14 @@ class SearchResultsBarComponent extends React.Component<any, any> {
         this.setCreatedFilter = this.setCreatedFilter.bind(this);
         this.toggleFilter = this.toggleFilter.bind(this);
         this.resetFilter = this.resetFilter.bind(this);
+    }
+
+    componentDidUpdate(prevProps: any): void {
+        if (prevProps.initiallyOpen != this.props.initiallyOpen) {
+            this.setState({
+                isTagSectionShown: this.props.initiallyOpen || this.urlParams.get('topic') != null,
+            });
+        }
     }
 
     toggleTagSection() {
