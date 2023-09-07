@@ -9,7 +9,6 @@ from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
 from datetime import timedelta
 from flask_babel import lazy_gettext
-from urllib.parse import urlparse
 
 from superdesk.default_settings import (  # noqa
     VERSION,
@@ -213,7 +212,6 @@ SIGNUP_EMAIL_RECIPIENTS = os.environ.get("SIGNUP_EMAIL_RECIPIENTS")
 
 #: public client url - used to create links within emails etc
 CLIENT_URL = os.environ.get("CLIENT_URL", "http://localhost:5050")
-SERVER_NAME = os.environ.get("SERVER_NAME") or urlparse(CLIENT_URL).netloc or CLIENT_URL
 PREFERRED_URL_SCHEME = os.environ.get("PREFERRED_URL_SCHEME") or ("https" if "https://" in CLIENT_URL else "http")
 
 MEDIA_PREFIX = os.environ.get("MEDIA_PREFIX", "/assets")
