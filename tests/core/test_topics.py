@@ -2,6 +2,7 @@ from flask import json
 from unittest import mock
 from pytest import fixture
 from copy import deepcopy
+from newsroom.auth.utils import start_user_session
 
 from newsroom.topics.views import get_topic_url
 from ..fixtures import (  # noqa: F401
@@ -38,12 +39,10 @@ company_topic_folders_url = "/api/companies/{}/topic_folders".format(COMPANY_1_I
 
 
 @fixture
-def auth_client(client):
+def auth_client(client, public_user):
     with client as cli:
         with client.session_transaction() as session:
-            session["user"] = PUBLIC_USER_ID
-            session["name"] = PUBLIC_USER_NAME
-            session["company"] = COMPANY_1_ID
+            start_user_session(public_user, session=session)
         yield cli
 
 
