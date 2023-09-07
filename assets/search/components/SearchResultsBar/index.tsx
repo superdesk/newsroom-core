@@ -25,21 +25,8 @@ import NewItemsIcon from '../NewItemsIcon';
 
 
 class SearchResultsBarComponent extends React.Component<any, any> {
-    sortValues = [
-        {
-            label: gettext('Date (Newest)'),
-            sortFunction: () => this.setSortQuery('versioncreated:desc'),
-        },
-        {
-            label: gettext('Date (Oldest)'),
-            sortFunction: () => this.setSortQuery('versioncreated:asc'),
-        },
-        {
-            label: gettext('Relevance'),
-            sortFunction: () => this.setSortQuery('_score'),
-        },
-    ];
-    topicNotNull: boolean;
+    private sortValues: Array<{label: string; sortFunction: () => void;}>;
+    private topicNotNull: boolean;
 
     static propTypes: any;
     static defaultProps: any;
@@ -47,6 +34,20 @@ class SearchResultsBarComponent extends React.Component<any, any> {
         super(props);
 
         this.topicNotNull = new URLSearchParams(window.location.search).get('topic') != null;
+        this.sortValues = [
+            {
+                label: gettext('Date (Newest)'),
+                sortFunction: () => this.setSortQuery('versioncreated:desc'),
+            },
+            {
+                label: gettext('Date (Oldest)'),
+                sortFunction: () => this.setSortQuery('versioncreated:asc'),
+            },
+            {
+                label: gettext('Relevance'),
+                sortFunction: () => this.setSortQuery('_score'),
+            },
+        ];
 
         this.state = {
             isTagSectionShown: this.props.initiallyOpen || this.topicNotNull,
