@@ -22,4 +22,4 @@ app = NewsroomWebApp("newsroom_celery")
 celery = app.celery
 
 # Set ``SERVER_NAME`` so ``url_for(_external=True)`` works
-app.config["SERVER_NAME"] = urlparse(app.config["CLIENT_URL"]).netloc or None
+app.config.setdefault("SERVER_NAME", urlparse(app.config["CLIENT_URL"]).netloc or None)
