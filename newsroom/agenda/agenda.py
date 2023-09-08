@@ -548,6 +548,12 @@ def _filter_terms(filters, item_type):
                         name="coverage_status",
                     )
                 )
+                must_not_term_filters.append(
+                    nested_query(
+                        path="coverages",
+                        query={"bool": {"must": [{"exists": {"field": "coverages.delivery_id"}}]}},
+                    )
+                )
             elif val == ["may be"]:
                 must_term_filters.append(
                     nested_query(
@@ -570,23 +576,11 @@ def _filter_terms(filters, item_type):
                     )
                 )
             elif val == ["not planned"]:
-                must_not_term_filters.append(
+                must_term_filters.append(
                     nested_query(
                         path="coverages",
                         query={
-                            "bool": {
-                                "filter": [
-                                    {
-                                        "terms": {
-                                            "coverages.coverage_status": [
-                                                "coverage intended",
-                                                "coverage not decided yet",
-                                                "coverage upon request",
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
+                            "bool": {"filter": [{"terms": {"coverages.coverage_status": ["coverage not intended"]}}]}
                         },
                         name="coverage_status",
                     )

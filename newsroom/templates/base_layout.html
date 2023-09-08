@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     {% block title_wrapper %}
-    <title>{{ config.SITE_NAME }} - {% block title %}{% endblock %}</title>
+    <title>{{ config.SITE_NAME }}{% if self.title() %} - {% endif %}{% block title %}{% endblock %}</title>
     {% endblock %}
 
     {% block fonts %}
@@ -51,9 +51,11 @@
             <div class="navbar__right navbar__right--login">
                 <div class="navbar__date">{{ get_date() | date_header }}</div>
                 <a class="nav-link" href="{{ url_for('auth.login') }}">{{ gettext('Login') }}</a>
+                {% if config.CONTACT_ADDRESS %}
                 <a class="nav-link"
                    href="{{ config.CONTACT_ADDRESS }}"
                    target="_blank">{{ gettext('Contact Us') }}</a>
+                {% endif %}
             </div>
             {% endif %}
         </nav>

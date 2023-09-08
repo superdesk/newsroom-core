@@ -712,7 +712,7 @@ const isBetweenDay = (day: moment.Moment, start: moment.Moment, end: moment.Mome
         return day.isSameOrAfter(start) && testDay.isSameOrBefore(endDate);
     }
 
-    return day.isBetween(startDate, endDate, 'day', '[]');
+    return testDay.isBetween(startDate, endDate, 'day', '[]');
 };
 
 /**
@@ -757,7 +757,7 @@ export function groupItems(items: any, activeDate: any, activeGrouping: any, fea
             }
 
             let key = null;
-            end = moment.min(end, minStart.clone().add(10, 'd')); // show each event for 10 days max not to destroy the UI
+            end = moment.min(end, start.clone().add(10, 'd')); // show each event for 10 days max not to destroy the UI
 
             // use clone otherwise it would modify start and potentially also maxStart, moments are mutable
             for (const day = start.clone(); day.isSameOrBefore(end, 'day'); day.add(1, 'd')) {

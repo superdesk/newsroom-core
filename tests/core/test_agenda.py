@@ -236,7 +236,7 @@ def test_share_items(client, app, mocker):
         assert resp.status_code == 201, resp.get_data().decode("utf-8")
         assert len(outbox) == 1
         assert outbox[0].recipients == ["foo2@bar.com"]
-        assert outbox[0].subject == "From AAP Newsroom: test headline"
+        assert outbox[0].subject == "From Newshub: test headline"
         assert "Hi Foo Bar" in outbox[0].body
         assert "admin admin (admin@sourcefabric.org) shared " in outbox[0].body
         assert "Conference Planning" in outbox[0].body
@@ -629,9 +629,8 @@ def test_filter_agenda_by_coverage_status(client):
     assert "foo" == data["_items"][0]["_id"]
 
     data = get_json(client, '/agenda/search?filter={"coverage_status":["not planned"]}')
-    assert 3 == data["_meta"]["total"]
-    assert "baz" == data["_items"][0]["_id"]
-    assert "bar" == data["_items"][1]["_id"]
+    assert 1 == data["_meta"]["total"]
+    assert "bar" == data["_items"][0]["_id"]
 
     data = get_json(client, '/agenda/search?filter={"coverage_status":["may be"]}')
     assert 1 == data["_meta"]["total"]

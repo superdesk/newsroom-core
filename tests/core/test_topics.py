@@ -2,6 +2,7 @@ from flask import json
 from unittest import mock
 from pytest import fixture
 from copy import deepcopy
+from newsroom.auth.utils import start_user_session
 
 from newsroom.topics.views import get_topic_url
 from ..fixtures import (  # noqa: F401
@@ -38,12 +39,10 @@ company_topic_folders_url = "/api/companies/{}/topic_folders".format(COMPANY_1_I
 
 
 @fixture
-def auth_client(client):
+def auth_client(client, public_user):
     with client as cli:
         with client.session_transaction() as session:
-            session["user"] = PUBLIC_USER_ID
-            session["name"] = PUBLIC_USER_NAME
-            session["company"] = COMPANY_1_ID
+            start_user_session(public_user, session=session)
         yield cli
 
 
@@ -153,7 +152,7 @@ def test_share_wire_topics(client, app):
         assert len(outbox) == 1
         assert outbox[0].recipients == ["test@bar.com"]
         assert outbox[0].sender == "newsroom@localhost"
-        assert outbox[0].subject == "From AAP Newsroom: %s" % topic["label"]
+        assert outbox[0].subject == "From Newshub: %s" % topic["label"]
         assert "Hi Test Bar" in outbox[0].body
         assert "Foo Bar (foo@bar.com) shared " in outbox[0].body
         assert topic["query"] in outbox[0].body
@@ -183,7 +182,7 @@ def test_share_agenda_topics(client, app):
         assert len(outbox) == 1
         assert outbox[0].recipients == ["test@bar.com"]
         assert outbox[0].sender == "newsroom@localhost"
-        assert outbox[0].subject == "From AAP Newsroom: %s" % agenda_topic["label"]
+        assert outbox[0].subject == "From Newshub: %s" % agenda_topic["label"]
         assert "Hi Test Bar" in outbox[0].body
         assert "Foo Bar (foo@bar.com) shared " in outbox[0].body
         assert agenda_topic["query"] in outbox[0].body

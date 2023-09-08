@@ -25,32 +25,35 @@ import NewItemsIcon from '../NewItemsIcon';
 
 
 class SearchResultsBarComponent extends React.Component<any, any> {
-    sortValues = [
-        {
-            label: gettext('Date (Newest)'),
-            sortFunction: () => this.setSortQuery('versioncreated:desc'),
-        },
-        {
-            label: gettext('Date (Oldest)'),
-            sortFunction: () => this.setSortQuery('versioncreated:asc'),
-        },
-        {
-            label: gettext('Relevance'),
-            sortFunction: () => this.setSortQuery('_score'),
-        },
-    ];
+    private sortValues: Array<{label: string; sortFunction: () => void;}>;
+    private topicNotNull: boolean;
 
     static propTypes: any;
     static defaultProps: any;
     constructor(props: any) {
         super(props);
 
-        const urlParams = new URLSearchParams(window.location.search);
+        this.topicNotNull = new URLSearchParams(window.location.search).get('topic') != null;
+        this.sortValues = [
+            {
+                label: gettext('Date (Newest)'),
+                sortFunction: () => this.setSortQuery('versioncreated:desc'),
+            },
+            {
+                label: gettext('Date (Oldest)'),
+                sortFunction: () => this.setSortQuery('versioncreated:asc'),
+            },
+            {
+                label: gettext('Relevance'),
+                sortFunction: () => this.setSortQuery('_score'),
+            },
+        ];
 
         this.state = {
-            isTagSectionShown: urlParams.get('topic') != null,
+            isTagSectionShown: this.props.initiallyOpen || this.topicNotNull,
             sortValue: this.sortValues[0].label,
         };
+
         this.toggleTagSection = this.toggleTagSection.bind(this);
         this.toggleNavigation = this.toggleNavigation.bind(this);
         this.setQuery = this.setQuery.bind(this);
@@ -61,6 +64,14 @@ class SearchResultsBarComponent extends React.Component<any, any> {
         this.setCreatedFilter = this.setCreatedFilter.bind(this);
         this.toggleFilter = this.toggleFilter.bind(this);
         this.resetFilter = this.resetFilter.bind(this);
+    }
+
+    componentDidUpdate(prevProps: any): void {
+        if (prevProps.initiallyOpen != this.props.initiallyOpen) {
+            this.setState({
+                isTagSectionShown: this.props.initiallyOpen || this.topicNotNull,
+            });
+        }
     }
 
     toggleTagSection() {
@@ -224,6 +235,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
 
 SearchResultsBarComponent.propTypes = {
     user: PropTypes.object,
+    initiallyOpen: PropTypes.bool,
 
     minimizeSearchResults: PropTypes.bool,
     showTotalItems: PropTypes.bool,
