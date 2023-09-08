@@ -10,6 +10,12 @@ import {updateUserNotificationSchedules} from 'user-profile/actions';
 import Modal from 'components/Modal';
 import {TimezoneInput} from 'components/TimezoneInput';
 
+const NOTIFICATION_TIME_OBJECT: React.InputHTMLAttributes<HTMLInputElement> = {
+    type: 'time',
+    min: '00:00',
+    step: '900',
+};
+
 interface IProps {
     modalFormInvalid(): void;
     modalFormValid(): void;
@@ -58,7 +64,7 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
         event.preventDefault();
 
         if (this.formRef.current == null) {
-            return;
+            throw new Error('ref missing');
         }
 
         const inputs = this.formRef.current.querySelectorAll('input') as NodeListOf<HTMLInputElement>;
@@ -102,31 +108,31 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                     >
                         <div className="form-group schedule-times__input-container">
                             <input
-                                type="time"
+                                type={NOTIFICATION_TIME_OBJECT.type}
                                 value={this.state.times[0]}
                                 onChange={(event) => {
                                     this.updateTime(event.target.value, 0);
                                 }}
-                                step="900"
-                                min="00:00"
+                                step={NOTIFICATION_TIME_OBJECT.step}
+                                min={NOTIFICATION_TIME_OBJECT.min}
                             />
                             <input
-                                type="time"
+                                type={NOTIFICATION_TIME_OBJECT.type}
                                 value={this.state.times[1]}
                                 onChange={(event) => {
                                     this.updateTime(event.target.value, 1);
                                 }}
-                                step="900"
-                                min="00:00"
+                                step={NOTIFICATION_TIME_OBJECT.step}
+                                min={NOTIFICATION_TIME_OBJECT.min}
                             />
                             <input
-                                type="time"
+                                type={NOTIFICATION_TIME_OBJECT.type}
                                 value={this.state.times[2]}
                                 onChange={(event) => {
                                     this.updateTime(event.target.value, 2);
                                 }}
-                                step="900"
-                                min="00:00"
+                                step={NOTIFICATION_TIME_OBJECT.step}
+                                min={NOTIFICATION_TIME_OBJECT.min}
                             />
                         </div>
                         <TimezoneInput
