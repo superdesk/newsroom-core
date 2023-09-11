@@ -169,7 +169,6 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                     className="nh-button nh-button--tertiary"
                                     onClick={() => {
                                         this.props.resetSearchParamsAndUpdateURL();
-                                        this.toggleTagSection();
                                         this.props.refresh();
                                     }}
                                 >
