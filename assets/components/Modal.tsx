@@ -134,7 +134,7 @@ class Modal extends React.Component<IProps, IState> {
                             <h5 className="modal-title">{this.props.title}</h5>
                             <CloseButton onClick={this.props.closeModal} />
                         </div>
-                        <div className="modal-body p-0">
+                        <div className="modal-body">
                             {this.props.children}
                         </div>
                         <div className="modal-footer">
