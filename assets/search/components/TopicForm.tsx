@@ -211,7 +211,8 @@ const TopicForm: React.FC<IProps> = ({
                 </div>
                 <div className="nh-flex__row">
                     <FormSection initiallyOpen={true} name={gettext('Topic details')} dataTestId="topic-form-group--params">
-                        <SearchResultTagsList
+                        <SearchResultTagsList]
+                        ref
                             user={user}
                             readonly={true}
                             showSaveTopic={false}

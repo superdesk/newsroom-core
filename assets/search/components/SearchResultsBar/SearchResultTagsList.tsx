@@ -23,7 +23,7 @@ export interface IProps {
 
     setQuery(): void;
     resetFilter(): void;
-    refresh(): void;
+    refresh?(): void;
     toggleNavigation(navigation: INavigation): void;
     toggleAdvancedSearchField(field: string): void;
     setAdvancedSearchKeywords(field: string, keywords: string): void;

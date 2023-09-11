@@ -12,7 +12,7 @@ interface IProps {
     searchParams: ISearchParams;
     setQuery: (query: string) => void;
     readonly?: boolean;
-    refresh: () => void;
+    refresh?: () => void;
 }
 
 export function SearchResultsQueryRow({searchParams, setQuery, readonly, refresh}: IProps) {
@@ -33,7 +33,7 @@ export function SearchResultsQueryRow({searchParams, setQuery, readonly, refresh
                         onClick={(event) => {
                             event.preventDefault();
                             setQuery('');
-                            refresh();
+                            refresh?.();
                         }}
                     />
                     <span className="search-result__tags-list-row-helper-text">{gettext('in all fields')}</span>

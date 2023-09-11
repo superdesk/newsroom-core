@@ -107,7 +107,7 @@ export function SearchResultsAdvancedSearchRow({
                         onClick={(event) => {
                             event.preventDefault();
                             removeKeywordEntry(field, index);
-                            refresh();
+                            refresh?.();
                         }}
                     />
                 );
@@ -134,7 +134,7 @@ export function SearchResultsAdvancedSearchRow({
                 onClick={(event) => {
                     event.preventDefault();
                     clearAdvancedSearchParams();
-                    refresh();
+                    refresh?.();
                 }}
             >
                 {gettext('Clear')}
@@ -177,7 +177,7 @@ export function SearchResultsAdvancedSearchRow({
                                 onClick={(event) => {
                                     event.preventDefault();
                                     toggleAdvancedSearchField(fieldName);
-                                    refresh();
+                                    refresh?.();
                                 }}
                             >
                                 {fieldNameToLabel[fieldName]}
