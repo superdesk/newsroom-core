@@ -110,7 +110,7 @@ class TopicEditor extends React.Component<IProps, IState> {
     }
 
     componentDidUpdate(prevProps: Readonly<IProps>) {
-        this.reloadFolders(this.props.topic != null && this.props.topic.is_global);
+        this.reloadFolders(this.props.topic?.is_global != null);
 
         if (get(prevProps, 'topic._id') !== get(this.props, 'topic._id') ||
             get(prevProps, 'topic._etag') !== get(this.props, 'topic._etag')
