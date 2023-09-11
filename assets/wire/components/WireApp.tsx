@@ -216,7 +216,13 @@ class WireApp extends BaseApp {
                         >
                             <SearchResultsBar
                                 minimizeSearchResults={this.state.minimizeSearchResults}
-                                initiallyOpen={this.props.activeQuery != null}
+                                initiallyOpen={
+                                    this.props.searchParams?.advanced != null ||
+                                    this.props.activeTopic != null ||
+                                    this.props.activeProduct != null ||
+                                    Object.keys(this.props.activeFilter ?? {}).length > 0 ||
+                                    this.props.activeQuery != null
+                                }
                                 showTotalItems={showTotalItems}
                                 showTotalLabel={showTotalLabel}
                                 showSaveTopic={showSaveTopic}
