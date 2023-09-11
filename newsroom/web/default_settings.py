@@ -212,6 +212,7 @@ SIGNUP_EMAIL_RECIPIENTS = os.environ.get("SIGNUP_EMAIL_RECIPIENTS")
 
 #: public client url - used to create links within emails etc
 CLIENT_URL = os.environ.get("CLIENT_URL", "http://localhost:5050")
+PREFERRED_URL_SCHEME = os.environ.get("PREFERRED_URL_SCHEME") or ("https" if "https://" in CLIENT_URL else "http")
 
 MEDIA_PREFIX = os.environ.get("MEDIA_PREFIX", "/assets")
 

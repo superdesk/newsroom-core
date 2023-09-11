@@ -85,20 +85,24 @@ def sign_user_by_email(
     return flask.redirect(flask.url_for(redirect_on_success))
 
 
-def start_user_session(user: User, permanent=False):
-    flask.session["user"] = str(user["_id"])  # str to avoid serialization issues
-    flask.session["name"] = "{} {}".format(user.get("first_name"), user.get("last_name"))
-    flask.session["user_type"] = user["user_type"]
-    flask.session["auth_ttl"] = utcnow().replace(tzinfo=None) + SESSION_AUTH_TTL
-    flask.session.permanent = permanent
+def start_user_session(user: User, permanent=False, session=None):
+    if session is None:
+        session = flask.session
+    session["user"] = str(user["_id"])  # str to avoid serialization issues
+    session["name"] = "{} {}".format(user.get("first_name"), user.get("last_name"))
+    session["user_type"] = user["user_type"]
+    session["auth_ttl"] = utcnow().replace(tzinfo=None) + SESSION_AUTH_TTL
+    session.permanent = permanent
 
 
-def clear_user_session():
-    flask.session["user"] = None
-    flask.session["name"] = None
-    flask.session["user_type"] = None
-    flask.session["auth_ttl"] = None
-    flask.session["auth_user"] = None
+def clear_user_session(session=None):
+    if session is None:
+        session = flask.session
+    session["user"] = None
+    session["name"] = None
+    session["user_type"] = None
+    session["auth_ttl"] = None
+    session["auth_user"] = None
 
 
 def is_current_user_admin() -> bool:
