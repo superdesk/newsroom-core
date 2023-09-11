@@ -77,6 +77,7 @@ export function SearchResultTagsList({
                 deselectMyTopic={deselectMyTopic}
             />
             <SearchResultsQueryRow
+                refresh={refresh}
                 searchParams={searchParams}
                 setQuery={setQuery}
                 readonly={readonly}

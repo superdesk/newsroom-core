@@ -134,6 +134,7 @@ export function SearchResultsAdvancedSearchRow({
                 onClick={(event) => {
                     event.preventDefault();
                     clearAdvancedSearchParams();
+                    refresh?.();
                 }}
             >
                 {gettext('Clear')}
