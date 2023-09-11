@@ -23,4 +23,4 @@ celery = app.celery
 
 # Set ``SERVER_NAME`` so ``url_for(_external=True)`` works
 # and only set it here so that web server can listeon on multiple domains
-app.config.setdefault("SERVER_NAME", urlparse(app.config["CLIENT_URL"]).netloc or None)
+app.config["SERVER_NAME"] = urlparse(app.config["CLIENT_URL"]).netloc or None
