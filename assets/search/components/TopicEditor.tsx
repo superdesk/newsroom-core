@@ -51,9 +51,13 @@ interface IProps {
     hideModal(): void;
     loadMyTopic(topic: ITopic): void;
     setTopicEditorFullscreen(fullscreen: boolean): void;
-    fetchFolders(global: boolean): Promise<Array<ITopicFolder>>;
+    fetchFolders(): Promise<void>;
     openEditTopicNotificationsModal(): void;
     setTopicSubscribers(topic: ITopic, subscribers: ITopic['subscribers']): void;
+    folders: {
+        companyFolders: Array<ITopicFolder>;
+        userFolders: Array<ITopicFolder>;
+    };
 }
 
 interface IState {
@@ -66,7 +70,6 @@ interface IState {
         tooltip: string;
     }>;
     activeTab: string;
-    folders: Array<ITopicFolder>;
 }
 
 class TopicEditor extends React.Component<IProps, IState> {
@@ -80,7 +83,6 @@ class TopicEditor extends React.Component<IProps, IState> {
             valid: false,
             tabs: [],
             activeTab: 'topic',
-            folders: [],
         };
 
         this.onChangeHandler = this.onChangeHandler.bind(this);
@@ -102,7 +104,6 @@ class TopicEditor extends React.Component<IProps, IState> {
 
     componentDidMount() {
         this.props.fetchNavigations();
-        this.reloadFolders(this.props.topic != null && this.props.topic.is_global);
 
         if (this.props.topic != null) {
             this.changeTopic(this.props.topic);
@@ -110,8 +111,6 @@ class TopicEditor extends React.Component<IProps, IState> {
     }
 
     componentDidUpdate(prevProps: Readonly<IProps>) {
-        this.reloadFolders(this.props.topic?.is_global === true);
-
         if (get(prevProps, 'topic._id') !== get(this.props, 'topic._id') ||
             get(prevProps, 'topic._etag') !== get(this.props, 'topic._etag')
         ) {
@@ -180,7 +179,6 @@ class TopicEditor extends React.Component<IProps, IState> {
 
             if (field === 'is_global') {
                 topic.folder = null;
-                this.reloadFolders(value);
             }
 
             set(topic, field, value);
@@ -424,12 +422,6 @@ class TopicEditor extends React.Component<IProps, IState> {
         });
     }
 
-    reloadFolders(global: any) {
-        this.props.fetchFolders(global).then((folders: Array<ITopicFolder>) => {
-            this.setState({folders: folders.filter((folder: any) => folder.section === this.props.section)});
-        });
-    }
-
     render() {
         // Wait for navigations to be loaded
         if (this.props.isLoading) {
@@ -506,7 +498,11 @@ class TopicEditor extends React.Component<IProps, IState> {
                                 save={this.saveTopic}
                                 onChange={this.onChangeHandler}
                                 readOnly={isReadOnly}
-                                folders={this.state.folders}
+                                folders={
+                                    this.state.topic.is_global
+                                        ? this.props.folders.companyFolders
+                                        : this.props.folders.userFolders
+                                }
                                 onFolderChange={this.onFolderChange}
 
                                 user={this.props.user}
@@ -597,7 +593,7 @@ const mapDispatchToProps = (dispatch: any) => ({
         dispatch(loadMyAgendaTopic(topic._id)) :
         dispatch(loadMyWireTopic(topic._id)),
     setTopicEditorFullscreen: (fullscreen: boolean) => dispatch(setTopicEditorFullscreen(fullscreen)),
-    fetchFolders: (global: boolean) => dispatch(fetchFolders(global, true)),
+    fetchFolders: () => dispatch(fetchFolders()),
     openEditTopicNotificationsModal: () => dispatch(openEditTopicNotificationsModal()),
     setTopicSubscribers: (topic: ITopic, subscribers: ITopic['subscribers']) =>
         dispatch(setTopicSubscribers(topic, subscribers)),

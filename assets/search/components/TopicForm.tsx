@@ -115,45 +115,48 @@ const TopicForm: React.FC<IProps> = ({
                 </div>
                 <div className="nh-flex__row">
                     <FormSection initiallyOpen={true} name={gettext('Organize your Topic')} dataTestId="topic-form-group--folder">
-                        <div className={'nh-container nh-container--direction-row mb-3 pt-2 pb-3'  + (folders.length > 0 ? '' : ' nh-container--highlight text-start')}>
-                            {folders.length > 0
-                                ? (
-                                    <Dropdown
-                                        small={true}
-                                        stretch={true}
-                                        icon={'icon--folder'}
-                                        label={getFolderName(topic, folders)}
-                                    >
-                                        {readOnly !== true && topic.folder && (
-                                            <button
-                                                key="top"
-                                                type="button"
-                                                data-test-id="dropdown-item--remove-from-folder"
-                                                className='dropdown-item'
-                                                onClick={() => onFolderChange(null)}
-                                            >
-                                                {gettext('Remove from folder')}
-                                            </button>
-                                        )}
-
-                                        {readOnly !== true && folders.map((folder: any) => (
-                                            <button
-                                                key={folder._id}
-                                                type="button"
-                                                data-test-id={`dropdown-item--${folder.name}`}
-                                                className="dropdown-item"
-                                                onClick={() => onFolderChange(folder)}
-                                                disabled={readOnly}
-                                            >
-                                                {folder.name}
-                                            </button>
-                                        ))}
-                                    </Dropdown>
-                                )
-                                : (
-                                    <p className='nh-container__text--small'>{gettext('To organize your topics, please create a folder in the “My Wire Topics” section.')}</p>
-                                )
+                        <div
+                            className={
+                                'nh-container nh-container--direction-row mb-3 pt-2 pb-3'
+                                + (folders.length > 0 ? '' : ' nh-container--highlight text-start')
                             }
+                        >
+                            {folders.length > 0 ? (
+                                <Dropdown
+                                    small={true}
+                                    stretch={true}
+                                    icon={'icon--folder'}
+                                    label={getFolderName(topic, folders)}
+                                >
+                                    {readOnly !== true && topic.folder && (
+                                        <button
+                                            key="top"
+                                            type="button"
+                                            data-test-id="dropdown-item--remove-from-folder"
+                                            className='dropdown-item'
+                                            onClick={() => onFolderChange(null)}
+                                        >
+                                            {gettext('Remove from folder')}
+                                        </button>
+                                    )}
+                                    {readOnly !== true && folders.map((folder: any) => (
+                                        <button
+                                            key={folder._id}
+                                            type="button"
+                                            data-test-id={`dropdown-item--${folder.name}`}
+                                            className="dropdown-item"
+                                            onClick={() => onFolderChange(folder)}
+                                            disabled={readOnly}
+                                        >
+                                            {folder.name}
+                                        </button>
+                                    ))}
+                                </Dropdown>
+                            ) : (
+                                <p className='nh-container__text--small'>
+                                    {gettext('To organize your topics, please create a folder in the “My Wire Topics” section.')}
+                                </p>
+                            )}
                         </div>
                     </FormSection>
                     <FormSection initiallyOpen={true} name={gettext('Email Notifications:')} dataTestId="topic-form-group--notifications">
