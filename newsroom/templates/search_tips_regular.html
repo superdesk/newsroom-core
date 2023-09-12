@@ -1,105 +1,70 @@
-<div class="advanced-search__content">
-    <div class="advanced-search__content-block advanced-search__content-block--no-background">
-        <p class="advanced-search__content-block-text">
-            <span class="advanced-search__content-block-text--bold">Be specific. </span>
-            The more relevant words you use in your search, the more successful your results.
-        </p>
-        <p class="advanced-search__content-block-text">
-            General Search = <span class="advanced-search__content-block-text--mono">Federal Budget</span><br/>
-            Specific Search = <span class="advanced-search__content-block-text--mono">Federal Budget 2023 Ministry of Health</span>
+<div class="tips-content">
+    <div>
+        <p><b>Be specific.</b> The more relevant words you use in your search, the more successful your results.</p>
+        <p>
+            General Search = <code>Federal Budget</code><br/>
+            Specific Search = <code>Federal Budget 2023 Ministry of Health</code>
         </p>
     </div>
-    <hr class="dashed" />
-    <div class="advanced-search__content-block advanced-search__content-block--no-background">
-        <p class="advanced-search__content-block-text">
-            <span class="advanced-search__content-block-text--bold">Use quotes </span>
-            to search for a phrase.
-        </p>
-        <p class="advanced-search__content-block-text">
-            Incorrect search for a phrase = <span class="advanced-search__content-block-text--mono">Winter storm warnings</span><br/>
-            Correct search for a phrase = <span class="advanced-search__content-block-text--mono">"Winter storm warnings"</span>
+    <hr />
+    <div>
+        <p><b>Use quotes</b> to search for a phrase.</p>
+        <p>
+            Incorrect search for a phrase = <code>Winter storm warnings</code><br/>
+            Correct search for a phrase = <code>"Winter storm warnings"</code>
         </p>
     </div>
-    <hr class="dashed" />
-    <div class="advanced-search__content-block advanced-search__content-block--no-background">
-        <p class="advanced-search__content-block-text advanced-search__content-block-text--bold">
-            Restricting search to a field
-        </p>
-        <p class="advanced-search__content-block-text">
-            When you run a search using the Search Bar, by default every field in a document is searchable and checked for matching query words, unless specified.
-        </p>
-        <p class="advanced-search__content-block-text">
-            The following are examples:
-        </p>
+    <hr />
+    <div>
+        <p><b>Restricting search to a field</b></p>
+        <p>When you run a search using the Search Bar, by default every field in a document is searchable and checked for matching query words, unless specified.</p>
+        <p>The following are examples:</p>
         <ul>
-            <li>Where the body_html contains "storm warning" as an exact phrase<br /><span class="advanced-search__content-block-text--mono">body_html:"storm warning"</span></li>
-            <li>Where headline field contains snow or storm<br /><span class="advanced-search__content-block-text--mono">headline:(snow OR storm)</span></li>
-            <li>Where the byline field contains the exact phrase "Noel Ransome"<br /><span class="advanced-search__content-block-text--mono">byline:"Noel Ransome"</span></li>
-            <li>Where the slugline field contains climate<br /><span class="advanced-search__content-block-text--mono">Slugline:climate</span></li>
+            <li>Where the body_html contains "storm warning" as an exact phrase<br /><code>body_html:"storm warning"</code></li>
+            <li>Where headline field contains snow or storm<br /><code>headline:(snow OR storm)</code></li>
+            <li>Where the byline field contains the exact phrase "Noel Ransome"<br /><code>byline:"Noel Ransome"</code></li>
+            <li>Where the slugline field contains climate<br /><code>Slugline:climate</code></li>
         </ul>
     </div>
-    <hr class="dashed" />
-    <div class="advanced-search__content-block advanced-search__content-block--no-background">
-        <p class="advanced-search__content-block-text advanced-search__content-block-text--bold">
-            Wildcards
-        </p>
-        <p class="advanced-search__content-block-text">
-            Wildcard searches can be run on individual terms, using <span class="advanced-search__content-block-text--mono">?</span> to replace a single character, and <span class="advanced-search__content-block-text--mono">*</span> to replace zero or more characters: <span class="advanced-search__content-block-text--mono">qu?ck bro*</span>
-        </p>
+    <hr />
+    <div>
+        <p><b>Wildcards</b></p>
+        <p>Wildcard searches can be run on individual terms, using <code>?</code> to replace a single character, and <code>*</code> to replace zero or more characters: <code>qu?ck bro*</code></p>
     </div>
-    <hr class="dashed" />
-    <div class="advanced-search__content-block advanced-search__content-block--no-background">
-        <p class="advanced-search__content-block-text advanced-search__content-block-text--bold">
-            Proximity search
-        </p>
-        <p class="advanced-search__content-block-text">
-            Use  <span class="advanced-search__content-block-text--mono">~</span> to find the matches within n words of each other.
-        </p>
-        <p class="advanced-search__content-block-text">
-            <span class="advanced-search__content-block-text--mono">“climate action”~10</span> means to find the matches where climate and action appear together with no more than 10 words between each term, regardless of the order that they appear.
-        </p>
+    <hr />
+    <div>
+        <p><b>Proximity search</b></p>
+        <p>Use  <code>~</code> to find the matches within n words of each other.</p>
+        <p><code>“climate action”~10</code> means to find the matches where climate and action appear together with no more than 10 words between each term, regardless of the order that they appear.</p>
     </div>
-    <hr class="dashed" />
-    <div class="advanced-search__content-block advanced-search__content-block--no-background">
-        <p class="advanced-search__content-block-text advanced-search__content-block-text--bold">
-            Using <span class="advanced-search__content-block-text--mono">+</span> and <span class="advanced-search__content-block-text--mono">–</span> to define what must and/or must not be present
-        </p>
-        <p class="advanced-search__content-block-text">
-            <span class="advanced-search__content-block-text--mono">winter storm +toronto -quebec</span>
-        </p>
-        <p class="advanced-search__content-block-text">
-            states that
-        </p>
+    <hr />
+    <div>
+        <p><b>Using <code>+</code> and <code>–</code> to define what must and/or must not be present</b></p>
+        <p><code>winter storm +toronto -quebec</code></p>
+        <p>states that</p>
         <ul>
             <li>Toronto must be present</li>
             <li>Quebec must not be present</li>
             <li>winter or storm are optional</li>
         </ul>
     </div>
-    <hr class="dashed" />
-    <div class="advanced-search__content-block advanced-search__content-block--no-background">
-        <p class="advanced-search__content-block-text advanced-search__content-block-text--bold">
-            List of other common fields/Boolean operators
-        </p>
+    <hr />
+    <div>
+        <p><b>List of other common fields/Boolean operators</b></p>
         <ul>
-            <li>Version e.g. <span class="advanced-search__content-block-text--mono">genre.name:Agate</span> will search for items with Agate as the version</li>
-            <li>Ranking e.g. <span class="advanced-search__content-block-text--mono">urgency:1</span> will search for items with ranking 1.</li>
-            <li>Wire Category/Calendar Category e.g. when using <span class="advanced-search__content-block-text--mono">service.name:Business</span> in the Wire section, it will search for wire items in the Business wire category. When using <span class="advanced-search__content-block-text--mono">service.name:Business</span> in the Calendar section, it will search for events and planning items in the Business category.</li>
-            <li>Subject e.g. <span class="advanced-search__content-block-text--mono">subject.name:Automobile</span> will search for items with Automobile as the subject</li>
-            <li>Source source: e.g. <span class="advanced-search__content-block-text--mono">source:The Canadian Press</span> will search for items by The Canadian Press</li>
-            <li>Word Count e.g. <span class="advanced-search__content-block-text--mono">wordcount:>100</span>  will search for items with more than 100 words</li>
+            <li>Version e.g. <code>genre.name:Agate</code> will search for items with Agate as the version</li>
+            <li>Ranking e.g. <code>urgency:1</code> will search for items with ranking 1.</li>
+            <li>Wire Category/Calendar Category e.g. when using <code>service.name:Business</code> in the Wire section, it will search for wire items in the Business wire category. When using <code>service.name:Business</code> in the Calendar section, it will search for events and planning items in the Business category.</li>
+            <li>Subject e.g. <code>subject.name:Automobile</code> will search for items with Automobile as the subject</li>
+            <li>Source source: e.g. <code>source:The Canadian Press</code> will search for items by The Canadian Press</li>
+            <li>Word Count e.g. <code>wordcount:>100</code>  will search for items with more than 100 words</li>
         </ul>
     </div>
-    <hr class="dashed" />
-    <div class="advanced-search__content-block advanced-search__content-block--no-background">
-        <p class="advanced-search__content-block-text advanced-search__content-block-text--bold">
-            Use our Filters to narrow down your search results in the Wire and Calendar. We offer a number of filtering options.
-        </p>
-
+    <hr />
+    <div>
+        <p><b>Use our Filters to narrow down your search results in the Wire and Calendar. We offer a number of filtering options.</b></p>
         <div>
-            <p class="advanced-search__content-block-text advanced-search__content-block-text--bold">
-                Filters - Wire
-            </p>
+            <h3><b>Filters - Wire</b></h3>
             <ul>
                 <li>Language – filter by the language of item</li>
                 <li>Source – filter by the source of item</li>
@@ -111,29 +76,17 @@
                 <li>Ranking – filter by the ranking of item done by our reporters (1=News – Urgent NewsAlerts, Urgents, important QuickHits; 2=News – Need to know; 3=News – Good to know; 4=News – Buzz People, Celebrity, Oddities, Brites, watercooler items; 5=News – Optional Secondary/tertiary world, sports, entertainment, life content; 6=Feature – Regular Major reviews, CP features such as Health Matters, top AP feature content; 7=Feature – Premium Editorials, columns, sidebars to regular features, non-major reviews, secondary or value-added AP feature material; 8=Routine Advisories, budget lines, other non-publishable or non-news items)</li>
             </ul>
         </div>
-
         <div>
-            <p class="advanced-search__content-block-text advanced-search__content-block-text--bold">
-                Filter - Calendar
-            </p>
-        </div>
-        
-        <div>
-            <p class="advanced-search__content-block-text">
-                <span class="advanced-search__content-block-text--bold">Events:</span> these are things that happen, something tangible - a match, a press conference, parliament sitting, a court case, etc.
-            </p>
-        </div>
-
-        <div>
-            <p class="advanced-search__content-block-text">
-                <span class="advanced-search__content-block-text--bold">Planning items:</span> this tells you what The Canadian Press is doing about an Event or an Issue. When related to an Event, it indicates to you we are covering the Event. Planning items can also be independent of an Event - this relates to issues or stories that do not have Events associated to them.
-            </p>
+            <h3><b>Filter - Calendar</b></h3>
         </div>
         <div>
-            <p class="advanced-search__content-block-text">
-                <span class="advanced-search__content-block-text--bold">Coverages:</span> they are created in Planning items. Coverages can be text, image, visual explainer, or video.
-            </p>
-
+            <p><b>Events:</b> these are things that happen, something tangible - a match, a press conference, parliament sitting, a court case, etc.</p>
+        </div>
+        <div>
+            <p><b>Planning items:</b> this tells you what The Canadian Press is doing about an Event or an Issue. When related to an Event, it indicates to you we are covering the Event. Planning items can also be independent of an Event - this relates to issues or stories that do not have Events associated to them.</p>
+        </div>
+        <div>
+            <p><b>Coverages:</b> they are created in Planning items. Coverages can be text, image, visual explainer, or video.</p>
             <ul>
                 <li>Coverage status – filter by the status of coverage</li>
                 <li>Category – filter by the category of event or a planning item</li>
