@@ -87,7 +87,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
     const isCompanyAdmin = isUserCompanyAdmin(currentUser);
     const company = companies.find((c) => c._id === user.company);
     const userIsAdmin = isUserAdmin(user);
-    const showResendInvite = (user._id == null || user.is_validated === true) && (
+    const showResendInvite = (user._id == null || user.is_validated !== true) && (
         (company?.auth_provider ?? 'newshub') === 'newshub'
     );
 
