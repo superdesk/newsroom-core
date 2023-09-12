@@ -1,3 +1,4 @@
+import {ITopic} from 'interfaces';
 import {get} from 'lodash';
 import {getConfig} from 'utils';
 
@@ -52,4 +53,8 @@ export function getAdvancedSearchFields(context: any) {
     });
 
     return (config.fields || {})[context];
+}
+
+export function getTopicUrl(topic: ITopic) {
+    return `/${topic.topic_type}?topic=${topic._id}`;
 }
