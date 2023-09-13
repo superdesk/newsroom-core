@@ -17,7 +17,6 @@ import {
     submitFollowTopic as submitProfileFollowTopic,
     hideModal,
     setTopicEditorFullscreen,
-    fetchFolders,
     openEditTopicNotificationsModal,
     setTopicSubscribers,
 } from 'user-profile/actions';
@@ -51,7 +50,6 @@ interface IProps {
     hideModal(): void;
     loadMyTopic(topic: ITopic): void;
     setTopicEditorFullscreen(fullscreen: boolean): void;
-    fetchFolders(): Promise<void>;
     openEditTopicNotificationsModal(): void;
     setTopicSubscribers(topic: ITopic, subscribers: ITopic['subscribers']): void;
     folders: {
@@ -593,7 +591,6 @@ const mapDispatchToProps = (dispatch: any) => ({
         dispatch(loadMyAgendaTopic(topic._id)) :
         dispatch(loadMyWireTopic(topic._id)),
     setTopicEditorFullscreen: (fullscreen: boolean) => dispatch(setTopicEditorFullscreen(fullscreen)),
-    fetchFolders: () => dispatch(fetchFolders()),
     openEditTopicNotificationsModal: () => dispatch(openEditTopicNotificationsModal()),
     setTopicSubscribers: (topic: ITopic, subscribers: ITopic['subscribers']) =>
         dispatch(setTopicSubscribers(topic, subscribers)),

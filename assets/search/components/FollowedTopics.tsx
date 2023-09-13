@@ -148,7 +148,7 @@ class FollowedTopics extends React.Component<any, any> {
 
     toggleGlobal() {
         this.setState((previousState: any) => ({showGlobal: !previousState.showGlobal}));
-        this.props.fetchFolders(); // state change will only happen later
+        this.props.fetchFolders();
     }
 
     createNewFolder() {
