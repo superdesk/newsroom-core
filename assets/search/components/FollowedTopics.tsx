@@ -249,7 +249,11 @@ class FollowedTopics extends React.Component<any, any> {
                                 folderPopover={this.state.folderPopover}
                                 toggleFolderPopover={this.toggleFolderPopover}
                                 moveTopic={this.props.moveTopic}
-                                saveFolder={this.props.saveFolder}
+                                saveFolder={(folder, data) => this.props.saveFolder(
+                                    folder,
+                                    data,
+                                    this.state.showGlobal,
+                                )}
                                 deleteFolder={this.deleteFolder}
                             />
                         </div>
@@ -321,7 +325,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     deleteTopic: (topic: any) => dispatch(deleteTopic(topic)),
     selectMenuItem: (item: any) => dispatch(selectMenuItem(item)),
     fetchCompanyUsers: (companyId: any) => dispatch(fetchCompanyUsers(companyId, true)),
-    saveFolder: (folder: any, data: any, global: any) => dispatch(saveFolder(folder, data, global)),
+    saveFolder: (folder: any, data: any, global: boolean) => dispatch(saveFolder(folder, data, global)),
     fetchFolders: () => dispatch(fetchFolders()),
     moveTopic: (topicId: any, folder: any) => dispatch(moveTopic(topicId, folder)),
     deleteFolder: (folder: any, global: boolean) => dispatch(deleteFolder(folder, global)),

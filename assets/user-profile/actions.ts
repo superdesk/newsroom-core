@@ -247,7 +247,7 @@ function mergeUpdates(updates: any, response: any) {
 }
 
 export const FOLDER_UPDATED = 'FOLDER_UPDATED';
-export function saveFolder(folder: any, data: any, global: any) {
+export function saveFolder(folder: any, data: any, global: boolean) {
     return (dispatch: any, getState: any) => {
         const state = getState();
         const url = getFoldersUrl(state, global, folder._id);
