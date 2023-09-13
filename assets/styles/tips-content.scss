@@ -27,8 +27,22 @@
         @extend .advanced-search__content-description-text;
     }
 
-    em {
-        color: #00658A;
+    div:nth-child(2) {
+        em {
+            color: #51831C;
+        }
+    }
+
+    div:nth-child(4) {
+        em {
+            color: #00658A;
+        }
+    }
+
+    div:nth-child(6) {
+        em {
+            color: #BC3434;
+        }
     }
 
     hr {
