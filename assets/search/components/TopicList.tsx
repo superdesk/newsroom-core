@@ -33,15 +33,16 @@ const TopicList = ({
     saveFolder,
     deleteFolder,
 }: IProps) => {
-
     if (get(topics, 'length', 0) < 0 && get(folders, 'length', 0) < 0) {
         return null;
     }
 
     const renderTopic = (topic: ITopic) => {
         const subscription = topic.subscribers?.find((sub) => sub.user_id === user._id);
+
         return (
-            <Topic key={topic._id}
+            <Topic
+                key={topic._id}
                 topic={topic}
                 actions={actions}
                 users={users}
@@ -53,10 +54,12 @@ const TopicList = ({
 
     const renderedFolders = folders.map((folder) => {
         const filteredTopics = topics.filter((topic) => topic.folder === folder._id);
+
         return (
             <TopicFolder
                 key={folder._id}
                 folder={folder}
+                index={folders.indexOf(folder)}
                 topics={filteredTopics}
                 folderPopover={folderPopover}
                 toggleFolderPopover={toggleFolderPopover}
