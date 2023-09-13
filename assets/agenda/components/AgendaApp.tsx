@@ -238,6 +238,12 @@ class AgendaApp extends BaseApp {
                             )}
 
                             <SearchResultsBar
+                                initiallyOpen={
+                                    Object.values(this.props.searchParams ?? {}).find((val) => val != null) != null ||
+                                    this.props.activeTopic != null ||
+                                    Object.keys(this.props.activeFilter ?? {}).length > 0 ||
+                                    this.props.activeQuery != null
+                                }
                                 minimizeSearchResults={this.state.minimizeSearchResults}
 
                                 showTotalItems={showTotalItems}
