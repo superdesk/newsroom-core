@@ -27,22 +27,16 @@
         @extend .advanced-search__content-description-text;
     }
 
-    div:nth-child(2) {
-        em {
-            color: #51831C;
-        }
+    .operator-and {
+        color: #51831C;
     }
 
-    div:nth-child(4) {
-        em {
-            color: #00658A;
-        }
+    .operator-or {
+        color: #00658A;
     }
 
-    div:nth-child(6) {
-        em {
-            color: #BC3434;
-        }
+    .operator-not {
+        color: #BC3434;
     }
 
     hr {
