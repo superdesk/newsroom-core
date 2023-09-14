@@ -129,8 +129,10 @@ class AgendaListItem extends React.Component<any, any> {
     renderListItem(isMobile: any, children: any) {
         const {item, isExtended, group, planningId, listConfig} = this.props;
         const classes = this.getClassNames(isExtended);
-        const planningItem = (get(item, 'planning_items') || []).find((p: any) => p.guid === planningId) || {};
-        const description =item.es_highlight ? getHighlightedDescription(item, planningItem) : getDescription(item,planningItem);
+        const planningItem = (get(item, 'planning_items') || []).find((p: any) => p.guid === planningId) || null;
+        const description = item.es_highlight
+            ? getHighlightedDescription(item, planningItem)
+            : getDescription(item,planningItem);
         // Show headline for adhoc planning items
         const showHeadline = !item.event && get(item, 'headline.length', 0) > 0;
 
@@ -182,11 +184,20 @@ class AgendaListItem extends React.Component<any, any> {
                         />
 
                         {(isMobile || isExtended) && description && (
-                            <p className="wire-articles__item__text">
-                                {item.es_highlight && item.es_highlight ? <span
-                                    dangerouslySetInnerHTML={({__html: description})}
-                                /> : <PlainText text={description} />}
-                            </p>
+                            <div className="wire-articles__item__text">
+                                {item.es_highlight && item.es_highlight
+                                    ? (
+                                        description.split('\n').map((element: string, index: number) => {
+                                            return (
+                                                <p key={index}>
+                                                    <span dangerouslySetInnerHTML={{__html: element}} />
+                                                </p>
+                                            )
+                                        })
+                                    )
+                                    : <PlainText text={description.split('\n')[0]} />
+                                }
+                            </div>
                         )}
                     </div>
                     {children}
