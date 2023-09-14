@@ -19,6 +19,13 @@ interface IProps {
     saveFolder: any;
     deleteFolder: any;
     children: any;
+
+    /**
+     * Used to track the order of every topic folder
+     * so that when open, the actions popover gets attached
+     * to the correct element from the DOM
+     */
+    index: number;
 }
 
 export function TopicFolder({
@@ -29,7 +36,8 @@ export function TopicFolder({
     moveTopic,
     saveFolder,
     deleteFolder,
-    children
+    children,
+    index,
 }: IProps) {
     const [opened, setOpened] = useState(false);
     const [editing, setEditing] = useState(EDITING_OFF);
@@ -126,8 +134,9 @@ export function TopicFolder({
                             <i className='icon--more'></i>
                         </button>
                         {
-                            folderPopover != null && (
+                            folderPopover == folder._id && (
                                 <TopicFolderActions
+                                    index={index}
                                     buttonRef={buttonRef}
                                     actions={actions}
                                     folder={folder}
