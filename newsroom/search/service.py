@@ -594,12 +594,21 @@ class BaseSearchService(Service):
                 ]
             )
 
+            field_query = highlight_search.query["bool"]["must"] or highlight_search.query["bool"]["filter"]
+            try:
+                # pop query_string type from the query which breaks the highlighting
+                field_query[0]["query_string"].pop("type", None)
+                field_query[0]["query_string"].pop("fields", None)
+            except KeyError:
+                pass
+
             for field in fields_to_highlight:
                 highlight_search.source["highlight"]["fields"][field] = {
                     "number_of_fragments": 0,
+                    "require_field_match": False,
                     "highlight_query": {
                         "bool": {
-                            "filter": highlight_search.query["bool"]["must"] or highlight_search.query["bool"]["filter"]
+                            "must": field_query,
                         }
                     },
                 }
