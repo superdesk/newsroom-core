@@ -214,10 +214,11 @@ function splitWords(str: string): Array<string> {
         .replace(/ {2,}/g, ' ')
 
         .trim()
-        .split(' ');
+        .split(/(?= [A-Z])/);
 }
 
 /**
+ * /(?= [A-Z])/
  * Returns first paragraph with highlighted text, and truncates output to ``max_length`` words
  *
  * @todo Any changes to this code **must** be reflected in the python version as well
