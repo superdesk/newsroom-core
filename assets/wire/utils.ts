@@ -214,11 +214,12 @@ function splitWords(str: string): Array<string> {
         .replace(/ {2,}/g, ' ')
 
         .trim()
-        .split(/(?= [A-Z])/);
+        // Split the input string based on spaces followed by an uppercase letter or an uppercase letter with accents.
+        // This regex handles uppercase words with or without accents.
+        .split(/(?= [A-ZÀ-ÖØ-Þ])/);
 }
 
 /**
- * /(?= [A-Z])/
  * Returns first paragraph with highlighted text, and truncates output to ``max_length`` words
  *
  * @todo Any changes to this code **must** be reflected in the python version as well
