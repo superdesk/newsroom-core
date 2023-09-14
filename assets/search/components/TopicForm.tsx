@@ -193,22 +193,26 @@ const TopicForm: React.FC<IProps> = ({
                                     {gettext('Scheduled')}
                                 </button>
                             </div>
-                            <div className="nh-container nh-container--highlight mb-3">
-                                <p className="nh-container__text--small">
-                                    {gettext('Your saved topic results will be emailed in a digest format at the time(s) per day set below.')}
-                                </p>
-                                <div className="h-spacer h-spacer--medium" />
-                                <span className="nh-container__schedule-info mb-3">
-                                    {getSubscriptionTimesString(user)}
-                                </span>
-                                <button
-                                    type="button"
-                                    className="nh-button nh-button--small nh-button--tertiary"
-                                    onClick={openEditTopicNotificationsModal}
-                                >
-                                    {gettext('Edit schedule')}
-                                </button>
-                            </div>
+                            {
+                                topicSubscriptionType !== null && (
+                                    <div className="nh-container nh-container--highlight mb-3">
+                                        <p className="nh-container__text--small">
+                                            {gettext('Your saved topic results will be emailed in a digest format at the time(s) per day set below.')}
+                                        </p>
+                                        <div className="h-spacer h-spacer--medium" />
+                                        <span className="nh-container__schedule-info mb-3">
+                                            {getSubscriptionTimesString(user)}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            className="nh-button nh-button--small nh-button--tertiary"
+                                            onClick={openEditTopicNotificationsModal}
+                                        >
+                                            {gettext('Edit schedule')}
+                                        </button>
+                                    </div>
+                                )
+                            }
                         </div>
                     </FormSection>
                 </div>
