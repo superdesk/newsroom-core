@@ -15,20 +15,20 @@ export default function AgendaLongDescription({item, plan}: {item: any, plan: an
 
     return (
         <div className="wire-column__preview__text wire-column__preview__text--pre">
-            {description.split('\n').map((lineOfPlainTex: string, index: number) => {
-                return lineOfPlainTex[0] !== '<'
+            {description.split('\n').map((lineOfHTML: string, index: number) => {
+                return lineOfHTML[0] !== '<'
                     ? (
                         <div>
                             {item.es_highlight
                                 ? (
-                                    <span dangerouslySetInnerHTML={{__html: lineOfPlainTex}} />
+                                    <span dangerouslySetInnerHTML={{__html: lineOfHTML}} />
                                 )
-                                : lineOfPlainTex
+                                : lineOfHTML
                             }
                         </div>
                     )
                     : (
-                        <div  dangerouslySetInnerHTML={{__html: lineOfPlainTex}} key={index} />
+                        <div  dangerouslySetInnerHTML={{__html: lineOfHTML}} key={index} />
                     );
             })}
         </div>
