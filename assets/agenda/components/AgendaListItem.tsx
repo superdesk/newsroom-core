@@ -187,12 +187,12 @@ class AgendaListItem extends React.Component<any, any> {
                             <div className="wire-articles__item__text">
                                 {item.es_highlight && item.es_highlight
                                     ? (
-                                        description.split('\n').map((element: string, index: number) => {
+                                        description.split('\n').map((lineOfPlainTex: string, index: number) => {
                                             return (
                                                 <p key={index}>
-                                                    <span dangerouslySetInnerHTML={{__html: element}} />
+                                                    <span dangerouslySetInnerHTML={{__html: lineOfPlainTex}} />
                                                 </p>
-                                            )
+                                            );
                                         })
                                     )
                                     : <PlainText text={description.split('\n')[0]} />
