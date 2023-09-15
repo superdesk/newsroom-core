@@ -154,6 +154,7 @@ class WireListItem extends React.Component<any, any> {
 
         return (
             <article
+                style={{backgroundColor: 'red'}}
                 key={item._id}
                 className={cardClassName}
                 ref={(elem: any) => this.dom.article = elem}
