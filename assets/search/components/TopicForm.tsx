@@ -194,7 +194,7 @@ const TopicForm: React.FC<IProps> = ({
                                 </button>
                             </div>
                             {
-                                topicSubscriptionType !== null && (
+                                (topicSubscriptionType !== null || topicSubscriptionType !== 'real-time') && (
                                     <div className="nh-container nh-container--highlight mb-3">
                                         <p className="nh-container__text--small">
                                             {gettext('Your saved topic results will be emailed in a digest format at the time(s) per day set below.')}
