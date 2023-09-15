@@ -4,12 +4,12 @@ import server from 'server';
 import analytics from 'analytics';
 
 import {getTimezoneOffset, errorHandler, notify, gettext, updateRouteParams, toggleValue} from 'utils';
-import {getNavigationUrlParam, getSearchParams, getTopicUrl} from './utils';
+import {getNavigationUrlParam, getSearchParams} from './utils';
 import {getLocations, getMapSource} from 'maps/utils';
 
 import {closeModal} from 'actions';
 import {setShareItems} from 'wire/actions';
-import {createOrUpdateTopic} from 'user-profile/actions';
+import {createOrUpdateTopic, fetchUser} from 'user-profile/actions';
 
 import {multiSelectTopicsConfigSelector} from 'ui/selectors';
 import {
@@ -260,7 +260,10 @@ export function submitFollowTopic(data: any) {
             .then((updates: any) => {
                 const topic = Object.assign(data, updates);
 
-                window.location.assign(getTopicUrl(topic));
+                dispatch(addTopic(topic));
+                dispatch(closeModal());
+                dispatch(fetchUser(userId));
+                return topic;
             })
             .catch(errorHandler);
     };

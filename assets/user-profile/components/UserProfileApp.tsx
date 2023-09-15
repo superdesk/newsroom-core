@@ -27,7 +27,6 @@ import ProfileToggle from './ProfileToggle';
 import {EditNotificationScheduleModal} from './EditNotificationScheduleModal';
 
 import '../style';
-import {isUserAdmin} from '../../users/utils';
 
 const modals: any = {
     shareItem: ShareItemModal,
