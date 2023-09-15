@@ -1,17 +1,8 @@
 // Serif font definition for publishable content parts of the application
 
-
-h1.card-title, 
-h2.card-title, 
-h3.card-title, 
-h4.card-title, 
-h5.card-title {
-    font-family: $font-family-serif;
-}
-
 .print-content {
     h1, h2, h3, h4, h5 {
-        font-family: $font-family-serif;
+        font-family: var(--font-family-core--secondary);
     }
     .print-content__header {
         margin-block-end: 1.5rem;

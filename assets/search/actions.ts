@@ -4,7 +4,7 @@ import server from 'server';
 import analytics from 'analytics';
 
 import {getTimezoneOffset, errorHandler, notify, gettext, updateRouteParams, toggleValue} from 'utils';
-import {getNavigationUrlParam, getSearchParams} from './utils';
+import {getNavigationUrlParam, getSearchParams, getTopicUrl} from './utils';
 import {getLocations, getMapSource} from 'maps/utils';
 
 import {closeModal} from 'actions';
@@ -260,9 +260,7 @@ export function submitFollowTopic(data: any) {
             .then((updates: any) => {
                 const topic = Object.assign(data, updates);
 
-                dispatch(addTopic(topic));
-                dispatch(closeModal());
-                return topic;
+                window.location.assign(getTopicUrl(topic));
             })
             .catch(errorHandler);
     };

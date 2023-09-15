@@ -843,6 +843,16 @@ def test_highlighting(client, app):
     data = json.loads(resp.get_data())
     assert data["_items"][0]["es_highlight"]["headline"][0] == '<span class="es-highlight">Demo</span> Article'
 
+    resp = client.get(
+        "/wire/search?q={query}&es_highlight=1".format(query='article AND "cheese and onions" AND "slugline" AND story')
+    )
+    data = json.loads(resp.get_data())
+    highlights = data["_items"][0]["es_highlight"]
+    assert "slugline" in highlights
+    assert "headline" in highlights
+    assert "body_html" in highlights
+    assert 4 == highlights["body_html"][0].count("es-highlight")
+
 
 def test_highlighting_with_advanced_search(client, app):
     app.data.insert(

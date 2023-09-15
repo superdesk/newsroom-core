@@ -7,6 +7,7 @@ import {SearchResultsFiltersRow} from './SearchResultsFiltersRow';
 import {IFilterGroup, INavigation, ISearchFields, ISearchParams, ITopic, IUser} from 'interfaces';
 import {SearchResultTagList} from './SearchResultTagList';
 import {gettext} from 'utils';
+import {getTopicUrl} from 'search/utils';
 
 export interface IProps {
     user: IUser;
@@ -107,7 +108,7 @@ export function SearchResultTagsList({
                             <a
                                 key="tag-filters--edit-button"
                                 className='nh-button nh-button--tertiary nh-button--small'
-                                href={`/${topicType}?topic=${activeTopic._id}`}
+                                href={getTopicUrl(activeTopic)}
                             >
                                 {gettext('Edit search terms')}
                             </a>

@@ -361,9 +361,19 @@ $container-max-widths: (
     --card-item-color-bg: hsl(0,0%,100%);
     --card-item-shadow: 0px 1px 4px hsla(0, 0%, 0%, 0.24);
     --card-item-shadow--hover: 0px 1px 8px hsla(0, 0%, 0%, 0.32);
-    --card-item-title-color: var(--color-text);
+    
     --card-item-image-color-bg: hsl(223, 17%, 29%);
     --card-item-footer-border-color: var(--color-line--x-light);
+
+    --card-item-title-font-family: var(--font-family-core--secondary);
+    --card-item-title-font-weight: 700;
+    --card-item-title-line-height: 1.4;
+    --card-item-title-color: var(--color-text); 
+    --card-item-title-font-size-h1: 2rem;
+    --card-item-title-font-size-h2: var(--text-size--xx-large);
+    --card-item-title-font-size-h3: var(--text-size--x-large);
+    --card-item-title-font-size-h4: var(--text-size--large);
+    --card-item-title-font-size-h5: var(--text-size--medium);
 
     --simplecard-item-outline-color: transparent;
     --simplecard-item-outline-color--hover: var(--color-line--medium);
@@ -492,8 +502,18 @@ $container-max-widths: (
     --toggle-button-font-weight: 500;
    
     // COMPONENT: FILTER PANE
-    --color-filterpane-bg: hsl(0, 0%, 99%);
-    --color-filterpane-text: hsl(0, 0%, 14%);
+
+    --filterpane-color-bg: hsl(0, 0%, 99%);
+    --filterpane-color-fg: var(--color-text);
+    --filterpane-section-heading-fg: var(--color-text);
+    --filterpane-section-heading-font-size: var(--text-size--small);
+    --filterpane-section-heading-font-family: var(--font-family-core--primary);
+    --filterpane-section-heading-font-weight: 700;
+    --filterpane-section-heading-text-transform: uppercase;
+    --filterpane-section-heading-margin: var(--space--1);
+    --filterpane-section-group-padding-b: var(--space--2);
+    --filterpane-section-group-margin-b: var(--space--2);
+    --filterpane-section-group-divider: 1px solid var(--color-line--light);
 
     // COMPONENT: COLLAPSIBLE BOX
     --collapsible-box-height: 48px;

@@ -27,8 +27,16 @@
         @extend .advanced-search__content-description-text;
     }
 
-    em {
+    .operator-and {
+        color: #51831C;
+    }
+
+    .operator-or {
         color: #00658A;
+    }
+
+    .operator-not {
+        color: #BC3434;
     }
 
     hr {

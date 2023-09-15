@@ -895,6 +895,7 @@ def send_topic_notification_emails(item, topics, topic_matches, users, companies
                     query = search_service.get_topic_query(
                         topic, user, company, section_filters, args={"es_highlight": 1, "ids": [item["_id"]]}
                     )
+
                     items = search_service.get_items_by_query(query, size=1)
                     highlighted_item = item
                     if items.count():
