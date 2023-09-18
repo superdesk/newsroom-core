@@ -214,9 +214,35 @@ function splitWords(str: string): Array<string> {
         .replace(/ {2,}/g, ' ')
 
         .trim()
-        // Split the input string based on spaces followed by an uppercase letter or an uppercase letter with accents.
-        // This regex handles uppercase words with or without accents.
-        .split(/(?= [A-ZÀ-ÖØ-Þ])/);
+        .split(' ');
+}
+
+/**
+ * Get text from a node, handling both text and element nodes.
+ *
+ * @param {Node} node - The node to extract text from.
+ * @param {number} count - The maximum number of characters to extract.
+ * @returns {{text: string, remainingCount: number}} - The extracted text and the remaining count.
+ */
+function getTextFromNode(node: Node, count: number): { text: string; remainingCount: number } {
+    if (node.nodeType === Node.TEXT_NODE) {
+        const textContent = (node as Text).textContent;
+        if (textContent) {
+            const sliceLength = Math.max(count, textContent.length);
+            return {
+                text: textContent.slice(0, sliceLength),
+                remainingCount: count - sliceLength,
+            };
+        }
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const tempDiv = document.createElement('div');
+        tempDiv.appendChild(node.cloneNode(true));
+        return {
+            text: tempDiv.innerHTML,
+            remainingCount: count - 1,
+        };
+    }
+    return {text: '', remainingCount: count};
 }
 
 /**
@@ -230,52 +256,39 @@ function splitWords(str: string): Array<string> {
  * @returns {string}
  */
 export function shortHighlightedtext(html: string, maxLength = 40) {
-    const parser = new DOMParser();
-    const doc: any = parser.parseFromString(html, 'text/html');
-    const span = doc.querySelector('span.es-highlight');
-    const parentElement = span.parentElement;
-    const treeWalker = (document as any).createTreeWalker(parentElement, NodeFilter.SHOW_TEXT, null, false);
-    let node = treeWalker.firstChild();
-    let text = '';
-    let count = 0;
-    let highlightedSpans = [];
-
-    while (node && count < maxLength) {
-        const content = node.textContent.trim();
-        const words = splitWords(content);
-        const remainingCount = maxLength - count;
-
-        if (words.length <= remainingCount) {
-            text += content + ' ';
-            count += words.length;
-        } else {
-            text += words.slice(0, remainingCount).join(' ');
-            count += remainingCount;
-        }
-
-        node = treeWalker.nextSibling();
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    const highlightSpan = div.querySelector('span.es-highlight');
+    if (!highlightSpan) {
+        return html;
     }
-    const truncatedText = text.trim();
-    highlightedSpans = parentElement.querySelectorAll('span.es-highlight');
-    let output = truncatedText;
-    let highlightedText = '';
-    let lastIndex = 0;
 
-    highlightedSpans.forEach((span: any) => {
-        const spanText = span.textContent.trim();
-        const spanIndex = truncatedText.indexOf(spanText, lastIndex);
+    let extractedText = '';
 
-        if (spanIndex !== -1) {
-            const spanStart = spanIndex;
-            const spanEnd = spanStart + spanText.length;
-            highlightedText += output.slice(lastIndex, spanStart) + span.outerHTML;
-            lastIndex = spanEnd;
-        }
-    });
+    // Extract text from previous siblings
+    let currentNode: Node | null = highlightSpan.previousSibling;
+    while (currentNode) {
+        const {text, remainingCount} = getTextFromNode(currentNode, maxLength);
+        extractedText = text + extractedText;
+        maxLength = remainingCount;
+        currentNode = currentNode.previousSibling;
+    }
 
-    output = highlightedText + output.slice(lastIndex);
+    // Append the highlighted span and its content
+    const tempDiv = document.createElement('div');
+    tempDiv.appendChild(highlightSpan.cloneNode(true));
+    extractedText += tempDiv.innerHTML;
 
-    return output + (count > maxLength ? '' : '...');
+    // Extract text from next siblings
+    currentNode = highlightSpan.nextSibling;
+    while (currentNode) {
+        const {text, remainingCount} = getTextFromNode(currentNode, maxLength);
+        extractedText += text;
+        maxLength = remainingCount;
+        currentNode = currentNode.nextSibling;
+    }
+
+    return extractedText + (html.length > maxLength ?'...' : '');
 }
 
 /**

@@ -66,8 +66,8 @@ describe('shortHighlightedtext', () => {
             jokainen parisuhde muuttuu huonoksi jo muutaman vuoden kuluessa.
             Tällöin kyse voi olla siitä, etteivät he kestä suhteen arkipäiväistymistä,
             kuvailee yksilö- ja pariterapeutti Jouni Pölönen.</p>\n\n
-            <p>Pölösen mukaanalkuhuuma <span class="es-highlight">kestää</span> yleensä 1–2 vuotta.
-            </p>\n\n<p>–Suhteen alussa on usein paljon seksiä ja ihmiset tuovat parhaat puolensa esiin.
+            <p>Pölösen mukaanalkuhuuma <span class="es-highlight">kestää</span> yleensä 1–2 vuotta.</p>
+            <p>–Suhteen alussa on usein paljon seksiä ja ihmiset tuovat parhaat puolensa esiin.
             Kun suhde sitten arkipäiväistyy ja intohimo väistyy arjen tieltä</p>`;
     
         const maxLength = 40;
@@ -103,8 +103,8 @@ describe('shortHighlightedtext', () => {
         jokainen parisuhde muuttuu huonoksi jo muutaman vuoden kuluessa.
         Tällöin kyse voi olla siitä, etteivät he kestä suhteen arkipäiväistymistä,
         kuvailee yksilö- ja pariterapeutti Jouni Pölönen mukaanalkuhuuma
-        <span class="es-highlight">kestää</span> yleensä 1–2 vuotta.
-        </p><p>–Suhteen alussa on usein paljon seksiä ja ihmiset tuovat parhaat puolensa esiin.
+        <span class="es-highlight">kestää</span> yleensä 1–2 vuotta.</p>
+        <p>–Suhteen alussa on usein paljon seksiä ja ihmiset tuovat parhaat puolensa esiin.
         Kun suhde sitten arkipäiväistyy ja intohimo väistyy arjen tieltä</p>`;
 
         const maxLength = 40;
@@ -112,7 +112,8 @@ describe('shortHighlightedtext', () => {
         expect(output).toEqual(`On olemassa myös sellaisia ihmisiä, joiden silmissä 
         jokainen parisuhde muuttuu huonoksi jo muutaman vuoden kuluessa.
         Tällöin kyse voi olla siitä, etteivät he kestä suhteen arkipäiväistymistä,
-        kuvailee yksilö- ja pariterapeutti Jouni Pölönen mukaanalkuhuuma <span class="es-highlight">kestää</span> yleensä 1–2 vuotta....`);
+        kuvailee yksilö- ja pariterapeutti Jouni Pölönen mukaanalkuhuuma
+        <span class="es-highlight">kestää</span> yleensä 1–2 vuotta....`);
     });
 
     it('returns highlighted text if we have multiple words search term span together', () => {
@@ -122,7 +123,7 @@ describe('shortHighlightedtext', () => {
         const maxLength = 40;
         const output = shortHighlightedtext(html, maxLength);
         expect(output).toEqual(`On olemassa myös sellaisia ihmisiä, joiden silmissä
-        jokainen parisuhde muuttuu <span class="es-highlight">mukaanalkuhuuma</span>  <span class="es-highlight">kestää</span> yleensä 1–2 vuotta...`);
+        jokainen parisuhde muuttuu <span class="es-highlight">mukaanalkuhuuma</span> <span class="es-highlight">kestää</span> yleensä 1–2 vuotta...`);
     });
        
 });
