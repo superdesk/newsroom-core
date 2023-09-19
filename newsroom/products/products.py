@@ -96,6 +96,9 @@ def get_products_by_company(
             ]
         if product_ids:
             lookup["_id"] = {"$in": product_ids}
+        else:
+            # no products selected for a company
+            return []
     else:
         lookup["companies"] = ObjectId(company["_id"])
     if navigation_id:

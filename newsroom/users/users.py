@@ -194,6 +194,7 @@ def get_updated_products(updates, original, company: Optional[Company]) -> List[
 
     company_section_names = get_company_section_names(company)
     company_product_ids = get_company_product_ids(company)
+
     return [
         product
         for product in products
