@@ -259,32 +259,24 @@ export function shortHighlightedtext(html: string, maxLength = 40) {
     const div = document.createElement('div');
     div.innerHTML = html;
     const highlightSpans = Array.from(div.querySelectorAll('span.es-highlight'));
-    if (highlightSpans.length === 0) {
-        return html;
-    }
 
     let extractedText = '';
 
     for (const highlightSpan of highlightSpans) {
-        let currentNode: Node | null = highlightSpan.previousSibling;
-        while (currentNode && currentNode.nodeType === Node.TEXT_NODE) {
-            const {text, remainingCount} = getTextFromNode(currentNode, maxLength);
+        const previousNode = highlightSpan.previousSibling;
+        if (previousNode && previousNode.nodeType === Node.TEXT_NODE) {
+            const { text, remainingCount } = getTextFromNode(previousNode, maxLength);
             extractedText += text;
             maxLength = remainingCount;
-            currentNode = currentNode.previousSibling;
         }
 
-        const tempDiv = document.createElement('div');
-        tempDiv.appendChild(highlightSpan.cloneNode(true));
-        extractedText += tempDiv.innerHTML;
+        extractedText += highlightSpan.outerHTML;
 
-        currentNode = highlightSpan.nextSibling;
-
-        while (currentNode && currentNode.nodeType === Node.TEXT_NODE) {
-            const {text, remainingCount} = getTextFromNode(currentNode, maxLength);
+        const nextNode = highlightSpan.nextSibling;
+        if (nextNode && nextNode.nodeType === Node.TEXT_NODE) {
+            const { text, remainingCount } = getTextFromNode(nextNode, maxLength);
             extractedText += text;
             maxLength = remainingCount;
-            currentNode = currentNode.nextSibling;
         }
     }
 
