@@ -237,7 +237,7 @@ class TopicEditor extends React.Component<IProps, IState> {
             }
         }
 
-        if (!canUserEditTopic(topic, this.props.user)) {
+        if (topic._id != null && !canUserEditTopic(topic, this.props.user)) {
             this.props.setTopicSubscribers(topic, topic.subscribers);
         } else {
             this.setState({topic});
