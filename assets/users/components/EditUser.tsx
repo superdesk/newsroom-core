@@ -233,7 +233,10 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                     value={user.company}
                                     defaultOption={''}
                                     options={getCompanyOptions(companies)}
-                                    onChange={onChange}
+                                    onChange={(e) => onChange({
+                                        ...e,
+                                        changeType: 'company',
+                                    })}
                                     error={errors ? errors.company : null}
                                 />
                             )}
@@ -251,7 +254,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                             )}
                         </FormToggle>
 
-                        {(userIsAdmin || hideFields.includes('sections')) ? null : (
+                        {(!currentUserIsAdmin || hideFields.includes('sections')) ? null : (
                             <FormToggle
                                 title={gettext('Sections')}
                                 testId="toggle--sections"
