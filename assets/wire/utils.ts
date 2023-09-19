@@ -258,34 +258,34 @@ function getTextFromNode(node: Node, count: number): { text: string; remainingCo
 export function shortHighlightedtext(html: string, maxLength = 40) {
     const div = document.createElement('div');
     div.innerHTML = html;
-    const highlightSpan = div.querySelector('span.es-highlight');
-    if (!highlightSpan) {
+    const highlightSpans = Array.from(div.querySelectorAll('span.es-highlight'));
+    if (highlightSpans.length === 0) {
         return html;
     }
 
     let extractedText = '';
 
-    // Extract text from previous siblings
-    let currentNode: Node | null = highlightSpan.previousSibling;
-    while (currentNode) {
-        const {text, remainingCount} = getTextFromNode(currentNode, maxLength);
-        extractedText = text + extractedText;
-        maxLength = remainingCount;
-        currentNode = currentNode.previousSibling;
-    }
+    for (const highlightSpan of highlightSpans) {
+        let currentNode: Node | null = highlightSpan.previousSibling;
+        while (currentNode && currentNode.nodeType === Node.TEXT_NODE) {
+            const {text, remainingCount} = getTextFromNode(currentNode, maxLength);
+            extractedText += text;
+            maxLength = remainingCount;
+            currentNode = currentNode.previousSibling;
+        }
 
-    // Append the highlighted span and its content
-    const tempDiv = document.createElement('div');
-    tempDiv.appendChild(highlightSpan.cloneNode(true));
-    extractedText += tempDiv.innerHTML;
+        const tempDiv = document.createElement('div');
+        tempDiv.appendChild(highlightSpan.cloneNode(true));
+        extractedText += tempDiv.innerHTML;
 
-    // Extract text from next siblings
-    currentNode = highlightSpan.nextSibling;
-    while (currentNode) {
-        const {text, remainingCount} = getTextFromNode(currentNode, maxLength);
-        extractedText += text;
-        maxLength = remainingCount;
-        currentNode = currentNode.nextSibling;
+        currentNode = highlightSpan.nextSibling;
+
+        while (currentNode && currentNode.nodeType === Node.TEXT_NODE) {
+            const {text, remainingCount} = getTextFromNode(currentNode, maxLength);
+            extractedText += text;
+            maxLength = remainingCount;
+            currentNode = currentNode.nextSibling;
+        }
     }
 
     return extractedText + (html.length > maxLength ?'...' : '');

@@ -123,14 +123,14 @@ describe('shortHighlightedtext', () => {
         const maxLength = 40;
         const output = shortHighlightedtext(html, maxLength);
         expect(output).toEqual(`On olemassa myös sellaisia ihmisiä, joiden silmissä
-        jokainen parisuhde muuttuu <span class="es-highlight">mukaanalkuhuuma</span> <span class="es-highlight">kestää</span> yleensä 1–2 vuotta...`);
+        jokainen parisuhde muuttuu <span class="es-highlight">mukaanalkuhuuma</span>  <span class="es-highlight">kestää</span> yleensä 1–2 vuotta...`);
     });
 
     it('returns highlight text condition with more tags', () => {
-        const html = '<ul><li><span class="es-highlight">foo</span></li><li><span class="es-highlight">foo</span></li><li>bar</li><li><span class="es-highlight">foo</span></li></ul>';
+        const html = '<ul><li><span class="es-highlight">foo</span></li><li> <span class="es-highlight">foo</span></li><li>bar</li><li> <span class="es-highlight">foo</span></li></ul>';
         const maxLength = 40;
         const output = shortHighlightedtext(html, maxLength);
-        expect(output).toEqual('<span class="es-highlight">foo</span>...');
+        expect(output).toEqual('<span class="es-highlight">foo</span> <span class="es-highlight">foo</span> <span class="es-highlight">foo</span>...');
     });
 
     it('returns highlight text condition with more matching words', () => {
@@ -138,7 +138,7 @@ describe('shortHighlightedtext', () => {
         <p>another <span class="es-highlight">matching</span> text.</p>`;
         const maxLength = 40;
         const output = shortHighlightedtext(html, maxLength);
-        expect(output).toEqual('some <span class="es-highlight">matching</span> text and <span class="es-highlight">more</span> matching text....');
+        expect(output).toEqual('some <span class="es-highlight">matching</span> text and  text and <span class="es-highlight">more</span> matching text.another <span class="es-highlight">matching</span> text....');
     });
 });
   
