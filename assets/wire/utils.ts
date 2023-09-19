@@ -265,7 +265,7 @@ export function shortHighlightedtext(html: string, maxLength = 40) {
     for (const highlightSpan of highlightSpans) {
         const previousNode = highlightSpan.previousSibling;
         if (previousNode && previousNode.nodeType === Node.TEXT_NODE) {
-            const { text, remainingCount } = getTextFromNode(previousNode, maxLength);
+            const {text, remainingCount} = getTextFromNode(previousNode, maxLength);
             extractedText += text;
             maxLength = remainingCount;
         }
@@ -274,7 +274,7 @@ export function shortHighlightedtext(html: string, maxLength = 40) {
 
         const nextNode = highlightSpan.nextSibling;
         if (nextNode && nextNode.nodeType === Node.TEXT_NODE) {
-            const { text, remainingCount } = getTextFromNode(nextNode, maxLength);
+            const {text, remainingCount} = getTextFromNode(nextNode, maxLength);
             extractedText += text;
             maxLength = remainingCount;
         }
