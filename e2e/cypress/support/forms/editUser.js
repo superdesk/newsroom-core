@@ -37,7 +37,6 @@ class EditUserFormWrapper extends BaseForm {
     }
 
     openAllToggleBoxes() {
-        this.getFormElement('[data-test-id="toggle--sections"]').click();
         this.getFormElement('[data-test-id="toggle--products"]').click();
         this.getFormElement('[data-test-id="toggle--user-settings"]').click();
     }
