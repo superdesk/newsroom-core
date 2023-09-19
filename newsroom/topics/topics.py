@@ -5,6 +5,7 @@ import newsroom
 import superdesk
 
 from bson import ObjectId
+from newsroom.auth import get_user
 from newsroom.types import Topic, User
 from newsroom.utils import set_original_creator, set_version_creator
 
@@ -93,6 +94,11 @@ class TopicsService(newsroom.Service):
 
         if updates.get("folder"):
             updates["folder"] = ObjectId(updates["folder"])
+
+    def on_updated(self, updates, original):
+        current_user = get_user()
+        if current_user:
+            auto_enable_user_emails(updates, original, current_user)
 
     def get_items(self, item_ids):
         return self.get(req=None, lookup={"_id": {"$in": item_ids}})

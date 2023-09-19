@@ -26,9 +26,7 @@ from newsroom.companies import (
     get_company_sections_monitoring_data,
 )
 from newsroom.notifications.notifications import get_notifications_with_items
-from newsroom.notifications import push_user_notification, push_company_notification
 from newsroom.topics import get_user_topics
-from newsroom.topics.topics import auto_enable_user_emails
 from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
 from newsroom.users.users import (
@@ -339,41 +337,6 @@ def delete(_id):
     """Deletes the user by given id"""
     get_resource_service("users").delete_action({"_id": ObjectId(_id)})
     return jsonify({"success": True}), 200
-
-
-@blueprint.route("/users/<_id>/topics", methods=["GET"])
-@login_required
-def get_topics(_id):
-    """Returns list of followed topics of given user"""
-    if flask.session["user"] != str(_id):
-        flask.abort(403)
-    return jsonify({"_items": get_user_topics(_id)}), 200
-
-
-@blueprint.route("/users/<_id>/topics", methods=["POST"])
-@login_required
-def post_topic(_id):
-    """Creates a user topic"""
-    user = get_user()
-    if str(user["_id"]) != str(_id):
-        flask.abort(403)
-
-    topic = get_json_or_400()
-    topic["user"] = user["_id"]
-    topic["company"] = user.get("company")
-
-    for subscriber in topic.get("subscribers") or []:
-        subscriber["user_id"] = ObjectId(subscriber["user_id"])
-
-    ids = get_resource_service("topics").post([topic])
-
-    auto_enable_user_emails(topic, {}, user)
-
-    if topic.get("is_global"):
-        push_company_notification("topic_created", user_id=str(user["_id"]))
-    else:
-        push_user_notification("topic_created")
-    return jsonify({"success": True, "_id": ids[0]}), 201
 
 
 @blueprint.route("/users/<user_id>/notifications", methods=["GET"])

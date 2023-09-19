@@ -342,9 +342,14 @@ export function updateUserNotificationSchedules(schedule: Omit<IUser['notificati
 }
 
 export function setTopicSubscribers(topic: ITopic, subscribers: ITopic['subscribers']) {
-    return (dispatch: any) => {
+    return (dispatch: any, getState: any) => {
+        const user = getState().user;
         const updates = {subscribers};
-        return updateTopic(topic, updates, dispatch);
+        return updateTopic(topic, updates, dispatch).then(() => {
+            // refresh user profile after topics change
+            // to get notifications updates
+            dispatch(fetchUser(user._id));
+        });
     };
 }
 
