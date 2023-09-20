@@ -218,31 +218,17 @@ function splitWords(str: string): Array<string> {
 }
 
 /**
- * Get text from a node, handling both text and element nodes.
+ * Extract text from a node, handling both text and element nodes.
  *
- * @param {Node} node - The node to extract text from.
- * @param {number} count - The maximum number of characters to extract.
- * @returns {{text: string, remainingCount: number}} - The extracted text and the remaining count.
+ * @param {Node | null} node - The node from which to extract text.
+ * @returns {string} - The extracted text from the node.
  */
-function getTextFromNode(node: Node, count: number): { text: string; remainingCount: number } {
+function getTextFromNode(node: Node | null): string {
+    if (!node) return '';
     if (node.nodeType === Node.TEXT_NODE) {
-        const textContent = (node as Text).textContent;
-        if (textContent) {
-            const sliceLength = Math.max(count, textContent.length);
-            return {
-                text: textContent.slice(0, sliceLength),
-                remainingCount: count - sliceLength,
-            };
-        }
-    } else if (node.nodeType === Node.ELEMENT_NODE) {
-        const tempDiv = document.createElement('div');
-        tempDiv.appendChild(node.cloneNode(true));
-        return {
-            text: tempDiv.innerHTML,
-            remainingCount: count - 1,
-        };
+        return node.textContent?.trim() || '';
     }
-    return {text: '', remainingCount: count};
+    return '';
 }
 
 /**
@@ -259,28 +245,27 @@ export function shortHighlightedtext(html: string, maxLength = 40) {
     const div = document.createElement('div');
     div.innerHTML = html;
     const highlightSpans = Array.from(div.querySelectorAll('span.es-highlight'));
-
-    let extractedText = '';
+    const extractedText: string[] = [];
+    let lastWord = '';
 
     for (const highlightSpan of highlightSpans) {
-        const previousNode = highlightSpan.previousSibling;
-        if (previousNode && previousNode.nodeType === Node.TEXT_NODE) {
-            const {text, remainingCount} = getTextFromNode(previousNode, maxLength);
-            extractedText += text;
-            maxLength = remainingCount;
+        const textBefore = getTextFromNode(highlightSpan.previousSibling);
+        const textAfter = getTextFromNode(highlightSpan.nextSibling);
+
+        if (textBefore && textBefore !== lastWord) {
+            extractedText.push(textBefore);
+            lastWord = textBefore;
         }
 
-        extractedText += highlightSpan.outerHTML;
+        extractedText.push(highlightSpan.outerHTML);
 
-        const nextNode = highlightSpan.nextSibling;
-        if (nextNode && nextNode.nodeType === Node.TEXT_NODE) {
-            const {text, remainingCount} = getTextFromNode(nextNode, maxLength);
-            extractedText += text;
-            maxLength = remainingCount;
+        // Append text after the highlight span
+        if (textAfter && textAfter !== lastWord) {
+            extractedText.push(textAfter);
+            lastWord = textAfter;
         }
     }
-
-    return extractedText + (html.length > maxLength ?'...' : '');
+    return extractedText.join(' ')+(html.length > maxLength ? '...' : ' ');
 }
 
 /**
