@@ -146,6 +146,12 @@ class WireApp extends BaseApp {
             );
         }
 
+        const showFilters = Object.values(this.props.searchParams ?? {}).find((val) => val != null) != null ||
+            this.props.activeTopic != null ||
+            this.props.activeProduct != null ||
+            Object.keys(this.props.activeFilter ?? {}).length > 0 ||
+            this.props.activeQuery != null;
+
         return (
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
@@ -179,7 +185,7 @@ class WireApp extends BaseApp {
                         )}
 
                         {this.props.bookmarks &&
-                            <BookmarkTabs active={this.props.context} sections={this.props.userSections}/>
+                            <BookmarkTabs active={this.props.context} sections={this.props.userSections} />
                         }
 
                         {!this.state.withSidebar && !this.props.bookmarks && (
@@ -205,34 +211,40 @@ class WireApp extends BaseApp {
                 </section>,
                 <section key="contentMain" className='content-main'>
                     <div className='wire-column--3'>
-                        <div className={`wire-column__nav ${this.state.withSidebar?'wire-column__nav--open':''}`}>
+                        <div className={`wire-column__nav ${this.state.withSidebar ? 'wire-column__nav--open' : ''}`}>
                             <h3 className="a11y-only">{gettext('Side filter panel')}</h3>
                             {this.state.withSidebar &&
                                 <SearchSidebar tabs={this.tabs} props={{...this.props}} />
                             }
                         </div>
-                        <div className={mainClassName}
+                        <div
+                            className={mainClassName}
                             ref={this.setListRef}
                         >
-                            <SearchResultsBar
-                                minimizeSearchResults={this.state.minimizeSearchResults}
+                            {
+                                showFilters && (
+                                    <SearchResultsBar
+                                        minimizeSearchResults={this.state.minimizeSearchResults}
+                                        initiallyOpen={showFilters}
+                                        showTotalItems={showTotalItems}
+                                        showTotalLabel={showTotalLabel}
+                                        showSaveTopic={showSaveTopic}
 
-                                showTotalItems={showTotalItems}
-                                showTotalLabel={showTotalLabel}
-                                showSaveTopic={showSaveTopic}
+                                        totalItems={this.props.totalItems}
+                                        totalItemsLabel={totalItemsLabel}
 
-                                totalItems={this.props.totalItems}
-                                totalItemsLabel={totalItemsLabel}
+                                        saveMyTopic={saveMyTopic}
+                                        activeTopic={this.props.activeTopic}
+                                        topicType={this.props.context === 'wire' ? this.props.context : null}
 
-                                saveMyTopic={saveMyTopic}
-                                activeTopic={this.props.activeTopic}
-                                topicType={this.props.context === 'wire' ? this.props.context : null}
-
-                                newItems={this.props.newItems}
-                                refresh={this.props.fetchItems}
-                                setSortQuery={this.props.setSortQuery}
-                                setQuery={this.props.setQuery}
-                            >
+                                        newItems={this.props.newItems}
+                                        refresh={this.props.fetchItems}
+                                        setSortQuery={this.props.setSortQuery}
+                                        setQuery={this.props.setQuery}
+                                    />
+                                )
+                            }
+                            <div className='wire-column__main-header-container'>
                                 <ListViewControls
                                     activeView={this.props.activeView}
                                     setView={this.props.setView}
@@ -244,8 +256,7 @@ class WireApp extends BaseApp {
                                     searchAllVersions={this.props.searchAllVersions}
                                     toggleSearchAllVersions={this.props.toggleSearchAllVersions}
                                 />
-                            </SearchResultsBar>
-
+                            </div>
                             <ItemsList
                                 actions={this.props.actions}
                                 activeView={this.props.activeView}
@@ -255,18 +266,18 @@ class WireApp extends BaseApp {
 
                         <div className={`wire-column__preview ${this.props.itemToPreview ? 'wire-column__preview--open' : ''}`}>
                             {this.props.itemToPreview &&
-                            <WirePreview
-                                item={this.props.itemToPreview}
-                                user={this.props.user}
-                                topics={this.props.topics}
-                                actions={this.filterActions(this.props.itemToPreview, this.props.previewConfig)}
-                                followStory={this.props.followStory}
-                                closePreview={this.props.closePreview}
-                                previewConfig={this.props.previewConfig}
-                                downloadMedia={this.props.downloadMedia}
-                                listConfig={this.props.listConfig}
-                                filterGroupLabels={this.props.filterGroupLabels}
-                            />
+                                <WirePreview
+                                    item={this.props.itemToPreview}
+                                    user={this.props.user}
+                                    topics={this.props.topics}
+                                    actions={this.filterActions(this.props.itemToPreview, this.props.previewConfig)}
+                                    followStory={this.props.followStory}
+                                    closePreview={this.props.closePreview}
+                                    previewConfig={this.props.previewConfig}
+                                    downloadMedia={this.props.downloadMedia}
+                                    listConfig={this.props.listConfig}
+                                    filterGroupLabels={this.props.filterGroupLabels}
+                                />
                             }
 
                         </div>

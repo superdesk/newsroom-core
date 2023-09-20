@@ -6,6 +6,7 @@ from authlib.integrations.flask_client import OAuth
 import superdesk
 from superdesk.utc import utcnow
 
+from newsroom.types import AuthProviderType
 from newsroom.template_filters import is_admin
 from newsroom.utils import (
     is_company_enabled,
@@ -14,6 +15,7 @@ from newsroom.utils import (
     get_cached_resource_by_id,
 )
 from newsroom.limiter import limiter
+from newsroom.auth.utils import get_company_auth_provider
 
 blueprint = Blueprint("oauth", __name__)
 oauth = None
@@ -23,7 +25,9 @@ def init_app(app):
     global oauth
     oauth = OAuth(app)
 
-    if app.config.get("GOOGLE_CLIENT_ID") and app.config.get("GOOGLE_CLIENT_SECRET"):
+    if (app.config.get("GOOGLE_CLIENT_ID") and app.config.get("GOOGLE_CLIENT_SECRET")) or app.config.get(
+        "FORCE_ENABLE_GOOGLE_OAUTH"
+    ):
         oauth.register(
             "google",
             server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
@@ -83,6 +87,10 @@ def google_authorized():
 
     if not is_account_enabled(user):
         return redirect_with_error(gettext("Account is disabled"))
+
+    auth_provider = get_company_auth_provider(company)
+    if auth_provider["auth_type"] != AuthProviderType.GOOGLE_OAUTH.value:
+        return redirect_with_error(gettext("Invalid login type, Oauth not enabled for your user"))
 
     # If the user is not yet validated, then validate it now
     if not user.get("is_validated", False):

@@ -27,7 +27,6 @@ import ProfileToggle from './ProfileToggle';
 import {EditNotificationScheduleModal} from './EditNotificationScheduleModal';
 
 import '../style';
-import {isUserAdmin} from '../../users/utils';
 
 const modals: any = {
     shareItem: ShareItemModal,
@@ -76,7 +75,7 @@ class UserProfileApp extends React.Component<any, any> {
     }
 
     isSectionEnabled(name: any) {
-        return isUserAdmin(this.props.user) || !!get(this.props, 'userSections', []).find((s: any) => s._id === name);
+        return !!get(this.props, 'userSections', []).find((s: any) => s._id === name);
     }
 
     renderModal(specs: any) {

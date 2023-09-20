@@ -114,7 +114,52 @@ const TopicForm: React.FC<IProps> = ({
                     </div>
                 </div>
                 <div className="nh-flex__row">
-                    <FormSection name={gettext('Email Notifications:')} testId="topic-form-group--notifications">
+                    <FormSection initiallyOpen={true} name={gettext('Organize your Topic')} dataTestId="topic-form-group--folder">
+                        <div
+                            className={
+                                'nh-container nh-container--direction-row mb-3 pt-2 pb-3'
+                                + (folders.length > 0 ? '' : ' nh-container--highlight text-start')
+                            }
+                        >
+                            {folders.length > 0 ? (
+                                <Dropdown
+                                    small={true}
+                                    stretch={true}
+                                    icon={'icon--folder'}
+                                    label={getFolderName(topic, folders)}
+                                >
+                                    {readOnly !== true && topic.folder && (
+                                        <button
+                                            key="top"
+                                            type="button"
+                                            data-test-id="dropdown-item--remove-from-folder"
+                                            className='dropdown-item'
+                                            onClick={() => onFolderChange(null)}
+                                        >
+                                            {gettext('Remove from folder')}
+                                        </button>
+                                    )}
+                                    {readOnly !== true && folders.map((folder: any) => (
+                                        <button
+                                            key={folder._id}
+                                            type="button"
+                                            data-test-id={`dropdown-item--${folder.name}`}
+                                            className="dropdown-item"
+                                            onClick={() => onFolderChange(folder)}
+                                            disabled={readOnly}
+                                        >
+                                            {folder.name}
+                                        </button>
+                                    ))}
+                                </Dropdown>
+                            ) : (
+                                <p className='nh-container__text--small'>
+                                    {gettext('To organize your topics, please create a folder in the “My Wire Topics” section.')}
+                                </p>
+                            )}
+                        </div>
+                    </FormSection>
+                    <FormSection initiallyOpen={true} name={gettext('Email Notifications:')} dataTestId="topic-form-group--notifications">
                         <div>
                             <div className="toggle-button__group toggle-button__group--spaced toggle-button__group--stretch-items my-2">
                                 <button
@@ -148,59 +193,31 @@ const TopicForm: React.FC<IProps> = ({
                                     {gettext('Scheduled')}
                                 </button>
                             </div>
-                            <div className="nh-container nh-container--highlight mb-3">
-                                <p className="nh-container__text--small">
-                                    {gettext('Your saved topic results will be emailed in a digest format at the time(s) per day set below.')}
-                                </p>
-                                <div className="h-spacer h-spacer--medium" />
-                                <span className="nh-container__schedule-info mb-3">
-                                    {getSubscriptionTimesString(user)}
-                                </span>
-                                <button
-                                    type="button"
-                                    className="nh-button nh-button--small nh-button--tertiary"
-                                    onClick={openEditTopicNotificationsModal}
-                                >
-                                    {gettext('Edit schedule')}
-                                </button>
-                            </div>
-                        </div>
-                    </FormSection>
-                    <FormSection name={gettext('Organize your Topic')} testId="topic-form-group--folder">
-                        <div className="nh-container nh-container--direction-row mb-3 pt-2 pb-3">
-                            <Dropdown
-                                small={true}
-                                stretch={true}
-                                icon={'icon--folder'}
-                                label={getFolderName(topic, folders)}
-                            >
-                                {readOnly !== true && topic.folder && (
-                                    <button
-                                        key="top"
-                                        type="button"
-                                        data-test-id="dropdown-item--remove-from-folder"
-                                        className='dropdown-item'
-                                        onClick={() => onFolderChange(null)}
-                                    >{gettext('Remove from folder')}</button>
-                                )}
-                                {readOnly !== true && folders.map((folder: any) => (
-                                    <button
-                                        key={folder._id}
-                                        type="button"
-                                        data-test-id={`dropdown-item--${folder.name}`}
-                                        className="dropdown-item"
-                                        onClick={() => onFolderChange(folder)}
-                                        disabled={readOnly}
-                                    >
-                                        {folder.name}
-                                    </button>
-                                ))}
-                            </Dropdown>
+                            {
+                                (topicSubscriptionType !== null && topicSubscriptionType !== 'real-time') && (
+                                    <div className="nh-container nh-container--highlight mb-3">
+                                        <p className="nh-container__text--small">
+                                            {gettext('Your saved topic results will be emailed in a digest format at the time(s) per day set below.')}
+                                        </p>
+                                        <div className="h-spacer h-spacer--medium" />
+                                        <span className="nh-container__schedule-info mb-3">
+                                            {getSubscriptionTimesString(user)}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            className="nh-button nh-button--small nh-button--tertiary"
+                                            onClick={openEditTopicNotificationsModal}
+                                        >
+                                            {gettext('Edit schedule')}
+                                        </button>
+                                    </div>
+                                )
+                            }
                         </div>
                     </FormSection>
                 </div>
                 <div className="nh-flex__row">
-                    <FormSection name={gettext('Topic details')} testId="topic-form-group--params">
+                    <FormSection initiallyOpen={true} name={gettext('Topic details')} dataTestId="topic-form-group--params">
                         <SearchResultTagsList
                             user={user}
                             readonly={true}

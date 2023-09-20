@@ -87,6 +87,9 @@
     .modal-content {
         height: 100%;
     }
+    .modal-body {
+        padding: 0 !important;
+    }
 }
 .modal-body {
     overflow-y: auto;

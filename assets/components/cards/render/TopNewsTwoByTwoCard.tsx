@@ -68,7 +68,7 @@ const getTopNews = (items: any, openItem: any, cardId: any, listConfig: any) => 
 
 function TopNewsTwoByTwoCard ({items, title, productId, openItem, isActive, cardId, listConfig}: any): any {
     return (
-        <CardRow title={title} productId={productId} isActive={isActive}>
+        <CardRow title={title} id={productId} isActive={isActive}>
             {getTopNews(items, openItem, cardId, listConfig)}
         </CardRow>
     );

@@ -33,10 +33,12 @@ import MonitoringEditor from 'search/components/MonitoringEditor';
 import TopicEditor from 'search/components/TopicEditor';
 import TopicList from 'search/components/TopicList';
 import {TopicFolderEditor} from './TopicFolderEditor';
+import {ITopicAction} from './Topic';
+import {ITopicFolder} from 'interfaces';
 
 class FollowedTopics extends React.Component<any, any> {
     static propTypes: any;
-    actions: any;
+    actions: Array<ITopicAction>;
     constructor(props: any, context: any) {
         super(props, context);
 
@@ -59,7 +61,7 @@ class FollowedTopics extends React.Component<any, any> {
                 name: gettext('Remove from folder'),
                 icon: 'folder-remove-from',
                 action: this.removeTopicFolder,
-                if: (topic: any) => topic.folder != null && canUserEditTopic(topic, this.props.user),
+                if: (topic) => topic.folder != null && canUserEditTopic(topic, this.props.user),
             },
             {
                 id: 'edit',
@@ -69,8 +71,7 @@ class FollowedTopics extends React.Component<any, any> {
             }];
 
         if (this.props.topicType !== 'monitoring') {
-            this.actions = [
-                ...this.actions,
+            this.actions = this.actions.concat([
                 {
                     id: 'share',
                     name: gettext('Share'),
@@ -81,9 +82,9 @@ class FollowedTopics extends React.Component<any, any> {
                     name: gettext('Delete'),
                     icon: 'trash',
                     action: this.deleteTopic,
-                    when: (topic: any) => canUserEditTopic(topic, this.props.user),
+                    if: (topic) => canUserEditTopic(topic, this.props.user),
                 }
-            ].filter(isActionEnabled('topic_actions'));
+            ]).filter(isActionEnabled('topic_actions'));
         }
     }
 
@@ -147,7 +148,7 @@ class FollowedTopics extends React.Component<any, any> {
 
     toggleGlobal() {
         this.setState((previousState: any) => ({showGlobal: !previousState.showGlobal}));
-        this.props.fetchFolders(!this.state.showGlobal); // state change will only happen later
+        this.props.fetchFolders();
     }
 
     createNewFolder() {
@@ -166,7 +167,7 @@ class FollowedTopics extends React.Component<any, any> {
         this.props.deleteFolder(folder, this.state.showGlobal);
     }
 
-    toggleFolderPopover(folder: any) {
+    toggleFolderPopover(folder: ITopicFolder) {
         this.setState({folderPopover: !this.state.folderPopover || this.state.folderPopover !== folder._id ? folder._id : null});
     }
 
@@ -239,25 +240,36 @@ class FollowedTopics extends React.Component<any, any> {
                                 topics={this.getFilteredTopics()}
                                 selectedTopicId={get(this.props.selectedItem, '_id')}
                                 actions={this.actions}
+                                user={this.props.user}
                                 users={this.props.companyUsers}
-                                folders={this.props.folders}
+                                folders={
+                                    this.state.showGlobal
+                                        ? this.props.folders.companyFolders
+                                        : this.props.folders.userFolders
+                                }
                                 folderPopover={this.state.folderPopover}
                                 toggleFolderPopover={this.toggleFolderPopover}
                                 moveTopic={this.props.moveTopic}
-                                saveFolder={this.props.saveFolder}
+                                saveFolder={(folder, data) => this.props.saveFolder(
+                                    folder,
+                                    data,
+                                    this.state.showGlobal,
+                                )}
                                 deleteFolder={this.deleteFolder}
                             />
                         </div>
                     </div>
                 )}
-                {this.props.selectedItem && (this.props.topicType === 'monitoring' ?
+                {this.props.selectedItem && (this.props.topicType === 'monitoring' ? (
                     <MonitoringEditor
                         item={this.props.selectedItem}
                         closeEditor={this.closeEditor}
                         onTopicChanged={this.onTopicChanged}
                         isAdmin={this.isMonitoringAdmin()}
-                    /> :
+                    />
+                ) : (
                     <TopicEditor
+                        folders={this.props.folders}
                         topic={this.props.selectedItem}
                         globalTopicsEnabled={this.props.globalTopicsEnabled}
                         closeEditor={this.closeEditor}
@@ -265,7 +277,8 @@ class FollowedTopics extends React.Component<any, any> {
                         isAdmin={canUserManageTopics(this.props.user)}
                         user={this.props.user}
                         companyUsers={this.props.companyUsers}
-                    />)}
+                    />
+                ))}
             </div>
         );
     }
@@ -291,10 +304,7 @@ FollowedTopics.propTypes = {
     moveTopic: PropTypes.func,
     saveFolder: PropTypes.func,
     deleteFolder: PropTypes.func,
-    folders: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        section: PropTypes.string.isRequired,
-    })),
+    folders: PropTypes.object,
 };
 
 const mapStateToProps = (state: any, ownProps: any) => ({
@@ -316,8 +326,8 @@ const mapDispatchToProps = (dispatch: any) => ({
     deleteTopic: (topic: any) => dispatch(deleteTopic(topic)),
     selectMenuItem: (item: any) => dispatch(selectMenuItem(item)),
     fetchCompanyUsers: (companyId: any) => dispatch(fetchCompanyUsers(companyId, true)),
-    saveFolder: (folder: any, data: any, global: any) => dispatch(saveFolder(folder, data, global)),
-    fetchFolders: (global: any) => dispatch(fetchFolders(global)),
+    saveFolder: (folder: any, data: any, global: boolean) => dispatch(saveFolder(folder, data, global)),
+    fetchFolders: () => dispatch(fetchFolders()),
     moveTopic: (topicId: any, folder: any) => dispatch(moveTopic(topicId, folder)),
     deleteFolder: (folder: any, global: boolean) => dispatch(deleteFolder(folder, global)),
 });

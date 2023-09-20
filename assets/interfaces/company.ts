@@ -1,6 +1,21 @@
 import {TDatetime} from './common';
 import {IUser} from './user';
 
+export interface IAuthProvider {
+    _id: string;
+    name: string;
+    auth_type: string;
+}
+
+export interface ICompanyType {
+    id: string;
+    name: string;
+}
+
+export interface IService {
+    name: string;
+    code: string;
+}
 
 export interface ICompany {
     _id: string;
@@ -17,7 +32,7 @@ export interface ICompany {
     archive_access?: boolean;
     events_only?: boolean;
     restrict_coverage_info?: boolean;
-    company_type?: string;
+    company_type?: ICompanyType['id'];
     account_manager?: string;
     monitoring_administrator?: IUser['_id'];
     allowed_ip_list?: Array<string>;
@@ -29,4 +44,5 @@ export interface ICompany {
         section: 'wire' | 'agenda';
     }>;
     auth_domain?: string;
+    auth_provider?: IAuthProvider['_id']; // if not defined, system assumes a value of 'newshub'
 }

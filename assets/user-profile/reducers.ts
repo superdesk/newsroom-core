@@ -21,6 +21,7 @@ import {SET_USER_COMPANY_MONITORING_LIST} from 'monitoring/actions';
 import {modalReducer} from 'reducers';
 import {GET_NAVIGATIONS, QUERY_NAVIGATIONS} from 'navigations/actions';
 import {SET_TOPICS} from '../search/actions';
+import {ITopicFolder} from 'interfaces';
 
 export interface IUserProfileStore {
     allSections?: Array<any>;
@@ -43,7 +44,8 @@ const initialState: any = {
     selectedItem: null,
     editorFullscreen: false,
     locators: [],
-    folders: [],
+    companyFolders: [],
+    userFolders: [],
 };
 
 export default function itemReducer(state: any = initialState, action: any): IUserProfileStore {
@@ -204,7 +206,8 @@ export default function itemReducer(state: any = initialState, action: any): IUs
     case RECIEVE_FOLDERS:
         return {
             ...state,
-            folders: action.payload,
+            companyFolders: action.payload.companyFolders,
+            userFolders: action.payload.userFolders,
         };
 
     case TOPIC_UPDATED:
@@ -217,12 +220,17 @@ export default function itemReducer(state: any = initialState, action: any): IUs
 
                 return {...topic, ...action.payload.updates};
             }),
+            selectedItem: state.selectedItem?._id === action.payload.topic._id ? {...state.selectedItem, ...action.payload.updates} : state.selectedItem,
         };
 
-    case FOLDER_UPDATED:
+    case FOLDER_UPDATED: {
+        const foldersToAccess = state.companyFolders.find(({_id}: ITopicFolder) => action.payload.folder._id === _id) != null
+            ? 'companyFolders'
+            : 'userFolders';
+
         return {
             ...state,
-            folders: state.folders.map((folder: any) => {
+            [foldersToAccess]: state[foldersToAccess].map((folder: ITopicFolder) => {
                 if (folder._id !== action.payload.folder._id) {
                     return folder;
                 }
@@ -230,12 +238,18 @@ export default function itemReducer(state: any = initialState, action: any): IUs
                 return {...folder, ...action.payload.updates};
             }),
         };
+    }
 
-    case FOLDER_DELETED:
+    case FOLDER_DELETED: {
+        const foldersToAccess = state.companyFolders.find(({_id}: ITopicFolder) => action.payload.folder._id === _id) != null
+            ? 'companyFolders'
+            : 'userFolders';
+
         return {
             ...state,
-            folders: state.folders.filter((folder: any) => folder._id !== action.payload.folder._id),
+            [foldersToAccess]: state[foldersToAccess].filter((folder: any) => folder._id !== action.payload.folder._id),
         };
+    }
 
     default:
         return state;

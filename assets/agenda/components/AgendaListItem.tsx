@@ -105,7 +105,7 @@ class AgendaListItem extends React.Component<any, any> {
     getClassNames(isExtended: any) {
         return {
             card: classNames('wire-articles__item-wrap col-12 agenda-item'),
-            wrap: classNames('wire-articles__item wire-articles__item--list', {
+            wrap: classNames('wire-articles__item wire-articles__item--agenda wire-articles__item--list', {
                 'wire-articles__item--covering': hasCoverages(this.props.item),
                 'wire-articles__item--watched': isWatched(this.props.item, this.props.user),
                 'wire-articles__item--not-covering': !hasCoverages(this.props.item),
@@ -129,8 +129,10 @@ class AgendaListItem extends React.Component<any, any> {
     renderListItem(isMobile: any, children: any) {
         const {item, isExtended, group, planningId, listConfig} = this.props;
         const classes = this.getClassNames(isExtended);
-        const planningItem = (get(item, 'planning_items') || []).find((p: any) => p.guid === planningId) || {};
-        const description =item.es_highlight ? getHighlightedDescription(item, planningItem) : getDescription(item,planningItem);
+        const planningItem = (get(item, 'planning_items') || []).find((p: any) => p.guid === planningId) || null;
+        const description = item.es_highlight
+            ? getHighlightedDescription(item, planningItem)
+            : getDescription(item,planningItem);
         // Show headline for adhoc planning items
         const showHeadline = !item.event && get(item, 'headline.length', 0) > 0;
 
@@ -182,11 +184,20 @@ class AgendaListItem extends React.Component<any, any> {
                         />
 
                         {(isMobile || isExtended) && description && (
-                            <p className="wire-articles__item__text">
-                                {item.es_highlight && item.es_highlight ? <span
-                                    dangerouslySetInnerHTML={({__html: description})}
-                                /> : <PlainText text={description} />}
-                            </p>
+                            <div className="wire-articles__item__text">
+                                {item.es_highlight && item.es_highlight
+                                    ? (
+                                        description.split('\n').map((lineOfHTML: string, index: number) => {
+                                            return (
+                                                <p key={index}>
+                                                    <span dangerouslySetInnerHTML={{__html: lineOfHTML}} />
+                                                </p>
+                                            );
+                                        })
+                                    )
+                                    : <PlainText text={description.split('\n')[0]} />
+                                }
+                            </div>
                         )}
                     </div>
                     {children}

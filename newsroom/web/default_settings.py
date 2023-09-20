@@ -176,8 +176,8 @@ CORE_APPS = [
     "newsroom.notifications.send_scheduled_notifications",
 ]
 
-SITE_NAME = "AAP Newsroom"
-COPYRIGHT_HOLDER = "AAP"
+SITE_NAME = "Newshub"
+COPYRIGHT_HOLDER = "Sourcefabric"
 COPYRIGHT_NOTICE = ""
 USAGE_TERMS = ""
 CONTACT_ADDRESS = "#"
@@ -212,6 +212,7 @@ SIGNUP_EMAIL_RECIPIENTS = os.environ.get("SIGNUP_EMAIL_RECIPIENTS")
 
 #: public client url - used to create links within emails etc
 CLIENT_URL = os.environ.get("CLIENT_URL", "http://localhost:5050")
+PREFERRED_URL_SCHEME = os.environ.get("PREFERRED_URL_SCHEME") or ("https" if "https://" in CLIENT_URL else "http")
 
 MEDIA_PREFIX = os.environ.get("MEDIA_PREFIX", "/assets")
 
@@ -372,13 +373,22 @@ CELERY_TASK_QUEUES = (
         Exchange(celery_queue("newsroom"), type="topic"),
         routing_key="newsroom.#",
     ),
+    Queue(
+        celery_queue("newsroom.push"),
+        Exchange(celery_queue("newsroom.push")),
+        routing_key="newsroom.push",
+    ),
 )
 
 CELERY_TASK_ROUTES = {
+    "newsroom.push.*": {
+        "queue": celery_queue("newsroom.push"),
+        "routing_key": "newsroom.push",
+    },
     "newsroom.*": {
         "queue": celery_queue("newsroom"),
         "routing_key": "newsroom.task",
-    }
+    },
 }
 
 
@@ -621,3 +631,24 @@ AGENDA_SEARCH_FIELDS = [
     "description_text",
     "location.name",
 ]
+
+#: The available authentication providers
+#:
+#: .. versionadded:: 2.5.0
+#:
+AUTH_PROVIDERS = [
+    {
+        "_id": "newshub",
+        "name": lazy_gettext("Newshub"),
+        "auth_type": "password",
+        "features": {"verify_email": True},
+    }
+]
+
+#:
+#: If `True` it will show multi day events only on starting day,
+#  when `False` those will be visible on every day.
+#:
+#: .. versionadded: 2.5.0
+#:
+AGENDA_SHOW_MULTIDAY_ON_START_ONLY = True

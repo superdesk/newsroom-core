@@ -1,4 +1,4 @@
-import {IUser} from 'interfaces';
+import {ITopic, IUser} from 'interfaces';
 
 import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
@@ -247,7 +247,7 @@ function mergeUpdates(updates: any, response: any) {
 }
 
 export const FOLDER_UPDATED = 'FOLDER_UPDATED';
-export function saveFolder(folder: any, data: any, global: any) {
+export function saveFolder(folder: any, data: any, global: boolean) {
     return (dispatch: any, getState: any) => {
         const state = getState();
         const url = getFoldersUrl(state, global, folder._id);
@@ -257,14 +257,14 @@ export function saveFolder(folder: any, data: any, global: any) {
 
             return server.patch(url, updates, folder._etag)
                 .then(() => {
-                    dispatch(fetchFolders(global));
+                    dispatch(fetchFolders());
                 });
         } else {
             const payload = {...data, section: state.selectedMenu === 'events' ? 'agenda' : 'wire'};
 
             return server.post(url, payload)
                 .then(() => {
-                    dispatch(fetchFolders(global));
+                    dispatch(fetchFolders());
                 });
         }
     };
@@ -272,11 +272,12 @@ export function saveFolder(folder: any, data: any, global: any) {
 
 export const FOLDER_DELETED = 'FOLDER_DELETED';
 export function deleteFolder(folder: any, global: boolean, deleteTopics?: boolean) {
+
     return (dispatch: any, getState: any) => {
         const state = getState();
         const url = getFoldersUrl(state, global, folder._id);
 
-        if (!window.confirm(gettext('Are you sure you want to delete folder?'))) {
+        if (!window.confirm(gettext('Are you sure you want to delete the folder {{name}} and all of its contents?', {name: folder.name}))) {
             return;
         }
 
@@ -291,19 +292,25 @@ export const RECIEVE_FOLDERS = 'RECIEVE_FOLDERS';
  * @param {bool} global - fetch company or user folders
  * @param {bool} skipDispatch - if true it won't replace folders in store
  */
-export function fetchFolders(global: boolean, skipDispatch?: boolean) {
+export function fetchFolders() {
     return (dispatch: any, getState: any) => {
         const state = getState();
-        const url = getFoldersUrl(state, global);
+        const companyTopicsUrl = getFoldersUrl(state, true);
+        const userTopicsUrl = getFoldersUrl(state, false);
 
-        return server.get(url).then((res) => {
-            if (skipDispatch) {
-                return res._items;
-            }
-
-            dispatch({type: RECIEVE_FOLDERS, payload: res._items});
-        }, (reason) => {
-            console.error(reason);
+        return Promise.all([
+            server.get(companyTopicsUrl),
+            server.get(userTopicsUrl),
+        ]).then(([companyFolders, userFolders]) => {
+            dispatch({
+                type: RECIEVE_FOLDERS,
+                payload: {
+                    companyFolders: companyFolders._items,
+                    userFolders: userFolders._items,
+                },
+            });
+        }).catch((error) => {
+            console.error(error);
             return Promise.reject();
         });
     };
@@ -312,18 +319,11 @@ export function fetchFolders(global: boolean, skipDispatch?: boolean) {
 export const TOPIC_UPDATED = 'TOPIC_UPDATED';
 export function moveTopic(topicId: any, folder: any) {
     return (dispatch: any, getState: any) => {
-        const updates = {
-            folder: folder != null ? folder._id : null,
-        };
-
         const state = getState();
+        const updates = {folder: folder != null ? folder._id : null};
         const topic = state.topics.find((topic: any) => topic._id === topicId);
-        const url = `/api/users/${topic.user}/topics/${topicId}`;
 
-        return server.patch(url, updates, topic._etag).then((response) => {
-            mergeUpdates(updates, response);
-            dispatch({type: TOPIC_UPDATED, payload: {topic, updates}});
-        });
+        return updateTopic(topic, updates, dispatch);
     };
 }
 
@@ -339,4 +339,25 @@ export function updateUserNotificationSchedules(schedule: Omit<IUser['notificati
             })
             .catch((error) => errorHandler(error, dispatch, setError(error)));
     };
+}
+
+export function setTopicSubscribers(topic: ITopic, subscribers: ITopic['subscribers']) {
+    return (dispatch: any, getState: any) => {
+        const user = getState().user;
+        const updates = {subscribers};
+        return updateTopic(topic, updates, dispatch).then(() => {
+            // refresh user profile after topics change
+            // to get notifications updates
+            dispatch(fetchUser(user._id));
+        });
+    };
+}
+
+function updateTopic(topic: ITopic, updates: Partial<ITopic>, dispatch: any) {
+    const url = `/api/users/${topic.user}/topics/${topic._id}`;
+
+    return server.patch(url, updates, topic._etag).then((response) => {
+        mergeUpdates(updates, response);
+        dispatch({type: TOPIC_UPDATED, payload: {topic, updates}});
+    });
 }

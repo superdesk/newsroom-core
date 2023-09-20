@@ -21,7 +21,7 @@ describe('Wire - Topics', function () {
                 advanced: {
                     fields: ['headline', 'body_html'],
                     keywords: {
-                        and: ['Weather'],
+                        all: ['Weather'],
                         any: ['Sydney', 'Prague', 'Belgrade'],
                         exclude: ['London'],
                     },
@@ -37,7 +37,7 @@ describe('Wire - Topics', function () {
                     'created-from': ['01/06/2023'],
                     'created-to': ['30/06/2023'],
                 },
-            }
+            };
 
             if (includeMyTopic) {
                 expectedSearchResults.myTopic = 'Sofab Weather';
@@ -80,19 +80,16 @@ describe('Wire - Topics', function () {
         });
         AdvancedSearchForm.runSearch();
 
-        // Open the search results bar, and make sure all search params are applied
-        WirePage.searchResults.toggleBar();
+        // Make sure all search params are applied
         expectSearchResultsBarTags(false);
 
         // Reload the page and make sure all search params are still applied
         cy.reload();
-        WirePage.searchResults.toggleBar();
         expectSearchResultsBarTags(false);
 
         // Save the new Topic
         WirePage.showSaveTopicModal();
         UserTopicForm.type({name: 'Sofab Weather'});
-        UserTopicForm.toggleFormGroup('params');
         expectSearchResultsBarTags(false, true);
         UserTopicForm.saveTopic();
         expectSearchResultsBarTags(true);
@@ -100,8 +97,8 @@ describe('Wire - Topics', function () {
         // Now edit the 'My Topic', and add it to a folder
         WirePage.filterPanel.selectTab('topics');
         WirePage.filterPanel.getCurrentPanel('[data-test-id="edit-btn"]').click();
-        profileTopics.createNewFolder("Weather");
-        profileTopics.createNewFolder("Traffic");
+        profileTopics.createNewFolder('Weather');
+        profileTopics.createNewFolder('Traffic');
         profileTopics.dragTopicToFolder('Sofab Weather', 'Weather');
         profileTopics
             .getTopicCardAction('Sofab Weather', 'Remove from folder')
@@ -109,7 +106,6 @@ describe('Wire - Topics', function () {
 
         // Open the Topic for editing, and check the search params etc
         profileTopics.getTopicCardAction('Sofab Weather', 'Edit').click();
-        UserTopicForm.toggleFormGroup('folder');
         UserTopicForm
             .getFormGroup('folder', '[data-test-id="dropdown-btn"]')
             .contains('Weather');
@@ -119,7 +115,6 @@ describe('Wire - Topics', function () {
         UserTopicForm
             .getFormGroup('folder', '[data-test-id="dropdown-item--Traffic"]')
             .click();
-        UserTopicForm.toggleFormGroup('params');
         expectSearchResultsBarTags(false, true);
         UserTopicForm.saveTopic();
     });

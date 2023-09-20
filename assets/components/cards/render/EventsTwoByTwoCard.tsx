@@ -1,8 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import MoreNewsButton from './MoreNewsButton';
 import moment from 'moment/moment';
 import {gettext} from 'utils';
+import {IEventsCardProps} from '../utils';
 
 
 const getEventPanel = (event: any, index: any) => {
@@ -75,18 +75,13 @@ const getEventPanel = (event: any, index: any) => {
 };
 
 
-function EventsTwoByTwoCard({events, title}: any) {
+const EventsTwoByTwoCard: React.ComponentType<IEventsCardProps> = ({events, title}: IEventsCardProps) => {
     return (
         <div className='row'>
-            <MoreNewsButton title={title}/>
+            <MoreNewsButton kind='product' title={title}/>
             {events.map((event: any, index: any) => getEventPanel(event, index))}
         </div>
     );
-}
-
-EventsTwoByTwoCard.propTypes = {
-    events: PropTypes.array,
-    title: PropTypes.string,
 };
 
 export default EventsTwoByTwoCard;

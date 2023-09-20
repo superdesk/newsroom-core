@@ -144,6 +144,11 @@ class AgendaApp extends BaseApp {
             }
         }
 
+        const showFilters = Object.values(this.props.searchParams ?? {}).find((val) => val != null) != null ||
+            this.props.activeTopic != null ||
+            Object.keys(this.props.activeFilter ?? {}).length > 0 ||
+            this.props.activeQuery != null;
+
         return (
             (this.props.itemToOpen ? [<AgendaItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
@@ -237,25 +242,31 @@ class AgendaApp extends BaseApp {
                                 />
                             )}
 
-                            <SearchResultsBar
-                                minimizeSearchResults={this.state.minimizeSearchResults}
+                            {
+                                showFilters && (
+                                    <SearchResultsBar
+                                        initiallyOpen={showFilters}
+                                        minimizeSearchResults={this.state.minimizeSearchResults}
 
-                                showTotalItems={showTotalItems}
-                                showTotalLabel={showTotalLabel}
-                                showSaveTopic={showSaveTopic}
+                                        showTotalItems={showTotalItems}
+                                        showTotalLabel={showTotalLabel}
+                                        showSaveTopic={showSaveTopic}
 
-                                totalItems={this.props.totalItems}
-                                totalItemsLabel={totalItemsLabel}
+                                        totalItems={this.props.totalItems}
+                                        totalItemsLabel={totalItemsLabel}
 
-                                saveMyTopic={saveMyTopic}
-                                activeTopic={this.props.activeTopic}
-                                topicType="agenda"
+                                        saveMyTopic={saveMyTopic}
+                                        activeTopic={this.props.activeTopic}
+                                        topicType="agenda"
 
-                                newItems={this.props.newItems}
-                                refresh={this.props.fetchItems}
+                                        newItems={this.props.newItems}
+                                        refresh={this.props.fetchItems}
 
-                                setQuery={this.props.setQuery}
-                            >
+                                        setQuery={this.props.setQuery}
+                                    />
+                                )
+                            }
+                            <div className='wire-column__main-header-container'>
                                 <AgendaListViewControls
                                     activeView={this.props.activeView}
                                     setView={this.props.setView}
@@ -264,8 +275,7 @@ class AgendaApp extends BaseApp {
                                     featuredFilter={this.props.featuredOnly}
                                     hasAgendaFeaturedItems={this.props.hasAgendaFeaturedItems}
                                 />
-                            </SearchResultsBar>
-
+                            </div>
                             <AgendaList
                                 actions={this.props.actions}
                                 activeView={this.props.activeView}

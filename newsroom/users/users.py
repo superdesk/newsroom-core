@@ -194,6 +194,7 @@ def get_updated_products(updates, original, company: Optional[Company]) -> List[
 
     company_section_names = get_company_section_names(company)
     company_product_ids = get_company_product_ids(company)
+
     return [
         product
         for product in products
@@ -309,15 +310,13 @@ class UsersService(newsroom.Service):
                 elif request and request.method == "DELETE" and doc.get("_id") != manager.get("_id"):
                     return
 
-        if request and request.url_rule and request.url_rule.rule:
+        if request.url_rule and request.url_rule.rule:
             if request.url_rule.rule in ["/reset_password/<token>", "/token/<token_type>"]:
                 return
 
-            elif request.url_rule.rule in [
-                "/users/<_id>",
-                "/users/<_id>/profile",
-                "/users/<_id>/notification_schedules",
-            ] or (request.endpoint and "|item" in request.endpoint and request.method == "PATCH"):
-                if not updated_fields or all([key in USER_PROFILE_UPDATES for key in updated_fields]):
-                    return
+        if request.method != "DELETE" and (
+            not updated_fields or all([key in USER_PROFILE_UPDATES for key in updated_fields])
+        ):
+            return
+
         abort(403)

@@ -11,3 +11,15 @@ export interface IFilterGroup {
         include_planning?: boolean;
     };
 }
+
+export interface ISection {
+    _id: string;
+    name: string;
+    group: string;
+    search_type: string;
+}
+
+export interface ICountry {
+    value: string;
+    text: string;
+}

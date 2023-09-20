@@ -50,7 +50,7 @@ export function getDefaultLocale() {
 }
 
 export function canUserUpdateTopic(user: any, topic: any) {
-    return !topic.is_global || (topic.is_global && user.manage_company_topics === true);
+    return !topic.is_global || user.manage_company_topics === true;
 }
 
 export function cleanUserEntityBeforePatch(data: Dictionary<any>) {

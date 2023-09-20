@@ -6,6 +6,7 @@ from newsroom.web.default_settings import (  # noqa
     CONTENTAPI_ELASTICSEARCH_URL,
     CONTENTAPI_ELASTICSEARCH_SETTINGS,
     CLIENT_URL,
+    AUTH_PROVIDERS,  # Required otherwise NewsAPI behave tests fail on ``company.validate_auth_provider``
 )
 
 NEWSAPI_URL = env("NEWSAPI_URL", "http://localhost:5400")

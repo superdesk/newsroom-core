@@ -40,7 +40,7 @@ from newsroom.utils import (
 from newsroom.utils import get_local_date, get_end_date
 from datetime import datetime
 from newsroom.wire import url_for_wire
-from newsroom.search.service import BaseSearchService, SearchQuery, query_string, get_filter_query
+from newsroom.search.service import BaseSearchService, SearchQuery, query_string, get_filter_query, strtobool
 from newsroom.search.config import is_search_field_nested, get_nested_config
 from .utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD, push_agenda_item_notification
 
@@ -334,19 +334,20 @@ def _set_event_date_range(search):
     should = []
 
     if date_from and not date_to:
+        dates_field = "dates.start" if app.config.get("AGENDA_SHOW_MULTIDAY_ON_START_ONLY") else "dates.end"
         # Filter from a particular date onwards
         should = [
             {
                 "bool": {
-                    "filter": {"range": {"dates.start": {"gte": date_from}}},
                     "must_not": {"term": {"dates.all_day": True}},
+                    "filter": {"range": {dates_field: {"gte": date_from}}},
                 },
             },
             {
                 "bool": {
                     "filter": [
                         {"term": {"dates.all_day": True}},
-                        {"range": {"dates.start": {"gte": search.args["date_from"]}}},
+                        {"range": {dates_field: {"gte": search.args["date_from"]}}},
                     ],
                 },
             },
@@ -547,6 +548,12 @@ def _filter_terms(filters, item_type):
                         name="coverage_status",
                     )
                 )
+                must_not_term_filters.append(
+                    nested_query(
+                        path="coverages",
+                        query={"bool": {"must": [{"exists": {"field": "coverages.delivery_id"}}]}},
+                    )
+                )
             elif val == ["may be"]:
                 must_term_filters.append(
                     nested_query(
@@ -569,23 +576,11 @@ def _filter_terms(filters, item_type):
                     )
                 )
             elif val == ["not planned"]:
-                must_not_term_filters.append(
+                must_term_filters.append(
                     nested_query(
                         path="coverages",
                         query={
-                            "bool": {
-                                "filter": [
-                                    {
-                                        "terms": {
-                                            "coverages.coverage_status": [
-                                                "coverage intended",
-                                                "coverage not decided yet",
-                                                "coverage upon request",
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
+                            "bool": {"filter": [{"terms": {"coverages.coverage_status": ["coverage not intended"]}}]}
                         },
                         name="coverage_status",
                     )
@@ -832,7 +827,7 @@ class AgendaService(BaseSearchService):
         orig_args = req.args
         req.args = {key: val for key, val in dict(req.args).items() if key not in planning_filters}
         req.args["itemType"] = "events"
-        req.args["noAggregations"] = 1
+        req.args["aggs"] = "false"
         req.projection = json.dumps({"_id": 1})
         item_ids = set([item["_id"] for item in super().get(req, lookup)])
         req.args = orig_args
@@ -1012,6 +1007,9 @@ class AgendaService(BaseSearchService):
         if search.args.get("id"):
             search.query["bool"]["filter"].append({"term": {"_id": search.args["id"]}})
 
+        if search.args.get("ids"):
+            search.query["bool"]["filter"].append({"terms": {"_id": search.args["ids"]}})
+
         if search.args.get("bookmarks"):
             set_saved_items_query(search.query, search.args["bookmarks"])
 
@@ -1039,7 +1037,11 @@ class AgendaService(BaseSearchService):
 
         self.set_post_filter(search.source, search, search.item_type)
 
-        if not search.source["from"] and not search.args.get("bookmarks") and not search.args.get("noAggregations"):
+        if (
+            not search.source["from"]
+            and not search.args.get("bookmarks")
+            and strtobool(search.args.get("aggs", "true"))
+        ):
             # avoid aggregations when handling pagination
             search.source["aggs"] = get_agenda_aggregations(search.item_type == "events")
         else:

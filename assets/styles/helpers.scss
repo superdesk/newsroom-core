@@ -82,7 +82,7 @@
 
 hr.dashed {
     border: none;
-    border-top: 1px dashed #676C7B;
+    border-top: 1px dashed hsl(225, 9%, 44%);
     color: #fff;
     background-color: #fff;
     opacity: 1;
@@ -95,3 +95,56 @@ hr.dashed {
 .d-contents {
     display: contents !important;
 }
+
+// BORDER RADIUS
+.rounded--none {
+    border-radius: 0px !important;
+}
+.rounded--xs {
+    border-radius: var(--border-radius--xs) !important;
+}
+.rounded--s {
+    border-radius: var(--border-radius--s) !important;
+}
+.rounded--m {
+    border-radius: var(--border-radius--m) !important;
+}
+.rounded--l {
+    border-radius: var(--border-radius--l) !important;
+}
+.rounded--xl {
+    border-radius: var(--boder-radius--xl) !important;
+}
+.rounded--full {
+    border-radius: var(--border-radius--full) !important;
+}
+
+// BORDERS
+
+.border-1--x-light {
+    border: 1px solid var(--color-line--x-light);
+}
+.border-1--light {
+    border: 1px solid var(--color-line--light);
+}
+.border-1--medium {
+    border: 1px solid var(--color-line--medium);
+}
+.border-1--strong {
+    border: 1px solid var(--color-line--strong);
+}
+.border-1--x-strong {
+    border: 1px solid var(--color-line--x-strong);
+}
+
+.border--solid {
+    border-style: solid !important;
+}
+.border--dashed {
+    border-style: dashed !important;
+}
+.border--dotted {
+    border-style: dotted !important;
+}
+
+

@@ -1,9 +1,12 @@
+from flask import current_app as app, abort
+from flask_babel import gettext
 from eve.utils import config
 from content_api import MONGO_PREFIX
 
 from superdesk import get_resource_service
 import newsroom
 from newsroom.companies.utils import get_company_section_names, get_company_product_ids
+from newsroom.signals import company_create
 
 
 class CompaniesResource(newsroom.Resource):
@@ -64,6 +67,7 @@ class CompaniesResource(newsroom.Resource):
             "type": "string",
             "nullable": True,
         },
+        "auth_provider": {"type": "string"},
     }
 
     datasource = {"source": "companies", "default_sort": [("name", 1)]}
@@ -88,7 +92,14 @@ class CompaniesResource(newsroom.Resource):
 
 
 class CompaniesService(newsroom.Service):
+    def on_create(self, docs):
+        super().on_create(docs)
+        for doc in docs:
+            self.validate_auth_provider(doc)
+            company_create.send(self, company=doc)
+
     def on_update(self, updates, original):
+        self.validate_auth_provider(updates)
         if "sections" in updates or "products" in updates:
             sections = updates.get("sections", original.get("sections")) or {}
             updates["products"] = [
@@ -98,6 +109,8 @@ class CompaniesService(newsroom.Service):
             ]
 
     def on_updated(self, updates, original):
+        app.cache.delete(str(original["_id"]))
+
         original_section_names = get_company_section_names(original)
         original_product_ids = get_company_product_ids(original)
 
@@ -118,3 +131,12 @@ class CompaniesService(newsroom.Service):
                     ],
                 }
                 user_service.patch(user[config.ID_FIELD], updates=user_updates)
+
+    def on_deleted(self, doc):
+        app.cache.delete(str(doc["_id"]))
+
+    def validate_auth_provider(self, company):
+        supported_provider_ids = [provider["_id"] for provider in app.config["AUTH_PROVIDERS"]]
+        if company.get("auth_provider") and company["auth_provider"] not in supported_provider_ids:
+            auth_provider_id = company["auth_provider"]
+            abort(403, gettext(f"Unknown auth_provider '{auth_provider_id}' supplied"))

@@ -1,6 +1,7 @@
 from bson import ObjectId
 from typing import Dict, List, TypedDict, Any
 from datetime import datetime
+from enum import Enum
 
 
 class Product(TypedDict, total=False):
@@ -42,15 +43,32 @@ class UserDashboardEntry(TypedDict):
 
 class UserData(TypedDict, total=False):
     _id: ObjectId
-    email: str
     first_name: str
     last_name: str
-    user_type: str
+    email: str
+    phone: str
+    mobile: str
+    role: str
+    signup_details: Dict[str, Any]
+    country: str
     company: ObjectId
-    is_enabled: bool
+    user_type: str
     is_validated: bool
-    sections: Dict[str, bool]
+    is_enabled: bool
+    is_approved: bool
+
+    expiry_alert: bool
+    receive_email: bool
+    receive_app_notifications: bool
+    locale: str
+    manage_company_topics: bool
+    last_active: datetime
+
+    original_creator: ObjectId
+    version_creator: ObjectId
+
     products: List[ProductRef]
+    sections: Dict[str, bool]
     dashboards: List[UserDashboardEntry]
     notification_schedule: NotificationSchedule
 
@@ -59,12 +77,38 @@ class User(UserData):
     pass
 
 
+class UserAuth(TypedDict):
+    _id: str
+    email: str
+    password: str
+    is_enabled: bool
+    is_approved: bool
+
+
+class AuthProviderType(Enum):
+    PASSWORD = "password"
+    GOOGLE_OAUTH = "google_oauth"
+    SAML = "saml"
+
+
+class AuthProviderFeatures(TypedDict, total=False):
+    verify_email: bool
+
+
+class AuthProvider(TypedDict):
+    _id: str
+    name: str
+    auth_type: AuthProviderType
+    features: AuthProviderFeatures
+
+
 class Company(TypedDict, total=False):
     _id: ObjectId
     name: str
     products: List[ProductRef]
     sections: Dict[str, bool]
     restrict_coverage_info: bool
+    auth_provider: str
 
 
 class TopicSubscriber(TypedDict):
@@ -72,7 +116,7 @@ class TopicSubscriber(TypedDict):
     notification_type: str
 
 
-class Topic(TypedDict):
+class Topic(TypedDict, total=False):
     _id: ObjectId
     label: str
     query: str

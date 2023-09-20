@@ -138,6 +138,8 @@ def test_is_scheduled_to_run_for_user():
 
     times = ["07:00", "15:00", "20:00"]
     tests = [
+        {"result": False, "now": (6, 59), "last_run": (1, 0)},
+        {"result": True, "now": (7, 4), "last_run": (1, 0)},
         {"result": False, "now": (6, 0)},
         {"result": True, "now": (7, 0)},
         {"result": False, "now": (10, 0), "last_run": (7, 0)},

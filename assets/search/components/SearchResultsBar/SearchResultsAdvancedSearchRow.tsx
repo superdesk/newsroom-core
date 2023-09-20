@@ -52,6 +52,19 @@ export function SearchResultsAdvancedSearchRow({
         any: splitTermKeywords(advancedSearchParams.any),
         exclude: splitTermKeywords(advancedSearchParams.exclude),
     };
+
+    const labels = {
+        all: gettext('and'),
+        any: gettext('or'),
+        exclude: gettext('not'),
+    };
+
+    const shades = {
+        all: 'success',
+        any: 'info',
+        exclude: 'alert',
+    };
+
     const fields = get(advancedSearchParams, 'fields') ?? [];
 
     if (!keywords.all.length && !keywords.any.length && !keywords.exclude.length) {
@@ -70,103 +83,36 @@ export function SearchResultsAdvancedSearchRow({
         }
     };
 
-    if (keywords.all.length) {
-        advancedSearchTags.push(
-            <Tag
-                key="tags-advanced--and"
-                text={gettext('and')}
-                operator={true}
-                shade="success"
-                readOnly={true}
-            />
-        );
-
-        keywords.all.forEach((term, index) => {
+    for (const field of Object.keys(keywords) as Array<keyof typeof keywords>) {
+        // due to the declaration outside key would be the last key
+        // at the end but we need the current value for the onClick callback
+        if (keywords[field].length) {
             advancedSearchTags.push(
                 <Tag
-                    key={`tags-advanced--and-${index}`} // using index instead of term which might not be unique
-                    text={term}
-                    shade="success"
-                    readOnly={readonly}
-                    onClick={(event) => {
-                        event.preventDefault();
-                        removeKeywordEntry('all', index);
-                        refresh?.();
-                    }}
-                />
-            );
-        });
-    }
-
-    if (keywords.any.length) {
-        if (advancedSearchTags.length) {
-            advancedSearchTags.push(
-                <span
-                    key="tag-advanced--separator-any"
-                    className="tag-list__separator"
-                />
-            );
-        }
-
-        advancedSearchTags.push(
-            <Tag
-                key="tags-advanced--or"
-                text={gettext('or')}
-                operator={true}
-                shade="info"
-                readOnly={true}
-            />
-        );
-
-        keywords.any.forEach((term, index) => {
-            advancedSearchTags.push(
-                <Tag
-                    key={`tags-advanced--or-${term}`}
-                    text={term}
-                    shade="info"
+                    key={`tags-advanced--${field}`}
+                    text={labels[field]}
+                    operator={true}
+                    shade={shades[field]}
                     readOnly={true}
-                    onClick={(event) => {
-                        event.preventDefault();
-                        removeKeywordEntry('any', index);
-                    }}
                 />
             );
-        });
-    }
 
-    if (keywords.exclude.length) {
-        if (advancedSearchTags.length) {
-            advancedSearchTags.push(
-                <span
-                    key="tag-separator--exclude"
-                    className="tag-list__separator"
-                />
-            );
+            keywords[field].forEach((term, index) => {
+                advancedSearchTags.push(
+                    <Tag
+                        key={`tags-advanced--${field}-${index}`} // using index instead of term which might not be unique
+                        text={term}
+                        shade={shades[field]}
+                        readOnly={readonly}
+                        onClick={(event) => {
+                            event.preventDefault();
+                            removeKeywordEntry(field, index);
+                            refresh?.();
+                        }}
+                    />
+                );
+            });
         }
-        advancedSearchTags.push(
-            <Tag
-                key="tags-advanced--exclude"
-                text={gettext('not')}
-                operator={true}
-                shade="alert"
-                readOnly={true}
-            />
-        );
-
-        keywords.exclude.forEach((term, index) => {
-            advancedSearchTags.push(
-                <Tag
-                    key={`tags-advanced--exclude-${term}`}
-                    text={term}
-                    shade="alert"
-                    readOnly={readonly}
-                    onClick={(event) => {
-                        event.preventDefault();
-                        removeKeywordEntry('exclude', index);
-                    }}
-                />
-            );
-        });
     }
 
     if (!advancedSearchTags.length) {
@@ -188,6 +134,7 @@ export function SearchResultsAdvancedSearchRow({
                 onClick={(event) => {
                     event.preventDefault();
                     clearAdvancedSearchParams();
+                    refresh?.();
                 }}
             >
                 {gettext('Clear')}

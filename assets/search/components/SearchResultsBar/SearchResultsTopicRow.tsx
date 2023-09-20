@@ -58,7 +58,7 @@ export function SearchResultsTopicRow({
         );
     }
 
-    if (get(searchParams, 'navigation.length', 0)) {
+    if ((searchParams.navigation?.length ?? 0) > 0 && (Object.keys(navigations ?? []).length > 0)) {
         searchParams.navigation.forEach((navId) => {
             const navigation = navigations[navId];
 
@@ -104,9 +104,7 @@ export function SearchResultsTopicRow({
                                     {},
                                     activeTopic,
                                     searchParams,
-                                    {query: searchParams.query},
                                     {topic_type: topicType},
-                                    {filter: searchParams.filter}
                                 ));
                             }}
                         >
@@ -126,7 +124,6 @@ export function SearchResultsTopicRow({
                                 {},
                                 searchParams,
                                 {topic_type: topicType},
-                                {filter: searchParams.filter}
                             ));
                         }}
                     >

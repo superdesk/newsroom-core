@@ -28,6 +28,7 @@ const TopicList = ({
     topics,
     selectedTopicId,
     actions,
+    user,
     users,
     folders,
     folderPopover,
@@ -77,6 +78,5 @@ const TopicList = ({
 
     // return Array.prototype.concat(renderedFolders, renderedTopics);
 };
-
 
 export default TopicList;

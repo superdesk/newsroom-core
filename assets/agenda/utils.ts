@@ -576,10 +576,10 @@ export function getHighlightedName(item: any) {
         return item.es_highlight.name[0];
     }
     else if (item.es_highlight.slugline){
-        return item.es_highlight.slugline [0];
+        return item.es_highlight.slugline[0];
     }
     else if (item.es_highlight.headline){
-        return item.es_highlight.headline [0];
+        return item.es_highlight.headline[0];
     }
     else{
         return getName(item);
@@ -594,7 +594,7 @@ export function getHighlightedName(item: any) {
  * @return {String}
  */
 export function getDescription(item: any, plan: any) {
-    return plan ? plan.description_text : (item ? item.definition_short : '');
+    return plan != null ? plan.description_text : (item ? item.definition_short : '');
 }
 
 /**
@@ -695,14 +695,24 @@ const getEndDate = (item: any) => item.dates.no_end_time || item.dates.all_day ?
     moment(item.dates.end || item.dates.start);
 
 // compare days without being affected by timezone
-const isBetweenDay = (day: any, start: any, end: any) => {
-    // it will be converted to local time
-    // if passed as string which we need
-    // for all day events which are in utc mode
-    const startDate = start.format('YYYY-MM-DD');
-    const endDate = end.format('YYYY-MM-DD');
+const isBetweenDay = (day: moment.Moment, start: moment.Moment, end: moment.Moment, allDay=false, noEndTime=false) => {
+    let testDay = day;
+    let startDate = start;
+    let endDate = end;
 
-    return day.isBetween(startDate, endDate, 'day', '[]');
+    if (allDay) {
+        // we ignore times and only check dates
+        testDay = moment(day.format('YYYY-MM-DD'));
+        startDate = moment(start.format('YYYY-MM-DD'));
+        endDate = moment(end.format('YYYY-MM-DD'));
+    } else if (noEndTime) {
+        // we ignore time for end date
+        testDay = moment(day.format('YYYY-MM-DD'));
+        endDate = moment(end.format('YYYY-MM-DD'));
+        return day.isSameOrAfter(start) && testDay.isSameOrBefore(endDate);
+    }
+
+    return testDay.isBetween(startDate, endDate, 'day', '[]');
 };
 
 /**
@@ -712,7 +722,7 @@ const isBetweenDay = (day: any, start: any, end: any) => {
  * @param activeGrouping: type of grouping i.e. day, week, month
  */
 export function groupItems(items: any, activeDate: any, activeGrouping: any, featuredOnly?: any) {
-    const maxStart = moment(activeDate).set({'h': 0, 'm': 0, 's': 0});
+    const minStart = moment(activeDate).set({'h': 0, 'm': 0, 's': 0});
     const groupedItems: any = {};
     const grouper = Groupers[activeGrouping];
 
@@ -727,7 +737,7 @@ export function groupItems(items: any, activeDate: any, activeGrouping: any, fea
             const itemExtraDates = getExtraDates(item);
             const itemStartDate = getStartDate(item);
             const start = item._display_from ? moment(item._display_from) :
-                moment.min(maxStart, moment.min(itemExtraDates.concat([itemStartDate])));
+                moment.max(minStart, moment.min(itemExtraDates.concat([itemStartDate])));
             const itemEndDate = getEndDate(item);
 
             // If item is an event and was actioned (postponed, rescheduled, cancelled only incase of multi-day event)
@@ -737,7 +747,7 @@ export function groupItems(items: any, activeDate: any, activeGrouping: any, fea
                 end = item._display_to ? moment(item._display_to) :
                     moment.max(
                         itemExtraDates
-                            .concat([maxStart])
+                            .concat([minStart])
                             // If event is all day the end timestamp is the same as
                             // start and depending on the local timezone offset it
                             // might not give enough room for the event to show up,
@@ -745,11 +755,13 @@ export function groupItems(items: any, activeDate: any, activeGrouping: any, fea
                             .concat([itemEndDate.clone().add(1, 'd')])
                     );
             }
+
             let key = null;
+            end = moment.min(end, start.clone().add(10, 'd')); // show each event for 10 days max not to destroy the UI
 
             // use clone otherwise it would modify start and potentially also maxStart, moments are mutable
             for (const day = start.clone(); day.isSameOrBefore(end, 'day'); day.add(1, 'd')) {
-                const isBetween = isBetweenDay(day, itemStartDate, itemEndDate);
+                const isBetween = isBetweenDay(day, itemStartDate, itemEndDate, item.dates.all_day, item.dates.no_end_time);
                 const containsExtra = containsExtraDate(item, day);
                 const addGroupItem = (item.event == null || get(item, '_hits.matched_planning_items') != null) ?
                     containsExtra :
