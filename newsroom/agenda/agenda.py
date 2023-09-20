@@ -449,7 +449,7 @@ aggregations: Dict[str, Dict[str, Any]] = {
     "language": {"terms": {"field": "language"}},
     "calendar": {"terms": {"field": "calendars.name", "size": 100}},
     "service": {"terms": {"field": "service.name", "size": 50}},
-    "subject": {"terms": {"field": "subject.name", "size": 20}},
+    "subject": {"terms": {"field": "subject.name", "size": 50}},
     "urgency": {"terms": {"field": "urgency"}},
     "place": {"terms": {"field": "place.name", "size": 50}},
     "coverage": {
@@ -462,7 +462,7 @@ aggregations: Dict[str, Dict[str, Any]] = {
         },
         "aggs": {
             "service": {"terms": {"field": "planning_items.service.name", "size": 50}},
-            "subject": {"terms": {"field": "planning_items.subject.name", "size": 20}},
+            "subject": {"terms": {"field": "planning_items.subject.name", "size": 50}},
             "urgency": {"terms": {"field": "planning_items.urgency"}},
             "place": {"terms": {"field": "planning_items.place.name", "size": 50}},
         },

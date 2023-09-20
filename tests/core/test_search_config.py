@@ -106,7 +106,7 @@ def test_default_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient)
     assert "urgency" in group_fields
     assert "place" in group_fields
 
-    assert agenda_aggregations["subject"] == {"terms": {"field": "subject.name", "size": 20}}
+    assert agenda_aggregations["subject"] == {"terms": {"field": "subject.name", "size": 50}}
 
     # Test search agenda_aggregations
     client.post("/push", data=json.dumps(test_event_1), content_type="application/json")
@@ -142,7 +142,7 @@ def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
         "aggs": {
             "subject_filtered": {
                 "filter": {"bool": {"must_not": [{"terms": {"subject.scheme": ["sttdepartment"]}}]}},
-                "aggs": {"subject": {"terms": {"field": "subject.name", "size": 20}}},
+                "aggs": {"subject": {"terms": {"field": "subject.name", "size": 50}}},
             },
         },
     }
@@ -153,7 +153,7 @@ def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
         "aggs": {
             "sttdepartment_filtered": {
                 "filter": {"bool": {"filter": [{"term": {"subject.scheme": "sttdepartment"}}]}},
-                "aggs": {"sttdepartment": {"terms": {"field": "subject.name", "size": 20}}},
+                "aggs": {"sttdepartment": {"terms": {"field": "subject.name", "size": 50}}},
             },
         },
     }
@@ -169,7 +169,7 @@ def test_custom_agenda_groups_config(app: BaseNewsroomApp, client: FlaskClient):
                             "sttdepartment": {
                                 "terms": {
                                     "field": "planning_items.subject.name",
-                                    "size": 20,
+                                    "size": 50,
                                 }
                             }
                         },
