@@ -647,3 +647,12 @@ def test_check_etag_when_updating_user(client):
     )
 
     assert response.status_code == 200
+
+
+def test_create_user_inherit_sections(app):
+    company_ids = app.data.insert("companies", [{"name": "test", "sections": {"agenda": True, "wire": False}}])
+    assert company_ids
+    user_ids = app.data.insert("users", [{"email": "newuser@example.com", "company": company_ids[0]}])
+    assert user_ids
+    user = app.data.find_one("users", req=None, _id=user_ids[0])
+    assert user["sections"] == {"agenda": True, "wire": False}
