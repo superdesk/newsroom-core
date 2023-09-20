@@ -590,6 +590,12 @@ $container-max-widths: (
     --content-item-text-font-weight: 300;
     --content-item-text-font-family: var(--font-family-core--secondary);
 
+    --content-item-state-border-color-not-covering: var(--color-line--medium);
+    --content-item-state-border-color-covering: var(--color-line--success);
+    --content-item-state-border-color-rescheduled: var(--color-warning);
+    --content-item-state-border-color-postponed: var(--color-info);
+    --content-item-state-border-color-canceled: var(--color-alert);
+
     // COMPONENT: IMPERSONATE USER
     --impersonate-user-chip-height: var(--space--5);
     --impersonate-user-chip-border-radius: var(--border-radius--full);

@@ -713,7 +713,7 @@ function Wire() {
                                         <div className="wire-articles__item-actions">
                                             <div className="btn-group">
                                                 <button className="icon-button" aria-label="More Actions">
-                                                    <i className="icon--more icon--gray-dark"></i>
+                                                    <i className="icon--more"></i>
                                                 </button>
                                             </div>
                                             <button type="button" className="icon-button icon-button--primary" title="" aria-label="Share" data-original-title="Share">
@@ -777,7 +777,7 @@ function Wire() {
                                         <div className="wire-articles__item-actions">
                                             <div className="btn-group">
                                                 <button className="icon-button" aria-label="More Actions">
-                                                    <i className="icon--more icon--gray-dark"></i>
+                                                    <i className="icon--more"></i>
                                                 </button>
                                             </div>
                                             <button type="button" className="icon-button icon-button--primary" title="" aria-label="Share" data-original-title="Share">
@@ -819,7 +819,7 @@ function Wire() {
                                                     <span className="wire-articles__item__icon coverage--undecided" title=" Text coverage MEL-TEST-April13-Breaking available (update to come)"><i className="icon--coverage-video"></i></span>
                                                 </div>
                                                 <div className="wire-articles__item__meta-info align-items-center">
-                                                    <span><i className="icon-small--location icon--gray-dark"></i></span>
+                                                    <span><i className="icon-small--location"></i></span>
                                                     <span className="me-2 align-self-stretch">Messezentrum Salzburg GmbH, Am Messezentrum 1, Salzburg, Austria</span>
                                                 </div>
                                             </div>

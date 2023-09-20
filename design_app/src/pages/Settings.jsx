@@ -152,7 +152,7 @@ function Settings() {
                         <div className="list-item__preview-header">
                             <h3>Awesome company</h3>
                             <button id="hide-sidebar" type="button" className="icon-button" data-dismiss="modal" aria-label="Close">
-                                <i className="icon--close-thin icon--gray-dark" aria-hidden="true"></i>
+                                <i className="icon--close-thin" aria-hidden="true"></i>
                             </button>
                         </div>
                         <div className="wire-column__preview__top-bar pt-0 audit-information pt-2">

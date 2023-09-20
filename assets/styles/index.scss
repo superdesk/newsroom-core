@@ -1379,7 +1379,7 @@ article.list {
 .search__form-buttons {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space--1);
     height: var(--searchbar-size-height) - 2px;
     margin-inline-end: 3px;
 }
@@ -4269,5 +4269,13 @@ article.list {
         display: block;
         min-width: var(--login-logo-image-width--min);
         max-width: var(--login-logo-image-width--max);
+    }
+}
+.wire-column__preview__content {
+    .wire-articles__item__meta {
+        margin-block-end: var(--space--2);
+    }
+    .wire-articles__item__meta-info {
+        row-gap: var(--space--0-5);
     }
 }

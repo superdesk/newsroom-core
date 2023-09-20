@@ -21,7 +21,7 @@ function EditUser() {
         <div className="list-item__preview-header">
             <h3>Add/Edit User</h3>
             <button id="hide-sidebar" type="button" className="icon-button" data-dismiss="modal" aria-label="Close">
-                <i className="icon--close-thin icon--gray-dark" aria-hidden="true"></i>
+                <i className="icon--close-thin" aria-hidden="true"></i>
             </button>
         </div>
         <div className="wire-column__preview__top-bar audit-information">
@@ -46,8 +46,8 @@ function EditUser() {
                         <div className="list-item__preview-form pt-0">
                             <div className="list-item__preview-collapsible" onClick={handleClickGeneral}>
                                 <div className="list-item__preview-collapsible-header">
-                                    {isGeneralShown && <i className="icon--arrow-right icon--gray-dark"></i>}
-                                    {!isGeneralShown && <i className="icon--arrow-right icon--gray-dark icon--rotate-90"></i>}
+                                    {isGeneralShown && <i className="icon--arrow-right"></i>}
+                                    {!isGeneralShown && <i className="icon--arrow-right icon--rotate-90"></i>}
                                     <h3>General</h3>
                                 </div>
                             </div>
@@ -118,8 +118,8 @@ function EditUser() {
                             }
                             <div className="list-item__preview-collapsible" onClick={handleClickProducts}>
                                 <div className="list-item__preview-collapsible-header">
-                                    {!isProductsShown && <i className="icon--arrow-right icon--gray-dark"></i>}
-                                    {isProductsShown && <i className="icon--arrow-right icon--gray-dark icon--rotate-90"></i>}
+                                    {!isProductsShown && <i className="icon--arrow-right"></i>}
+                                    {isProductsShown && <i className="icon--arrow-right icon--rotate-90"></i>}
                                     <h3>Products</h3>
                                 </div>
                             </div>
@@ -203,8 +203,8 @@ function EditUser() {
                             }
                             <div className="list-item__preview-collapsible" onClick={handleClickUserSettings}>
                                 <div className="list-item__preview-collapsible-header">
-                                    {!isUserSettingsShown && <i className="icon--arrow-right icon--gray-dark"></i>}
-                                    {isUserSettingsShown && <i className="icon--arrow-right icon--gray-dark icon--rotate-90"></i>}
+                                    {!isUserSettingsShown && <i className="icon--arrow-right"></i>}
+                                    {isUserSettingsShown && <i className="icon--arrow-right icon--rotate-90"></i>}
                                     <h3>User Settings</h3>
                                 </div>
                             </div>

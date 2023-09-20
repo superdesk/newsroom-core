@@ -456,7 +456,7 @@ class TopicEditor extends React.Component<IProps, IState> {
                         disabled={this.state.saving}
                         aria-label={gettext('Close')}
                     >
-                        <i className="icon--close-thin icon--gray-dark" />
+                        <i className="icon--close-thin" />
                     </button>
                 </div>
                 {!isCompanyTopic ? null : (

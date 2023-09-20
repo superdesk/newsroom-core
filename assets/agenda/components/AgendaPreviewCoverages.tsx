@@ -91,7 +91,7 @@ class AgendaPreviewCoverages extends React.Component<any, any> {
                         <div className="agenda-planning__preview-metadata">
                             {!agendaNames ? null : (
                                 <div className="agenda-planning__preview-agendas">
-                                    <i className="icon-small--calendar icon--gray-dark" />
+                                    <i className="icon-small--calendar" />
                                     <span>{agendaNames}</span>
                                 </div>
                             )}

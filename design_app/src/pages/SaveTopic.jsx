@@ -8,7 +8,7 @@ function SaveTopic() {
                 <div className="profileWrap">
                     <div className="profile__mobile-close d-md-none">
                         <button className="icon-button" aria-label='Close' onClick={'/wire'}>
-                            <i className="icon--close-thin icon--gray-dark" />
+                            <i className="icon--close-thin" />
                         </button>
                     </div>
                     <nav className='profile__side-navigation' id='profile-menu'>

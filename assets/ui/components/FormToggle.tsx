@@ -28,7 +28,7 @@ export class FormToggle extends React.Component<any, any> {
                 >
                     <div className="list-item__preview-collapsible-header">
                         <i className={classNames(
-                            'icon--arrow-right icon--gray-dark',
+                            'icon--arrow-right',
                             {'icon--rotate-90': this.state.expanded}
                         )} />
                         <h3>{this.props.title}</h3>

@@ -246,6 +246,13 @@
         height: auto;
         flex-shrink: 0;
     }
+    &.navbar--search-results {
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        @include phone {
+            padding-inline-end: var(--space--1);
+        }
+    }
 }
 
 .navbar__button-group {
@@ -511,6 +518,18 @@ nav.search {
                 border-color: black;
                 border-width: 0 0 4px 0;
                 border-style: solid;
+            }
+        }
+    }
+}
+
+.wire-column__main-header-container {
+    @include phone {
+        .navbar {
+            &.navbar--tools {
+                @include phone {
+                    display: none;
+                }
             }
         }
     }

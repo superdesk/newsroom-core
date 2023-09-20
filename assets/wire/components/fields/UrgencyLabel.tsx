@@ -21,12 +21,9 @@ export function UrgencyItemBorder({item, listConfig}: any) {
     }
 
     return <span
+        className='wire-articles__item-highlight-border'
         style={{
-            width: '4px',
             backgroundColor: urgencyHighlightColor,
-            position: 'absolute',
-            height: '100%',
-            zIndex: 1,
         }}
     ></span>;
 }

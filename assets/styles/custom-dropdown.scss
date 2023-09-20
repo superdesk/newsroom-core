@@ -114,3 +114,16 @@
         border-radius: var(--border-radius--s);
     }
 }
+
+.dropdown {
+    &.sorting-dropdown {
+        .nh-dropdown-button {
+            white-space: nowrap;
+            @include phone {
+                .nh-dropdown-button__text-label {
+                    display: none;
+                }
+            }
+        }
+    }
+}
