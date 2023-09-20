@@ -9,7 +9,6 @@ from newsroom.decorator import login_required, company_admin_only
 from newsroom.utils import query_resource, get_json_or_400
 from newsroom.auth import get_user, get_company
 from newsroom.company_admin import blueprint
-from newsroom.products.products import get_products_by_company
 from newsroom.email import send_template_email
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
 
@@ -25,7 +24,7 @@ def get_view_data():
     user = get_user()
     company = get_company(user) or {}
     company_users = list(query_resource("users", lookup={"company": ObjectId(company["_id"])}))
-    products = get_products_by_company(company)
+    products = list(query_resource("products", lookup={"is_enabled": True}))
     return {
         "users": company_users,
         "companyId": str(company["_id"]),
