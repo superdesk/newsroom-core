@@ -139,5 +139,12 @@ describe('shortHighlightedtext', () => {
         const output = shortHighlightedtext(html, maxLength);
         expect(output).toEqual('some <span class="es-highlight">matching</span> text and <span class="es-highlight">more</span> matching text. another <span class="es-highlight">matching</span> text....');
     });
+
+    it('returns highlight text, scenerio for checking duplicate words', () => {
+        const html = '<p>foo <span class="es-highlight">bar</span> foo <span class="es-highlight">bar</span> foo</p>';
+        const maxLength = 40;
+        const output = shortHighlightedtext(html, maxLength);
+        expect(output).toEqual('foo <span class="es-highlight">bar</span> foo <span class="es-highlight">bar</span> foo...');
+    });
 });
   

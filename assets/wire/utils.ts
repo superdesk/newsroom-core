@@ -226,7 +226,8 @@ function splitWords(str: string): Array<string> {
 function getTextFromNode(node: Node | null): string {
     if (!node) return '';
     if (node.nodeType === Node.TEXT_NODE) {
-        return node.textContent?.trim() || '';
+        const textContent = node.textContent || '';
+        return textContent.trim();
     }
     return '';
 }
@@ -246,24 +247,23 @@ export function shortHighlightedtext(html: string, maxLength = 40) {
     div.innerHTML = html;
     const highlightSpans = Array.from(div.querySelectorAll('span.es-highlight'));
     const extractedText: string[] = [];
-    let lastWord = '';
+    let lastNode: Node | null = null;
 
     for (const highlightSpan of highlightSpans) {
-        const textBefore = getTextFromNode(highlightSpan.previousSibling);
+        const textBefore = lastNode === highlightSpan.previousSibling ? '' : getTextFromNode(highlightSpan.previousSibling);
         const textAfter = getTextFromNode(highlightSpan.nextSibling);
 
-        if (textBefore && textBefore !== lastWord) {
+        if (textBefore) {
             extractedText.push(textBefore);
-            lastWord = textBefore;
         }
 
         extractedText.push(highlightSpan.outerHTML);
 
-        // Append text after the highlight span
-        if (textAfter && textAfter !== lastWord) {
+        if (textAfter) {
             extractedText.push(textAfter);
-            lastWord = textAfter;
         }
+
+        lastNode = highlightSpan.nextSibling;
     }
     return extractedText.join(' ')+(html.length > maxLength ? '...' : ' ');
 }
