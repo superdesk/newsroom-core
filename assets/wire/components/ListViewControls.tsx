@@ -20,7 +20,9 @@ function ListViewControls({
     toggleSearchAllVersions,
 }: any) {
     return(
-        <div className="navbar navbar--flex navbar--small">
+        <div
+            className="navbar navbar--flex navbar--small"
+        >
             <div className="navbar__inner navbar__inner--end">
                 {hideSearchAllVersions ? null : (
                     <SearchAllVersionsControl
