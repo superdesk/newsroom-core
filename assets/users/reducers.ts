@@ -81,7 +81,11 @@ export default function userReducer(state: any = initialState, action: any) {
         const user: any = {...state.userToEdit};
         const value = target.type === 'checkbox' ? target.checked : target.value;
 
-        if (field.startsWith('sections.')) {
+        if (action.event?.changeType === 'company') {
+            const newCompanySelected = state.companies.find(({_id}: any) => value === _id);
+            user.company = newCompanySelected?._id;
+            user.sections = newCompanySelected?.sections;
+        } else if (field.startsWith('sections.')) {
             const sectionId = field.replace('sections.', '');
 
             user.sections = {
