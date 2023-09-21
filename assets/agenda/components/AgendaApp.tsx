@@ -147,7 +147,8 @@ class AgendaApp extends BaseApp {
         const showFilters = Object.values(this.props.searchParams ?? {}).find((val) => val != null) != null ||
             this.props.activeTopic != null ||
             Object.keys(this.props.activeFilter ?? {}).length > 0 ||
-            this.props.activeQuery != null;
+            this.props.activeQuery != null ||
+            this.props.itemTypeFilter != null;
 
         return (
             (this.props.itemToOpen ? [<AgendaItemDetails key="itemDetails"
@@ -242,7 +243,6 @@ class AgendaApp extends BaseApp {
                                         locators={this.props.locators}
                                     />
                                 )}
-
                                 {
                                     showFilters && (
                                         <SearchResultsBar
