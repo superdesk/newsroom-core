@@ -55,7 +55,6 @@ import BookmarkTabs from 'components/BookmarkTabs';
 import {setActiveDate, setAgendaDropdownFilter} from 'local-store';
 import {previewConfigSelector, detailsConfigSelector} from 'ui/selectors';
 import {SearchResultsBar} from 'search/components/SearchResultsBar';
-import {agendaFiltersConfigSelector} from 'agenda/selectors';
 
 const modals = {
     shareItem: ShareItemModal,
@@ -384,7 +383,6 @@ const mapStateToProps = (state: any) => ({
     modal: state.modal,
     user: state.user,
     company: state.company,
-    filtersConfig: agendaFiltersConfigSelector(state),
     topics: topicsSelector(state),
     activeView: activeViewSelector(state),
     newItems: state.newItems,
