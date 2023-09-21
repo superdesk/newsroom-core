@@ -268,6 +268,8 @@ $container-max-widths: (
 
     // COMPONENT: MAIN HEADER / TOOLBAR
     --main-header-color-bg: var(--color-neutral-000);
+    --main-header-shadow: 0 3px 6px hsla(0, 0%, 0%, 0.1), 0 1px 0 hsla(0, 0%, 0%, 0.06);
+
     
     // COMPONENT: SEARCHBAR
     --searchbar-size-height: 40px;

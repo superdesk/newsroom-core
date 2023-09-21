@@ -227,13 +227,15 @@ def test_company_and_user_products(client, app, public_company, public_user, pro
     )
 
     assign_product_to_companies(client, product, [public_company])
+
+    # this is noop, user can only get products assigned to company
     assign_product_to_user(client, product2, public_user)
 
     utils.login(client, public_user)
 
     resp = client.get("/wire/search")
     assert 200 == resp.status_code
-    assert 2 == len(resp.json["_items"]), resp.json["_items"]
+    assert 1 == len(resp.json["_items"]), resp.json["_items"]
 
 
 def assign_product_to_companies(client, product, companies):
@@ -250,4 +252,4 @@ def assign_product_to_companies(client, product, companies):
 def assign_product_to_user(client, product, user):
     products = user.get("products") or []
     products.append({"_id": product["_id"], "section": product.get("product_type", "wire")})
-    utils.patch_json(client, f"/api/_users/{user['_id']}", {"products": products})
+    utils.patch_json(client, f"/api/_users/{user['_id']}", {"products": products, "sections": {"wire": True}})

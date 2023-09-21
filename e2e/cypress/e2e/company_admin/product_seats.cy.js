@@ -42,10 +42,6 @@ describe('CompanyAdmin - Product Seats', function () {
             expiry_alert: false,
             manage_company_topics: false,
         });
-        EditUserForm.expectSections({
-            wire: true,
-            agenda: true,
-        });
         EditUserForm.expectProducts({
             wire: {
                 [PRODUCTS.wire.all._id]: false,
@@ -66,7 +62,6 @@ describe('CompanyAdmin - Product Seats', function () {
             role: 'test user',
             expiry_alert: true,
         });
-        EditUserForm.typeSections({agenda: false});
         EditUserForm.typeProducts({wire: {
             [PRODUCTS.wire.all._id]: true,
             [PRODUCTS.wire.sports._id]: false,
@@ -85,10 +80,6 @@ describe('CompanyAdmin - Product Seats', function () {
                 locale: '',
                 expiry_alert: true,
                 manage_company_topics: false,
-            });
-            EditUserForm.expectSections({
-                wire: true,
-                agenda: false,
             });
             EditUserForm.expectProducts({
                 wire: {

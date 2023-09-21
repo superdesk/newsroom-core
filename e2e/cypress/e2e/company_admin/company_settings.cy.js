@@ -95,15 +95,9 @@ describe('CompanySettings', function() {
         });
 
         // Make sure Wire section is available, and defaulted to false
-        EditUserForm.expectSections({wire: false});
         EditUserForm.expectSectionsMissing(['agenda']);
-        EditUserForm.expectProductsMissing({
-            wire: [PRODUCTS.wire.all._id, PRODUCTS.wire.sports._id],
-            agenda: [PRODUCTS.agenda.sports._id],
-        });
 
         // Enable Wire section for this User
-        EditUserForm.typeSections({wire: true});
         EditUserForm.expectProducts({wire: {[PRODUCTS.wire.sports._id]: false}});
         EditUserForm.typeProducts({wire: {[PRODUCTS.wire.sports._id]: true}});
         EditUserForm.expectProductsMissing({
@@ -127,8 +121,7 @@ describe('CompanySettings', function() {
             expiry_alert: true,
             manage_company_topics: true,
         });
-        EditUserForm.expectSections({wire: true});
-        EditUserForm.expectSectionsMissing(['agenda']);
+
         EditUserForm.expectProducts({wire: {[PRODUCTS.wire.sports._id]: true}});
         EditUserForm.expectProductsMissing({
             wire: [PRODUCTS.wire.all._id],

@@ -146,6 +146,12 @@ class WireApp extends BaseApp {
             );
         }
 
+        const showFilters = Object.values(this.props.searchParams ?? {}).find((val) => val != null) != null ||
+            this.props.activeTopic != null ||
+            this.props.activeProduct != null ||
+            Object.keys(this.props.activeFilter ?? {}).length > 0 ||
+            this.props.activeQuery != null;
+
         return (
             (this.props.itemToOpen ? [<ItemDetails key="itemDetails"
                 item={this.props.itemToOpen}
@@ -211,34 +217,34 @@ class WireApp extends BaseApp {
                                 <SearchSidebar tabs={this.tabs} props={{...this.props}} />
                             }
                         </div>
-                        <div className={mainClassName}
+                        <div
+                            className={mainClassName}
                             ref={this.setListRef}
                         >
-                            <SearchResultsBar
-                                minimizeSearchResults={this.state.minimizeSearchResults}
-                                initiallyOpen={
-                                    Object.values(this.props.searchParams ?? {}).find((val) => val != null) != null ||
-                                    this.props.activeTopic != null ||
-                                    this.props.activeProduct != null ||
-                                    Object.keys(this.props.activeFilter ?? {}).length > 0 ||
-                                    this.props.activeQuery != null
+                            <div className='wire-column__main-header-container'>
+                                {
+                                    showFilters && (
+                                        <SearchResultsBar
+                                            minimizeSearchResults={this.state.minimizeSearchResults}
+                                            initiallyOpen={showFilters}
+                                            showTotalItems={showTotalItems}
+                                            showTotalLabel={showTotalLabel}
+                                            showSaveTopic={showSaveTopic}
+
+                                            totalItems={this.props.totalItems}
+                                            totalItemsLabel={totalItemsLabel}
+
+                                            saveMyTopic={saveMyTopic}
+                                            activeTopic={this.props.activeTopic}
+                                            topicType={this.props.context === 'wire' ? this.props.context : null}
+
+                                            newItems={this.props.newItems}
+                                            refresh={this.props.fetchItems}
+                                            setSortQuery={this.props.setSortQuery}
+                                            setQuery={this.props.setQuery}
+                                        />
+                                    )
                                 }
-                                showTotalItems={showTotalItems}
-                                showTotalLabel={showTotalLabel}
-                                showSaveTopic={showSaveTopic}
-
-                                totalItems={this.props.totalItems}
-                                totalItemsLabel={totalItemsLabel}
-
-                                saveMyTopic={saveMyTopic}
-                                activeTopic={this.props.activeTopic}
-                                topicType={this.props.context === 'wire' ? this.props.context : null}
-
-                                newItems={this.props.newItems}
-                                refresh={this.props.fetchItems}
-                                setSortQuery={this.props.setSortQuery}
-                                setQuery={this.props.setQuery}
-                            >
                                 <ListViewControls
                                     activeView={this.props.activeView}
                                     setView={this.props.setView}
@@ -250,8 +256,7 @@ class WireApp extends BaseApp {
                                     searchAllVersions={this.props.searchAllVersions}
                                     toggleSearchAllVersions={this.props.toggleSearchAllVersions}
                                 />
-                            </SearchResultsBar>
-
+                            </div>
                             <ItemsList
                                 actions={this.props.actions}
                                 activeView={this.props.activeView}

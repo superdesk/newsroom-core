@@ -7,7 +7,7 @@ import ListViewOptions from 'components/ListViewOptions';
 
 function AgendaListViewControls({activeView, setView, hideFeaturedToggle, toggleFeaturedFilter, featuredFilter, hasAgendaFeaturedItems}: any) {
     return (
-        <div className="navbar navbar--flex navbar--small navbar--tools">
+        <div className="navbar navbar--flex navbar--small navbar--list-controls ">
             <div className="navbar__inner navbar__inner--end">
                 {!hideFeaturedToggle && hasAgendaFeaturedItems  && DISPLAY_AGENDA_FEATURED_STORIES_ONLY &&
                     <AgendaFeaturedStoriesToogle onChange={toggleFeaturedFilter} featuredFilter={featuredFilter}/>

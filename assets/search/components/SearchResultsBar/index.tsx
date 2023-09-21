@@ -131,7 +131,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
             <React.Fragment>
                 <div
                     data-test-id="search-results-bar"
-                    className="wire-column__main-header-container"
+                    className="d-contents"
                 >
                     {!this.props.showTotalItems ? null : (
                         <div className="navbar navbar--flex line-shadow-end--light navbar--search-results">
