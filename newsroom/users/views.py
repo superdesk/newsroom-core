@@ -97,7 +97,7 @@ def search():
         if where.get("products._id"):
             lookup = {"products._id": where.get("products._id")}
 
-    if is_current_user_company_admin() and flask.request.args.get("where"):
+    if is_current_user_company_admin():
         # Make sure this request only searches for the current users company
         company = get_company()
 
