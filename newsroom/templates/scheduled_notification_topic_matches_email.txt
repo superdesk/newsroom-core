@@ -11,14 +11,14 @@ New {{ config.AGENDA_SECTION if section == "agenda" else config.WIRE_SECTION }} 
 {% endfor %}
 
 {% for section, topic_entries in entries.items() %}
-{% for entry.in topic_entries %}
+{% for entry in topic_entries %}
 
 Latest new {{ section }} items for {{ entry.topic.label }}
 {% if section == "wire" %}
 {{ entry.item.headline }}
 
 Slugline: {{ entry.item.slugline }} | Source: {{ entry.item.source}}
-Published on: {{ entry.item.versioncreated | notification_datetime }} | {{ entry.item.body_html | word_count }} words{% if entry.item.service[0].name %} | Category: {{ entry.item.service[0].name }}{% endif %}
+Published on: {{ entry.item.versioncreated | notification_datetime }} | {{ entry.item.body_html | word_count }} words{% if entry.item.service %} | Category: {{ entry.item | category_names }}{% endif %}
 {{ short_highlighted_text(get_highlighted_field(entry.item, ["body_html"]), output_html=False) }}
 View this item in your account: {{ url_for_wire(entry.item, True, section) }}
 View all item(s): {{ url_for('wire.wire', _external=True) }}?topic={{ entry.topic._id }}
