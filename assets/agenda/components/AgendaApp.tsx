@@ -55,6 +55,7 @@ import BookmarkTabs from 'components/BookmarkTabs';
 import {setActiveDate, setAgendaDropdownFilter} from 'local-store';
 import {previewConfigSelector, detailsConfigSelector} from 'ui/selectors';
 import {SearchResultsBar} from 'search/components/SearchResultsBar';
+import {agendaFiltersConfigSelector} from 'agenda/selectors';
 
 const modals = {
     shareItem: ShareItemModal,
@@ -147,7 +148,8 @@ class AgendaApp extends BaseApp {
         const showFilters = Object.values(this.props.searchParams ?? {}).find((val) => val != null) != null ||
             this.props.activeTopic != null ||
             Object.keys(this.props.activeFilter ?? {}).length > 0 ||
-            this.props.activeQuery != null;
+            this.props.activeQuery != null ||
+            this.props.itemTypeFilter != null;
 
         return (
             (this.props.itemToOpen ? [<AgendaItemDetails key="itemDetails"
@@ -241,7 +243,6 @@ class AgendaApp extends BaseApp {
                                     locators={this.props.locators}
                                 />
                             )}
-
                             {
                                 showFilters && (
                                     <SearchResultsBar
@@ -383,6 +384,7 @@ const mapStateToProps = (state: any) => ({
     modal: state.modal,
     user: state.user,
     company: state.company,
+    filtersConfig: agendaFiltersConfigSelector(state),
     topics: topicsSelector(state),
     activeView: activeViewSelector(state),
     newItems: state.newItems,
