@@ -38,7 +38,9 @@ def get_user_id():
     return _get_user_id()
 
 
-def query_resource(resource, lookup=None, max_results=0, projection=None, sort = None) -> Union[ElasticCursor, MongoCursor]:
+def query_resource(
+    resource, lookup=None, max_results=0, projection=None, sort=None
+) -> Union[ElasticCursor, MongoCursor]:
     req = ParsedRequest()
     req.max_results = max_results
     req.sort = sort
