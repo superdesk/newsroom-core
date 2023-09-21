@@ -658,15 +658,14 @@ def test_create_user_inherit_sections(app):
     assert user["sections"] == {"agenda": True, "wire": False}
 
 
-
 def test_filter_and_sorting_user(app, client):
-    users = client.get('/users/search?q=').get_json()
-    assert len(users) == 3 
+    users = client.get("/users/search?q=").get_json()
+    assert len(users) == 3
     response = client.get("/users/search?q=admin")
     assert "admin" in response.get_data(as_text=True)
     user_data = response.get_json()[0]
     patch_data = user_data.copy()
-    patch_data["first_name"] = "Zoe" 
+    patch_data["first_name"] = "Zoe"
     patch_data["last_name"] = "AAba"
     response = client.post(
         f"/users/{user_data['_id']}",
@@ -675,21 +674,21 @@ def test_filter_and_sorting_user(app, client):
     )
     assert response.status_code == 200
 
-    #sort by First_name
+    # sort by First_name
     users = client.get("/users/search?q=&sort=[('first_name', 1)]").get_json()
-    assert users[0]["first_name"] == 'Foo'
-    assert users[2]["first_name"] == 'Zoe'
+    assert users[0]["first_name"] == "Foo"
+    assert users[2]["first_name"] == "Zoe"
 
-    #sort by Last_name
-    users = client.get("/users/search?q=""&sort=[('last_name', 1)]").get_json()
+    # sort by Last_name
+    users = client.get("/users/search?q=" "&sort=[('last_name', 1)]").get_json()
     assert users[0]["last_name"] == "AAba"
-    assert users[1]["last_name"] == 'Bar'
+    assert users[1]["last_name"] == "Bar"
 
     # filter by Company_id
     users = client.get('/users/search?q=""&where={"company":"6215cbf55fc14ebe18e175a5"}').get_json()
-    assert len(users) == 2 
-    assert users[0]['company'] == '6215cbf55fc14ebe18e175a5'
+    assert len(users) == 2
+    assert users[0]["company"] == "6215cbf55fc14ebe18e175a5"
 
-    #filter by products
+    # filter by products
     users = client.get('/users/search?q=""&where={"products._id":"random"}').get_json()
     assert len(users) == 0
