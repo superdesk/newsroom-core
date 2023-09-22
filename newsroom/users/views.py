@@ -1,5 +1,5 @@
 import re
-
+import json
 from copy import deepcopy
 import flask
 from bson import ObjectId
@@ -79,6 +79,7 @@ def user_profile():
 @account_manager_or_company_admin_only
 def search():
     lookup = None
+    sort = None
     if flask.request.args.get("q"):
         regex = re.compile(".*{}.*".format(flask.request.args.get("q")), re.IGNORECASE)
         lookup = {"$or": [{"first_name": regex}, {"last_name": regex}]}
@@ -86,6 +87,19 @@ def search():
     if flask.request.args.get("ids"):
         lookup = {"_id": {"$in": (flask.request.args.get("ids") or "").split(",")}}
 
+    if flask.request.args.get("sort"):
+        sort = flask.request.args.get("sort")
+
+    where_param = flask.request.args.get("where")
+    if where_param:
+        try:
+            where = json.loads(where_param)
+            if where.get("company"):
+                lookup = {"company": where["company"]}
+            if where.get("products._id"):
+                lookup = {"products._id": where["products._id"]}
+        except json.JSONDecodeError as e:
+            return jsonify({"error": "Invalid 'where' parameter. JSON decoding failed: {}".format(str(e))}), 400
     if is_current_user_company_admin():
         # Make sure this request only searches for the current users company
         company = get_company()
@@ -98,7 +112,7 @@ def search():
 
         lookup["company"] = company["_id"]
 
-    users = list(query_resource("users", lookup=lookup))
+    users = list(query_resource("users", lookup=lookup, sort=sort))
     return jsonify(users), 200
 
 
