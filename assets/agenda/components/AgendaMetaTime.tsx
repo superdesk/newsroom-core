@@ -27,7 +27,7 @@ function getCalendarClass(item: any) {
     if (hasCoverages(item)) {
         return 'icon--green';
     } else {
-        return 'icon--gray-dark';
+        return 'icon--default';
     }
 }
 

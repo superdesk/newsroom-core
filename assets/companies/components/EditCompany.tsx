@@ -164,7 +164,7 @@ class EditCompany extends React.Component<IProps, IState> {
                         className='icon-button'
                         aria-label={gettext('Close')}
                         onClick={this.props.cancelEdit}>
-                        <i className="icon--close-thin icon--gray-dark" aria-hidden='true' />
+                        <i className="icon--close-thin" aria-hidden='true' />
                     </button>
                 </div>
                 <AuditInformation item={this.props.company} />

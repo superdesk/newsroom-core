@@ -221,30 +221,30 @@ class WireApp extends BaseApp {
                             className={mainClassName}
                             ref={this.setListRef}
                         >
-                            {
-                                showFilters && (
-                                    <SearchResultsBar
-                                        minimizeSearchResults={this.state.minimizeSearchResults}
-                                        initiallyOpen={showFilters}
-                                        showTotalItems={showTotalItems}
-                                        showTotalLabel={showTotalLabel}
-                                        showSaveTopic={showSaveTopic}
-
-                                        totalItems={this.props.totalItems}
-                                        totalItemsLabel={totalItemsLabel}
-
-                                        saveMyTopic={saveMyTopic}
-                                        activeTopic={this.props.activeTopic}
-                                        topicType={this.props.context === 'wire' ? this.props.context : null}
-
-                                        newItems={this.props.newItems}
-                                        refresh={this.props.fetchItems}
-                                        setSortQuery={this.props.setSortQuery}
-                                        setQuery={this.props.setQuery}
-                                    />
-                                )
-                            }
                             <div className='wire-column__main-header-container'>
+                                {
+                                    showFilters && (
+                                        <SearchResultsBar
+                                            minimizeSearchResults={this.state.minimizeSearchResults}
+                                            initiallyOpen={showFilters}
+                                            showTotalItems={showTotalItems}
+                                            showTotalLabel={showTotalLabel}
+                                            showSaveTopic={showSaveTopic}
+
+                                            totalItems={this.props.totalItems}
+                                            totalItemsLabel={totalItemsLabel}
+
+                                            saveMyTopic={saveMyTopic}
+                                            activeTopic={this.props.activeTopic}
+                                            topicType={this.props.context === 'wire' ? this.props.context : null}
+
+                                            newItems={this.props.newItems}
+                                            refresh={this.props.fetchItems}
+                                            setSortQuery={this.props.setSortQuery}
+                                            setQuery={this.props.setQuery}
+                                        />
+                                    )
+                                }
                                 <ListViewControls
                                     activeView={this.props.activeView}
                                     setView={this.props.setView}

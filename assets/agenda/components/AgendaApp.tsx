@@ -231,42 +231,42 @@ class AgendaApp extends BaseApp {
                             )}
                         </div>
                         <div className={mainClassName}>
-                            {!this.props.bookmarks && (
-                                <AgendaFilters
-                                    aggregations={this.props.aggregations}
-                                    toggleFilter={this.props.toggleDropdownFilter}
-                                    activeFilter={this.props.activeFilter}
-                                    eventsOnlyAccess={this.props.eventsOnlyAccess}
-                                    restrictCoverageInfo={this.props.restrictCoverageInfo}
-                                    itemTypeFilter={this.props.itemTypeFilter}
-                                    locators={this.props.locators}
-                                />
-                            )}
-                            {
-                                showFilters && (
-                                    <SearchResultsBar
-                                        initiallyOpen={showFilters}
-                                        minimizeSearchResults={this.state.minimizeSearchResults}
-
-                                        showTotalItems={showTotalItems}
-                                        showTotalLabel={showTotalLabel}
-                                        showSaveTopic={showSaveTopic}
-
-                                        totalItems={this.props.totalItems}
-                                        totalItemsLabel={totalItemsLabel}
-
-                                        saveMyTopic={saveMyTopic}
-                                        activeTopic={this.props.activeTopic}
-                                        topicType="agenda"
-
-                                        newItems={this.props.newItems}
-                                        refresh={this.props.fetchItems}
-
-                                        setQuery={this.props.setQuery}
-                                    />
-                                )
-                            }
                             <div className='wire-column__main-header-container'>
+                                {!this.props.bookmarks && (
+                                    <AgendaFilters
+                                        aggregations={this.props.aggregations}
+                                        toggleFilter={this.props.toggleDropdownFilter}
+                                        activeFilter={this.props.activeFilter}
+                                        eventsOnlyAccess={this.props.eventsOnlyAccess}
+                                        restrictCoverageInfo={this.props.restrictCoverageInfo}
+                                        itemTypeFilter={this.props.itemTypeFilter}
+                                        locators={this.props.locators}
+                                    />
+                                )}
+                                {
+                                    showFilters && (
+                                        <SearchResultsBar
+                                            initiallyOpen={showFilters}
+                                            minimizeSearchResults={this.state.minimizeSearchResults}
+
+                                            showTotalItems={showTotalItems}
+                                            showTotalLabel={showTotalLabel}
+                                            showSaveTopic={showSaveTopic}
+
+                                            totalItems={this.props.totalItems}
+                                            totalItemsLabel={totalItemsLabel}
+
+                                            saveMyTopic={saveMyTopic}
+                                            activeTopic={this.props.activeTopic}
+                                            topicType="agenda"
+
+                                            newItems={this.props.newItems}
+                                            refresh={this.props.fetchItems}
+
+                                            setQuery={this.props.setQuery}
+                                        />
+                                    )
+                                }
                                 <AgendaListViewControls
                                     activeView={this.props.activeView}
                                     setView={this.props.setView}

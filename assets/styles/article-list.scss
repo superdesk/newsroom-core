@@ -40,6 +40,7 @@
         inset-block-start:-4px;
         inset-block-end: -4px;
         width: 0;
+        border-radius: var(--content-list-item-border-radius) 0 0 var(--content-list-item-border-radius);
     }
     &:focus-visible {
         box-shadow: 0 0 0 1px var(--color-interactive-focus), 0 0 3px 4px var(--color-interactive-focus--translucent);
@@ -50,6 +51,15 @@
             margin-inline-end: 10px;
         }
     }
+}
+.wire-articles__item-highlight-border {
+    border-radius: var(--content-list-item-border-radius) 0 0 var(--content-list-item-border-radius);
+    width: 4px;
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: var(--space--2);
+    z-index: 1;
+    height: 100%;
 }
 
 .wire-articles__item--open {
@@ -101,16 +111,6 @@
     min-height: 1px;
     padding-inline-end: var(--space--2);
     padding-inline-start: var(--space--2);
-
-    @include xxsm {
-        margin-block-end: var(--space--1-5);
-        padding-inline-start: var(--space--1);
-        padding-inline-end: var(--space--1);
-    }
-    @include md {
-        padding-inline-end: var(--space--2);
-        padding-inline-start: var(--space--2);
-    }
 }
 
 .wire-articles--list {
@@ -140,13 +140,15 @@
     margin-inline-end: var(--space--2);
 }
 
+
+// STATES 
 .wire-articles__item--covering {
     &:before {
         width: 4px;
-        background-color: $green;
+        background-color: var(--content-item-state-border-color-covering);
     }
     .date-round__number {
-        color: $green;
+        color: var(--content-item-state-border-color-covering);
     }
     .date-round {
         background: #edf8da;
@@ -155,10 +157,10 @@
 .wire-articles__item--postponed {
     &:before {
         width: 4px;
-        background-color: var(--color-primary);
+        background-color: var(--content-item-state-border-color-postponed);
     }
     .date-round__number {
-        color: $orange;
+        color: var(--content-item-state-border-color-postponed);
     }
     .date-round {
         background: #edf8da;
@@ -167,10 +169,10 @@
 .wire-articles__item--rescheduled {
     &:before {
         width: 4px;
-        background-color: $orange;
+        background-color: var(--content-item-state-border-color-rescheduled);
     }
     .date-round__number {
-        color: $green-dark;
+        color: var(--content-item-state-border-color-rescheduled);
     }
     .date-round {
         background: #edf8da;
@@ -179,13 +181,13 @@
 .wire-articles__item--not-covering {
     &:before {
         width: 4px;
-        background-color: #bfc3c7;
+        background-color: var(--content-item-state-border-color-not-covering);
     }
     .date-round__number {
-        color: #9a9a9a;
+        color: var(--color-text--muted);
     }
     .date-round {
-        background: #f1f1f1;
+        background: var(--color-background--muted-2);
     }
 }
 .wire-articles__item--canceled {
@@ -608,10 +610,15 @@
         word-wrap: break-word;
     }
 
-    &--info {
+    &.wire-articles__item__meta-row--info {
         margin-inline-start: 1rem;
         color: var(--color-text--muted);
         font-weight: 400;
+    }
+    &.wire-articles__item__meta-row--contact span {
+        flex-direction: column;
+        row-gap: 2px;
+        align-items: flex-start;
     }
 }
 

@@ -315,6 +315,17 @@
     }
 }
 
+.nh-button--advanced-search {
+    @include phone {
+        width: 96px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;  
+        overflow: hidden;
+        padding-inline: var(--space--1);
+    }
+}
+
 .nh-button__group {
     display: flex;
     align-items: center;

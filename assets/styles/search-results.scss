@@ -123,6 +123,10 @@
 .search-result-count {
     font-size: 18px;
     font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 
 // Container Query test

@@ -65,7 +65,7 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                         </span>
                         {coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED && coverage.scheduled != null && (
                             <span className='d-flex text-nowrap'>
-                                <i className='icon-small--clock icon--gray-dark me-1'></i>
+                                <i className='icon-small--clock me-1'></i>
                                 <span className='coverage-item__text-label me-1'>{gettext('expected')}:</span>
                                 <span>{formatCoverageDate(coverage)}</span>
                             </span>

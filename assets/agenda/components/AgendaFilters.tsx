@@ -125,7 +125,7 @@ export function getDropdownItems(filter: any, aggregations: any, toggleFilter: a
 
 function AgendaFiltersComponent(props: any) {
     return (
-        <div className='wire-column__main-header-agenda d-flex m-0 px-3 align-items-center flex-wrap flex-sm-nowrap'>
+        <div className='navbar navbar--flex navbar--quick-filter'>
             {props.filtersConfig.map((filterName: any) => (
                 renderFilter[filterName](props)
             ))}

@@ -19,9 +19,9 @@ export function FormSection({initiallyOpen, name, children, dataTestId}: IProps)
             >
                 <div className="list-item__preview-collapsible-header">
                     {opened ? (
-                        <i className="icon--arrow-right icon--gray-dark icon--rotate-90"></i>
+                        <i className="icon--arrow-right icon--rotate-90"></i>
                     ) : (
-                        <i className="icon--arrow-right icon--gray-dark"></i>
+                        <i className="icon--arrow-right"></i>
                     )}
                     <h3>{name}</h3>
                 </div>

@@ -47,7 +47,7 @@ function Home() {
                                     <div className="wire-articles__item__meta">
                                         <div className="wire-articles__item__icons">
                                             <span className="wire-articles__item__icon">
-                                                <i className="icon--text icon--gray-dark"></i>
+                                                <i className="icon--text"></i>
                                             </span>
                                         </div>
                                         <div className="wire-articles__item__meta-info">
@@ -73,7 +73,7 @@ function Home() {
                                     <div className="wire-articles__item__meta">
                                         <div className="wire-articles__item__icons">
                                             <span className="wire-articles__item__icon">
-                                                <i className="icon--text icon--gray-dark"></i>
+                                                <i className="icon--text"></i>
                                             </span>
                                         </div>
                                         <div className="wire-articles__item__meta-info">
@@ -99,7 +99,7 @@ function Home() {
                                     <div className="wire-articles__item__meta">
                                         <div className="wire-articles__item__icons">
                                             <span className="wire-articles__item__icon">
-                                                <i className="icon--text icon--gray-dark"></i>
+                                                <i className="icon--text"></i>
                                             </span>
                                         </div>
                                         <div className="wire-articles__item__meta-info">
@@ -125,7 +125,7 @@ function Home() {
                                     <div className="wire-articles__item__meta">
                                         <div className="wire-articles__item__icons">
                                             <span className="wire-articles__item__icon">
-                                                <i className="icon--text icon--gray-dark"></i>
+                                                <i className="icon--text"></i>
                                             </span>
                                         </div>
                                         <div className="wire-articles__item__meta-info">
@@ -151,7 +151,7 @@ function Home() {
                                     <div className="wire-articles__item__meta">
                                         <div className="wire-articles__item__icons">
                                             <span className="wire-articles__item__icon">
-                                                <i className="icon--text icon--gray-dark"></i>
+                                                <i className="icon--text"></i>
                                             </span>
                                         </div>
                                         <div className="wire-articles__item__meta-info">
@@ -177,7 +177,7 @@ function Home() {
                                     <div className="wire-articles__item__meta">
                                         <div className="wire-articles__item__icons">
                                             <span className="wire-articles__item__icon">
-                                                <i className="icon--text icon--gray-dark"></i>
+                                                <i className="icon--text"></i>
                                             </span>
                                         </div>
                                         <div className="wire-articles__item__meta-info">

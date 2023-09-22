@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {Dropdown as BootstrapDropdown} from 'bootstrap';
 
-export function Dropdown({children, isActive, icon, label, className, buttonProps, small, stretch}: any) {
+export function Dropdown({children, isActive, icon, label, value, className, buttonProps, small, stretch}: any) {
     const dropdown: any = React.useRef();
     let dropdownInstance: any = null;
 
@@ -57,6 +57,11 @@ export function Dropdown({children, isActive, icon, label, className, buttonProp
                     {label}
                 </span>
             )}
+            {!value ? null : (
+                <span className="nh-dropdown-button__text-value">
+                    {value}
+                </span>
+            )}
             <i className='nh-dropdown-button__caret icon-small--arrow-down' />
         </button>
         <div className='dropdown-menu'>
@@ -69,6 +74,7 @@ Dropdown.propTypes = {
     children: PropTypes.node,
     icon: PropTypes.string,
     label: PropTypes.node,
+    value: PropTypes.node,
     isActive: PropTypes.bool,
     className: PropTypes.string,
     autoToggle: PropTypes.bool,

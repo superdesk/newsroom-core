@@ -21,7 +21,7 @@ function EditTopic() {
             <div className="list-item__preview-header">
                 <h3>Edit Topic</h3>
                 <button id="hide-sidebar" type="button" className="icon-button" data-dismiss="modal" aria-label="Close">
-                    <i className="icon--close-thin icon--gray-dark" aria-hidden="true"></i>
+                    <i className="icon--close-thin" aria-hidden="true"></i>
                 </button>
             </div>
             <div className="wire-column__preview__top-bar audit-information">
@@ -51,7 +51,7 @@ function EditTopic() {
                                 <div className="nh-flex__column">
                                     <div className="list-item__preview-collapsible" onClick={handleClickGeneral}>
                                         <div className="list-item__preview-collapsible-header">
-                                            {!isGeneralShown && <i className="icon--arrow-right icon--gray-dark"></i>}
+                                            {!isGeneralShown && <i className="icon--arrow-right"></i>}
                                             {isGeneralShown && <i className="icon--arrow-right icon--rotate-90"></i>}
                                             <h3>Email Notifications</h3>
                                         </div>
