@@ -24,7 +24,9 @@ def test_user_list_fails_for_anonymous_user(client, anonymous_user):
     assert b"Forbidden" in response.data
 
 
-def test_return_search_for_users(client):
+def test_return_search_for_users(client, app):
+    company_ids = app.data.insert("companies", [{"name": "test", "sections": {"wire": True, "agenda": True}}])
+
     # Register a new account
     response = client.post(
         "/users/new",
@@ -34,9 +36,8 @@ def test_return_search_for_users(client):
             "last_name": "Doe",
             "password": "abc",
             "phone": "1234567",
-            "company": ObjectId("59b4c5c61d41c8d736852fbf"),
+            "company": company_ids[0],
             "user_type": "public",
-            "sections": "wire,agenda",
         },
     )
 

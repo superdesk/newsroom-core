@@ -124,7 +124,7 @@ def create():
         if not _is_email_address_valid(form.email.data):
             return jsonify({"email": [gettext("Email address is already in use")]}), 400
 
-        new_user = get_updates_from_form(form)
+        new_user = get_updates_from_form(form, on_create=True)
         user_is_company_admin = is_current_user_company_admin()
         if user_is_company_admin:
             company = get_company()
@@ -254,12 +254,17 @@ def edit(_id):
     return jsonify(user), 200
 
 
-def get_updates_from_form(form: UserForm):
+def get_updates_from_form(form: UserForm, on_create=False):
     updates = form.data
     if form.company.data:
         updates["company"] = ObjectId(form.company.data)
     if "sections" in updates:
-        updates["sections"] = {section["_id"]: section["_id"] in (form.sections.data or []) for section in app.sections}
+        if on_create and not updates.get("sections"):
+            updates.pop("sections")  # will be populated later based on company
+        else:
+            updates["sections"] = {
+                section["_id"]: section["_id"] in (form.sections.data or []) for section in app.sections
+            }
 
     if "products" in updates:
         product_ids = [ObjectId(productId) for productId in updates["products"]]
