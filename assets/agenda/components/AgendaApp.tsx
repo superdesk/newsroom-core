@@ -252,6 +252,9 @@ class AgendaApp extends BaseApp {
                                             showTotalItems={showTotalItems}
                                             showTotalLabel={showTotalLabel}
                                             showSaveTopic={showSaveTopic}
+                                            onClearAll={() => {
+                                                this.props.toggleDropdownFilter('itemType', null);
+                                            }}
 
                                             totalItems={this.props.totalItems}
                                             totalItemsLabel={totalItemsLabel}
