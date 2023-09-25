@@ -127,6 +127,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
         const {isTagSectionShown} = this.state;
         const numberFormatter = (new Intl.NumberFormat(undefined, {style: 'decimal'}));
 
+        // console.log(this.props.itemTypeFilter);
         return (
             <React.Fragment>
                 <div
@@ -171,6 +172,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                     className="nh-button nh-button--tertiary"
                                     onClick={() => {
                                         this.props.resetSearchParamsAndUpdateURL();
+                                        this.props.onClearAll?.();
                                         this.props.refresh();
                                     }}
                                 >
