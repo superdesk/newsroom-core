@@ -136,6 +136,15 @@ class AgendaListItem extends React.Component<any, any> {
         // Show headline for adhoc planning items
         const showHeadline = !item.event && get(item, 'headline.length', 0) > 0;
 
+        const descriptionHTML = description.replace('\n', '<br/>').replace('<br/>', '</p>\n<p>');
+
+        function isHTML(value: string) {
+            const doc = new DOMParser().parseFromString(value, 'text/html');
+            return Array.from(doc.body.childNodes).some(node => node.nodeType === 1);
+        }
+
+        const descriptionArray = isHTML(description) ? descriptionHTML : description;    
+
         return (
             <article key={item._id}
                 className={classes.card}
@@ -185,17 +194,27 @@ class AgendaListItem extends React.Component<any, any> {
 
                         {(isMobile || isExtended) && description && (
                             <div className="wire-articles__item__text">
-                                {item.es_highlight && item.es_highlight
+                                {item.es_highlight && item.es_highlight.definition_short
                                     ? (
-                                        description.split('\n').map((lineOfHTML: string, index: number) => {
-                                            return (
-                                                <p key={index}>
-                                                    <span dangerouslySetInnerHTML={{__html: lineOfHTML}} />
-                                                </p>
-                                            );
+                                        descriptionArray.split('\n').map((lineOfHTML: string, index: number) => (
+                                            <p key={index}>
+                                                <span dangerouslySetInnerHTML={{__html: lineOfHTML}} />
+                                            </p>
+                                        ))
+                                    )
+                                    : (
+                                        descriptionArray.split('\n').slice(0, 3).map((plainOfHTML: string, i: number, array: any) => {
+                                            const lastChild: boolean = array.length -1 === i && descriptionArray.length > 3;
+
+                                            return isHTML(description)
+                                                ? (
+                                                    <div className={lastChild ? 'wire-articles__item__text--last-child' : ''} dangerouslySetInnerHTML={{__html: plainOfHTML}} />
+                                                )
+                                                : (
+                                                    <p className={lastChild ? 'wire-articles__item__text--last-child' : ''}>{plainOfHTML}</p>
+                                                );
                                         })
                                     )
-                                    : <PlainText text={description.split('\n')[0]} />
                                 }
                             </div>
                         )}

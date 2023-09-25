@@ -18,7 +18,7 @@ export default function AgendaLongDescription({item, plan}: {item: any, plan: an
             {description.split('\n').map((lineOfHTML: string, index: number) => {
                 return lineOfHTML[0] !== '<'
                     ? (
-                        <div>
+                        <div key={index}>
                             {item.es_highlight
                                 ? (
                                     <span dangerouslySetInnerHTML={{__html: lineOfHTML}} />
