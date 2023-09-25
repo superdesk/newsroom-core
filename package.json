@@ -16,7 +16,10 @@
     "design-app": "webpack-dev-server --config=webpack.design.js"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.0.8",
+    "@dnd-kit/sortable": "^7.0.2",
     "@popperjs/core": "^2.11.4",
+    "@sucrase/webpack-object-rest-spread-plugin": "^1.0.1",
     "@types/bootstrap": "^5.2.6",
     "@types/enzyme": "^3.10.13",
     "@types/karma": "^6.3.4",
