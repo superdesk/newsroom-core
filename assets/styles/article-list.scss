@@ -57,6 +57,15 @@
         }
     }
 }
+.wire-articles__item-highlight-border {
+    border-radius: var(--content-list-item-border-radius) 0 0 var(--content-list-item-border-radius);
+    width: 4px;
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: var(--space--2);
+    z-index: 1;
+    height: 100%;
+}
 
 .wire-articles__item-highlight-border {
     border-radius: var(--content-list-item-border-radius) 0 0 var(--content-list-item-border-radius);

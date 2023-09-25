@@ -1,5 +1,7 @@
+import {ICompany, IProduct, IUser} from 'interfaces';
 import {gettext} from '../utils';
 import {get} from 'lodash';
+import {ISeats} from 'interfaces/seat';
 
 export const userTypes = [
     {value: 'administrator', text: gettext('Administrator'), show_acc_mgr: false},
@@ -61,4 +63,30 @@ export function cleanUserEntityBeforePatch(data: Dictionary<any>) {
     });
 
     return data;
+}
+
+export function hasUnlimitedSeats(companyId: ICompany['_id'], seats: ISeats, product: IProduct): boolean {
+    const companySeats = seats[companyId];
+    const seatsForProduct = companySeats[product._id];
+
+    const maxSeats = seatsForProduct.max_seats;
+
+    const unlimited = maxSeats == null || maxSeats < 1;
+
+    return unlimited;
+}
+
+export function hasSeatsAvailable(companyId: ICompany['_id'], seats: ISeats, product: IProduct): boolean {
+    const companySeats = seats[companyId];
+    const seatsForProduct = companySeats[product._id];
+
+    if (hasUnlimitedSeats(companyId, seats, product)) {
+        return true;
+    } else {
+        return seatsForProduct.assigned_seats < seatsForProduct.max_seats;
+    }
+}
+
+export function seatOccupiedByUser(user: IUser, product: IProduct) {
+    return user.products.find((userProduct: {section: string; _id: string}) => userProduct._id === product._id);
 }

@@ -75,8 +75,8 @@ class SendScheduledNotificationEmails(Command):
                 company = companies.get(str(user.get("company", "")))
                 self.process_schedule(schedule, user, company, now_utc, user_topic_map.get(user["_id"]) or {}, force)
             except Exception as e:
-                logger.error(f"{self.log_msg} Failed to run schedule for user {user_id}")
                 logger.exception(e)
+                logger.error(f"{self.log_msg} Failed to run schedule for user {user_id}")
 
     def process_schedule(
         self,
