@@ -16,8 +16,11 @@ import {
 } from './actions';
 
 import {ADD_EDIT_USERS} from 'actions';
+import {companyProductSeatsSelector} from 'company-admin/selectors';
+import {IProduct} from 'interfaces';
 
 import {searchReducer} from 'search/reducers';
+import {hasSeatsAvailable, seatOccupiedByUser} from './utils';
 
 const initialState: any = {
     user: null,
@@ -107,9 +110,16 @@ export default function userReducer(state: any = initialState, action: any) {
                 user.products = (user.products || []).filter((product: any) => product._id !== productId);
             }
         } else if (field.includes('selectAllBtn')) {
-            user.products = state.products
-                .filter((product: any) => user.sections[product.product_type])
-                .map((product: any) => ({_id : product._id , section: product.product_type}));
+            const seats = companyProductSeatsSelector(state);
+
+            user.products = (state.products as Array<IProduct>)
+                .filter((product: IProduct) =>
+                    user.sections[product.product_type]
+                    && (
+                        hasSeatsAvailable(user.company, seats, product) || seatOccupiedByUser(user, product)
+                    )
+                )
+                .map((product) => ({_id : product._id , section: product.product_type}));
         }
         else {
             user[field] = value;
