@@ -4,6 +4,8 @@ import {DndContext, DragOverEvent, UniqueIdentifier} from '@dnd-kit/core';
 import {SortableContext, arrayMove} from '@dnd-kit/sortable';
 import {SortableItem} from './sortable-item';
 import {Overlay} from './overlay';
+import {Droppable} from './droppable';
+import {DropArea} from './drop-area';
 
 type IGroupedItems = {[key: string]: Array<string>};
 
@@ -117,15 +119,23 @@ export function SortableContainers<T>(props: IProps<T>) {
         >
             {
                 Object.keys(items).map((containerId) => (
-                    <ContainerTemplate key={containerId} containerId={containerId} context={props.context}>
-                        <SortableContext items={items[containerId]}>
-                            {
-                                items[containerId].map((id) => (
-                                    <SortableItem key={id} id={id} template={ItemTemplate} context={props.context} />
-                                ))
-                            }
-                        </SortableContext>
-                    </ContainerTemplate>
+                    <Droppable key={containerId} containerId={containerId}>{/** required for dropping into an empty container to work */}
+                        <ContainerTemplate containerId={containerId} context={props.context}>
+                            <SortableContext items={items[containerId]}>
+                                {
+                                    items[containerId].length > 0
+                                        ? (
+                                            items[containerId].map((id) => (
+                                                <SortableItem key={id} id={id} template={ItemTemplate} context={props.context} />
+                                            ))
+                                        )
+                                        : (
+                                            <DropArea />
+                                        )
+                                }
+                            </SortableContext>
+                        </ContainerTemplate>
+                    </Droppable>
 
                 ))
             }
