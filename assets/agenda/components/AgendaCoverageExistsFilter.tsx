@@ -43,6 +43,7 @@ function AgendaCoverageExistsFilter ({toggleFilter, activeFilter}: any) {
             activeFilter={activeFilter}
             toggleFilter={toggleFilter}
             getFilterLabel={getActiveFilterLabel}
+            optionLabel={gettext('Coverage')}
         >
             <button
                 key='coverage-planned'
