@@ -489,17 +489,16 @@ class BaseSearchService(Service):
             if len(search.navigation_ids):
                 search.products = get_products_by_navigation(search.navigation_ids, product_type=search.section)
             elif search.args.get("product"):
-                search.products = get_product_by_id(search.args["product"], product_type=search.section)
+                product = get_product_by_id(search.args["product"], product_type=search.section)
+                search.products = [product] if product else []
             else:
                 # admin will see everything by default,
                 # regardless of company products
                 search.products = []
         elif search.company:
             if search.args.get("product"):
-                search.products = get_product_by_id(
-                    search.args["product"],
-                    product_type=search.section,
-                )
+                product = get_product_by_id(search.args["product"], product_type=search.section)
+                search.products = [product] if product else []
 
             else:
                 search.products = []
@@ -843,10 +842,7 @@ class BaseSearchService(Service):
 
     def get_matching_topics_for_item(self, topics, users, companies, query):
         aggs = {"topics": {"filters": {"filters": {}}}}
-
         queried_topics = []
-        # get all section filters
-        section_filters = get_resource_service("section_filters").get_section_filters_dict()
 
         for topic in topics:
             user = users.get(str(topic["user"]))
@@ -855,7 +851,7 @@ class BaseSearchService(Service):
 
             company = companies.get(str(user.get("company", "")))
 
-            topic_query = self.get_topic_query(topic, user, company, section_filters, query)
+            topic_query = self.get_topic_query(topic, user, company, query)
             if not topic_query:
                 continue
 

@@ -29,6 +29,7 @@ def before_scenario(context, scenario):
         "NEWS_API_IMAGE_PERMISSIONS_ENABLED": True,
         "NEWS_API_TIME_LIMIT_DAYS": 100,
         "SITE_NAME": "Newsroom",
+        "CACHE_TYPE": "simple",
     }
 
     if "rate_limit" in scenario.tags:

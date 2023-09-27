@@ -23,6 +23,7 @@ from superdesk.json_utils import SuperdeskJSONEncoder
 from superdesk.validator import SuperdeskValidator
 from superdesk.logging import configure_logging
 from superdesk.errors import SuperdeskApiError
+from superdesk.cache import cache_backend
 from elasticapm.contrib.flask import ElasticAPM
 from sentry_sdk.integrations.flask import FlaskIntegration
 
@@ -165,6 +166,7 @@ class BaseNewsroomApp(eve.Eve):
         self.mail = Mail(self)
 
     def setup_cache(self):
+        cache_backend.init_app(self)
         self.cache = Cache(self)
 
     def setup_error_handlers(self):

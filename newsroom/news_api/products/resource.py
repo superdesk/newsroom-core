@@ -4,7 +4,7 @@ from flask import g
 from bson import ObjectId
 from eve.utils import ParsedRequest
 
-from newsroom.products import ProductsService, ProductsResource
+from newsroom.products.products import ProductsService, ProductsResource
 from newsroom.news_api.utils import post_api_audit
 
 

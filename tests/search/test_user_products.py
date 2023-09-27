@@ -77,6 +77,7 @@ def test_user_products(app, client, manager, product):
     assert 0 == len(data["_items"])
 
     app.data.update("products", product["_id"], {"query": "headline:WEATHER"}, product)
+    g.pop("cached:products", None)
 
     data = utils.get_json(client, "/wire/search")
     assert 1 == len(data["_items"])

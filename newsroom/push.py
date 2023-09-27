@@ -856,8 +856,6 @@ def notify_agenda_topic_matches(item, users_dict, companies_dict):
 
 
 def send_topic_notification_emails(item, topics, topic_matches, users, companies):
-    section_filters = superdesk.get_resource_service("section_filters").get_section_filters_dict()
-
     for topic in topics:
         if topic["_id"] not in topic_matches:
             continue
@@ -893,7 +891,7 @@ def send_topic_notification_emails(item, topics, topic_matches, users, companies
                         "wire_search" if topic["topic_type"] == "wire" else "agenda"
                     )
                     query = search_service.get_topic_query(
-                        topic, user, company, section_filters, args={"es_highlight": 1, "ids": [item["_id"]]}
+                        topic, user, company, args={"es_highlight": 1, "ids": [item["_id"]]}
                     )
 
                     items = search_service.get_items_by_query(query, size=1)

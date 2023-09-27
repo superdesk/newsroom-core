@@ -197,7 +197,7 @@ class WireSearchService(BaseSearchService):
 
         for navigation in navigations:
             navigation_id = navigation.get("_id")
-            products = get_products_by_navigation(navigation_id) or []
+            products = get_products_by_navigation([navigation_id]) or []
             navigation_filter = {"bool": {"should": [], "minimum_should_match": 1}}
             for product in products:
                 if product.get("query"):

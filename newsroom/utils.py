@@ -633,3 +633,12 @@ def short_highlighted_text(html: str, max_length: int = 40, output_html: bool = 
     output = highlighted_text + output[last_index:]
 
     return output + ("" if count > max_length else "...")
+
+
+def any_objectid_in_list(list_ids: List[Union[str, ObjectId]], source_ids: List[ObjectId]) -> bool:
+    """Tests if any of the ids in ``list_ids`` is in the ``source_ids`` list"""
+
+    for item_id in list_ids:
+        if ObjectId(item_id) in source_ids:
+            return True
+    return False
