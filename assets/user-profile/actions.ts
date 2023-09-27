@@ -1,4 +1,4 @@
-import {ITopic, IUser} from 'interfaces';
+import {ITopic, ITopicFolder, IUser} from 'interfaces';
 
 import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
@@ -317,7 +317,7 @@ export function fetchFolders() {
 }
 
 export const TOPIC_UPDATED = 'TOPIC_UPDATED';
-export function moveTopic(topicId: any, folder: any) {
+export function moveTopic(topicId: any, folder: ITopicFolder | null) {
     return (dispatch: any, getState: any) => {
         const state = getState();
         const updates = {folder: folder != null ? folder._id : null};
