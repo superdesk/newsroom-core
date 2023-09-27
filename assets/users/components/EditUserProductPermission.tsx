@@ -4,6 +4,7 @@ import classNames from 'classnames';
 
 import {isProductEnabled} from 'companies/utils';
 import CheckboxInput from 'components/CheckboxInput';
+import {hasSeatsAvailable, hasUnlimitedSeats} from 'users/utils';
 
 export function EditUserProductPermission({original, user, section, product, seats, onChange}: any): any {
     const maxSeats = user.company != null ?
@@ -15,7 +16,8 @@ export function EditUserProductPermission({original, user, section, product, sea
 
     const originallyEnabled = isProductEnabled(original.products || [], product._id);
     const currentlyEnabled = isProductEnabled(user.products || [], product._id);
-    const unlimited = maxSeats == null || maxSeats < 1;
+
+    const unlimited = hasUnlimitedSeats(user.company, seats, product);
 
     // Update the count/max reached for this form only, to reflect any current changes
     if (maxSeats != null && originallyEnabled !== currentlyEnabled) {
@@ -26,6 +28,7 @@ export function EditUserProductPermission({original, user, section, product, sea
         }
     }
     const maxReached = maxSeats && assignedSeats >= maxSeats;
+    const canToggleSeatSelection = hasSeatsAvailable(user.company, seats, product) || currentlyEnabled;
 
     return (
         <div className="list-item__preview-row">
@@ -35,10 +38,10 @@ export function EditUserProductPermission({original, user, section, product, sea
                     label={product.name}
                     value={currentlyEnabled || unlimited}
                     onChange={onChange}
-                    readOnly={(maxSeats !== null && currentlyEnabled === false && maxReached === true) || unlimited}
+                    readOnly={canToggleSeatSelection !== true}
                 />
             </div>
-            {maxSeats == null || unlimited ? null : (
+            {unlimited ? null : (
                 <div className={classNames({'text-danger': maxReached === true})}>
                     {assignedSeats}/{maxSeats}
                 </div>
