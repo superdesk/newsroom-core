@@ -299,14 +299,14 @@ export function fetchFolders() {
         const userTopicsUrl = getFoldersUrl(state, false);
 
         return Promise.all([
-            state.company !== 'None' ? server.get(companyTopicsUrl) : Promise.resolve({_items: []}),
-            server.get(userTopicsUrl),
+            state.company !== 'None' ? server.get(({_items}) => _items) : Promise.resolve({_items: []}),
+            server.get(({_items}) => _items),
         ]).then(([companyFolders, userFolders]) => {
             dispatch({
                 type: RECIEVE_FOLDERS,
                 payload: {
-                    companyFolders: companyFolders._items,
-                    userFolders: userFolders._items,
+                    companyFolders: companyFolders,
+                    userFolders: userFolders,
                 },
             });
         }).catch((error) => {
