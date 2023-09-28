@@ -27,7 +27,8 @@ export function Dropdown({children, isActive, icon, optionLabel, label, value, c
         <div
             className={classNames(
                 'dropdown',
-                className ? className : ''
+                className ? className : '',
+                icon != null ? 'nh-dropdown-button--with-icon' : ''
             )}
             onClick={(event: any) => {
                 event.stopPropagation();
@@ -53,11 +54,12 @@ export function Dropdown({children, isActive, icon, optionLabel, label, value, c
                 {!icon ? null : (
                     <i className={icon} />
                 )}
-                {textOnly ? label : (
-                    <span>
-                        {isActive && optionLabel ? `${optionLabel}: ${label}` : label}
-                    </span>
-                )}
+                {textOnly ? label : isActive && optionLabel ? (
+                    <>
+                        <span className='nh-dropdown-button__text-label'>{optionLabel}: </span>
+                        <span className='nh-dropdown-button__text-value'>{label}</span>
+                    </>
+                ) : (<span className='nh-dropdown-button__text-label'>{label}</span>)}
                 {!value ? null : (
                     <span className="nh-dropdown-button__text-value">
                         {value}
