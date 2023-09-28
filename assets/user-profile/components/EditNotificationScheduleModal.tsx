@@ -9,12 +9,7 @@ import {updateUserNotificationSchedules} from 'user-profile/actions';
 
 import Modal from 'components/Modal';
 import {TimezoneInput} from 'components/TimezoneInput';
-
-const NOTIFICATION_TIME_OBJECT: React.InputHTMLAttributes<HTMLInputElement> = {
-    type: 'time',
-    min: '00:00',
-    step: '900',
-};
+import {TimePicker} from 'components/cards/TimePicker';
 
 interface IProps {
     modalFormInvalid(): void;
@@ -30,6 +25,8 @@ interface IState {
     times: Array<string>;
 }
 
+const minutes = Array.from(Array(60).keys());
+const changedMinutes: Array<number> = minutes.filter((num) => num % 15 !== 0);
 
 class EditNotificationScheduleModalComponent extends React.Component<IProps, IState> {
     formRef: React.RefObject<HTMLFormElement>;
@@ -107,32 +104,32 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                         onSubmit={(event) => this.onSubmitForm(event)}
                     >
                         <div className="form-group schedule-times__input-container">
-                            <input
-                                type={NOTIFICATION_TIME_OBJECT.type}
+                            <TimePicker
                                 value={this.state.times[0]}
-                                onChange={(event) => {
-                                    this.updateTime(event.target.value, 0);
+                                disabledOptions={{
+                                    minutes: changedMinutes,
                                 }}
-                                step={NOTIFICATION_TIME_OBJECT.step}
-                                min={NOTIFICATION_TIME_OBJECT.min}
+                                onChange={(value) => {
+                                    this.updateTime(value, 0);
+                                }}
                             />
-                            <input
-                                type={NOTIFICATION_TIME_OBJECT.type}
+                            <TimePicker
                                 value={this.state.times[1]}
-                                onChange={(event) => {
-                                    this.updateTime(event.target.value, 1);
+                                disabledOptions={{
+                                    minutes: changedMinutes,
                                 }}
-                                step={NOTIFICATION_TIME_OBJECT.step}
-                                min={NOTIFICATION_TIME_OBJECT.min}
+                                onChange={(value) => {
+                                    this.updateTime(value, 1);
+                                }}
                             />
-                            <input
-                                type={NOTIFICATION_TIME_OBJECT.type}
+                            <TimePicker
                                 value={this.state.times[2]}
-                                onChange={(event) => {
-                                    this.updateTime(event.target.value, 2);
+                                disabledOptions={{
+                                    minutes: changedMinutes,
                                 }}
-                                step={NOTIFICATION_TIME_OBJECT.step}
-                                min={NOTIFICATION_TIME_OBJECT.min}
+                                onChange={(value) => {
+                                    this.updateTime(value, 2);
+                                }}
                             />
                         </div>
                         <TimezoneInput
