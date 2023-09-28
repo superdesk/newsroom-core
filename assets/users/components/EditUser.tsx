@@ -41,7 +41,10 @@ interface IReduxStoreProps {
 interface IProps extends IReduxStoreProps {
     original: IUser;
     user: IUser;
-    onChange: (event: any) => void;
+
+    /** @deprecated because it doesn't send changes and relies on DOM manipulation */
+    onChange_DEPRECATED: (event: any) => void;
+
     errors: any;
     companies: Array<ICompany>;
     onSave: (event: any) => void;
@@ -59,7 +62,7 @@ interface IProps extends IReduxStoreProps {
 const EditUserComponent: React.ComponentType<IProps> = ({
     original,
     user,
-    onChange,
+    onChange_DEPRECATED,
     errors,
     companies,
     onSave,
@@ -171,42 +174,42 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                 name='first_name'
                                 label={gettext('First Name')}
                                 value={user.first_name}
-                                onChange={onChange}
+                                onChange={onChange_DEPRECATED}
                                 error={errors ? errors.first_name : null} />)}
 
                             {hideFields.includes('last_name') ? null : (<TextInput
                                 name='last_name'
                                 label={gettext('Last Name')}
                                 value={user.last_name}
-                                onChange={onChange}
+                                onChange={onChange_DEPRECATED}
                                 error={errors ? errors.last_name : null} />)}
 
                             {hideFields.includes('email') ? null : (<TextInput
                                 name='email'
                                 label={gettext('Email')}
                                 value={user.email}
-                                onChange={onChange}
+                                onChange={onChange_DEPRECATED}
                                 error={errors ? errors.email : null} />)}
 
                             {hideFields.includes('phone') ? null : (<TextInput
                                 name='phone'
                                 label={gettext('Phone')}
                                 value={user.phone}
-                                onChange={onChange}
+                                onChange={onChange_DEPRECATED}
                                 error={errors ? errors.phone : null} />)}
 
                             {hideFields.includes('mobile') ? null : (<TextInput
                                 name='mobile'
                                 label={gettext('Mobile')}
                                 value={user.mobile}
-                                onChange={onChange}
+                                onChange={onChange_DEPRECATED}
                                 error={errors ? errors.mobile : null} />)}
 
                             {hideFields.includes('role') ? null : (<TextInput
                                 name='role'
                                 label={gettext('Role')}
                                 value={user.role}
-                                onChange={onChange}
+                                onChange={onChange_DEPRECATED}
                                 error={errors ? errors.role : null} />)}
                             {hideFields.includes('user_type') ? null : (<SelectInput
                                 name='user_type'
@@ -215,14 +218,14 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                 options={userTypeReadOnly(user, currentUser) ? [] : getUserTypes(currentUser) }
                                 defaultOption={userTypeReadOnly(user, currentUser) ? getUserLabel(user.user_type) : undefined}
                                 readOnly={userTypeReadOnly(user, currentUser) || isUserCompanyAdmin(currentUser)}
-                                onChange={onChange}
+                                onChange={onChange_DEPRECATED}
                                 error={errors ? errors.user_type : null}/>)}
                             {hideFields.includes('company') ? (
                                 <TextInput
                                     name='company'
                                     label={gettext('Company')}
                                     value={company?.name}
-                                    onChange={onChange}
+                                    onChange={onChange_DEPRECATED}
                                     readOnly={isUserCompanyAdmin(currentUser)}
                                     error={errors ? errors.company : null}
                                 />
@@ -233,7 +236,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                     value={user.company}
                                     defaultOption={''}
                                     options={getCompanyOptions(companies)}
-                                    onChange={(e) => onChange({
+                                    onChange={(e) => onChange_DEPRECATED({
                                         ...e,
                                         changeType: 'company',
                                     })}
@@ -246,7 +249,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                     name={'locale'}
                                     label={gettext('Language')}
                                     value={user.locale}
-                                    onChange={onChange}
+                                    onChange={onChange_DEPRECATED}
                                     options={localeOptions}
                                     defaultOption={getDefaultLocale()}
                                     error={errors ? errors.locale : null}
@@ -266,7 +269,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                                 name={`sections.${section._id}`}
                                                 label={section.name}
                                                 value={get(user, `sections.${section._id}`) === true}
-                                                onChange={onChange}
+                                                onChange={onChange_DEPRECATED}
                                             />
                                         </div>
                                     </div>
@@ -280,7 +283,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                 testId="toggle--products"
                             >
                                 {isCompanyAdmin ? <div className="products-list__heading d-flex justify-content-between align-items-center">
-                                    <button type='button' name='selectAllBtn' className='nh-button nh-button--tertiary nh-button--small' onClick={onChange} >
+                                    <button type='button' name='selectAllBtn' className='nh-button nh-button--tertiary nh-button--small' onClick={onChange_DEPRECATED} >
                                         {gettext('Select All')}
                                     </button>
                                 </div> : null}
@@ -303,7 +306,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                                 section={section}
                                                 product={product}
                                                 seats={seats}
-                                                onChange={onChange}
+                                                onChange={onChange_DEPRECATED}
                                             />
                                         ))}
                                     </React.Fragment>
@@ -321,7 +324,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                         name='is_approved'
                                         label={gettext('Approved')}
                                         value={user.is_approved === true}
-                                        onChange={onChange} />
+                                        onChange={onChange_DEPRECATED} />
                                 </div>
                             </div>)}
 
@@ -331,7 +334,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                         name='is_enabled'
                                         label={gettext('Enabled')}
                                         value={user.is_enabled === true}
-                                        onChange={onChange} />
+                                        onChange={onChange_DEPRECATED} />
                                 </div>
                             </div>)}
 
@@ -341,7 +344,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                         name='expiry_alert'
                                         label={gettext('Company Expiry Alert')}
                                         value={user.expiry_alert === true}
-                                        onChange={onChange} />
+                                        onChange={onChange_DEPRECATED} />
                                 </div>
                             </div>)}
 
@@ -351,7 +354,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                         name='manage_company_topics'
                                         label={gettext('Manage Company Topics')}
                                         value={user.manage_company_topics === true}
-                                        onChange={onChange} />
+                                        onChange={onChange_DEPRECATED} />
                                 </div>
                             </div>)}
                         </FormToggle>

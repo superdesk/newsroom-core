@@ -12,7 +12,7 @@ import {
     resendUserInvite,
     newUser,
     cancelEdit,
-    editUser,
+    editUser_DEPRECATED,
     setError,
     fetchUsers,
     setSort,
@@ -55,7 +55,7 @@ interface IStateProps {
 interface IDispatchProps {
     setSection: (sectionId: string) => any;
     newUser: () => IUser;
-    editUser: (event: any) => any;
+    editUser_DEPRECATED: (event: any) => any;
     setError: (errors: any) => any;
     saveUser: () => any;
     closeUserEditor: () => any;
@@ -242,7 +242,7 @@ class CompanyAdminAppComponent extends React.Component<IProps, IState> {
                                     <EditUser
                                         original={userToEdit._id != null ? this.props.usersById[userToEdit._id] : {}}
                                         user={userToEdit}
-                                        onChange={this.props.editUser}
+                                        onChange_DEPRECATED={this.props.editUser_DEPRECATED}
                                         errors={this.props.errors}
                                         companies={this.props.companies}
                                         onSave={this.saveUser}
@@ -290,7 +290,7 @@ const mapStateToProps = (state: ICompanyAdminStore): IStateProps => ({
 const mapDispatchToProps = (dispatch: any): IDispatchProps => ({
     setSection: (sectionId: any) => dispatch(setSection(sectionId)),
     newUser: () => dispatch(newUser()),
-    editUser: (event: any) => dispatch(editUser(event)),
+    editUser_DEPRECATED: (event: any) => dispatch(editUser_DEPRECATED(event)),
     setError: (errors: any) => dispatch(setError(errors)),
     saveUser: () => dispatch(postUser()),
     closeUserEditor: () => dispatch(cancelEdit()),

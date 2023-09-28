@@ -4,7 +4,7 @@ import {
     GET_USER,
     REMOVE_USER,
     SELECT_USER,
-    EDIT_USER,
+    EDIT_USER__DEPRECATED,
     QUERY_USERS,
     CANCEL_EDIT,
     NEW_USER,
@@ -78,7 +78,7 @@ export default function userReducer(state: any = initialState, action: any) {
         };
     }
 
-    case EDIT_USER: {
+    case EDIT_USER__DEPRECATED: {
         const target = action.event.target;
         const field = target.name;
         const user: any = {...state.userToEdit};

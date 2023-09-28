@@ -7,7 +7,7 @@ import {gettext} from 'utils';
 import {
     deleteUser,
     resendUserInvite,
-    editUser,
+    editUser_DEPRECATED,
     newUser,
     postUser,
     resetPassword,
@@ -94,7 +94,7 @@ class Users extends React.Component<any, any> {
                         hideFields={[]}
                         original={this.props.usersById[this.props.userToEdit._id] || {}}
                         user={this.props.userToEdit}
-                        onChange={this.props.editUser}
+                        onChange_DEPRECATED={this.props.editUser_DEPRECATED}
                         errors={this.props.errors}
                         companies={this.props.companies}
                         onSave={this.save}
@@ -152,7 +152,7 @@ const mapStateToProps = (state: any) => ({
 
 const mapDispatchToProps = (dispatch: any) => ({
     selectUser: (_id: any) => dispatch(selectUser(_id)),
-    editUser: (event: any) => dispatch(editUser(event)),
+    editUser_DEPRECATED: (event: any) => dispatch(editUser_DEPRECATED(event)),
     saveUser: () => dispatch(postUser()),
     deleteUser: () => dispatch(deleteUser()),
     resendUserInvite: () => dispatch(resendUserInvite()),
