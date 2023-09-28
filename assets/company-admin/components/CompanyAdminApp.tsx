@@ -17,6 +17,7 @@ import {
     fetchUsers,
     setSort,
     toggleSortDirection,
+    editUser,
 } from 'users/actions';
 import {setSearchQuery} from 'search/actions';
 import {productListSelector, companyListSelector, currentUserSelector} from '../selectors';
@@ -55,6 +56,7 @@ interface IStateProps {
 interface IDispatchProps {
     setSection: (sectionId: string) => any;
     newUser: () => IUser;
+    editUser: (nextUser: IUser) => void;
     editUser_DEPRECATED: (event: any) => any;
     setError: (errors: any) => any;
     saveUser: () => any;
@@ -242,6 +244,7 @@ class CompanyAdminAppComponent extends React.Component<IProps, IState> {
                                     <EditUser
                                         original={userToEdit._id != null ? this.props.usersById[userToEdit._id] : {}}
                                         user={userToEdit}
+                                        onChange={this.props.editUser}
                                         onChange_DEPRECATED={this.props.editUser_DEPRECATED}
                                         errors={this.props.errors}
                                         companies={this.props.companies}
@@ -290,6 +293,7 @@ const mapStateToProps = (state: ICompanyAdminStore): IStateProps => ({
 const mapDispatchToProps = (dispatch: any): IDispatchProps => ({
     setSection: (sectionId: any) => dispatch(setSection(sectionId)),
     newUser: () => dispatch(newUser()),
+    editUser: (nextUser: IUser) => dispatch(editUser(nextUser)),
     editUser_DEPRECATED: (event: any) => dispatch(editUser_DEPRECATED(event)),
     setError: (errors: any) => dispatch(setError(errors)),
     saveUser: () => dispatch(postUser()),

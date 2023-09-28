@@ -29,6 +29,12 @@ export function editUser_DEPRECATED(event: any) {
     return {type: EDIT_USER__DEPRECATED, event};
 }
 
+export const EDIT_USER = 'EDIT_USER';
+
+export function editUser(nextUser: IUser) {
+    return {type: EDIT_USER, payload: nextUser};
+}
+
 export const NEW_USER = 'NEW_USER';
 export function newUser(data?: any) {
     return {type: NEW_USER, data};

@@ -3,7 +3,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
 
-import {ICompany, IProduct} from '../../interfaces';
+import {ICompany, IProduct, ISection} from '../../interfaces';
 
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
@@ -20,6 +20,8 @@ import {
     getLocaleInputOptions,
     getDefaultLocale,
     isUserCompanyAdmin,
+    hasSeatsAvailable,
+    seatOccupiedByUser,
 } from '../utils';
 import {FormToggle} from 'ui/components/FormToggle';
 
@@ -42,6 +44,8 @@ interface IProps extends IReduxStoreProps {
     original: IUser;
     user: IUser;
 
+    onChange(user: IUser): void;
+
     /** @deprecated because it doesn't send changes and relies on DOM manipulation */
     onChange_DEPRECATED: (event: any) => void;
 
@@ -56,35 +60,36 @@ interface IProps extends IReduxStoreProps {
     resendUserInvite: () => void;
     hideFields: Array<string>;
     toolbar?: any;
-
 }
 
-const EditUserComponent: React.ComponentType<IProps> = ({
-    original,
-    user,
-    onChange_DEPRECATED,
-    errors,
-    companies,
-    onSave,
-    onResetPassword,
-    onClose,
-    onDelete,
-    currentUser,
-    toolbar,
-    products,
-    hideFields,
-    allSections,
-    companySections,
-    seats,
-    resendUserInvite,
-}) => {
+const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
+    const {
+        original,
+        user,
+        onChange,
+        errors,
+        companies,
+        onSave,
+        onResetPassword,
+        onClose,
+        onDelete,
+        currentUser,
+        toolbar,
+        products,
+        hideFields,
+        allSections,
+        companySections,
+        seats,
+        resendUserInvite,
+    } = props;
+
     const companyId = user.company;
     const localeOptions = getLocaleInputOptions();
     const stateLabelDetails = getUserStateLabelDetails(user);
     const companyProductIds = companyId != null
         ? Object.keys(seats[companyId] || {})
         : products.map((product: any) => product._id);
-    const sections = companyId != null ? companySections[companyId] || [] : allSections;
+    const sections: Array<ISection> = companyId != null ? companySections[companyId] || [] : allSections;
     const companySectionIds = sections.map((section: any) => section._id);
     const currentUserIsAdmin = isUserAdmin(currentUser);
     const isCompanyAdmin = isUserCompanyAdmin(currentUser);
@@ -113,7 +118,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
             aria-label={gettext('Edit User')}
         >
             <div className='list-item__preview-header'>
-                <h3>{ gettext('Add/Edit User') }</h3>
+                <h3>{gettext('Add/Edit User')}</h3>
                 <button
                     id='hide-sidebar'
                     type='button'
@@ -174,58 +179,58 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                 name='first_name'
                                 label={gettext('First Name')}
                                 value={user.first_name}
-                                onChange={onChange_DEPRECATED}
+                                onChange={props.onChange_DEPRECATED}
                                 error={errors ? errors.first_name : null} />)}
 
                             {hideFields.includes('last_name') ? null : (<TextInput
                                 name='last_name'
                                 label={gettext('Last Name')}
                                 value={user.last_name}
-                                onChange={onChange_DEPRECATED}
+                                onChange={props.onChange_DEPRECATED}
                                 error={errors ? errors.last_name : null} />)}
 
                             {hideFields.includes('email') ? null : (<TextInput
                                 name='email'
                                 label={gettext('Email')}
                                 value={user.email}
-                                onChange={onChange_DEPRECATED}
+                                onChange={props.onChange_DEPRECATED}
                                 error={errors ? errors.email : null} />)}
 
                             {hideFields.includes('phone') ? null : (<TextInput
                                 name='phone'
                                 label={gettext('Phone')}
                                 value={user.phone}
-                                onChange={onChange_DEPRECATED}
+                                onChange={props.onChange_DEPRECATED}
                                 error={errors ? errors.phone : null} />)}
 
                             {hideFields.includes('mobile') ? null : (<TextInput
                                 name='mobile'
                                 label={gettext('Mobile')}
                                 value={user.mobile}
-                                onChange={onChange_DEPRECATED}
+                                onChange={props.onChange_DEPRECATED}
                                 error={errors ? errors.mobile : null} />)}
 
                             {hideFields.includes('role') ? null : (<TextInput
                                 name='role'
                                 label={gettext('Role')}
                                 value={user.role}
-                                onChange={onChange_DEPRECATED}
+                                onChange={props.onChange_DEPRECATED}
                                 error={errors ? errors.role : null} />)}
                             {hideFields.includes('user_type') ? null : (<SelectInput
                                 name='user_type'
                                 label={gettext('User Type')}
                                 value={user.user_type}
-                                options={userTypeReadOnly(user, currentUser) ? [] : getUserTypes(currentUser) }
+                                options={userTypeReadOnly(user, currentUser) ? [] : getUserTypes(currentUser)}
                                 defaultOption={userTypeReadOnly(user, currentUser) ? getUserLabel(user.user_type) : undefined}
                                 readOnly={userTypeReadOnly(user, currentUser) || isUserCompanyAdmin(currentUser)}
-                                onChange={onChange_DEPRECATED}
-                                error={errors ? errors.user_type : null}/>)}
+                                onChange={props.onChange_DEPRECATED}
+                                error={errors ? errors.user_type : null} />)}
                             {hideFields.includes('company') ? (
                                 <TextInput
                                     name='company'
                                     label={gettext('Company')}
                                     value={company?.name}
-                                    onChange={onChange_DEPRECATED}
+                                    onChange={props.onChange_DEPRECATED}
                                     readOnly={isUserCompanyAdmin(currentUser)}
                                     error={errors ? errors.company : null}
                                 />
@@ -236,7 +241,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                     value={user.company}
                                     defaultOption={''}
                                     options={getCompanyOptions(companies)}
-                                    onChange={(e) => onChange_DEPRECATED({
+                                    onChange={(e) => props.onChange_DEPRECATED({
                                         ...e,
                                         changeType: 'company',
                                     })}
@@ -249,7 +254,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                     name={'locale'}
                                     label={gettext('Language')}
                                     value={user.locale}
-                                    onChange={onChange_DEPRECATED}
+                                    onChange={props.onChange_DEPRECATED}
                                     options={localeOptions}
                                     defaultOption={getDefaultLocale()}
                                     error={errors ? errors.locale : null}
@@ -269,7 +274,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                                 name={`sections.${section._id}`}
                                                 label={section.name}
                                                 value={get(user, `sections.${section._id}`) === true}
-                                                onChange={onChange_DEPRECATED}
+                                                onChange={props.onChange_DEPRECATED}
                                             />
                                         </div>
                                     </div>
@@ -277,42 +282,88 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                             </FormToggle>
                         )}
 
-                        {(userIsAdmin || hideFields.includes('products')) ? null : (
-                            <FormToggle
-                                title={gettext('Products')}
-                                testId="toggle--products"
-                            >
-                                {isCompanyAdmin ? <div className="products-list__heading d-flex justify-content-between align-items-center">
-                                    <button type='button' name='selectAllBtn' className='nh-button nh-button--tertiary nh-button--small' onClick={onChange_DEPRECATED} >
-                                        {gettext('Select All')}
-                                    </button>
-                                </div> : null}
-                                {sections.filter((section: any) => (
-                                    companySectionIds.includes(section._id) &&
-                                    get(user, `sections.${section._id}`) === true
-                                )).map((section: any) => (
-                                    <React.Fragment key={section._id}>
-                                        <div className="list-item__preview-subheading">
-                                            {section.name}
-                                        </div>
-                                        {products.filter(
-                                            (product: any) => product.product_type === section._id &&
-                                                companyProductIds.includes(product._id)
-                                        ).map((product: any) => (
-                                            <EditUserProductPermission
-                                                key={product._id}
-                                                original={original}
-                                                user={user}
-                                                section={section}
-                                                product={product}
-                                                seats={seats}
-                                                onChange={onChange_DEPRECATED}
-                                            />
-                                        ))}
-                                    </React.Fragment>
-                                ))}
-                            </FormToggle>
-                        )}
+                        {(userIsAdmin || hideFields.includes('products')) ? null : (() => {
+                            const filteredSections = sections.filter((section: any) => (
+                                companySectionIds.includes(section._id) &&
+                                get(user, `sections.${section._id}`) === true
+                            ));
+
+                            const filterProductsForSection = (product: IProduct, section: ISection) =>
+                                product.product_type === section._id
+                                && companyProductIds.includes(product._id);
+
+                            const productsFromSections = filteredSections
+                                .flatMap(
+                                    (section) => products.filter((product) => filterProductsForSection(product, section)),
+                                );
+
+                            return (
+                                <FormToggle
+                                    title={gettext('Products')}
+                                    testId="toggle--products"
+                                >
+                                    {(() => {
+                                        if (productsFromSections.length < 1) {
+                                            return (
+                                                <div>{gettext('No products available')}</div>
+                                            );
+                                        } else {
+                                            return (
+                                                <>
+                                                    {isCompanyAdmin && (
+                                                        <div className="products-list__heading d-flex justify-content-between align-items-center">
+                                                            <button
+                                                                type='button'
+                                                                name='selectAllBtn'
+                                                                className='nh-button nh-button--tertiary nh-button--small'
+                                                                onClick={() => {
+                                                                    onChange({
+                                                                        ...user,
+                                                                        products: productsFromSections
+                                                                            .filter((product) =>
+                                                                                hasSeatsAvailable(user.company, seats, product)
+                                                                                || seatOccupiedByUser(user, product))
+                                                                            .map((product) => ({
+                                                                                _id: product._id,
+                                                                                section: product.product_type,
+                                                                            }))
+                                                                    });
+                                                                }}
+                                                            >
+                                                                {gettext('Select All')}
+                                                            </button>
+                                                        </div>
+                                                    )}
+
+                                                    {filteredSections.map((section: any) => (
+                                                        <React.Fragment key={section._id}>
+                                                            <div className="list-item__preview-subheading">
+                                                                {section.name}
+                                                            </div>
+                                                            {
+                                                                products
+                                                                    .filter((product) => filterProductsForSection(product, section))
+                                                                    .map((product) => (
+                                                                        <EditUserProductPermission
+                                                                            key={product._id}
+                                                                            original={original}
+                                                                            user={user}
+                                                                            section={section}
+                                                                            product={product}
+                                                                            seats={seats}
+                                                                            onChange={props.onChange_DEPRECATED}
+                                                                        />
+                                                                    ))
+                                                            }
+                                                        </React.Fragment>
+                                                    ))}
+                                                </>
+                                            );
+                                        }
+                                    })()}
+                                </FormToggle>
+                            );
+                        })()}
 
                         <FormToggle
                             title={gettext('User Settings')}
@@ -324,7 +375,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                         name='is_approved'
                                         label={gettext('Approved')}
                                         value={user.is_approved === true}
-                                        onChange={onChange_DEPRECATED} />
+                                        onChange={props.onChange_DEPRECATED} />
                                 </div>
                             </div>)}
 
@@ -334,7 +385,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                         name='is_enabled'
                                         label={gettext('Enabled')}
                                         value={user.is_enabled === true}
-                                        onChange={onChange_DEPRECATED} />
+                                        onChange={props.onChange_DEPRECATED} />
                                 </div>
                             </div>)}
 
@@ -344,7 +395,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                         name='expiry_alert'
                                         label={gettext('Company Expiry Alert')}
                                         value={user.expiry_alert === true}
-                                        onChange={onChange_DEPRECATED} />
+                                        onChange={props.onChange_DEPRECATED} />
                                 </div>
                             </div>)}
 
@@ -354,7 +405,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                         name='manage_company_topics'
                                         label={gettext('Manage Company Topics')}
                                         value={user.manage_company_topics === true}
-                                        onChange={onChange_DEPRECATED} />
+                                        onChange={props.onChange_DEPRECATED} />
                                 </div>
                             </div>)}
                         </FormToggle>
@@ -370,7 +421,7 @@ const EditUserComponent: React.ComponentType<IProps> = ({
                                 id='resetPassword'
                                 onClick={onResetPassword} />
                         )}
-                        {user._id && (currentUserIsAdmin||isCompanyAdmin) && user._id !== currentUser._id && <input
+                        {user._id && (currentUserIsAdmin || isCompanyAdmin) && user._id !== currentUser._id && <input
                             type='button'
                             className='nh-button nh-button--secondary'
                             value={gettext('Delete')}
