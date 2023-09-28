@@ -126,6 +126,42 @@ class AgendaListItem extends React.Component<any, any> {
         };
     }
 
+    modifyDescriptionArr(description: any) {
+        const dom = new DOMParser().parseFromString(description.replaceAll('\n', '<br />'), 'text/html');
+        const arrayOfParagraphs = dom.querySelectorAll('p');
+        const body = dom.querySelectorAll('body');
+
+        const getSegmentCount = (value: HTMLParagraphElement): number => {
+            const length = value.getElementsByTagName('br').length;
+            if (length > 2) {
+                return 2 + 1;
+            } else {
+                return length + 1;
+            }
+        };
+
+        const descriptionHTMLArr: HTMLParagraphElement[] = [];
+        let currentSegmentCount = 3;
+        let paragraphsInnerText = '';
+        
+        [...arrayOfParagraphs].forEach(paragraph => {
+            if (currentSegmentCount > 0) {
+                paragraphsInnerText += paragraph.innerText;
+                paragraph.innerHTML = paragraph.innerHTML.split('<br>').filter((p: string) => p !== '').slice(0, currentSegmentCount).join('<br>');
+                
+                const brakeTag = getSegmentCount(paragraph);
+                currentSegmentCount = currentSegmentCount - brakeTag;
+
+                descriptionHTMLArr.push(paragraph);
+            }
+        });
+
+        return {
+            firstThreeSegments: descriptionHTMLArr,
+            hasMoreContent: body[0].innerText > paragraphsInnerText,
+        };
+    }
+
     renderListItem(isMobile: any, children: any) {
         const {item, isExtended, group, planningId, listConfig} = this.props;
         const classes = this.getClassNames(isExtended);
@@ -136,14 +172,36 @@ class AgendaListItem extends React.Component<any, any> {
         // Show headline for adhoc planning items
         const showHeadline = !item.event && get(item, 'headline.length', 0) > 0;
 
-        const descriptionHTML = description.replace('\n', '<br/>').replace('<br/>', '</p>\n<p>');
+        const descriptionHTMLArr = this.modifyDescriptionArr(description).firstThreeSegments;
 
-        function isHTML(value: string) {
-            const doc = new DOMParser().parseFromString(value, 'text/html');
-            return Array.from(doc.body.childNodes).some(node => node.nodeType === 1);
-        }
+        const renderDescription = (() => {
+            const isHTML = (value: string) => {
+                const doc = new DOMParser().parseFromString(value, 'text/html');
+                return Array.from(doc.body.childNodes).some(node => node.nodeType === 1);
+            };
 
-        const descriptionArray = isHTML(description) ? descriptionHTML : description;    
+            if (item.es_highlight && item.es_highlight.definition_short) {
+                return <div style={{whiteSpace: 'pre-line'}} dangerouslySetInnerHTML={{__html: description}} />;
+            } else {
+                if (isHTML(description)) {
+                    return (
+                        descriptionHTMLArr.slice(0, 3).map((plainOfHTML, i: number, array: any) => {
+                            const lastChild: boolean = array.length -1 === i && this.modifyDescriptionArr(description).hasMoreContent;
+
+                            return <div className={lastChild ? 'wire-articles__item__text--last-child' : ''} dangerouslySetInnerHTML={{__html: plainOfHTML.outerHTML}} key={i} />;
+                        })
+                    );
+                } else {
+                    return (
+                        description.split('\n').slice(0, 3).map((plainOfHTML: string, i: number, array: any) => {
+                            const lastChild: boolean = array.length -1 === i && description.length > description.split('\n').slice(0, 3).join('\n').length;
+
+                            return <p className={lastChild ? 'wire-articles__item__text--last-child' : ''} key={i}>{plainOfHTML}</p>;
+                        })
+                    );
+                }
+            }
+        })();
 
         return (
             <article key={item._id}
@@ -194,28 +252,7 @@ class AgendaListItem extends React.Component<any, any> {
 
                         {(isMobile || isExtended) && description && (
                             <div className="wire-articles__item__text">
-                                {item.es_highlight && item.es_highlight.definition_short
-                                    ? (
-                                        descriptionArray.split('\n').map((lineOfHTML: string, index: number) => (
-                                            <p key={index}>
-                                                <span dangerouslySetInnerHTML={{__html: lineOfHTML}} />
-                                            </p>
-                                        ))
-                                    )
-                                    : (
-                                        descriptionArray.split('\n').slice(0, 3).map((plainOfHTML: string, i: number, array: any) => {
-                                            const lastChild: boolean = array.length -1 === i && descriptionArray.length > 3;
-
-                                            return isHTML(description)
-                                                ? (
-                                                    <div className={lastChild ? 'wire-articles__item__text--last-child' : ''} dangerouslySetInnerHTML={{__html: plainOfHTML}} />
-                                                )
-                                                : (
-                                                    <p className={lastChild ? 'wire-articles__item__text--last-child' : ''}>{plainOfHTML}</p>
-                                                );
-                                        })
-                                    )
-                                }
+                                {renderDescription}  
                             </div>
                         )}
                     </div>
