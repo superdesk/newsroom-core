@@ -26,7 +26,7 @@ interface IState {
 }
 
 const minutes = Array.from(Array(60).keys());
-const changedMinutes: Array<number> = minutes.filter((num) => num % 15 !== 0);
+const disabledMinutes: Array<number> = minutes.filter((num) => num % 15 !== 0);
 
 class EditNotificationScheduleModalComponent extends React.Component<IProps, IState> {
     formRef: React.RefObject<HTMLFormElement>;
@@ -107,7 +107,7 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                             <TimePicker
                                 value={this.state.times[0]}
                                 disabledOptions={{
-                                    minutes: changedMinutes,
+                                    minutes: disabledMinutes,
                                 }}
                                 onChange={(value) => {
                                     this.updateTime(value, 0);
@@ -116,7 +116,7 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                             <TimePicker
                                 value={this.state.times[1]}
                                 disabledOptions={{
-                                    minutes: changedMinutes,
+                                    minutes: disabledMinutes,
                                 }}
                                 onChange={(value) => {
                                     this.updateTime(value, 1);
@@ -125,7 +125,7 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                             <TimePicker
                                 value={this.state.times[2]}
                                 disabledOptions={{
-                                    minutes: changedMinutes,
+                                    minutes: disabledMinutes,
                                 }}
                                 onChange={(value) => {
                                     this.updateTime(value, 2);
