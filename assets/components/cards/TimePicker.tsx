@@ -27,7 +27,7 @@ export class TimePicker extends React.PureComponent<IProps> {
         this.padValue = this.padValue.bind(this);
 
         const hour = new Date().toLocaleTimeString([], {hour: 'numeric'});
-        this.is12HourFormat = !hour.includes('AM') || !hour.includes('PM');
+        this.is12HourFormat = hour.includes('AM') || hour.includes('PM');
     }
 
     /**
@@ -77,18 +77,22 @@ export class TimePicker extends React.PureComponent<IProps> {
         const current = this.props.value.split(':');
 
         const updated12HourValue = (() => {
-            if (parseInt(current[0], 10) >= 12) {
-                if (newValue === '12') {
-                    return newValue;
+            if (index === 0) {
+                if (parseInt(this.props.value.split(':')[0], 10) >= 12) {
+                    if (newValue === '12') {
+                        return newValue;
+                    } else {
+                        return (parseInt(newValue, 10) + 12).toString();
+                    }
                 } else {
-                    return (parseInt(newValue, 10) + 12).toString();
+                    if (newValue === '12') {
+                        return '00';
+                    } else {
+                        return newValue;
+                    }
                 }
             } else {
-                if (newValue === '12') {
-                    return '00';
-                } else {
-                    return newValue;
-                }
+                return newValue;
             }
         })();
 
