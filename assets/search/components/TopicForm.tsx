@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import classNames from 'classnames';
 
 import {IUser, ITopic, ITopicFolder, INavigation, IFilterGroup, ITopicNotificationScheduleType} from 'interfaces';
@@ -11,6 +11,7 @@ import {Dropdown} from 'components/Dropdown';
 import {FormSection} from 'components/FormSection';
 
 import {SearchResultTagsList} from './SearchResultsBar/SearchResultTagsList';
+import {TopicFolderEditor} from './TopicFolderEditor';
 
 const TOPIC_NAME_MAXLENGTH = 30;
 
@@ -56,6 +57,7 @@ interface IProps {
 
     changeNotificationType(notificationType: ITopicNotificationScheduleType): void;
     openEditTopicNotificationsModal(): void;
+    saveFolder: (folder: any, data: any, global?: boolean) => void;
 }
 
 const TopicForm: React.FC<IProps> = ({
@@ -81,8 +83,10 @@ const TopicForm: React.FC<IProps> = ({
     availableFields,
     changeNotificationType,
     openEditTopicNotificationsModal,
+    saveFolder,
 }): React.ReactElement => {
     const topicSubscriptionType = getSubscriptionNotificationType(topic, user._id);
+    const [newFolder, setNewFolder] = useState<any>();
 
     return (
         <form onSubmit={save}>
@@ -115,13 +119,13 @@ const TopicForm: React.FC<IProps> = ({
                 </div>
                 <div className="nh-flex__row">
                     <FormSection initiallyOpen={true} name={gettext('Organize your Topic')} dataTestId="topic-form-group--folder">
-                        <div
-                            className={
-                                'nh-container nh-container--direction-row mb-3 pt-2 pb-3'
-                                + (folders.length > 0 ? '' : ' nh-container--highlight text-start')
-                            }
-                        >
-                            {folders.length > 0 ? (
+                        <>
+                            <div
+                                className={
+                                    'nh-container nh-container--direction-row mb-3 pt-2 pb-3'
+                                    + (folders.length > 0 ? '' : ' nh-container--highlight text-start')
+                                }
+                            >
                                 <Dropdown
                                     small={true}
                                     stretch={true}
@@ -151,13 +155,30 @@ const TopicForm: React.FC<IProps> = ({
                                             {folder.name}
                                         </button>
                                     ))}
+                                    <button
+                                        type='button'
+                                        className="dropdown-item"
+                                        onClick={() => {
+                                            setNewFolder({newFolder: {}, folderPopover: null});
+                                        }}
+                                    >
+                                        {gettext('Create new folder')}
+                                    </button>
                                 </Dropdown>
-                            ) : (
-                                <p className='nh-container__text--small'>
-                                    {gettext('To organize your topics, please create a folder in the “My Wire Topics” section.')}
-                                </p>
+                            </div>
+                            {newFolder != null && (
+                                <div className="simple-card__group">
+                                    <TopicFolderEditor
+                                        onSave={((name) => {
+                                            saveFolder(newFolder, {name}, topic.is_global);
+                                            setNewFolder(null);
+                                        })}
+                                        folder={newFolder.newFolder}
+                                        onCancel={() => setNewFolder({newFolder: null})}
+                                    />
+                                </div>
                             )}
-                        </div>
+                        </>
                     </FormSection>
                     <FormSection initiallyOpen={true} name={gettext('Email Notifications:')} dataTestId="topic-form-group--notifications">
                         <div>
