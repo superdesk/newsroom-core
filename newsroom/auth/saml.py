@@ -26,7 +26,7 @@ from flask import (
     abort,
 )
 from flask_babel import _
-from newsroom.types import UserData
+from newsroom.types import AuthProviderType, UserData
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from newsroom.auth.utils import sign_user_by_email
 
@@ -147,6 +147,7 @@ def saml():
     if session.get(SESSION_NAME_ID):
         return sign_user_by_email(
             session[SESSION_NAME_ID],
+            auth_type=AuthProviderType.SAML,
             create_missing=True,
             userdata=get_userdata(session[SESSION_NAME_ID], session[SESSION_USERDATA_KEY]),
             validate_login_attempt=True,
