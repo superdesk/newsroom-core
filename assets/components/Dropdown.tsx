@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {Dropdown as BootstrapDropdown} from 'bootstrap';
 
-export function Dropdown({children, isActive, icon, optionLabel, label, value, className, buttonProps, small, stretch}: any) {
+export function Dropdown({fullWidth, children, isActive, icon, optionLabel, label, value, className, buttonProps, small, stretch}: any) {
     const dropdown: any = React.useRef();
     let dropdownInstance: any = null;
 
@@ -22,6 +22,7 @@ export function Dropdown({children, isActive, icon, optionLabel, label, value, c
     });
 
     const textOnly = (buttonProps || {}).textOnly;
+    const styleComputed = fullWidth ? {width: '100%'} : {};
 
     return (
         <div
@@ -67,7 +68,7 @@ export function Dropdown({children, isActive, icon, optionLabel, label, value, c
                 )}
                 <i className='nh-dropdown-button__caret icon-small--arrow-down' />
             </button>
-            <div className='dropdown-menu'>
+            <div className='dropdown-menu' style={styleComputed}>
                 {children}
             </div>
         </div>
@@ -89,4 +90,5 @@ Dropdown.propTypes = {
         textOnly: PropTypes.bool,
     }),
     optionLabel: PropTypes.string,
+    fullWidth: PropTypes.bool,
 };
