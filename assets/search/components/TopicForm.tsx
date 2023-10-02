@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import classNames from 'classnames';
 
-import {IUser, ITopic, ITopicFolder, INavigation, IFilterGroup, ITopicNotificationScheduleType} from 'interfaces';
+import {IUser, ITopic, ITopicFolder, INavigation, IFilterGroup, ITopicNotificationScheduleType, ITopicFolder} from 'interfaces';
 import {gettext, getSubscriptionTimesString} from 'utils';
 
 import TextInput from 'components/TextInput';
@@ -88,6 +88,13 @@ const TopicForm: React.FC<IProps> = ({
     const topicSubscriptionType = getSubscriptionNotificationType(topic, user._id);
     const [newFolder, setNewFolder] = useState<Partial<ITopicFolder> | null>();
 
+    useEffect(() => {
+        const newlyCreatedFolder = folders.find((x) => x.name === newFolder?.name) as ITopicFolder;
+
+        setNewFolder(null);
+        onFolderChange(newlyCreatedFolder);
+    }, [folders]);
+
     return (
         <form onSubmit={save}>
             <div className="nh-flex-container list-item__preview-form pt-0">
@@ -171,7 +178,7 @@ const TopicForm: React.FC<IProps> = ({
                                     <TopicFolderEditor
                                         onSave={((name) => {
                                             saveFolder(newFolder, {name}, topic.is_global);
-                                            setNewFolder(null);
+                                            setNewFolder({name});
                                         })}
                                         folder={newFolder}
                                         onCancel={() => setNewFolder(null)}
