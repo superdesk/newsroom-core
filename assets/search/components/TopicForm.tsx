@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import classNames from 'classnames';
 
-import {IUser, ITopic, ITopicFolder, INavigation, IFilterGroup, ITopicNotificationScheduleType, ITopicFolder} from 'interfaces';
+import {IUser, ITopic, INavigation, IFilterGroup, ITopicNotificationScheduleType, ITopicFolder} from 'interfaces';
 import {gettext, getSubscriptionTimesString} from 'utils';
 
 import TextInput from 'components/TextInput';
