@@ -8,7 +8,13 @@ export function TopicFolderEditor ({folder, onSave, onCancel, error}) {
     const [name, setName] = useState(folder.name || '');
 
     return (
-        <div>
+        <div
+            onKeyUpCapture={(e) => {
+                if (e.key === 'Enter' && name != null) {
+                    onSave(name);
+                }
+            }}
+        >
             <div className={classNames('simple-card__group-header', {'simple-card__group-header--selected': error})}>
                 <div className="d-flex flex-row flex-grow-1 align-items-center gap-2 ps-1">
                     <i className="icon--folder icon--small" />
