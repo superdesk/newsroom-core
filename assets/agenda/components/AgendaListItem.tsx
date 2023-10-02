@@ -126,39 +126,37 @@ class AgendaListItem extends React.Component<any, any> {
         };
     }
 
-    modifyDescriptionArr(description: any) {
-        const dom = new DOMParser().parseFromString(description.replaceAll('\n', '<br />'), 'text/html');
-        const arrayOfParagraphs = dom.querySelectorAll('p');
-        const body = dom.querySelectorAll('body');
+    getSegments(description: string) {
+        const dom = new DOMParser().parseFromString(description.replace(/\n/g, '<br />'), 'text/html');
+        const arrayOfParagraphs = dom.body.querySelectorAll('p');
+        const body = dom.body;
 
-        const getSegmentCount = (value: HTMLParagraphElement): number => {
-            const length = value.getElementsByTagName('br').length;
-            if (length > 2) {
-                return 2 + 1;
-            } else {
-                return length + 1;
-            }
+        const getSegmentCount = (p: HTMLParagraphElement): number => {
+            // adding one because if there are 2 <br> tags it means there are 3 segments
+            return p.getElementsByTagName('br').length + 1;
         };
 
         const descriptionHTMLArr: HTMLParagraphElement[] = [];
-        let currentSegmentCount = 3;
+        let segmentsRemainingToBeAdded = 3;
         let paragraphsInnerText = '';
-        
+
         [...arrayOfParagraphs].forEach(paragraph => {
-            if (currentSegmentCount > 0) {
+            if (segmentsRemainingToBeAdded > 0) {
                 paragraphsInnerText += paragraph.innerText;
-                paragraph.innerHTML = paragraph.innerHTML.split('<br>').filter((p: string) => p !== '').slice(0, currentSegmentCount).join('<br>');
-                
-                const brakeTag = getSegmentCount(paragraph);
-                currentSegmentCount = currentSegmentCount - brakeTag;
+                paragraph.innerHTML = paragraph.innerHTML.split('<br>').filter((p: string) => p.trim() !== '').slice(0, segmentsRemainingToBeAdded).join('<br>');
+
+                segmentsRemainingToBeAdded = segmentsRemainingToBeAdded - getSegmentCount(paragraph);
 
                 descriptionHTMLArr.push(paragraph);
             }
         });
 
         return {
+            /**
+             * keep in mind that first 3 segments might be 1-3 paragraphs
+             */
             firstThreeSegments: descriptionHTMLArr,
-            hasMoreContent: body[0].innerText > paragraphsInnerText,
+            hasMoreContent: body.innerText.length > paragraphsInnerText.length,
         };
     }
 
@@ -166,13 +164,13 @@ class AgendaListItem extends React.Component<any, any> {
         const {item, isExtended, group, planningId, listConfig} = this.props;
         const classes = this.getClassNames(isExtended);
         const planningItem = (get(item, 'planning_items') || []).find((p: any) => p.guid === planningId) || null;
-        const description = item.es_highlight
+        const description: string = item.es_highlight
             ? getHighlightedDescription(item, planningItem)
             : getDescription(item,planningItem);
         // Show headline for adhoc planning items
         const showHeadline = !item.event && get(item, 'headline.length', 0) > 0;
 
-        const descriptionHTMLArr = this.modifyDescriptionArr(description).firstThreeSegments;
+        const {firstThreeSegments, hasMoreContent} =  this.getSegments(description);
 
         const renderDescription = (() => {
             const isHTML = (value: string) => {
@@ -180,23 +178,25 @@ class AgendaListItem extends React.Component<any, any> {
                 return Array.from(doc.body.childNodes).some(node => node.nodeType === 1);
             };
 
-            if (item.es_highlight && item.es_highlight.definition_short) {
+            if (item.es_highlight != null && (item.es_highlight.definition_short ?? '').length > 0) {
                 return <div style={{whiteSpace: 'pre-line'}} dangerouslySetInnerHTML={{__html: description}} />;
             } else {
                 if (isHTML(description)) {
                     return (
-                        descriptionHTMLArr.slice(0, 3).map((plainOfHTML, i: number, array: any) => {
-                            const lastChild: boolean = array.length -1 === i && this.modifyDescriptionArr(description).hasMoreContent;
+                        firstThreeSegments.map((paragraph, i: number) => {
+                            const lastChild: boolean = firstThreeSegments.length - 1 === i;
+                            const showThreeDots = lastChild && hasMoreContent;
 
-                            return <div className={lastChild ? 'wire-articles__item__text--last-child' : ''} dangerouslySetInnerHTML={{__html: plainOfHTML.outerHTML}} key={i} />;
+                            return <div className={showThreeDots ? 'wire-articles__item__text--last-child' : ''} dangerouslySetInnerHTML={{__html: paragraph.outerHTML}} key={i} />;
                         })
                     );
                 } else {
                     return (
-                        description.split('\n').slice(0, 3).map((plainOfHTML: string, i: number, array: any) => {
-                            const lastChild: boolean = array.length -1 === i && description.length > description.split('\n').slice(0, 3).join('\n').length;
+                        description.split('\n').slice(0, 3).map((plainText: string, i: number, array: Array<string>) => {
+                            const lastChild = array.length -1 === i;
+                            const showThreeDots: boolean = lastChild && description.length > description.split('\n').slice(0, 3).join('\n').length;
 
-                            return <p className={lastChild ? 'wire-articles__item__text--last-child' : ''} key={i}>{plainOfHTML}</p>;
+                            return <p className={showThreeDots ? 'wire-articles__item__text--last-child' : ''} key={i}>{plainText}</p>;
                         })
                     );
                 }
@@ -252,7 +252,7 @@ class AgendaListItem extends React.Component<any, any> {
 
                         {(isMobile || isExtended) && description && (
                             <div className="wire-articles__item__text">
-                                {renderDescription}  
+                                {renderDescription}
                             </div>
                         )}
                     </div>
