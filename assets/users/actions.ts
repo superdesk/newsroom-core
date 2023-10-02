@@ -21,9 +21,18 @@ export function getUser(user: any) {
     return {type: GET_USER, user};
 }
 
+/**@deprecated because it uses DOM elements inside reducer */
+export const EDIT_USER__DEPRECATED = 'EDIT_USER__DEPRECATED';
+
+/**@deprecated because it uses DOM elements inside reducer */
+export function editUser_DEPRECATED(event: any) {
+    return {type: EDIT_USER__DEPRECATED, event};
+}
+
 export const EDIT_USER = 'EDIT_USER';
-export function editUser(event: any) {
-    return {type: EDIT_USER, event};
+
+export function editUser(nextUser: IUser) {
+    return {type: EDIT_USER, payload: nextUser};
 }
 
 export const NEW_USER = 'NEW_USER';

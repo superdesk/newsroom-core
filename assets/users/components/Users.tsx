@@ -7,13 +7,14 @@ import {gettext} from 'utils';
 import {
     deleteUser,
     resendUserInvite,
-    editUser,
+    editUser_DEPRECATED,
     newUser,
     postUser,
     resetPassword,
     selectUser,
     setError,
-    cancelEdit
+    cancelEdit,
+    editUser
 } from '../actions';
 import {searchQuerySelector} from 'search/selectors';
 import {userSelector} from '../selectors';
@@ -21,6 +22,7 @@ import {userSelector} from '../selectors';
 import EditUser from './EditUser';
 import UsersList from './UsersList';
 import SearchResults from 'search/components/SearchResults';
+import {IUser} from 'interfaces';
 
 
 class Users extends React.Component<any, any> {
@@ -94,6 +96,7 @@ class Users extends React.Component<any, any> {
                         hideFields={[]}
                         original={this.props.usersById[this.props.userToEdit._id] || {}}
                         user={this.props.userToEdit}
+                        onChange_DEPRECATED={this.props.editUser_DEPRECATED}
                         onChange={this.props.editUser}
                         errors={this.props.errors}
                         companies={this.props.companies}
@@ -152,7 +155,8 @@ const mapStateToProps = (state: any) => ({
 
 const mapDispatchToProps = (dispatch: any) => ({
     selectUser: (_id: any) => dispatch(selectUser(_id)),
-    editUser: (event: any) => dispatch(editUser(event)),
+    editUser_DEPRECATED: (event: any) => dispatch(editUser_DEPRECATED(event)),
+    editUser: (nextUser: IUser) => dispatch(editUser(nextUser)),
     saveUser: () => dispatch(postUser()),
     deleteUser: () => dispatch(deleteUser()),
     resendUserInvite: () => dispatch(resendUserInvite()),

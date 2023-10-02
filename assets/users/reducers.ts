@@ -4,7 +4,7 @@ import {
     GET_USER,
     REMOVE_USER,
     SELECT_USER,
-    EDIT_USER,
+    EDIT_USER__DEPRECATED,
     QUERY_USERS,
     CANCEL_EDIT,
     NEW_USER,
@@ -13,6 +13,7 @@ import {
     SET_COMPANY,
     SET_SORT,
     TOGGLE_SORT_DIRECTION,
+    EDIT_USER,
 } from './actions';
 
 import {ADD_EDIT_USERS} from 'actions';
@@ -78,7 +79,7 @@ export default function userReducer(state: any = initialState, action: any) {
         };
     }
 
-    case EDIT_USER: {
+    case EDIT_USER__DEPRECATED: {
         const target = action.event.target;
         const field = target.name;
         const user: any = {...state.userToEdit};
@@ -109,17 +110,6 @@ export default function userReducer(state: any = initialState, action: any) {
             } else {
                 user.products = (user.products || []).filter((product: any) => product._id !== productId);
             }
-        } else if (field.includes('selectAllBtn')) {
-            const seats = companyProductSeatsSelector(state);
-
-            user.products = (state.products as Array<IProduct>)
-                .filter((product: IProduct) =>
-                    user.sections[product.product_type]
-                    && (
-                        hasSeatsAvailable(user.company, seats, product) || seatOccupiedByUser(user, product)
-                    )
-                )
-                .map((product) => ({_id : product._id , section: product.product_type}));
         }
         else {
             user[field] = value;
@@ -127,6 +117,13 @@ export default function userReducer(state: any = initialState, action: any) {
 
         return {...state, userToEdit: user, errors: null};
     }
+
+    case EDIT_USER:
+        return {
+            ...state,
+            userToEdit: action.payload,
+            errors: null,
+        };
 
     case NEW_USER: {
         const newUser =  {
