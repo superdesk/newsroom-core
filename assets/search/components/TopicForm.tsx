@@ -86,7 +86,7 @@ const TopicForm: React.FC<IProps> = ({
     saveFolder,
 }): React.ReactElement => {
     const topicSubscriptionType = getSubscriptionNotificationType(topic, user._id);
-    const [newFolder, setNewFolder] = useState<any>();
+    const [newFolder, setNewFolder] = useState<Partial<ITopicFolder> | null>();
 
     return (
         <form onSubmit={save}>
@@ -159,7 +159,7 @@ const TopicForm: React.FC<IProps> = ({
                                         type='button'
                                         className="dropdown-item"
                                         onClick={() => {
-                                            setNewFolder({newFolder: {}, folderPopover: null});
+                                            setNewFolder({});
                                         }}
                                     >
                                         {gettext('Create new folder')}
@@ -173,8 +173,8 @@ const TopicForm: React.FC<IProps> = ({
                                             saveFolder(newFolder, {name}, topic.is_global);
                                             setNewFolder(null);
                                         })}
-                                        folder={newFolder.newFolder}
-                                        onCancel={() => setNewFolder({newFolder: null})}
+                                        folder={newFolder}
+                                        onCancel={() => setNewFolder(null)}
                                     />
                                 </div>
                             )}

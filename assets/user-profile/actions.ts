@@ -1,4 +1,4 @@
-import {ITopic, IUser} from 'interfaces';
+import {ITopic, ITopicFolder, IUser} from 'interfaces';
 
 import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
@@ -247,7 +247,7 @@ function mergeUpdates(updates: any, response: any) {
 }
 
 export const FOLDER_UPDATED = 'FOLDER_UPDATED';
-export function saveFolder(folder: any, data: any, global?: boolean) {
+export function saveFolder(folder: ITopicFolder, data: {name: string}, global?: boolean) {
     return (dispatch: any, getState: any) => {
         const state = getState();
         const url = getFoldersUrl(state, global, folder._id);
