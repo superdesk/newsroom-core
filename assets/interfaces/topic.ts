@@ -8,6 +8,9 @@ export interface ITopicFolder {
     name: string;
     parent?: ITopicFolder['_id'];
     section: 'wire' | 'agenda' | 'monitoring';
+    _etag?: string;
+    _created?: string;
+    _updated?: string;
 }
 
 export type ISearchFields = Array<string>;
