@@ -284,8 +284,9 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
 
                         {(userIsAdmin || hideFields.includes('products')) ? null : (() => {
                             const filteredSections = sections.filter((section: any) => (
-                                companySectionIds.includes(section._id) &&
-                                get(user, `sections.${section._id}`) === true
+                                companySectionIds.includes(section._id) && user.sections ?
+                                    get(user, `sections.${section._id}`
+                                    ) === true : user.company ? user.sections = company?.sections||{} : {}
                             ));
 
                             const filterProductsForSection = (product: IProduct, section: ISection) =>
