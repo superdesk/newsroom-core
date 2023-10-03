@@ -134,7 +134,7 @@ const TopicForm: React.FC<IProps> = ({
                                 }
                             >
                                 <Dropdown
-                                    fullWidth={true}
+                                    stretchPopover={true}
                                     small={true}
                                     stretch={true}
                                     icon={'icon--folder'}
