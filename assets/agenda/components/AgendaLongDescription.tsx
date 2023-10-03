@@ -13,24 +13,22 @@ export default function AgendaLongDescription({item, plan}: {item: any, plan: an
         return null;
     }
 
+    function isHTML(value: string) {
+        const doc = new DOMParser().parseFromString(value, 'text/html');
+
+        return Array.from(doc.body.childNodes).some(node => node.nodeType === Node.ELEMENT_NODE);
+    }
+
     return (
         <div className="wire-column__preview__text wire-column__preview__text--pre">
-            {description.split('\n').map((lineOfHTML: string, index: number) => {
-                return lineOfHTML[0] !== '<'
-                    ? (
-                        <div>
-                            {item.es_highlight
-                                ? (
-                                    <span dangerouslySetInnerHTML={{__html: lineOfHTML}} />
-                                )
-                                : lineOfHTML
-                            }
-                        </div>
-                    )
-                    : (
-                        <div  dangerouslySetInnerHTML={{__html: lineOfHTML}} key={index} />
+            {isHTML(description)
+                ? <div style={{whiteSpace: 'pre-line'}} dangerouslySetInnerHTML={{__html: description}} />
+                : description.split('\n').map((plainText: string, index: number) => {
+                    return (
+                        <p key={index}>{plainText}</p>
                     );
-            })}
+                })
+            }
         </div>
     );
 }

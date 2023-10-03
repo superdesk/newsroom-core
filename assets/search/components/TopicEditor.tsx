@@ -19,6 +19,7 @@ import {
     setTopicEditorFullscreen,
     openEditTopicNotificationsModal,
     setTopicSubscribers,
+    saveFolder,
 } from 'user-profile/actions';
 import {loadMyWireTopic} from 'wire/actions';
 import {loadMyAgendaTopic} from 'agenda/actions';
@@ -43,6 +44,7 @@ interface IProps {
     filterGroups: {[key: string]: IFilterGroup};
     availableFields: Array<string>;
 
+    saveFolder: (folder: any, data: any, global?: boolean) => void;
     fetchNavigations(): Promise<void>;
     closeEditor(): void;
     saveTopic(isExisting: boolean, topic: ITopic): Promise<ITopic>;
@@ -490,6 +492,7 @@ class TopicEditor extends React.Component<IProps, IState> {
                     {this.state.activeTab === 'topic' && updatedTopic && (
                         <React.Fragment>
                             <TopicForm
+                                saveFolder={this.props.saveFolder}
                                 original={originalTopic}
                                 globalTopicsEnabled={this.props.globalTopicsEnabled}
                                 topic={updatedTopic}
@@ -582,6 +585,7 @@ const mapStateToProps = (state: any) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
+    saveFolder: (folder: any, data: any, global?: boolean) => dispatch(saveFolder(folder, data, global)),
     fetchNavigations: () => dispatch(fetchNavigations()),
     hideModal: () => dispatch(hideModal()),
     saveTopic: (isExisting: any, topic: any) => isExisting ?

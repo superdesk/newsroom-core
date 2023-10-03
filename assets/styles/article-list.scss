@@ -629,6 +629,18 @@
         margin: 0px;
         max-width: 160ch;
     }
+    div + div {
+        p {
+            margin-top: var(--space--1-5);
+        }
+    }
+    p + p {
+        margin-top: var(--space--1-5);
+    }
+    .wire-articles__item__text--last-child p::after,
+    p.wire-articles__item__text--last-child::after {
+        content: '…'
+    }
     &--large {
         font-size: 1rem !important;
     }

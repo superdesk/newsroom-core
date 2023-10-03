@@ -1,4 +1,4 @@
-import {ITopic, IUser} from 'interfaces';
+import {ITopic, ITopicFolder, IUser} from 'interfaces';
 
 import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
@@ -231,7 +231,7 @@ export function pushNotification(push: any): any {
     };
 }
 
-function getFoldersUrl(state: any, global: any, id?: any) {
+function getFoldersUrl(state: any, global: boolean | undefined, id?: any) {
     const baseUrl = global ?
         `/api/companies/${state.company}/topic_folders` :
         `/api/users/${state.user._id}/topic_folders`;
@@ -247,7 +247,7 @@ function mergeUpdates(updates: any, response: any) {
 }
 
 export const FOLDER_UPDATED = 'FOLDER_UPDATED';
-export function saveFolder(folder: any, data: any, global: boolean) {
+export function saveFolder(folder: ITopicFolder, data: {name: string}, global?: boolean) {
     return (dispatch: any, getState: any) => {
         const state = getState();
         const url = getFoldersUrl(state, global, folder._id);
@@ -299,14 +299,14 @@ export function fetchFolders() {
         const userTopicsUrl = getFoldersUrl(state, false);
 
         return Promise.all([
-            server.get(companyTopicsUrl),
-            server.get(userTopicsUrl),
+            state.company !== 'None' ? server.get(companyTopicsUrl).then(({_items}: {_items: Array<any>}) => _items) : Promise.resolve([]),
+            server.get(userTopicsUrl).then(({_items}: {_items: Array<any>}) => _items),
         ]).then(([companyFolders, userFolders]) => {
             dispatch({
                 type: RECIEVE_FOLDERS,
                 payload: {
-                    companyFolders: companyFolders._items,
-                    userFolders: userFolders._items,
+                    companyFolders: companyFolders,
+                    userFolders: userFolders,
                 },
             });
         }).catch((error) => {

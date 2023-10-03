@@ -1,10 +1,12 @@
-from typing import Any, Dict, List, Optional
+from typing import List, Optional, Union
 from bson import ObjectId
 
 import newsroom
 import superdesk
+from superdesk.services import CacheableService
 
-from newsroom.types import Company, Product
+from newsroom.types import Company, Product, User
+from newsroom.utils import any_objectid_in_list
 
 
 class ProductsResource(newsroom.Resource):
@@ -39,7 +41,9 @@ class ProductsResource(newsroom.Resource):
     internal_resource = True
 
 
-class ProductsService(newsroom.Service):
+class ProductsService(CacheableService):
+    cache_lookup = {"is_enabled": True}
+
     def on_deleted(self, doc):
         lookup = {"products._id": doc["_id"]}
         for resource in ("users", "companies"):
@@ -49,76 +53,82 @@ class ProductsService(newsroom.Service):
                 superdesk.get_resource_service(resource).system_update(item["_id"], updates, item)
 
 
-def _get_navigation_query(ids):
-    return {"$in": [ObjectId(oid) for oid in ids]} if type(ids) is list else ObjectId(ids)
+products_service = ProductsService()
 
 
-def get_products_by_navigation(navigation_id, product_type=None):
-    lookup = {"is_enabled": True, "navigations": _get_navigation_query(navigation_id)}
+def get_products_by_navigation(
+    navigation_ids: List[Union[str, ObjectId]], product_type: Optional[str] = None
+) -> List[Product]:
+    return [
+        product
+        for product in products_service.get_cached()
+        if (
+            any_objectid_in_list(navigation_ids, product.get("navigations") or [])
+            and (product_type is None or product.get("product_type") == product_type)
+        )
+    ]
 
-    if product_type is not None:
-        lookup["product_type"] = product_type
 
-    return list(superdesk.get_resource_service("products").get(req=None, lookup=lookup))
+def get_product_by_id(
+    product_id: Union[str, ObjectId], product_type: Optional[str] = None, company_id: Optional[ObjectId] = None
+) -> Optional[Product]:
+    product = products_service.get_cached_by_id(product_id)
 
+    if company_id is not None and ObjectId(company_id) not in product.get("companies") or []:
+        return None
 
-def get_product_by_id(product_id, product_type=None, company_id=None):
-    lookup = {"_id": ObjectId(product_id), "is_enabled": True}
+    if product_type is not None and product.get("product_type") != product_type:
+        return None
 
-    if company_id is not None:
-        lookup["companies"] = ObjectId(company_id)
-
-    if product_type is not None:
-        lookup["product_type"] = product_type
-
-    return list(superdesk.get_resource_service("products").get(req=None, lookup=lookup))
+    return product
 
 
 def get_products_by_company(
-    company: Optional[Company], navigation_id=None, product_type=None, unlimited_only=False
+    company: Optional[Company],
+    navigation_ids: Optional[List[Union[str, ObjectId]]] = None,
+    product_type: Optional[str] = None,
+    unlimited_only: Optional[bool] = False,
 ) -> List[Product]:
     """Get the list of products for a company
 
-    :param company_id: Company Id
-    :param navigation_id: Navigation Id
+    :param company: Company
+    :param navigation_ids: List of Navigation Ids
     :param product_type: Type of the product
+    :param unlimited_only: Include unlimited only products
     """
+
     if company is None:
         return []
-    lookup: Dict[str, Any] = {"is_enabled": True}
-    if "products" in company:
-        product_ids = []
-        if company.get("products"):
-            product_ids = [
-                ObjectId(p["_id"])
-                for p in company["products"]
-                if p["section"] == product_type and (not unlimited_only or not p.get("seats"))
-            ]
-        if product_ids:
-            lookup["_id"] = {"$in": product_ids}
-        else:
-            # no products selected for a company
-            return []
-    else:
-        lookup["companies"] = ObjectId(company["_id"])
-    if navigation_id:
-        lookup["navigations"] = _get_navigation_query(navigation_id)
-    if product_type:
-        lookup["product_type"] = product_type
 
-    products = list(superdesk.get_resource_service("products").get(req=None, lookup=lookup))
-    return products
+    company_id = ObjectId(company["_id"])
+    company_product_ids = [
+        ObjectId(product["_id"])
+        for product in company.get("products") or []
+        if product["section"] == product_type and (not unlimited_only or not product.get("seats"))
+    ]
 
+    if "products" in company and not company_product_ids:
+        # no products selected for this company
+        return []
 
-def get_products_dict_by_company(company_id):
-    lookup = {"is_enabled": True, "companies": ObjectId(company_id)}
-    return list(superdesk.get_resource_service("products").get(req=None, lookup=lookup))
+    def product_matches(product: Product):
+        if "products" in (company or {}) and product["_id"] not in company_product_ids:
+            return False
+        elif "products" not in (company or {}) and company_id not in (product.get("companies") or []):
+            return False
+        elif product_type and product.get("product_type") != product_type:
+            return False
+        elif navigation_ids and not any_objectid_in_list(navigation_ids, product.get("navigations") or []):
+            return False
+
+        return True
+
+    return [product for product in products_service.get_cached() if product_matches(product)]
 
 
-def get_products_by_user(user, section):
+def get_products_by_user(user: User, section: str) -> List[Product]:
     if user.get("products"):
         ids = [p["_id"] for p in user["products"] if p["section"] == section]
         if ids:
-            lookup = {"is_enabled": True, "_id": {"$in": ids}}
-            return list(superdesk.get_resource_service("products").get(req=None, lookup=lookup))
+            return [product for product in products_service.get_cached() if product["_id"] in ids]
     return []

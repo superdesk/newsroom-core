@@ -1,0 +1,38 @@
+.time-picker__wrapper {
+    display: flex;
+}
+
+.time-picker__select-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.time-picker__suffix {
+    padding: 0 8px;
+    font-size: 1rem;
+}
+
+.time-picker__select {
+    color: var(--color-text);
+    padding: 1px 2px;
+    background-color: transparent;
+    border: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+.time-picker__select:focus {
+    outline: none;
+    background-color: var(--color-interactive-focus--translucent);
+}
+
+.form-control:has(select:focus) {
+    color: var(--color-text--focus);
+    background-color: var(--input-color-bg--focus);
+    border-color: var(--color-interactive-focus);
+    box-shadow: inset 0 0 0 3px var(--searchbar-color-shadow--focus);
+    outline: none;
+}

@@ -174,7 +174,9 @@ def test_saml_auth_denies_other_auth_types(app, client):
 
     # Test logging in with ``auth_provider`` set to use SAML
     companies_service.patch(companies["saml_auth"], updates={"auth_provider": "saml"})
-    login_user()
+    response = login_user()
+    assert "Invalid login type" not in response.get_data(as_text=True)
+
     user = users_service.find_one(req=None, email="foo@samplecomp")
     assert user is not None
     with client.session_transaction() as session:

@@ -211,8 +211,9 @@ select.form-control {
     }
 }
 
-.schedule-times__input-container > * {
-    margin-inline-end: var(--space--2);
+.schedule-times__input-container {
+    display: flex;
+    gap: var(--space--3);
 }
 
 .edit-schedule__modal {

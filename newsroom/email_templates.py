@@ -6,7 +6,8 @@ from flask_babel import gettext
 from werkzeug.exceptions import BadRequest, NotFound
 from eve.utils import config
 
-from superdesk import Resource, Service, register_resource
+from superdesk import Resource, register_resource
+from superdesk.services import CacheableService
 
 logger = logging.getLogger(__name__)
 RESOURCE = "email_templates"
@@ -65,7 +66,7 @@ DEFAULT_SUBJECTS = {
 }
 
 
-class EmailTemplatesService(Service):
+class EmailTemplatesService(CacheableService):
     def find_one(self, req, **lookup):
         email = super().find_one(req, **lookup)
 
@@ -88,6 +89,13 @@ class EmailTemplatesService(Service):
     def on_fetched_item(self, doc):
         self.enhance_items([doc])
 
+    def get_from_mongo(self, req, lookup, projection=None):
+        """Make sure to enhance the item when fetching from mongo"""
+
+        items = super().get_from_mongo(req, lookup, projection)
+        self.enhance_items(items)
+        return items
+
     def enhance_items(self, docs):
         for email in docs:
             email_id = email["_id"]
@@ -97,7 +105,7 @@ class EmailTemplatesService(Service):
 
     def get_translated_subject(self, email_id: str, language_code: Optional[str] = None, **kwargs) -> str:
         language_code = language_code or current_app.config["DEFAULT_LANGUAGE"]
-        email = self.find_one(req=None, _id=email_id)
+        email = self.get_cached_by_id(email_id)
 
         try:
             subject = email["subject"]["translations"][language_code.lower()]
