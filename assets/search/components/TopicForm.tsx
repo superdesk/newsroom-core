@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import classNames from 'classnames';
 
-import {IUser, ITopic, ITopicFolder, INavigation, IFilterGroup, ITopicNotificationScheduleType} from 'interfaces';
+import {IUser, ITopic, INavigation, IFilterGroup, ITopicNotificationScheduleType, ITopicFolder} from 'interfaces';
 import {gettext, getSubscriptionTimesString} from 'utils';
 
 import TextInput from 'components/TextInput';
@@ -11,6 +11,7 @@ import {Dropdown} from 'components/Dropdown';
 import {FormSection} from 'components/FormSection';
 
 import {SearchResultTagsList} from './SearchResultsBar/SearchResultTagsList';
+import {TopicFolderEditor} from './TopicFolderEditor';
 
 const TOPIC_NAME_MAXLENGTH = 30;
 
@@ -56,6 +57,7 @@ interface IProps {
 
     changeNotificationType(notificationType: ITopicNotificationScheduleType): void;
     openEditTopicNotificationsModal(): void;
+    saveFolder: (folder: any, data: any, global?: boolean) => void;
 }
 
 const TopicForm: React.FC<IProps> = ({
@@ -81,8 +83,17 @@ const TopicForm: React.FC<IProps> = ({
     availableFields,
     changeNotificationType,
     openEditTopicNotificationsModal,
+    saveFolder,
 }): React.ReactElement => {
     const topicSubscriptionType = getSubscriptionNotificationType(topic, user._id);
+    const [newFolder, setNewFolder] = useState<Partial<ITopicFolder> | null>();
+
+    useEffect(() => {
+        const newlyCreatedFolder = folders.find((x) => x.name === newFolder?.name) as ITopicFolder;
+
+        setNewFolder(null);
+        onFolderChange(newlyCreatedFolder);
+    }, [folders]);
 
     return (
         <form onSubmit={save}>
@@ -115,46 +126,66 @@ const TopicForm: React.FC<IProps> = ({
                 </div>
                 <div className="nh-flex__row">
                     <FormSection initiallyOpen={true} name={gettext('Organize your Topic')} dataTestId="topic-form-group--folder">
-                        <div className={'nh-container nh-container--direction-row mb-3 pt-2 pb-3'  + (folders.length > 0 ? '' : ' nh-container--highlight text-start')}>
-                            {folders.length > 0
-                                ? (
-                                    <Dropdown
-                                        small={true}
-                                        stretch={true}
-                                        icon={'icon--folder'}
-                                        label={getFolderName(topic, folders)}
+                        <>
+                            <div
+                                className={
+                                    'nh-container nh-container--direction-row mb-3 pt-2 pb-3'
+                                    + (folders.length > 0 ? '' : ' nh-container--highlight text-start')
+                                }
+                            >
+                                <Dropdown
+                                    small={true}
+                                    stretch={true}
+                                    icon={'icon--folder'}
+                                    label={getFolderName(topic, folders)}
+                                >
+                                    {readOnly !== true && topic.folder && (
+                                        <button
+                                            key="top"
+                                            type="button"
+                                            data-test-id="dropdown-item--remove-from-folder"
+                                            className='dropdown-item'
+                                            onClick={() => onFolderChange(null)}
+                                        >
+                                            {gettext('Remove from folder')}
+                                        </button>
+                                    )}
+                                    {readOnly !== true && folders.map((folder: any) => (
+                                        <button
+                                            key={folder._id}
+                                            type="button"
+                                            data-test-id={`dropdown-item--${folder.name}`}
+                                            className="dropdown-item"
+                                            onClick={() => onFolderChange(folder)}
+                                            disabled={readOnly}
+                                        >
+                                            {folder.name}
+                                        </button>
+                                    ))}
+                                    <button
+                                        type='button'
+                                        className="dropdown-item"
+                                        onClick={() => {
+                                            setNewFolder({});
+                                        }}
                                     >
-                                        {readOnly !== true && topic.folder && (
-                                            <button
-                                                key="top"
-                                                type="button"
-                                                data-test-id="dropdown-item--remove-from-folder"
-                                                className='dropdown-item'
-                                                onClick={() => onFolderChange(null)}
-                                            >
-                                                {gettext('Remove from folder')}
-                                            </button>
-                                        )}
-
-                                        {readOnly !== true && folders.map((folder: any) => (
-                                            <button
-                                                key={folder._id}
-                                                type="button"
-                                                data-test-id={`dropdown-item--${folder.name}`}
-                                                className="dropdown-item"
-                                                onClick={() => onFolderChange(folder)}
-                                                disabled={readOnly}
-                                            >
-                                                {folder.name}
-                                            </button>
-                                        ))}
-                                    </Dropdown>
-                                )
-                                : (
-                                    <p className='nh-container__text--small'>{gettext('To organize your topics, please create a folder in the “My Wire Topics” section.')}</p>
-                                )
-                            }
-                        </div>
+                                        {gettext('Create new folder')}
+                                    </button>
+                                </Dropdown>
+                            </div>
+                            {newFolder != null && (
+                                <div className="simple-card__group">
+                                    <TopicFolderEditor
+                                        onSave={((name) => {
+                                            saveFolder(newFolder, {name}, topic.is_global);
+                                            setNewFolder({name});
+                                        })}
+                                        folder={newFolder}
+                                        onCancel={() => setNewFolder(null)}
+                                    />
+                                </div>
+                            )}
+                        </>
                     </FormSection>
                     <FormSection initiallyOpen={true} name={gettext('Email Notifications:')} dataTestId="topic-form-group--notifications">
                         <div>
@@ -190,22 +221,26 @@ const TopicForm: React.FC<IProps> = ({
                                     {gettext('Scheduled')}
                                 </button>
                             </div>
-                            <div className="nh-container nh-container--highlight mb-3">
-                                <p className="nh-container__text--small">
-                                    {gettext('Your saved topic results will be emailed in a digest format at the time(s) per day set below.')}
-                                </p>
-                                <div className="h-spacer h-spacer--medium" />
-                                <span className="nh-container__schedule-info mb-3">
-                                    {getSubscriptionTimesString(user)}
-                                </span>
-                                <button
-                                    type="button"
-                                    className="nh-button nh-button--small nh-button--tertiary"
-                                    onClick={openEditTopicNotificationsModal}
-                                >
-                                    {gettext('Edit schedule')}
-                                </button>
-                            </div>
+                            {
+                                (topicSubscriptionType !== null && topicSubscriptionType !== 'real-time') && (
+                                    <div className="nh-container nh-container--highlight mb-3">
+                                        <p className="nh-container__text--small">
+                                            {gettext('Your saved topic results will be emailed in a digest format at the time(s) per day set below.')}
+                                        </p>
+                                        <div className="h-spacer h-spacer--medium" />
+                                        <span className="nh-container__schedule-info mb-3">
+                                            {getSubscriptionTimesString(user)}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            className="nh-button nh-button--small nh-button--tertiary"
+                                            onClick={openEditTopicNotificationsModal}
+                                        >
+                                            {gettext('Edit schedule')}
+                                        </button>
+                                    </div>
+                                )
+                            }
                         </div>
                     </FormSection>
                 </div>

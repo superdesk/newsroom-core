@@ -501,6 +501,8 @@ def test_item_detail_access(client, app):
         ],
     )
 
+    g.pop("cached:products", None)
+
     # normal access
     data = get_json(client, item_url)
     assert data["_access"]
@@ -550,6 +552,9 @@ def test_search_using_section_filter_for_public_user(client, app):
         ],
     )
 
+    g.pop("cached:navigations", None)
+    g.pop("cached:products", None)
+
     with client.session_transaction() as session:
         session["user"] = str(PUBLIC_USER_ID)
         session["user_type"] = "public"
@@ -577,6 +582,7 @@ def test_search_using_section_filter_for_public_user(client, app):
     )
 
     g.section_filters = None
+    g.pop("cached:section_filters", None)
 
     resp = client.get("/wire/search")
     data = json.loads(resp.get_data())
@@ -842,6 +848,16 @@ def test_highlighting(client, app):
     resp = client.get("/wire/search?q=demo&es_highlight=1")
     data = json.loads(resp.get_data())
     assert data["_items"][0]["es_highlight"]["headline"][0] == '<span class="es-highlight">Demo</span> Article'
+
+    resp = client.get(
+        "/wire/search?q={query}&es_highlight=1".format(query='article AND "cheese and onions" AND "slugline" AND story')
+    )
+    data = json.loads(resp.get_data())
+    highlights = data["_items"][0]["es_highlight"]
+    assert "slugline" in highlights
+    assert "headline" in highlights
+    assert "body_html" in highlights
+    assert 4 == highlights["body_html"][0].count("es-highlight")
 
 
 def test_highlighting_with_advanced_search(client, app):

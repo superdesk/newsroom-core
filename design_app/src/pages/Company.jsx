@@ -59,18 +59,18 @@ function Company() {
                         <div className="btn-group">
                             <button id="company" type="button" className="btn btn-text-only d-flex btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Product one<span>6/10</span>
-                                <i className="icon-small--arrow-down icon--gray-dark"></i>
+                                <i className="icon-small--arrow-down"></i>
                             </button>                            
                         </div>
                         <div className="content-bar-divider"></div>
                         <div className="btn-group">
                             <button id="company" type="button" className="btn btn-text-only d-flex btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span>Sort by:</span>Last active
-                                <i className="icon-small--arrow-down icon--gray-dark"></i>
+                                <i className="icon-small--arrow-down"></i>
                             </button>
                         </div>
                         <div className="btn-group">
-                            <button className="icon-button" aria-label="Sort"><i className="icon--filter icon--gray-dark"></i></button>
+                            <button className="icon-button" aria-label="Sort"><i className="icon--filter"></i></button>
                         </div>
                         <div className="content-bar-divider"></div>
 

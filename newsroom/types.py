@@ -7,8 +7,16 @@ from enum import Enum
 class Product(TypedDict, total=False):
     _id: ObjectId
     name: str
+    description: str
+    original_creator: ObjectId
+    version_creator: ObjectId
+    sd_product_id: str
+    query: str
+    planning_item_query: str
+    is_enabled: bool
     product_type: str
-    navigations: List[str]
+    navigations: List[ObjectId]
+    companies: List[ObjectId]
 
 
 class ProductRef(TypedDict):

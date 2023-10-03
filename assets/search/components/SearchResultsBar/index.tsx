@@ -25,7 +25,7 @@ import NewItemsIcon from '../NewItemsIcon';
 
 
 class SearchResultsBarComponent extends React.Component<any, any> {
-    private sortValues: Array<{label: string; sortFunction: () => void;}>;
+    private sortValues: Array<{value: string; sortFunction: () => void;}>;
     private topicNotNull: boolean;
 
     static propTypes: any;
@@ -36,22 +36,22 @@ class SearchResultsBarComponent extends React.Component<any, any> {
         this.topicNotNull = new URLSearchParams(window.location.search).get('topic') != null;
         this.sortValues = [
             {
-                label: gettext('Date (Newest)'),
+                value: gettext('Date ↑'),
                 sortFunction: () => this.setSortQuery('versioncreated:desc'),
             },
             {
-                label: gettext('Date (Oldest)'),
+                value: gettext('Date ↓'),
                 sortFunction: () => this.setSortQuery('versioncreated:asc'),
             },
             {
-                label: gettext('Relevance'),
+                value: gettext('Relevance'),
                 sortFunction: () => this.setSortQuery('_score'),
             },
         ];
 
         this.state = {
             isTagSectionShown: this.props.initiallyOpen || this.topicNotNull,
-            sortValue: this.sortValues[0].label,
+            sortValue: this.sortValues[0].value,
         };
 
         this.toggleTagSection = this.toggleTagSection.bind(this);
@@ -131,10 +131,10 @@ class SearchResultsBarComponent extends React.Component<any, any> {
             <React.Fragment>
                 <div
                     data-test-id="search-results-bar"
-                    className="wire-column__main-header-container"
+                    className="d-contents"
                 >
                     {!this.props.showTotalItems ? null : (
-                        <div className="navbar navbar--flex line-shadow-end--light">
+                        <div className="navbar navbar--flex line-shadow-end--light navbar--search-results">
                             {!this.props.showTotalItems ? null : (
                                 <div className="search-result-count">
                                     {this.props.totalItems === 1 ?
@@ -147,20 +147,22 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                             )}
                             <div className="navbar__button-group">
                                 <Dropdown
-                                    label={gettext('Sort by: {{sort}}', {sort: this.state.sortValue})}
+                                    label={gettext('Sort by:')}
+                                    value={gettext('{{sort}}', {sort: this.state.sortValue})}
+                                    className={'sorting-dropdown'}
                                 >
                                     {
                                         this.sortValues.map((option) => (
                                             <button
-                                                key={option.label}
+                                                key={option.value}
                                                 type='button'
                                                 className='dropdown-item'
                                                 onClick={() => {
                                                     option.sortFunction();
-                                                    this.setState({sortValue: option.label});
+                                                    this.setState({sortValue: option.value});
                                                 }}
                                             >
-                                                {gettext(option.label)}
+                                                {gettext(option.value)}
                                             </button>
                                         ))
                                     }
@@ -169,7 +171,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                     className="nh-button nh-button--tertiary"
                                     onClick={() => {
                                         this.props.resetSearchParamsAndUpdateURL();
-                                        this.toggleTagSection();
+                                        this.props.onClearAll?.();
                                         this.props.refresh();
                                     }}
                                 >

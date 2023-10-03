@@ -1,5 +1,5 @@
 import re
-
+import json
 from copy import deepcopy
 import flask
 from bson import ObjectId
@@ -26,9 +26,7 @@ from newsroom.companies import (
     get_company_sections_monitoring_data,
 )
 from newsroom.notifications.notifications import get_notifications_with_items
-from newsroom.notifications import push_user_notification, push_company_notification
 from newsroom.topics import get_user_topics
-from newsroom.topics.topics import auto_enable_user_emails
 from newsroom.users import blueprint
 from newsroom.users.forms import UserForm
 from newsroom.users.users import (
@@ -81,6 +79,7 @@ def user_profile():
 @account_manager_or_company_admin_only
 def search():
     lookup = None
+    sort = None
     if flask.request.args.get("q"):
         regex = re.compile(".*{}.*".format(flask.request.args.get("q")), re.IGNORECASE)
         lookup = {"$or": [{"first_name": regex}, {"last_name": regex}]}
@@ -88,6 +87,19 @@ def search():
     if flask.request.args.get("ids"):
         lookup = {"_id": {"$in": (flask.request.args.get("ids") or "").split(",")}}
 
+    if flask.request.args.get("sort"):
+        sort = flask.request.args.get("sort")
+
+    where_param = flask.request.args.get("where")
+    if where_param:
+        try:
+            where = json.loads(where_param)
+            if where.get("company"):
+                lookup = {"company": where["company"]}
+            if where.get("products._id"):
+                lookup = {"products._id": where["products._id"]}
+        except json.JSONDecodeError as e:
+            return jsonify({"error": "Invalid 'where' parameter. JSON decoding failed: {}".format(str(e))}), 400
     if is_current_user_company_admin():
         # Make sure this request only searches for the current users company
         company = get_company()
@@ -100,7 +112,7 @@ def search():
 
         lookup["company"] = company["_id"]
 
-    users = list(query_resource("users", lookup=lookup))
+    users = list(query_resource("users", lookup=lookup, sort=sort))
     return jsonify(users), 200
 
 
@@ -112,7 +124,7 @@ def create():
         if not _is_email_address_valid(form.email.data):
             return jsonify({"email": [gettext("Email address is already in use")]}), 400
 
-        new_user = get_updates_from_form(form)
+        new_user = get_updates_from_form(form, on_create=True)
         user_is_company_admin = is_current_user_company_admin()
         if user_is_company_admin:
             company = get_company()
@@ -242,12 +254,17 @@ def edit(_id):
     return jsonify(user), 200
 
 
-def get_updates_from_form(form: UserForm):
+def get_updates_from_form(form: UserForm, on_create=False):
     updates = form.data
     if form.company.data:
         updates["company"] = ObjectId(form.company.data)
     if "sections" in updates:
-        updates["sections"] = {section["_id"]: section["_id"] in (form.sections.data or []) for section in app.sections}
+        if on_create and not updates.get("sections"):
+            updates.pop("sections")  # will be populated later based on company
+        else:
+            updates["sections"] = {
+                section["_id"]: section["_id"] in (form.sections.data or []) for section in app.sections
+            }
 
     if "products" in updates:
         product_ids = [ObjectId(productId) for productId in updates["products"]]
@@ -339,41 +356,6 @@ def delete(_id):
     """Deletes the user by given id"""
     get_resource_service("users").delete_action({"_id": ObjectId(_id)})
     return jsonify({"success": True}), 200
-
-
-@blueprint.route("/users/<_id>/topics", methods=["GET"])
-@login_required
-def get_topics(_id):
-    """Returns list of followed topics of given user"""
-    if flask.session["user"] != str(_id):
-        flask.abort(403)
-    return jsonify({"_items": get_user_topics(_id)}), 200
-
-
-@blueprint.route("/users/<_id>/topics", methods=["POST"])
-@login_required
-def post_topic(_id):
-    """Creates a user topic"""
-    user = get_user()
-    if str(user["_id"]) != str(_id):
-        flask.abort(403)
-
-    topic = get_json_or_400()
-    topic["user"] = user["_id"]
-    topic["company"] = user.get("company")
-
-    for subscriber in topic.get("subscribers") or []:
-        subscriber["user_id"] = ObjectId(subscriber["user_id"])
-
-    ids = get_resource_service("topics").post([topic])
-
-    auto_enable_user_emails(topic, {}, user)
-
-    if topic.get("is_global"):
-        push_company_notification("topic_created", user_id=str(user["_id"]))
-    else:
-        push_user_notification("topic_created")
-    return jsonify({"success": True, "_id": ids[0]}), 201
 
 
 @blueprint.route("/users/<user_id>/notifications", methods=["GET"])

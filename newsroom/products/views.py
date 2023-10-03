@@ -132,7 +132,12 @@ def update_companies(id):
                     company_products = [p for p in company_products if str(p["_id"]) != id]
                     update_company = True
         if update_company:
-            get_resource_service("companies").patch(company["_id"], updates={"products": company_products})
+            sections = company.get("sections") or {}
+            for product in company_products:
+                sections.setdefault(product["section"], True)
+            get_resource_service("companies").patch(
+                company["_id"], updates={"products": company_products, "sections": sections}
+            )
     return jsonify({"success": True}), 200
 
 

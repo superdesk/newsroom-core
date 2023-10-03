@@ -133,7 +133,7 @@ class MonitoringEditor extends React.Component<any, any> {
                         disabled={this.state.saving}
                         aria-label={gettext('Close')}
                     >
-                        <i className="icon--close-thin icon--gray-dark" />
+                        <i className="icon--close-thin" />
                     </button>
                 </div>
                 <ul className='nav nav-tabs'>

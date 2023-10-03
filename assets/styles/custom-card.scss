@@ -26,23 +26,28 @@
             pointer-events: none;
         }
         
-        h1.card-title { font-size: 3.125rem; font-weight: 900; line-height: 1.4; }
-        h2.card-title { font-size: 1.625rem; font-weight: 900; line-height: 1.4; }
-        h3.card-title { font-size: 1.25rem; font-weight: 900; line-height: 1.4; }
-        h4.card-title { font-size: 1rem; font-weight: 900; line-height: 1.4; }
-        h5.card-title { font-size: 0.875rem; font-weight: 900; line-height: 1.4; }
-        
-        h1.card-title, 
-        h2.card-title { 
-            color: var(--card-item-title-color); 
+        .card-title {
+            font-family: var(--card-item-title-font-family);
+            font-weight: var(--card-item-title-font-weight);
+            line-height: var(--card-item-title-line-height);
+            color: var(--card-item-title-color);
         }
-        
+        h1.card-title { font-size: var(--card-item-title-font-size-h1)}
+        h2.card-title { font-size: var(--card-item-title-font-size-h2)}
+        h3.card-title { font-size: var(--card-item-title-font-size-h3)}
+        h4.card-title { font-size: var(--card-item-title-font-size-h4)}
+        h5.card-title { font-size: var(--card-item-title-font-size-h5)}
+
         .card-header {
             border-radius: var(--card-item-border-radius) var(--card-item-border-radius) 0 0;
         }
         .card-footer {
             border-radius: 0 0 var(--card-item-border-radius) var(--card-item-border-radius);
             border-top: 1px solid var(--card-item-footer-border-color);
+            .wire-articles__item__meta-info span {
+                flex-wrap: wrap;
+                row-gap: var(--space--0-5);
+            }
         }
         .card-header, 
         .card-footer {

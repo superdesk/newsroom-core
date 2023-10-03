@@ -1,4 +1,4 @@
-import {ITopic, IUser} from 'interfaces';
+import {ITopic, ITopicFolder, IUser} from 'interfaces';
 
 import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
@@ -231,7 +231,7 @@ export function pushNotification(push: any): any {
     };
 }
 
-function getFoldersUrl(state: any, global: any, id?: any) {
+function getFoldersUrl(state: any, global: boolean | undefined, id?: any) {
     const baseUrl = global ?
         `/api/companies/${state.company}/topic_folders` :
         `/api/users/${state.user._id}/topic_folders`;
@@ -247,7 +247,7 @@ function mergeUpdates(updates: any, response: any) {
 }
 
 export const FOLDER_UPDATED = 'FOLDER_UPDATED';
-export function saveFolder(folder: any, data: any, global: any) {
+export function saveFolder(folder: ITopicFolder, data: {name: string}, global?: boolean) {
     return (dispatch: any, getState: any) => {
         const state = getState();
         const url = getFoldersUrl(state, global, folder._id);
@@ -257,14 +257,14 @@ export function saveFolder(folder: any, data: any, global: any) {
 
             return server.patch(url, updates, folder._etag)
                 .then(() => {
-                    dispatch(fetchFolders(global));
+                    dispatch(fetchFolders());
                 });
         } else {
             const payload = {...data, section: state.selectedMenu === 'events' ? 'agenda' : 'wire'};
 
             return server.post(url, payload)
                 .then(() => {
-                    dispatch(fetchFolders(global));
+                    dispatch(fetchFolders());
                 });
         }
     };
@@ -292,19 +292,25 @@ export const RECIEVE_FOLDERS = 'RECIEVE_FOLDERS';
  * @param {bool} global - fetch company or user folders
  * @param {bool} skipDispatch - if true it won't replace folders in store
  */
-export function fetchFolders(global: boolean, skipDispatch?: boolean) {
+export function fetchFolders() {
     return (dispatch: any, getState: any) => {
         const state = getState();
-        const url = getFoldersUrl(state, global);
+        const companyTopicsUrl = getFoldersUrl(state, true);
+        const userTopicsUrl = getFoldersUrl(state, false);
 
-        return server.get(url).then((res) => {
-            if (skipDispatch) {
-                return res._items;
-            }
-
-            dispatch({type: RECIEVE_FOLDERS, payload: res._items});
-        }, (reason) => {
-            console.error(reason);
+        return Promise.all([
+            state.company !== 'None' ? server.get(companyTopicsUrl).then(({_items}: {_items: Array<any>}) => _items) : Promise.resolve([]),
+            server.get(userTopicsUrl).then(({_items}: {_items: Array<any>}) => _items),
+        ]).then(([companyFolders, userFolders]) => {
+            dispatch({
+                type: RECIEVE_FOLDERS,
+                payload: {
+                    companyFolders: companyFolders,
+                    userFolders: userFolders,
+                },
+            });
+        }).catch((error) => {
+            console.error(error);
             return Promise.reject();
         });
     };
@@ -336,9 +342,14 @@ export function updateUserNotificationSchedules(schedule: Omit<IUser['notificati
 }
 
 export function setTopicSubscribers(topic: ITopic, subscribers: ITopic['subscribers']) {
-    return (dispatch: any) => {
+    return (dispatch: any, getState: any) => {
+        const user = getState().user;
         const updates = {subscribers};
-        return updateTopic(topic, updates, dispatch);
+        return updateTopic(topic, updates, dispatch).then(() => {
+            // refresh user profile after topics change
+            // to get notifications updates
+            dispatch(fetchUser(user._id));
+        });
     };
 }
 

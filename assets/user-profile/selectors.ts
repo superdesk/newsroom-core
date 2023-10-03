@@ -17,10 +17,12 @@ export const sectionSelector = (state: any) => MENU_SECTION_MAPPING[state.select
 export const foldersSelector = (state: any) => {
     const activeSection = sectionSelector(state);
 
-    return state.folders.filter((folder: any) => folder.section === activeSection);
+    return {
+        companyFolders: state.companyFolders.filter((folder: any) => folder.section === activeSection),
+        userFolders: state.userFolders.filter((folder: any) => folder.section === activeSection),
+    };
 };
 
-export const uiContextConfigSelector = (state: any, context: any) => get(state, `uiConfigs.${context}`) || {};
 export const globalTopicsEnabledSelector = (state: any, context: any) => context === 'monitoring' ? false : get(
     state,
     `uiConfigs.${context}.enable_global_topics`,

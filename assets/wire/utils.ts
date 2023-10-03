@@ -218,6 +218,21 @@ function splitWords(str: string): Array<string> {
 }
 
 /**
+ * Extract text from a node, handling both text and element nodes.
+ *
+ * @param {Node | null} node - The node from which to extract text.
+ * @returns {string} - The extracted text from the node.
+ */
+function getTextFromNode(node: Node | null): string {
+    if (!node) return '';
+    if (node.nodeType === Node.TEXT_NODE) {
+        const textContent = node.textContent || '';
+        return textContent.trim();
+    }
+    return '';
+}
+
+/**
  * Returns first paragraph with highlighted text, and truncates output to ``max_length`` words
  *
  * @todo Any changes to this code **must** be reflected in the python version as well
@@ -228,52 +243,29 @@ function splitWords(str: string): Array<string> {
  * @returns {string}
  */
 export function shortHighlightedtext(html: string, maxLength = 40) {
-    const parser = new DOMParser();
-    const doc: any = parser.parseFromString(html, 'text/html');
-    const span = doc.querySelector('span.es-highlight');
-    const parentElement = span.parentElement;
-    const treeWalker = (document as any).createTreeWalker(parentElement, NodeFilter.SHOW_TEXT, null, false);
-    let node = treeWalker.firstChild();
-    let text = '';
-    let count = 0;
-    let highlightedSpans = [];
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    const highlightSpans = Array.from(div.querySelectorAll('span.es-highlight'));
+    const extractedText: string[] = [];
+    let lastNode: Node | null = null;
 
-    while (node && count < maxLength) {
-        const content = node.textContent.trim();
-        const words = splitWords(content);
-        const remainingCount = maxLength - count;
+    for (const highlightSpan of highlightSpans) {
+        const textBefore = lastNode === highlightSpan.previousSibling ? '' : getTextFromNode(highlightSpan.previousSibling);
+        const textAfter = getTextFromNode(highlightSpan.nextSibling);
 
-        if (words.length <= remainingCount) {
-            text += content + ' ';
-            count += words.length;
-        } else {
-            text += words.slice(0, remainingCount).join(' ');
-            count += remainingCount;
+        if (textBefore) {
+            extractedText.push(textBefore);
         }
 
-        node = treeWalker.nextSibling();
+        extractedText.push(highlightSpan.outerHTML);
+
+        if (textAfter) {
+            extractedText.push(textAfter);
+        }
+
+        lastNode = highlightSpan.nextSibling;
     }
-    const truncatedText = text.trim();
-    highlightedSpans = parentElement.querySelectorAll('span.es-highlight');
-    let output = truncatedText;
-    let highlightedText = '';
-    let lastIndex = 0;
-
-    highlightedSpans.forEach((span: any) => {
-        const spanText = span.textContent.trim();
-        const spanIndex = truncatedText.indexOf(spanText, lastIndex);
-
-        if (spanIndex !== -1) {
-            const spanStart = spanIndex;
-            const spanEnd = spanStart + spanText.length;
-            highlightedText += output.slice(lastIndex, spanStart) + span.outerHTML;
-            lastIndex = spanEnd;
-        }
-    });
-
-    output = highlightedText + output.slice(lastIndex);
-
-    return output + (count > maxLength ? '' : '...');
+    return extractedText.join(' ')+(html.length > maxLength ? '...' : ' ');
 }
 
 /**

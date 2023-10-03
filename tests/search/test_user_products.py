@@ -77,6 +77,7 @@ def test_user_products(app, client, manager, product):
     assert 0 == len(data["_items"])
 
     app.data.update("products", product["_id"], {"query": "headline:WEATHER"}, product)
+    g.pop("cached:products", None)
 
     data = utils.get_json(client, "/wire/search")
     assert 1 == len(data["_items"])
@@ -107,17 +108,20 @@ def test_user_sections(app, client, manager, product):
         },
     )
 
-    # company has a product without limit, so this should work now
-    data = utils.get_json(client, "/agenda/search")
-    assert data
+    # has section but no products
+    with pytest.raises(AssertionError) as err:
+        utils.get_json(client, "/agenda/search")
+    assert "403" in str(err)
 
     utils.patch_json(
         client, f"/api/_users/{manager['_id']}", {"products": [{"section": "agenda", "_id": product["_id"]}]}
     )
 
+    # works now with company product
     data = utils.get_json(client, "/agenda/search")
     assert data
 
+    # section not enabled
     with pytest.raises(AssertionError) as err:
         utils.get_json(client, "/wire/search")
     assert "403" in str(err)

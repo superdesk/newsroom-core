@@ -8,10 +8,11 @@ interface IProps {
     folderPopover: string;
     actions: Array<any>;
     buttonRef: React.MutableRefObject<any>;
+    index: number;
 }
 
-export function TopicFolderActions({folder, toggleFolderPopover, folderPopover, actions, buttonRef}: IProps) {
-    const elem = document.querySelector('.simple-card__group-header-actions');
+export function TopicFolderActions({folder, toggleFolderPopover, folderPopover, actions, buttonRef, index}: IProps) {
+    const elem = document.querySelectorAll('.simple-card__group-header-actions')[index];
 
     const toggle = useCallback((e) => {
         if (!elem?.contains(e.target)) {

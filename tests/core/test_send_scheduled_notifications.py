@@ -1,3 +1,5 @@
+import flask
+
 from datetime import datetime, timedelta
 from bson import ObjectId
 
@@ -164,3 +166,53 @@ def test_is_scheduled_to_run_for_user():
         now = create_datetime_instance(test["now"][0], test["now"][1])
 
         assert command._is_scheduled_to_run_for_user(schedule, now, False) == test["result"], test
+
+
+def test_scheduled_notification_topic_matches_template():
+    template = "scheduled_notification_topic_matches_email.txt"
+
+    kwargs = {
+        "topic_match_table": {
+            "wire": [
+                ("foo", 2),
+                ("bar", 3),
+            ],
+            "agenda": [
+                ("agenda topic", 5),
+            ],
+        },
+        "entries": {
+            "wire": [
+                {
+                    "topic": {"_id": "topic-id"},
+                    "item": {"headline": "Test Article", "service": []},
+                },
+                {
+                    "topic": {"_id": "topic-id"},
+                    "item": {"headline": "Test Article 2", "service": [{"name": "Sports"}]},
+                },
+            ],
+            "agenda": [
+                {
+                    "topic": {"_id": "topic-id"},
+                    "item": {
+                        "name": "Test Event",
+                        "dates": {
+                            "start": datetime(2023, 9, 22, 10, 0, 0),
+                            "end": datetime(2023, 9, 22, 12, 0, 0),
+                        },
+                        "versioncreated": datetime(2023, 9, 20, 12, 0, 0),
+                    },
+                },
+            ],
+        },
+    }
+
+    output = flask.render_template(template, **kwargs)
+    assert output
+
+    print("OUT", output)
+
+    assert "Test Event" in output
+    assert "Test Article" in output
+    assert "Category: Sports" in output

@@ -126,13 +126,82 @@ class AgendaListItem extends React.Component<any, any> {
         };
     }
 
+    getSegments(description: string) {
+        const dom = new DOMParser().parseFromString(description.replace(/\n/g, '<br />'), 'text/html');
+        const arrayOfParagraphs = dom.body.querySelectorAll('p');
+        const body = dom.body;
+
+        const getSegmentCount = (p: HTMLParagraphElement): number => {
+            // adding one because if there are 2 <br> tags it means there are 3 segments
+            return p.getElementsByTagName('br').length + 1;
+        };
+
+        const descriptionHTMLArr: HTMLParagraphElement[] = [];
+        let segmentsRemainingToBeAdded = 3;
+        let paragraphsInnerText = '';
+
+        [...arrayOfParagraphs].forEach(paragraph => {
+            if (segmentsRemainingToBeAdded > 0) {
+                paragraphsInnerText += paragraph.innerText;
+                paragraph.innerHTML = paragraph.innerHTML.split('<br>').filter((p: string) => p.trim() !== '').slice(0, segmentsRemainingToBeAdded).join('<br>');
+
+                segmentsRemainingToBeAdded = segmentsRemainingToBeAdded - getSegmentCount(paragraph);
+
+                descriptionHTMLArr.push(paragraph);
+            }
+        });
+
+        return {
+            /**
+             * keep in mind that first 3 segments might be 1-3 paragraphs
+             */
+            firstThreeSegments: descriptionHTMLArr,
+            hasMoreContent: body.innerText.length > paragraphsInnerText.length,
+        };
+    }
+
     renderListItem(isMobile: any, children: any) {
         const {item, isExtended, group, planningId, listConfig} = this.props;
         const classes = this.getClassNames(isExtended);
-        const planningItem = (get(item, 'planning_items') || []).find((p: any) => p.guid === planningId) || {};
-        const description =item.es_highlight ? getHighlightedDescription(item, planningItem) : getDescription(item,planningItem);
+        const planningItem = (get(item, 'planning_items') || []).find((p: any) => p.guid === planningId) || null;
+        const description: string = item.es_highlight
+            ? getHighlightedDescription(item, planningItem)
+            : getDescription(item,planningItem);
         // Show headline for adhoc planning items
         const showHeadline = !item.event && get(item, 'headline.length', 0) > 0;
+
+        const {firstThreeSegments, hasMoreContent} =  this.getSegments(description);
+
+        const renderDescription = (() => {
+            const isHTML = (value: string) => {
+                const doc = new DOMParser().parseFromString(value, 'text/html');
+                return Array.from(doc.body.childNodes).some(node => node.nodeType === 1);
+            };
+
+            if (item.es_highlight != null && (item.es_highlight.definition_short ?? '').length > 0) {
+                return <div style={{whiteSpace: 'pre-line'}} dangerouslySetInnerHTML={{__html: description}} />;
+            } else {
+                if (isHTML(description)) {
+                    return (
+                        firstThreeSegments.map((paragraph, i: number) => {
+                            const lastChild: boolean = firstThreeSegments.length - 1 === i;
+                            const showThreeDots = lastChild && hasMoreContent;
+
+                            return <div className={showThreeDots ? 'wire-articles__item__text--last-child' : ''} dangerouslySetInnerHTML={{__html: paragraph.outerHTML}} key={i} />;
+                        })
+                    );
+                } else {
+                    return (
+                        description.split('\n').slice(0, 3).map((plainText: string, i: number, array: Array<string>) => {
+                            const lastChild = array.length -1 === i;
+                            const showThreeDots: boolean = lastChild && description.length > description.split('\n').slice(0, 3).join('\n').length;
+
+                            return <p className={showThreeDots ? 'wire-articles__item__text--last-child' : ''} key={i}>{plainText}</p>;
+                        })
+                    );
+                }
+            }
+        })();
 
         return (
             <article key={item._id}
@@ -182,11 +251,9 @@ class AgendaListItem extends React.Component<any, any> {
                         />
 
                         {(isMobile || isExtended) && description && (
-                            <p className="wire-articles__item__text">
-                                {item.es_highlight && item.es_highlight ? <span
-                                    dangerouslySetInnerHTML={({__html: description})}
-                                /> : <PlainText text={description} />}
-                            </p>
+                            <div className="wire-articles__item__text">
+                                {renderDescription}
+                            </div>
                         )}
                     </div>
                     {children}

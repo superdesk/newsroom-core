@@ -87,7 +87,7 @@ class EditMonitoringProfile extends React.Component<any, any> {
                         data-bs-dismiss='modal'
                         aria-label={gettext('Close')}
                         onClick={onClose}>
-                        <i className="icon--close-thin icon--gray-dark" aria-hidden='true'></i>
+                        <i className="icon--close-thin" aria-hidden='true'></i>
                     </button>
                 </div>
                 <AuditInformation item={item} />

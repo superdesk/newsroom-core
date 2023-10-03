@@ -16,11 +16,11 @@ export function AgendaContacs({item, inList = false}: IProps) {
                 <div
                     key={contact._id}
                     className={classNames({
-                        'd-flex': inList,
-                        'wire-articles__item__meta-row': !inList,
+                        'd-flex gap-1': inList,
+                        'wire-articles__item__meta-row wire-articles__item__meta-row--contact': !inList,
                     })}
                 >
-                    <i className='icon-small--user icon--gray-dark'></i>
+                    <i className='icon-small--user'></i>
                     <span>{`${contact.name}${(contact.name && contact.organisation) ? ', ' : ''}${contact.organisation} ${contact.phone} ${contact.mobile} `}
                         {contact.email && <a href={`mailto:${contact.email}`} target="_blank">{contact.email}</a>}
                     </span>

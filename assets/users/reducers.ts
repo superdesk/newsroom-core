@@ -4,7 +4,7 @@ import {
     GET_USER,
     REMOVE_USER,
     SELECT_USER,
-    EDIT_USER,
+    EDIT_USER__DEPRECATED,
     QUERY_USERS,
     CANCEL_EDIT,
     NEW_USER,
@@ -13,11 +13,15 @@ import {
     SET_COMPANY,
     SET_SORT,
     TOGGLE_SORT_DIRECTION,
+    EDIT_USER,
 } from './actions';
 
 import {ADD_EDIT_USERS} from 'actions';
+import {companyProductSeatsSelector} from 'company-admin/selectors';
+import {IProduct} from 'interfaces';
 
 import {searchReducer} from 'search/reducers';
+import {hasSeatsAvailable, seatOccupiedByUser} from './utils';
 
 const initialState: any = {
     user: null,
@@ -75,13 +79,17 @@ export default function userReducer(state: any = initialState, action: any) {
         };
     }
 
-    case EDIT_USER: {
+    case EDIT_USER__DEPRECATED: {
         const target = action.event.target;
         const field = target.name;
         const user: any = {...state.userToEdit};
         const value = target.type === 'checkbox' ? target.checked : target.value;
 
-        if (field.startsWith('sections.')) {
+        if (action.event?.changeType === 'company') {
+            const newCompanySelected = state.companies.find(({_id}: any) => value === _id);
+            user.company = newCompanySelected?._id;
+            user.sections = newCompanySelected?.sections;
+        } else if (field.startsWith('sections.')) {
             const sectionId = field.replace('sections.', '');
 
             user.sections = {
@@ -102,10 +110,6 @@ export default function userReducer(state: any = initialState, action: any) {
             } else {
                 user.products = (user.products || []).filter((product: any) => product._id !== productId);
             }
-        } else if (field.includes('selectAllBtn')) {
-            user.products = state.products
-                .filter((product: any) => user.sections[product.product_type])
-                .map((product: any) => ({_id : product._id , section: product.product_type}));
         }
         else {
             user[field] = value;
@@ -113,6 +117,13 @@ export default function userReducer(state: any = initialState, action: any) {
 
         return {...state, userToEdit: user, errors: null};
     }
+
+    case EDIT_USER:
+        return {
+            ...state,
+            userToEdit: action.payload,
+            errors: null,
+        };
 
     case NEW_USER: {
         const newUser =  {

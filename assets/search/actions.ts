@@ -9,7 +9,7 @@ import {getLocations, getMapSource} from 'maps/utils';
 
 import {closeModal} from 'actions';
 import {setShareItems} from 'wire/actions';
-import {createOrUpdateTopic} from 'user-profile/actions';
+import {createOrUpdateTopic, fetchUser} from 'user-profile/actions';
 
 import {multiSelectTopicsConfigSelector} from 'ui/selectors';
 import {
@@ -262,6 +262,7 @@ export function submitFollowTopic(data: any) {
 
                 dispatch(addTopic(topic));
                 dispatch(closeModal());
+                dispatch(fetchUser(userId));
                 return topic;
             })
             .catch(errorHandler);

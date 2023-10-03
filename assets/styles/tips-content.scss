@@ -1,0 +1,45 @@
+.tips-content {
+    @extend .advanced-search__content;
+
+    >div {
+        @extend .advanced-search__content-block;
+        @extend .advanced-search__content-block--no-background;
+    }
+
+    h3 {
+        margin: 0;
+    }
+
+    p {
+        @extend .advanced-search__content-block-text;
+    }
+
+    code {
+        color: var(--color-text);
+        font-family: monospace;
+        font-size: 15px;
+        background-color: hsla(0, 0%, 0%, 0.06);
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+
+    pre {
+        @extend .advanced-search__content-description-text;
+    }
+
+    .operator-and {
+        color: #51831C;
+    }
+
+    .operator-or {
+        color: #00658A;
+    }
+
+    .operator-not {
+        color: #BC3434;
+    }
+
+    hr {
+        @extend .dashed;
+    }
+}

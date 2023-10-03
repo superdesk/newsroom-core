@@ -1,6 +1,6 @@
 import flask
 import newsroom
-import superdesk
+from superdesk.services import CacheableService
 
 from typing import Dict, List
 from newsroom.search.service import query_string
@@ -28,7 +28,9 @@ class SectionFiltersResource(newsroom.Resource):
     query_objectid_as_string = True  # needed for companies/navigations lookup to work
 
 
-class SectionFiltersService(newsroom.Service):
+class SectionFiltersService(CacheableService):
+    cache_lookup = {"is_enabled": True}
+
     def get_section_filters(self, filter_type) -> List:
         """Get the list of section filter by filter type
 
@@ -40,12 +42,8 @@ class SectionFiltersService(newsroom.Service):
     def get_section_filters_dict(self) -> Dict[str, List]:
         """Get the list of all section filters"""
         if not getattr(flask.g, "section_filters", None):
-            lookup = {"is_enabled": True}
-            section_filters = list(
-                superdesk.get_resource_service("section_filters").get_from_mongo(req=None, lookup=lookup)
-            )
             filters: Dict[str, List] = {}
-            for f in section_filters:
+            for f in self.get_cached():
                 if not filters.get(f.get("filter_type")):
                     filters[f.get("filter_type")] = []
                 filters[f.get("filter_type")].append(f)

@@ -75,8 +75,8 @@ class SendScheduledNotificationEmails(Command):
                 company = companies.get(str(user.get("company", "")))
                 self.process_schedule(schedule, user, company, now_utc, user_topic_map.get(user["_id"]) or {}, force)
             except Exception as e:
-                logger.error(f"{self.log_msg} Failed to run schedule for user {user_id}")
                 logger.exception(e)
+                logger.error(f"{self.log_msg} Failed to run schedule for user {user_id}")
 
     def process_schedule(
         self,
@@ -211,10 +211,7 @@ class SendScheduledNotificationEmails(Command):
         for item_id in reversed(topic_queue["items"]):
             search_service = get_resource_service("wire_search" if topic["topic_type"] == "wire" else "agenda")
 
-            section_filters = get_resource_service("section_filters").get_section_filters_dict()
-            query = search_service.get_topic_query(
-                topic, user, company, section_filters, args={"es_highlight": 1, "ids": [item_id]}
-            )
+            query = search_service.get_topic_query(topic, user, company, args={"es_highlight": 1, "ids": [item_id]})
 
             items = search_service.get_items_by_query(query, size=1)
 

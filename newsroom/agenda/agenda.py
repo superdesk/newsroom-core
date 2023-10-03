@@ -40,7 +40,7 @@ from newsroom.utils import (
 from newsroom.utils import get_local_date, get_end_date
 from datetime import datetime
 from newsroom.wire import url_for_wire
-from newsroom.search.service import BaseSearchService, SearchQuery, query_string, get_filter_query
+from newsroom.search.service import BaseSearchService, SearchQuery, query_string, get_filter_query, strtobool
 from newsroom.search.config import is_search_field_nested, get_nested_config
 from .utils import get_latest_available_delivery, TO_BE_CONFIRMED_FIELD, push_agenda_item_notification
 
@@ -449,7 +449,7 @@ aggregations: Dict[str, Dict[str, Any]] = {
     "language": {"terms": {"field": "language"}},
     "calendar": {"terms": {"field": "calendars.name", "size": 100}},
     "service": {"terms": {"field": "service.name", "size": 50}},
-    "subject": {"terms": {"field": "subject.name", "size": 20}},
+    "subject": {"terms": {"field": "subject.name", "size": 50}},
     "urgency": {"terms": {"field": "urgency"}},
     "place": {"terms": {"field": "place.name", "size": 50}},
     "coverage": {
@@ -462,7 +462,7 @@ aggregations: Dict[str, Dict[str, Any]] = {
         },
         "aggs": {
             "service": {"terms": {"field": "planning_items.service.name", "size": 50}},
-            "subject": {"terms": {"field": "planning_items.subject.name", "size": 20}},
+            "subject": {"terms": {"field": "planning_items.subject.name", "size": 50}},
             "urgency": {"terms": {"field": "planning_items.urgency"}},
             "place": {"terms": {"field": "planning_items.place.name", "size": 50}},
         },
@@ -827,7 +827,7 @@ class AgendaService(BaseSearchService):
         orig_args = req.args
         req.args = {key: val for key, val in dict(req.args).items() if key not in planning_filters}
         req.args["itemType"] = "events"
-        req.args["noAggregations"] = 1
+        req.args["aggs"] = "false"
         req.projection = json.dumps({"_id": 1})
         item_ids = set([item["_id"] for item in super().get(req, lookup)])
         req.args = orig_args
@@ -1007,6 +1007,9 @@ class AgendaService(BaseSearchService):
         if search.args.get("id"):
             search.query["bool"]["filter"].append({"term": {"_id": search.args["id"]}})
 
+        if search.args.get("ids"):
+            search.query["bool"]["filter"].append({"terms": {"_id": search.args["ids"]}})
+
         if search.args.get("bookmarks"):
             set_saved_items_query(search.query, search.args["bookmarks"])
 
@@ -1034,7 +1037,11 @@ class AgendaService(BaseSearchService):
 
         self.set_post_filter(search.source, search, search.item_type)
 
-        if not search.source["from"] and not search.args.get("bookmarks") and not search.args.get("noAggregations"):
+        if (
+            not search.source["from"]
+            and not search.args.get("bookmarks")
+            and strtobool(search.args.get("aggs", "true"))
+        ):
             # avoid aggregations when handling pagination
             search.source["aggs"] = get_agenda_aggregations(search.item_type == "events")
         else:

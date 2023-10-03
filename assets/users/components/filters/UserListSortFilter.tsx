@@ -107,7 +107,7 @@ export class UserListSortFilter extends React.PureComponent<any, any> {
                         onClick={this.onSortChanged}
                     >
                         <i className={classNames(
-                            'icon--filter icon--gray-dark',
+                            'icon--filter',
                             {'rotate-180': this.props.sortDirection === -1}
                         )} />
                     </button>
