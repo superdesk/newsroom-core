@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import moment from 'moment-timezone';
 
 import {IUser} from 'interfaces';
-import {gettext, getScheduledNotificationConfig} from 'utils';
+import {gettext, getScheduledNotificationConfig, TIME_FORMAT_24_HOUR_CLOCK} from 'utils';
 import {modalFormInvalid, modalFormValid} from 'actions';
 import {updateUserNotificationSchedules} from 'user-profile/actions';
 
@@ -30,6 +30,7 @@ const disabledMinutes: Array<number> = minutes.filter((num) => num % 15 !== 0);
 
 class EditNotificationScheduleModalComponent extends React.Component<IProps, IState> {
     formRef: React.RefObject<HTMLFormElement>;
+    private TIME_FORMAT: '24-hours' | '12-hours';
     constructor(props: IProps) {
         super(props);
 
@@ -40,6 +41,8 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
 
         this.onSubmitForm = this.onSubmitForm.bind(this);
         this.formRef = React.createRef<HTMLFormElement>();
+
+        this.TIME_FORMAT = TIME_FORMAT_24_HOUR_CLOCK ? '24-hours' : '12-hours';
     }
 
     componentDidMount() {
@@ -106,6 +109,7 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                         <div className="form-group schedule-times__input-container">
                             <TimePicker
                                 value={this.state.times[0]}
+                                timeFormat={this.TIME_FORMAT}
                                 disabledOptions={{
                                     minutes: disabledMinutes,
                                 }}
@@ -115,6 +119,7 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                             />
                             <TimePicker
                                 value={this.state.times[1]}
+                                timeFormat={this.TIME_FORMAT}
                                 disabledOptions={{
                                     minutes: disabledMinutes,
                                 }}
@@ -124,6 +129,7 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                             />
                             <TimePicker
                                 value={this.state.times[2]}
+                                timeFormat={this.TIME_FORMAT}
                                 disabledOptions={{
                                     minutes: disabledMinutes,
                                 }}
