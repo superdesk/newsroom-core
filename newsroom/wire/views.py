@@ -14,6 +14,7 @@ from flask_babel import gettext
 from superdesk.utc import utcnow
 from superdesk import get_resource_service
 from superdesk.default_settings import strtobool
+from newsroom.auth.utils import check_user_has_products
 
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.products.products import get_products_by_company
@@ -87,6 +88,10 @@ def get_view_data():
     company_id = str(user["company"]) if user and user.get("company") else None
     user_folders = get_user_folders(user, "wire") if user else []
     company_folders = get_company_folders(company, "wire") if company else []
+    products = get_products_by_company(company, product_type="wire") if company else []
+
+    if user:
+        check_user_has_products(user, products)
 
     return {
         "user": user,
@@ -98,7 +103,7 @@ def get_view_data():
             if "wire" in f["types"]
         ],
         "navigations": get_navigations_by_company(company, product_type="wire") if company else [],
-        "products": get_products_by_company(company, product_type="wire") if company else [],
+        "products": products,
         "saved_items": get_bookmarks_count(user["_id"], "wire"),
         "context": "wire",
         "ui_config": get_resource_service("ui_config").get_section_config("wire"),

@@ -9,6 +9,8 @@ from eve.utils import ParsedRequest
 from superdesk import get_resource_service
 
 from newsroom.agenda import blueprint
+from newsroom.auth.utils import check_user_has_products
+from newsroom.products.products import get_products_by_company
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.topics import get_company_folders, get_user_folders, get_user_topics
 from newsroom.navigations.navigations import get_navigations_by_company
@@ -115,6 +117,9 @@ def get_view_data():
     user = get_user()
     topics = get_user_topics(user["_id"]) if user else []
     company = get_company(user) or {}
+    products = get_products_by_company(company, product_type="agenda") if company else []
+    if user:
+        check_user_has_products(user, products)
     return {
         "user": user,
         "company": str(user["company"]) if user and user.get("company") else None,
