@@ -79,6 +79,12 @@
             --icon-size: 20px;
         }
     }
+    &.icon-button--mini {
+        --icon-button-size: var(--icon-button-size--mini);
+        [class^="icon--"], [class*=" icon--"] {
+            --icon-size: 16px;
+        }
+    }
 }
 
 .icon-button[disabled] {
