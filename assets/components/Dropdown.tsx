@@ -48,13 +48,14 @@ export function Dropdown({
         >
             <button
                 type="button"
-                className={classNames({
-                    'nh-dropdown-button--borderless': borderless,
-                    'nh-dropdown-button': !borderless,
-                    'nh-dropdown-button--active': isActive,
-                    'nh-dropdown-button--small': small,
-                    'nh-dropdown-button--stretch': stretch,
-                })
+                className={classNames(
+                    'nh-dropdown-button',
+                    {
+                        'nh-dropdown-button--borderless': borderless,
+                        'nh-dropdown-button--active': isActive,
+                        'nh-dropdown-button--small': small,
+                        'nh-dropdown-button--stretch': stretch,
+                    })
                 }
                 aria-haspopup="true"
                 aria-expanded="false"
