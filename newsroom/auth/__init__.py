@@ -3,7 +3,7 @@ import flask
 
 import superdesk
 
-from typing import Optional
+from typing import Optional, overload
 from bson import ObjectId
 from eve.auth import BasicAuth
 from flask import Blueprint, session, abort
@@ -31,6 +31,13 @@ def get_user(required=False) -> Optional[User]:
         user = None
     if not user and required:
         abort(401)
+    return user
+
+
+def get_user_required() -> User:
+    """Use when there must be a user authenticated."""
+    user = get_user(True)
+    assert user is not None
     return user
 
 

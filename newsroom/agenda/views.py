@@ -1,4 +1,5 @@
 import json
+from typing import Dict
 
 import flask
 from flask import current_app as app, request
@@ -14,7 +15,7 @@ from newsroom.products.products import get_products_by_company
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.topics import get_company_folders, get_user_folders, get_user_topics
 from newsroom.navigations.navigations import get_navigations_by_company
-from newsroom.auth import get_company, get_user, get_user_id
+from newsroom.auth import get_company, get_user, get_user_id, get_user_required
 from newsroom.decorator import login_required, section
 from newsroom.utils import (
     get_entity_or_404,
@@ -113,13 +114,14 @@ def search():
     return send_response("agenda", response)
 
 
-def get_view_data():
-    user = get_user()
+def get_view_data() -> Dict:
+    user = get_user_required()
     topics = get_user_topics(user["_id"]) if user else []
     company = get_company(user) or {}
     products = get_products_by_company(company, product_type="agenda") if company else []
-    if user:
-        check_user_has_products(user, products)
+
+    check_user_has_products(user, products)
+
     return {
         "user": user,
         "company": str(user["company"]) if user and user.get("company") else None,
