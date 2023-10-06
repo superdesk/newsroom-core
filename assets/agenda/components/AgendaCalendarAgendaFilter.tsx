@@ -65,7 +65,7 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent<any, any> {
                 {allCalendarsButton}
                 {!calendarItems.length
                     ? (
-                        <div className='dropdown-item__empty'>No Calendars available</div>
+                        <div className='dropdown-item__empty'>{gettext('No Calendars available')}</div>
                     ) : (
                         <React.Fragment>
                             <h6 className="dropdown-header">{gettext('Events')}</h6>
