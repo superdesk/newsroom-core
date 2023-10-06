@@ -39,11 +39,14 @@ function DropdownFilter({
     getDropdownItems,
     getFilterLabel,
     className,
-    buttonProps,
-    ...props}: any) {
+    filterName,
+    borderless,
+    ...props
+}: any) {
     const isActive = !!(activeFilter[filter.field]);
     const filterLabel = getFilterLabel ? getFilterLabel : getActiveFilterLabel;
     const label = filterLabel(filter, activeFilter, isActive, {...props});
+    const items = getDropdownItems(filter, aggregations, toggleFilter, processBuckets, {...props});
 
     return (
         <Dropdown
@@ -51,15 +54,25 @@ function DropdownFilter({
             icon={filter.icon}
             label={label}
             className={className}
-            buttonProps={buttonProps}
+            borderless={borderless}
         >
             <button
                 type='button'
                 className='dropdown-item'
                 onClick={() => toggleFilter(filter.field, null)}
-            >{gettext(filter.label)}</button>
-            <div className='dropdown-divider'></div>
-            {getDropdownItems(filter, aggregations, toggleFilter, processBuckets, {...props})}
+            >
+                {gettext(filter.label)}
+            </button>
+            <div className='dropdown-divider' />
+            {
+                (items?.length ?? 0) < 1
+                    ? (
+                        <div className='dropdown-item__empty'>
+                            {gettext('No {{filterName}} available', {filterName: filterName ?? 'items'})}
+                        </div>
+                    )
+                    : items
+            }
         </Dropdown>
     );
 }
@@ -74,10 +87,9 @@ DropdownFilter.propTypes = {
     className: PropTypes.string,
     autoToggle: PropTypes.bool,
     onClick: PropTypes.func,
+    filterName: PropTypes.string,
+    borderless: PropTypes.bool,
     locators: PropTypes.any,
-    buttonProps: PropTypes.shape({
-        textOnly: PropTypes.bool,
-    }),
 };
 
 export default DropdownFilter;
