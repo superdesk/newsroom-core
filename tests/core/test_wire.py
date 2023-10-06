@@ -5,6 +5,8 @@ from urllib import parse
 from bson import ObjectId
 from copy import deepcopy
 
+from newsroom.auth.utils import start_user_session
+
 from ..fixtures import (  # noqa: F401
     items,
     init_items,
@@ -253,12 +255,14 @@ def test_search_sort(client, app):
     assert "urn:localhost:flood" == data["_items"][0]["_id"]
 
 
-def test_logged_in_user_no_product_gets_no_results(client, app):
+def test_logged_in_user_no_product_gets_no_results(client, app, public_user):
     with client.session_transaction() as session:
-        session["user"] = str(PUBLIC_USER_ID)
-        session["user_type"] = "public"
+        start_user_session(public_user, session=session)
     resp = client.get("/wire/search")
+    assert 403 == resp.status_code, resp.get_data()
+    resp = client.get("/wire")
     assert 403 == resp.status_code
+    assert "There is no product associated with your user." in resp.get_data().decode()
 
 
 def test_logged_in_user_no_company_gets_no_results(client, app):

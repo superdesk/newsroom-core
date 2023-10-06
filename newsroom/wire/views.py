@@ -1,4 +1,5 @@
 import io
+from typing import Dict
 import flask
 import zipfile
 import superdesk
@@ -14,12 +15,13 @@ from flask_babel import gettext
 from superdesk.utc import utcnow
 from superdesk import get_resource_service
 from superdesk.default_settings import strtobool
+from newsroom.auth.utils import check_user_has_products
 
 from newsroom.navigations.navigations import get_navigations_by_company
 from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
 from newsroom.wire.utils import update_action_list
-from newsroom.auth import get_company, get_user, get_user_id
+from newsroom.auth import get_company, get_user, get_user_id, get_user_required
 from newsroom.decorator import login_required, admin_only, section
 from newsroom.topics import get_user_topics, get_user_folders, get_company_folders
 from newsroom.email import send_template_email, get_language_template_name
@@ -80,13 +82,16 @@ def set_item_permission(item, permitted=True):
         item.pop("associations", None)
 
 
-def get_view_data():
-    user = get_user()
+def get_view_data() -> Dict:
+    user = get_user_required()
     company = get_company(user)
     topics = get_user_topics(user["_id"]) if user else []
     company_id = str(user["company"]) if user and user.get("company") else None
     user_folders = get_user_folders(user, "wire") if user else []
     company_folders = get_company_folders(company, "wire") if company else []
+    products = get_products_by_company(company, product_type="wire") if company else []
+
+    check_user_has_products(user, products)
 
     return {
         "user": user,
@@ -98,7 +103,7 @@ def get_view_data():
             if "wire" in f["types"]
         ],
         "navigations": get_navigations_by_company(company, product_type="wire") if company else [],
-        "products": get_products_by_company(company, product_type="wire") if company else [],
+        "products": products,
         "saved_items": get_bookmarks_count(user["_id"], "wire"),
         "context": "wire",
         "ui_config": get_resource_service("ui_config").get_section_config("wire"),
