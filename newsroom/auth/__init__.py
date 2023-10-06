@@ -3,7 +3,7 @@ import flask
 
 import superdesk
 
-from typing import Optional, overload
+from typing import Optional
 from bson import ObjectId
 from eve.auth import BasicAuth
 from flask import Blueprint, session, abort
