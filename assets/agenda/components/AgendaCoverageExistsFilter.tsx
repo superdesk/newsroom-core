@@ -9,7 +9,6 @@ const filter = {
     label: gettext('Any coverage status'),
     field: 'coverage_status',
     nestedField: 'coverage_status',
-    icon: 'icon-small--coverage-unrecognized',
 };
 
 const FILTER_VALUES = {

@@ -14,7 +14,6 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent<any, any> {
         const calendarFilter = {
             label: gettext('Any calendar'),
             field: 'calendar',
-            icon: 'icon-small--calendar',
             itemTypes: ['events', 'combined'],
             isItemActive: (key: any) => (
                 (this.props.activeFilter.calendar || []).includes(key)
@@ -24,7 +23,6 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent<any, any> {
             label: gettext('Any agenda'),
             field: 'agendas',
             nestedField: 'agenda',
-            icon: 'icon-small--calendar',
             itemTypes: ['planning', 'combined'],
             isItemActive: (key: any) => (
                 (this.props.activeFilter.agendas || []).includes(key)
@@ -45,30 +43,36 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent<any, any> {
             {}
         );
 
+        const allCalendarsButton = (
+            <button
+                type="button"
+                className="dropdown-item"
+                onClick={() => {
+                    this.props.toggleFilter('calendar', null);
+                    this.props.toggleFilter('agendas', null);
+                }}
+            >
+                {gettext('All Calendars')}
+            </button>
+        );
+
         return (
             <Dropdown
                 isActive={isActive}
-                icon="icon-small--calendar"
                 label={gettext('Calendars')}
+                optionLabel={gettext('Calendar')}
             >
-                <button
-                    type="button"
-                    className="dropdown-item"
-                    onClick={() => {
-                        this.props.toggleFilter('calendar', null);
-                        this.props.toggleFilter('agendas', null);
-                    }}
-                >
-                    {gettext('All Calendars')}
-                </button>
-                <div className="dropdown-divider" />
-                {!calendarItems.length ? null : (
-                    <React.Fragment>
-                        <h6 className="dropdown-header">{gettext('Events')}</h6>
-                        {calendarItems}
-                        <div className="dropdown-divider" />
-                    </React.Fragment>
-                )}
+                {allCalendarsButton}
+                {!calendarItems.length
+                    ? (
+                        <div className='dropdown-item__empty'>No Calendars available</div>
+                    ) : (
+                        <React.Fragment>
+                            <h6 className="dropdown-header">{gettext('Events')}</h6>
+                            {calendarItems}
+                            <div className="dropdown-divider" />
+                        </React.Fragment>
+                    )}
                 {!agendaItems.length ? null : (
                     <React.Fragment>
                         <h6 className="dropdown-header">{gettext('Planning')}</h6>
