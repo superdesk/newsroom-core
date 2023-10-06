@@ -441,7 +441,6 @@ export class LocationFilter extends React.Component<any, any> {
             >
                 <DropdownFilterButton
                     id="subnav_location"
-                    icon="icon-small--location"
                     label={this.getFilterLabel()}
                     isActive={isActive}
                     onClick={this.toggleDropdown}
