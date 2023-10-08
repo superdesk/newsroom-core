@@ -19,7 +19,7 @@ interface IProps {
     folders: Array<ITopicFolder>;
     folderPopover: string;
     toggleFolderPopover: (folder: ITopicFolder) => void;
-    moveTopic: (topicId: ITopic['_id'], folder: ITopicFolder | null) => Promise<any>;
+    moveTopic: (topicId: ITopic['_id'], folder: ITopicFolder | null) => Promise<void>;
     saveFolder: (folder: ITopicFolder, updates: Partial<ITopicFolder>) => Promise<any>;
     deleteFolder: (folder: ITopicFolder) => void;
 }
