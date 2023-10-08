@@ -187,37 +187,6 @@ export function shortText(item: any, length: any = 40, config?: any) {
 }
 
 /**
- * Split text into an array of words
- *
- * @todo: Any changes to this code **must** be reflected in the python version as well
- * @see superdesk-client-core:scripts/core/count-words.ts:countWords
- * @see newsroom.utils.split_words
- */
-function splitWords(str: string): Array<string> {
-    const strTrimmed = str.trim();
-
-    if (strTrimmed.length < 1) {
-        return [];
-    }
-
-    return strTrimmed;
-    // .replace(/\n/g, ' ') // replace newlines with spaces
-
-    // // Remove spaces between two numbers
-    // // 1 000 000 000 -> 1000000000
-    // .replace(/([0-9]) ([0-9])/g, '$1$2')
-
-    // // remove anything that is not a unicode letter, a space, comma or a number
-    // .replace(/[^\p{L} 0-9,]/gu, '')
-
-    // // replace two or more spaces with one space
-    // .replace(/ {2,}/g, ' ')
-
-    // .trim()
-    // .split(' ');
-}
-
-/**
  * Extract text from a node, handling both text and element nodes.
  *
  * @param {Node | null} node - The node from which to extract text.
