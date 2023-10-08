@@ -8,6 +8,7 @@ import {ITopic, ITopicFolder, IUser} from 'interfaces';
 
 import {Draggable} from '../../components/drag-and-drop/draggable';
 import {Overlay} from 'components/drag-and-drop/overlay';
+import {useCustomSensors} from 'components/drag-and-drop/use-custom-sensors';
 
 interface IProps {
     topics: Array<ITopic>;
@@ -95,9 +96,12 @@ const TopicList = ({
 
     const topicsWithoutFolder = topics.filter((topic) => topic.folder == null).map((topic) => renderTopic(topic));
 
+    const sensors = useCustomSensors({activationConstraint: {distance: 10}});
+
     return (
         <>
             <DndContext
+                sensors={sensors}
                 autoScroll={{
                     // by default it looks for an element to scroll in order of appearance in the DOM starting from window
                     // in our case with many absolutely positioned modal-like views it works better to reverse the order
