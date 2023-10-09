@@ -53,7 +53,7 @@ class NewsroomWebpack(Webpack):
             self.assets = {}
             return
 
-        if app.config.get("WEBPACK_SERVER_URL"):
+        if app.config.get("WEBPACK_SERVER_URL") and not app.config.get("WEBPACK_IGNORE_SERVER"):
             try:
                 self.assets = session.get(
                     urljoin(app.config["WEBPACK_SERVER_URL"], "manifest.json"),
