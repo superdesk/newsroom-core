@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import moment from 'moment-timezone';
 
 import {IUser} from 'interfaces';
-import {gettext, getScheduledNotificationConfig, TIME_FORMAT_24_HOUR_CLOCK} from 'utils';
+import {gettext, getScheduledNotificationConfig, TIME_FORMAT} from 'utils';
 import {modalFormInvalid, modalFormValid} from 'actions';
 import {updateUserNotificationSchedules} from 'user-profile/actions';
 
@@ -54,7 +54,7 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
         this.onSubmitForm = this.onSubmitForm.bind(this);
         this.formRef = React.createRef<HTMLFormElement>();
 
-        this.TIME_FORMAT = TIME_FORMAT_24_HOUR_CLOCK ? '24-hours' : '12-hours';
+        this.TIME_FORMAT = TIME_FORMAT.split(':')[0] === 'HH' ? '24-hours' : '12-hours';
     }
 
     componentDidMount() {
@@ -139,6 +139,7 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                                         <div className='d-flex flex-column align-items-center gap-2' key={index}>
                                             <TimePicker
                                                 value={this.state.times[index]}
+                                                timeFormat={this.TIME_FORMAT}
                                                 disabledOptions={{
                                                     minutes: disabledMinutes,
                                                 }}

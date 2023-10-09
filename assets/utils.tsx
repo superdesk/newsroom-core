@@ -59,10 +59,6 @@ const getCoverageDateTimeFormat = () =>
 const getCoverageDateFormat = () => getLocaleFormat('COVERAGE_DATE_FORMAT');
 
 export const TIME_FORMAT = getTimeFormat();
-export const TIME_FORMAT_24_HOUR_CLOCK: boolean = new Intl.DateTimeFormat(
-    getLocale(),
-    {timeStyle: 'long'}
-).format(new Date('1970-01-01 16:00')).includes('PM') != true;
 export const DATE_FORMAT = getDateFormat();
 export const COVERAGE_DATE_TIME_FORMAT = getCoverageDateTimeFormat();
 export const COVERAGE_DATE_FORMAT = getCoverageDateFormat();
