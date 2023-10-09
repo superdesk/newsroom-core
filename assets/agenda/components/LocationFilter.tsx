@@ -445,6 +445,7 @@ export class LocationFilter extends React.Component<any, any> {
                     isActive={isActive}
                     onClick={this.toggleDropdown}
                     autoToggle={false}
+                    noLabelWrap={true}
                 />
                 <div
                     className={classNames(

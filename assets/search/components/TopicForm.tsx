@@ -134,6 +134,7 @@ const TopicForm: React.FC<IProps> = ({
                                 }
                             >
                                 <Dropdown
+                                    stretchPopover={true}
                                     small={true}
                                     stretch={true}
                                     icon={'icon--folder'}
@@ -159,6 +160,7 @@ const TopicForm: React.FC<IProps> = ({
                                             onClick={() => onFolderChange(folder)}
                                             disabled={readOnly}
                                         >
+                                            <i className="icon--folder" />
                                             {folder.name}
                                         </button>
                                     ))}

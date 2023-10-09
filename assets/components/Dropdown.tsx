@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import {Dropdown as BootstrapDropdown} from 'bootstrap';
 
 export function Dropdown({
+    stretchPopover,
     children,
     isActive,
     icon,
@@ -11,9 +12,9 @@ export function Dropdown({
     label,
     value,
     className,
+    borderless,
     small,
     stretch,
-    borderless,
     hideLabel,
 }: any) {
     const dropdown: any = React.useRef();
@@ -32,6 +33,8 @@ export function Dropdown({
             document.removeEventListener('click', clickOutside);
         };
     });
+
+    const styleComputed = stretchPopover ? {width: '100%'} : {};
 
     return (
         <div
@@ -72,7 +75,7 @@ export function Dropdown({
                         >
                             {optionLabel}:
                         </span>
-                        <span className='nh-dropdown-button__text-label'>{label}</span>
+                        <span className='nh-dropdown-button__text-value'>{label}</span>
                     </>
                 ) : (
                     <span
@@ -89,7 +92,7 @@ export function Dropdown({
                 )}
                 <i className='nh-dropdown-button__caret icon-small--arrow-down' />
             </button>
-            <div className='dropdown-menu'>
+            <div className='dropdown-menu' style={styleComputed}>
                 {children}
             </div>
         </div>
@@ -108,7 +111,7 @@ Dropdown.propTypes = {
     small: PropTypes.bool,
     stretch: PropTypes.bool,
     optionLabel: PropTypes.string,
+    stretchPopover: PropTypes.bool,
     borderless: PropTypes.bool,
     hideLabel: PropTypes.bool,
-    hideLabelMobile: PropTypes.bool,
 };
