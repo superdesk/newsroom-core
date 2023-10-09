@@ -72,7 +72,7 @@ export function Dropdown({
                         >
                             {optionLabel}:
                         </span>
-                        <span className='nh-dropdown-button__text-label'>{label}</span>
+                        <span className='nh-dropdown-button__text-value'>{label}</span>
                     </>
                 ) : (
                     <span
