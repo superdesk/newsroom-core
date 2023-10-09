@@ -28,7 +28,12 @@ export function EditUserProductPermission({original, user, section, product, sea
         }
     }
     const maxReached = maxSeats && assignedSeats >= maxSeats;
-    const canToggleSeatSelection = hasSeatsAvailable(user.company, seats, product) || currentlyEnabled;
+
+    const canToggleSeatSelection = (
+        hasSeatsAvailable(user.company, seats, product)
+        || currentlyEnabled // it must be possible to un-select
+        || originallyEnabled // it must be possible to un-select and select again
+    );
 
     return (
         <div className="list-item__preview-row">
@@ -36,7 +41,7 @@ export function EditUserProductPermission({original, user, section, product, sea
                 <CheckboxInput
                     name={`products.${section._id}.${product._id}`}
                     label={product.name}
-                    value={currentlyEnabled || unlimited}
+                    value={currentlyEnabled || unlimited} // when seats are unlimited show as always selected and readonly
                     onChange={onChange}
                     readOnly={canToggleSeatSelection !== true}
                 />
