@@ -1,0 +1,41 @@
+{% extends "email_layout.txt" %}
+{% block name %}{% endblock %}
+{% block content %}
+{{ date | notification_datetime }}
+
+Votre sujet enregistré\tNombre
+{% for section, matches in topic_match_table.items() %}
+{% for name, count in matches %}
+Nouveaux éléments de {{ config.AGENDA_SECTION if section == "agenda" else config.WIRE_SECTION }} sur "{{ name }}"\t{{ count }}
+{% endfor %}
+{% endfor %}
+
+{% for section, topic_entries in entries.items() %}
+{% for entry in topic_entries %}
+
+Élément de {{ section }} le plus récent sur {{ entry.topic.label }}
+{% if section == "wire" %}
+{{ entry.item.headline }}
+
+Titre de rappel: {{ entry.item.slugline }} | Source: {{ entry.item.source}}
+Publié le: {{ entry.item.versioncreated | notification_datetime }} | {{ entry.item.body_html | word_count }} words{% if entry.item.service %} mots | Catégorie: {{ entry.item | category_names }}{% endif %}
+{{ short_highlighted_text(get_highlighted_field(entry.item, ["body_html"]), output_html=False) }}
+Consulter cet élément dans votre compte: {{ url_for_wire(entry.item, True, section) }}
+Consulter tous les éléments: {{ url_for('wire.wire', _external=True) }}?topic={{ entry.topic._id }}
+
+{% elif section == "agenda" %}
+
+{{ entry.item.headline or entry.item.name }}
+Date et heure de l’événement: {{ entry.item | agenda_dates_string }}{% if entry.item.location %} | Endroit: {{ entry.item | location_string }}{% endif %}
+Publié le: {{ entry.item.versioncreated | notification_datetime }}{% if entry.item.service %} | Catégorie: {{ entry.item | category_names }}{% endif %}
+
+{{ short_highlighted_text(get_highlighted_field(entry.item, ["definition_long", "description_text", "definition_short"]), output_html=False) }}
+
+Consulter cet élément dans votre compte: {{ url_for_wire(entry.item, True, section) }}
+Consulter tous les éléments: {{ url_for('agenda.index', _external=True) }}?topic={{ entry.topic._id }}
+
+{% endif %}
+
+{% endfor %}
+{% endfor %}
+{% endblock %}
