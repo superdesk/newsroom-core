@@ -1,6 +1,6 @@
-import React, {useState, useRef, useEffect, createRef} from 'react';
+import React, {useState, createRef} from 'react';
 import {get} from 'lodash';
-import {DndContext, TraversalOrder, getScrollableAncestors} from '@dnd-kit/core';
+import {DndContext, TraversalOrder} from '@dnd-kit/core';
 
 import {ITopicAction, Topic} from './Topic';
 import {TopicFolder} from './TopicFolder';
@@ -9,6 +9,7 @@ import {ITopic, ITopicFolder, IUser} from 'interfaces';
 import {Draggable} from '../../components/drag-and-drop/draggable';
 import {Overlay} from 'components/drag-and-drop/overlay';
 import {useCustomSensors} from 'components/drag-and-drop/use-custom-sensors';
+import {useScrollRestore} from 'components/drag-and-drop/use-scroll-restore';
 
 interface IProps {
     topics: Array<ITopic>;
@@ -42,15 +43,6 @@ const TopicList = ({
     }
 
     const [openedFolders, setOpenedFolders] = useState<{[folderId: string]: boolean}>({});
-    const scrollableParent = useRef<Element>();
-    const lastScrollPosition = useRef<number | null>(0); // of scrollable parent
-
-    /** a reference element is needed for finding first scrollable parent */
-    const referenceElement = createRef<HTMLDivElement>();
-
-    useEffect(() => {
-        scrollableParent.current = getScrollableAncestors(referenceElement.current)[0];
-    }, []);
 
     const renderTopic = (topic: ITopic) => {
         const subscription = topic.subscribers?.find((sub) => sub.user_id === user._id);
@@ -98,6 +90,11 @@ const TopicList = ({
 
     const sensors = useCustomSensors({activationConstraint: {distance: 10}});
 
+    /** a reference element is needed for finding first scrollable parent */
+    const referenceElement = createRef<HTMLDivElement>();
+
+    const scrollRestore = useScrollRestore(referenceElement);
+
     return (
         <>
             <DndContext
@@ -109,23 +106,10 @@ const TopicList = ({
                     order: TraversalOrder.ReversedTreeOrder,
                 }}
                 onDragMove={() => {
-                    // remember scroll position
-                    lastScrollPosition.current = scrollableParent.current?.scrollTop ?? null;
+                    scrollRestore.savePosition();
                 }}
                 onDragEnd={(event) => {
-                    setTimeout(() => {
-                        /**
-                         * Restore last scroll position in case auto-scrolling was performed while dragging.
-                         * Without this, after scrolling and dropping, scroll jumps to position as if no scrolling happened.
-                         * I suspect it might be because `moveTopic` is async, the dragging library might assume that dropping was cancelled.
-                         */
-                        if (scrollableParent.current != null && lastScrollPosition.current != null) {
-                            scrollableParent.current.scrollTop = lastScrollPosition.current;
-                        } else {
-                            // reset last scroll position
-                            lastScrollPosition.current = scrollableParent.current?.scrollTop ?? null;
-                        }
-                    });
+                    scrollRestore.restoreSavedPosition();
 
                     const topicId: ITopic['_id'] = event.active.id.toString();
 
