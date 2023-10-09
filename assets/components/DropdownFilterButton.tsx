@@ -2,7 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-function DropdownFilterButton({id, isActive, autoToggle, onClick, icon, label, hideLabel, borderless}: any) {
+function DropdownFilterButton({
+    id,
+    isActive,
+    autoToggle,
+    onClick,
+    icon,
+    label,
+    hideLabel,
+    borderless,
+    noLabelWrap,
+}: any) {
     return (
         <button
             id={id}
@@ -22,9 +32,15 @@ function DropdownFilterButton({id, isActive, autoToggle, onClick, icon, label, h
             {!icon ? null : (
                 <i className={`${icon} d-md-none`} />
             )}
-            <span style={hideLabel ? {display: 'none'} : {}} className="nh-dropdown-button__text-label">
-                {label}
-            </span>
+            {
+                noLabelWrap
+                    ? label
+                    : (
+                        <span style={hideLabel ? {display: 'none'} : {}} className="nh-dropdown-button__text-label">
+                            {label}
+                        </span>
+                    )
+            }
             <i className='nh-dropdown-button__caret icon-small--arrow-down' />
         </button>
     );
@@ -43,6 +59,7 @@ DropdownFilterButton.propTypes = {
     ]),
     hideLabel: PropTypes.bool,
     borderless: PropTypes.bool,
+    noLabelWrap: PropTypes.bool,
 };
 
 DropdownFilterButton.defaultProps = {autoToggle: true};
