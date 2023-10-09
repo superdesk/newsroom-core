@@ -3,7 +3,20 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {Dropdown as BootstrapDropdown} from 'bootstrap';
 
-export function Dropdown({stretchPopover, children, isActive, icon, optionLabel, label, value, className, buttonProps, small, stretch}: any) {
+export function Dropdown({
+    stretchPopover,
+    children,
+    isActive,
+    icon,
+    optionLabel,
+    label,
+    value,
+    className,
+    borderless,
+    small,
+    stretch,
+    hideLabel,
+}: any) {
     const dropdown: any = React.useRef();
     let dropdownInstance: any = null;
 
@@ -21,7 +34,6 @@ export function Dropdown({stretchPopover, children, isActive, icon, optionLabel,
         };
     });
 
-    const textOnly = (buttonProps || {}).textOnly;
     const styleComputed = stretchPopover ? {width: '100%'} : {};
 
     return (
@@ -42,12 +54,12 @@ export function Dropdown({stretchPopover, children, isActive, icon, optionLabel,
                 className={classNames(
                     'nh-dropdown-button',
                     {
+                        'nh-dropdown-button--borderless': borderless,
                         'nh-dropdown-button--active': isActive,
-                        'nh-dropdown-button--text-only': textOnly,
                         'nh-dropdown-button--small': small,
                         'nh-dropdown-button--stretch': stretch,
-                    }
-                )}
+                    })
+                }
                 aria-haspopup="true"
                 aria-expanded="false"
                 ref={dropdown}
@@ -55,12 +67,24 @@ export function Dropdown({stretchPopover, children, isActive, icon, optionLabel,
                 {!icon ? null : (
                     <i className={icon} />
                 )}
-                {textOnly ? label : isActive && optionLabel ? (
+                {(isActive && optionLabel) ? (
                     <>
-                        <span className='nh-dropdown-button__text-label'>{optionLabel}: </span>
+                        <span
+                            style={hideLabel ? {display: 'none'} : {}}
+                            className='nh-dropdown-button__text-label'
+                        >
+                            {optionLabel}:
+                        </span>
                         <span className='nh-dropdown-button__text-value'>{label}</span>
                     </>
-                ) : (<span className='nh-dropdown-button__text-label'>{label}</span>)}
+                ) : (
+                    <span
+                        style={hideLabel ? {display: 'none'} : {}}
+                        className='nh-dropdown-button__text-label'
+                    >
+                        {label}
+                    </span>
+                )}
                 {!value ? null : (
                     <span className="nh-dropdown-button__text-value">
                         {value}
@@ -86,9 +110,8 @@ Dropdown.propTypes = {
     reset: PropTypes.func,
     small: PropTypes.bool,
     stretch: PropTypes.bool,
-    buttonProps: PropTypes.shape({
-        textOnly: PropTypes.bool,
-    }),
     optionLabel: PropTypes.string,
     stretchPopover: PropTypes.bool,
+    borderless: PropTypes.bool,
+    hideLabel: PropTypes.bool,
 };

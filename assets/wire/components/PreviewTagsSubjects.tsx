@@ -25,7 +25,7 @@ function PreviewTagsSubjectsComponent({subjects, displayConfig, urlPrefix, filte
             }
 
             subjectsByScheme[subject.scheme].push(subject);
-        } else {
+        } else if (!subject.scheme || isDisplayed(subject.scheme, displayConfig)) {
             subjectsByScheme.subject.push(subject);
         }
     });

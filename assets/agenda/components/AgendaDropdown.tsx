@@ -9,6 +9,7 @@ interface IProps {
     toggleFilter: (filedName: string, value: any) => void;
     getFilterLabel?: (filter: string, activeFilter: string, isActive: boolean) => string;
     children?: any;
+    borderless?: boolean;
 }
 
 export function AgendaDropdown({
@@ -18,6 +19,7 @@ export function AgendaDropdown({
     toggleFilter,
     children,
     getFilterLabel,
+    borderless,
 }: IProps) {
 
     const isActive = activeFilter[filter.field];
@@ -29,6 +31,7 @@ export function AgendaDropdown({
 
     return (
         <Dropdown
+            borderless={borderless}
             isActive={isActive}
             icon={filter.icon}
             optionLabel={optionLabel}

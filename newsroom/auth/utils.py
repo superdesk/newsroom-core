@@ -7,6 +7,7 @@ from datetime import timedelta
 from typing import Dict, Optional
 from flask import current_app as app
 from flask_babel import _
+from newsroom.exceptions import AuthorizationError
 from newsroom.user_roles import UserRole
 from superdesk.utc import utcnow
 from newsroom.auth import get_user, get_company
@@ -32,6 +33,7 @@ SESSION_AUTH_TTL = timedelta(minutes=15)
 
 def sign_user_by_email(
     email: str,
+    auth_type: AuthProviderType,
     redirect_on_success: str = "wire.index",
     redirect_on_error: str = "auth.login",
     create_missing: bool = False,
@@ -58,7 +60,7 @@ def sign_user_by_email(
 
     if validate_login_attempt:
         company = get_company(user)
-        auth_provider = get_company_auth_provider(company)
+        company_auth_provider = get_company_auth_provider(company)
 
         if company is None:
             return redirect_with_error(_("No Company assigned"))
@@ -68,8 +70,10 @@ def sign_user_by_email(
             return redirect_with_error(_("Company has expired"))
         elif not is_account_enabled(user):
             return redirect_with_error(_("Account is disabled"))
-        elif auth_provider["auth_type"] != AuthProviderType.SAML.value:
-            return redirect_with_error(_("Invalid login type, SAML not enabled for your user"))
+        elif company_auth_provider["auth_type"] != auth_type.value:
+            return redirect_with_error(
+                _("Invalid login type, %(type)s not enabled for your user", type=auth_type.value)
+            )
 
     users.system_update(
         user["_id"],
@@ -209,3 +213,16 @@ def get_company_auth_provider(company: Optional[Company] = None) -> AuthProvider
 
     provider_id = (company or {}).get("auth_provider") or "newshub"
     return providers.get(provider_id) or providers["newshub"]
+
+
+def check_user_has_products(user: User, company_products) -> None:
+    """If user has no products and there are no company products abort page rendering."""
+    unlimited_products = [p for p in (company_products or []) if not p.get("seats")]
+    if (
+        not unlimited_products
+        and not user.get("products")
+        and not (is_current_user_admin() or is_current_user_account_mgr())
+    ):
+        raise AuthorizationError(
+            403, _("There is no product associated with your user. Please reach out to your Company Admin.")
+        )
