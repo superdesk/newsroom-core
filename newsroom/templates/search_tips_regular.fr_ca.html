@@ -1,0 +1,100 @@
+<div class="tips-content">
+    <div>
+        <p><b>Soyez précis.</b> Plus vous utilisez de mots pertinents dans votre recherche, plus vous obtiendrez de bons résultats.</p>
+        <p>
+            Recherche générale = <code>Budget fédéral</code><br/>
+            Recherche precise = <code>Budget fédéral 2023 ministère de la Santé</code>
+        </p>
+    </div>
+    <hr />
+    <div>
+        <p><b>Utilisez les guillemets</b> pour rechercher une phrase.</p>
+        <p>
+            Mauvaise recherche d’une phrase = Avis de tempête hivernale = <code>Avis de tempête hivernale</code><br/>
+            Bonne recherche d’une phrase = <code>“Avis de tempête hivernale”</code>
+        </p>
+    </div>
+    <hr />
+    <div>
+        <p><b>Limitez la recherche à un champ</b></p>
+        <p>Lorsque vous faites une recherche en utilisant la barre de recherche, les mots-clés peuvent, par défaut,  être recherchés dans tous les champs des documents. Les requêtes de recherche peuvent être restreintes à un champ précis, si désiré.</p>
+        <p>Voici des exemples:</p>
+        <ul>
+            <li>Pour trouver la phrase exacte «avis de tempête» dans le corps du texte (CORPS HTML)<br /><code>body_html:"avis de tempête"</code></li>
+            <li>Pour trouver le terme «neige» ou «tempête» dans le champ du titre<br /><code>headline:(neige OR tempête)</code></li>
+            <li>Pour trouver le nom précis «Noel Ransome» dans le champ de signature<br /><code>byline:"Noel Ransome"</code></li>
+            <li>Pour trouver le mot «climat» dans le titre de rappel<br /><code>Slugline:climat</code></li>
+        </ul>
+    </div>
+    <hr />
+    <div>
+        <p><b>Caractères génériques</b></p>
+        <p>Des caractères génériques peuvent être utilisés dans les recherches avec des termes individuels comme <code>?</code> (point d’interrogation) pour remplacer un caractère unique et <code>*</code> (astérisque) pour remplacer aucun ou plusieurs caractères: <code>qu?ck bro*</code></p>
+    </div>
+    <hr />
+    <div>
+        <p><b>Recherche de proximité</b></p>
+        <p>Utilisez  <code>~</code> pour trouver des termes qui se trouvent à n mots l’un de l’autre.</p>
+        <p><code>“mesure climat”~10</code> signifie que ces deux mots doivent se trouver au maximum à 10 mots l’un de l’autre.</p>
+    </div>
+    <hr />
+    <div>
+        <p><b>Autres expressions conditionnelles (booléennes)</b></p>
+        <ul>
+            <li><p>Utilisez <code>+</code> et <code>–</code> pour définir ce qui doit et/ou ne doit pas apparaître:</p></li>
+        </ul>
+        <p><code>tempête hivernale +toronto -québec</code></p>
+        <p>Cette expression spécifie que:</p>
+        <ul>
+            <li>Toronto doit être inclu</li>
+            <li>Québec doit être absent</li>
+            <li>Tempête ou hivernale sont optionnels</li>
+        </ul>
+    </div>
+    <hr />
+    <div>
+        <p><b>Liste d’autres champs ou expressions boléennes courants:</b></p>
+        <ul>
+            <li>Version. Par exemple: <code>genre.name:Agate</code> recherchera des documents dont la version est Agate.</li>
+            <li>Catégorie du fil ou du calendrier. Par exemple: <code>service.name:Affaires</code> recherchera des documents parus sur le fil Affaires, et la même requête dans la section du calendrier recherchera des événements et des couverture dans la catégorie Affaires.</li>
+            <li>Index/Sujet. Par exemple: <code>subject.name:Automobile</code> recherchera des documents dont le sujet ou l’index sont Automobile. </li>
+            <li>Source. Par example: <code>source:La Presse Canadienne</code> recherchera des documents dont la source est La Presse Canadienne.</li>
+            <li>Nombre de mots. Par exemple: <code>wordcount:>100</code> recherchera des documents dont le nombre de mot est supérieur à 100 mots.</li>
+        </ul>
+    </div>
+    <hr />
+    <div>
+        <p><b>Utilisez les filtres pour raffiner vos résultats de recherche sur le fil de presse et dans le calendrier. Nous proposons un certain nombre d’options de filtre.</b></p>
+        <div>
+            <h3><b>Filtres – Fil de presse</b></h3>
+            <ul>
+                <li>Langue – filtrer selon le langage des éléments</li>
+                <li>Source – filtrer selon la source des éléments</li>
+                <li>Catégorie du fil – filtrer selon la catégorie du fil des éléments</li>
+                <li>Sujet – filtrer selon le sujet des éléments</li>
+                <li>Version – filtrer selon la version des éléments</li>
+                <li>Date de publication – filtrer selon la date, ou une plage de dates, de la publication des éléments </li>
+            </ul>
+        </div>
+        <div>
+            <h3><b>Filtres - Calendrier</b></h3>
+        </div>
+        <div>
+            <p><b>Événements:</b> Ce qui va se produire, qui est tangible – un match, une conference de presse, une période de questions au parlement, une comparution en cour, etc.</p>
+        </div>
+        <div>
+            <p><b>Éléments de couverture:</b> Ce que La Presse Canadienne a l’intention de faire par rapport à un événement ou un dossier. Lorsque lié à un événement il signale que l’événement va être couvert. Les éléments de couverture peuvent aussi être indépendants, lorsqu’ils s’intéressent à des sujets ou des dossiers qui ne sont pas associés à un événement.</p>
+        </div>
+        <div>
+            <p><b>Couvertures:</b> Créées dans les Éléments de couverture. Les couvertures peuvent être des textes, des images ou des vidéos.</p>
+            <ul>
+                <li>Langue – filtrer selon le langage des éléments</li>
+                <li>Statut de couverture – filtrer selon le statut de couverture</li>
+                <li>Catégorie – filtrer selon la catégorie d’un événement ou d’un élément de couverture</li>
+                <li>Type d’événement – filtrer selon le type d’événement</li>
+                <li>Sujet – filtrer selon le sujet de l’événement ou de l’élément de couverture</li>
+                <li>Date de l’événement – filtrer selon la date, ou la plage de dates, de l’événement ou de l’élément de couverture</li>
+            </ul>
+        </div>
+    </div>
+</div>
