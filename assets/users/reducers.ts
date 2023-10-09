@@ -17,11 +17,8 @@ import {
 } from './actions';
 
 import {ADD_EDIT_USERS} from 'actions';
-import {companyProductSeatsSelector} from 'company-admin/selectors';
-import {IProduct} from 'interfaces';
 
 import {searchReducer} from 'search/reducers';
-import {hasSeatsAvailable, seatOccupiedByUser} from './utils';
 
 const initialState: any = {
     user: null,
