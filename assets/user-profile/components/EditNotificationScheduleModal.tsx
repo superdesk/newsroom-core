@@ -40,9 +40,10 @@ interface IState {
 const minutes = Array.from(Array(60).keys());
 const disabledMinutes: Array<number> = minutes.filter((num) => num % 15 !== 0);
 
+const timeFormat = TIME_FORMAT.split(':')[0] === 'HH' ? '24-hours' : '12-hours';
+
 class EditNotificationScheduleModalComponent extends React.Component<IProps, IState> {
     formRef: React.RefObject<HTMLFormElement>;
-    private TIME_FORMAT: '24-hours' | '12-hours';
     constructor(props: IProps) {
         super(props);
 
@@ -53,8 +54,6 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
 
         this.onSubmitForm = this.onSubmitForm.bind(this);
         this.formRef = React.createRef<HTMLFormElement>();
-
-        this.TIME_FORMAT = TIME_FORMAT.split(':')[0] === 'HH' ? '24-hours' : '12-hours';
     }
 
     componentDidMount() {
@@ -139,7 +138,7 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                                         <div className='d-flex flex-column align-items-center gap-2' key={index}>
                                             <TimePicker
                                                 value={this.state.times[index]}
-                                                timeFormat={this.TIME_FORMAT}
+                                                timeFormat={timeFormat}
                                                 disabledOptions={{
                                                     minutes: disabledMinutes,
                                                 }}
