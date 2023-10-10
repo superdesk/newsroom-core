@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+    elastic:
+        image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+        environment:
+            - discovery.type=single-node
+        networks:
+            - newsroom
+        tmpfs:
+            - /usr/share/elasticsearch/data
+
+    redis:
+        image: redis:alpine
+        networks:
+            - newsroom
+
+    mongo:
+        image: mongo:4
+        networks:
+            - newsroom
+        tmpfs:
+            - /data/db
+
+    server:
+        build: 
+            context: ../
+            dockerfile: e2e/server/Dockerfile
+        ports:
+            - "5050:5050"
+            - "5150:5150"
+        networks:
+            - newsroom
+        volumes:
+            - ./dist:/opt/client-dist
+        depends_on:
+            - redis
+            - mongo
+            - elastic
+        environment:
+            - WEB_CONCURRENCY=2
+            - WEBPACK_MANIFEST_PATH=/opt/client-dist/manifest.json
+            - MONGO_URI=mongodb://mongo:27017/newsroom
+            - CONTENTAPI_MONGO_URI=mongodb://mongo:27017/newsroom
+            - ELASTICSEARCH_URL=http://elastic:9200
+            - ELASTICSEARCH_INDEX=newsroom
+            - CELERY_BROKER_URL=redis://redis:6379/2
+            - REDIS_URL=redis://redis:6379/2
+            - DEFAULT_TIMEZONE=Europe/Prague
+            - SECRET_KEY=newsroom
+            - NEWSROOM_DEBUG=true
+
+networks:
+    newsroom:
+        driver: bridge

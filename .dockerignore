@@ -1,6 +1,15 @@
 .git
+.github
 .env
+.mypy_cache
+.pytest_cache
+.vscode
+*.egg-info
+__pycache__
 env
 dump
 dist
 node_modules
+design_app
+e2e/dist
+e2e/node_modules
