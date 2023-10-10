@@ -34,6 +34,13 @@ def get_user(required=False) -> Optional[User]:
     return user
 
 
+def get_user_required() -> User:
+    """Use when there must be a user authenticated."""
+    user = get_user(True)
+    assert user is not None
+    return user
+
+
 def get_company(user=None, required=False) -> Optional[Company]:
     if user is None:
         user = get_user(required=required)

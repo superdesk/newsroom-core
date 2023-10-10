@@ -3,7 +3,20 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {Dropdown as BootstrapDropdown} from 'bootstrap';
 
-export function Dropdown({children, isActive, icon, label, value, className, buttonProps, small, stretch}: any) {
+export function Dropdown({
+    stretchPopover,
+    children,
+    isActive,
+    icon,
+    optionLabel,
+    label,
+    value,
+    className,
+    borderless,
+    small,
+    stretch,
+    hideLabel,
+}: any) {
     const dropdown: any = React.useRef();
     let dropdownInstance: any = null;
 
@@ -21,53 +34,69 @@ export function Dropdown({children, isActive, icon, label, value, className, but
         };
     });
 
-    const textOnly = (buttonProps || {}).textOnly;
+    const styleComputed = stretchPopover ? {width: '100%'} : {};
 
-    return (<div
-        className={classNames(
-            'dropdown',
-            className ? className : ''
-        )}
-        onClick={(event: any) => {
-            event.stopPropagation();
-            dropdownInstance.toggle();
-        }}
-        data-test-id="dropdown-btn"
-    >
-        <button
-            type="button"
+    return (
+        <div
             className={classNames(
-                'nh-dropdown-button',
-                {
-                    active: isActive,
-                    'nh-dropdown-button--text-only': textOnly,
-                    'nh-dropdown-button--small': small,
-                    'nh-dropdown-button--stretch': stretch,
-                }
+                'dropdown',
+                className ? className : '',
+                icon != null ? 'nh-dropdown-button--with-icon' : ''
             )}
-            aria-haspopup="true"
-            aria-expanded="false"
-            ref={dropdown}
+            onClick={(event: any) => {
+                event.stopPropagation();
+                dropdownInstance.toggle();
+            }}
+            data-test-id="dropdown-btn"
         >
-            {!icon ? null : (
-                <i className={icon} />
-            )}
-            {textOnly ? label : (
-                <span className="nh-dropdown-button__text-label">
-                    {label}
-                </span>
-            )}
-            {!value ? null : (
-                <span className="nh-dropdown-button__text-value">
-                    {value}
-                </span>
-            )}
-            <i className='nh-dropdown-button__caret icon-small--arrow-down' />
-        </button>
-        <div className='dropdown-menu'>
-            {children}
+            <button
+                type="button"
+                className={classNames(
+                    'nh-dropdown-button',
+                    {
+                        'nh-dropdown-button--borderless': borderless,
+                        'nh-dropdown-button--active': isActive,
+                        'nh-dropdown-button--small': small,
+                        'nh-dropdown-button--stretch': stretch,
+                    })
+                }
+                aria-haspopup="true"
+                aria-expanded="false"
+                ref={dropdown}
+            >
+                {!icon ? null : (
+                    <i className={icon} />
+                )}
+                {(isActive && optionLabel) ? (
+                    <>
+                        <span
+                            style={hideLabel ? {display: 'none'} : {}}
+                            className='nh-dropdown-button__text-label'
+                        >
+                            {optionLabel}:
+                        </span>
+                        <span className='nh-dropdown-button__text-value'>{label}</span>
+                    </>
+                ) : (
+                    <span
+                        style={hideLabel ? {display: 'none'} : {}}
+                        className='nh-dropdown-button__text-label'
+                    >
+                        {label}
+                    </span>
+                )}
+                {!value ? null : (
+                    <span className="nh-dropdown-button__text-value">
+                        {value}
+                    </span>
+                )}
+                <i className='nh-dropdown-button__caret icon-small--arrow-down' />
+            </button>
+            <div className='dropdown-menu' style={styleComputed}>
+                {children}
+            </div>
         </div>
-    </div>);
+    );
 }
 
 Dropdown.propTypes = {
@@ -81,7 +110,8 @@ Dropdown.propTypes = {
     reset: PropTypes.func,
     small: PropTypes.bool,
     stretch: PropTypes.bool,
-    buttonProps: PropTypes.shape({
-        textOnly: PropTypes.bool,
-    }),
+    optionLabel: PropTypes.string,
+    stretchPopover: PropTypes.bool,
+    borderless: PropTypes.bool,
+    hideLabel: PropTypes.bool,
 };

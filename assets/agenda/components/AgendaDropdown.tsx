@@ -1,9 +1,26 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 import {Dropdown} from '../../components/Dropdown';
 
-export function AgendaDropdown({filter, activeFilter, toggleFilter, children, getFilterLabel}: any) {
+interface IProps {
+    filter: any;
+    optionLabel?: string;
+    activeFilter?: any;
+    toggleFilter: (filedName: string, value: any) => void;
+    getFilterLabel?: (filter: string, activeFilter: string, isActive: boolean) => string;
+    children?: any;
+    borderless?: boolean;
+}
+
+export function AgendaDropdown({
+    filter,
+    optionLabel,
+    activeFilter,
+    toggleFilter,
+    children,
+    getFilterLabel,
+    borderless,
+}: IProps) {
 
     const isActive = activeFilter[filter.field];
     const getActiveFilterLabel = getFilterLabel != null ?
@@ -14,25 +31,21 @@ export function AgendaDropdown({filter, activeFilter, toggleFilter, children, ge
 
     return (
         <Dropdown
+            borderless={borderless}
+            isActive={isActive}
             icon={filter.icon}
+            optionLabel={optionLabel}
             label={getActiveFilterLabel(filter, activeFilter, isActive)}
         >
             <button
                 type='button'
                 className='dropdown-item'
                 onClick={() => toggleFilter(filter.field, null)}
-            >{gettext(filter.label)}</button>
+            >
+                {gettext(filter.label)}
+            </button>
             <div className='dropdown-divider'></div>
             {children}
         </Dropdown>
     );
 }
-
-AgendaDropdown.propTypes = {
-    children: PropTypes.node,
-    filter: PropTypes.object,
-    toggleFilter: PropTypes.func,
-    activeFilter: PropTypes.object,
-    getFilterLabel: PropTypes.func,
-};
-

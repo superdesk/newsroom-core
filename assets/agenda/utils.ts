@@ -594,7 +594,7 @@ export function getHighlightedName(item: any) {
  * @return {String}
  */
 export function getDescription(item: any, plan: any) {
-    return plan != null ? plan.description_text : (item ? item.definition_short : '');
+    return plan?.description_text || item?.definition_short || '';
 }
 
 /**

@@ -19,14 +19,15 @@ function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter, eventsOnlyAccess, 
     const filter: any = {
         label: gettext('Events & Coverages'),
         field: 'itemType',
-        icon: 'icon-small--coverage-infographics'
     };
 
     return (
-        <AgendaDropdown key={filter.field}
+        <AgendaDropdown
+            key={filter.field}
             filter={filter}
             activeFilter={activeFilter}
             toggleFilter={toggleFilter}
+            optionLabel={gettext('Item type')}
         >
             <button
                 key="events_only"

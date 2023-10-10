@@ -356,6 +356,7 @@ $container-max-widths: (
 
     --icon-button-size: 40px;
     --icon-button-size--small: 32px;
+    --icon-button-size--mini: 20px;
 
 
     // COMPONENT: CARD ITEM & SIMPLE CARD ITEM
@@ -564,7 +565,7 @@ $container-max-widths: (
     --form-check-color-bg--checked: var(--color-core-checked-bg);
 
     // COMPONENT: CONTENT LIST ITEM
-    --content-list-item-padding: var(--space--2) var(--space--3);
+    --content-list-item-padding: var(--space--1-5) var(--space--1) var(--space--1-5) var(--space--2);
     --content-list-item-border-radius: var(--border-radius--s);
     --content-list-item-color-bg: hsl(0,0%,100%);
     --content-list-item-color-bg--watched: hsl(222, 16%, 94%);

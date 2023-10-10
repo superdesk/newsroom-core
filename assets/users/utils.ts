@@ -81,7 +81,7 @@ export function hasSeatsAvailable(companyId: ICompany['_id'], seats: ISeats, pro
     const seatsForProduct = companySeats[product._id];
 
     if (hasUnlimitedSeats(companyId, seats, product)) {
-        return true;
+        return false; // when seats are unlimited - it's shown as seated by default and not available for manual selection
     } else {
         return seatsForProduct.assigned_seats < seatsForProduct.max_seats;
     }

@@ -9,7 +9,6 @@ const filter = {
     label: gettext('Any coverage status'),
     field: 'coverage_status',
     nestedField: 'coverage_status',
-    icon: 'icon-small--coverage-unrecognized',
 };
 
 const FILTER_VALUES = {
@@ -43,6 +42,7 @@ function AgendaCoverageExistsFilter ({toggleFilter, activeFilter}: any) {
             activeFilter={activeFilter}
             toggleFilter={toggleFilter}
             getFilterLabel={getActiveFilterLabel}
+            optionLabel={gettext('Coverage')}
         >
             <button
                 key='coverage-planned'

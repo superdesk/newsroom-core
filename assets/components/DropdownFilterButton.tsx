@@ -2,16 +2,26 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-function DropdownFilterButton({id, isActive, autoToggle, onClick, icon, label, textOnly}: any) {
+function DropdownFilterButton({
+    id,
+    isActive,
+    autoToggle,
+    onClick,
+    icon,
+    label,
+    hideLabel,
+    borderless,
+    noLabelWrap,
+}: any) {
     return (
         <button
             id={id}
             type="button"
             className={classNames(
-                'nh-dropdown-button',
                 {
+                    'nh-dropdown-button--borderless': borderless,
+                    'nh-dropdown-button': !borderless,
                     'nh-dropdown-button--active': isActive,
-                    'nh-dropdown-button--text-only': textOnly,
                 }
             )}
             data-bs-toggle={autoToggle ? 'dropdown' : undefined}
@@ -22,12 +32,16 @@ function DropdownFilterButton({id, isActive, autoToggle, onClick, icon, label, t
             {!icon ? null : (
                 <i className={`${icon} d-md-none`} />
             )}
-            {textOnly ? label : (
-                <span className="d-none d-md-block">
-                    {label}
-                </span>
-            )}
-            <i className='icon-small--arrow-down' />
+            {
+                noLabelWrap
+                    ? label
+                    : (
+                        <span style={hideLabel ? {display: 'none'} : {}} className="nh-dropdown-button__text-label">
+                            {label}
+                        </span>
+                    )
+            }
+            <i className='nh-dropdown-button__caret icon-small--arrow-down' />
         </button>
     );
 }
@@ -43,7 +57,9 @@ DropdownFilterButton.propTypes = {
         PropTypes.node,
         PropTypes.string
     ]),
-    textOnly: PropTypes.bool,
+    hideLabel: PropTypes.bool,
+    borderless: PropTypes.bool,
+    noLabelWrap: PropTypes.bool,
 };
 
 DropdownFilterButton.defaultProps = {autoToggle: true};

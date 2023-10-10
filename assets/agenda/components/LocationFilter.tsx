@@ -402,13 +402,28 @@ export class LocationFilter extends React.Component<any, any> {
 
         switch (activeFilter.type) {
         case LOCATION_TYPE.CITY:
-            return gettext('City: {{ name }}', {name: activeFilter.name});
+            return (
+                <>
+                    <span className='nh-dropdown-button__text-label'>{gettext('City')}: </span>
+                    <span className='nh-dropdown-button__text-value'>{activeFilter.name}</span>
+                </>
+            );
         case LOCATION_TYPE.STATE:
-            return gettext('State: {{ name }}', {name: activeFilter.name});
+            return (
+                <>
+                    <span className='nh-dropdown-button__text-label'>{gettext('State')}: </span>
+                    <span className='nh-dropdown-button__text-value'>{activeFilter.name}</span>
+                </>
+            );
         case LOCATION_TYPE.COUNTRY:
-            return gettext('Country: {{ name }}', {name: activeFilter.name});
+            return (
+                <>
+                    <span className='nh-dropdown-button__text-label'>{gettext('Country')}: </span>
+                    <span className='nh-dropdown-button__text-value'>{activeFilter.name}</span>
+                </>
+            );
         case LOCATION_TYPE.PLACE:
-            return activeFilter.name;
+            return <span className='nh-dropdown-button__text-value'>{activeFilter.name}</span> ;
         default:
             return gettext('Any location');
         }
@@ -426,11 +441,11 @@ export class LocationFilter extends React.Component<any, any> {
             >
                 <DropdownFilterButton
                     id="subnav_location"
-                    icon="icon-small--location"
                     label={this.getFilterLabel()}
                     isActive={isActive}
                     onClick={this.toggleDropdown}
                     autoToggle={false}
+                    noLabelWrap={true}
                 />
                 <div
                     className={classNames(

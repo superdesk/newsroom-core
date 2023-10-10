@@ -9,12 +9,7 @@ import {updateUserNotificationSchedules} from 'user-profile/actions';
 
 import Modal from 'components/Modal';
 import {TimezoneInput} from 'components/TimezoneInput';
-
-const NOTIFICATION_TIME_OBJECT: React.InputHTMLAttributes<HTMLInputElement> = {
-    type: 'time',
-    min: '00:00',
-    step: '900',
-};
+import {TimePicker} from 'components/cards/TimePicker';
 
 interface IProps {
     modalFormInvalid(): void;
@@ -25,11 +20,25 @@ interface IProps {
     };
 }
 
+interface IAddButton {
+    type: 'add'
+}
+
+interface IRemoveButton {
+    type: 'remove';
+    index: number;
+}
+
+type IButtonType = IAddButton | IRemoveButton;
+
+
 interface IState {
     timezone: string;
     times: Array<string>;
 }
 
+const minutes = Array.from(Array(60).keys());
+const disabledMinutes: Array<number> = minutes.filter((num) => num % 15 !== 0);
 
 class EditNotificationScheduleModalComponent extends React.Component<IProps, IState> {
     formRef: React.RefObject<HTMLFormElement>;
@@ -55,7 +64,21 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
 
             times[index] = newTime;
 
-            return {times: times.sort()};
+            return {times};
+        });
+    }
+
+    updateNumberPerDay(props: IButtonType) {
+        const times = [...this.state.times];        
+
+        if (props.type === 'add') {
+            times.push(this.state.times[this.state.times.length - 1]);
+        } else {
+            times.splice(props.index, 1);
+        }
+
+        this.setState({
+            times: [...times]
         });
     }
 
@@ -106,43 +129,54 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                         ref={this.formRef}
                         onSubmit={(event) => this.onSubmitForm(event)}
                     >
-                        <div className="form-group schedule-times__input-container">
-                            <input
-                                type={NOTIFICATION_TIME_OBJECT.type}
-                                value={this.state.times[0]}
+                        <div className='d-flex flex-column align-items-center'>
+                            <div className="form-group schedule-times__input-container d-flex justify-content-center">
+                                {this.state.times.map((_time, index) => {
+                                    return (
+                                        <div className='d-flex flex-column align-items-center gap-2' key={index}>
+                                            <TimePicker
+                                                value={this.state.times[index]}
+                                                disabledOptions={{
+                                                    minutes: disabledMinutes,
+                                                }}
+                                                onChange={(value) => {
+                                                    this.updateTime(value, index);
+                                                }}
+                                            />
+                                            <button
+                                                type='button'
+                                                className="icon-button icon-button--mini icon-button--secondary icon-button--bordered"
+                                                data-test-id="remove-schedule"
+                                                aria-label={gettext('Remove schedule')}
+                                                disabled={this.state.times.length < 2}
+                                                onClick={() => this.updateNumberPerDay({type: 'remove', index})}
+                                            >
+                                                <i className="icon--minus" />
+                                            </button>
+                                        </div>
+                                    );
+                                })}
+                                {this.state.times.length < 3 && (
+                                    <button
+                                        type='button'
+                                        className="icon-button icon-button--secondary icon-button--bordered"
+                                        data-test-id="add-schedule"
+                                        aria-label={gettext('Add schedule')}
+                                        onClick={() => this.updateNumberPerDay({type:'add'})}
+                                    >
+                                        <i className="icon--plus" />
+                                    </button>
+                                )}  
+                            </div>
+                            <TimezoneInput
+                                name="timezone"
+                                label={gettext('Timezone')}
                                 onChange={(event) => {
-                                    this.updateTime(event.target.value, 0);
+                                    this.setState({timezone: event.target.value});
                                 }}
-                                step={NOTIFICATION_TIME_OBJECT.step}
-                                min={NOTIFICATION_TIME_OBJECT.min}
-                            />
-                            <input
-                                type={NOTIFICATION_TIME_OBJECT.type}
-                                value={this.state.times[1]}
-                                onChange={(event) => {
-                                    this.updateTime(event.target.value, 1);
-                                }}
-                                step={NOTIFICATION_TIME_OBJECT.step}
-                                min={NOTIFICATION_TIME_OBJECT.min}
-                            />
-                            <input
-                                type={NOTIFICATION_TIME_OBJECT.type}
-                                value={this.state.times[2]}
-                                onChange={(event) => {
-                                    this.updateTime(event.target.value, 2);
-                                }}
-                                step={NOTIFICATION_TIME_OBJECT.step}
-                                min={NOTIFICATION_TIME_OBJECT.min}
+                                value={this.state.timezone}
                             />
                         </div>
-                        <TimezoneInput
-                            name="timezone"
-                            label={gettext('Timezone')}
-                            onChange={(event) => {
-                                this.setState({timezone: event.target.value});
-                            }}
-                            value={this.state.timezone}
-                        />
                     </form>
                 </div>
             </Modal>

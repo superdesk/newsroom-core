@@ -32,6 +32,8 @@ function getCalendarClass(item: any) {
 }
 
 export default function AgendaMetaTime({item, borderRight, isRecurring, group, isMobilePhone, onlyDates}: any): any {
+    const icon = item.item_type === 'planning' ? 'icon--planning' : 'icon--calendar';
+
     const times = (
         <div key="times" className={classNames(
             bem('wire-articles__item', 'meta-time', {'border-right': borderRight}),
@@ -51,7 +53,7 @@ export default function AgendaMetaTime({item, borderRight, isRecurring, group, i
                 'wire-articles__item__icon',
                 {'dashed-border': isMobilePhone}
             )}>
-                <i className={`icon--calendar ${getCalendarClass(item)}`} />
+                <i className={`${icon} ${getCalendarClass(item)}`} />
                 {isRecurring && <span className="time-icon"><i className="icon-small--repeat" /></span>}
             </span>
         </div>

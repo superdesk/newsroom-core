@@ -1,4 +1,4 @@
-from superdesk.default_settings import urlparse
+from urllib.parse import urlparse
 from newsroom.web.default_settings import (  # noqa
     env,
     ELASTICSEARCH_URL,
