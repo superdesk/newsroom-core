@@ -10,6 +10,7 @@ interface IProps {
     getFilterLabel?: (filter: string, activeFilter: string, isActive: boolean) => string;
     children?: any;
     borderless?: boolean;
+    resetOptionLabel?: string;
 }
 
 export function AgendaDropdown({
@@ -20,6 +21,7 @@ export function AgendaDropdown({
     children,
     getFilterLabel,
     borderless,
+    resetOptionLabel,
 }: IProps) {
 
     const isActive = activeFilter[filter.field];
@@ -37,14 +39,18 @@ export function AgendaDropdown({
             optionLabel={optionLabel}
             label={getActiveFilterLabel(filter, activeFilter, isActive)}
         >
-            <button
-                type='button'
-                className='dropdown-item'
-                onClick={() => toggleFilter(filter.field, null)}
-            >
-                {gettext(filter.label)}
-            </button>
-            <div className='dropdown-divider'></div>
+            {isActive ? (
+                <>
+                    <button
+                        type='button'
+                        className='dropdown-item'
+                        onClick={() => toggleFilter(filter.field, null)}
+                    >
+                        {resetOptionLabel ?? gettext(filter.label)}
+                    </button>
+                    <div className='dropdown-divider'></div>
+                </>
+            ) : null}
             {children}
         </Dropdown>
     );

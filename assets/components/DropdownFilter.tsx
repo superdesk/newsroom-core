@@ -41,12 +41,14 @@ function DropdownFilter({
     className,
     filterName,
     borderless,
+    resetOptionLabel,
     ...props
 }: any) {
     const isActive = !!(activeFilter[filter.field]);
     const filterLabel = getFilterLabel ? getFilterLabel : getActiveFilterLabel;
     const label = filterLabel(filter, activeFilter, isActive, {...props});
     const items = getDropdownItems(filter, aggregations, toggleFilter, processBuckets, {...props});
+    const hasItemsAvailable = (items?.length ?? 0) > 0;
 
     return (
         <Dropdown
@@ -56,22 +58,22 @@ function DropdownFilter({
             className={className}
             borderless={borderless}
         >
-            <button
-                type='button'
-                className='dropdown-item'
-                onClick={() => toggleFilter(filter.field, null)}
-            >
-                {gettext(filter.label)}
-            </button>
+            {hasItemsAvailable || isActive && (
+                <button
+                    type='button'
+                    className='dropdown-item'
+                    onClick={() => toggleFilter(filter.field, null)}
+                >
+                    {resetOptionLabel ?? gettext(filter.label)}
+                </button>
+            )}
             <div className='dropdown-divider' />
             {
-                (items?.length ?? 0) < 1
-                    ? (
-                        <div className='dropdown-item__empty'>
-                            {gettext('No {{filterName}} available', {filterName: filterName ?? 'items'})}
-                        </div>
-                    )
-                    : items
+                hasItemsAvailable ? items : (
+                    <div className='dropdown-item__empty'>
+                        {gettext('No {{filterName}} available', {filterName: filterName ?? 'items'})}
+                    </div>
+                )
             }
         </Dropdown>
     );
@@ -90,6 +92,7 @@ DropdownFilter.propTypes = {
     filterName: PropTypes.string,
     borderless: PropTypes.bool,
     locators: PropTypes.any,
+    resetOptionLabel: PropTypes.string,
 };
 
 export default DropdownFilter;
