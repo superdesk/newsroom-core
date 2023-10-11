@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import moment from 'moment-timezone';
 
 import {IUser} from 'interfaces';
-import {gettext, getScheduledNotificationConfig} from 'utils';
+import {gettext, getScheduledNotificationConfig, TIME_FORMAT} from 'utils';
 import {modalFormInvalid, modalFormValid} from 'actions';
 import {updateUserNotificationSchedules} from 'user-profile/actions';
 
@@ -39,6 +39,8 @@ interface IState {
 
 const minutes = Array.from(Array(60).keys());
 const disabledMinutes: Array<number> = minutes.filter((num) => num % 15 !== 0);
+
+const timeFormat = TIME_FORMAT.split(':')[0] === 'HH' ? '24-hours' : '12-hours';
 
 class EditNotificationScheduleModalComponent extends React.Component<IProps, IState> {
     formRef: React.RefObject<HTMLFormElement>;
@@ -136,6 +138,7 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
                                         <div className='d-flex flex-column align-items-center gap-2' key={index}>
                                             <TimePicker
                                                 value={this.state.times[index]}
+                                                timeFormat={timeFormat}
                                                 disabledOptions={{
                                                     minutes: disabledMinutes,
                                                 }}
