@@ -21,6 +21,9 @@ export function AgendaDropdown({
     children,
     getFilterLabel,
     borderless,
+    
+    // Choose a custom label for the reset button
+    // if it's not provided it falls back to the filter label
     resetOptionLabel,
 }: IProps) {
 
