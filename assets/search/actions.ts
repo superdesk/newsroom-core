@@ -182,6 +182,12 @@ export function resetFilter(filter?: any) {
     };
 }
 
+export const CLEAR_QUICK_FILTER = 'CLEAR_QUICK_FILTER';
+export function clearQuickFilter(filter?: string) {
+    return {type: CLEAR_QUICK_FILTER, filter};
+}
+
+
 export const SET_VIEW = 'SET_VIEW';
 export function setView(view: any) {
     localStorage.setItem('view', view);

@@ -8,6 +8,7 @@ import {IFilterGroup, INavigation, ISearchFields, ISearchParams, ITopic, IUser} 
 import {SearchResultTagList} from './SearchResultTagList';
 import {gettext} from 'utils';
 import {getTopicUrl} from 'search/utils';
+import {SearchResultsAgendaQuickFilters} from './SearchResultsAgendaQucikFiltersRow';
 
 export interface IProps {
     user: IUser;
@@ -100,6 +101,7 @@ export function SearchResultTagsList({
                 resetFilter={resetFilter}
                 readonly={readonly}
             />
+            <SearchResultsAgendaQuickFilters />
             {readonly === true && activeTopic._id && (
                 <SearchResultTagList
                     testId="search-results--edit-button"

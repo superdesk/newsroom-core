@@ -1,12 +1,11 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
-
 import {gettext, getCreatedSearchParamLabel} from 'utils';
 
 import {SearchResultTagList} from './SearchResultTagList';
 import {Tag} from 'components/Tag';
 
 import {IProps as IParentProps} from './SearchResultTagsList';
+import {SearchResultsAgendaQuickFilters} from './SearchResultsAgendaQucikFiltersRow';
 
 type IProps = Pick<IParentProps,
     'readonly' |
@@ -144,11 +143,3 @@ export function SearchResultsFiltersRow({readonly, searchParams, filterGroups, t
         />
     );
 }
-
-SearchResultsFiltersRow.propTypes = {
-    searchParams: PropTypes.object,
-    filterGroups: PropTypes.object,
-    toggleFilter: PropTypes.func.isRequired,
-    setCreatedFilter: PropTypes.func.isRequired,
-    resetFilter: PropTypes.func.isRequired,
-};
