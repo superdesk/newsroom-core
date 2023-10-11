@@ -3,6 +3,7 @@ import {padStart, range} from 'lodash';
 
 interface IProps {
     value: string; // ISO 8601, 13:59:01
+    timeFormat: '12-hours' | '24-hours' 
     allowSeconds?: boolean;
     disabledOptions: {
         hours?: Array<number>;
@@ -16,8 +17,6 @@ interface IProps {
 type ITimeUnit = 'hours' | 'minutes' | 'seconds';
 
 export class TimePicker extends React.PureComponent<IProps> {
-    private is12HourFormat: boolean;
-
     constructor(props: IProps) {
         super(props);
 
@@ -25,9 +24,6 @@ export class TimePicker extends React.PureComponent<IProps> {
         this.getCorrectedTime = this.getCorrectedTime.bind(this);
         this.getOptionsForTimeUnit = this.getOptionsForTimeUnit.bind(this);
         this.padValue = this.padValue.bind(this);
-
-        const hour = new Date().toLocaleTimeString([], {hour: 'numeric'});
-        this.is12HourFormat = hour.includes('AM') || hour.includes('PM');
     }
 
     /**
@@ -58,7 +54,7 @@ export class TimePicker extends React.PureComponent<IProps> {
 
         const timeUnitArray = (() => {
             if (timeUnit === 'hours') {
-                if (this.is12HourFormat) {
+                if (this.props.timeFormat === '12-hours') {
                     return format12HourArr;
                 } else {
                     return range(24);
@@ -96,7 +92,7 @@ export class TimePicker extends React.PureComponent<IProps> {
             }
         })();
 
-        current[index] = this.is12HourFormat ? updated12HourValue : newValue;
+        current[index] = this.props.timeFormat === '12-hours' ? updated12HourValue : newValue;
 
         this.props.onChange(current.join(':'));
     }
@@ -126,7 +122,7 @@ export class TimePicker extends React.PureComponent<IProps> {
         /**
         * updating the initial value from props
         */
-        if (this.is12HourFormat) {
+        if (this.props.timeFormat === '12-hours') {
             if (parseInt(timeUnitValuesArray[0], 10) > 12) {
                 timeUnitValuesArray[0] = this.padValue(parseInt(timeUnitValuesArray[0], 10) - 12);
             }
@@ -186,7 +182,7 @@ export class TimePicker extends React.PureComponent<IProps> {
                     </div>
                 )}
 
-                {this.is12HourFormat && (
+                {this.props.timeFormat === '12-hours' && (
                     <div className='time-picker__select-wrapper'>
                         <span className='time-picker__suffix' />
                         <select
