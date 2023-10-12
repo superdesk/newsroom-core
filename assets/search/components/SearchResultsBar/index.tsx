@@ -176,7 +176,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                         this.props.refresh();
                                     }}
                                 >
-                                    {gettext('Clear all')}
+                                    {gettext('Clear All')}
                                 </button>
                                 <button
                                     data-test-id="toggle-search-bar"

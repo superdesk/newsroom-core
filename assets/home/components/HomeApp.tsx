@@ -282,7 +282,7 @@ class HomeApp extends React.Component<IProps, IState> {
                                                         },
                                                         {
                                                             _id: 'my-home',
-                                                            name: gettext('My home')
+                                                            name: gettext('My Home')
                                                         },
                                                     ]}
                                                     activeOptionId={this.state.activeOptionId}

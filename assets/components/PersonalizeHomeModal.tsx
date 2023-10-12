@@ -272,11 +272,11 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                                 options={[
                                     {
                                         _id: '1',
-                                        name: gettext('My topics'),
+                                        name: gettext('My Topics'),
                                     },
                                     {
                                         _id: '2',
-                                        name: gettext('Company topics'),
+                                        name: gettext('Company Topics'),
                                     },
                                 ]}
                                 switchOptions={(optionId) => {

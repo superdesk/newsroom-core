@@ -6,7 +6,7 @@ import {gettext, formatDate, formatTime} from 'utils';
 export default function Preview(props: any) {
     return (
         <div className='wire-column__preview__items' role={gettext('dialog')} aria-label={gettext('Article Preview')}>
-            <h3 className="a11y-only">{gettext('Article preview')}</h3>
+            <h3 className="a11y-only">{gettext('Article Preview')}</h3>
             <div className="wire-column__preview__top-bar pt-2 pb-0">
                 <div className='wire-column__preview__date'>{gettext('Published on {{ date }} at {{ time }}', {
                     date: formatDate(props.published),
