@@ -139,7 +139,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                             </label>
                             {user.user_type !== 'administrator' ? null : (
                                 <label className="label label--green label--fill label--big label--rounded">
-                                    {gettext('admin')}
+                                    {gettext('Admin')}
                                 </label>
                             )}
                             {!showResendInvite ? null : (

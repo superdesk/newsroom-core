@@ -8,17 +8,17 @@ export function getUserStateLabelDetails(user: any) {
     if (user.is_approved && user.is_enabled && user.is_validated) {
         return {
             colour: 'green',
-            text: gettext('active'),
+            text: gettext('Active'),
         };
     } else if (!user.is_approved || !user.is_validated) {
         return {
             colour: 'orange2',
-            text: gettext('pending'),
+            text: gettext('Pending'),
         };
     } else {
         return {
             colour: 'red',
-            text: gettext('disabled'),
+            text: gettext('Disabled'),
         };
     }
 }
@@ -45,11 +45,11 @@ export function CompanyUserListItem({user, onClick, selected, sections}: any) {
                     {user.first_name} {user.last_name}
                     {user.user_type === 'company_admin' ?
                         <label className="label label--restricted label--rounded label--fill">
-                            {gettext('company admin')}
+                            {gettext('Company Admin')}
                         </label>
                         : user.user_type === 'administrator' ?
                             <label className="label label--restricted label--rounded label--fill">
-                                {gettext('admin')}
+                                {gettext('Admin')}
                             </label> : null}
                 </div>
                 <div className="email">

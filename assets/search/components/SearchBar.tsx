@@ -56,7 +56,7 @@ class SearchBar extends React.Component<any, any> {
                     <form
                         className={classNames('search__form', {'search__form--active': !!this.state.query,})}
                         role="search"
-                        aria-label={gettext('search')}
+                        aria-label={gettext('Search')}
                         onSubmit={this.onSubmit}>
                         <input
                             type='text'
@@ -98,7 +98,7 @@ class SearchBar extends React.Component<any, any> {
                         <button
                             data-test-id="show-search-tips-panel-btn"
                             className="icon-button icon-button--tertiary icon-button--bordered"
-                            aria-label={gettext('Show Search tips')}
+                            aria-label={gettext('Show Search Tips')}
                             onClick={this.props.toggleSearchTipsPanel}
                         >
                             <i className="icon--info" />

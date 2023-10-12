@@ -128,7 +128,7 @@ class UserProfile extends React.Component<IProps, any> {
                             <div className="col-lg-12 mb-2">
                                 <CheckboxInput
                                     name='receive_app_notifications'
-                                    label={gettext('Receive inApp notifications')}
+                                    label={gettext('Receive App Notifications')}
                                     value={!!user.receive_app_notifications}
                                     onChange={onChange}
                                 />
@@ -137,7 +137,7 @@ class UserProfile extends React.Component<IProps, any> {
                             <div className="col-lg-12">
                                 <CheckboxInput
                                     name='receive_email'
-                                    label={gettext('Receive email notifications')}
+                                    label={gettext('Receive Email Notifications')}
                                     value={!!user.receive_email}
                                     onChange={onChange}
                                 />

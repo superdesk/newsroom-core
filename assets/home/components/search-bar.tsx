@@ -17,7 +17,7 @@ export class SearchBar extends React.PureComponent<any, any> {
                             className={classNames('search__form', {'search__form--active': !!this.state.value,})}
                             action="/wire"
                             role="search"
-                            aria-label={gettext('search')}>
+                            aria-label={gettext('Search')}>
                             <input
                                 type="text" name="q"
                                 className="search__input form-control"
