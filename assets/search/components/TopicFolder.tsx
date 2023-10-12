@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import {TopicFolderEditor} from './TopicFolderEditor';
 import {TopicFolderActions} from './TopicFolderActions';
 import {ITopicFolder} from 'interfaces';
+import {useDroppable} from '@dnd-kit/core';
 
 const EDITING_OFF = 0;
 const EDITING_ON = 1;
@@ -15,10 +16,12 @@ interface IProps {
     topics: any;
     folderPopover: string;
     toggleFolderPopover: (folder: any) => void;
-    moveTopic: any;
     saveFolder: any;
     deleteFolder: any;
     children: any;
+
+    opened: boolean;
+    setOpened: (val: boolean) => void;
 
     /**
      * Used to track the order of every topic folder
@@ -33,15 +36,14 @@ export function TopicFolder({
     topics,
     folderPopover,
     toggleFolderPopover,
-    moveTopic,
     saveFolder,
     deleteFolder,
     children,
+    opened,
+    setOpened,
     index,
 }: IProps) {
-    const [opened, setOpened] = useState(false);
     const [editing, setEditing] = useState(EDITING_OFF);
-    const [dragover, setDragOver] = useState(false);
     const buttonRef = useRef(null);
 
     const actions = [
@@ -62,29 +64,15 @@ export function TopicFolder({
         },
     ];
 
+    const {setNodeRef, isOver} = useDroppable({
+        id: folder._id,
+    });
+
     return (
         <div
             key={folder._id}
             className="simple-card__group"
             data-test-id={`folder-card--${folder.name}`}
-            onDragOver={(event) => {
-                event.preventDefault();
-                event.dataTransfer.dropEffect = 'move';
-                setDragOver(true);
-            }}
-            onDragLeave={() => {
-                setDragOver(false);
-            }}
-            onDrop={(event) => {
-                const topic = event.dataTransfer.getData('topic');
-
-                setDragOver(false);
-                moveTopic(topic, folder).then(() => {
-                    if (!opened) {
-                        setOpened(true);
-                    }
-                });
-            }}
         >
             {editing ? (
                 <TopicFolderEditor
@@ -97,9 +85,12 @@ export function TopicFolder({
                     onCancel={() => setEditing(EDITING_OFF)}
                 />
             ) : (
-                <div className={classNames('simple-card__group-header', {
-                    'simple-card__group-header--ondragover': dragover,
-                })}>
+                <div
+                    className={classNames('simple-card__group-header', {
+                        'simple-card__group-header--ondragover': isOver,
+                    })}
+                    ref={setNodeRef}
+                >
                     {opened ? (
                         <button
                             type="button"
