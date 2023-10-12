@@ -166,7 +166,7 @@ class EditMonitoringProfile extends React.Component<any, any> {
 
                                     <SelectInput
                                         name='alert_type'
-                                        label={gettext('Alert type')}
+                                        label={gettext('Alert Type')}
                                         value={item.alert_type || 'full_text'}
                                         options={[
                                             {value: 'linked_text', text: 'Linked extract(s)'},
@@ -177,7 +177,7 @@ class EditMonitoringProfile extends React.Component<any, any> {
 
                                     <SelectInput
                                         name='format_type'
-                                        label={gettext('Format type')}
+                                        label={gettext('Format Type')}
                                         value={item.format_type || 'monitoring_pdf'}
                                         options={[
                                             {value: 'monitoring_pdf', text: 'PDF'},
