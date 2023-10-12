@@ -59,7 +59,10 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent<any, any> {
         return (
             <Dropdown
                 isActive={isActive}
-                label={gettext('Calendars')}
+                label={isActive
+                    ? (this.props.activeFilter.calendar ?? this.props.activeFilter.agendas)
+                    : gettext('Calendars')
+                }
                 optionLabel={gettext('Calendar')}
             >
                 {allCalendarsButton}
@@ -67,17 +70,17 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent<any, any> {
                     ? (
                         <div className='dropdown-item__empty'>{gettext('No Calendars available')}</div>
                     ) : (
-                        <React.Fragment>
+                        <>
                             <h6 className="dropdown-header">{gettext('Events')}</h6>
                             {calendarItems}
                             <div className="dropdown-divider" />
-                        </React.Fragment>
+                        </>
                     )}
                 {!agendaItems.length ? null : (
-                    <React.Fragment>
+                    <>
                         <h6 className="dropdown-header">{gettext('Planning')}</h6>
                         {agendaItems}
-                    </React.Fragment>
+                    </>
                 )}
             </Dropdown>
         );
