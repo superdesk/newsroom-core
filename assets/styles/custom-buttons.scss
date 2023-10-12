@@ -263,7 +263,7 @@
     font-size: var(--text-size--medium);
     letter-spacing: 0;
     text-transform: none;
-    gap: var(--space--1);
+    gap: var(--space--0-5);
     position: relative;
     color: var(--color-text--muted);
     font-weight: 400;
@@ -285,6 +285,7 @@
     .nh-dropdown-button__caret {
         color: var(--color-text--muted);
         margin-inline-start: auto;
+        width:20px
     }
     [class^="icon--"],
     [class*=" icon--"] {

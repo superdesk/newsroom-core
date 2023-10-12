@@ -12,6 +12,8 @@ interface IProps {
     children?: any;
     borderless?: boolean;
     dropdownMenuHeader?: string;
+    resetOptionLabel?: string;
+    hideLabelOnMobile?: boolean;
 }
 
 export function AgendaDropdown({
@@ -23,6 +25,11 @@ export function AgendaDropdown({
     getFilterLabel,
     borderless,
     dropdownMenuHeader,
+    hideLabelOnMobile,
+    
+    // Choose a custom label for the reset button
+    // if it's not provided it falls back to the filter label
+    resetOptionLabel,
 }: IProps) {
 
     const isActive = activeFilter[filter.field];
@@ -40,14 +47,19 @@ export function AgendaDropdown({
             optionLabel={optionLabel}
             label={getActiveFilterLabel(filter, activeFilter, isActive)}
             dropdownMenuHeader={dropdownMenuHeader}
+            hideLabelOnMobile={hideLabelOnMobile}
         >
-            <button
-                type='button'
-                className='dropdown-item dropdown-item--emphasized'
-                onClick={() => toggleFilter(filter.field, null)}
-            >
-                {gettext(filter.label)}
-            </button>
+            {isActive ? (
+                <>
+                    <button
+                        type='button'
+                        className='dropdown-item dropdown-item--emphasized'
+                        onClick={() => toggleFilter(filter.field, null)}
+                    >
+                        {resetOptionLabel ?? gettext(filter.label)}
+                    </button>
+                </>
+            ) : null}
             {children}
         </Dropdown>
     );

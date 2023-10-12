@@ -32,7 +32,6 @@
         bottom: calc(var(--footer-height) + 10px);
         width: unset;
         max-height: unset;
-        background-color: transparent;
     }
 }
 
@@ -55,6 +54,7 @@
     color: var(--color-text);
     transition: all var(--transition-base) !important;
     box-shadow: inset 0 0 0 0 transparent;
+    white-space: normal;
     &:focus {
         outline: none;
         box-shadow: none;
@@ -91,6 +91,11 @@
     margin: var(--space--1);
     color: var(--color-text--muted);
     line-height: 1.1;
+}
+.dropdown-item--emphasized {
+    background-color: transparent;
+    font-weight: 500;
+    background-color: hsla(0, 0%, 0%, 0.03);
 }
 
 .dropdown-menu-right {
@@ -147,8 +152,14 @@
         flex-grow: 1;
         margin-inline-end: var(--space--1);
     }
+    &:first-child {
+        margin-block-start: var(--space--1-5);
+    }
 }
 
+.dropdown-menu__header + .dropdown-menu__section-heading {
+    margin-block-start: var(--space--1);
+}
 
 .dropdown-divider {
     margin: 0.3rem 0;
@@ -181,21 +192,43 @@
             white-space: nowrap;
             @include phone {
                 .nh-dropdown-button__text-label {
-                    display: none;
+                    position: absolute;
+                    top: 0;
+                    z-index: -1;
+                    pointer-events: none;
+                    opacity: 0 !important;
+                    height: 0 !important;
+                    width: 0 !important;
+                    min-width: 0 !important;
+                    min-height: 0 !important;
+                    overflow: hidden !important;
+                    font-size: 0.01px !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
                 }
             }
         }
     }
 }
 
-
-
 .nh-dropdown-button {
     &.nh-dropdown-button--active {
         @include phone {
             .nh-dropdown-button__text-label {
                 &.nh-dropdown-button__text-label--hide-on-mobile {
-                    display: none;
+                    position: absolute;
+                    top: 0;
+                    z-index: -1;
+                    pointer-events: none;
+                    opacity: 0 !important;
+                    height: 0 !important;
+                    width: 0 !important;
+                    min-width: 0 !important;
+                    min-height: 0 !important;
+                    overflow: hidden !important;
+                    font-size: 0.01px !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
                 }
             }
         }

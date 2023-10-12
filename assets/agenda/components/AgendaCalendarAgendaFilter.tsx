@@ -42,6 +42,8 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent<any, any> {
             processBuckets,
             {}
         );
+        const hasItemsAvailable = calendarItems?.length || agendaItems?.length;
+        const isSelected = this.props.activeFilter.calendar || this.props.activeFilter.agendas;
 
         const allCalendarsButton = (
             <button
@@ -59,26 +61,37 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent<any, any> {
         return (
             <Dropdown
                 isActive={isActive}
-                label={gettext('Calendar')}
+                label={isActive
+                    ? (this.props.activeFilter.calendar ?? this.props.activeFilter.agendas)
+                    : gettext('Calendar')
+                }
                 optionLabel={gettext('Calendar')}
                 dropdownMenuHeader={gettext('Calendars')}
+                hideLabelOnMobile
+
             >
-                {allCalendarsButton}
+                {!!hasItemsAvailable && isActive && isSelected && (
+                    allCalendarsButton
+                )}
+
+
+                
+                
 
                 {!calendarItems.length
                     ? (
                         <div className='dropdown-item__empty'>{gettext('No Calendars available')}</div>
                     ) : (
-                        <React.Fragment>
+                        <>
                             <h6 className="dropdown-menu__section-heading">{gettext('Events')}</h6>
                             {calendarItems}
-                        </React.Fragment>
+                        </>
                     )}
                 {!agendaItems.length ? null : (
-                    <React.Fragment>
+                    <>
                         <h6 className="dropdown-menu__section-heading">{gettext('Planning')}</h6>
                         {agendaItems}
-                    </React.Fragment>
+                    </>
                 )}
             </Dropdown>
         );

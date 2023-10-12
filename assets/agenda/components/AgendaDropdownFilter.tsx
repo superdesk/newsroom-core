@@ -11,13 +11,14 @@ const processBuckets = (buckets: any, filter: any, toggleFilter: any, dropdownMe
         onClick={() => toggleFilter(filter.field, bucket.key)}
     >{filter.transform ? filter.transform(bucket.key) : bucket.key}</button>);
 
-function AgendaDropdownFilter({aggregations, filter, toggleFilter, activeFilter, getDropdownItems, dropdownMenuHeader}: any) {
+function AgendaDropdownFilter({aggregations, filter, toggleFilter, activeFilter, getDropdownItems, dropdownMenuHeader, hideLabelOnMobile}: any) {
     return (
         <AgendaDropdown
             filter={filter}
             activeFilter={activeFilter}
             toggleFilter={toggleFilter}
             dropdownMenuHeader={dropdownMenuHeader}
+            hideLabelOnMobile={hideLabelOnMobile}
 
         >
             {getDropdownItems(filter, aggregations, toggleFilter, processBuckets)}
@@ -32,6 +33,7 @@ AgendaDropdownFilter.propTypes = {
     activeFilter: PropTypes.object,
     getDropdownItems: PropTypes.func,
     dropdownMenuHeader: PropTypes.string,
+    hideLabelOnMobile: PropTypes.bool,
 };
 
 export default AgendaDropdownFilter;
