@@ -150,7 +150,6 @@ class AgendaApp extends BaseApp {
             this.props.activeQuery != null ||
             this.props.itemTypeFilter != null;
 
-        // console.log(this.props.itemTypeFilter, this.props.activeFilter);
         return (
             (this.props.itemToOpen ? [<AgendaItemDetails key="itemDetails"
                 item={this.props.itemToOpen}

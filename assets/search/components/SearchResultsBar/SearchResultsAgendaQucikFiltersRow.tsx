@@ -10,7 +10,24 @@ import {clearQuickFilter} from 'search/actions';
 import {agendaCoverageStatusFilter, getActiveFilterLabel} from 'agenda/components/AgendaCoverageExistsFilter';
 import {setItemTypeFilter} from 'agenda/actions';
 
-type IProps = any;
+interface IReduxStateProps {
+    itemTypeFilter?: string;
+    activeFilter?: {
+        calendar?: any;
+        location?: any;
+        region?: any;
+        coverage_type?: any;
+        coverage_status?: any;
+    };
+}
+
+interface IReduxDispatchProps {
+    clearQuickFilter: (filter: string) => void;
+    clearItemTypeFilter: () => void;
+    clearAllQuickFilters: () => void;
+}
+
+type IProps = IReduxDispatchProps & IReduxStateProps;
 
 function SearchResultsAgendaQuickFiltersRow({
     itemTypeFilter,
@@ -159,5 +176,5 @@ const mapDispatchToProps = (dispatch: any) => ({
 });
 
 
-export const SearchResultsAgendaQuickFilters: React.ComponentType<any> =
-    connect<any>(mapStateToProps, mapDispatchToProps)(SearchResultsAgendaQuickFiltersRow);
+export const SearchResultsAgendaQuickFilters: React.ComponentType =
+    connect<IReduxStateProps, IReduxDispatchProps>(mapStateToProps, mapDispatchToProps)(SearchResultsAgendaQuickFiltersRow);
