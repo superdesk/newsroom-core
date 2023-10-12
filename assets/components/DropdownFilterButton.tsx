@@ -45,7 +45,7 @@ function DropdownFilterButton({
                                     'nh-dropdown-button__text-label--hide-on-mobile': hideLabelOnMobile,
                                 })
                             }
-                            >
+                        >
                             {label}
                         </span>
                     )

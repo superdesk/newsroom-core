@@ -86,7 +86,7 @@ export function Dropdown({
                     </>
                 ) : (
                     <span
-                    className={classNames(
+                        className={classNames(
                             'nh-dropdown-button__text-label',
                             {
                                 'a11y-only': hideLabel,
