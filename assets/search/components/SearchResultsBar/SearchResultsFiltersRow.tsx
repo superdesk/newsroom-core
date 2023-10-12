@@ -5,7 +5,6 @@ import {SearchResultTagList} from './SearchResultTagList';
 import {Tag} from 'components/Tag';
 
 import {IProps as IParentProps} from './SearchResultTagsList';
-import {SearchResultsAgendaQuickFilters} from './SearchResultsAgendaQucikFiltersRow';
 
 type IProps = Pick<IParentProps,
     'readonly' |
@@ -80,7 +79,7 @@ export function SearchResultsFiltersRow({readonly, searchParams, filterGroups, t
         }
     }
 
-    if (searchParams.filter != null) {
+    if (searchParams.filter != null && location.pathname.includes('/agenda') !== true) {
         for (const field in searchParams.filter) {
             const group = filterGroups[field];
 

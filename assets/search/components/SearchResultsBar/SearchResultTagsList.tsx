@@ -101,7 +101,9 @@ export function SearchResultTagsList({
                 resetFilter={resetFilter}
                 readonly={readonly}
             />
-            <SearchResultsAgendaQuickFilters />
+            {location.pathname.includes('/agenda') && (
+                <SearchResultsAgendaQuickFilters />
+            )}
             {readonly === true && activeTopic._id && (
                 <SearchResultTagList
                     testId="search-results--edit-button"

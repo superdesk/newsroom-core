@@ -112,7 +112,7 @@ function SearchResultsAgendaQuickFiltersRow({
     }
 
     if ((pills?.length ?? 0) < 1) {
-        return <li>no content</li>;
+        return null;
     }
 
     pills.push(
@@ -138,7 +138,7 @@ function SearchResultsAgendaQuickFiltersRow({
     return (
         <SearchResultTagList
             testId="search-results--filters"
-            title={gettext('Quick filters')}
+            title={gettext('Quick filters applied')}
             tags={pills}
         />
     );
