@@ -28,6 +28,7 @@ function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter, eventsOnlyAccess, 
             activeFilter={activeFilter}
             toggleFilter={toggleFilter}
             optionLabel={gettext('Item type')}
+            dropdownMenuHeader={gettext('Item type')}
         >
             <button
                 key="events_only"

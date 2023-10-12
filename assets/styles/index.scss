@@ -80,6 +80,7 @@ label {
 .alertify-notifier {
     .ajs-message {
         border: none;
+        border-radius: var(--ajs-message-border-radius);
     }
     .ajs-message.ajs-visible {
         font-size: 0.875rem; // 14px
@@ -88,10 +89,10 @@ label {
         text-shadow: none;
     }
     .ajs-message.ajs-success {
-        background: $pink;
+        background: var(--ajs-message-color-bg--success);
     }
     .ajs-message.ajs-error {
-        background: #cc0000;
+        background: var(--ajs-message-color-bg--error);
     }
 }
 
@@ -4274,5 +4275,12 @@ article.list {
     }
     .wire-articles__item__meta-info {
         row-gap: var(--space--0-5);
+    }
+}
+
+.list-item__preview-content {
+    .search-result__tags-list {
+        background-color: transparent;
+        box-shadow: none;
     }
 }

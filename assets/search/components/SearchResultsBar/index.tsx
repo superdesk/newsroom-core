@@ -150,6 +150,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                     label={gettext('Sort by:')}
                                     value={gettext('{{sort}}', {sort: this.state.sortValue})}
                                     className={'sorting-dropdown'}
+                                    dropdownMenuHeader={gettext('Sort results by')}
                                 >
                                     {
                                         this.sortValues.map((option) => (

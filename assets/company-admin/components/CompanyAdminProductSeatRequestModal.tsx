@@ -117,7 +117,7 @@ class CompanyAdminProductSeatRequestModalComponent extends React.Component<any, 
                         <ul className="dropdown-menu">
                             {sectionProducts.map((section: any, index: any) => (
                                 <React.Fragment key={section._id}>
-                                    <h6 className="dropdown-header">
+                                    <h6 className="dropdown-menu__header">
                                         {section.name}
                                     </h6>
                                     <div className="dropdown-divider" />

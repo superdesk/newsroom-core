@@ -5,11 +5,13 @@ import {Dropdown} from '../../components/Dropdown';
 interface IProps {
     filter: any;
     optionLabel?: string;
+    label?: string;
     activeFilter?: any;
     toggleFilter: (filedName: string, value: any) => void;
     getFilterLabel?: (filter: string, activeFilter: string, isActive: boolean) => string;
     children?: any;
     borderless?: boolean;
+    dropdownMenuHeader?: string;
 }
 
 export function AgendaDropdown({
@@ -20,6 +22,7 @@ export function AgendaDropdown({
     children,
     getFilterLabel,
     borderless,
+    dropdownMenuHeader,
 }: IProps) {
 
     const isActive = activeFilter[filter.field];
@@ -36,15 +39,15 @@ export function AgendaDropdown({
             icon={filter.icon}
             optionLabel={optionLabel}
             label={getActiveFilterLabel(filter, activeFilter, isActive)}
+            dropdownMenuHeader={dropdownMenuHeader}
         >
             <button
                 type='button'
-                className='dropdown-item'
+                className='dropdown-item dropdown-item--emphasized'
                 onClick={() => toggleFilter(filter.field, null)}
             >
                 {gettext(filter.label)}
             </button>
-            <div className='dropdown-divider'></div>
             {children}
         </Dropdown>
     );

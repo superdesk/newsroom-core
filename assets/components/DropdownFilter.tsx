@@ -41,6 +41,7 @@ function DropdownFilter({
     className,
     filterName,
     borderless,
+    dropdownMenuHeader,
     ...props
 }: any) {
     const isActive = !!(activeFilter[filter.field]);
@@ -55,15 +56,21 @@ function DropdownFilter({
             label={label}
             className={className}
             borderless={borderless}
+            dropdownMenuHeader={dropdownMenuHeader}
         >
-            <button
-                type='button'
-                className='dropdown-item'
-                onClick={() => toggleFilter(filter.field, null)}
-            >
-                {gettext(filter.label)}
-            </button>
-            <div className='dropdown-divider' />
+            {
+                (items?.length ?? 0) > 1
+                    ? (
+                        <button
+                            type='button'
+                            className='dropdown-item dropdown-item--emphasized'
+                            onClick={() => toggleFilter(filter.field, null)}
+                        >
+                            {gettext(filter.label)}
+                        </button>
+                    )
+                    : items
+            }
             {
                 (items?.length ?? 0) < 1
                     ? (
@@ -90,6 +97,7 @@ DropdownFilter.propTypes = {
     filterName: PropTypes.string,
     borderless: PropTypes.bool,
     locators: PropTypes.any,
+    dropdownMenuHeader: PropTypes.string,
 };
 
 export default DropdownFilter;

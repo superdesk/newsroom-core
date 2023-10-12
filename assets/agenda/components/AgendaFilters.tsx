@@ -59,6 +59,7 @@ const renderFilter: any = {
                 activeFilter={props.activeFilter}
                 getDropdownItems={getDropdownItems}
                 locators={props.locators}
+                dropdownMenuHeader={gettext('Regions')}
                 getFilterLabel={(filter: any, activeFilter: any, isActive: any, props: any) => {
                     if (!isActive) {
                         return filter.label;
@@ -91,6 +92,7 @@ const renderFilter: any = {
                 toggleFilter={props.toggleFilter}
                 activeFilter={props.activeFilter}
                 getDropdownItems={getDropdownItems}
+                dropdownMenuHeader={gettext('Coverage type')}
                 filter={{
                     label: gettext('Any coverage type'),
                     field: 'coverage',

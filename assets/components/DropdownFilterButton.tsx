@@ -30,7 +30,7 @@ function DropdownFilterButton({
             onClick={onClick}
         >
             {!icon ? null : (
-                <i className={`${icon} d-md-none`} />
+                <i className={`${icon}`} />
             )}
             {
                 noLabelWrap

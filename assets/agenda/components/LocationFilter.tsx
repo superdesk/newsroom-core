@@ -425,7 +425,7 @@ export class LocationFilter extends React.Component<any, any> {
         case LOCATION_TYPE.PLACE:
             return <span className='nh-dropdown-button__text-value'>{activeFilter.name}</span> ;
         default:
-            return gettext('Any location');
+            return gettext('Location');
         }
     }
 
@@ -454,6 +454,9 @@ export class LocationFilter extends React.Component<any, any> {
                     )}
                     aria-labelledby="subnav_location"
                 >
+                    <div className="dropdown-menu__header">
+                        {gettext('Location')}
+                    </div>
                     <div className="d-flex flex-column h-100 d-md-block p-md-2">
                         <div>
                             <input
@@ -477,17 +480,19 @@ export class LocationFilter extends React.Component<any, any> {
                                 {show: this.state.popupOpen}
                             )}
                         >
+                            {/* <div className="dropdown-menu__header">
+                                {gettext('Location')}
+                            </div> */}
                             {!isActive ? null : (
                                 <React.Fragment>
                                     <button
                                         type="button"
-                                        className="dropdown-item"
+                                        className="dropdown-item dropdown-item--emphasized"
                                         onClick={() => this.onChange()}
                                         ref={(ref: any) => this.dom.clearButton = ref}
                                     >
                                         {gettext('Any location')}
                                     </button>
-                                    <div className="dropdown-divider" />
                                 </React.Fragment>
                             )}
 
@@ -500,7 +505,7 @@ export class LocationFilter extends React.Component<any, any> {
                                 </div>
                             ) : (
                                 <React.Fragment>
-                                    <h6 className="dropdown-header">{gettext('Regions')}</h6>
+                                    <h6 className="dropdown-menu__section-heading">{gettext('Regions')}</h6>
                                     {this.state.results.regions.length > 0 ? (
                                         this.state.results.regions.map(this.renderRegionSearchResult)
                                     ) : (
@@ -512,9 +517,8 @@ export class LocationFilter extends React.Component<any, any> {
                                             {gettext('No regions found')}
                                         </button>
                                     )}
-                                    <div className="dropdown-divider" />
 
-                                    <h6 className="dropdown-header">{gettext('Places')}</h6>
+                                    <h6 className="dropdown-menu__section-heading">{gettext('Places')}</h6>
                                     {this.state.results.places.length > 0 ? (
                                         this.state.results.places.map(this.renderRegionSearchResult)
                                     ) : (

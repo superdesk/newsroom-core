@@ -16,6 +16,8 @@ export function Dropdown({
     small,
     stretch,
     hideLabel,
+    hideLabelOnMobile,
+    dropdownMenuHeader,
 }: any) {
     const dropdown: any = React.useRef();
     let dropdownInstance: any = null;
@@ -41,7 +43,6 @@ export function Dropdown({
             className={classNames(
                 'dropdown',
                 className ? className : '',
-                icon != null ? 'nh-dropdown-button--with-icon' : ''
             )}
             onClick={(event: any) => {
                 event.stopPropagation();
@@ -58,6 +59,7 @@ export function Dropdown({
                         'nh-dropdown-button--active': isActive,
                         'nh-dropdown-button--small': small,
                         'nh-dropdown-button--stretch': stretch,
+                        'nh-dropdown-button--with-icon': icon,
                     })
                 }
                 aria-haspopup="true"
@@ -70,8 +72,13 @@ export function Dropdown({
                 {(isActive && optionLabel) ? (
                     <>
                         <span
-                            style={hideLabel ? {display: 'none'} : {}}
-                            className='nh-dropdown-button__text-label'
+                            className={classNames(
+                                'nh-dropdown-button__text-label',
+                                {
+                                    'a11y-only': hideLabel,
+                                    'nh-dropdown-button__text-label--hide-on-mobile': hideLabelOnMobile,
+                                })
+                            }
                         >
                             {optionLabel}:
                         </span>
@@ -79,8 +86,13 @@ export function Dropdown({
                     </>
                 ) : (
                     <span
-                        style={hideLabel ? {display: 'none'} : {}}
-                        className='nh-dropdown-button__text-label'
+                    className={classNames(
+                            'nh-dropdown-button__text-label',
+                            {
+                                'a11y-only': hideLabel,
+                                'nh-dropdown-button__text-label--hide-on-mobile': hideLabelOnMobile,
+                            })
+                        }
                     >
                         {label}
                     </span>
@@ -93,6 +105,11 @@ export function Dropdown({
                 <i className='nh-dropdown-button__caret icon-small--arrow-down' />
             </button>
             <div className='dropdown-menu' style={styleComputed}>
+                {!dropdownMenuHeader ? null : (
+                    <div className="dropdown-menu__header">
+                        {dropdownMenuHeader}
+                    </div>
+                )}
                 {children}
             </div>
         </div>
@@ -114,4 +131,6 @@ Dropdown.propTypes = {
     stretchPopover: PropTypes.bool,
     borderless: PropTypes.bool,
     hideLabel: PropTypes.bool,
+    hideLabelOnMobile: PropTypes.bool,
+    dropdownMenuHeader: PropTypes.string,
 };

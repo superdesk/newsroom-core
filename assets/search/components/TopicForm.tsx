@@ -128,10 +128,7 @@ const TopicForm: React.FC<IProps> = ({
                     <FormSection initiallyOpen={true} name={gettext('Organize your Topic')} dataTestId="topic-form-group--folder">
                         <>
                             <div
-                                className={
-                                    'nh-container nh-container--direction-row mb-3 pt-2 pb-3'
-                                    + (folders.length > 0 ? '' : ' nh-container--highlight text-start')
-                                }
+                                className='nh-container nh-container--direction-row mb-3 pt-2 pb-3'
                             >
                                 <Dropdown
                                     stretchPopover={true}
@@ -164,19 +161,27 @@ const TopicForm: React.FC<IProps> = ({
                                             {folder.name}
                                         </button>
                                     ))}
-                                    <button
-                                        type='button'
-                                        className="dropdown-item"
-                                        onClick={() => {
-                                            setNewFolder({});
-                                        }}
-                                    >
-                                        {gettext('Create new folder')}
-                                    </button>
+                                    <div className="dropdown-menu__footer">
+                                        <button
+                                            type='button'
+                                            className="dropdown-item"
+                                            onClick={() => {
+                                                setNewFolder({});
+                                            }}
+                                        >
+                                            <i className="icon--folder-create" />
+                                            {gettext('Create new folder')}
+                                        </button>
+
+                                    </div>
+
                                 </Dropdown>
                             </div>
                             {newFolder != null && (
-                                <div className="simple-card__group">
+                                <div 
+                                    style={{zIndex:'1', insetBlockStart: '-75px', marginBlockEnd: '-56px'}}
+                                    className="simple-card__group position-relative"
+                                >
                                     <TopicFolderEditor
                                         onSave={((name) => {
                                             saveFolder(newFolder, {name}, topic.is_global);
