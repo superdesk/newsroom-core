@@ -42,17 +42,19 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent<any, any> {
             processBuckets,
             {}
         );
+        const hasItemsAvailable = calendarItems?.length || agendaItems?.length;
+        const isSelected = this.props.activeFilter.calendar || this.props.activeFilter.agendas;
 
         const allCalendarsButton = (
             <button
                 type="button"
-                className="dropdown-item"
+                className="dropdown-item dropdown-item--emphasized"
                 onClick={() => {
                     this.props.toggleFilter('calendar', null);
                     this.props.toggleFilter('agendas', null);
                 }}
             >
-                {gettext('All Calendars')}
+                {gettext('Clear selection')}
             </button>
         );
 
@@ -61,24 +63,33 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent<any, any> {
                 isActive={isActive}
                 label={isActive
                     ? (this.props.activeFilter.calendar ?? this.props.activeFilter.agendas)
-                    : gettext('Calendars')
+                    : gettext('Calendar')
                 }
                 optionLabel={gettext('Calendar')}
+                dropdownMenuHeader={gettext('Calendars')}
+                hideLabelOnMobile
+
             >
-                {allCalendarsButton}
+                {!!hasItemsAvailable && isActive && isSelected && (
+                    allCalendarsButton
+                )}
+
+
+                
+                
+
                 {!calendarItems.length
                     ? (
                         <div className='dropdown-item__empty'>{gettext('No Calendars available')}</div>
                     ) : (
                         <>
-                            <h6 className="dropdown-header">{gettext('Events')}</h6>
+                            <h6 className="dropdown-menu__section-heading">{gettext('Events')}</h6>
                             {calendarItems}
-                            <div className="dropdown-divider" />
                         </>
                     )}
                 {!agendaItems.length ? null : (
                     <>
-                        <h6 className="dropdown-header">{gettext('Planning')}</h6>
+                        <h6 className="dropdown-menu__section-heading">{gettext('Planning')}</h6>
                         {agendaItems}
                     </>
                 )}

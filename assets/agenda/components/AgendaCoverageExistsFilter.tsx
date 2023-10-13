@@ -6,7 +6,7 @@ import {gettext} from 'utils';
 import {AgendaDropdown} from './AgendaDropdown';
 
 const filter = {
-    label: gettext('Any coverage status'),
+    label: gettext('Coverage status'),
     field: 'coverage_status',
     nestedField: 'coverage_status',
 };
@@ -43,6 +43,9 @@ function AgendaCoverageExistsFilter ({toggleFilter, activeFilter}: any) {
             toggleFilter={toggleFilter}
             getFilterLabel={getActiveFilterLabel}
             optionLabel={gettext('Coverage')}
+            hideLabelOnMobile
+            resetOptionLabel={gettext('Clear selection')}
+            dropdownMenuHeader={gettext('Coverage status')}
         >
             <button
                 key='coverage-planned'

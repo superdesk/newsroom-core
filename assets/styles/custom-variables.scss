@@ -505,7 +505,6 @@ $container-max-widths: (
     --toggle-button-font-weight: 500;
    
     // COMPONENT: FILTER PANE
-
     --filterpane-color-bg: hsl(0, 0%, 99%);
     --filterpane-color-fg: var(--color-text);
     --filterpane-section-heading-fg: var(--color-text);
@@ -631,12 +630,21 @@ $container-max-widths: (
     --coverage-status-icon--undecided:      hsl(44, 100%, 32%);
     --coverage-status-icon--request:        hsl(44, 100%, 32%);
     
+    // COMPONENT: ALERTIFY NOTIFIER
+    --ajs-message-color-bg--success: var(--color-info);
+    --ajs-message-color-bg--error: var(--color-alert);
+    --ajs-message-border-radius: var(--border-radius--l);
+    --ajs-message-padding: var(--border-radius--l);
 
+    // COMPONENT: SEARCH RESULT PANEL (Tags list)
+    --search-result-tags-list-color-bg: var(--color-background--muted-2);
+    --search-result-tags-list-shadow-inner: inset 0 1px 2px hsla(0, 0%, 0%, 0.06), inset 0 -1px 2px hsla(0, 0%, 0%, 0.04)
 
 }
 
 .line-shadow-end--light {
     box-shadow: var(--line-shadow-end--light);
+    box-shadow: inset ;
 }
 
 .btn {
