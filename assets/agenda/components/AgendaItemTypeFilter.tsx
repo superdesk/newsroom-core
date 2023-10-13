@@ -28,7 +28,8 @@ function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter, eventsOnlyAccess, 
             activeFilter={activeFilter}
             toggleFilter={toggleFilter}
             optionLabel={gettext('Show')}
-            dropdownMenuHeader={gettext('Show')}
+            resetOptionLabel={gettext('Clear selection')}
+            //dropdownMenuHeader={gettext('Item Types')}
             hideLabelOnMobile
         >
             <button

@@ -54,7 +54,7 @@ export class AgendaCalendarAgendaFilter extends React.PureComponent<any, any> {
                     this.props.toggleFilter('agendas', null);
                 }}
             >
-                {gettext('All Calendars')}
+                {gettext('Clear selection')}
             </button>
         );
 

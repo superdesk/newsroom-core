@@ -495,7 +495,7 @@ export class LocationFilter extends React.Component<any, any> {
                                         onClick={() => this.onChange()}
                                         ref={(ref: any) => this.dom.clearButton = ref}
                                     >
-                                        {gettext('Any location')}
+                                        {gettext('Clear selection')}
                                     </button>
                                 </React.Fragment>
                             )}

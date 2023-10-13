@@ -44,7 +44,7 @@ function AgendaCoverageExistsFilter ({toggleFilter, activeFilter}: any) {
             getFilterLabel={getActiveFilterLabel}
             optionLabel={gettext('Coverage')}
             hideLabelOnMobile
-            resetOptionLabel={gettext('Any coverage status')}
+            resetOptionLabel={gettext('Clear selection')}
             dropdownMenuHeader={gettext('Coverage status')}
         >
             <button
