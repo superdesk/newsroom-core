@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.5.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-10-12 11:16+0200\n"
+"POT-Creation-Date: 2023-10-13 15:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1534,7 +1534,7 @@ msgstr ""
 msgid "Time to be confirmed"
 msgstr ""
 
-#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:57
+#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:60
 #: assets/agenda/utils.ts:77 assets/agenda/utils.ts:78
 msgid "Coverage not planned"
 msgstr ""
@@ -1679,32 +1679,39 @@ msgstr ""
 msgid "Any agenda"
 msgstr ""
 
-#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:55
-msgid "All Calendars"
+#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:57
+#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:47
+#: assets/agenda/components/AgendaFilters.tsx:63
+#: assets/agenda/components/AgendaFilters.tsx:97
+#: assets/agenda/components/AgendaItemTypeFilter.tsx:31
+#: assets/agenda/components/LocationFilter.tsx:498
+msgid "Clear selection"
 msgstr ""
 
-#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:62
-msgid "Calendars"
-msgstr ""
-
-#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:63
+#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:66
+#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:68
 msgid "Calendar"
 msgstr ""
 
-#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:68
+#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:69
+msgid "Calendars"
+msgstr ""
+
+#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:83
 msgid "No Calendars available"
 msgstr ""
 
-#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:71
+#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:86
 msgid "Events"
 msgstr ""
 
-#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:78
+#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:92
 msgid "Planning"
 msgstr ""
 
 #: assets/agenda/components/AgendaCoverageExistsFilter.tsx:9
-msgid "Any coverage status"
+#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:48
+msgid "Coverage status"
 msgstr ""
 
 #: assets/agenda/components/AgendaCoverageExistsFilter.tsx:26
@@ -1727,15 +1734,15 @@ msgstr ""
 msgid "Coverage"
 msgstr ""
 
-#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:51
+#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:54
 msgid "Coverage is planned"
 msgstr ""
 
-#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:63
+#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:66
 msgid "Coverage not decided"
 msgstr ""
 
-#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:69
+#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:72
 msgid "Coverage completed"
 msgstr ""
 
@@ -1815,20 +1822,22 @@ msgid "Top Stories"
 msgstr ""
 
 #: assets/agenda/components/AgendaFilters.tsx:56
-#: assets/agenda/components/LocationFilter.tsx:503
+#: assets/agenda/components/AgendaFilters.tsx:62
+#: assets/agenda/components/LocationFilter.tsx:512
 msgid "Regions"
 msgstr ""
 
-#: assets/agenda/components/AgendaFilters.tsx:75
-msgid "Any region"
+#: assets/agenda/components/AgendaFilters.tsx:77
+msgid "Region"
 msgstr ""
 
-#: assets/agenda/components/AgendaFilters.tsx:88
+#: assets/agenda/components/AgendaFilters.tsx:90
+#: assets/agenda/components/AgendaFilters.tsx:96
 msgid "Coverage types"
 msgstr ""
 
-#: assets/agenda/components/AgendaFilters.tsx:95
-msgid "Any coverage type"
+#: assets/agenda/components/AgendaFilters.tsx:100
+msgid "Coverage type"
 msgstr ""
 
 #: assets/agenda/components/AgendaInternalNote.tsx:13
@@ -1857,12 +1866,12 @@ msgid "{{ action }} {{ minutes }} minute(s) ago"
 msgstr ""
 
 #: assets/agenda/components/AgendaItemTypeFilter.tsx:14
-#: assets/agenda/components/AgendaItemTypeFilter.tsx:37
+#: assets/agenda/components/AgendaItemTypeFilter.tsx:40
 msgid "Events Only"
 msgstr ""
 
 #: assets/agenda/components/AgendaItemTypeFilter.tsx:15
-#: assets/agenda/components/AgendaItemTypeFilter.tsx:45
+#: assets/agenda/components/AgendaItemTypeFilter.tsx:48
 msgid "Planning Only"
 msgstr ""
 
@@ -1871,7 +1880,7 @@ msgid "Events & Coverages"
 msgstr ""
 
 #: assets/agenda/components/AgendaItemTypeFilter.tsx:30
-msgid "Item type"
+msgid "Show"
 msgstr ""
 
 #: assets/agenda/components/AgendaList.tsx:221
@@ -2002,27 +2011,29 @@ msgid "Country"
 msgstr ""
 
 #: assets/agenda/components/LocationFilter.tsx:428
-#: assets/agenda/components/LocationFilter.tsx:488
-msgid "Any location"
+#: assets/agenda/components/LocationFilter.tsx:459
+#: assets/components/cards/edit/ConfigEvent.tsx:56
+msgid "Location"
 msgstr ""
 
-#: assets/agenda/components/LocationFilter.tsx:462
+#: assets/agenda/components/LocationFilter.tsx:468
+#: assets/agenda/components/LocationFilter.tsx:469
 msgid "Search for a region or place"
 msgstr ""
 
-#: assets/agenda/components/LocationFilter.tsx:498
+#: assets/agenda/components/LocationFilter.tsx:507
 msgid "Searching locations..."
 msgstr ""
 
-#: assets/agenda/components/LocationFilter.tsx:512
+#: assets/agenda/components/LocationFilter.tsx:521
 msgid "No regions found"
 msgstr ""
 
-#: assets/agenda/components/LocationFilter.tsx:517
+#: assets/agenda/components/LocationFilter.tsx:525
 msgid "Places"
 msgstr ""
 
-#: assets/agenda/components/LocationFilter.tsx:526
+#: assets/agenda/components/LocationFilter.tsx:534
 msgid "No places found"
 msgstr ""
 
@@ -2564,7 +2575,7 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: assets/components/DropdownFilter.tsx:71
+#: assets/components/DropdownFilter.tsx:77
 msgid "No {{filterName}} available"
 msgstr ""
 
@@ -2636,7 +2647,7 @@ msgstr ""
 
 #: assets/components/NotificationList.tsx:109
 #: assets/search/components/AdvancedSearchPanel.tsx:168
-#: assets/search/components/SearchResultsBar/index.tsx:178
+#: assets/search/components/SearchResultsBar/index.tsx:179
 msgid "Clear All"
 msgstr ""
 
@@ -2779,10 +2790,6 @@ msgstr ""
 
 #: assets/components/cards/edit/ConfigEvent.tsx:48
 msgid "End Date"
-msgstr ""
-
-#: assets/components/cards/edit/ConfigEvent.tsx:56
-msgid "Location"
 msgstr ""
 
 #: assets/components/cards/edit/ConfigExternalMedia.tsx:15
@@ -3370,7 +3377,7 @@ msgid "Body"
 msgstr ""
 
 #: assets/search/components/FollowedTopics.tsx:61
-#: assets/search/components/TopicForm.tsx:151
+#: assets/search/components/TopicForm.tsx:148
 msgid "Remove from folder"
 msgstr ""
 
@@ -3379,7 +3386,7 @@ msgid "Would you like to delete topic {{name}}?"
 msgstr ""
 
 #: assets/search/components/FollowedTopics.tsx:218
-#: assets/search/components/TopicForm.tsx:174
+#: assets/search/components/TopicForm.tsx:173
 msgid "Create new folder"
 msgstr ""
 
@@ -3464,12 +3471,12 @@ msgid "Updated on {{ date }} at {{ time }}"
 msgstr ""
 
 #: assets/search/components/Topic.tsx:102
-#: assets/search/components/TopicForm.tsx:213
+#: assets/search/components/TopicForm.tsx:218
 msgid "Real-Time"
 msgstr ""
 
 #: assets/search/components/Topic.tsx:102
-#: assets/search/components/TopicForm.tsx:223
+#: assets/search/components/TopicForm.tsx:228
 msgid "Scheduled"
 msgstr ""
 
@@ -3538,26 +3545,26 @@ msgstr ""
 msgid "Organize your Topic"
 msgstr ""
 
-#: assets/search/components/TopicForm.tsx:192
+#: assets/search/components/TopicForm.tsx:197
 msgid "Email Notifications:"
 msgstr ""
 
-#: assets/search/components/TopicForm.tsx:203
+#: assets/search/components/TopicForm.tsx:208
 msgid "None"
 msgstr ""
 
-#: assets/search/components/TopicForm.tsx:230
+#: assets/search/components/TopicForm.tsx:235
 msgid ""
 "Your saved topic results will be emailed in a digest format at the "
 "time(s) per day set below."
 msgstr ""
 
-#: assets/search/components/TopicForm.tsx:241
+#: assets/search/components/TopicForm.tsx:246
 #: assets/user-profile/components/profile/UserProfile.tsx:164
 msgid "Edit schedule"
 msgstr ""
 
-#: assets/search/components/TopicForm.tsx:250
+#: assets/search/components/TopicForm.tsx:255
 msgid "Topic details"
 msgstr ""
 
@@ -3660,6 +3667,10 @@ msgstr ""
 
 #: assets/search/components/SearchResultsBar/index.tsx:151
 msgid "{{sort}}"
+msgstr ""
+
+#: assets/search/components/SearchResultsBar/index.tsx:153
+msgid "Sort results by"
 msgstr ""
 
 #: assets/section-filters/actions.ts:72
