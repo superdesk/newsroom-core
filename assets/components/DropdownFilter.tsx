@@ -41,7 +41,9 @@ function DropdownFilter({
     className,
     filterName,
     borderless,
+    dropdownMenuHeader,
     resetOptionLabel,
+    hideLabelOnMobile,
     ...props
 }: any) {
     const isActive = !!(activeFilter[filter.field]);
@@ -57,6 +59,8 @@ function DropdownFilter({
             label={label}
             className={className}
             borderless={borderless}
+            dropdownMenuHeader={dropdownMenuHeader}
+            hideLabelOnMobile={hideLabelOnMobile}
         >
             {hasItemsAvailable || isActive && (
                 <button
@@ -67,7 +71,6 @@ function DropdownFilter({
                     {resetOptionLabel ?? gettext(filter.label)}
                 </button>
             )}
-            <div className='dropdown-divider' />
             {
                 hasItemsAvailable ? items : (
                     <div className='dropdown-item__empty'>
@@ -92,7 +95,9 @@ DropdownFilter.propTypes = {
     filterName: PropTypes.string,
     borderless: PropTypes.bool,
     locators: PropTypes.any,
+    dropdownMenuHeader: PropTypes.string,
     resetOptionLabel: PropTypes.string,
+    hideLabelOnMobile: PropTypes.bool,
 };
 
 export default DropdownFilter;

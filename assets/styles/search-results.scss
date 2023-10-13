@@ -62,6 +62,8 @@
     width: 100%;
     container-type: inline-size;
     container-name: tags-list;
+    background-color: var(--search-result-tags-list-color-bg);
+    box-shadow: var(--search-result-tags-list-shadow-inner);
 }
 
 .search-result__tags-list-row {

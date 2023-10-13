@@ -12,6 +12,7 @@ function DropdownFilterButton({
     hideLabel,
     borderless,
     noLabelWrap,
+    hideLabelOnMobile,
 }: any) {
     return (
         <button
@@ -30,13 +31,21 @@ function DropdownFilterButton({
             onClick={onClick}
         >
             {!icon ? null : (
-                <i className={`${icon} d-md-none`} />
+                <i className={`${icon}`} />
             )}
             {
                 noLabelWrap
                     ? label
                     : (
-                        <span style={hideLabel ? {display: 'none'} : {}} className="nh-dropdown-button__text-label">
+                        <span
+                            className={classNames(
+                                'nh-dropdown-button__text-label',
+                                {
+                                    'a11y-only': hideLabel,
+                                    'nh-dropdown-button__text-label--hide-on-mobile': hideLabelOnMobile,
+                                })
+                            }
+                        >
                             {label}
                         </span>
                     )
@@ -60,6 +69,7 @@ DropdownFilterButton.propTypes = {
     hideLabel: PropTypes.bool,
     borderless: PropTypes.bool,
     noLabelWrap: PropTypes.bool,
+    hideLabelOnMobile: PropTypes.bool,
 };
 
 DropdownFilterButton.defaultProps = {autoToggle: true};
