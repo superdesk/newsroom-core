@@ -60,9 +60,6 @@ class CompanyDetailsProductFilterComponent extends React.PureComponent<any, any>
                 getDropdownItems={this.getDropdownItems}
                 activeFilter={this.getActiveQuery()}
                 toggleFilter={this.onChange}
-                buttonProps={{
-                    textOnly: true,
-                }}
             />
         );
     }

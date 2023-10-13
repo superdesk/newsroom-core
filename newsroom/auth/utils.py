@@ -7,6 +7,7 @@ from datetime import timedelta
 from typing import Dict, Optional
 from flask import current_app as app
 from flask_babel import _
+from newsroom.exceptions import AuthorizationError
 from newsroom.user_roles import UserRole
 from superdesk.utc import utcnow
 from newsroom.auth import get_user, get_company
@@ -212,3 +213,16 @@ def get_company_auth_provider(company: Optional[Company] = None) -> AuthProvider
 
     provider_id = (company or {}).get("auth_provider") or "newshub"
     return providers.get(provider_id) or providers["newshub"]
+
+
+def check_user_has_products(user: User, company_products) -> None:
+    """If user has no products and there are no company products abort page rendering."""
+    unlimited_products = [p for p in (company_products or []) if not p.get("seats")]
+    if (
+        not unlimited_products
+        and not user.get("products")
+        and not (is_current_user_admin() or is_current_user_account_mgr())
+    ):
+        raise AuthorizationError(
+            403, _("There is no product associated with your user. Please reach out to your Company Admin.")
+        )

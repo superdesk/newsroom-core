@@ -20,7 +20,7 @@ export function TopicFolderEditor ({folder, onSave, onCancel, error}) {
                     <i className="icon--folder icon--small" />
                     <input
                         type="text"
-                        aria-label={gettext('Folder name')}
+                        aria-label={gettext('Folder Name')}
                         data-test-id="folder-name--input"
                         className="form-control form-control--small"
                         maxLength="30"

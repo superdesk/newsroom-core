@@ -28,6 +28,7 @@ from elasticapm.contrib.flask import ElasticAPM
 from sentry_sdk.integrations.flask import FlaskIntegration
 
 from newsroom.auth import SessionAuth
+from newsroom.exceptions import AuthorizationError
 from newsroom.utils import is_json_request
 from newsroom.gettext import setup_babel
 
@@ -196,10 +197,14 @@ class BaseNewsroomApp(eve.Eve):
             error_code = err.status_code or 500
             return flask.jsonify({"error": err.message or "", "message": err.payload, "code": error_code}), error_code
 
+        def authorization_error(err: AuthorizationError):
+            return flask.render_template("authorization_error.html", message=err.message), err.code
+
         self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(404, render_404)
         self.register_error_handler(403, render_403)
         self.register_error_handler(SuperdeskApiError, superdesk_api_error)
+        self.register_error_handler(AuthorizationError, authorization_error)
 
     def general_setting(
         self,

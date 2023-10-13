@@ -139,7 +139,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                             </label>
                             {user.user_type !== 'administrator' ? null : (
                                 <label className="label label--green label--fill label--big label--rounded">
-                                    {gettext('admin')}
+                                    {gettext('Admin')}
                                 </label>
                             )}
                             {!showResendInvite ? null : (
@@ -284,8 +284,9 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
 
                         {(userIsAdmin || hideFields.includes('products')) ? null : (() => {
                             const filteredSections = sections.filter((section: any) => (
-                                companySectionIds.includes(section._id) &&
-                                get(user, `sections.${section._id}`) === true
+                                companySectionIds.includes(section._id) && user.sections ?
+                                    get(user, `sections.${section._id}`
+                                    ) === true : company?.sections
                             ));
 
                             const filterProductsForSection = (product: IProduct, section: ISection) =>

@@ -4,6 +4,7 @@ from flask import Config, Flask
 from pathlib import Path
 from pytest import fixture
 
+from superdesk.cache import cache
 from newsroom.web.factory import get_app
 from newsroom.tests import markers
 
@@ -72,6 +73,7 @@ def app(request):
     app = get_app(config=cfg, testing=True)
     with app.app_context():
         reset_elastic(app)
+        cache.clean()
         yield app
 
 

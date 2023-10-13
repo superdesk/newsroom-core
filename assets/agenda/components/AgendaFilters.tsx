@@ -53,6 +53,7 @@ const renderFilter: any = {
         !['events', 'planning', 'combined'].includes(props.itemTypeFilter || 'combined') ? null : (
             <DropdownFilter
                 key="region"
+                filterName={gettext('Regions')}
                 aggregations={props.aggregations}
                 toggleFilter={props.toggleFilter}
                 activeFilter={props.activeFilter}
@@ -73,7 +74,6 @@ const renderFilter: any = {
                 filter={{
                     label: gettext('Any region'),
                     field: 'place',
-                    icon: 'icon-small--region',
                     itemTypes: ['events', 'combined'],
                     transformBuckets: groupRegions,
                     notSorted: true,
@@ -85,6 +85,7 @@ const renderFilter: any = {
     coverage_type: (props: any) => (
         !['planning', 'combined'].includes(props.itemTypeFilter || 'combined') ? null : (
             <DropdownFilter
+                filterName={gettext('Coverage types')}
                 key="coverage_type"
                 aggregations={props.aggregations}
                 toggleFilter={props.toggleFilter}
@@ -94,7 +95,6 @@ const renderFilter: any = {
                     label: gettext('Any coverage type'),
                     field: 'coverage',
                     nestedField: 'coverage_type',
-                    icon: 'icon-small--coverage-text',
                     transform: getCoverageDisplayName,
                 }}
             />

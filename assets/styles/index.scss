@@ -1664,12 +1664,9 @@ article.list {
     inset-block-start: 0;
     @include lg {
         inset-block-start: 56px;
-        width: 340px;
+        width: 400px;
         position: static;
         border-inline-start: 2px solid #919191;
-    }
-    @include xl {
-        width: 380px;
     }
     @include xxl {
         width: 480px;

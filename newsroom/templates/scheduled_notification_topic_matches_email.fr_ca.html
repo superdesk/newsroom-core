@@ -1,0 +1,59 @@
+{% extends "email_layout.html" %}
+{% block htmlhead %}
+<style>
+{% include "email_stylesheet.css" %}
+</style>
+{% endblock %}
+{% block name %}{% endblock %}
+{% block content %}
+
+<p>{{ date | notification_datetime }}</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Votre sujet enregistré</th>
+            <th>Nombre</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for section, matches in topic_match_table.items() %}
+{% for name, count in matches %}
+        <tr>
+            <td>Nouveaux éléments de {{ config.AGENDA_SECTION if section == "agenda" else config.WIRE_SECTION }} sur "{{ name }}"</td>
+            <td>{{ count }}</td>
+        </tr>
+{% endfor %}
+{% endfor %}
+    </tbody>
+</table>
+
+{% for section, entries in entries.items() %}
+{% for entry in entries %}
+
+<h2>Élément de {{ config.AGENDA_SECTION if section == "agenda" else config.WIRE_SECTION }} le plus récent sur "{{ entry.topic.label }}"</h2>
+{% if section == "wire" %}
+
+<p><strong>{{ get_highlighted_field(entry.item, ["headline"]) | safe }}</strong></p>
+<p>Titre de rappel: {{ entry.item.slugline }} | Source: {{ entry.item.source}}</p>
+<p>Publié le: {{ entry.item.versioncreated | notification_datetime }} | {{ entry.item.body_html | word_count }} words{% if entry.item.service %} mots | Catégorie: {{ entry.item | category_names }}{% endif %}</p>
+{{ short_highlighted_text(get_highlighted_field(entry.item, ["body_html"])) | safe }}
+<p>Consulter cet élément dans votre compte: <a href="{{ url_for_wire(entry.item, True, section) }}">Link</a></p>
+<p>Consulter tous les éléments: <a href="{{ url_for('wire.wire', _external=True) }}?topic={{ entry.topic._id }}">Link</a></p>
+
+{% elif section == "agenda" %}
+
+<p><strong>{{ get_highlighted_field(entry.item, ["headline", "name"]) | safe }}</strong></p>
+<p>Date et heure de l’événement: {{ entry.item | agenda_dates_string }}{% if entry.item.location %} | Endroit: {{ entry.item | location_string }}{% endif %}</p>
+<p>Publié le: {{ entry.item.versioncreated | notification_datetime }}{% if entry.item.service %} | Catégorie: {{ entry.item | category_names }}{% endif %}</p>
+
+{{ short_highlighted_text(get_highlighted_field(entry.item, ["definition_long", "description_text", "definition_short"])) | safe }}
+
+<p>Consulter cet élément dans votre compte: <a href="{{ url_for_wire(entry.item, True, section) }}">Link</a></p>
+<p>Consulter tous les éléments: <a href="{{ url_for('agenda.index', _external=True) }}?topic={{ entry.topic._id }}">Link</a></p>
+
+{% endif %}
+
+{% endfor %}
+{% endfor %}
+{% endblock %}

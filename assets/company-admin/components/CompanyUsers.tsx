@@ -31,8 +31,8 @@ function CompanyUsersComponent({users, usersById, selectUser, activeUserId, curr
                         </th>
                     ))}
                     <th>
-                        <div>{gettext('Created on')}</div>
-                        <div>{gettext('Last active')}</div>
+                        <div>{gettext('Created On')}</div>
+                        <div>{gettext('Last Active')}</div>
                     </th>
                 </tr>
             </thead>

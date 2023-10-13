@@ -96,9 +96,6 @@ export class UserListSortFilter extends React.PureComponent<any, any> {
                     activeFilter={this.getActiveQuery()}
                     toggleFilter={this.onChange}
                     getFilterLabel={this.getFilterLabel}
-                    buttonProps={{
-                        textOnly: true,
-                    }}
                 />
                 <div className="btn-group">
                     <button
