@@ -48,7 +48,7 @@ const TopicList = ({
         const subscription = topic.subscribers?.find((sub) => sub.user_id === user._id);
 
         return (
-            <Draggable id={topic._id} key={topic._id} hideWhileDragging>
+            <Draggable id={topic._id} key={topic._id} hideWhileDragging dataTestId={`topic-card--${topic.label}`}>
                 <Topic
                     topic={topic}
                     actions={actions}

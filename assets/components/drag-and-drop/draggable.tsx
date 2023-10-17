@@ -6,6 +6,7 @@ interface IProps {
     id: string;
     hideWhileDragging?: boolean; // avoids ghosting when scrolling with overlay enabled
     children: React.ReactNode;
+    dataTestId?: string;
 }
 
 /**
@@ -25,7 +26,7 @@ export function Draggable(props: IProps) {
     }
 
     return (
-        <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
+        <div ref={setNodeRef} style={style} {...listeners} {...attributes} data-test-id={props.dataTestId}>
             {props.children}
         </div>
     );

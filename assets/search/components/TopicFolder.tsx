@@ -73,6 +73,7 @@ export function TopicFolder({
             key={folder._id}
             className="simple-card__group"
             data-test-id={`folder-card--${folder.name}`}
+            ref={setNodeRef}
         >
             {editing ? (
                 <TopicFolderEditor
@@ -89,7 +90,6 @@ export function TopicFolder({
                     className={classNames('simple-card__group-header', {
                         'simple-card__group-header--ondragover': isOver,
                     })}
-                    ref={setNodeRef}
                 >
                     {opened ? (
                         <button
