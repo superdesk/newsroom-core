@@ -4,6 +4,7 @@ const path = require('path');
 const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const TerserPlugin = require('terser-webpack-plugin-legacy');
+const ObjectRestSpreadPlugin = require('@sucrase/webpack-object-rest-spread-plugin');
 
 const config = {
     entry: {
@@ -89,6 +90,7 @@ const config = {
         mainFields: ['browser', 'main'],
     },
     plugins: [
+        new ObjectRestSpreadPlugin(),
         new ManifestPlugin({writeToFileEmit: true}),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'common',

@@ -63,17 +63,11 @@ export function Topic({topic, actions, users, selected, subscriptionType}: IProp
     return (
         <div
             key={topic._id}
-            data-test-id={`topic-card--${topic.label}`}
             className={classNames(
                 'simple-card',
                 'simple-card--draggable',
                 {'simple-card--selected': selected}
             )}
-            draggable={true}
-            onDragStart={(event) => {
-                event.dataTransfer.setData('topic', topic._id);
-                event.dataTransfer.dropEffect = 'move';
-            }}
         >
             <div className="simple-card__header simple-card__header-with-icons">
                 <ToolTip>
