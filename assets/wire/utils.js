@@ -73,12 +73,8 @@ export function getPicture(item) {
 
 function getBodyPicture(item) {
     const pictures = Object.values(get(item, 'associations', {}) || {}).filter((assoc) => get(assoc, 'type') === 'picture');
-    return pictures.length ? pictures[0] : null;
-}
 
-export function getPictureList(item) {
-    const pictures = Object.values(get(item, 'associations', {}) || {}).filter((assoc) => get(assoc, 'type') === 'picture');
-    return pictures.length ? pictures : [];
+    return pictures.length ? pictures[0] : null;
 }
 
 /**
