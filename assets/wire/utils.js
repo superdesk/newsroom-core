@@ -77,12 +77,6 @@ function getBodyPicture(item) {
     return picturesOrVideos.length ? picturesOrVideos[0] : null;
 }
 
-export function getPictureList(item) {
-    const picturesOrVideos = Object.values(get(item, 'associations', {}) || {})
-        .filter((assoc) => get(assoc, 'type') === 'picture' || get(assoc, 'type') === 'video');
-    return picturesOrVideos.length ? picturesOrVideos : [];
-}
-
 export function getVideoThumbnail(item) {
     const video = Object.values(get(item, 'associations', {}) || {})
         .find((assoc) => get(assoc, 'type') === 'video');

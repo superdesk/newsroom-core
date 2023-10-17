@@ -5,13 +5,13 @@ import {isEmpty} from 'lodash';
 
 import {isDisplayed} from 'utils';
 import {
+    getPicture,
     getItemMedia,
     showItemVersions,
     isEqualItem,
     isKilled,
     DISPLAY_ABSTRACT,
     isCustomRendition,
-    getPictureList,
 } from 'wire/utils';
 import types from 'wire/types';
 
@@ -48,8 +48,9 @@ class WirePreview extends React.PureComponent {
 
     render() {
         const {item, user, actions, followStory, topics, previewConfig, downloadMedia, listConfig, filterGroupLabels} = this.props;
-        const pictures = getPictureList(item);
+        const picture = getPicture(item);
         const media = getItemMedia(item);
+        const isCustom = isCustomRendition(picture);
 
         const previousVersions = 'preview_versions';
         return (
@@ -77,14 +78,11 @@ class WirePreview extends React.PureComponent {
                     {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item}/>}
                     {(isDisplayed('byline', previewConfig) || isDisplayed('located', previewConfig)) &&
                         <ArticleAuthor item={item} displayConfig={previewConfig} />}
-                    {pictures && pictures.map((pic)=> (
-                        <ArticlePicture
-                            key={pic._id}
-                            picture={pic}
-                            isKilled={isKilled(item)}
-                            isCustomRendition={isCustomRendition(pic)}
-                        />
-                    ))}
+                    {picture && <ArticlePicture
+                        picture={picture}
+                        isKilled={isKilled(item)}
+                        isCustomRendition={isCustom} />}
+
                     {isDisplayed('metadata_section', previewConfig) &&
                     <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions} displayConfig={previewConfig} listConfig={listConfig}
                         filterGroupLabels={filterGroupLabels} />}

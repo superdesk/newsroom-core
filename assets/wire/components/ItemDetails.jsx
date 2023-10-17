@@ -8,13 +8,13 @@ import {isDisplayed, gettext, formatDate, formatTime} from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import {
+    getPicture,
     getItemMedia,
     showItemVersions,
     isKilled,
     DISPLAY_ABSTRACT,
     isPreformatted,
     isCustomRendition,
-    getPictureList,
     getVideoThumbnail,
 } from 'wire/utils';
 import types from 'wire/types';
@@ -49,7 +49,7 @@ function ItemDetails({
     listConfig,
     filterGroupLabels,
 }) {
-    const pictures = getPictureList(item);
+    const picture = getPicture(item);
     const media = getItemMedia(item);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
 
@@ -68,14 +68,13 @@ function ItemDetails({
             </ContentHeader>
             <ArticleItemDetails disableTextSelection={detailsConfig.disable_text_selection}>
                 <ArticleContent>
-                    {pictures && pictures.map((pic) => (
+                    {picture && (
                         <ArticlePicture
-                            key={pic._id}
-                            picture={pic}
+                            picture={picture}
                             isKilled={isKilled(item)}
-                            isCustomRendition={isCustomRendition(pic)}
+                            isCustomRendition={isCustomRendition(picture)}
                         />
-                    ))}
+                    )}
                     {!isEmpty(media) && media.map((media) => <ArticleMedia
                         key={media.guid}
                         media={media}
