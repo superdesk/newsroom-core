@@ -49,6 +49,20 @@ function getRelatedItemsByType(item, type) {
     return item.type === type ? [item] : Object.values(get(item, 'associations', {}) || {}).filter((assoc) => get(assoc, 'type') === type);
 }
 
+export function getPicture(item) {
+    if (item.type === 'picture') {
+        return item;
+    }
+
+    const featured = get(item, 'associations.featuremedia');
+
+    if (featured != null && featured.type === 'picture') {
+        return featured;
+    }
+
+    return getBodyPicture(item);
+}
+
 /**
  * Get picture for an item
  *
