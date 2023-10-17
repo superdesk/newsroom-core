@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {getPicture, getVideos} from 'wire/utils';
+import {getPictureOrVideo, getVideos} from 'wire/utils';
 import {FieldComponents} from './fields';
 import WireListItemIcons from './WireListItemIcons';
 
@@ -19,7 +19,7 @@ function PreviewMeta({
     listConfig,
     filterGroupLabels,
 }) {
-    const picture = getPicture(item);
+    const picture = getPictureOrVideo(item);
     const fields = displayConfig.metadata_fields || DEFAULT_META_FIELDS;
 
     return (

@@ -1,4 +1,5 @@
 import * as utils from '../utils';
+import {getPictureOrVideo} from '../utils';
 
 describe('utils', () => {
     const html = '<p>Rolling News Bulletin</p><p></p><p></p><p>Parliament (CANBERRA)</p><p>Labor is still</p>';
@@ -20,6 +21,6 @@ describe('utils', () => {
                 embed123: embed,
             },
         };
-        expect(utils.getPicture(item)).toBe(embed);
+        expect(utils.getPictureOrVideo(item)).toBe(embed);
     }); 
 });

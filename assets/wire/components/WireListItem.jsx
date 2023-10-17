@@ -12,7 +12,7 @@ import {
     getConfig,
 } from 'utils';
 import {
-    getPicture,
+    getPictureOrVideo,
     getThumbnailRendition,
     showItemVersions,
     shortText,
@@ -140,7 +140,7 @@ class WireListItem extends React.Component {
             'wire-articles__item-select-visible': !LIST_ANIMATIONS,
             'wire-articles__item-select': LIST_ANIMATIONS,
         });
-        const picture = getPicture(item);
+        const picture = getPictureOrVideo(item);
         const videos = getVideos(item);
         const isMarketPlace = this.props.context === 'aapX';
         const fields = listConfig.metadata_fields || DEFAULT_META_FIELDS;

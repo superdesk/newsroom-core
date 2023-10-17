@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import CardRow from './CardRow';
 import CardFooter from './CardFooter';
-import {getPicture, shortText} from 'wire/utils';
+import {getPictureOrVideo, shortText} from 'wire/utils';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 
 const getTextOnlyPanel = (item, openItem, picture, cardId, listConfig) => (
@@ -28,7 +28,7 @@ const getTextOnlyPanel = (item, openItem, picture, cardId, listConfig) => (
 function TextOnlyCard ({items, title, product, openItem, isActive, cardId, listConfig}) {
     return (
         <CardRow title={title} product={product} isActive={isActive}>
-            {items.map((item) => getTextOnlyPanel(item, openItem, getPicture(item), cardId, listConfig))}
+            {items.map((item) => getTextOnlyPanel(item, openItem, getPictureOrVideo(item), cardId, listConfig))}
         </CardRow>
     );
 }

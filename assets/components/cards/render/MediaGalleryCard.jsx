@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {shortDate} from 'utils';
-import {getPicture, getThumbnailRendition, getCaption} from 'wire/utils';
+import {getPictureOrVideo, getThumbnailRendition, getCaption} from 'wire/utils';
 import CardRow from './CardRow';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 
@@ -30,7 +30,7 @@ const getMediaPanel = (item, picture, openItem, cardId) => {
 function MediaGalleryCard ({items, title, product, openItem, isActive, cardId}) {
     return (
         <CardRow title={title} product={product} isActive={isActive}>
-            {items.map((item) => getMediaPanel(item, getPicture(item), openItem, cardId))}
+            {items.map((item) => getMediaPanel(item, getPictureOrVideo(item), openItem, cardId))}
         </CardRow>
     );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {getPicture, getThumbnailRendition, getCaption, shortText} from 'wire/utils';
+import {getPictureOrVideo, getThumbnailRendition, getCaption, shortText} from 'wire/utils';
 import CardRow from './CardRow';
 import CardMeta from './CardMeta';
 import {Embargo} from '../../../wire/components/fields/Embargo';
@@ -34,7 +34,7 @@ const getTopNewsPanel = (item, picture, openItem, cardId, listConfig) => {
 function TopNewsOneByOneCard ({items, title, product, openItem, isActive, cardId, listConfig}) {
     return (
         <CardRow title={title} product={product} isActive={isActive}>
-            {items.map((item) => getTopNewsPanel(item, getPicture(item), openItem, cardId, listConfig))}
+            {items.map((item) => getTopNewsPanel(item, getPictureOrVideo(item), openItem, cardId, listConfig))}
         </CardRow>
     );
 }

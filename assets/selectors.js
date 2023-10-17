@@ -1,6 +1,6 @@
 import {get} from 'lodash';
 import {createSelector} from 'reselect';
-import {getPicture} from './wire/utils';
+import {getPictureOrVideo} from './wire/utils';
 
 export const formats = (state) => get(state, 'formats') || [];
 export const secondaryFormats = (state) => get(state, 'secondaryFormats') || [];
@@ -24,7 +24,7 @@ export const modalOptions = createSelector(
         let options = fmts;
         if (items && items.length) {
             const itemType = cntxt === 'agenda' ? 'agenda' : 'wire';
-            const hasPicture = items.every((itemId) => getPicture(itemsById && itemsById[itemId] || openItem));
+            const hasPicture = items.every((itemId) => getPictureOrVideo(itemsById && itemsById[itemId] || openItem));
             options = options.filter((opt) => get(opt, 'types', ['wire', 'agenda']).includes(itemType));
             if (!hasPicture) {
                 options = options.filter((opt) => get(opt, 'assets', ['text']).includes('text'));
