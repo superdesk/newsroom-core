@@ -132,7 +132,7 @@ class UserProfileApp extends React.Component<any, any> {
                             <h5 className="profile__profile-content-title">
                                 {links.find((link: any) => link.active).label}
                             </h5>
-                            <button className="profile__profile-content-close" aria-label={gettext('Close')} role="button" onClick={this.hideModal}>
+                            <button className="profile__profile-content-close" aria-label={gettext('Close')} role="button" onClick={this.hideModal} data-test-id="profile-content-close">
                                 <i className="icon--close-thin" />
                             </button>
                         </section>

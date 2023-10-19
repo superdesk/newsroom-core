@@ -47,6 +47,7 @@ export function TopicFolderActions({folder, toggleFolderPopover, folderPopover, 
                                 toggle(e);
                                 action.callback();
                             }}
+                            data-test-id={`action-topic-${action.name}`}
                         >
                             <i className={'icon--' + action.icon} />
                             {action.name}
