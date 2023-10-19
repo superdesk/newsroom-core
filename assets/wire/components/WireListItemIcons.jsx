@@ -7,7 +7,6 @@ function WireListItemIcons({item, divider}) {
 
     return (
         <div className='wire-articles__item__icons'>
-            {/*{item.type === 'text' &&*/}
             {contentTypes.has('text') &&
                 <span className='wire-articles__item__icon'>
                     <i className='icon--text icon--gray-dark'></i>
