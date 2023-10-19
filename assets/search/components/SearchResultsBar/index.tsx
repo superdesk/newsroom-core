@@ -127,8 +127,6 @@ class SearchResultsBarComponent extends React.Component<any, any> {
         const {isTagSectionShown} = this.state;
         const numberFormatter = (new Intl.NumberFormat(undefined, {style: 'decimal'}));
 
-        console.log()
-
         return (
             <React.Fragment>
                 <div
