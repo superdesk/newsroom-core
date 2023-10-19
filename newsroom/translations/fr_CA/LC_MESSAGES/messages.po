@@ -19,7 +19,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.5.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-10-12 11:16+0200\n"
+"POT-Creation-Date: 2023-10-13 15:04+0200\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
 "Last-Translator: Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2023\n"
 "Language-Team: French (Canada) (https://app.transifex.com/sourcefabric/teams/6584/fr_CA/)\n"
@@ -1599,7 +1599,7 @@ msgstr "couverture mise à jour {{ at }}"
 msgid "Time to be confirmed"
 msgstr "Heure à confirmer"
 
-#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:57
+#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:60
 #: assets/agenda/utils.ts:77 assets/agenda/utils.ts:78
 msgid "Coverage not planned"
 msgstr "Couverture non planifiée"
@@ -1749,33 +1749,40 @@ msgstr "Tout calendrier"
 msgid "Any agenda"
 msgstr "Tous les calendriers"
 
-#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:55
-msgid "All Calendars"
-msgstr "Tous les calendriers"
+#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:57
+#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:47
+#: assets/agenda/components/AgendaFilters.tsx:63
+#: assets/agenda/components/AgendaFilters.tsx:97
+#: assets/agenda/components/AgendaItemTypeFilter.tsx:31
+#: assets/agenda/components/LocationFilter.tsx:498
+msgid "Clear selection"
+msgstr "Effacer la sélection"
 
-#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:62
-msgid "Calendars"
-msgstr "Calendriers"
-
-#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:63
+#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:66
+#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:68
 msgid "Calendar"
 msgstr "Calendrier"
 
-#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:68
+#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:69
+msgid "Calendars"
+msgstr "Calendriers"
+
+#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:83
 msgid "No Calendars available"
 msgstr "Aucun calendrier disponible"
 
-#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:71
+#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:86
 msgid "Events"
 msgstr "Événements"
 
-#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:78
+#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:92
 msgid "Planning"
 msgstr "Planification"
 
 #: assets/agenda/components/AgendaCoverageExistsFilter.tsx:9
-msgid "Any coverage status"
-msgstr "Tout statut de couverture"
+#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:48
+msgid "Coverage status"
+msgstr "Statut de couverture"
 
 #: assets/agenda/components/AgendaCoverageExistsFilter.tsx:26
 msgid "Planned"
@@ -1797,15 +1804,15 @@ msgstr "Terminé"
 msgid "Coverage"
 msgstr "Couverture"
 
-#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:51
+#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:54
 msgid "Coverage is planned"
 msgstr "Couverture planifiée"
 
-#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:63
+#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:66
 msgid "Coverage not decided"
 msgstr "Pas de décision sur la couverture"
 
-#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:69
+#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:72
 msgid "Coverage completed"
 msgstr "Couverture terminée"
 
@@ -1885,21 +1892,23 @@ msgid "Top Stories"
 msgstr "Principaux articles"
 
 #: assets/agenda/components/AgendaFilters.tsx:56
-#: assets/agenda/components/LocationFilter.tsx:503
+#: assets/agenda/components/AgendaFilters.tsx:62
+#: assets/agenda/components/LocationFilter.tsx:512
 msgid "Regions"
 msgstr "Régions"
 
-#: assets/agenda/components/AgendaFilters.tsx:75
-msgid "Any region"
-msgstr "Toute région"
+#: assets/agenda/components/AgendaFilters.tsx:77
+msgid "Region"
+msgstr "Région"
 
-#: assets/agenda/components/AgendaFilters.tsx:88
+#: assets/agenda/components/AgendaFilters.tsx:90
+#: assets/agenda/components/AgendaFilters.tsx:96
 msgid "Coverage types"
 msgstr "Types de couverture"
 
-#: assets/agenda/components/AgendaFilters.tsx:95
-msgid "Any coverage type"
-msgstr "Textes et photos"
+#: assets/agenda/components/AgendaFilters.tsx:100
+msgid "Coverage type"
+msgstr "Type de couverture"
 
 #: assets/agenda/components/AgendaInternalNote.tsx:13
 msgid "Internal Note"
@@ -1927,12 +1936,12 @@ msgid "{{ action }} {{ minutes }} minute(s) ago"
 msgstr "{{ action }} il y a {{ minutes }} minute(s)"
 
 #: assets/agenda/components/AgendaItemTypeFilter.tsx:14
-#: assets/agenda/components/AgendaItemTypeFilter.tsx:37
+#: assets/agenda/components/AgendaItemTypeFilter.tsx:40
 msgid "Events Only"
 msgstr "Événements seulement"
 
 #: assets/agenda/components/AgendaItemTypeFilter.tsx:15
-#: assets/agenda/components/AgendaItemTypeFilter.tsx:45
+#: assets/agenda/components/AgendaItemTypeFilter.tsx:48
 msgid "Planning Only"
 msgstr "Couvertures seulement"
 
@@ -1941,8 +1950,8 @@ msgid "Events & Coverages"
 msgstr "Événements et couvertures"
 
 #: assets/agenda/components/AgendaItemTypeFilter.tsx:30
-msgid "Item type"
-msgstr "Type d'élément"
+msgid "Show"
+msgstr "Afficher"
 
 #: assets/agenda/components/AgendaList.tsx:221
 msgid "Tomorrow"
@@ -2072,27 +2081,29 @@ msgid "Country"
 msgstr "Pays"
 
 #: assets/agenda/components/LocationFilter.tsx:428
-#: assets/agenda/components/LocationFilter.tsx:488
-msgid "Any location"
-msgstr "Endroits"
+#: assets/agenda/components/LocationFilter.tsx:459
+#: assets/components/cards/edit/ConfigEvent.tsx:56
+msgid "Location"
+msgstr "Endroit"
 
-#: assets/agenda/components/LocationFilter.tsx:462
+#: assets/agenda/components/LocationFilter.tsx:468
+#: assets/agenda/components/LocationFilter.tsx:469
 msgid "Search for a region or place"
 msgstr "Chercher une région ou un endroit"
 
-#: assets/agenda/components/LocationFilter.tsx:498
+#: assets/agenda/components/LocationFilter.tsx:507
 msgid "Searching locations..."
 msgstr "À la recherche d'endroits..."
 
-#: assets/agenda/components/LocationFilter.tsx:512
+#: assets/agenda/components/LocationFilter.tsx:521
 msgid "No regions found"
 msgstr "Aucune région trouvée"
 
-#: assets/agenda/components/LocationFilter.tsx:517
+#: assets/agenda/components/LocationFilter.tsx:525
 msgid "Places"
 msgstr "Endroits"
 
-#: assets/agenda/components/LocationFilter.tsx:526
+#: assets/agenda/components/LocationFilter.tsx:534
 msgid "No places found"
 msgstr "Aucun endroit trouvé"
 
@@ -2636,7 +2647,7 @@ msgstr "Mis à jour par {{author}} à {{date}}"
 msgid "Edit"
 msgstr "Modifier"
 
-#: assets/components/DropdownFilter.tsx:71
+#: assets/components/DropdownFilter.tsx:77
 msgid "No {{filterName}} available"
 msgstr "Aucun {{filterName}} disponible"
 
@@ -2708,7 +2719,7 @@ msgstr "Aucune nouvelle notification!"
 
 #: assets/components/NotificationList.tsx:109
 #: assets/search/components/AdvancedSearchPanel.tsx:168
-#: assets/search/components/SearchResultsBar/index.tsx:178
+#: assets/search/components/SearchResultsBar/index.tsx:179
 msgid "Clear All"
 msgstr "Tout effacer"
 
@@ -2857,10 +2868,6 @@ msgstr "Date de début"
 #: assets/components/cards/edit/ConfigEvent.tsx:48
 msgid "End Date"
 msgstr "Date de fin"
-
-#: assets/components/cards/edit/ConfigEvent.tsx:56
-msgid "Location"
-msgstr "Endroit"
 
 #: assets/components/cards/edit/ConfigExternalMedia.tsx:15
 msgid "More button label"
@@ -3408,7 +3415,7 @@ msgstr "Afficher les astuces de recherche"
 
 #: assets/search/components/AdvancedSearchPanel.tsx:58
 msgid "All of these:"
-msgstr "Tous ceux-ci: "
+msgstr "Tous ces mots-clés: "
 
 #: assets/search/components/AdvancedSearchPanel.tsx:62
 #: assets/search/components/AdvancedSearchPanel.tsx:82
@@ -3423,7 +3430,7 @@ msgstr ""
 
 #: assets/search/components/AdvancedSearchPanel.tsx:78
 msgid "Any of these:"
-msgstr "N'importe lequel de ceux-ci: "
+msgstr "N'importe lequel de ces mots-clés: "
 
 #: assets/search/components/AdvancedSearchPanel.tsx:89
 msgid "And every item contain keyword1 OR keyword 2 etc."
@@ -3431,7 +3438,7 @@ msgstr "Et tous les éléments qui comprennent mot-clé1 OU mot-clé2 etc."
 
 #: assets/search/components/AdvancedSearchPanel.tsx:97
 msgid "None of these:"
-msgstr "Aucun de ceux-ci:"
+msgstr "Aucun de ces mots-clés:"
 
 #: assets/search/components/AdvancedSearchPanel.tsx:108
 msgid "And every item will NOT contain keyword1 nor keyword2 etc."
@@ -3456,7 +3463,7 @@ msgid "Body"
 msgstr "Corps"
 
 #: assets/search/components/FollowedTopics.tsx:61
-#: assets/search/components/TopicForm.tsx:151
+#: assets/search/components/TopicForm.tsx:148
 msgid "Remove from folder"
 msgstr "Retirer du dossier"
 
@@ -3465,7 +3472,7 @@ msgid "Would you like to delete topic {{name}}?"
 msgstr "Voulez-vous supprimer le sujet {{name}}?"
 
 #: assets/search/components/FollowedTopics.tsx:218
-#: assets/search/components/TopicForm.tsx:174
+#: assets/search/components/TopicForm.tsx:173
 msgid "Create new folder"
 msgstr "Créer un nouveau dossier"
 
@@ -3550,12 +3557,12 @@ msgid "Updated on {{ date }} at {{ time }}"
 msgstr "Mis à jour le {{ date }} à {{ time }}"
 
 #: assets/search/components/Topic.tsx:102
-#: assets/search/components/TopicForm.tsx:213
+#: assets/search/components/TopicForm.tsx:218
 msgid "Real-Time"
 msgstr "En temps réel"
 
 #: assets/search/components/Topic.tsx:102
-#: assets/search/components/TopicForm.tsx:223
+#: assets/search/components/TopicForm.tsx:228
 msgid "Scheduled"
 msgstr "Planifié"
 
@@ -3624,15 +3631,15 @@ msgstr "Créé à l'externe"
 msgid "Organize your Topic"
 msgstr "Organiser vos sujets"
 
-#: assets/search/components/TopicForm.tsx:192
+#: assets/search/components/TopicForm.tsx:197
 msgid "Email Notifications:"
 msgstr "Notifications par courriel:"
 
-#: assets/search/components/TopicForm.tsx:203
+#: assets/search/components/TopicForm.tsx:208
 msgid "None"
 msgstr "Aucun"
 
-#: assets/search/components/TopicForm.tsx:230
+#: assets/search/components/TopicForm.tsx:235
 msgid ""
 "Your saved topic results will be emailed in a digest format at the time(s) "
 "per day set below."
@@ -3640,12 +3647,12 @@ msgstr ""
 "Vos résultats de sujet enregistré vous seront transmis par courriel, dans un"
 " format résumé, au(x) moment(s) choisi(s) ci-dessous. "
 
-#: assets/search/components/TopicForm.tsx:241
+#: assets/search/components/TopicForm.tsx:246
 #: assets/user-profile/components/profile/UserProfile.tsx:164
 msgid "Edit schedule"
 msgstr "Modifier l'horaire"
 
-#: assets/search/components/TopicForm.tsx:250
+#: assets/search/components/TopicForm.tsx:255
 msgid "Topic details"
 msgstr "Détails du sujet"
 
@@ -3749,6 +3756,10 @@ msgstr "Trier par: "
 #: assets/search/components/SearchResultsBar/index.tsx:151
 msgid "{{sort}}"
 msgstr "{{sort}}"
+
+#: assets/search/components/SearchResultsBar/index.tsx:153
+msgid "Sort results by"
+msgstr "Classer les résultats selon"
 
 #: assets/section-filters/actions.ts:72
 msgid "Section Filter updated successfully"
