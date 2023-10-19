@@ -146,7 +146,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                 </div>
                             )}
                             <div className="navbar__button-group">
-                                {this.props.topicType == "wire" ? <Dropdown
+                                {this.props.topicType == 'wire' ? <Dropdown
                                     label={gettext('Sort by:')}
                                     value={gettext('{{sort}}', {sort: this.state.sortValue})}
                                     className={'sorting-dropdown'}
