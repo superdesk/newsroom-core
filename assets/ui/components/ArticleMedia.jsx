@@ -12,7 +12,7 @@ export default function ArticleMedia({isKilled, media, download}) {
             <div className='wire-column__preview__video'>
                 <span className='wire-column__preview__video-headline'>{media.headline || media.description_text}</span>
                 {media.type === 'video' && (
-                    <video controls>
+                    <video controls preload="metadata">
                         <source src={rendition.href} type={rendition.mimetype} />
                         {gettext('Your browser does not support playing video')}
                     </video>
