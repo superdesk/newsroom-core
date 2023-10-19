@@ -11,7 +11,13 @@ from newsroom.types import AuthProviderType
 from newsroom.decorator import admin_only, login_required
 from newsroom.auth import blueprint, get_auth_user_by_email, get_user_by_email, get_company_from_user
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
-from newsroom.auth.utils import clear_user_session, start_user_session, send_token, get_company_auth_provider
+from newsroom.auth.utils import (
+    clear_user_session,
+    redirect_to_next_url,
+    start_user_session,
+    send_token,
+    get_company_auth_provider,
+)
 from newsroom.utils import (
     is_company_enabled,
     is_account_enabled,
@@ -30,7 +36,6 @@ from .token import generate_auth_token, verify_auth_token
 @limiter.limit("60/minute")
 def login():
     form = LoginForm()
-    next_page = flask.request.args.get("next") or flask.url_for("wire.index")
     if form.validate_on_submit():
         if email_has_exceeded_max_login_attempts(form.email.data):
             return flask.render_template("account_locked.html", form=form)
@@ -51,9 +56,9 @@ def login():
                 else:
                     start_user_session(user, permanent=form.remember_me.data)
                     update_user_last_active(user)
-                    return flask.redirect(next_page)
+                    return redirect_to_next_url()
 
-    return flask.render_template("login.html", form=form, next_page=next_page)
+    return flask.render_template("login.html", form=form)
 
 
 def email_has_exceeded_max_login_attempts(email):
