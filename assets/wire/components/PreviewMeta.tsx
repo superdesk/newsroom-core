@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {getPicture} from 'wire/utils';
 import {FieldComponents} from './fields';
 import WireListItemIcons from './WireListItemIcons';
 
@@ -19,15 +18,11 @@ function PreviewMeta({
     listConfig,
     filterGroupLabels,
 }: any) {
-    const picture = getPicture(item);
     const fields = displayConfig.metadata_fields || DEFAULT_META_FIELDS;
 
     return (
         <div className="wire-articles__item__meta wire-articles__item__meta--boxed">
-            <WireListItemIcons
-                item={item}
-                picture={picture}
-            />
+            <WireListItemIcons item={item} />
             <div className="wire-articles__item__meta-info">
                 <FieldComponents
                     config={fields}
