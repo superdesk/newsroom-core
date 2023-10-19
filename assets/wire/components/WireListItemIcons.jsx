@@ -1,26 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {hasAudio, hasVideo} from 'wire/utils';
+import {getContentTypes} from 'wire/utils';
 
-function WireListItemIcons({item, picture, divider}) {
+function WireListItemIcons({item, divider}) {
+    const contentTypes = getContentTypes(item);
+
     return (
         <div className='wire-articles__item__icons'>
-            {item.type === 'text' &&
+            {/*{item.type === 'text' &&*/}
+            {contentTypes.has('text') &&
                 <span className='wire-articles__item__icon'>
                     <i className='icon--text icon--gray-dark'></i>
                 </span>
             }
-            {picture &&
+            {contentTypes.has('picture') &&
                 <span className='wire-articles__item__icon'>
                     <i className='icon--photo icon--gray-dark'></i>
                 </span>
             }
-            {hasVideo(item) &&
+            {contentTypes.has('video') &&
                 <span className='wire-articles__item__icon'>
                     <i className='icon--video icon--gray-dark'></i>
                 </span>
             }
-            {hasAudio(item) &&
+            {contentTypes.has('audio') &&
                 <span className='wire-articles__item__icon'>
                     <i className='icon--audio icon--gray-dark'></i>
                 </span>
@@ -34,7 +37,6 @@ function WireListItemIcons({item, picture, divider}) {
 
 WireListItemIcons.propTypes = {
     item: PropTypes.object,
-    picture: PropTypes.object,
     divider: PropTypes.bool,
 };
 

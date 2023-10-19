@@ -2,11 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import CardMeta from './CardMeta';
 
-function CardFooter({item, picture, listConfig}) {
+function CardFooter({item, listConfig}) {
     return (<div className="card-footer">
         <CardMeta
             item={item}
-            picture={picture}
             listConfig={listConfig}
         />
     </div>);
@@ -14,7 +13,6 @@ function CardFooter({item, picture, listConfig}) {
 
 CardFooter.propTypes = {
     item: PropTypes.object.isRequired,
-    picture: PropTypes.object,
     listConfig: PropTypes.object,
 };
 

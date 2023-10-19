@@ -4,9 +4,9 @@ import {gettext, shortDate, fullDate, isDisplayed} from 'utils';
 import {characterCount, wordCount} from 'utils';
 import WireListItemIcons from 'wire/components/WireListItemIcons';
 
-function CardMeta({item, picture, displayDivider, slugline, listConfig}) {
+function CardMeta({item, displayDivider, slugline, listConfig}) {
     return (<div className="wire-articles__item__meta">
-        <WireListItemIcons item={item} picture={picture} divider={displayDivider} />
+        <WireListItemIcons item={item} divider={displayDivider} />
         <div className="wire-articles__item__meta-info">
             {slugline && <span className='bold'>{slugline}</span>}
             <span>
@@ -26,7 +26,6 @@ function CardMeta({item, picture, displayDivider, slugline, listConfig}) {
 
 CardMeta.propTypes = {
     item: PropTypes.object.isRequired,
-    picture: PropTypes.object,
     displayDivider: PropTypes.bool,
     slugline: PropTypes.string,
     listConfig: PropTypes.object,

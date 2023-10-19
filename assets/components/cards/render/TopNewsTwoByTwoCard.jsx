@@ -9,7 +9,6 @@ import CardBody from './CardBody';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 
 const getTopNewsLeftPanel = (item, picture, openItem, cardId, listConfig) => {
-
     const rendition = getThumbnailRendition(picture, true);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
@@ -24,7 +23,6 @@ const getTopNewsLeftPanel = (item, picture, openItem, cardId, listConfig) => {
                 <Embargo item={item} isCard={true} />
                 <CardMeta
                     item={item}
-                    picture={picture}
                     displayDivider={false}
                     slugline={getSlugline(item, true)}
                 />
@@ -38,7 +36,6 @@ const getTopNewsLeftPanel = (item, picture, openItem, cardId, listConfig) => {
 };
 
 const getTopNewsRightPanel = (item, picture, openItem, cardId, listConfig) => {
-
     const rendition = getThumbnailRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
@@ -47,10 +44,7 @@ const getTopNewsRightPanel = (item, picture, openItem, cardId, listConfig) => {
         <div className='card card--home' onClick={() => openItem(item, cardId)}>
             <img className='card-img-top' src={imageUrl} alt={caption} />
             <CardBody item={item} displayDescription={false} displaySource={false} listConfig={listConfig}/>
-            <CardFooter
-                item={item}
-                picture={picture}
-            />
+            <CardFooter item={item} />
         </div>
     </div>);
 };
