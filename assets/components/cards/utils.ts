@@ -1,5 +1,7 @@
 import {memoize} from 'lodash';
 
+import {IListConfig} from 'interfaces';
+
 import ConfigEvent from 'components/cards/edit/ConfigEvent';
 import ConfigExternalMedia from 'components/cards/edit/ConfigExternalMedia';
 import ConfigNavigation from 'components/cards/edit/ConfigNavigation';
@@ -42,7 +44,7 @@ export interface ICardProps {
     openItem: any;
     isActive: boolean;
     cardId: string;
-    listConfig: string;
+    listConfig: IListConfig;
     kind?: MoreNewsSearchKind;
     type: string;
 }

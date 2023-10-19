@@ -1,12 +1,20 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import {IArticle, IListConfig} from 'interfaces';
+
 import {gettext, shortDate, fullDate, isDisplayed} from 'utils';
 import {characterCount, wordCount} from 'utils';
 import WireListItemIcons from 'wire/components/WireListItemIcons';
 
-function CardMeta({item, picture, displayDivider, slugline, listConfig}: any) {
+interface IProps {
+    item: IArticle;
+    displayDivider?: boolean;
+    slugline?: string;
+    listConfig?: IListConfig;
+}
+
+function CardMeta({item, displayDivider, slugline, listConfig}: IProps) {
     return (<div className="wire-articles__item__meta">
-        <WireListItemIcons item={item} picture={picture} divider={displayDivider} />
+        <WireListItemIcons item={item} divider={displayDivider} />
         <div className="wire-articles__item__meta-info">
             {slugline && <span className='bold'>{slugline}</span>}
             <span>
@@ -23,17 +31,5 @@ function CardMeta({item, picture, displayDivider, slugline, listConfig}: any) {
         </div>
     </div>);
 }
-
-CardMeta.propTypes = {
-    item: PropTypes.object.isRequired,
-    picture: PropTypes.object,
-    displayDivider: PropTypes.bool,
-    slugline: PropTypes.string,
-    listConfig: PropTypes.object,
-};
-
-CardMeta.defaultProps = {
-    displayDivider: false,
-};
 
 export default CardMeta;

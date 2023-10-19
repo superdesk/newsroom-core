@@ -10,7 +10,7 @@ import {render as _render} from 'react-dom';
 import alertify from 'alertifyjs';
 import moment from 'moment-timezone';
 
-import {IClientConfig, IUser} from 'interfaces';
+import {IArticle, IClientConfig, IUser} from 'interfaces';
 
 /*
  * Import and load all locales that will be used in moment.js
@@ -659,7 +659,7 @@ export function closeItemOnMobile(dispatch: any, state: any, openItemDetails: an
  * @param {boolean} withTakeKey - If true, appends the takekey to the response
  * @returns {String}
  */
-export function getSlugline(item: any, withTakeKey: any = false) {
+export function getSlugline(item: IArticle, withTakeKey: any = false): string {
     if (!item || !item.slugline) {
         return '';
     }

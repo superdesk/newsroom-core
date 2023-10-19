@@ -20,7 +20,6 @@ const getPictureTextPanel = (item: any, picture: any, openItem: any, withPicture
             <CardBody item={item} displayMeta={false} listConfig={listConfig} />
             <CardFooter
                 item={item}
-                picture={rendition}
                 listConfig={listConfig}
             />
         </div>
