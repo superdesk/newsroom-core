@@ -1,4 +1,6 @@
 import {get, isEmpty, isEqual, pickBy} from 'lodash';
+
+import {IArticle, IContentType, IRendition} from '../interfaces';
 import {getTextFromHtml, getConfig, isDisplayed} from 'utils';
 
 export const DISPLAY_ABSTRACT = getConfig('display_abstract');
@@ -49,6 +51,35 @@ function getRelatedItemsByType(item: any, type: any) {
     return item.type === type ? [item] : Object.values(get(item, 'associations', {}) || {}).filter((assoc: any) => get(assoc, 'type') === type);
 }
 
+export function getFeatureMedia(item: IArticle): IArticle | null {
+    if (['picture', 'video', 'audio'].includes(item.type)) {
+        return item;
+    }
+
+    const featured = item.associations?.featuremedia;
+
+    if (featured != null && ['picture', 'video', 'audio'].includes(featured.type)) {
+        return featured;
+    }
+
+    return getBodyPicture(item);
+}
+
+export function getOtherMedia(item: IArticle): Array<IArticle> | null {
+    if (['picture', 'video', 'audio'].includes(item.type)) {
+        return null;
+    }
+
+    return Object.keys(item.associations || {})
+        .filter((key) => (
+            !key.startsWith('editor_') &&
+            key !== 'featuremedia' &&
+            item.associations[key] != null &&
+            ['video', 'audio'].includes(item.associations[key].type)
+        ))
+        .map((key) => item.associations[key]);
+}
+
 /**
  * Get picture for an item
  *
@@ -71,13 +102,15 @@ export function getPicture(item: any) {
     return getBodyPicture(item);
 }
 
-function getBodyPicture(item: any) {
-    const pictures = Object.values(get(item, 'associations', {}) || {}).filter((assoc: any) => get(assoc, 'type') === 'picture');
+function getBodyPicture(item: IArticle): IArticle | null {
+    const pictures = Object.values(item.associations ?? {})
+        .filter((association) => association.type === 'picture');
     return pictures.length ? pictures[0] : null;
 }
 
-export function getPictureList(item: any) {
-    const pictures = Object.values(get(item, 'associations', {}) || {}).filter((assoc: any) => get(assoc, 'type') === 'picture');
+export function getPictureList(item: IArticle): Array<IArticle> {
+    const pictures = Object.values(item.associations ?? {})
+        .filter((association) => association.type === 'picture');
     return pictures.length ? pictures : [];
 }
 
@@ -88,9 +121,24 @@ export function getPictureList(item: any) {
  * @param {Boolean} large
  * @return {Object}
  */
-export function getThumbnailRendition(picture: any, large?: any) {
+export function getThumbnailRendition(picture: IArticle, large?: boolean): IRendition | undefined {
     const rendition = large ? 'renditions._newsroom_thumbnail_large' : 'renditions._newsroom_thumbnail';
     return get(picture, rendition, get(picture, 'renditions.thumbnail'));
+}
+
+export function getImageForList(item: IArticle): {item: IArticle, href: string} | undefined {
+    const pictures = getPictureList(item);
+    let thumbnail: IRendition | undefined;
+
+    for (let i = 0; i < pictures.length; i++) {
+        thumbnail = getThumbnailRendition(pictures[i]);
+
+        if (thumbnail != null && thumbnail.href != null) {
+            return {item: pictures[i], href: thumbnail.href};
+        }
+    }
+
+    return undefined;
 }
 
 /**
@@ -275,6 +323,18 @@ export function isEqualItem(a: any, b: any) {
 
 function hasMedia(item: any, type: any) {
     return item != null && getItemMedia(item).some((_item: any) => _item.type === type);
+}
+
+export function getContentTypes(item: IArticle): Set<IContentType> {
+    const contentTypes = new Set<IContentType>();
+
+    contentTypes.add(item.type);
+    Object.values(item.associations ?? {})
+        .forEach((item) => {
+            contentTypes.add(item.type);
+        });
+
+    return contentTypes;
 }
 
 export const hasAudio = (item: any) => hasMedia(item, 'audio');
