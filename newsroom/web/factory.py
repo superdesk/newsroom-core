@@ -1,6 +1,5 @@
 import os
 import flask
-import jinja2
 
 from newsroom.factory import BaseNewsroomApp
 from newsroom.template_filters import (
@@ -33,6 +32,7 @@ from newsroom.template_filters import (
     get_highlighted_field,
     get_item_category_names,
 )
+from newsroom.template_loaders import LocaleTemplateLoader
 from newsroom.notifications.notifications import get_initial_notifications
 from newsroom.limiter import limiter
 from newsroom.celery_app import init_celery
@@ -140,9 +140,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_filter(get_agenda_dates, "agenda_dates_string")
         self.add_template_filter(get_item_category_names, "category_names")
 
-        jinja2_loaders = [jinja2.FileSystemLoader(folder) for folder in self._theme_folders]
-
-        self.jinja_loader = jinja2.ChoiceLoader(jinja2_loaders)
+        self.jinja_loader = LocaleTemplateLoader(self._theme_folders)
 
     def _setup_limiter(self):
         limiter.init_app(self)
