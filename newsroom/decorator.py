@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import request, redirect, url_for, abort
+from flask import request, redirect, url_for, abort, session
 from newsroom.auth.utils import (
     clear_user_session,
     is_current_user_account_mgr,
@@ -15,7 +15,8 @@ def login_required(f):
     def decorated_function(*args, **kwargs):
         if not is_valid_session():
             clear_user_session()
-            return redirect(url_for("auth.login", next=request.url))
+            session["next_url"] = request.url
+            return redirect(url_for("auth.login"))
         return f(*args, **kwargs)
 
     return decorated_function

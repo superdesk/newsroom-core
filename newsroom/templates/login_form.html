@@ -19,7 +19,7 @@
     </div>
     <button type="submit" class="nh-button nh-button--primary w-100">{{ gettext("Login") }}</button>
     {% if config.GOOGLE_LOGIN %}
-    <a href="{{ url_for('oauth.google_login', next=next_page) }}"
+    <a href="{{ url_for('oauth.google_login') }}"
        class="nh-button nh-button--secondary w-100"
        role="button"
     >
