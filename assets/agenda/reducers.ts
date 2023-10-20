@@ -10,6 +10,7 @@ import {
     AGENDA_WIRE_ITEMS,
     WATCH_COVERAGE,
     STOP_WATCHING_COVERAGE,
+    SET_ERROR,
 } from './actions';
 
 import {get, uniq} from 'lodash';
@@ -34,7 +35,9 @@ const initialState = {
     activeQuery: null,
     user: null,
     userObject: null,
+    userFolders: [],
     company: null,
+    companyFolders: [],
     topics: [],
     selectedItems: [],
     bookmarks: false,
@@ -208,6 +211,8 @@ export default function agendaReducer(state: any = initialState, action: any): I
             uiConfig: action.agendaData.ui_config || {},
             groups: action.agendaData.groups || [],
             hasAgendaFeaturedItems: action.agendaData.has_agenda_featured_items || false,
+            userFolders: action.agendaData.user_folders,
+            companyFolders: action.agendaData.company_folders,
         };
     }
 
@@ -245,6 +250,11 @@ export default function agendaReducer(state: any = initialState, action: any): I
             }
         };
 
+    case SET_ERROR: {
+        return {...state,
+            isLoading: false,
+            errors: action.errors};
+    }
     default:
         return defaultReducer(state || initialState, action);
     }
