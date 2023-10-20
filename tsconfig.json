@@ -5,7 +5,7 @@
   "compilerOptions": {
     "allowJs": true,
     "baseUrl": "./assets",
-    "target": "es2015",
+    "target": "ES2015",
     "module": "commonjs",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

@@ -3,6 +3,7 @@ from flask import request, current_app, session
 from flask_babel import Babel, get_translations, format_datetime
 
 from newsroom.auth import get_user
+from newsroom.template_loaders import get_template_locale
 
 
 def get_client_translations(domain="client"):
@@ -40,6 +41,8 @@ def get_session_locale():
             return request.accept_languages.best_match(
                 current_app.config["LANGUAGES"], current_app.config["DEFAULT_LANGUAGE"]
             )
+    if get_template_locale():
+        return get_template_locale()
     return current_app.config["DEFAULT_LANGUAGE"]
 
 

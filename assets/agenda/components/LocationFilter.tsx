@@ -404,28 +404,28 @@ export class LocationFilter extends React.Component<any, any> {
         case LOCATION_TYPE.CITY:
             return (
                 <>
-                    <span className='nh-dropdown-button__text-label'>{gettext('City')}: </span>
+                    <span className='nh-dropdown-button__text-label nh-dropdown-button__text-label--hide-on-mobile'>{gettext('City')}: </span>
                     <span className='nh-dropdown-button__text-value'>{activeFilter.name}</span>
                 </>
             );
         case LOCATION_TYPE.STATE:
             return (
                 <>
-                    <span className='nh-dropdown-button__text-label'>{gettext('State')}: </span>
+                    <span className='nh-dropdown-button__text-label nh-dropdown-button__text-label--hide-on-mobile'>{gettext('State')}: </span>
                     <span className='nh-dropdown-button__text-value'>{activeFilter.name}</span>
                 </>
             );
         case LOCATION_TYPE.COUNTRY:
             return (
                 <>
-                    <span className='nh-dropdown-button__text-label'>{gettext('Country')}: </span>
+                    <span className='nh-dropdown-button__text-label nh-dropdown-button__text-label--hide-on-mobile'>{gettext('Country')}: </span>
                     <span className='nh-dropdown-button__text-value'>{activeFilter.name}</span>
                 </>
             );
         case LOCATION_TYPE.PLACE:
             return <span className='nh-dropdown-button__text-value'>{activeFilter.name}</span> ;
         default:
-            return gettext('Any location');
+            return gettext('Location');
         }
     }
 
@@ -446,6 +446,7 @@ export class LocationFilter extends React.Component<any, any> {
                     onClick={this.toggleDropdown}
                     autoToggle={false}
                     noLabelWrap={true}
+                    hideLabelOnMobile={true}
                 />
                 <div
                     className={classNames(
@@ -454,21 +455,27 @@ export class LocationFilter extends React.Component<any, any> {
                     )}
                     aria-labelledby="subnav_location"
                 >
-                    <div className="d-flex flex-column h-100 d-md-block p-md-2">
-                        <div>
-                            <input
-                                type="text"
-                                className="form-control"
-                                placeholder={gettext('Search for a region or place')}
-                                onChange={this.onSearchInputChange}
-                                // aria-activedescendant={true}
-                                aria-autocomplete="both"
-                                aria-expanded={true}
-                                aria-haspopup="listbox"
-                                aria-owns="dropdown-list-menu"
-                                role="combobox"
-                                ref={(ref: any) => this.dom.searchInput = ref}
-                            />
+                    <div className="dropdown-menu__header">
+                        {gettext('Location')}
+                    </div>
+                    <div className="d-flex flex-column h-100 d-md-block p-md-2 location-filter">
+                        <div className="search search--small search--with-icon search--bordered m-0">
+                            <form className="search__form" role="search" aria-label="search">
+                                <i className="icon--search icon--muted-2"></i>
+                                <input
+                                    type="text"
+                                    className="form-control search__input"
+                                    placeholder={gettext('Search for a region or place')}
+                                    aria-label={gettext('Search for a region or place')}
+                                    onChange={this.onSearchInputChange}
+                                    aria-autocomplete="both"
+                                    aria-expanded={true}
+                                    aria-haspopup="listbox"
+                                    aria-owns="dropdown-list-menu"
+                                    role="combobox"
+                                    ref={(ref: any) => this.dom.searchInput = ref}
+                                />
+                            </form>
                         </div>
                         <div
                             id="dropdown-list-menu"
@@ -477,17 +484,19 @@ export class LocationFilter extends React.Component<any, any> {
                                 {show: this.state.popupOpen}
                             )}
                         >
+                            {/* <div className="dropdown-menu__header">
+                                {gettext('Location')}
+                            </div> */}
                             {!isActive ? null : (
                                 <React.Fragment>
                                     <button
                                         type="button"
-                                        className="dropdown-item"
+                                        className="dropdown-item dropdown-item--emphasized"
                                         onClick={() => this.onChange()}
                                         ref={(ref: any) => this.dom.clearButton = ref}
                                     >
-                                        {gettext('Any location')}
+                                        {gettext('Clear selection')}
                                     </button>
-                                    <div className="dropdown-divider" />
                                 </React.Fragment>
                             )}
 
@@ -500,7 +509,7 @@ export class LocationFilter extends React.Component<any, any> {
                                 </div>
                             ) : (
                                 <React.Fragment>
-                                    <h6 className="dropdown-header">{gettext('Regions')}</h6>
+                                    <h6 className="dropdown-menu__section-heading">{gettext('Regions')}</h6>
                                     {this.state.results.regions.length > 0 ? (
                                         this.state.results.regions.map(this.renderRegionSearchResult)
                                     ) : (
@@ -512,9 +521,8 @@ export class LocationFilter extends React.Component<any, any> {
                                             {gettext('No regions found')}
                                         </button>
                                     )}
-                                    <div className="dropdown-divider" />
 
-                                    <h6 className="dropdown-header">{gettext('Places')}</h6>
+                                    <h6 className="dropdown-menu__section-heading">{gettext('Places')}</h6>
                                     {this.state.results.places.length > 0 ? (
                                         this.state.results.places.map(this.renderRegionSearchResult)
                                     ) : (

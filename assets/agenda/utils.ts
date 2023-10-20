@@ -74,19 +74,19 @@ export const WORKFLOW_STATUS = {
 };
 
 const DRAFT_STATUS_TEXTS = {
-    'coverage not planned': gettext('coverage not planned'),
-    'coverage not intended': gettext('coverage not planned'),
-    'coverage intended': gettext('coverage planned'),
-    'coverage not decided': gettext('coverage on merit'),
-    'coverage not decided yet': gettext('coverage on merit'),
-    'coverage upon request': gettext('coverage on request'),
+    'coverage not planned': gettext('Coverage not planned'),
+    'coverage not intended': gettext('Coverage not planned'),
+    'coverage intended': gettext('Coverage planned'),
+    'coverage not decided': gettext('Coverage on merit'),
+    'coverage not decided yet': gettext('Coverage on merit'),
+    'coverage upon request': gettext('Coverage on request'),
 };
 
 const WORKFLOW_STATUS_TEXTS = {
-    [WORKFLOW_STATUS.ASSIGNED]: gettext('coverage planned'),
-    [WORKFLOW_STATUS.ACTIVE]: gettext('coverage in progress'),
-    [WORKFLOW_STATUS.COMPLETED]: gettext('coverage available'),
-    [WORKFLOW_STATUS.CANCELLED]: gettext('coverage cancelled'),
+    [WORKFLOW_STATUS.ASSIGNED]: gettext('Coverage planned'),
+    [WORKFLOW_STATUS.ACTIVE]: gettext('Coverage in progress'),
+    [WORKFLOW_STATUS.COMPLETED]: gettext('Coverage available'),
+    [WORKFLOW_STATUS.CANCELLED]: gettext('Coverage cancelled'),
 };
 
 export const WORKFLOW_COLORS = {

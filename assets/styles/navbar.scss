@@ -271,7 +271,8 @@
         flex-wrap: wrap;
         border-block-end: 1px solid var(--color-line--x-light);
         @include phone {
-            //box-shadow: var(--main-header-shadow);
+            padding-inline: var(--space--1);
+            gap: var(--space--0-5);
         }
 
     }

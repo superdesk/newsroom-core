@@ -146,10 +146,11 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                 </div>
                             )}
                             <div className="navbar__button-group">
-                                <Dropdown
+                                {this.props.topicType === 'wire' ? <Dropdown
                                     label={gettext('Sort by:')}
                                     value={gettext('{{sort}}', {sort: this.state.sortValue})}
                                     className={'sorting-dropdown'}
+                                    dropdownMenuHeader={gettext('Sort results by')}
                                 >
                                     {
                                         this.sortValues.map((option) => (
@@ -166,7 +167,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                             </button>
                                         ))
                                     }
-                                </Dropdown>
+                                </Dropdown>: null}
                                 <button
                                     className="nh-button nh-button--tertiary"
                                     onClick={() => {
@@ -175,7 +176,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                         this.props.refresh();
                                     }}
                                 >
-                                    {gettext('Clear all')}
+                                    {gettext('Clear All')}
                                 </button>
                                 <button
                                     data-test-id="toggle-search-bar"

@@ -15,7 +15,7 @@ from newsroom.utils import (
     get_cached_resource_by_id,
 )
 from newsroom.limiter import limiter
-from newsroom.auth.utils import get_company_auth_provider
+from newsroom.auth.utils import get_company_auth_provider, redirect_to_next_url
 
 blueprint = Blueprint("oauth", __name__)
 oauth = None
@@ -43,7 +43,6 @@ def init_app(app):
 def google_login():
     global oauth
     redirect_uri = url_for(".google_authorized", _external=True)
-    flask.session["next_page"] = flask.request.args.get("next") or flask.url_for("wire.index")
     return oauth.google.authorize_redirect(redirect_uri)
 
 
@@ -51,13 +50,12 @@ def google_login():
 @limiter.limit("60/hour")
 def google_authorized():
     global oauth
-    next_page = flask.session.pop("next_page", flask.url_for("wire.index"))
     token = oauth.google.authorize_access_token()
 
     def redirect_with_error(error_str):
         flask.session.pop("_flashes", None)  # remove old messages and just show one message
         flask.flash(error_str, "danger")
-        return flask.redirect(url_for("auth.login", next=next_page))
+        return flask.redirect(url_for("auth.login"))
 
     if not token:
         return redirect_with_error(gettext("Invalid token"))
@@ -108,4 +106,4 @@ def google_authorized():
     flask.session["name"] = "{} {}".format(user.get("first_name"), user.get("last_name"))
     flask.session["user_type"] = user["user_type"]
 
-    return flask.redirect(next_page)
+    return redirect_to_next_url()

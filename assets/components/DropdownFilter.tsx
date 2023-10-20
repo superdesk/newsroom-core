@@ -41,12 +41,16 @@ function DropdownFilter({
     className,
     filterName,
     borderless,
+    dropdownMenuHeader,
+    resetOptionLabel,
+    hideLabelOnMobile,
     ...props
 }: any) {
     const isActive = !!(activeFilter[filter.field]);
     const filterLabel = getFilterLabel ? getFilterLabel : getActiveFilterLabel;
     const label = filterLabel(filter, activeFilter, isActive, {...props});
     const items = getDropdownItems(filter, aggregations, toggleFilter, processBuckets, {...props});
+    const hasItemsAvailable = (items?.length ?? 0) > 0;
 
     return (
         <Dropdown
@@ -55,23 +59,24 @@ function DropdownFilter({
             label={label}
             className={className}
             borderless={borderless}
+            dropdownMenuHeader={dropdownMenuHeader}
+            hideLabelOnMobile={hideLabelOnMobile}
         >
-            <button
-                type='button'
-                className='dropdown-item'
-                onClick={() => toggleFilter(filter.field, null)}
-            >
-                {gettext(filter.label)}
-            </button>
-            <div className='dropdown-divider' />
+            {hasItemsAvailable || isActive && (
+                <button
+                    type='button'
+                    className='dropdown-item'
+                    onClick={() => toggleFilter(filter.field, null)}
+                >
+                    {resetOptionLabel ?? gettext(filter.label)}
+                </button>
+            )}
             {
-                (items?.length ?? 0) < 1
-                    ? (
-                        <div className='dropdown-item__empty'>
-                            {gettext('No {{filterName}} available', {filterName: filterName ?? 'items'})}
-                        </div>
-                    )
-                    : items
+                hasItemsAvailable ? items : (
+                    <div className='dropdown-item__empty'>
+                        {gettext('No {{filterName}} available', {filterName: filterName ?? 'items'})}
+                    </div>
+                )
             }
         </Dropdown>
     );
@@ -90,6 +95,9 @@ DropdownFilter.propTypes = {
     filterName: PropTypes.string,
     borderless: PropTypes.bool,
     locators: PropTypes.any,
+    dropdownMenuHeader: PropTypes.string,
+    resetOptionLabel: PropTypes.string,
+    hideLabelOnMobile: PropTypes.bool,
 };
 
 export default DropdownFilter;

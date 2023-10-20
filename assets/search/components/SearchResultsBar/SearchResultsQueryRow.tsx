@@ -23,7 +23,7 @@ export function SearchResultsQueryRow({searchParams, setQuery, readonly, refresh
     return (
         <SearchResultTagList
             testId="search-results--query"
-            title={gettext('Search For')}
+            title={gettext('Search for')}
             tags={[
                 <div className="d-contents" key="tags-query">
                     <Tag

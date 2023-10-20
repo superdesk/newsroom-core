@@ -59,6 +59,8 @@ const renderFilter: any = {
                 activeFilter={props.activeFilter}
                 getDropdownItems={getDropdownItems}
                 locators={props.locators}
+                dropdownMenuHeader={gettext('Regions')}
+                resetOptionLabel={gettext('Clear selection')}
                 getFilterLabel={(filter: any, activeFilter: any, isActive: any, props: any) => {
                     if (!isActive) {
                         return filter.label;
@@ -72,7 +74,7 @@ const renderFilter: any = {
                     return region ? (get(region, 'state') || get(region, 'country') || get(region, 'world_region')) : get(activeFilter, `${filter.field}[0]`);
                 }}
                 filter={{
-                    label: gettext('Any region'),
+                    label: gettext('Region'),
                     field: 'place',
                     itemTypes: ['events', 'combined'],
                     transformBuckets: groupRegions,
@@ -91,8 +93,11 @@ const renderFilter: any = {
                 toggleFilter={props.toggleFilter}
                 activeFilter={props.activeFilter}
                 getDropdownItems={getDropdownItems}
+                dropdownMenuHeader={gettext('Coverage types')}
+                resetOptionLabel={gettext('Clear selection')}
+                hideLabelOnMobile={true}
                 filter={{
-                    label: gettext('Any coverage type'),
+                    label: gettext('Coverage type'),
                     field: 'coverage',
                     nestedField: 'coverage_type',
                     transform: getCoverageDisplayName,

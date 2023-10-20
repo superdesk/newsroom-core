@@ -13,6 +13,7 @@ from jinja2 import TemplateNotFound
 from newsroom.auth import get_company
 
 from newsroom.celery_app import celery
+from newsroom.template_loaders import set_template_locale
 from newsroom.utils import (
     get_agenda_dates,
     get_location_string,
@@ -201,13 +202,17 @@ def send_template_email(
         template_kwargs.setdefault("subject", subject)
         template_kwargs.setdefault("recipient_language", language)
 
-        send_email(
-            to=group["emails"],
-            subject=subject,
-            text_body=render_template(group["text_template"], **template_kwargs),
-            html_body=render_template(group["html_template"], **template_kwargs),
-            **kwargs,
-        )
+        try:
+            set_template_locale(language)
+            send_email(
+                to=group["emails"],
+                subject=subject,
+                text_body=render_template(group["text_template"], **template_kwargs),
+                html_body=render_template(group["html_template"], **template_kwargs),
+                **kwargs,
+            )
+        finally:
+            set_template_locale()
 
 
 def send_validate_account_email(user_name, user_email, token):

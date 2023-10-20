@@ -23,14 +23,14 @@ const getEventPanel = (event: any, index: any) => {
     };
 
     const getDateSpans = (d1: any, d2: any) => ([
-        isWholeMonth(d1, d2) ? <div key='day' className='date-round__number'><span>{gettext('all')}</span></div> :
+        isWholeMonth(d1, d2) ? <div key='day' className='date-round__number'><span>{gettext('All')}</span></div> :
             <div key='day' className='date-round__number'>
                 <span>{d1.format('D')}</span>{isSameMonth(d1, d2) && '-'}<span>{isSameMonth(d1, d2) && d2.format('D')}</span>
             </div>,
         <div key='month' className='date-round__month date-round__month--big'><span>{d1.format('MMMM')}</span></div>,
         isDifferentMonth(d1, d2) ?
             <div key='month2' className='date-round__month'>
-                {gettext('to')} <span className='date-round__number--small'>{d2.format('D')}</span>  <span>{d2.format('MMMM')}</span>
+                {gettext('To')} <span className='date-round__number--small'>{d2.format('D')}</span>  <span>{d2.format('MMMM')}</span>
             </div> : null,
     ]);
 

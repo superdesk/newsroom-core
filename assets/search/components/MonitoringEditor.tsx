@@ -179,7 +179,7 @@ class MonitoringEditor extends React.Component<any, any> {
 
                                     <SelectInput
                                         name='alert_type'
-                                        label={gettext('Alert type')}
+                                        label={gettext('Alert Type')}
                                         value={profile.alert_type}
                                         options={[
                                             {value: 'linked_text', text: 'Linked extract(s)'},

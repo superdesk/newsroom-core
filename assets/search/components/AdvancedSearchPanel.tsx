@@ -165,7 +165,7 @@ function AdvancedSearchPanelComponent({
                         fetchItems();
                     }}
                 >
-                    {gettext('Clear all')}
+                    {gettext('Clear All')}
                 </button>
                 <button
                     data-test-id="run-advanced-search-btn"
