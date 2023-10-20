@@ -97,6 +97,7 @@ def start_user_session(user: User, permanent=False, session=None):
     session["user_type"] = user["user_type"]
     session["auth_ttl"] = utcnow().replace(tzinfo=None) + SESSION_AUTH_TTL
     session.permanent = permanent
+    print("STARTED", session)
 
 
 def clear_user_session(session=None):

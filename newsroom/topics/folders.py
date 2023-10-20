@@ -1,4 +1,5 @@
 import newsroom
+from newsroom.user_roles import UserRole
 
 from . import topics
 
@@ -31,6 +32,8 @@ class FoldersResource(newsroom.Resource):
             {"unique": True, "collation": {"locale": "en", "strength": 2}},
         ),
     }
+    allowed_roles = [role for role in UserRole]
+    allowed_item_roles = allowed_roles
 
 
 class UserFoldersResource(FoldersResource):

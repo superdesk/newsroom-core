@@ -1,5 +1,6 @@
 import bcrypt
 import newsroom
+import superdesk
 from datetime import datetime
 from copy import deepcopy
 
@@ -9,7 +10,7 @@ from flask_babel import gettext
 from werkzeug.exceptions import BadRequest
 
 from newsroom.types import Company, ProductRef, User
-from newsroom.auth import get_user_id, get_user, get_company_from_user
+from newsroom.auth import get_user_id, get_user, get_company_from_user, SessionAuth
 from newsroom.settings import get_setting
 from newsroom.utils import set_original_creator, set_version_creator
 from superdesk.utils import is_hashed, get_hash
@@ -19,6 +20,32 @@ from newsroom.signals import user_created, user_updated, user_deleted
 from newsroom.companies.utils import get_company_section_names, get_company_product_ids
 
 
+class UserAuthentication(SessionAuth):
+    def authorized(self, allowed_roles, resource, method):
+        if super().authorized(allowed_roles, resource, method):
+            return True
+
+        if not request.view_args or not request.view_args.get("_id"):
+            # not a request for a specific user, stop
+            return False
+
+        if request.view_args["_id"] == str(get_user_id()):
+            # current user editing current user
+            return True
+
+        current_user = get_user()
+        if not current_user.get("company") or current_user.get("user_type") != UserRole.COMPANY_ADMIN.value:
+            # current user not a company admin
+            return False
+
+        request_user = superdesk.get_resource_service("users").find_one(req=None, _id=request.view_args["_id"])
+        if request_user.get("company") and request_user["company"] == current_user["company"]:
+            # if current user is a company admin for request user
+            return True
+
+        return False
+
+
 class UsersResource(newsroom.Resource):
     """
     Users schema
@@ -26,6 +53,8 @@ class UsersResource(newsroom.Resource):
 
     # Use a private style URL, otherwise ``POST /users/<_id>`` doesn't work from behave tests
     url = "_users"
+
+    authentication = UserAuthentication()
 
     schema = {
         "password": {"type": "string", "minlength": 8},
@@ -119,7 +148,7 @@ class UsersResource(newsroom.Resource):
     resource_methods = ["GET", "POST"]
     datasource = {
         "source": "users",
-        "projection": {"password": 0},
+        "projection": {"password": 0, "token": 0},
         "default_sort": [("first_name", 1)],
     }
     mongo_indexes = {
@@ -127,6 +156,21 @@ class UsersResource(newsroom.Resource):
             [("email", 1)],
             {"unique": True, "collation": {"locale": "en", "strength": 2}},
         )
+    }
+
+
+class AuthUserResource(newsroom.Resource):
+    internal_resource = True
+
+    schema = {
+        "email": UsersResource.schema["email"],
+        "password": UsersResource.schema["password"],
+        "token": UsersResource.schema["token"],
+        "token_expiry_date": UsersResource.schema["token_expiry_date"],
+    }
+
+    datasource = {
+        "source": "users",
     }
 
 
@@ -328,3 +372,10 @@ class UsersService(newsroom.Service):
             return
 
         abort(403)
+
+
+class AuthUserService(newsroom.Service):
+    pass
+
+
+users_service = UsersService()

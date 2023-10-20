@@ -190,6 +190,11 @@ def user(app):
 
 
 @fixture()
+def admin(user):
+    return user
+
+
+@fixture()
 def auth_users(client, user):
     test_login_succeeds_for_admin(client)
 
