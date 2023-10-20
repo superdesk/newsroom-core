@@ -101,5 +101,4 @@ It will run database migrations when needed.
 * Choose an instance you want to connect to and set `MONGO_DBNAME` environment variable in `newsroom-app/server/.env`. Example: `MONGO_DBNAME=nra-develop`
 * Start **only redis** service via docker `docker-compose up redis`
 * Run the following command in a terminal `ssh -L 9200:data-sd:9201 -L 27017:data-sd:27017 host7.sourcefabric.org` - it will connect to the test server and forward ports of mongo db and elastic search services
-
-
+* start client and server using standard procedures (non-docker)
