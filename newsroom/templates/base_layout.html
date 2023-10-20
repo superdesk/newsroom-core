@@ -43,7 +43,9 @@
 
             {% if session.get('name') %}
             <div class="navbar__right">
+                {% if config.SHOW_DATE %}
                 <div class="navbar__date">{{ get_date() | date_header }}</div>
+                {% endif %}
                 <div class="navbar-notifications" id="header-notification"></div>
                 <div id="header-profile-toggle" data-test-id="header-avatar"></div>
             </div>
