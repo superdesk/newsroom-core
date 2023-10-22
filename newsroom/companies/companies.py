@@ -60,6 +60,10 @@ class CompaniesResource(newsroom.Resource):
                 },
             },
         },
+        "auth_domain": {
+            "type": "string",
+            "nullable": True,
+        },
     }
 
     datasource = {"source": "companies", "default_sort": [("name", 1)]}
@@ -71,6 +75,14 @@ class CompaniesResource(newsroom.Resource):
         "name_1": (
             [("name", 1)],
             {"unique": True, "collation": {"locale": "en", "strength": 2}},
+        ),
+        "auth_domain_1": (
+            [("auth_domain", 1)],
+            {
+                "unique": True,
+                "collation": {"locale": "en", "strength": 2},
+                "partialFilterExpression": {"auth_domain": {"$gt": ""}},  # filters out None and ""
+            },
         ),
     }
 

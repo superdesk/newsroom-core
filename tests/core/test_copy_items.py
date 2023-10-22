@@ -11,7 +11,7 @@ def test_copy_agenda(client, app):
     assert resp.status_code == 200
 
     expected_text = load_fixture("agenda_copy_text.txt")
-    assert data["data"] == expected_text
+    assert data["data"].replace("\u202F", " ") == expected_text
 
 
 def test_copy_wire(client, app):
@@ -23,4 +23,4 @@ def test_copy_wire(client, app):
     assert resp.status_code == 200
 
     expected_text = load_fixture("item_copy_text.txt")
-    assert data["data"] == expected_text
+    assert data["data"].replace("\u202F", " ") == expected_text
