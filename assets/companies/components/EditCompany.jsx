@@ -186,7 +186,7 @@ class EditCompany extends React.Component {
                             errors={this.props.errors}
                             originalItem={!this.props.company._id ?
                                 this.props.company :
-                                this.props.company[this.props.company._id]
+                                this.props.companiesById[this.props.company._id]
                             }
                         />
                     )}
@@ -211,6 +211,7 @@ EditCompany.propTypes = {
     fetchCompanyUsers: PropTypes.func.isRequired,
     companyTypes: PropTypes.array,
     apiEnabled: PropTypes.bool,
+    companiesById: PropTypes.object,
     ssoEnabled: PropTypes.bool,
     sections: PropTypes.arrayOf(PropTypes.shape({
         _id: PropTypes.string.isRequired,
