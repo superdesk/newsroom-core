@@ -1,21 +1,19 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import {IArticle, IListConfig} from 'interfaces';
 import CardMeta from './CardMeta';
 
-function CardFooter({item, picture, listConfig}: any) {
+interface IProps {
+    item: IArticle;
+    listConfig?: IListConfig;
+}
+
+function CardFooter({item, listConfig}: IProps) {
     return (<div className="card-footer">
         <CardMeta
             item={item}
-            picture={picture}
             listConfig={listConfig}
         />
     </div>);
 }
-
-CardFooter.propTypes = {
-    item: PropTypes.object.isRequired,
-    picture: PropTypes.object,
-    listConfig: PropTypes.object,
-};
 
 export default CardFooter;

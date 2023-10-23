@@ -1,19 +1,22 @@
 import React from 'react';
+
+import {IArticle} from 'interfaces';
 import {shortDate} from 'utils';
 import {getPicture, getThumbnailRendition, getCaption} from 'wire/utils';
 import CardRow from './CardRow';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 import {ICardProps} from '../utils';
 
-const getMediaPanel = (item: any, picture: any, openItem: any, cardId: any) => {
-
+const getMediaPanel = (item: IArticle, picture: IArticle, openItem: any, cardId: string) => {
     const rendition = getThumbnailRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
 
     return (<div key={item._id} className='col-sm-6 col-lg-3 d-flex mb-4'>
         <div className='card card--home card--gallery' onClick={() => openItem(item, cardId)}>
-            <img className='card-img-top' src={imageUrl} alt={caption} />
+            {imageUrl == null ? null : (
+                <img className='card-img-top' src={imageUrl} alt={caption} />
+            )}
             <div className='card-body'>
                 <div className='wire-articles__item__meta'>
                     <div className='wire-articles__item__meta-info'>
