@@ -143,7 +143,7 @@ class SendScheduledNotificationEmails(Command):
             app_name=app.config["SITE_NAME"],
             entries=topic_entries,
             topic_match_table=topic_match_table,
-            date=now_local,
+            date=now_utc,
         )
 
         if not len(topic_entries["wire"]) and not len(topic_entries["agenda"]):
