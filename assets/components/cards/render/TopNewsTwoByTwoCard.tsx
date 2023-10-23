@@ -1,5 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
+import {IArticle, IListConfig} from 'interfaces';
+
 import {getSlugline} from 'utils';
 import {getPicture, getThumbnailRendition, getCaption, shortText} from 'wire/utils';
 import CardRow from './CardRow';
@@ -8,8 +11,7 @@ import CardMeta from './CardMeta';
 import CardBody from './CardBody';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 
-const getTopNewsLeftPanel = (item: any, picture: any, openItem: any, cardId: any, listConfig: any) => {
-
+const getTopNewsLeftPanel = (item: IArticle, picture: IArticle, openItem: any, cardId: string, listConfig: IListConfig) => {
     const rendition = getThumbnailRendition(picture, true);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
@@ -24,9 +26,9 @@ const getTopNewsLeftPanel = (item: any, picture: any, openItem: any, cardId: any
                 <Embargo item={item} isCard={true} />
                 <CardMeta
                     item={item}
-                    picture={picture}
                     displayDivider={false}
                     slugline={getSlugline(item, true)}
+                    listConfig={listConfig}
                 />
                 <div className='wire-articles__item__text'>
                     <p className='card-text'>{shortText(item, 40, listConfig)}</p>
@@ -37,20 +39,18 @@ const getTopNewsLeftPanel = (item: any, picture: any, openItem: any, cardId: any
     );
 };
 
-const getTopNewsRightPanel = (item: any, picture: any, openItem: any, cardId: any, listConfig?: any): any => {
-
+const getTopNewsRightPanel = (item: IArticle, picture: IArticle, openItem: any, cardId: string, listConfig?: IListConfig): any => {
     const rendition = getThumbnailRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
 
     return (<div key={item._id} className='col-sm-6 col-md-3 d-flex mb-4'>
         <div className='card card--home' onClick={() => openItem(item, cardId)}>
-            <img className='card-img-top' src={imageUrl} alt={caption} />
+            {imageUrl == null ? null : (
+                <img className='card-img-top' src={imageUrl} alt={caption} />
+            )}
             <CardBody item={item} displayDescription={false} displaySource={false} listConfig={listConfig}/>
-            <CardFooter
-                item={item}
-                picture={picture}
-            />
+            <CardFooter item={item} />
         </div>
     </div>);
 };

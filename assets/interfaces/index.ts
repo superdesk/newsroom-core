@@ -1,4 +1,4 @@
-export {TDatetime, IFilterGroup, ISection, ICountry} from './common';
+export {TDatetime, IFilterGroup, ISection, ICountry, IListConfig} from './common';
 export {ICompany, ICompanyType, IAuthProvider, IService} from './company';
 export {IClientConfig} from './config';
 export {INavigation} from './navigation';
@@ -8,3 +8,4 @@ export {IDashboardCard} from './dashboard';
 export {IProduct} from './product';
 export {ISectionFilter} from './section_filter';
 export {IAgendaItem} from './agenda';
+export {IArticle, IRendition, IContentType} from './content';

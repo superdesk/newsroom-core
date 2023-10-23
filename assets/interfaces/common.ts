@@ -23,3 +23,5 @@ export interface ICountry {
     value: string;
     text: string;
 }
+
+export type IListConfig = {[key: string]: string | number | boolean};

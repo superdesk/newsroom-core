@@ -41,6 +41,7 @@ export interface IEvent {
 }
 
 export interface IAgendaItem {
+    type: 'event' | 'planning';
     event?: IEvent;
     location?: IEvent['location'];
 }
