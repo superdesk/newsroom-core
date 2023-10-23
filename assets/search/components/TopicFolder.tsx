@@ -96,7 +96,7 @@ export function TopicFolder({
                         <button
                             type="button"
                             className="icon-button icon-button--tertiary"
-                            data-test-id="simple-card-toggle-btn"
+                            data-test-id="collapse"
                             title={gettext('Close')}
                             onClick={() => setOpened(false)}
                         ><i className="icon--minus"></i></button>
@@ -104,7 +104,7 @@ export function TopicFolder({
                         <button
                             type="button"
                             className="icon-button icon-button--tertiary"
-                            data-test-id="simple-card-toggle-btn"
+                            data-test-id="expand"
                             title={gettext('Open')}
                             onClick={() => setOpened(true)}
                             disabled={topics.length === 0}
@@ -126,7 +126,7 @@ export function TopicFolder({
                             ref={buttonRef}
                             className="icon-button icon-button--tertiary"
                             aria-label={gettext('Folder Actions')}
-                            data-test-id={`folder-action-${folder.name}`}
+                            data-test-id="menu"
                         >
                             <i className='icon--more'></i>
                         </button>

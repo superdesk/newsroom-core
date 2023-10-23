@@ -44,8 +44,8 @@ class ProfileTopicsWrapper {
     }
 
     getFolderAction(name, actionName) {
-        cy.get(`[data-test-id="folder-card"][data-test-value="${name}"] [data-test-id="folder-action-${name}"]`).click();
-        return cy.get(`[data-test-id="action-topic-${actionName}"]`);
+        cy.get(`[data-test-id="folder-card"][data-test-value="${name}"] [data-test-id="menu"]`).click();
+        return cy.get(`[data-test-id="action-folder"][data-test-value="${actionName}"]`);
     }
 
     dragTopicToFolder(topicName, folderName) {
