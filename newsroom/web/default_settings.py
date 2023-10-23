@@ -357,6 +357,9 @@ CLIENT_CONFIG = {
     "scheduled_notifications": {"default_times": DEFAULT_SCHEDULED_NOTIFICATION_TIMES},
 }
 
+# Enable rendering of the date in the base view
+SHOW_DATE = True
+
 # Enable iframely support for item body_html
 IFRAMELY = True
 
