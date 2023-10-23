@@ -49,6 +49,35 @@ function getRelatedItemsByType(item, type) {
     return item.type === type ? [item] : Object.values(get(item, 'associations', {}) || {}).filter((assoc) => get(assoc, 'type') === type);
 }
 
+export function getFeatureMedia(item) {
+    if (['picture', 'video', 'audio'].includes(item.type)) {
+        return item;
+    }
+
+    const featured = get(item, 'associations.featuremedia');
+
+    if (featured != null && ['picture', 'video', 'audio'].includes(featured.type)) {
+        return featured;
+    }
+
+    return getBodyPicture(item);
+}
+
+export function getOtherMedia(item) {
+    if (['picture', 'video', 'audio'].includes(item.type)) {
+        return null;
+    }
+
+    return Object.keys(item.associations || {})
+        .filter((key) => (
+            !key.startsWith('editor_') &&
+            key !== 'featuremedia' &&
+            item.associations[key] != null &&
+            ['video', 'audio'].includes(item.associations[key].type)
+        ))
+        .map((key) => item.associations[key]);
+}
+
 /**
  * Get picture for an item
  *
@@ -91,6 +120,21 @@ export function getPictureList(item) {
 export function getThumbnailRendition(picture, large) {
     const rendition = large ? 'renditions._newsroom_thumbnail_large' : 'renditions._newsroom_thumbnail';
     return get(picture, rendition, get(picture, 'renditions.thumbnail'));
+}
+
+export function getImageForList(item) {
+    const pictures = getPictureList(item);
+    let thumbnail;
+
+    for (let i = 0; i < pictures.length; i++) {
+        thumbnail = getThumbnailRendition(pictures[i]);
+
+        if (thumbnail != null && thumbnail.href != null) {
+            return {item: pictures[i], href: thumbnail.href};
+        }
+    }
+
+    return null;
 }
 
 /**
@@ -224,6 +268,19 @@ export function isEqualItem(a, b) {
 
 function hasMedia(item, type) {
     return item != null && getItemMedia(item).some((_item) => _item.type === type);
+}
+
+export function getContentTypes(item) {
+    const contentTypes = new Set();
+
+    contentTypes.add(item.type);
+    Object.values(item.associations || {})
+        .map((association) => association.type)
+        .forEach((mediaType) => {
+            contentTypes.add(mediaType);
+        });
+
+    return contentTypes;
 }
 
 export const hasAudio = (item) => hasMedia(item, 'audio');

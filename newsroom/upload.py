@@ -43,7 +43,9 @@ def get_upload(media_id, filename=None):
     response.cache_control.max_age = cache_for
     response.cache_control.s_max_age = cache_for
     response.cache_control.public = True
-    response.make_conditional(flask.request)
+
+    # Add ``accept_ranges`` & ``complete_length`` so video seeking is supported
+    response.make_conditional(flask.request, accept_ranges=True, complete_length=media_file.length)
 
     if filename is None and flask.request.args.get("filename"):
         filename = flask.request.args.get("filename")

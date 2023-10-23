@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import CardRow from './CardRow';
 import CardFooter from './CardFooter';
-import {getPicture, shortText} from 'wire/utils';
+import {shortText} from 'wire/utils';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 
-const getTextOnlyPanel = (item, openItem, picture, cardId, listConfig) => (
+const getTextOnlyPanel = (item, openItem, cardId, listConfig) => (
     <div key={item._id} className='col-sm-6 col-md-4 col-lg-3 col-xxl-2 d-flex mb-4'>
         <div className='card card--home' onClick={() => openItem(item, cardId)}>
             <div className='card-body'>
@@ -17,7 +17,6 @@ const getTextOnlyPanel = (item, openItem, picture, cardId, listConfig) => (
             </div>
             <CardFooter
                 item={item}
-                picture={picture}
                 listConfig={listConfig}
             />
         </div>
@@ -28,7 +27,7 @@ const getTextOnlyPanel = (item, openItem, picture, cardId, listConfig) => (
 function TextOnlyCard ({items, title, product, openItem, isActive, cardId, listConfig}) {
     return (
         <CardRow title={title} product={product} isActive={isActive}>
-            {items.map((item) => getTextOnlyPanel(item, openItem, getPicture(item), cardId, listConfig))}
+            {items.map((item) => getTextOnlyPanel(item, openItem, cardId, listConfig))}
         </CardRow>
     );
 }

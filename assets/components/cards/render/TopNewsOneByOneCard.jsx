@@ -6,7 +6,6 @@ import CardMeta from './CardMeta';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 
 const getTopNewsPanel = (item, picture, openItem, cardId, listConfig) => {
-
     const rendition = getThumbnailRendition(picture, true);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
@@ -19,7 +18,6 @@ const getTopNewsPanel = (item, picture, openItem, cardId, listConfig) => {
                 <Embargo item={item} isCard={true} />
                 <CardMeta
                     item={item}
-                    picture={picture}
                     listConfig={listConfig}
                     displayDivider={false}
                 />
