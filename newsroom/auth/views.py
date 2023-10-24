@@ -169,7 +169,6 @@ def login_with_token(token):
 @blueprint.route("/logout")
 def logout():
     clear_user_session()
-    print("CLEARED")
     return flask.redirect(flask.url_for("wire.index"))
 
 

@@ -25,6 +25,9 @@ class UserAuthentication(SessionAuth):
         if super().authorized(allowed_roles, resource, method):
             return True
 
+        if not get_user_id():
+            return False
+
         if not request.view_args or not request.view_args.get("_id"):
             # not a request for a specific user, stop
             return False
