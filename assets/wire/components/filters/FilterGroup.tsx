@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
-import PropTypes from 'prop-types';
-import {get, cloneDeep, uniqBy} from 'lodash';
+import {get, cloneDeep, uniqBy, range} from 'lodash';
 import {gettext} from 'utils';
 import {Skeleton} from 'primereact/skeleton';
 
@@ -11,7 +10,7 @@ import {WithPagination} from 'search/components/WithPagination';
 const LIMIT = 5;
 
 const getVisibleBuckets = (
-    buckets: Array<any>,
+    buckets: Array<JSX.Element>,
     group: any,
     toggleGroup: (event: any, group: any) => void,
 ) => {
@@ -66,16 +65,15 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
     const compareFunction = (a: any, b: any) => group.sorted ? -1 : String(a.key).localeCompare(String(b.key));
 
     const groupFilter = get(activeFilter, group.field, []);
-    const activeBuckets = (get(activeFilter, group.field) || [])
+    const activeBuckets: Array<any> = (get(activeFilter, group.field) || [])
         .map((filter: any) => ({key: filter}));
-    const bucketPath = get(group, 'agg_path') || `${group.field}.buckets`;
+    const bucketPath: string = get(group, 'agg_path') || `${group.field}.buckets`;
     const buckets = uniqBy(
-        cloneDeep(get(aggregations, bucketPath) || group.buckets || [])
-            .concat(activeBuckets),
-        'key'
+        cloneDeep(get(aggregations, bucketPath) || group.buckets || []).concat(activeBuckets) as Array<{key: string, doc_count: string}>,
+        'key',
     )
         .sort(compareFunction)
-        .filter(({key}: any) => searchTerm.length > 0 ? key.toString().toLocaleLowerCase().includes(searchTerm) : true) as any;
+        .filter(({key}: any) => searchTerm.length > 0 ? key.toString().toLocaleLowerCase().includes(searchTerm) : true);
 
     return (
         <NavGroup key={group.field} label={group.label}>
@@ -105,27 +103,29 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
             </div>
             <WithPagination
                 key={searchTerm}
-                pageSize={10}
-                getItems={(pageNo, pageSize) => Promise.resolve({
-                    itemCount: buckets?.length ?? 0,
-                    items: (buckets ?? []).slice(pageNo === 1 ? 0 : pageNo * pageSize, pageSize),
-                })}
+                pageSize={50}
+                getItems={(pageNo, pageSize) => {
+                    const step = pageNo === 1 ? 0 : (pageNo - 1) * pageSize;
+
+                    return Promise.resolve({
+                        itemCount: buckets?.length ?? 0,
+                        items: (buckets ?? []).slice(step, pageSize + step),
+                    });
+                }}
             >
-                {(items) => (
-                    <>
-                        {(
-                            getVisibleBuckets(items, group, toggleGroup)?.map((item) => (
-                                <FilterItem
-                                    key={item.key}
-                                    bucket={item}
-                                    group={group}
-                                    toggleFilter={toggleFilter}
-                                    groupFilter={groupFilter}
-                                />
-                            ))
-                        )}
-                    </>
-                )}
+                {(items) => {
+                    const itemsJsx = items.map((item) => (
+                        <FilterItem
+                            key={item.key}
+                            bucket={item}
+                            group={group}
+                            toggleFilter={toggleFilter}
+                            groupFilter={groupFilter}
+                        />
+                    ));
+
+                    return <div className='mb-1 mt-1' >{getVisibleBuckets(itemsJsx, group, toggleGroup)}</div>;
+                }}
             </WithPagination>
         </NavGroup>
     );

@@ -1,5 +1,4 @@
 import * as React from 'react';
-// import {Icon} from '../components/Icon';
 
 interface IProps<T> {
     getItems(pageNo: number, pageSize: number, signal: AbortSignal): Promise<{items: Array<T>, itemCount: number}>;
@@ -142,7 +141,7 @@ export class WithPagination<T> extends React.PureComponent<IProps<T>, IState<T>>
             } else {
                 return (
                     <button
-                        key="btn"
+                        key={`btn-${i}`}
                         data-test-id={`page-button-${i}`}
                         className={
                             this.state.currentPage === el
@@ -158,45 +157,29 @@ export class WithPagination<T> extends React.PureComponent<IProps<T>, IState<T>>
         });
 
         pageElements.unshift(
-            <>
+            <React.Fragment key="btn-start">
                 <button
-                    data-test-id="btn-1"
-                    className='sd-pagination__item sd-pagination__item--start'
-                    disabled={this.state.currentPage === 1}
-                    onClick={() => this.switchPage(1)}
-                >
-                    {/* <Icon name='backward-thin' /> */}
-                </button>
-                <button
-                    data-test-id="btn-2"
+                    data-test-id="btn-backward"
                     className='sd-pagination__item sd-pagination__item--start'
                     disabled={this.state.currentPage <= 1}
                     onClick={() => this.switchPage(this.state.currentPage - 1)}
                 >
-                    {/* <Icon name='chevron-left-thin' /> */}
+                    <i className='icon--chevron-left-thin'>&#xe648;</i>
                 </button>
-            </>,
+            </React.Fragment>,
         );
 
         pageElements.push(
-            <>
+            <React.Fragment key="btn-fwd">
                 <button
-                    data-test-id="btn-3"
+                    data-test-id="btn-forward"
                     className='sd-pagination__item sd-pagination__item--forward'
                     onClick={() => this.switchPage(this.state.currentPage + 1)}
                     disabled={this.state.currentPage === this.pageCount}
                 >
-                    {/* <Icon name='chevron-right-thin' /> */}
+                    <i className='icon--chevron-right-thin'>&#xe649;</i>
                 </button>
-                <button
-                    data-test-id="btn-4"
-                    className='sd-pagination__item sd-pagination__item--end'
-                    onClick={() => this.switchPage(this.pageCount)}
-                    disabled={this.state.currentPage === this.pageCount}
-                >
-                    {/* <Icon name='forward-thin' /> */}
-                </button>
-            </>,
+            </React.Fragment>,
         );
 
         const StyledPagination: React.ComponentType = () => (
@@ -205,6 +188,7 @@ export class WithPagination<T> extends React.PureComponent<IProps<T>, IState<T>>
                     display: 'flex',
                     flexDirection: 'row',
                     justifyContent: 'center',
+                    gap: 3,
                 }}
             >
                 {pageElements}
