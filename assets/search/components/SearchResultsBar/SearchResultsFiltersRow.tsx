@@ -5,6 +5,13 @@ import {SearchResultTagList} from './SearchResultTagList';
 import {Tag} from 'components/Tag';
 
 import {IProps as IParentProps} from './SearchResultTagsList';
+import {setItemTypeFilter} from 'agenda/actions';
+import {clearQuickFilter} from 'search/actions';
+import {searchFilterSelector} from 'search/selectors';
+import {connect} from 'react-redux';
+import {agendaCoverageStatusFilter, getActiveFilterLabel} from 'agenda/components/AgendaCoverageExistsFilter';
+
+const IS_AGENDA = location.pathname.includes('/agenda');
 
 type IProps = Pick<IParentProps,
     'readonly' |
@@ -15,8 +22,77 @@ type IProps = Pick<IParentProps,
     'resetFilter'
 >;
 
-export function SearchResultsFiltersRow({readonly, searchParams, filterGroups, toggleFilter, setCreatedFilter, resetFilter}: IProps) {
+type IActiveFilter = {
+    calendar?: any;
+    location?: any;
+    region?: any;
+    coverage_type?: any;
+    coverage_status?: any;
+};
+
+type IActiveFilterUnionType = keyof IActiveFilter;
+
+interface IReduxStateProps {
+    itemTypeFilter?: string;
+    activeFilter?: IActiveFilter;
+}
+
+interface IReduxDispatchProps {
+    clearQuickFilter: (filter: string) => void;
+    clearItemTypeFilter: () => void;
+    clearAllQuickFilters: () => void;
+}
+
+type IPropsAgendaExtended = IReduxDispatchProps & IReduxStateProps & IProps;
+
+function SearchResultsFiltersRow({
+    readonly,
+    searchParams,
+    filterGroups,
+    toggleFilter,
+    setCreatedFilter,
+    resetFilter,
+    itemTypeFilter,
+    clearItemTypeFilter,
+    activeFilter,
+}: IPropsAgendaExtended) {
     const tags = [];
+
+    if (IS_AGENDA) {
+        if (itemTypeFilter != null) {
+            tags.push(
+                <Tag
+                    key={`tags-filters--from-${itemTypeFilter}`}
+                    testId="tags-filters--agenda-quick-filters"
+                    text={itemTypeFilter === 'events' ? gettext('Events Only') : gettext('Planning Only')}
+                    readOnly={readonly}
+                    onClick={(event) => {
+                        event.preventDefault();
+                        clearItemTypeFilter();
+                    }}
+                />
+            );
+        }
+
+        Object.keys(activeFilter ?? {}).filter((filter) => activeFilter?.[filter as IActiveFilterUnionType] != null)
+            .forEach((filter) => {
+                tags.push(
+                    <Tag
+                        key={`tags-filters--${filter}`}
+                        testId={`tags-filters--agenda-quick-filters-${filter}`}
+                        text={filter === 'coverage_status'
+                            ? getActiveFilterLabel(agendaCoverageStatusFilter, activeFilter)
+                            :  activeFilter?.[filter as IActiveFilterUnionType]
+                        }
+                        readOnly={readonly}
+                        onClick={(event) => {
+                            event.preventDefault();
+                            clearQuickFilter(filter);
+                        }}
+                    />
+                );
+            });
+    }
 
     if (searchParams.created) {
         const created = getCreatedSearchParamLabel(searchParams.created);
@@ -79,7 +155,7 @@ export function SearchResultsFiltersRow({readonly, searchParams, filterGroups, t
         }
     }
 
-    if (searchParams.filter != null && location.pathname.includes('/agenda') !== true) {
+    if (searchParams.filter != null && IS_AGENDA !== true) {
         for (const field in searchParams.filter) {
             const group = filterGroups[field];
 
@@ -142,3 +218,25 @@ export function SearchResultsFiltersRow({readonly, searchParams, filterGroups, t
         />
     );
 }
+
+const mapStateToProps = (state: any) => ({
+    itemTypeFilter: state.agenda.itemType,
+    activeFilter: searchFilterSelector(state),
+});
+
+const mapDispatchToProps = (dispatch: any) => ({
+    clearQuickFilter: (filter: string) => dispatch(clearQuickFilter(filter)),
+    clearItemTypeFilter: () => dispatch(setItemTypeFilter(null)),
+    clearAllQuickFilters: () => {
+        dispatch(setItemTypeFilter(null));
+        dispatch(clearQuickFilter());
+    }
+});
+
+let component: React.ComponentType<IProps> = SearchResultsFiltersRow as React.ComponentType<IProps>;
+
+if (IS_AGENDA) {
+    component = connect<IReduxStateProps, IReduxDispatchProps, IProps>(mapStateToProps, mapDispatchToProps)(SearchResultsFiltersRow);
+}
+
+export default component;

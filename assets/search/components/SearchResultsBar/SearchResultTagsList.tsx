@@ -3,12 +3,11 @@ import * as React from 'react';
 import {SearchResultsTopicRow} from './SearchResultsTopicRow';
 import {SearchResultsQueryRow} from './SearchResultsQueryRow';
 import {SearchResultsAdvancedSearchRow} from './SearchResultsAdvancedSearchRow';
-import {SearchResultsFiltersRow} from './SearchResultsFiltersRow';
+import SearchResultsFiltersRow from './SearchResultsFiltersRow';
 import {IFilterGroup, INavigation, ISearchFields, ISearchParams, ITopic, IUser} from 'interfaces';
 import {SearchResultTagList} from './SearchResultTagList';
 import {gettext} from 'utils';
 import {getTopicUrl} from 'search/utils';
-import {SearchResultsAgendaQuickFilters} from './SearchResultsAgendaQucikFiltersRow';
 
 export interface IProps {
     user: IUser;
@@ -101,9 +100,6 @@ export function SearchResultTagsList({
                 resetFilter={resetFilter}
                 readonly={readonly}
             />
-            {location.pathname.includes('/agenda') && (
-                <SearchResultsAgendaQuickFilters />
-            )}
             {readonly === true && activeTopic._id && (
                 <SearchResultTagList
                     testId="search-results--edit-button"
