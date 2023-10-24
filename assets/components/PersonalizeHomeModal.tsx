@@ -121,11 +121,10 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                     <figcaption className="empty-state__text">
                         <h4 className="empty-state__text-heading">{gettext('You don\'t have any saved Topics yet.')}</h4>
                         <p className="empty-state__text-description">
-                            {gettext('You can create Topics by saving search terms and/or filters from the Wire and Agenda sections.')}
+                            {gettext('You can create Topics by saving search terms and/or filters from the Wire section.')}
                         </p>
                         <div className="empty-state__links">
                             <a className="" href="/wire">{gettext('Go to Wire')}</a>
-                            <a className="" href="/agenda">{gettext('Go to Agenda')}</a>
                         </div>
                     </figcaption>
                 </div>

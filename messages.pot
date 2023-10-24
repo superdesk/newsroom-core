@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.5.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-10-13 15:04+0200\n"
+"POT-Creation-Date: 2023-10-24 11:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,11 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.12.1\n"
 
-#: newsroom/email.py:414
+#: newsroom/email.py:419
 msgid "Kill/Takedown notice"
 msgstr ""
 
-#: newsroom/email.py:423
+#: newsroom/email.py:428
 #, python-format
 msgid "%(section)s cancelled notice"
 msgstr ""
@@ -117,7 +117,7 @@ msgstr ""
 msgid "ALL DAY"
 msgstr ""
 
-#: newsroom/auth/oauth.py:89 newsroom/auth/utils.py:72 newsroom/utils.py:296
+#: newsroom/auth/oauth.py:87 newsroom/auth/utils.py:72 newsroom/utils.py:296
 #: newsroom/utils.py:407
 msgid "Account is disabled"
 msgstr ""
@@ -126,7 +126,7 @@ msgstr ""
 msgid "Account has not been approved"
 msgstr ""
 
-#: newsroom/auth/views.py:50 newsroom/auth/views.py:140 newsroom/utils.py:397
+#: newsroom/auth/views.py:55 newsroom/auth/views.py:145 newsroom/utils.py:397
 msgid "Invalid username or password."
 msgstr ""
 
@@ -134,11 +134,11 @@ msgstr ""
 msgid "Insufficient Permissions. Access denied."
 msgstr ""
 
-#: newsroom/auth/views.py:132 newsroom/utils.py:411
+#: newsroom/auth/views.py:137 newsroom/utils.py:411
 msgid "Company account has been disabled."
 msgstr ""
 
-#: newsroom/auth/views.py:135 newsroom/utils.py:415
+#: newsroom/auth/views.py:140 newsroom/utils.py:415
 msgid "Company account has expired."
 msgstr ""
 
@@ -331,36 +331,36 @@ msgstr ""
 msgid "Confirm new password"
 msgstr ""
 
-#: newsroom/auth/oauth.py:63 newsroom/auth/views.py:146
-#: newsroom/auth/views.py:150 newsroom/news_api/news/assets/assets.py:24
+#: newsroom/auth/oauth.py:61 newsroom/auth/views.py:151
+#: newsroom/auth/views.py:155 newsroom/news_api/news/assets/assets.py:24
 #: newsroom/news_api/news/item/item.py:23
 msgid "Invalid token"
 msgstr ""
 
-#: newsroom/auth/oauth.py:68
+#: newsroom/auth/oauth.py:66
 msgid "Email not found"
 msgstr ""
 
-#: newsroom/auth/oauth.py:74 newsroom/auth/utils.py:57
+#: newsroom/auth/oauth.py:72 newsroom/auth/utils.py:57
 #: newsroom/users/views.py:174 newsroom/users/views.py:211
 #: newsroom/users/views.py:290 newsroom/users/views.py:310
 #: newsroom/users/views.py:345
 msgid "User not found"
 msgstr ""
 
-#: newsroom/auth/oauth.py:78 newsroom/auth/utils.py:66
+#: newsroom/auth/oauth.py:76 newsroom/auth/utils.py:66
 msgid "No Company assigned"
 msgstr ""
 
-#: newsroom/auth/oauth.py:83 newsroom/auth/utils.py:68
+#: newsroom/auth/oauth.py:81 newsroom/auth/utils.py:68
 msgid "Company is disabled"
 msgstr ""
 
-#: newsroom/auth/oauth.py:86 newsroom/auth/utils.py:70
+#: newsroom/auth/oauth.py:84 newsroom/auth/utils.py:70
 msgid "Company has expired"
 msgstr ""
 
-#: newsroom/auth/oauth.py:93
+#: newsroom/auth/oauth.py:91
 msgid "Invalid login type, Oauth not enabled for your user"
 msgstr ""
 
@@ -379,31 +379,31 @@ msgid ""
 "Company Admin."
 msgstr ""
 
-#: newsroom/auth/views.py:123
+#: newsroom/auth/views.py:128
 msgid "Exceeded number of allowed login attempts"
 msgstr ""
 
-#: newsroom/auth/views.py:180
+#: newsroom/auth/views.py:185
 msgid "Account already exists."
 msgstr ""
 
-#: newsroom/auth/views.py:205
+#: newsroom/auth/views.py:210
 msgid "Your account has been validated."
 msgstr ""
 
-#: newsroom/auth/views.py:208
+#: newsroom/auth/views.py:213
 msgid "Token has expired. Please create a new token"
 msgstr ""
 
-#: newsroom/auth/views.py:227
+#: newsroom/auth/views.py:232
 msgid "Your password has been changed. Please login again."
 msgstr ""
 
-#: newsroom/auth/views.py:245
+#: newsroom/auth/views.py:250
 msgid "Password login is not enabled for this user"
 msgstr ""
 
-#: newsroom/auth/views.py:255
+#: newsroom/auth/views.py:260
 msgid "A reset password token has been sent to your email address."
 msgstr ""
 
@@ -707,7 +707,7 @@ msgstr ""
 
 #: assets/company-reports/components/ContentActivity.tsx:67
 #: assets/company-reports/components/ContentActivity.tsx:122
-#: assets/item-actions.ts:18 assets/search/components/TopicFolder.tsx:113
+#: assets/item-actions.ts:18 assets/search/components/TopicFolder.tsx:104
 #: newsroom/reports/content_activity.py:221
 msgid "Open"
 msgstr ""
@@ -866,39 +866,39 @@ msgstr ""
 msgid "Main Navigation Bar"
 msgstr ""
 
-#: newsroom/templates/base_layout.html:53 newsroom/templates/login.html:13
+#: newsroom/templates/base_layout.html:55 newsroom/templates/login.html:13
 #: newsroom/templates/login_client.html:4 newsroom/templates/login_form.html:20
 msgid "Login"
 msgstr ""
 
-#: newsroom/templates/base_layout.html:57 newsroom/templates/footer.html:4
+#: newsroom/templates/base_layout.html:59 newsroom/templates/footer.html:4
 msgid "Contact Us"
 msgstr ""
 
-#: newsroom/templates/base_layout.html:67
+#: newsroom/templates/base_layout.html:69
 msgid "Side Navigation"
 msgstr ""
 
 #: assets/company-admin/components/CompanyUserListItem.tsx:48
-#: assets/users/utils.ts:11 newsroom/templates/base_layout.html:93
-#: newsroom/templates/base_layout.html:94
-#: newsroom/templates/base_layout.html:101
+#: assets/users/utils.ts:11 newsroom/templates/base_layout.html:95
+#: newsroom/templates/base_layout.html:96
+#: newsroom/templates/base_layout.html:103
 #: newsroom/templates/company_admin_index.html:3
 #: newsroom/templates/company_admin_index.html:6 newsroom/users/forms.py:39
 msgid "Company Admin"
 msgstr ""
 
-#: newsroom/templates/base_layout.html:110
-#: newsroom/templates/base_layout.html:111
-#: newsroom/templates/base_layout.html:118
+#: newsroom/templates/base_layout.html:112
+#: newsroom/templates/base_layout.html:113
+#: newsroom/templates/base_layout.html:120
 #: newsroom/templates/company_reports.html:3
 #: newsroom/templates/company_reports.html:6
 msgid "Reports"
 msgstr ""
 
-#: newsroom/templates/base_layout.html:126
-#: newsroom/templates/base_layout.html:127
-#: newsroom/templates/base_layout.html:134 newsroom/templates/settings.html:3
+#: newsroom/templates/base_layout.html:128
+#: newsroom/templates/base_layout.html:129
+#: newsroom/templates/base_layout.html:136 newsroom/templates/settings.html:3
 #: newsroom/templates/settings.html:6
 msgid "Settings"
 msgstr ""
@@ -1073,7 +1073,7 @@ msgstr ""
 #: assets/search/components/AdvancedSearchPanel.tsx:42
 #: assets/search/components/MonitoringEditor.tsx:134
 #: assets/search/components/TopicEditor.tsx:459
-#: assets/search/components/TopicFolder.tsx:107
+#: assets/search/components/TopicFolder.tsx:98
 #: assets/section-filters/components/EditSectionFilter.tsx:27
 #: assets/ui/components/ContentBar.tsx:8 assets/ui/components/Preview.tsx:16
 #: assets/user-profile/components/UserProfileApp.tsx:117
@@ -1088,15 +1088,15 @@ msgstr ""
 msgid "By:"
 msgstr ""
 
-#: assets/components/cards/render/CardMeta.tsx:15
+#: assets/components/cards/render/CardMeta.tsx:23
 #: assets/wire/components/ItemVersion.tsx:24
-#: assets/wire/components/WireListItem.tsx:245
+#: assets/wire/components/WireListItem.tsx:238
 #: assets/wire/components/fields/WordCount.tsx:6
 #: newsroom/templates/wire_item.html:62 newsroom/templates/wire_item.html:108
 msgid "words"
 msgstr ""
 
-#: assets/components/cards/render/CardMeta.tsx:17
+#: assets/components/cards/render/CardMeta.tsx:25
 #: assets/wire/components/ItemVersion.tsx:29
 #: assets/wire/components/fields/CharCount.tsx:6
 #: newsroom/templates/wire_item.html:64 newsroom/templates/wire_item.html:110
@@ -1299,27 +1299,27 @@ msgstr ""
 msgid "Video Explainer"
 msgstr ""
 
-#: newsroom/web/default_settings.py:586
+#: newsroom/web/default_settings.py:589
 msgid "Home"
 msgstr ""
 
-#: newsroom/web/default_settings.py:591
+#: newsroom/web/default_settings.py:594
 msgid "Wire"
 msgstr ""
 
-#: newsroom/web/default_settings.py:596
+#: newsroom/web/default_settings.py:599
 msgid "Agenda"
 msgstr ""
 
-#: newsroom/web/default_settings.py:601
+#: newsroom/web/default_settings.py:604
 msgid "Monitoring"
 msgstr ""
 
-#: newsroom/web/default_settings.py:606
+#: newsroom/web/default_settings.py:609
 msgid "Saved / Watched"
 msgstr ""
 
-#: newsroom/web/default_settings.py:643
+#: newsroom/web/default_settings.py:646
 msgid "Newshub"
 msgstr ""
 
@@ -1361,7 +1361,7 @@ msgstr ""
 #: assets/companies/components/EditCompanyDetails.tsx:178
 #: assets/components/CardEditor.tsx:65 assets/components/EditPanel.tsx:141
 #: assets/components/Modal.tsx:149
-#: assets/components/PersonalizeHomeModal.tsx:242
+#: assets/components/PersonalizeHomeModal.tsx:241
 #: assets/general-settings/components/GeneralSettingsApp.tsx:112
 #: assets/item-actions.ts:58
 #: assets/monitoring/components/EditMonitoringProfile.tsx:212
@@ -2163,13 +2163,13 @@ msgstr ""
 #: assets/cards/components/EditCard.tsx:90
 #: assets/companies/components/EditCompanyDetails.tsx:171
 #: assets/components/CardEditor.tsx:106
-#: assets/components/PersonalizeHomeModal.tsx:223
+#: assets/components/PersonalizeHomeModal.tsx:222
 #: assets/monitoring/components/EditMonitoringProfile.tsx:207
 #: assets/navigations/components/EditNavigation.tsx:121
 #: assets/oauth_clients/components/EditClient.tsx:64
 #: assets/products/components/EditProduct.tsx:187
 #: assets/search/components/FollowedTopics.tsx:82
-#: assets/search/components/TopicFolder.tsx:56
+#: assets/search/components/TopicFolder.tsx:58
 #: assets/section-filters/components/EditSectionFilter.tsx:88
 #: assets/users/components/EditUser.tsx:428
 msgid "Delete"
@@ -2662,66 +2662,62 @@ msgstr ""
 #: assets/components/PersonalizeHomeModal.tsx:124
 msgid ""
 "You can create Topics by saving search terms and/or filters from the Wire"
-" and Agenda sections."
+" section."
 msgstr ""
 
 #: assets/components/PersonalizeHomeModal.tsx:127
 msgid "Go to Wire"
 msgstr ""
 
-#: assets/components/PersonalizeHomeModal.tsx:128
-msgid "Go to Agenda"
-msgstr ""
-
-#: assets/components/PersonalizeHomeModal.tsx:149
+#: assets/components/PersonalizeHomeModal.tsx:148
 msgid "No items yet"
 msgstr ""
 
-#: assets/components/PersonalizeHomeModal.tsx:151
+#: assets/components/PersonalizeHomeModal.tsx:150
 msgid "Select some topics from the sidebar to add them here."
 msgstr ""
 
-#: assets/components/PersonalizeHomeModal.tsx:213
-#: assets/components/PersonalizeHomeModal.tsx:279
+#: assets/components/PersonalizeHomeModal.tsx:212
+#: assets/components/PersonalizeHomeModal.tsx:278
 #: assets/search/components/FollowedTopics.tsx:209
 #: assets/search/components/TopicsTab.tsx:106
 msgid "Company Topics"
 msgstr ""
 
-#: assets/components/PersonalizeHomeModal.tsx:213
-#: assets/components/PersonalizeHomeModal.tsx:275
+#: assets/components/PersonalizeHomeModal.tsx:212
+#: assets/components/PersonalizeHomeModal.tsx:274
 #: assets/layout/components/BaseApp.tsx:55
 #: assets/search/components/FollowedTopics.tsx:200
 #: assets/search/components/TopicsTab.tsx:98
 msgid "My Topics"
 msgstr ""
 
-#: assets/components/PersonalizeHomeModal.tsx:241
+#: assets/components/PersonalizeHomeModal.tsx:240
 #: assets/home/components/HomeApp.tsx:269
 #: assets/home/components/HomeApp.tsx:271
 msgid "Personalize Home"
 msgstr ""
 
-#: assets/components/PersonalizeHomeModal.tsx:245
-#: assets/components/PersonalizeHomeModal.tsx:319
+#: assets/components/PersonalizeHomeModal.tsx:244
+#: assets/components/PersonalizeHomeModal.tsx:318
 #: assets/home/components/HomeApp.tsx:285
 msgid "My Home"
 msgstr ""
 
-#: assets/components/PersonalizeHomeModal.tsx:257
+#: assets/components/PersonalizeHomeModal.tsx:256
 msgid "Select up to 6 Topics you want to display on your personal Home screen."
 msgstr ""
 
-#: assets/components/PersonalizeHomeModal.tsx:261
+#: assets/components/PersonalizeHomeModal.tsx:260
 msgid "{{size}} out of 6 topics selected"
 msgstr ""
 
+#: assets/components/PersonalizeHomeModal.tsx:300
 #: assets/components/PersonalizeHomeModal.tsx:301
-#: assets/components/PersonalizeHomeModal.tsx:302
 msgid "Search Topics"
 msgstr ""
 
-#: assets/components/PersonalizeHomeModal.tsx:305
+#: assets/components/PersonalizeHomeModal.tsx:304
 #: assets/home/components/search-bar.tsx:33
 #: assets/search/components/SearchBar.tsx:73
 msgid "Clear search"
@@ -2736,47 +2732,47 @@ msgstr ""
 msgid "Message"
 msgstr ""
 
-#: assets/components/cards/utils.ts:94
+#: assets/components/cards/utils.ts:96
 msgid "6-text-only"
 msgstr ""
 
-#: assets/components/cards/utils.ts:101
+#: assets/components/cards/utils.ts:103
 msgid "4-picture-text"
 msgstr ""
 
-#: assets/components/cards/utils.ts:108
+#: assets/components/cards/utils.ts:110
 msgid "4-media-gallery"
 msgstr ""
 
-#: assets/components/cards/utils.ts:115
+#: assets/components/cards/utils.ts:117
 msgid "4-photo-gallery"
 msgstr ""
 
-#: assets/components/cards/utils.ts:122
+#: assets/components/cards/utils.ts:124
 msgid "1x1-top-news"
 msgstr ""
 
-#: assets/components/cards/utils.ts:129
+#: assets/components/cards/utils.ts:131
 msgid "2x2-top-news"
 msgstr ""
 
-#: assets/components/cards/utils.ts:136
+#: assets/components/cards/utils.ts:138
 msgid "3-text-only"
 msgstr ""
 
-#: assets/components/cards/utils.ts:143
+#: assets/components/cards/utils.ts:145
 msgid "3-picture-text"
 msgstr ""
 
-#: assets/components/cards/utils.ts:150
+#: assets/components/cards/utils.ts:152
 msgid "4-text-only"
 msgstr ""
 
-#: assets/components/cards/utils.ts:157
+#: assets/components/cards/utils.ts:159
 msgid "2x2-events"
 msgstr ""
 
-#: assets/components/cards/utils.ts:164
+#: assets/components/cards/utils.ts:166
 msgid "6 Navigation Tiles Per Row"
 msgstr ""
 
@@ -3470,12 +3466,12 @@ msgstr ""
 msgid "Updated on {{ date }} at {{ time }}"
 msgstr ""
 
-#: assets/search/components/Topic.tsx:102
+#: assets/search/components/Topic.tsx:96
 #: assets/search/components/TopicForm.tsx:218
 msgid "Real-Time"
 msgstr ""
 
-#: assets/search/components/Topic.tsx:102
+#: assets/search/components/Topic.tsx:96
 #: assets/search/components/TopicForm.tsx:228
 msgid "Scheduled"
 msgstr ""
@@ -3516,11 +3512,11 @@ msgstr ""
 msgid "Send notifications to:"
 msgstr ""
 
-#: assets/search/components/TopicFolder.tsx:50
+#: assets/search/components/TopicFolder.tsx:52
 msgid "Rename"
 msgstr ""
 
-#: assets/search/components/TopicFolder.tsx:133
+#: assets/search/components/TopicFolder.tsx:124
 msgid "Folder Actions"
 msgstr ""
 
@@ -3738,7 +3734,7 @@ msgid "Article Preview"
 msgstr ""
 
 #: assets/ui/components/Preview.tsx:13
-#: assets/wire/components/ItemDetails.tsx:84
+#: assets/wire/components/ItemDetails.tsx:91
 msgid "Published on {{ date }} at {{ time }}"
 msgstr ""
 

@@ -1,26 +1,33 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import {hasAudio, hasVideo} from 'wire/utils';
+import {IArticle} from 'interfaces';
+import {getContentTypes} from 'wire/utils';
 
-function WireListItemIcons({item, picture, divider}: any) {
+interface IProps {
+    item: IArticle;
+    divider?: boolean;
+}
+
+function WireListItemIcons({item, divider}: IProps) {
+    const contentTypes = getContentTypes(item);
+
     return (
         <div className='wire-articles__item__icons wire-articles__item__icons--compact'>
-            {item.type === 'text' &&
+            {contentTypes.has('text') &&
                 <span className='wire-articles__item__icon'>
                     <i className='icon--text'></i>
                 </span>
             }
-            {picture &&
+            {contentTypes.has('picture') &&
                 <span className='wire-articles__item__icon'>
                     <i className='icon--photo'></i>
                 </span>
             }
-            {hasVideo(item) &&
+            {contentTypes.has('video') &&
                 <span className='wire-articles__item__icon'>
                     <i className='icon--video'></i>
                 </span>
             }
-            {hasAudio(item) &&
+            {contentTypes.has('audio') &&
                 <span className='wire-articles__item__icon'>
                     <i className='icon--audio'></i>
                 </span>
@@ -31,11 +38,5 @@ function WireListItemIcons({item, picture, divider}: any) {
         </div>
     );
 }
-
-WireListItemIcons.propTypes = {
-    item: PropTypes.object,
-    picture: PropTypes.object,
-    divider: PropTypes.bool,
-};
 
 export default WireListItemIcons;

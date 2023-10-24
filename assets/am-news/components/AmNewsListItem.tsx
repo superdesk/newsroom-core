@@ -92,6 +92,7 @@ class AmNewsListItem extends React.Component<any, any> {
             'time-label--stories': !isDataItem(item),
         });
         const picture = getPicture(item);
+        const thumbnailRendition = getThumbnailRendition(picture);
 
 
         return (
@@ -125,10 +126,10 @@ class AmNewsListItem extends React.Component<any, any> {
                         </div>
                     </div>
 
-                    {!isKilled(item) && getThumbnailRendition(picture) && (
+                    {!isKilled(item) && thumbnailRendition != null && (
                         <div className="wire-articles__item-image">
                             <figure>
-                                <img src={getThumbnailRendition(picture).href} />
+                                <img src={thumbnailRendition.href} />
                             </figure>
                         </div>
                     )}

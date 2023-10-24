@@ -12,8 +12,8 @@ import {
     getConfig,
 } from 'utils';
 import {
-    getPicture,
-    getThumbnailRendition,
+    getFeatureMedia,
+    getImageForList,
     showItemVersions,
     shortText,
     isKilled,
@@ -145,7 +145,7 @@ class WireListItem extends React.Component<any, any> {
             'wire-articles__item-select--visible': !LIST_ANIMATIONS,
             'wire-articles__item-select': LIST_ANIMATIONS,
         });
-        const picture = getPicture(item);
+        const listImage = getImageForList(item);
         const isMarketPlace = this.props.context === 'aapX';
         const fields = listConfig.metadata_fields || DEFAULT_META_FIELDS;
         const compactFields = listConfig.compact_metadata_fields || DEFAULT_COMPACT_META_FIELDS;
@@ -183,7 +183,6 @@ class WireListItem extends React.Component<any, any> {
                                 {!isExtended && (
                                     <WireListItemIcons
                                         item={item}
-                                        picture={picture}
                                         divider={false}
                                     />
                                 )}
@@ -197,10 +196,7 @@ class WireListItem extends React.Component<any, any> {
 
                         {isExtended && !isMarketPlace && (
                             <div className="wire-articles__item__meta">
-                                <WireListItemIcons
-                                    item={item}
-                                    picture={picture}
-                                />
+                                <WireListItemIcons item={item} />
                                 <div className="wire-articles__item__meta-info">
                                     <span className="bold">
                                         {item.es_highlight && item.es_highlight.slugline ? <div
@@ -236,10 +232,7 @@ class WireListItem extends React.Component<any, any> {
                                 key="meta"
                                 className="wire-articles__item__meta"
                             >
-                                <WireListItemIcons
-                                    item={item}
-                                    picture={picture}
-                                />
+                                <WireListItemIcons item={item} />
                                 <div className="wire-articles__item__meta-info">
                                     <span>
                                         {this.wordCount} {gettext('words')}
@@ -297,16 +290,12 @@ class WireListItem extends React.Component<any, any> {
                         )}
                     </div>
 
-                    {isExtended &&
-                        !isKilled(item) &&
-                        getThumbnailRendition(picture) && (
+                    {isExtended && !isKilled(item) && listImage != null && (
                         <div className="wire-articles__item-image">
                             <figure>
                                 <img
-                                    src={
-                                        getThumbnailRendition(picture).href
-                                    }
-                                    alt={getCaption(picture)}
+                                    src={listImage.href}
+                                    alt={getCaption(listImage.item)}
                                 />
                             </figure>
                         </div>
