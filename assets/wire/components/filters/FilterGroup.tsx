@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {get, cloneDeep, uniqBy, range} from 'lodash';
+import {get, cloneDeep, uniqBy} from 'lodash';
 import {gettext} from 'utils';
 import {Skeleton} from 'primereact/skeleton';
 
@@ -8,6 +8,7 @@ import FilterItem from './FilterItem';
 import {WithPagination} from 'search/components/WithPagination';
 
 const LIMIT = 5;
+type IBucket = {key: string, doc_count: string};
 
 const getVisibleBuckets = (
     buckets: Array<JSX.Element>,
@@ -69,7 +70,7 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
         .map((filter: any) => ({key: filter}));
     const bucketPath: string = get(group, 'agg_path') || `${group.field}.buckets`;
     const buckets = uniqBy(
-        cloneDeep(get(aggregations, bucketPath) || group.buckets || []).concat(activeBuckets) as Array<{key: string, doc_count: string}>,
+        cloneDeep(get(aggregations, bucketPath) || group.buckets || []).concat(activeBuckets) as Array<IBucket>,
         'key',
     )
         .sort(compareFunction)
@@ -113,7 +114,7 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
                     });
                 }}
             >
-                {(items) => {
+                {(items: Array<IBucket>) => {
                     const itemsJsx = items.map((item) => (
                         <FilterItem
                             key={item.key}
