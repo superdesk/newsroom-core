@@ -86,7 +86,7 @@ def sign_user_by_email(
 
     start_user_session(user)
 
-    return flask.redirect(flask.url_for(redirect_on_success))
+    return redirect_to_next_url(redirect_on_success)
 
 
 def start_user_session(user: User, permanent=False, session=None):
@@ -226,3 +226,8 @@ def check_user_has_products(user: User, company_products) -> None:
         raise AuthorizationError(
             403, _("There is no product associated with your user. Please reach out to your Company Admin.")
         )
+
+
+def redirect_to_next_url(default_view: str = "wire.index"):
+    next_url = flask.session.pop("next_url", None) or flask.url_for(default_view)
+    return flask.redirect(next_url)

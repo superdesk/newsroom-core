@@ -8,13 +8,13 @@ import {isDisplayed, gettext, formatDate, formatTime} from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import {
-    getItemMedia,
+    getFeatureMedia,
+    getOtherMedia,
     showItemVersions,
     isKilled,
     DISPLAY_ABSTRACT,
     isPreformatted,
     isCustomRendition,
-    getPictureList,
 } from 'wire/utils';
 import types from 'wire/types';
 import Content from 'ui/components/Content';
@@ -48,8 +48,8 @@ function ItemDetails({
     listConfig,
     filterGroupLabels,
 }: any) {
-    const pictures = getPictureList(item);
-    const media = getItemMedia(item);
+    const featureMedia = getFeatureMedia(item);
+    const media = getOtherMedia(item);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
 
     return (
@@ -67,14 +67,21 @@ function ItemDetails({
             </ContentHeader>
             <ArticleItemDetails disableTextSelection={detailsConfig.disable_text_selection}>
                 <ArticleContent>
-                    {pictures && pictures.map((pic: any) => (
-                        <ArticlePicture
-                            key={pic._id}
-                            picture={pic}
-                            isKilled={isKilled(item)}
-                            isCustomRendition={isCustomRendition(pic)}
-                        />
-                    ))}
+                    {featureMedia == null ? null : (
+                        featureMedia.type === 'picture' ? (
+                            <ArticlePicture
+                                picture={featureMedia}
+                                isKilled={isKilled(item)}
+                                isCustomRendition={isCustomRendition(featureMedia)}
+                            />
+                        ) : (
+                            <ArticleMedia
+                                media={featureMedia}
+                                isKilled={isKilled(item)}
+                                download={downloadMedia}
+                            />
+                        )
+                    )}
                     <ArticleContentWrapper itemType={itemType}>
                         <ArticleBody itemType={itemType}>
                             <ArticleEmbargoed item={item} />
@@ -89,12 +96,14 @@ function ItemDetails({
                             {isDisplayed('abstract', detailsConfig) &&
                             <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                             {isDisplayed('body_html', detailsConfig) && <ArticleBodyHtml item={item}/>}
-                            {!isEmpty(media) && media.map((media: any) => <ArticleMedia
-                                key={media.guid}
-                                media={media}
-                                isKilled={isKilled(item)}
-                                download={downloadMedia}
-                            />)}
+                            {media == null ? null : media.map((mediaItem) => (
+                                <ArticleMedia
+                                    key={mediaItem.guid}
+                                    media={mediaItem}
+                                    isKilled={isKilled(item)}
+                                    download={downloadMedia}
+                                />
+                            ))}
                         </ArticleBody>
 
                         {isDisplayed('metadata_section', detailsConfig) && (

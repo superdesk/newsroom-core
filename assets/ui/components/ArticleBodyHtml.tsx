@@ -166,19 +166,23 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
 
         container.innerHTML = html;
         container
-            .querySelectorAll('img')
-            .forEach((imageTag: any) => {
+            .querySelectorAll('img, video, audio')
+            .forEach((mediaTag: any) => {
                 // Using the tag's `src` attribute, find the Original Rendition's ID
                 const originalMediaId = imageEmbedOriginalIds.find((mediaId: any) => (
-                    !imageTag.src.startsWith('/assets/') &&
-                    imageTag.src.includes(mediaId))
+                    !mediaTag.src.startsWith('/assets/') &&
+                    mediaTag.src.includes(mediaId))
                 );
+
+                if (mediaTag instanceof HTMLVideoElement) {
+                    mediaTag.preload = 'metadata';
+                }
 
                 if (originalMediaId) {
                     // We now have the Original Rendition's ID
                     // Use that to update the `src` attribute to use Newshub's Web API
                     imageSourcesUpdated = true;
-                    imageTag.src = `/assets/${originalMediaId}`;
+                    mediaTag.src = `/assets/${originalMediaId}`;
                 }
             });
 

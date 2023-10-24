@@ -23,6 +23,7 @@ item = items[:2][0]
 
 
 def download_zip_file(client, _format, section):
+    now = utcnow()
     resp = client.get(
         "/download/%s?format=%s&type=%s" % (",".join(items_ids), _format, section),
         follow_redirects=True,
@@ -30,7 +31,7 @@ def download_zip_file(client, _format, section):
     assert resp.status_code == 200
     assert resp.mimetype == "application/zip"
     assert resp.headers.get("Content-Disposition") == "attachment; filename={}-newsroom.zip".format(
-        utcnow().strftime("%Y%m%d%H%M")
+        now.strftime("%Y%m%d%H%M")
     )
     _file = io.BytesIO(resp.get_data())
     return _file

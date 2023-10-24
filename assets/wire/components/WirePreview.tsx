@@ -5,13 +5,13 @@ import {isEmpty} from 'lodash';
 
 import {isDisplayed} from 'utils';
 import {
-    getItemMedia,
+    getFeatureMedia,
+    getOtherMedia,
     showItemVersions,
     isEqualItem,
     isKilled,
     DISPLAY_ABSTRACT,
     isCustomRendition,
-    getPictureList,
 } from 'wire/utils';
 import types from 'wire/types';
 
@@ -33,6 +33,7 @@ import AgendaLinks from './AgendaLinks';
 import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
+import {downloadMedia} from '../actions';
 
 
 class WirePreview extends React.PureComponent<any, any> {
@@ -50,8 +51,8 @@ class WirePreview extends React.PureComponent<any, any> {
 
     render() {
         const {item, user, actions, followStory, topics, previewConfig, downloadMedia, listConfig, filterGroupLabels} = this.props;
-        const pictures = getPictureList(item);
-        const media = getItemMedia(item);
+        const featureMedia = getFeatureMedia(item);
+        const media = getOtherMedia(item);
 
         const previousVersions = 'preview_versions';
         return (
@@ -79,14 +80,21 @@ class WirePreview extends React.PureComponent<any, any> {
                     {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item}/>}
                     {(isDisplayed('byline', previewConfig) || isDisplayed('located', previewConfig)) &&
                         <ArticleAuthor item={item} displayConfig={previewConfig} />}
-                    {pictures && pictures.map((pic: any)=> (
-                        <ArticlePicture
-                            key={pic._id}
-                            picture={pic}
-                            isKilled={isKilled(item)}
-                            isCustomRendition={isCustomRendition(pic)}
-                        />
-                    ))}
+                    {featureMedia == null ? null : (
+                        featureMedia.type === 'picture' ? (
+                            <ArticlePicture
+                                picture={featureMedia}
+                                isKilled={isKilled(item)}
+                                isCustomRendition={isCustomRendition(featureMedia)}
+                            />
+                        ) : (
+                            <ArticleMedia
+                                media={featureMedia}
+                                isKilled={isKilled(item)}
+                                download={downloadMedia}
+                            />
+                        )
+                    )}
                     {isDisplayed('metadata_section', previewConfig) &&
                     <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions} displayConfig={previewConfig} listConfig={listConfig}
                         filterGroupLabels={filterGroupLabels} />}
@@ -94,12 +102,14 @@ class WirePreview extends React.PureComponent<any, any> {
                     <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
                     {isDisplayed('body_html', previewConfig) && <ArticleBodyHtml item={item}/>}
 
-                    {!isEmpty(media) && media.map((media: any) => <ArticleMedia
-                        key={media.guid}
-                        media={media}
-                        isKilled={isKilled(item)}
-                        download={downloadMedia}
-                    />)}
+                    {media == null ? null : media.map((mediaItem) => (
+                        <ArticleMedia
+                            key={mediaItem.guid}
+                            media={mediaItem}
+                            isKilled={isKilled(item)}
+                            download={downloadMedia}
+                        />
+                    ))}
 
                     {isDisplayed('tags_section', previewConfig) &&
                         <PreviewTags item={item} isItemDetail={false} displayConfig={previewConfig}/>}
