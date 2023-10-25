@@ -617,6 +617,7 @@ def test_access_for_not_approved_user(client, app):
                 "email": "foo2@bar.com",
                 "first_name": "Foo",
                 "is_enabled": True,
+                "is_approved": False,
                 "receive_email": True,
                 "user_type": "administrator",
                 "_created": datetime.datetime(2016, 4, 26, 13, 0, 33, tzinfo=datetime.timezone.utc),

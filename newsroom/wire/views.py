@@ -180,7 +180,7 @@ def get_home_data():
         "cards": cards,
         "products": get_products_by_company(company) if company else [],
         "user": str(user["_id"]) if user else None,
-        "userProducts": user.get("products") if user else [],
+        "userProducts": user.get("products") or [],
         "userType": user.get("user_type"),
         "company": company_id,
         "formats": [
