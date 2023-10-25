@@ -9,6 +9,7 @@ from werkzeug.exceptions import Forbidden
 import newsroom
 from newsroom.products.products import get_products_by_navigation
 from newsroom.settings import get_setting
+from newsroom.user_roles import UserRole
 from newsroom.utils import get_local_date, get_end_date
 from newsroom.search.service import BaseSearchService, SearchQuery
 
@@ -46,6 +47,9 @@ class WireSearchResource(newsroom.Resource):
 
     item_methods = ["GET"]
     resource_methods = ["GET"]
+
+    allowed_roles = [role for role in UserRole]
+    allowed_item_roles = allowed_roles
 
 
 def versioncreated_range(created):

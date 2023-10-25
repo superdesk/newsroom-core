@@ -7,6 +7,7 @@ import superdesk
 from bson import ObjectId
 from newsroom.auth import get_user
 from newsroom.types import Topic, User
+from newsroom.user_roles import UserRole
 from newsroom.utils import set_original_creator, set_version_creator
 
 
@@ -61,6 +62,8 @@ class TopicsResource(newsroom.Resource):
         "advanced": {"type": "dict", "nullable": True},
     }
     datasource = {"source": "topics", "default_sort": [("label", 1)]}
+    allowed_roles = [role for role in UserRole]
+    allowed_item_roles = allowed_roles
 
 
 class TopicsService(newsroom.Service):

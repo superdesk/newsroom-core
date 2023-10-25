@@ -152,15 +152,15 @@ def test_user_sections(app, client, manager, product):
 def test_other_company_user_changes_blocked(client, manager):
     with pytest.raises(AssertionError) as err:
         utils.patch_json(client, f"/api/_users/{USERS[0]['_id']}", {"products": []})
-    assert "403" in str(err)
+    assert "401" in str(err)
 
     with pytest.raises(AssertionError) as err:
         utils.delete_json(client, f"/api/_users/{USERS[0]['_id']}", {})
-    assert "403" in str(err)
+    assert "401" in str(err)
 
     with pytest.raises(AssertionError) as err:
         utils.patch_json(client, f"/api/_users/{USERS[1]['_id']}", {"company": COMPANIES[0]["_id"]})
-    assert "403" in str(err)
+    assert "401" in str(err)
 
 
 def test_public_user_can_edit_his_dashboard(client, manager):

@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.5.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-10-12 11:16+0200\n"
+"POT-Creation-Date: 2023-10-13 15:04+0200\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
 "Last-Translator: Petr Jašek <petr.jasek@sourcefabric.org>, 2023\n"
 "Language-Team: Finnish (https://app.transifex.com/sourcefabric/teams/6584/fi/)\n"
@@ -1570,7 +1570,7 @@ msgstr "Sisältösuunnitelmia päivitetty {{  }}"
 msgid "Time to be confirmed"
 msgstr "Aika vahvistamatta"
 
-#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:57
+#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:60
 #: assets/agenda/utils.ts:77 assets/agenda/utils.ts:78
 msgid "Coverage not planned"
 msgstr "STT ei uutisoi"
@@ -1697,25 +1697,17 @@ msgstr "Kaikki osastot"
 msgid "Any agenda"
 msgstr "Kaikki tiedot"
 
-#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:55
-msgid "All Calendars"
-msgstr "Kaikki osastot"
-
-#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:62
+#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:69
 msgid "Calendars"
 msgstr "Osasto"
 
-#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:71
+#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:86
 msgid "Events"
 msgstr "Tapahtumat"
 
-#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:78
+#: assets/agenda/components/AgendaCalendarAgendaFilter.tsx:92
 msgid "Planning"
 msgstr "Uutissuunnittelu"
-
-#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:9
-msgid "Any coverage status"
-msgstr "Uutisoiko STT? (kaikki)"
 
 #: assets/agenda/components/AgendaCoverageExistsFilter.tsx:26
 msgid "Planned"
@@ -1733,15 +1725,15 @@ msgstr "STT ehkä uutisoi"
 msgid "Completed"
 msgstr "Juttu lähetetty"
 
-#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:51
+#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:54
 msgid "Coverage is planned"
 msgstr "STT uutisoi"
 
-#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:63
+#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:66
 msgid "Coverage not decided"
 msgstr "STT ehkä uutisoi"
 
-#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:69
+#: assets/agenda/components/AgendaCoverageExistsFilter.tsx:72
 msgid "Coverage completed"
 msgstr "Juttu lähetetty"
 
@@ -1821,17 +1813,10 @@ msgid "Top Stories"
 msgstr "Pääuutiset"
 
 #: assets/agenda/components/AgendaFilters.tsx:56
-#: assets/agenda/components/LocationFilter.tsx:503
+#: assets/agenda/components/AgendaFilters.tsx:62
+#: assets/agenda/components/LocationFilter.tsx:512
 msgid "Regions"
 msgstr "Kunnat ja kaupungit"
-
-#: assets/agenda/components/AgendaFilters.tsx:75
-msgid "Any region"
-msgstr "Kaikki alueet"
-
-#: assets/agenda/components/AgendaFilters.tsx:95
-msgid "Any coverage type"
-msgstr "Kaikki sisältötyypit"
 
 #: assets/agenda/components/AgendaInternalNote.tsx:13
 msgid "Internal Note"
@@ -1859,12 +1844,12 @@ msgid "{{ action }} {{ minutes }} minute(s) ago"
 msgstr "{{ action }} {{ minutes }} minuuttia sitten"
 
 #: assets/agenda/components/AgendaItemTypeFilter.tsx:14
-#: assets/agenda/components/AgendaItemTypeFilter.tsx:37
+#: assets/agenda/components/AgendaItemTypeFilter.tsx:40
 msgid "Events Only"
 msgstr "Tapahtumat"
 
 #: assets/agenda/components/AgendaItemTypeFilter.tsx:15
-#: assets/agenda/components/AgendaItemTypeFilter.tsx:45
+#: assets/agenda/components/AgendaItemTypeFilter.tsx:48
 msgid "Planning Only"
 msgstr "Uutissuunnittelu"
 
@@ -1992,27 +1977,29 @@ msgid "Country"
 msgstr "Maa"
 
 #: assets/agenda/components/LocationFilter.tsx:428
-#: assets/agenda/components/LocationFilter.tsx:488
-msgid "Any location"
-msgstr "Kaikki sijainnit"
+#: assets/agenda/components/LocationFilter.tsx:459
+#: assets/components/cards/edit/ConfigEvent.tsx:56
+msgid "Location"
+msgstr "Sijainti"
 
-#: assets/agenda/components/LocationFilter.tsx:462
+#: assets/agenda/components/LocationFilter.tsx:468
+#: assets/agenda/components/LocationFilter.tsx:469
 msgid "Search for a region or place"
 msgstr "Etsi aluetta tai paikkaa"
 
-#: assets/agenda/components/LocationFilter.tsx:498
+#: assets/agenda/components/LocationFilter.tsx:507
 msgid "Searching locations..."
 msgstr "Etsitään paikkatietoja..."
 
-#: assets/agenda/components/LocationFilter.tsx:512
+#: assets/agenda/components/LocationFilter.tsx:521
 msgid "No regions found"
 msgstr "Ei kuntia tai kaupunkeja"
 
-#: assets/agenda/components/LocationFilter.tsx:517
+#: assets/agenda/components/LocationFilter.tsx:525
 msgid "Places"
 msgstr "Paikat"
 
-#: assets/agenda/components/LocationFilter.tsx:526
+#: assets/agenda/components/LocationFilter.tsx:534
 msgid "No places found"
 msgstr "Paikkoja ei löytynyt"
 
@@ -2613,7 +2600,7 @@ msgstr "Ei uusia ilmoituksia"
 
 #: assets/components/NotificationList.tsx:109
 #: assets/search/components/AdvancedSearchPanel.tsx:168
-#: assets/search/components/SearchResultsBar/index.tsx:178
+#: assets/search/components/SearchResultsBar/index.tsx:179
 msgid "Clear All"
 msgstr "Tyhjennä kaikki"
 
@@ -2760,10 +2747,6 @@ msgstr "Alkupäivämäärä"
 #: assets/components/cards/edit/ConfigEvent.tsx:48
 msgid "End Date"
 msgstr "Loppupäivämäärä"
-
-#: assets/components/cards/edit/ConfigEvent.tsx:56
-msgid "Location"
-msgstr "Sijainti"
 
 #: assets/components/cards/edit/ConfigExternalMedia.tsx:15
 msgid "More button label"
@@ -3353,7 +3336,7 @@ msgid "Body"
 msgstr "Leipäteksti"
 
 #: assets/search/components/FollowedTopics.tsx:61
-#: assets/search/components/TopicForm.tsx:151
+#: assets/search/components/TopicForm.tsx:148
 msgid "Remove from folder"
 msgstr "Poista kansiosta"
 
@@ -3362,7 +3345,7 @@ msgid "Would you like to delete topic {{name}}?"
 msgstr "Haluatko varmasti poistaa haun {{name}}?"
 
 #: assets/search/components/FollowedTopics.tsx:218
-#: assets/search/components/TopicForm.tsx:174
+#: assets/search/components/TopicForm.tsx:173
 msgid "Create new folder"
 msgstr "Luo uusi kansio"
 
@@ -3431,12 +3414,12 @@ msgid "Updated on {{ date }} at {{ time }}"
 msgstr "Päivitetty {{ date }} {{ time }}"
 
 #: assets/search/components/Topic.tsx:102
-#: assets/search/components/TopicForm.tsx:213
+#: assets/search/components/TopicForm.tsx:218
 msgid "Real-Time"
 msgstr "Reaaliaikainen"
 
 #: assets/search/components/Topic.tsx:102
-#: assets/search/components/TopicForm.tsx:223
+#: assets/search/components/TopicForm.tsx:228
 msgid "Scheduled"
 msgstr "Aikataulutettu"
 
@@ -3500,15 +3483,15 @@ msgstr "Luotu ulkopuolella"
 msgid "Organize your Topic"
 msgstr "Järjestä tallennetut hakusi"
 
-#: assets/search/components/TopicForm.tsx:192
+#: assets/search/components/TopicForm.tsx:197
 msgid "Email Notifications:"
 msgstr "Sähköposti-ilmoitukset:"
 
-#: assets/search/components/TopicForm.tsx:203
+#: assets/search/components/TopicForm.tsx:208
 msgid "None"
 msgstr "Ei mitään"
 
-#: assets/search/components/TopicForm.tsx:230
+#: assets/search/components/TopicForm.tsx:235
 msgid ""
 "Your saved topic results will be emailed in a digest format at the time(s) "
 "per day set below."
@@ -3516,12 +3499,12 @@ msgstr ""
 "Tallentamasi haun tulokset lähetetään sinulle tiivistetyssä muodossa "
 "päivittäin alla määriteltyinä aikoina."
 
-#: assets/search/components/TopicForm.tsx:241
+#: assets/search/components/TopicForm.tsx:246
 #: assets/user-profile/components/profile/UserProfile.tsx:164
 msgid "Edit schedule"
 msgstr "Muuta aikataulua"
 
-#: assets/search/components/TopicForm.tsx:250
+#: assets/search/components/TopicForm.tsx:255
 msgid "Topic details"
 msgstr "Tarkemmat tiedot tallennetusta hausta"
 

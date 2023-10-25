@@ -2780,7 +2780,7 @@ msgstr "Personnaliser l'accueil"
 #: assets/components/PersonalizeHomeModal.tsx:319
 #: assets/home/components/HomeApp.tsx:285
 msgid "My Home"
-msgstr "Accueil"
+msgstr "Mon accueil"
 
 #: assets/components/PersonalizeHomeModal.tsx:257
 msgid ""
