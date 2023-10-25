@@ -88,6 +88,7 @@ class User(UserData):
 class UserAuth(TypedDict):
     _id: str
     email: str
+    token: str
     password: str
     is_enabled: bool
     is_approved: bool

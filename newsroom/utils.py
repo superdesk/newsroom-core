@@ -296,7 +296,7 @@ def is_account_enabled(user):
         flash(gettext("Account is disabled"), "danger")
         return False
 
-    if not user.get("is_approved"):
+    if user.get("is_approved") is False:
         account_created = user.get("_created")
 
         approve_expiration = utcnow() + timedelta(days=-app.config.get("NEW_ACCOUNT_ACTIVE_DAYS", 14))
