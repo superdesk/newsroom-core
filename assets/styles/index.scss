@@ -501,7 +501,7 @@ body.print {
 
         &.active {
             .sidenav-icons__badge {
-                outline: 2px solid var(--sidenav-color-item-bg--active);
+                outline: 2px solid var(--sidenav-color-badge-active-outline);
             }
 
             a {
