@@ -46,6 +46,7 @@ def sign_user_by_email(
     if user is None and create_missing and userdata is not None:
         user = userdata.copy()
         user["is_enabled"] = True
+        user["is_approved"] = True
         users.create([user])
 
     def redirect_with_error(error_str):
