@@ -393,6 +393,7 @@ $container-max-widths: (
     --sidenav-color-item-fg--active:    var(--color-primary);
     --sidenav-color-badge-bg:           hsla(0, 0%, 16%, 1);
     --sidenav-color-badge-fg:           hsla(0, 0%, 98%, 1);
+    --sidenav-color-badge-active-outline:hsla(0, 0%, 98%, 1);
     --sidenav-item-badge-size:          1.25rem;
     --sidenav-item-badge-font-size:     0.6875rem;
     --sidenav-item-helper-icon-size:    1.25rem;
