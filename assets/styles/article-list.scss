@@ -718,6 +718,27 @@
     }
 }
 
+@container contentListItem (max-width: 543px) {
+    .wire-articles__item__icons.wire-articles__item__icons--compact {
+        flex-direction: column;
+    }
+    .wire-articles__item-headline {
+        align-items: flex-start;
+    }
+    .wire-articles__item-headline-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        row-gap: var(--space--0-5);
+    }
+    .wire-articles__item__meta-info {
+        .meta-info-row {
+            flex-wrap: wrap;
+            row-gap: 0;
+        }
+    }
+}
+
+
 .wire-articles__item--open + .wire-articles__versions, .wire-articles__item--selected + .wire-articles__versions {
     outline: 1px solid #00aceb;
 }

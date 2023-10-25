@@ -116,6 +116,18 @@
     @include md {
         flex-direction: column;
     }
+    @include phone {
+        display: grid;
+        grid-template-columns: repeat(auto-fill,minmax(8rem,1fr));
+        gap: var(--space--0-5);
+        margin-inline: calc(-1 * var(--space--1));
+        margin-block-end: calc(-1 * var(--space--1));
+        margin-block-start: calc(-1 * var(--space--0-5));
+        .nh-button {
+            text-align: center;
+            padding-inline: var(--space--0-5);
+        }
+    }
 }
 
 .profile-content {
@@ -130,6 +142,9 @@
         flex-grow: 1;
         grid-row: 1 / 2;
         padding-inline: var(--space--3);
+    }
+    .profile-content__main-inner {
+        max-width: 1200px;
     }
 
     &.profile-content--topics,

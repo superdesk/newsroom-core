@@ -249,14 +249,7 @@ class HomeApp extends React.Component<IProps, IState> {
                     <div className="container-fluid">
                         {
                             isWireSectionConfigured && (
-                                <div
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        gap: 8,
-                                    }}
-                                >
+                                <div className="home-tools__container">
                                     {
                                         !this.hasPersonalDashboard ? (
                                             <div className="home-tools">

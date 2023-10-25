@@ -50,7 +50,7 @@ export function FieldComponents({config, item, fieldProps = {}}: any) {
             key === SEPARATOR_KEY ? `${SEPARATOR_KEY}${++separator}` : key;
 
         return (
-            <span className="probam" key={_key}>
+            <span className="meta-info-block" key={_key}>
                 <Component item={item} {...fieldProps} />
             </span>
         );
