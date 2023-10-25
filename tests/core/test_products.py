@@ -189,6 +189,8 @@ def test_delete_assigned_product(client, app, product, companies, user):
 
     app.data.insert("products", [product2])
 
+    utils.login(client, user)
+
     assign_product_to_companies(client, product, companies)
     assign_product_to_companies(client, product2, companies)
     assign_product_to_user(client, product2, user)
@@ -209,7 +211,7 @@ def test_delete_assigned_product(client, app, product, companies, user):
     assert 0 == len(updated_user["products"])
 
 
-def test_company_and_user_products(client, app, public_company, public_user, product):
+def test_company_and_user_products(client, app, public_company, public_user, product, admin):
     product2 = {
         "name": "test",
         "is_enabled": True,
@@ -229,6 +231,7 @@ def test_company_and_user_products(client, app, public_company, public_user, pro
     assign_product_to_companies(client, product, [public_company])
 
     # this is noop, user can only get products assigned to company
+    utils.login(client, admin)
     assign_product_to_user(client, product2, public_user)
 
     utils.login(client, public_user)

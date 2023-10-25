@@ -14,7 +14,12 @@ blueprint = Blueprint("auth", __name__)
 
 class SessionAuth(BasicAuth):
     def authorized(self, allowed_roles, resource, method):
-        return get_user_id()
+        if not get_user_id():
+            return False
+        if not resource:
+            return True  # list of apis is open
+        user_role = flask.session.get("user_type") if flask.request else None
+        return user_role in allowed_roles
 
 
 def get_user(required=False) -> Optional[User]:

@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
 
-from newsroom.auth import get_user_by_email
+from newsroom.auth import get_auth_user_by_email
 from newsroom.utils import get_user_dict, get_company_dict, is_valid_user
 from newsroom.tests.fixtures import COMPANY_1_ID
 from newsroom.tests.users import ADMIN_USER_ID
@@ -70,7 +70,7 @@ def test_reset_password_token_sent_for_user_succeeds(app, client):
     response = client.post("/users/59b4c5c61d41c8d736852000/reset_password")
     assert response.status_code == 200
     assert '"success": true' in response.get_data(as_text=True)
-    user = get_resource_service("users").find_one(req=None, email="test@sourcefabric.org")
+    user = get_resource_service("auth_user").find_one(req=None, email="test@sourcefabric.org")
     assert user.get("token") is not None
 
 
@@ -96,7 +96,7 @@ def test_reset_password_token_sent_for_user_fails_for_disabled_user(app, client)
     response = client.post("/users/59b4c5c61d41c8d736852000/reset_password")
     assert response.status_code == 400
     assert '"message": "Token could not be sent"' in response.get_data(as_text=True)
-    user = get_resource_service("users").find_one(req=None, email="test@sourcefabric.org")
+    user = get_resource_service("auth_user").find_one(req=None, email="test@sourcefabric.org")
     assert user.get("token") is None
 
 
@@ -194,7 +194,7 @@ def test_create_new_user_succeeds(app, client):
         assert "account created" in outbox[0].subject
 
     # get reset password token
-    user = get_user_by_email("new.user@abc.org")
+    user = get_auth_user_by_email("new.user@abc.org")
     client.get(url_for("auth.reset_password", token=user["token"]))
 
     # change the password
@@ -543,7 +543,7 @@ def test_signals(client, app):
     assert user["email"] == updated_listener.call_args.kwargs["user"]["email"]
     updated_listener.reset_mock()
 
-    token = app.data.find_one("users", req=None, _id=user_id)["token"]
+    token = app.data.find_one("auth_user", req=None, _id=user_id)["token"]
 
     resp = client.get(f"/validate/{token}")
     assert 302 == resp.status_code, resp.get_data(as_text=True)
