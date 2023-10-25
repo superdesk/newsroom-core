@@ -101,6 +101,7 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
                 </div>
             </div>
             <WithPagination
+                style='bottom-only'
                 key={searchTerm}
                 pageSize={50}
                 getItems={(pageNo, pageSize) => {

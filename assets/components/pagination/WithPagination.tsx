@@ -4,6 +4,7 @@ interface IProps<T> {
     getItems(pageNo: number, pageSize: number, signal: AbortSignal): Promise<{items: Array<T>, itemCount: number}>;
     children: (items: Array<T>) => JSX.Element;
     pageSize?: number;
+    style?: 'top-only' | 'bottom-only';
 }
 
 interface IState<T> {
@@ -209,14 +210,24 @@ export class WithPagination<T> extends React.PureComponent<IProps<T>, IState<T>>
             >
                 {
                     this.pageCount > 1 ? (
-                        <>
-                            <StyledPagination />
-                            {this.props.children(this.state.items)}
-                            <StyledPagination />
-                        </>
-                    ) : (
-                        this.props.children(this.state.items)
-                    )
+                        this.props.style === 'bottom-only' ? (
+                            <>
+                                {this.props.children(this.state.items)}
+                                <StyledPagination />
+                            </>
+                        ) : this.props.style === 'top-only' ? (
+                            <>
+                                <StyledPagination />
+                                {this.props.children(this.state.items)}
+                            </>
+                        ) : (
+                            <>
+                                <StyledPagination />
+                                {this.props.children(this.state.items)}
+                                <StyledPagination />
+                            </>
+                        )
+                    ) : this.props.children(this.state.items)
                 }
             </div>
         );
