@@ -634,6 +634,8 @@ $container-max-widths: (
     // COMPONENT: ALERTIFY NOTIFIER
     --ajs-message-color-bg--success: var(--color-info);
     --ajs-message-color-bg--error: var(--color-alert);
+    --ajs-message-color-bg--warning: var(--color-warning);
+    --ajs-message-color-fg--warning: hsl(0,0%,100%);
     --ajs-message-border-radius: var(--border-radius--l);
     --ajs-message-padding: var(--border-radius--l);
 

@@ -69,8 +69,8 @@ class UserProfile extends React.Component<IProps, any> {
         return (
             <form className="profile-content profile-content--user">
                 <div className="profile-content__main">
-                    <div className="col-12 col-xl-10 mx-auto">
-                        <div className="row pt-xl-4 pt-3 px-4">
+                    <div className="profile-content__main-inner col-12 mx-auto pt-3">
+                        <div className="row">
                             <div className="col-lg-6">
                                 <TextInput
                                     name='first_name'
@@ -143,29 +143,30 @@ class UserProfile extends React.Component<IProps, any> {
                                 />
                             </div>
 
-                            <div className="ng-flex__row">
-                                <div className="col-lg-6">
-                                    <div className="nh-container nh-container--highlight mb-3 mt-3">
-                                        <p className="nh-container__text--small">
-                                            {gettext('You will receive email notifications daily, sent in a digest ' +
-                                                'format at regular intervals. This setting will apply to all subscribed ' +
-                                                'scheduled email notifications (e.g. {{ wire }} Topics, ' +
-                                                '{{ agenda }} Topics).', window.sectionNames)}
-                                        </p>
-                                        <div className="h-spacer h-spacer--medium" />
-                                        <span className="nh-container__schedule-info mb-3">
-                                            {getSubscriptionTimesString(user)}
-                                        </span>
-                                        <button
-                                            type="button"
-                                            className="nh-button nh-button--small nh-button--tertiary"
-                                            onClick={this.props.openEditTopicNotificationsModal}
-                                        >
-                                            {gettext('Edit schedule')}
-                                        </button>
-                                    </div>
+
+                            <div className="col-lg-6">
+                                <div className="nh-container nh-container--highlight mb-3 mt-3">
+                                    <p className="nh-container__text--small">
+                                        {gettext('You will receive email notifications daily, sent in a digest ' +
+                                            'format at regular intervals. This setting will apply to all subscribed ' +
+                                            'scheduled email notifications (e.g. {{ wire }} Topics, ' +
+                                            '{{ agenda }} Topics).', window.sectionNames)}
+                                    </p>
+                                    <div className="h-spacer h-spacer--medium" />
+                                    <span className="nh-container__schedule-info mb-3">
+                                        {getSubscriptionTimesString(user)}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        className="nh-button nh-button--small nh-button--tertiary"
+                                        onClick={this.props.openEditTopicNotificationsModal}
+                                    >
+                                        {gettext('Edit schedule')}
+                                    </button>
                                 </div>
                             </div>
+                            <div className="col-lg-12"></div>
+
 
                             {!!localeOptions.length &&
                                 <div className="col-lg-6">
