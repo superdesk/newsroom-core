@@ -93,8 +93,8 @@
     .wire-articles__item__meta-info .bold {
         color: var(--color-text--muted);
     }
-    .wire-articles__wire-articles__item__metaitem__meta-info .bold {
-        font-weight: 500;
+    .wire-articles__item__meta-info .bold {
+        font-weight: 600;
     }
 }
 
@@ -561,7 +561,7 @@
     margin: 0;
     .bold {
         color: var(--color-text);
-        font-weight: 500;
+        font-weight: 600;
     }
     .versions-link {
         color: var(--color-text-link);
