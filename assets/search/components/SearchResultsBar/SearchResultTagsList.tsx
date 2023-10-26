@@ -93,6 +93,7 @@ export function SearchResultTagsList({
                 readonly={readonly}
             />
             <SearchResultsFiltersRow
+                refresh={refresh}
                 searchParams={searchParams}
                 filterGroups={filterGroups}
                 toggleFilter={toggleFilter}
