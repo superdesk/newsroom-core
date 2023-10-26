@@ -35,7 +35,6 @@ export interface IProps {
     saveMyTopic?: (params: ISearchParams) => void;
     deselectMyTopic?: (topicId: ITopic['_id']) => void;
     clearQuickFilter: (filter: string) => void;
-
 }
 
 export function SearchResultTagsList({
