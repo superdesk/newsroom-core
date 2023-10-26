@@ -15,9 +15,9 @@ type IProps = Pick<IParentProps,
     'toggleFilter' |
     'setCreatedFilter' |
     'resetFilter'
-> & {refresh?: () => void;};
+>;
 
-export function SearchResultsFiltersRow({readonly, searchParams, filterGroups, toggleFilter, setCreatedFilter, resetFilter, refresh}: IProps) {
+export function SearchResultsFiltersRow({readonly, searchParams, filterGroups, toggleFilter, setCreatedFilter, resetFilter}: IProps) {
     const tags = [];
 
     if (searchParams.created) {
@@ -38,7 +38,6 @@ export function SearchResultsFiltersRow({readonly, searchParams, filterGroups, t
                             from: null,
                             to: null,
                         });
-                        refresh?.();
                     }}
                 />
             );
@@ -57,7 +56,6 @@ export function SearchResultsFiltersRow({readonly, searchParams, filterGroups, t
                                 ...searchParams.created,
                                 from: null,
                             });
-                            refresh?.();
                         }}
                     />
                 );
@@ -76,7 +74,6 @@ export function SearchResultsFiltersRow({readonly, searchParams, filterGroups, t
                                 ...searchParams.created,
                                 to: null,
                             });
-                            refresh?.();
                         }}
                     />
                 );
@@ -107,7 +104,6 @@ export function SearchResultsFiltersRow({readonly, searchParams, filterGroups, t
                         onClick={(event) => {
                             event.preventDefault();
                             toggleFilter(group.field, filterValue, group.single);
-                            refresh?.();
                         }}
                     />
                 );
@@ -133,7 +129,6 @@ export function SearchResultsFiltersRow({readonly, searchParams, filterGroups, t
                 onClick={(event) => {
                     event.preventDefault();
                     resetFilter();
-                    refresh?.();
                 }}
             >
                 {gettext('Clear filters')}
