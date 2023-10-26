@@ -94,7 +94,7 @@
         color: var(--color-text--muted);
     }
     .wire-articles__wire-articles__item__metaitem__meta-info .bold {
-        font-weight: 500;
+        font-weight: 600;
     }
 }
 
@@ -708,6 +708,10 @@
         justify-content: flex-start;
         align-items: flex-start;
     }
+}
+
+.meta-info-row:empty {
+    display: contents;
 }
 
 @container contentListItem (max-width: 399px) {
