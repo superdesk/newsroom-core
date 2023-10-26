@@ -8,7 +8,7 @@ import {getNavigationUrlParam, getSearchParams} from './utils';
 import {getLocations, getMapSource} from 'maps/utils';
 
 import {closeModal} from 'actions';
-import {setShareItems} from 'wire/actions';
+import {fetchItems, setShareItems} from 'wire/actions';
 import {createOrUpdateTopic, fetchUser} from 'user-profile/actions';
 
 import {multiSelectTopicsConfigSelector} from 'ui/selectors';
@@ -140,6 +140,7 @@ export function toggleFilter(key: any, value: any, single?: any) {
         }
 
         dispatch(setSearchFilters(currentFilters));
+        dispatch(fetchItems());
         updateRouteParams(
             {filter: currentFilters},
             state,
@@ -163,6 +164,7 @@ export function setCreatedFilter(filter: any) {
         );
 
         dispatch(setSearchCreated(created));
+        dispatch(fetchItems());
         updateRouteParams(
             {created},
             state,
