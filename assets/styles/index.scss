@@ -506,7 +506,9 @@ body.print {
 
         &.active {
             .sidenav-icons__badge {
-                outline: 2px solid var(--sidenav-color-badge-active-outline);
+                outline: 2px solid var(--sidenav-color-badge-outline--active);
+                background-color: var(--sidenav-color-badge-bg--active);
+                color: var(--sidenav-color-badge-fg--active);
             }
 
             a {
@@ -3786,8 +3788,8 @@ article.list {
 }
 .collapsible-box__header-title {
     font-size: var(--text-size--large);
-    line-height: 1;
-    font-weight: 500;
+    line-height: 1.1;
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
