@@ -15,12 +15,12 @@ type MoreNewsInternalType = {[Property in MoreNewsSearchKind]: React.ComponentTy
 
 const MoreNewsInternal: MoreNewsInternalType = {
     'product': (props: {id: string}) => (
-        <a href={`/wire?product=${props.id}`} role='button' className='nh-button nh-button--tertiary mb-3'>
+        <a href={`/wire?product=${props.id}`} role='button' className='nh-button nh-button--tertiary nh-button--small mb-3'>
             {gettext('More news')}
         </a>
     ),
     'topic':  (props: {id: string}) => (
-        <a href={`/wire?topic=${props.id}`} role='button' className='nh-button nh-button--tertiary mb-3'>
+        <a href={`/wire?topic=${props.id}`} role='button' className='nh-button nh-button--tertiary nh-button--small mb-3'>
             {gettext('More news')}
         </a>
     ),
@@ -38,7 +38,7 @@ function MoreNewsButton(props: IProps): any {
             <div key='more-news' className='col-6 col-sm-4 d-flex align-items-start justify-content-end'>
                 {moreNews && id && <MoreNewsLink id={id} />}
                 {photoUrl && (
-                    <a href={photoUrl} target='_blank' rel='noopener noreferrer' role='button' className='nh-button nh-button--tertiary mb-3'>
+                    <a href={photoUrl} target='_blank' rel='noopener noreferrer' role='button' className='nh-button nh-button--tertiary nh-button--small mb-3'>
                         {photoUrlLabel}
                     </a>
                 )}

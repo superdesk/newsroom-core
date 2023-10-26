@@ -198,12 +198,12 @@ class WireListItem extends React.Component<any, any> {
                             <div className="wire-articles__item__meta">
                                 <WireListItemIcons item={item} />
                                 <div className="wire-articles__item__meta-info">
-                                    <span className="bold">
+                                    <span className="meta-info-slugline bold">
                                         {item.es_highlight && item.es_highlight.slugline ? <div
                                             dangerouslySetInnerHTML={({__html:item.es_highlight.slugline && item.es_highlight.slugline[0]})}
                                         /> : getSlugline(item, true)}
                                     </span>
-                                    <span>
+                                    <span className="meta-info-row">
                                         <FieldComponents
                                             config={fields}
                                             item={item}

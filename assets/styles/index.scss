@@ -87,9 +87,14 @@ label {
         font-weight: 300;
         letter-spacing: 0.2px;
         text-shadow: none;
+        box-shadow: 0 1px 4px hsla(0,0%,0%,0.12), 0 4px 8px hsla(0,0%,0%,0.4);
     }
     .ajs-message.ajs-success {
         background: var(--ajs-message-color-bg--success);
+    }
+    .ajs-message.ajs-warning {
+        background: var(--ajs-message-color-bg--warning);
+        color: var(--ajs-message-color-fg--warning);
     }
     .ajs-message.ajs-error {
         background: var(--ajs-message-color-bg--error);
@@ -4140,6 +4145,17 @@ article.list {
     .nh-flex__row {
         gap: var(--space--5);
         padding-inline: var(--space--3);
+    }
+}
+
+.home-tools__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space--1);
+    @include phone {
+        margin-top: calc( -1 * var(--space--1-5));
+        margin-block-end: var(--space--1-5);
     }
 }
 

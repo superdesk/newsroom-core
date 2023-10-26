@@ -43,7 +43,6 @@
     --top-bar-nav-brand-border-color: hsla(0, 0%, 100%, 0.4);
     --top-bar-nav-brand-border-type: solid;
 
-
     /* COMPONENT: SIDENAV */
     --sidenav-color-bg:                 hsl(0, 3%, 15%);
     --sidenav-color-item-bg--active:    hsl(356, 72%, 46%);
@@ -77,6 +76,12 @@
 
     /* COMPONENT: MAIN FOOTER */
     --footer-size--height: 48px;
+
+    /* COMPONENT: ALERTIFY NOTIFIER */
+    --ajs-message-color-bg--success: hsl(0, 3%, 15%);
+
+    /* COMPONENT: SEARCH RESULT PANEL (Tags list) */
+    --search-result-tags-list-color-bg: var(--main-header-color-bg);
 }
 
 .navbar__logo img.navbar__logo-img--fr {
@@ -90,7 +95,6 @@
 .navbar__additional-logo img.navbar__additional-logo-img.navbar__additional-logo-img--fr {
     width: 120px;
 }
-
 
 @media only screen and (max-width: 575px) {
     .navbar__logo img.navbar__logo-img--fr {
