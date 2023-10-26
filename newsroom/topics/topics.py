@@ -54,7 +54,7 @@ class TopicsResource(newsroom.Resource):
         "navigation": {
             "type": "list",
             "nullable": True,
-            "schema": {"type": "string"},
+            "schema": newsroom.Resource.rel("navigations"),
         },
         "original_creator": newsroom.Resource.rel("users"),
         "version_creator": newsroom.Resource.rel("users"),
