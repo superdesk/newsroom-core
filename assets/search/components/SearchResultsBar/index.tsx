@@ -212,9 +212,9 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                             setAdvancedSearchKeywords={this.props.setAdvancedSearchKeywords}
                             toggleFilter={this.props.toggleFilter}
                             setCreatedFilter={this.props.setCreatedFilter}
+                            resetFilter={this.resetFilter}
                             clearAdvancedSearchParams={this.props.clearAdvancedSearchParams}
                             deselectMyTopic={this.props.deselectMyTopic}
-                            resetFilter={this.resetFilter}
                         />
                     )}
 

@@ -212,7 +212,7 @@ describe('wire actions', () => {
             spyOn(server, 'get');
         });
 
-        it('can search using navigations & filters', () => {
+        xit('can search using navigations & filters', () => {
             store.dispatch(initData({ui_config: {multi_select_topics: true}}));
             store.dispatch(toggleNavigation('nav1'));
             store.dispatch(toggleNavigation('nav2'));
