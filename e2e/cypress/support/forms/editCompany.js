@@ -31,6 +31,8 @@ class EditCompanyFormWrapper extends BaseForm {
         } else {
             this.getFormElement('[data-test-id="save-btn"]').click();
         }
+        // wait for sidebar to close
+        this.getFormElement('[data-test-id="save-btn"]').should('not.exist');
     }
 
     getNewlyCreatedCompanyId(callback) {
