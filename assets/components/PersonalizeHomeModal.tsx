@@ -261,7 +261,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                                 {
                                     gettext(
                                         '{{size}} out of 6 topics selected',
-                                        {size: this.state.selectedTopicIds.length || '0'}
+                                        {size: this.state.selectedTopicIds.length}
                                     )
                                 }
                             </p>
