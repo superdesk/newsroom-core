@@ -226,8 +226,8 @@ describe('Wire - Topic', function () {
             */
             cy.get('[data-test-id="toggle-filter-panel"]').click();
             cy.get('[data-test-id="filter-panel-tab--topics"]').click();
-            cy.get('[data-test-id="collapse-box-button"]').click();
-            cy.get('[data-test-id="topic-list-item-My Topic"]').should('exist');
+            cy.get('[data-test-id="toggle-box-button"]').click();
+            cy.get('[data-test-id="topic-list-item"][data-test-value="My Topic"]').should('exist');
 
             /**
                 check if folder exist in appropriate folder in My Wire Topics
@@ -283,8 +283,8 @@ describe('Wire - Topic', function () {
             check if topic exist in the Wire in appropriate folder on the left My Topics panel
         */
         cy.get('[data-test-id="profile-page-close"]').click();
-        cy.get('[data-test-id="collapse-box-button"]').click();
-        cy.get('[data-test-id="topic-list-item-Topic 1"]').should('exist');
+        cy.get('[data-test-id="toggle-box-button"]').click();
+        cy.get('[data-test-id="topic-list-item"][data-test-value="Topic 1"]').should('exist');
 
         /**
             check if folder exist in appropriate folder in My Wire Topics
@@ -339,7 +339,7 @@ describe('Wire - Topic', function () {
         cy.get('[data-test-id="profile-page-close"]').click();
 
         // check that the topic appeared in the Wire in root on the left My Topics panel - is not in any folder
-        cy.get('[data-test-id="topic-list-item-Topic 1"]').then(($el) => {
+        cy.get('[data-test-id="topic-list-item"][data-test-value="Topic 1"]').then(($el) => {
             const el = $el[0];
             expect(el.closest('[data-test-id="folder-card"]')).to.be.null;
         });
