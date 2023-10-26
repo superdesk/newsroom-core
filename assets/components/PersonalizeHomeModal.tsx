@@ -172,12 +172,14 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
 
         const topicSearch = (searchMatches?.length ?? 0) > 0
             ? (
-                <div style={{padding: 4}}>
+                <div className='boxed-checklist'>
                     {searchMatches}
                 </div>
-            ) : <NoSearchMatches />;
+            ) : null;
 
-        const groupedTopics = (this.props.topics?.length ?? 0) > 0 ? (
+        const hasTopics = (filteredTopics(this.wireTopics).length ?? 0) > 0;
+
+        const groupedTopics = hasTopics ? (
             <div>
                 <div className='boxed-checklist'>
                     {filteredTopics(this.wireTopics).map((wireTopic) => (
@@ -259,7 +261,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                                 {
                                     gettext(
                                         '{{size}} out of 6 topics selected',
-                                        {size: this.state.selectedTopicIds.length}
+                                        {size: this.state.selectedTopicIds.length || '0'}
                                     )
                                 }
                             </p>
@@ -309,7 +311,7 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                                     </div>
                                 </form>
                             </div>
-                            {this.state.searchTerm ? topicSearch : groupedTopics}
+                            {this.state.searchTerm && hasTopics ? topicSearch : groupedTopics}
                         </div>
                     </aside>
                     <div
