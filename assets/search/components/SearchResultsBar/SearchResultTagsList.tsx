@@ -34,6 +34,8 @@ export interface IProps {
 
     saveMyTopic?: (params: ISearchParams) => void;
     deselectMyTopic?: (topicId: ITopic['_id']) => void;
+    clearQuickFilter: (filter: string) => void;
+
 }
 
 export function SearchResultTagsList({
@@ -58,6 +60,7 @@ export function SearchResultTagsList({
     deselectMyTopic,
     resetFilter,
     refresh,
+    clearQuickFilter,
 }: IProps) {
     return (
         <ul
@@ -93,6 +96,7 @@ export function SearchResultTagsList({
                 readonly={readonly}
             />
             <SearchResultsFiltersRow
+                clearQuickFilter={clearQuickFilter}
                 searchParams={searchParams}
                 filterGroups={filterGroups}
                 toggleFilter={toggleFilter}

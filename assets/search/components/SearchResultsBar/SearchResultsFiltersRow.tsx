@@ -6,7 +6,6 @@ import {Tag} from 'components/Tag';
 
 import {IProps as IParentProps} from './SearchResultTagsList';
 import {setItemTypeFilter} from 'agenda/actions';
-import {clearQuickFilter} from 'search/actions';
 import {searchFilterSelector} from 'search/selectors';
 import {connect} from 'react-redux';
 import {agendaCoverageStatusFilter, getActiveFilterLabel} from 'agenda/components/AgendaCoverageExistsFilter';
@@ -20,7 +19,7 @@ type IProps = Pick<IParentProps,
     'toggleFilter' |
     'setCreatedFilter' |
     'resetFilter'
->;
+> & {clearQuickFilter: (filter: string) => void;};
 
 type IActiveFilter = {
     calendar?: any;
@@ -38,9 +37,7 @@ interface IReduxStateProps {
 }
 
 interface IReduxDispatchProps {
-    clearQuickFilter: (filter: string) => void;
     clearItemTypeFilter: () => void;
-    clearAllQuickFilters: () => void;
 }
 
 type IPropsAgendaExtended = IReduxDispatchProps & IReduxStateProps & IProps;
@@ -55,9 +52,17 @@ function SearchResultsFiltersRow({
     itemTypeFilter,
     clearItemTypeFilter,
     activeFilter,
+    clearQuickFilter,
 }: IPropsAgendaExtended) {
     const tags = [];
 
+    /**
+     * FIXME: This is a bad implementation, but the proper fix would be too time consuming at this moment.
+     * Ideally we would want to unify the searchParameters so they are stored in the same variable both from
+     * agenda and wire. Another solution would be to not reuse the same component in wire and agenda filters
+     * so that wire has its own filter component and agenda has a separate one. The first solution is the better
+     * one since from a UI stand point the filters component is identical and should be reused ideally.
+     */
     if (IS_AGENDA) {
         if (itemTypeFilter != null) {
             tags.push(
@@ -203,6 +208,7 @@ function SearchResultsFiltersRow({
                 onClick={(event) => {
                     event.preventDefault();
                     resetFilter();
+                    clearItemTypeFilter?.();
                 }}
             >
                 {gettext('Clear filters')}
@@ -225,12 +231,7 @@ const mapStateToProps = (state: any) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    clearQuickFilter: (filter: string) => dispatch(clearQuickFilter(filter)),
     clearItemTypeFilter: () => dispatch(setItemTypeFilter(null)),
-    clearAllQuickFilters: () => {
-        dispatch(setItemTypeFilter(null));
-        dispatch(clearQuickFilter());
-    }
 });
 
 let component: React.ComponentType<IProps> = SearchResultsFiltersRow as React.ComponentType<IProps>;

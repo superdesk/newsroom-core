@@ -16,6 +16,7 @@ import {
     clearAdvancedSearchParams,
     resetFilter,
     deselectMyTopic,
+    clearQuickFilter,
 } from '../../actions';
 
 import {Dropdown} from './../../../components/Dropdown';
@@ -196,6 +197,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                     )}
                     {!isTagSectionShown ? null : (
                         <SearchResultTagsList
+                            clearQuickFilter={this.props.clearQuickFilter}
                             refresh={this.props.refresh}
                             user={this.props.user}
                             showSaveTopic={this.props.showSaveTopic}
@@ -299,6 +301,7 @@ const mapDispatchToProps = {
     clearAdvancedSearchParams,
     deselectMyTopic,
     resetFilter,
+    clearQuickFilter,
 };
 
 export const SearchResultsBar: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(SearchResultsBarComponent);
