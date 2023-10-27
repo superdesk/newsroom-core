@@ -365,10 +365,6 @@ class UsersService(newsroom.Service):
                 elif request and request.method == "DELETE" and doc.get("_id") != manager.get("_id"):
                     return
 
-        if request.url_rule and request.url_rule.rule:
-            if request.url_rule.rule in ["/reset_password/<token>", "/token/<token_type>"]:
-                return
-
         if request.method != "DELETE" and (
             not updated_fields or all([key in USER_PROFILE_UPDATES for key in updated_fields])
         ):

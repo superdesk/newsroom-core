@@ -138,7 +138,7 @@ def send_token(user, token_type="validate", update_token=True):
         if update_token:
             updates = {}
             add_token_data(updates)
-            superdesk.get_resource_service("users").patch(id=bson.ObjectId(user["_id"]), updates=updates)
+            superdesk.get_resource_service("users").system_update(bson.ObjectId(user["_id"]), updates, user)
             token = updates["token"]
 
         if token_type == "validate":
