@@ -22,7 +22,7 @@ class ProfileTopicsWrapper {
     createNewFolder(name) {
         this.getCreateFolderButton().click();
         this.getFolderNameInput().type(name + '{enter}');
-        cy.get(`[data-test-id="folder-card--${name}"]`).should('be.visible');
+        cy.get(`[data-test-id="folder-card"][data-test-value="${name}"]`).should('be.visible');
     }
 
     getTopicCard(name, additionalSelector) {
@@ -40,7 +40,12 @@ class ProfileTopicsWrapper {
     }
 
     getFolderCard(name) {
-        return this.getBaseComponent(`[data-test-id="folder-card--${name}"]`);
+        return this.getBaseComponent(`[data-test-id="folder-card"][data-test-value="${name}"]`);
+    }
+
+    getFolderAction(name, actionName) {
+        cy.get(`[data-test-id="folder-card"][data-test-value="${name}"] [data-test-id="menu"]`).click();
+        return cy.get(`[data-test-id="action-folder"][data-test-value="${actionName}"]`);
     }
 
     dragTopicToFolder(topicName, folderName) {

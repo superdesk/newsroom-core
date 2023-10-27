@@ -6,7 +6,7 @@ export function SidebarFolder({folder, children}) {
 
     return (
         <div className={`collapsible-box collapsible-box--active-within ${open ? 'collapsible-box--open' : 'collapsible-box--closed'}`}>
-            <div className="collapsible-box__header" onClick={() => setOpen(!open)} role='button'>
+            <div className="collapsible-box__header" onClick={() => setOpen(!open)} role='button' data-test-id="toggle-box-button">
                 <h4 className="collapsible-box__header-title">{folder.name}</h4>
                 <div className="collapsible-box__header-caret">
                     <i className="icon--arrow-start"></i>
