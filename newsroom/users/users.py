@@ -349,6 +349,10 @@ class UsersService(newsroom.Service):
             else [field for field in updates.keys() if updates[field] != doc.get(field) and field != "id"]
         )
 
+        if request.url_rule and request.url_rule.rule:
+            if request.url_rule.rule in ["/reset_password/<token>", "/token/<token_type>"]:
+                return
+
         if is_current_user_company_admin():
             manager = get_user()
             if doc.get("company") and doc["company"] == manager.get("company"):
