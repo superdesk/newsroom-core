@@ -20,5 +20,5 @@ python3-saml>=1.15,<1.16
 # https://github.com/xhtml2pdf/xhtml2pdf/issues/589
 reportlab==3.6.6
 
-superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@develop
-superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@develop
+superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@v2.7.0-rc1
+superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@v2.7.0-rc1
