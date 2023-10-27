@@ -147,6 +147,7 @@ def get_atom():
                                     "assets.get_item",
                                     asset_id=src.get("media"),
                                     _external=True,
+                                    _scheme="https",
                                 )
                                 html_updated = True
             if html_updated:
