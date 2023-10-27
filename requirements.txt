@@ -18,7 +18,7 @@ python3-saml>=1.15,<1.16
 
 # Fix an issue between xhtml2pdf v0.2.4 and reportlab v3.6.7
 # https://github.com/xhtml2pdf/xhtml2pdf/issues/589
-reportlab==3.6.6
+reportlab>=3.6.11,<3.7
 
 superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@v2.7.0-rc1
 superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@v2.7.0-rc1
