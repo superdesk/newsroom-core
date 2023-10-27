@@ -12,7 +12,7 @@
     <script>
         window.newsroom = {{ get_client_config() | tojson | safe }};
         reportData = {{ data | tojson | safe }};
-        report = {{ report | tojson | safe }};
+        report = "{{ report | tojson | safe }}";
     </script>
 
     {{ javascript_tag('%s_js' % setting_type) | safe }}
