@@ -12,6 +12,7 @@ import {FormSection} from 'components/FormSection';
 
 import {SearchResultTagsList} from './SearchResultsBar/SearchResultTagsList';
 import {TopicFolderEditor} from './TopicFolderEditor';
+import {noop} from 'lodash';
 
 const TOPIC_NAME_MAXLENGTH = 30;
 
@@ -178,7 +179,7 @@ const TopicForm: React.FC<IProps> = ({
                                 </Dropdown>
                             </div>
                             {newFolder != null && (
-                                <div 
+                                <div
                                     style={{zIndex:'1', insetBlockStart: '-75px', marginBlockEnd: '-56px'}}
                                     className="simple-card__group position-relative"
                                 >
@@ -254,8 +255,10 @@ const TopicForm: React.FC<IProps> = ({
                 <div className="nh-flex__row">
                     <FormSection initiallyOpen={true} name={gettext('Topic details')} dataTestId="topic-form-group--params">
                         <SearchResultTagsList
-                            user={user}
                             readonly={true}
+                            // Clearing filters isn't available in readOnly mode.
+                            clearQuickFilter={noop}
+                            user={user}
                             showSaveTopic={false}
                             showMyTopic={false}
                             searchParams={topic}

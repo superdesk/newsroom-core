@@ -1,12 +1,16 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
-
 import {gettext, getCreatedSearchParamLabel} from 'utils';
 
 import {SearchResultTagList} from './SearchResultTagList';
 import {Tag} from 'components/Tag';
 
 import {IProps as IParentProps} from './SearchResultTagsList';
+import {setItemTypeFilter} from 'agenda/actions';
+import {searchFilterSelector} from 'search/selectors';
+import {connect} from 'react-redux';
+import {agendaCoverageStatusFilter, getActiveFilterLabel} from 'agenda/components/AgendaCoverageExistsFilter';
+
+const IS_AGENDA = location.pathname.includes('/agenda');
 
 type IProps = Pick<IParentProps,
     'readonly' |
@@ -15,10 +19,85 @@ type IProps = Pick<IParentProps,
     'toggleFilter' |
     'setCreatedFilter' |
     'resetFilter'
->;
+> & {clearQuickFilter: (filter: string) => void;};
 
-export function SearchResultsFiltersRow({readonly, searchParams, filterGroups, toggleFilter, setCreatedFilter, resetFilter}: IProps) {
+type IActiveFilter = {
+    calendar?: any;
+    location?: any;
+    region?: any;
+    coverage_type?: any;
+    coverage_status?: any;
+};
+
+type IActiveFilterUnionType = keyof IActiveFilter;
+
+interface IReduxStateProps {
+    itemTypeFilter?: string;
+    activeFilter?: IActiveFilter;
+}
+
+interface IReduxDispatchProps {
+    clearItemTypeFilter: () => void;
+}
+
+type IPropsAgendaExtended = IReduxDispatchProps & IReduxStateProps & IProps;
+
+function SearchResultsFiltersRow({
+    readonly,
+    searchParams,
+    filterGroups,
+    toggleFilter,
+    setCreatedFilter,
+    resetFilter,
+    itemTypeFilter,
+    clearItemTypeFilter,
+    activeFilter,
+    clearQuickFilter,
+}: IPropsAgendaExtended) {
     const tags = [];
+
+    /**
+     * FIXME: This is a bad implementation, but the proper fix would be too time consuming at this moment.
+     * Ideally we would want to unify the searchParameters so they are stored in the same variable both from
+     * agenda and wire. Another solution would be to not reuse the same component in wire and agenda filters
+     * so that wire has its own filter component and agenda has a separate one. The first solution is the better
+     * one since from a UI stand point the filters component is identical and should be reused ideally.
+     */
+    if (IS_AGENDA) {
+        if (itemTypeFilter != null) {
+            tags.push(
+                <Tag
+                    key={`tags-filters--from-${itemTypeFilter}`}
+                    testId="tags-filters--agenda-quick-filters"
+                    text={itemTypeFilter === 'events' ? gettext('Events Only') : gettext('Planning Only')}
+                    readOnly={readonly}
+                    onClick={(event) => {
+                        event.preventDefault();
+                        clearItemTypeFilter();
+                    }}
+                />
+            );
+        }
+
+        Object.keys(activeFilter ?? {}).filter((filter) => activeFilter?.[filter as IActiveFilterUnionType] != null)
+            .forEach((filter) => {
+                tags.push(
+                    <Tag
+                        key={`tags-filters--${filter}`}
+                        testId={`tags-filters--agenda-quick-filters-${filter}`}
+                        text={filter === 'coverage_status'
+                            ? getActiveFilterLabel(agendaCoverageStatusFilter, activeFilter)
+                            :  activeFilter?.[filter as IActiveFilterUnionType]
+                        }
+                        readOnly={readonly}
+                        onClick={(event) => {
+                            event.preventDefault();
+                            clearQuickFilter(filter);
+                        }}
+                    />
+                );
+            });
+    }
 
     if (searchParams.created) {
         const created = getCreatedSearchParamLabel(searchParams.created);
@@ -81,7 +160,7 @@ export function SearchResultsFiltersRow({readonly, searchParams, filterGroups, t
         }
     }
 
-    if (searchParams.filter != null) {
+    if (searchParams.filter != null && IS_AGENDA !== true) {
         for (const field in searchParams.filter) {
             const group = filterGroups[field];
 
@@ -129,6 +208,7 @@ export function SearchResultsFiltersRow({readonly, searchParams, filterGroups, t
                 onClick={(event) => {
                     event.preventDefault();
                     resetFilter();
+                    clearItemTypeFilter?.();
                 }}
             >
                 {gettext('Clear filters')}
@@ -145,10 +225,19 @@ export function SearchResultsFiltersRow({readonly, searchParams, filterGroups, t
     );
 }
 
-SearchResultsFiltersRow.propTypes = {
-    searchParams: PropTypes.object,
-    filterGroups: PropTypes.object,
-    toggleFilter: PropTypes.func.isRequired,
-    setCreatedFilter: PropTypes.func.isRequired,
-    resetFilter: PropTypes.func.isRequired,
-};
+const mapStateToProps = (state: any) => ({
+    itemTypeFilter: state.agenda.itemType,
+    activeFilter: searchFilterSelector(state),
+});
+
+const mapDispatchToProps = (dispatch: any) => ({
+    clearItemTypeFilter: () => dispatch(setItemTypeFilter(null)),
+});
+
+let component: React.ComponentType<IProps> = SearchResultsFiltersRow as React.ComponentType<IProps>;
+
+if (IS_AGENDA) {
+    component = connect<IReduxStateProps, IReduxDispatchProps, IProps>(mapStateToProps, mapDispatchToProps)(SearchResultsFiltersRow);
+}
+
+export default component;

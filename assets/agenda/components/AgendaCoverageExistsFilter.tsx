@@ -5,8 +5,8 @@ import {get} from 'lodash';
 import {gettext} from 'utils';
 import {AgendaDropdown} from './AgendaDropdown';
 
-const filter = {
-    label: gettext('Coverage status'),
+export const agendaCoverageStatusFilter = {
+    label: gettext('Any coverage status'),
     field: 'coverage_status',
     nestedField: 'coverage_status',
 };
@@ -18,7 +18,7 @@ const FILTER_VALUES = {
     COMPLETED: 'completed'
 };
 
-function getActiveFilterLabel(filter: any, activeFilter: any) {
+export function getActiveFilterLabel(filter: any, activeFilter: any) {
     const filterValue = get(activeFilter, `${filter.field}[0]`);
 
     switch (filterValue) {
@@ -38,7 +38,7 @@ function getActiveFilterLabel(filter: any, activeFilter: any) {
 function AgendaCoverageExistsFilter ({toggleFilter, activeFilter}: any) {
     return (
         <AgendaDropdown
-            filter={filter}
+            filter={agendaCoverageStatusFilter}
             activeFilter={activeFilter}
             toggleFilter={toggleFilter}
             getFilterLabel={getActiveFilterLabel}
@@ -50,25 +50,25 @@ function AgendaCoverageExistsFilter ({toggleFilter, activeFilter}: any) {
             <button
                 key='coverage-planned'
                 className='dropdown-item'
-                onClick={() => toggleFilter(filter.field, FILTER_VALUES.PLANNED)}
+                onClick={() => toggleFilter(agendaCoverageStatusFilter.field, FILTER_VALUES.PLANNED)}
             >{gettext('Coverage is planned')}
             </button>
             <button
                 key='coverage-not-planned'
                 className='dropdown-item'
-                onClick={() => toggleFilter(filter.field, FILTER_VALUES.NOT_PLANNED)}
+                onClick={() => toggleFilter(agendaCoverageStatusFilter.field, FILTER_VALUES.NOT_PLANNED)}
             >{gettext('Coverage not planned')}
             </button>
             <button
                 key='coverage-not-decided'
                 className='dropdown-item'
-                onClick={() => toggleFilter(filter.field, FILTER_VALUES.MAY_BE)}
+                onClick={() => toggleFilter(agendaCoverageStatusFilter.field, FILTER_VALUES.MAY_BE)}
             >{gettext('Coverage not decided')}
             </button>
             <button
                 key='coverage-completed'
                 className='dropdown-item'
-                onClick={() => toggleFilter(filter.field, FILTER_VALUES.COMPLETED)}
+                onClick={() => toggleFilter(agendaCoverageStatusFilter.field, FILTER_VALUES.COMPLETED)}
             >{gettext('Coverage completed')}
             </button>
         </AgendaDropdown>
