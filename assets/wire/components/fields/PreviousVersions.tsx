@@ -1,8 +1,16 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+
+import {IArticle} from 'interfaces';
+import {newshubApi} from 'api';
 import {gettext} from 'utils';
 
-export function PreviousVersions ({item, isItemDetail, inputRef}: any) {
+interface IProps {
+    item: IArticle;
+    isItemDetail: boolean;
+    inputRef: string;
+}
+
+export function PreviousVersions ({item, isItemDetail, inputRef}: IProps) {
     if (isItemDetail) {
         return null;
     }
@@ -11,23 +19,20 @@ export function PreviousVersions ({item, isItemDetail, inputRef}: any) {
         const previousVersions = document.getElementById(inputRef);
         previousVersions && previousVersions.scrollIntoView();
     };
+    const numVersions = (item.ancestors ?? []).length;
+    const versionLabelText = newshubApi.ui.wire.getVersionsLabelText(
+        item,
+        numVersions === 0 || numVersions > 1
+    );
 
     return (
         <span>
             <div className="versions-link" onClick={onClick}>
-                {gettext('{{ count }} previous versions', {
-                    count: item.ancestors
-                        ? item.ancestors.length
-                        : '0',
+                {gettext('{{ count }} previous {{ versionsLabel }}', {
+                    versionsLabel: versionLabelText,
+                    count: numVersions,
                 })}
             </div>
         </span>
     );
 }
-
-
-PreviousVersions.propTypes = {
-    isItemDetail: PropTypes.bool,
-    item: PropTypes.object,
-    inputRef: PropTypes.string,
-};
