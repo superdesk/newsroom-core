@@ -1,6 +1,7 @@
 /* eslint-env node */
 
 const path = require('path');
+const process = require('process');
 const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const TerserPlugin = require('terser-webpack-plugin-legacy');
@@ -49,6 +50,7 @@ const config = {
                     path.resolve(__dirname, 'assets'),
                     path.resolve(__dirname, 'node_modules/bootstrap'),
                     path.resolve(process.cwd(), 'node_modules/bootstrap'),
+                    path.resolve(process.cwd(), 'src'),
                 ],
                 loader: 'ts-loader',
                 options: {
