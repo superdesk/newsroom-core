@@ -1,35 +1,58 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
+import {IArticle} from 'interfaces';
+import {newshubApi} from 'api';
 import {gettext} from 'utils';
 import ItemVersion from './ItemVersion';
 import {fetchNext, openItem} from '../actions';
 
-class ListItemNextVersion extends React.Component<any, any> {
-    static propTypes: any;
-    constructor(props: any) {
+interface IOwnProps {
+    item: IArticle;
+    displayConfig: {[field: string]: boolean};
+}
+
+interface IState {
+    next: IArticle | null;
+}
+
+interface IDispatchProps {
+    openItem(item: IArticle): void;
+}
+
+type IProps = IDispatchProps & IOwnProps;
+
+const mapDispatchToProps = (dispatch: any) => ({
+    openItem: (item: IArticle) => dispatch(openItem(item)),
+});
+
+class ListItemNextVersion extends React.Component<IProps, IState> {
+    constructor(props: IProps) {
         super(props);
         this.state = {next: null};
         this.open = this.open.bind(this);
-        this.fetch(props);
+        this.fetch();
     }
 
-    componentWillReceiveProps(nextProps: any) {
-        if (nextProps.item.nextversion !== this.props.item.nextversion) {
-            this.fetch(nextProps);
+    componentDidUpdate(prevProps: Readonly<IProps>) {
+        if (prevProps.item.nextversion !== this.props.item.nextversion) {
+            this.fetch();
         }
     }
 
-    fetch(props: any) {
-        props.dispatch(fetchNext(props.item))
-            .then((next: any) => this.setState({next}))
+    fetch() {
+        fetchNext(this.props.item)
+            .then((next) => this.setState({next: next}))
             .catch(() => this.setState({next: null}));
     }
 
     open(version: any, event: any) {
+        if (this.state.next == null) {
+            return;
+        }
+
         event.stopPropagation();
-        this.props.dispatch(openItem(this.state.next));
+        this.props.openItem(this.state.next);
     }
 
     render() {
@@ -37,12 +60,13 @@ class ListItemNextVersion extends React.Component<any, any> {
             return null;
         }
 
+        const versionLabelText = newshubApi.ui.wire.getVersionsLabelText(this.props.item, false);
         const baseClass = 'wire-column__preview';
 
         return (
             <div className={`${baseClass}__versions`}>
                 <span className={`${baseClass}__versions__box-headline`}>
-                    {gettext('Next version')}
+                    {gettext('Next {{ versionsLabel }}', {versionsLabel: versionLabelText})}
                 </span>
 
                 <ItemVersion
@@ -56,12 +80,6 @@ class ListItemNextVersion extends React.Component<any, any> {
     }
 }
 
-ListItemNextVersion.propTypes = {
-    item: PropTypes.object.isRequired,
-    dispatch: PropTypes.func.isRequired,
-    displayConfig: PropTypes.object,
-};
-
-const component: React.ComponentType<any> = connect()(ListItemNextVersion);
+const component= connect(null, mapDispatchToProps)(ListItemNextVersion);
 
 export default component;
