@@ -159,8 +159,8 @@ describe('wire actions', () => {
         const item: any = {_id: 'foo'};
         fetchMock.get(`/wire/${item._id}/versions`, {_items: [{_id: 'bar'}, {_id: 'baz'}]});
 
-        return store.dispatch(actions.fetchVersions(item))
-            .then((versions: any) => {
+        return actions.fetchVersions(item)
+            .then((versions) => {
                 expect(versions.length).toBe(2);
                 expect(versions[0]._id).toBe('bar');
             });
@@ -171,14 +171,14 @@ describe('wire actions', () => {
         const next: any = {};
         fetchMock.get('/wire/bar?format=json', next);
 
-        return store.dispatch(actions.fetchNext(item))
-            .then((_next: any) => {
+        return actions.fetchNext(item)
+            .then((_next) => {
                 expect(_next).toEqual(next);
             });
     });
 
     it('can reject if item has no next version', () => {
-        return store.dispatch(actions.fetchNext(testArticle)).then(() => {
+        return actions.fetchNext(testArticle).then(() => {
             expect(true).toBe(false); // this should not be called
         }, () => {
             expect(fetchMock.called()).toBeFalsy();
