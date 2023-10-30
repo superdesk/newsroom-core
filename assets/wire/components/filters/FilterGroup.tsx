@@ -79,27 +79,29 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
 
     return (
         <NavGroup key={group.field} label={group.label}>
-            <div className="mb-2 search search--small search--with-icon search--bordered m-0">
-                <div className="search__form" role="search" aria-label="search">
-                    <i className="icon--search icon--muted-2"></i>
-                    <input
-                        autoComplete='off'
-                        onChange={(e) => {
-                            setSearchTerm(e.target.value);
-                        }}
-                        value={searchTerm}
-                        type="text"
-                        className="search__input form-control"
-                        placeholder={gettext('Search Filters')}
-                        aria-label={gettext('Search Filters')}
-                    />
-                    <div className="search__form-buttons">
-                        <button className="search__button-clear" aria-label={gettext('Clear search')} type="button">
-                            {searchIcon}
-                        </button>
+            {buckets.length > 50 && (
+                <div className="mb-2 search search--small search--with-icon search--bordered m-0">
+                    <div className="search__form" role="search" aria-label="search">
+                        <i className="icon--search icon--muted-2"></i>
+                        <input
+                            autoComplete='off'
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                            }}
+                            value={searchTerm}
+                            type="text"
+                            className="search__input form-control"
+                            placeholder={gettext('Search Filters')}
+                            aria-label={gettext('Search Filters')}
+                        />
+                        <div className="search__form-buttons">
+                            <button className="search__button-clear" aria-label={gettext('Clear search')} type="button">
+                                {searchIcon}
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
             <WithPagination
                 style='bottom-only'
                 key={searchTerm}
