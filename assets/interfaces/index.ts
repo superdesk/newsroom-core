@@ -8,4 +8,4 @@ export {IDashboardCard} from './dashboard';
 export {IProduct} from './product';
 export {ISectionFilter} from './section_filter';
 export {IAgendaItem} from './agenda';
-export {IArticle, IRendition, IContentType} from './content';
+export {IArticle, IRendition, IContentType, IItemAction} from './content';

@@ -2,6 +2,7 @@ import thunk from 'redux-thunk';
 import fetchMock from 'fetch-mock';
 import {createStore, applyMiddleware} from 'redux';
 
+import {IArticle} from 'interfaces';
 import server from 'server';
 
 import wireApp from '../reducers';
@@ -15,6 +16,17 @@ import {
     loadMyTopic,
 } from 'search/actions';
 import {initData} from '../actions';
+
+const testArticle: IArticle = {
+    _id: 'foo',
+    guid: 'foo',
+    type: 'text',
+    associations: {},
+    slugline: 'test-article',
+    headline: 'My test article',
+    source: 'sofab',
+    versioncreated: '2023-06-27T11:07:17+0000',
+};
 
 describe('wire actions', () => {
     let store: any;
@@ -114,7 +126,7 @@ describe('wire actions', () => {
 
     it('can open item', () => {
         fetchMock.post('/history/new', {});
-        store.dispatch(actions.openItem({_id: 'foo'}));
+        store.dispatch(actions.openItem(testArticle));
         expect(store.getState().openItem._id).toBe('foo');
         expect(fetchMock.called('/history/new')).toBeTruthy();
         fetchMock.reset();
@@ -127,7 +139,7 @@ describe('wire actions', () => {
             expect(action).toEqual('open');
             expect(section).toEqual('wire');
         });
-        store.dispatch(actions.openItem({_id: 'foo'}));
+        store.dispatch(actions.openItem(testArticle));
         expect(store.getState().openItem._id).toBe('foo');
         fetchMock.reset();
     });
@@ -166,7 +178,7 @@ describe('wire actions', () => {
     });
 
     it('can reject if item has no next version', () => {
-        return store.dispatch(actions.fetchNext({})).then(() => {
+        return store.dispatch(actions.fetchNext(testArticle)).then(() => {
             expect(true).toBe(false); // this should not be called
         }, () => {
             expect(fetchMock.called()).toBeFalsy();
