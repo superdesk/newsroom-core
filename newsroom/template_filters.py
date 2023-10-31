@@ -98,14 +98,7 @@ def notification_date(datetime):
 
 def notification_datetime(datetime):
     if datetime:
-        return format_datetime(
-            parse_date(datetime),
-            (
-                get_client_format("NOTIFICATION_EMAIL_DATE_FORMAT")
-                + " "
-                + get_client_format("NOTIFICATION_EMAIL_TIME_FORMAT")
-            ),
-        )
+        return format_datetime(parse_date(datetime), get_client_format("NOTIFICATION_EMAIL_DATETIME_FORMAT"))
 
 
 def plain_text(html):
