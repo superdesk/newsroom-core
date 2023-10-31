@@ -159,7 +159,7 @@ export function gettext(text: string, params?: {[key: string]: any}): string {
     if (params) {
         Object.keys(params).forEach((param: string) => {
             const paramRegexp = new RegExp('{{ ?' + param + ' ?}}', 'g');
-            translated = translated.replace(paramRegexp, params[param] || '');
+            translated = translated.replace(paramRegexp, params[param] != null ? params[param] : '');
         });
     }
 

@@ -349,6 +349,10 @@ class UsersService(newsroom.Service):
             else [field for field in updates.keys() if updates[field] != doc.get(field) and field != "id"]
         )
 
+        if request.url_rule and request.url_rule.rule:
+            if request.url_rule.rule in ["/reset_password/<token>", "/token/<token_type>"]:
+                return
+
         if is_current_user_company_admin():
             manager = get_user()
             if doc.get("company") and doc["company"] == manager.get("company"):
@@ -364,10 +368,6 @@ class UsersService(newsroom.Service):
                     return
                 elif request and request.method == "DELETE" and doc.get("_id") != manager.get("_id"):
                     return
-
-        if request.url_rule and request.url_rule.rule:
-            if request.url_rule.rule in ["/reset_password/<token>", "/token/<token_type>"]:
-                return
 
         if request.method != "DELETE" and (
             not updated_fields or all([key in USER_PROFILE_UPDATES for key in updated_fields])

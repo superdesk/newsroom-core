@@ -72,7 +72,8 @@ export function TopicFolder({
         <div
             key={folder._id}
             className="simple-card__group"
-            data-test-id={`folder-card--${folder.name}`}
+            data-test-id="folder-card"
+            data-test-value={folder.name}
             ref={setNodeRef}
         >
             {editing ? (
@@ -95,12 +96,15 @@ export function TopicFolder({
                         <button
                             type="button"
                             className="icon-button icon-button--tertiary"
+                            data-test-id="collapse"
                             title={gettext('Close')}
                             onClick={() => setOpened(false)}
                         ><i className="icon--minus"></i></button>
                     ) : (
                         <button
-                            type="button" className="icon-button icon-button--tertiary"
+                            type="button"
+                            className="icon-button icon-button--tertiary"
+                            data-test-id="expand"
                             title={gettext('Open')}
                             onClick={() => setOpened(true)}
                             disabled={topics.length === 0}
@@ -121,7 +125,9 @@ export function TopicFolder({
                             }}
                             ref={buttonRef}
                             className="icon-button icon-button--tertiary"
-                            aria-label={gettext('Folder Actions')}>
+                            aria-label={gettext('Folder Actions')}
+                            data-test-id="menu"
+                        >
                             <i className='icon--more'></i>
                         </button>
                         {
