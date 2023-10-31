@@ -6,6 +6,8 @@ import hashlib
 from datetime import datetime
 from flask_babel import lazy_gettext
 from newsroom.template_filters import datetime_long, parse_date
+from newsroom.template_loaders import set_template_locale
+import newsroom.template_filters as template_filters
 
 
 def test_parse_date():
@@ -39,3 +41,12 @@ def test_to_json():
     assert '{"_id":"%s"}' % (str(object_id),) == str(
         flask.render_template_string("{{ obj | tojson }}", obj=dict(_id=object_id))
     )
+
+
+def test_notification_date_time_filters():
+    set_template_locale("fr_CA")
+    d = datetime(2023, 10, 31, 10, 0, 0)
+
+    assert "11:00" == template_filters.notification_time(d)
+    assert "octobre 31, 2023" == template_filters.notification_date(d)
+    assert "11:00 octobre 31, 2023" == template_filters.notification_datetime(d)

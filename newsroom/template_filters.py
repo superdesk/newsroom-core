@@ -14,6 +14,7 @@ from jinja2.utils import htmlsafe_json_dumps  # type: ignore
 from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
 from datetime import datetime
+from newsroom.template_loaders import get_template_locale
 
 from newsroom.user_roles import UserRole
 
@@ -23,7 +24,7 @@ _hash_cache = {}
 
 
 def get_client_format(key) -> Optional[str]:
-    locale = str(get_locale())
+    locale = str(get_template_locale() or get_locale())
     try:
         return app.config["CLIENT_LOCALE_FORMATS"][locale][key]
     except KeyError:
