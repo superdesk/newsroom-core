@@ -298,7 +298,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                     (section) => products.filter((product) => filterProductsForSection(product, section)),
                                 );
 
-                            return (
+                            return user.company != null && (
                                 <FormToggle
                                     title={gettext('Products')}
                                     testId="toggle--products"
