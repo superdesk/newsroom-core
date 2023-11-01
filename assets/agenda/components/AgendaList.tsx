@@ -388,7 +388,7 @@ const mapStateToProps = (state: any) => ({
     previewConfig: previewConfigSelector(state),
     featuredOnly: get(state, 'agenda.featuredOnly'),
     listConfig: listConfigSelector(state),
-    userType:state.user_type
+    userType: state.user_type
 });
 
 const component: React.ComponentType<any> = connect(mapStateToProps)(AgendaList);
