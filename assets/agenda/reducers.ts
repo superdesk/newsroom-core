@@ -196,6 +196,7 @@ export default function agendaReducer(state: any = initialState, action: any): I
             readItems: action.readData || {},
             user: (action.agendaData.user || {})._id || null,
             userObject: action.agendaData.user || {},
+            userType: (action.agendaData.user || {}).user_type || null,
             topics: action.agendaData.topics || [],
             company: action.agendaData.company || null,
             bookmarks: action.agendaData.bookmarks || false,
