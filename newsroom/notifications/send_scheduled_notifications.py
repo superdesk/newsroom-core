@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Optional, TypedDict, Tuple
+from typing import List, Dict, Any, Optional, TypedDict, Tuple, Set
 import logging
 from datetime import datetime, timedelta
 
@@ -96,48 +96,7 @@ class SendScheduledNotificationEmails(Command):
         # when rendering the email, otherwise it uses the system default
         set_session_timezone(user["notification_schedule"]["timezone"])
 
-        topic_entries: Dict[str, List[NotificationEmailTopicEntry]] = {
-            "wire": [],
-            "agenda": [],
-        }
-
-        topics_matched: List[ObjectId] = []
-        topic_match_table: Dict[str, List[Tuple[str, int]]] = {
-            "wire": [],
-            "agenda": [],
-        }
-
-        if schedule.get("topics"):
-            for section in ["wire", "agenda"]:
-                for topic_queue in self._get_queue_entries_for_section(schedule, section):
-                    if not len(topic_queue.get("items") or []):
-                        # This Topic Queue didn't match any items during this period
-                        continue
-
-                    topic = user_topics.get(topic_queue["topic_id"])
-
-                    if topic is None:
-                        # Topic was not found for some reason
-                        continue
-
-                    latest_item = self._get_latest_item_from_topic_queue(topic_queue, topic, user, company)
-
-                    if latest_item is None:
-                        # Latest item was not found for some reason
-                        continue
-
-                    topics_matched.append(topic["_id"])
-                    topic_match_table[section].append((topic["label"], len(topic_queue["items"])))
-                    topic_entries[section].append(
-                        NotificationEmailTopicEntry(
-                            topic=topic,
-                            item=latest_item,
-                        )
-                    )
-
-        for topic_id, topic in user_topics.items():
-            if topic["_id"] not in topics_matched:
-                topic_match_table[topic["topic_type"]].append((topic["label"], 0))
+        topic_entries, topic_match_table = self._get_topic_entries_and_match_table(schedule, user, company, user_topics)
 
         template_kwargs = dict(
             app_name=app.config["SITE_NAME"],
@@ -206,9 +165,16 @@ class SendScheduledNotificationEmails(Command):
         )
 
     def _get_latest_item_from_topic_queue(
-        self, topic_queue: NotificationQueueTopic, topic: Topic, user: User, company: Optional[Company]
+        self,
+        topic_queue: NotificationQueueTopic,
+        topic: Topic,
+        user: User,
+        company: Optional[Company],
+        exclude_items: Set[str],
     ) -> Optional[Dict[str, Any]]:
         for item_id in reversed(topic_queue["items"]):
+            if item_id in exclude_items:
+                continue
             search_service = get_resource_service("wire_search" if topic["topic_type"] == "wire" else "agenda")
 
             query = search_service.get_topic_query(topic, user, company, args={"es_highlight": 1, "ids": [item_id]})
@@ -219,6 +185,61 @@ class SendScheduledNotificationEmails(Command):
                 return items[0]
 
         return None
+
+    def _get_topic_entries_and_match_table(
+        self, schedule: NotificationQueue, user: User, company: Optional[Company], user_topics: Dict[ObjectId, Topic]
+    ) -> Tuple[Dict[str, List[NotificationEmailTopicEntry]], Dict[str, List[Tuple[str, int]]]]:
+        topic_entries: Dict[str, List[NotificationEmailTopicEntry]] = {
+            "wire": [],
+            "agenda": [],
+        }
+
+        topics_matched: List[ObjectId] = []
+        topic_match_table: Dict[str, List[Tuple[str, int]]] = {
+            "wire": [],
+            "agenda": [],
+        }
+
+        if not schedule.get("topics"):
+            return topic_entries, topic_match_table
+
+        for section in ["wire"]:
+            items_in_entries: Set[str] = set()
+            for topic_queue in self._get_queue_entries_for_section(schedule, section):
+                if not len(topic_queue.get("items") or []):
+                    # This Topic Queue didn't match any items during this period
+                    continue
+
+                topic = user_topics.get(topic_queue["topic_id"])
+
+                if topic is None:
+                    # Topic was not found for some reason
+                    continue
+
+                topic_match_table[section].append((topic["label"], len(topic_queue["items"])))
+                topics_matched.append(topic["_id"])
+
+                latest_item = self._get_latest_item_from_topic_queue(
+                    topic_queue, topic, user, company, items_in_entries
+                )
+
+                if latest_item is None:
+                    # Latest item was not found. It may have matched multiple topics
+                    continue
+
+                items_in_entries.add(latest_item["_id"])
+                topic_entries[section].append(
+                    NotificationEmailTopicEntry(
+                        topic=topic,
+                        item=latest_item,
+                    )
+                )
+
+        for topic_id, topic in user_topics.items():
+            if topic["_id"] not in topics_matched:
+                topic_match_table[topic["topic_type"]].append((topic["label"], 0))
+
+        return topic_entries, topic_match_table
 
 
 @celery.task(soft_time_limit=600)
