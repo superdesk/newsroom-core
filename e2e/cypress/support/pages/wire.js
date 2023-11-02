@@ -20,6 +20,15 @@ class WirePageWrapper {
     getTopSearchBarInput() {
         return cy.get('[data-test-id="top-search-bar"] input');
     }
+
+    openSideNav() {
+        cy.get('[data-test-id="sidenav-link-wire"]').click();
+    }
+
+    search(value) {
+        cy.get('[data-test-id="top-search-bar"]').click().type(value);
+        cy.get('[data-test-id="search-submit-button"]').click();
+    }
 }
 
 export const WirePage = new WirePageWrapper();

@@ -1,43 +1,15 @@
-import {setup, addDefaultResources, addResources, addAllWireItems} from '../../support/e2e';
+import {setup, addDefaultResources, addResources} from '../../support/e2e';
+import {WirePage} from '../../support/pages/wire'
+import {FilterPanel} from '../../support/pages/filter_panel'
 import {NewshubLayout} from '../../support/pages/layout';
+import {WIRE_ITEMS} from '../../fixtures/wire'
 
-export const WIRE_ITEMS = {
-    syd_weather_1: {
-        _id: 'urn:localhost:syd-weather-1',
-        type: 'text',
-        version: 1,
+const WireItems = {
+    item_1: {
+        ...WIRE_ITEMS.syd_weather_1,
         versioncreated: new Date(),
-        headline: 'Sydney Weather',
-        slugline: 'weather',
-        body_html: '<p><h1>Sydney Weather</h1></p>',
-        genre: [{code: 'Article', name: 'Article (news)'}],
-        subject: [{code: '01001000', name: 'archaeology'}],
-        service: [{code: 'weather', name: 'Weather'}],
-        place: [{code: 'NSW', name: 'New South Wales'}],
-        urgency: 3,
-        priority: 6,
-        language: 'en',
-        pubstatus: 'usable',
-        source: 'sofab',
     },
-    bris_traffic_1: {
-        _id: 'urn:localhost:bris-traffic-1',
-        type: 'text',
-        version: 1,
-        versioncreated: '2023-06-04T12:00:00+0000',
-        headline: 'Brisbane Traffic',
-        slugline: 'traffic',
-        body_html: '<p><h1>Brisbane Traffic</h1></p>',
-        genre: [{code: 'Article', name: 'Article (news)'}],
-        subject: [{code: '01001000', name: 'archaeology'}],
-        service: [{code: 'traffic', name: 'Traffic'}],
-        place: [{code: 'QLD', name: 'Queensland'}],
-        urgency: 3,
-        priority: 5,
-        language: 'en',
-        pubstatus: 'usable',
-        source: 'sofab',
-    },
+    item_2: WIRE_ITEMS.bris_traffic_1,
 };
 
 describe('wire - filters', () => {
@@ -48,8 +20,8 @@ describe('wire - filters', () => {
             resource: 'items',
             use_resource_service: false,
             items: [
-                WIRE_ITEMS.syd_weather_1,
-                WIRE_ITEMS.bris_traffic_1,
+                WireItems.item_1,
+                WireItems.item_2,
             ],
         }]);
         NewshubLayout.login('admin@example.com', 'admin');
@@ -59,48 +31,46 @@ describe('wire - filters', () => {
         /**
             SEARCH
         */
-        cy.get('[data-test-id="sidenav-link-wire"]').click();
-        cy.get('[data-test-id="top-search-bar"]').click().type('Sydney');
-        cy.get('[data-test-id="search-submit-button"]').click();
+        WirePage.openSideNav();
+        WirePage.search('Sydney');
 
         cy.url().should('include', 'Sydney');
 
-        cy.get(`[data-test-id="wire-item"][data-test-value="${WIRE_ITEMS.syd_weather_1._id}"]`).should('exist');
-        cy.get(`[data-test-id="wire-item"][data-test-value="${WIRE_ITEMS.bris_traffic_1._id}"]`).should('not.exist');
+        cy.get(`[data-test-id="wire-item"][data-test-value="${WireItems.item_1._id}"]`).should('exist');
+        cy.get(`[data-test-id="wire-item"][data-test-value="${WireItems.item_2._id}"]`).should('not.exist');
 
         cy.get('[data-test-id="top-search-bar"] form input').clear().type("{enter}");
         cy.url().should('not.include', 'Sydney');
 
-        cy.get(`[data-test-id="wire-item"][data-test-value="${WIRE_ITEMS.syd_weather_1._id}"]`).should('exist');
-        cy.get(`[data-test-id="wire-item"][data-test-value="${WIRE_ITEMS.bris_traffic_1._id}"]`).should('exist');
+        cy.get(`[data-test-id="wire-item"][data-test-value="${WireItems.item_1._id}"]`).should('exist');
+        cy.get(`[data-test-id="wire-item"][data-test-value="${WireItems.item_2._id}"]`).should('exist');
 
         /**
             FILTERS
         */
-        cy.get('[data-test-id="sidenav-link-wire"]').click();
-        cy.get('[data-test-id="toggle-filter-panel"]').click();
-        cy.get('[data-test-id="filter-panel-tab--filters"]').click();
+        FilterPanel.openPanel();
+        FilterPanel.openFiltersTab();
 
         /**
             check filtering by checkboxes
         */
-        cy.get(`[data-test-id="checkbox"][data-test-value="${WIRE_ITEMS.syd_weather_1.service[0].name}"] input`).check();
-        cy.get('[data-test-id="filter-panel--search-btn"]').click();
+        FilterPanel.selectFilter(WireItems.item_1.service[0].name);
+        FilterPanel.button('search');
 
-        cy.url().should('include', `${WIRE_ITEMS.syd_weather_1.service[0].name}`);
+        cy.url().should('include', `${WireItems.item_1.service[0].name}`);
 
-        cy.get(`[data-test-id="wire-item"][data-test-value="${WIRE_ITEMS.syd_weather_1._id}"]`).should('exist');
-        cy.get(`[data-test-id="wire-item"][data-test-value="${WIRE_ITEMS.bris_traffic_1._id}"]`).should('not.exist');
+        cy.get(`[data-test-id="wire-item"][data-test-value="${WireItems.item_1._id}"]`).should('exist');
+        cy.get(`[data-test-id="wire-item"][data-test-value="${WireItems.item_2._id}"]`).should('not.exist');
 
-        cy.get('[data-test-id="filter-panel--clear-btn"]').click();
+        FilterPanel.button('clear');
 
         /**
             check filtering by date input
         */
-        cy.get('[data-test-id="nav-link--today"]').click();
-        cy.get('[data-test-id="filter-panel--search-btn"]').click();
+        FilterPanel.selectNowDate();
+        FilterPanel.button('search');
 
-        cy.get(`[data-test-id="wire-item"][data-test-value="${WIRE_ITEMS.syd_weather_1._id}"]`).should('exist');
-        cy.get(`[data-test-id="wire-item"][data-test-value="${WIRE_ITEMS.bris_traffic_1._id}"]`).should('not.exist'); 
+        cy.get(`[data-test-id="wire-item"][data-test-value="${WireItems.item_1._id}"]`).should('exist');
+        cy.get(`[data-test-id="wire-item"][data-test-value="${WireItems.item_2._id}"]`).should('not.exist'); 
     });
 });
