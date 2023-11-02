@@ -203,7 +203,7 @@ class SendScheduledNotificationEmails(Command):
         if not schedule.get("topics"):
             return topic_entries, topic_match_table
 
-        for section in ["wire"]:
+        for section in ["wire", "agenda"]:
             items_in_entries: Set[str] = set()
             for topic_queue in self._get_queue_entries_for_section(schedule, section):
                 if not len(topic_queue.get("items") or []):
