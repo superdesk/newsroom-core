@@ -5,10 +5,11 @@ import logging
 import newsroom.signals as signals
 from copy import copy, deepcopy
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Set
 
 from flask import current_app as app
 from flask_babel import gettext
+from bson import ObjectId
 import superdesk
 from superdesk.text_utils import get_word_count, get_char_count
 from superdesk.utc import utcnow
@@ -726,6 +727,7 @@ def notify_new_item(item, check_topics=True):
         return
 
     item_type = item.get("type")
+    users_with_realtime_subscription: Set[ObjectId] = set()
     try:
         user_dict = get_user_dict()
         user_ids = [u["_id"] for u in user_dict.values()]
@@ -740,17 +742,26 @@ def notify_new_item(item, check_topics=True):
 
         if check_topics:
             if item_type == "text":
-                notify_wire_topic_matches(item, user_dict, company_dict)
+                users_with_realtime_subscription = notify_wire_topic_matches(item, user_dict, company_dict)
             else:
-                notify_agenda_topic_matches(item, user_dict, company_dict)
+                users_with_realtime_subscription = notify_agenda_topic_matches(item, user_dict, company_dict)
 
-        notify_user_matches(item, user_dict, company_dict, user_ids, company_ids)
+        notify_user_matches(
+            item,
+            user_dict,
+            company_dict,
+            user_ids,
+            company_ids,
+            users_with_realtime_subscription
+            if not item.get("pubstatus", item.get("state")) in ["canceled", "cancelled"]
+            else set(),
+        )
     except Exception as e:
         logger.exception(e)
         logger.error(f"Failed to notify users for new {item_type} item {item['_id']}")
 
 
-def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids):
+def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids, users_with_realtime_subscription):
     """Send notification to users who have downloaded or bookmarked the provided item"""
 
     related_items = item.get("ancestors", [])
@@ -773,7 +784,11 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids)
 
         # Add users if this section is wire
         # Or if the user is not already in the list of users for wire
-        user_list = [user_id for user_id in user_list if user_id not in users_processed]
+        user_list = [
+            user_id
+            for user_id in user_list
+            if user_id not in users_processed and ObjectId(user_id) not in users_with_realtime_subscription
+        ]
 
         users_processed.extend(user_list)
 
@@ -824,7 +839,7 @@ def send_user_notification_emails(item, user_matches, users, section):
                 send_history_match_notification_email(user, item=item, section=section)
 
 
-def notify_wire_topic_matches(item, users_dict, companies_dict):
+def notify_wire_topic_matches(item, users_dict, companies_dict) -> Set[ObjectId]:
     topics = get_topics_with_subscribers("wire")
     topic_matches = superdesk.get_resource_service("wire_search").get_matching_topics(
         item["_id"], topics, users_dict, companies_dict
@@ -832,10 +847,12 @@ def notify_wire_topic_matches(item, users_dict, companies_dict):
 
     if topic_matches:
         push_notification("topic_matches", item=item, topics=topic_matches)
-        send_topic_notification_emails(item, topics, topic_matches, users_dict, companies_dict)
+        return send_topic_notification_emails(item, topics, topic_matches, users_dict, companies_dict)
+    else:
+        return set()
 
 
-def notify_agenda_topic_matches(item, users_dict, companies_dict):
+def notify_agenda_topic_matches(item, users_dict, companies_dict) -> Set[ObjectId]:
     topics = get_topics_with_subscribers("agenda")
     topic_matches = superdesk.get_resource_service("agenda").get_matching_topics(
         item["_id"], topics, users_dict, companies_dict
@@ -852,10 +869,15 @@ def notify_agenda_topic_matches(item, users_dict, companies_dict):
 
     if topic_matches:
         push_agenda_item_notification("topic_matches", item=item, topics=topic_matches)
-        send_topic_notification_emails(item, topics, topic_matches, users_dict, companies_dict)
+        return send_topic_notification_emails(item, topics, topic_matches, users_dict, companies_dict)
+    else:
+        return set()
 
 
-def send_topic_notification_emails(item, topics, topic_matches, users, companies):
+def send_topic_notification_emails(item, topics, topic_matches, users, companies) -> Set[ObjectId]:
+    users_processed: Set[ObjectId] = set()
+    users_with_realtime_subscription: Set[ObjectId] = set()
+
     for topic in topics:
         if topic["_id"] not in topic_matches:
             continue
@@ -869,42 +891,53 @@ def send_topic_notification_emails(item, topics, topic_matches, users, companies
             company = companies.get(str(user.get("company")))
 
             section = topic.get("topic_type") or "wire"
-            save_user_notifications(
-                [
-                    UserNotification(
-                        user=user["_id"],
-                        item=item["_id"],
-                        resource=section,
-                        action="topic_matches",
-                        data=None,
-                    )
-                ]
-            )
+            if user["_id"] not in users_processed:
+                # Only send websocket notification once for each item
+                save_user_notifications(
+                    [
+                        UserNotification(
+                            user=user["_id"],
+                            item=item["_id"],
+                            resource=section,
+                            action="topic_matches",
+                            data=None,
+                        )
+                    ]
+                )
+                users_processed.add(user["_id"])
 
-            if user.get("receive_email"):
-                if subscriber.get("notification_type") == "scheduled":
-                    superdesk.get_resource_service("notification_queue").add_item_to_queue(
-                        user["_id"], section, topic["_id"], item
-                    )
-                else:
-                    search_service = superdesk.get_resource_service(
-                        "wire_search" if topic["topic_type"] == "wire" else "agenda"
-                    )
-                    query = search_service.get_topic_query(
-                        topic, user, company, args={"es_highlight": 1, "ids": [item["_id"]]}
-                    )
+            if not user.get("receive_email"):
+                continue
+            elif subscriber.get("notification_type") == "scheduled":
+                superdesk.get_resource_service("notification_queue").add_item_to_queue(
+                    user["_id"], section, topic["_id"], item
+                )
+            elif user["_id"] in users_with_realtime_subscription:
+                # This user has already received a realtime notification email about this item
+                # No need to send another
+                continue
+            else:
+                users_with_realtime_subscription.add(user["_id"])
+                search_service = superdesk.get_resource_service(
+                    "wire_search" if topic["topic_type"] == "wire" else "agenda"
+                )
+                query = search_service.get_topic_query(
+                    topic, user, company, args={"es_highlight": 1, "ids": [item["_id"]]}
+                )
 
-                    items = search_service.get_items_by_query(query, size=1)
-                    highlighted_item = item
-                    if items.count():
-                        highlighted_item = items[0]
+                items = search_service.get_items_by_query(query, size=1)
+                highlighted_item = item
+                if items.count():
+                    highlighted_item = items[0]
 
-                    send_new_item_notification_email(
-                        user,
-                        topic["label"],
-                        item=highlighted_item,
-                        section=section,
-                    )
+                send_new_item_notification_email(
+                    user,
+                    topic["label"],
+                    item=highlighted_item,
+                    section=section,
+                )
+
+    return users_with_realtime_subscription
 
 
 # keeping this for testing
