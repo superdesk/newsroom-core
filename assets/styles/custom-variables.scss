@@ -568,6 +568,7 @@ $container-max-widths: (
 
     // COMPONENT: CONTENT LIST ITEM
     --content-list-item-padding: var(--space--1-5) var(--space--1) var(--space--1-5) var(--space--2);
+    --content-list-item-padding--mobile: var(--space--1);
     --content-list-item-border-radius: var(--border-radius--s);
     --content-list-item-color-bg: hsl(0,0%,100%);
     --content-list-item-color-bg--watched: hsl(222, 16%, 94%);
