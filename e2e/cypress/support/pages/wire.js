@@ -7,6 +7,10 @@ class WirePageWrapper {
         this.filterPanel = new FilterPanelContainer();
     }
 
+    item(value) {
+        return cy.get(`[data-test-id="wire-item"][data-test-value="${value}"]`);
+    }
+
     showAdvancedSearchModal() {
         cy.get('[data-test-id="show-advanced-search-panel-btn"]').click();
     }

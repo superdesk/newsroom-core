@@ -36,14 +36,14 @@ describe('wire - filters', () => {
 
         cy.url().should('include', 'Sydney');
 
-        cy.get(`[data-test-id="wire-item"][data-test-value="${WireItems.item_1._id}"]`).should('exist');
-        cy.get(`[data-test-id="wire-item"][data-test-value="${WireItems.item_2._id}"]`).should('not.exist');
+        WirePage.item(WireItems.item_1._id).should('exist');
+        WirePage.item(WireItems.item_2._id).should('not.exist');
 
         cy.get('[data-test-id="top-search-bar"] form input').clear().type("{enter}");
         cy.url().should('not.include', 'Sydney');
 
-        cy.get(`[data-test-id="wire-item"][data-test-value="${WireItems.item_1._id}"]`).should('exist');
-        cy.get(`[data-test-id="wire-item"][data-test-value="${WireItems.item_2._id}"]`).should('exist');
+        WirePage.item(WireItems.item_1._id).should('exist');
+        WirePage.item(WireItems.item_2._id).should('exist');
 
         /**
             FILTERS
@@ -59,8 +59,8 @@ describe('wire - filters', () => {
 
         cy.url().should('include', `${WireItems.item_1.service[0].name}`);
 
-        cy.get(`[data-test-id="wire-item"][data-test-value="${WireItems.item_1._id}"]`).should('exist');
-        cy.get(`[data-test-id="wire-item"][data-test-value="${WireItems.item_2._id}"]`).should('not.exist');
+        WirePage.item(WireItems.item_1._id).should('exist');
+        WirePage.item(WireItems.item_2._id).should('not.exist');
 
         FilterPanel.button('clear');
 
@@ -70,7 +70,7 @@ describe('wire - filters', () => {
         FilterPanel.selectNowDate();
         FilterPanel.button('search');
 
-        cy.get(`[data-test-id="wire-item"][data-test-value="${WireItems.item_1._id}"]`).should('exist');
-        cy.get(`[data-test-id="wire-item"][data-test-value="${WireItems.item_2._id}"]`).should('not.exist'); 
+        WirePage.item(WireItems.item_1._id).should('exist');
+        WirePage.item(WireItems.item_2._id).should('not.exist'); 
     });
 });
