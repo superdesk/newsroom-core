@@ -674,7 +674,7 @@ function Wire() {
                                                 <div className="wire-articles__item-headline-inner">Correct me later on and see what fields appear</div>
                                             </h4>
                                             <div className="wire-articles__item__meta">
-                                                <div className="wire-articles__item__icons">
+                                                <div className="wire-articles__item__icons wire-articles__item__icons--compact">
                                                     <span className="wire-articles__item__icon">
                                                         <i className="icon--text"></i>
                                                     </span>
@@ -685,7 +685,6 @@ function Wire() {
                                                 <div className="wire-articles__item__meta-info">
                                                     <span className="bold">Correctme</span>
                                                     <span>
-                                                        <span></span>
                                                         <span>
                                                             <span>The Canadian Press</span>
                                                         </span>
@@ -738,7 +737,7 @@ function Wire() {
                                                 <div className="wire-articles__item-headline-inner">Maecenas faucibus mollis interdum natoque penatibus</div>
                                             </h4>
                                             <div className="wire-articles__item__meta">
-                                                <div className="wire-articles__item__icons">
+                                                <div className="wire-articles__item__icons wire-articles__item__icons--compact">
                                                     <span className="wire-articles__item__icon">
                                                         <i className="icon--text"></i>
                                                     </span>
@@ -749,7 +748,6 @@ function Wire() {
                                                 <div className="wire-articles__item__meta-info">
                                                     <span className="bold">Correctme</span>
                                                     <span>
-                                                        <span></span>
                                                         <span>
                                                             <span>The Canadian Press</span>
                                                         </span>
@@ -791,6 +789,27 @@ function Wire() {
                                 </article>
 
                                 {/* AGENDA Item for testing */}
+                                <div className="list-group-header">
+                                    <span class="badge rounded-pill badge--neutral">2</span>
+                                    <div className="list-group-header__title">
+                                        More hidden
+                                        <span className="list-group-header__title-info">(1 Event & Planning)</span>
+                                    </div>
+                                    <div className="list-group-header__coverage-group">
+                                        <div className="list-group-header__coverage-item">
+                                            <span className="wire-articles__item__icon coverage--completed" title="Some title"><i className="icon--coverage-text"></i></span>
+                                            <span className="list-group-header__coverage-number">1</span>
+                                        </div>
+                                        <div className="list-group-header__coverage-item">
+                                        <span className="wire-articles__item__icon coverage--assigned" title="Some title"><i className="icon--coverage-photo"></i></span>
+                                            <span className="list-group-header__coverage-number">2</span>
+                                        </div>
+                                    </div>
+                                    <div className="list-group-header__actions">
+                                        <button className="nh-button nh-button--tertiary nh-button--small">Show all</button>
+                                    </div>
+                                </div>
+
                                 <article className="wire-articles__item-wrap col-12 agenda-item">
                                     <div className="wire-articles__item wire-articles__item--list wire-articles__item--agenda wire-articles__item--not-covering" tabIndex="0">
                                         <div className="wire-articles__item-text-block">
@@ -808,6 +827,129 @@ function Wire() {
                                                 </div>
                                                 <div className="wire-articles__item__meta-time wire-articles__item__meta-time--border-right">
                                                     <span>20/06/2023 to 23/06/2023</span>
+                                                    <span className="multiday-label__wrap ms-2">
+                                                        <span className="multiday-label multiday-label--start">
+                                                            <span className="multiday-label__label">Day:</span>
+                                                            <span className="multiday-label__value">
+                                                                <span>1</span>
+                                                                <span className="multiday-label__value-divide">/</span>
+                                                                <span>4</span>
+                                                            </span>
+                                                        </span>
+                                                    </span>
+
+                                                </div>
+                                                <div className="wire-articles__item__icons wire-articles__item__icons--dashed-border">
+                                                    <span className="wire-articles__item__icon coverage--completed" title=" Text coverage MEL-TEST-NBA-RAPTORS available (updated)"><i className="icon--coverage-text"></i></span>
+                                                    <span className="wire-articles__item__icon coverage--assigned" title=" Planned Picture coverage MEL-TEST-NBA-RAPTORS, expected Apr 13th, 2023 at 23:00"><i className="icon--coverage-photo"></i></span>
+                                                    <span className="wire-articles__item__icon coverage--active" title=" Planned Text coverage MEL-TEST-NBA-RAPTORS-sidebar, expected Apr 13th, 2023 at 23:00"><i className="icon--coverage-text"></i></span>
+                                                    {/* <span className="wire-articles__item__icon coverage--cancelled" title=" Text coverage MEL-TEST-April13-Breaking available (update to come)"><i className="icon--coverage-text"><i className="blue-circle"></i></i></span> */}
+                                                    <span className="wire-articles__item__icon coverage--cancelled" title=" Text coverage MEL-TEST-April13-Breaking available (update to come)"><i className="icon--coverage-text"></i></span>
+                                                    <span className="wire-articles__item__icon coverage--not-covering" title=" Text coverage MEL-TEST-April13-Breaking available (update to come)"><i className="icon--coverage-infographics"></i></span>
+                                                    <span className="wire-articles__item__icon coverage--undecided" title=" Text coverage MEL-TEST-April13-Breaking available (update to come)"><i className="icon--coverage-video"></i></span>
+                                                </div>
+                                                <div className="wire-articles__item__meta-info align-items-center">
+                                                    <span><i className="icon-small--location"></i></span>
+                                                    <span className="me-2 align-self-stretch">Messezentrum Salzburg GmbH, Am Messezentrum 1, Salzburg, Austria</span>
+                                                </div>
+                                            </div>
+                                            <div className="wire-articles__item__text">
+                                                <p>DÜSSELDORF, Germany (AP) — Portugal left back João Cancelo’s switch to Bayern Munich and former Real Madrid star Isco Alarcón's potential signing by Union Berlin brought excitement to the last day of the winter transfer period in Germany. After seeing...</p>
+                                            </div>
+                                        </div>
+                                        <div className="wire-articles__item-actions">
+                                            <div className="btn-group">
+                                                <button className="icon-button icon-button--secondary" aria-label="More Actions"><i className="icon--more"></i></button>
+                                            </div>
+                                            <button type="button" className="icon-button icon-button--primary" title="" aria-label="Share" data-bs-original-title="Share"><i className="icon--share"></i></button>
+                                            <button type="button" className="icon-button icon-button--primary" title="" aria-label="Save" data-bs-original-title="Save"><i className="icon--bookmark-add"></i></button>
+                                        </div>
+                                    </div>
+                                </article>
+                                <article className="wire-articles__item-wrap col-12 agenda-item">
+                                    <div className="wire-articles__item wire-articles__item--list wire-articles__item--agenda wire-articles__item--not-covering" tabIndex="0">
+                                        <div className="wire-articles__item-text-block">
+                                            <h4 className="wire-articles__item-headline">
+                                                <div className="no-bindable-select wire-articles__item-select">
+                                                    <label className="circle-checkbox">
+                                                        <input type="checkbox" className="css-checkbox" /><i></i>
+                                                    </label>
+                                                </div>
+                                                <div className="wire-articles__item-headline-inner">Agenda item for testing, isco spice up last day of transfers in Germany</div>
+                                            </h4>
+                                            <div className="wire-articles__item__meta wire-articles__item__meta--">
+                                                <div className="wire-articles__item__icons wire-articles__item__icons--dashed-border">
+                                                    <span className="wire-articles__item__icon"><i className="icon--calendar"></i></span>
+                                                </div>
+                                                <div className="wire-articles__item__meta-time wire-articles__item__meta-time--border-right">
+                                                    <span>20/06/2023 to 23/06/2023</span>
+                                                    <span className="multiday-label__wrap ms-2">
+                                                        <span className="multiday-label multiday-label--mid">
+                                                            <span className="multiday-label__label">Day:</span>
+                                                            <span className="multiday-label__value">
+                                                                <span>2</span>
+                                                                <span className="multiday-label__value-divide">/</span>
+                                                                <span>4</span>
+                                                            </span>
+                                                        </span>
+                                                    </span>
+
+                                                </div>
+                                                <div className="wire-articles__item__icons wire-articles__item__icons--dashed-border">
+                                                    <span className="wire-articles__item__icon coverage--completed" title=" Text coverage MEL-TEST-NBA-RAPTORS available (updated)"><i className="icon--coverage-text"></i></span>
+                                                    <span className="wire-articles__item__icon coverage--assigned" title=" Planned Picture coverage MEL-TEST-NBA-RAPTORS, expected Apr 13th, 2023 at 23:00"><i className="icon--coverage-photo"></i></span>
+                                                    <span className="wire-articles__item__icon coverage--active" title=" Planned Text coverage MEL-TEST-NBA-RAPTORS-sidebar, expected Apr 13th, 2023 at 23:00"><i className="icon--coverage-text"></i></span>
+                                                    {/* <span className="wire-articles__item__icon coverage--cancelled" title=" Text coverage MEL-TEST-April13-Breaking available (update to come)"><i className="icon--coverage-text"><i className="blue-circle"></i></i></span> */}
+                                                    <span className="wire-articles__item__icon coverage--cancelled" title=" Text coverage MEL-TEST-April13-Breaking available (update to come)"><i className="icon--coverage-text"></i></span>
+                                                    <span className="wire-articles__item__icon coverage--not-covering" title=" Text coverage MEL-TEST-April13-Breaking available (update to come)"><i className="icon--coverage-infographics"></i></span>
+                                                    <span className="wire-articles__item__icon coverage--undecided" title=" Text coverage MEL-TEST-April13-Breaking available (update to come)"><i className="icon--coverage-video"></i></span>
+                                                </div>
+                                                <div className="wire-articles__item__meta-info align-items-center">
+                                                    <span><i className="icon-small--location"></i></span>
+                                                    <span className="me-2 align-self-stretch">Messezentrum Salzburg GmbH, Am Messezentrum 1, Salzburg, Austria</span>
+                                                </div>
+                                            </div>
+                                            <div className="wire-articles__item__text">
+                                                <p>DÜSSELDORF, Germany (AP) — Portugal left back João Cancelo’s switch to Bayern Munich and former Real Madrid star Isco Alarcón's potential signing by Union Berlin brought excitement to the last day of the winter transfer period in Germany. After seeing...</p>
+                                            </div>
+                                        </div>
+                                        <div className="wire-articles__item-actions">
+                                            <div className="btn-group">
+                                                <button className="icon-button icon-button--secondary" aria-label="More Actions"><i className="icon--more"></i></button>
+                                            </div>
+                                            <button type="button" className="icon-button icon-button--primary" title="" aria-label="Share" data-bs-original-title="Share"><i className="icon--share"></i></button>
+                                            <button type="button" className="icon-button icon-button--primary" title="" aria-label="Save" data-bs-original-title="Save"><i className="icon--bookmark-add"></i></button>
+                                        </div>
+                                    </div>
+                                </article>
+                                <article className="wire-articles__item-wrap col-12 agenda-item">
+                                    <div className="wire-articles__item wire-articles__item--list wire-articles__item--agenda wire-articles__item--not-covering" tabIndex="0">
+                                        <div className="wire-articles__item-text-block">
+                                            <h4 className="wire-articles__item-headline">
+                                                <div className="no-bindable-select wire-articles__item-select">
+                                                    <label className="circle-checkbox">
+                                                        <input type="checkbox" className="css-checkbox" /><i></i>
+                                                    </label>
+                                                </div>
+                                                <div className="wire-articles__item-headline-inner">Agenda item for testing, isco spice up last day of transfers in Germany</div>
+                                            </h4>
+                                            <div className="wire-articles__item__meta wire-articles__item__meta--">
+                                                <div className="wire-articles__item__icons wire-articles__item__icons--dashed-border">
+                                                    <span className="wire-articles__item__icon"><i className="icon--calendar"></i></span>
+                                                </div>
+                                                <div className="wire-articles__item__meta-time wire-articles__item__meta-time--border-right">
+                                                    <span>20/06/2023 to 23/06/2023</span>
+                                                    <span className="multiday-label__wrap ms-2">
+                                                        <span className="multiday-label multiday-label--end">
+                                                            <span className="multiday-label__label">Day:</span>
+                                                            <span className="multiday-label__value">
+                                                                <span>4</span>
+                                                                <span className="multiday-label__value-divide">/</span>
+                                                                <span>4</span>
+                                                            </span>
+                                                        </span>
+                                                    </span>
+
                                                 </div>
                                                 <div className="wire-articles__item__icons wire-articles__item__icons--dashed-border">
                                                     <span className="wire-articles__item__icon coverage--completed" title=" Text coverage MEL-TEST-NBA-RAPTORS available (updated)"><i className="icon--coverage-text"></i></span>
