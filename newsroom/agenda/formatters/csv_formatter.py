@@ -29,7 +29,7 @@ class CSVFormatter(BaseFormatter):
             "Language": item.get("language", ""),
             "Event start date": self.format_date(item, "start"),
             "Event end date": self.format_date(item, "end"),
-            "Event time": f"{self.format_time(item, 'start')}-{self.format_time(item, 'end')}",
+            "Event time": self.format_time(item),
             "Event timezone": item.get("dates", {}).get("tz", ""),
             "Location": self.parse_location(item, "name"),
             "Country": self.parse_location(item, "country"),
@@ -51,11 +51,14 @@ class CSVFormatter(BaseFormatter):
             return date_obj.strftime("%Y-%m-%d")
         return ""
 
-    def format_time(self, item, date_type):
-        date_obj = item.get("dates", {}).get(date_type)
-        if date_obj:
-            return date_obj.strftime("%H:%M:%S")
-        return ""
+    def format_time(self, item):
+        date_obj = item.get("dates", {})
+        if date_obj.get("all_day"):
+            return ""
+        elif date_obj.get("no_end_time"):
+            return f"{date_obj.get('start').strftime('%H:%M:%S')}"
+        else:
+            return f"{date_obj.get('start').strftime('%H:%M:%S')}-{date_obj.get('end').strftime('%H:%M:%S')}"
 
     def parse_location(self, item, field):
         """
