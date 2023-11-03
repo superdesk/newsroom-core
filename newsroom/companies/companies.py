@@ -6,6 +6,7 @@ from content_api import MONGO_PREFIX
 from superdesk import get_resource_service
 import newsroom
 from newsroom.companies.utils import get_company_section_names, get_company_product_ids
+from newsroom.products.types import PRODUCT_TYPES
 from newsroom.signals import company_create
 
 
@@ -59,7 +60,7 @@ class CompaniesResource(newsroom.Resource):
                 "schema": {
                     "_id": newsroom.Resource.rel("products"),
                     "seats": {"type": "number", "default": 0},
-                    "section": {"type": "string", "required": True, "allowed": ["wire", "agenda"]},
+                    "section": {"type": "string", "required": True, "allowed": PRODUCT_TYPES},
                 },
             },
         },

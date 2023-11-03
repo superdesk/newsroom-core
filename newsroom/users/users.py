@@ -8,6 +8,7 @@ from typing import Dict, Optional, List
 from flask import current_app as app, session, abort, request
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest
+from newsroom.products.types import PRODUCT_TYPES
 
 from newsroom.types import Company, ProductRef, User
 from newsroom.auth import get_user_id, get_user, get_company_from_user, SessionAuth
@@ -105,7 +106,7 @@ class UsersResource(newsroom.Resource):
                 "type": "dict",
                 "schema": {
                     "_id": newsroom.Resource.rel("products", required=True),
-                    "section": {"type": "string", "required": True, "allowed": ["wire", "agenda"]},
+                    "section": {"type": "string", "required": True, "allowed": PRODUCT_TYPES},
                 },
             },
         },
