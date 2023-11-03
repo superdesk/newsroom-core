@@ -139,3 +139,22 @@ def test_get_subject_falls_back_to_default_on_render_error(app):
 
     subject = service.get_translated_subject("coverage_request_email", "fr_ca", item={"name": "Test Coverage"})
     assert subject == "Coverage inquiry: Test Coverage"
+
+
+def test_get_from_mongo_returns_working_cursor(app):
+    app.data.insert(
+        RESOURCE,
+        [
+            {
+                "_id": "coverage_request_email",
+                "subject": {
+                    "default": "Coverage inquiry: {{ item.name or item.slugline }}",
+                    "translations": {"fr_ca": "Canadian French Coverage inquiry: {{ 1 / 0 }}"},
+                },
+            }
+        ],
+    )
+    service = get_resource_service(RESOURCE)
+    items = service.get_from_mongo(None, {})
+    assert 1 == items.count()
+    assert 1 == len(list(items))
