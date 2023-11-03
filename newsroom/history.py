@@ -89,7 +89,15 @@ def get_history_users(item_ids, active_user_ids, active_company_ids, section, ac
         "query": {
             "bool": {
                 "filter": [
-                    {"terms": {"company": [str(a) for a in active_company_ids]}},
+                    {
+                        "bool": {
+                            "should": [
+                                {"terms": {"company": [str(a) for a in active_company_ids]}},
+                                {"bool": {"must_not": [{"exists": {"field": "company"}}]}},
+                            ],
+                            "minimum_should_match": 1,
+                        },
+                    },
                     {"terms": {"item": [str(i) for i in item_ids]}},
                     {"term": {"section": section}},
                     {"term": {"action": action}},

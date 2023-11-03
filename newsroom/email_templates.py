@@ -1,19 +1,20 @@
 from typing import Optional
 import logging
+import newsroom
 
 from flask import render_template_string, current_app
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest, NotFound
 from eve.utils import config
 
-from superdesk import Resource, register_resource
+from superdesk import register_resource
 from superdesk.services import CacheableService
 
 logger = logging.getLogger(__name__)
 RESOURCE = "email_templates"
 
 
-class EmailTemplatesResource(Resource):
+class EmailTemplatesResource(newsroom.Resource):
     endpoint_name = RESOURCE
     item_methods = ["GET"]
     resource_methods = ["GET"]
@@ -89,12 +90,11 @@ class EmailTemplatesService(CacheableService):
     def on_fetched_item(self, doc):
         self.enhance_items([doc])
 
-    def get_from_mongo(self, req, lookup, projection=None):
+    def get_cached_by_id(self, _id):
         """Make sure to enhance the item when fetching from mongo"""
-
-        items = super().get_from_mongo(req, lookup, projection)
-        self.enhance_items(items)
-        return items
+        item = super().get_cached_by_id(_id)
+        self.enhance_items([item])
+        return item
 
     def enhance_items(self, docs):
         for email in docs:

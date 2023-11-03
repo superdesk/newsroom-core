@@ -308,10 +308,14 @@ CLIENT_LOCALE_FORMATS = {
         "DATE_FORMAT_HEADER": "EEEE, dd/MM/yyyy",
         "NOTIFICATION_EMAIL_TIME_FORMAT": "HH:mm a",
         "NOTIFICATION_EMAIL_DATE_FORMAT": "MMMM d, yyyy",
+        "NOTIFICATION_EMAIL_DATETIME_FORMAT": "HH:mm a MMMM d, yyyy",
     },
     "fr_CA": {  # example - you can overwrite any format above
         "DATE_FORMAT": "DD/MM/YYYY",
         "DATE_FORMAT_HEADER": "EEEE, 'le' d MMMM yyyy",
+        "NOTIFICATION_EMAIL_TIME_FORMAT": "HH:mm",
+        "NOTIFICATION_EMAIL_DATE_FORMAT": "MMMM d, yyyy",
+        "NOTIFICATION_EMAIL_DATETIME_FORMAT": "HH:mm MMMM d, yyyy",
     },
 }
 

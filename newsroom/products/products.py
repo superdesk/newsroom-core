@@ -4,6 +4,7 @@ from bson import ObjectId
 import newsroom
 import superdesk
 from superdesk.services import CacheableService
+from .types import PRODUCT_TYPES
 
 from newsroom.types import Company, Product, User
 from newsroom.utils import any_objectid_in_list
@@ -30,7 +31,7 @@ class ProductsResource(newsroom.Resource):
             "schema": newsroom.Resource.rel("companies"),
             "nullable": True,
         },
-        "product_type": {"type": "string", "default": "wire"},
+        "product_type": {"type": "string", "default": "wire", "allowed": PRODUCT_TYPES},
         "original_creator": newsroom.Resource.rel("users"),
         "version_creator": newsroom.Resource.rel("users"),
     }
