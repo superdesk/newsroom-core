@@ -89,7 +89,6 @@ class CSVFormatter(BaseFormatter):
                 ",".join(contact.get("contact_email", [])),
                 ",".join(contact.get("mobile", [])),
             ]
-            print(contact_info_strings.append(",".join(contact_values)))
             return ",".join(contact_values)
 
     def parse_coverage(self, item, field):
