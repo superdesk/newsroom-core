@@ -104,8 +104,8 @@ class UsersResource(newsroom.Resource):
             "schema": {
                 "type": "dict",
                 "schema": {
-                    "_id": newsroom.Resource.rel("products"),
-                    "section": {"type": "string", "default": "wire"},
+                    "_id": newsroom.Resource.rel("products", required=True),
+                    "section": {"type": "string", "required": True, "allowed": ["wire", "agenda"]},
                 },
             },
         },

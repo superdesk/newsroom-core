@@ -59,7 +59,7 @@ class CompaniesResource(newsroom.Resource):
                 "schema": {
                     "_id": newsroom.Resource.rel("products"),
                     "seats": {"type": "number", "default": 0},
-                    "section": {"type": "string", "default": "wire"},
+                    "section": {"type": "string", "required": True, "allowed": ["wire", "agenda"]},
                 },
             },
         },
