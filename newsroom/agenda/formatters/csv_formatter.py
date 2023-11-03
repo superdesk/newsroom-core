@@ -1,9 +1,7 @@
-
 from newsroom.formatter import BaseFormatter
 import csv
 import io
-from superdesk.utc import utcnow
-# from typing import isinstance
+
 
 class CSVFormatter(BaseFormatter):
     VERSION = "1.0"
@@ -12,79 +10,70 @@ class CSVFormatter(BaseFormatter):
     MIMETYPE = "text/csv"
 
     def format_item(self, item, item_type=None):
-
-        
         event_item = self.format_event(item)
+        return self.serialize_to_csv(event_item)
+
+    def serialize_to_csv(self, data):
         csv_string = io.StringIO()
-        csv_writer = csv.DictWriter(csv_string, delimiter=",", fieldnames=event_item.keys())
+        csv_writer = csv.DictWriter(csv_string, delimiter=",", fieldnames=data.keys())
         csv_writer.writeheader()
-        csv_writer.writerow(event_item)  # Write a single row for the provided item
+        csv_writer.writerow(data)  # Write a single row for the provided data
         csv_string.seek(0)  # Reset the buffer position
-
-        csv_data = csv_string.getvalue().encode('utf-8')  # Encode CSV data as bytes
-
-        return csv_data
-    
+        return csv_string.getvalue().encode("utf-8")
 
     def format_event(self, item):
-
-        location , country = self.parse_location(item)
-
+        event = item.get("event", {})
         return {
             "Event name": item.get("name", ""),
             "Description": item.get("definition_long", item.get("definition_short", "")),
             "Language": item.get("language", ""),
-            "Event start date":item.get("dates", {}).get("start", "").strftime('%Y-%m-%d'),
-            "Event end date": item.get("dates", {}).get("end", "").strftime('%Y-%m-%d'),
-            "Event time":item.get("dates", {}).get("start", "").strftime('%H:%M:%S'),
+            "Event start date": self.format_date(item, "start"),
+            "Event end date": self.format_date(item, "end"),
+            "Event time": f"{self.format_time(item, 'start')}-{self.format_time(item, 'end')}",
             "Event timezone": item.get("dates", {}).get("tz", ""),
-            "Location": location if location else "",
-            "Country": country if country else "",
-            "Subject": self.parse_subject(item),
-            "Website": item.get("event", {}).get("links")[0],
-            "Category": self.parse_category(item),
+            "Location": self.parse_location(item, "name"),
+            "Country": self.parse_location(item, "country"),
+            "Subject": self.parse_list(event, "subject"),
+            "Website": event.get("links")[0] if event.get("links") else "",
+            "Category": self.parse_list(event, "anpa_category"),
             "Event type": item.get("item_type", ""),
-            "Organization name": item.get("event", {}).get("event_contact_info",{})[0].get("organisation"," "),
+            "Organization name": item.get("event", {}).get("event_contact_info", {})[0].get("organisation", " "),
             "Contact": self.parse_contact_info(item),
             "Coverage type": self.parse_coverage(item, "coverage_type"),
             "Coverage status": self.parse_coverage(item, "coverage_status"),
         }
-    
 
-    def parse_location(self, item):
+    def format_date(self, item, date_type):
+        date_obj = item.get("dates", {}).get(date_type)
+        if date_obj:
+            return date_obj.strftime("%Y-%m-%d")
+        return ""
+
+    def format_time(self, item, date_type):
+        date_obj = item.get("dates", {}).get(date_type)
+        if date_obj:
+            return date_obj.strftime("%H:%M:%S")
+        return ""
+
+    def parse_location(self, item, field):
         """
-        parse location
+        parse location info
         """
         if item.get("location"):
             for loc in item.get("location"):
-                return loc.get("name", ""), loc.get("country","")
-
+                return loc.get(field, "") if not field == "country" else loc.get("address", {}).get(field)
         return ""
-    
-    def parse_subject(self, item):
-        """
-        parse subjects
-        """
-        event = item.get("event", {})
-        subj = []
-        if event.get("subject"):
-            for subject in event.get("subject"):
-                subj.append(subject.get("name", ""))
-        return  ",".join(subj)
 
+    def parse_list(self, item, key):
+        values = [v.get("name", "") for v in item.get(key, [])]
+        return ",".join(values)
 
-    def parse_category(self, item):
-        event = item.get("event", {})
-        cat = []
-        if event.get("anpa_category"):
-            for category in event.get("anpa_category"):
-                cat.append(category.get("name", ""))
-        return ",".join(cat)
-    
     def parse_contact_info(self, item):
+        """
+        parse contact information
+        """
         event_contact_info = item.get("event", {}).get("event_contact_info", [])
 
-        print(event_contact_info)
         contact_info_strings = []
         for contact in event_contact_info:
             contact_values = [
@@ -93,16 +82,18 @@ class CSVFormatter(BaseFormatter):
                 contact.get("last_name", ""),
                 contact.get("organisation", ""),
                 ",".join(contact.get("contact_email", [])),
-                ",".join(contact.get("mobile", []))
+                ",".join(contact.get("mobile", [])),
             ]
             print(contact_info_strings.append(",".join(contact_values)))
             return ",".join(contact_values)
 
     def parse_coverage(self, item, field):
-        coverages = item.get("coverages", {})
+        """
+        parse coverage information
+        """
+        coverages = item.get("event", {}).get("coverages", {})
+        value = []
         if coverages:
             for coverage in coverages:
-                value = coverage.get(field,"")
-            return ",".join(value)
-        return ""
-
+                value.append(coverage.get(field, ""))
+        return ",".join(value)
