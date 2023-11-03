@@ -37,6 +37,7 @@ def init_app(app):
     )
 
     app.download_formatter("ical", formatters.iCalFormatter(), "iCalendar", ["agenda"])
+    app.download_formatter("Csv", formatters.CSVFormatter(), "CSV", ["agenda"])
     app.add_template_global(url_for_agenda)
     app.add_template_global(get_coverage_email_text)
     app.add_template_global(get_coverage_content_type_name, "get_coverage_content_type")
