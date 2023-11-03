@@ -1,6 +1,7 @@
 from newsroom.formatter import BaseFormatter
 import csv
 import io
+import arrow
 
 
 class CSVFormatter(BaseFormatter):
@@ -45,8 +46,12 @@ class CSVFormatter(BaseFormatter):
             "Coverage status": self.parse_coverage(item, "coverage_status"),
         }
 
+    def datetime(self, value):
+        """Make sure dates are datetime instances."""
+        return arrow.get(value).datetime
+
     def format_date(self, item, date_type):
-        date_obj = item.get("dates", {}).get(date_type)
+        date_obj = self.datetime(item.get("dates", {}).get(date_type))
         if date_obj:
             return date_obj.strftime("%Y-%m-%d")
         return ""
@@ -56,9 +61,9 @@ class CSVFormatter(BaseFormatter):
         if date_obj.get("all_day"):
             return ""
         elif date_obj.get("no_end_time"):
-            return f"{date_obj.get('start').strftime('%H:%M:%S')}"
+            return f"{self.datetime(date_obj.get('start')).strftime('%H:%M:%S')}"
         else:
-            return f"{date_obj.get('start').strftime('%H:%M:%S')}-{date_obj.get('end').strftime('%H:%M:%S')}"
+            return f"{self.datetime(date_obj.get('start')).strftime('%H:%M:%S')} - {self.datetime(date_obj.get('end')).strftime('%H:%M:%S')}"
 
     def parse_location(self, item, field):
         """
