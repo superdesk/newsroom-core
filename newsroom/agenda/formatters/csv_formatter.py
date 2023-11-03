@@ -63,7 +63,7 @@ class CSVFormatter(BaseFormatter):
         elif date_obj.get("no_end_time"):
             return f"{self.datetime(date_obj.get('start')).strftime('%H:%M:%S')}"
         else:
-            return f"{self.datetime(date_obj.get('start')).strftime('%H:%M:%S')} - {self.datetime(date_obj.get('end')).strftime('%H:%M:%S')}"
+            return f"{self.datetime(date_obj.get('start')).strftime('%H:%M:%S')}-{self.datetime(date_obj.get('end')).strftime('%H:%M:%S')}"
 
     def parse_location(self, item, field):
         """
