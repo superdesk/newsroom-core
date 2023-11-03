@@ -79,7 +79,6 @@ class CSVFormatter(BaseFormatter):
         """
         event_contact_info = item.get("event", {}).get("event_contact_info", [])
 
-        contact_info_strings = []
         for contact in event_contact_info:
             contact_values = [
                 contact.get("honorific", ""),
