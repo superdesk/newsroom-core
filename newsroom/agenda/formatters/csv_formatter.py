@@ -2,6 +2,7 @@ from newsroom.formatter import BaseFormatter
 import csv
 import io
 import arrow
+from newsroom.utils import parse_dates
 
 
 class CSVFormatter(BaseFormatter):
@@ -14,11 +15,24 @@ class CSVFormatter(BaseFormatter):
         event_item = self.format_event(item)
         return self.serialize_to_csv(event_item)
 
+    def format_items(self, items, item_type=None):
+        formatted_event = []
+        for item in items:
+            parse_dates(item)
+            formatted_event.append(self.format_event(item))
+        return self.serialize_to_csv(formatted_event)
+
     def serialize_to_csv(self, data):
         csv_string = io.StringIO()
-        csv_writer = csv.DictWriter(csv_string, delimiter=",", fieldnames=data.keys())
+        fieldnames = data[0].keys() if isinstance(data, list) else data.keys()
+        csv_writer = csv.DictWriter(csv_string, delimiter=",", fieldnames=fieldnames)
         csv_writer.writeheader()
-        csv_writer.writerow(data)  # Write a single row for the provided data
+        if isinstance(data, list):
+            for item in data:
+                csv_writer.writerow(item)
+        else:
+            csv_writer.writerow(data)  # Write a single row for the provided data
+
         csv_string.seek(0)  # Reset the buffer position
         return csv_string.getvalue().encode("utf-8")
 
