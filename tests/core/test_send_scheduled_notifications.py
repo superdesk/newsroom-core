@@ -1,10 +1,11 @@
+from typing import Dict, List
 import flask
 
 from datetime import datetime, timedelta
 from bson import ObjectId
 
 from superdesk.utc import utcnow, utc_to_local
-from newsroom.types import Topic, NotificationQueueTopic, NotificationSchedule
+from newsroom.types import Topic, NotificationQueueTopic, NotificationSchedule, NotificationQueue
 from newsroom.notifications.send_scheduled_notifications import SendScheduledNotificationEmails
 
 from newsroom.tests.users import ADMIN_USER_ID
@@ -124,11 +125,64 @@ def test_get_latest_item_from_topic_queue(app):
     }
 
     command = SendScheduledNotificationEmails()
-    item = command._get_latest_item_from_topic_queue(topic_queue, topic, user, None)
+    item = command._get_latest_item_from_topic_queue(topic_queue, topic, user, None, set())
 
     assert item["_id"] == "topic1_item1"
     assert '<span class="es-highlight">cheese</span>' in item["es_highlight"]["body_html"][0]
     assert '<span class="es-highlight">cheese</span>' in item["es_highlight"]["slugline"][0]
+
+
+def test_get_topic_entries_and_match_table(app):
+    user = app.data.find_one("users", req=None, _id=ADMIN_USER_ID)
+    topic_ids: List[ObjectId] = app.data.insert(
+        "topics",
+        [
+            {
+                "label": "Cheesy Stuff",
+                "query": "cheese",
+                "topic_type": "wire",
+            },
+            {
+                "label": "Onions",
+                "query": "onions",
+                "topic_type": "wire",
+            },
+        ],
+    )
+    user_topics: Dict[ObjectId, Topic] = {topic["_id"]: topic for topic in app.data.find_all("topics")}
+    app.data.insert(
+        "items",
+        [
+            {
+                "_id": "topic1_item1",
+                "body_html": "Story that involves cheese and onions",
+                "slugline": "That's the test slugline cheese",
+                "headline": "Demo Article",
+            }
+        ],
+    )
+    schedule = NotificationQueue(
+        user=user["_id"],
+        topics=[
+            NotificationQueueTopic(
+                items=["topic1_item1"], topic_id=topic_ids[0], last_item_arrived=utcnow(), section="wire"
+            ),
+            NotificationQueueTopic(
+                items=["topic1_item1"], topic_id=topic_ids[1], last_item_arrived=utcnow(), section="wire"
+            ),
+        ],
+    )
+
+    command = SendScheduledNotificationEmails()
+    topic_entries, topic_match_table = command._get_topic_entries_and_match_table(schedule, user, None, user_topics)
+
+    assert len(topic_entries["wire"]) == 1
+    assert topic_entries["wire"][0]["topic"]["label"] == "Cheesy Stuff"
+    assert topic_entries["wire"][0]["item"]["_id"] == "topic1_item1"
+
+    assert len(topic_match_table["wire"]) == 2
+    assert topic_match_table["wire"][0] == ("Cheesy Stuff", 1)
+    assert topic_match_table["wire"][1] == ("Onions", 1)
 
 
 def test_is_scheduled_to_run_for_user():
@@ -210,9 +264,6 @@ def test_scheduled_notification_topic_matches_template():
 
     output = flask.render_template(template, **kwargs)
     assert output
-
-    print("OUT", output)
-
     assert "Test Event" in output
     assert "Test Article" in output
     assert "Category: Sports" in output
