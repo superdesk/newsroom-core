@@ -15,7 +15,7 @@ class CSVFormatter(BaseFormatter):
     MIMETYPE = "text/csv"
     MULTI = True
 
-    def format_item(self, item: Dict[str, Any], item_type: Union[str, None] = None) -> bytes:
+    def format_item(self, item, item_type=None):
         event_item = self.format_event(item)
         return self.serialize_to_csv(event_item)
 
@@ -103,17 +103,18 @@ class CSVFormatter(BaseFormatter):
         format contact information
         """
         event_contact_info = item.get("event", {}).get("event_contact_info", [])
-
-        for contact in event_contact_info:
-            contact_values = [
-                contact.get("honorific", ""),
-                contact.get("first_name", ""),
-                contact.get("last_name", ""),
-                contact.get("organisation", ""),
-                ",".join(contact.get("contact_email", [])),
-                ",".join(contact.get("mobile", [])),
-            ]
-            return ",".join(contact_values)
+        if event_contact_info:
+            for contact in event_contact_info:
+                contact_values = [
+                    contact.get("honorific", ""),
+                    contact.get("first_name", ""),
+                    contact.get("last_name", ""),
+                    contact.get("organisation", ""),
+                    ",".join(contact.get("contact_email", [])),
+                    ",".join(contact.get("mobile", [])),
+                ]
+                return ",".join(contact_values)
+        return ""
 
     def format_coverage(self, item: Dict[str, Any], field: str) -> str:
         """
