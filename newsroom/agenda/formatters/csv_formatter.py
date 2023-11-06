@@ -20,11 +20,11 @@ class CSVFormatter(BaseFormatter):
         return self.serialize_to_csv(event_item)
 
     def format_events(self, items: List[Dict[str, Any]], item_type: Union[str, None] = None) -> Tuple[bytes, str]:
-        formatted_event = []
+        formatted_events = []
         for item in items:
             parse_dates(item)
-            formatted_event.append(self.format_event(item))
-        return self.serialize_to_csv(formatted_event), secure_filename(
+            formatted_events.append(self.format_event(item))
+        return self.serialize_to_csv(formatted_events), secure_filename(
             f"{datetime.now().strftime('%Y-%m-%d-%H:%M:%S')}-{'multi'}.{self.FILE_EXTENSION}"
         )
 
