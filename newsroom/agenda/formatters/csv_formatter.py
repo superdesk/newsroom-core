@@ -31,7 +31,7 @@ class CSVFormatter(BaseFormatter):
     def serialize_to_csv(self, items: Union[List[Dict[str, Any]], Dict[str, Any]]) -> bytes:
         csv_string = io.StringIO()
         fieldnames = items[0].keys() if isinstance(items, list) else items.keys()
-        csv_writer = csv.DictWriter(csv_string, delimiter=",", fieldnames=fieldnames)
+        csv_writer: csv.DictWriter = csv.DictWriter(csv_string, delimiter=",", fieldnames=fieldnames)
         csv_writer.writeheader()
         if isinstance(items, list):
             for item in items:
@@ -90,7 +90,7 @@ class CSVFormatter(BaseFormatter):
         format location info
         """
         if item.get("location"):
-            for loc in item.get("location"):
+            for loc in item["location"]:
                 return loc.get(field, "") if not field == "country" else loc.get("address", {}).get(field)
         return ""
 
