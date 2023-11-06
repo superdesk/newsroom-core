@@ -2,7 +2,9 @@ from newsroom.formatter import BaseFormatter
 import csv
 import io
 import arrow
+from werkzeug.utils import secure_filename
 from newsroom.utils import parse_dates
+from datetime import datetime
 
 
 class CSVFormatter(BaseFormatter):
@@ -10,6 +12,7 @@ class CSVFormatter(BaseFormatter):
     PRODID = "Newshub"
     FILE_EXTENSION = "csv"
     MIMETYPE = "text/csv"
+    MULTI = True
 
     def format_item(self, item, item_type=None):
         event_item = self.format_event(item)
@@ -20,7 +23,9 @@ class CSVFormatter(BaseFormatter):
         for item in items:
             parse_dates(item)
             formatted_event.append(self.format_event(item))
-        return self.serialize_to_csv(formatted_event)
+        return self.serialize_to_csv(formatted_event), secure_filename(
+            f"{datetime.now().strftime('%Y-%m-%d-%H:%M:%S')}-{'multi'}.{self.FILE_EXTENSION}"
+        )
 
     def serialize_to_csv(self, data):
         csv_string = io.StringIO()

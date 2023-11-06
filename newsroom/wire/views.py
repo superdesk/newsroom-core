@@ -304,12 +304,11 @@ def download(_ids):
         _file.seek(0)
         mimetype = formatter.get_mimetype(item)
         attachment_filename = secure_filename(formatter.format_filename(item))
-    elif formatter.FILE_EXTENSION == "csv" and len(items) != 1:
+    elif formatter.MULTI == True and len(items) != 1:
         # if we have multiple items, so in this case we stored their data in one csv file.
-        csv_data = formatter.format_items(items, item_type=item_type)
+        csv_data, attachment_filename = formatter.format_items(items, item_type=item_type)
         _file.write(csv_data)
         _file.seek(0)
-        attachment_filename = secure_filename(formatter.format_filename(items[0]))
     else:
         with zipfile.ZipFile(_file, mode="w") as zf:
             for item in items:
