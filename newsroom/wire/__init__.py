@@ -118,7 +118,7 @@ def init_app(app: BaseNewsroomApp):
         {
             "genre": {"terms": {"field": "genre.name", "size": 50}},
             "service": {"terms": {"field": "service.name", "size": 50}},
-            "subject": {"terms": {"field": "subject.name", "size": 50}},
+            "subject": {"terms": {"field": "subject.name", "size": 20}},
             "urgency": {"terms": {"field": "urgency"}},
             "place": {"terms": {"field": "place.name", "size": 50}},
         },
