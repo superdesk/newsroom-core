@@ -207,7 +207,8 @@ def test_default_wire_groups_config(app: BaseNewsroomApp, client: FlaskClient):
     assert "place" in group_fields
 
     wire_aggregations = get_wire_aggregations()
-    assert wire_aggregations["subject"] == {"terms": {"field": "subject.name", "size": 20}}
+    print(wire_aggregations, "\n\n\n\n\n\n\n\n\n")
+    assert wire_aggregations["subject"] == {"terms": {"field": "subject.name", "size": 50}}
 
     client.post("/push", data=json.dumps(test_wire_item_1), content_type="application/json")
     res = client.get("/wire/search")
@@ -236,7 +237,7 @@ def test_custom_wire_groups_config(app: BaseNewsroomApp, client: FlaskClient):
         "aggs": {
             "subject_filtered": {
                 "filter": {"bool": {"must_not": [{"terms": {"subject.scheme": ["distribution"]}}]}},
-                "aggs": {"subject": {"terms": {"field": "subject.name", "size": 20}}},
+                "aggs": {"subject": {"terms": {"field": "subject.name", "size": 50}}},
             },
         },
     }
@@ -247,7 +248,7 @@ def test_custom_wire_groups_config(app: BaseNewsroomApp, client: FlaskClient):
         "aggs": {
             "distribution_filtered": {
                 "filter": {"bool": {"filter": [{"term": {"subject.scheme": "distribution"}}]}},
-                "aggs": {"distribution": {"terms": {"field": "subject.name", "size": 20}}},
+                "aggs": {"distribution": {"terms": {"field": "subject.name", "size": 50}}},
             },
         },
     }
