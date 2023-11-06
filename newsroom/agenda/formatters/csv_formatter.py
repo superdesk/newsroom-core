@@ -30,7 +30,7 @@ class CSVFormatter(BaseFormatter):
 
     def serialize_to_csv(self, items: Union[List[Dict[str, Any]], Dict[str, Any]]) -> bytes:
         csv_string = io.StringIO()
-        fieldnames = items[0].keys() if isinstance(items, list) else items.keys()
+        fieldnames: List[str] = list(items[0].keys()) if isinstance(items, list) else list(items.keys())
         csv_writer: csv.DictWriter = csv.DictWriter(csv_string, delimiter=",", fieldnames=fieldnames)
         csv_writer.writeheader()
         if isinstance(items, list):
