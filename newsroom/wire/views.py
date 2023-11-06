@@ -306,7 +306,7 @@ def download(_ids):
         attachment_filename = secure_filename(formatter.format_filename(item))
     elif formatter.MULTI and len(items) != 1:
         # if we have multiple items, so in this case we stored their data in one csv file.
-        csv_data, attachment_filename = formatter.format_items(items, item_type=item_type)
+        csv_data, attachment_filename = formatter.format_events(items, item_type=item_type)
         _file.write(csv_data)
         _file.seek(0)
     else:

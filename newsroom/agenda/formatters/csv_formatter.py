@@ -5,6 +5,7 @@ import arrow
 from werkzeug.utils import secure_filename
 from newsroom.utils import parse_dates
 from datetime import datetime
+from typing import List, Dict, Any, Union, Tuple
 
 
 class CSVFormatter(BaseFormatter):
@@ -14,11 +15,11 @@ class CSVFormatter(BaseFormatter):
     MIMETYPE = "text/csv"
     MULTI = True
 
-    def format_item(self, item, item_type=None):
+    def format_item(self, item: Dict[str, Any], item_type: Union[str, None] = None) -> bytes:
         event_item = self.format_event(item)
         return self.serialize_to_csv(event_item)
 
-    def format_items(self, items, item_type=None):
+    def format_events(self, items: List[Dict[str, Any]], item_type: Union[str, None] = None) -> Tuple[bytes, str]:
         formatted_event = []
         for item in items:
             parse_dates(item)
@@ -27,21 +28,21 @@ class CSVFormatter(BaseFormatter):
             f"{datetime.now().strftime('%Y-%m-%d-%H:%M:%S')}-{'multi'}.{self.FILE_EXTENSION}"
         )
 
-    def serialize_to_csv(self, data):
+    def serialize_to_csv(self, items: Union[List[Dict[str, Any]], Dict[str, Any]]) -> bytes:
         csv_string = io.StringIO()
-        fieldnames = data[0].keys() if isinstance(data, list) else data.keys()
+        fieldnames = items[0].keys() if isinstance(items, list) else items.keys()
         csv_writer = csv.DictWriter(csv_string, delimiter=",", fieldnames=fieldnames)
         csv_writer.writeheader()
-        if isinstance(data, list):
-            for item in data:
+        if isinstance(items, list):
+            for item in items:
                 csv_writer.writerow(item)
         else:
-            csv_writer.writerow(data)  # Write a single row for the provided data
+            csv_writer.writerow(items)  # Write a single row for the provided data
 
         csv_string.seek(0)  # Reset the buffer position
         return csv_string.getvalue().encode("utf-8")
 
-    def format_event(self, item):
+    def format_event(self, item: Dict[str, Any]) -> Dict[str, Any]:
         event = item.get("event", {})
         return {
             "Event name": item.get("name", ""),
@@ -51,31 +52,31 @@ class CSVFormatter(BaseFormatter):
             "Event end date": self.format_date(item, "end"),
             "Event time": self.format_time(item),
             "Event timezone": item.get("dates", {}).get("tz", ""),
-            "Location": self.parse_location(item, "name"),
-            "Country": self.parse_location(item, "country"),
-            "Subject": self.parse_list(event, "subject"),
+            "Location": self.format_location(item, "name"),
+            "Country": self.format_location(item, "country"),
+            "Subject": self.format_list(event, "subject"),
             "Website": event.get("links")[0] if event.get("links") else "",
-            "Category": self.parse_list(event, "anpa_category"),
+            "Category": self.format_list(event, "anpa_category"),
             "Event type": item.get("item_type", ""),
             "Organization name": event.get("event_contact_info")[0].get("organisation", " ")
             if event.get("event_contact_info")
             else "",
-            "Contact": self.parse_contact_info(item),
-            "Coverage type": self.parse_coverage(item, "coverage_type"),
-            "Coverage status": self.parse_coverage(item, "coverage_status"),
+            "Contact": self.format_contact_info(item),
+            "Coverage type": self.format_coverage(item, "coverage_type"),
+            "Coverage status": self.format_coverage(item, "coverage_status"),
         }
 
-    def datetime(self, value):
+    def datetime(self, value: Any) -> datetime:
         """Make sure dates are datetime instances."""
         return arrow.get(value).datetime
 
-    def format_date(self, item, date_type):
+    def format_date(self, item: Dict[str, Any], date_type: str) -> str:
         date_obj = self.datetime(item.get("dates", {}).get(date_type))
         if date_obj:
             return date_obj.strftime("%Y-%m-%d")
         return ""
 
-    def format_time(self, item):
+    def format_time(self, item: Dict[str, Any]) -> str:
         date_obj = item.get("dates", {})
         if date_obj.get("all_day"):
             return ""
@@ -84,22 +85,22 @@ class CSVFormatter(BaseFormatter):
         else:
             return f"{self.datetime(date_obj.get('start')).strftime('%H:%M:%S')}-{self.datetime(date_obj.get('end')).strftime('%H:%M:%S')}"
 
-    def parse_location(self, item, field):
+    def format_location(self, item: Dict[str, Any], field: str) -> str:
         """
-        parse location info
+        format location info
         """
         if item.get("location"):
             for loc in item.get("location"):
                 return loc.get(field, "") if not field == "country" else loc.get("address", {}).get(field)
         return ""
 
-    def parse_list(self, item, key):
+    def format_list(self, item: Dict[str, Any], key: str) -> str:
         values = [v.get("name", "") for v in item.get(key, [])]
         return ",".join(values)
 
-    def parse_contact_info(self, item):
+    def format_contact_info(self, item: Dict[str, Any]) -> str:
         """
-        parse contact information
+        format contact information
         """
         event_contact_info = item.get("event", {}).get("event_contact_info", [])
 
@@ -114,9 +115,9 @@ class CSVFormatter(BaseFormatter):
             ]
             return ",".join(contact_values)
 
-    def parse_coverage(self, item, field):
+    def format_coverage(self, item: Dict[str, Any], field: str) -> str:
         """
-        parse coverage information
+        format coverage information
         """
         coverages = item.get("event", {}).get("coverages", {})
         value = []
