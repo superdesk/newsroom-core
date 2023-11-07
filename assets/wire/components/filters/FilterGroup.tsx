@@ -8,6 +8,11 @@ import FilterItem from './FilterItem';
 import {WithPagination} from 'components/pagination/WithPagination';
 import {searchIcon} from 'search/components/search-icon';
 
+/**
+ * If the filter count is less than 50 we
+ * shouldn't render the search.
+ */
+const SEARCHBAR_THRESHOLD = 50;
 const LIMIT = 5;
 type IBucket = {key: string, doc_count: string};
 
@@ -70,16 +75,17 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
     const activeBuckets: Array<any> = (get(activeFilter, group.field) || [])
         .map((filter: any) => ({key: filter}));
     const bucketPath: string = get(group, 'agg_path') || `${group.field}.buckets`;
-    const buckets = uniqBy(
+    const allBuckets = uniqBy(
         cloneDeep(get(aggregations, bucketPath) || group.buckets || []).concat(activeBuckets) as Array<IBucket>,
         'key',
-    )
+    );
+    const bucketsBySearchTerm = allBuckets
         .sort(compareFunction)
         .filter(({key}: any) => searchTerm.length > 0 ? key.toString().toLocaleLowerCase().includes(searchTerm) : true);
 
     return (
         <NavGroup key={group.field} label={group.label}>
-            {buckets.length > 50 && (
+            {allBuckets.length > SEARCHBAR_THRESHOLD && (
                 <div className="mb-2 search search--small search--with-icon search--bordered m-0">
                     <div className="search__form" role="search" aria-label="search">
                         <i className="icon--search icon--muted-2"></i>
@@ -110,8 +116,8 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
                     const step = pageNo === 1 ? 0 : (pageNo - 1) * pageSize;
 
                     return Promise.resolve({
-                        itemCount: buckets?.length ?? 0,
-                        items: (buckets ?? []).slice(step, pageSize + step),
+                        itemCount: bucketsBySearchTerm?.length ?? 0,
+                        items: (bucketsBySearchTerm ?? []).slice(step, pageSize + step),
                     });
                 }}
             >
