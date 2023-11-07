@@ -13,6 +13,7 @@ class BaseFormatter(metaclass=FormatterRegistry):
     MIMETYPE = None
     FILE_EXTENSION = None
     MEDIATYPE = "text"
+    MULTI = False
 
     def format_filename(self, item):
         assert self.FILE_EXTENSION

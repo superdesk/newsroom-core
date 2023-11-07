@@ -17,6 +17,9 @@ class BaseFormatter:
     #: File extension to use for downloaded file.
     FILE_EXTENSION = None
 
+    #: Multi to use for download multiple file.
+    MULTI = False
+
     def format_item(self, item, item_type=None, items=[]):
         raise NotImplementedError
 
