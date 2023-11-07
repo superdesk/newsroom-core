@@ -8,6 +8,7 @@ import FilterItem from './FilterItem';
 import {WithPagination} from 'components/pagination/WithPagination';
 import {searchIcon} from 'search/components/search-icon';
 
+const SEARCHBAR_THRESHOLD = 50;
 const LIMIT = 5;
 type IBucket = {key: string, doc_count: string};
 
@@ -80,7 +81,7 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
 
     return (
         <NavGroup key={group.field} label={group.label}>
-            {allBuckets.length > 50 && (
+            {allBuckets.length > SEARCHBAR_THRESHOLD && (
                 <div className="mb-2 search search--small search--with-icon search--bordered m-0">
                     <div className="search__form" role="search" aria-label="search">
                         <i className="icon--search icon--muted-2"></i>
