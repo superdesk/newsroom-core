@@ -10,6 +10,7 @@ import {BOOKMARK_ITEMS, REMOVE_BOOKMARK} from '../wire/actions';
 import {CLOSE_MODAL, MODAL_FORM_VALID, RENDER_MODAL, SET_USER} from '../actions';
 import {modalReducer} from '../reducers';
 import {topicsReducer} from '../topics/reducer';
+import {IArticle} from 'interfaces';
 
 export interface IPersonalizedDashboardsWithData {
     dashboard_id?: string;
@@ -23,6 +24,7 @@ interface IState {
     topics: Array<any>;
     products: Array<any>;
     itemsByCard: any;
+    itemsById: {[_id: string]: IArticle};
     activeCard: any;
     uiConfig: any;
     userProducts: Array<any>;
@@ -34,6 +36,7 @@ const initialState: IState = {
     topics: [],
     products: [],
     itemsByCard: {},
+    itemsById: {},
     activeCard: null,
     uiConfig: {},
     userProducts: [],
@@ -106,8 +109,13 @@ export default function homeReducer(state: IState & any = initialState, action: 
     }
 
     case SET_CARD_ITEMS: {
+        const itemsById = {...state.itemsById};
+
+        setItemsById(itemsById, action.payload.items);
+
         return {
             ...state,
+            itemsById,
             itemsByCard: {
                 ...state.itemsByCard,
                 [action.payload.card]: action.payload.items,
@@ -116,8 +124,15 @@ export default function homeReducer(state: IState & any = initialState, action: 
     }
 
     case SET_MULTIPLE_CARD_ITEMS: {
+        const itemsById = {...state.itemsById};
+
+        for (const card in action.payload) {
+            setItemsById(itemsById, action.payload[card]);
+        }
+
         return {
             ...state,
+            itemsById,
             itemsByCard: {
                 ...state.itemsByCard,
                 ...action.payload,
@@ -133,4 +148,10 @@ export default function homeReducer(state: IState & any = initialState, action: 
     default:
         return {...state, topics: topicsReducer(state.topics, action)};
     }
+}
+
+function setItemsById(itemsById: IState['itemsById'], items: Array<IArticle>) {
+    items.forEach((item: IArticle) => {
+        itemsById[item._id] = item;
+    });
 }
