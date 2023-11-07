@@ -17,7 +17,7 @@ class CSVFormatter(BaseFormatter):
 
     def format_item(self, item, item_type=None):
         event_item = self.format_event(item)
-        return self.serialize_to_csv(event_item)
+        return self.serialize_to_csv([event_item])
 
     def format_events(self, items: List[Dict[str, Any]], item_type: Union[str, None] = None) -> Tuple[bytes, str]:
         formatted_events = []
@@ -28,16 +28,13 @@ class CSVFormatter(BaseFormatter):
             f"{datetime.now().strftime('%Y-%m-%d-%H:%M:%S')}-{'multi'}.{self.FILE_EXTENSION}"
         )
 
-    def serialize_to_csv(self, items: Union[List[Dict[str, Any]], Dict[str, Any]]) -> bytes:
+    def serialize_to_csv(self, items: List[Dict[str, Any]]) -> bytes:
         csv_string = io.StringIO()
-        fieldnames: List[str] = list(items[0].keys()) if isinstance(items, list) else list(items.keys())
+        fieldnames: List[str] = list(items[0].keys())
         csv_writer: csv.DictWriter = csv.DictWriter(csv_string, delimiter=",", fieldnames=fieldnames)
         csv_writer.writeheader()
-        if isinstance(items, list):
-            for item in items:
-                csv_writer.writerow(item)
-        else:
-            csv_writer.writerow(items)  # Write a single row for the provided data
+        for item in items:
+            csv_writer.writerow(item)
 
         csv_string.seek(0)  # Reset the buffer position
         return csv_string.getvalue().encode("utf-8")
