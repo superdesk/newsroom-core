@@ -8,6 +8,10 @@ import FilterItem from './FilterItem';
 import {WithPagination} from 'components/pagination/WithPagination';
 import {searchIcon} from 'search/components/search-icon';
 
+/**
+ * If the filter count is less than 50 we
+ * shouldn't render the search.
+ */
 const SEARCHBAR_THRESHOLD = 50;
 const LIMIT = 5;
 type IBucket = {key: string, doc_count: string};
