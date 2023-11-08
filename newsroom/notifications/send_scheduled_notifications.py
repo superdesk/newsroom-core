@@ -8,7 +8,7 @@ from flask import current_app as app
 from superdesk import get_resource_service, Command
 from superdesk.utc import utcnow, utc_to_local
 from superdesk.celery_task_utils import get_lock_id
-from superdesk.lock import lock, unlock, remove_locks
+from superdesk.lock import lock, unlock
 
 from newsroom.types import User, NotificationSchedule, Company, NotificationQueue, NotificationQueueTopic, Topic
 from newsroom.utils import get_user_dict, get_company_dict
@@ -32,13 +32,13 @@ class SendScheduledNotificationEmails(Command):
 
         lock_name = get_lock_id("newsroom", "send_scheduled_notifications")
         if not lock(lock_name, expire=610):
-            logger.error(f"{self.log_msg} Job already running")
+            logger.error("Send scheduled notifications task already running")
             return
 
-        self.run_schedules(force)
-
-        unlock(lock_name)
-        remove_locks()
+        try:
+            self.run_schedules(force)
+        finally:
+            unlock(lock_name)
 
         logger.info(f"{self.log_msg} Completed sending scheduled notifications")
 
@@ -51,8 +51,8 @@ class SendScheduledNotificationEmails(Command):
 
             schedules: List[NotificationQueue] = get_resource_service("notification_queue").get(req=None, lookup={})
         except Exception as e:
-            logger.error(f"{self.log_msg} Failed to retrieve data to run schedules")
             logger.exception(e)
+            logger.error("Failed to retrieve data to run schedules")
             return
 
         for schedule in schedules:
@@ -76,7 +76,7 @@ class SendScheduledNotificationEmails(Command):
                 self.process_schedule(schedule, user, company, now_utc, user_topic_map.get(user["_id"]) or {}, force)
             except Exception as e:
                 logger.exception(e)
-                logger.error(f"{self.log_msg} Failed to run schedule for user {user_id}")
+                logger.error("Failed to run schedule for user", extra={"user": user_id})
 
     def process_schedule(
         self,
