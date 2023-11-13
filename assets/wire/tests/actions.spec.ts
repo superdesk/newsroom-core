@@ -172,7 +172,6 @@ describe('wire actions', () => {
 
         return actions.fetchNext({...testArticle, nextversion: 'bar'})
             .then((_next) => {
-                console.log(_next);
                 expect(_next).toEqual(next);
             });
     });
