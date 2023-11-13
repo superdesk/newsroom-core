@@ -1,5 +1,6 @@
 import {get, isEmpty} from 'lodash';
 
+import {IArticle} from 'interfaces';
 import server from 'server';
 import analytics from 'analytics';
 
@@ -387,11 +388,9 @@ export function removeBookmarks(items: any) {
  * @param {Object} item
  * @return {Promise}
  */
-export function fetchVersions(item: any) {
-    return () => server.get(`/wire/${item._id}/versions`)
-        .then((data: any) => {
-            return data._items;
-        });
+export function fetchVersions(item: IArticle): Promise<Array<IArticle>> {
+    return server.get(`/wire/${item._id}/versions`)
+        .then((data: {_items: Array<IArticle>}) => (data._items));
 }
 
 /**
@@ -524,14 +523,12 @@ export function fetchNewItems() {
         .then((response: any) => dispatch(setNewItems(response)));
 }
 
-export function fetchNext(item: any) {
-    return () => {
-        if (!item.nextversion) {
-            return Promise.reject();
-        }
+export function fetchNext(item: IArticle): Promise<IArticle> {
+    if (!item.nextversion) {
+        return Promise.reject();
+    }
 
-        return server.get(`/wire/${item.nextversion}?format=json`);
-    };
+    return server.get(`/wire/${item.nextversion}?format=json`);
 }
 
 export const TOGGLE_FILTER = 'TOGGLE_FILTER';

@@ -1,4 +1,4 @@
-export {TDatetime, IFilterGroup, ISection, ICountry, IListConfig} from './common';
+export {TDatetime, IFilterGroup, ISection, ICountry, IListConfig, IItemAction} from './common';
 export {ICompany, ICompanyType, IAuthProvider, IService} from './company';
 export {IClientConfig} from './config';
 export {INavigation} from './navigation';

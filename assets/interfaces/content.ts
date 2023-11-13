@@ -13,7 +13,9 @@ export interface IArticle {
     _id: string;
     guid: string;
     type: IContentType;
-    associations: {[key: string]: IArticle};
+    ancestors?: Array<IArticle['_id']>;
+    nextversion?: IArticle['_id'];
+    associations?: {[key: string]: IArticle};
     renditions?: {[key: string]: IRendition};
     slugline: string;
     headline: string;
@@ -21,4 +23,6 @@ export interface IArticle {
     source: string;
     versioncreated: string;
     extra?: {[key: string]: any};
+    es_highlight?: {[field: string]: Array<string>}
+    deleted?: boolean; // Used only in the front-end, populated by wire/reducer
 }

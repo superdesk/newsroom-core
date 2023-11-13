@@ -1,20 +1,26 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
+import {IArticle} from 'interfaces';
 import {gettext} from 'utils';
 import {getVersionsLabelText} from 'wire/utils';
 
-export function PreviousVersions ({item, isItemDetail, inputRef}: any) {
+interface IProps {
+    item: IArticle;
+    isItemDetail: boolean;
+    inputRef: string;
+}
+
+export function PreviousVersions({item, isItemDetail, inputRef}: IProps) {
     if (isItemDetail) {
         return null;
     }
 
-    const numVersions = (item.ancestors ?? []).length;
-    const versionLabelText = getVersionsLabelText(item, numVersions === 0 || numVersions > 1);
     const onClick = () => {
         const previousVersions = document.getElementById(inputRef);
         previousVersions && previousVersions.scrollIntoView();
     };
+    const numVersions = item.ancestors?.length ?? 0;
+    const versionLabelText = getVersionsLabelText(item, numVersions === 0 || numVersions > 1);
 
     return (
         <span>
@@ -27,10 +33,3 @@ export function PreviousVersions ({item, isItemDetail, inputRef}: any) {
         </span>
     );
 }
-
-
-PreviousVersions.propTypes = {
-    isItemDetail: PropTypes.bool,
-    item: PropTypes.object,
-    inputRef: PropTypes.string,
-};
