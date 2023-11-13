@@ -1,7 +1,7 @@
 import {get, isEmpty, isEqual, pickBy} from 'lodash';
 
 import {IArticle, IContentType, IRendition} from '../interfaces';
-import {getTextFromHtml, getConfig, isDisplayed} from 'utils';
+import {getTextFromHtml, getConfig, isDisplayed, gettext} from 'utils';
 
 export const DISPLAY_ABSTRACT = getConfig('display_abstract');
 
@@ -339,3 +339,13 @@ export function getContentTypes(item: IArticle): Set<IContentType> {
 
 export const hasAudio = (item: any) => hasMedia(item, 'audio');
 export const hasVideo = (item: any) => hasMedia(item, 'video');
+
+export function getVersionsLabelText(item: IArticle, plural?: boolean): string {
+    const isTranscript = item.extra?.type === 'transcript';
+
+    if (plural === true) {
+        return isTranscript ? gettext('segments') : gettext('versions');
+    }
+
+    return isTranscript ? gettext('segment') : gettext('version');
+}

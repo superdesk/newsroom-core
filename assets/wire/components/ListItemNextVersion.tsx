@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
 import {gettext} from 'utils';
+import {getVersionsLabelText} from 'wire/utils';
 import ItemVersion from './ItemVersion';
 import {fetchNext, openItem} from '../actions';
 
@@ -37,12 +38,13 @@ class ListItemNextVersion extends React.Component<any, any> {
             return null;
         }
 
+        const versionLabelText = getVersionsLabelText(this.props.item);
         const baseClass = 'wire-column__preview';
 
         return (
             <div className={`${baseClass}__versions`}>
                 <span className={`${baseClass}__versions__box-headline`}>
-                    {gettext('Next version')}
+                    {gettext('Next {{ versionsLabel }}', {versionsLabel: versionLabelText})}
                 </span>
 
                 <ItemVersion

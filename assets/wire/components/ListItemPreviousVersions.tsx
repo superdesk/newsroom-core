@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
 import {gettext} from 'utils';
+import {getVersionsLabelText} from 'wire/utils';
 import {fetchVersions, openItem} from '../actions';
 
 import ItemVersion from './ItemVersion';
@@ -47,6 +48,7 @@ class ListItemPreviousVersions extends React.Component<any, any> {
             );
         }
 
+        const versionLabelText = getVersionsLabelText(this.props.item, this.state.versions.length > 1);
         const versions = this.state.versions.map((version: any) => (
             <ItemVersion
                 key={version._id}
@@ -63,7 +65,9 @@ class ListItemPreviousVersions extends React.Component<any, any> {
             this.props.item.ancestors ?
                 <div className={this.baseClass + '__versions'} id={this.props.inputId}>
                     {this.props.isPreview && (
-                        <span className="wire-column__preview__versions__box-headline">{gettext('Previous versions')}</span>
+                        <span className="wire-column__preview__versions__box-headline">
+                            {gettext('Previous {{ versionsLabel }}', {versionsLabel: versionLabelText})}
+                        </span>
                     )}
                     {versions}
                 </div> : null

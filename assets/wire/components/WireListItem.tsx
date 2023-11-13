@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {get} from 'lodash';
 
+import {IArticle} from 'interfaces';
 import {
     gettext,
     wordCount,
@@ -19,6 +20,7 @@ import {
     isKilled,
     getCaption,
     shortHighlightedtext,
+    getVersionsLabelText,
 } from 'wire/utils';
 
 import ActionButton from 'components/ActionButton';
@@ -37,32 +39,42 @@ export const DISPLAY_CHAR_COUNT = getConfig('display_char_count');
 const DEFAULT_META_FIELDS = ['source', 'charcount', 'versioncreated'];
 const DEFAULT_COMPACT_META_FIELDS = ['versioncreated'];
 
-function getShowVersionText(isExpanded: any, itemCount: any, matchCount: any, isExtended: any) {
+function getShowVersionText(item: IArticle, isExpanded: any, itemCount: any, matchCount: any, isExtended: any) {
+    const versionLabelText = getVersionsLabelText(item, itemCount > 1);
+
     if (isExpanded) {
         return (isExtended && matchCount) ?
             gettext(
-                'Hide previous versions ({{ count }}) - {{ matches }} matches',
+                'Hide previous {{ versionsLabel }} ({{ count }}) - {{ matches }} matches',
                 {
+                    versionsLabel: versionLabelText,
                     matches: matchCount,
                     count: itemCount,
                 }
             ) :
             gettext(
-                'Hide previous versions ({{ count }})',
-                {count: itemCount}
+                'Hide previous {{ versionsLabel }} ({{ count }})',
+                {
+                    versionsLabel: versionLabelText,
+                    count: itemCount,
+                }
             );
     } else {
         return (isExtended && matchCount) ?
             gettext(
-                'Show previous versions ({{ count }}) - {{ matches }} matches',
+                'Show previous {{ versionsLabel }} ({{ count }}) - {{ matches }} matches',
                 {
+                    versionsLabel: versionLabelText,
                     matches: matchCount,
                     count: itemCount,
                 }
             ) :
             gettext(
-                'Show previous versions ({{ count }})',
-                {count: itemCount}
+                'Show previous {{ versionsLabel }} ({{ count }})',
+                {
+                    versionsLabel: versionLabelText,
+                    count: itemCount,
+                }
             );
     }
 }
@@ -280,6 +292,7 @@ class WireListItem extends React.Component<any, any> {
                                     onClick={this.togglePreviousVersions}
                                 >
                                     {getShowVersionText(
+                                        this.props.item,
                                         this.state.previousVersions,
                                         item.ancestors.length,
                                         matchedAncestors.length,

@@ -20,4 +20,5 @@ export interface IArticle {
     anpa_take_key?: string;
     source: string;
     versioncreated: string;
+    extra?: {[key: string]: any};
 }
