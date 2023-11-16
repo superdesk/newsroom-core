@@ -100,7 +100,9 @@ def push():
     elif item.get("type") == "text":
         orig = superdesk.get_resource_service("items").find_one(req=None, _id=item["guid"])
         item["_id"] = publish_item(item, orig)
-        notify_new_wire_item.delay(item["_id"], check_topics=orig is None or app.config["WIRE_NOTIFICATIONS_ON_CORRECTIONS"])
+        notify_new_wire_item.delay(
+            item["_id"], check_topics=orig is None or app.config["WIRE_NOTIFICATIONS_ON_CORRECTIONS"]
+        )
     elif item["type"] == "planning_featured":
         publish_planning_featured(item)
     else:
