@@ -655,8 +655,15 @@ AUTH_PROVIDERS = [
 
 #:
 #: If `True` it will show multi day events only on starting day,
-#  when `False` those will be visible on every day.
+#: when `False` those will be visible on every day.
 #:
 #: .. versionadded: 2.5.0
 #:
 AGENDA_SHOW_MULTIDAY_ON_START_ONLY = True
+
+#: Send email notifications for corrections of wire items
+#:
+#:
+#: .. versionadded: 2.5.0
+#:
+WIRE_NOTIFICATIONS_ON_CORRECTIONS = False
