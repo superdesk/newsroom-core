@@ -37,11 +37,11 @@ class SearchResultsBarComponent extends React.Component<any, any> {
         this.topicNotNull = new URLSearchParams(window.location.search).get('topic') != null;
         this.sortValues = [
             {
-                value: gettext('Date ↑'),
+                value: gettext('Newest first'),
                 sortFunction: () => this.setSortQuery('versioncreated:desc'),
             },
             {
-                value: gettext('Date ↓'),
+                value: gettext('Oldest first'),
                 sortFunction: () => this.setSortQuery('versioncreated:asc'),
             },
             {
