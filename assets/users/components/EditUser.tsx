@@ -29,7 +29,6 @@ import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserList
 
 import {companyProductSeatsSelector, companySectionListSelector, sectionListSelector} from 'company-admin/selectors';
 import {IUser} from 'interfaces/user';
-import {IUserProfileStore} from 'user-profile/reducers';
 import ActionButton from 'components/ActionButton';
 
 const getCompanyOptions = (companies: Array<ICompany>) => companies.map((company) => ({value: company._id, text: company.name}));
@@ -38,6 +37,12 @@ interface IReduxStoreProps {
     allSections: Array<any>;
     companySections: any;
     seats: any;
+}
+
+interface IUserProfileStore {
+    allSections?: Array<any>;
+    companySections?: any;
+    seats?: any;
 }
 
 interface IProps extends IReduxStoreProps {

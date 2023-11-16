@@ -1,7 +1,15 @@
 from bson import ObjectId
-from typing import Dict, List, TypedDict, Any
+from typing import Dict, List, TypedDict, Any, Union, NoReturn
 from datetime import datetime
 from enum import Enum
+from flask_babel import LazyString
+
+
+def assert_never(value: NoReturn) -> NoReturn:
+    assert False, f"Unhandled value {value}"
+
+
+NameString = Union[str, LazyString]
 
 
 class Product(TypedDict, total=False):
@@ -49,18 +57,20 @@ class UserDashboardEntry(TypedDict):
     topic_ids: List[ObjectId]
 
 
-class UserData(TypedDict, total=False):
-    _id: ObjectId
+class UserRequired(TypedDict):
+    email: str
+    user_type: str
+
+
+class UserData(UserRequired, total=False):
     first_name: str
     last_name: str
-    email: str
     phone: str
     mobile: str
     role: str
     signup_details: Dict[str, Any]
     country: str
     company: ObjectId
-    user_type: str
     is_validated: bool
     is_enabled: bool
     is_approved: bool
@@ -82,7 +92,7 @@ class UserData(TypedDict, total=False):
 
 
 class User(UserData):
-    pass
+    _id: ObjectId
 
 
 class UserAuth(TypedDict):
@@ -98,22 +108,21 @@ class AuthProviderType(Enum):
     PASSWORD = "password"
     GOOGLE_OAUTH = "google_oauth"
     SAML = "saml"
+    FIREBASE = "firebase"
 
 
-class AuthProviderFeatures(TypedDict, total=False):
-    verify_email: bool
-
-
-class AuthProvider(TypedDict):
+class AuthProviderConfig(TypedDict):
     _id: str
-    name: str
+    name: NameString
     auth_type: AuthProviderType
-    features: AuthProviderFeatures
 
 
-class Company(TypedDict, total=False):
+class CompanyRequired(TypedDict):
     _id: ObjectId
     name: str
+
+
+class Company(CompanyRequired, total=False):
     products: List[ProductRef]
     sections: Dict[str, bool]
     restrict_coverage_info: bool

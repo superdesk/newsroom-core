@@ -7,6 +7,7 @@ import {store as userProfileStore} from './store';
 import {getLocale} from '../utils';
 import {reloadMyTopics as reloadMyAgendaTopics} from '../agenda/actions';
 import {reloadMyTopics as reloadMyWireTopics} from '../wire/actions';
+import {IUserProfileUpdates} from 'interfaces/user';
 
 export const GET_TOPICS = 'GET_TOPICS';
 export function getTopics(topics: any) {
@@ -19,8 +20,8 @@ export function getUser(user: any) {
 }
 
 export const EDIT_USER = 'EDIT_USER';
-export function editUser(event: any) {
-    return {type: EDIT_USER, event};
+export function editUser(payload: IUserProfileUpdates) {
+    return {type: EDIT_USER, payload};
 }
 
 export const INIT_DATA = 'INIT_DATA';
@@ -299,7 +300,7 @@ export function fetchFolders() {
         const userTopicsUrl = getFoldersUrl(state, false);
 
         return Promise.all([
-            state.company !== 'None' ? server.get(companyTopicsUrl).then(({_items}: {_items: Array<any>}) => _items) : Promise.resolve([]),
+            state.company ? server.get(companyTopicsUrl).then(({_items}: {_items: Array<any>}) => _items) : Promise.resolve([]),
             server.get(userTopicsUrl).then(({_items}: {_items: Array<any>}) => _items),
         ]).then(([companyFolders, userFolders]) => {
             dispatch({

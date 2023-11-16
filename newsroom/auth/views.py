@@ -1,19 +1,31 @@
+from typing import Literal
 import flask
 import bcrypt
+import logging
+import google.oauth2.id_token
 
 from bson import ObjectId
 from flask import current_app as app, abort
 from flask_babel import gettext
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
+from google.auth.transport import requests
 
 from newsroom.types import AuthProviderType
 from newsroom.decorator import admin_only, login_required
-from newsroom.auth import blueprint, get_auth_user_by_email, get_user_by_email, get_company_from_user
+from newsroom.auth import (
+    blueprint,
+    get_auth_user_by_email,
+    get_company,
+    get_user_by_email,
+    get_company_from_user,
+    get_user_required,
+)
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
 from newsroom.auth.utils import (
     clear_user_session,
     redirect_to_next_url,
+    sign_user_by_email,
     start_user_session,
     send_token,
     get_company_auth_provider,
@@ -32,6 +44,9 @@ from newsroom.limiter import limiter
 from .token import generate_auth_token, verify_auth_token
 
 
+logger = logging.getLogger(__name__)
+
+
 @blueprint.route("/login", methods=["GET", "POST"])
 @limiter.limit("60/minute")
 def login():
@@ -45,10 +60,9 @@ def login():
 
         if is_valid_user(user, company):
             auth_provider = get_company_auth_provider(company)
-            if auth_provider["auth_type"] != AuthProviderType.PASSWORD.value and not is_admin(user):
+            if auth_provider.type != AuthProviderType.PASSWORD and not is_admin(user):
                 # Password login is not enabled for this user's company, and the user is not an admin
-                provider_name = auth_provider["name"]
-                flask.flash(gettext(f"Invalid login type, please login using '{provider_name}'"), "danger")
+                flask.flash(gettext(f"Invalid login type, please login using '{auth_provider.name}'"), "danger")
             else:
                 user_auth = get_auth_user_by_email(user["email"])
                 if not _is_password_valid(form.password.data.encode("UTF-8"), user_auth):
@@ -58,7 +72,7 @@ def login():
                     update_user_last_active(user)
                     return redirect_to_next_url()
 
-    return flask.render_template("login.html", form=form)
+    return flask.render_template("login.html", form=form, firebase=app.config.get("FIREBASE_ENABLED"))
 
 
 def email_has_exceeded_max_login_attempts(email):
@@ -169,7 +183,7 @@ def login_with_token(token):
 @blueprint.route("/logout")
 def logout():
     clear_user_session()
-    return flask.redirect(flask.url_for("wire.index"))
+    return flask.redirect(flask.url_for("auth.login", logout=1))
 
 
 @blueprint.route("/signup", methods=["GET", "POST"])
@@ -237,21 +251,32 @@ def reset_password(token):
 
 
 @blueprint.route("/token/<token_type>", methods=["GET", "POST"])
-def token(token_type):
+def token(token_type: Literal["reset_password", "validate"]):
+    """Get token to reset password or validate email."""
     form = TokenForm()
     if form.validate_on_submit():
         user = get_user_by_email(form.email.data)
         company = get_company_from_user(user) if user else None
         auth_provider = get_company_auth_provider(company)
-        if auth_provider.get("features", {}).get("verify_email"):
+
+        if auth_provider.features.verify_email:
             send_token(user, token_type)
+
         flask.flash(
             gettext("A reset password token has been sent to your email address."),
             "success",
         )
+
         return flask.redirect(flask.url_for("auth.login"))
 
-    return flask.render_template("request_token.html", form=form, token_type=token_type)
+    return flask.render_template(
+        "request_token.html", form=form, token_type=token_type, firebase=app.config.get("FIREBASE_ENABLED")
+    )
+
+
+@blueprint.route("/reset_password_done")
+def reset_password_confirmation():
+    return flask.render_template("request_token_confirm.html")
 
 
 @blueprint.route("/login_locale", methods=["POST"])
@@ -283,3 +308,60 @@ def impersonate_stop():
     start_user_session(user)
     flask.session.pop("auth_user")
     return flask.redirect(flask.url_for("settings.app", app_id="users"))
+
+
+@blueprint.route("/change_password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    form = ResetPasswordForm()
+    user = get_user_required()
+    company = get_company(user)
+    auth_provider = get_company_auth_provider(company)
+    form.email.process_data(user["email"])
+
+    if form.validate_on_submit():
+        if auth_provider.type == AuthProviderType.FIREBASE:
+            if form.data.get("firebase_status"):
+                firebase_status = form.data["firebase_status"]
+                if firebase_status == "OK":
+                    flask.flash(gettext("Your password has been changed."), "success")
+                elif firebase_status == "auth/wrong-password":
+                    flask.flash(gettext("Wrong current password."), "error")
+                else:
+                    logger.warning("Unhandled firebase error %s", firebase_status)
+                    flask.flash(gettext("Could not change password. Please try again later."), "warning")
+        elif auth_provider.type == AuthProviderType.PASSWORD:
+            updates = {
+                "password": form.new_password.data,
+            }
+            get_resource_service("users").patch(id=ObjectId(user["_id"]), updates=updates)
+            flask.flash(gettext("Your password has been changed."), "success")
+        else:
+            flask.flash(gettext("Change password is not available."), "warning")
+        return flask.redirect(flask.url_for("auth.change_password"))
+
+    return flask.render_template(
+        "change_password.html", form=form, user=user, firebase=app.config.get("FIREBASE_ENABLED")
+    )
+
+
+@blueprint.route("/firebase_auth_token")
+def firebase_auth_token():
+    token = flask.request.args.get("token")
+    firebase_request_adapter = requests.Request()
+    if token:
+        try:
+            claims = google.oauth2.id_token.verify_firebase_token(
+                token,
+                audience=app.config["FIREBASE_CLIENT_CONFIG"]["projectId"],
+                request=firebase_request_adapter,
+            )
+        except ValueError as err:
+            logger.error(err)
+            flask.flash(gettext("User token is not valid"), "danger")
+            return flask.redirect(flask.url_for("auth.login", token_error=1))
+
+        email = claims["email"]
+        return sign_user_by_email(email, auth_type=AuthProviderType.FIREBASE, validate_login_attempt=True)
+
+    return flask.redirect(flask.url_for("auth.login"))

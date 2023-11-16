@@ -16,18 +16,21 @@ import {
     setError,
     openEditTopicNotificationsModal,
 } from '../../actions';
+import {IUserProfileState} from 'user-profile/reducers';
+import {IUserProfileUpdates} from 'interfaces/user';
 
 interface IProps {
     user: IUser;
-    errors: {[key: string]: string};
-    onChange(event: React.ChangeEvent): void;
+    errors: {[field in keyof IUserProfileUpdates]: string[]};
+    onChange(updates: IUserProfileUpdates): void;
     saveUser(): void;
     setError(errors: {[key: string]: string}): void;
     fetchUser(userId: IUser['_id']): void;
     openEditTopicNotificationsModal(): void;
+    authProviderFeatures: IUserProfileState['authProviderFeatures'];
 }
 
-class UserProfile extends React.Component<IProps, any> {
+class UserProfile extends React.Component<IProps> {
     static propTypes: any;
     constructor(props: any) {
         super(props);
@@ -63,7 +66,7 @@ class UserProfile extends React.Component<IProps, any> {
     }
 
     render() {
-        const {user, onChange, errors} = this.props;
+        const {user, onChange, errors, authProviderFeatures} = this.props;
         const onCancel = () => this.props.fetchUser(this.props.user._id);
         const localeOptions = getLocaleInputOptions();
         return (
@@ -76,8 +79,8 @@ class UserProfile extends React.Component<IProps, any> {
                                     name='first_name'
                                     label={gettext('First Name')}
                                     value={user.first_name}
-                                    onChange={onChange}
-                                    error={errors ? errors.first_name : null} />
+                                    onChange={(event) => onChange({first_name: event.target.value})}
+                                    error={errors?.first_name} />
                             </div>
 
                             <div className="col-lg-6">
@@ -85,8 +88,8 @@ class UserProfile extends React.Component<IProps, any> {
                                     name='last_name'
                                     label={gettext('Last Name')}
                                     value={user.last_name}
-                                    onChange={onChange}
-                                    error={errors ? errors.last_name : null} />
+                                    onChange={(event) => onChange({last_name: event.target.value})}
+                                    error={errors?.last_name} />
                             </div>
 
                             <div className="col-lg-12">
@@ -98,13 +101,26 @@ class UserProfile extends React.Component<IProps, any> {
                                 />
                             </div>
 
+                            {authProviderFeatures?.change_password === true && (
+                                <div className="col-lg-12">
+                                    <div className="form-group">
+                                        <a
+                                            href="/change_password"
+                                            className="nh-button nh-button--small nh-button--tertiary"
+                                        >
+                                            {gettext('Change password')}
+                                        </a>
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="col-lg-6">
                                 <TextInput
                                     name='phone'
                                     label={gettext('Phone')}
                                     value={user.phone}
-                                    onChange={onChange}
-                                    error={errors ? errors.phone : null} />
+                                    onChange={(event) => onChange({phone: event.target.value})}
+                                    error={errors?.phone} />
                             </div>
 
                             <div className="col-lg-6">
@@ -112,8 +128,8 @@ class UserProfile extends React.Component<IProps, any> {
                                     name='mobile'
                                     label={gettext('Mobile')}
                                     value={user.mobile}
-                                    onChange={onChange}
-                                    error={errors ? errors.mobile : null} />
+                                    onChange={(event) => onChange({mobile: event.target.value})}
+                                    error={errors?.mobile} />
                             </div>
 
                             <div className="col-lg-6">
@@ -121,8 +137,8 @@ class UserProfile extends React.Component<IProps, any> {
                                     name='role'
                                     label={gettext('Role')}
                                     value={user.role}
-                                    onChange={onChange}
-                                    error={errors ? errors.role : null} />
+                                    onChange={(event) => onChange({role: event.target.value})}
+                                    error={errors?.role} />
                             </div>
 
                             <div className="col-lg-12 mb-2">
@@ -130,7 +146,7 @@ class UserProfile extends React.Component<IProps, any> {
                                     name='receive_app_notifications'
                                     label={gettext('Receive App Notifications')}
                                     value={!!user.receive_app_notifications}
-                                    onChange={onChange}
+                                    onChange={(event) => onChange({receive_app_notifications: event.target.checked})}
                                 />
                             </div>
 
@@ -139,10 +155,9 @@ class UserProfile extends React.Component<IProps, any> {
                                     name='receive_email'
                                     label={gettext('Receive Email Notifications')}
                                     value={!!user.receive_email}
-                                    onChange={onChange}
+                                    onChange={(event) => onChange({receive_email: event.target.checked})}
                                 />
                             </div>
-
 
                             <div className="col-lg-6">
                                 <div className="nh-container nh-container--highlight mb-3 mt-3">
@@ -174,7 +189,7 @@ class UserProfile extends React.Component<IProps, any> {
                                         name='locale'
                                         label={gettext('Language')}
                                         value={user.locale}
-                                        onChange={onChange}
+                                        onChange={(event) => onChange({locale: event.target.value})}
                                         options={localeOptions}
                                         defaultOption={getDefaultLocale()}
                                     />
@@ -202,17 +217,21 @@ class UserProfile extends React.Component<IProps, any> {
     }
 }
 
-const mapStateToProps = (state: any) => ({
+const mapStateToProps = (state: IUserProfileState) => ({
     user: state.editedUser,
     errors: state.errors ?? {},
+    authProviderFeatures: state.authProviderFeatures,
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
     saveUser: () => dispatch(saveUser()),
     fetchUser: (userId: IUser['_id']) => dispatch(fetchUser(userId)),
-    onChange: (event: React.ChangeEvent) => dispatch(editUser(event)),
+    onChange: (updates: IUserProfileUpdates) => dispatch(editUser(updates)),
     setError: (errors: {[key: string]: string}) => dispatch(setError(errors)),
     openEditTopicNotificationsModal: () => dispatch(openEditTopicNotificationsModal()),
 });
+
+type IStateProps = typeof mapStateToProps;
+type IDispatchProps = typeof mapDispatchToProps;
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserProfile);
