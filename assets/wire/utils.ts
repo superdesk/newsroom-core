@@ -341,11 +341,9 @@ export const hasAudio = (item: any) => hasMedia(item, 'audio');
 export const hasVideo = (item: any) => hasMedia(item, 'video');
 
 export function getVersionsLabelText(item: IArticle, plural?: boolean): string {
-    const isTranscript = item.extra?.type === 'transcript';
-
-    if (plural === true) {
-        return isTranscript ? gettext('segments') : gettext('versions');
+    if (item.extra?.type === 'transcript') {
+        return plural ? gettext('segments') : gettext('segment');
     }
 
-    return isTranscript ? gettext('segment') : gettext('version');
+    return plural ? gettext('versions') : gettext('version');
 }

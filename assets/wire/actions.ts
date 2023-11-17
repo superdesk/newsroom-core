@@ -524,7 +524,7 @@ export function fetchNewItems() {
 }
 
 export function fetchNext(item: IArticle): Promise<IArticle> {
-    if (!item.nextversion) {
+    if (item.nextversion == null) {
         return Promise.reject();
     }
 

@@ -22,7 +22,10 @@ export interface IArticle {
     anpa_take_key?: string;
     source: string;
     versioncreated: string;
-    extra?: {[key: string]: any};
+    extra?: {
+        type?: 'transcript';
+        [key: string]: any;
+    };
     es_highlight?: {[field: string]: Array<string>}
     deleted?: boolean; // Used only in the front-end, populated by wire/reducer
 }
