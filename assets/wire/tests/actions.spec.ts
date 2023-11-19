@@ -2,6 +2,7 @@ import thunk from 'redux-thunk';
 import fetchMock from 'fetch-mock';
 import {createStore, applyMiddleware} from 'redux';
 
+import {IArticle} from 'interfaces';
 import server from 'server';
 
 import wireApp from '../reducers';
@@ -15,6 +16,17 @@ import {
     loadMyTopic,
 } from 'search/actions';
 import {initData} from '../actions';
+
+const testArticle: IArticle = {
+    _id: 'foo',
+    guid: 'foo',
+    type: 'text',
+    associations: {},
+    slugline: 'test-article',
+    headline: 'My test article',
+    source: 'sofab',
+    versioncreated: '2023-06-27T11:07:17+0000',
+};
 
 describe('wire actions', () => {
     let store: any;
@@ -114,7 +126,7 @@ describe('wire actions', () => {
 
     it('can open item', () => {
         fetchMock.post('/history/new', {});
-        store.dispatch(actions.openItem({_id: 'foo'}));
+        store.dispatch(actions.openItem(testArticle));
         expect(store.getState().openItem._id).toBe('foo');
         expect(fetchMock.called('/history/new')).toBeTruthy();
         fetchMock.reset();
@@ -127,7 +139,7 @@ describe('wire actions', () => {
             expect(action).toEqual('open');
             expect(section).toEqual('wire');
         });
-        store.dispatch(actions.openItem({_id: 'foo'}));
+        store.dispatch(actions.openItem(testArticle));
         expect(store.getState().openItem._id).toBe('foo');
         fetchMock.reset();
     });
@@ -147,7 +159,7 @@ describe('wire actions', () => {
         const item: any = {_id: 'foo'};
         fetchMock.get(`/wire/${item._id}/versions`, {_items: [{_id: 'bar'}, {_id: 'baz'}]});
 
-        return store.dispatch(actions.fetchVersions(item))
+        return actions.fetchVersions(item)
             .then((versions: any) => {
                 expect(versions.length).toBe(2);
                 expect(versions[0]._id).toBe('bar');
@@ -155,18 +167,17 @@ describe('wire actions', () => {
     });
 
     it('can fetch next item version', () => {
-        const item: any = {nextversion: 'bar'};
         const next: any = {};
         fetchMock.get('/wire/bar?format=json', next);
 
-        return store.dispatch(actions.fetchNext(item))
-            .then((_next: any) => {
+        return actions.fetchNext({...testArticle, nextversion: 'bar'})
+            .then((_next) => {
                 expect(_next).toEqual(next);
             });
     });
 
     it('can reject if item has no next version', () => {
-        return store.dispatch(actions.fetchNext({})).then(() => {
+        return actions.fetchNext(testArticle).then(() => {
             expect(true).toBe(false); // this should not be called
         }, () => {
             expect(fetchMock.called()).toBeFalsy();

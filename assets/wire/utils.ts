@@ -1,7 +1,7 @@
 import {get, isEmpty, isEqual, pickBy} from 'lodash';
 
 import {IArticle, IContentType, IRendition} from '../interfaces';
-import {getTextFromHtml, getConfig, isDisplayed} from 'utils';
+import {getTextFromHtml, getConfig, isDisplayed, gettext} from 'utils';
 
 export const DISPLAY_ABSTRACT = getConfig('display_abstract');
 
@@ -70,14 +70,14 @@ export function getOtherMedia(item: IArticle): Array<IArticle> | null {
         return null;
     }
 
-    return Object.keys(item.associations || {})
-        .filter((key) => (
+    return Object.entries(item.associations ?? {})
+        .filter(([key, mediaItem]) => (
             !key.startsWith('editor_') &&
             key !== 'featuremedia' &&
-            item.associations[key] != null &&
-            ['video', 'audio'].includes(item.associations[key].type)
+            mediaItem != null &&
+            ['video', 'audio'].includes(mediaItem.type)
         ))
-        .map((key) => item.associations[key]);
+        .map((args) => args[1]);
 }
 
 /**
@@ -339,3 +339,11 @@ export function getContentTypes(item: IArticle): Set<IContentType> {
 
 export const hasAudio = (item: any) => hasMedia(item, 'audio');
 export const hasVideo = (item: any) => hasMedia(item, 'video');
+
+export function getVersionsLabelText(item: IArticle, plural?: boolean): string {
+    if (item.extra?.type === 'transcript') {
+        return plural ? gettext('segments') : gettext('segment');
+    }
+
+    return plural ? gettext('versions') : gettext('version');
+}
