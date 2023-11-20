@@ -40,7 +40,7 @@ interface IReduxStoreProps {
     seats: any;
 }
 
-interface IProps extends IReduxStoreProps {
+interface IOwnProps {
     original: IUser;
     user: IUser;
 
@@ -61,6 +61,8 @@ interface IProps extends IReduxStoreProps {
     hideFields: Array<string>;
     toolbar?: any;
 }
+
+type IProps = IReduxStoreProps & IOwnProps;
 
 const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
     const {
@@ -446,6 +448,6 @@ const mapStateToProps = (state: IUserProfileStore): IReduxStoreProps => ({
     seats: companyProductSeatsSelector(state),
 });
 
-const EditUser = connect<IReduxStoreProps>(mapStateToProps)(EditUserComponent);
+const EditUser = connect<IReduxStoreProps, {}, IOwnProps, IUserProfileStore>(mapStateToProps)(EditUserComponent);
 
 export default EditUser;

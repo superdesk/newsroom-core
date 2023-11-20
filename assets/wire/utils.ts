@@ -1,6 +1,6 @@
 import {get, isEmpty, isEqual, pickBy} from 'lodash';
 
-import {IArticle, IContentType, IRendition} from '../interfaces';
+import {IArticle, IAgendaItem, IContentType, IRendition} from 'interfaces';
 import {getTextFromHtml, getConfig, isDisplayed} from 'utils';
 
 export const DISPLAY_ABSTRACT = getConfig('display_abstract');
@@ -15,9 +15,11 @@ const STATUS_KILLED = 'canceled';
  * @param {Object} item
  * @returns {number}
  */
-export function getIntVersion(item: any) {
-    if (item) {
-        return parseInt(item.version, 10) || 0;
+export function getIntVersion(item: IArticle | IAgendaItem | undefined): number | undefined {
+    if (item != null && item.version != null) {
+        return typeof item.version === 'number' ?
+            item.version :
+            parseInt(item.version, 10) || 0;
     }
 }
 
