@@ -439,24 +439,24 @@ def _set_manual_date_range(search):
     filters = []
     if search.args.get("starts_before"):
         starts_before = get_local_date(search.args["starts_before"], "00:00:00", offset)
-        filters.append({
-            "bool": {
-                "should": gen_date_range_filter(
-                    "dates.start", "lt", search.args["starts_before"], starts_before
-                ),
-                "minimum_should_match": 1,
-            },
-        })
+        filters.append(
+            {
+                "bool": {
+                    "should": gen_date_range_filter("dates.start", "lt", search.args["starts_before"], starts_before),
+                    "minimum_should_match": 1,
+                },
+            }
+        )
     if search.args.get("ends_after"):
         ends_after = get_local_date(search.args["ends_after"], "00:00:00", offset)
-        filters.append({
-            "bool": {
-                "should": gen_date_range_filter(
-                    "dates.end", "gte", search.args["ends_after"], ends_after
-                ),
-                "minimum_should_match": 1,
-            },
-        })
+        filters.append(
+            {
+                "bool": {
+                    "should": gen_date_range_filter("dates.end", "gte", search.args["ends_after"], ends_after),
+                    "minimum_should_match": 1,
+                },
+            }
+        )
 
     if len(filters):
         search.query["bool"]["filter"].extend(filters)
