@@ -15,7 +15,7 @@ from superdesk import config
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
 from superdesk.celery_task_utils import get_lock_id
-from superdesk.lock import lock, unlock, remove_locks
+from superdesk.lock import lock, unlock
 
 from newsroom.celery_app import celery
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
@@ -31,16 +31,15 @@ class CompanyExpiryAlerts:
 
         lock_name = get_lock_id("newsroom", "company_expiry")
         if not lock(lock_name, expire=610):
-            logger.error("{} Job already running".format(self.log_msg))
+            logger.error("Company expiry alert task already running")
             return
 
         try:
             self.worker()
         except Exception as e:
             logger.exception(e)
-
-        unlock(lock_name)
-        remove_locks()
+        finally:
+            unlock(lock_name)
 
         logger.info("{} Completed sending alerts.".format(self.log_msg))
 
