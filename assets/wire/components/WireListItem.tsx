@@ -1,24 +1,22 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {get} from 'lodash';
 
+import {IArticle, IItemAction, IUser, IListConfig, IAgendaItem} from 'interfaces';
 import {
     gettext,
     wordCount,
     characterCount,
     LIST_ANIMATIONS,
     getSlugline,
-    getConfig,
 } from 'utils';
 import {
-    getFeatureMedia,
     getImageForList,
     showItemVersions,
     shortText,
     isKilled,
     getCaption,
     shortHighlightedtext,
+    getVersionsLabelText,
 } from 'wire/utils';
 
 import ActionButton from 'components/ActionButton';
@@ -31,49 +29,88 @@ import {Embargo} from './fields/Embargo';
 import {UrgencyItemBorder, UrgencyLabel} from './fields/UrgencyLabel';
 import {FieldComponents} from './fields';
 
-export const DISPLAY_WORD_COUNT = getConfig('display_word_count');
-export const DISPLAY_CHAR_COUNT = getConfig('display_char_count');
-
 const DEFAULT_META_FIELDS = ['source', 'charcount', 'versioncreated'];
 const DEFAULT_COMPACT_META_FIELDS = ['versioncreated'];
 
-function getShowVersionText(isExpanded: any, itemCount: any, matchCount: any, isExtended: any) {
+function getShowVersionText(
+    item: IArticle,
+    isExpanded: boolean,
+    itemCount: number,
+    matchCount: number,
+    isExtended: boolean
+): string {
+    const versionLabelText = getVersionsLabelText(item, itemCount > 1);
+
     if (isExpanded) {
         return (isExtended && matchCount) ?
             gettext(
-                'Hide previous versions ({{ count }}) - {{ matches }} matches',
+                'Hide previous {{ versionsLabel }} ({{ count }}) - {{ matches }} matches',
                 {
+                    versionsLabel: versionLabelText,
                     matches: matchCount,
                     count: itemCount,
                 }
             ) :
             gettext(
-                'Hide previous versions ({{ count }})',
-                {count: itemCount}
+                'Hide previous {{ versionsLabel }} ({{ count }})',
+                {
+                    versionsLabel: versionLabelText,
+                    count: itemCount,
+                }
             );
     } else {
         return (isExtended && matchCount) ?
             gettext(
-                'Show previous versions ({{ count }}) - {{ matches }} matches',
+                'Show previous {{ versionsLabel }} ({{ count }}) - {{ matches }} matches',
                 {
+                    versionsLabel: versionLabelText,
                     matches: matchCount,
                     count: itemCount,
                 }
             ) :
             gettext(
-                'Show previous versions ({{ count }})',
-                {count: itemCount}
+                'Show previous {{ versionsLabel }} ({{ count }})',
+                {
+                    versionsLabel: versionLabelText,
+                    count: itemCount,
+                }
             );
     }
 }
 
-class WireListItem extends React.Component<any, any> {
-    static propTypes: any;
-    static defaultProps: any;
-    wordCount: any;
-    characterCount: any;
-    dom: any;
-    constructor(props: any) {
+interface IProps {
+    item: IArticle;
+    isActive: boolean;
+    isSelected: boolean;
+    isRead: boolean;
+    showActions: boolean;
+    isExtended: boolean;
+    matchedIds: Array<IArticle['_id']>;
+    isSearchFiltered: boolean;
+    showShortcutActionIcons: boolean;
+    user: IUser['_id'];
+    context: string;
+    contextName: string;
+    listConfig: IListConfig;
+    filterGroupLabels: {[field: string]: string};
+    actions: Array<IItemAction>;
+    onClick(item: IArticle): void;
+    onDoubleClick(item: IArticle): void;
+    onActionList(event: React.MouseEvent, item: IArticle, group?: string, plan?: IAgendaItem): void;
+    toggleSelected(): void;
+}
+
+interface IState {
+    previousVersions: boolean;
+}
+
+class WireListItem extends React.Component<IProps, IState> {
+    static defaultProps = {matchedIds: []};
+    wordCount: number;
+    characterCount: number;
+    dom: {article: HTMLElement | null};
+
+    constructor(props: IProps) {
         super(props);
         this.wordCount = wordCount(props.item);
         this.characterCount = characterCount(props.item);
@@ -84,7 +121,7 @@ class WireListItem extends React.Component<any, any> {
         this.dom = {article: null};
     }
 
-    onKeyDown(event: any) {
+    onKeyDown(event: React.KeyboardEvent) {
         switch (event.key) {
         case ' ': // on space toggle selected item
             this.props.toggleSelected();
@@ -97,7 +134,7 @@ class WireListItem extends React.Component<any, any> {
         event.preventDefault();
     }
 
-    togglePreviousVersions(event: any) {
+    togglePreviousVersions(event: React.MouseEvent) {
         event.stopPropagation();
         this.setState({previousVersions: !this.state.previousVersions});
     }
@@ -108,7 +145,7 @@ class WireListItem extends React.Component<any, any> {
         }
     }
 
-    stopPropagation(event: any) {
+    stopPropagation(event: React.MouseEvent) {
         event.stopPropagation();
     }
 
@@ -121,7 +158,7 @@ class WireListItem extends React.Component<any, any> {
             listConfig,
         } = this.props;
 
-        if (get(this.props, 'item.deleted')) {
+        if (this.props.item.deleted === true) {
             return (
                 <WireListItemDeleted
                     item={this.props.item}
@@ -280,8 +317,9 @@ class WireListItem extends React.Component<any, any> {
                                     onClick={this.togglePreviousVersions}
                                 >
                                     {getShowVersionText(
+                                        this.props.item,
                                         this.state.previousVersions,
-                                        item.ancestors.length,
+                                        item.ancestors?.length ?? 0,
                                         matchedAncestors.length,
                                         isExtended
                                     )}
@@ -348,36 +386,5 @@ class WireListItem extends React.Component<any, any> {
         );
     }
 }
-
-WireListItem.propTypes = {
-    item: PropTypes.object.isRequired,
-    isActive: PropTypes.bool.isRequired,
-    isSelected: PropTypes.bool.isRequired,
-    isRead: PropTypes.bool.isRequired,
-    onClick: PropTypes.func.isRequired,
-    onDoubleClick: PropTypes.func.isRequired,
-    onActionList: PropTypes.func.isRequired,
-    showActions: PropTypes.bool.isRequired,
-    toggleSelected: PropTypes.func.isRequired,
-    actions: PropTypes.arrayOf(
-        PropTypes.shape({
-            name: PropTypes.string,
-            action: PropTypes.func,
-        })
-    ),
-    isExtended: PropTypes.bool.isRequired,
-    user: PropTypes.string,
-    context: PropTypes.string,
-    contextName: PropTypes.string,
-    listConfig: PropTypes.object,
-    matchedIds: PropTypes.array,
-    isSearchFiltered: PropTypes.bool,
-    showShortcutActionIcons: PropTypes.bool,
-    filterGroupLabels: PropTypes.object,
-};
-
-WireListItem.defaultProps = {
-    matchedIds: [],
-};
 
 export default WireListItem;

@@ -305,7 +305,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                     title={gettext('Products')}
                                     testId="toggle--products"
                                 >
-                                    {(() => {
+                                    {user.company != null ? (() => {
                                         if (productsFromSections.length < 1) {
                                             return (
                                                 <div>{gettext('No products available')}</div>
@@ -363,7 +363,11 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                                 </>
                                             );
                                         }
-                                    })()}
+                                    })() : (
+                                        <div className='p-1'>
+                                            {gettext('If a company hasn\'t been selected, you can\'t select any products.')}
+                                        </div>
+                                    )}
                                 </FormToggle>
                             );
                         })()}
