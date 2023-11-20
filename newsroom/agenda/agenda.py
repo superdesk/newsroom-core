@@ -319,6 +319,25 @@ def get_date_filters(args):
     return date_range
 
 
+def gen_date_range_filter(field: str, operator: str, date_str: str, datetime_instance: datetime):
+    return [
+        {
+            "bool": {
+                "must_not": {"term": {"dates.all_day": True}},
+                "filter": {"range": {field: {operator: datetime_instance}}},
+            },
+        },
+        {
+            "bool": {
+                "filter": [
+                    {"term": {"dates.all_day": True}},
+                    {"range": {field: {operator: date_str}}},
+                ],
+            },
+        },
+    ]
+
+
 def _set_event_date_range(search):
     """Get events for selected date.
 
@@ -334,42 +353,12 @@ def _set_event_date_range(search):
     should = []
 
     if date_from and not date_to:
-        dates_field = "dates.start" if app.config.get("AGENDA_SHOW_MULTIDAY_ON_START_ONLY") else "dates.end"
         # Filter from a particular date onwards
-        should = [
-            {
-                "bool": {
-                    "must_not": {"term": {"dates.all_day": True}},
-                    "filter": {"range": {dates_field: {"gte": date_from}}},
-                },
-            },
-            {
-                "bool": {
-                    "filter": [
-                        {"term": {"dates.all_day": True}},
-                        {"range": {dates_field: {"gte": search.args["date_from"]}}},
-                    ],
-                },
-            },
-        ]
+        dates_field = "dates.start" if app.config.get("AGENDA_SHOW_MULTIDAY_ON_START_ONLY") else "dates.end"
+        should = gen_date_range_filter(dates_field, "gte", search.args["date_from"], date_from)
     elif not date_from and date_to:
         # Filter up to a particular date
-        should = [
-            {
-                "bool": {
-                    "filter": {"range": {"dates.end": {"lte": date_to}}},
-                    "must_not": {"term": {"dates.all_day": True}},
-                },
-            },
-            {
-                "bool": {
-                    "filter": [
-                        {"range": {"dates.end": {"lte": search.args["date_to"]}}},
-                        {"term": {"dates.all_day": True}},
-                    ],
-                },
-            },
-        ]
+        should = gen_date_range_filter("dates.end", "lte", search.args["date_to"], date_to)
     elif date_from and date_to:
         # Filter based on the date range provided
         should = [
@@ -443,6 +432,34 @@ def _set_event_date_range(search):
 
     if len(should):
         search.query["bool"]["filter"].append({"bool": {"should": should, "minimum_should_match": 1}})
+
+
+def _set_manual_date_range(search):
+    offset = int(search.args.get("timezone_offset", "0"))
+    filters = []
+    if search.args.get("starts_before"):
+        starts_before = get_local_date(search.args["starts_before"], "00:00:00", offset)
+        filters.append({
+            "bool": {
+                "should": gen_date_range_filter(
+                    "dates.start", "lt", search.args["starts_before"], starts_before
+                ),
+                "minimum_should_match": 1,
+            },
+        })
+    if search.args.get("ends_after"):
+        ends_after = get_local_date(search.args["ends_after"], "00:00:00", offset)
+        filters.append({
+            "bool": {
+                "should": gen_date_range_filter(
+                    "dates.end", "gte", search.args["ends_after"], ends_after
+                ),
+                "minimum_should_match": 1,
+            },
+        })
+
+    if len(filters):
+        search.query["bool"]["filter"].extend(filters)
 
 
 aggregations: Dict[str, Dict[str, Any]] = {
@@ -1015,6 +1032,7 @@ class AgendaService(BaseSearchService):
 
         if search.args.get("date_from") or search.args.get("date_to"):
             _set_event_date_range(search)
+        _set_manual_date_range(search)
 
     def set_post_filter(self, source: Dict[str, Any], req: ParsedRequest, item_type: Optional[str] = None):
         filters = json.loads(req.args.get("filter") or "{}")
