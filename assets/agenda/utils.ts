@@ -1,5 +1,7 @@
-import {get, isEmpty, includes, keyBy, sortBy, partition} from 'lodash';
+import {get, isEmpty, includes, keyBy, sortBy} from 'lodash';
 import moment from 'moment/moment';
+
+import {IAgendaItem, IAgendaListGroup, IAgendaListGroupItem, ICoverage, IUser} from 'interfaces';
 import {
     formatDate,
     formatMonth,
@@ -14,7 +16,6 @@ import {
     formatTime,
     DAY_IN_MINUTES,
 } from '../utils';
-import {IAgendaItem} from 'interfaces';
 
 export const STATUS_KILLED = 'killed';
 export const STATUS_CANCELED = 'cancelled';
@@ -156,8 +157,8 @@ export function isRescheduled(item: any) {
  * @param {Object} item
  * @return {Boolean}
  */
-export function hasCoverages(item: any) {
-    return !isEmpty(get(item, 'coverages'));
+export function hasCoverages(item: IAgendaItem): boolean {
+    return item.coverages?.[0]?.coverage_id != null;
 }
 
 /**
@@ -192,8 +193,8 @@ export function getCoverageDisplayName(coverageType: any) {
  * @param {String} userId
  * @return {Boolean}
  */
-export function isWatched(item: any, userId: any) {
-    return userId && includes(get(item, 'watches', []), userId);
+export function isWatched(item: IAgendaItem | ICoverage, userId?: IUser['_id']): boolean {
+    return userId != null && item.watches?.includes(userId) === true;
 }
 
 /**
@@ -203,8 +204,8 @@ export function isWatched(item: any, userId: any) {
  * @param {String} dateString
  * @return {Boolean}
  */
-export function isCoverageForExtraDay(coverage: any) {
-    return coverage.scheduled != null;
+export function isCoverageForExtraDay(coverage: ICoverage, dateString: string) {
+    return coverage.scheduled != null && formatDate(moment(coverage.scheduled)) === dateString;
 }
 
 /**
@@ -346,16 +347,13 @@ export function getDateInputDate(dateString: any) {
 
 /**
  * Return moment date
- *
- * @param {String} dateString
- * @return {String}
  */
-export function getMomentDate(dateString: any): any {
+export function getMomentDate(dateString?: number): moment.Moment {
     if (dateString) {
-        return moment(parseInt(dateString));
+        return moment(dateString);
     }
 
-    return '';
+    return moment();
 }
 
 /**
@@ -593,7 +591,7 @@ export function getHighlightedName(item: any) {
  * @param {Object} plan
  * @return {String}
  */
-export function getDescription(item: any, plan: any) {
+export function getDescription(item: IAgendaItem, plan?: IAgendaItem): string {
     return plan?.description_text || item?.definition_short || '';
 }
 
@@ -604,15 +602,14 @@ export function getDescription(item: any, plan: any) {
  * @param {Object} plan
  * @return {String}
  */
-export function getHighlightedDescription(item: any, plan: any) {
-
-    if (item.es_highlight.description_text) {
+export function getHighlightedDescription(item: IAgendaItem, plan?: IAgendaItem): string {
+    if (item.es_highlight?.description_text?.[0] != null) {
         return item.es_highlight.description_text[0];
     }
-    else if (item.es_highlight.definition_short) {
+    else if (item.es_highlight?.definition_short?.[0] != null) {
         return item.es_highlight.definition_short[0];
     }
-    else if (item.es_highlight.definition_long) {
+    else if (item.es_highlight?.definition_long?.[0] != null) {
         return item.es_highlight.definition_long[0];
     }
     else {
@@ -627,8 +624,8 @@ export function getHighlightedDescription(item: any, plan: any) {
  * @param {Object} item
  * @return {Array} list of dates
  */
-export function getExtraDates(item: any) {
-    return getDisplayDates(item).map((ed: any) => moment(ed.date));
+export function getExtraDates(item: IAgendaItem): Array<moment.Moment> {
+    return getDisplayDates(item).map((displayDate) => moment(displayDate.date));
 }
 
 /**
@@ -636,41 +633,43 @@ export function getExtraDates(item: any) {
  * @param item: Event or Planning item
  * @returns {Array.<{date: moment.Moment}>}
  */
-export function getDisplayDates(item: any) {
-    const matchedPlanning = get(item, '_hits.matched_planning_items');
-
-    if (matchedPlanning == null) {
-        return get(item, 'display_dates') || [];
+export function getDisplayDates(item: IAgendaItem): Array<{date: string}> {
+    if (item._hits == null || item._hits.matched_planning_items == null) {
+        return item.display_dates ?? [];
+    } else if (item.planning_items == null || item.planning_items.length === 0) {
+        return [];
     }
 
-    const dates: Array<any> = [];
-    const planningItems = get(item, 'planning_items') || [];
+    const dates: Array<{date: string}> = [];
     const planningIds = item._hits.matched_planning_items;
-    const coverageIds = get(item, '_hits.matched_coverages') != null ?
+    const coverageIds = item._hits.matched_coverages != null ?
         item._hits.matched_coverages :
-        (get(item, 'coverages') || []).map((coverage: any) => coverage.coverage_id);
+        (item.coverages ?? []).map((coverage) => coverage.coverage_id);
 
-    planningItems
-        .forEach((plan: any) => {
-            if (!planningIds.includes(plan._id)) {
-                return;
-            }
+    item.planning_items.forEach((plan) => {
+        if (!planningIds.includes(plan._id)) {
+            return;
+        }
 
-            const coverages = (get(plan, 'coverages') || []).filter((coverage: any) => coverage.scheduled);
+        const coverages = (plan.coverages ?? []).filter(
+            (coverage) => coverage.scheduled != null || coverage.planning?.scheduled != null
+        );
 
-            if (!coverages.length) {
+        if (!coverages.length) {
+            if (plan.planning_date != null) {
                 dates.push({date: plan.planning_date});
+            }
+            return;
+        }
+
+        coverages.forEach((coverage) => {
+            if (!coverageIds.includes(coverage.coverage_id)) {
                 return;
             }
 
-            coverages.forEach((coverage: any) => {
-                if (!coverageIds.includes(coverage.coverage_id)) {
-                    return;
-                }
-
-                dates.push({date: coverage.planning.scheduled});
-            });
+            dates.push({date: coverage.scheduled ?? coverage.planning?.scheduled});
         });
+    });
 
     return dates;
 }
@@ -682,17 +681,25 @@ export function getDisplayDates(item: any) {
  * @param {Date} date to check (moment)
  * @return {Boolean}
  */
-export function containsExtraDate(item: any, dateToCheck: any) {
-    return getDisplayDates(item).map((ed: any) => moment(ed.date).format('YYYY-MM-DD')).includes(dateToCheck.format('YYYY-MM-DD'));
+export function containsExtraDate(item: IAgendaItem, dateToCheck: moment.Moment) {
+    return getDisplayDates(item)
+        .map((ed) => moment(ed.date).format('YYYY-MM-DD'))
+        .includes(dateToCheck.format('YYYY-MM-DD'));
 }
 
 // get start date in utc mode if there is no time info
-const getStartDate = (item: any) => item.dates.all_day ? moment.utc(item.dates.start) : moment(item.dates.start);
+export function getStartDate(item: IAgendaItem): moment.Moment {
+    return item.dates.all_day === true ?
+        moment.utc(item.dates.start) :
+        moment(item.dates.start);
+}
 
 // get end date in utc mode if there is no end time info
-const getEndDate = (item: any) => item.dates.no_end_time || item.dates.all_day ?
-    moment.utc(item.dates.end || item.dates.start) :
-    moment(item.dates.end || item.dates.start);
+export function getEndDate(item: IAgendaItem): moment.Moment {
+    return item.dates.no_end_time === true || item.dates.all_day === true ?
+        moment.utc(item.dates.end || item.dates.start) :
+        moment(item.dates.end || item.dates.start);
+}
 
 // compare days without being affected by timezone
 const isBetweenDay = (day: moment.Moment, start: moment.Moment, end: moment.Moment, allDay=false, noEndTime=false) => {
@@ -721,33 +728,47 @@ const isBetweenDay = (day: moment.Moment, start: moment.Moment, end: moment.Mome
  * @param activeDate: date that the grouping will start from
  * @param activeGrouping: type of grouping i.e. day, week, month
  */
-export function groupItems(items: any, activeDate: any, activeGrouping: any, featuredOnly?: any) {
-    const minStart = moment(activeDate).set({'h': 0, 'm': 0, 's': 0});
-    const groupedItems: any = {};
-    const grouper = Groupers[activeGrouping];
+export function groupItems(
+    items: Array<IAgendaItem>,
+    minDate: moment.Moment,
+    maxDate: moment.Moment | undefined,
+    activeGrouping: string,
+    featuredOnly?: boolean
+): Array<IAgendaListGroup> {
+    if (items.length === 0) {
+        return [];
+    }
+
+    const groupedItems: {[key: string]: Array<IAgendaItem>} = {};
+    const grouper: (dateString: moment.Moment) => string = Groupers[activeGrouping];
 
     items
         // Filter out items that didn't match any Planning items
-        .filter((item: any) => (
-            get(item, 'planning_items.length', 0) === 0 ||
-            get(item, '_hits.matched_planning_items') == null ||
-            get(item, '_hits.matched_planning_items.length', 0) > 0)
-        )
-        .forEach((item: any) => {
+        .filter((item) => (
+            (item.planning_items?.length ?? 0) === 0 ||
+            item._hits?.matched_planning_items == null ||
+            item._hits?.matched_planning_items.length > 0
+        ))
+        .forEach((item) => {
             const itemExtraDates = getExtraDates(item);
             const itemStartDate = getStartDate(item);
-            const start = item._display_from ? moment(item._display_from) :
-                moment.max(minStart, moment.min(itemExtraDates.concat([itemStartDate])));
+            const start = item._display_from != null ?
+                moment(item._display_from) :
+                moment.max(minDate, moment.min(itemExtraDates.concat([itemStartDate])));
             const itemEndDate = getEndDate(item);
+            const scheduleType = getScheduleType(item);
 
             // If item is an event and was actioned (postponed, rescheduled, cancelled only incase of multi-day event)
             // actioned_date is set. In this case, use that as the cut off date.
-            let end = get(item, 'event.actioned_date') ? moment(item.event.actioned_date) : null;
-            if (!end || !moment.isMoment(end)) {
-                end = item._display_to ? moment(item._display_to) :
+            let end = item.event?.actioned_date != null ?
+                moment(item.event.actioned_date) :
+                null;
+            if (end != null || !moment.isMoment(end)) {
+                end = item._display_to != null ?
+                    moment(item._display_to) :
                     moment.max(
                         itemExtraDates
-                            .concat([minStart])
+                            .concat([minDate])
                             // If event is all day the end timestamp is the same as
                             // start and depending on the local timezone offset it
                             // might not give enough room for the event to show up,
@@ -757,79 +778,111 @@ export function groupItems(items: any, activeDate: any, activeGrouping: any, fea
             }
 
             let key = null;
-            end = moment.min(end, start.clone().add(10, 'd')); // show each event for 10 days max not to destroy the UI
+            end = maxDate != null ?
+                moment.min(end, maxDate) :
+                moment.min(end, start.clone().add(10, 'd')); // show each event for 10 days max not to destroy the UI
 
             // use clone otherwise it would modify start and potentially also maxStart, moments are mutable
             for (const day = start.clone(); day.isSameOrBefore(end, 'day'); day.add(1, 'd')) {
                 const isBetween = isBetweenDay(day, itemStartDate, itemEndDate, item.dates.all_day, item.dates.no_end_time);
                 const containsExtra = containsExtraDate(item, day);
-                const addGroupItem = (item.event == null || get(item, '_hits.matched_planning_items') != null) ?
-                    containsExtra :
+                const addGroupItem: boolean = item.event == null || item._hits?.matched_planning_items != null ?
+                    containsExtra || (scheduleType === SCHEDULE_TYPE.MULTI_DAY && isBetween) :
                     isBetween || containsExtra;
 
                 if (grouper(day) !== key && addGroupItem) {
                     key = grouper(day);
-                    const groupList = groupedItems[key] || [];
-                    groupList.push(item);
-                    groupedItems[key] = groupList;
+                    if (groupedItems[key] == null) {
+                        groupedItems[key] = [];
+                    }
+                    groupedItems[key].push(item);
                 }
             }
         });
 
-    Object.keys(groupedItems).forEach((k: any) => {
-        if (featuredOnly) {
-            groupedItems[k] = groupedItems[k].map((i: any) => i._id);
-        } else {
-            const tbcPartitioned = partition(groupedItems[k], (i) => isItemTBC(i));
-            groupedItems[k] = [
-                ...tbcPartitioned[0],
-                ...tbcPartitioned[1],
-            ].map((i: any) => i._id);
-        }
-    });
+    const groupedItemIds: {[group: string]: {day: Array<IAgendaItem['_id']>, hiddenItems: Array<IAgendaItem['_id']>}} = {};
+    const sortDates: {[date: string]: moment.Moment} = {};
+
+    if (featuredOnly) {
+        Object.keys(groupedItems).forEach((dateString) => {
+            groupedItemIds[dateString] = {day: groupedItems[dateString].map((i) => i._id), hiddenItems: []};
+            sortDates[dateString] = moment(dateString, DATE_FORMAT);
+        });
+    } else {
+        Object.keys(groupedItems).forEach((dateString) => {
+            const itemsWithoutTime: Array<IAgendaItem['_id']> = [];
+            const itemsWithTime: Array<IAgendaItem['_id']> = [];
+            const hiddenItems: Array<IAgendaItem['_id']> = [];
+
+            groupedItems[dateString].forEach((groupItem) => {
+                const itemStartDateGroup: string = grouper(getStartDate(groupItem));
+
+                if (itemStartDateGroup !== dateString) {
+                    hiddenItems.push(groupItem._id);
+                } else if (isItemTBC(groupItem)) {
+                    itemsWithoutTime.push(groupItem._id);
+                } else {
+                    itemsWithTime.push(groupItem._id);
+                }
+            });
+
+            groupedItemIds[dateString] = {
+                day: [
+                    ...itemsWithoutTime,
+                    ...itemsWithTime,
+                ],
+                hiddenItems: hiddenItems,
+            };
+            sortDates[dateString] = moment(dateString, DATE_FORMAT);
+        });
+    }
 
     return sortBy(
-        Object.keys(groupedItems).map((k: any) => (
+        Object.keys(groupedItemIds).map((dateString) => (
             {
-                date: k,
-                items: groupedItems[k],
-                _sortDate: moment(k, DATE_FORMAT)
-            })),
-        (g: any) => g._sortDate);
+                date: dateString,
+                items: groupedItemIds[dateString].day,
+                hiddenItems: groupedItemIds[dateString].hiddenItems,
+            }
+        )),
+        (g) => sortDates[g.date]
+    );
 }
 
 /**
  * Get Planning Item for the day
- * @param item: Agenda item
- * @param group: Group Date
  */
-export function getPlanningItemsByGroup(item: any, group: any) {
-    const planningItems = get(item, 'planning_items') || [];
+export function getPlanningItemsByGroup(item: IAgendaItem, group: string): Array<IAgendaItem> {
+    const planningItems = item.planning_items || [];
 
     if (planningItems.length === 0) {
         return [];
     }
 
     // Planning item without coverages
-    const plansWithoutCoverages = planningItems.filter((p: any) =>
-        formatDate(p.planning_date) === group && get(p, 'coverages.length', 0) === 0);
+    const plansWithoutCoverages: Array<IAgendaItem> = planningItems.filter((planningItem) => (
+        formatDate(planningItem.planning_date) === group &&
+        (planningItem.coverages?.length ?? 0) === 0
+    ));
 
-    const allPlans = keyBy(planningItems, '_id');
-    const processed: any = {};
+    const allPlans: {[itemId: string]: IAgendaItem} = keyBy(planningItems, '_id');
+    const processed: {[itemId: string]: boolean} = {};
 
     // get unique plans for that group based on the coverage.
-    const plansWithCoverages = (item.coverages || [])
-        .map((coverage: any) => {
-            if (isCoverageForExtraDay(coverage)) {
-                if (!processed[coverage.planning_id]) {
-                    processed[coverage.planning_id] = 1;
-                    return allPlans[coverage.planning_id];
-                }
-                return null;
+    const plansWithCoverages: Array<IAgendaItem> = (item.coverages || [])
+        .filter((coverage) => {
+            if (isCoverageForExtraDay(coverage, group) === false) {
+                return false;
             }
-            return null;
+
+            if (processed[coverage.planning_id] !== true) {
+                processed[coverage.planning_id] = true;
+                return true;
+            }
+
+            return false;
         })
-        .filter((p: any) => p);
+        .map((coverage) => allPlans[coverage.planning_id]);
 
     return [...plansWithCoverages, ...plansWithoutCoverages];
 }
@@ -849,7 +902,7 @@ export function getCoveragesForDisplay(item: any, plan: any, group: any) {
     (get(item, 'coverages') || [])
         .forEach((coverage: any) => {
             if (!get(plan, 'guid') || coverage.planning_id === get(plan, 'guid')) {
-                if (isCoverageForExtraDay(coverage)) {
+                if (isCoverageForExtraDay(coverage, group)) {
                     currentCoverage.push(coverage);
                 } else if (isCoverageOnPreviousDay(coverage, group)) {
                     previousCoverage.push(coverage);
@@ -862,18 +915,26 @@ export function getCoveragesForDisplay(item: any, plan: any, group: any) {
     return {current: currentCoverage, previous: previousCoverage};
 }
 
-export function getListItems(groups: any, itemsById: any) {
-    const listItems: any = [];
+export function getListItems(
+    groups: Array<IAgendaListGroup>,
+    itemsById: {[itemId: string]: IAgendaItem},
+    hiddenGroupsShown: {[dateString: string]: boolean} = {}
+): Array<IAgendaListGroupItem> {
+    const listItems: Array<IAgendaListGroupItem> = [];
 
-    groups.forEach((group: any) => {
-        group.items.forEach((_id: any) => {
-            const plans = getPlanningItemsByGroup(itemsById[_id], group.date);
+    groups.forEach((group) => {
+        const items = hiddenGroupsShown[group.date] === true ?
+            [...group.hiddenItems, ...group.items] :
+            group.items;
+        items.forEach((itemId) => {
+            const plans = getPlanningItemsByGroup(itemsById[itemId], group.date);
+
             if (plans.length > 0) {
-                plans.forEach((plan: any) => {
-                    listItems.push({_id, group: group.date, plan});
+                plans.forEach((plan) => {
+                    listItems.push({_id: itemId, group: group.date, plan: plan._id});
                 });
             } else {
-                listItems.push({_id, group: group.date, plan: null});
+                listItems.push({_id: itemId, group: group.date, plan: undefined});
             }
         });
     });
@@ -906,9 +967,11 @@ export const groupRegions = (filter: any, aggregations: any, props: any) => {
 
 export const getRegionName = (key: any, locator: any) => locator.label || key;
 
-export const isItemTBC = (item: any) => (
-    !get(item, 'event') ? get(item, `planning_items[0].${TO_BE_CONFIRMED_FIELD}`) : get(item, `event.${TO_BE_CONFIRMED_FIELD}`)
-);
+export function isItemTBC(item: IAgendaItem): boolean {
+    return item.event != null ?
+        item.event._time_to_be_confirmed === true :
+        item.planning_items?.[0]?._time_to_be_confirmed === true;
+}
 
 
 /**
@@ -969,7 +1032,7 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
     return gettext('{{ type }} coverage', {type: coverageType});
 };
 
-function getScheduleType(item: any) {
+function getScheduleType(item: IAgendaItem): string {
     const start = moment(item.dates.start);
     const end = moment(item.dates.end);
     const duration = end.diff(start, 'minutes');
@@ -1005,8 +1068,8 @@ function getScheduleType(item: any) {
  * @param {Object} options
  * @return {Array} [time string, date string]
  */
-export function formatAgendaDate(item: any, group: any, {localTimeZone = true, onlyDates = false}) {
-    const getFormattedTimezone = (date: any) => {
+export function formatAgendaDate(item: IAgendaItem, group?: string, {localTimeZone = true, onlyDates = false} = {}) {
+    function getFormattedTimezone(date: moment.Moment): string {
         const tzStr = date.format('z');
         if (tzStr.indexOf('+0') >= 0) {
             return tzStr.replace('+0', 'GMT+');
@@ -1017,7 +1080,7 @@ export function formatAgendaDate(item: any, group: any, {localTimeZone = true, o
         }
 
         return tzStr;
-    };
+    }
 
     const isTBCItem = isItemTBC(item);
     let start = parseDate(item.dates.start, item.dates.all_day);
@@ -1027,17 +1090,12 @@ export function formatAgendaDate(item: any, group: any, {localTimeZone = true, o
     const isGroupBetweenEventDates = dateGroup ?
         start.isSameOrBefore(dateGroup, 'day') && end.isSameOrAfter(dateGroup, 'day') : true;
 
-    if (!isGroupBetweenEventDates && hasCoverages(item)) {
+    if (group != null && !isGroupBetweenEventDates && hasCoverages(item)) {
         // we rendering for extra days
-        const scheduleDates = item.coverages
-            .map((coverage: any) => {
-                if (isCoverageForExtraDay(coverage)) {
-                    return coverage.scheduled;
-                }
-                return null;
-            })
-            .filter((d: any) => d)
-            .sort((a: any, b: any) => {
+        const scheduleDates = (item.coverages ?? [])
+            .filter((coverage) => isCoverageForExtraDay(coverage, group))
+            .map((coverage) => coverage.scheduled)
+            .sort((a, b) => {
                 if (a < b) return -1;
                 if (a > b) return 1;
                 return 0;
