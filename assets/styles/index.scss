@@ -3749,6 +3749,10 @@ article.list {
   background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
 }
 
+.list-group-header > .p-skeleton:after {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(224, 224, 224, 0.5), rgba(255, 255, 255, 0));
+}
+
 .filter-panel__topics-list {
     display: flex;
     flex-direction: column;
