@@ -1,5 +1,6 @@
 import {get} from 'lodash';
 
+import {ISearchState} from 'interfaces';
 import {toggleValue} from 'utils';
 import {getAdvancedSearchFields} from './utils';
 
@@ -28,33 +29,14 @@ import {
 
 import {EXTENDED_VIEW} from 'wire/defaults';
 
-interface IInitialState {
-    activeTopic: any;
-    activeNavigation: any;
-    activeQuery: any;
-    activeSortQuery: any;
-    activeFilter: any;
-    createdFilter: any;
-    productId: any;
-    navigations: any;
-    products: any;
-    activeView: typeof EXTENDED_VIEW;
-    advanced: {
-        all: any;
-        any: any;
-        exclude: any;
-        fields: any;
-    };
-}
-
-const INITIAL_STATE: IInitialState = {
-    activeTopic: null,
+const INITIAL_STATE: ISearchState = {
+    activeTopic: undefined,
     activeNavigation: [],
     activeQuery: '',
     activeSortQuery: '',
     activeFilter: {},
     createdFilter: {},
-    productId: null,
+    productId: undefined,
 
     navigations: [],
     products: [],
@@ -69,7 +51,7 @@ const INITIAL_STATE: IInitialState = {
     },
 };
 
-export function searchReducer(state=INITIAL_STATE, action?: any, context?: any) : IInitialState {
+export function searchReducer(state=INITIAL_STATE, action?: any, context?: any) : ISearchState {
     if (!action) {
         state.advanced.fields = getAdvancedSearchFields(context);
 

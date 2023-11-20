@@ -1,5 +1,17 @@
+import {get, uniq} from 'lodash';
+
+import {
+    IAgendaItem,
+    IAgendaListGroup,
+    IRestApiResponse,
+    IAgendaState,
+} from 'interfaces';
 import {
     RECIEVE_ITEMS,
+    SET_LIST_GROUPS_AND_ITEMS,
+    ADD_ITEMS_TO_LIST_GROUPS,
+    SET_LIST_GROUP_HIDDEN_ITEMS,
+    TOGGLE_HIDDEN_GROUP_ITEMS,
     INIT_DATA,
     SELECT_DATE,
     WATCH_EVENTS,
@@ -11,32 +23,41 @@ import {
     WATCH_COVERAGE,
     STOP_WATCHING_COVERAGE,
     SET_ERROR,
+    SET_LOADING_HIDDEN_ITEMS,
+    RECIEVE_NEXT_ITEMS,
 } from './actions';
 
-import {get, uniq} from 'lodash';
 import {EXTENDED_VIEW} from 'wire/defaults';
 import {searchReducer} from 'search/reducers';
 import {defaultReducer} from '../reducers';
 import {EARLIEST_DATE} from './utils';
-import {ITopic} from 'interfaces/topic';
 
-const initialState = {
+const initialState: IAgendaState = {
     items: [],
+    fetchFrom: 0,
     itemsById: {},
-    aggregations: null,
-    activeItem: null,
-    previewItem: null,
-    previewGroup: null,
-    previewPlan: null,
-    openItem: null,
+    listItems: {
+        groups: [],
+        hiddenGroupsShown: {},
+        hiddenItemsLoading: false,
+    },
+    aggregations: undefined,
+    activeItem: undefined,
+    previewItem: undefined,
+    previewGroup: undefined,
+    previewPlan: undefined,
+    openItem: undefined,
     isLoading: false,
     resultsFiltered: false,
-    totalItems: null,
-    activeQuery: null,
-    user: null,
-    userObject: null,
+    totalItems: 0,
+    activeQuery: undefined,
+    // Use `window.agendaData` so these attributes always have a value
+    user: window.agendaData.user._id,
+    userObject: window.agendaData.user,
+    userType: window.agendaData.user.user_type ?? 'public',
+
     userFolders: [],
-    company: null,
+    company: undefined,
     companyFolders: [],
     topics: [],
     selectedItems: [],
@@ -51,7 +72,7 @@ const initialState = {
         activeDate: Date.now(),
         activeGrouping: 'day',
         eventsOnlyAccess: false,
-        itemType: null,
+        itemType: undefined,
         featuredOnly: false,
         agendaWireItems: [],
     },
@@ -59,18 +80,15 @@ const initialState = {
     detail: false,
     userSections: {},
     searchInitiated: false,
-    uiConfig: {},
+    uiConfig: {_id: 'agenda'},
     groups: [],
     hasAgendaFeaturedItems: false,
+    savedItemsCount: 0,
 };
 
-export interface IAgendaState {
-    topics: Array<ITopic>;
-}
-
-function recieveItems(state: any, data: any) {
+function recieveItems(state: IAgendaState, data: IRestApiResponse<IAgendaItem>): IAgendaState {
     const itemsById = Object.assign({}, state.itemsById);
-    const items = data._items.map((item: any) => {
+    const items = data._items.map((item) => {
         itemsById[item._id] = item;
         return item._id;
     });
@@ -78,46 +96,125 @@ function recieveItems(state: any, data: any) {
     return {
         ...state,
         items,
+        fetchFrom: items.length,
         itemsById,
+        listItems: {
+            ...state.listItems,
+            groups: [],
+        },
         isLoading: false,
         totalItems: data._meta.total,
-        aggregations: data._aggregations || null,
+        aggregations: data._aggregations || undefined,
         newItems: [],
         searchInitiated: false,
     };
 }
 
-function _agendaReducer(state: any, action: any) {
-    switch (action.type) {
+function updateListGroups(state: IAgendaState, updatedGroups: Array<IAgendaListGroup>): IAgendaState {
+    const updatedGroupsById = updatedGroups.reduce<{[date: string]: IAgendaListGroup}>((groups, group) => {
+        groups[group.date] = group;
 
-    case SELECT_DATE:
-        return {
-            ...state,
-            selectedItems: [],
-            activeDate: action.dateString,
-            activeGrouping: action.grouping || 'day',
-        };
+        return groups;
+    }, {});
+    const currentGroupsById = state.listItems.groups.reduce<{[date: string]: IAgendaListGroup}>((groups, group) => {
+        groups[group.date] = group;
 
-    default:
-        return state;
-    }
+        return groups;
+    }, {});
+
+    return {
+        ...state,
+        listItems: {
+            ...state.listItems,
+            groups: uniq([
+                ...Object.keys(currentGroupsById),
+                ...Object.keys(updatedGroupsById),
+            ]).sort().map((groupId) => ({
+                ...currentGroupsById[groupId] ?? {},
+                items: uniq([
+                    ...currentGroupsById[groupId]?.items ?? [],
+                    ...updatedGroupsById[groupId]?.items ?? [],
+                ]),
+                hiddenItems: uniq([
+                    ...currentGroupsById[groupId]?.hiddenItems ?? [],
+                    ...updatedGroupsById[groupId]?.hiddenItems ?? [],
+                ]),
+                date: groupId,
+            })),
+        },
+    };
 }
 
-export default function agendaReducer(state: any = initialState, action: any): IAgendaState {
+function runDefaultReducer(state: IAgendaState, action: any): IAgendaState {
+    const newState: IAgendaState = defaultReducer(state || initialState, action);
+
+    if (action.type === RECIEVE_NEXT_ITEMS && action.data.setFromSearch) {
+        // increment the `fetchFrom` number with the length of the API response
+        newState.fetchFrom += (action.data as IRestApiResponse<IAgendaItem>)._items.length;
+    }
+
+    return newState;
+}
+
+export default function agendaReducer(state: IAgendaState = initialState, action: any): IAgendaState {
     switch (action.type) {
 
     case RECIEVE_ITEMS:
         return recieveItems(state, action.data);
 
+    case SET_LOADING_HIDDEN_ITEMS:
+        return {
+            ...state,
+            listItems: {
+                ...state.listItems,
+                hiddenItemsLoading: action.data,
+            },
+        };
+
+    case SET_LIST_GROUPS_AND_ITEMS:
+        return {
+            ...state,
+            listItems: {
+                ...state.listItems,
+                groups: action.data,
+            },
+        };
+
+    case ADD_ITEMS_TO_LIST_GROUPS:
+        return updateListGroups(state, action.data);
+
+    case SET_LIST_GROUP_HIDDEN_ITEMS:
+        return updateListGroups(state, action.data);
+
+    case TOGGLE_HIDDEN_GROUP_ITEMS:
+        return {
+            ...state,
+            listItems: {
+                ...state.listItems,
+                hiddenGroupsShown: {
+                    ...state.listItems.hiddenGroupsShown,
+                    [action.data]: !state.listItems.hiddenGroupsShown[action.data],
+                },
+            },
+        };
+
     case WATCH_EVENTS: {
         const itemsById = Object.assign({}, state.itemsById);
-        action.items.forEach((_id: any) => {
-            const watches = get(itemsById[_id], 'watches', []).concat(state.user);
-            itemsById[_id] = Object.assign({}, itemsById[_id], {watches});
-            (get(itemsById[_id], 'coverages') || []).forEach((c: any) => {
-                if (get(c, 'watches.length', 0) > 0) {
-                    c.watches = [];
-                }
+        action.items.forEach((itemId: string) => {
+            if (itemsById[itemId] == null) {
+                return;
+            }
+
+            itemsById[itemId] = {
+                ...itemsById[itemId],
+                watches: [
+                    ...itemsById[itemId].watches ?? [],
+                    state.user,
+                ],
+            };
+
+            (itemsById[itemId].coverages ?? []).forEach((coverage) => {
+                coverage.watches = [];
             });
         });
 
@@ -206,7 +303,7 @@ export default function agendaReducer(state: any = initialState, action: any): I
             openItem: openItem,
             detail: !!openItem,
             agenda,
-            savedItemsCount: action.agendaData.saved_items || null,
+            savedItemsCount: action.agendaData.saved_items || 0,
             userSections: action.agendaData.userSections || {},
             locators: action.agendaData.locators || null,
             uiConfig: action.agendaData.ui_config || {},
@@ -220,9 +317,14 @@ export default function agendaReducer(state: any = initialState, action: any): I
     case SELECT_DATE:
         return {
             ...state,
-            activeItem: null,
-            previewItem: null,
-            agenda: _agendaReducer(state.agenda, action)
+            activeItem: undefined,
+            previewItem: undefined,
+            selectedItems: [],
+            agenda: {
+                ...state.agenda,
+                activeDate: action.dateString,
+                activeGrouping: action.grouping || 'day',
+            },
         };
 
     case TOGGLE_FEATURED_FILTER:
@@ -257,6 +359,6 @@ export default function agendaReducer(state: any = initialState, action: any): I
             errors: action.errors};
     }
     default:
-        return defaultReducer(state || initialState, action);
+        return runDefaultReducer(state, action);
     }
 }
