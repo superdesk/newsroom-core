@@ -5,7 +5,7 @@ export default function FilterItem({bucket, group, toggleFilter, groupFilter}: a
     const isActive = groupFilter.indexOf(bucket.key) !== -1;
 
     return (
-        <div className="form-check">
+        <div className="form-check" data-test-id="filter" data-test-value={bucket.key}>
             <input
                 type="checkbox"
                 className="form-check-input"

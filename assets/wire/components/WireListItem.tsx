@@ -197,6 +197,8 @@ class WireListItem extends React.Component<IProps, IState> {
                 onClick={() => onClick(item)}
                 onDoubleClick={() => onDoubleClick(item)}
                 onKeyDown={this.onKeyDown}
+                data-test-id="wire-item"
+                data-test-value={item._id}
             >
                 <UrgencyItemBorder item={item} listConfig={listConfig} />
                 <div className={wrapClassName} tabIndex={0}>
