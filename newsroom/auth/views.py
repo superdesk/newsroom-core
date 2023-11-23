@@ -329,7 +329,7 @@ def change_password():
                     flask.flash(gettext("Wrong current password."), "error")
                 else:
                     logger.warning("Unhandled firebase error %s", firebase_status)
-                    flask.flash(gettext("Could not change password. Please try again later."), "warning")
+                    flask.flash(gettext("Could not change your password. Please contact us for assistance."), "warning")
         elif auth_provider.type == AuthProviderType.PASSWORD:
             updates = {
                 "password": form.new_password.data,

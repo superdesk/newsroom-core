@@ -25,7 +25,6 @@ if (sendButton != null) {
         sendButton.disabled = true;
         sendPasswordResetEmail(auth, email, {url: url.toString()})
             .then(() => {
-                // set `email_sent` to true, so server knows password reset was handled by firebase
                 form.submit();
             })
             .catch((reason) => {

@@ -1,7 +1,5 @@
 import abc
 
-# from type
-
 from newsroom.types import AuthProviderConfig, AuthProviderType
 
 

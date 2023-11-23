@@ -30,7 +30,7 @@ interface IProps {
     authProviderFeatures: IUserProfileState['authProviderFeatures'];
 }
 
-class UserProfile extends React.Component<IProps> {
+class UserProfile extends React.PureComponent<IProps> {
     static propTypes: any;
     constructor(props: any) {
         super(props);
@@ -230,8 +230,5 @@ const mapDispatchToProps = (dispatch: any) => ({
     setError: (errors: {[key: string]: string}) => dispatch(setError(errors)),
     openEditTopicNotificationsModal: () => dispatch(openEditTopicNotificationsModal()),
 });
-
-type IStateProps = typeof mapStateToProps;
-type IDispatchProps = typeof mapDispatchToProps;
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserProfile);

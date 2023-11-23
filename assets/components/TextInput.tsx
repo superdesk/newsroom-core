@@ -52,8 +52,11 @@ function TextInput({
             {copyAction &&
                 <button
                     className='icon-button'
-                    onClick={(e: any) => {e.preventDefault();navigator.clipboard.writeText(value || '');}}
                     title={gettext('Copy')}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        navigator.clipboard.writeText(value || '');
+                    }}
                 >
                     <i className='icon--copy'></i>
                 </button>

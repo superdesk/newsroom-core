@@ -17,6 +17,7 @@ if (form != null) {
 
         if (newPassword !== newPassword2) {
             form.submit();
+            return;
         }
 
         signInWithEmailAndPassword(auth, firebaseUserEmail, oldPassword).then((userCredential) => {

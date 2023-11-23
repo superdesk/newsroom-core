@@ -41,7 +41,7 @@ import {SET_ERROR_MESSAGE, toggleValue} from 'utils';
 import {topicsReducer} from './topics/reducer';
 
 export interface IModalState {
-    modal: any;
+    modal: string;
     data: any;
     modalProps: any;
     formValid?: boolean;

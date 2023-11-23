@@ -39,7 +39,6 @@ class LoginForm(FlaskForm):
 
 class TokenForm(FlaskForm):
     email = StringField(lazy_gettext("Email"), validators=[DataRequired(), Length(1, 64), Email()])
-    email_sent = BooleanField("email_sent", validators=[])
 
 
 class ResetPasswordForm(FlaskForm):
