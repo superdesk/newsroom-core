@@ -354,7 +354,7 @@ export function defaultReducer(state: any = {}, action: any) {
     }
 
     case SET_NEW_ITEM: {
-        const item = state.data || {};
+        const item = action.data || {};
 
         if (!item.nextversion && !state.itemsById[item._id]) {
             return {
