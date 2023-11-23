@@ -200,7 +200,7 @@ class EditCompany extends React.Component<IProps, IState> {
                                 onChange={this.props.onChange}
                                 save={this.save}
                                 deleteCompany={this.deleteCompany}
-                                ssoEnabled={this.props.ssoEnabled && currentAuthProvider?.auth_type === 'saml'}
+                                ssoEnabled={this.props.ssoEnabled && currentAuthProvider?.auth_type !== 'password'}
                                 authProviders={this.props.authProviders}
                                 countries = {this.props.countries}
                             />

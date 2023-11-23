@@ -80,7 +80,7 @@ class TextListInput extends React.Component<any, any> {
                 {!readOnly && <TextInput
                     name={name}
                     onChange={this.inputChange}
-                    onKeyDown={(event: any) => {
+                    onKeyDown={(event) => {
                         if (event.keyCode === KEYCODES.ENTER ||
                             event.keyCode === KEYCODES.DOWN) {
                             event.preventDefault();

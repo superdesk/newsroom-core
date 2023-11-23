@@ -14,6 +14,7 @@ from werkzeug.exceptions import NotFound, BadRequest
 
 from newsroom.decorator import admin_only, account_manager_only, login_required
 from newsroom.companies import blueprint
+from newsroom.types import AuthProviderConfig
 from newsroom.utils import (
     query_resource,
     find_one,
@@ -28,6 +29,13 @@ def get_company_types_options(company_types):
 
 
 def get_settings_data():
+    def render_provider(provider: AuthProviderConfig) -> Dict[str, str]:
+        return {
+            "_id": provider["_id"],
+            "name": str(provider["name"]),
+            "auth_type": provider["auth_type"].value,
+        }
+
     return {
         "companies": list(query_resource("companies")),
         "services": app.config["SERVICES"],
@@ -38,7 +46,7 @@ def get_settings_data():
         "ui_config": get_resource_service("ui_config").get_section_config("companies"),
         "countries": app.countries,
         "sso_enabled": bool(app.config.get("SAML_CLIENTS") or app.config.get("SAML_PATH")),
-        "auth_providers": app.config.get("AUTH_PROVIDERS"),
+        "auth_providers": [render_provider(provider) for provider in app.config.get("AUTH_PROVIDERS") or []],
     }
 
 

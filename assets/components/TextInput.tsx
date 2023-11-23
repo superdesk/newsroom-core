@@ -5,24 +5,45 @@ import InputWrapper from './InputWrapper';
 
 import {gettext} from 'utils';
 
+interface IProps {
+    type?: string;
+    name: string;
+    label?: string;
+    labelClasses? : string;
+    value?: string;
+    copyAction?: boolean;
+    error?: string[] | null;
+    required?: boolean;
+    maxLength?: number;
+    placeholder?: string;
+    description?: string;
+    min?: number;
+    autoFocus?: boolean;
+    readOnly?: boolean;
+    onChange?: React.ChangeEventHandler<HTMLInputElement>;
+    onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
+    props?: {[key: string]: any};
+}
+
 function TextInput({
     type,
     name,
     label,
     labelClasses,
-    onChange,
     value,
     error,
     required,
     readOnly,
+    onChange,
     maxLength,
     placeholder,
     description,
     min,
     autoFocus,
     copyAction,
+    onKeyDown,
     ...props
-}: any) {
+}: IProps) {
     return (
         <InputWrapper error={error} name={name} testId={`field-${name}`}>
             {label && (
@@ -31,8 +52,11 @@ function TextInput({
             {copyAction &&
                 <button
                     className='icon-button'
-                    onClick={(e: any) => {e.preventDefault();navigator.clipboard.writeText(value);}}
                     title={gettext('Copy')}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        navigator.clipboard.writeText(value || '');
+                    }}
                 >
                     <i className='icon--copy'></i>
                 </button>
@@ -45,13 +69,14 @@ function TextInput({
                     name={name}
                     className="form-control"
                     value={value}
-                    onChange={onChange}
+                    onChange={readOnly === true ? undefined : onChange}
                     required={required}
                     maxLength={maxLength}
                     disabled={readOnly}
                     placeholder={placeholder}
                     min={min}
                     autoFocus={autoFocus}
+                    onKeyDown={onKeyDown}
                     {...props}
                 />
                 {error && <div className="alert alert-danger">{error}</div>}
@@ -81,6 +106,4 @@ TextInput.propTypes = {
 
 TextInput.defaultProps = {autoFocus: false};
 
-const component: React.ComponentType<any> = TextInput;
-
-export default component;
+export default TextInput;
