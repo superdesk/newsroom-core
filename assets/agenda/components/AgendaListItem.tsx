@@ -1,14 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {get, isEqual} from 'lodash';
+
+import {IAgendaItem, IItemAction, IListConfig, IUser} from 'interfaces';
 
 import ActionButton from 'components/ActionButton';
-
 import AgendaListItemIcons from './AgendaListItemIcons';
 import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
 import AgendaInternalNote from './AgendaInternalNote';
-import {PlainText} from 'ui/components/PlainText';
 
 import {
     hasCoverages,
@@ -17,7 +15,6 @@ import {
     isRescheduled,
     getName,
     isWatched,
-    getDescription,
     getHighlightedDescription,
     getHighlightedName,
     getInternalNote,
@@ -25,20 +22,34 @@ import {
 import ActionMenu from '../../components/ActionMenu';
 import {LIST_ANIMATIONS, isMobilePhone} from 'utils';
 
-class AgendaListItem extends React.Component<any, any> {
-    static propTypes: any;
+interface IProps {
+    item: IAgendaItem;
+    group: string;
+    isActive: boolean;
+    isSelected: boolean;
+    isRead: boolean;
+    showActions: boolean;
+    actions: Array<IItemAction>;
+    isExtended: boolean;
+    user: IUser['_id'];
+    actioningItem?: IAgendaItem;
+    planningId?: IAgendaItem['_id'];
+    showShortcutActionIcons: boolean;
+    listConfig: IListConfig;
 
-    slugline: any;
-    state: any;
-    dom: any;
+    onClick(item: IAgendaItem, group: string, planningId?: IAgendaItem['_id']): void;
+    onDoubleClick(item: IAgendaItem, group: string, planningId?: IAgendaItem['_id']): void;
+    onActionList(event: React.MouseEvent, item: IAgendaItem, group: string, plan?: IAgendaItem): void;
+    toggleSelected(): void;
+    resetActioningItem(): void;
+}
 
-    constructor(props: any) {
+class AgendaListItem extends React.Component<IProps> {
+    dom: {article: HTMLElement | null};
+
+    constructor(props: IProps) {
         super(props);
-        this.slugline = props.item.slugline && props.item.slugline.trim();
-
-        this.state = {previousVersions: false};
         this.dom = {article: null};
-
         this.onKeyDown = this.onKeyDown.bind(this);
         this.setArticleRef = this.setArticleRef.bind(this);
         this.onArticleClick = this.onArticleClick.bind(this);
@@ -46,7 +57,7 @@ class AgendaListItem extends React.Component<any, any> {
         this.onMouseEnter = this.onMouseEnter.bind(this);
     }
 
-    onKeyDown(event: any) {
+    onKeyDown(event: React.KeyboardEvent) {
         switch (event.key) {
         case ' ':  // on space toggle selected item
             this.props.toggleSelected();
@@ -59,7 +70,7 @@ class AgendaListItem extends React.Component<any, any> {
         event.preventDefault();
     }
 
-    setArticleRef(elem: any) {
+    setArticleRef(elem: HTMLElement) {
         this.dom.article = elem;
     }
 
@@ -77,32 +88,34 @@ class AgendaListItem extends React.Component<any, any> {
         }
     }
 
-    shouldComponentUpdate(nextProps: any, nextState: any) {
-        const {props, state} = this;
+    shouldComponentUpdate(nextProps: Readonly<IProps>) {
+        const {props} = this;
+        const currentBookmarked = (props.item.bookmarks || []).includes(props.user);
+        const nextBookmarked = (nextProps.item.bookmarks || []).includes(nextProps.user);
 
-        return props.item._etag !== nextProps.item._etag || state.hover !== nextState.hover ||
-            props.isActive !== nextProps.isActive || props.isSelected !== nextProps.isSelected ||
+        return props.item._etag !== nextProps.item._etag ||
+            props.isActive !== nextProps.isActive ||
+            props.isSelected !== nextProps.isSelected ||
             props.isExtended !== nextProps.isExtended ||
-            get(props.actioningItem, '_id') === props.item._id ||
-            get(nextProps.actioningItem, '_id') === props.item._id ||
+            props.actioningItem?._id === props.item._id ||
+            nextProps.actioningItem?._id === props.item._id ||
             props.isRead !== nextProps.isRead ||
-            (get(props, 'item.bookmarks') || []).includes(props.user) !==
-            (get(nextProps, 'item.bookmarks') || []).includes(nextProps.user) ||
-            isWatched(props.item, props.user) !== isWatched(nextProps.item, nextProps.user) ||
-            isEqual(get(nextProps, 'coverages'), get(this.props, 'coverages'));
+            currentBookmarked !== nextBookmarked ||
+            nextBookmarked ||
+            isWatched(props.item, props.user) !== isWatched(nextProps.item, nextProps.user);
     }
 
     componentDidMount() {
-        if (this.props.isActive && this.dom.article) {
+        if (this.props.isActive === true && this.dom.article != null) {
             this.dom.article.focus();
         }
     }
 
-    stopPropagation(event: any) {
+    stopPropagation(event: React.MouseEvent) {
         event.stopPropagation();
     }
 
-    getClassNames(isExtended: any) {
+    getClassNames(isExtended: boolean) {
         return {
             card: classNames('wire-articles__item-wrap col-12 agenda-item'),
             wrap: classNames('wire-articles__item wire-articles__item--agenda wire-articles__item--list', {
@@ -129,7 +142,6 @@ class AgendaListItem extends React.Component<any, any> {
     getSegments(description: string) {
         const dom = new DOMParser().parseFromString(description.replace(/\n/g, '<br />'), 'text/html');
         const arrayOfParagraphs = dom.body.querySelectorAll('p');
-        const body = dom.body;
 
         const getSegmentCount = (p: HTMLParagraphElement): number => {
             // adding one because if there are 2 <br> tags it means there are 3 segments
@@ -140,7 +152,7 @@ class AgendaListItem extends React.Component<any, any> {
         let segmentsRemainingToBeAdded = 3;
         let paragraphsInnerText = '';
 
-        [...arrayOfParagraphs].forEach(paragraph => {
+        arrayOfParagraphs.forEach(paragraph => {
             if (segmentsRemainingToBeAdded > 0) {
                 paragraphsInnerText += paragraph.innerText;
                 paragraph.innerHTML = paragraph.innerHTML.split('<br>').filter((p: string) => p.trim() !== '').slice(0, segmentsRemainingToBeAdded).join('<br>');
@@ -156,20 +168,17 @@ class AgendaListItem extends React.Component<any, any> {
              * keep in mind that first 3 segments might be 1-3 paragraphs
              */
             firstThreeSegments: descriptionHTMLArr,
-            hasMoreContent: body.innerText.length > paragraphsInnerText.length,
+            hasMoreContent: dom.body.innerText.length > paragraphsInnerText.length,
         };
     }
 
-    renderListItem(isMobile: any, children: any) {
+    renderListItem(isMobile: boolean, children: React.ReactNode) {
         const {item, isExtended, group, planningId, listConfig} = this.props;
         const classes = this.getClassNames(isExtended);
-        const planningItem = (get(item, 'planning_items') || []).find((p: any) => p.guid === planningId) || null;
-        const description: string = item.es_highlight
-            ? getHighlightedDescription(item, planningItem)
-            : getDescription(item,planningItem);
+        const planningItem = (item.planning_items || []).find((p) => p.guid === planningId);
+        const description = getHighlightedDescription(item, planningItem);
         // Show headline for adhoc planning items
-        const showHeadline = !item.event && get(item, 'headline.length', 0) > 0;
-
+        const showHeadline = item.event == null && (item.headline?.length ?? 0) > 0;
         const {firstThreeSegments, hasMoreContent} =  this.getSegments(description);
 
         const renderDescription = (() => {
@@ -264,7 +273,7 @@ class AgendaListItem extends React.Component<any, any> {
 
     renderNonMobile() {
         const {item, planningId} = this.props;
-        const planningItem = (get(item, 'planning_items') || []).find((p: any) => p.guid === planningId) || {};
+        const planningItem = (item.planning_items || []).find((p) => p.guid === planningId);
 
         return this.renderListItem(false, !this.props.actions.length ? null : (
             <div className='wire-articles__item-actions' onClick={this.stopPropagation}>
@@ -279,7 +288,7 @@ class AgendaListItem extends React.Component<any, any> {
                     showShortcutActions={!this.props.showShortcutActionIcons}
                 />
 
-                {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action: any) => action.shortcut && (
+                {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action) => action.shortcut && (
                     <ActionButton
                         key={action.name}
                         className="icon-button icon-button--primary"
@@ -294,7 +303,7 @@ class AgendaListItem extends React.Component<any, any> {
 
     renderMobile() {
         const {item, planningId} = this.props;
-        const planningItem = (get(item, 'planning_items') || []).find((p: any) => p.guid === planningId) || {};
+        const planningItem = (item.planning_items || []).find((p) => p.guid === planningId);
         const internalNote = getInternalNote(item, planningItem);
 
         return this.renderListItem(true, (
@@ -309,7 +318,7 @@ class AgendaListItem extends React.Component<any, any> {
                     noPaddingRight={true}
                 />
 
-                {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action: any) => action.shortcut && (
+                {!this.props.showShortcutActionIcons ? null : this.props.actions.map((action) => action.shortcut && (
                     <ActionButton
                         key={action.name}
                         className="icon-button icon-button--primary"
@@ -340,29 +349,5 @@ class AgendaListItem extends React.Component<any, any> {
             this.renderNonMobile();
     }
 }
-
-AgendaListItem.propTypes = {
-    item: PropTypes.object.isRequired,
-    group: PropTypes.string,
-    isActive: PropTypes.bool.isRequired,
-    isSelected: PropTypes.bool.isRequired,
-    isRead: PropTypes.bool.isRequired,
-    onClick: PropTypes.func.isRequired,
-    onDoubleClick: PropTypes.func.isRequired,
-    onActionList: PropTypes.func.isRequired,
-    showActions: PropTypes.bool.isRequired,
-    toggleSelected: PropTypes.func.isRequired,
-    actions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string,
-        action: PropTypes.func,
-    })),
-    isExtended: PropTypes.bool.isRequired,
-    user: PropTypes.string,
-    actioningItem: PropTypes.object,
-    resetActioningItem: PropTypes.func,
-    planningId: PropTypes.string,
-    showShortcutActionIcons: PropTypes.bool,
-    listConfig: PropTypes.object,
-};
 
 export default AgendaListItem;

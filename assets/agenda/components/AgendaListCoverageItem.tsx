@@ -1,8 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {get, isEqual} from 'lodash';
+import {isEqual} from 'lodash';
 
+import {IAgendaItem, ICoverage, IUser} from 'interfaces';
 import {gettext} from '../../utils';
 import {
     getCoverageIcon,
@@ -14,48 +14,64 @@ import {
     COVERAGE_STATUS_COLORS
 } from '../utils';
 
-class AgendaListCoverageItem extends React.Component<any, any> {
-    static propTypes: any;
-    constructor(props: any) {
+interface IProps {
+    group: string;
+    planningItem: IAgendaItem;
+    user: IUser['_id'];
+    coverage: ICoverage;
+    showBorder?: boolean;
+}
+
+interface IState {
+    coverageClass: string;
+    beingUpdated: boolean;
+    isWatched: boolean;
+    watchText: string;
+    isCoverageForExtraDay: boolean;
+    tooltip: string;
+}
+
+class AgendaListCoverageItem extends React.Component<IProps, IState> {
+    constructor(props: IProps) {
         super(props);
 
-        this.state = this.getUpdatedState(props);
+        this.state = this.getUpdatedState();
     }
 
-    shouldComponentUpdate(nextProps: any) {
+    shouldComponentUpdate(nextProps: IProps) {
         return !isEqual(this.props.coverage, nextProps.coverage);
     }
 
-    componentWillReceiveProps(nextProps: any) {
-        if (!isEqual(this.props.coverage, nextProps.coverage)) {
-            this.setState(this.getUpdatedState(nextProps));
+    componentDidUpdate(prevProps: Readonly<IProps>) {
+        if (!isEqual(prevProps.coverage, this.props.coverage)) {
+            this.setState(this.getUpdatedState());
         }
     }
 
-    getUpdatedState(props: any) {
-        const watched = isWatched(props.coverage, props.user);
+    getUpdatedState(): IState {
+        const watched = isWatched(this.props.coverage, this.props.user);
+        const watchText = watched ? gettext('(Watching)') : '';
+        const beingUpdated = isCoverageBeingUpdated(this.props.coverage);
 
-        const state: any = {
-            coverageClass: `icon--coverage-${getCoverageIcon(props.coverage.coverage_type)}`,
-            beingUpdated: isCoverageBeingUpdated(props.coverage),
+        return {
+            coverageClass: `icon--coverage-${getCoverageIcon(this.props.coverage.coverage_type)}`,
+            beingUpdated: beingUpdated,
             isWatched: watched,
-            watchText: watched ? gettext('(Watching)') : '',
-            isCoverageForExtraDay: isCoverageForExtraDay(props.coverage),
+            watchText: watchText,
+            isCoverageForExtraDay: isCoverageForExtraDay(this.props.coverage, this.props.group),
+            tooltip: `${watchText} ${getCoverageTooltip(this.props.coverage, beingUpdated)}`,
         };
-
-        state.tooltip = `${state.watchText} ${getCoverageTooltip(props.coverage, state.beingUpdated)}`;
-
-        return state;
     }
 
     render() {
         const props = this.props;
         const state = this.state;
-        const coverage_icon = get(COVERAGE_STATUS_COLORS, props.coverage.coverage_status) || WORKFLOW_COLORS[props.coverage.workflow_status];
+        const coverage_icon = COVERAGE_STATUS_COLORS[props.coverage.coverage_status] ||
+            WORKFLOW_COLORS[props.coverage.workflow_status];
         return (
             !props.group ||
             props.coverage.scheduled == null ||
-            (state.isCoverageForExtraDay && props.coverage.planning_id === get(props, 'planningItem.guid'))
+            (state.isCoverageForExtraDay && props.coverage.planning_id === props.planningItem.guid)
         ) && (
             <span
                 className={classNames('wire-articles__item__icon',`${coverage_icon}`, {'dashed-border': props.showBorder})}
@@ -70,13 +86,5 @@ class AgendaListCoverageItem extends React.Component<any, any> {
         );
     }
 }
-
-AgendaListCoverageItem.propTypes = {
-    planningItem: PropTypes.object,
-    user: PropTypes.string,
-    coverage: PropTypes.object,
-    showBorder: PropTypes.bool,
-    group: PropTypes.string,
-};
 
 export default AgendaListCoverageItem;

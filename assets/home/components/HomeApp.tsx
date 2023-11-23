@@ -1,7 +1,9 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {getConfig, gettext, isDisplayed, isMobilePhone} from 'utils';
 import {get} from 'lodash';
+
+import {ITopic, IItemAction} from 'interfaces';
+import {gettext, isDisplayed, isMobilePhone} from 'utils';
 import {getCard} from 'components/cards/utils';
 import getItemActions from 'wire/item-actions';
 import ItemDetails from 'wire/components/ItemDetails';
@@ -20,7 +22,6 @@ import {personalizeHome} from 'agenda/actions';
 import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 import {getCurrentUser} from 'company-admin/selectors';
 import {IPersonalizedDashboardsWithData} from 'home/reducers';
-import {ITopic} from 'interfaces/topic';
 
 export const WIRE_SECTION = 'wire';
 
@@ -35,36 +36,39 @@ interface IState {
     activeOptionId: 'default' | 'my-home';
 }
 
-interface IProps {
+interface IStateProps {
     cards: Array<any>;
+    personalizedDashboards: Array<IPersonalizedDashboardsWithData>;
     itemsByCard: any;
     products: Array<any>;
     user: string;
     userType: string;
+    userSections: any;
     company: string;
-    format: Array<any>;
     itemToOpen: any;
-    personalizedDashboards: Array<IPersonalizedDashboardsWithData>;
     modal: any;
-    openItemDetails: () => void;
     activeCard: string;
-    actions: Array<{name: string; action: (action?: any) => void;}>;
-    fetchCardExternalItems: (cardId: string, cardLabel: string) => void;
-    personalizeHome: () => void;
-    fetchCompanyCardItems: () => void;
-    followStory: () => void;
     previewConfig: any;
     listConfig: any;
     detailsConfig: any;
-    downloadMedia: () => void;
     topics: Array<ITopic>;
-    isFollowing: boolean;
     isSearchEnabled: boolean;
     filterGroupLabels: any;
     currentUser: any;
-    fetchItems: () => any;
-    userSections: any;
 }
+
+interface IDispatchProps {
+    openItemDetails: (item: any, state: any) => void;
+    fetchItems: () => any;
+    personalizeHome: () => void;
+    actions: Array<IItemAction>;
+    fetchCardExternalItems: (cardId: string, cardLabel: string) => any;
+    fetchCompanyCardItems: () => any;
+    followStory: (item: any) => void;
+    downloadMedia: (href: any, id: any) => any;
+}
+
+type IProps = IStateProps & IDispatchProps;
 
 class HomeApp extends React.Component<IProps, IState> {
     static propTypes: any;
@@ -343,7 +347,7 @@ class HomeApp extends React.Component<IProps, IState> {
                         user={this.props.user}
                         topics={this.props.topics}
                         actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
-                        onClose={() => this.props.actions.filter((a: any) => a.id === 'open')[0].action(null)}
+                        onClose={() => this.props.actions.filter((a: any) => a.id === 'open')[0].action()}
                         followStory={this.props.followStory}
                         detailsConfig={this.props.detailsConfig}
                         filterGroupLabels={this.props.filterGroupLabels}
@@ -369,7 +373,7 @@ class HomeApp extends React.Component<IProps, IState> {
                         actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
                         followStory={this.props.followStory}
                         isFollowing={!!isFollowing}
-                        closePreview={() => this.props.actions.filter((a: any) => a.id === 'open')[0].action(null)}
+                        closePreview={() => this.props.actions.filter((a) => a.id === 'open')[0].action()}
                         previewConfig={this.props.previewConfig}
                         downloadMedia={this.props.downloadMedia}
                         listConfig={this.props.listConfig}
@@ -426,4 +430,9 @@ const mapDispatchToProps = (dispatch: any, state: any) => ({
 });
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomeApp);
+export default connect<
+    IStateProps,
+    IDispatchProps,
+    {},
+    any
+>(mapStateToProps, mapDispatchToProps)(HomeApp);

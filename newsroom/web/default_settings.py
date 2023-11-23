@@ -655,14 +655,6 @@ AUTH_PROVIDERS: List[AuthProviderConfig] = [
     }
 ]
 
-#:
-#: If `True` it will show multi day events only on starting day,
-#  when `False` those will be visible on every day.
-#:
-#: .. versionadded: 2.5.0
-#:
-AGENDA_SHOW_MULTIDAY_ON_START_ONLY = True
-
 FIREBASE_CLIENT_CONFIG = {
     "apiKey": env("FIREBASE_API_KEY"),
     "authDomain": env("FIREBASE_AUTH_DOMAIN"),

@@ -8,6 +8,8 @@ export interface IUserDashboard {
     topic_ids: Array<ITopic['_id']>;
 }
 
+export type IUserType = 'administrator' | 'internal' | 'public' | 'company_admin' | 'account_management';
+
 export interface IUser {
     _id: string;
     first_name: string;
@@ -19,7 +21,7 @@ export interface IUser {
     signup_details?: {[key: string]: any};
     country: string;
     company: ICompany['_id'];
-    user_type: 'administrator' | 'internal' | 'public' | 'company_admin' | 'account_management';
+    user_type: IUserType;
     is_validated?: boolean;
     is_enabled?: boolean;
     is_approved?: boolean;

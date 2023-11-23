@@ -1,6 +1,13 @@
 import {get, isEmpty, includes, cloneDeep} from 'lodash';
 import moment from 'moment';
 
+import {
+    IRestApiResponse,
+    IAgendaItem,
+    IAgendaListGroup,
+    IAgendaState,
+    AgendaThunkAction, ISearchState,
+} from 'interfaces';
 import server from 'server';
 import analytics from 'analytics';
 import {
@@ -19,6 +26,7 @@ import {renderModal, setSavedItemsCount} from 'actions';
 import {
     getDateInputDate,
     getMomentDate,
+    groupItems,
 } from './utils';
 
 import {
@@ -140,8 +148,23 @@ export function queryItems() {
 }
 
 export const RECIEVE_ITEMS = 'RECIEVE_ITEMS';
-export function recieveItems(data: any) {
+export function recieveItems(data: IRestApiResponse<IAgendaItem>) {
     return {type: RECIEVE_ITEMS, data};
+}
+
+export const SET_LIST_GROUPS_AND_ITEMS = 'SET_LIST_GROUPS_AND_ITEMS';
+function setListGroupsAndItems(groupItems: Array<IAgendaListGroup>) {
+    return {type: SET_LIST_GROUPS_AND_ITEMS, data: groupItems};
+}
+
+export const ADD_ITEMS_TO_LIST_GROUPS = 'ADD_ITEMS_TO_LIST_GROUPS';
+function addItemsToListGroups(groupItems: Array<IAgendaListGroup>) {
+    return {type: ADD_ITEMS_TO_LIST_GROUPS, data: groupItems};
+}
+
+export const TOGGLE_HIDDEN_GROUP_ITEMS = 'TOGGLE_HIDDEN_GROUP_ITEMS';
+export function toggleHiddenGroupItems(dateString: string) {
+    return {type: TOGGLE_HIDDEN_GROUP_ITEMS, data: dateString};
 }
 
 export const RECIEVE_ITEM = 'RECIEVE_ITEM';
@@ -199,58 +222,26 @@ export function copyPreviewContents(item: any) {
     };
 }
 
-/**
- * Search server request
- *
- * @param {Object} state
- * @param {bool} next
- * @return {Promise}
- */
-function search(state: any, next?: any) {
-    const currentMoment = moment();
-    const searchParams: any = searchParamsSelector(state);
-    const createdFilter: any = get(searchParams, 'created') || {};
-    const itemTypeFilter: any = get(state, 'agenda.itemType');
-    const eventsOnlyFilter: any = !state.bookmarks && itemTypeFilter === 'events';
-
-    const featuredFilter = noNavigationSelected(searchParams.navigation) &&
-        !state.bookmarks &&
-        !eventsOnlyFilter &&
-        get(state, 'agenda.featuredOnly');
-
-    let fromDateFilter: any;
-
-    if (featuredFilter) {
-        fromDateFilter = getMomentDate(get(state, 'agenda.activeDate')).set({
-            hour: currentMoment.hour(),
-            minute: currentMoment.minute()
-        }).format('DD/MM/YYYY HH:mm'); // Server expects specific date/time format for FeaturedStories param
-    } else {
-        const agendaDate = getDateInputDate(get(state, 'agenda.activeDate'));
-        fromDateFilter = (
-            isEmpty(createdFilter.from) &&
-            isEmpty(createdFilter.to) &&
-            !(state.bookmarks && state.user)
-        ) ? agendaDate : createdFilter.from;
-    }
-
-    let dateTo = createdFilter.to;
-    if (createdFilter.from && createdFilter.from.indexOf('now') >= 0) {
-        dateTo = createdFilter.from;
-    }
+function search(state: IAgendaState, fetchFrom: number): Promise<IRestApiResponse<IAgendaItem>> {
+    const {
+        itemType,
+        searchParams,
+        featured,
+        fromDate,
+        toDate,
+    } = getAgendaSearchParamsFromState(state);
 
     const params: any = {
         q: searchParams.query,
-        id: state.queryId,
         bookmarks: state.bookmarks && state.user,
         navigation: getNavigationUrlParam(searchParams.navigation, true, false),
         filter: !isEmpty(searchParams.filter) && encodeURIComponent(JSON.stringify(searchParams.filter)),
-        from: next ? state.items.length : 0,
-        date_from: fromDateFilter,
-        date_to: dateTo,
+        from: fetchFrom,
+        date_from: fromDate,
+        date_to: toDate,
         timezone_offset: getTimezoneOffset(),
-        featured: featuredFilter,
-        itemType: itemTypeFilter,
+        featured: featured,
+        itemType: itemType,
         advanced: !searchParams.advanced ? null : encodeURIComponent(JSON.stringify(searchParams.advanced)),
         es_highlight: !searchParams.query && !searchParams.advanced ? null : 1,
     };
@@ -266,16 +257,107 @@ function search(state: any, next?: any) {
 /**
  * Fetch items for current query
  */
-export function fetchItems(): any {
-    return (dispatch: any, getState: any) => {
+export function fetchItems(): AgendaThunkAction {
+    return (dispatch, getState) => {
         const start = Date.now();
         dispatch(queryItems());
-        return search(getState())
-            .then((data: any) => dispatch(recieveItems(data)))
+        return search(getState(), 0)
+            .then((data) => {
+                dispatch(recieveItems(data));
+                return dispatch(setListGroupsAndLoadHiddenItems(data._items, false));
+            })
             .then(() => {
                 analytics.timingComplete('search', Date.now() - start);
             })
             .catch((error) => errorHandler(error, dispatch, setError));
+    };
+}
+
+interface AgendaSearchParams {
+    itemType: IAgendaState['agenda']['itemType'];
+    searchParams: any;
+    featured: boolean;
+    fromDate?: string;
+    toDate?: string;
+}
+
+function getAgendaSearchParamsFromState(state: IAgendaState): AgendaSearchParams {
+    const itemTypeFilter = state.agenda.itemType;
+    const eventsOnlyFilter = !state.bookmarks && itemTypeFilter === 'events';
+    const searchParams: any = searchParamsSelector(state);
+    const createdFilter: ISearchState['createdFilter'] = searchParams.created || {};
+    const currentMoment = moment();
+    const featuredFilter = noNavigationSelected(searchParams.navigation) &&
+        !state.bookmarks &&
+        !eventsOnlyFilter &&
+        state.agenda.featuredOnly === true;
+    let fromDate: string | undefined;
+
+    if (featuredFilter) {
+        fromDate = getMomentDate(state.agenda.activeDate).set({
+            hour: currentMoment.hour(),
+            minute: currentMoment.minute()
+        }).format('DD/MM/YYYY HH:mm'); // Server expects specific date/time format for FeaturedStories param
+    } else {
+        const agendaDate = getDateInputDate(state.agenda.activeDate);
+
+        fromDate = (
+            createdFilter.from == null &&
+            createdFilter.to == null &&
+            state.bookmarks !== true
+        ) ? agendaDate : createdFilter.from;
+    }
+
+    return {
+        itemType: itemTypeFilter,
+        searchParams: searchParams,
+        featured: featuredFilter,
+        fromDate: fromDate,
+        toDate: createdFilter.from?.startsWith('now/') ?
+            createdFilter.from :
+            createdFilter.to,
+    };
+}
+
+function setListGroupsAndLoadHiddenItems(items: Array<IAgendaItem>, next?: boolean): AgendaThunkAction {
+    return (dispatch, getState) => {
+        // If there are groups shown, then load the hidden items for those groups
+        const state = getState();
+        const {activeGrouping, featuredOnly} = state.agenda;
+        const {fromDate, toDate} = getAgendaSearchParamsFromState(state);
+        let minDate: moment.Moment;
+        let maxDate: moment.Moment | undefined;
+
+        if (toDate != null && fromDate?.startsWith('now/') != true) {
+            maxDate = moment(toDate);
+        }
+        if (fromDate?.startsWith('now/')) {
+            if (fromDate === 'now/w') {
+                minDate = moment().startOf('week');
+                maxDate = minDate.clone().add(1, 'week').subtract(1, 'day');
+            } else if (fromDate === 'now/M') {
+                minDate = moment().startOf('month');
+                maxDate = minDate.clone().add(1, 'month').subtract(1, 'day');
+            } else {
+                minDate = moment().startOf('day');
+                maxDate = minDate.clone();
+            }
+        } else {
+            minDate = moment(fromDate);
+        }
+        minDate.set({'h': 0, 'm': 0, 's': 0});
+
+        if (maxDate != null) {
+            maxDate.set({'h': 23, 'm': 59, 's': 59});
+        }
+
+        const groups = groupItems(items, minDate, maxDate, activeGrouping, featuredOnly);
+
+        next === true ?
+            dispatch(addItemsToListGroups(groups)) :
+            dispatch(setListGroupsAndItems(groups));
+
+        return;
     };
 }
 
@@ -567,13 +649,13 @@ export function startLoading() {
 }
 
 export const RECIEVE_NEXT_ITEMS = 'RECIEVE_NEXT_ITEMS';
-export function recieveNextItems(data: any) {
-    return {type: RECIEVE_NEXT_ITEMS, data};
+export function recieveNextItems(data: IRestApiResponse<IAgendaItem>, setFetchFrom: boolean) {
+    return {type: RECIEVE_NEXT_ITEMS, data: {...data, setFetchFrom: setFetchFrom}};
 }
 
 const MAX_ITEMS = 1000; // server limit
-export function fetchMoreItems() {
-    return (dispatch: any, getState: any) => {
+export function fetchMoreItems(): AgendaThunkAction {
+    return (dispatch, getState) => {
         const state = getState();
         const limit = Math.min(MAX_ITEMS, state.totalItems);
 
@@ -582,8 +664,11 @@ export function fetchMoreItems() {
         }
 
         dispatch(startLoading());
-        return search(getState(), true)
-            .then((data: any) => dispatch(recieveNextItems(data)))
+        return search(getState(), state.fetchFrom)
+            .then((data) => {
+                dispatch(recieveNextItems(data, true));
+                return dispatch(setListGroupsAndLoadHiddenItems(data._items, true));
+            })
             .catch(errorHandler);
     };
 }
