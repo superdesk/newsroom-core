@@ -1,9 +1,9 @@
 import os
 import pathlib
-from typing import List
 import tzlocal
 import logging
 
+from typing import List
 from kombu import Queue, Exchange
 from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
@@ -53,6 +53,8 @@ from superdesk.default_settings import (  # noqa
     SENTRY_DSN,
     CACHE_URL,
 )
+
+from newsroom.types import AuthProviderConfig, AuthProviderType
 
 logger = logging.getLogger()
 
@@ -640,15 +642,24 @@ AGENDA_SEARCH_FIELDS = [
     "location.name",
 ]
 
+
 #: The available authentication providers
 #:
 #: .. versionadded:: 2.5.0
 #:
-AUTH_PROVIDERS = [
+AUTH_PROVIDERS: List[AuthProviderConfig] = [
     {
         "_id": "newshub",
         "name": lazy_gettext("Newshub"),
-        "auth_type": "password",
-        "features": {"verify_email": True},
+        "auth_type": AuthProviderType.PASSWORD,
     }
 ]
+
+FIREBASE_CLIENT_CONFIG = {
+    "apiKey": env("FIREBASE_API_KEY"),
+    "authDomain": env("FIREBASE_AUTH_DOMAIN"),
+    "projectId": env("FIREBASE_PROJECT_ID"),
+    "messagingSenderId": env("FIREBASE_SENDER_ID"),
+}
+
+FIREBASE_ENABLED = bool(FIREBASE_CLIENT_CONFIG["apiKey"] and FIREBASE_CLIENT_CONFIG["authDomain"])

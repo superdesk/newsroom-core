@@ -47,6 +47,12 @@ class ResetPasswordForm(FlaskForm):
         Length(min=8),
         EqualTo("new_password2", message=lazy_gettext("Passwords must match.")),
     ]
-    old_password = PasswordField(lazy_gettext("Old password"), validators=[])
+    old_password = PasswordField(
+        lazy_gettext("Current password"),
+        validators=[],
+    )
     new_password = PasswordField(lazy_gettext("New password"), validators=match_password2)
     new_password2 = PasswordField(lazy_gettext("Confirm new password"), validators=[DataRequired()])
+
+    email = StringField(lazy_gettext("Email"), validators=[])  # for autocomplete
+    firebase_status = StringField("firebase_status", validators=[])  # for firebase status code

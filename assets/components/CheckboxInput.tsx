@@ -2,8 +2,16 @@ import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
+interface IProps {
+    name?: string;
+    label: string;
+    readOnly?: boolean;
+    labelClass?: string;
+    value?: boolean;
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
 
-function CheckboxInput({name, label, onChange, value, labelClass, readOnly}: any) {
+function CheckboxInput({name, label, onChange, value, labelClass, readOnly}: IProps) {
     if (!name) {
         name = `input-${label}`;
     }

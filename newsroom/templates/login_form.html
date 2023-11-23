@@ -5,11 +5,11 @@
 
     <div class="form-group">
         <label for="email">{{ form.email.label.text }}</label>
-        {{ form.email(class="form-control", id="email", required="true") }}
+        {{ form.email(class="form-control", id="email", required="true", autocomplete="username") }}
     </div>
     <div class="form-group">
         <label for="password">{{ form.password.label.text }}</label>
-        {{ form.password(class="form-control", id="password", required="true") }}
+        {{ form.password(class="form-control", id="password", required="true", autocomplete="current-password") }}
     </div>
     <div class="form-check mb-4 p-0">
         <div class="form-check">

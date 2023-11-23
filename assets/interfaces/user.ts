@@ -46,3 +46,6 @@ export interface IUser {
         last_run_time?: TDatetime;
     };
 }
+
+type IUserProfileEditable = Pick<IUser, 'first_name' | 'last_name' | 'phone' | 'mobile' | 'role' | 'locale' | 'receive_email' | 'receive_app_notifications'>;
+export type IUserProfileUpdates = Partial<IUserProfileEditable>;

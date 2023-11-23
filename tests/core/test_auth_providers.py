@@ -22,8 +22,8 @@ companies = {
 def init(app):
     app.config["AUTH_PROVIDERS"].extend(
         [
-            {"_id": "gip", "name": "Google", "auth_type": AuthProviderType.GOOGLE_OAUTH.value},
-            {"_id": "saml", "name": "Azure", "auth_type": AuthProviderType.SAML.value},
+            {"_id": "gip", "name": "Google", "auth_type": AuthProviderType.GOOGLE_OAUTH},
+            {"_id": "saml", "name": "Azure", "auth_type": AuthProviderType.SAML},
         ]
     )
     app.data.insert(
@@ -38,7 +38,7 @@ def init(app):
                 "_id": companies["password_auth"],
                 "name": "Password based auth",
                 "is_enabled": True,
-                "auth_provider": "newshub",
+                "auth_provider": "newsroom",
             },
             {
                 "_id": companies["google_auth"],

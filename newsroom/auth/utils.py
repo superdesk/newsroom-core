@@ -7,11 +7,12 @@ from datetime import timedelta
 from typing import Dict, Optional
 from flask import current_app as app
 from flask_babel import _
+from newsroom.auth.providers import AuthProvider
 from newsroom.exceptions import AuthorizationError
 from newsroom.user_roles import UserRole
 from superdesk.utc import utcnow
 from newsroom.auth import get_user, get_company
-from newsroom.types import User, UserData, Company, AuthProvider, AuthProviderType
+from newsroom.types import User, UserData, Company, AuthProviderType
 from newsroom.utils import (
     get_random_string,
     is_valid_user,
@@ -71,7 +72,7 @@ def sign_user_by_email(
             return redirect_with_error(_("Company has expired"))
         elif not is_account_enabled(user):
             return redirect_with_error(_("Account is disabled"))
-        elif company_auth_provider["auth_type"] != auth_type.value:
+        elif company_auth_provider.type != auth_type:
             return redirect_with_error(
                 _("Invalid login type, %(type)s not enabled for your user", type=auth_type.value)
             )
@@ -210,9 +211,14 @@ def user_can_manage_company(company_id) -> bool:
 
 
 def get_company_auth_provider(company: Optional[Company] = None) -> AuthProvider:
-    providers: Dict[str, AuthProvider] = {provider["_id"]: provider for provider in app.config["AUTH_PROVIDERS"]}
+    providers: Dict[str, AuthProvider] = {
+        provider["_id"]: AuthProvider.get_provider(provider) for provider in app.config["AUTH_PROVIDERS"]
+    }
 
-    provider_id = (company or {}).get("auth_provider") or "newshub"
+    provider_id = "newshub"
+    if company and company.get("auth_provider"):
+        provider_id = company.get("auth_provider", "newshub")
+
     return providers.get(provider_id) or providers["newshub"]
 
 
