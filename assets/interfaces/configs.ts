@@ -32,22 +32,22 @@ export interface IListConfig {
         compact?: boolean;
         mobile?: boolean;
     };
-    abstract?: {displayed?: boolean};
-    wordcount?: {displayed?: boolean};
-    charcount?: {displayed?: boolean};
-    slugline?: {displayed?: boolean};
-    contacts?: {displayed?: boolean};
+    abstract?: {displayed: boolean};
+    wordcount?: {displayed: boolean};
+    charcount?: {displayed: boolean};
+    slugline?: {displayed: boolean};
+    contacts?: {displayed: boolean};
 }
 
 export interface IPreviewConfig {
-    slugline?: {displayed?: boolean};
-    abstract?: {displayed?: boolean};
-    category?: {displayed?: boolean};
-    subject?: {displayed?: boolean};
-    authors?: {displayed?: boolean};
-    byline?: {displayed?: boolean};
-    located?: {displayed?: boolean};
-    subjects?: {displayed?: boolean};
+    slugline?: {displayed: boolean};
+    abstract?: {displayed: boolean};
+    category?: {displayed: boolean};
+    subject?: {displayed: boolean};
+    authors?: {displayed: boolean};
+    byline?: {displayed: boolean};
+    located?: {displayed: boolean};
+    subjects?: {displayed: boolean};
     metadata_fields?: Array<IDisplayFieldsConfig>;
 }
 

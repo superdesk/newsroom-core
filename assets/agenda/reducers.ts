@@ -10,7 +10,6 @@ import {
     RECIEVE_ITEMS,
     SET_LIST_GROUPS_AND_ITEMS,
     ADD_ITEMS_TO_LIST_GROUPS,
-    SET_LIST_GROUP_HIDDEN_ITEMS,
     TOGGLE_HIDDEN_GROUP_ITEMS,
     INIT_DATA,
     SELECT_DATE,
@@ -23,7 +22,6 @@ import {
     WATCH_COVERAGE,
     STOP_WATCHING_COVERAGE,
     SET_ERROR,
-    SET_LOADING_HIDDEN_ITEMS,
     RECIEVE_NEXT_ITEMS,
 } from './actions';
 
@@ -39,7 +37,6 @@ const initialState: IAgendaState = {
     listItems: {
         groups: [],
         hiddenGroupsShown: {},
-        hiddenItemsLoading: false,
     },
     aggregations: undefined,
     activeItem: undefined,
@@ -162,15 +159,6 @@ export default function agendaReducer(state: IAgendaState = initialState, action
     case RECIEVE_ITEMS:
         return recieveItems(state, action.data);
 
-    case SET_LOADING_HIDDEN_ITEMS:
-        return {
-            ...state,
-            listItems: {
-                ...state.listItems,
-                hiddenItemsLoading: action.data,
-            },
-        };
-
     case SET_LIST_GROUPS_AND_ITEMS:
         return {
             ...state,
@@ -181,9 +169,6 @@ export default function agendaReducer(state: IAgendaState = initialState, action
         };
 
     case ADD_ITEMS_TO_LIST_GROUPS:
-        return updateListGroups(state, action.data);
-
-    case SET_LIST_GROUP_HIDDEN_ITEMS:
         return updateListGroups(state, action.data);
 
     case TOGGLE_HIDDEN_GROUP_ITEMS:

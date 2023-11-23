@@ -78,7 +78,6 @@ interface IStateProps {
     featuredOnly: boolean;
     listConfig: IListConfig;
     userType: IUserType;
-    hiddenItemsLoading: boolean;
     hiddenGroupsShown: {[dateString: string]: boolean};
 }
 
@@ -396,7 +395,6 @@ class AgendaList extends React.Component<IProps, IState> {
                                 itemsById={this.props.itemsById}
                                 itemsShown={this.props.hiddenGroupsShown[group.date] === true}
                                 toggleHideItems={this.props.toggleHiddenGroupItems}
-                                isLoading={this.props.hiddenItemsLoading}
                             />
                         )}
 
@@ -439,7 +437,6 @@ const mapStateToProps = (state: IAgendaState): IStateProps => ({
     featuredOnly: state.agenda.featuredOnly,
     listConfig: listConfigSelector(state),
     userType: state.userType,
-    hiddenItemsLoading: state.listItems.hiddenItemsLoading,
     hiddenGroupsShown: hiddenGroupsShownSelector(state),
 });
 

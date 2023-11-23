@@ -354,8 +354,7 @@ def _set_event_date_range(search):
 
     if date_from and not date_to:
         # Filter from a particular date onwards
-        dates_field = "dates.start" if app.config.get("AGENDA_SHOW_MULTIDAY_ON_START_ONLY") else "dates.end"
-        should = gen_date_range_filter(dates_field, "gte", search.args["date_from"], date_from)
+        should = gen_date_range_filter("dates.end", "gte", search.args["date_from"], date_from)
     elif not date_from and date_to:
         # Filter up to a particular date
         should = gen_date_range_filter("dates.end", "lte", search.args["date_to"], date_to)
@@ -432,34 +431,6 @@ def _set_event_date_range(search):
 
     if len(should):
         search.query["bool"]["filter"].append({"bool": {"should": should, "minimum_should_match": 1}})
-
-
-def _set_manual_date_range(search):
-    offset = int(search.args.get("timezone_offset", "0"))
-    filters = []
-    if search.args.get("starts_before"):
-        starts_before = get_local_date(search.args["starts_before"], "00:00:00", offset)
-        filters.append(
-            {
-                "bool": {
-                    "should": gen_date_range_filter("dates.start", "lt", search.args["starts_before"], starts_before),
-                    "minimum_should_match": 1,
-                },
-            }
-        )
-    if search.args.get("ends_after"):
-        ends_after = get_local_date(search.args["ends_after"], "00:00:00", offset)
-        filters.append(
-            {
-                "bool": {
-                    "should": gen_date_range_filter("dates.end", "gte", search.args["ends_after"], ends_after),
-                    "minimum_should_match": 1,
-                },
-            }
-        )
-
-    if len(filters):
-        search.query["bool"]["filter"].extend(filters)
 
 
 aggregations: Dict[str, Dict[str, Any]] = {
@@ -1032,7 +1003,6 @@ class AgendaService(BaseSearchService):
 
         if search.args.get("date_from") or search.args.get("date_to"):
             _set_event_date_range(search)
-        _set_manual_date_range(search)
 
     def set_post_filter(self, source: Dict[str, Any], req: ParsedRequest, item_type: Optional[str] = None):
         filters = json.loads(req.args.get("filter") or "{}")

@@ -147,11 +147,6 @@ export function queryItems() {
     return {type: QUERY_ITEMS};
 }
 
-export const SET_LOADING_HIDDEN_ITEMS = 'SET_LOADING_HIDDEN_ITEMS';
-function setLoadingHiddenItems(loading: boolean) {
-    return {type: SET_LOADING_HIDDEN_ITEMS, data: loading};
-}
-
 export const RECIEVE_ITEMS = 'RECIEVE_ITEMS';
 export function recieveItems(data: IRestApiResponse<IAgendaItem>) {
     return {type: RECIEVE_ITEMS, data};
@@ -165,11 +160,6 @@ function setListGroupsAndItems(groupItems: Array<IAgendaListGroup>) {
 export const ADD_ITEMS_TO_LIST_GROUPS = 'ADD_ITEMS_TO_LIST_GROUPS';
 function addItemsToListGroups(groupItems: Array<IAgendaListGroup>) {
     return {type: ADD_ITEMS_TO_LIST_GROUPS, data: groupItems};
-}
-
-export const SET_LIST_GROUP_HIDDEN_ITEMS = 'SET_LIST_GROUP_HIDDEN_ITEMS';
-function setListGroupHiddenItems(groupsItems: Array<IAgendaListGroup>) {
-    return {type: SET_LIST_GROUP_HIDDEN_ITEMS, data: groupsItems};
 }
 
 export const TOGGLE_HIDDEN_GROUP_ITEMS = 'TOGGLE_HIDDEN_GROUP_ITEMS';
@@ -232,15 +222,7 @@ export function copyPreviewContents(item: any) {
     };
 }
 
-function search(
-    state: IAgendaState,
-    fetchFrom: number,
-    // If provided, overrides date filters from state search params
-    dateRange?: {
-        startsBefore: string,
-        endsAfter: string,
-    }
-): Promise<IRestApiResponse<IAgendaItem>> {
+function search(state: IAgendaState, fetchFrom: number): Promise<IRestApiResponse<IAgendaItem>> {
     const {
         itemType,
         searchParams,
@@ -255,10 +237,8 @@ function search(
         navigation: getNavigationUrlParam(searchParams.navigation, true, false),
         filter: !isEmpty(searchParams.filter) && encodeURIComponent(JSON.stringify(searchParams.filter)),
         from: fetchFrom,
-        date_from: dateRange == null ? fromDate : null,
-        date_to: dateRange == null ? toDate : null,
-        starts_before: dateRange?.startsBefore,
-        ends_after: dateRange?.endsAfter,
+        date_from: fromDate,
+        date_to: toDate,
         timezone_offset: getTimezoneOffset(),
         featured: featured,
         itemType: itemType,
@@ -281,14 +261,12 @@ export function fetchItems(): AgendaThunkAction {
     return (dispatch, getState) => {
         const start = Date.now();
         dispatch(queryItems());
-        dispatch(setLoadingHiddenItems(true));
         return search(getState(), 0)
             .then((data) => {
                 dispatch(recieveItems(data));
                 return dispatch(setListGroupsAndLoadHiddenItems(data._items, false));
             })
             .then(() => {
-                dispatch(setLoadingHiddenItems(false));
                 analytics.timingComplete('search', Date.now() - start);
             })
             .catch((error) => errorHandler(error, dispatch, setError));
@@ -379,27 +357,7 @@ function setListGroupsAndLoadHiddenItems(items: Array<IAgendaItem>, next?: boole
             dispatch(addItemsToListGroups(groups)) :
             dispatch(setListGroupsAndItems(groups));
 
-        // If we're fetching the next lot of hidden items,
-        // then fetch from the date of the last group of normal items (items shown by default).
-        const hiddenItemsFromDate = next === true && groups.length > 0 ?
-            groups[groups.length - 1].date :
-            fromDate;
-
-        if (hiddenItemsFromDate == null) {
-            // No datetime provided, this might be for the bookmarks page
-            return Promise.resolve();
-        }
-
-        return search(state, 0, {startsBefore: hiddenItemsFromDate, endsAfter: hiddenItemsFromDate}).then(
-            (data) => {
-                const {activeGrouping, featuredOnly} = state.agenda;
-                const groups = groupItems(data._items, minDate, maxDate, activeGrouping, featuredOnly);
-
-                // Store the hidden items in the redux store, and set the group's hidden items
-                dispatch(recieveNextItems(data, false));
-                dispatch(setListGroupHiddenItems(groups));
-            }
-        );
+        return;
     };
 }
 

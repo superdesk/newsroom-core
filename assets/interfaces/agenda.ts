@@ -136,7 +136,6 @@ export interface IAgendaState {
     listItems: {
         groups: Array<IAgendaListGroup>;
         hiddenGroupsShown: {[dateString: string]: boolean};
-        hiddenItemsLoading: boolean;
     };
     aggregations?: {[field: string]: any}; // Too complex to even bother
     activeItem?: IAgendaListGroupItem;

@@ -12,23 +12,10 @@ interface IProps {
     itemIds: Array<IAgendaItem['_id']>;
     itemsById: {[itemId: string]: IAgendaItem};
     itemsShown: boolean;
-    isLoading: boolean
     toggleHideItems(group: string): void;
 }
 
-export function AgendaListGroupHeader({group, itemIds, itemsById, itemsShown, toggleHideItems, isLoading}: IProps) {
-    if (isLoading) {
-        return (
-            <div className="list-group-header">
-                <Skeleton size="1rem" />
-                <Skeleton width="10rem" />
-                <Skeleton width="10rem" />
-                <Skeleton />
-                <Skeleton width="10rem" />
-            </div>
-        );
-    }
-
+export function AgendaListGroupHeader({group, itemIds, itemsById, itemsShown, toggleHideItems}: IProps) {
     const coverageTypeCount: {[coverageType: string]: number} = {};
     let itemCount = 0;
 
