@@ -63,7 +63,7 @@
         </nav>
     {% endblock %}
 
-    <div class="contentWrap flex-md-p-row flex-lg-l-row {% block custom_content_style %}{% endblock %}">
+    <div class="contentWrap {% block custom_content_style %}{% endblock %}">
         {% if session.get('name') %}
         <nav class="sidenav">
             <h3 class="a11y-only">{{ gettext('Side Navigation') }}</h3>
