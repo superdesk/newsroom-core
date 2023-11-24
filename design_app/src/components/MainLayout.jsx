@@ -8,7 +8,7 @@ function MainLayout() {
   return (
         <div className="newsroomWrap">
             <MainNavbar />
-            <div className="contentWrap flex-md-p-row flex-lg-l-row">
+            <div className="contentWrap">
                 <SideNav />
                 <Outlet />
             </div>

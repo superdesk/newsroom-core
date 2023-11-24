@@ -170,7 +170,7 @@ class AgendaApp extends BaseApp {
                     <SelectedItemsBar
                         actions={this.props.actions}
                     />
-                    <nav className="content-bar navbar justify-content-start flex-nowrap flex-sm-wrap">
+                    <nav className="content-bar navbar justify-content-start flex-nowrap">
                         {this.state.withSidebar && (
                             <button
                                 className="content-bar__menu content-bar__menu--nav--open"
