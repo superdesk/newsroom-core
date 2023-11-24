@@ -328,7 +328,7 @@ body.print {
 }
 
 .sidenav {
-    flex: 0 0 var(--sidenav-size-width);
+    flex: 0 0 var(--navbar-height--mobile);
     background-color: var(--sidenav-color-bg);
     position: relative;
     padding: 0 4px;
@@ -340,32 +340,28 @@ body.print {
     }
 
     @include phone {
-        padding: 0 2px;
-        flex: 0 0 var(--navbar-height--mobile);
+        padding: 0 2px;    
         overflow-y: hidden;
+    }
+    @include md {
+        flex: 0 0 var(--sidenav-size-width);
     }
 }
 
 .sidenav-icons {
+    display: flex;
+    flex-direction: row;
+    margin: 0 auto;
+    gap: var(--space--0-5);
+    width: 100vw;
     padding: 0;
     list-style-type: none;
 
-    // Default for tablet and pcs
-    display: flex;
-    flex-direction: column;
-    margin: 0 auto;
-    overflow: visible;
-
-    @include phone {
-        display: flex;
-        flex-direction: row;
-        overflow: auto;
-        gap: var(--space--0-5);
-        overflow-y: hidden;
-        width: 100vw;
-    }
     @include md {
         padding-block-start: var(--space--1);
+        flex-direction: column;
+        overflow: visible;
+        width: auto;
     }
 
 
@@ -393,17 +389,19 @@ body.print {
         a, span {
             border-radius: var(--sidenav-item-border-radius);
             text-decoration: none;
-            width: var(--sidenav-item-width);
-            min-height: var(--navbar-height);
+            width: 40px;
+            height: calc(var(--navbar-height--mobile) - var(--space--1));
+            min-height: auto;
             padding: 2px 0;
-            line-height: var(--navbar-height);
+            line-height: var(--navbar-height--mobile);
             text-align: center;
             background-color: var(--sidenav-color-item-bg);
-            @include phone {
-                width: 40px;
-                height: calc(var(--navbar-height--mobile) - var(--space--1));
-                line-height: var(--navbar-height--mobile);
-                min-height: auto;
+            
+            @include md {
+                width: var(--sidenav-item-width);
+                min-height: var(--navbar-height);
+                line-height: var(--navbar-height);
+                height: auto;
             }
             &:focus {
                 outline: none;
@@ -429,7 +427,7 @@ body.print {
             }
         }
         .sidenav-icons__item-title {
-            display: var(--sidenav-item-title-display);
+            display: none;
             color: var(--sidenav-color-item-fg);
             font-size: 10px;
             font-weight: 700;
@@ -438,8 +436,8 @@ body.print {
             text-transform: uppercase;
             overflow-wrap: break-word;
             align-self: stretch;
-            @include phone {
-                display: none;
+            @include md {
+                display: var(--sidenav-item-title-display);
             }
         }
         .badge {
@@ -559,10 +557,12 @@ body.print {
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-direction: column;
         flex-grow: 0;
         flex-shrink: 0;
-        gap: calc(var(--separator-dot-size) * 1.5);
-        margin-block: var(--space--1-5);
+        gap: calc(var(--separator-dot-size) * 1);
+        margin-block: auto;
+        margin-inline: var(--space--0-5);
         .separator__dot {
             border-radius: var(--border-radius--full);
             display: block;
@@ -571,11 +571,10 @@ body.print {
             background-color: var(--separator-dot-color-bg);
             opacity: 0.4;
         }
-        @include phone {
-            flex-direction: column;
-            margin-block: auto;
-            margin-inline: var(--space--0-5);
-            gap: calc(var(--separator-dot-size) * 1);
+        @include md {
+            flex-direction: row;
+            margin-block: var(--space--1-5);
+            gap: calc(var(--separator-dot-size) * 1.5);
         }
 
     }
@@ -660,6 +659,10 @@ article.list {
     flex-grow: 1;
     overflow-y: auto;
     flex-direction: column;
+
+    @include md {
+        flex-direction: row;
+    }
 }
 .settings-inner {
     flex-direction: column;
@@ -1715,19 +1718,7 @@ article.list {
 .wire-column__nav--open {
     width: 100%;
     @include lg {
-        width: 240px;
-        .wire-column__nav__items .nav {
-            gap: var(--space--2);
-        }
-    }
-    @include xl {
-        width: 260px;
-    }
-    @include xxl {
         width: 320px;
-        .wire-column__nav__items .nav {
-            gap: var(--space--3);
-        }
     }
 }
 
@@ -2521,7 +2512,9 @@ article.list {
     inset-inline-start: 0;
     inset-inline-end: 0;
     z-index: 103;
-
+    @include sm {
+        inset-block-start: calc(var(--navbar-height--mobile) + var(--navbar-height));
+    }
     @include md {
         inset-block-start: var(--navbar-height);
         inset-inline-start: var(--sidenav-size-width);
