@@ -15,7 +15,7 @@ export interface IArticle extends IResourceItem {
     type: IContentType;
     ancestors?: Array<IArticle['_id']>;
     nextversion?: IArticle['_id'];
-    associations?: {[key: string]: IArticle};
+    associations?: {[key: string]: IArticle | null};
     renditions?: {[key: string]: IRendition};
     slugline: string;
     headline: string;
