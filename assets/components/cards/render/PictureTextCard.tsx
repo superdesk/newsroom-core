@@ -4,19 +4,20 @@ import CardBody from './CardBody';
 import CardFooter from './CardFooter';
 import CardRow from './CardRow';
 import {ICardProps} from '../utils';
+import {IArticle} from 'interfaces';
 
-const getPictureTextPanel = (item: any, picture: any, openItem: any, withPictures: any, cardId: any, listConfig: any) => {
-    const rendition = withPictures && getThumbnailRendition(picture);
+const getPictureTextPanel = (item: any, picture: IArticle | null, openItem: any, withPictures: boolean, cardId: any, listConfig: any) => {
+    const rendition = withPictures && picture != null && getThumbnailRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
 
     return (<div key={item._id} className="col-sm-6 col-lg-4 col-xl-3 d-flex mb-4">
         <div className="card card--home" onClick={() => openItem(item, cardId)}>
-            {rendition &&
+            {(rendition && imageUrl) ? (
                 <div className="card-img-top-wrapper card-img-top-wrapper--aspect-16-9">
                     <img className="card-img-top" src={imageUrl} alt={caption} />
                 </div>
-            }
+            ) : null}
             <CardBody item={item} displayMeta={false} listConfig={listConfig} />
             <CardFooter
                 item={item}
