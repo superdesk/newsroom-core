@@ -13,7 +13,9 @@ export interface IArticle {
     _id: string;
     guid: string;
     type: IContentType;
-    associations: {[key: string]: IArticle};
+    ancestors?: Array<IArticle['_id']>;
+    nextversion?: IArticle['_id'];
+    associations?: {[key: string]: IArticle | null};
     renditions?: {[key: string]: IRendition};
     slugline: string;
     headline: string;

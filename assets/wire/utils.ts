@@ -33,22 +33,22 @@ export function getVideos(item: any) {
     return getRelatedItemsByType(item, 'video');
 }
 
-const isMedia = (item: any) => item.type === 'audio' || item.type === 'video';
+const isMedia = (item: IArticle) => item.type === 'audio' || item.type === 'video';
 
 /**
  *
  * @param {*} item
  */
-export function getItemMedia(item: any) {
+export function getItemMedia(item: IArticle) {
     if (isMedia(item)) {
         return [item];
     }
 
-    return Object.values(get(item, 'associations', {}) || {}).filter((assoc: any) => assoc != null && isMedia(assoc));
+    return Object.values(item.associations || {}).filter((assoc) => assoc != null && isMedia(assoc));
 }
 
-function getRelatedItemsByType(item: any, type: any) {
-    return item.type === type ? [item] : Object.values(get(item, 'associations', {}) || {}).filter((assoc: any) => get(assoc, 'type') === type);
+function getRelatedItemsByType(item: IArticle, type: string) {
+    return item.type === type ? [item] : Object.values(item.associations || {}).filter((assoc) => assoc?.type === type);
 }
 
 export function getFeatureMedia(item: IArticle): IArticle | null {
@@ -70,14 +70,14 @@ export function getOtherMedia(item: IArticle): Array<IArticle> | null {
         return null;
     }
 
-    return Object.keys(item.associations || {})
-        .filter((key) => (
+    return Object.entries(item.associations || {})
+        .filter(([key, item]) => (
             !key.startsWith('editor_') &&
             key !== 'featuremedia' &&
-            item.associations[key] != null &&
-            ['video', 'audio'].includes(item.associations[key].type)
+            item != null &&
+            ['video', 'audio'].includes(item.type)
         ))
-        .map((key) => item.associations[key]);
+        .map(([key, item]) => item) as IArticle[]; // null values are filtered in .filter
 }
 
 /**
@@ -88,12 +88,12 @@ export function getOtherMedia(item: IArticle): Array<IArticle> | null {
  * @param {Object} item
  * @return {Object}
  */
-export function getPicture(item: any) {
+export function getPicture(item: IArticle) {
     if (item.type === 'picture') {
         return item;
     }
 
-    const featured = get(item, 'associations.featuremedia');
+    const featured = item.associations?.featuremedia;
 
     if (featured != null && featured.type === 'picture') {
         return featured;
@@ -104,13 +104,13 @@ export function getPicture(item: any) {
 
 function getBodyPicture(item: IArticle): IArticle | null {
     const pictures = Object.values(item.associations ?? {})
-        .filter((association) => association.type === 'picture');
+        .filter((association) => association?.type === 'picture');
     return pictures.length ? pictures[0] : null;
 }
 
 export function getPictureList(item: IArticle): Array<IArticle> {
     const pictures = Object.values(item.associations ?? {})
-        .filter((association) => association.type === 'picture');
+        .filter((association) => association?.type === 'picture') as IArticle[];
     return pictures.length ? pictures : [];
 }
 
@@ -122,8 +122,9 @@ export function getPictureList(item: IArticle): Array<IArticle> {
  * @return {Object}
  */
 export function getThumbnailRendition(picture: IArticle, large?: boolean): IRendition | undefined {
-    const rendition = large ? 'renditions._newsroom_thumbnail_large' : 'renditions._newsroom_thumbnail';
-    return get(picture, rendition, get(picture, 'renditions.thumbnail'));
+    const rendition = large ? picture.renditions?._newsroom_thumbnail_large : picture.renditions?._newsroom_thumbnail;
+
+    return rendition ?? picture.renditions?.thumbnail;
 }
 
 export function getImageForList(item: IArticle): {item: IArticle, href: string} | undefined {
@@ -362,7 +363,9 @@ export function getContentTypes(item: IArticle): Set<IContentType> {
     contentTypes.add(item.type);
     Object.values(item.associations ?? {})
         .forEach((item) => {
-            contentTypes.add(item.type);
+            if (item != null) {
+                contentTypes.add(item.type);
+            }
         });
 
     return contentTypes;

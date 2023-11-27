@@ -6,8 +6,8 @@ import CardMeta from './CardMeta';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 import {ICardProps} from '../utils';
 
-const getTopNewsPanel = (item: IArticle, picture: IArticle, openItem: any, cardId: string, listConfig: IListConfig) => {
-    const rendition = getThumbnailRendition(picture, true);
+const getTopNewsPanel = (item: IArticle, picture: IArticle | null, openItem: any, cardId: string, listConfig: IListConfig) => {
+    const rendition = picture ? getThumbnailRendition(picture, true) : null;
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
 
