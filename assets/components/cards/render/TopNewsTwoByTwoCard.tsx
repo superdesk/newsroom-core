@@ -11,8 +11,8 @@ import CardMeta from './CardMeta';
 import CardBody from './CardBody';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 
-const getTopNewsLeftPanel = (item: IArticle, picture: IArticle, openItem: any, cardId: string, listConfig: IListConfig) => {
-    const rendition = getThumbnailRendition(picture, true);
+const getTopNewsLeftPanel = (item: IArticle, picture: IArticle | null, openItem: any, cardId: string, listConfig: IListConfig) => {
+    const rendition = picture ? getThumbnailRendition(picture, true) : null;
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
 
@@ -39,8 +39,8 @@ const getTopNewsLeftPanel = (item: IArticle, picture: IArticle, openItem: any, c
     );
 };
 
-const getTopNewsRightPanel = (item: IArticle, picture: IArticle, openItem: any, cardId: string, listConfig?: IListConfig): any => {
-    const rendition = getThumbnailRendition(picture);
+const getTopNewsRightPanel = (item: IArticle, picture: IArticle | null, openItem: any, cardId: string, listConfig?: IListConfig): any => {
+    const rendition = picture ? getThumbnailRendition(picture) : null;
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
 

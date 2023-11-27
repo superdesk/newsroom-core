@@ -7,8 +7,8 @@ import CardBody from './CardBody';
 import CardRow from './CardRow';
 import {ICardProps} from '../utils';
 
-const getPictureTextPanel = (item: IArticle, picture: IArticle, openItem: any, cardId: string, listConfig: IListConfig) => {
-    const rendition = getThumbnailRendition(picture);
+const getPictureTextPanel = (item: IArticle, picture: IArticle | null, openItem: any, cardId: string, listConfig: IListConfig) => {
+    const rendition = picture ? getThumbnailRendition(picture) : null;
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
 
