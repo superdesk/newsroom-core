@@ -231,7 +231,7 @@ function SearchResultsFiltersRow({
 }
 
 const mapStateToProps = (state: any) => ({
-    itemTypeFilter: state.agenda.itemType,
+    itemTypeFilter: state.agenda?.itemType,
     activeFilter: searchFilterSelector(state),
 });
 
