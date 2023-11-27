@@ -1,6 +1,10 @@
 <form class="form" role="form" id="formLogin" method="post">
     {{ form.csrf_token }}
 
+    <div style="display:none">
+        {{ form.firebase_status(type="hidden", id="firebase-status") }}
+    </div>
+
     {% include "form_alerts.html" %}
 
     <div class="form-group">

@@ -17,6 +17,7 @@ from newsroom.auth import (
     blueprint,
     get_auth_user_by_email,
     get_company,
+    get_user,
     get_user_by_email,
     get_company_from_user,
     get_user_required,
@@ -51,6 +52,7 @@ logger = logging.getLogger(__name__)
 @limiter.limit("60/minute")
 def login():
     form = LoginForm()
+
     if form.validate_on_submit():
         if email_has_exceeded_max_login_attempts(form.email.data):
             return flask.render_template("account_locked.html", form=form)
@@ -60,7 +62,21 @@ def login():
 
         if is_valid_user(user, company):
             auth_provider = get_company_auth_provider(company)
-            if auth_provider.type != AuthProviderType.PASSWORD and not is_admin(user):
+            firebase_status = form.firebase_status.data
+            if (
+                auth_provider.type == AuthProviderType.FIREBASE
+                and firebase_status
+                and firebase_status
+                in (
+                    "auth/user-disabled",
+                    "auth/user-not-found",
+                    "auth/wrong-password",
+                )
+            ):
+                flask.flash(gettext("Invalid username or password."), "danger")
+            elif auth_provider.type == AuthProviderType.FIREBASE and firebase_status:
+                log_firebase_unexpected_error(firebase_status)
+            elif auth_provider.type != AuthProviderType.PASSWORD and not is_admin(user):
                 # Password login is not enabled for this user's company, and the user is not an admin
                 flask.flash(gettext(f"Invalid login type, please login using '{auth_provider.name}'"), "danger")
             else:
@@ -244,6 +260,10 @@ def reset_password(token):
         }
         get_resource_service("users").patch(id=ObjectId(user["_id"]), updates=updates)
         flask.flash(gettext("Your password has been changed. Please login again."), "success")
+
+        if get_user() is not None:  # user is authenticated already
+            return redirect_to_next_url()
+
         return flask.redirect(flask.url_for("auth.login"))
 
     app.cache.delete(user.get("email"))
@@ -328,8 +348,7 @@ def change_password():
                 elif firebase_status == "auth/wrong-password":
                     flask.flash(gettext("Wrong current password."), "error")
                 else:
-                    logger.warning("Unhandled firebase error %s", firebase_status)
-                    flask.flash(gettext("Could not change your password. Please contact us for assistance."), "warning")
+                    log_firebase_unexpected_error(firebase_status)
         elif auth_provider.type == AuthProviderType.PASSWORD:
             updates = {
                 "password": form.new_password.data,
@@ -365,3 +384,8 @@ def firebase_auth_token():
         return sign_user_by_email(email, auth_type=AuthProviderType.FIREBASE, validate_login_attempt=True)
 
     return flask.redirect(flask.url_for("auth.login"))
+
+
+def log_firebase_unexpected_error(firebase_status: str):
+    logger.warning("Unhandled firebase error %s", firebase_status)
+    flask.flash(gettext("Could not change your password. Please contact us for assistance."), "warning")

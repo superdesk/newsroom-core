@@ -3,6 +3,7 @@ import {signInWithEmailAndPassword, signOut} from 'firebase/auth';
 
 const form = document.getElementById('formLogin') as HTMLFormElement;
 const params = new URLSearchParams(window.location.search);
+const firebaseStatus = document.getElementById('firebase-status') as HTMLInputElement;
 
 if (params.get('email')) {
     form['email'].value = params.get('email');
@@ -43,8 +44,7 @@ form.onsubmit = (event) => {
         userCredential.user.getIdToken().then(sendTokenToServer);
     }, (reason) => {
         // login via firebase didn't work out,
-        // try standard newshub login
-        console.error(reason);
+        firebaseStatus.value = reason.code;
         form.submit();
     });
 
