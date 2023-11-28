@@ -1,6 +1,6 @@
 import {memoize} from 'lodash';
 
-import {IListConfig} from 'interfaces';
+import {IArticle, IListConfig} from 'interfaces';
 
 import ConfigEvent from 'components/cards/edit/ConfigEvent';
 import ConfigExternalMedia from 'components/cards/edit/ConfigExternalMedia';
@@ -41,7 +41,7 @@ export interface ICardProps {
     items: Array<any>;
     title: string;
     id: string;
-    openItem: any;
+    openItem: (item: IArticle, cardId: string) => void;
     isActive: boolean;
     cardId: string;
     listConfig: IListConfig;

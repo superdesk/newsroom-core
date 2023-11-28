@@ -4,9 +4,16 @@ import CardBody from './CardBody';
 import CardFooter from './CardFooter';
 import CardRow from './CardRow';
 import {ICardProps} from '../utils';
-import {IArticle} from 'interfaces';
+import {IArticle, IListConfig} from 'interfaces';
 
-const getPictureTextPanel = (item: any, picture: IArticle | null, openItem: any, withPictures: boolean, cardId: any, listConfig: any) => {
+const getPictureTextPanel = (
+    item: IArticle,
+    picture: IArticle | null,
+    openItem: ICardProps['openItem'],
+    withPictures: boolean,
+    cardId: ICardProps['cardId'],
+    listConfig: IListConfig,
+) => {
     const rendition = withPictures && picture != null && getThumbnailRendition(picture);
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
