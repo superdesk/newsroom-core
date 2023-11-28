@@ -5,6 +5,7 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import CalendarButtonWrapper from './CalendarButtonWrapper';
 import {EARLIEST_DATE} from '../agenda/utils';
+import React from 'react';
 
 class CalendarButton extends React.Component<any, any> {
     static propTypes: any;
@@ -26,31 +27,35 @@ class CalendarButton extends React.Component<any, any> {
 
     render() {
         const isStartDateToday = moment.isMoment(this.state.startDate) && !this.state.startDate.isSame(moment(), 'day');
-        const datePicker = (<DatePicker
-            customInput={<CalendarButtonWrapper active={isStartDateToday}/>}
-            dateFormat="yyyy-MM-dd"
-            todayButton={gettext('Today')}
-            selected={this.state.startDate}
-            onChange={this.handleChange}
-            highlightDates={[moment().toDate()]}
-            locale={window.locale || 'en'}
-            popperModifiers={[
-                {
-                    name: 'offset',
-                    options: {
-                        offset: [5, 10],
+        const datePicker = (
+            <DatePicker
+                customInput={<CalendarButtonWrapper active={isStartDateToday}/>}
+                dateFormat="yyyy-MM-dd"
+                todayButton={gettext('Today')}
+                selected={this.state.startDate}
+                onChange={this.handleChange}
+                highlightDates={[moment().toDate()]}
+                locale={window.locale || 'en'}
+                popperModifiers={[
+                    {
+                        name: 'offset',
+                        options: {
+                            offset: [5, 10],
+                        },
                     },
-                },
-            ]}
-        />);
+                ]}
+            />
+        );
 
         if (!this.props.label) {
             return datePicker;
         } else {
-            return (<div className={this.props.labelClass}>
-                <label className='pe-1'>{this.props.label}</label>
-                {datePicker}
-            </div>);
+            return (
+                <div className={this.props.labelClass}>
+                    <label className='pe-1 label--no-spacing'>{this.props.label}</label>
+                    {datePicker}
+                </div>
+            );
 
         }
     }
