@@ -23,6 +23,7 @@ module.exports = {
     ],
     'rules': {
         '@typescript-eslint/no-explicit-any': 0,
+        '@typescript-eslint/ban-ts-comment': 0,
         'indent': [
             'error',
             4
@@ -62,7 +63,7 @@ module.exports = {
     },
     'settings': {
         'react': {
-            'version': '16.2'
+            'version': '17.0'
         }
     }
 };

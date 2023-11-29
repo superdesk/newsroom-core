@@ -1,0 +1,73 @@
+{% extends "layout_wire.html" %}
+
+{% block contentMain %}
+
+<div class="container-fluid py-5 overflow-auto nh-login-page__content">
+
+    {% include "login_messages.html" %}
+
+    <div class="row">
+        <div class="col-12 col-md-8 col-lg-6 col-xxl-4 mx-auto">
+            <div class="card border-0 bg-white box-shadow--z1 rounded--m">
+                <div class="card-header pt-4 border-0 bg-white rounded--m">
+                    {% block login_header %}
+                    <div class="login-logo">
+                        {% include 'login_logo.html' %}
+                    </div>
+                    {% block login_title %}
+                    <h5 class="mb-0">
+                        {{ gettext("Login") }}
+                    </h5>
+                    {% endblock %}
+                    {% endblock %}
+                </div>
+                <div class="card-body pt-1">
+                    {% block login_body %}
+                    {% include "login_form.html" %}
+                    {% endblock %}
+                </div>
+
+                {% if config.SAML_AUTH_ENABLED and request.endpoint == "auth.login" %}
+                <div class="card-body pt-1 pb-2">
+                    <form action="{{ url_for('auth.saml') }}">
+                        <button type="submit" title="{{ gettext('Login using Single Sign On') }}" class="nh-button nh-button--primary w-100">{{ config.SAML_LABEL }}</button>
+                    </form>
+                </div>
+                {% endif %}
+
+                <div class="card-footer bg-white border-0 text-muted small">
+                    {% block login_footer %}
+                    <p>{{ gettext('Forgot your password?') }} <a href="{{ url_for('auth.token', token_type='reset_password') }}">{{ gettext('Click here to reset.') }}</a>
+                        {% if config.SHOW_USER_REGISTER %}{{ gettext("Or you can") }} <a href="{{ url_for('auth.signup') }}">{{ gettext('click here to register.') }}</a>{% endif %}
+                    </p>
+                    {% endblock %}
+                </div>
+
+                {% if get_client_locales()|length is gt 1 and request.endpoint == "auth.login" %}
+                <div class="card-body pt-1">
+                    <form class="form" role="form" method="post" action="{{ url_for('auth.set_locale') }}">
+                        <div class="form-group">
+                            <label for="language">{{ gettext('Language') }}</label>
+                            <div class="field">
+                                <select name="locale" class="form-control" onchange="this.form.submit()">
+                                    {% for locale in get_client_locales() %}
+                                    <option value="{{ locale.locale }}" {% if locale.locale == get_locale() %}selected{% endif %}>{{ locale.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+    {% if firebase %}
+        {% include "firebase_config.html" %}
+        {{ javascript_tag('firebase_login_js') | safe }}
+    {% endif %}
+{% endblock %}

@@ -1,6 +1,7 @@
+import {IItemAction} from 'interfaces';
 import {gettext, isActionEnabled} from './utils';
 
-export function getItemActions(dispatch: any, actions: any) {
+export function getItemActions(dispatch: any, actions: any): Array<IItemAction> {
     const {
         openItem,
         shareItems,

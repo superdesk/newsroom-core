@@ -7,8 +7,8 @@ import CardRow from './CardRow';
 import {Embargo} from '../../../wire/components/fields/Embargo';
 import {ICardProps} from '../utils';
 
-const getMediaPanel = (item: IArticle, picture: IArticle, openItem: any, cardId: string) => {
-    const rendition = getThumbnailRendition(picture);
+const getMediaPanel = (item: IArticle, picture: IArticle | null, openItem: any, cardId: string) => {
+    const rendition = picture ? getThumbnailRendition(picture) : null;
     const imageUrl = rendition && rendition.href;
     const caption = rendition && getCaption(picture);
 

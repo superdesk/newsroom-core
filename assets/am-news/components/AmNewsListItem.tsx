@@ -92,7 +92,7 @@ class AmNewsListItem extends React.Component<any, any> {
             'time-label--stories': !isDataItem(item),
         });
         const picture = getPicture(item);
-        const thumbnailRendition = getThumbnailRendition(picture);
+        const thumbnailRendition = picture ? getThumbnailRendition(picture) : null;
 
 
         return (

@@ -428,6 +428,9 @@
         padding-inline: 0;
         border-inline-start: none;
         opacity: 0.8;
+        .breadcrumb-sub-item {
+            display: none;
+        }
     }
     nav {
         display: flex;

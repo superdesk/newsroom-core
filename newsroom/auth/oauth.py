@@ -87,7 +87,7 @@ def google_authorized():
         return redirect_with_error(gettext("Account is disabled"))
 
     auth_provider = get_company_auth_provider(company)
-    if auth_provider["auth_type"] != AuthProviderType.GOOGLE_OAUTH.value:
+    if auth_provider.type != AuthProviderType.GOOGLE_OAUTH:
         return redirect_with_error(gettext("Invalid login type, Oauth not enabled for your user"))
 
     # If the user is not yet validated, then validate it now

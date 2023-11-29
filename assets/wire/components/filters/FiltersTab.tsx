@@ -141,8 +141,11 @@ class FiltersTab extends React.Component<any, any> {
                 {!isResetActive && !this.props.resultsFiltered ? null : ([
                     <div className='tab-pane__footer tab-pane__footer--inline' key='footer-buttons'>
 
-                        <button className='nh-button nh-button--secondary'
-                            onClick={this.reset}>
+                        <button
+                            className='nh-button nh-button--secondary'
+                            onClick={this.reset}
+                            data-test-id="filter-panel--clear-btn"
+                        >
                             {gettext('Clear')}
                         </button>
                         <button

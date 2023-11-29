@@ -85,10 +85,15 @@ function SearchResultsFiltersRow({
                     <Tag
                         key={`tags-filters--${filter}`}
                         testId={`tags-filters--agenda-quick-filters-${filter}`}
-                        text={filter === 'coverage_status'
-                            ? getActiveFilterLabel(agendaCoverageStatusFilter, activeFilter)
-                            :  activeFilter?.[filter as IActiveFilterUnionType]
-                        }
+                        text={(() => {
+                            if (filter === 'coverage_status') {
+                                return getActiveFilterLabel(agendaCoverageStatusFilter, activeFilter);
+                            } else if (filter === 'location') {
+                                return  activeFilter?.[filter as IActiveFilterUnionType].name;
+                            } else {
+                                return activeFilter?.[filter as IActiveFilterUnionType];
+                            }
+                        })()}
                         readOnly={readonly}
                         onClick={(event) => {
                             event.preventDefault();
@@ -226,7 +231,7 @@ function SearchResultsFiltersRow({
 }
 
 const mapStateToProps = (state: any) => ({
-    itemTypeFilter: state.agenda.itemType,
+    itemTypeFilter: state.agenda?.itemType,
     activeFilter: searchFilterSelector(state),
 });
 

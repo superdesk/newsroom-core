@@ -40,7 +40,14 @@ import {REMOVE_NEW_ITEMS, SET_NEW_ITEM} from './agenda/actions';
 import {SET_ERROR_MESSAGE, toggleValue} from 'utils';
 import {topicsReducer} from './topics/reducer';
 
-export function modalReducer(state?: any, action?: any): any {
+export interface IModalState {
+    modal: string;
+    data: any;
+    modalProps: any;
+    formValid?: boolean;
+}
+
+export function modalReducer(state?: IModalState, action?: any): IModalState | undefined {
     if (!action) {
         return state;
     }
@@ -54,19 +61,19 @@ export function modalReducer(state?: any, action?: any): any {
         };
 
     case CLOSE_MODAL:
-        return null;
+        return undefined;
 
     case MODAL_FORM_VALID:
-        return {
+        return state ? {
             ...state,
             formValid: true,
-        };
+        } : state;
 
     case MODAL_FORM_INVALID:
-        return {
+        return state ? {
             ...state,
             formValid: false,
-        };
+        } : state;
 
     default:
         return state;
@@ -354,7 +361,7 @@ export function defaultReducer(state: any = {}, action: any) {
     }
 
     case SET_NEW_ITEM: {
-        const item = state.data || {};
+        const item = action.data || {};
 
         if (!item.nextversion && !state.itemsById[item._id]) {
             return {

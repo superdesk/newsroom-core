@@ -3,16 +3,15 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {partition} from 'lodash';
 import {gettext} from 'utils';
+
+import {IUser, IUserDashboard, ITopic, IAgendaState} from 'interfaces';
 import Modal from 'components/Modal';
 import {Input} from 'reactstrap';
 import CheckboxInput from './CheckboxInput';
-import {IUser, IUserDashboard} from 'interfaces/user';
 import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 import {modalFormInvalid, modalFormValid} from 'actions';
 import {updateUser} from 'users/actions';
 import {getCurrentUser} from 'company-admin/selectors';
-import {IAgendaState} from 'agenda/reducers';
-import {ITopic} from 'interfaces/topic';
 import {IPersonalizedDashboardsWithData} from 'home/reducers';
 import {searchIcon} from 'search/components/search-icon';
 

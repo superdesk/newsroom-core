@@ -29,7 +29,6 @@ import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserList
 
 import {companyProductSeatsSelector, companySectionListSelector, sectionListSelector} from 'company-admin/selectors';
 import {IUser} from 'interfaces/user';
-import {IUserProfileStore} from 'user-profile/reducers';
 import ActionButton from 'components/ActionButton';
 
 const getCompanyOptions = (companies: Array<ICompany>) => companies.map((company) => ({value: company._id, text: company.name}));
@@ -40,7 +39,13 @@ interface IReduxStoreProps {
     seats: any;
 }
 
-interface IProps extends IReduxStoreProps {
+interface IUserProfileStore {
+    allSections?: Array<any>;
+    companySections?: any;
+    seats?: any;
+}
+
+interface IOwnProps {
     original: IUser;
     user: IUser;
 
@@ -61,6 +66,8 @@ interface IProps extends IReduxStoreProps {
     hideFields: Array<string>;
     toolbar?: any;
 }
+
+type IProps = IReduxStoreProps & IOwnProps;
 
 const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
     const {
@@ -303,7 +310,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                     title={gettext('Products')}
                                     testId="toggle--products"
                                 >
-                                    {(() => {
+                                    {user.company != null ? (() => {
                                         if (productsFromSections.length < 1) {
                                             return (
                                                 <div>{gettext('No products available')}</div>
@@ -361,7 +368,11 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                                 </>
                                             );
                                         }
-                                    })()}
+                                    })() : (
+                                        <div className='p-1'>
+                                            {gettext('If a company hasn\'t been selected, you can\'t select any products.')}
+                                        </div>
+                                    )}
                                 </FormToggle>
                             );
                         })()}
@@ -446,6 +457,6 @@ const mapStateToProps = (state: IUserProfileStore): IReduxStoreProps => ({
     seats: companyProductSeatsSelector(state),
 });
 
-const EditUser = connect<IReduxStoreProps>(mapStateToProps)(EditUserComponent);
+const EditUser = connect<IReduxStoreProps, {}, IOwnProps, IUserProfileStore>(mapStateToProps)(EditUserComponent);
 
 export default EditUser;

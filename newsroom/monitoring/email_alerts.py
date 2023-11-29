@@ -19,7 +19,7 @@ from eve.utils import ParsedRequest
 from superdesk import get_resource_service, Command
 from superdesk.utc import utcnow, utc_to_local, local_to_utc
 from superdesk.celery_task_utils import get_lock_id
-from superdesk.lock import lock, unlock, remove_locks
+from superdesk.lock import lock, unlock
 
 from newsroom.celery_app import celery
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
@@ -48,7 +48,7 @@ class MonitoringEmailAlerts(Command):
             "monitoring_{0}".format("scheduled" if not immediate else "immediate"),
         )
         if not lock(lock_name, expire=610):
-            logger.error("{} Job already running".format(self.log_msg))
+            logger.error("Monitoring email alerts task already running")
             return
 
         try:
@@ -64,9 +64,8 @@ class MonitoringEmailAlerts(Command):
                 self.scheduled_worker(now_to_minute)
         except Exception as e:
             logger.exception(e)
-
-        unlock(lock_name)
-        remove_locks()
+        finally:
+            unlock(lock_name)
 
         logger.info("{} Completed sending Monitoring Scheduled Alerts.".format(self.log_msg))
 

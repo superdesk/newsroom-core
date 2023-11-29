@@ -849,6 +849,10 @@ a.wire-articles__versions {
     gap: var(--space--1);
     .list-group-header__title-info {
         font-weight: 400;
+
+        @include phone {
+            display: none;
+        }
     }
 }
 
@@ -859,6 +863,9 @@ a.wire-articles__versions {
     padding-inline-end: var(--space--1);
     border-inline-end: 1px dotted var(--color-line--medium);
     margin-inline-start: var(--space--0-5);
+    @include phone {
+        display: none;
+    }
 }
 .list-group-header__coverage-item {
     display: flex;
@@ -884,7 +891,12 @@ a.wire-articles__versions {
         }
     }
 }
+.list-group-header__actions {
+    margin-inline-start: auto;
+}
 
+
+// MULTIDAY EVENT LABEL --------------------------- //
 .multiday-label {
     --colored-border-width: 10px;
     --multiday-label-height: 20px;
@@ -975,8 +987,4 @@ a.wire-articles__versions {
             border-block-end: calc(var(--multiday-label-height) / 2)  solid transparent;
         }
     }
-}
-
-.list-group-header__actions {
-    margin-inline-start: auto;
 }

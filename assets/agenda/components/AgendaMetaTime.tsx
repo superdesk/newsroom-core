@@ -1,13 +1,25 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import moment from 'moment';
 
+import {IAgendaItem} from 'interfaces';
 import {bem} from 'ui/utils';
-import {formatAgendaDate, hasCoverages} from '../utils';
+import {formatAgendaDate, getEndDate, getStartDate, hasCoverages} from '../utils';
+import {DATE_FORMAT, formatDate} from 'utils';
 
 import AgendaItemTimeUpdater from './AgendaItemTimeUpdater';
+import {MultiDayListLabel} from './MultiDayListLabel';
 
-function format(item: any, group: any, onlyDates: any) {
+interface IProps {
+    group?: string;
+    item: IAgendaItem;
+    borderRight?: boolean;
+    isRecurring?: boolean;
+    isMobilePhone?: boolean;
+    onlyDates?: boolean;
+}
+
+function format(item: IAgendaItem, group?: string, onlyDates = true) {
     return (
         <span key="date">
             {formatAgendaDate(item, group, {onlyDates})}
@@ -15,31 +27,38 @@ function format(item: any, group: any, onlyDates: any) {
     );
 }
 
-function getCalendarClass(item: any) {
+function getCalendarClass(item: IAgendaItem) {
     if (item.state === 'rescheduled') {
         return 'icon--orange';
-    }
-
-    if (item.state === 'cancelled') {
+    } else if (item.state === 'cancelled') {
         return 'icon--red';
+    } else if (hasCoverages(item)) {
+        return 'icon--green';
     }
 
-    if (hasCoverages(item)) {
-        return 'icon--green';
-    } else {
-        return 'icon--default';
-    }
+    return 'icon--default';
 }
 
-export default function AgendaMetaTime({item, borderRight, isRecurring, group, isMobilePhone, onlyDates}: any): any {
+export default function AgendaMetaTime({item, borderRight, isRecurring, group, isMobilePhone, onlyDates}: IProps) {
     const icon = item.item_type === 'planning' ? 'icon--planning' : 'icon--calendar';
-
+    const groupDate = moment(group, DATE_FORMAT);
+    const startDate = moment(formatDate(getStartDate(item)), DATE_FORMAT);
+    const endDate = moment(formatDate(getEndDate(item)), DATE_FORMAT);
+    const diffDays = groupDate.diff(startDate, 'days') + 1;
+    const itemDays = endDate.diff(startDate, 'days') + 1;
     const times = (
         <div key="times" className={classNames(
             bem('wire-articles__item', 'meta-time', {'border-right': borderRight}),
             {'w-100': isMobilePhone},
-            {'m-0': onlyDates})}>
-            {format(item, group, onlyDates)}
+            {'m-0': onlyDates})}
+        >
+            {format(item, group, onlyDates === true)}
+            {itemDays <= 1 ? null : (
+                <MultiDayListLabel
+                    current={diffDays}
+                    days={itemDays}
+                />
+            )}
         </div>
     );
 
@@ -59,23 +78,11 @@ export default function AgendaMetaTime({item, borderRight, isRecurring, group, i
         </div>
     );
 
-    return isMobilePhone ?
-        [times, icons] :
-        [icons, times, <AgendaItemTimeUpdater key="timeUpdate" item={item} borderRight={borderRight} />];
+    return (
+        <React.Fragment>
+            {isMobilePhone ?
+                [times, icons] :
+                [icons, times, <AgendaItemTimeUpdater key="timeUpdate" item={item} borderRight={borderRight} />]}
+        </React.Fragment>
+    );
 }
-
-AgendaMetaTime.propTypes = {
-    item: PropTypes.object,
-    borderRight: PropTypes.bool,
-    isRecurring: PropTypes.bool,
-    group: PropTypes.string,
-    isMobilePhone: PropTypes.bool,
-    onlyDates: PropTypes.bool,
-};
-
-AgendaMetaTime.defaultProps = {
-    isRecurring: false,
-    hasCoverage: false,
-    isMobilePhone: false,
-    borderRight: false,
-};

@@ -1,3 +1,7 @@
+import {IUser} from './user';
+import {IArticle} from './content';
+import {IAgendaItem} from './agenda';
+
 export type TDatetime = string; // ISO8601 format
 
 export interface IFilterGroup {
@@ -24,4 +28,43 @@ export interface ICountry {
     text: string;
 }
 
-export type IListConfig = {[key: string]: string | number | boolean};
+interface IBaseAction {
+    _id?: string;
+    id: string;
+    name: string;
+    shortcut?: boolean;
+    icon?: string;
+    tooltip?: string;
+    visited?(user: IUser['_id'], item: IArticle | IAgendaItem): void;
+    when?(props: any, item: IArticle | IAgendaItem): boolean;
+}
+
+interface ISingleItemAction extends IBaseAction {
+    action(item?: IArticle | IAgendaItem, group?: string, plan?: IAgendaItem): void;
+}
+
+interface IMultiItemAction extends IBaseAction {
+    multi: true;
+    action(items?: Array<IArticle | IAgendaItem>): void;
+}
+
+export type IItemAction = ISingleItemAction | IMultiItemAction;
+
+export interface IResourceItem {
+    _id: string;
+    _created: string;
+    _updated: string;
+    _etag: string;
+    type: string;
+}
+
+export interface IRestApiResponse<T extends IResourceItem> {
+    _items: Array<T>;
+    _links: {};
+    _meta: {
+        max_results: number;
+        page: number;
+        total: number;
+    };
+    _aggregations: {[key: string]: any};
+}
