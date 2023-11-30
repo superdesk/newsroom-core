@@ -24,7 +24,7 @@ _hash_cache = {}
 
 
 def get_client_format(key) -> Optional[str]:
-    locale = str(get_template_locale() or get_locale())
+    locale = get_locale()
     try:
         return app.config["CLIENT_LOCALE_FORMATS"][locale][key]
     except KeyError:
