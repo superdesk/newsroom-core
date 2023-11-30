@@ -5,7 +5,6 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import CalendarButtonWrapper from './CalendarButtonWrapper';
 import {EARLIEST_DATE} from '../agenda/utils';
-import React from 'react';
 
 class CalendarButton extends React.Component<any, any> {
     static propTypes: any;
