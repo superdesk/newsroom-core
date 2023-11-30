@@ -92,7 +92,7 @@ function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNew
 
     return (
         <div className="tab-pane__inner">
-            <div className="tab-content">
+            <div className="d-contents">
                 <CollapseBoxWithButton
                     id="my-topics"
                     buttonText={gettext('My Topics')}

@@ -85,6 +85,7 @@ export function SearchResultsTopicRow({
     return (
         <SearchResultTagList
             testId="search-results--topics"
+            sticky={true}
             title={tags.length ? gettext('Topic') : ''}
             tags={tags}
         >

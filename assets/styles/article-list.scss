@@ -891,7 +891,12 @@ a.wire-articles__versions {
         }
     }
 }
+.list-group-header__actions {
+    margin-inline-start: auto;
+}
 
+
+// MULTIDAY EVENT LABEL --------------------------- //
 .multiday-label {
     --colored-border-width: 10px;
     --multiday-label-height: 20px;
@@ -982,8 +987,4 @@ a.wire-articles__versions {
             border-block-end: calc(var(--multiday-label-height) / 2)  solid transparent;
         }
     }
-}
-
-.list-group-header__actions {
-    margin-inline-start: auto;
 }
