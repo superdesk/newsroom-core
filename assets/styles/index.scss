@@ -2195,6 +2195,8 @@ article.list {
 }
 
 .wire-column__preview__content {
+    display: flex;
+    flex-direction: column;
     flex-grow: 1;
     overflow: auto;
     padding: var(--space--1-5) var(--space--3);
