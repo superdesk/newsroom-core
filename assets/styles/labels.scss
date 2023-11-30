@@ -9,7 +9,9 @@ $labels-palette: (
   red: $red,
   available: $green,
   restricted: var(--color-text--muted),
-  yellow: $yellow
+  yellow: $yellow,
+  gray-dark: $cool-gray-dark,
+  gray-mid: $cool-gray-mid,
 );
 
 /// Generates base styles for a label.
