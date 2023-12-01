@@ -1786,11 +1786,11 @@ msgstr "Statut de couverture"
 
 #: assets/agenda/components/AgendaCoverageExistsFilter.tsx:26
 msgid "Planned"
-msgstr "Planifié"
+msgstr "Planifiée"
 
 #: assets/agenda/components/AgendaCoverageExistsFilter.tsx:28
 msgid "Not Planned"
-msgstr "Non planifié"
+msgstr "Non planifiée"
 
 #: assets/agenda/components/AgendaCoverageExistsFilter.tsx:30
 msgid "Not Decided"
@@ -1798,7 +1798,7 @@ msgstr "Pas de décision"
 
 #: assets/agenda/components/AgendaCoverageExistsFilter.tsx:32
 msgid "Completed"
-msgstr "Terminé"
+msgstr "Terminée"
 
 #: assets/agenda/components/AgendaCoverageExistsFilter.tsx:45
 msgid "Coverage"

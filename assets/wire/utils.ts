@@ -72,14 +72,14 @@ export function getOtherMedia(item: IArticle): Array<IArticle> | null {
         return null;
     }
 
-    return Object.entries(item.associations ?? {})
-        .filter(([key, mediaItem]) => (
+    return Object.entries(item.associations || {})
+        .filter(([key, item]) => (
             !key.startsWith('editor_') &&
             key !== 'featuremedia' &&
-            mediaItem != null &&
-            ['video', 'audio'].includes(mediaItem.type)
+            item != null &&
+            ['video', 'audio'].includes(item.type)
         ))
-        .map((args) => args[1]) as IArticle[]; // it's filtering out null values in .filter
+        .map(([key, item]) => item) as IArticle[]; // null values are filtered in .filter
 }
 
 /**
