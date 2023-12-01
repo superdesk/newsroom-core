@@ -33,7 +33,7 @@ def get_settings_data():
         return {
             "_id": provider["_id"],
             "name": str(provider["name"]),
-            "auth_type": provider["auth_type"].value,
+            "auth_type": str(provider["auth_type"]),
         }
 
     return {
