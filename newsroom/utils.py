@@ -50,8 +50,7 @@ def query_resource(
 
 
 def find_one(resource, **lookup):
-    req = ParsedRequest()
-    return app.data.find_one(resource, req, **lookup)
+    return app.data.find_one(resource, req=None, **lookup)
 
 
 def get_random_string():
