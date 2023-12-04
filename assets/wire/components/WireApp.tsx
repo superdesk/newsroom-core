@@ -61,6 +61,7 @@ import {
     listConfigSelector,
     advancedSearchTabsConfigSelector,
 } from 'ui/selectors';
+import NewItemsIcon from 'search/components/NewItemsIcon';
 
 const modals: any = {
     shareItem: ShareItemModal,
@@ -230,15 +231,11 @@ class WireApp extends BaseApp {
                                             showTotalItems={showTotalItems}
                                             showTotalLabel={showTotalLabel}
                                             showSaveTopic={showSaveTopic}
-
                                             totalItems={this.props.totalItems}
                                             totalItemsLabel={totalItemsLabel}
-
                                             saveMyTopic={saveMyTopic}
                                             activeTopic={this.props.activeTopic}
                                             topicType={this.props.context === 'wire' ? this.props.context : null}
-
-                                            newItems={this.props.newItems}
                                             refresh={this.props.fetchItems}
                                             setSortQuery={this.props.setSortQuery}
                                             setQuery={this.props.setQuery}
@@ -256,6 +253,16 @@ class WireApp extends BaseApp {
                                     searchAllVersions={this.props.searchAllVersions}
                                     toggleSearchAllVersions={this.props.toggleSearchAllVersions}
                                 />
+                                {!(this.props.newItems || []).length ? null : (
+                                    <div className="navbar navbar--flex navbar--small">
+                                        <div className="navbar__inner navbar__inner--end">
+                                            <NewItemsIcon
+                                                newItems={this.props.newItems}
+                                                refresh={this.props.fetchItems}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                             <ItemsList
                                 actions={this.props.actions}
