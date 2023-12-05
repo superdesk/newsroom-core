@@ -15,6 +15,7 @@ import FiltersTab from 'wire/components/filters/FiltersTab';
 import NavigationTab from 'wire/components/filters/NavigationTab';
 import {AdvancedSearchPanel} from 'search/components/AdvancedSearchPanel';
 import {SearchTipsPanel} from 'search/components/SearchTipsPanel';
+import '@superdesk/common/dist/src/index.css';
 
 export default class BaseApp extends React.Component<any, any> {
     static propTypes: any;

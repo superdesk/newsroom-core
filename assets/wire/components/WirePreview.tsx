@@ -33,7 +33,6 @@ import AgendaLinks from './AgendaLinks';
 import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
-import '@superdesk/common/dist/src/index.css';
 
 class WirePreview extends React.PureComponent<any, any> {
     static propTypes: any;
