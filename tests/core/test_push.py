@@ -4,7 +4,7 @@ import hmac
 import bson
 from bson import ObjectId
 from flask import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from superdesk import get_resource_service
 import newsroom.auth  # noqa - Fix cyclic import when running single test file
 from newsroom.utils import get_entity_or_404
@@ -856,3 +856,14 @@ def test_push_wire_subject_whitelist(client, app):
     parsed = get_entity_or_404(item["guid"], "items")
     assert 1 == len(parsed["subject"])
     assert "b" == parsed["subject"][0]["name"]
+
+
+def test_push_custom_expiry(client, app):
+    app.config["SOURCE_EXPIRY_DAYS"] = {"foo": 50}
+    updated = item.copy()
+    updated["source"] = "foo"
+    client.post("/push", data=json.dumps(updated), content_type="application/json")
+    parsed = get_entity_or_404(item["guid"], "items")
+    now = datetime.utcnow().replace(second=0, microsecond=0)
+    expiry: datetime = parsed["expiry"].replace(tzinfo=None)
+    assert now + timedelta(days=49) < expiry < now + timedelta(days=51)
