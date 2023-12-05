@@ -33,8 +33,6 @@ import AgendaLinks from './AgendaLinks';
 import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
-import {downloadMedia} from '../actions';
-
 
 class WirePreview extends React.PureComponent<any, any> {
     static propTypes: any;
@@ -53,8 +51,8 @@ class WirePreview extends React.PureComponent<any, any> {
         const {item, user, actions, followStory, topics, previewConfig, downloadMedia, listConfig, filterGroupLabels} = this.props;
         const featureMedia = getFeatureMedia(item);
         const media = getOtherMedia(item);
-
         const previousVersions = 'preview_versions';
+
         return (
             <Preview onCloseClick={this.props.closePreview} published={item.versioncreated}>
                 <div className='wire-column__preview__top-bar'>

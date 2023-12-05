@@ -7,7 +7,7 @@ from typing_extensions import TypedDict
 
 from superdesk import get_resource_service
 from flask import current_app, render_template, url_for
-from flask_babel import gettext
+from flask_babel import gettext, force_locale
 from flask_mail import Attachment, Message
 from jinja2 import TemplateNotFound
 from newsroom.auth import get_company
@@ -204,13 +204,14 @@ def send_template_email(
 
         try:
             set_template_locale(language)
-            send_email(
-                to=group["emails"],
-                subject=subject,
-                text_body=render_template(group["text_template"], **template_kwargs),
-                html_body=render_template(group["html_template"], **template_kwargs),
-                **kwargs,
-            )
+            with force_locale(language):
+                send_email(
+                    to=group["emails"],
+                    subject=subject,
+                    text_body=render_template(group["text_template"], **template_kwargs),
+                    html_body=render_template(group["html_template"], **template_kwargs),
+                    **kwargs,
+                )
         finally:
             set_template_locale()
 
