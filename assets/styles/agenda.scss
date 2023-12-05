@@ -27,7 +27,7 @@
     flex-shrink: 0;
     display: grid;
     grid-template-rows: auto auto 1fr auto;
-    max-height: clamp(360px, 65svh, 65svh);
+    max-height: clamp(360px, 50svh, 50svh);
     @include phone {
         .search-result__tags-list {
             border-bottom: 2px solid var(--main-header-color-bg);
