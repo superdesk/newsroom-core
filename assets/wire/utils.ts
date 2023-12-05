@@ -129,6 +129,10 @@ export function getThumbnailRendition(picture: IArticle, large?: boolean): IRend
     return rendition ?? picture.renditions?.thumbnail;
 }
 
+export function notNullOrUndefined<T>(x: null | undefined | T): x is T {
+    return x != null;
+}
+
 export function getImageForList(item: IArticle): {item: IArticle, href: string} | undefined {
     const pictures = getPictureList(item);
     let thumbnail: IRendition | undefined;

@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {isEmpty} from 'lodash';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import AgendaLinks from './AgendaLinks';
@@ -15,6 +14,9 @@ import {
     DISPLAY_ABSTRACT,
     isPreformatted,
     isCustomRendition,
+    getPictureList,
+    getThumbnailRendition,
+    notNullOrUndefined,
 } from 'wire/utils';
 import types from 'wire/types';
 import Content from 'ui/components/Content';
@@ -35,6 +37,7 @@ import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
+import {Carousel} from '@superdesk/common';
 
 function ItemDetails({
     item,
@@ -51,6 +54,10 @@ function ItemDetails({
     const featureMedia = getFeatureMedia(item);
     const media = getOtherMedia(item);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
+    const carouselItems = getPictureList(item)
+        .map((image) => getThumbnailRendition(image))
+        .filter(notNullOrUndefined)
+        .map((image) => ({src: image.href}));
 
     return (
         <Content type="item-detail">
@@ -69,11 +76,17 @@ function ItemDetails({
                 <ArticleContent>
                     {featureMedia == null ? null : (
                         featureMedia.type === 'picture' ? (
-                            <ArticlePicture
-                                picture={featureMedia}
-                                isKilled={isKilled(item)}
-                                isCustomRendition={isCustomRendition(featureMedia)}
-                            />
+                            carouselItems.length > 1 ? (
+                                <Carousel
+                                    images={carouselItems}
+                                />
+                            ) : (
+                                <ArticlePicture
+                                    picture={featureMedia}
+                                    isKilled={isKilled(item)}
+                                    isCustomRendition={isCustomRendition(featureMedia)}
+                                />
+                            )
                         ) : (
                             <ArticleMedia
                                 media={featureMedia}
