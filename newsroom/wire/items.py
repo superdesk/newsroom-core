@@ -26,8 +26,10 @@ class ItemsService(BaseItemsService):
             yield items
         # remove items with custom expiry
         lookup = {"expiry": {"$lt": expiry_datetime}}
-        items = list(self.get_from_mongo(req=None, lookup=lookup))
-        yield items
+        if max_results is None:
+            max_results = 100
+        for item in self.get_all_batch(max_results, 100, lookup):
+            yield [item]
 
 
 class ItemsVersionsResource(BaseItemsVersionsResource):
