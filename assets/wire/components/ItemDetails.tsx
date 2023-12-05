@@ -16,6 +16,7 @@ import {
     isCustomRendition,
     getPictureList,
     getThumbnailRendition,
+    notNullOrUndefined,
 } from 'wire/utils';
 import types from 'wire/types';
 import Content from 'ui/components/Content';
@@ -53,9 +54,10 @@ function ItemDetails({
     const featureMedia = getFeatureMedia(item);
     const media = getOtherMedia(item);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
-    const carouselItems = getPictureList(item).map((image) => ({
-        src: getThumbnailRendition(image)?.href as string,
-    }));
+    const carouselItems = getPictureList(item)
+        .map((image) => getThumbnailRendition(image))
+        .filter(notNullOrUndefined)
+        .map((image) => ({src: image.href}));
 
     return (
         <Content type="item-detail">
