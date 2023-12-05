@@ -16,7 +16,6 @@ class ItemsResource(BaseItemsResource):
     schema["slugline"] = schema["headline"] = schema["body_html"] = schema["description_html"] = metadata_schema[
         "body_html"
     ].copy()
-    schema["expiry"] = {"type": "datetime", "reaonly": True}
 
 
 class ItemsService(BaseItemsService):
