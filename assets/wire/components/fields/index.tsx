@@ -7,6 +7,7 @@ import {PreviousVersions} from './PreviousVersions';
 import {Embargo} from './Embargo';
 import {VersionCreated} from './VersionCreated';
 import {VersionType} from './VersionType';
+import {ExpiryDateLabel} from './ExpiryDateLabel';
 
 const ALLOWED_SEPARATORS = ['/', '//', '-'];
 const SEPARATOR_KEY = 'separator';
@@ -19,6 +20,7 @@ const MAP_FIELD_TO_COMPONENT: any = {
     previous_versions: PreviousVersions,
     embargo: Embargo,
     versioncreated: VersionCreated,
+    expiry: ExpiryDateLabel,
 };
 
 // Example config:
