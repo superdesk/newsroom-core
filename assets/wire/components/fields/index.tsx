@@ -1,6 +1,7 @@
 import React from 'react';
 import {Source} from './Source';
 import {UrgencyLabel} from './UrgencyLabel';
+import {DurationLabel} from './DurationLabel';
 import {CharCount} from './CharCount';
 import {WordCount} from './WordCount';
 import {PreviousVersions} from './PreviousVersions';
@@ -14,6 +15,7 @@ const SEPARATOR_KEY = 'separator';
 const MAP_FIELD_TO_COMPONENT: any = {
     urgency: UrgencyLabel,
     source: Source,
+    duration: DurationLabel,
     charcount: CharCount,
     wordcount: WordCount,
     previous_versions: PreviousVersions,
