@@ -188,6 +188,10 @@ $container-max-widths: (
     --color-text--inverse:        var(--color-neutral-050);
     --color-text--disabled:       var(--color-neutral-600);
 
+    // CORE: TEXT LINK
+    --color-text-link:            var(--color-interactive-focus);
+    --color-text-link-hover:      hsl(var(--color-interactive-focus-base), calc(var(--color-interactive-focus-l) - 8%));
+
     // CORE: LINE COLORS
     --color-line--x-light:        var(--color-neutral-150);
     --color-line--light:          var(--color-neutral-200);
@@ -284,7 +288,7 @@ $container-max-widths: (
     --searchbar-color-shadow--focus: var(--color-interactive-focus--translucent);
     --searchbar-color-button-bg: var(--color-text--muted);
     --searchbar-color-button-bg--active: var(--button-color-bg--primary);
-    --searchbar-color-button-bg--active-hover: var(--button-color-bg--primary--hover);
+    --searchbar-color-button-bg--active-hover: var(--button-color-bg--primary-hover);
 
     // COMPONENT: NAVBAR MAIN
     --top-bar-color-bg: hsl(216, 45%, 14%);

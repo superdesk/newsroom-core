@@ -17,7 +17,7 @@ function MyCompany() {
                         <td>Wire</td>
                     </tr>
                     <tr>
-                        <td>Product one</td>
+                        <td><a className="text-link text-link--text-color" href="#">Product one</a></td>
                         <td>16/30</td>
                         <td className="font-light">Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</td>
                         <td><button className="nh-button nh-button--tertiary nh-button--small">Request more seats</button></td>
