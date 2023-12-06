@@ -8,7 +8,7 @@ import {getNavigationUrlParam, getSearchParams} from './utils';
 import {getLocations, getMapSource} from 'maps/utils';
 
 import {closeModal} from 'actions';
-import {fetchItems, setShareItems} from 'wire/actions';
+import {setShareItems} from 'wire/actions';
 import {createOrUpdateTopic, fetchUser} from 'user-profile/actions';
 
 import {multiSelectTopicsConfigSelector} from 'ui/selectors';
@@ -22,6 +22,7 @@ import {
 } from './selectors';
 
 import {context} from 'selectors';
+import {fetchItems} from 'agenda/actions';
 
 export const SET_QUERY = 'SET_QUERY';
 export function setQuery(query: any) {
