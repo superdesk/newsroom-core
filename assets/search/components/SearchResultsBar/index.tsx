@@ -22,7 +22,6 @@ import {
 import {Dropdown} from './../../../components/Dropdown';
 
 import {SearchResultTagsList} from './SearchResultTagsList';
-import NewItemsIcon from '../NewItemsIcon';
 
 
 class SearchResultsBarComponent extends React.Component<any, any> {
@@ -222,17 +221,6 @@ class SearchResultsBarComponent extends React.Component<any, any> {
 
                     {this.props.children}
                 </div>
-
-                {!(this.props.newItems || []).length ? null : (
-                    <div className="navbar navbar--flex navbar--small">
-                        <div className="navbar__inner navbar__inner--end">
-                            <NewItemsIcon
-                                newItems={this.props.newItems}
-                                refresh={this.props.refresh}
-                            />
-                        </div>
-                    </div>
-                )}
             </React.Fragment>
         );
     }
@@ -255,7 +243,6 @@ SearchResultsBarComponent.propTypes = {
     activeTopic: PropTypes.object,
     topicType: PropTypes.string,
 
-    newItems: PropTypes.array,
     refresh: PropTypes.func,
 
     navigations: PropTypes.object,
