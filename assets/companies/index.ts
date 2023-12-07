@@ -1,14 +1,18 @@
 import {createStore, render} from 'utils';
 import companyReducer from './reducers';
 import CompaniesApp from './components/CompaniesApp';
-import {initViewData} from './actions';
+import {initViewData, onURLParamsChanged} from './actions';
 
 const store = createStore(companyReducer, 'Company');
 
-
-if (window.viewData && window.viewData.companies) {
+if (window.viewData) {
     store.dispatch(initViewData(window.viewData));
 }
 
+// Respond to URL param changes from browser history events
+window.addEventListener('popstate', () => {
+    store.dispatch(onURLParamsChanged());
+});
+store.dispatch(onURLParamsChanged());
 
 render(store, CompaniesApp, document.getElementById('settings-app'));
