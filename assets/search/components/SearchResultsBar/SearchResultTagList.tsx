@@ -6,16 +6,18 @@ interface IProps {
     testId: string;
     title?: string;
     secondary?: boolean;
+    sticky?: boolean;
     tags?: React.ReactNode[];
     children?: React.ReactNode;
 }
 
-export function SearchResultTagList({testId, title, tags, children, secondary}: IProps) {
+export function SearchResultTagList({testId, title, tags, children, secondary, sticky}: IProps) {
     return (
         <li
             data-test-id={testId}
             className={classNames(
                 'search-result__tags-list-row',
+                {'search-result__tags-list-row--sticky': sticky},
                 {'search-result__tags-list-row--secondary': secondary}
             )}
         >

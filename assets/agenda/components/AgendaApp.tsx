@@ -55,6 +55,7 @@ import BookmarkTabs from 'components/BookmarkTabs';
 import {setActiveDate, setAgendaDropdownFilter} from 'local-store';
 import {previewConfigSelector, detailsConfigSelector} from 'ui/selectors';
 import {SearchResultsBar} from 'search/components/SearchResultsBar';
+import NewItemsIcon from 'search/components/NewItemsIcon';
 
 const modals = {
     shareItem: ShareItemModal,
@@ -248,24 +249,18 @@ class AgendaApp extends BaseApp {
                                         <SearchResultsBar
                                             initiallyOpen={showFilters}
                                             minimizeSearchResults={this.state.minimizeSearchResults}
-
                                             showTotalItems={showTotalItems}
                                             showTotalLabel={showTotalLabel}
                                             showSaveTopic={showSaveTopic}
                                             onClearAll={() => {
                                                 this.props.toggleDropdownFilter('itemType', null);
                                             }}
-
                                             totalItems={this.props.totalItems}
                                             totalItemsLabel={totalItemsLabel}
-
                                             saveMyTopic={saveMyTopic}
                                             activeTopic={this.props.activeTopic}
                                             topicType="agenda"
-
-                                            newItems={this.props.newItems}
                                             refresh={this.props.fetchItems}
-
                                             setQuery={this.props.setQuery}
                                         />
                                     )
@@ -278,6 +273,16 @@ class AgendaApp extends BaseApp {
                                     featuredFilter={this.props.featuredOnly}
                                     hasAgendaFeaturedItems={this.props.hasAgendaFeaturedItems}
                                 />
+                                {!(this.props.newItems || []).length ? null : (
+                                    <div className="navbar navbar--flex navbar--small">
+                                        <div className="navbar__inner navbar__inner--end">
+                                            <NewItemsIcon
+                                                newItems={this.props.newItems}
+                                                refresh={this.props.fetchItems}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                             <AgendaList
                                 actions={this.props.actions}

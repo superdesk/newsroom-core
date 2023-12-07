@@ -4,7 +4,7 @@ import logging
 
 import newsroom.signals as signals
 from copy import copy, deepcopy
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, Set
 
 from flask import current_app as app
@@ -100,7 +100,9 @@ def push():
     elif item.get("type") == "text":
         orig = superdesk.get_resource_service("items").find_one(req=None, _id=item["guid"])
         item["_id"] = publish_item(item, orig)
-        notify_new_wire_item.delay(item["_id"], check_topics=orig is None)
+        notify_new_wire_item.delay(
+            item["_id"], check_topics=orig is None or app.config["WIRE_NOTIFICATIONS_ON_CORRECTIONS"]
+        )
     elif item["type"] == "planning_featured":
         publish_planning_featured(item)
     else:
@@ -129,6 +131,12 @@ def publish_item(doc, original):
     doc.setdefault("charcount", get_char_count(doc.get("body_html", "")))
     doc["original_id"] = doc["guid"]
 
+    source_expiry = app.config.get("SOURCE_EXPIRY_DAYS") or {}
+    if doc.get("source") in source_expiry:
+        doc["expiry"] = datetime.utcnow().replace(second=0, microsecond=0) + timedelta(
+            days=source_expiry[doc["source"]]
+        )
+
     service = superdesk.get_resource_service("content_api")
     service.datasource = "items"
 
@@ -142,6 +150,8 @@ def publish_item(doc, original):
             doc["bookmarks"] = parent_item.get("bookmarks", [])
             doc["planning_id"] = parent_item.get("planning_id")
             doc["coverage_id"] = parent_item.get("coverage_id")
+            if parent_item.get("expiry"):
+                doc["expiry"] = parent_item["expiry"]
         else:
             logger.warning(
                 "Failed to find evolvedfrom item %s for %s",

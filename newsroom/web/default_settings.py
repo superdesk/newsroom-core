@@ -3,7 +3,7 @@ import pathlib
 import tzlocal
 import logging
 
-from typing import List
+from typing import Dict, List
 from kombu import Queue, Exchange
 from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
@@ -663,3 +663,24 @@ FIREBASE_CLIENT_CONFIG = {
 }
 
 FIREBASE_ENABLED = bool(FIREBASE_CLIENT_CONFIG["apiKey"] and FIREBASE_CLIENT_CONFIG["authDomain"])
+
+#:
+#: If `True` it will show multi day events only on starting day,
+#: when `False` those will be visible on every day.
+#:
+#: .. versionadded: 2.5.0
+#:
+AGENDA_SHOW_MULTIDAY_ON_START_ONLY = True
+
+#: Send email notifications for corrections of wire items
+#:
+#:
+#: .. versionadded: 2.5.0
+#:
+WIRE_NOTIFICATIONS_ON_CORRECTIONS = False
+
+#: Set source specific expiry
+#:
+#: .. versionadded: 2.6
+#:
+SOURCE_EXPIRY_DAYS: Dict[str, int] = {}

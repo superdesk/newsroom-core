@@ -17,8 +17,11 @@ class Country(TypedDict):
     text: str
 
 
-class Product(TypedDict, total=False):
+class Entity(TypedDict):
     _id: ObjectId
+
+
+class Product(Entity, total=False):
     name: str
     description: str
     original_creator: ObjectId

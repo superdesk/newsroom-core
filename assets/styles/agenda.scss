@@ -21,10 +21,40 @@
 .wire-column__main-header-container {
     position: relative;
     z-index: 1;
-    display: flex;
-    flex-direction: column;
     background-color: var(--main-header-color-bg);
     box-shadow: 0 3px 6px hsla(0, 0%, 0%, 0.1), 0 1px 0 hsla(0, 0%, 0%, 0.06);
-    gap: 1px;
+    gap: 0;
     flex-shrink: 0;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    max-height: clamp(360px, 50svh, 50svh);
+    @include phone {
+        .search-result__tags-list {
+            border-bottom: 2px solid var(--main-header-color-bg);
+            padding-inline: var(--space--1);
+            .tags-list {
+                gap: var(--space--0-5);
+            }
+        }
+    }
+}
+
+// Grid Layout for the Search result elements inside the .wire-column__main-header-container
+
+.navbar--quick-filter {
+    grid-row: 1 / 2;
+}
+
+.navbar.navbar--search-results {
+    z-index: 1;
+    grid-row: 2 / 3;
+}
+
+.search-result__tags-list {
+    grid-row: 3 / 4;
+    overflow-y: auto;
+}
+
+.navbar--list-controls {
+    grid-row: 4 / 5;
 }
