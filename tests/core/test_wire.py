@@ -922,7 +922,12 @@ def test_navigation_for_public_users(client, app, setup_products):
     )
 
     # and remove those from company
-    app.data.update("companies", COMPANY_1_ID, {"products": None}, company)
+    app.data.update(
+        "companies",
+        COMPANY_1_ID,
+        {"products": [{"section": "wire", "_id": 10, "seats": 1}, {"section": "wire", "_id": 11, "seats": 1}]},
+        company,
+    )
 
     login(client, user)
 
