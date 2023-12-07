@@ -141,7 +141,6 @@ export function toggleFilter(key: any, value: any, single?: any) {
         }
 
         dispatch(setSearchFilters(currentFilters));
-        dispatch(fetchItems());
         updateRouteParams(
             {filter: currentFilters},
             state,
