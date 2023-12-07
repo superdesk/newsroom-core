@@ -6,7 +6,7 @@
 {% endif %}
 {%- if item.definition_long %}Definition: {{ item.definition_long }}
 {% endif -%}
-On: {{ item.dates.start | datetime_long }}
+On: {{ (item.dates.end or item.dates.start) | datetime_long }}
 
 {%- if item.subject %}Category: {{ item.subject|join(', ', attribute='name')}}
 {% endif %}
