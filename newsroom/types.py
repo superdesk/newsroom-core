@@ -4,8 +4,11 @@ from datetime import datetime
 from enum import Enum
 
 
-class Product(TypedDict, total=False):
+class Entity(TypedDict):
     _id: ObjectId
+
+
+class Product(Entity, total=False):
     name: str
     description: str
     original_creator: ObjectId
