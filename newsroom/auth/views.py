@@ -3,6 +3,7 @@ import flask
 import bcrypt
 import logging
 import google.oauth2.id_token
+import re
 
 from bson import ObjectId
 from flask import current_app as app, abort
@@ -204,18 +205,64 @@ def logout():
 
 @blueprint.route("/signup", methods=["GET", "POST"])
 def signup():
-    form = SignupForm()
+    form = (app.signup_form_class or SignupForm)()
+    if len(app.countries):
+        form.country.choices += [(item.get("value"), item.get("text")) for item in app.countries]
+
+    company_types = app.config.get("COMPANY_TYPES") or []
+    if len(company_types):
+        form.company_type.choices += [(item.get("id"), item.get("name")) for item in company_types]
+
     if form.validate_on_submit():
-        new_user = form.data
-        new_user.pop("csrf_token", None)
-
         user = get_auth_user_by_email(form.email.data)
-
         if user is not None:
             flask.flash(gettext("Account already exists."), "danger")
             return flask.redirect(flask.url_for("auth.login"))
 
-        send_new_signup_email(user=new_user)
+        company_service = get_resource_service("companies")
+        regex = re.compile(f"^{form.company.data}$", re.IGNORECASE)
+        company = company_service.find_one(req=None, name=regex)
+        is_new_company = company is None
+
+        if is_new_company:
+            enabled_products = get_resource_service("products").get(req=None, lookup={"is_enabled": True})
+            company = {
+                "name": form.company.data,
+                "contact_name": form.first_name.data + " " + form.last_name.data,
+                "contact_email": form.email.data,
+                "phone": form.phone.data,
+                "country": form.country.data,
+                "company_type": form.company_type.data,
+                "url": form.company_url.data,
+                "company_size": form.company_size.data,
+                "referred_by": form.referred_by.data,
+                "is_enabled": False,
+                "is_approved": False,
+                "sections": {section["_id"]: True for section in app.sections},
+                "products": [
+                    {"_id": product.get("_id"), "seats": 0, "section": product.get("product_type")}
+                    for product in enabled_products
+                ],
+            }
+            ids = company_service.post([company])
+            company["_id"] = ids[0]
+
+        user_service = get_resource_service("users")
+        new_user = {
+            "first_name": form.first_name.data,
+            "last_name": form.last_name.data,
+            "email": form.email.data,
+            "phone": form.phone.data,
+            "role": form.occupation.data,
+            "country": form.country.data,
+            "company": company["_id"],
+            "is_validated": False,
+            "is_enabled": False,
+            "is_approved": False,
+            "sections": {section["_id"]: True for section in app.sections},
+        }
+        user_service.post([new_user])
+        send_new_signup_email(company, new_user, is_new_company)
         return flask.render_template("signup_success.html"), 200
     return flask.render_template(
         "signup.html",
