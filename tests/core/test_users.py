@@ -15,10 +15,15 @@ from newsroom.tests.users import ADMIN_USER_ID
 from newsroom.signals import user_created, user_updated, user_deleted
 from unittest import mock
 
-from tests.utils import mock_send_email
+from tests.utils import mock_send_email, login
 
 
-def test_user_list_fails_for_anonymous_user(client, anonymous_user):
+def test_user_list_fails_for_anonymous_user(client, anonymous_user, public_user):
+    response = client.get("/users/search")
+    assert response.status_code == 302
+    assert response.headers.get("location") == "http://localhost:5050/login"
+
+    login(client, public_user)
     response = client.get("/users/search")
     assert response.status_code == 403
     assert b"Forbidden" in response.data

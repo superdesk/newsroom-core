@@ -5,10 +5,11 @@ from pytest import fixture
 from superdesk import get_resource_service
 from superdesk.utils import get_hash
 
+from newsroom.types import CompanyType, Country
 from newsroom.auth.token import verify_auth_token
 from newsroom.auth.views import _is_password_valid
-from newsroom.tests.users import ADMIN_USER_ID  # noqa
-from tests.utils import mock_send_email
+from newsroom.tests.users import ADMIN_USER_ID, ADMIN_USER_EMAIL  # noqa
+from tests.utils import mock_send_email, login
 from unittest import mock
 
 disabled_company = ObjectId()
@@ -39,7 +40,12 @@ def init(app):
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
 def test_new_user_signup_sends_email(app, client):
+    app.countries = [Country(value="AUS", text="Australia")]
     app.config["SIGNUP_EMAIL_RECIPIENTS"] = "admin@bar.com"
+    app.config["COMPANY_TYPES"] = [CompanyType(id="news_media", name="News Media")]
+    product_ids = app.data.insert(
+        "products", [{"name": "test", "query": "foo", "is_enabled": True, "product_type": "wire"}]
+    )
     with app.mail.record_messages() as outbox:
         # Sign up
         response = client.post(
@@ -48,11 +54,12 @@ def test_new_user_signup_sends_email(app, client):
                 "email": "newuser@abc.org",
                 "first_name": "John",
                 "last_name": "Doe",
-                "country": "Australia",
+                "country": "AUS",
                 "phone": "1234567",
-                "company": "Press 2 co.",
+                "company": "News Press Co.",
                 "company_size": "0-10",
                 "occupation": "Other",
+                "company_type": "news_media",
             },
         )
         assert response.status_code == 200
@@ -64,7 +71,53 @@ def test_new_user_signup_sends_email(app, client):
         assert "John" in outbox[0].body
         assert "Doe" in outbox[0].body
         assert "1234567" in outbox[0].body
-        assert "Press 2 co." in outbox[0].body
+        assert "News Press Co." in outbox[0].body
+        assert "Australia" in outbox[0].body
+        assert "News Media" in outbox[0].body
+
+    # Test that the new Company has been created
+    new_company = app.data.find_one("companies", req=None, name="News Press Co.")
+    assert new_company is not None
+    assert new_company["contact_name"] == "John Doe"
+    assert new_company["contact_email"] == "newuser@abc.org"
+    assert new_company["phone"] == "1234567"
+    assert new_company["country"] == "AUS"
+    assert new_company["company_type"] == "news_media"
+    assert new_company["is_enabled"] is False
+    assert new_company["is_approved"] is False
+    assert new_company["sections"] == {
+        "wire": True,
+        "agenda": True,
+        "news_api": True,
+        "monitoring": True,
+    }
+    assert new_company["products"] == [
+        {
+            "_id": product_ids[0],
+            "section": "wire",
+            "seats": 0,
+        }
+    ]
+
+    # Test that the new User has been created
+    new_user = app.data.find_one("users", req=None, email="newuser@abc.org")
+    assert new_user is not None
+    assert new_user["first_name"] == "John"
+    assert new_user["last_name"] == "Doe"
+    assert new_user["email"] == "newuser@abc.org"
+    assert new_user["phone"] == "1234567"
+    assert new_user["role"] == "Other"
+    assert new_user["country"] == "AUS"
+    assert new_user["company"] == new_company["_id"]
+    assert new_user["is_enabled"] is False
+    assert new_user["is_approved"] is False
+    assert new_user["is_validated"] is False
+    assert new_user["sections"] == {
+        "wire": True,
+        "agenda": True,
+        "news_api": True,
+        "monitoring": True,
+    }
 
 
 def test_new_user_signup_fails_if_fields_not_provided(client):
@@ -534,19 +587,11 @@ def test_access_for_disabled_user(app, client):
 
     user = get_resource_service("users").find_one(req=None, _id=user_id)
 
-    with client.session_transaction() as session:
-        session["user"] = str(user_id)
-        session["user_type"] = "administrator"
-        session["name"] = "public"
-        session["auth_ttl"] = None
+    login(client, {"email": "test@sourcefabric.org"})
     resp = client.get("/bookmarks_wire")
     assert 200 == resp.status_code
 
-    with client.session_transaction() as session:
-        session["user"] = ADMIN_USER_ID
-        session["user_type"] = "administrator"
-        session["name"] = "Admin"
-        session["auth_ttl"] = None
+    login(client, {"email": ADMIN_USER_EMAIL})
     resp = client.post(
         "/users/{}".format(user_id),
         data={
@@ -565,13 +610,11 @@ def test_access_for_disabled_user(app, client):
     )
     assert 200 == resp.status_code
 
-    with client.session_transaction() as session:
-        session["user"] = str(user_id)
-        session["user_type"] = "administrator"
-        session["name"] = "public"
-        session["auth_ttl"] = None
+    resp = login(client, {"email": "test@sourcefabric.org"}, assert_login=False)
+    assert "Account is disabled" in resp.get_data(as_text=True)
+
     resp = client.get("/users/search")
-    assert 403 == resp.status_code
+    assert 302 == resp.status_code
 
     resp = client.get("/wire")
     assert 302 == resp.status_code
