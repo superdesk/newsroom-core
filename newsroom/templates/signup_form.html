@@ -1,0 +1,62 @@
+<form class="form" method="post">
+    {{ form.hidden_tag() }}
+    {% include "form_alerts.html" %}
+
+    <div class="form-group">
+        <label for="first_name">{{ form.first_name.label.text }}</label>
+        {{ form.first_name(class="form-control", id="first_name", required="true") }}
+    </div>
+    <div class="form-group">
+        <label for="last_name">{{ form.last_name.label.text }}</label>
+        {{ form.last_name(class="form-control", id="last_name", required="true") }}
+    </div>
+    <div class="form-group">
+        <label for="email">{{ form.email.label.text }}</label>
+        {{ form.email(class="form-control", id="email", required="true") }}
+    </div>
+    <div class="form-group">
+        <label for="phone">{{ form.phone.label.text }}</label>
+        {{ form.phone(class="form-control", id="phone", required="true") }}
+    </div>
+    <div class="form-group">
+        <label for="country">{{ form.country.label.text }}</label>
+        {{ form.country(class="form-control", id="country", required="true") }}
+    </div>
+    <div class="form-group">
+        <label for="company">{{ form.company.label.text }}</label>
+        {{ form.company(class="form-control", id="company", required="true") }}
+    </div>
+
+    <div class="form-group">
+        <label for="occupation">{{ form.occupation.label.text }}</label>
+        {{ form.occupation(class="form-control", id="occupation", required="true") }}
+    </div>
+
+    {% if form.company_type.choices %}
+        <div class="form-group">
+            <label for="company_type">{{ form.company_type.label.text }}</label>
+            {{ form.company_type(class="form-control", id="company_type") }}
+        </div>
+    {% endif %}
+    <div class="form-group">
+        <label for="company_size">{{ form.company_size.label.text }}</label>
+        {{ form.company_size(class="form-control", id="company_size", required="true") }}
+    </div>
+    <div class="form-group">
+        <label for="company_url">{{ form.company_url.label.text }}</label>
+        {{ form.company_url(class="form-control", id="company_url") }}
+    </div>
+
+    <div class="form-group mb-4 p-0">
+        <div class="form-check">
+            {{ form.consent(class="form-check-input", id="consent", required="true") }}
+            <label class="form-check-label" for="consent">{{ form.consent.label.text }}</label>
+            <a href="{{ terms }}" target="_blank" class="link">{{ gettext("the terms and conditions") }}</a>
+        </div>
+    </div>
+
+    <div class="g-recaptcha mb-4" data-sitekey={{ sitekey }} data-callback="enableSubmitButton"></div>
+
+    <button type="submit" class="btn btn-primary w-100" id="signup-submit" disabled>
+        {{ gettext("Sign up") }}</button>
+</form>
