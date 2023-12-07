@@ -41,6 +41,7 @@
 
             {% include "impersonate_user.html" %}
 
+            {% block topnav_navbar %}
             {% if session.get('name') %}
             <div class="navbar__right">
                 {% if config.SHOW_DATE %}
@@ -60,6 +61,7 @@
                 {% endif %}
             </div>
             {% endif %}
+            {% endblock %}
         </nav>
     {% endblock %}
 
