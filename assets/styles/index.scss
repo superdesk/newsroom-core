@@ -16,6 +16,37 @@ a {
     text-decoration: none;
     &:hover {
         text-decoration: underline;
+        color: var(--color-text-link);
+    }
+}
+
+.text-link {
+    color: var(--color-text-link);
+    text-decoration: none;
+    display: inline;
+    border-bottom: 1px dotted var(--color-text-link);
+    transition: all 0.2s ease;
+    &:hover {
+        text-decoration: none !important;
+        color: var(--color-text-link-hover);
+        border-bottom: 1px solid var(--color-text-link);
+        cursor: pointer;
+    }
+    &.text-link--text-color {
+        color: var(--color-text);
+        &:hover {
+            color: var(--color-text-link);
+        }
+    }
+    &:focus {
+        outline: none;
+        box-shadow: none;
+    }
+    &:focus-visible {
+        outline: 1px dotted var(--color-text-link);
+        outline-offset: 2px;
+        border-radius: var(--border-radius--xs);
+        border: none;
     }
 }
 
