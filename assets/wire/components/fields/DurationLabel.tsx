@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {gettext} from 'utils';
-import {get} from 'lodash';
 
 export function DurationLabel ({item, filterGroupLabels}: any) {
     if (item.extra?.duration == null) {
@@ -28,7 +27,7 @@ export function DurationLabel ({item, filterGroupLabels}: any) {
         return value;
     }
 
-    const label = get(filterGroupLabels, 'duration', gettext('Duration'));
+    const label = filterGroupLabels?.duration ?? gettext('Duration');
     const time = secondsToHHMMSS(item.extra.duration);
     const text = label + ': ' + time;
 
