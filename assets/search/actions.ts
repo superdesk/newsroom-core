@@ -22,7 +22,6 @@ import {
 } from './selectors';
 
 import {context} from 'selectors';
-import {fetchItems} from 'agenda/actions';
 
 export const SET_QUERY = 'SET_QUERY';
 export function setQuery(query: any) {
@@ -164,7 +163,6 @@ export function setCreatedFilter(filter: any) {
         );
 
         dispatch(setSearchCreated(created));
-        dispatch(fetchItems());
         updateRouteParams(
             {created},
             state,
