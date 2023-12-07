@@ -12,8 +12,11 @@ def assert_never(value: NoReturn) -> NoReturn:
 NameString = Union[str, LazyString]
 
 
-class Product(TypedDict, total=False):
+class Entity(TypedDict):
     _id: ObjectId
+
+
+class Product(Entity, total=False):
     name: str
     description: str
     original_creator: ObjectId

@@ -1,3 +1,4 @@
+from pytest import fixture
 import pytz
 from flask import json, g, session as server_session
 from datetime import datetime, timedelta
@@ -15,7 +16,7 @@ from ..fixtures import (  # noqa: F401
     PUBLIC_USER_ID,
     COMPANY_1_ID,
 )
-from ..utils import get_json, get_admin_user_id, mock_send_email
+from ..utils import get_json, get_admin_user_id, login, mock_send_email
 from unittest import mock
 from newsroom.tests.users import ADMIN_USER_ID
 from superdesk import get_resource_service
@@ -23,6 +24,51 @@ from superdesk import get_resource_service
 
 NAV_1 = ObjectId("5e65964bf5db68883df561c0")
 NAV_2 = ObjectId("5e65964bf5db68883df561c1")
+
+
+@fixture
+def setup_products(app):
+    app.data.insert(
+        "navigations",
+        [
+            {
+                "_id": NAV_1,
+                "name": "navigation-1",
+                "is_enabled": True,
+                "product_type": "wire",
+            },
+            {
+                "_id": NAV_2,
+                "name": "navigation-2",
+                "is_enabled": True,
+                "product_type": "wire",
+            },
+        ],
+    )
+
+    app.data.insert(
+        "products",
+        [
+            {
+                "_id": 10,
+                "name": "product test",
+                "sd_product_id": 1,
+                "companies": [COMPANY_1_ID],
+                "navigations": [NAV_1],
+                "product_type": "wire",
+                "is_enabled": True,
+            },
+            {
+                "_id": 11,
+                "name": "product test 2",
+                "sd_product_id": 2,
+                "companies": [COMPANY_1_ID],
+                "navigations": [NAV_2],
+                "product_type": "wire",
+                "is_enabled": True,
+            },
+        ],
+    )
 
 
 def test_item_detail(client):
@@ -309,48 +355,7 @@ def test_search_filtered_by_users_products(client, app):
     assert "_aggregations" in data
 
 
-def test_search_filter_by_individual_navigation(client, app):
-    app.data.insert(
-        "navigations",
-        [
-            {
-                "_id": NAV_1,
-                "name": "navigation-1",
-                "is_enabled": True,
-                "product_type": "wire",
-            },
-            {
-                "_id": NAV_2,
-                "name": "navigation-2",
-                "is_enabled": True,
-                "product_type": "wire",
-            },
-        ],
-    )
-
-    app.data.insert(
-        "products",
-        [
-            {
-                "_id": 10,
-                "name": "product test",
-                "sd_product_id": 1,
-                "companies": [COMPANY_1_ID],
-                "navigations": [NAV_1],
-                "product_type": "wire",
-                "is_enabled": True,
-            },
-            {
-                "_id": 11,
-                "name": "product test 2",
-                "sd_product_id": 2,
-                "companies": [COMPANY_1_ID],
-                "navigations": [NAV_2],
-                "product_type": "wire",
-                "is_enabled": True,
-            },
-        ],
-    )
+def test_search_filter_by_individual_navigation(client, app, setup_products):
     with client.session_transaction() as session:
         session["user"] = str(PUBLIC_USER_ID)
         session["user_type"] = "public"
@@ -902,3 +907,36 @@ def test_french_accents_search(client, app):
     assert 1 == len(resp.json["_items"])
     resp = client.get("/wire/search?q=electión")
     assert 1 == len(resp.json["_items"])
+
+
+def test_navigation_for_public_users(client, app, setup_products):
+    user = app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
+    assert user
+
+    company = app.data.find_one("companies", req=None, _id=COMPANY_1_ID)
+    assert company
+
+    # add products to user
+    app.data.update(
+        "users", PUBLIC_USER_ID, {"products": [{"section": "wire", "_id": 10}, {"section": "wire", "_id": 11}]}, user
+    )
+
+    # and remove those from company
+    app.data.update(
+        "companies",
+        COMPANY_1_ID,
+        {"products": [{"section": "wire", "_id": 10, "seats": 1}, {"section": "wire", "_id": 11, "seats": 1}]},
+        company,
+    )
+
+    login(client, user)
+
+    # make sure user gets the products
+    resp = client.get("/wire/search")
+    data = json.loads(resp.get_data())
+    assert 2 == len(data["_items"])
+
+    # test navigation
+    resp = client.get(f"/wire/search?navigation={NAV_1}")
+    data = json.loads(resp.get_data())
+    assert 1 == len(data["_items"])
