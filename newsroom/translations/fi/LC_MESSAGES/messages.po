@@ -159,11 +159,11 @@ msgstr "Oikeudet eivät riitä. Pääsy evätty."
 
 #: newsroom/auth/views.py:137 newsroom/utils.py:411
 msgid "Company account has been disabled."
-msgstr "Yhtiön tili on suljettu."
+msgstr "Organisaation tili on suljettu."
 
 #: newsroom/auth/views.py:140 newsroom/utils.py:415
 msgid "Company account has expired."
-msgstr "Yhtiön tili on vanhentunut."
+msgstr "Organisaation tili on vanhentunut."
 
 #: newsroom/agenda/__init__.py:48
 msgid "Google Maps Styles"
@@ -309,7 +309,7 @@ msgstr "Puhelinnumerosi"
 
 #: newsroom/auth/forms.py:22
 msgid "Your company"
-msgstr "Yhtiö"
+msgstr "Organisaatio"
 
 #: newsroom/auth/forms.py:23
 msgid "Your country"
@@ -321,7 +321,7 @@ msgstr "Rooli"
 
 #: newsroom/auth/forms.py:26
 msgid "Size of your company"
-msgstr "Yhtiön koko"
+msgstr "Organisaation koko"
 
 #: newsroom/auth/forms.py:30
 msgid "I agree to"
@@ -378,15 +378,15 @@ msgstr "Käyttäjää ei löytynyt"
 
 #: newsroom/auth/oauth.py:76 newsroom/auth/utils.py:66
 msgid "No Company assigned"
-msgstr "Yhtiötä ei liitetty"
+msgstr "Organisaatiota ei liitetty"
 
 #: newsroom/auth/oauth.py:81 newsroom/auth/utils.py:68
 msgid "Company is disabled"
-msgstr "Yhtiö on suljettu."
+msgstr "Organisaatio on suljettu."
 
 #: newsroom/auth/oauth.py:84 newsroom/auth/utils.py:70
 msgid "Company has expired"
-msgstr "Yhtiö on vanhentunut"
+msgstr "Organisaatio on vanhentunut"
 
 #: newsroom/auth/oauth.py:91
 msgid "Invalid login type, Oauth not enabled for your user"
@@ -456,11 +456,11 @@ msgstr "Näkymätyyppiä ei löytynyt"
 
 #: newsroom/companies/__init__.py:55
 msgid "Company Management"
-msgstr "Yhtiöiden hallinta"
+msgstr "Organisaatioiden hallinta"
 
 #: newsroom/companies/views.py:69
 msgid "Company already exists"
-msgstr "Yhtiö on jo olemassa"
+msgstr "Organisaatio on jo olemassa"
 
 #: newsroom/companies/views.py:79 newsroom/navigations/views.py:64
 #: newsroom/products/views.py:64 newsroom/section_filters/views.py:55
@@ -473,7 +473,7 @@ msgstr "{0}: {1}"
 
 #: newsroom/companies/views.py:136 newsroom/company_admin/views.py:45
 msgid "Company not found"
-msgstr "Yhtiötä ei löytynyt"
+msgstr "Organisaatiota ei löytynyt"
 
 #: newsroom/company_admin/views.py:51
 msgid "No products selected"
@@ -502,7 +502,7 @@ msgid ""
 "time limit can be enabled for each company in the Permissions."
 msgstr ""
 "Tällä säädetään sitä, kuinka pitkältä ajalta ei-arkistoasiakkaat näkevät "
-"juttuja. Pääsy arkistoon avataan Yhtiöiden hallinta -> Käyttöoikeudet"
+"juttuja. Pääsy arkistoon avataan Organisaatioiden hallinta -> Käyttöoikeudet"
 
 #: newsroom/media_releases/__init__.py:33
 msgid "Time limit for Media Release items (in days)"
@@ -589,7 +589,7 @@ msgstr "Formaatti"
 #: assets/users/components/UsersList.tsx:32 newsroom/monitoring/forms.py:24
 #: newsroom/reports/reports.py:172 newsroom/users/forms.py:50
 msgid "Company"
-msgstr "Yhtiö"
+msgstr "Organisaatio"
 
 #: assets/companies/components/CompanyListItem.tsx:20
 #: assets/companies/components/EditCompanyDetails.tsx:161
@@ -773,7 +773,7 @@ msgstr "Sisältöjen käyttötilasto"
 #: assets/company-reports/components/CompanyReportsApp.tsx:16
 #: newsroom/reports/reports.py:53
 msgid "Saved searches per company"
-msgstr "Tallennettuja hakuja yhtiötä kohden"
+msgstr "Tallennettuja hakuja organisaatiota kohden"
 
 #: assets/company-reports/components/CompanyReportsApp.tsx:17
 #: newsroom/reports/reports.py:84
@@ -783,7 +783,7 @@ msgstr "Käyttäjien tallentamat haut"
 #: assets/company-reports/components/CompanyReportsApp.tsx:18
 #: newsroom/reports/reports.py:114
 msgid "Products per company"
-msgstr "Tuotteiden määrä yhtiötä kohden"
+msgstr "Tuotteiden määrä organisaatiota kohden"
 
 #: assets/company-reports/components/CompanyReportsApp.tsx:19
 #: newsroom/reports/reports.py:137
@@ -797,7 +797,7 @@ msgstr "Yhtiöiden toimintatilasto"
 #: assets/company-reports/components/CompanyReportsApp.tsx:45
 #: newsroom/reports/reports.py:338
 msgid "Company News API Usage"
-msgstr "Yhtiön uutis-APIn käyttö"
+msgstr "Organisaation uutis-APIn käyttö"
 
 #: newsroom/reports/reports.py:378
 msgid "Companies permissioned per product"
@@ -823,11 +823,11 @@ msgstr "Tarkennetun haun parametrit ovat vääränlaisia"
 
 #: newsroom/search/service.py:628
 msgid "User does not belong to a company."
-msgstr "Käyttäjä ei kuulu yhteenkään yhtiöön"
+msgstr "Käyttäjä ei kuulu yhteenkään organisaatioon"
 
 #: newsroom/search/service.py:630
 msgid "Your company doesn't have any products defined."
-msgstr "Yhtiölläsi ei ole yhtään määriteltyä tuotetta."
+msgstr "Organisaatiollasi ei ole yhtään määriteltyä tuotetta."
 
 #: newsroom/search/service.py:632
 msgid "Your product is not assigned to you or your company."
@@ -924,7 +924,7 @@ msgstr "Sivuvalikko"
 #: newsroom/templates/company_admin_index.html:3
 #: newsroom/templates/company_admin_index.html:6 newsroom/users/forms.py:39
 msgid "Company Admin"
-msgstr "Organisaation ylläpitäjä"
+msgstr "Pääkäyttäjä"
 
 #: newsroom/templates/base_layout.html:112
 #: newsroom/templates/base_layout.html:113
@@ -1019,7 +1019,7 @@ msgstr "Nimi:"
 
 #: newsroom/templates/monitoring_error.html:3
 msgid "Company:"
-msgstr "Yhtiö:"
+msgstr "Organisaatio:"
 
 #: newsroom/templates/monitoring_error.html:4
 msgid "Run time:"
@@ -1288,7 +1288,7 @@ msgstr "Sähköpostiosoite on jo käytössä"
 
 #: newsroom/users/views.py:141 newsroom/users/views.py:227
 msgid "Company is required for non administrators"
-msgstr "Yhtiö vaaditaan"
+msgstr "Organisaatio vaaditaan"
 
 #: newsroom/users/views.py:176
 msgid "User is already validated"
@@ -2233,19 +2233,19 @@ msgstr "Poista"
 
 #: assets/companies/actions.ts:130
 msgid "Company updated successfully"
-msgstr "Yhtiö päivitetty"
+msgstr "Organisaatio päivitetty"
 
 #: assets/companies/actions.ts:132
 msgid "Company created successfully"
-msgstr "Yhtiö luotu"
+msgstr "Organisaatio luotu"
 
 #: assets/companies/actions.ts:170
 msgid "Company deleted successfully"
-msgstr "Yhtiö poistettu"
+msgstr "Organisaatio poistettu"
 
 #: assets/companies/components/CompaniesApp.tsx:31
 msgid "New Company"
-msgstr "Uusi yhtiö"
+msgstr "Uusi organisaatio"
 
 #: assets/companies/components/CompanyList.tsx:37
 #: assets/companies/components/EditCompanyDetails.tsx:92
@@ -2317,19 +2317,19 @@ msgstr "API"
 
 #: assets/companies/components/EditCompany.tsx:96
 msgid "There are no users in the company."
-msgstr "Yhtiöllä ei ole käyttäjiä"
+msgstr "Organisaatiolla ei ole käyttäjiä"
 
 #: assets/companies/components/EditCompany.tsx:114
 msgid "Please provide company name"
-msgstr "Anna yhtiön nimi"
+msgstr "Anna organisaation nimi"
 
 #: assets/companies/components/EditCompany.tsx:138
 msgid "Would you like to delete company: {{name}}"
-msgstr "Haluatko varmasti poistaa yhtiön: {{name}}"
+msgstr "Haluatko varmasti poistaa organisaation: {{name}}"
 
 #: assets/companies/components/EditCompany.tsx:157
 msgid "Edit Company"
-msgstr "Muokkaa yritystä"
+msgstr "Muokkaa organisaatiota"
 
 #: assets/companies/components/EditCompanyAPI.tsx:77
 msgid "Allowed IP Addresses"
@@ -2345,11 +2345,11 @@ msgstr "SSO domain"
 
 #: assets/companies/components/EditCompanyDetails.tsx:74
 msgid "Company Type"
-msgstr "Yhtiötyyppi"
+msgstr "Organisaatiotyyppi"
 
 #: assets/companies/components/EditCompanyDetails.tsx:84
 msgid "Company Url"
-msgstr "Yhtiön verkkosivu"
+msgstr "Organisaation verkkosivu"
 
 #: assets/companies/components/EditCompanyDetails.tsx:116
 msgid "Contact Name"
@@ -2389,7 +2389,7 @@ msgstr "Uusi käyttäjä"
 
 #: assets/company-admin/components/CompanyAdminApp.tsx:198
 msgid "My Company"
-msgstr "Minun organisaationi"
+msgstr "Tilaustiedot"
 
 #: assets/company-admin/components/CompanyAdminApp.tsx:213
 msgid "Users : {{total}}"
@@ -2415,7 +2415,7 @@ msgstr "Huom"
 
 #: assets/company-admin/components/CompanyAdminSideNav.tsx:12
 msgid "Company User Management"
-msgstr "Organisaation käyttäjähallinta"
+msgstr "Käyttäjähallinta"
 
 #: assets/company-admin/components/CompanyDetailsProductFilter.tsx:18
 #: assets/company-reports/components/ProductCompanies.tsx:23
@@ -3159,7 +3159,7 @@ msgstr "Ei voi olla menneisyydessä"
 
 #: assets/news-api/components/EditAPIToken.tsx:162
 msgid "Are you sure you want to delete this Company's API Token?"
-msgstr "Haluatko varmasti poistaa yhtiön API-avaimen?"
+msgstr "Haluatko varmasti poistaa organisaation API-avaimen?"
 
 #: assets/news-api/components/EditAPIToken.tsx:198
 msgid "Expired On:"
