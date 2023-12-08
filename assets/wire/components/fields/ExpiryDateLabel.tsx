@@ -1,8 +1,17 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {gettext, formatDate} from 'utils';
+import {IArticle} from 'interfaces';
 
-export function ExpiryDateLabel ({item, filterGroupLabels}: any) {
+interface IProps {
+    item: IArticle,
+    filterGroupLabels: {
+        [field: string]: string;
+    },
+}
+
+export function ExpiryDateLabel (props: IProps) {
+    const {item, filterGroupLabels} = props;
+
     if (item.expiry == null) {
         return null;
     }
@@ -15,8 +24,3 @@ export function ExpiryDateLabel ({item, filterGroupLabels}: any) {
         <span>{text}</span>
     );
 }
-
-ExpiryDateLabel.propTypes = {
-    item: PropTypes.object,
-    filterGroupLabels: PropTypes.object,
-};

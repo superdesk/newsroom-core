@@ -27,6 +27,7 @@ export interface IArticle extends IResourceItem {
         type?: 'transcript';
         [key: string]: any;
     };
+    expiry?: string;
     es_highlight?: {[field: string]: Array<string>}
     deleted?: boolean; // Used only in the front-end, populated by wire/reducer
 }
