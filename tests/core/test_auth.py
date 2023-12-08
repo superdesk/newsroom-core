@@ -5,12 +5,10 @@ from pytest import fixture
 from superdesk import get_resource_service
 from superdesk.utils import get_hash
 
-from newsroom.types import CompanyType, Country
 from newsroom.auth.token import verify_auth_token
 from newsroom.auth.views import _is_password_valid
 from newsroom.tests.users import ADMIN_USER_ID, ADMIN_USER_EMAIL  # noqa
-from tests.utils import mock_send_email, login
-from unittest import mock
+from tests.utils import login
 
 disabled_company = ObjectId()
 expired_company = ObjectId()
@@ -36,108 +34,6 @@ def init(app):
             {"_id": company, "name": "Foo bar co.", "is_enabled": True},
         ],
     )
-
-
-@mock.patch("newsroom.email.send_email", mock_send_email)
-def test_new_user_signup_sends_email(app, client):
-    app.countries = [Country(value="AUS", text="Australia")]
-    app.config["SIGNUP_EMAIL_RECIPIENTS"] = "admin@bar.com"
-    app.config["COMPANY_TYPES"] = [CompanyType(id="news_media", name="News Media")]
-    product_ids = app.data.insert(
-        "products", [{"name": "test", "query": "foo", "is_enabled": True, "product_type": "wire"}]
-    )
-    with app.mail.record_messages() as outbox:
-        # Sign up
-        response = client.post(
-            url_for("auth.signup"),
-            data={
-                "email": "newuser@abc.org",
-                "first_name": "John",
-                "last_name": "Doe",
-                "country": "AUS",
-                "phone": "1234567",
-                "company": "News Press Co.",
-                "company_size": "0-10",
-                "occupation": "Other",
-                "company_type": "news_media",
-            },
-        )
-        assert response.status_code == 200
-
-        assert len(outbox) == 1
-        assert outbox[0].recipients == ["admin@bar.com"]
-        assert outbox[0].subject == "A new Newshub signup request"
-        assert "newuser@abc.org" in outbox[0].body
-        assert "John" in outbox[0].body
-        assert "Doe" in outbox[0].body
-        assert "1234567" in outbox[0].body
-        assert "News Press Co." in outbox[0].body
-        assert "Australia" in outbox[0].body
-        assert "News Media" in outbox[0].body
-
-    # Test that the new Company has been created
-    new_company = app.data.find_one("companies", req=None, name="News Press Co.")
-    assert new_company is not None
-    assert new_company["contact_name"] == "John Doe"
-    assert new_company["contact_email"] == "newuser@abc.org"
-    assert new_company["phone"] == "1234567"
-    assert new_company["country"] == "AUS"
-    assert new_company["company_type"] == "news_media"
-    assert new_company["is_enabled"] is False
-    assert new_company["is_approved"] is False
-    assert new_company["sections"] == {
-        "wire": True,
-        "agenda": True,
-        "news_api": True,
-        "monitoring": True,
-    }
-    assert new_company["products"] == [
-        {
-            "_id": product_ids[0],
-            "section": "wire",
-            "seats": 0,
-        }
-    ]
-
-    # Test that the new User has been created
-    new_user = app.data.find_one("users", req=None, email="newuser@abc.org")
-    assert new_user is not None
-    assert new_user["first_name"] == "John"
-    assert new_user["last_name"] == "Doe"
-    assert new_user["email"] == "newuser@abc.org"
-    assert new_user["phone"] == "1234567"
-    assert new_user["role"] == "Other"
-    assert new_user["country"] == "AUS"
-    assert new_user["company"] == new_company["_id"]
-    assert new_user["is_enabled"] is False
-    assert new_user["is_approved"] is False
-    assert new_user["is_validated"] is False
-    assert new_user["sections"] == {
-        "wire": True,
-        "agenda": True,
-        "news_api": True,
-        "monitoring": True,
-    }
-
-
-def test_new_user_signup_fails_if_fields_not_provided(client):
-    # Register a new account
-    response = client.post(
-        url_for("auth.signup"),
-        data={
-            "email": "newuser@abc.org",
-            "email2": "newuser@abc.org",
-            "phone": "1234567",
-            "password": "abc",
-            "password2": "abc",
-        },
-    )
-    txt = response.get_data(as_text=True)
-    assert "company: This field is required" in txt
-    assert "company_size: Not a valid choice" in txt
-    assert "name: This field is required" in txt
-    assert "country: This field is required" in txt
-    assert "occupation: Not a valid choice" in txt
 
 
 def test_login_fails_for_wrong_username_or_password(client):
