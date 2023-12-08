@@ -1,8 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {gettext} from 'utils';
+import {IArticle} from 'interfaces';
 
-export function DurationLabel ({item, filterGroupLabels}: any) {
+interface IProps {
+    item: IArticle,
+    filterGroupLabels: {
+        [field: string]: string;
+    },
+}
+
+export function DurationLabel (props: IProps) {
+    const {item, filterGroupLabels} = props;
+
     if (item.extra?.duration == null) {
         return null;
     }
@@ -35,8 +45,3 @@ export function DurationLabel ({item, filterGroupLabels}: any) {
         <span>{text}</span>
     );
 }
-
-DurationLabel.propTypes = {
-    item: PropTypes.object,
-    filterGroupLabels: PropTypes.object,
-};
