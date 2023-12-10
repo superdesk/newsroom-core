@@ -203,7 +203,7 @@ def approve_company(company_id):
     for user in users_service.get(req=None, lookup={"company": original["_id"], "is_approved": {"$ne": True}}):
         users_service.approve_user(user)
 
-    return jsonify({"success": True}), 200
+    return {"success": True}
 
 
 def get_product_updates(updates: Dict[str, bool], seats: Dict[str, int]):

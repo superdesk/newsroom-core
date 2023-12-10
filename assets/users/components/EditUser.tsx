@@ -493,9 +493,7 @@ const mapStateToProps = (state: IUserProfileStore): IReduxStoreProps => ({
     countries: state.countries,
 });
 
-const mapDispatchToProps = (dispatch: any): IDispatchProps => ({
-    approveUser: (userId) => dispatch(approveUser(userId)),
-});
+const mapDispatchToProps = ({approveUser});
 
 const EditUser = connect<
     IReduxStoreProps,

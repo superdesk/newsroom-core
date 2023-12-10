@@ -220,7 +220,8 @@ def signup():
             return flask.redirect(flask.url_for("auth.login"))
 
         company_service = get_resource_service("companies")
-        regex = re.compile(f"^{form.company.data}$", re.IGNORECASE)
+        company_name = re.escape(form.company.data)
+        regex = re.compile(f"^{company_name}$", re.IGNORECASE)
         company = company_service.find_one(req=None, name=regex)
         is_new_company = company is None
 
