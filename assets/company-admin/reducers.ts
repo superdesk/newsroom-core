@@ -1,4 +1,4 @@
-import {IUser} from 'interfaces/user';
+import {IUser, ICountry} from 'interfaces';
 import {INIT_VIEW_DATA, SET_PRODUCT_FILTER, SET_SECTION} from './actions';
 
 import {RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID} from 'actions';
@@ -22,6 +22,7 @@ export interface ICompanyAdminStore {
     productId: string;
     companies: Array<any>;
     totalUsers: number;
+    countries: Array<ICountry>;
 }
 
 const initialState = {
@@ -47,6 +48,7 @@ const initialState = {
     sections: [],
     products: [],
     productId: null,
+    countries: [],
 };
 
 export function companyAdminReducer(state: any = initialState, action: any): ICompanyAdminStore {
@@ -56,6 +58,7 @@ export function companyAdminReducer(state: any = initialState, action: any): ICo
             ...userReducer(state, action),
             products: action.data.products,
             company: action.data.companyId,
+            countries: action.data.countries,
         };
     case SET_PRODUCT_FILTER:
         return {

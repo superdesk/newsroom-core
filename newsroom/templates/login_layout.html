@@ -2,7 +2,7 @@
 
 {% block contentMain %}
 
-<div class="container-fluid py-5 overflow-auto nh-login-page__content">
+<div id="login-container" class="container-fluid py-5 overflow-auto nh-login-page__content {% block custom_container_style %}{% endblock %}">
 
     {% include "login_messages.html" %}
 
@@ -62,6 +62,9 @@
             </div>
         </div>
     </div>
+
+    {% block login_page_footer %}
+    {% endblock %}
 </div>
 {% endblock %}
 

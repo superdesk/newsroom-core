@@ -1,8 +1,17 @@
 Hi {{app_name}} Administrator,
 
-There's a new sign up request with the following details:
+There's a new {{ "Company" if is_new_company else "User" }} sign up request with the following details:
 
 
+Company Details:
+Name:          {{ company.name }}
+Type:          {{ company_type }}
+Country:       {{ country }}
+Size:          {{ company.company_size }}
+URL:           {{ company.url }}
+Referred By:   {{ company.referred_by }}
+
+User Details:
 First Name:     {{user.first_name}}
 Last Name:      {{user.last_name}}
 Email:          {{user.email}}
@@ -13,7 +22,7 @@ Occupation:     {{user.occupation}}
 Company Size:   {{user.company_size}}
 
 
-Please go to {{url}} to create a new user.
+Please go to {{url}} to activate the new account.
 
 
 Regards,

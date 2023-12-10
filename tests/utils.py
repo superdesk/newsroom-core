@@ -82,7 +82,7 @@ def mock_send_email(to, subject, text_body, html_body=None, sender=None, attachm
         return _app.mail.send(msg)
 
 
-def login(client: FlaskClient, user):
+def login(client: FlaskClient, user, assert_login=True):
     client.get(url_for("auth.logout"))
 
     resp = client.post(
@@ -92,7 +92,9 @@ def login(client: FlaskClient, user):
             "password": "admin",
         },
     )
-    assert resp.status_code == 302, f"Login failed for user {user['email']}"
+    if assert_login:
+        assert resp.status_code == 302, f"Login failed for user {user['email']}"
+    return resp
 
 
 def load_fixture(filename: str) -> str:

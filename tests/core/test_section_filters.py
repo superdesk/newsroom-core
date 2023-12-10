@@ -3,6 +3,7 @@ from flask import json
 from pytest import fixture
 
 from newsroom.tests.users import test_login_succeeds_for_admin
+from tests import utils
 
 
 @fixture(autouse=True)
@@ -20,7 +21,12 @@ def init(app):
     )
 
 
-def test_filter_list_fails_for_anonymous_user(client, anonymous_user):
+def test_filter_list_fails_for_anonymous_user(client, anonymous_user, public_user):
+    response = client.get("/section_filters/search")
+    assert response.status_code == 302
+    assert response.headers.get("location") == "http://localhost:5050/login"
+
+    utils.login(client, public_user)
     response = client.get("/section_filters/search")
     assert response.status_code == 403
     assert b"Forbidden" in response.data

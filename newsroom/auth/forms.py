@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm, RecaptchaField
 from flask_babel import lazy_gettext
-from wtforms import StringField, PasswordField, SelectField, BooleanField
+from wtforms import StringField, PasswordField, SelectField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 
@@ -20,13 +20,17 @@ class SignupForm(FlaskForm):
     last_name = StringField(lazy_gettext("Your Last Name"), validators=[DataRequired(), Length(1, 128)])
     phone = StringField(lazy_gettext("Your telephone number"), validators=[DataRequired()])
     company = StringField(lazy_gettext("Your company"), validators=[DataRequired()])
-    country = StringField(lazy_gettext("Your country"), validators=[DataRequired()])
+    country = SelectField(lazy_gettext("Your country"), validators=[DataRequired()], choices=[("", "")], default="")
     occupation = SelectField(lazy_gettext("Your position"), choices=occupations, validators=[DataRequired()])
+    company_type = SelectField(lazy_gettext("Company Type"), validators=[], choices=[("", "")], default="")
     company_size = SelectField(
         lazy_gettext("Size of your company"),
         choices=company_sizes,
         validators=[DataRequired()],
     )
+    company_url = StringField(lazy_gettext("Company URL"), validators=[])
+    referred_by = TextAreaField(lazy_gettext("How did you hear about us? (Referral, social media, web search)"))
+
     consent = BooleanField(lazy_gettext("I agree to"), validators=[])
     recaptcha = RecaptchaField()
 

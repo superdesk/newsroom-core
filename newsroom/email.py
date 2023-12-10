@@ -10,8 +10,9 @@ from flask import current_app, render_template, url_for
 from flask_babel import gettext, force_locale
 from flask_mail import Attachment, Message
 from jinja2 import TemplateNotFound
-from newsroom.auth import get_company
 
+from newsroom.types import Company, User, Country, CompanyType
+from newsroom.auth import get_company
 from newsroom.celery_app import celery
 from newsroom.template_loaders import set_template_locale
 from newsroom.utils import (
@@ -127,13 +128,44 @@ def send_email(to, subject, text_body, html_body=None, sender=None, attachments_
     _send_email.apply_async(kwargs=kwargs)
 
 
-def send_new_signup_email(user):
+def send_new_signup_email(company: Company, user: User, is_new_company: bool):
+    url_kwargs = (
+        {
+            "app_id": "companies",
+            "companyId": str(company["_id"]),
+            "_external": True,
+        }
+        if is_new_company
+        else {
+            "app_id": "users",
+            "userId": str(user["_id"]),
+            "_external": True,
+        }
+    )
+    country_name = company.get("country") or ""
+    countries: List[Country] = current_app.countries
+    if len(country_name) and len(countries):
+        country: Optional[Country] = next((c for c in countries if c["value"] == country_name), None)
+        if country is not None:
+            country_name = country["text"]
+
+    company_type_name = company.get("company_type") or ""
+    company_types: List[CompanyType] = current_app.config.get("COMPANY_TYPES") or []
+    if len(company_type_name) and len(company_types):
+        company_type: Optional[CompanyType] = next((t for t in company_types if t["id"] == company_type_name), None)
+        if company_type is not None:
+            company_type_name = company_type["name"]
+
     send_template_email(
         to=current_app.config["SIGNUP_EMAIL_RECIPIENTS"].split(","),
         template="signup_request_email",
         template_kwargs=dict(
-            url=url_for("settings.app", app_id="users", _external=True),
+            url=url_for("settings.app", **url_kwargs),
             user=user,
+            company=company,
+            is_new_company=is_new_company,
+            country=country_name,
+            company_type=company_type_name,
         ),
     )
 
