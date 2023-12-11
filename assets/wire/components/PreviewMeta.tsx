@@ -5,6 +5,7 @@ import WireListItemIcons from './WireListItemIcons';
 
 const DEFAULT_META_FIELDS = [
     'urgency',
+    'duration',
     'source',
     ['charcount', 'wordcount'],
     'previous_versions',
