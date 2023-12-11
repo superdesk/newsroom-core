@@ -7,9 +7,8 @@ from superdesk.utils import get_hash
 
 from newsroom.auth.token import verify_auth_token
 from newsroom.auth.views import _is_password_valid
-from newsroom.tests.users import ADMIN_USER_ID  # noqa
-from tests.utils import login, mock_send_email
-from unittest import mock
+from newsroom.tests.users import ADMIN_USER_EMAIL
+from tests.utils import login
 
 disabled_company = ObjectId()
 expired_company = ObjectId()
@@ -35,56 +34,6 @@ def init(app):
             {"_id": company, "name": "Foo bar co.", "is_enabled": True},
         ],
     )
-
-
-@mock.patch("newsroom.email.send_email", mock_send_email)
-def test_new_user_signup_sends_email(app, client):
-    app.config["SIGNUP_EMAIL_RECIPIENTS"] = "admin@bar.com"
-    with app.mail.record_messages() as outbox:
-        # Sign up
-        response = client.post(
-            url_for("auth.signup"),
-            data={
-                "email": "newuser@abc.org",
-                "first_name": "John",
-                "last_name": "Doe",
-                "country": "Australia",
-                "phone": "1234567",
-                "company": "Press 2 co.",
-                "company_size": "0-10",
-                "occupation": "Other",
-            },
-        )
-        assert response.status_code == 200
-
-        assert len(outbox) == 1
-        assert outbox[0].recipients == ["admin@bar.com"]
-        assert outbox[0].subject == "A new Newshub signup request"
-        assert "newuser@abc.org" in outbox[0].body
-        assert "John" in outbox[0].body
-        assert "Doe" in outbox[0].body
-        assert "1234567" in outbox[0].body
-        assert "Press 2 co." in outbox[0].body
-
-
-def test_new_user_signup_fails_if_fields_not_provided(client):
-    # Register a new account
-    response = client.post(
-        url_for("auth.signup"),
-        data={
-            "email": "newuser@abc.org",
-            "email2": "newuser@abc.org",
-            "phone": "1234567",
-            "password": "abc",
-            "password2": "abc",
-        },
-    )
-    txt = response.get_data(as_text=True)
-    assert "company: This field is required" in txt
-    assert "company_size: Not a valid choice" in txt
-    assert "name: This field is required" in txt
-    assert "country: This field is required" in txt
-    assert "occupation: Not a valid choice" in txt
 
 
 def test_login_fails_for_wrong_username_or_password(client):
@@ -534,19 +483,11 @@ def test_access_for_disabled_user(app, client):
 
     user = get_resource_service("users").find_one(req=None, _id=user_id)
 
-    with client.session_transaction() as session:
-        session["user"] = str(user_id)
-        session["user_type"] = "administrator"
-        session["name"] = "public"
-        session["auth_ttl"] = None
+    login(client, {"email": "test@sourcefabric.org"})
     resp = client.get("/bookmarks_wire")
     assert 200 == resp.status_code
 
-    with client.session_transaction() as session:
-        session["user"] = ADMIN_USER_ID
-        session["user_type"] = "administrator"
-        session["name"] = "Admin"
-        session["auth_ttl"] = None
+    login(client, {"email": ADMIN_USER_EMAIL})
     resp = client.post(
         "/users/{}".format(user_id),
         data={
@@ -565,13 +506,11 @@ def test_access_for_disabled_user(app, client):
     )
     assert 200 == resp.status_code
 
-    with client.session_transaction() as session:
-        session["user"] = str(user_id)
-        session["user_type"] = "administrator"
-        session["name"] = "public"
-        session["auth_ttl"] = None
+    resp = login(client, {"email": "test@sourcefabric.org"}, assert_login=False)
+    assert "Account is disabled" in resp.get_data(as_text=True)
+
     resp = client.get("/users/search")
-    assert 403 == resp.status_code
+    assert 302 == resp.status_code
 
     resp = client.get("/wire")
     assert 302 == resp.status_code

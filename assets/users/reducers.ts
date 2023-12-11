@@ -36,6 +36,7 @@ const initialState: any = {
     search: searchReducer(undefined, undefined, 'settings'),
     sections: [],
     products: [],
+    countries: [],
 };
 
 export default function userReducer(state: any = initialState, action: any) {
@@ -45,6 +46,7 @@ export default function userReducer(state: any = initialState, action: any) {
             ...state,
             sections: action.data.sections,
             products: action.data.products,
+            countries: action.data.countries,
         };
     case SELECT_USER: {
         const defaultUser: any = {

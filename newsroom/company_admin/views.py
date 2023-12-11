@@ -31,6 +31,7 @@ def get_view_data():
         "companies": [company],
         "sections": app.sections,
         "products": products,
+        "countries": app.countries,
     }
 
 

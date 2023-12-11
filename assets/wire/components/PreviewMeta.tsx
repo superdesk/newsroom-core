@@ -8,6 +8,7 @@ const DEFAULT_META_FIELDS = [
     'source',
     ['charcount', 'wordcount'],
     'previous_versions',
+    'expiry',
 ];
 
 function PreviewMeta({

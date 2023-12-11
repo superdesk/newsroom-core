@@ -79,12 +79,30 @@ export function EditCompanyDetails({
                     error={errors ? errors.company_type : undefined}
                 />
 
+                <SelectInput
+                    name="company_size"
+                    label={gettext('Company Size')}
+                    value={company.company_size || ''}
+                    options={['0-10', '11-100', '>100'].map((value) => ({text: value, value: value}))}
+                    defaultOption=""
+                    onChange={onChange}
+                    error={errors ? errors.company_size : undefined}
+                />
+
                 <TextInput
                     name='url'
                     label={gettext('Company Url')}
                     value={company.url}
                     onChange={onChange}
                     error={errors ? errors.url : null}
+                />
+
+                <TextInput
+                    name="referred_by"
+                    label={gettext('Referred By')}
+                    value={company.referred_by}
+                    onChange={onChange}
+                    error={errors ? errors.referred_by : undefined}
                 />
 
                 <TextInput
