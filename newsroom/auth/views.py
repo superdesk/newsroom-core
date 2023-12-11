@@ -394,18 +394,21 @@ def change_password():
                 if firebase_status == "OK":
                     flask.flash(gettext("Your password has been changed."), "success")
                 elif firebase_status == "auth/wrong-password":
-                    flask.flash(gettext("Wrong current password."), "error")
+                    flask.flash(gettext("Current password invalid."), "danger")
                 else:
                     log_firebase_unexpected_error(firebase_status)
+                return flask.redirect(flask.url_for("auth.change_password"))
         elif auth_provider.type == AuthProviderType.PASSWORD:
-            updates = {
-                "password": form.new_password.data,
-            }
-            get_resource_service("users").patch(id=ObjectId(user["_id"]), updates=updates)
-            flask.flash(gettext("Your password has been changed."), "success")
+            user_auth = get_auth_user_by_email(user["email"])
+            if not _is_password_valid(form.old_password.data.encode("UTF-8"), user_auth):
+                flask.flash(gettext("Current password invalid."), "danger")
+            else:
+                updates = {"password": form.new_password.data}
+                get_resource_service("users").patch(id=ObjectId(user["_id"]), updates=updates)
+                flask.flash(gettext("Your password has been changed."), "success")
+                return flask.redirect(flask.url_for("auth.change_password"))
         else:
             flask.flash(gettext("Change password is not available."), "warning")
-        return flask.redirect(flask.url_for("auth.change_password"))
 
     return flask.render_template(
         "change_password.html", form=form, user=user, firebase=app.config.get("FIREBASE_ENABLED")

@@ -7,7 +7,7 @@ from superdesk.utils import get_hash
 
 from newsroom.auth.token import verify_auth_token
 from newsroom.auth.views import _is_password_valid
-from newsroom.tests.users import ADMIN_USER_ID, ADMIN_USER_EMAIL  # noqa
+from newsroom.tests.users import ADMIN_USER_EMAIL
 from tests.utils import login
 
 disabled_company = ObjectId()
@@ -575,3 +575,35 @@ def test_access_for_not_approved_user(client, app):
             json={"label": "bar", "query": "test", "notifications": True, "topic_type": "wire"},
         )
         assert 302 == resp.status_code, resp.get_data()
+
+
+def test_change_password(client, admin):
+    login(client, admin)
+    resp = client.get("/change_password")
+    assert 200 == resp.status_code
+
+    resp = client.post(
+        "/change_password",
+        data={
+            "old_password": "foo",
+            "new_password": "newpassword",
+            "new_password2": "newpassword",
+        },
+        follow_redirects=True,
+    )
+
+    assert 200 == resp.status_code
+    assert "Current password invalid" in resp.get_data(as_text=True)
+
+    resp = client.post(
+        "/change_password",
+        data={
+            "old_password": "admin",
+            "new_password": "newpassword",
+            "new_password2": "newpassword",
+        },
+        follow_redirects=True,
+    )
+
+    assert 200 == resp.status_code
+    assert "Your password has been changed" in resp.get_data(as_text=True)
