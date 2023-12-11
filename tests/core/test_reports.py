@@ -2,7 +2,7 @@ from flask import json
 from pytest import fixture
 from bson import ObjectId
 from datetime import datetime, timedelta
-from newsroom.tests.fixtures import COMPANY_1_ID, COMPANY_2_ID
+from newsroom.tests.fixtures import COMPANY_1_ID
 
 
 @fixture(autouse=True)
