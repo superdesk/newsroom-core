@@ -359,7 +359,7 @@ def get_product_company():
         {
             "_id": product.get("_id"),
             "product": product.get("name"),
-            "companies": product.get("companies", []),
+            "companies": get_companies_id_by_product(product.get("_id")),
         }
         for product in products
     ]
@@ -369,6 +369,18 @@ def get_product_company():
 
     results = {"results": res, "name": gettext("Companies permissioned per product")}
     return results
+
+
+def get_companies_id_by_product(product_id):
+    """
+    get company ID , based on product ID
+    """
+    companies = list(query_resource("companies"))
+    return [
+        company["_id"]
+        for company in companies
+        if any(prod["_id"] == ObjectId(product_id) for prod in company.get("products", []))
+    ]
 
 
 def get_expired_companies():
