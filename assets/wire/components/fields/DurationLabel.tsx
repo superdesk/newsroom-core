@@ -17,11 +17,11 @@ export function DurationLabel (props: IProps) {
         return null;
     }
 
-    function zeroPad(number: number) {
+    function zeroPad(number: number):string {
         if (number.toString().length < 2) {
             return `0${number}`;
         } else {
-            return number;
+            return number.toString();
         }
     }
 
