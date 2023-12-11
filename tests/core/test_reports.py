@@ -35,6 +35,48 @@ def init(app):
             },
         ],
     )
+    app.data.insert(
+        "products",
+        [
+            {
+                "_id": ObjectId("5e65964bf5db68883df561d1"),
+                "name": "Sport",
+                "description": "sport product",
+                "is_enabled": True,
+                "product_type": "agenda",
+            },
+            {
+                "_id": ObjectId("6e65964bf5db68883df561d1"),
+                "name": "News",
+                "description": "news product",
+                "is_enabled": True,
+                "product_type": "wire",
+            },
+        ],
+    )
+    app.data.insert(
+        "companies",
+        [
+            {
+                "_id": ObjectId(),
+                "name": "Example Company",
+                "is_enabled": True,
+                "sections": {"wire": True},
+                "products": [
+                    {"_id": ObjectId("5e65964bf5db68883df561d1"), "section": "wire"},
+                ],
+            },
+            {
+                "_id": ObjectId(),
+                "name": "Example 2 Company",
+                "is_enabled": True,
+                "sections": {"wire": True},
+                "products": [
+                    {"_id": ObjectId("6e65964bf5db68883df561d1"), "section": "wire"},
+                ],
+            },
+        ],
+    )
 
 
 def test_company_saved_searches(client, app):
@@ -73,64 +115,24 @@ def test_user_saved_searches(client, app):
     assert report["results"][0]["topic_count"] == 2
 
 
-def test_company_products(client, app):
-    app.data.insert(
-        "products",
-        [
-            {
-                "_id": "p-1",
-                "name": "Sport",
-                "description": "sport product",
-                "companies": [COMPANY_1_ID],
-                "is_enabled": True,
-            },
-            {
-                "_id": "p-2",
-                "name": "News",
-                "description": "news product",
-                "companies": [COMPANY_1_ID, COMPANY_2_ID],
-                "is_enabled": True,
-            },
-        ],
-    )
-
+def test_company_products(client):
     resp = client.get("reports/company-products")
     report = json.loads(resp.get_data())
     assert report["name"] == "Products per company"
-    assert len(report["results"]) == 2
-    assert report["results"][0]["name"] == "Paper Co."
+    assert len(report["results"]) == 4
+    assert report["results"][0]["name"] == "Example 2 Company"
     assert len(report["results"][0]["products"]) == 1
-    assert report["results"][1]["name"] == "Press Co."
-    assert len(report["results"][1]["products"]) == 2
+    assert report["results"][1]["name"] == "Example Company"
+    assert len(report["results"][1]["products"]) == 1
 
 
-def test_product_companies(client, app):
-    app.data.insert(
-        "products",
-        [
-            {
-                "_id": "p-1",
-                "name": "Sport",
-                "description": "sport product",
-                "companies": [COMPANY_1_ID],
-                "is_enabled": True,
-            },
-            {
-                "_id": "p-2",
-                "name": "News",
-                "description": "news product",
-                "companies": [COMPANY_1_ID, COMPANY_2_ID],
-                "is_enabled": True,
-            },
-        ],
-    )
-
+def test_product_companies(client):
     resp = client.get("reports/product-companies")
     report = json.loads(resp.get_data())
     assert report["name"] == "Companies permissioned per product"
     assert len(report["results"]) == 2
     assert report["results"][0]["product"] == "News"
-    assert len(report["results"][0]["enabled_companies"]) == 2
+    assert len(report["results"][0]["enabled_companies"]) == 1
     assert report["results"][1]["product"] == "Sport"
     assert len(report["results"][1]["enabled_companies"]) == 1
 
@@ -157,3 +159,13 @@ def test_expired_companies(client, app):
     report = json.loads(resp.get_data())
     assert report["name"] == "Expired companies"
     assert len(report["results"]) == 2
+
+
+def test_companies(client):
+    resp = client.get("reports/company")
+    report = json.loads(resp.get_data())
+    assert report["name"] == "Company"
+    assert len(report["results"]) == 4
+    assert report["results"][0]["name"] == "Example 2 Company"
+    assert report["results"][1]["name"] == "Example Company"
+    assert report["results"][2]["name"] == "Paper Co."
