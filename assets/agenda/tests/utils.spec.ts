@@ -135,10 +135,10 @@ describe('utils', () => {
             expect(groupedItems.hasOwnProperty('17-10-2018')).toBe(false);
             expect(groupedItems.hasOwnProperty('16-10-2018')).toBe(true);
             expect(groupedItems.hasOwnProperty('18-10-2018')).toBe(true);
-            expect(groupedItems['16-10-2018'].items).toEqual([]);
-            expect(groupedItems['16-10-2018'].hiddenItems).toEqual(['foo']);
-            expect(groupedItems['18-10-2018'].items).toEqual([]);
-            expect(groupedItems['18-10-2018'].hiddenItems).toEqual(['foo']);
+            expect(groupedItems['16-10-2018'].items).toEqual(['foo']);
+            expect(groupedItems['16-10-2018'].hiddenItems).toEqual([]);
+            expect(groupedItems['18-10-2018'].items).toEqual(['foo']);
+            expect(groupedItems['18-10-2018'].hiddenItems).toEqual([]);
         });
 
         it('returns grouped ad-hoc plan with no extra days', () => {
