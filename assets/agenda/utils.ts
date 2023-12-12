@@ -235,14 +235,19 @@ export function getGeoLocation(item: any) {
  * @return {String}
  */
 export function getLocationString(item: any) {
-    return [
-        get(item, 'location.0.name', get(item, 'location.0.address.title')),
-        get(item, 'location.0.address.line.0'),
-        get(item, 'location.0.address.city') || get(item, 'location.0.address.area'),
-        get(item, 'location.0.address.state') || get(item, 'location.0.address.locality'),
-        get(item, 'location.0.address.postal_code'),
-        get(item, 'location.0.address.country'),
-    ].filter((d: any) => d).join(', ');
+    const location = item.location?.[0];
+    const locationAddress = location?.address;
+
+    const locationArray: Array<string> = [
+        location?.name ?? locationAddress?.title ?? '',
+        locationAddress?.line?.[0] ?? '',
+        locationAddress?.city ?? locationAddress?.area ?? '',
+        locationAddress?.state ?? locationAddress?.locality ?? '',
+        locationAddress?.postal_code ?? '',
+        locationAddress?.country ?? '',
+    ];
+
+    return locationArray.filter((d: string) => d != null && d.trim() != '').join(', ');
 }
 
 /**
