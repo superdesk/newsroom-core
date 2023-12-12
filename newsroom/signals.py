@@ -3,6 +3,9 @@ from blinker import Namespace
 signals = Namespace()
 
 publish_item = signals.signal("publish-item")
+publish_event = signals.signal("publish-event")
+publish_planning = signals.signal("publish-planning")
+
 
 #:
 #: ..versionadded:: 2.4
