@@ -247,7 +247,7 @@ export function getLocationString(item: any) {
         locationAddress?.country ?? '',
     ];
 
-    return locationArray.filter((d: string) => d != null && d.trim() != '').join(', ');
+    return locationArray.filter((d: string) => d != null && d.trim() != '').map((loc) => loc.trim()).join(', ');
 }
 
 /**
