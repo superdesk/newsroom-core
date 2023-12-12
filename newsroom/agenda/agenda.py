@@ -425,9 +425,8 @@ def _set_event_date_range(search):
             },
         ]
 
-    if search.item_type == "events":
-        # Get events for extra dates for coverages and planning.
-        should.append({"range": {"display_dates": date_range}})
+    # Get events for extra dates for coverages and planning.
+    should.append({"range": {"display_dates.date": date_range}})
 
     if len(should):
         search.query["bool"]["filter"].append({"bool": {"should": should, "minimum_should_match": 1}})
