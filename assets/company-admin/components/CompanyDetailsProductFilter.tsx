@@ -29,9 +29,11 @@ class CompanyDetailsProductFilterComponent extends React.PureComponent<any, any>
 
     getDropdownItems(filter: any) {
         const sectionIds = this.props.companySections[this.props.currentCompany._id].map((section: any) => section._id);
+        const currentCompanyProducts: Array<string> = this.props.currentCompany.products.map(({_id}: any) => _id);
 
         return this.props.products
             .filter((product: any) => sectionIds.includes(product.product_type))
+            .filter((product: any) => currentCompanyProducts.includes(product._id))
             .map((product: any) => (
                 <button
                     key={product._id}
