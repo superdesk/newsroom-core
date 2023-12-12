@@ -730,7 +730,7 @@ const isBetweenDay = (day: moment.Moment, start: moment.Moment, end: moment.Mome
  */
 export function groupItems(
     items: Array<IAgendaItem>,
-    minDate: moment.Moment,
+    minDate: moment.Moment | undefined,
     maxDate: moment.Moment | undefined,
     activeGrouping: string,
     featuredOnly?: boolean
@@ -752,9 +752,21 @@ export function groupItems(
         .forEach((item) => {
             const itemExtraDates = getExtraDates(item);
             const itemStartDate = getStartDate(item);
-            const start = item._display_from != null ?
-                moment(item._display_from) :
-                moment.max(minDate, moment.min(itemExtraDates.concat([itemStartDate])));
+            let start: moment.Moment;
+
+            if (item._display_from != null) {
+                start = moment(item._display_from);
+            } else {
+                start = moment.min([
+                    ...itemExtraDates,
+                    itemStartDate,
+                ]);
+
+                if (minDate != null) {
+                    start = moment.max(minDate, start);
+                }
+            }
+
             const itemEndDate = getEndDate(item);
             const scheduleType = getScheduleType(item);
 
@@ -764,17 +776,24 @@ export function groupItems(
                 moment(item.event.actioned_date) :
                 null;
             if (end != null || !moment.isMoment(end)) {
-                end = item._display_to != null ?
-                    moment(item._display_to) :
-                    moment.max(
-                        itemExtraDates
-                            .concat([minDate])
-                            // If event is all day the end timestamp is the same as
-                            // start and depending on the local timezone offset it
-                            // might not give enough room for the event to show up,
-                            // so add an extra day for it.
-                            .concat([itemEndDate.clone().add(1, 'd')])
-                    );
+                if (item._display_to != null) {
+                    end = moment(item._display_to);
+                } else {
+                    const endDates = [
+                        ...itemExtraDates,
+                        // If event is all day the end timestamp is the same as
+                        // start and depending on the local timezone offset it
+                        // might not give enough room for the event to show up,
+                        // so add an extra day for it.
+                        itemEndDate.clone().add(1, 'd'),
+                    ];
+
+                    if (minDate != null) {
+                        endDates.push(minDate);
+                    }
+
+                    end = moment.max(endDates);
+                }
             }
 
             let key = null;
