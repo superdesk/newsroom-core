@@ -28,6 +28,8 @@ export interface IArticle extends IResourceItem {
         [key: string]: any;
     };
     expiry?: string;
-    es_highlight?: {[field: string]: Array<string>}
+    description_text: string;
+    es_highlight?: {[field: string]: Array<string>};
+    extra_items?: {[type: string]: {type: string, items: Array<any>}};
     deleted?: boolean; // Used only in the front-end, populated by wire/reducer
 }
