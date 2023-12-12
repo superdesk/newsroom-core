@@ -815,9 +815,10 @@ export function groupItems(
             const hiddenItems: Array<IAgendaItem['_id']> = [];
 
             groupedItems[dateString].forEach((groupItem) => {
+                const scheduleType = getScheduleType(groupItem);
                 const itemStartDateGroup: string = grouper(getStartDate(groupItem));
 
-                if (itemStartDateGroup !== dateString) {
+                if (itemStartDateGroup !== dateString && scheduleType === SCHEDULE_TYPE.MULTI_DAY) {
                     hiddenItems.push(groupItem._id);
                 } else if (isItemTBC(groupItem)) {
                     itemsWithoutTime.push(groupItem._id);
