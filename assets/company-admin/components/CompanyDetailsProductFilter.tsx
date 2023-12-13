@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
 
@@ -8,9 +7,25 @@ import {currentCompanySelector, companySectionListSelector} from '../selectors';
 
 import DropdownFilter from 'components/DropdownFilter';
 
-class CompanyDetailsProductFilterComponent extends React.PureComponent<any, any> {
-    static propTypes: any;
-    filter: any;
+interface IReduxProps {
+    currentCompany: any;
+    companySections: any;
+}
+
+interface IOwnProps {
+    products: Array<any>;
+    product?: string;
+    setProductFilter: (value: any) => void;
+}
+
+type IProps = IOwnProps & IReduxProps;
+
+class CompanyDetailsProductFilterComponent extends React.PureComponent<IProps> {
+    filter: {
+        label: string;
+        field: string;
+    };
+
     constructor(props: any) {
         super(props);
 
@@ -66,17 +81,10 @@ class CompanyDetailsProductFilterComponent extends React.PureComponent<any, any>
     }
 }
 
-CompanyDetailsProductFilterComponent.propTypes = {
-    products: PropTypes.arrayOf(PropTypes.object),
-    product: PropTypes.string,
-    setProductFilter: PropTypes.func,
-    currentCompany: PropTypes.object,
-    companySections: PropTypes.object,
-};
-
 const mapStateToProps = (state: any) => ({
     currentCompany: currentCompanySelector(state),
     companySections: companySectionListSelector(state),
 });
 
-export const CompanyDetailsProductFilter: React.ComponentType<any> = connect(mapStateToProps)(CompanyDetailsProductFilterComponent);
+export const CompanyDetailsProductFilter: React.ComponentType<IOwnProps>
+    = connect<IReduxProps, {}, IOwnProps>(mapStateToProps)(CompanyDetailsProductFilterComponent);
