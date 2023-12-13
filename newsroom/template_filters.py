@@ -14,6 +14,7 @@ from jinja2.utils import htmlsafe_json_dumps  # type: ignore
 from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
 from datetime import datetime
+from newsroom.gettext import set_session_timezone, get_session_timezone, clear_session_timezone
 
 from newsroom.user_roles import UserRole
 
@@ -60,6 +61,78 @@ def parse_date(datetime):
             return arrow.get(datetime).datetime
     return datetime
 
+
+def get_schedule_type(start, end, all_day, no_end_time):
+    duration = int((end - start).total_seconds() / 60)  # Convert seconds to minutes
+    DAY_IN_MINUTES = 24 * 60 - 1
+
+    if all_day:
+        return "ALL_DAY" if duration == 0 else "MULTI_DAY"
+
+    if no_end_time:
+        return "NO_DURATION"
+
+    if duration > DAY_IN_MINUTES or start.date() == end.date():
+        return "MULTI_DAY"
+
+    if duration == DAY_IN_MINUTES and start.date() == end.date():
+        return "ALL_DAY"
+
+    if duration == 0 and start.time() == end.time():
+        return "NO_DURATION"
+
+    return "REGULAR"
+
+
+def is_item_tbc(item):
+    event_tbc = item.get("event", {}).get("_time_to_be_confirmed", False)
+    if not event_tbc:
+        planning = item.get("planning_items", [])
+        return planning[0].get("_time_to_be_confirmed", False) if planning else False
+    return event_tbc
+
+
+def format_event_datetime(item):
+    datetime = item.get("dates", {})
+    if datetime:
+        tz = datetime.get("tz", get_session_timezone())
+        try:
+            # Set the session timezone
+            set_session_timezone(tz)
+
+            start = parse_date(datetime.get("start"))
+            end = parse_date(datetime.get("end"))
+            all_day = datetime.get("all_day")
+            no_end_time = datetime.get("no_end_time")
+            is_tbc_item = is_item_tbc(item)
+            schedule_type = get_schedule_type(start, end, all_day, no_end_time)
+
+            formatted_start = datetime_long(start)
+            formatted_end = datetime_long(end)
+
+            if is_tbc_item and start != end:
+                return f"Event Starts: {formatted_start} - Event Ends: {formatted_end} (Time to be confirmed)"
+            elif is_tbc_item:
+                return f"Event Starts: {formatted_start} (Time to be confirmed)"
+            elif start != end and (all_day or no_end_time):
+                return f"Event Starts: {formatted_start} - Event Ends: {formatted_end}"
+            elif start == end and (all_day or schedule_type == "ALL_DAY"):
+                return f"Event Starts: {formatted_start} ({tz})"
+            elif no_end_time and start != end:
+                return f"Event Starts: {formatted_start} - Event Ends:{formatted_end} ({tz})"
+            elif no_end_time or schedule_type == "NO_DURATION":
+                return f"Event Starts: {formatted_start} ({tz})"
+            elif schedule_type == "REGULAR":
+                return f"Event Starts: {formatted_start} - Event Ends:{formatted_end} ({tz})"
+            elif schedule_type == "MULTI_DAY":
+                return f"Event Starts :{formatted_start} - Event Ends: {formatted_end} ({tz})"
+            else:
+                print("Not sure about the datetime format", item, schedule_type)
+                return f"Event Starts: {formatted_start} - Event Ends: {formatted_end} ({tz})"
+
+        finally:
+            # clear session timezone
+            clear_session_timezone()
 
 def datetime_short(datetime):
     if datetime:

@@ -74,6 +74,15 @@ def set_session_timezone(timezone: str):
     current_app.session_timezone = timezone
 
 
+def clear_session_timezone():
+    try:
+        session.pop("timezone", None)
+    except RuntimeError:
+        pass
+
+    current_app.config.pop("SESSION_TIMEZONE", None)
+
+
 def setup_babel(app):
     babel = Babel(app)
 
