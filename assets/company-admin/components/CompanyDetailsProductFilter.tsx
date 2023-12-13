@@ -8,7 +8,10 @@ import {currentCompanySelector, companySectionListSelector} from '../selectors';
 import DropdownFilter from 'components/DropdownFilter';
 
 interface IReduxProps {
-    currentCompany: any;
+    currentCompany: {
+        _id: string;
+        products: Array<{_id: string}>;
+    };
     companySections: any;
 }
 
@@ -44,7 +47,7 @@ class CompanyDetailsProductFilterComponent extends React.PureComponent<IProps> {
 
     getDropdownItems(filter: any) {
         const sectionIds = new Set(this.props.companySections[this.props.currentCompany._id].map((section: any) => section._id));
-        const currentCompanyProducts: Set<string> = new Set(this.props.currentCompany.products.map(({_id}: any) => _id));
+        const currentCompanyProducts: Set<string> = new Set(this.props.currentCompany.products.map(({_id}) => _id));
 
         return this.props.products
             .filter((product: any) => sectionIds.has(product.product_type) && currentCompanyProducts.has(product._id))
