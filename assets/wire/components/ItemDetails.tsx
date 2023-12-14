@@ -80,13 +80,6 @@ function ItemDetails({
             }).filter(notNullOrUndefined);
         });
 
-    if (featureMedia?.renditions?.viewImage.href != null && imagesArray.length > 0) {
-        imagesArray[0] = [
-            {src: featureMedia.renditions.viewImage.href},
-            ...imagesArray[0],
-        ];
-    }
-
     return (
         <Content type="item-detail">
             <ContentHeader>
@@ -103,14 +96,14 @@ function ItemDetails({
             <ArticleItemDetails disableTextSelection={detailsConfig.disable_text_selection}>
                 <ArticleContent>
                     {
-                        (imagesArray).map((images) => (
+                        (imagesArray.length > 0) && imagesArray.map((images) => (
                             <Carousel
                                 key={images[0].src}
                                 images={images}
                             />
                         ))
                     }
-                    {imagesArray.length < 1 && featureMedia != null && (
+                    {featureMedia != null && (
                         featureMedia.type === 'picture' ? (
                             <ArticlePicture
                                 picture={featureMedia}
