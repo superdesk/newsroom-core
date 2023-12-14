@@ -653,7 +653,8 @@ def get_coverages(planning_items, original_coverages, new_plan):
             for coverage in planning_item.get("coverages") or []:
                 existing_coverage = get_existing_coverage(coverage["coverage_id"])
                 coverage_planning = coverage.get("planning") or {}
-
+                assigned_desk = coverage.get("assigned_desk") or {}
+                assigned_user = coverage.get("assigned_user") or {}
                 new_coverage = {
                     "planning_id": planning_item.get("guid"),
                     "coverage_id": coverage.get("coverage_id"),
@@ -665,6 +666,10 @@ def get_coverages(planning_items, original_coverages, new_plan):
                     "genre": coverage_planning.get("genre", []),
                     "coverage_provider": (coverage.get("coverage_provider") or {}).get("name"),
                     "watches": existing_coverage.get("watches") or coverage.get("watches", []),
+                    "assigned_desk_name": assigned_desk.get("name"),
+                    "assigned_desk_email": assigned_desk.get("email"),
+                    "assigned_user_name": assigned_user.get("display_name"),
+                    "assigned_user_email": assigned_user.get("email"),
                 }
 
                 if TO_BE_CONFIRMED_FIELD in coverage:

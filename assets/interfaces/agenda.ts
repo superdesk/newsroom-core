@@ -78,6 +78,11 @@ export interface ICoverage {
     watches?: Array<IUser['_id']>;
     coverage_status: ICoverageStatus;
     workflow_status: ICoverageWorkflowStatus;
+
+    assigned_desk_name?: string;
+    assigned_desk_email?: string;
+    assigned_user_name?: string;
+    assigned_user_email?: string;
 }
 
 export interface IAgendaItem extends IResourceItem {
