@@ -72,7 +72,7 @@ def get_schedule_type(start, end, all_day, no_end_time):
     if no_end_time:
         return "NO_DURATION"
 
-    if duration > DAY_IN_MINUTES or start.date() == end.date():
+    if duration > DAY_IN_MINUTES or start.date() != end.date():
         return "MULTI_DAY"
 
     if duration == DAY_IN_MINUTES and start.date() == end.date():
@@ -100,39 +100,38 @@ def format_event_datetime(item):
             # Set the session timezone
             set_session_timezone(tz)
 
-            start = parse_date(datetime.get("start"))
-            end = parse_date(datetime.get("end"))
+            start = parse_date(format_datetime(parse_date(datetime.get("start")), "yyyy-MM-dd HH:mm:ss"))
+            end = parse_date(format_datetime(parse_date(datetime.get("end")), "yyyy-MM-dd HH:mm:ss"))
             all_day = datetime.get("all_day")
             no_end_time = datetime.get("no_end_time")
             is_tbc_item = is_item_tbc(item)
+
             schedule_type = get_schedule_type(start, end, all_day, no_end_time)
 
             formatted_start = datetime_long(start)
             formatted_end = datetime_long(end)
 
-            if is_tbc_item and start != end:
-                return f"Event Starts: {formatted_start} - Event Ends: {formatted_end} (Time to be confirmed)"
-            elif is_tbc_item:
-                return f"Event Starts: {formatted_start} (Time to be confirmed)"
-            elif start != end and (all_day or no_end_time):
-                return f"Event Starts: {formatted_start} - Event Ends: {formatted_end}"
-            elif start == end and (all_day or schedule_type == "ALL_DAY"):
-                return f"Event Starts: {formatted_start} ({tz})"
-            elif no_end_time and start != end:
-                return f"Event Starts: {formatted_start} - Event Ends:{formatted_end} ({tz})"
-            elif no_end_time or schedule_type == "NO_DURATION":
-                return f"Event Starts: {formatted_start} ({tz})"
-            elif schedule_type == "REGULAR":
-                return f"Event Starts: {formatted_start} - Event Ends:{formatted_end} ({tz})"
-            elif schedule_type == "MULTI_DAY":
-                return f"Event Starts :{formatted_start} - Event Ends: {formatted_end} ({tz})"
-            else:
-                print("Not sure about the datetime format", item, schedule_type)
+            if is_tbc_item:
+                if start.date() != end.date():
+                    return f"Event Starts: {formatted_start} - Event Ends: {formatted_end} (Time to be confirmed)"
+                else:
+                    return f"Event Starts: {formatted_start} (Time to be confirmed)"
+
+            if start.date() != end.date():
+                if all_day or no_end_time or schedule_type in ("REGULAR", "MULTI_DAY"):
+                    return f"Event Starts: {formatted_start} - Event Ends: {formatted_end}"
+
+            if start.date() == end.date():
+                if no_end_time or all_day or schedule_type in ("ALL_DAY", "NO_DURATION"):
+                    return f"Event Starts: {formatted_start} ({tz})"
+
+            if no_end_time:
                 return f"Event Starts: {formatted_start} - Event Ends: {formatted_end} ({tz})"
 
         finally:
             # clear session timezone
             clear_session_timezone()
+
 
 def datetime_short(datetime):
     if datetime:
