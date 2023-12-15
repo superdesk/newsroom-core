@@ -29,6 +29,7 @@ const testArticle: IArticle = {
     headline: 'My test article',
     source: 'sofab',
     versioncreated: '2023-06-27T11:07:17+0000',
+    description_text: 'test',
 };
 
 describe('wire actions', () => {

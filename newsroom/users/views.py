@@ -44,6 +44,7 @@ def get_settings_data():
         "companies": list(query_resource("companies")),
         "sections": app.sections,
         "products": list(query_resource("products")),
+        "countries": app.countries,
     }
 
 
@@ -388,4 +389,19 @@ def delete_notification(user_id, notification_id):
         flask.abort(403)
 
     get_resource_service("notifications").delete_action({"_id": notification_id})
+    return jsonify({"success": True}), 200
+
+
+@blueprint.route("/users/<user_id>/approve", methods=["POST"])
+@account_manager_or_company_admin_only
+def approve_user(user_id):
+    users_service = get_resource_service("users")
+    user = users_service.find_one(req=None, _id=ObjectId(user_id))
+    if not user:
+        return NotFound(gettext("User not found"))
+
+    if user.get("is_approved"):
+        return jsonify({"error": gettext("User is already approved")}), 403
+
+    users_service.approve_user(user)
     return jsonify({"success": True}), 200

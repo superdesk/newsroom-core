@@ -181,6 +181,31 @@ def company_users(_id):
     return jsonify(users), 200
 
 
+@blueprint.route("/companies/<company_id>/approve", methods=["POST"])
+@account_manager_only
+def approve_company(company_id):
+    original = find_one("companies", _id=ObjectId(company_id))
+    if not original:
+        return NotFound(gettext("Company not found"))
+
+    if original.get("is_approved"):
+        return jsonify({"error": gettext("Company is already approved")}), 403
+
+    # Activate this Company
+    updates = {
+        "is_enabled": True,
+        "is_approved": True,
+    }
+    get_resource_service("companies").patch(original["_id"], updates=updates)
+
+    # Activate the Users of this Company
+    users_service = get_resource_service("users")
+    for user in users_service.get(req=None, lookup={"company": original["_id"], "is_approved": {"$ne": True}}):
+        users_service.approve_user(user)
+
+    return {"success": True}
+
+
 def get_product_updates(updates: Dict[str, bool], seats: Dict[str, int]):
     product_ids = [product_id for product_id, selected in updates.items() if selected]
     if not product_ids:

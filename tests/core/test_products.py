@@ -35,7 +35,12 @@ def companies(app):
     return _companies
 
 
-def test_product_list_fails_for_anonymous_user(client, anonymous_user):
+def test_product_list_fails_for_anonymous_user(client, anonymous_user, public_user):
+    response = client.get("/products/search")
+    assert response.status_code == 302
+    assert response.headers.get("location") == "http://localhost:5050/login"
+
+    utils.login(client, public_user)
     response = client.get("/products/search")
     assert response.status_code == 403
     assert b"Forbidden" in response.data

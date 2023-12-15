@@ -110,6 +110,11 @@ function getBodyPicture(item: IArticle): IArticle | null {
     return pictures.length ? pictures[0] : null;
 }
 
+export function getMediaGalleryPictureList(item: IArticle) {
+    return Object.values(item.extra_items ?? {})
+        .filter((value) => value?.type === 'media');
+}
+
 export function getPictureList(item: IArticle): Array<IArticle> {
     const pictures = Object.values(item.associations ?? {})
         .filter((association) => association?.type === 'picture') as IArticle[];

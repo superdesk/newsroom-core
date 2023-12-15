@@ -507,6 +507,7 @@ class BaseSearchService(Service):
                     user_products = get_products_by_user(
                         search.user,
                         search.section,
+                        search.navigation_ids,
                     )
 
                     if user_products:

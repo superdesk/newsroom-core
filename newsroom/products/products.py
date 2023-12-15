@@ -9,6 +9,8 @@ from .types import PRODUCT_TYPES
 from newsroom.types import Company, Product, User
 from newsroom.utils import any_objectid_in_list
 
+NavigationIds = List[Union[str, ObjectId]]
+
 
 class ProductsResource(newsroom.Resource):
     """
@@ -45,7 +47,7 @@ class ProductsResource(newsroom.Resource):
 class ProductsService(CacheableService):
     cache_lookup = {"is_enabled": True}
 
-    def on_deleted(self, doc):
+    def on_deleted(self, doc: Product) -> None:
         lookup = {"products._id": doc["_id"]}
         for resource in ("users", "companies"):
             items = superdesk.get_resource_service(resource).get(req=None, lookup=lookup)
@@ -57,9 +59,7 @@ class ProductsService(CacheableService):
 products_service = ProductsService()
 
 
-def get_products_by_navigation(
-    navigation_ids: List[Union[str, ObjectId]], product_type: Optional[str] = None
-) -> List[Product]:
+def get_products_by_navigation(navigation_ids: NavigationIds, product_type: Optional[str] = None) -> List[Product]:
     return [
         product
         for product in products_service.get_cached()
@@ -74,6 +74,8 @@ def get_product_by_id(
     product_id: Union[str, ObjectId], product_type: Optional[str] = None, company_id: Optional[ObjectId] = None
 ) -> Optional[Product]:
     product = products_service.get_cached_by_id(product_id)
+    if not product:
+        return None
 
     if company_id is not None and ObjectId(company_id) not in product.get("companies") or []:
         return None
@@ -86,7 +88,7 @@ def get_product_by_id(
 
 def get_products_by_company(
     company: Optional[Company],
-    navigation_ids: Optional[List[Union[str, ObjectId]]] = None,
+    navigation_ids: Optional[NavigationIds] = None,
     product_type: Optional[str] = None,
     unlimited_only: Optional[bool] = False,
 ) -> List[Product]:
@@ -112,7 +114,7 @@ def get_products_by_company(
         # no products selected for this company
         return []
 
-    def product_matches(product: Product):
+    def product_matches(product: Product) -> bool:
         if "products" in (company or {}) and product["_id"] not in company_product_ids:
             return False
         elif "products" not in (company or {}) and company_id not in (product.get("companies") or []):
@@ -127,9 +129,15 @@ def get_products_by_company(
     return [product for product in products_service.get_cached() if product_matches(product)]
 
 
-def get_products_by_user(user: User, section: str) -> List[Product]:
-    if user.get("products"):
+def get_products_by_user(user: User, section: str, navigation_ids: Optional[NavigationIds]) -> List[Product]:
+    if "products" in user and user["products"]:
         ids = [p["_id"] for p in user["products"] if p["section"] == section]
+
+        def product_matches(product: Product) -> bool:
+            return product["_id"] in ids and (
+                not navigation_ids or any_objectid_in_list(navigation_ids, product.get("navigations") or [])
+            )
+
         if ids:
-            return [product for product in products_service.get_cached() if product["_id"] in ids]
+            return [product for product in products_service.get_cached() if product_matches(product)]
     return []

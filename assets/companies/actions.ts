@@ -1,11 +1,17 @@
-import {gettext, notify, errorHandler} from 'utils';
+import {ICompany} from 'interfaces';
+import {gettext, notify, errorHandler, updateRouteParams} from 'utils';
 import server from 'server';
 import {searchQuerySelector} from 'search/selectors';
+import {ICompanySettingsStore} from './reducers';
 
 
 export const SELECT_COMPANY = 'SELECT_COMPANY';
-export function selectCompany(id: any) {
+export function selectCompany(id: string, updateRoute = true) {
     return function (dispatch: any) {
+        if (updateRoute) {
+            updateRouteParams({companyId: id}, {});
+        }
+
         dispatch(select(id));
         dispatch(fetchCompanyUsers(id));
     };
@@ -48,7 +54,11 @@ export function newCompany(data: any) {
 }
 
 export const CANCEL_EDIT = 'CANCEL_EDIT';
-export function cancelEdit(event?: any) {
+export function cancelEdit(event?: any, updateRoute = true) {
+    if (updateRoute) {
+        updateRouteParams({companyId: null}, {});
+    }
+
     return {type: CANCEL_EDIT, event};
 }
 
@@ -109,6 +119,17 @@ export function fetchCompanyUsers(companyId: any, force: any = false) {
         return server.get(`/companies/${companyId}/users`)
             .then((data: any) => {
                 return dispatch(getCompanyUsers(data));
+            })
+            .catch((error: any) => errorHandler(error, dispatch, setError));
+    };
+}
+
+export function approveCompany(companyId: ICompany['_id']) {
+    return function (dispatch: any) {
+        return server.post(`/companies/${companyId}/approve`, {})
+            .then(() => {
+                notify.success(gettext('Company has been approved'));
+                dispatch(fetchCompanies());
             })
             .catch((error: any) => errorHandler(error, dispatch, setError));
     };
@@ -184,4 +205,18 @@ export function deleteCompany() {
 export const INIT_VIEW_DATA = 'INIT_VIEW_DATA';
 export function initViewData(data: any) {
     return {type: INIT_VIEW_DATA, data};
+}
+
+export function onURLParamsChanged() {
+    return (dispatch: any, getState: any) => {
+        const params = new URLSearchParams(window.location.search);
+        const companyId = params.get('companyId');
+        const state: ICompanySettingsStore = getState();
+
+        if (companyId != null && state.companyToEdit?._id !== companyId) {
+            dispatch(selectCompany(companyId, false));
+        } else if (companyId == null && state.companyToEdit != null) {
+            dispatch(cancelEdit(undefined, false));
+        }
+    };
 }

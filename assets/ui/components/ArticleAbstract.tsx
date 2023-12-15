@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {IArticle} from 'interfaces';
 
 interface IProps {
-    item: {
-        description_text?: string;
-    };
+    item: IArticle;
     displayAbstract?: boolean;
 }
 
