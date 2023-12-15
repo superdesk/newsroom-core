@@ -31,7 +31,7 @@ from newsroom.template_filters import (
     initials,
     get_highlighted_field,
     get_item_category_names,
-    format_event_datetime
+    format_event_datetime,
 )
 from newsroom.template_loaders import LocaleTemplateLoader
 from newsroom.notifications.notifications import get_initial_notifications
