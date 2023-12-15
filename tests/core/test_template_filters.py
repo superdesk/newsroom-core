@@ -5,7 +5,7 @@ import hashlib
 
 from datetime import datetime
 from flask_babel import lazy_gettext
-from newsroom.template_filters import datetime_long, parse_date
+from newsroom.template_filters import datetime_long, parse_date, format_event_datetime
 from newsroom.template_loaders import set_template_locale
 import newsroom.template_filters as template_filters
 
@@ -50,3 +50,84 @@ def test_notification_date_time_filters():
     assert "11:00" == template_filters.notification_time(d)
     assert "octobre 31, 2023" == template_filters.notification_date(d)
     assert "11:00 octobre 31, 2023" == template_filters.notification_datetime(d)
+
+
+def test_format_event_datetime():
+    # Case 1: Regular event with specific start and end times
+    event1 = {
+        "dates": {
+            "tz": "Asia/Calcutta",
+            "start": "2023-10-31T18:30:00+0000",
+            "end": "2023-11-01T20:45:00+0000",
+            "all_day": False,
+            "no_end_time": False,
+        },
+    }
+    assert "Event Starts: 01/11/2023 05:30 - Event Ends: 02/11/2023 07:45 (Asia/Calcutta)" == format_event_datetime(
+        event1
+    )
+
+    # Case 2: All-day event
+    event2 = {
+        "dates": {
+            "tz": "Asia/Calcutta",
+            "start": "2023-10-31T18:30:00+0000",
+            "end": "2023-11-01T18:29:59+0000",
+            "all_day": True,
+            "no_end_time": False,
+        },
+    }
+    assert "Event Starts: 01/11/2023 05:30 (Asia/Calcutta)" == format_event_datetime(event2)
+
+    # Case 3: Time-to-be-confirmed event
+    event3 = {
+        "dates": {
+            "tz": "Asia/Calcutta",
+            "start": "2023-10-31T18:30:00+0000",
+            "end": "2023-11-01T18:29:59+0000",
+            "all_day": False,
+            "no_end_time": False,
+        },
+        "event": {
+            "_time_to_be_confirmed": True,
+        },
+    }
+    assert "Event Starts: 01/11/2023 05:30 (Asia/Calcutta) (Time to be confirmed)" == format_event_datetime(event3)
+
+    # Case 4: Event with no end time
+    event4 = {
+        "dates": {
+            "tz": "Asia/Calcutta",
+            "start": "2023-10-31T18:30:00+0000",
+            "end": "2023-11-01T00:00:00+0000",
+            "all_day": False,
+            "no_end_time": True,
+        }
+    }
+    assert "Event Starts: 01/11/2023 05:30 (Asia/Calcutta)" == format_event_datetime(event4)
+
+    # Case 5: All-day event with no end time
+    event5 = {
+        "dates": {
+            "tz": "Asia/Calcutta",
+            "start": "2023-10-31T18:30:00+0000",
+            "end": "2023-11-01T18:29:59+0000",
+            "all_day": True,
+            "no_end_time": True,
+        },
+    }
+    assert "Event Starts: 01/11/2023 05:30 (Asia/Calcutta)" == format_event_datetime(event5)
+
+    # Case 6: Multi-day event
+    event6 = {
+        "dates": {
+            "tz": "Asia/Calcutta",
+            "start": "2023-10-31T18:30:00+0000",
+            "end": "2023-11-02T20:45:00+0000",
+            "all_day": False,
+            "no_end_time": False,
+        },
+    }
+    assert "Event Starts: 01/11/2023 05:30 - Event Ends: 03/11/2023 07:45 (Asia/Calcutta)" == format_event_datetime(
+        event6
+    )

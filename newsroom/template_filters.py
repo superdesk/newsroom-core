@@ -113,13 +113,15 @@ def format_event_datetime(item):
 
             if is_tbc_item:
                 if start.date() != end.date():
-                    return f"Event Starts: {formatted_start} - Event Ends: {formatted_end} (Time to be confirmed)"
+                    return (
+                        f"Event Starts: {formatted_start} - Event Ends: {formatted_end} ({tz}) (Time to be confirmed)"
+                    )
                 else:
-                    return f"Event Starts: {formatted_start} (Time to be confirmed)"
+                    return f"Event Starts: {formatted_start} ({tz}) (Time to be confirmed)"
 
             if start.date() != end.date():
                 if all_day or no_end_time or schedule_type in ("REGULAR", "MULTI_DAY"):
-                    return f"Event Starts: {formatted_start} - Event Ends: {formatted_end}"
+                    return f"Event Starts: {formatted_start} - Event Ends: {formatted_end} ({tz})"
 
             if start.date() == end.date():
                 if no_end_time or all_day or schedule_type in ("ALL_DAY", "NO_DURATION"):
