@@ -141,6 +141,8 @@ def format_event_datetime(item: dict) -> Optional[str]:
         if no_end_time:
             return lazy_gettext(f"Event Starts: {formatted_start} - Event Ends: {formatted_end} ({tz})")
 
+        return None
+
     finally:
         # clear session timezone
         clear_session_timezone()
