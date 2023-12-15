@@ -22,7 +22,7 @@ from newsroom.utils import (
 from newsroom.agenda.agenda import get_date_filters
 from newsroom.news_api.api_tokens import API_TOKENS
 from newsroom.news_api.utils import format_report_results
-
+from newsroom.companies.utils import get_companies_id_by_product
 from .content_activity import get_content_activity_report  # noqa
 
 
@@ -88,22 +88,16 @@ def get_company_products():
     """Returns products by company"""
     results = []
     companies = get_entity_dict(query_resource("companies"))
-    products_data = list(query_resource("products"))
-    for company_id, details in companies.items():
-        products = details.get("products", [])
+    products_data = get_entity_dict(query_resource("products"))
+    for company_id, company_details in companies.items():
         company_result = {
             "_id": str(company_id),
-            "name": details.get("name", ""),
-            "is_enabled": details.get("is_enabled", ""),
-            "products": [],
+            "name": company_details.get("name", ""),
+            "is_enabled": company_details.get("is_enabled", ""),
+            "products": [
+                products_data.get(product_info.get("_id")) for product_info in company_details.get("products", [])
+            ],
         }
-        for product_info in products:
-            product_id = product_info.get("_id")
-            product_data = next((p for p in products_data if p["_id"] == product_id), None)
-            if product_data:
-                product_result = deepcopy(product_data)
-                company_result["products"].append(product_result)
-
         results.append(company_result)
 
     sorted_results = sorted(results, key=lambda k: k["name"])
@@ -147,17 +141,11 @@ def get_company_report():
             "_id": company_id,
             "name": company["name"],
             "is_enabled": company["is_enabled"],
-            "products": [],
+            "products": [products_data.get(prod.get("_id")) for prod in company.get("products", [])],
             "users": users,
             "company": company_id,
             "account_manager": company.get("account_manager"),
         }
-
-        for prod in company.get("products", []):
-            product = products_data.get(prod.get("_id"))
-            if product:
-                company_result["products"].append(product)
-
         results.append(company_result)
 
     sorted_results = sorted(results, key=lambda k: k["name"])
@@ -369,18 +357,6 @@ def get_product_company():
 
     results = {"results": res, "name": gettext("Companies permissioned per product")}
     return results
-
-
-def get_companies_id_by_product(product_id):
-    """
-    get company ID , based on product ID
-    """
-    companies = list(query_resource("companies"))
-    return [
-        company["_id"]
-        for company in companies
-        if any(prod["_id"] == ObjectId(product_id) for prod in company.get("products", []))
-    ]
 
 
 def get_expired_companies():
