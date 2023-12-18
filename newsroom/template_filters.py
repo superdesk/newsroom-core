@@ -161,7 +161,7 @@ def format_event_datetime(item: dict) -> str:
             return lazy_gettext("Event Starts: {start} ({tz})").format(start=formatted_start, tz=tz)
 
         if schedule_type == ScheduleType.REGULAR:
-            return lazy_gettext("Event Starts : {start_time} to {end_time} - On Date: {date} ({tz})").format(
+            return lazy_gettext("Event Starts: {start_time} to {end_time} - On Date: {date} ({tz})").format(
                 start_time=formatted_start.split()[1],
                 end_time=formatted_end.split()[1],
                 date=formatted_end.split()[0],
