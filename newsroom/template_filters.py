@@ -138,29 +138,39 @@ def format_event_datetime(item: dict) -> str:
 
         if is_tbc_item:
             if start.date() != (end.date() if end else None):
-                return lazy_gettext(
-                    f"Event Starts: {formatted_start} - Event Ends: {formatted_end} ({tz}) (Time to be confirmed)"
+                return lazy_gettext("Event starts: {start} - Event Ends: {end} ({tz}) (Time to be confirmed)").format(
+                    start=formatted_start, end=formatted_end, tz=tz
                 )
+
             else:
-                return lazy_gettext(f"Event Starts: {formatted_start} ({tz}) (Time to be confirmed)")
+                return lazy_gettext("Event Starts: {start} ({tz}) (Time to be confirmed)").format(
+                    start=formatted_start, tz=tz
+                )
 
         if start.date() != (end.date() if end else None):
             if all_day or no_end_time and schedule_type in (ScheduleType.REGULAR, ScheduleType.MULTI_DAY):
-                return lazy_gettext(f"Event Starts: {formatted_start} - Event Ends: {formatted_end} ({tz})")
+                return lazy_gettext("Event Starts: {start} - Event Ends: {formatted_end} ({tz})").format(
+                    start=formatted_start, end=formatted_end, tz=tz
+                )
 
         if start.date() == (end.date() if end else None):
             if no_end_time or all_day and schedule_type in (ScheduleType.ALL_DAY, ScheduleType.NO_DURATION):
-                return lazy_gettext(f"Event Starts: {formatted_start} ({tz})")
+                return lazy_gettext("Event Starts: {start} ({tz})").format(start=formatted_start, tz=tz)
 
         if no_end_time and start.date():
-            return lazy_gettext(f"Event Starts: {formatted_start} ({tz})")
+            return lazy_gettext("Event Starts: {start} ({tz})").format(start=formatted_start, tz=tz)
 
         if schedule_type == ScheduleType.REGULAR:
-            return lazy_gettext(
-                f"Event Starts : {formatted_start.split()[1]} to {formatted_end.split()[1]} - On Date: {formatted_start.split()[0]} ({tz})"
+            return lazy_gettext("Event Starts : {start_time} to {end_time} - On Date: {date} ({tz})").format(
+                start_time=formatted_start.split()[1],
+                end_time=formatted_end.split()[1],
+                date=formatted_end.split()[0],
+                tz=tz,
             )
         else:
-            return lazy_gettext(f"Event Starts: {formatted_start} - Event Ends: {formatted_end} ({tz})")
+            return lazy_gettext("Event Starts: {start} - Event Ends: {end} ({tz})").format(
+                start=formatted_start, end=formatted_end, tz=tz
+            )
 
     finally:
         # clear session timezone
