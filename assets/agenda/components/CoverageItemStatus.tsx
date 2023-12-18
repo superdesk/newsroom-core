@@ -83,7 +83,7 @@ export default class CoverageItemStatus extends React.Component<any, any> {
                 <ActionButton
                     key={action.name}
                     item={coverage}
-                    className='icon-button icon-button--small icon-button--bordered'
+                    className='icon-button icon-button--small  icon-button--bordered icon-button--tertiary'
                     action={action}
                     plan={this.props.item}
                     isVisited={parentWatched}
@@ -93,7 +93,7 @@ export default class CoverageItemStatus extends React.Component<any, any> {
 
         const content = [
             (<span key="topRow" className={get(actions, 'length', 0) === 0 ? 'coverage-item--element-grow' : ''} >
-                <span key="label" className='coverage-item__text-label me-1'>{gettext('Status')}:</span>
+                <span key="label" className='coverage-item__text-label me-1'>{gettext('status')}:</span>
                 <span key="value">{getCoverageStatusText(coverage)}</span>
             </span>),
             actions
@@ -177,7 +177,6 @@ export default class CoverageItemStatus extends React.Component<any, any> {
             get(this.props, 'coverageData.ednote', {})[coverage.coverage_id];
         const reason = this.getWorkflowStatusReason();
         const scheduledStatus = get(this.props, 'coverageData.scheduled_update_status', {})[coverage.coverage_id];
-
 
         return (
             <Fragment>
