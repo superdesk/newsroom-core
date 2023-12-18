@@ -22,7 +22,7 @@ from newsroom.utils import (
 from newsroom.agenda.agenda import get_date_filters
 from newsroom.news_api.api_tokens import API_TOKENS
 from newsroom.news_api.utils import format_report_results
-
+from newsroom.companies.utils import get_companies_id_by_product
 from .content_activity import get_content_activity_report  # noqa
 
 
@@ -87,28 +87,18 @@ def get_user_saved_searches():
 def get_company_products():
     """Returns products by company"""
     results = []
-    company_products = {}
     companies = get_entity_dict(query_resource("companies"))
-    products = query_resource("products")
-
-    for product in products:
-        for company_id in product.get("companies", []):
-            company_product = company_products.get(company_id, {})
-            products = company_product.get("products", [])
-            products.append(product)
-            company_product["products"] = products
-            company_products[company_id] = company_product
-
-    for _id, details in company_products.items():
-        if companies.get(_id):
-            results.append(
-                {
-                    "_id": str(_id),
-                    "name": companies[_id]["name"],
-                    "is_enabled": companies[_id]["is_enabled"],
-                    "products": details.get("products", []),
-                }
-            )
+    products_data = get_entity_dict(query_resource("products"))
+    for company_id, company_details in companies.items():
+        company_result = {
+            "_id": str(company_id),
+            "name": company_details.get("name", ""),
+            "is_enabled": company_details.get("is_enabled", ""),
+            "products": [
+                products_data.get(product_info.get("_id")) for product_info in company_details.get("products", [])
+            ],
+        }
+        results.append(company_result)
 
     sorted_results = sorted(results, key=lambda k: k["name"])
     return {"results": sorted_results, "name": gettext("Products per company")}
@@ -140,33 +130,23 @@ def get_product_stories():
 def get_company_report():
     """Returns products by company"""
     results = []
-    company_products = {}
-    companies = get_entity_dict(query_resource("companies"))
-    products = query_resource("products")
+    companies = list(query_resource("companies"))
+    products_data = get_entity_dict(query_resource("products"))
 
-    for product in products:
-        for company_id in product.get("companies", []):
-            company_product = company_products.get(company_id, {})
-            products = company_product.get("products", [])
-            products.append(product)
-            company_product["products"] = products
-            company_products[company_id] = company_product
+    for company in companies:
+        company_id = str(company["_id"])
+        users = list(query_resource("users", lookup={"company": company_id}))
 
-    for _id, details in company_products.items():
-        users = list(query_resource("users", lookup={"company": _id}))
-        if companies.get(_id):
-            company = companies[_id]
-            results.append(
-                {
-                    "_id": str(_id),
-                    "name": company["name"],
-                    "is_enabled": company["is_enabled"],
-                    "products": details.get("products", []),
-                    "users": users,
-                    "company": company,
-                    "account_manager": company.get("account_manager"),
-                }
-            )
+        company_result = {
+            "_id": company_id,
+            "name": company["name"],
+            "is_enabled": company["is_enabled"],
+            "products": [products_data.get(prod.get("_id")) for prod in company.get("products", [])],
+            "users": users,
+            "company": company_id,
+            "account_manager": company.get("account_manager"),
+        }
+        results.append(company_result)
 
     sorted_results = sorted(results, key=lambda k: k["name"])
     return {"results": sorted_results, "name": gettext("Company")}
@@ -367,7 +347,7 @@ def get_product_company():
         {
             "_id": product.get("_id"),
             "product": product.get("name"),
-            "companies": product.get("companies", []),
+            "companies": get_companies_id_by_product(product.get("_id")),
         }
         for product in products
     ]
