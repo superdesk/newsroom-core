@@ -138,7 +138,7 @@ def format_event_datetime(item: dict) -> str:
 
         if is_tbc_item:
             if start.date() != (end.date() if end else None):
-                return lazy_gettext("Event starts: {start} - Event Ends: {end} ({tz}) (Time to be confirmed)").format(
+                return lazy_gettext("Event Starts: {start} - Event Ends: {end} ({tz}) (Time to be confirmed)").format(
                     start=formatted_start, end=formatted_end, tz=tz
                 )
 
