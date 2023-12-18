@@ -75,36 +75,31 @@ export default class CoverageItemStatus extends React.Component<any, any> {
         return '';
     }
 
-    getStatusContent(coverage: any) {
+    getCoverageActions(coverage: any) {
         const actionsToShow = this.filterActions();
         const parentWatched = isWatched(this.props.item, this.props.user);
         const actions = actionsToShow.map((action: any) =>
-            <span className="coverage-item--element-grow d-flex justify-content-end" key="action-button">
-                <ActionButton
-                    key={action.name}
-                    item={coverage}
-                    className='icon-button icon-button--small  icon-button--bordered icon-button--tertiary'
-                    action={action}
-                    plan={this.props.item}
-                    isVisited={parentWatched}
-                    disabled={parentWatched}
-                />
-            </span>);
+            <ActionButton
+                key={action.name}
+                item={coverage}
+                className='icon-button icon-button--small icon-button--bordered icon-button--tertiary'
+                action={action}
+                plan={this.props.item}
+                isVisited={parentWatched}
+                disabled={parentWatched}
+            />
+        );
 
-        const content = [
-            (<span key="topRow" className={get(actions, 'length', 0) === 0 ? 'coverage-item--element-grow' : ''} >
-                <span key="label" className='coverage-item__text-label me-1'>{gettext('status')}:</span>
-                <span key="value">{getCoverageStatusText(coverage)}</span>
-            </span>),
-            actions
-        ];
+        const content = [actions];
 
-        if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED &&
-            ['video', 'video_explainer', 'picture', 'graphic'].includes(coverage.coverage_type) && getDeliveryHref(coverage)) {
-            content.push(
+        if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED
+            && ['video', 'video_explainer', 'picture', 'graphic'].includes(coverage.coverage_type)
+            && getDeliveryHref(coverage)
+        ) {
+            content.unshift(
                 <a
                     key="contentLink"
-                    className="nh-button nh-button--small nh-button--tertiary ms-2"
+                    className="nh-button nh-button--small nh-button--tertiary"
                     ref={(elem) => this.elem = elem}
                     title={gettext('Open in new tab')}
                     href={coverage.delivery_href}
@@ -116,13 +111,15 @@ export default class CoverageItemStatus extends React.Component<any, any> {
             );
         }
 
-        if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED && this.state.wireItem &&
-            !(this.props.hideViewContentItems || []).includes(this.state.wireItem._id)) {
-            content.push(
+        if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED
+            && this.state.wireItem
+            && !(this.props.hideViewContentItems || []).includes(this.state.wireItem._id)
+        ) {
+            content.unshift(
                 this.state.wireItem._access
                     ? <a
                         key="contentLink"
-                        className='nh-button nh-button--small nh-button--tertiary ms-2'
+                        className='nh-button nh-button--small nh-button--tertiary'
                         ref={(elem) => this.elem = elem}
                         title={gettext('Open in new tab')}
                         href={'/wire?item='+ get(coverage, 'delivery_id')}
@@ -133,7 +130,7 @@ export default class CoverageItemStatus extends React.Component<any, any> {
                     </a>
                     : <a
                         key="contentLink"
-                        className='nh-button nh-button--small nh-button--tertiary ms-2 nh-button--disabled'
+                        className='nh-button nh-button--small nh-button--tertiary nh-button--disabled'
                         ref={(elem) => this.elem = elem}
                         title={gettext('“You don’t have access to this content, please contact test@localhost”')}
                     >
@@ -180,31 +177,52 @@ export default class CoverageItemStatus extends React.Component<any, any> {
 
         return (
             <Fragment>
-                {wireText && <div className='coverage-item__row'>
-                    <p className='wire-articles__item__text m-0'>{wireText}</p>
-                </div>}
+                {wireText && (
+                    <div className='coverage-item__row'>
+                        <p className='wire-articles__item__text m-0'>{wireText}</p>
+                    </div>
+                )}
+
                 {isCoverageBeingUpdated(coverage) && (
                     <div className='coverage-item__row'>
                         <span className='label label--blue'>{gettext('Update coming')}</span>
                     </div>
                 )}
-                <div className='coverage-item__row'>{this.getStatusContent(coverage)}</div>
 
-                {scheduledStatus && <div className='coverage-item__row'>
-                    <span>{scheduledStatus}</span>
-                </div>}
+                <div className='coverage-item__row'>
+                    <span key="topRow">
+                        <span key="label" className='coverage-item__text-label me-1'>{gettext('status')}:</span>
+                        <span key="value">{getCoverageStatusText(coverage)}</span>
+                    </span>
+                </div>
 
-                {edNote && <div className='coverage-item__row'>
-                    <AgendaEdNote item={{ednote: edNote}} noMargin/>
-                </div>}
+                {scheduledStatus && (
+                    <div className='coverage-item__row'>
+                        <span>{scheduledStatus}</span>
+                    </div>
+                )}
 
-                {reason && <div className='coverage-item__row'>
-                    <AgendaEdNote item={{ednote: reason}} noMargin/>
-                </div>}
+                {edNote && (
+                    <div className='coverage-item__row'>
+                        <AgendaEdNote item={{ednote: edNote}} noMargin />
+                    </div>
+                )}
 
-                {internalNote && <div className='coverage-item__row'>
-                    <AgendaInternalNote internalNote={internalNote} noMargin />
-                </div>}
+                {reason && (
+                    <div className='coverage-item__row'>
+                        <AgendaEdNote item={{ednote: reason}} noMargin />
+                    </div>
+                )}
+
+                {internalNote && (
+                    <div className='coverage-item__row'>
+                        <AgendaInternalNote internalNote={internalNote} noMargin />
+                    </div>
+                )}
+
+                <div className='coverage-item__row d-flex justify-content-end gap-2'>
+                    {this.getCoverageActions(coverage)}
+                </div>
             </Fragment>
         );
     }
