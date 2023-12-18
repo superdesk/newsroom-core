@@ -2668,12 +2668,12 @@ article.list {
     flex-direction: column;
     font-size: var(--text-size--medium);
     margin-block-end: 12px;
-    padding: var(--space--1);
+    padding: var(--space--1) var(--space--1) var(--space--1) var(--space--1-5);
     border-radius: var(--content-list-item-border-radius);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.1);
 
     @include xl {
-        padding: var(--space--1-5);
+        padding: var(--space--1-5) var(--space--1) var(--space--1) var(--space--2);
     }
 
     &.coverage-item--clickable {
@@ -2703,7 +2703,7 @@ article.list {
     }
     &.coverage-item__row--header-row {
         overflow: visible;
-        padding-block-end: var(--space--1);
+        padding-block-end: var(--space--1-5);
         gap: var(--space--2);
     }
 }
