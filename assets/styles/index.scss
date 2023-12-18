@@ -2201,7 +2201,6 @@ article.list {
 
         @include xl {
             padding: 0 0 20px 0px;
-            font-size: 1rem;
             line-height: 1.5rem;
         }
 
@@ -2664,19 +2663,20 @@ article.list {
 }
 
 .coverage-item {
-    background-color: #FCFCFC;
+    background-color: var(--content-list-item-color-bg);
     display: flex;
     flex-direction: column;
-    font-size: 0.8125rem;
+    font-size: var(--text-size--medium);
     margin-block-end: 12px;
-    padding: 4px 6px;
+    padding: var(--space--1);
+    border-radius: var(--content-list-item-border-radius);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.1);
 
     @include xl {
-        padding: 6px 12px;
+        padding: var(--space--1-5);
     }
 
-    &--clickable {
+    &.coverage-item--clickable {
         &:hover {
             cursor: pointer;
         }
@@ -2688,10 +2688,6 @@ article.list {
     justify-content: flex-start;
     align-items: center;
     overflow: hidden;
-
-    & + .coverage-item__row {
-        margin-block-start: 4px;
-    }
     a:hover {
         text-decoration: none;
     }
@@ -2699,15 +2695,16 @@ article.list {
         font-size: 0.75rem;
         margin: 4px 0;
     }
-    i {
-        font-size: 16px;
-    }
-
     &--gray {
         color: #747474 !important;
     }
     .icon-coverage-status {
         margin: 2px 2px 0;
+    }
+    &.coverage-item__row--header-row {
+        overflow: visible;
+        padding-block-end: var(--space--1);
+        gap: var(--space--2);
     }
 }
 .coverage-item__column {
@@ -2719,7 +2716,7 @@ article.list {
     }
 }
 .coverage-item__text-label {
-    color: var(--color-text);
+    color: var(--color-text--muted-2);
 }
 .coverage-item--element-grow {
     flex-grow: 1;
@@ -2732,9 +2729,8 @@ article.list {
 }
 .coverage-item__coverage-icon {
     display: flex;
-    flex-grow: 1;
     position: relative;
-    padding-inline-start: 16px;
+    //padding-inline-start: 16px;
 
     &[class*=" coverage--"] {
         &::before {
@@ -2746,8 +2742,9 @@ article.list {
             height: 12px;
             width: 12px;
             position: absolute;
-            inset-block-start:2px;
-            inset-inline-start: 0px;
+            inset-block-end: -4px;
+            inset-inline-end: -4px; 
+            box-shadow: 0 0 0 2px var(--content-list-item-color-bg);
             background-repeat: no-repeat;
             background-size: 100%;
         }
@@ -2812,7 +2809,6 @@ article.list {
     margin-inline-end: var(--space--0-5);
     text-decoration: none;
     transition: background-color var(--transition-base);
-    //word-break: break-all;
     &:hover {
         color: var(--color-text);
         background-color: var(--tag-label-bg-darker);
@@ -4322,4 +4318,10 @@ article.list {
         background-color: transparent;
         box-shadow: none;
     }
+}
+
+.text-label {
+    font-weight: 300;
+    color: var(--color-text--muted);
+    font-size: inherit;
 }
