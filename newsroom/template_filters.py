@@ -71,22 +71,34 @@ def parse_date(datetime):
 
 
 def get_schedule_type(start: datetime, end: datetime, all_day: bool, no_end_time: bool) -> ScheduleType:
-    duration = int((end - start).total_seconds() / 60)  # Convert seconds to minutes
+    """
+    Determine the schedule type based on event start and end times.
+
+    params :
+    - start (datetime): Start time of the event.
+    - end (datetime): End time of the event.
+    - all_day (bool): True if the event is an all-day event.
+    - no_end_time (bool): True if the event has no specified end time.
+
+    return:
+    ScheduleType: The type of schedule (ALL_DAY, NO_DURATION, MULTI_DAY, REGULAR).
+    """
+    duration = int((end - start).seconds / 60) if not no_end_time else 0
     DAY_IN_MINUTES = 24 * 60 - 1
 
     if all_day:
-        return ScheduleType.ALL_DAY if duration == 0 else ScheduleType.MULTI_DAY
+        return ScheduleType.ALL_DAY if duration in (0, DAY_IN_MINUTES) else ScheduleType.MULTI_DAY
 
     if no_end_time:
         return ScheduleType.NO_DURATION
 
-    if duration > DAY_IN_MINUTES or start.date() != end.date():
+    if duration > DAY_IN_MINUTES or start.date() != (end.date() if end else None):
         return ScheduleType.MULTI_DAY
 
-    if duration == DAY_IN_MINUTES and start.date() == end.date():
+    if duration == DAY_IN_MINUTES and start.date() == (end.date() if end else None):
         return ScheduleType.ALL_DAY
 
-    if duration == 0 and start.time() == end.time():
+    if duration == 0 and start.time() == (end.time() if end else None):
         return ScheduleType.NO_DURATION
 
     return ScheduleType.REGULAR
@@ -94,17 +106,15 @@ def get_schedule_type(start: datetime, end: datetime, all_day: bool, no_end_time
 
 def is_item_tbc(item: dict) -> bool:
     event_tbc = item.get("event", {}).get("_time_to_be_confirmed", False)
-    if not event_tbc:
-        planning = item.get("planning_items", [])
-        return planning[0].get("_time_to_be_confirmed", False) if planning else False
-    return event_tbc
+    planning = item.get("planning_items", [])
+    return event_tbc or (planning and planning[0].get("_time_to_be_confirmed", False))
 
 
-def format_event_datetime(item: dict) -> Optional[str]:
+def format_event_datetime(item: dict) -> str:
     date_info = item.get("dates", {})
 
     if not date_info:
-        return None
+        return ""
 
     tz = date_info.get("tz", get_session_timezone())
     try:
@@ -112,7 +122,11 @@ def format_event_datetime(item: dict) -> Optional[str]:
         set_session_timezone(tz)
 
         start = parse_date(format_datetime(parse_date(date_info.get("start")), "yyyy-MM-dd HH:mm:ss"))
-        end = parse_date(format_datetime(parse_date(date_info.get("end")), "yyyy-MM-dd HH:mm:ss"))
+        end = (
+            parse_date(format_datetime(parse_date(date_info.get("end")), "yyyy-MM-dd HH:mm:ss"))
+            if date_info.get("end")
+            else None
+        )
         all_day = date_info.get("all_day")
         no_end_time = date_info.get("no_end_time")
         is_tbc_item = is_item_tbc(item)
@@ -120,28 +134,33 @@ def format_event_datetime(item: dict) -> Optional[str]:
         schedule_type = get_schedule_type(start, end, all_day, no_end_time)
 
         formatted_start = datetime_long(start)
-        formatted_end = datetime_long(end)
+        formatted_end = datetime_long(end) if end else None
 
         if is_tbc_item:
-            if start.date() != end.date():
+            if start.date() != (end.date() if end else None):
                 return lazy_gettext(
                     f"Event Starts: {formatted_start} - Event Ends: {formatted_end} ({tz}) (Time to be confirmed)"
                 )
             else:
                 return lazy_gettext(f"Event Starts: {formatted_start} ({tz}) (Time to be confirmed)")
 
-        if start.date() != end.date():
-            if all_day or no_end_time or schedule_type in (ScheduleType.REGULAR, ScheduleType.MULTI_DAY):
+        if start.date() != (end.date() if end else None):
+            if all_day or no_end_time and schedule_type in (ScheduleType.REGULAR, ScheduleType.MULTI_DAY):
                 return lazy_gettext(f"Event Starts: {formatted_start} - Event Ends: {formatted_end} ({tz})")
 
-        if start.date() == end.date():
-            if no_end_time or all_day or schedule_type in (ScheduleType.ALL_DAY, ScheduleType.NO_DURATION):
+        if start.date() == (end.date() if end else None):
+            if no_end_time or all_day and schedule_type in (ScheduleType.ALL_DAY, ScheduleType.NO_DURATION):
                 return lazy_gettext(f"Event Starts: {formatted_start} ({tz})")
 
-        if no_end_time:
-            return lazy_gettext(f"Event Starts: {formatted_start} - Event Ends: {formatted_end} ({tz})")
+        if no_end_time and start.date():
+            return lazy_gettext(f"Event Starts: {formatted_start} ({tz})")
 
-        return None
+        if schedule_type == ScheduleType.REGULAR:
+            return lazy_gettext(
+                f"Event Starts : {formatted_start.split()[1]} to {formatted_end.split()[1]} - On Date: {formatted_start.split()[0]} ({tz})"
+            )
+        else:
+            return lazy_gettext(f"Event Starts: {formatted_start} - Event Ends: {formatted_end} ({tz})")
 
     finally:
         # clear session timezone
