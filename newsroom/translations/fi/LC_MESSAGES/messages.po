@@ -1360,7 +1360,7 @@ msgstr "Seuranta"
 
 #: newsroom/web/default_settings.py:609
 msgid "Saved / Watched"
-msgstr "Tallennettu/seurannassa"
+msgstr "Tallennetut"
 
 #: newsroom/web/default_settings.py:646
 msgid "Newshub"
@@ -3533,12 +3533,12 @@ msgstr "Päivitetty {{ date }} {{ time }}"
 #: assets/search/components/Topic.tsx:96
 #: assets/search/components/TopicForm.tsx:218
 msgid "Real-Time"
-msgstr "Reaaliaikainen"
+msgstr "Heti haun päivittyessä"
 
 #: assets/search/components/Topic.tsx:96
 #: assets/search/components/TopicForm.tsx:228
 msgid "Scheduled"
-msgstr "Aikataulutettu"
+msgstr "Aikataulutetusti"
 
 #: assets/search/components/TopicEditor.tsx:141
 msgid "Company Topic"
@@ -3618,8 +3618,8 @@ msgid ""
 "Your saved topic results will be emailed in a digest format at the time(s) "
 "per day set below."
 msgstr ""
-"Tallentamasi haun tulokset lähetetään sinulle tiivistetyssä muodossa "
-"päivittäin alla määriteltyinä aikoina."
+"Tallentamasi haun tulokset lähetetään sinulle tiivistelmänä päivittäin alla "
+"määriteltyinä aikoina."
 
 #: assets/search/components/TopicForm.tsx:246
 #: assets/user-profile/components/profile/UserProfile.tsx:164
@@ -3895,9 +3895,9 @@ msgid ""
 "regular intervals. This setting will apply to all subscribed scheduled email"
 " notifications (e.g. {{ wire }} Topics, {{ agenda }} Topics)."
 msgstr ""
-"Saat säännöllisesti päivittäin tiivistelmän sähköpostitse. Tämä asetus "
-"vaikuttaa kaikkiin tilattuihin sähköpostiraportteihin (esimerkiksi {{ wire "
-"}}n hakuihin ja {{ agenda }}n hakuihin)."
+"Saat ennalta määriteltyinä ajankohtina tiivistelmän sähköpostitse. Tämä "
+"asetus vaikuttaa kaikkiin tilattuihin sähköpostiraportteihin (esimerkiksi {{"
+" wire }}-osion hakuihin ja {{ agenda }}n hakuihin)."
 
 #: assets/user-profile/components/profile/UserProfile.tsx:196
 msgid "Save Changes"
