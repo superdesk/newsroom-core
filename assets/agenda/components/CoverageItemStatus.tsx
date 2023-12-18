@@ -13,6 +13,8 @@ import AgendaInternalNote from './AgendaInternalNote';
 import AgendaEdNote from './AgendaEdNote';
 import ActionButton from 'components/ActionButton';
 
+import {Tooltip} from 'bootstrap';
+
 function getDeliveryHref(coverage: any) {
     return get(coverage, 'delivery_href');
 }
@@ -24,11 +26,14 @@ function getDeliveryId(coverage: any) {
 export default class CoverageItemStatus extends React.Component<any, any> {
     static propTypes: any;
     static defaultProps: any;
+    tooltip: any;
+    elem: any;
     constructor(props: any) {
         super(props);
         this.state = {wireItem: null};
         this.filterActions = this.filterActions.bind(this);
         this.onAnchorClick = this.onAnchorClick.bind(this);
+        this.tooltip = null;
     }
 
     onAnchorClick(e: any) {
@@ -37,6 +42,16 @@ export default class CoverageItemStatus extends React.Component<any, any> {
 
     componentDidMount() {
         this.setWireItem(this.props);
+
+        if (this.elem != null) {
+            this.tooltip = new Tooltip(this.elem, {trigger: 'hover'});
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.elem && this.tooltip) {
+            this.tooltip.dispose();
+        }
     }
 
     componentWillReceiveProps(nextProps: any) {
@@ -64,11 +79,11 @@ export default class CoverageItemStatus extends React.Component<any, any> {
         const actionsToShow = this.filterActions();
         const parentWatched = isWatched(this.props.item, this.props.user);
         const actions = actionsToShow.map((action: any) =>
-            <span className="coverage-item--element-grow" key="action-button">
+            <span className="coverage-item--element-grow d-flex justify-content-end" key="action-button">
                 <ActionButton
                     key={action.name}
                     item={coverage}
-                    className='icon-button'
+                    className='icon-button icon-button--small icon-button--bordered'
                     action={action}
                     plan={this.props.item}
                     isVisited={parentWatched}
@@ -87,15 +102,17 @@ export default class CoverageItemStatus extends React.Component<any, any> {
         if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED &&
             ['video', 'video_explainer', 'picture', 'graphic'].includes(coverage.coverage_type) && getDeliveryHref(coverage)) {
             content.push(
-                <span key="contentLink" className="label label--available">
-                    <a  href={coverage.delivery_href}
-                        className="wire-column__preview__coverage__available-story"
-                        target="_blank"
-                        onClick={this.onAnchorClick}
-                        title={gettext('Open in new tab')}>
-                        {gettext('View Content')}
-                    </a>
-                </span>
+                <a
+                    key="contentLink"
+                    className="nh-button nh-button--small nh-button--tertiary ms-2"
+                    ref={(elem) => this.elem = elem}
+                    title={gettext('Open in new tab')}
+                    href={coverage.delivery_href}
+                    target="_blank"
+                    onClick={this.onAnchorClick}
+                >
+                    {gettext('View Content')}
+                </a>
             );
         }
 
@@ -103,20 +120,25 @@ export default class CoverageItemStatus extends React.Component<any, any> {
             !(this.props.hideViewContentItems || []).includes(this.state.wireItem._id)) {
             content.push(
                 this.state.wireItem._access
-                    ? <span key="contentLink" className="label label--available">
-                        <a className="wire-column__preview__coverage__available-story"
-                            key="value"
-                            href={'/wire?item='+ get(coverage, 'delivery_id')}
-                            target={this.props.contentLinkTarget}
-                            onClick={this.onAnchorClick}
-                            title={gettext('Open in new tab')}>
-                            {gettext('View Content')}
-                        </a></span>
-                    : <span key="contentLink" className="label label--restricted">
-                        <a className="wire-column__preview__coverage__restricted-story"
-                            key="value" href="#"
-                            onClick={this.onAnchorClick}
-                            target="_blank">{gettext('View Content')}</a></span>
+                    ? <a
+                        key="contentLink"
+                        className='nh-button nh-button--small nh-button--tertiary ms-2'
+                        ref={(elem) => this.elem = elem}
+                        title={gettext('Open in new tab')}
+                        href={'/wire?item='+ get(coverage, 'delivery_id')}
+                        target={this.props.contentLinkTarget}
+                        onClick={this.onAnchorClick}
+                    >
+                        {gettext('View Content')}
+                    </a>
+                    : <a
+                        key="contentLink"
+                        className='nh-button nh-button--small nh-button--tertiary ms-2 nh-button--disabled'
+                        ref={(elem) => this.elem = elem}
+                        title={gettext('“You don’t have access to this content, please contact test@localhost”')}
+                    >
+                        {gettext('View Content')}
+                    </a>
             );
         }
 
