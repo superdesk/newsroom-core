@@ -83,7 +83,7 @@ def get_schedule_type(start: datetime, end: datetime, all_day: bool, no_end_time
     return:
     ScheduleType: The type of schedule (ALL_DAY, NO_DURATION, MULTI_DAY, REGULAR).
     """
-    duration = int((end - start).seconds / 60) if not no_end_time else 0
+    duration = int((end - start).total_seconds() / 60) if not no_end_time and end else 0
     DAY_IN_MINUTES = 24 * 60 - 1
 
     if all_day:
@@ -92,10 +92,10 @@ def get_schedule_type(start: datetime, end: datetime, all_day: bool, no_end_time
     if no_end_time:
         return ScheduleType.NO_DURATION
 
-    if duration > DAY_IN_MINUTES or start.date() != (end.date() if end else None):
+    if duration >= DAY_IN_MINUTES and start.date() != (end.date() if end else None):
         return ScheduleType.MULTI_DAY
 
-    if duration == DAY_IN_MINUTES and start.date() == (end.date() if end else None):
+    if duration <= DAY_IN_MINUTES and start.date() == (end.date() if end else None):
         return ScheduleType.ALL_DAY
 
     if duration == 0 and start.time() == (end.time() if end else None):
@@ -121,12 +121,8 @@ def format_event_datetime(item: dict) -> str:
         # Set the session timezone
         set_session_timezone(tz)
 
-        start = parse_date(format_datetime(parse_date(date_info.get("start")), "yyyy-MM-dd HH:mm:ss"))
-        end = (
-            parse_date(format_datetime(parse_date(date_info.get("end")), "yyyy-MM-dd HH:mm:ss"))
-            if date_info.get("end")
-            else None
-        )
+        start = parse_date(date_info.get("start"))
+        end = parse_date(date_info.get("end")) if date_info.get("end") else None
         all_day = date_info.get("all_day")
         no_end_time = date_info.get("no_end_time")
         is_tbc_item = is_item_tbc(item)
@@ -137,7 +133,7 @@ def format_event_datetime(item: dict) -> str:
         formatted_end = datetime_long(end) if end else None
 
         if is_tbc_item:
-            if start.date() != (end.date() if end else None):
+            if end and start.date() != end.date():
                 return lazy_gettext("Event Starts: {start} - Event Ends: {end} ({tz}) (Time to be confirmed)").format(
                     start=formatted_start, end=formatted_end, tz=tz
                 )
@@ -147,15 +143,20 @@ def format_event_datetime(item: dict) -> str:
                     start=formatted_start, tz=tz
                 )
 
-        if start.date() != (end.date() if end else None):
-            if all_day or no_end_time and schedule_type in (ScheduleType.REGULAR, ScheduleType.MULTI_DAY):
-                return lazy_gettext("Event Starts: {start} - Event Ends: {formatted_end} ({tz})").format(
+        if end and start.date() != end.date() and schedule_type in (ScheduleType.REGULAR, ScheduleType.MULTI_DAY):
+            if all_day or no_end_time:
+                return lazy_gettext("Event Starts: {start} - Event Ends: {end} ({tz})").format(
                     start=formatted_start, end=formatted_end, tz=tz
                 )
 
-        if start.date() == (end.date() if end else None):
-            if no_end_time or all_day and schedule_type in (ScheduleType.ALL_DAY, ScheduleType.NO_DURATION):
-                return lazy_gettext("Event Starts: {start} ({tz})").format(start=formatted_start, tz=tz)
+        if (
+            end
+            and start.date() == end.date()
+            or schedule_type in (ScheduleType.ALL_DAY, ScheduleType.NO_DURATION)
+            or no_end_time
+            or all_day
+        ):
+            return lazy_gettext("Event Starts: {start} ({tz})").format(start=formatted_start, tz=tz)
 
         if no_end_time and start.date():
             return lazy_gettext("Event Starts: {start} ({tz})").format(start=formatted_start, tz=tz)

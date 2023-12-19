@@ -63,7 +63,7 @@ def test_format_event_datetime():
             "no_end_time": False,
         },
     }
-    assert "Event Starts: 01/11/2023 05:30 - Event Ends: 02/11/2023 07:45 (Asia/Calcutta)" == format_event_datetime(
+    assert "Event Starts: 01/11/2023 00:00 - Event Ends: 02/11/2023 02:15 (Asia/Calcutta)" == format_event_datetime(
         event1
     )
 
@@ -77,14 +77,14 @@ def test_format_event_datetime():
             "no_end_time": False,
         },
     }
-    assert "Event Starts: 18/12/2023 05:30 (Asia/Calcutta)" == format_event_datetime(event2)
+    assert "Event Starts: 18/12/2023 00:00 (Asia/Calcutta)" == format_event_datetime(event2)
 
     # Case 3: Time-to-be-confirmed event
     event3 = {
         "dates": {
             "tz": "Asia/Calcutta",
             "start": "2023-10-31T18:30:00+0000",
-            "end": "2023-11-01T18:29:59+0000",
+            "end": "2023-11-01T20:45:00+0000",
             "all_day": False,
             "no_end_time": False,
         },
@@ -92,7 +92,10 @@ def test_format_event_datetime():
             "_time_to_be_confirmed": True,
         },
     }
-    assert "Event Starts: 01/11/2023 05:30 (Asia/Calcutta) (Time to be confirmed)" == format_event_datetime(event3)
+    assert (
+        "Event Starts: 01/11/2023 00:00 - Event Ends: 02/11/2023 02:15 (Asia/Calcutta) (Time to be confirmed)"
+        == format_event_datetime(event3)
+    )
 
     # Case 4: Event with no end time
     event4 = {
@@ -103,9 +106,10 @@ def test_format_event_datetime():
             "no_end_time": True,
         }
     }
-    assert "Event Starts: 01/11/2023 05:30 (Asia/Calcutta)" == format_event_datetime(event4)
+    print(format_event_datetime(event4))
+    assert "Event Starts: 01/11/2023 00:00 (Asia/Calcutta)" == format_event_datetime(event4)
 
-    # Case 5: All-day event with no end time
+    # Case 5: All-day event with no_end_time
     event5 = {
         "dates": {
             "tz": "Asia/Calcutta",
@@ -115,7 +119,7 @@ def test_format_event_datetime():
             "no_end_time": True,
         },
     }
-    assert "Event Starts: 01/11/2023 05:30 (Asia/Calcutta)" == format_event_datetime(event5)
+    assert "Event Starts: 01/11/2023 00:00 (Asia/Calcutta)" == format_event_datetime(event5)
 
     # Case 6: Multi-day event
     event6 = {
@@ -127,7 +131,7 @@ def test_format_event_datetime():
             "no_end_time": False,
         },
     }
-    assert "Event Starts: 01/11/2023 05:30 - Event Ends: 03/11/2023 07:45 (Asia/Calcutta)" == format_event_datetime(
+    assert "Event Starts: 01/11/2023 00:00 - Event Ends: 03/11/2023 02:15 (Asia/Calcutta)" == format_event_datetime(
         event6
     )
 
@@ -135,13 +139,13 @@ def test_format_event_datetime():
     event7 = {
         "dates": {
             "tz": "Asia/Calcutta",
-            "start": "2023-11-01T13:29:59+0000",
-            "end": "2023-11-01T15:30:00+0000",
+            "start": "2023-11-01T19:29:59+0000",
+            "end": "2023-11-02T15:30:00+0000",
             "all_day": False,
             "no_end_time": False,
         }
     }
-    assert "Event Starts: 00:29 to 02:30 - On Date: 02/11/2023 (Asia/Calcutta)" == format_event_datetime(event7)
+    assert "Event Starts: 00:59 to 21:00 - On Date: 02/11/2023 (Asia/Calcutta)" == format_event_datetime(event7)
 
     # Case 8: REGULAR schedule_type with no end time
     event8 = {
@@ -152,4 +156,4 @@ def test_format_event_datetime():
             "no_end_time": True,
         },
     }
-    assert "Event Starts: 02/11/2023 05:30 (Asia/Calcutta)" == format_event_datetime(event8)
+    assert "Event Starts: 02/11/2023 00:00 (Asia/Calcutta)" == format_event_datetime(event8)
