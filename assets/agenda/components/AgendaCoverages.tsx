@@ -62,7 +62,13 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                         <span className={classNames('coverage-item__coverage-icon', WORKFLOW_COLORS[coverage.workflow_status])}>
                             <i className={`icon--coverage-${getCoverageIcon(coverage.coverage_type)}`}></i>
                         </span>
-                        <span className='coverage-item__coverage-heading'>{`${(coverage.genre?.length ?? 0) > 0 ? gettext(coverage.genre[0].name) : getCoverageDisplayName(coverage.coverage_type)}${getSlugline(coverage)}`}</span>
+
+                        <span className='coverage-item__coverage-heading'>
+                            <span className='fw-medium'>
+                                {`${(coverage.genre?.length ?? 0) > 0 ? gettext(coverage.genre[0].name) : getCoverageDisplayName(coverage.coverage_type)}`}
+                            </span>
+                            {`${getSlugline(coverage)}`}
+                        </span>
 
                     </div>
                     {coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED && coverage.scheduled != null && (
