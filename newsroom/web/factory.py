@@ -67,6 +67,8 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.generate_renditions = None
         self.generate_embed_renditions = None
         self.session_timezone = None
+        self.countries = []
+        self.signup_form_class = None
 
         super(NewsroomWebApp, self).__init__(import_name=import_name, config=config, **kwargs)
 

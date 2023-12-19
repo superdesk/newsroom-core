@@ -184,7 +184,8 @@
         color: var(--button-color-fg) !important;
     }
     &.disabled,
-    &:disabled {
+    &:disabled,
+    &.nh-button--disabled {
         opacity: .5;
         cursor: not-allowed;
         &:hover {

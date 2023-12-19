@@ -235,14 +235,19 @@ export function getGeoLocation(item: any) {
  * @return {String}
  */
 export function getLocationString(item: any) {
-    return [
-        get(item, 'location.0.name', get(item, 'location.0.address.title')),
-        get(item, 'location.0.address.line.0'),
-        get(item, 'location.0.address.city') || get(item, 'location.0.address.area'),
-        get(item, 'location.0.address.state') || get(item, 'location.0.address.locality'),
-        get(item, 'location.0.address.postal_code'),
-        get(item, 'location.0.address.country'),
-    ].filter((d: any) => d).join(', ');
+    const location = item.location?.[0];
+    const locationAddress = location?.address;
+
+    const locationArray: Array<string> = [
+        location?.name ?? locationAddress?.title ?? '',
+        locationAddress?.line?.[0] ?? '',
+        locationAddress?.city ?? locationAddress?.area ?? '',
+        locationAddress?.state ?? locationAddress?.locality ?? '',
+        locationAddress?.postal_code ?? '',
+        locationAddress?.country ?? '',
+    ];
+
+    return locationArray.filter((d: string) => d != null && d.trim() != '').map((loc) => loc.trim()).join(', ');
 }
 
 /**
@@ -730,7 +735,7 @@ const isBetweenDay = (day: moment.Moment, start: moment.Moment, end: moment.Mome
  */
 export function groupItems(
     items: Array<IAgendaItem>,
-    minDate: moment.Moment,
+    minDate: moment.Moment | undefined,
     maxDate: moment.Moment | undefined,
     activeGrouping: string,
     featuredOnly?: boolean
@@ -752,9 +757,21 @@ export function groupItems(
         .forEach((item) => {
             const itemExtraDates = getExtraDates(item);
             const itemStartDate = getStartDate(item);
-            const start = item._display_from != null ?
-                moment(item._display_from) :
-                moment.max(minDate, moment.min(itemExtraDates.concat([itemStartDate])));
+            let start: moment.Moment;
+
+            if (item._display_from != null) {
+                start = moment(item._display_from);
+            } else {
+                start = moment.min([
+                    ...itemExtraDates,
+                    itemStartDate,
+                ]);
+
+                if (minDate != null) {
+                    start = moment.max(minDate, start);
+                }
+            }
+
             const itemEndDate = getEndDate(item);
             const scheduleType = getScheduleType(item);
 
@@ -764,17 +781,24 @@ export function groupItems(
                 moment(item.event.actioned_date) :
                 null;
             if (end != null || !moment.isMoment(end)) {
-                end = item._display_to != null ?
-                    moment(item._display_to) :
-                    moment.max(
-                        itemExtraDates
-                            .concat([minDate])
-                            // If event is all day the end timestamp is the same as
-                            // start and depending on the local timezone offset it
-                            // might not give enough room for the event to show up,
-                            // so add an extra day for it.
-                            .concat([itemEndDate.clone().add(1, 'd')])
-                    );
+                if (item._display_to != null) {
+                    end = moment(item._display_to);
+                } else {
+                    const endDates = [
+                        ...itemExtraDates,
+                        // If event is all day the end timestamp is the same as
+                        // start and depending on the local timezone offset it
+                        // might not give enough room for the event to show up,
+                        // so add an extra day for it.
+                        itemEndDate.clone().add(1, 'd'),
+                    ];
+
+                    if (minDate != null) {
+                        endDates.push(minDate);
+                    }
+
+                    end = moment.max(endDates);
+                }
             }
 
             let key = null;
@@ -815,9 +839,10 @@ export function groupItems(
             const hiddenItems: Array<IAgendaItem['_id']> = [];
 
             groupedItems[dateString].forEach((groupItem) => {
+                const scheduleType = getScheduleType(groupItem);
                 const itemStartDateGroup: string = grouper(getStartDate(groupItem));
 
-                if (itemStartDateGroup !== dateString) {
+                if (itemStartDateGroup !== dateString && scheduleType === SCHEDULE_TYPE.MULTI_DAY) {
                     hiddenItems.push(groupItem._id);
                 } else if (isItemTBC(groupItem)) {
                     itemsWithoutTime.push(groupItem._id);

@@ -95,17 +95,23 @@ class FiltersTab extends React.Component<any, any> {
     }
 
     getFilterGroups() {
-        return this.state.groups.map((group: any) => (
-            <FilterGroup
-                key={group.label}
-                group={group}
-                activeFilter={this.state.activeFilter}
-                aggregations={this.props.aggregations}
-                toggleGroup={this.toggleGroup}
-                toggleFilter={this.updateFilter}
-                isLoading={this.props.isLoading}
-            />
-        ));
+        return this.state.groups.map((group: any) => {
+            if (this.props.aggregations == null) {
+                return null;
+            }
+
+            return (
+                <FilterGroup
+                    key={group.label}
+                    group={group}
+                    activeFilter={this.state.activeFilter}
+                    aggregations={this.props.aggregations}
+                    toggleGroup={this.toggleGroup}
+                    toggleFilter={this.updateFilter}
+                    isLoading={this.props.isLoading}
+                />
+            );
+        });
     }
 
     search(event: any) {

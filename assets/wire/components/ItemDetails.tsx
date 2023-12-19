@@ -7,15 +7,14 @@ import {isDisplayed, gettext, formatDate, formatTime} from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import {
-    getFeatureMedia,
     getOtherMedia,
     showItemVersions,
     isKilled,
     DISPLAY_ABSTRACT,
     isPreformatted,
     isCustomRendition,
-    getPictureList,
-    getThumbnailRendition,
+    getFeatureMedia,
+    getMediaGalleryPictureList,
     notNullOrUndefined,
 } from 'wire/utils';
 import types from 'wire/types';
@@ -38,7 +37,20 @@ import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
 import {Carousel} from '@superdesk/common';
+import {IArticle} from 'interfaces';
 
+interface IProps {
+    item: IArticle;
+    user: any;
+    actions: any;
+    topics: any;
+    onClose: any;
+    detailsConfig: any;
+    downloadMedia: any;
+    followStory: any;
+    listConfig: any;
+    filterGroupLabels: any;
+}
 function ItemDetails({
     item,
     user,
@@ -50,14 +62,23 @@ function ItemDetails({
     followStory,
     listConfig,
     filterGroupLabels,
-}: any) {
+}: IProps) {
     const featureMedia = getFeatureMedia(item);
     const media = getOtherMedia(item);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
-    const carouselItems = getPictureList(item)
-        .map((image) => getThumbnailRendition(image))
-        .filter(notNullOrUndefined)
-        .map((image) => ({src: image.href}));
+    const carousels = getMediaGalleryPictureList(item);
+    const imagesArray: Array<Array<{src: string}>> = carousels
+        .map((carousel) => {
+            return carousel.items.map((picture) => {
+                const imageHref = Object.values(item.associations ?? {}).find((association) => association?.guid === picture.guid);
+
+                if (imageHref?.renditions?.viewImage?.href == null) {
+                    return null;
+                } else {
+                    return {src: imageHref.renditions.viewImage.href};
+                }
+            }).filter(notNullOrUndefined);
+        });
 
     return (
         <Content type="item-detail">
@@ -74,19 +95,21 @@ function ItemDetails({
             </ContentHeader>
             <ArticleItemDetails disableTextSelection={detailsConfig.disable_text_selection}>
                 <ArticleContent>
-                    {featureMedia == null ? null : (
+                    {
+                        (imagesArray.length > 0) && imagesArray.map((images) => (
+                            <Carousel
+                                key={images[0].src}
+                                images={images}
+                            />
+                        ))
+                    }
+                    {featureMedia != null && (
                         featureMedia.type === 'picture' ? (
-                            carouselItems.length > 1 ? (
-                                <Carousel
-                                    images={carouselItems}
-                                />
-                            ) : (
-                                <ArticlePicture
-                                    picture={featureMedia}
-                                    isKilled={isKilled(item)}
-                                    isCustomRendition={isCustomRendition(featureMedia)}
-                                />
-                            )
+                            <ArticlePicture
+                                picture={featureMedia}
+                                isKilled={isKilled(item)}
+                                isCustomRendition={isCustomRendition(featureMedia)}
+                            />
                         ) : (
                             <ArticleMedia
                                 media={featureMedia}

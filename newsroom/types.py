@@ -12,6 +12,11 @@ def assert_never(value: NoReturn) -> NoReturn:
 NameString = Union[str, LazyString]
 
 
+class Country(TypedDict):
+    value: str
+    text: str
+
+
 class Entity(TypedDict):
     _id: ObjectId
 
@@ -126,10 +131,47 @@ class CompanyRequired(TypedDict):
 
 
 class Company(CompanyRequired, total=False):
+    # Accounting/Auditing
+    original_creator: ObjectId
+    version_creator: ObjectId
+
+    # Company details
+    url: str
+    contact_name: str
+    contact_email: str
+    phone: str
+    country: str
+    company_type: str
+    account_manager: str
+    monitoring_administrator: ObjectId
+    company_size: str
+    referred_by: str
+
+    # Authentication
+    auth_provider: str
+    auth_domain: str
+    is_enabled: bool
+    is_approved: bool
+    expiry_date: datetime
+
+    # Authorization
     products: List[ProductRef]
     sections: Dict[str, bool]
     restrict_coverage_info: bool
-    auth_provider: str
+    sd_subscriber_id: str
+    archive_access: bool
+    events_only: bool
+    allowed_ip_list: List[str]  # Used by the NewsAPI
+
+
+class CompanyTypeRequired(TypedDict):
+    id: str
+    name: str
+
+
+class CompanyType(CompanyTypeRequired, total=False):
+    wire_must: Dict[str, Any]
+    must_not: Dict[str, Any]
 
 
 class TopicSubscriber(TypedDict):

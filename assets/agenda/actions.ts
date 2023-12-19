@@ -325,30 +325,32 @@ function setListGroupsAndLoadHiddenItems(items: Array<IAgendaItem>, next?: boole
         const state = getState();
         const {activeGrouping, featuredOnly} = state.agenda;
         const {fromDate, toDate} = getAgendaSearchParamsFromState(state);
-        let minDate: moment.Moment;
+        let minDate: moment.Moment | undefined;
         let maxDate: moment.Moment | undefined;
 
-        if (toDate != null && fromDate?.startsWith('now/') != true) {
-            maxDate = moment(toDate);
-        }
-        if (fromDate?.startsWith('now/')) {
-            if (fromDate === 'now/w') {
-                minDate = moment().startOf('week');
-                maxDate = minDate.clone().add(1, 'week').subtract(1, 'day');
-            } else if (fromDate === 'now/M') {
-                minDate = moment().startOf('month');
-                maxDate = minDate.clone().add(1, 'month').subtract(1, 'day');
-            } else {
-                minDate = moment().startOf('day');
-                maxDate = minDate.clone();
+        if (state.bookmarks !== true) {
+            if (toDate != null && fromDate?.startsWith('now/') != true) {
+                maxDate = moment(toDate);
             }
-        } else {
-            minDate = moment(fromDate);
-        }
-        minDate.set({'h': 0, 'm': 0, 's': 0});
+            if (fromDate?.startsWith('now/')) {
+                if (fromDate === 'now/w') {
+                    minDate = moment().startOf('week');
+                    maxDate = minDate.clone().add(1, 'week').subtract(1, 'day');
+                } else if (fromDate === 'now/M') {
+                    minDate = moment().startOf('month');
+                    maxDate = minDate.clone().add(1, 'month').subtract(1, 'day');
+                } else {
+                    minDate = moment().startOf('day');
+                    maxDate = minDate.clone();
+                }
+            } else {
+                minDate = moment(fromDate);
+            }
+            minDate.set({'h': 0, 'm': 0, 's': 0});
 
-        if (maxDate != null) {
-            maxDate.set({'h': 23, 'm': 59, 's': 59});
+            if (maxDate != null) {
+                maxDate.set({'h': 23, 'm': 59, 's': 59});
+            }
         }
 
         const groups = groupItems(items, minDate, maxDate, activeGrouping, featuredOnly);

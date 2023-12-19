@@ -212,7 +212,9 @@ def watch_coverage():
     data = get_json_or_400()
     assert data.get("item_id")
     assert data.get("coverage_id")
-    return update_coverage_watch(data["item_id"], data["coverage_id"], user_id, add=request.method == "POST")
+    response = update_coverage_watch(data["item_id"], data["coverage_id"], user_id, add=request.method == "POST")
+    push_user_notification("saved_items", count=get_resource_service("agenda").get_saved_items_count())
+    return response
 
 
 def update_coverage_watch(item_id, coverage_id, user_id, add, skip_associated=False):

@@ -430,7 +430,7 @@
             position: absolute;
             inset-block-end: -4px;
             inset-inline-end: -4px;
-            box-shadow: 0 0 0 2px hsl(0, 0%, 100%);
+            box-shadow: 0 0 0 2px var(--content-list-item-color-bg);
             background-repeat: no-repeat;
             background-size: 100%;
         }

@@ -228,6 +228,7 @@ def publish_event(event, orig):
                 # This can happen when pushing a Planning item before linking to an Event
                 service.system_update(plan["_id"], {"event_id": _id}, plan)
 
+        signals.publish_event.send(app._get_current_object(), item=agenda, is_new=True)
         _id = service.post([agenda])[0]
     else:
         # replace the original document
@@ -276,6 +277,11 @@ def publish_event(event, orig):
             set_agenda_metadata_from_event(updates, event, False)
 
         if updates:
+            updated = orig.copy()
+            updated.update(updates)
+            signals.publish_event.send(
+                app._get_current_object(), item=updated, updates=updates, orig=orig, is_new=False
+            )
             service.patch(orig["_id"], updates)
             updates["_id"] = orig["_id"]
             superdesk.get_resource_service("agenda").notify_agenda_update(updates, orig)
@@ -322,9 +328,11 @@ def publish_planning_item(planning, orig):
         # Setting ``_id`` of Agenda to be equal to the Planning item if there's no Event ID
         agenda.setdefault("_id", planning["guid"])
         agenda.setdefault("guid", planning["guid"])
+        signals.publish_planning.send(app._get_current_object(), item=agenda, is_new=new_plan)
         return service.post([agenda])[0]
     else:
         # Replace the original
+        signals.publish_planning.send(app._get_current_object(), item=agenda, is_new=new_plan)
         service.patch(agenda["_id"], agenda)
         return agenda["_id"]
 

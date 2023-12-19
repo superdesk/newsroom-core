@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {isEmpty} from 'lodash';
 
 import {isDisplayed} from 'utils';
 import {
