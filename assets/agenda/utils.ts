@@ -627,7 +627,7 @@ export function getHighlightedDescription(item: any, plan: any) {
  * @param {Object} item
  * @return {Array} list of dates
  */
-export function getExtraDates(item: any) {
+export function getExtraDates(item: any): Array<moment.Moment> {
     return getDisplayDates(item).map((ed: any) => moment(ed.date));
 }
 
@@ -636,7 +636,7 @@ export function getExtraDates(item: any) {
  * @param item: Event or Planning item
  * @returns {Array.<{date: moment.Moment}>}
  */
-export function getDisplayDates(item: any) {
+export function getDisplayDates(item: any): Array<{date: string}> {
     const matchedPlanning = get(item, '_hits.matched_planning_items');
 
     if (matchedPlanning == null) {
@@ -658,7 +658,7 @@ export function getDisplayDates(item: any) {
 
             const coverages = (get(plan, 'coverages') || []).filter((coverage: any) => coverage.scheduled);
 
-            if (!coverages.length) {
+            if (!coverages.length && plan.planning_date != null) {
                 dates.push({date: plan.planning_date});
                 return;
             }
@@ -668,7 +668,11 @@ export function getDisplayDates(item: any) {
                     return;
                 }
 
-                dates.push({date: coverage.planning.scheduled});
+                if (coverage.planning?.scheduled != null) {
+                    // when restricted coverage is enabled
+                    // there might be no date
+                    dates.push({date: coverage.planning.scheduled});
+                }
             });
         });
 
@@ -763,7 +767,7 @@ export function groupItems(items: any, activeDate: any, activeGrouping: any, fea
             for (const day = start.clone(); day.isSameOrBefore(end, 'day'); day.add(1, 'd')) {
                 const isBetween = isBetweenDay(day, itemStartDate, itemEndDate, item.dates.all_day, item.dates.no_end_time);
                 const containsExtra = containsExtraDate(item, day);
-                const addGroupItem = (item.event == null || get(item, '_hits.matched_planning_items') != null) ?
+                const addGroupItem = (item.event == null || get(item, '_hits.matched_planning_items') != null) && itemExtraDates.length ?
                     containsExtra :
                     isBetween || containsExtra;
 
