@@ -143,15 +143,14 @@ def format_event_datetime(item: dict) -> str:
                     start=formatted_start, tz=tz
                 )
 
-        if end and start.date() != end.date() and schedule_type in (ScheduleType.REGULAR, ScheduleType.MULTI_DAY):
+        if (end and start.date() != end.date()) and schedule_type in (ScheduleType.REGULAR, ScheduleType.MULTI_DAY):
             if all_day or no_end_time:
                 return lazy_gettext("Event Starts: {start} - Event Ends: {end} ({tz})").format(
                     start=formatted_start, end=formatted_end, tz=tz
                 )
 
         if (
-            end
-            and start.date() == end.date()
+            (end and start.date() == end.date())
             or schedule_type in (ScheduleType.ALL_DAY, ScheduleType.NO_DURATION)
             or no_end_time
             or all_day
@@ -163,9 +162,9 @@ def format_event_datetime(item: dict) -> str:
 
         if schedule_type == ScheduleType.REGULAR:
             return lazy_gettext("Event Starts: {start_time} to {end_time} - On Date: {date} ({tz})").format(
-                start_time=formatted_start.split()[1],
-                end_time=formatted_end.split()[1],
-                date=formatted_end.split()[0],
+                start_time=notification_time(start),
+                end_time=notification_time(end),
+                date=notification_date(start),
                 tz=tz,
             )
         else:

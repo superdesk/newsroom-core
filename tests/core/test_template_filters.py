@@ -106,7 +106,6 @@ def test_format_event_datetime():
             "no_end_time": True,
         }
     }
-    print(format_event_datetime(event4))
     assert "Event Starts: 01/11/2023 00:00 (Asia/Calcutta)" == format_event_datetime(event4)
 
     # Case 5: All-day event with no_end_time
@@ -145,7 +144,9 @@ def test_format_event_datetime():
             "no_end_time": False,
         }
     }
-    assert "Event Starts: 00:59 to 21:00 - On Date: 02/11/2023 (Asia/Calcutta)" == format_event_datetime(event7)
+    assert "Event Starts: 00:59 AM to 21:00 PM - On Date: November 2, 2023 (Asia/Calcutta)" == format_event_datetime(
+        event7
+    )
 
     # Case 8: REGULAR schedule_type with no end time
     event8 = {
