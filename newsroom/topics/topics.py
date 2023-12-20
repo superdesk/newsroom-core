@@ -81,17 +81,12 @@ class TopicsService(newsroom.Service):
 
         # If ``is_global`` has been turned off, then remove all subscribers
         # except for the owner of the Topic
-        if (
-            original.get("is_global")
-            and "is_global" in updates
-            and not updates.get("is_global")
-            and not updates.get("subscribers")
-        ):
+        if original.get("is_global") and "is_global" in updates and not updates.get("is_global"):
             # First find the subscriber entry for the original user
             subscriber = next(
                 (
                     subscriber
-                    for subscriber in original.get("subscribers", [])
+                    for subscriber in updates.get("subscribers", [])
                     if subscriber["user_id"] == original["user"]
                 ),
                 None,
