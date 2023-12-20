@@ -133,7 +133,7 @@ def format_event_datetime(item: dict) -> str:
         formatted_end = datetime_long(end) if end else None
 
         if is_tbc_item:
-            if end and start.date() != end.date():
+            if schedule_type == ScheduleType.MULTI_DAY:
                 return lazy_gettext("Event Starts: {start} - Event Ends: {end} ({tz}) (Time to be confirmed)").format(
                     start=formatted_start, end=formatted_end, tz=tz
                 )
@@ -143,24 +143,14 @@ def format_event_datetime(item: dict) -> str:
                     start=formatted_start, tz=tz
                 )
 
-        if (end and start.date() != end.date()) and schedule_type in (ScheduleType.REGULAR, ScheduleType.MULTI_DAY):
-            if all_day or no_end_time:
-                return lazy_gettext("Event Starts: {start} - Event Ends: {end} ({tz})").format(
-                    start=formatted_start, end=formatted_end, tz=tz
-                )
-
-        if (
-            (end and start.date() == end.date())
-            or schedule_type in (ScheduleType.ALL_DAY, ScheduleType.NO_DURATION)
-            or no_end_time
-            or all_day
-        ):
+        elif schedule_type in (ScheduleType.ALL_DAY, ScheduleType.NO_DURATION):
             return lazy_gettext("Event Starts: {start} ({tz})").format(start=formatted_start, tz=tz)
 
-        if no_end_time and start.date():
-            return lazy_gettext("Event Starts: {start} ({tz})").format(start=formatted_start, tz=tz)
-
-        if schedule_type == ScheduleType.REGULAR:
+        elif schedule_type == ScheduleType.MULTI_DAY:
+            return lazy_gettext("Event Starts: {start} - Event Ends: {end} ({tz})").format(
+                start=formatted_start, end=formatted_end, tz=tz
+            )
+        elif schedule_type == ScheduleType.REGULAR:
             return lazy_gettext("Event Starts: {start_time} to {end_time} - On Date: {date} ({tz})").format(
                 start_time=notification_time(start),
                 end_time=notification_time(end),
@@ -168,8 +158,13 @@ def format_event_datetime(item: dict) -> str:
                 tz=tz,
             )
         else:
-            return lazy_gettext("Event Starts: {start} - Event Ends: {end} ({tz})").format(
-                start=formatted_start, end=formatted_end, tz=tz
+            # Default
+            lazy_gettext("Event Starts: {start_time} {start_date} to Event Ends: {end_time} {end_date} ({tz})").format(
+                start_time=notification_time(start),
+                start_date=notification_date(start),
+                end_time=notification_time(end),
+                end_date=notification_date(end),
+                tz=tz,
             )
 
     finally:
