@@ -1418,3 +1418,27 @@ def test_push_events_signal(client, app):
 
     parsed = get_entity_or_404(event["guid"], "agenda")
     assert parsed and parsed["dates"]["all_day"]
+
+
+def test_push_planning_coverages_assignemnt_info(client, app):
+    planning = deepcopy(test_planning)
+
+    planning["coverages"][0]["assigned_desk"] = {
+        "name": "Sports",
+        "email": "sports@example.com",
+    }
+
+    planning["coverages"][0]["assigned_user"] = {
+        "display_name": "John Doe",
+        "email": "john@example.com",
+    }
+
+    client.post("/push", data=json.dumps(planning), content_type="application/json")
+
+    parsed = get_entity_or_404(planning["guid"], "agenda")
+    assert parsed
+    coverage = parsed["coverages"][0]
+    assert "Sports" == coverage["assigned_desk_name"]
+    assert "sports@example.com" == coverage["assigned_desk_email"]
+    assert "John Doe" == coverage["assigned_user_name"]
+    assert "john@example.com" == coverage["assigned_user_email"]

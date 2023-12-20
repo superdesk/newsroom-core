@@ -209,6 +209,10 @@ class AgendaResource(newsroom.Resource):
                     },
                 },
                 "watches": not_analyzed,
+                "assigned_desk_name": not_analyzed,
+                "assigned_desk_email": not_indexed,
+                "assigned_user_name": not_analyzed,
+                "assigned_user_email": not_indexed,
             },
         },
     }
