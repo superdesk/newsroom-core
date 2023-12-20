@@ -86,7 +86,7 @@ class TopicsService(newsroom.Service):
             subscriber = next(
                 (
                     subscriber
-                    for subscriber in updates.get("subscribers", original.get("subscribers", []))
+                    for subscriber in (updates.get("subscribers") or original.get("subscribers") or [])
                     if subscriber["user_id"] == original["user"]
                 ),
                 None,
