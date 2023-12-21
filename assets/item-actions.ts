@@ -56,7 +56,7 @@ export function getItemActions(dispatch: any, actions: any): Array<IItemAction> 
         },
         {
             id: 'save',
-            name: gettext('Save'),
+            name: gettext('Bookmark'),
             icon: 'bookmark-add',
             multi: true,
             shortcut: true,
@@ -65,7 +65,7 @@ export function getItemActions(dispatch: any, actions: any): Array<IItemAction> 
         },
         {
             id: 'unsave',
-            name: gettext('Unsave'),
+            name: gettext('Unbookmark'),
             icon: 'bookmark-remove',
             multi: true,
             shortcut: true,
