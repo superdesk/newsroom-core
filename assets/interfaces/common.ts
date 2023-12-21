@@ -33,7 +33,7 @@ interface IBaseAction {
     id: string;
     name: string;
     shortcut?: boolean;
-    icon?: string;
+    icon: string;
     tooltip?: string;
     visited?(user: IUser['_id'], item: IArticle | IAgendaItem): void;
     when?(props: any, item: IArticle | IAgendaItem): boolean;

@@ -27,6 +27,7 @@ import ProfileToggle from './ProfileToggle';
 import {EditNotificationScheduleModal} from './EditNotificationScheduleModal';
 
 import '../style';
+import {IconButton} from 'components/IconButton';
 
 const modals: any = {
     shareItem: ShareItemModal,
@@ -114,9 +115,11 @@ class UserProfileApp extends React.Component<any, any> {
             >
                 <div className="profileWrap">
                     <div className="profile__mobile-close d-md-none">
-                        <button className="icon-button" aria-label={gettext('Close')} onClick={this.hideModal}>
-                            <i className="icon--close-thin" />
-                        </button>
+                        <IconButton
+                            icon='close-thin'
+                            ariaLabel={gettext('Close')}
+                            onClick={this.hideModal}
+                        />
                     </div>
                     <nav className='profile__side-navigation' id='profile-menu'>
                         <UserProfileAvatar

@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import TextInput from 'components/TextInput';
 import {gettext} from 'utils';
 import {Button} from 'components/Buttons';
+import CloseButton from 'components/CloseButton';
 
 class EditClient extends React.Component<any, any> {
     static propTypes: any;
@@ -20,15 +21,7 @@ class EditClient extends React.Component<any, any> {
                 aria-label={gettext('Edit Client')}>
                 <div className='list-item__preview-header'>
                     <h3>{ gettext('Add/Edit Client') }</h3>
-                    <button
-                        id='hide-sidebar'
-                        type='button'
-                        className='icon-button'
-                        data-bs-dismiss='modal'
-                        aria-label={gettext('Close')}
-                        onClick={this.props.onClose}>
-                        <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
-                    </button>
+                    <CloseButton onClick={this.props.onClose} />
                 </div>
 
                 <div className='tab-content'>

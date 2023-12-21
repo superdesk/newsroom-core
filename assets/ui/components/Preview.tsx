@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {gettext, formatDate, formatTime} from 'utils';
+import {IconButton} from 'components/IconButton';
 
 export default function Preview(props: any) {
     return (
@@ -13,9 +14,11 @@ export default function Preview(props: any) {
                     time: formatTime(props.published),
                 })}</div>
                 {props.innerElements}
-                <button className="icon-button" aria-label={gettext('Close')} onClick={props.onCloseClick}>
-                    <i className="icon--close-thin icon--gray"></i>
-                </button>
+                <IconButton
+                    icon='close-thin'
+                    aria-label={gettext('Close')}
+                    onClick={props.onCloseClick}
+                />
             </div>
             {props.children}
         </div>

@@ -7,6 +7,7 @@ import {gettext} from 'utils';
 
 import {searchQuerySelector} from 'search/selectors';
 import {Button} from 'components/Buttons';
+import {IconButton} from 'components/IconButton';
 
 class SearchBar extends React.Component<any, any> {
     static propTypes: any;
@@ -95,14 +96,14 @@ class SearchBar extends React.Component<any, any> {
                         />
                     )}
                     {this.props.toggleSearchTipsPanel == null ? null : (
-                        <button
+                        <IconButton
                             data-test-id="show-search-tips-panel-btn"
-                            className="icon-button icon-button--tertiary icon-button--bordered"
-                            aria-label={gettext('Show Search Tips')}
+                            icon='info'
+                            variant='tertiary'
+                            border
+                            ariaLabel={gettext('Show Search Tips')}
                             onClick={this.props.toggleSearchTipsPanel}
-                        >
-                            <i className="icon--info" />
-                        </button>
+                        />
                     )}
                 </div>
             </React.Fragment>

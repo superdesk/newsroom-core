@@ -29,6 +29,7 @@ import EditPanel from 'components/EditPanel';
 import AuditInformation from 'components/AuditInformation';
 import {ToolTip} from 'ui/components/ToolTip';
 import {Button} from 'components/Buttons';
+import CloseButton from 'components/CloseButton';
 
 interface IProps {
     topic: ITopic;
@@ -451,16 +452,7 @@ class TopicEditor extends React.Component<IProps, IState> {
             >
                 <div className="list-item__preview-header">
                     <h3>{this.getTitle()}</h3>
-                    <button
-                        id="hide-sidebar"
-                        type="button"
-                        className="icon-button"
-                        onClick={this.props.closeEditor}
-                        disabled={this.state.saving}
-                        aria-label={gettext('Close')}
-                    >
-                        <i className="icon--close-thin" />
-                    </button>
+                    <CloseButton onClick={this.props.closeEditor} disabled={this.state.saving} />
                 </div>
                 {!isCompanyTopic ? null : (
                     <AuditInformation

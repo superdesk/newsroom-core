@@ -12,6 +12,7 @@ import {
     getCardEditComponent,
 } from 'components/cards/utils';
 import {Button} from 'components/Buttons';
+import CloseButton from 'components/CloseButton';
 
 
 class EditCard extends React.Component<any, any> {
@@ -46,15 +47,7 @@ class EditCard extends React.Component<any, any> {
             <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit Cards')}>
                 <div className='list-item__preview-header'>
                     <h3>{this.props.card.label}</h3>
-                    <button
-                        id='hide-sidebar'
-                        type='button'
-                        className='icon-button'
-                        data-bs-dismiss='modal'
-                        aria-label={gettext('Close')}
-                        onClick={this.props.onClose}>
-                        <i className="icon--close-thin" aria-hidden='true'></i>
-                    </button>
+                    <CloseButton onClick={this.props.onClose} />
                 </div>
                 <AuditInformation item={this.props.card} />
                 <form>

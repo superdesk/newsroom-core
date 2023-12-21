@@ -11,7 +11,7 @@ import {sectionsPropType} from 'features/sections/types';
 import {MAX_TILE_IMAGES} from '../actions';
 import AuditInformation from 'components/AuditInformation';
 import {Button} from 'components/Buttons';
-
+import CloseButton from 'components/CloseButton';
 
 class EditNavigation extends React.Component<any, any> {
     static propTypes: any;
@@ -47,15 +47,7 @@ class EditNavigation extends React.Component<any, any> {
             <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit Navigation')}>
                 <div className='list-item__preview-header'>
                     <h3>{this.props.navigation.name}</h3>
-                    <button
-                        id='hide-sidebar'
-                        type='button'
-                        className='icon-button'
-                        data-bs-dismiss='modal'
-                        aria-label={gettext('Close')}
-                        onClick={this.props.onClose}>
-                        <i className="icon--close-thin" aria-hidden='true'></i>
-                    </button>
+                    <CloseButton onClick={this.props.onClose} />
                 </div>
                 <AuditInformation item={this.props.navigation} />
 

@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {Modal as BSModal} from 'bootstrap';
 import {gettext} from 'utils';
 import {closeModal} from 'actions';
-import CloseButton from './CloseButton';
+import CloseModalButton from './CloseModalButton';
 import classNames from 'classnames';
 import {Button} from 'components/Buttons';
 
@@ -85,7 +85,7 @@ class Modal extends React.Component<IProps, IState> {
                     <div className="modal-content">
                         <div className="modal-header">
                             <h5 className="modal-title">{this.props.title}</h5>
-                            <CloseButton onClick={this.props.closeModal} />
+                            <CloseModalButton onClick={this.props.closeModal} />
                         </div>
                         <div className="modal-body">
                             {this.props.children}

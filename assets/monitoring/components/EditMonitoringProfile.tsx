@@ -14,6 +14,7 @@ import MonitoringSchedule from './MonitoringSchedule';
 
 import {gettext} from 'utils';
 import {Button} from 'components/Buttons';
+import CloseButton from 'components/CloseButton';
 
 const getCompanyOptions = (companies: any) => companies.map((company: any) => ({value: company._id, text: company.name}));
 
@@ -81,15 +82,7 @@ class EditMonitoringProfile extends React.Component<any, any> {
             <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit {{monitoring}}', window.sectionNames)}>
                 <div className='list-item__preview-header'>
                     <h3>{ gettext('Add/Edit {{monitoring}} Profile', window.sectionNames) }</h3>
-                    <button
-                        id='hide-sidebar'
-                        type='button'
-                        className='icon-button'
-                        data-bs-dismiss='modal'
-                        aria-label={gettext('Close')}
-                        onClick={onClose}>
-                        <i className="icon--close-thin" aria-hidden='true'></i>
-                    </button>
+                    <CloseButton onClick={onClose} />
                 </div>
                 <AuditInformation item={item} />
                 <ul className='nav nav-tabs'>

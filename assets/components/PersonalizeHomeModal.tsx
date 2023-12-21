@@ -14,6 +14,7 @@ import {updateUser} from 'users/actions';
 import {getCurrentUser} from 'company-admin/selectors';
 import {IPersonalizedDashboardsWithData} from 'home/reducers';
 import {searchIcon} from 'search/components/search-icon';
+import {IconButton} from './IconButton';
 
 interface IMapStateProps {
     topics: Array<ITopic>;
@@ -217,17 +218,14 @@ class PersonalizeHomeModal extends React.Component<IProps, IState> {
                                 </div>
                             </div>
                             <div className='simple-card__actions'>
-                                <button
-                                    type="button"
-                                    className="icon-button icon-button--secondary icon-button--small"
-                                    title=""
-                                    aria-label={gettext('Delete')}
+                                <IconButton
+                                    icon='trash'
+                                    size='small'
+                                    ariaLabel={gettext('Delete')}
                                     onClick={() => {
                                         this.handleChange(topic._id);
                                     }}
-                                >
-                                    <i className="icon--trash" />
-                                </button>
+                                />
                             </div>
                         </div>
                     );

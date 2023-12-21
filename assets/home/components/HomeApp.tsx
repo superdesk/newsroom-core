@@ -23,6 +23,7 @@ import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 import {getCurrentUser} from 'company-admin/selectors';
 import {IPersonalizedDashboardsWithData} from 'home/reducers';
 import {Button} from 'components/Buttons';
+import {IconButton} from 'components/IconButton';
 
 export const WIRE_SECTION = 'wire';
 
@@ -245,7 +246,6 @@ class HomeApp extends React.Component<IProps, IState> {
                 {this.props.isSearchEnabled && (
                     <SearchBar />
                 )}
-
                 <section
                     className="content-main d-block py-4 px-2 p-md-3 p-lg-4"
                     onScroll={this.onHomeScroll}
@@ -290,16 +290,17 @@ class HomeApp extends React.Component<IProps, IState> {
                                                         }
                                                     }}
                                                 />
-                                                <button
+                                                <IconButton
+                                                    icon='settings'
+                                                    variant='tertiary'
+                                                    size='small'
+                                                    border
+                                                    tooltip={gettext('Edit personal Home')}
+                                                    ariaLabel={gettext('Edit personal Home')}
                                                     onClick={() => {
                                                         this.props.personalizeHome();
                                                     }}
-                                                    type="button"
-                                                    className="icon-button icon-button--small icon-button--tertiary icon-button--bordered"
-                                                    title={gettext('Edit personal Home')}
-                                                >
-                                                    <i className="icon--settings"></i>
-                                                </button>
+                                                />
                                             </div>
                                         )
                                     }

@@ -1,21 +1,26 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {gettext} from 'utils';
+import {IconButton} from './IconButton';
 
-function CloseButton({onClick}: any) {
-    return (
-        <button type="button"
-            className="close"
-            aria-label={gettext('Close')}
-            role="button"
-            onClick={onClick}>
-            <span aria-hidden="true">&times;</span>
-        </button>
-    );
+interface IProps {
+    onClick: (event: React.MouseEvent) => void;
+    disabled?: boolean;
 }
 
-CloseButton.propTypes = {
-    onClick: PropTypes.func.isRequired,
-};
+class CloseButton extends React.Component<IProps> {
+    render() {
+        return (
+            <IconButton
+                icon='close-thin'
+                id='hide-sidebar'
+                data-bs-dismiss='modal'
+                ariaLabel={gettext('Close')}
+                ariaHidden={true}
+                disabled={this.props.disabled}
+                onClick={this.props.onClick}
+            />
+        );
+    }
+}
 
 export default CloseButton;

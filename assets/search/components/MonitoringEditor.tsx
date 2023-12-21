@@ -12,6 +12,7 @@ import MonitoringSchedule from '../../monitoring/components/MonitoringSchedule';
 import {fetchCompanyUsers} from 'companies/actions';
 import {postMonitoringProfile} from 'monitoring/actions';
 import {Button} from 'components/Buttons';
+import CloseButton from 'components/CloseButton';
 
 class MonitoringEditor extends React.Component<any, any> {
     static propTypes: any;
@@ -126,16 +127,7 @@ class MonitoringEditor extends React.Component<any, any> {
             <div className='list-item__preview' role={gettext('dialog')} aria-label={gettext('Edit {{monitoring}}', window.sectionNames)}>
                 <div className="list-item__preview-header">
                     <h3>{get(item, 'name')}</h3>
-                    <button
-                        id="hide-sidebar"
-                        type="button"
-                        className="icon-button"
-                        onClick={this.props.closeEditor}
-                        disabled={this.state.saving}
-                        aria-label={gettext('Close')}
-                    >
-                        <i className="icon--close-thin" />
-                    </button>
+                    <CloseButton onClick={this.props.cancelEdit} disabled={this.state.saving} />
                 </div>
                 <ul className='nav nav-tabs'>
                     {this.tabs.filter((tab: any, index: any) => index === 0 || this.props.item._id).map((tab: any) => (

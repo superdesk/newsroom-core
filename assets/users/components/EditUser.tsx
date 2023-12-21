@@ -33,6 +33,8 @@ import {companyProductSeatsSelector, companySectionListSelector, sectionListSele
 import {IUser} from 'interfaces/user';
 import ActionButton from 'components/ActionButton';
 import {Button} from 'components/Buttons';
+import {IconButton} from 'components/IconButton';
+import CloseButton from 'components/CloseButton';
 
 const getCompanyOptions = (companies: Array<ICompany>) => companies.map((company) => ({value: company._id, text: company.name}));
 
@@ -119,10 +121,8 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
     );
 
     const resendInviteButton = {
-        name: gettext('Resend Invite'),
         icon: 'refresh',
         tooltip: gettext('Resend Invite'),
-        multi: false,
         action: () => {
             if (confirm(gettext('Would you like to resend the invitation for {{ email }}?', {email: user.email}))) {
                 resendUserInvite();
@@ -138,15 +138,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
         >
             <div className='list-item__preview-header'>
                 <h3>{gettext('Add/Edit User')}</h3>
-                <button
-                    id='hide-sidebar'
-                    type='button'
-                    className='icon-button'
-                    data-bs-dismiss='modal'
-                    aria-label={gettext('Close')}
-                    onClick={onClose}>
-                    <i className="icon--close-thin icon--gray" aria-hidden='true'></i>
-                </button>
+                <CloseButton onClick={onClose} />
             </div>
             <AuditInformation item={user} />
             <div className="list-item__preview-content">
@@ -162,11 +154,12 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                 </label>
                             )}
                             {!showResendInvite ? null : (
-                                <ActionButton
-                                    key={resendInviteButton.name}
-                                    className="icon-button icon-button--small icon-button--secondary"
-                                    aria-label={gettext('Resend Invite')}
-                                    action={resendInviteButton}
+                                <IconButton
+                                    icon={resendInviteButton.icon}
+                                    size='small'
+                                    tooltip={resendInviteButton.tooltip}
+                                    ariaLabel={resendInviteButton.tooltip}
+                                    onClick={resendInviteButton.action}
                                 />
                             )}
                         </div>
@@ -355,11 +348,10 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                                 <>
                                                     {isCompanyAdmin && (
                                                         <div className="products-list__heading d-flex justify-content-between align-items-center">
-                                                            {/* TODO: name? */}
-                                                            <Button
-                                                                value={gettext('Select All')}
-                                                                variant='tertiary'
-                                                                size='small'
+                                                            <button
+                                                                type='button'
+                                                                name='selectAllBtn'
+                                                                className='nh-button nh-button--tertiary nh-button--small'
                                                                 onClick={() => {
                                                                     onChange({
                                                                         ...user,
@@ -373,7 +365,9 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                                                             }))
                                                                     });
                                                                 }}
-                                                            />
+                                                            >
+                                                                {gettext('Select All')}
+                                                            </button>
                                                         </div>
                                                     )}
 
