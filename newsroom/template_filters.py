@@ -134,24 +134,20 @@ def format_event_datetime(item: dict) -> str:
 
         if is_tbc_item:
             if schedule_type == ScheduleType.MULTI_DAY:
-                return lazy_gettext("Event Starts: {start} - Event Ends: {end} ({tz}) (Time to be confirmed)").format(
+                return lazy_gettext("Date: {start} to {end} ({tz}) (Time to be confirmed)").format(
                     start=formatted_start, end=formatted_end, tz=tz
                 )
 
             else:
-                return lazy_gettext("Event Starts: {start} ({tz}) (Time to be confirmed)").format(
-                    start=formatted_start, tz=tz
-                )
+                return lazy_gettext("Date: {start} ({tz}) (Time to be confirmed)").format(start=formatted_start, tz=tz)
 
         elif schedule_type in (ScheduleType.ALL_DAY, ScheduleType.NO_DURATION):
-            return lazy_gettext("Event Starts: {start} ({tz})").format(start=formatted_start, tz=tz)
+            return lazy_gettext("Date: {start} ({tz})").format(start=formatted_start, tz=tz)
 
         elif schedule_type == ScheduleType.MULTI_DAY:
-            return lazy_gettext("Event Starts: {start} - Event Ends: {end} ({tz})").format(
-                start=formatted_start, end=formatted_end, tz=tz
-            )
+            return lazy_gettext("Date: {start} to {end} ({tz})").format(start=formatted_start, end=formatted_end, tz=tz)
         elif schedule_type == ScheduleType.REGULAR:
-            return lazy_gettext("Event Starts: {start_time} to {end_time} - On Date: {date} ({tz})").format(
+            return lazy_gettext("Time: {start_time} to {end_time} on Date: {date} ({tz})").format(
                 start_time=notification_time(start),
                 end_time=notification_time(end),
                 date=notification_date(start),
@@ -159,7 +155,7 @@ def format_event_datetime(item: dict) -> str:
             )
         else:
             # Default
-            return lazy_gettext("Event On: {start_time} {start_date} to {end_time} {end_date} ({tz})").format(
+            return lazy_gettext("Date: {start_time} {start_date} to {end_time} {end_date} ({tz})").format(
                 start_time=notification_time(start),
                 start_date=notification_date(start),
                 end_time=notification_time(end),
