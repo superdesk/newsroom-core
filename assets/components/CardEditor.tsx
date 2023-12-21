@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {gettext} from 'utils';
+import {Button} from 'components/Buttons';
 
 export default class CardEditor extends React.Component<any, any> {
     static propTypes: any;
@@ -58,22 +59,21 @@ export default class CardEditor extends React.Component<any, any> {
                             <div className="card-header d-flex flex-row">{editorTitle || label}</div>
                             <div className="card-body">{editorCardBody}</div>
                             <div className="card-footer d-flex">
-                                <button
-                                    className="nh-button nh-button--primary ms-auto"
-                                    onClick={this.onSave}
+                                <Button   
+                                    value={saveText}
+                                    variant='primary'
+                                    className='ms-auto'
                                     disabled={Object.keys(errors || {}).length > 0}
-                                    aria-label={gettext('Save')}
-                                >
-                                    {saveText}
-                                </button>
+                                    onClick={this.onSave}
+                                />
+
                                 {!hideCancel && (
-                                    <button
-                                        className='nh-button nh-button--secondary ms-3'
+                                    <Button   
+                                        value={gettext('Cancel')}
+                                        variant='secondary'
+                                        className='ms-3'
                                         onClick={this.onCancelClick}
-                                        aria-label={gettext('Cancel')}
-                                    >
-                                        {gettext('Cancel')}
-                                    </button>
+                                    />
                                 )}
                             </div>
                         </div>

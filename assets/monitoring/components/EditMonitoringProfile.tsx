@@ -13,6 +13,7 @@ import AuditInformation from 'components/AuditInformation';
 import MonitoringSchedule from './MonitoringSchedule';
 
 import {gettext} from 'utils';
+import {Button} from 'components/Buttons';
 
 const getCompanyOptions = (companies: any) => companies.map((company: any) => ({value: company._id, text: company.name}));
 
@@ -201,16 +202,18 @@ class EditMonitoringProfile extends React.Component<any, any> {
                                 </div>
 
                                 <div className='list-item__preview-footer'>
-                                    {item._id && <input
-                                        type='button'
-                                        className='nh-button nh-button--secondary'
-                                        value={gettext('Delete')}
-                                        onClick={onDelete} />}
-                                    <input
-                                        type='button'
-                                        className='nh-button nh-button--primary'
+                                    {item._id && (
+                                        <Button
+                                            value={gettext('Delete')}
+                                            variant='secondary'
+                                            onClick={onDelete}
+                                        />
+                                    )}
+                                    <Button
                                         value={gettext('Save')}
-                                        onClick={onSave} />
+                                        variant='primary'
+                                        onClick={onSave}
+                                    />
                                 </div>
                             </form>
                         </div>

@@ -11,6 +11,7 @@ import MonitoringSchedule from '../../monitoring/components/MonitoringSchedule';
 
 import {fetchCompanyUsers} from 'companies/actions';
 import {postMonitoringProfile} from 'monitoring/actions';
+import {Button} from 'components/Buttons';
 
 class MonitoringEditor extends React.Component<any, any> {
     static propTypes: any;
@@ -199,22 +200,23 @@ class MonitoringEditor extends React.Component<any, any> {
                                         value={profile.is_enabled}
                                         {...propsToFields} />
                                 </div>
-                                {isAdmin && (<div className="list-item__preview-footer">
-                                    <input
-                                        type="button"
-                                        className="nh-button nh-button--secondary"
-                                        value={gettext('Cancel')}
-                                        onClick={this.props.closeEditor}
-                                        disabled={this.state.saving}
-                                    />
-                                    <input
-                                        type="button"
-                                        className="nh-button nh-button--primary"
-                                        value={gettext('Save')}
-                                        onClick={this.saveprofile}
-                                        disabled={this.state.saving || !this.state.dirty}
-                                    />
-                                </div>)}
+                                {isAdmin && (
+                                    <div className="list-item__preview-footer">
+                                        <Button
+                                            value={gettext('Cancel')}
+                                            variant='secondary'
+                                            disabled={this.state.saving}
+                                            onClick={this.props.closeEditor}
+                                        />
+
+                                        <Button
+                                            value={gettext('Save')}
+                                            variant='primary'
+                                            disabled={this.state.saving || !this.state.dirty}
+                                            onClick={this.saveprofile}
+                                        />
+                                    </div>
+                                )}
                             </form>
                         </div>}
                         {this.state.activeTab === 'users' &&

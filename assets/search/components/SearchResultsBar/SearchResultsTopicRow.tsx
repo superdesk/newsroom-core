@@ -8,6 +8,7 @@ import {canUserUpdateTopic} from 'users/utils';
 import {SearchResultTagList} from './SearchResultTagList';
 import {Tag} from 'components/Tag';
 import {IProps as IParentProps} from './SearchResultTagsList';
+import {Button} from 'components/Buttons';
 
 type IProps = Pick<IParentProps,
     'user' |
@@ -92,9 +93,11 @@ export function SearchResultsTopicRow({
             {!showSaveTopic ? null : (
                 <div className="tags-list-row__button-group">
                     {!hasActiveTopic || !canUserUpdateTopic(user, activeTopic) ? null : (
-                        <button
+                        <Button
                             data-test-id="update-topic-btn"
-                            className="nh-button nh-button--tertiary nh-button--small"
+                            value={gettext('Update topic')}
+                            variant='tertiary'
+                            size='small'
                             onClick={(event) => {
                                 event.preventDefault();
                                 if (!saveMyTopic) {
@@ -108,13 +111,16 @@ export function SearchResultsTopicRow({
                                     {topic_type: topicType},
                                 ));
                             }}
-                        >
-                            {gettext('Update topic')}
-                        </button>
+                        />
                     )}
-                    <button
+                    <Button
                         data-test-id="save-topic-btn"
-                        className="nh-button nh-button--tertiary nh-button--small"
+                        value={hasActiveTopic
+                            ? gettext('Save as new topic')
+                            : gettext('Save new topic')
+                        }
+                        variant='tertiary'
+                        size='small'
                         onClick={(event) => {
                             event.preventDefault();
                             if (!saveMyTopic) {
@@ -127,12 +133,7 @@ export function SearchResultsTopicRow({
                                 {topic_type: topicType},
                             ));
                         }}
-                    >
-                        {hasActiveTopic ?
-                            gettext('Save as new topic') :
-                            gettext('Save new topic')
-                        }
-                    </button>
+                    />
                 </div>
             )}
         </SearchResultTagList>

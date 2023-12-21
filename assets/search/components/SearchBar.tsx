@@ -6,6 +6,7 @@ import {connect} from 'react-redux';
 import {gettext} from 'utils';
 
 import {searchQuerySelector} from 'search/selectors';
+import {Button} from 'components/Buttons';
 
 class SearchBar extends React.Component<any, any> {
     static propTypes: any;
@@ -86,13 +87,12 @@ class SearchBar extends React.Component<any, any> {
                 </div>
                 <div className="mx-2 d-flex gap-2">
                     {this.props.toggleAdvancedSearchPanel == null ? null : (
-                        <button
+                        <Button
+                            value={gettext('Advanced Search')}
                             data-test-id="show-advanced-search-panel-btn"
-                            className="nh-button  nh-button--advanced-search"
+                            className="nh-button--advanced-search"
                             onClick={this.props.toggleAdvancedSearchPanel}
-                        >
-                            {gettext('Advanced Search')}
-                        </button>
+                        />
                     )}
                     {this.props.toggleSearchTipsPanel == null ? null : (
                         <button

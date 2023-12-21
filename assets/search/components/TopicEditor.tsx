@@ -28,6 +28,7 @@ import TopicForm from './TopicForm';
 import EditPanel from 'components/EditPanel';
 import AuditInformation from 'components/AuditInformation';
 import {ToolTip} from 'ui/components/ToolTip';
+import {Button} from 'components/Buttons';
 
 interface IProps {
     topic: ITopic;
@@ -547,22 +548,19 @@ class TopicEditor extends React.Component<IProps, IState> {
                 </div>
                 {(this.state.activeTab === 'subscribers' || isReadOnly) ? null : (
                     <div className="list-item__preview-footer">
-                        <input
-                            type="button"
-                            className="nh-button nh-button--secondary"
+                        <Button
                             value={gettext('Cancel')}
-                            onClick={this.props.closeEditor}
+                            variant='secondary'
                             disabled={this.state.saving}
-                            aria-label={gettext('Cancel')}
+                            onClick={this.props.closeEditor}
                         />
-                        <input
+
+                        <Button
                             data-test-id="save-topic-btn"
-                            type="button"
-                            className="nh-button nh-button--primary"
                             value={gettext('Save')}
-                            onClick={this.saveTopic}
+                            variant='primary'
                             disabled={this.state.saving || !this.state.valid}
-                            aria-label={gettext('Save')}
+                            onClick={this.saveTopic}
                         />
                     </div>
                 )}

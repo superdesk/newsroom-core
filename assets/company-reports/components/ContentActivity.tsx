@@ -10,6 +10,7 @@ import {fetchReport, REPORTS, runReport, toggleFilter, fetchAggregations} from '
 import CalendarButton from '../../components/CalendarButton';
 import MultiSelectDropdown from '../../components/MultiSelectDropdown';
 import ReportsTable from './ReportsTable';
+import {Button} from 'components/Buttons';
 
 class ContentActivity extends React.Component<any, any> {
     static propTypes: any;
@@ -282,12 +283,12 @@ class ContentActivity extends React.Component<any, any> {
                         );
                     })}
 
-                    <button
-                        key='content_activity_export'
-                        className="nh-button nh-button--secondary ms-auto me-3"
-                        type="button"
+                    <Button
+                        value={gettext('Export to CSV')}
+                        variant='secondary'
+                        className='ms-auto me-3'
                         onClick={this.exportToCSV}
-                    >{gettext('Export to CSV')}</button>
+                    />
                 </div>
                 <ReportsTable
                     key='report_table'

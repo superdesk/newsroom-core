@@ -4,6 +4,7 @@ import classNames from 'classnames';
 
 import TextInput from 'components/TextInput';
 import {gettext} from 'utils';
+import {Button} from 'components/Buttons';
 
 class EditClient extends React.Component<any, any> {
     static propTypes: any;
@@ -58,16 +59,18 @@ class EditClient extends React.Component<any, any> {
                                 }
                             </div>
                             <div className='list-item__preview-footer'>
-                                {this.props.client._id && <input
-                                    type='button'
-                                    className='nh-button nh-button--secondary'
-                                    value={gettext('Delete')}
-                                    onClick={this.props.onDelete}/>}
-                                <input
-                                    type='button'
-                                    className='nh-button nh-button--primary'
+                                {this.props.client._id && (
+                                    <Button
+                                        value={gettext('Delete')}
+                                        variant='secondary'
+                                        onClick={this.props.onDelete}
+                                    />
+                                )}
+                                <Button
                                     value={gettext('Save')}
-                                    onClick={this.props.onSave}/>
+                                    variant='primary'
+                                    onClick={this.props.onSave}
+                                />
                             </div>
                         </form>
                     </div>

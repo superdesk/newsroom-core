@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 
 import CheckboxInput from 'components/CheckboxInput';
+import {Button} from 'components/Buttons';
 
 function CompanyPermissions({
     company,
@@ -160,11 +161,11 @@ function CompanyPermissions({
 
                 </div>
                 <div className='list-item__preview-footer'>
-                    <input
+                    <Button
                         data-test-id="save-btn"
-                        type='submit'
-                        className='nh-button nh-button--primary'
                         value={gettext('Save')}
+                        type='submit'
+                        variant='primary'
                     />
                 </div>
             </form>

@@ -32,6 +32,7 @@ import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserList
 import {companyProductSeatsSelector, companySectionListSelector, sectionListSelector} from 'company-admin/selectors';
 import {IUser} from 'interfaces/user';
 import ActionButton from 'components/ActionButton';
+import {Button} from 'components/Buttons';
 
 const getCompanyOptions = (companies: Array<ICompany>) => companies.map((company) => ({value: company._id, text: company.name}));
 
@@ -172,28 +173,26 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                         {(currentUserIsAdmin && user._id != null && user._id !== currentUser._id) && (
                             <div className="list-item__preview-toolbar-right">
                                 {original.is_approved === false ? (
-                                    <button
+                                    <Button
+                                        value={gettext('Approve')}
                                         type="submit"
-                                        className="nh-button nh-button--tertiary nh-button--small"
-                                        aria-label={gettext('Approve User')}
+                                        variant='tertiary'
+                                        size='small'
                                         onClick={(event) => {
                                             event.preventDefault();
                                             approveUser(original._id);
                                         }}
-                                    >
-                                        {gettext('Approve')}
-                                    </button>
+                                    />
                                 ) : (
                                     <form method="POST" action={'/auth/impersonate'}>
                                         <input type="hidden" name="user" value={user._id} />
-                                        <button
-                                            type="submit"
-                                            className="nh-button nh-button--tertiary nh-button--small"
-                                            aria-label={gettext('Impersonate User')}
+                                        <Button
                                             data-test-id="impersonate-user-btn"
-                                        >
-                                            {gettext('Impersonate User')}
-                                        </button>
+                                            value={gettext('Impersonate User')}
+                                            type="submit"
+                                            variant='tertiary'
+                                            size='small'
+                                        />
                                     </form>
                                 )}
                             </div>
@@ -356,10 +355,11 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                                 <>
                                                     {isCompanyAdmin && (
                                                         <div className="products-list__heading d-flex justify-content-between align-items-center">
-                                                            <button
-                                                                type='button'
-                                                                name='selectAllBtn'
-                                                                className='nh-button nh-button--tertiary nh-button--small'
+                                                            {/* TODO: name? */}
+                                                            <Button
+                                                                value={gettext('Select All')}
+                                                                variant='tertiary'
+                                                                size='small'
                                                                 onClick={() => {
                                                                     onChange({
                                                                         ...user,
@@ -373,9 +373,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                                                             }))
                                                                     });
                                                                 }}
-                                                            >
-                                                                {gettext('Select All')}
-                                                            </button>
+                                                            />
                                                         </div>
                                                     )}
 
@@ -462,24 +460,26 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
 
                     <div className='list-item__preview-footer'>
                         {!user.is_validated || isCompanyAdmin ? null : (
-                            <input
-                                type='button'
-                                className='nh-button nh-button--secondary'
+                            <Button
                                 value={gettext('Reset Password')}
+                                variant='secondary'
                                 id='resetPassword'
-                                onClick={onResetPassword} />
+                                onClick={onResetPassword}
+                            />
                         )}
-                        {user._id && (currentUserIsAdmin || isCompanyAdmin) && user._id !== currentUser._id && <input
-                            type='button'
-                            className='nh-button nh-button--secondary'
-                            value={gettext('Delete')}
-                            onClick={onDelete} />}
-                        <input
+                        {user._id && (currentUserIsAdmin || isCompanyAdmin) && user._id !== currentUser._id && (
+                            <Button
+                                value={gettext('Delete')}
+                                variant='secondary'
+                                onClick={onDelete}
+                            />
+                        )}
+                        <Button
                             data-test-id="save-btn"
-                            type='button'
-                            className='nh-button nh-button--primary'
                             value={gettext('Save')}
-                            onClick={onSave} />
+                            variant='primary'
+                            onClick={onSave}
+                        />
                     </div>
                 </form>
             </div>

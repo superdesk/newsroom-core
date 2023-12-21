@@ -9,6 +9,7 @@ import {toggleAdvancedSearchField, setAdvancedSearchKeywords, clearAdvancedSearc
 
 import CheckboxInput from 'components/CheckboxInput';
 import InputWrapper from 'components/InputWrapper';
+import {Button} from 'components/Buttons';
 
 function AdvancedSearchPanelComponent({
     params,
@@ -157,25 +158,25 @@ function AdvancedSearchPanelComponent({
                 </div>
             </div>
             <div className="advanced-search__footer">
-                <button
-                    className="nh-button nh-button--secondary"
+                <Button
+                    value={gettext('Clear All')}
+                    variant='secondary'
                     onClick={() => {
                         clearParams();
                         toggleAdvancedSearchPanel();
                         fetchItems();
                     }}
-                >
-                    {gettext('Clear All')}
-                </button>
-                <button
+                />
+
+                <Button
                     data-test-id="run-advanced-search-btn"
-                    className="nh-button nh-button--primary"
+                    value={gettext('Search')}
+                    variant='primary'
                     onClick={() => {
                         fetchItems();
                         toggleAdvancedSearchPanel();
                     }}
-                >
-                    {gettext('Search')}</button>
+                />
             </div>
         </div>
     );

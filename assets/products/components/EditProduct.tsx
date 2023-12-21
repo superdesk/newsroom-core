@@ -9,6 +9,7 @@ import {gettext, getProductQuery} from 'utils';
 import EditPanel from '../../components/EditPanel';
 import AuditInformation from 'components/AuditInformation';
 import {sectionsPropType} from '../../features/sections/types';
+import {Button} from 'components/Buttons';
 
 const getProductCompanies = (product: any, companies: any) => ({
     companies: companies.filter((company: any) => {
@@ -181,16 +182,16 @@ class EditProduct extends React.Component<any, any> {
                                 </div>
                                 <div className='list-item__preview-footer'>
                                     {this.getPoductTestButton(this.props.product)}
-                                    <input
-                                        type='button'
-                                        className='nh-button nh-button--secondary'
+                                    <Button
                                         value={gettext('Delete')}
-                                        onClick={this.props.onDelete}/>
-                                    <input
-                                        type='button'
-                                        className='nh-button nh-button--primary'
+                                        variant='secondary'
+                                        onClick={this.props.onDelete}
+                                    />
+                                    <Button
                                         value={gettext('Save')}
-                                        onClick={this.props.onSave}/>
+                                        variant='primary'
+                                        onClick={this.props.onSave}
+                                    />
                                 </div>
                             </form>
                         </div>

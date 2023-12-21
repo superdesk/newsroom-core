@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {gettext} from '../utils';
 import {isEmpty, get, pickBy, isEqual, every} from 'lodash';
 import CheckboxInput from 'components/CheckboxInput';
+import {Button} from 'components/Buttons';
 
 class EditPanel extends React.Component<any, any> {
     static propTypes: any;
@@ -127,18 +128,17 @@ class EditPanel extends React.Component<any, any> {
                     </div>
                     <div className='list-item__preview-footer'>
                         {this.props.onCancel && (
-                            <input
-                                type="button"
-                                className="nh-button nh-button--secondary"
+                            <Button
                                 value={gettext('Cancel')}
-                                onClick={this.props.onCancel}
+                                variant='secondary'
                                 disabled={this.props.cancelDisabled}
+                                onClick={this.props.onCancel}
                             />
                         )}
-                        <input
-                            type='submit'
-                            className='nh-button nh-button--primary'
+                        <Button
                             value={gettext('Save')}
+                            type='submit'
+                            variant='primary'
                             disabled={this.props.saveDisabled}
                         />
                     </div>

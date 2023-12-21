@@ -2,58 +2,11 @@ import React from 'react';
 import {get} from 'lodash';
 import {connect} from 'react-redux';
 import {Modal as BSModal} from 'bootstrap';
-
 import {gettext} from 'utils';
 import {closeModal} from 'actions';
-
 import CloseButton from './CloseButton';
 import classNames from 'classnames';
-
-interface IButtonProps {
-    label: string;
-    type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'];
-    onClick?(event: React.MouseEvent<HTMLButtonElement>): void;
-}
-
-/**
- * Primary modal button for actions like save/send/etc
- */
-function ModalPrimaryButton({label, type, onClick, disabled}: IButtonProps & {disabled?: boolean}): React.ReactElement {
-    assertButtonHandler(label, type, onClick);
-    return (
-        <button
-            type={type || 'button'}
-            onClick={onClick}
-            className="nh-button nh-button--primary"
-            disabled={disabled}
-        >{label}</button>
-    );
-}
-
-/**
- * Secondary modal button for actions like cancel/reset
- */
-export function ModalSecondaryButton({label, type, onClick}: IButtonProps): React.ReactElement {
-    assertButtonHandler(label, type, onClick);
-    return (
-        <button
-            type={type || 'button'}
-            onClick={onClick}
-            className="nh-button nh-button--secondary"
-        >{label}</button>
-    );
-}
-
-/**
- * Test if button makes any sense
- *
- * either type or onClick handler must be specified
- */
-function assertButtonHandler(label: IButtonProps['label'], type: IButtonProps['type'], onClick: IButtonProps['onClick']) {
-    if (!type && !onClick) {
-        console.warn('You should use either type or onClick handler for button', label);
-    }
-}
+import {Button} from 'components/Buttons';
 
 interface IProps {
     title: string;
@@ -138,18 +91,19 @@ class Modal extends React.Component<IProps, IState> {
                             {this.props.children}
                         </div>
                         <div className="modal-footer">
-                            <ModalSecondaryButton
-                                type="reset"
-                                label={this.props.onCancelLabel || gettext('Cancel')}
+                            <Button
+                                type='reset'
+                                variant='secondary'
+                                value={this.props.onCancelLabel || gettext('Cancel')}
                                 onClick={this.props.closeModal}
                             />
-                            {' '}
-                            <ModalPrimaryButton
-                                type="submit"
-                                label={this.props.onSubmitLabel || gettext('Save')}
-                                onClick={this.onSubmit}
+                            <Button
+                                type='submit'
+                                variant='primary'
+                                value={this.props.onSubmitLabel || gettext('Save')}
                                 disabled={this.state.submitting || !this.props.formValid}
-                            />
+                                onClick={this.onSubmit}
+                            />     
                         </div>
                     </div>
                 </div>

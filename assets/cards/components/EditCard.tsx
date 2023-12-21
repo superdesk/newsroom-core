@@ -11,6 +11,7 @@ import {
     CARD_TYPES,
     getCardEditComponent,
 } from 'components/cards/utils';
+import {Button} from 'components/Buttons';
 
 
 class EditCard extends React.Component<any, any> {
@@ -84,16 +85,16 @@ class EditCard extends React.Component<any, any> {
                         <CardComponent {...cardProps}/>
                     </div>
                     <div className='list-item__preview-footer'>
-                        <input
-                            type='button'
-                            className='nh-button nh-button--secondary'
+                        <Button
                             value={gettext('Delete')}
-                            onClick={this.props.onDelete}/>
-                        <input
-                            type='button'
-                            className='nh-button nh-button--primary'
+                            variant='secondary'
+                            onClick={this.props.onDelete}
+                        />
+                        <Button
                             value={gettext('Save')}
-                            onClick={this.props.onSave}/>
+                            variant='primary'
+                            onClick={this.props.onSave}
+                        />
                     </div>
                 </form>
             </div>

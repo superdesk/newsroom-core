@@ -24,6 +24,7 @@ import CompanyPermissions from './CompanyPermissions';
 import EditCompanyAPI from './EditCompanyAPI';
 import AuditInformation from 'components/AuditInformation';
 import {EditCompanyDetails} from './EditCompanyDetails';
+import {Button} from 'components/Buttons';
 
 interface IStateProps {
     company: ICompany;
@@ -187,14 +188,13 @@ class EditCompany extends React.Component<IProps, IState> {
                             </label>
                         </div>
                         <div className="list-item__preview-toolbar-right">
-                            <button
-                                type="submit"
-                                className="nh-button nh-button--tertiary nh-button--small"
-                                aria-label={gettext('Approve Company & Users')}
+                            <Button
+                                value={gettext('Approve Company & Users')}
+                                type='submit'
+                                variant='tertiary'
+                                size='small'
                                 onClick={this.approveCompany}
-                            >
-                                {gettext('Approve Company & Users')}
-                            </button>
+                            />
                         </div>
                     </div>
                 )}

@@ -6,6 +6,7 @@ import {isEmpty} from 'lodash';
 import {gettext} from 'utils';
 
 import {selectAll, selectNone} from 'wire/actions';
+import {Button} from 'components/Buttons';
 
 class SelectedItemsBar extends React.PureComponent<any, any> {
     static propTypes: any;
@@ -40,13 +41,18 @@ class SelectedItemsBar extends React.PureComponent<any, any> {
 
         return (
             <div className='multi-action-bar multi-action-bar--open'>
-                <button className='nh-button nh-button--primary me-2'
-                    onClick={this.props.selectAll}>{gettext('Select All')}
-                </button>
+                <Button
+                    value={gettext('Select All')}
+                    variant='primary'
+                    className='me-2'
+                    onClick={this.props.selectAll}
+                />
 
-                <button className='nh-button nh-button--secondary'
-                    onClick={this.props.selectNone}>{gettext('Cancel')}
-                </button>
+                <Button
+                    value={gettext('Cancel')}
+                    variant='secondary'
+                    onClick={this.props.selectNone}
+                />
 
                 <span className='multi-action-bar__count'>
                     {gettext('{{ count }} item(s) selected', {count: this.props.selectedItems.length})}

@@ -18,6 +18,7 @@ import {
 } from '../../actions';
 import {IUserProfileState} from 'user-profile/reducers';
 import {IUserProfileUpdates} from 'interfaces/user';
+import {Button} from 'components/Buttons';
 
 interface IProps {
     user: IUser;
@@ -171,13 +172,12 @@ class UserProfile extends React.PureComponent<IProps> {
                                     <span className="nh-container__schedule-info mb-3">
                                         {getSubscriptionTimesString(user)}
                                     </span>
-                                    <button
-                                        type="button"
-                                        className="nh-button nh-button--small nh-button--tertiary"
+                                    <Button
+                                        value={gettext('Edit schedule')}
+                                        variant="tertiary"
+                                        size="small"
                                         onClick={this.props.openEditTopicNotificationsModal}
-                                    >
-                                        {gettext('Edit schedule')}
-                                    </button>
+                                    />
                                 </div>
                             </div>
                             <div className="col-lg-12"></div>
@@ -200,17 +200,17 @@ class UserProfile extends React.PureComponent<IProps> {
                 </div>
 
                 <div className='profile-content__footer'>
-                    <input
-                        type='button'
-                        className='nh-button nh-button--secondary'
+                    <Button
                         value={gettext('Cancel')}
-                        onClick={onCancel} />
+                        variant='secondary'
+                        onClick={onCancel}
+                    />
 
-                    <input
-                        type='button'
-                        className='nh-button nh-button--primary'
+                    <Button
                         value={gettext('Save Changes')}
-                        onClick={this.save} />
+                        variant='primary'
+                        onClick={this.save}
+                    />
                 </div>
             </form>
         );
