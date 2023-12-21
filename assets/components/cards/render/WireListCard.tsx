@@ -12,6 +12,7 @@ import {listConfigSelector} from 'ui/selectors';
 import {DEFAULT_COMPACT_META_FIELDS} from 'wire/components/WireListItem';
 import {IArticle, IListConfig} from 'interfaces';
 import {showModal} from '@superdesk/common';
+import {filterGroupsToLabelMap} from 'search/selectors';
 
 interface IOwnProps {
     item: IArticle;
@@ -19,6 +20,7 @@ interface IOwnProps {
 
 interface IPropsReduxStore {
     listConfig: IListConfig;
+    filterGroupLabels: any;
 }
 
 type IPropsCombined = IPropsReduxStore & IOwnProps;
@@ -119,6 +121,7 @@ class WireListPanel extends React.Component<IPropsCombined> {
 }
 
 const mapStateToProps = (state: any) => ({
+    filterGroupLabels: filterGroupsToLabelMap(state),
     listConfig: listConfigSelector(state),
 });
 
