@@ -159,9 +159,7 @@ def format_event_datetime(item: dict) -> str:
             )
         else:
             # Default
-            return lazy_gettext(
-                "Event Starts: {start_time} {start_date} to Event Ends: {end_time} {end_date} ({tz})"
-            ).format(
+            return lazy_gettext("Event On: {start_time} {start_date} to {end_time} {end_date} ({tz})").format(
                 start_time=notification_time(start),
                 start_date=notification_date(start),
                 end_time=notification_time(end),
