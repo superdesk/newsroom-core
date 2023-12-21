@@ -12,6 +12,7 @@ import {
     initParams,
     openItemDetails,
     previewItem,
+    fetchFoldersWire,
 } from './actions';
 import {setView} from 'search/actions';
 
@@ -48,3 +49,7 @@ render(store, WireApp, document.getElementById('wire-app'));
 
 // initialize web socket listener
 initWebSocket(store, pushNotification);
+
+export const WIRE_TOPIC_FOLDERS_UPDATED = 'reload-wire-folders';
+
+document.addEventListener(WIRE_TOPIC_FOLDERS_UPDATED, () => store.dispatch(fetchFoldersWire()));

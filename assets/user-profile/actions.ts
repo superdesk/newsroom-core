@@ -232,7 +232,7 @@ export function pushNotification(push: any): any {
     };
 }
 
-function getFoldersUrl(state: any, global: boolean | undefined, id?: any) {
+export function getFoldersUrl(state: any, global: boolean | undefined, id?: any) {
     const baseUrl = global ?
         `/api/companies/${state.company}/topic_folders` :
         `/api/users/${state.user._id}/topic_folders`;
@@ -240,7 +240,7 @@ function getFoldersUrl(state: any, global: boolean | undefined, id?: any) {
     return id != null ? `${baseUrl}/${id}` : baseUrl;
 }
 
-function mergeUpdates(updates: any, response: any) {
+export function mergeUpdates(updates: any, response: any) {
     updates._id = response._id;
     updates._etag = response._etag;
     updates._status = response._status;
