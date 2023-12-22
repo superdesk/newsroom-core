@@ -8,18 +8,27 @@ import logging
 
 from flask import current_app as app
 from eve.utils import str_to_date
-from flask_babel import format_time, format_date, format_datetime, get_locale
+from flask_babel import format_time, format_date, format_datetime, get_locale, lazy_gettext
 from flask_babel.speaklater import LazyString
 from jinja2.utils import htmlsafe_json_dumps  # type: ignore
 from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
 from datetime import datetime
+from newsroom.gettext import set_session_timezone, get_session_timezone, clear_session_timezone
+from enum import Enum
 
 from newsroom.user_roles import UserRole
 
 
 logger = logging.getLogger(__name__)
 _hash_cache = {}
+
+
+class ScheduleType(Enum):
+    ALL_DAY = "ALL_DAY"
+    MULTI_DAY = "MULTI_DAY"
+    NO_DURATION = "NO_DURATION"
+    REGULAR = "REGULAR"
 
 
 def get_client_format(key) -> Optional[str]:
@@ -59,6 +68,104 @@ def parse_date(datetime):
         except ValueError:
             return arrow.get(datetime).datetime
     return datetime
+
+
+def get_schedule_type(start: datetime, end: datetime, all_day: bool, no_end_time: bool) -> ScheduleType:
+    """
+    Determine the schedule type based on event start and end times.
+
+    params :
+    - start (datetime): Start time of the event.
+    - end (datetime): End time of the event.
+    - all_day (bool): True if the event is an all-day event.
+    - no_end_time (bool): True if the event has no specified end time.
+
+    return:
+    ScheduleType: The type of schedule (ALL_DAY, NO_DURATION, MULTI_DAY, REGULAR).
+    """
+    duration = int((end - start).total_seconds() / 60) if not no_end_time and end else 0
+    DAY_IN_MINUTES = 24 * 60 - 1
+
+    if all_day:
+        return ScheduleType.ALL_DAY if duration in (0, DAY_IN_MINUTES) else ScheduleType.MULTI_DAY
+
+    if no_end_time:
+        return ScheduleType.NO_DURATION
+
+    if duration >= DAY_IN_MINUTES and start.date() != (end.date() if end else None):
+        return ScheduleType.MULTI_DAY
+
+    if duration <= DAY_IN_MINUTES and start.date() == (end.date() if end else None):
+        return ScheduleType.ALL_DAY
+
+    if duration == 0 and start.time() == (end.time() if end else None):
+        return ScheduleType.NO_DURATION
+
+    return ScheduleType.REGULAR
+
+
+def is_item_tbc(item: dict) -> bool:
+    event_tbc = item.get("event", {}).get("_time_to_be_confirmed", False)
+    planning = item.get("planning_items", [])
+    return event_tbc or (planning and planning[0].get("_time_to_be_confirmed", False))
+
+
+def format_event_datetime(item: dict) -> str:
+    date_info = item.get("dates", {})
+
+    if not date_info:
+        return ""
+
+    tz = date_info.get("tz", get_session_timezone())
+    try:
+        # Set the session timezone
+        set_session_timezone(tz)
+
+        start = parse_date(date_info.get("start"))
+        end = parse_date(date_info.get("end")) if date_info.get("end") else None
+        all_day = date_info.get("all_day")
+        no_end_time = date_info.get("no_end_time")
+        is_tbc_item = is_item_tbc(item)
+
+        schedule_type = get_schedule_type(start, end, all_day, no_end_time)
+
+        formatted_start = datetime_long(start)
+        formatted_end = datetime_long(end) if end else None
+
+        if is_tbc_item:
+            if schedule_type == ScheduleType.MULTI_DAY:
+                return lazy_gettext("Date: {start} to {end} ({tz}) (Time to be confirmed)").format(
+                    start=formatted_start, end=formatted_end, tz=tz
+                )
+
+            else:
+                return lazy_gettext("Date: {start} ({tz}) (Time to be confirmed)").format(start=formatted_start, tz=tz)
+
+        elif schedule_type in (ScheduleType.ALL_DAY, ScheduleType.NO_DURATION):
+            return lazy_gettext("Date: {start} ({tz})").format(start=formatted_start, tz=tz)
+
+        elif schedule_type == ScheduleType.MULTI_DAY:
+            return lazy_gettext("Date: {start} to {end} ({tz})").format(start=formatted_start, end=formatted_end, tz=tz)
+        elif schedule_type == ScheduleType.REGULAR:
+            return lazy_gettext("Time: {start_time} to {end_time} on Date: {date} ({tz})").format(
+                start_time=notification_time(start),
+                end_time=notification_time(end),
+                date=notification_date(start),
+                tz=tz,
+            )
+        else:
+            # Default
+            return lazy_gettext("Date: {start_time} {start_date} to {end_time} {end_date} ({tz})").format(
+                start_time=notification_time(start),
+                start_date=notification_date(start),
+                end_time=notification_time(end),
+                end_date=notification_date(end),
+                tz=tz,
+            )
+
+    finally:
+        # clear session timezone
+        clear_session_timezone()
 
 
 def datetime_short(datetime):
