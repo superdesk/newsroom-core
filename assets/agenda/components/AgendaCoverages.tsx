@@ -13,7 +13,9 @@ import {
     getCoverageTooltip,
     WORKFLOW_COLORS,
     WORKFLOW_STATUS,
-    formatCoverageDate
+    formatCoverageDate,
+    getCoverageAsigneeName,
+    getCoverageDeskName
 } from '../utils';
 import {agendaContentLinkTarget} from 'ui/selectors';
 
@@ -71,6 +73,22 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                         </span>
 
                     </div>
+                    {<div className='coverage-item__row align-items-center'>
+                        {getCoverageAsigneeName(coverage) && (
+                            <span className='d-flex text-nowrap pe-1'>
+                                <span className='coverage-item__text-label me-1'>{gettext('assignee')}:</span>
+                                <span>{getCoverageAsigneeName(coverage)}</span>
+                            </span>
+                        )}
+                        {getCoverageAsigneeName(coverage) && getCoverageDeskName(coverage) && ' | '}
+                        {getCoverageDeskName(coverage) && (
+                            <span className='d-flex text-nowrap ps-1'>
+                                <span className='coverage-item__text-label me-1'>{gettext('desk')}:</span>
+                                <span className=''>{getCoverageDeskName(coverage)}</span>
+                            </span>
+                        )}
+                    </div>
+                    }
                     {coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED && coverage.scheduled != null && (
                         <div
                             className='coverage-item__row align-items-center'
