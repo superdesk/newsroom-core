@@ -47,79 +47,83 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                     ))}
                 </div>
             )}
-            {coveragesWithState.map((coverage: any) => (
-                <div
-                    className={classNames(
-                        'coverage-item',
-                        {'coverage-item--clickable': onClick}
-                    )}
-                    key={coverage.coverage_id}
-                    onClick={onClick}
-                    title={onClick ? gettext('Open {{agenda}} in a new tab', window.sectionNames) : onClick}
-                >
+            {coveragesWithState.map((coverage: any) => {
+                const assigneeName = getCoverageAsigneeName(coverage);
+                const deskName = getCoverageDeskName(coverage);
+                return(
                     <div
-                        className='coverage-item__row coverage-item__row--header-row'
-                        title={getCoverageTooltip(coverage)}
+                        className={classNames(
+                            'coverage-item',
+                            {'coverage-item--clickable': onClick}
+                        )}
+                        key={coverage.coverage_id}
+                        onClick={onClick}
+                        title={onClick ? gettext('Open {{agenda}} in a new tab', window.sectionNames) : onClick}
                     >
-                        <span className={classNames('coverage-item__coverage-icon', WORKFLOW_COLORS[coverage.workflow_status])}>
-                            <i className={`icon--coverage-${getCoverageIcon(coverage.coverage_type)}`}></i>
-                        </span>
-
-                        <span className='coverage-item__coverage-heading'>
-                            <span className='fw-medium'>
-                                {`${(coverage.genre?.length ?? 0) > 0 ? gettext(coverage.genre[0].name) : getCoverageDisplayName(coverage.coverage_type)}`}
-                            </span>
-                            {`${getSlugline(coverage)}`}
-                        </span>
-
-                    </div>
-                    {<div className='coverage-item__row align-items-center'>
-                        {getCoverageAsigneeName(coverage) && (
-                            <span className='d-flex text-nowrap pe-1'>
-                                <span className='coverage-item__text-label me-1'>{gettext('assignee')}:</span>
-                                <span>{getCoverageAsigneeName(coverage)}</span>
-                            </span>
-                        )}
-                        {getCoverageAsigneeName(coverage) && getCoverageDeskName(coverage) && ' | '}
-                        {getCoverageDeskName(coverage) && (
-                            <span className='d-flex text-nowrap ps-1'>
-                                <span className='coverage-item__text-label me-1'>{gettext('desk')}:</span>
-                                <span className=''>{getCoverageDeskName(coverage)}</span>
-                            </span>
-                        )}
-                    </div>
-                    }
-                    {coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED && coverage.scheduled != null && (
                         <div
-                            className='coverage-item__row align-items-center'
+                            className='coverage-item__row coverage-item__row--header-row'
+                            title={getCoverageTooltip(coverage)}
                         >
-                            <span className='d-flex text-nowrap'>
-                                <span className='coverage-item__text-label me-1'>{gettext('expected')}:</span>
-                                <span className=''>{formatCoverageDate(coverage)}</span>
+                            <span className={classNames('coverage-item__coverage-icon', WORKFLOW_COLORS[coverage.workflow_status])}>
+                                <i className={`icon--coverage-${getCoverageIcon(coverage.coverage_type)}`}></i>
                             </span>
+
+                            <span className='coverage-item__coverage-heading'>
+                                <span className='fw-medium'>
+                                    {`${(coverage.genre?.length ?? 0) > 0 ? gettext(coverage.genre[0].name) : getCoverageDisplayName(coverage.coverage_type)}`}
+                                </span>
+                                {`${getSlugline(coverage)}`}
+                            </span>
+
                         </div>
-                    )}
+                        {(assigneeName || deskName) && (
+                            <div className='coverage-item__row align-items-center'>
+                                {assigneeName && (
+                                    <span className='d-flex text-nowrap pe-1'>
+                                        <span className='coverage-item__text-label me-1'>{gettext('assignee')}:</span>
+                                        <span>{assigneeName}</span>
+                                    </span>
+                                )}
+                                {assigneeName && deskName && ' | '}
+                                {deskName && (
+                                    <span className='d-flex text-nowrap ps-1'>
+                                        <span className='coverage-item__text-label me-1'>{gettext('desk')}:</span>
+                                        <span className=''>{deskName}</span>
+                                    </span>
+                                )}
+                            </div>
+                        )}
+                        {coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED && coverage.scheduled != null && (
+                            <div
+                                className='coverage-item__row align-items-center'
+                            >
+                                <span className='d-flex text-nowrap'>
+                                    <span className='coverage-item__text-label me-1'>{gettext('expected')}:</span>
+                                    <span className=''>{formatCoverageDate(coverage)}</span>
+                                </span>
+                            </div>
+                        )}
 
 
 
-                    {coverage.coverage_provider && (
-                        <div className='coverage-item__row'>
-                            <span className='coverage-item__text-label me-1'>{gettext('source')}:</span>
-                            <span className='me-2'>{coverage.coverage_provider}</span>
-                        </div>
-                    )}
-                    <CoverageItemStatus
-                        coverage={coverage}
-                        item={item}
-                        wireItems={wireItems}
-                        actions={actions}
-                        user={user}
-                        coverageData={getDataFromCoverages(item)}
-                        hideViewContentItems={hideViewContentItems}
-                        contentLinkTarget={contentLinkTarget}
-                    />
-                </div>
-            ))}
+                        {coverage.coverage_provider && (
+                            <div className='coverage-item__row'>
+                                <span className='coverage-item__text-label me-1'>{gettext('source')}:</span>
+                                <span className='me-2'>{coverage.coverage_provider}</span>
+                            </div>
+                        )}
+                        <CoverageItemStatus
+                            coverage={coverage}
+                            item={item}
+                            wireItems={wireItems}
+                            actions={actions}
+                            user={user}
+                            coverageData={getDataFromCoverages(item)}
+                            hideViewContentItems={hideViewContentItems}
+                            contentLinkTarget={contentLinkTarget}
+                        />
+                    </div>
+                );})}
         </React.Fragment>
     );
 }
