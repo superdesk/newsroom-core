@@ -18,6 +18,7 @@ import {
     getCoverageDeskName
 } from '../utils';
 import {agendaContentLinkTarget} from 'ui/selectors';
+import {ICoverage} from 'interfaces';
 
 
 function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, onClick, hideViewContentItems, contentLinkTarget}: any) {
@@ -50,6 +51,9 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
             {coveragesWithState.map((coverage: any) => {
                 const assigneeName = getCoverageAsigneeName(coverage);
                 const deskName = getCoverageDeskName(coverage);
+                const assignedUserEmail = coverage.assigned_user_email;
+                const assignedDeskEmail = coverage.assigned_desk_email;
+                const subject = `Coverage inquiry from NewsPro user: ${item.name || item.slugline}`;
                 return(
                     <div
                         className={classNames(
@@ -81,14 +85,16 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                                 {assigneeName && (
                                     <span className='d-flex text-nowrap pe-1'>
                                         <span className='coverage-item__text-label me-1'>{gettext('assignee')}:</span>
-                                        <span>{assigneeName}</span>
+                                        {assignedUserEmail ? <a href={`mailto:${assignedUserEmail}?subject=${gettext(subject)}`} 
+                                            target="_blank">{assigneeName}</a> : <span>{assigneeName}</span> }
                                     </span>
                                 )}
                                 {assigneeName && deskName && ' | '}
                                 {deskName && (
                                     <span className='d-flex text-nowrap ps-1'>
                                         <span className='coverage-item__text-label me-1'>{gettext('desk')}:</span>
-                                        <span className=''>{deskName}</span>
+                                        {assignedDeskEmail ? <a href={`mailto:${assignedDeskEmail}?subject=${gettext(subject)}`}
+                                            target="_blank">{deskName}</a> : <span>{deskName}</span>}
                                     </span>
                                 )}
                             </div>
