@@ -186,12 +186,12 @@ export function getCoverageDisplayName(coverageType: any) {
         get(coverageTypes, `${coverageType}.name`, coverageType);
 }
 
-export function getCoverageAsigneeName(coverage: any) {
+export function getCoverageAsigneeName(coverage: ICoverage) {
     return coverage.assigned_user_name || null;
 
 }
 
-export function getCoverageDeskName(coverage: any) {
+export function getCoverageDeskName(coverage: ICoverage) {
     return coverage.assigned_desk_name || null;
 }
 /**
@@ -1013,7 +1013,7 @@ export function isItemTBC(item: IAgendaItem): boolean {
  * @param {String} dateString
  * @return {String}
  */
-export function formatCoverageDate(coverage: any) {
+export function formatCoverageDate(coverage: ICoverage) {
     return get(coverage, TO_BE_CONFIRMED_FIELD) ?
         `${parseDate(coverage.scheduled).format(COVERAGE_DATE_FORMAT)} ${TO_BE_CONFIRMED_TEXT}` :
         parseDate(coverage.scheduled).format(COVERAGE_DATE_TIME_FORMAT);
@@ -1023,41 +1023,41 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
     const slugline = coverage.item_slugline || coverage.slugline;
     const coverageType = getCoverageDisplayName(coverage.coverage_type);
     const coverageScheduled = moment(coverage.scheduled);
-    const assignee = getCoverageAsigneeName(coverage) || '';
-    const desk = getCoverageDeskName(coverage) || '';
+    const assigneeText = getCoverageAsigneeName(coverage) ? `, assignee: ${getCoverageAsigneeName(coverage)}` : '';
+    const deskText = getCoverageDeskName(coverage) ? `, desk: ${getCoverageDeskName(coverage)}` : '';
 
     if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
-        return gettext('{{ type }} coverage {{ slugline }} {{ status_text }}, assignee: {{assignee}}, desk: {{desk}}', {
+        return gettext('{{ type }} coverage {{ slugline }} {{ status_text }}{{assignee}}{{desk}}', {
             type: coverageType,
             slugline: slugline,
             status_text: getCoverageStatusText(coverage),
-            assignee:assignee,
-            desk: desk,
+            assignee:assigneeText,
+            desk: deskText,
         });
     } else if (coverage.workflow_status === WORKFLOW_STATUS.ASSIGNED) {
-        return gettext('Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}}, assignee: {{assignee}}, desk: {{desk}}', {
+        return gettext('Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}}{{assignee}}{{desk}}', {
             type: coverageType,
             slugline: slugline,
             date: formatDate(coverageScheduled),
             time: formatTime(coverageScheduled),
-            assignee:assignee,
-            desk: desk,
+            assignee:assigneeText,
+            desk: deskText,
         });
     } else if (coverage.workflow_status === WORKFLOW_STATUS.ACTIVE) {
-        return gettext('{{ type }} coverage {{ slugline }} in progress, expected {{date}} at {{time}}, assignee: {{assignee}}, desk: {{desk}}', {
+        return gettext('{{ type }} coverage {{ slugline }} in progress, expected {{date}} at {{time}}{{assignee}}{{desk}}', {
             type: coverageType,
             slugline: slugline,
             date: formatDate(coverageScheduled),
             time: formatTime(coverageScheduled),
-            assignee:assignee,
-            desk: desk,
+            assignee:assigneeText,
+            desk: deskText,
         });
     } else if (coverage.workflow_status === WORKFLOW_STATUS.CANCELLED) {
-        return gettext('{{ type }} coverage {{slugline}} cancelled, assignee: {{assignee}}, desk: {{desk}}', {
+        return gettext('{{ type }} coverage {{slugline}} cancelled{{assignee}}{{desk}}', {
             type: coverageType,
             slugline: slugline,
-            assignee:assignee,
-            desk: desk,
+            assignee:assigneeText,
+            desk: deskText,
         });
     } else if (coverage.workflow_status === WORKFLOW_STATUS.COMPLETED) {
         let deliveryState: any;
@@ -1065,12 +1065,12 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
             deliveryState = beingUpdated ? gettext('(update to come)') : gettext('(updated)');
         }
 
-        return gettext('{{ type }} coverage {{ slugline }} available {{deliveryState}}, assignee: {{assignee}}, desk: {{desk}}', {
+        return gettext('{{ type }} coverage {{ slugline }} available {{deliveryState}} {{assignee}}{{desk}}', {
             type: coverageType,
             slugline: slugline,
             deliveryState: deliveryState,
-            assignee:assignee,
-            desk: desk,
+            assignee:assigneeText,
+            desk: deskText,
         });
     }
 
