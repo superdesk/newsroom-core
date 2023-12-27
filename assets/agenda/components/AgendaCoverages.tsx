@@ -32,14 +32,14 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
         return slugline ? ` | ${slugline}` : '';
     };
 
-    const coveragesWithoutState = coverages.filter((coverage: any) => WORKFLOW_COLORS[coverage.workflow_status] == null);
-    const coveragesWithState = coverages.filter((coverage: any) => WORKFLOW_COLORS[coverage.workflow_status] != null);
+    const coveragesWithoutState = coverages.filter((coverage: ICoverage) => WORKFLOW_COLORS[coverage.workflow_status] == null);
+    const coveragesWithState = coverages.filter((coverage: ICoverage) => WORKFLOW_COLORS[coverage.workflow_status] != null);
 
     return (
         <React.Fragment>
             {!coveragesWithoutState.length ? null : (
                 <div>
-                    {coveragesWithoutState.map((coverage: any) => ( 
+                    {coveragesWithoutState.map((coverage: ICoverage) => (
                         <i
                             className={`icon--coverage-${getCoverageIcon(coverage.coverage_type)} me-2`}
                             key={coverage.coverage_id}
@@ -48,7 +48,7 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                     ))}
                 </div>
             )}
-            {coveragesWithState.map((coverage: any) => {
+            {coveragesWithState.map((coverage: ICoverage) => {
                 const assigneeName = getCoverageAsigneeName(coverage);
                 const deskName = getCoverageDeskName(coverage);
                 const assignedUserEmail = coverage.assigned_user_email;
@@ -74,7 +74,8 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
 
                             <span className='coverage-item__coverage-heading'>
                                 <span className='fw-medium'>
-                                    {`${(coverage.genre?.length ?? 0) > 0 ? gettext(coverage.genre[0].name) : getCoverageDisplayName(coverage.coverage_type)}`}
+                                    {`${coverage.genre && (coverage.genre?.length ?? 0) > 0 ? gettext(
+                                        coverage.genre[0].name) : getCoverageDisplayName(coverage.coverage_type)}`}
                                 </span>
                                 {`${getSlugline(coverage)}`}
                             </span>
