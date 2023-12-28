@@ -53,7 +53,7 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                 const deskName = getCoverageDeskName(coverage);
                 const assignedUserEmail = coverage.assigned_user_email;
                 const assignedDeskEmail = coverage.assigned_desk_email;
-                const subject = `Coverage inquiry from NewsPro user: ${item.name || item.slugline}`;
+                const subject = gettext(`Coverage inquiry from ${window.sitename} user: ${item.name || item.slugline}`);
                 return(
                     <div
                         className={classNames(
@@ -86,7 +86,7 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                                 {assigneeName && (
                                     <span className='d-flex text-nowrap pe-1'>
                                         <span className='coverage-item__text-label me-1'>{gettext('assignee')}:</span>
-                                        {assignedUserEmail ? <a href={`mailto:${assignedUserEmail}?subject=${gettext(subject)}`} 
+                                        {assignedUserEmail ? <a href={`mailto:${assignedUserEmail}?subject=${subject}`} 
                                             target="_blank">{assigneeName}</a> : <span>{assigneeName}</span> }
                                     </span>
                                 )}
@@ -94,7 +94,7 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                                 {deskName && (
                                     <span className='d-flex text-nowrap ps-1'>
                                         <span className='coverage-item__text-label me-1'>{gettext('desk')}:</span>
-                                        {assignedDeskEmail ? <a href={`mailto:${assignedDeskEmail}?subject=${gettext(subject)}`}
+                                        {assignedDeskEmail ? <a href={`mailto:${assignedDeskEmail}?subject=${subject}`}
                                             target="_blank">{deskName}</a> : <span>{deskName}</span>}
                                     </span>
                                 )}
