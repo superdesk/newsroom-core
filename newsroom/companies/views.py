@@ -111,7 +111,7 @@ def get_company_updates(data, original=None):
         "contact_email": data.get("contact_email") or original.get("contact_email"),
         "phone": data.get("phone") or original.get("phone"),
         "country": data.get("country") or original.get("country"),
-        "is_enabled": data.get("is_enabled") or original.get("is_enabled"),
+        "is_enabled": data.get("is_enabled", original.get("is_enabled")),
         "company_type": data.get("company_type") or original.get("company_type"),
         "monitoring_administrator": data.get("monitoring_administrator") or original.get("monitoring_administrator"),
         "allowed_ip_list": data.get("allowed_ip_list") or original.get("allowed_ip_list"),
