@@ -11,8 +11,8 @@ import {connect} from 'react-redux';
 import {listConfigSelector} from 'ui/selectors';
 import {DEFAULT_COMPACT_META_FIELDS} from 'wire/components/WireListItem';
 import {IArticle, IListConfig} from 'interfaces';
-import {showModal} from '@superdesk/common';
 import {filterGroupsToLabelMap} from 'search/selectors';
+import {setActive, openItem} from 'wire/actions';
 
 interface IOwnProps {
     item: IArticle;
@@ -21,6 +21,7 @@ interface IOwnProps {
 interface IPropsReduxStore {
     listConfig: IListConfig;
     filterGroupLabels: any;
+    dispatch: any;
 }
 
 type IPropsCombined = IPropsReduxStore & IOwnProps;
@@ -44,29 +45,16 @@ class WireListPanel extends React.Component<IPropsCombined> {
         const {item, listConfig} = this.props;
         const isExtended = false;
 
-        // FIXME: Implement the proper subscription overlay
-        const showOverlay = () => showModal(({closeModal}) => {
-            return (
-                <div
-                    style={{
-                        position: 'absolute',
-                        zIndex: 2400,
-                        width: '100%',
-                        height: '100%',
-                        background: 'white'
-                    }}
-                >
-                    <div>subscribe</div>
-                    <button type='button' onClick={closeModal}>Close modal</button>
-                </div>
-            );
-        });
+        const onItemClick = () => {
+            this.props.dispatch(setActive(item._id));
+            this.props.dispatch(openItem(item));
+        };
+
         return (
             <article
                 key={item._id}
                 className={cardClassName}
-                onClick={() => showOverlay()}
-                onDoubleClick={() => showOverlay()}
+                onClick={onItemClick}
                 data-test-id={`wire-${item._id}`}
                 data-test-value={item._id}
             >
@@ -123,6 +111,7 @@ class WireListPanel extends React.Component<IPropsCombined> {
 const mapStateToProps = (state: any) => ({
     filterGroupLabels: filterGroupsToLabelMap(state),
     listConfig: listConfigSelector(state),
+    dispatch: {},
 });
 
 const WireListPanelConnected: React.ComponentType<IOwnProps> =
