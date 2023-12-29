@@ -53,7 +53,7 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                 const deskName = getCoverageDeskName(coverage);
                 const assignedUserEmail = coverage.assigned_user_email;
                 const assignedDeskEmail = coverage.assigned_desk_email;
-                const subject = gettext(`Coverage inquiry from ${window.sitename} user: ${item.name || item.slugline}`);
+                const subject = gettext(`Coverage inquiry from {{sitename}} user: ${item.name || item.slugline}`,{sitename: window.sitename});
                 return(
                     <div
                         className={classNames(
