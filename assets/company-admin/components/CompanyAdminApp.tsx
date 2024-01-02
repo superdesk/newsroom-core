@@ -188,7 +188,10 @@ class CompanyAdminAppComponent extends React.Component<IProps, IState> {
                             </button> */}
                             <div className="toggle-button__group toggle-button__group--navbar">
                                 <button
-                                    onClick={() => this.props.setSection('my_company')}
+                                    onClick={() => {
+                                        this.props.setSection('my_company');
+                                        this.props.setQuery('');
+                                    }}
                                     className={classNames(
                                         'toggle-button',
                                         {'toggle-button--active': this.props.sectionId === 'my_company'}
@@ -198,7 +201,10 @@ class CompanyAdminAppComponent extends React.Component<IProps, IState> {
                                     {gettext('My Company')}
                                 </button>
                                 <button
-                                    onClick={() => this.props.setSection('users')}
+                                    onClick={() => {
+                                        this.props.setSection('users');
+                                        this.props.setQuery('');
+                                    }}
                                     className={classNames(
                                         'toggle-button',
                                         {'toggle-button--active': this.props.sectionId === 'users'}
