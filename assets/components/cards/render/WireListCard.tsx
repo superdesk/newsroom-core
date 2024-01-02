@@ -12,10 +12,11 @@ import {listConfigSelector} from 'ui/selectors';
 import {DEFAULT_COMPACT_META_FIELDS} from 'wire/components/WireListItem';
 import {IArticle, IListConfig} from 'interfaces';
 import {filterGroupsToLabelMap} from 'search/selectors';
-import {setActive, openItem} from 'wire/actions';
 
 interface IOwnProps {
     item: IArticle;
+    openItem: (item: IArticle, cardId: string) => void;
+    cardId: string;
 }
 
 interface IPropsReduxStore {
@@ -42,12 +43,11 @@ class WireListPanel extends React.Component<IPropsCombined> {
         const wrapClassName = classNames('wire-articles__item wire-articles__item--wire wire-articles__item--list');
         const listImage = getImageForList(this.props.item);
         const compactFields = this.props.listConfig.compact_metadata_fields || DEFAULT_COMPACT_META_FIELDS;
-        const {item, listConfig} = this.props;
+        const {item, listConfig, cardId, openItem} = this.props;
         const isExtended = false;
 
         const onItemClick = () => {
-            this.props.dispatch(setActive(item._id));
-            this.props.dispatch(openItem(item));
+            openItem(item, cardId);
         };
 
         return (
@@ -120,13 +120,22 @@ const WireListPanelConnected: React.ComponentType<IOwnProps> =
 export interface IWireListCardProps {
     items: Array<IArticle>;
     title?: string;
+    openItem: (item: IArticle, cardId: string) => void;
+    cardId: string;
 }
 
-const WireListCard: React.ComponentType<IWireListCardProps> = ({items, title}: IWireListCardProps) => {
+const WireListCard: React.ComponentType<IWireListCardProps> = ({items, title, openItem, cardId}: IWireListCardProps) => {
     return (
         <div className='row'>
             <MoreNewsButton kind='product' title={title ?? ''} />
-            {items.map((item: IArticle) => (<WireListPanelConnected key={item._id} item={item} />))}
+            {items.map((item: IArticle) => (
+                <WireListPanelConnected
+                    key={item._id}
+                    item={item}
+                    cardId={cardId}
+                    openItem={openItem}
+                />
+            ))}
         </div>
     );
 };
