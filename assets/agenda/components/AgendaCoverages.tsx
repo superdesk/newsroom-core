@@ -53,7 +53,8 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                 const deskName = getCoverageDeskName(coverage);
                 const assignedUserEmail = coverage.assigned_user_email;
                 const assignedDeskEmail = coverage.assigned_desk_email;
-                const subject = gettext(`Coverage inquiry from {{sitename}} user: ${item.name || item.slugline}`,{sitename: window.sitename});
+                const subject = gettext('Coverage inquiry from {{sitename}} user: {{item}}',
+                    {sitename: window.sitename, item: item.name || item.slugline});
                 return(
                     <div
                         className={classNames(
@@ -62,7 +63,7 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                         )}
                         key={coverage.coverage_id}
                         onClick={onClick}
-                        title={onClick ? gettext('Open {{agenda}} in a new tab', window.sectionNames) : onClick}
+                        title={gettext('Open {{agenda}} in a new tab', window.sectionNames) || onClick}
                     >
                         <div
                             className='coverage-item__row coverage-item__row--header-row'
@@ -77,7 +78,7 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                                     {`${coverage.genre && (coverage.genre?.length ?? 0) > 0 ? gettext(
                                         coverage.genre[0].name) : getCoverageDisplayName(coverage.coverage_type)}`}
                                 </span>
-                                {`${getSlugline(coverage)}`}
+                                {getSlugline(coverage)}
                             </span>
 
                         </div>

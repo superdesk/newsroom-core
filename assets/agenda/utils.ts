@@ -1029,16 +1029,19 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
     const coverageScheduled = moment(coverage.scheduled);
     const assignee = getCoverageAsigneeName(coverage);
     const desk = getCoverageDeskName(coverage);
-    const assignedDetails = `${assignee ? `, ${gettext('assignee')}: ${assignee}` : ''}${desk ? `, ${gettext('desk')}: ${desk}` : ''}`;
+    const assignedDetails = [
+        assignee ? gettext('assignee: {{name}}', {name: assignee}) : '',
+        desk ? gettext('desk: {{name}}', {name: desk}) : '',
+    ].filter((x) => x !== '').join(', ');
     if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
-        return gettext('{{ type }} coverage {{ slugline }} {{ status_text }}{{assignedDetails}}', {
+        return gettext('{{ type }} coverage {{ slugline }} {{ status_text }} {{assignedDetails}}', {
             type: coverageType,
             slugline: slugline,
             status_text: getCoverageStatusText(coverage),
             assignedDetails,
         });
     } else if (coverage.workflow_status === WORKFLOW_STATUS.ASSIGNED) {
-        return gettext('Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}}{{assignedDetails}}', {
+        return gettext('Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}} {{assignedDetails}}', {
             type: coverageType,
             slugline: slugline,
             date: formatDate(coverageScheduled),
@@ -1046,7 +1049,7 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
             assignedDetails,
         });
     } else if (coverage.workflow_status === WORKFLOW_STATUS.ACTIVE) {
-        return gettext('{{ type }} coverage {{ slugline }} in progress, expected {{date}} at {{time}}{{assignedDetails}}', {
+        return gettext('{{ type }} coverage {{ slugline }} in progress, expected {{date}} at {{time}} {{assignedDetails}}', {
             type: coverageType,
             slugline: slugline,
             date: formatDate(coverageScheduled),
@@ -1054,7 +1057,7 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
             assignedDetails,
         });
     } else if (coverage.workflow_status === WORKFLOW_STATUS.CANCELLED) {
-        return gettext('{{ type }} coverage {{slugline}} cancelled{{assignedDetails}}', {
+        return gettext('{{ type }} coverage {{slugline}} cancelled {{assignedDetails}}', {
             type: coverageType,
             slugline: slugline,
             assignedDetails,
@@ -1065,7 +1068,7 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
             deliveryState = beingUpdated ? gettext('(update to come)') : gettext('(updated)');
         }
 
-        return gettext('{{ type }} coverage {{ slugline }} available {{deliveryState}}{{assignedDetails}}', {
+        return gettext('{{ type }} coverage {{ slugline }} available {{deliveryState}} {{assignedDetails}}', {
             type: coverageType,
             slugline: slugline,
             deliveryState: deliveryState,
@@ -1073,7 +1076,7 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
         });
     }
 
-    return gettext('{{ type }} coverage{{assignedDetails}}', {type: coverageType, assignedDetails});
+    return gettext('{{ type }} coverage {{assignedDetails}}', {type: coverageType, assignedDetails});
 };
 
 function getScheduleType(item: IAgendaItem): string {
