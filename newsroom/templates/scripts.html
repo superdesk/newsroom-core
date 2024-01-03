@@ -17,6 +17,7 @@
         regular: `{{ render_search_tips_html('regular') | safe }}`,
         advanced: `{{ render_search_tips_html('advanced') | safe }}`,
     }
+    window.sitename = '{{ config.SITE_NAME }}';
 </script>
 {% endif %}
 
