@@ -1,7 +1,8 @@
-from flask import g
 import pytest
+import superdesk
 import tests.utils as utils
 
+from flask import g
 from newsroom.users.users import UserRole
 
 from .fixtures import (
@@ -32,7 +33,7 @@ def product(app):
 
 
 @pytest.fixture
-def manager(app, client, product):
+def company(app, product):
     company = COMPANIES[1].copy()
     company["name"] = "Example co."
     company["products"] = [
@@ -43,7 +44,11 @@ def manager(app, client, product):
     ]
     company.pop("_id")
     app.data.insert("companies", [company])
+    return company
 
+
+@pytest.fixture
+def manager(app, client, product, company):
     manager = USERS[1].copy()
     manager["company"] = company["_id"]
     manager["email"] = "manager@example.com"
@@ -60,7 +65,7 @@ def manager(app, client, product):
     return manager
 
 
-def test_user_products(app, client, manager, product):
+def test_user_products(app, client, manager, product, company):
     g.settings["allow_companies_to_manage_products"]["value"] = True
     utils.patch_json(
         client,
@@ -84,6 +89,18 @@ def test_user_products(app, client, manager, product):
 
     data = utils.get_json(client, "/wire/search?q=amazon")
     assert 0 == len(data["_items"])
+
+
+def test_user_products_after_company_update(app, client, manager, product, company):
+    superdesk.get_resource_service("companies").patch(
+        company["_id"],
+        {
+            "products": [{"section": "wire", "_id": product["_id"]}],
+        },
+    )
+
+    user = app.data.find_one("users", req=None, _id=manager["_id"])
+    assert user["products"]
 
 
 def test_user_sections(app, client, manager, product):

@@ -667,12 +667,16 @@ export function getDisplayDates(item: IAgendaItem): Array<{date: string}> {
             return;
         }
 
-        coverages.forEach((coverage) => {
+        coverages.forEach((coverage: any) => {
             if (!coverageIds.includes(coverage.coverage_id)) {
                 return;
             }
 
-            dates.push({date: coverage.scheduled ?? coverage.planning?.scheduled});
+            if (coverage.planning?.scheduled != null) {
+                // when restricted coverage is enabled
+                // there might be no date
+                dates.push({date: coverage.planning.scheduled});
+            }
         });
     });
 
@@ -810,7 +814,7 @@ export function groupItems(
             for (const day = start.clone(); day.isSameOrBefore(end, 'day'); day.add(1, 'd')) {
                 const isBetween = isBetweenDay(day, itemStartDate, itemEndDate, item.dates.all_day, item.dates.no_end_time);
                 const containsExtra = containsExtraDate(item, day);
-                const addGroupItem: boolean = item.event == null || item._hits?.matched_planning_items != null ?
+                const addGroupItem: boolean = (item.event == null || item._hits?.matched_planning_items != null) && itemExtraDates.length ?
                     containsExtra || (scheduleType === SCHEDULE_TYPE.MULTI_DAY && isBetween) :
                     isBetween || containsExtra;
 

@@ -686,15 +686,19 @@ def test_filter_and_sorting_user(app, client):
     assert users[2]["first_name"] == "Zoe"
 
     # sort by Last_name
-    users = client.get("/users/search?q=" "&sort=[('last_name', 1)]").get_json()
+    users = client.get("/users/search?q=&sort=[('last_name', 1)]").get_json()
     assert users[0]["last_name"] == "AAba"
     assert users[1]["last_name"] == "Bar"
 
     # filter by Company_id
-    users = client.get('/users/search?q=""&where={"company":"6215cbf55fc14ebe18e175a5"}').get_json()
+    users = client.get('/users/search?q=&where={"company":"6215cbf55fc14ebe18e175a5"}').get_json()
     assert len(users) == 2
     assert users[0]["company"] == "6215cbf55fc14ebe18e175a5"
 
+    # filter by company and search by name
+    users = client.get('/users/search?q=foo&where={"company":"6215cbf55fc14ebe18e175a5"}').get_json()
+    assert len(users) == 1
+
     # filter by products
-    users = client.get('/users/search?q=""&where={"products._id":"random"}').get_json()
+    users = client.get('/users/search?q=&where={"products._id":"random"}').get_json()
     assert len(users) == 0
