@@ -63,7 +63,7 @@ function AgendaCoveragesComponent({item, coverages, wireItems, actions, user, on
                         )}
                         key={coverage.coverage_id}
                         onClick={onClick}
-                        title={gettext('Open {{agenda}} in a new tab', window.sectionNames) || onClick}
+                        title={onClick ? gettext('Open {{agenda}} in a new tab', window.sectionNames) : ''}
                     >
                         <div
                             className='coverage-item__row coverage-item__row--header-row'
