@@ -83,11 +83,11 @@ export interface ICoverage {
     assigned_desk_email?: string;
     assigned_user_name?: string;
     assigned_user_email?: string;
-    genre?:Array<{
-        qcode:string,
-        name:string
+    genre?: Array<{
+        qcode: string,
+        name: string
     }>;
-    coverage_provider?:string;
+    coverage_provider?: string;
 }
 
 export interface IAgendaItem extends IResourceItem {
