@@ -115,11 +115,14 @@ class CompaniesService(newsroom.Service):
     def on_updated(self, updates, original):
         app.cache.delete(str(original["_id"]))
 
+        updated = original.copy()
+        updated.update(updates)
+
         original_section_names = get_company_section_names(original)
         original_product_ids = get_company_product_ids(original)
 
-        updated_section_names = get_company_section_names(updates) if "sections" in updates else original_section_names
-        updated_product_ids = get_company_product_ids(updates) if "products" in updates else original_product_ids
+        updated_section_names = get_company_section_names(updated)
+        updated_product_ids = get_company_product_ids(updated)
 
         if original_section_names != updated_section_names or original_product_ids != updated_product_ids:
             user_service = get_resource_service("users")
