@@ -24,6 +24,7 @@ class CardsResource(newsroom.Resource):
                 "3-picture-text",
                 "2x2-events",
                 "6-navigation-row",
+                "wire-list",
             ],
         },
         "config": {
