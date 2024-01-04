@@ -53,9 +53,11 @@ def page(template):
 def render_public_dashboard():
     return render_template(
         "public_dashboard.html",
-        cards=get_public_cards(),
-        ui_config=get_public_dashboard_config(),
-        items_by_card=get_public_items_by_cards(),
+        data={
+            "cards": get_public_cards(),
+            "ui_config": get_public_dashboard_config(),
+            "items_by_card": get_public_items_by_cards(),
+        },
     )
 
 
