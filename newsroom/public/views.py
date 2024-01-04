@@ -57,6 +57,7 @@ def render_public_dashboard():
             "cards": get_public_cards(),
             "ui_config": get_public_dashboard_config(),
             "items_by_card": get_public_items_by_cards(),
+            "groups": app.config.get("WIRE_GROUPS", []),
         },
     )
 

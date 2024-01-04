@@ -28,6 +28,7 @@ export function publicAppReducer(state: IPublicAppState = initialState, action: 
                 ...state,
                 cards: action.payload.cards,
                 uiConfig: action.payload.ui_config,
+                groups: action.payload.groups,
             },
             getMultipleCardItems(action.payload.items_by_card),
         );
