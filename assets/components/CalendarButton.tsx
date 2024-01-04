@@ -31,7 +31,7 @@ class CalendarButton extends React.Component<any, any> {
         const rootLocale = locale.substring(0, 2);
         const allLocales = locales as any;
 
-        return allLocales[locale] || allLocales[rootLocale];
+        return allLocales[locale] ?? allLocales[rootLocale];
     };
 
     render() {
