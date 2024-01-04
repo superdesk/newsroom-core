@@ -14,7 +14,7 @@ import {SearchResultTagsList} from './SearchResultsBar/SearchResultTagsList';
 import {TopicFolderEditor} from './TopicFolderEditor';
 import {noop} from 'lodash';
 
-const TOPIC_NAME_MAXLENGTH = 30;
+const TOPIC_NAME_MAXLENGTH = 40;
 
 function getFolderName(topic: ITopic, folders: Array<ITopicFolder>): string {
     const folder = topic.folder ? folders.find((folder: any) => folder._id === topic.folder) : null;
