@@ -1,4 +1,6 @@
 import {memoize} from 'lodash';
+import * as React from 'react';
+import {ComponentType} from 'react';
 
 import {IArticle, IListConfig} from 'interfaces';
 
@@ -18,7 +20,7 @@ import EventsTwoByTwoCard from 'components/cards/render/EventsTwoByTwoCard';
 import NavigationSixPerRow from 'components/cards/render/NavigationSixPerRow';
 import {gettext} from 'utils';
 import {MoreNewsSearchKind} from './render/MoreNewsButton';
-import {ComponentType} from 'react';
+
 
 export interface IEventsCardProps {
     events: any;
@@ -35,6 +37,7 @@ export interface IPictureCardProps {
     moreUrl: string;
     moreUrlLabel: string;
     listConfig: any;
+    onMoreNewsClicked?(event: React.MouseEvent<HTMLAnchorElement>): void;
 }
 
 export interface ICardProps {
@@ -47,6 +50,7 @@ export interface ICardProps {
     listConfig: IListConfig;
     kind?: MoreNewsSearchKind;
     type: string;
+    onMoreNewsClicked?(event: React.MouseEvent<HTMLAnchorElement>): void;
 }
 
 interface IEventsCard {

@@ -19,7 +19,14 @@ const PhotoGalleryCard: React.ComponentType<IPictureCardProps> = (props: IPictur
 
     return (
         <div className='row'>
-            <MoreNewsButton kind="product" key="more" title={title} photoUrl={moreUrl} photoUrlLabel={moreUrlLabel} />
+            <MoreNewsButton
+                kind="product"
+                key="more"
+                title={title}
+                photoUrl={moreUrl}
+                photoUrlLabel={moreUrlLabel}
+                onMoreNewsClicked={props.onMoreNewsClicked}
+            />
             {photos.map((photo: any, index: any) => getMediaPanel(photo, index))}
         </div>
     );
