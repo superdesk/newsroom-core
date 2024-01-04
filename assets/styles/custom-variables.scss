@@ -126,7 +126,7 @@ $container-max-widths: (
     // Medium
     --color-neutral-300: hsl(0, 2%, 74%);
     --color-neutral-400: hsl(0, 2%, 54%);
-    --color-neutral-500: hsl(0, 2%, 40%);
+    // --color-neutral-500: hsl(0, 2%, 40%);
 
     --color-neutral-600: hsl(0, 2%, 34%);
     // Dark
@@ -142,6 +142,7 @@ $container-max-widths: (
     @include defineColorHSL(--color-highlight, 356, 72%, 46%);
     @include defineColorHSL(--color-highlight1, 268, 68%, 45%);
     @include defineColorHSL(--color-highlight2, 310, 89%, 36%);
+    @include defineColorHSL(--color-neutral-500, 0, 2%, 40%);
 
     // THEME COLORS
     @include defineColorHSL(--color-primary, 196, 100%, 34%);

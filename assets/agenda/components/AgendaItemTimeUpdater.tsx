@@ -6,6 +6,7 @@ import classNames from 'classnames';
 
 import {bem} from 'ui/utils';
 import {gettext} from 'utils';
+import {Label} from 'components/Label';
 
 class AgendaItemTimeUpdater extends React.Component<any, any> {
     static propTypes: any;
@@ -108,7 +109,7 @@ class AgendaItemTimeUpdater extends React.Component<any, any> {
 
         return(
             <div className={className}>
-                <div className="label label--blue">{this.state.timeText}</div>
+                <Label text={this.state.timeText} type='info' style='translucent' />
             </div>
         );
     }

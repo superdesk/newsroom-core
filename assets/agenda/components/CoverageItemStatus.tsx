@@ -14,6 +14,7 @@ import AgendaEdNote from './AgendaEdNote';
 import ActionButton from 'components/ActionButton';
 
 import {Tooltip} from 'bootstrap';
+import {Label} from 'components/Label';
 
 function getDeliveryHref(coverage: any) {
     return get(coverage, 'delivery_href');
@@ -185,7 +186,7 @@ export default class CoverageItemStatus extends React.Component<any, any> {
 
                 {isCoverageBeingUpdated(coverage) && (
                     <div className='coverage-item__row'>
-                        <span className='label label--blue'>{gettext('Update coming')}</span>
+                        <Label text={gettext('Update coming')} type='info' style='translucent' />
                     </div>
                 )}
 

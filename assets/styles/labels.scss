@@ -1,5 +1,32 @@
 // Labels
 
+$label-bg-colors: (
+    default:        var(--color-neutral-500),
+    warning:        var(--color-warning),
+    alert:          var(--color-alert),
+    success:        var(--color-success),
+    info:           var(--color-info),
+    highlight:      var(--color-highlight2),
+);
+
+$label-bg-colors-translucent: (
+    default:        alpha(var(--color-neutral-500), 0.25),
+    warning:        alpha(var(--color-warning), 0.25),
+    alert:          alpha(var(--color-alert), 0.25),
+    success:        alpha(var(--color-success), 0.25),
+    info:           alpha(var(--color-info), 0.25),
+    highlight:      alpha(var(--color-highlight), 0.25),
+);
+
+$label-text-colors: (
+    default:        var(--tag-label-txt-default),
+    warning:        lightness(var(--color-warning), 0.65),
+    alert:          lightness(var(--color-alert), 0.65),
+    success:        lightness(var(--color-success), 0.65),
+    info:           lightness(var(--color-info), 0.65),
+    highlight:      var(--tag-label-txt-inverse),
+);
+
 $labels-palette: (
   blue: $main-blue,
   green: $green,
@@ -19,13 +46,13 @@ $labels-palette: (
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0 var(--space--1);
+    padding: 0 var(--space--1-5);
     vertical-align: middle;
     border-radius: var(--border-radius--xs);
     text-transform: uppercase;
     line-height: 1;
     letter-spacing: 0.125em;
-    font-size: 9px;
+    font-size: 10px;
     white-space: nowrap;
     cursor: default;
     border: 1px solid transparent;
@@ -38,76 +65,49 @@ $labels-palette: (
     @include label;
     --label-height: 20px;
 
-    background-color: transparent;
-    border-style: solid;
-    border-width: 1px;
-    border-color: $gray-mid;
-    color: $gray-mid;
-
-    @each $name, $color in $labels-palette {
+    @each $name, $color in $label-bg-colors {
         &.label--#{$name} {
-            border-color: transparent;
-            color: $color;
-            text-decoration-color: $color;
-            background-color: rgba($color, 0.2);
-        }
-    }
-    @each $name, $color in $labels-palette {
-        &.label--rounded.label--#{$name} {
-            background-color: rgba($color, 0.2);
+            color: $white;
+            background-color: $color;
         }
     }
 
-    &.label--big,
-    &.label--large {
+    &.label--big {
         --label-height: 24px;
         font-size: 11px;
         line-height: 1;
         padding: 0 var(--space--1-5);
     }
-    &.label--fill {
-        @each $name, $color in $labels-palette {
+
+    &.label--hollow {
+        @each $name, $color in $label-bg-colors {
+            &.label--#{$name} {
+                border: 1px solid $color;
+                background-color: transparent !important;
+                color: $color;
+            }
+        }
+    }
+
+    &.label--translucent {
+        @each $name, $color in $label-bg-colors-translucent {
             &.label--#{$name} {
                 background-color: $color;
-                border-color: $color;
-                color: $white;
-                text-decoration-color: $white;
+            }
+        }
+
+        @each $name, $color in $label-text-colors {
+            &.label--#{$name} {
+                color: $color;
             }
         }
     }
 }
 
 .label--rounded {
-    --label-height: 20px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: var(--label-height);
-    padding: 0 var(--space--1-5);
     border-radius: var(--border-radius--full);
-    font-size: 10px;
-    letter-spacing: 0.125em;
-    line-height: 1;
-    text-transform: uppercase;
-    white-space: nowrap;
-    cursor: default;
-    border-color: transparent;
-    font-weight: 600;
-    background-color: hsla(0, 0%, 60%, 0.25);
-    color: var(--color-text--muted);
-    &.label--alert {
-        background-color: alpha(var(--color-alert), 0.25);
-        color: lightness(var(--color-alert), 0.85);
-    }
-    &.label--big,
-    &.label--large {
-        --label-height: 24px;
-        font-size: 11px;
-        line-height: 1;
-        padding: 0 var(--space--1-5);
-    }
-
 }
+
 .label + .label {
     margin-inline-start: var(--space--1);
 }

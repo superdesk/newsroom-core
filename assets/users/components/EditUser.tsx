@@ -32,6 +32,7 @@ import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserList
 import {companyProductSeatsSelector, companySectionListSelector, sectionListSelector} from 'company-admin/selectors';
 import {IUser} from 'interfaces/user';
 import ActionButton from 'components/ActionButton';
+import {Label} from 'components/Label';
 
 const getCompanyOptions = (companies: Array<ICompany>) => companies.map((company) => ({value: company._id, text: company.name}));
 
@@ -156,9 +157,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                 {stateLabelDetails.text}
                             </label>
                             {user.user_type !== 'administrator' ? null : (
-                                <label className="label label--green label--fill label--big label--rounded">
-                                    {gettext('Admin')}
-                                </label>
+                                <Label text={gettext('Admin')} type='success' style='fill' size='big' />
                             )}
                             {!showResendInvite ? null : (
                                 <ActionButton

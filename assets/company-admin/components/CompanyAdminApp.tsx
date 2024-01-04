@@ -34,6 +34,7 @@ import {CompanyDetailsProductFilter} from './CompanyDetailsProductFilter';
 import {CompanyAdminProductSeatRequestModal} from './CompanyAdminProductSeatRequestModal';
 import {IUser} from 'interfaces/user';
 import {ICompanyAdminStore} from 'company-admin/reducers';
+import {Label} from 'components/Label';
 
 interface IStateProps {
     sectionId: string;
@@ -215,8 +216,9 @@ class CompanyAdminAppComponent extends React.Component<IProps, IState> {
                                 </button>
                             </div>
 
-                            {this.props.sectionId === 'users' ? <label className='label label--big label--rounded me-2'>{
-                                gettext('Users : {{total}}', {total : this.props.totalUsers})}</label> : ''}
+                            {this.props.sectionId === 'users'
+                                && <Label text={gettext('Users : {{total}}', {total : this.props.totalUsers})} size='big' style='translucent' className='me-2' />
+                            }
                             <div className="content-bar-divider" />
                             {this.props.sectionId !== 'users' ? null : (
                                 <React.Fragment>
