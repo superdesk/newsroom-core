@@ -9,7 +9,7 @@ from superdesk.upload import upload_url as _upload_url
 from superdesk.media.media_operations import guess_media_extension
 
 import newsroom
-from newsroom.decorator import login_required
+from newsroom.decorator import is_valid_session, clear_session_and_redirect_to_login
 
 
 cache_for = 3600 * 24 * 7  # 7 days cache
@@ -26,8 +26,11 @@ def get_file(key):
 
 
 @blueprint.route("/assets/<path:media_id>", methods=["GET"])
-@login_required
 def get_upload(media_id, filename=None):
+    # Allow access to ``/assets/<media_id>`` if PUBLIC_DASHBOARD is enabled or is a valid session
+    if not flask.current_app.config.get("PUBLIC_DASHBOARD") and not is_valid_session():
+        return clear_session_and_redirect_to_login()
+
     try:
         media_file = flask.current_app.media.get(media_id, ASSETS_RESOURCE)
     except bson.errors.InvalidId:
