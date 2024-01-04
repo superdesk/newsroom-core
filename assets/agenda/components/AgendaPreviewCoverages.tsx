@@ -10,6 +10,7 @@ import PreviewBox from 'ui/components/PreviewBox';
 import AgendaCoverages from './AgendaCoverages';
 import AgendaInternalNote from './AgendaInternalNote';
 import AgendaEdNote from './AgendaEdNote';
+import AgendaLongDescription from './AgendaLongDescription';
 
 class AgendaPreviewCoverages extends React.Component<any, any> {
     static propTypes: any;
@@ -95,9 +96,8 @@ class AgendaPreviewCoverages extends React.Component<any, any> {
                                     <span>{agendaNames}</span>
                                 </div>
                             )}
-                            <p>
-                                {plan.description_text}
-                            </p>
+
+                            <AgendaLongDescription item={item} plan={plan}/>
 
                             {!plan.ednote ? null : (
                                 <AgendaEdNote
@@ -105,6 +105,7 @@ class AgendaPreviewCoverages extends React.Component<any, any> {
                                     noMargin={true}
                                 />
                             )}
+
                             {!plan.internal_note ? null : (
                                 <AgendaInternalNote
                                     internalNote={plan.internal_note}

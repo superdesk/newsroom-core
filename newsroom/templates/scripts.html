@@ -10,6 +10,7 @@
         monitoring: "{{ config.MONITORING_SECTION }}",
         saved: "{{ config.SAVED_SECTION }}",
     };
+    window.sitename = '{{ config.SITE_NAME }}';
 
     {% if session.get("user") %}
         window.notificationData = {{ get_initial_notifications() | tojson | safe }};
