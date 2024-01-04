@@ -26,7 +26,7 @@ interface IDispatchProps {
 }
 
 type IProps = IStateProps & IDispatchProps;
-const RESTRICTED_ACCESS_MODAL_NAME = 'userRegistration';
+const RESTRICTED_ACCESS_MODAL_NAME = 'restrictedAccessModal';
 
 const PublicAppComponent: React.FC<IProps> = ({
     cards,
