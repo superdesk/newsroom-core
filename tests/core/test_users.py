@@ -213,11 +213,7 @@ def test_create_new_user_succeeds(app, client):
     assert response.status_code == 302
 
     # Login with the new account succeeds
-    response = client.post(
-        url_for("auth.login"),
-        data={"email": "new.user@abc.org", "password": "abc123def"},
-        follow_redirects=True,
-    )
+    response = login(client, {"email": "new.user@abc.org", "password": "abc123def"}, follow_redirects=True)
     assert response.status_code == 200
     assert "John" in response.get_data(as_text=True)
 
@@ -491,11 +487,7 @@ def test_account_manager_can_update_user(app, client):
         "company": company_ids[0],
     }
     app.data.insert("users", [account_mgr])
-    response = client.post(
-        url_for("auth.login"),
-        data={"email": "accountmgr@sourcefabric.org", "password": "admin"},
-        follow_redirects=True,
-    )
+    response = login(client, {"email": "accountmgr@sourcefabric.org", "password": "admin"}, follow_redirects=True)
     assert response.status_code == 200
     account_mgr["first_name"] = "Updated Account"
     response = client.post("users/5c5914275f627d5885fee6a8", data=account_mgr, follow_redirects=True)
