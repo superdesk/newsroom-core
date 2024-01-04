@@ -1,8 +1,5 @@
-{% if session.get("user") %}
 <script>
     window.newsroom = {{ get_client_config() | tojson | safe }};
-    window.notificationData = {{ get_initial_notifications() | tojson | safe }};
-    window.profileData = {{ get_user_profile_data() | tojson | safe }};
     window.translations = {{ get_client_translations() | tojson | safe }};
     window.locales = {{ get_client_locales() | tojson | safe }};
     window.locale = '{{ get_locale() | tojson | safe }}';
@@ -13,12 +10,18 @@
         monitoring: "{{ config.MONITORING_SECTION }}",
         saved: "{{ config.SAVED_SECTION }}",
     };
-    window.searchTipsHtml = {
-        regular: `{{ render_search_tips_html('regular') | safe }}`,
-        advanced: `{{ render_search_tips_html('advanced') | safe }}`,
-    }
+
+    {% if session.get("user") %}
+        window.notificationData = {{ get_initial_notifications() | tojson | safe }};
+        window.profileData = {{ get_user_profile_data() | tojson | safe }};
+        window.searchTipsHtml = {
+            regular: `{{ render_search_tips_html('regular') | safe }}`,
+            advanced: `{{ render_search_tips_html('advanced') | safe }}`,
+        }
+    {% elif config.PUBLIC_DASHBOARD %}
+        window.restrictedActionModalBody = `{{ render_restricted_action_modal_body() | safe }}`;
+    {% endif %}
 </script>
-{% endif %}
 
 {{ javascript_tag('newsroom_js') | safe }}
 

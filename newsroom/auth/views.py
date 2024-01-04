@@ -31,6 +31,7 @@ from newsroom.auth.utils import (
     start_user_session,
     send_token,
     get_company_auth_provider,
+    is_valid_session,
 )
 from newsroom.utils import (
     is_company_enabled,
@@ -52,6 +53,11 @@ logger = logging.getLogger(__name__)
 @blueprint.route("/login", methods=["GET", "POST"])
 @limiter.limit("60/minute")
 def login():
+    if is_valid_session():
+        # If user has already logged in, then redirect them to the next page
+        # which defaults to the home page
+        return redirect_to_next_url()
+
     form = LoginForm()
 
     if form.validate_on_submit():
@@ -115,7 +121,9 @@ def email_has_exceeded_max_login_attempts(email):
 
     if login_attempt["attempt_count"] == max_attempt_allowed:
         if login_attempt.get("user_id"):
-            get_resource_service("users").patch(id=ObjectId(login_attempt["user_id"]), updates={"is_enabled": False})
+            get_resource_service("auth_user").patch(
+                id=ObjectId(login_attempt["user_id"]), updates={"is_enabled": False}
+            )
         return True
 
     return login_attempt["attempt_count"] >= max_attempt_allowed
@@ -200,7 +208,7 @@ def login_with_token(token):
 @blueprint.route("/logout")
 def logout():
     clear_user_session()
-    return flask.redirect(flask.url_for("auth.login", logout=1))
+    return flask.redirect(flask.url_for("wire.index"))
 
 
 @blueprint.route("/signup", methods=["GET", "POST"])
