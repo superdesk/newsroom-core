@@ -8,6 +8,7 @@ import ConfigEvent from 'components/cards/edit/ConfigEvent';
 import ConfigExternalMedia from 'components/cards/edit/ConfigExternalMedia';
 import ConfigNavigation from 'components/cards/edit/ConfigNavigation';
 import ConfigProduct from 'components/cards/edit/ConfigProduct';
+import {ConfigWireList} from './edit/ConfigWireList';
 
 import TextOnlyCard from 'components/cards/render/TextOnlyCard';
 import PictureTextCard from 'components/cards/render/PictureTextCard';
@@ -20,7 +21,7 @@ import EventsTwoByTwoCard from 'components/cards/render/EventsTwoByTwoCard';
 import NavigationSixPerRow from 'components/cards/render/NavigationSixPerRow';
 import {gettext} from 'utils';
 import {MoreNewsSearchKind} from './render/MoreNewsButton';
-import WireListCard, {IWireListCardProps} from './render/WireListCard';
+import WireListCard from './render/WireListCard';
 
 export interface IEventsCardProps {
     events: any;
@@ -62,15 +63,6 @@ interface IEventsCard {
 }
 
 
-interface IWireListCard {
-    _id: 'wire-list';
-    text: string;
-    size: number;
-    dashboardComponent: ComponentType<IWireListCardProps>;
-    editComponent: ComponentType<any>;
-}
-
-
 interface IPhotoCard {
     _id: '4-photo-gallery';
     text: string;
@@ -103,7 +95,7 @@ interface ICard {
     dashboardComponent: ComponentType<ICardProps>;
 }
 
-type ICardUnified = IWireListCard | IEventsCard | IPhotoCard | ICard | INavigationRowCard;
+type ICardUnified = IEventsCard | IPhotoCard | ICard | INavigationRowCard;
 
 const CARD_TYPES: Array<ICardUnified> = [
     {
@@ -179,7 +171,7 @@ const CARD_TYPES: Array<ICardUnified> = [
     {
         _id: 'wire-list',
         text: gettext('wire-list'),
-        editComponent: ConfigProduct,
+        editComponent: ConfigWireList,
         dashboardComponent: WireListCard,
         size: 4,
     },
