@@ -20,7 +20,7 @@ import EventsTwoByTwoCard from 'components/cards/render/EventsTwoByTwoCard';
 import NavigationSixPerRow from 'components/cards/render/NavigationSixPerRow';
 import {gettext} from 'utils';
 import {MoreNewsSearchKind} from './render/MoreNewsButton';
-
+import WireListCard, {IWireListCardProps} from './render/WireListCard';
 
 export interface IEventsCardProps {
     events: any;
@@ -61,6 +61,16 @@ interface IEventsCard {
     dashboardComponent: ComponentType<IEventsCardProps>;
 }
 
+
+interface IWireListCard {
+    _id: 'wire-list';
+    text: string;
+    size: number;
+    dashboardComponent: ComponentType<IWireListCardProps>;
+    editComponent: ComponentType<any>;
+}
+
+
 interface IPhotoCard {
     _id: '4-photo-gallery';
     text: string;
@@ -85,14 +95,15 @@ interface ICard {
     | '2x2-top-news'
     | '3-text-only'
     | '4-text-only'
-    | '3-picture-text';
+    | '3-picture-text'
+    |'wire-list';
     text: string;
     editComponent: ComponentType<any>;
     size: number;
     dashboardComponent: ComponentType<ICardProps>;
 }
 
-type ICardUnified = IEventsCard | IPhotoCard | ICard | INavigationRowCard;
+type ICardUnified = IWireListCard | IEventsCard | IPhotoCard | ICard | INavigationRowCard;
 
 const CARD_TYPES: Array<ICardUnified> = [
     {
@@ -163,6 +174,13 @@ const CARD_TYPES: Array<ICardUnified> = [
         text: gettext('2x2-events'),
         editComponent: ConfigEvent,
         dashboardComponent: EventsTwoByTwoCard,
+        size: 4,
+    },
+    {
+        _id: 'wire-list',
+        text: gettext('wire-list'),
+        editComponent: ConfigProduct,
+        dashboardComponent: WireListCard,
         size: 4,
     },
     {
