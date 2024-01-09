@@ -648,6 +648,14 @@ $container-max-widths: (
     --search-result-tags-list-color-bg: var(--color-background--muted-2);
     --search-result-tags-list-shadow-inner: inset 0 1px 2px hsla(0, 0%, 0%, 0.08), inset 0 -1px 2px hsla(0, 0%, 0%, 0.06);
 
+    // COMPONENT: MULTI-DAY LABEL
+    --multiday-label-color-bg: hsl(89, 66%, 30%);
+    --multiday-label-color-fg: hsl(0, 0%, 100%);
+    --multiday-label-font-size: var(--text-size--small);
+
+    // COMPONENT: SKELETON
+    --p-skeleton-color-bg: var(--color-neutral-150);
+    --p-skeleton-animated-gradient: linear-gradient(90deg, hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0.04), hsla(0, 0%, 100%, 0));
 }
 
 .line-shadow-end--light {

@@ -3737,11 +3737,11 @@ article.list {
 
 // add only styles from primereact theme related to skeleton
 .p-skeleton {
-  background-color: rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
+    background-color: var(--p-skeleton-color-bg);
+    border-radius: var(--border-radius--s);
 }
 .p-skeleton:after {
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
+    background: var(--p-skeleton-animated-gradient);
 }
 
 .filter-panel__topics-list {
