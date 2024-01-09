@@ -7,6 +7,7 @@ import {
     RECIEVE_AGGS,
     LOADING_AGGREGATIONS,
     SET_ERROR,
+    UPDATE_FOLDERS,
 } from './actions';
 
 import {get, cloneDeep} from 'lodash';
@@ -187,7 +188,13 @@ export default function wireReducer(state: any = initialState, action: any) {
             newsOnlyFilterText: action.newsOnlyFilterText,
         };
     }
-
+    case UPDATE_FOLDERS: {
+        return {
+            ...state,
+            companyFolders: action.payload.companyFolders,
+            userFolders: action.payload.userFolders,
+        };
+    }
     case TOGGLE_NEWS:
     case TOGGLE_SEARCH_ALL_VERSIONS:
         return {...state, wire: _wireReducer(state.wire, action)};

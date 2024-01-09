@@ -513,11 +513,11 @@ export const UPDATE_FOLDERS = 'UPDATE_FOLDERS';
  * @param {bool} global - fetch company or user folders
  * @param {bool} skipDispatch - if true it won't replace folders in store
  */
-export function fetchFoldersWire() {
+export function fetchFoldersWire(companyId: string, userId: string) {
     return (dispatch: any, getState: any) => {
         const state = getState();
-        const companyTopicsUrl = getFoldersUrl(state, true);
-        const userTopicsUrl = getFoldersUrl(state, false);
+        const companyTopicsUrl = getFoldersUrl(companyId, userId, true);
+        const userTopicsUrl = getFoldersUrl(companyId, userId, false);
 
         return Promise.all([
             state.company ? server.get(companyTopicsUrl).then(({_items}: {_items: Array<any>}) => _items) : Promise.resolve([]),
@@ -530,9 +530,6 @@ export function fetchFoldersWire() {
                     userFolders: userFolders,
                 },
             });
-        }).catch((error) => {
-            console.error(error);
-            return Promise.reject();
         });
     };
 }

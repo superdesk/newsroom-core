@@ -3,11 +3,16 @@ import {initWebSocket} from 'websocket';
 import UserProfileApp from './components/UserProfileApp';
 import {initData, selectMenu, pushNotification} from './actions';
 import {store} from './store';
-import {WIRE_TOPIC_FOLDERS_UPDATED} from 'wire';
 
 if (window.profileData) {
     store.dispatch(initData(window.profileData));
 }
+
+/**
+ * This constant needs to be defined here because of script loading.
+ * If not it will break the tests because of the loading order.
+ */
+export const WIRE_TOPIC_FOLDERS_UPDATED = 'reload-wire-folders';
 
 let previousState = store.getState();
 
@@ -15,10 +20,13 @@ store.subscribe(() => {
     const currentState = store.getState();
 
     if (
-        store.getState().userFolders != previousState.userFolders
-        || store.getState().companyFolders != previousState.companyFolders
+        currentState.userFolders != previousState.userFolders
+        || currentState.companyFolders != previousState.companyFolders
     ) {
-        document.dispatchEvent(new CustomEvent(WIRE_TOPIC_FOLDERS_UPDATED));
+        document.dispatchEvent(new CustomEvent(
+            WIRE_TOPIC_FOLDERS_UPDATED,
+            {detail: {companyId: currentState.company, userId: currentState.user._id}})
+        );
     }
 
     previousState = currentState;
