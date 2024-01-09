@@ -10,7 +10,7 @@ from flask_babel import _
 from newsroom.exceptions import AuthorizationError
 from newsroom.user_roles import UserRole
 from superdesk.utc import utcnow
-from newsroom.auth import get_user, get_company
+from newsroom.auth import get_user, get_company, get_user_by_email
 from newsroom.types import User, UserData, Company, AuthProvider, AuthProviderType
 from newsroom.utils import (
     get_random_string,
@@ -41,7 +41,7 @@ def sign_user_by_email(
     validate_login_attempt: bool = False,
 ) -> werkzeug.Response:
     users = superdesk.get_resource_service("users")
-    user: User = users.find_one(req=None, email=email)
+    user = get_user_by_email(email)
 
     if user is None and create_missing and userdata is not None:
         user = userdata.copy()
