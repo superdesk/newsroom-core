@@ -22,6 +22,7 @@ import {personalizeHome} from 'agenda/actions';
 import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 import {getCurrentUser} from 'company-admin/selectors';
 import {IPersonalizedDashboardsWithData} from 'home/reducers';
+import '@superdesk/common/dist/src/index.css';
 
 export const WIRE_SECTION = 'wire';
 
@@ -179,6 +180,7 @@ class HomeApp extends React.Component<IProps, IState> {
         const Card = getCard(card.type);
         const items = this.props.itemsByCard[card.label] || [];
 
+        console.log(this.props.itemsByCard);
         if (Card?._id === '4-photo-gallery') {
             return (
                 <Card.dashboardComponent
