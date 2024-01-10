@@ -558,7 +558,8 @@ def _filter_terms(filters, item_type):
                 must_term_filters.append(
                     nested_query(
                         path="coverages",
-                        query={"terms": {
+                        query={
+                            "terms": {
                                 "coverages.coverage_status": [
                                     "coverage not decided yet",
                                     "coverage upon request",
