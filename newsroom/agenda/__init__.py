@@ -14,6 +14,8 @@ from .utils import (
     get_coverage_publish_time,
     get_coverage_scheduled_date,
     get_planning_coverages,
+    get_coverage_scheduled_date,
+    get_coverage_status,
 )
 
 
@@ -46,6 +48,8 @@ def init_app(app):
     app.add_template_global(get_coverage_scheduled_date, "get_coverage_date")
     app.add_template_global(get_coverage_publish_time, "get_coverage_publish_time")
     app.add_template_global(get_planning_coverages)
+    app.add_template_global(get_coverage_scheduled_date, "get_coverage_scheduled_date")
+    app.add_template_global(get_coverage_status, "get_coverage_status")
     app.general_setting(
         "google_maps_styles",
         lazy_gettext("Google Maps Styles"),
