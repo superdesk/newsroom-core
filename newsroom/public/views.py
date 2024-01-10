@@ -20,7 +20,9 @@ def get_public_dashboard_config():
         return app.cache.get(PUBLIC_DASHBOARD_CONFIG_CACHE_KEY)
 
     config = get_resource_service("ui_config").get_section_config("home")
-    app.cache.set(PUBLIC_DASHBOARD_CONFIG_CACHE_KEY, config, timeout=app.config.get("DASHBOARD_CACHE_TIMEOUT", 300))
+    app.cache.set(
+        PUBLIC_DASHBOARD_CONFIG_CACHE_KEY, config, timeout=app.config.get("PUBLIC_CONTENT_CACHE_TIMEOUT", 240)
+    )
     return config
 
 
@@ -30,7 +32,7 @@ def get_public_items_by_cards() -> Dict[str, List[Article]]:
 
     items_by_card = get_items_for_dashboard(get_public_cards(), True, True)
     app.cache.set(
-        PUBLIC_DASHBOARD_ITEMS_CACHE_KEY, items_by_card, timeout=app.config.get("DASHBOARD_CACHE_TIMEOUT", 300)
+        PUBLIC_DASHBOARD_ITEMS_CACHE_KEY, items_by_card, timeout=app.config.get("PUBLIC_CONTENT_CACHE_TIMEOUT", 240)
     )
     return items_by_card
 
@@ -40,7 +42,7 @@ def get_public_cards() -> List[DashboardCard]:
         return app.cache.get(PUBLIC_DASHBOARD_CARDS_CACHE_KEY)
 
     cards = list(query_resource("cards", lookup={"dashboard": "newsroom"}))
-    app.cache.set(PUBLIC_DASHBOARD_CARDS_CACHE_KEY, cards, timeout=app.config.get("DASHBOARD_CACHE_TIMEOUT", 300))
+    app.cache.set(PUBLIC_DASHBOARD_CARDS_CACHE_KEY, cards, timeout=app.config.get("PUBLIC_CONTENT_CACHE_TIMEOUT", 240))
 
     return cards
 
