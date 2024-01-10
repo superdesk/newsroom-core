@@ -1,4 +1,5 @@
 import React from 'react';
+import {memoize} from 'lodash';
 
 import {gettext, getConfig} from 'utils';
 import {AgendaDropdown} from './AgendaDropdown';
@@ -12,6 +13,7 @@ interface IProps {
 
 interface ICoverageStatusOptionConfig {
     enabled: boolean;
+    index: number;
     option_label: string;
     button_label: string;
 }
@@ -38,18 +40,23 @@ export function getActiveFilterLabel(
         filter.label;
 }
 
-function AgendaCoverageExistsFilter({toggleFilter, activeFilter}: IProps) {
+const getCoverageStatusOptions = memoize<() => Array<[ICoverageStatusOptionValue, ICoverageStatusOptionConfig]>>(() => {
     const config: ICoverageStatusFilterConfig = getConfig('coverage_status_filter');
-    const enabledOptions= ([
+    const enabledOptionValues: Array<ICoverageStatusOptionValue> = [
         'planned',
         'may be',
         'not intended',
         'not planned',
         'completed',
-    ]
-        .filter((option) => (config[option as ICoverageStatusOptionValue]?.enabled === true))
-    ) as Array<ICoverageStatusOptionValue>;
+    ];
 
+    return enabledOptionValues
+        .filter((optionValue) => config[optionValue]?.enabled == true)
+        .sort((optionA, optionB) => config[optionA].index - config[optionB].index)
+        .map((optionValue) => ([optionValue, config[optionValue]]));
+});
+
+function AgendaCoverageExistsFilter({toggleFilter, activeFilter}: IProps) {
     return (
         <AgendaDropdown
             filter={filter}
@@ -61,16 +68,14 @@ function AgendaCoverageExistsFilter({toggleFilter, activeFilter}: IProps) {
             resetOptionLabel={gettext('Clear selection')}
             dropdownMenuHeader={gettext('Coverage status')}
         >
-            {enabledOptions.map((option) => (
-                config[option]?.enabled !== true ? null : (
-                    <button
-                        key={`coverage-${option}`}
-                        className="dropdown-item"
-                        onClick={() => toggleFilter(filter.field, option)}
-                    >
-                        {config[option].option_label}
-                    </button>
-                )
+            {getCoverageStatusOptions().map(([value, config]) => (
+                <button
+                    key={`coverage-${value}`}
+                    className="dropdown-item"
+                    onClick={() => toggleFilter(filter.field, value)}
+                >
+                    {config.option_label}
+                </button>
             ))}
         </AgendaDropdown>
     );
