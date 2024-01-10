@@ -15,7 +15,6 @@ from google.auth.transport import requests
 from newsroom.types import AuthProviderType
 from newsroom.decorator import admin_only, login_required
 from newsroom.auth import (
-    blueprint,
     get_auth_user_by_email,
     get_company,
     get_user,
@@ -46,6 +45,7 @@ from newsroom.limiter import limiter
 from .token import generate_auth_token, verify_auth_token
 
 
+blueprint = flask.Blueprint("auth", __name__)
 logger = logging.getLogger(__name__)
 
 
