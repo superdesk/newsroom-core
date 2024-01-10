@@ -208,7 +208,7 @@ def login_with_token(token):
 @blueprint.route("/logout")
 def logout():
     clear_user_session()
-    return flask.redirect(flask.url_for("wire.index"))
+    return flask.redirect(flask.url_for("auth.login", logout=1))
 
 
 @blueprint.route("/signup", methods=["GET", "POST"])
