@@ -180,7 +180,6 @@ class HomeApp extends React.Component<IProps, IState> {
         const Card = getCard(card.type);
         const items = this.props.itemsByCard[card.label] || [];
 
-        console.log(this.props.itemsByCard);
         if (Card?._id === '4-photo-gallery') {
             return (
                 <Card.dashboardComponent
