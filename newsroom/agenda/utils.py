@@ -172,6 +172,8 @@ def get_coverage_status(coverage: Dict[str, Any]) -> str:
         return "Not decided"
     elif coverage_status == "coverage not intended":
         return "Cancelled"
+    else:
+        return ""
 
 
 def get_item_type(item: Dict[str, Any]) -> Literal["event", "planning"]:
