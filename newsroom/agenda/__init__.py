@@ -10,6 +10,7 @@ from . import formatters
 from .utils import (
     get_coverage_email_text,
     get_coverage_content_type_name,
+    get_coverage_status_text,
     get_coverage_publish_time,
     get_coverage_scheduled_date,
     get_planning_coverages,
@@ -41,6 +42,7 @@ def init_app(app):
     app.add_template_global(url_for_agenda)
     app.add_template_global(get_coverage_email_text)
     app.add_template_global(get_coverage_content_type_name, "get_coverage_content_type")
+    app.add_template_global(get_coverage_status_text, "get_coverage_status_text")
     app.add_template_global(get_coverage_scheduled_date, "get_coverage_date")
     app.add_template_global(get_coverage_publish_time, "get_coverage_publish_time")
     app.add_template_global(get_planning_coverages)
