@@ -196,3 +196,22 @@ class Topic(TypedDict, total=False):
     folder: ObjectId
     advanced: Dict[str, Any]
     subscribers: List[TopicSubscriber]
+
+
+class DashboardCardConfig(TypedDict, total=False):
+    product: str
+    size: int
+
+
+class DashboardCard(TypedDict, total=False):
+    _id: ObjectId
+    label: str
+    type: str
+    config: DashboardCardConfig
+    order: int
+    dashboard: str
+    original_creator: ObjectId
+    version_creator: ObjectId
+
+
+Article = Dict[str, Any]

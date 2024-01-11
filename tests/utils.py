@@ -82,18 +82,26 @@ def mock_send_email(to, subject, text_body, html_body=None, sender=None, attachm
         return _app.mail.send(msg)
 
 
-def login(client: FlaskClient, user, assert_login=True):
+def logout(client: FlaskClient):
     client.get(url_for("auth.logout"))
+
+
+def login(client: FlaskClient, user, assert_login=True, follow_redirects=False, auto_logout=True):
+    if auto_logout:
+        logout(client)
 
     resp = client.post(
         url_for("auth.login"),
         data={
             "email": user["email"],
-            "password": "admin",
+            "password": user.get("password") or "admin",
         },
+        follow_redirects=follow_redirects,
     )
     if assert_login:
-        assert resp.status_code == 302, f"Login failed for user {user['email']}"
+        assert (
+            resp.status_code == 302 if not follow_redirects else resp.status_code == 200
+        ), f"Login failed for user {user['email']}"
     return resp
 
 

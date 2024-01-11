@@ -684,3 +684,45 @@ WIRE_NOTIFICATIONS_ON_CORRECTIONS = False
 #: .. versionadded: 2.6
 #:
 SOURCE_EXPIRY_DAYS: Dict[str, int] = {}
+
+#: If `True` will enable the Public Dashboard feature
+#:
+#: .. versionadded: 2.6
+#:
+PUBLIC_DASHBOARD = False
+
+#: The timeout used on the content cache for public pages
+#:
+#: .. versionadded: 2.6
+#:
+PUBLIC_CONTENT_CACHE_TIMEOUT = 240
+
+#: List of Wire item fields to keep when accessing from public dashboard
+#:
+#: .. versionadded: 2.6
+#:
+PUBLIC_WIRE_ALLOWED_FIELDS = [
+    "_id",
+    "guid",
+    "type",
+    "slugline",
+    "headline",
+    "anpa_take_key",
+    "description_html",
+    "description_text",
+    "abstract",
+    "body_html",
+    "source",
+    "versioncreated",
+    "wordcount",
+    "charcount",
+    "byline",
+    "copyrightnotice",
+    "language",
+    "mimetype",
+    "priority",
+    "urgency",
+    "usageterms",
+    "version",
+    "renditions",
+]
