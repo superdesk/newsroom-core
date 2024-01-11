@@ -168,8 +168,10 @@ def get_coverage_status(coverage: Dict[str, Any]) -> str:
     coverage_status = coverage.get("coverage_status")
     if coverage_status == "coverage intended":
         return gettext("Planned")
-    elif coverage_status in ("coverage not decided yet", "coverage upon request"):
+    elif coverage_status == "coverage not decided yet":
         return gettext("Not decided")
+    elif coverage_status == "coverage upon request":
+        return gettext("On request")
     elif coverage_status == "coverage not intended":
         return gettext("Cancelled")
     else:
