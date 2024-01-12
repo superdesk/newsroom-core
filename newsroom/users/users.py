@@ -194,6 +194,7 @@ USER_PROFILE_UPDATES = {
     "notification_schedule",
     "expiry_alert",
     "_updated",
+    "password"
 }
 
 
