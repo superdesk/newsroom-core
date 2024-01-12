@@ -134,6 +134,10 @@ export function createStore<State = any>(reducer: any, name: any = 'default'): S
  * @param {Element} element
  */
 export function render(store: any, App: any, element?: any, props?: any) {
+    if (element == null) {
+        return;
+    }
+
     return _render(
         <Provider store={store}>
             <App {...props}/>
