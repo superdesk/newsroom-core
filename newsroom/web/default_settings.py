@@ -375,7 +375,7 @@ CLIENT_CONFIG = {
         "may be": {
             "enabled": True,
             "index": 3,
-            "option_label": lazy_gettext("Not Decided / On request"),
+            "option_label": lazy_gettext("Not Decided / On Request"),
             "button_label": lazy_gettext("Not Decided / On Request"),
         },
         "not intended": {

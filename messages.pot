@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.5.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-01-11 11:24+0100\n"
+"POT-Creation-Date: 2024-01-15 15:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1303,11 +1303,7 @@ msgstr ""
 msgid "Is Planned"
 msgstr ""
 
-#: newsroom/web/default_settings.py:378
-msgid "Not Decided / On request"
-msgstr ""
-
-#: newsroom/web/default_settings.py:379
+#: newsroom/web/default_settings.py:378 newsroom/web/default_settings.py:379
 msgid "Not Decided / On Request"
 msgstr ""
 
