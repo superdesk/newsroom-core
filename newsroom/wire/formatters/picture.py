@@ -27,7 +27,7 @@ class PictureFormatter(BaseFormatter):
         if not picture:
             raise ValueError("Undefined picture")
 
-        picture_details = picture.get("renditions", {}).get("baseImage", {})
+        picture_details = picture.get("renditions", {}).get("original", {})
         self.MIMETYPE = picture_details.get("mimetype", "image/jpeg")
         picture_details["file_extension"] = self.update_extension()
 
