@@ -8,7 +8,7 @@ interface IProps {
     label?: string;
     activeFilter?: any;
     toggleFilter: (filedName: string, value: any) => void;
-    getFilterLabel?: (filter: string, activeFilter: string, isActive: boolean) => string;
+    getFilterLabel?: (filter: {field: string; label: string}, activeFilter: {[field: string]: any}, isActive: boolean) => string;
     children?: any;
     borderless?: boolean;
     dropdownMenuHeader?: string;

@@ -71,6 +71,7 @@ class UserRequired(TypedDict):
 
 
 class UserData(UserRequired, total=False):
+    _id: ObjectId
     first_name: str
     last_name: str
     phone: str
@@ -100,7 +101,7 @@ class UserData(UserRequired, total=False):
 
 
 class User(UserData):
-    _id: ObjectId
+    pass
 
 
 class UserAuth(TypedDict):

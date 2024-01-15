@@ -1,9 +1,24 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import {get} from 'lodash';
+import {memoize} from 'lodash';
 
-import {gettext} from 'utils';
+import {gettext, getConfig} from 'utils';
 import {AgendaDropdown} from './AgendaDropdown';
+
+type ICoverageStatusOptionValue = 'planned' | 'not planned' | 'may be' | 'not intended' | 'completed';
+
+interface IProps {
+    toggleFilter(field: string, value?: ICoverageStatusOptionValue): void;
+    activeFilter: {coverage_status?: Array<ICoverageStatusOptionValue>};
+}
+
+interface ICoverageStatusOptionConfig {
+    enabled: boolean;
+    index: number;
+    option_label: string;
+    button_label: string;
+}
+
+type ICoverageStatusFilterConfig = {[value in ICoverageStatusOptionValue]: ICoverageStatusOptionConfig};
 
 export const agendaCoverageStatusFilter = {
     label: gettext('Any coverage status'),
@@ -11,31 +26,37 @@ export const agendaCoverageStatusFilter = {
     nestedField: 'coverage_status',
 };
 
-const FILTER_VALUES = {
-    PLANNED: 'planned',
-    NOT_PLANNED: 'not planned',
-    MAY_BE: 'may be',
-    COMPLETED: 'completed'
-};
-
-export function getActiveFilterLabel(filter: any, activeFilter: any) {
-    const filterValue = get(activeFilter, `${filter.field}[0]`);
-
-    switch (filterValue) {
-    case FILTER_VALUES.PLANNED:
-        return gettext('Planned');
-    case FILTER_VALUES.NOT_PLANNED:
-        return gettext('Not Planned');
-    case FILTER_VALUES.MAY_BE:
-        return gettext('Not Decided');
-    case FILTER_VALUES.COMPLETED:
-        return gettext('Completed');
+export function getActiveFilterLabel(
+    filter: {label: string; field: string},
+    activeFilter?: {
+        coverage_status?: Array<ICoverageStatusOptionValue>;
+        [field: string]: any;
     }
+) {
+    const config: ICoverageStatusFilterConfig = getConfig('coverage_status_filter');
 
-    return filter.label;
+    return activeFilter?.coverage_status?.[0] != null ?
+        config[activeFilter.coverage_status[0]].button_label :
+        filter.label;
 }
 
-function AgendaCoverageExistsFilter ({toggleFilter, activeFilter}: any) {
+const getCoverageStatusOptions = memoize<() => Array<[ICoverageStatusOptionValue, ICoverageStatusOptionConfig]>>(() => {
+    const config: ICoverageStatusFilterConfig = getConfig('coverage_status_filter');
+    const enabledOptionValues: Array<ICoverageStatusOptionValue> = [
+        'planned',
+        'may be',
+        'not intended',
+        'not planned',
+        'completed',
+    ];
+
+    return enabledOptionValues
+        .filter((optionValue) => config[optionValue]?.enabled == true)
+        .sort((optionA, optionB) => config[optionA].index - config[optionB].index)
+        .map((optionValue) => ([optionValue, config[optionValue]]));
+});
+
+function AgendaCoverageExistsFilter({toggleFilter, activeFilter}: IProps) {
     return (
         <AgendaDropdown
             filter={agendaCoverageStatusFilter}
@@ -47,37 +68,17 @@ function AgendaCoverageExistsFilter ({toggleFilter, activeFilter}: any) {
             resetOptionLabel={gettext('Clear selection')}
             dropdownMenuHeader={gettext('Coverage status')}
         >
-            <button
-                key='coverage-planned'
-                className='dropdown-item'
-                onClick={() => toggleFilter(agendaCoverageStatusFilter.field, FILTER_VALUES.PLANNED)}
-            >{gettext('Coverage is planned')}
-            </button>
-            <button
-                key='coverage-not-planned'
-                className='dropdown-item'
-                onClick={() => toggleFilter(agendaCoverageStatusFilter.field, FILTER_VALUES.NOT_PLANNED)}
-            >{gettext('Coverage not planned')}
-            </button>
-            <button
-                key='coverage-not-decided'
-                className='dropdown-item'
-                onClick={() => toggleFilter(agendaCoverageStatusFilter.field, FILTER_VALUES.MAY_BE)}
-            >{gettext('Coverage not decided')}
-            </button>
-            <button
-                key='coverage-completed'
-                className='dropdown-item'
-                onClick={() => toggleFilter(agendaCoverageStatusFilter.field, FILTER_VALUES.COMPLETED)}
-            >{gettext('Coverage completed')}
-            </button>
+            {getCoverageStatusOptions().map(([value, config]) => (
+                <button
+                    key={`coverage-${value}`}
+                    className="dropdown-item"
+                    onClick={() => toggleFilter(agendaCoverageStatusFilter.field, value)}
+                >
+                    {config.option_label}
+                </button>
+            ))}
         </AgendaDropdown>
     );
 }
-
-AgendaCoverageExistsFilter.propTypes = {
-    toggleFilter: PropTypes.func,
-    activeFilter: PropTypes.object,
-};
 
 export default AgendaCoverageExistsFilter;

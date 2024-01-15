@@ -361,6 +361,38 @@ CLIENT_CONFIG = {
         },
     },
     "scheduled_notifications": {"default_times": DEFAULT_SCHEDULED_NOTIFICATION_TIMES},
+    "coverage_status_filter": {
+        "not planned": {
+            "enabled": True,
+            "index": 1,
+            "option_label": lazy_gettext("No Coverage"),
+            "button_label": lazy_gettext("No Coverage"),
+        },
+        "planned": {
+            "enabled": True,
+            "index": 2,
+            "option_label": lazy_gettext("Is Planned"),
+            "button_label": lazy_gettext("Is Planned"),
+        },
+        "may be": {
+            "enabled": True,
+            "index": 3,
+            "option_label": lazy_gettext("Not Decided / On request"),
+            "button_label": lazy_gettext("Not Decided / On Request"),
+        },
+        "not intended": {
+            "enabled": True,
+            "index": 4,
+            "option_label": lazy_gettext("Not Intended / Cancelled"),
+            "button_label": lazy_gettext("Not Intended / Cancelled"),
+        },
+        "completed": {
+            "enabled": True,
+            "index": 5,
+            "option_label": lazy_gettext("Completed"),
+            "button_label": lazy_gettext("Completed"),
+        },
+    },
 }
 
 # Enable rendering of the date in the base view

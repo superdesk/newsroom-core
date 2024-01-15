@@ -4,14 +4,14 @@ import werkzeug
 import superdesk
 
 from datetime import timedelta
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 from flask import current_app as app
 from flask_babel import _
 from newsroom.auth.providers import AuthProvider
 from newsroom.exceptions import AuthorizationError
 from newsroom.user_roles import UserRole
 from superdesk.utc import utcnow
-from newsroom.auth import get_user, get_company
+from newsroom.auth import get_user, get_company, get_user_by_email
 from newsroom.types import User, UserData, Company, AuthProviderType
 from newsroom.utils import (
     get_random_string,
@@ -42,13 +42,14 @@ def sign_user_by_email(
     validate_login_attempt: bool = False,
 ) -> werkzeug.Response:
     users = superdesk.get_resource_service("users")
-    user: User = users.find_one(req=None, email=email)
+    user: Union[User, UserData, None] = get_user_by_email(email)
 
     if user is None and create_missing and userdata is not None:
         user = userdata.copy()
         user["is_enabled"] = True
         user["is_approved"] = True
         users.create([user])
+        assert "_id" in user
 
     def redirect_with_error(error_str):
         flask.session.pop("_flashes", None)
@@ -57,8 +58,6 @@ def sign_user_by_email(
 
     if user is None:
         return redirect_with_error(_("User not found"))
-
-    assert "_id" in user
 
     if validate_login_attempt:
         company = get_company(user)
