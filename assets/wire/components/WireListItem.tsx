@@ -29,7 +29,7 @@ import {Embargo} from './fields/Embargo';
 import {UrgencyItemBorder, UrgencyLabel} from './fields/UrgencyLabel';
 import {FieldComponents} from './fields';
 
-const DEFAULT_META_FIELDS = ['source', 'charcount', 'versioncreated'];
+export const DEFAULT_META_FIELDS = ['source', 'charcount', 'versioncreated'];
 export const DEFAULT_COMPACT_META_FIELDS = ['versioncreated'];
 
 function getShowVersionText(

@@ -6,10 +6,8 @@ import superdesk
 from typing import Optional
 from bson import ObjectId
 from eve.auth import BasicAuth
-from flask import Blueprint, session, abort
+from flask import session, abort
 from newsroom.types import Company, User, UserAuth
-
-blueprint = Blueprint("auth", __name__)
 
 
 class SessionAuth(BasicAuth):
@@ -87,6 +85,3 @@ def _get_user_by_email(email, repo):
     lookup = {"email": {"$regex": re.compile("^{}$".format(re.escape(email)), re.IGNORECASE)}}
     users = list(superdesk.get_resource_service(repo).get(req=None, lookup=lookup))
     return users[0] if users else None
-
-
-from . import views  # noqa

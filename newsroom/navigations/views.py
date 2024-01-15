@@ -7,6 +7,7 @@ from bson import ObjectId
 from flask import jsonify, current_app as app
 from flask_babel import gettext
 from superdesk import get_resource_service
+from superdesk.cache import cache
 
 from newsroom.decorator import admin_only
 from newsroom.navigations import blueprint
@@ -116,3 +117,4 @@ def add_remove_products_for_navigation(nav_id: ObjectId, product_ids: List[str])
             db.update_one({"_id": product["_id"]}, {"$addToSet": {"navigations": nav_id}})
         else:
             db.update_one({"_id": product["_id"]}, {"$pull": {"navigations": nav_id}})
+    cache.clean(["products"])

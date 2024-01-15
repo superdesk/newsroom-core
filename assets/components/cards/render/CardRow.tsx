@@ -10,6 +10,7 @@ interface IOwnProps {
     moreNews?: boolean;
     user?: any;
     kind?: MoreNewsSearchKind;
+    onMoreNewsClicked?(event: React.MouseEvent<HTMLAnchorElement>): void;
 }
 
 interface IReduxStateProps {
@@ -36,13 +37,19 @@ class CardRow extends React.Component<IComponentProps, any> {
         const {title, id, children, userProducts, userType, kind} = this.props;
         let moreNews = this.props.moreNews == null ? true : this.props.moreNews;
 
-        if (userType !== 'administrator' && kind == null) {
+        if (userType !== 'administrator' && kind == null && (userProducts?.length ?? 0) > 0) {
             moreNews = userProducts.some((userProduct: any) => userProduct._id === id);
         }
 
         return (
             <div className='row' ref={(elem) => (this.cardElem = elem)}>
-                <MoreNewsButton title={title} id={id} kind={kind ?? 'product'} moreNews={moreNews} />
+                <MoreNewsButton
+                    title={title}
+                    id={id}
+                    kind={kind ?? 'product'}
+                    moreNews={moreNews}
+                    onMoreNewsClicked={this.props.onMoreNewsClicked}
+                />
                 {children}
             </div>
         );

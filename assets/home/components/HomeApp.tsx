@@ -16,12 +16,13 @@ import {downloadMedia, fetchItems} from 'wire/actions';
 import {SearchBar} from './search-bar';
 import {previewConfigSelector, listConfigSelector, detailsConfigSelector, isSearchEnabled} from 'ui/selectors';
 import {filterGroupsToLabelMap} from 'search/selectors';
-import CardRow from 'components/cards/render/CardRow';
 import {PersonalizeHomeSettingsModal} from 'components/PersonalizeHomeModal';
 import {personalizeHome} from 'agenda/actions';
 import {RadioButtonGroup} from 'features/sections/SectionSwitch';
 import {getCurrentUser} from 'company-admin/selectors';
 import {IPersonalizedDashboardsWithData} from 'home/reducers';
+
+import {DashboardPanels} from './DashboardPanels';
 
 export const WIRE_SECTION = 'wire';
 
@@ -32,7 +33,6 @@ const modals: any = {
 };
 
 interface IState {
-    loadingItems: boolean;
     activeOptionId: 'default' | 'my-home';
 }
 
@@ -70,7 +70,7 @@ interface IDispatchProps {
 
 type IProps = IStateProps & IDispatchProps;
 
-class HomeApp extends React.Component<IProps, IState> {
+class HomeApp extends React.Component<IProps, IState>  {
     static propTypes: any;
 
     height: number;
@@ -79,7 +79,6 @@ class HomeApp extends React.Component<IProps, IState> {
 
     constructor(props: any, context: any) {
         super(props, context);
-        this.getPanels = this.getPanels.bind(this);
         this.filterActions = this.filterActions.bind(this);
         this.renderModal = this.renderModal.bind(this);
         this.onHomeScroll = this.onHomeScroll.bind(this);
@@ -88,7 +87,6 @@ class HomeApp extends React.Component<IProps, IState> {
         this.hasPersonalDashboard = (this.props.personalizedDashboards?.[0]?.topic_items?.length ?? 0) > 0;
 
         this.state = {
-            loadingItems: true,
             activeOptionId: this.hasPersonalDashboard ? 'my-home' : 'default',
         };
     }
@@ -96,19 +94,6 @@ class HomeApp extends React.Component<IProps, IState> {
     componentDidMount() {
         (document.getElementById('footer') as any).className = 'footer footer--home';
         this.height = this.elem.offsetHeight;
-
-        // Load items for cards
-        Promise.all([
-            this.props.fetchCompanyCardItems(),
-            ...this.props.cards
-                .filter((card: any) => card.dashboard === 'newsroom' && card.type === '4-photo-gallery')
-                .map((card: any) => (
-                    this.props.fetchCardExternalItems(get(card, '_id'), get(card, 'label'))
-                )),
-        ])
-            .then(() => {
-                this.setState({loadingItems: false});
-            });
     }
 
     renderModal(specs: any) {
@@ -128,10 +113,6 @@ class HomeApp extends React.Component<IProps, IState> {
         } else {
             (document.getElementById('footer') as any).className = 'footer footer--home';
         }
-    }
-
-    getProductId(card: any) {
-        return card.config.product;
     }
 
     getPanelsForPersonalizedDashboard() {
@@ -164,79 +145,12 @@ class HomeApp extends React.Component<IProps, IState> {
         );
     }
 
-    getPanels(card: any) {
-        if (this.state.loadingItems) {
-            return (
-                <CardRow key={card.label} title={card.label} id={this.getProductId(card)} isActive={this.props.activeCard === card._id}>
-                    <div className='col-sm-6 col-md-4 col-lg-3 col-xxl-2 d-flex mb-4'>
-                        <div className="spinner-border text-success" />
-                        <span className="a11y-only">{gettext('Loading Card Items')}</span>
-                    </div>
-                </CardRow>
-            );
-        }
-
-        const Card = getCard(card.type);
-        const items = this.props.itemsByCard[card.label] || [];
-
-        if (Card?._id === '4-photo-gallery') {
-            return (
-                <Card.dashboardComponent
-                    key={card.label}
-                    photos={items}
-                    title={card.label}
-                    moreUrl={card.config.more_url}
-                    moreUrlLabel={card.config.more_url_label}
-                    listConfig={this.props.listConfig}
-                />
-            );
-        }
-
-        if (Card?._id === '2x2-events') {
-            return (
-                <Card.dashboardComponent
-                    key={card.label}
-                    events={get(card, 'config.events')}
-                    title={card.label}
-                />
-            );
-        }
-
-        if (Card?._id === '6-navigation-row') {
-            return (
-                <Card.dashboardComponent
-                    key={card.label}
-                    card={card}
-                />
-            );
-        }
-
-        const DashboardComponent = Card?.dashboardComponent;
-
-        return (
-            DashboardComponent && (
-                <DashboardComponent
-                    key={card.label}
-                    type={card.type}
-                    items={items}
-                    title={card.label}
-                    id={this.getProductId(card)}
-                    openItem={this.props.openItemDetails}
-                    isActive={this.props.activeCard === card._id}
-                    cardId={card._id}
-                    listConfig={this.props.listConfig}
-                />
-            )
-        );
-    }
-
     filterActions(item: any, config: any) {
         return this.props.actions.filter((action: any) => (!config || isDisplayed(action.id, config)) &&
             (!action.when || action.when(this.props, item)));
     }
 
     renderContent(children?: any): any {
-        const {cards} = this.props;
         const isWireSectionConfigured = this.props.userSections[WIRE_SECTION] != null;
 
         return (
@@ -318,15 +232,15 @@ class HomeApp extends React.Component<IProps, IState> {
                             this.state.activeOptionId === 'my-home' ? (
                                 this.getPanelsForPersonalizedDashboard()
                             ) : (
-                                cards.length === 0 ? (
-                                    <div className="alert alert-warning my-4" role="alert">
-                                        <strong>{gettext('Warning')}!</strong>
-                                        {gettext('There\'s no card defined for {{home}} page!', window.sectionNames)}
-                                    </div>
-                                ) : (
-                                    this.props.cards.filter((c: any) => c.dashboard === 'newsroom')
-                                        .map((card: any) => this.getPanels(card))
-                                )
+                                <DashboardPanels
+                                    cards={this.props.cards.filter((card) => card.dashboard === 'newsroom')}
+                                    activeCard={this.props.activeCard}
+                                    itemsByCard={this.props.itemsByCard}
+                                    listConfig={this.props.listConfig}
+                                    fetchCardItems={this.props.fetchCompanyCardItems}
+                                    fetchCardExternalItems={this.props.fetchCardExternalItems}
+                                    openItem={this.props.openItemDetails}
+                                />
                             )
                         }
                     </div>

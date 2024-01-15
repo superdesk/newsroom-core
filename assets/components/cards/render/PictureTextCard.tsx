@@ -39,7 +39,7 @@ const PictureTextCard: React.ComponentType<ICardProps> = (props: ICardProps) => 
     const withPictures = type.indexOf('picture') > -1;
 
     return (
-        <CardRow kind={kind} title={title} id={id} isActive={isActive}>
+        <CardRow kind={kind} title={title} id={id} isActive={isActive} onMoreNewsClicked={props.onMoreNewsClicked}>
             {items.map((item: any) => getPictureTextPanel(item, getPicture(item), openItem, withPictures, cardId, listConfig))}
         </CardRow>
     );

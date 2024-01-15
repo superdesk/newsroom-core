@@ -11,11 +11,11 @@ import {gettext} from 'utils';
 import {
     fetchItems
 } from '../../wire/actions';
-import BaseApp from 'layout/components/BaseApp';
+import SearchBase from 'layout/components/SearchBase';
 import NavigationSixPerRow from 'components/cards/render/NavigationSixPerRow';
 
 
-class MarketPlaceApp extends BaseApp {
+class MarketPlaceApp extends SearchBase<any> {
     constructor(props: any) {
         super(props);
     }

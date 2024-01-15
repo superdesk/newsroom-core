@@ -30,7 +30,7 @@ from newsroom.types import AuthProviderType, UserData
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from newsroom.auth.utils import sign_user_by_email
 
-from . import blueprint
+from .views import blueprint
 
 
 SESSION_NAME_ID = "samlNameId"
