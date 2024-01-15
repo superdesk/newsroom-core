@@ -1,8 +1,9 @@
-import {render, isWireContext} from 'utils';
+import {isWireContext} from 'utils';
 import {initWebSocket} from 'websocket';
 import UserProfileApp from './components/UserProfileApp';
 import {initData, selectMenu, pushNotification} from './actions';
 import {store} from './store';
+import {render} from 'render-utls';
 
 if (window.profileData) {
     store.dispatch(initData(window.profileData));

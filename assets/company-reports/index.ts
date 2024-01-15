@@ -1,7 +1,8 @@
-import {createStore, render} from 'utils';
+import {createStore} from 'utils';
 import companyReportReducer from './reducers';
 import {initData} from './actions';
 import CompanyReportsApp from './components/CompanyReportsApp';
+import {render} from 'render-utls';
 
 
 const store = createStore(companyReportReducer, 'CompanyReports');

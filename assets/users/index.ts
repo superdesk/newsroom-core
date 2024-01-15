@@ -1,4 +1,5 @@
-import {createStore, render} from 'utils';
+import {createStore} from 'utils';
+import {render} from 'render-utls';
 import userReducer from './reducers';
 import UsersApp from './components/UsersApp';
 import {initViewData, onURLParamsChanged} from './actions';

@@ -1,7 +1,8 @@
-import {createStore, render} from 'utils';
+import {createStore} from 'utils';
 import companyReducer from './reducers';
 import CompaniesApp from './components/CompaniesApp';
 import {initViewData, onURLParamsChanged} from './actions';
+import {render} from 'render-utls';
 
 const store = createStore(companyReducer, 'Company');
 

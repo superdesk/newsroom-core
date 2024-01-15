@@ -1,4 +1,5 @@
-import {createStore, render} from 'utils';
+import {createStore} from 'utils';
+import {render} from 'render-utls';
 import sectionFiltersReducer from './reducers';
 import SectionFiltersApp from './components/SectionFiltersApp';
 import {initViewData} from './actions';

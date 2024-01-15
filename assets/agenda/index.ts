@@ -1,5 +1,5 @@
 import {IAgendaState} from 'interfaces';
-import {createStore, render, getInitData, isMobilePhone, closeItemOnMobile} from 'utils';
+import {createStore, getInitData, isMobilePhone, closeItemOnMobile} from 'utils';
 import {initWebSocket} from 'websocket';
 
 import agendaReducer from './reducers';
@@ -7,6 +7,7 @@ import {getActiveDate, getReadItems, getFeaturedOnlyParam} from 'local-store';
 import AgendaApp from './components/AgendaApp';
 import {fetchItems, setState, initData, initParams, pushNotification, openItemDetails, previewItem} from './actions';
 import {setView} from 'search/actions';
+import {render} from 'render-utls';
 
 const store = createStore<IAgendaState>(agendaReducer, 'Agenda');
 

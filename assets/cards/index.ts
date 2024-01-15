@@ -1,7 +1,8 @@
-import {createStore, render} from 'utils';
+import {createStore} from 'utils';
 import cardReducer from './reducers';
 import CardsApp from './components/CardsApp';
 import {initViewData} from './actions';
+import {render} from 'render-utls';
 
 
 const store = createStore(cardReducer, 'Cards');

@@ -1,9 +1,10 @@
 import {get} from 'lodash';
 
-import {createStore, render} from 'utils';
+import {createStore} from 'utils';
 import {runReport} from '../actions';
 import {panels} from '../utils';
 import companyReportReducer from '../reducers';
+import {render} from 'render-utls';
 
 const store = createStore(companyReportReducer, 'CompanyReports');
 const Panel = panels[window.report];

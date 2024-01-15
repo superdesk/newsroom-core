@@ -1,6 +1,6 @@
 import {get, startsWith} from 'lodash';
 
-import {createStore, render, getInitData, closeItemOnMobile, isMobilePhone} from '../utils';
+import {createStore, getInitData, closeItemOnMobile, isMobilePhone} from '../utils';
 import {initWebSocket} from 'websocket';
 
 import {getReadItems} from 'local-store';
@@ -19,7 +19,7 @@ import {
     toggleNavigation,
     toggleNavigationById,
 } from '../search/actions';
-
+import {render} from 'render-utls';
 
 const store = createStore(wireReducer, 'AM');
 

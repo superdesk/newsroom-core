@@ -15,9 +15,27 @@ import FiltersTab from 'wire/components/filters/FiltersTab';
 import NavigationTab from 'wire/components/filters/NavigationTab';
 import {AdvancedSearchPanel} from 'search/components/AdvancedSearchPanel';
 import {SearchTipsPanel} from 'search/components/SearchTipsPanel';
-import '@superdesk/common/dist/src/index.css';
 
-export default class BaseApp extends React.Component<any, any> {
+interface IBaseState {
+    withSidebar: boolean;
+    minimizeSearchResults: boolean;
+    initialLoad: boolean;
+    isAdvancedSearchShown: boolean;
+    isSearchTipsShown: boolean;
+}
+
+interface IBaseProps {
+    bookmarks: any;
+    savedItemsCount: number;
+    context: any;
+    actions: any;
+    fetchMoreItems: () => Promise<void>;
+    state: any;
+    fetchItems: () => Promise<void>;
+    activeQuery: any;
+}
+
+export default class SearchBase<Props = {}> extends React.Component<Props & IBaseProps, IBaseState & any> {
     static propTypes: any;
     dom: any;
     tooltips: any;
@@ -257,7 +275,7 @@ export default class BaseApp extends React.Component<any, any> {
     }
 }
 
-BaseApp.propTypes = {
+SearchBase.propTypes = {
     state: PropTypes.object.isRequired,
     context: PropTypes.string.isRequired,
     actions: PropTypes.arrayOf(PropTypes.object).isRequired,
