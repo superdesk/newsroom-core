@@ -232,15 +232,20 @@ export function pushNotification(push: any): any {
     };
 }
 
-function getFoldersUrl(state: any, global: boolean | undefined, id?: any) {
+export function getFoldersUrl(
+    company?: string,
+    userId?: string,
+    global?: boolean,
+    folderId?: string,
+) {
     const baseUrl = global ?
-        `/api/companies/${state.company}/topic_folders` :
-        `/api/users/${state.user._id}/topic_folders`;
+        `/api/companies/${company}/topic_folders` :
+        `/api/users/${userId}/topic_folders`;
 
-    return id != null ? `${baseUrl}/${id}` : baseUrl;
+    return folderId != null ? `${baseUrl}/${folderId}` : baseUrl;
 }
 
-function mergeUpdates(updates: any, response: any) {
+export function mergeUpdates(updates: any, response: any) {
     updates._id = response._id;
     updates._etag = response._etag;
     updates._status = response._status;
@@ -251,7 +256,7 @@ export const FOLDER_UPDATED = 'FOLDER_UPDATED';
 export function saveFolder(folder: ITopicFolder, data: {name: string}, global?: boolean) {
     return (dispatch: any, getState: any) => {
         const state = getState();
-        const url = getFoldersUrl(state, global, folder._id);
+        const url = getFoldersUrl(state.company, state.user?._id, global, folder._id);
 
         if (folder._etag) {
             const updates = {...data};
@@ -276,7 +281,7 @@ export function deleteFolder(folder: any, global: boolean, deleteTopics?: boolea
 
     return (dispatch: any, getState: any) => {
         const state = getState();
-        const url = getFoldersUrl(state, global, folder._id);
+        const url = getFoldersUrl(state.company, state.user?._id, global, folder._id);
 
         if (!window.confirm(gettext('Are you sure you want to delete the folder {{name}} and all of its contents?', {name: folder.name}))) {
             return;
@@ -296,8 +301,8 @@ export const RECIEVE_FOLDERS = 'RECIEVE_FOLDERS';
 export function fetchFolders() {
     return (dispatch: any, getState: any) => {
         const state = getState();
-        const companyTopicsUrl = getFoldersUrl(state, true);
-        const userTopicsUrl = getFoldersUrl(state, false);
+        const companyTopicsUrl = getFoldersUrl(state.company, state.user?._id, true);
+        const userTopicsUrl = getFoldersUrl(state.company, state.user?._id, false);
 
         return Promise.all([
             state.company ? server.get(companyTopicsUrl).then(({_items}: {_items: Array<any>}) => _items) : Promise.resolve([]),

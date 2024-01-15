@@ -13,8 +13,10 @@ import {
     initParams,
     openItemDetails,
     previewItem,
+    fetchFoldersWire,
 } from './actions';
 import {setView} from 'search/actions';
+import {WIRE_TOPIC_FOLDERS_UPDATED} from 'user-profile';
 
 const store = createStore(wireReducer, 'Wire');
 
@@ -49,3 +51,10 @@ render(store, WireApp, document.getElementById('wire-app'));
 
 // initialize web socket listener
 initWebSocket(store, pushNotification);
+
+document.addEventListener(WIRE_TOPIC_FOLDERS_UPDATED, (_e) => {
+    const e: CustomEvent = _e as CustomEvent;
+    const {companyId, userId} = e.detail;
+
+    store.dispatch(fetchFoldersWire(companyId, userId));
+});

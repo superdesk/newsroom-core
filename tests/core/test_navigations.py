@@ -1,6 +1,8 @@
 from bson import ObjectId
 from flask import json
 from pytest import fixture
+from newsroom.navigations.views import add_remove_products_for_navigation
+from newsroom.products.products import get_products_by_navigation
 
 from newsroom.tests.users import test_login_succeeds_for_admin  # noqa
 from newsroom.tests.fixtures import COMPANY_1_ID
@@ -230,3 +232,42 @@ def test_get_agenda_navigations_by_company_returns_ordered(client, app):
     assert navigations[0].get("name") == "Uber"
     navigations = get_navigations_by_company({"_id": COMPANY_1_ID}, "wire")
     assert navigations[0].get("name") == "Sport"
+
+
+def test_get_products_by_navigation_caching(app):
+    nav_id = ObjectId()
+    app.data.insert(
+        "navigations",
+        [
+            {
+                "_id": nav_id,
+                "name": "Uber",
+                "is_enabled": True,
+                "product_type": "agenda",
+            }
+        ],
+    )
+
+    app.data.insert(
+        "products",
+        [
+            {
+                "_id": "p-2",
+                "name": "A News",
+                "navigations": [nav_id],
+                "description": "news product",
+                "is_enabled": True,
+                "product_type": "wire",
+                "query": "latest",
+            },
+        ],
+    )
+
+    # using new context to avoid caching via flask.g
+    with app.app_context():
+        assert 1 == len(get_products_by_navigation([nav_id], "wire"))
+
+    add_remove_products_for_navigation(nav_id, [])
+
+    with app.app_context():
+        assert 0 == len(get_products_by_navigation([nav_id], "wire"))

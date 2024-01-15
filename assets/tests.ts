@@ -22,6 +22,33 @@ window.newsroom = {
             live_blog: {name: 'Live Blog', icon: 'live-blog'},
             video_explainer: {name: 'Video Explainer', icon: 'explainer'},
         },
+        coverage_status_filter: {
+            planned: {
+                enabled: true,
+                option_label: 'Coverage is planned',
+                button_label: 'Planned',
+            },
+            'may be': {
+                enabled: true,
+                option_label: 'Coverage not decided',
+                button_label: 'Not Decided',
+            },
+            'not intended': {
+                enabled: true,
+                option_label: 'Coverage not intended',
+                button_label: 'Not Intended',
+            },
+            'not planned': {
+                enabled: true,
+                option_label: 'Coverage not planned',
+                button_label: 'Not Planned',
+            },
+            'completed': {
+                enabled: true,
+                option_label: 'Coverage completed',
+                button_label: 'Completed',
+            },
+        },
         debug: true,
         default_language: 'en',
         default_timezone: 'Australia/Sydney',

@@ -186,6 +186,7 @@ def user(app):
         "receive_app_notifications": True,
     }
     app.data.insert("users", [_user])
+    _user["password"] = "admin"
     return _user
 
 

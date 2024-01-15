@@ -1,6 +1,11 @@
 import {get, differenceBy} from 'lodash';
 import server from 'server';
 
+export const INIT_DATA = 'INIT_DATA';
+export function initData(payload: any) {
+    return {type: INIT_DATA, payload};
+}
+
 export const RENDER_MODAL = 'RENDER_MODAL';
 export function renderModal(modal: any, data: any) {
     return {type: RENDER_MODAL, modal, data};

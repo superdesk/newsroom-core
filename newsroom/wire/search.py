@@ -142,7 +142,7 @@ class WireSearchService(BaseSearchService):
                 exc_info=True,
             )
 
-    def get_product_items(self, product_id, size):
+    def get_product_items(self, product_id: str, size: int, exclude_embargoed: bool = False):
         search = SearchQuery()
         self.prefill_search_args(search)
         self.prefill_search_items(search)
@@ -156,7 +156,7 @@ class WireSearchService(BaseSearchService):
         if not product:
             return []
 
-        if not app.config["DASHBOARD_EMBARGOED"]:
+        if not app.config["DASHBOARD_EMBARGOED"] or exclude_embargoed:
             search.query["bool"]["filter"].append(
                 {
                     "bool": {

@@ -271,7 +271,7 @@ describe('Wire - Topic', function () {
                 ],
             },
         ]);
-        NewshubLayout.login('admin@admin.com', 'admin');
+        NewshubLayout.login('admin@example.com', 'admin');
         navigateToMyWireTopic();
 
         profileTopics.getFolderCard("Folder 1").find('[data-test-id="expand"]').click();
@@ -321,7 +321,7 @@ describe('Wire - Topic', function () {
                 ],
             },
         ]);
-        NewshubLayout.login('admin@admin.com', 'admin');
+        NewshubLayout.login('admin@example.com', 'admin');
         navigateToMyWireTopic();
 
         /**

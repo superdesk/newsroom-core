@@ -116,7 +116,7 @@ BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
 BLUEPRINTS = [
     "newsroom.wire",
-    "newsroom.auth",
+    "newsroom.auth.views",
     "newsroom.users",
     "newsroom.companies",
     "newsroom.design",
@@ -361,6 +361,38 @@ CLIENT_CONFIG = {
         },
     },
     "scheduled_notifications": {"default_times": DEFAULT_SCHEDULED_NOTIFICATION_TIMES},
+    "coverage_status_filter": {
+        "not planned": {
+            "enabled": True,
+            "index": 1,
+            "option_label": lazy_gettext("No Coverage"),
+            "button_label": lazy_gettext("No Coverage"),
+        },
+        "planned": {
+            "enabled": True,
+            "index": 2,
+            "option_label": lazy_gettext("Is Planned"),
+            "button_label": lazy_gettext("Is Planned"),
+        },
+        "may be": {
+            "enabled": True,
+            "index": 3,
+            "option_label": lazy_gettext("Not Decided / On request"),
+            "button_label": lazy_gettext("Not Decided / On Request"),
+        },
+        "not intended": {
+            "enabled": True,
+            "index": 4,
+            "option_label": lazy_gettext("Not Intended / Cancelled"),
+            "button_label": lazy_gettext("Not Intended / Cancelled"),
+        },
+        "completed": {
+            "enabled": True,
+            "index": 5,
+            "option_label": lazy_gettext("Completed"),
+            "button_label": lazy_gettext("Completed"),
+        },
+    },
 }
 
 # Enable rendering of the date in the base view
@@ -684,3 +716,45 @@ WIRE_NOTIFICATIONS_ON_CORRECTIONS = False
 #: .. versionadded: 2.6
 #:
 SOURCE_EXPIRY_DAYS: Dict[str, int] = {}
+
+#: If `True` will enable the Public Dashboard feature
+#:
+#: .. versionadded: 2.6
+#:
+PUBLIC_DASHBOARD = False
+
+#: The timeout used on the content cache for public pages
+#:
+#: .. versionadded: 2.6
+#:
+PUBLIC_CONTENT_CACHE_TIMEOUT = 240
+
+#: List of Wire item fields to keep when accessing from public dashboard
+#:
+#: .. versionadded: 2.6
+#:
+PUBLIC_WIRE_ALLOWED_FIELDS = [
+    "_id",
+    "guid",
+    "type",
+    "slugline",
+    "headline",
+    "anpa_take_key",
+    "description_html",
+    "description_text",
+    "abstract",
+    "body_html",
+    "source",
+    "versioncreated",
+    "wordcount",
+    "charcount",
+    "byline",
+    "copyrightnotice",
+    "language",
+    "mimetype",
+    "priority",
+    "urgency",
+    "usageterms",
+    "version",
+    "renditions",
+]

@@ -164,6 +164,20 @@ def get_planning_coverages(item, plan_id):
     return [coverage for coverage in item.get("coverages") or [] if coverage.get("planning_id") == plan_id]
 
 
+def get_coverage_status(coverage: Dict[str, Any]) -> str:
+    coverage_status = coverage.get("coverage_status")
+    if coverage_status == "coverage intended":
+        return gettext("Planned")
+    elif coverage_status == "coverage not decided yet":
+        return gettext("Not decided")
+    elif coverage_status == "coverage upon request":
+        return gettext("On request")
+    elif coverage_status == "coverage not intended":
+        return gettext("Cancelled")
+    else:
+        return ""
+
+
 def get_item_type(item: Dict[str, Any]) -> Literal["event", "planning"]:
     if item.get("item_type") is not None:
         return item["item_type"]

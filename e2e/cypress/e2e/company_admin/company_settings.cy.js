@@ -21,7 +21,7 @@ describe('CompanySettings', function() {
 
     it('Can create new Company & User and assign sections and products', function() {
         // Login and navigate to Company settings page
-        NewshubLayout.login('admin@nistrator.org', 'admin');
+        NewshubLayout.login('admin@example.com', 'admin');
         NewshubLayout.getSidebarLink('settings').click();
         SettingsNav.getNavLink('companies').click();
 

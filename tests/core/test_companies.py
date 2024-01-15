@@ -5,6 +5,7 @@ from newsroom.tests.fixtures import COMPANY_1_ID
 from superdesk import get_resource_service
 
 from newsroom.user_roles import UserRole
+from tests.utils import logout
 
 
 def test_delete_company_deletes_company_and_users(client):
@@ -115,6 +116,7 @@ def test_get_company_users(client):
 
 
 def test_save_company_permissions(client, app):
+    logout(client)
     sports_id = ObjectId()
     app.data.insert(
         "products",
@@ -164,6 +166,7 @@ def test_save_company_permissions(client, app):
     app.data.update("users", user["_id"], {"company": COMPANY_1_ID, "user_type": UserRole.PUBLIC.value}, user)
 
     # refresh session with new type
+    logout(client)
     test_login_succeeds_for_admin(client)
 
     # test section protection

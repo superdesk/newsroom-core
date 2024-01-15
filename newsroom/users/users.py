@@ -172,6 +172,7 @@ class AuthUserResource(newsroom.Resource):
         "password": UsersResource.schema["password"],
         "token": UsersResource.schema["token"],
         "token_expiry_date": UsersResource.schema["token_expiry_date"],
+        "is_enabled": UsersResource.schema["is_enabled"],
     }
 
     datasource = {
@@ -193,6 +194,7 @@ USER_PROFILE_UPDATES = {
     "notification_schedule",
     "expiry_alert",
     "_updated",
+    "password",
 }
 
 
