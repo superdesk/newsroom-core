@@ -30,6 +30,10 @@ class PictureFormatter(BaseFormatter):
 
         renditions = picture.get("renditions", {})
         picture_details = renditions.get(app.config.get("DOWNLOAD_RENDITION")) or renditions.get("baseImage", {})
+
+        if picture_details is None:
+            raise ValueError("Unable to find picture renditions")
+
         self.MIMETYPE = picture_details.get("mimetype", "image/jpeg")
         picture_details["file_extension"] = self.update_extension()
 
