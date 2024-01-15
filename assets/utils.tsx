@@ -125,6 +125,7 @@ export function createStore<State = any>(reducer: any, name: any = 'default'): S
     return _createStore<State, any, any, any>(reducer, _compose(applyMiddleware(...middlewares)));
 }
 
+/*
  * Noop for now, but it's better to use it from beginning.
  *
  * It handles interpolation:
