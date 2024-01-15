@@ -6,7 +6,7 @@ import {get} from 'lodash';
 
 import {noNavigationSelected} from 'search/utils';
 
-import BaseApp from '../../layout/components/BaseApp';
+import SearchBase from '../../layout/components/SearchBase';
 import SearchBar from 'search/components/SearchBar';
 import {SearchResultsBar} from 'search/components/SearchResultsBar';
 import DownloadItemsModal from '../../wire/components/DownloadItemsModal';
@@ -48,7 +48,7 @@ const modals: any = {
     downloadItems: DownloadItemsModal,
 };
 
-class AmNewsApp extends BaseApp {
+class AmNewsApp extends SearchBase<any> {
     static propTypes: any;
 
     modals: any;

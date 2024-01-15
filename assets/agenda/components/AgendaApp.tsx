@@ -37,7 +37,7 @@ import {
     showSaveTopicSelector,
 } from 'search/selectors';
 
-import BaseApp from 'layout/components/BaseApp';
+import SearchBase from 'layout/components/SearchBase';
 import AgendaPreview from './AgendaPreview';
 import AgendaList from './AgendaList';
 import SearchBar from 'search/components/SearchBar';
@@ -62,7 +62,7 @@ const modals = {
     downloadItems: DownloadItemsModal,
 };
 
-class AgendaApp extends BaseApp {
+class AgendaApp extends SearchBase<any> {
     static propTypes: any;
 
     modals: any;

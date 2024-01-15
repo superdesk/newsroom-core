@@ -70,7 +70,7 @@ interface IDispatchProps {
 
 type IProps = IStateProps & IDispatchProps;
 
-class HomeApp extends React.Component<IProps, IState> {
+class HomeApp extends React.Component<IProps, IState>  {
     static propTypes: any;
 
     height: number;

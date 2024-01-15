@@ -1,8 +1,9 @@
 import {IPublicAppState} from 'interfaces';
-import {createStore, render} from 'utils';
+import {createStore} from 'utils';
 import {PublicApp} from './components/PublicApp';
 import {publicAppReducer} from './reducers';
 import {initData} from 'actions';
+import {render} from 'render-utils';
 
 const store = createStore<IPublicAppState>(publicAppReducer, 'Public');
 

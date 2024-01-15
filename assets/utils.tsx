@@ -6,7 +6,6 @@ import {Provider} from 'react-redux';
 import {createStore as _createStore, applyMiddleware, compose, Store, Middleware} from 'redux';
 import {createLogger} from 'redux-logger';
 import thunk, {ThunkAction} from 'redux-thunk';
-import {render as _render} from 'react-dom';
 import alertify from 'alertifyjs';
 import moment from 'moment-timezone';
 
@@ -126,27 +125,7 @@ export function createStore<State = any>(reducer: any, name: any = 'default'): S
     return _createStore<State, any, any, any>(reducer, _compose(applyMiddleware(...middlewares)));
 }
 
-/**
- * Render helper
- *
- * @param {Store} store
- * @param {Component} App
- * @param {Element} element
- */
-export function render(store: any, App: any, element?: any, props?: any) {
-    if (element == null) {
-        return;
-    }
-
-    return _render(
-        <Provider store={store}>
-            <App {...props}/>
-        </Provider>,
-        element
-    );
-}
-
-/**
+/*
  * Noop for now, but it's better to use it from beginning.
  *
  * It handles interpolation:
