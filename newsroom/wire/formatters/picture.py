@@ -29,7 +29,7 @@ class PictureFormatter(BaseFormatter):
             raise ValueError("Undefined picture")
 
         renditions = picture.get("renditions", {})
-        picture_details = renditions.get(app.config.get("DOWNLOAD_RENDITION")) or renditions.get("baseImage")
+        picture_details = renditions.get(app.config.get("DOWNLOAD_RENDITION")) or renditions.get("baseImage", {})
         self.MIMETYPE = picture_details.get("mimetype", "image/jpeg")
         picture_details["file_extension"] = self.update_extension()
 
