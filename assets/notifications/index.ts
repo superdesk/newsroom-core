@@ -1,5 +1,5 @@
 import {createStore} from 'utils';
-import {render} from 'render-utls';
+import {render} from 'render-utils';
 import {initWebSocket} from 'websocket';
 import notificationReducer from './reducers';
 import NotificationApp from './components/NotificationsApp';

@@ -1,5 +1,5 @@
 import {createStore} from 'utils';
-import {render} from 'render-utls';
+import {render} from 'render-utils';
 import navigationReducer from './reducers';
 import NavigationsApp from './components/NavigationsApp';
 import {initViewData} from './actions';

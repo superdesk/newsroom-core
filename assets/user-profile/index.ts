@@ -3,7 +3,7 @@ import {initWebSocket} from 'websocket';
 import UserProfileApp from './components/UserProfileApp';
 import {initData, selectMenu, pushNotification} from './actions';
 import {store} from './store';
-import {render} from 'render-utls';
+import {render} from 'render-utils';
 
 if (window.profileData) {
     store.dispatch(initData(window.profileData));

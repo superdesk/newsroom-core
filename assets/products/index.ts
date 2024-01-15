@@ -1,5 +1,5 @@
 import {createStore} from 'utils';
-import {render} from 'render-utls';
+import {render} from 'render-utils';
 import productReducer from './reducers';
 import ProductsApp from './components/ProductsApp';
 import {initViewData} from './actions';

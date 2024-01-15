@@ -1,5 +1,5 @@
 import {createStore} from 'utils';
-import {render} from 'render-utls';
+import {render} from 'render-utils';
 import clientReducer from './reducers';
 import ClientsApp from './components/ClientsApp';
 import {initViewData} from './actions';

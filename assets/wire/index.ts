@@ -1,6 +1,6 @@
 import {createStore, getInitData, closeItemOnMobile, isMobilePhone} from 'utils';
 import {initWebSocket} from 'websocket';
-import {render} from 'render-utls';
+import {render} from 'render-utils';
 
 import wireReducer from './reducers';
 import {getNewsOnlyParam, getSearchAllVersionsParam, getReadItems} from 'local-store';

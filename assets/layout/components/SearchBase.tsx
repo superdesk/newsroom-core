@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {get} from 'lodash';
 import {createPortal} from 'react-dom';
 import {Tooltip} from 'bootstrap';
@@ -274,15 +273,3 @@ export default class SearchBase<Props = {}> extends React.Component<Props & IBas
         );
     }
 }
-
-SearchBase.propTypes = {
-    state: PropTypes.object.isRequired,
-    context: PropTypes.string.isRequired,
-    actions: PropTypes.arrayOf(PropTypes.object).isRequired,
-    activeQuery: PropTypes.string,
-    fetchMoreItems: PropTypes.func.isRequired,
-    fetchItems: PropTypes.func.isRequired,
-    savedItemsCount: PropTypes.number,
-    bookmarks: PropTypes.bool,
-    isLoading: PropTypes.bool,
-};

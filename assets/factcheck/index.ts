@@ -17,7 +17,7 @@ import {
     toggleNavigationById,
     setView,
 } from 'search/actions';
-import {render} from 'render-utls';
+import {render} from 'render-utils';
 
 
 const store = createStore(wireReducer, 'FactCheck');

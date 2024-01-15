@@ -7,7 +7,7 @@ import {getActiveDate, getReadItems, getFeaturedOnlyParam} from 'local-store';
 import AgendaApp from './components/AgendaApp';
 import {fetchItems, setState, initData, initParams, pushNotification, openItemDetails, previewItem} from './actions';
 import {setView} from 'search/actions';
-import {render} from 'render-utls';
+import {render} from 'render-utils';
 
 const store = createStore<IAgendaState>(agendaReducer, 'Agenda');
 

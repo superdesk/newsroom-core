@@ -2,7 +2,7 @@ import {createStore} from 'utils';
 import cardReducer from './reducers';
 import CardsApp from './components/CardsApp';
 import {initViewData} from './actions';
-import {render} from 'render-utls';
+import {render} from 'render-utils';
 
 
 const store = createStore(cardReducer, 'Cards');

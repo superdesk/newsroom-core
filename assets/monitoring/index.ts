@@ -1,7 +1,7 @@
 import {get, startsWith} from 'lodash';
 
 import {createStore, getInitData, closeItemOnMobile, isMobilePhone} from 'utils';
-import {render} from 'render-utls';
+import {render} from 'render-utils';
 import {initWebSocket} from 'websocket';
 import {getReadItems} from 'local-store';
 import monitoringReducer from './reducers';

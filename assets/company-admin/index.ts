@@ -3,7 +3,7 @@ import {createStore} from 'utils';
 import {initViewData} from './actions';
 import {companyAdminReducer} from './reducers';
 import {CompanyAdminApp} from './components/CompanyAdminApp';
-import {render} from 'render-utls';
+import {render} from 'render-utils';
 
 const store = createStore(companyAdminReducer, 'CompanyAdmin');
 

@@ -4,7 +4,7 @@ import {createStore} from 'utils';
 import {runReport} from '../actions';
 import {panels} from '../utils';
 import companyReportReducer from '../reducers';
-import {render} from 'render-utls';
+import {render} from 'render-utils';
 
 const store = createStore(companyReportReducer, 'CompanyReports');
 const Panel = panels[window.report];

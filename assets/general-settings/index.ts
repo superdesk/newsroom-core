@@ -2,7 +2,7 @@ import {createStore} from 'utils';
 import settingsReducer from './reducers';
 import GeneralSettingsApp from './components/GeneralSettingsApp';
 import {initViewData} from './actions';
-import {render} from 'render-utls';
+import {render} from 'render-utils';
 
 
 const store = createStore(settingsReducer, 'GeneralSettings');

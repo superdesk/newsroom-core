@@ -3,7 +3,7 @@ import {initWebSocket} from 'websocket';
 import homeReducer from './reducers';
 import HomeApp from './components/HomeApp';
 import {initData, pushNotification} from './actions';
-import {render} from 'render-utls';
+import {render} from 'render-utils';
 
 
 const store = createStore(homeReducer, 'Home');
