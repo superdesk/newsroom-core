@@ -247,7 +247,7 @@ class AgendaListItem extends React.Component<IProps> {
                         const lastChild: boolean = firstThreeSearchSegments.length - 1 === i;
                         const showThreeDots = lastChild && hasMoreSearchContent;
 
-                        const Wrapper: React.ComponentType<{children: HTMLElement}> = ({children}) => {
+                        const Wrapper: React.ComponentType<{children: React.ReactNode}> = ({children}) => {
                             if (lastChild && numberOfNotRenderResults > 0) {
                                 return (
                                     <div key={i} className='d-flex gap-1 align-items-end'>
@@ -260,7 +260,11 @@ class AgendaListItem extends React.Component<IProps> {
                             }
                         };
 
-                        return <Wrapper key={i}><div className={showThreeDots ? 'wire-articles__item__text--last-child' : ''} dangerouslySetInnerHTML={{__html: paragraph.outerHTML}} /></Wrapper>;
+                        return (
+                            <Wrapper key={i}>
+                                <div className={showThreeDots ? 'wire-articles__item__text--last-child' : ''} dangerouslySetInnerHTML={{__html: paragraph.outerHTML}} />
+                            </Wrapper>
+                        );
                     })
                 );
             } else {
