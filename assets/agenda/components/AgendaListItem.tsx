@@ -44,6 +44,11 @@ interface IProps {
     resetActioningItem(): void;
 }
 
+const isHTML = (value: string) => {
+    const doc = new DOMParser().parseFromString(value, 'text/html');
+    return Array.from(doc.body.childNodes).some(node => node.nodeType === 1);
+};
+
 class AgendaListItem extends React.Component<IProps> {
     dom: {article: HTMLElement | null};
 
@@ -172,6 +177,59 @@ class AgendaListItem extends React.Component<IProps> {
         };
     }
 
+    getSearchSegments(_description: string) {
+        const domWithoutHighlightedText = new DOMParser().parseFromString(_description, 'text/html');
+        domWithoutHighlightedText.querySelectorAll('span.es-highlight').forEach((element) => {
+            element.remove();
+        });
+
+        const description = isHTML(domWithoutHighlightedText.body.outerHTML) ? _description : _description.split('\n').map((p) => `<p>${p}</p>`).join('');
+
+        const dom = new DOMParser().parseFromString(description.replace(/\n/g, '<br />'), 'text/html');
+        const arrayOfParagraphs = dom.body.querySelectorAll('p');
+        const numberOfResults = dom.body.querySelectorAll('span.es-highlight').length;
+
+        const getSegmentCount = (p: HTMLParagraphElement): number => {
+            // adding one because if there are 2 <br> tags it means there are 3 segments
+            return p.getElementsByTagName('br').length + 1;
+        };
+
+        const descriptionHTMLArr: HTMLParagraphElement[] = [];
+        let segmentsRemainingToBeAdded = 3;
+        let paragraphsInnerText = '';
+
+        arrayOfParagraphs.forEach((paragraph, i) => {
+            const span = paragraph.getElementsByClassName('es-highlight');
+
+            if (span.length > 0) {
+                [...arrayOfParagraphs].slice(i, arrayOfParagraphs.length).forEach((paragraph, i) => {
+                    if (segmentsRemainingToBeAdded > 0) {
+                        paragraphsInnerText += paragraph.innerText;
+                        paragraph.innerHTML = paragraph.innerHTML.split('<br>').filter((p: string) => p.trim() !== '').slice(0, segmentsRemainingToBeAdded).join('<br>');
+    
+                        segmentsRemainingToBeAdded = segmentsRemainingToBeAdded - getSegmentCount(paragraph);
+    
+                        descriptionHTMLArr.push(paragraph);
+                    }
+                });
+            }
+        });
+
+        let numberOfRenderResults = 0;
+        descriptionHTMLArr.forEach(element => {
+            numberOfRenderResults += element.querySelectorAll('span.es-highlight').length;
+        });
+
+        return {
+            /**
+             * keep in mind that first 3 segments might be 1-3 paragraphs
+             */
+            firstThreeSearchSegments: descriptionHTMLArr,
+            hasMoreSearchContent: dom.body.innerText.length > paragraphsInnerText.length,
+            numberOfNotRenderResults: numberOfResults - numberOfRenderResults,
+        };
+    }
+
     renderListItem(isMobile: boolean, children: React.ReactNode) {
         const {item, isExtended, group, planningId, listConfig} = this.props;
         const classes = this.getClassNames(isExtended);
@@ -180,15 +238,31 @@ class AgendaListItem extends React.Component<IProps> {
         // Show headline for adhoc planning items
         const showHeadline = item.event == null && (item.headline?.length ?? 0) > 0;
         const {firstThreeSegments, hasMoreContent} =  this.getSegments(description);
+        const {firstThreeSearchSegments, hasMoreSearchContent, numberOfNotRenderResults} =  this.getSearchSegments(description);
 
         const renderDescription = (() => {
-            const isHTML = (value: string) => {
-                const doc = new DOMParser().parseFromString(value, 'text/html');
-                return Array.from(doc.body.childNodes).some(node => node.nodeType === 1);
-            };
-
             if (item.es_highlight != null && (item.es_highlight.definition_short ?? '').length > 0) {
-                return <div style={{whiteSpace: 'pre-line'}} dangerouslySetInnerHTML={{__html: description}} />;
+                return (
+                    firstThreeSearchSegments.map((paragraph, i: number) => {
+                        const lastChild: boolean = firstThreeSearchSegments.length - 1 === i;
+                        const showThreeDots = lastChild && hasMoreSearchContent;
+
+                        const Wrapper: React.ComponentType<{children: HTMLElement}> = ({children}) => {
+                            if (lastChild && numberOfNotRenderResults > 0) {
+                                return (
+                                    <div key={i} className='d-flex gap-1 align-items-end'>
+                                        {children}
+                                        <span className='wire-articles__item__text--muted'>({numberOfNotRenderResults} more)</span>
+                                    </div>
+                                );
+                            } else {
+                                return <>{children}</>;
+                            }
+                        };
+
+                        return <Wrapper key={i}><div className={showThreeDots ? 'wire-articles__item__text--last-child' : ''} dangerouslySetInnerHTML={{__html: paragraph.outerHTML}} /></Wrapper>;
+                    })
+                );
             } else {
                 if (isHTML(description)) {
                     return (
