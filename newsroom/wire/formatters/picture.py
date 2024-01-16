@@ -2,6 +2,7 @@ import mimetypes
 
 from newsroom.wire.formatters.base import BaseFormatter
 from newsroom.wire.utils import get_picture
+from flask import current_app as app
 
 
 class PictureFormatter(BaseFormatter):
@@ -27,7 +28,12 @@ class PictureFormatter(BaseFormatter):
         if not picture:
             raise ValueError("Undefined picture")
 
-        picture_details = picture.get("renditions", {}).get("baseImage", {})
+        renditions = picture.get("renditions", {})
+        picture_details = renditions.get(app.config.get("DOWNLOAD_RENDITION")) or renditions.get("baseImage", {})
+
+        if picture_details is None:
+            raise ValueError("Unable to find picture renditions")
+
         self.MIMETYPE = picture_details.get("mimetype", "image/jpeg")
         picture_details["file_extension"] = self.update_extension()
 
