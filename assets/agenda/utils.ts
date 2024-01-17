@@ -48,7 +48,7 @@ const Groupers: any = {
 };
 
 export function getCoverageStatusText(coverage: any) {
-    if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
+    if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT || coverage.coverage_status !== 'coverage intended') {
         return get(DRAFT_STATUS_TEXTS, coverage.coverage_status, '');
     }
 
@@ -1029,6 +1029,7 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
     const coverageScheduled = moment(coverage.scheduled);
     const assignee = getCoverageAsigneeName(coverage);
     const desk = getCoverageDeskName(coverage);
+    const status =  getCoverageStatusText(coverage);
     const assignedDetails = [
         assignee ? gettext('assignee: {{name}}', {name: assignee}) : '',
         desk ? gettext('desk: {{name}}', {name: desk}) : '',
@@ -1041,12 +1042,13 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
             assignedDetails,
         });
     } else if (coverage.workflow_status === WORKFLOW_STATUS.ASSIGNED) {
-        return gettext('Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}} {{assignedDetails}}', {
+        return gettext('{{ status }} {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}} {{assignedDetails}}', {
             type: coverageType,
             slugline: slugline,
             date: formatDate(coverageScheduled),
             time: formatTime(coverageScheduled),
             assignedDetails,
+            status,
         });
     } else if (coverage.workflow_status === WORKFLOW_STATUS.ACTIVE) {
         return gettext('{{ type }} coverage {{ slugline }} in progress, expected {{date}} at {{time}} {{assignedDetails}}', {
