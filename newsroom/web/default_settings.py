@@ -699,3 +699,13 @@ AGENDA_SHOW_MULTIDAY_ON_START_ONLY = True
 #: .. versionadded: 2.5.0
 #:
 WIRE_NOTIFICATIONS_ON_CORRECTIONS = False
+
+#: Round ``now`` when querying for embargoed items
+#: Common options are:
+# "" - No rounding
+# "/m" - Round ``now`` down to nearest minute
+# "/h" - Round ``now`` down to nearest hour
+#:
+#: .. versionadded:: 2.5.0
+#:
+EMBARGO_QUERY_ROUNDING = "/m"
