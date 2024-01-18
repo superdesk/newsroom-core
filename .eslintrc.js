@@ -22,6 +22,7 @@ module.exports = {
         '@typescript-eslint',
     ],
     'rules': {
+        'react/prop-types': 0,
         '@typescript-eslint/no-explicit-any': 0,
         '@typescript-eslint/ban-ts-comment': 0,
         'indent': [
