@@ -20,7 +20,7 @@ import {
     getInternalNote,
 } from '../utils';
 import ActionMenu from '../../components/ActionMenu';
-import {LIST_ANIMATIONS, isMobilePhone} from 'utils';
+import {LIST_ANIMATIONS, isMobilePhone, gettext} from 'utils';
 
 interface IProps {
     item: IAgendaItem;
@@ -252,7 +252,7 @@ class AgendaListItem extends React.Component<IProps> {
                                 return (
                                     <div key={i} className='d-flex gap-1 align-items-end'>
                                         {children}
-                                        <span className='wire-articles__item__text--muted'>({numberOfNotRenderResults} more)</span>
+                                        <span className='wire-articles__item__text--muted'>({gettext('{{n}} more', {n: numberOfNotRenderResults})})</span>
                                     </div>
                                 );
                             } else {
