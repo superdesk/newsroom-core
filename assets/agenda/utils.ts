@@ -15,6 +15,7 @@ import {
     AGENDA_DATE_FORMAT_SHORT,
     formatTime,
     DAY_IN_MINUTES,
+    upperCaseFirstCharacter,
 } from '../utils';
 
 export const STATUS_KILLED = 'killed';
@@ -1025,7 +1026,7 @@ export function formatCoverageDate(coverage: ICoverage) {
 
 export function formattedCoverageStatusText(coverage: ICoverage) {
     const statusText = getCoverageStatusText(coverage).replace('Coverage ', '');
-    return statusText.charAt(0).toUpperCase() + statusText.slice(1);
+    return upperCaseFirstCharacter(statusText);
 }
 
 export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
