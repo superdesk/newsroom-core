@@ -1023,13 +1023,18 @@ export function formatCoverageDate(coverage: ICoverage) {
         parseDate(coverage.scheduled).format(COVERAGE_DATE_TIME_FORMAT);
 }
 
+export function formattedCoverageStatusText(coverage: ICoverage) {
+    const statusText = getCoverageStatusText(coverage).replace('Coverage ', '');
+    return statusText.charAt(0).toUpperCase() + statusText.slice(1);
+}
+
 export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
     const slugline = coverage.item_slugline || coverage.slugline;
     const coverageType = getCoverageDisplayName(coverage.coverage_type);
     const coverageScheduled = moment(coverage.scheduled);
     const assignee = getCoverageAsigneeName(coverage);
     const desk = getCoverageDeskName(coverage);
-    const status =  getCoverageStatusText(coverage);
+    const status =  formattedCoverageStatusText(coverage);
     const assignedDetails = [
         assignee ? gettext('assignee: {{name}}', {name: assignee}) : '',
         desk ? gettext('desk: {{name}}', {name: desk}) : '',
