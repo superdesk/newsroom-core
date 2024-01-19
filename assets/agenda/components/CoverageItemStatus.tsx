@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import {get} from 'lodash';
 import {gettext} from 'utils';
 import {
+    getCoverageStatusText,
     WORKFLOW_STATUS,
     isCoverageBeingUpdated,
     isWatched,
-    formattedCoverageStatusText,
 } from '../utils';
 
 import AgendaInternalNote from './AgendaInternalNote';
@@ -192,7 +192,7 @@ export default class CoverageItemStatus extends React.Component<any, any> {
                 <div className='coverage-item__row'>
                     <span key="topRow">
                         <span key="label" className='coverage-item__text-label me-1'>{gettext('status')}:</span>
-                        <span key="value">{formattedCoverageStatusText(coverage)}</span>
+                        <span key="value">{getCoverageStatusText(coverage)}</span>
                     </span>
                 </div>
 
