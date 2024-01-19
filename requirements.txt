@@ -20,5 +20,5 @@ google-auth>=2.6,<2.7
 # https://github.com/xhtml2pdf/xhtml2pdf/issues/589
 reportlab>=3.6.11,<3.7
 
-superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@develop
+superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@release/2.7
 superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@v2.7.0-rc1
