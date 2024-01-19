@@ -47,8 +47,10 @@ const Groupers: any = {
     'month': formatMonth,
 };
 
+const COVERAGE_INTENDED = 'coverage intended';
+
 export function getCoverageStatusText(coverage: any) {
-    if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT || coverage.coverage_status !== 'coverage intended') {
+    if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT || coverage.coverage_status !== COVERAGE_INTENDED) {
         return get(DRAFT_STATUS_TEXTS, coverage.coverage_status, '');
     }
 
@@ -1034,7 +1036,7 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
         desk ? gettext('desk: {{name}}', {name: desk}) : '',
     ].filter((x) => x !== '').join(', ');
 
-    if (coverage.coverage_status !== 'coverage intended') {
+    if (coverage.coverage_status !== COVERAGE_INTENDED) {
         return get(DRAFT_STATUS_TEXTS, coverage.coverage_status, '');
     } else if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
         return gettext('{{ type }} coverage {{ slugline }} {{ status_text }} {{assignedDetails}}', {
