@@ -416,7 +416,8 @@ class BaseSearchService(Service):
             return
 
         current_user = get_user(required=False)
-        search.is_admin = is_admin(current_user)
+        if current_user:
+            search.is_admin = is_admin(current_user)
 
         if search.is_admin and search.args.get("user"):
             search.user = get_resource_service("users").find_one(req=None, _id=search.args["user"])
@@ -843,56 +844,60 @@ class BaseSearchService(Service):
             response.hits["hits"]["total"] = response.count() + embargoed_response.count()
 
     def get_matching_topics_for_item(self, topics, users, companies, query):
-        aggs = {"topics": {"filters": {"filters": {}}}}
-        queried_topics = []
-
-        for topic in topics:
-            user = users.get(str(topic["user"]))
-            if not user:
-                continue
-
-            company = companies.get(str(user.get("company", "")))
-
-            topic_query = self.get_topic_query(topic, user, company, query)
-            if not topic_query:
-                continue
-
-            aggs["topics"]["filters"]["filters"][str(topic["_id"])] = topic_query.query
-
-            queried_topics.append(topic)
-
-        source = {"query": query}
-        source["aggs"] = aggs if aggs["topics"]["filters"]["filters"] else {}
-        source["size"] = 0
-
-        req = ParsedRequest()
-        req.args = {"source": json.dumps(source)}
         topic_matches = []
+        topics_checked = set()
 
-        try:
-            search_results = self.internal_get(req, None)
+        for user in users.values():
+            aggs = {"topics": {"filters": {"filters": {}}}}
+            company = companies.get(str(user.get("company", "")))
+            # there will be one base search for a user with aggs for user topics
+            search = self.get_topic_query(None, user, company, query=query)
+            if not search:
+                continue
+            queried_topics = []
+            for topic in topics:
+                user_id = str(topic["user"])
+                if not user_id or str(user["_id"]) != user_id:
+                    continue
+                if topic["_id"] in topics_checked:
+                    continue
+                topics_checked.add(topic["_id"])
 
-            for topic in queried_topics:
-                if search_results.hits["aggregations"]["topics"]["buckets"][str(topic["_id"])]["doc_count"] > 0:
-                    topic_matches.append(topic["_id"])
+                topic_query = self.get_topic_query(topic, None, None)
+                if not topic_query:
+                    continue
 
-        except Exception as exc:
-            logger.error(
-                "Error in get_matching_topics for query: {}".format(json.dumps(source)),
-                exc,
-                exc_info=True,
-            )
-            raise
+                aggs["topics"]["filters"]["filters"][str(topic["_id"])] = topic_query.query
+                queried_topics.append(topic)
+            if not queried_topics:
+                continue
+            source = {"query": search.query}
+            source["aggs"] = aggs if aggs["topics"]["filters"]["filters"] else {}
+            source["size"] = 0
+
+            req = ParsedRequest()
+            req.args = {"source": json.dumps(source)}
+
+            try:
+                search_results = self.internal_get(req, None)
+
+                for topic in queried_topics:
+                    if search_results.hits["aggregations"]["topics"]["buckets"][str(topic["_id"])]["doc_count"] > 0:
+                        topic_matches.append(topic["_id"])
+
+            except Exception:
+                logger.exception(
+                    "Error in get_matching_topics",
+                    extra=dict(
+                        query=source,
+                        user=user_id,
+                    ),
+                )
+                continue
 
         return topic_matches
 
-    def get_topic_query(self, topic, user, company, section_filters=None, query=None, args=None):
-        search = SearchQuery()
-
-        search.user = user
-        search.company = company
-        search.section = topic.get("topic_type") or "wire"
-
+    def apply_topic_args(self, topic, args=None):
         if args is None:
             args = {}
 
@@ -917,20 +922,36 @@ class BaseSearchService(Service):
         if topic.get("navigation"):
             args["navigation"] = topic["navigation"]
 
-        search.args = args
+        return args
+
+    def get_topic_query(self, topic, user, company, section_filters=None, query=None, args=None):
+        search = SearchQuery()
+        search.user = user
+        search.company = company
+        search.section = self.section
+
+        if not args:
+            args = {}
+
+        if topic:
+            search.args = self.apply_topic_args(topic, args)
+        elif args:
+            search.args = args
 
         if query is not None:
             search.query = deepcopy(query)
 
         try:
             self.prefill_search_query(search)
-            self.validate_request(search)
+            if user:
+                self.validate_request(search)
             self.apply_filters(search, section_filters)
         except Forbidden as exc:
-            logger.info(
-                "Notification for user:{} and topic:{} is skipped".format(user.get("_id"), topic.get("_id")),
-                exc_info=exc,
-            )
+            if user and topic:
+                logger.info(
+                    "Notification for user:{} and topic:{} is skipped".format(user.get("_id"), topic.get("_id")),
+                    exc_info=exc,
+                )
             return
 
         return search

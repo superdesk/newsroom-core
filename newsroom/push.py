@@ -760,7 +760,7 @@ def notify_new_item(item, check_topics=True):
         )
     except Exception as e:
         logger.exception(e)
-        logger.error(f"Failed to notify users for new {item_type} item {item['_id']}")
+        logger.error(f"Failed to notify users for new {item_type} item", extra={"_id": item["_id"]})
 
 
 def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids, users_with_realtime_subscription):
