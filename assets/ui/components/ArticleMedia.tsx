@@ -9,7 +9,7 @@ export default function ArticleMedia({isKilled, media, download}: any) {
 
     return (
         (rendition && !isKilled) && (
-            <div className='wire-column__preview__video'>
+            <div className='wire-column__preview__video' key={rendition.href}>
                 <span className='wire-column__preview__video-headline'>{media.headline || media.description_text}</span>
                 {media.type === 'video' && (
                     <video controls preload="metadata">
