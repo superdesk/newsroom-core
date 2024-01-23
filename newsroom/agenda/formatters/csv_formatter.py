@@ -43,7 +43,7 @@ class CSVFormatter(BaseFormatter):
         event = item.get("event", {})
         return {
             "Event name": item.get("name", ""),
-            "Description": item.get("definition_long", item.get("definition_short", "")),
+            "Description": item.get("definition_long") or item.get("definition_short", ""),
             "Language": item.get("language", ""),
             "Event start date": self.format_date(item, "start"),
             "Event end date": self.format_date(item, "end"),
