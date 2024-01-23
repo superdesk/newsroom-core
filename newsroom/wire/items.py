@@ -24,6 +24,12 @@ class ItemsResource(BaseItemsResource):
 
 
 class ItemsService(BaseItemsService):
+    def _is_internal_api(self):
+        # we need to avoid superdesk core handling which makes it return nothing
+        # todo: get rid of the base item service from content api, there is too much
+        # logic related to subscribers
+        return False
+
     def get_expired_items(self, expiry_datetime=None, expiry_days=None, max_results=None, include_children=True):
         # remove old items based on expiry days config
         for items in super().get_expired_items(expiry_datetime, expiry_days, max_results, include_children):
