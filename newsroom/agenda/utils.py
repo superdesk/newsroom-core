@@ -277,7 +277,7 @@ def get_filtered_subject(subject: Dict[str, Any], schemas: list) -> list:
     """
     Filter subject based on schemas
     """
-    if len(schemas) == 0:
+    if schemas and len(schemas) == 0:
         return subject
     filtered_items = []
     for schema in schemas:
