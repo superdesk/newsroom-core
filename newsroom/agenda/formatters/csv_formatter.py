@@ -42,9 +42,9 @@ class CSVFormatter(BaseFormatter):
         return csv_string.getvalue().encode("utf-8")
 
     def format_event(self, item: Dict[str, Any]) -> Dict[str, Any]:
-        SUBJ_SCHEMAS = app.config.get("AGENDA_CSV_SUBJECT_SCHEMES")
+        subj_schemas = app.config.get("AGENDA_CSV_SUBJECT_SCHEMES", [])
         event = item.get("event", {})
-        event["subject"] = get_filtered_subject(event.get("subject", {}), SUBJ_SCHEMAS)
+        event["subject"] = get_filtered_subject(event.get("subject", {}), subj_schemas)
         return {
             "Event name": item.get("name", ""),
             "Description": item.get("definition_long") or item.get("definition_short", "") or "",

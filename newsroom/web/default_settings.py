@@ -193,8 +193,8 @@ TEMPLATES_AUTO_RELOAD = True
 
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S+0000"
 
-WEBPACK_ASSETS_URL = os.environ.get("WEBPACK_ASSETS_URL")
-WEBPACK_SERVER_URL = os.environ.get("WEBPACK_SERVER_URL")
+WEBPACK_ASSETS_URL = os.environ.get("WEBPACK_ASSETS_URL", "http://localhost:8080")
+WEBPACK_SERVER_URL = os.environ.get("WEBPACK_SERVER_URL", "http://localhost:8080")
 
 # How many days a new account can stay active before it is approved by admin
 NEW_ACCOUNT_ACTIVE_DAYS = 14
@@ -758,3 +758,7 @@ PUBLIC_WIRE_ALLOWED_FIELDS = [
     "version",
     "renditions",
 ]
+
+#: Filter subject based on this config in the Formatter
+
+AGENDA_CSV_SUBJECT_SCHEMES = []
