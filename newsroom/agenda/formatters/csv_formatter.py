@@ -6,6 +6,8 @@ from werkzeug.utils import secure_filename
 from newsroom.utils import parse_dates
 from datetime import datetime
 from typing import List, Dict, Any, Union, Tuple
+from newsroom.agenda.utils import get_filtered_subject
+from flask import current_app as app
 
 
 class CSVFormatter(BaseFormatter):
@@ -40,7 +42,9 @@ class CSVFormatter(BaseFormatter):
         return csv_string.getvalue().encode("utf-8")
 
     def format_event(self, item: Dict[str, Any]) -> Dict[str, Any]:
+        SUBJ_SCHEMAS = app.config.get("AGENDA_CSV_SUBJECT_SCHEMES")
         event = item.get("event", {})
+        event["subject"] = get_filtered_subject(event.get("subject", {}), SUBJ_SCHEMAS)
         return {
             "Event name": item.get("name", ""),
             "Description": item.get("definition_long") or item.get("definition_short", "") or "",
@@ -110,7 +114,7 @@ class CSVFormatter(BaseFormatter):
                     ",".join(contact.get("contact_email", [])),
                     ",".join(contact.get("mobile", [])),
                 ]
-                return ",".join(contact_values)
+                return ",".join(list(filter(bool, contact_values)))
         return ""
 
     def format_coverage(self, item: Dict[str, Any], field: str) -> str:
