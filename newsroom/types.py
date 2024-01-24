@@ -1,5 +1,5 @@
 from bson import ObjectId
-from typing import Dict, List, TypedDict, Any, Union, NoReturn
+from typing import Dict, List, Optional, TypedDict, Any, Union, NoReturn
 from datetime import datetime
 from enum import Enum
 from flask_babel import LazyString
@@ -102,6 +102,17 @@ class UserData(UserRequired, total=False):
 
 class User(UserData):
     pass
+
+
+class PublicUserData(TypedDict):
+    _id: str
+    company: str
+    first_name: str
+    last_name: str
+    email: str
+    products: List[ProductRef]
+    sections: Dict[str, bool]
+    notification_schedule: Optional[NotificationSchedule]
 
 
 class UserAuth(TypedDict):
