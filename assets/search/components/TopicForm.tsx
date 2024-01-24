@@ -91,9 +91,13 @@ const TopicForm: React.FC<IProps> = ({
 
     useEffect(() => {
         const newlyCreatedFolder = folders.find((x) => x.name === newFolder?.name) as ITopicFolder;
-
         setNewFolder(null);
-        onFolderChange(newlyCreatedFolder);
+
+        // if a new folder has been created from the topic editor form,
+        // set it as the folder, on the topic that is being edited currently
+        if (newlyCreatedFolder) {
+            onFolderChange(newlyCreatedFolder);
+        }
     }, [folders]);
 
     return (
