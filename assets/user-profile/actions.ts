@@ -258,9 +258,8 @@ export function saveFolder(folder: ITopicFolder, data: {name: string}, global?: 
         const state = getState();
         const url = getFoldersUrl(state.company, state.user?._id, global, folder._id);
 
-        const returnFolder = (allFolders: IFoldersUnified, id: string) => {
-            return ([...allFolders.userFolders, allFolders.companyFolders] as Array<ITopicFolder>).find(({_id}) => _id === id);
-        };
+        const returnFolder = (allFolders: IFoldersUnified, id: string) =>
+            [...allFolders.userFolders, ...allFolders.companyFolders].find(({_id}) => _id === id);
 
         if (folder._etag) {
             const updates = {...data};
