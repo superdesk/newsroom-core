@@ -1,6 +1,7 @@
 import React from 'react';
 import MoreNewsButton, {MoreNewsSearchKind} from './MoreNewsButton';
 import {connect} from 'react-redux';
+import {IProduct} from 'interfaces/product';
 
 interface IOwnProps {
     id: string;
@@ -15,6 +16,7 @@ interface IOwnProps {
 interface IReduxStateProps {
     userProducts: Array<any>;
     userType: string;
+    companyProducts: Array<IProduct>;
 }
 
 type IComponentProps = IOwnProps & IReduxStateProps
@@ -37,7 +39,11 @@ class CardRow extends React.Component<IComponentProps, any> {
         let moreNews = this.props.moreNews == null ? true : this.props.moreNews;
 
         if (userType !== 'administrator' && kind == null) {
-            moreNews = userProducts.some((userProduct: any) => userProduct._id === id);
+            const isProductInUserProducts = userProducts.some(userProduct => userProduct._id === product._id);
+            const isProductInCompanyProductsWithoutSeats = companyProducts.some(
+                companyProduct => companyProduct._id === product._id && !companyProduct.seats
+            );
+            moreNews = isProductInUserProducts || isProductInCompanyProductsWithoutSeats;
         }
 
         return (
@@ -52,6 +58,7 @@ class CardRow extends React.Component<IComponentProps, any> {
 const mapStateToProps = (state: any): IReduxStateProps => ({
     userProducts: state.userProducts,
     userType: state.userType,
+    companyProducts: state.companyProducts,
 });
 
 const component: React.ComponentType<IOwnProps> = connect<IReduxStateProps, {}, IOwnProps>(mapStateToProps)(CardRow);
