@@ -328,7 +328,7 @@ def test_coverage_request(client, app):
             "/agenda/request_coverage",
             data=json.dumps(
                 {
-                    "item": ["urn:conference"],
+                    "item": "urn:conference",
                     "message": "Some info message",
                 }
             ),
