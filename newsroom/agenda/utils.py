@@ -1,4 +1,4 @@
-from typing import Dict, NamedTuple, Any, Literal
+from typing import Dict, NamedTuple, Any, Literal, List, Union
 from datetime import timedelta
 
 from flask import current_app as app
@@ -273,7 +273,9 @@ def push_agenda_item_notification(name, item, **kwargs):
         )
 
 
-def get_filtered_subject(subject: Dict[str, Any], schemas: list) -> list:
+def get_filtered_subject(
+    subject: List[Dict[str, Any]], schemas: List[str]
+) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
     """
     Filter subject based on schemas
     """
