@@ -281,7 +281,4 @@ def get_filtered_subject(
     """
     if not schemas:
         return subject
-    filtered_items = []
-    for schema in schemas:
-        filtered_items += [item for item in subject if "scheme" in item and item["scheme"] == schema]
-    return filtered_items
+    return [subj for subj in subject if subj.get("scheme") in schemas]

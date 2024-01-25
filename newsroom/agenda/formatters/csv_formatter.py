@@ -44,7 +44,7 @@ class CSVFormatter(BaseFormatter):
     def format_event(self, item: Dict[str, Any]) -> Dict[str, Any]:
         subj_schemas = app.config.get("AGENDA_CSV_SUBJECT_SCHEMES", [])
         event = item.get("event", {})
-        event["subject"] = get_filtered_subject(event.get("subject", {}), subj_schemas)
+        event["subject"] = get_filtered_subject(event.get("subject", []), subj_schemas)
         return {
             "Event name": item.get("name", ""),
             "Description": item.get("definition_long") or item.get("definition_short", "") or "",
