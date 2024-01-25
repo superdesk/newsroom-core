@@ -58,7 +58,7 @@ interface IProps {
 
     changeNotificationType(notificationType: ITopicNotificationScheduleType): void;
     openEditTopicNotificationsModal(): void;
-    saveFolder: (folder: any, data: any, global?: boolean) => void;
+    saveFolder: (folder: any, data: any, global?: boolean) => Promise<ITopicFolder>;
 }
 
 const TopicForm: React.FC<IProps> = ({
@@ -88,17 +88,6 @@ const TopicForm: React.FC<IProps> = ({
 }): React.ReactElement => {
     const topicSubscriptionType = getSubscriptionNotificationType(topic, user._id);
     const [newFolder, setNewFolder] = useState<Partial<ITopicFolder> | null>();
-
-    useEffect(() => {
-        const newlyCreatedFolder = folders.find((x) => x.name === newFolder?.name) as ITopicFolder;
-        setNewFolder(null);
-
-        // if a new folder has been created from the topic editor form,
-        // set it as the folder, on the topic that is being edited currently
-        if (newlyCreatedFolder) {
-            onFolderChange(newlyCreatedFolder);
-        }
-    }, [folders]);
 
     return (
         <form onSubmit={save}>
@@ -188,10 +177,12 @@ const TopicForm: React.FC<IProps> = ({
                                     className="simple-card__group position-relative"
                                 >
                                     <TopicFolderEditor
-                                        onSave={((name) => {
-                                            saveFolder(newFolder, {name}, topic.is_global);
-                                            setNewFolder({name});
-                                        })}
+                                        onSave={((name) =>
+                                            saveFolder(newFolder, {name}, topic.is_global).then((result) => {
+                                                onFolderChange(result);
+                                                setNewFolder(null);
+                                            })
+                                        )}
                                         folder={newFolder}
                                         onCancel={() => setNewFolder(null)}
                                     />
