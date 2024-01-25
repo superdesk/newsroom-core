@@ -19,7 +19,7 @@ from eve_elastic.elastic import parse_date, ElasticCursor
 from flask import current_app as app, json, abort, request, g, flash, session, url_for
 from flask_babel import gettext
 
-from newsroom.types import User, Company
+from newsroom.types import PublicUserData, User, Company
 from newsroom.template_filters import (
     time_short,
     parse_date as parse_short_date,
@@ -643,3 +643,16 @@ def any_objectid_in_list(list_ids: List[Union[str, ObjectId]], source_ids: List[
         if ObjectId(item_id) in source_ids:
             return True
     return False
+
+
+def get_public_user_data(user: User) -> PublicUserData:
+    return PublicUserData(
+        _id=str(user.get("_id", "")),
+        company=str(user.get("company", "")),
+        first_name=user.get("first_name", ""),
+        last_name=user.get("last_name", ""),
+        email=user.get("email", ""),
+        products=user.get("products") or [],
+        sections=user.get("sections") or {},
+        notification_schedule=user.get("notification_schedule"),
+    )
