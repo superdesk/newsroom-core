@@ -258,19 +258,19 @@ export function saveFolder(folder: ITopicFolder, data: {name: string}, global?: 
         const state = getState();
         const url = getFoldersUrl(state.company, state.user?._id, global, folder._id);
 
-        const returnFolder = (allFolders: IFoldersUnified, id: string) =>
+        const getFolder = (allFolders: IFoldersUnified, id: string) =>
             [...allFolders.userFolders, ...allFolders.companyFolders].find(({_id}) => _id === id);
 
         if (folder._etag) {
             const updates = {...data};
 
             return server.patch(url, updates, folder._etag)
-                .then((result) => dispatch(fetchFolders()).then((allFolders: IFoldersUnified) => returnFolder(allFolders, result._id)));
+                .then((result) => dispatch(fetchFolders()).then((allFolders: IFoldersUnified) => getFolder(allFolders, result._id)));
         } else {
             const payload = {...data, section: state.selectedMenu === 'events' ? 'agenda' : 'wire'};
 
             return server.post(url, payload)
-                .then((result) => dispatch(fetchFolders()).then((allFolders: IFoldersUnified) => returnFolder(allFolders, result._id)));
+                .then((result) => dispatch(fetchFolders()).then((allFolders: IFoldersUnified) => getFolder(allFolders, result._id)));
         }
     };
 }
