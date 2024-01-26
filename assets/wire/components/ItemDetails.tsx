@@ -96,7 +96,7 @@ function ItemDetails({
             <ArticleItemDetails disableTextSelection={detailsConfig.disable_text_selection}>
                 <ArticleContent>
                     {
-                        (imagesArray.length > 0) && imagesArray.map((images) => (
+                        isDisplayed('gallery', detailsConfig) && (imagesArray.length > 0) && imagesArray.map((images) => (
                             <Carousel
                                 key={images[0].src}
                                 images={images}
