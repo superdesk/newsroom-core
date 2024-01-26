@@ -882,7 +882,7 @@ class AgendaService(BaseSearchService):
         self.apply_request_filter(search)
         self.apply_request_advanced_search(search)
 
-        if not is_admin_or_internal(search.user):
+        if search.user and not is_admin_or_internal(search.user):
             _remove_fields(search.source, PRIVATE_FIELDS)
 
         if search.item_type == "events":
