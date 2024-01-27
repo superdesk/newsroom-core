@@ -880,9 +880,8 @@ class AgendaService(BaseSearchService):
         # Apply agenda based filters
         self.apply_section_filter(search, section_filters)
         self.apply_request_filter(search)
-        self.apply_request_advanced_search(search)
 
-        if search.user and not is_admin_or_internal(search.user):
+        if not is_admin_or_internal(search.user):
             _remove_fields(search.source, PRIVATE_FIELDS)
 
         if search.item_type == "events":
@@ -1006,6 +1005,8 @@ class AgendaService(BaseSearchService):
 
         if search.args.get("date_from") or search.args.get("date_to"):
             _set_event_date_range(search)
+
+        self.apply_request_advanced_search(search)
 
     def set_post_filter(self, source: Dict[str, Any], req: ParsedRequest, item_type: Optional[str] = None):
         filters = json.loads(req.args.get("filter") or "{}")

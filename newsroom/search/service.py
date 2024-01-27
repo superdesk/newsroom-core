@@ -284,11 +284,14 @@ class BaseSearchService(Service):
         self.apply_time_limit_filter(search)
         self.apply_products_filter(search)
         self.apply_request_filter(search)
-        self.apply_request_advanced_search(search)
         self.apply_embargoed_filters(search)
 
         if len(search.query["bool"].get("should", [])):
             search.query["bool"]["minimum_should_match"] = 1
+
+    def apply_topic_filter(self, search):
+        """Topic filter is set via search args."""
+        self.apply_request_filter(search)
 
     def gen_source_from_search(self, search):
         """Generate the eve source object from the search query instance
@@ -574,9 +577,6 @@ class BaseSearchService(Service):
             # Set up the search query for filtering
             self.apply_request_filter(highlight_search)
 
-            # Set up the search query for advanced search options
-            self.apply_request_advanced_search(highlight_search)
-
             # Set up highlighting settings
             highlight_search.source.setdefault("highlight", {})
             highlight_search.source["highlight"].setdefault("fields", {})
@@ -777,6 +777,8 @@ class BaseSearchService(Service):
             if search.args.get("created_from") or search.args.get("created_to"):
                 search.source["post_filter"]["bool"]["filter"].append(self.versioncreated_range(search.args))
 
+        self.apply_request_advanced_search(search)
+
     def get_advanced_search_fields(self, search: SearchQuery) -> List[str]:
         advanced_fields = search.advanced.get("fields") if search.advanced is not None else []
         return advanced_fields or get_advanced_search_fields(self.section)
@@ -944,7 +946,9 @@ class BaseSearchService(Service):
             self.prefill_search_query(search)
             if user:
                 self.validate_request(search)
-            self.apply_filters(search, section_filters)
+                self.apply_filters(search, section_filters)
+            else:
+                self.apply_topic_filter(search)
         except Forbidden as exc:
             if user and topic:
                 logger.info(
