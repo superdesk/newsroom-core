@@ -1018,7 +1018,10 @@ class AgendaService(BaseSearchService):
         self.apply_request_advanced_search(search)
 
     def set_post_filter(self, source: Dict[str, Any], req: ParsedRequest, item_type: Optional[str] = None):
-        filters = json.loads(req.args.get("filter") or "{}")
+        filters = req.args.get("filter")
+        if isinstance(filters, str):
+            filters = json.loads(filters)
+
         if not filters:
             return
 
