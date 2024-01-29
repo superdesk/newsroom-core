@@ -108,6 +108,9 @@ def test_realtime_notifications_agenda(app, mocker):
                         "notification_type": "real-time",
                     },
                 ],
+                "filter": {
+                    "language": ["abcd"],  # filters are not applied atm, but can ruin the query
+                },
             },
             {
                 "user": ADMIN_USER_ID,
