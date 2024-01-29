@@ -44,7 +44,7 @@ interface IProps {
     filterGroups: {[key: string]: IFilterGroup};
     availableFields: Array<string>;
 
-    saveFolder: (folder: any, data: any, global?: boolean) => void;
+    saveFolder: (folder: any, data: any, global?: boolean) => Promise<ITopicFolder>;
     fetchNavigations(): Promise<void>;
     closeEditor(): void;
     saveTopic(isExisting: boolean, topic: ITopic): Promise<ITopic>;
