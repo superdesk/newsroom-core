@@ -333,7 +333,7 @@ class BaseSearchService(Service):
         for key, val in filters.items():
             if not val:
                 continue
-            bool_query["filter"].append(
+            bool_query["must"].append(
                 get_filter_query(key, val, self.get_aggregation_field(key), get_nested_config("items", key))
             )
 
@@ -744,7 +744,7 @@ class BaseSearchService(Service):
             )
 
         if search.args.get("ids"):
-            search.query["bool"]["filter"].append({"terms": {"_id": search.args["ids"]}})
+            search.query["bool"]["must"].append({"terms": {"_id": search.args["ids"]}})
 
         filters = None
         if search.args.get("filter"):
@@ -761,21 +761,21 @@ class BaseSearchService(Service):
                 if app.config.get("FILTER_AGGREGATIONS", True):
                     self.set_bool_query_from_filters(search.query["bool"], filters)
                 else:
-                    search.query["bool"]["filter"].append(filters)
+                    search.query["bool"]["must"].append(filters)
 
             if search.args.get("created_from") or search.args.get("created_to"):
-                search.query["bool"]["filter"].append(self.versioncreated_range(search.args))
+                search.query["bool"]["must"].append(self.versioncreated_range(search.args))
         elif filters or search.args.get("created_from") or search.args.get("created_to"):
-            search.source["post_filter"] = {"bool": {"filter": []}}
+            search.source["post_filter"] = {"bool": {"must": []}}
 
             if filters:
                 if app.config.get("FILTER_AGGREGATIONS", True):
                     self.set_bool_query_from_filters(search.source["post_filter"]["bool"], filters)
                 else:
-                    search.source["post_filter"]["bool"]["filter"].append(filters)
+                    search.source["post_filter"]["bool"]["must"].append(filters)
 
             if search.args.get("created_from") or search.args.get("created_to"):
-                search.source["post_filter"]["bool"]["filter"].append(self.versioncreated_range(search.args))
+                search.source["post_filter"]["bool"]["must"].append(self.versioncreated_range(search.args))
 
         self.apply_request_advanced_search(search)
 
