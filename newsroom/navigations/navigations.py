@@ -42,7 +42,7 @@ def get_navigations_by_company(company: Company, product_type="wire", events_onl
     Returns list of navigations for given company id
     Navigations will contain the list of product ids
     """
-    products = get_products_by_company(company, None, product_type)
+    products = get_products_by_company(company, None, product_type, True)
 
     # Get the navigation ids used across products
     navigation_ids = []
