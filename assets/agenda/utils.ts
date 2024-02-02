@@ -839,12 +839,12 @@ export function groupItems(
         });
 
     const groupedItemIds: {[group: string]: {day: Array<IAgendaItem['_id']>, hiddenItems: Array<IAgendaItem['_id']>}} = {};
-    const sortDates: {[date: string]: moment.Moment} = {};
+    const sortDates: {[date: string]: number} = {};
 
     if (featuredOnly) {
         Object.keys(groupedItems).forEach((dateString) => {
             groupedItemIds[dateString] = {day: groupedItems[dateString].map((i) => i._id), hiddenItems: []};
-            sortDates[dateString] = moment(dateString, DATE_FORMAT);
+            sortDates[dateString] = moment(dateString, DATE_FORMAT).unix();
         });
     } else {
         Object.keys(groupedItems).forEach((dateString) => {
@@ -872,7 +872,7 @@ export function groupItems(
                 ],
                 hiddenItems: hiddenItems,
             };
-            sortDates[dateString] = moment(dateString, DATE_FORMAT);
+            sortDates[dateString] = moment(dateString, DATE_FORMAT).unix();
         });
     }
 
