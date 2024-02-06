@@ -839,12 +839,10 @@ export function groupItems(
         });
 
     const groupedItemIds: {[group: string]: {day: Array<IAgendaItem['_id']>, hiddenItems: Array<IAgendaItem['_id']>}} = {};
-    const sortDates: {[date: string]: number} = {};
 
     if (featuredOnly) {
         Object.keys(groupedItems).forEach((dateString) => {
             groupedItemIds[dateString] = {day: groupedItems[dateString].map((i) => i._id), hiddenItems: []};
-            sortDates[dateString] = moment(dateString, DATE_FORMAT).unix();
         });
     } else {
         Object.keys(groupedItems).forEach((dateString) => {
@@ -872,20 +870,28 @@ export function groupItems(
                 ],
                 hiddenItems: hiddenItems,
             };
-            sortDates[dateString] = moment(dateString, DATE_FORMAT).unix();
         });
     }
 
-    return sortBy(
-        Object.keys(groupedItemIds).map((dateString) => (
-            {
-                date: dateString,
-                items: groupedItemIds[dateString].day,
-                hiddenItems: groupedItemIds[dateString].hiddenItems,
-            }
-        )),
-        (g) => sortDates[g.date]
-    );
+    return sortGroups(Object.keys(groupedItemIds).map((dateString) => (
+        {
+            date: dateString,
+            items: groupedItemIds[dateString].day,
+            hiddenItems: groupedItemIds[dateString].hiddenItems,
+        }
+    )));
+}
+
+export function sortGroups(groups: Array<IAgendaListGroup>): Array<IAgendaListGroup> {
+    const sorted = Array.from(groups);
+    sorted.sort((a, b) => {
+        const aUnix = moment(a.date, DATE_FORMAT).unix();
+        const bUnix = moment(b.date, DATE_FORMAT).unix();
+
+        return aUnix - bUnix;
+    });
+
+    return sorted;
 }
 
 /**
