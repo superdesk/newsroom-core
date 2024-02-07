@@ -1,15 +1,1 @@
-{% extends "layout_wire.html" %}
-
-{% block contentMain %}
-<div id="public-app" class="content"></div>
-{% endblock %}
-
-{% block script %}
-    {% include "scripts.html" %}
-
-    <script>
-        window.viewData = {{ data | tojson | safe }}
-    </script>
-
-    {{ javascript_tag('public_js') | safe }}
-{% endblock %}
+{% extends "public_dashboard_base.html" %}
