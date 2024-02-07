@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 from flask import render_template, current_app as app
 
 from superdesk import get_resource_service
+from newsroom.auth.utils import is_valid_session
 
 from newsroom.types import DashboardCard, Article
 from newsroom.public import blueprint
@@ -66,4 +67,6 @@ def render_public_dashboard():
 
 @blueprint.route("/public/card_items")
 def public_card_items():
+    if not is_valid_session() and not app.config.get("PUBLIC_DASHBOARD"):
+        return {"_items": []}
     return {"_items": get_public_items_by_cards()}
