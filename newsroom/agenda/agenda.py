@@ -664,7 +664,7 @@ class AgendaService(BaseSearchService):
     section = "agenda"
     limit_days_setting = None
     default_sort = [{"dates.start": "asc"}]
-    default_page_size = 100
+    default_page_size = 250
 
     def get_advanced_search_fields(self, search: SearchQuery) -> List[str]:
         fields = super().get_advanced_search_fields(search)
@@ -880,7 +880,6 @@ class AgendaService(BaseSearchService):
         # Apply agenda based filters
         self.apply_section_filter(search, section_filters)
         self.apply_request_filter(search)
-        self.apply_request_advanced_search(search)
 
         if not is_admin_or_internal(search.user):
             _remove_fields(search.source, PRIVATE_FIELDS)
@@ -1007,8 +1006,13 @@ class AgendaService(BaseSearchService):
         if search.args.get("date_from") or search.args.get("date_to"):
             _set_event_date_range(search)
 
+        self.apply_request_advanced_search(search)
+
     def set_post_filter(self, source: Dict[str, Any], req: ParsedRequest, item_type: Optional[str] = None):
-        filters = json.loads(req.args.get("filter") or "{}")
+        filters = req.args.get("filter")
+        if isinstance(filters, str):
+            filters = json.loads(filters)
+
         if not filters:
             return
 

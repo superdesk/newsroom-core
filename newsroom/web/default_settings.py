@@ -758,3 +758,7 @@ PUBLIC_WIRE_ALLOWED_FIELDS = [
     "version",
     "renditions",
 ]
+
+#: Filter subject based on this config in the Formatter
+
+AGENDA_CSV_SUBJECT_SCHEMES = []

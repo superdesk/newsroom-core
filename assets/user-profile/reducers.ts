@@ -20,6 +20,7 @@ import {IModalState, modalReducer} from 'reducers';
 import {GET_NAVIGATIONS, QUERY_NAVIGATIONS} from 'navigations/actions';
 import {SET_TOPICS} from '../search/actions';
 import {ISection, ITopic, ITopicFolder, IUser} from 'interfaces';
+import {GET_COMPANY_USERS} from 'companies/actions';
 
 export interface IUserProfileState {
     user: IUser | null;
@@ -37,6 +38,7 @@ export interface IUserProfileState {
     editorFullscreen: boolean;
     locators: [];
     companyFolders: ITopicFolder[];
+    companyUsers: IUser[];
     userFolders: ITopicFolder[];
     authProviderFeatures?: {
         change_password: boolean;
@@ -67,6 +69,7 @@ const initialState: IUserProfileState = {
     editorFullscreen: false,
     locators: [],
     companyFolders: [],
+    companyUsers: [],
     userFolders: [],
     errors: {},
 };
@@ -243,6 +246,13 @@ export default function itemReducer(state: IUserProfileState = initialState, act
         return {
             ...state,
             [foldersToAccess]: state[foldersToAccess].filter((folder: any) => folder._id !== action.payload.folder._id),
+        };
+    }
+
+    case GET_COMPANY_USERS: {
+        return {
+            ...state,
+            companyUsers: action.data,
         };
     }
 

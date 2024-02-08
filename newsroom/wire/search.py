@@ -182,6 +182,7 @@ class WireSearchService(BaseSearchService):
 
         self.gen_source_from_search(search)
         search.source["post_filter"] = {"bool": {"filter": []}}
+        search.source.pop("aggs", None)
         internal_req = self.get_internal_request(search)
 
         return list(self.internal_get(internal_req, None))
