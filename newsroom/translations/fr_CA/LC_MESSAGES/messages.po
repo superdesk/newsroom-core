@@ -27,7 +27,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.12.1\n"
+"Generated-By: Babel 2.13.1\n"
 "Language: fr_CA\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
@@ -1385,19 +1385,19 @@ msgstr "Sections"
 msgid "Can not delete current user"
 msgstr "Impossible de supprimer l'utilisateur actuel"
 
-#: newsroom/users/views.py:125 newsroom/users/views.py:222
+#: newsroom/users/views.py:122 newsroom/users/views.py:219
 msgid "Email address is already in use"
 msgstr "Cette adresse de courriel est déjà utilisée"
 
-#: newsroom/users/views.py:141 newsroom/users/views.py:227
+#: newsroom/users/views.py:138 newsroom/users/views.py:224
 msgid "Company is required for non administrators"
 msgstr "Une entreprise est requise pour les non-administrateurs"
 
-#: newsroom/users/views.py:176
+#: newsroom/users/views.py:173
 msgid "User is already validated"
 msgstr "Utilisateur déjà validé"
 
-#: newsroom/users/views.py:340
+#: newsroom/users/views.py:337
 msgid "User id not provided"
 msgstr "Identifiant d'utilisateur non fourni"
 
@@ -2365,7 +2365,7 @@ msgstr "Modifier les fiches"
 #: assets/oauth_clients/components/EditClient.tsx:64
 #: assets/products/components/EditProduct.tsx:187
 #: assets/search/components/FollowedTopics.tsx:82
-#: assets/search/components/TopicFolder.tsx:58
+#: assets/search/components/TopicFolder.tsx:56
 #: assets/section-filters/components/EditSectionFilter.tsx:88
 #: assets/users/components/EditUser.tsx:475
 msgid "Delete"
@@ -2895,7 +2895,7 @@ msgstr "Aucune nouvelle notification !"
 
 #: assets/components/NotificationList.tsx:109
 #: assets/search/components/AdvancedSearchPanel.tsx:168
-#: assets/search/components/SearchResultsBar/index.tsx:179
+#: assets/search/components/SearchResultsBar/index.tsx:178
 msgid "Clear All"
 msgstr "Tout effacer"
 
@@ -3782,7 +3782,7 @@ msgstr "Enregistrer le sujet"
 msgid "Send notifications to:"
 msgstr "Envoyer les notifications à : "
 
-#: assets/search/components/TopicFolder.tsx:52
+#: assets/search/components/TopicFolder.tsx:50
 msgid "Rename"
 msgstr "Renommer"
 
@@ -3916,28 +3916,28 @@ msgstr "Le plus récent en premier"
 msgid "Oldest first"
 msgstr "Le plus ancien en premier"
 
-#: assets/search/components/SearchResultsBar/index.tsx:47
+#: assets/search/components/SearchResultsBar/index.tsx:46
 msgid "Relevance"
 msgstr "Pertinence"
 
-#: assets/search/components/SearchResultsBar/index.tsx:141
+#: assets/search/components/SearchResultsBar/index.tsx:140
 msgid "1 result"
 msgstr "1 résultat"
 
-#: assets/search/components/SearchResultsBar/index.tsx:143
+#: assets/search/components/SearchResultsBar/index.tsx:142
 msgid "{{ count }} results"
 msgstr "{{ count }} résultats"
 
-#: assets/search/components/SearchResultsBar/index.tsx:150
+#: assets/search/components/SearchResultsBar/index.tsx:149
 #: assets/users/components/filters/UserListSortFilter.tsx:83
 msgid "Sort by:"
 msgstr "Trier par : "
 
-#: assets/search/components/SearchResultsBar/index.tsx:151
+#: assets/search/components/SearchResultsBar/index.tsx:150
 msgid "{{sort}}"
 msgstr "{{sort}}"
 
-#: assets/search/components/SearchResultsBar/index.tsx:153
+#: assets/search/components/SearchResultsBar/index.tsx:152
 msgid "Sort results by"
 msgstr "Classer les résultats selon"
 

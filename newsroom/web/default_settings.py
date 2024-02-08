@@ -377,7 +377,7 @@ CLIENT_CONFIG = {
         "may be": {
             "enabled": True,
             "index": 3,
-            "option_label": lazy_gettext("Not Decided / On request"),
+            "option_label": lazy_gettext("Not Decided / On Request"),
             "button_label": lazy_gettext("Not Decided / On Request"),
         },
         "not intended": {
@@ -762,3 +762,13 @@ PUBLIC_WIRE_ALLOWED_FIELDS = [
 #: Filter subject based on this config in the Formatter
 
 AGENDA_CSV_SUBJECT_SCHEMES = []
+
+#: Round ``now`` when querying for embargoed items
+#: Common options are:
+# "" - No rounding
+# "/m" - Round ``now`` down to nearest minute
+# "/h" - Round ``now`` down to nearest hour
+#:
+#: .. versionadded:: 2.5.0
+#:
+EMBARGO_QUERY_ROUNDING = "/m"

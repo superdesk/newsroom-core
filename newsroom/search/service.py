@@ -819,10 +819,11 @@ class BaseSearchService(Service):
     def apply_embargoed_filters(self, search):
         """Generate filters for embargoed params"""
 
+        embargo_query_rounding = app.config.get("EMBARGO_QUERY_ROUNDING")
         if search.args.get("exclude_embargoed"):
-            search.query["bool"]["must_not"].append({"range": {"embargoed": {"gt": "now"}}})
+            search.query["bool"]["must_not"].append({"range": {"embargoed": {"gt": f"now{embargo_query_rounding}"}}})
         elif search.args.get("embargoed_only"):
-            search.query["bool"]["filter"].append({"range": {"embargoed": {"gt": "now"}}})
+            search.query["bool"]["filter"].append({"range": {"embargoed": {"gt": f"now{embargo_query_rounding}"}}})
 
     def prepend_embargoed_items_to_response(self, response, req, lookup):
         search = SearchQuery()

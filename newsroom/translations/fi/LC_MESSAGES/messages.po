@@ -25,7 +25,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.12.1\n"
+"Generated-By: Babel 2.13.1\n"
 "Language: fi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
@@ -1290,19 +1290,19 @@ msgstr "Osiot"
 msgid "Can not delete current user"
 msgstr "Kyseistä käyttäjää ei voi poistaa"
 
-#: newsroom/users/views.py:125 newsroom/users/views.py:222
+#: newsroom/users/views.py:122 newsroom/users/views.py:219
 msgid "Email address is already in use"
 msgstr "Sähköpostiosoite on jo käytössä"
 
-#: newsroom/users/views.py:141 newsroom/users/views.py:227
+#: newsroom/users/views.py:138 newsroom/users/views.py:224
 msgid "Company is required for non administrators"
 msgstr "Organisaatio vaaditaan"
 
-#: newsroom/users/views.py:176
+#: newsroom/users/views.py:173
 msgid "User is already validated"
 msgstr "Käyttäjä on jo vahvistettu"
 
-#: newsroom/users/views.py:340
+#: newsroom/users/views.py:337
 msgid "User id not provided"
 msgstr "Käyttäjä-id:tä ei löytynyt"
 
@@ -2156,7 +2156,7 @@ msgstr "Muokkaa kortteja"
 #: assets/oauth_clients/components/EditClient.tsx:64
 #: assets/products/components/EditProduct.tsx:187
 #: assets/search/components/FollowedTopics.tsx:82
-#: assets/search/components/TopicFolder.tsx:58
+#: assets/search/components/TopicFolder.tsx:56
 #: assets/section-filters/components/EditSectionFilter.tsx:88
 #: assets/users/components/EditUser.tsx:475
 msgid "Delete"
@@ -2666,7 +2666,7 @@ msgstr "Ei uusia ilmoituksia"
 
 #: assets/components/NotificationList.tsx:109
 #: assets/search/components/AdvancedSearchPanel.tsx:168
-#: assets/search/components/SearchResultsBar/index.tsx:179
+#: assets/search/components/SearchResultsBar/index.tsx:178
 msgid "Clear All"
 msgstr "Tyhjennä kaikki"
 
@@ -3540,7 +3540,7 @@ msgstr "Tallenna haku"
 msgid "Send notifications to:"
 msgstr "Lähetä ilmoitukset:"
 
-#: assets/search/components/TopicFolder.tsx:52
+#: assets/search/components/TopicFolder.tsx:50
 msgid "Rename"
 msgstr "Nimeä uudelleen"
 
@@ -3670,24 +3670,24 @@ msgstr "Tallenna uusi haku"
 msgid "Relevance"
 msgstr "Relevanssi"
 
-#: assets/search/components/SearchResultsBar/index.tsx:141
+#: assets/search/components/SearchResultsBar/index.tsx:140
 msgid "1 result"
 msgstr "1 tulos"
 
-#: assets/search/components/SearchResultsBar/index.tsx:143
+#: assets/search/components/SearchResultsBar/index.tsx:142
 msgid "{{ count }} results"
 msgstr "{{ count }} tulosta"
 
-#: assets/search/components/SearchResultsBar/index.tsx:150
+#: assets/search/components/SearchResultsBar/index.tsx:149
 #: assets/users/components/filters/UserListSortFilter.tsx:83
 msgid "Sort by:"
 msgstr "Järjestä:"
 
-#: assets/search/components/SearchResultsBar/index.tsx:151
+#: assets/search/components/SearchResultsBar/index.tsx:150
 msgid "{{sort}}"
 msgstr "{{sort}}"
 
-#: assets/search/components/SearchResultsBar/index.tsx:153
+#: assets/search/components/SearchResultsBar/index.tsx:152
 msgid "Sort results by"
 msgstr "Järjestä tulokset"
 
