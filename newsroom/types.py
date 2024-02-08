@@ -1,5 +1,5 @@
 from bson import ObjectId
-from typing import Dict, List, Optional, TypedDict, Any, Union, NoReturn
+from typing import Dict, List, Literal, Optional, TypedDict, Any, Union, NoReturn
 from datetime import datetime
 from enum import Enum
 from flask_babel import LazyString
@@ -215,10 +215,26 @@ class DashboardCardConfig(TypedDict, total=False):
     size: int
 
 
+DashboardCardType = Literal[
+    "6-text-only",
+    "4-picture-text",
+    "4-text-only",
+    "4-media-gallery",
+    "4-photo-gallery",
+    "1x1-top-news",
+    "2x2-top-news",
+    "3-text-only",
+    "3-picture-text",
+    "2x2-events",
+    "6-navigation-row",
+    "wire-list",
+]
+
+
 class DashboardCard(TypedDict, total=False):
     _id: ObjectId
     label: str
-    type: str
+    type: DashboardCardType
     config: DashboardCardConfig
     order: int
     dashboard: str
