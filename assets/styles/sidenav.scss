@@ -1,0 +1,355 @@
+.nav-block {
+    --pin-button-inset-end: 3.125rem;
+    --sidenav-transition: .3s ease;
+    background-color: var(--sidenav-color-bg);
+    position: relative;
+    overflow: visible;
+    z-index: 200;
+    transition: all var(--sidenav-transition);
+    flex: 0 0 var(--sidenav-size);
+
+    &:dir(rtl) {
+        box-shadow: inset 3px 0px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    @include large_phone {
+        padding: 0 2px;    
+        overflow-y: hidden;
+        flex: 0 0 var(--navbar-height--mobile);
+
+        .sidenav {
+            flex-direction: row;
+            padding-block-start: var(--space--0-5);
+            padding-block-end: 0 ;
+            padding-inline-start: var(--space--0-5);
+            padding-inline-end: 0 !important;
+            gap: var(--space--0-5);
+            height: var(--navbar-height--mobile);
+            overflow-x: auto;
+            position: static;
+            width: 100% !important;
+            .sidenav__item {
+                position: relative;
+                height: var(--sidenav-item-size);
+                
+                a, .sidenav__item-button {
+                    height: var(--sidenav-item-size);
+                    width: var(--sidenav-item-size);
+                    gap: 0;
+                    flex-grow: 0;
+                    flex-shrink: 0;
+                    flex-direction: column;
+                }
+                .sidenav__badge {
+                    inset-block-start: -2px;
+                    inset-inline-end: -5px;
+                }
+                .sidenav__helper-icon {
+                    inset-block-start: 0;
+                    inset-inline-end: 0;
+                }
+                .sidenav__item-title {
+                    position: absolute;
+                    opacity: 0 !important;
+                    width: 0 !important;
+                    inset-block-start: -1000px;
+                    font-size: 0.1px;
+                    line-height: 1;
+                    flex-grow: 0;
+                    flex-shrink: 1;
+                }
+            }
+            .nav-block__pin-button {
+                display: none !important;
+            }
+        }
+    }
+
+
+    &.nav-block--pinned {
+        flex: 0 0 var(--sidenav-size-pinned);
+        padding-inline-end: var(--space--1-5);
+        .sidenav {
+            width: 100%;
+            box-shadow: none;
+            padding-inline-end: var(--space--1-5);
+            .sidenav__item-title {
+                opacity: 1;
+                width: 100%;
+                padding-inline-end: var(--space--2);
+            }
+            .nav-block__pin-button {
+                transform: translateX(calc(var(--sidenav-size-pinned) - var(--pin-button-inset-end)));
+                [class^="icon--"], [class*=" icon--"] {
+                    transform: rotate(180deg);
+                }
+            }
+        }
+        @include large_phone {
+            flex: 0 0 var(--navbar-height--mobile) !important;
+            padding-inline-end: 0;
+            .sidenav {
+                height: var(--navbar-height--mobile);
+            }
+        }
+    }
+}
+
+.sidenav {
+    z-index: 1;
+    padding: 0;
+    padding-block-start: var(--space--5);
+    padding-block-end: var(--space--2);
+    padding-inline: var(--space--1);
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    gap: var(--space--1);
+    list-style-type: none;
+    background-color: var(--sidenav-color-bg);
+
+    position: absolute;
+    z-index: 100;
+    inset-block: 0;
+    inset-inline-start: 0;
+
+    width: var(--sidenav-size);
+    min-width: var(--sidenav-size);
+    transition: all var(--sidenav-transition);
+    overflow-y: auto;
+
+    .sidenav__item-icon {
+        --icon-block-radius: var(--sidenav-item-radius);
+        --icon-block-size: var(--sidenav-item-size);
+        position: relative;
+        background-color: transparent;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--icon-block-radius);
+        height: var(--icon-block-size);
+        width: var(--icon-block-size);
+        transition: all var(--sidenav-transition);
+    }
+
+    .sidenav__item-title {
+        opacity: 0;
+        width: 0;
+        color: var(--sidenav-color-item-fg);
+        font-size: var(--sidenav-item-font-size);
+        line-height: 1.1;
+        font-weight: 400;
+        overflow-wrap: break-word;
+        flex-grow: 1;
+        flex-shrink: 1;
+        transition: all var(--sidenav-transition);
+        overflow: hidden !important;
+        white-space: nowrap;
+    }
+
+    .nav-block__pin-button {
+        --pin-button-size: 1.5rem;
+        background-color: var(--sidenav-pin-button-color-bg-default);
+        height: var(--pin-button-size);
+        width: var(--pin-button-size);
+        border-radius: var(--border-radius--full);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+        border: none;
+        opacity: 0.6;
+        position: absolute;
+        inset-block-start: var(--space--1-5);
+        inset-inline-start: var(--space--2);
+        transform: translateX(0);
+        transition: all 0.5s ease;
+
+        [class^="icon--"], [class*=" icon--"] {
+            --icon-size: 18px;
+            color: var(--sidenav-pin-button-color-fg-default);
+        }
+
+        &:hover {
+            background-color: var(--sidenav-pin-button-color-bg-hover);
+            opacity: 1;
+            [class^="icon--"], [class*=" icon--"] {
+                color: var(--sidenav-pin-button-color-fg-hover);
+            }
+        }
+        &:active {
+            border: 2px solid var(--sidenav-color-bg);
+        }
+        &:focus {
+            outline: none;
+        }
+        &:focus-visible {
+            box-shadow: inset 0 0 0 1px hsla(0, 0%, 0%, 0.4), 0 0 2px 3px hsla(0, 0%, 100%, 0.5);
+        }
+    }
+
+    &:hover {
+        width: var(--sidenav-size-overlay);
+        box-shadow: var(--sidenav-shadow-overlay);
+        padding-inline-end: var(--space--1-5);
+        .sidenav__item-title {
+            opacity: 1;
+            width: 100%;
+            padding-inline-end: var(--space--3);
+        }
+
+        .nav-block__pin-button {
+            opacity: 1;
+            transform: translateX(calc(var(--sidenav-size-overlay) - var(--pin-button-inset-end)));
+        }
+    }
+
+    .sidenav__item {
+        position: relative;
+        border-radius: var(--sidenav-item-border-radius);
+        transition: all var(--sidenav-transition);
+        &:hover {
+            background-color: var(--sidenav-color-item-bg--hover);
+        }
+
+        a,
+        .sidenav__item-button {
+            border-radius: var(--sidenav-item-border-radius);
+            text-decoration: none;
+            height: var(--sidenav-item-size);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: auto;
+            gap: var(--space--1);
+            flex-grow: 1;
+            flex-shrink: 1;
+            &:hover {
+                text-decoration: none;
+            }
+            &:focus {
+                outline: none;
+            }
+            &:focus-visible {
+                box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 3px 4px rgba(255, 255, 255, .7);
+            }
+        }
+
+        .badge {
+            background-color: var(--sidenav-color-badge-bg);
+            color: var(--sidenav-color-badge-fg);
+            outline: 2px solid var(--sidenav-color-bg);
+            &.badge--icon {
+                background-color: var(--sidenav-color-item-bg--active);
+                [class^="icon-small--"],
+                [class^="icon-small--"] {
+                    color: var(--sidenav-color-item-fg--active) !important;
+                }
+            }
+        }
+        .sidenav__badge,
+        .sidenav__helper-icon {
+            position: absolute;
+            font-size: var(--sidenav-item-badge-font-size);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius--full);
+            background-color: var(--sidenav-color-badge-bg);
+            color: var(--sidenav-color-badge-fg);
+            outline: 2px solid var(--sidenav-color-bg);
+            z-index: 1;
+        }
+        .sidenav__badge {
+            height: var(--sidenav-item-badge-size);
+            min-width: var(--sidenav-item-badge-size);
+            font-size: var(--sidenav-item-badge-font-size);
+            font-weight: 700;
+            line-height: 1;
+            inset-block-start: -7px;
+            inset-inline-end: -4px;
+            background-color: var(--sidenav-color-badge-bg);
+            color: var(--sidenav-color-badge-fg);
+            padding: 0.35em 0.6em;
+            &:empty {
+                display: none;
+            }
+        }
+
+        .sidenav__helper-icon {
+            height: var(--sidenav-item-helper-icon-size);
+            width: var(--sidenav-item-helper-icon-size);
+            background-color: var(--sidenav-color-item-fg);
+            color: var(--sidenav-item-helper-icon-fg);
+            padding: 0;
+            inset-block-start: 0;
+            inset-inline-end: 0;
+            [class^="icon-small--"],
+            [class^="icon-small--"] {
+                color: var(--sidenav-item-helper-icon-fg) !important;
+            }
+        }
+
+        &.active {
+            .sidenav__badge {
+                outline: none;
+                box-shadow: -2px 4px 0 -2px var(--sidenav-color-badge-outline--active);
+                background-color: var(--sidenav-color-badge-bg--active);
+                color: var(--sidenav-color-badge-fg--active);
+            }
+
+            a {
+                background-color: var(--sidenav-color-item-bg--active);
+                border-radius: 4px;
+                text-decoration: none;
+            }
+            [class^="icon--"],
+            [class*=" icon--"],
+            .sidenav__item-title {
+                color: var(--sidenav-color-item-fg--active);
+            }
+        }
+        .badge--icon {
+            inset-block-start: 2px;
+            inset-inline-end: 7px;
+        }
+        [class^="icon--"], [class*=" icon--"] {
+            color: var(--sidenav-color-item-fg);
+        }
+    }
+
+
+    .sidenav__stretch-separator {
+        flex-grow: 1;
+        align-self: stretch;
+        justify-self: stretch;
+        margin: auto;
+    }
+    .sidenav__separator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        flex-grow: 0;
+        flex-shrink: 0;
+        gap: calc(var(--separator-dot-size) * 1);
+        margin-block: auto;
+        margin-inline: var(--space--0-5);
+        .separator__dot {
+            border-radius: var(--border-radius--full);
+            display: block;
+            height: var(--separator-dot-size);
+            width: var(--separator-dot-size);
+            background-color: var(--separator-dot-color-bg);
+            opacity: 0.4;
+        }
+        @include md {
+            flex-direction: row;
+            margin-block: var(--space--1-5);
+            gap: calc(var(--separator-dot-size) * 1.5);
+        }
+
+    }
+}
