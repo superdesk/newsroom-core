@@ -148,7 +148,8 @@ class AgendaResource(newsroom.Resource):
     schema["source"] = {"type": "string", "mapping": {"type": "keyword"}}
 
     # aggregated fields
-    schema["urgency"] = planning_schema["urgency"]
+    schema["urgency"] = {**planning_schema["urgency"], "mapping": {"type": "keyword"}}
+    schema["priority"] = {**planning_schema["priority"], "mapping": {"type": "keyword"}}
     schema["place"] = planning_schema["place"]
     schema["service"] = planning_schema["anpa_category"]
     schema["state_reason"] = {"type": "string"}

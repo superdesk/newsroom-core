@@ -22,6 +22,8 @@ class ItemsResource(BaseItemsResource):
     schema["slugline"] = schema["headline"] = schema["body_html"] = schema["description_html"] = metadata_schema[
         "body_html"
     ].copy()
+    schema["urgency"] = {**metadata_schema["urgency"], "mapping": {"type": "keyword"}}
+    schema["priority"] = {**metadata_schema["priority"], "mapping": {"type": "keyword"}}
 
 
 class ItemsService(BaseItemsService):
@@ -48,6 +50,8 @@ class ItemsVersionsResource(BaseItemsVersionsResource):
     schema["slugline"] = schema["headline"] = schema["body_html"] = schema["description_html"] = metadata_schema[
         "body_html"
     ].copy()
+    schema["urgency"] = {**metadata_schema["urgency"], "mapping": {"type": "keyword"}}
+    schema["priority"] = {**metadata_schema["priority"], "mapping": {"type": "keyword"}}
 
 
 def init_app(app):
