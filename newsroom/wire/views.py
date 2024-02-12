@@ -16,7 +16,7 @@ from superdesk import get_resource_service
 from superdesk.default_settings import strtobool
 from newsroom.auth.utils import check_user_has_products, is_valid_session
 
-from newsroom.navigations.navigations import get_navigations_by_company
+from newsroom.navigations.navigations import get_navigations_by_user, get_navigations_by_company
 from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
 from newsroom.wire.utils import update_action_list
@@ -108,7 +108,8 @@ def get_view_data() -> Dict:
             for f in app.download_formatters.values()
             if "wire" in f["types"]
         ],
-        "navigations": get_navigations_by_company(company, product_type="wire") if company else [],
+        "navigations": (get_navigations_by_user(user, "wire") if user else [])
+        + (get_navigations_by_company(company, "wire") if company else []),
         "products": products,
         "saved_items": get_bookmarks_count(user["_id"], "wire"),
         "context": "wire",

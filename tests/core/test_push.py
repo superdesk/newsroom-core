@@ -728,7 +728,7 @@ def test_matching_topics(client, app):
     client.post("/push", data=json.dumps(item), content_type="application/json")
     search = get_resource_service("wire_search")
 
-    users = {"foo": {"company": "1", "user_type": "administrator"}}
+    users = {"foo": {"company": "1", "user_type": "administrator", "_id": "foo"}}
     companies = {"1": {"_id": 1, "name": "test-comp"}}
     topics = [
         {"_id": "created_to_old", "created": {"to": "2017-01-01"}, "user": "foo"},
@@ -766,7 +766,7 @@ def test_matching_topics_for_public_user(client, app):
     client.post("/push", json=item)
     search = get_resource_service("wire_search")
 
-    users = {"foo": {"company": COMPANY_1_ID, "user_type": "public"}}
+    users = {"foo": {"company": COMPANY_1_ID, "user_type": "public", "_id": "foo"}}
     companies = {str(COMPANY_1_ID): {"_id": COMPANY_1_ID, "name": "test-comp"}}
     topics = [
         {"_id": "created_to_old", "created": {"to": "2017-01-01"}, "user": "foo"},
@@ -805,8 +805,8 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
     search = get_resource_service("wire_search")
 
     users = {
-        "foo": {"company": COMPANY_1_ID, "user_type": "public"},
-        "bar": {"company": COMPANY_2_ID, "user_type": "public"},
+        "foo": {"company": COMPANY_1_ID, "user_type": "public", "_id": "foo"},
+        "bar": {"company": COMPANY_2_ID, "user_type": "public", "_id": "bar"},
     }
     companies = {str(COMPANY_1_ID): {"_id": COMPANY_1_ID, "name": "test-comp"}}
     topics = [
@@ -867,3 +867,37 @@ def test_push_custom_expiry(client, app):
     now = datetime.utcnow().replace(second=0, microsecond=0)
     expiry: datetime = parsed["expiry"].replace(tzinfo=None)
     assert now + timedelta(days=49) < expiry < now + timedelta(days=51)
+
+
+def test_matching_topics_with_mallformed_query(client, app):
+    app.data.insert(
+        "products",
+        [
+            {
+                "_id": ObjectId("59b4c5c61d41c8d736852fbf"),
+                "name": "Sport",
+                "description": "Top level sport product",
+                "sd_product_id": "p-1",
+                "is_enabled": True,
+                "companies": [COMPANY_1_ID],
+                "product_type": "wire",
+            }
+        ],
+    )
+
+    item["products"] = [{"code": "p-1"}]
+    client.post("/push", json=item)
+    search = get_resource_service("wire_search")
+
+    users = {
+        "foo": {"company": COMPANY_1_ID, "user_type": "public", "_id": "foo"},
+        "bar": {"company": COMPANY_1_ID, "user_type": "public", "_id": "bar"},
+    }
+    companies = {str(COMPANY_1_ID): {"_id": COMPANY_1_ID, "name": "test-comp"}}
+    topics = [
+        {"_id": "good", "query": "*:*", "user": "bar"},
+        {"_id": "bad", "query": "AND Foo", "user": "foo"},
+    ]
+    with app.test_request_context():
+        matching = search.get_matching_topics(item["guid"], topics, users, companies)
+        assert ["good"] == matching

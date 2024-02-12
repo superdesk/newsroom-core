@@ -84,7 +84,7 @@ def get_atom():
             if complete_item.get("ancestors") and len(complete_item.get("ancestors")):
                 SubElement(entry, "id").text = complete_item.get("ancestors")[0]
             else:
-                SubElement(entry, "id").text = complete_item.get("_id")
+                SubElement(entry, "id").text = str(complete_item.get("_id"))
 
             SubElement(entry, "title").text = etree.CDATA(complete_item.get("headline"))
             SubElement(entry, "published").text = _format_date(complete_item.get("firstpublished"))

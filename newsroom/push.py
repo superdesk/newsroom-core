@@ -86,11 +86,11 @@ def push():
     signals.push.send(app._get_current_object(), item=item)
 
     if item.get("type") == "event":
-        orig = app.data.find_one("agenda", req=None, guid=item["guid"])
+        orig = app.data.find_one("agenda", req=None, _id=item["guid"])
         _id = publish_event(item, orig)
         notify_new_agenda_item.delay(_id, check_topics=True)
     elif item.get("type") == "planning":
-        orig = app.data.find_one("agenda", req=None, guid=item["guid"]) or {}
+        orig = app.data.find_one("agenda", req=None, _id=item["guid"]) or {}
         item["planning_date"] = parse_date_str(item["planning_date"])
         plan_id = publish_planning_item(item, orig)
         event_id = publish_planning_into_event(item)
@@ -781,7 +781,7 @@ def notify_new_item(item, check_topics=True):
         )
     except Exception as e:
         logger.exception(e)
-        logger.error(f"Failed to notify users for new {item_type} item {item['_id']}")
+        logger.error(f"Failed to notify users for new {item_type} item", extra={"_id": item["_id"]})
 
 
 def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids, users_with_realtime_subscription):
