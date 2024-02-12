@@ -1,23 +1,23 @@
-<li class="sidenav-icons__item {% if request.endpoint == nav.endpoint or request.endpoint in nav.secondary_endpoints %}active{% endif %} {% if nav.badge or nav.url %}badge--top-right{% endif %}">
+<li class="sidenav__item {% if request.endpoint == nav.endpoint or request.endpoint in nav.secondary_endpoints %}active{% endif %} {% if nav.badge or nav.url %}badge--top-right{% endif %}">
     <a href="{{ url_for(nav.endpoint) if nav.endpoint else nav.url }}" title="{{  gettext(nav.name) }}"
-        data-bs-toggle="tooltip"
-        data-bs-placement="right"
-        aria-label="{{  gettext(nav.name) }}"
         data-test-id="sidenav-link-{{ nav.name.lower().replace('/', '_').replace(' ', '_') }}"
         role="button"
         {% if nav.url %}target="_blank"{% endif %}
     >
         {% if nav.badge %}
-        <div id="{{ nav.badge }}" class="sidenav-icons__badge"></div>
+        <span id="{{ nav.badge }}" class="sidenav-icons__badge"></span>
         {% endif %}
-        {% block navurl %}
-        {% if nav.url %}
-        <div class="sidenav-icons__helper-icon">
-            <i class="icon-small--external"></i>
-        </div>
-        {% endif %}
-        {% endblock %}
-        <i class="icon--{{ nav.icon }}"></i>
-        <div class="sidenav-icons__item-title">{{  gettext(nav.name) }}</div>
+
+        <span class="sidenav__item-icon">
+            {% block navurl %}
+            {% if nav.url %}
+            <span class="sidenav__helper-icon">
+                <i class="icon-small--external"></i>
+            </span>
+            {% endif %}
+            {% endblock %}
+            <i class="icon--{{ nav.icon }}"></i>
+        </span>
+        <span class="sidenav__item-title">{{  gettext(nav.name) }}</span>
     </a>
 </li>
