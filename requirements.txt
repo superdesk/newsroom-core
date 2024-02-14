@@ -18,7 +18,7 @@ google-auth>=2.6,<2.28
 
 # Fix an issue between xhtml2pdf v0.2.4 and reportlab v3.6.7
 # https://github.com/xhtml2pdf/xhtml2pdf/issues/589
-reportlab>=3.6.11,<3.7
+reportlab>=3.6.11,<4.2
 
 superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@v2.7.0-rc3
 superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@v2.7.0-rc1
