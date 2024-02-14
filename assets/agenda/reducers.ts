@@ -23,6 +23,7 @@ import {
     STOP_WATCHING_COVERAGE,
     SET_ERROR,
     RECIEVE_NEXT_ITEMS,
+    LOADING_AGGREGATIONS,
 } from './actions';
 
 import {EXTENDED_VIEW} from 'wire/defaults';
@@ -104,6 +105,7 @@ function recieveItems(state: IAgendaState, data: IRestApiResponse<IAgendaItem>):
         aggregations: data._aggregations || undefined,
         newItems: [],
         searchInitiated: false,
+        loadingAggregations: false,
     };
 }
 
@@ -345,6 +347,9 @@ export default function agendaReducer(state: IAgendaState = initialState, action
             isLoading: false,
             errors: action.errors};
     }
+    case LOADING_AGGREGATIONS:
+        return {...state, loadingAggregations: true};
+
     default:
         return runDefaultReducer(state, action);
     }
