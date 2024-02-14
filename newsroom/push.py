@@ -100,9 +100,10 @@ def push():
     elif item.get("type") == "text":
         orig = superdesk.get_resource_service("items").find_one(req=None, _id=item["guid"])
         item["_id"] = publish_item(item, orig)
-        notify_new_wire_item.delay(
-            item["_id"], check_topics=orig is None or app.config["WIRE_NOTIFICATIONS_ON_CORRECTIONS"]
-        )
+        if not item.get("nextversion"):
+            notify_new_wire_item.delay(
+                item["_id"], check_topics=orig is None or app.config["WIRE_NOTIFICATIONS_ON_CORRECTIONS"]
+            )
     elif item["type"] == "planning_featured":
         publish_planning_featured(item)
     else:
@@ -158,6 +159,11 @@ def publish_item(doc, original):
                 doc["evolvedfrom"],
                 doc["guid"],
             )
+
+    next_item = service.find_one(req=None, evolvedfrom=doc["guid"])
+    if next_item:  # there is already an updated
+        doc["nextversion"] = next_item["_id"]
+        fix_updates(doc, next_item, service)
 
     fix_hrefs(doc)
     logger.debug("publishing %s", doc["guid"])
@@ -999,3 +1005,15 @@ def publish_planning_featured(item):
         assert item.get("tz"), {"tz": 1}
         assert item.get("items"), {"items": 1}
         service.create([item])
+
+
+def fix_updates(doc, next_item, service):
+    ancestors = (doc.get("ancestors") or []) + [doc["guid"]]
+    for i in range(50):
+        updates = {"ancestors": ancestors + (next_item.get("ancestors") or []), "original_id": doc["original_id"]}
+        service.system_update(next_item["_id"], updates, next_item)
+        next_item = service.find_one(req=None, evolvedfrom=next_item["_id"])
+        if next_item is None:
+            break
+    else:
+        logger.warning("Didn't fix ancestors in 50 iterations", extra={"guid": doc["guid"]})
