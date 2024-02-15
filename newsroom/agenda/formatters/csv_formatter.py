@@ -5,7 +5,7 @@ import arrow
 from werkzeug.utils import secure_filename
 from newsroom.utils import parse_dates
 from datetime import datetime
-from typing import List, Dict, Any, Union, Tuple
+from typing import List, Dict, Any, Union, Tuple, Optional
 from newsroom.agenda.utils import get_filtered_subject
 from flask import current_app as app
 
@@ -55,7 +55,7 @@ class CSVFormatter(BaseFormatter):
             "Event timezone": item.get("dates", {}).get("tz", ""),
             "Location": self.format_location(item, "name"),
             "Country": self.format_location(item, "country"),
-            "Subject": self.format_list(event, "subject"),
+            "Subject": self.format_list(event, "subject", event.get("language")),
             "Website": event.get("links")[0] if event.get("links") else "",
             "Category": self.format_list(event, "anpa_category"),
             "Event type": item.get("item_type", ""),
@@ -95,9 +95,11 @@ class CSVFormatter(BaseFormatter):
                 return loc.get(field, "") if not field == "country" else loc.get("address", {}).get(field)
         return ""
 
-    def format_list(self, item: Dict[str, Any], key: str) -> str:
-        values = [v.get("name", "") for v in item.get(key, [])]
-        return ",".join(values)
+    def format_list(self, item: Dict[str, Any], key: str, language: Optional[str] = None) -> str:
+        values = [
+            v.get("translations", {}).get("name", {}).get(language) or v.get("name", "") for v in item.get(key, [])
+        ]
+        return ",".join(list(filter(bool, values)))
 
     def format_contact_info(self, item: Dict[str, Any]) -> str:
         """
