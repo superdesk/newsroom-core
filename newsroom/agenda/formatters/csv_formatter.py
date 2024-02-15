@@ -55,7 +55,7 @@ class CSVFormatter(BaseFormatter):
             "Event timezone": item.get("dates", {}).get("tz", ""),
             "Location": self.format_location(item, "name"),
             "Country": self.format_location(item, "country"),
-            "Subject": self.format_list(event, "subject"),
+            "Subject": self.format_list(event, "subject", event.get("language")),
             "Website": event.get("links")[0] if event.get("links") else "",
             "Category": self.format_list(event, "anpa_category"),
             "Event type": item.get("item_type", ""),
@@ -95,8 +95,10 @@ class CSVFormatter(BaseFormatter):
                 return loc.get(field, "") if not field == "country" else loc.get("address", {}).get(field)
         return ""
 
-    def format_list(self, item: Dict[str, Any], key: str) -> str:
-        values = [v.get("name", "") for v in item.get(key, [])]
+    def format_list(self, item: Dict[str, Any], key: str, language: str = None) -> str:
+        values = [
+            v.get("translations", {}).get("name", {}).get(language) or v.get("name", "") for v in item.get(key, [])
+        ]
         return ",".join(list(filter(bool, values)))
 
     def format_contact_info(self, item: Dict[str, Any]) -> str:

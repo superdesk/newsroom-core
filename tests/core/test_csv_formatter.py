@@ -97,7 +97,7 @@ def test_csv_formatter_item(client, app):
         "Australia/Sydney",
         "Sydney",
         "Australia",
-        "Statistics & Economic Indicators,Economic Indicators",
+        "Statistics & Economic Indicators,Economic Indicators,anniversary",
         "www.earthhour.com",
         "Australian General News,Economic News",
         "event",
