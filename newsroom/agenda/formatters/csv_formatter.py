@@ -5,7 +5,7 @@ import arrow
 from werkzeug.utils import secure_filename
 from newsroom.utils import parse_dates
 from datetime import datetime
-from typing import List, Dict, Any, Union, Tuple
+from typing import List, Dict, Any, Union, Tuple, Optional
 from newsroom.agenda.utils import get_filtered_subject
 from flask import current_app as app
 
@@ -95,7 +95,7 @@ class CSVFormatter(BaseFormatter):
                 return loc.get(field, "") if not field == "country" else loc.get("address", {}).get(field)
         return ""
 
-    def format_list(self, item: Dict[str, Any], key: str, language: str = None) -> str:
+    def format_list(self, item: Dict[str, Any], key: str, language: Optional[str] = None) -> str:
         values = [
             v.get("translations", {}).get("name", {}).get(language) or v.get("name", "") for v in item.get(key, [])
         ]
