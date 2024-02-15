@@ -2,6 +2,7 @@ import newsroom
 from newsroom.products.products import get_products_by_company, get_products_by_user
 import superdesk
 
+from newsroom.utils import is_admin
 from newsroom.types import Company, UserData
 
 
@@ -71,6 +72,10 @@ def get_navigations_by_user(user: UserData, product_type="wire", events_only=Fal
     Returns list of navigations for given user id
     Navigations will contain the list of product ids
     """
+
+    if is_admin(user):
+        return list(superdesk.get_resource_service("navigations").get(req=None, lookup={}))
+
     products = get_products_by_user(user, product_type, None)
 
     # Get the navigation ids used across products
