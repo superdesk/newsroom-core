@@ -1126,7 +1126,7 @@ function getScheduleType(item: IAgendaItem): string {
  * @param {Object} options
  * @return {Array} [time string, date string]
  */
-export function formatAgendaDate(item: IAgendaItem, group?: string, {localTimeZone = true, onlyDates = false} = {}) {
+export function formatAgendaDate(item: IAgendaItem, {localTimeZone = true, onlyDates = false} = {}) {
     function getFormattedTimezone(date: moment.Moment): string {
         const tzStr = date.format('z');
         if (tzStr.indexOf('+0') >= 0) {
@@ -1141,27 +1141,8 @@ export function formatAgendaDate(item: IAgendaItem, group?: string, {localTimeZo
     }
 
     const isTBCItem = isItemTBC(item);
-    let start = parseDate(item.dates.start, item.dates.all_day);
+    const start = parseDate(item.dates.start, item.dates.all_day);
     const end = parseDate(item.dates.end, item.dates.all_day || item.dates.no_end_time);
-    const dateGroup = group ? moment(group, DATE_FORMAT) : null;
-
-    const isGroupBetweenEventDates = dateGroup ?
-        start.isSameOrBefore(dateGroup, 'day') && end.isSameOrAfter(dateGroup, 'day') : true;
-
-    if (group != null && !isGroupBetweenEventDates && hasCoverages(item)) {
-        // we rendering for extra days
-        const scheduleDates = (item.coverages ?? [])
-            .filter((coverage) => isCoverageForExtraDay(coverage, group))
-            .map((coverage) => coverage.scheduled)
-            .sort((a, b) => {
-                if (a < b) return -1;
-                if (a > b) return 1;
-                return 0;
-            });
-        if (scheduleDates.length > 0) {
-            start = moment(scheduleDates[0]);
-        }
-    }
 
     const scheduleType = getScheduleType(item);
     const startDate = formatDate(start);

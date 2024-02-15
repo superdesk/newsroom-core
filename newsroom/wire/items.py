@@ -25,6 +25,13 @@ class ItemsResource(BaseItemsResource):
     schema["urgency"] = {**metadata_schema["urgency"], "mapping": {"type": "keyword"}}
     schema["priority"] = {**metadata_schema["priority"], "mapping": {"type": "keyword"}}
 
+    mongo_indexes = deepcopy(BaseItemsResource.mongo_indexes) or {}
+    mongo_indexes.update(
+        {
+            "evolvedfrom_1": ([("evelovedfrom", 1)], {"background": True}),
+        }
+    )
+
 
 class ItemsService(BaseItemsService):
     def _is_internal_api(self):
