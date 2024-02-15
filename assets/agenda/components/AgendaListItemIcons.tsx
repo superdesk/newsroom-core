@@ -70,7 +70,13 @@ class AgendaListItemIcons extends React.Component<IProps, IState> {
                 (this.props.item.coverages || []).filter((c) => (
                     !this.props.group ||
                     c.scheduled == null ||
-                    (isCoverageForExtraDay(c, this.props.group) && c.planning_id === this.props.planningItem?.guid)
+                    (
+                        isCoverageForExtraDay(c, this.props.group) &&
+                        (
+                            this.props.planningItem == null ||
+                            c.planning_id === this.props.planningItem?.guid
+                        )
+                    )
                 )),
             attachments: (getAttachments(this.props.item)).length,
             isRecurring: isRecurring(this.props.item),
@@ -108,7 +114,7 @@ class AgendaListItemIcons extends React.Component<IProps, IState> {
                     isMobilePhone={props.isMobilePhone}
                 />
 
-                {props.planningItem != null && state.coveragesToDisplay.length > 0 && (
+                {state.coveragesToDisplay.length > 0 && (
                     <div className='wire-articles__item__icons wire-articles__item__icons--dashed-border'>
                         {state.coveragesToDisplay.map((coverage, index) => (
                             <AgendaListCoverageItem
@@ -117,8 +123,6 @@ class AgendaListItemIcons extends React.Component<IProps, IState> {
                                 coverage={coverage}
                                 showBorder={props.isMobilePhone && index === state.coveragesToDisplay.length - 1}
                                 group={props.group}
-                                // Using `ts-ignore` otherwise `tsc` complains planningItem may be undefined
-                                // @ts-ignore
                                 planningItem={props.planningItem}
                             />
                         ))}
