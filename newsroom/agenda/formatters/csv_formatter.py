@@ -97,7 +97,7 @@ class CSVFormatter(BaseFormatter):
 
     def format_list(self, item: Dict[str, Any], key: str) -> str:
         values = [v.get("name", "") for v in item.get(key, [])]
-        return ",".join(values)
+        return ",".join(list(filter(bool, values)))
 
     def format_contact_info(self, item: Dict[str, Any]) -> str:
         """

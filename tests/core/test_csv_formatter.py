@@ -31,6 +31,17 @@ event["coverages"] = [
 event["subject"] = [
     {"name": "Statistics & Economic Indicators", "qcode": "150", "scheme": "event_types", "code": "150"},
     {"name": "Economic Indicators", "qcode": "3", "scheme": "categories", "code": "3"},
+    {
+        "name": None,
+        "qcode": "20001237",
+        "parent": "08000000",
+        "iptc_subject": None,
+        "ap_subject": None,
+        "in_jimi": False,
+        "translations": {"name": {"en-CA": "anniversary", "fr-CA": None}},
+        "scheme": "subject_custom",
+        "code": "20001237",
+    },
 ]
 event["anpa_category"].append({"name": "Economic News", "qcode": "b", "code": "b"})
 
