@@ -166,7 +166,12 @@ def get_planning_coverages(item, plan_id):
 
 def get_coverage_status(coverage: Dict[str, Any]) -> str:
     coverage_status = coverage.get("coverage_status")
-    if coverage_status == "coverage intended":
+    workflow_status = coverage.get("workflow_status")
+    if workflow_status == ASSIGNMENT_WORKFLOW_STATE.COMPLETED:
+        return gettext("Completed")
+    elif workflow_status == WORKFLOW_STATE.CANCELLED:
+        return gettext("Cancelled")
+    elif coverage_status == "coverage intended":
         return gettext("Planned")
     elif coverage_status == "coverage not decided yet":
         return gettext("Not decided")
