@@ -126,7 +126,7 @@ def send_email(to, subject, text_body, html_body=None, sender=None, sender_name=
         "text_body": handle_long_lines_text(text_body),
         "html_body": handle_long_lines_html(html_body),
         "sender": sender,
-        "sender_name": sender_name or current_app.config.get("MAIL_DEFAULT_SENDER_NAME"),
+        "sender_name": sender_name or current_app.config.get("EMAIL_DEFAULT_SENDER_NAME"),
         "attachments_info": attachments_info,
     }
     _send_email.apply_async(kwargs=kwargs)
