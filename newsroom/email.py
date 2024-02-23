@@ -235,6 +235,11 @@ def send_template_email(
         template_kwargs.setdefault("recipient_language", language)
 
         try:
+            sender = current_app.config["EMAIL_SENDER_LANGUAGE_MAP"][language]
+        except (KeyError, TypeError):
+            sender = None
+
+        try:
             set_template_locale(language)
             with force_locale(language):
                 send_email(
@@ -242,6 +247,7 @@ def send_template_email(
                     subject=subject,
                     text_body=render_template(group["text_template"], **template_kwargs),
                     html_body=render_template(group["html_template"], **template_kwargs),
+                    sender=sender,
                     **kwargs,
                 )
         finally:
