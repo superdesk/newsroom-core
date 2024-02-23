@@ -80,12 +80,15 @@ def handle_long_lines_html(html):
 
 
 @celery.task(soft_time_limit=120)
-def _send_email(to, subject, text_body, html_body=None, sender=None, attachments_info=None):
+def _send_email(to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None):
     if attachments_info is None:
         attachments_info = []
 
     if sender is None:
         sender = current_app.config["MAIL_DEFAULT_SENDER"]
+
+    if sender_name is not None:
+        sender = (sender_name, sender)
 
     decoded_attachments = []
     for a in attachments_info:
@@ -106,7 +109,7 @@ def _send_email(to, subject, text_body, html_body=None, sender=None, attachments
         return app.mail.send(msg)
 
 
-def send_email(to, subject, text_body, html_body=None, sender=None, attachments_info=None):
+def send_email(to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None):
     """
     Sends the email
     :param to: List of recipients
@@ -123,6 +126,7 @@ def send_email(to, subject, text_body, html_body=None, sender=None, attachments_
         "text_body": handle_long_lines_text(text_body),
         "html_body": handle_long_lines_html(html_body),
         "sender": sender,
+        "sender_name": sender_name or current_app.config.get("MAIL_DEFAULT_SENDER_NAME"),
         "attachments_info": attachments_info,
     }
     _send_email.apply_async(kwargs=kwargs)
@@ -235,9 +239,9 @@ def send_template_email(
         template_kwargs.setdefault("recipient_language", language)
 
         try:
-            sender = current_app.config["EMAIL_SENDER_LANGUAGE_MAP"][language]
+            sender_name = current_app.config["EMAIL_SENDER_NAME_LANGUAGE_MAP"][language]
         except (KeyError, TypeError):
-            sender = None
+            sender_name = None
 
         try:
             set_template_locale(language)
@@ -247,7 +251,7 @@ def send_template_email(
                     subject=subject,
                     text_body=render_template(group["text_template"], **template_kwargs),
                     html_body=render_template(group["html_template"], **template_kwargs),
-                    sender=sender,
+                    sender_name=sender_name,
                     **kwargs,
                 )
         finally:
