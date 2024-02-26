@@ -13,7 +13,7 @@ xhtml2pdf>=0.2.4
 sentry-sdk[flask]>=1.5.7,<1.6
 eve-elastic>=7.3.1,<7.4
 MarkupSafe<2.1
-python3-saml>=1.15,<1.16
+python3-saml>=1.15,<1.17
 google-auth>=2.6,<2.28
 
 # Fix an issue between xhtml2pdf v0.2.4 and reportlab v3.6.7
