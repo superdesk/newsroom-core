@@ -33,7 +33,7 @@ import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
-import RenditionData from './RenditionData';
+import MediaPreview from './MediaPreview';
 
 function ItemDetails({
     item,
@@ -68,8 +68,8 @@ function ItemDetails({
             <ArticleItemDetails disableTextSelection={detailsConfig.disable_text_selection}>
                 <ArticleContent>
                     {featureMedia && (
-                        <RenditionData
-                            association={featureMedia}
+                        <MediaPreview
+                            media={featureMedia}
                             item={item}
                             download={downloadMedia}
                         />
@@ -78,9 +78,9 @@ function ItemDetails({
                         allMedia
                             .filter((mediaItem) => mediaItem.guid !== featureMedia?.guid)
                             .map((data) => (
-                                <RenditionData
+                                <MediaPreview
                                     key={data?.guid}
-                                    association={data}
+                                    media={data}
                                     item={item}
                                     download={downloadMedia}
                                 />
