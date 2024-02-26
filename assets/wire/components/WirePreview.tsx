@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {isEmpty} from 'lodash';
-
 import {isDisplayed} from 'utils';
 import {
     getFeatureMedia,
@@ -19,7 +17,6 @@ import types from 'wire/types';
 import Preview from 'ui/components/Preview';
 import ArticleSlugline from 'ui/components/ArticleSlugline';
 import ArticleAuthor from  'ui/components/ArticleAuthor';
-import ArticlePicture from  'ui/components/ArticlePicture';
 import ArticleMedia from  'ui/components/ArticleMedia';
 import ArticleHeadline from 'ui/components/ArticleHeadline';
 import ArticleAbstract from 'ui/components/ArticleAbstract';
@@ -34,7 +31,7 @@ import AgendaLinks from './AgendaLinks';
 import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
-import {downloadMedia} from '../actions';
+import MediaPreview from './MediaPreview';
 
 
 class WirePreview extends React.PureComponent<any, any> {
@@ -81,42 +78,27 @@ class WirePreview extends React.PureComponent<any, any> {
                     {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item}/>}
                     {(isDisplayed('byline', previewConfig) || isDisplayed('located', previewConfig)) &&
                         <ArticleAuthor item={item} displayConfig={previewConfig} />}
-                    {featureMedia == null ? null : (
-                        featureMedia.type === 'picture' ? (
-                            <ArticlePicture
-                                picture={featureMedia}
-                                isKilled={isKilled(item)}
-                                isCustomRendition={isCustomRendition(featureMedia)}
-                            />
-                        ) : (
-                            <ArticleMedia
-                                media={featureMedia}
-                                isKilled={isKilled(item)}
-                                download={downloadMedia}
-                            />
-                        )
+                    {featureMedia && (
+                        <MediaPreview
+                            data={featureMedia}
+                            isKilled={isKilled(item)}
+                            isCustomRendition={isCustomRendition(featureMedia)}
+                            download={downloadMedia}
+                        />
                     )}
-                    {allMedia == null ? null : allMedia
-                        .filter((mediaItem) => mediaItem.guid !== featureMedia?.guid) // Filter out feature media
-                        .map((data) => {
-                            return (
-                                data.type === 'picture' ? (
-                                    <ArticlePicture
-                                        key={data?.guid}
-                                        picture={data}
-                                        isKilled={isKilled(item)}
-                                        isCustomRendition={isCustomRendition(data)}
-                                    />
-                                ) : (
-                                    <ArticleMedia
-                                        key={data.guid}
-                                        media={data}
-                                        isKilled={isKilled(item)}
-                                        download={downloadMedia}
-                                    />
-                                )
-                            );
-                        })}
+                    {allMedia && (
+                        allMedia
+                            .filter((mediaItem) => mediaItem.guid !== featureMedia?.guid)
+                            .map((data) => (
+                                <MediaPreview
+                                    key={data?.guid}
+                                    data={data}
+                                    isKilled={isKilled(item)} 
+                                    isCustomRendition={isCustomRendition(data)}
+                                    download={downloadMedia}
+                                />
+                            ))
+                    )}
                     {isDisplayed('metadata_section', previewConfig) &&
                     <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions} displayConfig={previewConfig} listConfig={listConfig}
                         filterGroupLabels={filterGroupLabels} />}

@@ -23,7 +23,6 @@ import ContentHeader from 'ui/components/ContentHeader';
 import ContentBar from 'ui/components/ContentBar';
 import ArticleItemDetails from 'ui/components/ArticleItemDetails';
 import ArticleContent from 'ui/components/ArticleContent';
-import ArticlePicture from 'ui/components/ArticlePicture';
 import ArticleMedia from  'ui/components/ArticleMedia';
 import ArticleContentWrapper from 'ui/components/ArticleContentWrapper';
 import ArticleContentInfoWrapper from 'ui/components/ArticleContentInfoWrapper';
@@ -36,6 +35,7 @@ import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
+import MediaPreview from './MediaPreview';
 
 function ItemDetails({
     item,
@@ -69,40 +69,27 @@ function ItemDetails({
             </ContentHeader>
             <ArticleItemDetails disableTextSelection={detailsConfig.disable_text_selection}>
                 <ArticleContent>
-                    {featureMedia == null ? null : (
-                        featureMedia.type === 'picture' ? (
-                            <ArticlePicture
-                                picture={featureMedia}
-                                isKilled={isKilled(item)}
-                                isCustomRendition={isCustomRendition(featureMedia)}
-                            />
-                        ) : (
-                            <ArticleMedia
-                                media={featureMedia}
-                                isKilled={isKilled(item)}
-                                download={downloadMedia}
-                            />
-                        )
+                    {featureMedia && (
+                        <MediaPreview
+                            data={featureMedia}
+                            isKilled={isKilled(item)}
+                            isCustomRendition={isCustomRendition(featureMedia)}
+                            download={downloadMedia}
+                        />
                     )}
-                    {allMedia == null ? null : allMedia
-                        .filter((mediaItem) => mediaItem.guid !== featureMedia?.guid) // Filter out feature media
-                        .map((data) => {
-                            return (
-                                data.type === 'picture' ? (
-                                    <ArticlePicture
-                                        picture={data}
-                                        isKilled={isKilled(item)}
-                                        isCustomRendition={isCustomRendition(featureMedia)}
-                                    />
-                                ) : (
-                                    <ArticleMedia
-                                        media={data}
-                                        isKilled={isKilled(item)}
-                                        download={downloadMedia}
-                                    />
-                                )
-                            );
-                        })}
+                    {allMedia && (
+                        allMedia
+                            .filter((mediaItem) => mediaItem.guid !== featureMedia?.guid)
+                            .map((data) => (
+                                <MediaPreview
+                                    key={data?.guid}
+                                    data={data}
+                                    isKilled={isKilled(item)} 
+                                    isCustomRendition={isCustomRendition(data)}
+                                    download={downloadMedia}
+                                />
+                            ))
+                    )}
                     <ArticleContentWrapper itemType={itemType}>
                         <ArticleBody itemType={itemType}>
                             <ArticleEmbargoed item={item} />
