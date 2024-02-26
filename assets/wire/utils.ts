@@ -114,6 +114,14 @@ export function getPictureList(item: IArticle): Array<IArticle> {
     return pictures.length ? pictures : [];
 }
 
+export function getBodyPictureList(item: IArticle): Array<IArticle> {
+    return Object.entries(item.associations || {})
+        .filter(([key, item]) => (
+            !key.startsWith('editor_')))
+        .map(([key, item]) => item) as IArticle[];
+
+}
+
 /**
  * Get picture thumbnail rendition specs
  *
@@ -129,13 +137,20 @@ export function getThumbnailRendition(picture: IArticle, large?: boolean): IRend
 
 export function getImageForList(item: IArticle): {item: IArticle, href: string} | undefined {
     const pictures = getPictureList(item);
+    const feature = getFeatureMedia(item);
     let thumbnail: IRendition | undefined;
 
-    for (let i = 0; i < pictures.length; i++) {
-        thumbnail = getThumbnailRendition(pictures[i]);
-
+    if (feature) {
+        thumbnail = getThumbnailRendition(feature);
         if (thumbnail != null && thumbnail.href != null) {
-            return {item: pictures[i], href: thumbnail.href};
+            return {item: feature, href: thumbnail.href};
+        }
+    } else {
+        for (let i = 0; i < pictures.length; i++) {
+            thumbnail = getThumbnailRendition(pictures[i]);
+            if (thumbnail != null && thumbnail.href != null) {
+                return {item: pictures[i], href: thumbnail.href};
+            }
         }
     }
 
