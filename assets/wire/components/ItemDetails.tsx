@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {isEmpty} from 'lodash';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import AgendaLinks from './AgendaLinks';
@@ -14,7 +13,7 @@ import {
     isKilled,
     DISPLAY_ABSTRACT,
     isPreformatted,
-    isCustomRendition,
+    getPictureList
 } from 'wire/utils';
 import types from 'wire/types';
 import Content from 'ui/components/Content';
@@ -22,7 +21,6 @@ import ContentHeader from 'ui/components/ContentHeader';
 import ContentBar from 'ui/components/ContentBar';
 import ArticleItemDetails from 'ui/components/ArticleItemDetails';
 import ArticleContent from 'ui/components/ArticleContent';
-import ArticlePicture from 'ui/components/ArticlePicture';
 import ArticleMedia from  'ui/components/ArticleMedia';
 import ArticleContentWrapper from 'ui/components/ArticleContentWrapper';
 import ArticleContentInfoWrapper from 'ui/components/ArticleContentInfoWrapper';
@@ -35,6 +33,7 @@ import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
+import MediaPreview from './MediaPreview';
 
 function ItemDetails({
     item,
@@ -51,6 +50,7 @@ function ItemDetails({
     const featureMedia = getFeatureMedia(item);
     const media = getOtherMedia(item);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
+    const allMedia = getPictureList(item);
 
     return (
         <Content type="item-detail">
@@ -67,20 +67,24 @@ function ItemDetails({
             </ContentHeader>
             <ArticleItemDetails disableTextSelection={detailsConfig.disable_text_selection}>
                 <ArticleContent>
-                    {featureMedia == null ? null : (
-                        featureMedia.type === 'picture' ? (
-                            <ArticlePicture
-                                picture={featureMedia}
-                                isKilled={isKilled(item)}
-                                isCustomRendition={isCustomRendition(featureMedia)}
-                            />
-                        ) : (
-                            <ArticleMedia
-                                media={featureMedia}
-                                isKilled={isKilled(item)}
-                                download={downloadMedia}
-                            />
-                        )
+                    {featureMedia && (
+                        <MediaPreview
+                            media={featureMedia}
+                            item={item}
+                            download={downloadMedia}
+                        />
+                    )}
+                    {allMedia && (
+                        allMedia
+                            .filter((mediaItem) => mediaItem.guid !== featureMedia?.guid)
+                            .map((data) => (
+                                <MediaPreview
+                                    key={data?.guid}
+                                    media={data}
+                                    item={item}
+                                    download={downloadMedia}
+                                />
+                            ))
                     )}
                     <ArticleContentWrapper itemType={itemType}>
                         <ArticleBody itemType={itemType}>
