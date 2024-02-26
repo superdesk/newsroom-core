@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {isEmpty} from 'lodash';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import AgendaLinks from './AgendaLinks';
@@ -14,7 +13,6 @@ import {
     isKilled,
     DISPLAY_ABSTRACT,
     isPreformatted,
-    isCustomRendition,
     getPictureList
 } from 'wire/utils';
 import types from 'wire/types';
@@ -35,7 +33,7 @@ import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
-import MediaPreview from './MediaPreview';
+import RenditionData from './RenditionData';
 
 function ItemDetails({
     item,
@@ -70,10 +68,9 @@ function ItemDetails({
             <ArticleItemDetails disableTextSelection={detailsConfig.disable_text_selection}>
                 <ArticleContent>
                     {featureMedia && (
-                        <MediaPreview
+                        <RenditionData
                             data={featureMedia}
-                            isKilled={isKilled(item)}
-                            isCustomRendition={isCustomRendition(featureMedia)}
+                            item={item}
                             download={downloadMedia}
                         />
                     )}
@@ -81,11 +78,10 @@ function ItemDetails({
                         allMedia
                             .filter((mediaItem) => mediaItem.guid !== featureMedia?.guid)
                             .map((data) => (
-                                <MediaPreview
+                                <RenditionData
                                     key={data?.guid}
                                     data={data}
-                                    isKilled={isKilled(item)} 
-                                    isCustomRendition={isCustomRendition(data)}
+                                    item={item}
                                     download={downloadMedia}
                                 />
                             ))

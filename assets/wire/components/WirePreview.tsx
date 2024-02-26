@@ -9,7 +9,6 @@ import {
     isEqualItem,
     isKilled,
     DISPLAY_ABSTRACT,
-    isCustomRendition,
     getPictureList
 } from 'wire/utils';
 import types from 'wire/types';
@@ -31,7 +30,7 @@ import AgendaLinks from './AgendaLinks';
 import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
-import MediaPreview from './MediaPreview';
+import RenditionData from './RenditionData';
 
 
 class WirePreview extends React.PureComponent<any, any> {
@@ -79,10 +78,9 @@ class WirePreview extends React.PureComponent<any, any> {
                     {(isDisplayed('byline', previewConfig) || isDisplayed('located', previewConfig)) &&
                         <ArticleAuthor item={item} displayConfig={previewConfig} />}
                     {featureMedia && (
-                        <MediaPreview
+                        <RenditionData
                             data={featureMedia}
-                            isKilled={isKilled(item)}
-                            isCustomRendition={isCustomRendition(featureMedia)}
+                            item={item}
                             download={downloadMedia}
                         />
                     )}
@@ -90,11 +88,10 @@ class WirePreview extends React.PureComponent<any, any> {
                         allMedia
                             .filter((mediaItem) => mediaItem.guid !== featureMedia?.guid)
                             .map((data) => (
-                                <MediaPreview
-                                    key={data?.guid}
+                                <RenditionData
+                                    key={data.guid}
                                     data={data}
-                                    isKilled={isKilled(item)} 
-                                    isCustomRendition={isCustomRendition(data)}
+                                    item={item}
                                     download={downloadMedia}
                                 />
                             ))
