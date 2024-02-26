@@ -2,13 +2,13 @@ import io
 import os
 import hmac
 import bson
-from bson import ObjectId
 from flask import json
 from datetime import datetime, timedelta
 from superdesk import get_resource_service
-import newsroom.auth  # noqa - Fix cyclic import when running single test file
-from newsroom.utils import get_entity_or_404
-from ..fixtures import COMPANY_1_ID, COMPANY_2_ID
+from newsroom.tests.fixtures import TEST_USER_ID  # noqa - Fix cyclic import when running single test file
+from newsroom.utils import get_company_dict, get_entity_or_404, get_user_dict
+from tests.core.utils import add_company_products
+from ..fixtures import COMPANY_1_ID, PUBLIC_USER_ID
 from ..utils import mock_send_email
 from unittest import mock
 
@@ -480,16 +480,15 @@ def test_notify_user_matches_for_new_item_in_bookmarks(client, app, mocker):
     user_ids = app.data.insert("users", [user])
     user["_id"] = user_ids[0]
 
-    app.data.insert(
-        "products",
+    add_company_products(
+        app,
+        COMPANY_1_ID,
         [
             {
-                "_id": 1,
                 "name": "Service A",
                 "query": "service.code: a",
                 "is_enabled": True,
                 "description": "Service A",
-                "companies": [COMPANY_1_ID],
                 "sd_product_id": None,
                 "product_type": "wire",
             }
@@ -747,16 +746,15 @@ def test_matching_topics(client, app):
 
 def test_matching_topics_for_public_user(client, app):
     app.config["WIRE_AGGS"]["genre"] = {"terms": {"field": "genre.name", "size": 50}}
-    app.data.insert(
-        "products",
+    add_company_products(
+        app,
+        COMPANY_1_ID,
         [
             {
-                "_id": ObjectId("59b4c5c61d41c8d736852fbf"),
                 "name": "Sport",
                 "description": "Top level sport product",
                 "sd_product_id": "p-1",
                 "is_enabled": True,
-                "companies": [COMPANY_1_ID],
                 "product_type": "wire",
             }
         ],
@@ -766,18 +764,19 @@ def test_matching_topics_for_public_user(client, app):
     client.post("/push", json=item)
     search = get_resource_service("wire_search")
 
-    users = {"foo": {"company": COMPANY_1_ID, "user_type": "public", "_id": "foo"}}
-    companies = {str(COMPANY_1_ID): {"_id": COMPANY_1_ID, "name": "test-comp"}}
+    users = get_user_dict(use_globals=False)
+    assert str(PUBLIC_USER_ID) in users
+    companies = get_company_dict(use_globals=False)
     topics = [
-        {"_id": "created_to_old", "created": {"to": "2017-01-01"}, "user": "foo"},
+        {"_id": "created_to_old", "created": {"to": "2017-01-01"}, "user": PUBLIC_USER_ID},
         {
             "_id": "created_from_future",
             "created": {"from": "now/d"},
-            "user": "foo",
+            "user": PUBLIC_USER_ID,
             "timezone_offset": 60 * 28,
         },
-        {"_id": "filter", "filter": {"genre": ["other"]}, "user": "foo"},
-        {"_id": "query", "query": "Foo", "user": "foo"},
+        {"_id": "filter", "filter": {"genre": ["other"]}, "user": PUBLIC_USER_ID},
+        {"_id": "query", "query": "Foo", "user": PUBLIC_USER_ID},
     ]
     matching = search.get_matching_topics(item["guid"], topics, users, companies)
     assert ["created_from_future", "query"] == matching
@@ -785,16 +784,15 @@ def test_matching_topics_for_public_user(client, app):
 
 def test_matching_topics_for_user_with_inactive_company(client, app):
     app.config["WIRE_AGGS"]["genre"] = {"terms": {"field": "genre.name", "size": 50}}
-    app.data.insert(
-        "products",
+    add_company_products(
+        app,
+        COMPANY_1_ID,
         [
             {
-                "_id": ObjectId("59b4c5c61d41c8d736852fbf"),
                 "name": "Sport",
                 "description": "Top level sport product",
                 "sd_product_id": "p-1",
                 "is_enabled": True,
-                "companies": [COMPANY_1_ID],
                 "product_type": "wire",
             }
         ],
@@ -804,21 +802,18 @@ def test_matching_topics_for_user_with_inactive_company(client, app):
     client.post("/push", json=item)
     search = get_resource_service("wire_search")
 
-    users = {
-        "foo": {"company": COMPANY_1_ID, "user_type": "public", "_id": "foo"},
-        "bar": {"company": COMPANY_2_ID, "user_type": "public", "_id": "bar"},
-    }
-    companies = {str(COMPANY_1_ID): {"_id": COMPANY_1_ID, "name": "test-comp"}}
+    users = get_user_dict(use_globals=False)
+    companies = get_company_dict(use_globals=False)
     topics = [
         {"_id": "created_to_old", "created": {"to": "2017-01-01"}, "user": "bar"},
         {
             "_id": "created_from_future",
             "created": {"from": "now/d"},
-            "user": "foo",
+            "user": PUBLIC_USER_ID,
             "timezone_offset": 60 * 28,
         },
         {"_id": "filter", "filter": {"genre": ["other"]}, "user": "bar"},
-        {"_id": "query", "query": "Foo", "user": "foo"},
+        {"_id": "query", "query": "Foo", "user": PUBLIC_USER_ID},
     ]
     with app.test_request_context():
         matching = search.get_matching_topics(item["guid"], topics, users, companies)
@@ -870,16 +865,15 @@ def test_push_custom_expiry(client, app):
 
 
 def test_matching_topics_with_mallformed_query(client, app):
-    app.data.insert(
-        "products",
+    add_company_products(
+        app,
+        COMPANY_1_ID,
         [
             {
-                "_id": ObjectId("59b4c5c61d41c8d736852fbf"),
                 "name": "Sport",
                 "description": "Top level sport product",
                 "sd_product_id": "p-1",
                 "is_enabled": True,
-                "companies": [COMPANY_1_ID],
                 "product_type": "wire",
             }
         ],
@@ -889,14 +883,11 @@ def test_matching_topics_with_mallformed_query(client, app):
     client.post("/push", json=item)
     search = get_resource_service("wire_search")
 
-    users = {
-        "foo": {"company": COMPANY_1_ID, "user_type": "public", "_id": "foo"},
-        "bar": {"company": COMPANY_1_ID, "user_type": "public", "_id": "bar"},
-    }
-    companies = {str(COMPANY_1_ID): {"_id": COMPANY_1_ID, "name": "test-comp"}}
+    users = get_user_dict(use_globals=False)
+    companies = get_company_dict(use_globals=False)
     topics = [
-        {"_id": "good", "query": "*:*", "user": "bar"},
-        {"_id": "bad", "query": "AND Foo", "user": "foo"},
+        {"_id": "good", "query": "*:*", "user": TEST_USER_ID},
+        {"_id": "bad", "query": "AND Foo", "user": PUBLIC_USER_ID},
     ]
     with app.test_request_context():
         matching = search.get_matching_topics(item["guid"], topics, users, companies)

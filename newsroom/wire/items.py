@@ -23,6 +23,8 @@ class ItemsResource(BaseItemsResource):
         "body_html"
     ].copy()
 
+    schema["expiry"] = {"type": "datetime"}
+
     mongo_indexes = deepcopy(BaseItemsResource.mongo_indexes) or {}
     mongo_indexes.update(
         {

@@ -14,6 +14,7 @@ from superdesk.etree import parse_html
 from superdesk.text_utils import get_text
 
 from bson import ObjectId
+from bson.errors import InvalidId
 from eve.utils import config, ParsedRequest
 from eve_elastic.elastic import parse_date, ElasticCursor
 from flask import current_app as app, json, abort, request, g, flash, session, url_for
@@ -656,3 +657,10 @@ def get_public_user_data(user: User) -> PublicUserData:
         sections=user.get("sections") or {},
         notification_schedule=user.get("notification_schedule"),
     )
+
+
+def parse_objectid(value: Union[str, ObjectId]) -> Union[str, ObjectId]:
+    try:
+        return ObjectId(value)
+    except InvalidId:
+        return value
