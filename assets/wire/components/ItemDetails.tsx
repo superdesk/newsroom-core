@@ -52,7 +52,7 @@ function ItemDetails({
     const featureMedia = getFeatureMedia(item);
     const media = getOtherMedia(item);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
-    const allMedia = getPictureList(item)
+    const allMedia = getPictureList(item);
 
     return (
         <Content type="item-detail">
@@ -85,24 +85,24 @@ function ItemDetails({
                         )
                     )}
                     {allMedia == null ? null : allMedia
-                    .filter((mediaItem) => mediaItem.guid !== featureMedia?.guid) // Filter out feature media
-                    .map((data) => {
-                        return (
-                            data.type === 'picture' ? (
-                            <ArticlePicture
-                                picture={data}
-                                isKilled={isKilled(item)}
-                                isCustomRendition={isCustomRendition(featureMedia)}
-                            />
-                        ) : (
-                            <ArticleMedia
-                                media={data}
-                                isKilled={isKilled(item)}
-                                download={downloadMedia}
-                            />
-                        )
-                    )
-                    })}
+                        .filter((mediaItem) => mediaItem.guid !== featureMedia?.guid) // Filter out feature media
+                        .map((data) => {
+                            return (
+                                data.type === 'picture' ? (
+                                    <ArticlePicture
+                                        picture={data}
+                                        isKilled={isKilled(item)}
+                                        isCustomRendition={isCustomRendition(featureMedia)}
+                                    />
+                                ) : (
+                                    <ArticleMedia
+                                        media={data}
+                                        isKilled={isKilled(item)}
+                                        download={downloadMedia}
+                                    />
+                                )
+                            );
+                        })}
                     <ArticleContentWrapper itemType={itemType}>
                         <ArticleBody itemType={itemType}>
                             <ArticleEmbargoed item={item} />
