@@ -12,6 +12,7 @@ import {
     isKilled,
     DISPLAY_ABSTRACT,
     isCustomRendition,
+    getPictureList
 } from 'wire/utils';
 import types from 'wire/types';
 
@@ -53,7 +54,7 @@ class WirePreview extends React.PureComponent<any, any> {
         const {item, user, actions, followStory, topics, previewConfig, downloadMedia, listConfig, filterGroupLabels} = this.props;
         const featureMedia = getFeatureMedia(item);
         const media = getOtherMedia(item);
-
+        const allMedia = getPictureList(item)
         const previousVersions = 'preview_versions';
         return (
             <Preview onCloseClick={this.props.closePreview} published={item.versioncreated}>
@@ -95,6 +96,27 @@ class WirePreview extends React.PureComponent<any, any> {
                             />
                         )
                     )}
+                    {allMedia == null ? null : allMedia
+                    .filter((mediaItem) => mediaItem.guid !== featureMedia?.guid) // Filter out feature media
+                    .map((data) => {
+                        return (
+                            data.type === 'picture' ? (
+                            <ArticlePicture
+                                key={data?.guid}
+                                picture={data}
+                                isKilled={isKilled(item)}
+                                isCustomRendition={isCustomRendition(data)}
+                            />
+                        ) : (
+                            <ArticleMedia
+                                key={data.guid}
+                                media={data}
+                                isKilled={isKilled(item)}
+                                download={downloadMedia}
+                            />
+                        )
+                    )
+                    })}
                     {isDisplayed('metadata_section', previewConfig) &&
                     <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions} displayConfig={previewConfig} listConfig={listConfig}
                         filterGroupLabels={filterGroupLabels} />}
