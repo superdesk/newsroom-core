@@ -5,20 +5,20 @@ import {isCustomRendition, isKilled} from 'wire/utils';
 import {IArticle} from 'interfaces';
 
 interface IProps {
-  data: IArticle;
+  association: IArticle;
   item: IArticle;
   download: () => void;
 }
 
-export default function RenditionData({data, item, download}: IProps) {
-    const key = data?.guid || '';
-    if (data?.type === 'picture') {
+export default function RenditionData({association, item, download}: IProps) {
+    const key = association?.guid || '';
+    if (association?.type === 'picture') {
         return (
             <ArticlePicture
                 key={key}
-                picture={data}
+                picture={association}
                 isKilled={isKilled(item)}
-                isCustomRendition={isCustomRendition(data)}
+                isCustomRendition={isCustomRendition(association)}
             />
         );
     }
@@ -26,7 +26,7 @@ export default function RenditionData({data, item, download}: IProps) {
     return (
         <ArticleMedia
             key={key}
-            media={data}
+            media={association}
             isKilled={isKilled(item)}
             download={download}
         />

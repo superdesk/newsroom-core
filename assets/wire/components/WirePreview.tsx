@@ -79,7 +79,7 @@ class WirePreview extends React.PureComponent<any, any> {
                         <ArticleAuthor item={item} displayConfig={previewConfig} />}
                     {featureMedia && (
                         <RenditionData
-                            data={featureMedia}
+                            association={featureMedia}
                             item={item}
                             download={downloadMedia}
                         />
@@ -90,7 +90,7 @@ class WirePreview extends React.PureComponent<any, any> {
                             .map((data) => (
                                 <RenditionData
                                     key={data.guid}
-                                    data={data}
+                                    association={data}
                                     item={item}
                                     download={downloadMedia}
                                 />
