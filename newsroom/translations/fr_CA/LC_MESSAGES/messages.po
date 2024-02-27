@@ -3567,7 +3567,7 @@ msgstr "En temps réel"
 #: assets/search/components/Topic.tsx:102
 #: assets/search/components/TopicForm.tsx:228
 msgid "Scheduled"
-msgstr "Planifié"
+msgstr "Planifiées"
 
 #: assets/search/components/TopicEditor.tsx:141
 msgid "Company Topic"
