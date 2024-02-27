@@ -108,10 +108,25 @@ function getBodyPicture(item: IArticle): IArticle | null {
     return pictures.length ? pictures[0] : null;
 }
 
-export function getPictureList(item: IArticle): Array<IArticle> {
+export function getPictureList(item: IArticle, options: {includeFeatured?: boolean, includeEditor?: boolean} = {}): IArticle[] {
     const pictures = Object.values(item.associations ?? {})
         .filter((association) => association?.type === 'picture') as IArticle[];
-    return pictures.length ? pictures : [];
+
+    const {includeFeatured = true, includeEditor = true} = options;
+
+    let filteredPictures = pictures;
+
+    if (!includeFeatured) {
+        const featureMedia = getFeatureMedia(item);
+        filteredPictures = featureMedia ? filteredPictures.filter((mediaItem) => mediaItem.guid !== featureMedia.guid) : filteredPictures;
+    }
+
+    if (!includeEditor) {
+        const bodyMedia = getBodyPictureList(item);
+        filteredPictures = filteredPictures.filter((mediaItem) => bodyMedia.includes(mediaItem));
+    }
+
+    return filteredPictures;
 }
 
 export function getBodyPictureList(item: IArticle): Array<IArticle> {

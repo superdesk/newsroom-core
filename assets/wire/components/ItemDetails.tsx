@@ -14,7 +14,6 @@ import {
     DISPLAY_ABSTRACT,
     isPreformatted,
     getPictureList,
-    getBodyPictureList
 } from 'wire/utils';
 import types from 'wire/types';
 import Content from 'ui/components/Content';
@@ -51,8 +50,8 @@ function ItemDetails({
     const featureMedia = getFeatureMedia(item);
     const media = getOtherMedia(item);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
-    const allMedia = getPictureList(item);
-    const bodyImages = getBodyPictureList(item);
+    const allMedia = getPictureList(item, {includeFeatured:false, includeEditor: false});
+
     return (
         <Content type="item-detail">
             <ContentHeader>
@@ -77,7 +76,6 @@ function ItemDetails({
                     )}
                     {allMedia && (
                         allMedia
-                            .filter((mediaItem) => mediaItem.guid !== featureMedia?.guid && bodyImages.includes(mediaItem))
                             .map((data) => (
                                 <MediaPreview
                                     key={data?.guid}
