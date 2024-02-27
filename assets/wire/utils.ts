@@ -108,10 +108,35 @@ function getBodyPicture(item: IArticle): IArticle | null {
     return pictures.length ? pictures[0] : null;
 }
 
-export function getPictureList(item: IArticle): Array<IArticle> {
+export function getPictureList(item: IArticle, {includeFeatured = false, includeEditor = false} = {}): IArticle[] {
     const pictures = Object.values(item.associations ?? {})
         .filter((association) => association?.type === 'picture') as IArticle[];
-    return pictures.length ? pictures : [];
+
+    let filteredPictures = pictures;
+
+    if (!includeFeatured) {
+        const featureMedia = getFeatureMedia(item);
+        filteredPictures = featureMedia ? filteredPictures.filter((mediaItem) => mediaItem.guid !== featureMedia.guid) : filteredPictures;
+    }
+
+    if (!includeEditor) {
+        const bodyMedia = getBodyPictureList(item);
+        filteredPictures = filteredPictures.filter((mediaItem) => bodyMedia.includes(mediaItem));
+    }
+
+    return filteredPictures;
+}
+
+export function getBodyPictureList(item: IArticle): Array<IArticle> {
+    return Object.entries(item.associations || {})
+        .filter(([key, item]) => (
+            !key.startsWith('editor_')))
+        .map(([key, item]) => item) as IArticle[];
+
+}
+
+export function getGalleryMedia(item: IArticle): IArticle[] {
+    return getPictureList(item, {includeFeatured: false, includeEditor: false});
 }
 
 /**
@@ -129,13 +154,20 @@ export function getThumbnailRendition(picture: IArticle, large?: boolean): IRend
 
 export function getImageForList(item: IArticle): {item: IArticle, href: string} | undefined {
     const pictures = getPictureList(item);
+    const feature = getFeatureMedia(item);
     let thumbnail: IRendition | undefined;
 
-    for (let i = 0; i < pictures.length; i++) {
-        thumbnail = getThumbnailRendition(pictures[i]);
-
+    if (feature) {
+        thumbnail = getThumbnailRendition(feature);
         if (thumbnail != null && thumbnail.href != null) {
-            return {item: pictures[i], href: thumbnail.href};
+            return {item: feature, href: thumbnail.href};
+        }
+    } else {
+        for (let i = 0; i < pictures.length; i++) {
+            thumbnail = getThumbnailRendition(pictures[i]);
+            if (thumbnail != null && thumbnail.href != null) {
+                return {item: pictures[i], href: thumbnail.href};
+            }
         }
     }
 

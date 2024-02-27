@@ -13,7 +13,7 @@ import {
     isKilled,
     DISPLAY_ABSTRACT,
     isPreformatted,
-    getPictureList
+    getGalleryMedia
 } from 'wire/utils';
 import types from 'wire/types';
 import Content from 'ui/components/Content';
@@ -50,7 +50,7 @@ function ItemDetails({
     const featureMedia = getFeatureMedia(item);
     const media = getOtherMedia(item);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
-    const allMedia = getPictureList(item);
+    const galleryMedia = getGalleryMedia(item);
 
     return (
         <Content type="item-detail">
@@ -74,9 +74,8 @@ function ItemDetails({
                             download={downloadMedia}
                         />
                     )}
-                    {allMedia && (
-                        allMedia
-                            .filter((mediaItem) => mediaItem.guid !== featureMedia?.guid)
+                    {galleryMedia && (
+                        galleryMedia
                             .map((data) => (
                                 <MediaPreview
                                     key={data?.guid}

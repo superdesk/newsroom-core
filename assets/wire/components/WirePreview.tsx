@@ -9,7 +9,7 @@ import {
     isEqualItem,
     isKilled,
     DISPLAY_ABSTRACT,
-    getPictureList
+    getGalleryMedia,
 } from 'wire/utils';
 import types from 'wire/types';
 
@@ -50,8 +50,9 @@ class WirePreview extends React.PureComponent<any, any> {
         const {item, user, actions, followStory, topics, previewConfig, downloadMedia, listConfig, filterGroupLabels} = this.props;
         const featureMedia = getFeatureMedia(item);
         const media = getOtherMedia(item);
-        const allMedia = getPictureList(item);
+        const galleryMedia = getGalleryMedia(item);
         const previousVersions = 'preview_versions';
+
         return (
             <Preview onCloseClick={this.props.closePreview} published={item.versioncreated}>
                 <div className='wire-column__preview__top-bar'>
@@ -84,9 +85,8 @@ class WirePreview extends React.PureComponent<any, any> {
                             download={downloadMedia}
                         />
                     )}
-                    {allMedia && (
-                        allMedia
-                            .filter((mediaItem) => mediaItem.guid !== featureMedia?.guid)
+                    {galleryMedia && (
+                        galleryMedia
                             .map((data) => (
                                 <MediaPreview
                                     key={data.guid}
