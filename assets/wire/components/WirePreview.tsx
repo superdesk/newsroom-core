@@ -50,7 +50,7 @@ class WirePreview extends React.PureComponent<any, any> {
         const {item, user, actions, followStory, topics, previewConfig, downloadMedia, listConfig, filterGroupLabels} = this.props;
         const featureMedia = getFeatureMedia(item);
         const media = getOtherMedia(item);
-        const allMedia = getGalleryMedia(item);
+        const galleryMedia = getGalleryMedia(item);
         const previousVersions = 'preview_versions';
 
         return (
@@ -85,8 +85,8 @@ class WirePreview extends React.PureComponent<any, any> {
                             download={downloadMedia}
                         />
                     )}
-                    {allMedia && (
-                        allMedia
+                    {galleryMedia && (
+                        galleryMedia
                             .map((data) => (
                                 <MediaPreview
                                     key={data.guid}

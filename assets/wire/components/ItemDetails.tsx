@@ -50,7 +50,7 @@ function ItemDetails({
     const featureMedia = getFeatureMedia(item);
     const media = getOtherMedia(item);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
-    const allMedia = getGalleryMedia(item);
+    const galleryMedia = getGalleryMedia(item);
 
     return (
         <Content type="item-detail">
@@ -74,8 +74,8 @@ function ItemDetails({
                             download={downloadMedia}
                         />
                     )}
-                    {allMedia && (
-                        allMedia
+                    {galleryMedia && (
+                        galleryMedia
                             .map((data) => (
                                 <MediaPreview
                                     key={data?.guid}
