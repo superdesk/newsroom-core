@@ -108,11 +108,9 @@ function getBodyPicture(item: IArticle): IArticle | null {
     return pictures.length ? pictures[0] : null;
 }
 
-export function getPictureList(item: IArticle, options: {includeFeatured?: boolean, includeEditor?: boolean} = {}): IArticle[] {
+export function getPictureList(item: IArticle, {includeFeatured = false, includeEditor = false} = {}): IArticle[] {
     const pictures = Object.values(item.associations ?? {})
         .filter((association) => association?.type === 'picture') as IArticle[];
-
-    const {includeFeatured = true, includeEditor = true} = options;
 
     let filteredPictures = pictures;
 
@@ -135,6 +133,10 @@ export function getBodyPictureList(item: IArticle): Array<IArticle> {
             !key.startsWith('editor_')))
         .map(([key, item]) => item) as IArticle[];
 
+}
+
+export function getGalleryMedia(item: IArticle): IArticle[] {
+    return getPictureList(item, {includeFeatured: false, includeEditor: false});
 }
 
 /**

@@ -9,7 +9,7 @@ import {
     isEqualItem,
     isKilled,
     DISPLAY_ABSTRACT,
-    getPictureList,
+    getGalleryMedia,
 } from 'wire/utils';
 import types from 'wire/types';
 
@@ -50,7 +50,7 @@ class WirePreview extends React.PureComponent<any, any> {
         const {item, user, actions, followStory, topics, previewConfig, downloadMedia, listConfig, filterGroupLabels} = this.props;
         const featureMedia = getFeatureMedia(item);
         const media = getOtherMedia(item);
-        const allMedia = getPictureList(item, {includeFeatured:false, includeEditor: false});
+        const allMedia = getGalleryMedia(item);
         const previousVersions = 'preview_versions';
 
         return (
