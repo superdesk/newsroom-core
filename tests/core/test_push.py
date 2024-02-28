@@ -892,3 +892,32 @@ def test_matching_topics_with_mallformed_query(client, app):
     with app.test_request_context():
         matching = search.get_matching_topics(item["guid"], topics, users, companies)
         assert ["good"] == matching
+
+
+def test_matching_topics_when_disabling_section(client, app):
+    add_company_products(
+        app,
+        COMPANY_1_ID,
+        [
+            {
+                "name": "All",
+                "query": "*:*",
+                "is_enabled": True,
+                "product_type": "wire",
+            }
+        ],
+    )
+
+    client.post("/push", json=item)
+    search = get_resource_service("wire_search")
+
+    users = get_user_dict(use_globals=False)
+    companies = get_company_dict(use_globals=False)
+    topics = [
+        {"_id": "all wire", "query": "*:*", "user": TEST_USER_ID, "topic_type": "wire"},
+        {"_id": "all agenda", "query": "*:*", "user": TEST_USER_ID, "topic_type": "agenda"},
+    ]
+    users[str(TEST_USER_ID)]["sections"] = {"wire": False, "agenda": True}
+    with app.test_request_context():
+        matching = search.get_matching_topics(item["guid"], topics, users, companies)
+        assert [] == matching

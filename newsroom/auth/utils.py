@@ -110,6 +110,10 @@ def clear_user_session(session=None):
     session["auth_user"] = None
 
 
+def is_user_admin(user: User) -> bool:
+    return user.get("user_type") == UserRole.ADMINISTRATOR.value
+
+
 def is_current_user_admin() -> bool:
     return flask.session.get("user_type") == UserRole.ADMINISTRATOR.value
 
@@ -177,23 +181,26 @@ def revalidate_session_user():
     return is_valid
 
 
-def get_user_sections() -> Dict[str, bool]:
-    user = get_user()
+def get_user_sections(user) -> Dict[str, bool]:
     if not user:
         return {}
-    elif is_current_user_admin():
+
+    if is_user_admin(user):
         # Admin users should see all sections
         return {section["_id"]: True for section in app.sections}
-    elif user.get("sections"):
+
+    if user.get("sections"):
         return user["sections"]
+
     company = get_company(user)
     if company and company.get("sections"):
         return company["sections"]
+
     return {}
 
 
-def user_has_section_allowed(section) -> bool:
-    sections = get_user_sections()
+def user_has_section_allowed(user: User, section) -> bool:
+    sections = get_user_sections(user)
     if sections:
         return sections.get(section, False)
     return True  # might be False eventually, atm allow access if sections are not set explicitly
