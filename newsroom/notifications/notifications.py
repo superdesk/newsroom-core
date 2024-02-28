@@ -5,7 +5,6 @@ import superdesk
 from bson import ObjectId
 from superdesk.utc import utcnow
 from flask import current_app as app, session
-from newsroom.utils import get_cached_resource_by_id
 
 
 class NotificationsResource(newsroom.Resource):
@@ -38,7 +37,7 @@ class NotificationsService(newsroom.Service):
 
         for doc in docs:
             user_id = str(doc["user"])
-            user = get_cached_resource_by_id("users", user_id)
+            user = superdesk.get_resource_service("users").find_one(req=None, _id=user_id)
 
             if not user.get("receive_app_notifications"):
                 continue
