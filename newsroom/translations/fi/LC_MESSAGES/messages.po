@@ -8,10 +8,10 @@
 # Srdjan Karalic <srdjan.karalic@sourcefabric.org>, 2021
 # Tomi Toivio <tomi.toivio@ukuli.fi>, 2023
 # Petr Jašek <petr.jasek@sourcefabric.org>, 2023
-# Maija Paikkala, 2024
 # Gideon Lehmann <gideon.lehmann@sourcefabric.org>, 2024
 # Olli Vesala <olli.vesala@stt.fi>, 2024
 # Andrey Podshivalov, 2024
+# Maija Paikkala, 2024
 # 
 #, fuzzy
 msgid ""
@@ -20,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-01-25 14:14+0100\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
-"Last-Translator: Andrey Podshivalov, 2024\n"
+"Last-Translator: Maija Paikkala, 2024\n"
 "Language-Team: Finnish (https://app.transifex.com/sourcefabric/teams/6584/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3644,7 +3644,7 @@ msgstr "Tyhjennä valinnat"
 
 #: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:227
 msgid "Filters applied"
-msgstr "Filttereitä käytössä"
+msgstr "Suodattimia käytössä"
 
 #: assets/search/components/SearchResultsBar/SearchResultsQueryRow.tsx:39
 msgid "in all fields"
@@ -3705,7 +3705,7 @@ msgstr "Lisäsuodatin poistettu"
 
 #: assets/section-filters/components/EditSectionFilter.tsx:19
 msgid "Edit Section Filters"
-msgstr "Muokkaa osion filttereitä"
+msgstr "Muokkaa osion suodattimia"
 
 #: assets/section-filters/components/EditSectionFilter.tsx:21
 msgid "New Filter"
@@ -3717,7 +3717,7 @@ msgstr "Testaa Superdesk-tuotteen id:tä"
 
 #: assets/section-filters/components/SectionFilters.tsx:41
 msgid "Please provide Section Filter name"
-msgstr "Anna filtterille nimi"
+msgstr "Anna suodattimelle nimi"
 
 #: assets/section-filters/components/SectionFilters.tsx:62
 msgid "Would you like to delete Section Filter: {{name}}"
@@ -3725,7 +3725,7 @@ msgstr "Haluatko poistaa lisäsuodattimen: {{name}}"
 
 #: assets/section-filters/components/SectionFiltersApp.tsx:32
 msgid "New Section Filter"
-msgstr "Uusi section filter"
+msgstr "Uusi suodatin"
 
 #: assets/ui/components/ArticleAuthor.tsx:10
 msgid "By"
