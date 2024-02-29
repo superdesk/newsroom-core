@@ -13,6 +13,9 @@ PUBLIC_USER_NAME = "{} {}".format(PUBLIC_USER_FIRSTNAME, PUBLIC_USER_LASTNAME)
 TEST_USER_ID = ObjectId("5cc94454bc43165c045ffec9")
 COMPANY_1_ID = ObjectId("6215cbf55fc14ebe18e175a5")
 COMPANY_2_ID = ObjectId("6215ce6ed2943dec3725afde")
+PRODUCT_1_ID = ObjectId()
+PRODUCT_2_ID = ObjectId()
+PRODUCT_3_ID = ObjectId()
 
 items = [
     {
@@ -215,6 +218,11 @@ def setup_user_company(app):
                 "name": "Press Co.",
                 "is_enabled": True,
                 "contact_name": "Tom",
+                "products": [
+                    {"_id": PRODUCT_1_ID, "section": "wire", "seats": 0},
+                    {"_id": PRODUCT_2_ID, "section": "wire", "seats": 0},
+                    {"_id": PRODUCT_3_ID, "section": "wire", "seats": 0},
+                ],
             },
             {
                 "_id": COMPANY_2_ID,
@@ -288,26 +296,23 @@ def company_products(app):
         "products",
         [
             {
-                "_id": 12,
+                "_id": PRODUCT_1_ID,
                 "name": "product test",
                 "query": "headline:more",
-                "companies": [COMPANY_1_ID],
                 "is_enabled": True,
                 "product_type": "wire",
             },
             {
-                "_id": 13,
+                "_id": PRODUCT_2_ID,
                 "name": "product test 2",
                 "query": "headline:Weather",
-                "companies": [COMPANY_1_ID],
                 "is_enabled": True,
                 "product_type": "wire",
             },
             {
-                "_id": 15,
+                "_id": PRODUCT_3_ID,
                 "name": "all content",
                 "query": "*:*",
-                "companies": [COMPANY_1_ID],
                 "is_enabled": True,
                 "product_type": "wire",
             },

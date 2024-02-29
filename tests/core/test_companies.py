@@ -127,12 +127,15 @@ def test_save_company_permissions(client, app):
                 "description": "sport product",
                 "companies": [COMPANY_1_ID],
                 "is_enabled": True,
+                "product_type": "wire",
             },
             {
                 "_id": sports_id,
                 "name": "News",
                 "description": "news product",
                 "is_enabled": True,
+                "product_type": "wire",
+                "product_type": "wire",
             },
         ],
     )

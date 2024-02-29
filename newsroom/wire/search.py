@@ -253,10 +253,9 @@ class WireSearchService(BaseSearchService):
                         {"term": {"type": "composite"}},
                         {"constant_score": {"filter": {"exists": {"field": "nextversion"}}}},
                     ],
-                    "filter": [{"term": {"_id": item_id}}],
+                    "must": [{"term": {"_id": item_id}}],
                     "should": [],
-                    "must": [],
-                }
+                },
             },
         )
 

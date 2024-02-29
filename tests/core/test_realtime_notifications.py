@@ -13,8 +13,8 @@ from ..utils import mock_send_email
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_realtime_notifications_wire(app, mocker):
-    user = app.data.find_one("users", req=None, _id=ADMIN_USER_ID)
+def test_realtime_notifications_wire(app, mocker, company_products):
+    user = app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
     app.data.insert(
         "topics",
         [
@@ -43,13 +43,6 @@ def test_realtime_notifications_wire(app, mocker):
                 ],
             },
         ],
-    )
-    app.data.insert(
-        "history",
-        docs=[{"version": "1", "_id": "topic1_item1"}],
-        action="download",
-        user=user,
-        section="wire",
     )
 
     app.data.insert(
@@ -90,6 +83,15 @@ def test_realtime_notifications_wire(app, mocker):
     # Only 1 email should have been sent (not 3)
     assert len(outbox) == 1
     assert "http://localhost:5050/wire?item=topic1_item1" in outbox[0].body
+
+    # test notification after removing company products
+    company = app.data.find_one("companies", req=None, _id=user["company"])
+    app.data.update("companies", company["_id"], {"products": []}, company)
+
+    with app.mail.record_messages() as outbox:
+        notify_new_wire_item("topic1_item1")
+
+    assert len(outbox) == 0
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
@@ -199,6 +201,5 @@ def test_realtime_notifications_agenda(app, mocker):
     assert notification["resource"] == "agenda"
     assert str(notification["user"]) == ADMIN_USER_ID
 
-    # Only 1 email should have been sent (not 3)
     assert len(outbox) == 2
     assert "http://localhost:5050/agenda?item=event_id_1" in outbox[0].body

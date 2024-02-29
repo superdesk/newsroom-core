@@ -12,6 +12,7 @@ from superdesk.default_settings import strtobool as _strtobool
 from content_api.errors import BadParameterValueError
 
 from newsroom import Service
+from newsroom.auth.utils import user_has_section_allowed
 from newsroom.search.config import (
     SearchGroupNestedConfig,
     get_nested_config,
@@ -849,6 +850,9 @@ class BaseSearchService(Service):
         topics_checked = set()
 
         for user in users.values():
+            if not user_has_section_allowed(user, self.section):
+                continue
+
             aggs = {"topics": {"filters": {"filters": {}}}}
             company = companies.get(str(user.get("company", "")))
             # there will be one base search for a user with aggs for user topics
