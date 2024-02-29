@@ -181,7 +181,7 @@ def revalidate_session_user():
     return is_valid
 
 
-def get_user_sections(user) -> Dict[str, bool]:
+def get_user_sections(user: User) -> Dict[str, bool]:
     if not user:
         return {}
 
@@ -199,7 +199,7 @@ def get_user_sections(user) -> Dict[str, bool]:
     return {}
 
 
-def user_has_section_allowed(user: User, section) -> bool:
+def user_has_section_allowed(user: User, section: str) -> bool:
     sections = get_user_sections(user)
     if sections:
         return sections.get(section, False)
