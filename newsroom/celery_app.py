@@ -33,6 +33,7 @@ from superdesk.celery_app import (  # noqa
 )
 
 import newsroom
+from newsroom.errors import LockedError
 
 
 logger = logging.getLogger(__name__)
@@ -109,6 +110,8 @@ class AppContextTask(TaskBase):  # type: ignore
         with newsroom.flask_app.app_context():
             try:
                 return super().__call__(*args, **kwargs)
+            except LockedError as e:  # workaround to skip with block body without error logged
+                logger.debug("Lock conflict on %s", e)
             except Exception as e:
                 logger.warning("Error when calling task %s", self.name)
                 handle_exception(e)
