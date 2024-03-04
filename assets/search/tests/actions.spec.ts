@@ -10,6 +10,11 @@ describe('search actions', () => {
     let store: any;
     let params: any;
 
+    const resetWindowLocation = () => {
+        history.replaceState({}, '', '?');
+        expect(window.location.search).toBe('');
+    };
+
     const updateParams = (search?: any) => {
         params = {
             state: store.getState(),
@@ -18,7 +23,7 @@ describe('search actions', () => {
     };
 
     beforeEach(() => {
-        (history as any).pushState({}, null, ''); // reset window.location.search
+        resetWindowLocation();
         store = createStore(wireReducer, applyMiddleware(thunk));
         updateParams('');
     });
