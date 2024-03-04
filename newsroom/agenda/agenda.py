@@ -1287,7 +1287,7 @@ class AgendaService(BaseSearchService):
                     "must_not": [
                         {"term": {"state": "killed"}},
                     ],
-                    "filter": [
+                    "must": [
                         {"term": {"_id": item_id}},
                     ],
                     "should": [],

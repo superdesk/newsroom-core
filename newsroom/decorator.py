@@ -1,5 +1,6 @@
 from functools import wraps
 from flask import request, redirect, url_for, abort, session
+from newsroom.auth import get_user_required
 from newsroom.auth.utils import (
     clear_user_session,
     is_current_user_account_mgr,
@@ -78,7 +79,8 @@ def section(section):
     def _section_required(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
-            if not is_current_user_admin() and not user_has_section_allowed(section):
+            user = get_user_required()
+            if not is_current_user_admin() and not user_has_section_allowed(user, section):
                 return abort(403)
             return f(*args, **kwargs)
 

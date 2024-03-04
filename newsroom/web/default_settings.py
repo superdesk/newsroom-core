@@ -772,3 +772,12 @@ AGENDA_CSV_SUBJECT_SCHEMES = []
 #: .. versionadded:: 2.5.0
 #:
 EMBARGO_QUERY_ROUNDING = "/m"
+
+#: Language to Email Sender map
+#: When sending an email, the system will attempt to use the sender from this map
+#: based on the language from the user profile, falling back to ``MAIL_DEFAULT_SENDER`` if not found
+#:
+#: .. versionadded: 2.6.0
+#:
+EMAIL_DEFAULT_SENDER_NAME = None
+EMAIL_SENDER_NAME_LANGUAGE_MAP = {}

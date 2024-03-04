@@ -11,9 +11,10 @@
 # Simon Peacock <simon.peacock@gmail.com>, 2023
 # Gideon Lehmann <gideon.lehmann@sourcefabric.org>, 2024
 # Sabina <sabina.gergel@thecanadianpress.com>, 2024
-# Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2024
 # Evzen Deulin <evgeny.deulin@sourcefabric.org>, 2024
 # Nefertiti Patell, 2024
+# Paemiga Sararithi, 2024
+# Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2024
 # 
 #, fuzzy
 msgid ""
@@ -22,7 +23,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-01-25 14:14+0100\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
-"Last-Translator: Nefertiti Patell, 2024\n"
+"Last-Translator: Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2024\n"
 "Language-Team: French (Canada) (https://app.transifex.com/sourcefabric/teams/6584/fr_CA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1323,7 +1324,7 @@ msgstr "Téléphone"
 #: assets/users/components/EditUser.tsx:240
 #: assets/users/components/UsersList.tsx:29 newsroom/users/forms.py:47
 msgid "Mobile"
-msgstr "Mobile"
+msgstr "Cellulaire"
 
 #: assets/user-profile/components/profile/UserProfile.tsx:138
 #: assets/users/components/EditUser.tsx:247
@@ -2546,6 +2547,10 @@ msgstr "Taille de l'entreprise"
 msgid "Company Url"
 msgstr "Adresse URL de l'entreprise"
 
+#: assets/companies/components/EditCompanyDetails.tsx:102
+msgid "Referred By"
+msgstr "Recommandé par"
+
 #: assets/companies/components/EditCompanyDetails.tsx:134
 msgid "Contact Name"
 msgstr "Nom du contact"
@@ -3571,6 +3576,10 @@ msgstr "Nouveau produit"
 msgid "This action requires you to log in!"
 msgstr "Cela nécessite de vous connecter à votre compte !"
 
+#: assets/public/components/PublicApp.tsx:70
+msgid "Register"
+msgstr "Enregistrer"
+
 #: assets/search/actions.ts:302
 msgid "Items were shared successfully."
 msgstr "Les éléments ont été partagés avec succès."
@@ -3625,7 +3634,8 @@ msgstr "Aucun de ces mots-clés:"
 #: assets/search/components/AdvancedSearchPanel.tsx:108
 msgid "And every item will NOT contain keyword1 nor keyword2 etc."
 msgstr ""
-"Exclure tous les éléments qui comprennent le mot-clé1 ou le mot-clé2, etc."
+"Et exclure tous les éléments qui comprennent le mot-clé1 OU le mot-clé2, "
+"etc."
 
 #: assets/search/components/AdvancedSearchPanel.tsx:113
 msgid "Apply these keyword rules to at least one of these search fields:"
@@ -3744,7 +3754,7 @@ msgstr "En temps réel"
 #: assets/search/components/Topic.tsx:96
 #: assets/search/components/TopicForm.tsx:229
 msgid "Scheduled"
-msgstr "Planifié"
+msgstr "Planifiées"
 
 #: assets/search/components/TopicEditor.tsx:141
 msgid "Company Topic"
@@ -4109,7 +4119,7 @@ msgstr ""
 "Vous allez recevoir des notifications par courriel chaque jour, transmises "
 "dans un format résumé, à intervalles réguliers. Ce réglage s'appliquera à "
 "toutes les notifications par courriel programmées auxquelles vous êtes "
-"abonnés (par exemple : Sujets {{ wire }}, Sujets {{ agenda }} ). "
+"abonnées (par exemple : Sujets {{ wire }}, Sujets {{ agenda }}). "
 
 #: assets/user-profile/components/profile/UserProfile.tsx:212
 msgid "Save Changes"
@@ -4310,9 +4320,23 @@ msgstr "{{ count }} élément(s) sélectionné(s)"
 msgid "{{wire}} Content"
 msgstr "Contenu {{wire}}"
 
+#: assets/wire/components/WireListItem.tsx:46
+msgid ""
+"Hide previous {{ versionsLabel }} ({{ count }}) - {{ matches }} matches"
+msgstr ""
+"Masquer les {{ versionsLabel }} ({{ count }}) - {{ matches }} "
+"correspondances précédentes"
+
 #: assets/wire/components/WireListItem.tsx:54
 msgid "Hide previous {{ versionsLabel }} ({{ count }})"
 msgstr "Masquer les {{ versionsLabel }} précédentes ({{ count }})"
+
+#: assets/wire/components/WireListItem.tsx:63
+msgid ""
+"Show previous {{ versionsLabel }} ({{ count }}) - {{ matches }} matches"
+msgstr ""
+"Afficher les {{ versionsLabel }} ({{ count }}) - {{ matches }} "
+"correspondances précédentes"
 
 #: assets/wire/components/WireListItem.tsx:71
 msgid "Show previous {{ versionsLabel }} ({{ count }})"
@@ -4340,7 +4364,7 @@ msgstr "JUMELAGE"
 
 #: assets/wire/components/fields/PreviousVersions.tsx:28
 msgid "{{ count }} previous {{ versionsLabel }}"
-msgstr "{{ count }} {{ versionsLabel }} précédents "
+msgstr "{{ count }} {{ versionsLabel }} précédentes "
 
 #: assets/wire/components/fields/VersionType.tsx:7
 msgid "Version type: {{version}}"
