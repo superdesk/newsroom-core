@@ -2,20 +2,24 @@ import hmac
 import flask
 import logging
 
+import superdesk
 import newsroom.signals as signals
+
 from copy import copy, deepcopy
 from datetime import datetime, timedelta
 from typing import Optional, Set
+from contextlib import contextmanager
 
 from flask import current_app as app
 from flask_babel import gettext
 from bson import ObjectId
-import superdesk
 from superdesk.text_utils import get_word_count, get_char_count
 from superdesk.utc import utcnow
 from superdesk.errors import SuperdeskApiError
 from planning.common import WORKFLOW_STATE
 from newsroom.celery_app import celery
+from newsroom.errors import LockedError
+from superdesk.lock import lock, unlock
 
 from newsroom.notifications import (
     push_notification,
@@ -736,19 +740,34 @@ def set_item_reference(coverage):
             notify_new_wire_item.delay(item["_id"], check_topics=False)
 
 
+@contextmanager
+def locked(_id: str, service: str):
+    lock_name = f"notify-{service}-{_id}"
+    if not lock(lock_name, expire=300):
+        raise LockedError(lock_name)
+    logger.debug("Starting task %s", lock_name)
+    try:
+        yield lock_name
+    finally:
+        unlock(lock_name)
+        logger.debug("Done with %s", lock_name)
+
+
 @celery.task
 def notify_new_wire_item(_id, check_topics=True):
-    item = superdesk.get_resource_service("items").find_one(req=None, _id=_id)
-    if item:
-        notify_new_item(item, check_topics=check_topics)
+    with locked(_id, "wire"):
+        item = superdesk.get_resource_service("items").find_one(req=None, _id=_id)
+        if item:
+            notify_new_item(item, check_topics=check_topics)
 
 
 @celery.task
 def notify_new_agenda_item(_id, check_topics=True):
-    agenda = app.data.find_one("agenda", req=None, _id=_id)
-    if agenda:
-        superdesk.get_resource_service("agenda").enhance_items([agenda])
-        notify_new_item(agenda, check_topics=check_topics)
+    with locked(_id, "agenda"):
+        agenda = app.data.find_one("agenda", req=None, _id=_id)
+        if agenda:
+            superdesk.get_resource_service("agenda").enhance_items([agenda])
+            notify_new_item(agenda, check_topics=check_topics)
 
 
 def notify_new_item(item, check_topics=True):
