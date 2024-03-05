@@ -164,10 +164,11 @@ def publish_item(doc, original):
                 doc["guid"],
             )
 
-    next_item = service.find_one(req=None, evolvedfrom=doc["guid"])
-    if next_item:  # there is already an updated
-        doc["nextversion"] = next_item["_id"]
-        fix_updates(doc, next_item, service)
+    if not original:  # check if there are updates of this item already
+        next_item = service.find_one(req=None, evolvedfrom=doc["guid"])
+        if next_item:  # there is an update, add missing ancestor
+            doc["nextversion"] = next_item["_id"]
+            fix_updates(doc, next_item, service)
 
     fix_hrefs(doc)
     logger.debug("publishing %s", doc["guid"])

@@ -28,7 +28,7 @@ class ItemsResource(BaseItemsResource):
     mongo_indexes = deepcopy(BaseItemsResource.mongo_indexes) or {}
     mongo_indexes.update(
         {
-            "evolvedfrom_1": ([("evelovedfrom", 1)], {"background": True}),
+            "evolvedfrom_1": ([("evolvedfrom", 1)], {"background": True}),
         }
     )
 
