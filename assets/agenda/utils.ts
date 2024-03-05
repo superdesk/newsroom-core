@@ -766,7 +766,8 @@ export function groupItems(
         .filter((item) => (
             (item.planning_items?.length ?? 0) === 0 ||
             item._hits?.matched_planning_items == null ||
-            item._hits?.matched_planning_items.length > 0
+            item._hits?.matched_planning_items.length > 0 ||
+            item._hits?.matched_coverages?.length
         ))
         .forEach((item) => {
             const itemExtraDates = getExtraDates(item);
