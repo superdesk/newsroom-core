@@ -545,6 +545,13 @@ def _filter_terms(filters, item_type):
                         query={"exists": {"field": "coverages.delivery_id"}},
                     )
                 )
+                must_not_term_filters.append(
+                    nested_query(
+                        path="coverages",
+                        query={"terms": {"coverages.workflow_status": ["completed"]}},
+                        name="workflow_status",
+                    )
+                )
             elif val == ["may be"]:
                 must_term_filters.append(
                     nested_query(
@@ -569,12 +576,24 @@ def _filter_terms(filters, item_type):
                     )
                 )
             elif val == ["completed"]:
-                must_term_filters.append(
+                should_term_filters = []
+                # Check if "delivery_id" is present
+                should_term_filters.append(
                     nested_query(
                         path="coverages",
                         query={"exists": {"field": "coverages.delivery_id"}},
                     )
                 )
+
+                # If "delivery_id" is not present, check "workflow_status"
+                should_term_filters.append(
+                    nested_query(
+                        path="coverages",
+                        query={"terms": {"coverages.workflow_status": ["completed"]}},
+                        name="workflow_status",
+                    )
+                )
+                must_term_filters.append({"bool": {"should": should_term_filters}})
             elif val == ["not intended"]:
                 must_term_filters.append(
                     nested_query(
