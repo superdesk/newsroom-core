@@ -33,7 +33,6 @@ import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
-import {Carousel} from '@superdesk/common';
 import {IArticle} from 'interfaces';
 import MediaPreview from './MediaPreview';
 interface IProps {
@@ -64,21 +63,6 @@ function ItemDetails({
     const media = getOtherMedia(item);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
     const galleryMedia = getGalleryMedia(item);
-
-    // const carousels = getMediaGalleryPictureList(item);
-    // const imagesArray: Array<Array<{src: string}>> = carousels
-    //     .map((carousel) => {
-    //         return carousel.items.map((picture) => {
-    //             const imageHref = Object.values(item.associations ?? {}).find((association) => association?.guid === picture.guid);
-
-    //             if (imageHref?.renditions?.viewImage?.href == null) {
-    //                 return null;
-    //             } else {
-    //                 return {src: imageHref.renditions.viewImage.href};
-    //             }
-    //         }).filter(notNullOrUndefined);
-    //     });
-
     return (
         <Content type="item-detail">
             <ContentHeader>
@@ -94,14 +78,6 @@ function ItemDetails({
             </ContentHeader>
             <ArticleItemDetails disableTextSelection={detailsConfig.disable_text_selection}>
                 <ArticleContent>
-                    {/* {
-                        isDisplayed('gallery', detailsConfig) && (imagesArray.length > 0) && imagesArray.map((images) => (
-                            <Carousel
-                                key={images[0].src}
-                                images={images}
-                            />
-                        ))
-                    } */}
                     {featureMedia && (
                         <MediaPreview
                             media={featureMedia}
