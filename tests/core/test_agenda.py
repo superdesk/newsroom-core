@@ -616,6 +616,27 @@ def test_filter_agenda_by_coverage_status(client):
                 "qcode": "ncostat:notdec",
             },
         },
+        {
+            "planning": {
+                "g2_content_type": "audio",
+                "slugline": "Vivid planning item",
+                "scheduled": "2018-05-28T10:51:52+0000",
+            },
+            "news_coverage_status": {
+                "name": "coverage intended",
+                "label": "Planned",
+                "qcode": "ncostat:int",
+            },
+            "workflow_status": "completed",
+            "firstcreated": "2018-05-28T10:55:00+0000",
+            "coverage_id": "placeholder_urn:newsml:stt.fi:20230529:620123",
+            "deliveries": [
+                {
+                    "publish_time": "2018-05-30T10:55:00+0000",
+                    "delivery_state": "published",
+                }
+            ],
+        },
     )
     client.post("/push", data=json.dumps(test_planning), content_type="application/json")
 
@@ -634,6 +655,10 @@ def test_filter_agenda_by_coverage_status(client):
     data = get_json(client, '/agenda/search?filter={"coverage_status":["not planned"]}')
     assert 1 == data["_meta"]["total"]
     assert "baz" == data["_items"][0]["_id"]
+
+    data = get_json(client, '/agenda/search?filter={"coverage_status":["completed"]}')
+    assert 1 == data["_meta"]["total"]
+    assert "123foo" == data["_items"][0]["_id"]
 
 
 def test_filter_events_only(client):
