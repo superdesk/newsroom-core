@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import AgendaLinks from './AgendaLinks';
-import {isDisplayed, gettext, formatDate, formatTime} from 'utils';
+import {isDisplayed, gettext, formatDate, formatTime, getConfig} from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import {
@@ -16,6 +16,7 @@ import {
     getFeatureMedia,
     getMediaGalleryPictureList,
     notNullOrUndefined,
+    getGalleryMedia,
 } from 'wire/utils';
 import types from 'wire/types';
 import Content from 'ui/components/Content';
@@ -23,7 +24,6 @@ import ContentHeader from 'ui/components/ContentHeader';
 import ContentBar from 'ui/components/ContentBar';
 import ArticleItemDetails from 'ui/components/ArticleItemDetails';
 import ArticleContent from 'ui/components/ArticleContent';
-import ArticlePicture from 'ui/components/ArticlePicture';
 import ArticleMedia from  'ui/components/ArticleMedia';
 import ArticleContentWrapper from 'ui/components/ArticleContentWrapper';
 import ArticleContentInfoWrapper from 'ui/components/ArticleContentInfoWrapper';
@@ -38,7 +38,7 @@ import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
 import {Carousel} from '@superdesk/common';
 import {IArticle} from 'interfaces';
-
+import MediaPreview from './MediaPreview';
 interface IProps {
     item: IArticle;
     user: any;
@@ -66,19 +66,21 @@ function ItemDetails({
     const featureMedia = getFeatureMedia(item);
     const media = getOtherMedia(item);
     const itemType = isPreformatted(item) ? 'preformatted' : 'text';
-    const carousels = getMediaGalleryPictureList(item);
-    const imagesArray: Array<Array<{src: string}>> = carousels
-        .map((carousel) => {
-            return carousel.items.map((picture) => {
-                const imageHref = Object.values(item.associations ?? {}).find((association) => association?.guid === picture.guid);
+    const galleryMedia = getGalleryMedia(item);
 
-                if (imageHref?.renditions?.viewImage?.href == null) {
-                    return null;
-                } else {
-                    return {src: imageHref.renditions.viewImage.href};
-                }
-            }).filter(notNullOrUndefined);
-        });
+    // const carousels = getMediaGalleryPictureList(item);
+    // const imagesArray: Array<Array<{src: string}>> = carousels
+    //     .map((carousel) => {
+    //         return carousel.items.map((picture) => {
+    //             const imageHref = Object.values(item.associations ?? {}).find((association) => association?.guid === picture.guid);
+
+    //             if (imageHref?.renditions?.viewImage?.href == null) {
+    //                 return null;
+    //             } else {
+    //                 return {src: imageHref.renditions.viewImage.href};
+    //             }
+    //         }).filter(notNullOrUndefined);
+    //     });
 
     return (
         <Content type="item-detail">
@@ -95,28 +97,31 @@ function ItemDetails({
             </ContentHeader>
             <ArticleItemDetails disableTextSelection={detailsConfig.disable_text_selection}>
                 <ArticleContent>
-                    {
+                    {/* {
                         isDisplayed('gallery', detailsConfig) && (imagesArray.length > 0) && imagesArray.map((images) => (
                             <Carousel
                                 key={images[0].src}
                                 images={images}
                             />
                         ))
-                    }
-                    {featureMedia != null && (
-                        featureMedia.type === 'picture' ? (
-                            <ArticlePicture
-                                picture={featureMedia}
-                                isKilled={isKilled(item)}
-                                isCustomRendition={isCustomRendition(featureMedia)}
-                            />
-                        ) : (
-                            <ArticleMedia
-                                media={featureMedia}
-                                isKilled={isKilled(item)}
-                                download={downloadMedia}
-                            />
-                        )
+                    } */}
+                    {featureMedia && (
+                        <MediaPreview
+                            media={featureMedia}
+                            item={item}
+                            download={downloadMedia}
+                        />
+                    )}
+                    {galleryMedia && (
+                        galleryMedia
+                            .map((data) => (
+                                <MediaPreview
+                                    key={data?.guid}
+                                    media={data}
+                                    item={item}
+                                    download={downloadMedia}
+                                />
+                            ))
                     )}
                     <ArticleContentWrapper itemType={itemType}>
                         <ArticleBody itemType={itemType}>

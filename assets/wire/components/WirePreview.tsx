@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import {isDisplayed} from 'utils';
+import {getConfig, isDisplayed} from 'utils';
 import {
     getFeatureMedia,
     getOtherMedia,
@@ -11,6 +11,7 @@ import {
     isKilled,
     DISPLAY_ABSTRACT,
     isCustomRendition,
+    getGalleryMedia,
 } from 'wire/utils';
 import types from 'wire/types';
 
@@ -32,6 +33,7 @@ import AgendaLinks from './AgendaLinks';
 import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
+import MediaPreview from './MediaPreview';
 
 class WirePreview extends React.PureComponent<any, any> {
     static propTypes: any;
@@ -50,6 +52,7 @@ class WirePreview extends React.PureComponent<any, any> {
         const {item, user, actions, followStory, topics, previewConfig, downloadMedia, listConfig, filterGroupLabels} = this.props;
         const featureMedia = getFeatureMedia(item);
         const media = getOtherMedia(item);
+        const galleryMedia = getGalleryMedia(item);
         const previousVersions = 'preview_versions';
 
         return (
@@ -77,20 +80,23 @@ class WirePreview extends React.PureComponent<any, any> {
                     {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item}/>}
                     {(isDisplayed('byline', previewConfig) || isDisplayed('located', previewConfig)) &&
                         <ArticleAuthor item={item} displayConfig={previewConfig} />}
-                    {featureMedia == null ? null : (
-                        featureMedia.type === 'picture' ? (
-                            <ArticlePicture
-                                picture={featureMedia}
-                                isKilled={isKilled(item)}
-                                isCustomRendition={isCustomRendition(featureMedia)}
-                            />
-                        ) : (
-                            <ArticleMedia
-                                media={featureMedia}
-                                isKilled={isKilled(item)}
-                                download={downloadMedia}
-                            />
-                        )
+                    {featureMedia && (
+                        <MediaPreview
+                            media={featureMedia}
+                            item={item}
+                            download={downloadMedia}
+                        />
+                    )}
+                    {galleryMedia && (
+                        galleryMedia
+                            .map((data) => (
+                                <MediaPreview
+                                    key={data.guid}
+                                    media={data}
+                                    item={item}
+                                    download={downloadMedia}
+                                />
+                            ))
                     )}
                     {isDisplayed('metadata_section', previewConfig) &&
                     <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions} displayConfig={previewConfig} listConfig={listConfig}
