@@ -164,7 +164,7 @@ def publish_item(doc, original):
                 doc["guid"],
             )
 
-    if not original:  # check if there are updates of this item already
+    if not original and app.config.get("PUSH_FIX_UPDATES"):  # check if there are updates of this item already
         next_item = service.find_one(req=None, evolvedfrom=doc["guid"])
         if next_item:  # there is an update, add missing ancestor
             doc["nextversion"] = next_item["_id"]
