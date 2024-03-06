@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import {getConfig, isDisplayed} from 'utils';
+import {isDisplayed} from 'utils';
 import {
     getFeatureMedia,
     getOtherMedia,
@@ -10,7 +10,6 @@ import {
     isEqualItem,
     isKilled,
     DISPLAY_ABSTRACT,
-    isCustomRendition,
     getGalleryMedia,
 } from 'wire/utils';
 import types from 'wire/types';
@@ -18,7 +17,6 @@ import types from 'wire/types';
 import Preview from 'ui/components/Preview';
 import ArticleSlugline from 'ui/components/ArticleSlugline';
 import ArticleAuthor from  'ui/components/ArticleAuthor';
-import ArticlePicture from  'ui/components/ArticlePicture';
 import ArticleMedia from  'ui/components/ArticleMedia';
 import ArticleHeadline from 'ui/components/ArticleHeadline';
 import ArticleAbstract from 'ui/components/ArticleAbstract';

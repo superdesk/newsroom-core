@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import PreviewMeta from './PreviewMeta';
 import PreviewTags from './PreviewTags';
 import AgendaLinks from './AgendaLinks';
-import {isDisplayed, gettext, formatDate, formatTime, getConfig} from 'utils';
+import {isDisplayed, gettext, formatDate, formatTime} from 'utils';
 import ListItemPreviousVersions from './ListItemPreviousVersions';
 import ListItemNextVersion from './ListItemNextVersion';
 import {
@@ -12,10 +12,7 @@ import {
     isKilled,
     DISPLAY_ABSTRACT,
     isPreformatted,
-    isCustomRendition,
     getFeatureMedia,
-    getMediaGalleryPictureList,
-    notNullOrUndefined,
     getGalleryMedia,
 } from 'wire/utils';
 import types from 'wire/types';
