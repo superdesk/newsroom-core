@@ -135,8 +135,8 @@ def get_json_or_400():
     return data
 
 
-def get_type():
-    item_type = request.args.get("type", "wire")
+def get_type(type: str = None):
+    item_type = type or request.args.get("type", "wire")
     types = {
         "wire": "items",
         "agenda": "agenda",

@@ -416,6 +416,13 @@ export function downloadItems(items: any) {
     return renderModal('downloadItems', {items});
 }
 
+interface DownloadPayload {
+    items: any;
+    format: any;
+    type: any;
+    monitoringProfile: any;
+    secondaryFormat: any;
+}
 /**
  * Start download - open download view in new window.
  *
@@ -423,27 +430,43 @@ export function downloadItems(items: any) {
  * @param {String} params
  */
 export function submitDownloadItems(items: any, params: any) {
-    return (dispatch: any, getState: any) => {
+    return async (dispatch: any, getState: any) => {
         const {format, secondaryFormat} = params;
         const userContext = context(getState());
-        let uri = `/download/${items.join(',')}?format=${format}&type=${userContext}`;
+        const monitoringProfile = get(getState(), 'search.activeNavigation[0]');
+        const payload: DownloadPayload = {
+            items,
+            format,
+            type: userContext,
+            monitoringProfile,
+            secondaryFormat,
+        };
+
+        let url = '/download';
         if (userContext === 'monitoring') {
-            const monitoringProfile = get(getState(), 'search.activeNavigation[0]');
-            uri = `/monitoring/export/${items.join(',')}?format=${format}&monitoring_profile=${monitoringProfile}`;
-            uri = `${uri}&secondary_format=${secondaryFormat}`;
+            url = '/monitoring/export';
+            payload.monitoringProfile = monitoringProfile;
         }
-        browserDownload(uri);
-        dispatch(setDownloadItems(items));
-        dispatch(closeModal());
-        analytics.multiItemEvent('download', items.map((_id: any) => getState().itemsById[_id]));
+        try {
+            const response = await server.post(url, payload);
+            const blob = await response.blob();
+            browserDownload(blob);
+            dispatch(setDownloadItems(items));
+            dispatch(closeModal());
+            analytics.multiItemEvent('download', items.map((_id: any) => getState().itemsById[_id]));
+        } catch (error) {
+            console.error('Error downloading file:', error);
+        }
     };
 }
 
-function browserDownload(url: any) {
+function browserDownload(blob: Blob) {
     const link = document.createElement('a');
     link.download = '';
-    link.href = url;
+    link.href = URL.createObjectURL(blob);
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
 }
 
 export const REMOVE_NEW_ITEMS = 'REMOVE_NEW_ITEMS';

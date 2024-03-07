@@ -270,14 +270,14 @@ def search():
     return send_response("wire_search", response)
 
 
-@blueprint.route("/download/<_ids>")
+@blueprint.route("/download", methods=["POST"])
 @login_required
-def download(_ids):
+def download():
     user = get_user(required=True)
-    _format = flask.request.args.get("format", "text")
-    item_type = get_type()
-    items = get_items_for_user_action(_ids.split(","), item_type)
-
+    data = flask.request.json
+    _format = data.get("format", "text")
+    item_type = get_type(data["type"])
+    items = get_items_for_user_action(data["items"], item_type)
     _file = io.BytesIO()
     formatter = app.download_formatters[_format]["formatter"]
     mimetype = None
@@ -322,7 +322,7 @@ def download(_ids):
                 )
         _file.seek(0)
 
-    update_action_list(_ids.split(","), "downloads", force_insert=True)
+    update_action_list(data["items"], "downloads", force_insert=True)
     get_resource_service("history").create_history_record(items, "download", user, request.args.get("type", "wire"))
     return flask.send_file(
         _file,

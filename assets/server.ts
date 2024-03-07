@@ -10,7 +10,9 @@ function options(custom: any = {}) {
 function checkStatus(response: Response): Promise<any> {
     if (response.status === 204) {
         return Promise.resolve({});
-    } else if (response.status >= 200 && response.status < 300) {
+    }else if (response.status == 200 && response.url && response.url.includes('/download')){
+        return Promise.resolve(response);
+    }else if (response.status >= 200 && response.status < 300) {
         return response.json();
     } else if (response.status === 400) {
         return response.json().then((data: any) => Promise.reject({errorData: data}));
