@@ -10,7 +10,7 @@ function options(custom: any = {}) {
 function checkStatus(response: Response): Promise<any> {
     if (response.status === 204) {
         return Promise.resolve({});
-    }else if (response.status == 200 && response.url && response.url.includes('/download')){
+    }else if (response.status == 200 && response.headers.get('Content-Disposition')?.includes('attachment')){
         return Promise.resolve(response);
     }else if (response.status >= 200 && response.status < 300) {
         return response.json();

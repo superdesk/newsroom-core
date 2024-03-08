@@ -276,7 +276,7 @@ def download():
     user = get_user(required=True)
     data = flask.request.json
     _format = data.get("format", "text")
-    item_type = get_type(data["type"])
+    item_type = get_type(data.get("type"))
     items = get_items_for_user_action(data["items"], item_type)
     _file = io.BytesIO()
     formatter = app.download_formatters[_format]["formatter"]
