@@ -420,8 +420,6 @@ interface DownloadPayload {
     items: any;
     format: any;
     type: any;
-    monitoringProfile: any;
-    secondaryFormat: any;
 }
 /**
  * Start download - open download view in new window.
@@ -433,34 +431,42 @@ export function submitDownloadItems(items: any, params: any) {
     return async (dispatch: any, getState: any) => {
         const {format, secondaryFormat} = params;
         const userContext = context(getState());
-        const monitoringProfile = get(getState(), 'search.activeNavigation[0]');
         const payload: DownloadPayload = {
             items,
             format,
             type: userContext,
-            monitoringProfile,
-            secondaryFormat,
         };
 
         let url = '/download';
         if (userContext === 'monitoring') {
-            url = '/monitoring/export';
-            payload.monitoringProfile = monitoringProfile;
+            const monitoringProfile = get(getState(), 'search.activeNavigation[0]');
+            url = `/monitoring/export/${items.join(',')}?format=${format}&monitoring_profile=${monitoringProfile}`;
+            url = `${url}&secondary_format=${secondaryFormat}`;
+            initiateDownloadFromUrl(url);
         }
-        try {
-            const response = await server.post(url, payload);
-            const blob = await response.blob();
-            browserDownload(blob);
-            dispatch(setDownloadItems(items));
-            dispatch(closeModal());
-            analytics.multiItemEvent('download', items.map((_id: any) => getState().itemsById[_id]));
-        } catch (error) {
-            console.error('Error downloading file:', error);
+        else{
+            try {
+                const response = await server.post(url, payload);
+                const blob = await response.blob();
+                initiateDownloadFromBlob(blob);
+            } catch (error) {
+                console.error('Error downloading file:', error);
+            }
         }
+        dispatch(setDownloadItems(items));
+        dispatch(closeModal());
+        analytics.multiItemEvent('download', items.map((_id: any) => getState().itemsById[_id]));
     };
 }
 
-function browserDownload(blob: Blob) {
+function initiateDownloadFromUrl(url: string) {
+    const link = document.createElement('a');
+    link.download = '';
+    link.href = url;
+    link.click();
+}
+
+function initiateDownloadFromBlob(blob: Blob) {
     const link = document.createElement('a');
     link.download = '';
     link.href = URL.createObjectURL(blob);
