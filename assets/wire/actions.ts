@@ -442,13 +442,13 @@ export function submitDownloadItems(items: any, params: any) {
             const monitoringProfile = get(getState(), 'search.activeNavigation[0]');
             url = `/monitoring/export/${items.join(',')}?format=${format}&monitoring_profile=${monitoringProfile}`;
             url = `${url}&secondary_format=${secondaryFormat}`;
-            initiateDownloadFromUrl(url);
+            initiateDownload(url);
         }
         else{
             try {
                 const response = await server.post(url, payload);
                 const blob = await response.blob();
-                initiateDownloadFromBlob(blob);
+                initiateDownload(blob);
             } catch (error) {
                 console.error('Error downloading file:', error);
             }
@@ -459,21 +459,13 @@ export function submitDownloadItems(items: any, params: any) {
     };
 }
 
-function initiateDownloadFromUrl(url: string) {
+function initiateDownload(source: string | Blob) {
     const link = document.createElement('a');
     link.download = '';
-    link.href = url;
+    link.href = typeof source === 'string' ? source : URL.createObjectURL(source);
     link.click();
 }
 
-function initiateDownloadFromBlob(blob: Blob) {
-    const link = document.createElement('a');
-    link.download = '';
-    link.href = URL.createObjectURL(blob);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
 
 export const REMOVE_NEW_ITEMS = 'REMOVE_NEW_ITEMS';
 export function removeNewItems(data: any) {
