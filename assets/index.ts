@@ -5,8 +5,8 @@ if (isTouchDevice()) {
     document.documentElement.classList.add('no-touch');
 }
 
-let element = document.getElementById('nav');
-let pinButton = document.getElementById('pin-btn');
+const element = document.getElementById('nav');
+const pinButton = document.getElementById('pin-btn');
 
 if (pinButton != null) {
     pinButton.onclick = handleNavExpanded;
@@ -17,13 +17,13 @@ if (sessionStorage.getItem('navigation-pinned')) {
 }
 
 function handleNavExpanded() {
-    if (element?.classList.contains("nav-block--pinned")) {
+    if (element?.classList.contains('nav-block--pinned')) {
         sessionStorage.removeItem('navigation-pinned');
-        element.classList.remove("nav-block--pinned");
+        element.classList.remove('nav-block--pinned');
         pinButton?.setAttribute('title', gettext('Expand'));
     } else {
         sessionStorage.setItem('navigation-pinned', 'true');
-        element?.classList.add("nav-block--pinned");
+        element?.classList.add('nav-block--pinned');
         pinButton?.setAttribute('title', gettext('Collapse'));
     }
-};
+}
