@@ -10,10 +10,12 @@ function options(custom: any = {}) {
 function checkStatus(response: Response): Promise<any> {
     if (response.status === 204) {
         return Promise.resolve({});
-    }else if (response.status == 200 && response.headers.get('Content-Disposition')?.includes('attachment')){
+    } else if (response.status >= 200 && response.status < 300) {
+        const contentType = response.headers.get('Content-Type');
+        if (contentType && contentType.includes('application/json')) {
+            return response.json();
+        }
         return Promise.resolve(response);
-    }else if (response.status >= 200 && response.status < 300) {
-        return response.json();
     } else if (response.status === 400) {
         return response.json().then((data: any) => Promise.reject({errorData: data}));
     } else if (response.type === 'opaqueredirect') {
