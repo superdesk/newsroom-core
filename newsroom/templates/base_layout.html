@@ -73,7 +73,7 @@
             <ul class="sidenav">
 
                 <li className='d-phone-none'>
-                    <button id="pin-btn" class='nav-block__pin-button' title="Expand" onClick={handleNavExpanded()}>
+                    <button id="pin-btn" class='nav-block__pin-button' title="{{ gettext('Expand') }}">
                         <i class="icon--arrow-end" role='presentation'></i>
                     </button>
                 </li>
@@ -178,18 +178,4 @@
 {% endblock %}
 
 </body>
-<script>
-    let element = document.getElementById('nav');
-    let pinButton = document.getElementById('pin-btn');
-
-    function handleNavExpanded() {
-        if (element.classList.contains("nav-block--pinned")) {
-            element.classList.remove("nav-block--pinned");
-            pinButton.setAttribute('title', 'Expand')
-        } else {
-            element.classList.add("nav-block--pinned");
-            pinButton.setAttribute('title', 'Collapse')
-        }
-    };
-</script>
 </html>
