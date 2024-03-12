@@ -592,10 +592,6 @@ export function setAndUpdateNewItems(data: any) {
 
         dispatch(updateItem(item));
 
-        // Do not use 'killed' items for new-item notifications
-        if (item.state === 'killed') {
-            return Promise.resolve();
-        }
 
         dispatch({type: SET_NEW_ITEM, data: item});
         return Promise.resolve();
