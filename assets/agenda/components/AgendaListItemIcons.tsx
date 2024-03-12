@@ -94,7 +94,7 @@ class AgendaListItemIcons extends React.Component<IProps, IState> {
 
     render() {
         const props = this.props;
-        const state = this.state;
+        const state = this.getUpdatedState();
         const className = bem('wire-articles', 'item__meta', {row: props.row});
         const subject = this.getItemByschema(props);
 
