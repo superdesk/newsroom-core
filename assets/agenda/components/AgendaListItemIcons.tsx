@@ -52,10 +52,6 @@ class AgendaListItemIcons extends React.Component<IProps, IState> {
             !isEqual(this.props.item.coverages, nextProps.item.coverages);
     }
 
-    shouldComponentUpdate(props: Readonly<IProps>) {
-        return this.itemChanged(props);
-    }
-
     componentDidUpdate(prevProps: Readonly<IProps>) {
         if (this.itemChanged(prevProps)) {
             this.setState(this.getUpdatedState());
@@ -94,7 +90,7 @@ class AgendaListItemIcons extends React.Component<IProps, IState> {
 
     render() {
         const props = this.props;
-        const state = this.getUpdatedState();
+        const state = this.state;
         const className = bem('wire-articles', 'item__meta', {row: props.row});
         const subject = this.getItemByschema(props);
 
