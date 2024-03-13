@@ -598,6 +598,7 @@ export function setAndUpdateNewItems(data: any) {
                 dispatch(fetchItem(plan._id));
             });
         }
+
         // Do not use 'killed' items for new-item notifications
         if (item.state === 'killed') {
             return Promise.resolve();
