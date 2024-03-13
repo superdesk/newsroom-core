@@ -9,6 +9,7 @@ from newsroom.auth import get_user
 from newsroom.types import Topic, User
 from newsroom.user_roles import UserRole
 from newsroom.utils import set_original_creator, set_version_creator
+from newsroom.signals import user_deleted
 
 
 class TopicNotificationType(enum.Enum):
@@ -67,6 +68,10 @@ class TopicsResource(newsroom.Resource):
 
 
 class TopicsService(newsroom.Service):
+    def __init__(self, datasource: Optional[str] = None, backend=None):
+        super().__init__(datasource, backend)
+        user_deleted.connect(self.on_user_deleted)
+
     def on_create(self, docs):
         super().on_create(docs)
         for doc in docs:
@@ -115,6 +120,27 @@ class TopicsService(newsroom.Service):
             for dashboard in updates["dashboards"]:
                 dashboard["topic_ids"] = [topic_id for topic_id in dashboard["topic_ids"] if topic_id != doc["_id"]]
             superdesk.get_resource_service("users").system_update(user["_id"], updates, user)
+
+    def on_user_deleted(self, sender, user, **kwargs):
+        # delete user private topics
+        self.delete_action({"is_global": False, "user": user["_id"]})
+
+        # remove user topic subscriptions from existing topics
+        topics = self.get(req=None, lookup={"subscribers.user_id": user["_id"]})
+        for topic in topics:
+            updates = dict(
+                subscribers=[s for s in topic["subscribers"] if s["user_id"] != user["_id"]],
+            )
+
+            if topic.get("user") == user["_id"]:
+                topic["user"] = None
+
+            self.system_update(topic["_id"], updates, topic)
+
+        # remove user as a topic creator for the rest
+        user_topics = self.get(req=None, lookup={"user": user["_id"]})
+        for topic in user_topics:
+            self.system_update(topic["_id"], {"user": None}, topic)
 
 
 def get_user_topics(user_id):
@@ -210,4 +236,4 @@ def auto_enable_user_emails(updates: Topic, original: Topic, user: User):
     superdesk.get_resource_service("users").patch(user["_id"], updates={"receive_email": True})
 
 
-topics_service = TopicsService()
+topics_service = TopicsService("topics", superdesk.get_backend())
