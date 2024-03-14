@@ -132,7 +132,9 @@ export default class CoverageItemStatus extends React.Component<any, any> {
                         key="contentLink"
                         className='nh-button nh-button--small nh-button--tertiary nh-button--disabled'
                         ref={(elem) => this.elem = elem}
-                        title={gettext('You don’t have access to this content, please contact {{email}}', {email: getConfig('view_content_tooltip_email')})}
+                        href={`mailto:${getConfig('view_content_tooltip_email')}`}
+                        target='_blank'
+                        title={gettext('You don’t have access to this content, please contact help-{{email}}', {email: getConfig('view_content_tooltip_email')})}
                     >
                         {gettext('View Content')}
                     </a>
@@ -174,7 +176,6 @@ export default class CoverageItemStatus extends React.Component<any, any> {
             get(this.props, 'coverageData.ednote', {})[coverage.coverage_id];
         const reason = this.getWorkflowStatusReason();
         const scheduledStatus = get(this.props, 'coverageData.scheduled_update_status', {})[coverage.coverage_id];
-
         return (
             <Fragment>
                 {wireText && (
