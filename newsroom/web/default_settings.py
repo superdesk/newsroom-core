@@ -344,7 +344,6 @@ CLIENT_CONFIG = {
     "item_actions": {},
     "display_abstract": DISPLAY_ABSTRACT,
     "display_credits": False,
-    "view_content_tooltip_email": "test@localhost.com",
     "filter_panel_defaults": {
         "tab": {
             "wire": "nav",  # Options are 'nav', 'topics', 'filters'
