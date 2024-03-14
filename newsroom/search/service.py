@@ -629,6 +629,9 @@ class BaseSearchService(Service):
         if not search.is_admin:
             if not search.company:
                 abort(403, gettext("User does not belong to a company."))
+            elif not search.user.get("sections", {}).get(search.section):
+                msg = f"User does not have access to {search.section} section"
+                abort(403, gettext(msg))
             elif not len(search.products):
                 abort(403, gettext("Your company doesn't have any products defined."))
             elif search.args.get("product") and not self.is_validate_product(search):
