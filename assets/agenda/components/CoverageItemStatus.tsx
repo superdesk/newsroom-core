@@ -135,7 +135,8 @@ export default class CoverageItemStatus extends React.Component<any, any> {
                         ref={(elem) => this.elem = elem}
                         href={viewContentEmail ? `mailto:${viewContentEmail}` : undefined}
                         target='_blank'
-                        title={gettext('You don’t have access to this content, please contact {{email}}', {email: viewContentEmail})}
+                        title={viewContentEmail ? gettext('You don’t have access to this content, please contact {{email}}', {email: viewContentEmail}
+                        ) : gettext('You don’t have access to this content')}
                     >
                         {gettext('View Content')}
                     </a>
