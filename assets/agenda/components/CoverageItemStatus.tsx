@@ -1,7 +1,7 @@
 import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
-import {gettext} from 'utils';
+import {getConfig, gettext} from 'utils';
 import {
     getCoverageStatusText,
     WORKFLOW_STATUS,
@@ -132,7 +132,7 @@ export default class CoverageItemStatus extends React.Component<any, any> {
                         key="contentLink"
                         className='nh-button nh-button--small nh-button--tertiary nh-button--disabled'
                         ref={(elem) => this.elem = elem}
-                        title={gettext('“You don’t have access to this content, please contact test@localhost”')}
+                        title={gettext('You don’t have access to this content, please contact {{email}}', {email: getConfig('view_content_tooltip_email')})}
                     >
                         {gettext('View Content')}
                     </a>
