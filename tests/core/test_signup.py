@@ -103,10 +103,10 @@ def test_new_user_signup_fails_if_fields_not_provided(client):
     )
     txt = response.get_data(as_text=True)
     assert "company: This field is required" in txt
-    assert "company_size: Not a valid choice" in txt
+    assert "company_size: This field is required" in txt
     assert "name: This field is required" in txt
     assert "country: This field is required" in txt
-    assert "occupation: Not a valid choice" in txt
+    assert "occupation: This field is required" in txt
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)

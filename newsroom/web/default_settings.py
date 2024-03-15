@@ -377,7 +377,7 @@ CLIENT_CONFIG = {
         "may be": {
             "enabled": True,
             "index": 3,
-            "option_label": lazy_gettext("Not Decided / On request"),
+            "option_label": lazy_gettext("Not Decided / On Request"),
             "button_label": lazy_gettext("Not Decided / On Request"),
         },
         "not intended": {
@@ -758,3 +758,26 @@ PUBLIC_WIRE_ALLOWED_FIELDS = [
     "version",
     "renditions",
 ]
+
+#: Filter subject based on this config in the Formatter
+
+AGENDA_CSV_SUBJECT_SCHEMES = []
+
+#: Round ``now`` when querying for embargoed items
+#: Common options are:
+# "" - No rounding
+# "/m" - Round ``now`` down to nearest minute
+# "/h" - Round ``now`` down to nearest hour
+#:
+#: .. versionadded:: 2.5.0
+#:
+EMBARGO_QUERY_ROUNDING = "/m"
+
+#: Language to Email Sender map
+#: When sending an email, the system will attempt to use the sender from this map
+#: based on the language from the user profile, falling back to ``MAIL_DEFAULT_SENDER`` if not found
+#:
+#: .. versionadded: 2.6.0
+#:
+EMAIL_DEFAULT_SENDER_NAME = None
+EMAIL_SENDER_NAME_LANGUAGE_MAP = {}

@@ -136,7 +136,7 @@ export function createStore<State = any>(reducer: any, name: any = 'default'): S
  * @param {Object} params
  * @return {String}
  */
-export function gettext(text: string, params?: {[key: string]: any}): string {
+export function gettext(text: string, params?: {[key: string]: string | number}): string {
     let translated = get(window.translations, text, text);
 
     if (params) {

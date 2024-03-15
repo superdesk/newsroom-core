@@ -79,6 +79,7 @@ interface IStateProps {
     listConfig: IListConfig;
     userType: IUserType;
     hiddenGroupsShown: {[dateString: string]: boolean};
+    itemTypeFilter: IAgendaState['agenda']['itemType'];
 }
 
 interface IDispatchProps {
@@ -305,7 +306,10 @@ class AgendaList extends React.Component<IProps, IState> {
                 key={`${group.date}-${forHiddenItems ? 'hidden-items' : 'items'}-group`}
             >
                 {itemIds.map((itemId) => {
-                    const plans = getPlanningItemsByGroup(this.props.itemsById[itemId], group.date);
+                    // Only show multiple entries for this item if we're in the `Planning Only` view
+                    const plans = this.props.itemTypeFilter !== 'planning' ?
+                        [] :
+                        getPlanningItemsByGroup(this.props.itemsById[itemId], group.date);
 
                     return plans.length > 0 ? (
                         <React.Fragment key={`${itemId}--${group.date}`}>
@@ -438,6 +442,7 @@ const mapStateToProps = (state: IAgendaState): IStateProps => ({
     listConfig: listConfigSelector(state),
     userType: state.userType,
     hiddenGroupsShown: hiddenGroupsShownSelector(state),
+    itemTypeFilter: state.agenda?.itemType,
 });
 
 const mapDispatchToProps: IDispatchProps = {

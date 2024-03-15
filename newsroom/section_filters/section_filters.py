@@ -67,4 +67,4 @@ class SectionFiltersService(CacheableService):
 
         for f in section_filters:
             if f.get("query"):
-                query["bool"]["filter"].append(query_string(f.get("query")))
+                query["bool"].setdefault("filter", []).append(query_string(f.get("query")))

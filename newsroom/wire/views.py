@@ -183,6 +183,7 @@ def get_home_data():
         "userProducts": user.get("products") or [],
         "userType": user.get("user_type"),
         "company": company_id,
+        "companyProducts": company.get("products") if company else [],
         "formats": [
             {
                 "format": f["format"],
