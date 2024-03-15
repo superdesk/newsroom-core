@@ -73,9 +73,15 @@
 
     <div class="contentWrap {% block custom_content_style %}{% endblock %}">
         {% if session.get('name') %}
-        <nav class="{`nav-block ${isNavExpanded ? 'nav-block--pinned' : ''}`}">
+        <nav id="nav" class="nav-block">
             <h3 class="a11y-only">{{ gettext('Side Navigation') }}</h3>
             <ul class="sidenav">
+
+                <li className='d-phone-none'>
+                    <button id="pin-btn" class='nav-block__pin-button' title="{{ gettext('Expand') }}">
+                        <i class="icon--arrow-end" role='presentation'></i>
+                    </button>
+                </li>
 
                 {% block default_navs %}
                     {% for group in range(0, 10) %}
