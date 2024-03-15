@@ -7,8 +7,8 @@ jobs:
   flake8:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
       - run: pip install flake8
@@ -17,22 +17,19 @@ jobs:
   mypy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      - run: |
-             sudo apt-get update
-             sudo apt-get install pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl
-      - run: pip install -Ur mypy-requirements.txt
+      - run: pip install -r mypy-requirements.txt
       - run: mypy .
 
   black:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      - run: pip install black~=23.0
+      - run: pip install -r black-requirements.txt
       - run: black --check .

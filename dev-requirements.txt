@@ -1,14 +1,11 @@
 -r requirements.txt
+-r mypy-requirements.txt
+-r black-requirements.txt
 
-black>=23,<24
 flake8
-sphinx
-sphinx-autobuild
 pytest
 pytest-cov
 pytest-mock
-responses>=0.10.6,<0.11
+responses>=0.10.6,<0.26
 httmock
 wooper
-mypy
-typing_extensions>=3.7.4

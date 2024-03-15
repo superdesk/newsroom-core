@@ -22,6 +22,7 @@ from tests.utils import (
     mock_send_email,
 )
 from tests.fixtures import PUBLIC_USER_ID, COMPANY_1_ID
+from .utils import add_company_products
 
 from copy import deepcopy
 from bson import ObjectId
@@ -73,22 +74,19 @@ test_planning = {
 
 @fixture
 def agenda_user(client, app):
-    app.data.insert(
-        "products",
+    add_company_products(
+        app,
+        COMPANY_1_ID,
         [
             {
-                "_id": 12,
                 "name": "product test",
                 "query": "headline:test",
-                "companies": [COMPANY_1_ID],
                 "is_enabled": True,
                 "product_type": "agenda",
             },
             {
-                "_id": 13,
                 "name": "product test 2",
                 "query": "slugline:prime",
-                "companies": [COMPANY_1_ID],
                 "is_enabled": True,
                 "product_type": "agenda",
             },
@@ -251,7 +249,7 @@ def test_share_items(client, app, mocker):
     assert str(user_id) in data["shares"]
 
 
-def test_agenda_search_filtered_by_query_product(client, app):
+def test_agenda_search_filtered_by_query_product(client, app, public_company):
     NAV_1 = ObjectId("5e65964bf5db68883df561c0")
     NAV_2 = ObjectId("5e65964bf5db68883df561c1")
 
@@ -273,23 +271,20 @@ def test_agenda_search_filtered_by_query_product(client, app):
         ],
     )
 
-    app.data.insert(
-        "products",
+    add_company_products(
+        app,
+        COMPANY_1_ID,
         [
             {
-                "_id": 12,
                 "name": "product test",
                 "query": "headline:test",
-                "companies": [COMPANY_1_ID],
                 "navigations": [NAV_1],
                 "is_enabled": True,
                 "product_type": "agenda",
             },
             {
-                "_id": 13,
                 "name": "product test 2",
                 "query": "slugline:prime",
-                "companies": [COMPANY_1_ID],
                 "navigations": [NAV_2],
                 "is_enabled": True,
                 "product_type": "agenda",
@@ -621,6 +616,27 @@ def test_filter_agenda_by_coverage_status(client):
                 "qcode": "ncostat:notdec",
             },
         },
+        {
+            "planning": {
+                "g2_content_type": "audio",
+                "slugline": "Vivid planning item",
+                "scheduled": "2018-05-28T10:51:52+0000",
+            },
+            "news_coverage_status": {
+                "name": "coverage intended",
+                "label": "Planned",
+                "qcode": "ncostat:int",
+            },
+            "workflow_status": "completed",
+            "firstcreated": "2018-05-28T10:55:00+0000",
+            "coverage_id": "placeholder_urn:newsml:stt.fi:20230529:620123",
+            "deliveries": [
+                {
+                    "publish_time": "2018-05-30T10:55:00+0000",
+                    "delivery_state": "published",
+                }
+            ],
+        },
     )
     client.post("/push", data=json.dumps(test_planning), content_type="application/json")
 
@@ -639,6 +655,10 @@ def test_filter_agenda_by_coverage_status(client):
     data = get_json(client, '/agenda/search?filter={"coverage_status":["not planned"]}')
     assert 1 == data["_meta"]["total"]
     assert "baz" == data["_items"][0]["_id"]
+
+    data = get_json(client, '/agenda/search?filter={"coverage_status":["completed"]}')
+    assert 1 == data["_meta"]["total"]
+    assert "123foo" == data["_items"][0]["_id"]
 
 
 def test_filter_events_only(client):

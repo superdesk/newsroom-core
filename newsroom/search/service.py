@@ -12,6 +12,7 @@ from superdesk.default_settings import strtobool as _strtobool
 from content_api.errors import BadParameterValueError
 
 from newsroom import Service
+from newsroom.auth.utils import user_has_section_allowed
 from newsroom.search.config import (
     SearchGroupNestedConfig,
     get_nested_config,
@@ -284,11 +285,14 @@ class BaseSearchService(Service):
         self.apply_time_limit_filter(search)
         self.apply_products_filter(search)
         self.apply_request_filter(search)
-        self.apply_request_advanced_search(search)
         self.apply_embargoed_filters(search)
 
         if len(search.query["bool"].get("should", [])):
             search.query["bool"]["minimum_should_match"] = 1
+
+    def apply_topic_filter(self, search):
+        """Topic filter is set via search args."""
+        self.apply_request_filter(search)
 
     def gen_source_from_search(self, search):
         """Generate the eve source object from the search query instance
@@ -330,7 +334,7 @@ class BaseSearchService(Service):
         for key, val in filters.items():
             if not val:
                 continue
-            bool_query["filter"].append(
+            bool_query["must"].append(
                 get_filter_query(key, val, self.get_aggregation_field(key), get_nested_config("items", key))
             )
 
@@ -574,9 +578,6 @@ class BaseSearchService(Service):
             # Set up the search query for filtering
             self.apply_request_filter(highlight_search)
 
-            # Set up the search query for advanced search options
-            self.apply_request_advanced_search(highlight_search)
-
             # Set up highlighting settings
             highlight_search.source.setdefault("highlight", {})
             highlight_search.source["highlight"].setdefault("fields", {})
@@ -744,7 +745,7 @@ class BaseSearchService(Service):
             )
 
         if search.args.get("ids"):
-            search.query["bool"]["filter"].append({"terms": {"_id": search.args["ids"]}})
+            search.query["bool"]["must"].append({"terms": {"_id": search.args["ids"]}})
 
         filters = None
         if search.args.get("filter"):
@@ -761,21 +762,23 @@ class BaseSearchService(Service):
                 if app.config.get("FILTER_AGGREGATIONS", True):
                     self.set_bool_query_from_filters(search.query["bool"], filters)
                 else:
-                    search.query["bool"]["filter"].append(filters)
+                    search.query["bool"]["must"].append(filters)
 
             if search.args.get("created_from") or search.args.get("created_to"):
-                search.query["bool"]["filter"].append(self.versioncreated_range(search.args))
+                search.query["bool"]["must"].append(self.versioncreated_range(search.args))
         elif filters or search.args.get("created_from") or search.args.get("created_to"):
-            search.source["post_filter"] = {"bool": {"filter": []}}
+            search.source["post_filter"] = {"bool": {"must": []}}
 
             if filters:
                 if app.config.get("FILTER_AGGREGATIONS", True):
                     self.set_bool_query_from_filters(search.source["post_filter"]["bool"], filters)
                 else:
-                    search.source["post_filter"]["bool"]["filter"].append(filters)
+                    search.source["post_filter"]["bool"]["must"].append(filters)
 
             if search.args.get("created_from") or search.args.get("created_to"):
-                search.source["post_filter"]["bool"]["filter"].append(self.versioncreated_range(search.args))
+                search.source["post_filter"]["bool"]["must"].append(self.versioncreated_range(search.args))
+
+        self.apply_request_advanced_search(search)
 
     def get_advanced_search_fields(self, search: SearchQuery) -> List[str]:
         advanced_fields = search.advanced.get("fields") if search.advanced is not None else []
@@ -817,10 +820,11 @@ class BaseSearchService(Service):
     def apply_embargoed_filters(self, search):
         """Generate filters for embargoed params"""
 
+        embargo_query_rounding = app.config.get("EMBARGO_QUERY_ROUNDING")
         if search.args.get("exclude_embargoed"):
-            search.query["bool"]["must_not"].append({"range": {"embargoed": {"gt": "now"}}})
+            search.query["bool"]["must_not"].append({"range": {"embargoed": {"gt": f"now{embargo_query_rounding}"}}})
         elif search.args.get("embargoed_only"):
-            search.query["bool"]["filter"].append({"range": {"embargoed": {"gt": "now"}}})
+            search.query["bool"]["filter"].append({"range": {"embargoed": {"gt": f"now{embargo_query_rounding}"}}})
 
     def prepend_embargoed_items_to_response(self, response, req, lookup):
         search = SearchQuery()
@@ -847,6 +851,9 @@ class BaseSearchService(Service):
         topics_checked = set()
 
         for user in users.values():
+            if not user_has_section_allowed(user, self.section):
+                continue
+
             aggs = {"topics": {"filters": {"filters": {}}}}
             company = companies.get(str(user.get("company", "")))
             # there will be one base search for a user with aggs for user topics
@@ -944,7 +951,9 @@ class BaseSearchService(Service):
             self.prefill_search_query(search)
             if user:
                 self.validate_request(search)
-            self.apply_filters(search, section_filters)
+                self.apply_filters(search, section_filters)
+            else:
+                self.apply_topic_filter(search)
         except Forbidden as exc:
             if user and topic:
                 logger.info(

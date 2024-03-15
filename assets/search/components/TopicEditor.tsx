@@ -576,7 +576,7 @@ const mapStateToProps = (state: any) => ({
     isLoading: state.isLoading,
     navigations: state.navigations || [],
     editorFullscreen: topicEditorFullscreenSelector(state),
-    companyUsers: state.monitoringProfileUsers || [],
+    companyUsers: state.companyUsers || [],
 
     navigationsById: navigationsByIdSelector(state),
     filterGroups: filterGroupsByIdSelector(state),
