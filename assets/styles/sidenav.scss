@@ -117,6 +117,7 @@
     min-width: var(--sidenav-size);
     transition: all var(--sidenav-transition);
     overflow-y: auto;
+    overflow-x: hidden;
 
     .sidenav__item-icon {
         --icon-block-radius: var(--sidenav-item-radius);
