@@ -11,7 +11,7 @@ gunicorn>=20.0.4,<21.3
 PyRTF3>=0.47.5
 xhtml2pdf>=0.2.4
 sentry-sdk[flask]>=1.5.7,<1.42
-eve-elastic>=7.3.1,<7.4
+eve-elastic>=7.3.1,<7.5
 MarkupSafe<2.2
 python3-saml>=1.15,<1.17
 google-auth>=2.6,<2.29
