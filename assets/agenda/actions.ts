@@ -591,8 +591,13 @@ export function setAndUpdateNewItems(data: any) {
         }
 
         dispatch(updateItem(item));
-        dispatch(fetchItems());
 
+        // Fetch related planning items if the updated item has planning_items
+        if (item.item_type === 'event' && item.planning_items && item.planning_items.length > 0) {
+            item.planning_items.forEach((plan: IAgendaItem) => {
+                dispatch(fetchItem(plan._id));
+            });
+        }
         // Do not use 'killed' items for new-item notifications
         if (item.state === 'killed') {
             return Promise.resolve();
