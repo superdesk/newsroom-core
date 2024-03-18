@@ -591,6 +591,7 @@ export function setAndUpdateNewItems(data: any) {
         }
 
         dispatch(updateItem(item));
+        dispatch(fetchItems());
 
         // Do not use 'killed' items for new-item notifications
         if (item.state === 'killed') {
