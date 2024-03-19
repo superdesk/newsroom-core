@@ -7,6 +7,7 @@ from bson import ObjectId
 from copy import deepcopy
 
 from newsroom.auth.utils import start_user_session
+from tests.core.utils import add_company_products
 
 from ..fixtures import (  # noqa: F401
     items,
@@ -24,6 +25,9 @@ from superdesk import get_resource_service
 
 NAV_1 = ObjectId("5e65964bf5db68883df561c0")
 NAV_2 = ObjectId("5e65964bf5db68883df561c1")
+
+PROD_1 = ObjectId()
+PROD_2 = ObjectId()
 
 
 @fixture
@@ -46,23 +50,22 @@ def setup_products(app):
         ],
     )
 
-    app.data.insert(
-        "products",
+    add_company_products(
+        app,
+        COMPANY_1_ID,
         [
             {
-                "_id": 10,
+                "_id": PROD_1,
                 "name": "product test",
                 "sd_product_id": 1,
-                "companies": [COMPANY_1_ID],
                 "navigations": [NAV_1],
                 "product_type": "wire",
                 "is_enabled": True,
             },
             {
-                "_id": 11,
+                "_id": PROD_2,
                 "name": "product test 2",
                 "sd_product_id": 2,
-                "companies": [COMPANY_1_ID],
                 "navigations": [NAV_2],
                 "product_type": "wire",
                 "is_enabled": True,
@@ -174,22 +177,20 @@ def test_bookmarks(client, app):
 
 
 def test_bookmarks_by_section(client, app):
-    products = [
-        {
-            "_id": 1,
-            "name": "Service A",
-            "query": "service.code: a",
-            "is_enabled": True,
-            "description": "Service A",
-            "companies": [COMPANY_1_ID],
-            "sd_product_id": None,
-            "product_type": "wire",
-        }
-    ]
-
-    app.data.insert("products", products)
-    product_id = app.data.find_all("products")[0]["_id"]
-    assert product_id == 1
+    add_company_products(
+        app,
+        COMPANY_1_ID,
+        [
+            {
+                "name": "Service A",
+                "query": "service.code: a",
+                "is_enabled": True,
+                "description": "Service A",
+                "sd_product_id": None,
+                "product_type": "wire",
+            },
+        ],
+    )
 
     with client.session_transaction() as session:
         session["user"] = "59b4c5c61d41c8d736852fbf"
@@ -331,14 +332,13 @@ def test_administrator_gets_all_results(client, app):
 
 
 def test_search_filtered_by_users_products(client, app):
-    app.data.insert(
-        "products",
+    add_company_products(
+        app,
+        COMPANY_1_ID,
         [
             {
-                "_id": 10,
                 "name": "product test",
                 "sd_product_id": 1,
-                "companies": [COMPANY_1_ID],
                 "is_enabled": True,
                 "product_type": "wire",
             }
@@ -402,23 +402,20 @@ def test_search_filtered_by_query_product(client, app):
         ],
     )
 
-    app.data.insert(
-        "products",
+    add_company_products(
+        app,
+        COMPANY_1_ID,
         [
             {
-                "_id": 12,
                 "name": "product test",
                 "query": "headline:more",
-                "companies": [COMPANY_1_ID],
                 "navigations": [NAV_1],
                 "product_type": "wire",
                 "is_enabled": True,
             },
             {
-                "_id": 13,
                 "name": "product test 2",
                 "query": "headline:Weather",
-                "companies": [COMPANY_1_ID],
                 "navigations": [NAV_2],
                 "product_type": "wire",
                 "is_enabled": True,
@@ -496,21 +493,18 @@ def test_item_detail_access(client, app):
     assert not data.get("body_html")
 
     # add product
-    app.data.insert(
-        "products",
+    add_company_products(
+        app,
+        COMPANY_1_ID,
         [
             {
-                "_id": 10,
                 "name": "matching product",
-                "companies": [COMPANY_1_ID],
                 "is_enabled": True,
                 "product_type": "wire",
                 "query": "slugline:%s" % items[0]["slugline"],
             }
         ],
     )
-
-    g.pop("cached:products", None)
 
     # normal access
     data = get_json(client, item_url)
@@ -537,23 +531,20 @@ def test_search_using_section_filter_for_public_user(client, app):
         ],
     )
 
-    app.data.insert(
-        "products",
+    add_company_products(
+        app,
+        COMPANY_1_ID,
         [
             {
-                "_id": 12,
                 "name": "product test",
                 "query": "headline:more",
-                "companies": [COMPANY_1_ID],
                 "navigations": [NAV_1],
                 "is_enabled": True,
                 "product_type": "wire",
             },
             {
-                "_id": 13,
                 "name": "product test 2",
                 "query": "headline:Weather",
-                "companies": [COMPANY_1_ID],
                 "navigations": [NAV_2],
                 "is_enabled": True,
                 "product_type": "wire",
@@ -562,7 +553,6 @@ def test_search_using_section_filter_for_public_user(client, app):
     )
 
     g.pop("cached:navigations", None)
-    g.pop("cached:products", None)
 
     with client.session_transaction() as session:
         session["user"] = str(PUBLIC_USER_ID)
@@ -630,14 +620,13 @@ def test_administrator_gets_results_based_on_section_filter(client, app):
 
 
 def test_time_limited_access(client, app):
-    app.data.insert(
-        "products",
+    add_company_products(
+        app,
+        COMPANY_1_ID,
         [
             {
-                "_id": 10,
                 "name": "product test",
                 "query": "versioncreated:<=now-2d",
-                "companies": [COMPANY_1_ID],
                 "is_enabled": True,
                 "product_type": "wire",
             }
@@ -672,14 +661,13 @@ def test_time_limited_access(client, app):
 
 
 def test_company_type_filter(client, app):
-    app.data.insert(
-        "products",
+    add_company_products(
+        app,
+        COMPANY_1_ID,
         [
             {
-                "_id": 10,
                 "name": "product test",
                 "query": "versioncreated:<=now-2d",
-                "companies": [COMPANY_1_ID],
                 "is_enabled": True,
                 "product_type": "wire",
             }
@@ -720,14 +708,15 @@ def test_search_by_products_and_filtered_by_embargoe(client, app):
     with app.test_request_context():
         server_session["user"] = str(PUBLIC_USER_ID)
         server_session["user_type"] = "public"
-        app.data.insert(
-            "products",
+        product_id = ObjectId()
+        add_company_products(
+            app,
+            COMPANY_1_ID,
             [
                 {
-                    "_id": 10,
+                    "_id": product_id,
                     "name": "product test",
                     "query": "headline:china",
-                    "companies": [COMPANY_1_ID],
                     "is_enabled": True,
                     "product_type": "wire",
                 }
@@ -747,7 +736,7 @@ def test_search_by_products_and_filtered_by_embargoe(client, app):
             ],
         )
 
-        items = get_resource_service("wire_search").get_product_items(10, 20)
+        items = get_resource_service("wire_search").get_product_items(product_id, 20)
         assert 1 == len(items)
 
         app.config["COMPANY_TYPES"] = [
@@ -757,7 +746,7 @@ def test_search_by_products_and_filtered_by_embargoe(client, app):
         company = app.data.find_one("companies", req=None, _id=COMPANY_1_ID)
         app.data.update("companies", COMPANY_1_ID, {"company_type": "test"}, company)
 
-        items = get_resource_service("wire_search").get_product_items(10, 20)
+        items = get_resource_service("wire_search").get_product_items(product_id, 20)
         assert 0 == len(items)
 
         # ex-embargoed item is fetched
@@ -773,7 +762,7 @@ def test_search_by_products_and_filtered_by_embargoe(client, app):
             ],
         )
 
-        items = get_resource_service("wire_search").get_product_items(10, 20)
+        items = get_resource_service("wire_search").get_product_items(product_id, 20)
         assert 1 == len(items)
         assert items[0]["headline"] == "china story"
 
@@ -918,14 +907,17 @@ def test_navigation_for_public_users(client, app, setup_products):
 
     # add products to user
     app.data.update(
-        "users", PUBLIC_USER_ID, {"products": [{"section": "wire", "_id": 10}, {"section": "wire", "_id": 11}]}, user
+        "users",
+        PUBLIC_USER_ID,
+        {"products": [{"section": "wire", "_id": PROD_1}, {"section": "wire", "_id": PROD_2}]},
+        user,
     )
 
     # and remove those from company
     app.data.update(
         "companies",
         COMPANY_1_ID,
-        {"products": [{"section": "wire", "_id": 10, "seats": 1}, {"section": "wire", "_id": 11, "seats": 1}]},
+        {"products": [{"section": "wire", "_id": PROD_1, "seats": 1}, {"section": "wire", "_id": PROD_2, "seats": 1}]},
         company,
     )
 

@@ -148,7 +148,8 @@ class AgendaResource(newsroom.Resource):
     schema["source"] = {"type": "string", "mapping": {"type": "keyword"}}
 
     # aggregated fields
-    schema["urgency"] = planning_schema["urgency"]
+    schema["urgency"] = {**planning_schema["urgency"], "mapping": {"type": "keyword"}}
+    schema["priority"] = {**planning_schema["priority"], "mapping": {"type": "keyword"}}
     schema["place"] = planning_schema["place"]
     schema["service"] = planning_schema["anpa_category"]
     schema["state_reason"] = {"type": "string"}
@@ -545,6 +546,13 @@ def _filter_terms(filters, item_type):
                         query={"exists": {"field": "coverages.delivery_id"}},
                     )
                 )
+                must_not_term_filters.append(
+                    nested_query(
+                        path="coverages",
+                        query={"terms": {"coverages.workflow_status": ["completed"]}},
+                        name="workflow_status",
+                    )
+                )
             elif val == ["may be"]:
                 must_term_filters.append(
                     nested_query(
@@ -569,12 +577,24 @@ def _filter_terms(filters, item_type):
                     )
                 )
             elif val == ["completed"]:
-                must_term_filters.append(
+                should_term_filters = []
+                # Check if "delivery_id" is present
+                should_term_filters.append(
                     nested_query(
                         path="coverages",
                         query={"exists": {"field": "coverages.delivery_id"}},
                     )
                 )
+
+                # If "delivery_id" is not present, check "workflow_status"
+                should_term_filters.append(
+                    nested_query(
+                        path="coverages",
+                        query={"terms": {"coverages.workflow_status": ["completed"]}},
+                        name="workflow_status",
+                    )
+                )
+                must_term_filters.append({"bool": {"should": should_term_filters}})
             elif val == ["not intended"]:
                 must_term_filters.append(
                     nested_query(
@@ -664,7 +684,7 @@ class AgendaService(BaseSearchService):
     section = "agenda"
     limit_days_setting = None
     default_sort = [{"dates.start": "asc"}]
-    default_page_size = 100
+    default_page_size = 250
 
     def get_advanced_search_fields(self, search: SearchQuery) -> List[str]:
         fields = super().get_advanced_search_fields(search)
@@ -880,7 +900,6 @@ class AgendaService(BaseSearchService):
         # Apply agenda based filters
         self.apply_section_filter(search, section_filters)
         self.apply_request_filter(search)
-        self.apply_request_advanced_search(search)
 
         if not is_admin_or_internal(search.user):
             _remove_fields(search.source, PRIVATE_FIELDS)
@@ -1007,8 +1026,13 @@ class AgendaService(BaseSearchService):
         if search.args.get("date_from") or search.args.get("date_to"):
             _set_event_date_range(search)
 
+        self.apply_request_advanced_search(search)
+
     def set_post_filter(self, source: Dict[str, Any], req: ParsedRequest, item_type: Optional[str] = None):
-        filters = json.loads(req.args.get("filter") or "{}")
+        filters = req.args.get("filter")
+        if isinstance(filters, str):
+            filters = json.loads(filters)
+
         if not filters:
             return
 
@@ -1282,7 +1306,7 @@ class AgendaService(BaseSearchService):
                     "must_not": [
                         {"term": {"state": "killed"}},
                     ],
-                    "filter": [
+                    "must": [
                         {"term": {"_id": item_id}},
                     ],
                     "should": [],

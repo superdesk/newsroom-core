@@ -90,6 +90,7 @@ class FollowedTopics extends React.Component<any, any> {
 
     componentDidMount() {
         this.onTopicChanged();
+
         if (this.props.user && this.props.user.company && this.props.user.company.length) {
             this.props.fetchCompanyUsers(this.props.user.company);
         }
@@ -315,7 +316,7 @@ const mapStateToProps = (state: any, ownProps: any) => ({
     selectedMenu: selectedMenuSelector(state),
     editorFullscreen: topicEditorFullscreenSelector(state),
     globalTopicsEnabled: globalTopicsEnabledSelector(state, ownProps.topicType),
-    companyUsers: state.monitoringProfileUsers || [],
+    companyUsers: state.companyUsers || [],
     folders: foldersSelector(state),
 });
 

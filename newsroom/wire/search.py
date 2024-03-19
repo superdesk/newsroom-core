@@ -157,11 +157,12 @@ class WireSearchService(BaseSearchService):
             return []
 
         if not app.config["DASHBOARD_EMBARGOED"] or exclude_embargoed:
+            embargo_query_rounding = app.config.get("EMBARGO_QUERY_ROUNDING")
             search.query["bool"]["filter"].append(
                 {
                     "bool": {
                         "should": [
-                            {"range": {"embargoed": {"lt": "now"}}},
+                            {"range": {"embargoed": {"lt": f"now{embargo_query_rounding}"}}},
                             {"bool": {"must_not": {"exists": {"field": "embargoed"}}}},
                         ]
                     }
@@ -182,6 +183,7 @@ class WireSearchService(BaseSearchService):
 
         self.gen_source_from_search(search)
         search.source["post_filter"] = {"bool": {"filter": []}}
+        search.source.pop("aggs", None)
         internal_req = self.get_internal_request(search)
 
         return list(self.internal_get(internal_req, None))
@@ -252,10 +254,9 @@ class WireSearchService(BaseSearchService):
                         {"term": {"type": "composite"}},
                         {"constant_score": {"filter": {"exists": {"field": "nextversion"}}}},
                     ],
-                    "filter": [{"term": {"_id": item_id}}],
+                    "must": [{"term": {"_id": item_id}}],
                     "should": [],
-                    "must": [],
-                }
+                },
             },
         )
 

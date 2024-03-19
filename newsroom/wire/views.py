@@ -16,7 +16,7 @@ from superdesk import get_resource_service
 from superdesk.default_settings import strtobool
 from newsroom.auth.utils import check_user_has_products, is_valid_session
 
-from newsroom.navigations.navigations import get_navigations_by_company
+from newsroom.navigations.navigations import get_navigations_by_user, get_navigations_by_company
 from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
 from newsroom.wire.utils import update_action_list
@@ -108,7 +108,8 @@ def get_view_data() -> Dict:
             for f in app.download_formatters.values()
             if "wire" in f["types"]
         ],
-        "navigations": get_navigations_by_company(company, product_type="wire") if company else [],
+        "navigations": (get_navigations_by_user(user, "wire") if user else [])
+        + (get_navigations_by_company(company, "wire") if company else []),
         "products": products,
         "saved_items": get_bookmarks_count(user["_id"], "wire"),
         "context": "wire",
@@ -182,6 +183,7 @@ def get_home_data():
         "userProducts": user.get("products") or [],
         "userType": user.get("user_type"),
         "company": company_id,
+        "companyProducts": company.get("products") if company else [],
         "formats": [
             {
                 "format": f["format"],
@@ -270,14 +272,14 @@ def search():
     return send_response("wire_search", response)
 
 
-@blueprint.route("/download/<_ids>")
+@blueprint.route("/download", methods=["POST"])
 @login_required
-def download(_ids):
+def download():
     user = get_user(required=True)
-    _format = flask.request.args.get("format", "text")
-    item_type = get_type()
-    items = get_items_for_user_action(_ids.split(","), item_type)
-
+    data = flask.request.json
+    _format = data.get("format", "text")
+    item_type = get_type(data.get("type"))
+    items = get_items_for_user_action(data["items"], item_type)
     _file = io.BytesIO()
     formatter = app.download_formatters[_format]["formatter"]
     mimetype = None
@@ -322,7 +324,7 @@ def download(_ids):
                 )
         _file.seek(0)
 
-    update_action_list(_ids.split(","), "downloads", force_insert=True)
+    update_action_list(data["items"], "downloads", force_insert=True)
     get_resource_service("history").create_history_record(items, "download", user, request.args.get("type", "wire"))
     return flask.send_file(
         _file,

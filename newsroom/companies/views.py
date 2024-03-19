@@ -16,6 +16,7 @@ from newsroom.decorator import admin_only, account_manager_only, login_required
 from newsroom.companies import blueprint
 from newsroom.types import AuthProviderConfig
 from newsroom.utils import (
+    get_public_user_data,
     query_resource,
     find_one,
     get_json_or_400,
@@ -176,9 +177,8 @@ def delete(_id):
 @blueprint.route("/companies/<_id>/users", methods=["GET"])
 @login_required
 def company_users(_id):
-    """TODO(petr): use projection to hide fields like token/email."""
-    users = list(query_resource("users", lookup={"company": ObjectId(_id)}))
-    return jsonify(users), 200
+    users = [get_public_user_data(user) for user in query_resource("users", lookup={"company": ObjectId(_id)})]
+    return jsonify(users)
 
 
 @blueprint.route("/companies/<company_id>/approve", methods=["POST"])

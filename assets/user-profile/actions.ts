@@ -258,20 +258,19 @@ export function saveFolder(folder: ITopicFolder, data: {name: string}, global?: 
         const state = getState();
         const url = getFoldersUrl(state.company, state.user?._id, global, folder._id);
 
+        const getFolder = (allFolders: IFoldersUnified, id: string) =>
+            [...allFolders.userFolders, ...allFolders.companyFolders].find(({_id}) => _id === id);
+
         if (folder._etag) {
             const updates = {...data};
 
             return server.patch(url, updates, folder._etag)
-                .then(() => {
-                    dispatch(fetchFolders());
-                });
+                .then((result) => dispatch(fetchFolders()).then((allFolders: IFoldersUnified) => getFolder(allFolders, result._id)));
         } else {
             const payload = {...data, section: state.selectedMenu === 'events' ? 'agenda' : 'wire'};
 
             return server.post(url, payload)
-                .then(() => {
-                    dispatch(fetchFolders());
-                });
+                .then((result) => dispatch(fetchFolders()).then((allFolders: IFoldersUnified) => getFolder(allFolders, result._id)));
         }
     };
 }
@@ -298,7 +297,12 @@ export const RECIEVE_FOLDERS = 'RECIEVE_FOLDERS';
  * @param {bool} global - fetch company or user folders
  * @param {bool} skipDispatch - if true it won't replace folders in store
  */
-export function fetchFolders() {
+type IFoldersUnified = {
+    companyFolders: Array<ITopicFolder>;
+    userFolders: Array<ITopicFolder>;
+};
+
+export function fetchFolders(): (dispatch: any, getState: any) => Promise<IFoldersUnified> {
     return (dispatch: any, getState: any) => {
         const state = getState();
         const companyTopicsUrl = getFoldersUrl(state.company, state.user?._id, true);
@@ -315,6 +319,11 @@ export function fetchFolders() {
                     userFolders: userFolders,
                 },
             });
+
+            return {
+                companyFolders: companyFolders as Array<ITopicFolder>,
+                userFolders: userFolders as Array<ITopicFolder>,
+            };
         }).catch((error) => {
             console.error(error);
             return Promise.reject();

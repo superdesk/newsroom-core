@@ -202,6 +202,7 @@ export interface IAgendaState {
         }>;
     };
     errors?: {[field: string]: Array<string>};
+    loadingAggregations?: boolean;
 }
 
 export type AgendaGetState = () => IAgendaState;

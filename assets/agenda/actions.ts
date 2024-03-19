@@ -255,6 +255,10 @@ function search(state: IAgendaState, fetchFrom: number): Promise<IRestApiRespons
     return server.get(`/agenda/search?${queryString}&tick=${Date.now().toString()}`);
 }
 
+export const LOADING_AGGREGATIONS = 'LOADING_AGGREGATIONS';
+function loadingAggregations() {
+    return {type: LOADING_AGGREGATIONS};
+}
 /**
  * Fetch items for current query
  */
@@ -262,6 +266,7 @@ export function fetchItems(): AgendaThunkAction {
     return (dispatch, getState) => {
         const start = Date.now();
         dispatch(queryItems());
+        dispatch(loadingAggregations());
         return search(getState(), 0)
             .then((data) => {
                 dispatch(recieveItems(data));
@@ -592,6 +597,13 @@ export function setAndUpdateNewItems(data: any) {
         }
 
         dispatch(updateItem(item));
+
+        // Fetch related planning items if the updated item has planning_items
+        if (item.item_type === 'event' && item.planning_items && item.planning_items.length > 0) {
+            item.planning_items.forEach((plan: IAgendaItem) => {
+                dispatch(fetchItem(plan._id));
+            });
+        }
 
         // Do not use 'killed' items for new-item notifications
         if (item.state === 'killed') {

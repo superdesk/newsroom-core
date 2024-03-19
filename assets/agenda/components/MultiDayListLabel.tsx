@@ -22,7 +22,7 @@ export const MultiDayListLabel = React.memo(({current, days}: IProps) => (
         <span className={`multiday-label ${getLabelSectionClass(current, days)}`}>
             <span className="multiday-label__label">{gettext('Day:')}</span>
             <span className="multiday-label__value">
-                <span>{current}</span>
+                <span>{current > days ? days : current}</span>
                 <span className="multiday-label__value-divide">/</span>
                 <span>{days}</span>
             </span>

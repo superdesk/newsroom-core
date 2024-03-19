@@ -1,17 +1,17 @@
 <div class="tips-content">
     <div>
-        <p><b>Soyez précis.</b> Plus vous utilisez de mots pertinents dans votre recherche, plus vous obtiendrez de bons résultats.</p>
+        <p><b>Utilisez les guillemets anglais (" ") quand vous voulez rechercher une expression exacte.</b></p>
         <p>
-            Recherche générale = <code>Budget fédéral</code><br/>
-            Recherche precise = <code>Budget fédéral 2023 ministère de la Santé</code>
+            Recherche d’une phrase = <code> Avis de tempête hivernale</code> (n’importe lequel de ces mots vont se retrouver dans les résultats)<br/>
+            Bonne recherche d’une phrase = <code>"Avis de tempête hivernale"</code> (mettre les mots entre les guillemets va uniquement retrouver l’expression exacte dans les résultats)
         </p>
     </div>
     <hr />
     <div>
-        <p><b>Utilisez les guillemets</b> pour rechercher une phrase.</p>
+        <p><b>Soyez précis.</b> Plus vous utilisez de mots pertinents dans votre recherche, plus vous obtiendrez de bons résultats.</p>
         <p>
-            Mauvaise recherche d’une phrase = Avis de tempête hivernale = <code>Avis de tempête hivernale</code><br/>
-            Bonne recherche d’une phrase = <code>“Avis de tempête hivernale”</code>
+            Recherche générale = <code>Budget fédéral</code><br/>
+            Recherche precise = <code>"Budget fédéral 2023"</code>
         </p>
     </div>
     <hr />
@@ -20,22 +20,25 @@
         <p>Lorsque vous faites une recherche en utilisant la barre de recherche, les mots-clés peuvent, par défaut,  être recherchés dans tous les champs des documents. Les requêtes de recherche peuvent être restreintes à un champ précis, si désiré.</p>
         <p>Voici des exemples:</p>
         <ul>
-            <li>Pour trouver la phrase exacte «avis de tempête» dans le corps du texte (CORPS HTML)<br /><code>body_html:"avis de tempête"</code></li>
-            <li>Pour trouver le terme «neige» ou «tempête» dans le champ du titre<br /><code>headline:(neige OR tempête)</code></li>
-            <li>Pour trouver le nom précis «Noel Ransome» dans le champ de signature<br /><code>byline:"Noel Ransome"</code></li>
-            <li>Pour trouver le mot «climat» dans le titre de rappel<br /><code>Slugline:climat</code></li>
+            <li>Pour trouver la phrase exacte « avis de tempête » dans le corps du texte (CORPS HTML)<br /><code>body_html:"avis de tempête"</code></li>
+            <li>Pour trouver le terme « neige » ou « tempête » dans le champ du titre<br /><code>headline:(neige OR tempête)</code></li>
+            <li>Pour trouver le nom précis « Noel Ransome » dans le champ de signature<br /><code>byline:"Noel Ransome"</code></li>
+            <li>Pour trouver le mot « climat » dans le titre de rappel<br /><code>slugline:climat</code></li>
         </ul>
     </div>
     <hr />
     <div>
         <p><b>Caractères génériques</b></p>
-        <p>Des caractères génériques peuvent être utilisés dans les recherches avec des termes individuels comme <code>?</code> (point d’interrogation) pour remplacer un caractère unique et <code>*</code> (astérisque) pour remplacer aucun ou plusieurs caractères: <code>qu?ck bro*</code></p>
+        <p>Des caractères génériques peuvent être utilisés dans les recherches avec des termes individuels comme <code>?</code> (point d’interrogation) pour remplacer un caractère unique et <code>*</code> (astérisque) pour remplacer aucun ou plusieurs caractères.</p>
+        <p>Voici des exemples :</p>
+        <p>Le point d’interrogation remplace le caractère ‘e’ dans l’expression L<code>?</code>gault</p>
+        <p>L’astérisque remplace aucun ou plusieurs caractères dans l’expression manifest<code>*</code>. Par exemple, cette recherche va trouver des résultats avec les variations différentes de l’expression manifest<code>*</code> tels que manifest, manifeste, manifesté, manifestant, manifestants, manifester, manifestation, manifestations, manifestement, etc.</p>
     </div>
     <hr />
     <div>
         <p><b>Recherche de proximité</b></p>
-        <p>Utilisez  <code>~</code> pour trouver des termes qui se trouvent à n mots l’un de l’autre.</p>
-        <p><code>“mesure climat”~10</code> signifie que ces deux mots doivent se trouver au maximum à 10 mots l’un de l’autre.</p>
+        <p>Utilisez le symbole <code>~</code> pour trouver des termes qui se trouvent à n mots l’un de l’autre.</p>
+        <p>Par exemple, l’expression <code>“mesure climat”~10</code> signifie que ces deux mots doivent se trouver au maximum à 10 mots l’un de l’autre.</p>
     </div>
     <hr />
     <div>
@@ -55,45 +58,45 @@
     <div>
         <p><b>Liste d’autres champs ou expressions boléennes courants:</b></p>
         <ul>
-            <li>Version. Par exemple: <code>genre.name:Agate</code> recherchera des documents dont la version est Agate.</li>
-            <li>Catégorie du fil ou du calendrier. Par exemple: <code>service.name:Affaires</code> recherchera des documents parus sur le fil Affaires, et la même requête dans la section du calendrier recherchera des événements et des couverture dans la catégorie Affaires.</li>
-            <li>Index/Sujet. Par exemple: <code>subject.name:Automobile</code> recherchera des documents dont le sujet ou l’index sont Automobile. </li>
-            <li>Source. Par example: <code>source:La Presse Canadienne</code> recherchera des documents dont la source est La Presse Canadienne.</li>
-            <li>Nombre de mots. Par exemple: <code>wordcount:>100</code> recherchera des documents dont le nombre de mot est supérieur à 100 mots.</li>
+            <li>Recherche par version. Par exemple, l’expression <code>genre.name:Budget</code> recherche des documents dont la version est Budget.</li>
+            <li>Recherche par catégorie du fil ou du calendrier: Par exemple, l’expression <code>service.name:Affaires</code>  recherche des documents parus sur le fil Affaires, et la même requête dans l’onglet « Calendrier » recherche des événements et des couvertures dans la catégorie Affaires.</li>
+            <li>Recherche par sujet: Par exemple, l’expression <code>subject.name:Automobile</code> recherche des documents dont le sujet est Automobile.</li>
+            <li>Recherche par source: Par exemple, l’expression <code>source:"La Presse Canadienne"</code> recherche des documents dont la source est La Presse Canadienne.</li>
+            <li>Recherche par nombre de mots: Par exemple, l’expression <code>wordcount:>100</code> recherche des documents dont le nombre de mots est supérieur à 100 mots.</li>
         </ul>
     </div>
     <hr />
     <div>
-        <p><b>Utilisez les filtres pour raffiner vos résultats de recherche sur le fil de presse et dans le calendrier. Nous proposons un certain nombre d’options de filtre.</b></p>
+        <p><b>Utilisez les filtres pour raffiner vos résultats de recherche sur le fil de presse et dans le calendrier.</b></p>
         <div>
-            <h3><b>Filtres – Fil de presse</b></h3>
+            <h3><b>Filtres – Fil de presse (partie gauche de l’écran)</b></h3>
             <ul>
-                <li>Langue – filtrer selon le langage des éléments</li>
-                <li>Source – filtrer selon la source des éléments</li>
-                <li>Catégorie du fil – filtrer selon la catégorie du fil des éléments</li>
+                <li>Langue – pour filtrer selon anglais ou français</li>
+                <li>Source – pour filtrer selon la source (The Canadian Press, La Presse Canadienne, The Associated Press, etc.)</li>
+                <li>Catégorie fil de presse – pour filtrer selon la catégorie du fil de presse (Affaires, Finance, National, Nouvelles Générales, Politique, etc.)</li>
                 <li>Sujet – filtrer selon le sujet des éléments</li>
-                <li>Version – filtrer selon la version des éléments</li>
-                <li>Date de publication – filtrer selon la date, ou une plage de dates, de la publication des éléments </li>
+                <li>Sujet – pour filtrer selon le sujet (Changement climatique, Défense, Économie, Environnement, Santé, etc.)</li>
+                <li>Date de publication – pour filtrer selon la date (le même jour, semaine, mois) ou une plage de dates</li>
             </ul>
         </div>
         <div>
-            <h3><b>Filtres - Calendrier</b></h3>
+            <h3><b>Filtres sous l’onglet « Calendrier » (liste déroulante sous la barre de recherche)</b></h3>
         </div>
         <div>
-            <p><b>Événements:</b> Ce qui va se produire, qui est tangible – un match, une conference de presse, une période de questions au parlement, une comparution en cour, etc.</p>
+            <p><b>Événements et couvertures:</b> pour filtrer par événements ou couvertures seulement.</p>
         </div>
         <div>
-            <p><b>Éléments de couverture:</b> Ce que La Presse Canadienne a l’intention de faire par rapport à un événement ou un dossier. Lorsque lié à un événement il signale que l’événement va être couvert. Les éléments de couverture peuvent aussi être indépendants, lorsqu’ils s’intéressent à des sujets ou des dossiers qui ne sont pas associés à un événement.</p>
+            <p><b>Statut de couverture:</b> ce que La Presse Canadienne a l’intention de faire par rapport à un événement ou un dossier. Lorsque lié à un événement il signale la présence en couverture. Il est possible de filtrer les résultats selon le statut de couverture d’un événement ou d’un dossier (couverture planifiée, couverture non planifiée, pas de décision sur la couverture, couverture terminée).</p>
         </div>
         <div>
-            <p><b>Couvertures:</b> Créées dans les Éléments de couverture. Les couvertures peuvent être des textes, des images ou des vidéos.</p>
+            <p><b>Type de couverture:</b> il s’agit du type de couverture qui peut être un texte, une photo, ou une vidéo.</p>
+            <p><b>Partie gauche de l’écran:</b></p>
             <ul>
-                <li>Langue – filtrer selon le langage des éléments</li>
-                <li>Statut de couverture – filtrer selon le statut de couverture</li>
-                <li>Catégorie – filtrer selon la catégorie d’un événement ou d’un élément de couverture</li>
-                <li>Type d’événement – filtrer selon le type d’événement</li>
-                <li>Sujet – filtrer selon le sujet de l’événement ou de l’élément de couverture</li>
-                <li>Date de l’événement – filtrer selon la date, ou la plage de dates, de l’événement ou de l’élément de couverture</li>
+                <li>Langue: pour filtrer selon anglais ou français</li>
+                <li>Catégorie: pour filtrer selon la catégorie d’un événement ou d’un élément de couverture (Affaires, National, Voyage, etc.)</li>
+                <li>Type d’événement: pour filtrer selon le type d’événement (conférence, lancement de produit, visite officielle, etc.)</li>
+                <li>Sujet: pour filtrer selon le sujet de l’événement ou de l’élément de couverture (Économie, Politique, Relations internationales, etc.)</li>
+                <li>Date de l’événement: pour filtrer selon la date (le même jour, semaine, mois) ou une plage de dates</li>
             </ul>
         </div>
     </div>

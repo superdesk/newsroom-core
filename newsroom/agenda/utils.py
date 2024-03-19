@@ -1,4 +1,4 @@
-from typing import Dict, NamedTuple, Any, Literal
+from typing import Dict, NamedTuple, Any, Literal, List, Union
 from datetime import timedelta
 
 from flask import current_app as app
@@ -166,7 +166,12 @@ def get_planning_coverages(item, plan_id):
 
 def get_coverage_status(coverage: Dict[str, Any]) -> str:
     coverage_status = coverage.get("coverage_status")
-    if coverage_status == "coverage intended":
+    workflow_status = coverage.get("workflow_status")
+    if workflow_status == ASSIGNMENT_WORKFLOW_STATE.COMPLETED:
+        return gettext("Completed")
+    elif workflow_status == WORKFLOW_STATE.CANCELLED:
+        return gettext("Cancelled")
+    elif coverage_status == "coverage intended":
         return gettext("Planned")
     elif coverage_status == "coverage not decided yet":
         return gettext("Not decided")
@@ -271,3 +276,14 @@ def push_agenda_item_notification(name, item, **kwargs):
             item=item,
             **kwargs,
         )
+
+
+def get_filtered_subject(
+    subject: List[Dict[str, Any]], schemas: List[str]
+) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
+    """
+    Filter subject based on schemas
+    """
+    if not schemas:
+        return subject
+    return [subj for subj in subject if subj.get("scheme") in schemas]

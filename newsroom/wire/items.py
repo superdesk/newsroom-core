@@ -1,4 +1,5 @@
 from typing import List, Dict
+from typing_extensions import assert_never
 from copy import deepcopy
 
 from flask import current_app as app
@@ -21,9 +22,26 @@ class ItemsResource(BaseItemsResource):
     schema["slugline"] = schema["headline"] = schema["body_html"] = schema["description_html"] = metadata_schema[
         "body_html"
     ].copy()
+    schema["urgency"] = {**metadata_schema["urgency"], "mapping": {"type": "keyword"}}
+    schema["priority"] = {**metadata_schema["priority"], "mapping": {"type": "keyword"}}
+
+    schema["expiry"] = {"type": "datetime"}
+
+    mongo_indexes = deepcopy(BaseItemsResource.mongo_indexes) or {}
+    mongo_indexes.update(
+        {
+            "evolvedfrom_1": ([("evolvedfrom", 1)], {"background": True}),
+        }
+    )
 
 
 class ItemsService(BaseItemsService):
+    def _is_internal_api(self):
+        # we need to avoid superdesk core handling which makes it return nothing
+        # todo: get rid of the base item service from content api, there is too much
+        # logic related to subscribers
+        return False
+
     def get_expired_items(self, expiry_datetime=None, expiry_days=None, max_results=None, include_children=True):
         # remove old items based on expiry days config
         for items in super().get_expired_items(expiry_datetime, expiry_days, max_results, include_children):
@@ -41,6 +59,8 @@ class ItemsVersionsResource(BaseItemsVersionsResource):
     schema["slugline"] = schema["headline"] = schema["body_html"] = schema["description_html"] = metadata_schema[
         "body_html"
     ].copy()
+    schema["urgency"] = {**metadata_schema["urgency"], "mapping": {"type": "keyword"}}
+    schema["priority"] = {**metadata_schema["priority"], "mapping": {"type": "keyword"}}
 
 
 def init_app(app):
@@ -79,7 +99,9 @@ def get_items_for_dashboard(
             items_by_card[card["label"]] = [
                 filter_fields(item) if filter_public_fields else item
                 for item in superdesk.get_resource_service("wire_search").get_product_items(
-                    ObjectId(card["config"]["product"]), card["config"]["size"], exclude_embargoed=exclude_embargoed
+                    ObjectId(card["config"]["product"]),
+                    card["config"]["size"] or get_default_size(card),
+                    exclude_embargoed=exclude_embargoed,
                 )
             ]
         elif card["type"] == "4-photo-gallery":
@@ -88,3 +110,33 @@ def get_items_for_dashboard(
             items_by_card[card["label"]] = []
 
     return items_by_card
+
+
+def get_default_size(card: DashboardCard) -> int:
+    if not card.get("type"):
+        return 0
+    if card["type"] == "1x1-top-news":
+        return 1
+    if card["type"] == "2x2-events":
+        return 4
+    if card["type"] == "2x2-top-news":
+        return 4
+    if card["type"] == "3-picture-text":
+        return 3
+    if card["type"] == "3-text-only":
+        return 3
+    if card["type"] == "4-media-gallery":
+        return 4
+    if card["type"] == "4-photo-gallery":
+        return 4
+    if card["type"] == "4-picture-text":
+        return 4
+    if card["type"] == "4-text-only":
+        return 4
+    if card["type"] == "6-navigation-row":
+        return 6
+    if card["type"] == "6-text-only":
+        return 6
+    if card["type"] == "wire-list":
+        return 5
+    assert_never(card["type"])
