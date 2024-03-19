@@ -81,26 +81,49 @@ function SearchResultsFiltersRow({
 
         Object.keys(activeFilter ?? {}).filter((filter) => activeFilter?.[filter as IActiveFilterUnionType] != null)
             .forEach((filter) => {
-                tags.push(
-                    <Tag
-                        key={`tags-filters--${filter}`}
-                        testId={`tags-filters--agenda-quick-filters-${filter}`}
-                        text={(() => {
-                            if (filter === 'coverage_status') {
-                                return getActiveFilterLabel(agendaCoverageStatusFilter, activeFilter);
-                            } else if (filter === 'location') {
-                                return  activeFilter?.[filter as IActiveFilterUnionType].name;
-                            } else {
-                                return activeFilter?.[filter as IActiveFilterUnionType];
-                            }
-                        })()}
-                        readOnly={readonly}
-                        onClick={(event) => {
-                            event.preventDefault();
-                            clearQuickFilter(filter);
-                        }}
-                    />
-                );
+                const filterValue = (() => {
+                    if (filter === 'coverage_status') {
+                        return getActiveFilterLabel(agendaCoverageStatusFilter, activeFilter);
+                    } else if (filter === 'location') {
+                        return  activeFilter?.[filter as IActiveFilterUnionType].name;
+                    } else {
+                        return activeFilter?.[filter as IActiveFilterUnionType];
+                    }
+                })();
+
+                const filtersData: Array<{key: string; label: string; onRemove(): void}> = Array.isArray(filterValue)
+                    ? filterValue.map((filterLabel) => ({
+                        key: filter + '__' + filterLabel,
+                        label: filterLabel,
+                        onRemove: () => {
+                            toggleFilter(filter, filterLabel, undefined);
+                        },
+                    }))
+                    : [
+                        {
+                            key: filter,
+                            label: filterValue,
+                            onRemove: () => {
+                                clearQuickFilter(filter);
+                            },
+                        },
+                    ];
+
+                for (const {key, label, onRemove} of filtersData) {
+                    tags.push(
+                        <Tag
+                            key={key}
+                            testId={`tags-filters--agenda-quick-filters-${label}`}
+                            text={label}
+                            readOnly={readonly}
+                            onClick={(event) => {
+                                event.preventDefault();
+                                onRemove();
+                            }}
+                        />
+                    );
+                }
+
             });
     }
 
