@@ -256,8 +256,6 @@ const TopicForm: React.FC<IProps> = ({
                     <FormSection initiallyOpen={true} name={gettext('Topic details')} dataTestId="topic-form-group--params">
                         <SearchResultTagsList
                             readonly={true}
-                            // Clearing filters isn't available in readOnly mode.
-                            clearQuickFilter={noop}
                             user={user}
                             showSaveTopic={false}
                             showMyTopic={false}

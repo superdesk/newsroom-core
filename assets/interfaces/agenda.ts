@@ -32,6 +32,7 @@ export interface IContact {
 
 export interface ILocation {
     name: string;
+    type?: string;
     qcode: string;
     location?: {lat: number; lon: number};
     details?: string[];
