@@ -248,6 +248,9 @@ NEWS_ONLY_FILTERS = [
     {"match": {"source": "PMF"}},
 ]
 
+# avoid conflict with superdesk
+SESSION_COOKIE_NAME = "newsroom_session"
+
 # the lifetime of a permanent session in seconds
 PERMANENT_SESSION_LIFETIME = 604800  # 7 days
 
