@@ -42,6 +42,7 @@ import {searchParamsSelector, searchFilterSelector} from 'search/selectors';
 
 import {clearAgendaDropdownFilters} from '../local-store';
 import {getLocations, getMapSource} from '../maps/utils';
+import {ILocation} from 'interfaces/agenda';
 
 const WATCH_URL = '/agenda_watch';
 const WATCH_COVERAGE_URL = '/agenda_coverage_watch';
@@ -619,7 +620,7 @@ export function updateItem(item: any) {
     return {type: UPDATE_ITEM, item: item};
 }
 
-export function toggleDropdownFilter(key: any, val: any) {
+export function toggleDropdownFilter(key: any, val: any, single = true) {
     return (dispatch: any) => {
         dispatch(setActive(null));
         dispatch(preview(null));
@@ -627,16 +628,16 @@ export function toggleDropdownFilter(key: any, val: any) {
         if (key === 'itemType') {
             dispatch(setItemTypeFilter(val));
         } else if (key === 'location') {
-            dispatch(setLocationFilter(val));
+            dispatch(toggleLocationFilter(val));
         } else {
-            dispatch(toggleFilter(key, val, true));
+            dispatch(toggleFilter(key, val, single));
         }
 
         dispatch(fetchItems());
     };
 }
 
-function setLocationFilter(location: any) {
+function toggleLocationFilter(location: ILocation) {
     return (dispatch: any, getState: any) => {
         const state = getState();
         const currentFilters = cloneDeep(searchFilterSelector(state));
