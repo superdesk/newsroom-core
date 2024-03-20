@@ -7,7 +7,7 @@ from newsroom.auth.saml import get_userdata
 def test_user_data_with_matching_company(app):
     company = {
         "name": "test",
-        "auth_domain": "example.com",
+        "auth_domains": ["example.com"],
     }
     app.data.insert("companies", [company])
 
@@ -27,7 +27,7 @@ def test_user_data_with_matching_company(app):
 def test_user_data_with_matching_preconfigured_client(app, client):
     company = {
         "name": "test",
-        "auth_domain": "samplecomp",
+        "auth_domains": ["samplecomp"],
     }
 
     app.data.insert("companies", [company])
@@ -54,13 +54,15 @@ def test_user_data_with_matching_preconfigured_client(app, client):
         assert user_data.get("company") == company["_id"]
 
 
-def test_auth_domain_unique_for_company(app):
-    app.data.insert("companies", [{"name": "test", "auth_domain": "example.com"}])
+def test_company_auth_domains(app):
+    app.data.insert("companies", [{"name": "test", "auth_domains": ["example.com"]}])
+    assert app.data.find_one("companies", req=None, auth_domains="example.com") is not None
     with pytest.raises(werkzeug.exceptions.Conflict):
-        app.data.insert("companies", [{"name": "test2", "auth_domain": "example.com"}])
+        app.data.insert("companies", [{"name": "test2", "auth_domains": ["example.com"]}])
     with pytest.raises(werkzeug.exceptions.Conflict):
-        app.data.insert("companies", [{"name": "TEST2", "auth_domain": "EXAMPLE.COM"}])
-    app.data.insert("companies", [{"name": "test3", "auth_domain": None}])
-    app.data.insert("companies", [{"name": "test4", "auth_domain": None}])
-    app.data.insert("companies", [{"name": "test5", "auth_domain": ""}])
-    app.data.insert("companies", [{"name": "test6", "auth_domain": ""}])
+        app.data.insert("companies", [{"name": "TEST2", "auth_domains": ["EXAMPLE.COM"]}])
+    app.data.insert("companies", [{"name": "test3", "auth_domains": []}])
+    app.data.insert("companies", [{"name": "test4", "auth_domains": ["foo.com", "bar.com"]}])
+    assert app.data.find_one("companies", req=None, auth_domains="bar.com") is not None
+    with pytest.raises(werkzeug.exceptions.Conflict):
+        app.data.insert("companies", [{"name": "test6", "auth_domains": ["unique.com", "example.com"]}])

@@ -46,6 +46,6 @@ export interface ICompany {
         seats: number;
         section: 'wire' | 'agenda';
     }>;
-    auth_domain?: string;
+    auth_domains?: Array<string>;
     auth_provider?: IAuthProvider['_id']; // if not defined, system assumes a value of 'newshub'
 }
