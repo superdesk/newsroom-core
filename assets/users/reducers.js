@@ -81,10 +81,19 @@ export default function userReducer(state = initialState, action) {
         let user = {...state.userToEdit};
         const value = target.type === 'checkbox' ? target.checked : target.value;
 
-        if (field.startsWith('sections.')) {
+        if (field === 'company') {
+            if ((value || '').length > 0) {
+                user.sections = {}; // Defaults to use `company.sections` for permissions
+                user.company = value;
+            } else {
+                user.company = null;
+            }
+        } else if (field.startsWith('sections.')) {
             const sectionId = field.replace('sections.', '');
+            const company = state.companies.find((company) => company._id === user.company);
 
             user.sections = {
+                ...company != null ? company.sections || {} : {},
                 ...user.sections || {},
                 [sectionId]: value,
             };

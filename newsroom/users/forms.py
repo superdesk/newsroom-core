@@ -16,12 +16,13 @@ class CommaSeparatedListField(Field):
             return ""
 
     def process_formdata(self, valuelist):
-        if len(valuelist) == 1 and not len(valuelist[0]):
+        if valuelist == [""]:  # An empty string from the client is equal to an empty array
             self.data = []
-        elif valuelist:
+        elif len(valuelist):
             self.data = [x.strip() for x in valuelist[0].split(",")]
         else:
-            self.data = []
+            # No data was provided by client, store `None` so we know not to process this field
+            self.data = None
 
 
 class UserForm(FlaskForm):

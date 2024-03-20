@@ -231,10 +231,10 @@ def get_updates_from_form(form: UserForm):
     updates = form.data
     if form.company.data:
         updates["company"] = ObjectId(form.company.data)
-    if "sections" in updates:
+    if updates.get("sections") is not None:
         updates["sections"] = {section["_id"]: section["_id"] in (form.sections.data or []) for section in app.sections}
 
-    if "products" in updates:
+    if updates.get("products") is not None:
         product_ids = [ObjectId(productId) for productId in updates["products"]]
         products = {
             product["_id"]: product for product in query_resource("products", lookup={"_id": {"$in": product_ids}})
