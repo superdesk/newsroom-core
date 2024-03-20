@@ -596,10 +596,9 @@ export function setAndUpdateNewItems(data: any) {
         // If coverage is updated in the item fetch all items and reintilized group listing.
         if (prevItem && prevItem.coverages.length !== item.coverages.length) {
             dispatch(fetchItems());
+        } else {
+            dispatch(updateItem(item));
         }
-
-        dispatch(updateItem(item));
-
         // Do not use 'killed' items for new-item notifications
         if (item.state === 'killed') {
             return Promise.resolve();
