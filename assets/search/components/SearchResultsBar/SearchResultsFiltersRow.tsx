@@ -19,7 +19,7 @@ type IProps = Pick<IParentProps,
     'toggleFilter' |
     'setCreatedFilter' |
     'resetFilter'
-> & {removeDropdownFilter: (key: any, value: any) => void;};
+>;
 
 type IActiveFilter = {
     calendar?: any;
@@ -38,6 +38,7 @@ interface IReduxStateProps {
 
 interface IReduxDispatchProps {
     clearItemTypeFilter: () => void;
+    removeDropdownFilter: (key: any, value: any) => void;
 }
 
 type IPropsAgendaExtended = IReduxDispatchProps & IReduxStateProps & IProps;
