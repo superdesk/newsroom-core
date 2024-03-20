@@ -568,7 +568,6 @@ export function setAndUpdateNewItems(data: any) {
         const item = data.item || {};
         const state = getState();
 
-        console.log(item)
         if (item.type !== 'agenda') {
 
             // Check if the item is used in the preview or opened agenda item
