@@ -215,7 +215,9 @@ export function isWatched(item: IAgendaItem | ICoverage, userId?: IUser['_id']):
  * @return {Boolean}
  */
 export function isCoverageForExtraDay(coverage: ICoverage, dateString: string) {
-    return coverage.scheduled != null && formatDate(moment(coverage.scheduled)) === dateString;
+    return coverage.scheduled != null && (
+        formatDate(moment(coverage.scheduled)) === dateString ||
+        formatDate(moment.utc(coverage.scheduled)) === dateString);
 }
 
 /**
