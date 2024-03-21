@@ -635,6 +635,7 @@ def test_check_etag_when_updating_user(client):
 
     user_data = response.get_json()[0]
     patch_data = user_data.copy()
+    patch_data["sections"] = "wire,agenda"
     patch_data["first_name"] = "Foo"
 
     response = client.post(f"/users/{user_data['_id']}", data=patch_data, headers={"If-Match": "something random"})

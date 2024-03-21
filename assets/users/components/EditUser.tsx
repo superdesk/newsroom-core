@@ -98,6 +98,11 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
     const showResendInvite = (user._id == null || user.is_validated !== true) && (
         (company?.auth_provider ?? 'newshub') === 'newshub'
     );
+    // If `user.sections` has value(s) then we use that dictionary, otherwise we will use `company.sections`
+    // This is the same logic as applied on the server side
+    const userSections = Object.keys(user.sections || {}).length > 0 ?
+        user.sections :
+        company?.sections || {};
 
     const resendInviteButton = {
         name: gettext('Resend Invite'),
@@ -267,13 +272,13 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                 title={gettext('Sections')}
                                 testId="toggle--sections"
                             >
-                                {sections.filter((section: any) => companySectionIds.includes(section._id)).map((section: any) => (
+                                {sections.filter((section) => companySectionIds.includes(section._id)).map((section) => (
                                     <div className="list-item__preview-row" key={section._id}>
                                         <div className="form-group">
                                             <CheckboxInput
                                                 name={`sections.${section._id}`}
                                                 label={section.name}
-                                                value={get(user, `sections.${section._id}`) === true}
+                                                value={userSections[section._id] === true}
                                                 onChange={props.onChange_DEPRECATED}
                                             />
                                         </div>
@@ -283,10 +288,8 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                         )}
 
                         {(userIsAdmin || hideFields.includes('products')) ? null : (() => {
-                            const filteredSections = sections.filter((section: any) => (
-                                companySectionIds.includes(section._id) && user.sections ?
-                                    get(user, `sections.${section._id}`
-                                    ) === true : company?.sections
+                            const filteredSections = sections.filter((section) => (
+                                companySectionIds.includes(section._id) && userSections[section._id] === true
                             ));
 
                             const filterProductsForSection = (product: IProduct, section: ISection) =>
@@ -336,7 +339,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                                         </div>
                                                     )}
 
-                                                    {filteredSections.map((section: any) => (
+                                                    {filteredSections.map((section) => (
                                                         <React.Fragment key={section._id}>
                                                             <div className="list-item__preview-subheading">
                                                                 {section.name}
