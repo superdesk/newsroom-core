@@ -657,7 +657,7 @@ def test_create_user_inherit_sections(app):
     user_ids = app.data.insert("users", [{"email": "newuser@example.com", "company": company_ids[0]}])
     assert user_ids
     user = app.data.find_one("users", req=None, _id=user_ids[0])
-    assert user["sections"] == {"agenda": True, "wire": False}
+    assert user.get("sections") is None  # When sections has a `Falsy` value, the parent Company sections will be used
 
 
 def test_filter_and_sorting_user(app, client):
