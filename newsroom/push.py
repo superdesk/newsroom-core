@@ -767,6 +767,10 @@ def notify_new_agenda_item(_id, check_topics=True):
     with locked(_id, "agenda"):
         agenda = app.data.find_one("agenda", req=None, _id=_id)
         if agenda:
+            if agenda.get("recurrence_id") and agenda.get("recurrence_id") != _id:
+                logger.info("Ignoring recurring event %s", _id)
+                return
+
             superdesk.get_resource_service("agenda").enhance_items([agenda])
             notify_new_item(agenda, check_topics=check_topics)
 
