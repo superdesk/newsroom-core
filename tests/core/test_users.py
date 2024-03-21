@@ -44,8 +44,7 @@ def test_return_search_for_users(client, app):
     response = client.get("/users/search?q=jo")
     assert "John" in response.get_data(as_text=True)
     user_data = response.get_json()[0]
-    assert user_data["sections"]["agenda"]
-    assert user_data["sections"]["wire"]
+    assert user_data.get("sections") is None
 
 
 def test_reset_password_token_sent_for_user_succeeds(app, client):
