@@ -119,10 +119,12 @@ export function postUser() {
         const user = cloneDeep(getState().userToEdit);
         const url = `/users/${user._id ? user._id : 'new'}`;
 
-        if (user.sections != null) {
+        if (Object.keys(user.sections || {}).length > 0) {
             user.sections = Object.keys(user.sections)
                 .filter((sectionId) => user.sections[sectionId] === true)
                 .join(',');
+        } else {
+            delete user.sections;
         }
         if (user.products != null) {
             user.products = user.products

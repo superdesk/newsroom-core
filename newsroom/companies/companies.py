@@ -108,7 +108,9 @@ class CompaniesService(newsroom.Service):
             user_service = get_resource_service("users")
             for user in user_service.get(req=None, lookup={"company": original[config.ID_FIELD]}):
                 user_updates = {
-                    "sections": {
+                    "sections": {}
+                    if not user.get("sections")
+                    else {
                         section: (user.get("sections") or {}).get(section, False) for section in updated_section_names
                     },
                     "products": [

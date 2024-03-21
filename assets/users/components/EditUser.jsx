@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {get} from 'lodash';
 
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
@@ -50,8 +49,13 @@ function EditUserComponent({
     const companySectionIds = sections.map((section) => section._id);
     const isAdmin = isUserAdmin(currentUser);
     const isCompanyAdmin = isUserCompanyAdmin(currentUser);
-
     let company = companies.map((value)=> value.name);
+
+    // If `user.sections` has value(s) then we use that dictionary, otherwise we will use `company.sections`
+    // This is the same logic as applied on the server side
+    const userSections = Object.keys(user.sections || {}).length > 0 ?
+        user.sections :
+        (companies.find((company) => company._id === companyId) || {}).sections || {};
 
     return (
         <div
@@ -199,7 +203,7 @@ function EditUserComponent({
                                             <CheckboxInput
                                                 name={`sections.${section._id}`}
                                                 label={section.name}
-                                                value={get(user, `sections.${section._id}`) === true}
+                                                value={userSections[section._id] === true}
                                                 onChange={onChange}
                                             />
                                         </div>
@@ -215,7 +219,7 @@ function EditUserComponent({
                             >
                                 {sections.filter((section) => (
                                     companySectionIds.includes(section._id) &&
-                                    get(user, `sections.${section._id}`) === true
+                                    userSections[section._id] === true
                                 )).map((section) => (
                                     <React.Fragment key={section._id}>
                                         <div className="list-item__preview-subheading">
