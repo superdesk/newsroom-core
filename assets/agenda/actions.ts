@@ -594,7 +594,7 @@ export function setAndUpdateNewItems(data: any) {
         const prevItem = itemsById[item['_id']];
 
         // If coverage is updated in the item fetch all items and reintilized group listing.
-        if (prevItem && prevItem.coverages.length !== item.coverages.length) {
+        if (prevItem && prevItem.coverages?.length !== item?.coverages?.length) {
             dispatch(fetchItems());
         } else {
             dispatch(updateItem(item));
