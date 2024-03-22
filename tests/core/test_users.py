@@ -44,8 +44,7 @@ def test_return_search_for_users(client, app):
     response = client.get("/users/search?q=jo")
     assert "John" in response.get_data(as_text=True)
     user_data = response.get_json()[0]
-    assert user_data["sections"]["agenda"]
-    assert user_data["sections"]["wire"]
+    assert user_data.get("sections") is None
 
 
 def test_reset_password_token_sent_for_user_succeeds(app, client):
@@ -635,6 +634,7 @@ def test_check_etag_when_updating_user(client):
 
     user_data = response.get_json()[0]
     patch_data = user_data.copy()
+    patch_data["sections"] = "wire,agenda"
     patch_data["first_name"] = "Foo"
 
     response = client.post(f"/users/{user_data['_id']}", data=patch_data, headers={"If-Match": "something random"})
@@ -656,7 +656,7 @@ def test_create_user_inherit_sections(app):
     user_ids = app.data.insert("users", [{"email": "newuser@example.com", "company": company_ids[0]}])
     assert user_ids
     user = app.data.find_one("users", req=None, _id=user_ids[0])
-    assert user["sections"] == {"agenda": True, "wire": False}
+    assert user.get("sections") is None  # When sections has a `Falsy` value, the parent Company sections will be used
 
 
 def test_filter_and_sorting_user(app, client):
