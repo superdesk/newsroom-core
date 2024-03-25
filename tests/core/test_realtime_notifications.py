@@ -238,5 +238,8 @@ def test_realtime_notifications_agenda_reccuring_event(app):
         notify_new_agenda_item("event_id_1")
         assert notify_new_item.call_count == 1
 
-        notify_new_agenda_item("event_id_2")
+        notify_new_agenda_item("event_id_2", is_new=True)
         assert notify_new_item.call_count == 1
+
+        notify_new_agenda_item("event_id_2")
+        assert notify_new_item.call_count == 2
