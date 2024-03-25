@@ -12,18 +12,18 @@
 # Gideon Lehmann <gideon.lehmann@sourcefabric.org>, 2024
 # Sabina <sabina.gergel@thecanadianpress.com>, 2024
 # Evzen Deulin <evgeny.deulin@sourcefabric.org>, 2024
-# Nefertiti Patell, 2024
 # Paemiga Sararithi, 2024
 # Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2024
+# Nefertiti Patell, 2024
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Newsroom-Core 2.5.0.dev0\n"
+"Project-Id-Version: Newsroom-Core 2.6.0rc2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-01-25 14:14+0100\n"
+"POT-Creation-Date: 2024-03-19 13:59+0100\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
-"Last-Translator: Charles-Philippe Giroux <charles-philippe.giroux@lapressecanadienne.com>, 2024\n"
+"Last-Translator: Nefertiti Patell, 2024\n"
 "Language-Team: French (Canada) (https://app.transifex.com/sourcefabric/teams/6584/fr_CA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -32,11 +32,11 @@ msgstr ""
 "Language: fr_CA\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
-#: newsroom/email.py:452
+#: newsroom/email.py:462
 msgid "Kill/Takedown notice"
 msgstr "Avis de supression"
 
-#: newsroom/email.py:461
+#: newsroom/email.py:471
 #, python-format
 msgid "%(section)s cancelled notice"
 msgstr "%(section)s avis d'annulation"
@@ -54,7 +54,7 @@ msgstr "Le gabarit de courriel '%(name)s' n'a pas été trouvé"
 msgid "Activity History: Inavlid request"
 msgstr "Historique d'activité: demande invalide"
 
-#: newsroom/push.py:109
+#: newsroom/push.py:114
 msgid "Unknown type {}"
 msgstr "Type inconnu {}"
 
@@ -165,33 +165,33 @@ msgstr ""
 "Date : du {start_date} au {end_date} de {start_time} à {end_time} ({tz})"
 
 #: assets/missing-translations.ts:3 newsroom/agenda/utils.py:41
-#: newsroom/utils.py:205
+#: newsroom/utils.py:206
 msgid "ALL DAY"
 msgstr "TOUTE LA JOURNÉE"
 
-#: newsroom/auth/oauth.py:87 newsroom/auth/utils.py:73 newsroom/utils.py:297
-#: newsroom/utils.py:408
+#: newsroom/auth/oauth.py:87 newsroom/auth/utils.py:73 newsroom/utils.py:298
+#: newsroom/utils.py:409
 msgid "Account is disabled"
 msgstr "Compte désactivé"
 
-#: newsroom/utils.py:305
+#: newsroom/utils.py:306
 msgid "Account has not been approved"
 msgstr "Le compte n'a pas été approuvé"
 
 #: newsroom/auth/views.py:83 newsroom/auth/views.py:92
-#: newsroom/auth/views.py:184 newsroom/utils.py:398
+#: newsroom/auth/views.py:184 newsroom/utils.py:399
 msgid "Invalid username or password."
 msgstr "Nom d'utilisateur ou mot de passe invalide."
 
-#: newsroom/utils.py:404
+#: newsroom/utils.py:405
 msgid "Insufficient Permissions. Access denied."
 msgstr "Autorisations insuffisantes. Accès refusé."
 
-#: newsroom/auth/views.py:176 newsroom/utils.py:412
+#: newsroom/auth/views.py:176 newsroom/utils.py:413
 msgid "Company account has been disabled."
 msgstr "Le compte de l'entreprise a été désactivé."
 
-#: newsroom/auth/views.py:179 newsroom/utils.py:416
+#: newsroom/auth/views.py:179 newsroom/utils.py:417
 msgid "Company account has expired."
 msgstr "Le compte de l'entreprise a expiré."
 
@@ -279,21 +279,26 @@ msgstr "Une couverture a été ajoutée à un événement que vous avez surveill
 msgid "Coverage added"
 msgstr "Couverture ajoutée"
 
-#: newsroom/agenda/utils.py:170
+#: newsroom/agenda/utils.py:171 newsroom/web/default_settings.py:392
+#: newsroom/web/default_settings.py:393
+msgid "Completed"
+msgstr "Terminée"
+
+#: newsroom/agenda/utils.py:173 newsroom/agenda/utils.py:181
+msgid "Cancelled"
+msgstr "Annulée"
+
+#: newsroom/agenda/utils.py:175
 msgid "Planned"
 msgstr "Planifiée"
 
-#: newsroom/agenda/utils.py:172
+#: newsroom/agenda/utils.py:177
 msgid "Not decided"
 msgstr "Non décidée"
 
-#: newsroom/agenda/utils.py:174
+#: newsroom/agenda/utils.py:179
 msgid "On request"
 msgstr "Sur demande"
-
-#: newsroom/agenda/utils.py:176
-msgid "Cancelled"
-msgstr "Annulée"
 
 #: newsroom/agenda/views.py:225
 msgid "Cannot edit coverage watch when watching parent item"
@@ -465,7 +470,7 @@ msgid "Invalid login type, %(type)s not enabled for your user"
 msgstr ""
 "Type de connexion invalide, %(type)sn'est pas activé pour votre utilisateur"
 
-#: newsroom/auth/utils.py:233
+#: newsroom/auth/utils.py:240
 msgid ""
 "There is no product associated with your user. Please reach out to your "
 "Company Admin."
@@ -630,7 +635,7 @@ msgstr "Extrait(s) lié(s)"
 #: assets/products/components/ProductList.tsx:22
 #: assets/search/components/AdvancedSearchPanel.tsx:118
 #: assets/search/components/SearchResultsBar/SearchResultsAdvancedSearchRow.tsx:146
-#: assets/search/components/TopicForm.tsx:106
+#: assets/search/components/TopicForm.tsx:99
 #: assets/section-filters/components/EditSectionFilter.tsx:37
 #: assets/section-filters/components/SectionFilterList.tsx:22
 #: assets/users/components/UsersList.tsx:26 newsroom/monitoring/forms.py:19
@@ -720,7 +725,7 @@ msgstr ""
 msgid "Query"
 msgstr "Requête"
 
-#: newsroom/monitoring/search.py:67 newsroom/search/service.py:639
+#: newsroom/monitoring/search.py:67 newsroom/search/service.py:640
 msgid "Invalid product parameter"
 msgstr "Paramètre de produit invalide"
 
@@ -902,24 +907,24 @@ msgstr "Entreprises expirées"
 msgid "Unknown report {}"
 msgstr "Rapport inconnu {}"
 
-#: newsroom/search/service.py:306
+#: newsroom/search/service.py:310
 msgid "Page limit exceeded"
 msgstr "Limite du nombre de pages excédée"
 
-#: newsroom/search/service.py:556
+#: newsroom/search/service.py:560
 msgid "Incorrect type supplied for advanced search params"
 msgstr ""
 "L'adresse URL n'est pas valide pour les paramètres de la recherche avancée"
 
-#: newsroom/search/service.py:630
+#: newsroom/search/service.py:631
 msgid "User does not belong to a company."
 msgstr "L'utilisateur n'appartient pas à une entreprise."
 
-#: newsroom/search/service.py:632
+#: newsroom/search/service.py:633
 msgid "Your company doesn't have any products defined."
 msgstr "Votre entreprise n'a pas de produits définis."
 
-#: newsroom/search/service.py:634
+#: newsroom/search/service.py:635
 msgid "Your product is not assigned to you or your company."
 msgstr "Les membres de votre entreprise n'ont pas accès à ce produit."
 
@@ -994,46 +999,46 @@ msgstr "Couvertures:"
 msgid "AM"
 msgstr "Vidéo explicative"
 
-#: newsroom/templates/base_layout.html:32
+#: newsroom/templates/base_layout.html:33
 msgid "Main Navigation Bar"
 msgstr "Barre de navigation principale"
 
 #: assets/public/components/PublicApp.tsx:78
-#: newsroom/templates/base_layout.html:57
+#: newsroom/templates/base_layout.html:58
 #: newsroom/templates/login_client.html:4
 #: newsroom/templates/login_form.html:24
 #: newsroom/templates/login_layout.html:19
 msgid "Login"
 msgstr "Ouvrir une session"
 
-#: newsroom/templates/base_layout.html:61 newsroom/templates/footer.html:4
+#: newsroom/templates/base_layout.html:62 newsroom/templates/footer.html:4
 msgid "Contact Us"
 msgstr "Contactez-nous"
 
-#: newsroom/templates/base_layout.html:72
+#: newsroom/templates/base_layout.html:73
 msgid "Side Navigation"
 msgstr "Navigation latérale"
 
 #: assets/company-admin/components/CompanyUserListItem.tsx:48
-#: assets/users/utils.ts:11 newsroom/templates/base_layout.html:98
-#: newsroom/templates/base_layout.html:99
-#: newsroom/templates/base_layout.html:106
+#: assets/users/utils.ts:11 newsroom/templates/base_layout.html:99
+#: newsroom/templates/base_layout.html:100
+#: newsroom/templates/base_layout.html:107
 #: newsroom/templates/company_admin_index.html:3
 #: newsroom/templates/company_admin_index.html:6 newsroom/users/forms.py:39
 msgid "Company Admin"
 msgstr "Administrateur client"
 
-#: newsroom/templates/base_layout.html:115
 #: newsroom/templates/base_layout.html:116
-#: newsroom/templates/base_layout.html:123
+#: newsroom/templates/base_layout.html:117
+#: newsroom/templates/base_layout.html:124
 #: newsroom/templates/company_reports.html:3
 #: newsroom/templates/company_reports.html:6
 msgid "Reports"
 msgstr "Rapports"
 
-#: newsroom/templates/base_layout.html:131
 #: newsroom/templates/base_layout.html:132
-#: newsroom/templates/base_layout.html:139 newsroom/templates/settings.html:3
+#: newsroom/templates/base_layout.html:133
+#: newsroom/templates/base_layout.html:140 newsroom/templates/settings.html:3
 #: newsroom/templates/settings.html:6
 msgid "Settings"
 msgstr "Paramètres"
@@ -1470,10 +1475,6 @@ msgstr "Non décidée / au mérite"
 msgid "Not Intended / Cancelled"
 msgstr "Non prévue / annulée"
 
-#: newsroom/web/default_settings.py:392 newsroom/web/default_settings.py:393
-msgid "Completed"
-msgstr "Terminée"
-
 #: newsroom/web/default_settings.py:627
 msgid "Home"
 msgstr "Accueil"
@@ -1667,11 +1668,11 @@ msgstr "Les éléments ont été retirés des favoris avec succès."
 msgid "Item was removed from bookmarks successfully."
 msgstr "L'élément a été retiré des favoris."
 
-#: assets/agenda/actions.ts:756
+#: assets/agenda/actions.ts:763
 msgid "Started watching coverage successfully."
 msgstr "Cette couverture est maintenant surveillée."
 
-#: assets/agenda/actions.ts:769
+#: assets/agenda/actions.ts:776
 msgid "Stopped watching coverage successfully."
 msgstr "Cette couverture n'est plus surveillée."
 
@@ -1727,21 +1728,21 @@ msgstr "Couverture annulée"
 msgid "Update expected @ ${dateString}"
 msgstr "Mise à jour attendue @ ${dateString}"
 
-#: assets/agenda/utils.ts:1035
+#: assets/agenda/utils.ts:1042
 msgid "assignee: {{name}}"
 msgstr "personne affectée : {{name}}"
 
-#: assets/agenda/utils.ts:1036
+#: assets/agenda/utils.ts:1043
 msgid "desk: {{name}}"
 msgstr "Pupitre : {{name}}"
 
-#: assets/agenda/utils.ts:1045
+#: assets/agenda/utils.ts:1052
 msgid ""
 "{{ type }} coverage {{ slugline }} {{ status_text }} {{assignedDetails}}"
 msgstr ""
 "{{ type }} couverture {{ slugline }} {{ status_text }} {{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1053
+#: assets/agenda/utils.ts:1060
 msgid ""
 "Planned {{ type }} coverage {{ slugline }}, expected {{date}} at {{time}} "
 "{{assignedDetails}}"
@@ -1749,7 +1750,7 @@ msgstr ""
 "Couverture {{ slugline }} planifiée {{ type }}, attendu le {{date}} à "
 "{{time}} {{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1061
+#: assets/agenda/utils.ts:1068
 msgid ""
 "{{ type }} coverage {{ slugline }} in progress, expected {{date}} at "
 "{{time}} {{assignedDetails}}"
@@ -1757,19 +1758,19 @@ msgstr ""
 "Couverture {{ type }} {{ slugline }} en cours, attendu le {{date}} à "
 "{{time}} {{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1065
+#: assets/agenda/utils.ts:1072
 msgid "{{ type }} coverage {{slugline}} cancelled {{assignedDetails}}"
 msgstr "Couverture {{ type }} {{slugline}} annulée {{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1073
+#: assets/agenda/utils.ts:1080
 msgid "(update to come)"
 msgstr "(mise à jour à venir)"
 
-#: assets/agenda/utils.ts:1073
+#: assets/agenda/utils.ts:1080
 msgid "(updated)"
 msgstr "(mise à jour)"
 
-#: assets/agenda/utils.ts:1076
+#: assets/agenda/utils.ts:1083
 msgid ""
 "{{ type }} coverage {{ slugline }} available {{deliveryState}} "
 "{{assignedDetails}}"
@@ -1777,35 +1778,35 @@ msgstr ""
 "Couverture {{ type }} {{ slugline }} disponible {{deliveryState}} "
 "{{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1084
+#: assets/agenda/utils.ts:1091
 msgid "{{ type }} coverage {{assignedDetails}}"
 msgstr "Couverture {{ type }} {{assignedDetails}}"
 
-#: assets/agenda/utils.ts:1169
+#: assets/agenda/utils.ts:1157
 msgid "{{startDate}} to {{endDate}} (Time to be confirmed)"
 msgstr "{{startDate}} à {{endDate}} (Heure à déterminer)"
 
-#: assets/agenda/utils.ts:1175
+#: assets/agenda/utils.ts:1163
 msgid "{{startDate}} (Time to be confirmed)"
 msgstr "{{startDate}} (Heure à déterminer)"
 
-#: assets/agenda/utils.ts:1180
+#: assets/agenda/utils.ts:1168
 msgid "{{startDate}} to {{endDate}}"
 msgstr "{{startDate}} à {{endDate}}"
 
-#: assets/agenda/utils.ts:1189
+#: assets/agenda/utils.ts:1177
 msgid "{{startTime}} {{startDate}} - {{endDate}} {{timezone}}"
 msgstr "{{startTime}} {{startDate}} - {{endDate}} {{timezone}}"
 
-#: assets/agenda/utils.ts:1197
+#: assets/agenda/utils.ts:1185
 msgid "{{startTime}} {{startDate}} {{timezone}}"
 msgstr "{{startTime}} {{startDate}} {{timezone}}"
 
-#: assets/agenda/utils.ts:1204
+#: assets/agenda/utils.ts:1192
 msgid "{{startTime}} - {{endTime}} {{startDate}} {{timezone}}"
 msgstr "{{startTime}} - {{endTime}} {{startDate}} {{timezone}}"
 
-#: assets/agenda/utils.ts:1212 assets/agenda/utils.ts:1222
+#: assets/agenda/utils.ts:1200 assets/agenda/utils.ts:1210
 msgid "{{startTime}} {{startDate}} to {{endTime}} {{endDate}} {{timezone}}"
 msgstr "{{startTime}} {{startDate}} à {{endTime}} {{endDate}} {{timezone}}"
 
@@ -2088,7 +2089,7 @@ msgstr "Masquer"
 msgid "Show all"
 msgstr "Tout afficher"
 
-#: assets/agenda/components/AgendaListItemIcons.tsx:144
+#: assets/agenda/components/AgendaListItemIcons.tsx:140
 msgid "{{ attachments }} file(s) attached"
 msgstr "{{ attachments }} fichier(s) joint(s)"
 
@@ -2141,35 +2142,38 @@ msgstr "Détails de l'inscription"
 msgid "Invitation Details"
 msgstr "Détails de l'invitation"
 
-#: assets/agenda/components/CoverageItemStatus.tsx:104
-#: assets/agenda/components/CoverageItemStatus.tsx:124
+#: assets/agenda/components/CoverageItemStatus.tsx:105
+#: assets/agenda/components/CoverageItemStatus.tsx:125
 msgid "Open in new tab"
 msgstr "Ouvrir dans un nouvel onglet"
 
-#: assets/agenda/components/CoverageItemStatus.tsx:109
-#: assets/agenda/components/CoverageItemStatus.tsx:129
-#: assets/agenda/components/CoverageItemStatus.tsx:137
+#: assets/agenda/components/CoverageItemStatus.tsx:110
+#: assets/agenda/components/CoverageItemStatus.tsx:130
+#: assets/agenda/components/CoverageItemStatus.tsx:141
 msgid "View Content"
 msgstr "Voir le contenu"
 
-#: assets/agenda/components/CoverageItemStatus.tsx:135
-msgid "“You don’t have access to this content, please contact test@localhost”"
-msgstr ""
-"« Vous n'avez pas accès à ce contenu, veuillez contacter test@localhost »"
+#: assets/agenda/components/CoverageItemStatus.tsx:138
+msgid "You don’t have access to this content, please contact {{email}}"
+msgstr "Vous n'avez pas accès à ce contenu, veuillez contacter {{email}}"
 
-#: assets/agenda/components/CoverageItemStatus.tsx:160
+#: assets/agenda/components/CoverageItemStatus.tsx:139
+msgid "You don’t have access to this content"
+msgstr "Vous n'avez pas accès à ce contenu"
+
+#: assets/agenda/components/CoverageItemStatus.tsx:164
 msgid "All coverages cancelled: {{ reason }}"
 msgstr "Toutes les couvertures ont été annulées: {{ reason }}"
 
-#: assets/agenda/components/CoverageItemStatus.tsx:163
+#: assets/agenda/components/CoverageItemStatus.tsx:167
 msgid "Planning cancelled: {{ reason }}"
 msgstr "Couverture annulée: {{ reason }}"
 
-#: assets/agenda/components/CoverageItemStatus.tsx:188
+#: assets/agenda/components/CoverageItemStatus.tsx:191
 msgid "Update coming"
 msgstr "Mise à jour à venir"
 
-#: assets/agenda/components/CoverageItemStatus.tsx:194
+#: assets/agenda/components/CoverageItemStatus.tsx:197
 msgid "status"
 msgstr "statut"
 
@@ -3089,7 +3093,7 @@ msgid "All"
 msgstr "Tout"
 
 #: assets/components/cards/render/EventsTwoByTwoCard.tsx:33
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:152
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:175
 #: assets/wire/components/filters/NavCreatedPicker.tsx:46
 msgid "To"
 msgstr "À"
@@ -3653,7 +3657,7 @@ msgid "Body"
 msgstr "Corps"
 
 #: assets/search/components/FollowedTopics.tsx:61
-#: assets/search/components/TopicForm.tsx:149
+#: assets/search/components/TopicForm.tsx:142
 msgid "Remove from folder"
 msgstr "Retirer du dossier"
 
@@ -3662,7 +3666,7 @@ msgid "Would you like to delete topic {{name}}?"
 msgstr "Voulez-vous supprimer le sujet {{name}}?"
 
 #: assets/search/components/FollowedTopics.tsx:219
-#: assets/search/components/TopicForm.tsx:174
+#: assets/search/components/TopicForm.tsx:167
 msgid "Create new folder"
 msgstr "Créer un nouveau dossier"
 
@@ -3694,17 +3698,10 @@ msgstr "Se désabonner"
 msgid "Subscribe"
 msgstr "S'abonner"
 
-#: assets/search/components/NewItemsIcon.tsx:46
-msgid "New events to load"
-msgstr "Nouveaux événements à charger"
-
-#: assets/search/components/NewItemsIcon.tsx:47
-msgid "New stories available to load"
-msgstr "Nouveaux articles disponibles pour chargement"
-
-#: assets/search/components/NewItemsIcon.tsx:56
-msgid "Refresh"
-msgstr "Rafraîchir"
+#: assets/search/components/NewItemsIcon.tsx:57
+#: assets/search/components/NewItemsIcon.tsx:58
+msgid "refresh"
+msgstr "rafraîchir"
 
 #: assets/search/components/SearchResults.tsx:15
 msgid "search results found"
@@ -3747,12 +3744,12 @@ msgid "Updated on {{ date }} at {{ time }}"
 msgstr "Mis à jour le {{ date }} à {{ time }}"
 
 #: assets/search/components/Topic.tsx:96
-#: assets/search/components/TopicForm.tsx:219
+#: assets/search/components/TopicForm.tsx:214
 msgid "Real-Time"
 msgstr "En temps réel"
 
 #: assets/search/components/Topic.tsx:96
-#: assets/search/components/TopicForm.tsx:229
+#: assets/search/components/TopicForm.tsx:224
 msgid "Scheduled"
 msgstr "Planifiées"
 
@@ -3809,27 +3806,27 @@ msgstr "Nom du dossier"
 msgid "Add to folder"
 msgstr "Ajouter au dossier"
 
-#: assets/search/components/TopicForm.tsx:117
+#: assets/search/components/TopicForm.tsx:110
 msgid "Share with my Company"
 msgstr "Partager avec mes collègues"
 
-#: assets/search/components/TopicForm.tsx:124
+#: assets/search/components/TopicForm.tsx:117
 msgid "Created Externally"
 msgstr "Créé à l'externe"
 
-#: assets/search/components/TopicForm.tsx:129
+#: assets/search/components/TopicForm.tsx:122
 msgid "Organize your Topic"
 msgstr "Organiser vos sujets"
 
-#: assets/search/components/TopicForm.tsx:198
+#: assets/search/components/TopicForm.tsx:193
 msgid "Email Notifications:"
 msgstr "Notifications par courriel :"
 
-#: assets/search/components/TopicForm.tsx:209
+#: assets/search/components/TopicForm.tsx:204
 msgid "None"
 msgstr "Aucune"
 
-#: assets/search/components/TopicForm.tsx:236
+#: assets/search/components/TopicForm.tsx:231
 msgid ""
 "Your saved topic results will be emailed in a digest format at the time(s) "
 "per day set below."
@@ -3837,12 +3834,12 @@ msgstr ""
 "Les résultats de vos sujets enregistrés vous seront transmis par courriel, "
 "dans un format résumé, au(x) moment(s) choisi(s) ci-dessous. "
 
-#: assets/search/components/TopicForm.tsx:247
+#: assets/search/components/TopicForm.tsx:242
 #: assets/user-profile/components/profile/UserProfile.tsx:179
 msgid "Edit schedule"
 msgstr "Modifier l'horaire"
 
-#: assets/search/components/TopicForm.tsx:256
+#: assets/search/components/TopicForm.tsx:251
 msgid "Topic details"
 msgstr "Détails du sujet"
 
@@ -3884,17 +3881,17 @@ msgstr "Rechercher"
 msgid "inside"
 msgstr "dans"
 
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:115
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:134
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:138
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:157
 #: assets/wire/components/filters/NavCreatedPicker.tsx:38
 msgid "From"
 msgstr "De"
 
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:219
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:242
 msgid "Clear filters"
 msgstr "Effacer les filtres"
 
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:227
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:250
 msgid "Filters applied"
 msgstr "Filtres appliqués"
 
@@ -4016,7 +4013,7 @@ msgid "Article Preview"
 msgstr "Aperçu de l'article"
 
 #: assets/ui/components/Preview.tsx:13
-#: assets/wire/components/ItemDetails.tsx:127
+#: assets/wire/components/ItemDetails.tsx:105
 msgid "Published on {{ date }} at {{ time }}"
 msgstr "Publié le {{ date }} à {{ time }}"
 
@@ -4036,14 +4033,14 @@ msgstr "Sujet supprimé avec succès"
 msgid "Topic was shared successfully."
 msgstr "Sujet partagé avec succès."
 
-#: assets/user-profile/actions.ts:286
+#: assets/user-profile/actions.ts:285
 msgid ""
 "Are you sure you want to delete the folder {{name}} and all of its contents?"
 msgstr ""
 "Êtes-vous certain de vouloir supprimer le dossier {{name}} et l'ensemble de "
 "son contenu?"
 
-#: assets/user-profile/actions.ts:342
+#: assets/user-profile/actions.ts:351
 msgid "Global schedule updated"
 msgstr "Horaire global mis à jour"
 
@@ -4236,19 +4233,19 @@ msgstr "Les éléments ont été retirés avec succès"
 msgid "Item was removed successfully"
 msgstr "L'élément a été retiré avec succès"
 
-#: assets/wire/utils.ts:359
+#: assets/wire/utils.ts:391
 msgid "segments"
 msgstr "segments"
 
-#: assets/wire/utils.ts:359
+#: assets/wire/utils.ts:391
 msgid "segment"
 msgstr "segment"
 
-#: assets/wire/utils.ts:362
+#: assets/wire/utils.ts:394
 msgid "versions"
 msgstr "versions"
 
-#: assets/wire/utils.ts:362
+#: assets/wire/utils.ts:394
 msgid "version"
 msgstr "version"
 
