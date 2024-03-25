@@ -89,7 +89,7 @@
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "enzyme": "^3.0.0",
     "eslint": "^8.46.0",
-    "eslint-plugin-react": "^7.33.1",
+    "eslint-plugin-react": "^7.34.1",
     "fetch-mock": "^9.11.0",
     "karma": "^6.4.2",
     "karma-chrome-launcher": "^2.2.0",
