@@ -184,7 +184,7 @@ def get_user_id_to_topic_for_subscribers(
     user_topic_map: Dict[ObjectId, Dict[ObjectId, Topic]] = {}
     for topic in get_topics_with_subscribers():
         for subscriber in topic.get("subscribers") or []:
-            if notification_type is not None and subscriber["notification_type"] != notification_type:
+            if notification_type is not None and subscriber.get("notification_type") != notification_type:
                 continue
             user_topic_map.setdefault(subscriber["user_id"], {})
             user_topic_map[subscriber["user_id"]][topic["_id"]] = topic

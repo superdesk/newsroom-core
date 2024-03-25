@@ -16,9 +16,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Newsroom-Core 2.5.0.dev0\n"
+"Project-Id-Version: Newsroom-Core 2.6.0rc2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-01-25 14:14+0100\n"
+"POT-Creation-Date: 2024-03-19 13:59+0100\n"
 "PO-Revision-Date: 2019-11-27 15:02+0000\n"
 "Last-Translator: Maija Paikkala, 2024\n"
 "Language-Team: Finnish (https://app.transifex.com/sourcefabric/teams/6584/fi/)\n"
@@ -29,11 +29,11 @@ msgstr ""
 "Language: fi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: newsroom/email.py:452
+#: newsroom/email.py:462
 msgid "Kill/Takedown notice"
 msgstr "Ilmoitus poistosta"
 
-#: newsroom/email.py:461
+#: newsroom/email.py:471
 #, python-format
 msgid "%(section)s cancelled notice"
 msgstr "%(section)s peruttu"
@@ -51,7 +51,7 @@ msgstr "Sähköpostitemplatea '%(name)s' ei löytynyt"
 msgid "Activity History: Inavlid request"
 msgstr "Historia: Virheellinen pyyntö"
 
-#: newsroom/push.py:109
+#: newsroom/push.py:114
 msgid "Unknown type {}"
 msgstr "Tuntematon tyyppi {}"
 
@@ -136,33 +136,33 @@ msgstr ""
 "käyttäjien pääsyä tuotteisiin"
 
 #: assets/missing-translations.ts:3 newsroom/agenda/utils.py:41
-#: newsroom/utils.py:205
+#: newsroom/utils.py:206
 msgid "ALL DAY"
 msgstr "KOKO PÄIVÄ"
 
-#: newsroom/auth/oauth.py:87 newsroom/auth/utils.py:73 newsroom/utils.py:297
-#: newsroom/utils.py:408
+#: newsroom/auth/oauth.py:87 newsroom/auth/utils.py:73 newsroom/utils.py:298
+#: newsroom/utils.py:409
 msgid "Account is disabled"
 msgstr "Tili on suljettu."
 
-#: newsroom/utils.py:305
+#: newsroom/utils.py:306
 msgid "Account has not been approved"
 msgstr "Tiliä ei ole hyväksytty"
 
 #: newsroom/auth/views.py:83 newsroom/auth/views.py:92
-#: newsroom/auth/views.py:184 newsroom/utils.py:398
+#: newsroom/auth/views.py:184 newsroom/utils.py:399
 msgid "Invalid username or password."
 msgstr "Väärä käyttäjänimi tai salasana"
 
-#: newsroom/utils.py:404
+#: newsroom/utils.py:405
 msgid "Insufficient Permissions. Access denied."
 msgstr "Oikeudet eivät riitä. Pääsy evätty."
 
-#: newsroom/auth/views.py:176 newsroom/utils.py:412
+#: newsroom/auth/views.py:176 newsroom/utils.py:413
 msgid "Company account has been disabled."
 msgstr "Organisaation tili on suljettu."
 
-#: newsroom/auth/views.py:179 newsroom/utils.py:416
+#: newsroom/auth/views.py:179 newsroom/utils.py:417
 msgid "Company account has expired."
 msgstr "Organisaation tili on vanhentunut."
 
@@ -249,6 +249,11 @@ msgstr "Seuraamassasi tapahtumassa on uutta sisältöä"
 #: newsroom/agenda/agenda.py:72
 msgid "Coverage added"
 msgstr "Sisältö lisätty"
+
+#: newsroom/agenda/utils.py:171 newsroom/web/default_settings.py:392
+#: newsroom/web/default_settings.py:393
+msgid "Completed"
+msgstr "Juttu lähetetty"
 
 #: newsroom/agenda/views.py:225
 msgid "Cannot edit coverage watch when watching parent item"
@@ -405,7 +410,7 @@ msgid "Invalid login type, %(type)s not enabled for your user"
 msgstr ""
 "Väärä kirjautumistapa, %(type)s ei ole käytettävissä tälle käyttäjälle"
 
-#: newsroom/auth/utils.py:233
+#: newsroom/auth/utils.py:240
 msgid ""
 "There is no product associated with your user. Please reach out to your "
 "Company Admin."
@@ -541,7 +546,7 @@ msgstr "Linkitetyt"
 #: assets/products/components/ProductList.tsx:22
 #: assets/search/components/AdvancedSearchPanel.tsx:118
 #: assets/search/components/SearchResultsBar/SearchResultsAdvancedSearchRow.tsx:146
-#: assets/search/components/TopicForm.tsx:106
+#: assets/search/components/TopicForm.tsx:99
 #: assets/section-filters/components/EditSectionFilter.tsx:37
 #: assets/section-filters/components/SectionFilterList.tsx:22
 #: assets/users/components/UsersList.tsx:26 newsroom/monitoring/forms.py:19
@@ -631,7 +636,7 @@ msgstr ""
 msgid "Query"
 msgstr "Hakulauseke"
 
-#: newsroom/monitoring/search.py:67 newsroom/search/service.py:639
+#: newsroom/monitoring/search.py:67 newsroom/search/service.py:640
 msgid "Invalid product parameter"
 msgstr "Väärä tuoteparametri"
 
@@ -813,23 +818,23 @@ msgstr "Vanhentuneet yhtiöt"
 msgid "Unknown report {}"
 msgstr "Tuntematon raportti {}"
 
-#: newsroom/search/service.py:306
+#: newsroom/search/service.py:310
 msgid "Page limit exceeded"
 msgstr "Sivumäärä ylitetty"
 
-#: newsroom/search/service.py:556
+#: newsroom/search/service.py:560
 msgid "Incorrect type supplied for advanced search params"
 msgstr "Tarkennetun haun parametrit ovat vääränlaisia"
 
-#: newsroom/search/service.py:630
+#: newsroom/search/service.py:631
 msgid "User does not belong to a company."
 msgstr "Käyttäjä ei kuulu yhteenkään organisaatioon"
 
-#: newsroom/search/service.py:632
+#: newsroom/search/service.py:633
 msgid "Your company doesn't have any products defined."
 msgstr "Organisaatiollasi ei ole yhtään määriteltyä tuotetta."
 
-#: newsroom/search/service.py:634
+#: newsroom/search/service.py:635
 msgid "Your product is not assigned to you or your company."
 msgstr "Tuotteesi ei ole linkitetty organisaatioosi."
 
@@ -899,46 +904,46 @@ msgstr "Sisällöt:"
 msgid "AM"
 msgstr "AM"
 
-#: newsroom/templates/base_layout.html:32
+#: newsroom/templates/base_layout.html:33
 msgid "Main Navigation Bar"
 msgstr "Päävalikko"
 
 #: assets/public/components/PublicApp.tsx:78
-#: newsroom/templates/base_layout.html:57
+#: newsroom/templates/base_layout.html:58
 #: newsroom/templates/login_client.html:4
 #: newsroom/templates/login_form.html:24
 #: newsroom/templates/login_layout.html:19
 msgid "Login"
 msgstr "Kirjaudu sisään"
 
-#: newsroom/templates/base_layout.html:61 newsroom/templates/footer.html:4
+#: newsroom/templates/base_layout.html:62 newsroom/templates/footer.html:4
 msgid "Contact Us"
 msgstr "Ota yhteyttä"
 
-#: newsroom/templates/base_layout.html:72
+#: newsroom/templates/base_layout.html:73
 msgid "Side Navigation"
 msgstr "Sivuvalikko"
 
 #: assets/company-admin/components/CompanyUserListItem.tsx:48
-#: assets/users/utils.ts:11 newsroom/templates/base_layout.html:98
-#: newsroom/templates/base_layout.html:99
-#: newsroom/templates/base_layout.html:106
+#: assets/users/utils.ts:11 newsroom/templates/base_layout.html:99
+#: newsroom/templates/base_layout.html:100
+#: newsroom/templates/base_layout.html:107
 #: newsroom/templates/company_admin_index.html:3
 #: newsroom/templates/company_admin_index.html:6 newsroom/users/forms.py:39
 msgid "Company Admin"
 msgstr "Pääkäyttäjä"
 
-#: newsroom/templates/base_layout.html:115
 #: newsroom/templates/base_layout.html:116
-#: newsroom/templates/base_layout.html:123
+#: newsroom/templates/base_layout.html:117
+#: newsroom/templates/base_layout.html:124
 #: newsroom/templates/company_reports.html:3
 #: newsroom/templates/company_reports.html:6
 msgid "Reports"
 msgstr "Tilastot"
 
-#: newsroom/templates/base_layout.html:131
 #: newsroom/templates/base_layout.html:132
-#: newsroom/templates/base_layout.html:139 newsroom/templates/settings.html:3
+#: newsroom/templates/base_layout.html:133
+#: newsroom/templates/base_layout.html:140 newsroom/templates/settings.html:3
 #: newsroom/templates/settings.html:6
 msgid "Settings"
 msgstr "Asetukset"
@@ -1366,10 +1371,6 @@ msgstr "Ehkä"
 msgid "Not Intended / Cancelled"
 msgstr "STT ei uutisoi"
 
-#: newsroom/web/default_settings.py:392 newsroom/web/default_settings.py:393
-msgid "Completed"
-msgstr "Juttu lähetetty"
-
 #: newsroom/web/default_settings.py:627
 msgid "Home"
 msgstr "Etusivu"
@@ -1555,11 +1556,11 @@ msgstr "Kohteet poistettu kirjanmerkeistä"
 msgid "Item was removed from bookmarks successfully."
 msgstr "Kohde poistettu kirjanmerkeistä"
 
-#: assets/agenda/actions.ts:756
+#: assets/agenda/actions.ts:763
 msgid "Started watching coverage successfully."
 msgstr "Seuranta lisätty onnistuneesti."
 
-#: assets/agenda/actions.ts:769
+#: assets/agenda/actions.ts:776
 msgid "Stopped watching coverage successfully."
 msgstr "Seuranta peruttu onnistuneesti."
 
@@ -1615,39 +1616,39 @@ msgstr "Peruttu"
 msgid "Update expected @ ${dateString}"
 msgstr "Päivitys odotettavissa @ ${dateString}"
 
-#: assets/agenda/utils.ts:1073
+#: assets/agenda/utils.ts:1080
 msgid "(update to come)"
 msgstr "(päivitys tulossa)"
 
-#: assets/agenda/utils.ts:1073
+#: assets/agenda/utils.ts:1080
 msgid "(updated)"
 msgstr "(päivitetty)"
 
-#: assets/agenda/utils.ts:1169
+#: assets/agenda/utils.ts:1157
 msgid "{{startDate}} to {{endDate}} (Time to be confirmed)"
 msgstr "{{startDate}} - {{endDate}} (Kellonaika varmistuu myöhemmin)"
 
-#: assets/agenda/utils.ts:1175
+#: assets/agenda/utils.ts:1163
 msgid "{{startDate}} (Time to be confirmed)"
 msgstr "{{startDate}} (Kellonaika varmistuu myöhemmin)"
 
-#: assets/agenda/utils.ts:1180
+#: assets/agenda/utils.ts:1168
 msgid "{{startDate}} to {{endDate}}"
 msgstr "{{startDate}} – {{endDate}}"
 
-#: assets/agenda/utils.ts:1189
+#: assets/agenda/utils.ts:1177
 msgid "{{startTime}} {{startDate}} - {{endDate}} {{timezone}}"
 msgstr "{{startDate}} klo {{startTime}} - {{endDate}} {{timezone}}"
 
-#: assets/agenda/utils.ts:1197
+#: assets/agenda/utils.ts:1185
 msgid "{{startTime}} {{startDate}} {{timezone}}"
 msgstr "{{startDate}} klo {{startTime}} {{timezone}}"
 
-#: assets/agenda/utils.ts:1204
+#: assets/agenda/utils.ts:1192
 msgid "{{startTime}} - {{endTime}} {{startDate}} {{timezone}}"
 msgstr "{{startDate}} klo {{startTime}} - {{endTime}} {{timezone}}"
 
-#: assets/agenda/utils.ts:1212 assets/agenda/utils.ts:1222
+#: assets/agenda/utils.ts:1200 assets/agenda/utils.ts:1210
 msgid "{{startTime}} {{startDate}} to {{endTime}} {{endDate}} {{timezone}}"
 msgstr ""
 "{{startDate}} klo {{startTime}} - {{endDate}} klo {{endTime}} {{timezone}}"
@@ -1893,7 +1894,7 @@ msgstr "Kohteita ei löytynyt"
 msgid "(Watching)"
 msgstr "(Seurataan)"
 
-#: assets/agenda/components/AgendaListItemIcons.tsx:144
+#: assets/agenda/components/AgendaListItemIcons.tsx:140
 msgid "{{ attachments }} file(s) attached"
 msgstr "{{ attachments }} tiedostoa liitetty"
 
@@ -1946,26 +1947,26 @@ msgstr "Järjestäjän antamaa lisätietoa"
 msgid "Invitation Details"
 msgstr "Alkuperäinen kutsu"
 
-#: assets/agenda/components/CoverageItemStatus.tsx:104
-#: assets/agenda/components/CoverageItemStatus.tsx:124
+#: assets/agenda/components/CoverageItemStatus.tsx:105
+#: assets/agenda/components/CoverageItemStatus.tsx:125
 msgid "Open in new tab"
 msgstr "Avaa välilehdellä"
 
-#: assets/agenda/components/CoverageItemStatus.tsx:109
-#: assets/agenda/components/CoverageItemStatus.tsx:129
-#: assets/agenda/components/CoverageItemStatus.tsx:137
+#: assets/agenda/components/CoverageItemStatus.tsx:110
+#: assets/agenda/components/CoverageItemStatus.tsx:130
+#: assets/agenda/components/CoverageItemStatus.tsx:141
 msgid "View Content"
 msgstr "Avaa juttu"
 
-#: assets/agenda/components/CoverageItemStatus.tsx:160
+#: assets/agenda/components/CoverageItemStatus.tsx:164
 msgid "All coverages cancelled: {{ reason }}"
 msgstr "Kaikki sisällöt peruttu  {{ reason }}"
 
-#: assets/agenda/components/CoverageItemStatus.tsx:163
+#: assets/agenda/components/CoverageItemStatus.tsx:167
 msgid "Planning cancelled: {{ reason }}"
 msgstr "Uutissuunnitelmat peruttu: {{ reason }} "
 
-#: assets/agenda/components/CoverageItemStatus.tsx:188
+#: assets/agenda/components/CoverageItemStatus.tsx:191
 msgid "Update coming"
 msgstr "Päivitys tulossa"
 
@@ -2851,7 +2852,7 @@ msgid "All"
 msgstr "Kaikki"
 
 #: assets/components/cards/render/EventsTwoByTwoCard.tsx:33
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:152
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:175
 #: assets/wire/components/filters/NavCreatedPicker.tsx:46
 msgid "To"
 msgstr "Päättyen"
@@ -3401,7 +3402,7 @@ msgid "Body"
 msgstr "Leipäteksti"
 
 #: assets/search/components/FollowedTopics.tsx:61
-#: assets/search/components/TopicForm.tsx:149
+#: assets/search/components/TopicForm.tsx:142
 msgid "Remove from folder"
 msgstr "Poista kansiosta"
 
@@ -3410,7 +3411,7 @@ msgid "Would you like to delete topic {{name}}?"
 msgstr "Haluatko varmasti poistaa haun {{name}}?"
 
 #: assets/search/components/FollowedTopics.tsx:219
-#: assets/search/components/TopicForm.tsx:174
+#: assets/search/components/TopicForm.tsx:167
 msgid "Create new folder"
 msgstr "Luo uusi kansio"
 
@@ -3441,18 +3442,6 @@ msgstr "Peru tilaus"
 #: assets/search/components/MonitoringEditor.tsx:163
 msgid "Subscribe"
 msgstr "Tilaa"
-
-#: assets/search/components/NewItemsIcon.tsx:46
-msgid "New events to load"
-msgstr "Uusia tapahtumia ladattavaksi"
-
-#: assets/search/components/NewItemsIcon.tsx:47
-msgid "New stories available to load"
-msgstr "Uusia uutisia ladattavissa"
-
-#: assets/search/components/NewItemsIcon.tsx:56
-msgid "Refresh"
-msgstr "Päivitä"
 
 #: assets/search/components/SearchResults.tsx:15
 msgid "search results found"
@@ -3495,12 +3484,12 @@ msgid "Updated on {{ date }} at {{ time }}"
 msgstr "Päivitetty {{ date }} {{ time }}"
 
 #: assets/search/components/Topic.tsx:96
-#: assets/search/components/TopicForm.tsx:219
+#: assets/search/components/TopicForm.tsx:214
 msgid "Real-Time"
 msgstr "Heti haun päivittyessä"
 
 #: assets/search/components/Topic.tsx:96
-#: assets/search/components/TopicForm.tsx:229
+#: assets/search/components/TopicForm.tsx:224
 msgid "Scheduled"
 msgstr "Aikataulutetusti"
 
@@ -3557,27 +3546,27 @@ msgstr "Kansion nimi"
 msgid "Add to folder"
 msgstr "Lisää kansio"
 
-#: assets/search/components/TopicForm.tsx:117
+#: assets/search/components/TopicForm.tsx:110
 msgid "Share with my Company"
 msgstr "Koko yhtiön jaettu tallennettu haku?"
 
-#: assets/search/components/TopicForm.tsx:124
+#: assets/search/components/TopicForm.tsx:117
 msgid "Created Externally"
 msgstr "Luotu ulkopuolella"
 
-#: assets/search/components/TopicForm.tsx:129
+#: assets/search/components/TopicForm.tsx:122
 msgid "Organize your Topic"
 msgstr "Järjestä tallennetut hakusi"
 
-#: assets/search/components/TopicForm.tsx:198
+#: assets/search/components/TopicForm.tsx:193
 msgid "Email Notifications:"
 msgstr "Sähköposti-ilmoitukset:"
 
-#: assets/search/components/TopicForm.tsx:209
+#: assets/search/components/TopicForm.tsx:204
 msgid "None"
 msgstr "Ei mitään"
 
-#: assets/search/components/TopicForm.tsx:236
+#: assets/search/components/TopicForm.tsx:231
 msgid ""
 "Your saved topic results will be emailed in a digest format at the time(s) "
 "per day set below."
@@ -3585,12 +3574,12 @@ msgstr ""
 "Tallentamasi haun tulokset lähetetään sinulle tiivistelmänä päivittäin alla "
 "määriteltyinä aikoina."
 
-#: assets/search/components/TopicForm.tsx:247
+#: assets/search/components/TopicForm.tsx:242
 #: assets/user-profile/components/profile/UserProfile.tsx:179
 msgid "Edit schedule"
 msgstr "Muuta aikataulua"
 
-#: assets/search/components/TopicForm.tsx:256
+#: assets/search/components/TopicForm.tsx:251
 msgid "Topic details"
 msgstr "Tarkemmat tiedot tallennetusta hausta"
 
@@ -3632,17 +3621,17 @@ msgstr "Hae"
 msgid "inside"
 msgstr "sisällä"
 
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:115
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:134
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:138
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:157
 #: assets/wire/components/filters/NavCreatedPicker.tsx:38
 msgid "From"
 msgstr "Alkaen"
 
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:219
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:242
 msgid "Clear filters"
 msgstr "Tyhjennä valinnat"
 
-#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:227
+#: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:250
 msgid "Filters applied"
 msgstr "Suodattimia käytössä"
 
@@ -3756,7 +3745,7 @@ msgid "Article Preview"
 msgstr "Esikatselu"
 
 #: assets/ui/components/Preview.tsx:13
-#: assets/wire/components/ItemDetails.tsx:127
+#: assets/wire/components/ItemDetails.tsx:105
 msgid "Published on {{ date }} at {{ time }}"
 msgstr "Julkaistu {{ date }} klo {{ time }}"
 
@@ -3776,13 +3765,13 @@ msgstr "Haku on poistettu"
 msgid "Topic was shared successfully."
 msgstr "Haku on jaettu onnistuneesti"
 
-#: assets/user-profile/actions.ts:286
+#: assets/user-profile/actions.ts:285
 msgid ""
 "Are you sure you want to delete the folder {{name}} and all of its contents?"
 msgstr ""
 "Oletko varma, että haluat poistaa kansion {{name}} ja kaiken sen sisällön?"
 
-#: assets/user-profile/actions.ts:342
+#: assets/user-profile/actions.ts:351
 msgid "Global schedule updated"
 msgstr "Ajastusta muutettu"
 

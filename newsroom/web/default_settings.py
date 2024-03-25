@@ -446,10 +446,12 @@ CELERY_BEAT_SCHEDULE = {
     "newsroom:monitoring_schedule_alerts": {
         "task": "newsroom.monitoring.email_alerts.monitoring_schedule_alerts",
         "schedule": timedelta(seconds=60),
+        "options": {"expires": 59},  # if the task is not executed within 59 seconds, it will be discarded
     },
     "newsroom:monitoring_immediate_alerts": {
         "task": "newsroom.monitoring.email_alerts.monitoring_immediate_alerts",
         "schedule": timedelta(seconds=60),
+        "options": {"expires": 59},  # if the task is not executed within 59 seconds, it will be discarded
     },
     "newsroom:remove_expired_content_api": {
         "task": "content_api.commands.item_expiry",
@@ -462,6 +464,7 @@ CELERY_BEAT_SCHEDULE = {
     "newsroom:send_scheduled_notifications": {
         "task": "newsroom.notifications.send_scheduled_notifications.send_scheduled_notifications",
         "schedule": crontab(minute="*/5"),
+        "options": {"expires": 5 * 60 - 1},
     },
 }
 

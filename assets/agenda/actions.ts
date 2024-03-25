@@ -572,9 +572,9 @@ export const SET_NEW_ITEM = 'SET_NEW_ITEM';
 export function setAndUpdateNewItems(data: any) {
     return function(dispatch: any, getState: any) {
         const item = data.item || {};
+        const state = getState();
 
         if (item.type !== 'agenda') {
-            const state = getState();
 
             // Check if the item is used in the preview or opened agenda item
             // If yes, make it available to the preview
@@ -596,15 +596,20 @@ export function setAndUpdateNewItems(data: any) {
             return Promise.resolve();
         }
 
-        dispatch(updateItem(item));
+        const {itemsById} = state;
+        const prevItem = itemsById[item['_id']];
 
-        // Fetch related planning items if the updated item has planning_items
-        if (item.item_type === 'event' && item.planning_items && item.planning_items.length > 0) {
-            item.planning_items.forEach((plan: IAgendaItem) => {
-                dispatch(fetchItem(plan._id));
-            });
+        // If coverage is updated in the item fetch all items and reintilized group listing.
+        if (prevItem && prevItem.coverages?.length !== item?.coverages?.length) {
+            dispatch(fetchItems());
+        } else {
+            dispatch(updateItem(item));
+            if (item.item_type === 'event' && item.planning_items && item.planning_items.length > 0) {
+                item.planning_items.forEach((plan: IAgendaItem) => {
+                    dispatch(fetchItem(plan._id));}
+                );
+            }
         }
-
         // Do not use 'killed' items for new-item notifications
         if (item.state === 'killed') {
             return Promise.resolve();
