@@ -21,6 +21,7 @@ export type IDisplayFieldsConfig = string |
 export interface IListConfig {
     subject?: {
         scheme?: Array<string> | string;
+        topStoryScheme?: string;
     };
     highlights?: {
         urgency?: Array<string>;

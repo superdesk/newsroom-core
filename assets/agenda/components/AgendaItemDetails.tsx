@@ -75,6 +75,7 @@ function AgendaItemDetails(
                 item={item}
                 group={group}
                 disableTextSelection={detailsConfig.disable_text_selection}
+                detailsConfig={detailsConfig}
             >
                 <ArticleBody>
                     <AgendaMeta item={item} />
