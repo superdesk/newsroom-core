@@ -141,6 +141,8 @@ def delete_dashboard_caches():
 def get_personal_dashboards_data(user, company, topics):
     def get_topic_items(topic):
         query = superdesk.get_resource_service("wire_search").get_topic_query(topic, user, company)
+        if not query:
+            return list()
         return list(superdesk.get_resource_service("wire_search").get_items_by_query(query, size=4))
 
     def _get_topic_data(topic_id):
