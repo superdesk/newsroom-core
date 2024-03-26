@@ -1,5 +1,8 @@
+import typing
 import superdesk
 import newsroom
+
+from newsroom.types import DashboardCardType
 
 
 class UIConfigResource(newsroom.Resource):
@@ -33,6 +36,7 @@ class UIConfigResource(newsroom.Resource):
         "open_coverage_content_in_same_page": {"type": "boolean", "default": False},
         "subnav": {"type": "dict"},
         "init_version": {"type": "integer"},
+        "personal_home_card_type": {"type": "string", "allowed": list(typing.get_args(DashboardCardType))},
     }
     datasource = {"source": "ui_config"}
     item_methods = ["GET"]
