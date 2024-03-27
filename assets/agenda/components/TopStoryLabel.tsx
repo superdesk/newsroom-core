@@ -1,10 +1,10 @@
 import React from 'react';
 import classNames from  'classnames';
-import {IAgendaItem} from 'interfaces';
+import {IAgendaItem, IListConfig, IPreviewConfig} from 'interfaces';
 
 interface IProps {
     item: IAgendaItem;
-    config: any;
+    config: IListConfig | IPreviewConfig;
     size?: 'normal' | 'big';
 }
 

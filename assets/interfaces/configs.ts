@@ -44,7 +44,11 @@ export interface IPreviewConfig {
     slugline?: {displayed: boolean};
     abstract?: {displayed: boolean};
     category?: {displayed: boolean};
-    subject?: {displayed: boolean};
+    subject?: {
+        displayed: boolean;
+        scheme?: Array<string> | string;
+        topStoryScheme?: string;
+    };
     authors?: {displayed: boolean};
     byline?: {displayed: boolean};
     located?: {displayed: boolean};
