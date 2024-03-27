@@ -787,3 +787,6 @@ EMBARGO_QUERY_ROUNDING = "/m"
 #:
 EMAIL_DEFAULT_SENDER_NAME = None
 EMAIL_SENDER_NAME_LANGUAGE_MAP = {}
+
+#: Set the card type for personal dashboard
+PERSONAL_DASHBOARD_CARD_TYPE = "4-picture-text"

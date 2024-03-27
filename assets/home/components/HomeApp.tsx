@@ -32,11 +32,9 @@ const modals: any = {
 
 type IProps = IStateProps & IDispatchProps;
 
-interface IOwnProps {
+class HomeApp extends React.Component<IProps, {
     activeOptionId: 'default' | 'my-home';
-}
-
-class HomeApp extends React.Component<IProps, IOwnProps>  {
+}>{
     static propTypes: any;
 
     height: number;
@@ -82,33 +80,39 @@ class HomeApp extends React.Component<IProps, IOwnProps>  {
     }
 
     getPanelsForPersonalizedDashboard() {
-        const {personalizedDashboards, personalHomeCardType} = this.props;
-        const Card = getCard(personalHomeCardType);
-        const personalizedDashboardTopicIds = personalizedDashboards?.[0].topic_items?.map(({_id}) => _id);
-        const topicItems = this.props.topics.filter(({_id}) => personalizedDashboardTopicIds?.includes(_id));
+        const {personalizedDashboards} = this.props;
+        return personalizedDashboards?.map((dashboard) => {
+            const Card = getCard(dashboard.dashboard_card_type);
+            const personalizedDashboardTopicIds = dashboard.topic_items?.map(({_id}) => _id);
+            const topicItems = this.props.topics.filter(({_id}) => personalizedDashboardTopicIds?.includes(_id));
 
-        return (
-            personalizedDashboards?.[0].topic_items?.map((item) => {
-                const currentTopic = topicItems.find(({_id}) => _id === item._id);
+            if (Card == null || Card._id === '2x2-events' || Card._id === '4-photo-gallery' || Card._id === '6-navigation-row') {
+                return;
+            }
 
-                return (
-                    Card?._id === personalHomeCardType && currentTopic && (
-                        <Card.dashboardComponent
-                            kind="topic"
-                            key={item._id}
-                            type={personalHomeCardType}
-                            items={item.items}
-                            title={currentTopic?.label}
-                            id={currentTopic?._id}
-                            openItem={this.props.openItemDetails}
-                            isActive={this.props.activeCard === item._id}
-                            cardId={item._id}
-                            listConfig={this.props.listConfig}
-                        />
-                    )
-                );
-            })
-        );
+            return (
+                dashboard.topic_items?.map((item) => {
+                    const currentTopic = topicItems.find(({_id}) => _id === item._id);
+
+                    return (
+                        currentTopic && (
+                            <Card.dashboardComponent
+                                kind="topic"
+                                key={item._id}
+                                type={dashboard.dashboard_card_type}
+                                items={item.items}
+                                title={currentTopic?.label}
+                                id={currentTopic?._id}
+                                openItem={this.props.openItemDetails}
+                                isActive={this.props.activeCard === item._id}
+                                cardId={item._id}
+                                listConfig={this.props.listConfig}
+                            />
+                        )
+                    );
+                })
+            );
+        });
     }
 
     filterActions(item: any, config: any) {
@@ -291,7 +295,6 @@ const mapStateToProps = (state: IHomeState) => ({
     isSearchEnabled: isSearchEnabled(state),
     filterGroupLabels: filterGroupsToLabelMap(state),
     currentUser: getCurrentUser(state),
-    personalHomeCardType: state.uiConfig.personal_home_card_type ?? '4-picture-text',
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
@@ -316,6 +319,6 @@ type IDispatchProps = ReturnType<typeof mapDispatchToProps>;
 export default connect<
     IStateProps,
     IDispatchProps,
-    IOwnProps,
+    null,
     IHomeState
 >(mapStateToProps, mapDispatchToProps)(HomeApp);

@@ -231,7 +231,7 @@ DashboardCardType = Literal[
 ]
 
 
-class DashboardCard(TypedDict, total=False):
+class DashboardCard(TypedDict):
     _id: ObjectId
     label: str
     type: DashboardCardType

@@ -16,6 +16,7 @@ import {IHomeUIConfig} from 'interfaces/configs';
 export interface IPersonalizedDashboardsWithData {
     dashboard_id?: string;
     dashboard_name?: string;
+    dashboard_card_type: IDashboardCard['type'];
     topic_items?: Array<{_id: string, items: Array<any>}>;
 }
 

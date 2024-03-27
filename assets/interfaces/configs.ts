@@ -62,12 +62,9 @@ interface IBaseUIConfig {
     enable_global_topics?: boolean;
 }
 
-export type IPersonalHomeCardType = Exclude<IDashboardCard['type'], '4-photo-gallery' | '6-navigation-row' | '2x2-events'>;
-
 export interface IHomeUIConfig extends IBaseUIConfig {
     _id: 'home';
     search?: boolean;
-    personal_home_card_type?: IPersonalHomeCardType;
 }
 
 export interface IWireUIConfig extends IBaseUIConfig {
