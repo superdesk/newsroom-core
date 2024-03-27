@@ -38,7 +38,7 @@ import {
     searchSortQuerySelector,
 } from 'search/selectors';
 
-import BaseApp from 'layout/components/BaseApp';
+import SearchBase from 'layout/components/SearchBase';
 import WirePreview from './WirePreview';
 import ItemsList from './ItemsList';
 import SearchBar from 'search/components/SearchBar';
@@ -69,7 +69,7 @@ const modals: any = {
     itemStatistics: ItemStatisticsModal,
 };
 
-class WireApp extends BaseApp {
+class WireApp extends SearchBase<any> {
     constructor(props: any) {
         super(props);
         this.modals = modals;

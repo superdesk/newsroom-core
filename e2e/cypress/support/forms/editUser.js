@@ -36,7 +36,10 @@ class EditUserFormWrapper extends BaseForm {
         cy.get('@newUserId').then(callback);
     }
 
-    openAllToggleBoxes() {
+    openAllToggleBoxes(includeSections = true) {
+        if (includeSections === true) {
+            this.getFormElement('[data-test-id="toggle--sections"]').click();
+        }
         this.getFormElement('[data-test-id="toggle--products"]').click();
         this.getFormElement('[data-test-id="toggle--user-settings"]').click();
     }

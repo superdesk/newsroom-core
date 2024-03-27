@@ -12,6 +12,7 @@ from superdesk.default_settings import strtobool as _strtobool
 from content_api.errors import BadParameterValueError
 
 from newsroom import Service
+from newsroom.auth.utils import user_has_section_allowed
 from newsroom.search.config import (
     SearchGroupNestedConfig,
     get_nested_config,
@@ -284,11 +285,14 @@ class BaseSearchService(Service):
         self.apply_time_limit_filter(search)
         self.apply_products_filter(search)
         self.apply_request_filter(search)
-        self.apply_request_advanced_search(search)
         self.apply_embargoed_filters(search)
 
         if len(search.query["bool"].get("should", [])):
             search.query["bool"]["minimum_should_match"] = 1
+
+    def apply_topic_filter(self, search):
+        """Topic filter is set via search args."""
+        self.apply_request_filter(search)
 
     def gen_source_from_search(self, search):
         """Generate the eve source object from the search query instance
@@ -330,7 +334,7 @@ class BaseSearchService(Service):
         for key, val in filters.items():
             if not val:
                 continue
-            bool_query["filter"].append(
+            bool_query["must"].append(
                 get_filter_query(key, val, self.get_aggregation_field(key), get_nested_config("items", key))
             )
 
@@ -416,7 +420,8 @@ class BaseSearchService(Service):
             return
 
         current_user = get_user(required=False)
-        search.is_admin = is_admin(current_user)
+        if current_user:
+            search.is_admin = is_admin(current_user)
 
         if search.is_admin and search.args.get("user"):
             search.user = get_resource_service("users").find_one(req=None, _id=search.args["user"])
@@ -573,9 +578,6 @@ class BaseSearchService(Service):
             # Set up the search query for filtering
             self.apply_request_filter(highlight_search)
 
-            # Set up the search query for advanced search options
-            self.apply_request_advanced_search(highlight_search)
-
             # Set up highlighting settings
             highlight_search.source.setdefault("highlight", {})
             highlight_search.source["highlight"].setdefault("fields", {})
@@ -636,6 +638,10 @@ class BaseSearchService(Service):
                 # Ensure that all the provided products are permissioned for this request
                 if not all(p in [c.get("_id") for c in search.products] for p in search.args["requested_products"]):
                     abort(404, gettext("Invalid product parameter"))
+            elif search.section and search.user and search.user.get("sections"):
+                if not search.user.get("sections", {}).get(search.section):
+                    msg = f"User does not have access to {search.section} section"
+                    abort(403, gettext(msg))
 
     def is_validate_product(self, data):
         """
@@ -743,7 +749,7 @@ class BaseSearchService(Service):
             )
 
         if search.args.get("ids"):
-            search.query["bool"]["filter"].append({"terms": {"_id": search.args["ids"]}})
+            search.query["bool"]["must"].append({"terms": {"_id": search.args["ids"]}})
 
         filters = None
         if search.args.get("filter"):
@@ -760,21 +766,23 @@ class BaseSearchService(Service):
                 if app.config.get("FILTER_AGGREGATIONS", True):
                     self.set_bool_query_from_filters(search.query["bool"], filters)
                 else:
-                    search.query["bool"]["filter"].append(filters)
+                    search.query["bool"]["must"].append(filters)
 
             if search.args.get("created_from") or search.args.get("created_to"):
-                search.query["bool"]["filter"].append(self.versioncreated_range(search.args))
+                search.query["bool"]["must"].append(self.versioncreated_range(search.args))
         elif filters or search.args.get("created_from") or search.args.get("created_to"):
-            search.source["post_filter"] = {"bool": {"filter": []}}
+            search.source["post_filter"] = {"bool": {"must": []}}
 
             if filters:
                 if app.config.get("FILTER_AGGREGATIONS", True):
                     self.set_bool_query_from_filters(search.source["post_filter"]["bool"], filters)
                 else:
-                    search.source["post_filter"]["bool"]["filter"].append(filters)
+                    search.source["post_filter"]["bool"]["must"].append(filters)
 
             if search.args.get("created_from") or search.args.get("created_to"):
-                search.source["post_filter"]["bool"]["filter"].append(self.versioncreated_range(search.args))
+                search.source["post_filter"]["bool"]["must"].append(self.versioncreated_range(search.args))
+
+        self.apply_request_advanced_search(search)
 
     def get_advanced_search_fields(self, search: SearchQuery) -> List[str]:
         advanced_fields = search.advanced.get("fields") if search.advanced is not None else []
@@ -816,10 +824,11 @@ class BaseSearchService(Service):
     def apply_embargoed_filters(self, search):
         """Generate filters for embargoed params"""
 
+        embargo_query_rounding = app.config.get("EMBARGO_QUERY_ROUNDING")
         if search.args.get("exclude_embargoed"):
-            search.query["bool"]["must_not"].append({"range": {"embargoed": {"gt": "now"}}})
+            search.query["bool"]["must_not"].append({"range": {"embargoed": {"gt": f"now{embargo_query_rounding}"}}})
         elif search.args.get("embargoed_only"):
-            search.query["bool"]["filter"].append({"range": {"embargoed": {"gt": "now"}}})
+            search.query["bool"]["filter"].append({"range": {"embargoed": {"gt": f"now{embargo_query_rounding}"}}})
 
     def prepend_embargoed_items_to_response(self, response, req, lookup):
         search = SearchQuery()
@@ -842,56 +851,63 @@ class BaseSearchService(Service):
             response.hits["hits"]["total"] = response.count() + embargoed_response.count()
 
     def get_matching_topics_for_item(self, topics, users, companies, query):
-        aggs = {"topics": {"filters": {"filters": {}}}}
-        queried_topics = []
-
-        for topic in topics:
-            user = users.get(str(topic["user"]))
-            if not user:
-                continue
-
-            company = companies.get(str(user.get("company", "")))
-
-            topic_query = self.get_topic_query(topic, user, company, query)
-            if not topic_query:
-                continue
-
-            aggs["topics"]["filters"]["filters"][str(topic["_id"])] = topic_query.query
-
-            queried_topics.append(topic)
-
-        source = {"query": query}
-        source["aggs"] = aggs if aggs["topics"]["filters"]["filters"] else {}
-        source["size"] = 0
-
-        req = ParsedRequest()
-        req.args = {"source": json.dumps(source)}
         topic_matches = []
+        topics_checked = set()
 
-        try:
-            search_results = self.internal_get(req, None)
+        for user in users.values():
+            if not user_has_section_allowed(user, self.section):
+                continue
 
-            for topic in queried_topics:
-                if search_results.hits["aggregations"]["topics"]["buckets"][str(topic["_id"])]["doc_count"] > 0:
-                    topic_matches.append(topic["_id"])
+            aggs = {"topics": {"filters": {"filters": {}}}}
+            company = companies.get(str(user.get("company", "")))
+            # there will be one base search for a user with aggs for user topics
+            search = self.get_topic_query(None, user, company, query=query)
+            if not search:
+                continue
+            queried_topics = []
+            for topic in topics:
+                user_id = str(topic["user"])
+                if not user_id or str(user["_id"]) != user_id:
+                    continue
+                if topic["_id"] in topics_checked:
+                    continue
+                topics_checked.add(topic["_id"])
 
-        except Exception as exc:
-            logger.error(
-                "Error in get_matching_topics for query: {}".format(json.dumps(source)),
-                exc,
-                exc_info=True,
-            )
-            raise
+                topic_query = self.get_topic_query(topic, None, None)
+                if not topic_query:
+                    continue
+
+                aggs["topics"]["filters"]["filters"][str(topic["_id"])] = topic_query.query
+                queried_topics.append(topic)
+            if not queried_topics:
+                continue
+            source = {"query": search.query}
+            source["aggs"] = aggs if aggs["topics"]["filters"]["filters"] else {}
+            source["size"] = 0
+
+            req = ParsedRequest()
+            req.args = {"source": json.dumps(source)}
+
+            try:
+                search_results = self.internal_get(req, None)
+
+                for topic in queried_topics:
+                    if search_results.hits["aggregations"]["topics"]["buckets"][str(topic["_id"])]["doc_count"] > 0:
+                        topic_matches.append(topic["_id"])
+
+            except Exception:
+                logger.exception(
+                    "Error in get_matching_topics",
+                    extra=dict(
+                        query=source,
+                        user=user_id,
+                    ),
+                )
+                continue
 
         return topic_matches
 
-    def get_topic_query(self, topic, user, company, section_filters=None, query=None, args=None):
-        search = SearchQuery()
-
-        search.user = user
-        search.company = company
-        search.section = topic.get("topic_type") or "wire"
-
+    def apply_topic_args(self, topic, args=None):
         if args is None:
             args = {}
 
@@ -916,20 +932,38 @@ class BaseSearchService(Service):
         if topic.get("navigation"):
             args["navigation"] = topic["navigation"]
 
-        search.args = args
+        return args
+
+    def get_topic_query(self, topic, user, company, section_filters=None, query=None, args=None):
+        search = SearchQuery()
+        search.user = user
+        search.company = company
+        search.section = self.section
+
+        if not args:
+            args = {}
+
+        if topic:
+            search.args = self.apply_topic_args(topic, args)
+        elif args:
+            search.args = args
 
         if query is not None:
             search.query = deepcopy(query)
 
         try:
             self.prefill_search_query(search)
-            self.validate_request(search)
-            self.apply_filters(search, section_filters)
+            if user:
+                self.validate_request(search)
+                self.apply_filters(search, section_filters)
+            else:
+                self.apply_topic_filter(search)
         except Forbidden as exc:
-            logger.info(
-                "Notification for user:{} and topic:{} is skipped".format(user.get("_id"), topic.get("_id")),
-                exc_info=exc,
-            )
+            if user and topic:
+                logger.info(
+                    "Notification for user:{} and topic:{} is skipped".format(user.get("_id"), topic.get("_id")),
+                    exc_info=exc,
+                )
             return
 
         return search

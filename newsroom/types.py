@@ -1,5 +1,5 @@
 from bson import ObjectId
-from typing import Dict, List, TypedDict, Any, Union, NoReturn
+from typing import Dict, List, Literal, Optional, TypedDict, Any, Union, NoReturn
 from datetime import datetime
 from enum import Enum
 from flask_babel import LazyString
@@ -71,6 +71,7 @@ class UserRequired(TypedDict):
 
 
 class UserData(UserRequired, total=False):
+    _id: ObjectId
     first_name: str
     last_name: str
     phone: str
@@ -100,7 +101,18 @@ class UserData(UserRequired, total=False):
 
 
 class User(UserData):
-    _id: ObjectId
+    pass
+
+
+class PublicUserData(TypedDict):
+    _id: str
+    company: str
+    first_name: str
+    last_name: str
+    email: str
+    products: List[ProductRef]
+    sections: Dict[str, bool]
+    notification_schedule: Optional[NotificationSchedule]
 
 
 class UserAuth(TypedDict):
@@ -149,7 +161,7 @@ class Company(CompanyRequired, total=False):
 
     # Authentication
     auth_provider: str
-    auth_domain: str
+    auth_domains: List[str]
     is_enabled: bool
     is_approved: bool
     expiry_date: datetime
@@ -196,3 +208,38 @@ class Topic(TypedDict, total=False):
     folder: ObjectId
     advanced: Dict[str, Any]
     subscribers: List[TopicSubscriber]
+
+
+class DashboardCardConfig(TypedDict, total=False):
+    product: str
+    size: int
+
+
+DashboardCardType = Literal[
+    "6-text-only",
+    "4-picture-text",
+    "4-text-only",
+    "4-media-gallery",
+    "4-photo-gallery",
+    "1x1-top-news",
+    "2x2-top-news",
+    "3-text-only",
+    "3-picture-text",
+    "2x2-events",
+    "6-navigation-row",
+    "wire-list",
+]
+
+
+class DashboardCard(TypedDict, total=False):
+    _id: ObjectId
+    label: str
+    type: DashboardCardType
+    config: DashboardCardConfig
+    order: int
+    dashboard: str
+    original_creator: ObjectId
+    version_creator: ObjectId
+
+
+Article = Dict[str, Any]

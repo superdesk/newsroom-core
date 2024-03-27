@@ -32,6 +32,7 @@ export interface IContact {
 
 export interface ILocation {
     name: string;
+    type?: string;
     qcode: string;
     location?: {lat: number; lon: number};
     details?: string[];
@@ -201,6 +202,7 @@ export interface IAgendaState {
         }>;
     };
     errors?: {[field: string]: Array<string>};
+    loadingAggregations?: boolean;
 }
 
 export type AgendaGetState = () => IAgendaState;

@@ -65,9 +65,13 @@ class CompaniesResource(newsroom.Resource):
                 },
             },
         },
-        "auth_domain": {
+        "auth_domain": {  # Deprecated
             "type": "string",
             "nullable": True,
+            "readonly": True,
+        },
+        "auth_domains": {
+            "type": "list",
         },
         "auth_provider": {"type": "string"},
         "company_size": {"type": "string"},
@@ -84,12 +88,12 @@ class CompaniesResource(newsroom.Resource):
             [("name", 1)],
             {"unique": True, "collation": {"locale": "en", "strength": 2}},
         ),
-        "auth_domain_1": (
-            [("auth_domain", 1)],
+        "auth_domains_1": (
+            [("auth_domains", 1)],
             {
                 "unique": True,
                 "collation": {"locale": "en", "strength": 2},
-                "partialFilterExpression": {"auth_domain": {"$gt": ""}},  # filters out None and ""
+                "partialFilterExpression": {"auth_domains.0": {"$exists": True}},  # only check non empty
             },
         ),
     }
@@ -128,7 +132,9 @@ class CompaniesService(newsroom.Service):
             user_service = get_resource_service("users")
             for user in user_service.get(req=None, lookup={"company": original[config.ID_FIELD]}):
                 user_updates = {
-                    "sections": {
+                    "sections": {}
+                    if not user.get("sections")
+                    else {
                         section: (user.get("sections") or {}).get(section, False) for section in updated_section_names
                     },
                     "products": [

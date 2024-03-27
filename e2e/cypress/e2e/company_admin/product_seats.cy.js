@@ -28,7 +28,7 @@ describe('CompanyAdmin - Product Seats', function () {
             .click();
 
         // Make sure the form has all the appropriate values & permissions
-        EditUserForm.openAllToggleBoxes();
+        EditUserForm.openAllToggleBoxes(false);
         EditUserForm.expect({
             first_name: USERS.foobar.monkey.first_name,
             last_name: USERS.foobar.monkey.last_name,
@@ -106,7 +106,7 @@ describe('CompanyAdmin - Product Seats', function () {
         EditUserForm
             .getFormElement()
             .should('be.visible');
-        EditUserForm.openAllToggleBoxes();
+        EditUserForm.openAllToggleBoxes(false);
         expectUpdatedUser();
 
         // Reload the page, re-open it, and make sure the form has all the appropriate values & permissions
@@ -115,7 +115,7 @@ describe('CompanyAdmin - Product Seats', function () {
         CompanyAdminPage
             .getUserListItem(USERS.foobar.monkey._id)
             .click();
-        EditUserForm.openAllToggleBoxes();
+        EditUserForm.openAllToggleBoxes(false);
         expectUpdatedUser();
     });
 
@@ -131,7 +131,7 @@ describe('CompanyAdmin - Product Seats', function () {
             .click();
 
         // Make sure the form has all the appropriate values & permissions
-        EditUserForm.openAllToggleBoxes();
+        EditUserForm.openAllToggleBoxes(false);
         EditUserForm.expectProducts({
             wire: {
                 [PRODUCTS.wire.all._id]: false,
@@ -180,7 +180,7 @@ describe('CompanyAdmin - Product Seats', function () {
         EditUserForm
             .getFormElement()
             .should('be.visible');
-        EditUserForm.openAllToggleBoxes();
+        EditUserForm.openAllToggleBoxes(false);
         EditUserForm.expectProducts({
             wire: {
                 [PRODUCTS.wire.all._id]: false,
@@ -197,7 +197,7 @@ describe('CompanyAdmin - Product Seats', function () {
         CompanyAdminPage
             .getUserListItem(USERS.foobar.monkey._id)
             .click();
-        EditUserForm.openAllToggleBoxes();
+        EditUserForm.openAllToggleBoxes(false);
         EditUserForm.expectProducts({
             wire: {
                 [PRODUCTS.wire.all._id]: false,

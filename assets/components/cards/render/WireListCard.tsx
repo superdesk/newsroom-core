@@ -1,37 +1,34 @@
 import React from 'react';
-import MoreNewsButton from './MoreNewsButton';
+import {connect} from 'react-redux';
 import classNames from 'classnames';
-import {characterCount, wordCount} from 'utils';
+
+import {IArticle, IListConfig} from 'interfaces';
+import {ICardProps} from '../utils';
+import {characterCount, getSlugline, wordCount} from 'utils';
+import {isKilled, getCaption, getImageForList, shortHighlightedtext, shortText} from 'wire/utils';
+
+import {filterGroupsToLabelMap} from 'search/selectors';
+
+import {DEFAULT_META_FIELDS} from 'wire/components/WireListItem';
 import WireListItemIcons from 'wire/components/WireListItemIcons';
 import {FieldComponents} from 'wire/components/fields';
 import {Embargo} from 'wire/components/fields/Embargo';
 import {UrgencyItemBorder, UrgencyLabel} from 'wire/components/fields/UrgencyLabel';
-import {isKilled, getCaption, getImageForList} from 'wire/utils';
-import {connect} from 'react-redux';
-import {listConfigSelector} from 'ui/selectors';
-import {DEFAULT_COMPACT_META_FIELDS} from 'wire/components/WireListItem';
-import {IArticle, IListConfig} from 'interfaces';
-import {filterGroupsToLabelMap} from 'search/selectors';
+import CardRow from './CardRow';
 
-interface IOwnProps {
+interface IWireListCardItemProps {
     item: IArticle;
     openItem: (item: IArticle, cardId: string) => void;
     cardId: string;
-}
-
-interface IPropsReduxStore {
     listConfig: IListConfig;
-    filterGroupLabels: any;
-    dispatch: any;
+    filterGroupLabels: {[field: string]: string};
 }
 
-type IPropsCombined = IPropsReduxStore & IOwnProps;
-
-class WireListPanel extends React.Component<IPropsCombined> {
+class WireListPanel extends React.Component<IWireListCardItemProps> {
     wordCount: number;
     characterCount: number;
 
-    constructor(props: IPropsCombined) {
+    constructor(props: IWireListCardItemProps) {
         super(props);
 
         this.wordCount = wordCount(props.item);
@@ -42,9 +39,7 @@ class WireListPanel extends React.Component<IPropsCombined> {
         const cardClassName = classNames('wire-articles__item-wrap col-12 wire-item');
         const wrapClassName = classNames('wire-articles__item wire-articles__item--wire wire-articles__item--list');
         const listImage = getImageForList(this.props.item);
-        const compactFields = this.props.listConfig.compact_metadata_fields || DEFAULT_COMPACT_META_FIELDS;
         const {item, listConfig, cardId, openItem} = this.props;
-        const isExtended = false;
 
         const onItemClick = () => {
             openItem(item, cardId);
@@ -63,12 +58,6 @@ class WireListPanel extends React.Component<IPropsCombined> {
                     <div className="wire-articles__item-text-block">
                         <h4 className="wire-articles__item-headline">
                             <div className="wire-articles__item-headline-inner">
-                                {!isExtended && (
-                                    <WireListItemIcons
-                                        item={item}
-                                        divider={false}
-                                    />
-                                )}
                                 <Embargo item={item} />
                                 <UrgencyLabel item={item} listConfig={listConfig} filterGroupLabels={this.props.filterGroupLabels} />
                                 {item.es_highlight && item.es_highlight.headline ? <div
@@ -77,19 +66,32 @@ class WireListPanel extends React.Component<IPropsCombined> {
                             </div>
                         </h4>
                         <div className="wire-articles__item__meta">
+                            <WireListItemIcons item={item} />
                             <div className="wire-articles__item__meta-info">
-                                <span>
+                                <span className="meta-info-slugline bold">
+                                    {item.es_highlight && item.es_highlight.slugline ? <div
+                                        dangerouslySetInnerHTML={({__html: item.es_highlight.slugline && item.es_highlight.slugline[0]})}
+                                    /> : getSlugline(item, true)}
+                                </span>
+                                <span className="meta-info-row">
                                     <FieldComponents
-                                        config={compactFields}
+                                        config={this.props.listConfig.metadata_fields || DEFAULT_META_FIELDS}
                                         item={item}
                                         fieldProps={{
-                                            listConfig,
+                                            listConfig: listConfig,
                                             isItemDetail: false,
                                         }}
                                     />
                                 </span>
                             </div>
                         </div>
+
+                        <div className="wire-articles__item__text">
+                            {item.es_highlight && item.es_highlight.body_html ? <div
+                                dangerouslySetInnerHTML={({__html: shortHighlightedtext(item.es_highlight.body_html[0], 40)})}
+                            /> : <p>{shortText(item, 40, listConfig)}</p>}
+                        </div>
+
                     </div>
 
                     {!isKilled(item) && listImage != null && (
@@ -108,36 +110,29 @@ class WireListPanel extends React.Component<IPropsCombined> {
     }
 }
 
-const mapStateToProps = (state: any) => ({
-    filterGroupLabels: filterGroupsToLabelMap(state),
-    listConfig: listConfigSelector(state),
-    dispatch: {},
-});
-
-const WireListPanelConnected: React.ComponentType<IOwnProps> =
-    connect<IPropsReduxStore, {}, IOwnProps>(mapStateToProps)(WireListPanel);
-
-export interface IWireListCardProps {
-    items: Array<IArticle>;
-    title?: string;
-    openItem: (item: IArticle, cardId: string) => void;
-    cardId: string;
+interface IWireListCardProps extends ICardProps {
+    filterGroupLabels: {[field: string]: string};
 }
 
-const WireListCard: React.ComponentType<IWireListCardProps> = ({items, title, openItem, cardId}: IWireListCardProps) => {
+const WireListCardComponent: React.ComponentType<IWireListCardProps> = (props: IWireListCardProps) => {
     return (
-        <div className='row'>
-            <MoreNewsButton kind='product' title={title ?? ''} />
-            {items.map((item: IArticle) => (
-                <WireListPanelConnected
+        <CardRow title={props.title} id={props.id} isActive={props.isActive} onMoreNewsClicked={props.onMoreNewsClicked}>
+            {props.items.map((item: IArticle) => (
+                <WireListPanel
                     key={item._id}
                     item={item}
-                    cardId={cardId}
-                    openItem={openItem}
+                    cardId={props.cardId}
+                    openItem={props.openItem}
+                    listConfig={props.listConfig}
+                    filterGroupLabels={props.filterGroupLabels}
                 />
             ))}
-        </div>
+        </CardRow>
     );
 };
+
+const mapStateToProps = (state: any) => ({filterGroupLabels: filterGroupsToLabelMap(state)});
+const WireListCard = connect(mapStateToProps)(WireListCardComponent);
+
 
 export default WireListCard;

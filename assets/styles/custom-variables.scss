@@ -404,6 +404,7 @@ $container-max-widths: (
     --sidenav-color-bg:                     var(--color-primary);
     --sidenav-color-item-bg:                transparent;
     --sidenav-color-item-fg:                hsla(0, 0%, 100%, 1);
+    --sidenav-color-item-bg--hover:         hsla(0, 0%, 0%, 0.16);
     --sidenav-color-item-bg--active:        hsla(0, 0%, 100%, 1);
     --sidenav-color-item-fg--active:        var(--color-primary);
     --sidenav-color-badge-bg:               hsla(0, 0%, 16%, 1);
@@ -411,18 +412,29 @@ $container-max-widths: (
     --sidenav-color-badge-fg:               hsla(0, 0%, 98%, 1);
     --sidenav-color-badge-fg--active:       hsla(0, 0%, 98%, 1);
     --sidenav-color-badge-outline--active:  var(--sidenav-color-item-bg--active);
+    --sidenav-item-size:                    var(--space--5);
+    --sidenav-item-font-size:               0.875rem;
     --sidenav-item-badge-size:              1.25rem;
     --sidenav-item-badge-font-size:         0.6875rem;
-    --sidenav-item-helper-icon-size:        1.25rem;
+    --sidenav-item-helper-icon-size:        1.125rem;
     --sidenav-item-helper-icon-fg:          var(--sidenav-color-bg);
     --sidenav-item-border-radius:           var(--border-radius--s);
     --separator-dot-size:                   3px;
     --separator-dot-color-bg:               var(--sidenav-color-item-fg);
     // Title and size options
-    --sidenav-item-title-display:           block; // set to none to hide the title
-    --sidenav-size-width:                   80px; // width of the sidenav on desktop
-    --sidenav-item-gap:                     8px; // left and right spacing between item and the bar on desktop
-    --sidenav-item-width:                   calc(var(--sidenav-size-width) - var(--sidenav-item-gap)); // width of the sidenav item on desktop
+    //--sidenav-item-title-display:           block; // set to none to hide the title
+    // --sidenav-size-width:                   56px; // width of the sidenav on desktop
+    // --sidenav-item-gap:                     8px; // left and right spacing between item and the bar on desktop
+    // --sidenav-item-width:                   calc(var(--sidenav-size-width) - var(--sidenav-item-gap)); // width of the sidenav item on desktop
+    --sidenav-item-radius:                  var(--border-radius--s);
+    --sidenav-size:                         3.5rem;
+    --sidenav-size-overlay:                 14rem;
+    --sidenav-size-pinned:                  14rem;
+    --sidenav-shadow-overlay:               4px 0 8px hsla(0, 0%, 0%, 0.24);
+    --sidenav-pin-button-color-bg-default:  hsla(0, 0%, 16%, 0.2);
+    --sidenav-pin-button-color-bg-hover:    hsla(0, 0%, 100%, 0.8);
+    --sidenav-pin-button-color-fg-default:  hsla(0, 0%, 100%, 1);
+    --sidenav-pin-button-color-fg-hover:    var(--color-primary);
 
     // COMPONENT: PROFILE MODAL
     --profile-header-height: 56px;
@@ -665,6 +677,13 @@ $container-max-widths: (
     --multiday-label-color-bg: hsl(89, 66%, 30%);
     --multiday-label-color-fg: hsl(0, 0%, 100%);
     --multiday-label-font-size: var(--text-size--small);
+
+    // COMPONENT: SKELETON
+    --p-skeleton-color-bg: var(--color-neutral-150);
+    --p-skeleton-animated-gradient: linear-gradient(90deg, hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0.04), hsla(0, 0%, 100%, 0));
+
+    // COMPONENT: LABEL
+    --color-top-story: var(--color-primary);
 }
 
 .line-shadow-end--light {

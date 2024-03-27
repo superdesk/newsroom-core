@@ -19,10 +19,10 @@ interface IProps {
     onlyDates?: boolean;
 }
 
-function format(item: IAgendaItem, group?: string, onlyDates = true) {
+function format(item: IAgendaItem, onlyDates = true) {
     return (
         <span key="date">
-            {formatAgendaDate(item, group, {onlyDates})}
+            {formatAgendaDate(item, {onlyDates})}
         </span>
     );
 }
@@ -52,7 +52,7 @@ export default function AgendaMetaTime({item, borderRight, isRecurring, group, i
             {'w-100': isMobilePhone},
             {'m-0': onlyDates})}
         >
-            {format(item, group, onlyDates === true)}
+            {format(item, onlyDates === true)}
             {itemDays <= 1 ? null : (
                 <MultiDayListLabel
                     current={diffDays}

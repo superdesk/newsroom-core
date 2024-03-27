@@ -28,6 +28,7 @@ import {
     setTopics,
     loadMyTopic,
 } from 'search/actions';
+import {getFoldersUrl} from 'user-profile/actions';
 
 export const SET_STATE = 'SET_STATE';
 export function setState(state: any) {
@@ -415,6 +416,11 @@ export function downloadItems(items: any) {
     return renderModal('downloadItems', {items});
 }
 
+interface DownloadPayload {
+    items: any;
+    format: any;
+    type: any;
+}
 /**
  * Start download - open download view in new window.
  *
@@ -422,28 +428,44 @@ export function downloadItems(items: any) {
  * @param {String} params
  */
 export function submitDownloadItems(items: any, params: any) {
-    return (dispatch: any, getState: any) => {
+    return async (dispatch: any, getState: any) => {
         const {format, secondaryFormat} = params;
         const userContext = context(getState());
-        let uri = `/download/${items.join(',')}?format=${format}&type=${userContext}`;
+        const payload: DownloadPayload = {
+            items,
+            format,
+            type: userContext,
+        };
+
+        let url = '/download';
         if (userContext === 'monitoring') {
             const monitoringProfile = get(getState(), 'search.activeNavigation[0]');
-            uri = `/monitoring/export/${items.join(',')}?format=${format}&monitoring_profile=${monitoringProfile}`;
-            uri = `${uri}&secondary_format=${secondaryFormat}`;
+            url = `/monitoring/export/${items.join(',')}?format=${format}&monitoring_profile=${monitoringProfile}`;
+            url = `${url}&secondary_format=${secondaryFormat}`;
+            initiateDownload(url);
         }
-        browserDownload(uri);
+        else{
+            try {
+                const response = await server.post(url, payload);
+                const blob = await response.blob();
+                initiateDownload(blob);
+            } catch (error) {
+                console.error('Error downloading file:', error);
+            }
+        }
         dispatch(setDownloadItems(items));
         dispatch(closeModal());
         analytics.multiItemEvent('download', items.map((_id: any) => getState().itemsById[_id]));
     };
 }
 
-function browserDownload(url: any) {
+function initiateDownload(source: string | Blob) {
     const link = document.createElement('a');
     link.download = '';
-    link.href = url;
+    link.href = typeof source === 'string' ? source : URL.createObjectURL(source);
     link.click();
 }
+
 
 export const REMOVE_NEW_ITEMS = 'REMOVE_NEW_ITEMS';
 export function removeNewItems(data: any) {
@@ -503,6 +525,33 @@ export function reloadMyTopics(reloadTopic: any = false) {
                 }
             })
             .catch(errorHandler);
+    };
+}
+
+export const UPDATE_FOLDERS = 'UPDATE_FOLDERS';
+
+/**
+ * @param {bool} global - fetch company or user folders
+ * @param {bool} skipDispatch - if true it won't replace folders in store
+ */
+export function fetchFoldersWire(companyId: string, userId: string) {
+    return (dispatch: any, getState: any) => {
+        const state = getState();
+        const companyTopicsUrl = getFoldersUrl(companyId, userId, true);
+        const userTopicsUrl = getFoldersUrl(companyId, userId, false);
+
+        return Promise.all([
+            state.company ? server.get(companyTopicsUrl).then(({_items}: {_items: Array<any>}) => _items) : Promise.resolve([]),
+            server.get(userTopicsUrl).then(({_items}: {_items: Array<any>}) => _items),
+        ]).then(([companyFolders, userFolders]) => {
+            dispatch({
+                type: UPDATE_FOLDERS,
+                payload: {
+                    companyFolders: companyFolders,
+                    userFolders: userFolders,
+                },
+            });
+        });
     };
 }
 

@@ -42,6 +42,7 @@ import {searchParamsSelector, searchFilterSelector} from 'search/selectors';
 
 import {clearAgendaDropdownFilters} from '../local-store';
 import {getLocations, getMapSource} from '../maps/utils';
+import {ILocation} from 'interfaces/agenda';
 
 const WATCH_URL = '/agenda_watch';
 const WATCH_COVERAGE_URL = '/agenda_coverage_watch';
@@ -254,6 +255,10 @@ function search(state: IAgendaState, fetchFrom: number): Promise<IRestApiRespons
     return server.get(`/agenda/search?${queryString}&tick=${Date.now().toString()}`);
 }
 
+export const LOADING_AGGREGATIONS = 'LOADING_AGGREGATIONS';
+function loadingAggregations() {
+    return {type: LOADING_AGGREGATIONS};
+}
 /**
  * Fetch items for current query
  */
@@ -261,6 +266,7 @@ export function fetchItems(): AgendaThunkAction {
     return (dispatch, getState) => {
         const start = Date.now();
         dispatch(queryItems());
+        dispatch(loadingAggregations());
         return search(getState(), 0)
             .then((data) => {
                 dispatch(recieveItems(data));
@@ -566,9 +572,9 @@ export const SET_NEW_ITEM = 'SET_NEW_ITEM';
 export function setAndUpdateNewItems(data: any) {
     return function(dispatch: any, getState: any) {
         const item = data.item || {};
+        const state = getState();
 
         if (item.type !== 'agenda') {
-            const state = getState();
 
             // Check if the item is used in the preview or opened agenda item
             // If yes, make it available to the preview
@@ -590,8 +596,20 @@ export function setAndUpdateNewItems(data: any) {
             return Promise.resolve();
         }
 
-        dispatch(updateItem(item));
+        const {itemsById} = state;
+        const prevItem = itemsById[item['_id']];
 
+        // If coverage is updated in the item fetch all items and reintilized group listing.
+        if (prevItem && prevItem.coverages?.length !== item?.coverages?.length) {
+            dispatch(fetchItems());
+        } else {
+            dispatch(updateItem(item));
+            if (item.item_type === 'event' && item.planning_items && item.planning_items.length > 0) {
+                item.planning_items.forEach((plan: IAgendaItem) => {
+                    dispatch(fetchItem(plan._id));}
+                );
+            }
+        }
         // Do not use 'killed' items for new-item notifications
         if (item.state === 'killed') {
             return Promise.resolve();
@@ -607,7 +625,7 @@ export function updateItem(item: any) {
     return {type: UPDATE_ITEM, item: item};
 }
 
-export function toggleDropdownFilter(key: any, val: any) {
+export function toggleDropdownFilter(key: any, val: any, single = true) {
     return (dispatch: any) => {
         dispatch(setActive(null));
         dispatch(preview(null));
@@ -615,16 +633,16 @@ export function toggleDropdownFilter(key: any, val: any) {
         if (key === 'itemType') {
             dispatch(setItemTypeFilter(val));
         } else if (key === 'location') {
-            dispatch(setLocationFilter(val));
+            dispatch(toggleLocationFilter(val));
         } else {
-            dispatch(toggleFilter(key, val, true));
+            dispatch(toggleFilter(key, val, single));
         }
 
         dispatch(fetchItems());
     };
 }
 
-function setLocationFilter(location: any) {
+function toggleLocationFilter(location: ILocation) {
     return (dispatch: any, getState: any) => {
         const state = getState();
         const currentFilters = cloneDeep(searchFilterSelector(state));

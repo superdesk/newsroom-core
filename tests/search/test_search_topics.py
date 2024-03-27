@@ -26,7 +26,7 @@ def test_get_topic_query_wire(app):
 
         assert search is not None
         assert "bool" in search.query
-        assert {"terms": {"_id": ["item-id"]}} in search.query["bool"]["filter"]
+        assert {"terms": {"_id": ["item-id"]}} in search.query["bool"]["must"]
         assert "aggs" not in search.query
 
         assert_no_aggs(service, search)

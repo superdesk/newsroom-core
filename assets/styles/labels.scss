@@ -28,6 +28,7 @@ $label-text-colors: (
 );
 
 $labels-palette: (
+  top-story: var(--color-top-story),
   blue: $main-blue,
   green: $green,
   green-dark: $green-dark,
@@ -106,6 +107,34 @@ $labels-palette: (
 
 .label--rounded {
     border-radius: var(--border-radius--full);
+    font-size: 10px;
+    letter-spacing: 0.125em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: default;
+    border-color: transparent;
+    font-weight: 600;
+    background-color: hsla(0, 0%, 60%, 0.25);
+    color: var(--color-text--muted);
+    &.label--alert {
+        background-color: alpha(var(--color-alert), 0.25);
+        color: lightness(var(--color-alert), 0.85);
+    }
+    &.label--big,
+    &.label--large {
+        --label-height: 24px;
+        font-size: 11px;
+        line-height: 1;
+        padding: 0 var(--space--1-5);
+    }
+    &.label--top-story {
+        padding: 0 var(--space--1-5) 0 var(--space--3);
+        background-image: url('/static/star.svg');
+        background-repeat: no-repeat;
+        background-position: 8px center;
+    }
+
 }
 
 .label + .label {

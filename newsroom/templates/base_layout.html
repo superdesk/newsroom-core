@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% block meta %}{% endblock %}
 
     {% block title_wrapper %}
     <title>{{ config.SITE_NAME }}{% if self.title() %} - {% endif %}{% block title %}{% endblock %}</title>
@@ -19,10 +20,14 @@
         href="{{ theme_url('favicon.ico') }}">
     <link rel="stylesheet" href="/static/primeicons.css"/>
 
-{{ javascript_tag('common') | safe }}
-{{ javascript_tag('newsroom_css') | safe }}
-<link rel="stylesheet" href="{{ theme_url('theme.css') }}"/>
-{% block sectioncss %}{% endblock %}
+    {{ javascript_tag('common') | safe }}
+    {{ javascript_tag('newsroom_css') | safe }}
+    <link rel="stylesheet" href="{{ theme_url('theme.css') }}"/>
+    {% block sectioncss %}{% endblock %}
+
+    {% block head %}
+    {% endblock %}
+
 </head>
 <body>
 
@@ -68,15 +73,21 @@
 
     <div class="contentWrap {% block custom_content_style %}{% endblock %}">
         {% if session.get('name') %}
-        <nav class="sidenav">
+        <nav id="nav" class="nav-block">
             <h3 class="a11y-only">{{ gettext('Side Navigation') }}</h3>
-            <ul class="sidenav-icons">
+            <ul class="sidenav">
+
+                <li className='d-phone-none'>
+                    <button id="pin-btn" class='nav-block__pin-button' title="{{ gettext('Expand') }}">
+                        <i class="icon--arrow-end" role='presentation'></i>
+                    </button>
+                </li>
 
                 {% block default_navs %}
                     {% for group in range(0, 10) %}
                         {% for nav in sidenavs(request.blueprint)|selectattr("group", "equalto", group) %}
                         {% if group > 0 and loop.first and loop.length %}
-                        <li class="sidenav-icons__separator">
+                        <li class="sidenav__separator" role="presentation">
                             <span class="separator__dot" aria-hidden="true"></span>
                             <span class="separator__dot" aria-hidden="true"></span>
                             <span class="separator__dot" aria-hidden="true"></span>
@@ -89,10 +100,10 @@
                     {% endfor %}
                 {%  endblock %}
 
-                <li class="sidenav-icons__stretch-separator"></li>
+                <li class="sidenav__stretch-separator" role="presentation"></li>
 
                 {% if is_company_admin() %}
-                <li class="sidenav-icons__item  {% if request.endpoint == 'company_admin.index' %}active{% endif %}">
+                <li class="sidenav__item  {% if request.endpoint == 'company_admin.index' %}active{% endif %}">
                     <a
                         href="{{ url_for('company_admin.index') }}"
                         title="{{ gettext('Company Admin') }}"
@@ -102,42 +113,49 @@
                         data-bs-placement="right"
                         data-test-id="sidenav-link-company_admin"
                     >
-                        <i class="icon--cog"></i>
-                        <div class="sidenav-icons__item-title">{{ gettext('Company Admin') }}</div>
+                        <span class="sidenav__item-icon">
+                            <i class="icon--cog" role="presentation"></i>
+                        </span>   
+                        <span class="sidenav__item-title">{{ gettext('Company Admin') }}</span>
                     </a>
                 </li>
                 {% endif %}
 
                 {% if is_admin_or_account_manager() %}
-                <li class="sidenav-icons__item  {% if request.endpoint == 'reports.company_reports' %}active{% endif %}">
-                  <a
-                      href="{{ url_for('reports.company_reports') }}"
-                      title="{{ gettext('Reports') }}"
-                      aria-label="{{ gettext('Reports') }}"
-                      role="button"
-                      data-bs-toggle="tooltip"
-                      data-bs-placement="right"
-                      data-test-id="sidenav-link-reports"
-                  >
-                      <i class="icon--report"></i>
-                      <div class="sidenav-icons__item-title">{{ gettext('Reports') }}</div>
-                  </a>
+                <li class="sidenav__item  {% if request.endpoint == 'reports.company_reports' %}active{% endif %}">
+                    <a
+                        href="{{ url_for('reports.company_reports') }}"
+                        title="{{ gettext('Reports') }}"
+                        aria-label="{{ gettext('Reports') }}"
+                        role="button"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="right"
+                        data-test-id="sidenav-link-reports"
+                    >
+                        <span class="sidenav__item-icon">
+                            <i class="icon--report"></i>
+                        </span>    
+                    
+                        <span class="sidenav__item-title">{{ gettext('Reports') }}</span>
+                    </a>
                 </li>
                 {% endif %}
                 {% for app in settings_apps|sort(attribute='weight') %}{% if loop.first and is_admin() %}
-                <li class="sidenav-icons__item  {% if request.blueprint == 'settings' %}active{% endif %}">
-                  <a
-                      href="{{ url_for('settings.app', app_id=app._id) }}"
-                      title="{{ gettext('Settings') }}"
-                      aria-label="{{ gettext('Settings') }}"
-                      role="button"
-                      data-bs-toggle="tooltip"
-                      data-bs-placement="right"
-                      data-test-id="sidenav-link-settings"
-                  >
-                      <i class="icon--cog"></i>
-                      <div class="sidenav-icons__item-title">{{ gettext('Settings') }}</div>
-                  </a>
+                <li class="sidenav__item  {% if request.blueprint == 'settings' %}active{% endif %}">
+                    <a
+                        href="{{ url_for('settings.app', app_id=app._id) }}"
+                        title="{{ gettext('Settings') }}"
+                        aria-label="{{ gettext('Settings') }}"
+                        role="button"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="right"
+                        data-test-id="sidenav-link-settings"
+                    >
+                        <span class="sidenav__item-icon">
+                            <i class="icon--cog" role="presentation"></i>
+                        </span>
+                        <span class="sidenav__item-title">{{ gettext('Settings') }}</span>
+                    </a>
                 </li>
                 {% endif %}{% endfor %}
             </ul>
@@ -162,6 +180,9 @@
 {% include "scripts.html" %}
 
 {% block script %}
+{% endblock %}
+
+{% block layout_script %}
 {% endblock %}
 
 </body>

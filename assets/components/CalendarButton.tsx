@@ -5,6 +5,8 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import CalendarButtonWrapper from './CalendarButtonWrapper';
 import {EARLIEST_DATE} from '../agenda/utils';
+import {registerLocale} from  'react-datepicker';
+import * as locales from 'date-fns/locale';
 
 class CalendarButton extends React.Component<any, any> {
     static propTypes: any;
@@ -24,7 +26,21 @@ class CalendarButton extends React.Component<any, any> {
         prevProps.activeDate === EARLIEST_DATE && this.setState({startDate: moment(this.props.activeDate)});
     }
 
+    getLocale = () => {
+        const locale = window.locale.replace('_', '');
+        const rootLocale = locale.substring(0, 2);
+        const allLocales = locales as any;
+
+        return allLocales[locale] ?? allLocales[rootLocale];
+    };
+
     render() {
+        const locale = this.getLocale();
+
+        if (locale != undefined) {
+            registerLocale(locale.code, locale);
+        }
+
         const isStartDateToday = moment.isMoment(this.state.startDate) && !this.state.startDate.isSame(moment(), 'day');
         const datePicker = (
             <DatePicker
@@ -34,7 +50,7 @@ class CalendarButton extends React.Component<any, any> {
                 selected={this.state.startDate}
                 onChange={this.handleChange}
                 highlightDates={[moment().toDate()]}
-                locale={window.locale || 'en'}
+                locale={locale?.code ?? 'en'}
                 popperModifiers={[
                     {
                         name: 'offset',

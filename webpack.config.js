@@ -37,6 +37,7 @@ const config = {
         firebase_login_js: path.resolve(__dirname, 'assets/auth/firebase/login.ts'),
         firebase_reset_password_js: path.resolve(__dirname, 'assets/auth/firebase/reset_password.ts'),
         firebase_change_password_js: path.resolve(__dirname, 'assets/auth/firebase/change_password.ts'),
+        public_js: path.resolve(__dirname, 'assets/public/index.ts'),
     },
     output: {
         path: path.resolve(process.cwd(), 'dist'),

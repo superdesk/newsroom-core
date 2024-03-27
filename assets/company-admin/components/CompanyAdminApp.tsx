@@ -205,6 +205,7 @@ class CompanyAdminAppComponent extends React.Component<IProps, IState> {
                                     onClick={() => {
                                         this.props.setSection('users');
                                         this.props.setQuery('');
+                                        this.props.fetchUsers();
                                     }}
                                     className={classNames(
                                         'toggle-button',

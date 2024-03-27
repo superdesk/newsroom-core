@@ -39,14 +39,14 @@ export default function AgendaTime({item, children}: any) {
                     getClassNames(),
                     getClassNames('remote'),
                     {'p-0': isItemTBC})}>
-                    {formatAgendaDate(new_dates, undefined, {localTimeZone: false})}
+                    {formatAgendaDate(new_dates, {localTimeZone: false})}
                 </div>
             );
         }
 
         return (
             <div key='time' className={getClassNames('event')}>
-                {formatAgendaDate(item, undefined, {})}
+                {formatAgendaDate(item, {})}
             </div>
         );
     };

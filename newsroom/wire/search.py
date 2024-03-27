@@ -142,7 +142,7 @@ class WireSearchService(BaseSearchService):
                 exc_info=True,
             )
 
-    def get_product_items(self, product_id, size):
+    def get_product_items(self, product_id: str, size: int, exclude_embargoed: bool = False):
         search = SearchQuery()
         self.prefill_search_args(search)
         self.prefill_search_items(search)
@@ -156,12 +156,13 @@ class WireSearchService(BaseSearchService):
         if not product:
             return []
 
-        if not app.config["DASHBOARD_EMBARGOED"]:
+        if not app.config["DASHBOARD_EMBARGOED"] or exclude_embargoed:
+            embargo_query_rounding = app.config.get("EMBARGO_QUERY_ROUNDING")
             search.query["bool"]["filter"].append(
                 {
                     "bool": {
                         "should": [
-                            {"range": {"embargoed": {"lt": "now"}}},
+                            {"range": {"embargoed": {"lt": f"now{embargo_query_rounding}"}}},
                             {"bool": {"must_not": {"exists": {"field": "embargoed"}}}},
                         ]
                     }
@@ -182,6 +183,7 @@ class WireSearchService(BaseSearchService):
 
         self.gen_source_from_search(search)
         search.source["post_filter"] = {"bool": {"filter": []}}
+        search.source.pop("aggs", None)
         internal_req = self.get_internal_request(search)
 
         return list(self.internal_get(internal_req, None))
@@ -252,10 +254,9 @@ class WireSearchService(BaseSearchService):
                         {"term": {"type": "composite"}},
                         {"constant_score": {"filter": {"exists": {"field": "nextversion"}}}},
                     ],
-                    "filter": [{"term": {"_id": item_id}}],
+                    "must": [{"term": {"_id": item_id}}],
                     "should": [],
-                    "must": [],
-                }
+                },
             },
         )
 

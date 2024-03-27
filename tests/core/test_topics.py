@@ -378,3 +378,75 @@ def test_topic_subscriber_auto_enable_user_emails(app, auth_client):
     # And make sure user emails are re-enabled again
     user = get_resource_by_id("users", PUBLIC_USER_ID)
     assert user["receive_email"] is True
+
+
+def test_remove_user_topics_on_user_delete(client, app):
+    app.data.insert(
+        "topics",
+        [
+            {
+                "label": "test1",
+                "user": PUBLIC_USER_ID,
+                "is_global": False,
+            },
+            {
+                "label": "test2",
+                "subscribers": [
+                    {
+                        "user_id": PUBLIC_USER_ID,
+                        "notification_type": "real-time",
+                    },
+                    {
+                        "user_id": TEST_USER_ID,
+                        "notification_type": "real-time",
+                    },
+                ],
+            },
+            {
+                "label": "test3",
+                "user": PUBLIC_USER_ID,
+                "is_global": True,
+                "subscribers": [
+                    {
+                        "user_id": PUBLIC_USER_ID,
+                        "notification_type": "real-time",
+                    },
+                    {
+                        "user_id": TEST_USER_ID,
+                        "notification_type": "real-time",
+                    },
+                ],
+            },
+        ],
+    )
+
+    app.data.insert(
+        "user_topic_folders",
+        [
+            {"name": "delete", "user": PUBLIC_USER_ID},
+            {"name": "skip", "user": TEST_USER_ID},
+        ],
+    )
+
+    topics, _ = app.data.find("topics", req=None, lookup=None)
+    assert 3 == topics.count()
+
+    folders, _ = app.data.find("user_topic_folders", req=None, lookup=None)
+    assert 2 == folders.count()
+
+    client.delete(f"/users/{PUBLIC_USER_ID}")
+
+    # make sure it's editable later
+    resp = client.get(f"/api/users/{PUBLIC_USER_ID}/topics")
+    assert 200 == resp.status_code
+
+    topics, _ = app.data.find("topics", req=None, lookup=None)
+    assert 2 == topics.count()
+    assert "test2" == topics[0]["label"]
+    assert 1 == len(topics[0]["subscribers"])
+    assert "test3" == topics[1]["label"]
+    assert None is topics[1].get("user")
+
+    folders, _ = app.data.find("user_topic_folders", req=None, lookup=None)
+    assert 1 == folders.count()
+    assert "skip" == folders[0]["name"]

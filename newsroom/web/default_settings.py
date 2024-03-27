@@ -116,7 +116,7 @@ BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
 BLUEPRINTS = [
     "newsroom.wire",
-    "newsroom.auth",
+    "newsroom.auth.views",
     "newsroom.users",
     "newsroom.companies",
     "newsroom.design",
@@ -248,6 +248,9 @@ NEWS_ONLY_FILTERS = [
     {"match": {"source": "PMF"}},
 ]
 
+# avoid conflict with superdesk
+SESSION_COOKIE_NAME = "newsroom_session"
+
 # the lifetime of a permanent session in seconds
 PERMANENT_SESSION_LIFETIME = 604800  # 7 days
 
@@ -361,6 +364,38 @@ CLIENT_CONFIG = {
         },
     },
     "scheduled_notifications": {"default_times": DEFAULT_SCHEDULED_NOTIFICATION_TIMES},
+    "coverage_status_filter": {
+        "not planned": {
+            "enabled": True,
+            "index": 1,
+            "option_label": lazy_gettext("No Coverage"),
+            "button_label": lazy_gettext("No Coverage"),
+        },
+        "planned": {
+            "enabled": True,
+            "index": 2,
+            "option_label": lazy_gettext("Is Planned"),
+            "button_label": lazy_gettext("Is Planned"),
+        },
+        "may be": {
+            "enabled": True,
+            "index": 3,
+            "option_label": lazy_gettext("Not Decided / On Request"),
+            "button_label": lazy_gettext("Not Decided / On Request"),
+        },
+        "not intended": {
+            "enabled": True,
+            "index": 4,
+            "option_label": lazy_gettext("Not Intended / Cancelled"),
+            "button_label": lazy_gettext("Not Intended / Cancelled"),
+        },
+        "completed": {
+            "enabled": True,
+            "index": 5,
+            "option_label": lazy_gettext("Completed"),
+            "button_label": lazy_gettext("Completed"),
+        },
+    },
 }
 
 # Enable rendering of the date in the base view
@@ -411,10 +446,12 @@ CELERY_BEAT_SCHEDULE = {
     "newsroom:monitoring_schedule_alerts": {
         "task": "newsroom.monitoring.email_alerts.monitoring_schedule_alerts",
         "schedule": timedelta(seconds=60),
+        "options": {"expires": 59},  # if the task is not executed within 59 seconds, it will be discarded
     },
     "newsroom:monitoring_immediate_alerts": {
         "task": "newsroom.monitoring.email_alerts.monitoring_immediate_alerts",
         "schedule": timedelta(seconds=60),
+        "options": {"expires": 59},  # if the task is not executed within 59 seconds, it will be discarded
     },
     "newsroom:remove_expired_content_api": {
         "task": "content_api.commands.item_expiry",
@@ -427,6 +464,7 @@ CELERY_BEAT_SCHEDULE = {
     "newsroom:send_scheduled_notifications": {
         "task": "newsroom.notifications.send_scheduled_notifications.send_scheduled_notifications",
         "schedule": crontab(minute="*/5"),
+        "options": {"expires": 5 * 60 - 1},
     },
 }
 
@@ -684,3 +722,68 @@ WIRE_NOTIFICATIONS_ON_CORRECTIONS = False
 #: .. versionadded: 2.6
 #:
 SOURCE_EXPIRY_DAYS: Dict[str, int] = {}
+
+#: If `True` will enable the Public Dashboard feature
+#:
+#: .. versionadded: 2.6
+#:
+PUBLIC_DASHBOARD = False
+
+#: The timeout used on the content cache for public pages
+#:
+#: .. versionadded: 2.6
+#:
+PUBLIC_CONTENT_CACHE_TIMEOUT = 240
+
+#: List of Wire item fields to keep when accessing from public dashboard
+#:
+#: .. versionadded: 2.6
+#:
+PUBLIC_WIRE_ALLOWED_FIELDS = [
+    "_id",
+    "guid",
+    "type",
+    "slugline",
+    "headline",
+    "anpa_take_key",
+    "description_html",
+    "description_text",
+    "abstract",
+    "body_html",
+    "source",
+    "versioncreated",
+    "wordcount",
+    "charcount",
+    "byline",
+    "copyrightnotice",
+    "language",
+    "mimetype",
+    "priority",
+    "urgency",
+    "usageterms",
+    "version",
+    "renditions",
+]
+
+#: Filter subject based on this config in the Formatter
+
+AGENDA_CSV_SUBJECT_SCHEMES = []
+
+#: Round ``now`` when querying for embargoed items
+#: Common options are:
+# "" - No rounding
+# "/m" - Round ``now`` down to nearest minute
+# "/h" - Round ``now`` down to nearest hour
+#:
+#: .. versionadded:: 2.5.0
+#:
+EMBARGO_QUERY_ROUNDING = "/m"
+
+#: Language to Email Sender map
+#: When sending an email, the system will attempt to use the sender from this map
+#: based on the language from the user profile, falling back to ``MAIL_DEFAULT_SENDER`` if not found
+#:
+#: .. versionadded: 2.6.0
+#:
+EMAIL_DEFAULT_SENDER_NAME = None
+EMAIL_SENDER_NAME_LANGUAGE_MAP = {}

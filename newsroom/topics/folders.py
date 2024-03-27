@@ -1,5 +1,8 @@
 import newsroom
+import superdesk
+
 from newsroom.user_roles import UserRole
+from newsroom.signals import user_deleted
 
 from . import topics
 
@@ -65,9 +68,16 @@ class CompanyFoldersResource(FoldersResource):
 
 
 class FoldersService(newsroom.Service):
+    def __init__(self, datasource: str, backend=None):
+        super().__init__(datasource, backend)
+        user_deleted.connect(self.on_user_deleted)
+
     def on_deleted(self, doc):
         self.delete_action({"parent": doc["_id"]})
         topics.topics_service.delete_action({"folder": doc["_id"]})
+
+    def on_user_deleted(self, sender, user, **kwargs):
+        self.delete_action({"user": user["_id"]})
 
 
 class UserFoldersService(FoldersService):
@@ -76,3 +86,6 @@ class UserFoldersService(FoldersService):
 
 class CompanyFoldersService(FoldersService):
     pass
+
+
+folders_service = FoldersService("topic_folders", superdesk.get_backend())

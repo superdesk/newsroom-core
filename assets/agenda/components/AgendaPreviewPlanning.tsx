@@ -62,7 +62,7 @@ export class AgendaPreviewPlanning extends React.Component<any, any> {
                     <div className="agenda-planning__container info-box">
                         <div className="info-box__content">
                             <span className="info-box__label">
-                                {gettext('Other Planning Items')}
+                                {plan == null ? gettext('Planning Items') : gettext('Other Planning Items')}
                             </span>
                             {otherPlanningItems.map((planningItem: any) => (
                                 <AgendaPreviewCoverages

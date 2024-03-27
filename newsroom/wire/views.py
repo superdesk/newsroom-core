@@ -4,7 +4,6 @@ import flask
 import zipfile
 import superdesk
 
-from bson import ObjectId
 from operator import itemgetter
 from flask import current_app as app, request, jsonify
 from eve.render import send_response
@@ -15,14 +14,14 @@ from flask_babel import gettext
 from superdesk.utc import utcnow
 from superdesk import get_resource_service
 from superdesk.default_settings import strtobool
-from newsroom.auth.utils import check_user_has_products
+from newsroom.auth.utils import check_user_has_products, is_valid_session
 
-from newsroom.navigations.navigations import get_navigations_by_company
+from newsroom.navigations.navigations import get_navigations_by_user, get_navigations_by_company
 from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
 from newsroom.wire.utils import update_action_list
 from newsroom.auth import get_company, get_user, get_user_id, get_user_required
-from newsroom.decorator import login_required, admin_only, section
+from newsroom.decorator import login_required, admin_only, section, clear_session_and_redirect_to_login
 from newsroom.topics import get_user_topics, get_user_folders, get_company_folders
 from newsroom.email import send_template_email, get_language_template_name
 from newsroom.utils import (
@@ -46,8 +45,15 @@ from newsroom.notifications import (
 )
 from newsroom.template_filters import is_admin_or_internal
 from newsroom.gettext import get_session_locale
+from newsroom.public.views import (
+    render_public_dashboard,
+    PUBLIC_DASHBOARD_CONFIG_CACHE_KEY,
+    PUBLIC_DASHBOARD_CARDS_CACHE_KEY,
+    PUBLIC_DASHBOARD_ITEMS_CACHE_KEY,
+)
 
 from .search import get_bookmarks_count
+from .items import get_items_for_dashboard
 from ..upload import ASSETS_RESOURCE, get_upload
 
 HOME_ITEMS_CACHE_KEY = "home_items"
@@ -102,7 +108,8 @@ def get_view_data() -> Dict:
             for f in app.download_formatters.values()
             if "wire" in f["types"]
         ],
-        "navigations": get_navigations_by_company(company, product_type="wire") if company else [],
+        "navigations": (get_navigations_by_user(user, "wire") if user else [])
+        + (get_navigations_by_company(company, "wire") if company else []),
         "products": products,
         "saved_items": get_bookmarks_count(user["_id"], "wire"),
         "context": "wire",
@@ -118,23 +125,16 @@ def get_items_by_card(cards, company_id):
     if app.cache.get(cache_key):
         return app.cache.get(cache_key)
 
-    items_by_card = {}
-    for card in cards:
-        if card["config"].get("product"):
-            items_by_card[card["label"]] = superdesk.get_resource_service("wire_search").get_product_items(
-                ObjectId(card["config"]["product"]), card["config"]["size"]
-            )
-        elif card["type"] == "4-photo-gallery":
-            # Omit external media, let the client manually request these
-            # using '/media_card_external' endpoint
-            items_by_card[card["label"]] = None
-
+    items_by_card = get_items_for_dashboard(cards)
     app.cache.set(cache_key, items_by_card, timeout=app.config.get("DASHBOARD_CACHE_TIMEOUT", 300))
     return items_by_card
 
 
 def delete_dashboard_caches():
     app.cache.delete(HOME_ITEMS_CACHE_KEY)
+    app.cache.delete(PUBLIC_DASHBOARD_CONFIG_CACHE_KEY)
+    app.cache.delete(PUBLIC_DASHBOARD_CARDS_CACHE_KEY)
+    app.cache.delete(PUBLIC_DASHBOARD_ITEMS_CACHE_KEY)
     for company in query_resource("companies"):
         app.cache.delete(f"{HOME_ITEMS_CACHE_KEY}{company['_id']}")
 
@@ -142,6 +142,8 @@ def delete_dashboard_caches():
 def get_personal_dashboards_data(user, company, topics):
     def get_topic_items(topic):
         query = superdesk.get_resource_service("wire_search").get_topic_query(topic, user, company)
+        if not query:
+            return list()
         return list(superdesk.get_resource_service("wire_search").get_items_by_query(query, size=4))
 
     def _get_topic_data(topic_id):
@@ -183,6 +185,7 @@ def get_home_data():
         "userProducts": user.get("products") or [],
         "userType": user.get("user_type"),
         "company": company_id,
+        "companyProducts": company.get("products") if company else [],
         "formats": [
             {
                 "format": f["format"],
@@ -208,8 +211,12 @@ def get_previous_versions(item):
 
 
 @blueprint.route("/")
-@login_required
 def index():
+    if not is_valid_session():
+        return (
+            render_public_dashboard() if app.config.get("PUBLIC_DASHBOARD") else clear_session_and_redirect_to_login()
+        )
+
     return flask.render_template("home.html", data=get_home_data())
 
 
@@ -267,14 +274,14 @@ def search():
     return send_response("wire_search", response)
 
 
-@blueprint.route("/download/<_ids>")
+@blueprint.route("/download", methods=["POST"])
 @login_required
-def download(_ids):
+def download():
     user = get_user(required=True)
-    _format = flask.request.args.get("format", "text")
-    item_type = get_type()
-    items = get_items_for_user_action(_ids.split(","), item_type)
-
+    data = flask.request.json
+    _format = data.get("format", "text")
+    item_type = get_type(data.get("type"))
+    items = get_items_for_user_action(data["items"], item_type)
     _file = io.BytesIO()
     formatter = app.download_formatters[_format]["formatter"]
     mimetype = None
@@ -319,7 +326,7 @@ def download(_ids):
                 )
         _file.seek(0)
 
-    update_action_list(_ids.split(","), "downloads", force_insert=True)
+    update_action_list(data["items"], "downloads", force_insert=True)
     get_resource_service("history").create_history_record(items, "download", user, request.args.get("type", "wire"))
     return flask.send_file(
         _file,

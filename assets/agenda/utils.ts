@@ -47,8 +47,10 @@ const Groupers: any = {
     'month': formatMonth,
 };
 
+const COVERAGE_INTENDED = 'coverage intended';
+
 export function getCoverageStatusText(coverage: any) {
-    if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
+    if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT || coverage.coverage_status !== COVERAGE_INTENDED) {
         return get(DRAFT_STATUS_TEXTS, coverage.coverage_status, '');
     }
 
@@ -646,7 +648,7 @@ export function getExtraDates(item: IAgendaItem): Array<moment.Moment> {
  * @param item: Event or Planning item
  * @returns {Array.<{date: moment.Moment}>}
  */
-export function getDisplayDates(item: IAgendaItem): Array<{date: string}> {
+function getDisplayDates(item: IAgendaItem): Array<{date: string}> {
     if (item._hits == null || item._hits.matched_planning_items == null) {
         return item.display_dates ?? [];
     } else if (item.planning_items == null || item.planning_items.length === 0) {
@@ -693,14 +695,10 @@ export function getDisplayDates(item: IAgendaItem): Array<{date: string}> {
 
 /**
  * Checks if a date is in extra dates
- *
- * @param {Object} item
- * @param {Date} date to check (moment)
- * @return {Boolean}
  */
-export function containsExtraDate(item: IAgendaItem, dateToCheck: moment.Moment) {
-    return getDisplayDates(item)
-        .map((ed) => moment(ed.date).format('YYYY-MM-DD'))
+function containsExtraDate(dateToCheck: moment.Moment, extraDates: Array<moment.Moment>) {
+    return extraDates
+        .map((ed) => ed.format('YYYY-MM-DD'))
         .includes(dateToCheck.format('YYYY-MM-DD'));
 }
 
@@ -764,7 +762,8 @@ export function groupItems(
         .filter((item) => (
             (item.planning_items?.length ?? 0) === 0 ||
             item._hits?.matched_planning_items == null ||
-            item._hits?.matched_planning_items.length > 0
+            item._hits?.matched_planning_items.length > 0 ||
+            item._hits?.matched_coverages?.length
         ))
         .forEach((item) => {
             const itemExtraDates = getExtraDates(item);
@@ -785,7 +784,6 @@ export function groupItems(
             }
 
             const itemEndDate = getEndDate(item);
-            const scheduleType = getScheduleType(item);
 
             // If item is an event and was actioned (postponed, rescheduled, cancelled only incase of multi-day event)
             // actioned_date is set. In this case, use that as the cut off date.
@@ -821,10 +819,7 @@ export function groupItems(
             // use clone otherwise it would modify start and potentially also maxStart, moments are mutable
             for (const day = start.clone(); day.isSameOrBefore(end, 'day'); day.add(1, 'd')) {
                 const isBetween = isBetweenDay(day, itemStartDate, itemEndDate, item.dates.all_day, item.dates.no_end_time);
-                const containsExtra = containsExtraDate(item, day);
-                const addGroupItem: boolean = (item.event == null || item._hits?.matched_planning_items != null) && itemExtraDates.length ?
-                    containsExtra || (scheduleType === SCHEDULE_TYPE.MULTI_DAY && isBetween) :
-                    isBetween || containsExtra;
+                const addGroupItem = isBetween || containsExtraDate(day, itemExtraDates);
 
                 if (grouper(day) !== key && addGroupItem) {
                     key = grouper(day);
@@ -837,12 +832,10 @@ export function groupItems(
         });
 
     const groupedItemIds: {[group: string]: {day: Array<IAgendaItem['_id']>, hiddenItems: Array<IAgendaItem['_id']>}} = {};
-    const sortDates: {[date: string]: moment.Moment} = {};
 
     if (featuredOnly) {
         Object.keys(groupedItems).forEach((dateString) => {
             groupedItemIds[dateString] = {day: groupedItems[dateString].map((i) => i._id), hiddenItems: []};
-            sortDates[dateString] = moment(dateString, DATE_FORMAT);
         });
     } else {
         Object.keys(groupedItems).forEach((dateString) => {
@@ -870,20 +863,28 @@ export function groupItems(
                 ],
                 hiddenItems: hiddenItems,
             };
-            sortDates[dateString] = moment(dateString, DATE_FORMAT);
         });
     }
 
-    return sortBy(
-        Object.keys(groupedItemIds).map((dateString) => (
-            {
-                date: dateString,
-                items: groupedItemIds[dateString].day,
-                hiddenItems: groupedItemIds[dateString].hiddenItems,
-            }
-        )),
-        (g) => sortDates[g.date]
-    );
+    return sortGroups(Object.keys(groupedItemIds).map((dateString) => (
+        {
+            date: dateString,
+            items: groupedItemIds[dateString].day,
+            hiddenItems: groupedItemIds[dateString].hiddenItems,
+        }
+    )));
+}
+
+export function sortGroups(groups: Array<IAgendaListGroup>): Array<IAgendaListGroup> {
+    const sorted = Array.from(groups);
+    sorted.sort((a, b) => {
+        const aUnix = moment(a.date, DATE_FORMAT).unix();
+        const bUnix = moment(b.date, DATE_FORMAT).unix();
+
+        return aUnix - bUnix;
+    });
+
+    return sorted;
 }
 
 /**
@@ -1033,7 +1034,10 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
         assignee ? gettext('assignee: {{name}}', {name: assignee}) : '',
         desk ? gettext('desk: {{name}}', {name: desk}) : '',
     ].filter((x) => x !== '').join(', ');
-    if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
+
+    if (coverage.coverage_status !== COVERAGE_INTENDED) {
+        return get(DRAFT_STATUS_TEXTS, coverage.coverage_status, '');
+    } else if (coverage.workflow_status === WORKFLOW_STATUS.DRAFT) {
         return gettext('{{ type }} coverage {{ slugline }} {{ status_text }} {{assignedDetails}}', {
             type: coverageType,
             slugline: slugline,
@@ -1115,7 +1119,7 @@ function getScheduleType(item: IAgendaItem): string {
  * @param {Object} options
  * @return {Array} [time string, date string]
  */
-export function formatAgendaDate(item: IAgendaItem, group?: string, {localTimeZone = true, onlyDates = false} = {}) {
+export function formatAgendaDate(item: IAgendaItem, {localTimeZone = true, onlyDates = false} = {}) {
     function getFormattedTimezone(date: moment.Moment): string {
         const tzStr = date.format('z');
         if (tzStr.indexOf('+0') >= 0) {
@@ -1130,27 +1134,8 @@ export function formatAgendaDate(item: IAgendaItem, group?: string, {localTimeZo
     }
 
     const isTBCItem = isItemTBC(item);
-    let start = parseDate(item.dates.start, item.dates.all_day);
+    const start = parseDate(item.dates.start, item.dates.all_day);
     const end = parseDate(item.dates.end, item.dates.all_day || item.dates.no_end_time);
-    const dateGroup = group ? moment(group, DATE_FORMAT) : null;
-
-    const isGroupBetweenEventDates = dateGroup ?
-        start.isSameOrBefore(dateGroup, 'day') && end.isSameOrAfter(dateGroup, 'day') : true;
-
-    if (group != null && !isGroupBetweenEventDates && hasCoverages(item)) {
-        // we rendering for extra days
-        const scheduleDates = (item.coverages ?? [])
-            .filter((coverage) => isCoverageForExtraDay(coverage, group))
-            .map((coverage) => coverage.scheduled)
-            .sort((a, b) => {
-                if (a < b) return -1;
-                if (a > b) return 1;
-                return 0;
-            });
-        if (scheduleDates.length > 0) {
-            start = moment(scheduleDates[0]);
-        }
-    }
 
     const scheduleType = getScheduleType(item);
     const startDate = formatDate(start);
