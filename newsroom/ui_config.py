@@ -1,8 +1,5 @@
-import typing
 import superdesk
 import newsroom
-
-from newsroom.types import DashboardCardType
 
 
 class UIConfigResource(newsroom.Resource):
