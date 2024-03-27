@@ -15,7 +15,7 @@ import {TopicFolderEditor} from './TopicFolderEditor';
 import {noop} from 'lodash';
 import {Button} from 'components/Buttons';
 
-const TOPIC_NAME_MAXLENGTH = 30;
+const TOPIC_NAME_MAXLENGTH = 40;
 
 function getFolderName(topic: ITopic, folders: Array<ITopicFolder>): string {
     const folder = topic.folder ? folders.find((folder: any) => folder._id === topic.folder) : null;
@@ -59,7 +59,7 @@ interface IProps {
 
     changeNotificationType(notificationType: ITopicNotificationScheduleType): void;
     openEditTopicNotificationsModal(): void;
-    saveFolder: (folder: any, data: any, global?: boolean) => void;
+    saveFolder: (folder: any, data: any, global?: boolean) => Promise<ITopicFolder>;
 }
 
 const TopicForm: React.FC<IProps> = ({
@@ -89,13 +89,6 @@ const TopicForm: React.FC<IProps> = ({
 }): React.ReactElement => {
     const topicSubscriptionType = getSubscriptionNotificationType(topic, user._id);
     const [newFolder, setNewFolder] = useState<Partial<ITopicFolder> | null>();
-
-    useEffect(() => {
-        const newlyCreatedFolder = folders.find((x) => x.name === newFolder?.name) as ITopicFolder;
-
-        setNewFolder(null);
-        onFolderChange(newlyCreatedFolder);
-    }, [folders]);
 
     return (
         <form onSubmit={save}>
@@ -185,10 +178,12 @@ const TopicForm: React.FC<IProps> = ({
                                     className="simple-card__group position-relative"
                                 >
                                     <TopicFolderEditor
-                                        onSave={((name) => {
-                                            saveFolder(newFolder, {name}, topic.is_global);
-                                            setNewFolder({name});
-                                        })}
+                                        onSave={((name) =>
+                                            saveFolder(newFolder, {name}, topic.is_global).then((result) => {
+                                                onFolderChange(result);
+                                                setNewFolder(null);
+                                            })
+                                        )}
                                         folder={newFolder}
                                         onCancel={() => setNewFolder(null)}
                                     />
@@ -256,8 +251,6 @@ const TopicForm: React.FC<IProps> = ({
                     <FormSection initiallyOpen={true} name={gettext('Topic details')} dataTestId="topic-form-group--params">
                         <SearchResultTagsList
                             readonly={true}
-                            // Clearing filters isn't available in readOnly mode.
-                            clearQuickFilter={noop}
                             user={user}
                             showSaveTopic={false}
                             showMyTopic={false}

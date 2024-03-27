@@ -1,4 +1,4 @@
-from typing import Dict, NamedTuple, Any, Literal
+from typing import Dict, NamedTuple, Any, Literal, List, Union
 from datetime import timedelta
 
 from flask import current_app as app
@@ -164,6 +164,37 @@ def get_planning_coverages(item, plan_id):
     return [coverage for coverage in item.get("coverages") or [] if coverage.get("planning_id") == plan_id]
 
 
+def get_coverage_status(coverage: Dict[str, Any]) -> str:
+    coverage_status = coverage.get("coverage_status")
+    workflow_status = coverage.get("workflow_status")
+    if workflow_status == ASSIGNMENT_WORKFLOW_STATE.COMPLETED:
+        return gettext("Completed")
+    elif workflow_status == WORKFLOW_STATE.CANCELLED:
+        return gettext("Cancelled")
+    elif coverage_status == "coverage intended":
+        return gettext("Planned")
+    elif coverage_status == "coverage not decided yet":
+        return gettext("Not decided")
+    elif coverage_status == "coverage upon request":
+        return gettext("On request")
+    elif coverage_status == "coverage not intended":
+        return gettext("Cancelled")
+    else:
+        return ""
+
+
+def get_event_state(item: Dict[str, Any]) -> str:
+    event_state = item.get("event", {}).get("state")
+    if event_state == "scheduled":
+        return gettext("Planned")
+    elif event_state == "postponed":
+        return gettext("Postponed")
+    elif event_state == "cancelled":
+        return gettext("Cancelled")
+    else:
+        return ""
+
+
 def get_item_type(item: Dict[str, Any]) -> Literal["event", "planning"]:
     if item.get("item_type") is not None:
         return item["item_type"]
@@ -257,3 +288,14 @@ def push_agenda_item_notification(name, item, **kwargs):
             item=item,
             **kwargs,
         )
+
+
+def get_filtered_subject(
+    subject: List[Dict[str, Any]], schemas: List[str]
+) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
+    """
+    Filter subject based on schemas
+    """
+    if not schemas:
+        return subject
+    return [subj for subj in subject if subj.get("scheme") in schemas]

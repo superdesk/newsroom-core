@@ -15,7 +15,6 @@ from google.auth.transport import requests
 from newsroom.types import AuthProviderType
 from newsroom.decorator import admin_only, login_required
 from newsroom.auth import (
-    blueprint,
     get_auth_user_by_email,
     get_company,
     get_user,
@@ -31,6 +30,7 @@ from newsroom.auth.utils import (
     start_user_session,
     send_token,
     get_company_auth_provider,
+    is_valid_session,
 )
 from newsroom.utils import (
     is_company_enabled,
@@ -46,12 +46,18 @@ from newsroom.limiter import limiter
 from .token import generate_auth_token, verify_auth_token
 
 
+blueprint = flask.Blueprint("auth", __name__)
 logger = logging.getLogger(__name__)
 
 
 @blueprint.route("/login", methods=["GET", "POST"])
 @limiter.limit("60/minute")
 def login():
+    if is_valid_session():
+        # If user has already logged in, then redirect them to the next page
+        # which defaults to the home page
+        return redirect_to_next_url()
+
     form = LoginForm()
 
     if form.validate_on_submit():
@@ -115,7 +121,9 @@ def email_has_exceeded_max_login_attempts(email):
 
     if login_attempt["attempt_count"] == max_attempt_allowed:
         if login_attempt.get("user_id"):
-            get_resource_service("users").patch(id=ObjectId(login_attempt["user_id"]), updates={"is_enabled": False})
+            get_resource_service("auth_user").patch(
+                id=ObjectId(login_attempt["user_id"]), updates={"is_enabled": False}
+            )
         return True
 
     return login_attempt["attempt_count"] >= max_attempt_allowed

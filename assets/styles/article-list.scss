@@ -594,6 +594,9 @@
     &--headline {
         margin-inline-start: var(--space--2);
     }
+    &--muted {
+        color: var(--color-text--muted);
+    }
 }
 .wire-articles__item__versions-btn {
     margin-inline-start: 24px;

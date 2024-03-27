@@ -1,4 +1,6 @@
 import {memoize} from 'lodash';
+import * as React from 'react';
+import {ComponentType} from 'react';
 
 import {IArticle, IListConfig} from 'interfaces';
 
@@ -6,6 +8,7 @@ import ConfigEvent from 'components/cards/edit/ConfigEvent';
 import ConfigExternalMedia from 'components/cards/edit/ConfigExternalMedia';
 import ConfigNavigation from 'components/cards/edit/ConfigNavigation';
 import ConfigProduct from 'components/cards/edit/ConfigProduct';
+import {ConfigWireList} from './edit/ConfigWireList';
 
 import TextOnlyCard from 'components/cards/render/TextOnlyCard';
 import PictureTextCard from 'components/cards/render/PictureTextCard';
@@ -18,7 +21,7 @@ import EventsTwoByTwoCard from 'components/cards/render/EventsTwoByTwoCard';
 import NavigationSixPerRow from 'components/cards/render/NavigationSixPerRow';
 import {gettext} from 'utils';
 import {MoreNewsSearchKind} from './render/MoreNewsButton';
-import {ComponentType} from 'react';
+import WireListCard from './render/WireListCard';
 
 export interface IEventsCardProps {
     events: any;
@@ -35,6 +38,7 @@ export interface IPictureCardProps {
     moreUrl: string;
     moreUrlLabel: string;
     listConfig: any;
+    onMoreNewsClicked?(event: React.MouseEvent<HTMLAnchorElement>): void;
 }
 
 export interface ICardProps {
@@ -47,6 +51,7 @@ export interface ICardProps {
     listConfig: IListConfig;
     kind?: MoreNewsSearchKind;
     type: string;
+    onMoreNewsClicked?(event: React.MouseEvent<HTMLAnchorElement>): void;
 }
 
 interface IEventsCard {
@@ -56,6 +61,7 @@ interface IEventsCard {
     size: number;
     dashboardComponent: ComponentType<IEventsCardProps>;
 }
+
 
 interface IPhotoCard {
     _id: '4-photo-gallery';
@@ -81,7 +87,8 @@ interface ICard {
     | '2x2-top-news'
     | '3-text-only'
     | '4-text-only'
-    | '3-picture-text';
+    | '3-picture-text'
+    |'wire-list';
     text: string;
     editComponent: ComponentType<any>;
     size: number;
@@ -159,6 +166,13 @@ const CARD_TYPES: Array<ICardUnified> = [
         text: gettext('2x2-events'),
         editComponent: ConfigEvent,
         dashboardComponent: EventsTwoByTwoCard,
+        size: 4,
+    },
+    {
+        _id: 'wire-list',
+        text: gettext('wire-list'),
+        editComponent: ConfigWireList,
+        dashboardComponent: WireListCard,
         size: 4,
     },
     {

@@ -49,8 +49,7 @@ def test_return_search_for_users(client, app):
     response = client.get("/users/search?q=jo")
     assert "John" in response.get_data(as_text=True)
     user_data = response.get_json()[0]
-    assert user_data["sections"]["agenda"]
-    assert user_data["sections"]["wire"]
+    assert user_data.get("sections") is None
 
 
 def test_reset_password_token_sent_for_user_succeeds(app, client):
@@ -213,11 +212,7 @@ def test_create_new_user_succeeds(app, client):
     assert response.status_code == 302
 
     # Login with the new account succeeds
-    response = client.post(
-        url_for("auth.login"),
-        data={"email": "new.user@abc.org", "password": "abc123def"},
-        follow_redirects=True,
-    )
+    response = login(client, {"email": "new.user@abc.org", "password": "abc123def"}, follow_redirects=True)
     assert response.status_code == 200
     assert "John" in response.get_data(as_text=True)
 
@@ -491,11 +486,7 @@ def test_account_manager_can_update_user(app, client):
         "company": company_ids[0],
     }
     app.data.insert("users", [account_mgr])
-    response = client.post(
-        url_for("auth.login"),
-        data={"email": "accountmgr@sourcefabric.org", "password": "admin"},
-        follow_redirects=True,
-    )
+    response = login(client, {"email": "accountmgr@sourcefabric.org", "password": "admin"}, follow_redirects=True)
     assert response.status_code == 200
     account_mgr["first_name"] = "Updated Account"
     response = client.post("users/5c5914275f627d5885fee6a8", data=account_mgr, follow_redirects=True)
@@ -640,6 +631,7 @@ def test_check_etag_when_updating_user(client):
 
     user_data = response.get_json()[0]
     patch_data = user_data.copy()
+    patch_data["sections"] = "wire,agenda"
     patch_data["first_name"] = "Foo"
 
     response = client.post(f"/users/{user_data['_id']}", data=patch_data, headers={"If-Match": "something random"})
@@ -661,7 +653,7 @@ def test_create_user_inherit_sections(app):
     user_ids = app.data.insert("users", [{"email": "newuser@example.com", "company": company_ids[0]}])
     assert user_ids
     user = app.data.find_one("users", req=None, _id=user_ids[0])
-    assert user["sections"] == {"agenda": True, "wire": False}
+    assert user.get("sections") is None  # When sections has a `Falsy` value, the parent Company sections will be used
 
 
 def test_filter_and_sorting_user(app, client):
@@ -686,15 +678,19 @@ def test_filter_and_sorting_user(app, client):
     assert users[2]["first_name"] == "Zoe"
 
     # sort by Last_name
-    users = client.get("/users/search?q=" "&sort=[('last_name', 1)]").get_json()
+    users = client.get("/users/search?q=&sort=[('last_name', 1)]").get_json()
     assert users[0]["last_name"] == "AAba"
     assert users[1]["last_name"] == "Bar"
 
     # filter by Company_id
-    users = client.get('/users/search?q=""&where={"company":"6215cbf55fc14ebe18e175a5"}').get_json()
+    users = client.get('/users/search?q=&where={"company":"6215cbf55fc14ebe18e175a5"}').get_json()
     assert len(users) == 2
     assert users[0]["company"] == "6215cbf55fc14ebe18e175a5"
 
+    # filter by company and search by name
+    users = client.get('/users/search?q=foo&where={"company":"6215cbf55fc14ebe18e175a5"}').get_json()
+    assert len(users) == 1
+
     # filter by products
-    users = client.get('/users/search?q=""&where={"products._id":"random"}').get_json()
+    users = client.get('/users/search?q=&where={"products._id":"random"}').get_json()
     assert len(users) == 0

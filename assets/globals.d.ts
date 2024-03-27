@@ -37,8 +37,10 @@ interface Window {
     marketPlaceData: {
         home_page: any;
     };
+    restrictedActionModalBody: string;
 
     __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any;
+    sitename: string;
 }
 
 type Dictionary<T> = {[key: string]: T};

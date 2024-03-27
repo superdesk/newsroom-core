@@ -78,10 +78,10 @@ def step_impl_get_aggregations(context):
 
 @when('we login with email "{email}" and password "{password}"')
 def when_we_login_as_user(context, email, password):
-    url = "/login"
     with context.app.test_request_context():
+        context.client.get(get_prefixed_url(context.app, "/logout"), headers=context.headers)
         response = context.client.post(
-            get_prefixed_url(context.app, url),
+            get_prefixed_url(context.app, "/login"),
             data=json.dumps(
                 dict(
                     email=email,

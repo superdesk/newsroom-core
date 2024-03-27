@@ -3,6 +3,7 @@ from flask import json
 from pytest import fixture
 from copy import deepcopy
 from newsroom.notifications import get_user_notifications
+from tests.core.utils import add_company_products
 from tests.fixtures import (  # noqa: F401
     items,
     init_items,
@@ -37,7 +38,8 @@ def set_events_only_company(app):
     app.data.update("users", PUBLIC_USER_ID, {"is_enabled": True, "receive_email": True}, user)
 
 
-def set_products(app):
+@fixture
+def agenda_products(app):
     app.data.insert(
         "navigations",
         [
@@ -56,23 +58,20 @@ def set_products(app):
         ],
     )
 
-    app.data.insert(
-        "products",
+    add_company_products(
+        app,
+        COMPANY_1_ID,
         [
             {
-                "_id": 12,
                 "name": "product test",
                 "query": "headline:test",
-                "companies": [COMPANY_1_ID],
                 "navigations": [NAV_1],
                 "is_enabled": True,
                 "product_type": "agenda",
             },
             {
-                "_id": 13,
                 "name": "product test 2",
                 "query": "slugline:prime",
-                "companies": [COMPANY_1_ID],
                 "navigations": [NAV_2],
                 "is_enabled": True,
                 "product_type": "agenda",
@@ -94,9 +93,8 @@ def test_item_json(client):
     assert "coverages" not in data
 
 
-def test_search(client, app):
+def test_search(client, app, agenda_products):
     # public user
-    set_products(app)
     with client.session_transaction() as session:
         session["user"] = PUBLIC_USER_ID
         session["user_type"] = "public"
@@ -139,7 +137,7 @@ def set_watch_products(app):
         "products",
         [
             {
-                "_id": 12,
+                "_id": "12",
                 "name": "product test",
                 "query": "press",
                 "companies": [COMPANY_1_ID],

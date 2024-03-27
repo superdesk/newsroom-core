@@ -30,7 +30,7 @@ from newsroom.types import AuthProviderType, UserData
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from newsroom.auth.utils import sign_user_by_email
 
-from . import blueprint
+from .views import blueprint
 
 
 SESSION_NAME_ID = "samlNameId"
@@ -85,14 +85,14 @@ def get_userdata(nameid: str, saml_data: Dict[str, List[str]]) -> UserData:
     # first we try to find company based on email domain
     domain = nameid.split("@")[-1]
     if domain:
-        company = superdesk.get_resource_service("companies").find_one(req=None, auth_domain=domain)
+        company = superdesk.get_resource_service("companies").find_one(req=None, auth_domains=domain)
         if company is not None:
             userdata["company"] = company["_id"]
 
     # then based on preconfigured saml client
     if session.get(SESSION_SAML_CLIENT) and not userdata.get("company"):
         company = superdesk.get_resource_service("companies").find_one(
-            req=None, auth_domain=session[SESSION_SAML_CLIENT]
+            req=None, auth_domains=session[SESSION_SAML_CLIENT]
         )
         if company is not None:
             userdata["company"] = company["_id"]

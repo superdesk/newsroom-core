@@ -78,6 +78,13 @@ def get_client_config():
         if key not in ["_updated", "version_creator"]:
             value = setting.get("value", setting.get("default"))
             config["client_config"][key] = value
+
+    # Copy certain app configs to client_config
+    config["client_config"].update(
+        dict(
+            show_user_register=flask.current_app.config.get("SHOW_USER_REGISTER") is True,
+        )
+    )
     return config
 
 

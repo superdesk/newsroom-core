@@ -35,6 +35,14 @@ class CompanyAdminPageWrapper {
     getUserSeats(userId, section) {
         return this.getUserList(`[data-test-id="user-list-item--${userId}"] [data-test-id="user-seats--${section}"]`);
     }
+
+    clickButton(testId) {
+        return cy.get(`[data-test-id="${testId}"]`).click();
+    }
+
+    typeInput(testId, text) {
+        return cy.get(`[data-test-id="${testId}"]`).type(text);
+}
 }
 
 export const CompanyAdminPage = new CompanyAdminPageWrapper();

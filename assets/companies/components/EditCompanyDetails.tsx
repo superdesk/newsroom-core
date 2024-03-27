@@ -9,6 +9,7 @@ import SelectInput from 'components/SelectInput';
 import DateInput from 'components/DateInput';
 import CheckboxInput from 'components/CheckboxInput';
 import {Button} from 'components/Buttons';
+import TextListInput from 'components/TextListInput';
 
 interface IProps {
     company: ICompany;
@@ -61,12 +62,12 @@ export function EditCompanyDetails({
                 )}
 
                 {ssoEnabled && (
-                    <TextInput
-                        name='auth_domain'
-                        label={gettext('SSO domain')}
-                        value={company.auth_domain || ''}
+                    <TextListInput
+                        name='auth_domains'
+                        label={gettext('SSO domains')}
+                        value={company.auth_domains || []}
                         onChange={onChange}
-                        error={errors ? errors.auth_domain : null}
+                        error={errors ? errors.auth_domains : null}
                     />
                 )}
 

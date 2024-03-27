@@ -1,3 +1,4 @@
+from typing import List
 from bson import ObjectId
 
 from werkzeug.exceptions import NotFound
@@ -6,6 +7,7 @@ from flask_babel import gettext
 
 from superdesk.utc import utcnow, utc_to_local
 from newsroom.decorator import login_required, company_admin_only
+from newsroom.types import Company, Product
 from newsroom.utils import query_resource, get_json_or_400
 from newsroom.auth import get_user, get_company
 from newsroom.company_admin import blueprint
@@ -20,15 +22,23 @@ def index():
     return render_template("company_admin_index.html", data=get_view_data())
 
 
+def filter_disabled_products(company: Company, products: List[Product]) -> Company:
+    product_ids = set([p["_id"] for p in products])
+    if company.get("products"):
+        company["products"] = [ref for ref in company["products"] if ref["_id"] in product_ids]
+    return company
+
+
 def get_view_data():
     user = get_user()
-    company = get_company(user) or {}
+    company = get_company(user)
+    assert company is not None
     company_users = list(query_resource("users", lookup={"company": ObjectId(company["_id"])}))
     products = list(query_resource("products", lookup={"is_enabled": True}))
     return {
         "users": company_users,
         "companyId": str(company["_id"]),
-        "companies": [company],
+        "companies": [filter_disabled_products(company, products)],
         "sections": app.sections,
         "products": products,
         "countries": app.countries,

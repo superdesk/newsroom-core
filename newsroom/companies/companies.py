@@ -65,9 +65,13 @@ class CompaniesResource(newsroom.Resource):
                 },
             },
         },
-        "auth_domain": {
+        "auth_domain": {  # Deprecated
             "type": "string",
             "nullable": True,
+            "readonly": True,
+        },
+        "auth_domains": {
+            "type": "list",
         },
         "auth_provider": {"type": "string"},
         "company_size": {"type": "string"},
@@ -84,12 +88,12 @@ class CompaniesResource(newsroom.Resource):
             [("name", 1)],
             {"unique": True, "collation": {"locale": "en", "strength": 2}},
         ),
-        "auth_domain_1": (
-            [("auth_domain", 1)],
+        "auth_domains_1": (
+            [("auth_domains", 1)],
             {
                 "unique": True,
                 "collation": {"locale": "en", "strength": 2},
-                "partialFilterExpression": {"auth_domain": {"$gt": ""}},  # filters out None and ""
+                "partialFilterExpression": {"auth_domains.0": {"$exists": True}},  # only check non empty
             },
         ),
     }
@@ -115,17 +119,22 @@ class CompaniesService(newsroom.Service):
     def on_updated(self, updates, original):
         app.cache.delete(str(original["_id"]))
 
+        updated = original.copy()
+        updated.update(updates)
+
         original_section_names = get_company_section_names(original)
         original_product_ids = get_company_product_ids(original)
 
-        updated_section_names = get_company_section_names(updates) if "sections" in updates else original_section_names
-        updated_product_ids = get_company_product_ids(updates) if "products" in updates else original_product_ids
+        updated_section_names = get_company_section_names(updated)
+        updated_product_ids = get_company_product_ids(updated)
 
         if original_section_names != updated_section_names or original_product_ids != updated_product_ids:
             user_service = get_resource_service("users")
             for user in user_service.get(req=None, lookup={"company": original[config.ID_FIELD]}):
                 user_updates = {
-                    "sections": {
+                    "sections": {}
+                    if not user.get("sections")
+                    else {
                         section: (user.get("sections") or {}).get(section, False) for section in updated_section_names
                     },
                     "products": [

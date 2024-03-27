@@ -20,6 +20,7 @@ interface IProps {
     formValid: boolean; // provided by Redux state
     onSubmit(event: React.MouseEvent<HTMLButtonElement>): void;
     closeModal(event?: React.MouseEvent<HTMLButtonElement>): void;
+    footer?(): React.ComponentType | React.JSX.Element;
 }
 
 interface IState {
@@ -89,22 +90,24 @@ class Modal extends React.Component<IProps, IState> {
                         </div>
                         <div className="modal-body">
                             {this.props.children}
-                        </div>
-                        <div className="modal-footer">
-                            <Button
-                                type='reset'
-                                variant='secondary'
-                                value={this.props.onCancelLabel || gettext('Cancel')}
-                                onClick={this.props.closeModal}
-                            />
-                            <Button
-                                type='submit'
-                                variant='primary'
-                                value={this.props.onSubmitLabel || gettext('Save')}
-                                disabled={this.state.submitting || !this.props.formValid}
-                                onClick={this.onSubmit}
-                            />     
-                        </div>
+                        </div>\
+                        {this.props.footer != null ? this.props.footer() : (
+                            <div className="modal-footer">
+                                <Button
+                                    type='reset'
+                                    variant='secondary'
+                                    value={this.props.onCancelLabel || gettext('Cancel')}
+                                    onClick={this.props.closeModal}
+                                />
+                                <Button
+                                    type='submit'
+                                    variant='primary'
+                                    value={this.props.onSubmitLabel || gettext('Save')}
+                                    disabled={this.state.submitting || !this.props.formValid}
+                                    onClick={this.onSubmit}
+                                />     
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

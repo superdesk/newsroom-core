@@ -32,6 +32,7 @@ export interface IContact {
 
 export interface ILocation {
     name: string;
+    type?: string;
     qcode: string;
     location?: {lat: number; lon: number};
     details?: string[];
@@ -83,6 +84,11 @@ export interface ICoverage {
     assigned_desk_email?: string;
     assigned_user_name?: string;
     assigned_user_email?: string;
+    genre?: Array<{
+        qcode: string,
+        name: string
+    }>;
+    coverage_provider?: string;
 }
 
 export interface IAgendaItem extends IResourceItem {
@@ -196,6 +202,7 @@ export interface IAgendaState {
         }>;
     };
     errors?: {[field: string]: Array<string>};
+    loadingAggregations?: boolean;
 }
 
 export type AgendaGetState = () => IAgendaState;

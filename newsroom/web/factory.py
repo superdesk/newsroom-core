@@ -1,6 +1,7 @@
 import os
 import flask
 
+from newsroom.auth import get_user
 from newsroom.factory import BaseNewsroomApp
 from newsroom.template_filters import (
     datetime_short,
@@ -31,6 +32,7 @@ from newsroom.template_filters import (
     initials,
     get_highlighted_field,
     get_item_category_names,
+    format_event_datetime,
 )
 from newsroom.template_loaders import LocaleTemplateLoader
 from newsroom.notifications.notifications import get_initial_notifications
@@ -141,6 +143,9 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_filter(get_location_string, "location_string")
         self.add_template_filter(get_agenda_dates, "agenda_dates_string")
         self.add_template_filter(get_item_category_names, "category_names")
+        self.add_template_filter(format_event_datetime)
+
+        self.context_processor(lambda: {"auth_user": get_user()})
 
         self.jinja_loader = LocaleTemplateLoader(self._theme_folders)
 

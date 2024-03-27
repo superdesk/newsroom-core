@@ -172,6 +172,7 @@ class AuthUserResource(newsroom.Resource):
         "password": UsersResource.schema["password"],
         "token": UsersResource.schema["token"],
         "token_expiry_date": UsersResource.schema["token_expiry_date"],
+        "is_enabled": UsersResource.schema["is_enabled"],
     }
 
     datasource = {
@@ -193,6 +194,7 @@ USER_PROFILE_UPDATES = {
     "notification_schedule",
     "expiry_alert",
     "_updated",
+    "password",
 }
 
 
@@ -266,14 +268,6 @@ class UsersService(newsroom.Service):
             set_original_creator(doc)
             if doc.get("password", None) and not is_hashed(doc.get("password")):
                 doc["password"] = self._get_password_hash(doc["password"])
-
-    def create(self, docs):
-        for doc in docs:
-            if "sections" not in doc and doc.get("company"):
-                company = get_company_from_user(doc)
-                if company and company.get("sections"):
-                    doc["sections"] = company.get("sections")
-        return super().create(docs)
 
     def on_created(self, docs):
         super().on_created(docs)

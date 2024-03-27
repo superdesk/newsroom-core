@@ -5,7 +5,7 @@ import {SearchResultTagList} from './SearchResultTagList';
 import {Tag} from 'components/Tag';
 
 import {IProps as IParentProps} from './SearchResultTagsList';
-import {setItemTypeFilter} from 'agenda/actions';
+import {setItemTypeFilter, toggleDropdownFilter} from 'agenda/actions';
 import {searchFilterSelector} from 'search/selectors';
 import {connect} from 'react-redux';
 import {agendaCoverageStatusFilter, getActiveFilterLabel} from 'agenda/components/AgendaCoverageExistsFilter';
@@ -20,7 +20,7 @@ type IProps = Pick<IParentProps,
     'toggleFilter' |
     'setCreatedFilter' |
     'resetFilter'
-> & {clearQuickFilter: (filter: string) => void;};
+>;
 
 type IActiveFilter = {
     calendar?: any;
@@ -39,22 +39,24 @@ interface IReduxStateProps {
 
 interface IReduxDispatchProps {
     clearItemTypeFilter: () => void;
+    removeDropdownFilter: (key: any, value: any) => void;
 }
 
 type IPropsAgendaExtended = IReduxDispatchProps & IReduxStateProps & IProps;
 
-function SearchResultsFiltersRow({
-    readonly,
-    searchParams,
-    filterGroups,
-    toggleFilter,
-    setCreatedFilter,
-    resetFilter,
-    itemTypeFilter,
-    clearItemTypeFilter,
-    activeFilter,
-    clearQuickFilter,
-}: IPropsAgendaExtended) {
+function SearchResultsFiltersRow(props: IPropsAgendaExtended) {
+    const {
+        readonly,
+        searchParams,
+        filterGroups,
+        toggleFilter,
+        setCreatedFilter,
+        resetFilter,
+        itemTypeFilter,
+        clearItemTypeFilter,
+        removeDropdownFilter,
+    } = props;
+    const activeFilter = props.activeFilter ?? {};
     const tags = [];
 
     /**
@@ -80,28 +82,67 @@ function SearchResultsFiltersRow({
             );
         }
 
-        Object.keys(activeFilter ?? {}).filter((filter) => activeFilter?.[filter as IActiveFilterUnionType] != null)
-            .forEach((filter) => {
-                tags.push(
-                    <Tag
-                        key={`tags-filters--${filter}`}
-                        testId={`tags-filters--agenda-quick-filters-${filter}`}
-                        text={(() => {
-                            if (filter === 'coverage_status') {
-                                return getActiveFilterLabel(agendaCoverageStatusFilter, activeFilter);
-                            } else if (filter === 'location') {
-                                return  activeFilter?.[filter as IActiveFilterUnionType].name;
-                            } else {
-                                return activeFilter?.[filter as IActiveFilterUnionType];
-                            }
-                        })()}
-                        readOnly={readonly}
-                        onClick={(event) => {
-                            event.preventDefault();
-                            clearQuickFilter(filter);
-                        }}
-                    />
-                );
+        Object.keys(activeFilter).filter((filter) => activeFilter[filter as IActiveFilterUnionType] != null)
+            .forEach((_filter) => {
+                const filter = _filter as IActiveFilterUnionType;
+
+                const filtersData: Array<{key: string; label: string; onRemove(): void}> = (() => {
+                    if (filter === 'coverage_status') {
+                        return [
+                            {
+                                key: 'coverage_status',
+                                label: getActiveFilterLabel(agendaCoverageStatusFilter, activeFilter),
+                                onRemove: () => {
+                                    removeDropdownFilter(filter, activeFilter[filter]);
+                                },
+                            },
+                        ];
+                    } else if (filter === 'location') {
+                        return [
+                            {
+                                key: 'location',
+                                label: activeFilter[filter].name,
+                                onRemove: () => {
+                                    removeDropdownFilter(filter, activeFilter[filter]);
+                                },
+                            },
+                        ];
+                    } else if (Array.isArray(activeFilter[filter])) {
+                        return activeFilter[filter].map((val: string) => ({
+                            key: filter + val,
+                            label: val,
+                            onRemove: () => {
+                                removeDropdownFilter(filter, val);
+                            },
+                        }));
+                    } else {
+                        return [
+                            {
+                                key: filter + activeFilter[filter],
+                                label: activeFilter[filter],
+                                onRemove: () => {
+                                    removeDropdownFilter(filter, activeFilter[filter]);
+                                },
+                            },
+                        ];
+                    }
+                })();
+
+                for (const {key, label, onRemove} of filtersData) {
+                    tags.push(
+                        <Tag
+                            key={key}
+                            testId={`tags-filters--agenda-quick-filters-${label}`}
+                            text={label}
+                            readOnly={readonly}
+                            onClick={(event) => {
+                                event.preventDefault();
+                                onRemove();
+                            }}
+                        />
+                    );
+                }
+
             });
     }
 
@@ -238,6 +279,7 @@ const mapStateToProps = (state: any) => ({
 
 const mapDispatchToProps = (dispatch: any) => ({
     clearItemTypeFilter: () => dispatch(setItemTypeFilter(null)),
+    removeDropdownFilter: (key: any, val: any) => dispatch(toggleDropdownFilter(key, val, false)),
 });
 
 let component: React.ComponentType<IProps> = SearchResultsFiltersRow as React.ComponentType<IProps>;

@@ -46,7 +46,7 @@ interface IProps {
     filterGroups: {[key: string]: IFilterGroup};
     availableFields: Array<string>;
 
-    saveFolder: (folder: any, data: any, global?: boolean) => void;
+    saveFolder: (folder: any, data: any, global?: boolean) => Promise<ITopicFolder>;
     fetchNavigations(): Promise<void>;
     closeEditor(): void;
     saveTopic(isExisting: boolean, topic: ITopic): Promise<ITopic>;
@@ -566,7 +566,7 @@ const mapStateToProps = (state: any) => ({
     isLoading: state.isLoading,
     navigations: state.navigations || [],
     editorFullscreen: topicEditorFullscreenSelector(state),
-    companyUsers: state.monitoringProfileUsers || [],
+    companyUsers: state.companyUsers || [],
 
     navigationsById: navigationsByIdSelector(state),
     filterGroups: filterGroupsByIdSelector(state),

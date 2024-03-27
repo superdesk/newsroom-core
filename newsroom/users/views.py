@@ -81,11 +81,11 @@ def user_profile():
 @blueprint.route("/users/search", methods=["GET"])
 @account_manager_or_company_admin_only
 def search():
-    lookup = None
+    lookup = {}
     sort = None
     if flask.request.args.get("q"):
-        regex = re.compile(".*{}.*".format(flask.request.args.get("q")), re.IGNORECASE)
-        lookup = {"$or": [{"first_name": regex}, {"last_name": regex}]}
+        regex = re.compile(re.escape(flask.request.args.get("q")), re.IGNORECASE)
+        lookup = {"$or": [{"first_name": regex}, {"last_name": regex}, {"email": regex}]}
 
     if flask.request.args.get("ids"):
         lookup = {"_id": {"$in": (flask.request.args.get("ids") or "").split(",")}}
@@ -98,9 +98,9 @@ def search():
         try:
             where = json.loads(where_param)
             if where.get("company"):
-                lookup = {"company": where["company"]}
+                lookup["company"] = where["company"]
             if where.get("products._id"):
-                lookup = {"products._id": where["products._id"]}
+                lookup["products._id"] = where["products._id"]
         except json.JSONDecodeError as e:
             return jsonify({"error": "Invalid 'where' parameter. JSON decoding failed: {}".format(str(e))}), 400
     if is_current_user_company_admin():
@@ -109,9 +109,6 @@ def search():
 
         if company is None:
             flask.abort(401)
-
-        if lookup is None:
-            lookup = {}
 
         lookup["company"] = company["_id"]
 
@@ -264,12 +261,12 @@ def get_updates_from_form(form: UserForm, on_create=False):
     if "sections" in updates:
         if on_create and not updates.get("sections"):
             updates.pop("sections")  # will be populated later based on company
-        else:
+        elif updates.get("sections") is not None:
             updates["sections"] = {
                 section["_id"]: section["_id"] in (form.sections.data or []) for section in app.sections
             }
 
-    if "products" in updates:
+    if updates.get("products") is not None:
         product_ids = [ObjectId(productId) for productId in updates["products"]]
         products = {
             product["_id"]: product for product in query_resource("products", lookup={"_id": {"$in": product_ids}})

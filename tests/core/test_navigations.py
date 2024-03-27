@@ -1,10 +1,13 @@
 from bson import ObjectId
 from flask import json
 from pytest import fixture
+from newsroom.navigations.views import add_remove_products_for_navigation
+from newsroom.products.products import get_products_by_navigation
 
 from newsroom.tests.users import test_login_succeeds_for_admin  # noqa
 from newsroom.tests.fixtures import COMPANY_1_ID
 from newsroom.navigations.navigations import get_navigations_by_company
+from tests.core.utils import add_company_products
 
 
 NAV_ID = ObjectId("59b4c5c61d41c8d736852fbf")
@@ -200,23 +203,20 @@ def test_get_agenda_navigations_by_company_returns_ordered(client, app):
         ],
     )
 
-    app.data.insert(
-        "products",
+    add_company_products(
+        app,
+        COMPANY_1_ID,
         [
             {
-                "_id": "p-1",
                 "name": "Top Things",
                 "navigations": ["n-1"],
-                "companies": [COMPANY_1_ID],
                 "is_enabled": True,
                 "query": "_featured",
                 "product_type": "agenda",
             },
             {
-                "_id": "p-2",
                 "name": "A News",
                 "navigations": ["59b4c5c61d41c8d736852fbf"],
-                "companies": [COMPANY_1_ID],
                 "description": "news product",
                 "is_enabled": True,
                 "product_type": "wire",
@@ -226,7 +226,47 @@ def test_get_agenda_navigations_by_company_returns_ordered(client, app):
     )
 
     test_login_succeeds_for_admin(client)
-    navigations = get_navigations_by_company({"_id": COMPANY_1_ID}, "agenda")
+    company = app.data.find_one("companies", req=None, _id=COMPANY_1_ID)
+    navigations = get_navigations_by_company(company, "agenda")
     assert navigations[0].get("name") == "Uber"
-    navigations = get_navigations_by_company({"_id": COMPANY_1_ID}, "wire")
+    navigations = get_navigations_by_company(company, "wire")
     assert navigations[0].get("name") == "Sport"
+
+
+def test_get_products_by_navigation_caching(app):
+    nav_id = ObjectId()
+    app.data.insert(
+        "navigations",
+        [
+            {
+                "_id": nav_id,
+                "name": "Uber",
+                "is_enabled": True,
+                "product_type": "agenda",
+            }
+        ],
+    )
+
+    app.data.insert(
+        "products",
+        [
+            {
+                "_id": "p-2",
+                "name": "A News",
+                "navigations": [nav_id],
+                "description": "news product",
+                "is_enabled": True,
+                "product_type": "wire",
+                "query": "latest",
+            },
+        ],
+    )
+
+    # using new context to avoid caching via flask.g
+    with app.app_context():
+        assert 1 == len(get_products_by_navigation([nav_id], "wire"))
+
+    add_remove_products_for_navigation(nav_id, [])
+
+    with app.app_context():
+        assert 0 == len(get_products_by_navigation([nav_id], "wire"))
