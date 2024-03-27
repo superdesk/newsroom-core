@@ -145,6 +145,8 @@ def get_personal_dashboards_data(user, company, topics):
 
     def get_topic_items(topic):
         query = superdesk.get_resource_service("wire_search").get_topic_query(topic, user, company)
+        if not query:
+            return list()
         return list(
             superdesk.get_resource_service("wire_search").get_items_by_query(query, size=get_card_size(card_type))
         )

@@ -183,6 +183,18 @@ def get_coverage_status(coverage: Dict[str, Any]) -> str:
         return ""
 
 
+def get_event_state(item: Dict[str, Any]) -> str:
+    event_state = item.get("event", {}).get("state")
+    if event_state == "scheduled":
+        return gettext("Planned")
+    elif event_state == "postponed":
+        return gettext("Postponed")
+    elif event_state == "cancelled":
+        return gettext("Cancelled")
+    else:
+        return ""
+
+
 def get_item_type(item: Dict[str, Any]) -> Literal["event", "planning"]:
     if item.get("item_type") is not None:
         return item["item_type"]

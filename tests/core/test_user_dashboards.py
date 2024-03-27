@@ -1,4 +1,6 @@
+import bson
 import tests.utils as utils
+
 from newsroom.wire.views import get_personal_dashboards_data
 
 
@@ -70,3 +72,47 @@ def test_user_dashboards(app, client, public_user, public_company, company_produ
 
     assert "dashboards" in data
     assert data["dashboards"][0]["topic_ids"] == []
+
+
+def test_dashboard_data_for_user_without_wire_section(app):
+    products = [
+        {"product_type": "wire"},
+    ]
+
+    app.data.insert("products", products)
+
+    topic = {
+        "_id": bson.ObjectId("65b968911298768bef93c53f"),
+        "advanced": None,
+        "created": None,
+        "filter": {
+            "language": [
+                "fr",
+            ],
+        },
+        "navigation": None,
+        "query": '"Sonia Bélanger"',
+        "topic_type": "wire",
+    }
+
+    user = {
+        "user_type": "company_admin",
+        "company": "foo",
+        "sections": {
+            "wire": False,
+        },
+        "dashboards": [{"type": "4-picture-text", "topic_ids": [topic["_id"]], "name": "My Home"}],
+    }
+
+    company = {
+        "_id": "foo",
+        "products": [
+            {"_id": products[0]["_id"], "section": "wire"},
+        ],
+        "sections": {
+            "wire": True,
+        },
+    }
+
+    data = get_personal_dashboards_data(user, company, [topic])
+    assert data
