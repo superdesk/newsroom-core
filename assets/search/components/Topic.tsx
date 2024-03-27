@@ -6,6 +6,7 @@ import {gettext, formatDate, formatTime} from 'utils';
 import ActionButton from 'components/ActionButton';
 import {ToolTip} from 'ui/components/ToolTip';
 import {ITopic, ITopicNotificationScheduleType, IUser} from 'interfaces';
+import {Label} from 'components/Label';
 
 export interface ITopicAction {
     id: string;
@@ -92,9 +93,7 @@ export function Topic({topic, actions, users, selected, subscriptionType}: IProp
                     <div className="simple-card__column simple-card__column--align-end">
                         <span className="simple-card__notification-info">
                             <i className="icon--alert"></i>
-                            <span className="label--rounded label--alert">
-                                {subscriptionType === 'real-time' ? gettext('Real-Time') : gettext('Scheduled')}
-                            </span>
+                            <Label text={subscriptionType === 'real-time' ? gettext('Real-Time') : gettext('Scheduled')} type='alert' style='translucent' />
                         </span>
                     </div>
                 )}
