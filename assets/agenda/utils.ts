@@ -648,7 +648,7 @@ export function getExtraDates(item: IAgendaItem): Array<moment.Moment> {
  * @param item: Event or Planning item
  * @returns {Array.<{date: moment.Moment}>}
  */
-export function getDisplayDates(item: IAgendaItem): Array<{date: string}> {
+function getDisplayDates(item: IAgendaItem): Array<{date: string}> {
     if (item._hits == null || item._hits.matched_planning_items == null) {
         return item.display_dates ?? [];
     } else if (item.planning_items == null || item.planning_items.length === 0) {
@@ -695,14 +695,10 @@ export function getDisplayDates(item: IAgendaItem): Array<{date: string}> {
 
 /**
  * Checks if a date is in extra dates
- *
- * @param {Object} item
- * @param {Date} date to check (moment)
- * @return {Boolean}
  */
-export function containsExtraDate(item: IAgendaItem, dateToCheck: moment.Moment) {
-    return getDisplayDates(item)
-        .map((ed) => moment(ed.date).format('YYYY-MM-DD'))
+function containsExtraDate(dateToCheck: moment.Moment, extraDates: Array<moment.Moment>) {
+    return extraDates
+        .map((ed) => ed.format('YYYY-MM-DD'))
         .includes(dateToCheck.format('YYYY-MM-DD'));
 }
 
@@ -788,7 +784,6 @@ export function groupItems(
             }
 
             const itemEndDate = getEndDate(item);
-            const scheduleType = getScheduleType(item);
 
             // If item is an event and was actioned (postponed, rescheduled, cancelled only incase of multi-day event)
             // actioned_date is set. In this case, use that as the cut off date.
@@ -824,10 +819,7 @@ export function groupItems(
             // use clone otherwise it would modify start and potentially also maxStart, moments are mutable
             for (const day = start.clone(); day.isSameOrBefore(end, 'day'); day.add(1, 'd')) {
                 const isBetween = isBetweenDay(day, itemStartDate, itemEndDate, item.dates.all_day, item.dates.no_end_time);
-                const containsExtra = containsExtraDate(item, day);
-                const addGroupItem: boolean = (item.event == null || item._hits?.matched_planning_items != null) && itemExtraDates.length ?
-                    containsExtra || (scheduleType === SCHEDULE_TYPE.MULTI_DAY && isBetween) :
-                    isBetween || containsExtra;
+                const addGroupItem = isBetween || containsExtraDate(day, itemExtraDates);
 
                 if (grouper(day) !== key && addGroupItem) {
                     key = grouper(day);

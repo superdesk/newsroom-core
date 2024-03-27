@@ -135,9 +135,9 @@ def get_json_or_400():
     return data
 
 
-def get_type():
-    item_type = request.args.get("type", "wire")
-    types = {
+def get_type(type: Optional[str] = None) -> str:
+    item_type = type or request.args.get("type", "wire")
+    types: Dict[Union[str, None], str] = {
         "wire": "items",
         "agenda": "agenda",
         "am_news": "items",

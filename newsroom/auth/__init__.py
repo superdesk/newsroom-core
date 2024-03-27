@@ -28,10 +28,9 @@ def get_user(required=False) -> Optional[User]:
     :param required: Is user required.
     """
     user_id = get_user_id()
+    user = None
     if user_id:
         user = superdesk.get_resource_service("users").find_one(req=None, _id=user_id)
-    else:
-        user = None
     if not user and required:
         abort(401)
     return user

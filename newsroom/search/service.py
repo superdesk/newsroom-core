@@ -638,6 +638,10 @@ class BaseSearchService(Service):
                 # Ensure that all the provided products are permissioned for this request
                 if not all(p in [c.get("_id") for c in search.products] for p in search.args["requested_products"]):
                     abort(404, gettext("Invalid product parameter"))
+            elif search.section and search.user and search.user.get("sections"):
+                if not search.user.get("sections", {}).get(search.section):
+                    msg = f"User does not have access to {search.section} section"
+                    abort(403, gettext(msg))
 
     def is_validate_product(self, data):
         """

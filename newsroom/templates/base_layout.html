@@ -20,10 +20,14 @@
         href="{{ theme_url('favicon.ico') }}">
     <link rel="stylesheet" href="/static/primeicons.css"/>
 
-{{ javascript_tag('common') | safe }}
-{{ javascript_tag('newsroom_css') | safe }}
-<link rel="stylesheet" href="{{ theme_url('theme.css') }}"/>
-{% block sectioncss %}{% endblock %}
+    {{ javascript_tag('common') | safe }}
+    {{ javascript_tag('newsroom_css') | safe }}
+    <link rel="stylesheet" href="{{ theme_url('theme.css') }}"/>
+    {% block sectioncss %}{% endblock %}
+
+    {% block head %}
+    {% endblock %}
+
 </head>
 <body>
 
@@ -176,6 +180,9 @@
 {% include "scripts.html" %}
 
 {% block script %}
+{% endblock %}
+
+{% block layout_script %}
 {% endblock %}
 
 </body>

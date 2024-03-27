@@ -680,6 +680,9 @@ $container-max-widths: (
     // COMPONENT: SKELETON
     --p-skeleton-color-bg: var(--color-neutral-150);
     --p-skeleton-animated-gradient: linear-gradient(90deg, hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0.04), hsla(0, 0%, 100%, 0));
+
+    // COMPONENT: LABEL
+    --color-top-story: var(--color-primary);
 }
 
 .line-shadow-end--light {

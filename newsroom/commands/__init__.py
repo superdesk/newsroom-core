@@ -18,6 +18,8 @@ from .scheduled_notifications import send_scheduled_notifications  # noqa
 
 from newsroom.celery_app import celery
 
+from . import elastic_reindex  # noqa
+
 
 @celery.task(soft_time_limit=600)
 def async_remove_expired_agenda():

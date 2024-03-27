@@ -161,7 +161,7 @@ class Company(CompanyRequired, total=False):
 
     # Authentication
     auth_provider: str
-    auth_domain: str
+    auth_domains: List[str]
     is_enabled: bool
     is_approved: bool
     expiry_date: datetime

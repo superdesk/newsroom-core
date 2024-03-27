@@ -24,7 +24,6 @@ import {
     CLEAR_ADVANCED_SEARCH_PARAMS,
     SET_ADVANCED_SEARCH_PARAMS,
     SET_SEARCH_SORT_QUERY,
-    CLEAR_QUICK_FILTER,
 } from './actions';
 
 import {EXTENDED_VIEW} from 'wire/defaults';
@@ -102,23 +101,6 @@ export function searchReducer(state=INITIAL_STATE, action?: any, context?: any) 
             createdFilter,
         };
     }
-
-    case CLEAR_QUICK_FILTER:
-        if (action.filter == null) {
-            return {
-                ...state,
-                activeFilter: {},
-            };
-        }
-
-        // eslint-disable-next-line no-case-declarations
-        const updatedQuickFilters = {...state.activeFilter};
-        delete updatedQuickFilters[action.filter];
-
-        return {
-            ...state,
-            activeFilter: updatedQuickFilters,
-        };
 
     case RESET_FILTER:
         return {

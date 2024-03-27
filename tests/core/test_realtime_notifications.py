@@ -203,3 +203,43 @@ def test_realtime_notifications_agenda(app, mocker):
 
     assert len(outbox) == 2
     assert "http://localhost:5050/agenda?item=event_id_1" in outbox[0].body
+
+
+def test_realtime_notifications_agenda_reccuring_event(app):
+    app.data.insert(
+        "agenda",
+        [
+            {
+                "_id": "event_id_1",
+                "type": "agenda",
+                "versioncreated": datetime.utcnow(),
+                "name": "cheese event",
+                "dates": {
+                    "start": datetime.utcnow(),
+                    "end": datetime.utcnow(),
+                },
+                "recurrence_id": "event_id_1",
+            },
+            {
+                "_id": "event_id_2",
+                "type": "agenda",
+                "versioncreated": datetime.utcnow(),
+                "name": "another event",
+                "dates": {
+                    "start": datetime.utcnow(),
+                    "end": datetime.utcnow(),
+                },
+                "recurrence_id": "event_id_1",
+            },
+        ],
+    )
+
+    with mock.patch("newsroom.push.notify_new_item") as notify_new_item:
+        notify_new_agenda_item("event_id_1")
+        assert notify_new_item.call_count == 1
+
+        notify_new_agenda_item("event_id_2", is_new=True)
+        assert notify_new_item.call_count == 1
+
+        notify_new_agenda_item("event_id_2")
+        assert notify_new_item.call_count == 2

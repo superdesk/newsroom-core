@@ -132,7 +132,7 @@ describe('utils', () => {
             const groupedItems = keyBy(utils.groupItems(items, moment('2018-10-15'), undefined, 'day'), 'date');
 
             expect(groupedItems.hasOwnProperty('15-10-2018')).toBe(false);
-            expect(groupedItems.hasOwnProperty('17-10-2018')).toBe(false);
+            expect(groupedItems.hasOwnProperty('17-10-2018')).toBe(true);
             expect(groupedItems.hasOwnProperty('16-10-2018')).toBe(true);
             expect(groupedItems.hasOwnProperty('18-10-2018')).toBe(true);
             expect(groupedItems['16-10-2018'].items).toEqual(['foo']);

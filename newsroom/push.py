@@ -92,7 +92,7 @@ def push():
     if item.get("type") == "event":
         orig = app.data.find_one("agenda", req=None, _id=item["guid"])
         _id = publish_event(item, orig)
-        notify_new_agenda_item.delay(_id, check_topics=True)
+        notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)
     elif item.get("type") == "planning":
         orig = app.data.find_one("agenda", req=None, _id=item["guid"]) or {}
         item["planning_date"] = parse_date_str(item["planning_date"])
@@ -100,7 +100,7 @@ def push():
         event_id = publish_planning_into_event(item)
         # Prefer parent Event when sending notificaitons
         _id = event_id or plan_id
-        notify_new_agenda_item.delay(_id, check_topics=True)
+        notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)
     elif item.get("type") == "text":
         orig = superdesk.get_resource_service("items").find_one(req=None, _id=item["guid"])
         item["_id"] = publish_item(item, orig)
@@ -763,10 +763,14 @@ def notify_new_wire_item(_id, check_topics=True):
 
 
 @celery.task
-def notify_new_agenda_item(_id, check_topics=True):
+def notify_new_agenda_item(_id, check_topics=True, is_new=False):
     with locked(_id, "agenda"):
         agenda = app.data.find_one("agenda", req=None, _id=_id)
         if agenda:
+            if agenda.get("recurrence_id") and agenda.get("recurrence_id") != _id and is_new:
+                logger.info("Ignoring recurring event %s", _id)
+                return
+
             superdesk.get_resource_service("agenda").enhance_items([agenda])
             notify_new_item(agenda, check_topics=check_topics)
 
