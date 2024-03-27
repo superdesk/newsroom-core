@@ -132,7 +132,7 @@ describe('CompanySettings', function() {
 
     it('TGA-86: User section permissions are not lost when saving other metadata', function() {
         // Login and navigate to Company settings page
-        NewshubLayout.login('admin@nistrator.org', 'admin');
+        NewshubLayout.login('admin@example.com', 'admin');
         NewshubLayout.getSidebarLink('settings').click();
         SettingsNav.getNavLink('companies').click();
 
@@ -200,7 +200,7 @@ describe('CompanySettings', function() {
 
     it('Section permissions use parent Company until changed on the user level', function() {
         // Login and navigate to Company settings page
-        NewshubLayout.login('admin@nistrator.org', 'admin');
+        NewshubLayout.login('admin@example.com', 'admin');
         NewshubLayout.getSidebarLink('settings').click();
         SettingsNav.getNavLink('companies').click();
 
