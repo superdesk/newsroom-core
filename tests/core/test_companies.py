@@ -182,3 +182,14 @@ def test_company_ip_whitelist_validation(client):
     test_login_succeeds_for_admin(client)
     resp = client.post("companies/new", data=json.dumps(new_company), content_type="application/json")
     assert resp.status_code == 400
+
+
+def test_company_auth_domains(client):
+    new_company = {"name": "Test", "auth_domains": ["example.com"]}
+    resp = client.post("companies/new", data=json.dumps(new_company), content_type="application/json")
+    assert resp.status_code == 201
+
+    new_company = {"name": "Test 2", "auth_domains": ["example.com"]}
+    resp = client.post("companies/new", data=json.dumps(new_company), content_type="application/json")
+    assert resp.status_code == 400
+    assert resp.json.get("auth_domains") == "Value is already used"

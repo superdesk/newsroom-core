@@ -75,7 +75,7 @@ def create():
     try:
         ids = get_resource_service("companies").post([new_company])
     except werkzeug.exceptions.Conflict:
-        return jsonify({"name": gettext("Company already exists")}), 400
+        return conflict_error(new_company)
 
     return jsonify({"success": True, "_id": ids[0]}), 201
 
@@ -116,7 +116,7 @@ def get_company_updates(data, original=None):
         "company_type": data.get("company_type") or original.get("company_type"),
         "monitoring_administrator": data.get("monitoring_administrator") or original.get("monitoring_administrator"),
         "allowed_ip_list": data.get("allowed_ip_list") or original.get("allowed_ip_list"),
-        "auth_domain": data.get("auth_domain"),
+        "auth_domains": data.get("auth_domains"),
         "auth_provider": data.get("auth_provider") or original.get("auth_provider") or "newshub",
     }
 
@@ -152,10 +152,20 @@ def edit(_id):
 
         updates = get_company_updates(company, original)
         set_version_creator(updates)
-        get_resource_service("companies").patch(ObjectId(_id), updates=updates)
+        try:
+            get_resource_service("companies").patch(ObjectId(_id), updates=updates)
+        except werkzeug.exceptions.Conflict:
+            return conflict_error(updates)
         app.cache.delete(_id)
         return jsonify({"success": True}), 200
     return jsonify(original), 200
+
+
+def conflict_error(updates):
+    if updates.get("auth_domains"):
+        return jsonify({"auth_domains": gettext("Value is already used")}), 400
+    else:
+        return jsonify({"name": gettext("Company already exists")}), 400
 
 
 @blueprint.route("/companies/<_id>", methods=["DELETE"])
