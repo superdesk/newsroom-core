@@ -179,6 +179,9 @@ class SendScheduledNotificationEmails(Command):
 
             query = search_service.get_topic_query(topic, user, company, args={"es_highlight": 1, "ids": [item_id]})
 
+            if not query:  # user might not have access to section anymore
+                return None
+
             items = search_service.get_items_by_query(query, size=1)
 
             if items.count():

@@ -1,3 +1,5 @@
+import {ICompany} from 'interfaces';
+
 import {
     INIT_VIEW_DATA,
     GET_USERS,
@@ -85,13 +87,18 @@ export default function userReducer(state: any = initialState, action: any) {
         const value = target.type === 'checkbox' ? target.checked : target.value;
 
         if (action.event?.changeType === 'company') {
-            const newCompanySelected = state.companies.find(({_id}: any) => value === _id);
-            user.company = newCompanySelected?._id;
-            user.sections = newCompanySelected?.sections;
+            if ((value || '').length > 0) {
+                user.sections = {}; // Defaults to use `company.sections` for permissions
+                user.company = value;
+            } else {
+                user.company = null;
+            }
         } else if (field.startsWith('sections.')) {
             const sectionId = field.replace('sections.', '');
+            const company = state.companies.find((company: ICompany) => company._id === user.company);
 
             user.sections = {
+                ...company?.sections || {},
                 ...user.sections || {},
                 [sectionId]: value,
             };
