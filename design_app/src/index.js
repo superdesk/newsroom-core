@@ -7,7 +7,7 @@ import '../../assets/styles/app.scss'; // Newshub - import of everything
 import './assets/styles/_design_external-style.scss'; // Static file
 //import './assets/styles/theme.css'; // CP Theme OLD
 
-import './assets/styles/theme_News-Pro.css'; // CP News Pro Theme
+//import './assets/styles/theme_News-Pro.css'; // CP News Pro Theme
 //import './assets/styles/theme_Command-News.css'; // CP Command News Theme
 
 ReactDOM.render(
@@ -15,7 +15,7 @@ ReactDOM.render(
   document.getElementById('root'),
 );
 
-// Check if hot reloading is enable. If it is, changes won't reload the page.
+// Check if hot reloading is enable. If it is, changes will not reload the page.
 // This is related to webpack-dev-server and works on development only.
 if (module.hot) {
   module.hot.accept();

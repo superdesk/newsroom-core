@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {get} from 'lodash';
 import {gettext} from 'utils';
 import types from 'wire/types';
+import {Button} from 'components/Buttons';
 
 const isFollowing = (item: any, topics: any) =>
     item && item.slugline && topics && topics.find(
@@ -15,12 +16,12 @@ export default function FollowStory({item, user, topics, followStory}: any) {
 
     if (canFollowStory) {
         return (
-            <button type="button"
+            <Button
+                value={gettext('Follow story')}
+                variant='secondary'
                 disabled={disabled}
-                className="nh-button nh-button--secondary"
-                onClick={() => followStory(item)}>
-                {gettext('Follow story')}
-            </button>
+                onClick={() => followStory(item)}
+            />
         );
     }
 

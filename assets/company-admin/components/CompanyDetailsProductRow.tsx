@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import {gettext, getConfig} from 'utils';
 import classNames from 'classnames';
+import {Button} from 'components/Buttons';
 
 export function CompanyDetailsProductRow({product, onNameClicked, showSeatRequestModal}: any) {
     const unlimited = product.max_seats == null || product.max_seats < 1;
@@ -28,12 +29,12 @@ export function CompanyDetailsProductRow({product, onNameClicked, showSeatReques
             <td className="font-light">{product.description}</td>
             {getConfig('allow_companies_to_manage_products') && !unlimited && (
                 <td>
-                    <button
-                        className="nh-button nh-button--tertiary nh-button--small"
+                    <Button
+                        value={gettext('Request more seats')}
+                        variant='tertiary'
+                        size='small'
                         onClick={() => showSeatRequestModal([product._id])}
-                    >
-                        {gettext('Request more seats')}
-                    </button>
+                    />
                 </td>
             )}
         </tr>

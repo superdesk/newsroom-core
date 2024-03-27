@@ -10,6 +10,7 @@ import {
 } from '../actions';
 import {gettext} from 'utils';
 import {panels} from '../utils';
+import {Button} from 'components/Buttons';
 
 const options = [
     {value: '', text: ''},
@@ -60,18 +61,21 @@ class CompanyReportsApp extends React.Component<any, any> {
                     </div>
 
                     <div className="content-bar__right">
-                        {this.props.activeReport && <button
-                            className='nh-button nh-button--secondary'
-                            type='button'
-                            onClick={this.props.runReport}>
-                            {gettext('Run report')}
-                        </button>}
-                        {this.props.activeReport && <button
-                            className='nh-button nh-button--secondary ms-2'
-                            type='button'
-                            onClick={this.props.printReport} >
-                            {gettext('Print report')}
-                        </button>}
+                        {this.props.activeReport && (
+                            <Button
+                                value={gettext('Run report')}
+                                variant='secondary'
+                                onClick={this.props.runReport}
+                            />
+                        )}
+                        {this.props.activeReport && (
+                            <Button
+                                value={gettext('Print report')}
+                                variant='secondary'
+                                className='ms-2'
+                                onClick={this.props.printReport}
+                            />
+                        )}
                     </div>
                 </nav>
             </section>,
