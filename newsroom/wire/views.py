@@ -1,9 +1,9 @@
 import io
-from typing import Dict
 import flask
 import zipfile
 import superdesk
 
+from typing import Dict
 from operator import itemgetter
 from flask import current_app as app, request, jsonify
 from eve.render import send_response
@@ -16,6 +16,7 @@ from superdesk import get_resource_service
 from superdesk.default_settings import strtobool
 from newsroom.auth.utils import check_user_has_products, is_valid_session
 
+from newsroom.cards import get_card_size, get_card_type
 from newsroom.navigations.navigations import get_navigations_by_user, get_navigations_by_company
 from newsroom.products.products import get_products_by_company
 from newsroom.wire import blueprint
@@ -140,11 +141,15 @@ def delete_dashboard_caches():
 
 
 def get_personal_dashboards_data(user, company, topics):
+    card_type = get_card_type(app.config.get("PERSONAL_DASHBOARD_CARD_TYPE") or "4-picture-text")
+
     def get_topic_items(topic):
         query = superdesk.get_resource_service("wire_search").get_topic_query(topic, user, company)
         if not query:
             return list()
-        return list(superdesk.get_resource_service("wire_search").get_items_by_query(query, size=4))
+        return list(
+            superdesk.get_resource_service("wire_search").get_items_by_query(query, size=get_card_size(card_type))
+        )
 
     def _get_topic_data(topic_id):
         for topic in topics:
@@ -162,6 +167,7 @@ def get_personal_dashboards_data(user, company, topics):
         return {
             "dashboard_id": f"d{index}",
             "dashboard_name": dashboard.get("name", ""),
+            "dashboard_card_type": card_type,
             "topic_items": list(
                 filter(None, [_get_topic_data(topic_id) for topic_id in dashboard.get("topic_ids") or []])
             ),

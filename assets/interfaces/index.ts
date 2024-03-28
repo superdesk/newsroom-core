@@ -23,4 +23,3 @@ export {
 } from './agenda';
 export {IArticle, IRendition, IContentType} from './content';
 export {ISearchState} from './search';
-export {IPublicAppState} from './public';

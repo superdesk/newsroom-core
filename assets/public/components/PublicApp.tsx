@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {connect} from 'react-redux';
 
-import {IArticle, IDashboardCard, IListConfig, IPublicAppState} from 'interfaces';
+import {IArticle, IDashboardCard, IListConfig} from 'interfaces';
 import {IModalState} from 'reducers';
 
 import {gettext, getConfig} from 'utils';
@@ -12,6 +12,7 @@ import {fetchCardExternalItems} from 'home/actions';
 import {DashboardPanels} from 'home/components/DashboardPanels';
 import Modal from 'components/Modal';
 import {HTMLContent} from 'components/HTMLContent';
+import {IPublicAppState} from 'home/reducers';
 
 interface IStateProps {
     cards: Array<IDashboardCard>;

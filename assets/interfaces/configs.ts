@@ -1,3 +1,4 @@
+import {IDashboardCard} from './dashboard';
 
 export type IDisplayFieldsConfig = string |
     '/' |

@@ -1,4 +1,4 @@
-import {IPublicAppState} from 'interfaces';
+import {IPublicAppState} from 'home/reducers';
 import {createStore} from 'utils';
 import {PublicApp} from './components/PublicApp';
 import {publicAppReducer} from './reducers';
