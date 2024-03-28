@@ -22,6 +22,7 @@ import AgendaListItemLabels from './AgendaListItemLabels';
 import {AgendaPreviewPlanning} from './AgendaPreviewPlanning';
 import {AgendaPreviewEvent} from './AgendaPreviewEvent';
 import {AgendaRegistrationInvitationDetails} from './AgendaRegistrationInvitationDetails';
+import TopStoryLabel from './TopStoryLabel';
 
 class AgendaPreview extends React.PureComponent<any, any> {
     static propTypes: any;
@@ -56,6 +57,7 @@ class AgendaPreview extends React.PureComponent<any, any> {
             wireItems,
             coverageActions,
             restrictCoverageInfo,
+            previewConfig,
         } = this.props;
 
         const isWatching = get(item, 'watches', []).includes(user);
@@ -87,7 +89,10 @@ class AgendaPreview extends React.PureComponent<any, any> {
                             {noselect: this.props.previewConfig.disable_text_selection}
                         )}
                     >
-                        <AgendaName item={item} />
+                        <hgroup>
+                            <TopStoryLabel item={item} config={previewConfig} size='big' />
+                            <AgendaName item={item} noMargin/>
+                        </hgroup>
                         <AgendaTime item={item}>
                             <AgendaListItemLabels
                                 item={item}
