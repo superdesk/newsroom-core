@@ -31,7 +31,8 @@ export class ToolTip extends React.PureComponent<any, any> {
             } else {
                 this.tooltip = new Tooltip(child, {
                     trigger: 'hover',
-                    placement: this.props.placement || 'top'
+                    placement: this.props.placement || 'top',
+                    title: this.props.title,
                 });
             }
         }
@@ -58,4 +59,5 @@ export class ToolTip extends React.PureComponent<any, any> {
 ToolTip.propTypes = {
     children: PropTypes.node.isRequired,
     placement: PropTypes.string,
+    title: PropTypes.string,
 };
