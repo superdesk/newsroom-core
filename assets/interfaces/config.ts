@@ -49,5 +49,5 @@ export interface IClientConfig {
     system_alert_recipients?: string;
     wire_time_limit_days: number;
     view_content_tooltip_email?: string;
-    searchbar_threshold_value?:number;
+    searchbar_threshold_value?: number;
 }
