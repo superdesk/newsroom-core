@@ -126,6 +126,7 @@ export interface IAgendaItem extends IResourceItem {
     watches?: Array<IUser['_id']>;
     es_highlight?: {[field: string]: Array<string>};
     state: string;
+    subject?: Array<{scheme?: string; code: string; name: string}>;
 }
 
 export interface IAgendaListGroup {
