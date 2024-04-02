@@ -2051,7 +2051,7 @@ msgstr "(Seurataan)"
 #: assets/agenda/components/AgendaListGroupHeader.tsx:60
 #: assets/agenda/components/AgendaListGroupHeader.tsx:68
 msgid "More hidden"
-msgstr "Lisää piilotettuna"
+msgstr "Käynnissä olevat piilotettu"
 
 #: assets/agenda/components/AgendaListGroupHeader.tsx:62
 msgid "{{ numberOfItems }} Event"
@@ -3889,7 +3889,7 @@ msgstr "Tallenna uutena hakuna"
 
 #: assets/search/components/SearchResultsBar/SearchResultsTopicRow.tsx:133
 msgid "Save new topic"
-msgstr "Tallenna uusi haku"
+msgstr "Tallenna haku"
 
 #: assets/search/components/SearchResultsBar/index.tsx:39
 msgid "Newest first"
@@ -4347,7 +4347,7 @@ msgstr "Näytä vähemmän"
 #: assets/wire/components/filters/FilterGroup.tsx:100
 #: assets/wire/components/filters/FilterGroup.tsx:101
 msgid "Search Filters"
-msgstr "Hakufiltterit"
+msgstr "Hakusuodattimet"
 
 #: assets/wire/components/filters/NavCreatedPicker.tsx:27
 msgid "Event Date"
