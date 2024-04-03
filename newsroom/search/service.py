@@ -13,7 +13,7 @@ from content_api.errors import BadParameterValueError
 
 from newsroom import Service
 from newsroom.auth.utils import user_has_section_allowed
-from newsroom.search import BoolQueryParams, QueryStringQuery
+from newsroom.search import BoolQuery, BoolQueryParams, QueryStringQuery
 from newsroom.search.config import (
     SearchGroupNestedConfig,
     get_nested_config,
@@ -128,7 +128,7 @@ class SearchQuery(object):
 
         self.aggs = None
         self.source = {}
-        self.query = {"bool": {"filter": [], "must": [], "must_not": [], "should": []}}
+        self.query: BoolQuery = {"bool": {"filter": [], "must": [], "must_not": [], "should": []}}
         self.highlight = None
         self.item_type = None
         self.planning_items_should = []

@@ -866,12 +866,11 @@ class AgendaService(BaseSearchService):
 
         pass
 
-    def apply_filters(self, search, section_filters=None):
+    def apply_filters(self, search: SearchQuery, section_filters=None):
         """Generate and apply the different search filters
 
         :param newsroom.search.SearchQuery search: the search query instance
         """
-
         # First construct the product query
         self.apply_company_filter(search)
 
@@ -1044,8 +1043,6 @@ class AgendaService(BaseSearchService):
         if app.config.get("FILTER_BY_POST_FILTER", False):
             source["post_filter"] = {"bool": {}}
             self.set_bool_query_from_filters(source["post_filter"]["bool"], filters, item_type)
-        else:
-            self.set_bool_query_from_filters(source["query"]["bool"], filters, item_type)
 
     def gen_source_from_search(self, search):
         """Generate the eve source object from the search query instance
