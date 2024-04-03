@@ -13,6 +13,7 @@ from content_api.errors import BadParameterValueError
 
 from newsroom import Service
 from newsroom.auth.utils import user_has_section_allowed
+from newsroom.search import BoolQuery, BoolQueryParams, QueryStringQuery
 from newsroom.search.config import (
     SearchGroupNestedConfig,
     get_nested_config,
@@ -48,7 +49,7 @@ def query_string(
     fields: List[str] = ["*"],
     multimatch_type: Literal["cross_fields", "best_fields"] = "cross_fields",
     analyze_wildcard=False,
-):
+) -> QueryStringQuery:
     query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
     return {
         "query_string": {
@@ -106,6 +107,16 @@ class AdvancedSearchParams(TypedDict):
     fields: List[str]
 
 
+class SearchArgs(TypedDict, total=False):
+    q: str
+    id: str
+    ids: List[str]
+    size: int
+    bookmarks: str
+    ignore_latest: bool
+    filter: Union[Dict[str, str], str]
+
+
 class SearchQuery(object):
     """Class for storing the search parameters for validation and query generation"""
 
@@ -120,14 +131,14 @@ class SearchQuery(object):
         self.requested_products = []
         self.advanced: Optional[AdvancedSearchParams] = None
 
-        self.args = {}
+        self.args: SearchArgs = {}
         self.lookup = {}
         self.projections = {}
         self.req = None
 
         self.aggs = None
         self.source = {}
-        self.query = {"bool": {"filter": [], "must": [], "must_not": [], "should": []}}
+        self.query: BoolQuery = {"bool": {"filter": [], "must": [], "must_not": [], "should": []}}
         self.highlight = None
         self.item_type = None
         self.planning_items_should = []
@@ -199,7 +210,7 @@ class BaseSearchService(Service):
 
         # Now run a query only using the IDs from the above search
         # This final search makes sure pagination still works
-        search.query["bool"] = {"filter": {"terms": {"_id": next_item_ids}}}
+        search.query["bool"] = {"filter": [{"ids": {"values": next_item_ids}}]}
         self.gen_source_from_search(search)
         internal_req = self.get_internal_request(search)
         res = self.internal_get(internal_req, search.lookup)
@@ -330,10 +341,11 @@ class BaseSearchService(Service):
 
         return internal_req
 
-    def set_bool_query_from_filters(self, bool_query: Dict[str, Any], filters: Dict[str, Any]):
+    def set_bool_query_from_filters(self, bool_query: BoolQueryParams, filters: Dict[str, Any]) -> None:
         for key, val in filters.items():
             if not val:
                 continue
+            bool_query.setdefault("must", [])
             bool_query["must"].append(
                 get_filter_query(key, val, self.get_aggregation_field(key), get_nested_config("items", key))
             )
@@ -576,7 +588,7 @@ class BaseSearchService(Service):
             highlight_search.advanced = deepcopy(search.advanced)
 
             # Set up the search query for filtering
-            self.apply_request_filter(highlight_search)
+            self.apply_request_filter(highlight_search, highlights=True)
 
             # Set up highlighting settings
             highlight_search.source.setdefault("highlight", {})
@@ -742,31 +754,34 @@ class BaseSearchService(Service):
         if product.get("query"):
             return self.query_string(product["query"])
 
-    def apply_request_filter(self, search):
+    def parse_filters(self, search: SearchQuery) -> Optional[Dict[str, Any]]:
+        if search.args.get("filter"):
+            if isinstance(search.args["filter"], dict):
+                return search.args["filter"]
+            else:
+                try:
+                    return json.loads(search.args["filter"])
+                except TypeError:
+                    raise BadParameterValueError("Incorrect type supplied for filter parameter")
+        return None
+
+    def apply_request_filter(self, search: SearchQuery, highlights=False) -> None:
         if search.args.get("q"):
             search.query["bool"].setdefault("must", []).append(
                 self.query_string(search.args["q"], search.args.get("default_operator") or "AND")
             )
 
         if search.args.get("ids"):
-            search.query["bool"]["must"].append({"terms": {"_id": search.args["ids"]}})
+            search.query["bool"]["must"].append({"ids": {"values": search.args["ids"]}})
 
-        filters = None
-        if search.args.get("filter"):
-            if isinstance(search.args["filter"], dict):
-                filters = search.args["filter"]
-            else:
-                try:
-                    filters = json.loads(search.args["filter"])
-                except TypeError:
-                    raise BadParameterValueError("Incorrect type supplied for filter parameter")
+        filters = self.parse_filters(search)
 
         if not app.config.get("FILTER_BY_POST_FILTER", False):
             if filters:
                 if app.config.get("FILTER_AGGREGATIONS", True):
                     self.set_bool_query_from_filters(search.query["bool"], filters)
-                else:
-                    search.query["bool"]["must"].append(filters)
+                elif isinstance(filters, dict):
+                    search.query["bool"]["must"].append(filters)  # type: ignore
 
             if search.args.get("created_from") or search.args.get("created_to"):
                 search.query["bool"]["must"].append(self.versioncreated_range(search.args))
@@ -906,7 +921,7 @@ class BaseSearchService(Service):
 
         return topic_matches
 
-    def apply_topic_args(self, topic, args=None):
+    def apply_topic_args(self, topic, args=None) -> SearchArgs:
         if args is None:
             args = {}
 
@@ -974,7 +989,7 @@ class BaseSearchService(Service):
         internal_req = self.get_internal_request(search)
         return self.internal_get(internal_req, search.lookup)
 
-    def query_string(self, query, default_operator="AND"):
+    def query_string(self, query, default_operator="AND") -> QueryStringQuery:
         fields_config_key = "WIRE_SEARCH_FIELDS" if self.section == "wire" else "AGENDA_SEARCH_FIELDS"
         fields = app.config.get(fields_config_key, ["*"])
         return query_string(query, default_operator=default_operator, fields=fields)

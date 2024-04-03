@@ -111,7 +111,7 @@ def test_realtime_notifications_agenda(app, mocker):
                     },
                 ],
                 "filter": {
-                    "language": ["abcd"],  # filters are not applied atm, but can ruin the query
+                    "language": ["en"],
                 },
             },
             {
@@ -137,6 +137,21 @@ def test_realtime_notifications_agenda(app, mocker):
                         "notification_type": "real-time",
                     },
                 ],
+            },
+            {
+                "user": ADMIN_USER_ID,
+                "label": "Should not match anything",
+                "query": None,
+                "topic_type": "agenda",
+                "subscribers": [
+                    {
+                        "user_id": ADMIN_USER_ID,
+                        "notification_type": "real-time",
+                    },
+                ],
+                "filter": {
+                    "language": ["foo"],
+                },
             },
         ],
     )
@@ -170,6 +185,7 @@ def test_realtime_notifications_agenda(app, mocker):
                 "type": "agenda",
                 "versioncreated": datetime.utcnow(),
                 "name": "cheese event",
+                "language": "en",
                 "dates": {
                     "start": datetime.utcnow(),
                     "end": datetime.utcnow(),
@@ -180,6 +196,7 @@ def test_realtime_notifications_agenda(app, mocker):
                 "type": "agenda",
                 "versioncreated": datetime.utcnow(),
                 "name": "another event",
+                "language": "en",
                 "dates": {
                     "start": datetime.utcnow(),
                     "end": datetime.utcnow(),
