@@ -107,6 +107,16 @@ class AdvancedSearchParams(TypedDict):
     fields: List[str]
 
 
+class SearchArgs(TypedDict, total=False):
+    q: str
+    id: str
+    ids: List[str]
+    size: int
+    bookmarks: str
+    ignore_latest: bool
+    filter: Union[Dict[str, str], str]
+
+
 class SearchQuery(object):
     """Class for storing the search parameters for validation and query generation"""
 
@@ -121,7 +131,7 @@ class SearchQuery(object):
         self.requested_products = []
         self.advanced: Optional[AdvancedSearchParams] = None
 
-        self.args = {}
+        self.args: SearchArgs = {}
         self.lookup = {}
         self.projections = {}
         self.req = None
@@ -200,7 +210,7 @@ class BaseSearchService(Service):
 
         # Now run a query only using the IDs from the above search
         # This final search makes sure pagination still works
-        search.query["bool"] = {"filter": {"terms": {"_id": next_item_ids}}}
+        search.query["bool"] = {"filter": [{"ids": {"values": next_item_ids}}]}
         self.gen_source_from_search(search)
         internal_req = self.get_internal_request(search)
         res = self.internal_get(internal_req, search.lookup)
@@ -331,7 +341,7 @@ class BaseSearchService(Service):
 
         return internal_req
 
-    def set_bool_query_from_filters(self, bool_query: BoolQueryParams, filters: Dict[str, Any]):
+    def set_bool_query_from_filters(self, bool_query: BoolQueryParams, filters: Dict[str, Any]) -> None:
         for key, val in filters.items():
             if not val:
                 continue
@@ -762,7 +772,7 @@ class BaseSearchService(Service):
             )
 
         if search.args.get("ids"):
-            search.query["bool"]["must"].append({"terms": {"_id": search.args["ids"]}})
+            search.query["bool"]["must"].append({"ids": {"values": search.args["ids"]}})
 
         filters = self.parse_filters(search)
 
@@ -770,8 +780,8 @@ class BaseSearchService(Service):
             if filters:
                 if app.config.get("FILTER_AGGREGATIONS", True):
                     self.set_bool_query_from_filters(search.query["bool"], filters)
-                else:
-                    search.query["bool"]["must"].append(filters)
+                elif isinstance(filters, dict):
+                    search.query["bool"]["must"].append(filters)  # type: ignore
 
             if search.args.get("created_from") or search.args.get("created_to"):
                 search.query["bool"]["must"].append(self.versioncreated_range(search.args))
@@ -911,7 +921,7 @@ class BaseSearchService(Service):
 
         return topic_matches
 
-    def apply_topic_args(self, topic, args=None):
+    def apply_topic_args(self, topic, args=None) -> SearchArgs:
         if args is None:
             args = {}
 

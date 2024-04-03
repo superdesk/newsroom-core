@@ -914,8 +914,8 @@ class AgendaService(BaseSearchService):
                             {
                                 # Match Events before ``item_type`` field was added
                                 "bool": {
-                                    "must_not": {"exists": {"field": "item_type"}},
-                                    "filter": {"exists": {"field": "event_id"}},
+                                    "must_not": [{"exists": {"field": "item_type"}}],
+                                    "filter": [{"exists": {"field": "event_id"}}],
                                 },
                             },
                         ],
@@ -950,12 +950,12 @@ class AgendaService(BaseSearchService):
                 {
                     "bool": {
                         "should": [
-                            {"bool": {"must_not": {"exists": {"field": "item_type"}}}},
+                            {"bool": {"must_not": [{"exists": {"field": "item_type"}}]}},
                             {"term": {"item_type": "event"}},
                             {
                                 "bool": {
-                                    "filter": {"term": {"item_type": "planning"}},
-                                    "must_not": {"exists": {"field": "event_id"}},
+                                    "filter": [{"term": {"item_type": "planning"}}],
+                                    "must_not": [{"exists": {"field": "event_id"}}],
                                 },
                             },
                         ],
@@ -1015,10 +1015,10 @@ class AgendaService(BaseSearchService):
                 )
 
         if search.args.get("id"):
-            search.query["bool"]["filter"].append({"term": {"_id": search.args["id"]}})
+            search.query["bool"]["filter"].append({"ids": {"values": [search.args["id"]]}})
 
         if search.args.get("ids"):
-            search.query["bool"]["filter"].append({"terms": {"_id": search.args["ids"]}})
+            search.query["bool"]["filter"].append({"ids": {"values": search.args["ids"]}})
 
         if search.args.get("bookmarks"):
             set_saved_items_query(search.query, search.args["bookmarks"])

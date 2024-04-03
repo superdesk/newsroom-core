@@ -162,7 +162,7 @@ class WireSearchService(BaseSearchService):
                     "bool": {
                         "should": [
                             {"range": {"embargoed": {"lt": "now"}}},
-                            {"bool": {"must_not": {"exists": {"field": "embargoed"}}}},
+                            {"bool": {"must_not": [{"exists": {"field": "embargoed"}}]}},
                         ]
                     }
                 }

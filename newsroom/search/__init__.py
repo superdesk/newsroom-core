@@ -25,18 +25,39 @@ class QueryStringParams(TypedDict, total=False):
     type: Literal["cross_fields", "best_fields"]
 
 
-class TermQueryParams(TypedDict):
-    value: str
+Value = Union[str, bool, int]
 
 
-class TermsQueryParams(TypedDict):
-    value: List[str]
+class QueryStringQuery(TypedDict):
+    query_string: QueryStringParams
 
 
-TermQuery = Dict[Literal["term"], Dict[str, TermQueryParams]]
-TermsQuery = Dict[Literal["terms"], Dict[str, TermsQueryParams]]
-MatchQuery = Dict[Literal["match"], Dict[str, str]]
-QueryStringQuery = Dict[Literal["query_string"], QueryStringParams]
+class ExistsQueryParam(TypedDict):
+    field: str
+
+
+class ExistsQuery(TypedDict):
+    exists: ExistsQueryParam
+
+
+class MatchQuery(TypedDict):
+    match: Dict[str, Value]
+
+
+class TermQuery(TypedDict):
+    term: Dict[str, Value]
+
+
+class TermsQuery(TypedDict):
+    terms: Dict[str, List[Value]]
+
+
+class IDsQuery(TypedDict):
+    ids: Dict[Literal["values"], List[str]]
+
+
+class RangeQuery(TypedDict):
+    range: Dict[str, Dict[Literal["gte", "gt", "lte", "lt"], Value]]
 
 
 class BoolQueryParams(TypedDict, total=False):
@@ -47,16 +68,19 @@ class BoolQueryParams(TypedDict, total=False):
     minimum_should_match: int
 
 
-BoolQuery = Dict[Literal["bool"], BoolQueryParams]
+class BoolQuery(TypedDict):
+    bool: BoolQueryParams
 
 
-class _NestedQuery(TypedDict):
+class NestedQueryParams(TypedDict):
     path: str
     query: Union[TermQuery, BoolQuery]
 
 
-NestedQuery = Dict[Literal["nested"], _NestedQuery]
+class NestedQuery(TypedDict):
+    nested: NestedQueryParams
 
-TermLevelQuery = Union[TermQuery, TermsQuery]
+
+TermLevelQuery = Union[TermQuery, TermsQuery, IDsQuery, ExistsQuery, RangeQuery]
 FullTextQuery = Union[QueryStringQuery, MatchQuery]
 Query = Union[TermLevelQuery, FullTextQuery, BoolQuery, NestedQuery]
