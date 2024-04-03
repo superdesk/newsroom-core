@@ -1,18 +1,36 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import {get, memoize} from 'lodash';
+import {memoize} from 'lodash';
 import {formatHTML} from 'utils';
 import {connect} from 'react-redux';
 import {selectCopy} from '../../wire/actions';
+import {IArticle} from 'interfaces';
+import {extensions} from 'index';
 
-/**
- * using component to fix iframely loading
- * https://iframely.com/docs/reactjs
- */
-class ArticleBodyHtml extends React.PureComponent<any, any> {
-    static propTypes: any;
-    getBodyHTML: any;
-    bodyRef: any;
+function isLinkExternal(href: string) {
+    try {
+        const url = new URL(href);
+
+        // Check if the hosts are different and protocol is http or https
+        return url.host !== window.location.host && ['http:', 'https:'].includes(url.protocol);
+    } catch (e) {
+        // will throw if string is not a valid link
+        return false;
+    }
+}
+
+interface IOwnProps {
+    item: IArticle;
+}
+
+interface IMapDispatchToProps {
+    reportCopy(item: IArticle): void;
+}
+
+type IProps = IOwnProps & IMapDispatchToProps;
+
+class ArticleBodyHtmlComponent extends React.PureComponent<IProps> {
+    private getBodyHTML: any;
+    private bodyRef: React.RefObject<HTMLDivElement>;
 
     constructor(props: any) {
         super(props);
@@ -22,21 +40,48 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
         // use memoize so this function is only called when `body_html` changes
         this.getBodyHTML = memoize(this._getBodyHTML.bind(this));
 
-        this.bodyRef = React.createRef();
+        this.bodyRef = React.createRef<HTMLDivElement>();
     }
 
+
     componentDidMount() {
-        this.loadIframely();
+        const item = this.props.item;
+        const html = this.getBodyHTML(
+            (item.es_highlight?.body_html ?? '').length > 0 ?
+                item.es_highlight?.body_html[0] :
+                item.body_html
+        );
+
+        if (!html) {
+            return;
+        }
+
+        const prepareWirePreview = extensions.prepareWirePreview ?? ((element) => element);
+        const previewElement = prepareWirePreview(new DOMParser().parseFromString(html, 'text/html').body);
+
+        if (this.bodyRef.current == null) {
+            return;
+        }
+
+        this.bodyRef.current.appendChild(previewElement);
+
+        this.loadIframely(); // https://iframely.com/docs/react
         this.executeScripts();
         document.addEventListener('copy', this.copyClicked);
         document.addEventListener('click', this.clickClicked);
+
     }
 
-    clickClicked(event: any) {
+    componentWillUnmount() {
+        document.removeEventListener('copy', this.copyClicked);
+        document.removeEventListener('click', this.clickClicked);
+    }
+
+    private clickClicked(event: any) {
         if (event != null) {
             const target = event.target;
 
-            if (target && target.tagName === 'A' && this.isLinkExternal(target.href)) {
+            if (target && target.tagName === 'A' && isLinkExternal(target.href)) {
                 event.preventDefault();
                 event.stopPropagation();
 
@@ -49,32 +94,15 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
         }
     }
 
-    isLinkExternal(href: any) {
-        try {
-            const url = new URL(href);
-
-            // Check if the hosts are different and protocol is http or https
-            return url.host !== window.location.host && ['http:', 'https:'].includes(url.protocol);
-        } catch (e) {
-            // will throw if string is not a valid link
-            return false;
-        }
-    }
-
-    componentDidUpdate() {
-        this.loadIframely();
-        this.executeScripts();
-    }
-
-    loadIframely() {
-        const html = get(this.props, 'item.body_html', '');
+    private loadIframely() {
+        const html = this.props.item?.body_html ?? '';
 
         if (window.iframely && html && html.includes('iframely')) {
             window.iframely.load();
         }
     }
 
-    executeScripts() {
+    private executeScripts() {
         const tree: any = this.bodyRef.current;
         const loaded: Array<any> = [];
 
@@ -121,16 +149,11 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
         });
     }
 
-    copyClicked() {
+    private copyClicked() {
         this.props.reportCopy(this.props.item);
     }
 
-    componentWillUnmount() {
-        document.removeEventListener('copy', this.copyClicked);
-        document.removeEventListener('click', this.clickClicked);
-    }
-
-    _getBodyHTML(bodyHtml: any) {
+    private _getBodyHTML(bodyHtml: any) {
         return !bodyHtml ?
             null :
             this._updateImageEmbedSources(formatHTML(bodyHtml));
@@ -143,15 +166,17 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
      * @returns {string}
      * @private
      */
-    _updateImageEmbedSources(html: any) {
+    private _updateImageEmbedSources(html: any) {
         const item = this.props.item;
+
+        const associations: NonNullable<IArticle['associations']> = item.associations ?? {};
 
         // Get the list of Original Rendition IDs for all Image Associations
         const imageEmbedOriginalIds = Object
-            .keys(item.associations || {})
+            .keys(associations)
             .filter((key: any) => key.startsWith('editor_'))
-            .map((key: any) => get(item.associations[key], 'renditions.original.media'))
-            .filter((value: any) => value);
+            .map((key: any) => associations[key]?.renditions?.['original']?.media)
+            .filter((value: any) => value != null);
 
         if (!imageEmbedOriginalIds.length) {
             // This item has no Image Embeds
@@ -187,49 +212,27 @@ class ArticleBodyHtml extends React.PureComponent<any, any> {
             });
 
         // If Image tags were not updated, then return the supplied html as-is
-        return imageSourcesUpdated ?
-            container.innerHTML :
-            html;
+        return imageSourcesUpdated ? container.innerHTML : html;
     }
 
     render() {
-        const item = this.props.item;
-        const html = this.getBodyHTML(
-            get(item, 'es_highlight.body_html.length', 0) > 0 ?
-                item.es_highlight.body_html[0] :
-                item.body_html
-        );
-
-        if (!html) {
-            return null;
-        }
+        // preview element will be populated in `componentDidMount`
 
         return (
             <div
                 ref={this.bodyRef}
                 className='wire-column__preview__text wire-column__preview__text--pre'
                 id='preview-body'
-                dangerouslySetInnerHTML={({__html: html})}
             />
         );
     }
 }
 
-ArticleBodyHtml.propTypes = {
-    item: PropTypes.shape({
-        body_html: PropTypes.string,
-        es_highlight: PropTypes.shape({
-            body_html: PropTypes.arrayOf(PropTypes.string),
-        }),
-        associations: PropTypes.object,
-    }).isRequired,
-    reportCopy: PropTypes.func,
-};
-
 const mapDispatchToProps = (dispatch: any) => ({
     reportCopy: (item: any) => dispatch(selectCopy(item))
 });
 
-const component: React.ComponentType<any> = connect(null, mapDispatchToProps)(ArticleBodyHtml);
+const ArticleBodyHtmlConnected: React.ComponentType<IProps> = connect(null, mapDispatchToProps)(ArticleBodyHtmlComponent);
 
-export default component;
+// component needs to reinitialize if item changes
+export const ArticleBodyHtml: React.ComponentType<IProps> = (props) => <ArticleBodyHtmlConnected {...props} key={props.item._id} />;
