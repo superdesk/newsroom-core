@@ -269,13 +269,13 @@ class WireSearchService(BaseSearchService):
         except Forbidden:
             return False
 
-    def apply_request_filter(self, search):
+    def apply_request_filter(self, search, highlights=True):
         """Generate the filters from request args
 
         :param newsroom.search.SearchQuery search: The search query instance
         """
 
-        super().apply_request_filter(search)
+        super().apply_request_filter(search, highlights=highlights)
 
         if search.args.get("bookmarks"):
             set_bookmarks_query(search.query, search.args["bookmarks"])

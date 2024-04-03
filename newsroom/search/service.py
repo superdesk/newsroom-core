@@ -13,6 +13,7 @@ from content_api.errors import BadParameterValueError
 
 from newsroom import Service
 from newsroom.auth.utils import user_has_section_allowed
+from newsroom.search import BoolQueryParams, QueryStringQuery
 from newsroom.search.config import (
     SearchGroupNestedConfig,
     get_nested_config,
@@ -48,7 +49,7 @@ def query_string(
     fields: List[str] = ["*"],
     multimatch_type: Literal["cross_fields", "best_fields"] = "cross_fields",
     analyze_wildcard=False,
-):
+) -> QueryStringQuery:
     query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
     return {
         "query_string": {
@@ -330,10 +331,11 @@ class BaseSearchService(Service):
 
         return internal_req
 
-    def set_bool_query_from_filters(self, bool_query: Dict[str, Any], filters: Dict[str, Any]):
+    def set_bool_query_from_filters(self, bool_query: BoolQueryParams, filters: Dict[str, Any]):
         for key, val in filters.items():
             if not val:
                 continue
+            bool_query.setdefault("must", [])
             bool_query["must"].append(
                 get_filter_query(key, val, self.get_aggregation_field(key), get_nested_config("items", key))
             )
@@ -576,7 +578,7 @@ class BaseSearchService(Service):
             highlight_search.advanced = deepcopy(search.advanced)
 
             # Set up the search query for filtering
-            self.apply_request_filter(highlight_search)
+            self.apply_request_filter(highlight_search, highlights=True)
 
             # Set up highlighting settings
             highlight_search.source.setdefault("highlight", {})
@@ -742,7 +744,18 @@ class BaseSearchService(Service):
         if product.get("query"):
             return self.query_string(product["query"])
 
-    def apply_request_filter(self, search):
+    def parse_filters(self, search: SearchQuery) -> Optional[Dict[str, Any]]:
+        if search.args.get("filter"):
+            if isinstance(search.args["filter"], dict):
+                return search.args["filter"]
+            else:
+                try:
+                    return json.loads(search.args["filter"])
+                except TypeError:
+                    raise BadParameterValueError("Incorrect type supplied for filter parameter")
+        return None
+
+    def apply_request_filter(self, search: SearchQuery, highlights=False) -> None:
         if search.args.get("q"):
             search.query["bool"].setdefault("must", []).append(
                 self.query_string(search.args["q"], search.args.get("default_operator") or "AND")
@@ -751,15 +764,7 @@ class BaseSearchService(Service):
         if search.args.get("ids"):
             search.query["bool"]["must"].append({"terms": {"_id": search.args["ids"]}})
 
-        filters = None
-        if search.args.get("filter"):
-            if isinstance(search.args["filter"], dict):
-                filters = search.args["filter"]
-            else:
-                try:
-                    filters = json.loads(search.args["filter"])
-                except TypeError:
-                    raise BadParameterValueError("Incorrect type supplied for filter parameter")
+        filters = self.parse_filters(search)
 
         if not app.config.get("FILTER_BY_POST_FILTER", False):
             if filters:
@@ -974,7 +979,7 @@ class BaseSearchService(Service):
         internal_req = self.get_internal_request(search)
         return self.internal_get(internal_req, search.lookup)
 
-    def query_string(self, query, default_operator="AND"):
+    def query_string(self, query, default_operator="AND") -> QueryStringQuery:
         fields_config_key = "WIRE_SEARCH_FIELDS" if self.section == "wire" else "AGENDA_SEARCH_FIELDS"
         fields = app.config.get(fields_config_key, ["*"])
         return query_string(query, default_operator=default_operator, fields=fields)

@@ -30,6 +30,7 @@ from newsroom.notifications import (
     save_user_notifications,
     UserNotification,
 )
+from newsroom.search import BoolQuery, BoolQueryParams
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.utils import (
     get_user_dict,
@@ -501,7 +502,7 @@ coverage_filters = ["coverage", "coverage_status"]
 planning_filters = coverage_filters + ["agendas"]
 
 
-def _filter_terms(filters, item_type):
+def _filter_terms(filters, item_type, highlights=False):
     must_term_filters = []
     must_not_term_filters = []
     for key, val in filters.items():
@@ -623,6 +624,7 @@ def _filter_terms(filters, item_type):
                                     path="planning_items",
                                     query={"bool": {"filter": [{"terms": {f"planning_items.{agg_field}": val}}]}},
                                     name=key,
+                                    inner_hits=highlights,
                                 ),
                             ],
                         },
@@ -979,14 +981,14 @@ class AgendaService(BaseSearchService):
             if product.get("planning_item_query") and search.item_type != "events":
                 search.planning_items_should.append(planning_items_query_string(product.get("planning_item_query")))
 
-    def apply_request_filter(self, search):
+    def apply_request_filter(self, search: SearchQuery, highlights=False):
         """Generate the request filters
 
         :param newsroom.search.SearchQuery search: The search query instance
         """
 
         if search.args.get("q"):
-            test_query = {"bool": {"should": []}}
+            test_query: BoolQuery = {"bool": {"should": []}}
             try:
                 q = json.loads(search.args.get("q"))
                 if isinstance(q, dict):
@@ -1024,6 +1026,10 @@ class AgendaService(BaseSearchService):
 
         if search.args.get("date_from") or search.args.get("date_to"):
             _set_event_date_range(search)
+
+        filters = self.parse_filters(search)
+        if filters:
+            self.set_bool_query_from_filters(search.query["bool"], filters, search.item_type, highlights=highlights)
 
         self.apply_request_advanced_search(search)
 
@@ -1277,9 +1283,13 @@ class AgendaService(BaseSearchService):
         return agenda_items
 
     def set_bool_query_from_filters(
-        self, bool_query: Dict[str, Any], filters: Dict[str, Any], item_type: Optional[str] = None
+        self,
+        bool_query: BoolQueryParams,
+        filters: Dict[str, Any],
+        item_type: Optional[str] = None,
+        highlights=False,
     ):
-        filter_terms = _filter_terms(filters, item_type)
+        filter_terms = _filter_terms(filters, item_type, highlights=highlights)
         bool_query.setdefault("filter", [])
         bool_query["filter"] += filter_terms["must_term_filters"]
 
