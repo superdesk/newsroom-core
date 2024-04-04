@@ -1,6 +1,7 @@
 /* eslint-env node */
 
 const path = require('path');
+const fs = require('fs');
 const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const TerserPlugin = require('terser-webpack-plugin-legacy');
@@ -9,7 +10,6 @@ const ObjectRestSpreadPlugin = require('@sucrase/webpack-object-rest-spread-plug
 const config = {
     entry: {
         newsroom_js: path.resolve(__dirname, 'assets/index.ts'),
-        newsroom_custom_js: path.resolve(process.cwd(), 'app.ts'),
         companies_js: path.resolve(__dirname, 'assets/companies/index.ts'),
         oauth_clients_js: path.resolve(__dirname, 'assets/oauth_clients/index.ts'),
         users_js: path.resolve(__dirname, 'assets/users/index.ts'),
@@ -108,6 +108,13 @@ const config = {
         disableHostCheck: true,
     },
 };
+
+const customJsPath = path.resolve(process.cwd(), 'app.ts');
+
+if (fs.existsSync(customJsPath)) {
+    config.entry['newsroom_custom_js'] = customJsPath;
+}
+
 
 if (process.env.NODE_ENV === 'production') {
     config.plugins.push(new webpack.DefinePlugin({
