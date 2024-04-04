@@ -102,3 +102,23 @@ It will run database migrations when needed.
 * Start **only redis** service via docker `docker-compose up redis`
 * Run the following command in a terminal `ssh -L 9200:data-sd:9201 -L 27017:data-sd:27017 host7.sourcefabric.org` - it will connect to the test server and forward ports of mongo db and elastic search services
 * start client and server using standard procedures (non-docker)
+
+
+## Extensions API
+
+To enable extensions:
+* modify `webpack.config.js` in the root repo and overwrite the path to `newsroom_js` entry point to a path of a newly created file in the root repository.
+* inside that newly created file, import and call `registerExtensions` function from `newsroom-core/assets/index`.
+
+Here's an example of how to overwrite `newsroom_js` entry point:
+
+```js
+// webpack.config.js
+
+const path = require('path');
+const config = require('newsroom-core/webpack.config');
+
+config.entry.newsroom_js = path.resolve(__dirname, 'index.js');
+
+module.exports = config
+```
