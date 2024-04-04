@@ -106,19 +106,9 @@ It will run database migrations when needed.
 
 ## Extensions API
 
-To enable extensions:
-* modify `webpack.config.js` in the root repo and overwrite the path to `newsroom_js` entry point to a path of a newly created file in the root repository.
-* inside that newly created file, import and call `registerExtensions` function from `newsroom-core/assets/index`.
+Prerequisites:
 
-Here's an example of how to overwrite `newsroom_js` entry point:
+* ensure `client/app.ts` file is present in the root repository. If it's not present, create an empty file.
+* ensure `client/tsconfig.json` is present in the root repository. If it's not present, copy it from `newsroom-app`.
 
-```js
-// webpack.config.js
-
-const path = require('path');
-const config = require('newsroom-core/webpack.config');
-
-config.entry.newsroom_js = path.resolve(__dirname, 'index.js');
-
-module.exports = config
-```
+To enable extensions open `client/app.ts`, import and call `registerExtensions` function from `newsroom-core/assets/index`.

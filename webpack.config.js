@@ -9,6 +9,7 @@ const ObjectRestSpreadPlugin = require('@sucrase/webpack-object-rest-spread-plug
 const config = {
     entry: {
         newsroom_js: path.resolve(__dirname, 'assets/index.ts'),
+        newsroom_custom_js: path.resolve(process.cwd(), 'app.ts'),
         companies_js: path.resolve(__dirname, 'assets/companies/index.ts'),
         oauth_clients_js: path.resolve(__dirname, 'assets/oauth_clients/index.ts'),
         users_js: path.resolve(__dirname, 'assets/users/index.ts'),
@@ -53,6 +54,7 @@ const config = {
                     path.resolve(__dirname, 'assets'),
                     path.resolve(__dirname, 'node_modules/bootstrap'),
                     path.resolve(process.cwd(), 'node_modules/bootstrap'),
+                    process.cwd(), // for newsroom_custom_js
                 ],
                 loader: 'ts-loader',
                 options: {
