@@ -300,12 +300,60 @@ class AgendaList extends React.Component<IProps, IState> {
         const isExtended = this.props.activeView === EXTENDED_VIEW;
         const showShortcutActionIcons = shouldShowListShortcutActionIcons(this.props.listConfig, isExtended);
 
+        const getItemIdsSorted = () => {
+            let topStoryIds: Array<string> = [];
+            let coveragesOnlyIds: Array<string> = [];
+            let restIds: Array<string> = [];
+
+            itemIds.forEach((id) => {
+                const item = this.props.itemsById[id];
+                const hasCoverage = (item.coverages?.length ?? 0) > 0;
+                const isTopStory = (item.subject ?? []).find((subj) => subj.scheme === this.props.listConfig.subject?.topStoryScheme);
+
+                if (isTopStory) {
+
+                    // hiddenItems has items which are multiDay and are not on the first date of the group
+                    if (group.hiddenItems.includes(item._id) === false) {
+                        topStoryIds = [
+                            ...topStoryIds,
+                            item._id,
+                        ];
+                    } else {
+                        restIds = [
+                            ...restIds,
+                            item._id,
+                        ];
+                    }
+                } else if (hasCoverage) {
+
+                    // items with coverages are displayed after top stories
+                    coveragesOnlyIds = [
+                        ...coveragesOnlyIds,
+                        item._id,
+                    ];
+                } else {
+
+                    // all other items should follow
+                    restIds = [
+                        ...restIds,
+                        item._id,
+                    ];
+                }
+            });
+
+            return [
+                ...topStoryIds,
+                ...coveragesOnlyIds,
+                ...restIds,
+            ];
+        };
+
         return (
             <div
                 className="wire-articles__group"
                 key={`${group.date}-${forHiddenItems ? 'hidden-items' : 'items'}-group`}
             >
-                {itemIds.map((itemId) => {
+                {getItemIdsSorted().map((itemId) => {
                     // Only show multiple entries for this item if we're in the `Planning Only` view
                     const plans = this.props.itemTypeFilter !== 'planning' ?
                         [] :
