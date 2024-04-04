@@ -232,7 +232,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     reportCopy: (item: any) => dispatch(selectCopy(item))
 });
 
-const ArticleBodyHtmlConnected: React.ComponentType<IProps> = connect(null, mapDispatchToProps)(ArticleBodyHtmlComponent);
+const ArticleBodyHtmlConnected: React.ComponentType<IOwnProps> = connect(null, mapDispatchToProps)(ArticleBodyHtmlComponent);
 
 // component needs to reinitialize if item changes
-export const ArticleBodyHtml: React.ComponentType<IProps> = (props) => <ArticleBodyHtmlConnected {...props} key={props.item._id} />;
+export const ArticleBodyHtml: React.ComponentType<IOwnProps> = (props) => <ArticleBodyHtmlConnected {...props} key={props.item._id} />;
