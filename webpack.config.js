@@ -109,10 +109,13 @@ const config = {
     },
 };
 
-const customJsPath = path.resolve(process.cwd(), 'app.ts');
+const customJsPathTsx = path.resolve(process.cwd(), 'app.tsx');
+const customJsPathTs = path.resolve(process.cwd(), 'app.ts');
 
-if (fs.existsSync(customJsPath)) {
-    config.entry['newsroom_custom_js'] = customJsPath;
+if (fs.existsSync(customJsPathTsx)) {
+    config.entry['newsroom_custom_js'] = customJsPathTsx;
+} else if (fs.existsSync(customJsPathTs)) {
+    config.entry['newsroom_custom_js'] = customJsPathTs;
 }
 
 
