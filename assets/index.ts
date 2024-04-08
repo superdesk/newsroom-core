@@ -1,13 +1,14 @@
 import {gettext, isTouchDevice} from 'utils';
 import 'primereact/resources/primereact.min.css';
 import {Button} from './ui/components/Button';
+import {IArticle} from 'interfaces';
 
 if (isTouchDevice()) {
     document.documentElement.classList.add('no-touch');
 }
 
 interface IExtensions {
-    prepareWirePreview?(content: HTMLElement): HTMLElement;
+    prepareWirePreview?(content: HTMLElement, item: IArticle): HTMLElement;
 }
 
 export const extensions: IExtensions = {};

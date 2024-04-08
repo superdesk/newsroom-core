@@ -57,7 +57,10 @@ class ArticleBodyHtmlComponent extends React.PureComponent<IProps> {
         }
 
         const prepareWirePreview = extensions.prepareWirePreview ?? ((element) => element);
-        const previewElement = prepareWirePreview(new DOMParser().parseFromString(html, 'text/html').body);
+        const previewElement = prepareWirePreview(
+            new DOMParser().parseFromString(html, 'text/html').body,
+            item,
+        );
 
         if (this.bodyRef.current == null) {
             return;
