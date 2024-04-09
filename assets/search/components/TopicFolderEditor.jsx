@@ -35,6 +35,7 @@ export function TopicFolderEditor ({folder, onSave, onCancel, error}) {
                         type="button"
                         className="icon-button icon-button--secondary icon-button--bordered icon-button--small"
                         aria-label={gettext('Cancel')}
+                        data-test-id="create-folder--cancel-btn"
                         title={gettext('Cancel')}
                         onClick={() => onCancel()}
                     >

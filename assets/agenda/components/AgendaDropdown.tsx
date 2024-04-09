@@ -42,7 +42,7 @@ export function AgendaDropdown({
     return (
         <Dropdown
             borderless={borderless}
-            isActive={isActive}
+            isActive={(isActive?.length ?? 0) > 0}
             icon={filter.icon}
             optionLabel={optionLabel}
             label={getActiveFilterLabel(filter, activeFilter, isActive)}

@@ -2,20 +2,24 @@ import hmac
 import flask
 import logging
 
+import superdesk
 import newsroom.signals as signals
+
 from copy import copy, deepcopy
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, Set
+from contextlib import contextmanager
 
 from flask import current_app as app
 from flask_babel import gettext
 from bson import ObjectId
-import superdesk
 from superdesk.text_utils import get_word_count, get_char_count
 from superdesk.utc import utcnow
 from superdesk.errors import SuperdeskApiError
 from planning.common import WORKFLOW_STATE
 from newsroom.celery_app import celery
+from newsroom.errors import LockedError
+from superdesk.lock import lock, unlock
 
 from newsroom.notifications import (
     push_notification,
@@ -86,23 +90,24 @@ def push():
     signals.push.send(app._get_current_object(), item=item)
 
     if item.get("type") == "event":
-        orig = app.data.find_one("agenda", req=None, guid=item["guid"])
+        orig = app.data.find_one("agenda", req=None, _id=item["guid"])
         _id = publish_event(item, orig)
-        notify_new_agenda_item.delay(_id, check_topics=True)
+        notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)
     elif item.get("type") == "planning":
-        orig = app.data.find_one("agenda", req=None, guid=item["guid"]) or {}
+        orig = app.data.find_one("agenda", req=None, _id=item["guid"]) or {}
         item["planning_date"] = parse_date_str(item["planning_date"])
         plan_id = publish_planning_item(item, orig)
         event_id = publish_planning_into_event(item)
         # Prefer parent Event when sending notificaitons
         _id = event_id or plan_id
-        notify_new_agenda_item.delay(_id, check_topics=True)
+        notify_new_agenda_item.delay(_id, check_topics=True, is_new=orig is None)
     elif item.get("type") == "text":
         orig = superdesk.get_resource_service("items").find_one(req=None, _id=item["guid"])
         item["_id"] = publish_item(item, orig)
-        notify_new_wire_item.delay(
-            item["_id"], check_topics=orig is None or app.config["WIRE_NOTIFICATIONS_ON_CORRECTIONS"]
-        )
+        if not item.get("nextversion"):
+            notify_new_wire_item.delay(
+                item["_id"], check_topics=orig is None or app.config["WIRE_NOTIFICATIONS_ON_CORRECTIONS"]
+            )
     elif item["type"] == "planning_featured":
         publish_planning_featured(item)
     else:
@@ -131,6 +136,12 @@ def publish_item(doc, original):
     doc.setdefault("charcount", get_char_count(doc.get("body_html", "")))
     doc["original_id"] = doc["guid"]
 
+    source_expiry = app.config.get("SOURCE_EXPIRY_DAYS") or {}
+    if doc.get("source") in source_expiry:
+        doc["expiry"] = datetime.utcnow().replace(second=0, microsecond=0) + timedelta(
+            days=source_expiry[doc["source"]]
+        )
+
     service = superdesk.get_resource_service("content_api")
     service.datasource = "items"
 
@@ -144,12 +155,20 @@ def publish_item(doc, original):
             doc["bookmarks"] = parent_item.get("bookmarks", [])
             doc["planning_id"] = parent_item.get("planning_id")
             doc["coverage_id"] = parent_item.get("coverage_id")
+            if parent_item.get("expiry"):
+                doc["expiry"] = parent_item["expiry"]
         else:
             logger.warning(
                 "Failed to find evolvedfrom item %s for %s",
                 doc["evolvedfrom"],
                 doc["guid"],
             )
+
+    if not original and app.config.get("PUSH_FIX_UPDATES"):  # check if there are updates of this item already
+        next_item = service.find_one(req=None, evolvedfrom=doc["guid"])
+        if next_item:  # there is an update, add missing ancestor
+            doc["nextversion"] = next_item["_id"]
+            fix_updates(doc, next_item, service)
 
     fix_hrefs(doc)
     logger.debug("publishing %s", doc["guid"])
@@ -220,6 +239,7 @@ def publish_event(event, orig):
                 # This can happen when pushing a Planning item before linking to an Event
                 service.system_update(plan["_id"], {"event_id": _id}, plan)
 
+        signals.publish_event.send(app._get_current_object(), item=agenda, is_new=True)
         _id = service.post([agenda])[0]
     else:
         # replace the original document
@@ -268,6 +288,11 @@ def publish_event(event, orig):
             set_agenda_metadata_from_event(updates, event, False)
 
         if updates:
+            updated = orig.copy()
+            updated.update(updates)
+            signals.publish_event.send(
+                app._get_current_object(), item=updated, updates=updates, orig=orig, is_new=False
+            )
             service.patch(orig["_id"], updates)
             updates["_id"] = orig["_id"]
             superdesk.get_resource_service("agenda").notify_agenda_update(updates, orig)
@@ -314,9 +339,11 @@ def publish_planning_item(planning, orig):
         # Setting ``_id`` of Agenda to be equal to the Planning item if there's no Event ID
         agenda.setdefault("_id", planning["guid"])
         agenda.setdefault("guid", planning["guid"])
+        signals.publish_planning.send(app._get_current_object(), item=agenda, is_new=new_plan)
         return service.post([agenda])[0]
     else:
         # Replace the original
+        signals.publish_planning.send(app._get_current_object(), item=agenda, is_new=new_plan)
         service.patch(agenda["_id"], agenda)
         return agenda["_id"]
 
@@ -637,7 +664,8 @@ def get_coverages(planning_items, original_coverages, new_plan):
             for coverage in planning_item.get("coverages") or []:
                 existing_coverage = get_existing_coverage(coverage["coverage_id"])
                 coverage_planning = coverage.get("planning") or {}
-
+                assigned_desk = coverage.get("assigned_desk") or {}
+                assigned_user = coverage.get("assigned_user") or {}
                 new_coverage = {
                     "planning_id": planning_item.get("guid"),
                     "coverage_id": coverage.get("coverage_id"),
@@ -649,6 +677,10 @@ def get_coverages(planning_items, original_coverages, new_plan):
                     "genre": coverage_planning.get("genre", []),
                     "coverage_provider": (coverage.get("coverage_provider") or {}).get("name"),
                     "watches": existing_coverage.get("watches") or coverage.get("watches", []),
+                    "assigned_desk_name": assigned_desk.get("name"),
+                    "assigned_desk_email": assigned_desk.get("email"),
+                    "assigned_user_name": assigned_user.get("display_name"),
+                    "assigned_user_email": assigned_user.get("email"),
                 }
 
                 if TO_BE_CONFIRMED_FIELD in coverage:
@@ -709,19 +741,38 @@ def set_item_reference(coverage):
             notify_new_wire_item.delay(item["_id"], check_topics=False)
 
 
+@contextmanager
+def locked(_id: str, service: str):
+    lock_name = f"notify-{service}-{_id}"
+    if not lock(lock_name, expire=300):
+        raise LockedError(lock_name)
+    logger.debug("Starting task %s", lock_name)
+    try:
+        yield lock_name
+    finally:
+        unlock(lock_name)
+        logger.debug("Done with %s", lock_name)
+
+
 @celery.task
 def notify_new_wire_item(_id, check_topics=True):
-    item = superdesk.get_resource_service("items").find_one(req=None, _id=_id)
-    if item:
-        notify_new_item(item, check_topics=check_topics)
+    with locked(_id, "wire"):
+        item = superdesk.get_resource_service("items").find_one(req=None, _id=_id)
+        if item:
+            notify_new_item(item, check_topics=check_topics)
 
 
 @celery.task
-def notify_new_agenda_item(_id, check_topics=True):
-    agenda = app.data.find_one("agenda", req=None, _id=_id)
-    if agenda:
-        superdesk.get_resource_service("agenda").enhance_items([agenda])
-        notify_new_item(agenda, check_topics=check_topics)
+def notify_new_agenda_item(_id, check_topics=True, is_new=False):
+    with locked(_id, "agenda"):
+        agenda = app.data.find_one("agenda", req=None, _id=_id)
+        if agenda:
+            if agenda.get("recurrence_id") and agenda.get("recurrence_id") != _id and is_new:
+                logger.info("Ignoring recurring event %s", _id)
+                return
+
+            superdesk.get_resource_service("agenda").enhance_items([agenda])
+            notify_new_item(agenda, check_topics=check_topics)
 
 
 def notify_new_item(item, check_topics=True):
@@ -760,7 +811,7 @@ def notify_new_item(item, check_topics=True):
         )
     except Exception as e:
         logger.exception(e)
-        logger.error(f"Failed to notify users for new {item_type} item {item['_id']}")
+        logger.error(f"Failed to notify users for new {item_type} item", extra={"_id": item["_id"]})
 
 
 def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids, users_with_realtime_subscription):
@@ -978,3 +1029,15 @@ def publish_planning_featured(item):
         assert item.get("tz"), {"tz": 1}
         assert item.get("items"), {"items": 1}
         service.create([item])
+
+
+def fix_updates(doc, next_item, service):
+    ancestors = (doc.get("ancestors") or []) + [doc["guid"]]
+    for i in range(50):
+        updates = {"ancestors": ancestors + (next_item.get("ancestors") or []), "original_id": doc["original_id"]}
+        service.system_update(next_item["_id"], updates, next_item)
+        next_item = service.find_one(req=None, evolvedfrom=next_item["_id"])
+        if next_item is None:
+            break
+    else:
+        logger.warning("Didn't fix ancestors in 50 iterations", extra={"guid": doc["guid"]})

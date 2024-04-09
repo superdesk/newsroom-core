@@ -1,4 +1,4 @@
-import {gettext, notify, errorHandler} from 'utils';
+import {gettext, notify, errorHandler, updateRouteParams} from 'utils';
 import server from 'server';
 import {searchQuerySelector} from 'search/selectors';
 import {get, cloneDeep} from 'lodash';
@@ -6,8 +6,11 @@ import {cleanUserEntityBeforePatch} from './utils';
 import {IUser} from 'interfaces/user';
 
 export const SELECT_USER = 'SELECT_USER';
-export function selectUser(id: any) {
+export function selectUser(id: any, updateRoute = true) {
     return function (dispatch: any) {
+        if (updateRoute) {
+            updateRouteParams({userId: id}, {});
+        }
         dispatch(select(id));
     };
 }
@@ -41,7 +44,11 @@ export function newUser(data?: any) {
 }
 
 export const CANCEL_EDIT = 'CANCEL_EDIT';
-export function cancelEdit(event?: any) {
+export function cancelEdit(event?: any, updateRoute = true) {
+    if (updateRoute) {
+        updateRouteParams({userId: null}, {});
+    }
+
     return {type: CANCEL_EDIT, event};
 }
 
@@ -147,10 +154,12 @@ export function postUser() {
         const user = cloneDeep(getState().userToEdit);
         const url = `/users/${user._id ? user._id : 'new'}`;
 
-        if (user.sections != null) {
+        if (Object.keys(user.sections || {}).length > 0) {
             user.sections = Object.keys(user.sections)
                 .filter((sectionId: any) => user.sections[sectionId] === true)
                 .join(',');
+        } else {
+            delete user.sections;
         }
         if (user.products != null) {
             user.products = user.products
@@ -225,5 +234,30 @@ export function initViewData(data: any): any {
         dispatch(getUsers(data.users));
         dispatch(getCompanies(data.companies));
         dispatch(getUser(get(window.profileData, 'user', {})));
+    };
+}
+
+export function onURLParamsChanged() {
+    return (dispatch: any, getState: any) => {
+        const params = new URLSearchParams(window.location.search);
+        const userId = params.get('userId');
+        const state = getState();
+
+        if (userId != null && state.userToEdit?._id !== userId) {
+            dispatch(selectUser(userId, false));
+        } else if (userId == null && state.userToEdit != null) {
+            dispatch(cancelEdit(undefined, false));
+        }
+    };
+}
+
+export function approveUser(userId: IUser['_id']) {
+    return function(dispatch: any) {
+        return server.post(`/users/${userId}/approve`, {})
+            .then(() => {
+                notify.success(gettext('User has been approved'));
+                dispatch(fetchUsers());
+            })
+            .catch((error: any) => errorHandler(error, dispatch, setError));
     };
 }

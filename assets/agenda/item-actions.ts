@@ -3,6 +3,7 @@ import {getItemActions} from '../item-actions';
 import * as agendaActions from './actions';
 import {gettext} from '../utils';
 import {isWatched} from './utils';
+import {IItemAction} from 'interfaces';
 
 const canWatchAgendaItem = (state: any, item: any, includeCoverages: any) => {
     const result = state.user && !isWatched(item, state.user);
@@ -16,22 +17,25 @@ const canWatchAgendaItem = (state: any, item: any, includeCoverages: any) => {
 
 export const getAgendaItemActions = (dispatch: any) => {
     const {watchEvents, stopWatchingEvents} = agendaActions;
-    return (getItemActions(dispatch, {...agendaActions}) as any).concat([
-        {
-            name: gettext('Watch'),
-            icon: 'watch',
-            multi: true,
-            when: (state: any, item: any, includeCoverages: any) => canWatchAgendaItem(state, item, includeCoverages),
-            action: (items: any) => dispatch(watchEvents(items)),
-        },
-        {
-            name: gettext('Stop watching'),
-            icon: 'unwatch',
-            multi: true,
-            when: (state: any, item: any, includeCoverages: any) => !canWatchAgendaItem(state, item, includeCoverages),
-            action: (items: any) => dispatch(stopWatchingEvents(items)),
-        },
-    ]);
+
+    return (getItemActions(dispatch, {...agendaActions}) as any)
+        .filter((action: IItemAction) => action.id !== 'remove')
+        .concat([
+            {
+                name: gettext('Watch'),
+                icon: 'watch',
+                multi: true,
+                when: (state: any, item: any, includeCoverages: any) => canWatchAgendaItem(state, item, includeCoverages),
+                action: (items: any) => dispatch(watchEvents(items)),
+            },
+            {
+                name: gettext('Stop watching'),
+                icon: 'unwatch',
+                multi: true,
+                when: (state: any, item: any, includeCoverages: any) => !canWatchAgendaItem(state, item, includeCoverages),
+                action: (items: any) => dispatch(stopWatchingEvents(items)),
+            },
+        ]);
 };
 
 export const getCoverageItemActions = (dispatch: any) => {

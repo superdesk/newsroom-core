@@ -1,3 +1,4 @@
+import {dragAndDrop} from '../dnd/utils';
 
 class ProfileTopicsWrapper {
     getBaseComponent(additionalSelector) {
@@ -20,9 +21,8 @@ class ProfileTopicsWrapper {
 
     createNewFolder(name) {
         this.getCreateFolderButton().click();
-        cy.intercept('/api/users/*/topic_folders').as('getFolders');
         this.getFolderNameInput().type(name + '{enter}');
-        cy.wait('@getFolders');
+        cy.get(`[data-test-id="folder-card"][data-test-value="${name}"]`).should('be.visible');
     }
 
     getTopicCard(name, additionalSelector) {
@@ -40,14 +40,19 @@ class ProfileTopicsWrapper {
     }
 
     getFolderCard(name) {
-        return this.getBaseComponent(`[data-test-id="folder-card--${name}"]`);
+        return this.getBaseComponent(`[data-test-id="folder-card"][data-test-value="${name}"]`);
+    }
+
+    getFolderAction(name, actionName) {
+        cy.get(`[data-test-id="folder-card"][data-test-value="${name}"] [data-test-id="menu"]`).click();
+        return cy.get(`[data-test-id="action-folder"][data-test-value="${actionName}"]`);
     }
 
     dragTopicToFolder(topicName, folderName) {
-        const dataTransfer = new DataTransfer();
-
-        this.getTopicCard(topicName).trigger('dragstart', {dataTransfer});
-        this.getFolderCard(folderName).trigger('drop', {dataTransfer});
+        dragAndDrop(
+            this.getTopicCard(topicName),
+            this.getFolderCard(folderName),
+        );
     }
 }
 

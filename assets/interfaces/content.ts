@@ -1,3 +1,4 @@
+import {IResourceItem} from './common';
 
 export type IContentType = 'text' | 'picture' | 'video' | 'audio';
 
@@ -9,8 +10,7 @@ export interface IRendition {
     height?: number;
 }
 
-export interface IArticle {
-    _id: string;
+export interface IArticle extends IResourceItem {
     guid: string;
     type: IContentType;
     ancestors?: Array<IArticle['_id']>;
@@ -22,4 +22,14 @@ export interface IArticle {
     anpa_take_key?: string;
     source: string;
     versioncreated: string;
+    version?: number | string;
+    extra?: {
+        type?: 'transcript';
+        [key: string]: any;
+    };
+    expiry?: string;
+    description_text: string;
+    es_highlight?: {[field: string]: Array<string>};
+    extra_items?: {[type: string]: {type: string, items: Array<any>}};
+    deleted?: boolean; // Used only in the front-end, populated by wire/reducer
 }

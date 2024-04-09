@@ -16,6 +16,7 @@ import {
     deleteCompany,
     cancelEdit,
     fetchCompanyUsers,
+    approveCompany,
 } from '../actions';
 import {getCurrentCompanyForEditor} from '../selectors';
 
@@ -48,6 +49,7 @@ interface IDispatchProps {
     deleteCompany(): void;
     cancelEdit(event?: React.MouseEvent): void;
     fetchCompanyUsers(companyId: ICompany['_id']): void;
+    approveCompany(companyId: ICompany['_id']): void;
 }
 
 type IProps = IDispatchProps & IStateProps;
@@ -66,6 +68,7 @@ class EditCompany extends React.Component<IProps, IState> {
         this.getUsers = this.getUsers.bind(this);
         this.save = this.save.bind(this);
         this.deleteCompany = this.deleteCompany.bind(this);
+        this.approveCompany = this.approveCompany.bind(this);
 
         this.state = {
             activeTab: 'company-details',
@@ -100,7 +103,7 @@ class EditCompany extends React.Component<IProps, IState> {
 
         return this.props.users.map((user: any) => (
             <tr key={user._id}>
-                <td>{user.first_name} {user.last_name}</td>
+                <td><a href={`/settings/users?userId=${user._id}`}>{user.first_name} {user.last_name}</a></td>
                 <td>{shortDate(user._created)}</td>
             </tr>
         ));
@@ -141,6 +144,14 @@ class EditCompany extends React.Component<IProps, IState> {
         }
     }
 
+    approveCompany(event: React.MouseEvent) {
+        event.preventDefault();
+
+        if (confirm(gettext('This will also send account activation emails, would you like to continue?'))) {
+            this.props.approveCompany(this.props.company._id);
+        }
+    }
+
     render() {
         const currentAuthProvider =  this.props.authProviders.find(
             (provider) => provider._id === (this.props.company.auth_provider ?? 'newshub')
@@ -168,6 +179,25 @@ class EditCompany extends React.Component<IProps, IState> {
                     </button>
                 </div>
                 <AuditInformation item={this.props.company} />
+                {this.props.company.is_approved !== false ? null : (
+                    <div className="list-item__preview-toolbar">
+                        <div className="list-item__preview-toolbar-left">
+                            <label className="label label--orange2 label--big label--rounded">
+                                {gettext('Pending')}
+                            </label>
+                        </div>
+                        <div className="list-item__preview-toolbar-right">
+                            <button
+                                type="submit"
+                                className="nh-button nh-button--tertiary nh-button--small"
+                                aria-label={gettext('Approve Company & Users')}
+                                onClick={this.approveCompany}
+                            >
+                                {gettext('Approve Company & Users')}
+                            </button>
+                        </div>
+                    </div>
+                )}
                 <ul
                     data-test-id="form-tabs"
                     className='nav nav-tabs'
@@ -200,7 +230,7 @@ class EditCompany extends React.Component<IProps, IState> {
                                 onChange={this.props.onChange}
                                 save={this.save}
                                 deleteCompany={this.deleteCompany}
-                                ssoEnabled={this.props.ssoEnabled && currentAuthProvider?.auth_type === 'saml'}
+                                ssoEnabled={this.props.ssoEnabled && currentAuthProvider?.auth_type !== 'password'}
                                 authProviders={this.props.authProviders}
                                 countries = {this.props.countries}
                             />
@@ -267,6 +297,7 @@ const mapDispatchToProps = (dispatch: any): IDispatchProps => ({
     deleteCompany: () => dispatch(deleteCompany()),
     cancelEdit: (event) => dispatch(cancelEdit(event)),
     fetchCompanyUsers: (companyId) => dispatch(fetchCompanyUsers(companyId)),
+    approveCompany: (companyId) => dispatch(approveCompany(companyId)),
 });
 
 export default connect<

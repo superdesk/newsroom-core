@@ -23,6 +23,7 @@ export interface ICompany {
     url?: string;
     sd_subscriber_id?: string;
     is_enabled: boolean;
+    is_approved?: boolean;
     contact_name?: string;
     contact_email?: string;
     phone?: string;
@@ -33,6 +34,8 @@ export interface ICompany {
     events_only?: boolean;
     restrict_coverage_info?: boolean;
     company_type?: ICompanyType['id'];
+    company_size?: string;
+    referred_by?: string;
     account_manager?: string;
     monitoring_administrator?: IUser['_id'];
     allowed_ip_list?: Array<string>;

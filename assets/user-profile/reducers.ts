@@ -14,26 +14,50 @@ import {
     FOLDER_DELETED,
 } from './actions';
 
-import {RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID, ADD_EDIT_USERS} from 'actions';
-import {GET_COMPANY_USERS} from 'companies/actions';
-import {SET_USER_COMPANY_MONITORING_LIST} from 'monitoring/actions';
+import {RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID} from 'actions';
 
-import {modalReducer} from 'reducers';
+import {IModalState, modalReducer} from 'reducers';
 import {GET_NAVIGATIONS, QUERY_NAVIGATIONS} from 'navigations/actions';
 import {SET_TOPICS} from '../search/actions';
-import {ITopicFolder} from 'interfaces';
+import {ISection, ITopic, ITopicFolder, IUser} from 'interfaces';
+import {GET_COMPANY_USERS} from 'companies/actions';
 
-export interface IUserProfileStore {
-    allSections?: Array<any>;
-    companySections?: any;
-    seats?: any;
+export interface IUserProfileState {
+    user: IUser | null;
+    editedUser: Partial<IUser> | null;
+    company: string | null;
+    topics: ITopic[];
+    topicsById: {[_id: ITopic['_id']]: ITopic};
+    activeTopicId: ITopic['_id'] | null;
+    isLoading: boolean;
+    selectedMenu: 'profile' | 'topics' | 'events' | 'monitoring';
+    dropdown: boolean;
+    displayModal: boolean;
+    navigations: [];
+    selectedItem: ITopic | null;
+    editorFullscreen: boolean;
+    locators: [];
+    companyFolders: ITopicFolder[];
+    companyUsers: IUser[];
+    userFolders: ITopicFolder[];
+    authProviderFeatures?: {
+        change_password: boolean;
+        verify_password: boolean;
+    };
+    errors: {[key: string]: string[]} | null;
+    modal?: IModalState;
+    userSections?: ISection[];
+    monitoringList?: Array<any>;
+    monitoringAdministrator?: string;
+    uiConfigs?: any;
+    groups?: Array<any>;
 }
 
-const initialState: any = {
+const initialState: IUserProfileState = {
     user: null,
     editedUser: null,
     company: null,
-    topics: null,
+    topics: [],
     topicsById: {},
     activeTopicId: null,
     isLoading: false,
@@ -45,16 +69,17 @@ const initialState: any = {
     editorFullscreen: false,
     locators: [],
     companyFolders: [],
+    companyUsers: [],
     userFolders: [],
+    errors: {},
 };
 
-export default function itemReducer(state: any = initialState, action: any): IUserProfileStore {
-    let newSelected, newState;
+export default function itemReducer(state: IUserProfileState = initialState, action: any): IUserProfileState {
     switch (action.type) {
 
     case GET_TOPICS: {
         const topicsById = Object.assign({}, state.topicsById);
-        const topics = action.topics.map((topic: any) => {
+        const topics = action.topics.map((topic: ITopic) => {
             topicsById[topic._id] = topic;
             return topic;
         });
@@ -98,11 +123,7 @@ export default function itemReducer(state: any = initialState, action: any): IUs
     }
 
     case EDIT_USER: {
-
-        const target = action.event.target;
-        const field = target.name;
-        const editedUser = Object.assign({}, state.editedUser);
-        editedUser[field] = target.type === 'checkbox' ? target.checked : target.value;
+        const editedUser = Object.assign({}, state.editedUser, action.payload);
         return {...state, editedUser, errors: null};
     }
 
@@ -119,6 +140,10 @@ export default function itemReducer(state: any = initialState, action: any): IUs
             monitoringAdministrator: action.data.monitoring_administrator,
             uiConfigs: action.data.ui_configs,
             groups: action.data.groups || [],
+            authProviderFeatures: {
+                verify_password: action.data.authProviderFeatures?.verify_password === true,
+                change_password: action.data.authProviderFeatures?.change_password === true,
+            },
         };
     }
 
@@ -176,33 +201,6 @@ export default function itemReducer(state: any = initialState, action: any): IUs
             editorFullscreen: action.payload,
         };
 
-    case GET_COMPANY_USERS:
-        return {...state, monitoringProfileUsers: action.data};
-
-    case SET_USER_COMPANY_MONITORING_LIST:
-        newSelected = state.selectedItem && (action.data || []).find((w: any) => w._id === state.selectedItem._id);
-        newState = {
-            ...state,
-            monitoringList: action.data,
-
-        };
-
-        if (newSelected) {
-            newState.selectedItem = newSelected;
-        }
-
-        return newState;
-
-    case ADD_EDIT_USERS: {
-        return {
-            ...state,
-            editUsers: [
-                ...(state.editUsers || []),
-                ...action.data,
-            ]
-        };
-    }
-
     case RECIEVE_FOLDERS:
         return {
             ...state,
@@ -248,6 +246,13 @@ export default function itemReducer(state: any = initialState, action: any): IUs
         return {
             ...state,
             [foldersToAccess]: state[foldersToAccess].filter((folder: any) => folder._id !== action.payload.folder._id),
+        };
+    }
+
+    case GET_COMPANY_USERS: {
+        return {
+            ...state,
+            companyUsers: action.data,
         };
     }
 

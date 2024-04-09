@@ -57,6 +57,7 @@ def manager(app, client, product, company):
 
     app.data.insert("users", [manager])
 
+    manager.pop("password")
     utils.login(client, manager)
 
     data = utils.get_json(client, "/wire/search")
@@ -182,5 +183,6 @@ def test_other_company_user_changes_blocked(client, manager):
 
 def test_public_user_can_edit_his_dashboard(client, manager):
     public_user = next((user for user in USERS if user["_id"] == PUBLIC_USER_ID))
+    public_user.pop("password")
     utils.login(client, public_user)
     utils.patch_json(client, f"/api/_users/{PUBLIC_USER_ID}", {"dashboards": []})

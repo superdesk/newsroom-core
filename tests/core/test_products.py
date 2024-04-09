@@ -35,7 +35,12 @@ def companies(app):
     return _companies
 
 
-def test_product_list_fails_for_anonymous_user(client, anonymous_user):
+def test_product_list_fails_for_anonymous_user(client, anonymous_user, public_user):
+    response = client.get("/products/search")
+    assert response.status_code == 302
+    assert response.headers.get("location") == "http://localhost:5050/login"
+
+    utils.login(client, public_user)
     response = client.get("/products/search")
     assert response.status_code == 403
     assert b"Forbidden" in response.data
@@ -169,7 +174,9 @@ def test_assign_products_to_companies(client, app, product, companies):
 
 
 def test_products_company_migration(app, companies):
-    app.data.insert("products", [{"name": "test1", "companies": [companies[0]["_id"], str(companies[1]["_id"])]}])
+    product = {"name": "test1"}
+    app.data.insert("products", [product])
+    app.data.update("products", product["_id"], {"companies": [companies[0]["_id"], str(companies[1]["_id"])]}, product)
 
     update_module = importlib.import_module("data_updates.00009_20230116-145407_products")
     data_update = update_module.DataUpdate()

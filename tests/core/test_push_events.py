@@ -10,6 +10,7 @@ from typing import Dict, Any
 from flask import json
 from superdesk import get_resource_service
 
+import newsroom.signals
 
 from newsroom.tests.users import (
     ADMIN_USER_ID,
@@ -1389,3 +1390,55 @@ def test_push_plan_with_date_before_event_start(client, app):
     parsed = get_entity_or_404(planning["guid"], "agenda")
     assert 1 == len(parsed["planning_items"])
     assert 2 == len(parsed["coverages"])
+
+
+def test_push_planning_signal(client, app):
+    def on_push_planning(sender, item, is_new, **kwargs):
+        item["dates"]["all_day"] = True
+        assert is_new
+
+    newsroom.signals.publish_planning.connect(on_push_planning)
+
+    planning = deepcopy(test_planning)
+    client.post("/push", data=json.dumps(planning), content_type="application/json")
+
+    parsed = get_entity_or_404(planning["guid"], "agenda")
+    assert parsed and parsed["dates"]["all_day"]
+
+
+def test_push_events_signal(client, app):
+    def on_push_event(sender, item, is_new, **kwargs):
+        item["dates"]["all_day"] = True
+        assert is_new
+
+    newsroom.signals.publish_event.connect(on_push_event)
+
+    event = deepcopy(test_event)
+    client.post("/push", data=json.dumps(event), content_type="application/json")
+
+    parsed = get_entity_or_404(event["guid"], "agenda")
+    assert parsed and parsed["dates"]["all_day"]
+
+
+def test_push_planning_coverages_assignemnt_info(client, app):
+    planning = deepcopy(test_planning)
+
+    planning["coverages"][0]["assigned_desk"] = {
+        "name": "Sports",
+        "email": "sports@example.com",
+    }
+
+    planning["coverages"][0]["assigned_user"] = {
+        "display_name": "John Doe",
+        "email": "john@example.com",
+    }
+
+    client.post("/push", data=json.dumps(planning), content_type="application/json")
+
+    parsed = get_entity_or_404(planning["guid"], "agenda")
+    assert parsed
+    coverage = parsed["coverages"][0]
+    assert "Sports" == coverage["assigned_desk_name"]
+    assert "sports@example.com" == coverage["assigned_desk_email"]
+    assert "John Doe" == coverage["assigned_user_name"]
+    assert "john@example.com" == coverage["assigned_user_email"]

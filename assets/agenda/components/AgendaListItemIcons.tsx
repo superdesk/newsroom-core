@@ -1,6 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import {get, isEqual} from 'lodash';
+import {isEqual} from 'lodash';
+
+import {IAgendaItem, IUser, ICoverage, IListConfig} from 'interfaces';
 import {bem} from 'ui/utils';
 import {
     hasCoverages,
@@ -20,50 +21,61 @@ import AgendaLocation from './AgendaLocation';
 import {gettext, isDisplayed} from 'utils';
 import {AgendaContacs} from './AgendaContacts';
 
-class AgendaListItemIcons extends React.Component {
-    static propTypes: any;
-    static defaultProps: any;
+interface IProps {
+    user: IUser['_id'];
+    group: string;
+    item: IAgendaItem;
+    planningItem?: IAgendaItem;
+    hideCoverages?: boolean;
+    row?: boolean;
+    isMobilePhone?: boolean;
+    listConfig: IListConfig;
+}
 
-    constructor(props: any) {
+interface IState {
+    internalNote: string;
+    coveragesToDisplay: Array<ICoverage>;
+    attachments: number;
+    isRecurring: boolean;
+}
+
+class AgendaListItemIcons extends React.Component<IProps, IState> {
+    constructor(props: IProps) {
         super(props);
 
-        this.state = this.getUpdatedState(props);
+        this.state = this.getUpdatedState();
     }
 
-    itemChanged(nextProps: any) {
-        return get(this.props, 'item._id') !== get(nextProps, 'item._id') ||
-            get(this.props, 'item._etag') !== get(nextProps, 'item._etag') ||
-            !isEqual(get(this.props, 'item.coverages'), get(nextProps, 'item.coverages'));
+    itemChanged(nextProps: Readonly<IProps>) {
+        return this.props.item._id !== nextProps.item._id ||
+            this.props.item._etag !== nextProps.item._etag ||
+            !isEqual(this.props.item.coverages, nextProps.item.coverages);
     }
 
-    shouldComponentUpdate(nextProps: any) {
-        return this.itemChanged(nextProps);
-    }
-
-    componentWillReceiveProps(nextProps: any) {
-        if (this.itemChanged(nextProps)) {
-            this.setState(this.getUpdatedState(nextProps));
+    componentDidUpdate(prevProps: Readonly<IProps>) {
+        if (this.itemChanged(prevProps)) {
+            this.setState(this.getUpdatedState());
         }
     }
 
-    getUpdatedState(props: any) {
+    getUpdatedState(): IState {
         return {
-            internalNote: getInternalNote(props.item, props.planningItem),
-            coveragesToDisplay: !hasCoverages(props.item) || props.hideCoverages ?
+            internalNote: getInternalNote(this.props.item, this.props.planningItem),
+            coveragesToDisplay: !hasCoverages(this.props.item) || this.props.hideCoverages ?
                 [] :
-                (props.item.coverages || []).filter((c: any) => (
-                    !props.group ||
+                (this.props.item.coverages || []).filter((c) => (
+                    !this.props.group ||
                     c.scheduled == null ||
-                    (isCoverageForExtraDay(c) && c.planning_id === get(props, 'planningItem.guid'))
+                    (isCoverageForExtraDay(c, this.props.group) && c.planning_id === this.props.planningItem?.guid)
                 )),
-            attachments: (getAttachments(props.item)).length,
-            isRecurring: isRecurring(props.item),
+            attachments: (getAttachments(this.props.item)).length,
+            isRecurring: isRecurring(this.props.item),
         };
     }
 
-    getItemByschema(props: any) {
+    getItemByschema(props: IProps) {
         const {listConfig} = props;
-        if ((listConfig || {}).subject != null) {
+        if (listConfig.subject != null) {
             const scheme = listConfig.subject.scheme;
             const subjects = getSubjects(props.item);
             return scheme == null ?
@@ -77,8 +89,8 @@ class AgendaListItemIcons extends React.Component {
     }
 
     render() {
-        const props: any = this.props;
-        const state: any = this.state;
+        const props = this.props;
+        const state = this.state;
         const className = bem('wire-articles', 'item__meta', {row: props.row});
         const subject = this.getItemByschema(props);
 
@@ -86,22 +98,24 @@ class AgendaListItemIcons extends React.Component {
             <div className={className}>
                 <AgendaMetaTime
                     item={props.item}
-                    borderRight={!props.isMobilePhone}
+                    borderRight={props.isMobilePhone}
                     isRecurring={state.isRecurring}
                     group={props.group}
                     isMobilePhone={props.isMobilePhone}
                 />
 
-                {state.coveragesToDisplay.length > 0 && (
+                {props.planningItem != null && state.coveragesToDisplay.length > 0 && (
                     <div className='wire-articles__item__icons wire-articles__item__icons--dashed-border'>
-                        {state.coveragesToDisplay.map((coverage: any, index: any) => (
+                        {state.coveragesToDisplay.map((coverage, index) => (
                             <AgendaListCoverageItem
                                 key={index}
-                                planningItem={props.planningItem}
                                 user={props.user}
                                 coverage={coverage}
                                 showBorder={props.isMobilePhone && index === state.coveragesToDisplay.length - 1}
                                 group={props.group}
+                                // Using `ts-ignore` otherwise `tsc` complains planningItem may be undefined
+                                // @ts-ignore
+                                planningItem={props.planningItem}
                             />
                         ))}
                     </div>
@@ -145,18 +159,5 @@ class AgendaListItemIcons extends React.Component {
         );
     }
 }
-
-AgendaListItemIcons.propTypes = {
-    item: PropTypes.object,
-    planningItem: PropTypes.object,
-    group: PropTypes.string,
-    hideCoverages: PropTypes.bool,
-    row: PropTypes.bool,
-    isMobilePhone: PropTypes.bool,
-    user: PropTypes.string,
-    listConfig : PropTypes.object,
-};
-
-AgendaListItemIcons.defaultProps = {isMobilePhone: false};
 
 export default AgendaListItemIcons;

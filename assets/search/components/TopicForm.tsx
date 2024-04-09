@@ -12,8 +12,9 @@ import {FormSection} from 'components/FormSection';
 
 import {SearchResultTagsList} from './SearchResultsBar/SearchResultTagsList';
 import {TopicFolderEditor} from './TopicFolderEditor';
+import {noop} from 'lodash';
 
-const TOPIC_NAME_MAXLENGTH = 30;
+const TOPIC_NAME_MAXLENGTH = 40;
 
 function getFolderName(topic: ITopic, folders: Array<ITopicFolder>): string {
     const folder = topic.folder ? folders.find((folder: any) => folder._id === topic.folder) : null;
@@ -57,7 +58,7 @@ interface IProps {
 
     changeNotificationType(notificationType: ITopicNotificationScheduleType): void;
     openEditTopicNotificationsModal(): void;
-    saveFolder: (folder: any, data: any, global?: boolean) => void;
+    saveFolder: (folder: any, data: any, global?: boolean) => Promise<ITopicFolder>;
 }
 
 const TopicForm: React.FC<IProps> = ({
@@ -87,13 +88,6 @@ const TopicForm: React.FC<IProps> = ({
 }): React.ReactElement => {
     const topicSubscriptionType = getSubscriptionNotificationType(topic, user._id);
     const [newFolder, setNewFolder] = useState<Partial<ITopicFolder> | null>();
-
-    useEffect(() => {
-        const newlyCreatedFolder = folders.find((x) => x.name === newFolder?.name) as ITopicFolder;
-
-        setNewFolder(null);
-        onFolderChange(newlyCreatedFolder);
-    }, [folders]);
 
     return (
         <form onSubmit={save}>
@@ -178,15 +172,17 @@ const TopicForm: React.FC<IProps> = ({
                                 </Dropdown>
                             </div>
                             {newFolder != null && (
-                                <div 
+                                <div
                                     style={{zIndex:'1', insetBlockStart: '-75px', marginBlockEnd: '-56px'}}
                                     className="simple-card__group position-relative"
                                 >
                                     <TopicFolderEditor
-                                        onSave={((name) => {
-                                            saveFolder(newFolder, {name}, topic.is_global);
-                                            setNewFolder({name});
-                                        })}
+                                        onSave={((name) =>
+                                            saveFolder(newFolder, {name}, topic.is_global).then((result) => {
+                                                onFolderChange(result);
+                                                setNewFolder(null);
+                                            })
+                                        )}
                                         folder={newFolder}
                                         onCancel={() => setNewFolder(null)}
                                     />
@@ -254,8 +250,8 @@ const TopicForm: React.FC<IProps> = ({
                 <div className="nh-flex__row">
                     <FormSection initiallyOpen={true} name={gettext('Topic details')} dataTestId="topic-form-group--params">
                         <SearchResultTagsList
-                            user={user}
                             readonly={true}
+                            user={user}
                             showSaveTopic={false}
                             showMyTopic={false}
                             searchParams={topic}

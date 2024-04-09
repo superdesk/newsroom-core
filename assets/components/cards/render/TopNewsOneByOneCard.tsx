@@ -36,7 +36,7 @@ const TopNewsOneByOneCard: React.ComponentType<ICardProps> = (props: ICardProps)
     const {items, title, id, openItem, isActive, cardId, listConfig} = props;
 
     return (
-        <CardRow title={title} id={id} isActive={isActive}>
+        <CardRow title={title} id={id} isActive={isActive} onMoreNewsClicked={props.onMoreNewsClicked}>
             {items.map((item: any) => getTopNewsPanel(item, getPicture(item), openItem, cardId, listConfig))}
         </CardRow>
     );

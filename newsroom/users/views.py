@@ -9,7 +9,7 @@ from superdesk import get_resource_service
 from werkzeug.exceptions import BadRequest, NotFound
 
 from newsroom.user_roles import UserRole
-from newsroom.auth import get_user, get_user_by_email, get_company
+from newsroom.auth import get_user_by_email, get_company, get_user_required
 from newsroom.auth.utils import (
     send_token,
     add_token_data,
@@ -44,21 +44,24 @@ def get_settings_data():
         "companies": list(query_resource("companies")),
         "sections": app.sections,
         "products": list(query_resource("products")),
+        "countries": app.countries,
     }
 
 
 def get_view_data():
-    user = get_user()
-    company = user["company"] if user and user.get("company") else None
+    user = get_user_required()
+    company = get_company(user)
+    auth_provider = get_company_auth_provider(company)
     rv = {
         "user": user if user else None,
-        "company": str(company),
+        "company": str(company["_id"]) if company else "",
         "topics": get_user_topics(user["_id"]) if user else [],
         "companyName": get_user_company_name(user),
         "locators": get_vocabulary("locators"),
         "monitoring_list": get_monitoring_for_company(user),
         "ui_configs": {config["_id"]: config for config in query_resource("ui_config")},
         "groups": app.config.get("WIRE_GROUPS", []),
+        "authProviderFeatures": dict(auth_provider.features),
     }
 
     if app.config.get("ENABLE_MONITORING"):
@@ -147,12 +150,12 @@ def create():
         company = get_company(new_user)
         auth_provider = get_company_auth_provider(company)
 
-        if auth_provider.get("features", {}).get("verify_email"):
+        if auth_provider.features.verify_email:
             add_token_data(new_user)
 
         ids = get_resource_service("users").post([new_user])
 
-        if auth_provider.get("features", {}).get("verify_email"):
+        if auth_provider.features.verify_email:
             send_token(new_user, token_type="new_account", update_token=False)
 
         return jsonify({"success": True, "_id": ids[0]}), 201
@@ -174,7 +177,7 @@ def resent_invite(_id):
     elif user_is_company_admin and (company is None or user["company"] != ObjectId(company["_id"])):
         # Company admins can only resent invites for members of their company only
         flask.abort(403)
-    elif not auth_provider.get("features", {}).get("verify_email"):
+    elif not auth_provider.features.verify_email:
         # Can only regenerate new token if ``verify_email`` is enabled in ``AuthProvider``
         flask.abort(403)
 
@@ -258,12 +261,12 @@ def get_updates_from_form(form: UserForm, on_create=False):
     if "sections" in updates:
         if on_create and not updates.get("sections"):
             updates.pop("sections")  # will be populated later based on company
-        else:
+        elif updates.get("sections") is not None:
             updates["sections"] = {
                 section["_id"]: section["_id"] in (form.sections.data or []) for section in app.sections
             }
 
-    if "products" in updates:
+    if updates.get("products") is not None:
         product_ids = [ObjectId(productId) for productId in updates["products"]]
         products = {
             product["_id"]: product for product in query_resource("products", lookup={"_id": {"$in": product_ids}})
@@ -383,4 +386,19 @@ def delete_notification(user_id, notification_id):
         flask.abort(403)
 
     get_resource_service("notifications").delete_action({"_id": notification_id})
+    return jsonify({"success": True}), 200
+
+
+@blueprint.route("/users/<user_id>/approve", methods=["POST"])
+@account_manager_or_company_admin_only
+def approve_user(user_id):
+    users_service = get_resource_service("users")
+    user = users_service.find_one(req=None, _id=ObjectId(user_id))
+    if not user:
+        return NotFound(gettext("User not found"))
+
+    if user.get("is_approved"):
+        return jsonify({"error": gettext("User is already approved")}), 403
+
+    users_service.approve_user(user)
     return jsonify({"success": True}), 200

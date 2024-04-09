@@ -7,9 +7,8 @@ from superdesk.utils import get_hash
 
 from newsroom.auth.token import verify_auth_token
 from newsroom.auth.views import _is_password_valid
-from newsroom.tests.users import ADMIN_USER_ID  # noqa
-from tests.utils import mock_send_email
-from unittest import mock
+from newsroom.tests.users import ADMIN_USER_EMAIL
+from tests.utils import login, logout
 
 disabled_company = ObjectId()
 expired_company = ObjectId()
@@ -37,62 +36,8 @@ def init(app):
     )
 
 
-@mock.patch("newsroom.email.send_email", mock_send_email)
-def test_new_user_signup_sends_email(app, client):
-    app.config["SIGNUP_EMAIL_RECIPIENTS"] = "admin@bar.com"
-    with app.mail.record_messages() as outbox:
-        # Sign up
-        response = client.post(
-            url_for("auth.signup"),
-            data={
-                "email": "newuser@abc.org",
-                "first_name": "John",
-                "last_name": "Doe",
-                "country": "Australia",
-                "phone": "1234567",
-                "company": "Press 2 co.",
-                "company_size": "0-10",
-                "occupation": "Other",
-            },
-        )
-        assert response.status_code == 200
-
-        assert len(outbox) == 1
-        assert outbox[0].recipients == ["admin@bar.com"]
-        assert outbox[0].subject == "A new Newshub signup request"
-        assert "newuser@abc.org" in outbox[0].body
-        assert "John" in outbox[0].body
-        assert "Doe" in outbox[0].body
-        assert "1234567" in outbox[0].body
-        assert "Press 2 co." in outbox[0].body
-
-
-def test_new_user_signup_fails_if_fields_not_provided(client):
-    # Register a new account
-    response = client.post(
-        url_for("auth.signup"),
-        data={
-            "email": "newuser@abc.org",
-            "email2": "newuser@abc.org",
-            "phone": "1234567",
-            "password": "abc",
-            "password2": "abc",
-        },
-    )
-    txt = response.get_data(as_text=True)
-    assert "company: This field is required" in txt
-    assert "company_size: Not a valid choice" in txt
-    assert "name: This field is required" in txt
-    assert "country: This field is required" in txt
-    assert "occupation: Not a valid choice" in txt
-
-
 def test_login_fails_for_wrong_username_or_password(client):
-    response = client.post(
-        url_for("auth.login"),
-        data={"email": "xyz@abc.org", "password": "abc"},
-        follow_redirects=True,
-    )
+    response = login(client, {"email": "xyz@abc.org", "password": "abc"}, assert_login=False)
     assert "Invalid username or password" in response.get_data(as_text=True)
 
 
@@ -117,11 +62,7 @@ def test_login_fails_for_disabled_user(app, client):
         ],
     )
 
-    response = client.post(
-        url_for("auth.login"),
-        data={"email": "test@sourcefabric.org", "password": "admin"},
-        follow_redirects=True,
-    )
+    response = login(client, {"email": "test@sourcefabric.org", "password": "admin"}, assert_login=False)
     assert "Account is disabled" in response.get_data(as_text=True)
 
 
@@ -146,11 +87,7 @@ def test_login_fails_for_user_with_disabled_company(app, client):
         ],
     )
 
-    response = client.post(
-        url_for("auth.login"),
-        data={"email": "test@sourcefabric.org", "password": "admin"},
-        follow_redirects=True,
-    )
+    response = login(client, {"email": "test@sourcefabric.org", "password": "admin"}, assert_login=False)
     assert "Company account has been disabled" in response.get_data(as_text=True)
 
 
@@ -204,11 +141,7 @@ def test_login_for_user_with_enabled_company_succeeds(app, client):
     )
 
     get_resource_service("companies").patch(id=disabled_company, updates={"is_enabled": True})
-    response = client.post(
-        url_for("auth.login"),
-        data={"email": "test@sourcefabric.org", "password": "admin"},
-        follow_redirects=True,
-    )
+    response = login(client, {"email": "test@sourcefabric.org", "password": "admin"}, follow_redirects=True)
     assert "John" in response.get_data(as_text=True)
 
 
@@ -232,11 +165,7 @@ def test_login_fails_for_not_approved_user(app, client):
             }
         ],
     )
-    response = client.post(
-        url_for("auth.login"),
-        data={"email": "test@sourcefabric.org", "password": "admin"},
-        follow_redirects=True,
-    )
+    response = login(client, {"email": "test@sourcefabric.org", "password": "admin"}, follow_redirects=True)
     assert "Account has not been approved" in response.get_data(as_text=True)
 
 
@@ -254,6 +183,7 @@ def test_login_fails_for_many_times_gets_limited(client, app):
 
 
 def test_account_is_locked_after_5_wrong_passwords(app, client):
+    logout(client)
     # Register a new account
     app.data.insert(
         "users",
@@ -274,10 +204,12 @@ def test_account_is_locked_after_5_wrong_passwords(app, client):
         ],
     )
     for i in range(1, 10):
-        response = client.post(
-            url_for("auth.login"),
-            data={"email": "test@sourcefabric.org", "password": "wrongone"},
+        response = login(
+            client,
+            {"email": "test@sourcefabric.org", "password": "wrongone"},
+            assert_login=False,
             follow_redirects=True,
+            auto_logout=False,
         )
         if i <= 5:
             assert "Invalid username or password" in response.get_data(as_text=True)
@@ -291,6 +223,7 @@ def test_account_is_locked_after_5_wrong_passwords(app, client):
 
 
 def test_account_stays_unlocked_after_few_wrong_attempts(app, client):
+    logout(client)
     # Register a new account
     app.data.insert(
         "users",
@@ -311,29 +244,27 @@ def test_account_stays_unlocked_after_few_wrong_attempts(app, client):
         ],
     )
     for i in range(1, 4):
-        response = client.post(
-            url_for("auth.login"),
-            data={"email": "test@sourcefabric.org", "password": "wrongone"},
+        response = login(
+            client,
+            {"email": "test@sourcefabric.org", "password": "wrongone"},
+            assert_login=False,
             follow_redirects=True,
         )
         if i <= 5:
             assert "Invalid username or password" in response.get_data(as_text=True)
 
     # correct login will clear the attempt count
-    client.post(
-        url_for("auth.login"),
-        data={"email": "test@sourcefabric.org", "password": "admin"},
-        follow_redirects=True,
-    )
+    login(client, {"email": "test@sourcefabric.org", "password": "admin"}, follow_redirects=True)
 
     # now logout
-    response = client.get(url_for("auth.logout"), follow_redirects=True)
+    logout(client)
 
     # user can try 4 more times
     for i in range(1, 4):
-        response = client.post(
-            url_for("auth.login"),
-            data={"email": "test@sourcefabric.org", "password": "wrongone"},
+        response = login(
+            client,
+            {"email": "test@sourcefabric.org", "password": "wrongone"},
+            assert_login=False,
             follow_redirects=True,
         )
         if i <= 5:
@@ -345,11 +276,14 @@ def test_account_stays_unlocked_after_few_wrong_attempts(app, client):
 
 
 def test_account_appears_locked_for_non_existing_user(client):
+    logout(client)
     for i in range(1, 10):
-        response = client.post(
-            url_for("auth.login"),
-            data={"email": "xyz@abc.org", "password": "abc"},
+        response = login(
+            client,
+            {"email": "xyz@abc.org", "password": "abc"},
+            auto_logout=False,
             follow_redirects=True,
+            assert_login=False,
         )
         if i <= 5:
             assert "Invalid username or password" in response.get_data(as_text=True)
@@ -474,11 +408,7 @@ def test_login_for_public_user_if_company_not_assigned(client, app):
         ],
     )
 
-    response = client.post(
-        url_for("auth.login"),
-        data={"email": "test@sourcefabric.org", "password": "admin"},
-        follow_redirects=True,
-    )
+    response = login(client, {"email": "test@sourcefabric.org", "password": "admin"}, follow_redirects=True)
     assert "Insufficient Permissions. Access denied." in response.get_data(as_text=True)
 
 
@@ -501,11 +431,7 @@ def test_login_for_internal_user_if_company_not_assigned(client, app):
         ],
     )
 
-    response = client.post(
-        url_for("auth.login"),
-        data={"email": "test@sourcefabric.org", "password": "admin"},
-        follow_redirects=True,
-    )
+    response = login(client, {"email": "test@sourcefabric.org", "password": "admin"}, follow_redirects=True)
     assert "Insufficient Permissions. Access denied." in response.get_data(as_text=True)
 
 
@@ -534,19 +460,11 @@ def test_access_for_disabled_user(app, client):
 
     user = get_resource_service("users").find_one(req=None, _id=user_id)
 
-    with client.session_transaction() as session:
-        session["user"] = str(user_id)
-        session["user_type"] = "administrator"
-        session["name"] = "public"
-        session["auth_ttl"] = None
+    login(client, {"email": "test@sourcefabric.org"})
     resp = client.get("/bookmarks_wire")
     assert 200 == resp.status_code
 
-    with client.session_transaction() as session:
-        session["user"] = ADMIN_USER_ID
-        session["user_type"] = "administrator"
-        session["name"] = "Admin"
-        session["auth_ttl"] = None
+    login(client, {"email": ADMIN_USER_EMAIL})
     resp = client.post(
         "/users/{}".format(user_id),
         data={
@@ -565,13 +483,11 @@ def test_access_for_disabled_user(app, client):
     )
     assert 200 == resp.status_code
 
-    with client.session_transaction() as session:
-        session["user"] = str(user_id)
-        session["user_type"] = "administrator"
-        session["name"] = "public"
-        session["auth_ttl"] = None
+    resp = login(client, {"email": "test@sourcefabric.org"}, assert_login=False)
+    assert "Account is disabled" in resp.get_data(as_text=True)
+
     resp = client.get("/users/search")
-    assert 403 == resp.status_code
+    assert 302 == resp.status_code
 
     resp = client.get("/wire")
     assert 302 == resp.status_code
@@ -636,3 +552,35 @@ def test_access_for_not_approved_user(client, app):
             json={"label": "bar", "query": "test", "notifications": True, "topic_type": "wire"},
         )
         assert 302 == resp.status_code, resp.get_data()
+
+
+def test_change_password(client, admin):
+    login(client, admin)
+    resp = client.get("/change_password")
+    assert 200 == resp.status_code
+
+    resp = client.post(
+        "/change_password",
+        data={
+            "old_password": "foo",
+            "new_password": "newpassword",
+            "new_password2": "newpassword",
+        },
+        follow_redirects=True,
+    )
+
+    assert 200 == resp.status_code
+    assert "Current password invalid" in resp.get_data(as_text=True)
+
+    resp = client.post(
+        "/change_password",
+        data={
+            "old_password": "admin",
+            "new_password": "newpassword",
+            "new_password2": "newpassword",
+        },
+        follow_redirects=True,
+    )
+
+    assert 200 == resp.status_code
+    assert "Your password has been changed" in resp.get_data(as_text=True)

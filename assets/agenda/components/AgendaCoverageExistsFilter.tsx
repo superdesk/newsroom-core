@@ -20,7 +20,7 @@ interface ICoverageStatusOptionConfig {
 
 type ICoverageStatusFilterConfig = {[value in ICoverageStatusOptionValue]: ICoverageStatusOptionConfig};
 
-export const filter = {
+export const agendaCoverageStatusFilter = {
     label: gettext('Any coverage status'),
     field: 'coverage_status',
     nestedField: 'coverage_status',
@@ -59,7 +59,7 @@ const getCoverageStatusOptions = memoize<() => Array<[ICoverageStatusOptionValue
 function AgendaCoverageExistsFilter({toggleFilter, activeFilter}: IProps) {
     return (
         <AgendaDropdown
-            filter={filter}
+            filter={agendaCoverageStatusFilter}
             activeFilter={activeFilter}
             toggleFilter={toggleFilter}
             getFilterLabel={getActiveFilterLabel}
@@ -72,7 +72,7 @@ function AgendaCoverageExistsFilter({toggleFilter, activeFilter}: IProps) {
                 <button
                     key={`coverage-${value}`}
                     className="dropdown-item"
-                    onClick={() => toggleFilter(filter.field, value)}
+                    onClick={() => toggleFilter(agendaCoverageStatusFilter.field, value)}
                 >
                     {config.option_label}
                 </button>

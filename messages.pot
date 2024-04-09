@@ -703,7 +703,7 @@ msgstr ""
 
 #: assets/company-reports/components/ContentActivity.tsx:67
 #: assets/company-reports/components/ContentActivity.tsx:122
-#: assets/item-actions.ts:18 assets/search/components/TopicFolder.tsx:113
+#: assets/item-actions.ts:18 assets/search/components/TopicFolder.tsx:104
 #: newsroom/reports/content_activity.py:221
 msgid "Open"
 msgstr ""
@@ -1069,7 +1069,7 @@ msgstr ""
 #: assets/search/components/AdvancedSearchPanel.tsx:42
 #: assets/search/components/MonitoringEditor.tsx:134
 #: assets/search/components/TopicEditor.tsx:459
-#: assets/search/components/TopicFolder.tsx:107
+#: assets/search/components/TopicFolder.tsx:98
 #: assets/section-filters/components/EditSectionFilter.tsx:27
 #: assets/ui/components/ContentBar.tsx:8 assets/ui/components/Preview.tsx:16
 #: assets/user-profile/components/UserProfileApp.tsx:117
@@ -2159,7 +2159,7 @@ msgstr ""
 #: assets/oauth_clients/components/EditClient.tsx:64
 #: assets/products/components/EditProduct.tsx:187
 #: assets/search/components/FollowedTopics.tsx:82
-#: assets/search/components/TopicFolder.tsx:56
+#: assets/search/components/TopicFolder.tsx:58
 #: assets/section-filters/components/EditSectionFilter.tsx:88
 #: assets/users/components/EditUser.tsx:432
 msgid "Delete"
@@ -3456,12 +3456,12 @@ msgstr ""
 msgid "Updated on {{ date }} at {{ time }}"
 msgstr ""
 
-#: assets/search/components/Topic.tsx:102
+#: assets/search/components/Topic.tsx:96
 #: assets/search/components/TopicForm.tsx:218
 msgid "Real-Time"
 msgstr ""
 
-#: assets/search/components/Topic.tsx:102
+#: assets/search/components/Topic.tsx:96
 #: assets/search/components/TopicForm.tsx:228
 msgid "Scheduled"
 msgstr ""
@@ -3502,11 +3502,11 @@ msgstr ""
 msgid "Send notifications to:"
 msgstr ""
 
-#: assets/search/components/TopicFolder.tsx:50
+#: assets/search/components/TopicFolder.tsx:52
 msgid "Rename"
 msgstr ""
 
-#: assets/search/components/TopicFolder.tsx:133
+#: assets/search/components/TopicFolder.tsx:124
 msgid "Folder Actions"
 msgstr ""
 

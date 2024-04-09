@@ -3,7 +3,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
 
-import {ICompany, IProduct, ISection} from '../../interfaces';
+import {ICompany, IProduct, ISection, ICountry} from 'interfaces';
 
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
@@ -23,13 +23,14 @@ import {
     hasSeatsAvailable,
     seatOccupiedByUser,
 } from '../utils';
+import {approveUser} from '../actions';
+
 import {FormToggle} from 'ui/components/FormToggle';
 
 import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserListItem';
 
 import {companyProductSeatsSelector, companySectionListSelector, sectionListSelector} from 'company-admin/selectors';
 import {IUser} from 'interfaces/user';
-import {IUserProfileStore} from 'user-profile/reducers';
 import ActionButton from 'components/ActionButton';
 
 const getCompanyOptions = (companies: Array<ICompany>) => companies.map((company) => ({value: company._id, text: company.name}));
@@ -38,9 +39,21 @@ interface IReduxStoreProps {
     allSections: Array<any>;
     companySections: any;
     seats: any;
+    countries: Array<ICountry>;
 }
 
-interface IProps extends IReduxStoreProps {
+interface IDispatchProps {
+    approveUser(userId: IUser['_id']): void;
+}
+
+interface IUserProfileStore {
+    allSections?: Array<any>;
+    companySections?: any;
+    seats?: any;
+    countries: Array<ICountry>;
+}
+
+interface IOwnProps {
     original: IUser;
     user: IUser;
 
@@ -62,6 +75,8 @@ interface IProps extends IReduxStoreProps {
     toolbar?: any;
 }
 
+type IProps = IReduxStoreProps & IDispatchProps & IOwnProps;
+
 const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
     const {
         original,
@@ -81,6 +96,8 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
         companySections,
         seats,
         resendUserInvite,
+        approveUser,
+        countries,
     } = props;
 
     const companyId = user.company;
@@ -95,9 +112,15 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
     const isCompanyAdmin = isUserCompanyAdmin(currentUser);
     const company = companies.find((c) => c._id === user.company);
     const userIsAdmin = isUserAdmin(user);
-    const showResendInvite = (user._id == null || user.is_validated !== true) && (
+    const isNewUserBeingCreated = original?._id == null;
+    const showResendInvite = !isNewUserBeingCreated && (user._id == null || user.is_validated !== true) && (
         (company?.auth_provider ?? 'newshub') === 'newshub'
     );
+    // If `user.sections` has value(s) then we use that dictionary, otherwise we will use `company.sections`
+    // This is the same logic as applied on the server side
+    const userSections = Object.keys(user.sections || {}).length > 0 ?
+        user.sections :
+        company?.sections || {};
 
     const resendInviteButton = {
         name: gettext('Resend Invite'),
@@ -153,17 +176,31 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                         </div>
                         {(currentUserIsAdmin && user._id != null && user._id !== currentUser._id) && (
                             <div className="list-item__preview-toolbar-right">
-                                <form method="POST" action={'/auth/impersonate'}>
-                                    <input type="hidden" name="user" value={user._id} />
+                                {original.is_approved === false ? (
                                     <button
                                         type="submit"
                                         className="nh-button nh-button--tertiary nh-button--small"
-                                        aria-label={gettext('Impersonate User')}
-                                        data-test-id="impersonate-user-btn"
+                                        aria-label={gettext('Approve User')}
+                                        onClick={(event) => {
+                                            event.preventDefault();
+                                            approveUser(original._id);
+                                        }}
                                     >
-                                        {gettext('Impersonate User')}
+                                        {gettext('Approve')}
                                     </button>
-                                </form>
+                                ) : (
+                                    <form method="POST" action={'/auth/impersonate'}>
+                                        <input type="hidden" name="user" value={user._id} />
+                                        <button
+                                            type="submit"
+                                            className="nh-button nh-button--tertiary nh-button--small"
+                                            aria-label={gettext('Impersonate User')}
+                                            data-test-id="impersonate-user-btn"
+                                        >
+                                            {gettext('Impersonate User')}
+                                        </button>
+                                    </form>
+                                )}
                             </div>
                         )}
                     </div>
@@ -248,6 +285,17 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                     error={errors ? errors.company : null}
                                 />
                             )}
+                            {hideFields.includes('country') ? null : (
+                                <SelectInput
+                                    name="country"
+                                    label={gettext('Country')}
+                                    value={user.country}
+                                    defaultOption=""
+                                    options={countries}
+                                    onChange={props.onChange_DEPRECATED}
+                                    error={errors ? errors.country : null}
+                                />
+                            )}
 
                             {(!localeOptions.length || hideFields.includes('language')) ? null : (
                                 <SelectInput
@@ -267,13 +315,13 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                 title={gettext('Sections')}
                                 testId="toggle--sections"
                             >
-                                {sections.filter((section: any) => companySectionIds.includes(section._id)).map((section: any) => (
+                                {sections.filter((section) => companySectionIds.includes(section._id)).map((section) => (
                                     <div className="list-item__preview-row" key={section._id}>
                                         <div className="form-group">
                                             <CheckboxInput
                                                 name={`sections.${section._id}`}
                                                 label={section.name}
-                                                value={get(user, `sections.${section._id}`) === true}
+                                                value={userSections[section._id] === true}
                                                 onChange={props.onChange_DEPRECATED}
                                             />
                                         </div>
@@ -283,10 +331,8 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                         )}
 
                         {(userIsAdmin || hideFields.includes('products')) ? null : (() => {
-                            const filteredSections = sections.filter((section: any) => (
-                                companySectionIds.includes(section._id) && user.sections ?
-                                    get(user, `sections.${section._id}`
-                                    ) === true : company?.sections
+                            const filteredSections = sections.filter((section) => (
+                                companySectionIds.includes(section._id) && userSections[section._id] === true
                             ));
 
                             const filterProductsForSection = (product: IProduct, section: ISection) =>
@@ -336,7 +382,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                                                         </div>
                                                     )}
 
-                                                    {filteredSections.map((section: any) => (
+                                                    {filteredSections.map((section) => (
                                                         <React.Fragment key={section._id}>
                                                             <div className="list-item__preview-subheading">
                                                                 {section.name}
@@ -448,8 +494,16 @@ const mapStateToProps = (state: IUserProfileStore): IReduxStoreProps => ({
     allSections: sectionListSelector(state),
     companySections: companySectionListSelector(state),
     seats: companyProductSeatsSelector(state),
+    countries: state.countries,
 });
 
-const EditUser = connect<IReduxStoreProps>(mapStateToProps)(EditUserComponent);
+const mapDispatchToProps = ({approveUser});
+
+const EditUser = connect<
+    IReduxStoreProps,
+    IDispatchProps,
+    IOwnProps,
+    IUserProfileStore
+>(mapStateToProps, mapDispatchToProps)(EditUserComponent);
 
 export default EditUser;

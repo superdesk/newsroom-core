@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 export function TopicItem({topic, isActive, onClick, newItems}: any) {
     return (
-        <li className="topic-list__item">
+        <li className="topic-list__item" data-test-id="topic-list-item" data-test-value={topic.label}>
             <a className={`topic-list__item-link ${isActive ? 'topic-list__item-link--active' : ''}`}
                 aria-selected={isActive} href=""
                 onClick={(event) => onClick(event, topic)}

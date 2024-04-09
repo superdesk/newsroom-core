@@ -117,14 +117,14 @@ def search():
 def get_view_data() -> Dict:
     user = get_user_required()
     topics = get_user_topics(user["_id"]) if user else []
-    company = get_company(user) or {}
+    company = get_company(user)
     products = get_products_by_company(company, product_type="agenda") if company else []
 
     check_user_has_products(user, products)
 
     return {
         "user": user,
-        "company": str(user["company"]) if user and user.get("company") else None,
+        "company": str(user.get("company")) if user and user.get("company") else None,
         "topics": [t for t in topics if t.get("topic_type") == "agenda"],
         "formats": [
             {"format": f["format"], "name": f["name"]}
@@ -139,8 +139,8 @@ def get_view_data() -> Dict:
         if company
         else [],
         "saved_items": get_resource_service("agenda").get_saved_items_count(),
-        "events_only": company.get("events_only", False),
-        "restrict_coverage_info": company.get("restrict_coverage_info", False),
+        "events_only": company.get("events_only", False) if company else False,
+        "restrict_coverage_info": company.get("restrict_coverage_info", False) if company else False,
         "locators": get_vocabulary("locators"),
         "ui_config": get_resource_service("ui_config").get_section_config("agenda"),
         "groups": app.config.get("AGENDA_GROUPS", []),
@@ -212,7 +212,9 @@ def watch_coverage():
     data = get_json_or_400()
     assert data.get("item_id")
     assert data.get("coverage_id")
-    return update_coverage_watch(data["item_id"], data["coverage_id"], user_id, add=request.method == "POST")
+    response = update_coverage_watch(data["item_id"], data["coverage_id"], user_id, add=request.method == "POST")
+    push_user_notification("saved_items", count=get_resource_service("agenda").get_saved_items_count())
+    return response
 
 
 def update_coverage_watch(item_id, coverage_id, user_id, add, skip_associated=False):

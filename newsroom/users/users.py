@@ -4,7 +4,7 @@ import superdesk
 from datetime import datetime
 from copy import deepcopy
 
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, TypedDict
 from flask import current_app as app, session, abort, request
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest
@@ -12,6 +12,7 @@ from newsroom.products.types import PRODUCT_TYPES
 
 from newsroom.types import Company, ProductRef, User
 from newsroom.auth import get_user_id, get_user, get_company_from_user, SessionAuth
+from newsroom.auth.utils import get_company, get_company_auth_provider, add_token_data, send_token
 from newsroom.settings import get_setting
 from newsroom.utils import set_original_creator, set_version_creator
 from superdesk.utils import is_hashed, get_hash
@@ -171,6 +172,7 @@ class AuthUserResource(newsroom.Resource):
         "password": UsersResource.schema["password"],
         "token": UsersResource.schema["token"],
         "token_expiry_date": UsersResource.schema["token_expiry_date"],
+        "is_enabled": UsersResource.schema["is_enabled"],
     }
 
     datasource = {
@@ -192,6 +194,7 @@ USER_PROFILE_UPDATES = {
     "notification_schedule",
     "expiry_alert",
     "_updated",
+    "password",
 }
 
 
@@ -265,14 +268,6 @@ class UsersService(newsroom.Service):
             set_original_creator(doc)
             if doc.get("password", None) and not is_hashed(doc.get("password")):
                 doc["password"] = self._get_password_hash(doc["password"])
-
-    def create(self, docs):
-        for doc in docs:
-            if "sections" not in doc and doc.get("company"):
-                company = get_company_from_user(doc)
-                if company and company.get("sections"):
-                    doc["sections"] = company.get("sections")
-        return super().create(docs)
 
     def on_created(self, docs):
         super().on_created(docs)
@@ -376,6 +371,33 @@ class UsersService(newsroom.Service):
             return
 
         abort(403)
+
+    def approve_user(self, user: User):
+        """Approves & enables the supplied user, and sends an account validation email"""
+
+        company = get_company(user)
+        auth_provider = get_company_auth_provider(company)
+
+        # Need to define ``user_updates`` type, otherwise ``updated_user.update(user_updates)`` fails type checks
+        class UserApprovalUpdates(TypedDict, total=False):
+            is_enabled: bool
+            is_approved: bool
+            token: str
+            token_expiry_date: str
+
+        user_updates: UserApprovalUpdates = {
+            "is_enabled": True,
+            "is_approved": True,
+        }
+        if auth_provider.features.verify_email:
+            add_token_data(user_updates)
+        self.patch(user["_id"], updates=user_updates)
+
+        # Send new account / password reset email
+        if auth_provider.features.verify_email:
+            updated_user: User = deepcopy(user)
+            updated_user.update(user_updates)
+            send_token(updated_user, token_type="new_account", update_token=False)
 
 
 class AuthUserService(newsroom.Service):

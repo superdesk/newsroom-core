@@ -36,6 +36,7 @@ def init_app(app: BaseNewsroomApp):
         "newsroom",
         lazy_gettext("Newsroom"),
         [
+            "wire-list",
             "6-text-only",
             "4-picture-text",
             "4-media-gallery",

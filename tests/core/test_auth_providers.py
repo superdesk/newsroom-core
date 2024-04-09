@@ -8,6 +8,7 @@ from flask import url_for
 from superdesk import get_resource_service
 from newsroom.types import AuthProviderType
 from newsroom.tests import markers
+from tests.utils import logout
 
 
 companies = {
@@ -22,8 +23,8 @@ companies = {
 def init(app):
     app.config["AUTH_PROVIDERS"].extend(
         [
-            {"_id": "gip", "name": "Google", "auth_type": AuthProviderType.GOOGLE_OAUTH.value},
-            {"_id": "saml", "name": "Azure", "auth_type": AuthProviderType.SAML.value},
+            {"_id": "gip", "name": "Google", "auth_type": AuthProviderType.GOOGLE_OAUTH},
+            {"_id": "saml", "name": "Azure", "auth_type": AuthProviderType.SAML},
         ]
     )
     app.data.insert(
@@ -38,7 +39,7 @@ def init(app):
                 "_id": companies["password_auth"],
                 "name": "Password based auth",
                 "is_enabled": True,
-                "auth_provider": "newshub",
+                "auth_provider": "newsroom",
             },
             {
                 "_id": companies["google_auth"],
@@ -58,6 +59,7 @@ def init(app):
 
 
 def test_password_auth_denies_other_auth_types(app, client):
+    logout(client)
     users_service = get_resource_service("users")
     user_id = ObjectId()
     app.data.insert(
@@ -148,6 +150,7 @@ def mock_saml_client(req):
 @markers.enable_saml
 @mock.patch("newsroom.auth.saml.init_saml_auth", mock_saml_client)
 def test_saml_auth_denies_other_auth_types(app, client):
+    logout(client)
     app.config["SAML_CLIENTS"] = ["samplecomp"]
     users_service = get_resource_service("users")
     companies_service = get_resource_service("companies")
@@ -200,6 +203,7 @@ class MockOAuth:
 
 @markers.enable_google_login
 def test_google_oauth_denies_other_auth_types(app, client):
+    logout(client)
     companies_service = get_resource_service("companies")
     user_id = ObjectId()
     app.data.insert(

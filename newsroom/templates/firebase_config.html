@@ -1,0 +1,6 @@
+<script>
+    {% if user %}
+        window.firebaseUserEmail = "{{ user.email | tojson }}";
+    {% endif %}
+    window.firebaseConfig = {{ config.FIREBASE_CLIENT_CONFIG | tojson }};
+</script>

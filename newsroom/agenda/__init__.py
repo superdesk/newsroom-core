@@ -13,6 +13,7 @@ from .utils import (
     get_coverage_publish_time,
     get_coverage_scheduled_date,
     get_planning_coverages,
+    get_coverage_status,
 )
 
 
@@ -37,12 +38,14 @@ def init_app(app):
     )
 
     app.download_formatter("ical", formatters.iCalFormatter(), "iCalendar", ["agenda"])
+    app.download_formatter("Csv", formatters.CSVFormatter(), "CSV", ["agenda"])
     app.add_template_global(url_for_agenda)
     app.add_template_global(get_coverage_email_text)
     app.add_template_global(get_coverage_content_type_name, "get_coverage_content_type")
     app.add_template_global(get_coverage_scheduled_date, "get_coverage_date")
     app.add_template_global(get_coverage_publish_time, "get_coverage_publish_time")
     app.add_template_global(get_planning_coverages)
+    app.add_template_global(get_coverage_status, "get_coverage_status")
     app.general_setting(
         "google_maps_styles",
         lazy_gettext("Google Maps Styles"),

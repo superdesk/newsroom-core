@@ -1,7 +1,20 @@
 from bson import ObjectId
-from typing import Dict, List, TypedDict, Any
+from typing import Dict, List, Literal, Optional, TypedDict, Any, Union, NoReturn
 from datetime import datetime
 from enum import Enum
+from flask_babel import LazyString
+
+
+def assert_never(value: NoReturn) -> NoReturn:
+    assert False, f"Unhandled value {value}"
+
+
+NameString = Union[str, LazyString]
+
+
+class Country(TypedDict):
+    value: str
+    text: str
 
 
 class Entity(TypedDict):
@@ -52,18 +65,21 @@ class UserDashboardEntry(TypedDict):
     topic_ids: List[ObjectId]
 
 
-class UserData(TypedDict, total=False):
+class UserRequired(TypedDict):
+    email: str
+    user_type: str
+
+
+class UserData(UserRequired, total=False):
     _id: ObjectId
     first_name: str
     last_name: str
-    email: str
     phone: str
     mobile: str
     role: str
     signup_details: Dict[str, Any]
     country: str
     company: ObjectId
-    user_type: str
     is_validated: bool
     is_enabled: bool
     is_approved: bool
@@ -88,6 +104,17 @@ class User(UserData):
     pass
 
 
+class PublicUserData(TypedDict):
+    _id: str
+    company: str
+    first_name: str
+    last_name: str
+    email: str
+    products: List[ProductRef]
+    sections: Dict[str, bool]
+    notification_schedule: Optional[NotificationSchedule]
+
+
 class UserAuth(TypedDict):
     _id: str
     email: str
@@ -101,26 +128,62 @@ class AuthProviderType(Enum):
     PASSWORD = "password"
     GOOGLE_OAUTH = "google_oauth"
     SAML = "saml"
+    FIREBASE = "firebase"
 
 
-class AuthProviderFeatures(TypedDict, total=False):
-    verify_email: bool
-
-
-class AuthProvider(TypedDict):
+class AuthProviderConfig(TypedDict):
     _id: str
-    name: str
+    name: NameString
     auth_type: AuthProviderType
-    features: AuthProviderFeatures
 
 
-class Company(TypedDict, total=False):
+class CompanyRequired(TypedDict):
     _id: ObjectId
     name: str
+
+
+class Company(CompanyRequired, total=False):
+    # Accounting/Auditing
+    original_creator: ObjectId
+    version_creator: ObjectId
+
+    # Company details
+    url: str
+    contact_name: str
+    contact_email: str
+    phone: str
+    country: str
+    company_type: str
+    account_manager: str
+    monitoring_administrator: ObjectId
+    company_size: str
+    referred_by: str
+
+    # Authentication
+    auth_provider: str
+    auth_domain: str
+    is_enabled: bool
+    is_approved: bool
+    expiry_date: datetime
+
+    # Authorization
     products: List[ProductRef]
     sections: Dict[str, bool]
     restrict_coverage_info: bool
-    auth_provider: str
+    sd_subscriber_id: str
+    archive_access: bool
+    events_only: bool
+    allowed_ip_list: List[str]  # Used by the NewsAPI
+
+
+class CompanyTypeRequired(TypedDict):
+    id: str
+    name: str
+
+
+class CompanyType(CompanyTypeRequired, total=False):
+    wire_must: Dict[str, Any]
+    must_not: Dict[str, Any]
 
 
 class TopicSubscriber(TypedDict):
@@ -145,3 +208,38 @@ class Topic(TypedDict, total=False):
     folder: ObjectId
     advanced: Dict[str, Any]
     subscribers: List[TopicSubscriber]
+
+
+class DashboardCardConfig(TypedDict, total=False):
+    product: str
+    size: int
+
+
+DashboardCardType = Literal[
+    "6-text-only",
+    "4-picture-text",
+    "4-text-only",
+    "4-media-gallery",
+    "4-photo-gallery",
+    "1x1-top-news",
+    "2x2-top-news",
+    "3-text-only",
+    "3-picture-text",
+    "2x2-events",
+    "6-navigation-row",
+    "wire-list",
+]
+
+
+class DashboardCard(TypedDict, total=False):
+    _id: ObjectId
+    label: str
+    type: DashboardCardType
+    config: DashboardCardConfig
+    order: int
+    dashboard: str
+    original_creator: ObjectId
+    version_creator: ObjectId
+
+
+Article = Dict[str, Any]

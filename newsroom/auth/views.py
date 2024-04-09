@@ -1,22 +1,36 @@
+from typing import Literal
 import flask
 import bcrypt
+import logging
+import google.oauth2.id_token
+import re
 
 from bson import ObjectId
 from flask import current_app as app, abort
 from flask_babel import gettext
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
+from google.auth.transport import requests
 
 from newsroom.types import AuthProviderType
 from newsroom.decorator import admin_only, login_required
-from newsroom.auth import blueprint, get_auth_user_by_email, get_user_by_email, get_company_from_user
+from newsroom.auth import (
+    get_auth_user_by_email,
+    get_company,
+    get_user,
+    get_user_by_email,
+    get_company_from_user,
+    get_user_required,
+)
 from newsroom.auth.forms import SignupForm, LoginForm, TokenForm, ResetPasswordForm
 from newsroom.auth.utils import (
     clear_user_session,
     redirect_to_next_url,
+    sign_user_by_email,
     start_user_session,
     send_token,
     get_company_auth_provider,
+    is_valid_session,
 )
 from newsroom.utils import (
     is_company_enabled,
@@ -32,10 +46,20 @@ from newsroom.limiter import limiter
 from .token import generate_auth_token, verify_auth_token
 
 
+blueprint = flask.Blueprint("auth", __name__)
+logger = logging.getLogger(__name__)
+
+
 @blueprint.route("/login", methods=["GET", "POST"])
 @limiter.limit("60/minute")
 def login():
+    if is_valid_session():
+        # If user has already logged in, then redirect them to the next page
+        # which defaults to the home page
+        return redirect_to_next_url()
+
     form = LoginForm()
+
     if form.validate_on_submit():
         if email_has_exceeded_max_login_attempts(form.email.data):
             return flask.render_template("account_locked.html", form=form)
@@ -45,10 +69,23 @@ def login():
 
         if is_valid_user(user, company):
             auth_provider = get_company_auth_provider(company)
-            if auth_provider["auth_type"] != AuthProviderType.PASSWORD.value and not is_admin(user):
+            firebase_status = form.firebase_status.data
+            if (
+                auth_provider.type == AuthProviderType.FIREBASE
+                and firebase_status
+                and firebase_status
+                in (
+                    "auth/user-disabled",
+                    "auth/user-not-found",
+                    "auth/wrong-password",
+                )
+            ):
+                flask.flash(gettext("Invalid username or password."), "danger")
+            elif auth_provider.type == AuthProviderType.FIREBASE and firebase_status:
+                log_firebase_unexpected_error(firebase_status)
+            elif auth_provider.type != AuthProviderType.PASSWORD and not is_admin(user):
                 # Password login is not enabled for this user's company, and the user is not an admin
-                provider_name = auth_provider["name"]
-                flask.flash(gettext(f"Invalid login type, please login using '{provider_name}'"), "danger")
+                flask.flash(gettext(f"Invalid login type, please login using '{auth_provider.name}'"), "danger")
             else:
                 user_auth = get_auth_user_by_email(user["email"])
                 if not _is_password_valid(form.password.data.encode("UTF-8"), user_auth):
@@ -58,7 +95,7 @@ def login():
                     update_user_last_active(user)
                     return redirect_to_next_url()
 
-    return flask.render_template("login.html", form=form)
+    return flask.render_template("login.html", form=form, firebase=app.config.get("FIREBASE_ENABLED"))
 
 
 def email_has_exceeded_max_login_attempts(email):
@@ -84,7 +121,9 @@ def email_has_exceeded_max_login_attempts(email):
 
     if login_attempt["attempt_count"] == max_attempt_allowed:
         if login_attempt.get("user_id"):
-            get_resource_service("users").patch(id=ObjectId(login_attempt["user_id"]), updates={"is_enabled": False})
+            get_resource_service("auth_user").patch(
+                id=ObjectId(login_attempt["user_id"]), updates={"is_enabled": False}
+            )
         return True
 
     return login_attempt["attempt_count"] >= max_attempt_allowed
@@ -169,23 +208,70 @@ def login_with_token(token):
 @blueprint.route("/logout")
 def logout():
     clear_user_session()
-    return flask.redirect(flask.url_for("wire.index"))
+    return flask.redirect(flask.url_for("auth.login", logout=1))
 
 
 @blueprint.route("/signup", methods=["GET", "POST"])
 def signup():
-    form = SignupForm()
+    form = (app.signup_form_class or SignupForm)()
+    if len(app.countries):
+        form.country.choices += [(item.get("value"), item.get("text")) for item in app.countries]
+
+    company_types = app.config.get("COMPANY_TYPES") or []
+    if len(company_types):
+        form.company_type.choices += [(item.get("id"), item.get("name")) for item in company_types]
+
     if form.validate_on_submit():
-        new_user = form.data
-        new_user.pop("csrf_token", None)
-
         user = get_auth_user_by_email(form.email.data)
-
         if user is not None:
             flask.flash(gettext("Account already exists."), "danger")
             return flask.redirect(flask.url_for("auth.login"))
 
-        send_new_signup_email(user=new_user)
+        company_service = get_resource_service("companies")
+        company_name = re.escape(form.company.data)
+        regex = re.compile(f"^{company_name}$", re.IGNORECASE)
+        company = company_service.find_one(req=None, name=regex)
+        is_new_company = company is None
+
+        if is_new_company:
+            enabled_products = get_resource_service("products").get(req=None, lookup={"is_enabled": True})
+            company = {
+                "name": form.company.data,
+                "contact_name": form.first_name.data + " " + form.last_name.data,
+                "contact_email": form.email.data,
+                "phone": form.phone.data,
+                "country": form.country.data,
+                "company_type": form.company_type.data,
+                "url": form.company_url.data,
+                "company_size": form.company_size.data,
+                "referred_by": form.referred_by.data,
+                "is_enabled": False,
+                "is_approved": False,
+                "sections": {section["_id"]: True for section in app.sections},
+                "products": [
+                    {"_id": product.get("_id"), "seats": 0, "section": product.get("product_type")}
+                    for product in enabled_products
+                ],
+            }
+            ids = company_service.post([company])
+            company["_id"] = ids[0]
+
+        user_service = get_resource_service("users")
+        new_user = {
+            "first_name": form.first_name.data,
+            "last_name": form.last_name.data,
+            "email": form.email.data,
+            "phone": form.phone.data,
+            "role": form.occupation.data,
+            "country": form.country.data,
+            "company": company["_id"],
+            "is_validated": False,
+            "is_enabled": False,
+            "is_approved": False,
+            "sections": {section["_id"]: True for section in app.sections},
+        }
+        user_service.post([new_user])
+        send_new_signup_email(company, new_user, is_new_company)
         return flask.render_template("signup_success.html"), 200
     return flask.render_template(
         "signup.html",
@@ -230,6 +316,10 @@ def reset_password(token):
         }
         get_resource_service("users").patch(id=ObjectId(user["_id"]), updates=updates)
         flask.flash(gettext("Your password has been changed. Please login again."), "success")
+
+        if get_user() is not None:  # user is authenticated already
+            return redirect_to_next_url()
+
         return flask.redirect(flask.url_for("auth.login"))
 
     app.cache.delete(user.get("email"))
@@ -237,21 +327,32 @@ def reset_password(token):
 
 
 @blueprint.route("/token/<token_type>", methods=["GET", "POST"])
-def token(token_type):
+def token(token_type: Literal["reset_password", "validate"]):
+    """Get token to reset password or validate email."""
     form = TokenForm()
     if form.validate_on_submit():
         user = get_user_by_email(form.email.data)
         company = get_company_from_user(user) if user else None
         auth_provider = get_company_auth_provider(company)
-        if auth_provider.get("features", {}).get("verify_email"):
+
+        if auth_provider.features.verify_email:
             send_token(user, token_type)
+
         flask.flash(
             gettext("A reset password token has been sent to your email address."),
             "success",
         )
+
         return flask.redirect(flask.url_for("auth.login"))
 
-    return flask.render_template("request_token.html", form=form, token_type=token_type)
+    return flask.render_template(
+        "request_token.html", form=form, token_type=token_type, firebase=app.config.get("FIREBASE_ENABLED")
+    )
+
+
+@blueprint.route("/reset_password_done")
+def reset_password_confirmation():
+    return flask.render_template("request_token_confirm.html")
 
 
 @blueprint.route("/login_locale", methods=["POST"])
@@ -283,3 +384,67 @@ def impersonate_stop():
     start_user_session(user)
     flask.session.pop("auth_user")
     return flask.redirect(flask.url_for("settings.app", app_id="users"))
+
+
+@blueprint.route("/change_password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    form = ResetPasswordForm()
+    user = get_user_required()
+    company = get_company(user)
+    auth_provider = get_company_auth_provider(company)
+    form.email.process_data(user["email"])
+
+    if form.validate_on_submit():
+        if auth_provider.type == AuthProviderType.FIREBASE:
+            if form.data.get("firebase_status"):
+                firebase_status = form.data["firebase_status"]
+                if firebase_status == "OK":
+                    flask.flash(gettext("Your password has been changed."), "success")
+                elif firebase_status == "auth/wrong-password":
+                    flask.flash(gettext("Current password invalid."), "danger")
+                else:
+                    log_firebase_unexpected_error(firebase_status)
+                return flask.redirect(flask.url_for("auth.change_password"))
+        elif auth_provider.type == AuthProviderType.PASSWORD:
+            user_auth = get_auth_user_by_email(user["email"])
+            if not _is_password_valid(form.old_password.data.encode("UTF-8"), user_auth):
+                flask.flash(gettext("Current password invalid."), "danger")
+            else:
+                updates = {"password": form.new_password.data}
+                get_resource_service("users").patch(id=ObjectId(user["_id"]), updates=updates)
+                flask.flash(gettext("Your password has been changed."), "success")
+                return flask.redirect(flask.url_for("auth.change_password"))
+        else:
+            flask.flash(gettext("Change password is not available."), "warning")
+
+    return flask.render_template(
+        "change_password.html", form=form, user=user, firebase=app.config.get("FIREBASE_ENABLED")
+    )
+
+
+@blueprint.route("/firebase_auth_token")
+def firebase_auth_token():
+    token = flask.request.args.get("token")
+    firebase_request_adapter = requests.Request()
+    if token:
+        try:
+            claims = google.oauth2.id_token.verify_firebase_token(
+                token,
+                audience=app.config["FIREBASE_CLIENT_CONFIG"]["projectId"],
+                request=firebase_request_adapter,
+            )
+        except ValueError as err:
+            logger.error(err)
+            flask.flash(gettext("User token is not valid"), "danger")
+            return flask.redirect(flask.url_for("auth.login", token_error=1))
+
+        email = claims["email"]
+        return sign_user_by_email(email, auth_type=AuthProviderType.FIREBASE, validate_login_attempt=True)
+
+    return flask.redirect(flask.url_for("auth.login"))
+
+
+def log_firebase_unexpected_error(firebase_status: str):
+    logger.warning("Unhandled firebase error %s", firebase_status)
+    flask.flash(gettext("Could not change your password. Please contact us for assistance."), "warning")

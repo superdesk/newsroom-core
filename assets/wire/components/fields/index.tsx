@@ -1,12 +1,14 @@
 import React from 'react';
 import {Source} from './Source';
 import {UrgencyLabel} from './UrgencyLabel';
+import {DurationLabel} from './DurationLabel';
 import {CharCount} from './CharCount';
 import {WordCount} from './WordCount';
 import {PreviousVersions} from './PreviousVersions';
 import {Embargo} from './Embargo';
 import {VersionCreated} from './VersionCreated';
 import {VersionType} from './VersionType';
+import {ExpiryDateLabel} from './ExpiryDateLabel';
 
 const ALLOWED_SEPARATORS = ['/', '//', '-'];
 const SEPARATOR_KEY = 'separator';
@@ -14,11 +16,13 @@ const SEPARATOR_KEY = 'separator';
 const MAP_FIELD_TO_COMPONENT: any = {
     urgency: UrgencyLabel,
     source: Source,
+    duration: DurationLabel,
     charcount: CharCount,
     wordcount: WordCount,
     previous_versions: PreviousVersions,
     embargo: Embargo,
     versioncreated: VersionCreated,
+    expiry: ExpiryDateLabel,
 };
 
 // Example config:

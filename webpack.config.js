@@ -4,6 +4,7 @@ const path = require('path');
 const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const TerserPlugin = require('terser-webpack-plugin-legacy');
+const ObjectRestSpreadPlugin = require('@sucrase/webpack-object-rest-spread-plugin');
 
 const config = {
     entry: {
@@ -33,6 +34,10 @@ const config = {
         common: path.resolve(__dirname, 'assets/common.ts'),
         design_js: path.resolve(__dirname, 'assets/design_pages.ts'),
         company_admin_js: path.resolve(__dirname, 'assets/company-admin/index.ts'),
+        firebase_login_js: path.resolve(__dirname, 'assets/auth/firebase/login.ts'),
+        firebase_reset_password_js: path.resolve(__dirname, 'assets/auth/firebase/reset_password.ts'),
+        firebase_change_password_js: path.resolve(__dirname, 'assets/auth/firebase/change_password.ts'),
+        public_js: path.resolve(__dirname, 'assets/public/index.ts'),
     },
     output: {
         path: path.resolve(process.cwd(), 'dist'),
@@ -89,6 +94,7 @@ const config = {
         mainFields: ['browser', 'main'],
     },
     plugins: [
+        new ObjectRestSpreadPlugin(),
         new ManifestPlugin({writeToFileEmit: true}),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'common',

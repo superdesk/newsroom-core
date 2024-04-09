@@ -1,9 +1,9 @@
 import os
 import pathlib
-from typing import List
 import tzlocal
 import logging
 
+from typing import Dict, List
 from kombu import Queue, Exchange
 from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
@@ -53,6 +53,8 @@ from superdesk.default_settings import (  # noqa
     SENTRY_DSN,
     CACHE_URL,
 )
+
+from newsroom.types import AuthProviderConfig, AuthProviderType
 
 logger = logging.getLogger()
 
@@ -114,7 +116,7 @@ BABEL_DEFAULT_TIMEZONE = DEFAULT_TIMEZONE
 
 BLUEPRINTS = [
     "newsroom.wire",
-    "newsroom.auth",
+    "newsroom.auth.views",
     "newsroom.users",
     "newsroom.companies",
     "newsroom.design",
@@ -245,6 +247,9 @@ NEWS_ONLY_FILTERS = [
     {"match": {"genre.code": "Results (sport)"}},
     {"match": {"source": "PMF"}},
 ]
+
+# avoid conflict with superdesk
+SESSION_COOKIE_NAME = "newsroom_session"
 
 # the lifetime of a permanent session in seconds
 PERMANENT_SESSION_LIFETIME = 604800  # 7 days
@@ -441,10 +446,12 @@ CELERY_BEAT_SCHEDULE = {
     "newsroom:monitoring_schedule_alerts": {
         "task": "newsroom.monitoring.email_alerts.monitoring_schedule_alerts",
         "schedule": timedelta(seconds=60),
+        "options": {"expires": 59},  # if the task is not executed within 59 seconds, it will be discarded
     },
     "newsroom:monitoring_immediate_alerts": {
         "task": "newsroom.monitoring.email_alerts.monitoring_immediate_alerts",
         "schedule": timedelta(seconds=60),
+        "options": {"expires": 59},  # if the task is not executed within 59 seconds, it will be discarded
     },
     "newsroom:remove_expired_content_api": {
         "task": "content_api.commands.item_expiry",
@@ -457,6 +464,7 @@ CELERY_BEAT_SCHEDULE = {
     "newsroom:send_scheduled_notifications": {
         "task": "newsroom.notifications.send_scheduled_notifications.send_scheduled_notifications",
         "schedule": crontab(minute="*/5"),
+        "options": {"expires": 5 * 60 - 1},
     },
 }
 
@@ -672,18 +680,27 @@ AGENDA_SEARCH_FIELDS = [
     "location.name",
 ]
 
+
 #: The available authentication providers
 #:
 #: .. versionadded:: 2.5.0
 #:
-AUTH_PROVIDERS = [
+AUTH_PROVIDERS: List[AuthProviderConfig] = [
     {
         "_id": "newshub",
         "name": lazy_gettext("Newshub"),
-        "auth_type": "password",
-        "features": {"verify_email": True},
+        "auth_type": AuthProviderType.PASSWORD,
     }
 ]
+
+FIREBASE_CLIENT_CONFIG = {
+    "apiKey": env("FIREBASE_API_KEY"),
+    "authDomain": env("FIREBASE_AUTH_DOMAIN"),
+    "projectId": env("FIREBASE_PROJECT_ID"),
+    "messagingSenderId": env("FIREBASE_SENDER_ID"),
+}
+
+FIREBASE_ENABLED = bool(FIREBASE_CLIENT_CONFIG["apiKey"] and FIREBASE_CLIENT_CONFIG["authDomain"])
 
 #:
 #: If `True` it will show multi day events only on starting day,
@@ -709,3 +726,64 @@ WIRE_NOTIFICATIONS_ON_CORRECTIONS = False
 #: .. versionadded:: 2.5.0
 #:
 EMBARGO_QUERY_ROUNDING = "/m"
+
+#: Set source specific expiry
+#:
+#: .. versionadded: 2.6
+#:
+SOURCE_EXPIRY_DAYS: Dict[str, int] = {}
+
+#: If `True` will enable the Public Dashboard feature
+#:
+#: .. versionadded: 2.6
+#:
+PUBLIC_DASHBOARD = False
+
+#: The timeout used on the content cache for public pages
+#:
+#: .. versionadded: 2.6
+#:
+PUBLIC_CONTENT_CACHE_TIMEOUT = 240
+
+#: List of Wire item fields to keep when accessing from public dashboard
+#:
+#: .. versionadded: 2.6
+#:
+PUBLIC_WIRE_ALLOWED_FIELDS = [
+    "_id",
+    "guid",
+    "type",
+    "slugline",
+    "headline",
+    "anpa_take_key",
+    "description_html",
+    "description_text",
+    "abstract",
+    "body_html",
+    "source",
+    "versioncreated",
+    "wordcount",
+    "charcount",
+    "byline",
+    "copyrightnotice",
+    "language",
+    "mimetype",
+    "priority",
+    "urgency",
+    "usageterms",
+    "version",
+    "renditions",
+]
+
+#: Filter subject based on this config in the Formatter
+
+AGENDA_CSV_SUBJECT_SCHEMES = []
+
+#: Language to Email Sender map
+#: When sending an email, the system will attempt to use the sender from this map
+#: based on the language from the user profile, falling back to ``MAIL_DEFAULT_SENDER`` if not found
+#:
+#: .. versionadded: 2.6.0
+#:
+EMAIL_DEFAULT_SENDER_NAME = None
+EMAIL_SENDER_NAME_LANGUAGE_MAP = {}

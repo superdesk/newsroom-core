@@ -3,9 +3,9 @@ import server from 'server';
 import analytics from 'analytics';
 import {get, isInteger, keyBy, isEmpty, cloneDeep, throttle, memoize} from 'lodash';
 import {Provider} from 'react-redux';
-import {createStore as _createStore, applyMiddleware, compose} from 'redux';
+import {createStore as _createStore, applyMiddleware, compose, Store, Middleware} from 'redux';
 import {createLogger} from 'redux-logger';
-import thunk from 'redux-thunk';
+import thunk, {ThunkAction} from 'redux-thunk';
 import {render as _render} from 'react-dom';
 import alertify from 'alertifyjs';
 import moment from 'moment-timezone';
@@ -90,10 +90,10 @@ export function assertNever(x: any): never {
  * @param {String} name
  * @return {Store}
  */
-export function createStore(reducer: any, name: any = 'default') {
+export function createStore<State = any>(reducer: any, name: any = 'default'): Store<State, any> {
     // https://redux.js.org/api-reference/compose
     let _compose = compose;
-    const middlewares = [
+    const middlewares: Array<Middleware> = [
         thunk
     ];
 
@@ -123,7 +123,7 @@ export function createStore(reducer: any, name: any = 'default') {
         }
     }
 
-    return _createStore(reducer, _compose(applyMiddleware(...middlewares)));
+    return _createStore<State, any, any, any>(reducer, _compose(applyMiddleware(...middlewares)));
 }
 
 /**
@@ -134,6 +134,10 @@ export function createStore(reducer: any, name: any = 'default') {
  * @param {Element} element
  */
 export function render(store: any, App: any, element?: any, props?: any) {
+    if (element == null) {
+        return;
+    }
+
     return _render(
         <Provider store={store}>
             <App {...props}/>
@@ -153,7 +157,7 @@ export function render(store: any, App: any, element?: any, props?: any) {
  * @param {Object} params
  * @return {String}
  */
-export function gettext(text: string, params?: {[key: string]: any}): string {
+export function gettext(text: string, params?: {[key: string]: string | number}): string {
     let translated = get(window.translations, text, text);
 
     if (params) {

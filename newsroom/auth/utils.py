@@ -4,14 +4,15 @@ import werkzeug
 import superdesk
 
 from datetime import timedelta
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 from flask import current_app as app
 from flask_babel import _
+from newsroom.auth.providers import AuthProvider
 from newsroom.exceptions import AuthorizationError
 from newsroom.user_roles import UserRole
 from superdesk.utc import utcnow
 from newsroom.auth import get_user, get_company, get_user_by_email
-from newsroom.types import User, UserData, Company, AuthProvider, AuthProviderType
+from newsroom.types import User, UserData, Company, AuthProviderType
 from newsroom.utils import (
     get_random_string,
     is_valid_user,
@@ -41,13 +42,14 @@ def sign_user_by_email(
     validate_login_attempt: bool = False,
 ) -> werkzeug.Response:
     users = superdesk.get_resource_service("users")
-    user = get_user_by_email(email)
+    user: Union[User, UserData, None] = get_user_by_email(email)
 
     if user is None and create_missing and userdata is not None:
         user = userdata.copy()
         user["is_enabled"] = True
         user["is_approved"] = True
         users.create([user])
+        assert "_id" in user
 
     def redirect_with_error(error_str):
         flask.session.pop("_flashes", None)
@@ -56,8 +58,6 @@ def sign_user_by_email(
 
     if user is None:
         return redirect_with_error(_("User not found"))
-
-    assert "_id" in user
 
     if validate_login_attempt:
         company = get_company(user)
@@ -71,7 +71,7 @@ def sign_user_by_email(
             return redirect_with_error(_("Company has expired"))
         elif not is_account_enabled(user):
             return redirect_with_error(_("Account is disabled"))
-        elif company_auth_provider["auth_type"] != auth_type.value:
+        elif company_auth_provider.type != auth_type:
             return redirect_with_error(
                 _("Invalid login type, %(type)s not enabled for your user", type=auth_type.value)
             )
@@ -108,6 +108,10 @@ def clear_user_session(session=None):
     session["user_type"] = None
     session["auth_ttl"] = None
     session["auth_user"] = None
+
+
+def is_user_admin(user: User) -> bool:
+    return user.get("user_type") == UserRole.ADMINISTRATOR.value
 
 
 def is_current_user_admin() -> bool:
@@ -177,23 +181,26 @@ def revalidate_session_user():
     return is_valid
 
 
-def get_user_sections() -> Dict[str, bool]:
-    user = get_user()
+def get_user_sections(user: User) -> Dict[str, bool]:
     if not user:
         return {}
-    elif is_current_user_admin():
+
+    if is_user_admin(user):
         # Admin users should see all sections
         return {section["_id"]: True for section in app.sections}
-    elif user.get("sections"):
+
+    if user.get("sections"):
         return user["sections"]
+
     company = get_company(user)
     if company and company.get("sections"):
         return company["sections"]
+
     return {}
 
 
-def user_has_section_allowed(section) -> bool:
-    sections = get_user_sections()
+def user_has_section_allowed(user: User, section: str) -> bool:
+    sections = get_user_sections(user)
     if sections:
         return sections.get(section, False)
     return True  # might be False eventually, atm allow access if sections are not set explicitly
@@ -210,9 +217,14 @@ def user_can_manage_company(company_id) -> bool:
 
 
 def get_company_auth_provider(company: Optional[Company] = None) -> AuthProvider:
-    providers: Dict[str, AuthProvider] = {provider["_id"]: provider for provider in app.config["AUTH_PROVIDERS"]}
+    providers: Dict[str, AuthProvider] = {
+        provider["_id"]: AuthProvider.get_provider(provider) for provider in app.config["AUTH_PROVIDERS"]
+    }
 
-    provider_id = (company or {}).get("auth_provider") or "newshub"
+    provider_id = "newshub"
+    if company and company.get("auth_provider"):
+        provider_id = company.get("auth_provider", "newshub")
+
     return providers.get(provider_id) or providers["newshub"]
 
 

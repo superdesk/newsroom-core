@@ -2,7 +2,7 @@
   <div class="alert alert-danger" role="alert">
     <ul>
       {% for field, errors in form.errors.items() %}
-        <li>{{ field }}: {{ gettext(errors[0]) }}</li>
+        <li data-test-id="error-row">{{ field }}: {{ errors | join(" ") }}</li>
       {% endfor %}
     </ul>
   </div>

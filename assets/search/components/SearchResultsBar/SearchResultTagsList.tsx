@@ -3,7 +3,7 @@ import * as React from 'react';
 import {SearchResultsTopicRow} from './SearchResultsTopicRow';
 import {SearchResultsQueryRow} from './SearchResultsQueryRow';
 import {SearchResultsAdvancedSearchRow} from './SearchResultsAdvancedSearchRow';
-import {SearchResultsFiltersRow} from './SearchResultsFiltersRow';
+import SearchResultsFiltersRow from './SearchResultsFiltersRow';
 import {IFilterGroup, INavigation, ISearchFields, ISearchParams, ITopic, IUser} from 'interfaces';
 import {SearchResultTagList} from './SearchResultTagList';
 import {gettext} from 'utils';

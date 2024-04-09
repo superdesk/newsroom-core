@@ -1,20 +1,32 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {get, cloneDeep, uniqBy} from 'lodash';
 import {gettext} from 'utils';
 import {Skeleton} from 'primereact/skeleton';
 
 import NavGroup from './NavGroup';
 import FilterItem from './FilterItem';
+import {WithPagination} from 'components/pagination/WithPagination';
+import {searchIcon} from 'search/components/search-icon';
 
+/**
+ * If the filter count is less than 50 we
+ * shouldn't render the search.
+ */
+const SEARCHBAR_THRESHOLD = 50;
 const LIMIT = 5;
+type IBucket = {key: string, doc_count: string};
 
-const getVisibleBuckets = (buckets: any, group: any, toggleGroup: any) => {
+const getVisibleBuckets = (
+    buckets: Array<JSX.Element>,
+    group: any,
+    toggleGroup: (event: any, group: any) => void,
+) => {
     if (!buckets.length) {
         return;
     }
 
     let visibleBuckets = buckets;
+
     if (buckets.length > LIMIT && !group.isOpen) {
         visibleBuckets = buckets.slice(0, LIMIT).concat([
             <a key={'more'} onClick={(event: any) => toggleGroup(event, group)} className="small" href="">
@@ -36,6 +48,8 @@ const getVisibleBuckets = (buckets: any, group: any, toggleGroup: any) => {
 
 
 export default function FilterGroup({group, activeFilter, aggregations, toggleFilter, toggleGroup, isLoading}: any) {
+    const [searchTerm, setSearchTerm] = useState('');
+
     if (isLoading === true) {
         return (
             <NavGroup key={group.field} label={group.label}>
@@ -58,37 +72,71 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
     const compareFunction = (a: any, b: any) => group.sorted ? -1 : String(a.key).localeCompare(String(b.key));
 
     const groupFilter = get(activeFilter, group.field, []);
-    const activeBuckets = (get(activeFilter, group.field) || [])
+    const activeBuckets: Array<any> = (get(activeFilter, group.field) || [])
         .map((filter: any) => ({key: filter}));
-    const bucketPath = get(group, 'agg_path') || `${group.field}.buckets`;
-    const buckets = uniqBy(
-        cloneDeep(get(aggregations, bucketPath) || group.buckets || [])
-            .concat(activeBuckets),
-        'key'
-    )
+    const bucketPath: string = get(group, 'agg_path') || `${group.field}.buckets`;
+    const allBuckets = uniqBy(
+        cloneDeep(get(aggregations, bucketPath) || group.buckets || []).concat(activeBuckets) as Array<IBucket>,
+        'key',
+    );
+    const bucketsBySearchTerm = allBuckets
         .sort(compareFunction)
-        .map((bucket: any) => (
-            <FilterItem
-                key={bucket.key}
-                bucket={bucket}
-                group={group}
-                toggleFilter={toggleFilter}
-                groupFilter={groupFilter}
-            />
-        ));
+        .filter(({key}: any) => searchTerm.length > 0 ? key.toString().toLocaleLowerCase().includes(searchTerm) : true);
 
     return (
         <NavGroup key={group.field} label={group.label}>
-            {getVisibleBuckets(buckets, group, toggleGroup)}
+            {allBuckets.length > SEARCHBAR_THRESHOLD && (
+                <div className="mb-2 search search--small search--with-icon search--bordered m-0">
+                    <div className="search__form" role="search" aria-label="search">
+                        <i className="icon--search icon--muted-2"></i>
+                        <input
+                            autoComplete='off'
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                            }}
+                            value={searchTerm}
+                            type="text"
+                            className="search__input form-control"
+                            placeholder={gettext('Search Filters')}
+                            aria-label={gettext('Search Filters')}
+                        />
+                        <div className="search__form-buttons">
+                            <button className="search__button-clear" aria-label={gettext('Clear search')} type="button">
+                                {searchIcon}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            <WithPagination
+                style='bottom-only'
+                key={searchTerm}
+                pageSize={50}
+                getItems={(pageNo, pageSize) => {
+                    const step = pageNo === 1 ? 0 : (pageNo - 1) * pageSize;
+
+                    return Promise.resolve({
+                        itemCount: bucketsBySearchTerm?.length ?? 0,
+                        items: (bucketsBySearchTerm ?? []).slice(step, pageSize + step),
+                    });
+                }}
+            >
+                {(items: Array<IBucket>) => {
+                    const itemsJsx = items.map((item) => (
+                        <FilterItem
+                            key={item.key}
+                            bucket={item}
+                            group={group}
+                            toggleFilter={toggleFilter}
+                            groupFilter={groupFilter}
+                        />
+                    ));
+
+                    return <div className='mb-1 mt-1' >{getVisibleBuckets(itemsJsx, group, toggleGroup)}</div>;
+                }}
+            </WithPagination>
         </NavGroup>
     );
 }
 
-FilterGroup.propTypes = {
-    group: PropTypes.object,
-    activeFilter: PropTypes.object,
-    aggregations: PropTypes.object,
-    toggleFilter: PropTypes.func.isRequired,
-    toggleGroup: PropTypes.func.isRequired,
-    isLoading: PropTypes.bool,
-};
+

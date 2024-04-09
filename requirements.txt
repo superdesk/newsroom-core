@@ -11,14 +11,13 @@ gunicorn>=20.0.4,<20.1
 PyRTF3>=0.47.5
 xhtml2pdf>=0.2.4
 sentry-sdk[flask]>=1.5.7,<1.6
-eve-elastic>=7.3.1,<7.4
 MarkupSafe<2.1
 python3-saml>=1.15,<1.16
-
+google-auth>=2.6,<2.7
 
 # Fix an issue between xhtml2pdf v0.2.4 and reportlab v3.6.7
 # https://github.com/xhtml2pdf/xhtml2pdf/issues/589
 reportlab>=3.6.11,<3.7
 
-superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@v2.7.0-rc1
+superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@v2.7.0-rc4
 superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@v2.7.0-rc1

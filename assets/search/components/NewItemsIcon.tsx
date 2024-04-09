@@ -1,15 +1,18 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import 'react-toggle/style.css';
-import {get} from 'lodash';
 import {Tooltip} from 'bootstrap';
 
-import {gettext, isTouchDevice, isWireContext} from 'utils';
+import {gettext, isTouchDevice} from 'utils';
 
-class NewItemsIcon extends React.Component<any, any> {
-    static propTypes: any;
-    dom: any;
-    tooltip: any;
+interface IProps {
+    newItems?: Array<string>; // array of IDs
+    refresh(): void;
+}
+
+class NewItemsIcon extends React.Component<IProps> {
+    private dom: any;
+    private tooltip: any;
+
     constructor(props: any) {
         super(props);
 
@@ -38,35 +41,31 @@ class NewItemsIcon extends React.Component<any, any> {
     }
 
     render() {
-        const newItemsLength = get(this.props, 'newItems.length', 0) > 25 ?
-            '25+' :
-            get(this.props, 'newItems.length');
+        const newItems = this.props.newItems ?? [];
 
-        const newItemsTooltip = !isWireContext() ?
-            gettext('New events to load') :
-            gettext('New stories available to load');
+        /**
+         * one added item and one removed item would result in action count of 2
+         */
+        const additionOrRemovalActionCount = newItems.length > 25 ?
+            '25+' :
+            newItems.length;
 
         return (
             <button
                 type="button"
                 ref={(elem: any) => this.dom.tooltip = elem}
-                title={newItemsTooltip}
+                title={gettext('refresh')}
+                aria-label={gettext('refresh')}
                 className="button__reset-styles d-flex align-items-center ms-3"
                 onClick={this.props.refresh}
-                aria-label={gettext('Refresh')}
             >
-                <i className="icon--refresh icon--pink"/>
+                <i className="icon--refresh icon--pink" />
                 <span className="badge rounded-pill bg-info ms-2">
-                    {newItemsLength}
+                    {additionOrRemovalActionCount}
                 </span>
             </button>
         );
     }
 }
-
-NewItemsIcon.propTypes = {
-    newItems: PropTypes.array,
-    refresh: PropTypes.func,
-};
 
 export default NewItemsIcon;

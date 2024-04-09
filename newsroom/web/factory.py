@@ -31,6 +31,7 @@ from newsroom.template_filters import (
     initials,
     get_highlighted_field,
     get_item_category_names,
+    format_event_datetime,
 )
 from newsroom.template_loaders import LocaleTemplateLoader
 from newsroom.notifications.notifications import get_initial_notifications
@@ -66,6 +67,8 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.generate_renditions = None
         self.generate_embed_renditions = None
         self.session_timezone = None
+        self.countries = []
+        self.signup_form_class = None
 
         super(NewsroomWebApp, self).__init__(import_name=import_name, config=config, **kwargs)
 
@@ -139,6 +142,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_filter(get_location_string, "location_string")
         self.add_template_filter(get_agenda_dates, "agenda_dates_string")
         self.add_template_filter(get_item_category_names, "category_names")
+        self.add_template_filter(format_event_datetime)
 
         self.jinja_loader = LocaleTemplateLoader(self._theme_folders)
 

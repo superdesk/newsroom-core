@@ -1,6 +1,7 @@
+import {IItemAction} from 'interfaces';
 import {gettext, isActionEnabled} from './utils';
 
-export function getItemActions(dispatch: any, actions: any) {
+export function getItemActions(dispatch: any, actions: any): Array<IItemAction> {
     const {
         openItem,
         shareItems,
@@ -55,7 +56,7 @@ export function getItemActions(dispatch: any, actions: any) {
         },
         {
             id: 'save',
-            name: gettext('Save'),
+            name: gettext('Bookmark'),
             icon: 'bookmark-add',
             multi: true,
             shortcut: true,
@@ -64,7 +65,7 @@ export function getItemActions(dispatch: any, actions: any) {
         },
         {
             id: 'unsave',
-            name: gettext('Unsave'),
+            name: gettext('Unbookmark'),
             icon: 'bookmark-remove',
             multi: true,
             shortcut: true,

@@ -66,7 +66,7 @@ class MonitoringPanel extends React.Component<any, any> {
         event.preventDefault();
 
         confirm(gettext('Would you like to delete the {{monitoring}} Profile: {{name}}?',
-            {name: this.props.monitoringProfileToEdit.name, sectionNames: window.sectionNames})) &&
+            {name: this.props.monitoringProfileToEdit.name, ...window.sectionNames})) &&
             this.props.deleteMonitoringProfile();
     }
 

@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% block meta %}{% endblock %}
 
     {% block title_wrapper %}
     <title>{{ config.SITE_NAME }}{% if self.title() %} - {% endif %}{% block title %}{% endblock %}</title>
@@ -17,6 +18,7 @@
 
     <link rel="icon" type="image/x-icon"
         href="{{ theme_url('favicon.ico') }}">
+    <link rel="stylesheet" href="/static/primeicons.css"/>
 
 {{ javascript_tag('common') | safe }}
 {{ javascript_tag('newsroom_css') | safe }}
@@ -41,6 +43,7 @@
 
             {% include "impersonate_user.html" %}
 
+            {% block topnav_navbar %}
             {% if session.get('name') %}
             <div class="navbar__right">
                 {% if config.SHOW_DATE %}
@@ -60,6 +63,7 @@
                 {% endif %}
             </div>
             {% endif %}
+            {% endblock %}
         </nav>
     {% endblock %}
 

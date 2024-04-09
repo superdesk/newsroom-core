@@ -20,6 +20,7 @@ class CompaniesResource(newsroom.Resource):
         "url": {"type": "string"},
         "sd_subscriber_id": {"type": "string"},
         "is_enabled": {"type": "boolean", "default": True},
+        "is_approved": {"type": "boolean", "default": True},
         "contact_name": {"type": "string"},
         "contact_email": {"type": "string"},
         "phone": {"type": "string"},
@@ -69,6 +70,8 @@ class CompaniesResource(newsroom.Resource):
             "nullable": True,
         },
         "auth_provider": {"type": "string"},
+        "company_size": {"type": "string"},
+        "referred_by": {"type": "string"},
     }
 
     datasource = {"source": "companies", "default_sort": [("name", 1)]}
@@ -125,7 +128,9 @@ class CompaniesService(newsroom.Service):
             user_service = get_resource_service("users")
             for user in user_service.get(req=None, lookup={"company": original[config.ID_FIELD]}):
                 user_updates = {
-                    "sections": {
+                    "sections": {}
+                    if not user.get("sections")
+                    else {
                         section: (user.get("sections") or {}).get(section, False) for section in updated_section_names
                     },
                     "products": [

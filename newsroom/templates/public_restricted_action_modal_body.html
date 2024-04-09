@@ -1,0 +1,17 @@
+<div>Logging in provides the following benefits:</div>
+<ul>
+    <li>Access to the entire article body and metadata</li>
+    <li>Access to audio and video multimedia that's embedded in articles</li>
+    <li>Searching of content</li>
+    <li>Getting notified of new content</li>
+    <li>Bookmarking and sharing of content</li>
+    <li>Ability to download, print or copy content</li>
+    <li>Access to Agenda, which includes upcoming Events and associated coverages</li>
+</ul>
+
+{% if config.CONTACT_ADDRESS and config.CONTACT_ADDRESS != "#" %}
+<div>
+    If you would like further information or assistance, please visit
+    <a href="{{ config.CONTACT_ADDRESS }}">{{ config.CONTACT_ADDRESS }}</a>
+</div>
+{% endif %}

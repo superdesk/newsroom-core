@@ -14,12 +14,13 @@ from superdesk.etree import parse_html
 from superdesk.text_utils import get_text
 
 from bson import ObjectId
+from bson.errors import InvalidId
 from eve.utils import config, ParsedRequest
 from eve_elastic.elastic import parse_date, ElasticCursor
 from flask import current_app as app, json, abort, request, g, flash, session, url_for
 from flask_babel import gettext
 
-from newsroom.types import User, Company
+from newsroom.types import PublicUserData, User, Company
 from newsroom.template_filters import (
     time_short,
     parse_date as parse_short_date,
@@ -50,8 +51,7 @@ def query_resource(
 
 
 def find_one(resource, **lookup):
-    req = ParsedRequest()
-    return app.data.find_one(resource, req, **lookup)
+    return app.data.find_one(resource, req=None, **lookup)
 
 
 def get_random_string():
@@ -135,9 +135,9 @@ def get_json_or_400():
     return data
 
 
-def get_type():
-    item_type = request.args.get("type", "wire")
-    types = {
+def get_type(type: Optional[str] = None) -> str:
+    item_type = type or request.args.get("type", "wire")
+    types: Dict[Union[str, None], str] = {
         "wire": "items",
         "agenda": "agenda",
         "am_news": "items",
@@ -230,7 +230,9 @@ def get_location_string(agenda):
         location[0].get("address", {}).get("country"),
     ]
 
-    return ", ".join([location_part for location_part in location_items if location_part])
+    return ", ".join(
+        [location_part.strip() for location_part in location_items if location_part and not location_part.isspace()]
+    )
 
 
 def get_public_contacts(agenda):
@@ -642,3 +644,23 @@ def any_objectid_in_list(list_ids: List[Union[str, ObjectId]], source_ids: List[
         if ObjectId(item_id) in source_ids:
             return True
     return False
+
+
+def get_public_user_data(user: User) -> PublicUserData:
+    return PublicUserData(
+        _id=str(user.get("_id", "")),
+        company=str(user.get("company", "")),
+        first_name=user.get("first_name", ""),
+        last_name=user.get("last_name", ""),
+        email=user.get("email", ""),
+        products=user.get("products") or [],
+        sections=user.get("sections") or {},
+        notification_schedule=user.get("notification_schedule"),
+    )
+
+
+def parse_objectid(value: Union[str, ObjectId]) -> Union[str, ObjectId]:
+    try:
+        return ObjectId(value)
+    except InvalidId:
+        return value

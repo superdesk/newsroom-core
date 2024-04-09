@@ -1,7 +1,7 @@
 import {get, isEmpty, isEqual, pickBy} from 'lodash';
 
-import {IArticle, IContentType, IRendition} from '../interfaces';
-import {getTextFromHtml, getConfig, isDisplayed} from 'utils';
+import {IArticle, IAgendaItem, IContentType, IRendition} from 'interfaces';
+import {getTextFromHtml, getConfig, isDisplayed, gettext} from 'utils';
 
 export const DISPLAY_ABSTRACT = getConfig('display_abstract');
 
@@ -15,9 +15,11 @@ const STATUS_KILLED = 'canceled';
  * @param {Object} item
  * @returns {number}
  */
-export function getIntVersion(item: any) {
-    if (item) {
-        return parseInt(item.version, 10) || 0;
+export function getIntVersion(item: IArticle | IAgendaItem | undefined): number | undefined {
+    if (item != null && item.version != null) {
+        return typeof item.version === 'number' ?
+            item.version :
+            parseInt(item.version, 10) || 0;
     }
 }
 
@@ -108,10 +110,40 @@ function getBodyPicture(item: IArticle): IArticle | null {
     return pictures.length ? pictures[0] : null;
 }
 
-export function getPictureList(item: IArticle): Array<IArticle> {
+export function getMediaGalleryPictureList(item: IArticle) {
+    return Object.values(item.extra_items ?? {})
+        .filter((value) => value?.type === 'media');
+}
+
+export function getPictureList(item: IArticle, {includeFeatured = false, includeEditor = false} = {}): IArticle[] {
     const pictures = Object.values(item.associations ?? {})
         .filter((association) => association?.type === 'picture') as IArticle[];
-    return pictures.length ? pictures : [];
+
+    let filteredPictures = pictures;
+
+    if (!includeFeatured) {
+        const featureMedia = getFeatureMedia(item);
+        filteredPictures = featureMedia ? filteredPictures.filter((mediaItem) => mediaItem.guid !== featureMedia.guid) : filteredPictures;
+    }
+
+    if (!includeEditor) {
+        const bodyMedia = getBodyPictureList(item);
+        filteredPictures = filteredPictures.filter((mediaItem) => bodyMedia.includes(mediaItem));
+    }
+
+    return filteredPictures;
+}
+
+export function getBodyPictureList(item: IArticle): Array<IArticle> {
+    return Object.entries(item.associations || {})
+        .filter(([key, item]) => (
+            !key.startsWith('editor_')))
+        .map(([key, item]) => item) as IArticle[];
+
+}
+
+export function getGalleryMedia(item: IArticle): IArticle[] {
+    return getPictureList(item, {includeFeatured: false, includeEditor: false});
 }
 
 /**
@@ -127,15 +159,26 @@ export function getThumbnailRendition(picture: IArticle, large?: boolean): IRend
     return rendition ?? picture.renditions?.thumbnail;
 }
 
+export function notNullOrUndefined<T>(x: null | undefined | T): x is T {
+    return x != null;
+}
+
 export function getImageForList(item: IArticle): {item: IArticle, href: string} | undefined {
     const pictures = getPictureList(item);
+    const feature = getFeatureMedia(item);
     let thumbnail: IRendition | undefined;
 
-    for (let i = 0; i < pictures.length; i++) {
-        thumbnail = getThumbnailRendition(pictures[i]);
-
+    if (feature) {
+        thumbnail = getThumbnailRendition(feature);
         if (thumbnail != null && thumbnail.href != null) {
-            return {item: pictures[i], href: thumbnail.href};
+            return {item: feature, href: thumbnail.href};
+        }
+    } else {
+        for (let i = 0; i < pictures.length; i++) {
+            thumbnail = getThumbnailRendition(pictures[i]);
+            if (thumbnail != null && thumbnail.href != null) {
+                return {item: pictures[i], href: thumbnail.href};
+            }
         }
     }
 
@@ -233,37 +276,6 @@ export function shortText(item: any, length: any = 40, config?: any) {
     const text = useBody ?  getTextFromHtml(html) : item.description_text || getTextFromHtml(html);
     const words = text.split(/\s/).filter((w: any) => w);
     return words.slice(0, length).join(' ') + (words.length > length ? '...' : '');
-}
-
-/**
- * Split text into an array of words
- *
- * @todo: Any changes to this code **must** be reflected in the python version as well
- * @see superdesk-client-core:scripts/core/count-words.ts:countWords
- * @see newsroom.utils.split_words
- */
-function splitWords(str: string): Array<string> {
-    const strTrimmed = str.trim();
-
-    if (strTrimmed.length < 1) {
-        return [];
-    }
-
-    return strTrimmed
-        .replace(/\n/g, ' ') // replace newlines with spaces
-
-        // Remove spaces between two numbers
-        // 1 000 000 000 -> 1000000000
-        .replace(/([0-9]) ([0-9])/g, '$1$2')
-
-        // remove anything that is not a unicode letter, a space, comma or a number
-        .replace(/[^\p{L} 0-9,]/gu, '')
-
-        // replace two or more spaces with one space
-        .replace(/ {2,}/g, ' ')
-
-        .trim()
-        .split(' ');
 }
 
 /**
@@ -373,3 +385,11 @@ export function getContentTypes(item: IArticle): Set<IContentType> {
 
 export const hasAudio = (item: any) => hasMedia(item, 'audio');
 export const hasVideo = (item: any) => hasMedia(item, 'video');
+
+export function getVersionsLabelText(item: IArticle, plural?: boolean): string {
+    if (item.extra?.type === 'transcript') {
+        return plural ? gettext('segments') : gettext('segment');
+    }
+
+    return plural ? gettext('versions') : gettext('version');
+}

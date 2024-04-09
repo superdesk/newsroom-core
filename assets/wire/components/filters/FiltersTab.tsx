@@ -95,15 +95,23 @@ class FiltersTab extends React.Component<any, any> {
     }
 
     getFilterGroups() {
-        return this.state.groups.map((group: any) => <FilterGroup
-            key={group.label}
-            group={group}
-            activeFilter={this.state.activeFilter}
-            aggregations={this.props.aggregations}
-            toggleGroup={this.toggleGroup}
-            toggleFilter={this.updateFilter}
-            isLoading={this.props.isLoading}
-        />);
+        return this.state.groups.map((group: any) => {
+            if (this.props.aggregations == null) {
+                return null;
+            }
+
+            return (
+                <FilterGroup
+                    key={group.label}
+                    group={group}
+                    activeFilter={this.state.activeFilter}
+                    aggregations={this.props.aggregations}
+                    toggleGroup={this.toggleGroup}
+                    toggleFilter={this.updateFilter}
+                    isLoading={this.props.isLoading}
+                />
+            );
+        });
     }
 
     search(event: any) {
@@ -127,20 +135,23 @@ class FiltersTab extends React.Component<any, any> {
         return (
             <div className="d-contents">
                 <div className='tab-pane__inner'>
-                    {this.getFilterGroups().filter((group: any) => !!group).concat([
-                        (<NavCreatedPicker
+                    {this.getFilterGroups().filter((group: any) => !!group).concat([(
+                        <NavCreatedPicker
                             key="created"
                             createdFilter={createdFilter}
                             setCreatedFilter={this.setCreatedFilterAndSearch}
                             context = {this.props.context}
-                        />)
-                    ])}
+                        />
+                    )])}
                 </div>
                 {!isResetActive && !this.props.resultsFiltered ? null : ([
                     <div className='tab-pane__footer tab-pane__footer--inline' key='footer-buttons'>
 
-                        <button className='nh-button nh-button--secondary'
-                            onClick={this.reset}>
+                        <button
+                            className='nh-button nh-button--secondary'
+                            onClick={this.reset}
+                            data-test-id="filter-panel--clear-btn"
+                        >
                             {gettext('Clear')}
                         </button>
                         <button

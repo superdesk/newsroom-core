@@ -7,6 +7,7 @@ import {store as userProfileStore} from './store';
 import {getLocale} from '../utils';
 import {reloadMyTopics as reloadMyAgendaTopics} from '../agenda/actions';
 import {reloadMyTopics as reloadMyWireTopics} from '../wire/actions';
+import {IUserProfileUpdates} from 'interfaces/user';
 
 export const GET_TOPICS = 'GET_TOPICS';
 export function getTopics(topics: any) {
@@ -19,8 +20,8 @@ export function getUser(user: any) {
 }
 
 export const EDIT_USER = 'EDIT_USER';
-export function editUser(event: any) {
-    return {type: EDIT_USER, event};
+export function editUser(payload: IUserProfileUpdates) {
+    return {type: EDIT_USER, payload};
 }
 
 export const INIT_DATA = 'INIT_DATA';
@@ -231,15 +232,20 @@ export function pushNotification(push: any): any {
     };
 }
 
-function getFoldersUrl(state: any, global: boolean | undefined, id?: any) {
+export function getFoldersUrl(
+    company?: string,
+    userId?: string,
+    global?: boolean,
+    folderId?: string,
+) {
     const baseUrl = global ?
-        `/api/companies/${state.company}/topic_folders` :
-        `/api/users/${state.user._id}/topic_folders`;
+        `/api/companies/${company}/topic_folders` :
+        `/api/users/${userId}/topic_folders`;
 
-    return id != null ? `${baseUrl}/${id}` : baseUrl;
+    return folderId != null ? `${baseUrl}/${folderId}` : baseUrl;
 }
 
-function mergeUpdates(updates: any, response: any) {
+export function mergeUpdates(updates: any, response: any) {
     updates._id = response._id;
     updates._etag = response._etag;
     updates._status = response._status;
@@ -250,22 +256,21 @@ export const FOLDER_UPDATED = 'FOLDER_UPDATED';
 export function saveFolder(folder: ITopicFolder, data: {name: string}, global?: boolean) {
     return (dispatch: any, getState: any) => {
         const state = getState();
-        const url = getFoldersUrl(state, global, folder._id);
+        const url = getFoldersUrl(state.company, state.user?._id, global, folder._id);
+
+        const getFolder = (allFolders: IFoldersUnified, id: string) =>
+            [...allFolders.userFolders, ...allFolders.companyFolders].find(({_id}) => _id === id);
 
         if (folder._etag) {
             const updates = {...data};
 
             return server.patch(url, updates, folder._etag)
-                .then(() => {
-                    dispatch(fetchFolders());
-                });
+                .then((result) => dispatch(fetchFolders()).then((allFolders: IFoldersUnified) => getFolder(allFolders, result._id)));
         } else {
             const payload = {...data, section: state.selectedMenu === 'events' ? 'agenda' : 'wire'};
 
             return server.post(url, payload)
-                .then(() => {
-                    dispatch(fetchFolders());
-                });
+                .then((result) => dispatch(fetchFolders()).then((allFolders: IFoldersUnified) => getFolder(allFolders, result._id)));
         }
     };
 }
@@ -275,7 +280,7 @@ export function deleteFolder(folder: any, global: boolean, deleteTopics?: boolea
 
     return (dispatch: any, getState: any) => {
         const state = getState();
-        const url = getFoldersUrl(state, global, folder._id);
+        const url = getFoldersUrl(state.company, state.user?._id, global, folder._id);
 
         if (!window.confirm(gettext('Are you sure you want to delete the folder {{name}} and all of its contents?', {name: folder.name}))) {
             return;
@@ -292,14 +297,19 @@ export const RECIEVE_FOLDERS = 'RECIEVE_FOLDERS';
  * @param {bool} global - fetch company or user folders
  * @param {bool} skipDispatch - if true it won't replace folders in store
  */
-export function fetchFolders() {
+type IFoldersUnified = {
+    companyFolders: Array<ITopicFolder>;
+    userFolders: Array<ITopicFolder>;
+};
+
+export function fetchFolders(): (dispatch: any, getState: any) => Promise<IFoldersUnified> {
     return (dispatch: any, getState: any) => {
         const state = getState();
-        const companyTopicsUrl = getFoldersUrl(state, true);
-        const userTopicsUrl = getFoldersUrl(state, false);
+        const companyTopicsUrl = getFoldersUrl(state.company, state.user?._id, true);
+        const userTopicsUrl = getFoldersUrl(state.company, state.user?._id, false);
 
         return Promise.all([
-            state.company !== 'None' ? server.get(companyTopicsUrl).then(({_items}: {_items: Array<any>}) => _items) : Promise.resolve([]),
+            state.company ? server.get(companyTopicsUrl).then(({_items}: {_items: Array<any>}) => _items) : Promise.resolve([]),
             server.get(userTopicsUrl).then(({_items}: {_items: Array<any>}) => _items),
         ]).then(([companyFolders, userFolders]) => {
             dispatch({
@@ -309,6 +319,11 @@ export function fetchFolders() {
                     userFolders: userFolders,
                 },
             });
+
+            return {
+                companyFolders: companyFolders as Array<ITopicFolder>,
+                userFolders: userFolders as Array<ITopicFolder>,
+            };
         }).catch((error) => {
             console.error(error);
             return Promise.reject();
@@ -317,7 +332,7 @@ export function fetchFolders() {
 }
 
 export const TOPIC_UPDATED = 'TOPIC_UPDATED';
-export function moveTopic(topicId: any, folder: any) {
+export function moveTopic(topicId: any, folder: ITopicFolder | null) {
     return (dispatch: any, getState: any) => {
         const state = getState();
         const updates = {folder: folder != null ? folder._id : null};

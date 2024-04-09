@@ -1,40 +1,64 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
+import {IArticle, IListConfig} from 'interfaces';
 import {gettext} from 'utils';
+import {getVersionsLabelText} from 'wire/utils';
 import {fetchVersions, openItem} from '../actions';
 
 import ItemVersion from './ItemVersion';
 
+interface IOwnProps {
+    item: IArticle;
+    isPreview: boolean;
+    inputId?: string;
+    displayConfig?: IListConfig;
+    matchedIds?: Array<IArticle['_id']>
+}
 
-class ListItemPreviousVersions extends React.Component<any, any> {
+interface IState {
+    versions: Array<IArticle>;
+    loading: boolean;
+    error: boolean;
+}
+
+interface IDispatchProps {
+    openItem(item: IArticle): void;
+}
+
+type IProps = IDispatchProps & IOwnProps;
+
+const mapDispatchToProps = (dispatch: any) => ({
+    openItem: (item: IArticle) => dispatch(openItem(item)),
+});
+
+
+class ListItemPreviousVersions extends React.Component<IProps, IState> {
     baseClass: string;
-    static propTypes: any;
-    static defaultProps: any;
+    static defaultProps = {matchedIds: []};
 
-    constructor(props: any) {
+    constructor(props: IProps) {
         super(props);
         this.state = {versions: [], loading: true, error: false};
         this.baseClass = this.props.isPreview ? 'wire-column__preview' : 'wire-articles';
         this.open = this.open.bind(this);
-        this.fetch(props);
+        this.fetch();
     }
 
-    componentWillReceiveProps(nextProps: any) {
-        if (nextProps.item._id !== this.props.item._id) {
-            this.fetch(nextProps);
+    componentDidUpdate(prevProps: Readonly<IProps>) {
+        if (prevProps.item._id !== this.props.item._id) {
+            this.fetch();
         }
     }
 
-    open(version: any, event: any) {
+    open(version: IArticle, event: React.MouseEvent) {
         event.stopPropagation();
-        this.props.dispatch(openItem(version));
+        this.props.openItem(version);
     }
 
-    fetch(props: any) {
-        props.dispatch(fetchVersions(props.item))
-            .then((versions: any) => this.setState({versions, loading: false}))
+    fetch() {
+        fetchVersions(this.props.item)
+            .then((versions) => this.setState({versions, loading: false}))
             .catch(() => this.setState({error: true}));
     }
 
@@ -47,6 +71,7 @@ class ListItemPreviousVersions extends React.Component<any, any> {
             );
         }
 
+        const versionLabelText = getVersionsLabelText(this.props.item, this.state.versions.length > 1);
         const versions = this.state.versions.map((version: any) => (
             <ItemVersion
                 key={version._id}
@@ -63,7 +88,9 @@ class ListItemPreviousVersions extends React.Component<any, any> {
             this.props.item.ancestors ?
                 <div className={this.baseClass + '__versions'} id={this.props.inputId}>
                     {this.props.isPreview && (
-                        <span className="wire-column__preview__versions__box-headline">{gettext('Previous versions')}</span>
+                        <span className="wire-column__preview__versions__box-headline">
+                            {gettext('Previous {{ versionsLabel }}', {versionsLabel: versionLabelText})}
+                        </span>
                     )}
                     {versions}
                 </div> : null
@@ -71,22 +98,6 @@ class ListItemPreviousVersions extends React.Component<any, any> {
     }
 }
 
-ListItemPreviousVersions.propTypes = {
-    item: PropTypes.shape({
-        _id: PropTypes.string,
-        ancestors: PropTypes.array,
-    }).isRequired,
-    isPreview: PropTypes.bool.isRequired,
-    dispatch: PropTypes.func,
-    inputId: PropTypes.string,
-    displayConfig: PropTypes.object,
-    matchedIds: PropTypes.array,
-};
-
-ListItemPreviousVersions.defaultProps = {
-    matchedIds: [],
-};
-
-const component: React.ComponentType<any> = connect()(ListItemPreviousVersions);
+const component = connect(null, mapDispatchToProps)(ListItemPreviousVersions);
 
 export default component;

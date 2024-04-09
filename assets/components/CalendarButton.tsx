@@ -42,31 +42,35 @@ class CalendarButton extends React.Component<any, any> {
         }
 
         const isStartDateToday = moment.isMoment(this.state.startDate) && !this.state.startDate.isSame(moment(), 'day');
-        const datePicker = (<DatePicker
-            customInput={<CalendarButtonWrapper active={isStartDateToday}/>}
-            dateFormat="yyyy-MM-dd"
-            todayButton={gettext('Today')}
-            selected={this.state.startDate}
-            onChange={this.handleChange}
-            highlightDates={[moment().toDate()]}
-            locale={locale?.code ?? 'en'}
-            popperModifiers={[
-                {
-                    name: 'offset',
-                    options: {
-                        offset: [5, 10],
+        const datePicker = (
+            <DatePicker
+                customInput={<CalendarButtonWrapper active={isStartDateToday}/>}
+                dateFormat="yyyy-MM-dd"
+                todayButton={gettext('Today')}
+                selected={this.state.startDate}
+                onChange={this.handleChange}
+                highlightDates={[moment().toDate()]}
+                locale={locale?.code ?? 'en'}
+                popperModifiers={[
+                    {
+                        name: 'offset',
+                        options: {
+                            offset: [5, 10],
+                        },
                     },
-                },
-            ]}
-        />);
+                ]}
+            />
+        );
 
         if (!this.props.label) {
             return datePicker;
         } else {
-            return (<div className={this.props.labelClass}>
-                <label className='pe-1'>{this.props.label}</label>
-                {datePicker}
-            </div>);
+            return (
+                <div className={this.props.labelClass}>
+                    <label className='pe-1 label--no-spacing'>{this.props.label}</label>
+                    {datePicker}
+                </div>
+            );
 
         }
     }

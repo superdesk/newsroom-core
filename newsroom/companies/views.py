@@ -14,7 +14,9 @@ from werkzeug.exceptions import NotFound, BadRequest
 
 from newsroom.decorator import admin_only, account_manager_only, login_required
 from newsroom.companies import blueprint
+from newsroom.types import AuthProviderConfig
 from newsroom.utils import (
+    get_public_user_data,
     query_resource,
     find_one,
     get_json_or_400,
@@ -28,6 +30,13 @@ def get_company_types_options(company_types):
 
 
 def get_settings_data():
+    def render_provider(provider: AuthProviderConfig) -> Dict[str, str]:
+        return {
+            "_id": provider["_id"],
+            "name": str(provider["name"]),
+            "auth_type": provider["auth_type"].value,
+        }
+
     return {
         "companies": list(query_resource("companies")),
         "services": app.config["SERVICES"],
@@ -38,7 +47,7 @@ def get_settings_data():
         "ui_config": get_resource_service("ui_config").get_section_config("companies"),
         "countries": app.countries,
         "sso_enabled": bool(app.config.get("SAML_CLIENTS") or app.config.get("SAML_PATH")),
-        "auth_providers": app.config.get("AUTH_PROVIDERS"),
+        "auth_providers": [render_provider(provider) for provider in app.config.get("AUTH_PROVIDERS") or []],
     }
 
 
@@ -103,7 +112,7 @@ def get_company_updates(data, original=None):
         "contact_email": data.get("contact_email") or original.get("contact_email"),
         "phone": data.get("phone") or original.get("phone"),
         "country": data.get("country") or original.get("country"),
-        "is_enabled": data.get("is_enabled") or original.get("is_enabled"),
+        "is_enabled": data.get("is_enabled", original.get("is_enabled")),
         "company_type": data.get("company_type") or original.get("company_type"),
         "monitoring_administrator": data.get("monitoring_administrator") or original.get("monitoring_administrator"),
         "allowed_ip_list": data.get("allowed_ip_list") or original.get("allowed_ip_list"),
@@ -168,9 +177,33 @@ def delete(_id):
 @blueprint.route("/companies/<_id>/users", methods=["GET"])
 @login_required
 def company_users(_id):
-    """TODO(petr): use projection to hide fields like token/email."""
-    users = list(query_resource("users", lookup={"company": ObjectId(_id)}))
-    return jsonify(users), 200
+    users = [get_public_user_data(user) for user in query_resource("users", lookup={"company": ObjectId(_id)})]
+    return jsonify(users)
+
+
+@blueprint.route("/companies/<company_id>/approve", methods=["POST"])
+@account_manager_only
+def approve_company(company_id):
+    original = find_one("companies", _id=ObjectId(company_id))
+    if not original:
+        return NotFound(gettext("Company not found"))
+
+    if original.get("is_approved"):
+        return jsonify({"error": gettext("Company is already approved")}), 403
+
+    # Activate this Company
+    updates = {
+        "is_enabled": True,
+        "is_approved": True,
+    }
+    get_resource_service("companies").patch(original["_id"], updates=updates)
+
+    # Activate the Users of this Company
+    users_service = get_resource_service("users")
+    for user in users_service.get(req=None, lookup={"company": original["_id"], "is_approved": {"$ne": True}}):
+        users_service.approve_user(user)
+
+    return {"success": True}
 
 
 def get_product_updates(updates: Dict[str, bool], seats: Dict[str, int]):

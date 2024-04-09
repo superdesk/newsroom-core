@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import {get} from 'lodash';
 import {createPortal} from 'react-dom';
 import {Tooltip} from 'bootstrap';
+
+import {IArticle, IAgendaItem, IListConfig, IPreviewConfig, IItemAction} from 'interfaces';
 import {isTouchDevice, gettext, isDisplayed, isMobilePhone} from 'utils';
 import {getSingleFilterValue} from 'search/utils';
 import {getFilterPanelOpenState, setFilterPanelOpenState} from 'local-store';
@@ -13,6 +15,7 @@ import FiltersTab from 'wire/components/filters/FiltersTab';
 import NavigationTab from 'wire/components/filters/NavigationTab';
 import {AdvancedSearchPanel} from 'search/components/AdvancedSearchPanel';
 import {SearchTipsPanel} from 'search/components/SearchTipsPanel';
+import '@superdesk/common/dist/src/index.css';
 
 export default class BaseApp extends React.Component<any, any> {
     static propTypes: any;
@@ -171,7 +174,15 @@ export default class BaseApp extends React.Component<any, any> {
         }
     }
 
-    filterActions(item: any, config?: any, includeCoverages: any = false) {
+    filterActions(
+        item?: IArticle | IAgendaItem,
+        config?: IListConfig | IPreviewConfig,
+        includeCoverages = false
+    ): Array<IItemAction> {
+        if (item == null) {
+            return [];
+        }
+
         return this.props.actions.filter((action: any) => (!config || isDisplayed(action.id, config)) &&
           (!action.when || action.when(this.props.state, item, includeCoverages)));
     }
