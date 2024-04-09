@@ -40,6 +40,47 @@ const groupedItemsSelector = (state: IAgendaState) => state.listItems.groups;
 
 const hiddenGroupsShownSelector = (state: IAgendaState) => state.listItems.hiddenGroupsShown;
 
+const getItemIdsSorted = (
+    itemIds: Array<string>,
+    itemsById: {[itemId: string]: IAgendaItem},
+    listConfig: IListConfig,
+    group: IAgendaListGroup,
+) => {
+    const topStoryIds: Array<string> = [];
+    const coveragesOnlyIds: Array<string> = [];
+    const restIds: Array<string> = [];
+
+    itemIds.forEach((id) => {
+        const item = itemsById[id];
+        const hasCoverage = (item.coverages?.length ?? 0) > 0;
+        const isTopStory = (item.subject ?? []).find((subj) => subj.scheme === listConfig.subject?.topStoryScheme);
+
+        if (isTopStory) {
+
+            // hiddenItems has items which are multiDay and are not on the first date of the group
+            if (group.hiddenItems.includes(item._id) === false) {
+                topStoryIds.push(item._id);
+            } else {
+                restIds.push(item._id);
+            }
+        } else if (hasCoverage) {
+
+            // items with coverages are displayed after top stories
+            coveragesOnlyIds.push(item._id);
+        } else {
+
+            // all other items should follow
+            restIds.push(item._id);
+        }
+    });
+
+    return [
+        ...topStoryIds,
+        ...coveragesOnlyIds,
+        ...restIds,
+    ];
+};
+
 /**
  * Single event or planning item could be display multiple times.
  * Hence, the list items needs to tbe calculate so that keyboard scroll works.
@@ -305,7 +346,7 @@ class AgendaList extends React.Component<IProps, IState> {
                 className="wire-articles__group"
                 key={`${group.date}-${forHiddenItems ? 'hidden-items' : 'items'}-group`}
             >
-                {itemIds.map((itemId) => {
+                {getItemIdsSorted(itemIds, this.props.itemsById, this.props.listConfig, group).map((itemId) => {
                     // Only show multiple entries for this item if we're in the `Planning Only` view
                     const plans = this.props.itemTypeFilter !== 'planning' ?
                         [] :
