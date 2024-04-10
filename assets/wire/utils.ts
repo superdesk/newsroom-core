@@ -327,7 +327,7 @@ export function shortHighlightedtext(html: string, maxLength = 40) {
         lastNode = highlightSpan.nextSibling;
     }
     return extractedText.join(' ')
-        .replace(/<img[^>]*src="([^"]*)"[^>]*>/g, '&lt;img src="$1"&gt;')
+        .replace(/<img[^>]*src="([^"]*)"[^>]*>/g, ' ')
             + (html.length > maxLength ? '...' : ' ');
 }
 

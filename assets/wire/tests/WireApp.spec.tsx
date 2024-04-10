@@ -148,10 +148,10 @@ describe('shortHighlightedtext', () => {
     });
 
     it('handles the scenario when the highlight text has images', () => {
-        const html = '<p>foo <span class="es-highlight">bar &lt;img src="image1.jpg"&gt; baz</span></p>';
+        const html = 'experience.&lt;img src="img.jpg" alt="Team Vapaus" /&gt;Norion<span class="es-highlight">Nordic</span> financing bank.';
         const maxLength = 40;
         const output = shortHighlightedtext(html, maxLength);
-        expect(output).toEqual('foo <span class="es-highlight">bar &lt;img src="image1.jpg"&gt; baz</span>...');
+        expect(output).toEqual('experience. Norion <span class="es-highlight">Nordic</span> financing bank....');
     });
 });
   
