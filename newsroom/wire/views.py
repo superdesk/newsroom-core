@@ -23,7 +23,7 @@ from newsroom.wire.utils import update_action_list
 from newsroom.auth import get_company, get_user, get_user_id, get_user_required
 from newsroom.decorator import login_required, admin_only, section, clear_session_and_redirect_to_login
 from newsroom.topics import get_user_topics, get_user_folders, get_company_folders
-from newsroom.email import send_template_email, get_language_template_name
+from newsroom.email import get_language_template_name, send_user_email
 from newsroom.utils import (
     get_entity_or_404,
     get_json_or_400,
@@ -384,8 +384,8 @@ def share():
             ]
         )
 
-        send_template_email(
-            to=[user["email"]],
+        send_user_email(
+            user,
             template=f"share_{item_type}",
             template_kwargs=template_kwargs,
         )

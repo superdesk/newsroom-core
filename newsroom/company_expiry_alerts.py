@@ -18,6 +18,7 @@ from superdesk.celery_task_utils import get_lock_id
 from superdesk.lock import lock, unlock
 
 from newsroom.celery_app import celery
+from newsroom.email import send_user_email
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
 
 
@@ -73,11 +74,12 @@ class CompanyExpiryAlerts:
                             self.log_msg, company.get("name"), recipients
                         )
                     )
-                    send_template_email(
-                        to=[u["email"] for u in users],
-                        template="company_expiry_alert_user",
-                        template_kwargs=template_kwargs,
-                    )
+                    for user in users:
+                        send_user_email(
+                            user,
+                            template="company_expiry_alert_user",
+                            template_kwargs=template_kwargs,
+                        )
 
             if not (general_settings.get("values") or {}).get("company_expiry_alert_recipients"):
                 return  # No one else to send

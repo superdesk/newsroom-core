@@ -1,7 +1,11 @@
+from contextlib import contextmanager
+
 import flask
 import jinja2
 
 from typing import Optional
+from flask_babel import get_locale, get_timezone, _get_current_context, Locale
+import pytz
 
 TEMPLATE_LOCALE = "template_locale"
 
@@ -16,6 +20,34 @@ def get_template_locale() -> Optional[str]:
 
 def noop():
     return False
+
+
+@contextmanager
+def template_locale(locale: Optional[str] = None, timezone: Optional[str] = None):
+    """Overriding babel locale and timezone using internals, but there is no public api for that."""
+    ctx = _get_current_context()
+    if not ctx:
+        yield
+        return
+
+    old_locale = get_locale()
+    old_tzinfo = get_timezone()
+
+    if locale:
+        ctx.babel_locale = Locale.parse(locale)
+        set_template_locale(locale)
+
+    if timezone:
+        ctx.babel_tzinfo = pytz.timezone(timezone)
+
+    yield
+
+    if locale:
+        set_template_locale(None)
+    if old_locale:
+        ctx.babel_locale = old_locale
+    if old_tzinfo:
+        ctx.babel_tzinfo = old_tzinfo
 
 
 class LocaleTemplateLoader(jinja2.FileSystemLoader):

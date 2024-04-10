@@ -3,8 +3,8 @@ import flask
 import werkzeug
 import superdesk
 
-from datetime import timedelta
-from typing import Dict, Optional, Union
+from datetime import datetime, timedelta
+from typing import Dict, Optional, TypedDict, Union
 from flask import current_app as app
 from flask_babel import _
 from newsroom.auth.providers import AuthProvider
@@ -133,31 +133,44 @@ def is_current_user(user_id):
     return flask.session["user"] == str(user_id)
 
 
-def send_token(user, token_type="validate", update_token=True):
+def send_token(user: User, token_type="validate", update_token=True):
     if user is not None and user.get("is_enabled", False):
         if token_type == "validate" and user.get("is_validated", False):
             return False
 
         token = user.get("token")
         if update_token:
-            updates = {}
-            add_token_data(updates)
+            updates = get_token_data()
             superdesk.get_resource_service("users").system_update(bson.ObjectId(user["_id"]), updates, user)
             token = updates["token"]
 
+        assert isinstance(token, str)
+
         if token_type == "validate":
-            send_validate_account_email(user["first_name"], user["email"], token)
+            send_validate_account_email(user, token)
         if token_type == "new_account":
-            send_new_account_email(user["first_name"], user["email"], token)
+            send_new_account_email(user, token)
         elif token_type == "reset_password":
-            send_reset_password_email(user["first_name"], user["email"], token)
+            send_reset_password_email(user, token)
         return True
     return False
 
 
+class TokenData(TypedDict):
+    token: str
+    token_expiry_date: datetime
+
+
+def get_token_data() -> TokenData:
+    return {
+        "token": get_random_string(),
+        "token_expiry_date": utcnow() + timedelta(days=app.config["VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE"]),
+    }
+
+
 def add_token_data(user):
-    user["token"] = get_random_string()
-    user["token_expiry_date"] = utcnow() + timedelta(days=app.config["VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE"])
+    updates = get_token_data()
+    user.update(updates)
 
 
 def is_valid_session():

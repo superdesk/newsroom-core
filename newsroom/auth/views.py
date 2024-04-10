@@ -335,6 +335,8 @@ def token(token_type: Literal["reset_password", "validate"]):
         company = get_company_from_user(user) if user else None
         auth_provider = get_company_auth_provider(company)
 
+        assert user
+
         if auth_provider.features.verify_email:
             send_token(user, token_type)
 

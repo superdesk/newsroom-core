@@ -550,7 +550,7 @@ def test_signals(client, app):
         resp = client.post(f"/users/{user_id}/reset_password")
         assert 200 == resp.status_code, resp.get_data(as_text=True)
         password_email.assert_called_once()
-        reset_token = password_email.call_args.args[2]
+        reset_token = password_email.call_args.args[1]
         assert reset_token
 
     updated_listener.reset_mock()
