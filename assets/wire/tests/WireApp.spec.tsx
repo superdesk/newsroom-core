@@ -146,5 +146,12 @@ describe('shortHighlightedtext', () => {
         const output = shortHighlightedtext(html, maxLength);
         expect(output).toEqual('foo <span class="es-highlight">bar</span> foo <span class="es-highlight">bar</span> foo...');
     });
+
+    it('handles the scenario when the highlight text has images', () => {
+        const html = '<p>foo <span class="es-highlight">bar &lt;img src="image1.jpg"&gt; baz</span></p>';
+        const maxLength = 40;
+        const output = shortHighlightedtext(html, maxLength);
+        expect(output).toEqual('foo <span class="es-highlight">bar &lt;img src="image1.jpg"&gt; baz</span>...');
+    });
 });
   
