@@ -225,61 +225,52 @@ def get_language_template_name(template_name: str, language: str, extension: str
     return fallback_template_name
 
 
+EmailKwargs = Dict[str, Any]
+TemplateKwargs = Dict[str, Any]
+
+
 def send_user_email(
     user: User,
     template: str,
-    *,
-    template_kwargs: Optional[Dict[str, Any]] = None,
+    template_kwargs: Optional[TemplateKwargs] = None,
     ignore_preferences=False,  # ignore user email preferences
-    **kwargs,
-):
+    **kwargs: EmailKwargs,
+) -> None:
     """Send an email to Newsroom user, respecting user's email preferences."""
     if not user.get("receive_email") and not ignore_preferences:
         # If this is a user in the system, and has emails disabled
         # then skip this recipient
         return
-
-    language = to_email_language(user.get("locale") or current_app.config["DEFAULT_LANGUAGE"])
+    language = user.get("locale") or current_app.config["DEFAULT_LANGUAGE"]
     timezone = get_user_timezone(user)
-
-    email_templates = get_resource_service("email_templates")
-    template_kwargs = {} if not template_kwargs else template_kwargs
-
-    html_template = get_language_template_name(template, language, "html")
-    text_template = get_language_template_name(template, language, "txt")
-
-    with template_locale(language, timezone):
-        subject = email_templates.get_translated_subject(template, language, **template_kwargs)
-        template_kwargs.setdefault("subject", subject)
-        template_kwargs.setdefault("recipient_language", language)
-        send_email(
-            to=[user["email"]],
-            subject=subject,
-            text_body=render_template(text_template, **template_kwargs),
-            html_body=render_template(html_template, **template_kwargs),
-            sender_name=get_sender_name(language),
-            **kwargs,
-        )
+    _send_localized_email([user["email"]], template, language, timezone, template_kwargs or {}, kwargs)
 
 
 def send_template_email(
     to: List[str],
     template: str,
-    template_kwargs: Optional[Dict[str, Any]] = None,
-    ignore_preferences=False,  # ignore user email preferences
-    **kwargs,
-):
+    template_kwargs: Optional[TemplateKwargs] = None,
+    **kwargs: EmailKwargs,
+) -> None:
     """Send email to list of recipients using default locale."""
-    template_kwargs = {} if not template_kwargs else template_kwargs
-    email_templates = get_resource_service("email_templates")
-    language = to_email_language(current_app.config["DEFAULT_LANGUAGE"])
+    language = current_app.config["DEFAULT_LANGUAGE"]
     timezone = current_app.config["DEFAULT_TIMEZONE"]
-    sender_name = get_sender_name(language)
+    _send_localized_email(to, template, language, timezone, template_kwargs or {}, kwargs)
+
+
+def _send_localized_email(
+    to: List[str],
+    template: str,
+    language: str,
+    timezone: str,
+    template_kwargs: TemplateKwargs,
+    email_kwargs: EmailKwargs,
+) -> None:
+    language = to_email_language(language)
+    email_templates = get_resource_service("email_templates")
     html_template = get_language_template_name(template, language, "html")
     text_template = get_language_template_name(template, language, "txt")
     with template_locale(language, timezone):
-        # ``coverage_request_email`` requires ``subject`` variable for the body template
-        # so add the generated/rendered subject to kwargs (if subject is not already defined)
         subject = email_templates.get_translated_subject(template, language, **template_kwargs)
         template_kwargs.setdefault("subject", subject)
         template_kwargs.setdefault("recipient_language", language)
@@ -288,8 +279,8 @@ def send_template_email(
             subject=subject,
             text_body=render_template(text_template, **template_kwargs),
             html_body=render_template(html_template, **template_kwargs),
-            sender_name=sender_name,
-            **kwargs,
+            sender_name=get_sender_name(language),
+            **email_kwargs,
         )
 
 
