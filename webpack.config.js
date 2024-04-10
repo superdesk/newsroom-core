@@ -1,7 +1,6 @@
 /* eslint-env node */
 
 const path = require('path');
-const fs = require('fs');
 const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const TerserPlugin = require('terser-webpack-plugin-legacy');
@@ -54,7 +53,7 @@ const config = {
                     path.resolve(__dirname, 'assets'),
                     path.resolve(__dirname, 'node_modules/bootstrap'),
                     path.resolve(process.cwd(), 'node_modules/bootstrap'),
-                    process.cwd(), // for newsroom_custom_js
+                    process.cwd(), // for app
                 ],
                 loader: 'ts-loader',
                 options: {
@@ -91,6 +90,7 @@ const config = {
             'node_modules',
         ],
         alias: {
+            app: path.resolve(process.cwd(), 'app'),
             'moment-timezone': 'moment-timezone/builds/moment-timezone-with-data-10-year-range',
         },
         mainFields: ['browser', 'main'],
@@ -108,16 +108,6 @@ const config = {
         disableHostCheck: true,
     },
 };
-
-const customJsPathTsx = path.resolve(process.cwd(), 'app.tsx');
-const customJsPathTs = path.resolve(process.cwd(), 'app.ts');
-
-if (fs.existsSync(customJsPathTsx)) {
-    config.entry['newsroom_custom_js'] = customJsPathTsx;
-} else if (fs.existsSync(customJsPathTs)) {
-    config.entry['newsroom_custom_js'] = customJsPathTs;
-}
-
 
 if (process.env.NODE_ENV === 'production') {
     config.plugins.push(new webpack.DefinePlugin({

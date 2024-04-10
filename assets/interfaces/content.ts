@@ -34,4 +34,5 @@ export interface IArticle extends IResourceItem {
     deleted?: boolean; // Used only in the front-end, populated by wire/reducer
     bookmarks?: Array<string>;
     body_html?: string;
+    subject?: Array<{name: string, scheme: string, code: string}>;
 }

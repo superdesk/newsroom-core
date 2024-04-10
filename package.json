@@ -6,6 +6,7 @@
     "type": "git",
     "url": "https://github.com/superdesk/newsroom-core.git"
   },
+  "main": "assets/index.ts",
   "scripts": {
     "start": "webpack-dev-server --progress --colors --content-base dist --host 0.0.0.0",
     "build": "export NODE_ENV=production && webpack --config webpack.config.js --progress --profile --colors",

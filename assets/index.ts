@@ -34,3 +34,5 @@ export const exposed: IExposedForExtensions = {
         gettext,
     },
 };
+
+import 'app';
