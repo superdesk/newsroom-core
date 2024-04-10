@@ -9,6 +9,8 @@ import {toggleAdvancedSearchField, setAdvancedSearchKeywords, clearAdvancedSearc
 
 import CheckboxInput from 'components/CheckboxInput';
 import InputWrapper from 'components/InputWrapper';
+import {Button} from 'components/Buttons';
+import {IconButton} from 'components/IconButton';
 
 function AdvancedSearchPanelComponent({
     params,
@@ -28,22 +30,19 @@ function AdvancedSearchPanelComponent({
                     <h3>{gettext('Advanced Search')}</h3>
                     <div className="btn-group">
                         <div className="mx-2">
-                            <button
-                                className="icon-button"
-                                aria-label={gettext('Show Search Tips')}
+                            <IconButton
+                                icon='info'
+                                ariaLabel={gettext('Show Search Tips')}
                                 onClick={toggleSearchTipsPanel}
-                            >
-                                <i className="icon--info" />
-                            </button>
+                            />
                         </div>
                         <div className="mx-2">
-                            <button
-                                className="icon-button icon-button icon-button--bordered"
-                                aria-label={gettext('Close')}
+                            <IconButton
+                                icon='close-thin'
+                                border
+                                ariaLabel={gettext('Close')}
                                 onClick={toggleAdvancedSearchPanel}
-                            >
-                                <i className="icon--close-thin" />
-                            </button>
+                            />
                         </div>
                     </div>
                 </nav>
@@ -157,25 +156,25 @@ function AdvancedSearchPanelComponent({
                 </div>
             </div>
             <div className="advanced-search__footer">
-                <button
-                    className="nh-button nh-button--secondary"
+                <Button
+                    value={gettext('Clear All')}
+                    variant='secondary'
                     onClick={() => {
                         clearParams();
                         toggleAdvancedSearchPanel();
                         fetchItems();
                     }}
-                >
-                    {gettext('Clear All')}
-                </button>
-                <button
+                />
+
+                <Button
                     data-test-id="run-advanced-search-btn"
-                    className="nh-button nh-button--primary"
+                    value={gettext('Search')}
+                    variant='primary'
                     onClick={() => {
                         fetchItems();
                         toggleAdvancedSearchPanel();
                     }}
-                >
-                    {gettext('Search')}</button>
+                />
             </div>
         </div>
     );

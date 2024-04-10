@@ -30,8 +30,7 @@ export function Topic({topic, actions, users, selected, subscriptionType}: IProp
                 key={action.name}
                 testId={`topic-action--${action.name}`}
                 item={topic}
-                className='icon-button icon-button--primary'
-                displayName={false}
+                variant='primary'
                 action={action}
             />
         )

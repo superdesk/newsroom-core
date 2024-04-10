@@ -9,6 +9,7 @@ import {setItemTypeFilter, toggleDropdownFilter} from 'agenda/actions';
 import {searchFilterSelector} from 'search/selectors';
 import {connect} from 'react-redux';
 import {agendaCoverageStatusFilter, getActiveFilterLabel} from 'agenda/components/AgendaCoverageExistsFilter';
+import {Button} from 'components/Buttons';
 
 const IS_AGENDA = location.pathname.includes('/agenda');
 
@@ -248,17 +249,17 @@ function SearchResultsFiltersRow(props: IPropsAgendaExtended) {
             />
         );
         tags.push(
-            <button
+            <Button
                 key="tag-filters--clear-button"
-                className='nh-button nh-button--tertiary nh-button--small'
+                value={gettext('Clear filters')}
+                variant='tertiary'
+                size='small'
                 onClick={(event) => {
                     event.preventDefault();
                     resetFilter();
                     clearItemTypeFilter?.();
                 }}
-            >
-                {gettext('Clear filters')}
-            </button>
+            />
         );
     }
 

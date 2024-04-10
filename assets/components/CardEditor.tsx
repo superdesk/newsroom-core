@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {gettext} from 'utils';
+import {Button} from 'components/Buttons';
+import {IconButton} from './IconButton';
 
 export default class CardEditor extends React.Component<any, any> {
     static propTypes: any;
@@ -58,22 +60,21 @@ export default class CardEditor extends React.Component<any, any> {
                             <div className="card-header d-flex flex-row">{editorTitle || label}</div>
                             <div className="card-body">{editorCardBody}</div>
                             <div className="card-footer d-flex">
-                                <button
-                                    className="nh-button nh-button--primary ms-auto"
-                                    onClick={this.onSave}
+                                <Button   
+                                    value={saveText}
+                                    variant='primary'
+                                    className='ms-auto'
                                     disabled={Object.keys(errors || {}).length > 0}
-                                    aria-label={gettext('Save')}
-                                >
-                                    {saveText}
-                                </button>
+                                    onClick={this.onSave}
+                                />
+
                                 {!hideCancel && (
-                                    <button
-                                        className='nh-button nh-button--secondary ms-3'
+                                    <Button   
+                                        value={gettext('Cancel')}
+                                        variant='secondary'
+                                        className='ms-3'
                                         onClick={this.onCancelClick}
-                                        aria-label={gettext('Cancel')}
-                                    >
-                                        {gettext('Cancel')}
-                                    </button>
+                                    />
                                 )}
                             </div>
                         </div>
@@ -100,12 +101,19 @@ export default class CardEditor extends React.Component<any, any> {
                         <div className="card mt-3 d-block">
                             <div className="card-header d-flex justify-content-start align-items-center">
                                 <span className={titleClassNames}>{previewTitle || label}</span>
-                                <button className="icon-button ms-auto" aria-label={gettext('Edit')} onClick={this.onEditClick}>
-                                    <i className="icon--edit" />
-                                </button>
-                                {!this.props.noDelete && <button className="icon-button" aria-label={gettext('Delete')} onClick={onDelete}>
-                                    <i className="icon--trash" />
-                                </button>}
+                                <IconButton
+                                    icon='edit'
+                                    className='ms-auto'
+                                    ariaLabel={gettext('Edit')}
+                                    onClick={this.onEditClick}
+                                />
+                                {!this.props.noDelete && (
+                                    <IconButton
+                                        icon='trash'
+                                        ariaLabel={gettext('Delete')} 
+                                        onClick={onDelete}
+                                    />
+                                )}
                             </div>
                             <div className="card-body">{previewCardBody}</div>
                         </div>

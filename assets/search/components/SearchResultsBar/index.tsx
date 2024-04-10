@@ -21,6 +21,7 @@ import {
 import {Dropdown} from './../../../components/Dropdown';
 
 import {SearchResultTagsList} from './SearchResultTagsList';
+import {Button} from 'components/Buttons';
 
 
 class SearchResultsBarComponent extends React.Component<any, any> {
@@ -167,16 +168,15 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                         ))
                                     }
                                 </Dropdown>: null}
-                                <button
-                                    className="nh-button nh-button--tertiary"
+                                <Button
+                                    value={gettext('Clear All')}
+                                    variant='tertiary'
                                     onClick={() => {
                                         this.props.resetSearchParamsAndUpdateURL();
                                         this.props.onClearAll?.();
                                         this.props.refresh();
                                     }}
-                                >
-                                    {gettext('Clear All')}
-                                </button>
+                                />
                                 <button
                                     data-test-id="toggle-search-bar"
                                     onClick={this.toggleTagSection}

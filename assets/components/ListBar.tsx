@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import SearchBar from 'search/components/SearchBar';
+import {Button} from 'components/Buttons';
 
 class ListBar extends React.Component<any, any> {
     static propTypes: any;
@@ -27,14 +28,13 @@ class ListBar extends React.Component<any, any> {
                         )}
                     <div className="content-bar__right">
                         {this.props.onNewItem && (
-                            <button
-                                className="nh-button nh-button--primary"
+                            <Button
+                                value={this.props.buttonText}
+                                variant='primary'
                                 data-test-id="new-item-btn"
                                 disabled={this.props.disabled}
                                 onClick={() => this.props.onNewItem()}
-                            >
-                                {this.props.buttonText}
-                            </button>
+                            />
                         )}
                     </div>
                 </nav>
