@@ -289,6 +289,9 @@ function getTextFromNode(node: Node | null): string {
     if (node.nodeType === Node.TEXT_NODE) {
         const textContent = node.textContent || '';
         return textContent.trim();
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const element = node as HTMLElement;
+        return element.innerText.trim();
     }
     return '';
 }
@@ -318,7 +321,7 @@ export function shortHighlightedtext(html: string, maxLength = 40) {
             extractedText.push(textBefore);
         }
 
-        extractedText.push(highlightSpan.outerHTML);
+        extractedText.push(`<span class="es-highlight">${getTextFromNode(highlightSpan)}</span>`);
 
         if (textAfter) {
             extractedText.push(textAfter);
