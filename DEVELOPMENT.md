@@ -111,4 +111,4 @@ Prerequisites:
 * ensure `client/app.ts` file is present in the root repository. If it's not present, create an empty file.
 * ensure `client/tsconfig.json` is present in the root repository. If it's not present, copy it from `newsroom-app`.
 
-To enable extensions open `client/app.ts`, import and call `registerExtensions` function from `newsroom-core/assets/index`.
+To enable extensions open `client/app.ts`, import and call `registerExtensions` function from `newsroom-core`.
