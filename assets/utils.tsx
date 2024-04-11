@@ -489,7 +489,7 @@ const SHIFT_OUT_REGEXP = new RegExp(String.fromCharCode(14), 'g');
  * @param {String} html
  * @return {String}
  */
-export function formatHTML(html: any) {
+export function formatHTML(html: string) {
     return html.replace(SHIFT_OUT_REGEXP, html.indexOf('<pre>') === -1 ? '<br>' : '\n');
 }
 
