@@ -53,6 +53,7 @@ const config = {
                     path.resolve(__dirname, 'assets'),
                     path.resolve(__dirname, 'node_modules/bootstrap'),
                     path.resolve(process.cwd(), 'node_modules/bootstrap'),
+                    process.cwd(), // for app
                 ],
                 loader: 'ts-loader',
                 options: {
@@ -89,6 +90,7 @@ const config = {
             'node_modules',
         ],
         alias: {
+            app: path.resolve(process.cwd(), 'app'),
             'moment-timezone': 'moment-timezone/builds/moment-timezone-with-data-10-year-range',
         },
         mainFields: ['browser', 'main'],

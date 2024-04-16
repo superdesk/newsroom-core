@@ -102,3 +102,13 @@ It will run database migrations when needed.
 * Start **only redis** service via docker `docker-compose up redis`
 * Run the following command in a terminal `ssh -L 9200:data-sd:9201 -L 27017:data-sd:27017 host7.sourcefabric.org` - it will connect to the test server and forward ports of mongo db and elastic search services
 * start client and server using standard procedures (non-docker)
+
+
+## Extensions API
+
+Prerequisites:
+
+* ensure `client/app.ts` file is present in the root repository. If it's not present, create an empty file.
+* ensure `client/tsconfig.json` is present in the root repository. If it's not present, copy it from `newsroom-app`.
+
+To enable extensions open `client/app.ts`, import and call `registerExtensions` function from `newsroom-core`.

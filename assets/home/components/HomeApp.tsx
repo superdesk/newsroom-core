@@ -252,6 +252,7 @@ class HomeApp extends React.Component<IProps, {
             <div key='preview_test' className={`wire-column__preview ${this.props.itemToOpen ? 'wire-column__preview--open' : ''}`}>
                 {this.props.itemToOpen && (
                     <WirePreview
+                        key={this.props.itemToOpen._id}
                         item={this.props.itemToOpen}
                         user={this.props.user}
                         actions={this.filterActions(this.props.itemToOpen, this.props.previewConfig)}
