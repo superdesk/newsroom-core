@@ -531,14 +531,14 @@ export function errorHandler(error: {errorData: any} | Response, dispatch?: any,
  * @param {Mixed} defaultValue
  * @return {Mixed}
  */
-export function getConfig(key: any, defaultValue?: any) {
+export function getConfig(key: keyof IClientConfig, defaultValue?: any) {
     const clientConfig = window && window.newsroom && window.newsroom.client_config || {};
 
     if (Object.keys(clientConfig).length === 0) {
         console.warn('Client config is not yet available for key', key);
     }
 
-    return get(clientConfig, key, defaultValue);
+    return key in clientConfig ? clientConfig[key] : defaultValue;
 }
 
 export function getLocale() {

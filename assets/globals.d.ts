@@ -58,6 +58,8 @@ interface IClientConfig {
             button_label: string;
         }
     };
+    show_user_register?: boolean;
+    multimedia_website_search_url?: string;
 }
 
 interface Window {
