@@ -68,3 +68,9 @@ export interface IRestApiResponse<T extends IResourceItem> {
     };
     _aggregations: {[key: string]: any};
 }
+
+export interface ISubject {
+    name: string;
+    code: string;
+    scheme: string;
+}

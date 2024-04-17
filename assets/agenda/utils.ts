@@ -1,4 +1,4 @@
-import {get, isEmpty, includes, keyBy, sortBy} from 'lodash';
+import {get, isEmpty, keyBy, sortBy} from 'lodash';
 import moment from 'moment/moment';
 
 import {IAgendaItem, IAgendaListGroup, IAgendaListGroupItem, ICoverage, IUser} from 'interfaces';
@@ -16,6 +16,7 @@ import {
     formatTime,
     DAY_IN_MINUTES,
 } from '../utils';
+import {ISubject} from 'interfaces/common';
 
 export const STATUS_KILLED = 'killed';
 export const STATUS_CANCELED = 'cancelled';
@@ -1208,3 +1209,5 @@ export function formatAgendaDate(item: IAgendaItem, {localTimeZone = true, onlyD
         });
     }
 }
+
+export const isTopStory = (subj: ISubject) => subj.scheme === window.newsroom.client_config.agenda_top_story_scheme;

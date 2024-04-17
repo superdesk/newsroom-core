@@ -1,6 +1,6 @@
 import {AnyAction} from 'redux';
 import {ThunkAction, ThunkDispatch} from 'redux-thunk';
-import {IFilterGroup, IResourceItem, ISection} from './common';
+import {IFilterGroup, IResourceItem, ISection, ISubject} from './common';
 import {IAgendaUIConfig} from './configs';
 import {IUser, IUserType} from './user';
 import {ITopic, ITopicFolder} from './topic';
@@ -126,7 +126,7 @@ export interface IAgendaItem extends IResourceItem {
     watches?: Array<IUser['_id']>;
     es_highlight?: {[field: string]: Array<string>};
     state: string;
-    subject?: Array<{scheme?: string; code: string; name: string}>;
+    subject?: Array<ISubject>;
 }
 
 export interface IAgendaListGroup {

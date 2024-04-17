@@ -1,4 +1,4 @@
-import {IResourceItem} from './common';
+import {IResourceItem, ISubject} from './common';
 
 export type IContentType = 'text' | 'picture' | 'video' | 'audio';
 
@@ -34,5 +34,5 @@ export interface IArticle extends IResourceItem {
     deleted?: boolean; // Used only in the front-end, populated by wire/reducer
     bookmarks?: Array<string>;
     body_html?: string;
-    subject?: Array<{name: string, scheme: string, code: string}>;
+    subject?: Array<ISubject>;
 }
