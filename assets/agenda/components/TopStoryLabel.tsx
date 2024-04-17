@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from  'classnames';
 import {IAgendaItem, IListConfig, IPreviewConfig} from 'interfaces';
+import {isTopStory} from 'agenda/utils';
 
 interface IProps {
     item: IAgendaItem;
@@ -13,16 +14,16 @@ export default function TopStoryLabel({item, config, size}: IProps) {
         'label--big': size === 'big',
         'mb-2': size === 'big',
     });
+    const subjectList = item.subject || [];
+    const topStorySubjects = subjectList.filter(isTopStory);
 
     return (
-        config.subject?.topStoryScheme
-            ? (
-                <div>
-                    {item.subject?.filter(subject => subject.scheme === config.subject?.topStoryScheme).map(subject => {
-                        return <span className={classes} key={subject.name}>{subject.name}</span>;
-                    })}
-                </div>
-            )
-            : null
+        topStorySubjects.length > 0 ? (
+            <div>
+                {topStorySubjects.map(subject => (
+                    <span className={classes} key={subject.name}>{subject.name}</span>
+                ))}
+            </div>
+        ) : null
     );
 }

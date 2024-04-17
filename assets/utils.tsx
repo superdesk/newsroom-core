@@ -2,14 +2,13 @@ import React from 'react';
 import server from 'server';
 import analytics from 'analytics';
 import {get, isInteger, keyBy, isEmpty, cloneDeep, throttle, memoize} from 'lodash';
-import {Provider} from 'react-redux';
 import {createStore as _createStore, applyMiddleware, compose, Store, Middleware} from 'redux';
 import {createLogger} from 'redux-logger';
-import thunk, {ThunkAction} from 'redux-thunk';
+import thunk from 'redux-thunk';
 import alertify from 'alertifyjs';
 import moment from 'moment-timezone';
 
-import {IArticle, IClientConfig, IUser} from 'interfaces';
+import {IArticle, IUser} from 'interfaces';
 
 /*
  * Import and load all locales that will be used in moment.js

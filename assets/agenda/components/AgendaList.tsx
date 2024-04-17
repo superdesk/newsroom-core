@@ -25,7 +25,7 @@ import {AgendaListGroupHeader} from './AgendaListGroupHeader';
 import {setActive, previewItem, toggleSelected, openItem, toggleHiddenGroupItems} from '../actions';
 import {EXTENDED_VIEW} from 'wire/defaults';
 import {getIntVersion} from 'wire/utils';
-import {getPlanningItemsByGroup, getListItems} from 'agenda/utils';
+import {getPlanningItemsByGroup, getListItems, isTopStory} from 'agenda/utils';
 import {searchNavigationSelector} from 'search/selectors';
 import {previewConfigSelector, listConfigSelector} from 'ui/selectors';
 import {AGENDA_DATE_FORMAT_LONG, AGENDA_DATE_FORMAT_SHORT} from '../../utils';
@@ -53,9 +53,9 @@ const getItemIdsSorted = (
     itemIds.forEach((id) => {
         const item = itemsById[id];
         const hasCoverage = (item.coverages?.length ?? 0) > 0;
-        const isTopStory = (item.subject ?? []).find((subj) => subj.scheme === listConfig.subject?.topStoryScheme);
+        const topStory = (item.subject ?? []).find(isTopStory);
 
-        if (isTopStory) {
+        if (topStory) {
 
             // hiddenItems has items which are multiDay and are not on the first date of the group
             if (group.hiddenItems.includes(item._id) === false) {
