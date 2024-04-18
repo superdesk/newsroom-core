@@ -27,7 +27,7 @@
                     {% endblock %}
                 </div>
 
-                {% if config.SAML_AUTH_ENABLED and request.endpoint == "auth.login" %}
+                {% if config.SAML_PATH and request.endpoint == "auth.login" %}
                 <div class="card-body pt-1 pb-2">
                     <form action="{{ url_for('auth.saml') }}">
                         <button type="submit" title="{{ gettext('Login using Single Sign On') }}" class="nh-button nh-button--primary w-100">{{ config.SAML_LABEL }}</button>
