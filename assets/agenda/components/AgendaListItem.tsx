@@ -22,6 +22,7 @@ import {
 import ActionMenu from '../../components/ActionMenu';
 import {LIST_ANIMATIONS, isMobilePhone, gettext} from 'utils';
 import TopStoryLabel from './TopStoryLabel';
+import ToBeConfirmedLabel from './ToBeConfirmedLabel';
 
 interface IProps {
     item: IAgendaItem;
@@ -302,7 +303,10 @@ class AgendaListItem extends React.Component<IProps> {
             >
                 <div className={classes.wrap} tabIndex={0}>
                     <div className={classes.article} key="article">
-                        <TopStoryLabel item={item} config={listConfig} />
+                        <div className='d-flex gap-2'>
+                            <TopStoryLabel item={item} config={listConfig} />
+                            <ToBeConfirmedLabel item={item} />
+                        </div>
 
                         <h4 className='wire-articles__item-headline'>
                             <div className={classes.select} onClick={this.stopPropagation}>

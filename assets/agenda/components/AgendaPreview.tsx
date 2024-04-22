@@ -23,6 +23,7 @@ import {AgendaPreviewPlanning} from './AgendaPreviewPlanning';
 import {AgendaPreviewEvent} from './AgendaPreviewEvent';
 import {AgendaRegistrationInvitationDetails} from './AgendaRegistrationInvitationDetails';
 import TopStoryLabel from './TopStoryLabel';
+import ToBeConfirmedLabel from './ToBeConfirmedLabel';
 
 class AgendaPreview extends React.PureComponent<any, any> {
     static propTypes: any;
@@ -90,7 +91,10 @@ class AgendaPreview extends React.PureComponent<any, any> {
                         )}
                     >
                         <hgroup>
-                            <TopStoryLabel item={item} config={previewConfig} size='big' />
+                            <div className='d-flex gap-2'>
+                                <TopStoryLabel item={item} config={previewConfig} size='big' />
+                                <ToBeConfirmedLabel item={item} size='big' />
+                            </div>
                             <AgendaName item={item} noMargin/>
                         </hgroup>
                         <AgendaTime item={item}>

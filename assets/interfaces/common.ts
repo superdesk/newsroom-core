@@ -74,3 +74,9 @@ export interface ISubject {
     code: string;
     scheme: string;
 }
+
+export interface IOccurStatus {
+    name: string;
+    qcode: string;
+    label: string;
+}

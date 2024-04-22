@@ -9,6 +9,7 @@ import AgendaMap from '../../agenda/components/AgendaMap';
 import AgendaTime from '../../agenda/components/AgendaTime';
 import AgendaListItemLabels from '../../agenda/components/AgendaListItemLabels';
 import TopStoryLabel from 'agenda/components/TopStoryLabel';
+import ToBeConfirmedLabel from 'agenda/components/ToBeConfirmedLabel';
 
 export default function Article({image, item, children, disableTextSelection, detailsConfig}: any) {  
     return (
@@ -21,7 +22,10 @@ export default function Article({image, item, children, disableTextSelection, de
         >
             <div className={bem('wire-column__preview', 'content', {covering: hasCoverages(item)})}>
                 <hgroup className='mt-4'>
-                    <TopStoryLabel item={item} config={detailsConfig} size='big' />
+                    <div className='d-flex gap-2'>
+                        <TopStoryLabel item={item} config={detailsConfig} size='big' />
+                        <ToBeConfirmedLabel item={item} size='big' />
+                    </div>
                     <AgendaName item={item} noMargin />
                 </hgroup>
                 <AgendaTime item={item}>
