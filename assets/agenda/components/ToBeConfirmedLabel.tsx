@@ -1,7 +1,6 @@
 import React from 'react';
 import classNames from  'classnames';
-import {IAgendaItem, IListConfig, IPreviewConfig} from 'interfaces';
-import {isTopStory} from 'agenda/utils';
+import {IAgendaItem} from 'interfaces';
 import {gettext} from 'utils';
 
 interface IProps {
