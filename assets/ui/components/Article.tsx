@@ -10,7 +10,7 @@ import AgendaTime from '../../agenda/components/AgendaTime';
 import AgendaListItemLabels from '../../agenda/components/AgendaListItemLabels';
 import TopStoryLabel from 'agenda/components/TopStoryLabel';
 import ToBeConfirmedLabel from 'agenda/components/ToBeConfirmedLabel';
-import {LabelGroup} from 'agenda/components/LabelGroup';
+import {LabelGroup} from './LabelGroup';
 
 export default function Article({image, item, children, disableTextSelection, detailsConfig}: any) {  
     return (

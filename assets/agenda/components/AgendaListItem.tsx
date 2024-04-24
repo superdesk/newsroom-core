@@ -23,7 +23,7 @@ import ActionMenu from '../../components/ActionMenu';
 import {LIST_ANIMATIONS, isMobilePhone, gettext} from 'utils';
 import TopStoryLabel from './TopStoryLabel';
 import ToBeConfirmedLabel from './ToBeConfirmedLabel';
-import {LabelGroup} from './LabelGroup';
+import {LabelGroup} from 'ui/components/LabelGroup';
 
 interface IProps {
     item: IAgendaItem;

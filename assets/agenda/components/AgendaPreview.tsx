@@ -24,7 +24,7 @@ import {AgendaPreviewEvent} from './AgendaPreviewEvent';
 import {AgendaRegistrationInvitationDetails} from './AgendaRegistrationInvitationDetails';
 import TopStoryLabel from './TopStoryLabel';
 import ToBeConfirmedLabel from './ToBeConfirmedLabel';
-import {LabelGroup} from './LabelGroup';
+import {LabelGroup} from 'ui/components/LabelGroup';
 
 class AgendaPreview extends React.PureComponent<any, any> {
     static propTypes: any;
