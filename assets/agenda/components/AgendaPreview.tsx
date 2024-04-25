@@ -24,7 +24,7 @@ import {AgendaPreviewEvent} from './AgendaPreviewEvent';
 import {AgendaRegistrationInvitationDetails} from './AgendaRegistrationInvitationDetails';
 import TopStoryLabel from './TopStoryLabel';
 import ToBeConfirmedLabel from './ToBeConfirmedLabel';
-import {LabelGroup} from 'ui/components/LabelGroup';
+import {Spacer} from '@superdesk/common';
 
 class AgendaPreview extends React.PureComponent<any, any> {
     static propTypes: any;
@@ -92,10 +92,10 @@ class AgendaPreview extends React.PureComponent<any, any> {
                         )}
                     >
                         <hgroup>
-                            <LabelGroup>
+                            <Spacer gap='4' noGrow>
                                 <TopStoryLabel item={item} config={previewConfig} size='big' />
                                 <ToBeConfirmedLabel item={item} size='big' />
-                            </LabelGroup>
+                            </Spacer>
                             <AgendaName item={item} noMargin/>
                         </hgroup>
                         <AgendaTime item={item}>

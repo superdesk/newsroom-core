@@ -10,7 +10,7 @@ import AgendaTime from '../../agenda/components/AgendaTime';
 import AgendaListItemLabels from '../../agenda/components/AgendaListItemLabels';
 import TopStoryLabel from 'agenda/components/TopStoryLabel';
 import ToBeConfirmedLabel from 'agenda/components/ToBeConfirmedLabel';
-import {LabelGroup} from './LabelGroup';
+import {Spacer} from '@superdesk/common';
 
 export default function Article({image, item, children, disableTextSelection, detailsConfig}: any) {  
     return (
@@ -23,10 +23,10 @@ export default function Article({image, item, children, disableTextSelection, de
         >
             <div className={bem('wire-column__preview', 'content', {covering: hasCoverages(item)})}>
                 <hgroup className='mt-4'>
-                    <LabelGroup>
+                    <Spacer gap='4' noGrow>
                         <TopStoryLabel item={item} config={detailsConfig} size='big' />
                         <ToBeConfirmedLabel item={item} size='big' />
-                    </LabelGroup>
+                    </Spacer>
                     <AgendaName item={item} noMargin />
                 </hgroup>
                 <AgendaTime item={item}>
