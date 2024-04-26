@@ -23,6 +23,8 @@ import {AgendaPreviewPlanning} from './AgendaPreviewPlanning';
 import {AgendaPreviewEvent} from './AgendaPreviewEvent';
 import {AgendaRegistrationInvitationDetails} from './AgendaRegistrationInvitationDetails';
 import TopStoryLabel from './TopStoryLabel';
+import ToBeConfirmedLabel from './ToBeConfirmedLabel';
+import {LabelGroup} from 'ui/components/LabelGroup';
 
 class AgendaPreview extends React.PureComponent<any, any> {
     static propTypes: any;
@@ -90,7 +92,10 @@ class AgendaPreview extends React.PureComponent<any, any> {
                         )}
                     >
                         <hgroup>
-                            <TopStoryLabel item={item} config={previewConfig} size='big' />
+                            <LabelGroup>
+                                <TopStoryLabel item={item} config={previewConfig} size='big' />
+                                <ToBeConfirmedLabel item={item} size='big' />
+                            </LabelGroup>
                             <AgendaName item={item} noMargin/>
                         </hgroup>
                         <AgendaTime item={item}>
