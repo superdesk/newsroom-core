@@ -1,6 +1,6 @@
 import {AnyAction} from 'redux';
 import {ThunkAction, ThunkDispatch} from 'redux-thunk';
-import {IFilterGroup, ISingleItemAction, IResourceItem, ISection, ISubject, TDatetime} from './common';
+import {IFilterGroup, IOccurStatus, ISingleItemAction, IResourceItem, ISection, ISubject, TDatetime} from './common';
 import {IAgendaUIConfig} from './configs';
 import {IUser, IUserType} from './user';
 import {ITopic, ITopicFolder} from './topic';
@@ -53,6 +53,7 @@ export interface IEvent {
     actioned_date?: string;
     _time_to_be_confirmed?: boolean;
     files?: Array<string>;
+    occur_status?: IOccurStatus;
 }
 
 export type ICoverageStatus = 'coverage intended' |

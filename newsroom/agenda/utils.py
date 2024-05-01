@@ -184,8 +184,12 @@ def get_coverage_status(coverage: Dict[str, Any]) -> str:
 
 
 def get_event_state(item: Dict[str, Any]) -> str:
-    event_state = item.get("event", {}).get("state")
-    if event_state == "scheduled":
+    event = item.get("event", {})
+    occur_status = event.get("occur_status", {})
+    event_state = event.get("state")
+    if occur_status.get("qcode") == "eocstat:eos3":
+        return gettext("To be confirmed")
+    elif event_state == "scheduled":
         return gettext("Planned")
     elif event_state == "postponed":
         return gettext("Postponed")
