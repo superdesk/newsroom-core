@@ -777,3 +777,9 @@ AGENDA_CSV_SUBJECT_SCHEMES = []
 #:
 EMAIL_DEFAULT_SENDER_NAME = None
 EMAIL_SENDER_NAME_LANGUAGE_MAP = {}
+
+#: Hides Coverage assignee details for public users, such as desk and user details
+#:
+#: .. versionadded: 2.7
+#:
+AGENDA_HIDE_COVERAGE_ASSIGNEES = False

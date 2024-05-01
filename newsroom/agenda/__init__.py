@@ -3,7 +3,7 @@ from flask import Blueprint
 from flask_babel import lazy_gettext
 
 from newsroom.utils import url_for_agenda
-from .agenda import AgendaResource, AgendaService, aggregations
+from .agenda import AgendaResource, AgendaService, aggregations, PRIVATE_FIELDS
 from newsroom.search.config import init_nested_aggregation
 from .featured import FeaturedResource, FeaturedService
 from . import formatters
@@ -78,3 +78,6 @@ def init_app(app):
         ]
 
     init_nested_aggregation(AgendaResource, app.config.get("AGENDA_GROUPS", []), aggregations)
+
+    if app.config.get("AGENDA_HIDE_COVERAGE_ASSIGNEES"):
+        PRIVATE_FIELDS.extend(["*.assigned_desk_*", "*.assigned_user_*"])
