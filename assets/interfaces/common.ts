@@ -39,7 +39,7 @@ interface IBaseAction {
     when?(props: any, item: IArticle | IAgendaItem): boolean;
 }
 
-interface ISingleItemAction extends IBaseAction {
+export interface ISingleItemAction extends IBaseAction {
     action(item?: IArticle | IAgendaItem, group?: string, plan?: IAgendaItem): void;
 }
 

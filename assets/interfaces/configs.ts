@@ -53,6 +53,7 @@ export interface IPreviewConfig {
     located?: {displayed: boolean};
     subjects?: {displayed: boolean};
     metadata_fields?: Array<IDisplayFieldsConfig>;
+    disable_text_selection?: boolean;
 }
 
 interface IBaseUIConfig {
@@ -74,12 +75,18 @@ export interface IWireUIConfig extends IBaseUIConfig {
     _id: 'wire';
 }
 
+export interface IAgendaPreviewConfig extends IPreviewConfig {
+    coverage_metadata_fields?: Array<string>;
+}
+
 export interface IAgendaUIConfig extends IBaseUIConfig {
     _id: 'agenda';
     open_coverage_content_in_same_page?: boolean;
     subnav?: {
         filters?: Array<string>;
     };
+    preview?: IAgendaPreviewConfig;
+    details?: IAgendaPreviewConfig;
 }
 
 export type IUIConfig = IHomeUIConfig | IWireUIConfig | IAgendaUIConfig;
