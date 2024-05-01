@@ -1,7 +1,11 @@
-import {gettext, isTouchDevice} from 'utils';
+import {ComponentType} from 'react';
 import 'primereact/resources/primereact.min.css';
+
+import {IArticle, ICoverageMetadataPreviewProps} from 'interfaces';
+import {gettext, isTouchDevice} from 'utils';
+
+import {registerCoveragePreviewFieldComponent} from './agenda/components/preview';
 import {Button} from './ui/components/Button';
-import {IArticle} from 'interfaces';
 
 if (isTouchDevice()) {
     document.documentElement.classList.add('no-touch');
@@ -24,6 +28,12 @@ interface IExposedForExtensions {
     locale: {
         gettext: typeof gettext,
     };
+    agenda: {
+        registerCoveragePreviewFieldComponent(
+            field: string,
+            component: ComponentType<ICoverageMetadataPreviewProps>
+        ): void;
+    };
 }
 
 export const exposed: IExposedForExtensions = {
@@ -32,6 +42,9 @@ export const exposed: IExposedForExtensions = {
     },
     locale: {
         gettext,
+    },
+    agenda: {
+        registerCoveragePreviewFieldComponent,
     },
 };
 

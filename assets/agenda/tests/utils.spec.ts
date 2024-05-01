@@ -17,6 +17,7 @@ describe('utils', () => {
                     state: 'scheduled',
                     _created: '2023-11-16T04:00:00+0000',
                     _updated: '2023-11-16T04:00:00+0000',
+                    versioncreated: '2023-11-16T04:00:00+0000',
                     _etag: 'etag123',
                     dates: {start: '2018-10-15T04:00:00+0000', end: '2018-10-15T05:00:00+0000', tz: 'Australia/Sydney'},
                     event: {_id: 'foo'},
@@ -29,6 +30,7 @@ describe('utils', () => {
                     state: 'scheduled',
                     _created: '2023-11-16T04:00:00+0000',
                     _updated: '2023-11-16T04:00:00+0000',
+                    versioncreated: '2023-11-16T04:00:00+0000',
                     _etag: 'etag123',
                     dates: {start: '2018-10-18T06:00:00+0000', end: '2018-10-18T09:00:00+0000', tz: 'Australia/Sydney'},
                     event: {_id: 'bar'},
@@ -55,6 +57,7 @@ describe('utils', () => {
                     state: 'scheduled',
                     _created: '2023-11-16T04:00:00+0000',
                     _updated: '2023-11-16T04:00:00+0000',
+                    versioncreated: '2023-11-16T04:00:00+0000',
                     _etag: 'etag123',
                     dates: {start: '2018-10-15T04:00:00+0000', end: '2018-10-17T05:00:00+0000', tz: 'Australia/Sydney'},
                     event: {_id: 'foo'}
@@ -67,6 +70,7 @@ describe('utils', () => {
                     state: 'scheduled',
                     _created: '2023-11-16T04:00:00+0000',
                     _updated: '2023-11-16T04:00:00+0000',
+                    versioncreated: '2023-11-16T04:00:00+0000',
                     _etag: 'etag123',
                     dates: {start: '2018-10-17T06:00:00+0000', end: '2018-10-18T09:00:00+0000', tz: 'Australia/Sydney'},
                     event: {_id: 'bar'}
@@ -93,6 +97,7 @@ describe('utils', () => {
                     state: 'scheduled',
                     _created: '2023-11-16T04:00:00+0000',
                     _updated: '2023-11-16T04:00:00+0000',
+                    versioncreated: '2023-11-16T04:00:00+0000',
                     _etag: 'etag123',
                     dates: {start: '2018-10-15T04:00:00+0000', end: '2018-10-17T05:00:00+0000', tz: 'Australia/Sydney'},
                     display_dates: [{date: '2018-10-13T10:00:00+0000'}],
@@ -121,6 +126,7 @@ describe('utils', () => {
                     state: 'scheduled',
                     _created: '2023-11-16T04:00:00+0000',
                     _updated: '2023-11-16T04:00:00+0000',
+                    versioncreated: '2023-11-16T04:00:00+0000',
                     _etag: 'etag123',
                     dates: {start: '2018-10-17T04:00:00+0000', end: '2018-10-17T04:00:00+0000'},
                     display_dates: [
@@ -151,6 +157,7 @@ describe('utils', () => {
                     state: 'scheduled',
                     _created: '2023-11-16T04:00:00+0000',
                     _updated: '2023-11-16T04:00:00+0000',
+                    versioncreated: '2023-11-16T04:00:00+0000',
                     _etag: 'etag123',
                     dates: {start: '2018-10-17T04:00:00+0000', end: '2018-10-17T04:00:00+0000'},
                     display_dates: [{date: '2018-10-17T04:00:00+0000'}],
@@ -177,6 +184,7 @@ describe('utils', () => {
                     state: 'scheduled',
                     _created: '2023-11-16T04:00:00+0000',
                     _updated: '2023-11-16T04:00:00+0000',
+                    versioncreated: '2023-11-16T04:00:00+0000',
                     _etag: 'etag123',
                     dates: {start: '2018-10-15T04:00:00+0000', end: '2018-10-15T05:00:00+0000', tz: 'Australia/Sydney'},
                     display_dates: [
@@ -219,6 +227,7 @@ describe('utils', () => {
                             state: 'scheduled',
                             _created: '2023-11-16T04:00:00+0000',
                             _updated: '2023-11-16T04:00:00+0000',
+                            versioncreated: '2023-11-16T04:00:00+0000',
                             _etag: 'etag123',
                             'planning_date': '2018-10-15T04:30:00+0000',
                             dates: {start: '2018-10-15T04:30:00+0000', end: '2018-10-15T04:30:00+0000'},
@@ -230,6 +239,7 @@ describe('utils', () => {
                                     coverage_type: 'text',
                                     coverage_status: 'coverage intended',
                                     workflow_status: 'assigned',
+                                    news_coverage_status: {qcode: 'ncostat:int', name: 'intended', label: 'intended'},
                                 },
                                 {
                                     'scheduled': '2018-10-14T04:00:00+0000',
@@ -238,6 +248,7 @@ describe('utils', () => {
                                     coverage_type: 'text',
                                     coverage_status: 'coverage intended',
                                     workflow_status: 'assigned',
+                                    news_coverage_status: {qcode: 'ncostat:int', name: 'intended', label: 'intended'},
                                 }
                             ],
                         },
@@ -249,6 +260,7 @@ describe('utils', () => {
                             state: 'scheduled',
                             _created: '2023-11-16T04:00:00+0000',
                             _updated: '2023-11-16T04:00:00+0000',
+                            versioncreated: '2023-11-16T04:00:00+0000',
                             _etag: 'etag123',
                             'planning_date': '2018-10-15T04:30:00+0000',
                             dates: {start: '2018-10-15T04:30:00+0000', end: '2018-10-15T04:30:00+0000'},
@@ -259,6 +271,7 @@ describe('utils', () => {
                                 coverage_type: 'text',
                                 coverage_status: 'coverage intended',
                                 workflow_status: 'assigned',
+                                news_coverage_status: {qcode: 'ncostat:int', name: 'intended', label: 'intended'},
                             }],
                         }
                     ]
@@ -298,6 +311,7 @@ describe('utils', () => {
                     state: 'scheduled',
                     _created: '2023-11-16T04:00:00+0000',
                     _updated: '2023-11-16T04:00:00+0000',
+                    versioncreated: '2023-11-16T04:00:00+0000',
                     _etag: 'etag123',
                     dates: {start: '2018-10-15T04:00:00+0000', end: '2018-10-15T05:00:00+0000', tz: 'Australia/Sydney'},
                     display_dates: [{date: '2018-10-14T04:00:00+0000'}],
@@ -314,6 +328,7 @@ describe('utils', () => {
                             state: 'scheduled',
                             _created: '2023-11-16T04:00:00+0000',
                             _updated: '2023-11-16T04:00:00+0000',
+                            versioncreated: '2023-11-16T04:00:00+0000',
                             _etag: 'etag123',
                         }
                     ]
@@ -349,6 +364,7 @@ describe('utils', () => {
             state: 'scheduled',
             _created: '2023-11-16T04:00:00+0000',
             _updated: '2023-11-16T04:00:00+0000',
+            versioncreated: '2023-11-16T04:00:00+0000',
             _etag: 'etag123',
             dates: {start: '2018-10-15T04:00:00+0000', end: '2018-10-15T05:00:00+0000', tz: 'Australia/Sydney'},
             event: {_id: 'event1'},
@@ -360,6 +376,7 @@ describe('utils', () => {
             state: 'scheduled',
             _created: '2023-11-16T04:00:00+0000',
             _updated: '2023-11-16T04:00:00+0000',
+            versioncreated: '2023-11-16T04:00:00+0000',
             _etag: 'etag123',
             dates: {start: '2018-10-16T04:00:00+0000', end: '2018-10-16T05:00:00+0000', tz: 'Australia/Sydney'},
             event: {_id: 'event2'},
@@ -371,6 +388,7 @@ describe('utils', () => {
             state: 'scheduled',
             _created: '2023-11-16T04:00:00+0000',
             _updated: '2023-11-16T04:00:00+0000',
+            versioncreated: '2023-11-16T04:00:00+0000',
             _etag: 'etag123',
             dates: {start: '2018-10-17T04:00:00+0000', end: '2018-10-17T05:00:00+0000', tz: 'Australia/Sydney'},
             event: {_id: 'event3'},

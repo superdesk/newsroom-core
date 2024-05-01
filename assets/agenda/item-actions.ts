@@ -3,7 +3,7 @@ import {getItemActions} from '../item-actions';
 import * as agendaActions from './actions';
 import {gettext} from '../utils';
 import {isWatched} from './utils';
-import {IItemAction} from 'interfaces';
+import {IItemAction, ICoverageItemAction} from 'interfaces';
 
 const canWatchAgendaItem = (state: any, item: any, includeCoverages: any) => {
     const result = state.user && !isWatched(item, state.user);
@@ -38,21 +38,22 @@ export const getAgendaItemActions = (dispatch: any) => {
         ]);
 };
 
-export const getCoverageItemActions = (dispatch: any) => {
+export const getCoverageItemActions = (dispatch: any): Array<ICoverageItemAction> => {
     const {watchCoverage, stopWatchingCoverage} = agendaActions;
     return [
         {
             name: gettext('Watch'),
             icon: 'watch',
-            when: (cov: any, user: any) => user && !isWatched(cov, user),
-            action: (coverage: any, group: any, item: any) => dispatch(watchCoverage(coverage, item)),
+            when: (cov, user) => user != null && !isWatched(cov, user),
+            action: (coverage, item) => dispatch(watchCoverage(coverage, item)),
             tooltip: gettext('Watch this coverage'),
         },
         {
             name: gettext('Stop watching'),
             icon: 'unwatch',
-            when: (cov: any, user: any) => user && isWatched(cov, user),
-            action: (coverage: any, group: any, item: any) => dispatch(stopWatchingCoverage(coverage, item)),
+            when: (cov, user) => user != null && isWatched(cov, user),
+            action: (coverage, item) => dispatch(stopWatchingCoverage(coverage, item)),
+            tooltip: gettext('Stop watching this coverage'),
         },
     ];
 };

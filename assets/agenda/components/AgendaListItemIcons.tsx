@@ -1,7 +1,7 @@
 import React from 'react';
 import {isEqual} from 'lodash';
 
-import {IAgendaItem, IUser, ICoverage, IListConfig} from 'interfaces';
+import {IAgendaItem, IPlanningItem, IUser, ICoverage, IListConfig} from 'interfaces';
 import {bem} from 'ui/utils';
 import {
     hasCoverages,
@@ -25,7 +25,7 @@ interface IProps {
     user: IUser['_id'];
     group: string;
     item: IAgendaItem;
-    planningItem?: IAgendaItem;
+    planningItem?: IPlanningItem;
     hideCoverages?: boolean;
     row?: boolean;
     isMobilePhone?: boolean;

@@ -1,12 +1,22 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
-import {get} from 'lodash';
 
 import {gettext} from 'utils';
 import {isPlanningItem} from '../utils';
 import AgendaPreviewCoverages from './AgendaPreviewCoverages';
+import {IAgendaItem, ICoverageItemAction, IUser, IAgendaPreviewConfig, IArticle} from 'interfaces';
 
-export class AgendaPreviewPlanning extends React.Component<any, any> {
+interface IProps {
+    item: IAgendaItem;
+    planningId?: IAgendaItem['_id'];
+    user?: IUser['_id'];
+    wireItems?: Array<IArticle>;
+    coverageActions?: Array<ICoverageItemAction>;
+    previewGroup?: string;
+    restrictCoverageInfo?: boolean;
+    previewConfig: IAgendaPreviewConfig;
+}
+
+export class AgendaPreviewPlanning extends React.Component<IProps, any> {
     static propTypes: any;
     render() {
         const {
@@ -19,9 +29,9 @@ export class AgendaPreviewPlanning extends React.Component<any, any> {
             restrictCoverageInfo,
         } = this.props;
 
-        const planningItems = get(item, 'planning_items') || [];
-        const plan = planningItems.find((p: any) => p.guid === planningId);
-        const otherPlanningItems = planningItems.filter((p: any) => p.guid !== planningId);
+        const planningItems = item.planning_items || [];
+        const plan = planningItems.find((p) => p.guid === planningId);
+        const otherPlanningItems = planningItems.filter((p) => p.guid !== planningId);
 
         if (isPlanningItem(item) || restrictCoverageInfo) {
             return (
@@ -34,6 +44,7 @@ export class AgendaPreviewPlanning extends React.Component<any, any> {
                     user={user}
                     previewGroup={previewGroup}
                     restrictCoverageInfo={restrictCoverageInfo}
+                    previewConfig={this.props.previewConfig}
                 />
             );
         }
@@ -54,6 +65,7 @@ export class AgendaPreviewPlanning extends React.Component<any, any> {
                                 actions={coverageActions}
                                 user={user}
                                 previewGroup={previewGroup}
+                                previewConfig={this.props.previewConfig}
                             />
                         </div>
                     </div>
@@ -73,6 +85,7 @@ export class AgendaPreviewPlanning extends React.Component<any, any> {
                                     actions={coverageActions}
                                     user={user}
                                     previewGroup={previewGroup}
+                                    previewConfig={this.props.previewConfig}
                                 />
                             ))}
                         </div>
@@ -82,13 +95,3 @@ export class AgendaPreviewPlanning extends React.Component<any, any> {
         );
     }
 }
-
-AgendaPreviewPlanning.propTypes = {
-    user: PropTypes.string,
-    item: PropTypes.object,
-    planningId: PropTypes.string,
-    wireItems: PropTypes.array,
-    coverageActions: PropTypes.array,
-    previewGroup: PropTypes.string,
-    restrictCoverageInfo: PropTypes.bool,
-};

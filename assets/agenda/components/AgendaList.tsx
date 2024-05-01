@@ -7,6 +7,7 @@ import moment from 'moment';
 
 import {
     IAgendaItem,
+    IPlanningItem,
     IAgendaListGroup,
     IAgendaListGroupItem,
     ICompany,
@@ -287,7 +288,7 @@ class AgendaList extends React.Component<IProps, IState> {
           (!action.when || action.when(this.props, item)));
     }
 
-    isActiveItem(_id: IAgendaItem['_id'], group: string, plan?: IAgendaItem) {
+    isActiveItem(_id: IAgendaItem['_id'], group: string, plan?: IPlanningItem) {
         const {activeItem} = this.props;
 
         if (activeItem == null || (!_id && !group && !plan)) {
