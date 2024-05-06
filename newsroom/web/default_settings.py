@@ -790,3 +790,9 @@ EMAIL_SENDER_NAME_LANGUAGE_MAP = {}
 
 #: Set the card type for personal dashboard
 PERSONAL_DASHBOARD_CARD_TYPE = "4-picture-text"
+
+#: Hides Coverage assignee details for public users, such as desk and user details
+#:
+#: .. versionadded: 2.7
+#:
+AGENDA_HIDE_COVERAGE_ASSIGNEES = False

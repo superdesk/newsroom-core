@@ -35,4 +35,8 @@ export interface IArticle extends IResourceItem {
     bookmarks?: Array<string>;
     body_html?: string;
     subject?: Array<ISubject>;
+    ednote?: string;
+
+    // populated by the backend
+    _access?: boolean;
 }
