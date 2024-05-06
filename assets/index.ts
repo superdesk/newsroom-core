@@ -4,7 +4,7 @@ import 'primereact/resources/primereact.min.css';
 import {IArticle, ICoverageMetadataPreviewProps} from 'interfaces';
 import {gettext, isTouchDevice} from 'utils';
 
-import {registerCoveragePreviewFieldComponent} from './agenda/components/preview';
+import {registerCoverageFieldComponent} from './agenda/components/preview';
 import {Button} from './ui/components/Button';
 
 if (isTouchDevice()) {
@@ -29,7 +29,7 @@ interface IExposedForExtensions {
         gettext: typeof gettext,
     };
     agenda: {
-        registerCoveragePreviewFieldComponent(
+        registerCoverageFieldComponent(
             field: string,
             component: ComponentType<ICoverageMetadataPreviewProps>
         ): void;
@@ -44,7 +44,7 @@ export const exposed: IExposedForExtensions = {
         gettext,
     },
     agenda: {
-        registerCoveragePreviewFieldComponent,
+        registerCoverageFieldComponent,
     },
 };
 

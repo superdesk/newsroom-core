@@ -16,7 +16,7 @@ import {CoverageWorkflowReason} from './coverage/CoverageWorkflowReason';
 import {CoverageInternalNote} from './coverage/CoverageInternalNote';
 import {CoverageActions} from './coverage/CoverageActions';
 
-export const DEFAULT_COVERAGE_PREVIEW_META_FIELDS = [
+export const DEFAULT_COVERAGE_METADATA_FIELDS = [
     'coverage_header',
     'coverage_assignee_names',
     'coverage_expected_date',
@@ -31,7 +31,7 @@ export const DEFAULT_COVERAGE_PREVIEW_META_FIELDS = [
     'coverage_actions',
 ];
 
-export const coveragePreviewFieldToComponentMap: {[key: string]: React.ComponentType<ICoverageMetadataPreviewProps>} = {
+export const coverageFieldToComponentMap: {[key: string]: React.ComponentType<ICoverageMetadataPreviewProps>} = {
     coverage_header: CoverageMetadataPreviewHeader,
     coverage_assignee_names: CoverageAssigneeNames,
     coverage_expected_date: CoverageExpectedDate,
@@ -46,6 +46,6 @@ export const coveragePreviewFieldToComponentMap: {[key: string]: React.Component
     coverage_actions: CoverageActions,
 };
 
-export function registerCoveragePreviewFieldComponent(field: string, component: React.ComponentType<ICoverageMetadataPreviewProps>) {
-    coveragePreviewFieldToComponentMap[field] = component;
+export function registerCoverageFieldComponent(field: string, component: React.ComponentType<ICoverageMetadataPreviewProps>) {
+    coverageFieldToComponentMap[field] = component;
 }

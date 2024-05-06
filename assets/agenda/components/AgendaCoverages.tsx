@@ -11,7 +11,7 @@ import {
 } from 'interfaces';
 import {gettext} from 'utils';
 import {getCoverageIcon, getCoverageTooltip, WORKFLOW_COLORS} from '../utils';
-import {coveragePreviewFieldToComponentMap, DEFAULT_COVERAGE_PREVIEW_META_FIELDS} from './preview';
+import {coverageFieldToComponentMap, DEFAULT_COVERAGE_METADATA_FIELDS} from './preview';
 
 interface IProps {
     item: IAgendaItem;
@@ -40,7 +40,7 @@ export default function AgendaCoverages({
 
     const coveragesWithoutState = coverages.filter((coverage) => WORKFLOW_COLORS[coverage.workflow_status] == null);
     const coveragesWithState = coverages.filter((coverage) => WORKFLOW_COLORS[coverage.workflow_status] != null);
-    const coverageFieldsToRender = previewConfig?.coverage_metadata_fields ?? DEFAULT_COVERAGE_PREVIEW_META_FIELDS;
+    const coverageFieldsToRender = previewConfig?.coverage_metadata_fields ?? DEFAULT_COVERAGE_METADATA_FIELDS;
 
     return (
         <React.Fragment>
@@ -67,7 +67,7 @@ export default function AgendaCoverages({
                         title={onClick ? gettext('Open {{agenda}} in a new tab', window.sectionNames) : ''}
                     >
                         {coverageFieldsToRender.map((field) => {
-                            const FieldComponent = coveragePreviewFieldToComponentMap[field];
+                            const FieldComponent = coverageFieldToComponentMap[field];
 
                             if (FieldComponent == null) {
                                 console.warn(`Component not registered for field ${field}`);
