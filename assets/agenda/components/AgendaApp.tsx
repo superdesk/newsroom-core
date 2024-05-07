@@ -161,7 +161,6 @@ class AgendaApp extends SearchBase<any> {
                 group={this.props.previewGroup}
                 planningId={this.props.previewPlan}
                 eventsOnly={eventsOnly}
-                wireItems={this.props.wireItems}
                 coverageActions={this.props.coverageActions}
                 detailsConfig={this.props.detailsConfig}
                 restrictCoverageInfo={this.props.restrictCoverageInfo}
@@ -303,7 +302,6 @@ class AgendaApp extends SearchBase<any> {
                             previewGroup={this.props.previewGroup}
                             previewPlan={this.props.previewPlan}
                             eventsOnly={eventsOnly}
-                            wireItems={this.props.wireItems}
                             previewConfig={this.props.previewConfig}
                             restrictCoverageInfo={this.props.restrictCoverageInfo}
                         />
@@ -368,7 +366,6 @@ AgendaApp.propTypes = {
     restrictCoverageInfo: PropTypes.bool,
     itemTypeFilter: PropTypes.string,
     locators: PropTypes.array,
-    wireItems: PropTypes.array,
     searchParams: PropTypes.object,
     showSaveTopic: PropTypes.bool,
     previewConfig: PropTypes.object,
@@ -410,7 +407,6 @@ const mapStateToProps = (state: any) => ({
     featuredOnly: get(state, 'agenda.featuredOnly'),
     context: state.context,
     locators: get(state, 'locators.items', []),
-    wireItems: get(state, 'agenda.agendaWireItems'),
     setQuery: PropTypes.func.isRequired,
     searchParams: searchParamsSelector(state),
     showSaveTopic: showSaveTopicSelector(state),

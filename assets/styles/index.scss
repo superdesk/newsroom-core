@@ -2663,18 +2663,12 @@ article.list {
 }
 
 .coverage-item {
-    background-color: var(--content-list-item-color-bg);
     display: flex;
     flex-direction: column;
     font-size: var(--text-size--medium);
     margin-block-end: 12px;
-    padding: var(--space--1) var(--space--1) var(--space--1) var(--space--1-5);
     border-radius: var(--content-list-item-border-radius);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.1);
-
-    @include xl {
-        padding: var(--space--1-5) var(--space--1) var(--space--1) var(--space--2);
-    }
 
     &.coverage-item--clickable {
         &:hover {
@@ -2683,11 +2677,19 @@ article.list {
     }
 }
 .coverage-item__row {
+    background-color: var(--content-list-item-color-bg);
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
     overflow: hidden;
+
+    padding: 0 var(--space--1) 0 var(--space--1-5);
+
+    @include xl {
+        padding: 0 var(--space--1) 0 var(--space--2);
+    }
+
     a:hover {
         text-decoration: none;
     }
@@ -2707,6 +2709,53 @@ article.list {
         gap: var(--space--2);
     }
 }
+.coverage-item__row:first-child {
+    padding-top: var(--space--1);
+    @include xl {
+        padding-top: var(--space--1-5);
+    }
+}
+.coverage-item__row:last-child {
+    padding-bottom: var(--space--1);
+    @include xl {
+        padding-bottom: var(--space--1-5);
+    }
+}
+
+.coverage-item__extended-row {
+    background-color: var(--content-list-item-color-bg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .nh-collapsible-panel__header {
+        padding: 0 var(--space--1) 0 var(--space--1-5);
+
+        @include xl {
+            padding: 0 var(--space--1) 0 var(--space--2);
+        }
+    }
+
+}
+
+.coverage-item__extended-row-items {
+    background-color: var(--color-background--muted-2);
+    display: flex;
+    flex-direction: column;
+
+    .coverage-item__extended-row-item {
+        border-top: 1px solid var(--color-line--light);
+        display: flex;
+        flex-direction: column;
+
+        padding: var(--space--1) var(--space--1) var(--space--1) var(--space--1-5);
+
+        @include xl {
+            padding: var(--space--1-5) var(--space--1) var(--space--1) var(--space--2);
+        }
+    }
+}
+
 .coverage-item__column {
     display: flex;
     flex-direction: column;

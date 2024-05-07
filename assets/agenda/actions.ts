@@ -83,14 +83,16 @@ export function previewItem(item?: any, group?: any, plan?: any) {
     };
 }
 
-export function fetchWireItemsForAgenda(item: any) {
+export function fetchWireItemsForAgenda(item?: IAgendaItem) {
     return (dispatch: any) => {
-        const wireIds: Array<any> = [];
-        (get(item, 'coverages') || []).forEach((c: any) => {
-            if (c.coverage_type === 'text' && c.delivery_id) {
-                wireIds.push(c.delivery_id);
-            }
-        });
+        const wireIds = (item?.coverages || [])
+            .filter((coverage) => coverage.coverage_type === 'text')
+            .map((coverage) => (
+                (coverage.deliveries || [])
+                    .map((delivery) => delivery.delivery_id || '')
+                    .filter((wireId) => wireId.length > 0)
+            ))
+            .flat();
 
         if (wireIds.length > 0){
             return server.get(`/wire/items/${wireIds.join(',')}`)

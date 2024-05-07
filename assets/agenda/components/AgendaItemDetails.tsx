@@ -1,7 +1,7 @@
 import React from 'react';
 import {isEmpty, get} from 'lodash';
 
-import {IAgendaItem, IArticle, ICoverageItemAction, IItemAction, IPreviewConfig, IUser} from 'interfaces';
+import {IAgendaItem, ICoverageItemAction, IItemAction, IPreviewConfig, IUser} from 'interfaces';
 import {gettext} from 'utils';
 
 import {getLocations, mapsKey} from 'maps/utils';
@@ -37,7 +37,6 @@ interface IProps {
     actions?: Array<IItemAction>;
     group?: string;
     eventsOnly?: boolean;
-    wireItems?: Array<IArticle>;
     coverageActions?: Array<ICoverageItemAction>;
     detailsConfig: IPreviewConfig;
     restrictCoverageInfo?: boolean;
@@ -55,7 +54,6 @@ function AgendaItemDetails(
         group,
         planningId,
         eventsOnly,
-        wireItems,
         coverageActions,
         detailsConfig,
         restrictCoverageInfo,
@@ -102,7 +100,6 @@ function AgendaItemDetails(
                         user={user}
                         item={item}
                         planningId={planningId}
-                        wireItems={wireItems}
                         coverageActions={coverageActions}
                         restrictCoverageInfo={restrictCoverageInfo}
                         previewConfig={detailsConfig}

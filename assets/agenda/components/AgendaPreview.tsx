@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import {IAgendaItem, IArticle, ICoverageItemAction, IItemAction, IPreviewConfig, IUser} from 'interfaces';
+import {IAgendaItem, ICoverageItemAction, IItemAction, IPreviewConfig, IUser} from 'interfaces';
 
 import {isEqualItem} from 'wire/utils';
 import {hasCoverages, isPostponed, isRescheduled, getInternalNote, planHasEvent} from '../utils';
@@ -36,7 +36,6 @@ interface IProps {
     previewGroup?: string;
     previewPlan?: IAgendaItem['_id'];
     eventsOnly?: boolean;
-    wireItems?: Array<IArticle>;
     coverageActions?: Array<ICoverageItemAction>;
     previewConfig: IPreviewConfig;
     restrictCoverageInfo?: boolean;
@@ -70,7 +69,6 @@ class AgendaPreview extends React.PureComponent<IProps, {}> {
             previewGroup,
             previewPlan,
             eventsOnly,
-            wireItems,
             coverageActions,
             restrictCoverageInfo,
             previewConfig,
@@ -126,7 +124,6 @@ class AgendaPreview extends React.PureComponent<IProps, {}> {
                             user={user}
                             item={item}
                             planningId={previewPlan}
-                            wireItems={wireItems}
                             coverageActions={coverageActions}
                             previewGroup={previewGroup}
                             restrictCoverageInfo={restrictCoverageInfo}
