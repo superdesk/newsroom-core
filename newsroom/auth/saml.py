@@ -58,10 +58,9 @@ def init_saml_auth(req):
 
 
 def prepare_flask_request(request):
-    scheme = request.scheme
     url_data = urlparse(request.url)
     return {
-        "https": "on" if scheme == "https" else "off",
+        "https": "off" if "http://localhost" in app.config.get("CLIENT_URL", "") else "on",
         "http_host": request.host,
         "server_port": url_data.port,
         "script_name": request.path,

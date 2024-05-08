@@ -789,6 +789,9 @@ EMAIL_DEFAULT_SENDER_NAME = None
 EMAIL_SENDER_NAME_LANGUAGE_MAP = {}
 
 #: Set the card type for personal dashboard
+#:
+#: .. versionadded: 2.7
+#:
 PERSONAL_DASHBOARD_CARD_TYPE = "4-picture-text"
 
 #: Hides Coverage assignee details for public users, such as desk and user details
