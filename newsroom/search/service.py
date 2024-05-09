@@ -7,6 +7,7 @@ from flask_babel import gettext
 from eve.utils import ParsedRequest
 from werkzeug.exceptions import Forbidden
 
+from newsroom.types import Company, Section, SectionFilter, Topic, User
 from superdesk import get_resource_service
 from superdesk.default_settings import strtobool as _strtobool
 from content_api.errors import BadParameterValueError
@@ -121,11 +122,11 @@ class SearchQuery(object):
     """Class for storing the search parameters for validation and query generation"""
 
     def __init__(self):
-        self.user = None
+        self.user: Optional[User] = None
+        self.company: Optional[Company] = None
         self.is_admin = False
-        self.company = None
 
-        self.section = None
+        self.section: Optional[Section] = None
         self.navigation_ids = []
         self.products = []
         self.requested_products = []
@@ -145,7 +146,7 @@ class SearchQuery(object):
 
 
 class BaseSearchService(Service):
-    section = "wire"
+    section: Section = "wire"
     limit_days_setting: Union[None, str] = "wire_time_limit_days"
     default_sort = [{"versioncreated": "desc"}]
     default_page_size = 25
@@ -286,7 +287,7 @@ class BaseSearchService(Service):
         self.prefill_search_advanced(search)
         self.prefill_search_highlights(search, req)
 
-    def apply_filters(self, search, section_filters=None):
+    def apply_filters(self, search: SearchQuery, section_filters: Optional[List[SectionFilter]] = None) -> None:
         """Generate and apply the different search filters
 
         :param SearchQuery search: the search query instance
@@ -673,7 +674,7 @@ class BaseSearchService(Service):
 
             return ObjectId(product) in user_specific_products or ObjectId(product) in company_products_with_zero_seats
 
-    def apply_section_filter(self, search, filters=None):
+    def apply_section_filter(self, search: SearchQuery, filters: Optional[List[SectionFilter]] = None) -> None:
         """Generate the section filter
 
         :param SearchQuery search: the search query instance
@@ -949,7 +950,15 @@ class BaseSearchService(Service):
 
         return args
 
-    def get_topic_query(self, topic, user, company, section_filters=None, query=None, args=None):
+    def get_topic_query(
+        self,
+        topic: Topic,
+        user: User,
+        company: Company,
+        section_filters: Optional[List[SectionFilter]] = None,
+        query: Optional[BoolQuery] = None,
+        args: Optional[SearchArgs] = None,
+    ) -> Optional[SearchQuery]:
         search = SearchQuery()
         search.user = user
         search.company = company
@@ -972,16 +981,23 @@ class BaseSearchService(Service):
                 self.validate_request(search)
                 self.apply_filters(search, section_filters)
             else:
+                self.prefill_topic_products(topic, search)
                 self.apply_topic_filter(search)
+                self.apply_products_filter(search)
         except Forbidden as exc:
             if user and topic:
                 logger.info(
                     "Notification for user:{} and topic:{} is skipped".format(user.get("_id"), topic.get("_id")),
                     exc_info=exc,
                 )
-            return
+            return None
 
         return search
+
+    def prefill_topic_products(self, topic: Topic, search: SearchQuery) -> None:
+        navigation_ids = topic.get("navigation") or []
+        if navigation_ids:
+            search.products = get_products_by_navigation(navigation_ids, product_type=topic.get("topic_type"))
 
     def get_items_by_query(self, search, size=10, aggs=None):
         search.args["size"] = size
