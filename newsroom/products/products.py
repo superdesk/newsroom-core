@@ -8,10 +8,9 @@ import superdesk
 from superdesk.services import CacheableService
 from .types import PRODUCT_TYPES
 
-from newsroom.types import Company, Product, User
+from newsroom.types import Company, Product, User, NavigationIds
 from newsroom.utils import any_objectid_in_list, parse_objectid
 
-NavigationIds = List[Union[str, ObjectId]]
 IdsList = NavigationIds
 
 

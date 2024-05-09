@@ -15,6 +15,28 @@ from ..utils import mock_send_email
 @mock.patch("newsroom.email.send_email", mock_send_email)
 def test_realtime_notifications_wire(app, mocker, company_products):
     user = app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
+    navigations = [
+        {
+            "name": "Food",
+            "product_type": "wire",
+            "is_enabled": True,
+        },
+        {
+            "name": "Sport",
+            "product_type": "wire",
+            "is_enabled": True,
+        },
+    ]
+
+    app.data.insert("navigations", navigations)
+
+    for product in company_products:
+        if "*" in product["query"]:
+            # we want only products which will filter out everything
+            continue
+        updates = {"navigations": [navigations[0]["_id"]]}
+        app.data.update("products", product["_id"], updates, product)
+
     app.data.insert(
         "topics",
         [
@@ -41,6 +63,19 @@ def test_realtime_notifications_wire(app, mocker, company_products):
                         "notification_type": "real-time",
                     },
                 ],
+            },
+            {
+                "user": user["_id"],
+                "label": "Company products",
+                "query": "*:*",
+                "topic_type": "wire",
+                "subscribers": [
+                    {
+                        "user_id": user["_id"],
+                        "notification_type": "real-time",
+                    },
+                ],
+                "navigation": [navigations[0]["_id"]],
             },
         ],
     )

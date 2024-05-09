@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from eve.utils import ParsedRequest
 from flask import current_app as app, json
+from newsroom.types import Section
 from superdesk import get_resource_service
 from werkzeug.exceptions import Forbidden
 
@@ -92,7 +93,7 @@ def items_query(ignore_latest=False):
 
 
 class WireSearchService(BaseSearchService):
-    section = "wire"
+    section: Section = "wire"
 
     def get_bookmarks_count(self, user_id):
         req = ParsedRequest()
