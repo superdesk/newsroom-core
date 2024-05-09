@@ -7,6 +7,7 @@ from flask_babel import gettext
 from eve.utils import ParsedRequest
 from werkzeug.exceptions import Forbidden
 
+from newsroom.types import Topic
 from superdesk import get_resource_service
 from superdesk.default_settings import strtobool as _strtobool
 from content_api.errors import BadParameterValueError
@@ -949,7 +950,7 @@ class BaseSearchService(Service):
 
         return args
 
-    def get_topic_query(self, topic, user, company, section_filters=None, query=None, args=None):
+    def get_topic_query(self, topic: Topic, user, company, section_filters=None, query=None, args=None):
         search = SearchQuery()
         search.user = user
         search.company = company
@@ -972,7 +973,9 @@ class BaseSearchService(Service):
                 self.validate_request(search)
                 self.apply_filters(search, section_filters)
             else:
+                self.prefill_topic_products(topic, search)
                 self.apply_topic_filter(search)
+                self.apply_products_filter(search)
         except Forbidden as exc:
             if user and topic:
                 logger.info(
@@ -982,6 +985,11 @@ class BaseSearchService(Service):
             return
 
         return search
+
+    def prefill_topic_products(self, topic: Topic, search: SearchQuery) -> None:
+        navigation_ids = topic.get("navigation") or []
+        if navigation_ids:
+            search.products = get_products_by_navigation(navigation_ids, product_type=topic.get("topic_type"))
 
     def get_items_by_query(self, search, size=10, aggs=None):
         search.args["size"] = size

@@ -10,6 +10,9 @@ def assert_never(value: NoReturn) -> NoReturn:
 
 
 NameString = Union[str, LazyString]
+NavigationIds = List[Union[str, ObjectId]]
+Section = Literal["wire", "agenda", "monitoring"]
+SectionAllowedMap = Dict[Section, bool]
 
 
 class Country(TypedDict):
@@ -30,15 +33,15 @@ class Product(Entity, total=False):
     query: str
     planning_item_query: str
     is_enabled: bool
-    product_type: str
-    navigations: List[ObjectId]
+    product_type: Section
+    navigations: NavigationIds
     companies: List[ObjectId]
 
 
 class ProductRef(TypedDict):
     _id: ObjectId
     seats: int
-    section: str
+    section: Section
 
 
 class NotificationSchedule(TypedDict, total=False):
@@ -95,7 +98,7 @@ class UserData(UserRequired, total=False):
     version_creator: ObjectId
 
     products: List[ProductRef]
-    sections: Dict[str, bool]
+    sections: SectionAllowedMap
     dashboards: List[UserDashboardEntry]
     notification_schedule: NotificationSchedule
 
@@ -111,7 +114,7 @@ class PublicUserData(TypedDict):
     last_name: str
     email: str
     products: List[ProductRef]
-    sections: Dict[str, bool]
+    sections: SectionAllowedMap
     notification_schedule: Optional[NotificationSchedule]
 
 
@@ -168,7 +171,7 @@ class Company(CompanyRequired, total=False):
 
     # Authorization
     products: List[ProductRef]
-    sections: Dict[str, bool]
+    sections: SectionAllowedMap
     restrict_coverage_info: bool
     sd_subscriber_id: str
     archive_access: bool
@@ -201,8 +204,8 @@ class Topic(TypedDict, total=False):
     company: ObjectId
     is_global: bool
     timezone_offset: int
-    topic_type: str
-    navigation: List[str]
+    topic_type: Section
+    navigation: NavigationIds
     original_creator: ObjectId
     version_creator: ObjectId
     folder: ObjectId

@@ -12,7 +12,7 @@ from newsroom.exceptions import AuthorizationError
 from newsroom.user_roles import UserRole
 from superdesk.utc import utcnow
 from newsroom.auth import get_user, get_company, get_user_by_email
-from newsroom.types import User, UserData, Company, AuthProviderType
+from newsroom.types import Section, SectionAllowedMap, User, UserData, Company, AuthProviderType
 from newsroom.utils import (
     get_random_string,
     is_valid_user,
@@ -194,7 +194,7 @@ def revalidate_session_user():
     return is_valid
 
 
-def get_user_sections(user: User) -> Dict[str, bool]:
+def get_user_sections(user: User) -> SectionAllowedMap:
     if not user:
         return {}
 
@@ -212,7 +212,7 @@ def get_user_sections(user: User) -> Dict[str, bool]:
     return {}
 
 
-def user_has_section_allowed(user: User, section: str) -> bool:
+def user_has_section_allowed(user: User, section: Section) -> bool:
     sections = get_user_sections(user)
     if sections:
         return sections.get(section, False)

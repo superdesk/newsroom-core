@@ -1,7 +1,9 @@
+from typing import List
 from pytz import utc
 from bson import ObjectId
 from pytest import fixture
 from datetime import datetime, timedelta
+from newsroom.types import Product
 from superdesk.utc import utcnow
 from newsroom.tests.users import ADMIN_USER_ID, test_login_succeeds_for_admin
 
@@ -292,29 +294,30 @@ def anonymous_user(client):
 
 @fixture
 def company_products(app):
-    app.data.insert(
-        "products",
-        [
-            {
-                "_id": PRODUCT_1_ID,
-                "name": "product test",
-                "query": "headline:more",
-                "is_enabled": True,
-                "product_type": "wire",
-            },
-            {
-                "_id": PRODUCT_2_ID,
-                "name": "product test 2",
-                "query": "headline:Weather",
-                "is_enabled": True,
-                "product_type": "wire",
-            },
-            {
-                "_id": PRODUCT_3_ID,
-                "name": "all content",
-                "query": "*:*",
-                "is_enabled": True,
-                "product_type": "wire",
-            },
-        ],
-    )
+    _products: List[Product] = [
+        {
+            "_id": PRODUCT_1_ID,
+            "name": "product test",
+            "query": "headline:more",
+            "is_enabled": True,
+            "product_type": "wire",
+        },
+        {
+            "_id": PRODUCT_2_ID,
+            "name": "product test 2",
+            "query": "headline:Weather",
+            "is_enabled": True,
+            "product_type": "wire",
+        },
+        {
+            "_id": PRODUCT_3_ID,
+            "name": "all content",
+            "query": "*:*",
+            "is_enabled": True,
+            "product_type": "wire",
+        },
+    ]
+
+    app.data.insert("products", _products)
+
+    return _products
