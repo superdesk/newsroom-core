@@ -11,7 +11,7 @@ def assert_never(value: NoReturn) -> NoReturn:
 
 NameString = Union[str, LazyString]
 NavigationIds = List[Union[str, ObjectId]]
-Section = Literal["wire", "agenda", "monitoring"]
+Section = Literal["wire", "agenda", "monitoring", "news_api", "media_releases", "factcheck", "am_news", "aapX"]
 SectionAllowedMap = Dict[Section, bool]
 
 
@@ -211,6 +211,18 @@ class Topic(TypedDict, total=False):
     folder: ObjectId
     advanced: Dict[str, Any]
     subscribers: List[TopicSubscriber]
+
+
+class SectionFilter(TypedDict, total=False):
+    name: str
+    description: str
+    sd_product_id: str
+    query: str
+    is_enabled: bool
+    filter_type: Section
+    search_type: Section
+    original_creator: ObjectId
+    version_creator: ObjectId
 
 
 class DashboardCardConfig(TypedDict, total=False):
