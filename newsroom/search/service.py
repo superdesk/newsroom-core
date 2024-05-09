@@ -674,7 +674,7 @@ class BaseSearchService(Service):
 
             return ObjectId(product) in user_specific_products or ObjectId(product) in company_products_with_zero_seats
 
-    def apply_section_filter(self, search, filters: Optional[List[SectionFilter]] = None):
+    def apply_section_filter(self, search: SearchQuery, filters: Optional[List[SectionFilter]] = None) -> None:
         """Generate the section filter
 
         :param SearchQuery search: the search query instance
