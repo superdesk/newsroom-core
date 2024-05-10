@@ -1,7 +1,6 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {connect} from 'react-redux';
 import moment from 'moment-timezone';
-import classNames from 'classnames';
 
 import {IAgendaState, IArticle, ICoverageMetadataPreviewProps} from 'interfaces';
 
@@ -9,6 +8,7 @@ import {gettext, getConfig, COVERAGE_DATE_TIME_FORMAT} from 'utils';
 import {isWatched, WORKFLOW_STATUS} from 'agenda/utils';
 import {agendaContentLinkTarget} from 'ui/selectors';
 
+import {CollapseBox} from 'ui/components/CollapseBox';
 import ActionButton from 'components/ActionButton';
 import {ToolTip} from 'ui/components/ToolTip';
 
@@ -93,7 +93,6 @@ function CoverageActionsComponent({
         );
     }
 
-    const [wireListOpen, setWireListOpen] = useState(true);
     const wireIds = coverage.workflow_status !== WORKFLOW_STATUS.COMPLETED ?
         [] :
         (coverage.deliveries || [])
@@ -106,74 +105,56 @@ function CoverageActionsComponent({
             {actionButtons}
         </div>
     ) : (
-        <div className={classNames(
-            'nh-collapsible-panel pt-0 nh-collapsible-panel--small coverage-item__extended-row',
-            {
-                'nh-collapsible-panel--open': wireListOpen,
-                'nh-collapsible-panel--closed': !wireListOpen,
-                'pb-0': wireListOpen,
-            }
-        )}
+        <CollapseBox
+            id={coverage.coverage_id + '-actions'}
+            title={(open) => (open ?
+                gettext('Hide all versions ({{count}})', {count: wireIds.length}) :
+                gettext('Show all versions ({{count}})', {count: wireIds.length})
+            )}
+            initiallyOpen={true}
+            className={(open) => 'coverage-item__extended-row' + (!open ? '' : ' pb-0')}
+            headerButtons={actionButtons}
         >
-            <div className="nh-collapsible-panel__header">
-                <div
-                    className="nh-collapsible-panel__button"
-                    role="button"
-                    aria-expanded={wireListOpen}
-                    onClick={() => setWireListOpen(!wireListOpen)}
-                >
-                    <div className="nh-collapsible-panel__caret">
-                        <i className="icon--arrow-right"/>
-                    </div>
-                    <span>{wireListOpen ?
-                        gettext('Hide all versions ({{count}})', {count: wireIds.length}) :
-                        gettext('Show all versions ({{count}})', {count: wireIds.length})
-                    }</span>
-                </div>
-                {actionButtons}
-            </div>
-            <div className="nh-collapsible-panel__content-wraper">
-                <div className="nh-collapsible-panel__content coverage-item__extended-row-items">
-                    {wireVersions.map((version) => (
-                        <div
-                            key={version._id}
-                            className="coverage-item__extended-row-item"
-                        >
-                            <div>
-                                <span className="coverage-item__text-label me-1">
-                                    {gettext('Headline')}
-                                </span>
-                                <span>
-                                    {version.headline}
-                                </span>
-                            </div>
-                            <div>
-                                <span className="coverage-item__text-label me-1">
-                                    {gettext('Published')}
-                                </span>
-                                <span>
-                                    {moment(version._updated).format(COVERAGE_DATE_TIME_FORMAT)}
-                                </span>
-                            </div>
-                            <div className="ms-auto">
-                                <ToolTip>
-                                    <a
-                                        className="nh-button nh-button--small nh-button--tertiary"
-                                        target={contentLinkTarget}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                        }}
-                                        {...getViewContentButtonAttributes(version, viewContentEmail)}
-                                    >
-                                        {gettext('View Content')}
-                                    </a>
-                                </ToolTip>
-                            </div>
+            <div className="coverage-item__extended-row-items">
+                {wireVersions.map((version) => (
+                    <div
+                        key={version._id}
+                        className="coverage-item__extended-row-item"
+                    >
+                        <div>
+                            <span className="coverage-item__text-label me-1">
+                                {gettext('Headline')}
+                            </span>
+                            <span>
+                                {version.headline}
+                            </span>
                         </div>
-                    ))}
-                </div>
+                        <div>
+                            <span className="coverage-item__text-label me-1">
+                                {gettext('Published')}
+                            </span>
+                            <span>
+                                {moment(version._updated).format(COVERAGE_DATE_TIME_FORMAT)}
+                            </span>
+                        </div>
+                        <div className="ms-auto">
+                            <ToolTip>
+                                <a
+                                    className="nh-button nh-button--small nh-button--tertiary"
+                                    target={contentLinkTarget}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                    }}
+                                    {...getViewContentButtonAttributes(version, viewContentEmail)}
+                                >
+                                    {gettext('View Content')}
+                                </a>
+                            </ToolTip>
+                        </div>
+                    </div>
+                ))}
             </div>
-        </div>
+        </CollapseBox>
     );
 }
 

@@ -6,11 +6,13 @@ interface IProps {
     onClick(event: React.MouseEvent): void;
     size?: 'small';
     variant?: 'primary' | 'secondary' | 'tertiary';
+    'data-test-id'?: string;
 }
 
 export function Button(props: IProps) {
     return (
         <button
+            data-test-id={props['data-test-id']}
             onClick={props.onClick}
             className={classNames('nh-button', {
                 'nh-button--small': props.size === 'small',
