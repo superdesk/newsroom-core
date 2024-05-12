@@ -7,7 +7,8 @@ import {gettext, isWireContext} from 'utils';
 import {removeNewItems} from 'wire/actions';
 import {loadMyWireTopic} from 'wire/actions';
 import {loadMyAgendaTopic} from 'agenda/actions';
-import {CollapseBoxWithButton} from '../../ui/components/Collapse';
+import {CollapseBox} from 'ui/components/CollapseBox';
+import {Button} from 'ui/components/Button';
 import {TopicItem} from './TopicItem';
 import {SidebarFolder} from '../../components/SidebarFolder';
 
@@ -93,21 +94,31 @@ function TopicsTab({topics, loadMyTopic, newItemsByTopic, activeTopic, removeNew
     return (
         <div className="tab-pane__inner">
             <div className="d-contents">
-                <CollapseBoxWithButton
+                <CollapseBox
                     id="my-topics"
-                    buttonText={gettext('My Topics')}
+                    title={gettext('My Topics')}
                     initiallyOpen={true}
-                    edit={clickManage}
+                    drawHeaderLine={true}
+                    headerButtons={(
+                        <Button
+                            data-test-id="edit-btn"
+                            variant="tertiary"
+                            size="small"
+                            text={gettext('Edit')}
+                            onClick={clickManage}
+                        />
+                    )}
                 >
                     {renderTopicsSection(userFolders, personalTopics)}
-                </CollapseBoxWithButton>
-                <CollapseBoxWithButton
+                </CollapseBox>
+                <CollapseBox
                     id="company-topics"
-                    buttonText={gettext('Company Topics')}
+                    title={gettext('Company Topics')}
+                    drawHeaderLine={true}
                     initiallyOpen={true}
                 >
                     {renderTopicsSection(companyFolders, globalTopics)}
-                </CollapseBoxWithButton>
+                </CollapseBox>
             </div>
         </div>
     );
