@@ -158,7 +158,7 @@ export interface IFullCoverage extends Omit<ICoverage, 'deliveries'> {
             qcode: string;
             name: string;
         }>;
-        subjects?: Array<ISubject>;
+        subject?: Array<ISubject>;
         genre?: Array<{
             qcode: string,
             name: string
