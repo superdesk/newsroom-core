@@ -134,7 +134,7 @@ function CoverageActionsComponent({
                                 {gettext('Published')}
                             </span>
                             <span>
-                                {moment(version._updated).format(COVERAGE_DATE_TIME_FORMAT)}
+                                {moment(version.versioncreated).format(COVERAGE_DATE_TIME_FORMAT)}
                             </span>
                         </div>
                         <div className="ms-auto">
