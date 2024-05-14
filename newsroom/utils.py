@@ -670,6 +670,14 @@ def get_groups(company: Optional[Company], groups: List[Group]) -> List[Group]:
     """
     filter agenda groups based on restrict_coverage_info permission
     """
-    if company and company.get("restrict_coverage_info"):
-        return [group for group in groups if "restrict_coverage_info" not in group.get("permissions", [])]
-    return groups
+    return [group for group in groups if has_permissions(group, company)]
+
+
+def has_permissions(group: Group, company: Optional[Company]) -> bool:
+    group_permissions = group.get("permissions", [])
+    if group_permissions:
+        for permission in group_permissions:
+            if company and company.get(permission):
+                return False
+        return True
+    return True
