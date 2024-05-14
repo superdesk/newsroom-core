@@ -20,7 +20,7 @@ from eve_elastic.elastic import parse_date, ElasticCursor
 from flask import current_app as app, json, abort, request, g, flash, session, url_for
 from flask_babel import gettext
 
-from newsroom.types import PublicUserData, User, Company
+from newsroom.types import PublicUserData, User, Company, Group
 from newsroom.template_filters import (
     time_short,
     parse_date as parse_short_date,
@@ -666,11 +666,10 @@ def parse_objectid(value: Union[str, ObjectId]) -> Union[str, ObjectId]:
         return value
 
 
-def get_groups(company: Optional[Company], groups: list) -> list:
+def get_groups(company: Optional[Company], groups: List[Group]) -> List[Group]:
     """
-    filter agenda groups based on restrict_coverage_info
-    # STTNHUB - 327
+    filter agenda groups based on restrict_coverage_info permission
     """
     if company and company.get("restrict_coverage_info"):
-        return [item for item in groups if item["field"] != "stturgency"]
+        return [group for group in groups if "restrict_coverage_info" not in group.get("permissions", [])]
     return groups

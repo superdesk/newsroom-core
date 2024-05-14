@@ -13,6 +13,14 @@ NameString = Union[str, LazyString]
 NavigationIds = List[Union[str, ObjectId]]
 Section = Literal["wire", "agenda", "monitoring", "news_api", "media_releases", "factcheck", "am_news", "aapX"]
 SectionAllowedMap = Dict[Section, bool]
+Permissions = Literal["restrict_coverage_info"]
+
+
+class Group(TypedDict):
+    field: str
+    label: str
+    nested: dict
+    permissions: List[Permissions]
 
 
 class Country(TypedDict):
