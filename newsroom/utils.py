@@ -676,4 +676,4 @@ def get_groups(groups: List[Group], company: Optional[Company]):
 
 
 def get_company_permissions(company: Optional[Company]) -> Dict[Permissions, bool]:
-    return {"coverage_info": not company or company.get("restrict_coverage_info") != True}
+    return {"coverage_info": not company or company.get("restrict_coverage_info") is not True}
