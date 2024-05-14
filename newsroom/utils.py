@@ -664,3 +664,13 @@ def parse_objectid(value: Union[str, ObjectId]) -> Union[str, ObjectId]:
         return ObjectId(value)
     except InvalidId:
         return value
+
+
+def get_groups(company: Optional[Company], groups: list) -> list:
+    """
+    filter agenda groups based on restrict_coverage_info
+    # STTNHUB - 327
+    """
+    if company and company.get("restrict_coverage_info"):
+        return [item for item in groups if item["field"] != "stturgency"]
+    return groups
