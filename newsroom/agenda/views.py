@@ -144,7 +144,7 @@ def get_view_data() -> Dict:
         "restrict_coverage_info": company.get("restrict_coverage_info", False) if company else False,
         "locators": get_vocabulary("locators"),
         "ui_config": get_resource_service("ui_config").get_section_config("agenda"),
-        "groups": get_groups(company, app.config.get("AGENDA_GROUPS", [])),
+        "groups": get_groups(app.config.get("AGENDA_GROUPS", []), company),
         "has_agenda_featured_items": get_resource_service("agenda_featured").find_one(req=None) is not None,
         "user_folders": get_user_folders(user, "agenda") if user else [],
         "company_folders": get_company_folders(company, "agenda") if company else [],

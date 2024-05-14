@@ -82,7 +82,7 @@ jokainen parisuhde muuttuu <span class="es-highlight">mukaanalkuhuuma</span>  <s
     )
 
 
-def test_filter_groups(app):
+def test_filter_groups():
     agenda_groups = [
         {
             "field": "event_type",
@@ -101,7 +101,7 @@ def test_filter_groups(app):
                 "value": "stturgency",
                 "include_planning": True,
             },
-            "permissions": ["restrict_coverage_info"],
+            "permissions": ["coverage_info"],
         },
     ]
 
@@ -109,7 +109,7 @@ def test_filter_groups(app):
 
     assert len(agenda_groups) == 2
 
-    assert len(get_groups(company, agenda_groups)) == 1
+    assert len(get_groups(agenda_groups, company)) == 1
 
     company["restrict_coverage_info"] = False
-    assert len(get_groups(company, agenda_groups)) == 2
+    assert len(get_groups(agenda_groups, company)) == 2
