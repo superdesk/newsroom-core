@@ -20,7 +20,7 @@ from eve_elastic.elastic import parse_date, ElasticCursor
 from flask import current_app as app, json, abort, request, g, flash, session, url_for
 from flask_babel import gettext
 
-from newsroom.types import PublicUserData, User, Company
+from newsroom.types import PublicUserData, User, Company, Group, Permissions
 from newsroom.template_filters import (
     time_short,
     parse_date as parse_short_date,
@@ -664,3 +664,16 @@ def parse_objectid(value: Union[str, ObjectId]) -> Union[str, ObjectId]:
         return ObjectId(value)
     except InvalidId:
         return value
+
+
+def get_groups(groups: List[Group], company: Optional[Company]):
+    company_permissions = get_company_permissions(company)
+    return [
+        group
+        for group in groups
+        if not group.get("permissions") or all([company_permissions[permission] for permission in group["permissions"]])
+    ]
+
+
+def get_company_permissions(company: Optional[Company]) -> Dict[Permissions, bool]:
+    return {"coverage_info": not company or company.get("restrict_coverage_info") is not True}
