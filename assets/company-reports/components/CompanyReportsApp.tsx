@@ -27,16 +27,11 @@ const options = [
 
 class CompanyReportsApp extends React.Component<any, any> {
     static propTypes: any;
-    constructor(props: any, context: any) {
-        super(props, context);
 
-        this.getPanel = this.getPanel.bind(this);
-    }
-
-    getPanel() {
+    getPanel = () => {
         const Panel = panels[this.props.activeReport];
         return Panel && this.props.results && <Panel key="panel" {...this.props}/>;
-    }
+    };
 
     render() {
         const reportOptions = !this.props.apiEnabled ? options :
