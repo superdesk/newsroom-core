@@ -37,7 +37,7 @@ def get_items(args):
             "service",
             "versioncreated",
             "anpa_take_key",
-            "source"
+            "source",
         ],
     }
 
