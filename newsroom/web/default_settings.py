@@ -799,3 +799,9 @@ PERSONAL_DASHBOARD_CARD_TYPE = "4-picture-text"
 #: .. versionadded: 2.7
 #:
 AGENDA_HIDE_COVERAGE_ASSIGNEES = False
+
+#: Hides planning items from the default item type filter
+#:
+#: .. versionadded: 2.8
+#:
+AGENDA_DEFAULT_FILTER_HIDE_PLANNING = False

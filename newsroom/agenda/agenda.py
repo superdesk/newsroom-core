@@ -945,6 +945,25 @@ class AgendaService(BaseSearchService):
                     }
                 }
             )
+        elif app.config.get("AGENDA_DEFAULT_FILTER_HIDE_PLANNING"):
+            search.query["bool"]["filter"].append(
+                {
+                    "bool": {
+                        "should": [
+                            {"term": {"item_type": "event"}},
+                            {
+                                # Match Events before ``item_type`` field was added
+                                "bool": {
+                                    "must_not": [{"exists": {"field": "item_type"}}],
+                                    "filter": [{"exists": {"field": "event_id"}}],
+                                },
+                            },
+                        ],
+                        "minimum_should_match": 1,
+                    },
+                }
+            )
+            _remove_fields(search.source, ["planning_items", "display_dates"])
         else:
             # Don't include Planning items that are associated with an Event
             search.query["bool"]["filter"].append(
