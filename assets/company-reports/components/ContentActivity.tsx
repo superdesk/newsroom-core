@@ -110,6 +110,7 @@ class ContentActivity extends React.Component<any, any> {
             gettext('Place'),
             gettext('Category'),
             gettext('Subject'),
+            gettext('Source'),
             gettext('Companies'),
             gettext('Actions'),
         ];
@@ -159,6 +160,7 @@ class ContentActivity extends React.Component<any, any> {
                 versioncreated: formatTime(get(item, 'versioncreated') || ''),
                 headline: get(item, 'headline') || '',
                 anpa_take_key: get(item, 'anpa_take_key') || '',
+                source: item?.source ?? '',
                 place: (get(item, 'place') || [])
                     .map((place: any) => place.name)
                     .sort(),
@@ -230,6 +232,7 @@ class ContentActivity extends React.Component<any, any> {
                             {subject}<br />
                         </Fragment>
                     ))}</td>
+                    <td>{item.source}</td>
                     <td>{item.companies.map((company: any) => (
                         <Fragment key={company}>
                             {company}<br />

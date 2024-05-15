@@ -37,6 +37,7 @@ def get_items(args):
             "service",
             "versioncreated",
             "anpa_take_key",
+            "source"
         ],
     }
 
@@ -189,6 +190,7 @@ def export_csv(args, results):
             gettext("Place"),
             gettext("Category"),
             gettext("Subject"),
+            gettext("Source"),
             gettext("Companies"),
             gettext("Actions"),
         ]
@@ -239,6 +241,7 @@ def export_csv(args, results):
             "\r\n".join(sorted([place.get("name") or "" for place in item.get("place") or []])),
             "\r\n".join(sorted([service.get("name") or "" for service in item.get("service") or []])),
             "\r\n".join(sorted([subject.get("name") or "" for subject in item.get("subject") or []])),
+            item.get("source", ""),
             "\r\n".join(
                 sorted(
                     [
