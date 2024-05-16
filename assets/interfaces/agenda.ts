@@ -241,6 +241,14 @@ export interface IAgendaListGroupItem {
     plan?: IAgendaItem['_id'];
 }
 
+export interface IAggregation {  // incomplete
+    field: string;
+    buckets: Array<{
+        key: string;
+        doc_count: number;
+    }>;
+}
+
 export interface IAgendaState {
     items: Array<IAgendaItem['_id']>;
     fetchFrom: number;
@@ -249,7 +257,7 @@ export interface IAgendaState {
         groups: Array<IAgendaListGroup>;
         hiddenGroupsShown: {[dateString: string]: boolean};
     };
-    aggregations?: {[field: string]: any}; // Too complex to even bother
+    aggregations?: {[field: string]: IAggregation};
     activeItem?: IAgendaListGroupItem;
     previewItem?: IAgendaItem['_id'];
     previewGroup?: string;
