@@ -145,6 +145,12 @@ class UsersResource(newsroom.Resource):
                 "last_run_time": {
                     "type": "datetime",
                 },
+                "pause_from": {
+                    "type": "datetime",
+                },
+                "pause_to": {
+                    "type": "datetime",
+                },
             },
         },
     }
