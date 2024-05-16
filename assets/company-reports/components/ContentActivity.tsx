@@ -1,8 +1,7 @@
 import React, {Fragment} from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
 import {connect} from 'react-redux';
-import {get, keyBy, cloneDeep} from 'lodash';
+import {keyBy, cloneDeep} from 'lodash';
 
 import {gettext, formatTime} from '../../utils';
 import {fetchReport, REPORTS, runReport, toggleFilter, fetchAggregations} from '../actions';
@@ -11,7 +10,52 @@ import CalendarButton from '../../components/CalendarButton';
 import MultiSelectDropdown from '../../components/MultiSelectDropdown';
 import ReportsTable from './ReportsTable';
 
-class ContentActivity extends React.Component<any, any> {
+
+interface IReportAction {
+    download?: number;
+    copy?: number;
+    share?: number;
+    print?: number;
+    open?: number;
+    preview?: number;
+    clipboard?: number;
+    api?: number;
+}
+
+interface IResultItem {
+    _id: string;
+    versioncreated: string;
+    headline: string;
+    anpa_take_key: string;
+    source: string;
+    place: Array<{name: string}>;
+    service: Array<{name: string}>;
+    subject: Array<{name: string}>;
+    aggs?: {
+        actions?: IReportAction;
+        total?: number;
+        companies?: Array<string>;
+    };
+}
+
+interface IProps {
+    results: Array<IResultItem>,
+    print: boolean;
+    companies: Array<any>;
+    isLoading: boolean;
+    apiEnabled: boolean;
+
+    runReport: typeof runReport;
+    toggleFilter: typeof toggleFilter;
+    fetchReport: typeof fetchReport;
+    fetchAggregations: typeof fetchAggregations;
+
+    sections: Array<any>;
+    reportParams: Dictionary<any>;
+    aggregations: Dictionary<any>;
+}
+
+class ContentActivity extends React.Component<IProps, any> {
     static propTypes: any;
     constructor(props: any) {
         super(props);
@@ -77,12 +121,12 @@ class ContentActivity extends React.Component<any, any> {
         };
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         // Fetch the genre & company aggregations to populate those dropdowns
         this.props.fetchAggregations(REPORTS['content-activity']);
     }
 
-    componentWillReceiveProps(nextProps: any) {
+    UNSAFE_componentWillReceiveProps(nextProps: any) {
         if (this.props.results !== nextProps.results) {
             this.updateResults(nextProps);
         }
@@ -93,13 +137,10 @@ class ContentActivity extends React.Component<any, any> {
     }
 
     getFilteredActions() {
-        let actions = get(this.props, 'reportParams.action');
+        const {reportParams} = this.props;
+        const defaultActions = ['download', 'copy', 'share', 'print', 'open', 'preview', 'clipboard', 'api'];
 
-        if (!get(actions, 'length', 0)) {
-            actions = ['download', 'copy', 'share', 'print', 'open', 'preview', 'clipboard', 'api'];
-        }
-
-        return actions;
+        return reportParams?.action || defaultActions;
     }
 
     getHeaders() {
@@ -153,38 +194,41 @@ class ContentActivity extends React.Component<any, any> {
 
     updateResults(props: any) {
         const companies = keyBy(this.props.companies, '_id');
-
         const results = props.results.map(
-            (item: any) => ({
-                _id: item._id,
-                versioncreated: formatTime(get(item, 'versioncreated') || ''),
-                headline: get(item, 'headline') || '',
-                anpa_take_key: get(item, 'anpa_take_key') || '',
-                source: item?.source ?? '',
-                place: (get(item, 'place') || [])
-                    .map((place: any) => place.name)
-                    .sort(),
-                service: (get(item, 'service') || [])
-                    .map((service: any) => service.name)
-                    .sort(),
-                subject: (get(item, 'subject') || [])
-                    .map((subject: any) => subject.name)
-                    .sort(),
-                total: get(item, 'aggs.total') || 0,
-                companies: (get(item, 'aggs.companies') || [])
-                    .map((company: any) => companies[company].name)
-                    .sort(),
-                actions: {
-                    download: get(item, 'aggs.actions.download') || 0,
-                    copy: get(item, 'aggs.actions.copy') || 0,
-                    share: get(item, 'aggs.actions.share') || 0,
-                    print: get(item, 'aggs.actions.print') || 0,
-                    open: get(item, 'aggs.actions.open') || 0,
-                    preview: get(item, 'aggs.actions.preview') || 0,
-                    clipboard: get(item, 'aggs.actions.clipboard') || 0,
-                    api: get(item, 'aggs.actions.api') || 0,
-                }
-            })
+            (item: IResultItem) => {
+                const actions = item?.aggs?.actions || {};
+
+                return {
+                    _id: item._id,
+                    versioncreated: formatTime(item?.versioncreated || ''),
+                    headline: item?.headline || '',
+                    anpa_take_key: item?.anpa_take_key || '',
+                    source: item?.source || '',
+                    place: (item?.place || [])
+                        .map((place) => place.name)
+                        .sort(),
+                    service: (item?.service || [])
+                        .map((service) => service.name)
+                        .sort(),
+                    subject: (item?.subject || [])
+                        .map((subject) => subject.name)
+                        .sort(),
+                    total: item?.aggs?.total || 0,
+                    companies: (item?.aggs?.companies || [])
+                        .map((company) => companies[company].name)
+                        .sort(),
+                    actions: {
+                        download: actions?.download || 0,
+                        copy: actions?.copy || 0,
+                        share: actions?.share || 0,
+                        print: actions?.print || 0,
+                        open: actions?.open || 0,
+                        preview: actions?.preview || 0,
+                        clipboard: actions?.clipboard || 0,
+                        api: actions?.api || 0,
+                    }
+                };
+            }
         );
         this.setState({results});
     }
@@ -211,7 +255,7 @@ class ContentActivity extends React.Component<any, any> {
         const {results} = this.state;
         const actions = this.getFilteredActions();
 
-        if (get(results, 'length', 0) > 0) {
+        if (results?.length > 0) {
             return results.map((item: any) =>
                 <tr key={item._id}>
                     <td>{item.versioncreated}</td>
@@ -269,7 +313,7 @@ class ContentActivity extends React.Component<any, any> {
                         <CalendarButton
                             key='content_activity_date'
                             selectDate={this.onDateChange}
-                            activeDate={get(reportParams, 'date_from') || moment()}
+                            activeDate={reportParams?.date_from || moment()}
                         />
                     </div>
 
@@ -303,21 +347,6 @@ class ContentActivity extends React.Component<any, any> {
         );
     }
 }
-
-ContentActivity.propTypes = {
-    results: PropTypes.array,
-    print: PropTypes.bool,
-    companies: PropTypes.array,
-    runReport: PropTypes.func,
-    toggleFilter: PropTypes.func,
-    isLoading: PropTypes.bool,
-    fetchReport: PropTypes.func,
-    reportParams: PropTypes.object,
-    sections: PropTypes.array,
-    fetchAggregations: PropTypes.func,
-    aggregations: PropTypes.object,
-    apiEnabled: PropTypes.bool,
-};
 
 const mapStateToProps = (state: any) => ({
     companies: state.companies,
