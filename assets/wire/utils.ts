@@ -115,10 +115,35 @@ export function getMediaGalleryPictureList(item: IArticle) {
         .filter((value) => value?.type === 'media');
 }
 
-export function getPictureList(item: IArticle): Array<IArticle> {
+export function getPictureList(item: IArticle, {includeFeatured = false, includeEditor = false} = {}): IArticle[] {
     const pictures = Object.values(item.associations ?? {})
         .filter((association) => association?.type === 'picture') as IArticle[];
-    return pictures.length ? pictures : [];
+
+    let filteredPictures = pictures;
+
+    if (!includeFeatured) {
+        const featureMedia = getFeatureMedia(item);
+        filteredPictures = featureMedia ? filteredPictures.filter((mediaItem) => mediaItem.guid !== featureMedia.guid) : filteredPictures;
+    }
+
+    if (!includeEditor) {
+        const bodyMedia = getBodyPictureList(item);
+        filteredPictures = filteredPictures.filter((mediaItem) => bodyMedia.includes(mediaItem));
+    }
+
+    return filteredPictures;
+}
+
+export function getBodyPictureList(item: IArticle): Array<IArticle> {
+    return Object.entries(item.associations || {})
+        .filter(([key, item]) => (
+            !key.startsWith('editor_')))
+        .map(([key, item]) => item) as IArticle[];
+
+}
+
+export function getGalleryMedia(item: IArticle): IArticle[] {
+    return getPictureList(item, {includeFeatured: false, includeEditor: false});
 }
 
 /**
@@ -140,13 +165,20 @@ export function notNullOrUndefined<T>(x: null | undefined | T): x is T {
 
 export function getImageForList(item: IArticle): {item: IArticle, href: string} | undefined {
     const pictures = getPictureList(item);
+    const feature = getFeatureMedia(item);
     let thumbnail: IRendition | undefined;
 
-    for (let i = 0; i < pictures.length; i++) {
-        thumbnail = getThumbnailRendition(pictures[i]);
-
+    if (feature) {
+        thumbnail = getThumbnailRendition(feature);
         if (thumbnail != null && thumbnail.href != null) {
-            return {item: pictures[i], href: thumbnail.href};
+            return {item: feature, href: thumbnail.href};
+        }
+    } else {
+        for (let i = 0; i < pictures.length; i++) {
+            thumbnail = getThumbnailRendition(pictures[i]);
+            if (thumbnail != null && thumbnail.href != null) {
+                return {item: pictures[i], href: thumbnail.href};
+            }
         }
     }
 
@@ -257,6 +289,9 @@ function getTextFromNode(node: Node | null): string {
     if (node.nodeType === Node.TEXT_NODE) {
         const textContent = node.textContent || '';
         return textContent.trim();
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const element = node as HTMLElement;
+        return element.innerText.trim();
     }
     return '';
 }
@@ -286,7 +321,7 @@ export function shortHighlightedtext(html: string, maxLength = 40) {
             extractedText.push(textBefore);
         }
 
-        extractedText.push(highlightSpan.outerHTML);
+        extractedText.push(`<span class="es-highlight">${getTextFromNode(highlightSpan)}</span>`);
 
         if (textAfter) {
             extractedText.push(textAfter);
@@ -294,7 +329,9 @@ export function shortHighlightedtext(html: string, maxLength = 40) {
 
         lastNode = highlightSpan.nextSibling;
     }
-    return extractedText.join(' ')+(html.length > maxLength ? '...' : ' ');
+    return extractedText.join(' ')
+        .replace(/<img[^>]*src="([^"]*)"[^>]*>/g, ' ')
+            + (html.length > maxLength ? '...' : ' ');
 }
 
 /**

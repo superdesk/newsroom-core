@@ -9,5 +9,3 @@ types-tzlocal
 types-Werkzeug
 types-protobuf
 typing-extensions
-
--r requirements.txt

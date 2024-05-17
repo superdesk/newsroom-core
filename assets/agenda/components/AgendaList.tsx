@@ -7,6 +7,7 @@ import moment from 'moment';
 
 import {
     IAgendaItem,
+    IPlanningItem,
     IAgendaListGroup,
     IAgendaListGroupItem,
     ICompany,
@@ -25,7 +26,7 @@ import {AgendaListGroupHeader} from './AgendaListGroupHeader';
 import {setActive, previewItem, toggleSelected, openItem, toggleHiddenGroupItems} from '../actions';
 import {EXTENDED_VIEW} from 'wire/defaults';
 import {getIntVersion} from 'wire/utils';
-import {getPlanningItemsByGroup, getListItems} from 'agenda/utils';
+import {getPlanningItemsByGroup, getListItems, isTopStory} from 'agenda/utils';
 import {searchNavigationSelector} from 'search/selectors';
 import {previewConfigSelector, listConfigSelector} from 'ui/selectors';
 import {AGENDA_DATE_FORMAT_LONG, AGENDA_DATE_FORMAT_SHORT} from '../../utils';
@@ -39,6 +40,47 @@ const itemsByIdSelector = (state: IAgendaState) => state.itemsById || EMPTY_OBJE
 const groupedItemsSelector = (state: IAgendaState) => state.listItems.groups;
 
 const hiddenGroupsShownSelector = (state: IAgendaState) => state.listItems.hiddenGroupsShown;
+
+const getItemIdsSorted = (
+    itemIds: Array<string>,
+    itemsById: {[itemId: string]: IAgendaItem},
+    listConfig: IListConfig,
+    group: IAgendaListGroup,
+) => {
+    const topStoryIds: Array<string> = [];
+    const coveragesOnlyIds: Array<string> = [];
+    const restIds: Array<string> = [];
+
+    itemIds.forEach((id) => {
+        const item = itemsById[id];
+        const hasCoverage = (item.coverages?.length ?? 0) > 0;
+        const topStory = (item.subject ?? []).find(isTopStory);
+
+        if (topStory) {
+
+            // hiddenItems has items which are multiDay and are not on the first date of the group
+            if (group.hiddenItems.includes(item._id) === false) {
+                topStoryIds.push(item._id);
+            } else {
+                restIds.push(item._id);
+            }
+        } else if (hasCoverage) {
+
+            // items with coverages are displayed after top stories
+            coveragesOnlyIds.push(item._id);
+        } else {
+
+            // all other items should follow
+            restIds.push(item._id);
+        }
+    });
+
+    return [
+        ...topStoryIds,
+        ...coveragesOnlyIds,
+        ...restIds,
+    ];
+};
 
 /**
  * Single event or planning item could be display multiple times.
@@ -79,6 +121,7 @@ interface IStateProps {
     listConfig: IListConfig;
     userType: IUserType;
     hiddenGroupsShown: {[dateString: string]: boolean};
+    itemTypeFilter: IAgendaState['agenda']['itemType'];
 }
 
 interface IDispatchProps {
@@ -245,7 +288,7 @@ class AgendaList extends React.Component<IProps, IState> {
           (!action.when || action.when(this.props, item)));
     }
 
-    isActiveItem(_id: IAgendaItem['_id'], group: string, plan?: IAgendaItem) {
+    isActiveItem(_id: IAgendaItem['_id'], group: string, plan?: IPlanningItem) {
         const {activeItem} = this.props;
 
         if (activeItem == null || (!_id && !group && !plan)) {
@@ -304,8 +347,11 @@ class AgendaList extends React.Component<IProps, IState> {
                 className="wire-articles__group"
                 key={`${group.date}-${forHiddenItems ? 'hidden-items' : 'items'}-group`}
             >
-                {itemIds.map((itemId) => {
-                    const plans = getPlanningItemsByGroup(this.props.itemsById[itemId], group.date);
+                {getItemIdsSorted(itemIds, this.props.itemsById, this.props.listConfig, group).map((itemId) => {
+                    // Only show multiple entries for this item if we're in the `Planning Only` view
+                    const plans = this.props.itemTypeFilter !== 'planning' ?
+                        [] :
+                        getPlanningItemsByGroup(this.props.itemsById[itemId], group.date);
 
                     return plans.length > 0 ? (
                         <React.Fragment key={`${itemId}--${group.date}`}>
@@ -438,6 +484,7 @@ const mapStateToProps = (state: IAgendaState): IStateProps => ({
     listConfig: listConfigSelector(state),
     userType: state.userType,
     hiddenGroupsShown: hiddenGroupsShownSelector(state),
+    itemTypeFilter: state.agenda?.itemType,
 });
 
 const mapDispatchToProps: IDispatchProps = {

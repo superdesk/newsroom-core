@@ -10,18 +10,17 @@ import {
     isEqualItem,
     isKilled,
     DISPLAY_ABSTRACT,
-    isCustomRendition,
+    getGalleryMedia,
 } from 'wire/utils';
 import types from 'wire/types';
 
 import Preview from 'ui/components/Preview';
 import ArticleSlugline from 'ui/components/ArticleSlugline';
 import ArticleAuthor from  'ui/components/ArticleAuthor';
-import ArticlePicture from  'ui/components/ArticlePicture';
 import ArticleMedia from  'ui/components/ArticleMedia';
 import ArticleHeadline from 'ui/components/ArticleHeadline';
 import ArticleAbstract from 'ui/components/ArticleAbstract';
-import ArticleBodyHtml from 'ui/components/ArticleBodyHtml';
+import {ArticleBodyHtml} from 'ui/components/ArticleBodyHtml';
 import ArticleEmbargoed from 'ui/components/ArticleEmbargoed';
 
 
@@ -32,6 +31,7 @@ import AgendaLinks from './AgendaLinks';
 import PreviewEdnote from './PreviewEdnote';
 import WireActionButtons from './WireActionButtons';
 import {Authors} from './fields/Authors';
+import MediaPreview from './MediaPreview';
 
 class WirePreview extends React.PureComponent<any, any> {
     static propTypes: any;
@@ -50,6 +50,7 @@ class WirePreview extends React.PureComponent<any, any> {
         const {item, user, actions, followStory, topics, previewConfig, downloadMedia, listConfig, filterGroupLabels} = this.props;
         const featureMedia = getFeatureMedia(item);
         const media = getOtherMedia(item);
+        const galleryMedia = getGalleryMedia(item);
         const previousVersions = 'preview_versions';
 
         return (
@@ -77,27 +78,30 @@ class WirePreview extends React.PureComponent<any, any> {
                     {isDisplayed('headline', previewConfig) && <ArticleHeadline item={item}/>}
                     {(isDisplayed('byline', previewConfig) || isDisplayed('located', previewConfig)) &&
                         <ArticleAuthor item={item} displayConfig={previewConfig} />}
-                    {featureMedia == null ? null : (
-                        featureMedia.type === 'picture' ? (
-                            <ArticlePicture
-                                picture={featureMedia}
-                                isKilled={isKilled(item)}
-                                isCustomRendition={isCustomRendition(featureMedia)}
-                            />
-                        ) : (
-                            <ArticleMedia
-                                media={featureMedia}
-                                isKilled={isKilled(item)}
-                                download={downloadMedia}
-                            />
-                        )
+                    {featureMedia && (
+                        <MediaPreview
+                            media={featureMedia}
+                            item={item}
+                            download={downloadMedia}
+                        />
+                    )}
+                    {galleryMedia && (
+                        galleryMedia
+                            .map((data) => (
+                                <MediaPreview
+                                    key={data.guid}
+                                    media={data}
+                                    item={item}
+                                    download={downloadMedia}
+                                />
+                            ))
                     )}
                     {isDisplayed('metadata_section', previewConfig) &&
                     <PreviewMeta item={item} isItemDetail={false} inputRef={previousVersions} displayConfig={previewConfig} listConfig={listConfig}
                         filterGroupLabels={filterGroupLabels} />}
                     {isDisplayed('abstract', previewConfig) &&
                     <ArticleAbstract item={item} displayAbstract={DISPLAY_ABSTRACT}/>}
-                    {isDisplayed('body_html', previewConfig) && <ArticleBodyHtml item={item}/>}
+                    {isDisplayed('body_html', previewConfig) && <ArticleBodyHtml item={item} />}
 
                     {media == null ? null : media.map((mediaItem) => (
                         <ArticleMedia

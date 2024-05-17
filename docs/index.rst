@@ -17,6 +17,14 @@ Developers Guide
     developers
     company
 
+Configuration
+-------------
+
+.. toctree::
+    :maxdepth: 2
+
+    config-ui
+
 API Reference
 -------------
 

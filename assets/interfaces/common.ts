@@ -39,7 +39,7 @@ interface IBaseAction {
     when?(props: any, item: IArticle | IAgendaItem): boolean;
 }
 
-interface ISingleItemAction extends IBaseAction {
+export interface ISingleItemAction extends IBaseAction {
     action(item?: IArticle | IAgendaItem, group?: string, plan?: IAgendaItem): void;
 }
 
@@ -67,4 +67,16 @@ export interface IRestApiResponse<T extends IResourceItem> {
         total: number;
     };
     _aggregations: {[key: string]: any};
+}
+
+export interface ISubject {
+    name: string;
+    code: string;
+    scheme: string;
+}
+
+export interface IOccurStatus {
+    name: string;
+    qcode: string;
+    label: string;
 }

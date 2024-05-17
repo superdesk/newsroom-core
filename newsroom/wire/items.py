@@ -13,6 +13,7 @@ from content_api.items_versions.service import ItemsVersionsService
 
 from superdesk.metadata.item import metadata_schema
 
+from newsroom.cards import get_card_size
 from newsroom.types import DashboardCard, Article
 
 
@@ -21,9 +22,26 @@ class ItemsResource(BaseItemsResource):
     schema["slugline"] = schema["headline"] = schema["body_html"] = schema["description_html"] = metadata_schema[
         "body_html"
     ].copy()
+    schema["urgency"] = {**metadata_schema["urgency"], "mapping": {"type": "keyword"}}
+    schema["priority"] = {**metadata_schema["priority"], "mapping": {"type": "keyword"}}
+
+    schema["expiry"] = {"type": "datetime"}
+
+    mongo_indexes = deepcopy(BaseItemsResource.mongo_indexes) or {}
+    mongo_indexes.update(
+        {
+            "evolvedfrom_1": ([("evolvedfrom", 1)], {"background": True}),
+        }
+    )
 
 
 class ItemsService(BaseItemsService):
+    def _is_internal_api(self):
+        # we need to avoid superdesk core handling which makes it return nothing
+        # todo: get rid of the base item service from content api, there is too much
+        # logic related to subscribers
+        return False
+
     def get_expired_items(self, expiry_datetime=None, expiry_days=None, max_results=None, include_children=True):
         # remove old items based on expiry days config
         for items in super().get_expired_items(expiry_datetime, expiry_days, max_results, include_children):
@@ -41,6 +59,8 @@ class ItemsVersionsResource(BaseItemsVersionsResource):
     schema["slugline"] = schema["headline"] = schema["body_html"] = schema["description_html"] = metadata_schema[
         "body_html"
     ].copy()
+    schema["urgency"] = {**metadata_schema["urgency"], "mapping": {"type": "keyword"}}
+    schema["priority"] = {**metadata_schema["priority"], "mapping": {"type": "keyword"}}
 
 
 def init_app(app):
@@ -79,7 +99,9 @@ def get_items_for_dashboard(
             items_by_card[card["label"]] = [
                 filter_fields(item) if filter_public_fields else item
                 for item in superdesk.get_resource_service("wire_search").get_product_items(
-                    ObjectId(card["config"]["product"]), card["config"]["size"], exclude_embargoed=exclude_embargoed
+                    ObjectId(card["config"].get("product")),
+                    card["config"].get("size") or get_card_size(card["type"]),
+                    exclude_embargoed=exclude_embargoed,
                 )
             ]
         elif card["type"] == "4-photo-gallery":

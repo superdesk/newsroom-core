@@ -3,7 +3,7 @@ from flask import Blueprint
 from flask_babel import lazy_gettext
 
 from newsroom.utils import url_for_agenda
-from .agenda import AgendaResource, AgendaService, aggregations
+from .agenda import AgendaResource, AgendaService, aggregations, PRIVATE_FIELDS
 from newsroom.search.config import init_nested_aggregation
 from .featured import FeaturedResource, FeaturedService
 from . import formatters
@@ -14,6 +14,7 @@ from .utils import (
     get_coverage_scheduled_date,
     get_planning_coverages,
     get_coverage_status,
+    get_event_state,
 )
 
 
@@ -46,6 +47,7 @@ def init_app(app):
     app.add_template_global(get_coverage_publish_time, "get_coverage_publish_time")
     app.add_template_global(get_planning_coverages)
     app.add_template_global(get_coverage_status, "get_coverage_status")
+    app.add_template_global(get_event_state, "get_event_state")
     app.general_setting(
         "google_maps_styles",
         lazy_gettext("Google Maps Styles"),
@@ -78,3 +80,6 @@ def init_app(app):
         ]
 
     init_nested_aggregation(AgendaResource, app.config.get("AGENDA_GROUPS", []), aggregations)
+
+    if app.config.get("AGENDA_HIDE_COVERAGE_ASSIGNEES"):
+        PRIVATE_FIELDS.extend(["*.assigned_desk_*", "*.assigned_user_*"])

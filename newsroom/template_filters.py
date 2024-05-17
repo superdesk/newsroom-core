@@ -272,9 +272,10 @@ def section_allowed(nav, sections):
 
 
 def get_company_sidenavs(blueprint=None):
-    from newsroom.auth.utils import get_user_sections
+    from newsroom.auth.utils import get_user_sections, get_user
 
-    sections = get_user_sections()
+    user = get_user()
+    sections = get_user_sections(user)
     navs = sidenavs(blueprint)
     if sections:
         return [nav for nav in navs if section_allowed(nav, sections)]

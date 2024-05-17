@@ -1,7 +1,15 @@
-export {TDatetime, IFilterGroup, ISection, ICountry, IItemAction, IResourceItem, IRestApiResponse} from './common';
-export {IListConfig, IPreviewConfig, IDisplayFieldsConfig} from './configs';
+export {
+    TDatetime,
+    IFilterGroup,
+    ISection,
+    ICountry,
+    IItemAction,
+    ISingleItemAction,
+    IResourceItem,
+    IRestApiResponse,
+} from './common';
+export {IListConfig, IPreviewConfig, IDisplayFieldsConfig, IAgendaPreviewConfig} from './configs';
 export {ICompany, ICompanyType, IAuthProvider, IService} from './company';
-export {IClientConfig} from './config';
 export {INavigation} from './navigation';
 export {ITopicNotificationScheduleType, ITopicFolder, ITopic, ISearchParams, ISearchFields} from './topic';
 export {IUserDashboard, IUser, IUserType} from './user';
@@ -20,7 +28,10 @@ export {
     AgendaThunkDispatch,
     ICoverageStatus,
     ICoverageWorkflowStatus,
+    ICoverageMetadataPreviewProps,
+    ICoverageItemAction,
+    IPlanningItem,
+    IFullCoverage,
 } from './agenda';
 export {IArticle, IRendition, IContentType} from './content';
 export {ISearchState} from './search';
-export {IPublicAppState} from './public';

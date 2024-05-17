@@ -1,5 +1,5 @@
 from bson import ObjectId
-from typing import Dict, List, TypedDict, Any, Union, NoReturn
+from typing import Dict, List, Literal, Optional, TypedDict, Any, Union, NoReturn
 from datetime import datetime
 from enum import Enum
 from flask_babel import LazyString
@@ -10,6 +10,17 @@ def assert_never(value: NoReturn) -> NoReturn:
 
 
 NameString = Union[str, LazyString]
+NavigationIds = List[Union[str, ObjectId]]
+Section = Literal["wire", "agenda", "monitoring", "news_api", "media_releases", "factcheck", "am_news", "aapX"]
+SectionAllowedMap = Dict[Section, bool]
+Permissions = Literal["coverage_info"]
+
+
+class Group(TypedDict):
+    field: str
+    label: str
+    nested: dict
+    permissions: List[Permissions]
 
 
 class Country(TypedDict):
@@ -30,15 +41,15 @@ class Product(Entity, total=False):
     query: str
     planning_item_query: str
     is_enabled: bool
-    product_type: str
-    navigations: List[ObjectId]
+    product_type: Section
+    navigations: NavigationIds
     companies: List[ObjectId]
 
 
 class ProductRef(TypedDict):
     _id: ObjectId
     seats: int
-    section: str
+    section: Section
 
 
 class NotificationSchedule(TypedDict, total=False):
@@ -95,13 +106,24 @@ class UserData(UserRequired, total=False):
     version_creator: ObjectId
 
     products: List[ProductRef]
-    sections: Dict[str, bool]
+    sections: SectionAllowedMap
     dashboards: List[UserDashboardEntry]
     notification_schedule: NotificationSchedule
 
 
 class User(UserData):
     pass
+
+
+class PublicUserData(TypedDict):
+    _id: str
+    company: str
+    first_name: str
+    last_name: str
+    email: str
+    products: List[ProductRef]
+    sections: SectionAllowedMap
+    notification_schedule: Optional[NotificationSchedule]
 
 
 class UserAuth(TypedDict):
@@ -150,14 +172,14 @@ class Company(CompanyRequired, total=False):
 
     # Authentication
     auth_provider: str
-    auth_domain: str
+    auth_domains: List[str]
     is_enabled: bool
     is_approved: bool
     expiry_date: datetime
 
     # Authorization
     products: List[ProductRef]
-    sections: Dict[str, bool]
+    sections: SectionAllowedMap
     restrict_coverage_info: bool
     sd_subscriber_id: str
     archive_access: bool
@@ -190,8 +212,8 @@ class Topic(TypedDict, total=False):
     company: ObjectId
     is_global: bool
     timezone_offset: int
-    topic_type: str
-    navigation: List[str]
+    topic_type: Section
+    navigation: NavigationIds
     original_creator: ObjectId
     version_creator: ObjectId
     folder: ObjectId
@@ -199,15 +221,43 @@ class Topic(TypedDict, total=False):
     subscribers: List[TopicSubscriber]
 
 
+class SectionFilter(TypedDict, total=False):
+    name: str
+    description: str
+    sd_product_id: str
+    query: str
+    is_enabled: bool
+    filter_type: Section
+    search_type: Section
+    original_creator: ObjectId
+    version_creator: ObjectId
+
+
 class DashboardCardConfig(TypedDict, total=False):
     product: str
     size: int
 
 
-class DashboardCard(TypedDict, total=False):
+DashboardCardType = Literal[
+    "6-text-only",
+    "4-picture-text",
+    "4-text-only",
+    "4-media-gallery",
+    "4-photo-gallery",
+    "1x1-top-news",
+    "2x2-top-news",
+    "3-text-only",
+    "3-picture-text",
+    "2x2-events",
+    "6-navigation-row",
+    "wire-list",
+]
+
+
+class DashboardCard(TypedDict):
     _id: ObjectId
     label: str
-    type: str
+    type: DashboardCardType
     config: DashboardCardConfig
     order: int
     dashboard: str

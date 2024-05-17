@@ -1,3 +1,5 @@
+import warnings
+
 from typing import List, Optional, Union
 from bson import ObjectId
 
@@ -6,10 +8,10 @@ import superdesk
 from superdesk.services import CacheableService
 from .types import PRODUCT_TYPES
 
-from newsroom.types import Company, Product, User
-from newsroom.utils import any_objectid_in_list
+from newsroom.types import Company, Product, User, NavigationIds
+from newsroom.utils import any_objectid_in_list, parse_objectid
 
-NavigationIds = List[Union[str, ObjectId]]
+IdsList = NavigationIds
 
 
 class ProductsResource(newsroom.Resource):
@@ -55,6 +57,28 @@ class ProductsService(CacheableService):
                 updates = {"products": [p for p in item["products"] if p["_id"] != doc["_id"]]}
                 superdesk.get_resource_service(resource).system_update(item["_id"], updates, item)
 
+    def create(self, docs):
+        company_products = {}
+        for doc in docs:
+            if doc.get("companies"):
+                for company_id in doc["companies"]:
+                    company_products.setdefault(company_id, []).append(doc)
+        res = super().create(docs)
+        if company_products:
+            warnings.warn("Using deprecated product.companies", DeprecationWarning)
+
+        company_service = superdesk.get_resource_service("companies")
+        for company_id, products in company_products.items():
+            company = company_service.find_one(req=None, _id=company_id)
+            if company:
+                updates = {
+                    "products": company.get("products") or [],
+                }
+                for product in products:
+                    updates["products"].append({"_id": product["_id"], "section": product["product_type"], "seats": 0})
+                company_service.system_update(company["_id"], updates, company)
+        return res
+
 
 products_service = ProductsService()
 
@@ -77,7 +101,7 @@ def get_product_by_id(
     if not product:
         return None
 
-    if company_id is not None and ObjectId(company_id) not in product.get("companies") or []:
+    if company_id is not None and parse_objectid(company_id) not in product.get("companies") or []:
         return None
 
     if product_type is not None and product.get("product_type") != product_type:
@@ -99,45 +123,37 @@ def get_products_by_company(
     :param product_type: Type of the product
     :param unlimited_only: Include unlimited only products
     """
-
     if company is None:
         return []
 
-    company_id = ObjectId(company["_id"])
     company_product_ids = [
-        ObjectId(product["_id"])
+        parse_objectid(product["_id"])
         for product in company.get("products") or []
-        if product["section"] == product_type and (not unlimited_only or not product.get("seats"))
+        if (product_type is None or product["section"] == product_type)
+        and (not unlimited_only or not product.get("seats"))
     ]
 
-    if "products" in company and not company_product_ids:
-        # no products selected for this company
-        return []
+    if company_product_ids:
+        lookup = get_products_lookup(company_product_ids, navigation_ids)
+        return list(products_service.get_from_mongo(req=None, lookup=lookup))
 
-    def product_matches(product: Product) -> bool:
-        if "products" in (company or {}) and product["_id"] not in company_product_ids:
-            return False
-        elif "products" not in (company or {}) and company_id not in (product.get("companies") or []):
-            return False
-        elif product_type and product.get("product_type") != product_type:
-            return False
-        elif navigation_ids and not any_objectid_in_list(navigation_ids, product.get("navigations") or []):
-            return False
-
-        return True
-
-    return [product for product in products_service.get_cached() if product_matches(product)]
+    return []
 
 
 def get_products_by_user(user: User, section: str, navigation_ids: Optional[NavigationIds]) -> List[Product]:
-    if "products" in user and user["products"]:
-        ids = [p["_id"] for p in user["products"] if p["section"] == section]
-
-        def product_matches(product: Product) -> bool:
-            return product["_id"] in ids and (
-                not navigation_ids or any_objectid_in_list(navigation_ids, product.get("navigations") or [])
-            )
-
+    if user.get("products"):
+        ids = [parse_objectid(p["_id"]) for p in user["products"] if p["section"] == section]
         if ids:
-            return [product for product in products_service.get_cached() if product_matches(product)]
+            lookup = get_products_lookup(ids, navigation_ids)
+            return list(products_service.get_from_mongo(req=None, lookup=lookup))
+
     return []
+
+
+def get_products_lookup(product_ids: IdsList, navigation_ids: Optional[IdsList]):
+    lookup = {"_id": {"$in": product_ids}}
+
+    if navigation_ids:
+        lookup["navigations"] = {"$in": navigation_ids}
+
+    return lookup

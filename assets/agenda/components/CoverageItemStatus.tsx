@@ -1,7 +1,7 @@
 import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {get} from 'lodash';
-import {gettext} from 'utils';
+import {getConfig, gettext} from 'utils';
 import {
     getCoverageStatusText,
     WORKFLOW_STATUS,
@@ -78,6 +78,7 @@ export default class CoverageItemStatus extends React.Component<any, any> {
     getCoverageActions(coverage: any) {
         const actionsToShow = this.filterActions();
         const parentWatched = isWatched(this.props.item, this.props.user);
+        const viewContentEmail = getConfig('view_content_tooltip_email');
         const actions = actionsToShow.map((action: any) =>
             <ActionButton
                 key={action.name}
@@ -132,7 +133,10 @@ export default class CoverageItemStatus extends React.Component<any, any> {
                         key="contentLink"
                         className='nh-button nh-button--small nh-button--tertiary nh-button--disabled'
                         ref={(elem) => this.elem = elem}
-                        title={gettext('“You don’t have access to this content, please contact test@localhost”')}
+                        href={viewContentEmail ? `mailto:${viewContentEmail}` : undefined}
+                        target='_blank'
+                        title={viewContentEmail ? gettext('You don’t have access to this content, please contact {{email}}', {email: viewContentEmail}
+                        ) : gettext('You don’t have access to this content')}
                     >
                         {gettext('View Content')}
                     </a>
@@ -174,7 +178,6 @@ export default class CoverageItemStatus extends React.Component<any, any> {
             get(this.props, 'coverageData.ednote', {})[coverage.coverage_id];
         const reason = this.getWorkflowStatusReason();
         const scheduledStatus = get(this.props, 'coverageData.scheduled_update_status', {})[coverage.coverage_id];
-
         return (
             <Fragment>
                 {wireText && (

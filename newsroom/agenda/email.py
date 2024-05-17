@@ -1,4 +1,4 @@
-from newsroom.email import send_template_email
+from newsroom.email import send_template_email, send_user_email
 from newsroom.utils import (
     get_agenda_dates,
     get_location_string,
@@ -18,8 +18,8 @@ def send_coverage_notification_email(user, agenda, wire_item):
             item=wire_item,
             section="agenda",
         )
-        send_template_email(
-            to=[user["email"]],
+        send_user_email(
+            user,
             template="agenda_new_coverage_email",
             template_kwargs=template_kwargs,
         )
@@ -56,8 +56,8 @@ def send_agenda_notification_email(
             time_updated=time_updated,
             coverage_modified=coverage_modified,
         )
-        send_template_email(
-            to=[user["email"]],
+        send_user_email(
+            user,
             template="agenda_updated_email",
             template_kwargs=template_kwargs,
         )

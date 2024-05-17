@@ -1,6 +1,7 @@
 import React from 'react';
 import MoreNewsButton, {MoreNewsSearchKind} from './MoreNewsButton';
 import {connect} from 'react-redux';
+import {ICompany} from 'interfaces';
 
 interface IOwnProps {
     id: string;
@@ -16,6 +17,7 @@ interface IOwnProps {
 interface IReduxStateProps {
     userProducts: Array<any>;
     userType: string;
+    companyProducts: ICompany['products'];
 }
 
 type IComponentProps = IOwnProps & IReduxStateProps
@@ -34,11 +36,15 @@ class CardRow extends React.Component<IComponentProps, any> {
     }
 
     render() {
-        const {title, id, children, userProducts, userType, kind} = this.props;
+        const {title, id, children, userProducts, userType, kind, companyProducts} = this.props;
         let moreNews = this.props.moreNews == null ? true : this.props.moreNews;
 
-        if (userType !== 'administrator' && kind == null && (userProducts?.length ?? 0) > 0) {
-            moreNews = userProducts.some((userProduct: any) => userProduct._id === id);
+        if (userType !== 'administrator' && kind == null) {
+            const isProductInUserProducts = userProducts.some(userProduct => userProduct._id === id);
+            const isProductInCompanyProductsWithoutSeats = (companyProducts || []).some(
+                companyProduct => companyProduct._id === id && !companyProduct.seats
+            );
+            moreNews = isProductInUserProducts || isProductInCompanyProductsWithoutSeats;
         }
 
         return (
@@ -59,6 +65,7 @@ class CardRow extends React.Component<IComponentProps, any> {
 const mapStateToProps = (state: any): IReduxStateProps => ({
     userProducts: state.userProducts,
     userType: state.userType,
+    companyProducts: state.companyProducts,
 });
 
 const component: React.ComponentType<IOwnProps> = connect<IReduxStateProps, {}, IOwnProps>(mapStateToProps)(CardRow);

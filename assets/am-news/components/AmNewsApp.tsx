@@ -190,6 +190,7 @@ class AmNewsApp extends SearchBase<any> {
                         <div className={`wire-column__preview ${this.props.itemToPreview ? 'wire-column__preview--open' : ''}`}>
                             {this.props.itemToPreview &&
                                 <WirePreview
+                                    key={this.props.itemToPreview._id}
                                     item={this.props.itemToPreview}
                                     user={this.props.user}
                                     actions={this.filterActions(this.props.itemToPreview)}

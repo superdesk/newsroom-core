@@ -145,6 +145,12 @@ class UsersResource(newsroom.Resource):
                 "last_run_time": {
                     "type": "datetime",
                 },
+                "pause_from": {
+                    "type": "datetime",
+                },
+                "pause_to": {
+                    "type": "datetime",
+                },
             },
         },
     }
@@ -268,14 +274,6 @@ class UsersService(newsroom.Service):
             set_original_creator(doc)
             if doc.get("password", None) and not is_hashed(doc.get("password")):
                 doc["password"] = self._get_password_hash(doc["password"])
-
-    def create(self, docs):
-        for doc in docs:
-            if "sections" not in doc and doc.get("company"):
-                company = get_company_from_user(doc)
-                if company and company.get("sections"):
-                    doc["sections"] = company.get("sections")
-        return super().create(docs)
 
     def on_created(self, docs):
         super().on_created(docs)

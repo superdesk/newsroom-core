@@ -24,10 +24,8 @@ item = items[:2][0]
 
 def download_zip_file(client, _format, section):
     now = utcnow()
-    resp = client.get(
-        "/download/%s?format=%s&type=%s" % (",".join(items_ids), _format, section),
-        follow_redirects=True,
-    )
+    payload = {"items": items_ids, "type": section, "format": _format}
+    resp = client.post("/download", data=json.dumps(payload), content_type="application/json")
     assert resp.status_code == 200
     assert resp.mimetype == "application/zip"
     assert resp.headers.get("Content-Disposition") == "attachment; filename={}-newsroom.zip".format(
@@ -145,10 +143,8 @@ def setup_image(client, app):
 def test_download_single(client, app):
     setup_image(client, app)
     for _format in wire_formats:
-        resp = client.get(
-            "/download/%s?format=%s" % (item["_id"], _format["format"]),
-            follow_redirects=True,
-        )
+        payload = {"items": [item["_id"]], "format": _format["format"]}
+        resp = client.post("/download", data=json.dumps(payload), content_type="application/json")
         assert resp.status_code == 200
         assert resp.mimetype == _format["mimetype"]
         assert resp.headers.get("Content-Disposition") in [
@@ -180,7 +176,8 @@ def test_wire_download(client, app):
 def test_agenda_download(client, app):
     setup_image(client, app)
     for _format in agenda_formats:
-        resp = client.get("/download/%s?format=%s&type=agenda" % (agenda_items[0]["_id"], _format["format"]))
+        payload = {"items": [agenda_items[0]["_id"]], "type": "agenda", "format": _format["format"]}
+        resp = client.post("/download", data=json.dumps(payload), content_type="application/json")
         assert resp.status_code == 200, resp.get_data()
         assert resp.mimetype == _format["mimetype"]
         if _format.get("test_content"):

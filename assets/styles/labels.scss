@@ -1,6 +1,7 @@
 // Labels
 
 $labels-palette: (
+  top-story: var(--color-top-story),
   blue: $main-blue,
   green: $green,
   green-dark: $green-dark,
@@ -12,6 +13,18 @@ $labels-palette: (
   yellow: $yellow,
   gray-dark: $cool-gray-dark,
   gray-mid: $cool-gray-mid,
+);
+
+$flex-justify: (
+    justify-start: start,
+    justify-center: center,
+    justify-end: end,
+);
+
+$flex-align: (
+    align-start: start,
+    align-center: center,
+    align-end: end,
 );
 
 /// Generates base styles for a label.
@@ -106,8 +119,35 @@ $labels-palette: (
         line-height: 1;
         padding: 0 var(--space--1-5);
     }
+    &.label--top-story {
+        padding: 0 var(--space--1-5) 0 var(--space--3);
+        background-image: url('/static/star.svg');
+        background-repeat: no-repeat;
+        background-position: 8px center;
+    }
 
 }
 .label + .label {
     margin-inline-start: var(--space--1);
+}
+
+.label-group {
+    display: flex;
+    gap: var(--space--0-5);
+}
+
+.label-group--vertical {
+    flex-direction: column;
+}
+
+@each $flex, $position in $flex-justify {
+    .label-group--#{$flex} {
+        justify-content: $position;
+    }
+}
+
+@each $flex, $position in $flex-align {
+    .label-group--#{$flex} {
+        align-items: $position;
+    }
 }

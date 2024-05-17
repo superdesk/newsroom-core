@@ -52,7 +52,7 @@ def init(app):
                 "name": "SAML based auth",
                 "is_enabled": True,
                 "auth_provider": "saml",
-                "auth_domain": "samplecomp",
+                "auth_domains": ["samplecomp"],
             },
         ],
     )

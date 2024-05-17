@@ -12,7 +12,7 @@ from superdesk.lock import lock, unlock
 
 from newsroom.types import User, NotificationSchedule, Company, NotificationQueue, NotificationQueueTopic, Topic
 from newsroom.utils import get_user_dict, get_company_dict
-from newsroom.email import send_template_email
+from newsroom.email import send_user_email
 from newsroom.celery_app import celery
 from newsroom.topics.topics import get_user_id_to_topic_for_subscribers, TopicNotificationType
 from newsroom.gettext import get_session_timezone, set_session_timezone
@@ -107,15 +107,15 @@ class SendScheduledNotificationEmails(Command):
 
         if not len(topic_entries["wire"]) and not len(topic_entries["agenda"]):
             # No item's matched this topic queue, send an email indicating no matches
-            send_template_email(
-                to=[user["email"]],
+            send_user_email(
+                user,
                 template="scheduled_notification_no_matches_email",
                 template_kwargs=template_kwargs,
             )
         else:
             # Items matched this topic queue, send an email indicated matches
-            send_template_email(
-                to=[user["email"]],
+            send_user_email(
+                user,
                 template="scheduled_notification_topic_matches_email",
                 template_kwargs=template_kwargs,
             )
@@ -178,6 +178,9 @@ class SendScheduledNotificationEmails(Command):
             search_service = get_resource_service("wire_search" if topic["topic_type"] == "wire" else "agenda")
 
             query = search_service.get_topic_query(topic, user, company, args={"es_highlight": 1, "ids": [item_id]})
+
+            if not query:  # user might not have access to section anymore
+                return None
 
             items = search_service.get_items_by_query(query, size=1)
 

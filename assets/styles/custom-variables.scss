@@ -248,6 +248,7 @@ $container-max-widths: (
     --icon-size--default: 24px;
     --icon-size--small: 20px;
     --icon-size--x-small: 16px;
+    --icon-size--xx-small: 12px;
     --icon-color--muted: var(--color-text--muted);
     --icon-color--muted-2: var(--color-text--muted-2);
 
@@ -668,6 +669,9 @@ $container-max-widths: (
     // COMPONENT: SKELETON
     --p-skeleton-color-bg: var(--color-neutral-150);
     --p-skeleton-animated-gradient: linear-gradient(90deg, hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0.04), hsla(0, 0%, 100%, 0));
+
+    // COMPONENT: LABEL
+    --color-top-story: var(--color-primary);
 }
 
 .line-shadow-end--light {

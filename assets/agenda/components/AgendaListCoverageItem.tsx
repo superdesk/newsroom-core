@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import {isEqual} from 'lodash';
 
-import {IAgendaItem, ICoverage, IUser} from 'interfaces';
+import {IAgendaItem, IPlanningItem, ICoverage, IUser} from 'interfaces';
 import {gettext} from '../../utils';
 import {
     getCoverageIcon,
@@ -16,7 +16,7 @@ import {
 
 interface IProps {
     group: string;
-    planningItem: IAgendaItem;
+    planningItem?: IPlanningItem;
     user: IUser['_id'];
     coverage: ICoverage;
     showBorder?: boolean;
@@ -71,7 +71,13 @@ class AgendaListCoverageItem extends React.Component<IProps, IState> {
         return (
             !props.group ||
             props.coverage.scheduled == null ||
-            (state.isCoverageForExtraDay && props.coverage.planning_id === props.planningItem.guid)
+            (
+                state.isCoverageForExtraDay &&
+                (
+                    props.planningItem == null ||
+                    props.coverage.planning_id === props.planningItem.guid
+                )
+            )
         ) && (
             <span
                 className={classNames('wire-articles__item__icon',`${coverage_icon}`, {'dashed-border': props.showBorder})}

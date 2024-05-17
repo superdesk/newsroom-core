@@ -2,14 +2,13 @@ import React from 'react';
 import server from 'server';
 import analytics from 'analytics';
 import {get, isInteger, keyBy, isEmpty, cloneDeep, throttle, memoize} from 'lodash';
-import {Provider} from 'react-redux';
 import {createStore as _createStore, applyMiddleware, compose, Store, Middleware} from 'redux';
 import {createLogger} from 'redux-logger';
-import thunk, {ThunkAction} from 'redux-thunk';
+import thunk from 'redux-thunk';
 import alertify from 'alertifyjs';
 import moment from 'moment-timezone';
 
-import {IArticle, IClientConfig, IUser} from 'interfaces';
+import {IArticle, IUser} from 'interfaces';
 
 /*
  * Import and load all locales that will be used in moment.js
@@ -136,7 +135,7 @@ export function createStore<State = any>(reducer: any, name: any = 'default'): S
  * @param {Object} params
  * @return {String}
  */
-export function gettext(text: string, params?: {[key: string]: any}): string {
+export function gettext(text: string, params?: {[key: string]: string | number}): string {
     let translated = get(window.translations, text, text);
 
     if (params) {
@@ -489,7 +488,7 @@ const SHIFT_OUT_REGEXP = new RegExp(String.fromCharCode(14), 'g');
  * @param {String} html
  * @return {String}
  */
-export function formatHTML(html: any) {
+export function formatHTML(html: string) {
     return html.replace(SHIFT_OUT_REGEXP, html.indexOf('<pre>') === -1 ? '<br>' : '\n');
 }
 
@@ -532,14 +531,14 @@ export function errorHandler(error: {errorData: any} | Response, dispatch?: any,
  * @param {Mixed} defaultValue
  * @return {Mixed}
  */
-export function getConfig(key: any, defaultValue?: any) {
+export function getConfig(key: keyof IClientConfig, defaultValue?: any) {
     const clientConfig = window && window.newsroom && window.newsroom.client_config || {};
 
     if (Object.keys(clientConfig).length === 0) {
         console.warn('Client config is not yet available for key', key);
     }
 
-    return get(clientConfig, key, defaultValue);
+    return key in clientConfig ? clientConfig[key] : defaultValue;
 }
 
 export function getLocale() {

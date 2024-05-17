@@ -22,6 +22,7 @@ from superdesk.celery_task_utils import get_lock_id
 from superdesk.lock import lock, unlock
 
 from newsroom.celery_app import celery
+from newsroom.email import send_user_email
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
 from newsroom.utils import parse_date_str, get_items_by_id, get_entity_or_404
 
@@ -235,6 +236,7 @@ class MonitoringEmailAlerts(Command):
 
         for m in monitoring_list:
             if m.get("users"):
+                users = get_items_by_id([ObjectId(u) for u in m["users"]], "users")
                 internal_req = ParsedRequest()
                 internal_req.args = {
                     "navigation": str(m["_id"]),
@@ -258,21 +260,22 @@ class MonitoringEmailAlerts(Command):
                         attachment = base64.b64encode(_file.read())
                         formatter = app.download_formatters[m["format_type"]]["formatter"]
 
-                        send_template_email(
-                            to=[u["email"] for u in get_items_by_id([ObjectId(u) for u in m["users"]], "users")],
-                            template="monitoring_email",
-                            template_kwargs=template_kwargs,
-                            attachments_info=[
-                                {
-                                    "file": attachment,
-                                    "file_name": formatter.format_filename(None),
-                                    "content_type": "application/{}".format(formatter.FILE_EXTENSION),
-                                    "file_desc": "Monitoring Report for Celery monitoring alerts for profile: {}".format(
-                                        m["name"]
-                                    ),
-                                }
-                            ],
-                        )
+                        for user in users:
+                            send_user_email(
+                                user,
+                                template="monitoring_email",
+                                template_kwargs=template_kwargs,
+                                attachments_info=[
+                                    {
+                                        "file": attachment,
+                                        "file_name": formatter.format_filename(None),
+                                        "content_type": "application/{}".format(formatter.FILE_EXTENSION),
+                                        "file_desc": "Monitoring Report for Celery monitoring alerts for profile: {}".format(
+                                            m["name"]
+                                        ),
+                                    }
+                                ],
+                            )
                     except Exception:
                         logger.exception(
                             "{0} Error processing monitoring profile {1} for company {2}.".format(
@@ -293,11 +296,12 @@ class MonitoringEmailAlerts(Command):
                                 template_kwargs=template_kwargs,
                             )
                 elif m["schedule"].get("interval") != "immediate" and m.get("always_send"):
-                    send_template_email(
-                        to=[u["email"] for u in get_items_by_id([ObjectId(u) for u in m["users"]], "users")],
-                        template="monitoring_email_no_updates",
-                        template_kwargs=template_kwargs,
-                    )
+                    for user in users:
+                        send_user_email(
+                            user,
+                            template="monitoring_email_no_updates",
+                            template_kwargs=template_kwargs,
+                        )
 
             get_resource_service("monitoring").patch(
                 m["_id"],

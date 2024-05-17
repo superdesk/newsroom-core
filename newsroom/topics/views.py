@@ -10,7 +10,7 @@ from newsroom.topics.topics import get_user_topics as _get_user_topics, auto_ena
 from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required
 from newsroom.utils import get_json_or_400, get_entity_or_404
-from newsroom.email import send_template_email
+from newsroom.email import send_user_email
 from newsroom.notifications import (
     push_user_notification,
     push_company_notification,
@@ -216,8 +216,8 @@ def share():
             "message": data.get("message"),
             "app_name": app.config["SITE_NAME"],
         }
-        send_template_email(
-            to=[user["email"]],
+        send_user_email(
+            user,
             template="share_topic",
             template_kwargs=template_kwargs,
         )

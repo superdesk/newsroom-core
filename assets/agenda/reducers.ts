@@ -1,4 +1,4 @@
-import {get, uniq} from 'lodash';
+import {get, uniq, cloneDeep} from 'lodash';
 
 import {
     IAgendaItem,
@@ -23,12 +23,13 @@ import {
     STOP_WATCHING_COVERAGE,
     SET_ERROR,
     RECIEVE_NEXT_ITEMS,
+    LOADING_AGGREGATIONS,
 } from './actions';
 
 import {EXTENDED_VIEW} from 'wire/defaults';
 import {searchReducer} from 'search/reducers';
 import {defaultReducer} from '../reducers';
-import {EARLIEST_DATE} from './utils';
+import {EARLIEST_DATE, sortGroups} from './utils';
 
 const initialState: IAgendaState = {
     items: [],
@@ -104,6 +105,7 @@ function recieveItems(state: IAgendaState, data: IRestApiResponse<IAgendaItem>):
         aggregations: data._aggregations || undefined,
         newItems: [],
         searchInitiated: false,
+        loadingAggregations: false,
     };
 }
 
@@ -123,21 +125,23 @@ function updateListGroups(state: IAgendaState, updatedGroups: Array<IAgendaListG
         ...state,
         listItems: {
             ...state.listItems,
-            groups: uniq([
-                ...Object.keys(currentGroupsById),
-                ...Object.keys(updatedGroupsById),
-            ]).sort().map((groupId) => ({
-                ...currentGroupsById[groupId] ?? {},
-                items: uniq([
-                    ...currentGroupsById[groupId]?.items ?? [],
-                    ...updatedGroupsById[groupId]?.items ?? [],
-                ]),
-                hiddenItems: uniq([
-                    ...currentGroupsById[groupId]?.hiddenItems ?? [],
-                    ...updatedGroupsById[groupId]?.hiddenItems ?? [],
-                ]),
-                date: groupId,
-            })),
+            groups: sortGroups(
+                uniq([
+                    ...Object.keys(currentGroupsById),
+                    ...Object.keys(updatedGroupsById),
+                ]).map((groupId) => ({
+                    ...currentGroupsById[groupId] ?? {},
+                    items: uniq([
+                        ...currentGroupsById[groupId]?.items ?? [],
+                        ...updatedGroupsById[groupId]?.items ?? [],
+                    ]),
+                    hiddenItems: uniq([
+                        ...currentGroupsById[groupId]?.hiddenItems ?? [],
+                        ...updatedGroupsById[groupId]?.hiddenItems ?? [],
+                    ]),
+                    date: groupId,
+                })),
+            ),
         },
     };
 }
@@ -145,7 +149,7 @@ function updateListGroups(state: IAgendaState, updatedGroups: Array<IAgendaListG
 function runDefaultReducer(state: IAgendaState, action: any): IAgendaState {
     const newState: IAgendaState = defaultReducer(state || initialState, action);
 
-    if (action.type === RECIEVE_NEXT_ITEMS && action.data.setFromSearch) {
+    if (action.type === RECIEVE_NEXT_ITEMS && action.data.setFetchFrom) {
         // increment the `fetchFrom` number with the length of the API response
         newState.fetchFrom += (action.data as IRestApiResponse<IAgendaItem>)._items.length;
     }
@@ -207,28 +211,64 @@ export default function agendaReducer(state: IAgendaState = initialState, action
     }
 
     case WATCH_COVERAGE: {
-        const itemsById = Object.assign({}, state.itemsById);
-        const item = itemsById[get(action, 'item._id')];
-        const coverage = (get(item, 'coverages') || []).find((c: any) => c.coverage_id === action.coverage.coverage_id);
-        if (coverage) {
-            coverage['watches'] = uniq([
-                ...(get(coverage, 'watches') || []),
-                state.user
-            ]);
+        const itemId = action.item._id;
+        const coverageId = action.coverage.coverage_id;
+
+        if (state.itemsById[itemId] == null) {
+            console.warn(`Unable to watch coverage ${itemId}.${coverageId}, item not found in redux store`);
+            return state;
         }
 
-        return {...state, itemsById};
+        const item = cloneDeep(state.itemsById[itemId]);
+        const coverage = (item.coverages || [])
+            .find((c) => c.coverage_id === coverageId);
+
+        if (coverage == null) {
+            console.warn(`Unable to watch coverage ${itemId}.${coverageId}, coverage not found in redux store`);
+            return state;
+        }
+
+        coverage['watches'] = uniq([
+            ...(coverage.watches || []),
+            state.user
+        ]);
+
+        return {
+            ...state,
+            itemsById: {
+                ...state.itemsById,
+                [itemId]: item,
+            },
+        };
     }
 
     case STOP_WATCHING_COVERAGE: {
-        const itemsById = Object.assign({}, state.itemsById);
-        const item = itemsById[get(action, 'item._id')];
-        const coverage = (get(item, 'coverages') || []).find((c: any) => c.coverage_id === action.coverage.coverage_id);
-        if (coverage) {
-            coverage['watches'] = (get(coverage, 'watches') || []).filter((u: any) => u !== state.user);
+        const itemId = action.item._id;
+        const coverageId = action.coverage.coverage_id;
+
+        if (state.itemsById[itemId] == null) {
+            console.warn(`Unable to watch coverage ${itemId}.${coverageId}, item not found in redux store`);
+            return state;
         }
 
-        return {...state, itemsById};
+        const item = cloneDeep(state.itemsById[itemId]);
+        const coverage = (item.coverages || [])
+            .find((c) => c.coverage_id === coverageId);
+
+        if (coverage == null) {
+            console.warn(`Unable to watch coverage ${itemId}.${coverageId}, coverage not found in redux store`);
+            return state;
+        }
+
+        coverage.watches = (coverage.watches || []).filter((u) => u !== state.user);
+
+        return {
+            ...state,
+            itemsById: {
+                ...state.itemsById,
+                [itemId]: item,
+            },
+        };
     }
 
     case STOP_WATCHING_EVENTS: {
@@ -343,6 +383,9 @@ export default function agendaReducer(state: IAgendaState = initialState, action
             isLoading: false,
             errors: action.errors};
     }
+    case LOADING_AGGREGATIONS:
+        return {...state, loadingAggregations: true};
+
     default:
         return runDefaultReducer(state, action);
     }

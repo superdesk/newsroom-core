@@ -1,7 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {get, isEmpty} from 'lodash';
+
+import {IAgendaItem, IPlanningItem, IArticle, ICoverageItemAction, IPreviewConfig, IUser} from 'interfaces';
 
 import {gettext, fullDate} from 'utils';
 import {getCoveragesForDisplay, getCoverageIcon, getAgendaNames} from '../utils';
@@ -12,9 +12,23 @@ import AgendaInternalNote from './AgendaInternalNote';
 import AgendaEdNote from './AgendaEdNote';
 import AgendaLongDescription from './AgendaLongDescription';
 
-class AgendaPreviewCoverages extends React.Component<any, any> {
-    static propTypes: any;
-    constructor(props: any) {
+interface IProps {
+    item: IAgendaItem;
+    plan?: IPlanningItem;
+    previewGroup?: string;
+    wireItems?: Array<IArticle>;
+    actions?: Array<ICoverageItemAction>;
+    user?: IUser['_id'];
+    restrictCoverageInfo?: boolean;
+    previewConfig: IPreviewConfig;
+}
+
+interface IState {
+    expanded: boolean;
+}
+
+class AgendaPreviewCoverages extends React.Component<IProps, IState> {
+    constructor(props: IProps) {
         super(props);
 
         this.state = {expanded: true};
@@ -22,7 +36,7 @@ class AgendaPreviewCoverages extends React.Component<any, any> {
     }
 
     toggleExpanded() {
-        this.setState((prevState: any) => ({expanded: !prevState.expanded}));
+        this.setState((prevState) => ({expanded: !prevState.expanded}));
     }
 
     render() {
@@ -30,7 +44,7 @@ class AgendaPreviewCoverages extends React.Component<any, any> {
 
         const displayCoverages = getCoveragesForDisplay(item, plan, previewGroup);
 
-        if (isEmpty(displayCoverages.current) && isEmpty(displayCoverages.previous)) {
+        if (displayCoverages.current.length === 0 && displayCoverages.previous.length === 0) {
             return null;
         }
 
@@ -38,7 +52,7 @@ class AgendaPreviewCoverages extends React.Component<any, any> {
 
         return (item.item_type === 'planning' || restrictCoverageInfo) ? (
             <React.Fragment>
-                {get(displayCoverages.current, 'length', 0) > 0 && (
+                {displayCoverages.current.length > 0 && (
                     <PreviewBox label={gettext('Coverages:')}>
                         <AgendaCoverages
                             item={item}
@@ -46,11 +60,12 @@ class AgendaPreviewCoverages extends React.Component<any, any> {
                             wireItems={wireItems}
                             actions={actions}
                             user={user}
+                            previewConfig={this.props.previewConfig}
                         />
                     </PreviewBox>
                 )}
 
-                {get(displayCoverages.previous, 'length', 0) > 0 && (
+                {displayCoverages.previous.length > 0 && (
                     <PreviewBox label={gettext('Previous Coverages:')}>
                         <AgendaCoverages
                             item={item}
@@ -58,6 +73,7 @@ class AgendaPreviewCoverages extends React.Component<any, any> {
                             wireItems={wireItems}
                             actions={actions}
                             user={user}
+                            previewConfig={this.props.previewConfig}
                         />
                     </PreviewBox>
                 )}
@@ -73,14 +89,14 @@ class AgendaPreviewCoverages extends React.Component<any, any> {
                             'rotate-90-ccw': !this.state.expanded,
                         })} />
                     </a>
-                    <h3 onClick={this.toggleExpanded}>{plan.name}</h3>
+                    <h3 onClick={this.toggleExpanded}>{plan?.name}</h3>
                 </div>
                 <p className="agenda-planning__preview-date">
-                    {fullDate(plan.planning_date)}
+                    {fullDate(plan?.planning_date)}
                 </p>
                 {!this.state.expanded ? (
                     <div style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
-                        {displayCoverages.current.concat(displayCoverages.previous).map((coverage: any) => (
+                        {displayCoverages.current.concat(displayCoverages.previous).map((coverage) => (
                             <i
                                 key={coverage.coverage_id}
                                 className={`icon-small--coverage-${getCoverageIcon(coverage.coverage_type)} me-2`}
@@ -99,14 +115,14 @@ class AgendaPreviewCoverages extends React.Component<any, any> {
 
                             <AgendaLongDescription item={item} plan={plan}/>
 
-                            {!plan.ednote ? null : (
+                            {plan?.ednote == null ? null : (
                                 <AgendaEdNote
                                     item={plan}
                                     noMargin={true}
                                 />
                             )}
 
-                            {!plan.internal_note ? null : (
+                            {plan?.internal_note == null ? null : (
                                 <AgendaInternalNote
                                     internalNote={plan.internal_note}
                                     noMargin={true}
@@ -114,7 +130,7 @@ class AgendaPreviewCoverages extends React.Component<any, any> {
                             )}
                         </div>
 
-                        {get(displayCoverages.current, 'length', 0) > 0 && (
+                        {displayCoverages.current.length > 0 && (
                             <PreviewBox label={gettext('Coverages:')}>
                                 <AgendaCoverages
                                     item={item}
@@ -122,11 +138,12 @@ class AgendaPreviewCoverages extends React.Component<any, any> {
                                     wireItems={wireItems}
                                     actions={actions}
                                     user={user}
+                                    previewConfig={this.props.previewConfig}
                                 />
                             </PreviewBox>
                         )}
 
-                        {get(displayCoverages.previous, 'length', 0) > 0 && (
+                        {displayCoverages.previous.length > 0 && (
                             <PreviewBox label={gettext('Previous Coverages:')}>
                                 <AgendaCoverages
                                     item={item}
@@ -134,6 +151,7 @@ class AgendaPreviewCoverages extends React.Component<any, any> {
                                     wireItems={wireItems}
                                     actions={actions}
                                     user={user}
+                                    previewConfig={this.props.previewConfig}
                                 />
                             </PreviewBox>
                         )}
@@ -145,13 +163,3 @@ class AgendaPreviewCoverages extends React.Component<any, any> {
 }
 
 export default AgendaPreviewCoverages;
-
-AgendaPreviewCoverages.propTypes = {
-    item: PropTypes.object,
-    plan: PropTypes.object,
-    previewGroup: PropTypes.string,
-    wireItems: PropTypes.array,
-    actions: PropTypes.array,
-    user: PropTypes.string,
-    restrictCoverageInfo: PropTypes.bool,
-};

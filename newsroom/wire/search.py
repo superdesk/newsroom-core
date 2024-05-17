@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from eve.utils import ParsedRequest
 from flask import current_app as app, json
+from newsroom.types import Section
 from superdesk import get_resource_service
 from werkzeug.exceptions import Forbidden
 
@@ -92,7 +93,7 @@ def items_query(ignore_latest=False):
 
 
 class WireSearchService(BaseSearchService):
-    section = "wire"
+    section: Section = "wire"
 
     def get_bookmarks_count(self, user_id):
         req = ParsedRequest()
@@ -157,12 +158,13 @@ class WireSearchService(BaseSearchService):
             return []
 
         if not app.config["DASHBOARD_EMBARGOED"] or exclude_embargoed:
+            embargo_query_rounding = app.config.get("EMBARGO_QUERY_ROUNDING")
             search.query["bool"]["filter"].append(
                 {
                     "bool": {
                         "should": [
-                            {"range": {"embargoed": {"lt": "now"}}},
-                            {"bool": {"must_not": {"exists": {"field": "embargoed"}}}},
+                            {"range": {"embargoed": {"lt": f"now{embargo_query_rounding}"}}},
+                            {"bool": {"must_not": [{"exists": {"field": "embargoed"}}]}},
                         ]
                     }
                 }
@@ -182,6 +184,7 @@ class WireSearchService(BaseSearchService):
 
         self.gen_source_from_search(search)
         search.source["post_filter"] = {"bool": {"filter": []}}
+        search.source.pop("aggs", None)
         internal_req = self.get_internal_request(search)
 
         return list(self.internal_get(internal_req, None))
@@ -252,10 +255,9 @@ class WireSearchService(BaseSearchService):
                         {"term": {"type": "composite"}},
                         {"constant_score": {"filter": {"exists": {"field": "nextversion"}}}},
                     ],
-                    "filter": [{"term": {"_id": item_id}}],
+                    "must": [{"term": {"_id": item_id}}],
                     "should": [],
-                    "must": [],
-                }
+                },
             },
         )
 
@@ -269,13 +271,13 @@ class WireSearchService(BaseSearchService):
         except Forbidden:
             return False
 
-    def apply_request_filter(self, search):
+    def apply_request_filter(self, search, highlights=True):
         """Generate the filters from request args
 
         :param newsroom.search.SearchQuery search: The search query instance
         """
 
-        super().apply_request_filter(search)
+        super().apply_request_filter(search, highlights=highlights)
 
         if search.args.get("bookmarks"):
             set_bookmarks_query(search.query, search.args["bookmarks"])

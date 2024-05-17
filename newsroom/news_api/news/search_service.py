@@ -318,7 +318,7 @@ class NewsAPINewsService(BaseSearchService):
                 desc = "Multiple values received for parameter ({})"
                 raise UnexpectedParameterError(desc=desc.format(param_name))
 
-    def apply_request_filter(self, search):
+    def apply_request_filter(self, search, highlights=True):
         """Generate the filters from request args
 
         :param newsroom.search.SearchQuery search:  The search query instance

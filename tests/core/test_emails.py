@@ -11,10 +11,14 @@ from newsroom.email import (
     handle_long_lines_html,
 )
 from unittest import mock
+from datetime import datetime
+
+from newsroom.types import User
+from newsroom.email import send_user_email
 
 
 def test_item_notification_template(client, app, mocker):
-    user = {"email": "foo@example.com"}
+    user = {"email": "foo@example.com", "receive_email": True}
     item = {
         "_id": "tag:localhost:2018:bcc9fd45",
         "guid": "tag:localhost:2018:bcc9fd45",
@@ -38,6 +42,7 @@ def test_item_notification_template(client, app, mocker):
     sub.assert_called_with(
         to=[user["email"]],
         subject="New story for followed topic: Topic",
+        sender_name=None,
         text_body=render_template_string(
             """
 {% extends "new_item_notification.txt" %}
@@ -207,3 +212,32 @@ def check_lines_length(text, length=998):
     lines = text.splitlines()
     for line in lines:
         assert len(line) < length
+
+
+def test_send_user_email(app):
+    user = User(
+        email="foo@example.com",
+        notification_schedule={"timezone": "Europe/Helsinki"},
+        user_type="user",
+        receive_email=True,
+    )
+    date = datetime(2024, 4, 9, 11, 0, 0)
+    template_kwargs = dict(date=date, topic_match_table={"wire": [], "agenda": []}, entries={})
+    with mock.patch("newsroom.email.send_email") as send_email_mock:
+        send_user_email(user, "scheduled_notification_topic_matches_email", template_kwargs=template_kwargs)
+        assert send_email_mock.called
+        assert "at 14:00 PM" in send_email_mock.call_args[1]["subject"]
+        assert "sujet" not in send_email_mock.call_args[1]["text_body"]
+
+        user["notification_schedule"]["timezone"] = "America/New_York"
+        user["locale"] = "fr_CA"
+        send_user_email(user, "scheduled_notification_topic_matches_email", template_kwargs=template_kwargs)
+
+        assert send_email_mock.call_count == 2
+        assert "at 07:00" in send_email_mock.call_args[1]["subject"]
+        assert "sujet" in send_email_mock.call_args[1]["text_body"]
+
+        user["locale"] = None
+        user["notification_schedule"] = None
+        send_user_email(user, "scheduled_notification_topic_matches_email", template_kwargs=template_kwargs)
+        assert "at 13:00 PM" in send_email_mock.call_args[1]["subject"]  # default timezone Europe/Prague
