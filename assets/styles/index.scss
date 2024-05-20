@@ -2379,6 +2379,13 @@ article.list {
     white-space: pre-wrap;
 }
 
+.wire-column__preview__text blockquote {
+    padding-inline-start: var(--space--2);
+    font-weight: 600;
+    border-inline-start: 3px solid var(--color-line--medium);
+    font-style: italic;
+}
+
 .wire-column__preview__tags, .info-box--top {
     display: flex;
     flex-wrap: wrap;
