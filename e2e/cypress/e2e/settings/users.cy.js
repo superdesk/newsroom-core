@@ -2,7 +2,9 @@ import {setup, addDefaultResources} from '../../support/e2e';
 import {NewshubLayout} from '../../support/pages/layout';
 import {SettingsNav} from '../../support/containers/settingsNav';
 import {UserSettingsPage} from '../../support/pages/settings_users';
+import {CompanySettingsPage} from '../../support/pages/settings_company';
 import {USERS} from '../../fixtures/users';
+import {COMPANIES} from '../../fixtures/companies';
 
 describe('Settings - Users', function () {
     beforeEach(() => {
@@ -53,5 +55,20 @@ describe('Settings - Users', function () {
         UserSettingsPage
             .getPreview()
             .should('not.contain', 'Impersonate User');
+    });
+
+    it('can hide reset password for Azure auth company', () => {
+        SettingsNav.getNavLink('users').click();
+        UserSettingsPage.getUserListItem(USERS.foobar.admin._id).click();
+        cy.get('[data-test-id="reset-password-btn"]').should('exist');
+
+        SettingsNav.getNavLink('companies').click();
+        CompanySettingsPage.getCompanyListItem(COMPANIES.foobar._id).click();
+        cy.get('[data-test-id="field-auth_provider-select"]').select('azure');
+        cy.get('[data-test-id="save-btn"]').click();
+
+        SettingsNav.getNavLink('users').click();
+        UserSettingsPage.getUserListItem(USERS.foobar.admin._id).click();
+        cy.get('[data-test-id="reset-password-btn"]').should('not.exist');
     });
 });

@@ -229,10 +229,12 @@ def user_can_manage_company(company_id) -> bool:
     return False
 
 
+def get_auth_providers() -> Dict[str, AuthProvider]:
+    return {provider["_id"]: AuthProvider.get_provider(provider) for provider in app.config["AUTH_PROVIDERS"]}
+
+
 def get_company_auth_provider(company: Optional[Company] = None) -> AuthProvider:
-    providers: Dict[str, AuthProvider] = {
-        provider["_id"]: AuthProvider.get_provider(provider) for provider in app.config["AUTH_PROVIDERS"]
-    }
+    providers = get_auth_providers()
 
     provider_id = "newshub"
     if company and company.get("auth_provider"):
