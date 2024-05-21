@@ -57,7 +57,7 @@ describe('Settings - Users', function () {
             .should('not.contain', 'Impersonate User');
     });
 
-    it('can hide reset password for Azure auth company', () => {
+    it('can use Azure as auth provider for company', () => {
         SettingsNav.getNavLink('users').click();
         UserSettingsPage.getUserListItem(USERS.foobar.admin._id).click();
         cy.get('[data-test-id="reset-password-btn"]').should('exist');
@@ -65,6 +65,7 @@ describe('Settings - Users', function () {
         SettingsNav.getNavLink('companies').click();
         CompanySettingsPage.getCompanyListItem(COMPANIES.foobar._id).click();
         cy.get('[data-test-id="field-auth_provider-select"]').select('azure');
+        cy.get('[data-test-id="field-auth_domains"]').should('exist');
         cy.get('[data-test-id="save-btn"]').click();
 
         SettingsNav.getNavLink('users').click();
