@@ -32,7 +32,6 @@ export interface ICompanySettingsStore {
     sections: Array<ISection>;
     companyTypes: Array<ICompanyType>;
     apiEnabled: boolean;
-    ssoEnabled: boolean;
     search: any;
     companyToEdit: ICompany | null;
     errors: {[field: string]: Array<string>} | null;
@@ -64,7 +63,6 @@ const initialState: ICompanySettingsStore = {
     errors: null,
     companyUsers: [],
     products: [],
-    ssoEnabled: false,
     authProviders: [],
     ui_config: {},
     countries: [],
@@ -235,7 +233,6 @@ export default function companyReducer(state: any = initialState, action: any) {
             sections: action.data.sections,
             companyTypes: action.data.company_types || [],
             apiEnabled: action.data.api_enabled || false,
-            ssoEnabled: action.data.sso_enabled || false,
             authProviders: action.data.auth_providers || [],
             ui_config: action.data.ui_config,
             countries: action.data.countries,
