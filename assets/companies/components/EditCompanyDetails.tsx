@@ -57,13 +57,15 @@ export function EditCompanyDetails({
                             onChange={onChange}
                             error={errors?.auth_provider}
                         />
-                        <TextListInput
-                            name='auth_domains'
-                            label={gettext('SSO domains')}
-                            value={company.auth_domains || []}
-                            onChange={onChange}
-                            error={errors ? errors.auth_domains : null}
-                        />
+                        {company.auth_provider == null || company.auth_provider === 'newshub' ? null : (
+                            <TextListInput
+                                name='auth_domains'
+                                label={gettext('SSO domains')}
+                                value={company.auth_domains || []}
+                                onChange={onChange}
+                                error={errors ? errors.auth_domains : null}
+                            />
+                        )}
                     </>
                 )}
 
