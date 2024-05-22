@@ -176,6 +176,14 @@ export function openEditTopicNotificationsModal() {
     };
 }
 
+export function openPauseNotificationModal() {
+    return (dispatch: any, getState: any) => {
+        const user = getState().user;
+
+        dispatch(renderModal('pauseNotificationModal', {user}));
+    };
+}
+
 /**
  * Submit share followed topic form and close modal if that works
  *
@@ -349,6 +357,26 @@ export function updateUserNotificationSchedules(schedule: Omit<IUser['notificati
         return server.post(`/users/${user._id}/notification_schedules`, schedule)
             .then(() => {
                 notify.success(gettext('Global schedule updated'));
+                dispatch(fetchUser(user._id));
+                dispatch(closeModal());
+            })
+            .catch((error) => errorHandler(error, dispatch, setError(error)));
+    };
+}
+
+export function postNotificationSchedule(userId: string, schedule: Omit<IUser['notification_schedule'], 'last_run_time'>):Promise<void> {
+    return server.post(`/users/${userId}/notification_schedules`, schedule)
+        .then(() => {
+            notify.success(gettext('pause notification updated'));
+        });
+}
+
+export function updateUserNotificationPause(schedule: Omit<IUser['notification_schedule'], 'last_run_time'>) {
+    return (dispatch: any, getState: any) => {
+        const user = getState().user;
+
+        return postNotificationSchedule(user._id, schedule)
+            .then(() => {
                 dispatch(fetchUser(user._id));
                 dispatch(closeModal());
             })

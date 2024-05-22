@@ -5,10 +5,12 @@ import {
     INIT_DATA,
     CLEAR_NOTIFICATION,
     CLEAR_ALL_NOTIFICATIONS,
+    GET_USER,
 } from './actions';
 
 const initialState: any = {
     user: null,
+    fullUser: null,
     items: {},
     notifications: [],
     notificationCount: 0,
@@ -63,10 +65,18 @@ export default function notificationReducer(state: any = initialState, action: a
         return {
             ...state,
             user: action.data.user || null,
+            fullUser: action.data.fullUser || null,
             items: {},
             notifications: [],
             notificationCount: action.data.notificationCount,
             loading: false,
+        };
+    }
+
+    case GET_USER: {
+        return {
+            ...state,
+            fullUser: action.user,
         };
     }
 

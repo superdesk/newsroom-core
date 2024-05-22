@@ -44,6 +44,8 @@ export interface IUser {
         timezone: string;
         times: Array<string>;
         last_run_time?: TDatetime;
+        pauseFrom?: string;
+        pauseTo?: string;
     };
 }
 

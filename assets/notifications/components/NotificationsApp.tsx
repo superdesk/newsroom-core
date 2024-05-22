@@ -5,6 +5,7 @@ import {
     deleteNotification,
     deleteAllNotifications,
     loadNotifications,
+    updateUserNotificationPause,
 } from '../actions';
 
 import NotificationList from 'components/NotificationList';
@@ -26,6 +27,9 @@ class NotificationsApp extends React.Component<any, any> {
                 clearAll={this.props.clearAll}
                 loadNotifications={this.props.loadNotifications}
                 loading={this.props.loading}
+                fullUser={this.props.fullUser}
+                user={this.props.user}
+                updateUserNotificationPause={this.props.updateUserNotificationPause}
             />,
         ];
     }
@@ -33,6 +37,7 @@ class NotificationsApp extends React.Component<any, any> {
 
 NotificationsApp.propTypes = {
     user: PropTypes.string,
+    fullUser: PropTypes.object,
     items: PropTypes.object,
     notifications: PropTypes.arrayOf(PropTypes.object),
     count: PropTypes.number,
@@ -44,6 +49,7 @@ NotificationsApp.propTypes = {
 
 const mapStateToProps = (state: any) => ({
     user: state.user,
+    fullUser: state.fullUser,
     items: state.items,
     notifications: state.notifications,
     count: state.notificationCount,
@@ -54,6 +60,9 @@ const mapDispatchToProps = (dispatch: any) => ({
     clearNotification: (id: any) => dispatch(deleteNotification(id)),
     clearAll: () => dispatch(deleteAllNotifications()),
     loadNotifications: () => dispatch(loadNotifications()),
+    updateUserNotificationPause: () => (
+        dispatch(updateUserNotificationPause())
+    ),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(NotificationsApp);
