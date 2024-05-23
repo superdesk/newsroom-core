@@ -22,6 +22,8 @@ interface IState {
 
 const disabledOptionDateFrom = new Date().toISOString().split('T')[0];
 
+const ONE_DAY = 1; // representing one day, can be used for adding or subtracting a day depending on the context of the function
+
 class PauseNotificationModalComponent extends React.Component<IProps, IState> {
     formRef: React.RefObject<HTMLFormElement>;
     constructor(props: IProps) {
@@ -72,7 +74,7 @@ class PauseNotificationModalComponent extends React.Component<IProps, IState> {
     disabledMinOption(state: string | undefined) {
         if (state != '' && state != undefined) {
             const newMaxDate = new Date(state);
-            newMaxDate.setDate(newMaxDate.getDate() + 1);
+            newMaxDate.setDate(newMaxDate.getDate() + ONE_DAY);
             return newMaxDate.toISOString().split('T')[0];
         } else {
             return disabledOptionDateFrom;
@@ -82,7 +84,7 @@ class PauseNotificationModalComponent extends React.Component<IProps, IState> {
     disabledMaxOption(state: string | undefined) {
         if (state != '' && state != undefined) {
             const newMaxDate = new Date(state);
-            newMaxDate.setDate(newMaxDate.getDate() - 1);
+            newMaxDate.setDate(newMaxDate.getDate() - ONE_DAY);
             return newMaxDate.toISOString().split('T')[0];
         }
     }
@@ -111,7 +113,9 @@ class PauseNotificationModalComponent extends React.Component<IProps, IState> {
                                     type="date"
                                     name="date-from"
                                     className="form-control"
-                                    onChange={(event) => this.updateDate(event, 'pauseFrom')}
+                                    onChange={(event) => {
+                                        this.updateDate(event, 'pauseFrom');
+                                    }}
                                     value={this.state.pauseFrom}
                                     min={disabledOptionDateFrom}
                                     max={this.disabledMaxOption(this.state.pauseTo)}
@@ -125,7 +129,9 @@ class PauseNotificationModalComponent extends React.Component<IProps, IState> {
                                     type="date"
                                     name="date-to"
                                     className="form-control"
-                                    onChange={(event) => this.updateDate(event, 'pauseTo')}
+                                    onChange={(event) => {
+                                        this.updateDate(event, 'pauseTo');
+                                    }}
                                     value={this.state.pauseTo}
                                     min={this.disabledMinOption(this.state.pauseFrom)}
                                 />

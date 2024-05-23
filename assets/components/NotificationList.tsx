@@ -173,8 +173,9 @@ class NotificationList extends React.Component<any, IState> {
                         {'navbar-notifications__inner-circle--disconnected': !this.state.connected}
                     )}
                     ref={(elem: any) => this.elem = elem}
-                    title={gettext('Notifications')}>
-                    <h3 className="a11y-only">Notification bell</h3>
+                    title={gettext('Notifications')}
+                >
+                    <h3 className="a11y-only">{gettext('Notification bell')}</h3>
                     <i className='icon--alert' onClick={this.toggleDisplay} />
                 </span>
 
