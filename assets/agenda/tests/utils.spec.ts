@@ -4,6 +4,10 @@ import moment from 'moment';
 import {IAgendaItem} from 'interfaces';
 import * as utils from '../utils';
 
+const getGroupedItems = (items: IAgendaItem[], minDate: moment.Moment, maxDate?: moment.Moment) => keyBy(
+    utils.groupItems(items, minDate, maxDate, 'day', false),
+    'date'
+);
 
 describe('utils', () => {
     describe('groupItems', () => {
@@ -394,29 +398,75 @@ describe('utils', () => {
             event: {_id: 'event3'},
         }];
 
-        const getGroupedItems = (minDate: moment.Moment, maxDate?: moment.Moment) => keyBy(
-            utils.groupItems(items, minDate, maxDate, 'day', false),
-            'date'
-        );
-        let groupedItems = getGroupedItems(moment('2018-10-14'), moment('2018-10-18'));
+        let groupedItems = getGroupedItems(items, moment('2018-10-14'), moment('2018-10-18'));
 
         expect(groupedItems['15-10-2018'].items).toEqual(['event1']);
         expect(groupedItems['16-10-2018'].items).toEqual(['event2']);
         expect(groupedItems['17-10-2018'].items).toEqual(['event3']);
 
-        groupedItems = getGroupedItems(moment('2018-10-14'), moment('2018-10-15'));
+        groupedItems = getGroupedItems(items, moment('2018-10-14'), moment('2018-10-15'));
         expect(groupedItems['15-10-2018'].items).toEqual(['event1']);
         expect(groupedItems['16-10-2018']).toBeUndefined();
         expect(groupedItems['17-10-2018']).toBeUndefined();
 
-        groupedItems = getGroupedItems(moment('2018-10-16'), moment('2018-10-18'));
+        groupedItems = getGroupedItems(items, moment('2018-10-16'), moment('2018-10-18'));
         expect(groupedItems['15-10-2018']).toBeUndefined();
         expect(groupedItems['16-10-2018'].items).toEqual(['event2']);
         expect(groupedItems['17-10-2018'].items).toEqual(['event3']);
 
-        groupedItems = getGroupedItems(moment('2018-10-16'));
+        groupedItems = getGroupedItems(items, moment('2018-10-16'));
         expect(groupedItems['15-10-2018']).toBeUndefined();
         expect(groupedItems['16-10-2018'].items).toEqual(['event2']);
         expect(groupedItems['17-10-2018'].items).toEqual(['event3']);
+    });
+
+    it('groupItems handles no_end_time events', () => {
+        const items: Array<IAgendaItem> = [
+            {
+                _id: 'event1',
+                guid: 'event1',
+                type: 'agenda',
+                item_type: 'event',
+                state: 'scheduled',
+                _created: '2023-11-16T04:00:00+0000',
+                _updated: '2023-11-16T04:00:00+0000',
+                versioncreated: '2023-11-16T04:00:00+0000',
+                _etag: 'etag123',
+                event: {_id: 'event1'},
+                dates: {
+                    'start': '2024-05-22T23:07:00+0000',
+                    'end': '2024-05-22T23:07:00+0000',
+                    'no_end_time': true,
+                    'tz': 'US/Eastern',
+                    'all_day': false
+                }
+            },
+            {
+                _id: 'event2',
+                guid: 'event2',
+                type: 'agenda',
+                item_type: 'event',
+                state: 'scheduled',
+                _created: '2023-11-16T04:00:00+0000',
+                _updated: '2023-11-16T04:00:00+0000',
+                versioncreated: '2023-11-16T04:00:00+0000',
+                _etag: 'etag123',
+                event: {_id: 'event2'},
+                dates: {
+                    'start': '2024-05-24T01:00:00+0000',
+                    'end': '2024-05-24T01:00:00+0000',
+                    'no_end_time': true,
+                    'tz': 'Europe/Prague',
+                    'all_day': false
+                }
+            }
+        ];
+        
+        const groupedItems = getGroupedItems(items, moment('2024-05-21'), moment('2024-05-25'));
+
+        expect(Object.keys(groupedItems)).toEqual(['23-05-2024', '24-05-2024']);
+
+        expect(groupedItems['23-05-2024'].items).toEqual(['event1']);
+        expect(groupedItems['24-05-2024'].items).toEqual(['event2']);
     });
 });
