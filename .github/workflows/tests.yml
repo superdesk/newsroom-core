@@ -3,6 +3,9 @@ name: "CI"
 on:
   [push, pull_request]
 
+env:
+  TZ: "Europe/Prague"
+
 jobs:
 
   server:
