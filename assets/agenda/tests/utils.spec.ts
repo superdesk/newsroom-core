@@ -9,6 +9,20 @@ const getGroupedItems = (items: IAgendaItem[], minDate: moment.Moment, maxDate?:
     'date'
 );
 
+const createEvent = (id: string, dates: IAgendaItem['dates']): IAgendaItem => ({
+    _id: id,
+    guid: id,
+    type: 'agenda',
+    item_type: 'event',
+    state: 'scheduled',
+    _created: '2023-11-16T04:00:00+0000',
+    _updated: '2023-11-16T04:00:00+0000',
+    versioncreated: '2023-11-16T04:00:00+0000',
+    _etag: 'etag',
+    event: {_id: id},
+    dates,
+});
+
 describe('utils', () => {
     describe('groupItems', () => {
         it('returns grouped items per day', () => {
@@ -360,43 +374,17 @@ describe('utils', () => {
     });
 
     it('groupItems restricting groups to min and max dates', () => {
-        const items: Array<IAgendaItem> = [{
-            _id: 'event1',
-            guid: 'event1',
-            type: 'agenda',
-            item_type: 'event',
-            state: 'scheduled',
-            _created: '2023-11-16T04:00:00+0000',
-            _updated: '2023-11-16T04:00:00+0000',
-            versioncreated: '2023-11-16T04:00:00+0000',
-            _etag: 'etag123',
-            dates: {start: '2018-10-15T04:00:00+0000', end: '2018-10-15T05:00:00+0000', tz: 'Australia/Sydney'},
-            event: {_id: 'event1'},
-        }, {
-            _id: 'event2',
-            guid: 'event2',
-            type: 'agenda',
-            item_type: 'event',
-            state: 'scheduled',
-            _created: '2023-11-16T04:00:00+0000',
-            _updated: '2023-11-16T04:00:00+0000',
-            versioncreated: '2023-11-16T04:00:00+0000',
-            _etag: 'etag123',
-            dates: {start: '2018-10-16T04:00:00+0000', end: '2018-10-16T05:00:00+0000', tz: 'Australia/Sydney'},
-            event: {_id: 'event2'},
-        }, {
-            _id: 'event3',
-            guid: 'event3',
-            type: 'agenda',
-            item_type: 'event',
-            state: 'scheduled',
-            _created: '2023-11-16T04:00:00+0000',
-            _updated: '2023-11-16T04:00:00+0000',
-            versioncreated: '2023-11-16T04:00:00+0000',
-            _etag: 'etag123',
-            dates: {start: '2018-10-17T04:00:00+0000', end: '2018-10-17T05:00:00+0000', tz: 'Australia/Sydney'},
-            event: {_id: 'event3'},
-        }];
+        const items: Array<IAgendaItem> = [
+            createEvent('event1', {
+                start: '2018-10-15T04:00:00+0000', end: '2018-10-15T05:00:00+0000', tz: 'Australia/Sydney',
+            }),
+            createEvent('event2', {
+                start: '2018-10-16T04:00:00+0000', end: '2018-10-16T05:00:00+0000', tz: 'Australia/Sydney',
+            }),
+            createEvent('event3', {
+                start: '2018-10-17T04:00:00+0000', end: '2018-10-17T05:00:00+0000', tz: 'Australia/Sydney',
+            }),
+        ];
 
         let groupedItems = getGroupedItems(items, moment('2018-10-14'), moment('2018-10-18'));
 
@@ -422,44 +410,34 @@ describe('utils', () => {
 
     it('groupItems handles no_end_time events', () => {
         const items: Array<IAgendaItem> = [
-            {
-                _id: 'event1',
-                guid: 'event1',
-                type: 'agenda',
-                item_type: 'event',
-                state: 'scheduled',
-                _created: '2023-11-16T04:00:00+0000',
-                _updated: '2023-11-16T04:00:00+0000',
-                versioncreated: '2023-11-16T04:00:00+0000',
-                _etag: 'etag123',
-                event: {_id: 'event1'},
-                dates: {
-                    'start': '2024-05-22T23:07:00+0000',
-                    'end': '2024-05-22T23:07:00+0000',
-                    'no_end_time': true,
-                    'tz': 'US/Eastern',
-                    'all_day': false
-                }
-            },
-            {
-                _id: 'event2',
-                guid: 'event2',
-                type: 'agenda',
-                item_type: 'event',
-                state: 'scheduled',
-                _created: '2023-11-16T04:00:00+0000',
-                _updated: '2023-11-16T04:00:00+0000',
-                versioncreated: '2023-11-16T04:00:00+0000',
-                _etag: 'etag123',
-                event: {_id: 'event2'},
-                dates: {
-                    'start': '2024-05-24T01:00:00+0000',
-                    'end': '2024-05-24T01:00:00+0000',
-                    'no_end_time': true,
-                    'tz': 'Europe/Prague',
-                    'all_day': false
-                }
-            }
+            createEvent('event1', {
+                'start': '2024-05-22T23:07:00+0000',
+                'end': '2024-05-22T23:07:00+0000',
+                'no_end_time': true,
+                'tz': 'US/Eastern',
+                'all_day': false
+            }),
+            createEvent('event2', {
+                'start': '2024-05-24T01:00:00+0000',
+                'end': '2024-05-24T01:00:00+0000',
+                'no_end_time': true,
+                'tz': 'Europe/Prague',
+                'all_day': false
+            }),
+            createEvent('event3', {
+                'start': '2024-05-24T00:00:00+0000',
+                'end': '2024-05-24T00:00:00+0000',
+                'no_end_time': true,
+                'tz': 'Europe/Prague',
+                'all_day': false
+            }),
+            createEvent('event4', {
+                'start': '2024-05-23T23:25:00+0000',
+                'end': '2024-05-24T00:00:00+0000',
+                'no_end_time': true,
+                'tz': 'Europe/Prague',
+                'all_day': false
+            }),
         ];
         
         const groupedItems = getGroupedItems(items, moment('2024-05-21'), moment('2024-05-25'));
@@ -467,6 +445,15 @@ describe('utils', () => {
         expect(Object.keys(groupedItems)).toEqual(['23-05-2024', '24-05-2024']);
 
         expect(groupedItems['23-05-2024'].items).toEqual(['event1']);
-        expect(groupedItems['24-05-2024'].items).toEqual(['event2']);
+        expect(groupedItems['24-05-2024'].items).toEqual(['event2', 'event3', 'event4']);
+    });
+
+    describe('timezone', () => {
+        it('should be CET/CEST', () => {
+            const offset = new Date().getTimezoneOffset();
+
+            expect(offset).toBeLessThanOrEqual(-60);
+            expect(offset).toBeGreaterThanOrEqual(-120);
+        });
     });
 });
