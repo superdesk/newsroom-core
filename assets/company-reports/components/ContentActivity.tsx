@@ -1,14 +1,12 @@
 import React, {Fragment} from 'react';
-import moment from 'moment';
 import {connect} from 'react-redux';
-import {keyBy, cloneDeep} from 'lodash';
+import {keyBy} from 'lodash';
 
 import {gettext, formatTime} from '../../utils';
-import {fetchReport, REPORTS, runReport, toggleFilter, fetchAggregations} from '../actions';
+import {fetchReport, REPORTS} from '../actions';
 
-import CalendarButton from '../../components/CalendarButton';
-import MultiSelectDropdown from '../../components/MultiSelectDropdown';
 import ReportsTable from './ReportsTable';
+import {ContentActivityFilters} from './ContentActivityFilters';
 
 
 interface IReportAction {
@@ -45,94 +43,23 @@ interface IProps {
     isLoading: boolean;
     apiEnabled: boolean;
 
-    runReport: typeof runReport;
-    toggleFilter: typeof toggleFilter;
     fetchReport: typeof fetchReport;
-    fetchAggregations: typeof fetchAggregations;
 
-    sections: Array<any>;
     reportParams: Dictionary<any>;
-    aggregations: Dictionary<any>;
 }
 
 class ContentActivity extends React.Component<IProps, any> {
-    static propTypes: any;
     constructor(props: any) {
         super(props);
 
-        this.onDateChange = this.onDateChange.bind(this);
-        this.exportToCSV = this.exportToCSV.bind(this);
-        this.onChangeSection = this.onChangeSection.bind(this);
-
         this.state = {
-            filters: ['section', 'genre', 'company', 'action'],
-            results: [],
-            section: {
-                field: 'section',
-                label: gettext('Section'),
-                options: this.props.sections
-                    .filter((section: any) => section.group === 'wire' || (section.group === 'api' && this.props.apiEnabled)
-                    || section.group === 'monitoring')
-                    .map((section: any) => ({
-                        label: section.name,
-                        value: section.name,
-                    })),
-                onChange: this.onChangeSection,
-                showAllButton: false,
-                multi: false,
-                default: this.props.sections[0].name,
-            },
-            genre: {
-                field: 'genre',
-                label: gettext('Genres'),
-                options: [],
-                onChange: this.props.toggleFilter,
-                showAllButton: true,
-                multi: true,
-                default: [],
-            },
-            company: {
-                field: 'company',
-                label: gettext('Companies'),
-                options: [],
-                onChange: this.props.toggleFilter,
-                showAllButton: true,
-                multi: false,
-                default: null,
-            },
-            action: {
-                field: 'action',
-                label: gettext('Actions'),
-                options: [
-                    {label: gettext('Download'), value: 'download'},
-                    {label: gettext('Copy'), value: 'copy'},
-                    {label: gettext('Share'), value: 'share'},
-                    {label: gettext('Print'), value: 'print'},
-                    {label: gettext('Open'), value: 'open'},
-                    {label: gettext('Preview'), value: 'preview'},
-                    {label: gettext('Clipboard'), value: 'clipboard'},
-                    {label: gettext('API retrieval'), value: 'api'},
-                ],
-                onChange: this.props.toggleFilter,
-                showAllButton: true,
-                multi: true,
-                default: [],
-            }
+            results: []
         };
-    }
-
-    UNSAFE_componentWillMount() {
-        // Fetch the genre & company aggregations to populate those dropdowns
-        this.props.fetchAggregations(REPORTS['content-activity']);
     }
 
     UNSAFE_componentWillReceiveProps(nextProps: any) {
         if (this.props.results !== nextProps.results) {
             this.updateResults(nextProps);
-        }
-
-        if (this.props.aggregations !== nextProps.aggregations) {
-            this.updateAggregations(nextProps);
         }
     }
 
@@ -167,29 +94,6 @@ class ContentActivity extends React.Component<IProps, any> {
         actions.includes('api') && headers.push(gettext('API retrieval'));
 
         return headers;
-    }
-
-    updateAggregations(props: any) {
-        const genre = cloneDeep(this.state.genre);
-        const company = cloneDeep(this.state.company);
-
-        genre.options = props.aggregations.genres
-            .sort()
-            .map((genre: any) => ({
-                label: genre,
-                value: genre,
-            }));
-        company.options = props.companies
-            .filter((company: any) => props.aggregations.companies.includes(company._id))
-            .map((company: any) => ({
-                label: company.name,
-                value: company.name,
-            }));
-
-        this.setState({
-            genre,
-            company,
-        });
     }
 
     updateResults(props: any) {
@@ -233,23 +137,13 @@ class ContentActivity extends React.Component<IProps, any> {
         this.setState({results});
     }
 
-    onDateChange(value: any) {
-        this.props.toggleFilter('date_from', value);
-        this.props.fetchAggregations(REPORTS['content-activity']);
-    }
-
-    onChangeSection(field: any, value: any) {
-        this.props.toggleFilter('section', value);
-        this.props.fetchAggregations(REPORTS['content-activity']);
-    }
-
-    exportToCSV() {
+    exportToCSV = () => {
         this.props.fetchReport(
             REPORTS['content-activity'],
             false,
             true
         );
-    }
+    };
 
     renderList() {
         const {results} = this.state;
@@ -303,38 +197,21 @@ class ContentActivity extends React.Component<IProps, any> {
     }
 
     render() {
-        const {print, reportParams} = this.props;
-        const {filters} = this.state;
+        const {print} = this.props;
 
         return (
             <Fragment>
                 <div className="align-items-center d-flex flex-sm-nowrap flex-wrap m-0 px-3 wire-column__main-header-agenda">
-                    <div className='ms-3' style={{marginRight: '-1rem'}}>
-                        <CalendarButton
-                            key='content_activity_date'
-                            selectDate={this.onDateChange}
-                            activeDate={reportParams?.date_from || moment()}
-                        />
-                    </div>
-
-                    {filters.map((filterName: any) => {
-                        const filter = this.state[filterName];
-
-                        return (
-                            <MultiSelectDropdown
-                                key={filterName}
-                                {...filter}
-                                values={reportParams[filter.field] || filter.default}
-                            />
-                        );
-                    })}
+                    <ContentActivityFilters />
 
                     <button
                         key='content_activity_export'
                         className="nh-button nh-button--secondary ms-auto me-3"
                         type="button"
                         onClick={this.exportToCSV}
-                    >{gettext('Export to CSV')}</button>
+                    >
+                        {gettext('Export to CSV')}
+                    </button>
                 </div>
                 <ReportsTable
                     key='report_table'
@@ -351,16 +228,11 @@ class ContentActivity extends React.Component<IProps, any> {
 const mapStateToProps = (state: any) => ({
     companies: state.companies,
     reportParams: state.reportParams,
-    isLoading: state.isLoading,
-    sections: state.sections,
-    aggregations: state.reportAggregations,
+    isLoading: state.isLoading
 });
 
 const mapDispatchToProps: any = {
-    toggleFilter,
-    fetchReport,
-    runReport,
-    fetchAggregations,
+    fetchReport
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ContentActivity);
