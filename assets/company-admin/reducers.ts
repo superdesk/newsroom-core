@@ -4,24 +4,18 @@ import {INIT_VIEW_DATA, SET_PRODUCT_FILTER, SET_SECTION} from './actions';
 import {RENDER_MODAL, CLOSE_MODAL, MODAL_FORM_VALID, MODAL_FORM_INVALID} from 'actions';
 import {modalReducer} from 'reducers';
 import {searchReducer} from 'search/reducers';
-import userReducer from 'users/reducers';
+import userReducer, {IUserSettingsState} from 'users/reducers';
 
-export interface ICompanyAdminStore {
+export interface ICompanyAdminStore extends IUserSettingsState {
     sectionId: string;
     usersById: any;
-    user: IUser;
-    userToEdit: IUser;
-    errors: any;
     products: Array<any>;
-    modal: {
+    modal?: {
         modal: string;
         data: any;
     };
-    sort: string;
-    sortDirection: number;
-    productId: string;
+    productId?: string;
     companies: Array<any>;
-    totalUsers: number;
     countries: Array<ICountry>;
 }
 
@@ -32,7 +26,6 @@ const initialState = {
     usersById: {},
     activeUserId: null,
     isLoading: false,
-    totalUsers: null,
     activeQuery: null,
     companies: [],
     company: null,
@@ -41,7 +34,6 @@ const initialState = {
     modal: modalReducer(),
     search: searchReducer(undefined, undefined, 'settings'),
 
-    userToEdit: null,
     errors: null,
 
     sectionId: 'my_company',
@@ -59,6 +51,7 @@ export function companyAdminReducer(state: any = initialState, action: any): ICo
             products: action.data.products,
             company: action.data.companyId,
             countries: action.data.countries,
+            sectionId: initialState.sectionId,
         };
     case SET_PRODUCT_FILTER:
         return {
@@ -78,6 +71,6 @@ export function companyAdminReducer(state: any = initialState, action: any): ICo
         return {...state, modal: modalReducer(state.modal, action)};
 
     default:
-        return userReducer(state, action);
+        return {...userReducer(state, action), sectionId: state.sectionId};
     }
 }

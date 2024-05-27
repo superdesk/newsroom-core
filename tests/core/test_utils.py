@@ -1,4 +1,4 @@
-from newsroom.utils import short_highlighted_text
+from newsroom.utils import short_highlighted_text, get_groups
 
 
 def test_short_highlighted_text():
@@ -80,3 +80,36 @@ jokainen parisuhde muuttuu <span class="es-highlight">mukaanalkuhuuma</span> <sp
         == """On olemassa myös sellaisia ihmisiä, joiden silmissä
 jokainen parisuhde muuttuu <span class="es-highlight">mukaanalkuhuuma</span>  <span class="es-highlight">kestää</span> yleensä 1–2 vuotta..."""
     )
+
+
+def test_filter_groups():
+    agenda_groups = [
+        {
+            "field": "event_type",
+            "nested": {
+                "parent": "subject",
+                "field": "scheme",
+                "value": "event_type",
+            },
+            "permissions": [],
+        },
+        {
+            "field": "stturgency",
+            "nested": {
+                "parent": "subject",
+                "field": "scheme",
+                "value": "stturgency",
+                "include_planning": True,
+            },
+            "permissions": ["coverage_info"],
+        },
+    ]
+
+    company = {"_id": "1234", "name": "test company", "restrict_coverage_info": True}
+
+    assert len(agenda_groups) == 2
+
+    assert len(get_groups(agenda_groups, company)) == 1
+
+    company["restrict_coverage_info"] = False
+    assert len(get_groups(agenda_groups, company)) == 2

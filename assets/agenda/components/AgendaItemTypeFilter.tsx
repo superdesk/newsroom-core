@@ -1,9 +1,17 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {gettext} from 'utils';
 import {AgendaDropdown} from './AgendaDropdown';
+import {ItemTypeFilterConfig} from 'interfaces/configs';
 
-function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter, eventsOnlyAccess, restrictCoverageInfo}: any) {
+interface IProps {
+    toggleFilter: (filedName: string, value: string | null) => void;
+    itemTypeFilter?: 'events' | 'planning' | 'combined';
+    eventsOnlyAccess: boolean;
+    restrictCoverageInfo: boolean;
+    config?: ItemTypeFilterConfig;
+}
+
+function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter, eventsOnlyAccess, restrictCoverageInfo, config}: IProps) {
     if (eventsOnlyAccess) {
         return null;
     }
@@ -16,7 +24,7 @@ function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter, eventsOnlyAccess, 
         ]
     };
 
-    const filter: any = {
+    const filter = {
         label: gettext('Events & Coverages'),
         field: 'itemType',
     };
@@ -32,14 +40,16 @@ function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter, eventsOnlyAccess, 
             //dropdownMenuHeader={gettext('Item Types')}
             hideLabelOnMobile
         >
-            <button
-                key="events_only"
-                className="dropdown-item"
-                onClick={() => toggleFilter(filter.field, 'events')}
-            >
-                {gettext('Events Only')}
-            </button>
-            {restrictCoverageInfo ? null : (
+            {config?.events_only === false ? null : (
+                <button
+                    key="events_only"
+                    className="dropdown-item"
+                    onClick={() => toggleFilter(filter.field, 'events')}
+                >
+                    {gettext('Events Only')}
+                </button>
+            )}
+            {restrictCoverageInfo || config?.planning_only === false ? null : (
                 <button
                     key="planning_only"
                     className="dropdown-item"
@@ -51,13 +61,5 @@ function AgendaItemTypeFilter ({toggleFilter, itemTypeFilter, eventsOnlyAccess, 
         </AgendaDropdown>
     );
 }
-
-AgendaItemTypeFilter.propTypes = {
-    toggleFilter: PropTypes.func,
-    itemTypeFilter: PropTypes.string,
-    eventsOnlyAccess: PropTypes.bool,
-    restrictCoverageInfo: PropTypes.bool,
-};
-
 
 export default AgendaItemTypeFilter;

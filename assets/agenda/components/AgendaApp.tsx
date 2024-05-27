@@ -234,13 +234,11 @@ class AgendaApp extends SearchBase<any> {
                             <div className='wire-column__main-header-container'>
                                 {!this.props.bookmarks && (
                                     <AgendaFilters
-                                        aggregations={this.props.aggregations}
                                         toggleFilter={this.props.toggleDropdownFilter}
                                         activeFilter={this.props.activeFilter}
                                         eventsOnlyAccess={this.props.eventsOnlyAccess}
                                         restrictCoverageInfo={this.props.restrictCoverageInfo}
                                         itemTypeFilter={this.props.itemTypeFilter}
-                                        locators={this.props.locators}
                                     />
                                 )}
                                 {
@@ -350,7 +348,6 @@ AgendaApp.propTypes = {
     closePreview: PropTypes.func,
     navigations: PropTypes.array.isRequired,
     activeNavigation: PropTypes.arrayOf(PropTypes.string),
-    aggregations: PropTypes.object,
     toggleDropdownFilter: PropTypes.func,
     selectDate: PropTypes.func,
     activeDate: PropTypes.number,
@@ -365,7 +362,6 @@ AgendaApp.propTypes = {
     eventsOnlyAccess: PropTypes.bool,
     restrictCoverageInfo: PropTypes.bool,
     itemTypeFilter: PropTypes.string,
-    locators: PropTypes.array,
     searchParams: PropTypes.object,
     showSaveTopic: PropTypes.bool,
     previewConfig: PropTypes.object,
@@ -395,7 +391,6 @@ const mapStateToProps = (state: any) => ({
     activeTopic: activeTopicSelector(state),
     activeNavigation: searchNavigationSelector(state),
     bookmarks: state.bookmarks,
-    aggregations: state.aggregations,
     activeDate: get(state, 'agenda.activeDate'),
     activeGrouping: get(state, 'agenda.activeGrouping'),
     eventsOnlyAccess: get(state, 'agenda.eventsOnlyAccess', false),
@@ -406,7 +401,6 @@ const mapStateToProps = (state: any) => ({
     userSections: state.userSections,
     featuredOnly: get(state, 'agenda.featuredOnly'),
     context: state.context,
-    locators: get(state, 'locators.items', []),
     setQuery: PropTypes.func.isRequired,
     searchParams: searchParamsSelector(state),
     showSaveTopic: showSaveTopicSelector(state),

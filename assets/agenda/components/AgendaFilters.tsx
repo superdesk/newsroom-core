@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {get} from 'lodash';
 
@@ -12,6 +11,8 @@ import AgendaCoverageExistsFilter from './AgendaCoverageExistsFilter';
 import AgendaItemTypeFilter from './AgendaItemTypeFilter';
 import {AgendaCalendarAgendaFilter} from './AgendaCalendarAgendaFilter';
 import {LocationFilter} from './LocationFilter';
+import {IAgendaState} from 'interfaces/agenda';
+import {ISearchState} from 'interfaces/search';
 
 export const transformFilterBuckets = (filter: any, aggregations: any, props: any) => {
     if (!filter.transformBuckets) {
@@ -21,17 +22,18 @@ export const transformFilterBuckets = (filter: any, aggregations: any, props: an
     return filter.transformBuckets(filter, aggregations, props);
 };
 
-const renderFilter: any = {
-    item_type: (props: any) => (
+const renderFilter = {
+    item_type: (props: IProps) => (
         <AgendaItemTypeFilter
             key="item_type"
             itemTypeFilter={props.itemTypeFilter}
             toggleFilter={props.toggleFilter}
             eventsOnlyAccess={props.eventsOnlyAccess}
             restrictCoverageInfo={props.restrictCoverageInfo}
+            config={props.itemTypeFilterConfig}
         />
     ),
-    calendar: (props: any) => (
+    calendar: (props: IProps) => (
         <AgendaCalendarAgendaFilter
             key="calendar"
             aggregations={props.aggregations}
@@ -40,7 +42,7 @@ const renderFilter: any = {
             itemTypeFilter={props.itemTypeFilter}
         />
     ),
-    location: (props: any) => (
+    location: (props: IProps) => (
         !['events', 'combined'].includes(props.itemTypeFilter || 'combined') ? null : (
             <LocationFilter
                 key="location"
@@ -49,7 +51,7 @@ const renderFilter: any = {
             />
         )
     ),
-    region: (props: any) => (
+    region: (props: IProps) => (
         !['events', 'planning', 'combined'].includes(props.itemTypeFilter || 'combined') ? null : (
             <DropdownFilter
                 key="region"
@@ -84,7 +86,7 @@ const renderFilter: any = {
             />
         )
     ),
-    coverage_type: (props: any) => (
+    coverage_type: (props: IProps) => (
         !['planning', 'combined'].includes(props.itemTypeFilter || 'combined') ? null : (
             <DropdownFilter
                 filterName={gettext('Coverage types')}
@@ -105,7 +107,7 @@ const renderFilter: any = {
             />
         )
     ),
-    coverage_status: (props: any) => (
+    coverage_status: (props: IProps) => (
         (props.eventsOnlyAccess || props.itemTypeFilter === 'events') ? null : (
             <AgendaCoverageExistsFilter
                 key="coverage_status"
@@ -128,31 +130,34 @@ export function getDropdownItems(filter: any, aggregations: any, toggleFilter: a
     return [];
 }
 
-function AgendaFiltersComponent(props: any) {
+function AgendaFiltersComponent(props: IProps) {
     return (
         <div className='navbar navbar--flex navbar--quick-filter'>
-            {props.filtersConfig.map((filterName: any) => (
+            {props.filtersConfig.map((filterName) => (
                 renderFilter[filterName](props)
             ))}
         </div>
     );
 }
 
-AgendaFiltersComponent.propTypes = {
-    aggregations: PropTypes.object,
-    toggleFilter: PropTypes.func,
-    activeFilter: PropTypes.object,
-    eventsOnlyAccess: PropTypes.bool,
-    restrictCoverageInfo: PropTypes.bool,
-    itemTypeFilter: PropTypes.string,
-    locators: PropTypes.arrayOf(PropTypes.object),
-    filtersConfig: PropTypes.arrayOf(PropTypes.string),
-};
+interface IOwnProps {
+    toggleFilter: (fieldName: string, value?: string | null) => void;
+    activeFilter: ISearchState['activeFilter'];
+    eventsOnlyAccess: boolean;
+    restrictCoverageInfo: boolean;
+    itemTypeFilter?: 'events' | 'planning' | 'combined';
+}
 
-const mapStateToProps = (state: any) => ({
+const mapStateToProps = (state: IAgendaState) => ({
+    aggregations: state.aggregations,
     filtersConfig: agendaFiltersConfigSelector(state),
+    locators: state.locators?.items || [],
+    itemTypeFilterConfig: state.uiConfig.subnav?.item_type || {},
+    subnavConfig: state,
 });
 
-const AgendaFilters: React.ComponentType<any> = connect(mapStateToProps)(AgendaFiltersComponent);
+type StateProps = ReturnType<typeof mapStateToProps>;
 
-export default AgendaFilters;
+type IProps = StateProps & IOwnProps;
+
+export default connect<StateProps, null, IOwnProps, IAgendaState>(mapStateToProps)(AgendaFiltersComponent);

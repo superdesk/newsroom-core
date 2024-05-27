@@ -669,7 +669,7 @@ export function getStartDate(item: IAgendaItem): moment.Moment {
 
 // get end date in utc mode if there is no end time info
 export function getEndDate(item: IAgendaItem): moment.Moment {
-    return item.dates.no_end_time === true || item.dates.all_day === true ?
+    return item.dates.all_day === true ?
         moment.utc(item.dates.end || item.dates.start) :
         moment(item.dates.end || item.dates.start);
 }
@@ -682,17 +682,12 @@ const isBetweenDay = (day: moment.Moment, start: moment.Moment, end: moment.Mome
 
     if (allDay) {
         // we ignore times and only check dates
-        testDay = moment(day.format('YYYY-MM-DD'));
         startDate = moment(start.format('YYYY-MM-DD'));
         endDate = moment(end.format('YYYY-MM-DD'));
-    } else if (noEndTime) {
-        // we ignore time for end date
-        testDay = moment(day.format('YYYY-MM-DD'));
-        endDate = moment(end.format('YYYY-MM-DD'));
-        return day.isSameOrAfter(start) && testDay.isSameOrBefore(endDate);
+        testDay =  moment(day.format('YYYY-MM-DD'));
     }
 
-    return testDay.isBetween(startDate, endDate, 'day', '[]');
+    return testDay.isSameOrAfter(startDate, 'day') && testDay.isSameOrBefore(endDate, 'day');
 };
 
 /**
@@ -1093,7 +1088,7 @@ export function formatAgendaDate(item: IAgendaItem, {localTimeZone = true, onlyD
 
     const isTBCItem = isItemTBC(item);
     const start = parseDate(item.dates.start, item.dates.all_day);
-    const end = parseDate(item.dates.end, item.dates.all_day || item.dates.no_end_time);
+    const end = parseDate(item.dates.end, item.dates.all_day);
 
     const scheduleType = getScheduleType(item);
     const startDate = formatDate(start);

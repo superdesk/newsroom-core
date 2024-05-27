@@ -79,11 +79,19 @@ export interface IAgendaPreviewConfig extends IPreviewConfig {
     coverage_metadata_fields?: Array<string>;
 }
 
+export type AgendaFilterTypes = 'item_type' | 'calendar' | 'location' | 'region' | 'coverage_type' | 'coverage_status';
+
+export interface ItemTypeFilterConfig {
+    events_only?: boolean;
+    planning_only?: boolean;
+}
+
 export interface IAgendaUIConfig extends IBaseUIConfig {
     _id: 'agenda';
     open_coverage_content_in_same_page?: boolean;
     subnav?: {
-        filters?: Array<string>;
+        filters?: Array<AgendaFilterTypes>;
+        item_type?: ItemTypeFilterConfig;
     };
     preview?: IAgendaPreviewConfig;
     details?: IAgendaPreviewConfig;
