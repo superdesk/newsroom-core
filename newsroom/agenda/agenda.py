@@ -686,7 +686,10 @@ class AgendaService(BaseSearchService):
     section = "agenda"
     limit_days_setting = None
     default_sort = [{"dates.start": "asc"}]
-    default_page_size = 250
+
+    @property
+    def default_page_size(self) -> int:
+        return app.config.get("AGENDA_PAGE_SIZE", 250)
 
     def get_advanced_search_fields(self, search: SearchQuery) -> List[str]:
         fields = super().get_advanced_search_fields(search)
