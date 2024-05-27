@@ -115,7 +115,7 @@ export const ContentActivityFilters = () => {
 
     return (
         <>
-            <div className='ms-3' style={{marginRight: '-1rem'}}>
+            <div>
                 <CalendarButton
                     key='content_activity_date'
                     selectDate={onDateChange}

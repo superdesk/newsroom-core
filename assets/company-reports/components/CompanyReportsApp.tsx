@@ -12,7 +12,7 @@ import {gettext} from 'utils';
 import {panels} from '../utils';
 
 const options = [
-    {value: '', text: ''},
+    {value: '', text: gettext('Select a report')},
     {value: REPORTS_NAMES.COMPANY_SAVED_SEARCHES, text: gettext('Saved searches per company')},
     {value: REPORTS_NAMES.USER_SAVED_SEARCHES, text: gettext('Saved searches per user')},
     {value: REPORTS_NAMES.COMPANY_PRODUCTS, text: gettext('Products per company')},
@@ -49,8 +49,14 @@ class CompanyReportsApp extends React.Component<any, any> {
                             id={'company-reports'}
                             name={'company-reports'}
                             value={this.props.activeReport || ''}
+
                             onChange={(event: any) => this.props.setActiveReport(event.target.value)}>
-                            {reportOptions.map((option: any) => <option key={option.value} value={option.value}>{option.text}</option>)}
+                            {reportOptions
+                                .map((option: any) =>
+                                    <option key={option.value} value={option.value}>
+                                        {option.text}
+                                    </option>
+                                )}
                         </select>
                     </div>
 
