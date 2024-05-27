@@ -1,6 +1,5 @@
 import React, {Fragment} from 'react';
 import {connect} from 'react-redux';
-import {keyBy} from 'lodash';
 
 import {gettext, formatTime} from '../../utils';
 import {fetchReport, REPORTS} from '../actions';
@@ -40,29 +39,12 @@ interface IProps {
     results: Array<IResultItem>,
     print: boolean;
     companies: Array<any>;
-    isLoading: boolean;
-    apiEnabled: boolean;
 
     fetchReport: typeof fetchReport;
-
     reportParams: Dictionary<any>;
 }
 
 class ContentActivity extends React.Component<IProps, any> {
-    constructor(props: any) {
-        super(props);
-
-        this.state = {
-            results: []
-        };
-    }
-
-    UNSAFE_componentWillReceiveProps(nextProps: any) {
-        if (this.props.results !== nextProps.results) {
-            this.updateResults(nextProps);
-        }
-    }
-
     getFilteredActions() {
         const {reportParams} = this.props;
         const defaultActions = ['download', 'copy', 'share', 'print', 'open', 'preview', 'clipboard', 'api'];
@@ -96,47 +78,6 @@ class ContentActivity extends React.Component<IProps, any> {
         return headers;
     }
 
-    updateResults(props: any) {
-        const companies = keyBy(this.props.companies, '_id');
-        const results = props.results.map(
-            (item: IResultItem) => {
-                const actions = item?.aggs?.actions || {};
-
-                return {
-                    _id: item._id,
-                    versioncreated: formatTime(item?.versioncreated || ''),
-                    headline: item?.headline || '',
-                    anpa_take_key: item?.anpa_take_key || '',
-                    source: item?.source || '',
-                    place: (item?.place || [])
-                        .map((place) => place.name)
-                        .sort(),
-                    service: (item?.service || [])
-                        .map((service) => service.name)
-                        .sort(),
-                    subject: (item?.subject || [])
-                        .map((subject) => subject.name)
-                        .sort(),
-                    total: item?.aggs?.total || 0,
-                    companies: (item?.aggs?.companies || [])
-                        .map((company) => companies[company].name)
-                        .sort(),
-                    actions: {
-                        download: actions?.download || 0,
-                        copy: actions?.copy || 0,
-                        share: actions?.share || 0,
-                        print: actions?.print || 0,
-                        open: actions?.open || 0,
-                        preview: actions?.preview || 0,
-                        clipboard: actions?.clipboard || 0,
-                        api: actions?.api || 0,
-                    }
-                };
-            }
-        );
-        this.setState({results});
-    }
-
     exportToCSV = () => {
         this.props.fetchReport(
             REPORTS['content-activity'],
@@ -145,48 +86,59 @@ class ContentActivity extends React.Component<IProps, any> {
         );
     };
 
+    renderSorted = (elems: Array<string>) => {
+        return elems
+            .sort()
+            .map((name) => (
+                <Fragment key={name}>
+                    {name}<br />
+                </Fragment>
+            ));
+    };
+
+    renderNamesSorted = (elems: Array<{name: string}>) => {
+        return this.renderSorted((elems || []).map((x) => x.name));
+    };
+
+    renderCompaniesSorted = (companiesIds: Array<number>) => {
+        const {companies} = this.props;
+        const companiesNames = companiesIds
+            .map((companyId) => companies.find(x => x._id === companyId)?.name)
+            .filter(x => x !== undefined);
+
+        return this.renderSorted(companiesNames);
+    };
+
     renderList() {
-        const {results} = this.state;
+        const {results} = this.props;
         const actions = this.getFilteredActions();
 
         if (results?.length > 0) {
-            return results.map((item: any) =>
-                <tr key={item._id}>
-                    <td>{item.versioncreated}</td>
-                    <td>{item.headline}</td>
-                    <td>{item.anpa_take_key}</td>
-                    <td>{item.place.map((place: any) => (
-                        <Fragment key={place}>
-                            {place}<br />
-                        </Fragment>
-                    ))}</td>
-                    <td>{item.service.map((service: any) => (
-                        <Fragment key={service}>
-                            {service}<br />
-                        </Fragment>
-                    ))}</td>
-                    <td>{item.subject.map((subject: any) => (
-                        <Fragment key={subject}>
-                            {subject}<br />
-                        </Fragment>
-                    ))}</td>
-                    <td>{item.source}</td>
-                    <td>{item.companies.map((company: any) => (
-                        <Fragment key={company}>
-                            {company}<br />
-                        </Fragment>
-                    ))}</td>
-                    <td>{item.total}</td>
-                    {actions.includes('download') && <td>{item.actions.download}</td>}
-                    {actions.includes('copy') && <td>{item.actions.copy}</td>}
-                    {actions.includes('share') && <td>{item.actions.share}</td>}
-                    {actions.includes('print') && <td>{item.actions.print}</td>}
-                    {actions.includes('open') && <td>{item.actions.open}</td>}
-                    {actions.includes('preview') && <td>{item.actions.preview}</td>}
-                    {actions.includes('clipboard') && <td>{item.actions.clipboard}</td>}
-                    {actions.includes('api') && <td>{item.actions.api}</td>}
-                </tr>
-            );
+            return results.map((item: any) => {
+                const itemActions = item?.aggs?.actions || {};
+
+                return (
+                    <tr key={item._id}>
+                        <td>{formatTime(item?.versioncreated || '')}</td>
+                        <td>{item.headline || ''}</td>
+                        <td>{item.anpa_take_key || ''}</td>
+                        <td>{this.renderNamesSorted(item?.place)}</td>
+                        <td>{this.renderNamesSorted(item?.service)}</td>
+                        <td>{this.renderNamesSorted(item?.subject)}</td>
+                        <td>{item.source}</td>
+                        <td>{this.renderCompaniesSorted(item?.aggs?.companies || [])}</td>
+                        <td>{item?.aggs?.total || 0}</td>
+                        {actions.includes('download') && <td>{itemActions?.download || 0}</td>}
+                        {actions.includes('copy') && <td>{itemActions?.copy || 0}</td>}
+                        {actions.includes('share') && <td>{itemActions?.share || 0}</td>}
+                        {actions.includes('print') && <td>{itemActions?.print || 0}</td>}
+                        {actions.includes('open') && <td>{itemActions?.open || 0}</td>}
+                        {actions.includes('preview') && <td>{itemActions?.preview || 0}</td>}
+                        {actions.includes('clipboard') && <td>{itemActions?.clipboard || 0}</td>}
+                        {actions.includes('api') && <td>{itemActions?.api || 0}</td>}
+                    </tr>
+                );
+            });
         }
 
         return [
@@ -227,8 +179,7 @@ class ContentActivity extends React.Component<IProps, any> {
 
 const mapStateToProps = (state: any) => ({
     companies: state.companies,
-    reportParams: state.reportParams,
-    isLoading: state.isLoading
+    reportParams: state.reportParams
 });
 
 const mapDispatchToProps: any = {
