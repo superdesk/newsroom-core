@@ -199,7 +199,11 @@ def get_agenda_dates(agenda: Dict[str, Any], date_paranthesis: bool = False) -> 
     all_day = agenda.get("dates", {}).get("all_day", False)
 
     if all_day:
-        return "{}".format(date_short(start))
+        return (
+            "{}".format(date_short(start))
+            if start.date() == end.date()
+            else "{} - {}".format(date_short(start), date_short(end))
+        )
 
     if start + timedelta(minutes=DAY_IN_MINUTES) < end:
         # Multi day event
