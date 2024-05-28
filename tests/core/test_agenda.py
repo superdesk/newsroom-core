@@ -582,19 +582,30 @@ def test_get_agenda_dates():
 
     agenda = {
         "dates": {
-            "end": datetime.strptime("2018-05-30T06:00:00+0000", "%Y-%m-%dT%H:%M:%S+0000").replace(tzinfo=pytz.UTC),
-            "start": datetime.strptime("2018-05-30+0000", "%Y-%m-%d+0000").replace(tzinfo=pytz.UTC),
+            "end": datetime.strptime("2018-05-30T00:00:00+0000", "%Y-%m-%dT%H:%M:%S+0000").replace(tzinfo=pytz.UTC),
+            "start": datetime.strptime("2018-05-30T00:00:00+0000", "%Y-%m-%dT%H:%M:%S+0000").replace(tzinfo=pytz.UTC),
+            "all_day": True,
         },
     }
     assert get_agenda_dates(agenda) == "30/05/2018"
 
     agenda = {
         "dates": {
-            "end": datetime.strptime("2018-05-30+0000", "%Y-%m-%d+0000").replace(tzinfo=pytz.UTC),
+            "end": datetime.strptime("2018-05-30T08:00:00+0000", "%Y-%m-%dT%H:%M:%S+0000").replace(tzinfo=pytz.UTC),
             "start": datetime.strptime("2018-05-30T06:00:00+0000", "%Y-%m-%dT%H:%M:%S+0000").replace(tzinfo=pytz.UTC),
+            "all_day": True,
         },
     }
     assert get_agenda_dates(agenda) == "30/05/2018"
+
+    agenda = {
+        "dates": {
+            "end": datetime.strptime("2018-05-30T00:00:00+0000", "%Y-%m-%dT%H:%M:%S+0000").replace(tzinfo=pytz.UTC),
+            "start": datetime.strptime("2018-05-27T04:00:00+0000", "%Y-%m-%dT%H:%M:%S+0000").replace(tzinfo=pytz.UTC),
+            "all_day": True,
+        },
+    }
+    assert get_agenda_dates(agenda) == "27/05/2018 - 30/05/2018"
 
 
 def test_filter_agenda_by_coverage_status(client):
