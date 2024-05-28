@@ -196,10 +196,14 @@ def date_short(datetime):
 def get_agenda_dates(agenda: Dict[str, Any], date_paranthesis: bool = False) -> str:
     start = parse_date_str(agenda.get("dates", {}).get("start"))
     end = parse_date_str(agenda.get("dates", {}).get("end"))
+    all_day = agenda.get("dates", {}).get("all_day", False)
 
-    if start.time() == datetime.min.time() or end.time() == datetime.min.time():
-        # if start time or end time is not present
-        return "{}".format(date_short(start))
+    if all_day:
+        return (
+            "{}".format(date_short(start))
+            if start.date() == end.date()
+            else "{} - {}".format(date_short(start), date_short(end))
+        )
 
     if start + timedelta(minutes=DAY_IN_MINUTES) < end:
         # Multi day event
