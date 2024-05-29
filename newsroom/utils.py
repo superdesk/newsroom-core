@@ -199,10 +199,11 @@ def get_agenda_dates(agenda: Dict[str, Any], date_paranthesis: bool = False) -> 
     all_day = agenda.get("dates", {}).get("all_day", False)
 
     if all_day:
+        format = app.config.get("ALL_DAY_DATE_FORMAT", "%d/%m/%Y")
         return (
-            "{}".format(start.strftime("%d/%m/%Y"))
+            "{}".format(start.strftime(format))
             if start.date() == end.date()
-            else "{} - {}".format(start.strftime("%d/%m/%Y"), end.strftime("%d/%m/%Y"))
+            else "{} - {}".format(start.strftime(format), end.strftime(format))
         )
 
     if start + timedelta(minutes=DAY_IN_MINUTES) < end:
