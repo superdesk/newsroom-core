@@ -18,7 +18,7 @@ from bson.errors import InvalidId
 from eve.utils import config, ParsedRequest
 from eve_elastic.elastic import parse_date, ElasticCursor
 from flask import current_app as app, json, abort, request, g, flash, session, url_for
-from flask_babel import gettext, _get_current_context
+from flask_babel import gettext
 
 from newsroom.types import PublicUserData, User, Company, Group, Permissions
 from newsroom.template_filters import (
