@@ -395,12 +395,12 @@ class UsersService(newsroom.Service):
             "is_enabled": True,
             "is_approved": True,
         }
-        if auth_provider.features.verify_email:
+        if auth_provider.features["verify_email"]:
             add_token_data(user_updates)
         self.patch(user["_id"], updates=user_updates)
 
         # Send new account / password reset email
-        if auth_provider.features.verify_email:
+        if auth_provider.features["verify_email"]:
             updated_user: User = deepcopy(user)
             updated_user.update(user_updates)
             send_token(updated_user, token_type="new_account", update_token=False)

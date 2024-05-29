@@ -337,7 +337,7 @@ def token(token_type: Literal["reset_password", "validate"]):
 
         assert user
 
-        if auth_provider.features.verify_email:
+        if auth_provider.features["verify_email"]:
             send_token(user, token_type)
 
         flask.flash(

@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import {connect} from 'react-redux';
-import {get} from 'lodash';
 
 import {ICompany, IProduct, ISection, ICountry} from 'interfaces';
 
@@ -32,6 +31,7 @@ import {getUserStateLabelDetails} from 'company-admin/components/CompanyUserList
 import {companyProductSeatsSelector, companySectionListSelector, sectionListSelector} from 'company-admin/selectors';
 import {IUser} from 'interfaces/user';
 import ActionButton from 'components/ActionButton';
+import {IUserSettingsState} from 'users/reducers';
 
 const getCompanyOptions = (companies: Array<ICompany>) => companies.map((company) => ({value: company._id, text: company.name}));
 
@@ -40,6 +40,7 @@ interface IReduxStoreProps {
     companySections: any;
     seats: any;
     countries: Array<ICountry>;
+    authProviderFeatures: IUserSettingsState['authProviderFeatures'];
 }
 
 interface IDispatchProps {
@@ -51,6 +52,7 @@ interface IUserProfileStore {
     companySections?: any;
     seats?: any;
     countries: Array<ICountry>;
+    authProviderFeatures: IUserSettingsState['authProviderFeatures'];
 }
 
 interface IOwnProps {
@@ -98,6 +100,7 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
         resendUserInvite,
         approveUser,
         countries,
+        authProviderFeatures,
     } = props;
 
     const companyId = user.company;
@@ -121,6 +124,8 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
     const userSections = Object.keys(user.sections || {}).length > 0 ?
         user.sections :
         company?.sections || {};
+    const authProvider = company?.auth_provider ?? 'newshub';
+    const userAuthProviderFeatures = authProviderFeatures[authProvider];
 
     const resendInviteButton = {
         name: gettext('Resend Invite'),
@@ -464,13 +469,15 @@ const EditUserComponent: React.ComponentType<IProps> = (props: IProps) => {
                     </div>
 
                     <div className='list-item__preview-footer'>
-                        {!user.is_validated || isCompanyAdmin ? null : (
+                        {!user.is_validated || isCompanyAdmin || userAuthProviderFeatures.verify_email === false ? null : (
                             <input
                                 type='button'
                                 className='nh-button nh-button--secondary'
                                 value={gettext('Reset Password')}
                                 id='resetPassword'
-                                onClick={onResetPassword} />
+                                onClick={onResetPassword}
+                                data-test-id='reset-password-btn'
+                            />
                         )}
                         {user._id && (currentUserIsAdmin || isCompanyAdmin) && user._id !== currentUser._id && <input
                             type='button'
@@ -495,6 +502,7 @@ const mapStateToProps = (state: IUserProfileStore): IReduxStoreProps => ({
     companySections: companySectionListSelector(state),
     seats: companyProductSeatsSelector(state),
     countries: state.countries,
+    authProviderFeatures: state.authProviderFeatures,
 });
 
 const mapDispatchToProps = ({approveUser});

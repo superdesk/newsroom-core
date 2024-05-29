@@ -1,4 +1,4 @@
-import {ICompany} from 'interfaces';
+import {ICompany, ICountry, IProduct, ISearchState, ISection, IUser} from 'interfaces';
 
 import {
     INIT_VIEW_DATA,
@@ -22,26 +22,50 @@ import {ADD_EDIT_USERS} from 'actions';
 
 import {searchReducer} from 'search/reducers';
 
-const initialState: any = {
-    user: null,
-    query: null,
+export interface IUserSettingsState {
+    user?: IUser;
+    users: IUser['_id'][];
+    usersById: {[key: IUser['_id']]: IUser};
+    totalUsers?: number;
+    sortDirection: -1 | 1;
+    activeQuery?: string;
+    activeUserId?: string;
+    editUsers?: IUser[];
+    company?: ICompany['_id'];
+    companies: ICompany[];
+    companiesById: {[key: ICompany['_id']]: ICompany};
+    query?: string;
+    userToEdit?: Partial<IUser>;
+    isLoading: boolean;
+    sort?: string;
+    search: ISearchState;
+    sections: ISection[];
+    products: IProduct[];
+    countries: ICountry[];
+    errors?: {[field: string]: string[]};
+    authProviderFeatures: {
+        [provider: string]: {
+            verify_email: boolean;
+            change_password: boolean;
+        };
+    };
+}
+
+const initialState: IUserSettingsState = {
     users: [],
     usersById: {},
-    activeUserId: null,
     isLoading: false,
-    totalUsers: null,
-    activeQuery: null,
     companies: [],
-    company: null,
-    sort: null,
     sortDirection: 1,
     search: searchReducer(undefined, undefined, 'settings'),
     sections: [],
     products: [],
     countries: [],
+    companiesById: {},
+    authProviderFeatures: {},
 };
 
-export default function userReducer(state: any = initialState, action: any) {
+export default function userReducer(state: IUserSettingsState = initialState, action: any): IUserSettingsState {
     switch (action.type) {
     case INIT_VIEW_DATA:
         return {
@@ -49,13 +73,14 @@ export default function userReducer(state: any = initialState, action: any) {
             sections: action.data.sections,
             products: action.data.products,
             countries: action.data.countries,
+            authProviderFeatures: action.data.auth_provider_features,
         };
+
     case SELECT_USER: {
         const defaultUser: any = {
             user_type: 'public',
             is_approved: true,
             is_enabled: true,
-            _id: null,
             first_name: '',
             last_name: '',
             email: '',
@@ -67,9 +92,9 @@ export default function userReducer(state: any = initialState, action: any) {
 
         return {
             ...state,
-            activeUserId: action.id || null,
-            userToEdit: action.id ? Object.assign(defaultUser, state.usersById[action.id]) : null,
-            errors: null,
+            activeUserId: action.id,
+            userToEdit: action.id ? Object.assign(defaultUser, state.usersById[action.id]) : undefined,
+            errors: undefined,
         };
     }
 
@@ -95,7 +120,7 @@ export default function userReducer(state: any = initialState, action: any) {
             }
         } else if (field.startsWith('sections.')) {
             const sectionId = field.replace('sections.', '');
-            const company = state.companies.find((company: ICompany) => company._id === user.company);
+            const company = state.companies.find((company) => company._id === user.company);
 
             user.sections = {
                 ...company?.sections || {},
@@ -121,33 +146,34 @@ export default function userReducer(state: any = initialState, action: any) {
             user[field] = value;
         }
 
-        return {...state, userToEdit: user, errors: null};
+        return {...state, userToEdit: user, errors: undefined};
     }
 
     case EDIT_USER:
         return {
             ...state,
             userToEdit: action.payload,
-            errors: null,
+            errors: undefined,
         };
 
     case NEW_USER: {
-        const newUser =  {
+        const newUser: Partial<IUser> = {
             user_type: 'public',
             is_approved: true,
             is_enabled: true,
-            _id: null,
-            name: '',
             email: '',
             phone: '',
-            company: state.company,
         };
 
-        return {...state, userToEdit: newUser, errors: null};
+        if (state.company) {
+            newUser.company = state.company;
+        }
+
+        return {...state, userToEdit: newUser, errors: undefined};
     }
 
     case CANCEL_EDIT: {
-        return {...state, userToEdit: null, errors: null};
+        return {...state, userToEdit: undefined, errors: undefined};
     }
 
     case SET_ERROR:
@@ -156,8 +182,8 @@ export default function userReducer(state: any = initialState, action: any) {
     case QUERY_USERS:
         return {...state,
             isLoading: true,
-            totalUsers: null,
-            userToEdit: null,
+            totalUsers: undefined,
+            userToEdit: undefined,
             activeQuery: state.query};
 
     case GET_USERS: {
@@ -179,7 +205,7 @@ export default function userReducer(state: any = initialState, action: any) {
     case REMOVE_USER: {
         const usersById = Object.assign({}, state.usersById);
         const userToEdit = state.userToEdit && state.userToEdit._id === action.userId ?
-            null :
+            undefined :
             state.userToEdit;
         const users = state.users.filter((userId: any) => userId !== action.userId);
 
@@ -190,7 +216,7 @@ export default function userReducer(state: any = initialState, action: any) {
             usersById,
             userToEdit,
             users,
-            errors: null,
+            errors: undefined,
         };
     }
 
