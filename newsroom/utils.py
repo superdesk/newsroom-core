@@ -200,9 +200,9 @@ def get_agenda_dates(agenda: Dict[str, Any], date_paranthesis: bool = False) -> 
 
     if all_day:
         return (
-            "{}".format(date_short(start))
+            "{}".format(start.strftime("%d/%m/%Y"))
             if start.date() == end.date()
-            else "{} - {}".format(date_short(start), date_short(end))
+            else "{} - {}".format(start.strftime("%d/%m/%Y"), end.strftime("%d/%m/%Y"))
         )
 
     if start + timedelta(minutes=DAY_IN_MINUTES) < end:
