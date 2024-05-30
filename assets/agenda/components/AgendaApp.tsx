@@ -22,6 +22,7 @@ import {
     setView,
     setQuery,
     saveMyTopic,
+    setSortQuery,
 } from 'search/actions';
 
 import {
@@ -124,25 +125,15 @@ class AgendaApp extends SearchBase<any> {
             !this.props.featuredOnly;
         let showTotalItems = false;
         let showTotalLabel = false;
-        let totalItemsLabel: any;
 
         if (get(this.props, 'activeTopic.label')) {
-            totalItemsLabel = this.props.activeTopic.label;
             showTotalItems = showTotalLabel = true;
         } else if (numNavigations === 1) {
-            totalItemsLabel = get(getItemFromArray(
-                this.props.searchParams.navigation[0],
-                this.props.navigations
-            ), 'name') || '';
             showTotalItems = showTotalLabel = true;
         } else if (numNavigations > 1) {
-            totalItemsLabel = gettext('Custom View');
             showTotalItems = showTotalLabel = true;
         } else if (this.props.showSaveTopic) {
             showTotalItems = showTotalLabel = true;
-            if (this.props.bookmarks && get(this.props, 'searchParams.query.length', 0) > 0) {
-                totalItemsLabel = this.props.searchParams.query;
-            }
         }
 
         const showFilters = Object.values(this.props.searchParams ?? {}).find((val) => val != null) != null ||
@@ -253,12 +244,14 @@ class AgendaApp extends SearchBase<any> {
                                                 this.props.toggleDropdownFilter('itemType', null);
                                             }}
                                             totalItems={this.props.totalItems}
-                                            totalItemsLabel={totalItemsLabel}
                                             saveMyTopic={saveMyTopic}
                                             activeTopic={this.props.activeTopic}
                                             topicType="agenda"
                                             refresh={this.props.fetchItems}
                                             setQuery={this.props.setQuery}
+                                            setSortQuery={this.props.setSortQuery}
+                                            showSortDropdown={true}
+                                            defaultSortValue="relevance"
                                         />
                                     )
                                 }
@@ -431,6 +424,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     requestCoverage: (item: any, message: any) => dispatch(requestCoverage(item, message)),
     toggleFeaturedFilter: (fetch: any) => dispatch(toggleFeaturedFilter(fetch)),
     setQuery: (query: any) => dispatch(setQuery(query)),
+    setSortQuery: (query: any) => dispatch(setSortQuery(query)),
 });
 
 const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(AgendaApp);
