@@ -325,6 +325,9 @@
     gap: var(--space--1);
     align-items: center;
     margin-block-end: 0;
+    .label + .label {
+        margin: 0;
+    }
 }
 .wire-articles__item-headline--indent {
     display: inline-block;

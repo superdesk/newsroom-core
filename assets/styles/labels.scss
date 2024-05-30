@@ -88,6 +88,26 @@ $flex-align: (
             }
         }
     }
+    &.label-wire--latest {
+        background-color:  var(--label-color-bg-wire-latest);
+        border-color: var(--label-color-bg-wire-latest);
+        color: white;
+    }
+    &.label-wire--alert {
+        background-color:  var(--label-color-bg-wire-alert);
+        border-color: var(--label-color-bg-wire-alert);
+        color: white;
+    }
+    &.label-wire--advisory {
+        background-color:  var(--label-color-bg-wire-advisory);
+        border-color: var(--label-color-bg-wire-advisory);
+        color: white;
+    }
+    &.label-wire--press-release {
+        background-color:  var(--label-color-bg-press-release);
+        border-color: var(--label-color-bg-wire-press-release);
+        color: white;
+    }
 }
 
 .label--rounded {
