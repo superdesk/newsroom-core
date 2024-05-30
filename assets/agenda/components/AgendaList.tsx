@@ -414,6 +414,7 @@ class AgendaList extends React.Component<IProps, IState> {
     }
 
     render() {
+        const lastGroupWithItems = this.props.groupedItems.findLastIndex((group) => group.items.length > 0);
         return (
             <div
                 className={classNames('wire-articles wire-articles--list', {
@@ -428,7 +429,7 @@ class AgendaList extends React.Component<IProps, IState> {
                 }}
                 onScroll={this.props.onScroll}
             >
-                {this.props.groupedItems.map((group) => (
+                {this.props.groupedItems.filter((group, index) => lastGroupWithItems >= index).map((group) => (
                     <React.Fragment key={group.date}>
                         <div className='wire-articles__header' key={`${group.date}header`}>
                             {this.getListGroupDate(group)}
