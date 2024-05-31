@@ -13,6 +13,9 @@ from newsroom.settings import get_setting
 from newsroom.user_roles import UserRole
 from newsroom.utils import get_local_date, get_end_date
 from newsroom.search.service import BaseSearchService, SearchQuery
+from typing import TypedDict, Literal, List
+from flask import current_app as app
+import pytz
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +26,13 @@ def get_bookmarks_count(user_id, product_type):
 
 def get_aggregations():
     return app.config.get("WIRE_AGGS", {})
+
+
+class TimeFilter(TypedDict):
+    name: str
+    default: bool
+    query: str
+    filter: Literal["today", "last_week", "last_30_days", ""]
 
 
 class WireSearchResource(newsroom.Resource):
@@ -56,18 +66,25 @@ class WireSearchResource(newsroom.Resource):
 def versioncreated_range(created):
     _range = {}
     offset = int(created.get("timezone_offset", "0"))
-    if created.get("created_from"):
+    if created.get("date_from"):
         _range["gte"] = get_local_date(
-            created["created_from"],
-            created.get("created_from_time", "00:00:00"),
+            created["date_from"],
+            created.get("date_from_time", "00:00:00"),
             offset,
         )
-    if created.get("created_to"):
+    if created.get("date_to"):
         _range["lte"] = get_end_date(
-            created["created_to"],
-            get_local_date(created["created_to"], "23:59:59", offset),
+            created["date_to"],
+            get_local_date(created["date_to"], "23:59:59", offset),
         )
     return {"range": {"versioncreated": _range}}
+
+
+def get_start_and_end_of_last_week(date=None):
+    now = date or datetime.now(pytz.utc)
+    start_of_last_week = (now - timedelta(days=now.weekday() + 7)).replace(hour=0, minute=0, second=0, microsecond=0)
+    end_of_last_week = start_of_last_week + timedelta(days=7)
+    return start_of_last_week, end_of_last_week
 
 
 def set_bookmarks_query(query, user_id):
@@ -271,6 +288,18 @@ class WireSearchService(BaseSearchService):
         except Forbidden:
             return False
 
+    def get_time_filters(self) -> List[TimeFilter]:
+        """Retrieve the time filters from app config."""
+        return app.config.get("WIRE_TIME_FILTERS", [])
+
+    def get_time_filter_query(self, filter_name: str) -> str:
+        """Get the query for the given filter name."""
+        time_filters = self.get_time_filters()
+        for time_filter in time_filters:
+            if time_filter["filter"] == filter_name:
+                return time_filter["query"]
+        return ""
+
     def apply_request_filter(self, search, highlights=True):
         """Generate the filters from request args
 
@@ -289,6 +318,34 @@ class WireSearchService(BaseSearchService):
             elif app.config.get("NEWS_ONLY_FILTERS"):
                 for f in app.config.get("NEWS_ONLY_FILTERS", []):
                     search.query["bool"]["must_not"].append(f)
+
+        date_filter = search.args.get("date_filter")
+        if date_filter:
+            if date_filter == "custom_date":
+                search.query["bool"]["must"].append(versioncreated_range(search.args))
+            elif date_filter == "last_week":
+                start_of_last_week, end_of_last_week = get_start_and_end_of_last_week()
+                search.query["bool"]["must"].append(
+                    {
+                        "range": {
+                            "versioncreated": {
+                                "gte": start_of_last_week.isoformat(),
+                                "lt": end_of_last_week.isoformat(),
+                            }
+                        }
+                    }
+                )
+            else:
+                query = self.get_time_filter_query(date_filter)
+                if query:
+                    search.query["bool"]["must"].append({"range": {"versioncreated": {"gte": query, "lt": "now+1d/d"}}})
+        else:
+            default_time_filter = next((f for f in self.get_time_filters() if f["default"]), None)
+            if default_time_filter:
+                default_query = default_time_filter["query"]
+                search.query["bool"]["must"].append(
+                    {"range": {"versioncreated": {"gte": default_query, "lt": "now+1d"}}}
+                )
 
     def get_product_item_report(self, product, section_filters=None):
         query = items_query()
