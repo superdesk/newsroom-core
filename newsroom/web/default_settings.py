@@ -805,3 +805,9 @@ AGENDA_HIDE_COVERAGE_ASSIGNEES = False
 #: .. versionadded: 2.8
 #:
 AGENDA_DEFAULT_FILTER_HIDE_PLANNING = False
+
+WIRE_TIME_FILTERS = [
+    {"name": "Today", "filter": "today", "default": False, "query": "now/d"},
+    {"name": "Last Week", "filter": "last_week", "default": False, "query": "now-1w/w"},
+    {"name": "Last 30 days", "filter": "last_30_days", "default": True, "query": "now-30d/d"},
+]
