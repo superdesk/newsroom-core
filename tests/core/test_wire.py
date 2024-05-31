@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 from urllib import parse
 from bson import ObjectId
 from copy import deepcopy
-
 from newsroom.auth.utils import start_user_session
+from newsroom.wire.search import get_start_and_end_of_last_week
 from tests.core.utils import add_company_products
 
 from ..fixtures import (  # noqa: F401
@@ -932,3 +932,105 @@ def test_navigation_for_public_users(client, app, setup_products):
     resp = client.get(f"/wire/search?navigation={NAV_1}")
     data = json.loads(resp.get_data())
     assert 1 == len(data["_items"])
+
+
+def test_date_filters(client, app):
+    # remove all other's item
+    app.data.remove("items")
+    now = datetime.utcnow()
+    app.data.insert(
+        "items",
+        [
+            {
+                "_id": "tag:today",
+                "type": "text",
+                "versioncreated": now,
+            },
+            {
+                "_id": "tag:Week",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=3),
+            },
+            {
+                "_id": "tag:Week2",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=7),
+            },
+            {
+                "_id": "tag:Week2_MOnday",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=11),
+            },
+            {
+                "_id": "tag:Week2_SUNday",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=4),
+            },
+            {
+                "_id": "tag:thisMonth",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=15),
+            },
+            {
+                "_id": "tag:thisMonth2",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=30),
+            },
+            {
+                "_id": "tag:lastMonth",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=40),
+            },
+            {
+                "_id": "tag:twoMonthsAgo",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=60),
+            },
+        ],
+    )
+
+    # Default Last 7 days
+    resp = client.get("/wire/search")
+    assert len(resp.json["_items"]) == 7
+    assert resp.json["_items"][0]["_id"] == "tag:today"
+    assert resp.json["_items"][1]["_id"] == "tag:Week"
+    assert resp.json["_items"][2]["_id"] == "tag:Week2_SUNday"
+    assert resp.json["_items"][3]["_id"] == "tag:Week2"
+    assert resp.json["_items"][4]["_id"] == "tag:Week2_MOnday"
+    assert resp.json["_items"][5]["_id"] == "tag:thisMonth"
+    assert resp.json["_items"][6]["_id"] == "tag:thisMonth2"
+
+    # Test "Today" filter
+    resp = client.get("/wire/search?date_filter=today")
+    assert len(resp.json["_items"]) == 1
+    assert resp.json["_items"][0]["_id"] == "tag:today"
+
+    # Test "Last 7 days" filter
+    resp = client.get("/wire/search?date_filter=last_week")
+    assert len(resp.json["_items"]) == 2
+
+    date = datetime(2024, 5, 31, 00, 00, 00)  # Friday
+    start, end = get_start_and_end_of_last_week(date)
+
+    assert start.strftime("%Y-%m-%d") == "2024-05-20"  # monday
+    assert end.strftime("%Y-%m-%d") == "2024-05-27"  # Sunday
+
+    # Test "Last 30 days" filter
+    resp = client.get("/wire/search?date_filter=last_30_days")
+    assert len(resp.json["_items"]) == 7
+
+    # custom filter
+    date_to = (now - timedelta(days=35)).strftime("%Y-%m-%d")
+    date_from = (now - timedelta(days=70)).strftime("%Y-%m-%d")
+    resp = client.get("/wire/search?date_filter=custom_date&date_from={}&date_to={}".format(date_from, date_to))
+    assert len(resp.json["_items"]) == 2
+    assert resp.json["_items"][0]["_id"] == "tag:lastMonth"
+    assert resp.json["_items"][1]["_id"] == "tag:twoMonthsAgo"
