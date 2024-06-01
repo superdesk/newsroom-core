@@ -65,16 +65,16 @@ class WireSearchResource(newsroom.Resource):
 def versioncreated_range(created):
     _range = {}
     offset = int(created.get("timezone_offset", "0"))
-    if created.get("date_from"):
+    if created.get("created_from"):
         _range["gte"] = get_local_date(
-            created["date_from"],
+            created["created_from"],
             created.get("date_from_time", "00:00:00"),
             offset,
         )
-    if created.get("date_to"):
+    if created.get("created_to"):
         _range["lte"] = get_end_date(
-            created["date_to"],
-            get_local_date(created["date_to"], "23:59:59", offset),
+            created["created_to"],
+            get_local_date(created["created_to"], "23:59:59", offset),
         )
     return {"range": {"versioncreated": _range}}
 
@@ -291,7 +291,7 @@ class WireSearchService(BaseSearchService):
         """Retrieve the time filters from app config."""
         return app.config.get("WIRE_TIME_FILTERS", [])
 
-    def get_time_filter_query(self, filter_name: str) -> str:
+    def get_date_filter_query(self, filter_name: str) -> str:
         """Get the query for the given filter name."""
         time_filters = self.get_time_filters()
         for time_filter in time_filters:
@@ -321,7 +321,7 @@ class WireSearchService(BaseSearchService):
         date_filter = search.args.get("date_filter")
         if date_filter:
             if date_filter == "custom_date":
-                search.query["bool"]["must"].append(versioncreated_range(search.args))
+                pass
             elif date_filter == "last_week":
                 start_of_last_week, end_of_last_week = get_start_and_end_of_last_week()
                 search.query["bool"]["must"].append(
@@ -335,7 +335,7 @@ class WireSearchService(BaseSearchService):
                     }
                 )
             else:
-                query = self.get_time_filter_query(date_filter)
+                query = self.get_date_filter_query(date_filter)
                 if query:
                     search.query["bool"]["must"].append({"range": {"versioncreated": {"gte": query, "lt": "now+1d/d"}}})
         else:

@@ -1041,9 +1041,11 @@ def test_date_filters(client, app):
     assert len(resp.json["_items"]) == 7
 
     # custom filter
-    date_to = (now - timedelta(days=35)).strftime("%Y-%m-%d")
-    date_from = (now - timedelta(days=70)).strftime("%Y-%m-%d")
-    resp = client.get("/wire/search?date_filter=custom_date&date_from={}&date_to={}".format(date_from, date_to))
+    created_to = (now - timedelta(days=35)).strftime("%Y-%m-%d")
+    created_from = (now - timedelta(days=70)).strftime("%Y-%m-%d")
+    resp = client.get(
+        "/wire/search?date_filter=custom_date&created_from={}&created_to={}".format(created_from, created_to)
+    )
     assert len(resp.json["_items"]) == 2
     assert resp.json["_items"][0]["_id"] == "tag:lastMonth"
     assert resp.json["_items"][1]["_id"] == "tag:twoMonthsAgo"
