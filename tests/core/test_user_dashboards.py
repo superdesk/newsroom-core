@@ -2,6 +2,7 @@ import bson
 import tests.utils as utils
 
 from newsroom.wire.views import get_personal_dashboards_data
+from datetime import datetime
 
 
 def test_user_dashboards(app, client, public_user, public_company, company_products):
@@ -27,10 +28,10 @@ def test_user_dashboards(app, client, public_user, public_company, company_produ
     app.data.insert(
         "items",
         [
-            {"guid": "test1", "headline": "foo"},
-            {"guid": "test2", "headline": "bar"},
-            {"guid": "test3", "headline": "baz"},
-            {"guid": "test4", "headline": "foo bar"},
+            {"guid": "test1", "headline": "foo", "versioncreated": datetime.utcnow()},
+            {"guid": "test2", "headline": "bar", "versioncreated": datetime.utcnow()},
+            {"guid": "test3", "headline": "baz", "versioncreated": datetime.utcnow()},
+            {"guid": "test4", "headline": "foo bar", "versioncreated": datetime.utcnow()},
         ],
     )
 

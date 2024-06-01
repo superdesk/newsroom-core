@@ -89,6 +89,7 @@ def test_realtime_notifications_wire(app, mocker, company_products):
                 "slugline": "That's the test slugline cheese",
                 "headline": "Demo Article",
                 "body_html": "Story that involves cheese and onions",
+                "versioncreated": datetime.utcnow(),
             },
             {
                 "_id": "item_other",
@@ -96,6 +97,7 @@ def test_realtime_notifications_wire(app, mocker, company_products):
                 "slugline": "other",
                 "headline": "other",
                 "body_html": "other",
+                "versioncreated": datetime.utcnow(),
             },
         ],
     )

@@ -259,7 +259,9 @@ def test_search_filters_items_with_updates(client, app):
 
 
 def test_search_includes_killed_items(client, app):
-    app.data.insert("items", [{"_id": "foo", "pubstatus": "canceled", "headline": "killed"}])
+    app.data.insert(
+        "items", [{"_id": "foo", "pubstatus": "canceled", "headline": "killed", "versioncreated": datetime.utcnow()}]
+    )
     resp = client.get("/wire/search?q=headline:killed")
     data = json.loads(resp.get_data())
     assert 1 == len(data["_items"])
@@ -268,7 +270,14 @@ def test_search_includes_killed_items(client, app):
 def test_search_by_products_id(client, app):
     app.data.insert(
         "items",
-        [{"_id": "foo", "headline": "product test", "products": [{"code": "12345"}]}],
+        [
+            {
+                "_id": "foo",
+                "headline": "product test",
+                "products": [{"code": "12345"}],
+                "versioncreated": datetime.utcnow(),
+            }
+        ],
     )
     resp = client.get("/wire/search?q=products.code:12345")
     data = json.loads(resp.get_data())
@@ -829,6 +838,7 @@ def test_highlighting(client, app):
                 "body_html": "Story that involves cheese and onions",
                 "slugline": "That's the test slugline cheese",
                 "headline": "Demo Article",
+                "versioncreated": datetime.utcnow(),
             }
         ],
     )
@@ -867,6 +877,7 @@ def test_highlighting_with_advanced_search(client, app):
                 "body_html": "Story that involves cheese and onions",
                 "slugline": "That's the test slugline cheese",
                 "headline": "Demo Article",
+                "versioncreated": datetime.utcnow(),
             }
         ],
     )
@@ -891,7 +902,9 @@ def test_highlighting_with_advanced_search(client, app):
 
 
 def test_french_accents_search(client, app):
-    app.data.insert("items", [{"_id": "foo", "body_html": "Story that involves élection"}])
+    app.data.insert(
+        "items", [{"_id": "foo", "body_html": "Story that involves élection", "versioncreated": datetime.utcnow()}]
+    )
     resp = client.get("/wire/search?q=election")
     assert 1 == len(resp.json["_items"])
     resp = client.get("/wire/search?q=electión")

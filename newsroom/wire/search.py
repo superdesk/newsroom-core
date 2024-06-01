@@ -14,7 +14,6 @@ from newsroom.user_roles import UserRole
 from newsroom.utils import get_local_date, get_end_date
 from newsroom.search.service import BaseSearchService, SearchQuery
 from typing import TypedDict, Literal, List
-from flask import current_app as app
 import pytz
 
 logger = logging.getLogger(__name__)
