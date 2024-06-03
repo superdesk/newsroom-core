@@ -11,6 +11,7 @@ export interface ISearchState {
     createdFilter: {
         from?: string;
         to?: string;
+        date_filter?: string;
     };
     productId?: IProduct['_id'];
     navigations: Array<INavigation>;

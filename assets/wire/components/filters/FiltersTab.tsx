@@ -135,14 +135,15 @@ class FiltersTab extends React.Component<any, any> {
         return (
             <div className="d-contents">
                 <div className='tab-pane__inner'>
-                    {this.getFilterGroups().filter((group: any) => !!group).concat([(
+                    {[
                         <NavCreatedPicker
                             key="created"
                             createdFilter={createdFilter}
                             setCreatedFilter={this.setCreatedFilterAndSearch}
-                            context = {this.props.context}
+                            context={this.props.context}
+                            wireFilters={this.props.dateFilters}
                         />
-                    )])}
+                    ].concat(this.getFilterGroups().filter((group: any) => !!group))}
                 </div>
                 {!isResetActive && !this.props.resultsFiltered ? null : ([
                     <div className='tab-pane__footer tab-pane__footer--inline' key='footer-buttons'>

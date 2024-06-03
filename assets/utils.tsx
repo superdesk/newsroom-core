@@ -703,6 +703,11 @@ export function getCreatedSearchParamLabel(created: any) {
         } else {
             return {from: formatDate(created.from)};
         }
+    } else if (created.date_filter){
+        const value = created.date_filter.split('_').map(
+            (word: string) => word.charAt(0)
+                .toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+        return {relative: gettext(value)};
     }
 
     return {};

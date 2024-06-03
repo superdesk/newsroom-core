@@ -354,6 +354,7 @@ WireApp.propTypes = {
     searchParams: PropTypes.object,
     showSaveTopic: PropTypes.bool,
     filterGroupLabels: PropTypes.object,
+    dateFilters: PropTypes.object,
 };
 
 const mapStateToProps = (state: any) => ({
@@ -391,7 +392,8 @@ const mapStateToProps = (state: any) => ({
     searchParams: searchParamsSelector(state),
     showSaveTopic: showSaveTopicSelector(state),
     filterGroupLabels: filterGroupsToLabelMap(state),
-    errorMessage: state.errorMessage
+    errorMessage: state.errorMessage,
+    dateFilters: state.dateFilters
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
