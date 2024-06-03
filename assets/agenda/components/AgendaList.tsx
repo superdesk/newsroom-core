@@ -432,8 +432,8 @@ class AgendaList extends React.Component<IProps, IState> {
                 onScroll={this.props.onScroll}
             >
                 {groupedItems.length === 1 ?
-                    this.renderGroupItems(this.props.groupedItems[0], false) :
-                    this.props.groupedItems.map((group) => (
+                    this.renderGroupItems(groupedItems[0], false) :
+                    groupedItems.map((group) => (
                         <React.Fragment key={group.date}>
                             <div className='wire-articles__header' key={`${group.date}header`}>
                                 {this.getListGroupDate(group)}
@@ -457,7 +457,7 @@ class AgendaList extends React.Component<IProps, IState> {
                         </React.Fragment>
                     ))
                 }
-                {!this.props.groupedItems.length &&
+                {!groupedItems.length &&
                     <div className="wire-articles__item-wrap col-12">
                         <div className="alert alert-secondary">{gettext('No items found.')}</div>
                     </div>
