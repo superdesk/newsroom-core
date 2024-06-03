@@ -91,7 +91,15 @@ class FiltersTab extends React.Component<any, any> {
             )
         );
 
-        this.setState({createdFilter: created});
+        this.setState({createdFilter: created}, () => {
+            const defaultFilterExists = this.props.dateFilters?.some((filter: {
+                filter: string,default: string
+                }) => createdFilter.date_filter == filter.filter && filter.default);
+            // If a default filter is set, trigger search
+            if (defaultFilterExists) {
+                this.search();
+            }
+        });
     }
 
     getFilterGroups() {
@@ -114,8 +122,10 @@ class FiltersTab extends React.Component<any, any> {
         });
     }
 
-    search(event: any) {
-        event.preventDefault();
+    search(event: any = null) {
+        if (event) {
+            event.preventDefault();
+        }
         this.props.updateFilterStateAndURL(this.state.activeFilter, this.state.createdFilter);
         this.props.fetchItems();
     }
