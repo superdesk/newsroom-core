@@ -13,7 +13,7 @@ from newsroom.settings import get_setting
 from newsroom.user_roles import UserRole
 from newsroom.utils import get_local_date, get_end_date
 from newsroom.search.service import BaseSearchService, SearchQuery
-from typing import TypedDict, Literal, List
+from typing import TypedDict, Literal, List, Optional
 import pytz
 
 logger = logging.getLogger(__name__)
@@ -32,6 +32,14 @@ class TimeFilter(TypedDict):
     default: bool
     query: str
     filter: Literal["today", "last_week", "last_30_days", ""]
+
+
+class DateRangeQuery(TypedDict):
+    gt: str
+    gte: str
+    lt: str
+    lte: str
+    time_zone: str
 
 
 class WireSearchResource(newsroom.Resource):
@@ -319,32 +327,33 @@ class WireSearchService(BaseSearchService):
                     search.query["bool"]["must_not"].append(f)
 
         date_filter = search.args.get("date_filter")
+        date_range_query: Optional[DateRangeQuery] = None
         if date_filter:
-            if date_filter == "custom_date":
-                pass
-            elif date_filter == "last_week":
-                start_of_last_week, end_of_last_week = get_start_and_end_of_last_week()
-                search.query["bool"]["must"].append(
-                    {
-                        "range": {
-                            "versioncreated": {
-                                "gte": start_of_last_week.isoformat(),
-                                "lt": end_of_last_week.isoformat(),
-                            }
-                        }
-                    }
-                )
-            else:
+            if date_filter == "last_week":
+                date_range_query: DateRangeQuery = {
+                    "gte": "now-1w/w",
+                    "lt": "now/w",
+                    "time_zone": app.config.get("DEFAULT_TIMEZONE"),
+                }
+            elif date_filter != "custom_date":
                 query = self.get_date_filter_query(date_filter)
                 if query:
-                    search.query["bool"]["must"].append({"range": {"versioncreated": {"gte": query, "lt": "now+1d/d"}}})
+                    date_range_query = {"gte": query, "time_zone": app.config.get("DEFAULT_TIMEZONE")}
         else:
-            default_time_filter = next((f for f in self.get_time_filters() if f["default"]), None)
+            default_time_filter: TimeFilter = next((f for f in self.get_time_filters() if f["default"]), None)
             if default_time_filter:
-                default_query = default_time_filter["query"]
-                search.query["bool"]["must"].append(
-                    {"range": {"versioncreated": {"gte": default_query, "lt": "now+1d"}}}
-                )
+                if default_time_filter["filter"] == "last_week":
+                    date_range_query: DateRangeQuery = {
+                        "gte": "now-1w/w",
+                        "lt": "now/w",
+                        "time_zone": app.config.get("DEFAULT_TIMEZONE"),
+                    }
+                else:
+                    default_query = default_time_filter["query"]
+                    date_range_query = {"gte": default_query, "time_zone": app.config.get("DEFAULT_TIMEZONE")}
+
+        if date_range_query:
+            search.query["bool"]["must"].append({"range": {"versioncreated": date_range_query}})
 
     def get_product_item_report(self, product, section_filters=None):
         query = items_query()

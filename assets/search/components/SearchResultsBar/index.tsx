@@ -214,6 +214,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                             resetFilter={this.resetFilter}
                             clearAdvancedSearchParams={this.props.clearAdvancedSearchParams}
                             deselectMyTopic={this.props.deselectMyTopic}
+                            dateFilters={this.props.dateFilters}
                         />
                     )}
 
@@ -259,6 +260,7 @@ SearchResultsBarComponent.propTypes = {
     resetFilter: PropTypes.func.isRequired,
 
     children: PropTypes.node,
+    dateFilters: PropTypes.object
 };
 
 SearchResultsBarComponent.defaultProps = {
@@ -274,6 +276,7 @@ const mapStateToProps = (state: any) => ({
     navigations: navigationsByIdSelector(state),
     filterGroups: filterGroupsByIdSelector(state),
     availableFields: getAdvancedSearchFields(state.context),
+    dateFilters: state.dateFilters,
 });
 
 const mapDispatchToProps = {

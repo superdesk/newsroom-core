@@ -34,6 +34,7 @@ export interface IProps {
 
     saveMyTopic?: (params: ISearchParams) => void;
     deselectMyTopic?: (topicId: ITopic['_id']) => void;
+    dateFilters?: []
 }
 
 export function SearchResultTagsList({
@@ -58,6 +59,7 @@ export function SearchResultTagsList({
     deselectMyTopic,
     resetFilter,
     refresh,
+    dateFilters
 }: IProps) {
     return (
         <ul
@@ -99,6 +101,7 @@ export function SearchResultTagsList({
                 setCreatedFilter={setCreatedFilter}
                 resetFilter={resetFilter}
                 readonly={readonly}
+                dateFilters={dateFilters}
             />
             {readonly === true && activeTopic._id && (
                 <SearchResultTagList

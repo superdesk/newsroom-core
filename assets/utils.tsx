@@ -681,7 +681,7 @@ export function shouldShowListShortcutActionIcons(listConfig: any, isExtended: a
         );
 }
 
-export function getCreatedSearchParamLabel(created: any) {
+export function getCreatedSearchParamLabel(created: any, dateFilters: any = null) {
     if (created.to) {
         if (created.from) {
             return {
@@ -704,10 +704,8 @@ export function getCreatedSearchParamLabel(created: any) {
             return {from: formatDate(created.from)};
         }
     } else if (created.date_filter){
-        const value = created.date_filter.split('_').map(
-            (word: string) => word.charAt(0)
-                .toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-        return {relative: gettext(value)};
+        const value = dateFilters?.find((filter: any) => filter?.filter == created?.date_filter);
+        return {relative: gettext(value?.name)};
     }
 
     return {};

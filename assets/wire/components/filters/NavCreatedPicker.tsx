@@ -12,14 +12,10 @@ const agendaShortcuts = [
 ];
 
 function NavCreatedPicker({setCreatedFilter, createdFilter, context, wireFilters}: any) {
-    const [showCustomRange, setShowCustomRange] = useState(false);
+    const [showCustomRange, setShowCustomRange] = useState(createdFilter.date_filter === 'custom_date');
 
     useEffect(() => {
-        if (createdFilter.date_filter === 'custom_date') {
-            setShowCustomRange(true);
-        } else {
-            setShowCustomRange(false);
-        }
+        setShowCustomRange(createdFilter.date_filter === 'custom_date');
         if (isEmpty(createdFilter) && context == 'wire'){
             const defaultFilter = wireFilters.find((filter: {default: any}) => filter.default);
             setCreatedFilter({...createdFilter, date_filter: defaultFilter?.filter});
