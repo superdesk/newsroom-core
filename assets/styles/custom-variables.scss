@@ -241,7 +241,7 @@ $container-max-widths: (
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
 
-
+    --base-line-height: 1.5;
 
 
     // CORE: ICONS
@@ -607,6 +607,7 @@ $container-max-widths: (
     --content-item-headline-line-height: 1.2;
 
     --content-item-text-font-size: var(--text-size--large);
+    --content-item-lead-font-size: calc(var(--text-size--large) * 1.0625); // 17px
     --content-item-text-line-height: 1.6;
     --content-item-text-font-weight: 300;
     --content-item-text-font-family: var(--font-family-core--secondary);
