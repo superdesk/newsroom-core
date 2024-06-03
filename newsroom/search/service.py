@@ -149,8 +149,11 @@ class BaseSearchService(Service):
     section: Section = "wire"
     limit_days_setting: Union[None, str] = "wire_time_limit_days"
     default_sort = [{"versioncreated": "desc"}]
-    default_page_size = 25
     _matched_ids = []  # array of IDs matched on the request, used when searching all versions
+
+    @property
+    def default_page_size(self) -> int:
+        return 25
 
     def get(self, req, lookup):
         search = SearchQuery()
