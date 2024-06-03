@@ -2,11 +2,13 @@ import {ITopic} from './topic';
 import {INavigation} from './navigation';
 import {IProduct} from './product';
 
+export type ISearchSortValue = 'versioncreated:desc' | 'versioncreated:asc' | '_score';
+
 export interface ISearchState {
     activeTopic?: ITopic['_id'];
     activeNavigation?: Array<INavigation['_id']>;
     activeQuery?: string;
-    activeSortQuery?: string;
+    activeSortQuery?: ISearchSortValue;
     activeFilter: {[key: string]: any};
     createdFilter: {
         from?: string;
