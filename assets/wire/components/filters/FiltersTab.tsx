@@ -94,7 +94,7 @@ class FiltersTab extends React.Component<any, any> {
         this.setState({createdFilter: created}, () => {
             const defaultFilterExists = this.props.dateFilters?.some((filter: {
                 filter: string,default: string
-                }) => createdFilter.date_filter == filter.filter && filter.default);
+                }) => createdFilter?.date_filter == filter?.filter && filter?.default);
             // If a default filter is set, trigger search
             if (defaultFilterExists) {
                 this.search();

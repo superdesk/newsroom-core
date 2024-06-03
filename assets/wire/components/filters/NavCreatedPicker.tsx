@@ -22,7 +22,7 @@ function NavCreatedPicker({setCreatedFilter, createdFilter, context, wireFilters
         }
         if (isEmpty(createdFilter) && context == 'wire'){
             const defaultFilter = wireFilters.find((filter: {default: any}) => filter.default);
-            setCreatedFilter({...createdFilter, date_filter: defaultFilter.filter});
+            setCreatedFilter({...createdFilter, date_filter: defaultFilter?.filter});
         }
     }, [createdFilter.date_filter]);
 
