@@ -68,7 +68,7 @@ def versioncreated_range(created):
     if created.get("created_from"):
         _range["gte"] = get_local_date(
             created["created_from"],
-            created.get("date_from_time", "00:00:00"),
+            created.get("created_from_time", "00:00:00"),
             offset,
         )
     if created.get("created_to"):
