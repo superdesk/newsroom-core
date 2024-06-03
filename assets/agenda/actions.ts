@@ -6,7 +6,9 @@ import {
     IAgendaItem,
     IAgendaListGroup,
     IAgendaState,
-    AgendaThunkAction, ISearchState,
+    AgendaThunkAction,
+    ISearchState,
+    ISearchParams,
 } from 'interfaces';
 import server from 'server';
 import analytics from 'analytics';
@@ -284,7 +286,7 @@ export function fetchItems(): AgendaThunkAction {
 
 interface AgendaSearchParams {
     itemType: IAgendaState['agenda']['itemType'];
-    searchParams: any;
+    searchParams: ISearchParams;
     featured: boolean;
     fromDate?: string;
     toDate?: string;

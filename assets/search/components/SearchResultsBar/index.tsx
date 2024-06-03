@@ -2,7 +2,7 @@ import * as React from 'react';
 import classNames from 'classnames';
 import {connect} from 'react-redux';
 
-import {IAgendaState, IFilterGroup, INavigation, ISearchFields, ISearchParams, ITopic, IUser} from 'interfaces';
+import {IAgendaState, IFilterGroup, INavigation, ISearchFields, ISearchParams, ITopic, IUser, ISearchSortValue} from 'interfaces';
 
 import {gettext} from 'utils';
 import {searchParamsSelector, navigationsByIdSelector, filterGroupsByIdSelector} from '../../selectors';
@@ -43,15 +43,13 @@ interface IDispatchProps {
     resetFilter(): void;
 }
 
-type ISortValue = 'newest' | 'oldest' | 'relevance';
-
-function getSortValueLabel(sortValue: ISortValue): string {
+function getSortValueLabel(sortValue: ISearchSortValue): string {
     switch (sortValue) {
-    case 'newest':
+    case 'versioncreated:desc':
         return gettext('Newest first');
-    case 'oldest':
+    case 'versioncreated:asc':
         return gettext('Oldest first');
-    case 'relevance':
+    case '_score':
         return gettext('Relevance');
     }
 }
@@ -67,24 +65,23 @@ interface IOwnProps {
     activeTopic: ITopic;
     topicType: ITopic['topic_type'];
     saveMyTopic?: (params: ISearchParams) => void;
-    defaultSortValue?: ISortValue;
+    defaultSortValue?: ISearchSortValue;
 
     refresh(): void;
     onClearAll?(): void;
     setQuery(query: string): void;
-    setSortQuery(query: string): void;
+    setSortQuery(query: ISearchSortValue): void;
 }
 
 type IProps = IReduxStoreProps & IDispatchProps & IOwnProps;
 
 interface IState {
     isTagSectionShown: boolean;
-    sortValue: ISortValue;
+    sortValue: ISearchSortValue;
 }
 
 
 class SearchResultsBarComponent extends React.Component<IProps, IState> {
-    private sortValues: Array<{value: ISortValue; sortFunction: () => void;}>;
     private topicNotNull: boolean;
 
     static defaultProps: Partial<IOwnProps> = {
@@ -97,24 +94,9 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
         super(props);
 
         this.topicNotNull = new URLSearchParams(window.location.search).get('topic') != null;
-        this.sortValues = [
-            {
-                value: 'newest',
-                sortFunction: () => this.setSortQuery('versioncreated:desc'),
-            },
-            {
-                value: 'oldest',
-                sortFunction: () => this.setSortQuery('versioncreated:asc'),
-            },
-            {
-                value: 'relevance',
-                sortFunction: () => this.setSortQuery('_score'),
-            },
-        ];
-
         this.state = {
             isTagSectionShown: this.props.initiallyOpen || this.topicNotNull,
-            sortValue: this.props.defaultSortValue ?? this.sortValues[0].value,
+            sortValue: this.props.defaultSortValue ?? 'versioncreated:desc',
         };
 
         this.toggleTagSection = this.toggleTagSection.bind(this);
@@ -151,7 +133,7 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
         this.props.refresh();
     }
 
-    setSortQuery(sortQuery: string) {
+    setSortQuery(sortQuery: ISearchSortValue) {
         this.props.setSortQuery(sortQuery);
         this.props.refresh();
     }
@@ -189,6 +171,11 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
     render() {
         const {isTagSectionShown} = this.state;
         const numberFormatter = (new Intl.NumberFormat(undefined, {style: 'decimal'}));
+        const sortValues: Array<ISearchSortValue> = [
+            'versioncreated:desc',
+            'versioncreated:asc',
+            '_score',
+        ];
 
         return (
             <React.Fragment>
@@ -216,21 +203,19 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
                                         className={'sorting-dropdown'}
                                         dropdownMenuHeader={gettext('Sort results by')}
                                     >
-                                        {
-                                            this.sortValues.map((option) => (
-                                                <button
-                                                    key={option.value}
-                                                    type='button'
-                                                    className='dropdown-item'
-                                                    onClick={() => {
-                                                        option.sortFunction();
-                                                        this.setState({sortValue: option.value});
-                                                    }}
-                                                >
-                                                    {getSortValueLabel(option.value)}
-                                                </button>
-                                            ))
-                                        }
+                                        {sortValues.map((sortValue) => (
+                                            <button
+                                                key={sortValue}
+                                                type="button"
+                                                className="dropdown-item"
+                                                onClick={() => {
+                                                    this.setSortQuery(sortValue);
+                                                    this.setState({sortValue: sortValue});
+                                                }}
+                                            >
+                                                {getSortValueLabel(sortValue)}
+                                            </button>
+                                        ))}
                                     </Dropdown>
                                 )}
                                 <button

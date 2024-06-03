@@ -48,9 +48,9 @@ export function SearchResultsAdvancedSearchRow({
     };
 
     const keywords = {
-        all: splitTermKeywords(advancedSearchParams.all),
-        any: splitTermKeywords(advancedSearchParams.any),
-        exclude: splitTermKeywords(advancedSearchParams.exclude),
+        all: splitTermKeywords(advancedSearchParams.all ?? ''),
+        any: splitTermKeywords(advancedSearchParams.any ?? ''),
+        exclude: splitTermKeywords(advancedSearchParams.exclude ?? ''),
     };
 
     const labels = {

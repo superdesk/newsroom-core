@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {get, isEmpty} from 'lodash';
 
+import {ISearchSortValue} from 'interfaces';
 import {getItemFromArray, gettext} from 'utils';
 import {noNavigationSelected} from 'search/utils';
 
@@ -251,7 +252,7 @@ class AgendaApp extends SearchBase<any> {
                                             setQuery={this.props.setQuery}
                                             setSortQuery={this.props.setSortQuery}
                                             showSortDropdown={true}
-                                            defaultSortValue="relevance"
+                                            defaultSortValue="_score"
                                         />
                                     )
                                 }
@@ -424,7 +425,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     requestCoverage: (item: any, message: any) => dispatch(requestCoverage(item, message)),
     toggleFeaturedFilter: (fetch: any) => dispatch(toggleFeaturedFilter(fetch)),
     setQuery: (query: any) => dispatch(setQuery(query)),
-    setSortQuery: (query: any) => dispatch(setSortQuery(query)),
+    setSortQuery: (query: ISearchSortValue) => dispatch(setSortQuery(query)),
 });
 
 const component: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(AgendaApp);

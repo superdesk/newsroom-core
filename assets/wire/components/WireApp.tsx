@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {get, isEqual} from 'lodash';
 
+import {ISearchSortValue} from 'interfaces';
 import {gettext, getItemFromArray, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE} from 'utils';
 import {getSingleFilterValue} from 'search/utils';
 
@@ -390,7 +391,7 @@ const mapDispatchToProps = (dispatch: any) => ({
         dispatch(fetchItems());
     },
     setQuery: (query: any) => dispatch(setQuery(query)),
-    setSortQuery: (query: any) => dispatch(setSortQuery(query)),
+    setSortQuery: (query: ISearchSortValue) => dispatch(setSortQuery(query)),
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view: any) => dispatch(setView(view)),
