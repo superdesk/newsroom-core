@@ -27,19 +27,19 @@ def get_aggregations():
     return app.config.get("WIRE_AGGS", {})
 
 
-class TimeFilter(TypedDict):
-    name: str
-    default: bool
-    query: str
-    filter: Literal["today", "last_week", "last_30_days", ""]
-
-
 class DateRangeQuery(TypedDict):
     gt: str
     gte: str
     lt: str
     lte: str
     time_zone: str
+
+
+class TimeFilter(TypedDict):
+    name: str
+    default: bool
+    query: DateRangeQuery
+    filter: Literal["today", "last_week", "last_30_days", ""]
 
 
 class WireSearchResource(newsroom.Resource):
