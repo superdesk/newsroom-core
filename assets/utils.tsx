@@ -705,7 +705,7 @@ export function getCreatedSearchParamLabel(created: any, dateFilters: any = null
         }
     } else if (created.date_filter){
         const value = dateFilters?.find((filter: any) => filter?.filter == created?.date_filter);
-        return {relative: gettext(value?.name)};
+        return {relative: value?.name};
     }
 
     return {};

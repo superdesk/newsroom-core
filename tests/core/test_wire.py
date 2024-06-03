@@ -6,8 +6,8 @@ from urllib import parse
 from bson import ObjectId
 from copy import deepcopy
 from newsroom.auth.utils import start_user_session
-from newsroom.wire.search import get_start_and_end_of_last_week
 from tests.core.utils import add_company_products
+from newsroom.wire.search import WireSearchService, SearchQuery
 
 from ..fixtures import (  # noqa: F401
     items,
@@ -1012,6 +1012,7 @@ def test_date_filters(client, app):
 
     # Default Last 7 days
     resp = client.get("/wire/search")
+    assert resp.status_code == 200
     assert len(resp.json["_items"]) == 7
     assert resp.json["_items"][0]["_id"] == "tag:today"
     assert resp.json["_items"][1]["_id"] == "tag:Week"
@@ -1023,6 +1024,7 @@ def test_date_filters(client, app):
 
     # Test "Today" filter
     resp = client.get("/wire/search?date_filter=today")
+    assert resp.status_code == 200
     assert len(resp.json["_items"]) == 1
     assert resp.json["_items"][0]["_id"] == "tag:today"
 
@@ -1030,14 +1032,9 @@ def test_date_filters(client, app):
     resp = client.get("/wire/search?date_filter=last_week")
     assert resp.status_code == 200
 
-    date = datetime(2024, 5, 31, 00, 00, 00)  # Friday
-    start, end = get_start_and_end_of_last_week(date)
-
-    assert start.strftime("%Y-%m-%d") == "2024-05-20"  # monday
-    assert end.strftime("%Y-%m-%d") == "2024-05-27"  # Sunday
-
     # Test "Last 30 days" filter
     resp = client.get("/wire/search?date_filter=last_30_days")
+    assert resp.status_code == 200
     assert len(resp.json["_items"]) == 7
 
     # custom filter
@@ -1046,6 +1043,54 @@ def test_date_filters(client, app):
     resp = client.get(
         "/wire/search?date_filter=custom_date&created_from={}&created_to={}".format(created_from, created_to)
     )
+    assert resp.status_code == 200
     assert len(resp.json["_items"]) == 2
     assert resp.json["_items"][0]["_id"] == "tag:lastMonth"
     assert resp.json["_items"][1]["_id"] == "tag:twoMonthsAgo"
+
+
+def test_date_filters_query(client, app):
+    service = WireSearchService()
+    app.config["DEFAULT_TIMEZONE"] = "Europe/Berlin"
+
+    def _set_search_query(user_id, args):
+        with app.test_request_context():
+            server_session["user"] = user_id
+            search = SearchQuery()
+            search.args = args
+            service.apply_request_filter(search)
+            return search.query["bool"]["must"]
+
+    # Last week
+    assert [
+        {"range": {"versioncreated": {"gte": "now-1w/w", "lt": "now/w", "time_zone": "Europe/Berlin"}}}
+    ] == _set_search_query(ADMIN_USER_ID, {"date_filter": "last_week"})
+
+    # Last 30 Days
+    assert [{"range": {"versioncreated": {"gte": "now-30d/d", "time_zone": "Europe/Berlin"}}}] == _set_search_query(
+        ADMIN_USER_ID, {"date_filter": "last_30_days"}
+    )
+
+    # Today
+    assert [{"range": {"versioncreated": {"gte": "now/d", "time_zone": "Europe/Berlin"}}}] == _set_search_query(
+        ADMIN_USER_ID, {"date_filter": "today"}
+    )
+
+    # Default
+    assert [{"range": {"versioncreated": {"gte": "now-30d/d", "time_zone": "Europe/Berlin"}}}] == _set_search_query(
+        ADMIN_USER_ID, {}
+    )
+
+    # Custom Date
+    assert [
+        {
+            "range": {
+                "versioncreated": {
+                    "gte": datetime(2024, 6, 20, 0, 0, tzinfo=pytz.UTC),
+                    "lte": datetime(2024, 6, 23, 23, 59, 59, tzinfo=pytz.UTC),
+                }
+            }
+        }
+    ] == _set_search_query(
+        ADMIN_USER_ID, {"date_filter": "custom_date", "created_from": "2024-06-20", "created_to": "2024-06-23"}
+    )

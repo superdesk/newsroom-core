@@ -32,7 +32,7 @@ class DateRangeQuery(TypedDict):
     gte: str
     lt: str
     lte: str
-    time_zone: str
+    time_zone: Optional[str]
 
 
 class TimeFilter(TypedDict):
@@ -299,13 +299,23 @@ class WireSearchService(BaseSearchService):
         """Retrieve the time filters from app config."""
         return app.config.get("WIRE_TIME_FILTERS", [])
 
-    def get_date_filter_query(self, filter_name: str) -> str:
+    def get_date_filter_query(self, filter_name: str) -> Optional[DateRangeQuery]:
         """Get the query for the given filter name."""
         time_filters = self.get_time_filters()
         for time_filter in time_filters:
             if time_filter["filter"] == filter_name:
-                return time_filter["query"]
-        return ""
+                query = time_filter["query"]
+                query["time_zone"] = app.config.get("DEFAULT_TIMEZONE")
+                return query
+        return None
+
+    def get_date_range_query(self, date_filter: str) -> Optional[DateRangeQuery]:
+        if date_filter != "custom_date":
+            query = self.get_date_filter_query(date_filter)
+            if query:
+                query["time_zone"] = app.config.get("DEFAULT_TIMEZONE")
+                return query
+        return None
 
     def apply_request_filter(self, search, highlights=True):
         """Generate the filters from request args
@@ -329,28 +339,12 @@ class WireSearchService(BaseSearchService):
         date_filter = search.args.get("date_filter")
         date_range_query: Optional[DateRangeQuery] = None
         if date_filter:
-            if date_filter == "last_week":
-                date_range_query: DateRangeQuery = {
-                    "gte": "now-1w/w",
-                    "lt": "now/w",
-                    "time_zone": app.config.get("DEFAULT_TIMEZONE"),
-                }
-            elif date_filter != "custom_date":
-                query = self.get_date_filter_query(date_filter)
-                if query:
-                    date_range_query = {"gte": query, "time_zone": app.config.get("DEFAULT_TIMEZONE")}
+            date_range_query = self.get_date_range_query(date_filter)
         else:
-            default_time_filter: TimeFilter = next((f for f in self.get_time_filters() if f["default"]), None)
+            default_time_filter: Optional[TimeFilter] = next((f for f in self.get_time_filters() if f["default"]), None)
             if default_time_filter:
-                if default_time_filter["filter"] == "last_week":
-                    date_range_query: DateRangeQuery = {
-                        "gte": "now-1w/w",
-                        "lt": "now/w",
-                        "time_zone": app.config.get("DEFAULT_TIMEZONE"),
-                    }
-                else:
-                    default_query = default_time_filter["query"]
-                    date_range_query = {"gte": default_query, "time_zone": app.config.get("DEFAULT_TIMEZONE")}
+                date_range_query = default_time_filter["query"]
+                date_range_query["time_zone"] = app.config.get("DEFAULT_TIMEZONE")
 
         if date_range_query:
             search.query["bool"]["must"].append({"range": {"versioncreated": date_range_query}})
