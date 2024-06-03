@@ -2,6 +2,8 @@ import {ICompany, IProduct, IUser} from 'interfaces';
 import {gettext} from '../utils';
 import {get} from 'lodash';
 import {ISeats} from 'interfaces/seat';
+import {type Dictionary} from 'globals';
+
 
 export const userTypes = [
     {value: 'administrator', text: gettext('Administrator'), show_acc_mgr: false},

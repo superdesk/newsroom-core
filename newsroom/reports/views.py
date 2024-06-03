@@ -1,10 +1,10 @@
 from io import StringIO
 import csv
 
-from flask import jsonify, render_template, abort, current_app as newsroom_app
+from flask import session, jsonify, render_template, abort, current_app as newsroom_app
 from flask_babel import gettext, current_app as app
 
-from newsroom.decorator import account_manager_only
+from newsroom.decorator import account_manager_only, account_manager_or_company_admin_only
 from newsroom.reports import blueprint
 from newsroom.reports import reports
 from newsroom.utils import query_resource
@@ -23,13 +23,14 @@ def print_reports(report):
 
 
 @blueprint.route("/reports/company_reports", methods=["GET"])
-@account_manager_only
+@account_manager_or_company_admin_only
 def company_reports():
     companies = list(query_resource("companies"))
     data = {
         "companies": companies,
         "sections": newsroom_app.sections,
         "api_enabled": app.config.get("NEWS_API_ENABLED", False),
+        "current_user_type": session.get("user_type"),
     }
     return render_template("company_reports.html", setting_type="company_reports", data=data)
 
