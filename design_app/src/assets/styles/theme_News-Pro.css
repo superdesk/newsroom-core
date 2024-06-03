@@ -84,6 +84,9 @@
 
     /* COMPONENT: SEARCH RESULT PANEL (Tags list) */
     --search-result-tags-list-color-bg: var(--main-header-color-bg);
+
+    /* COMPONENT: MULTI-DAY LABEL */
+    --multiday-label-color-bg: var(--color-info);
 }
 
 .navbar__logo img.navbar__logo-img--fr {
