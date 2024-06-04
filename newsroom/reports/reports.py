@@ -4,7 +4,7 @@ from collections import defaultdict
 from copy import deepcopy
 
 from bson import ObjectId
-from flask import abort, session
+from flask import abort
 from flask_babel import gettext
 from flask import request, send_file, current_app as newsroom_app, json
 from eve.utils import ParsedRequest
