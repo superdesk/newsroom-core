@@ -96,7 +96,7 @@
     "karma-chrome-launcher": "^2.2.0",
     "karma-jasmine": "^2.0.0",
     "karma-sourcemap-loader": "^0.3.8",
-    "karma-webpack": "^2.0.4",
+    "karma-webpack": "^3.0.5",
     "sinon": "^4.0.0"
   }
 }
