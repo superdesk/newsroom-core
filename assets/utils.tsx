@@ -681,7 +681,7 @@ export function shouldShowListShortcutActionIcons(listConfig: any, isExtended: a
         );
 }
 
-export function getCreatedSearchParamLabel(created: any) {
+export function getCreatedSearchParamLabel(created: any, dateFilters: any = null) {
     if (created.to) {
         if (created.from) {
             return {
@@ -703,6 +703,9 @@ export function getCreatedSearchParamLabel(created: any) {
         } else {
             return {from: formatDate(created.from)};
         }
+    } else if (created.date_filter){
+        const value = dateFilters?.find((filter: any) => filter?.filter == created?.date_filter);
+        return {relative: value?.name};
     }
 
     return {};

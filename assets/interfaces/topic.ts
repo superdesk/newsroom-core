@@ -29,6 +29,7 @@ export interface ISearchParams {
     created?: {
         from?: string | null;
         to?: string | null;
+        date_filter?: string | null;
     };
     product: ISearchState['productId'];
     sortQuery: ISearchState['activeSortQuery'];

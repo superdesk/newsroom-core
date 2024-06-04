@@ -22,6 +22,7 @@ import {
 import {Dropdown} from './../../../components/Dropdown';
 
 import {SearchResultTagsList} from './SearchResultTagsList';
+import {ICommonState, IDateFilters} from 'interfaces/common';
 
 interface IReduxStoreProps {
     user: IUser;
@@ -71,6 +72,7 @@ interface IOwnProps {
     onClearAll?(): void;
     setQuery(query: string): void;
     setSortQuery(query: ISearchSortValue): void;
+    dateFilters?: IDateFilters
 }
 
 type IProps = IReduxStoreProps & IDispatchProps & IOwnProps;
@@ -265,6 +267,7 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
                             resetFilter={this.resetFilter}
                             clearAdvancedSearchParams={this.props.clearAdvancedSearchParams}
                             deselectMyTopic={this.props.deselectMyTopic}
+                            dateFilters={this.props.dateFilters}
                         />
                     )}
 
@@ -275,12 +278,13 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
     }
 }
 
-const mapStateToProps = (state: IAgendaState) => ({
+const mapStateToProps = (state: ICommonState) => ({
     user: state.userObject,
     searchParams: searchParamsSelector(state),
     navigations: navigationsByIdSelector(state),
     filterGroups: filterGroupsByIdSelector(state),
     availableFields: getAdvancedSearchFields(state.context),
+    dateFilters: state.dateFilters,
 });
 
 const mapDispatchToProps = {

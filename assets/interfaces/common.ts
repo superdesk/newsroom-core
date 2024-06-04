@@ -1,6 +1,6 @@
 import {IUser} from './user';
 import {IArticle} from './content';
-import {IAgendaItem} from './agenda';
+import {IAgendaItem, IAgendaState} from './agenda';
 
 export type TDatetime = string; // ISO8601 format
 
@@ -79,4 +79,13 @@ export interface IOccurStatus {
     name: string;
     qcode: string;
     label: string;
+}
+
+export interface IDateFilters{
+    name: string,
+    default: boolean,
+    filter: string;
+}
+export interface ICommonState extends IAgendaState {
+    dateFilters?: IDateFilters
 }

@@ -5,9 +5,9 @@ from datetime import datetime, timedelta
 from urllib import parse
 from bson import ObjectId
 from copy import deepcopy
-
 from newsroom.auth.utils import start_user_session
 from tests.core.utils import add_company_products
+from newsroom.wire.search import WireSearchService, SearchQuery
 
 from ..fixtures import (  # noqa: F401
     items,
@@ -259,7 +259,9 @@ def test_search_filters_items_with_updates(client, app):
 
 
 def test_search_includes_killed_items(client, app):
-    app.data.insert("items", [{"_id": "foo", "pubstatus": "canceled", "headline": "killed"}])
+    app.data.insert(
+        "items", [{"_id": "foo", "pubstatus": "canceled", "headline": "killed", "versioncreated": datetime.utcnow()}]
+    )
     resp = client.get("/wire/search?q=headline:killed")
     data = json.loads(resp.get_data())
     assert 1 == len(data["_items"])
@@ -268,7 +270,14 @@ def test_search_includes_killed_items(client, app):
 def test_search_by_products_id(client, app):
     app.data.insert(
         "items",
-        [{"_id": "foo", "headline": "product test", "products": [{"code": "12345"}]}],
+        [
+            {
+                "_id": "foo",
+                "headline": "product test",
+                "products": [{"code": "12345"}],
+                "versioncreated": datetime.utcnow(),
+            }
+        ],
     )
     resp = client.get("/wire/search?q=products.code:12345")
     data = json.loads(resp.get_data())
@@ -829,6 +838,7 @@ def test_highlighting(client, app):
                 "body_html": "Story that involves cheese and onions",
                 "slugline": "That's the test slugline cheese",
                 "headline": "Demo Article",
+                "versioncreated": datetime.utcnow(),
             }
         ],
     )
@@ -867,6 +877,7 @@ def test_highlighting_with_advanced_search(client, app):
                 "body_html": "Story that involves cheese and onions",
                 "slugline": "That's the test slugline cheese",
                 "headline": "Demo Article",
+                "versioncreated": datetime.utcnow(),
             }
         ],
     )
@@ -891,7 +902,9 @@ def test_highlighting_with_advanced_search(client, app):
 
 
 def test_french_accents_search(client, app):
-    app.data.insert("items", [{"_id": "foo", "body_html": "Story that involves élection"}])
+    app.data.insert(
+        "items", [{"_id": "foo", "body_html": "Story that involves élection", "versioncreated": datetime.utcnow()}]
+    )
     resp = client.get("/wire/search?q=election")
     assert 1 == len(resp.json["_items"])
     resp = client.get("/wire/search?q=electión")
@@ -932,3 +945,153 @@ def test_navigation_for_public_users(client, app, setup_products):
     resp = client.get(f"/wire/search?navigation={NAV_1}")
     data = json.loads(resp.get_data())
     assert 1 == len(data["_items"])
+
+
+def test_date_filters(client, app):
+    # remove all other's item
+    app.data.remove("items")
+    now = datetime.utcnow()
+    app.config["DEFAULT_TIMEZONE"] = "Europe/Berlin"
+    app.data.insert(
+        "items",
+        [
+            {
+                "_id": "tag:today",
+                "type": "text",
+                "versioncreated": now,
+            },
+            {
+                "_id": "tag:Week",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=3),
+            },
+            {
+                "_id": "tag:Week2",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=7),
+            },
+            {
+                "_id": "tag:Week2_MOnday",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=11),
+            },
+            {
+                "_id": "tag:Week2_SUNday",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=4),
+            },
+            {
+                "_id": "tag:thisMonth",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=15),
+            },
+            {
+                "_id": "tag:thisMonth2",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=30),
+            },
+            {
+                "_id": "tag:lastMonth",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=40),
+            },
+            {
+                "_id": "tag:twoMonthsAgo",
+                "type": "text",
+                "version": 1,
+                "versioncreated": now - timedelta(days=60),
+            },
+        ],
+    )
+
+    # Default Last 7 days
+    resp = client.get("/wire/search")
+    assert resp.status_code == 200
+    assert len(resp.json["_items"]) == 7
+    assert resp.json["_items"][0]["_id"] == "tag:today"
+    assert resp.json["_items"][1]["_id"] == "tag:Week"
+    assert resp.json["_items"][2]["_id"] == "tag:Week2_SUNday"
+    assert resp.json["_items"][3]["_id"] == "tag:Week2"
+    assert resp.json["_items"][4]["_id"] == "tag:Week2_MOnday"
+    assert resp.json["_items"][5]["_id"] == "tag:thisMonth"
+    assert resp.json["_items"][6]["_id"] == "tag:thisMonth2"
+
+    # Test "Today" filter
+    resp = client.get("/wire/search?date_filter=today")
+    assert resp.status_code == 200
+    assert len(resp.json["_items"]) == 1
+    assert resp.json["_items"][0]["_id"] == "tag:today"
+
+    # Test "Last 7 days" filter
+    resp = client.get("/wire/search?date_filter=last_week")
+    assert resp.status_code == 200
+
+    # Test "Last 30 days" filter
+    resp = client.get("/wire/search?date_filter=last_30_days")
+    assert resp.status_code == 200
+    assert len(resp.json["_items"]) == 7
+
+    # custom filter
+    created_to = (now - timedelta(days=35)).strftime("%Y-%m-%d")
+    created_from = (now - timedelta(days=70)).strftime("%Y-%m-%d")
+    resp = client.get(
+        "/wire/search?date_filter=custom_date&created_from={}&created_to={}".format(created_from, created_to)
+    )
+    assert resp.status_code == 200
+    assert len(resp.json["_items"]) == 2
+    assert resp.json["_items"][0]["_id"] == "tag:lastMonth"
+    assert resp.json["_items"][1]["_id"] == "tag:twoMonthsAgo"
+
+
+def test_date_filters_query(client, app):
+    service = WireSearchService()
+    app.config["DEFAULT_TIMEZONE"] = "Europe/Berlin"
+
+    def _set_search_query(user_id, args):
+        with app.test_request_context():
+            server_session["user"] = user_id
+            search = SearchQuery()
+            search.args = args
+            service.apply_request_filter(search)
+            return search.query["bool"]["must"]
+
+    # Last week
+    assert [
+        {"range": {"versioncreated": {"gte": "now-1w/w", "lt": "now/w", "time_zone": "Europe/Berlin"}}}
+    ] == _set_search_query(ADMIN_USER_ID, {"date_filter": "last_week"})
+
+    # Last 30 Days
+    assert [{"range": {"versioncreated": {"gte": "now-30d/d", "time_zone": "Europe/Berlin"}}}] == _set_search_query(
+        ADMIN_USER_ID, {"date_filter": "last_30_days"}
+    )
+
+    # Today
+    assert [{"range": {"versioncreated": {"gte": "now/d", "time_zone": "Europe/Berlin"}}}] == _set_search_query(
+        ADMIN_USER_ID, {"date_filter": "today"}
+    )
+
+    # Default
+    assert [{"range": {"versioncreated": {"gte": "now-30d/d", "time_zone": "Europe/Berlin"}}}] == _set_search_query(
+        ADMIN_USER_ID, {}
+    )
+
+    # Custom Date
+    assert [
+        {
+            "range": {
+                "versioncreated": {
+                    "gte": datetime(2024, 6, 20, 0, 0, tzinfo=pytz.UTC),
+                    "lte": datetime(2024, 6, 23, 23, 59, 59, tzinfo=pytz.UTC),
+                }
+            }
+        }
+    ] == _set_search_query(
+        ADMIN_USER_ID, {"date_filter": "custom_date", "created_from": "2024-06-20", "created_to": "2024-06-23"}
+    )
