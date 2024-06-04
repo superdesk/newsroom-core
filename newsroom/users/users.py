@@ -406,13 +406,15 @@ class UsersService(newsroom.Service):
             updated_user.update(user_updates)
             send_token(updated_user, token_type="new_account", update_token=False)
 
-    def user_has_paused_notifications(self, user) -> bool:
+    def user_has_paused_notifications(self, user: User) -> bool:
         schedule = user.get("notification_schedule") or {}
         timezone = pytz.timezone(schedule.get("timezone") or app.config.get("DEFAULT_TIMEZONE") or "UTC")
-        if schedule.get("pause_from") and schedule.get("pause_to"):
+        pause_from = schedule.get("pause_from")
+        pause_to = schedule.get("pause_to")
+        if pause_from and pause_to:
             now = datetime.now(timezone)
-            pause_from = schedule["pause_from"].replace(tzinfo=timezone)
-            pause_to = schedule["pause_to"].replace(tzinfo=timezone)
+            pause_from = pause_from.replace(tzinfo=timezone)
+            pause_to = pause_to.replace(tzinfo=timezone)
             if pause_from <= now <= pause_to:
                 return True
         return False
