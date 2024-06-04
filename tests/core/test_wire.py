@@ -951,6 +951,7 @@ def test_date_filters(client, app):
     # remove all other's item
     app.data.remove("items")
     now = datetime.utcnow()
+    app.config["DEFAULT_TIMEZONE"] = "Europe/Berlin"
     app.data.insert(
         "items",
         [
