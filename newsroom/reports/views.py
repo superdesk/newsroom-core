@@ -4,15 +4,17 @@ import csv
 from flask import session, jsonify, render_template, abort, current_app as newsroom_app
 from flask_babel import gettext, current_app as app
 
-from newsroom.decorator import account_manager_only, account_manager_or_company_admin_only
+from newsroom.decorator import account_manager_or_company_admin_only
 from newsroom.reports import blueprint
-from newsroom.reports import reports
 from newsroom.utils import query_resource
+
+from .utils import get_current_user_reports
 
 
 @blueprint.route("/reports/print/<report>", methods=["GET"])
-@account_manager_only
+@account_manager_or_company_admin_only
 def print_reports(report):
+    reports = get_current_user_reports()
     func = reports.get(report)
 
     if not func:
@@ -38,6 +40,7 @@ def company_reports():
 @blueprint.route("/reports/<report>", methods=["GET"])
 @account_manager_or_company_admin_only
 def get_report(report):
+    reports = get_current_user_reports()
     func = reports.get(report)
 
     if not func:
@@ -48,8 +51,9 @@ def get_report(report):
 
 
 @blueprint.route("/reports/export/<report>", methods=["GET"])
-@account_manager_only
+@account_manager_or_company_admin_only
 def export_reports(report):
+    reports = get_current_user_reports()
     func = reports.get(report)
 
     if not func:

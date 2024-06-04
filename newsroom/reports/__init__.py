@@ -11,7 +11,7 @@ from .reports import (
     get_company_api_usage,
     get_product_company,
     get_expired_companies,
-    get_company_and_user_saved_searches
+    get_company_and_user_saved_searches,
 )
 import superdesk
 from newsroom.wire.search import WireSearchService, WireSearchResource
@@ -19,7 +19,7 @@ from newsroom.wire.search import WireSearchService, WireSearchResource
 
 blueprint = Blueprint("reports", __name__)
 
-reports = {
+admin_reports = {
     "company-saved-searches": get_company_saved_searches,
     "user-saved-searches": get_user_saved_searches,
     "company-products": get_company_products,
@@ -30,8 +30,10 @@ reports = {
     "company-news-api-usage": get_company_api_usage,
     "product-companies": get_product_company,
     "expired-companies": get_expired_companies,
-    "company-and-user-saved-searches": get_company_and_user_saved_searches
+    "company-and-user-saved-searches": get_company_and_user_saved_searches,
 }
+
+company_admin_reports = {"company-and-user-saved-searches": get_company_and_user_saved_searches}
 
 
 def init_app(app):
