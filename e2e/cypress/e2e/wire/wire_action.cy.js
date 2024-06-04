@@ -5,10 +5,7 @@ import {NewshubLayout} from '../../support/pages/layout';
 import {WIRE_ITEMS} from '../../fixtures/wire'
 
 const WireItems = {
-    item_1: {
-        ...WIRE_ITEMS.syd_weather_1,
-        versioncreated: new Date(),
-    },
+    item_1: WIRE_ITEMS.syd_weather_1,
     item_2: WIRE_ITEMS.bris_traffic_1,
     item_3: WIRE_ITEMS.bris_traffic_2,
 };
