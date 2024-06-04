@@ -1,28 +1,30 @@
 import * as React from 'react';
 import {connect} from 'react-redux';
-import {IUser} from 'interfaces';
+import {IEvent, IUser} from 'interfaces';
 import {gettext} from 'utils';
 import {modalFormInvalid, modalFormValid} from 'actions';
-import {updateUserNotificationPause} from 'user-profile/actions';
+import {updateUserNotificationSchedule} from 'user-profile/actions';
 import Modal from 'components/Modal';
 
 interface IProps {
     modalFormInvalid(): void;
     modalFormValid(): void;
-    updateUserNotificationPause(schedule: Omit<IUser['notification_schedule'], 'last_run_time'>): void;
+    updateUserNotificationPause(schedule: Omit<IUser['notification_schedule'], 'last_run_time'>, message: string): void;
     data: {
         user: IUser;
     };
 }
 
 interface IState {
-    pauseFrom?: string;
-    pauseTo?: string;
+    pauseFrom: string;
+    pauseTo: string;
 }
 
 const disabledOptionDateFrom = new Date().toISOString().split('T')[0];
 
 const ONE_DAY = 1; // representing one day, can be used for adding or subtracting a day depending on the context of the function
+
+const DATE_ID = 'date-from';
 
 class PauseNotificationModalComponent extends React.Component<IProps, IState> {
     formRef: React.RefObject<HTMLFormElement>;
@@ -53,25 +55,22 @@ class PauseNotificationModalComponent extends React.Component<IProps, IState> {
 
         const inputs = this.formRef.current.querySelectorAll('input') as NodeListOf<HTMLInputElement>;
 
-        const hasErrors = [...inputs].some(input => {
+        const hasErrors = Array.from(inputs).some(input => {
             return input.checkValidity() !== true;
         });
 
         if (hasErrors === true) {
             this.formRef.current.reportValidity();
         } else {
-            this.props.updateUserNotificationPause(this.state);
+            this.props.updateUserNotificationPause(this.state, gettext('Notifications paused'));
         }
     }
 
-    updateDate(event: any, state: 'pauseFrom' | 'pauseTo') {
-        const stateClone: IState = {};
-
-        stateClone[state] = event?.target.value;
-        this.setState(stateClone);
+    updateDate(event: React.ChangeEvent<HTMLInputElement>, pauseType: 'pauseFrom' | 'pauseTo') {
+        this.setState({...this.state, [pauseType]: event.target.value});
     }
 
-    disabledMinOption(state: string | undefined) {
+    disabledPrevOptions(state: string | undefined) {
         if (state != '' && state != undefined) {
             const newMaxDate = new Date(state);
             newMaxDate.setDate(newMaxDate.getDate() + ONE_DAY);
@@ -81,7 +80,7 @@ class PauseNotificationModalComponent extends React.Component<IProps, IState> {
         }
     }
 
-    disabledMaxOption(state: string | undefined) {
+    disabledNextOptions(state: string | undefined) {
         if (state != '' && state != undefined) {
             const newMaxDate = new Date(state);
             newMaxDate.setDate(newMaxDate.getDate() - ONE_DAY);
@@ -107,18 +106,18 @@ class PauseNotificationModalComponent extends React.Component<IProps, IState> {
                     >
                         <div className='d-flex align-items-center gap-5'>
                             <div className="d-flex flex-column align-items-start">
-                                <label htmlFor="date-from">{gettext('From')}</label>
+                                <label htmlFor={DATE_ID}>{gettext('From')}</label>
                                 <input
-                                    id="date-from"
+                                    id={DATE_ID}
                                     type="date"
-                                    name="date-from"
+                                    name={DATE_ID}
                                     className="form-control"
                                     onChange={(event) => {
                                         this.updateDate(event, 'pauseFrom');
                                     }}
                                     value={this.state.pauseFrom}
                                     min={disabledOptionDateFrom}
-                                    max={this.disabledMaxOption(this.state.pauseTo)}
+                                    max={this.disabledNextOptions(this.state.pauseTo)}
                                 />
                             </div>
 
@@ -133,7 +132,7 @@ class PauseNotificationModalComponent extends React.Component<IProps, IState> {
                                         this.updateDate(event, 'pauseTo');
                                     }}
                                     value={this.state.pauseTo}
-                                    min={this.disabledMinOption(this.state.pauseFrom)}
+                                    min={this.disabledPrevOptions(this.state.pauseFrom)}
                                 />
                             </div>
                         </div>
@@ -147,8 +146,8 @@ class PauseNotificationModalComponent extends React.Component<IProps, IState> {
 const mapDispatchToProps = (dispatch: any) => ({
     modalFormInvalid: () => dispatch(modalFormInvalid()),
     modalFormValid: () => dispatch(modalFormValid()),
-    updateUserNotificationPause: (schedule: Omit<IUser['notification_schedule'], 'last_run_time'>) => (
-        dispatch(updateUserNotificationPause(schedule))
+    updateUserNotificationPause: (schedule: Omit<IUser['notification_schedule'], 'last_run_time'>, message: string) => (
+        dispatch(updateUserNotificationSchedule(schedule, message))
     ),
 });
 

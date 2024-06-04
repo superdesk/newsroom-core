@@ -5,10 +5,12 @@ import {
     deleteNotification,
     deleteAllNotifications,
     loadNotifications,
-    updateUserNotificationPause,
+    updateFullUser,
 } from '../actions';
 
 import NotificationList from 'components/NotificationList';
+import {postNotificationSchedule} from 'helpers/notification';
+import {gettext} from 'utils';
 
 class NotificationsApp extends React.Component<any, any> {
     static propTypes: any;
@@ -28,15 +30,17 @@ class NotificationsApp extends React.Component<any, any> {
                 loadNotifications={this.props.loadNotifications}
                 loading={this.props.loading}
                 fullUser={this.props.fullUser}
-                user={this.props.user}
-                updateUserNotificationPause={this.props.updateUserNotificationPause}
+                resumeNotifications={() => {
+                    postNotificationSchedule(this.props.fullUser._id, {pauseFrom: '', pauseTo: ''}, gettext('Notifications resumed')).then(() =>
+                        this.props.resumeNotifications()
+                    );
+                }}
             />,
         ];
     }
 }
 
 NotificationsApp.propTypes = {
-    user: PropTypes.string,
     fullUser: PropTypes.object,
     items: PropTypes.object,
     notifications: PropTypes.arrayOf(PropTypes.object),
@@ -48,7 +52,6 @@ NotificationsApp.propTypes = {
 };
 
 const mapStateToProps = (state: any) => ({
-    user: state.user,
     fullUser: state.fullUser,
     items: state.items,
     notifications: state.notifications,
@@ -60,8 +63,8 @@ const mapDispatchToProps = (dispatch: any) => ({
     clearNotification: (id: any) => dispatch(deleteNotification(id)),
     clearAll: () => dispatch(deleteAllNotifications()),
     loadNotifications: () => dispatch(loadNotifications()),
-    updateUserNotificationPause: () => (
-        dispatch(updateUserNotificationPause())
+    resumeNotifications: () => (
+        dispatch(updateFullUser())
     ),
 });
 

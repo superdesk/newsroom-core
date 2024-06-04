@@ -115,19 +115,13 @@ export function pushNotification(push: any): any {
     };
 }
 
-export function updateUserNotificationPause() {
+export function updateFullUser() {
     return (dispatch: any, getState: any) => {
         const fullUser = getState().fullUser;
-        return dispatch(fetchUser(fullUser._id));
-    };
-}
-
-export function fetchUser(id: any) {
-    return function (dispatch: any) {
-        return server.get(`/users/${id}`)
-            .then((data: IUser) => { 
-                dispatch(getUser(data));
-            })
-            .catch((error: any) => errorHandler(error, dispatch));
+        return server.get(`/users/${fullUser._id}`)
+        .then((data: IUser) => { 
+            dispatch(getUser(data));
+        })
+        .catch((error: any) => errorHandler(error, dispatch));
     };
 }

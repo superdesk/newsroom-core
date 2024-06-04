@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 import {IUser} from 'interfaces';
-import {gettext, getSubscriptionTimesString} from 'utils';
+import {gettext, getSubscriptionTimesString, formatDate} from 'utils';
 
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
@@ -16,6 +16,7 @@ import {
     setError,
     openEditTopicNotificationsModal,
     openPauseNotificationModal,
+    updateUserNotificationSchedule,
 } from '../../actions';
 import {IUserProfileState} from 'user-profile/reducers';
 import {IUserProfileUpdates} from 'interfaces/user';
@@ -30,6 +31,7 @@ interface IProps {
     openEditTopicNotificationsModal(): void;
     openPauseNotificationModal(): void;
     authProviderFeatures: IUserProfileState['authProviderFeatures'];
+    updateUserNotificationPause(schedule: Omit<IUser['notification_schedule'], 'last_run_time'>, message: string): void;
 }
 
 class UserProfile extends React.PureComponent<IProps> {
@@ -185,15 +187,39 @@ class UserProfile extends React.PureComponent<IProps> {
                             
                             <div className='row'>
                                 <div className="col-lg-6">
-                                    <div className="nh-container nh-container--highlight mb-3 mt-1">
-                                        <button
-                                            type="button"
-                                            className="nh-button nh-button--small nh-button--tertiary"
-                                            onClick={this.props.openPauseNotificationModal}
-                                        >
-                                            {gettext('Pause All Notification')}
-                                        </button>
-                                    </div>
+                                {this.props.user.notification_schedule?.pauseFrom != '' && this.props.user.notification_schedule?.pauseTo != ''
+                                    ? (
+                                        <div className="nh-container nh-container__text--alert">
+                                            <div className='d-flex flex-column gap-3 p-3'>
+                                                <div>
+                                                    {gettext('All notifications will be paused from {{dateFrom}} to {{dateTo}}', {dateFrom: formatDate(this.props.user.notification_schedule?.pauseFrom), dateTo: formatDate(this.props.user.notification_schedule?.pauseTo)})}
+                                                </div>
+                                                <div>
+                                                    <button
+                                                        type="button"
+                                                        className="nh-button nh-button--small nh-button--tertiary"
+                                                        onClick={() => {
+                                                            this.props.updateUserNotificationPause({pauseFrom: '', pauseTo: ''}, gettext('Notifications resumed')) 
+                                                        }}
+                                                    >
+                                                        {gettext('Clear Pausing')}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )
+                                    : (
+                                        <div className="nh-container nh-container--highlight mb-3 mt-1">
+                                            <button
+                                                type="button"
+                                                className="nh-button nh-button--small nh-button--tertiary"
+                                                onClick={this.props.openPauseNotificationModal}
+                                            >
+                                                {gettext('Pause All Notification')}
+                                            </button>
+                                        </div>
+                                    )
+                                }
                                 </div>
                             </div>
 
@@ -247,6 +273,9 @@ const mapDispatchToProps = (dispatch: any) => ({
     setError: (errors: {[key: string]: string}) => dispatch(setError(errors)),
     openEditTopicNotificationsModal: () => dispatch(openEditTopicNotificationsModal()),
     openPauseNotificationModal: () => dispatch(openPauseNotificationModal()),
+    updateUserNotificationPause: (schedule: Omit<IUser['notification_schedule'], 'last_run_time'>, message: string) => (
+        dispatch(updateUserNotificationSchedule(schedule, message))
+    ),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserProfile);

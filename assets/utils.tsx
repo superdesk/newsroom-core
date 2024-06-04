@@ -737,7 +737,7 @@ export function getSubscriptionTimesString(user: IUser): string {
     const timezoneAbbreviation = now.zoneAbbr();
     const timeStrings = [];
 
-    for (const time of schedule.times) {
+    for (const time of (schedule.times ?? [])) {
         const time_parts = time.split(':');
 
         now.hours(parseInt(time_parts[0], 10))
