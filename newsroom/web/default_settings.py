@@ -811,15 +811,15 @@ AGENDA_DEFAULT_FILTER_HIDE_PLANNING = False
 #: .. versionadded: 2.8
 #:
 WIRE_TIME_FILTERS = [
-    {"name": "Today", "filter": "today", "default": False, "query": {"gte": "now/d"}},
+    {"name": lazy_gettext("Today"), "filter": "today", "default": False, "query": {"gte": "now/d"}},
     {
-        "name": "Last Week",
+        "name": lazy_gettext("Last Week"),
         "filter": "last_week",
         "default": False,
         "query": {"gte": "now-1w/w", "lt": "now/w"},
     },
     {
-        "name": "Last 30 days",
+        "name": lazy_gettext("Last 30 days"),
         "filter": "last_30_days",
         "default": True,
         "query": {"gte": "now-30d/d"},
