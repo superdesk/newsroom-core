@@ -36,7 +36,7 @@ def company_reports():
 
 
 @blueprint.route("/reports/<report>", methods=["GET"])
-@account_manager_only
+@account_manager_or_company_admin_only
 def get_report(report):
     func = reports.get(report)
 

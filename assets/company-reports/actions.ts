@@ -14,6 +14,7 @@ export const REPORTS_NAMES = {
     'COMPANY_NEWS_API_USAGE': 'company-news-api-usage',
     'PRODUCT_COMPANIES': 'product-companies',
     'EXPIRED_COMPANIES': 'expired-companies',
+    'COMPANY_AND_USER_SAVED_SEARCHES': 'company-and-user-saved-searches',
 };
 
 
@@ -28,6 +29,7 @@ export const REPORTS: any = {
     [REPORTS_NAMES.COMPANY_NEWS_API_USAGE]: '/reports/company-news-api-usage',
     [REPORTS_NAMES.PRODUCT_COMPANIES]: '/reports/product-companies',
     [REPORTS_NAMES.EXPIRED_COMPANIES]: '/reports/expired-companies',
+    [REPORTS_NAMES.COMPANY_AND_USER_SAVED_SEARCHES]: '/reports/company-and-user-saved-searches',
 };
 
 function getReportQueryString(currentState: any, next: any, exportReport: any, notify: any) {

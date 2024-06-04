@@ -11,6 +11,7 @@ from .reports import (
     get_company_api_usage,
     get_product_company,
     get_expired_companies,
+    get_company_and_user_saved_searches
 )
 import superdesk
 from newsroom.wire.search import WireSearchService, WireSearchResource
@@ -29,6 +30,7 @@ reports = {
     "company-news-api-usage": get_company_api_usage,
     "product-companies": get_product_company,
     "expired-companies": get_expired_companies,
+    "company-and-user-saved-searches": get_company_and_user_saved_searches
 }
 
 

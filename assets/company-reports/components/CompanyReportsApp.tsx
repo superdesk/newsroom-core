@@ -42,7 +42,7 @@ const adminReports = [
 
 const companyAdminReports = [
     {value: '', text: gettext('Select a report')},
-    {value: REPORTS_NAMES.COMPANY_SAVED_SEARCHES, text: gettext('Saved searches per company')},
+    {value: REPORTS_NAMES.COMPANY_AND_USER_SAVED_SEARCHES, text: gettext('Saved My Topics and Company Topics')},
 ];
 
 const getReportsByUserType = (userType: UserType): Array<any> => {
