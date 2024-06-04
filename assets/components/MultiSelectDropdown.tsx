@@ -39,7 +39,6 @@ function MultiSelectDropdown({values, label, field, options, onChange, showAllBu
         <Dropdown
             key={field}
             label={buttonLabel}
-            icon={'icon-small--arrow-down'}
             isActive={isActive}
         >
             {showAllButton && (

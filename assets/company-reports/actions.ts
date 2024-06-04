@@ -119,7 +119,7 @@ export function runReport() {
     };
 }
 
-export function fetchAggregations(url: any) {
+export function fetchAggregations(url: string) {
     return function(dispatch: any, getState: any) {
         const queryString = getReportQueryString(getState(), 0, false, notify);
 
@@ -144,7 +144,6 @@ export function fetchReport(url: any, next?: any, exportReport?: any) {
         }
 
         const queryString = getReportQueryString(getState(), next, exportReport, notify);
-        let apiRequest: any;
 
         if (exportReport) {
             if (getState().results.length <= 0) {
@@ -156,18 +155,14 @@ export function fetchReport(url: any, next?: any, exportReport?: any) {
             return;
         }
 
-        if (queryString) {
-            apiRequest = server.get(`${url}?${queryString}`);
-        } else {
-            apiRequest = server.get(url);
-        }
+        const apiRequest = server.get(queryString ? `${url}?${queryString}` : url);
 
         return apiRequest.then((data: any) => {
             if (!next) {
                 dispatch(receivedData(data));
             } else {
                 dispatch(isLoading(false));
-                dispatch(addResults(get(data, 'results', [])));
+                dispatch(addResults(data?.results ?? []));
             }
         })
             .catch((error: any) => errorHandler(error, dispatch, setError));
