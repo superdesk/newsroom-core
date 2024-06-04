@@ -22,7 +22,7 @@ export interface IProps {
     filterGroups: {[key: string]: IFilterGroup};
     availableFields: ISearchFields;
 
-    setQuery(): void;
+    setQuery(query: string): void;
     resetFilter(): void;
     refresh?(): void;
     toggleNavigation(navigation: INavigation): void;

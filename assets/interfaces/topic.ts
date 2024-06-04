@@ -1,5 +1,6 @@
 import {IUser} from './user';
 import {ICompany} from './company';
+import {ISearchState} from './search';
 
 export type ITopicNotificationScheduleType = 'real-time' | 'scheduled' | null;
 
@@ -23,16 +24,14 @@ export interface ISearchParams {
     timezone_offset?: number;
     topic_type: 'wire' | 'agenda';
     navigation: Array<string>;
-    advanced?: {
-        all: string;
-        any: string;
-        exclude: string;
-        fields: ISearchFields;
-    };
+    // if `advanced` is defined, make sure `fields` is mandatory and all others are not
+    advanced?: {fields: ISearchState['advanced']['fields']} & Partial<Omit<ISearchState['advanced'], 'fields'>>;
     created?: {
         from?: string | null;
         to?: string | null;
     };
+    product: ISearchState['productId'];
+    sortQuery: ISearchState['activeSortQuery'];
 }
 
 export interface ITopic extends ISearchParams {

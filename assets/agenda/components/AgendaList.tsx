@@ -415,6 +415,8 @@ class AgendaList extends React.Component<IProps, IState> {
 
     render() {
         const lastGroupWithItems = this.props.groupedItems.findLastIndex((group) => group.items.length > 0);
+        const groupedItems = this.props.groupedItems.slice(0, lastGroupWithItems + 1);
+
         return (
             <div
                 className={classNames('wire-articles wire-articles--list', {
@@ -429,30 +431,33 @@ class AgendaList extends React.Component<IProps, IState> {
                 }}
                 onScroll={this.props.onScroll}
             >
-                {this.props.groupedItems.filter((group, index) => lastGroupWithItems >= index).map((group) => (
-                    <React.Fragment key={group.date}>
-                        <div className='wire-articles__header' key={`${group.date}header`}>
-                            {this.getListGroupDate(group)}
-                        </div>
+                {groupedItems.length === 1 ?
+                    this.renderGroupItems(groupedItems[0], false) :
+                    groupedItems.map((group) => (
+                        <React.Fragment key={group.date}>
+                            <div className='wire-articles__header' key={`${group.date}header`}>
+                                {this.getListGroupDate(group)}
+                            </div>
 
-                        {group.hiddenItems.length === 0 ? null : (
-                            <AgendaListGroupHeader
-                                group={group.date}
-                                itemIds={group.hiddenItems}
-                                itemsById={this.props.itemsById}
-                                itemsShown={this.props.hiddenGroupsShown[group.date] === true}
-                                toggleHideItems={this.props.toggleHiddenGroupItems}
-                            />
-                        )}
+                            {group.hiddenItems.length === 0 ? null : (
+                                <AgendaListGroupHeader
+                                    group={group.date}
+                                    itemIds={group.hiddenItems}
+                                    itemsById={this.props.itemsById}
+                                    itemsShown={this.props.hiddenGroupsShown[group.date] === true}
+                                    toggleHideItems={this.props.toggleHiddenGroupItems}
+                                />
+                            )}
 
-                        {this.props.hiddenGroupsShown[group.date] !== true ?
-                            null :
-                            this.renderGroupItems(group, true)
-                        }
-                        {this.renderGroupItems(group, false)}
-                    </React.Fragment>
-                ))}
-                {!this.props.groupedItems.length &&
+                            {this.props.hiddenGroupsShown[group.date] !== true ?
+                                null :
+                                this.renderGroupItems(group, true)
+                            }
+                            {this.renderGroupItems(group, false)}
+                        </React.Fragment>
+                    ))
+                }
+                {!groupedItems.length &&
                     <div className="wire-articles__item-wrap col-12">
                         <div className="alert alert-secondary">{gettext('No items found.')}</div>
                     </div>

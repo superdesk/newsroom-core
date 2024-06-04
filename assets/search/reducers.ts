@@ -32,7 +32,7 @@ const INITIAL_STATE: ISearchState = {
     activeTopic: undefined,
     activeNavigation: [],
     activeQuery: '',
-    activeSortQuery: '',
+    activeSortQuery: undefined,
     activeFilter: {},
     createdFilter: {},
     productId: undefined,
