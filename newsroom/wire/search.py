@@ -13,7 +13,7 @@ from newsroom.settings import get_setting
 from newsroom.user_roles import UserRole
 from newsroom.utils import get_local_date, get_end_date
 from newsroom.search.service import BaseSearchService, SearchQuery
-from typing import TypedDict, Literal, List, Optional
+from typing import TypedDict, List, Optional
 import pytz
 
 logger = logging.getLogger(__name__)
@@ -39,7 +39,7 @@ class TimeFilter(TypedDict):
     name: str
     default: bool
     query: DateRangeQuery
-    filter: Literal["today", "last_week", "last_30_days", ""]
+    filter: str
 
 
 class WireSearchResource(newsroom.Resource):
@@ -305,7 +305,7 @@ class WireSearchService(BaseSearchService):
         for time_filter in time_filters:
             if time_filter["filter"] == filter_name:
                 query = time_filter["query"]
-                query["time_zone"] = app.config.get("DEFAULT_TIMEZONE")
+                query.setdefault("time_zone", app.config.get("DEFAULT_TIMEZONE"))
                 return query
         return None
 
@@ -313,7 +313,6 @@ class WireSearchService(BaseSearchService):
         if date_filter != "custom_date":
             query = self.get_date_filter_query(date_filter)
             if query:
-                query["time_zone"] = app.config.get("DEFAULT_TIMEZONE")
                 return query
         return None
 

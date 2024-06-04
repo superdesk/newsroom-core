@@ -84,8 +84,8 @@ export interface IOccurStatus {
 export interface IDateFilters{
     name: string,
     default: boolean,
-    query?: Array<{}>
-    filter: Array<['today', 'last_week', 'last_30_days', '']>
+    query?: string,
+    filter: string;
 }
 export interface ICommonState extends IAgendaState {
     dateFilters?: IDateFilters
