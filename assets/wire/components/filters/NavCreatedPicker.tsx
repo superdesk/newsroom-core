@@ -16,7 +16,7 @@ function NavCreatedPicker({setCreatedFilter, createdFilter, context, wireFilters
 
     useEffect(() => {
         setShowCustomRange(createdFilter.date_filter === 'custom_date');
-        if (isEmpty(createdFilter) && context == 'wire'){
+        if (isEmpty(createdFilter) && context === 'wire'){
             const defaultFilter = wireFilters.find((filter: {default: any}) => filter.default);
             setCreatedFilter({...createdFilter, date_filter: defaultFilter?.filter});
         }
@@ -50,6 +50,7 @@ function NavCreatedPicker({setCreatedFilter, createdFilter, context, wireFilters
                     className="form-control"
                     value={showCustomRange ? 'custom_date' : createdFilter.date_filter || ''}
                     onChange={onDateFilterChange}
+                    data-test-id="date-filter-select"
                 >
                     {context === 'agenda' ? (
                         agendaShortcuts.map((shortcut) => (
@@ -78,6 +79,7 @@ function NavCreatedPicker({setCreatedFilter, createdFilter, context, wireFilters
                             className="form-control"
                             onChange={onInputChange}
                             value={createdFilter.from || ''}
+                            data-test-id="custom-date-from"
                         />
                     </div>
                     <div className="formGroup">
@@ -89,6 +91,7 @@ function NavCreatedPicker({setCreatedFilter, createdFilter, context, wireFilters
                             className="form-control"
                             onChange={onInputChange}
                             value={createdFilter.to || ''}
+                            data-test-id="custom-date-to"
                         />
                     </div>
                 </>
