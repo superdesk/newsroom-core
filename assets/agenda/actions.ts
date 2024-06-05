@@ -6,7 +6,9 @@ import {
     IAgendaItem,
     IAgendaListGroup,
     IAgendaState,
-    AgendaThunkAction, ISearchState,
+    AgendaThunkAction,
+    ISearchState,
+    ISearchParams,
 } from 'interfaces';
 import server from 'server';
 import analytics from 'analytics';
@@ -235,6 +237,7 @@ function search(state: IAgendaState, fetchFrom: number): Promise<IRestApiRespons
     } = getAgendaSearchParamsFromState(state);
 
     const params: any = {
+        sort: searchParams.sortQuery == null ? null : searchParams.sortQuery,
         q: searchParams.query,
         bookmarks: state.bookmarks && state.user,
         navigation: getNavigationUrlParam(searchParams.navigation, true, false),
@@ -283,7 +286,7 @@ export function fetchItems(): AgendaThunkAction {
 
 interface AgendaSearchParams {
     itemType: IAgendaState['agenda']['itemType'];
-    searchParams: any;
+    searchParams: ISearchParams;
     featured: boolean;
     fromDate?: string;
     toDate?: string;
@@ -329,10 +332,12 @@ function getAgendaSearchParamsFromState(state: IAgendaState): AgendaSearchParams
 
 function setListGroupsAndLoadHiddenItems(items: Array<IAgendaItem>, next?: boolean): AgendaThunkAction {
     return (dispatch, getState) => {
+
         // If there are groups shown, then load the hidden items for those groups
         const state = getState();
         const {activeGrouping, featuredOnly} = state.agenda;
-        const {fromDate, toDate} = getAgendaSearchParamsFromState(state);
+        const {fromDate, toDate, searchParams} = getAgendaSearchParamsFromState(state);
+
         let minDate: moment.Moment | undefined;
         let maxDate: moment.Moment | undefined;
 
@@ -361,7 +366,13 @@ function setListGroupsAndLoadHiddenItems(items: Array<IAgendaItem>, next?: boole
             }
         }
 
-        const groups = groupItems(items, minDate, maxDate, activeGrouping, featuredOnly);
+        const groups: Array<IAgendaListGroup> = (searchParams.sortQuery ?? '_score') === '_score' ?
+            groupItems(items, minDate, maxDate, activeGrouping, featuredOnly) :
+            [{
+                date: '',
+                items: items.map((item) => item._id),
+                hiddenItems: [],
+            }];
 
         next === true ?
             dispatch(addItemsToListGroups(groups)) :

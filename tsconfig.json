@@ -3,9 +3,10 @@
     "assets"
   ],
   "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ES2023"],
     "allowJs": true,
     "baseUrl": "./assets",
-    "target": "ES2017",
+    "target": "ES6",
     "module": "commonjs",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

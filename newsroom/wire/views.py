@@ -118,6 +118,7 @@ def get_view_data() -> Dict:
         "groups": app.config.get("WIRE_GROUPS", []),
         "user_folders": user_folders,
         "company_folders": company_folders,
+        "date_filters": app.config.get("WIRE_TIME_FILTERS", []),
     }
 
 

@@ -91,7 +91,6 @@ interface Window {
     viewData: any;
     report: any;
     factCheckData: any;
-    companyReportsData: any;
     mapsLoaded: any;
     googleMapsKey: any;
     mediaReleasesData: any;

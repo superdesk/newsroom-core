@@ -1,7 +1,8 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {connect} from 'react-redux';
+
+import {IAgendaState, IFilterGroup, INavigation, ISearchFields, ISearchParams, ITopic, IUser, ISearchSortValue} from 'interfaces';
 
 import {gettext} from 'utils';
 import {searchParamsSelector, navigationsByIdSelector, filterGroupsByIdSelector} from '../../selectors';
@@ -21,36 +22,83 @@ import {
 import {Dropdown} from './../../../components/Dropdown';
 
 import {SearchResultTagsList} from './SearchResultTagsList';
+import {ICommonState, IDateFilters} from 'interfaces/common';
+
+interface IReduxStoreProps {
+    user: IUser;
+    searchParams: ISearchParams;
+    navigations: {[key: string]: INavigation};
+    filterGroups: {[key: string]: IFilterGroup};
+    availableFields: ISearchFields;
+}
+
+interface IDispatchProps {
+    toggleNavigation(navigation: INavigation): void;
+    toggleAdvancedSearchField(field: string): void;
+    setAdvancedSearchKeywords(field: string, keywords: string): void;
+    toggleFilter(key: string, value: any, single: any): void;
+    setCreatedFilter(createdFilter: ITopic['created']): void;
+    resetSearchParamsAndUpdateURL(): void;
+    clearAdvancedSearchParams(): void;
+    deselectMyTopic?: (topicId: ITopic['_id']) => void;
+    resetFilter(): void;
+}
+
+function getSortValueLabel(sortValue: ISearchSortValue): string {
+    switch (sortValue) {
+    case 'versioncreated:desc':
+        return gettext('Newest first');
+    case 'versioncreated:asc':
+        return gettext('Oldest first');
+    case '_score':
+        return gettext('Relevance');
+    }
+}
+
+interface IOwnProps {
+    initiallyOpen?: boolean;
+    minimizeSearchResults?: boolean;
+    showTotalItems?: boolean;
+    showTotalLabel?: boolean;
+    showSaveTopic?: boolean;
+    showSortDropdown?: boolean;
+    totalItems?: number;
+    activeTopic: ITopic;
+    topicType: ITopic['topic_type'];
+    saveMyTopic?: (params: ISearchParams) => void;
+    defaultSortValue?: ISearchSortValue;
+
+    refresh(): void;
+    onClearAll?(): void;
+    setQuery(query: string): void;
+    setSortQuery(query: ISearchSortValue): void;
+    dateFilters?: IDateFilters
+}
+
+type IProps = IReduxStoreProps & IDispatchProps & IOwnProps;
+
+interface IState {
+    isTagSectionShown: boolean;
+    sortValue: ISearchSortValue;
+}
 
 
-class SearchResultsBarComponent extends React.Component<any, any> {
-    private sortValues: Array<{value: string; sortFunction: () => void;}>;
+class SearchResultsBarComponent extends React.Component<IProps, IState> {
     private topicNotNull: boolean;
 
-    static propTypes: any;
-    static defaultProps: any;
+    static defaultProps: Partial<IOwnProps> = {
+        minimizeSearchResults: false,
+        showTotalItems: true,
+        showTotalLabel: true,
+        showSaveTopic: false,
+    };
     constructor(props: any) {
         super(props);
 
         this.topicNotNull = new URLSearchParams(window.location.search).get('topic') != null;
-        this.sortValues = [
-            {
-                value: gettext('Newest first'),
-                sortFunction: () => this.setSortQuery('versioncreated:desc'),
-            },
-            {
-                value: gettext('Oldest first'),
-                sortFunction: () => this.setSortQuery('versioncreated:asc'),
-            },
-            {
-                value: gettext('Relevance'),
-                sortFunction: () => this.setSortQuery('_score'),
-            },
-        ];
-
         this.state = {
             isTagSectionShown: this.props.initiallyOpen || this.topicNotNull,
-            sortValue: this.sortValues[0].value,
+            sortValue: this.props.defaultSortValue ?? 'versioncreated:desc',
         };
 
         this.toggleTagSection = this.toggleTagSection.bind(this);
@@ -87,7 +135,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
         this.props.refresh();
     }
 
-    setSortQuery(sortQuery: string) {
+    setSortQuery(sortQuery: ISearchSortValue) {
         this.props.setSortQuery(sortQuery);
         this.props.refresh();
     }
@@ -125,6 +173,11 @@ class SearchResultsBarComponent extends React.Component<any, any> {
     render() {
         const {isTagSectionShown} = this.state;
         const numberFormatter = (new Intl.NumberFormat(undefined, {style: 'decimal'}));
+        const sortValues: Array<ISearchSortValue> = [
+            'versioncreated:desc',
+            'versioncreated:asc',
+            '_score',
+        ];
 
         return (
             <React.Fragment>
@@ -145,28 +198,28 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                                 </div>
                             )}
                             <div className="navbar__button-group">
-                                {this.props.topicType === 'wire' ? <Dropdown
-                                    label={gettext('Sort by:')}
-                                    value={gettext('{{sort}}', {sort: this.state.sortValue})}
-                                    className={'sorting-dropdown'}
-                                    dropdownMenuHeader={gettext('Sort results by')}
-                                >
-                                    {
-                                        this.sortValues.map((option) => (
+                                {this.props.showSortDropdown !== true ? null : (
+                                    <Dropdown
+                                        label={gettext('Sort by:')}
+                                        value={getSortValueLabel(this.state.sortValue)}
+                                        className={'sorting-dropdown'}
+                                        dropdownMenuHeader={gettext('Sort results by')}
+                                    >
+                                        {sortValues.map((sortValue) => (
                                             <button
-                                                key={option.value}
-                                                type='button'
-                                                className='dropdown-item'
+                                                key={sortValue}
+                                                type="button"
+                                                className="dropdown-item"
                                                 onClick={() => {
-                                                    option.sortFunction();
-                                                    this.setState({sortValue: option.value});
+                                                    this.setSortQuery(sortValue);
+                                                    this.setState({sortValue: sortValue});
                                                 }}
                                             >
-                                                {gettext(option.value)}
+                                                {getSortValueLabel(sortValue)}
                                             </button>
-                                        ))
-                                    }
-                                </Dropdown>: null}
+                                        ))}
+                                    </Dropdown>
+                                )}
                                 <button
                                     className="nh-button nh-button--tertiary"
                                     onClick={() => {
@@ -214,6 +267,7 @@ class SearchResultsBarComponent extends React.Component<any, any> {
                             resetFilter={this.resetFilter}
                             clearAdvancedSearchParams={this.props.clearAdvancedSearchParams}
                             deselectMyTopic={this.props.deselectMyTopic}
+                            dateFilters={this.props.dateFilters}
                         />
                     )}
 
@@ -224,56 +278,13 @@ class SearchResultsBarComponent extends React.Component<any, any> {
     }
 }
 
-SearchResultsBarComponent.propTypes = {
-    user: PropTypes.object,
-    initiallyOpen: PropTypes.bool,
-
-    minimizeSearchResults: PropTypes.bool,
-    showTotalItems: PropTypes.bool,
-    showTotalLabel: PropTypes.bool,
-    showSaveTopic: PropTypes.bool,
-
-    totalItems: PropTypes.number,
-    totalItemsLabel: PropTypes.string,
-
-    saveMyTopic: PropTypes.func,
-    searchParams: PropTypes.object,
-    activeTopic: PropTypes.object,
-    topicType: PropTypes.string,
-
-    refresh: PropTypes.func,
-
-    navigations: PropTypes.object,
-    filterGroups: PropTypes.object,
-    availableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
-
-    toggleNavigation: PropTypes.func.isRequired,
-    toggleAdvancedSearchField: PropTypes.func.isRequired,
-    setQuery: PropTypes.func.isRequired,
-    setAdvancedSearchKeywords: PropTypes.func.isRequired,
-    toggleFilter: PropTypes.func.isRequired,
-    setCreatedFilter: PropTypes.func.isRequired,
-    resetSearchParamsAndUpdateURL: PropTypes.func.isRequired,
-    clearAdvancedSearchParams: PropTypes.func.isRequired,
-    deselectMyTopic: PropTypes.func.isRequired,
-    resetFilter: PropTypes.func.isRequired,
-
-    children: PropTypes.node,
-};
-
-SearchResultsBarComponent.defaultProps = {
-    minimizeSearchResults: false,
-    showTotalItems: true,
-    showTotalLabel: true,
-    showSaveTopic: false,
-};
-
-const mapStateToProps = (state: any) => ({
+const mapStateToProps = (state: ICommonState) => ({
     user: state.userObject,
     searchParams: searchParamsSelector(state),
     navigations: navigationsByIdSelector(state),
     filterGroups: filterGroupsByIdSelector(state),
     availableFields: getAdvancedSearchFields(state.context),
+    dateFilters: state.dateFilters,
 });
 
 const mapDispatchToProps = {
@@ -288,4 +299,9 @@ const mapDispatchToProps = {
     resetFilter,
 };
 
-export const SearchResultsBar: React.ComponentType<any> = connect(mapStateToProps, mapDispatchToProps)(SearchResultsBarComponent);
+export const SearchResultsBar = connect<
+    IReduxStoreProps,
+    IDispatchProps,
+    IOwnProps,
+    IAgendaState
+>(mapStateToProps, mapDispatchToProps)(SearchResultsBarComponent);

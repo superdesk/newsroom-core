@@ -138,7 +138,7 @@ $container-max-widths: (
     @include defineColorHSL(--color-success, 95, 50%, 34%);
     @include defineColorHSL(--color-warning, 36, 100%, 40%);
     @include defineColorHSL(--color-alert, 356, 72%, 46%);
-    @include defineColorHSL(--color-info, 198, 45%, 50%);
+    @include defineColorHSL(--color-info, 198, 45%, 45%);
     @include defineColorHSL(--color-highlight, 356, 72%, 46%);
     @include defineColorHSL(--color-highlight1, 268, 68%, 45%);
     @include defineColorHSL(--color-highlight2, 310, 89%, 36%);
@@ -241,7 +241,7 @@ $container-max-widths: (
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
 
-
+    --base-line-height: 1.5;
 
 
     // CORE: ICONS
@@ -607,6 +607,7 @@ $container-max-widths: (
     --content-item-headline-line-height: 1.2;
 
     --content-item-text-font-size: var(--text-size--large);
+    --content-item-lead-font-size: calc(var(--text-size--large) * 1.0625); // 17px
     --content-item-text-line-height: 1.6;
     --content-item-text-font-weight: 300;
     --content-item-text-font-family: var(--font-family-core--secondary);
@@ -662,7 +663,7 @@ $container-max-widths: (
     --search-result-tags-list-shadow-inner: inset 0 1px 2px hsla(0, 0%, 0%, 0.08), inset 0 -1px 2px hsla(0, 0%, 0%, 0.06);
 
     // COMPONENT: MULTI-DAY LABEL
-    --multiday-label-color-bg: hsl(89, 66%, 30%);
+    --multiday-label-color-bg: var(--color-success);
     --multiday-label-color-fg: hsl(0, 0%, 100%);
     --multiday-label-font-size: var(--text-size--small);
 

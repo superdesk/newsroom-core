@@ -36,7 +36,6 @@ black==23.12.1
 blinker==1.7.0
     # via
     #   elastic-apm
-    #   flask
     #   flask-mail
     #   raven
     #   sentry-sdk
@@ -68,9 +67,7 @@ certifi==2024.2.2
 cffi==1.16.0
     # via cryptography
 chardet==5.2.0
-    # via
-    #   reportlab
-    #   superdesk-core
+    # via superdesk-core
 charset-normalizer==3.3.2
     # via requests
 ciso8601==2.3.1
@@ -438,7 +435,7 @@ tomli==2.0.1
     #   pytest
 types-python-dateutil==2.9.0.20240316
     # via arrow
-typing-extensions==4.12.0
+typing-extensions==4.12.1
     # via
     #   black
     #   jwcrypto

@@ -90,6 +90,9 @@
     --label-color-bg-wire-alert: var(--color-alert);
     --label-color-bg-wire-advisory: var(--color-success);
     --label-color-bg-wire-press-release: var(--color-info);
+
+    /* COMPONENT: MULTI-DAY LABEL */
+    --multiday-label-color-bg: var(--color-info);
 }
 
 .navbar__logo img.navbar__logo-img--fr {

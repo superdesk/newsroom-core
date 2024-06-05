@@ -1,13 +1,14 @@
 from flask import json
 from urllib.parse import quote
 from tests.utils import get_json
+from datetime import datetime
 
 
 def test_wire_search_fields(client, app):
     app.data.insert(
         "items",
         [
-            {"headline": "foo", "ednote": "bar", "guid": "test", "type": "text"},
+            {"headline": "foo", "ednote": "bar", "guid": "test", "type": "text", "versioncreated": datetime.utcnow()},
         ],
     )
 
@@ -22,7 +23,7 @@ def test_wire_search_cross_fields(client, app):
     app.data.insert(
         "items",
         [
-            {"headline": "foo", "body_html": "bar", "type": "text"},
+            {"headline": "foo", "body_html": "bar", "type": "text", "versioncreated": datetime.utcnow()},
         ],
     )
 

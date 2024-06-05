@@ -292,11 +292,18 @@ def sidenavs_by_group(group=0, blueprint=None):
     return [nav for nav in blueprint_navs if nav.get("group") == group]
 
 
-def is_admin_or_account_manager(user=None):
-    allowed_user_types = ["administrator", "account_management"]
+def is_user_type_allowed(allowed_user_types, user=None):
     if user:
         return user.get("user_type") in allowed_user_types
     return flask.session.get("user_type") in allowed_user_types
+
+
+def is_admin_or_account_manager(user=None):
+    return is_user_type_allowed(["administrator", "account_management"], user)
+
+
+def is_admin_manager_or_company_admin(user=None):
+    return is_user_type_allowed(["administrator", "account_management", "company_admin"], user)
 
 
 def is_company_admin(user=None):

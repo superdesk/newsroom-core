@@ -13,7 +13,7 @@ describe('CompanyAdmin - Product Seats', function () {
         addDefaultResources();
     });
 
-    it('CopmanyAdmin can manage their user product permissions', () => {
+    it('CompanyAdmin can manage their user product permissions', () => {
         // Login and navigate to CompanyAdmin page
         NewshubLayout.login('foo@bar.com', 'admin');
         NewshubLayout.getSidebarLink('company_admin').click();

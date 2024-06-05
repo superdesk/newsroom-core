@@ -45,6 +45,7 @@ from newsroom.agenda.utils import (
     TO_BE_CONFIRMED_FIELD,
     push_agenda_item_notification,
 )
+from newsroom.users import users_service
 
 
 logger = logging.getLogger(__name__)
@@ -822,6 +823,9 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids,
     is_text = item.get("type") == "text"
 
     users_processed = []
+    users_with_paused_notifications = set(
+        [user["_id"] for user in users_dict.values() if users_service.user_has_paused_notifications(user)]
+    )
 
     def _get_users(section):
         """Get the list of users who have downloaded or bookmarked the items"""
@@ -840,7 +844,9 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids,
         user_list = [
             user_id
             for user_id in user_list
-            if user_id not in users_processed and ObjectId(user_id) not in users_with_realtime_subscription
+            if user_id not in users_processed
+            and ObjectId(user_id) not in users_with_realtime_subscription
+            and ObjectId(user_id) not in users_with_paused_notifications
         ]
 
         users_processed.extend(user_list)

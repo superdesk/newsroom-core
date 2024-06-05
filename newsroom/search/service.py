@@ -32,6 +32,7 @@ from newsroom.settings import get_setting
 from newsroom.template_filters import is_admin
 from newsroom.utils import get_local_date, get_end_date
 from bson.objectid import ObjectId
+from newsroom.users import users_service
 
 logger = logging.getLogger(__name__)
 
@@ -149,8 +150,11 @@ class BaseSearchService(Service):
     section: Section = "wire"
     limit_days_setting: Union[None, str] = "wire_time_limit_days"
     default_sort = [{"versioncreated": "desc"}]
-    default_page_size = 25
     _matched_ids = []  # array of IDs matched on the request, used when searching all versions
+
+    @property
+    def default_page_size(self) -> int:
+        return 25
 
     def get(self, req, lookup):
         search = SearchQuery()
@@ -872,6 +876,9 @@ class BaseSearchService(Service):
 
         for user in users.values():
             if not user_has_section_allowed(user, self.section):
+                continue
+
+            if users_service.user_has_paused_notifications(user):
                 continue
 
             aggs = {"topics": {"filters": {"filters": {}}}}

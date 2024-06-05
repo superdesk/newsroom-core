@@ -18,7 +18,7 @@ from bson.errors import InvalidId
 from eve.utils import config, ParsedRequest
 from eve_elastic.elastic import parse_date, ElasticCursor
 from flask import current_app as app, json, abort, request, g, flash, session, url_for
-from flask_babel import gettext
+from flask_babel import gettext, format_date as _format_date
 
 from newsroom.types import PublicUserData, User, Company, Group, Permissions
 from newsroom.template_filters import (
@@ -26,6 +26,7 @@ from newsroom.template_filters import (
     parse_date as parse_short_date,
     format_datetime,
     is_admin,
+    get_client_format,
 )
 
 
@@ -199,11 +200,10 @@ def get_agenda_dates(agenda: Dict[str, Any], date_paranthesis: bool = False) -> 
     all_day = agenda.get("dates", {}).get("all_day", False)
 
     if all_day:
-        return (
-            "{}".format(date_short(start))
-            if start.date() == end.date()
-            else "{} - {}".format(date_short(start), date_short(end))
-        )
+        format = get_client_format("NOTIFICATION_EMAIL_DATE_FORMAT") or "dd/MM/yyyy"
+        _start = _format_date(start, format, rebase=False)
+        _end = _format_date(end, format, rebase=False)
+        return _start if start.date() == end.date() else "{} - {}".format(_start, _end)
 
     if start + timedelta(minutes=DAY_IN_MINUTES) < end:
         # Multi day event

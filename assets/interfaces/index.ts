@@ -34,4 +34,4 @@ export {
     IFullCoverage,
 } from './agenda';
 export {IArticle, IRendition, IContentType} from './content';
-export {ISearchState} from './search';
+export {ISearchState, ISearchSortValue} from './search';

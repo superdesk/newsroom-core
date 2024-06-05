@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {get, isEqual} from 'lodash';
 
+import {ISearchSortValue} from 'interfaces';
 import {gettext, getItemFromArray, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE} from 'utils';
 import {getSingleFilterValue} from 'search/utils';
 
@@ -108,39 +109,23 @@ class WireApp extends SearchBase<any> {
             !this.props.bookmarks;
         let showTotalItems = false;
         let showTotalLabel = false;
-        let totalItemsLabel: any;
         const filterValue = getSingleFilterValue(this.props.activeFilter, ['genre', 'subject']);
 
         if (get(this.props, 'context') === 'wire') {
             if (get(this.props, 'activeTopic.label')) {
-                totalItemsLabel = this.props.activeTopic.label;
                 showTotalItems = showTotalLabel = true;
             } else if (numNavigations === 1) {
-                totalItemsLabel = get(getItemFromArray(
-                    this.props.searchParams.navigation[0],
-                    this.props.navigations
-                ), 'name') || '';
                 showTotalItems = showTotalLabel = true;
             } else if (get(this.props, 'activeProduct.name')) {
-                totalItemsLabel = this.props.activeProduct.name;
                 showTotalItems = showTotalLabel = true;
             } else if (filterValue !== null) {
-                totalItemsLabel = filterValue;
                 showTotalItems = showTotalLabel = true;
             } else if (numNavigations > 1) {
-                totalItemsLabel = gettext('Custom View');
                 showTotalItems = showTotalLabel = true;
             } else if (this.props.showSaveTopic) {
                 showTotalItems = showTotalLabel = true;
-                if (this.props.bookmarks && get(this.props, 'searchParams.query.length', 0) > 0) {
-                    totalItemsLabel = this.props.searchParams.query;
-                }
             }
         } else {
-            if (get(this.props, 'searchParams.query.length', 0) > 0) {
-                totalItemsLabel = this.props.searchParams.query;
-            }
-
             showTotalItems = showTotalLabel = !isEqual(
                 this.props.searchParams,
                 {navigation: [get(this.props, 'searchParams.navigation[0]')]}
@@ -232,10 +217,10 @@ class WireApp extends SearchBase<any> {
                                             showTotalLabel={showTotalLabel}
                                             showSaveTopic={showSaveTopic}
                                             totalItems={this.props.totalItems}
-                                            totalItemsLabel={totalItemsLabel}
                                             saveMyTopic={saveMyTopic}
                                             activeTopic={this.props.activeTopic}
                                             topicType={this.props.context === 'wire' ? this.props.context : null}
+                                            showSortDropdown={true}
                                             refresh={this.props.fetchItems}
                                             setSortQuery={this.props.setSortQuery}
                                             setQuery={this.props.setQuery}
@@ -354,6 +339,7 @@ WireApp.propTypes = {
     searchParams: PropTypes.object,
     showSaveTopic: PropTypes.bool,
     filterGroupLabels: PropTypes.object,
+    dateFilters: PropTypes.object,
 };
 
 const mapStateToProps = (state: any) => ({
@@ -391,7 +377,8 @@ const mapStateToProps = (state: any) => ({
     searchParams: searchParamsSelector(state),
     showSaveTopic: showSaveTopicSelector(state),
     filterGroupLabels: filterGroupsToLabelMap(state),
-    errorMessage: state.errorMessage
+    errorMessage: state.errorMessage,
+    dateFilters: state.dateFilters
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
@@ -406,7 +393,7 @@ const mapDispatchToProps = (dispatch: any) => ({
         dispatch(fetchItems());
     },
     setQuery: (query: any) => dispatch(setQuery(query)),
-    setSortQuery: (query: any) => dispatch(setSortQuery(query)),
+    setSortQuery: (query: ISearchSortValue) => dispatch(setSortQuery(query)),
     actions: getItemActions(dispatch),
     fetchMoreItems: () => dispatch(fetchMoreItems()),
     setView: (view: any) => dispatch(setView(view)),
