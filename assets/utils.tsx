@@ -19,7 +19,6 @@ import {IArticle, IUser} from 'interfaces';
 // TODO: Improve how we load Moment locales, based on server config
 import 'moment/locale/fr-ca';
 import 'moment/locale/fi';
-import {type IClientConfig} from 'globals';
 
 moment.locale(getLocale());
 window.moment = moment;

@@ -2,7 +2,6 @@ import {ICompany, IProduct, IUser} from 'interfaces';
 import {gettext} from '../utils';
 import {get} from 'lodash';
 import {ISeats} from 'interfaces/seat';
-import {type Dictionary} from 'globals';
 
 
 export const userTypes = [

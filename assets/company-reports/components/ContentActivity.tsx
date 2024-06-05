@@ -6,7 +6,6 @@ import {fetchReport, REPORTS} from '../actions';
 
 import ReportsTable from './ReportsTable';
 import {ContentActivityFilters} from './ContentActivityFilters';
-import {type Dictionary} from 'globals';
 
 
 interface IReportAction {

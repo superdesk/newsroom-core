@@ -9,3 +9,9 @@ export interface ICompanyReportsData {
     current_user_type: UserType;
     products: Array<IProduct>;
 }
+
+declare global {
+    interface Window {
+        companyReportsData: ICompanyReportsData;
+    }
+}

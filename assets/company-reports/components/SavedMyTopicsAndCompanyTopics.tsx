@@ -18,7 +18,7 @@ interface IProps {
 
 
 const SavedMyTopicsAndCompanyTopics = ({results, print}: IProps) => {
-    const list = results && results.map((item: any) =>
+    const list = results && results.map((item) =>
         <tr key={item._id}>
             <td>{item.name}</td>
             <td>{item.is_enabled.toString()}</td>
