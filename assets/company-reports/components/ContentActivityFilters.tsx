@@ -9,6 +9,7 @@ import {toggleFilter, fetchAggregations} from '../actions';
 import CalendarButton from 'components/CalendarButton';
 import moment from 'moment';
 
+
 export const ContentActivityFilters = () => {
     const dispatch = useDispatch<Dispatch<any>>();
     const {

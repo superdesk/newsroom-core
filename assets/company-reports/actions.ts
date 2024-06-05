@@ -1,6 +1,7 @@
 import {errorHandler, getItemFromArray, getDateInputDate, notify, gettext} from '../utils';
 import server from '../server';
 import {get, cloneDeep} from 'lodash';
+import {type ICompanyReportsData} from './types';
 
 export const REPORTS_NAMES = {
     'COMPANY_SAVED_SEARCHES': 'company-saved-searches',
@@ -13,6 +14,7 @@ export const REPORTS_NAMES = {
     'COMPANY_NEWS_API_USAGE': 'company-news-api-usage',
     'PRODUCT_COMPANIES': 'product-companies',
     'EXPIRED_COMPANIES': 'expired-companies',
+    'COMPANY_AND_USER_SAVED_SEARCHES': 'company-and-user-saved-searches',
 };
 
 
@@ -27,6 +29,7 @@ export const REPORTS: any = {
     [REPORTS_NAMES.COMPANY_NEWS_API_USAGE]: '/reports/company-news-api-usage',
     [REPORTS_NAMES.PRODUCT_COMPANIES]: '/reports/product-companies',
     [REPORTS_NAMES.EXPIRED_COMPANIES]: '/reports/expired-companies',
+    [REPORTS_NAMES.COMPANY_AND_USER_SAVED_SEARCHES]: '/reports/company-and-user-saved-searches',
 };
 
 function getReportQueryString(currentState: any, next: any, exportReport: any, notify: any) {
@@ -70,7 +73,7 @@ function getReportQueryString(currentState: any, next: any, exportReport: any, n
 }
 
 export const INIT_DATA = 'INIT_DATA';
-export function initData(data: any): any {
+export function initData(data: ICompanyReportsData): any {
     return function (dispatch: any) {
         dispatch(fetchProducts());
         dispatch({type: INIT_DATA, data});

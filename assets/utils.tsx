@@ -117,7 +117,7 @@ export function createStore<State = any>(reducer: any, name: any = 'default'): S
         // if it's available in the browser
         // https://github.com/zalmoxisus/redux-devtools-extension
         if (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) {
-            _compose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__;
+            _compose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({name});
         }
     }
 

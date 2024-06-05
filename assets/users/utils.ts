@@ -3,6 +3,7 @@ import {gettext} from '../utils';
 import {get} from 'lodash';
 import {ISeats} from 'interfaces/seat';
 
+
 export const userTypes = [
     {value: 'administrator', text: gettext('Administrator'), show_acc_mgr: false},
     {value: 'internal', text: gettext('Internal'), show_acc_mgr: false},
