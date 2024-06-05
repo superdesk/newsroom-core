@@ -22,8 +22,8 @@ const SavedMyTopicsAndCompanyTopics = ({results, print}: IProps) => {
         <tr key={item._id}>
             <td>{item.name}</td>
             <td>{item.is_enabled.toString()}</td>
-            <td>{item.my_topics_count}</td>
-            <td>{item.company_topics_count}</td>
+            <td data-test-id='my-topics'>{item.my_topics_count}</td>
+            <td data-test-id='company-topics'>{item.company_topics_count}</td>
         </tr>
     );
 

@@ -3,6 +3,7 @@ import {PRODUCTS} from '../fixtures/products';
 import {COMPANIES} from '../fixtures/companies';
 import {USERS} from '../fixtures/users';
 import {WIRE_ITEMS} from '../fixtures/wire';
+import {TOPICS} from '../fixtures/topics';
 
 export const baseUrl = 'http://localhost:5050/';
 
@@ -78,6 +79,12 @@ export function addDefaultResources() {
         resource: 'users', items: [
             USERS.foobar.admin,
             USERS.foobar.monkey,
+        ],
+    }, {
+        resource: 'topics', items: [
+            TOPICS.my_topic,
+            TOPICS.company_shared_topics[0],
+            TOPICS.company_shared_topics[1],
         ],
     }]);
 }

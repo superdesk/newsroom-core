@@ -85,8 +85,9 @@ class CompanyReportsApp extends React.Component<IProps> {
                         <div className='content-bar__left'>
                             <select
                                 className="form-control"
-                                id={'company-reports'}
-                                name={'company-reports'}
+                                id="company-reports"
+                                name="company-reports"
+                                data-test-id="company-reports-select"
                                 value={this.props.activeReport || ''}
                                 onChange={(event) => this.props.setActiveReport(event.target.value)}>
                                 {this
@@ -103,7 +104,9 @@ class CompanyReportsApp extends React.Component<IProps> {
                             {this.props.activeReport && <button
                                 className='nh-button nh-button--secondary'
                                 type='button'
-                                onClick={this.props.runReport}>
+                                onClick={this.props.runReport}
+                                data-test-id="run-report-button"
+                            >
                                 {gettext('Run report')}
                             </button>}
                             {this.props.activeReport && <button
