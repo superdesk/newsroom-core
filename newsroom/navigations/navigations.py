@@ -74,7 +74,7 @@ def get_navigations_by_user(user: UserData, product_type="wire", events_only=Fal
     """
 
     if is_admin(user):
-        return list(superdesk.get_resource_service("navigations").get(req=None, lookup={}))
+        return list(superdesk.get_resource_service("navigations").get(req=None, lookup={"product_type": product_type}))
 
     products = get_products_by_user(user, product_type, None)
 
