@@ -66,7 +66,8 @@ export const searchParamsSelector = createSelector<
         const params: ISearchParams = {
             query: (search.activeQuery?.length ?? 0) ? search.activeQuery : undefined,
             sortQuery: (search.activeSortQuery?.length ?? 0) ? search.activeSortQuery : undefined,
-            created: ((search.createdFilter?.from?.length ?? 0) + (search.createdFilter?.to?.length ?? 0)) > 0 ?
+            created: ((search.createdFilter?.from?.length ?? 0) + (search.createdFilter?.to?.length ?? 0)) > 0 ||
+                search.createdFilter?.date_filter ?
                 search.createdFilter :
                 undefined,
             navigation: search.activeNavigation ?? [],
