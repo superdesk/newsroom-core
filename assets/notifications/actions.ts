@@ -2,6 +2,8 @@ import {get} from 'lodash';
 import {gettext, notify, errorHandler} from 'utils';
 import server from 'server';
 import {IUser} from 'interfaces';
+import {store as userProfileStore} from '../user-profile/store';
+import {getUser as getUserProfileUser} from 'user-profile/actions';
 
 export const UPDATE_NOTIFICATION_COUNT = 'UPDATE_NOTIFICATION_COUNT';
 export function updateNotificationCount(count: any) {
@@ -119,8 +121,9 @@ export function updateFullUser() {
     return (dispatch: any, getState: any) => {
         const fullUser = getState().fullUser;
         return server.get(`/users/${fullUser._id}`)
-        .then((data: IUser) => { 
+        .then((data: IUser) => {
             dispatch(getUser(data));
+            userProfileStore.dispatch(getUserProfileUser(data));
         })
         .catch((error: any) => errorHandler(error, dispatch));
     };
