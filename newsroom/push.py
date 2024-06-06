@@ -505,6 +505,9 @@ def set_agenda_metadata_from_planning(agenda, planning_item, force_adhoc=False):
     if not plan:
         new_plan = True
 
+    agenda_versioncreated: datetime = agenda["versioncreated"]
+    plan_versioncreated: datetime = parse_date_str(planning_item.get("versioncreated")) or agenda_versioncreated
+
     plan["_id"] = planning_item.get("_id") or planning_item.get("guid")
     plan["guid"] = planning_item.get("guid")
     plan["slugline"] = planning_item.get("slugline")
@@ -520,8 +523,8 @@ def set_agenda_metadata_from_planning(agenda, planning_item, force_adhoc=False):
     plan["coverages"] = planning_item.get("coverages") or []
     plan["ednote"] = planning_item.get("ednote")
     plan["internal_note"] = planning_item.get("internal_note")
-    plan["versioncreated"] = parse_date_str(planning_item.get("versioncreated"))
-    plan["firstcreated"] = parse_date_str(planning_item.get("firstcreated"))
+    plan["versioncreated"] = plan_versioncreated
+    plan["firstcreated"] = parse_date_str(planning_item.get("firstcreated")) or agenda["firstcreated"]
     plan["state"] = planning_item.get("state")
     plan["state_reason"] = planning_item.get("state_reason")
     plan["products"] = planning_item.get("products")
@@ -532,6 +535,13 @@ def set_agenda_metadata_from_planning(agenda, planning_item, force_adhoc=False):
 
     if new_plan:
         agenda["planning_items"].append(plan)
+
+    # Update the versioncreated datetime from Planning item if it's newer than the parent item
+    try:
+        if plan_versioncreated > agenda_versioncreated:
+            agenda["versioncreated"] = plan_versioncreated
+    except (KeyError, TypeError):
+        pass
 
     return new_plan
 
