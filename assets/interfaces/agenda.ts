@@ -221,6 +221,7 @@ export interface IAgendaItem extends IResourceItem {
     subject?: Array<ISubject>;
     ednote?: string;
     state_reason?: string;
+    firstcreated: string;
     versioncreated: string;
     internal_note?: string;
 }
