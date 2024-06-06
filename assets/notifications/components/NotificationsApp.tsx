@@ -7,10 +7,13 @@ import {
     loadNotifications,
     updateFullUser,
 } from '../actions';
+import {store as userProfileStore} from '../../user-profile/store';
+import {getUser as getUserProfileUser} from 'user-profile/actions';
 
 import NotificationList from 'components/NotificationList';
 import {postNotificationSchedule} from 'helpers/notification';
 import {gettext} from 'utils';
+import {IUser} from 'interfaces/user';
 
 class NotificationsApp extends React.Component<any, any> {
     static propTypes: any;
@@ -32,7 +35,7 @@ class NotificationsApp extends React.Component<any, any> {
                 fullUser={this.props.fullUser}
                 resumeNotifications={() => {
                     postNotificationSchedule(this.props.fullUser._id, {pauseFrom: '', pauseTo: ''}, gettext('Notifications resumed')).then(() =>
-                        this.props.resumeNotifications()
+                        this.props.resumeNotifications(this.props.fullUser._id)
                     );
                 }}
             />,
@@ -63,9 +66,11 @@ const mapDispatchToProps = (dispatch: any) => ({
     clearNotification: (id: any) => dispatch(deleteNotification(id)),
     clearAll: () => dispatch(deleteAllNotifications()),
     loadNotifications: () => dispatch(loadNotifications()),
-    resumeNotifications: () => (
-        dispatch(updateFullUser())
-    ),
+    resumeNotifications: (userId: string) => {
+        dispatch(updateFullUser(userId)).then((fullUser: IUser) => {
+            userProfileStore.dispatch(getUserProfileUser(fullUser));
+        })
+    }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(NotificationsApp);
