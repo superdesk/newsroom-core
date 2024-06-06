@@ -99,7 +99,9 @@ class ArticleBodyHtmlComponent extends React.PureComponent<IProps, IState> {
             return false;
         }
 
-        this.bodyRef.current.appendChild(getBodyElement(bodyHtml, item));
+        const body = getBodyElement(bodyHtml, item);
+
+        this.bodyRef.current.innerHTML = body.innerHTML;
 
         return true;
     }

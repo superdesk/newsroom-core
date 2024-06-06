@@ -6,7 +6,7 @@ from newsroom.products.products import get_products_by_navigation
 
 from newsroom.tests.users import test_login_succeeds_for_admin  # noqa
 from newsroom.tests.fixtures import COMPANY_1_ID
-from newsroom.navigations.navigations import get_navigations_by_company
+from newsroom.navigations.navigations import get_navigations_by_company, get_navigations_by_user
 from tests.core.utils import add_company_products
 
 
@@ -14,7 +14,7 @@ NAV_ID = ObjectId("59b4c5c61d41c8d736852fbf")
 
 
 @fixture(autouse=True)
-def init(app):
+def navigations(app):
     app.data.insert(
         "navigations",
         [
@@ -24,7 +24,12 @@ def init(app):
                 "product_type": "wire",
                 "description": "Top level sport navigation",
                 "is_enabled": True,
-            }
+            },
+            {
+                "name": "Calendar",
+                "product_type": "agenda",
+                "is_enabled": True,
+            },
         ],
     )
 
@@ -270,3 +275,13 @@ def test_get_products_by_navigation_caching(app):
 
     with app.app_context():
         assert 0 == len(get_products_by_navigation([nav_id], "wire"))
+
+
+def test_get_navigations_by_user_for_admin(admin):
+    navigations = get_navigations_by_user(admin, "wire")
+    assert 1 == len(navigations)
+    assert "Sport" == navigations[0]["name"]
+
+    navigations = get_navigations_by_user(admin, "agenda")
+    assert 1 == len(navigations)
+    assert "Calendar" == navigations[0]["name"]
