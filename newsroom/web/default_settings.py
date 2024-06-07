@@ -3,7 +3,7 @@ import pathlib
 import tzlocal
 import logging
 
-from typing import Dict, List
+from typing import Dict, List, Literal
 from kombu import Queue, Exchange
 from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
@@ -825,3 +825,9 @@ WIRE_TIME_FILTERS = [
         "query": {"gte": "now-30d/d"},
     },
 ]
+
+#: Set when users who downloaded/bookmarked an item should be notified
+#:
+#: .. versionadded: 2.8
+#:
+NOTIFY_MATCHING_USERS: Literal["never", "cancel", "update"] = "update"
