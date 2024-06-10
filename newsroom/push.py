@@ -810,15 +810,19 @@ def notify_new_item(item, check_topics=True):
             else:
                 users_with_realtime_subscription = notify_agenda_topic_matches(item, user_dict, company_dict)
 
+        if app.config.get("NOTIFY_MATCHING_USERS") == "never":
+            return
+
+        if app.config.get("NOTIFY_MATCHING_USERS") == "cancel" and not is_canceled(item):
+            return
+
         notify_user_matches(
             item,
             user_dict,
             company_dict,
             user_ids,
             company_ids,
-            users_with_realtime_subscription
-            if not item.get("pubstatus", item.get("state")) in ["canceled", "cancelled"]
-            else set(),
+            users_with_realtime_subscription if not is_canceled(item) else set(),
         )
     except Exception as e:
         logger.exception(e)
@@ -901,7 +905,7 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids,
 def send_user_notification_emails(item, user_matches, users, section):
     for user_id in user_matches:
         user = users.get(str(user_id))
-        if item.get("pubstatus", item.get("state")) in ["canceled", "cancelled"]:
+        if is_canceled(item):
             send_item_killed_notification_email(user, item=item)
         else:
             if user.get("receive_email"):
@@ -1057,3 +1061,7 @@ def fix_updates(doc, next_item, service):
             break
     else:
         logger.warning("Didn't fix ancestors in 50 iterations", extra={"guid": doc["guid"]})
+
+
+def is_canceled(item) -> bool:
+    return item.get("pubstatus", item.get("state")) in ["canceled", "cancelled"]

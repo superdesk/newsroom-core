@@ -208,7 +208,10 @@ def notification_datetime(datetime):
         return format_datetime(parse_date(datetime), get_client_format("NOTIFICATION_EMAIL_DATETIME_FORMAT"))
 
 
-def plain_text(html):
+def plain_text(html) -> str:
+    if not html:
+        return ""
+
     # Remove newlines, and strip whitespace, before converting tag blocks to newlines
     text = "".join([line.strip() for line in html.split("\n")])
 
