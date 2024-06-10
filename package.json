@@ -71,7 +71,7 @@
     "store": "2.0.12",
     "style-loader": "^0.19.0",
     "terser-webpack-plugin-legacy": "^1.2.5",
-    "ts-loader": "^3.5.0",
+    "ts-loader": "^9.2.1",
     "typescript": "5.2.2",
     "url-search-params-polyfill": "8.2.5",
     "webpack": "3.11.0",
