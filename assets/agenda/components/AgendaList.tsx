@@ -414,7 +414,9 @@ class AgendaList extends React.Component<IProps, IState> {
     }
 
     render() {
-        const lastGroupWithItems = this.props.groupedItems.findLastIndex((group) => group.items.length > 0);
+
+        const lastGroupWithItems = getLastGroupWithItems(this.props.groupedItems);
+
         return (
             <div
                 className={classNames('wire-articles wire-articles--list', {
@@ -504,3 +506,14 @@ const component = connect<
 >(mapStateToProps, mapDispatchToProps)(AgendaList);
 
 export default component;
+
+function getLastGroupWithItems(groupedItems: Array<IAgendaListGroup>): number {
+    const groupsWithItems = groupedItems.filter((group) => group.items.length > 0);
+
+    if (groupsWithItems.length > 0) {
+        const lastGroup = groupsWithItems[groupsWithItems.length - 1];
+        return groupedItems.indexOf(lastGroup);
+    }
+
+    return -1;
+}
