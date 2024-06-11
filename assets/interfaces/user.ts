@@ -31,6 +31,7 @@ export interface IUser {
     locale: string;
     manage_company_topics?: boolean;
     last_active?: TDatetime;
+    _created?: TDatetime;
 
     original_creator?: IUser['_id'];
     version_creator?: IUser['_id'];
