@@ -14,7 +14,7 @@ import {TimePicker} from 'components/cards/TimePicker';
 interface IProps {
     modalFormInvalid(): void;
     modalFormValid(): void;
-    updateUserNotificationSchedules(schedule: Omit<IUser['notification_schedule'], 'last_run_time'>, message: string): void;
+    updateUserNotificationSchedule(schedule: Omit<IUser['notification_schedule'], 'last_run_time'>): void;
     data: {
         user: IUser;
     };
@@ -101,7 +101,7 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
         if (hasErrors === true) {
             this.formRef.current.reportValidity();
         } else {
-            this.props.updateUserNotificationSchedules(this.state, gettext('Global schedule updated'));
+            this.props.updateUserNotificationSchedule(this.state);
         }
     }
 
@@ -190,8 +190,8 @@ class EditNotificationScheduleModalComponent extends React.Component<IProps, ISt
 const mapDispatchToProps = (dispatch: any) => ({
     modalFormInvalid: () => dispatch(modalFormInvalid()),
     modalFormValid: () => dispatch(modalFormValid()),
-    updateUserNotificationSchedules: (schedule: Omit<IUser['notification_schedule'], 'last_run_time'>, message: string) => (
-        dispatch(updateUserNotificationSchedule(schedule, message))
+    updateUserNotificationSchedule: (schedule: Omit<IUser['notification_schedule'], 'last_run_time'>) => (
+        dispatch(updateUserNotificationSchedule(schedule, gettext('Global schedule updated')))
     ),
 });
 

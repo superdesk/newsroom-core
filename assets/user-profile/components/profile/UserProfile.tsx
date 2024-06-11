@@ -215,7 +215,7 @@ class UserProfile extends React.PureComponent<IProps> {
                                                 className="nh-button nh-button--small nh-button--tertiary"
                                                 onClick={this.props.openPauseNotificationModal}
                                             >
-                                                {gettext('Pause All Notification')}
+                                                {gettext('Pause All Notifications')}
                                             </button>
                                         </div>
                                     )

@@ -18,7 +18,6 @@ import {
     hideModal,
     setTopicEditorFullscreen,
     openEditTopicNotificationsModal,
-    openPauseNotificationModal,
     setTopicSubscribers,
     saveFolder,
 } from 'user-profile/actions';
@@ -597,7 +596,6 @@ const mapDispatchToProps = (dispatch: any) => ({
         dispatch(loadMyWireTopic(topic._id)),
     setTopicEditorFullscreen: (fullscreen: boolean) => dispatch(setTopicEditorFullscreen(fullscreen)),
     openEditTopicNotificationsModal: () => dispatch(openEditTopicNotificationsModal()),
-    openPauseNotificationModal: () => dispatch(openPauseNotificationModal()),
     setTopicSubscribers: (topic: ITopic, subscribers: ITopic['subscribers']) =>
         dispatch(setTopicSubscribers(topic, subscribers)),
 });
