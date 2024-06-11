@@ -4,7 +4,6 @@ import {initData} from './actions';
 import CompanyReportsApp from './components/CompanyReportsApp';
 import {render} from 'render-utils';
 
-
 const store = createStore(companyReportReducer, 'CompanyReports');
 
 // init data

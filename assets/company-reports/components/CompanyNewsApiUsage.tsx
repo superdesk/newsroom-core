@@ -8,7 +8,7 @@ import {gettext} from 'utils';
 import {REPORTS} from '../actions';
 
 
-class ComapnyNewsApiUsage extends React.Component<any, any> {
+class CompanyNewsApiUsage extends React.Component<any, any> {
     static propTypes: any;
     previousScrollTop: any;
     constructor(props: any) {
@@ -102,7 +102,7 @@ class ComapnyNewsApiUsage extends React.Component<any, any> {
     }
 }
 
-ComapnyNewsApiUsage.propTypes = {
+CompanyNewsApiUsage.propTypes = {
     results: PropTypes.array,
     print: PropTypes.bool,
     reportParams: PropTypes.object,
@@ -114,4 +114,4 @@ ComapnyNewsApiUsage.propTypes = {
 
 };
 
-export default ComapnyNewsApiUsage;
+export default CompanyNewsApiUsage;

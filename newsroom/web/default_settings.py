@@ -3,7 +3,7 @@ import pathlib
 import tzlocal
 import logging
 
-from typing import Dict, List
+from typing import Dict, List, Literal
 from kombu import Queue, Exchange
 from celery.schedules import crontab
 from superdesk.default_settings import strtobool, env, local_to_utc_hour
@@ -805,3 +805,29 @@ AGENDA_HIDE_COVERAGE_ASSIGNEES = False
 #: .. versionadded: 2.8
 #:
 AGENDA_DEFAULT_FILTER_HIDE_PLANNING = False
+
+#: Wire Date Time filters
+#:
+#: .. versionadded: 2.8
+#:
+WIRE_TIME_FILTERS = [
+    {"name": lazy_gettext("Today"), "filter": "today", "default": False, "query": {"gte": "now/d"}},
+    {
+        "name": lazy_gettext("Last Week"),
+        "filter": "last_week",
+        "default": False,
+        "query": {"gte": "now-1w/w", "lt": "now/w"},
+    },
+    {
+        "name": lazy_gettext("Last 30 days"),
+        "filter": "last_30_days",
+        "default": True,
+        "query": {"gte": "now-30d/d"},
+    },
+]
+
+#: Set when users who downloaded/bookmarked an item should be notified
+#:
+#: .. versionadded: 2.8
+#:
+NOTIFY_MATCHING_USERS: Literal["never", "cancel", "update"] = "update"

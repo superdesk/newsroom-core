@@ -13,6 +13,7 @@ import superdesk
 from superdesk.utc import utcnow
 
 
+from newsroom.auth import get_user
 from newsroom.utils import (
     query_resource,
     get_entity_dict,
@@ -82,6 +83,41 @@ def get_user_saved_searches():
 
     sorted_results = sorted(results, key=lambda k: k["name"])
     return {"results": sorted_results, "name": gettext("Saved searches per user")}
+
+
+def get_company_and_user_saved_searches():
+    """
+    Returns saved My topics and Company topics per user in their company
+    """
+
+    results = []
+    current_company = get_user().get("company")
+    lookup_company = dict(company=current_company)
+    users = get_entity_dict(query_resource("users", lookup=lookup_company))
+    topics = query_resource("topics", lookup=lookup_company)
+
+    saved_topics = defaultdict(lambda: dict(my_topics=0, company_topics=0))
+
+    for topic in topics:
+        topics_key = "company_topics" if topic.get("is_global") else "my_topics"
+        saved_topics[topic["user"]][topics_key] += 1
+
+    for _id, topics_count in saved_topics.items():
+        results.append(
+            {
+                "_id": _id,
+                "name": "{} {}".format(
+                    users.get(_id, {}).get("first_name"),
+                    users.get(_id, {}).get("last_name"),
+                ),
+                "is_enabled": users.get(_id, {}).get("is_enabled"),
+                "my_topics_count": topics_count.get("my_topics"),
+                "company_topics_count": topics_count.get("company_topics"),
+            }
+        )
+
+    sorted_results = sorted(results, key=lambda k: k["name"])
+    return {"results": sorted_results, "name": gettext("Saved My Topics and Company Topics")}
 
 
 def get_company_products():

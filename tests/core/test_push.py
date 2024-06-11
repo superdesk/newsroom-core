@@ -396,8 +396,32 @@ def test_notify_user_matches_for_new_item_in_history(client, app, mocker):
         assert notification["resource"] == "text"
         assert notification["user"] == user_ids[0]
 
-    assert len(outbox) == 1
-    assert "http://localhost:5050/wire?item=bar" in outbox[0].body
+        assert len(outbox) == 1
+        assert "http://localhost:5050/wire?item=bar" in outbox[0].body
+
+        outbox.clear()
+        app.config["PUSH_KEY"] = None
+        item = {"guid": "bar", "type": "text", "headline": "this is a test"}
+
+        app.config["NOTIFY_MATCHING_USERS"] = "never"
+        resp = client.post("/push", json=item)
+        assert 200 == resp.status_code
+        assert len(outbox) == 0
+
+        item["pubstatus"] = "canceled"
+        resp = client.post("/push", json=item)
+        assert 200 == resp.status_code
+        assert len(outbox) == 0
+
+        app.config["NOTIFY_MATCHING_USERS"] = "cancel"
+        resp = client.post("/push", json=item)
+        assert 200 == resp.status_code
+        assert len(outbox) == 1
+
+        item["pubstatus"] = "usable"
+        resp = client.post("/push", json=item)
+        assert 200 == resp.status_code
+        assert len(outbox) == 1
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)

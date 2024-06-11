@@ -18,6 +18,7 @@ COMPANY_2_ID = ObjectId("6215ce6ed2943dec3725afde")
 PRODUCT_1_ID = ObjectId()
 PRODUCT_2_ID = ObjectId()
 PRODUCT_3_ID = ObjectId()
+PRODUCT_ALL_AGENDA_ID = ObjectId()
 
 items = [
     {
@@ -224,6 +225,7 @@ def setup_user_company(app):
                     {"_id": PRODUCT_1_ID, "section": "wire", "seats": 0},
                     {"_id": PRODUCT_2_ID, "section": "wire", "seats": 0},
                     {"_id": PRODUCT_3_ID, "section": "wire", "seats": 0},
+                    {"_id": PRODUCT_ALL_AGENDA_ID, "section": "agenda", "seats": 0},
                 ],
             },
             {
@@ -315,6 +317,13 @@ def company_products(app):
             "query": "*:*",
             "is_enabled": True,
             "product_type": "wire",
+        },
+        {
+            "_id": PRODUCT_ALL_AGENDA_ID,
+            "name": "all agenda",
+            "query": "*:*",
+            "is_enabled": True,
+            "product_type": "agenda",
         },
     ]
 

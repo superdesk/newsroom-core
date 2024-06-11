@@ -150,16 +150,15 @@ def get_type(type: Optional[str] = None) -> str:
     return types[item_type]
 
 
-def parse_date_str(date):
-    if date and isinstance(date, str):
-        return parse_date(date)
-    return date
+def parse_date_str(date: Union[str, datetime]) -> datetime:
+    return parse_date(date) if isinstance(date, str) else date
 
 
 def parse_dates(item):
     for field in ["firstcreated", "versioncreated", "embargoed"]:
-        if parse_date_str(item.get(field)):
-            item[field] = parse_date_str(item[field])
+        datetime_value = parse_date_str(item.get(field))
+        if datetime_value is not None:
+            item[field] = datetime_value
 
 
 def get_entity_dict(items, str_id=False):

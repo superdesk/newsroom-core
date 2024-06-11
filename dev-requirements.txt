@@ -324,7 +324,7 @@ pypng==0.20220715.0
     # via qrcode
 pyrtf3==0.47.5
     # via -r requirements.txt
-pytest==8.2.1
+pytest==8.2.2
     # via
     #   -r dev-requirements.in
     #   pytest-cov
@@ -393,7 +393,7 @@ requests==2.32.2
     #   wooper
 requests-oauthlib==2.0.0
     # via python-twitter
-responses==0.25.0
+responses==0.25.2
     # via -r dev-requirements.in
 rsa==4.9
     # via
@@ -435,7 +435,7 @@ tomli==2.0.1
     #   pytest
 types-python-dateutil==2.9.0.20240316
     # via arrow
-typing-extensions==4.12.1
+typing-extensions==4.12.2
     # via
     #   black
     #   jwcrypto

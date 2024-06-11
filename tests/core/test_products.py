@@ -5,6 +5,7 @@ from flask import json
 from pytest import fixture
 
 from newsroom.tests.users import test_login_succeeds_for_admin
+from datetime import datetime
 
 from .. import utils
 
@@ -230,8 +231,8 @@ def test_company_and_user_products(client, app, public_company, public_user, pro
     app.data.insert(
         "items",
         [
-            {"headline": "finance item", "type": "text"},
-            {"headline": "sports item", "type": "text"},
+            {"headline": "finance item", "type": "text", "versioncreated": datetime.utcnow()},
+            {"headline": "sports item", "type": "text", "versioncreated": datetime.utcnow()},
         ],
     )
 

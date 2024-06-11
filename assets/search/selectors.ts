@@ -1,5 +1,6 @@
 import {createSelector} from 'reselect';
-import {get, find, filter as removeNulls, isEqual, isEmpty} from 'lodash';
+import {IAgendaState, ISearchParams} from 'interfaces';
+import {get, find, filter as removeNulls, isEqual} from 'lodash';
 
 export const searchQuerySelector = (state: any) => get(state, 'search.activeQuery') || null;
 export const searchSortQuerySelector = (state: any) => get(state, 'search.activeSortQuery') || null;
@@ -54,53 +55,59 @@ export const activeProductSelector = createSelector(
 
 export const resultsFilteredSelector = (state: any) => state.resultsFiltered;
 
-export const searchParamsSelector = createSelector(
-    [searchQuerySelector, searchSortQuerySelector, searchCreatedSelector, searchNavigationSelector, searchFilterSelector, searchProductSelector, advancedSearchParamsSelector],
-    (query: any, sortQuery: any, created: any, navigation: any, filter: any, product: any, advancedSearchParams: any) => {
-        const params: any = {
-            query: !isEmpty(query) ? query : null,
-            sortQuery: !isEmpty(sortQuery) ? sortQuery : null,
-            created: !isEmpty(created) ? created : null,
-            navigation: !isEmpty(navigation) ? navigation : null,
-            product: !isEmpty(product) ? product : null,
+export const searchParamsSelector = createSelector<
+    IAgendaState,
+    IAgendaState['search'],
+    'wire' | 'agenda',
+    ISearchParams
+>(
+    [(state) => state.search ?? {}, (state) => state.context],
+    (search, context) => {
+        const params: ISearchParams = {
+            query: (search.activeQuery?.length ?? 0) ? search.activeQuery : undefined,
+            sortQuery: (search.activeSortQuery?.length ?? 0) ? search.activeSortQuery : undefined,
+            created: ((search.createdFilter?.from?.length ?? 0) + (search.createdFilter?.to?.length ?? 0)) > 0 ||
+                search.createdFilter?.date_filter ?
+                search.createdFilter :
+                undefined,
+            navigation: search.activeNavigation ?? [],
+            product: (search.productId?.length ?? 0) > 0 ? search.productId : undefined,
+            topic_type: context,
         };
 
-        if (advancedSearchParams.all || advancedSearchParams.any || advancedSearchParams.exclude) {
-            params.advanced = {fields: advancedSearchParams.fields};
+        if (
+            search.advanced != null &&
+            (search.advanced.all.length > 0 || search.advanced.any.length > 0 || search.advanced.exclude.length > 0)
+        ) {
+            params.advanced = {fields: search.advanced.fields};
 
-            if (advancedSearchParams.all) {
-                params.advanced.all = advancedSearchParams.all;
+            if (search.advanced.all.length > 0) {
+                params.advanced.all = search.advanced.all;
             }
-            if (advancedSearchParams.any) {
-                params.advanced.any = advancedSearchParams.any;
+            if (search.advanced.any.length > 0) {
+                params.advanced.any = search.advanced.any;
             }
-            if (advancedSearchParams.exclude) {
-                params.advanced.exclude = advancedSearchParams.exclude;
+            if (search.advanced.exclude.length > 0) {
+                params.advanced.exclude = search.advanced.exclude;
             }
-        } else {
-            params.advanced = null;
         }
 
-        if (filter && Object.keys(filter).length > 0) {
-            params.filter = {};
-            Object.keys(filter).forEach((key: any) => {
-                if (key === 'location') {
-                    params.filter[key] = filter[key];
-                    return;
-                }
-
-                const value = removeNulls(filter[key]);
-
-                if (value && value.length > 0) {
-                    params.filter[key] = value;
-                }
-            });
-
-            if (isEmpty(params.filter)) {
-                delete params.filter;
+        params.filter = {};
+        for (const key of Object.keys(search.activeFilter || {})) {
+            if (key === 'location') {
+                params.filter[key] = search.activeFilter[key];
+                continue;
             }
-        } else {
-            params.filter = null;
+
+            const value = removeNulls(search.activeFilter[key]);
+
+            if (value && value.length > 0) {
+                params.filter[key] = value;
+            }
+        }
+
+        if (Object.keys(params.filter).length === 0) {
+            delete params.filter;
         }
 
         return params;

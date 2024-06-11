@@ -50,6 +50,7 @@ const initialState: any = {
     searchInitiated: false,
     loadingAggregations: false,
     errorMessage : null,
+    dateFilters: [],
 };
 
 function recieveItems(state: any, data: any) {
@@ -186,6 +187,7 @@ export default function wireReducer(state: any = initialState, action: any) {
             uiConfig: action.wireData.ui_config || {},
             groups: action.wireData.groups || [],
             newsOnlyFilterText: action.newsOnlyFilterText,
+            dateFilters: action.wireData.date_filters || []
         };
     }
     case UPDATE_FOLDERS: {

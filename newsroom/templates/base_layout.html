@@ -113,7 +113,7 @@
                 </li>
                 {% endif %}
 
-                {% if is_admin_or_account_manager() %}
+                {% if is_admin_manager_or_company_admin() %}
                 <li class="sidenav-icons__item  {% if request.endpoint == 'reports.company_reports' %}active{% endif %}">
                   <a
                       href="{{ url_for('reports.company_reports') }}"

@@ -1,7 +1,7 @@
 import flask
 
 from unittest import mock
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from bson import ObjectId
 from superdesk import get_resource_service
@@ -89,6 +89,7 @@ def test_realtime_notifications_wire(app, mocker, company_products):
                 "slugline": "That's the test slugline cheese",
                 "headline": "Demo Article",
                 "body_html": "Story that involves cheese and onions",
+                "versioncreated": datetime.utcnow(),
             },
             {
                 "_id": "item_other",
@@ -96,6 +97,7 @@ def test_realtime_notifications_wire(app, mocker, company_products):
                 "slugline": "other",
                 "headline": "other",
                 "body_html": "other",
+                "versioncreated": datetime.utcnow(),
             },
         ],
     )
@@ -295,3 +297,81 @@ def test_realtime_notifications_agenda_reccuring_event(app):
 
         notify_new_agenda_item("event_id_2")
         assert notify_new_item.call_count == 2
+
+
+@mock.patch("newsroom.email.send_email", mock_send_email)
+def test_pause_notifications(app, mocker, company_products):
+    user = app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
+    updates = {
+        "notification_schedule": dict(
+            pause_from=datetime.now() - timedelta(days=1),
+            pause_to=datetime.now() + timedelta(days=1),
+        )
+    }
+    app.data.update("users", user["_id"], updates, user)
+
+    app.data.insert(
+        "agenda",
+        [
+            {
+                "_id": "event_id_1",
+                "type": "agenda",
+                "versioncreated": datetime.utcnow(),
+                "name": "cheese event",
+                "dates": {
+                    "start": datetime.utcnow(),
+                    "end": datetime.utcnow(),
+                },
+            },
+        ],
+    )
+
+    app.data.insert(
+        "items",
+        [
+            {
+                "_id": "item1",
+                "type": "text",
+                "slugline": "That's the test slugline cheese",
+                "headline": "Demo Article",
+                "body_html": "Story that involves cheese and onions",
+            },
+        ],
+    )
+
+    app.data.insert(
+        "topics",
+        [
+            {
+                "user": PUBLIC_USER_ID,
+                "label": "All wire",
+                "query": "*:*",
+                "topic_type": "wire",
+                "subscribers": [
+                    {
+                        "user_id": PUBLIC_USER_ID,
+                        "notification_type": "real-time",
+                    },
+                ],
+            },
+            {
+                "user": PUBLIC_USER_ID,
+                "label": "All agenda",
+                "query": "*:*",
+                "topic_type": "agenda",
+                "subscribers": [
+                    {
+                        "user_id": PUBLIC_USER_ID,
+                        "notification_type": "real-time",
+                    },
+                ],
+            },
+        ],
+    )
+
+    push_mock = mocker.patch("newsroom.notifications.push_notification")
+    with app.mail.record_messages() as outbox:
+        notify_new_agenda_item("event_id_1")
+        notify_new_wire_item("item1")
+        assert len(outbox) == 0
+        push_mock.assert_not_called()
