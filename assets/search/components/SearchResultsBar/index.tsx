@@ -22,7 +22,7 @@ import {
 import {Dropdown} from './../../../components/Dropdown';
 
 import {SearchResultTagsList} from './SearchResultTagsList';
-import {ICommonState, IDateFilters} from 'interfaces/common';
+import {IDateFilters} from 'interfaces/common';
 
 interface IReduxStoreProps {
     user: IUser;
@@ -278,7 +278,7 @@ class SearchResultsBarComponent extends React.Component<IProps, IState> {
     }
 }
 
-const mapStateToProps = (state: ICommonState) => ({
+const mapStateToProps = (state: IAgendaState) => ({
     user: state.userObject,
     searchParams: searchParamsSelector(state),
     navigations: navigationsByIdSelector(state),

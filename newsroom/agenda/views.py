@@ -148,6 +148,7 @@ def get_view_data() -> Dict:
         "has_agenda_featured_items": get_resource_service("agenda_featured").find_one(req=None) is not None,
         "user_folders": get_user_folders(user, "agenda") if user else [],
         "company_folders": get_company_folders(company, "agenda") if company else [],
+        "date_filters": app.config.get("AGENDA_TIME_FILTERS", []),
     }
 
 

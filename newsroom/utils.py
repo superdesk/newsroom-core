@@ -504,15 +504,21 @@ def today(time, offset):
 
 
 def format_date(date, time, offset):
+    _today = today(time, offset)
     if date == "now/d":
         return today(time, offset)
     if date == "now/w":
-        _today = today(time, offset)
         monday = _today - timedelta(days=_today.weekday())
         return monday
     if date == "now/M":
         month = today(time, offset).replace(day=1)
         return month
+    if date == "now-24h/h":
+        return _today - timedelta(hours=24)
+    if date == "now-7d/d":
+        return _today - timedelta(days=7)
+    if date == "now-30d/d":
+        return _today - timedelta(days=30)
     return datetime.strptime("%sT%s" % (date, time), "%Y-%m-%dT%H:%M:%S")
 
 
@@ -528,6 +534,8 @@ def get_end_date(date_range, start_date):
         return start_date + timedelta(days=6)
     if date_range == "now/M":
         return start_date + relativedelta(months=+1) - timedelta(days=1)
+    if date_range in ("now-24h/h", "now-7d/d", "now-30d/d"):
+        start_date
     return start_date
 
 

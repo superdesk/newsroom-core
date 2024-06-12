@@ -700,6 +700,12 @@ export function getCreatedSearchParamLabel(created: any, dateFilters: any = null
             return {relative: gettext('This week')};
         } else if (created.from === 'now/M') {
             return {relative: gettext('This month')};
+        } else if (created.from === 'now-24h/h') {
+            return {relative: gettext('Last 24 hours')};
+        } else if (created.from === 'now-7d/d') {
+            return {relative: gettext('Last 7 days')};
+        } else if (created.from === 'now-30d/d') {
+            return {relative: gettext('Last 30 days')};
         } else {
             return {from: formatDate(created.from)};
         }

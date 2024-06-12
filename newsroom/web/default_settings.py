@@ -831,3 +831,19 @@ WIRE_TIME_FILTERS = [
 #: .. versionadded: 2.8
 #:
 NOTIFY_MATCHING_USERS: Literal["never", "cancel", "update"] = "update"
+
+#: Agenda Date Time filters
+#:
+#: .. versionadded: 2.8
+#:
+AGENDA_TIME_FILTERS = [
+    {"name": lazy_gettext("Today"), "query": "now/d"},
+    {
+        "name": lazy_gettext("This Week"),
+        "query": "now/w",
+    },
+    {
+        "name": lazy_gettext("This Month"),
+        "query": "now/M",
+    },
+]

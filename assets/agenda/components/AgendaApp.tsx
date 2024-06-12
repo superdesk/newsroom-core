@@ -361,6 +361,7 @@ AgendaApp.propTypes = {
     previewConfig: PropTypes.object,
     detailsConfig: PropTypes.object,
     groups: PropTypes.array,
+    dateFilters: PropTypes.array,
 };
 
 const mapStateToProps = (state: any) => ({
@@ -402,7 +403,8 @@ const mapStateToProps = (state: any) => ({
     detailsConfig: detailsConfigSelector(state),
     groups: get(state, 'groups', []),
     hasAgendaFeaturedItems: state.hasAgendaFeaturedItems,
-    errorMessage:state.errorMessage
+    errorMessage: state.errorMessage,
+    dateFilters: state.dateFilters,
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
