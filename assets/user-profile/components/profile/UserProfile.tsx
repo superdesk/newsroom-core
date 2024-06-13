@@ -199,7 +199,7 @@ class UserProfile extends React.PureComponent<IProps> {
                                                             type="button"
                                                             className="nh-button nh-button--small nh-button--tertiary"
                                                             onClick={() => {
-                                                                this.props.updateUserNotificationPause({pauseFrom: '', pauseTo: ''}, gettext('Notifications resumed'))
+                                                                this.props.updateUserNotificationPause({pauseFrom: '', pauseTo: ''}, gettext('Notifications resumed'));
                                                             }}
                                                         >
                                                             {gettext('Clear Pausing')}
