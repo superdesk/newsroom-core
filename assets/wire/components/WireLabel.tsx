@@ -27,7 +27,7 @@ export default function WireLabel({item}: IProps) {
                         >
                             {gettext(subject.name)}
                         </span>
-                    )
+                    );
                 })}
             </div>
         ) : null
