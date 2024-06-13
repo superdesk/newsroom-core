@@ -19,6 +19,7 @@ import {IArticle, IUser} from 'interfaces';
 // TODO: Improve how we load Moment locales, based on server config
 import 'moment/locale/fr-ca';
 import 'moment/locale/fi';
+import {IDateFilters} from 'interfaces/common';
 
 moment.locale(getLocale());
 window.moment = moment;
@@ -694,17 +695,10 @@ export function getCreatedSearchParamLabel(created: any, dateFilters: any = null
             };
         }
     } else if (created.from) {
-        if (created.from === 'now/d') {
-            return {relative: gettext('Today')};
-        } else if (created.from === 'now/w') {
-            return {relative: gettext('This week')};
-        } else if (created.from === 'now/M') {
-            return {relative: gettext('This month')};
-        } else {
-            return {from: formatDate(created.from)};
-        }
+        const value = dateFilters?.find((filter: IDateFilters) => filter?.query == created?.from);
+        return value && value.name ? {relative: value?.name} : {from: formatDate(created.from)};
     } else if (created.date_filter){
-        const value = dateFilters?.find((filter: any) => filter?.filter == created?.date_filter);
+        const value = dateFilters?.find((filter: IDateFilters) => filter?.filter == created?.date_filter);
         return {relative: value?.name};
     }
 

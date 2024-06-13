@@ -336,6 +336,7 @@ export default function agendaReducer(state: IAgendaState = initialState, action
             hasAgendaFeaturedItems: action.agendaData.has_agenda_featured_items || false,
             userFolders: action.agendaData.user_folders,
             companyFolders: action.agendaData.company_folders,
+            dateFilters: action.agendaData.date_filters || []
         };
     }
 

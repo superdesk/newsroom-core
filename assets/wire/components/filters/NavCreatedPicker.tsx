@@ -5,19 +5,13 @@ import {gettext} from 'utils';
 import NavGroup from './NavGroup';
 import {isEmpty} from 'lodash';
 
-const agendaShortcuts = [
-    {label: gettext('Today'), value: 'now/d'},
-    {label: gettext('This week'), value: 'now/w'},
-    {label: gettext('This month'), value: 'now/M'},
-];
-
-function NavCreatedPicker({setCreatedFilter, createdFilter, context, wireFilters}: any) {
+function NavCreatedPicker({setCreatedFilter, createdFilter, context, dateFilters}: any) {
     const [showCustomRange, setShowCustomRange] = useState(createdFilter.date_filter === 'custom_date');
 
     useEffect(() => {
         setShowCustomRange(createdFilter.date_filter === 'custom_date');
         if (isEmpty(createdFilter) && context === 'wire'){
-            const defaultFilter = wireFilters.find((filter: {default: any}) => filter.default);
+            const defaultFilter = dateFilters.find((filter: {default: any}) => filter.default);
             setCreatedFilter({...createdFilter, date_filter: defaultFilter?.filter});
         }
     }, [createdFilter.date_filter]);
@@ -53,13 +47,13 @@ function NavCreatedPicker({setCreatedFilter, createdFilter, context, wireFilters
                     data-test-id="date-filter-select"
                 >
                     {context === 'agenda' ? (
-                        agendaShortcuts.map((shortcut) => (
-                            <option key={shortcut.value} value={shortcut.value}>
-                                {shortcut.label}
+                        dateFilters.map((filter: {query: string, name: string}) => (
+                            <option key={filter.query} value={filter.query}>
+                                {filter.name}
                             </option>
                         ))
                     ) : (
-                        wireFilters.map((filter: {filter: string, name: string}) => (
+                        dateFilters.map((filter: {filter: string, name: string}) => (
                             <option key={filter.filter} value={filter.filter}>
                                 {filter.name}
                             </option>
@@ -104,7 +98,7 @@ NavCreatedPicker.propTypes = {
     createdFilter: PropTypes.object.isRequired,
     setCreatedFilter: PropTypes.func.isRequired,
     context: PropTypes.string,
-    wireFilters: PropTypes.array,
+    dateFilters: PropTypes.array,
 };
 
 export default NavCreatedPicker;

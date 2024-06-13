@@ -151,7 +151,7 @@ class FiltersTab extends React.Component<any, any> {
                             createdFilter={createdFilter}
                             setCreatedFilter={this.setCreatedFilterAndSearch}
                             context={this.props.context}
-                            wireFilters={this.props.dateFilters}
+                            dateFilters={this.props.dateFilters}
                         />
                     ].concat(this.getFilterGroups().filter((group: any) => !!group))}
                 </div>

@@ -82,10 +82,8 @@ export interface IOccurStatus {
 }
 
 export interface IDateFilters{
-    name: string,
-    default: boolean,
-    filter: string;
-}
-export interface ICommonState extends IAgendaState {
-    dateFilters?: IDateFilters
+    name?: string,
+    default?: boolean,
+    filter?: string;
+    query?:string;
 }
