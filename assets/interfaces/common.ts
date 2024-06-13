@@ -82,7 +82,7 @@ export interface IOccurStatus {
 }
 
 export interface IDateFilters{
-    name: string,
+    name?: string,
     default?: boolean,
     filter?: string;
     query?:string;
