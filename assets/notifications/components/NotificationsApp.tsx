@@ -67,7 +67,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     updateUser: (userId: string) => {
         dispatch(updateFullUser(userId)).then((fullUser: IUser) => {
             userProfileStore.dispatch(getUserProfileUser(fullUser));
-        })
+        });
     }
 });
 

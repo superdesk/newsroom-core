@@ -118,10 +118,10 @@ export function pushNotification(push: any): any {
 export function updateFullUser(userId: string) {
     return (dispatch: any, getState: any) => {
         return server.get(`/users/${userId}`)
-        .then((data: IUser) => {
-            dispatch(getUser(data));
-            return data;
-        })
-        .catch((error: any) => errorHandler(error, dispatch));
+            .then((data: IUser) => {
+                dispatch(getUser(data));
+                return data;
+            })
+            .catch((error: any) => errorHandler(error, dispatch));
     };
 }
