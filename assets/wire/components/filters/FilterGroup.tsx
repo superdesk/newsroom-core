@@ -80,8 +80,11 @@ export default function FilterGroup({group, activeFilter, aggregations, toggleFi
         'key',
     );
     const bucketsBySearchTerm = allBuckets
-        .sort(compareFunction)
-        .filter(({key}: any) => searchTerm.length > 0 ? key.toString().toLocaleLowerCase().includes(searchTerm) : true);
+        .filter(({key}: any) => searchTerm.length > 0
+            ? key.toString().toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())
+            : true,
+        )
+        .sort(compareFunction);
 
     return (
         <NavGroup key={group.field} label={group.label}>
