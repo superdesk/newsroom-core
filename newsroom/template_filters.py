@@ -209,6 +209,9 @@ def notification_datetime(datetime):
 
 
 def plain_text(html):
+    if not html:
+        return ""
+
     # Remove newlines, and strip whitespace, before converting tag blocks to newlines
     text = "".join([line.strip() for line in html.split("\n")])
 
