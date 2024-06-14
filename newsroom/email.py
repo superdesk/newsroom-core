@@ -103,11 +103,7 @@ def _send_email(to, subject, text_body, html_body=None, sender=None, sender_name
     msg.body = text_body
     msg.html = html_body
     app = current_app._get_current_object()
-    with app.mail.connect() as connection:
-        if connection:
-            return connection.send(msg)
-
-        return app.mail.send(msg)
+    return app.mail.send(msg)
 
 
 def send_email(to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None):
