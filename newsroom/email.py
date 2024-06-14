@@ -2,7 +2,7 @@ import base64
 import email.policy as email_policy
 
 from lxml import etree
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Union
 from typing_extensions import TypedDict
 
 from superdesk import get_resource_service
@@ -45,7 +45,7 @@ MAX_LINE_LENGTH = 998 - 50  # RFC 5322 - buffer for html indentation
 
 def handle_long_lines_text(text, limit=MAX_LINE_LENGTH):
     if not text:
-        return text
+        return ""
     output = []
     lines = text.splitlines()
     for line in lines:
@@ -103,11 +103,7 @@ def _send_email(to, subject, text_body, html_body=None, sender=None, sender_name
     msg.body = text_body
     msg.html = html_body
     app = current_app._get_current_object()
-    with app.mail.connect() as connection:
-        if connection:
-            return connection.send(msg)
-
-        return app.mail.send(msg)
+    return app.mail.send(msg)
 
 
 def send_email(to, subject, text_body, html_body=None, sender=None, sender_name=None, attachments_info=None):
@@ -124,8 +120,8 @@ def send_email(to, subject, text_body, html_body=None, sender=None, sender_name=
     kwargs = {
         "to": to,
         "subject": subject,
-        "text_body": handle_long_lines_text(text_body),
-        "html_body": handle_long_lines_html(html_body),
+        "text_body": handle_long_lines_text(text_body) if text_body else None,
+        "html_body": handle_long_lines_html(html_body) if html_body else None,
         "sender": sender,
         "sender_name": sender_name or current_app.config.get("EMAIL_DEFAULT_SENDER_NAME"),
         "attachments_info": attachments_info,
@@ -489,7 +485,7 @@ def _send_wire_killed_notification_email(user, item):
     formatter = current_app.download_formatters["text"]["formatter"]
     recipients = [user["email"]]
     subject = gettext("Kill/Takedown notice")
-    text_body = formatter.format_item(item)
+    text_body = to_text(formatter.format_item(item))
 
     send_email(to=recipients, subject=subject, text_body=text_body)
 
@@ -498,6 +494,12 @@ def _send_agenda_killed_notification_email(user, item):
     formatter = current_app.download_formatters["text"]["formatter"]
     recipients = [user["email"]]
     subject = gettext("%(section)s cancelled notice", section=current_app.config["AGENDA_SECTION"])
-    text_body = formatter.format_item(item, item_type="agenda")
+    text_body = to_text(formatter.format_item(item, item_type="agenda"))
 
     send_email(to=recipients, subject=subject, text_body=text_body)
+
+
+def to_text(output: Union[str, bytes]) -> str:
+    if isinstance(output, bytes):
+        return output.decode("utf-8")
+    return output

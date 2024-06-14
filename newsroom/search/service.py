@@ -713,7 +713,7 @@ class BaseSearchService(Service):
         limit_days = get_setting(self.limit_days_setting) if self.limit_days_setting is not None else None
 
         if limit_days and search.company and not search.company.get("archive_access", False):
-            search.query["bool"]["filter"].append(
+            search.query["bool"].setdefault("filter", []).append(
                 {
                     "range": {
                         "versioncreated": {
