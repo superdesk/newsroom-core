@@ -7,7 +7,7 @@ class TextFormatter(BaseFormatter):
     FILE_EXTENSION = "txt"
     MIMETYPE = "text/plain"
 
-    def format_item(self, item, item_type="items"):
+    def format_item(self, item, item_type="items") -> bytes:
         if item_type == "items":
             return str.encode(flask.render_template("download_item.txt", item=item), "utf-8")
         else:

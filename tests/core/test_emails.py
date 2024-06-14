@@ -4,6 +4,7 @@ from flask import render_template_string, json, url_for
 from jinja2 import TemplateNotFound
 
 from newsroom.email import (
+    send_item_killed_notification_email,
     send_new_item_notification_email,
     map_email_recipients_by_language,
     EmailGroup,
@@ -241,3 +242,30 @@ def test_send_user_email(app):
         user["notification_schedule"] = None
         send_user_email(user, "scheduled_notification_topic_matches_email", template_kwargs=template_kwargs)
         assert "at 13:00 PM" in send_email_mock.call_args[1]["subject"]  # default timezone Europe/Prague
+
+
+def test_item_killed_notification_email(app):
+    user = User(
+        email="foo@example.com",
+        user_type="user",
+    )
+
+    item = {
+        "type": "text",
+        "headline": "killed",
+        "versioncreated": datetime.now(),
+    }
+
+    with mock.patch.object(app, "mail") as app_mail:
+        send_item_killed_notification_email(user, item)
+        assert app_mail.send.called
+        assert "Kill/Takedown notice" == app_mail.send.call_args[0][0].subject
+
+    item = {
+        "type": "event",
+    }
+
+    with mock.patch.object(app, "mail") as app_mail:
+        send_item_killed_notification_email(user, item)
+        assert app_mail.send.called
+        assert "Agenda cancelled notice" == app_mail.send.call_args[0][0].subject
