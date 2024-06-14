@@ -345,13 +345,22 @@ function setListGroupsAndLoadHiddenItems(items: Array<IAgendaItem>, next?: boole
             if (toDate != null && fromDate?.startsWith('now/') != true) {
                 maxDate = moment(toDate);
             }
-            if (fromDate?.startsWith('now/')) {
+            if (fromDate?.startsWith('now')) {
                 if (fromDate === 'now/w') {
                     minDate = moment().startOf('week');
                     maxDate = minDate.clone().add(1, 'week').subtract(1, 'day');
                 } else if (fromDate === 'now/M') {
                     minDate = moment().startOf('month');
                     maxDate = minDate.clone().add(1, 'month').subtract(1, 'day');
+                } else if (fromDate == 'now-24h/h') {
+                    minDate = moment().subtract(24, 'hours').startOf('hour');
+                    maxDate = moment().startOf('hour');
+                } else if (fromDate === 'now-7d/d') {
+                    minDate = moment().subtract(7, 'days').startOf('day');
+                    maxDate = moment().startOf('day');
+                } else if (fromDate === 'now-30d/d') {
+                    minDate = moment().subtract(30, 'days').startOf('day');
+                    maxDate = moment().startOf('day');
                 } else {
                     minDate = moment().startOf('day');
                     maxDate = minDate.clone();
