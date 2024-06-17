@@ -85,7 +85,7 @@ class NotificationList extends React.Component<IProps, IState> {
     }
 
     render() {
-        let notificationArePaused: boolean = false;
+        let notificationArePaused = false;
 
         if (this.props.fullUser.notification_schedule?.pauseFrom) {
             notificationArePaused = new Date(this.props.fullUser.notification_schedule.pauseFrom) < new Date();

@@ -9,7 +9,7 @@ import Modal from 'components/Modal';
 interface IProps {
     modalFormInvalid(): void;
     modalFormValid(): void;
-    updateUserNotificationSchedule(schedule: Omit<IUser['notification_schedule'], 'last_run_time'>, message: string): void;
+    updateUserNotificationSchedule(schedule: Partial<IUser['notification_schedule']>, message: string): void;
     data: {
         user: IUser;
     };
