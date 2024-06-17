@@ -4151,6 +4151,14 @@ article.list {
         border-radius: var(--border-radius--m);
         padding: var(--space--2);
     }
+    &.nh-container__text--alert {
+        color:  var(--color-alert);
+        background-color: alpha(var(--color-alert), 0.25);
+    }
+    &.nh-container__text--info {
+        color:  var(--color-info);
+        background-color: alpha(var(--color-info), 0.25);
+    }
 }
 
 .a11y-only {

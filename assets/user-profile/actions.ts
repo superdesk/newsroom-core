@@ -8,6 +8,7 @@ import {getLocale} from '../utils';
 import {reloadMyTopics as reloadMyAgendaTopics} from '../agenda/actions';
 import {reloadMyTopics as reloadMyWireTopics} from '../wire/actions';
 import {IUserProfileUpdates} from 'interfaces/user';
+import {postNotificationSchedule} from 'helpers/notification';
 
 export const GET_TOPICS = 'GET_TOPICS';
 export function getTopics(topics: any) {
@@ -173,6 +174,14 @@ export function openEditTopicNotificationsModal() {
         const user = getState().user;
 
         dispatch(renderModal('editNotificationSchedule', {user}));
+    };
+}
+
+export function openPauseNotificationModal() {
+    return (dispatch: any, getState: any) => {
+        const user = getState().user;
+
+        dispatch(renderModal('pauseNotificationModal', {user}));
     };
 }
 
@@ -342,13 +351,12 @@ export function moveTopic(topicId: any, folder: ITopicFolder | null) {
     };
 }
 
-export function updateUserNotificationSchedules(schedule: Omit<IUser['notification_schedule'], 'last_run_time'>) {
+export function updateUserNotificationSchedule(schedule: Omit<IUser['notification_schedule'], 'last_run_time'>, message: string) {
     return (dispatch: any, getState: any) => {
         const user = getState().user;
 
-        return server.post(`/users/${user._id}/notification_schedules`, schedule)
+        return postNotificationSchedule(user._id, schedule, message)
             .then(() => {
-                notify.success(gettext('Global schedule updated'));
                 dispatch(fetchUser(user._id));
                 dispatch(closeModal());
             })
