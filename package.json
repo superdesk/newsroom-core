@@ -39,7 +39,7 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "bootstrap": "5.1.3",
-    "classnames": "^2.3.1",
+    "classnames": "^2.5.1",
     "copy-webpack-plugin": "^12.0.2",
     "css-loader": "^0.28.5",
     "dompurify": "^3.1.0",
