@@ -131,7 +131,7 @@ exceptiongroup==1.2.1
     # via pytest
 feedparser==6.0.11
     # via superdesk-core
-flake8==7.0.0
+flake8==7.1.0
     # via -r dev-requirements.in
 flask==1.1.2
     # via
@@ -292,7 +292,7 @@ pyasn1-modules==0.4.0
     # via
     #   google-auth
     #   oauth2client
-pycodestyle==2.11.1
+pycodestyle==2.12.0
     # via flake8
 pycparser==2.22
     # via cffi
