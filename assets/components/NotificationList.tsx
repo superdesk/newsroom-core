@@ -85,7 +85,11 @@ class NotificationList extends React.Component<IProps, IState> {
     }
 
     render() {
-        const notificationArePaused: boolean = new Date(this.props.fullUser.notification_schedule?.pauseFrom ?? '') < new Date();
+        let notificationArePaused: boolean = false;
+
+        if (this.props.fullUser.notification_schedule?.pauseFrom) {
+            notificationArePaused = new Date(this.props.fullUser.notification_schedule.pauseFrom) < new Date();
+        }
         
         return (
             <div className="navbar-notifications__inner">

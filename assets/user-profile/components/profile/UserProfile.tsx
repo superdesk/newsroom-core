@@ -187,12 +187,12 @@ class UserProfile extends React.PureComponent<IProps> {
                             
                             <div className='row'>
                                 <div className="col-lg-6">
-                                    {this.props.user.notification_schedule?.pauseFrom != '' && this.props.user.notification_schedule?.pauseTo != ''
+                                    {this.props.user.notification_schedule && this.props.user.notification_schedule.pauseFrom != '' && this.props.user.notification_schedule.pauseTo != ''
                                         ? (
                                             <div className="nh-container nh-container__text--alert">
                                                 <div className='d-flex flex-column gap-3 p-3'>
                                                     <div>
-                                                        {gettext('All notifications will be paused from {{dateFrom}} to {{dateTo}}', {dateFrom: formatDate(this.props.user.notification_schedule?.pauseFrom), dateTo: formatDate(this.props.user.notification_schedule?.pauseTo)})}
+                                                        {gettext('All notifications will be paused from {{dateFrom}} to {{dateTo}}', {dateFrom: formatDate(this.props.user.notification_schedule.pauseFrom), dateTo: formatDate(this.props.user.notification_schedule.pauseTo)})}
                                                     </div>
                                                     <div>
                                                         <button
