@@ -85,6 +85,12 @@
     /* COMPONENT: SEARCH RESULT PANEL (Tags list) */
     --search-result-tags-list-color-bg: var(--main-header-color-bg);
 
+    /* COMPONENT: WIRE ARTICLE (WireLabel) */
+    --label-color-bg-wire-latest: var(--color-warning);
+    --label-color-bg-wire-alert: var(--color-alert);
+    --label-color-bg-wire-advisory: var(--color-success);
+    --label-color-bg-wire-press-release: var(--color-info);
+
     /* COMPONENT: MULTI-DAY LABEL */
     --multiday-label-color-bg: var(--color-info);
 }

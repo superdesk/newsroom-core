@@ -51,7 +51,7 @@ export function UrgencyLabel ({item, listConfig, filterGroupLabels, alwaysShow =
 
     return (
         <span
-            className={'label label--orange2 label--rounded me-2'}
+            className={'label label--orange2 label--rounded'}
             style={{
                 color: urgencyHighlightColor,
                 backgroundColor: urgencyHighlightColor + '15', // color + alpha channel

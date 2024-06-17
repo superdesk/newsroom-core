@@ -1163,3 +1163,4 @@ export function formatAgendaDate(item: IAgendaItem, {localTimeZone = true, onlyD
 }
 
 export const isTopStory = (subj: ISubject) => subj.scheme === window.newsroom.client_config.agenda_top_story_scheme;
+export const wireLabel = (subj: ISubject) => subj.scheme === window.newsroom.client_config.wire_labels_scheme;

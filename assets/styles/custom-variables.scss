@@ -673,6 +673,10 @@ $container-max-widths: (
 
     // COMPONENT: LABEL
     --color-top-story: var(--color-primary);
+    --label-color-bg-wire-latest: var(--color-warning);
+    --label-color-bg-wire-alert: var(--color-alert);
+    --label-color-bg-wire-advisory: var(--color-success);
+    --label-color-bg-wire-press-release: var(--color-info);
 }
 
 .line-shadow-end--light {

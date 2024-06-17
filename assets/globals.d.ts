@@ -51,6 +51,7 @@ interface IClientConfig {
     view_content_tooltip_email?: string;
     searchbar_threshold_value?: number;
     agenda_top_story_scheme?: string;
+    wire_labels_scheme?: string;
     coverage_status_filter?: {
         [key: string]: {
             enabled: boolean;
