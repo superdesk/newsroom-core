@@ -253,31 +253,10 @@ def export_csv(args, results):
             aggs.get("total") or 0,
         ]
 
-        if "download" in actions:
-            row.append((aggs.get("actions") or {}).get("download") or 0)
-
-        if "copy" in actions:
-            row.append((aggs.get("actions") or {}).get("copy") or 0)
-
-        if "share" in actions:
-            row.append((aggs.get("actions") or {}).get("share") or 0)
-
-        if "print" in actions:
-            row.append((aggs.get("actions") or {}).get("print") or 0)
-
-        if "open" in actions:
-            row.append((aggs.get("actions") or {}).get("open") or 0)
-
-        if "preview" in actions:
-            row.append((aggs.get("actions") or {}).get("preview") or 0)
-
-        if "clipboard" in actions:
-            row.append((aggs.get("actions") or {}).get("clipboard") or 0)
-
-        if "api" in actions:
-            row.append((aggs.get("actions") or {}).get("api") or 0)
-
-        rows.append(row)
+        action_names = ["download", "copy", "share", "print", "open", "preview", "clipboard", "api"]
+        for action_name in action_names:
+            if action_name in actions:
+                row.append((aggs.get("actions") or {}).get(action_name, 0))
 
     return rows
 
