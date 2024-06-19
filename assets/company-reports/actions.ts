@@ -2,6 +2,7 @@ import {errorHandler, getItemFromArray, getDateInputDate, notify, gettext} from 
 import server from '../server';
 import {get, cloneDeep} from 'lodash';
 import {type ICompanyReportsData} from './types';
+import {Store, Dispatch} from 'redux';
 
 export const REPORTS_NAMES = {
     'COMPANY_SAVED_SEARCHES': 'company-saved-searches',
@@ -32,7 +33,7 @@ export const REPORTS: any = {
     [REPORTS_NAMES.COMPANY_AND_USER_SAVED_SEARCHES]: '/reports/company-and-user-saved-searches',
 };
 
-function getReportQueryString(currentState: any, next: any, exportReport: any, notify: any) {
+function getReportQueryString(currentState: any, next: boolean, exportReport: boolean, notify: any) {
     const params = cloneDeep(currentState.reportParams);
     if (params) {
         if (params.company) {
@@ -124,7 +125,7 @@ export function runReport() {
 
 export function fetchAggregations(url: string) {
     return function(dispatch: any, getState: any) {
-        const queryString = getReportQueryString(getState(), 0, false, notify);
+        const queryString = getReportQueryString(getState(), false, false, notify);
 
         server.get(`${url}?${queryString}&aggregations=1`)
             .then((data: any) => {
@@ -191,17 +192,23 @@ export function toggleFilterAndQuery(filter: any, value: any) {
 }
 
 export function printReport() {
-    return function (dispatch: any, getState: any) {
+    const queryStringRequiredReports = [
+        REPORTS_NAMES.SUBSCRIBER_ACTIVITY,
+        REPORTS_NAMES.CONTENT_ACTIVITY
+    ];
+    const REPORTS_URL_BASE = '/reports/print/';
+
+    return async function (_: Dispatch, getState: Store['getState']) {
         const state = getState();
         const activeReport = state.activeReport;
+        let url = `${REPORTS_URL_BASE}${activeReport}`;
 
-        if (activeReport === REPORTS_NAMES.SUBSCRIBER_ACTIVITY) {
+        if (queryStringRequiredReports.includes(activeReport)) {
             const queryString = getReportQueryString(state, false, false, notify);
-            window.open(`/reports/print/${activeReport}?${queryString}`, '_blank');
-        } else {
-            window.open(`/reports/print/${activeReport}`, '_blank');
+            url += `?${queryString}`;
         }
 
+        window.open(url, '_blank');
         return Promise.resolve();
     };
 }
