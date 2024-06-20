@@ -14,7 +14,7 @@ export default function WireLabel({item}: IProps) {
 
     return (
         wireItemSubjects.length > 0 ? (
-            <div>
+            <div className='d-flex gap-2 flex-wrap'>
                 {wireItemSubjects.map(subject => {
                     const classes = classNames('label label--fill label--rounded', {
                         [`label-wire--${subject.code}`]: subject.code,
