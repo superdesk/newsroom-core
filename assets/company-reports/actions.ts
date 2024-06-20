@@ -1,6 +1,6 @@
 import {errorHandler, getItemFromArray, getDateInputDate, notify, gettext} from '../utils';
 import server from '../server';
-import {get, cloneDeep} from 'lodash';
+import {cloneDeep} from 'lodash';
 import {type ICompanyReportsData} from './types';
 import {Store, Dispatch} from 'redux';
 
@@ -37,7 +37,7 @@ function getReportQueryString(currentState: any, next: boolean, exportReport: bo
     const params = cloneDeep(currentState.reportParams);
     if (params) {
         if (params.company) {
-            params.company = get(getItemFromArray(params.company, currentState.companies, 'name'), '_id');
+            params.company = getItemFromArray(params.company, currentState.companies, 'name')?._id;
         }
 
         if (params.date_from > params.date_to) {
@@ -53,22 +53,23 @@ function getReportQueryString(currentState: any, next: boolean, exportReport: bo
         }
 
         if (params.section) {
-            params.section = get(getItemFromArray(params.section, currentState.sections, 'name'), '_id');
+            params.section = getItemFromArray(params.section, currentState.sections, 'name')?._id;
         }
 
         if (params.product) {
-            params.product = get(getItemFromArray(params.product, currentState.products, 'name'), '_id');
+            params.product = getItemFromArray(params.product, currentState.products, 'name')?._id;
         }
 
         if (exportReport) {
             params.export = true;
         }
 
-        params['from'] = next ? get(currentState, 'results.length') : 0;
+        params['from'] = next ? currentState?.results?.length : 0;
         const queryString = Object.keys(params)
-            .filter((key: any) => params[key])
-            .map((key: any) => [key, params[key]].join('='))
+            .filter((key) => params[key])
+            .map((key) => [key, params[key]].join('='))
             .join('&');
+
         return queryString;
     }
 }
