@@ -43,7 +43,7 @@ class NotificationsApp extends React.Component<IProps, any> {
                 loading={this.props.loading}
                 fullUser={this.props.fullUser}
                 resumeNotifications={() => {
-                    postNotificationSchedule(this.props.fullUser._id, {pauseFrom: '', pauseTo: ''}, gettext('Notifications resumed')).then(() =>
+                    postNotificationSchedule(this.props.fullUser._id, {pause_from: '', pause_to: ''}, gettext('Notifications resumed')).then(() =>
                         this.props.updateUser(this.props.fullUser._id)
                     );
                 }}

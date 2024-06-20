@@ -87,8 +87,8 @@ class NotificationList extends React.Component<IProps, IState> {
     render() {
         let notificationArePaused = false;
 
-        if (this.props.fullUser.notification_schedule?.pauseFrom) {
-            notificationArePaused = new Date(this.props.fullUser.notification_schedule.pauseFrom) < new Date();
+        if (this.props.fullUser.notification_schedule?.pause_from) {
+            notificationArePaused = new Date(this.props.fullUser.notification_schedule.pause_from) < new Date();
         }
         
         return (
@@ -117,7 +117,7 @@ class NotificationList extends React.Component<IProps, IState> {
                         return null;
                     }
 
-                    if (this.props.fullUser.notification_schedule != null && this.props.fullUser.notification_schedule.pauseFrom != '' && this.props.fullUser.notification_schedule.pauseTo != '' && notificationArePaused) {
+                    if (this.props.fullUser.notification_schedule != null && this.props.fullUser.notification_schedule.pause_from != '' && this.props.fullUser.notification_schedule.pause_to != '' && notificationArePaused) {
                         return (
                             <div className="notif__list dropdown-menu dropdown-menu-right show">
                                 <div className='notif__list__header d-flex'>
@@ -126,7 +126,7 @@ class NotificationList extends React.Component<IProps, IState> {
         
                                 <div className='d-flex flex-column gap-2 p-3'>
                                     <div className='nh-container nh-container__text--alert p-2'>
-                                        {gettext('All notifications are paused until {{date}}', {date: formatDate(this.props.fullUser.notification_schedule.pauseTo)})}
+                                        {gettext('All notifications are paused until {{date}}', {date: formatDate(this.props.fullUser.notification_schedule.pause_to)})}
                                     </div>
         
                                     <button
@@ -168,10 +168,10 @@ class NotificationList extends React.Component<IProps, IState> {
                                     </button>
                                 </div>
 
-                                {(this.props.fullUser.notification_schedule != null && this.props.fullUser.notification_schedule.pauseFrom != '' && this.props.fullUser.notification_schedule.pauseTo != '' && !notificationArePaused) && (
+                                {(this.props.fullUser.notification_schedule != null && this.props.fullUser.notification_schedule.pause_from != '' && this.props.fullUser.notification_schedule.pause_to != '' && !notificationArePaused) && (
                                     <div className='p-3'>
                                         <div className='nh-container nh-container__text--info p-2'>
-                                            {gettext('All notifications are set to be paused from {{dateFrom}} to {{dateTo}}', {dateFrom: formatDate(this.props.fullUser.notification_schedule.pauseFrom), dateTo: formatDate(this.props.fullUser.notification_schedule.pauseTo)})}
+                                            {gettext('All notifications are set to be paused from {{dateFrom}} to {{dateTo}}', {dateFrom: formatDate(this.props.fullUser.notification_schedule.pause_from), dateTo: formatDate(this.props.fullUser.notification_schedule.pause_to)})}
                                         </div>
                                     </div>
                                 )}
