@@ -413,9 +413,9 @@ class UsersService(newsroom.Service):
         pause_to = schedule.get("pause_to")
         if pause_from and pause_to:
             now = datetime.now(timezone).date()
-            pause_from = date.fromisoformat(pause_from)
-            pause_to = date.fromisoformat(pause_to)
-            if pause_from <= now <= pause_to:
+            pause_from_date = date.fromisoformat(pause_from)
+            pause_to_date = date.fromisoformat(pause_to)
+            if pause_from_date <= now <= pause_to_date:
                 return True
         return False
 
