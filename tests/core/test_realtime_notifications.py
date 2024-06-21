@@ -304,8 +304,8 @@ def test_pause_notifications(app, mocker, company_products):
     user = app.data.find_one("users", req=None, _id=PUBLIC_USER_ID)
     updates = {
         "notification_schedule": dict(
-            pause_from=datetime.now() - timedelta(days=1),
-            pause_to=datetime.now() + timedelta(days=1),
+            pause_from=(datetime.now() - timedelta(days=1)).date().isoformat(),
+            pause_to=(datetime.now() + timedelta(days=1)).date().isoformat(),
         )
     }
     app.data.update("users", user["_id"], updates, user)
