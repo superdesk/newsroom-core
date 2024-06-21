@@ -2370,6 +2370,11 @@ article.list {
     line-height: var(--content-item-text-line-height);
 }
 
+.wire-column__preview__lead {
+    font-size: var(--content-item-lead-font-size); // 17px
+    font-weight: var(--font-weight-semibold);
+}
+
 .wire-column__preview__text {
     margin-block-end: var(--space--3);
     .wire-column__preview--canceled & {
@@ -3107,11 +3112,6 @@ article.list {
     @include lg {
         margin: 0px 40px 0px 10px;
     }
-}
-
-.content--item-detail .wire-column__preview__lead {
-    font-size: var(--content-item-lead-font-size); // 17px
-    font-weight: var(--font-weight-semibold);
 }
 
 .content--item-detail .wire-column__preview__headline {
