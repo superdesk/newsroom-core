@@ -2,7 +2,7 @@ import pytz
 import bcrypt
 import newsroom
 import superdesk
-from datetime import datetime
+from datetime import datetime, date
 from copy import deepcopy
 
 from typing import Dict, Optional, List, TypedDict
@@ -147,10 +147,10 @@ class UsersResource(newsroom.Resource):
                     "type": "datetime",
                 },
                 "pause_from": {
-                    "type": "datetime",
+                    "type": "string",
                 },
                 "pause_to": {
-                    "type": "datetime",
+                    "type": "string",
                 },
             },
         },
@@ -412,9 +412,9 @@ class UsersService(newsroom.Service):
         pause_from = schedule.get("pause_from")
         pause_to = schedule.get("pause_to")
         if pause_from and pause_to:
-            now = datetime.now(timezone)
-            pause_from = pause_from.replace(tzinfo=timezone)
-            pause_to = pause_to.replace(tzinfo=timezone)
+            now = datetime.now(timezone).date()
+            pause_from = date.fromisoformat(pause_from)
+            pause_to = date.fromisoformat(pause_to)
             if pause_from <= now <= pause_to:
                 return True
         return False

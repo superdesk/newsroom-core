@@ -56,8 +56,8 @@ class NotificationSchedule(TypedDict, total=False):
     timezone: str
     times: List[str]
     last_run_time: datetime
-    pause_from: datetime
-    pause_to: datetime
+    pause_from: str
+    pause_to: str
 
 
 class NotificationQueueTopic(TypedDict, total=False):
