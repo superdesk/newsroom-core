@@ -441,8 +441,8 @@ def _set_event_date_range(search):
 aggregations: Dict[str, Dict[str, Any]] = {
     "language": {"terms": {"field": "language"}},
     "calendar": {"terms": {"field": "calendars.name", "size": 100}},
-    "service": {"terms": {"field": "service.name", "size": 50}},
-    "subject": {"terms": {"field": "subject.name", "size": 50}},
+    "service": {"terms": {"field": "service.name", "size": 100}},
+    "subject": {"terms": {"field": "subject.name", "size": 200}},
     "urgency": {"terms": {"field": "urgency"}},
     "place": {"terms": {"field": "place.name", "size": 50}},
     "coverage": {
@@ -454,8 +454,8 @@ aggregations: Dict[str, Dict[str, Any]] = {
             "path": "planning_items",
         },
         "aggs": {
-            "service": {"terms": {"field": "planning_items.service.name", "size": 50}},
-            "subject": {"terms": {"field": "planning_items.subject.name", "size": 50}},
+            "service": {"terms": {"field": "planning_items.service.name", "size": 100}},
+            "subject": {"terms": {"field": "planning_items.subject.name", "size": 200}},
             "urgency": {"terms": {"field": "planning_items.urgency"}},
             "place": {"terms": {"field": "planning_items.place.name", "size": 50}},
         },
