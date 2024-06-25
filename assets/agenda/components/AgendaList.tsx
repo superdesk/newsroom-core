@@ -518,5 +518,6 @@ function getLastGroupWithItems(groupedItems: Array<IAgendaListGroup>): number {
         return groupedItems.indexOf(lastGroup);
     }
 
-    return -1;
+    // If no groups have items, return the last group
+    return groupedItems.length - 1;
 }

@@ -152,7 +152,7 @@ export default class SearchBase<Props = {}> extends React.Component<Props & IBas
 
     renderLoader() {
         return (
-            <div className="d-flex justify-content-center h-50">
+            <div className="d-flex justify-content-center h-50 w-100">
                 <div className="spinner-border text-muted m-5 align-self-center" />
             </div>
         );
@@ -251,6 +251,10 @@ export default class SearchBase<Props = {}> extends React.Component<Props & IBas
     }
 
     render() {
+        if (this.state.initialLoad) {
+            return this.renderLoader();
+        }
+
         return (
             <React.Fragment>
                 <div className="content">
