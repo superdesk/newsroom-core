@@ -7,7 +7,7 @@ from typing_extensions import TypedDict
 
 from superdesk import get_resource_service
 from flask import current_app, render_template, url_for
-from flask_babel import gettext
+from flask_babel import gettext, force_locale
 from flask_mail import Attachment, Message
 from jinja2 import TemplateNotFound
 
@@ -266,7 +266,7 @@ def _send_localized_email(
     email_templates = get_resource_service("email_templates")
     html_template = get_language_template_name(template, language, "html")
     text_template = get_language_template_name(template, language, "txt")
-    with template_locale(language, timezone):
+    with template_locale(language, timezone), force_locale(language):
         subject = email_templates.get_translated_subject(template, language, **template_kwargs)
         template_kwargs.setdefault("subject", subject)
         template_kwargs.setdefault("recipient_language", language)
