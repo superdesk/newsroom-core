@@ -266,18 +266,19 @@ def _send_localized_email(
     email_templates = get_resource_service("email_templates")
     html_template = get_language_template_name(template, language, "html")
     text_template = get_language_template_name(template, language, "txt")
-    with template_locale(language, timezone), force_locale(language):
+    with template_locale(language, timezone):
         subject = email_templates.get_translated_subject(template, language, **template_kwargs)
         template_kwargs.setdefault("subject", subject)
         template_kwargs.setdefault("recipient_language", language)
-        send_email(
-            to=to,
-            subject=subject,
-            text_body=render_template(text_template, **template_kwargs),
-            html_body=render_template(html_template, **template_kwargs),
-            sender_name=get_sender_name(language),
-            **email_kwargs,
-        )
+        with force_locale(language):
+            send_email(
+                to=to,
+                subject=subject,
+                text_body=render_template(text_template, **template_kwargs),
+                html_body=render_template(html_template, **template_kwargs),
+                sender_name=get_sender_name(language),
+                **email_kwargs,
+            )
 
 
 def get_sender_name(language: str) -> Optional[str]:
