@@ -79,6 +79,7 @@ items = [
 agenda_items = [
     {
         "type": "agenda",
+        "item_type": "event",
         "_id": "urn:conference",
         "event_id": "urn:conference",
         "versioncreated": datetime(2018, 6, 27, 11, 12, 4, tzinfo=utc),

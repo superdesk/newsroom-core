@@ -668,7 +668,7 @@ def test_filter_agenda_by_coverage_status(client):
     client.post("/push", data=json.dumps(test_planning), content_type="application/json")
 
     data = get_json(client, '/agenda/search?filter={"coverage_status":["planned"]}')
-    assert 1 == data["_meta"]["total"]
+    assert 2 == data["_meta"]["total"]
     assert "foo" == data["_items"][0]["_id"]
 
     data = get_json(client, '/agenda/search?filter={"coverage_status":["not intended"]}')
