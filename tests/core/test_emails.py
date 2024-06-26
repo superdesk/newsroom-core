@@ -16,6 +16,7 @@ from datetime import datetime
 
 from newsroom.types import User
 from newsroom.email import send_user_email
+from tests.fixtures import agenda_items
 
 
 def test_item_notification_template(client, app, mocker):
@@ -269,3 +270,26 @@ def test_item_killed_notification_email(app):
         send_item_killed_notification_email(user, item)
         assert app_mail.send.called
         assert "Agenda cancelled notice" == app_mail.send.call_args[0][0].subject
+
+
+def test_send_user_email_on_locale_changed():
+    user = User(
+        email="foo@example.com",
+        notification_schedule={"timezone": "Asia/Calcutta"},
+        user_type="user",
+        receive_email=True,
+    )
+
+    user["locale"] = "fr_CA"
+    with mock.patch("newsroom.email.send_email") as send_email_mock:
+        template_kwargs = dict(item=agenda_items[0], planning_item=agenda_items[0]["planning_items"][0])
+        send_user_email(user, "test_template", template_kwargs=template_kwargs)
+        assert "Event status : Planifiée" in send_email_mock.call_args[1]["text_body"]
+        assert "Coverage status: Planifiée" in send_email_mock.call_args[1]["text_body"]
+
+    user["locale"] = "en"
+    with mock.patch("newsroom.email.send_email") as send_email_mock:
+        template_kwargs = dict(item=agenda_items[0], planning_item=agenda_items[0]["planning_items"][0])
+        send_user_email(user, "test_template", template_kwargs=template_kwargs)
+        assert "Event status : Planned" in send_email_mock.call_args[1]["text_body"]
+        assert "Coverage status: Planned" in send_email_mock.call_args[1]["text_body"]

@@ -270,15 +270,14 @@ def _send_localized_email(
         subject = email_templates.get_translated_subject(template, language, **template_kwargs)
         template_kwargs.setdefault("subject", subject)
         template_kwargs.setdefault("recipient_language", language)
-        with force_locale(language):
-            send_email(
-                to=to,
-                subject=subject,
-                text_body=render_template(text_template, **template_kwargs),
-                html_body=render_template(html_template, **template_kwargs),
-                sender_name=get_sender_name(language),
-                **email_kwargs,
-            )
+        send_email(
+            to=to,
+            subject=subject,
+            text_body=render_template(text_template, **template_kwargs),
+            html_body=render_template(html_template, **template_kwargs),
+            sender_name=get_sender_name(language),
+            **email_kwargs,
+        )
 
 
 def get_sender_name(language: str) -> Optional[str]:
