@@ -142,6 +142,7 @@ agenda_items = [
                 },
                 "workflow_status": "active",
                 "coverage_id": "urn:coverage",
+                "planning_id": "urn:planning",
                 "news_coverage_status": {
                     "label": "Planned",
                     "name": "coverage intended",
@@ -158,6 +159,7 @@ agenda_items = [
             "pubstatus": "usable",
             "files": [{"media": "media", "name": "test.txt", "mimetype": "text/plain"}],
             "internal_note": "Internal message for event",
+            "state": "scheduled",
         },
         "firstcreated": "2018-06-27T11:12:04+0000",
         "_current_version": 1,

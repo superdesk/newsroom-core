@@ -4,7 +4,7 @@ import flask
 import jinja2
 
 from typing import Optional
-from flask_babel import get_locale, get_timezone, _get_current_context, Locale
+from flask_babel import get_locale, get_timezone, _get_current_context, Locale, force_locale
 import pytz
 
 TEMPLATE_LOCALE = "template_locale"
@@ -40,7 +40,8 @@ def template_locale(locale: Optional[str] = None, timezone: Optional[str] = None
     if timezone:
         ctx.babel_tzinfo = pytz.timezone(timezone)
 
-    yield
+    with force_locale(locale):
+        yield
 
     if locale:
         set_template_locale(None)
