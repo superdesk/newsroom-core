@@ -7,7 +7,7 @@ from typing_extensions import TypedDict
 
 from superdesk import get_resource_service
 from flask import current_app, render_template, url_for
-from flask_babel import gettext, force_locale
+from flask_babel import gettext
 from flask_mail import Attachment, Message
 from jinja2 import TemplateNotFound
 
