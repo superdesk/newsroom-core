@@ -59,6 +59,7 @@ interface IClientConfig {
             button_label: string;
         }
     };
+    agenda_sort_events_with_coverage_on_top?: boolean;
     show_user_register?: boolean;
     multimedia_website_search_url?: string;
 }
