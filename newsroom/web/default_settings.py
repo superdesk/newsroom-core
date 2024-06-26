@@ -396,7 +396,7 @@ CLIENT_CONFIG = {
             "button_label": lazy_gettext("Completed"),
         },
     },
-    "agenda_top_story_sorting_only": True,
+    "agenda_sort_events_with_coverage_on_top": False,
 }
 
 # Enable rendering of the date in the base view
