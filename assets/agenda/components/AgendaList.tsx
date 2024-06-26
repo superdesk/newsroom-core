@@ -29,7 +29,7 @@ import {getIntVersion} from 'wire/utils';
 import {getPlanningItemsByGroup, getListItems, isTopStory} from 'agenda/utils';
 import {searchNavigationSelector} from 'search/selectors';
 import {previewConfigSelector, listConfigSelector} from 'ui/selectors';
-import {AGENDA_DATE_FORMAT_LONG, AGENDA_DATE_FORMAT_SHORT} from '../../utils';
+import {AGENDA_DATE_FORMAT_LONG, AGENDA_DATE_FORMAT_SHORT, AGENDA_SORT_EVENTS_WITH_COVERAGE_ON_TOP} from '../../utils';
 
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
@@ -64,7 +64,7 @@ const getItemIdsSorted = (
             } else {
                 restIds.push(item._id);
             }
-        } else if (hasCoverage) {
+        } else if (hasCoverage && AGENDA_SORT_EVENTS_WITH_COVERAGE_ON_TOP == true) {
 
             // items with coverages are displayed after top stories
             coveragesOnlyIds.push(item._id);
