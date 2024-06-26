@@ -29,7 +29,7 @@ import {getIntVersion} from 'wire/utils';
 import {getPlanningItemsByGroup, getListItems, isTopStory} from 'agenda/utils';
 import {searchNavigationSelector} from 'search/selectors';
 import {previewConfigSelector, listConfigSelector} from 'ui/selectors';
-import {AGENDA_DATE_FORMAT_LONG, AGENDA_DATE_FORMAT_SHORT, AGENDA_TOP_STORY_SORTING} from '../../utils';
+import {AGENDA_DATE_FORMAT_LONG, AGENDA_DATE_FORMAT_SHORT, AGENDA_TOP_STORY_SORTING_ONLY} from '../../utils';
 
 
 const PREVIEW_TIMEOUT = 500; // time to preview an item after selecting using kb
@@ -64,7 +64,7 @@ const getItemIdsSorted = (
             } else {
                 restIds.push(item._id);
             }
-        } else if (hasCoverage) {
+        } else if (hasCoverage && AGENDA_TOP_STORY_SORTING_ONLY == false) {
 
             // items with coverages are displayed after top stories
             coveragesOnlyIds.push(item._id);
@@ -347,10 +347,7 @@ class AgendaList extends React.Component<IProps, IState> {
                 className="wire-articles__group"
                 key={`${group.date}-${forHiddenItems ? 'hidden-items' : 'items'}-group`}
             >
-                {(AGENDA_TOP_STORY_SORTING
-                    ? getItemIdsSorted(itemIds, this.props.itemsById, this.props.listConfig, group)
-                    : itemIds
-                ).map((itemId) => {
+                {getItemIdsSorted(itemIds, this.props.itemsById, this.props.listConfig, group).map((itemId) => {
                     // Only show multiple entries for this item if we're in the `Planning Only` view
                     const plans = this.props.itemTypeFilter !== 'planning' ?
                         [] :
