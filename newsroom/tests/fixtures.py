@@ -79,7 +79,6 @@ items = [
 agenda_items = [
     {
         "type": "agenda",
-        "item_type": "event",
         "_id": "urn:conference",
         "event_id": "urn:conference",
         "versioncreated": datetime(2018, 6, 27, 11, 12, 4, tzinfo=utc),
@@ -142,7 +141,6 @@ agenda_items = [
                     "internal_note": "Internal message for coverage",
                 },
                 "workflow_status": "active",
-                "coverage_status": "coverage intended",
                 "coverage_id": "urn:coverage",
                 "planning_id": "urn:planning",
                 "news_coverage_status": {

@@ -273,12 +273,16 @@ def test_item_killed_notification_email(app):
 
 
 def test_send_user_email_on_locale_changed():
+    event_item = agenda_items[0]
+
     user = User(
         email="foo@example.com",
         notification_schedule={"timezone": "Asia/Calcutta"},
         user_type="user",
         receive_email=True,
     )
+
+    event_item["coverages"][0]["coverage_status"] = "coverage intended"
 
     user["locale"] = "fr_CA"
     with mock.patch("newsroom.email.send_email") as send_email_mock:
