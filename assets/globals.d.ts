@@ -19,6 +19,7 @@ interface IClientConfig {
     display_all_versions_toggle: boolean;
     display_credits: boolean;
     display_news_only: boolean;
+    display_author_role: boolean;
     filter_panel_defaults: {
         tab: {
             wire: string;

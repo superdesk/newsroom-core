@@ -347,6 +347,7 @@ CLIENT_CONFIG = {
     "item_actions": {},
     "display_abstract": DISPLAY_ABSTRACT,
     "display_credits": False,
+    "display_author_role": True,
     "filter_panel_defaults": {
         "tab": {
             "wire": "nav",  # Options are 'nav', 'topics', 'filters'

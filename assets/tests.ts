@@ -57,6 +57,7 @@ window.newsroom = {
         display_all_versions_toggle: false,
         display_credits: false,
         display_news_only: true,
+        display_author_role: true,
         filter_panel_defaults: {
             tab: {
                 wire: 'nav',

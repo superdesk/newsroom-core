@@ -71,6 +71,7 @@ export const DAY_IN_MINUTES = 24 * 60 - 1;
 export const LIST_ANIMATIONS = getConfig('list_animations', true);
 export const DISPLAY_NEWS_ONLY = getConfig('display_news_only', true);
 export const AGENDA_SORT_EVENTS_WITH_COVERAGE_ON_TOP = getConfig('agenda_sort_events_with_coverage_on_top', false);
+export const DISPLAY_AUTHOR_ROLE = getConfig('display_author_role', true);
 export const DISPLAY_AGENDA_FEATURED_STORIES_ONLY = getConfig('display_agenda_featured_stories_only', true);
 export const DISPLAY_ALL_VERSIONS_TOGGLE = getConfig('display_all_versions_toggle', true);
 export const DEFAULT_TIMEZONE = getConfig('default_timezone', 'Australia/Sydney');
