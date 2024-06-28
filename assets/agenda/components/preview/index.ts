@@ -21,7 +21,6 @@ export const DEFAULT_COVERAGE_METADATA_FIELDS = [
     'coverage_assignee_names',
     'coverage_expected_date',
     'coverage_provider',
-    'coverage_wire_text',
     'coverage_update_coming',
     'coverage_status',
     'coverage_scheduled_status',
