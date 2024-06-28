@@ -8,7 +8,14 @@ def test_wire_search_fields(client, app):
     app.data.insert(
         "items",
         [
-            {"headline": "foo", "ednote": "bar", "guid": "test", "type": "text", "versioncreated": datetime.utcnow()},
+            {
+                "headline": "foo",
+                "ednote": "bar",
+                "guid": "test",
+                "type": "text",
+                "versioncreated": datetime.utcnow(),
+                "authors": [{"name": "Alex Dawn", "role": "EDITOR"}],
+            },
         ],
     )
 
@@ -17,6 +24,9 @@ def test_wire_search_fields(client, app):
 
     data = get_json(client, "/wire/search?q=bar")
     assert 0 == len(data["_items"])
+
+    data = get_json(client, "/wire/search?q=alex")
+    assert 1 == len(data["_items"])
 
 
 def test_wire_search_cross_fields(client, app):

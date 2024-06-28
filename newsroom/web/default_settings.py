@@ -667,6 +667,7 @@ WIRE_SEARCH_FIELDS = [
     "description_text",
     "keywords",
     "located",
+    "authors.name",
 ]
 
 #:
