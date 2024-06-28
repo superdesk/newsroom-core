@@ -266,3 +266,7 @@ class DashboardCard(TypedDict):
 
 
 Article = Dict[str, Any]
+
+
+class Navigation(Entity):
+    name: str
