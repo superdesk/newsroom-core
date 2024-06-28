@@ -1,28 +1,16 @@
 import React from 'react';
 import classNames from 'classnames';
-import {get} from 'lodash';
 import {Tooltip} from 'bootstrap';
-import {formatDate, gettext} from 'utils';
+import {gettext} from 'utils';
 import {isTouchDevice} from '../utils';
-import NotificationListItem from './NotificationListItem';
-import {IUser} from 'interfaces';
+import {NotificationPopup, IProps as INotificationPopupProps} from './NotificationPopup';
 
 interface IState {
     displayItems: boolean;
     connected: boolean;
 }
 
-interface IProps {
-    items: any;
-    count: number;
-    fullUser: IUser;
-    notifications: Array<any>;
-    loading: boolean;
-    clearNotification(id: IUser['_id']): void;
-    clearAll(): void;
-    loadNotifications(): void;
-    resumeNotifications(): void;
-}
+type IProps = INotificationPopupProps;
 
 class NotificationList extends React.Component<IProps, IState> {
     tooltip: any;
@@ -75,21 +63,17 @@ class NotificationList extends React.Component<IProps, IState> {
     }
 
     toggleDisplay() {
-        this.setState({displayItems: !this.state.displayItems});
-        if (!this.state.displayItems) {
-            this.props.loadNotifications();
-            (document.getElementById('header-notification') as HTMLElement).classList.add('navbar-notifications--open');
-        } else {
-            (document.getElementById('header-notification') as HTMLElement).classList.remove('navbar-notifications--open');
-        }
+        this.setState({displayItems: !this.state.displayItems}, (() => {
+            if (this.state.displayItems) {
+                this.props.loadNotifications();
+                (document.getElementById('header-notification') as HTMLElement).classList.add('navbar-notifications--open');
+            } else {
+                (document.getElementById('header-notification') as HTMLElement).classList.remove('navbar-notifications--open');
+            }
+        }));
     }
 
     render() {
-        let notificationArePaused = false;
-
-        if (this.props.fullUser.notification_schedule?.pause_from) {
-            notificationArePaused = new Date(this.props.fullUser.notification_schedule.pause_from) < new Date();
-        }
         
         return (
             <div className="navbar-notifications__inner">
@@ -112,92 +96,19 @@ class NotificationList extends React.Component<IProps, IState> {
                     <i className='icon--alert' onClick={this.toggleDisplay} />
                 </span>
 
-                {(() => {
-                    if (this.state.displayItems !== true) {
-                        return null;
-                    }
-
-                    if (this.props.fullUser.notification_schedule != null && this.props.fullUser.notification_schedule.pause_from != '' && this.props.fullUser.notification_schedule.pause_to != '' && notificationArePaused) {
-                        return (
-                            <div className="notif__list dropdown-menu dropdown-menu-right show">
-                                <div className='notif__list__header d-flex'>
-                                    <span className='notif__list__header-headline ms-3'>{gettext('Notifications')}</span>
-                                </div>
-        
-                                <div className='d-flex flex-column gap-2 p-3'>
-                                    <div className='nh-container nh-container__text--alert p-2'>
-                                        {gettext('All notifications are paused until {{date}}', {date: formatDate(this.props.fullUser.notification_schedule.pause_to)})}
-                                    </div>
-        
-                                    <button
-                                        type="button"
-                                        className="nh-button nh-button--small nh-button--tertiary"
-                                        onClick={() => {
-                                            this.props.resumeNotifications();
-                                        }}
-                                    >
-                                        {gettext('Resume all notifications')}
-                                    </button>
-                                </div>
-                            </div>
-                        );
-                    } else {
-                        if (this.props.count === 0) {
-                            return (
-                                <div className="notif__list dropdown-menu dropdown-menu-right show">
-                                    <div className='notif__list__header d-flex'>
-                                        <span className='notif__list__header-headline ms-3'>{gettext('Notifications')}</span>
-                                    </div>
-        
-                                    <div className='notif__list__message'>
-                                        {gettext('No new notifications!')}
-                                    </div>
-                                </div>
-                            );
-                        } else {
-                            <div className="notif__list dropdown-menu dropdown-menu-right show">
-                                <div className='notif__list__header d-flex'>
-                                    <span className='notif__list__header-headline ms-3'>{gettext('Notifications')}</span>
-        
-                                    <button
-                                        type="button"
-                                        className="button-pill ms-auto me-3"
-                                        onClick={this.props.clearAll}
-                                    >
-                                        {gettext('Clear All')}
-                                    </button>
-                                </div>
-
-                                {(this.props.fullUser.notification_schedule != null && this.props.fullUser.notification_schedule.pause_from != '' && this.props.fullUser.notification_schedule.pause_to != '' && !notificationArePaused) && (
-                                    <div className='p-3'>
-                                        <div className='nh-container nh-container__text--info p-2'>
-                                            {gettext('All notifications are set to be paused from {{dateFrom}} to {{dateTo}}', {dateFrom: formatDate(this.props.fullUser.notification_schedule.pause_from), dateTo: formatDate(this.props.fullUser.notification_schedule.pause_to)})}
-                                        </div>
-                                    </div>
-                                )}
-        
-                                {this.props.loading ? (
-                                    <div className='notif__list__message'>
-                                        {gettext('Loading...')}
-                                    </div>
-                                ) : (
-                                    this.props.notifications.map((notification: any) => (
-                                        <NotificationListItem
-                                            key={get(this.props.items, `${notification.item}._id`, 'test')}
-                                            item={get(
-                                                this.props.items,
-                                                `${notification.item}`,
-                                                get(notification, 'data.item', {})
-                                            )}
-                                            notification={notification}
-                                            clearNotification={this.props.clearNotification}
-                                        />
-                                    ))
-                                )}
-                            </div>;
-                        }
-                    }})()
-                }
+                {this.state.displayItems === true && (
+                    <NotificationPopup
+                        fullUser={this.props.fullUser}
+                        items={this.props.items}
+                        count={this.props.count}
+                        notifications={this.props.notifications}
+                        loading={this.props.loading}
+                        clearNotification={this.props.clearNotification}
+                        clearAll={this.props.clearAll}
+                        loadNotifications={this.props.loadNotifications}
+                        resumeNotifications={this.props.resumeNotifications}
+                    />
+                )}
             </div>
         );
     }
