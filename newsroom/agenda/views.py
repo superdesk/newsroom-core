@@ -14,7 +14,7 @@ from newsroom.auth.utils import check_user_has_products
 from newsroom.products.products import get_products_by_company
 from newsroom.template_filters import is_admin_or_internal, is_admin
 from newsroom.topics import get_company_folders, get_user_folders, get_user_topics
-from newsroom.navigations.navigations import get_navigations_by_company
+from newsroom.navigations.navigations import get_navigations
 from newsroom.auth import get_company, get_user, get_user_id, get_user_required
 from newsroom.decorator import login_required, section
 from newsroom.utils import (
@@ -132,13 +132,7 @@ def get_view_data() -> Dict:
             for f in app.download_formatters.values()
             if "agenda" in f["types"]
         ],
-        "navigations": get_navigations_by_company(
-            company,
-            product_type="agenda",
-            events_only=company.get("events_only", False),
-        )
-        if company
-        else [],
+        "navigations": get_navigations(user, company, "agenda"),
         "saved_items": get_resource_service("agenda").get_saved_items_count(),
         "events_only": company.get("events_only", False) if company else False,
         "restrict_coverage_info": company.get("restrict_coverage_info", False) if company else False,
