@@ -159,7 +159,7 @@ class WireSearchService(BaseSearchService):
 
         if not app.config["DASHBOARD_EMBARGOED"] or exclude_embargoed:
             embargo_query_rounding = app.config.get("EMBARGO_QUERY_ROUNDING")
-            search.query["bool"]["filter"].append(
+            search.query["bool"].setdefault("filter", []).append(
                 {
                     "bool": {
                         "should": [
