@@ -19,12 +19,12 @@ export interface IProps {
 }
 
 export const NotificationPopup = (props: IProps) => {
-    const now = new Date();
+    const today = (new Date()).toISOString().substring(0, 10);
     const pausedFrom = props.fullUser.notification_schedule?.pause_from ?? '';
     const pausedTo = props.fullUser.notification_schedule?.pause_to ?? '';
     const notificationsArePaused = (
-        pausedFrom != '' && new Date(pausedFrom) < now &&
-        pausedTo != '' && new Date(pausedTo) > now
+        pausedFrom != '' && pausedFrom <= today &&
+        pausedTo != '' && pausedTo >= today
     );
 
     if (notificationsArePaused) {
