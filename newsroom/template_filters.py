@@ -402,5 +402,5 @@ def get_ga_user_properties(user: User) -> Dict[str, str]:
     return {
         "company": (company.get("name") if company else "") or "none",
         "user": f"{user['first_name']} {user['last_name'][:1]}".strip(),
-        "user_id": str(user.get("_id") or ""),
+        "user_internal_id": str(user.get("_id") or ""),  # user_id is reserved name
     }
