@@ -73,6 +73,7 @@ class UserProfile extends React.PureComponent<IProps> {
         const {user, onChange, errors, authProviderFeatures} = this.props;
         const onCancel = () => this.props.fetchUser(this.props.user._id);
         const localeOptions = getLocaleInputOptions();
+        const today = (new Date()).toISOString().substring(0, 10);
         return (
             <form className="profile-content profile-content--user">
                 <div className="profile-content__main">
@@ -187,12 +188,12 @@ class UserProfile extends React.PureComponent<IProps> {
                             
                             <div className='row'>
                                 <div className="col-lg-6">
-                                    {this.props.user.notification_schedule && this.props.user.notification_schedule.pause_from != '' && this.props.user.notification_schedule.pause_to != ''
+                                    {(this.props.user.notification_schedule?.pause_from && this.props.user.notification_schedule?.pause_to && this.props.user.notification_schedule?.pause_to >= today)
                                         ? (
                                             <div className="nh-container nh-container__text--alert">
                                                 <div className='d-flex flex-column gap-3 p-3'>
                                                     <div>
-                                                        {gettext('All notifications will be paused from {{dateFrom}} to {{dateTo}}', {dateFrom: formatDate(this.props.user.notification_schedule.pause_from), dateTo: formatDate(this.props.user.notification_schedule.pause_to)})}
+                                                        {gettext('All notifications will be paused from {{dateFrom}} to {{dateTo}}', {dateFrom: formatDate(this.props.user.notification_schedule?.pause_from), dateTo: formatDate(this.props.user.notification_schedule?.pause_to)})}
                                                     </div>
                                                     <div>
                                                         <button

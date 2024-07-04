@@ -78,7 +78,7 @@ export const NotificationPopup = (props: IProps) => {
                         </button>
                     </div>
 
-                    {(pausedFrom != '' && pausedTo != '' && notificationsArePaused === false) && (
+                    {(pausedFrom != '' && pausedTo != '' && pausedTo >= today) && (
                         <div className='p-3'>
                             <div className='nh-container nh-container__text--info p-2'>
                                 {gettext('All notifications are set to be paused from {{dateFrom}} to {{dateTo}}', {dateFrom: formatDate(pausedFrom), dateTo: formatDate(pausedTo)})}
