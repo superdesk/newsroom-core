@@ -759,6 +759,18 @@ export function parseISODate(date?: string): number {
 }
 
 // Will return number of seconds since epoch for today at 00:00:00
-export function getTodayTimestamp(): number {
+function getTodayTimestamp(): number {
     return (new Date()).setUTCHours(0, 0, 0, 0);
+}
+
+export function notificationsArePaused(pausedFrom: number, pausedTo: number): boolean {
+    const today = getTodayTimestamp();
+
+    return pausedFrom <= today && pausedTo >= today;
+}
+
+export function notificationsWillBePaused(pausedFrom: number, pausedTo: number): boolean {
+    const today = getTodayTimestamp();
+
+    return pausedFrom > today && pausedTo > today;
 }
