@@ -19,7 +19,7 @@ from flask_mail import Mail
 from flask_caching import Cache
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
-from superdesk.json_utils import SuperdeskJSONEncoder
+from superdesk.json_utils import SuperdeskJSONEncoder, SuperdeskFlaskJSONProvider
 from superdesk.validator import SuperdeskValidator
 from superdesk.logging import configure_logging
 from superdesk.errors import SuperdeskApiError
@@ -65,6 +65,8 @@ class BaseNewsroomApp(eve.Eve):
         if config is None:
             config = {}
 
+        self.json_provider_class = SuperdeskFlaskJSONProvider
+
         super(BaseNewsroomApp, self).__init__(
             import_name,
             data=self.DATALAYER,
@@ -75,6 +77,7 @@ class BaseNewsroomApp(eve.Eve):
             settings=config,
             **kwargs,
         )
+
         self.json_encoder = SuperdeskJSONEncoder
         self.data.json_encoder_class = SuperdeskJSONEncoder
 

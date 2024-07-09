@@ -1000,7 +1000,7 @@ def send_topic_notification_emails(item, topics, topic_matches, users, companies
 
                 items = search_service.get_items_by_query(query, size=1)
                 highlighted_item = item
-                if items.count():
+                if len(items) > 0:
                     highlighted_item = items[0]
 
                 send_new_item_notification_email(

@@ -1,9 +1,6 @@
-from itsdangerous import (
-    TimedJSONWebSignatureSerializer as Serializer,
-    BadSignature,
-    SignatureExpired,
-)
+import time
 from flask import current_app as app
+from authlib.jose import jwt, JoseError
 
 from typing import TypedDict, Optional
 
@@ -22,34 +19,34 @@ def generate_auth_token(user, expiration=3600) -> bytes:
     :param expiration: ttl in seconds
     :return: token as encoded string
     """
-    s = Serializer(app.config["SECRET_KEY"], expires_in=expiration)
-    return s.dumps(
-        {
-            "id": str(user["_id"]),
-            "first_name": user.get("first_name"),
-            "last_name": user.get("last_name"),
-            "user_type": user["user_type"],
-        }
-    )
+    header = {'alg': 'HS256'}
+    payload = {
+        "id": str(user["_id"]),
+        "first_name": user.get("first_name"),
+        "last_name": user.get("last_name"),
+        "user_type": user["user_type"],
+        "exp": int(time.time()) + expiration,
+    }
+
+    return jwt.encode(header, payload, app.config["SECRET_KEY"]).decode('utf-8')
+
 
 
 def verify_auth_token(token: str) -> Optional[AuthToken]:
     """
-    Verifies and decodes th token
+    Verifies and decodes the token
     :param token: Encoded token
     :return: decoded token as dict
     """
-    s = Serializer(app.config["SECRET_KEY"])
     try:
-        parsed = s.loads(token)
-    except SignatureExpired:
-        return None  # valid token, but expired
-    except BadSignature:
-        return None  # invalid token
+        decoded = jwt.decode(token, app.config["SECRET_KEY"])
+        decoded.validate()
 
-    return {
-        "id": parsed["id"],
-        "user_type": parsed["user_type"],
-        "first_name": parsed["first_name"],
-        "last_name": parsed["last_name"],
-    }
+        return {
+            "id": decoded["id"],
+            "user_type": decoded["user_type"],
+            "first_name": decoded["first_name"],
+            "last_name": decoded["last_name"],
+        }
+    except (JoseError, KeyError):
+        return None

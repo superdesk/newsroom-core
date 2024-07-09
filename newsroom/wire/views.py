@@ -337,7 +337,7 @@ def download():
     return flask.send_file(
         _file,
         mimetype=mimetype,
-        attachment_filename=attachment_filename,
+        download_name=attachment_filename,
         as_attachment=True,
     )
 

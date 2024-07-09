@@ -174,7 +174,9 @@ def add_token_data(user):
 
 
 def is_valid_session():
-    now = utcnow().replace(tzinfo=None)
+    """Uses timezone-aware objects to avoid TypeError comparison"""
+    now = utcnow()
+
     return (
         flask.session.get("user")
         and flask.session.get("user_type")

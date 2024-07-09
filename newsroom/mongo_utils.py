@@ -118,9 +118,11 @@ def _get_mongo_items(mongo_collection_name, hours=None):
         if last_id:
             args["filter"].update({config.ID_FIELD: {"$gt": last_id}})
         cursor = db.find(**args)
-        if not cursor.count():
-            break
         items = list(cursor)
+
+        if len(items) == 0:
+            break
+
         last_id = items[-1][config.ID_FIELD]
         yield items
 

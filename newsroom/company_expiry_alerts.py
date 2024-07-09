@@ -64,7 +64,7 @@ class CompanyExpiryAlerts:
                 users = get_resource_service("users").find(
                     {"company": company.get(config.ID_FIELD), "expiry_alert": True}
                 )
-                if users.count() > 0:
+                if len(list(users)) > 0:
                     template_kwargs = {
                         "expiry_date": company.get("expiry_date"),
                         "expires_on": company.get("expiry_date").strftime("%d-%m-%Y"),
