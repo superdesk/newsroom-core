@@ -106,19 +106,19 @@ def get_atom():
                 SubElement(SubElement(entry, "author"), "name").text = complete_item.get("byline")
 
             if complete_item.get("pubstatus") == "usable":
-                SubElement(entry, etree.QName(_message_nsmap.get("dcterms"), "valid")).text = (
-                    "start={}; end={}; scheme=W3C-DTF".format(
-                        _format_date(utcnow()),
-                        _format_date(utcnow() + datetime.timedelta(days=30)),
-                    )
+                SubElement(
+                    entry, etree.QName(_message_nsmap.get("dcterms"), "valid")
+                ).text = "start={}; end={}; scheme=W3C-DTF".format(
+                    _format_date(utcnow()),
+                    _format_date(utcnow() + datetime.timedelta(days=30)),
                 )
             else:
                 # in effect a kill set the end date into the past
-                SubElement(entry, etree.QName(_message_nsmap.get("dcterms"), "valid")).text = (
-                    "start={}; end={}; scheme=W3C-DTF".format(
-                        _format_date(utcnow()),
-                        _format_date(utcnow() - datetime.timedelta(days=30)),
-                    )
+                SubElement(
+                    entry, etree.QName(_message_nsmap.get("dcterms"), "valid")
+                ).text = "start={}; end={}; scheme=W3C-DTF".format(
+                    _format_date(utcnow()),
+                    _format_date(utcnow() - datetime.timedelta(days=30)),
                 )
 
             categories = [{"name": s.get("name")} for s in complete_item.get("service", [])]

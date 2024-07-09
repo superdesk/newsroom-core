@@ -1,7 +1,6 @@
 import pytz
 from flask import json
 from datetime import datetime
-from urllib import parse
 from unittest import mock
 from pytest import fixture
 

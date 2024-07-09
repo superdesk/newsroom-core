@@ -19,7 +19,7 @@ def generate_auth_token(user, expiration=3600) -> bytes:
     :param expiration: ttl in seconds
     :return: token as encoded string
     """
-    header = {'alg': 'HS256'}
+    header = {"alg": "HS256"}
     payload = {
         "id": str(user["_id"]),
         "first_name": user.get("first_name"),
@@ -28,8 +28,7 @@ def generate_auth_token(user, expiration=3600) -> bytes:
         "exp": int(time.time()) + expiration,
     }
 
-    return jwt.encode(header, payload, app.config["SECRET_KEY"]).decode('utf-8')
-
+    return jwt.encode(header, payload, app.config["SECRET_KEY"]).decode("utf-8")
 
 
 def verify_auth_token(token: str) -> Optional[AuthToken]:
