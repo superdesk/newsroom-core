@@ -238,7 +238,7 @@ def test_share_items(client, app, mocker):
         assert "Hi Foo Bar" in outbox[0].body
         assert "admin admin (admin@sourcefabric.org) shared " in outbox[0].body
         assert "Conference Planning" in outbox[0].body
-        assert "http://localhost:5050/agenda?item=urn%3Aconference" in outbox[0].body
+        assert "http://localhost:5050/agenda?item=urn:conference" in outbox[0].body
         assert "Some info message" in outbox[0].body
 
     resp = client.get("/agenda/{}?format=json".format("urn:conference"))
@@ -336,7 +336,7 @@ def test_coverage_request(client, app):
         assert outbox[0].subject == "Coverage inquiry: Conference Planning"
         assert "admin admin" in outbox[0].body
         assert "admin@sourcefabric.org" in outbox[0].body
-        assert "http://localhost:5050/agenda?item={}".format(parse.quote("urn:conference")) in outbox[0].body
+        assert "http://localhost:5050/agenda?item=urn:conference" in outbox[0].body
         assert "Some info message" in outbox[0].body
 
 

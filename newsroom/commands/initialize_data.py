@@ -1,14 +1,18 @@
+import click
 import pathlib
 import logging
 import elasticsearch.exceptions
 
 from collections import OrderedDict
 
+from flask import current_app
+from flask.cli import with_appcontext
+
 from apps.prepopulate.app_initialize import (
     AppInitializeWithDataCommand as _AppInitializeWithDataCommand,
 )
+from .cli import newsroom_cli
 
-from .manager import app, manager
 from .elastic_rebuild import elastic_rebuild
 
 
@@ -26,6 +30,7 @@ __entities__: OrderedDict = OrderedDict(
 class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
     def run(self, entity_name=None, force=False, init_index_only=False):
         logger.info("Starting data initialization")
+        app = current_app
 
         data_paths = [
             path
@@ -76,31 +81,30 @@ class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
         return 0
 
 
-@manager.option(
+@newsroom_cli.command("initialize_data")
+@click.option(
     "-n",
-    "--entity_name",
-    dest="entity_name",
-    action="append",
+    "--entity-name",
+    multiple=True,
     required=False,
     help="entity(ies) to initialize",
 )
-@manager.option(
+@click.option(
     "-f",
     "--force",
-    dest="force",
-    action="store_true",
+    is_flag=True,
     required=False,
     help="if True, update item even if it has been modified by user",
 )
-@manager.option(
+@click.option(
     "-i",
     "--init-index-only",
-    dest="init_index_only",
-    action="store_true",
+    is_flag=True,
     required=False,
     help="if True, it only initializes index only",
 )
-def initialize_data(entity_name=None, path=None, force=False, init_index_only=False):
+@with_appcontext
+def initialize_data(entity_name, force, init_index_only):
     """Initialize application with predefined data for various entities.
 
     Loads predefined data (users, ui_config, email_templates, etc..) for instance.
@@ -116,7 +120,7 @@ def initialize_data(entity_name=None, path=None, force=False, init_index_only=Fa
     Example:
     ::
 
-        $ python manage.py initialize_data
+        $ flask newsroom initialize_data
 
     """
     cmd = AppInitializeWithDataCommand()

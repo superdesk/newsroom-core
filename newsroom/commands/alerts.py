@@ -1,10 +1,9 @@
 from newsroom.company_expiry_alerts import CompanyExpiryAlerts
 from newsroom.monitoring.email_alerts import MonitoringEmailAlerts
+from .cli import newsroom_cli
 
-from .manager import manager
 
-
-@manager.command
+@newsroom_cli.command("send_company_expiry_alerts")
 def send_company_expiry_alerts():
     """
     Send expiry alerts for companies which are close to be expired (now + 7 days)
@@ -18,7 +17,7 @@ def send_company_expiry_alerts():
     CompanyExpiryAlerts().send_alerts()
 
 
-@manager.command
+@newsroom_cli.command("send_monitoring_schedule_alerts")
 def send_monitoring_schedule_alerts():
     """
     Send monitoring schedule alerts.
@@ -32,7 +31,7 @@ def send_monitoring_schedule_alerts():
     MonitoringEmailAlerts().run()
 
 
-@manager.command
+@newsroom_cli.command("send_monitoring_immediate_alerts")
 def send_monitoring_immediate_alerts():
     """
     Send monitoring immediate alerts.

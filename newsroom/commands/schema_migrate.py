@@ -1,14 +1,16 @@
+import click
 from flask import current_app as app
 from superdesk.lock import lock, unlock
 from superdesk.commands.rebuild_elastic_index import RebuildElasticIndex
 from newsroom import SCHEMA_VERSIONS
-from .manager import manager
+from .cli import newsroom_cli
 
 
 VERSION_ID = "schema_version"
 
 
-@manager.command
+@newsroom_cli.command("schema_migrate")
+@click.argument("resource_name", required=False)
 def schema_migrate(resource_name=None):
     """Migrate elastic schema if needed, should be triggered on every deploy.
 

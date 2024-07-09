@@ -8,10 +8,10 @@ from superdesk import get_resource_service
 from superdesk.lock import lock, unlock
 
 from newsroom.search.config import nested_agg_groups, SearchGroupNestedConfig
-from .manager import manager
+from .cli import newsroom_cli
 
 
-@manager.command
+@newsroom_cli.command("fix_topic_nested_filters")
 def fix_topic_nested_filters():
     """Fix My/Company Topics after adding ``Nested Agg`` to Wire/Agenda group configs
 

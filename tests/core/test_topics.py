@@ -193,21 +193,21 @@ def test_get_topic_share_url(app):
     assert get_topic_url(topic) == "http://localhost:5050/wire?q=art+exhibition"
 
     topic = {"topic_type": "wire", "filter": {"location": [["Sydney"]]}}
-    assert get_topic_url(topic) == "http://localhost:5050/wire?filter=%7B%22location%22%3A+%5B%5B%22Sydney%22%5D%5D%7D"
+    assert get_topic_url(topic) == "http://localhost:5050/wire?filter=%7B%22location%22:+%5B%5B%22Sydney%22%5D%5D%7D"
 
     topic = {"topic_type": "wire", "navigation": ["123"]}
     assert get_topic_url(topic) == "http://localhost:5050/wire?navigation=%5B%22123%22%5D"
 
     topic = {"topic_type": "wire", "navigation": ["123", "456"]}
-    assert get_topic_url(topic) == "http://localhost:5050/wire?navigation=%5B%22123%22%2C+%22456%22%5D"
+    assert get_topic_url(topic) == "http://localhost:5050/wire?navigation=%5B%22123%22,+%22456%22%5D"
 
     topic = {"topic_type": "wire", "created": {"from": "2018-06-01"}}
-    assert get_topic_url(topic) == "http://localhost:5050/wire?created=%7B%22from%22%3A+%222018-06-01%22%7D"
+    assert get_topic_url(topic) == "http://localhost:5050/wire?created=%7B%22from%22:+%222018-06-01%22%7D"
 
     topic = {"topic_type": "wire", "advanced": {"all": "Weather Sydney", "fields": ["headline", "body_html"]}}
     assert get_topic_url(topic) == (
         "http://localhost:5050/wire?advanced="
-        "%7B%22all%22%3A+%22Weather+Sydney%22%2C+%22fields%22%3A+%5B%22headline%22%2C+%22body_html%22%5D%7D"
+        "%7B%22all%22:+%22Weather+Sydney%22,+%22fields%22:+%5B%22headline%22,+%22body_html%22%5D%7D"
     )
 
     topic = {
@@ -221,10 +221,10 @@ def test_get_topic_share_url(app):
     assert (
         get_topic_url(topic) == "http://localhost:5050/wire?"
         "q=art+exhibition"
-        "&filter=%7B%22urgency%22%3A+%5B3%5D%7D"
+        "&filter=%7B%22urgency%22:+%5B3%5D%7D"
         "&navigation=%5B%22123%22%5D"
-        "&created=%7B%22from%22%3A+%222018-06-01%22%7D"
-        "&advanced=%7B%22all%22%3A+%22Weather+Sydney%22%2C+%22fields%22%3A+%5B%22headline%22%2C+%22body_html%22%5D%7D"
+        "&created=%7B%22from%22:+%222018-06-01%22%7D"
+        "&advanced=%7B%22all%22:+%22Weather+Sydney%22,+%22fields%22:+%5B%22headline%22,+%22body_html%22%5D%7D"
     )
 
 

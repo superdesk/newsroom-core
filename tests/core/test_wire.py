@@ -124,8 +124,8 @@ def test_share_items(client, app):
         assert "admin admin (admin@sourcefabric.org) shared " in outbox[0].body
         assert items[0]["headline"] in outbox[0].body
         assert items[1]["headline"] in outbox[0].body
-        assert "http://localhost:5050/wire?item=%s" % parse.quote(items[0]["_id"]) in outbox[0].body
-        assert "http://localhost:5050/wire?item=%s" % parse.quote(items[1]["_id"]) in outbox[0].body
+        assert "http://localhost:5050/wire?item=%s" % items[0]["_id"] in outbox[0].body
+        assert "http://localhost:5050/wire?item=%s" % items[1]["_id"] in outbox[0].body
         # assert 'Some info message' in outbox[0].body
 
     resp = client.get("/wire/{}?format=json".format(items[0]["_id"]))

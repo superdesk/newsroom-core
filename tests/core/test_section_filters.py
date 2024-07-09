@@ -24,7 +24,7 @@ def init(app):
 def test_filter_list_fails_for_anonymous_user(client, anonymous_user, public_user):
     response = client.get("/section_filters/search")
     assert response.status_code == 302
-    assert response.headers.get("location") == "http://localhost:5050/login"
+    assert response.headers.get("location") == "/login"
 
     utils.login(client, public_user)
     response = client.get("/section_filters/search")

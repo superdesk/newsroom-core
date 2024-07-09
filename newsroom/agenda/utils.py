@@ -249,9 +249,11 @@ def remove_restricted_coverage_info(items):
             remove_planning_info(item)
 
         item["coverages"] = [
-            coverage
-            if coverage_is_completed(coverage)
-            else {key: val for key, val in coverage.items() if key in coverage_keys_to_copy}
+            (
+                coverage
+                if coverage_is_completed(coverage)
+                else {key: val for key, val in coverage.items() if key in coverage_keys_to_copy}
+            )
             for coverage in item.get("coverages") or []
         ]
 
@@ -259,9 +261,11 @@ def remove_restricted_coverage_info(items):
             remove_planning_info(plan)
 
             plan["coverages"] = [
-                coverage
-                if coverage_is_completed(coverage)
-                else {key: val for key, val in coverage.items() if key in coverage_keys_to_copy}
+                (
+                    coverage
+                    if coverage_is_completed(coverage)
+                    else {key: val for key, val in coverage.items() if key in coverage_keys_to_copy}
+                )
                 for coverage in plan.get("coverages") or []
             ]
             for coverage in plan["coverages"]:

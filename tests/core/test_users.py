@@ -22,7 +22,7 @@ from tests.utils import mock_send_email, login
 def test_user_list_fails_for_anonymous_user(client, anonymous_user, public_user):
     response = client.get("/users/search")
     assert response.status_code == 302
-    assert response.headers.get("location") == "http://localhost:5050/login"
+    assert response.headers.get("location") == "/login"
 
     login(client, public_user)
     response = client.get("/users/search")

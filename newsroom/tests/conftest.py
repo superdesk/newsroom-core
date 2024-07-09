@@ -80,3 +80,8 @@ def app(request):
 @fixture
 def client(app: Flask):
     return app.test_client()
+
+
+@fixture
+def runner(app: Flask):
+    return app.test_cli_runner()
