@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 import {IUser} from 'interfaces';
-import {gettext, getSubscriptionTimesString, formatDate} from 'utils';
+import {gettext, getSubscriptionTimesString, formatDate, parseISODate, getTodayTimestamp} from 'utils';
 
 import TextInput from 'components/TextInput';
 import SelectInput from 'components/SelectInput';
@@ -73,7 +73,7 @@ class UserProfile extends React.PureComponent<IProps> {
         const {user, onChange, errors, authProviderFeatures} = this.props;
         const onCancel = () => this.props.fetchUser(this.props.user._id);
         const localeOptions = getLocaleInputOptions();
-        const today = (new Date()).toISOString().substring(0, 10);
+        const today = getTodayTimestamp();
         return (
             <form className="profile-content profile-content--user">
                 <div className="profile-content__main">
@@ -188,7 +188,7 @@ class UserProfile extends React.PureComponent<IProps> {
                             
                             <div className='row'>
                                 <div className="col-lg-6">
-                                    {(this.props.user.notification_schedule?.pause_from && this.props.user.notification_schedule?.pause_to && this.props.user.notification_schedule?.pause_to >= today)
+                                    {(parseISODate(this.props.user.notification_schedule?.pause_from) && parseISODate(this.props.user.notification_schedule?.pause_to) >= today)
                                         ? (
                                             <div className="nh-container nh-container__text--alert">
                                                 <div className='d-flex flex-column gap-3 p-3'>
