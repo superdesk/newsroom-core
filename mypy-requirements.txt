@@ -3,7 +3,7 @@ types-Flask
 types-Jinja2
 types-python-dateutil
 types-pytz
-types-requests
+types-requests<2.31.0.7  # https://github.com/python/typeshed/issues/10825
 types-tzlocal
 types-Werkzeug
 types-protobuf
