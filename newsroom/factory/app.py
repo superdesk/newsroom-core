@@ -24,6 +24,7 @@ from superdesk.validator import SuperdeskValidator
 from superdesk.logging import configure_logging
 from superdesk.errors import SuperdeskApiError
 from superdesk.cache import cache_backend
+from superdesk.core.app import SuperdeskAsyncApp
 from elasticapm.contrib.flask import ElasticAPM
 from sentry_sdk.integrations.flask import FlaskIntegration
 
@@ -66,6 +67,7 @@ class BaseNewsroomApp(eve.Eve):
             config = {}
 
         self.json_provider_class = SuperdeskFlaskJSONProvider
+        self.async_app = SuperdeskAsyncApp(self)
 
         super(BaseNewsroomApp, self).__init__(
             import_name,
