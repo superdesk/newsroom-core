@@ -1,5 +1,5 @@
 import os
-import pymongo
+from pymongo import MongoClient
 from flask import Config, Flask
 from pathlib import Path
 from pytest import fixture
@@ -50,7 +50,7 @@ def reset_elastic(app):
 
 
 def drop_mongo(config: Config):
-    client = pymongo.MongoClient(config["CONTENTAPI_MONGO_URI"])
+    client: MongoClient = MongoClient(config["CONTENTAPI_MONGO_URI"])
     client.drop_database(config["CONTENTAPI_MONGO_DBNAME"])
 
 

@@ -16,7 +16,7 @@ def get_company_section_names(company: Company) -> List[str]:
     return sorted([section for section, enabled in company.get("sections", {}).items() if enabled])
 
 
-def get_company_product_ids(company: Company) -> List[ObjectId]:
+def get_company_product_ids(company: Company) -> List[Optional[ObjectId]]:
     return sorted(
         [
             product.get("_id")

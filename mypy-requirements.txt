@@ -1,7 +1,6 @@
 mypy
 types-Flask
 types-Jinja2
-types-itsdangerous
 types-python-dateutil
 types-pytz
 types-requests
