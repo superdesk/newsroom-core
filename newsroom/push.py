@@ -274,8 +274,10 @@ def publish_event(event, orig):
             updates["coverages"] = None
             updates["planning_items"] = None
 
-        elif event.get("state") == WORKFLOW_STATE.SCHEDULED:
-            # event is reposted (possibly after a cancel)
+        elif parse_date_str(event.get("versioncreated")) > orig.get(
+            "versioncreated"
+        ):  # event is reposted (possibly after a cancel)
+            logger.info("Updating event %s", orig["_id"])
             updates = {
                 "event": event,
                 "version": event.get("version", event.get(app.config["VERSION"])),
@@ -286,6 +288,9 @@ def publish_event(event, orig):
             }
 
             set_agenda_metadata_from_event(updates, event, False)
+
+        else:
+            logger.info("Ignoring event %s", orig["_id"])
 
         if updates:
             updated = orig.copy()
