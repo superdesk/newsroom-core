@@ -221,7 +221,6 @@ itsdangerous==2.2.0
     #   flask
     #   flask-oidc-ex
     #   flask-wtf
-    #   superdesk-core
 jinja2==3.1.4
     # via
     #   flask
@@ -477,7 +476,7 @@ unidecode==1.3.8
     # via superdesk-core
 uritools==4.0.3
     # via pyhanko-certvalidator
-urllib3==2.1.0
+urllib3==2.2.2
     # via
     #   botocore
     #   elastic-apm
@@ -521,7 +520,9 @@ xmlsec==1.3.14
     #   python3-saml
     #   superdesk-core
 yarl==1.9.4
-    # via aiohttp
+    # via
+    #   aiohttp
+    #   elasticsearch
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
