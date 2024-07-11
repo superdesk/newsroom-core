@@ -62,7 +62,7 @@ function DropdownFilter({
             dropdownMenuHeader={dropdownMenuHeader}
             hideLabelOnMobile={hideLabelOnMobile}
         >
-            {hasItemsAvailable || isActive && (
+            {(hasItemsAvailable && isActive) && (
                 <button
                     type='button'
                     className='dropdown-item'

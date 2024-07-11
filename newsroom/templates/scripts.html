@@ -39,10 +39,7 @@
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
 
-    gtag('set', 'user_properties', {
-        company: (window.profileData || {}).companyName || 'none',
-        user: ((window.profileData || {}).user || {}).first_name || 'unknown',
-    });
+    gtag('set', 'user_properties', {{ get_ga_user_properties(auth_user) | tojson }});
 
     let configParams = {};
     {% if session.get('user') %}
