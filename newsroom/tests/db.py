@@ -10,4 +10,3 @@ def drop_mongo():
     dbname = app.config["MONGO_DBNAME"]
     dbconn = app.data.mongo.pymongo(prefix=MONGO_PREFIX).cx
     dbconn.drop_database(dbname)
-    dbconn.close()
