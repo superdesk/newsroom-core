@@ -81,6 +81,7 @@ class BaseNewsroomApp(eve.Eve):
         )
 
         self.json_encoder = SuperdeskJSONEncoder
+        self.data.json_encoder_class = SuperdeskJSONEncoder
 
         newsroom.flask_app = self
 
