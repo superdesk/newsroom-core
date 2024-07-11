@@ -59,7 +59,7 @@ def to_json(value):
         value = str(value)
     if isinstance(value, ObjectId):
         value = str(value)
-    return htmlsafe_json_dumps(obj=value, dumps=app.json.dumps)
+    return htmlsafe_json_dumps(obj=value, dumps=app.json_encoder().dumps)
 
 
 def parse_date(datetime):
