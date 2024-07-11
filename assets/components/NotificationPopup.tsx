@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {formatDate, gettext} from 'utils';
+import {formatDate, gettext, notificationsArePaused, notificationsWillBePaused, parseISODate} from 'utils';
 import {IArticle, IUser} from 'interfaces';
 
 import NotificationListItem from './NotificationListItem';
@@ -19,15 +19,10 @@ export interface IProps {
 }
 
 export const NotificationPopup = (props: IProps) => {
-    const today = (new Date()).toISOString().substring(0, 10);
-    const pausedFrom = props.fullUser.notification_schedule?.pause_from ?? '';
-    const pausedTo = props.fullUser.notification_schedule?.pause_to ?? '';
-    const notificationsArePaused = (
-        pausedFrom != '' && pausedFrom <= today &&
-        pausedTo != '' && pausedTo >= today
-    );
+    const pausedFrom = parseISODate(props.fullUser.notification_schedule?.pause_from);
+    const pausedTo = parseISODate(props.fullUser.notification_schedule?.pause_to);
 
-    if (notificationsArePaused) {
+    if (notificationsArePaused(pausedFrom, pausedTo)) {
         return (
             <div className="notif__list dropdown-menu dropdown-menu-right show">
                 <div className='notif__list__header d-flex'>
@@ -78,7 +73,7 @@ export const NotificationPopup = (props: IProps) => {
                         </button>
                     </div>
 
-                    {(pausedFrom != '' && pausedTo != '' && notificationsArePaused === false) && (
+                    {(notificationsWillBePaused(pausedFrom, pausedTo)) && (
                         <div className='p-3'>
                             <div className='nh-container nh-container__text--info p-2'>
                                 {gettext('All notifications are set to be paused from {{dateFrom}} to {{dateTo}}', {dateFrom: formatDate(pausedFrom), dateTo: formatDate(pausedTo)})}

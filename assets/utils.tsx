@@ -752,3 +752,25 @@ export function getSubscriptionTimesString(user: IUser): string {
         timezone: timezoneAbbreviation,
     });
 }
+
+// Returns the number of seconds since epoch for the given ISO date string
+export function parseISODate(date?: string): number {
+    return date ? Date.parse(date) : NaN;
+}
+
+// Will return number of seconds since epoch for today at 00:00:00
+function getTodayTimestamp(): number {
+    return (new Date()).setUTCHours(0, 0, 0, 0);
+}
+
+export function notificationsArePaused(pausedFrom: number, pausedTo: number): boolean {
+    const today = getTodayTimestamp();
+
+    return pausedFrom <= today && pausedTo >= today;
+}
+
+export function notificationsWillBePaused(pausedFrom: number, pausedTo: number): boolean {
+    const today = getTodayTimestamp();
+
+    return pausedFrom > today && pausedTo > today;
+}
