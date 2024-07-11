@@ -442,6 +442,7 @@ def set_agenda_metadata_from_event(agenda, event, set_doc_id=True):
     agenda["definition_short"] = event.get("definition_short")
     agenda["definition_long"] = event.get("definition_long")
     agenda["version"] = event.get("version")
+    agenda["versioncreated"] = event.get("versioncreated")
     agenda["calendars"] = event.get("calendars")
     agenda["location"] = event.get("location")
     agenda["ednote"] = event.get("ednote")
