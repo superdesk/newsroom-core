@@ -6,7 +6,7 @@ services:
             - newsroom
 
     mongo:
-        image: mongo:3.6
+        image: mongo:6
         networks:
             - newsroom
 
