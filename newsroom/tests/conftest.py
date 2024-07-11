@@ -84,4 +84,5 @@ def client(app: Flask):
 
 @fixture
 def runner(app: Flask):
+    """Necessary fixture to invoke click commands from unit tests"""
     return app.test_cli_runner()
