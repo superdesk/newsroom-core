@@ -19,11 +19,12 @@ from flask_mail import Mail
 from flask_caching import Cache
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
-from superdesk.json_utils import SuperdeskJSONEncoder
+from superdesk.json_utils import SuperdeskJSONEncoder, SuperdeskFlaskJSONProvider
 from superdesk.validator import SuperdeskValidator
 from superdesk.logging import configure_logging
 from superdesk.errors import SuperdeskApiError
 from superdesk.cache import cache_backend
+from superdesk.core.app import SuperdeskAsyncApp
 from elasticapm.contrib.flask import ElasticAPM
 from sentry_sdk.integrations.flask import FlaskIntegration
 
@@ -65,6 +66,9 @@ class BaseNewsroomApp(eve.Eve):
         if config is None:
             config = {}
 
+        self.json_provider_class = SuperdeskFlaskJSONProvider
+        self.async_app = SuperdeskAsyncApp(self)
+
         super(BaseNewsroomApp, self).__init__(
             import_name,
             data=self.DATALAYER,
@@ -75,6 +79,7 @@ class BaseNewsroomApp(eve.Eve):
             settings=config,
             **kwargs,
         )
+
         self.json_encoder = SuperdeskJSONEncoder
         self.data.json_encoder_class = SuperdeskJSONEncoder
 

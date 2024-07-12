@@ -1,7 +1,8 @@
-from .manager import app, manager
+from flask import current_app
+from .cli import newsroom_cli
 
 
-@manager.command
+@newsroom_cli.command("elastic_init")
 def elastic_init():
     """Init elastic index.
 
@@ -14,4 +15,5 @@ def elastic_init():
         $ python manage.py elastic_init
 
     """
+    app = current_app
     app.data.init_elastic(app)

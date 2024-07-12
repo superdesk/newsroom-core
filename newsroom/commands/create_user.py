@@ -1,10 +1,18 @@
+import click
+from flask.cli import with_appcontext
 from superdesk import get_resource_service
 
 from newsroom.auth import get_user_by_email
-from .manager import manager
+from .cli import newsroom_cli
 
 
-@manager.command
+@newsroom_cli.command("create_user")
+@click.argument("email")
+@click.argument("password")
+@click.argument("first_name")
+@click.argument("last_name")
+@click.argument("is_admin", type=bool)
+@with_appcontext
 def create_user(email, password, first_name, last_name, is_admin):
     """Create a user with given email, password, first_name, last_name and is_admin flag.
 
@@ -13,10 +21,8 @@ def create_user(email, password, first_name, last_name, is_admin):
     Example:
     ::
 
-        $ python manage.py create_user admin@admin.com adminadmin admin admin True
-
+        $ flask newsroom create_user admin@admin.com adminadmin admin admin True
     """
-
     new_user = {
         "email": email,
         "password": password,

@@ -1,11 +1,11 @@
 from elasticsearch import exceptions as es_exceptions
 from eve_elastic import get_es
+from flask import current_app
+from .cli import newsroom_cli
 from superdesk.commands.flush_elastic_index import FlushElasticIndex
 
-from .manager import manager, app
 
-
-@manager.command
+@newsroom_cli.command("elastic_rebuild")
 def elastic_rebuild():
     """
     It removes elastic index, creates a new one(s) and index it from mongo.
@@ -13,9 +13,11 @@ def elastic_rebuild():
     Example:
     ::
 
-        $ python manage.py elastic_rebuild
+        $ flask newsroom elastic_rebuild
 
     """
+    app = current_app
+
     delete_elastic(app.config["ELASTICSEARCH_INDEX"])
     delete_elastic(app.config["CONTENTAPI_ELASTICSEARCH_INDEX"])
     FlushElasticIndex().run(sd_index=True, capi_index=True)
@@ -27,6 +29,7 @@ def delete_elastic(index_prefix: str):
     Copied from superdesk.commands.flush_elastic_index:_delete_elastic (from v2.6)
     So we can have it here without relying on superdesk/develop branch
     """
+    app = current_app
 
     es = get_es(app.config["ELASTICSEARCH_URL"])
     indices = list(es.indices.get_alias("{}_*".format(index_prefix)).keys())

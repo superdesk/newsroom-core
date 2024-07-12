@@ -2,6 +2,7 @@ import os
 import flask
 
 from newsroom.auth import get_user
+from newsroom.commands.cli import newsroom_cli
 from newsroom.factory import BaseNewsroomApp
 from newsroom.template_filters import (
     datetime_short,
@@ -294,4 +295,9 @@ class NewsroomWebApp(BaseNewsroomApp):
 
 
 def get_app(config=None, **kwargs):
-    return NewsroomWebApp(__name__, config=config, **kwargs)
+    app = NewsroomWebApp(__name__, config=config, **kwargs)
+
+    # register newsroom commands group
+    app.cli.add_command(newsroom_cli)
+
+    return app

@@ -115,7 +115,7 @@ def test_index_from_mongo_from_timestamp(app, client):
     assert 6 == app.data.elastic.find("items", ParsedRequest(), {})[1]
 
 
-def test_fix_topic_nested_filters(app, client):
+def test_fix_topic_nested_filters(app, runner):
     app.config["WIRE_GROUPS"].extend(
         [
             {
@@ -190,7 +190,7 @@ def test_fix_topic_nested_filters(app, client):
     )
 
     with app.test_request_context():
-        fix_topic_nested_filters()
+        runner.invoke(fix_topic_nested_filters)
 
     updated_topic = app.data.find_one("topics", None, topic_id)
 

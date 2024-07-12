@@ -1,3 +1,4 @@
+import click
 from newsroom.data_updates import (
     GenerateUpdate,
     Upgrade,
@@ -5,37 +6,39 @@ from newsroom.data_updates import (
     Downgrade,
 )
 
-from .manager import manager
+from .cli import newsroom_cli
 
 
-@manager.option("-r", "--resource", dest="resource", required=True)
+@newsroom_cli.command("data_generate_update")
+@click.option("-r", "--resource", required=True, help="Resource to generate update for")
 def data_generate_update(resource):
     cmd = GenerateUpdate()
     cmd.run(resource)
 
 
-@manager.option(
+@newsroom_cli.command("data_upgrade")
+@click.option(
     "-i",
     "--id",
-    dest="data_update_id",
+    "data_update_id",
     required=False,
-    choices=get_data_updates_files(strip_file_extension=True),
+    type=click.Choice(get_data_updates_files(strip_file_extension=True)),
     help="Data update id to run last",
 )
-@manager.option(
+@click.option(
     "-f",
     "--fake-init",
-    dest="fake",
+    "fake",
+    is_flag=True,
     required=False,
-    action="store_true",
     help="Mark data updates as run without actually running them",
 )
-@manager.option(
+@click.option(
     "-d",
     "--dry-run",
-    dest="dry",
+    "dry",
+    is_flag=True,
     required=False,
-    action="store_true",
     help="Does not mark data updates as done. This can be useful for development.",
 )
 def data_upgrade(data_update_id=None, fake=False, dry=False):
@@ -43,28 +46,29 @@ def data_upgrade(data_update_id=None, fake=False, dry=False):
     cmd.run(data_update_id, fake, dry)
 
 
-@manager.option(
+@newsroom_cli.command("data_downgrade")
+@click.option(
     "-i",
     "--id",
-    dest="data_update_id",
+    "data_update_id",
     required=False,
-    choices=get_data_updates_files(strip_file_extension=True),
+    type=click.Choice(get_data_updates_files(strip_file_extension=True)),
     help="Data update id to run last",
 )
-@manager.option(
+@click.option(
     "-f",
     "--fake-init",
-    dest="fake",
+    "fake",
+    is_flag=True,
     required=False,
-    action="store_true",
     help="Mark data updates as run without actually running them",
 )
-@manager.option(
+@click.option(
     "-d",
     "--dry-run",
-    dest="dry",
+    "dry",
+    is_flag=True,
     required=False,
-    action="store_true",
     help="Does not mark data updates as done. This can be useful for development.",
 )
 def data_downgrade(data_update_id=None, fake=False, dry=False):

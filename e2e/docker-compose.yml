@@ -16,14 +16,14 @@ services:
             - newsroom
 
     mongo:
-        image: mongo:4
+        image: mongo:6
         networks:
             - newsroom
         tmpfs:
             - /data/db
 
     server:
-        build: 
+        build:
             context: ../
             dockerfile: e2e/server/Dockerfile
         ports:

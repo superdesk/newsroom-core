@@ -263,6 +263,7 @@ def test_send_immediate_alerts(client, app):
             }
         ],
     )
+
     with app.mail.record_messages() as outbox, app.test_request_context():
         MonitoringEmailAlerts().run(immediate=True)
         assert_recipients(

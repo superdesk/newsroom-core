@@ -1,9 +1,11 @@
+import click
 import content_api
 
-from .manager import manager
+from .cli import newsroom_cli
 
 
-@manager.option("-m", "--expiry", dest="expiry_days", required=False)
+@newsroom_cli.command("remove_expired")
+@click.option("-m", "--expiry", "expiry_days", required=False, help="Number of days to determine expiry")
 def remove_expired(expiry_days):
     """Remove expired items from the content_api items collection.
 
@@ -12,7 +14,7 @@ def remove_expired(expiry_days):
     Example:
     ::
 
-        $ python manage.py remove_expired
+        $ flask newsroom remove_expired
 
     """
     exp = content_api.RemoveExpiredItems()

@@ -96,7 +96,7 @@ def test_get_expired_chain_ids(app):
     assert _get_expired_chain_ids(event4, expiry_datetime) == []
 
 
-def test_remove_expired_agenda(app):
+def test_remove_expired_agenda(runner, app):
     app.data.insert(
         "agenda",
         [
@@ -121,7 +121,7 @@ def test_remove_expired_agenda(app):
 
     # Test with default ``AGENDA_EXPIRY_DAYS=0`` (disable purging)
     agenda_service = get_resource_service("agenda")
-    remove_expired_agenda()
+    runner.invoke(remove_expired_agenda)
     item_ids = [item["_id"] for item in agenda_service.find({})]
     for item_id in ids_to_keep + ids_to_purge:
         assert item_id in item_ids

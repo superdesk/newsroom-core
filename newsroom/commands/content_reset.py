@@ -1,7 +1,8 @@
-from .manager import app, manager
+from flask import current_app
+from .cli import newsroom_cli
 
 
-@manager.command
+@newsroom_cli.command("content_reset")
 def content_reset():
     """Removes all data from 'items' and 'items_versions' indexes/collections.
 
@@ -11,5 +12,5 @@ def content_reset():
         $ python manage.py content_reset
 
     """
-    app.data.remove("items")
-    app.data.remove("items_versions")
+    current_app.data.remove("items")
+    current_app.data.remove("items_versions")

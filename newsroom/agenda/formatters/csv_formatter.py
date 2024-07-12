@@ -59,9 +59,9 @@ class CSVFormatter(BaseFormatter):
             "Website": event.get("links")[0] if event.get("links") else "",
             "Category": self.format_list(event, "anpa_category"),
             "Event type": item.get("item_type", ""),
-            "Organization name": event.get("event_contact_info")[0].get("organisation", " ")
-            if event.get("event_contact_info")
-            else "",
+            "Organization name": (
+                event.get("event_contact_info")[0].get("organisation", " ") if event.get("event_contact_info") else ""
+            ),
             "Contact": self.format_contact_info(item),
             "Coverage type": self.format_coverage(item, "coverage_type"),
             "Coverage status": self.format_coverage(item, "coverage_status"),
