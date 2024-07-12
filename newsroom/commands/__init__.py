@@ -1,5 +1,4 @@
-# disable "imported but unused" complains
-# flake8: noqa: F401
+# flake8 F401 "imported but unused" disabled in setup.cfg
 from .create_user import create_user
 from .elastic_rebuild import elastic_rebuild
 from .elastic_init import elastic_init
