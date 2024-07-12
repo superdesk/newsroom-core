@@ -51,9 +51,9 @@ blinker==1.8.2
     #   raven
     #   sentry-sdk
     #   superdesk-core
-boto3==1.34.142
+boto3==1.34.143
     # via superdesk-core
-botocore==1.34.142
+botocore==1.34.143
     # via
     #   boto3
     #   s3transfer
@@ -87,7 +87,6 @@ ciso8601==2.3.1
     # via eve-elastic
 click==8.1.7
     # via
-    #   -r requirements.txt
     #   black
     #   celery
     #   click-didyoumean
@@ -102,7 +101,7 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.3.0
     # via celery
-coverage[toml]==7.5.4
+coverage[toml]==7.6.0
     # via pytest-cov
 croniter==2.0.5
     # via superdesk-core
@@ -137,9 +136,7 @@ email-validator==2.2.0
 eve==2.1.0
     # via superdesk-core
 eve-elastic==7.4.1
-    # via
-    #   -r requirements.txt
-    #   superdesk-core
+    # via superdesk-core
 events==0.3
     # via eve
 exceptiongroup==1.2.1
@@ -150,23 +147,19 @@ flake8==7.1.0
     # via -r dev-requirements.in
 flask==3.0.3
     # via
-    #   -r requirements.txt
     #   eve
     #   flask-babel
     #   flask-caching
     #   flask-limiter
     #   flask-mail
     #   flask-oidc-ex
-    #   flask-pymongo
     #   flask-webpack
     #   flask-wtf
     #   raven
     #   sentry-sdk
     #   superdesk-core
-flask-babel==1.0.0
-    # via
-    #   -r requirements.txt
-    #   superdesk-core
+flask-babel==4.0.0
+    # via superdesk-core
 flask-caching==2.3.0
     # via -r requirements.txt
 flask-limiter==0.9.5.1
@@ -175,8 +168,6 @@ flask-mail==0.10.0
     # via superdesk-core
 flask-oidc-ex==0.5.8
     # via superdesk-core
-flask-pymongo==2.3.0
-    # via -r requirements.txt
 flask-webpack==0.1.0
     # via -r requirements.txt
 flask-wtf==1.2.1
@@ -254,7 +245,6 @@ lxml-html-clean==0.1.1
     # via superdesk-core
 markupsafe==2.1.5
     # via
-    #   -r requirements.txt
     #   jinja2
     #   sentry-sdk
     #   superdesk-core
@@ -262,7 +252,7 @@ markupsafe==2.1.5
     #   wtforms
 mccabe==0.7.0
     # via flake8
-motor==3.5.0
+motor==3.5.1
     # via superdesk-core
 multidict==6.0.5
     # via
@@ -336,7 +326,6 @@ pymemcache==4.0.0
 pymongo==4.7.3
     # via
     #   eve
-    #   flask-pymongo
     #   motor
     #   superdesk-core
 pyparsing==3.1.2
@@ -400,7 +389,6 @@ regex==2024.5.15
     # via superdesk-core
 reportlab==4.2.2
     # via
-    #   -r requirements.txt
     #   superdesk-core
     #   svglib
     #   xhtml2pdf
