@@ -11,5 +11,5 @@ sentry-sdk[flask]>=1.5.7,<2.7
 python3-saml>=1.15,<1.17
 google-auth>=2.6,<2.30
 
-superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@hg/flask-v3-unstable
-superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@hg/flask-v3-unstable
+superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@async
+superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@async
