@@ -1,4 +1,6 @@
 from functools import wraps
+from inspect import iscoroutinefunction
+
 from flask import request, redirect, url_for, abort, session
 from newsroom.auth import get_user_required
 from newsroom.auth.utils import (
@@ -18,6 +20,16 @@ def clear_session_and_redirect_to_login():
 
 
 def login_required(f):
+    if iscoroutinefunction(f):
+
+        @wraps(f)
+        async def async_decorated_function(*args, **kwargs):
+            if not is_valid_session():
+                return clear_session_and_redirect_to_login()
+            return await f(*args, **kwargs)
+
+        return async_decorated_function
+
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not is_valid_session():
@@ -28,6 +40,18 @@ def login_required(f):
 
 
 def admin_only(f):
+    if iscoroutinefunction(f):
+
+        @wraps(f)
+        async def async_decorated_function(*args, **kwargs):
+            if not is_valid_session():
+                return clear_session_and_redirect_to_login()
+            elif not is_current_user_admin():
+                return abort(403)
+            return await f(*args, **kwargs)
+
+        return async_decorated_function
+
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not is_valid_session():
@@ -40,6 +64,18 @@ def admin_only(f):
 
 
 def account_manager_only(f):
+    if iscoroutinefunction(f):
+
+        @wraps(f)
+        async def async_decorated_function(*args, **kwargs):
+            if not is_valid_session():
+                return clear_session_and_redirect_to_login()
+            elif not is_current_user_admin() and not is_current_user_account_mgr():
+                return abort(403)
+            return await f(*args, **kwargs)
+
+        return async_decorated_function
+
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not is_valid_session():
@@ -52,6 +88,18 @@ def account_manager_only(f):
 
 
 def company_admin_only(f):
+    if iscoroutinefunction(f):
+
+        @wraps(f)
+        async def async_decorated_function(*args, **kwargs):
+            if not is_valid_session():
+                return clear_session_and_redirect_to_login()
+            elif not is_current_user_company_admin():
+                return abort(403)
+            return await f(*args, **kwargs)
+
+        return async_decorated_function
+
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not is_valid_session():
@@ -64,6 +112,22 @@ def company_admin_only(f):
 
 
 def account_manager_or_company_admin_only(f):
+    if iscoroutinefunction(f):
+
+        @wraps(f)
+        async def async_decorated_function(*args, **kwargs):
+            if not is_valid_session():
+                return clear_session_and_redirect_to_login()
+            elif (
+                not is_current_user_admin()
+                and not is_current_user_account_mgr()
+                and not is_current_user_company_admin()
+            ):
+                return abort(403)
+            return await f(*args, **kwargs)
+
+        return async_decorated_function
+
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not is_valid_session():
@@ -77,6 +141,17 @@ def account_manager_or_company_admin_only(f):
 
 def section(section):
     def _section_required(f):
+        if iscoroutinefunction(f):
+
+            @wraps(f)
+            async def async_wrapper(*args, **kwargs):
+                user = get_user_required()
+                if not is_current_user_admin() and not user_has_section_allowed(user, section):
+                    return abort(403)
+                return await f(*args, **kwargs)
+
+            return async_wrapper
+
         @wraps(f)
         def wrapper(*args, **kwargs):
             user = get_user_required()
