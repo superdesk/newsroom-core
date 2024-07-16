@@ -298,6 +298,6 @@ def get_app(config=None, **kwargs):
     app = NewsroomWebApp(__name__, config=config, **kwargs)
 
     # register newsroom commands group
-    app.cli.add_command(newsroom_cli)
+    app.register_blueprint(newsroom_cli)
 
     return app

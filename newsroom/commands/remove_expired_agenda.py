@@ -17,7 +17,7 @@ from .cli import newsroom_cli
 logger = logging.getLogger(__name__)
 
 
-@newsroom_cli.command("remove_expired_agenda")
+@newsroom_cli.cli.command("remove_expired_agenda")
 @click.option("-m", "--expiry", "expiry_days", required=False, help="Number of days to determine expiry")
 def remove_expired_agenda(expiry_days=None):
     """Remove expired Agenda items

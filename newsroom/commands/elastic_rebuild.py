@@ -5,7 +5,7 @@ from .cli import newsroom_cli
 from superdesk.commands.flush_elastic_index import FlushElasticIndex
 
 
-@newsroom_cli.command("elastic_rebuild")
+@newsroom_cli.cli.command("elastic_rebuild")
 def elastic_rebuild():
     """
     It removes elastic index, creates a new one(s) and index it from mongo.

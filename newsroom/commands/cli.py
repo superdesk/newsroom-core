@@ -1,3 +1,3 @@
-from flask.cli import AppGroup
+from flask import Blueprint
 
-newsroom_cli = AppGroup("newsroom")
+newsroom_cli = Blueprint("newsroom", __name__, cli_group=None)

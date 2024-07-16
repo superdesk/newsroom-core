@@ -11,7 +11,7 @@ from newsroom.mongo_utils import (
 from .cli import newsroom_cli
 
 
-@newsroom_cli.command("index_from_mongo_period")
+@newsroom_cli.cli.command("index_from_mongo_period")
 @click.option("-h", "--hours", default=None, help="Number of hours to index")
 @click.option("-c", "--collection", default=None, help="Name of the collection to index")
 @click.option("-t", "--timestamp", default=None, help="Timestamp to start indexing from")
@@ -32,7 +32,7 @@ def index_from_mongo_period(hours, collection, timestamp, direction):
         index_elastic_from_mongo(hours=hours, collection=collection)
 
 
-@newsroom_cli.command("index_from_mongo")
+@newsroom_cli.cli.command("index_from_mongo")
 @click.option("--from", "-f", "collection_name", help="Name of the collection to index")
 @click.option("--all", "all_collections", is_flag=True, help="Index all collections")
 @click.option("--page-size", "-p", default=500, help="Page size for indexing")

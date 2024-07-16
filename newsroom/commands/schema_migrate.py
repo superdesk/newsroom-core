@@ -9,7 +9,7 @@ from .cli import newsroom_cli
 VERSION_ID = "schema_version"
 
 
-@newsroom_cli.command("schema_migrate")
+@newsroom_cli.cli.command("schema_migrate")
 @click.argument("resource_name", required=False)
 def schema_migrate(resource_name=None):
     """Migrate elastic schema if needed, should be triggered on every deploy.

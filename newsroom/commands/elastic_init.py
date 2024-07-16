@@ -2,7 +2,7 @@ from flask import current_app
 from .cli import newsroom_cli
 
 
-@newsroom_cli.command("elastic_init")
+@newsroom_cli.cli.command("elastic_init")
 def elastic_init():
     """Init elastic index.
 

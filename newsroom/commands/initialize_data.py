@@ -81,7 +81,7 @@ class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
         return 0
 
 
-@newsroom_cli.command("initialize_data")
+@newsroom_cli.cli.command("initialize_data")
 @click.option(
     "-n",
     "--entity-name",
