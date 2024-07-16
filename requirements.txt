@@ -14,6 +14,7 @@ sentry-sdk[flask]>=1.5.7,<1.6
 MarkupSafe<2.1
 python3-saml>=1.15,<1.16
 google-auth>=2.6,<2.7
+xmlsec==1.3.13 # https://github.com/xmlsec/python-xmlsec/issues/314
 
 # Fix an issue between xhtml2pdf v0.2.4 and reportlab v3.6.7
 # https://github.com/xhtml2pdf/xhtml2pdf/issues/589
