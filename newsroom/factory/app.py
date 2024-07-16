@@ -10,7 +10,6 @@ import re
 import pathlib
 import importlib
 
-import eve
 import flask
 import newsroom
 import sentry_sdk
@@ -25,6 +24,7 @@ from superdesk.logging import configure_logging
 from superdesk.errors import SuperdeskApiError
 from superdesk.cache import cache_backend
 from superdesk.core.app import SuperdeskAsyncApp
+from superdesk.factory.app import SuperdeskEve
 from elasticapm.contrib.flask import ElasticAPM
 from sentry_sdk.integrations.flask import FlaskIntegration
 
@@ -37,7 +37,7 @@ from newsroom.gettext import setup_babel
 NEWSROOM_DIR = pathlib.Path(__file__).resolve().parent.parent
 
 
-class BaseNewsroomApp(eve.Eve):
+class BaseNewsroomApp(SuperdeskEve):
     """The base Newsroom app class"""
 
     SERVICE_NAME = "Newsroom"
@@ -70,7 +70,7 @@ class BaseNewsroomApp(eve.Eve):
         self.async_app = SuperdeskAsyncApp(self)
 
         super(BaseNewsroomApp, self).__init__(
-            import_name,
+            import_name=import_name,
             data=self.DATALAYER,
             auth=self.AUTH_SERVICE,
             template_folder=os.path.join(NEWSROOM_DIR, "templates"),
@@ -101,6 +101,8 @@ class BaseNewsroomApp(eve.Eve):
 
         if not self.config.get("TESTING"):
             configure_logging(self.config.get("LOG_CONFIG_FILE"))
+
+        self.async_app.start()
 
     def load_app_default_config(self):
         """

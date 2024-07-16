@@ -179,6 +179,8 @@ CORE_APPS = [
     "newsroom.notifications.send_scheduled_notifications",
 ]
 
+MODULES = []
+
 SITE_NAME = "Newshub"
 COPYRIGHT_HOLDER = "Sourcefabric"
 COPYRIGHT_NOTICE = ""
