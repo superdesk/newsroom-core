@@ -56,6 +56,7 @@ from newsroom.public.views import (
 from .search import get_bookmarks_count
 from .items import get_items_for_dashboard
 from ..upload import ASSETS_RESOURCE, get_upload
+from newsroom.ui_config_async import UiConfigResourceService
 
 HOME_ITEMS_CACHE_KEY = "home_items"
 HOME_EXTERNAL_ITEMS_CACHE_KEY = "home_external_items"
@@ -89,7 +90,7 @@ def set_item_permission(item, permitted=True):
         item.pop("associations", None)
 
 
-def get_view_data() -> Dict:
+async def get_view_data() -> Dict:
     user = get_user_required()
     company = get_company(user)
     topics = get_user_topics(user["_id"]) if user else []
@@ -97,6 +98,7 @@ def get_view_data() -> Dict:
     user_folders = get_user_folders(user, "wire") if user else []
     company_folders = get_company_folders(company, "wire") if company else []
     products = get_products_by_company(company, product_type="wire") if company else []
+    ui_config_service = UiConfigResourceService()
 
     check_user_has_products(user, products)
 
@@ -113,7 +115,7 @@ def get_view_data() -> Dict:
         "products": products,
         "saved_items": get_bookmarks_count(user["_id"], "wire"),
         "context": "wire",
-        "ui_config": get_resource_service("ui_config").get_section_config("wire"),
+        "ui_config": await ui_config_service.get_section_config("wire") ,
         "groups": app.config.get("WIRE_GROUPS", []),
         "user_folders": user_folders,
         "company_folders": company_folders,
@@ -177,12 +179,13 @@ def get_personal_dashboards_data(user, company, topics):
     return [_get_dashboard_data(dashboard, i) for i, dashboard in enumerate(dashboards)]
 
 
-def get_home_data():
+async def get_home_data():
     user = get_user()
     company = get_company(user)
     cards = list(query_resource("cards", lookup={"dashboard": "newsroom"}))
     company_id = str(user["company"]) if user and user.get("company") else None
     topics = get_user_topics(user["_id"]) if user else []
+    ui_config_service = UiConfigResourceService()
 
     return {
         "cards": cards,
@@ -203,7 +206,7 @@ def get_home_data():
         ],
         "context": "wire",
         "topics": topics,
-        "ui_config": get_resource_service("ui_config").get_section_config("home"),
+        "ui_config": await ui_config_service.get_section_config("wire") ,
         "groups": app.config.get("WIRE_GROUPS", []),
         "personalizedDashboards": get_personal_dashboards_data(user, company, topics),
     }
@@ -217,13 +220,13 @@ def get_previous_versions(item):
 
 
 @blueprint.route("/")
-def index():
+async def index():
     if not is_valid_session():
         return (
-            render_public_dashboard() if app.config.get("PUBLIC_DASHBOARD") else clear_session_and_redirect_to_login()
+            await render_public_dashboard() if app.config.get("PUBLIC_DASHBOARD") else clear_session_and_redirect_to_login()
         )
-
-    return flask.render_template("home.html", data=get_home_data())
+    data = await get_home_data()
+    return flask.render_template("home.html", data=data)
 
 
 @blueprint.route("/media_card_external/<card_id>")
@@ -254,14 +257,15 @@ def get_card_items():
 @blueprint.route("/wire")
 @login_required
 @section("wire")
-def wire():
-    return flask.render_template("wire_index.html", data=get_view_data())
+async def wire():
+    data = await get_view_data()
+    return flask.render_template("wire_index.html", data=data)
 
 
 @blueprint.route("/bookmarks_wire")
 @login_required
-def bookmarks():
-    data = get_view_data()
+async def bookmarks():
+    data = await get_view_data()
     data["bookmarks"] = True
     return flask.render_template("wire_bookmarks.html", data=data)
 
@@ -489,7 +493,7 @@ def versions(_id):
 
 @blueprint.route("/wire/<_id>")
 @login_required
-def item(_id):
+async def item(_id):
     items = get_items_for_user_action([_id], "items")
     if not items:
         return
@@ -500,7 +504,8 @@ def item(_id):
         "wire",
         False if flask.request.args.get("ignoreLatest") == "false" else True,
     )
-    display_char_count = get_resource_service("ui_config").get_section_config("wire").get("char_count", False)
+    ui_config_service = UiConfigResourceService()
+    display_char_count = await ui_config_service.get_section_config("wire").get("char_count", False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get("_access"):

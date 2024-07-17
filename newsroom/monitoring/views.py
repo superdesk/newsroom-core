@@ -37,17 +37,19 @@ from newsroom.utils import (
 )
 
 from .forms import MonitoringForm, alert_types
+from newsroom.ui_config_async import UiConfigResourceService
 
 
-def get_view_data():
+async def get_view_data():
     user = get_user()
+    ui_config_service = UiConfigResourceService()
     return {
         "user": str(user["_id"]) if user else None,
         "company": str(user["company"]) if user and user.get("company") else None,
         "navigations": get_monitoring_for_company(user),
         "context": "monitoring",
         "groups": app.config.get("MONITORING_GROUPS") or app.config.get("WIRE_GROUPS", []),
-        "ui_config": get_resource_service("ui_config").get_section_config("monitoring"),
+        "ui_config": await ui_config_service.get_section_config("monitoring"),
         "saved_items": get_bookmarks_count(user["_id"], "monitoring"),
         "formats": [
             {"format": f["format"], "name": f["name"]}
@@ -208,8 +210,8 @@ def delete(_id):
 @blueprint.route("/monitoring")
 @section("monitoring")
 @login_required
-def index():
-    return flask.render_template("monitoring_index.html", data=get_view_data())
+async def index():
+    return flask.render_template("monitoring_index.html", data= await get_view_data())
 
 
 @blueprint.route("/monitoring/export/<_ids>")
@@ -311,7 +313,7 @@ def bookmark():
 
 @blueprint.route("/bookmarks_monitoring")
 @login_required
-def bookmarks():
-    data = get_view_data()
+async def bookmarks():
+    data = await get_view_data()
     data["bookmarks"] = True
     return flask.render_template("monitoring_bookmarks.html", data=data)

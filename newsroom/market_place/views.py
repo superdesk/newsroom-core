@@ -23,12 +23,13 @@ from newsroom.utils import (
     query_resource,
 )
 from newsroom.notifications import push_user_notification
+from newsroom.ui_config_async import UiConfigResourceService
 
 
 search_endpoint_name = "{}_search".format(SECTION_ID)
 
 
-def get_view_data():
+async def get_view_data():
     """Get the view data"""
     user = get_user()
     topics = get_user_topics(user["_id"]) if user else []
@@ -37,6 +38,7 @@ def get_view_data():
         product_type=SECTION_ID,
     )
     get_story_count(navigations, user)
+    ui_config_service = UiConfigResourceService()
     return {
         "user": str(user["_id"]) if user else None,
         "user_type": (user or {}).get("user_type") or "public",
@@ -48,7 +50,7 @@ def get_view_data():
         ],
         "saved_items": get_bookmarks_count(user["_id"], SECTION_ID),
         "context": SECTION_ID,
-        "ui_config": get_resource_service("ui_config").get_section_config(SECTION_ID),
+        "ui_config": await ui_config_service.get_section_config(SECTION_ID),
         "home_page": False,
         "title": SECTION_NAME,
     }
@@ -82,8 +84,8 @@ def get_home_page_data():
 @blueprint.route("/{}".format(SECTION_ID))
 @login_required
 @section(SECTION_ID)
-def index():
-    return flask.render_template("market_place_index.html", data=get_view_data())
+async def index():
+    return flask.render_template("market_place_index.html", data= await get_view_data())
 
 
 @blueprint.route("/{}/home".format(SECTION_ID))
@@ -103,8 +105,8 @@ def search():
 @blueprint.route("/bookmarks_{}".format(SECTION_ID))
 @login_required
 @section(SECTION_ID)
-def bookmarks():
-    data = get_view_data()
+async def bookmarks():
+    data = await get_view_data()
     data["bookmarks"] = True
     return flask.render_template("market_place_bookmarks.html", data=data)
 
@@ -144,10 +146,11 @@ def versions(_id):
 
 @blueprint.route("/{}/<_id>".format(SECTION_ID))
 @login_required
-def item(_id):
+async def item(_id):
     item = get_entity_or_404(_id, "items")
     set_permissions(item, "aapX")
-    display_char_count = get_resource_service("ui_config").get_section_config(SECTION_ID).get("char_count", False)
+    ui_config_service = UiConfigResourceService()
+    display_char_count = await ui_config_service.get_section_config(SECTION_ID).get("char_count", False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get("_access"):

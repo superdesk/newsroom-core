@@ -179,7 +179,7 @@ CORE_APPS = [
     "newsroom.notifications.send_scheduled_notifications",
 ]
 
-MODULES = []
+MODULES = ["newsroom.ui_config_async"]
 
 SITE_NAME = "Newshub"
 COPYRIGHT_HOLDER = "Sourcefabric"

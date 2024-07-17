@@ -18,13 +18,15 @@ from newsroom.wire.views import (
 )
 from newsroom.utils import get_json_or_400, get_entity_or_404, is_json_request, get_type
 from newsroom.notifications import push_user_notification
+from newsroom.ui_config_async import UiConfigResourceService
 
 logger = logging.getLogger(__name__)
 
 
-def get_view_data():
+async def get_view_data():
     """Get the view data"""
     user = get_user()
+    ui_config_service = UiConfigResourceService()
     return {
         "user": str(user["_id"]) if user else None,
         "user_type": (user or {}).get("user_type") or "public",
@@ -38,15 +40,16 @@ def get_view_data():
         ],
         "saved_items": get_bookmarks_count(user["_id"], "am_news"),
         "context": "am_news",
-        "ui_config": get_resource_service("ui_config").get_section_config("am_news"),
+        "ui_config": await ui_config_service.get_section_config("am_news"),
     }
 
 
 @blueprint.route("/am_news")
 @login_required
 @section("am_news")
-def index():
-    return flask.render_template("am_news_index.html", data=get_view_data())
+async def index():
+    data = await get_view_data()
+    return flask.render_template("am_news_index.html", data=data)
 
 
 @blueprint.route("/am_news/search")
@@ -58,8 +61,8 @@ def search():
 
 @blueprint.route("/bookmarks_am_news")
 @login_required
-def bookmarks():
-    data = get_view_data()
+async def bookmarks():
+    data = await get_view_data()
     data["bookmarks"] = True
     return flask.render_template("am_news_bookmarks.html", data=data)
 
@@ -99,10 +102,12 @@ def versions(_id):
 
 @blueprint.route("/am_news/<_id>")
 @login_required
-def item(_id):
+async def item(_id):
     item = get_entity_or_404(_id, "items")
     set_permissions(item, "am_news")
-    display_char_count = get_resource_service("ui_config").get_section_config("am_news").get("char_count", False)
+    ui_config_service = UiConfigResourceService()
+    am_news = await ui_config_service.get_section_config("am_news")
+    display_char_count = am_news.get("char_count", False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get("_access"):
