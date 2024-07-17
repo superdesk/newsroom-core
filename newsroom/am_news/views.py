@@ -4,7 +4,6 @@ import flask
 from flask import current_app as app
 from eve.render import send_response
 from eve.methods.get import get_internal
-from superdesk import get_resource_service
 
 from newsroom.am_news import blueprint
 from newsroom.auth import get_user, get_user_id
@@ -106,8 +105,7 @@ async def item(_id):
     item = get_entity_or_404(_id, "items")
     set_permissions(item, "am_news")
     ui_config_service = UiConfigResourceService()
-    am_news = await ui_config_service.get_section_config("am_news")
-    display_char_count = am_news.get("char_count", False)
+    display_char_count = await ui_config_service.get_section_config("am_news").get("char_count", False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get("_access"):

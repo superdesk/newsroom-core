@@ -12,12 +12,12 @@ class UiConfig(ResourceModel):
     details: Optional[Dict[str, Any]] = None
     list: Optional[Dict[str, Any]] = None
     advanced_search_tabs: Optional[Dict[str, Any]] = None
-    multi_select_topics: bool = None
-    search: bool = None
-    enable_global_topics: bool = None
-    open_coverage_content_in_same_page: bool = None
-    subnav: Dict[str, Any] = None
-    init_version: int = None
+    multi_select_topics: Optional[bool] = None
+    search: Optional[bool] = None
+    enable_global_topics: Optional[bool] = None
+    open_coverage_content_in_same_page: Optional[bool] = None
+    subnav: Optional[Dict[str, Any]] = None
+    init_version: Optional[int] = None
 
 
 class UiConfigResourceService(AsyncResourceService[UiConfig]):

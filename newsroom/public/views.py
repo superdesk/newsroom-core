@@ -3,7 +3,6 @@ from typing import List, Dict
 from werkzeug.utils import secure_filename
 from flask import render_template, current_app as app
 
-from superdesk import get_resource_service
 from newsroom.auth.utils import is_valid_session
 
 from newsroom.types import DashboardCard, Article
