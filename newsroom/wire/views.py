@@ -115,7 +115,7 @@ async def get_view_data() -> Dict:
         "products": products,
         "saved_items": get_bookmarks_count(user["_id"], "wire"),
         "context": "wire",
-        "ui_config": await ui_config_service.get_section_config("wire") ,
+        "ui_config": await ui_config_service.get_section_config("wire"),
         "groups": app.config.get("WIRE_GROUPS", []),
         "user_folders": user_folders,
         "company_folders": company_folders,
@@ -206,7 +206,7 @@ async def get_home_data():
         ],
         "context": "wire",
         "topics": topics,
-        "ui_config": await ui_config_service.get_section_config("wire") ,
+        "ui_config": await ui_config_service.get_section_config("wire"),
         "groups": app.config.get("WIRE_GROUPS", []),
         "personalizedDashboards": get_personal_dashboards_data(user, company, topics),
     }
@@ -223,7 +223,9 @@ def get_previous_versions(item):
 async def index():
     if not is_valid_session():
         return (
-            await render_public_dashboard() if app.config.get("PUBLIC_DASHBOARD") else clear_session_and_redirect_to_login()
+            await render_public_dashboard()
+            if app.config.get("PUBLIC_DASHBOARD")
+            else clear_session_and_redirect_to_login()
         )
     data = await get_home_data()
     return flask.render_template("home.html", data=data)

@@ -211,7 +211,7 @@ def delete(_id):
 @section("monitoring")
 @login_required
 async def index():
-    return flask.render_template("monitoring_index.html", data= await get_view_data())
+    return flask.render_template("monitoring_index.html", data=await get_view_data())
 
 
 @blueprint.route("/monitoring/export/<_ids>")

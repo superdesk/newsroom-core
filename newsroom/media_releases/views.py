@@ -42,7 +42,7 @@ async def get_view_data():
 @login_required
 @section("media_releases")
 async def index():
-    return flask.render_template("media_releases_index.html", data= await get_view_data())
+    return flask.render_template("media_releases_index.html", data=await get_view_data())
 
 
 @blueprint.route("/media_releases/search")

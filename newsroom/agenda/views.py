@@ -38,11 +38,12 @@ from newsroom.notifications import push_user_notification
 from newsroom.search.config import merge_planning_aggs
 from newsroom.ui_config_async import UiConfigResourceService
 
+
 @blueprint.route("/agenda")
 @login_required
 @section("agenda")
 async def index():
-    return flask.render_template("agenda_index.html", data= await get_view_data())
+    return flask.render_template("agenda_index.html", data=await get_view_data())
 
 
 @blueprint.route("/bookmarks_agenda")
