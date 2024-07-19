@@ -100,7 +100,8 @@ async def item(_id):
     item = get_entity_or_404(_id, "items")
     set_permissions(item, "factcheck")
     ui_config_service = UiConfigResourceService()
-    display_char_count = await ui_config_service.get_section_config("factcheck").get("char_count", False)
+    config = await ui_config_service.get_section_config("factcheck")
+    display_char_count = config.get("char_count", False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get("_access"):

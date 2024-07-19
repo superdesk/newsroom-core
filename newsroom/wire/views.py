@@ -507,7 +507,8 @@ async def item(_id):
         False if flask.request.args.get("ignoreLatest") == "false" else True,
     )
     ui_config_service = UiConfigResourceService()
-    display_char_count = await ui_config_service.get_section_config("wire").get("char_count", False)
+    config = await ui_config_service.get_section_config("wire")
+    display_char_count = config.get("char_count", False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get("_access"):
