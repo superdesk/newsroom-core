@@ -7,15 +7,14 @@ from content_api import MONGO_PREFIX
 
 
 class UiConfig(ResourceModel):
-    _id: str
     preview: Optional[Dict[str, Any]] = None
     details: Optional[Dict[str, Any]] = None
     list: Optional[Dict[str, Any]] = None
     advanced_search_tabs: Optional[Dict[str, Any]] = None
-    multi_select_topics: Optional[bool] = None
+    multi_select_topics: Optional[bool] = False
     search: Optional[bool] = None
-    enable_global_topics: Optional[bool] = None
-    open_coverage_content_in_same_page: Optional[bool] = None
+    enable_global_topics: Optional[bool] = True
+    open_coverage_content_in_same_page: Optional[bool] = False
     subnav: Optional[Dict[str, Any]] = None
     init_version: Optional[int] = None
 
@@ -27,7 +26,7 @@ class UiConfigResourceService(AsyncResourceService[UiConfig]):
 
         if not config:
             return {}
-        return config.dict()
+        return config.dict(by_alias=True, exclude_unset=True)
 
 
 ui_config_model_config = ResourceModelConfig(
