@@ -1,5 +1,5 @@
 <script>
-    window.newsroom = {{ get_client_config() | tojson | safe }};
+    window.newsroom = {{ client_config | tojson | safe }};
     window.translations = {{ get_client_translations() | tojson | safe }};
     window.locales = {{ get_client_locales() | tojson | safe }};
     window.locale = '{{ get_locale() | tojson | safe }}';
@@ -31,9 +31,9 @@
     {{ javascript_tag('user_profile_js') | safe }}
 {% endif %}
 
-{% if get_setting('google_analytics') %}
+{% if google_analytics_setting %}
 <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id={{ get_setting('google_analytics') | safe }}"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ google_analytics_setting | safe }}"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -46,7 +46,7 @@
         configParams['user_id'] = '{{ session['user'] }}';
     {% endif %}
 
-    gtag('config', '{{ get_setting('google_analytics') | tojson }}', configParams);
+    gtag('config', '{{ google_analytics_setting | tojson }}', configParams);
 
     {% with messages = get_flashed_messages(category_filter=['analytics']) %}
         {% if messages %}

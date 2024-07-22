@@ -3,8 +3,7 @@
 import re
 import copy
 import flask
-import asyncio
-import nest_asyncio
+import inspect
 
 from flask_babel import gettext, lazy_gettext
 from superdesk.utc import utcnow
@@ -12,9 +11,6 @@ from superdesk.utc import utcnow
 from newsroom.utils import get_json_or_400, set_version_creator
 from newsroom.template_filters import newsroom_config
 from newsroom.decorator import admin_only, account_manager_only
-
-# Apply nest_asyncio to allow nested event loops
-nest_asyncio.apply()
 
 blueprint = flask.Blueprint("settings", __name__)
 
@@ -29,8 +25,17 @@ def get_settings_collection():
 @account_manager_only
 async def app(app_id):
     for app in flask.current_app.settings_apps:
+        client_config = await get_client_config()
+        google_analytics_setting = await get_setting("google_analytics_setting")
         if app._id == app_id:
-            return flask.render_template("settings.html", setting_type=app_id, data=app.data())
+            data = await app.data() if inspect.iscoroutine(app.data()) else app.data()
+            return flask.render_template(
+                "settings.html",
+                setting_type=app_id,
+                data=data,
+                client_config=client_config,
+                google_analytics_setting=google_analytics_setting,
+            )
     flask.abort(404)
 
 
@@ -77,7 +82,7 @@ async def get_setting(setting_key=None, include_audit=False):
 
 
 async def get_client_config():
-    config = await newsroom_config()
+    config = newsroom_config()
     for key, setting in (await get_setting() or {}).items():
         if key not in ["_updated", "version_creator"]:
             value = setting.get("value", setting.get("default"))
@@ -113,33 +118,13 @@ async def validate_general_settings(values):
                 return gettext("{}: Email IDs not in proper format".format(field_txt))
 
 
-def sync_get_setting(setting_key=None):
-    loop = asyncio.get_event_loop()
-    result = loop.run_until_complete(get_setting(setting_key))
-    return result
-
-
-def sync_get_client_config(*args):
-    loop = asyncio.get_event_loop()
-    result = loop.run_until_complete(get_client_config(*args))
-    return result
-
-
-def sync_get_initial_data(setting_key=None):
-    loop = asyncio.get_event_loop()
-    result = loop.run_until_complete(get_initial_data(setting_key))
-    return result
-
-
 def init_app(app):
     app.settings_app(
         "general-settings",
         lazy_gettext("General Settings"),
         weight=800,
-        data=sync_get_initial_data,
+        data=get_initial_data,
     )
-    app.add_template_global(sync_get_setting, "get_setting")
-    app.add_template_global(sync_get_client_config, "get_client_config")
 
     # basic settings
     app.general_setting(
