@@ -485,7 +485,7 @@ def test_search_created_to(client):
     assert 0 == len(data["_items"])
 
 
-def test_item_detail_access(client, app):
+async def test_item_detail_access(client, app):
     item_url = "/wire/%s" % items[0]["_id"]
     data = get_json(client, item_url)
     assert data["_access"]
