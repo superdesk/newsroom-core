@@ -57,6 +57,7 @@ from .search import get_bookmarks_count
 from .items import get_items_for_dashboard
 from ..upload import ASSETS_RESOURCE, get_upload
 from newsroom.ui_config_async import UiConfigResourceService
+from newsroom.settings import get_client_config
 
 HOME_ITEMS_CACHE_KEY = "home_items"
 HOME_EXTERNAL_ITEMS_CACHE_KEY = "home_external_items"
@@ -261,7 +262,8 @@ def get_card_items():
 @section("wire")
 async def wire():
     data = await get_view_data()
-    return flask.render_template("wire_index.html", data=data)
+    client_config = await get_client_config()
+    return flask.render_template("wire_index.html", data=data, client_config=client_config)
 
 
 @blueprint.route("/bookmarks_wire")
