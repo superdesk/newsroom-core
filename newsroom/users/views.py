@@ -195,7 +195,7 @@ def _is_email_address_valid(email):
 
 @blueprint.route("/users/<_id>", methods=["GET", "POST"])
 @login_required
-def edit(_id):
+async def edit(_id):
     user_is_company_admin = is_current_user_company_admin()
     user_is_admin = is_current_user_admin()
     user_is_account_mgr = is_current_user_account_mgr()
@@ -242,7 +242,7 @@ def edit(_id):
             elif user_is_company_admin:
                 allowed_fields = (
                     COMPANY_ADMIN_ALLOWED_UPDATES
-                    if not asyncio.run(get_setting("allow_companies_to_manage_products"))
+                    if not await get_setting("allow_companies_to_manage_products")
                     else COMPANY_ADMIN_ALLOWED_UPDATES.union(COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES)
                 )
 
