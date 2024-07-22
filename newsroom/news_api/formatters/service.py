@@ -10,6 +10,7 @@ from superdesk.utc import utcnow
 from newsroom.wire.formatters import get_all_formatters
 from newsroom.settings import get_setting
 from newsroom import Service
+import asyncio
 
 
 class APIFormattersService(Service):
@@ -41,7 +42,7 @@ class APIFormattersService(Service):
             if not item:
                 abort(404)
         # Ensure that the item has not expired
-        if utcnow() - timedelta(days=int(get_setting("news_api_time_limit_days"))) > item.get(
+        if utcnow() - timedelta(days=int(asyncio.run(get_setting("news_api_time_limit_days")))) > item.get(
             "versioncreated", utcnow()
         ):
             abort(404)

@@ -37,6 +37,7 @@ from newsroom.users.users import (
 )
 from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary
 from newsroom.monitoring.views import get_monitoring_for_company
+import asyncio
 
 
 def get_settings_data():
@@ -241,7 +242,7 @@ def edit(_id):
             elif user_is_company_admin:
                 allowed_fields = (
                     COMPANY_ADMIN_ALLOWED_UPDATES
-                    if not get_setting("allow_companies_to_manage_products")
+                    if not asyncio.run(get_setting("allow_companies_to_manage_products"))
                     else COMPANY_ADMIN_ALLOWED_UPDATES.union(COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES)
                 )
 

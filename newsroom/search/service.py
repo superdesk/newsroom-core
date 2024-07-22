@@ -33,6 +33,7 @@ from newsroom.template_filters import is_admin
 from newsroom.utils import get_local_date, get_end_date
 from bson.objectid import ObjectId
 from newsroom.users import users_service
+import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -711,7 +712,7 @@ class BaseSearchService(Service):
         if search.is_admin:
             return
 
-        limit_days = get_setting(self.limit_days_setting) if self.limit_days_setting is not None else None
+        limit_days = asyncio.run(get_setting(self.limit_days_setting)) if self.limit_days_setting is not None else None
 
         if limit_days and search.company and not search.company.get("archive_access", False):
             search.query["bool"].setdefault("filter", []).append(

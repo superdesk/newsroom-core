@@ -21,6 +21,7 @@ from newsroom.auth.utils import is_current_user_admin, is_current_user_account_m
 from newsroom.user_roles import UserRole
 from newsroom.signals import user_created, user_updated, user_deleted
 from newsroom.companies.utils import get_company_section_names, get_company_product_ids
+import asyncio
 
 
 class UserAuthentication(SessionAuth):
@@ -361,7 +362,7 @@ class UsersService(newsroom.Service):
             if doc.get("company") and doc["company"] == manager.get("company"):
                 allowed_updates = (
                     COMPANY_ADMIN_ALLOWED_UPDATES
-                    if not get_setting("allow_companies_to_manage_products")
+                    if not asyncio.run(get_setting("allow_companies_to_manage_products"))
                     else COMPANY_ADMIN_ALLOWED_UPDATES.union(COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES)
                 )
 

@@ -368,8 +368,10 @@ pytest-cov==5.0.0
     # via -r dev-requirements.in
 pytest-mock==3.14.0
     # via -r dev-requirements.in
-python-bidi==0.5.0
-    # via xhtml2pdf
+python-bidi==0.4.2
+    # via
+    #   -r requirements.txt
+    #   xhtml2pdf
 python-dateutil==2.9.0.post0
     # via
     #   arrow
@@ -448,6 +450,7 @@ six==1.16.0
     #   isodate
     #   oauth2client
     #   parse-type
+    #   python-bidi
     #   python-dateutil
 superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@async
     # via -r requirements.txt
