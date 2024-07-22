@@ -99,8 +99,7 @@ async def item(_id):
     item = get_entity_or_404(_id, "items")
     set_permissions(item, "media_releases")
     ui_config_service = UiConfigResourceService()
-    display_char_count = await ui_config_service.get_section_config("media_releases").get("char_count", False)
-    config = await ui_config_service.get_section_config("factcheck")
+    config = await ui_config_service.get_section_config("media_releases")
     display_char_count = config.get("char_count", False)
     if is_json_request(flask.request):
         return flask.jsonify(item)

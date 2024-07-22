@@ -44,6 +44,7 @@ from newsroom.celery_app import init_celery
 from newsroom.settings import SettingsApp
 from newsroom.webpack import NewsroomWebpack
 from newsroom.utils import short_highlighted_text, get_location_string, get_agenda_dates
+import asyncio
 
 
 class NewsroomWebApp(BaseNewsroomApp):
@@ -112,6 +113,10 @@ class NewsroomWebApp(BaseNewsroomApp):
         # config from env var
         self.config.from_envvar("NEWSROOM_SETTINGS", silent=True)
 
+    def sync_newsroom_config(self):
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(newsroom_config())
+
     def _setup_jinja(self):
         self.add_template_filter(to_json, name="tojson")
         self.add_template_filter(datetime_short)
@@ -133,7 +138,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_global(is_company_admin)
         self.add_template_global(is_admin_manager_or_company_admin)
         self.add_template_global(authorized_settings_apps)
-        self.add_template_global(newsroom_config)
+        self.add_template_global(self.sync_newsroom_config, "newsroom_config")
         self.add_template_global(is_admin)
         self.add_template_global(get_initial_notifications)
         self.add_template_global(hash_string, "hash")

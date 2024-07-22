@@ -242,7 +242,7 @@ def is_admin_or_internal(user=None):
     return flask.session.get("user_type") in allowed_user_types
 
 
-def newsroom_config():
+async def newsroom_config():
     port = int(os.environ.get("PORT", "5000"))
     return {
         "websocket": os.environ.get("NEWSROOM_WEBSOCKET_URL", "ws://localhost:%d" % (port + 100,)),
