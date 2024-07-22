@@ -37,7 +37,6 @@ from newsroom.users.users import (
 )
 from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary
 from newsroom.monitoring.views import get_monitoring_for_company
-import asyncio
 
 
 def get_settings_data():
