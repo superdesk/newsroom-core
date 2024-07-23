@@ -12,6 +12,7 @@ from superdesk.utc import utcnow
 from superdesk.json_utils import try_cast
 from superdesk.etree import parse_html
 from superdesk.text_utils import get_text
+from superdesk.core.web import Request
 
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -133,6 +134,13 @@ def get_json_or_400():
     data = request.get_json()
     if not isinstance(data, dict):
         abort(400)
+    return data
+
+
+async def get_json_or_400_async(req: Request):
+    data = await req.get_json()
+    if not isinstance(data, dict):
+        await req.abort(400)
     return data
 
 

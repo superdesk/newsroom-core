@@ -1,32 +1,38 @@
-from typing import Dict
+from typing import Dict, Optional
 import re
 import ipaddress
-
-import flask
-import werkzeug.exceptions
 
 from bson import ObjectId
 from datetime import datetime
 from flask import jsonify, current_app as app
 from flask_babel import gettext
+
+from pydantic import BaseModel
 from superdesk import get_resource_service
+from superdesk.core.web import Request, Response
+from superdesk.core.resources.fields import ObjectId as ObjectIdField
+
 from werkzeug.exceptions import NotFound, BadRequest
 
 from newsroom.decorator import admin_only, account_manager_only, login_required
-from newsroom.companies import blueprint
 from newsroom.types import AuthProviderConfig
 from newsroom.utils import (
     get_public_user_data,
     query_resource,
-    find_one,
-    get_json_or_400,
+    get_json_or_400_async,
     set_original_creator,
     set_version_creator,
 )
 
+from .module import company_endpoints, company_configs
+from .companies_async import CompanyService, CompanyResource
 
-def get_company_types_options(company_types):
-    return [dict([(k, v) for k, v in company_type.items() if k in {"id", "name"}]) for company_type in company_types]
+
+def get_company_types_options():
+    return [
+        dict([(k, v) for k, v in company_type.items() if k in {"id", "name"}])
+        for company_type in company_configs.company_types
+    ]
 
 
 def get_settings_data():
@@ -42,7 +48,7 @@ def get_settings_data():
         "services": app.config["SERVICES"],
         "products": list(query_resource("products")),
         "sections": app.sections,
-        "company_types": get_company_types_options(app.config.get("COMPANY_TYPES", [])),
+        "company_types": get_company_types_options(),
         "api_enabled": app.config.get("NEWS_API_ENABLED", False),
         "ui_config": get_resource_service("ui_config").get_section_config("companies"),
         "countries": app.countries,
@@ -50,33 +56,46 @@ def get_settings_data():
     }
 
 
-@blueprint.route("/companies/search", methods=["GET"])
+class CompanySearchArgs(BaseModel):
+    q: Optional[str] = None
+
+
+@company_endpoints.endpoint("/companies/search", methods=["GET"])
 @account_manager_only
-def search():
+async def search_companies(args: None, params: CompanySearchArgs, request: Request) -> Response:
     lookup = None
-    if flask.request.args.get("q"):
-        regex = re.compile(".*{}.*".format(flask.request.args.get("q")), re.IGNORECASE)
+    if params.q is not None:
+        regex = re.compile(".*{}.*".format(params.q), re.IGNORECASE)
         lookup = {"name": regex}
-    companies = list(query_resource("companies", lookup=lookup))
-    return jsonify(companies), 200
+    cursor = await CompanyService().search(lookup)
+    companies = await cursor.to_list_raw()
+    return Response(companies, 200, ())
 
 
-@blueprint.route("/companies/new", methods=["POST"])
+@company_endpoints.endpoint("/companies/new", methods=["POST"])
 @account_manager_only
-def create():
-    company = get_json_or_400()
+async def create_company(request: Request) -> Response:
+    company = await get_json_or_400_async(request)
+    if not isinstance(company, dict):
+        return request.abort(400)
+
     errors = get_errors_company(company)
     if errors:
-        return errors
+        return Response(errors[0], errors[1], ())
 
-    new_company = get_company_updates(company)
-    set_original_creator(new_company)
+    company_data = get_company_updates(company)
+    set_original_creator(company_data)
+    company_data["_id"] = ObjectId()
+
+    # TODO: Catch validation errors here, like we are with previous implementation
+    #       To be passed back to the front-end, to show validation errors
+    new_company = CompanyResource.model_validate(company_data)
     try:
-        ids = get_resource_service("companies").post([new_company])
-    except werkzeug.exceptions.Conflict:
-        return conflict_error(new_company)
+        ids = await CompanyService().create([new_company])
+    except ValueError:
+        return Response({"name": gettext("Company already exists")}, 400, ())
 
-    return jsonify({"success": True, "_id": ids[0]}), 201
+    return Response({"success": True, "_id": ids[0]}, 201, ())
 
 
 def get_errors_company(updates, original=None):
@@ -117,8 +136,11 @@ def get_company_updates(data, original=None):
         "allowed_ip_list": data.get("allowed_ip_list") or original.get("allowed_ip_list"),
         "auth_domains": data.get("auth_domains"),
         "auth_provider": data.get("auth_provider") or original.get("auth_provider") or "newshub",
+        "company_size": data.get("company_size") or original.get("company_size"),
+        "referred_by": data.get("referred_by") or original.get("referred_by"),
     }
 
+    # "seats" are not in CompanyResource
     for field in ["sections", "archive_access", "events_only", "restrict_coverage_info", "products", "seats"]:
         if field in data:
             updates[field] = data[field]
@@ -135,29 +157,40 @@ def get_company_updates(data, original=None):
     return updates
 
 
-@blueprint.route("/companies/<_id>", methods=["GET", "POST"])
+class CompanyItemArgs(BaseModel):
+    company_id: ObjectIdField
+
+
+@company_endpoints.endpoint("/companies/<string:company_id>", methods=["GET", "POST"])
 @account_manager_only
-def edit(_id):
-    original = find_one("companies", _id=ObjectId(_id))
+async def edit_company(args: CompanyItemArgs, params: None, request: Request) -> Response:
+    service = CompanyService()
+    original = await service.find_by_id_raw(args.company_id)
 
     if not original:
-        return NotFound(gettext("Company not found"))
+        raise NotFound(gettext("Company not found"))
+    elif request.method == "GET":
+        return Response(original, 200, ())
 
-    if flask.request.method == "POST":
-        company = get_json_or_400()
-        errors = get_errors_company(company, original)
-        if errors:
-            return errors
+    request_json = await get_json_or_400_async(request)
+    if not isinstance(request_json, dict):
+        return request.abort(400)
 
-        updates = get_company_updates(company, original)
-        set_version_creator(updates)
-        try:
-            get_resource_service("companies").patch(ObjectId(_id), updates=updates)
-        except werkzeug.exceptions.Conflict:
-            return conflict_error(updates)
-        app.cache.delete(_id)
-        return jsonify({"success": True}), 200
-    return jsonify(original), 200
+    errors = get_errors_company(request_json, original)
+    if errors:
+        return Response(errors[0], errors[1], ())
+
+    updates = get_company_updates(request_json, original)
+    set_version_creator(updates)  # TODO: should this go into resource service?
+
+    # TODO: Catch validation errors here, like we are with previous implementation
+    #       To be passed back to the front-end, to show validation errors
+    try:
+        await service.update(args.company_id, updates)
+    except Exception as e:
+        return Response({"name": gettext("Company already exists"), "error": str(e)}, 400, ())
+
+    return Response({"success": True}, 200, ())
 
 
 def conflict_error(updates):
@@ -167,64 +200,58 @@ def conflict_error(updates):
         return jsonify({"name": gettext("Company already exists")}), 400
 
 
-@blueprint.route("/companies/<_id>", methods=["DELETE"])
+@company_endpoints.endpoint("/companies/<string:company_id>", methods=["DELETE"])
 @admin_only
-def delete(_id):
-    """
-    Deletes the company and users of the company with given company id
-    """
-    try:
-        get_resource_service("users").delete_action(lookup={"company": ObjectId(_id)})
-    except BadRequest as er:
-        return jsonify({"error": er.description}), 403
-    get_resource_service("companies").delete_action(lookup={"_id": ObjectId(_id)})
+async def delete_company(args: CompanyItemArgs, params: None, request: Request) -> Response:
+    service = CompanyService()
+    original = await service.find_by_id(args.company_id)
 
-    app.cache.delete(_id)
-    return jsonify({"success": True}), 200
-
-
-@blueprint.route("/companies/<_id>/users", methods=["GET"])
-@login_required
-def company_users(_id):
-    users = [get_public_user_data(user) for user in query_resource("users", lookup={"company": ObjectId(_id)})]
-    return jsonify(users)
-
-
-@blueprint.route("/companies/<company_id>/approve", methods=["POST"])
-@account_manager_only
-def approve_company(company_id):
-    original = find_one("companies", _id=ObjectId(company_id))
     if not original:
-        return NotFound(gettext("Company not found"))
+        raise NotFound(gettext("Company not found"))
 
-    if original.get("is_approved"):
-        return jsonify({"error": gettext("Company is already approved")}), 403
+    try:
+        # TODO-ASYNC: Convert to users async service
+        get_resource_service("users").delete_action(lookup={"company": args.company_id})
+    except BadRequest as er:
+        return Response({"error": str(er)}, 403, ())
+
+    try:
+        await service.delete(original)
+    except Exception as e:
+        return Response({"error": str(e)}, 400, ())
+
+    return Response({"success": True}, 200, ())
+
+
+@company_endpoints.endpoint("/companies/<string:company_id>/users", methods=["GET"])
+@login_required
+async def company_users(args: CompanyItemArgs, params: None, request: Request) -> Response:
+    # TODO-ASYNC: Convert to users async service
+    users = [get_public_user_data(user) for user in query_resource("users", lookup={"company": args.company_id})]
+    return Response(users, 200, ())
+
+
+@company_endpoints.endpoint("/companies/<string:company_id>/approve", methods=["POST"])
+@account_manager_only
+async def approve_company(args: CompanyItemArgs, params: None, request: Request) -> Response:
+    service = CompanyService()
+    original = await service.find_by_id(args.company_id)
+    if not original:
+        raise NotFound(gettext("Company not found"))
+    elif original.is_approved:
+        return Response({"error": gettext("Company is already approved")}, 403, ())
 
     # Activate this Company
     updates = {
         "is_enabled": True,
         "is_approved": True,
     }
-    get_resource_service("companies").patch(original["_id"], updates=updates)
+    await service.update(original.id, updates)
 
     # Activate the Users of this Company
+    # TODO-ASYNC: Convert to users async service
     users_service = get_resource_service("users")
-    for user in users_service.get(req=None, lookup={"company": original["_id"], "is_approved": {"$ne": True}}):
+    for user in users_service.get(req=None, lookup={"company": original.id, "is_approved": {"$ne": True}}):
         users_service.approve_user(user)
 
-    return {"success": True}
-
-
-def get_product_updates(updates: Dict[str, bool], seats: Dict[str, int]):
-    product_ids = [product_id for product_id, selected in updates.items() if selected]
-    if not product_ids:
-        return []
-    products = list(query_resource("products", lookup={"_id": {"$in": product_ids}}))
-    return [
-        {
-            "_id": product["_id"],
-            "section": product.get("product_type") or "wire",
-            "seats": seats.get(str(product["_id"])) or 0,
-        }
-        for product in products
-    ]
+    return Response({"success": True}, 200, ())
