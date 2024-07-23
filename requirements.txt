@@ -16,6 +16,7 @@ eve-elastic>=7.3.1,<7.5
 MarkupSafe<2.2
 python3-saml>=1.15,<1.17
 google-auth>=2.6,<2.30
+python-bidi<0.5
 
 
 # Fix an issue between xhtml2pdf v0.2.4 and reportlab v3.6.7
