@@ -26,7 +26,7 @@ class APIFormattersService(Service):
         formatters = get_all_formatters()
         return next((f for f in formatters if type(f).__name__ == name), None)
 
-    def get_version(self, id, version, formatter_name):
+    async def get_version(self, id, version, formatter_name):
         formatter = self._get_formatter(formatter_name)
         if not formatter:
             abort(404)
@@ -42,7 +42,7 @@ class APIFormattersService(Service):
             if not item:
                 abort(404)
         # Ensure that the item has not expired
-        if utcnow() - timedelta(days=int(asyncio.run(get_setting("news_api_time_limit_days")))) > item.get(
+        if utcnow() - timedelta(days=int(await get_setting("news_api_time_limit_days"))) > item.get(
             "versioncreated", utcnow()
         ):
             abort(404)

@@ -269,10 +269,10 @@ class UsersService(newsroom.Service):
     Serves mainly as a proxy to the data layer.
     """
 
-    def on_create(self, docs):
+    async def on_create(self, docs):
         super().on_create(docs)
         for doc in docs:
-            self.check_permissions(doc)
+            await self.check_permissions(doc)
             set_original_creator(doc)
             if doc.get("password", None) and not is_hashed(doc.get("password")):
                 doc["password"] = self._get_password_hash(doc["password"])
@@ -282,8 +282,8 @@ class UsersService(newsroom.Service):
         for doc in docs:
             user_created.send(self, user=doc)
 
-    def on_update(self, updates, original):
-        self.check_permissions(original, updates)
+    async def on_update(self, updates, original):
+        await self.check_permissions(original, updates)
         set_version_creator(updates)
         if "password" in updates:
             updates["password"] = self._get_password_hash(updates["password"])
@@ -331,14 +331,14 @@ class UsersService(newsroom.Service):
         app.cache.delete(str(doc.get("_id")))
         user_deleted.send(self, user=doc)
 
-    def on_delete(self, doc):
+    async def on_delete(self, doc):
         if doc.get("_id") == get_user_id():
             raise BadRequest(gettext("Can not delete current user"))
         user = self.find_one(req=None, _id=doc["_id"])
-        self.check_permissions(user)
+        await self.check_permissions(user)
         super().on_delete(doc)
 
-    def check_permissions(self, doc, updates=None):
+    async def check_permissions(self, doc, updates=None):
         """Check if current user has permissions to edit user."""
         if not request or request.method == "GET":  # in behave there is test request context
             return
@@ -362,7 +362,7 @@ class UsersService(newsroom.Service):
             if doc.get("company") and doc["company"] == manager.get("company"):
                 allowed_updates = (
                     COMPANY_ADMIN_ALLOWED_UPDATES
-                    if not asyncio.run(get_setting("allow_companies_to_manage_products"))
+                    if not await get_setting("allow_companies_to_manage_products")
                     else COMPANY_ADMIN_ALLOWED_UPDATES.union(COMPANY_ADMIN_ALLOWED_PRODUCT_UPDATES)
                 )
 
