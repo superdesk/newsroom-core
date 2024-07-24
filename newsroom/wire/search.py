@@ -15,7 +15,6 @@ from newsroom.utils import get_local_date, get_end_date
 from newsroom.search.service import BaseSearchService, SearchQuery
 from typing import TypedDict, List, Optional
 import pytz
-import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -329,7 +328,7 @@ class WireSearchService(BaseSearchService):
             set_bookmarks_query(search.query, search.args["bookmarks"])
 
         if search.args.get("newsOnly") and not (search.args.get("navigation") or search.args.get("product_type")):
-            news_only_filter = asyncio.run(get_setting("news_only_filter"))
+            news_only_filter = get_setting("news_only_filter")
             if news_only_filter:
                 search.query["bool"]["must_not"].append(self.query_string(news_only_filter))
             elif app.config.get("NEWS_ONLY_FILTERS"):

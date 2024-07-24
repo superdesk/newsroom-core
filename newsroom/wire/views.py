@@ -57,7 +57,6 @@ from .search import get_bookmarks_count
 from .items import get_items_for_dashboard
 from ..upload import ASSETS_RESOURCE, get_upload
 from newsroom.ui_config_async import UiConfigResourceService
-from newsroom.settings import get_client_config
 
 HOME_ITEMS_CACHE_KEY = "home_items"
 HOME_EXTERNAL_ITEMS_CACHE_KEY = "home_external_items"
@@ -223,11 +222,12 @@ def get_previous_versions(item):
 @blueprint.route("/")
 async def index():
     if not is_valid_session():
-        return (
+        data = (
             await render_public_dashboard()
             if app.config.get("PUBLIC_DASHBOARD")
             else clear_session_and_redirect_to_login()
         )
+        return data
     data = await get_home_data()
     return flask.render_template("home.html", data=data)
 
@@ -262,8 +262,7 @@ def get_card_items():
 @section("wire")
 async def wire():
     data = await get_view_data()
-    client_config = await get_client_config()
-    return flask.render_template("wire_index.html", data=data, client_config=client_config)
+    return flask.render_template("wire_index.html", data=data)
 
 
 @blueprint.route("/bookmarks_wire")

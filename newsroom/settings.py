@@ -3,7 +3,6 @@
 import re
 import copy
 import flask
-import inspect
 
 from flask_babel import gettext, lazy_gettext
 from superdesk.utc import utcnow
@@ -23,28 +22,19 @@ def get_settings_collection():
 
 @blueprint.route("/settings/<app_id>")
 @account_manager_only
-async def app(app_id):
+def app(app_id):
     for app in flask.current_app.settings_apps:
-        client_config = await get_client_config()
-        google_analytics_setting = await get_setting("google_analytics_setting")
         if app._id == app_id:
-            data = await app.data() if inspect.iscoroutine(app.data()) else app.data()
-            return flask.render_template(
-                "settings.html",
-                setting_type=app_id,
-                data=data,
-                client_config=client_config,
-                google_analytics_setting=google_analytics_setting,
-            )
+            return flask.render_template("settings.html", setting_type=app_id, data=app.data())
     flask.abort(404)
 
 
 @blueprint.route("/settings/general_settings", methods=["POST"])
 @admin_only
-async def update_values():
+def update_values():
     values = get_json_or_400()
 
-    error = await validate_general_settings(values)
+    error = validate_general_settings(values)
     if error:
         return "", error
 
@@ -57,12 +47,12 @@ async def update_values():
     return flask.jsonify(updates)
 
 
-async def get_initial_data(setting_key=None):
-    data = await get_setting(setting_key=setting_key, include_audit=True)
+def get_initial_data(setting_key=None):
+    data = get_setting(setting_key=setting_key, include_audit=True)
     return data
 
 
-async def get_setting(setting_key=None, include_audit=False):
+def get_setting(setting_key=None, include_audit=False):
     if not getattr(flask.g, "settings", None):
         values = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
         settings = copy.deepcopy(flask.current_app._general_settings)
@@ -81,9 +71,9 @@ async def get_setting(setting_key=None, include_audit=False):
     return flask.g.settings
 
 
-async def get_client_config():
+def get_client_config():
     config = newsroom_config()
-    for key, setting in (await get_setting() or {}).items():
+    for key, setting in (get_setting() or {}).items():
         if key not in ["_updated", "version_creator"]:
             value = setting.get("value", setting.get("default"))
             config["client_config"][key] = value
@@ -97,7 +87,7 @@ async def get_client_config():
     return config
 
 
-async def validate_general_settings(values):
+def validate_general_settings(values):
     # validate email formats for company_expiry_alert_recipients
     email_regex = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
     fields = [
@@ -125,6 +115,8 @@ def init_app(app):
         weight=800,
         data=get_initial_data,
     )
+    app.add_template_global(get_setting)
+    app.add_template_global(get_client_config)
 
     # basic settings
     app.general_setting(

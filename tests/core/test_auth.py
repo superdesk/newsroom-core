@@ -169,9 +169,9 @@ def test_login_fails_for_not_approved_user(app, client):
     assert "Account has not been approved" in response.get_data(as_text=True)
 
 
-async def test_login_fails_for_many_times_gets_limited(client, app):
+def test_login_fails_for_many_times_gets_limited(client, app):
     for i in range(1, 100):
-        response = await client.post(
+        response = client.post(
             url_for("auth.login"),
             data={"email": "xyz{}@abc.org".format(i), "password": "abc"},
             follow_redirects=True,
@@ -291,7 +291,7 @@ def test_account_appears_locked_for_non_existing_user(client):
             assert "Your account has been locked" in response.get_data(as_text=True)
 
 
-async def test_login_with_remember_me_selected_creates_permanent_session(app, client):
+def test_login_with_remember_me_selected_creates_permanent_session(app, client):
     # Register a new account
     app.data.insert(
         "users",

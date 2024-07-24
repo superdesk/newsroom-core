@@ -133,7 +133,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_template_global(is_company_admin)
         self.add_template_global(is_admin_manager_or_company_admin)
         self.add_template_global(authorized_settings_apps)
-        self.add_template_global(newsroom_config, "newsroom_config")
+        self.add_template_global(newsroom_config)
         self.add_template_global(is_admin)
         self.add_template_global(get_initial_notifications)
         self.add_template_global(hash_string, "hash")

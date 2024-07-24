@@ -58,7 +58,7 @@ def init(app):
     )
 
 
-async def test_password_auth_denies_other_auth_types(app, client):
+def test_password_auth_denies_other_auth_types(app, client):
     logout(client)
     users_service = get_resource_service("users")
     user_id = ObjectId()

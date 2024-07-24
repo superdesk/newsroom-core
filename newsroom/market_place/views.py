@@ -85,7 +85,8 @@ def get_home_page_data():
 @login_required
 @section(SECTION_ID)
 async def index():
-    return flask.render_template("market_place_index.html", data=await get_view_data())
+    data = await get_view_data()
+    return flask.render_template("market_place_index.html", data=data)
 
 
 @blueprint.route("/{}/home".format(SECTION_ID))

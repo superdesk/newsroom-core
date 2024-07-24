@@ -367,7 +367,7 @@ def set_locale():
 
 @blueprint.route("/auth/impersonate", methods=["POST"])
 @admin_only
-async def impersonate_user():
+def impersonate_user():
     if not flask.session.get("auth_user"):
         flask.session["auth_user"] = flask.session["user"]
     user_id = flask.request.form.get("user")
@@ -380,7 +380,7 @@ async def impersonate_user():
 
 @blueprint.route("/auth/impersonate_stop", methods=["POST"])
 @login_required
-async def impersonate_stop():
+def impersonate_stop():
     assert flask.session.get("auth_user")
     user = get_resource_service("users").find_one(req=None, _id=flask.session.get("auth_user"))
     start_user_session(user)
