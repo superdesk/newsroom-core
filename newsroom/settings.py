@@ -25,10 +25,17 @@ def get_settings_collection():
 @blueprint.route("/settings/<app_id>")
 @account_manager_only
 async def app(app_id):
+    from newsroom.users import get_user_profile_data  # noqa
+
+    user_profile_data = await get_user_profile_data()
+
     for app in flask.current_app.settings_apps:
         if app._id == app_id:
-            data = await app.data() if iscoroutine(app.data()) else app.data()
-            return flask.render_template("settings.html", setting_type=app_id, data=data)
+            value = app.data()
+            data = await value if iscoroutine(value) else value
+            return flask.render_template(
+                "settings.html", setting_type=app_id, data=data, user_profile_data=user_profile_data
+            )
     flask.abort(404)
 
 

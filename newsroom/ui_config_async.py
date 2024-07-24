@@ -26,6 +26,13 @@ class UiConfigResourceService(AsyncResourceService[UiConfig]):
             return {}
         return config.dict(by_alias=True, exclude_unset=True)
 
+    async def get_all_config(self) -> dict:
+        # Collect all config items asynchronously
+        configs = [config async for config in self.get_all()]
+
+        # Use dictionary comprehension to build the result
+        return {item.id: item.dict(by_alias=True, exclude_unset=True) for item in configs} if configs else {}
+
 
 ui_config_model_config = ResourceConfig(
     name="ui_config",

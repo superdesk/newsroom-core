@@ -14,7 +14,7 @@
 
     {% if session.get("user") %}
         window.notificationData = {{ get_initial_notifications() | tojson | safe }};
-        window.profileData = {{ get_user_profile_data() | tojson | safe }};
+        window.profileData = {{ user_profile_data | tojson | safe }};
         window.searchTipsHtml = {
             regular: `{{ render_search_tips_html('regular') | safe }}`,
             advanced: `{{ render_search_tips_html('advanced') | safe }}`,

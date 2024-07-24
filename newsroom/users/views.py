@@ -37,6 +37,7 @@ from newsroom.users.users import (
 )
 from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabulary
 from newsroom.monitoring.views import get_monitoring_for_company
+from newsroom.ui_config_async import UiConfigResourceService
 
 
 def get_settings_data():
@@ -50,10 +51,11 @@ def get_settings_data():
     }
 
 
-def get_view_data():
+async def get_view_data():
     user = get_user_required()
     company = get_company(user)
     auth_provider = get_company_auth_provider(company)
+    ui_config_service = UiConfigResourceService()
     rv = {
         "user": user if user else None,
         "company": str(company["_id"]) if company else "",
@@ -61,7 +63,7 @@ def get_view_data():
         "companyName": get_user_company_name(user),
         "locators": get_vocabulary("locators"),
         "monitoring_list": get_monitoring_for_company(user),
-        "ui_configs": {config["_id"]: config for config in query_resource("ui_config")},
+        "ui_configs": await ui_config_service.get_all_config(),
         "groups": app.config.get("WIRE_GROUPS", []),
         "authProviderFeatures": dict(auth_provider.features),
     }
@@ -76,8 +78,9 @@ def get_view_data():
 
 @blueprint.route("/myprofile", methods=["GET"])
 @login_required
-def user_profile():
-    return flask.render_template("user_profile.html", data=get_view_data())
+async def user_profile():
+    data = await get_view_data()
+    return flask.render_template("user_profile.html", data=data)
 
 
 @blueprint.route("/users/search", methods=["GET"])

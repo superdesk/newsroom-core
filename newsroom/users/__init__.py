@@ -14,8 +14,6 @@ def init_app(app):
     superdesk.register_resource("auth_user", AuthUserResource, AuthUserService, _app=app)
     from . import views  # noqa
 
-    app.add_template_global(views.get_view_data, "get_user_profile_data")
-
     app.settings_app(
         "users",
         lazy_gettext("User Management"),
@@ -23,3 +21,10 @@ def init_app(app):
         data=views.get_settings_data,
         allow_account_mgr=True,
     )
+
+
+async def get_user_profile_data():
+    from . import views  # noqa
+
+    data = await views.get_view_data()
+    return data
