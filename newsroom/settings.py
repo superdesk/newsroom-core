@@ -10,6 +10,7 @@ from superdesk.utc import utcnow
 from newsroom.utils import get_json_or_400, set_version_creator
 from newsroom.template_filters import newsroom_config
 from newsroom.decorator import admin_only, account_manager_only
+from inspect import iscoroutine
 
 
 blueprint = flask.Blueprint("settings", __name__)
@@ -23,10 +24,11 @@ def get_settings_collection():
 
 @blueprint.route("/settings/<app_id>")
 @account_manager_only
-def app(app_id):
+async def app(app_id):
     for app in flask.current_app.settings_apps:
         if app._id == app_id:
-            return flask.render_template("settings.html", setting_type=app_id, data=app.data())
+            data = await app.data() if iscoroutine(app.data()) else app.data()
+            return flask.render_template("settings.html", setting_type=app_id, data=data)
     flask.abort(404)
 
 
