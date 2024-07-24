@@ -330,11 +330,11 @@ class UsersService(newsroom.Service):
         app.cache.delete(str(doc.get("_id")))
         user_deleted.send(self, user=doc)
 
-    async def on_delete(self, doc):
+    def on_delete(self, doc):
         if doc.get("_id") == get_user_id():
             raise BadRequest(gettext("Can not delete current user"))
         user = self.find_one(req=None, _id=doc["_id"])
-        await self.check_permissions(user)
+        self.check_permissions(user)
         super().on_delete(doc)
 
     def check_permissions(self, doc, updates=None):

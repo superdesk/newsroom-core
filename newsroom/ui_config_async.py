@@ -11,10 +11,10 @@ class UiConfig(ResourceModel):
     details: Optional[Dict[str, Any]] = None
     list: Optional[Dict[str, Any]] = None
     advanced_search_tabs: Optional[Dict[str, Any]] = None
-    multi_select_topics: Optional[bool] = False
+    multi_select_topics: bool = False
     search: Optional[bool] = None
-    enable_global_topics: Optional[bool] = True
-    open_coverage_content_in_same_page: Optional[bool] = False
+    enable_global_topics: bool = True
+    open_coverage_content_in_same_page: bool = False
     subnav: Optional[Dict[str, Any]] = None
     init_version: Optional[int] = None
 

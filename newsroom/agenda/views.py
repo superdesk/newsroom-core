@@ -43,7 +43,8 @@ from newsroom.ui_config_async import UiConfigResourceService
 @login_required
 @section("agenda")
 async def index():
-    return flask.render_template("agenda_index.html", data=await get_view_data())
+    data = await get_view_data()
+    return flask.render_template("agenda_index.html", data=data)
 
 
 @blueprint.route("/bookmarks_agenda")

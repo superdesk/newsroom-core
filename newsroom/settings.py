@@ -2,14 +2,15 @@
 
 import re
 import copy
-import flask
 
+import flask
 from flask_babel import gettext, lazy_gettext
 from superdesk.utc import utcnow
 
 from newsroom.utils import get_json_or_400, set_version_creator
 from newsroom.template_filters import newsroom_config
 from newsroom.decorator import admin_only, account_manager_only
+
 
 blueprint = flask.Blueprint("settings", __name__)
 
