@@ -10,6 +10,7 @@ from newsroom.public import blueprint
 from newsroom.utils import query_resource
 from newsroom.wire.items import get_items_for_dashboard
 from newsroom.ui_config_async import UiConfigResourceService
+from newsroom.users import get_user_profile_data
 
 PUBLIC_DASHBOARD_CONFIG_CACHE_KEY = "public-dashboard-config"
 PUBLIC_DASHBOARD_CARDS_CACHE_KEY = "public-dashboard-cards"
@@ -55,6 +56,7 @@ def page(template):
 
 
 async def render_public_dashboard():
+    user_profile_data = await get_user_profile_data()
     return render_template(
         "public_dashboard.html",
         data={
@@ -63,6 +65,7 @@ async def render_public_dashboard():
             "items_by_card": get_public_items_by_cards(),
             "groups": app.config.get("WIRE_GROUPS", []),
         },
+        user_profile_data=user_profile_data,
     )
 
 
