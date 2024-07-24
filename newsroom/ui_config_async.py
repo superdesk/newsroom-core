@@ -1,9 +1,7 @@
 from typing import Optional, Dict, Any
 from superdesk.core.module import Module
-from superdesk.core.mongo import MongoResourceConfig
-from superdesk.core.resources import ResourceModel, ResourceModelConfig
-from superdesk.core.resources.service import AsyncResourceService
 from content_api import MONGO_PREFIX
+from superdesk.core.resources import ResourceConfig, AsyncResourceService, MongoResourceConfig, ResourceModel
 
 
 class UiConfig(ResourceModel):
@@ -29,7 +27,7 @@ class UiConfigResourceService(AsyncResourceService[UiConfig]):
         return config.dict(by_alias=True, exclude_unset=True)
 
 
-ui_config_model_config = ResourceModelConfig(
+ui_config_model_config = ResourceConfig(
     name="ui_config",
     data_class=UiConfig,
     mongo=MongoResourceConfig(prefix=MONGO_PREFIX),
