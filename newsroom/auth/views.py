@@ -44,7 +44,7 @@ from newsroom.email import send_new_signup_email
 from newsroom.limiter import limiter
 
 from .token import generate_auth_token, verify_auth_token
-
+from newsroom.users import get_user_profile_data
 
 blueprint = flask.Blueprint("auth", __name__)
 logger = logging.getLogger(__name__)
@@ -52,17 +52,17 @@ logger = logging.getLogger(__name__)
 
 @blueprint.route("/login", methods=["GET", "POST"])
 @limiter.limit("60/minute")
-def login():
+async def login():
     if is_valid_session():
         # If user has already logged in, then redirect them to the next page
         # which defaults to the home page
         return redirect_to_next_url()
-
+    user_profile_data = await get_user_profile_data()
     form = LoginForm()
 
     if form.validate_on_submit():
         if email_has_exceeded_max_login_attempts(form.email.data):
-            return flask.render_template("account_locked.html", form=form)
+            return flask.render_template("account_locked.html", form=form, user_profile_data=user_profile_data)
 
         user = get_user_by_email(form.email.data)
         company = get_company_from_user(user) if user is not None else None
@@ -95,7 +95,9 @@ def login():
                     update_user_last_active(user)
                     return redirect_to_next_url()
 
-    return flask.render_template("login.html", form=form, firebase=app.config.get("FIREBASE_ENABLED"))
+    return flask.render_template(
+        "login.html", form=form, firebase=app.config.get("FIREBASE_ENABLED"), user_profile_data=user_profile_data
+    )
 
 
 def email_has_exceeded_max_login_attempts(email):
@@ -212,8 +214,9 @@ def logout():
 
 
 @blueprint.route("/signup", methods=["GET", "POST"])
-def signup():
+async def signup():
     form = (app.signup_form_class or SignupForm)()
+    user_profile_data = await get_user_profile_data()
     if len(app.countries):
         form.country.choices += [(item.get("value"), item.get("text")) for item in app.countries]
 
@@ -272,12 +275,13 @@ def signup():
         }
         user_service.post([new_user])
         send_new_signup_email(company, new_user, is_new_company)
-        return flask.render_template("signup_success.html"), 200
+        return flask.render_template("signup_success.html", user_profile_data=user_profile_data), 200
     return flask.render_template(
         "signup.html",
         form=form,
         sitekey=app.config["RECAPTCHA_PUBLIC_KEY"],
         terms=app.config["TERMS_AND_CONDITIONS"],
+        user_profile_data=user_profile_data,
     )
 
 
@@ -301,10 +305,11 @@ def validate_account(token):
 
 
 @blueprint.route("/reset_password/<token>", methods=["GET", "POST"])
-def reset_password(token):
+async def reset_password(token):
+    user_profile_data = await get_user_profile_data()
     user = get_resource_service("users").find_one(req=None, token=token)
     if not user:
-        return flask.render_template("password_reset_link_expiry.html")
+        return flask.render_template("password_reset_link_expiry.html", user_profile_data=user_profile_data)
 
     form = ResetPasswordForm()
     if form.validate_on_submit():
@@ -323,13 +328,14 @@ def reset_password(token):
         return flask.redirect(flask.url_for("auth.login"))
 
     app.cache.delete(user.get("email"))
-    return flask.render_template("reset_password.html", form=form, token=token)
+    return flask.render_template("reset_password.html", form=form, token=token, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/token/<token_type>", methods=["GET", "POST"])
-def token(token_type: Literal["reset_password", "validate"]):
+async def token(token_type: Literal["reset_password", "validate"]):
     """Get token to reset password or validate email."""
     form = TokenForm()
+    user_profile_data = await get_user_profile_data()
     if form.validate_on_submit():
         user = get_user_by_email(form.email.data)
         company = get_company_from_user(user) if user else None
@@ -348,13 +354,18 @@ def token(token_type: Literal["reset_password", "validate"]):
         return flask.redirect(flask.url_for("auth.login"))
 
     return flask.render_template(
-        "request_token.html", form=form, token_type=token_type, firebase=app.config.get("FIREBASE_ENABLED")
+        "request_token.html",
+        form=form,
+        token_type=token_type,
+        firebase=app.config.get("FIREBASE_ENABLED"),
+        user_profile_data=user_profile_data,
     )
 
 
 @blueprint.route("/reset_password_done")
-def reset_password_confirmation():
-    return flask.render_template("request_token_confirm.html")
+async def reset_password_confirmation():
+    user_profile_data = await get_user_profile_data()
+    return flask.render_template("request_token_confirm.html", user_profile_data=user_profile_data)
 
 
 @blueprint.route("/login_locale", methods=["POST"])
@@ -390,12 +401,13 @@ def impersonate_stop():
 
 @blueprint.route("/change_password", methods=["GET", "POST"])
 @login_required
-def change_password():
+async def change_password():
     form = ResetPasswordForm()
     user = get_user_required()
     company = get_company(user)
     auth_provider = get_company_auth_provider(company)
     form.email.process_data(user["email"])
+    user_profile_data = await get_user_profile_data()
 
     if form.validate_on_submit():
         if auth_provider.type == AuthProviderType.FIREBASE:
@@ -421,7 +433,11 @@ def change_password():
             flask.flash(gettext("Change password is not available."), "warning")
 
     return flask.render_template(
-        "change_password.html", form=form, user=user, firebase=app.config.get("FIREBASE_ENABLED")
+        "change_password.html",
+        form=form,
+        user=user,
+        firebase=app.config.get("FIREBASE_ENABLED"),
+        user_profile_data=user_profile_data,
     )
 
 

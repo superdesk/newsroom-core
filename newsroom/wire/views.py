@@ -57,6 +57,7 @@ from .search import get_bookmarks_count
 from .items import get_items_for_dashboard
 from ..upload import ASSETS_RESOURCE, get_upload
 from newsroom.ui_config_async import UiConfigResourceService
+from newsroom.users import get_user_profile_data
 
 HOME_ITEMS_CACHE_KEY = "home_items"
 HOME_EXTERNAL_ITEMS_CACHE_KEY = "home_external_items"
@@ -229,7 +230,8 @@ async def index():
         )
         return data
     data = await get_home_data()
-    return flask.render_template("home.html", data=data)
+    user_profile_data = await get_user_profile_data()
+    return flask.render_template("home.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/media_card_external/<card_id>")
@@ -262,7 +264,8 @@ def get_card_items():
 @section("wire")
 async def wire():
     data = await get_view_data()
-    return flask.render_template("wire_index.html", data=data)
+    user_profile_data = await get_user_profile_data()
+    return flask.render_template("wire_index.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/bookmarks_wire")
@@ -270,7 +273,8 @@ async def wire():
 async def bookmarks():
     data = await get_view_data()
     data["bookmarks"] = True
-    return flask.render_template("wire_bookmarks.html", data=data)
+    user_profile_data = await get_user_profile_data()
+    return flask.render_template("wire_bookmarks.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/wire/search")
@@ -462,7 +466,7 @@ def bookmark():
 
 @blueprint.route("/wire/<_id>/copy", methods=["POST"])
 @login_required
-def copy(_id):
+async def copy(_id):
     item_type = get_type()
     item = get_entity_or_404(_id, item_type)
 
@@ -477,6 +481,7 @@ def copy(_id):
                 "location": "" if item_type != "agenda" else get_location_string(item),
                 "contacts": get_public_contacts(item),
                 "calendars": ", ".join([calendar.get("name") for calendar in item.get("calendars") or []]),
+                "user_profile_data": await get_user_profile_data(),
             }
         )
     copy_data = flask.render_template(template_name, **template_kwargs).strip()
@@ -510,10 +515,11 @@ async def item(_id):
     ui_config_service = UiConfigResourceService()
     config = await ui_config_service.get_section_config("wire")
     display_char_count = config.get("char_count", False)
+    user_profile_data = await get_user_profile_data()
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get("_access"):
-        return flask.render_template("wire_item_access_restricted.html", item=item)
+        return flask.render_template("wire_item_access_restricted.html", item=item, user_profile_data=user_profile_data)
     previous_versions = get_previous_versions(item)
     template = "wire_item.html"
     data = {"item": item}
@@ -534,6 +540,7 @@ async def item(_id):
         **data,
         previous_versions=previous_versions,
         display_char_count=display_char_count,
+        user_profile_data=user_profile_data,
     )
 
 

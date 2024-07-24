@@ -16,6 +16,7 @@ from newsroom.wire.views import (
 from newsroom.utils import get_json_or_400, get_entity_or_404, is_json_request, get_type
 from newsroom.notifications import push_user_notification
 from newsroom.ui_config_async import UiConfigResourceService
+from newsroom.users import get_user_profile_data
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +43,8 @@ async def get_view_data():
 @section("media_releases")
 async def index():
     data = await get_view_data()
-    return flask.render_template("media_releases_index.html", data=data)
+    user_profile_data = await get_user_profile_data()
+    return flask.render_template("media_releases_index.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/media_releases/search")
@@ -58,7 +60,8 @@ def search():
 async def bookmarks():
     data = await get_view_data()
     data["bookmarks"] = True
-    return flask.render_template("media_releases_bookmarks.html", data=data)
+    user_profile_data = await get_user_profile_data()
+    return flask.render_template("media_releases_bookmarks.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/media_releases_bookmark", methods=["POST", "DELETE"])
@@ -102,10 +105,11 @@ async def item(_id):
     ui_config_service = UiConfigResourceService()
     config = await ui_config_service.get_section_config("media_releases")
     display_char_count = config.get("char_count", False)
+    user_profile_data = await get_user_profile_data()
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get("_access"):
-        return flask.render_template("wire_item_access_restricted.html", item=item)
+        return flask.render_template("wire_item_access_restricted.html", item=item, user_profile_data=user_profile_data)
     previous_versions = get_previous_versions(item)
     if "print" in flask.request.args:
         template = "wire_item_print.html"
@@ -117,4 +121,5 @@ async def item(_id):
         item=item,
         previous_versions=previous_versions,
         display_char_count=display_char_count,
+        user_profile_data=user_profile_data,
     )

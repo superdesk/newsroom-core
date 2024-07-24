@@ -154,7 +154,6 @@ CORE_APPS = [
     "newsroom.topics",
     "newsroom.upload",
     "newsroom.history",
-    "newsroom.ui_config",
     "newsroom.notifications",
     "newsroom.products",
     "newsroom.section_filters",

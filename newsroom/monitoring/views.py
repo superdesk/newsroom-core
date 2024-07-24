@@ -38,6 +38,7 @@ from newsroom.utils import (
 
 from .forms import MonitoringForm, alert_types
 from newsroom.ui_config_async import UiConfigResourceService
+from newsroom.users import get_user_profile_data
 
 
 async def get_view_data():
@@ -212,7 +213,8 @@ def delete(_id):
 @login_required
 async def index():
     data = await get_view_data()
-    return flask.render_template("monitoring_index.html", data=data)
+    user_profile_data = await get_user_profile_data()
+    return flask.render_template("monitoring_index.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/monitoring/export/<_ids>")
@@ -317,4 +319,5 @@ def bookmark():
 async def bookmarks():
     data = await get_view_data()
     data["bookmarks"] = True
-    return flask.render_template("monitoring_bookmarks.html", data=data)
+    user_profile_data = await get_user_profile_data()
+    return flask.render_template("monitoring_bookmarks.html", data=data, user_profile_data=user_profile_data)

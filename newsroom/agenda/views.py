@@ -37,29 +37,32 @@ from newsroom.companies.utils import restrict_coverage_info
 from newsroom.notifications import push_user_notification
 from newsroom.search.config import merge_planning_aggs
 from newsroom.ui_config_async import UiConfigResourceService
+from newsroom.users import get_user_profile_data
 
 
 @blueprint.route("/agenda")
 @login_required
 @section("agenda")
 async def index():
+    user_profile_data = await get_user_profile_data()
     data = await get_view_data()
-    return flask.render_template("agenda_index.html", data=data)
+    return flask.render_template("agenda_index.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/bookmarks_agenda")
 @login_required
 async def bookmarks():
     data = await get_view_data()
+    user_profile_data = await get_user_profile_data()
     data["bookmarks"] = True
-    return flask.render_template("agenda_bookmarks.html", data=data)
+    return flask.render_template("agenda_bookmarks.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/agenda/<_id>")
 @login_required
 async def item(_id):
     item = get_entity_or_404(_id, "agenda")
-
+    user_profile_data = await get_user_profile_data()
     user = get_user()
     company = get_company(user)
     if not is_admin_or_internal(user):
@@ -97,11 +100,16 @@ async def item(_id):
             contacts=get_public_contacts(item),
             links=get_links(item),
             is_admin=is_admin_or_internal(user),
+            user_profile_data=user_profile_data,
         )
 
     data = await get_view_data()
     data["item"] = item
-    return flask.render_template("agenda_index.html", data=data, title=item.get("name", item.get("headline")))
+    return flask.render_template(
+        "agenda_index.html",
+        data=data,
+        title=item.get("name", item.get("headline"), user_profile_data=user_profile_data),
+    )
 
 
 @blueprint.route("/agenda/search")

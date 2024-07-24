@@ -5,6 +5,7 @@ from flask_babel import lazy_gettext
 
 
 from .users import AuthUserService, UsersResource, AuthUserResource, users_service
+from inspect import iscoroutine
 
 blueprint = Blueprint("users", __name__)
 
@@ -26,5 +27,6 @@ def init_app(app):
 async def get_user_profile_data():
     from . import views  # noqa
 
-    data = await views.get_view_data()
+    func = views.get_view_data()
+    data = await func if iscoroutine(func) else func
     return data

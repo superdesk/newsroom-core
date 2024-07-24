@@ -10,7 +10,7 @@ class UiConfig(ResourceModel):
     list: Optional[Dict[str, Any]] = None
     advanced_search_tabs: Optional[Dict[str, Any]] = None
     multi_select_topics: bool = False
-    search: Optional[bool] = None
+    search: bool = False
     enable_global_topics: bool = True
     open_coverage_content_in_same_page: bool = False
     subnav: Optional[Dict[str, Any]] = None
