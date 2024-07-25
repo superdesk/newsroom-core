@@ -3,7 +3,7 @@ import flask
 import werkzeug
 import superdesk
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Optional, TypedDict, Union
 from flask import current_app as app
 from flask_babel import _
@@ -175,12 +175,19 @@ def add_token_data(user):
 
 def is_valid_session():
     """Uses timezone-aware objects to avoid TypeError comparison"""
-    now = utcnow()
+    # Get the current UTC time as a timezone-aware datetime
+    now = datetime.now(timezone.utc)
 
+    # Retrieve auth_ttl and ensure it is also timezone-aware
+    auth_ttl = flask.session.get("auth_ttl")
+    if auth_ttl and isinstance(auth_ttl, datetime) and auth_ttl.tzinfo is None:
+        auth_ttl = auth_ttl.replace(tzinfo=timezone.utc)  # Make auth_ttl timezone-aware
+
+    # Check session validity
     return (
         flask.session.get("user")
         and flask.session.get("user_type")
-        and (flask.session.get("auth_ttl") and flask.session.get("auth_ttl") > now or revalidate_session_user())
+        and (auth_ttl and auth_ttl > now or revalidate_session_user())
     )
 
 

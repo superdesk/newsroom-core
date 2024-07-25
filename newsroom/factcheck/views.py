@@ -4,7 +4,6 @@ from flask import current_app as app
 from eve.render import send_response
 from eve.methods.get import get_internal
 
-from superdesk import get_resource_service
 from newsroom.factcheck import blueprint
 from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required, section
@@ -16,13 +15,16 @@ from newsroom.wire.views import (
 )
 from newsroom.utils import get_json_or_400, get_entity_or_404, is_json_request, get_type
 from newsroom.notifications import push_user_notification
+from newsroom.ui_config_async import UiConfigResourceService
+from newsroom.users import get_user_profile_data
 
 logger = logging.getLogger(__name__)
 
 
-def get_view_data():
+async def get_view_data():
     """Get the view data"""
     user = get_user()
+    ui_config_service = UiConfigResourceService()
     return {
         "user": str(user["_id"]) if user else None,
         "company": str(user["company"]) if user and user.get("company") else None,
@@ -32,15 +34,17 @@ def get_view_data():
         ],
         "saved_items": get_bookmarks_count(user["_id"], "factcheck"),
         "context": "factcheck",
-        "ui_config": get_resource_service("ui_config").get_section_config("factcheck"),
+        "ui_config": await ui_config_service.get_section_config("factcheck"),
     }
 
 
 @blueprint.route("/factcheck")
 @login_required
 @section("factcheck")
-def index():
-    return flask.render_template("factcheck_index.html", data=get_view_data())
+async def index():
+    data = await get_view_data()
+    user_profile_data = await get_user_profile_data()
+    return flask.render_template("factcheck_index.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/factcheck/search")
@@ -53,10 +57,11 @@ def search():
 
 @blueprint.route("/bookmarks_factcheck")
 @login_required
-def bookmarks():
+async def bookmarks():
     data = get_view_data()
     data["bookmarks"] = True
-    return flask.render_template("factcheck_bookmarks.html", data=data)
+    user_profile_data = await get_user_profile_data()
+    return flask.render_template("factcheck_bookmarks.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/factcheck_bookmark", methods=["POST", "DELETE"])
@@ -94,14 +99,17 @@ def versions(_id):
 
 @blueprint.route("/factcheck/<_id>")
 @login_required
-def item(_id):
+async def item(_id):
+    user_profile_data = await get_user_profile_data()
     item = get_entity_or_404(_id, "items")
     set_permissions(item, "factcheck")
-    display_char_count = get_resource_service("ui_config").get_section_config("factcheck").get("char_count", False)
+    ui_config_service = UiConfigResourceService()
+    config = await ui_config_service.get_section_config("factcheck")
+    display_char_count = config.get("char_count", False)
     if is_json_request(flask.request):
         return flask.jsonify(item)
     if not item.get("_access"):
-        return flask.render_template("wire_item_access_restricted.html", item=item)
+        return flask.render_template("wire_item_access_restricted.html", item=item, user_profile_data=user_profile_data)
     previous_versions = get_previous_versions(item)
     if "print" in flask.request.args:
         template = "wire_item_print.html"
@@ -113,4 +121,5 @@ def item(_id):
         item=item,
         previous_versions=previous_versions,
         display_char_count=display_char_count,
+        user_profile_data=user_profile_data,
     )

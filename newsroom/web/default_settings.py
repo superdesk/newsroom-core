@@ -154,7 +154,6 @@ CORE_APPS = [
     "newsroom.topics",
     "newsroom.upload",
     "newsroom.history",
-    "newsroom.ui_config",
     "newsroom.notifications",
     "newsroom.products",
     "newsroom.section_filters",
@@ -179,7 +178,7 @@ CORE_APPS = [
     "newsroom.notifications.send_scheduled_notifications",
 ]
 
-MODULES = []
+MODULES = ["newsroom.ui_config_async"]
 
 SITE_NAME = "Newshub"
 COPYRIGHT_HOLDER = "Sourcefabric"

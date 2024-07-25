@@ -36,28 +36,33 @@ from newsroom.agenda.utils import remove_fields_for_public_user, remove_restrict
 from newsroom.companies.utils import restrict_coverage_info
 from newsroom.notifications import push_user_notification
 from newsroom.search.config import merge_planning_aggs
+from newsroom.ui_config_async import UiConfigResourceService
+from newsroom.users import get_user_profile_data
 
 
 @blueprint.route("/agenda")
 @login_required
 @section("agenda")
-def index():
-    return flask.render_template("agenda_index.html", data=get_view_data())
+async def index():
+    user_profile_data = await get_user_profile_data()
+    data = await get_view_data()
+    return flask.render_template("agenda_index.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/bookmarks_agenda")
 @login_required
-def bookmarks():
-    data = get_view_data()
+async def bookmarks():
+    data = await get_view_data()
+    user_profile_data = await get_user_profile_data()
     data["bookmarks"] = True
-    return flask.render_template("agenda_bookmarks.html", data=data)
+    return flask.render_template("agenda_bookmarks.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/agenda/<_id>")
 @login_required
-def item(_id):
+async def item(_id):
     item = get_entity_or_404(_id, "agenda")
-
+    user_profile_data = await get_user_profile_data()
     user = get_user()
     company = get_company(user)
     if not is_admin_or_internal(user):
@@ -95,11 +100,17 @@ def item(_id):
             contacts=get_public_contacts(item),
             links=get_links(item),
             is_admin=is_admin_or_internal(user),
+            user_profile_data=user_profile_data,
         )
 
-    data = get_view_data()
+    data = await get_view_data()
     data["item"] = item
-    return flask.render_template("agenda_index.html", data=data, title=item.get("name", item.get("headline")))
+    return flask.render_template(
+        "agenda_index.html",
+        data=data,
+        title=item.get("name", item.get("headline")),
+        user_profile_data=user_profile_data,
+    )
 
 
 @blueprint.route("/agenda/search")
@@ -115,13 +126,14 @@ def search():
     return send_response("agenda", response)
 
 
-def get_view_data() -> Dict:
+async def get_view_data() -> Dict:
     user = get_user_required()
     topics = get_user_topics(user["_id"]) if user else []
     company = get_company(user)
     products = get_products_by_company(company, product_type="agenda") if company else []
 
     check_user_has_products(user, products)
+    ui_config_service = UiConfigResourceService()
 
     return {
         "user": user,
@@ -137,7 +149,7 @@ def get_view_data() -> Dict:
         "events_only": company.get("events_only", False) if company else False,
         "restrict_coverage_info": company.get("restrict_coverage_info", False) if company else False,
         "locators": get_vocabulary("locators"),
-        "ui_config": get_resource_service("ui_config").get_section_config("agenda"),
+        "ui_config": await ui_config_service.get_section_config("agenda"),
         "groups": get_groups(app.config.get("AGENDA_GROUPS", []), company),
         "has_agenda_featured_items": get_resource_service("agenda_featured").find_one(req=None) is not None,
         "user_folders": get_user_folders(user, "agenda") if user else [],

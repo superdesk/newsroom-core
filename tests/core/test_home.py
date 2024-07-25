@@ -4,7 +4,7 @@ from newsroom.wire.views import get_home_data
 from newsroom.tests.fixtures import PUBLIC_USER_ID
 
 
-def test_personal_dashboard_data(client, app, company_products):
+async def test_personal_dashboard_data(client, app, company_products):
     with app.test_request_context():
         server_session["user"] = str(PUBLIC_USER_ID)
         server_session["user_type"] = "public"
@@ -29,7 +29,7 @@ def test_personal_dashboard_data(client, app, company_products):
             user,
         )
 
-        data = get_home_data()
+        data = await get_home_data()
 
     assert "personalizedDashboards" in data
     dashboard_data = data["personalizedDashboards"][0]

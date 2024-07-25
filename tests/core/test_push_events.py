@@ -1103,7 +1103,7 @@ def test_push_cancelled_planning_cancels_adhoc_planning(client, app):
     assert "Reason" in parsed["ednote"][0]
 
 
-def test_push_update_for_an_item_with_coverage(client, app, mocker):
+async def test_push_update_for_an_item_with_coverage(client, app, mocker):
     test_item = {
         "type": "text",
         "guid": "item",

@@ -14,13 +14,15 @@ from newsroom.auth import get_user, get_company
 from newsroom.company_admin import blueprint
 from newsroom.email import send_template_email
 from newsroom.settings import get_settings_collection, GENERAL_SETTINGS_LOOKUP
+from newsroom.users import get_user_profile_data
 
 
 @blueprint.route("/company_admin")
 @login_required
 @company_admin_only
-def index():
-    return render_template("company_admin_index.html", data=get_view_data())
+async def index():
+    user_profile_data = await get_user_profile_data()
+    return render_template("company_admin_index.html", data=get_view_data(), user_profile_data=user_profile_data)
 
 
 def filter_disabled_products(company: Company, products: List[Product]) -> Company:

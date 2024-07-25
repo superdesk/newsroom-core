@@ -9,6 +9,7 @@ from newsroom.reports import blueprint
 from newsroom.utils import query_resource
 
 from .utils import get_current_user_reports
+from newsroom.users import get_user_profile_data
 
 
 @blueprint.route("/reports/print/<report>", methods=["GET"])
@@ -26,15 +27,18 @@ def print_reports(report):
 
 @blueprint.route("/reports/company_reports", methods=["GET"])
 @account_manager_or_company_admin_only
-def company_reports():
+async def company_reports():
     companies = list(query_resource("companies"))
+    user_profile_data = await get_user_profile_data()
     data = {
         "companies": companies,
         "sections": newsroom_app.sections,
         "api_enabled": app.config.get("NEWS_API_ENABLED", False),
         "current_user_type": session.get("user_type"),
     }
-    return render_template("company_reports.html", setting_type="company_reports", data=data)
+    return render_template(
+        "company_reports.html", setting_type="company_reports", data=data, user_profile_data=user_profile_data
+    )
 
 
 @blueprint.route("/reports/<report>", methods=["GET"])

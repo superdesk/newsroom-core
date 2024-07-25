@@ -23,13 +23,14 @@ from newsroom.utils import (
     set_original_creator,
     set_version_creator,
 )
+from newsroom.ui_config_async import UiConfigResourceService
 
 
 def get_company_types_options(company_types):
     return [dict([(k, v) for k, v in company_type.items() if k in {"id", "name"}]) for company_type in company_types]
 
 
-def get_settings_data():
+async def get_settings_data():
     def render_provider(provider: AuthProviderConfig) -> Dict[str, str]:
         return {
             "_id": provider["_id"],
@@ -37,6 +38,7 @@ def get_settings_data():
             "auth_type": provider["auth_type"].value,
         }
 
+    ui_config_service = UiConfigResourceService()
     return {
         "companies": list(query_resource("companies")),
         "services": app.config["SERVICES"],
@@ -44,7 +46,7 @@ def get_settings_data():
         "sections": app.sections,
         "company_types": get_company_types_options(app.config.get("COMPANY_TYPES", [])),
         "api_enabled": app.config.get("NEWS_API_ENABLED", False),
-        "ui_config": get_resource_service("ui_config").get_section_config("companies"),
+        "ui_config": await ui_config_service.get_section_config("companies"),
         "countries": app.countries,
         "auth_providers": [render_provider(provider) for provider in app.config.get("AUTH_PROVIDERS") or []],
     }
