@@ -108,7 +108,8 @@ async def item(_id):
     return flask.render_template(
         "agenda_index.html",
         data=data,
-        title=item.get("name", item.get("headline"), user_profile_data=user_profile_data),
+        title=item.get("name", item.get("headline")),
+        user_profile_data=user_profile_data,
     )
 
 
