@@ -119,7 +119,15 @@ def get_company_updates(data, original=None):
         "auth_provider": data.get("auth_provider") or original.get("auth_provider") or "newshub",
     }
 
-    for field in ["sections", "archive_access", "events_only", "restrict_coverage_info", "products", "seats"]:
+    for field in [
+        "sections",
+        "archive_access",
+        "events_only",
+        "restrict_coverage_info",
+        "products",
+        "seats",
+        "internal",
+    ]:
         if field in data:
             updates[field] = data[field]
 
