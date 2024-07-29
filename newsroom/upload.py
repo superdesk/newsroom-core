@@ -78,5 +78,6 @@ def init_app(app):
             "authentication": None,
             "mongo_prefix": newsroom.MONGO_PREFIX,
             "internal_resource": True,
+            "mongo_indexes": {},
         },
     )
