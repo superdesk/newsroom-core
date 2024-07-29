@@ -19,6 +19,7 @@ from eve.utils import config, ParsedRequest
 from eve_elastic.elastic import parse_date, ElasticCursor
 from flask import current_app as app, json, abort, request, g, flash, session, url_for
 from flask_babel import gettext, format_date as _format_date
+from superdesk.core.web import Request
 
 from newsroom.types import PublicUserData, User, Company, Group, Permissions
 from newsroom.template_filters import (
@@ -133,6 +134,13 @@ def get_json_or_400():
     data = request.get_json()
     if not isinstance(data, dict):
         abort(400)
+    return data
+
+
+async def get_json_or_400_async(req: Request):
+    data = await req.get_json()
+    if not isinstance(data, dict):
+        await req.abort(400)
     return data
 
 
