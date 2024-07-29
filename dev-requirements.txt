@@ -324,7 +324,7 @@ pypng==0.20220715.0
     # via qrcode
 pyrtf3==0.47.5
     # via -r requirements.txt
-pytest==8.2.2
+pytest==8.3.2
     # via
     #   -r dev-requirements.in
     #   pytest-cov
@@ -334,7 +334,9 @@ pytest-cov==5.0.0
 pytest-mock==3.14.0
     # via -r dev-requirements.in
 python-bidi==0.4.2
-    # via xhtml2pdf
+    # via
+    #   -r requirements.txt
+    #   xhtml2pdf
 python-dateutil==2.9.0.post0
     # via
     #   arrow
