@@ -181,6 +181,14 @@ export function EditCompanyDetails({
                     onChange={onChange}
                 />
 
+                <CheckboxInput
+                    labelClass={company.internal ? 'text-warning' : ''}
+                    name='internal'
+                    label={gettext('Internal')}
+                    value={company.internal}
+                    onChange={onChange}
+                />
+
             </div>
             <div className='list-item__preview-footer'>
                 {company._id && <input
