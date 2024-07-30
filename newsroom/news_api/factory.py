@@ -33,7 +33,7 @@ class NewsroomNewsAPI(BaseNewsroomApp):
     INSTANCE_CONFIG = "settings_newsapi.py"
 
     def __init__(self, import_name=__package__, config=None, **kwargs):
-        if not getattr(self, "settings"):
+        if not getattr(self, "settings", None):
             self.settings = flask.Config(".")
 
         if config and config.get("BEHAVE"):
@@ -132,6 +132,9 @@ class NewsroomNewsAPI(BaseNewsroomApp):
         self.register_error_handler(SuperdeskApiError, superdesk_api_error)
         self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(Exception, base_exception_error)
+
+    def settings_app(self, app, name, weight=1000, data=None, allow_account_mgr=False):
+        pass
 
 
 def get_app(config=None, **kwargs):

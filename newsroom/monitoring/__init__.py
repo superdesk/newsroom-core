@@ -1,3 +1,4 @@
+from os import path
 from flask import Blueprint
 from flask_babel import lazy_gettext
 import superdesk
@@ -42,4 +43,5 @@ def init_app(app):
     superdesk.register_resource("monitoring_search", MonitoringSearchResource, MonitoringSearchService, _app=app)
 
     app.add_template_global(get_keywords_in_text, "get_keywords_in_text")
-    app.add_template_global(app.theme_folder, "monitoring_image_path")
+    theme_folder = getattr(app, "theme_folder", None) or path.join(app.config["SERVER_PATH"], "theme")
+    app.add_template_global(theme_folder, "monitoring_image_path")

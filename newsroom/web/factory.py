@@ -167,7 +167,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_url_rule(
             self.static_url_path.replace("static", "theme") + "/<path:filename>",
             endpoint="theme",
-            host=self.static_host,
+            host=getattr(self, "static_host", None),
             view_func=self.send_theme_file,
         )
 
