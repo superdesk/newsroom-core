@@ -1,18 +1,24 @@
-from content_api import MONGO_PREFIX
-from typing import Optional, Annotated, List, Dict, Union
-from superdesk.core.resources import ResourceModel, ResourceConfig, MongoResourceConfig
+import logging
+from pydantic import Field
+from datetime import datetime
+from typing import Optional, Annotated, List, Dict
+
+
+from superdesk.core.resources import ResourceModel, ResourceConfig, MongoResourceConfig, validators
 from superdesk.core.resources.service import AsyncResourceService
 from superdesk.core.web import EndpointGroup
-from pydantic import Field
-import logging
-from bson import ObjectId
+
+
+from content_api import MONGO_PREFIX
 
 
 class ClientResource(ResourceModel):
-    id: Annotated[Union[str, ObjectId], Field(alias="_id")] = None
-    name: str
+    name: Annotated[
+        Optional[str],
+        validators.validate_iunique_value_async(resource_name="oauth_clients", field_name="name"),
+    ]
     password: str
-    last_active: Optional[str] = None
+    last_active: Optional[datetime] = None
     etag: Annotated[Optional[str], Field(alias="_etag")] = None
 
 
@@ -21,7 +27,7 @@ class ClientService(AsyncResourceService[ClientResource]):
 
     resource_name = "oauth_clients"
 
-    async def get_all_client(self) -> List[Dict]:
+    async def get_all_clients(self) -> List[Dict]:
         try:
             # Collect all items asynchronously
             clients = [client async for client in self.get_all()]

@@ -16,7 +16,7 @@ from .clients_async import clients_endpoints, ClientService, ClientResource
 
 
 async def get_settings_data():
-    data = await ClientService().get_all_client()
+    data = await ClientService().get_all_clients()
     return {
         "oauth_clients": data,
     }
@@ -54,6 +54,7 @@ async def create(request: Request) -> Response:
 
     password = gen_password()
     doc = {
+        "_id": ObjectId(),
         "name": client.get("name"),
         "password": bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode(),
     }
