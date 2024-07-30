@@ -1,7 +1,7 @@
 import logging
 from pydantic import Field
 from datetime import datetime
-from typing import Optional, Annotated, List, Dict
+from typing_extensions import Optional, Annotated, List, Dict
 
 
 from superdesk.core.resources import ResourceModel, ResourceConfig, MongoResourceConfig, validators
