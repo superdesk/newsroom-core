@@ -34,7 +34,6 @@ black==23.12.1
 blinker==1.7.0
     # via
     #   elastic-apm
-    #   flask
     #   flask-mail
     #   raven
     #   sentry-sdk
@@ -66,9 +65,7 @@ certifi==2024.7.4
 cffi==1.16.0
     # via cryptography
 chardet==5.2.0
-    # via
-    #   reportlab
-    #   superdesk-core
+    # via superdesk-core
 charset-normalizer==3.3.2
     # via requests
 ciso8601==2.3.1
@@ -417,7 +414,7 @@ six==1.16.0
     #   oauth2client
     #   parse-type
     #   python-dateutil
-superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@release/2.7
+superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@v2.7.3
     # via -r requirements.txt
 superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@v2.7.2
     # via -r requirements.txt
