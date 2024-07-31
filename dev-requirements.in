@@ -1,0 +1,11 @@
+-r requirements.txt
+-r mypy-requirements.txt
+-r black-requirements.txt
+
+flake8
+pytest
+pytest-cov
+pytest-mock
+responses>=0.10.6,<0.26
+httmock
+wooper
