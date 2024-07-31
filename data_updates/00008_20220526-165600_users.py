@@ -7,7 +7,7 @@
 # Author  : Mark Pittaway
 # Creation: 2022-05-26 16:56
 
-from eve.utils import config
+from superdesk.resource_fields import ID_FIELD
 from superdesk.commands.data_updates import DataUpdate as _DataUpdate
 
 
@@ -21,7 +21,7 @@ class DataUpdate(_DataUpdate):
 
             print(
                 mongodb_collection.update(
-                    {config.ID_FIELD: user.get(config.ID_FIELD)},
+                    {ID_FIELD: user.get(ID_FIELD)},
                     {"$set": {"receive_app_notifications": user.get("receive_email", True)}},
                 )
             )

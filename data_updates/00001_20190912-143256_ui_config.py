@@ -7,7 +7,7 @@
 # Author  : Mark Pittaway
 # Creation: 2019-09-12 14:32
 
-from eve.utils import config
+from superdesk.resource_fields import ID_FIELD
 from superdesk.commands.data_updates import DataUpdate as _DataUpdate
 
 
@@ -20,7 +20,7 @@ class DataUpdate(_DataUpdate):
         for section in mongodb_collection.find({}):
             print(
                 mongodb_collection.update(
-                    {config.ID_FIELD: section.get(config.ID_FIELD)},
+                    {ID_FIELD: section.get(ID_FIELD)},
                     {"$set": {"multi_select_topics": False}},
                 )
             )
@@ -29,7 +29,7 @@ class DataUpdate(_DataUpdate):
         for section in mongodb_collection.find({}):
             print(
                 mongodb_collection.update(
-                    {config.ID_FIELD: section.get(config.ID_FIELD)},
+                    {ID_FIELD: section.get(ID_FIELD)},
                     {"$unset": {"multi_select_topics": 1}},
                 )
             )

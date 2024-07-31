@@ -2,11 +2,12 @@ import logging
 from typing import List, Literal, Optional, Union, Dict, Any, TypedDict
 from copy import deepcopy
 
-from flask import current_app as app, json, abort
 from flask_babel import gettext
 from eve.utils import ParsedRequest
 from werkzeug.exceptions import Forbidden
 
+from superdesk.core import json, get_app_config, get_current_app
+from superdesk.flask import abort
 from newsroom.types import Company, Section, SectionFilter, Topic, User
 from superdesk import get_resource_service
 from superdesk.default_settings import strtobool as _strtobool
@@ -52,7 +53,7 @@ def query_string(
     multimatch_type: Literal["cross_fields", "best_fields"] = "cross_fields",
     analyze_wildcard=False,
 ) -> QueryStringQuery:
-    query_string_settings = app.config["ELASTICSEARCH_SETTINGS"]["settings"]["query_string"]
+    query_string_settings = get_app_config("ELASTICSEARCH_SETTINGS")["settings"]["query_string"]
     return {
         "query_string": {
             "query": query,
@@ -356,7 +357,7 @@ class BaseSearchService(Service):
             )
 
     def get_aggregations(self):
-        return app.config.get("WIRE_AGGS") or {}
+        return get_app_config("WIRE_AGGS") or {}
 
     def get_aggregation_field(self, key):
         aggregations = self.get_aggregations()
@@ -581,6 +582,7 @@ class BaseSearchService(Service):
     def prefill_search_highlights(self, search, req):
         query = search.args.get("q")
         advanced_search = search.advanced or {}
+        app = get_current_app()
 
         if app.data.elastic.should_highlight(search) and (
             query or advanced_search.get("all") or advanced_search.get("any")
@@ -695,7 +697,7 @@ class BaseSearchService(Service):
         if search.is_admin or not search.company or not search.company.get("company_type"):
             return
 
-        for company_type in app.config.get("COMPANY_TYPES", []):
+        for company_type in get_app_config("COMPANY_TYPES", []):
             if company_type["id"] == search.company["company_type"]:
                 if company_type.get("wire_must"):
                     search.query["bool"]["filter"].append(company_type["wire_must"])
@@ -781,9 +783,9 @@ class BaseSearchService(Service):
 
         filters = self.parse_filters(search)
 
-        if not app.config.get("FILTER_BY_POST_FILTER", False):
+        if not get_app_config("FILTER_BY_POST_FILTER", False):
             if filters:
-                if app.config.get("FILTER_AGGREGATIONS", True):
+                if get_app_config("FILTER_AGGREGATIONS", True):
                     self.set_bool_query_from_filters(search.query["bool"], filters)
                 elif isinstance(filters, dict):
                     search.query["bool"]["must"].append(filters)  # type: ignore
@@ -794,7 +796,7 @@ class BaseSearchService(Service):
             search.source["post_filter"] = {"bool": {"must": []}}
 
             if filters:
-                if app.config.get("FILTER_AGGREGATIONS", True):
+                if get_app_config("FILTER_AGGREGATIONS", True):
                     self.set_bool_query_from_filters(search.source["post_filter"]["bool"], filters)
                 else:
                     search.source["post_filter"]["bool"]["must"].append(filters)
@@ -844,7 +846,7 @@ class BaseSearchService(Service):
     def apply_embargoed_filters(self, search):
         """Generate filters for embargoed params"""
 
-        embargo_query_rounding = app.config.get("EMBARGO_QUERY_ROUNDING")
+        embargo_query_rounding = get_app_config("EMBARGO_QUERY_ROUNDING")
         if search.args.get("exclude_embargoed"):
             search.query["bool"]["must_not"].append({"range": {"embargoed": {"gt": f"now{embargo_query_rounding}"}}})
         elif search.args.get("embargoed_only"):
@@ -1015,5 +1017,5 @@ class BaseSearchService(Service):
 
     def query_string(self, query, default_operator="AND") -> QueryStringQuery:
         fields_config_key = "WIRE_SEARCH_FIELDS" if self.section == "wire" else "AGENDA_SEARCH_FIELDS"
-        fields = app.config.get(fields_config_key, ["*"])
+        fields = get_app_config(fields_config_key, ["*"])
         return query_string(query, default_operator=default_operator, fields=fields)

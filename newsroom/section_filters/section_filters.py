@@ -1,8 +1,9 @@
-import flask
-import newsroom
+from typing import Dict, List
+
+from superdesk.flask import g
 from superdesk.services import CacheableService
 
-from typing import Dict, List
+import newsroom
 from newsroom.search.service import query_string
 
 
@@ -41,14 +42,14 @@ class SectionFiltersService(CacheableService):
 
     def get_section_filters_dict(self) -> Dict[str, List]:
         """Get the list of all section filters"""
-        if not getattr(flask.g, "section_filters", None):
+        if not getattr(g, "section_filters", None):
             filters: Dict[str, List] = {}
             for f in self.get_cached():
                 if not filters.get(f.get("filter_type")):
                     filters[f.get("filter_type")] = []
                 filters[f.get("filter_type")].append(f)
-            flask.g.section_filters = filters
-        return flask.g.section_filters
+            g.section_filters = filters
+        return g.section_filters
 
     def apply_section_filter(self, query, product_type, filters=None):
         """Get the list of base products for product type

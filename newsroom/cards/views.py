@@ -1,9 +1,10 @@
 import re
 
-import flask
 from bson import ObjectId
-from flask import jsonify, json, current_app as app
 from flask_babel import gettext
+
+from superdesk.core import json, get_current_app
+from superdesk.flask import jsonify, request, abort
 from superdesk import get_resource_service
 
 from newsroom.decorator import admin_only, login_required
@@ -22,7 +23,7 @@ def get_settings_data():
     return {
         "products": list(query_resource("products", lookup={"is_enabled": True})),
         "cards": list(query_resource("cards")),
-        "dashboards": app.dashboards,
+        "dashboards": get_current_app().as_any().dashboards,
         "navigations": list(query_resource("navigations", lookup={"is_enabled": True})),
     }
 
@@ -38,8 +39,8 @@ def index():
 @admin_only
 def search():
     lookup = None
-    if flask.request.args.get("q"):
-        regex = re.compile(".*{}.*".format(flask.request.args.get("q")), re.IGNORECASE)
+    if request.args.get("q"):
+        regex = re.compile(".*{}.*".format(request.args.get("q")), re.IGNORECASE)
         lookup = {"label": regex}
     products = list(query_resource("cards", lookup=lookup))
     return jsonify(products), 200
@@ -48,7 +49,7 @@ def search():
 @blueprint.route("/cards/new", methods=["POST"])
 @admin_only
 def create():
-    data = json.loads(flask.request.form["card"])
+    data = json.loads(request.form["card"])
     card_data = _get_card_data(data)
     set_original_creator(card_data)
     ids = get_resource_service("cards").post([card_data])
@@ -58,7 +59,7 @@ def create():
 
 def _get_card_data(data):
     if not data:
-        flask.abort(400)
+        abort(400)
 
     if not data.get("label"):
         raise ValueError(gettext("Label not found"))
@@ -66,7 +67,7 @@ def _get_card_data(data):
     if not data.get("type"):
         raise ValueError(gettext("Type not found"))
 
-    if data.get("dashboard") and data["dashboard"] not in {d["_id"] for d in app.dashboards}:
+    if data.get("dashboard") and data["dashboard"] not in {d["_id"] for d in get_current_app().as_any().dashboards}:
         raise ValueError(gettext("Dashboard type not found"))
 
     card_data = {
@@ -99,7 +100,7 @@ def _get_card_data(data):
 def edit(id):
     get_entity_or_404(id, "cards")
 
-    data = json.loads(flask.request.form["card"])
+    data = json.loads(request.form["card"])
     card_data = _get_card_data(data)
     set_version_creator(card_data)
     get_resource_service("cards").patch(id=ObjectId(id), updates=card_data)

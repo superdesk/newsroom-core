@@ -1,6 +1,6 @@
-import superdesk
-from flask import Blueprint
 from flask_babel import lazy_gettext
+import superdesk
+from superdesk.flask import Blueprint
 
 from .navigations import NavigationsResource, NavigationsService
 

@@ -1,4 +1,4 @@
-from flask import Blueprint
+from superdesk.flask import Blueprint
 
 from .reports import (
     get_company_saved_searches,

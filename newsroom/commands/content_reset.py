@@ -1,4 +1,4 @@
-from flask import current_app
+from superdesk.core import get_current_app
 from .cli import newsroom_cli
 
 
@@ -12,5 +12,6 @@ def content_reset():
         $ python manage.py content_reset
 
     """
-    current_app.data.remove("items")
-    current_app.data.remove("items_versions")
+    app = get_current_app()
+    app.data.remove("items")
+    app.data.remove("items_versions")

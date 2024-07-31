@@ -9,8 +9,9 @@ from PyRTF.document.character import TEXT
 from PyRTF.object.picture import Image
 from PyRTF.document.base import RawCode
 from werkzeug.utils import secure_filename
+
+from superdesk.core import get_app_config, get_current_app
 from superdesk.utc import utcnow, utc_to_local
-from flask import current_app as app
 
 from newsroom.wire import url_for_wire
 from newsroom.monitoring.utils import get_keywords_in_text
@@ -195,7 +196,7 @@ class MonitoringRTFFormatter(BaseFormatter):
         if not date_items_dict:
             return _file
 
-        current_date = utc_to_local(app.config["DEFAULT_TIMEZONE"], utcnow()).strftime("%d/%m/%Y")
+        current_date = utc_to_local(get_app_config("DEFAULT_TIMEZONE"), utcnow()).strftime("%d/%m/%Y")
         doc = Document()
         section = Section()
         ss = doc.StyleSheet
@@ -216,7 +217,7 @@ class MonitoringRTFFormatter(BaseFormatter):
         p1 = Paragraph(ss.ParagraphStyles.Heading1)
         p1.append(
             "{} Monitoring: {} ({})".format(
-                app.config.get("MONITORING_REPORT_NAME", "Newsroom"),
+                get_app_config("MONITORING_REPORT_NAME", "Newsroom"),
                 monitoring_profile["name"],
                 current_date,
             )
@@ -231,7 +232,7 @@ class MonitoringRTFFormatter(BaseFormatter):
                 self.format_item(item, ss, monitoring_profile, section)
 
         doc.Sections.append(section)
-        app.customize_rtf_file(doc)
+        get_current_app().as_any().customize_rtf_file(doc)
 
         doc.write(_file.name)
         return _file

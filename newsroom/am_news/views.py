@@ -1,10 +1,10 @@
 import logging
 
-import flask
-from flask import current_app as app
 from eve.render import send_response
 from eve.methods.get import get_internal
 
+from superdesk.core import get_current_app
+from superdesk.flask import render_template, jsonify, request
 from newsroom.am_news import blueprint
 from newsroom.auth import get_user, get_user_id
 from newsroom.decorator import login_required, section
@@ -36,7 +36,9 @@ async def get_view_data():
             product_type="am_news",
         ),
         "formats": [
-            {"format": f["format"], "name": f["name"]} for f in app.download_formatters.values() if "wire" in f["types"]
+            {"format": f["format"], "name": f["name"]}
+            for f in get_current_app().as_any().download_formatters.values()
+            if "wire" in f["types"]
         ],
         "saved_items": get_bookmarks_count(user["_id"], "am_news"),
         "context": "am_news",
@@ -50,7 +52,7 @@ async def get_view_data():
 async def index():
     data = await get_view_data()
     user_profile_data = await get_user_profile_data()
-    return flask.render_template("am_news_index.html", data=data, user_profile_data=user_profile_data)
+    return render_template("am_news_index.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/am_news/search")
@@ -66,7 +68,7 @@ async def bookmarks():
     data = await get_view_data()
     user_profile_data = await get_user_profile_data()
     data["bookmarks"] = True
-    return flask.render_template("am_news_bookmarks.html", data=data, user_profile_data=user_profile_data)
+    return render_template("am_news_bookmarks.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/am_news_bookmark", methods=["POST", "DELETE"])
@@ -82,7 +84,7 @@ def bookmark():
     update_action_list(data.get("items"), "bookmarks", item_type="items")
     user_id = get_user_id()
     push_user_notification("saved_items", count=get_bookmarks_count(user_id, "am_news"))
-    return flask.jsonify(), 200
+    return jsonify(), 200
 
 
 @blueprint.route("/am_news/<_id>/copy", methods=["POST"])
@@ -91,7 +93,7 @@ def copy(_id):
     item_type = get_type()
     get_entity_or_404(_id, item_type)
     update_action_list([_id], "copies", item_type=item_type)
-    return flask.jsonify(), 200
+    return jsonify(), 200
 
 
 @blueprint.route("/am_news/<_id>/versions")
@@ -99,7 +101,7 @@ def copy(_id):
 def versions(_id):
     item = get_entity_or_404(_id, "items")
     items = get_previous_versions(item)
-    return flask.jsonify({"_items": items})
+    return jsonify({"_items": items})
 
 
 @blueprint.route("/am_news/<_id>")
@@ -111,17 +113,17 @@ async def item(_id):
     ui_config_service = UiConfigResourceService()
     config = await ui_config_service.get_section_config("am_news")
     display_char_count = config.get("char_count", False)
-    if is_json_request(flask.request):
-        return flask.jsonify(item)
+    if is_json_request(request):
+        return jsonify(item)
     if not item.get("_access"):
-        return flask.render_template("wire_item_access_restricted.html", item=item, user_profile_data=user_profile_data)
+        return render_template("wire_item_access_restricted.html", item=item, user_profile_data=user_profile_data)
     previous_versions = get_previous_versions(item)
-    if "print" in flask.request.args:
+    if "print" in request.args:
         template = "wire_item_print.html"
         update_action_list([_id], "prints", force_insert=True)
     else:
         template = "wire_item.html"
-    return flask.render_template(
+    return render_template(
         template,
         item=item,
         previous_versions=previous_versions,

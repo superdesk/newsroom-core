@@ -1,4 +1,4 @@
-from flask import request
+from superdesk.flask import request
 
 from content_api.errors import BadParameterValueError
 

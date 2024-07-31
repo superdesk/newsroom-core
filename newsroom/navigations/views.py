@@ -1,11 +1,11 @@
 import re
-import flask
-import json
 from typing import List
 
 from bson import ObjectId
-from flask import jsonify, current_app as app
 from flask_babel import gettext
+
+from superdesk.core import get_current_app, json
+from superdesk.flask import jsonify, request
 from superdesk import get_resource_service
 from superdesk.cache import cache
 
@@ -24,7 +24,9 @@ def get_settings_data():
     return {
         "products": list(query_resource("products")),
         "navigations": list(query_resource("navigations")),
-        "sections": [s for s in app.sections if s.get("_id") != "monitoring"],  # monitoring has no navigation
+        "sections": [
+            s for s in get_current_app().as_any().sections if s.get("_id") != "monitoring"
+        ],  # monitoring has no navigation
     }
 
 
@@ -37,8 +39,8 @@ def index():
 @blueprint.route("/navigations/search", methods=["GET"])
 def search():
     lookup = None
-    if flask.request.args.get("q"):
-        regex = re.compile(".*{}.*".format(flask.request.args.get("q")), re.IGNORECASE)
+    if request.args.get("q"):
+        regex = re.compile(".*{}.*".format(request.args.get("q")), re.IGNORECASE)
         lookup = {"name": regex}
     products = list(query_resource("navigations", lookup=lookup))
     return jsonify(products), 200
@@ -47,7 +49,7 @@ def search():
 @blueprint.route("/navigations/new", methods=["POST"])
 @admin_only
 def create():
-    data = json.loads(flask.request.form["navigation"])
+    data = json.loads(request.form["navigation"])
     nav_data = _get_navigation_data(data)
     product_ids = nav_data.pop("products", None)
 
@@ -86,7 +88,7 @@ def _get_navigation_data(data):
 def edit(_id):
     get_entity_or_404(_id, "navigations")
 
-    data = json.loads(flask.request.form["navigation"])
+    data = json.loads(request.form["navigation"])
     nav_data = _get_navigation_data(data)
     product_ids = nav_data.pop("products", None)
 
@@ -111,7 +113,7 @@ def delete(_id):
 def add_remove_products_for_navigation(nav_id: ObjectId, product_ids: List[str]):
     get_entity_or_404(nav_id, "navigations")
     products = query_resource("products")
-    db = app.data.get_mongo_collection("products")
+    db = get_current_app().data.get_mongo_collection("products")
     for product in products:
         if str(product["_id"]) in product_ids:
             db.update_one({"_id": product["_id"]}, {"$addToSet": {"navigations": nav_id}})

@@ -1,12 +1,11 @@
-import re
-import flask
-
-import superdesk
-
 from typing import Optional
+import re
+
 from bson import ObjectId
 from eve.auth import BasicAuth
-from flask import session, abort
+
+import superdesk
+from superdesk.flask import session, abort, request, g
 from newsroom.types import Company, User, UserAuth
 
 
@@ -16,7 +15,7 @@ class SessionAuth(BasicAuth):
             return False
         if not resource:
             return True  # list of apis is open
-        user_role = flask.session.get("user_type") if flask.request else None
+        user_role = session.get("user_type") if request else None
         return user_role in allowed_roles
 
 
@@ -48,8 +47,8 @@ def get_company(user=None, required=False) -> Optional[Company]:
         user = get_user(required=required)
     if user and user.get("company"):
         return get_company_from_user(user)
-    if hasattr(flask.g, "company_id"):  # if there is no user this might be company session (in news api)
-        return superdesk.get_resource_service("companies").find_one(req=None, _id=flask.g.company_id)
+    if hasattr(g, "company_id"):  # if there is no user this might be company session (in news api)
+        return superdesk.get_resource_service("companies").find_one(req=None, _id=g.company_id)
     return None
 
 
@@ -65,7 +64,7 @@ def get_user_id():
 
     Make sure it's an ObjectId.
     """
-    if flask.request and session.get("user"):
+    if request and session.get("user"):
         return ObjectId(session.get("user"))
     return None
 

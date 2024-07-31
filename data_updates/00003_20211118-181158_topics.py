@@ -7,7 +7,7 @@
 # Author  : Mark Pittaway
 # Creation: 2021-11-18 18:11
 
-from eve.utils import config
+from superdesk.resource_fields import ID_FIELD
 from superdesk.commands.data_updates import DataUpdate as _DataUpdate
 from superdesk import get_resource_service
 
@@ -28,7 +28,7 @@ class DataUpdate(_DataUpdate):
                 print("Updating topic of existing user", topic["_id"], topic.get("label"))
                 print(
                     mongodb_collection.update(
-                        {config.ID_FIELD: topic.get(config.ID_FIELD)},
+                        {ID_FIELD: topic.get(ID_FIELD)},
                         {
                             "$set": {
                                 "subscribers": [topic["user"]] if topic.get("notifications", False) else [],
@@ -44,7 +44,7 @@ class DataUpdate(_DataUpdate):
         for topic in mongodb_collection.find({}):
             print(
                 mongodb_collection.update(
-                    {config.ID_FIELD: topic.get(config.ID_FIELD)},
+                    {ID_FIELD: topic.get(ID_FIELD)},
                     {
                         "$set": {"notifications": topic["user"] in (topic.get("subscribers") or [])},
                         "$unset": {"subscribers": "", "company": "", "is_global": ""},

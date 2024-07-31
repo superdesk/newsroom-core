@@ -2,9 +2,10 @@ from typing import List
 from bson import ObjectId
 
 from werkzeug.exceptions import NotFound
-from flask import render_template, current_app as app, jsonify
 from flask_babel import gettext
 
+from superdesk.core import get_current_app, get_app_config
+from superdesk.flask import render_template, jsonify
 from superdesk.utc import utcnow, utc_to_local
 from newsroom.auth.utils import get_auth_providers
 from newsroom.decorator import login_required, company_admin_only
@@ -38,6 +39,8 @@ def get_view_data():
     assert company is not None
     company_users = list(query_resource("users", lookup={"company": ObjectId(company["_id"])}))
     products = list(query_resource("products", lookup={"is_enabled": True}))
+    app = get_current_app().as_any()
+
     return {
         "users": company_users,
         "companyId": str(company["_id"]),
@@ -93,13 +96,13 @@ def send_product_seat_request_email():
         to=recipients,
         template="additional_product_seat_request_email",
         template_kwargs=dict(
-            app_name=app.config["SITE_NAME"],
+            app_name=get_current_app("SITE_NAME"),
             products=products,
             number_of_seats=data["number_of_seats"],
             note=data["note"],
             user=user,
             company=company,
-            now=utc_to_local(app.config["DEFAULT_TIMEZONE"], utcnow()),
+            now=utc_to_local(get_app_config("DEFAULT_TIMEZONE"), utcnow()),
             all_products=len(products) == len(company.get("products") or []),
         ),
     )

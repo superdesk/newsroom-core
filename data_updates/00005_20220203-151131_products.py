@@ -7,7 +7,7 @@
 # Author  : Mark Pittaway
 # Creation: 2022-02-03 15:11
 
-from eve.utils import config
+from superdesk.resource_fields import ID_FIELD
 from superdesk.commands.data_updates import DataUpdate as _DataUpdate
 
 
@@ -21,7 +21,7 @@ class DataUpdate(_DataUpdate):
 
             print(
                 mongodb_collection.update(
-                    {config.ID_FIELD: product.get(config.ID_FIELD)},
+                    {ID_FIELD: product.get(ID_FIELD)},
                     {"$set": {"navigations": [str(nav_id) for nav_id in product.get("navigations")]}},
                 )
             )

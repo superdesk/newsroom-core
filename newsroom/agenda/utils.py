@@ -1,8 +1,9 @@
 from typing import Dict, NamedTuple, Any, Literal, List, Union
 from datetime import timedelta
 
-from flask import current_app as app
 from flask_babel import gettext
+
+from superdesk.core import get_app_config
 from planning.common import WORKFLOW_STATE, ASSIGNMENT_WORKFLOW_STATE
 from superdesk.metadata.item import CONTENT_STATE
 
@@ -93,7 +94,7 @@ def get_coverage_scheduled(coverage):
 
 
 def get_coverage_content_type_name(coverage, language):
-    coverage_types = app.config["COVERAGE_TYPES"]
+    coverage_types = get_app_config("COVERAGE_TYPES")
     content_type = coverage.get("coverage_type") or coverage.get("planning", {}).get("g2_content_type", "")
     coverage_type = coverage_types.get(content_type, {})
     locale = (language or get_session_locale() or "en").lower()
@@ -102,7 +103,7 @@ def get_coverage_content_type_name(coverage, language):
 
 
 def get_display_date_from_string(datetime_str):
-    return format_datetime(parse_date(datetime_str), app.config["AGENDA_EMAIL_LIST_DATE_FORMAT"])
+    return format_datetime(parse_date(datetime_str), get_app_config("AGENDA_EMAIL_LIST_DATE_FORMAT"))
 
 
 def get_coverage_publish_time(coverage):

@@ -1,8 +1,8 @@
 import click
-from flask import current_app
 from flask.cli import with_appcontext
-from superdesk.commands.index_from_mongo import IndexFromMongo
 
+from superdesk.core import get_current_app
+from superdesk.commands.index_from_mongo import IndexFromMongo
 from newsroom.mongo_utils import (
     index_elastic_from_mongo,
     index_elastic_from_mongo_from_timestamp,
@@ -21,7 +21,7 @@ def index_from_mongo_period(hours, collection, timestamp, direction):
     """
     It allows to reindex up to a certain period.
     """
-    app = current_app
+    app = get_current_app()
     print("Checking if elastic index exists, a new one will be created if not")
     app.data.init_elastic(app)
     print("Elastic index check has been completed")

@@ -23,7 +23,8 @@ from celery.worker.request import Request
 from kombu.serialization import register
 from eve.io.mongo import MongoJSONEncoder
 from eve.utils import str_to_date
-from flask import json
+
+from superdesk.core import json
 from superdesk.celery_app import (  # noqa
     finish_subtask_from_progress,
     finish_task_for_progress,

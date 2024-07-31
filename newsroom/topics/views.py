@@ -1,8 +1,8 @@
-import flask
-
 from bson import ObjectId
+
+from superdesk.core import json, get_app_config
 from superdesk import get_resource_service
-from flask import json, jsonify, abort, current_app as app, url_for
+from superdesk.flask import jsonify, abort, url_for, session
 
 from newsroom.types import Topic
 from newsroom.topics import blueprint
@@ -23,8 +23,8 @@ from newsroom.notifications import (
 @login_required
 def get_topics(_id):
     """Returns list of followed topics of given user"""
-    if flask.session["user"] != str(_id):
-        flask.abort(403)
+    if session["user"] != str(_id):
+        abort(403)
     return jsonify({"_items": _get_user_topics(_id)}), 200
 
 
@@ -34,7 +34,7 @@ def post_topic(_id):
     """Creates a user topic"""
     user = get_user()
     if str(user["_id"]) != str(_id):
-        flask.abort(403)
+        abort(403)
 
     topic = get_json_or_400()
     topic["user"] = user["_id"]
@@ -214,7 +214,7 @@ def share():
             "topic": topic,
             "url": topic_url,
             "message": data.get("message"),
-            "app_name": app.config["SITE_NAME"],
+            "app_name": get_app_config("SITE_NAME"),
         }
         send_user_email(
             user,

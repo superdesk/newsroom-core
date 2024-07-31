@@ -1,10 +1,12 @@
 import datetime
-import newsroom
-import superdesk
 
 from bson import ObjectId
+
+import superdesk
+from superdesk.core import get_app_config
 from superdesk.utc import utcnow
-from flask import current_app as app, session
+from superdesk.flask import session
+import newsroom
 
 
 class NotificationsResource(newsroom.Resource):
@@ -79,7 +81,7 @@ class NotificationsService(newsroom.Service):
 
 
 def get_user_notifications(user_id):
-    ttl = app.config.get("NOTIFICATIONS_TTL", 1)
+    ttl = get_app_config("NOTIFICATIONS_TTL", 1)
     lookup = {
         "user": user_id,
         "created": {"$gte": utcnow() - datetime.timedelta(days=ttl)},

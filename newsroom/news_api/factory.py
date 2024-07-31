@@ -1,15 +1,16 @@
 import os
 import logging
-import flask
 import jinja2
 
 from elasticsearch.exceptions import RequestError as ElasticRequestError
 from werkzeug.exceptions import HTTPException
+
+from superdesk.flask import Config, jsonify, g
 from superdesk.errors import SuperdeskApiError
+from superdesk.utc import utcnow
 
 from newsroom.factory import BaseNewsroomApp
 from newsroom.news_api.api_tokens import CompanyTokenAuth
-from superdesk.utc import utcnow
 from newsroom.template_filters import (
     datetime_short,
     datetime_long,
@@ -34,7 +35,7 @@ class NewsroomNewsAPI(BaseNewsroomApp):
 
     def __init__(self, import_name=__package__, config=None, **kwargs):
         if not getattr(self, "settings", None):
-            self.settings = flask.Config(".")
+            self.settings = Config(".")
 
         if config and config.get("BEHAVE"):
             # ``superdesk.tests.update_config`` adds ``planning`` to ``INSTALLED_APPS``
@@ -85,7 +86,7 @@ class NewsroomNewsAPI(BaseNewsroomApp):
 
     def setup_error_handlers(self):
         def json_error(err):
-            return flask.jsonify(err), err["code"]
+            return jsonify(err), err["code"]
 
         def handle_werkzeug_errors(err):
             return json_error(
@@ -142,17 +143,17 @@ def get_app(config=None, **kwargs):
 
     @app.after_request
     def after_request(response):
-        if flask.g.get("rate_limit_requests"):
+        if g.get("rate_limit_requests"):
             response.headers.add(
                 "X-RateLimit-Remaining",
-                app.config.get("RATE_LIMIT_REQUESTS") - flask.g.get("rate_limit_requests"),
+                app.config.get("RATE_LIMIT_REQUESTS") - g.get("rate_limit_requests"),
             )
             response.headers.add("X-RateLimit-Limit", app.config.get("RATE_LIMIT_REQUESTS"))
 
-            if flask.g.get("rate_limit_expiry"):
+            if g.get("rate_limit_expiry"):
                 response.headers.add(
                     "X-RateLimit-Reset",
-                    (flask.g.get("rate_limit_expiry") - utcnow()).seconds,
+                    (g.get("rate_limit_expiry") - utcnow()).seconds,
                 )
         return response
 

@@ -1,8 +1,8 @@
 from datetime import timedelta
-
-from flask import abort
-from flask import current_app as app
 from eve.versioning import versioned_id_field
+
+from superdesk.core import get_app_config
+from superdesk.flask import abort
 from superdesk.utils import ListCursor
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
@@ -33,7 +33,7 @@ class APIFormattersService(Service):
             item = get_resource_service("items_versions").find_one(req=None, _id_document=id, version=version)
             if not item:
                 abort(404)
-            resource_def = app.config["DOMAIN"]["items"]
+            resource_def = get_app_config("DOMAIN")["items"]
             id_field = versioned_id_field(resource_def)
             item["_id"] = item[id_field]
         else:

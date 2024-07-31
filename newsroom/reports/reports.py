@@ -4,14 +4,14 @@ from collections import defaultdict
 from copy import deepcopy
 
 from bson import ObjectId
-from flask import abort
 from flask_babel import gettext
-from flask import request, send_file, current_app as newsroom_app, json
 from eve.utils import ParsedRequest
 from werkzeug.utils import secure_filename
+
+from superdesk.core import json, get_current_app
+from superdesk.flask import abort, request, send_file
 import superdesk
 from superdesk.utc import utcnow
-
 
 from newsroom.auth import get_user
 from newsroom.utils import (
@@ -246,7 +246,7 @@ def get_subscriber_activity_report():
     user_items = get_entity_dict(get_items_by_id(user_ids, "users"), True)
 
     def get_section_name(s):
-        return next((sec for sec in newsroom_app.sections if sec.get("_id") == s), {}).get("name")
+        return next((sec for sec in get_current_app().as_any().sections if sec.get("_id") == s), {}).get("name")
 
     for doc in docs:
         if doc.get("item") in wire_items:

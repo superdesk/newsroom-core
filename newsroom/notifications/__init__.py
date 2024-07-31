@@ -1,15 +1,16 @@
 from typing import List, Dict, Any, Optional
 from typing_extensions import TypedDict
 
-import flask
 from bson import ObjectId
-import superdesk
 
+import superdesk
+from superdesk.flask import Blueprint
 from superdesk.notification import push_notification
+
 from newsroom.auth import get_user, get_user_id
 from .notification_queue import NotificationQueueResource, NotificationQueueService
 
-blueprint = flask.Blueprint("notifications", __name__)
+blueprint = Blueprint("notifications", __name__)
 
 
 def push_user_notification(name, **kwargs):

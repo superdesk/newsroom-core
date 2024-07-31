@@ -1,5 +1,4 @@
-from flask import Blueprint, render_template
-
+from superdesk.flask import Blueprint, render_template
 from newsroom.gettext import get_session_locale
 from newsroom.email import get_language_template_name
 

@@ -1,4 +1,4 @@
-from flask import Blueprint
+from superdesk.flask import Blueprint
 from newsroom.web.factory import NewsroomWebApp
 
 blueprint = Blueprint("company_admin", __name__)

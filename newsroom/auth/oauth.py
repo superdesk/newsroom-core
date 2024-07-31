@@ -1,11 +1,11 @@
-import flask
-from flask import Blueprint, url_for
 from flask_babel import gettext
 from authlib.integrations.flask_client import OAuth
 
 import superdesk
+from superdesk.flask import Blueprint, url_for, session, redirect
 from superdesk.utc import utcnow
 
+from newsroom.flask import flash
 from newsroom.types import AuthProviderType
 from newsroom.template_filters import is_admin
 from newsroom.utils import (
@@ -53,9 +53,9 @@ def google_authorized():
     token = oauth.google.authorize_access_token()
 
     def redirect_with_error(error_str):
-        flask.session.pop("_flashes", None)  # remove old messages and just show one message
-        flask.flash(error_str, "danger")
-        return flask.redirect(url_for("auth.login"))
+        session.pop("_flashes", None)  # remove old messages and just show one message
+        flash(error_str, "danger")
+        return redirect(url_for("auth.login"))
 
     if not token:
         return redirect_with_error(gettext("Invalid token"))
@@ -102,8 +102,8 @@ def google_authorized():
         )
 
     # Set flask session information
-    flask.session["user"] = str(user["_id"])
-    flask.session["name"] = "{} {}".format(user.get("first_name"), user.get("last_name"))
-    flask.session["user_type"] = user["user_type"]
+    session["user"] = str(user["_id"])
+    session["name"] = "{} {}".format(user.get("first_name"), user.get("last_name"))
+    session["user_type"] = user["user_type"]
 
     return redirect_to_next_url()

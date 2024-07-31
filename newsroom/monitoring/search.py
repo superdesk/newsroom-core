@@ -1,7 +1,8 @@
 import logging
 
-from flask import abort
 from flask_babel import gettext
+
+from superdesk.flask import abort
 from superdesk import get_resource_service
 
 from newsroom.search.service import query_string
