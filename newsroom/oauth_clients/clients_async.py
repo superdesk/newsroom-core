@@ -3,18 +3,16 @@ from pydantic import Field
 from datetime import datetime
 from typing_extensions import Optional, Annotated, List, Dict
 
-
-from superdesk.core.resources import ResourceModel, ResourceConfig, MongoResourceConfig, validators
+from superdesk.core.resources import ResourceModelWithObjectId, ResourceConfig, MongoResourceConfig, validators
 from superdesk.core.resources.service import AsyncResourceService
 from superdesk.core.web import EndpointGroup
-
 
 from content_api import MONGO_PREFIX
 
 
-class ClientResource(ResourceModel):
+class ClientResource(ResourceModelWithObjectId):
     name: Annotated[
-        Optional[str],
+        str,
         validators.validate_iunique_value_async(resource_name="oauth_clients", field_name="name"),
     ]
     password: str
