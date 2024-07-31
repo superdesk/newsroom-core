@@ -1,23 +1,21 @@
 import os
-
-from pydantic import BaseModel
 import newsroom
 import bson.errors
-from typing import Any, Mapping, Optional, Sequence, cast
 
+from pydantic import BaseModel
 from werkzeug.utils import secure_filename
 from motor.motor_asyncio import AsyncIOMotorGridOut
+from typing import Any, Mapping, Optional, Sequence, cast
 
 from superdesk.core.module import Module
+from superdesk.core import get_current_app
+from superdesk.flask import request, url_for
 from superdesk.upload import upload_url as _upload_url
-from superdesk.core import get_current_app, get_app_config
 from superdesk.core.web import Response, EndpointGroup, Request
-from superdesk.flask import request, url_for, Blueprint, abort
-from superdesk.core.elastic.common import ElasticResourceConfig
-from superdesk.core.resources import ResourceModel, ResourceConfig
 from superdesk.media.media_operations import guess_media_extension
+from superdesk.core.resources import ResourceModel, ResourceConfig
 
-from newsroom.decorator import is_valid_session, clear_session_and_redirect_to_login
+# from newsroom.decorator import is_valid_session, clear_session_and_redirect_to_login
 
 
 CACHE_MAX_AGE = 3600 * 24 * 7  # 7 days
