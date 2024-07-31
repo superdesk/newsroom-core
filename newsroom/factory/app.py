@@ -23,6 +23,7 @@ from superdesk.validator import SuperdeskValidator
 from superdesk.logging import configure_logging
 from superdesk.errors import SuperdeskApiError
 from superdesk.cache import cache_backend
+from superdesk.core.storage import GridFSMediaStorageAsync
 from superdesk.core.app import SuperdeskAsyncApp
 from superdesk.factory.app import SuperdeskEve
 
@@ -45,6 +46,8 @@ class BaseNewsroomApp(SuperdeskEve):
     DATALAYER = SuperdeskDataLayer
     AUTH_SERVICE = SessionAuth
     INSTANCE_CONFIG = None
+
+    media_async: GridFSMediaStorageAsync
 
     def __init__(self, import_name=__package__, config=None, testing=False, **kwargs):
         """Override __init__ to do Newsroom specific config and still be able
@@ -138,6 +141,7 @@ class BaseNewsroomApp(SuperdeskEve):
             self.media = AmazonMediaStorage(self)
         else:
             self.media = SuperdeskGridFSMediaStorage(self)
+            self.media_async = GridFSMediaStorageAsync()
 
     def setup_babel(self):
         self.config.setdefault("BABEL_TRANSLATION_DIRECTORIES", os.path.join(NEWSROOM_DIR, "translations"))

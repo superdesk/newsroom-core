@@ -1,21 +1,28 @@
 import os
+
+from pydantic import BaseModel
+import newsroom
 import bson.errors
+from typing import cast
 
 from werkzeug.wsgi import wrap_file
 from werkzeug.utils import secure_filename
 
-from superdesk.core import get_current_app, get_app_config
-from superdesk.flask import request, url_for, Blueprint, abort
+from superdesk.core.module import Module
 from superdesk.upload import upload_url as _upload_url
+from superdesk.core import get_current_app, get_app_config
+from superdesk.core.web import Response, EndpointGroup
+from superdesk.flask import request, url_for, Blueprint, abort
+from superdesk.core.elastic.common import ElasticResourceConfig
+from superdesk.core.resources import ResourceModel, ResourceConfig
 from superdesk.media.media_operations import guess_media_extension
 
-import newsroom
 from newsroom.decorator import is_valid_session, clear_session_and_redirect_to_login
 
 
 CACHE_MAX_AGE = 3600 * 24 * 7  # 7 days
 ASSETS_RESOURCE = "upload"
-blueprint = Blueprint(ASSETS_RESOURCE, __name__)
+upload_endpoints = EndpointGroup(ASSETS_RESOURCE, __name__)
 
 
 def get_file(key):
@@ -26,9 +33,14 @@ def get_file(key):
         return url_for("upload.get_upload", media_id=filename)
 
 
-def get_media_file(media_id):
+async def get_media_file(media_id):
+    from newsroom.web.factory import NewsroomWebApp
+
+    app = cast(NewsroomWebApp, get_current_app())
+
     try:
-        return get_current_app().media.get(media_id, ASSETS_RESOURCE)
+        result = await app.media_async.get(media_id, ASSETS_RESOURCE)
+        return result
     except bson.errors.InvalidId:
         return None
 
@@ -60,19 +72,29 @@ def set_filename_in_response(response, filename, media_file):
         response.headers["Content-Disposition"] = "inline"
 
 
-@blueprint.route("/assets/<path:media_id>", methods=["GET"])
-def get_upload(media_id):
-    if not get_app_config("PUBLIC_DASHBOARD") and not is_valid_session():
-        return clear_session_and_redirect_to_login()
+class RouteArguments(BaseModel):
+    media_id: str
 
-    media_file = get_media_file(media_id)
+@upload_endpoints.endpoint("/assets/<string:media_id>", methods=["GET"])
+async def get_upload(args: RouteArguments, _p, _r) -> Response:
+    print('*' * 100)
+    print(args)
+
+    # if not get_app_config("PUBLIC_DASHBOARD") and not is_valid_session():
+    #     return clear_session_and_redirect_to_login()
+
+    media_file = await get_media_file(args.media_id)
     if not media_file:
         abort(404)
 
-    response = construct_response(media_file)
-    filename = request.args.get("filename")
-    set_filename_in_response(response, filename, media_file)
-    return response
+    # import pdb; pdb.set_trace()
+
+    content = await media_file.read()
+
+    # response = construct_response(media_file)
+    # filename = request.args.get("filename")
+    # set_filename_in_response(response, filename, media_file)
+    return Response(content, 200, ())
 
 
 def upload_url(media_id):
@@ -89,3 +111,18 @@ def init_app(app):
             "internal_resource": True,
         },
     )
+
+
+class Upload(ResourceModel):
+    # NOTE: Temporary resource so `GridFSMediaStorageAsync` would work
+    # we should remove once Upload resource is implemented  on `superdesk-core`
+    pass
+
+
+upload_model_config = ResourceConfig(
+    name="upload",
+    data_class=Upload,
+    elastic=None,
+)
+
+module = Module(name="newsroom.upload", resources=[upload_model_config], endpoints=[upload_endpoints])

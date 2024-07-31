@@ -14,5 +14,5 @@ google-auth>=2.6,<2.30
 # Fix issue with xhtml2pdf not working with python-bidi>=0.5
 python-bidi<0.5
 
-superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@async
-superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@async
+# superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@async
+# superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@async
