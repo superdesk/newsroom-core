@@ -4,10 +4,11 @@ from copy import deepcopy
 
 from bson import ObjectId
 from content_api.items.resource import code_mapping
-from eve.utils import ParsedRequest, config
-from flask import json, abort, current_app as app
+from eve.utils import ParsedRequest
 from flask_babel import lazy_gettext
 
+from superdesk.core import json, get_current_app
+from superdesk.flask import abort
 from planning.common import (
     WORKFLOW_STATE_SCHEMA,
     ASSIGNMENT_WORKFLOW_STATE,
@@ -15,6 +16,9 @@ from planning.common import (
 )
 from planning.events.events_schema import events_schema
 from planning.planning.planning import planning_schema
+
+from superdesk.core import get_app_config
+from superdesk.resource_fields import ITEMS
 from superdesk import get_resource_service
 from superdesk.resource import Resource, not_enabled, not_analyzed, not_indexed, string_with_analyzer
 from superdesk.utils import ListCursor
@@ -689,7 +693,7 @@ class AgendaService(BaseSearchService):
 
     @property
     def default_page_size(self) -> int:
-        return app.config.get("AGENDA_PAGE_SIZE", 250)
+        return get_app_config("AGENDA_PAGE_SIZE", 250)
 
     def get_advanced_search_fields(self, search: SearchQuery) -> List[str]:
         fields = super().get_advanced_search_fields(search)
@@ -712,7 +716,7 @@ class AgendaService(BaseSearchService):
         return fields
 
     def on_fetched(self, doc):
-        self.enhance_items(doc[config.ITEMS])
+        self.enhance_items(doc[ITEMS])
 
     def on_fetched_item(self, doc):
         self.enhance_items([doc])
@@ -796,8 +800,8 @@ class AgendaService(BaseSearchService):
         media_coverages = [c for c in completed_coverages if c.get("coverage_type") != "text"]
         for c in media_coverages:
             try:
-                c["deliveries"][0]["delivery_href"] = c["delivery_href"] = app.set_photo_coverage_href(
-                    c, None, c["deliveries"]
+                c["deliveries"][0]["delivery_href"] = c["delivery_href"] = (
+                    get_current_app().as_any().set_photo_coverage_href(c, None, c["deliveries"])
                 )
             except Exception as e:
                 logger.exception(e)
@@ -948,7 +952,7 @@ class AgendaService(BaseSearchService):
                     }
                 }
             )
-        elif app.config.get("AGENDA_DEFAULT_FILTER_HIDE_PLANNING"):
+        elif get_app_config("AGENDA_DEFAULT_FILTER_HIDE_PLANNING"):
             search.query["bool"]["filter"].append(
                 {
                     "bool": {
@@ -1063,7 +1067,7 @@ class AgendaService(BaseSearchService):
         if not filters:
             return
 
-        if app.config.get("FILTER_BY_POST_FILTER", False):
+        if get_app_config("FILTER_BY_POST_FILTER", False):
             source["post_filter"] = {"bool": {}}
             self.set_bool_query_from_filters(source["post_filter"]["bool"], filters, item_type)
 

@@ -1,9 +1,10 @@
 from io import StringIO
 import csv
 
-from flask import session, jsonify, render_template, abort, current_app as newsroom_app
 from flask_babel import gettext, current_app as app
 
+from superdesk.core import get_current_app
+from superdesk.flask import session, jsonify, render_template, abort
 from newsroom.decorator import account_manager_or_company_admin_only
 from newsroom.reports import blueprint
 from newsroom.utils import query_resource
@@ -32,7 +33,7 @@ async def company_reports():
     user_profile_data = await get_user_profile_data()
     data = {
         "companies": companies,
-        "sections": newsroom_app.sections,
+        "sections": get_current_app().as_any().sections,
         "api_enabled": app.config.get("NEWS_API_ENABLED", False),
         "current_user_type": session.get("user_type"),
     }
@@ -72,7 +73,9 @@ def export_reports(report):
 
     csv_file = data.getvalue().encode("utf-8")
 
-    response = newsroom_app.response_class(response=csv_file, status=200, mimetype="text/csv", direct_passthrough=True)
+    response = get_current_app().response_class(
+        response=csv_file, status=200, mimetype="text/csv", direct_passthrough=True
+    )
 
     response.content_length = len(csv_file)
     response.headers["Content-Type"] = "text/csv"

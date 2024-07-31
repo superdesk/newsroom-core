@@ -1,6 +1,6 @@
 from lxml import etree
-from flask import current_app as app
 
+from superdesk.core import get_app_config
 from superdesk.publish.formatters.newsml_g2_formatter import (
     NewsMLG2Formatter as SuperdeskFormatter,
 )
@@ -12,9 +12,9 @@ class NewsroomFormatter(SuperdeskFormatter):
     def _format_rights(self, newsItem, article):
         """Override superdesk implementation which reads it from db."""
         rights = {
-            "copyrightholder": app.config.get("COPYRIGHT_HOLDER", "Newsroom"),
-            "copyrightnotice": app.config.get("COPYRIGHT_NOTICE", ""),
-            "usageterms": app.config.get("USAGE_TERMS", ""),
+            "copyrightholder": get_app_config("COPYRIGHT_HOLDER", "Newsroom"),
+            "copyrightnotice": get_app_config("COPYRIGHT_NOTICE", ""),
+            "usageterms": get_app_config("USAGE_TERMS", ""),
         }
         rightsinfo = etree.SubElement(newsItem, "rightsInfo")
         holder = etree.SubElement(rightsinfo, "copyrightHolder")

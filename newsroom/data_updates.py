@@ -16,9 +16,10 @@ import time
 from string import Template
 from types import ModuleType
 
-from flask import current_app
-import superdesk
 from eve.utils import ParsedRequest
+
+import superdesk
+from superdesk.core import get_current_app, get_app_config
 
 
 DEFAULT_DATA_UPDATE_DIR_NAME = "data_updates"
@@ -62,8 +63,9 @@ DEFAULT_DATA_UPDATE_BW_IMPLEMENTATION = "raise NotImplementedError()"
 def get_dirs(only_relative_folder=False):
     dirs = []
     try:
-        with current_app.app_context():
-            dirs.append(current_app.config.get("DATA_UPDATES_PATH", DEFAULT_DATA_UPDATE_DIR_NAME))
+        app = get_current_app()
+        with app.app_context():
+            dirs.append(get_app_config("DATA_UPDATES_PATH", DEFAULT_DATA_UPDATE_DIR_NAME))
     except RuntimeError:
         # working outside of application context
         pass
@@ -166,7 +168,7 @@ class DataUpdateCommand(superdesk.Command):
 
     def resource_registered(self, module_scope):
         try:
-            current_app.data.get_mongo_collection(module_scope.DataUpdate.resource)
+            get_current_app().data.get_mongo_collection(module_scope.DataUpdate.resource)
             return True
         except KeyError:
             return False
@@ -325,8 +327,12 @@ superdesk.command("data:downgrade", Downgrade())
 
 
 class DataUpdate:
+    resource: str
+
     def apply(self, direction):
         assert direction in ["forwards", "backwards"]
-        collection = current_app.data.get_mongo_collection(self.resource)
-        db = current_app.data.driver.db
+
+        app = get_current_app()
+        collection = app.data.get_mongo_collection(self.resource)
+        db = app.data.driver.db
         getattr(self, direction)(collection, db)

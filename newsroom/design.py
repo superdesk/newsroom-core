@@ -1,7 +1,7 @@
-import flask
 from datetime import datetime, timedelta
+from superdesk.flask import Blueprint, url_for, render_template
 
-blueprint = flask.Blueprint("design", __name__)
+blueprint = Blueprint("design", __name__)
 
 
 @blueprint.route("/design/detail")
@@ -18,7 +18,7 @@ def detail():
         "associations": {
             "featuremedia": {
                 "description_text": "Lorem ipsum etc.",
-                "renditions": {"baseImage": {"href": flask.url_for("static", filename="article_preview.png")}},
+                "renditions": {"baseImage": {"href": url_for("static", filename="article_preview.png")}},
             },
         },
     }
@@ -36,14 +36,14 @@ def detail():
             "body_html": "<p>foo bar</p>",
         },
     ]
-    return flask.render_template("wire_item.html", item=item, previous_versions=previous_versions)
+    return render_template("wire_item.html", item=item, previous_versions=previous_versions)
 
 
 @blueprint.route("/design/")
 def index():
-    return flask.render_template("design_index.html")
+    return render_template("design_index.html")
 
 
 @blueprint.route("/design/<page>")
 def page(page):
-    return flask.render_template("design_%s.html" % page)
+    return render_template("design_%s.html" % page)

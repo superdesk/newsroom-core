@@ -1,6 +1,7 @@
 from os import path
-from flask import Blueprint
 from flask_babel import lazy_gettext
+
+from superdesk.flask import Blueprint
 import superdesk
 
 from newsroom.monitoring import email_alerts  # noqa

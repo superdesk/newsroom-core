@@ -7,7 +7,8 @@ from datetime import datetime
 
 from bson import ObjectId
 from werkzeug.datastructures import MultiDict
-from flask import current_app as app
+
+from superdesk.core import get_app_config
 from superdesk import get_resource_service
 from superdesk.utc import utcnow, local_to_utc
 from superdesk.errors import SuperdeskApiError
@@ -272,11 +273,12 @@ class NewsAPINewsService(BaseSearchService):
 
         :param newsroom.search.SearchQuery search: The search query instance
         """
+        query_max_page_size = get_app_config("QUERY_MAX_PAGE_SIZE")
         if search.args["page"] < 1:
             raise BadParameterValueError("Page number must be greater or equal to 1")
-        elif search.args["page_size"] > app.config["QUERY_MAX_PAGE_SIZE"]:
+        elif search.args["page_size"] > query_max_page_size:
             raise BadParameterValueError(
-                "Requested maximum number of results exceeds {max}".format(max=app.config["QUERY_MAX_PAGE_SIZE"])
+                "Requested maximum number of results exceeds {max}".format(max=query_max_page_size)
             )
         elif (search.args["page"] - 1) * search.args["page_size"] >= 1000:
             # https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html#pagination
@@ -656,7 +658,7 @@ class NewsAPINewsService(BaseSearchService):
 
     @staticmethod
     def _format_date(date):
-        return datetime.strftime(date, app.config["ELASTIC_DATETIME_FORMAT"])
+        return datetime.strftime(date, get_app_config("ELASTIC_DATETIME_FORMAT"))
 
     def on_fetched(self, doc):
         post_api_audit(doc)

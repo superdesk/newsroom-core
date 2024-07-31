@@ -1,4 +1,5 @@
-from flask import request, current_app as app
+from superdesk.core import get_current_app
+from superdesk.flask import request
 from newsroom.auth import get_user_id
 
 
@@ -30,6 +31,7 @@ def update_action_list(items, action_list, force_insert=False, item_type="items"
     """
     user_id = get_user_id()
     if user_id:
+        app = get_current_app()
         db = app.data.get_mongo_collection(item_type)
         elastic = app.data._search_backend(item_type)
         if request.method == "POST" or force_insert:

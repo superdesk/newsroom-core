@@ -1,7 +1,8 @@
-import superdesk
-
-from flask import Blueprint, current_app as newsroom_app, json
 from flask_babel import lazy_gettext
+
+import superdesk
+from superdesk.core import json, get_current_app
+from superdesk.flask import Blueprint
 from newsroom.auth import get_company
 from newsroom.user_roles import UserRole
 from .companies import CompaniesResource, CompaniesService
@@ -12,17 +13,18 @@ blueprint = Blueprint("companies", __name__)
 
 def get_company_sections_monitoring_data(company_id, user):
     """get the section configured for the company"""
+    app = get_current_app().as_any()
     if not company_id or user["user_type"] == UserRole.ADMINISTRATOR.value:
-        return {"userSections": newsroom_app.sections}
+        return {"userSections": app.sections}
 
     company = superdesk.get_resource_service("companies").find_one(req=None, _id=company_id)
 
     rv = {
         "monitoring_administrator": (company or {}).get("monitoring_administrator"),
-        "userSections": newsroom_app.sections,
+        "userSections": app.sections,
     }
     if company and company.get("sections"):
-        rv["userSections"] = [s for s in newsroom_app.sections if company.get("sections").get(s["_id"])]
+        rv["userSections"] = [s for s in app.sections if company.get("sections").get(s["_id"])]
 
     return rv
 

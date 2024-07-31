@@ -1,10 +1,11 @@
 import re
 from typing import List
 
-import flask
 from bson import ObjectId
-from flask import jsonify, current_app
 from flask_babel import gettext
+
+from superdesk.core import get_current_app
+from superdesk.flask import jsonify, request
 from superdesk import get_resource_service
 
 from newsroom.decorator import admin_only, account_manager_only, account_manager_or_company_admin_only
@@ -25,7 +26,9 @@ def get_settings_data():
         "products": list(query_resource("products")),
         "navigations": list(query_resource("navigations")),
         "companies": list(query_resource("companies")),
-        "sections": [s for s in current_app.sections if s.get("_id") != "monitoring"],  # monitoring has no products
+        "sections": [
+            s for s in get_current_app().as_any().sections if s.get("_id") != "monitoring"
+        ],  # monitoring has no products
     }
 
 
@@ -42,8 +45,8 @@ def get_product_ref(product: Product, seats=0) -> ProductRef:
 @admin_only
 def index():
     lookup = None
-    if flask.request.args.get("q"):
-        lookup = flask.request.args.get("q")
+    if request.args.get("q"):
+        lookup = request.args.get("q")
     products = list(query_resource("products", lookup=lookup))
     return jsonify(products), 200
 
@@ -52,8 +55,8 @@ def index():
 @account_manager_or_company_admin_only
 def search():
     lookup = None
-    if flask.request.args.get("q"):
-        regex = re.compile(".*{}.*".format(flask.request.args.get("q")), re.IGNORECASE)
+    if request.args.get("q"):
+        regex = re.compile(".*{}.*".format(request.args.get("q")), re.IGNORECASE)
         lookup = {"name": regex}
     products = list(query_resource("products", lookup=lookup))
     return jsonify(products), 200
@@ -109,7 +112,7 @@ def edit(id):
 @blueprint.route("/products/<id>/companies", methods=["POST"])
 @account_manager_only
 def update_companies(id):
-    updates = flask.request.get_json()
+    updates = request.get_json()
     product = get_entity_or_404(id, "products")
     selected_companies = updates.get("companies") or []
     for company in get_resource_service("companies").get_all():
@@ -144,7 +147,7 @@ def update_companies(id):
 @blueprint.route("/products/<id>/navigations", methods=["POST"])
 @admin_only
 def update_navigations(id):
-    updates = flask.request.get_json()
+    updates = request.get_json()
     if updates.get("navigations"):
         updates["navigations"] = [ObjectId(nav_id) for nav_id in updates["navigations"]]
     get_resource_service("products").patch(id=ObjectId(id), updates=updates)

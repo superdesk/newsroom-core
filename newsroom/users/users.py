@@ -1,16 +1,18 @@
 import pytz
 import bcrypt
-import newsroom
-import superdesk
 from datetime import datetime, date
 from copy import deepcopy
 
 from typing import Dict, Optional, List, TypedDict
-from flask import current_app as app, session, abort, request
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest
-from newsroom.products.types import PRODUCT_TYPES
 
+import superdesk
+from superdesk.core import get_app_config, get_current_app
+from superdesk.flask import session, abort, request
+
+import newsroom
+from newsroom.products.types import PRODUCT_TYPES
 from newsroom.types import Company, ProductRef, User
 from newsroom.auth import get_user_id, get_user, get_company_from_user, SessionAuth
 from newsroom.auth.utils import get_company, get_company_auth_provider, add_token_data, send_token
@@ -295,6 +297,7 @@ class UsersService(newsroom.Service):
             updates["sections"] = get_updated_sections(updates, original, company)
             updates["products"] = get_updated_products(updates, original, company)
 
+        app = get_current_app().as_any()
         app.cache.delete(str(original.get("_id")))
         app.cache.delete(original.get("email"))
 
@@ -310,11 +313,13 @@ class UsersService(newsroom.Service):
         notification_schedule = deepcopy(user["notification_schedule"])
         notification_schedule["last_run_time"] = run_time
         self.update(user["_id"], {"notification_schedule": notification_schedule}, user)
+
+        app = get_current_app().as_any()
         app.cache.delete(str(user["_id"]))
         app.cache.delete(user.get("email"))
 
     def _get_password_hash(self, password):
-        return get_hash(password, app.config.get("BCRYPT_GENSALT_WORK_FACTOR", 12))
+        return get_hash(password, get_app_config("BCRYPT_GENSALT_WORK_FACTOR", 12))
 
     def password_match(self, password, hashed_password):
         """Return true if the given password matches the hashed password
@@ -327,7 +332,7 @@ class UsersService(newsroom.Service):
             return False
 
     def on_deleted(self, doc):
-        app.cache.delete(str(doc.get("_id")))
+        get_current_app().as_any().cache.delete(str(doc.get("_id")))
         user_deleted.send(self, user=doc)
 
     def on_delete(self, doc):
@@ -408,7 +413,7 @@ class UsersService(newsroom.Service):
 
     def user_has_paused_notifications(self, user: User) -> bool:
         schedule = user.get("notification_schedule") or {}
-        timezone = pytz.timezone(schedule.get("timezone") or app.config.get("DEFAULT_TIMEZONE") or "UTC")
+        timezone = pytz.timezone(schedule.get("timezone") or get_app_config("DEFAULT_TIMEZONE") or "UTC")
         pause_from = schedule.get("pause_from")
         pause_to = schedule.get("pause_to")
         if pause_from and pause_to:

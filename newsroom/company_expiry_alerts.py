@@ -11,7 +11,7 @@
 import datetime
 import logging
 
-from superdesk import config
+from superdesk.resource_fields import ID_FIELD
 from superdesk import get_resource_service
 from superdesk.utc import utcnow
 from superdesk.celery_task_utils import get_lock_id
@@ -61,9 +61,7 @@ class CompanyExpiryAlerts:
         if len(companies) > 0:
             # Send notifications to users who are nominated to receive expiry alerts
             for company in companies:
-                users = get_resource_service("users").find(
-                    {"company": company.get(config.ID_FIELD), "expiry_alert": True}
-                )
+                users = get_resource_service("users").find({"company": company.get(ID_FIELD), "expiry_alert": True})
                 if len(list(users)) > 0:
                     template_kwargs = {
                         "expiry_date": company.get("expiry_date"),

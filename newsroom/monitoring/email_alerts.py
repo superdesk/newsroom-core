@@ -14,8 +14,9 @@ import logging
 from bson import ObjectId
 from urllib.parse import urlparse
 
-from flask import current_app as app
 from eve.utils import ParsedRequest
+
+from superdesk.core import get_app_config, get_current_app
 from superdesk import get_resource_service, Command
 from superdesk.utc import utcnow, utc_to_local, local_to_utc
 from superdesk.celery_task_utils import get_lock_id
@@ -53,9 +54,10 @@ class MonitoringEmailAlerts(Command):
             return
 
         try:
-            now_local = utc_to_local(app.config["DEFAULT_TIMEZONE"], utcnow())
-            app.config["SERVER_NAME"] = urlparse(app.config["CLIENT_URL"]).netloc or None
-            celery.conf["SERVER_NAME"] = app.config["SERVER_NAME"]
+            now_local = utc_to_local(get_app_config("DEFAULT_TIMEZONE"), utcnow())
+            get_current_app().config["SERVER_NAME"] = celery.conf["SERVER_NAME"] = (
+                urlparse(get_app_config("CLIENT_URL")).netloc or None
+            )
 
             now_to_minute = now_local.replace(second=0, microsecond=0)
 
@@ -72,10 +74,11 @@ class MonitoringEmailAlerts(Command):
 
     def immediate_worker(self, now):
         last_minute = now - datetime.timedelta(minutes=1)
+        default_timezone = get_app_config("DEFAULT_TIMEZONE")
         self.send_alerts(
             self.get_immediate_monitoring_list(),
-            local_to_utc(app.config["DEFAULT_TIMEZONE"], last_minute).strftime("%Y-%m-%d"),
-            local_to_utc(app.config["DEFAULT_TIMEZONE"], last_minute).strftime("%H:%M:%S"),
+            local_to_utc(default_timezone, last_minute).strftime("%Y-%m-%d"),
+            local_to_utc(default_timezone, last_minute).strftime("%H:%M:%S"),
             now,
         )
 
@@ -103,11 +106,12 @@ class MonitoringEmailAlerts(Command):
         yesterday = now - datetime.timedelta(days=1)
         last_week = now - datetime.timedelta(days=7)
 
-        one_hours_ago_utc = local_to_utc(app.config["DEFAULT_TIMEZONE"], one_hour_ago)
-        two_hours_ago_utc = local_to_utc(app.config["DEFAULT_TIMEZONE"], two_hours_ago)
-        four_hours_ago_utc = local_to_utc(app.config["DEFAULT_TIMEZONE"], four_hours_ago)
-        yesterday_utc = local_to_utc(app.config["DEFAULT_TIMEZONE"], yesterday)
-        last_week_utc = local_to_utc(app.config["DEFAULT_TIMEZONE"], last_week)
+        default_timezone = get_app_config("DEFAULT_TIMEZONE")
+        one_hours_ago_utc = local_to_utc(default_timezone, one_hour_ago)
+        two_hours_ago_utc = local_to_utc(default_timezone, two_hours_ago)
+        four_hours_ago_utc = local_to_utc(default_timezone, four_hours_ago)
+        yesterday_utc = local_to_utc(default_timezone, yesterday)
+        last_week_utc = local_to_utc(default_timezone, last_week)
 
         alert_monitoring = {
             "one": {
@@ -170,13 +174,14 @@ class MonitoringEmailAlerts(Command):
         last_week,
     ):
         last_run_time = parse_date_str(profile["last_run_time"]) if profile.get("last_run_time") else None
+        default_timezone = get_app_config("DEFAULT_TIMEZONE")
         if last_run_time:
-            last_run_time = utc_to_local(app.config["DEFAULT_TIMEZONE"], last_run_time)
+            last_run_time = utc_to_local(default_timezone, last_run_time)
 
         # Convert time to current date for range comparision
         if profile["schedule"].get("time"):
             hour_min = profile["schedule"]["time"].split(":")
-            schedule_today_plus_five_mins = utc_to_local(app.config["DEFAULT_TIMEZONE"], utcnow())
+            schedule_today_plus_five_mins = utc_to_local(default_timezone, utcnow())
             schedule_today_plus_five_mins = schedule_today_plus_five_mins.replace(
                 hour=int(hour_min[0]), minute=int(hour_min[1])
             )
@@ -258,7 +263,7 @@ class MonitoringEmailAlerts(Command):
                         truncate_article_body(items, m)
                         _file = get_monitoring_file(m, items)
                         attachment = base64.b64encode(_file.read())
-                        formatter = app.download_formatters[m["format_type"]]["formatter"]
+                        formatter = get_current_app().as_any().download_formatters[m["format_type"]]["formatter"]
 
                         for user in users:
                             send_user_email(
@@ -305,7 +310,7 @@ class MonitoringEmailAlerts(Command):
 
             get_resource_service("monitoring").patch(
                 m["_id"],
-                {"last_run_time": local_to_utc(app.config["DEFAULT_TIMEZONE"], now)},
+                {"last_run_time": local_to_utc(get_app_config("DEFAULT_TIMEZONE"), now)},
             )
 
 

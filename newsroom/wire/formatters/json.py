@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from flask import json
+from superdesk.core import json
 from planning.output_formatters.json_event import JsonEventFormatter
 from planning.output_formatters.utils import expand_contact_info
 

@@ -1,8 +1,8 @@
 import mimetypes
 
+from superdesk.core import get_app_config
 from newsroom.wire.formatters.base import BaseFormatter
 from newsroom.wire.utils import get_picture
-from flask import current_app as app
 
 
 class PictureFormatter(BaseFormatter):
@@ -29,7 +29,7 @@ class PictureFormatter(BaseFormatter):
             raise ValueError("Undefined picture")
 
         renditions = picture.get("renditions", {})
-        picture_details = renditions.get(app.config.get("DOWNLOAD_RENDITION")) or renditions.get("baseImage", {})
+        picture_details = renditions.get(get_app_config("DOWNLOAD_RENDITION")) or renditions.get("baseImage", {})
 
         if picture_details is None:
             raise ValueError("Unable to find picture renditions")

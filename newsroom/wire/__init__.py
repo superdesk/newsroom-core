@@ -1,9 +1,8 @@
-import superdesk
-
-from flask import Blueprint, url_for
 from flask_babel import lazy_gettext
 from content_api.items.resource import code_mapping
 
+import superdesk
+from superdesk.flask import Blueprint, url_for
 from newsroom.factory.app import BaseNewsroomApp
 from newsroom.wire.search import WireSearchResource, WireSearchService
 from newsroom.search.config import init_nested_aggregation

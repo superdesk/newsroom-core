@@ -1,8 +1,9 @@
 from typing import List, Dict
 from copy import deepcopy
 
-from flask import current_app as app
 from bson import ObjectId
+
+from superdesk.core import get_app_config
 import superdesk
 
 from content_api.items.resource import ItemsResource as BaseItemsResource
@@ -79,7 +80,7 @@ def get_items_for_dashboard(
     ``PUBLIC_WIRE_ALLOWED_FIELDS`` config
     """
 
-    allowed_public_fields = app.config.get("PUBLIC_WIRE_ALLOWED_FIELDS", [])
+    allowed_public_fields = get_app_config("PUBLIC_WIRE_ALLOWED_FIELDS", [])
 
     if len(allowed_public_fields) == 0:
         filter_public_fields = False

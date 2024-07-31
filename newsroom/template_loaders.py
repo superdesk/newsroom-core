@@ -1,21 +1,22 @@
 from contextlib import contextmanager
 
-import flask
 import jinja2
 
 from typing import Optional
 from flask_babel import get_locale, get_timezone, _get_current_context, Locale, force_locale
 import pytz
 
+from superdesk.flask import g
+
 TEMPLATE_LOCALE = "template_locale"
 
 
 def set_template_locale(language: Optional[str] = None) -> None:
-    setattr(flask.g, TEMPLATE_LOCALE, language)
+    setattr(g, TEMPLATE_LOCALE, language)
 
 
 def get_template_locale() -> Optional[str]:
-    return getattr(flask.g, TEMPLATE_LOCALE, None)
+    return getattr(g, TEMPLATE_LOCALE, None)
 
 
 def noop():

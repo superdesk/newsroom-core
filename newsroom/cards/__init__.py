@@ -1,8 +1,8 @@
-import superdesk
-from flask import Blueprint
 from flask_babel import lazy_gettext
 from typing_extensions import assert_never
 
+import superdesk
+from superdesk.flask import Blueprint
 from newsroom.types import DashboardCardType
 
 from .cards import CardsResource, CardsService

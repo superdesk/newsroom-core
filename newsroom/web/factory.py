@@ -1,5 +1,6 @@
 import os
-import flask
+
+from newsroom.flask import send_from_directory
 
 from newsroom.auth import get_user
 from newsroom.commands.cli import newsroom_cli
@@ -190,7 +191,7 @@ class NewsroomWebApp(BaseNewsroomApp):
 
     def send_theme_file(self, filename):
         if os.path.exists(os.path.join(self.theme_folder, filename)):
-            return flask.send_from_directory(self.theme_folder, filename)
+            return send_from_directory(self.theme_folder, filename)
         return self.send_static_file(filename)
 
     def section(self, _id, name, group, search_type=None):

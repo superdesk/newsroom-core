@@ -1,9 +1,9 @@
 from typing import List, Dict, Optional, Any
 from copy import deepcopy
 
-from flask import json
 from eve.utils import ParsedRequest
 
+from superdesk.core import json
 from superdesk import get_resource_service
 from superdesk.lock import lock, unlock
 

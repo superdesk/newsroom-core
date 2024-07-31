@@ -3,9 +3,10 @@ import logging
 
 from typing import List, Set, Dict, Any, Generator
 from datetime import datetime, timedelta
-from flask import current_app as app, json
-from eve.utils import ParsedRequest, date_to_str, config
+from eve.utils import ParsedRequest, date_to_str
 
+from superdesk.core import json, get_app_config
+from superdesk.resource_fields import ID_FIELD
 from superdesk import get_resource_service
 from superdesk.lock import lock, unlock
 from superdesk.utc import utcnow
@@ -32,7 +33,7 @@ def remove_expired_agenda(expiry_days=None):
         $ python manage.py remove_expired_agenda --expiry 60
     """
 
-    num_of_days = int(expiry_days) if expiry_days is not None else app.config.get("AGENDA_EXPIRY_DAYS", 0)
+    num_of_days = int(expiry_days) if expiry_days is not None else get_app_config("AGENDA_EXPIRY_DAYS", 0)
 
     if num_of_days == 0:
         logger.info("Expiry days is set to 0, therefor no items will be removed")
@@ -65,7 +66,7 @@ def _remove_expired_items(now: datetime, expiry_days: int):
         items_to_remove: Set[str] = set()
 
         for item in expired_items:
-            item_id = item[config.ID_FIELD]
+            item_id = item[ID_FIELD]
             logger.info(f"Processing expired item {item_id}")
             for child_id in _get_expired_chain_ids(item, expiry_datetime):
                 items_to_remove.add(child_id)
@@ -73,7 +74,7 @@ def _remove_expired_items(now: datetime, expiry_days: int):
         if len(items_to_remove):
             logger.info(f"Deleting items: {items_to_remove}")
             num_items_removed += len(items_to_remove)
-            agenda_service.delete_action(lookup={config.ID_FIELD: {"$in": list(items_to_remove)}})
+            agenda_service.delete_action(lookup={ID_FIELD: {"$in": list(items_to_remove)}})
 
     logger.info("Finished removing expired items from agenda collection")
     return num_items_removed
@@ -85,7 +86,7 @@ def _get_expired_items(
     """Get the expired items, based on ``expiry_datetime``"""
 
     agenda_service = get_resource_service("agenda")
-    max_loops = app.config.get("MAX_EXPIRY_LOOPS", 50)
+    max_loops = get_app_config("MAX_EXPIRY_LOOPS", 50)
     for i in range(max_loops):  # avoid blocking forever just in case
         req = ParsedRequest()
         expiry_datetime_str = date_to_str(expiry_datetime)
@@ -131,7 +132,7 @@ def _get_expired_items(
                         },
                     },
                     "sort": [{"dates.start": "asc"}],
-                    "size": app.config.get("MAX_EXPIRY_QUERY_LIMIT", 100),
+                    "size": get_app_config("MAX_EXPIRY_QUERY_LIMIT", 100),
                 }
             ),
         }
@@ -164,18 +165,18 @@ def _get_expired_chain_ids(parent: Dict[str, Any], expiry_datetime: datetime) ->
     """
 
     item_type = get_item_type(parent)
-    plan_ids = [plan.get(config.ID_FIELD) for plan in (parent.get("planning_items") or [])]
+    plan_ids = [plan.get(ID_FIELD) for plan in (parent.get("planning_items") or [])]
 
     if item_type == AGENDA_ITEM_TYPE.PLANNING:
-        return [] if not has_plan_expired(parent, expiry_datetime) else [parent[config.ID_FIELD]]
+        return [] if not has_plan_expired(parent, expiry_datetime) else [parent[ID_FIELD]]
     elif not len(plan_ids):
-        return [parent[config.ID_FIELD]]
+        return [parent[ID_FIELD]]
 
     agenda_service = get_resource_service("agenda")
-    items: List[str] = [parent[config.ID_FIELD]]
-    for plan in agenda_service.find(where={config.ID_FIELD: {"$in": plan_ids}}):
+    items: List[str] = [parent[ID_FIELD]]
+    for plan in agenda_service.find(where={ID_FIELD: {"$in": plan_ids}}):
         if not has_plan_expired(plan, expiry_datetime):
             return []
-        items.append(plan[config.ID_FIELD])
+        items.append(plan[ID_FIELD])
 
     return items

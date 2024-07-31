@@ -1,7 +1,6 @@
-import superdesk
-
-from flask import Blueprint
 from flask_babel import lazy_gettext
+import superdesk
+from superdesk.flask import Blueprint
 
 
 from .users import AuthUserService, UsersResource, AuthUserResource, users_service

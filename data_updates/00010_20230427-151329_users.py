@@ -7,7 +7,7 @@
 # Author  : marklark
 # Creation: 2023-04-27 15:13
 
-from eve.utils import config
+from superdesk.resource_fields import ID_FIELD
 from superdesk import get_resource_service
 from superdesk.commands.data_updates import DataUpdate as _DataUpdate
 
@@ -45,7 +45,7 @@ class DataUpdate(_DataUpdate):
                 }
 
             if updates:
-                print(mongodb_collection.update({config.ID_FIELD: user.get(config.ID_FIELD)}, {"$set": updates}))
+                print(mongodb_collection.update({ID_FIELD: user.get(ID_FIELD)}, {"$set": updates}))
 
     def backwards(self, mongodb_collection, mongodb_database):
         pass
