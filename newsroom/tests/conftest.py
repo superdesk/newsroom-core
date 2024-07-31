@@ -92,12 +92,10 @@ async def app_async(app):
 @fixture
 def client_async(app: BaseNewsroomApp, client):
     if client:
-        print("*" * 100)
         pass
 
     asgi_app = WsgiToAsgi(app)
     client_async = AsyncTestClient(app, asgi_app)
-    client_async.set_cookie("newsroom_session", client.get_cookie("newsroom_session").value)
     return client_async
 
 

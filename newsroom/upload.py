@@ -3,15 +3,15 @@ import os
 from pydantic import BaseModel
 import newsroom
 import bson.errors
-from typing import cast
+from typing import Any, Mapping, Optional, Sequence, cast
 
-from werkzeug.wsgi import wrap_file
 from werkzeug.utils import secure_filename
+from motor.motor_asyncio import AsyncIOMotorGridOut
 
 from superdesk.core.module import Module
 from superdesk.upload import upload_url as _upload_url
 from superdesk.core import get_current_app, get_app_config
-from superdesk.core.web import Response, EndpointGroup
+from superdesk.core.web import Response, EndpointGroup, Request
 from superdesk.flask import request, url_for, Blueprint, abort
 from superdesk.core.elastic.common import ElasticResourceConfig
 from superdesk.core.resources import ResourceModel, ResourceConfig
@@ -45,56 +45,46 @@ async def get_media_file(media_id):
         return None
 
 
-def construct_response(media_file):
-    app = get_current_app()
-    data = wrap_file(request.environ, media_file, buffer_size=1024 * 256)
-
-    response = app.response_class(data, mimetype=media_file.content_type, direct_passthrough=True)
-    response.content_length = media_file.length
-    response.last_modified = media_file.upload_date
-    response.set_etag(media_file.md5)
-    response.cache_control.max_age = CACHE_MAX_AGE
-    response.cache_control.s_max_age = CACHE_MAX_AGE
-    response.cache_control.public = True
-    response.make_conditional(request, accept_ranges=True, complete_length=media_file.length)
-
-    return response
-
-
-def set_filename_in_response(response, filename, media_file):
+def get_content_disposition(filename: Optional[str], metadata: Mapping[str, Any] = {}) -> str:
     if filename:
         _filename, ext = os.path.splitext(filename)
         if not ext:
-            ext = guess_media_extension(media_file.content_type)
+            ext = guess_media_extension(metadata.get("contentType"))
         filename = secure_filename(f"{_filename}{ext}")
-        response.headers["Content-Disposition"] = f'attachment; filename="{filename}"'
-    else:
-        response.headers["Content-Disposition"] = "inline"
+        return f'attachment; filename="{filename}"'
+
+    return "inline"
+
+
+def generate_response_headers(media_file: AsyncIOMotorGridOut) -> Sequence:
+    metadata = media_file.metadata or {}
+
+    return [
+        ("Content-Disposition", get_content_disposition(media_file.filename, metadata)),
+        ("Last-Modified", media_file.upload_date),
+        ("Cache-Control", f"max-age={CACHE_MAX_AGE}, public"),
+        ("Content-Type", metadata.get("contentType", media_file.content_type))
+        # TODO:
+        # - set etag which not sure if it's required
+        # - find alternative to response.make_conditional(request, accept_ranges=True, complete_length=media_file.length)
+    ]
 
 
 class RouteArguments(BaseModel):
     media_id: str
 
-@upload_endpoints.endpoint("/assets/<string:media_id>", methods=["GET"])
-async def get_upload(args: RouteArguments, _p, _r) -> Response:
-    print('*' * 100)
-    print(args)
 
+@upload_endpoints.endpoint("/assets/<string:media_id>", methods=["GET"])
+async def get_upload(args: RouteArguments, _p, request: Request) -> Response:
     # if not get_app_config("PUBLIC_DASHBOARD") and not is_valid_session():
     #     return clear_session_and_redirect_to_login()
 
     media_file = await get_media_file(args.media_id)
     if not media_file:
-        abort(404)
-
-    # import pdb; pdb.set_trace()
+        return await request.abort(404)
 
     content = await media_file.read()
-
-    # response = construct_response(media_file)
-    # filename = request.args.get("filename")
-    # set_filename_in_response(response, filename, media_file)
-    return Response(content, 200, ())
+    return Response(content, 200, generate_response_headers(media_file))
 
 
 def upload_url(media_id):

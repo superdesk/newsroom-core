@@ -1,35 +1,38 @@
-async def test_valid_media_request(client_async, app):
-    media_id = await app.media_async.put(
-        b"This is the content", content_type="plain/text", filename="foo")
+"""
+Test "dot image" generated with PIL
 
+image = Image.new('RGBA', (1, 1), (0, 0, 0, 255)) # RGBA: black dot
+byte_arr = io.BytesIO()
+image.save(byte_arr, format='PNG')
+image_content = byte_arr.getvalue()
+"""
+
+TEST_PNG_BLACK_DOT = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\rIDATx\x9cc```\xf8\x0f\x00\x01\x04\x01\x00_\xe5\xc3K\x00\x00\x00\x00IEND\xaeB`\x82"
+
+
+async def save_black_dot_image(app):
+    media_id = await app.media_async.put(TEST_PNG_BLACK_DOT, content_type="image/png", filename="image.png")
+    return media_id
+
+
+async def test_valid_media_request(client_async, app):
+    media_id = await save_black_dot_image(app)
     response = await client_async.get(f"/assets/{media_id}")
 
-    # import pdb
-
-    # pdb.set_trace()
-
     assert response.status_code == 200
-    assert response.content_type == "plain/text"
+    assert response.content_type == "image/png"
     assert "Content-Disposition" in response.headers
 
 
-# def test_media_not_found(client):
-#     media_id = "nonexistent_media_id"
-#     response = client.get(f"/assets/{media_id}")
-#     assert response.status_code == 404
+def test_media_not_found(client):
+    media_id = "nonexistent_media_id"
+    response = client.get(f"/assets/{media_id}")
+    assert response.status_code == 404
 
 
-# def test_filename_in_response_header(client, app):
-#     media_id = app.media.put(b"File content", content_type="plain/text")
+async def test_filename_in_response_header(client_async, app):
+    media_id = await app.media_async.put(b"Plain text content", content_type="plain/text", filename="testfile.txt")
 
-#     response = client.get(f"/assets/{media_id}?filename=testfile.txt")
-#     assert response.status_code == 200
-#     assert response.headers["Content-Disposition"] == 'attachment; filename="testfile.txt"'
-
-
-# def test_content_disposition_inline(client, app):
-#     media_id = app.media.put(b"Sample content", content_type="image/jpeg")
-
-#     response = client.get(f"/assets/{media_id}")
-#     assert response.status_code == 200
-#     assert "inline" in response.headers["Content-Disposition"]
+    response = await client_async.get(f"/assets/{media_id}?filename=testfile.txt")
+    assert response.status_code == 200
+    assert response.headers["Content-Disposition"] == 'attachment; filename="testfile.txt"'
