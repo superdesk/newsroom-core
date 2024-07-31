@@ -97,7 +97,9 @@ def clear_session_timezone():
 
 def setup_babel(app):
     babel = Babel(app)
-    babel.init_app(app, locale_selector=get_session_locale, timezone_selector=get_session_timezone)
+
+    babel.locale_selector_func = get_session_locale
+    babel.timezone_selector_func = get_session_timezone
 
     app.add_template_global(get_client_translations)
     app.add_template_global(get_client_locales)
