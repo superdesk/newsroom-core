@@ -2,7 +2,6 @@ from pydantic import BaseModel
 
 from superdesk.core import get_app_config
 from superdesk.core.web import Response, Request
-from superdesk.upload import upload_url as _upload_url
 
 from .module import assets_endpoints
 from .utils import generate_response_headers, get_media_file
@@ -25,7 +24,3 @@ async def get_upload(args: RouteArguments, _p, request: Request) -> Response:
 
     content = await media_file.read()
     return Response(content, 200, generate_response_headers(media_file))
-
-
-def upload_url(media_id):
-    return _upload_url(media_id, view="assets.get_media_streamed")

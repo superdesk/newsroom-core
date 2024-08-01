@@ -7,6 +7,7 @@ from typing import Any, Mapping, Optional, Sequence, cast
 
 from superdesk.core import get_current_app
 from superdesk.flask import request, url_for
+from superdesk.upload import upload_url as _upload_url
 from superdesk.media.media_operations import guess_media_extension
 
 from .module import ASSETS_RESOURCE
@@ -57,3 +58,7 @@ def get_file(key):
         filename = secure_filename(file.filename)
         get_current_app().media.put(file, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type)
         return url_for("upload.get_upload", media_id=filename)
+
+
+def upload_url(media_id: str):
+    return _upload_url(media_id, view="assets.get_media_streamed")
