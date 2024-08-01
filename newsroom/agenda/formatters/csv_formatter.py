@@ -1,13 +1,16 @@
-from newsroom.formatter import BaseFormatter
+from typing import List, Dict, Any, Union, Tuple, Optional
+from datetime import datetime
+
 import csv
 import io
 import arrow
+
 from werkzeug.utils import secure_filename
+
+from superdesk.core import get_app_config
+from newsroom.formatter import BaseFormatter
 from newsroom.utils import parse_dates
-from datetime import datetime
-from typing import List, Dict, Any, Union, Tuple, Optional
 from newsroom.agenda.utils import get_filtered_subject
-from flask import current_app as app
 
 
 class CSVFormatter(BaseFormatter):
@@ -42,7 +45,7 @@ class CSVFormatter(BaseFormatter):
         return csv_string.getvalue().encode("utf-8")
 
     def format_event(self, item: Dict[str, Any]) -> Dict[str, Any]:
-        subj_schemas = app.config.get("AGENDA_CSV_SUBJECT_SCHEMES", [])
+        subj_schemas = get_app_config("AGENDA_CSV_SUBJECT_SCHEMES", [])
         event = item.get("event", {})
         event["subject"] = get_filtered_subject(event.get("subject", []), subj_schemas)
         return {

@@ -12,8 +12,8 @@ from authlib.integrations.flask_oauth2 import AuthorizationServer
 from authlib.oauth2.rfc6749 import grants
 from authlib.jose import jwt
 from bson import ObjectId
-import flask
-from flask import request
+
+from superdesk.flask import request, Blueprint
 from .models import query_client, save_token
 from newsroom.utils import get_cached_resource_by_id
 import superdesk
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 authorization = AuthorizationServer(query_client=query_client, save_token=save_token)
 
 
-blueprint = flask.Blueprint("auth_server", __name__)
+blueprint = Blueprint("auth_server", __name__)
 
 TOKEN_ENDPOINT = "/api/auth_server/token"
 shared_secret = None

@@ -7,6 +7,7 @@ import regex
 from typing import List, Dict, Any, Optional, Union
 from pymongo.cursor import Cursor as MongoCursor
 
+from superdesk.core import get_app_config
 import superdesk
 from superdesk.utc import utcnow
 from superdesk.json_utils import try_cast
@@ -16,11 +17,13 @@ from superdesk.core.web import Request
 
 from bson import ObjectId
 from bson.errors import InvalidId
-from eve.utils import config, ParsedRequest
+from eve.utils import ParsedRequest
 from eve_elastic.elastic import parse_date, ElasticCursor
-from flask import current_app as app, json, abort, request, g, flash, session, url_for
 from flask_babel import gettext, format_date as _format_date
 
+from superdesk.core import json, get_current_app
+from superdesk.flask import abort, request, g, session, url_for
+from newsroom.flask import flash
 from newsroom.types import PublicUserData, User, Company, Group, Permissions
 from newsroom.template_filters import (
     time_short,
@@ -48,12 +51,12 @@ def query_resource(
     req.max_results = max_results
     req.sort = sort
     req.projection = json.dumps(projection) if projection else None
-    cursor, count = app.data.find(resource, req, lookup, perform_count=False)
+    cursor, count = get_current_app().data.find(resource, req, lookup, perform_count=False)
     return cursor
 
 
 def find_one(resource, **lookup):
-    return app.data.find_one(resource, req=None, **lookup)
+    return get_current_app().data.find_one(resource, req=None, **lookup)
 
 
 def get_random_string():
@@ -65,7 +68,7 @@ def json_serialize_datetime_objectId(obj):
     Serialize so that objectid and date are converted to appropriate format.
     """
     if isinstance(obj, datetime):
-        return str(datetime.strftime(obj, config.DATE_FORMAT))
+        return str(datetime.strftime(obj, get_app_config("DATE_FORMAT")))
 
     if isinstance(obj, ObjectId):
         return str(obj)
@@ -115,7 +118,7 @@ def get_entity_or_404(_id, resource):
 
 def get_entities_elastic_or_mongo_or_404(_ids, resource):
     """Finds item in elastic search as fist preference. If not configured, finds from mongo"""
-    elastic = app.data._search_backend(resource)
+    elastic = get_current_app().data._search_backend(resource)
     items = []
     if elastic:
         for id in _ids:
@@ -295,7 +298,7 @@ def is_company_enabled(user, company=None):
 
 
 def is_company_expired(user=None, company=None):
-    if app.config.get("ALLOW_EXPIRED_COMPANY_LOGINS"):
+    if get_app_config("ALLOW_EXPIRED_COMPANY_LOGINS"):
         return False
     elif user and not user.get("company"):
         return False if is_admin(user) else True
@@ -316,7 +319,7 @@ def is_account_enabled(user):
     if user.get("is_approved") is False:
         account_created = user.get("_created")
 
-        approve_expiration = utcnow() + timedelta(days=-app.config.get("NEW_ACCOUNT_ACTIVE_DAYS", 14))
+        approve_expiration = utcnow() + timedelta(days=-get_app_config("NEW_ACCOUNT_ACTIVE_DAYS", 14))
         if not account_created or account_created < approve_expiration:
             flash(gettext("Account has not been approved"), "danger")
             return False
@@ -343,7 +346,7 @@ def get_user_dict(use_globals: bool = True) -> Dict[str, User]:
 
     if not use_globals:
         return _get_users()
-    elif "user_dict" not in g or app.testing:
+    elif "user_dict" not in g or get_current_app().testing:
         user_dict = _get_users()
         g.user_dict = user_dict
     return g.user_dict
@@ -370,7 +373,7 @@ def get_company_dict(use_globals: bool = True) -> Dict[str, Company]:
 
     if not use_globals:
         return _get_companies()
-    elif "company_dict" not in g or app.testing:
+    elif "company_dict" not in g or get_current_app().testing:
         g.company_dict = _get_companies()
     return g.company_dict
 
@@ -384,6 +387,7 @@ def get_cached_resource_by_id(resource, _id, black_list_keys=None):
     :param _id: id
     :param set black_list_keys: black list of keys to exclude from the document.
     """
+    app = get_current_app().as_any()
     item = app.cache.get(str(_id))
     if item:
         return loads(item)
@@ -442,7 +446,9 @@ def update_user_last_active(user):
         # Set the cached version of the user
         user["last_active"] = current_time
         user["is_validated"] = True
-        app.cache.set(str(user["_id"]), json.dumps(user, default=json_serialize_datetime_objectId))
+        get_current_app().as_any().cache.set(
+            str(user["_id"]), json.dumps(user, default=json_serialize_datetime_objectId)
+        )
         # Set the db version of the user
         superdesk.get_resource_service("users").system_update(
             ObjectId(user["_id"]), {"last_active": current_time, "is_validated": True}, user
@@ -457,7 +463,7 @@ def get_items_by_id(ids, resource):
 
 
 def get_vocabulary(id):
-    vocabularies = app.data.pymongo("items").db.vocabularies
+    vocabularies = get_current_app().data.pymongo("items").db.vocabularies
     if vocabularies is not None and vocabularies.count_documents({}) > 0 and id:
         return vocabularies.find_one({"_id": id})
 

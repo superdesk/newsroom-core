@@ -1,7 +1,7 @@
 from behave import then, when
-from flask import json
 from wooper.expect import expect_status_in
 
+from superdesk.core import json
 from superdesk.tests.steps import (
     assert_200,
     get_json_data,

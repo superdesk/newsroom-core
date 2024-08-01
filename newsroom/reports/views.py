@@ -1,14 +1,16 @@
 from io import StringIO
 import csv
 
-from flask import session, jsonify, render_template, abort, current_app as newsroom_app
 from flask_babel import gettext, current_app as app
 
+from superdesk.core import get_current_app
+from superdesk.flask import session, jsonify, render_template, abort
 from newsroom.decorator import account_manager_or_company_admin_only
 from newsroom.reports import blueprint
 from newsroom.utils import query_resource
 
 from .utils import get_current_user_reports
+from newsroom.users import get_user_profile_data
 
 
 @blueprint.route("/reports/print/<report>", methods=["GET"])
@@ -26,15 +28,18 @@ def print_reports(report):
 
 @blueprint.route("/reports/company_reports", methods=["GET"])
 @account_manager_or_company_admin_only
-def company_reports():
+async def company_reports():
     companies = list(query_resource("companies"))
+    user_profile_data = await get_user_profile_data()
     data = {
         "companies": companies,
-        "sections": newsroom_app.sections,
+        "sections": get_current_app().as_any().sections,
         "api_enabled": app.config.get("NEWS_API_ENABLED", False),
         "current_user_type": session.get("user_type"),
     }
-    return render_template("company_reports.html", setting_type="company_reports", data=data)
+    return render_template(
+        "company_reports.html", setting_type="company_reports", data=data, user_profile_data=user_profile_data
+    )
 
 
 @blueprint.route("/reports/<report>", methods=["GET"])
@@ -68,7 +73,9 @@ def export_reports(report):
 
     csv_file = data.getvalue().encode("utf-8")
 
-    response = newsroom_app.response_class(response=csv_file, status=200, mimetype="text/csv", direct_passthrough=True)
+    response = get_current_app().response_class(
+        response=csv_file, status=200, mimetype="text/csv", direct_passthrough=True
+    )
 
     response.content_length = len(csv_file)
     response.headers["Content-Type"] = "text/csv"

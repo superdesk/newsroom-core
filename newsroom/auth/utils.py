@@ -1,12 +1,15 @@
 import bson
-import flask
 import werkzeug
-import superdesk
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Optional, TypedDict, Union
-from flask import current_app as app
 from flask_babel import _
+
+import superdesk
+from superdesk.core import get_current_app, get_app_config
+from superdesk.flask import session, redirect, url_for
+
+from newsroom.flask import flash
 from newsroom.auth.providers import AuthProvider
 from newsroom.exceptions import AuthorizationError
 from newsroom.user_roles import UserRole
@@ -52,9 +55,9 @@ def sign_user_by_email(
         assert "_id" in user
 
     def redirect_with_error(error_str):
-        flask.session.pop("_flashes", None)
-        flask.flash(error_str, "danger")
-        return flask.redirect(flask.url_for(redirect_on_error, user_error=1))
+        session.pop("_flashes", None)
+        flash(error_str, "danger")
+        return redirect(url_for(redirect_on_error, user_error=1))
 
     if user is None:
         return redirect_with_error(_("User not found"))
@@ -90,9 +93,7 @@ def sign_user_by_email(
     return redirect_to_next_url(redirect_on_success)
 
 
-def start_user_session(user: User, permanent=False, session=None):
-    if session is None:
-        session = flask.session
+def start_user_session(user: User, permanent=False):
     session["user"] = str(user["_id"])  # str to avoid serialization issues
     session["name"] = "{} {}".format(user.get("first_name"), user.get("last_name"))
     session["user_type"] = user["user_type"]
@@ -100,9 +101,7 @@ def start_user_session(user: User, permanent=False, session=None):
     session.permanent = permanent
 
 
-def clear_user_session(session=None):
-    if session is None:
-        session = flask.session
+def clear_user_session():
     session["user"] = None
     session["name"] = None
     session["user_type"] = None
@@ -115,22 +114,22 @@ def is_user_admin(user: User) -> bool:
 
 
 def is_current_user_admin() -> bool:
-    return flask.session.get("user_type") == UserRole.ADMINISTRATOR.value
+    return session.get("user_type") == UserRole.ADMINISTRATOR.value
 
 
 def is_current_user_account_mgr() -> bool:
-    return flask.session.get("user_type") == UserRole.ACCOUNT_MANAGEMENT.value
+    return session.get("user_type") == UserRole.ACCOUNT_MANAGEMENT.value
 
 
 def is_current_user_company_admin() -> bool:
-    return flask.session.get("user_type") == UserRole.COMPANY_ADMIN.value
+    return session.get("user_type") == UserRole.COMPANY_ADMIN.value
 
 
 def is_current_user(user_id):
     """
     Checks if the current session user is the same as given user id
     """
-    return flask.session["user"] == str(user_id)
+    return session["user"] == str(user_id)
 
 
 def send_token(user: User, token_type="validate", update_token=True):
@@ -164,7 +163,7 @@ class TokenData(TypedDict):
 def get_token_data() -> TokenData:
     return {
         "token": get_random_string(),
-        "token_expiry_date": utcnow() + timedelta(days=app.config["VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE"]),
+        "token_expiry_date": utcnow() + timedelta(days=get_app_config("VALIDATE_ACCOUNT_TOKEN_TIME_TO_LIVE")),
     }
 
 
@@ -175,24 +174,29 @@ def add_token_data(user):
 
 def is_valid_session():
     """Uses timezone-aware objects to avoid TypeError comparison"""
-    now = utcnow()
+    # Get the current UTC time as a timezone-aware datetime
+    now = datetime.now(timezone.utc)
 
+    # Retrieve auth_ttl and ensure it is also timezone-aware
+    auth_ttl = session.get("auth_ttl")
+    if auth_ttl and isinstance(auth_ttl, datetime) and auth_ttl.tzinfo is None:
+        auth_ttl = auth_ttl.replace(tzinfo=timezone.utc)  # Make auth_ttl timezone-aware
+
+    # Check session validity
     return (
-        flask.session.get("user")
-        and flask.session.get("user_type")
-        and (flask.session.get("auth_ttl") and flask.session.get("auth_ttl") > now or revalidate_session_user())
+        session.get("user") and session.get("user_type") and (auth_ttl and auth_ttl > now or revalidate_session_user())
     )
 
 
 def revalidate_session_user():
-    user = superdesk.get_resource_service("users").find_one(req=None, _id=flask.session.get("user"))
+    user = superdesk.get_resource_service("users").find_one(req=None, _id=session.get("user"))
     if not user:
         clear_user_session()
         return False
     company = get_company(user)
     is_valid = is_valid_user(user, company)
     if is_valid:
-        flask.session["auth_ttl"] = utcnow().replace(tzinfo=None) + SESSION_AUTH_TTL
+        session["auth_ttl"] = utcnow().replace(tzinfo=None) + SESSION_AUTH_TTL
     return is_valid
 
 
@@ -202,7 +206,7 @@ def get_user_sections(user: User) -> SectionAllowedMap:
 
     if is_user_admin(user):
         # Admin users should see all sections
-        return {section["_id"]: True for section in app.sections}
+        return {section["_id"]: True for section in get_current_app().as_any().sections}
 
     if user.get("sections"):
         return user["sections"]
@@ -232,7 +236,7 @@ def user_can_manage_company(company_id) -> bool:
 
 
 def get_auth_providers() -> Dict[str, AuthProvider]:
-    return {provider["_id"]: AuthProvider.get_provider(provider) for provider in app.config["AUTH_PROVIDERS"]}
+    return {provider["_id"]: AuthProvider.get_provider(provider) for provider in get_app_config("AUTH_PROVIDERS")}
 
 
 def get_company_auth_provider(company: Optional[Company] = None) -> AuthProvider:
@@ -259,5 +263,5 @@ def check_user_has_products(user: User, company_products) -> None:
 
 
 def redirect_to_next_url(default_view: str = "wire.index"):
-    next_url = flask.session.pop("next_url", None) or flask.url_for(default_view)
-    return flask.redirect(next_url)
+    next_url = session.pop("next_url", None) or url_for(default_view)
+    return redirect(next_url)

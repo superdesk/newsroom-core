@@ -4,8 +4,11 @@ import pathlib
 import requests
 
 from urllib.parse import urljoin
-from flask import current_app, request, url_for, send_from_directory
 from flask_webpack import Webpack
+
+from superdesk.core import get_app_config, get_current_app
+from superdesk.flask import request, url_for
+from newsroom.flask import send_from_directory
 
 
 def is_localhost():
@@ -14,7 +17,7 @@ def is_localhost():
 
 def send_asset(filename):
     return send_from_directory(
-        os.path.dirname(current_app.config["WEBPACK_MANIFEST_PATH"]),
+        os.path.dirname(get_app_config("WEBPACK_MANIFEST_PATH")),
         filename,
     )
 
@@ -42,7 +45,7 @@ class NewsroomWebpack(Webpack):
         app.add_url_rule("/static/dist/<path:filename>", "asset", send_asset)
 
     def _refresh_webpack_stats_if_debug(self):
-        if current_app.debug or is_localhost():
+        if get_current_app().as_any().debug or is_localhost():
             self._refresh_webpack_stats()
 
     def _set_asset_paths(self, app):

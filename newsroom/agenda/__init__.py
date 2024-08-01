@@ -1,7 +1,7 @@
 import superdesk
-from flask import Blueprint
 from flask_babel import lazy_gettext
 
+from superdesk.flask import Blueprint
 from newsroom.utils import url_for_agenda
 from .agenda import AgendaResource, AgendaService, aggregations, PRIVATE_FIELDS
 from newsroom.search.config import init_nested_aggregation

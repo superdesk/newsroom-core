@@ -1,10 +1,11 @@
 import ipaddress
 from datetime import timedelta
 
-from flask import Blueprint
 from flask_babel import gettext
-from flask import g, current_app as app, abort, request
 from eve.auth import TokenAuth
+
+from superdesk.core import get_current_app, get_app_config
+from superdesk.flask import Blueprint, g, abort, request
 import superdesk
 from superdesk.utc import utcnow
 from superdesk import get_resource_service
@@ -23,6 +24,7 @@ from . import views  # noqa
 class CompanyTokenAuth(TokenAuth):
     def check_auth(self, token_id, allowed_roles, resource, method):
         """Try to find auth token and if valid put subscriber id into ``g.company_id``."""
+        app = get_current_app()
         token = app.data.mongo.find_one(API_TOKENS, req=None, _id=token_id)
         if not token:
             return False
@@ -57,18 +59,20 @@ class CompanyTokenAuth(TokenAuth):
         # Check rate_limit
         updates = {}
         new_period = False
-        if app.config.get("RATE_LIMIT_REQUESTS"):
+        rate_limit_requests = get_app_config("RATE_LIMIT_REQUESTS")
+        if rate_limit_requests:
             new_period = not token.get("rate_limit_expiry") or token["rate_limit_expiry"] <= now
             if new_period:
                 updates["rate_limit_requests"] = 1
             elif token.get("rate_limit_expiry"):
-                if token.get("rate_limit_requests", 0) >= app.config.get("RATE_LIMIT_REQUESTS"):
+                if token.get("rate_limit_requests", 0) >= rate_limit_requests:
                     abort(429, gettext("Rate limit exceeded"))
                 else:
                     updates["rate_limit_requests"] = token.get("rate_limit_requests", 0) + 1
 
-        if app.config.get("RATE_LIMIT_PERIOD") and new_period:
-            updates["rate_limit_expiry"] = now + timedelta(seconds=app.config.get("RATE_LIMIT_PERIOD"))
+        rate_limit_period = get_app_config("RATE_LIMIT_PERIOD")
+        if rate_limit_period and new_period:
+            updates["rate_limit_expiry"] = now + timedelta(seconds=rate_limit_period)
 
         if updates:
             get_resource_service(API_TOKENS).patch(token_id, updates)
@@ -83,5 +87,5 @@ class CompanyTokenAuth(TokenAuth):
 
 
 def init_app(app):
-    if app.config.get("NEWS_API_ENABLED"):
+    if get_app_config("NEWS_API_ENABLED"):
         superdesk.register_resource(API_TOKENS, NewsApiTokensResource, NewsApiTokensService, _app=app)

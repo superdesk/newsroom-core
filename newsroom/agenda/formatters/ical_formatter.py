@@ -1,7 +1,7 @@
 import arrow
 import icalendar
 
-from flask import url_for
+from superdesk.flask import url_for
 from superdesk.utc import utcnow
 
 from newsroom.agenda.contacts import get_contact_name, get_contact_email

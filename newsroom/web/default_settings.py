@@ -153,7 +153,6 @@ CORE_APPS = [
     "newsroom.topics",
     "newsroom.upload",
     "newsroom.history",
-    "newsroom.ui_config",
     "newsroom.notifications",
     "newsroom.products",
     "newsroom.section_filters",
@@ -179,6 +178,7 @@ CORE_APPS = [
 ]
 
 MODULES = [
+    "newsroom.ui_config_async",
     "newsroom.companies",
 ]
 

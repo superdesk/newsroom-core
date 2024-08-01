@@ -3,31 +3,41 @@
 import re
 import copy
 
-import flask
 from flask_babel import gettext, lazy_gettext
+
+from superdesk.core import get_current_app, get_app_config
+from superdesk.flask import Blueprint, abort, render_template, g, jsonify
 from superdesk.utc import utcnow
 
 from newsroom.utils import get_json_or_400, set_version_creator
 from newsroom.template_filters import newsroom_config
 from newsroom.decorator import admin_only, account_manager_only
+from inspect import iscoroutine
 
 
-blueprint = flask.Blueprint("settings", __name__)
+blueprint = Blueprint("settings", __name__)
 
 GENERAL_SETTINGS_LOOKUP = {"_id": "general_settings"}
 
 
 def get_settings_collection():
-    return flask.current_app.data.pymongo("items").db.settings
+    return get_current_app().data.pymongo("items").db.settings
 
 
 @blueprint.route("/settings/<app_id>")
 @account_manager_only
-def app(app_id):
-    for app in flask.current_app.settings_apps:
+async def app(app_id):
+    from newsroom.users import get_user_profile_data  # noqa
+
+    user_profile_data = await get_user_profile_data()
+    app = get_current_app().as_any()
+
+    for app in app.settings_apps:
         if app._id == app_id:
-            return flask.render_template("settings.html", setting_type=app_id, data=app.data())
-    flask.abort(404)
+            value = app.data()
+            data = await value if iscoroutine(value) else value
+            return render_template("settings.html", setting_type=app_id, data=data, user_profile_data=user_profile_data)
+    abort(404)
 
 
 @blueprint.route("/settings/general_settings", methods=["POST"])
@@ -44,8 +54,8 @@ def update_values():
     updates["_updated"] = utcnow()
 
     get_settings_collection().update_one(GENERAL_SETTINGS_LOOKUP, {"$set": updates}, upsert=True)
-    flask.g.settings = None  # reset cache on update
-    return flask.jsonify(updates)
+    g.settings = None  # reset cache on update
+    return jsonify(updates)
 
 
 def get_initial_data(setting_key=None):
@@ -54,9 +64,10 @@ def get_initial_data(setting_key=None):
 
 
 def get_setting(setting_key=None, include_audit=False):
-    if not getattr(flask.g, "settings", None):
+    if not getattr(g, "settings", None):
         values = get_settings_collection().find_one(GENERAL_SETTINGS_LOOKUP)
-        settings = copy.deepcopy(flask.current_app._general_settings)
+        app = get_current_app().as_any()
+        settings = copy.deepcopy(app._general_settings)
         if values:
             for key, val in values.get("values", {}).items():
                 if not (val is None or val == "") and settings.get(key) is not None:
@@ -65,11 +76,11 @@ def get_setting(setting_key=None, include_audit=False):
                 settings["_updated"] = values.get("_updated")
                 settings["version_creator"] = values.get("version_creator")
 
-        flask.g.settings = settings
+        g.settings = settings
     if setting_key:
-        setting_dict = flask.g.settings.get(setting_key) or {}
+        setting_dict = g.settings.get(setting_key) or {}
         return setting_dict.get("value", setting_dict.get("default"))
-    return flask.g.settings
+    return g.settings
 
 
 def get_client_config():
@@ -82,7 +93,7 @@ def get_client_config():
     # Copy certain app configs to client_config
     config["client_config"].update(
         dict(
-            show_user_register=flask.current_app.config.get("SHOW_USER_REGISTER") is True,
+            show_user_register=get_app_config("SHOW_USER_REGISTER") is True,
         )
     )
     return config

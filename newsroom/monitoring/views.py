@@ -1,13 +1,14 @@
 import base64
 from bson import ObjectId
 
-import flask
-from flask import jsonify, current_app as app, send_file
 from flask_babel import gettext
 from werkzeug.exceptions import NotFound
 from eve.methods.get import get_internal
 from eve.render import send_response
 from newsroom.decorator import admin_only, login_required, account_manager_only, section
+
+from superdesk.core import get_app_config, get_current_app
+from superdesk.flask import jsonify, send_file, request, render_template
 from superdesk import get_resource_service
 from superdesk.logging import logger
 
@@ -37,21 +38,24 @@ from newsroom.utils import (
 )
 
 from .forms import MonitoringForm, alert_types
+from newsroom.ui_config_async import UiConfigResourceService
+from newsroom.users import get_user_profile_data
 
 
-def get_view_data():
+async def get_view_data():
     user = get_user()
+    ui_config_service = UiConfigResourceService()
     return {
         "user": str(user["_id"]) if user else None,
         "company": str(user["company"]) if user and user.get("company") else None,
         "navigations": get_monitoring_for_company(user),
         "context": "monitoring",
-        "groups": app.config.get("MONITORING_GROUPS") or app.config.get("WIRE_GROUPS", []),
-        "ui_config": get_resource_service("ui_config").get_section_config("monitoring"),
+        "groups": get_app_config("MONITORING_GROUPS") or get_app_config("WIRE_GROUPS", []),
+        "ui_config": await ui_config_service.get_section_config("monitoring"),
         "saved_items": get_bookmarks_count(user["_id"], "monitoring"),
         "formats": [
             {"format": f["format"], "name": f["name"]}
-            for f in app.download_formatters.values()
+            for f in get_current_app().as_any().download_formatters.values()
             if "monitoring" in f["types"]
         ],
         "secondary_formats": [{"format": f[0], "name": f[1]} for f in alert_types],
@@ -89,7 +93,7 @@ def get_monitoring_for_company(user):
 @blueprint.route("/monitoring/<id>/users", methods=["POST"])
 @account_manager_only
 def update_users(id):
-    updates = flask.request.get_json()
+    updates = request.get_json()
     if "users" in updates:
         updates["users"] = [ObjectId(u_id) for u_id in updates["users"]]
         get_resource_service("monitoring").patch(id=ObjectId(id), updates=updates)
@@ -107,7 +111,7 @@ def monitoring_companies():
 @blueprint.route("/monitoring/<id>/schedule", methods=["POST"])
 @account_manager_only
 def update_schedule(id):
-    updates = flask.request.get_json()
+    updates = request.get_json()
     get_resource_service("monitoring").patch(id=ObjectId(id), updates=updates)
     return jsonify({"success": True}), 200
 
@@ -135,7 +139,7 @@ def create():
             company_users = list(query_resource("users", lookup={"company": new_data["company"]}))
             new_data["users"] = [ObjectId(u["_id"]) for u in company_users]
 
-        request_updates = flask.request.get_json()
+        request_updates = request.get_json()
         process_form_request(new_data, request_updates, form)
 
         set_original_creator(new_data)
@@ -150,34 +154,34 @@ def create():
 @blueprint.route("/monitoring/<_id>", methods=["GET", "POST"])
 @login_required
 def edit(_id):
-    if flask.request.args.get("context", "") == "wire":
+    if request.args.get("context", "") == "wire":
         items = get_items_for_user_action([_id], "items")
         if not items:
             return
 
         item = items[0]
-        if is_json_request(flask.request):
-            return flask.jsonify(item)
+        if is_json_request(request):
+            return jsonify(item)
 
-    if "print" in flask.request.args:
-        assert flask.request.args.get("monitoring_profile")
-        monitoring_profile = get_entity_or_404(flask.request.args.get("monitoring_profile"), "monitoring")
+    if "print" in request.args:
+        assert request.args.get("monitoring_profile")
+        monitoring_profile = get_entity_or_404(request.args.get("monitoring_profile"), "monitoring")
         items = get_items_for_monitoring_report([_id], monitoring_profile, full_text=True)
-        flask.request.view_args["date_items_dict"] = get_date_items_dict(items)
-        flask.request.view_args["monitoring_profile"] = monitoring_profile
-        flask.request.view_args["monitoring_report_name"] = app.config.get("MONITORING_REPORT_NAME", "Newsroom")
-        flask.request.view_args["print"] = True
+        request.view_args["date_items_dict"] = get_date_items_dict(items)
+        request.view_args["monitoring_profile"] = monitoring_profile
+        request.view_args["monitoring_report_name"] = get_app_config("MONITORING_REPORT_NAME", "Newsroom")
+        request.view_args["print"] = True
         return wire_print(_id)
 
     profile = find_one("monitoring", _id=ObjectId(_id))
     if not profile:
         return NotFound(gettext("monitoring Profile not found"))
 
-    if flask.request.method == "POST":
+    if request.method == "POST":
         form = MonitoringForm(monitoring=profile)
         if form.validate_on_submit():
             updates = form.data
-            request_updates = flask.request.get_json()
+            request_updates = request.get_json()
 
             # If the updates have anything other than 'users', only admin or monitoring_admin can update
             if len(request_updates.keys()) == 1 and "users" not in request_updates:
@@ -208,21 +212,23 @@ def delete(_id):
 @blueprint.route("/monitoring")
 @section("monitoring")
 @login_required
-def index():
-    return flask.render_template("monitoring_index.html", data=get_view_data())
+async def index():
+    data = await get_view_data()
+    user_profile_data = await get_user_profile_data()
+    return render_template("monitoring_index.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/monitoring/export/<_ids>")
 @login_required
 def export(_ids):
     user = get_user(required=True)
-    _format = flask.request.args.get("format")
+    _format = request.args.get("format")
     if not _format:
         return jsonify({"message": "No format specified."}), 400
 
-    layout_format = flask.request.args.get("secondary_format")
-    formatter = app.download_formatters[_format]["formatter"]
-    monitoring_profile = get_entity_or_404(flask.request.args.get("monitoring_profile"), "monitoring")
+    layout_format = request.args.get("secondary_format")
+    formatter = get_current_app().as_any().download_formatters[_format]["formatter"]
+    monitoring_profile = get_entity_or_404(request.args.get("monitoring_profile"), "monitoring")
     monitoring_profile["format_type"] = _format
     monitoring_profile["alert_type"] = layout_format
     items = get_items_for_monitoring_report([_id for _id in _ids.split(",")], monitoring_profile)
@@ -262,14 +268,14 @@ def share():
     for user_id in data["users"]:
         user = get_resource_service("users").find_one(req=None, _id=user_id)
         template_kwargs = {
-            "app_name": app.config["SITE_NAME"],
+            "app_name": get_app_config("SITE_NAME"),
             "profile": monitoring_profile,
             "recipient": user,
             "sender": current_user,
             "message": data.get("message"),
             "item_name": "Monitoring Report",
         }
-        formatter = app.download_formatters["monitoring_pdf"]["formatter"]
+        formatter = get_current_app().as_any().download_formatters["monitoring_pdf"]["formatter"]
         monitoring_profile["format_type"] = "monitoring_pdf"
         _file = get_monitoring_file(monitoring_profile, items)
         attachment = base64.b64encode(_file.read())
@@ -306,12 +312,13 @@ def bookmark():
     update_action_list(data.get("items"), "bookmarks", item_type="items")
     user_id = get_user_id()
     push_user_notification("saved_items", count=get_bookmarks_count(user_id, "monitoring"))
-    return flask.jsonify(), 200
+    return jsonify(), 200
 
 
 @blueprint.route("/bookmarks_monitoring")
 @login_required
-def bookmarks():
-    data = get_view_data()
+async def bookmarks():
+    data = await get_view_data()
     data["bookmarks"] = True
-    return flask.render_template("monitoring_bookmarks.html", data=data)
+    user_profile_data = await get_user_profile_data()
+    return render_template("monitoring_bookmarks.html", data=data, user_profile_data=user_profile_data)

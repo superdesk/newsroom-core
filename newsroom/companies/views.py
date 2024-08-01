@@ -4,15 +4,14 @@ import ipaddress
 
 from bson import ObjectId
 from datetime import datetime
-from flask import jsonify, current_app as app
 from flask_babel import gettext
-
+from werkzeug.exceptions import NotFound, BadRequest
 from pydantic import BaseModel
-from superdesk import get_resource_service
+
+from superdesk.core import get_app_config, get_current_app
 from superdesk.core.web import Request, Response
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
-
-from werkzeug.exceptions import NotFound, BadRequest
+from superdesk import get_resource_service
 
 from newsroom.decorator import admin_only, account_manager_only, login_required
 from newsroom.types import AuthProviderConfig
@@ -23,6 +22,7 @@ from newsroom.utils import (
     set_original_creator,
     set_version_creator,
 )
+from newsroom.ui_config_async import UiConfigResourceService
 
 from .module import company_endpoints, company_configs
 from .companies_async import CompanyService, CompanyResource
@@ -35,7 +35,7 @@ def get_company_types_options():
     ]
 
 
-def get_settings_data():
+async def get_settings_data():
     def render_provider(provider: AuthProviderConfig) -> Dict[str, str]:
         return {
             "_id": provider["_id"],
@@ -43,16 +43,17 @@ def get_settings_data():
             "auth_type": provider["auth_type"].value,
         }
 
+    ui_config_service = UiConfigResourceService()
     return {
         "companies": list(query_resource("companies")),
-        "services": app.config["SERVICES"],
+        "services": get_app_config("SERVICES"),
         "products": list(query_resource("products")),
-        "sections": app.sections,
+        "sections": get_current_app().as_any().sections,
         "company_types": get_company_types_options(),
-        "api_enabled": app.config.get("NEWS_API_ENABLED", False),
-        "ui_config": get_resource_service("ui_config").get_section_config("companies"),
-        "countries": app.countries,
-        "auth_providers": [render_provider(provider) for provider in app.config.get("AUTH_PROVIDERS") or []],
+        "api_enabled": get_app_config("NEWS_API_ENABLED", False),
+        "ui_config": await ui_config_service.get_section_config("companies"),
+        "countries": get_current_app().as_any().countries,
+        "auth_providers": [render_provider(provider) for provider in get_app_config("AUTH_PROVIDERS") or []],
     }
 
 
@@ -103,7 +104,7 @@ def get_errors_company(updates, original=None):
         original = {}
 
     if not (updates.get("name") or original.get("name")):
-        return jsonify({"name": gettext("Name not found")}), 400
+        return {"name": gettext("Name not found")}, 400
 
     if updates.get("allowed_ip_list"):
         errors = []
@@ -114,7 +115,7 @@ def get_errors_company(updates, original=None):
                 errors.append(gettext("{0}: {1}".format(ip, e)))
 
         if errors:
-            return jsonify({"allowed_ip_list": errors}), 400
+            return {"allowed_ip_list": errors}, 400
 
 
 def get_company_updates(data, original=None):
@@ -191,13 +192,6 @@ async def edit_company(args: CompanyItemArgs, params: None, request: Request) ->
         return Response({"name": gettext("Company already exists"), "error": str(e)}, 400, ())
 
     return Response({"success": True}, 200, ())
-
-
-def conflict_error(updates):
-    if updates.get("auth_domains"):
-        return jsonify({"auth_domains": gettext("Value is already used")}), 400
-    else:
-        return jsonify({"name": gettext("Company already exists")}), 400
 
 
 @company_endpoints.endpoint("/companies/<string:company_id>", methods=["DELETE"])

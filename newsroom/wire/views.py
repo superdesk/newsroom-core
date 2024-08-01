@@ -1,16 +1,17 @@
 import io
-import flask
 import zipfile
 import superdesk
 
 from typing import Dict
 from operator import itemgetter
-from flask import current_app as app, request, jsonify
 from eve.render import send_response
 from eve.methods.get import get_internal
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import ImmutableMultiDict
 from flask_babel import gettext
+
+from superdesk.core import get_app_config, get_current_app
+from superdesk.flask import request, jsonify, render_template, abort, send_file
 from superdesk.utc import utcnow
 from superdesk import get_resource_service
 from superdesk.default_settings import strtobool
@@ -56,13 +57,15 @@ from newsroom.public.views import (
 from .search import get_bookmarks_count
 from .items import get_items_for_dashboard
 from ..upload import ASSETS_RESOURCE, get_upload
+from newsroom.ui_config_async import UiConfigResourceService
+from newsroom.users import get_user_profile_data
 
 HOME_ITEMS_CACHE_KEY = "home_items"
 HOME_EXTERNAL_ITEMS_CACHE_KEY = "home_external_items"
 
 
 def get_services(user):
-    services = app.config["SERVICES"]
+    services = get_app_config("SERVICES")
     for service in services:
         service.setdefault("is_active", True)
     company = get_company(user)
@@ -89,7 +92,7 @@ def set_item_permission(item, permitted=True):
         item.pop("associations", None)
 
 
-def get_view_data() -> Dict:
+async def get_view_data() -> Dict:
     user = get_user_required()
     company = get_company(user)
     topics = get_user_topics(user["_id"]) if user else []
@@ -97,6 +100,7 @@ def get_view_data() -> Dict:
     user_folders = get_user_folders(user, "wire") if user else []
     company_folders = get_company_folders(company, "wire") if company else []
     products = get_products_by_company(company, product_type="wire") if company else []
+    ui_config_service = UiConfigResourceService()
 
     check_user_has_products(user, products)
 
@@ -106,32 +110,34 @@ def get_view_data() -> Dict:
         "topics": [t for t in topics if t.get("topic_type") == "wire"],
         "formats": [
             {"format": f["format"], "name": f["name"], "assets": f["assets"]}
-            for f in app.download_formatters.values()
+            for f in get_current_app().as_any().download_formatters.values()
             if "wire" in f["types"]
         ],
         "navigations": get_navigations(user, company, "wire"),
         "products": products,
         "saved_items": get_bookmarks_count(user["_id"], "wire"),
         "context": "wire",
-        "ui_config": get_resource_service("ui_config").get_section_config("wire"),
-        "groups": app.config.get("WIRE_GROUPS", []),
+        "ui_config": await ui_config_service.get_section_config("wire"),
+        "groups": get_app_config("WIRE_GROUPS", []),
         "user_folders": user_folders,
         "company_folders": company_folders,
-        "date_filters": app.config.get("WIRE_TIME_FILTERS", []),
+        "date_filters": get_app_config("WIRE_TIME_FILTERS", []),
     }
 
 
 def get_items_by_card(cards, company_id):
     cache_key = "{}{}".format(HOME_ITEMS_CACHE_KEY, company_id or "")
+    app = get_current_app().as_any()
     if app.cache.get(cache_key):
         return app.cache.get(cache_key)
 
     items_by_card = get_items_for_dashboard(cards)
-    app.cache.set(cache_key, items_by_card, timeout=app.config.get("DASHBOARD_CACHE_TIMEOUT", 300))
+    app.cache.set(cache_key, items_by_card, timeout=get_app_config("DASHBOARD_CACHE_TIMEOUT", 300))
     return items_by_card
 
 
 def delete_dashboard_caches():
+    app = get_current_app().as_any()
     app.cache.delete(HOME_ITEMS_CACHE_KEY)
     app.cache.delete(PUBLIC_DASHBOARD_CONFIG_CACHE_KEY)
     app.cache.delete(PUBLIC_DASHBOARD_CARDS_CACHE_KEY)
@@ -141,7 +147,7 @@ def delete_dashboard_caches():
 
 
 def get_personal_dashboards_data(user, company, topics):
-    card_type = get_card_type(app.config.get("PERSONAL_DASHBOARD_CARD_TYPE") or "4-picture-text")
+    card_type = get_card_type(get_app_config("PERSONAL_DASHBOARD_CARD_TYPE") or "4-picture-text")
 
     def get_topic_items(topic):
         query = superdesk.get_resource_service("wire_search").get_topic_query(topic, user, company)
@@ -177,12 +183,13 @@ def get_personal_dashboards_data(user, company, topics):
     return [_get_dashboard_data(dashboard, i) for i, dashboard in enumerate(dashboards)]
 
 
-def get_home_data():
+async def get_home_data():
     user = get_user()
     company = get_company(user)
     cards = list(query_resource("cards", lookup={"dashboard": "newsroom"}))
     company_id = str(user["company"]) if user and user.get("company") else None
     topics = get_user_topics(user["_id"]) if user else []
+    ui_config_service = UiConfigResourceService()
 
     return {
         "cards": cards,
@@ -199,12 +206,12 @@ def get_home_data():
                 "types": f["types"],
                 "assets": f["assets"],
             }
-            for f in app.download_formatters.values()
+            for f in get_current_app().as_any().download_formatters.values()
         ],
         "context": "wire",
         "topics": topics,
-        "ui_config": get_resource_service("ui_config").get_section_config("home"),
-        "groups": app.config.get("WIRE_GROUPS", []),
+        "ui_config": await ui_config_service.get_section_config("wire"),
+        "groups": get_app_config("WIRE_GROUPS", []),
         "personalizedDashboards": get_personal_dashboards_data(user, company, topics),
     }
 
@@ -217,28 +224,33 @@ def get_previous_versions(item):
 
 
 @blueprint.route("/")
-def index():
+async def index():
     if not is_valid_session():
-        return (
-            render_public_dashboard() if app.config.get("PUBLIC_DASHBOARD") else clear_session_and_redirect_to_login()
+        data = (
+            await render_public_dashboard()
+            if get_app_config("PUBLIC_DASHBOARD")
+            else clear_session_and_redirect_to_login()
         )
-
-    return flask.render_template("home.html", data=get_home_data())
+        return data
+    data = await get_home_data()
+    user_profile_data = await get_user_profile_data()
+    return render_template("home.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/media_card_external/<card_id>")
 @login_required
 def get_media_card_external(card_id):
     cache_id = "{}_{}".format(HOME_EXTERNAL_ITEMS_CACHE_KEY, card_id)
+    app = get_current_app().as_any()
 
     if app.cache.get(cache_id):
         card_items = app.cache.get(cache_id)
     else:
         card = get_entity_or_404(card_id, "cards")
         card_items = app.get_media_cards_external(card)
-        app.cache.set(cache_id, card_items, timeout=app.config.get("DASHBOARD_CACHE_TIMEOUT", 300))
+        app.cache.set(cache_id, card_items, timeout=get_app_config("DASHBOARD_CACHE_TIMEOUT", 300))
 
-    return flask.jsonify({"_items": card_items})
+    return jsonify({"_items": card_items})
 
 
 @blueprint.route("/card_items")
@@ -248,32 +260,35 @@ def get_card_items():
     cards = list(query_resource("cards", lookup={"dashboard": "newsroom"}))
     company_id = str(user["company"]) if user and user.get("company") else None
     items_by_card = get_items_by_card(cards, company_id)
-    return flask.jsonify({"_items": items_by_card})
+    return jsonify({"_items": items_by_card})
 
 
 @blueprint.route("/wire")
 @login_required
 @section("wire")
-def wire():
-    return flask.render_template("wire_index.html", data=get_view_data())
+async def wire():
+    data = await get_view_data()
+    user_profile_data = await get_user_profile_data()
+    return render_template("wire_index.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/bookmarks_wire")
 @login_required
-def bookmarks():
-    data = get_view_data()
+async def bookmarks():
+    data = await get_view_data()
     data["bookmarks"] = True
-    return flask.render_template("wire_bookmarks.html", data=data)
+    user_profile_data = await get_user_profile_data()
+    return render_template("wire_bookmarks.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/wire/search")
 @login_required
 @section("wire")
 def search():
-    if "prepend_embargoed" in request.args or app.config["PREPEND_EMBARGOED_TO_WIRE_SEARCH"]:
+    if "prepend_embargoed" in request.args or get_app_config("PREPEND_EMBARGOED_TO_WIRE_SEARCH"):
         args = request.args.to_dict()
         args["prepend_embargoed"] = strtobool(
-            str(request.args.get("prepend_embargoed", app.config["PREPEND_EMBARGOED_TO_WIRE_SEARCH"]))
+            str(request.args.get("prepend_embargoed", get_app_config("PREPEND_EMBARGOED_TO_WIRE_SEARCH")))
         )
         request.args = ImmutableMultiDict(args)
     response = get_internal("wire_search")
@@ -284,12 +299,12 @@ def search():
 @login_required
 def download():
     user = get_user(required=True)
-    data = flask.request.json
+    data = request.json
     _format = data.get("format", "text")
     item_type = get_type(data.get("type"))
     items = get_items_for_user_action(data["items"], item_type)
     _file = io.BytesIO()
-    formatter = app.download_formatters[_format]["formatter"]
+    formatter = get_current_app().as_any().download_formatters[_format]["formatter"]
     mimetype = None
     attachment_filename = "%s-newsroom.zip" % utcnow().strftime("%Y%m%d%H%M")
     if formatter.get_mediatype() == "picture":
@@ -298,13 +313,13 @@ def download():
                 picture = formatter.format_item(items[0], item_type=item_type)
                 return get_upload(picture["media"], filename="baseimage%s" % picture["file_extension"])
             except ValueError:
-                return flask.abort(404)
+                return abort(404)
         else:
             with zipfile.ZipFile(_file, mode="w") as zf:
                 for item in items:
                     try:
                         picture = formatter.format_item(item, item_type=item_type)
-                        file = flask.current_app.media.get(picture["media"], ASSETS_RESOURCE)
+                        file = get_current_app().media.get(picture["media"], ASSETS_RESOURCE)
                         zf.writestr("baseimage%s" % picture["file_extension"], file.read())
                     except ValueError:
                         pass
@@ -334,7 +349,7 @@ def download():
 
     update_action_list(data["items"], "downloads", force_insert=True)
     get_resource_service("history").create_history_record(items, "download", user, request.args.get("type", "wire"))
-    return flask.send_file(
+    return send_file(
         _file,
         mimetype=mimetype,
         download_name=attachment_filename,
@@ -357,7 +372,7 @@ def share():
         if not user or not user.get("email"):
             continue
         template_kwargs = {
-            "app_name": app.config["SITE_NAME"],
+            "app_name": get_app_config("SITE_NAME"),
             "recipient": user,
             "sender": current_user,
             "items": items,
@@ -366,7 +381,7 @@ def share():
             "subject_name": items[0].get("headline") or items[0].get("name"),
         }
         if item_type == "agenda":
-            template_kwargs["maps"] = data.get("maps") if app.config.get("GOOGLE_MAPS_KEY") else []
+            template_kwargs["maps"] = data.get("maps") if get_app_config("GOOGLE_MAPS_KEY") else []
             template_kwargs["dateStrings"] = [get_agenda_dates(item) for item in items]
             template_kwargs["locations"] = [get_location_string(item) for item in items]
             template_kwargs["contactList"] = [get_public_contacts(item) for item in items]
@@ -401,7 +416,7 @@ def share():
     get_resource_service("history").create_history_record(
         items, "share", current_user, request.args.get("type", "wire")
     )
-    return flask.jsonify(), 201
+    return jsonify(), 201
 
 
 @blueprint.route("/wire", methods=["DELETE"])
@@ -419,7 +434,7 @@ def remove_wire_items():
         ids.extend(doc.get("ancestors") or [])
 
     if not ids:
-        flask.abort(404, gettext("Not found"))
+        abort(404, gettext("Not found"))
 
     docs = list(doc for doc in items_service.get_from_mongo(req=None, lookup={"_id": {"$in": ids}}))
 
@@ -434,7 +449,7 @@ def remove_wire_items():
 
     push_notification("items_deleted", ids=ids)
 
-    return flask.jsonify(), 200
+    return jsonify(), 200
 
 
 @blueprint.route("/wire_bookmark", methods=["POST", "DELETE"])
@@ -450,12 +465,12 @@ def bookmark():
     update_action_list(data.get("items"), "bookmarks", item_type="items")
     user_id = get_user_id()
     push_user_notification("saved_items", count=get_bookmarks_count(user_id, "wire"))
-    return flask.jsonify(), 200
+    return jsonify(), 200
 
 
 @blueprint.route("/wire/<_id>/copy", methods=["POST"])
 @login_required
-def copy(_id):
+async def copy(_id):
     item_type = get_type()
     item = get_entity_or_404(_id, item_type)
 
@@ -470,13 +485,14 @@ def copy(_id):
                 "location": "" if item_type != "agenda" else get_location_string(item),
                 "contacts": get_public_contacts(item),
                 "calendars": ", ".join([calendar.get("name") for calendar in item.get("calendars") or []]),
+                "user_profile_data": await get_user_profile_data(),
             }
         )
-    copy_data = flask.render_template(template_name, **template_kwargs).strip()
+    copy_data = render_template(template_name, **template_kwargs).strip()
 
     update_action_list([_id], "copies", item_type=item_type)
     get_resource_service("history").create_history_record([item], "copy", get_user(), request.args.get("type", "wire"))
-    return flask.jsonify({"data": copy_data}), 200
+    return jsonify({"data": copy_data}), 200
 
 
 @blueprint.route("/wire/<_id>/versions")
@@ -484,12 +500,12 @@ def copy(_id):
 def versions(_id):
     item = get_entity_or_404(_id, "items")
     items = get_previous_versions(item)
-    return flask.jsonify({"_items": items})
+    return jsonify({"_items": items})
 
 
 @blueprint.route("/wire/<_id>")
 @login_required
-def item(_id):
+async def item(_id):
     items = get_items_for_user_action([_id], "items")
     if not items:
         return
@@ -498,19 +514,22 @@ def item(_id):
     set_permissions(
         item,
         "wire",
-        False if flask.request.args.get("ignoreLatest") == "false" else True,
+        False if request.args.get("ignoreLatest") == "false" else True,
     )
-    display_char_count = get_resource_service("ui_config").get_section_config("wire").get("char_count", False)
-    if is_json_request(flask.request):
-        return flask.jsonify(item)
+    ui_config_service = UiConfigResourceService()
+    config = await ui_config_service.get_section_config("wire")
+    display_char_count = config.get("char_count", False)
+    user_profile_data = await get_user_profile_data()
+    if is_json_request(request):
+        return jsonify(item)
     if not item.get("_access"):
-        return flask.render_template("wire_item_access_restricted.html", item=item)
+        return render_template("wire_item_access_restricted.html", item=item, user_profile_data=user_profile_data)
     previous_versions = get_previous_versions(item)
     template = "wire_item.html"
     data = {"item": item}
-    if "print" in flask.request.args:
-        if flask.request.args.get("monitoring_profile"):
-            data.update(flask.request.view_args)
+    if "print" in request.args:
+        if request.args.get("monitoring_profile"):
+            data.update(request.view_args)
             template = "monitoring_export.html"
         else:
             template = "wire_item_print.html"
@@ -520,11 +539,12 @@ def item(_id):
             [item], "print", get_user(), request.args.get("type", "wire")
         )
 
-    return flask.render_template(
+    return render_template(
         template,
         **data,
         previous_versions=previous_versions,
         display_char_count=display_char_count,
+        user_profile_data=user_profile_data,
     )
 
 
@@ -537,7 +557,7 @@ def items(_ids):
         set_permissions(
             item,
             "wire",
-            False if flask.request.args.get("ignoreLatest") == "false" else True,
+            False if request.args.get("ignoreLatest") == "false" else True,
         )
 
     return jsonify(items.docs), 200

@@ -1,7 +1,7 @@
 from functools import wraps
 from inspect import iscoroutinefunction
 
-from flask import request, redirect, url_for, abort, session
+from superdesk.flask import request, redirect, url_for, abort, session
 from newsroom.auth import get_user_required
 from newsroom.auth.utils import (
     clear_user_session,

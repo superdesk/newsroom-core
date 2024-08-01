@@ -1,5 +1,4 @@
 import hmac
-import flask
 import logging
 
 import superdesk
@@ -10,9 +9,12 @@ from datetime import datetime, timedelta
 from typing import Optional, Set
 from contextlib import contextmanager
 
-from flask import current_app as app
 from flask_babel import gettext
 from bson import ObjectId
+
+from superdesk.core import json, get_app_config, get_current_app
+from superdesk.resource_fields import VERSION
+from superdesk.flask import Blueprint, request, jsonify, abort
 from superdesk.text_utils import get_word_count, get_char_count
 from superdesk.utc import utcnow
 from superdesk.errors import SuperdeskApiError
@@ -49,19 +51,19 @@ from newsroom.users import users_service
 
 
 logger = logging.getLogger(__name__)
-blueprint = flask.Blueprint("push", __name__)
+blueprint = Blueprint("push", __name__)
 
 KEY = "PUSH_KEY"
 
 
 def test_signature(request):
     """Test if request is signed using app PUSH_KEY."""
-    if not app.config.get(KEY):
-        if not app.config.get("TESTING"):
+    key = get_app_config(KEY)
+    if not key:
+        if not get_app_config("TESTING"):
             logger.warning("PUSH_KEY is not configured, can not verify incoming data.")
         return True
     payload = request.get_data()
-    key = app.config[KEY]
     mac = hmac.new(key, payload, "sha1")
     return hmac.compare_digest(request.headers.get("x-superdesk-signature", ""), "sha1=%s" % mac.hexdigest())
 
@@ -69,11 +71,12 @@ def test_signature(request):
 def assert_test_signature(request):
     if not test_signature(request):
         logger.warning("signature invalid on push from %s", request.referrer or request.remote_addr)
-        flask.abort(403)
+        abort(403)
 
 
 def fix_hrefs(doc):
     if doc.get("renditions"):
+        app = get_current_app()
         for key, rendition in doc["renditions"].items():
             if rendition.get("media"):
                 rendition["href"] = app.upload_url(rendition["media"])
@@ -83,12 +86,14 @@ def fix_hrefs(doc):
 
 @blueprint.route("/push", methods=["POST"])
 def push():
-    assert_test_signature(flask.request)
-    item = flask.json.loads(flask.request.get_data())
+    assert_test_signature(request)
+    item = json.loads(request.get_data())
     assert "guid" in item or "_id" in item, {"guid": 1}
     assert "type" in item, {"type": 1}
 
-    signals.push.send(app._get_current_object(), item=item)
+    app = get_current_app()
+
+    signals.push.send(app.as_any()._get_current_object(), item=item)
 
     if item.get("type") == "event":
         orig = app.data.find_one("agenda", req=None, _id=item["guid"])
@@ -107,16 +112,16 @@ def push():
         item["_id"] = publish_item(item, orig)
         if not item.get("nextversion"):
             notify_new_wire_item.delay(
-                item["_id"], check_topics=orig is None or app.config["WIRE_NOTIFICATIONS_ON_CORRECTIONS"]
+                item["_id"], check_topics=orig is None or get_app_config("WIRE_NOTIFICATIONS_ON_CORRECTIONS")
             )
     elif item["type"] == "planning_featured":
         publish_planning_featured(item)
     else:
-        flask.abort(400, gettext("Unknown type {}".format(item.get("type"))))
+        abort(400, gettext("Unknown type {}".format(item.get("type"))))
 
-    if app.config.get("DELETE_DASHBOARD_CACHE_ON_PUSH", True):
+    if get_app_config("DELETE_DASHBOARD_CACHE_ON_PUSH", True):
         delete_dashboard_caches()
-    return flask.jsonify({})
+    return jsonify({})
 
 
 def set_dates(doc):
@@ -125,7 +130,7 @@ def set_dates(doc):
     doc.setdefault("firstcreated", now)
     doc.setdefault("versioncreated", now)
     doc.setdefault("version", 1)
-    doc.setdefault(app.config["VERSION"], 1)
+    doc.setdefault(VERSION, 1)
 
 
 def publish_item(doc, original):
@@ -137,7 +142,7 @@ def publish_item(doc, original):
     doc.setdefault("charcount", get_char_count(doc.get("body_html", "")))
     doc["original_id"] = doc["guid"]
 
-    source_expiry = app.config.get("SOURCE_EXPIRY_DAYS") or {}
+    source_expiry = get_app_config("SOURCE_EXPIRY_DAYS") or {}
     if doc.get("source") in source_expiry:
         doc["expiry"] = datetime.utcnow().replace(second=0, microsecond=0) + timedelta(
             days=source_expiry[doc["source"]]
@@ -165,7 +170,7 @@ def publish_item(doc, original):
                 doc["guid"],
             )
 
-    if not original and app.config.get("PUSH_FIX_UPDATES"):  # check if there are updates of this item already
+    if not original and get_app_config("PUSH_FIX_UPDATES"):  # check if there are updates of this item already
         next_item = service.find_one(req=None, evolvedfrom=doc["guid"])
         if next_item:  # there is an update, add missing ancestor
             doc["nextversion"] = next_item["_id"]
@@ -173,13 +178,14 @@ def publish_item(doc, original):
 
     fix_hrefs(doc)
     logger.debug("publishing %s", doc["guid"])
+    app = get_current_app().as_any()
     for assoc in doc.get("associations", {}).values():
         if assoc:
             assoc.setdefault("subscribers", [])
             app.generate_renditions(assoc)
 
     # If there is a function defined that generates renditions for embedded images call it.
-    if app.generate_embed_renditions:
+    if getattr(app, "generate_embed_renditions", None):
         app.generate_embed_renditions(doc)
 
     try:
@@ -191,11 +197,11 @@ def publish_item(doc, original):
         logger.info("Failed to notify new wire item for Agenda watches")
         logger.exception(ex)
 
-    if app.config.get("WIRE_SUBJECT_SCHEME_WHITELIST") and doc.get("subject"):
+    if get_app_config("WIRE_SUBJECT_SCHEME_WHITELIST") and doc.get("subject"):
         doc["subject"] = [
             subject
             for subject in doc["subject"]
-            if subject.get("scheme") in app.config["WIRE_SUBJECT_SCHEME_WHITELIST"]
+            if subject.get("scheme") in get_app_config("WIRE_SUBJECT_SCHEME_WHITELIST")
         ]
 
     signals.publish_item.send(app._get_current_object(), item=doc, is_new=original is None)
@@ -212,6 +218,7 @@ def publish_event(event, orig):
     validate_event_push(orig, event)
 
     # populate attachments href
+    app = get_current_app()
     if event.get("files"):
         for file_ref in event["files"]:
             if file_ref.get("media"):
@@ -240,7 +247,7 @@ def publish_event(event, orig):
                 # This can happen when pushing a Planning item before linking to an Event
                 service.system_update(plan["_id"], {"event_id": _id}, plan)
 
-        signals.publish_event.send(app._get_current_object(), item=agenda, is_new=True)
+        signals.publish_event.send(app.as_any()._get_current_object(), item=agenda, is_new=True)
         _id = service.post([agenda])[0]
     else:
         # replace the original document
@@ -253,7 +260,7 @@ def publish_event(event, orig):
             # update the event, the version and the state
             updates = {
                 "event": event,
-                "version": event.get("version", event.get(app.config["VERSION"])),
+                "version": event.get("version", event.get(VERSION)),
                 "state": event["state"],
                 "state_reason": event.get("state_reason"),
                 "planning_items": orig.get("planning_items"),
@@ -279,7 +286,7 @@ def publish_event(event, orig):
             # event is reposted (possibly after a cancel)
             updates = {
                 "event": event,
-                "version": event.get("version", event.get(app.config["VERSION"])),
+                "version": event.get("version", event.get(VERSION)),
                 "state": event["state"],
                 "dates": get_event_dates(event),
                 "planning_items": orig.get("planning_items"),
@@ -292,7 +299,7 @@ def publish_event(event, orig):
             updated = orig.copy()
             updated.update(updates)
             signals.publish_event.send(
-                app._get_current_object(), item=updated, updates=updates, orig=orig, is_new=False
+                app.as_any()._get_current_object(), item=updated, updates=updates, orig=orig, is_new=False
             )
             service.patch(orig["_id"], updates)
             updates["_id"] = orig["_id"]
@@ -317,7 +324,7 @@ def validate_event_push(orig, updates):
     dates = get_event_dates(event)
     event_id = event.get("guid")
 
-    max_duration = app.config["MAX_MULTI_DAY_EVENT_DURATION"] or 365
+    max_duration = get_app_config("MAX_MULTI_DAY_EVENT_DURATION") or 365
     if (dates["end"] - dates["start"]).days > max_duration:
         raise SuperdeskApiError.badRequestError(
             f"Failed to ingest Event with id '{event_id}': duration exceeds maximum allowed"
@@ -335,16 +342,17 @@ def publish_planning_item(planning, orig):
 
     # Add the planning item to the list
     set_agenda_planning_items(agenda, orig, planning, action="add" if new_plan else "update")
+    app = get_current_app()
 
     if not agenda.get("_id"):
         # Setting ``_id`` of Agenda to be equal to the Planning item if there's no Event ID
         agenda.setdefault("_id", planning["guid"])
         agenda.setdefault("guid", planning["guid"])
-        signals.publish_planning.send(app._get_current_object(), item=agenda, is_new=new_plan)
+        signals.publish_planning.send(app.as_any()._get_current_object(), item=agenda, is_new=new_plan)
         return service.post([agenda])[0]
     else:
         # Replace the original
-        signals.publish_planning.send(app._get_current_object(), item=agenda, is_new=new_plan)
+        signals.publish_planning.send(app.as_any()._get_current_object(), item=agenda, is_new=new_plan)
         service.patch(agenda["_id"], agenda)
         return agenda["_id"]
 
@@ -647,6 +655,7 @@ def get_coverages(planning_items, original_coverages, new_plan):
                     )
 
                     try:
+                        app = get_current_app().as_any()
                         cov_deliveries[0]["delivery_href"] = app.set_photo_coverage_href(
                             coverage, planning_item, cov_deliveries
                         )
@@ -776,6 +785,7 @@ def notify_new_wire_item(_id, check_topics=True):
 @celery.task
 def notify_new_agenda_item(_id, check_topics=True, is_new=False):
     with locked(_id, "agenda"):
+        app = get_current_app()
         agenda = app.data.find_one("agenda", req=None, _id=_id)
         if agenda:
             if agenda.get("recurrence_id") and agenda.get("recurrence_id") != _id and is_new:
@@ -810,10 +820,10 @@ def notify_new_item(item, check_topics=True):
             else:
                 users_with_realtime_subscription = notify_agenda_topic_matches(item, user_dict, company_dict)
 
-        if app.config.get("NOTIFY_MATCHING_USERS") == "never":
+        if get_app_config("NOTIFY_MATCHING_USERS") == "never":
             return
 
-        if app.config.get("NOTIFY_MATCHING_USERS") == "cancel" and not is_canceled(item):
+        if get_app_config("NOTIFY_MATCHING_USERS") == "cancel" and not is_canceled(item):
             return
 
         notify_user_matches(
@@ -893,6 +903,7 @@ def notify_user_matches(item, users_dict, companies_dict, user_ids, company_ids,
     _send_notification("wire", _get_users("wire"))
 
     # Next iterate over the registered sections (excluding wire and api)
+    app = get_current_app().as_any()
     for section_id in [
         section["_id"]
         for section in app.sections
@@ -1017,26 +1028,28 @@ def send_topic_notification_emails(item, topics, topic_matches, users, companies
 # keeping this for testing
 @blueprint.route("/notify", methods=["POST"])
 def notify():
-    data = flask.json.loads(flask.request.get_data())
+    data = json.loads(request.get_data())
     notify_new_item(data["item"])
-    return flask.jsonify({"status": "OK"}), 200
+    return jsonify({"status": "OK"}), 200
 
 
 @blueprint.route("/push_binary", methods=["POST"])
 def push_binary():
-    assert_test_signature(flask.request)
-    media = flask.request.files["media"]
-    media_id = flask.request.form["media_id"]
+    assert_test_signature(request)
+    media = request.files["media"]
+    media_id = request.form["media_id"]
+    app = get_current_app()
     app.media.put(media, resource=ASSETS_RESOURCE, _id=media_id, content_type=media.content_type)
-    return flask.jsonify({"status": "OK"}), 201
+    return jsonify({"status": "OK"}), 201
 
 
 @blueprint.route("/push_binary/<media_id>")
 def push_binary_get(media_id):
+    app = get_current_app()
     if app.media.get(media_id, resource=ASSETS_RESOURCE):
-        return flask.jsonify({})
+        return jsonify({})
     else:
-        flask.abort(404)
+        abort(404)
 
 
 def publish_planning_featured(item):

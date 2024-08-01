@@ -10,12 +10,12 @@ import re
 import pathlib
 import importlib
 
-import flask
-import newsroom
 import sentry_sdk
-
 from flask_mail import Mail
 from flask_caching import Cache
+from elasticapm.contrib.flask import ElasticAPM
+
+from superdesk.flask import jsonify, request, render_template, g
 from superdesk.storage import AmazonMediaStorage, SuperdeskGridFSMediaStorage
 from superdesk.datalayer import SuperdeskDataLayer
 from superdesk.json_utils import SuperdeskJSONEncoder, SuperdeskFlaskJSONProvider
@@ -25,9 +25,10 @@ from superdesk.errors import SuperdeskApiError
 from superdesk.cache import cache_backend
 from superdesk.core.app import SuperdeskAsyncApp
 from superdesk.factory.app import SuperdeskEve
-from elasticapm.contrib.flask import ElasticAPM
+
 from sentry_sdk.integrations.flask import FlaskIntegration
 
+import newsroom
 from newsroom.auth import SessionAuth
 from newsroom.exceptions import AuthorizationError
 from newsroom.utils import is_json_request
@@ -179,17 +180,17 @@ class BaseNewsroomApp(SuperdeskEve):
 
     def setup_error_handlers(self):
         def assertion_error(err):
-            return flask.jsonify({"error": err.args[0] if err.args else 1}), 400
+            return jsonify({"error": err.args[0] if err.args else 1}), 400
 
         def render_404(err):
-            if flask.request and is_json_request(flask.request):
-                return flask.jsonify({"code": 404}), 404
-            return flask.render_template("404.html"), 404
+            if request and is_json_request(request):
+                return jsonify({"code": 404}), 404
+            return render_template("404.html"), 404
 
         def render_403(err):
-            if flask.request and is_json_request(flask.request):
+            if request and is_json_request(request):
                 return (
-                    flask.jsonify(
+                    jsonify(
                         {
                             "code": 403,
                             "error": str(err),
@@ -198,14 +199,14 @@ class BaseNewsroomApp(SuperdeskEve):
                     ),
                     403,
                 )
-            return flask.render_template("403.html"), 403
+            return render_template("403.html"), 403
 
         def superdesk_api_error(err):
             error_code = err.status_code or 500
-            return flask.jsonify({"error": err.message or "", "message": err.payload, "code": error_code}), error_code
+            return jsonify({"error": err.message or "", "message": err.payload, "code": error_code}), error_code
 
         def authorization_error(err: AuthorizationError):
-            return flask.render_template("authorization_error.html", message=err.message), err.code
+            return render_template("authorization_error.html", message=err.message), err.code
 
         self.register_error_handler(AssertionError, assertion_error)
         self.register_error_handler(404, render_404)
@@ -234,8 +235,8 @@ class BaseNewsroomApp(SuperdeskEve):
             "client_setting": client_setting,
         }
 
-        if flask.g:  # reset settings cache
-            flask.g.settings = None
+        if g:  # reset settings cache
+            g.settings = None
 
     def setup_apm(self):
         if self.config.get("APM_SERVER_URL") and self.config.get("APM_SECRET_TOKEN"):

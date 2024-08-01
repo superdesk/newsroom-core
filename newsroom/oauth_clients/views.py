@@ -1,17 +1,18 @@
 import re
 
-import flask
 from bson import ObjectId
 import bcrypt
-from flask import jsonify, current_app as app
 from flask_babel import gettext
-from superdesk import get_resource_service
 from werkzeug.exceptions import NotFound
+
+from superdesk.core import get_current_app
+from superdesk.flask import jsonify, request
+from superdesk import get_resource_service
+from superdesk.utils import gen_password
 
 from newsroom.decorator import admin_only, account_manager_only
 from newsroom.oauth_clients import blueprint
 from newsroom.utils import query_resource, find_one, get_json_or_400
-from superdesk.utils import gen_password
 
 
 def get_settings_data():
@@ -24,8 +25,8 @@ def get_settings_data():
 @account_manager_only
 def search():
     lookup = None
-    if flask.request.args.get("q"):
-        regex = re.compile(".*{}.*".format(flask.request.args.get("q")), re.IGNORECASE)
+    if request.args.get("q"):
+        regex = re.compile(".*{}.*".format(request.args.get("q")), re.IGNORECASE)
         lookup = {"name": regex}
     companies = list(query_resource("oauth_clients", lookup=lookup))
     return jsonify(companies), 200
@@ -60,12 +61,12 @@ def edit(_id):
     if not client:
         return NotFound(gettext("Client not found"))
 
-    if flask.request.method == "POST":
+    if request.method == "POST":
         client = get_json_or_400()
         updates = {}
         updates["name"] = client.get("name")
         get_resource_service("oauth_clients").patch(ObjectId(_id), updates=updates)
-        app.cache.delete(_id)
+        get_current_app().as_any().cache.delete(_id)
         return jsonify({"success": True}), 200
     return jsonify(client), 200
 
@@ -78,5 +79,5 @@ def delete(_id):
     """
     get_resource_service("oauth_clients").delete_action(lookup={"_id": ObjectId(_id)})
 
-    app.cache.delete(_id)
+    get_current_app().as_any().cache.delete(_id)
     return jsonify({"success": True}), 200

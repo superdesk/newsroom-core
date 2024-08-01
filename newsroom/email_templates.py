@@ -2,11 +2,12 @@ from typing import Optional
 import logging
 import newsroom
 
-from flask import render_template_string, current_app
 from flask_babel import gettext
 from werkzeug.exceptions import BadRequest, NotFound
-from eve.utils import config
 
+from superdesk.core import get_app_config
+from superdesk.flask import render_template_string
+from superdesk.resource_fields import ID_FIELD, ITEMS
 from superdesk import register_resource
 from superdesk.services import CacheableService
 
@@ -73,7 +74,7 @@ class EmailTemplatesService(CacheableService):
         email = super().find_one(req, **lookup)
 
         if not email:
-            email_id = lookup.get(config.ID_FIELD)
+            email_id = lookup.get(ID_FIELD)
 
             if not email_id:
                 raise BadRequest(gettext("Email template name not supplied"))
@@ -86,7 +87,7 @@ class EmailTemplatesService(CacheableService):
         return email
 
     def on_fetched(self, doc):
-        self.enhance_items(doc[config.ITEMS])
+        self.enhance_items(doc[ITEMS])
 
     def on_fetched_item(self, doc):
         self.enhance_items([doc])
@@ -105,7 +106,7 @@ class EmailTemplatesService(CacheableService):
             email["subject"].setdefault("translations", {})
 
     def get_translated_subject(self, email_id: str, language_code: Optional[str] = None, **kwargs) -> str:
-        language_code = language_code or current_app.config["DEFAULT_LANGUAGE"]
+        language_code = language_code or get_app_config("DEFAULT_LANGUAGE")
         email = self.get_cached_by_id(email_id)
 
         try:

@@ -1,12 +1,13 @@
 import json
 from typing import Dict
 
-import flask
-from flask import current_app as app, request
 from flask_babel import gettext
 from eve.methods.get import get_internal
 from eve.render import send_response
 from eve.utils import ParsedRequest
+
+from superdesk.core import get_app_config, get_current_app
+from superdesk.flask import request, render_template, abort, jsonify
 from superdesk import get_resource_service
 
 from newsroom.agenda import blueprint
@@ -36,28 +37,33 @@ from newsroom.agenda.utils import remove_fields_for_public_user, remove_restrict
 from newsroom.companies.utils import restrict_coverage_info
 from newsroom.notifications import push_user_notification
 from newsroom.search.config import merge_planning_aggs
+from newsroom.ui_config_async import UiConfigResourceService
+from newsroom.users import get_user_profile_data
 
 
 @blueprint.route("/agenda")
 @login_required
 @section("agenda")
-def index():
-    return flask.render_template("agenda_index.html", data=get_view_data())
+async def index():
+    user_profile_data = await get_user_profile_data()
+    data = await get_view_data()
+    return render_template("agenda_index.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/bookmarks_agenda")
 @login_required
-def bookmarks():
-    data = get_view_data()
+async def bookmarks():
+    data = await get_view_data()
+    user_profile_data = await get_user_profile_data()
     data["bookmarks"] = True
-    return flask.render_template("agenda_bookmarks.html", data=data)
+    return render_template("agenda_bookmarks.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/agenda/<_id>")
 @login_required
-def item(_id):
+async def item(_id):
     item = get_entity_or_404(_id, "agenda")
-
+    user_profile_data = await get_user_profile_data()
     user = get_user()
     company = get_company(user)
     if not is_admin_or_internal(user):
@@ -68,7 +74,7 @@ def item(_id):
         # remove planning items and coverages.
         if not item.get("event"):
             # for adhoc planning items abort the request
-            flask.abort(403)
+            abort(403)
 
         item.pop("planning_items", None)
         item.pop("coverages", None)
@@ -76,17 +82,17 @@ def item(_id):
     if restrict_coverage_info(company):
         remove_restricted_coverage_info([item])
 
-    if is_json_request(flask.request):
-        return flask.jsonify(item)
+    if is_json_request(request):
+        return jsonify(item)
 
-    if "print" in flask.request.args:
-        map = flask.request.args.get("map")
+    if "print" in request.args:
+        map = request.args.get("map")
         template = "agenda_item_print.html"
         update_action_list([_id], "prints", force_insert=True)
         get_resource_service("history").create_history_record(
             [item], "print", get_user(), request.args.get("type", "agenda")
         )
-        return flask.render_template(
+        return render_template(
             template,
             item=item,
             map=map,
@@ -95,11 +101,17 @@ def item(_id):
             contacts=get_public_contacts(item),
             links=get_links(item),
             is_admin=is_admin_or_internal(user),
+            user_profile_data=user_profile_data,
         )
 
-    data = get_view_data()
+    data = await get_view_data()
     data["item"] = item
-    return flask.render_template("agenda_index.html", data=data, title=item.get("name", item.get("headline")))
+    return render_template(
+        "agenda_index.html",
+        data=data,
+        title=item.get("name", item.get("headline")),
+        user_profile_data=user_profile_data,
+    )
 
 
 @blueprint.route("/agenda/search")
@@ -115,13 +127,14 @@ def search():
     return send_response("agenda", response)
 
 
-def get_view_data() -> Dict:
+async def get_view_data() -> Dict:
     user = get_user_required()
     topics = get_user_topics(user["_id"]) if user else []
     company = get_company(user)
     products = get_products_by_company(company, product_type="agenda") if company else []
 
     check_user_has_products(user, products)
+    ui_config_service = UiConfigResourceService()
 
     return {
         "user": user,
@@ -129,7 +142,7 @@ def get_view_data() -> Dict:
         "topics": [t for t in topics if t.get("topic_type") == "agenda"],
         "formats": [
             {"format": f["format"], "name": f["name"]}
-            for f in app.download_formatters.values()
+            for f in get_current_app().as_any().download_formatters.values()
             if "agenda" in f["types"]
         ],
         "navigations": get_navigations(user, company, "agenda"),
@@ -137,12 +150,12 @@ def get_view_data() -> Dict:
         "events_only": company.get("events_only", False) if company else False,
         "restrict_coverage_info": company.get("restrict_coverage_info", False) if company else False,
         "locators": get_vocabulary("locators"),
-        "ui_config": get_resource_service("ui_config").get_section_config("agenda"),
-        "groups": get_groups(app.config.get("AGENDA_GROUPS", []), company),
+        "ui_config": await ui_config_service.get_section_config("agenda"),
+        "groups": get_groups(get_app_config("AGENDA_GROUPS", []), company),
         "has_agenda_featured_items": get_resource_service("agenda_featured").find_one(req=None) is not None,
         "user_folders": get_user_folders(user, "agenda") if user else [],
         "company_folders": get_company_folders(company, "agenda") if company else [],
-        "date_filters": app.config.get("AGENDA_TIME_FILTERS", []),
+        "date_filters": get_app_config("AGENDA_TIME_FILTERS", []),
     }
 
 
@@ -155,7 +168,7 @@ def request_coverage():
     assert data.get("message")
     item = get_entity_or_404(data.get("item"), "agenda")
     send_coverage_request_email(user, data.get("message"), item)
-    return flask.jsonify(), 201
+    return jsonify(), 201
 
 
 @blueprint.route("/agenda_bookmark", methods=["POST", "DELETE"])
@@ -165,7 +178,7 @@ def bookmark():
     assert data.get("items")
     update_action_list(data.get("items"), "bookmarks", item_type="agenda")
     push_user_notification("saved_items", count=get_resource_service("agenda").get_saved_items_count())
-    return flask.jsonify(), 200
+    return jsonify(), 200
 
 
 @blueprint.route("/agenda_watch", methods=["POST", "DELETE"])
@@ -193,12 +206,12 @@ def follow():
                 if not user_item_watches:
                     # delete user watches of all coverages
                     get_resource_service("agenda").patch(item_id, coverage_updates)
-                    return flask.jsonify(), 200
+                    return jsonify(), 200
 
             update_action_list(data.get("items"), "watches", item_type="agenda")
 
     push_user_notification("saved_items", count=get_resource_service("agenda").get_saved_items_count())
-    return flask.jsonify(), 200
+    return jsonify(), 200
 
 
 @blueprint.route("/agenda_coverage_watch", methods=["POST", "DELETE"])
@@ -218,14 +231,14 @@ def update_coverage_watch(item_id, coverage_id, user_id, add, skip_associated=Fa
 
     if user_id in item.get("watches", []):
         return (
-            flask.jsonify({"error": gettext("Cannot edit coverage watch when watching parent item")}),
+            jsonify({"error": gettext("Cannot edit coverage watch when watching parent item")}),
             403,
         )
 
     try:
         coverage_index = [c["coverage_id"] for c in (item.get("coverages") or [])].index(coverage_id)
     except ValueError:
-        return flask.jsonify({"error": gettext("Coverage not found")}), 404
+        return jsonify({"error": gettext("Coverage not found")}), 404
 
     updates = {"coverages": item["coverages"]}
 
@@ -237,12 +250,12 @@ def update_coverage_watch(item_id, coverage_id, user_id, add, skip_associated=Fa
         try:
             updates["coverages"][coverage_index]["watches"].remove(user_id)
         except Exception:
-            return flask.jsonify({"error": gettext("Error removing watch.")}), 404
+            return jsonify({"error": gettext("Error removing watch.")}), 404
 
     get_resource_service("agenda").patch(item_id, updates)
 
     if skip_associated:
-        return flask.jsonify(), 200
+        return jsonify(), 200
     elif item.get("item_type") == "planning" and item.get("event_id"):
         # Need to also update the parent Event's list of coverage watches
         return update_coverage_watch(item["event_id"], coverage_id, user_id, add, skip_associated=True)
@@ -256,13 +269,13 @@ def update_coverage_watch(item_id, coverage_id, user_id, add, skip_associated=Fa
             skip_associated=True,
         )
 
-    return flask.jsonify(), 200
+    return jsonify(), 200
 
 
 @blueprint.route("/agenda/wire_items/<wire_id>")
 @login_required
 def related_wire_items(wire_id):
-    elastic = app.data._search_backend("agenda")
+    elastic = get_current_app().data._search_backend("agenda")
     source = {}
     must_terms = [{"term": {"coverages.delivery_id": {"value": wire_id}}}]
     query = {
@@ -276,7 +289,7 @@ def related_wire_items(wire_id):
 
     if len(agenda_result.docs) == 0:
         return (
-            flask.jsonify({"error": gettext("%(section)s item not found", section=app.config["AGENDA_SECTION"])}),
+            jsonify({"error": gettext("%(section)s item not found", section=get_app_config("AGENDA_SECTION"))}),
             404,
         )
 
@@ -302,7 +315,7 @@ def related_wire_items(wire_id):
         set_item_permission(wire_item, wire_item.get("_id") in permissioned_ids)
 
     return (
-        flask.jsonify(
+        jsonify(
             {
                 "agenda_item": agenda_result.docs[0],
                 "wire_items": wire_items,

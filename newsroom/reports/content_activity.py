@@ -1,8 +1,8 @@
 from copy import deepcopy
 
-from flask import abort, request
 from flask_babel import gettext
 
+from superdesk.flask import abort, request
 from superdesk import get_resource_service
 from superdesk.utc import utc_to_local
 

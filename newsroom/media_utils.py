@@ -2,7 +2,8 @@ import io
 import logging
 
 from PIL import Image, ImageEnhance
-from flask import current_app as app
+
+from superdesk.core import get_current_app, get_app_config
 from newsroom.upload import ASSETS_RESOURCE
 
 THUMBNAIL_SIZE = (640, 640)
@@ -18,6 +19,7 @@ def store_image(image, filename=None, _id=None):
         image = image.convert("RGB")
     image.save(binary, "jpeg", quality=THUMBNAIL_QUALITY)
     binary.seek(0)
+    app = get_current_app()
     media_id = app.media.put(
         binary,
         filename=filename,
@@ -46,11 +48,12 @@ def get_thumbnail(image):
 
 def get_watermark(image):
     image = image.copy()
-    if not app.config.get("WATERMARK_IMAGE"):
+    watermark_image_file = get_app_config("WATERMARK_IMAGE")
+    if not watermark_image_file:
         return image
     if image.mode != "RGBA":
         image = image.convert("RGBA")
-    with open(app.config["WATERMARK_IMAGE"], mode="rb") as watermark_binary:
+    with open(watermark_image_file, mode="rb") as watermark_binary:
         watermark_image = Image.open(watermark_binary)
         set_opacity(watermark_image, 0.3)
         watermark_layer = Image.new("RGBA", image.size)
@@ -78,6 +81,7 @@ def generate_preview_details_renditions(picture):
         return
 
     # add watermark to base/view images
+    app = get_current_app()
     for key in ["base", "view"]:
         rendition = picture.get("renditions", {}).get("%sImage" % key)
         if rendition:
@@ -106,6 +110,7 @@ def generate_renditions(picture):
         return
 
     # generate thumbnails
+    app = get_current_app()
     binary = app.media.get(rendition["media"], resource=ASSETS_RESOURCE)
     im = Image.open(binary)
     thumbnail = get_thumbnail(im)  # 4-3 rendition resized
@@ -119,7 +124,7 @@ def generate_renditions(picture):
             ),
         }
     )
-    app.generate_preview_details_renditions(picture)
+    app.as_any().generate_preview_details_renditions(picture)
 
 
 def init_app(app):

@@ -1,10 +1,10 @@
-import superdesk
-
-from flask import Blueprint
 from flask_babel import lazy_gettext
+import superdesk
+from superdesk.flask import Blueprint
 
 
 from .users import AuthUserService, UsersResource, AuthUserResource, users_service
+from inspect import iscoroutine
 
 blueprint = Blueprint("users", __name__)
 
@@ -14,8 +14,6 @@ def init_app(app):
     superdesk.register_resource("auth_user", AuthUserResource, AuthUserService, _app=app)
     from . import views  # noqa
 
-    app.add_template_global(views.get_view_data, "get_user_profile_data")
-
     app.settings_app(
         "users",
         lazy_gettext("User Management"),
@@ -23,3 +21,11 @@ def init_app(app):
         data=views.get_settings_data,
         allow_account_mgr=True,
     )
+
+
+async def get_user_profile_data():
+    from . import views  # noqa
+
+    func = views.get_view_data()
+    data = await func if iscoroutine(func) else func
+    return data

@@ -1,8 +1,8 @@
-import flask
-from flask import current_app as app
 from eve.render import send_response
 from eve.methods.get import get_internal
 
+from superdesk.core import get_current_app
+from superdesk.flask import render_template, jsonify, request
 from superdesk import get_resource_service
 from newsroom.market_place import blueprint, SECTION_ID, SECTION_NAME
 from newsroom.auth import get_user, get_user_id, get_company_from_user
@@ -23,12 +23,14 @@ from newsroom.utils import (
     query_resource,
 )
 from newsroom.notifications import push_user_notification
+from newsroom.ui_config_async import UiConfigResourceService
+from newsroom.users import get_user_profile_data
 
 
 search_endpoint_name = "{}_search".format(SECTION_ID)
 
 
-def get_view_data():
+async def get_view_data():
     """Get the view data"""
     user = get_user()
     topics = get_user_topics(user["_id"]) if user else []
@@ -37,6 +39,7 @@ def get_view_data():
         product_type=SECTION_ID,
     )
     get_story_count(navigations, user)
+    ui_config_service = UiConfigResourceService()
     return {
         "user": str(user["_id"]) if user else None,
         "user_type": (user or {}).get("user_type") or "public",
@@ -44,11 +47,13 @@ def get_view_data():
         "topics": [t for t in topics if t.get("topic_type") == SECTION_ID],
         "navigations": navigations,
         "formats": [
-            {"format": f["format"], "name": f["name"]} for f in app.download_formatters.values() if "wire" in f["types"]
+            {"format": f["format"], "name": f["name"]}
+            for f in get_current_app().as_any().download_formatters.values()
+            if "wire" in f["types"]
         ],
         "saved_items": get_bookmarks_count(user["_id"], SECTION_ID),
         "context": SECTION_ID,
-        "ui_config": get_resource_service("ui_config").get_section_config(SECTION_ID),
+        "ui_config": await ui_config_service.get_section_config(SECTION_ID),
         "home_page": False,
         "title": SECTION_NAME,
     }
@@ -82,15 +87,18 @@ def get_home_page_data():
 @blueprint.route("/{}".format(SECTION_ID))
 @login_required
 @section(SECTION_ID)
-def index():
-    return flask.render_template("market_place_index.html", data=get_view_data())
+async def index():
+    data = await get_view_data()
+    user_profile_data = await get_user_profile_data()
+    return render_template("market_place_index.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/{}/home".format(SECTION_ID))
 @login_required
 @section(SECTION_ID)
-def home():
-    return flask.render_template("market_place_home.html", data=get_home_page_data())
+async def home():
+    user_profile_data = await get_user_profile_data()
+    return render_template("market_place_home.html", data=get_home_page_data(), user_profile_data=user_profile_data)
 
 
 @blueprint.route("/{}/search".format(SECTION_ID))
@@ -103,10 +111,11 @@ def search():
 @blueprint.route("/bookmarks_{}".format(SECTION_ID))
 @login_required
 @section(SECTION_ID)
-def bookmarks():
-    data = get_view_data()
+async def bookmarks():
+    data = await get_view_data()
     data["bookmarks"] = True
-    return flask.render_template("market_place_bookmarks.html", data=data)
+    user_profile_data = await get_user_profile_data()
+    return render_template("market_place_bookmarks.html", data=data, user_profile_data=user_profile_data)
 
 
 @blueprint.route("/{}_bookmark".format(SECTION_ID), methods=["POST", "DELETE"])
@@ -122,7 +131,7 @@ def bookmark():
     update_action_list(data.get("items"), "bookmarks", item_type="items")
     user_id = get_user_id()
     push_user_notification("saved_items", count=get_bookmarks_count(user_id, SECTION_ID))
-    return flask.jsonify(), 200
+    return jsonify(), 200
 
 
 @blueprint.route("/{}/<_id>/copy".format(SECTION_ID), methods=["POST"])
@@ -131,7 +140,7 @@ def copy(_id):
     item_type = get_type()
     get_entity_or_404(_id, item_type)
     update_action_list([_id], "copies", item_type=item_type)
-    return flask.jsonify(), 200
+    return jsonify(), 200
 
 
 @blueprint.route("/{}/<_id>/versions".format(SECTION_ID))
@@ -139,28 +148,32 @@ def copy(_id):
 def versions(_id):
     item = get_entity_or_404(_id, "items")
     items = get_previous_versions(item)
-    return flask.jsonify({"_items": items})
+    return jsonify({"_items": items})
 
 
 @blueprint.route("/{}/<_id>".format(SECTION_ID))
 @login_required
-def item(_id):
+async def item(_id):
     item = get_entity_or_404(_id, "items")
     set_permissions(item, "aapX")
-    display_char_count = get_resource_service("ui_config").get_section_config(SECTION_ID).get("char_count", False)
-    if is_json_request(flask.request):
-        return flask.jsonify(item)
+    ui_config_service = UiConfigResourceService()
+    config = await ui_config_service.get_section_config(SECTION_ID)
+    display_char_count = config.get("char_count", False)
+    user_profile_data = await get_user_profile_data()
+    if is_json_request(request):
+        return jsonify(item)
     if not item.get("_access"):
-        return flask.render_template("wire_item_access_restricted.html", item=item)
+        return render_template("wire_item_access_restricted.html", item=item, user_profile_data=user_profile_data)
     previous_versions = get_previous_versions(item)
-    if "print" in flask.request.args:
+    if "print" in request.args:
         template = "wire_item_print.html"
         update_action_list([_id], "prints", force_insert=True)
     else:
         template = "wire_item.html"
-    return flask.render_template(
+    return render_template(
         template,
         item=item,
         previous_versions=previous_versions,
         display_char_count=display_char_count,
+        user_profile_data=user_profile_data,
     )

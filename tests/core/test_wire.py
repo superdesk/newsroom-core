@@ -312,8 +312,8 @@ def test_search_sort(client, app):
 
 
 def test_logged_in_user_no_product_gets_no_results(client, app, public_user):
-    with client.session_transaction() as session:
-        start_user_session(public_user, session=session)
+    with client.session_transaction():
+        start_user_session(public_user)
     resp = client.get("/wire/search")
     assert 403 == resp.status_code, resp.get_data()
     resp = client.get("/wire")
@@ -485,7 +485,7 @@ def test_search_created_to(client):
     assert 0 == len(data["_items"])
 
 
-def test_item_detail_access(client, app):
+async def test_item_detail_access(client, app):
     item_url = "/wire/%s" % items[0]["_id"]
     data = get_json(client, item_url)
     assert data["_access"]

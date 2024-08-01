@@ -1,9 +1,10 @@
 import re
 
-import flask
 from bson import ObjectId
-from flask import jsonify, current_app
 from flask_babel import gettext
+
+from superdesk.core import get_current_app
+from superdesk.flask import jsonify, request
 from superdesk import get_resource_service
 
 from newsroom.decorator import admin_only
@@ -24,7 +25,7 @@ def get_settings_data():
     """
     data = {
         "section_filters": list(query_resource("section_filters")),
-        "sections": current_app.sections,
+        "sections": get_current_app().as_any().sections,
     }
     return data
 
@@ -33,8 +34,8 @@ def get_settings_data():
 @admin_only
 def index():
     lookup = None
-    if flask.request.args.get("q"):
-        lookup = flask.request.args.get("q")
+    if request.args.get("q"):
+        lookup = request.args.get("q")
     section_filters = list(query_resource("section_filters", lookup=lookup))
     return jsonify(section_filters), 200
 
@@ -43,8 +44,8 @@ def index():
 @admin_only
 def search():
     lookup = None
-    if flask.request.args.get("q"):
-        regex = re.compile(".*{}.*".format(flask.request.args.get("q")), re.IGNORECASE)
+    if request.args.get("q"):
+        regex = re.compile(".*{}.*".format(request.args.get("q")), re.IGNORECASE)
         lookup = {"name": regex}
     section_filters = list(query_resource("section_filters", lookup=lookup))
     return jsonify(section_filters), 200
@@ -65,7 +66,7 @@ def create():
         return validation
 
     section = next(
-        (s for s in current_app.sections if s["_id"] == section_filter.get("filter_type")),
+        (s for s in get_current_app().as_any().sections if s["_id"] == section_filter.get("filter_type")),
         None,
     )
     if section and section.get("search_type"):

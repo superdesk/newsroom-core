@@ -1,4 +1,4 @@
-from flask import url_for
+from superdesk.flask import url_for
 
 
 ADMIN_USER_ID = "5cc94b99bc4316684dc7dc07"

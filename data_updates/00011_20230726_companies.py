@@ -7,8 +7,8 @@
 # Author  : Ketan
 # Creation: 2023-07-26
 
+from superdesk.resource_fields import ID_FIELD
 from superdesk.commands.data_updates import DataUpdate as _DataUpdate
-from eve.utils import config
 
 
 class DataUpdate(_DataUpdate):
@@ -28,7 +28,7 @@ class DataUpdate(_DataUpdate):
 
                 print(
                     mongodb_collection.update(
-                        {config.ID_FIELD: company.get(config.ID_FIELD)},
+                        {ID_FIELD: company.get(ID_FIELD)},
                         {"$set": {"country": new_country_qcode}},
                     )
                 )

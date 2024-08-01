@@ -1,6 +1,7 @@
 from copy import deepcopy
-from flask import json, Config
 
+from superdesk.core import json
+from superdesk.flask import Config
 from superdesk.tests.steps import get_prefixed_url
 from newsroom.tests.conftest import drop_mongo, reset_elastic, root
 
