@@ -18,8 +18,6 @@ class CompanyProduct:
 
 
 class CompanyResource(NewshubResourceModel):
-    etag: Annotated[Optional[str], Field(alias="_etag")] = None
-
     name: Annotated[str, validate_iunique_value_async("companies", "name")]
     url: Optional[str] = None
     sd_subscriber_id: Optional[str] = None
