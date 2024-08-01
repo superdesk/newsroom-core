@@ -15,14 +15,9 @@ class UiConfig(ResourceModel):
     open_coverage_content_in_same_page: bool = False
     subnav: Optional[Dict[str, Any]] = None
     init_version: Optional[int] = None
-    _etag: Optional[Any] = None
 
 
 class UiConfigResourceService(AsyncResourceService[UiConfig]):
-    def get_model_instance_from_dict(self, data: Dict[str, Any]):
-        data.pop("_etag", None)
-        return super().get_model_instance_from_dict(data)
-
     async def get_section_config(self, section_name: str) -> Dict[str, Any]:
         """Get the section config"""
         config = await self.find_by_id(section_name)

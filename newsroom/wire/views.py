@@ -1,5 +1,4 @@
 import io
-import asyncio
 import zipfile
 import superdesk
 
@@ -299,7 +298,7 @@ def search():
 
 @blueprint.route("/download", methods=["POST"])
 @login_required
-def download():
+async def download():
     user = get_user(required=True)
     data = request.json
     _format = data.get("format", "text")
@@ -313,8 +312,8 @@ def download():
         if len(items) == 1:
             try:
                 picture = formatter.format_item(items[0], item_type=item_type)
-                # TODO: running through `asyncio.run` until we migrate this view
-                return asyncio.run(get_upload(picture["media"], filename="baseimage%s" % picture["file_extension"]))
+                media_url = await get_upload(picture["media"], filename="baseimage%s" % picture["file_extension"]))
+                return media_url
             except ValueError:
                 return abort(404)
         else:
