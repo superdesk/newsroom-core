@@ -1,6 +1,5 @@
 from typing import Annotated, Optional
 from datetime import datetime
-from pydantic import Field
 
 from superdesk.core.resources import dataclass
 from superdesk.core.resources.validators import validate_data_relation_async, validate_iunique_value_async
