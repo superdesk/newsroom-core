@@ -43,7 +43,7 @@ bcrypt==4.1.3
     # via superdesk-core
 behave==1.2.6
     # via wooper
-billiard==3.6.4.0
+billiard==4.2.0
     # via celery
 black==23.12.1
     # via
@@ -70,7 +70,7 @@ cachetools==5.4.0
     # via
     #   flask-oidc-ex
     #   google-auth
-celery[redis]==5.2.7
+celery[redis]==5.4.0
     # via superdesk-core
 cerberus==1.3.5
     # via
@@ -178,7 +178,7 @@ flask-limiter==0.9.5.1
     # via -r requirements.txt
 flask-mail==0.10.0
     # via superdesk-core
-flask-oidc-ex==0.5.8
+flask-oidc-ex==0.6.2
     # via superdesk-core
 flask-webpack==0.1.0
     # via -r requirements.txt
@@ -202,7 +202,7 @@ h2==4.1.0
     # via hypercorn
 hachoir==3.3.0
     # via superdesk-core
-hermescache==0.10.0
+hermescache==1.0.0
     # via superdesk-core
 honcho==1.1.0
     # via -r requirements.txt
@@ -393,6 +393,7 @@ python-dateutil==2.9.0.post0
     # via
     #   arrow
     #   botocore
+    #   celery
     #   croniter
     #   icalendar
     #   superdesk-core
@@ -406,7 +407,6 @@ python3-saml==1.16.0
     # via -r requirements.txt
 pytz==2024.1
     # via
-    #   celery
     #   croniter
     #   eve-elastic
     #   flask-babel
@@ -471,7 +471,7 @@ six==1.16.0
     #   parse-type
     #   python-bidi
     #   python-dateutil
-superdesk-core @ git+https://github.com/MarkLark86/superdesk-core.git@async-latest
+superdesk-core @ git+https://github.com/superdesk/superdesk-core.git@async
     # via -r requirements.txt
 superdesk-planning @ git+https://github.com/superdesk/superdesk-planning.git@async
     # via -r requirements.txt
@@ -534,6 +534,8 @@ typing-extensions==4.12.2
     #   pypdf
     #   qrcode
     #   superdesk-core
+tzdata==2024.1
+    # via celery
 tzlocal==5.2
     # via
     #   pyhanko
