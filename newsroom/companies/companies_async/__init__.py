@@ -31,6 +31,7 @@ company_resource_config = ResourceConfig(
                 keys=[("auth_domains", 1)],
                 unique=True,
                 collation={"locale": "en", "strength": 2},
+                sparse=False,
                 partialFilterExpression={"auth_domains.0": {"$exists": True}},  # only check non empty
             ),
         ],
