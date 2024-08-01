@@ -1,12 +1,13 @@
 from pydantic import BaseModel
 
-from superdesk.upload import upload_url as _upload_url
+from superdesk.core import get_app_config
 from superdesk.core.web import Response, Request
+from superdesk.upload import upload_url as _upload_url
 
 from .module import assets_endpoints
 from .utils import generate_response_headers, get_media_file
 
-# from newsroom.decorator import is_valid_session, clear_session_and_redirect_to_login
+from newsroom.decorator import is_valid_session, clear_session_and_redirect_to_login
 
 
 class RouteArguments(BaseModel):
@@ -15,8 +16,8 @@ class RouteArguments(BaseModel):
 
 @assets_endpoints.endpoint("/assets/<string:media_id>", methods=["GET"])
 async def get_upload(args: RouteArguments, _p, request: Request) -> Response:
-    # if not get_app_config("PUBLIC_DASHBOARD") and not is_valid_session():
-    #     return clear_session_and_redirect_to_login()
+    if not get_app_config("PUBLIC_DASHBOARD") and not is_valid_session():
+        return clear_session_and_redirect_to_login()
 
     media_file = await get_media_file(args.media_id)
     if not media_file:
