@@ -19,6 +19,7 @@ from bson.errors import InvalidId
 from eve.utils import ParsedRequest
 from eve_elastic.elastic import parse_date, ElasticCursor
 from flask_babel import gettext, format_date as _format_date
+from superdesk.core.web import Request
 
 from superdesk.core import json, get_current_app
 from superdesk.flask import abort, request, g, session, url_for
@@ -136,6 +137,13 @@ def get_json_or_400():
     data = request.get_json()
     if not isinstance(data, dict):
         abort(400)
+    return data
+
+
+async def get_json_or_400_async(req: Request):
+    data = await req.get_json()
+    if not isinstance(data, dict):
+        await req.abort(400)
     return data
 
 
