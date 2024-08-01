@@ -1,83 +1,104 @@
 import re
-
-from bson import ObjectId
 import bcrypt
+from typing import Optional
+
 from flask_babel import gettext
+from pydantic import BaseModel
 from werkzeug.exceptions import NotFound
 
-from superdesk.core import get_current_app
-from superdesk.flask import jsonify, request
-from superdesk import get_resource_service
 from superdesk.utils import gen_password
+from superdesk.core.web import Request, Response
+from superdesk.core.resources.fields import ObjectId
 
+from newsroom.utils import get_json_or_400_async
 from newsroom.decorator import admin_only, account_manager_only
-from newsroom.oauth_clients import blueprint
-from newsroom.utils import query_resource, find_one, get_json_or_400
+from .clients_async import clients_endpoints, ClientService, ClientResource
 
 
-def get_settings_data():
+async def get_settings_data():
+    data = await ClientService().get_all_clients()
     return {
-        "oauth_clients": list(query_resource("oauth_clients")),
+        "oauth_clients": data,
     }
 
 
-@blueprint.route("/oauth_clients/search", methods=["GET"])
+class ClientSearchArgs(BaseModel):
+    q: Optional[str] = None
+
+
+class ClientArgs(BaseModel):
+    client_id: ObjectId
+
+
+@clients_endpoints.endpoint("/oauth_clients/search", methods=["GET"])
 @account_manager_only
-def search():
+async def search(args: None, params: ClientSearchArgs, request: Request) -> Response:
     lookup = None
-    if request.args.get("q"):
-        regex = re.compile(".*{}.*".format(request.args.get("q")), re.IGNORECASE)
+    if params.q:
+        regex = re.compile(f".*{re.escape(params.q)}.*", re.IGNORECASE)
         lookup = {"name": regex}
-    companies = list(query_resource("oauth_clients", lookup=lookup))
-    return jsonify(companies), 200
+    cursor = await ClientService().search(lookup)
+    data = await cursor.to_list_raw()
+    return Response(data, 200, ())
 
 
-@blueprint.route("/oauth_clients/new", methods=["POST"])
+@clients_endpoints.endpoint("/oauth_clients/new", methods=["POST"])
 @account_manager_only
-def create():
+async def create(request: Request) -> Response:
     """
     Creates the client with given client id
     """
-    client = get_json_or_400()
+    client = await get_json_or_400_async(request)
+    if not isinstance(client, dict):
+        return request.abort(400)
 
     password = gen_password()
-    new_company = {
+    doc = {
+        "_id": ObjectId(),
         "name": client.get("name"),
         "password": bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode(),
     }
+    new_client = ClientResource.model_validate(doc)
+    ids = await ClientService().create([new_client])
+    return Response({"success": True, "_id": ids[0], "password": password}, 201, ())
 
-    ids = get_resource_service("oauth_clients").post([new_company])
-    return jsonify({"success": True, "_id": ids[0], "password": password}), 201
 
-
-@blueprint.route("/oauth_clients/<_id>", methods=["GET", "POST"])
+@clients_endpoints.endpoint("/oauth_clients/<string:client_id>", methods=["GET", "POST"])
 @account_manager_only
-def edit(_id):
+async def edit(args: ClientArgs, params: None, request: Request) -> Response:
     """
     Edits the client with given client id
     """
-    client = find_one("oauth_clients", _id=ObjectId(_id))
-
-    if not client:
+    service = ClientService()
+    original = await service.find_by_id(args.client_id)
+    if not original:
         return NotFound(gettext("Client not found"))
+    elif request.method == "GET":
+        return Response(original, 200, ())
 
-    if request.method == "POST":
-        client = get_json_or_400()
-        updates = {}
-        updates["name"] = client.get("name")
-        get_resource_service("oauth_clients").patch(ObjectId(_id), updates=updates)
-        get_current_app().as_any().cache.delete(_id)
-        return jsonify({"success": True}), 200
-    return jsonify(client), 200
+    request_json = await get_json_or_400_async(request)
+    if not isinstance(request_json, dict):
+        return request.abort(400)
+
+    updates = {}
+    updates["name"] = request_json.get("name")
+    await service.update(args.client_id, updates)
+    return Response({"success": True}, 200, ())
 
 
-@blueprint.route("/oauth_clients/<_id>", methods=["DELETE"])
+@clients_endpoints.endpoint("/oauth_clients/<string:client_id>", methods=["DELETE"])
 @admin_only
-def delete(_id):
+async def delete(args: ClientArgs, params: None, request: Request) -> Response:
     """
     Deletes the client with given client id
     """
-    get_resource_service("oauth_clients").delete_action(lookup={"_id": ObjectId(_id)})
+    service = ClientService()
+    original = await service.find_by_id(args.client_id)
 
-    get_current_app().as_any().cache.delete(_id)
-    return jsonify({"success": True}), 200
+    if not original:
+        raise NotFound(gettext("Client not found"))
+    try:
+        await service.delete(original)
+    except Exception as e:
+        return Response({"error": str(e)}, 400, ())
+    return Response({"success": True}, 200, ())

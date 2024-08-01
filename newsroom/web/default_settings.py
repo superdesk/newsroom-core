@@ -134,7 +134,6 @@ BLUEPRINTS = [
     "newsroom.settings",
     "newsroom.news_api.api_tokens",
     "newsroom.monitoring",
-    "newsroom.oauth_clients",
     "newsroom.auth_server.oauth2",
     "newsroom.company_admin",
 ]
@@ -179,6 +178,7 @@ CORE_APPS = [
 
 MODULES = [
     "newsroom.ui_config_async",
+    "newsroom.oauth_clients",
     "newsroom.companies",
 ]
 
