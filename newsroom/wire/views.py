@@ -312,7 +312,7 @@ async def download():
         if len(items) == 1:
             try:
                 picture = formatter.format_item(items[0], item_type=item_type)
-                media_url = await get_upload(picture["media"], filename="baseimage%s" % picture["file_extension"]))
+                media_url = await get_upload(picture["media"], filename="baseimage%s" % picture["file_extension"])
                 return media_url
             except ValueError:
                 return abort(404)
