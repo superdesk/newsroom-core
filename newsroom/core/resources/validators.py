@@ -2,6 +2,8 @@ from typing import Optional
 
 import ipaddress
 from pydantic import AfterValidator
+from pydantic_core import PydanticCustomError
+from flask_babel import gettext
 
 from superdesk.core.app import get_current_async_app
 
@@ -15,8 +17,8 @@ def validate_ip_address() -> AfterValidator:
 
         try:
             ipaddress.ip_network(value, strict=True)
-        except ValueError as error:
-            raise ValueError(f"Invalid IP address: {value}") from error
+        except ValueError:
+            raise PydanticCustomError("ipaddress", gettext("Invalid IP address {ipaddress}"), dict(ipaddress=ipaddress))
 
         return value
 
@@ -33,7 +35,9 @@ def validate_auth_provider() -> AfterValidator:
         app = get_current_async_app()
         supported_provider_ids = [provider["_id"] for provider in app.wsgi.config["AUTH_PROVIDERS"]]
         if value not in supported_provider_ids:
-            raise ValueError(f"Unknown auth_provider '{value}' supplied")
+            raise PydanticCustomError(
+                "auth_provider", gettext("Unknown auth provider {provider}"), dict(provider=value)
+            )
 
         return value
 

@@ -1,16 +1,16 @@
 from typing import Dict, Optional
 import re
-import ipaddress
 
 from bson import ObjectId
 from datetime import datetime
 from flask_babel import gettext
 from werkzeug.exceptions import NotFound, BadRequest
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from superdesk.core import get_app_config, get_current_app
 from superdesk.core.web import Request, Response
 from superdesk.core.resources.fields import ObjectId as ObjectIdField
+from superdesk.core.resources.validators import get_field_errors_from_pydantic_validation_error
 from superdesk import get_resource_service
 
 from newsroom.decorator import admin_only, account_manager_only, login_required
@@ -19,8 +19,6 @@ from newsroom.utils import (
     get_public_user_data,
     query_resource,
     get_json_or_400_async,
-    set_original_creator,
-    set_version_creator,
 )
 from newsroom.ui_config_async import UiConfigResourceService
 
@@ -45,7 +43,7 @@ async def get_settings_data():
 
     ui_config_service = UiConfigResourceService()
     return {
-        "companies": list(query_resource("companies")),
+        "companies": [company async for company in CompanyService().get_all_raw()],
         "services": get_app_config("SERVICES"),
         "products": list(query_resource("products")),
         "sections": get_current_app().as_any().sections,
@@ -80,42 +78,23 @@ async def create_company(request: Request) -> Response:
     if not isinstance(company, dict):
         return request.abort(400)
 
-    errors = get_errors_company(company)
-    if errors:
-        return Response(errors[0], errors[1], ())
-
     company_data = get_company_updates(company)
-    set_original_creator(company_data)
     company_data["_id"] = ObjectId()
 
-    # TODO: Catch validation errors here, like we are with previous implementation
-    #       To be passed back to the front-end, to show validation errors
-    new_company = CompanyResource.model_validate(company_data)
     try:
+        new_company = CompanyResource.model_validate(company_data)
         ids = await CompanyService().create([new_company])
-    except ValueError:
-        return Response({"name": gettext("Company already exists")}, 400, ())
+    except ValidationError as error:
+        return Response(
+            {
+                field: list(errors.values())[0]
+                for field, errors in get_field_errors_from_pydantic_validation_error(error).items()
+            },
+            400,
+            (),
+        )
 
     return Response({"success": True, "_id": ids[0]}, 201, ())
-
-
-def get_errors_company(updates, original=None):
-    if original is None:
-        original = {}
-
-    if not (updates.get("name") or original.get("name")):
-        return {"name": gettext("Name not found")}, 400
-
-    if updates.get("allowed_ip_list"):
-        errors = []
-        for ip in updates["allowed_ip_list"]:
-            try:
-                ipaddress.ip_network(ip, strict=True)
-            except ValueError as e:
-                errors.append(gettext("{0}: {1}".format(ip, e)))
-
-        if errors:
-            return {"allowed_ip_list": errors}, 400
 
 
 def get_company_updates(data, original=None):
@@ -177,19 +156,19 @@ async def edit_company(args: CompanyItemArgs, params: None, request: Request) ->
     if not isinstance(request_json, dict):
         return request.abort(400)
 
-    errors = get_errors_company(request_json, original)
-    if errors:
-        return Response(errors[0], errors[1], ())
-
     updates = get_company_updates(request_json, original)
-    set_version_creator(updates)  # TODO: should this go into resource service?
 
-    # TODO: Catch validation errors here, like we are with previous implementation
-    #       To be passed back to the front-end, to show validation errors
     try:
         await service.update(args.company_id, updates)
-    except Exception as e:
-        return Response({"name": gettext("Company already exists"), "error": str(e)}, 400, ())
+    except ValidationError as error:
+        return Response(
+            {
+                field: list(errors.values())[0]
+                for field, errors in get_field_errors_from_pydantic_validation_error(error).items()
+            },
+            400,
+            (),
+        )
 
     return Response({"success": True}, 200, ())
 

@@ -22,10 +22,10 @@ class CompanyService(NewshubAsyncResourceService[CompanyResource]):
     async def on_update(self, updates: Dict[str, Any], original: CompanyResource) -> None:
         await super().on_update(updates, original)
         if "sections" in updates or "products" in updates:
-            sections = updates.get("sections", original.get("sections")) or {}
+            sections = updates.get("sections", original.sections) or {}
             updates["products"] = [
                 product
-                for product in updates.get("products", original.get("products")) or []
+                for product in updates.get("products", original.products) or []
                 if product.get("section") and sections.get(product["section"]) is True
             ]
 
