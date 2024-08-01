@@ -15,7 +15,7 @@ from newsroom.utils import (
     set_original_creator,
     set_version_creator,
 )
-from newsroom.assets.utils import get_file
+from newsroom.assets.utils import get_file_sync
 from newsroom.wire.views import delete_dashboard_caches
 
 
@@ -57,10 +57,7 @@ def create():
     return jsonify({"success": True, "_id": ids[0]}), 201
 
 
-def _get_card_data(data):
-    if not data:
-        abort(400)
-
+async def _get_card_data(data):
     if not data.get("label"):
         raise ValueError(gettext("Label not found"))
 
@@ -80,7 +77,9 @@ def _get_card_data(data):
 
     if data.get("type") == "2x2-events":
         for index, event in enumerate(card_data["config"]["events"]):
-            file_url = get_file("file{}".format(index))
+            # NOTE: using `sync` compat method until `cards` is migrated to async
+            file_url = get_file_sync(f"file{index}")
+
             if file_url:
                 event["file_url"] = file_url
 
@@ -101,6 +100,9 @@ def edit(id):
     get_entity_or_404(id, "cards")
 
     data = json.loads(request.form["card"])
+    if not data:
+        abort(400)
+
     card_data = _get_card_data(data)
     set_version_creator(card_data)
     get_resource_service("cards").patch(id=ObjectId(id), updates=card_data)

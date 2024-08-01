@@ -1,3 +1,4 @@
+import asyncio
 import os
 import bson
 
@@ -15,11 +16,20 @@ from .module import ASSETS_ENDPOINT_GROUP_NAME, ASSETS_RESOURCE
 CACHE_MAX_AGE = 3600 * 24 * 7  # 7 days
 
 
-async def get_media_file(media_id):
+def get_newsroom_app():
     from newsroom.web.factory import NewsroomWebApp
 
-    app = cast(NewsroomWebApp, get_current_app())
+    return cast(NewsroomWebApp, get_current_app())
 
+
+async def get_media_file(media_id: str):
+    """
+    Asynchronously retrieves a media file from the database using its media ID.
+
+    Returns:
+        The media file object if found, otherwise None.
+    """
+    app = get_newsroom_app()
     try:
         result = await app.media_async.get(media_id, ASSETS_RESOURCE)
         return result
@@ -28,6 +38,12 @@ async def get_media_file(media_id):
 
 
 def get_content_disposition(filename: Optional[str], metadata: Mapping[str, Any] = {}) -> str:
+    """
+    Generates the Content-Disposition header value based on the filename and metadata.
+
+    Returns:
+        str: A Content-Disposition header string.
+    """
     if filename:
         _filename, ext = os.path.splitext(filename)
         if not ext:
@@ -39,6 +55,15 @@ def get_content_disposition(filename: Optional[str], metadata: Mapping[str, Any]
 
 
 def generate_response_headers(media_file: AsyncIOMotorGridOut) -> Sequence:
+    """
+    Generates a sequence of HTTP headers for a media file based on its properties.
+
+    Args:
+        media_file (AsyncIOMotorGridOut): The media file object retrieved from a database.
+
+    Returns:
+        Sequence[Tuple[str, Any]]: A list of tuples representing HTTP response headers
+    """
     metadata = media_file.metadata or {}
 
     return [
@@ -52,15 +77,35 @@ def generate_response_headers(media_file: AsyncIOMotorGridOut) -> Sequence:
     ]
 
 
-def get_file(key):
-    file = request.files.get(key)
-    if file:
-        filename = secure_filename(file.filename)
-        get_current_app().media.put(file, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type)
-        endpoint = f"{ASSETS_ENDPOINT_GROUP_NAME}.get_upload"
+async def get_file_async(key: str) -> Optional[str]:
+    """
+    Asynchronously uploads a file retrieved from a request to a media storage service
+    and generates a URL for accessing the uploaded file.
 
+    Args:
+        key (str): The key in the request.files dictionary that corresponds to the file to be uploaded.
+
+    Returns:
+        Optional[str]: A URL to the uploaded file if a file is found and successfully uploaded; otherwise, None.
+        None is returned if no file is found for the provided key or if the file fails to upload.
+    """
+    file = request.files.get(key)
+
+    if file:
+        app = get_newsroom_app()
+        filename = secure_filename(file.filename)
+
+        await app.media_async.put(
+            file, filename, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type
+        )
+
+        endpoint = f"{ASSETS_ENDPOINT_GROUP_NAME}.get_upload"
         return url_for(endpoint, media_id=filename)
 
 
 def upload_url(media_id: str):
     return _upload_url(media_id, view="assets.get_media_streamed")
+
+
+# TODO: remove once `cards` and `navigations` apps are moved to new async framework
+get_file_sync = lambda x: asyncio.run(get_file_async(x))

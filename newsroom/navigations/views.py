@@ -17,7 +17,7 @@ from newsroom.utils import (
     set_original_creator,
     set_version_creator,
 )
-from newsroom.assets.utils import get_file
+from newsroom.assets.utils import get_file_sync
 
 
 def get_settings_data():
@@ -76,7 +76,9 @@ def _get_navigation_data(data):
     }
 
     for index, tile in enumerate(navigation_data["tile_images"] or []):
-        file_url = get_file("file{}".format(index))
+        # NOTE: using `sync` compat method until `navigations` is migrated to async
+        file_url = get_file_sync(f"file{index}")
+
         if file_url:
             tile["file_url"] = file_url
 
