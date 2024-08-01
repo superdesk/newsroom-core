@@ -77,35 +77,26 @@ def generate_response_headers(media_file: AsyncIOMotorGridOut) -> Sequence:
     ]
 
 
-async def get_file_async(key: str) -> Optional[str]:
+async def save_file_and_get_url(file: Any) -> Optional[str]:
     """
-    Asynchronously uploads a file retrieved from a request to a media storage service
-    and generates a URL for accessing the uploaded file.
+    Asynchronously uploads a file to the media storage service and generates a URL
+    for accessing the uploaded file.
 
     Args:
-        key (str): The key in the request.files dictionary that corresponds to the file to be uploaded.
+        file: The file to be uploaded.
 
     Returns:
         Optional[str]: A URL to the uploaded file if a file is found and successfully uploaded; otherwise, None.
         None is returned if no file is found for the provided key or if the file fails to upload.
     """
-    file = request.files.get(key)
+    app = get_newsroom_app()
+    filename = secure_filename(file.filename)
 
-    if file:
-        app = get_newsroom_app()
-        filename = secure_filename(file.filename)
+    await app.media_async.put(file, filename, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type)
 
-        await app.media_async.put(
-            file, filename, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type
-        )
-
-        endpoint = f"{ASSETS_ENDPOINT_GROUP_NAME}.get_upload"
-        return url_for(endpoint, media_id=filename)
+    endpoint = f"{ASSETS_ENDPOINT_GROUP_NAME}.get_upload"
+    return url_for(endpoint, media_id=filename)
 
 
 def upload_url(media_id: str):
     return _upload_url(media_id, view="assets.get_media_streamed")
-
-
-# TODO: remove once `cards` and `navigations` apps are moved to new async framework
-get_file_sync = lambda x: asyncio.run(get_file_async(x))

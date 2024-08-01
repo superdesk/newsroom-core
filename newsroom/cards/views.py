@@ -1,4 +1,5 @@
 import re
+from typing import Any, Optional
 
 from bson import ObjectId
 from flask_babel import gettext
@@ -15,7 +16,7 @@ from newsroom.utils import (
     set_original_creator,
     set_version_creator,
 )
-from newsroom.assets.utils import get_file_sync
+from newsroom.assets.utils import save_file_and_get_url
 from newsroom.wire.views import delete_dashboard_caches
 
 
@@ -26,6 +27,10 @@ def get_settings_data():
         "dashboards": get_current_app().as_any().dashboards,
         "navigations": list(query_resource("navigations", lookup={"is_enabled": True})),
     }
+
+
+def _get_file_from_request(key: str) -> Optional[Any]:
+    return request.files.get(key)
 
 
 @blueprint.route("/cards", methods=["GET"])
@@ -48,9 +53,9 @@ def search():
 
 @blueprint.route("/cards/new", methods=["POST"])
 @admin_only
-def create():
+async def create():
     data = json.loads(request.form["card"])
-    card_data = _get_card_data(data)
+    card_data = await _get_card_data(data)
     set_original_creator(card_data)
     ids = get_resource_service("cards").post([card_data])
     delete_dashboard_caches()
@@ -77,11 +82,12 @@ async def _get_card_data(data):
 
     if data.get("type") == "2x2-events":
         for index, event in enumerate(card_data["config"]["events"]):
-            # NOTE: using `sync` compat method until `cards` is migrated to async
-            file_url = get_file_sync(f"file{index}")
+            file = _get_file_from_request(f"file{index}")
 
-            if file_url:
-                event["file_url"] = file_url
+            if file:
+                file_url = await save_file_and_get_url(file)
+                if file_url:
+                    event["file_url"] = file_url
 
     if data.get("type") == "4-photo-gallery":
         for source in (data.get("config") or {}).get("sources"):
@@ -96,14 +102,14 @@ async def _get_card_data(data):
 
 @blueprint.route("/cards/<id>", methods=["POST"])
 @admin_only
-def edit(id):
+async def edit(id):
     get_entity_or_404(id, "cards")
 
     data = json.loads(request.form["card"])
     if not data:
         abort(400)
 
-    card_data = _get_card_data(data)
+    card_data = await _get_card_data(data)
     set_version_creator(card_data)
     get_resource_service("cards").patch(id=ObjectId(id), updates=card_data)
     delete_dashboard_caches()

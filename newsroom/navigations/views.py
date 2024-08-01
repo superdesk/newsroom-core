@@ -1,5 +1,5 @@
 import re
-from typing import List
+from typing import Any, List, Optional
 
 from bson import ObjectId
 from flask_babel import gettext
@@ -17,7 +17,7 @@ from newsroom.utils import (
     set_original_creator,
     set_version_creator,
 )
-from newsroom.assets.utils import get_file_sync
+from newsroom.assets.utils import save_file_and_get_url
 
 
 def get_settings_data():
@@ -28,6 +28,10 @@ def get_settings_data():
             s for s in get_current_app().as_any().sections if s.get("_id") != "monitoring"
         ],  # monitoring has no navigation
     }
+
+
+def _get_file_from_request(key: str) -> Optional[Any]:
+    return request.files.get(key)
 
 
 @blueprint.route("/navigations", methods=["GET"])
@@ -48,9 +52,9 @@ def search():
 
 @blueprint.route("/navigations/new", methods=["POST"])
 @admin_only
-def create():
+async def create():
     data = json.loads(request.form["navigation"])
-    nav_data = _get_navigation_data(data)
+    nav_data = await _get_navigation_data(data)
     product_ids = nav_data.pop("products", None)
 
     set_original_creator(nav_data)
@@ -62,7 +66,7 @@ def create():
     return jsonify({"success": True, "_id": ids[0]}), 201
 
 
-def _get_navigation_data(data):
+async def _get_navigation_data(data):
     if not data.get("name"):
         return jsonify(gettext("Name not found")), 400
 
@@ -76,22 +80,23 @@ def _get_navigation_data(data):
     }
 
     for index, tile in enumerate(navigation_data["tile_images"] or []):
-        # NOTE: using `sync` compat method until `navigations` is migrated to async
-        file_url = get_file_sync(f"file{index}")
+        file = _get_file_from_request(f"file{index}")
 
-        if file_url:
-            tile["file_url"] = file_url
+        if file:
+            file_url = await save_file_and_get_url(f"file{index}")
+            if file_url:
+                tile["file_url"] = file_url
 
     return navigation_data
 
 
 @blueprint.route("/navigations/<_id>", methods=["POST"])
 @admin_only
-def edit(_id):
+async def edit(_id):
     get_entity_or_404(_id, "navigations")
 
     data = json.loads(request.form["navigation"])
-    nav_data = _get_navigation_data(data)
+    nav_data = await _get_navigation_data(data)
     product_ids = nav_data.pop("products", None)
 
     set_version_creator(nav_data)
