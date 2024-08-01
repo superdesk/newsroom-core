@@ -17,7 +17,7 @@ from newsroom.utils import (
     set_original_creator,
     set_version_creator,
 )
-from newsroom.upload import get_file
+from newsroom.assets.utils import get_file
 
 
 def get_settings_data():

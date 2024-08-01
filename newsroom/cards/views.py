@@ -15,7 +15,7 @@ from newsroom.utils import (
     set_original_creator,
     set_version_creator,
 )
-from newsroom.upload import get_file
+from newsroom.assets.utils import get_file
 from newsroom.wire.views import delete_dashboard_caches
 
 

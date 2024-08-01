@@ -6,7 +6,7 @@ from superdesk.core import get_current_app
 from superdesk.flask import abort, Blueprint, request
 import superdesk
 
-from newsroom.upload import ASSETS_RESOURCE
+from newsroom.assets.module import ASSETS_RESOURCE
 from newsroom.news_api.utils import post_api_audit
 
 

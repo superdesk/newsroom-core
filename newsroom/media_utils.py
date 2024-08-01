@@ -4,7 +4,7 @@ import logging
 from PIL import Image, ImageEnhance
 
 from superdesk.core import get_current_app, get_app_config
-from newsroom.upload import ASSETS_RESOURCE
+from newsroom.assets.module import ASSETS_RESOURCE
 
 THUMBNAIL_SIZE = (640, 640)
 THUMBNAIL_QUALITY = 80
