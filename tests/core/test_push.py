@@ -3,6 +3,7 @@ import os
 import hmac
 import bson
 from flask import json
+from quart.datastructures import FileStorage
 from datetime import datetime, timedelta
 from superdesk import get_resource_service
 from newsroom.tests.fixtures import TEST_USER_ID  # noqa - Fix cyclic import when running single test file
@@ -80,26 +81,25 @@ def test_notify_invalid_signature(client, app):
     assert 403 == resp.status_code
 
 
-def test_push_binary(client):
+async def test_push_binary(client_async):
     media_id = str(bson.ObjectId())
 
-    resp = client.get("/push_binary/%s" % media_id)
+    resp = await client_async.get("/push_binary/%s" % media_id)
     assert 404 == resp.status_code
 
-    resp = client.post(
+    resp = await client_async.post(
         "/push_binary",
-        data=dict(
-            media_id=media_id,
-            media=(io.BytesIO(b"binary"), media_id),
-        ),
+        form={"media_id": media_id},
+        files={"media": FileStorage(io.BytesIO(b"binary"), filename=media_id)},
     )
     assert 201 == resp.status_code
 
-    resp = client.get("/push_binary/%s" % media_id)
+    resp = await client_async.get("/push_binary/%s" % media_id)
     assert 200 == resp.status_code
 
-    resp = client.get("/assets/%s" % media_id)
-    assert 200 == resp.status_code
+    with mock.patch("newsroom.assets.views.is_valid_session", return_value=True):
+        resp = await client_async.get("/assets/%s" % media_id)
+        assert 200 == resp.status_code
 
 
 def get_fixture_path(fixture):
