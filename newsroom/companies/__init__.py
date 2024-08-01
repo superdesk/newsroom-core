@@ -2,13 +2,13 @@ from flask_babel import lazy_gettext
 
 import superdesk
 from superdesk.core import json, get_current_app
-from superdesk.flask import Blueprint
-from newsroom.auth import get_company
-from newsroom.user_roles import UserRole
-from .companies import CompaniesResource, CompaniesService
 from apps.prepopulate.app_initialize import get_filepath
 
-blueprint = Blueprint("companies", __name__)
+from newsroom.auth import get_company
+from newsroom.user_roles import UserRole
+
+from .companies import CompaniesResource, CompaniesService
+from .module import module  # noqa
 
 
 def get_company_sections_monitoring_data(company_id, user):
