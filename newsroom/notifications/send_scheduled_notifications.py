@@ -3,8 +3,8 @@ import logging
 from datetime import datetime, timedelta
 
 from bson import ObjectId
-from flask import current_app as app
 
+from superdesk.core import get_app_config
 from superdesk import get_resource_service, Command
 from superdesk.utc import utcnow, utc_to_local
 from superdesk.celery_task_utils import get_lock_id
@@ -70,7 +70,9 @@ class SendScheduledNotificationEmails(Command):
                     user["notification_schedule"] = {}
 
                 user["notification_schedule"].setdefault("timezone", get_session_timezone())
-                user["notification_schedule"].setdefault("times", app.config["DEFAULT_SCHEDULED_NOTIFICATION_TIMES"])
+                user["notification_schedule"].setdefault(
+                    "times", get_app_config("DEFAULT_SCHEDULED_NOTIFICATION_TIMES")
+                )
 
                 company = companies.get(str(user.get("company", "")))
                 self.process_schedule(schedule, user, company, now_utc, user_topic_map.get(user["_id"]) or {}, force)
@@ -99,7 +101,7 @@ class SendScheduledNotificationEmails(Command):
         topic_entries, topic_match_table = self._get_topic_entries_and_match_table(schedule, user, company, user_topics)
 
         template_kwargs = dict(
-            app_name=app.config["SITE_NAME"],
+            app_name=get_app_config("SITE_NAME"),
             entries=topic_entries,
             topic_match_table=topic_match_table,
             date=now_utc,

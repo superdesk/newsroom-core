@@ -2,9 +2,9 @@ import time
 import pymongo
 from datetime import timedelta, datetime
 
-from flask import current_app as app
+from superdesk.core import get_current_app
+from superdesk.resource_fields import ID_FIELD
 from superdesk.errors import BulkIndexError
-from superdesk import config
 from superdesk.utc import utcnow
 
 
@@ -14,6 +14,7 @@ default_page_size = 500
 def index_elastic_from_mongo(hours=None, collection=None):
     print('Starting indexing from mongodb for "{}" collection hours={}'.format(collection, hours))
 
+    app = get_current_app()
     resources = app.data.get_elastic_resources()
     if collection:
         if collection not in resources:
@@ -64,6 +65,7 @@ def index_elastic_from_mongo_from_timestamp(collection, timestamp_str, direction
         )
     )
 
+    app = get_current_app()
     resources = app.data.get_elastic_resources()
     if collection not in resources:
         raise SystemExit("Cannot find collection: {}".format(collection))
@@ -104,8 +106,9 @@ def _get_mongo_items(mongo_collection_name, hours=None):
         )
     )
 
+    app = get_current_app()
     db = app.data.get_mongo_collection(mongo_collection_name)
-    args = {"limit": default_page_size, "sort": [(config.ID_FIELD, pymongo.ASCENDING)]}
+    args = {"limit": default_page_size, "sort": [(ID_FIELD, pymongo.ASCENDING)]}
     if hours:
         now = utcnow() - timedelta(hours=float(hours))
         args["filter"] = {"versioncreated": {"$gte": now}}
@@ -116,14 +119,14 @@ def _get_mongo_items(mongo_collection_name, hours=None):
     last_id = None
     while True:
         if last_id:
-            args["filter"].update({config.ID_FIELD: {"$gt": last_id}})
+            args["filter"].update({ID_FIELD: {"$gt": last_id}})
         cursor = db.find(**args)
         items = list(cursor)
 
         if len(items) == 0:
             break
 
-        last_id = items[-1][config.ID_FIELD]
+        last_id = items[-1][ID_FIELD]
         yield items
 
 
@@ -137,6 +140,7 @@ def _get_mongo_items_from_timestamp(collection, timestamp, direction):
     """
     print("Indexing data {} than {} from mongo/{} to elastic/{}".format(direction, timestamp, collection, collection))
 
+    app = get_current_app()
     db = app.data.get_mongo_collection(collection)
 
     args = {"limit": default_page_size, "sort": [("_created", pymongo.ASCENDING)]}
@@ -165,13 +169,13 @@ def _get_mongo_items_from_timestamp(collection, timestamp, direction):
         # Filter out the items that were processed last iteration
         # As we're filtering based on creation time, there may be an overlap
         # If multiple items were created on the same second
-        items = [item for item in cursor if item.get(config.ID_FIELD) not in last_ids]
+        items = [item for item in cursor if item.get(ID_FIELD) not in last_ids]
 
         if not len(items):
             break
 
         # Store the last created time and ids
         last_created = items[-1].get("_created")
-        last_ids = [item.get(config.ID_FIELD) for item in items]
+        last_ids = [item.get(ID_FIELD) for item in items]
 
         yield items

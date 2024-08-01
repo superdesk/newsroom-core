@@ -1,6 +1,6 @@
-from flask import render_template
 from typing import Dict, List, Literal, TypedDict, Union
 
+from superdesk.flask import render_template
 from newsroom.gettext import get_session_locale
 from newsroom.email import get_language_template_name
 

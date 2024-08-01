@@ -1,8 +1,7 @@
 import logging
 import json
 
-import flask
-from flask import jsonify
+from superdesk.flask import jsonify, request
 from superdesk import get_resource_service
 from superdesk.json_utils import loads
 from content_api.errors import BadParameterValueError
@@ -29,7 +28,7 @@ def create():
 
 @blueprint.route("/news_api_tokens", methods=["PATCH"])
 def update():
-    token = flask.request.args.get("token")
+    token = request.args.get("token")
     try:
         data = loads(json.dumps(get_json_or_400()))
         return jsonify(get_resource_service(API_TOKENS).patch(token, data)), 200
@@ -39,7 +38,7 @@ def update():
 
 @blueprint.route("/news_api_tokens", methods=["DELETE"])
 def delete():
-    company = flask.request.args.get("company")
+    company = request.args.get("company")
     try:
         token = get_resource_service(API_TOKENS).find_one(req=None, company=company)
         if token and token.get("token"):
@@ -53,7 +52,7 @@ def delete():
 
 @blueprint.route("/news_api_tokens", methods=["GET"])
 def get():
-    company = flask.request.args.get("company")
+    company = request.args.get("company")
     data = get_resource_service(API_TOKENS).find_one(req=None, company=company)
     if data:
         return jsonify(data), 200

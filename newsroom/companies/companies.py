@@ -1,8 +1,9 @@
-from flask import current_app as app, abort
 from flask_babel import gettext
-from eve.utils import config
 from content_api import MONGO_PREFIX
 
+from superdesk.core import get_current_app, get_app_config
+from superdesk.flask import abort
+from superdesk.resource_fields import ID_FIELD
 from superdesk import get_resource_service
 import newsroom
 from newsroom.companies.utils import get_company_section_names, get_company_product_ids
@@ -117,7 +118,7 @@ class CompaniesService(newsroom.Service):
             ]
 
     def on_updated(self, updates, original):
-        app.cache.delete(str(original["_id"]))
+        get_current_app().as_any().cache.delete(str(original["_id"]))
 
         updated = original.copy()
         updated.update(updates)
@@ -130,7 +131,7 @@ class CompaniesService(newsroom.Service):
 
         if original_section_names != updated_section_names or original_product_ids != updated_product_ids:
             user_service = get_resource_service("users")
-            for user in user_service.get(req=None, lookup={"company": original[config.ID_FIELD]}):
+            for user in user_service.get(req=None, lookup={"company": original[ID_FIELD]}):
                 user_updates = {
                     "sections": (
                         {}
@@ -146,13 +147,13 @@ class CompaniesService(newsroom.Service):
                         if product.get("section") in updated_section_names and product.get("_id") in updated_product_ids
                     ],
                 }
-                user_service.patch(user[config.ID_FIELD], updates=user_updates)
+                user_service.patch(user[ID_FIELD], updates=user_updates)
 
     def on_deleted(self, doc):
-        app.cache.delete(str(doc["_id"]))
+        get_current_app().as_any().cache.delete(str(doc["_id"]))
 
     def validate_auth_provider(self, company):
-        supported_provider_ids = [provider["_id"] for provider in app.config["AUTH_PROVIDERS"]]
+        supported_provider_ids = [provider["_id"] for provider in get_app_config("AUTH_PROVIDERS")]
         if company.get("auth_provider") and company["auth_provider"] not in supported_provider_ids:
             auth_provider_id = company["auth_provider"]
             abort(403, gettext(f"Unknown auth_provider '{auth_provider_id}' supplied"))

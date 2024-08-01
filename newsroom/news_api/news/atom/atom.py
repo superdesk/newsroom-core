@@ -1,19 +1,22 @@
-import superdesk
-import flask
-from eve.methods.get import get_internal
-from lxml import etree, html as lxml_html
-from lxml.etree import SubElement
-from superdesk.utc import utcnow
-from superdesk.etree import to_string
-from flask import current_app as app
 import datetime
 import logging
 import re
+
+from eve.methods.get import get_internal
+from lxml import etree, html as lxml_html
+from lxml.etree import SubElement
+
+import superdesk
+from superdesk.core import get_current_app, get_app_config
+from superdesk.flask import Blueprint, request, url_for, Response
+from superdesk.utc import utcnow
+from superdesk.etree import to_string
+
 from newsroom.auth import get_company
 from newsroom.news_api.utils import check_association_permission
 from newsroom.products.products import get_products_by_company
 
-blueprint = superdesk.Blueprint("atom", __name__)
+blueprint = Blueprint("atom", __name__)
 
 
 logger = logging.getLogger(__name__)
@@ -35,8 +38,8 @@ def get_atom():
         DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
         return date.strftime(DATETIME_FORMAT) + "Z"
 
-    auth = app.auth
-    if not auth.authorized([], None, flask.request.method):
+    auth = get_current_app().auth
+    if not auth.authorized([], None, request.method):
         return auth.authenticate()
 
     XML_ROOT = '<?xml version="1.0" encoding="UTF-8"?>'
@@ -50,14 +53,15 @@ def get_atom():
 
     #    feed = etree.Element('feed', attrib={'lang': 'en-us'}, nsmap=_message_nsmap)
     feed = etree.Element("feed", nsmap=_message_nsmap)
-    SubElement(feed, "title").text = etree.CDATA("{} Atom Feed".format(app.config["SITE_NAME"]))
+    site_name = get_app_config("SITE_NAME")
+    SubElement(feed, "title").text = etree.CDATA("{} Atom Feed".format(site_name))
     SubElement(feed, "updated").text = _format_update_date(utcnow())
-    SubElement(SubElement(feed, "author"), "name").text = app.config["SITE_NAME"]
-    SubElement(feed, "id").text = flask.url_for("atom.get_atom", _external=True)
+    SubElement(SubElement(feed, "author"), "name").text = site_name
+    SubElement(feed, "id").text = url_for("atom.get_atom", _external=True)
     SubElement(
         feed,
         "link",
-        attrib={"href": flask.url_for("atom.get_atom", _external=True), "rel": "self"},
+        attrib={"href": url_for("atom.get_atom", _external=True), "rel": "self"},
     )
 
     response = get_internal("news/search")
@@ -94,7 +98,7 @@ def get_atom():
                 "link",
                 attrib={
                     "rel": "self",
-                    "href": flask.url_for(
+                    "href": url_for(
                         "news/item.get_item",
                         item_id=item.get("_id"),
                         format="TextFormatter",
@@ -143,7 +147,7 @@ def get_atom():
                             embed_id = "editor_" + m.group(1)
                             src = complete_item.get("associations").get(embed_id).get("renditions").get("16-9")
                             if src:
-                                imgElem.attrib["src"] = flask.url_for(
+                                imgElem.attrib["src"] = url_for(
                                     "assets.get_item",
                                     asset_id=src.get("media"),
                                     _external=True,
@@ -161,7 +165,7 @@ def get_atom():
                 )
                 metadata = (complete_item.get("associations") or {}).get("featuremedia") or {}
 
-                url = flask.url_for("assets.get_item", _external=True, asset_id=image.get("media"))
+                url = url_for("assets.get_item", _external=True, asset_id=image.get("media"))
                 media = SubElement(
                     entry,
                     etree.QName(_message_nsmap.get("media"), "content"),
@@ -185,7 +189,7 @@ def get_atom():
         except Exception as ex:
             logger.exception("processing {} - {}".format(item.get("_id"), ex))
 
-    return flask.Response(
+    return Response(
         XML_ROOT + etree.tostring(feed, pretty_print=True).decode("utf-8"),
         mimetype="application/atom+xml",
     )

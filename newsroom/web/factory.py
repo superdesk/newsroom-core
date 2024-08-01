@@ -1,5 +1,6 @@
 import os
-import flask
+
+from newsroom.flask import send_from_directory
 
 from newsroom.auth import get_user
 from newsroom.commands.cli import newsroom_cli
@@ -167,7 +168,7 @@ class NewsroomWebApp(BaseNewsroomApp):
         self.add_url_rule(
             self.static_url_path.replace("static", "theme") + "/<path:filename>",
             endpoint="theme",
-            host=self.static_host,
+            host=getattr(self, "static_host", None),
             view_func=self.send_theme_file,
         )
 
@@ -190,7 +191,7 @@ class NewsroomWebApp(BaseNewsroomApp):
 
     def send_theme_file(self, filename):
         if os.path.exists(os.path.join(self.theme_folder, filename)):
-            return flask.send_from_directory(self.theme_folder, filename)
+            return send_from_directory(self.theme_folder, filename)
         return self.send_static_file(filename)
 
     def section(self, _id, name, group, search_type=None):

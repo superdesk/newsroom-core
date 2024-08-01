@@ -1,11 +1,11 @@
-import flask
 import superdesk
+from superdesk.flask import Blueprint
 
 from .topics import get_user_topics  # noqa
 from . import folders, topics
 
 
-blueprint = flask.Blueprint("topics", __name__)
+blueprint = Blueprint("topics", __name__)
 
 
 def init_app(app):

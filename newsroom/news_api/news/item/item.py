@@ -1,15 +1,14 @@
-import flask
-import superdesk
-
 from bson import ObjectId
-from flask import current_app as app, abort, g
 from flask_babel import gettext
 
+import superdesk
+from superdesk.core import get_current_app
+from superdesk.flask import abort, g, Blueprint, request
 from superdesk import get_resource_service
 from newsroom.news_api.utils import post_api_audit
 
 
-blueprint = superdesk.Blueprint("news/item", __name__)
+blueprint = Blueprint("news/item", __name__)
 
 
 def init_app(app):
@@ -18,12 +17,13 @@ def init_app(app):
 
 @blueprint.route("/news/item/<path:item_id>", methods=["GET"])
 def get_item(item_id):
+    app = get_current_app()
     auth = app.auth
-    if not auth.authorized([], None, flask.request.method):
+    if not auth.authorized([], None, request.method):
         return abort(401, gettext("Invalid token"))
 
-    _format = flask.request.args.get("format", "NINJSFormatter")
-    _version = flask.request.args.get("version")
+    _format = request.args.get("format", "NINJSFormatter")
+    _version = request.args.get("version")
     service = get_resource_service("formatters")
     formatted = service.get_version(item_id, _version, _format)
     mimetype = formatted.get("mimetype")

@@ -1,6 +1,7 @@
 from superdesk import get_resource_service
+from superdesk.core import get_app_config
 from superdesk.utc import utcnow
-from flask import request, g, current_app as app
+from superdesk.flask import request, g
 
 
 def post_api_audit(doc):
@@ -61,7 +62,7 @@ def check_association_permission(item, products):
     :param item:
     :return:
     """
-    if not app.config.get("NEWS_API_IMAGE_PERMISSIONS_ENABLED"):
+    if not get_app_config("NEWS_API_IMAGE_PERMISSIONS_ENABLED"):
         return True
 
     if ((item.get("associations") or {}).get("featuremedia") or {}).get("products"):

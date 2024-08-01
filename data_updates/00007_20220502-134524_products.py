@@ -8,7 +8,8 @@
 # Creation: 2022-05-02 13:45
 
 from bson import ObjectId
-from eve.utils import config
+
+from superdesk.resource_fields import ID_FIELD
 from superdesk.commands.data_updates import DataUpdate as _DataUpdate
 
 
@@ -22,7 +23,7 @@ class DataUpdate(_DataUpdate):
 
             print(
                 mongodb_collection.update(
-                    {config.ID_FIELD: product.get(config.ID_FIELD)},
+                    {ID_FIELD: product.get(ID_FIELD)},
                     {"$set": {"navigations": [ObjectId(nav_id) for nav_id in product.get("navigations")]}},
                 )
             )

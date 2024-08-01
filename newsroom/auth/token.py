@@ -1,8 +1,9 @@
+from typing import TypedDict, Optional
+
 import time
-from flask import current_app as app
 from authlib.jose import jwt, JoseError
 
-from typing import TypedDict, Optional
+from superdesk.core import get_app_config
 
 
 class AuthToken(TypedDict):
@@ -28,7 +29,7 @@ def generate_auth_token(user, expiration=3600) -> bytes:
         "exp": int(time.time()) + expiration,
     }
 
-    return jwt.encode(header, payload, app.config["SECRET_KEY"]).decode("utf-8")
+    return jwt.encode(header, payload, get_app_config("SECRET_KEY")).decode("utf-8")
 
 
 def verify_auth_token(token: str) -> Optional[AuthToken]:
@@ -38,7 +39,7 @@ def verify_auth_token(token: str) -> Optional[AuthToken]:
     :return: decoded token as dict
     """
     try:
-        decoded = jwt.decode(token, app.config["SECRET_KEY"])
+        decoded = jwt.decode(token, get_app_config("SECRET_KEY"))
         decoded.validate()
 
         return {

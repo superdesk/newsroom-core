@@ -2,11 +2,13 @@ import logging
 from datetime import datetime, timedelta
 
 from eve.utils import ParsedRequest
-from flask import current_app as app, json
-from newsroom.types import Section
-from superdesk import get_resource_service
+
 from werkzeug.exceptions import Forbidden
 
+from superdesk.core import json, get_app_config
+from superdesk import get_resource_service
+
+from newsroom.types import Section
 import newsroom
 from newsroom.products.products import get_products_by_navigation
 from newsroom.settings import get_setting
@@ -24,7 +26,7 @@ def get_bookmarks_count(user_id, product_type):
 
 
 def get_aggregations():
-    return app.config.get("WIRE_AGGS", {})
+    return get_app_config("WIRE_AGGS", {})
 
 
 class DateRangeQuery(TypedDict):
@@ -181,8 +183,8 @@ class WireSearchService(BaseSearchService):
         if not product:
             return []
 
-        if not app.config["DASHBOARD_EMBARGOED"] or exclude_embargoed:
-            embargo_query_rounding = app.config.get("EMBARGO_QUERY_ROUNDING")
+        if not get_app_config("DASHBOARD_EMBARGOED") or exclude_embargoed:
+            embargo_query_rounding = get_app_config("EMBARGO_QUERY_ROUNDING")
             search.query["bool"].setdefault("filter", []).append(
                 {
                     "bool": {
@@ -297,7 +299,7 @@ class WireSearchService(BaseSearchService):
 
     def get_time_filters(self) -> List[TimeFilter]:
         """Retrieve the time filters from app config."""
-        return app.config.get("WIRE_TIME_FILTERS", [])
+        return get_app_config("WIRE_TIME_FILTERS", [])
 
     def get_date_filter_query(self, filter_name: str) -> Optional[DateRangeQuery]:
         """Get the query for the given filter name."""
@@ -305,7 +307,7 @@ class WireSearchService(BaseSearchService):
         for time_filter in time_filters:
             if time_filter["filter"] == filter_name:
                 query = time_filter["query"]
-                query.setdefault("time_zone", app.config.get("DEFAULT_TIMEZONE"))
+                query.setdefault("time_zone", get_app_config("DEFAULT_TIMEZONE"))
                 return query
         return None
 
@@ -331,8 +333,8 @@ class WireSearchService(BaseSearchService):
             news_only_filter = get_setting("news_only_filter")
             if news_only_filter:
                 search.query["bool"]["must_not"].append(self.query_string(news_only_filter))
-            elif app.config.get("NEWS_ONLY_FILTERS"):
-                for f in app.config.get("NEWS_ONLY_FILTERS", []):
+            elif get_app_config("NEWS_ONLY_FILTERS"):
+                for f in get_app_config("NEWS_ONLY_FILTERS", []):
                     search.query["bool"]["must_not"].append(f)
 
         date_filter = search.args.get("date_filter")
@@ -343,7 +345,7 @@ class WireSearchService(BaseSearchService):
             default_time_filter: Optional[TimeFilter] = next((f for f in self.get_time_filters() if f["default"]), None)
             if default_time_filter:
                 date_range_query = default_time_filter["query"]
-                date_range_query["time_zone"] = app.config.get("DEFAULT_TIMEZONE")
+                date_range_query["time_zone"] = get_app_config("DEFAULT_TIMEZONE")
 
         if date_range_query:
             search.query["bool"]["must"].append({"range": {"versioncreated": date_range_query}})

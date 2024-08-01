@@ -5,9 +5,9 @@ import elasticsearch.exceptions
 
 from collections import OrderedDict
 
-from flask import current_app
 from flask.cli import with_appcontext
 
+from superdesk.core import get_current_app
 from apps.prepopulate.app_initialize import (
     AppInitializeWithDataCommand as _AppInitializeWithDataCommand,
 )
@@ -30,7 +30,7 @@ __entities__: OrderedDict = OrderedDict(
 class AppInitializeWithDataCommand(_AppInitializeWithDataCommand):
     def run(self, entity_name=None, force=False, init_index_only=False):
         logger.info("Starting data initialization")
-        app = current_app
+        app = get_current_app()
 
         data_paths = [
             path

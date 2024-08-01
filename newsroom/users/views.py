@@ -1,12 +1,14 @@
 import re
 import json
 from copy import deepcopy
-import flask
+
 from bson import ObjectId
-from flask import jsonify, current_app as app
 from flask_babel import gettext
-from superdesk import get_resource_service
 from werkzeug.exceptions import BadRequest, NotFound
+
+from superdesk.core import get_current_app, get_app_config
+from superdesk.flask import jsonify, render_template, request, abort, session
+from superdesk import get_resource_service
 
 from newsroom.user_roles import UserRole
 from newsroom.auth import get_user_by_email, get_company, get_user_required
@@ -41,6 +43,8 @@ from newsroom.ui_config_async import UiConfigResourceService
 
 
 def get_settings_data():
+    app = get_current_app().as_any()
+
     return {
         "users": list(query_resource("users")),
         "companies": list(query_resource("companies")),
@@ -64,11 +68,11 @@ async def get_view_data():
         "locators": get_vocabulary("locators"),
         "monitoring_list": get_monitoring_for_company(user),
         "ui_configs": await ui_config_service.get_all_config(),
-        "groups": app.config.get("WIRE_GROUPS", []),
+        "groups": get_app_config("WIRE_GROUPS", []),
         "authProviderFeatures": dict(auth_provider.features),
     }
 
-    if app.config.get("ENABLE_MONITORING"):
+    if get_app_config("ENABLE_MONITORING"):
         rv["monitoring_list"] = get_monitoring_for_company(user)
 
     rv.update(get_company_sections_monitoring_data(company, user))
@@ -80,7 +84,7 @@ async def get_view_data():
 @login_required
 async def user_profile():
     data = await get_view_data()
-    return flask.render_template("user_profile.html", data=data)
+    return render_template("user_profile.html", data=data)
 
 
 @blueprint.route("/users/search", methods=["GET"])
@@ -88,17 +92,17 @@ async def user_profile():
 def search():
     lookup = {}
     sort = None
-    if flask.request.args.get("q"):
-        regex = re.compile(re.escape(flask.request.args.get("q")), re.IGNORECASE)
+    if request.args.get("q"):
+        regex = re.compile(re.escape(request.args.get("q")), re.IGNORECASE)
         lookup = {"$or": [{"first_name": regex}, {"last_name": regex}, {"email": regex}]}
 
-    if flask.request.args.get("ids"):
-        lookup = {"_id": {"$in": (flask.request.args.get("ids") or "").split(",")}}
+    if request.args.get("ids"):
+        lookup = {"_id": {"$in": (request.args.get("ids") or "").split(",")}}
 
-    if flask.request.args.get("sort"):
-        sort = flask.request.args.get("sort")
+    if request.args.get("sort"):
+        sort = request.args.get("sort")
 
-    where_param = flask.request.args.get("where")
+    where_param = request.args.get("where")
     if where_param:
         try:
             where = json.loads(where_param)
@@ -113,7 +117,7 @@ def search():
         company = get_company()
 
         if company is None:
-            flask.abort(401)
+            abort(401)
 
         lookup["company"] = company["_id"]
 
@@ -134,7 +138,7 @@ def create():
         if user_is_company_admin:
             company = get_company()
             if company is None:
-                flask.abort(401)
+                abort(401)
 
             # Make sure this new user is associated with ``company`` and as a ``PUBLIC`` user
             new_user["company"] = company["_id"]
@@ -181,10 +185,10 @@ def resent_invite(_id):
         return jsonify({"is_validated": gettext("User is already validated")}), 400
     elif user_is_company_admin and (company is None or user["company"] != ObjectId(company["_id"])):
         # Company admins can only resent invites for members of their company only
-        flask.abort(403)
+        abort(403)
     elif not auth_provider.features["verify_email"]:
         # Can only regenerate new token if ``verify_email`` is enabled in ``AuthProvider``
-        flask.abort(403)
+        abort(403)
 
     send_token(user, token_type="new_account")
     return jsonify({"success": True}), 200
@@ -204,22 +208,22 @@ def edit(_id):
     user_is_non_admin = not (user_is_company_admin or user_is_admin or user_is_account_mgr)
 
     if not (user_is_admin or user_is_account_mgr or user_is_company_admin) and not is_current_user(_id):
-        flask.abort(401)
+        abort(401)
 
     user = find_one("users", _id=ObjectId(_id))
     company = get_company()
 
     if user_is_company_admin and (company is None or user["company"] != ObjectId(company["_id"])):
-        flask.abort(403)
+        abort(403)
 
     if not user:
         return NotFound(gettext("User not found"))
 
-    etag = flask.request.headers.get("If-Match")
+    etag = request.headers.get("If-Match")
     if etag and user["_etag"] != etag:
-        return flask.abort(412)
+        return abort(412)
 
-    if flask.request.method == "POST":
+    if request.method == "POST":
         form = UserForm(user=user)
         if form.validate_on_submit():
             if form.email.data != user["email"] and not _is_email_address_valid(form.email.data):
@@ -236,7 +240,7 @@ def edit(_id):
             updates = get_updates_from_form(form)
 
             if not user_is_admin and updates.get("user_type", "") != user.get("user_type", ""):
-                flask.abort(401)
+                abort(401)
 
             allowed_fields = None
             if user_is_non_admin:
@@ -268,7 +272,8 @@ def get_updates_from_form(form: UserForm, on_create=False):
             updates.pop("sections")  # will be populated later based on company
         elif updates.get("sections") is not None:
             updates["sections"] = {
-                section["_id"]: section["_id"] in (form.sections.data or []) for section in app.sections
+                section["_id"]: section["_id"] in (form.sections.data or [])
+                for section in get_current_app().as_any().sections
             }
 
     if updates.get("products") is not None:
@@ -286,7 +291,7 @@ def get_updates_from_form(form: UserForm, on_create=False):
 @login_required
 def edit_user_profile(_id):
     if not is_current_user(_id):
-        flask.abort(403)
+        abort(403)
 
     user_id = ObjectId(_id)
     user = find_one("users", _id=user_id)
@@ -306,7 +311,7 @@ def edit_user_profile(_id):
 @login_required
 def edit_user_notification_schedules(_id):
     if not is_current_user(_id):
-        flask.abort(403)
+        abort(403)
 
     user_id = ObjectId(_id)
     user = find_one("users", _id=user_id)
@@ -366,8 +371,8 @@ def delete(_id):
 @blueprint.route("/users/<user_id>/notifications", methods=["GET"])
 @login_required
 def get_notifications(user_id):
-    if flask.session["user"] != str(user_id):
-        flask.abort(403)
+    if session["user"] != str(user_id):
+        abort(403)
 
     return jsonify(get_notifications_with_items()), 200
 
@@ -376,8 +381,8 @@ def get_notifications(user_id):
 @login_required
 def delete_all(user_id):
     """Deletes all notification by given user id"""
-    if flask.session["user"] != str(user_id):
-        flask.abort(403)
+    if session["user"] != str(user_id):
+        abort(403)
 
     get_resource_service("notifications").delete_action({"user": ObjectId(user_id)})
     return jsonify({"success": True}), 200
@@ -387,8 +392,8 @@ def delete_all(user_id):
 @login_required
 def delete_notification(user_id, notification_id):
     """Deletes the notification by given id"""
-    if flask.session["user"] != str(user_id):
-        flask.abort(403)
+    if session["user"] != str(user_id):
+        abort(403)
 
     get_resource_service("notifications").delete_action({"_id": notification_id})
     return jsonify({"success": True}), 200

@@ -4,10 +4,11 @@ import werkzeug.exceptions
 from superdesk import get_resource_service
 from superdesk.resource import not_analyzed, not_enabled
 from superdesk.utc import utcnow
-from flask import json, abort, Blueprint, jsonify
 from flask_babel import gettext
 from eve.utils import ParsedRequest
 
+from superdesk.core import json
+from superdesk.flask import abort, Blueprint, jsonify
 import newsroom
 from newsroom.utils import get_json_or_400
 from newsroom.auth import get_user

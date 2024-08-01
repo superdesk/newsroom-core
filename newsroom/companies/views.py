@@ -2,15 +2,15 @@ from typing import Dict
 import re
 import ipaddress
 
-import flask
 import werkzeug.exceptions
-
 from bson import ObjectId
 from datetime import datetime
-from flask import jsonify, current_app as app
 from flask_babel import gettext
-from superdesk import get_resource_service
 from werkzeug.exceptions import NotFound, BadRequest
+
+from superdesk.core import get_app_config, get_current_app
+from superdesk.flask import jsonify, request
+from superdesk import get_resource_service
 
 from newsroom.decorator import admin_only, account_manager_only, login_required
 from newsroom.companies import blueprint
@@ -41,14 +41,14 @@ async def get_settings_data():
     ui_config_service = UiConfigResourceService()
     return {
         "companies": list(query_resource("companies")),
-        "services": app.config["SERVICES"],
+        "services": get_app_config("SERVICES"),
         "products": list(query_resource("products")),
-        "sections": app.sections,
-        "company_types": get_company_types_options(app.config.get("COMPANY_TYPES", [])),
-        "api_enabled": app.config.get("NEWS_API_ENABLED", False),
+        "sections": get_current_app().as_any().sections,
+        "company_types": get_company_types_options(get_app_config("COMPANY_TYPES", [])),
+        "api_enabled": get_app_config("NEWS_API_ENABLED", False),
         "ui_config": await ui_config_service.get_section_config("companies"),
-        "countries": app.countries,
-        "auth_providers": [render_provider(provider) for provider in app.config.get("AUTH_PROVIDERS") or []],
+        "countries": get_current_app().as_any().countries,
+        "auth_providers": [render_provider(provider) for provider in get_app_config("AUTH_PROVIDERS") or []],
     }
 
 
@@ -56,8 +56,8 @@ async def get_settings_data():
 @account_manager_only
 def search():
     lookup = None
-    if flask.request.args.get("q"):
-        regex = re.compile(".*{}.*".format(flask.request.args.get("q")), re.IGNORECASE)
+    if request.args.get("q"):
+        regex = re.compile(".*{}.*".format(request.args.get("q")), re.IGNORECASE)
         lookup = {"name": regex}
     companies = list(query_resource("companies", lookup=lookup))
     return jsonify(companies), 200
@@ -145,7 +145,7 @@ def edit(_id):
     if not original:
         return NotFound(gettext("Company not found"))
 
-    if flask.request.method == "POST":
+    if request.method == "POST":
         company = get_json_or_400()
         errors = get_errors_company(company, original)
         if errors:
@@ -157,7 +157,7 @@ def edit(_id):
             get_resource_service("companies").patch(ObjectId(_id), updates=updates)
         except werkzeug.exceptions.Conflict:
             return conflict_error(updates)
-        app.cache.delete(_id)
+        get_current_app().as_any().cache.delete(_id)
         return jsonify({"success": True}), 200
     return jsonify(original), 200
 
@@ -181,7 +181,7 @@ def delete(_id):
         return jsonify({"error": er.description}), 403
     get_resource_service("companies").delete_action(lookup={"_id": ObjectId(_id)})
 
-    app.cache.delete(_id)
+    get_current_app().as_any().cache.delete(_id)
     return jsonify({"success": True}), 200
 
 

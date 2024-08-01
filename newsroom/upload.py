@@ -1,10 +1,11 @@
 import os
-import flask
 import bson.errors
 
 from werkzeug.wsgi import wrap_file
 from werkzeug.utils import secure_filename
-from flask import request, url_for, current_app as newsroom_app
+
+from superdesk.core import get_current_app, get_app_config
+from superdesk.flask import request, url_for, Blueprint, abort
 from superdesk.upload import upload_url as _upload_url
 from superdesk.media.media_operations import guess_media_extension
 
@@ -14,32 +15,34 @@ from newsroom.decorator import is_valid_session, clear_session_and_redirect_to_l
 
 cache_for = 3600 * 24 * 7  # 7 days cache
 ASSETS_RESOURCE = "upload"
-blueprint = flask.Blueprint(ASSETS_RESOURCE, __name__)
+blueprint = Blueprint(ASSETS_RESOURCE, __name__)
 
 
 def get_file(key):
     file = request.files.get(key)
     if file:
         filename = secure_filename(file.filename)
-        newsroom_app.media.put(file, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type)
+        get_current_app().media.put(file, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type)
         return url_for("upload.get_upload", media_id=filename)
 
 
 @blueprint.route("/assets/<path:media_id>", methods=["GET"])
 def get_upload(media_id, filename=None):
     # Allow access to ``/assets/<media_id>`` if PUBLIC_DASHBOARD is enabled or is a valid session
-    if not flask.current_app.config.get("PUBLIC_DASHBOARD") and not is_valid_session():
+    if not get_app_config("PUBLIC_DASHBOARD") and not is_valid_session():
         return clear_session_and_redirect_to_login()
 
+    app = get_current_app()
+
     try:
-        media_file = flask.current_app.media.get(media_id, ASSETS_RESOURCE)
+        media_file = app.media.get(media_id, ASSETS_RESOURCE)
     except bson.errors.InvalidId:
         media_file = None
     if not media_file:
-        flask.abort(404)
+        abort(404)
 
-    data = wrap_file(flask.request.environ, media_file, buffer_size=1024 * 256)
-    response = flask.current_app.response_class(data, mimetype=media_file.content_type, direct_passthrough=True)
+    data = wrap_file(request.environ, media_file, buffer_size=1024 * 256)
+    response = app.response_class(data, mimetype=media_file.content_type, direct_passthrough=True)
     response.content_length = media_file.length
     response.last_modified = media_file.upload_date
     response.set_etag(media_file.md5)
@@ -48,10 +51,10 @@ def get_upload(media_id, filename=None):
     response.cache_control.public = True
 
     # Add ``accept_ranges`` & ``complete_length`` so video seeking is supported
-    response.make_conditional(flask.request, accept_ranges=True, complete_length=media_file.length)
+    response.make_conditional(request, accept_ranges=True, complete_length=media_file.length)
 
-    if filename is None and flask.request.args.get("filename"):
-        filename = flask.request.args.get("filename")
+    if filename is None and request.args.get("filename"):
+        filename = request.args.get("filename")
 
     if filename:
         _filename, ext = os.path.splitext(filename)

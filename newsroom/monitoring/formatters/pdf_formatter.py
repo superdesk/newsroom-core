@@ -1,6 +1,8 @@
 from xhtml2pdf import pisa
 from werkzeug.utils import secure_filename
-from flask import render_template, current_app as app
+
+from superdesk.core import get_app_config
+from superdesk.flask import render_template
 from superdesk.utc import utcnow, utc_to_local
 
 from newsroom.wire.formatters.base import BaseFormatter
@@ -21,8 +23,8 @@ class MonitoringPDFFormatter(BaseFormatter):
         data = {
             "date_items_dict": date_items_dict,
             "monitoring_profile": monitoring_profile,
-            "current_date": utc_to_local(app.config["DEFAULT_TIMEZONE"], utcnow()).strftime("%d/%m/%Y"),
-            "monitoring_report_name": app.config.get("MONITORING_REPORT_NAME", "Newsroom"),
+            "current_date": utc_to_local(get_app_config("DEFAULT_TIMEZONE"), utcnow()).strftime("%d/%m/%Y"),
+            "monitoring_report_name": get_app_config("MONITORING_REPORT_NAME", "Newsroom"),
         }
         exported_html = str.encode(render_template("monitoring_export.html", **data), "utf-8")
         pdf_context = pisa.CreatePDF(exported_html)

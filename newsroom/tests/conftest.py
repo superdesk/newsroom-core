@@ -1,9 +1,9 @@
 import os
 from pymongo import MongoClient
-from flask import Config, Flask
 from pathlib import Path
 from pytest import fixture
 
+from superdesk.flask import Config, Flask
 from superdesk.cache import cache
 from newsroom.web.factory import get_app
 from newsroom.tests import markers

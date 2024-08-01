@@ -1,4 +1,4 @@
-from flask import current_app
+from superdesk.core import get_current_app
 from .cli import newsroom_cli
 
 
@@ -15,5 +15,5 @@ def elastic_init():
         $ python manage.py elastic_init
 
     """
-    app = current_app
+    app = get_current_app()
     app.data.init_elastic(app)
