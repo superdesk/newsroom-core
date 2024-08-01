@@ -10,7 +10,7 @@ from superdesk.flask import request, url_for
 from superdesk.upload import upload_url as _upload_url
 from superdesk.media.media_operations import guess_media_extension
 
-from .module import ASSETS_RESOURCE
+from .module import ASSETS_ENDPOINT_GROUP_NAME, ASSETS_RESOURCE
 
 CACHE_MAX_AGE = 3600 * 24 * 7  # 7 days
 
@@ -57,7 +57,9 @@ def get_file(key):
     if file:
         filename = secure_filename(file.filename)
         get_current_app().media.put(file, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type)
-        return url_for("upload.get_upload", media_id=filename)
+        endpoint = f"{ASSETS_ENDPOINT_GROUP_NAME}.get_upload"
+
+        return url_for(endpoint, media_id=filename)
 
 
 def upload_url(media_id: str):

@@ -1,9 +1,11 @@
+from newsroom import MONGO_PREFIX
 from superdesk.core.module import Module
 from superdesk.core.web import EndpointGroup
 from superdesk.core.resources import ResourceModel, ResourceConfig
 
 
 ASSETS_RESOURCE = "upload"
+ASSETS_ENDPOINT_GROUP_NAME = "assets"
 
 
 class Upload(ResourceModel):
@@ -25,9 +27,17 @@ def legacy_init_app(app):
     from .utils import upload_url
 
     app.wsgi.upload_url = upload_url
+    app.wsgi.config["DOMAIN"].setdefault(
+        "upload",
+        {
+            "authentication": None,
+            "mongo_prefix": MONGO_PREFIX,
+            "internal_resource": True,
+        },
+    )
 
 
-assets_endpoints = EndpointGroup(ASSETS_RESOURCE, __name__)
+assets_endpoints = EndpointGroup(ASSETS_ENDPOINT_GROUP_NAME, __name__)
 module = Module(
     name="newsroom.assets", init=legacy_init_app, resources=[upload_model_config], endpoints=[assets_endpoints]
 )
