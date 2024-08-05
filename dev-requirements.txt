@@ -131,7 +131,7 @@ exceptiongroup==1.2.1
     # via pytest
 feedparser==6.0.11
     # via superdesk-core
-flake8==7.1.0
+flake8==7.1.1
     # via -r dev-requirements.in
 flask==1.1.2
     # via
@@ -245,7 +245,7 @@ markupsafe==2.0.1
     #   wtforms
 mccabe==0.7.0
     # via flake8
-mongolock==1.3.4
+mongolock @ git+https://github.com/superdesk/mongolock.git@v1
     # via superdesk-core
 mypy-extensions==1.0.0
     # via black
