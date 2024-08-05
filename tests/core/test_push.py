@@ -134,6 +134,7 @@ async def test_push_binary_thumbnail_saves_copy(client_async):
     with open(get_fixture_path("thumbnail.jpg"), mode="rb") as picture:
         assert resp.content_length == len(picture.read())
 
+
 @pytest.mark.skip(reason="Fix once other views are moved to async")
 def test_push_featuremedia_generates_renditions(client):
     media_id = str(bson.ObjectId())
@@ -172,6 +173,7 @@ def test_push_featuremedia_generates_renditions(client):
         rendition = picture["renditions"]["_newsroom_%s" % name]
         resp = client.get(rendition["href"])
         assert 200 == resp.status_code
+
 
 @pytest.mark.skip(reason="Fix once other views are moved to async")
 async def test_push_update_removes_featuremedia(client):

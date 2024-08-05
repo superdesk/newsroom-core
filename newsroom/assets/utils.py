@@ -3,11 +3,10 @@ import bson
 
 from werkzeug.utils import secure_filename
 from motor.motor_asyncio import AsyncIOMotorGridOut
-from typing import Any, Mapping, Optional, Sequence, cast
+from typing import Any, Mapping, Optional, Sequence
 
 from newsroom.core import get_newsroom_app
 from superdesk.flask import url_for
-from superdesk.core import get_current_app
 from superdesk.upload import upload_url as _upload_url
 from superdesk.media.media_operations import guess_media_extension
 

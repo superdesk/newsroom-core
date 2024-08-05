@@ -1,5 +1,4 @@
 import re
-from typing import Any, Optional
 
 from bson import ObjectId
 from flask_babel import gettext

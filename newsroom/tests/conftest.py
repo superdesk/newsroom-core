@@ -4,15 +4,13 @@ from pytest import fixture
 from pymongo import MongoClient
 from asgiref.wsgi import WsgiToAsgi
 
-from newsroom.factory.app import BaseNewsroomApp
-from superdesk.flask import Config, Flask
 from superdesk.cache import cache
+from superdesk.flask import Config, Flask
 from superdesk.tests.async_test_client import AsyncTestClient
 
 from newsroom.web.factory import get_app
 from newsroom.factory.app import BaseNewsroomApp
 from newsroom.tests import markers
-from superdesk.tests.async_test_client import AsyncTestClient
 
 root = (Path(__file__).parent / "..").resolve()
 
