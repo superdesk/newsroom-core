@@ -41,7 +41,7 @@ from newsroom.email import (
 from newsroom.history import get_history_users
 from newsroom.wire.views import delete_dashboard_caches
 from newsroom.wire import url_for_wire
-from newsroom.assets.module import ASSETS_RESOURCE
+from newsroom.assets import ASSETS_RESOURCE
 from newsroom.agenda.utils import (
     get_latest_available_delivery,
     TO_BE_CONFIRMED_FIELD,

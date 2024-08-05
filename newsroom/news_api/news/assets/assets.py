@@ -1,12 +1,12 @@
+import superdesk
 import bson.errors
+
 from werkzeug.wsgi import wrap_file
 from flask_babel import gettext
-
 from superdesk.core import get_current_app
 from superdesk.flask import abort, Blueprint, request
-import superdesk
 
-from newsroom.assets.module import ASSETS_RESOURCE
+from newsroom.assets import ASSETS_RESOURCE
 from newsroom.news_api.utils import post_api_audit
 
 

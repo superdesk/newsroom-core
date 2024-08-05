@@ -137,11 +137,12 @@ class BaseNewsroomApp(SuperdeskEve):
         self.config.update(self.settings or {})
 
     def setup_media_storage(self):
+        self.media_async = GridFSMediaStorageAsync()
+
         if self.config.get("AMAZON_CONTAINER_NAME"):
             self.media = AmazonMediaStorage(self)
         else:
             self.media = SuperdeskGridFSMediaStorage(self)
-            self.media_async = GridFSMediaStorageAsync()
 
     def setup_babel(self):
         self.config.setdefault("BABEL_TRANSLATION_DIRECTORIES", os.path.join(NEWSROOM_DIR, "translations"))

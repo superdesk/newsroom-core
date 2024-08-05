@@ -4,6 +4,7 @@ from typing import Any, Optional
 from bson import ObjectId
 from flask_babel import gettext
 
+from newsroom.flask import get_file_from_request
 from superdesk.core import json, get_current_app
 from superdesk.flask import jsonify, request, abort
 from superdesk import get_resource_service
@@ -16,7 +17,7 @@ from newsroom.utils import (
     set_original_creator,
     set_version_creator,
 )
-from newsroom.assets.utils import save_file_and_get_url
+from newsroom.assets import save_file_and_get_url
 from newsroom.wire.views import delete_dashboard_caches
 
 
@@ -27,10 +28,6 @@ def get_settings_data():
         "dashboards": get_current_app().as_any().dashboards,
         "navigations": list(query_resource("navigations", lookup={"is_enabled": True})),
     }
-
-
-def _get_file_from_request(key: str) -> Optional[Any]:
-    return request.files.get(key)
 
 
 @blueprint.route("/cards", methods=["GET"])
@@ -82,7 +79,7 @@ async def _get_card_data(data):
 
     if data.get("type") == "2x2-events":
         for index, event in enumerate(card_data["config"]["events"]):
-            file = _get_file_from_request(f"file{index}")
+            file = get_file_from_request(f"file{index}")
 
             if file:
                 file_url = await save_file_and_get_url(file)

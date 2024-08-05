@@ -4,6 +4,7 @@ from typing import Any, List, Optional
 from bson import ObjectId
 from flask_babel import gettext
 
+from newsroom.flask import get_file_from_request
 from superdesk.core import get_current_app, json
 from superdesk.flask import jsonify, request
 from superdesk import get_resource_service
@@ -17,7 +18,7 @@ from newsroom.utils import (
     set_original_creator,
     set_version_creator,
 )
-from newsroom.assets.utils import save_file_and_get_url
+from newsroom.assets import save_file_and_get_url
 
 
 def get_settings_data():
@@ -28,10 +29,6 @@ def get_settings_data():
             s for s in get_current_app().as_any().sections if s.get("_id") != "monitoring"
         ],  # monitoring has no navigation
     }
-
-
-def _get_file_from_request(key: str) -> Optional[Any]:
-    return request.files.get(key)
 
 
 @blueprint.route("/navigations", methods=["GET"])
@@ -80,7 +77,7 @@ async def _get_navigation_data(data):
     }
 
     for index, tile in enumerate(navigation_data["tile_images"] or []):
-        file = _get_file_from_request(f"file{index}")
+        file = get_file_from_request(f"file{index}")
 
         if file:
             file_url = await save_file_and_get_url(f"file{index}")

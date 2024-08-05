@@ -37,6 +37,8 @@ CORE_APPS = [
     "newsroom.history",
 ]
 
+MODULES = ["newsroom.assets.module"]
+
 INSTALLED_APPS = []
 
 LANGUAGES = ["en", "fi", "cs", "fr_CA"]

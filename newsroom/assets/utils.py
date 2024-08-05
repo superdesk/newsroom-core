@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 from motor.motor_asyncio import AsyncIOMotorGridOut
 from typing import Any, Mapping, Optional, Sequence, cast
 
+from newsroom.core import get_newsroom_app
 from superdesk.flask import url_for
 from superdesk.core import get_current_app
 from superdesk.upload import upload_url as _upload_url
@@ -13,12 +14,6 @@ from superdesk.media.media_operations import guess_media_extension
 from .module import ASSETS_ENDPOINT_GROUP_NAME, ASSETS_RESOURCE
 
 CACHE_MAX_AGE = 3600 * 24 * 7  # 7 days
-
-
-def get_newsroom_app():
-    from newsroom.web.factory import NewsroomWebApp
-
-    return cast(NewsroomWebApp, get_current_app())
 
 
 async def get_media_file(media_id: str):

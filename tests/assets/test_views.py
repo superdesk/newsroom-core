@@ -39,7 +39,7 @@ def test_media_not_found(client):
 
 
 async def test_filename_in_response_header(client_async, app):
-    media_id = await app.media_async.put(b"Plain text content", content_type="plain/text", filename="testfile.txt")
+    media_id = await app.media_async.put(b"Plain text content", content_type="text/plain", filename="testfile.txt")
 
     response = await client_async.get(f"/assets/{media_id}?filename=testfile.txt")
     assert response.status_code == 200
