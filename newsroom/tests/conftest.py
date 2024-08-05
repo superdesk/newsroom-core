@@ -7,7 +7,10 @@ from asgiref.wsgi import WsgiToAsgi
 from newsroom.factory.app import BaseNewsroomApp
 from superdesk.flask import Config, Flask
 from superdesk.cache import cache
+from superdesk.tests.async_test_client import AsyncTestClient
+
 from newsroom.web.factory import get_app
+from newsroom.factory.app import BaseNewsroomApp
 from newsroom.tests import markers
 from superdesk.tests.async_test_client import AsyncTestClient
 
@@ -90,18 +93,18 @@ async def app_async(app):
 
 
 @fixture
-def client_async(app: BaseNewsroomApp, client):
-    if client:
-        pass
-
-    asgi_app = WsgiToAsgi(app)
-    client_async = AsyncTestClient(app, asgi_app)
-    return client_async
+def client(app: Flask):
+    return app.test_client()
 
 
 @fixture
-def client(app: Flask):
-    return app.test_client()
+def client_async(app: BaseNewsroomApp, client):
+    if client:
+        pass
+    asgi_app = WsgiToAsgi(app)
+    client_async = AsyncTestClient(app, asgi_app)
+    # client_async.set_cookie("newsroom_session", client.get_cookie("newsroom_session").value)
+    return client_async
 
 
 @fixture

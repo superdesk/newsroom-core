@@ -118,7 +118,6 @@ BLUEPRINTS = [
     "newsroom.wire",
     "newsroom.auth.views",
     "newsroom.users",
-    "newsroom.companies",
     "newsroom.design",
     "newsroom.history",
     "newsroom.push",
@@ -175,7 +174,12 @@ CORE_APPS = [
     "newsroom.notifications.send_scheduled_notifications",
 ]
 
-MODULES = ["newsroom.ui_config_async", "newsroom.oauth_clients", "newsroom.assets.module"]
+MODULES = [
+    "newsroom.ui_config_async",
+    "newsroom.oauth_clients",
+    "newsroom.companies",
+    "newsroom.assets.module",
+]
 
 SITE_NAME = "Newshub"
 COPYRIGHT_HOLDER = "Sourcefabric"

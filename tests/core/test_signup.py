@@ -4,11 +4,15 @@ from flask import url_for
 
 from newsroom.types import CompanyType, Country
 from newsroom.auth import get_auth_user_by_email
+from newsroom.companies.companies_async import CompanyService, CompanyProduct
+from newsroom.products.types import ProductType
+
 from tests.utils import mock_send_email
 
 
 @mock.patch("newsroom.email.send_email", mock_send_email)
-def test_new_user_signup_sends_email(app, client):
+async def test_new_user_signup_sends_email(app, client):
+    company_service = CompanyService()
     app.countries = [Country(value="AUS", text="Australia")]
     app.config["SIGNUP_EMAIL_RECIPIENTS"] = "admin@bar.com"
     app.config["COMPANY_TYPES"] = [CompanyType(id="news_media", name="News Media")]
@@ -45,27 +49,27 @@ def test_new_user_signup_sends_email(app, client):
         assert "News Media" in outbox[0].body
 
     # Test that the new Company has been created
-    new_company = app.data.find_one("companies", req=None, name="News Press Co.")
+    new_company = await company_service.find_one(name="News Press Co.")
     assert new_company is not None
-    assert new_company["contact_name"] == "John Doe"
-    assert new_company["contact_email"] == "newuser@abc.org"
-    assert new_company["phone"] == "1234567"
-    assert new_company["country"] == "AUS"
-    assert new_company["company_type"] == "news_media"
-    assert new_company["is_enabled"] is False
-    assert new_company["is_approved"] is False
-    assert new_company["sections"] == {
+    assert new_company.contact_name == "John Doe"
+    assert new_company.contact_email == "newuser@abc.org"
+    assert new_company.phone == "1234567"
+    assert new_company.country == "AUS"
+    assert new_company.company_type == "news_media"
+    assert new_company.is_enabled is False
+    assert new_company.is_approved is False
+    assert new_company.sections == {
         "wire": True,
         "agenda": True,
         "news_api": True,
         "monitoring": True,
     }
-    assert new_company["products"] == [
-        {
-            "_id": product_ids[0],
-            "section": "wire",
-            "seats": 0,
-        }
+    assert new_company.products == [
+        CompanyProduct(
+            _id=product_ids[0],
+            section=ProductType.WIRE,
+            seats=0,
+        )
     ]
 
     # Test that the new User has been created
@@ -77,7 +81,7 @@ def test_new_user_signup_sends_email(app, client):
     assert new_user["phone"] == "1234567"
     assert new_user["role"] == "Other"
     assert new_user["country"] == "AUS"
-    assert new_user["company"] == new_company["_id"]
+    assert new_user["company"] == new_company.id
     assert new_user["is_enabled"] is False
     assert new_user["is_approved"] is False
     assert new_user["is_validated"] is False
