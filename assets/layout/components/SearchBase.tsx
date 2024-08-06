@@ -3,7 +3,7 @@ import {get} from 'lodash';
 import {createPortal} from 'react-dom';
 import {Tooltip} from 'bootstrap';
 
-import {IArticle, IAgendaItem, IListConfig, IPreviewConfig, IItemAction} from 'interfaces';
+import {IArticle, IAgendaItem, IListConfig, IPreviewConfig, IItemAction, ISearchParams} from 'interfaces';
 import {isTouchDevice, gettext, isDisplayed, isMobilePhone} from 'utils';
 import {getSingleFilterValue} from 'search/utils';
 import {getFilterPanelOpenState, setFilterPanelOpenState} from 'local-store';
@@ -32,6 +32,7 @@ interface IBaseProps {
     state: any;
     fetchItems: () => Promise<void>;
     activeQuery: any;
+    searchParams: ISearchParams;
 }
 
 export default class SearchBase<Props = {}> extends React.Component<Props & IBaseProps, IBaseState & any> {
