@@ -113,6 +113,7 @@ label:not(.label--no-spacing) {
 
 
 .alertify-notifier {
+    z-index: 1000000001 !important;
     .ajs-message {
         border: none;
         border-radius: var(--ajs-message-border-radius);
@@ -348,7 +349,6 @@ label:not(.label--no-spacing) {
 
 .newsroomWrap {
     position: absolute;
-    z-index: 1;
     inset-block-start: 0px;
     inset-inline-end: 0;
     inset-inline-start: 0;
