@@ -4,6 +4,7 @@ from typing import List
 from bson import ObjectId
 from flask_babel import gettext
 
+from newsroom.flask import get_file_from_request
 from superdesk.core import get_current_app, json
 from superdesk.flask import jsonify, request
 from superdesk import get_resource_service
@@ -17,7 +18,7 @@ from newsroom.utils import (
     set_original_creator,
     set_version_creator,
 )
-from newsroom.upload import get_file
+from newsroom.assets import save_file_and_get_url
 
 
 def get_settings_data():
@@ -48,9 +49,9 @@ def search():
 
 @blueprint.route("/navigations/new", methods=["POST"])
 @admin_only
-def create():
+async def create():
     data = json.loads(request.form["navigation"])
-    nav_data = _get_navigation_data(data)
+    nav_data = await _get_navigation_data(data)
     product_ids = nav_data.pop("products", None)
 
     set_original_creator(nav_data)
@@ -62,7 +63,7 @@ def create():
     return jsonify({"success": True, "_id": ids[0]}), 201
 
 
-def _get_navigation_data(data):
+async def _get_navigation_data(data):
     if not data.get("name"):
         return jsonify(gettext("Name not found")), 400
 
@@ -76,20 +77,23 @@ def _get_navigation_data(data):
     }
 
     for index, tile in enumerate(navigation_data["tile_images"] or []):
-        file_url = get_file("file{}".format(index))
-        if file_url:
-            tile["file_url"] = file_url
+        file = get_file_from_request(f"file{index}")
+
+        if file:
+            file_url = await save_file_and_get_url(f"file{index}")
+            if file_url:
+                tile["file_url"] = file_url
 
     return navigation_data
 
 
 @blueprint.route("/navigations/<_id>", methods=["POST"])
 @admin_only
-def edit(_id):
+async def edit(_id):
     get_entity_or_404(_id, "navigations")
 
     data = json.loads(request.form["navigation"])
-    nav_data = _get_navigation_data(data)
+    nav_data = await _get_navigation_data(data)
     product_ids = nav_data.pop("products", None)
 
     set_version_creator(nav_data)

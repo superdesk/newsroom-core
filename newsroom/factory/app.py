@@ -23,6 +23,7 @@ from superdesk.validator import SuperdeskValidator
 from superdesk.logging import configure_logging
 from superdesk.errors import SuperdeskApiError
 from superdesk.cache import cache_backend
+from superdesk.core.storage import GridFSMediaStorageAsync
 from superdesk.core.app import SuperdeskAsyncApp
 from superdesk.factory.app import SuperdeskEve
 
@@ -45,6 +46,8 @@ class BaseNewsroomApp(SuperdeskEve):
     DATALAYER = SuperdeskDataLayer
     AUTH_SERVICE = SessionAuth
     INSTANCE_CONFIG = None
+
+    media_async: GridFSMediaStorageAsync
 
     def __init__(self, import_name=__package__, config=None, testing=False, **kwargs):
         """Override __init__ to do Newsroom specific config and still be able
@@ -134,6 +137,8 @@ class BaseNewsroomApp(SuperdeskEve):
         self.config.update(self.settings or {})
 
     def setup_media_storage(self):
+        self.media_async = GridFSMediaStorageAsync()
+
         if self.config.get("AMAZON_CONTAINER_NAME"):
             self.media = AmazonMediaStorage(self)
         else:

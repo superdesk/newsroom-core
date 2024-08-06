@@ -1,11 +1,11 @@
 import os
-from pymongo import MongoClient
 from pathlib import Path
 from pytest import fixture
+from pymongo import MongoClient
 from asgiref.wsgi import WsgiToAsgi
 
-from superdesk.flask import Config, Flask
 from superdesk.cache import cache
+from superdesk.flask import Config, Flask
 from superdesk.tests.async_test_client import AsyncTestClient
 
 from newsroom.web.factory import get_app

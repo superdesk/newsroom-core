@@ -164,6 +164,11 @@ class NewsroomWebApp(BaseNewsroomApp):
     def _setup_assets(self):
         NewsroomWebpack(self)
 
+    def _get_current_object(self):
+        # TODO-ASYNC: many tests break because of this method being missing
+        # leaving here just to reduce the noise. We will remove it later
+        return self
+
     def _setup_theme(self):
         self.add_url_rule(
             self.static_url_path.replace("static", "theme") + "/<path:filename>",

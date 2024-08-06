@@ -56,7 +56,7 @@ from newsroom.public.views import (
 
 from .search import get_bookmarks_count
 from .items import get_items_for_dashboard
-from ..upload import ASSETS_RESOURCE, get_upload
+from newsroom.assets import ASSETS_RESOURCE, get_upload
 from newsroom.ui_config_async import UiConfigResourceService
 from newsroom.users import get_user_profile_data
 
@@ -297,7 +297,7 @@ def search():
 
 @blueprint.route("/download", methods=["POST"])
 @login_required
-def download():
+async def download():
     user = get_user(required=True)
     data = request.json
     _format = data.get("format", "text")
@@ -311,7 +311,8 @@ def download():
         if len(items) == 1:
             try:
                 picture = formatter.format_item(items[0], item_type=item_type)
-                return get_upload(picture["media"], filename="baseimage%s" % picture["file_extension"])
+                media_url = await get_upload(picture["media"], filename="baseimage%s" % picture["file_extension"])
+                return media_url
             except ValueError:
                 return abort(404)
         else:

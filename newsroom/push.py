@@ -41,7 +41,7 @@ from newsroom.email import (
 from newsroom.history import get_history_users
 from newsroom.wire.views import delete_dashboard_caches
 from newsroom.wire import url_for_wire
-from newsroom.upload import ASSETS_RESOURCE
+from newsroom.assets import ASSETS_RESOURCE
 from newsroom.agenda.utils import (
     get_latest_available_delivery,
     TO_BE_CONFIRMED_FIELD,
@@ -1034,19 +1034,20 @@ def notify():
 
 
 @blueprint.route("/push_binary", methods=["POST"])
-def push_binary():
+async def push_binary():
     assert_test_signature(request)
     media = request.files["media"]
     media_id = request.form["media_id"]
     app = get_current_app()
-    app.media.put(media, resource=ASSETS_RESOURCE, _id=media_id, content_type=media.content_type)
+    await app.media_async.put(media, media_id, resource=ASSETS_RESOURCE, _id=media_id, content_type=media.content_type)
     return jsonify({"status": "OK"}), 201
 
 
 @blueprint.route("/push_binary/<media_id>")
-def push_binary_get(media_id):
+async def push_binary_get(media_id):
     app = get_current_app()
-    if app.media.get(media_id, resource=ASSETS_RESOURCE):
+    media_file = await app.media_async.get(media_id, resource=ASSETS_RESOURCE)
+    if media_file:
         return jsonify({})
     else:
         abort(404)

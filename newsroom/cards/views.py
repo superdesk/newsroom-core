@@ -3,6 +3,7 @@ import re
 from bson import ObjectId
 from flask_babel import gettext
 
+from newsroom.flask import get_file_from_request
 from superdesk.core import json, get_current_app
 from superdesk.flask import jsonify, request, abort
 from superdesk import get_resource_service
@@ -15,7 +16,7 @@ from newsroom.utils import (
     set_original_creator,
     set_version_creator,
 )
-from newsroom.upload import get_file
+from newsroom.assets import save_file_and_get_url
 from newsroom.wire.views import delete_dashboard_caches
 
 
@@ -48,19 +49,16 @@ def search():
 
 @blueprint.route("/cards/new", methods=["POST"])
 @admin_only
-def create():
+async def create():
     data = json.loads(request.form["card"])
-    card_data = _get_card_data(data)
+    card_data = await _get_card_data(data)
     set_original_creator(card_data)
     ids = get_resource_service("cards").post([card_data])
     delete_dashboard_caches()
     return jsonify({"success": True, "_id": ids[0]}), 201
 
 
-def _get_card_data(data):
-    if not data:
-        abort(400)
-
+async def _get_card_data(data):
     if not data.get("label"):
         raise ValueError(gettext("Label not found"))
 
@@ -80,9 +78,12 @@ def _get_card_data(data):
 
     if data.get("type") == "2x2-events":
         for index, event in enumerate(card_data["config"]["events"]):
-            file_url = get_file("file{}".format(index))
-            if file_url:
-                event["file_url"] = file_url
+            file = get_file_from_request(f"file{index}")
+
+            if file:
+                file_url = await save_file_and_get_url(file)
+                if file_url:
+                    event["file_url"] = file_url
 
     if data.get("type") == "4-photo-gallery":
         for source in (data.get("config") or {}).get("sources"):
@@ -97,11 +98,14 @@ def _get_card_data(data):
 
 @blueprint.route("/cards/<id>", methods=["POST"])
 @admin_only
-def edit(id):
+async def edit(id):
     get_entity_or_404(id, "cards")
 
     data = json.loads(request.form["card"])
-    card_data = _get_card_data(data)
+    if not data:
+        abort(400)
+
+    card_data = await _get_card_data(data)
     set_version_creator(card_data)
     get_resource_service("cards").patch(id=ObjectId(id), updates=card_data)
     delete_dashboard_caches()
