@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {get, isEqual} from 'lodash';
 
-import {ISearchParams, ISearchSortValue} from 'interfaces';
+import {ISearchSortValue} from 'interfaces';
 import {gettext, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE} from 'utils';
 import {getSingleFilterValue, searchParamsUpdated} from 'search/utils';
 

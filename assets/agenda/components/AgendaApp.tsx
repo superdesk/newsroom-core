@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {get, isEmpty} from 'lodash';
 
 import {ISearchSortValue} from 'interfaces';
-import {getItemFromArray, gettext} from 'utils';
+import {gettext} from 'utils';
 import {noNavigationSelected, searchParamsUpdated} from 'search/utils';
 
 import {
