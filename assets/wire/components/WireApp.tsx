@@ -5,8 +5,8 @@ import {connect} from 'react-redux';
 import {get, isEqual} from 'lodash';
 
 import {ISearchSortValue} from 'interfaces';
-import {gettext, getItemFromArray, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE} from 'utils';
-import {getSingleFilterValue} from 'search/utils';
+import {gettext, DISPLAY_NEWS_ONLY, DISPLAY_ALL_VERSIONS_TOGGLE} from 'utils';
+import {getSingleFilterValue, searchParamsUpdated} from 'search/utils';
 
 import {
     fetchItems,
@@ -132,7 +132,7 @@ class WireApp extends SearchBase<any> {
             );
         }
 
-        const showFilters = Object.values(this.props.searchParams ?? {}).find((val) => val != null) != null ||
+        const showFilters = searchParamsUpdated(this.props.searchParams) ||
             this.props.activeTopic != null ||
             this.props.activeProduct != null ||
             Object.keys(this.props.activeFilter ?? {}).length > 0 ||

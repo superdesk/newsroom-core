@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import {gettext} from 'utils';
+import {gettext, DISPLAY_AUTHOR_ROLE} from 'utils';
 
 import InfoBox from '../InfoBox';
 
@@ -14,7 +14,7 @@ export function Authors({item}: any) {
         <InfoBox label={gettext('Authors')}>
             {item.authors.map((author: any) => (
                 <div key={author.code + '/' + author.role} className="wire-column__preview__item__author">
-                    <h5>{author.role}</h5>
+                    {DISPLAY_AUTHOR_ROLE ? <h5>{author.role}</h5> : null}
                     <h6>{author.name}</h6>
                     {(!author.biography || !author.biography.length) ? null : (
                         <p>{author.biography.split('\n').map((item: any, key: any) => (

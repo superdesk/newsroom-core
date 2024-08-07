@@ -451,14 +451,29 @@ describe('utils', () => {
                 'tz': 'Europe/Prague',
                 'all_day': false
             }),
+            createEvent('event5', {
+                'start': '2024-05-20T20:25:00+0000',
+                'end': '2024-05-23T00:00:00+0000',
+                'no_end_time': true,
+                'tz': 'Europe/Prague',
+            }),
         ];
         
         const groupedItems = getGroupedItems(items, moment('2024-05-21'), moment('2024-05-25'));
 
-        expect(Object.keys(groupedItems)).toEqual(['23-05-2024', '24-05-2024']);
+        expect(Object.keys(groupedItems)).toEqual(['21-05-2024', '22-05-2024', '23-05-2024', '24-05-2024']);
+
+        expect(groupedItems['21-05-2024'].items).toEqual([]);
+        expect(groupedItems['21-05-2024'].hiddenItems).toEqual(['event5']);
+
+        expect(groupedItems['22-05-2024'].items).toEqual([]);
+        expect(groupedItems['22-05-2024'].hiddenItems).toEqual(['event5']);
 
         expect(groupedItems['23-05-2024'].items).toEqual(['event1']);
+        expect(groupedItems['23-05-2024'].hiddenItems).toEqual(['event5']);
+
         expect(groupedItems['24-05-2024'].items).toEqual(['event2', 'event3', 'event4']);
+        expect(groupedItems['24-05-2024'].hiddenItems).toEqual([]);
     });
 
     describe('timezone', () => {

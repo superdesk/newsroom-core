@@ -80,7 +80,7 @@ class UserDashboardEntry(TypedDict):
 
 class UserRequired(TypedDict):
     email: str
-    user_type: str
+    user_type: Literal["administrator", "internal", "public", "company_admin", "account_management"]
 
 
 class UserData(UserRequired, total=False):
@@ -268,3 +268,7 @@ class DashboardCard(TypedDict):
 
 
 Article = Dict[str, Any]
+
+
+class Navigation(Entity):
+    name: str

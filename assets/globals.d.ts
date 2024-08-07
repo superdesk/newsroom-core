@@ -19,6 +19,7 @@ interface IClientConfig {
     display_all_versions_toggle: boolean;
     display_credits: boolean;
     display_news_only: boolean;
+    display_author_role: boolean;
     filter_panel_defaults: {
         tab: {
             wire: string;
@@ -59,6 +60,7 @@ interface IClientConfig {
             button_label: string;
         }
     };
+    agenda_sort_events_with_coverage_on_top?: boolean;
     show_user_register?: boolean;
     multimedia_website_search_url?: string;
 }

@@ -1,10 +1,19 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {gettext, shortDate, isInPast} from 'utils';
 import {getCountryLabel} from '../utils';
+import {ICompany, ICountry} from 'interfaces';
 
-function CompanyListItem({company, type, isActive, onClick, showSubscriberId, countries}: any) {
+interface IProps {
+    company: ICompany;
+    type?: {name: string};
+    isActive: boolean;
+    onClick: (id: string) => void;
+    showSubscriberId: boolean;
+    countries: Array<ICountry>;
+}
+
+export default function CompanyListItem({company, type, isActive, onClick, showSubscriberId, countries}: IProps) {
     return (
         <tr key={company._id}
             className={classNames({'table--selected': isActive, 'table-secondary': !company.is_enabled})}
@@ -12,7 +21,9 @@ function CompanyListItem({company, type, isActive, onClick, showSubscriberId, co
             tabIndex={0}
             data-test-id={`company-list-item--${company._id}`}
         >
-            <td className="name">{company.name}</td>
+            <td className="name">{company.name} {company.internal ? (
+                <span className="badge badge--neutral-translucent me-2">{gettext('Internal')}</span>
+            ) : null}</td>
             <td className="type">{type ? gettext(type.name) : ''}</td>
             {showSubscriberId && <td>{company.sd_subscriber_id}</td>}
             <td>{company.account_manager}</td>
@@ -27,16 +38,3 @@ function CompanyListItem({company, type, isActive, onClick, showSubscriberId, co
         </tr>
     );
 }
-
-CompanyListItem.propTypes = {
-    company: PropTypes.object,
-    type: PropTypes.shape({
-        name: PropTypes.string.isRequired,
-    }),
-    isActive: PropTypes.bool,
-    onClick: PropTypes.func,
-    showSubscriberId: PropTypes.bool,
-    countries: PropTypes.array
-};
-
-export default CompanyListItem;

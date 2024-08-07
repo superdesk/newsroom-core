@@ -347,6 +347,7 @@ CLIENT_CONFIG = {
     "item_actions": {},
     "display_abstract": DISPLAY_ABSTRACT,
     "display_credits": False,
+    "display_author_role": True,
     "filter_panel_defaults": {
         "tab": {
             "wire": "nav",  # Options are 'nav', 'topics', 'filters'
@@ -396,6 +397,7 @@ CLIENT_CONFIG = {
             "button_label": lazy_gettext("Completed"),
         },
     },
+    "agenda_sort_events_with_coverage_on_top": False,
 }
 
 # Enable rendering of the date in the base view

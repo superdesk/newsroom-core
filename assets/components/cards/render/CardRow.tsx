@@ -63,9 +63,9 @@ class CardRow extends React.Component<IComponentProps, any> {
 }
 
 const mapStateToProps = (state: any): IReduxStateProps => ({
-    userProducts: state.userProducts,
+    userProducts: state.userProducts || [],
     userType: state.userType,
-    companyProducts: state.companyProducts,
+    companyProducts: state.companyProducts || [],
 });
 
 const component: React.ComponentType<IOwnProps> = connect<IReduxStateProps, {}, IOwnProps>(mapStateToProps)(CardRow);

@@ -1037,12 +1037,16 @@ export const getCoverageTooltip = (coverage: any, beingUpdated?: any) => {
 };
 
 function getScheduleType(item: IAgendaItem): string {
-    const start = moment(item.dates.start);
-    const end = moment(item.dates.end);
+    const start = getStartDate(item);
+    const end = getEndDate(item);
     const duration = end.diff(start, 'minutes');
 
     if (item.dates.all_day) {
         return duration === 0 ? SCHEDULE_TYPE.ALL_DAY : SCHEDULE_TYPE.MULTI_DAY;
+    }
+
+    if (item.dates.no_end_time && !start.isSame(end, 'day')) {
+        return SCHEDULE_TYPE.MULTI_DAY;
     }
 
     if (item.dates.no_end_time) {

@@ -27,6 +27,8 @@ describe('wire - filters', () => {
     });
 
     it('can search using navigation & filters', () => {
+        cy.get('[data-test-id="search-results-bar"]').should('not.exist');
+
         /**
             SEARCH
         */
@@ -63,10 +65,8 @@ describe('wire - filters', () => {
 
         FilterPanel.button('clear');
 
-        /**
-            check filtering by date input
-        */
-        cy.get('[data-test-id="date-filter-select"]').should('have.value', 'last_30_days');
+        // check filtering by date input
+        cy.get('[data-test-id="date-filter-select"]').should('have.value', '');
 
         WirePage.item(WireItems.item_1._id).should('exist');
         WirePage.item(WireItems.item_2._id).should('exist');
@@ -81,5 +81,10 @@ describe('wire - filters', () => {
 
         // Add assertions to verify the items displayed based on the custom date range
         WirePage.item(WireItems.item_3._id).should('exist');
+
+        cy.get('[data-test-id="date-filter-select"]').select('');
+        FilterPanel.button('search');
+
+        cy.get('[data-test-id="search-results-bar"]').should('not.exist');
     });
 });

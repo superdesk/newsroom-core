@@ -14,9 +14,11 @@ from jinja2.utils import htmlsafe_json_dumps  # type: ignore
 from superdesk.text_utils import get_text, get_word_count, get_char_count
 from superdesk.utc import utcnow
 from datetime import datetime
+from newsroom.auth import get_company
 from newsroom.gettext import set_session_timezone, get_session_timezone, clear_session_timezone
 from enum import Enum
 
+from newsroom.types import User
 from newsroom.user_roles import UserRole
 
 
@@ -391,3 +393,14 @@ def get_item_category_names(item: Dict[str, Any]) -> str:
         return ""
 
     return ", ".join([category["name"] for category in item["service"]])
+
+
+def get_ga_user_properties(user: User) -> Dict[str, str]:
+    if not user:
+        return {}
+    company = get_company(user)
+    return {
+        "company": (company.get("name") if company else "") or "none",
+        "user": f"{user['first_name']} {user['last_name'][:1]}".strip(),
+        "user_internal_id": str(user.get("_id") or ""),  # user_id is reserved name
+    }
