@@ -22,7 +22,7 @@ import {
 import {Dropdown} from './../../../components/Dropdown';
 
 import {SearchResultTagsList} from './SearchResultTagsList';
-import {IDateFilters} from 'interfaces/common';
+import {IDateFilter} from 'interfaces/common';
 
 interface IReduxStoreProps {
     user: IUser;
@@ -72,7 +72,7 @@ interface IOwnProps {
     onClearAll?(): void;
     setQuery(query: string): void;
     setSortQuery(query: ISearchSortValue): void;
-    dateFilters?: IDateFilters
+    dateFilters?: IDateFilter
 }
 
 type IProps = IReduxStoreProps & IDispatchProps & IOwnProps;
