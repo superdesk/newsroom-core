@@ -1,12 +1,10 @@
 /* eslint-env node */
 
 const path = require('path');
-const webpack = require('webpack');
-const ManifestPlugin = require('webpack-manifest-plugin');
-const TerserPlugin = require('terser-webpack-plugin-legacy');
-const ObjectRestSpreadPlugin = require('@sucrase/webpack-object-rest-spread-plugin');
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 
 const config = {
+    mode: 'production',
     entry: {
         newsroom_js: path.resolve(__dirname, 'assets/index.ts'),
         companies_js: path.resolve(__dirname, 'assets/companies/index.ts'),
@@ -42,8 +40,8 @@ const config = {
     output: {
         path: path.resolve(process.cwd(), 'dist'),
         publicPath: 'http://localhost:8080/',
-        filename: '[name].[chunkhash].js',
-        chunkFilename: '[id].[chunkhash].js'
+        filename: '[name].[hash].js',
+        chunkFilename: '[id].[hash].js'
     },
     module: {
         rules: [
@@ -96,27 +94,12 @@ const config = {
         mainFields: ['browser', 'main'],
     },
     plugins: [
-        new ObjectRestSpreadPlugin(),
-        new ManifestPlugin({writeToFileEmit: true}),
-        new webpack.optimize.CommonsChunkPlugin({
-            name: 'common',
-            minChunks: Infinity,
-        }),
+        new WebpackManifestPlugin({writeToFileEmit: true}),
     ],
     devServer: {
         compress: true,
-        disableHostCheck: true,
+        host: "0.0.0.0",
     },
 };
-
-if (process.env.NODE_ENV === 'production') {
-    config.plugins.push(new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
-    }));
-    config.plugins.push(new TerserPlugin({
-        cache: true,
-        parallel: true,
-    }));
-}
 
 module.exports = config;
