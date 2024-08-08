@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from motor.motor_asyncio import AsyncIOMotorGridOut
 from typing import Any, Mapping, Optional, Sequence
 
-from newsroom.core import get_newsroom_app
+from newsroom.core import get_current_wsgi_app
 from superdesk.flask import url_for
 from superdesk.upload import upload_url as _upload_url
 from superdesk.media.media_operations import guess_media_extension
@@ -22,7 +22,7 @@ async def get_media_file(media_id: str):
     Returns:
         The media file object if found, otherwise None.
     """
-    app = get_newsroom_app()
+    app = get_current_wsgi_app()
     try:
         result = await app.media_async.get(media_id, ASSETS_RESOURCE)
         return result
@@ -63,7 +63,7 @@ def generate_response_headers(media_file: AsyncIOMotorGridOut) -> Sequence:
         ("Content-Disposition", get_content_disposition(media_file.filename, metadata)),
         ("Last-Modified", media_file.upload_date),
         ("Cache-Control", f"max-age={CACHE_MAX_AGE}, public"),
-        ("Content-Type", metadata.get("contentType", media_file.content_type))
+        ("Content-Type", metadata.get("contentType", media_file.content_type)),
         # TODO:
         # - set etag which not sure if it's required
         # - find alternative to response.make_conditional(request, accept_ranges=True, complete_length=media_file.length)
@@ -82,7 +82,7 @@ async def save_file_and_get_url(file: Any) -> Optional[str]:
         Optional[str]: A URL to the uploaded file if a file is found and successfully uploaded; otherwise, None.
         None is returned if no file is found for the provided key or if the file fails to upload.
     """
-    app = get_newsroom_app()
+    app = get_current_wsgi_app()
     filename = secure_filename(file.filename)
 
     await app.media_async.put(file, filename, resource=ASSETS_RESOURCE, _id=filename, content_type=file.content_type)

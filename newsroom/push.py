@@ -20,7 +20,6 @@ from superdesk.utc import utcnow
 from superdesk.errors import SuperdeskApiError
 from planning.common import WORKFLOW_STATE
 from newsroom.celery_app import celery
-from newsroom.errors import LockedError
 from superdesk.lock import lock, unlock
 
 from newsroom.notifications import (
@@ -765,7 +764,9 @@ def set_item_reference(coverage):
 def locked(_id: str, service: str):
     lock_name = f"notify-{service}-{_id}"
     if not lock(lock_name, expire=300):
-        raise LockedError(lock_name)
+        logger.debug(f"Lock conflict on {lock_name}")
+        return
+
     logger.debug("Starting task %s", lock_name)
     try:
         yield lock_name
