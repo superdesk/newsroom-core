@@ -519,6 +519,13 @@ def format_date(date, time, offset):
         return _today - timedelta(days=7)
     if date == "now-30d/d":
         return _today - timedelta(days=30)
+    if date == "now30d/d":
+        return _today + timedelta(days=30)
+    if date == "now3M/M":
+        return _today + timedelta(days=90)
+    if date == "now12M/M":
+        return _today + timedelta(days=365)
+
     return datetime.strptime("%sT%s" % (date, time), "%Y-%m-%dT%H:%M:%S")
 
 

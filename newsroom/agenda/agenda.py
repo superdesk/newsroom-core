@@ -32,12 +32,7 @@ from newsroom.notifications import (
 )
 from newsroom.search import BoolQuery, BoolQueryParams
 from newsroom.template_filters import is_admin_or_internal, is_admin
-from newsroom.utils import (
-    get_user_dict,
-    get_company_dict,
-    get_entity_or_404,
-    parse_date_str,
-)
+from newsroom.utils import get_user_dict, get_company_dict, get_entity_or_404, parse_date_str, get_utcnow
 from newsroom.utils import get_local_date, get_end_date
 from datetime import datetime
 from newsroom.wire import url_for_wire
@@ -318,10 +313,19 @@ def _agenda_query():
 def get_date_filters(args):
     date_range = {}
     offset = int(args.get("timezone_offset", "0"))
+
+    agenda_filters = app.config.get("AGENDA_TIME_FILTERS")
+    default_filter = next((f for f in agenda_filters if f.get("default", False)), None)
+
     if args.get("date_from"):
-        date_range["gt"] = get_local_date(args["date_from"], "00:00:00", offset)
+        if default_filter and not args.get("date_to") and args.get("date_from") == get_utcnow().strftime("%Y-%m-%d"):
+            date_range["gt"] = get_local_date(default_filter["query"], "00:00:00", offset)
+        else:
+            date_range["gt"] = get_local_date(args["date_from"], "00:00:00", offset)
+
     if args.get("date_to"):
         date_range["lt"] = get_end_date(args["date_to"], get_local_date(args["date_to"], "23:59:59", offset))
+
     return date_range
 
 
