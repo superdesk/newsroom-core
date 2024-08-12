@@ -1,10 +1,11 @@
-from flask_babel import lazy_gettext
 import superdesk
+from inspect import iscoroutine
+from flask_babel import lazy_gettext
 from superdesk.flask import Blueprint
 
-
 from .users import AuthUserService, UsersResource, AuthUserResource, users_service
-from inspect import iscoroutine
+from .module import module  # noqa
+
 
 blueprint = Blueprint("users", __name__)
 

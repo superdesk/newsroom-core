@@ -22,7 +22,7 @@ upload_model_config = ResourceConfig(
 
 
 def legacy_init_app(app):
-    # TODO: remove this once we fully moved into async storage
+    # TODO-ASYNC: remove this once we fully moved into async storage
     # Keeping this only for compatibility with `sync` media storage
     from .utils import upload_url
 
