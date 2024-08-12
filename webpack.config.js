@@ -94,7 +94,7 @@ const config = {
         mainFields: ['browser', 'main'],
     },
     plugins: [
-        new WebpackManifestPlugin({writeToFileEmit: true, publicPath: '/'}),
+        new WebpackManifestPlugin({writeToFileEmit: true, publicPath: ''}),
     ],
     devServer: {
         compress: true,
