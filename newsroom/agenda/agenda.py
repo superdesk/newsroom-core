@@ -341,7 +341,7 @@ def get_date_filters(args):
             elif agenda_filter.startswith("now+"):  # Handle future filters (e.g., next_7_days)
                 date_range["gt"] = start_date
                 date_range["lt"] = get_end_date(agenda_filter, start_date)
-            elif agenda_filter.startswith("now"): # Handle current filters (e.g., this_week)
+            elif agenda_filter.startswith("now"):  # Handle current filters (e.g., this_week)
                 date_range["gt"] = get_local_date(agenda_filter, "00:00:00", offset)
                 date_range["lt"] = get_end_date(agenda_filter, get_local_date(agenda_filter, "23:59:59", offset))
     else:
