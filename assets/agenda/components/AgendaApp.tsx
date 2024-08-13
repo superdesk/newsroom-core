@@ -252,7 +252,12 @@ class AgendaApp extends SearchBase<any> {
                                             setQuery={this.props.setQuery}
                                             setSortQuery={this.props.setSortQuery}
                                             showSortDropdown={true}
-                                            defaultSortValue="_score"
+                                            sortOptions={[
+                                                {label: gettext('Date'), value: ''},
+                                                {label: gettext('Newest updates'), value: 'versioncreated:desc'},
+                                                {label: gettext('Oldest updates'), value: 'versioncreated:asc'},
+                                                {label: gettext('Relevance'), value: '_score'},
+                                            ]}
                                         />
                                     )
                                 }
