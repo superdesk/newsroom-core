@@ -32,12 +32,7 @@ from newsroom.notifications import (
 )
 from newsroom.search import BoolQuery, BoolQueryParams
 from newsroom.template_filters import is_admin_or_internal, is_admin
-from newsroom.utils import (
-    get_user_dict,
-    get_company_dict,
-    get_entity_or_404,
-    parse_date_str,
-)
+from newsroom.utils import get_user_dict, get_company_dict, get_entity_or_404, parse_date_str
 from newsroom.utils import get_local_date, get_end_date
 from datetime import datetime
 from newsroom.wire import url_for_wire
@@ -315,13 +310,46 @@ def _agenda_query():
     }
 
 
+def get_date_filter_query(filter_name: str):
+    """Get the query for the given filter name."""
+    time_filters = app.config.get("AGENDA_TIME_FILTERS", [])
+    default_filter = next((f for f in time_filters if f.get("default")), None)
+    if not filter_name:
+        return default_filter["query"] if default_filter else None
+    if filter_name == "custom_date":
+        return None
+    for time_filter in time_filters:
+        if time_filter["filter"] == filter_name:
+            query = time_filter["query"]
+            return query
+    return None
+
+
 def get_date_filters(args):
     date_range = {}
     offset = int(args.get("timezone_offset", "0"))
-    if args.get("date_from"):
-        date_range["gt"] = get_local_date(args["date_from"], "00:00:00", offset)
-    if args.get("date_to"):
-        date_range["lt"] = get_end_date(args["date_to"], get_local_date(args["date_to"], "23:59:59", offset))
+
+    agenda_filter = get_date_filter_query(args.get("date_filter"))
+    date_from = args.get("date_from")
+
+    if agenda_filter:
+        if date_from:
+            start_date = get_local_date(date_from, "00:00:00", offset)
+            if agenda_filter.startswith("now-"):  # Handle past filters (e.g., last_7_days)
+                date_range["gt"] = get_local_date(agenda_filter, "00:00:00", offset)
+                date_range["lt"] = start_date
+            elif agenda_filter.startswith("now+"):  # Handle future filters (e.g., next_7_days)
+                date_range["gt"] = start_date
+                date_range["lt"] = get_end_date(agenda_filter, start_date)
+            elif agenda_filter.startswith("now"):  # Handle current filters (e.g., this_week)
+                date_range["gt"] = get_local_date(agenda_filter, "00:00:00", offset)
+                date_range["lt"] = get_end_date(agenda_filter, get_local_date(agenda_filter, "23:59:59", offset))
+    else:
+        if date_from:
+            date_range["gt"] = get_local_date(date_from, "00:00:00", offset)
+        if args.get("date_to"):
+            date_range["lt"] = get_end_date(args["date_to"], get_local_date(args["date_to"], "23:59:59", offset))
+
     return date_range
 
 
@@ -360,10 +388,10 @@ def _set_event_date_range(search):
 
     if date_from and not date_to:
         # Filter from a particular date onwards
-        should = gen_date_range_filter("dates.end", "gte", search.args["date_from"], date_from)
+        should = gen_date_range_filter("dates.end", "gte", search.args.get("date_from"), date_from)
     elif not date_from and date_to:
         # Filter up to a particular date
-        should = gen_date_range_filter("dates.end", "lte", search.args["date_to"], date_to)
+        should = gen_date_range_filter("dates.end", "lte", search.args.get("date_to"), date_to)
     elif date_from and date_to:
         # Filter based on the date range provided
         should = [
@@ -381,8 +409,8 @@ def _set_event_date_range(search):
                 # Both start/end dates are inside the range, all day version
                 "bool": {
                     "filter": [
-                        {"range": {"dates.start": {"gte": search.args["date_from"]}}},
-                        {"range": {"dates.end": {"lte": search.args["date_to"]}}},
+                        {"range": {"dates.start": {"gte": search.args.get("date_from")}}},
+                        {"range": {"dates.end": {"lte": search.args.get("date_to")}}},
                         {"term": {"dates.all_day": True}},
                     ],
                 },
@@ -401,8 +429,8 @@ def _set_event_date_range(search):
                 # Starts before date_from and finishes after date_to, all day version
                 "bool": {
                     "filter": [
-                        {"range": {"dates.start": {"lt": search.args["date_from"]}}},
-                        {"range": {"dates.end": {"gt": search.args["date_to"]}}},
+                        {"range": {"dates.start": {"lt": search.args.get("date_from")}}},
+                        {"range": {"dates.end": {"gt": search.args.get("date_to")}}},
                         {"term": {"dates.all_day": True}},
                     ],
                 },
@@ -422,8 +450,16 @@ def _set_event_date_range(search):
                 # Start date is within range OR End date is within range, all day version
                 "bool": {
                     "should": [
-                        {"range": {"dates.start": {"gte": search.args["date_from"], "lte": search.args["date_to"]}}},
-                        {"range": {"dates.end": {"gte": search.args["date_from"], "lte": search.args["date_to"]}}},
+                        {
+                            "range": {
+                                "dates.start": {"gte": search.args.get("date_from"), "lte": search.args.get("date_to")}
+                            }
+                        },
+                        {
+                            "range": {
+                                "dates.end": {"gte": search.args.get("date_from"), "lte": search.args.get("date_to")}
+                            }
+                        },
                     ],
                     "filter": {"term": {"dates.all_day": True}},
                     "minimum_should_match": 1,
