@@ -1,7 +1,8 @@
 from datetime import datetime
 
+from bson import ObjectId
 from pydantic import Field
-from typing import Annotated, Any, Dict, List, Optional
+from typing import Annotated, Any, Dict, List, Optional, Union
 
 from newsroom.user_roles import UserRole
 from newsroom.companies.companies_async import CompanyProduct
@@ -41,10 +42,11 @@ class UserResourceModel(NewshubResourceModel):
     phone: Optional[str] = None
     mobile: Optional[str] = None
     role: Optional[str] = None
-    signup_details: Optional[Dict[str, Any]] = None
-    country: str
     company: Annotated[Optional[ObjectIdField], validate_data_relation_async("companies")] = None
     user_type: UserRole = Field(default=UserRole.PUBLIC)
+
+    country: Optional[str] = None
+    signup_details: Optional[Dict[str, Any]] = None
 
     is_validated: bool = False
     is_enabled: bool = True
@@ -54,8 +56,8 @@ class UserResourceModel(NewshubResourceModel):
     is_approved: bool = False
     expiry_alert: bool = False
 
-    token: str
-    token_expiry_date: datetime
+    token: Optional[str] = None
+    token_expiry_date: Optional[datetime] = None
 
     receive_email: bool = True
     receive_app_notifications: bool = True

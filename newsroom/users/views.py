@@ -11,7 +11,7 @@ from superdesk.flask import jsonify, render_template, request, abort, session
 from superdesk import get_resource_service
 
 from newsroom.user_roles import UserRole
-from newsroom.auth import get_user_by_email, get_company, get_user_required
+from newsroom.auth import get_user_by_email, get_company
 from newsroom.auth.utils import (
     get_auth_providers,
     send_token,
@@ -41,6 +41,8 @@ from newsroom.utils import query_resource, find_one, get_json_or_400, get_vocabu
 from newsroom.monitoring.views import get_monitoring_for_company
 from newsroom.ui_config_async import UiConfigResourceService
 
+from .utils import get_company_from_user_or_session, get_user_or_abort, get_company_from_user
+
 
 def get_settings_data():
     app = get_current_app().as_any()
@@ -56,28 +58,35 @@ def get_settings_data():
 
 
 async def get_view_data():
-    user = get_user_required()
-    company = get_company(user)
-    auth_provider = get_company_auth_provider(company)
+    user = await get_user_or_abort()
+    user_as_dict = user.model_dump(by_alias=True, exclude_unset=True)
+
+    company = await get_company_from_user_or_session(user)
+    company_as_dict = company.model_dump(by_alias=True, exclude_unset=True)
+
+    auth_provider = get_company_auth_provider(company_as_dict)
     ui_config_service = UiConfigResourceService()
-    rv = {
-        "user": user if user else None,
-        "company": str(company["_id"]) if company else "",
-        "topics": get_user_topics(user["_id"]) if user else [],
-        "companyName": get_user_company_name(user),
+
+    user_company = await get_company_from_user(user)
+
+    view_data = {
+        "user": user_as_dict,
+        "company": company.id or "",
+        "topics": get_user_topics(user.id) if user else [],
+        "companyName": user_company.name or "",
         "locators": get_vocabulary("locators"),
-        "monitoring_list": get_monitoring_for_company(user),
         "ui_configs": await ui_config_service.get_all_config(),
         "groups": get_app_config("WIRE_GROUPS", []),
         "authProviderFeatures": dict(auth_provider.features),
     }
 
     if get_app_config("ENABLE_MONITORING"):
-        rv["monitoring_list"] = get_monitoring_for_company(user)
+        # TODO-ASYNC: update when monitoring app is moved to async
+        view_data["monitoring_list"] = get_monitoring_for_company(user_as_dict)
 
-    rv.update(get_company_sections_monitoring_data(company, user))
+    view_data.update(await get_company_sections_monitoring_data(company, user))
 
-    return rv
+    return view_data
 
 
 @blueprint.route("/myprofile", methods=["GET"])

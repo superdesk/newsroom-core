@@ -1,6 +1,10 @@
+import superdesk
+
 from flask_babel import lazy_gettext
 
-import superdesk
+from newsroom.companies.companies_async.types import CompanyResource
+from newsroom.users.model import UserResourceModel
+
 from superdesk.core import json, get_current_app
 from apps.prepopulate.app_initialize import get_filepath
 
@@ -11,22 +15,19 @@ from .companies import CompaniesResource, CompaniesService
 from .module import module  # noqa
 
 
-def get_company_sections_monitoring_data(company_id, user):
+async def get_company_sections_monitoring_data(company: CompanyResource, user: UserResourceModel):
     """get the section configured for the company"""
     app = get_current_app().as_any()
-    if not company_id or user["user_type"] == UserRole.ADMINISTRATOR.value:
+
+    if not company or user.user_type == UserRole.ADMINISTRATOR.value:
         return {"userSections": app.sections}
 
-    company = superdesk.get_resource_service("companies").find_one(req=None, _id=company_id)
+    data = {"monitoring_administrator": company.monitoring_administrator, "userSections": app.sections}
 
-    rv = {
-        "monitoring_administrator": (company or {}).get("monitoring_administrator"),
-        "userSections": app.sections,
-    }
-    if company and company.get("sections"):
-        rv["userSections"] = [s for s in app.sections if company.get("sections").get(s["_id"])]
+    if company and company.sections:
+        data["userSections"] = [s for s in app.sections if company.sections.get(s["_id"])]
 
-    return rv
+    return data
 
 
 def get_user_company_name(user) -> str:

@@ -1,7 +1,8 @@
-import enum
+from enum import Enum, unique
 
 
-class UserRole(enum.Enum):
+@unique
+class UserRole(str, Enum):
     ADMINISTRATOR = "administrator"
     INTERNAL = "internal"
     PUBLIC = "public"
