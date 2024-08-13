@@ -32,7 +32,7 @@ from newsroom.notifications import (
 )
 from newsroom.search import BoolQuery, BoolQueryParams
 from newsroom.template_filters import is_admin_or_internal, is_admin
-from newsroom.utils import get_user_dict, get_company_dict, get_entity_or_404, parse_date_str, get_utcnow
+from newsroom.utils import get_user_dict, get_company_dict, get_entity_or_404, parse_date_str
 from newsroom.utils import get_local_date, get_end_date
 from datetime import datetime
 from newsroom.wire import url_for_wire
