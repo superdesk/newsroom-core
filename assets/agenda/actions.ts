@@ -45,6 +45,7 @@ import {searchParamsSelector, searchFilterSelector} from 'search/selectors';
 import {clearAgendaDropdownFilters} from '../local-store';
 import {getLocations, getMapSource} from '../maps/utils';
 import {ILocation} from 'interfaces/agenda';
+import {IDateFilter} from 'interfaces/common';
 
 const WATCH_URL = '/agenda_watch';
 const WATCH_COVERAGE_URL = '/agenda_coverage_watch';
@@ -234,6 +235,7 @@ function search(state: IAgendaState, fetchFrom: number): Promise<IRestApiRespons
         featured,
         fromDate,
         toDate,
+        date_filter
     } = getAgendaSearchParamsFromState(state);
 
     const params: any = {
@@ -245,6 +247,7 @@ function search(state: IAgendaState, fetchFrom: number): Promise<IRestApiRespons
         from: fetchFrom,
         date_from: fromDate,
         date_to: toDate,
+        date_filter: date_filter,
         timezone_offset: getTimezoneOffset(),
         featured: featured,
         itemType: itemType,
@@ -290,6 +293,7 @@ interface AgendaSearchParams {
     featured: boolean;
     fromDate?: string;
     toDate?: string;
+    date_filter?: string;
 }
 
 function getAgendaSearchParamsFromState(state: IAgendaState): AgendaSearchParams {
@@ -319,11 +323,14 @@ function getAgendaSearchParamsFromState(state: IAgendaState): AgendaSearchParams
         ) ? agendaDate : createdFilter.from;
     }
 
+    const defaultFilter = state.dateFilters?.find((filter:any)=> filter.default);
+
     return {
         itemType: itemTypeFilter,
         searchParams: searchParams,
         featured: featuredFilter,
         fromDate: fromDate,
+        date_filter: state?.search?.createdFilter?.date_filter || defaultFilter?.filter,
         toDate: createdFilter.from?.startsWith('now/') ?
             createdFilter.from :
             createdFilter.to,
