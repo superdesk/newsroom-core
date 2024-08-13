@@ -373,16 +373,16 @@ function setListGroupsAndLoadHiddenItems(items: Array<IAgendaItem>, next?: boole
                     maxDate = moment().startOf('day');
                 }else if (activeFilterQuery === 'now+7d/d') { 
                     minDate = moment().startOf('day');
-                    maxDate = moment().clone().add(7, 'days').endOf('day');
+                    maxDate = moment().add(7, 'days').endOf('day');
                 } else if (activeFilterQuery === 'now+30d/d') {
                     minDate = moment().startOf('day');
-                    maxDate = moment().clone().add(30, 'days').endOf('day');
+                    maxDate = moment().add(30, 'days').endOf('day');
                 } else if (activeFilterQuery === 'now+3M/d') {
                     minDate = moment().startOf('day');
-                    maxDate = moment().clone().add(90, 'days').endOf('day');
+                    maxDate = moment().add(90, 'days').endOf('day');
                 } else if (activeFilterQuery === 'now+12M/d') {
                     minDate = moment().startOf('day');
-                    maxDate = moment().clone().add(12, 'months').endOf('day');
+                    maxDate = moment().add(12, 'months').endOf('day');
                 } else {
                     minDate = moment().startOf('day');
                     maxDate = minDate.clone();
