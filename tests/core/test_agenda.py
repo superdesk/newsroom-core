@@ -753,8 +753,8 @@ def test_agenda_filters_query(app):
             "AGENDA_TIME_FILTERS": [
                 {"name": "Next 7 days", "filter": "next_7_days", "query": "now+7d/d"},
                 {"name": "Next 30 days", "filter": "next_30_days", "query": "now+30d/d"},
-                {"name": "Next 3 months", "filter": "next_3_months", "query": "now+90d/d"},
-                {"name": "Next 12 months", "filter": "next_12_months", "query": "now+12M/M", "default": True},
+                {"name": "Next 3 months", "filter": "next_3_months", "query": "now+3M/d"},
+                {"name": "Next 12 months", "filter": "next_12_months", "query": "now+12M/d", "default": True},
                 {"name": "Last 7 days", "filter": "last_7_days", "query": "now-7d/d"},
                 {"name": "Last 30 days", "filter": "last_30_days", "query": "now-30d/d"},
                 {"name": "Last 24 hours", "filter": "last_24_hours", "query": "now-24h/h"},

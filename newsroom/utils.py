@@ -540,9 +540,9 @@ def get_end_date(date_range, start_date):
         return start_date + timedelta(days=7)
     if date_range == "now+30d/d":
         return start_date + timedelta(days=30)
-    if date_range == "now+90d/d":
+    if date_range == "now+3M/d":
         return start_date + timedelta(days=90)
-    if date_range == "now+12M/M":
+    if date_range == "now+12M/d":
         return start_date + timedelta(days=365)
     return start_date
 
