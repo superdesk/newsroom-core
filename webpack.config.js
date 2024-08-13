@@ -56,6 +56,7 @@ const config = {
                 loader: 'ts-loader',
                 options: {
                     transpileOnly: true,
+                    configFile: path.resolve(__dirname, 'tsconfig.json'),
                 },
             },
             {
