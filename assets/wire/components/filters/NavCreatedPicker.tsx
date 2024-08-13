@@ -23,9 +23,7 @@ function NavCreatedPicker({setCreatedFilter, createdFilter, context, dateFilters
         if (value === 'custom_date') {
             setCreatedFilter({...createdFilter, date_filter: value, from: '', to: ''});
         } else {
-            if (context === 'agenda') {
-                setCreatedFilter({...createdFilter, date_filter: value, from: undefined, to: undefined});
-            }
+            setCreatedFilter({...createdFilter, date_filter: value, from: undefined, to: undefined});
         }
     };
 
