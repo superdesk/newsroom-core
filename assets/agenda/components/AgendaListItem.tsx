@@ -132,7 +132,9 @@ class AgendaListItem extends React.Component<IProps> {
                 'wire-articles__item--not-covering': !hasCoverages(this.props.item),
                 'wire-articles__item--postponed': isPostponed(this.props.item),
                 'wire-articles__item--canceled': isCanceled(this.props.item),
-                'wire-articles__item--visited': this.props.isRead,
+
+                // Planning items don't have a version, while event items do, which is affecting the `isRead` prop.
+                'wire-articles__item--visited': this.props.item.item_type === 'event' ? !this.props.isRead : this.props.isRead,
                 'wire-articles__item--rescheduled': isRescheduled(this.props.item),
                 'wire-articles__item--selected': this.props.isSelected,
                 'wire-articles__item--open': this.props.isActive,
@@ -209,9 +211,9 @@ class AgendaListItem extends React.Component<IProps> {
                     if (segmentsRemainingToBeAdded > 0) {
                         paragraphsInnerText += paragraph.innerText;
                         paragraph.innerHTML = paragraph.innerHTML.split('<br>').filter((p: string) => p.trim() !== '').slice(0, segmentsRemainingToBeAdded).join('<br>');
-    
+
                         segmentsRemainingToBeAdded = segmentsRemainingToBeAdded - getSegmentCount(paragraph);
-    
+
                         descriptionHTMLArr.push(paragraph);
                     }
                 });
