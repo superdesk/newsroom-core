@@ -56,6 +56,7 @@ const config = {
                 loader: 'ts-loader',
                 options: {
                     transpileOnly: true,
+                    configFile: path.resolve(__dirname, 'tsconfig.json'),
                 },
             },
             {
@@ -99,6 +100,9 @@ const config = {
     devServer: {
         compress: true,
         host: "0.0.0.0",
+        headers: {
+            "Access-Control-Allow-Origin": "*",
+        },
     },
 };
 
