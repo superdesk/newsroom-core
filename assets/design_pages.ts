@@ -1,5 +1,4 @@
 import 'url-search-params-polyfill';
-import 'whatwg-fetch';
 import {Tooltip, Dropdown} from 'bootstrap';
 import {isTouchDevice} from 'utils';
 import {setElementStyle, elementHasClass, replaceElementClasses, onElementClicked, removeElementClass} from 'domUtils';
