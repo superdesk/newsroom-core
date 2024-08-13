@@ -8,19 +8,21 @@ export const DISPLAY_ABSTRACT = getConfig('display_abstract');
 
 const STATUS_KILLED = 'canceled';
 
-
+const DEFAULT_NO_VERSION = 0;
 /**
  * Returns the item version as integer
  *
  * @param {Object} item
  * @returns {number}
  */
-export function getIntVersion(item: IArticle | IAgendaItem | undefined): number | undefined {
+export function getIntVersion(item: IArticle | IAgendaItem | undefined): number {
     if (item != null && item.version != null) {
         return typeof item.version === 'number' ?
             item.version :
             parseInt(item.version, 10) || 0;
     }
+
+    return DEFAULT_NO_VERSION;
 }
 
 /**
