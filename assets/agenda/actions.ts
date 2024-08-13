@@ -45,7 +45,6 @@ import {searchParamsSelector, searchFilterSelector} from 'search/selectors';
 import {clearAgendaDropdownFilters} from '../local-store';
 import {getLocations, getMapSource} from '../maps/utils';
 import {ILocation} from 'interfaces/agenda';
-import {IDateFilter} from 'interfaces/common';
 
 const WATCH_URL = '/agenda_watch';
 const WATCH_COVERAGE_URL = '/agenda_coverage_watch';
@@ -323,14 +322,12 @@ function getAgendaSearchParamsFromState(state: IAgendaState): AgendaSearchParams
         ) ? agendaDate : createdFilter.from;
     }
 
-    const defaultFilter = state.dateFilters?.find((filter:any)=> filter.default);
-
     return {
         itemType: itemTypeFilter,
         searchParams: searchParams,
         featured: featuredFilter,
         fromDate: fromDate,
-        date_filter: state?.search?.createdFilter?.date_filter || defaultFilter?.filter,
+        date_filter: state?.search?.createdFilter?.date_filter,
         toDate: createdFilter.from?.startsWith('now/') ?
             createdFilter.from :
             createdFilter.to,

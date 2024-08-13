@@ -86,5 +86,4 @@ export interface IDateFilter {
     default?: boolean,
     filter?: string;
     query?: string;
-    find?: any;
 }

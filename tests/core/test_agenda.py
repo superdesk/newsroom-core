@@ -758,6 +758,9 @@ def test_agenda_filters_query(app):
                 {"name": "Last 7 days", "filter": "last_7_days", "query": "now-7d/d"},
                 {"name": "Last 30 days", "filter": "last_30_days", "query": "now-30d/d"},
                 {"name": "Last 24 hours", "filter": "last_24_hours", "query": "now-24h/h"},
+                {"name": "Today", "query": "now/d", "filter": "today"},
+                {"name": "This Week", "query": "now/w", "filter": "this_week"},
+                {"name": "This Month", "query": "now/M", "filter": "this_month"},
             ]
         }
     )
@@ -781,3 +784,15 @@ def test_agenda_filters_query(app):
     date_range = get_date_filters(args)
     assert date_range["gt"] == datetime(2024, 8, 12, 0, 0, tzinfo=pytz.UTC)
     assert date_range["lt"] == datetime(2024, 9, 12, 23, 59, 59, tzinfo=pytz.UTC)
+
+    # Test case 4: Default case where default filter is "next_12_months"
+    args = {"date_from": "2024-08-12"}
+    date_range = get_date_filters(args)
+    assert date_range["gt"] == datetime(2024, 8, 12, 0, 0, tzinfo=pytz.UTC)
+    assert date_range["lt"] == datetime(2025, 8, 12, 0, 0, tzinfo=pytz.UTC)
+
+    # Test case 5: Filter for this_week
+    args = {"date_from": "2024-08-13", "date_filter": "today"}
+    date_range = get_date_filters(args)
+    assert date_range["gt"] == datetime(2024, 8, 13, 0, 0, tzinfo=pytz.UTC)
+    assert date_range["lt"] == datetime(2024, 8, 13, 23, 59, 59, tzinfo=pytz.UTC)
