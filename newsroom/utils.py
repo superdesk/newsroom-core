@@ -503,7 +503,7 @@ def today(time, offset):
     return local_start_date
 
 
-def format_date(date, time, offset):
+def format_date(date, time, offset, is_future=False):
     _today = today(time, offset)
     if date == "now/d":
         return today(time, offset)
@@ -519,13 +519,6 @@ def format_date(date, time, offset):
         return _today - timedelta(days=7)
     if date == "now-30d/d":
         return _today - timedelta(days=30)
-    if date == "now30d/d":
-        return _today + timedelta(days=30)
-    if date == "now3M/M":
-        return _today + timedelta(days=90)
-    if date == "now12M/M":
-        return _today + timedelta(days=365)
-
     return datetime.strptime("%sT%s" % (date, time), "%Y-%m-%dT%H:%M:%S")
 
 
@@ -543,6 +536,14 @@ def get_end_date(date_range, start_date):
         return start_date + relativedelta(months=+1) - timedelta(days=1)
     if date_range in ("now-24h/h", "now-7d/d", "now-30d/d"):
         start_date
+    if date_range == "now+7d/d":
+        return start_date + timedelta(days=7)
+    if date_range == "now+30d/d":
+        return start_date + timedelta(days=30)
+    if date_range == "now+90d/d":
+        return start_date + timedelta(days=90)
+    if date_range == "now+12M/M":
+        return start_date + timedelta(days=365)
     return start_date
 
 
