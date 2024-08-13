@@ -503,7 +503,7 @@ def today(time, offset):
     return local_start_date
 
 
-def format_date(date, time, offset, is_future=False):
+def format_date(date, time, offset):
     _today = today(time, offset)
     if date == "now/d":
         return today(time, offset)
