@@ -315,7 +315,7 @@ def get_date_filter_query(filter_name: str):
     time_filters = app.config.get("AGENDA_TIME_FILTERS", [])
     default_filter = next((f for f in time_filters if f.get("default")), None)
     if not filter_name:
-        return default_filter["query"]
+        return default_filter["query"] if default_filter else None
     if filter_name == "custom_date":
         return None
     for time_filter in time_filters:
