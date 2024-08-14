@@ -16,7 +16,7 @@ import {
     fetchFoldersWire,
 } from './actions';
 import {setView} from 'search/actions';
-import {WIRE_TOPIC_FOLDERS_UPDATED} from 'user-profile';
+import {WIRE_TOPIC_FOLDERS_UPDATED} from 'user-profile/constants';
 
 const store = createStore(wireReducer, 'Wire');
 

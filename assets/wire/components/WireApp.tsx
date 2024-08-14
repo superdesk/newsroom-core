@@ -339,7 +339,7 @@ WireApp.propTypes = {
     searchParams: PropTypes.object,
     showSaveTopic: PropTypes.bool,
     filterGroupLabels: PropTypes.object,
-    dateFilters: PropTypes.object,
+    dateFilters: PropTypes.arrayOf(PropTypes.object),
 };
 
 const mapStateToProps = (state: any) => ({
