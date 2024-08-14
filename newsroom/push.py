@@ -20,7 +20,6 @@ from superdesk.utc import utcnow
 from superdesk.errors import SuperdeskApiError
 from planning.common import WORKFLOW_STATE
 from newsroom.celery_app import celery
-from newsroom.errors import LockedError
 from superdesk.lock import lock, unlock
 
 from newsroom.notifications import (
@@ -41,7 +40,7 @@ from newsroom.email import (
 from newsroom.history import get_history_users
 from newsroom.wire.views import delete_dashboard_caches
 from newsroom.wire import url_for_wire
-from newsroom.upload import ASSETS_RESOURCE
+from newsroom.assets import ASSETS_RESOURCE
 from newsroom.agenda.utils import (
     get_latest_available_delivery,
     TO_BE_CONFIRMED_FIELD,
@@ -764,7 +763,9 @@ def set_item_reference(coverage):
 def locked(_id: str, service: str):
     lock_name = f"notify-{service}-{_id}"
     if not lock(lock_name, expire=300):
-        raise LockedError(lock_name)
+        logger.debug(f"Lock conflict on {lock_name}")
+        return
+
     logger.debug("Starting task %s", lock_name)
     try:
         yield lock_name
@@ -1038,14 +1039,15 @@ async def push_binary():
     media = (await request.files)["media"]
     media_id = (await request.form)["media_id"]
     app = get_current_app()
-    app.media.put(media, resource=ASSETS_RESOURCE, _id=media_id, content_type=media.content_type)
+    await app.media_async.put(media, media_id, resource=ASSETS_RESOURCE, _id=media_id, content_type=media.content_type)
     return jsonify({"status": "OK"}), 201
 
 
 @blueprint.route("/push_binary/<media_id>")
-def push_binary_get(media_id):
+async def push_binary_get(media_id):
     app = get_current_app()
-    if app.media.get(media_id, resource=ASSETS_RESOURCE):
+    media_file = await app.media_async.get(media_id, resource=ASSETS_RESOURCE)
+    if media_file:
         return jsonify({})
     else:
         abort(404)

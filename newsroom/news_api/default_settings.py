@@ -33,12 +33,14 @@ CORE_APPS = [
     "newsroom.products",
     "newsroom.news_api.api_audit",
     "newsroom.news_api.news.assets.assets",
-    "newsroom.upload",
     "newsroom.news_api.news.atom.atom",
     "newsroom.history",
 ]
 
+# TODO-ASYNC: commenting this out for now as it breaks with
+# ValueError: The name 'assets' is already registered for a different blueprint
 MODULES = [
+    "newsroom.assets.module"
     "newsroom.companies",
 ]
 

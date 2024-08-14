@@ -78,7 +78,7 @@ class iCalFormatter(BaseFormatter):
             if media.get("media"):
                 event.add(
                     "attach",
-                    url_for("upload.get_upload", media_id=media["media"], _external=True),
+                    url_for("assets.get_upload", media_id=media["media"], _external=True),
                 )
 
         # geo

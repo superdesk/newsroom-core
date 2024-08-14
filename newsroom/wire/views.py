@@ -1,5 +1,6 @@
 import io
 import zipfile
+from inspect import iscoroutinefunction
 import superdesk
 
 from typing import Dict
@@ -56,7 +57,7 @@ from newsroom.public.views import (
 
 from .search import get_bookmarks_count
 from .items import get_items_for_dashboard
-from ..upload import ASSETS_RESOURCE, get_upload
+from newsroom.assets import ASSETS_RESOURCE, get_upload
 from newsroom.ui_config_async import UiConfigResourceService
 from newsroom.users import get_user_profile_data
 
@@ -298,8 +299,6 @@ async def search():
 @blueprint.route("/download", methods=["POST"])
 @login_required
 async def download():
-    from inspect import iscoroutinefunction
-
     user = get_user(required=True)
     data = await request.get_json()
     _format = data.get("format", "text")

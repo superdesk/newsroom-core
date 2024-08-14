@@ -9,7 +9,6 @@ import functools
 from bson import ObjectId
 from pymongo import MongoClient
 from quart import Quart, Config
-from eve.io.mongo import ensure_mongo_indexes
 
 from superdesk.cache import cache
 

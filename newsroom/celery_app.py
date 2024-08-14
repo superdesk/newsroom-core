@@ -15,74 +15,24 @@ Created on May 29, 2014
 """
 
 import logging
+import newsroom
 
-import arrow
-from bson import ObjectId
 from celery import Celery
 from celery.worker.request import Request
-from kombu.serialization import register
-from eve.io.mongo import MongoJSONEncoder
-from eve.utils import str_to_date
 
-from superdesk.core import json, get_current_app
-from superdesk.celery_app import (  # noqa
-    finish_subtask_from_progress,
-    finish_task_for_progress,
-    __get_redis,
-    update_key,
-    _update_subtask_progress,
-)
-
-import newsroom
-from newsroom.errors import LockedError
+from superdesk.celery_app import __get_redis, HybridAppContextTask, ContextAwareSerializerFactory
 
 
 logger = logging.getLogger(__name__)
-celery = Celery(__name__)
-TaskBase = celery.Task
 
 
-def try_cast(v):
-    # False and 0 are getting converted to datetime by arrow
-    if v is None or isinstance(v, bool) or v == 0:
-        return v
-
-    try:
-        str_to_date(v)  # try if it matches format
-        return arrow.get(v).datetime  # return timezone aware time
-    except Exception:
-        try:
-            return ObjectId(v)
-        except Exception:
-            return v
+def get_newsroom_web_app():
+    # using `newsroom.flas_app` as it's the one that returns the right app context
+    return newsroom.flask_app
 
 
-def dumps(o):
-    return MongoJSONEncoder().encode(o)
-
-
-def loads(s):
-    o = json.loads(s)
-    return serialize(o)
-
-
-def serialize(o):
-    if isinstance(o, list):
-        return [serialize(item) for item in o]
-    elif isinstance(o, dict):
-        if o.get("kwargs") and not isinstance(o["kwargs"], dict):
-            o["kwargs"] = json.loads(o["kwargs"])
-        return {k: serialize(v) for k, v in o.items()}
-    else:
-        return try_cast(o)
-
-
-register("newsroom/json", dumps, loads, content_type="application/json")
-
-
-def handle_exception(exc):
-    """Log exception to logger."""
-    logger.exception(exc)
+serializer_factory = ContextAwareSerializerFactory(get_newsroom_web_app)
+serializer_factory.register_serializer("newsroom/json")
 
 
 class NewsroomRequest(Request):
@@ -100,27 +50,17 @@ class NewsroomRequest(Request):
         logger.warning("Failure detected for task %s", self.task.name)
 
 
-class AppContextTask(TaskBase):  # type: ignore
-    abstract = True
+class NewsroomContextTask(HybridAppContextTask):
     serializer = "newsroom/json"
     Request = NewsroomRequest
 
-    # TODO-ASYNC: Support async celery tasks (requires async with app.app_context())
-    def __call__(self, *args, **kwargs):
-        try:
-            return super().__call__(*args, **kwargs)
-        except LockedError as e:  # workaround to skip with block body without error logged
-            logger.debug("Lock conflict on %s", e)
-        except Exception as e:
-            logger.warning("Error when calling task %s", self.name)
-            handle_exception(e)
-
-    def on_failure(self, exc, task_id, args, kwargs, einfo):
-        logger.warning("Failure detected for task %s", self.name)
-        handle_exception(exc)
+    def get_current_app(self):
+        """Simple override to use the right context app"""
+        return get_newsroom_web_app()
 
 
-celery.Task = AppContextTask
+celery = Celery(__name__)
+celery.Task = NewsroomContextTask
 
 
 def init_celery(app):

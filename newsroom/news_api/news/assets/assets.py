@@ -1,3 +1,4 @@
+import superdesk
 import bson.errors
 from io import BytesIO
 from datetime import datetime, timezone, timedelta
@@ -6,9 +7,8 @@ from quart_babel import gettext
 
 from superdesk.core import get_current_app
 from superdesk.flask import abort, Blueprint, request
-import superdesk
 
-from newsroom.upload import ASSETS_RESOURCE
+from newsroom.assets import ASSETS_RESOURCE
 from newsroom.news_api.utils import post_api_audit
 
 
@@ -28,7 +28,7 @@ async def get_item(asset_id):
         return abort(401, gettext("Invalid token"))
 
     try:
-        media_file = app.media.get(asset_id, ASSETS_RESOURCE)
+        media_file = await app.media_async.get(asset_id, resource=ASSETS_RESOURCE)
     except bson.errors.InvalidId:
         media_file = None
     if not media_file:

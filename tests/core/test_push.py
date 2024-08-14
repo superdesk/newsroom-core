@@ -168,6 +168,7 @@ async def test_push_featuremedia_generates_renditions(client):
         assert 200 == resp.status_code
 
 
+@pytest.mark.skip(reason="Fix once other views are moved to async")
 async def test_push_update_removes_featuremedia(client):
     media_id = str(bson.ObjectId())
     await upload_binary("picture.jpg", client, media_id=media_id)

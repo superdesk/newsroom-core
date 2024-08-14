@@ -4,6 +4,7 @@ from typing import List
 from bson import ObjectId
 from quart_babel import gettext
 
+from newsroom.flask import get_file_from_request
 from superdesk.core import get_current_app, json
 from superdesk.flask import jsonify, request
 from superdesk import get_resource_service
@@ -17,7 +18,7 @@ from newsroom.utils import (
     set_original_creator,
     set_version_creator,
 )
-from newsroom.upload import get_file
+from newsroom.assets import save_file_and_get_url
 
 
 def get_settings_data():
@@ -76,9 +77,12 @@ async def _get_navigation_data(data):
     }
 
     for index, tile in enumerate(navigation_data["tile_images"] or []):
-        file_url = await get_file("file{}".format(index))
-        if file_url:
-            tile["file_url"] = file_url
+        file = await get_file_from_request(f"file{index}")
+
+        if file:
+            file_url = await save_file_and_get_url(f"file{index}")
+            if file_url:
+                tile["file_url"] = file_url
 
     return navigation_data
 
