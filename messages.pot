@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Newsroom-Core 2.8.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-08-13 11:56+0200\n"
+"POT-Creation-Date: 2024-08-14 08:25+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -207,43 +207,43 @@ msgstr ""
 msgid "Place"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:56
+#: newsroom/agenda/agenda.py:51
 msgid "An event you have been watching has been updated"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:57
+#: newsroom/agenda/agenda.py:52
 msgid "Event updated"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:60
+#: newsroom/agenda/agenda.py:55
 msgid "An event you have been watching has been cancelled"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:61
+#: newsroom/agenda/agenda.py:56
 msgid "Event cancelled"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:64
+#: newsroom/agenda/agenda.py:59
 msgid "An event you have been watching has a new planning"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:65
+#: newsroom/agenda/agenda.py:60
 msgid "Planning added"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:68
+#: newsroom/agenda/agenda.py:63
 msgid "An event you have been watching has a planning cancelled"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:69
+#: newsroom/agenda/agenda.py:64
 msgid "Planning cancelled"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:72
+#: newsroom/agenda/agenda.py:67
 msgid "An event you have been watching has a new coverage added"
 msgstr ""
 
-#: newsroom/agenda/agenda.py:73
+#: newsroom/agenda/agenda.py:68
 msgid "Coverage added"
 msgstr ""
 
@@ -1476,11 +1476,11 @@ msgstr ""
 msgid "Last 30 days"
 msgstr ""
 
-#: newsroom/web/default_settings.py:844
+#: newsroom/web/default_settings.py:843
 msgid "This Week"
 msgstr ""
 
-#: newsroom/web/default_settings.py:848
+#: newsroom/web/default_settings.py:844
 msgid "This Month"
 msgstr ""
 
@@ -1599,39 +1599,39 @@ msgstr ""
 msgid "Disconnected from Notification Server!"
 msgstr ""
 
-#: assets/agenda/actions.ts:125
+#: assets/agenda/actions.ts:126
 msgid "Your inquiry has been sent successfully"
 msgstr ""
 
-#: assets/agenda/actions.ts:408
+#: assets/agenda/actions.ts:430
 msgid "Started watching items successfully."
 msgstr ""
 
-#: assets/agenda/actions.ts:419
+#: assets/agenda/actions.ts:441
 msgid "Stopped watching items successfully."
 msgstr ""
 
-#: assets/agenda/actions.ts:464 assets/wire/actions.ts:360
+#: assets/agenda/actions.ts:486 assets/wire/actions.ts:360
 msgid "Items were bookmarked successfully."
 msgstr ""
 
-#: assets/agenda/actions.ts:466 assets/wire/actions.ts:362
+#: assets/agenda/actions.ts:488 assets/wire/actions.ts:362
 msgid "Item was bookmarked successfully."
 msgstr ""
 
-#: assets/agenda/actions.ts:481 assets/wire/actions.ts:377
+#: assets/agenda/actions.ts:503 assets/wire/actions.ts:377
 msgid "Items were removed from bookmarks successfully."
 msgstr ""
 
-#: assets/agenda/actions.ts:483 assets/wire/actions.ts:379
+#: assets/agenda/actions.ts:505 assets/wire/actions.ts:379
 msgid "Item was removed from bookmarks successfully."
 msgstr ""
 
-#: assets/agenda/actions.ts:796
+#: assets/agenda/actions.ts:818
 msgid "Started watching coverage successfully."
 msgstr ""
 
-#: assets/agenda/actions.ts:809
+#: assets/agenda/actions.ts:831
 msgid "Stopped watching coverage successfully."
 msgstr ""
 
@@ -3100,7 +3100,7 @@ msgstr ""
 #: assets/components/cards/render/EventsTwoByTwoCard.tsx:33
 #: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:194
 #: assets/user-profile/components/PauseNotificationModal.tsx:126
-#: assets/wire/components/filters/NavCreatedPicker.tsx:74
+#: assets/wire/components/filters/NavCreatedPicker.tsx:70
 msgid "To"
 msgstr ""
 
@@ -3888,7 +3888,7 @@ msgstr ""
 #: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:157
 #: assets/search/components/SearchResultsBar/SearchResultsFiltersRow.tsx:176
 #: assets/user-profile/components/PauseNotificationModal.tsx:111
-#: assets/wire/components/filters/NavCreatedPicker.tsx:62
+#: assets/wire/components/filters/NavCreatedPicker.tsx:58
 msgid "From"
 msgstr ""
 
@@ -4389,15 +4389,15 @@ msgstr ""
 msgid "Search Filters"
 msgstr ""
 
-#: assets/wire/components/filters/NavCreatedPicker.tsx:40
+#: assets/wire/components/filters/NavCreatedPicker.tsx:36
 msgid "Event Date"
 msgstr ""
 
-#: assets/wire/components/filters/NavCreatedPicker.tsx:40
+#: assets/wire/components/filters/NavCreatedPicker.tsx:36
 msgid "Published By"
 msgstr ""
 
-#: assets/wire/components/filters/NavCreatedPicker.tsx:56
+#: assets/wire/components/filters/NavCreatedPicker.tsx:52
 msgid "Custom date range"
 msgstr ""
 
